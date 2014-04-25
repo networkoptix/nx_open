@@ -7,7 +7,7 @@ class QnInstantBusinessEvent: public QnAbstractBusinessEvent
 {
     typedef QnAbstractBusinessEvent base_type;
 protected:
-    explicit QnInstantBusinessEvent(BusinessEventType::Value eventType,
+    explicit QnInstantBusinessEvent(QnBusiness::EventType eventType,
                                     const QnResourcePtr& resource,
                                     qint64 timeStamp);
 public:

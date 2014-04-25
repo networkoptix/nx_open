@@ -3,8 +3,9 @@
 
 #include <QtCore/QUuid>
 #include <QtCore/QCryptographicHash>
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/user_resource.h"
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
 #include "api/app_server_connection.h"
@@ -38,8 +39,7 @@ QnAuthHelper* QnAuthHelper::instance()
     return m_instance;
 }
 
-bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response)
-{
+bool QnAuthHelper::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response) {
     QString cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
     int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
     if (customAuthInfoPos >= 0) {
@@ -49,6 +49,10 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         if (doCustomAuthorization(digest.toLatin1(), response, QnAppServerConnectionFactory::prevSessionKey()))
             return true;
     }
+
+    nx_http::StringType videoWall_auth = nx_http::getHeaderValue( request.headers, "X-NetworkOptix-VideoWall" );
+    if (!videoWall_auth.isEmpty())
+        return (!qnResPool->getResourceById(QUuid(videoWall_auth)).dynamicCast<QnVideoWallResource>().isNull());
 
     nx_http::StringType authorization = nx_http::getHeaderValue( request.headers, "Authorization" );
     if (authorization.isEmpty()) {

@@ -33,10 +33,9 @@ void QnTransactionLog::init()
 
     m_relativeOffset = 0;
     QSqlQuery queryTime(m_dbManager->getDB());
-    queryTime.prepare("SELECT max(timestamp) FROM transaction_log where peer_guid = ?");
-    queryTime.bindValue(0, qnCommon->moduleGUID().toRfc4122());
+    queryTime.prepare("SELECT max(timestamp) FROM transaction_log");
     if (queryTime.exec() && queryTime.next()) {
-        m_relativeOffset = queryTime.value(0).toLongLong();
+        m_relativeOffset = qMax(0ll, queryTime.value(0).toLongLong());
     }
 
     QSqlQuery querySequence(m_dbManager->getDB());
@@ -101,20 +100,16 @@ QnTranState QnTransactionLog::getTransactionsState()
 
 bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash)
 {
-    /*
-    QReadLocker lock(&m_dbManager->getMutex());
     if (m_state.value(tran.id.peerGUID) >= tran.id.sequence)
-        return true; // transaction from this peer already processed;
-
-    QMap<QUuid, QnAbstractTransaction>::iterator itr = m_updateHistory.find(hash);
+        return true;
+    QMap<QUuid, qint64>::iterator itr = m_updateHistory.find(hash);
     if (itr == m_updateHistory.end())
         return false;
-    QnAbstractTransaction& lastTran = *itr;
-    qAbs(tran.timestamp - lastTran.timestamp);
-    */
 
-    return m_state.value(tran.id.peerGUID) >= tran.id.sequence ||
-           m_updateHistory.value(hash) > tran.timestamp;
+    const qint64 lastTime = itr.value();
+    bool rez = lastTime > tran.timestamp ||
+        (lastTime == tran.timestamp && tran.id.peerGUID > qnCommon->moduleGUID());
+   return rez;
 }
 
 ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result)

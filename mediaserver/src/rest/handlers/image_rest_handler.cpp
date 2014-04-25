@@ -146,6 +146,11 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         return CODE_INVALID_PARAMETER;
     }
 
+#ifdef EDGE_SERVER
+    if (dstSize.height() < 1)
+        dstSize.setHeight(316); // default value
+#endif
+
     bool useHQ = true;
     if ((dstSize.width() > 0 && dstSize.width() <= 480) || (dstSize.height() > 0 && dstSize.height() <= 316))
         useHQ = false;
@@ -254,7 +259,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     const int roundedWidth = qPower2Ceil((unsigned) dstSize.width(), 8);
     const int roundedHeight = qPower2Ceil((unsigned) dstSize.height(), 2);
 
-    if (format == "jpg" || format == "jpeg" || format == "png")
+    if (format == "jpg" || format == "jpeg")
     {
         // prepare image using ffmpeg encoder
 
@@ -281,7 +286,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         AVCodec* codec = avcodec_find_encoder_by_name(format == "jpg" || format == "jpeg" ? "mjpeg" : format.constData());
         if (avcodec_open2(videoEncoderCodecCtx, codec, NULL) < 0)
         {
-            qWarning() << "Can't initialize ffmpeg encoder for encoding image";
+            qWarning() << "Can't initialize ffmpeg encoder for encoding image to format " << format;
         }
         else {
             const static int MAX_VIDEO_FRAME = roundedWidth * roundedHeight * 3;

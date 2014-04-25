@@ -8,6 +8,9 @@
 #include "utils/camera_advanced_settings_xml_parser.h"
 #include "ui/workbench/workbench_context_aware.h"
 #include "utils/common/connective.h"
+#ifdef WEBKIT_PRESENT
+#include <QtWebKitWidgets/QtWebKitWidgets>
+#endif
 
 namespace Ui {
     class SingleCameraSettingsWidget;
@@ -120,10 +123,13 @@ private slots:
     void at_motionRegionListChanged();
     void at_advancedSettingsLoaded(int status, const QnStringVariantPairList &params, int handle);
     void at_pingButton_clicked();
+    void at_analogViewCheckBox_clicked();
     void at_fisheyeSettingsChanged();
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
+    void updateLicensesButtonVisible();
+    void updateLicenseText();
     void updateIpAddressText();
     void updateWebPageText();
 
@@ -146,6 +152,12 @@ private:
     void loadAdvancedSettings();
 
     void cleanAdvancedSettings();
+#ifdef WEBKIT_PRESENT
+    void updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView);
+#endif
+    Q_SLOT void at_sslErrors(QNetworkReply* reply, const QList<QSslError> &);
+    Q_SLOT void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
+    Q_SLOT void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
 
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
@@ -184,6 +196,7 @@ private:
     mutable QnMediaServerConnectionPtr m_serverConnection;
 
     QHash<QnId, QnImageProvider*> m_imageProvidersByResourceId;
+	QUrl m_lastSiteUrl;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

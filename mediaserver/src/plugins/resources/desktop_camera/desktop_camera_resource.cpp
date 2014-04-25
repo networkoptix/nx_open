@@ -43,7 +43,7 @@ QnAbstractStreamDataProvider* QnDesktopCameraResource::createLiveDataProvider()
 
 QString QnDesktopCameraResource::gePhysicalIdPrefix() const
 {
-    return QLatin1String(ID_PREFIX) + serverGuid() + lit("_");
+    return QLatin1String(ID_PREFIX) + serverGuid().toString() + lit("_");
 }
 
 QString QnDesktopCameraResource::getUserName() const 

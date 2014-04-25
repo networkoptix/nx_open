@@ -25,56 +25,61 @@ static QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
     return addListStrings.join(QLatin1String(";"));
 }
 
-void ApiStorageData::fromResource(QnAbstractStorageResourcePtr resource)
+void fromResourceToApi(const QnAbstractStorageResourcePtr &resource, ApiStorageData &data)
 {
-    ApiResourceData::fromResource(resource);
-    spaceLimit = resource->getSpaceLimit();
-    usedForWriting = resource->isUsedForWriting();
+    fromResourceToApi(resource, (ApiResourceData &)data);
+    data.spaceLimit = resource->getSpaceLimit();
+    data.usedForWriting = resource->isUsedForWriting();
 }
 
-void ApiStorageData::toResource(QnAbstractStorageResourcePtr resource) const
+void fromApiToResource(const ApiStorageData &data, QnAbstractStorageResourcePtr& resource)
 {
-    ApiResourceData::toResource(resource);
-    resource->setSpaceLimit(spaceLimit);
-    resource->setUsedForWriting(usedForWriting);
+    fromApiToResource((const ApiResourceData &)data, resource);
+    resource->setSpaceLimit(data.spaceLimit);
+    resource->setUsedForWriting(data.usedForWriting);
 }
 
-void ApiStorageDataList::loadFromQuery(QSqlQuery& query)
+void ApiStorageList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(query, ApiStorageData, data, ApiStorageDataFields ApiResourceDataFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiStorageData, data, ApiStorageFields ApiResourceFields)
 }
 
-void ApiMediaServerData::fromResource(QnMediaServerResourcePtr resource)
+void fromResourceToApi(const QnMediaServerResourcePtr& resource, ApiMediaServerData& data)
 {
-    ApiResourceData::fromResource(resource);
+    fromResourceToApi(resource, (ApiResourceData &)data);
 
-    netAddrList = serializeNetAddrList(resource->getNetAddrList());
-    apiUrl = resource->getApiUrl();
-    flags = resource->getServerFlags();
-    panicMode = resource->getPanicMode();
-    streamingUrl = resource->getStreamingUrl();
-    version = resource->getVersion().toString();
+    data.netAddrList = serializeNetAddrList(resource->getNetAddrList());
+    data.apiUrl = resource->getApiUrl();
+    data.flags = resource->getServerFlags();
+    data.panicMode = resource->getPanicMode();
+    data.streamingUrl = resource->getStreamingUrl();
+    data.version = resource->getVersion().toString();
+    data.maxCameras = resource->getMaxCameras();
+    data.redundancy = resource->isRedundancy();
     //authKey = resource-> getetAuthKey();
 
     QnAbstractStorageResourceList storageList = resource->getStorages();
-    storages.resize(storageList.size());
+    data.storages.resize(storageList.size());
     for (int i = 0; i < storageList.size(); ++i)
-        storages[i].fromResource(storageList[i]);
+        fromResourceToApi(storageList[i], data.storages[i]);
 }
 
-void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, const ResourceContext& ctx) const
+void fromApiToResource(const ApiMediaServerData &data, QnMediaServerResourcePtr& resource, const ResourceContext& ctx)
 {
-    ApiResourceData::toResource(resource);
+    fromApiToResource((const ApiResourceData &)data, resource);
 
     QList<QHostAddress> resNetAddrList;
-    deserializeNetAddrList(resNetAddrList, netAddrList);
+    deserializeNetAddrList(resNetAddrList, data.netAddrList);
 
-    resource->setApiUrl(apiUrl);
+    resource->setApiUrl(data.apiUrl);
     resource->setNetAddrList(resNetAddrList);
-    resource->setServerFlags(flags);
-    resource->setPanicMode((Qn::PanicMode) panicMode);
-    resource->setStreamingUrl(streamingUrl);
-    resource->setVersion(QnSoftwareVersion(version));
+    resource->setServerFlags(data.flags);
+    resource->setPanicMode((Qn::PanicMode) data.panicMode);
+    resource->setStreamingUrl(data.streamingUrl);
+    resource->setVersion(QnSoftwareVersion(data.version));
+    resource->setMaxCameras(data.maxCameras);
+    resource->setRedundancy(data.redundancy);
+
     //resource->setAuthKey(authKey);
 
     QnResourceTypePtr resType = ctx.resTypePool->getResourceTypeByName(QLatin1String("Storage"));
@@ -82,32 +87,32 @@ void ApiMediaServerData::toResource(QnMediaServerResourcePtr resource, const Res
         return;
 
     QnAbstractStorageResourceList storagesRes;
-    foreach(const ApiStorageData& storage, storages) {
+    foreach(const ApiStorageData& storage, data.storages) {
         QnAbstractStorageResourcePtr storageRes = ctx.resFactory->createResource(resType->getId(), QnResourceParams(storage.url, QString())).dynamicCast<QnAbstractStorageResource>();
         
-        storage.toResource(storageRes);
+        fromApiToResource(storage, storageRes);
         storagesRes.push_back(storageRes);
     }
     resource->setStorages(storagesRes);
 }
 
-template <class T> void ApiMediaServerDataList::toResourceList(QList<T>& outData, const ResourceContext& ctx) const
+template <class T> void ApiMediaServerList::toResourceList(QList<T>& outData, const ResourceContext& ctx) const
 {
     outData.reserve(outData.size() + data.size());
     for(int i = 0; i < data.size(); ++i) 
     {
         QnMediaServerResourcePtr server(new QnMediaServerResource(ctx.resTypePool));
-        data[i].toResource(server, ctx);
+        fromApiToResource(data[i], server, ctx);
         outData << server;
     }
 }
-template void ApiMediaServerDataList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData, const ResourceContext& ctx) const;
-template void ApiMediaServerDataList::toResourceList<QnMediaServerResourcePtr>(QList<QnMediaServerResourcePtr>& outData, const ResourceContext& ctx) const;
+template void ApiMediaServerList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData, const ResourceContext& ctx) const;
+template void ApiMediaServerList::toResourceList<QnMediaServerResourcePtr>(QList<QnMediaServerResourcePtr>& outData, const ResourceContext& ctx) const;
 
 
-void ApiMediaServerDataList::loadFromQuery(QSqlQuery& query)
+void ApiMediaServerList::loadFromQuery(QSqlQuery& query)
 {
-    QN_QUERY_TO_DATA_OBJECT(query, ApiMediaServerData, data, medisServerDataFields ApiResourceDataFields)
+    QN_QUERY_TO_DATA_OBJECT(query, ApiMediaServerData, data, medisServerDataFields ApiResourceFields)
 }
 
 }

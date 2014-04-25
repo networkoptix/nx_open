@@ -15,23 +15,22 @@ Also EC machine no longer needs to be able to connect to each MS. In order for c
     - Added a new button to "Server settings" dialog. 
     - Archive can be restored without stopping recording.
 7. Improved compatibility mode: added possibility to download old versions of client. If you user client and server versions are different, proper client version will be downloaded automatically(except for the MacOS).
-8. Desktop cameras: Displays local desktop. Video can be recorded. All settings are from Screen recording settings.
-9. Auto detection of new layout aspect ratio.
+8. Auto detection of new layout aspect ratio.
    - Default layout aspect ration is 16:9
    - if just one item is added, than layout AR is equal to the item's AR
    - if multiple items are added, than layout AR ia a peek the most common AR among this new items
-10. Added possibility to fix aspect ratio for video resource: Added checkbox on "Camera settings -> Expert".
-11. Generic http plugin.
-12. Export progress dialog is not modal. (User can do other things while exporting operation is in progress.)
-13. Added a possibility to choose corner where to place the timestamp:
+9. Added possibility to fix aspect ratio for video resource: Added checkbox on "Camera settings -> Expert".
+10. Generic http plugin.
+11. Export progress dialog is not modal. (User can do other things while exporting operation is in progress.)
+12. Added a possibility to choose corner where to place the timestamp:
    - For screenshots. User click on button "Screenshot", dialog "Save Screenshot as" appears.
      There is Drop-Down List "Timestamps" at the bottom of dialog window. User can choose one of next value: No timestamp, Top left corner, Top right corner, Bottom left corner, Bottom right corner. 
    - For export selected area. The same Drop-Down List appears at the bottom of dialog "Export Video As".
      Drop-Down List "Timestamps" is disabled for .exe format.
-14. A simple way to disable auto discovery: Added a new checkbox "Enable auto discovery" on "System settings -> Server"
-15. Added a possibility to resize resource tree panel.
-16. Added ability to calibrate fish-eye cameras. Calibration can be done automatically.
-17. Added ability to run client in configuration mode. This mode is activated automatically if the client is rum on a weak PC (in terms of CPU and/or video adapter). This mode is restricted (all animations are turned off, there are no notifications and only one video can be viewed in the same time)
+13. A simple way to disable auto discovery: Added a new checkbox "Enable auto discovery" on "System settings -> Server"
+14. Added a possibility to resize resource tree panel.
+15. Added ability to calibrate fish-eye cameras. Calibration can be done automatically.
+16. Added ability to run client in configuration mode. This mode is activated automatically if the client is rum on a weak PC (in terms of CPU and/or video adapter). This mode is restricted (all animations are turned off, there are no notifications and only one video can be viewed in the same time)
 
 
 Improvements:
@@ -74,6 +73,7 @@ Improvements:
 24. Added a new action "Zoom to selection" to the timeline context menu.
     If click on it, the selection has been zoomed. If there are no selection on timeline, "Zoom to selection" is not available.
 25. Ability to view client logs and clear cache.
+26. Added dewarping for pictures.
     
 Bugs Fixed:
 1. Tray tool. Incorrect EC port in the list if it has been changed.Fixed.

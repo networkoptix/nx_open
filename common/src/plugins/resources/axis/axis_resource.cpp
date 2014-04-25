@@ -53,11 +53,6 @@ QnAbstractStreamDataProvider* QnPlAxisResource::createLiveDataProvider()
     return new QnAxisStreamReader(toSharedPointer());
 }
 
-bool QnPlAxisResource::shoudResolveConflicts() const 
-{
-    return false;
-}
-
 void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
@@ -65,8 +60,7 @@ void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 
 bool QnPlAxisResource::startInputPortMonitoring()
 {
-    if( isDisabled()
-        || hasFlags(QnResource::foreigner)      //we do not own camera
+    if( hasFlags(QnResource::foreigner)      //we do not own camera
         || m_inputPortNameToIndex.empty() )
     {
         return false;

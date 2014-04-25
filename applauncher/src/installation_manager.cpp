@@ -16,19 +16,22 @@
 #include "version.h"
 
 
-#ifdef AK_DEBUG
-static QRegExp versionDirMatch( ".*" );
-#else
-static QRegExp versionDirMatch( "\\d+\\.\\d+.*" );
-#endif
+namespace {
+    QRegExp versionDirMatch( "\\d+\\.\\d+.*" );
 
 #ifdef Q_OS_LINUX
-static QString installationPathPrefix = ".local/share";
+    QString installationPathPrefix = ".local/share";
 #else
-static QString installationPathPrefix = "AppData/Local";
+    QString installationPathPrefix = "AppData/Local";
 #endif
 
-static const QString INSTALLATION_DATA_FILE( "install.dat" );
+    const QString INSTALLATION_DATA_FILE( "install.dat" );
+
+    QnSoftwareVersion toMinorVersion(const QnSoftwareVersion &version) {
+        return QnSoftwareVersion(version.major(), version.minor(), 0, 0);
+    }
+
+} // anonymous namespace
 
 
 bool InstallationManager::AppData::exists() const {
@@ -138,7 +141,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     NX_LOG(QString::fromLatin1("Checking current version (%1)").arg(QN_APPLICATION_VERSION), cl_logDEBUG1);
     AppData current = getAppData(QCoreApplication::applicationDirPath());
     if (current.exists()) {
-        current.m_version = QnSoftwareVersion(QN_APPLICATION_VERSION);
+        current.m_version = toMinorVersion(QnSoftwareVersion(QN_APPLICATION_VERSION));
         tempInstalledProductsByVersion.insert(current.version(), current);
     } else {
         NX_LOG(QString::fromLatin1("Can't find client binary in %1").arg(current.rootPath()), cl_logWARNING);
@@ -157,7 +160,7 @@ void InstallationManager::updateInstalledVersionsInformation()
             if (!appData.exists())
                 continue;
 
-            appData.m_version = QnSoftwareVersion(entry);
+            appData.m_version = toMinorVersion(QnSoftwareVersion(entry));
 
             tempInstalledProductsByVersion.insert(appData.version(), appData);
             NX_LOG(QString::fromLatin1("Compatibility version %1 found").arg(entry), cl_logDEBUG1);

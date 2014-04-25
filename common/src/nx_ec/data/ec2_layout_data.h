@@ -6,72 +6,25 @@
 
 namespace ec2
 {
-    struct ApiLayoutItemData: public ApiData
-    {
-        QByteArray uuid;
-        qint32 flags;
-        float left;
-        float top;
-        float right;
-        float bottom;
-        float rotation;
-        QnId resourceId;
-        QString resourcePath;
-        float zoomLeft;
-        float zoomTop;
-        float zoomRight;
-        float zoomBottom;
-        QByteArray zoomTargetUuid;
-        QByteArray contrastParams;
-        QByteArray dewarpingParams;
+    #include "ec2_layout_data_i.h"
 
-        void toResource(QnLayoutItemData& resource) const;
-        void fromResource(const QnLayoutItemData& resource);
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
+    void fromApiToResource(const ApiLayoutItemData& data, QnLayoutItemData& resource);
+    void fromResourceToApi(QnLayoutResourcePtr resource, ApiLayoutData& data);
 
-    #define ApiLayoutItemDataFields (uuid) (flags) (left) (top) (right) (bottom) (rotation) (resourceId) (resourcePath) (zoomLeft) (zoomTop) (zoomRight) (zoomBottom) (zoomTargetUuid) (contrastParams) (dewarpingParams)
-    QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiLayoutItemData, ApiLayoutItemDataFields)
-}
+    void fromResourceToApi(const QnLayoutItemData& resource, ApiLayoutItemData& data);
+    void fromApiToResource(const ApiLayoutData& data, QnLayoutResourcePtr resource);
 
 
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiLayoutItemData, ApiLayoutItemFields);
 
-namespace ec2
-{
-    struct ApiLayoutItemDataWithRef: public ApiLayoutItemData {
+    struct ApiLayoutItemWithRef: ApiLayoutItemData {
         QnId layoutId;
     };
 
-    struct ApiLayoutData: public ApiResourceData
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiLayoutData, ApiLayoutFields);
+
+    struct ApiLayoutList: ApiLayoutDataListData
     {
-        float cellAspectRatio;
-        float cellSpacingWidth;
-        float cellSpacingHeight;
-        std::vector<ApiLayoutItemData> items;
-        bool   userCanEdit;
-        bool   locked;
-        QString backgroundImageFilename;
-        qint32  backgroundWidth;
-        qint32  backgroundHeight;
-        float backgroundOpacity;
-        qint32 userId;
-
-        void toResource(QnLayoutResourcePtr resource) const;
-        void fromResource(QnLayoutResourcePtr resource);
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
-
-    #define ApiLayoutDataFields (cellAspectRatio) (cellSpacingWidth) (cellSpacingHeight) (items) (userCanEdit) (locked) (backgroundImageFilename) (backgroundWidth) (backgroundHeight) (backgroundOpacity) (userId)
-    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS (ApiLayoutData, ec2::ApiResourceData, ApiLayoutDataFields)
-}
-                                                                                
-
-namespace ec2
-{
-    struct ApiLayoutDataList: public ApiData
-    {
-        std::vector<ApiLayoutData> data;
-
         void loadFromQuery(QSqlQuery& query);
         template <class T> void toResourceList(QList<T>& outData) const;
         template <class T> void fromResourceList(const QList<T>& srcData)
@@ -80,12 +33,10 @@ namespace ec2
             for( const T& layoutRes: srcData )
             {
                 data.push_back( ApiLayoutData() );
-                data.back().fromResource( layoutRes );
+                fromResourceToApi(layoutRes, data.back());
             }
         }
     };
-
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiLayoutDataList, (data) )
 }
 
 #endif  //EC2_LAYOUT_DATA_H

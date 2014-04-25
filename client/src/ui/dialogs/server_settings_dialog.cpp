@@ -133,9 +133,11 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     /* Set up context help. */
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->nameLabel,           ui->maxCamerasSpinBox,              Qn::ServerSettings_General_Help);
     setHelpTopic(ui->ipAddressLabel,      ui->ipAddressLineEdit,              Qn::ServerSettings_General_Help);
     setHelpTopic(ui->portLabel,           ui->portLineEdit,                   Qn::ServerSettings_General_Help);
     setHelpTopic(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
+    setHelpTopic(ui->rebuildGroupBox,                                         Qn::ServerSettings_ArchiveRestoring_Help);
 
     connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
     connect(ui->pingButton,             SIGNAL(clicked()),              this,   SLOT(at_pingButton_clicked()));
@@ -268,6 +270,10 @@ void QnServerSettingsDialog::updateFromResources()
     bool edge = QnMediaServerResource::isEdgeServer(m_server);
     ui->nameLineEdit->setText(m_server->getName());
     ui->nameLineEdit->setEnabled(!edge);
+    ui->maxCamerasSpinBox->setValue(m_server->getMaxCameras());
+    ui->maxCamerasSpinBox->setEnabled(!edge);
+    ui->checkBoxRedundancy->setChecked(m_server->isRedundancy());
+    ui->checkBoxRedundancy->setEnabled(!edge);
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
@@ -282,7 +288,7 @@ void QnServerSettingsDialog::submitToResources() {
         QnAbstractStorageResourceList storages;
         foreach(const QnStorageSpaceData &item, tableItems()) {
             if(!item.isUsedForWriting && item.storageId.isNull()) {
-                serverStorageStates.insert(QnServerStorageKey(m_server->getGuid(), item.path), item.reservedSpace);
+                serverStorageStates.insert(QnServerStorageKey(m_server->getId(), item.path), item.reservedSpace);
                 continue;
             }
 
@@ -306,8 +312,11 @@ void QnServerSettingsDialog::submitToResources() {
     }
 
     bool edge = QnMediaServerResource::isEdgeServer(m_server);
-    if (!edge)
+    if (!edge) {
         m_server->setName(ui->nameLineEdit->text());
+        m_server->setMaxCameras(ui->maxCamerasSpinBox->value());
+        m_server->setRedundancy(ui->checkBoxRedundancy->isChecked());
+    }
 }
 
 void QnServerSettingsDialog::setBottomLabelText(const QString &text) {
@@ -422,7 +431,7 @@ void QnServerSettingsDialog::at_rebuildButton_clicked()
     if (action == RebuildAction_Start)
     {
         int button = QMessageBox::warning(
-            mainWindow(),
+            this,
             tr("Warning"),
             tr("You are about to launch the archive re-synchronization routine. ATTENTION! Your hard disk usage will be increased during re-synchronization process! "
             "Depending on the total size of archive it can take several hours. "
@@ -510,7 +519,7 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
         QnStorageSpaceData &item = items[i];
 
         if(item.reservedSpace == -1)
-            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getGuid(), item.path) , -1);
+            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getId(), item.path) , -1);
 
         /* Note that if freeSpace is -1, then we'll also get -1 in reservedSpace, which is the desired behavior. */
         if(item.reservedSpace == -1)

@@ -3,13 +3,13 @@
 
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
+#include <core/resource/network_resource.h>
 
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
-QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher()
-{
-
-}
+QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher():
+    base_type()
+{ }
 
 QnDesktopCameraResourceSearcher::~QnDesktopCameraResourceSearcher()
 {
@@ -65,6 +65,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
 
 QnResourcePtr QnDesktopCameraResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
+    Q_UNUSED(params);
     QnNetworkResourcePtr result;
 
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
@@ -114,12 +115,6 @@ void QnDesktopCameraResourceSearcher::cleanupConnections()
             ++itr;
         }
     }
-}
-
-QnDesktopCameraResourceSearcher& QnDesktopCameraResourceSearcher::instance()
-{
-    static QnDesktopCameraResourceSearcher inst;
-    return inst;
 }
 
 TCPSocketPtr QnDesktopCameraResourceSearcher::getConnection(const QString& userName)

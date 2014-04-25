@@ -37,7 +37,7 @@ public:
     QnAbstractStorageResourceList getStorages() const;
     void setStorages(const QnAbstractStorageResourceList& storages);
 
-    virtual void updateInner(QnResourcePtr other) override;
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
@@ -54,18 +54,24 @@ public:
     QString getProxyHost();
     int getProxyPort();
 
+    int getMaxCameras() const;
+    void setMaxCameras(int value);
+
+    void setRedundancy(bool value);
+    int isRedundancy() const;
+
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
-
     static bool isEdgeServer(const QnResourcePtr &resource);
-
+    virtual void setStatus(Status newStatus, bool silenceMode = false) override;
+    qint64 currentStatusTime() const;
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
     void determineOptimalNetIF_testProxy();
 
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
-    void panicModeChanged(const QnMediaServerResourcePtr &resource);
+    void panicModeChanged(const QnResourcePtr &resource);
 
 private:
     QnMediaServerConnectionPtr m_restConnection;
@@ -81,6 +87,9 @@ private:
     QnSoftwareVersion m_version;
     QMap<int, QString> m_runningIfRequests;
     QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
+    int m_maxCameras;
+    bool m_redundancy;
+    QElapsedTimer m_statusTimer;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

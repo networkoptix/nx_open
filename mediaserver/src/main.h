@@ -63,6 +63,7 @@ private slots:
         bool isLocal,
         const QString& moduleSeed );
 
+    void at_appStarted();
 private:
     void updateDisabledVendorsIfNeeded();
     void initTcpListener();
@@ -70,6 +71,7 @@ private:
 private:
     int m_argc;
     char** m_argv;
+    bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
     NetworkOptixModuleFinder* m_moduleFinder;

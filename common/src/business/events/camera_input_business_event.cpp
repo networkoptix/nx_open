@@ -6,7 +6,7 @@
 #include "camera_input_business_event.h"
 
 QnCameraInputEvent::QnCameraInputEvent(const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp, const QString& inputPortID):
-    base_type(BusinessEventType::Camera_Input, resource, toggleState, timeStamp),
+    base_type(QnBusiness::CameraInputEvent, resource, toggleState, timeStamp),
     m_inputPortID(inputPortID)
 {
 }

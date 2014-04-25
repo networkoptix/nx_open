@@ -55,6 +55,7 @@ private:
     QnResourcePoolModelNode *node(const QUuid &uuid);
     QnResourcePoolModelNode *node(const QModelIndex &index) const;
     QnResourcePoolModelNode *node(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
+    QnResourcePoolModelNode *node(const QnResourcePtr &resource, const QString &groupId, const QString &groupName);
     QnResourcePoolModelNode *expectedParent(QnResourcePoolModelNode *node);
     bool isIgnored(const QnResourcePtr &resource) const;
 
@@ -75,19 +76,20 @@ private slots:
     void at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
     void at_resource_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
 
-#ifdef QN_ENABLE_VIDEO_WALL
     void at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
     void at_user_videoWallItemAdded(const QnUserResourcePtr &user, const QUuid &uuid);
     void at_user_videoWallItemRemoved(const QnUserResourcePtr &user, const QUuid &uuid);
-#endif
 
-	void at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera);
+
+    void at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera);
 private:
     friend class QnResourcePoolModelNode;
 
     typedef QPair<QnResourcePtr, QUuid> NodeKey;
+
+    typedef QHash<QString, QnResourcePoolModelNode *> RecorderHash;
 
     /** Root nodes array */
     QnResourcePoolModelNode *m_rootNodes[Qn::NodeTypeCount];
@@ -100,6 +102,9 @@ private:
 
     /** Mapping for resource nodes, by resource. */
     QHash<QnResourcePtr, QnResourcePoolModelNode *> m_resourceNodeByResource;
+
+    /** Mapping for recorder nodes, by resource. */
+    QHash<QnResourcePtr, RecorderHash> m_recorderHashByResource;
 
     /** Mapping for item nodes, by item id. */
     QHash<QUuid, QnResourcePoolModelNode *> m_itemNodeByUuid;

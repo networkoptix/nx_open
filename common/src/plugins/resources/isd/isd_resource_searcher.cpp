@@ -10,12 +10,6 @@ QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
 }
 
-QnPlISDResourceSearcher& QnPlISDResourceSearcher::instance()
-{
-    static QnPlISDResourceSearcher inst;
-    return inst;
-}
-
 QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;

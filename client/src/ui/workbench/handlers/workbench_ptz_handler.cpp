@@ -141,7 +141,8 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
     }
 
     if (widget->ptzController()->activatePreset(id, 1.0)) {
-        action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
+        if (!widget->dewarpingParams().enabled) // do not jump to live if this is a fisheye camera
+            action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     } else {
         if(resource->getStatus() == QnResource::Offline || resource->getStatus() == QnResource::Unauthorized) {
             QMessageBox::critical(
@@ -174,7 +175,8 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
     }
 
     if (widget->ptzController()->activateTour(id)) {
-        action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
+        if (!widget->dewarpingParams().enabled) // do not jump to live if this is a fisheye camera
+            action(Qn::JumpToLiveAction)->trigger(); // TODO: #Elric ?
     } else {
         if(resource->getStatus() == QnResource::Offline || resource->getStatus() == QnResource::Unauthorized) {
             QMessageBox::critical(
@@ -241,7 +243,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered() {
     if(!getDevicePosition(controller, &position))
         return;
 
-    qreal startZ = 0.0;
+    qreal startZ = -1.0;
     qreal endZ = 1.0;
 
     for(int i = 0; i <= 20; i++) {

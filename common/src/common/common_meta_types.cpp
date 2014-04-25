@@ -25,11 +25,18 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/layout_item_data.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_history.h>
+
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_pc_data.h>
+#include <core/resource/videowall_control_message.h>
+
 #include <core/misc/schedule_task.h>
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/media_dewarping_params.h>
@@ -86,15 +93,21 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnVirtualCameraResourceList>();
     qRegisterMetaType<QnSecurityCamResourcePtr>();
     qRegisterMetaType<QnAbstractStorageResourcePtr>();
+    qRegisterMetaType<QnVideoWallResourcePtr>();
 
     qRegisterMetaType<QnUserResourceList>();
+    qRegisterMetaType<QnVideoWallResourceList>();
 
     qRegisterMetaType<QnCameraHistoryList>();
+    qRegisterMetaType<QnCameraHistoryItemPtr>();
 
     qRegisterMetaType<QnLicensePtr>();
     qRegisterMetaType<QnLicenseList>();
 
     qRegisterMetaType<QnLayoutItemData>();
+    qRegisterMetaType<QnVideoWallItem>();
+    qRegisterMetaType<QnVideoWallPcData>();
+    qRegisterMetaType<QnVideoWallControlMessage>();
     qRegisterMetaType<QnMotionRegion>();
     qRegisterMetaType<QnScheduleTask>();
     qRegisterMetaType<QnScheduleTaskList>();

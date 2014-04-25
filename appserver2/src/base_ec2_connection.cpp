@@ -26,6 +26,7 @@ namespace ec2
         m_userManager( new QnUserManager<T>(m_queryProcessor, resCtx) ),
         m_businessEventManager( new QnBusinessEventManager<T>(m_queryProcessor, resCtx) ),
         m_layoutManager( new QnLayoutManager<T>(m_queryProcessor, resCtx) ),
+        m_videowallManager( new QnVideowallManager<T>(m_queryProcessor, resCtx) ),
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) )
     {
         connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(QnId, bool, bool)), this, SIGNAL(remotePeerFound(QnId, bool, bool)), Qt::DirectConnection);
@@ -72,6 +73,12 @@ namespace ec2
     AbstractLayoutManagerPtr BaseEc2Connection<T>::getLayoutManager()
     {
         return m_layoutManager;
+    }
+
+    template<class T>
+    AbstractVideowallManagerPtr BaseEc2Connection<T>::getVideowallManager()
+    {
+        return m_videowallManager;
     }
 
     template<class T>
@@ -177,14 +184,14 @@ namespace ec2
     }
 
     template<class T>
-    void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url, bool isClient)
+    void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url, bool isClient, const QUuid& peerGuid)
     {
         QUrl url(_url);
         url.setPath("/ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
         url.setQuery(q);
-        QnTransactionMessageBus::instance()->addConnectionToPeer(url, isClient);
+        QnTransactionMessageBus::instance()->addConnectionToPeer(url, isClient, peerGuid);
     }
 
     template<class T>

@@ -11,6 +11,7 @@
 #include <QtCore/QDataStream>
 #include <QtGui/QVector3D>
 
+#include <utils/common/id.h>
 #include <utils/common/model_functions_fwd.h>
 #include <recording/time_period.h>
 
@@ -129,5 +130,35 @@ typedef QHash<int, QString> QnPtzHotkeyHash;
 Q_DECLARE_METATYPE(QnPtzHotkey);
 QN_DECLARE_FUNCTIONS(QnPtzHotkey, (json));
 
+// -------------------------------------------------------------------------- //
+// QnVideowallAttachSettings
+// -------------------------------------------------------------------------- //
+
+struct QnVideowallAttachSettings {
+    enum AttachMode {
+        AttachWindow,
+        AttachScreen,
+        AttachAll
+    };
+
+    enum LayoutMode {
+        LayoutNone,
+        LayoutClone,
+        LayoutCustom
+    };
+
+    AttachMode attachMode;
+    LayoutMode layoutMode;
+    QnId layoutId;               /**< for custom layout */
+    bool autoFill;
+    bool closeClient;
+
+    QnVideowallAttachSettings():
+        attachMode(AttachScreen),
+        layoutMode(LayoutClone),
+        autoFill(true),
+        closeClient(false)
+        {}
+};
 
 #endif // QN_CLIENT_MODEL_TYPES_H

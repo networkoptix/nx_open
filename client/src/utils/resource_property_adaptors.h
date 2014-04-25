@@ -16,7 +16,7 @@ public:
         base_type(lit("showBusinessEvents"), 0xFFFFFFFFFFFFFFFFull, parent)
     {}
 
-    bool isAllowed(BusinessEventType::Value eventType) const {
+    bool isAllowed(QnBusiness::EventType eventType) const {
         return value() & (1ull << eventType);
     }
 };

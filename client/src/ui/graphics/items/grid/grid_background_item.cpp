@@ -14,7 +14,8 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
-
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <utils/common/warnings.h>
 
 #ifdef _WIN32
 //if defined, background is drawn with native API (as gl texture), else - QPainter::drawImage is used
@@ -154,7 +155,7 @@ void QnGridBackgroundItem::setMapper(QnWorkbenchGridMapper *mapper) {
 void QnGridBackgroundItem::update(const QnLayoutResourcePtr &layout) {
     Q_D(QnGridBackgroundItem);
 
-    bool isExportedLayout = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+    bool isExportedLayout = snapshotManager()->isFile(layout);
     qreal opacity = qBound(0.0, layout->backgroundOpacity(), 1.0);
     bool hasChanges =
             (d->imageIsLocal != isExportedLayout) ||
@@ -318,7 +319,7 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 #endif
 }
 
-void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget * )
 {
     Q_D(QnGridBackgroundItem);
 #ifdef NATIVE_PAINT_BACKGROUND
@@ -340,7 +341,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
         d->imgUploaded = true;
     }
 
-    QnGlNativePainting::begin(painter);
+    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
 
     if( m_imgAsFrame->format == PIX_FMT_YUVA420P || m_imgAsFrame->format == PIX_FMT_RGBA )
     {

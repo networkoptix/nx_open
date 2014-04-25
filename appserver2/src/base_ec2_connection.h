@@ -12,16 +12,18 @@
 #include "core/resource_management/resource_pool.h"
 #include "nx_ec/data/mserver_data.h"
 #include "transaction/transaction.h"
-#include "business_event_manager.h"
-#include "camera_manager.h"
+#include "managers/business_event_manager.h"
+#include "managers/camera_manager.h"
 #include "managers/layout_manager.h"
 #include "managers/license_manager.h"
 #include "managers/stored_file_manager.h"
-#include "media_server_manager.h"
-#include "resource_manager.h"
-#include "user_manager.h"
+#include "managers/media_server_manager.h"
+#include "managers/resource_manager.h"
+#include "managers/user_manager.h"
+#include "managers/videowall_manager.h"
 
 #include "nx_ec/data/ec2_full_data.h"
+#include "nx_ec/data/ec2_videowall_data.h"
 
 
 namespace ec2
@@ -43,6 +45,7 @@ namespace ec2
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager() override;
         virtual AbstractUserManagerPtr getUserManager() override;
         virtual AbstractLayoutManagerPtr getLayoutManager() override;
+        virtual AbstractVideowallManagerPtr getVideowallManager() override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
 
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
@@ -52,7 +55,7 @@ namespace ec2
         virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) override;
         virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
 
-        virtual void addRemotePeer(const QUrl& url, bool isClient) override;
+        virtual void addRemotePeer(const QUrl& url, bool isClient, const QUuid& peerGuid) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
     public:
 
@@ -67,20 +70,28 @@ namespace ec2
             m_licenseManager->triggerNotification( tran );
         }
 
+        void triggerNotification( const QnTransaction<ApiLicense>& tran ) {
+            m_licenseManager->triggerNotification( tran );
+        }
+
         void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran ) {
             m_businessEventManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCamera>& tran ) {
             m_cameraManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraDataList>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCameraList>& tran ) {
             m_cameraManager->triggerNotification( tran );
         }
 
         void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran ) {
             m_businessEventManager->triggerNotification( tran );
+        }
+
+        void triggerNotification( const QnTransaction<ApiVideowallData>& tran ) {
+            m_videowallManager->triggerNotification( tran );
         }
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran ) {
@@ -98,6 +109,8 @@ namespace ec2
                 return m_businessEventManager->triggerNotification( tran );
             case ApiCommand::removeLayout:
                 return m_layoutManager->triggerNotification( tran );
+            case ApiCommand::removeVideowall:
+                return m_videowallManager->triggerNotification( tran );
             default:
                 assert( false );
             }
@@ -123,7 +136,7 @@ namespace ec2
             m_resourceManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiCameraServerItem>& tran ) {
             return m_cameraManager->triggerNotification( tran );
         }
 
@@ -131,7 +144,7 @@ namespace ec2
             return m_userManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiBusinessRule>& tran ) {
             return m_businessEventManager->triggerNotification( tran );
         }
 
@@ -139,7 +152,7 @@ namespace ec2
             return m_layoutManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran ) {
+        void triggerNotification( const QnTransaction<ApiLayoutList>& tran ) {
             return m_layoutManager->triggerNotification( tran );
         }
 
@@ -147,7 +160,7 @@ namespace ec2
             return m_storedFileManager->triggerNotification( tran );
         }
 
-        void triggerNotification( const QnTransaction<ApiFullData>& tran ) {
+        void triggerNotification( const QnTransaction<ApiFullInfo>& tran ) {
             QnFullResourceData fullResData;
             tran.params.toResourceList( fullResData, m_resCtx );
             emit initNotification(fullResData);
@@ -170,6 +183,10 @@ namespace ec2
             }
         }
 
+        void triggerNotification(const QnTransaction<ApiVideowallControlMessageData> &tran) {
+            return m_videowallManager->triggerNotification(tran);
+        }
+
         void triggerNotification( const QnTransaction<ApiEmailSettingsData>&  ) {
         }
 
@@ -187,6 +204,7 @@ namespace ec2
         std::shared_ptr<QnUserManager<QueryProcessorType>> m_userManager;
         std::shared_ptr<QnBusinessEventManager<QueryProcessorType>> m_businessEventManager;
         std::shared_ptr<QnLayoutManager<QueryProcessorType>> m_layoutManager;
+        std::shared_ptr<QnVideowallManager<QueryProcessorType>> m_videowallManager;
         std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
 
     private:

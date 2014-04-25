@@ -22,6 +22,9 @@ namespace ec2
                 case connect:
                     return "connect";
 
+                case clientInstanceId:
+                    return "clientInstanceId";
+
                 case getResourceTypes:
                     return "getResourceTypes";
                 case getResource:
@@ -87,6 +90,15 @@ namespace ec2
                 case removeLayout:
                     return "removeLayout";
 
+                case saveVideowall:
+                    return "saveVideowall";
+                case getVideowallList:
+                    return "getVideowallList";
+                case removeVideowall:
+                    return "removeVideowall";
+                case videowallControl:
+                    return "videowallControl";
+
                 case listDirectory:
                     return "listDirectory";
                 case getStoredFile:
@@ -100,6 +112,8 @@ namespace ec2
 
                 case addLicenses:
                     return "addLicenses";
+                case addLicense:
+                    return "addLicense";
                 case getLicenses:
                     return "getLicenses";
 
@@ -126,9 +140,20 @@ namespace ec2
                     return "unlockRequest";
 
                 default:
-                    return "unknown";
+                    return "unknown " + QString::number((int)val);
             }
         }
+
+        bool isSystem( Value val )
+        {
+            return  val == lockRequest   ||
+                    val == lockResponse  ||
+                    val == unlockRequest ||
+                    val == tranSyncRequest ||
+                    val == tranSyncResponse ||
+                    val == serverAliveInfo;
+        }
+
     }
 
     QnAbstractTransaction::QnAbstractTransaction(ApiCommand::Value _command, bool _persistent)

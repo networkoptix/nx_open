@@ -28,11 +28,12 @@ private slots:
     void onLoadingFailed(int code, int handle);
 
 private:
-    int loadInternal(QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QList<QRegion> &motionRegions);
+    int loadInternal(QnMediaServerResourcePtr mServer, QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QList<QRegion> &motionRegions);
 
 private:
     QMutex m_mutex;
-    QMap<QnNetworkResourcePtr, QnTimePeriodLoader *> m_cache;
+    //QMap<QnNetworkResourcePtr, QnTimePeriodLoader *> m_cache;
+    QMap<QString, QnTimePeriodLoader *> m_cache;
 
     QMap<int, QList<int> > m_multiLoadProgress;
     QMap<int, QVector<QnTimePeriodList> > m_multiLoadPeriod;

@@ -41,7 +41,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
     else {
         resource= qnResPool->getResourceByUniqId(resourceId);
         if (!resource) {
-            resource= qnResPool->getResourceByGuid(resourceId);
+            resource= qnResPool->getResourceById(resourceId);
             if (!resource)
                 errStr = tr("Resource with id '%1' not found \n").arg(resourceId);
         }
@@ -52,7 +52,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
         {
             emit mserverFailure(resource,
                  qnSyncTime->currentUSecsSinceEpoch(),
-                 QnBusiness::MServerIssueTerminated);
+                 QnBusiness::ServerTerminatedReason);
             //qnBusinessRuleConnector->at_mserverFailure(resource,
             //                                           qnSyncTime->currentUSecsSinceEpoch(),
             //                                           QnBusiness::MServerIssueTerminated);

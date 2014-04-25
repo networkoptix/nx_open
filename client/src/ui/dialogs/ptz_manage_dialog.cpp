@@ -30,6 +30,8 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate {
@@ -72,11 +74,7 @@ private:
 };
 
 QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
-    base_type(parent, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowSystemMenuHint | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint
-#ifdef Q_OS_MAC
-    | Qt::Tool
-#endif
-    ),
+    base_type(parent),
     ui(new Ui::PtzManageDialog),
     m_model(new QnPtzManageModel(this)),
     m_adaptor(new QnPtzHotkeysResourcePropertyAdaptor(this)),
@@ -128,6 +126,8 @@ QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
 
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked,   this, &QnAbstractPtzDialog::saveChanges);
 
+    setHelpTopic(ui->tourGroupBox, Qn::PtzManagement_Tour_Help);
+
     //TODO: implement preview receiving and displaying
 
     //TODO: think about forced refresh in some cases or even a button - low priority
@@ -154,11 +154,20 @@ void QnPtzManageDialog::reject() {
         return;
 
     clear();
+    base_type::reject();
+}
+
+void QnPtzManageDialog::accept() {
+    saveData();
+
+    clear();
+    QDialog::accept(); // here we skip QnAbstractPtzDialog::accept because we don't want call synchronize()
 }
 
 void QnPtzManageDialog::closeWithoutCancel() {
     checkForUnsavedChanges(true);
     clear();
+    base_type::reject();
 }
 
 void QnPtzManageDialog::loadData(const QnPtzData &data) {
@@ -267,7 +276,8 @@ void QnPtzManageDialog::clear() {
     setController(QnPtzControllerPtr());
     m_model->setPresets(QnPtzPresetList());
     m_model->setTours(QnPtzTourList());
-    base_type::reject();
+    ui->tourEditWidget->setSpots(QnPtzTourSpotList());
+    ui->tourEditWidget->setPresets(QnPtzPresetList());
 }
 
 void QnPtzManageDialog::saveData() {
@@ -280,6 +290,14 @@ void QnPtzManageDialog::saveData() {
     }
 
     m_adaptor->setValue(m_model->hotkeys());
+
+    // reset active ptz object if the current active ptz object is an empty tour
+    QnPtzObject ptzObject;
+    if (controller()->getActiveObject(&ptzObject) && ptzObject.type == Qn::TourPtzObject) {
+        QnPtzManageModel::RowData rowData = m_model->rowData(ptzObject.id);
+        if (!rowData.tourModel.tour.isValid(m_model->presets()))
+            controller()->continuousMove(QVector3D(0, 0, 0)); // #TODO: #dklychkov evil hack to reset active object. We should implement an adequate way to do this
+    }
 }
 
 Qn::PtzDataFields QnPtzManageDialog::requiredFields() const {
@@ -595,8 +613,11 @@ void QnPtzManageDialog::at_model_modelReset() {
         int row = m_model->rowNumber(m_lastRowData);
         if (row != -1) {
             QModelIndex index = m_model->index(row, m_lastColumn);
+
+            QAbstractItemView::EditTriggers oldEditTriggers = ui->tableView->editTriggers();
+            ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers); // to prevent field editor from showing
             ui->tableView->setCurrentIndex(index);
-            ui->tableView->closePersistentEditor(index);
+            ui->tableView->setEditTriggers(oldEditTriggers);
         }
     }
 }
@@ -658,7 +679,7 @@ void QnPtzManageDialog::updateUi() {
         m_cache->downloadFile(selectedRow.id());
     ui->deleteButton->setEnabled(isPreset || isTour);
     ui->goToPositionButton->setEnabled(isPreset || (isTour && !selectedRow.tourModel.tour.spots.isEmpty()));
-    ui->startTourButton->setEnabled(isValidTour && !selectedRow.tourModel.local);
+    ui->startTourButton->setEnabled(isValidTour && !selectedRow.tourModel.modified);
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(isModified());
 }
 

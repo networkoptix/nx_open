@@ -3,7 +3,6 @@
 #include <QtWidgets/QTextEdit>
 #include <QtWidgets/QVBoxLayout>
 
-#include <utils/network/icmp_mac.h>
 #include <utils/ping_utility.h>
 
 #ifdef Q_OS_MACX

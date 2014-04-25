@@ -84,6 +84,9 @@ namespace detail
         boost::optional<qint64> m_localFileSize;
         boost::optional<qint64> m_remoteFileSize;
         bool m_responseReceivedCalled;
+        std::shared_ptr<AbstractByteStreamFilter> m_fileDataProcessor;
+        bool m_fileClosePending;
+        QString m_fileName;
 
         void asyncStatDone( SystemError::ErrorCode errorCode, qint64 fileSize );
         //!Implementation of QnFile::AbstractWriteHandler::onAsyncWriteFinished

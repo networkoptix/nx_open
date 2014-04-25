@@ -148,6 +148,10 @@ public:
         d.reference(key) = value;
     }
 
+    void remove(const Key &key) {
+        d.reference(key) = d.factory()();
+    }
+
     T operator[](const Key &key) const {
         return d.value(key);
     }

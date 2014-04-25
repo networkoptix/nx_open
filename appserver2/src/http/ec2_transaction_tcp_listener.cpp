@@ -67,18 +67,23 @@ void QnTransactionTcpProcessor::run()
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
     d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
 
-    // 1-st stage
-    bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
-    sendResponse("HTTP", lockOK ? CODE_OK : CODE_INVALID_PARAMETER , "application/octet-stream");
-    if (!lockOK)
-        return;
+    if (!isClient)
+    {
+        // use two stage connect for server peers only, go to second stage for client immediatly
 
-    // 2-nd stage
-    if (!readRequest()) {
-        QnTransactionTransport::connectingCanceled(remoteGuid, false);
-        return;
+        // 1-st stage
+        bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
+        sendResponse("HTTP", lockOK ? CODE_OK : CODE_INVALID_PARAMETER , "application/octet-stream");
+        if (!lockOK)
+            return;
+
+        // 2-nd stage
+        if (!readRequest()) {
+            QnTransactionTransport::connectingCanceled(remoteGuid, false);
+            return;
+        }
+        parseRequest();
     }
-    parseRequest();
 
     query = QUrlQuery(d->request.requestLine.url.query());
     bool fail = query.hasQueryItem("canceled") || !QnTransactionTransport::tryAcquireConnected(remoteGuid, false);

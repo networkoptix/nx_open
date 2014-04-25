@@ -21,13 +21,12 @@ void QnClientMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
 }
 
-void QnClientMessageProcessor::onResourceStatusChanged(QnResourcePtr resource, QnResource::Status status)
-{
+void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
     resource->setStatus(status);
+    checkForTmpStatus(resource);
 }
 
-void QnClientMessageProcessor::updateResource(QnResourcePtr resource)
-{
+void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
     QnResourcePtr ownResource;
 
     ownResource = qnResPool->getResourceById(resource->getId());
@@ -96,8 +95,8 @@ void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr
     int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
     resource->apiConnection()->setProxyAddr(resource->getApiUrl(), url, port);
     disconnect(resource.data(), NULL, this, NULL);
-    connect(resource.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), 
-             this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)));
+    //connect(resource.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), 
+    //         this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)));
     resource->determineOptimalNetIF();
 }
 
@@ -106,7 +105,7 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource:
     QnResourcePtr server = qnResPool->getResourceById(id);
     if (!server)
         return;
-    foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras(server)) {
+    foreach(QnResourcePtr res, qnResPool->getAllCameras(server)) {
         QnServerCameraPtr serverCamera = res.dynamicCast<QnServerCamera>();
         if (serverCamera)
             serverCamera->setTmpStatus(status);
@@ -115,6 +114,9 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource:
 
 void QnClientMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool isProxy)
 {
+    if (id == qnCommon->moduleGUID())
+        return;
+
     if (isProxy) {
         //updateTmpStatus(id, QnResource::NotDefined);
         return;
@@ -136,9 +138,10 @@ void QnClientMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool is
     if (m_opened) {
         m_opened = false;
         emit connectionClosed();
-        foreach(QnResourcePtr res, qnResPool->getAllResourceByTypeName(lit("Server")))
+        QString serverTypeName = lit("Server");
+        foreach(QnResourcePtr res, qnResPool->getAllResourceByTypeName(serverTypeName))
             res->setStatus(QnResource::Offline);
-        foreach(QnResourcePtr res, qnResPool->getAllEnabledCameras())
+        foreach(QnResourcePtr res, qnResPool->getAllCameras(QnResourcePtr()))
             res->setStatus(QnResource::Offline);
     }
 }

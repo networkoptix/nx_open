@@ -60,9 +60,8 @@ void QnNotificationSoundManagerDialog::at_addButton_clicked() {
 
     QString supportedFormats = tr("Sound files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
-    QStringList extensions = QStringList() << QLatin1String("wav") << QLatin1String("mp3") << QLatin1String("ogg") << QLatin1String("wma");
 
-    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file..."), qnSettings->mediaFolder(), supportedFormats, extensions));
+    QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(this, tr("Select file..."), qnSettings->mediaFolder(), supportedFormats));
     dialog->setFileMode(QFileDialog::ExistingFile);
 
     int cropSoundSecs = 5;

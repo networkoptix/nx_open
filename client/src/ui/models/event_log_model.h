@@ -38,7 +38,7 @@ public:
 
     bool hasMotionUrl(const QModelIndex &index) const;
 
-    BusinessEventType::Value eventType(int row) const;
+    QnBusiness::EventType eventType(int row) const;
     QnResourcePtr eventResource(int row) const;
     qint64 eventTimestamp(int row) const;
 

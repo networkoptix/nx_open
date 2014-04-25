@@ -54,9 +54,4 @@ bool QnTestCameraResource::setHostAddress(const QString &ip, QnDomain /*domain*/
     return true;
 }
 
-bool QnTestCameraResource::shoudResolveConflicts() const
-{
-    return false;
-}
-
 #endif // #ifdef ENABLE_TEST_CAMERA

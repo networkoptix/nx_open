@@ -5,100 +5,99 @@
 namespace ec2
 {
 
-    void ApiLayoutItemData::toResource(QnLayoutItemData& resource) const
+    void fromApiToResource(const ApiLayoutItemData& data, QnLayoutItemData& resource)
     {
-
-        resource.uuid = uuid;
-        resource.flags = flags;
-        resource.combinedGeometry = QRectF(QPointF(left, top), QPointF(right, bottom));
-        resource.rotation = rotation;
-        resource.resource.id =  resourceId;
-        resource.resource.path = resourcePath;
-        resource.zoomRect = QRectF(QPointF(zoomLeft, zoomTop), QPointF(zoomRight, zoomBottom));
-        resource.zoomTargetUuid = zoomTargetUuid;
-        resource.contrastParams = ImageCorrectionParams::deserialize(contrastParams);
-        resource.dewarpingParams = QJson::deserialized<QnItemDewarpingParams>(dewarpingParams);
+        resource.uuid = data.uuid;
+        resource.flags = data.flags;
+        resource.combinedGeometry = QRectF(QPointF(data.left, data.top), QPointF(data.right, data.bottom));
+        resource.rotation = data.rotation;
+        resource.resource.id =  data.resourceId;
+        resource.resource.path = data.resourcePath;
+        resource.zoomRect = QRectF(QPointF(data.zoomLeft, data.zoomTop), QPointF(data.zoomRight, data.zoomBottom));
+        resource.zoomTargetUuid = data.zoomTargetUuid;
+        resource.contrastParams = ImageCorrectionParams::deserialize(data.contrastParams);
+        resource.dewarpingParams = QJson::deserialized<QnItemDewarpingParams>(data.dewarpingParams);
     }
 
-    void ApiLayoutItemData::fromResource(const QnLayoutItemData& resource)
+    void fromResourceToApi(const QnLayoutItemData& resource, ApiLayoutItemData& data)
     {
-        uuid = resource.uuid.toByteArray();
-        flags = resource.flags;
-        left = resource.combinedGeometry.topLeft().x();
-        top = resource.combinedGeometry.topLeft().y();
-        right = resource.combinedGeometry.bottomRight().x();
-        bottom = resource.combinedGeometry.bottomRight().y();
-        rotation = resource.rotation;
-        resourceId = resource.resource.id;
-        resourcePath = resource.resource.path;
-        zoomLeft = resource.zoomRect.topLeft().x();
-        zoomTop = resource.zoomRect.topLeft().y();
-        zoomRight = resource.zoomRect.bottomRight().x();
-        zoomBottom = resource.zoomRect.bottomRight().y();
-        zoomTargetUuid = resource.zoomTargetUuid.toByteArray();
-        contrastParams = resource.contrastParams.serialize();
-        dewarpingParams = QJson::serialized(resource.dewarpingParams);
+        data.uuid = resource.uuid.toByteArray();
+        data.flags = resource.flags;
+        data.left = resource.combinedGeometry.topLeft().x();
+        data.top = resource.combinedGeometry.topLeft().y();
+        data.right = resource.combinedGeometry.bottomRight().x();
+        data.bottom = resource.combinedGeometry.bottomRight().y();
+        data.rotation = resource.rotation;
+        data.resourceId = resource.resource.id;
+        data.resourcePath = resource.resource.path;
+        data.zoomLeft = resource.zoomRect.topLeft().x();
+        data.zoomTop = resource.zoomRect.topLeft().y();
+        data.zoomRight = resource.zoomRect.bottomRight().x();
+        data.zoomBottom = resource.zoomRect.bottomRight().y();
+        data.zoomTargetUuid = resource.zoomTargetUuid.toByteArray();
+        data.contrastParams = resource.contrastParams.serialize();
+        data.dewarpingParams = QJson::serialized(resource.dewarpingParams);
     }
 
 
-    void ApiLayoutData::toResource(QnLayoutResourcePtr resource) const
+    void fromApiToResource(const ApiLayoutData& data, QnLayoutResourcePtr resource)
     {
-        ApiResourceData::toResource(resource);
-        resource->setCellAspectRatio(cellAspectRatio);
-        resource->setCellSpacing(cellSpacingWidth, cellSpacingHeight);
-        resource->setUserCanEdit(userCanEdit);
-        resource->setLocked(locked);
-        resource->setBackgroundImageFilename(backgroundImageFilename);
-        resource->setBackgroundSize(QSize(backgroundWidth, backgroundHeight));
-        resource->setBackgroundOpacity(backgroundOpacity);
+        fromApiToResource((const ApiResourceData &)data, resource);
+        resource->setCellAspectRatio(data.cellAspectRatio);
+        resource->setCellSpacing(data.cellSpacingWidth, data.cellSpacingHeight);
+        resource->setUserCanEdit(data.userCanEdit);
+        resource->setLocked(data.locked);
+        resource->setBackgroundImageFilename(data.backgroundImageFilename);
+        resource->setBackgroundSize(QSize(data.backgroundWidth, data.backgroundHeight));
+        resource->setBackgroundOpacity(data.backgroundOpacity);
         QnLayoutItemDataList outItems;
-        for (int i = 0; i < items.size(); ++i) {
+        for (int i = 0; i < data.items.size(); ++i) {
             outItems << QnLayoutItemData();
-            items[i].toResource(outItems.last());
+            fromApiToResource(data.items[i], outItems.last());
         }
         resource->setItems(outItems);
     }
 
-    void ApiLayoutData::fromResource(QnLayoutResourcePtr resource)
+    void fromResourceToApi(QnLayoutResourcePtr resource, ApiLayoutData& data)
     {
-        ApiResourceData::fromResource(resource);
-        cellAspectRatio = resource->cellAspectRatio();
-        cellSpacingWidth = resource->cellSpacing().width();
-        cellSpacingHeight = resource->cellSpacing().height();
-        userCanEdit = resource->userCanEdit();
-        locked = resource->locked();
-        backgroundImageFilename = resource->backgroundImageFilename();
-        backgroundWidth = resource->backgroundSize().width();
-        backgroundHeight = resource->backgroundSize().height();
-        backgroundOpacity = resource->backgroundOpacity();
+        fromResourceToApi(resource, (ApiResourceData &)data);
+        data.cellAspectRatio = resource->cellAspectRatio();
+        data.cellSpacingWidth = resource->cellSpacing().width();
+        data.cellSpacingHeight = resource->cellSpacing().height();
+        data.userCanEdit = resource->userCanEdit();
+        data.locked = resource->locked();
+        data.backgroundImageFilename = resource->backgroundImageFilename();
+        data.backgroundWidth = resource->backgroundSize().width();
+        data.backgroundHeight = resource->backgroundSize().height();
+        data.backgroundOpacity = resource->backgroundOpacity();
         const QnLayoutItemDataMap& layoutItems = resource->getItems();
-        items.clear();
-        items.reserve( layoutItems.size() );
+        data.items.clear();
+        data.items.reserve( layoutItems.size() );
         for( const QnLayoutItemData& item: layoutItems )
         {
-            items.push_back( ApiLayoutItemData() );
-            items.back().fromResource( item );
+            data.items.push_back( ApiLayoutItemData() );
+            fromResourceToApi(item, data.items.back());
         }
     }
 
 
     template <class T>
-    void ApiLayoutDataList::toResourceList(QList<T>& outData) const
+    void ApiLayoutList::toResourceList(QList<T>& outData) const
     {
         outData.reserve(outData.size() + data.size());
         for(int i = 0; i < data.size(); ++i)
         {
             QnLayoutResourcePtr layout(new QnLayoutResource());
-            data[i].toResource(layout);
+            fromApiToResource(data[i], layout);
             outData << layout;
         }
     }
-    template void ApiLayoutDataList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData) const;
-    template void ApiLayoutDataList::toResourceList<QnLayoutResourcePtr>(QList<QnLayoutResourcePtr>& outData) const;
+    template void ApiLayoutList::toResourceList<QnResourcePtr>(QList<QnResourcePtr>& outData) const;
+    template void ApiLayoutList::toResourceList<QnLayoutResourcePtr>(QList<QnLayoutResourcePtr>& outData) const;
 
-    void ApiLayoutDataList::loadFromQuery(QSqlQuery& query)
+    void ApiLayoutList::loadFromQuery(QSqlQuery& query)
     {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiLayoutData, data, ApiLayoutDataFields ApiResourceDataFields)
+        QN_QUERY_TO_DATA_OBJECT(query, ApiLayoutData, data, ApiLayoutFields ApiResourceFields)
     }
 
 }

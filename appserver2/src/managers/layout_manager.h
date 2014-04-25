@@ -33,27 +33,25 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiLayoutData>& tran )
         {
             assert( tran.command == ApiCommand::saveLayout);
-            QnLayoutResourcePtr layoutResource = m_resCtx.resFactory->createResource(
-                tran.params.typeId,
-                QnResourceParams(tran.params.url, QString()) ).dynamicCast<QnLayoutResource>();
-            tran.params.toResource( layoutResource );
+            QnLayoutResourcePtr layoutResource(new QnLayoutResource());
+            fromApiToResource(tran.params, layoutResource);
             emit addedOrUpdated( layoutResource );
         }
 
-        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran )
+        void triggerNotification( const QnTransaction<ApiLayoutList>& tran )
         {
             assert(tran.command == ApiCommand::saveLayouts );
             foreach(const ApiLayoutData& layout, tran.params.data) 
             {
                 QnLayoutResourcePtr layoutResource(new QnLayoutResource());
-                layout.toResource( layoutResource );
+                fromApiToResource(layout, layoutResource);
                 emit addedOrUpdated( layoutResource );
             }
         }
 
     private:
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
-        QnTransaction<ApiLayoutDataList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );
+        QnTransaction<ApiLayoutList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );
 
     private:
         QueryProcessorType* const m_queryProcessor;

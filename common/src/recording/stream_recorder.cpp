@@ -1,4 +1,5 @@
 #include "stream_recorder.h"
+
 #include "core/resource/resource_consumer.h"
 #include "core/datapacket/abstract_data_packet.h"
 #include "core/datapacket/media_data_packet.h"
@@ -7,7 +8,8 @@
 #include "utils/common/util.h"
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
-#include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
+#include <plugins/resources/archive/avi_files/avi_archive_delegate.h>
+#include <plugins/resources/archive/avi_files/avi_archive_custom_data.h>
 #include "transcoding/ffmpeg_audio_transcoder.h"
 #include "transcoding/ffmpeg_video_transcoder.h"
 #include "transcoding/filters/contrast_image_filter.h"
@@ -498,11 +500,19 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Software, fileExt), "Network Optix", 0);
         QnMediaDewarpingParams mediaDewarpingParams = mediaDev->getDewarpingParams();
         if (mediaDewarpingParams.enabled && !m_itemDewarpingParams.enabled) {
-            // deworping exists in resource and not activated now. Allow deworping for saved file
+            // dewarping exists in resource and not activated now. Allow dewarping for saved file
             av_dict_set(&m_formatCtx->metadata,
                         QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Dewarping, fileExt),
                         QJson::serialized<QnMediaDewarpingParams>(mediaDewarpingParams), 0);
         }
+
+        QnAviArchiveCustomData customData;
+        customData.overridenAr = m_device->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
+        av_dict_set(&m_formatCtx->metadata,
+            QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Custom, fileExt),
+            QJson::serialized<QnAviArchiveCustomData>(customData), 0);
+        
+
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature) {
             QByteArray signPattern = QnSignHelper::getSignPattern();

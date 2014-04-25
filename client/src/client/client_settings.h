@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QStringList>
+#include <QtCore/QUuid>
 #include <QtGui/QColor>
 
 #include <utils/common/property_storage.h>
@@ -13,6 +14,7 @@
 #include <client/client_globals.h>
 #include <client/client_connection_data.h>
 #include <client/client_model_types.h>
+#include <common/common_meta_types.h>
 
 class QSettings;
 class QNetworkAccessManager;
@@ -132,6 +134,12 @@ public:
 
         CLIENT_SKIN,
 
+        /** Unique id for this PC for videowall construction. */
+        PC_UUID,
+
+        /** Flag that client is run in videowall mode */
+        VIDEO_WALL_MODE,
+
         RAINBOW_MODE,
 
         VARIABLE_COUNT
@@ -221,9 +229,12 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                        isPtzPresetInUseWarningDisabled,    setPtzPresetInUseWarningDisabled,   PTZ_PRESET_IN_USE_WARNING_DISABLED, false)
         QN_DECLARE_RW_PROPERTY(Qn::Corner,                  timestampCorner,        setTimestampCorner,         TIMESTAMP_CORNER,           Qn::BottomRightCorner)
         QN_DECLARE_RW_PROPERTY(int,                         lightMode,              setLightMode,               LIGHT_MODE,                 0)  //int because of intended flags system
-        QN_DECLARE_RW_PROPERTY(int,                         lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        -1)
+        QN_DECLARE_RW_PROPERTY(int,                         lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        0)
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
+        QN_DECLARE_RW_PROPERTY(QUuid,                       pcUuid,                 setPcUuid,                  PC_UUID,                    QUuid())
+        QN_DECLARE_RW_PROPERTY(bool,                        isVideoWallMode,        setVideoWallMode,           VIDEO_WALL_MODE,            false)
         QN_DECLARE_RW_PROPERTY(bool,                        isRainbowMode,          setRainbowMode,             RAINBOW_MODE,               false)
+
     QN_END_PROPERTY_STORAGE()
 
 private:

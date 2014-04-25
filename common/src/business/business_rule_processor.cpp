@@ -28,6 +28,7 @@
 #include "nx_ec/data/ec2_email.h"
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
+#include "common/common_module.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
@@ -73,7 +74,7 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (action->actionType() == BusinessActionType::SendMail || action->actionType() == BusinessActionType::Diagnostics)
+    if (action->actionType() == QnBusiness::SendMailAction || action->actionType() == QnBusiness::DiagnosticsAction)
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
@@ -90,7 +91,7 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
         for (int i = 0; i < resList.size(); ++i)
         {
             QnMediaServerResourcePtr routeToServer = getDestMServer(action, resList[i]);
-            if (routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getGuid() != getGuid())
+            if (routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getId() != getGuid())
             {
                 // delivery to other server
                 QUrl serverUrl = routeToServer->getApiUrl();
@@ -117,7 +118,7 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 
 bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (BusinessActionType::hasToggleState(action->actionType()))
+    if (QnBusiness::hasToggleState(action->actionType()))
     {
         // check for duplicate actions. For example: camera start recording by 2 different events e.t.c
         QString actionKey = action->getExternalUniqKey();
@@ -139,16 +140,16 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
     switch( action->actionType() )
     {
-    case BusinessActionType::SendMail:
+    case QnBusiness::SendMailAction:
         return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
 
-    case BusinessActionType::Diagnostics:
+    case QnBusiness::DiagnosticsAction:
         return true;
 
-    case BusinessActionType::ShowPopup:
-    case BusinessActionType::PlaySound:
-    case BusinessActionType::PlaySoundRepeated:
-    case BusinessActionType::SayText:
+    case QnBusiness::ShowPopupAction:
+    case QnBusiness::PlaySoundOnceAction:
+    case QnBusiness::PlaySoundAction:
+    case QnBusiness::SayTextAction:
         return broadcastBusinessAction(action);
 
     default:
@@ -349,7 +350,7 @@ bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEv
         return false;
 
 
-    if (!BusinessEventType::hasToggleState(bEvent->getEventType()))
+    if (!QnBusiness::hasToggleState(bEvent->getEventType()))
         return true;
     
     // for continue event put information to m_eventsInProgress
@@ -375,7 +376,7 @@ QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(QnAbstractBus
         {
             QnAbstractBusinessActionPtr action;
 
-            if (BusinessActionType::hasToggleState(rule->actionType()))
+            if (QnBusiness::hasToggleState(rule->actionType()))
                 action = processToggleAction(bEvent, rule);
             else
                 action = processInstantAction(bEvent, rule);
@@ -570,7 +571,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
 {
     QString ruleId = rule->getUniqueId();
     RunningRuleInfo runtimeRule = m_rulesInProgress.value(ruleId);
-    bool isToggledAction = BusinessActionType::hasToggleState(rule->actionType()); // We decided to terminate continues actions only if rule is changed
+    bool isToggledAction = QnBusiness::hasToggleState(rule->actionType()); // We decided to terminate continues actions only if rule is changed
     if (!runtimeRule.isActionRunning.isEmpty() && !runtimeRule.resources.isEmpty() && isToggledAction)
     {
         foreach(const QnId& resId, runtimeRule.isActionRunning)
@@ -621,11 +622,13 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessE
 {
     //notifying resources to start input monitoring
     {
-        if( businessRule->eventType() == BusinessEventType::Camera_Input)
+        if( businessRule->eventType() == QnBusiness::CameraInputEvent)
         {
             QnResourceList resList = businessRule->eventResourceObjects();
-            if (resList.isEmpty())
-                resList = qnResPool->getAllEnabledCameras();
+            if (resList.isEmpty()) {
+                QnResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID());
+                resList = qnResPool->getAllCameras(mServer);
+            }
 
             for( QnResourceList::const_iterator it = resList.constBegin(); it != resList.constEnd(); ++it )
             {
@@ -643,7 +646,7 @@ void QnBusinessRuleProcessor::notifyResourcesAboutEventIfNeccessary( QnBusinessE
     //notifying resources about recording action
     {
         const QnResourceList& resList = businessRule->actionResourceObjects();
-        if( businessRule->actionType() == BusinessActionType::CameraRecording)
+        if( businessRule->actionType() == QnBusiness::CameraRecordingAction)
         {
             for( QnResourceList::const_iterator it = resList.begin(); it != resList.end(); ++it )
             {

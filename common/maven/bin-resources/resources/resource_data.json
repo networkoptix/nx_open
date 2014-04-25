@@ -17,6 +17,12 @@
     
     "version": "1.0",
     "data": [
+		{
+            "keys": [
+                "*|*"
+            ],
+            "show_url": true
+        },
         {
             "keys": [
                 "VIVOTEK|SD8362", "VIVOTEK|SD83X3", "VIVOTEK|SD81X1", "VIVOTEK|SD83X1"
@@ -270,6 +276,33 @@
                         "device":  [0,     50,    100,    150,    200,    250,    300,    350,    400,    450,    500,    550,    600,    650,    700,    750,    800,    850,    900,     950,    1000],
                         "logical": [1, 1.0319, 1.1540, 1.2209, 1.3808, 1.4651, 1.6802, 1.7936, 2.0959, 2.2587, 2.6660, 2.8696, 3.4621, 3.7953, 4.6840, 5.2209, 6.6650, 7.4982, 9.8495, 11.1825, 13.8485],
                         "logicalMultiplier": 35.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "VISTA|VK2-1080XVRDPTZ"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   1,  -1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO": "Actual tilt range is [0, -180].",
+                        "device":  [0.9,   0],
+                        "logical": [0,   -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [    -1,   -0.9,   -0.8,   -0.7,   -0.6,   -0.5,   -0.4,   -0.3,   -0.2,   -0.1,      0,    0.1,    0.2,    0.3,    0.4,    0.5,    0.6,    0.7,    0.8,    0.9,       1],
+                        "logical": [1.0000, 1.0748, 1.1636, 1.2617, 1.3738, 1.5000, 1.6449, 1.8178, 2.0187, 2.2477, 2.5234, 2.8458, 3.2383, 3.7150, 4.2850, 4.9766, 5.8411, 6.8645, 7.9626, 9.2925, 10.9050],
+                        "logicalMultiplier": 32.0,
                         "space": "35MmEquiv"
                     }
                 }

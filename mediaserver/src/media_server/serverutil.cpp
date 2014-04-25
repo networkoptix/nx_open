@@ -65,17 +65,16 @@ void mac_eth0(char  MAC_str[13], char** host)
 #endif
 
 
-QString serverGuid()
-{
-    static QString guid;
+QUuid serverGuid() {
+    static QUuid guid;
 
-    if (!guid.isEmpty())
+    if (!guid.isNull())
         return guid;
 
     QString name = useAlternativeGuid ? lit("serverGuid2") : lit("serverGuid");
 
     guid = MSSettings::roSettings()->value(name).toString();
-    if (guid.isEmpty())
+    if (guid.isNull())
     {
         if (!MSSettings::roSettings()->isWritable())
         {
@@ -92,9 +91,9 @@ QString serverGuid()
 	md5Hash.addData("edge");
 	guid = QUuid::fromRfc4122(md5Hash.result()).toString();
 #else
-	guid = QUuid::createUuid().toString();
+	guid = QUuid::createUuid();
 #endif
-        MSSettings::roSettings()->setValue(name, guid);
+        MSSettings::roSettings()->setValue(name, guid.toString());
     }
 #ifdef _TEST_TWO_SERVERS
     return guid + "test";

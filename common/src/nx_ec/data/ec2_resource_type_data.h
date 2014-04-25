@@ -6,67 +6,17 @@
 
 namespace ec2 
 {
+    #include "ec2_resource_type_data_i.h"
 
-    struct ApiPropertyType: public ApiData
-    {
-        QnId resource_type_id;
+    void fromApiToResource(const ApiPropertyTypeData &data, QnParamTypePtr& resource);
 
-        QString name;
-        int type;
+	void fromResourceToApi(const QnResourceTypePtr& resource, ApiResourceTypeData &data);
+	void fromApiToResource(const ApiResourceTypeData &data, QnResourceTypePtr resource);
 
-        // MinMaxStep
-        qint32 min;
-        qint32 max;
-        qint32 step;
+    QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceTypeData, ApiResourceTypeFields);
 
-        // Enumaration
-        QString values;
-        QString ui_values;
-
-        // Value
-        QString default_value;
-
-        QString group;
-        QString sub_group;
-        QString description;
-
-        bool ui;
-        bool readonly;
-
-        QString netHelper;
-
-        void toResource(QnParamTypePtr resource) const;
-    };
-
-    #define ApiPropertyTypeFields (resource_type_id) (name) (type) (min) (max) (step) (values) (ui_values) (default_value) (group) (sub_group) (description) (ui) (readonly) (netHelper)
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiPropertyType, ApiPropertyTypeFields)
-
-
-    struct ApiResourceTypeData: public ApiData
-    {
-	    QnId id;
-	    QString name;
-	    QString manufacture;
-	    std::vector<QnId> parentId;
-        std::vector<ApiPropertyType> propertyTypeList;
-
-	    void fromResource(const QnResourceTypePtr& resource);
-	    void toResource(QnResourceTypePtr resource) const;
-	    QN_DECLARE_STRUCT_SQL_BINDER();
-    };
-
-    QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiResourceTypeData, (id) (name) (manufacture) (parentId) (propertyTypeList) )
-
-
-    struct ApiResourceTypeList: public ApiData {
-	    void loadFromQuery(QSqlQuery& query);
-	    void toResourceTypeList(QnResourceTypeList& resTypeList) const;
-
-	    std::vector<ApiResourceTypeData> data;
-    };
-
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiResourceTypeList, (data))
-
+	void loadResourceTypesFromQuery(ApiResourceTypeDataListData &data, QSqlQuery& query);
+	void fromApiToResourceTypeList(const ApiResourceTypeDataListData &data, QnResourceTypeList& resTypeList);
 }
 
 #endif // __EC2_RESOURCE_TYPE_DATA_H_

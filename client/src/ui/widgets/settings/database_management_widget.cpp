@@ -39,7 +39,15 @@ QnDatabaseManagementWidget::~QnDatabaseManagementWidget() {
 }
 
 void QnDatabaseManagementWidget::at_backupButton_clicked() {
-    QString fileName = QnFileDialog::getSaveFileName(this, tr("Save Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QnCustomFileDialog::fileDialogOptions());
+    // TODO: #dklychkov file name filter string duplicates the value of dbExtension variable
+    QScopedPointer<QnCustomFileDialog> fileDialog(new QnCustomFileDialog(
+                                                      this,
+                                                      tr("Save Database Backup..."),
+                                                      qnSettings->lastDatabaseBackupDir(),
+                                                      tr("Database Backup Files (*.db)")));
+    fileDialog->exec();
+
+    QString fileName = fileDialog->selectedFile();
     if(fileName.isEmpty())
         return;
 

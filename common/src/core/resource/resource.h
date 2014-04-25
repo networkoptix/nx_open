@@ -50,7 +50,6 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(QString searchString READ toSearchString)
     Q_PROPERTY(QnId parentId READ getParentId WRITE setParentId)
     Q_PROPERTY(Status status READ getStatus WRITE setStatus)
-    Q_PROPERTY(bool disabled READ isDisabled WRITE setDisabled)
     Q_PROPERTY(Flags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
@@ -100,7 +99,10 @@ public:
 
         foreigner = 0x40000,    /**< Resource belongs to other entity. E.g., camera on another server */
         no_last_gop = 0x80000,  /**< Do not use last GOP for this when stream is opened */
-        deprecated = 0x100000,   /**< Resource absent in EC but still used in memory for some reason */
+        deprecated = 0x100000,  /**< Resource absent in EC but still used in memory for some reason */
+
+        videowall = 0x200000,           /**< Videowall resource */
+        videowall_item = 0x400000,      /**< Videowall item */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -125,11 +127,8 @@ public:
     QnId getParentId() const;
     void setParentId(QnId parent);
 
-    void setGuid(const QUuid& guid);
-    QUuid getGuid() const;
-
     // device unique identifier
-    virtual QString getUniqueId() const { return getGuid().toString(); };
+    virtual QString getUniqueId() const { return getId().toString(); };
     virtual void setUniqId(const QString& value);
 
 
@@ -138,9 +137,6 @@ public:
     QnId getTypeId() const;
     void setTypeId(QnId id);
     void setTypeByName(const QString& resTypeName);
-
-    bool isDisabled() const;
-    void setDisabled(bool disabled = true);
 
     virtual Status getStatus() const;
     virtual void setStatus(Status newStatus, bool silenceMode = false);
@@ -264,7 +260,6 @@ public:
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;
     void statusChanged(const QnResourcePtr &resource);
-    void disabledChanged(const QnResourcePtr &resource);
     void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged(const QnResourcePtr &resource);
@@ -274,6 +269,7 @@ signals:
     void mediaDewarpingParamsChanged(const QnResourcePtr &resource);
     void propertyChanged(const QnResourcePtr &resource, const QString &key);
     void initializedChanged(const QnResourcePtr &resource);
+    void videoLayoutChanged(const QnResourcePtr &resource);
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
@@ -309,7 +305,7 @@ public:
     QnResourcePtr toSharedPointer() const;
 
 protected:
-    virtual void updateInner(QnResourcePtr other);
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
 
     // should just do physical job ( network or so ) do not care about memory domain
     virtual bool getParamPhysical(const QnParam &param, QVariant &val);
@@ -340,6 +336,8 @@ private:
     void initAndEmit();
 
     void updateUrlName(const QString &oldUrl, const QString &newUrl);
+    bool emitDynamicSignal(const char *signal, void **arguments);
+    void afterUpdateInner(QSet<QByteArray>& modifiedFields);
 
     friend class InitAsyncTask;
 
@@ -357,6 +355,15 @@ protected:
     mutable QnParamList m_resourceParamList;
 
     static bool m_appStopping;
+
+    /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
+    QnId m_parentId;
+
+    /** Name of this resource. */
+    QString m_name;
+
+    /** Url of this resource, if any. */
+    QString m_url; 
 private:
     /** Resource pool this this resource belongs to. */
     QnResourcePool *m_resourcePool;
@@ -364,26 +371,15 @@ private:
     /** Identifier of this resource. */
     QnId m_id;
 
-    /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
-    QnId m_parentId;
-
     /** Identifier of the type of this resource. */
     QnId m_typeId;
 
     /** Flags of this resource that determine its type. */
     Flags m_flags;
     
-    /** Name of this resource. */
-    QString m_name;
-
-    /** Disable flag of the resource. */
-    bool m_disabled;
 
     /** Status of this resource. */
     Status m_status;
-
-    /** Url of this resource, if any. */
-    QString m_url; 
 
     QDateTime m_lastDiscoveredTime;
     QDateTime m_lastStatusUpdateTime;

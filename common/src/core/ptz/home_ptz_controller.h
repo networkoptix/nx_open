@@ -31,6 +31,9 @@ public:
     virtual bool updateHomeObject(const QnPtzObject &homePosition) override;
     virtual bool getHomeObject(QnPtzObject *homePosition) override;
 
+protected:
+    virtual void restartExecutor();
+
 private:
     void at_adaptor_valueChanged();
 

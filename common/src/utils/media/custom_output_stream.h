@@ -29,7 +29,7 @@ public:
     }
 
     //!Implementation of \a AbstractByteStreamFilter::flush
-    virtual void flush() {}
+    virtual size_t flush() { return 0; }
 
 private:
     Func m_func;

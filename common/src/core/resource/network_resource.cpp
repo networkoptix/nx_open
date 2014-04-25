@@ -177,21 +177,16 @@ unsigned int QnNetworkResource::getNetworkTimeout() const
     return m_networkTimeout;
 }
 
-void QnNetworkResource::updateInner(QnResourcePtr other)
+void QnNetworkResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    QnResource::updateInner(other);
+    QnResource::updateInner(other, modifiedFields);
     QnNetworkResourcePtr other_casted = qSharedPointerDynamicCast<QnNetworkResource>(other);
     if (other_casted)
     {
         m_auth = other_casted->m_auth;
         m_macAddress = other_casted->m_macAddress;
     }
-}
-
-bool QnNetworkResource::shoudResolveConflicts() const
-{
-    return false;
 }
 
 bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source )
@@ -205,60 +200,6 @@ bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
     return false;
 }
 
-
-
-bool QnNetworkResource::conflicting()
-{
-    if (checkNetworkStatus(QnNetworkResource::BadHostAddr))
-        return false;
-
-    QElapsedTimer time;
-    time.restart();
-    CL_LOG(cl_logDEBUG2) cl_log.log("begining of QnNetworkResource::conflicting() ",  cl_logDEBUG2);
-
-    QString mac = getMacByIP(getHostAddress());
-
-//#ifndef _WIN32
-    // If mac is empty or resolution is not implemented
-    if (mac.isEmpty())
-        return false;
-//#endif
-
-    if (mac!=m_macAddress.toString())// someone else has this IP
-    {
-        addNetworkStatus(QnNetworkResource::BadHostAddr);
-        return true;
-    }
-
-    QnSleep::msleep(10);
-
-    CLPing ping;
-    if (!ping.ping(getHostAddress(), 2, ping_timeout)) // I do not know how else to solve this problem. but getMacByIP do not creates any ARP record
-    {
-        //addNetworkStatus(QnNetworkResource::BadHostAddr);
-        //return true;
-
-        // some times ping does not work but cam is still is not conflicting
-    }
-
-    mac = getMacByIP(getHostAddress(), false); // just in case if ARP response from some else have delayed
-
-
-
-    if (mac!=m_macAddress.toString() && mac!=QLatin1String("00-00-00-00-00-00"))// someone else has this IP
-    {
-        addNetworkStatus(QnNetworkResource::BadHostAddr);
-        return true;
-    }
-
-    if (mac==QLatin1String("00-00-00-00-00-00"))
-    {
-        CL_LOG(cl_logERROR) cl_log.log("00-00-00-00-00-00 mac record in OS arp( got it once on WIN7) table?!", cl_logERROR);
-    }
-
-    CL_LOG(cl_logDEBUG2) cl_log.log("end of  QnNetworkResource::conflicting(),  time elapsed: ", time.elapsed(), cl_logDEBUG2);
-    return false;
-}
 
 int QnNetworkResource::getChannel() const
 {

@@ -82,7 +82,7 @@ class QnMediaServerConnection: public QnAbstractConnection {
     typedef QnAbstractConnection base_type;
 
 public:
-    QnMediaServerConnection(QnMediaServerResource* mserver, QObject *parent = NULL);
+    QnMediaServerConnection(QnMediaServerResource* mserver, const QString& videoWallKey = QString(), QObject *parent = NULL);
     virtual ~QnMediaServerConnection();
 
     void setProxyAddr(const QUrl &apiUrl, const QString &addr, int port);
@@ -140,8 +140,8 @@ public:
         qint64 dateFrom, 
         qint64 dateTo, 
         QnResourceList cameras,
-        BusinessEventType::Value eventType, 
-        BusinessActionType::Value actionType,
+        QnBusiness::EventType eventType, 
+        QnBusiness::ActionType actionType,
         QnId businessRuleId, 
         QObject *target, 
         const char *slot);

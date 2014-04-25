@@ -5,7 +5,7 @@ QnMServerConflictBusinessEvent::QnMServerConflictBusinessEvent(
         const QnResourcePtr& mServerRes,
         qint64 timeStamp,
         const QList<QByteArray>& conflictList):
-    base_type(BusinessEventType::MediaServer_Conflict,
+    base_type(QnBusiness::ServerConflictEvent,
                             mServerRes,
                             timeStamp)
 {

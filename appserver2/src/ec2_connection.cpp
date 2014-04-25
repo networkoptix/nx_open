@@ -4,6 +4,7 @@
 ***********************************************************/
 
 #include "ec2_connection.h"
+#include "mutex/distributed_mutex.h"
 
 
 namespace ec2
@@ -23,6 +24,8 @@ namespace ec2
         m_transactionLog( new QnTransactionLog(m_dbManager.get() )),
         m_connectionInfo( connectionInfo )
     {
+        ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
+
         m_dbManager->init();
         m_transactionLog->init();
 
@@ -38,7 +41,9 @@ namespace ec2
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
-        QnTransactionMessageBus::instance()->removeHandler(this);
+        if (QnTransactionMessageBus::instance())
+            QnTransactionMessageBus::instance()->removeHandler(this);
+        ec2::QnDistributedMutexManager::initStaticInstance(0);
     }
 
     QnConnectionInfo Ec2DirectConnection::connectionInfo() const
@@ -48,6 +53,6 @@ namespace ec2
 
     void Ec2DirectConnection::startReceivingNotifications( bool /*isClient*/)
     {
-        //TODO/IMPL
+        QnTransactionMessageBus::instance()->start();
     }
 }

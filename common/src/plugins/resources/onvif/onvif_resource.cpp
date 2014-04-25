@@ -1131,11 +1131,6 @@ int QnPlOnvifResource::round(float value)
 }
 
 
-bool QnPlOnvifResource::shoudResolveConflicts() const
-{
-    return false;
-}
-
 bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source)
 {
     QnPlOnvifResourcePtr onvifR = source.dynamicCast<QnPlOnvifResource>();
@@ -2233,8 +2228,7 @@ QnAbstractPtzController *QnPlOnvifResource::createPtzControllerInternal()
 
 bool QnPlOnvifResource::startInputPortMonitoring()
 {
-    if( isDisabled()
-        || hasFlags(QnResource::foreigner) )     //we do not own camera
+    if( hasFlags(QnResource::foreigner) )     //we do not own camera
     {
         return false;
     }

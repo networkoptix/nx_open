@@ -5,10 +5,12 @@
 #include <QtCore/QHash>
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
+#include <QtCore/QUuid>
+#include <QtNetwork/QHostAddress>
 
-#include "core/resource/resource.h"
-#include "core/resource_management/resource_criterion.h"
-#include "core/resource/network_resource.h"
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_criterion.h>
 
 class QnResource;
 class QnNetworkResource;
@@ -59,8 +61,7 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(QnId id) const;
-    QnResourcePtr getResourceByGuid(const QUuid& guid) const;
+    QnResourcePtr getResourceById(const QnId &id) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
     void updateUniqId(QnResourcePtr res, const QString &newUniqId);
@@ -77,10 +78,8 @@ public:
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
-    QnNetworkResourcePtr getEnabledResourceByPhysicalId(const QString &mac) const;
-    QnResourceList getAllEnabledCameras(QnResourcePtr mServer = QnResourcePtr(), Filter searchFilter = OnlyFriends) const;
+    QnResourceList getAllCameras(const QnResourcePtr &mServer) const;
     QnResourceList getResourcesByParentId(const QnId& parentId) const;
-    QnResourcePtr getEnabledResourceByUniqueId(const QString &uniqueId) const;
 
     // returns list of resources with such flag
     QnResourceList getResourcesWithFlag(QnResource::Flag flag) const;
@@ -89,6 +88,20 @@ public:
     QnResourceList getResourcesWithTypeId(QnId id) const;
 
     QnUserResourcePtr getAdministrator() const;
+
+    /**
+     * @brief getVideoWallItemByUuid            Find videowall item by uuid.
+     * @param uuid                              Unique id of the item.
+     * @return                                  Pair of videowall containing the item and item's uuid.
+     */
+    QnVideoWallItemIndex getVideoWallItemByUuid(const QUuid &uuid) const;
+
+    /**
+     * @brief getVideoWallItemsByUuid           Find list of videowall items by their uuid.
+     * @param uuids                             Unique ids of the items.
+     * @return                                  List of pairs of videowall containing the item and item's uuid.
+     */
+    QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QUuid> &uuids) const;
 
     QStringList allTags() const;
 
@@ -101,10 +114,6 @@ public:
     int activeAnalog() const {
         return activeCamerasByClass(true);
     }
-
-    // TODO #GDM: this is a hack. Fix.
-    bool isLayoutsUpdated() const;
-    void setLayoutsUpdated(bool updateLayouts);
 
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();
@@ -119,7 +128,6 @@ signals:
 
 private:
     mutable QMutex m_resourcesMtx;
-    bool m_updateLayouts;
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
     QHash<QString, QnResourcePtr> m_resources;

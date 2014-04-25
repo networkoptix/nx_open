@@ -18,6 +18,7 @@
 
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <utils/media/pts_to_clock_mapper.h>
 
 #include "isd_motion_estimation.h"
 
@@ -85,6 +86,8 @@ private:
     int m_framesSinceTimeResync;
     int m_epollFD;
 
+    PtsToClockMapper m_ptsMapper;
+
     int initializeVMux();
     int getVideoPacket( nxcip::MediaDataPacket** packet );
     bool registerFD( int fd );
@@ -95,7 +98,7 @@ private:
     void fillAudioFormat( const ISDAudioPacket& audioPacket );
 #endif
     int64_t calcNextTimestamp( int32_t pts, int64_t absoluteTimeMS );
-    void resyncTime( int32_t pts, int64_t absoluteSourceTimeMS );
+    void resyncTime( int64_t absoluteSourceTimeUSec );
 };
 
 #endif  //ILP_STREAM_READER_H

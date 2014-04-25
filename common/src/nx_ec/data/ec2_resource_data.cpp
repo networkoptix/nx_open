@@ -3,39 +3,37 @@
 
 namespace ec2 {
 
-void ApiResourceData::fromResource(const QnResourcePtr& resource)
+void fromResourceToApi(const QnResourcePtr& resource, ApiResourceData& data)
 {
     Q_ASSERT(!resource->getId().isNull());
     Q_ASSERT(!resource->getTypeId().isNull());
 
-	id = resource->getId();
-	typeId = resource->getTypeId();
-	parentGuid = resource->getParentId();
-	name = resource->getName();
-	url = resource->getUrl();
-	status = resource->getStatus();
-	disabled = resource->isDisabled();
+	data.id = resource->getId();
+	data.typeId = resource->getTypeId();
+	data.parentGuid = resource->getParentId();
+	data.name = resource->getName();
+	data.url = resource->getUrl();
+	data.status = resource->getStatus();
 
     QnParamList params = resource->getResourceParamList();
     foreach(const QnParam& param, resource->getResourceParamList().list())
     {
         if (param.domain() == QnDomainDatabase)
-            addParams.push_back(ApiResourceParam(param.name(), param.value().toString(), true));
+            data.addParams.push_back(ApiResourceParamData(param.name(), param.value().toString(), true));
     }
 }
 
-void ApiResourceData::toResource(QnResourcePtr resource) const
+void fromApiToResource(const ApiResourceData& data, QnResourcePtr resource)
 {
-	resource->setId(id);
+	resource->setId(data.id);
 	//resource->setGuid(guid);
-	resource->setTypeId(typeId);
-	resource->setParentId(parentGuid);
-	resource->setName(name);
-	resource->setUrl(url);
-	resource->setStatus(status, true);
-	resource->setDisabled(disabled);
+	resource->setTypeId(data.typeId);
+	resource->setParentId(data.parentGuid);
+	resource->setName(data.name);
+	resource->setUrl(data.url);
+	resource->setStatus(data.status, true);
 
-    foreach(const ApiResourceParam& param, addParams) {
+    foreach(const ApiResourceParamData& param, data.addParams) {
         if (param.isResTypeParam)
             resource->setParam(param.name, param.value, QnDomainDatabase);
         else
@@ -43,20 +41,20 @@ void ApiResourceData::toResource(QnResourcePtr resource) const
     }
 }
 
-void ApiResourceDataList::loadFromQuery(QSqlQuery& /*query*/)
+void ApiResourceList::loadFromQuery(QSqlQuery& /*query*/)
 {
     //TODO/IMPL
     assert( false );
 }
 
-void ApiResourceDataList::toResourceList( QnResourceFactory* resFactory, QnResourceList& resList ) const
+void ApiResourceList::toResourceList( QnResourceFactory* resFactory, QnResourceList& resList ) const
 {
 	resList.reserve(data.size());
 	for(int i = 0; i < data.size(); ++i) {
         QnResourcePtr res = resFactory->createResource(
             data[i].typeId,
             QnResourceParams(data[i].url, QString() )).dynamicCast<QnResource>();
-		data[i].toResource( res );
+		fromApiToResource(data[i],  res);
 		resList << res;
 	}
 }
@@ -75,7 +73,7 @@ void ApiParamList::fromResourceList(const QnKvPairList& resources)
 void ApiParamList::toResourceList(QnKvPairList& resources) const
 {
     resources.reserve(data.size());
-    foreach(const ApiResourceParam& param, data)
+    foreach(const ApiResourceParamData& param, data)
     {
         resources << QnKvPair();
         resources.last().setName(param.name);

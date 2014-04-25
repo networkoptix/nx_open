@@ -3,56 +3,56 @@
 namespace ec2
 {
 
-void ApiPropertyType::toResource(QnParamTypePtr resource) const
+void fromApiToResource(const ApiPropertyTypeData& data, QnParamTypePtr& resource)
 {
     //resource->id = id;
-    resource->name = name;
-    resource->type = (QnParamType::DataType) type;
-    resource->min_val = min;
-    resource->max_val = max;
-    resource->step = step;
-    foreach(const QString& val, values.split(QLatin1Char(',')))
+    resource->name = data.name;
+    resource->type = (QnParamType::DataType) data.type;
+    resource->min_val = data.min;
+    resource->max_val = data.max;
+    resource->step = data.step;
+    foreach(const QString& val, data.values.split(QLatin1Char(',')))
         resource->possible_values << val.trimmed();
-    foreach(const QString& val, ui_values.split(QLatin1Char(',')))
+    foreach(const QString& val, data.ui_values.split(QLatin1Char(',')))
         resource->ui_possible_values << val.trimmed();
-    resource->default_value = default_value;
-    resource->group = group;
-    resource->subgroup = sub_group;
-    resource->description = description;
-    resource->ui = ui;
-    resource->isReadOnly = readonly;
-    resource->paramNetHelper = netHelper;
+    resource->default_value = data.default_value;
+    resource->group = data.group;
+    resource->subgroup = data.sub_group;
+    resource->description = data.description;
+    resource->ui = data.ui;
+    resource->isReadOnly = data.readonly;
+    resource->paramNetHelper = data.netHelper;
 }
 
 
-void ApiResourceTypeData::toResource(QnResourceTypePtr resource) const
+void fromApiToResource(const ApiResourceTypeData& data, QnResourceTypePtr resource)
 {
-	resource->setId(id);
-	resource->setName(name);
-	resource->setManufacture(manufacture);
+	resource->setId(data.id);
+	resource->setName(data.name);
+	resource->setManufacture(data.manufacture);
 	
-	if (!parentId.empty())
-		resource->setParentId(parentId[0]);
-	for (int i = 1; i < parentId.size(); ++i)
-		resource->addAdditionalParent(parentId[0]);
-    foreach(const ApiPropertyType& p, propertyTypeList) {
+	if (!data.parentId.empty())
+		resource->setParentId(data.parentId[0]);
+	for (int i = 1; i < data.parentId.size(); ++i)
+		resource->addAdditionalParent(data.parentId[i]);
+    foreach(const ApiPropertyTypeData& p, data.propertyTypeList) {
         QnParamTypePtr param(new QnParamType());
-        p.toResource(param);
+        fromApiToResource(p, param);
         resource->addParamType(param);
     }
 }
 
-void ApiResourceTypeList::loadFromQuery(QSqlQuery& query)
+void loadResourceTypesFromQuery(ApiResourceTypeDataListData &data, QSqlQuery& query)
 {
-	QN_QUERY_TO_DATA_OBJECT(query, ApiResourceTypeData, data, (id) (name) (manufacture) );
+	QN_QUERY_TO_DATA_OBJECT(query, ApiResourceTypeData, data.data, (id) (name) (manufacture) );
 }
 
-void ApiResourceTypeList::toResourceTypeList(QnResourceTypeList& resTypeList) const
+void fromApiToResourceTypeList(const ApiResourceTypeDataListData &data, QnResourceTypeList& resTypeList)
 {
-	resTypeList.reserve(data.size());
-	for(int i = 0; i < data.size(); ++i) {
+	resTypeList.reserve((int)data.data.size());
+	for(int i = 0; i < data.data.size(); ++i) {
 		QnResourceTypePtr resType(new QnResourceType());
-		data[i].toResource(resType);
+		fromApiToResource(data.data[i], resType);
 		resTypeList << resType;
 	}
 }

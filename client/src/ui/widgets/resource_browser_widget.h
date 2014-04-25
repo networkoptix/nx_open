@@ -67,9 +67,6 @@ public:
 signals:
     void thumbnailClicked();
 
-private slots:
-    void at_provider_imageChanged(const QImage &image);
-
 private:
     QnProxyLabel* m_textLabel;
     QnClickableProxyLabel* m_thumbnailLabel;
@@ -100,6 +97,8 @@ public:
     QnResourceList selectedResources() const;
 
     QnLayoutItemIndexList selectedLayoutItems() const;
+
+    QnVideoWallItemIndexList selectedVideoWallItems() const;
 
     virtual Qn::ActionScope currentScope() const override;
 

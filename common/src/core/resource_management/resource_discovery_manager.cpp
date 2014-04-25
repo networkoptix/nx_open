@@ -462,10 +462,14 @@ QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const
 void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher) {
     // TODO: #Elric strictly speaking, we must do this under lock.
 
-    QSet<QString> disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
+    QSet<QString> disabledVendorsForAutoSearch;
+#ifndef EDGE_SERVER
+    disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
+#endif
 
     searcher->setShouldBeUsed(
-        searcher->isLocal() ||
+        searcher->isLocal() ||                  // local resources should always be found
+        searcher->isVirtualResource() ||        // virtual resources should always be found
         (!disabledVendorsForAutoSearch.contains(searcher->manufacture()) && !disabledVendorsForAutoSearch.contains(lit("all")))
     );
 }

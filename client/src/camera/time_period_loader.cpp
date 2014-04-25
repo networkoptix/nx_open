@@ -4,6 +4,7 @@
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
 
 //#define QN_TIME_PERIOD_LOADER_DEBUG
@@ -29,15 +30,11 @@ QnTimePeriodLoader::QnTimePeriodLoader(const QnMediaServerConnectionPtr &connect
         qnNullWarning(resource);
 }
 
-QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent) {
+QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnMediaServerResourcePtr serverResource, QnResourcePtr resource, QObject *parent) {
     QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
-    if (!networkResource)
+    if (!networkResource || !serverResource)
         return NULL;
-
-    QnMediaServerResourcePtr serverResource = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(resource->getParentId()));
-    if (!serverResource)
-        return NULL;
-
+    
     QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();
     if (!serverConnection)
         return NULL;

@@ -200,7 +200,7 @@ QnConstCompressedAudioDataPtr QnVideoCameraGopKeeper::getLastAudioFrame() const
 void QnVideoCameraGopKeeper::updateCameraActivity()
 {
     qint64 usecTime = getUsecTimer();
-    if (!m_resource->isDisabled() && m_resource->isInitialized() &&
+    if (!m_resource->hasFlags(QnResource::foreigner) && m_resource->isInitialized() &&
        (!m_lastKeyFrame || qnSyncTime->currentUSecsSinceEpoch() - m_lastKeyFrame->timestamp > CAMERA_UPDATE_INTERNVAL))
     {
         if (!m_activityStarted && usecTime > m_nextMinTryTime) {
@@ -328,7 +328,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnResource::ConnectionRole 
 {
     QMutexLocker lock(&m_getReaderMutex);
 
-    if (!m_resource->isDisabled() && m_resource->isInitialized()) 
+    if (!m_resource->hasFlags(QnResource::foreigner) && m_resource->isInitialized()) 
     {
         if (role == QnResource::Role_LiveVideo && m_primaryReader == 0)
             createReader(QnResource::Role_LiveVideo);
@@ -413,7 +413,7 @@ void QnVideoCamera::notInUse(void* user)
 
 bool QnVideoCamera::isSomeActivity() const
 {
-    return !m_cameraUsers.isEmpty() && !m_resource->isDisabled();
+    return !m_cameraUsers.isEmpty() && !m_resource->hasFlags(QnResource::foreigner);
 }
 
 void QnVideoCamera::updateActivity()

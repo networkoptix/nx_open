@@ -35,6 +35,8 @@ namespace ec2
 
     void RemoteEC2Connection::startReceivingNotifications( bool isClient)
     {
+        QnTransactionMessageBus::instance()->start();
+
         QUrl url(m_queryProcessor->getUrl());
         url.setPath("ec2/events");
         QUrlQuery q;

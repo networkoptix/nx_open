@@ -9,6 +9,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QDesktopServices>
 #include <QtWidgets/QSplitter>
+#include <QtWidgets/QStackedLayout>
 
 #include <camera/single_thumbnail_loader.h>
 
@@ -35,12 +36,19 @@
 #include <ui/widgets/properties/camera_settings_widget_p.h>
 
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/license_usage_helper.h>
+#include <common/common_module.h>
+#include <core/resource/resource_data.h>
+#include <core/resource_management/resource_data_pool.h>
+#include "api/app_server_connection.h"
+#include "api/network_proxy_factory.h"
+#include "client/client_settings.h"
 
 namespace {
     const QSize fisheyeThumbnailSize(0, 0); //unlimited size for better calibration
@@ -73,10 +81,11 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_motionLayout->setContentsMargins(0, 0, 0, 0);
 
     ui->cameraScheduleWidget->setContext(context());
+    connect(context(), &QnWorkbenchContext::userChanged, this, &QnSingleCameraSettingsWidget::updateLicensesButtonVisible);
 
     /* Set up context help. */
     setHelpTopic(this,                                                      Qn::CameraSettings_Help);
-    setHelpTopic(ui->fisheyeCheckBox,                                     Qn::CameraSettings_Dewarping_Help);
+    setHelpTopic(ui->fisheyeCheckBox,                                       Qn::CameraSettings_Dewarping_Help);
     setHelpTopic(ui->nameLabel,         ui->nameEdit,                       Qn::CameraSettings_General_Name_Help);
     setHelpTopic(ui->modelLabel,        ui->modelEdit,                      Qn::CameraSettings_General_Model_Help);
     setHelpTopic(ui->firmwareLabel,     ui->firmwareEdit,                   Qn::CameraSettings_General_Firmware_Help);
@@ -88,6 +97,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     setHelpTopic(ui->motionTab,                                             Qn::CameraSettings_Motion_Help);
     setHelpTopic(ui->advancedTab,                                           Qn::CameraSettings_Properties_Help);
     setHelpTopic(ui->fisheyeTab,                                            Qn::CameraSettings_Dewarping_Help);
+    setHelpTopic(ui->arOverrideCheckBox, ui->arComboBox,                    Qn::CameraSettings_AspectRatio_Help);
+    setHelpTopic(ui->arGroupBox,                                            Qn::CameraSettings_AspectRatio_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
@@ -116,13 +127,30 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
     connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButton_clicked()));
+    connect(ui->moreLicensesButton,     &QPushButton::clicked,                  this,   &QnSingleCameraSettingsWidget::moreLicensesRequested);
+
+    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
+    connect(ui->analogViewCheckBox,     SIGNAL(stateChanged(int)),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
+    connect(qnLicensePool,              SIGNAL(licensesChanged()),              this,   SLOT(updateLicenseText()), Qt::QueuedConnection);
+    connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
     connect(ui->expertSettingsWidget,   SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
 
     connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
     connect(ui->fisheyeCheckBox,        &QCheckBox::toggled,                    this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
 
+    connect(ui->arOverrideCheckBox, &QCheckBox::stateChanged, this, [this](int state){ ui->arComboBox->setEnabled(state == Qt::Checked);} );
+    connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dbDataChanged()));
+
+    ui->arComboBox->addItem(tr("4:3"),  4.0 / 3);
+    ui->arComboBox->addItem(tr("16:9"), 16.0 / 9);
+    ui->arComboBox->addItem(tr("1:1"),  1.0);
+    ui->arComboBox->setCurrentIndex(0);
+    connect(ui->arComboBox,         SIGNAL(currentIndexChanged(int)),    this,          SLOT(at_dbDataChanged()));
+
+
     updateFromResource();
+    updateLicensesButtonVisible();
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
@@ -143,27 +171,88 @@ QnMediaServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() c
     return m_serverConnection;
 }
 
+void QnSingleCameraSettingsWidget::at_sslErrors(QNetworkReply* reply, const QList<QSslError> &)
+{
+    reply->ignoreSslErrors();
+}
+void QnSingleCameraSettingsWidget::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
+{
+    qDebug()<<"at_authenticationRequired"<<m_camera->getAuth().user();
+    authenticator->setUser(m_camera->getAuth().user());
+    authenticator->setPassword(m_camera->getAuth().password());
+}
+void QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator)
+{
+    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+    authenticator->setUser(lastUsedConnection.url.userName());
+    authenticator->setPassword(lastUsedConnection.url.password());
+}
+
+#ifdef WEBKIT_PRESENT
+void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView)
+{
+    if ( qnCommon )
+    {
+        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
+        bool show_url = resourceData.value<bool>(lit("show_url"), false);
+        if ( show_url )
+        {
+            QnMediaServerResourcePtr server = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
+            QString camera_host = m_camera->getHostAddress();
+            int camera_port = m_camera->httpPort();
+            QString url_camera_name = QString(QLatin1String("http://%1:%2")).arg(camera_host).arg(camera_port);
+            QString proxy_url = server->getProxyHost();
+            int proxy_port = server->getProxyPort();
+            proxy_port = 50000;
+            QString proxy_url_path = QString(QLatin1String("http://%1:%2")).arg(proxy_url).arg(proxy_port);
+            QUrl camera_url;
+            camera_url.setHost(camera_host);
+            camera_url.setPort(camera_port);
+            camera_url.setScheme(lit("http"));
+            QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+            QnNetworkProxyFactory::instance()->removeFromProxyList(m_lastSiteUrl);
+            QnNetworkProxyFactory::instance()->addToProxyList(camera_url, proxy_url, proxy_port);
+            m_lastSiteUrl = camera_url;
+            QNetworkRequest request(camera_url);
+            camera_url.setUserName(qnSettings->lastUsedConnection().url.userName());
+            camera_url.setPassword(qnSettings->lastUsedConnection().url.password());
+            request.setRawHeader("proxy",proxy_url_path.toUtf8());
+            advancedWebView->load(request);
+            advancedWebView->show();
+            stackedLayout->setCurrentIndex(1);
+        } else
+        {
+            stackedLayout->setCurrentIndex(0);
+        }                
+    } 
+}
+#endif
+
 void QnSingleCameraSettingsWidget::initAdvancedTab()
 {
     QVariant id;
     QTreeWidget* advancedTreeWidget = 0;
     QStackedLayout* advancedLayout = 0;
+#ifdef WEBKIT_PRESENT
+    QWebView* advancedWebView = 0;
+#endif
     setAnyCameraChanges(false);
 
     if (m_camera && m_camera->getParam(lit("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
     {
         if (!m_widgetsRecreator)
         {
-            QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->advancedTab->layout());
-            if(!layout) {
+            QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*>(ui->advancedTab->layout());
+            if(!stacked_layout) 
+            {
                 delete ui->advancedTab->layout();
-                ui->advancedTab->setLayout(layout = new QHBoxLayout());
+                ui->advancedTab->setLayout(stacked_layout = new QStackedLayout());
             }
 
             QSplitter* advancedSplitter = new QSplitter();
             advancedSplitter->setChildrenCollapsible(false);
 
-            layout->addWidget(advancedSplitter);
+            stacked_layout->addWidget(advancedSplitter);
 
             advancedTreeWidget = new QTreeWidget();
             advancedTreeWidget->setColumnCount(1);
@@ -181,6 +270,13 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
             sizes[0] = 200;
             sizes[1] = 400;
             advancedSplitter->setSizes(sizes);
+#ifdef WEBKIT_PRESENT
+            advancedWebView = new QWebView(ui->advancedTab);
+            connect(advancedWebView->page()->networkAccessManager(), SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(at_sslErrors(QNetworkReply*,QList<QSslError>)));
+            connect(advancedWebView->page()->networkAccessManager(), SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator *)), this, SLOT(at_authenticationRequired(QNetworkReply*, QAuthenticator *)), Qt::DirectConnection);
+            stacked_layout->addWidget(advancedWebView);
+            updateWebPage(stacked_layout,advancedWebView);
+#endif
         } else {
             if (m_camera->getUniqueId() == m_widgetsRecreator->getCameraId()) {
                 return;
@@ -195,20 +291,34 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
 
             advancedTreeWidget = m_widgetsRecreator->getRootWidget();
             advancedLayout = m_widgetsRecreator->getRootLayout();
+#ifdef WEBKIT_PRESENT
+            advancedWebView = m_widgetsRecreator->getWebView();
+#endif
             cleanAdvancedSettings();
         }
 
-        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), *advancedTreeWidget, *advancedLayout, this);
+        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), *advancedTreeWidget, *advancedLayout,
+#ifdef WEBKIT_PRESENT
+            advancedWebView,
+#endif
+            this);
     }
     else if (m_widgetsRecreator)
     {
         advancedTreeWidget = m_widgetsRecreator->getRootWidget();
         advancedLayout = m_widgetsRecreator->getRootLayout();
-
+#ifdef WEBKIT_PRESENT
+        advancedWebView = m_widgetsRecreator->getWebView();
+#endif
         cleanAdvancedSettings();
 
         //Dummy creator: required for cameras, that doesn't support advanced settings
-        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout, this);
+        //m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout, this);
+		m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout,
+#ifdef WEBKIT_PRESENT
+            advancedWebView,
+#endif
+            this);
     }
 }
 
@@ -273,6 +383,13 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         connect(m_camera, SIGNAL(resourceChanged(const QnResourcePtr &)),   this, SLOT(updateIpAddressText()));
         connect(m_camera, SIGNAL(urlChanged(const QnResourcePtr &)),        this, SLOT(updateWebPageText())); // TODO: #Elric also listen to hostAddress changes?
         connect(m_camera, SIGNAL(resourceChanged(const QnResourcePtr &)),   this, SLOT(updateWebPageText()));
+        QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*>(ui->advancedTab->layout());
+#ifdef WEBKIT_PRESENT
+        if ( m_widgetsRecreator && m_widgetsRecreator->getWebView() && stacked_layout)
+        {
+            updateWebPage(stacked_layout,m_widgetsRecreator->getWebView());
+        }        
+#endif
     }
 
     updateFromResource();
@@ -344,10 +461,14 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     if (hasDbChanges()) {
         m_camera->setName(ui->nameEdit->text());
         m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
-        m_camera->setUrl(ui->ipAddressEdit->text());
+        //m_camera->setUrl(ui->ipAddressEdit->text());
         m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
 
-        m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
+        if (m_camera->isDtsBased()) {
+            m_camera->setScheduleDisabled(!ui->analogViewCheckBox->isChecked());
+        } else {
+            m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
+        }
 
         if (!m_camera->isDtsBased()) {
             if (m_hasScheduleChanges) {
@@ -364,6 +485,11 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 
             submitMotionWidgetToResource();
         }
+
+        if (ui->arOverrideCheckBox->isChecked())
+            m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ui->arComboBox->itemData(ui->arComboBox->currentIndex()).toDouble()));
+        else
+            m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
 
         ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
 
@@ -427,6 +553,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         m_cameraSupportsMotion = false;
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
+        ui->analogGroupBox->setVisible(false);
     } else {
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());
@@ -450,6 +577,25 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->tabWidget->setTabEnabled(Qn::MotionSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::AdvancedCameraSettingsTab, !dtsBased);
         ui->tabWidget->setTabEnabled(Qn::ExpertCameraSettingsTab, !dtsBased);
+
+        ui->analogGroupBox->setVisible(m_camera->isDtsBased());
+        ui->analogViewCheckBox->setChecked(!m_camera->isScheduleDisabled());
+
+        QString arOverride = m_camera->getProperty(QnMediaResource::customAspectRatioKey());
+        ui->arOverrideCheckBox->setChecked(!arOverride.isEmpty());
+        if (!arOverride.isEmpty()) 
+        {
+            // float is important here
+            float ar = arOverride.toFloat();
+            int idx = -1;
+            for (int i = 0; i < ui->arComboBox->count(); ++i) {
+                if (qFuzzyEquals(ar, ui->arComboBox->itemData(i).toFloat())) {
+                    idx = i;
+                    break;
+                }
+            }
+            ui->arComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
+        }
 
         if (!dtsBased) {
             ui->softwareMotionButton->setEnabled(m_camera->supportedMotionType() & Qn::MT_SoftwareGrid);
@@ -491,7 +637,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->expertSettingsWidget->updateFromResources(QnVirtualCameraResourceList() << m_camera);
 
             if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
-                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, fisheyeThumbnailSize, QnSingleThumbnailLoader::PngFormat, this);
+                m_imageProvidersByResourceId[m_camera->getId()] = QnSingleThumbnailLoader::newInstance(m_camera, -1, fisheyeThumbnailSize, QnSingleThumbnailLoader::JpgFormat, this);
             ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
     }
@@ -500,6 +646,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     updateMotionWidgetFromResource();
     updateMotionAvailability();
+    updateLicenseText();
     updateIpAddressText();
     updateWebPageText();
     updateRecordingParamsAvailability();
@@ -770,6 +917,76 @@ void QnSingleCameraSettingsWidget::at_pingButton_clicked() {
     menu()->trigger(Qn::PingAction, QnActionParameters(m_camera));
 }
 
+void QnSingleCameraSettingsWidget::at_analogViewCheckBox_clicked() {
+    ui->cameraScheduleWidget->setScheduleEnabled(ui->analogViewCheckBox->isChecked());
+}
+
+void QnSingleCameraSettingsWidget::updateLicensesButtonVisible() {
+    ui->moreLicensesButton->setVisible(context()->accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
+}
+
+void QnSingleCameraSettingsWidget::updateLicenseText() {
+    if (!m_camera || !m_camera->isDtsBased())
+        return;
+
+    QnLicenseUsageHelper helper;
+
+    int usedDigitalChange = helper.usedDigital();
+    int usedAnalogChange = helper.usedAnalog();
+    helper.propose(QnVirtualCameraResourceList() << m_camera, ui->analogViewCheckBox->isChecked());
+
+    usedDigitalChange = helper.usedDigital() - usedDigitalChange;
+    usedAnalogChange = helper.usedAnalog() - usedAnalogChange;
+
+    { // digital licenses
+        QString usageText = tr("%n license(s) are used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
+        ui->digitalLicensesLabel->setText(usageText);
+        QPalette palette = this->palette();
+        if (!helper.isValid() && helper.required() > 0)
+            setWarningStyle(&palette);
+        ui->digitalLicensesLabel->setPalette(palette);
+    }
+
+    { // analog licenses
+        QString usageText = tr("%n analog license(s) are used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
+        ui->analogLicensesLabel->setText(usageText);
+        QPalette palette = this->palette();
+        if (!helper.isValid() && helper.required() > 0)
+            setWarningStyle(&palette);
+        ui->analogLicensesLabel->setPalette(palette);
+        ui->analogLicensesLabel->setVisible(helper.totalAnalog() > 0);
+    }
+
+    if (ui->analogViewCheckBox->checkState() != Qt::Checked) {
+        ui->requiredLicensesLabel->setVisible(false);
+        return;
+    }
+
+    { // required licenses
+        QPalette palette = this->palette();
+        if (!helper.isValid())
+            setWarningStyle(&palette);
+        ui->requiredLicensesLabel->setPalette(palette);
+        ui->requiredLicensesLabel->setVisible(true);
+    }
+
+    if (helper.required() > 0) {
+        ui->requiredLicensesLabel->setText(tr("Activate %n more license(s).", "", helper.required()));
+    } else if (usedDigitalChange > 0 && usedAnalogChange > 0) {
+        ui->requiredLicensesLabel->setText(tr("%1 more licenses and %2 more analog licenses will be used.")
+            .arg(usedDigitalChange)
+            .arg(usedAnalogChange)
+            );
+    } else if (usedDigitalChange > 0) {
+        ui->requiredLicensesLabel->setText(tr("%n more license(s) will be used.", "", usedDigitalChange));
+    } else if (usedAnalogChange > 0) {
+        ui->requiredLicensesLabel->setText(tr("%n more analog license(s) will be used.", "", usedAnalogChange));
+    }
+    else {
+        ui->requiredLicensesLabel->setText(QString());
+    }
+}
+
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
     if (m_inUpdateMaxFps)
         return; /* Do not show message twice. */
@@ -909,6 +1126,7 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplie
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged() {
+    ui->analogViewCheckBox->setChecked(ui->cameraScheduleWidget->isScheduleEnabled());
     m_scheduleEnabledChanged = true;
 }
 

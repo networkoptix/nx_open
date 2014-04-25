@@ -5,16 +5,7 @@
 #include "nx_ec/binary_serialization_helper.h"
 
 namespace ec2 {
-
-    struct ApiData {
-        virtual ~ApiData() {}
-    };
-
-    struct ApiIdData: public ApiData {
-        QnId id;
-    };
-
-    QN_DEFINE_STRUCT_SERIALIZATORS (ApiIdData, (id) )
+    #include "api_data_i.h"
 }
 
 #ifndef Q_MOC_RUN
@@ -35,18 +26,18 @@ void TYPE::autoBindValuesOrdered(QSqlQuery& query, int startIdx)  const\
     QN_DEFINE_STRUCT_SQL_BINDER(TYPE, FIELD_SEQ);
 
 #define QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS_BINDERS(TYPE, BASE_TYPE, FIELD_SEQ, ... /* PREFIX */) \
-	QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(TYPE, BASE_TYPE, FIELD_SEQ); \
-	QN_DEFINE_STRUCT_SQL_BINDER(TYPE, FIELD_SEQ);
+    QN_DEFINE_DERIVED_STRUCT_SERIALIZATORS(TYPE, BASE_TYPE, FIELD_SEQ); \
+    QN_DEFINE_STRUCT_SQL_BINDER(TYPE, FIELD_SEQ);
 
 // --------------- fill query params from a object
 
 template <class T>
 void doAutoBind(QSqlQuery& query, const char* fieldName, const T& field) {
-	query.bindValue(QString::fromLatin1(fieldName), field);
+    query.bindValue(QString::fromLatin1(fieldName), field);
 }
 
 inline void doAutoBind(QSqlQuery& query, const char* fieldName, const QString& field) {
-	query.bindValue(QString::fromLatin1(fieldName), field.isNull() ? QString(QLatin1String("")) : field);
+    query.bindValue(QString::fromLatin1(fieldName), field.isNull() ? QString(QLatin1String("")) : field);
 }
 
 inline void doAutoBind(QSqlQuery& query, const char* fieldName, const bool& field) {
@@ -59,7 +50,7 @@ inline void doAutoBind(QSqlQuery& query, const char* fieldName, const QnId& fiel
 
 template <class T>
 void doAutoBind(QSqlQuery& , const char* , const std::vector<T>& ) {
-	//
+    //
 }
 
 template <class T>
@@ -95,15 +86,15 @@ void doAutoBindOrdered(QSqlQuery& , int , const std::vector<T>& ) {
 
 #define QN_QUERY_TO_DATA_OBJECT_FILTERED(query, TYPE, data, FIELD_SEQ, FILTER, ...) \
 { \
-	QSqlRecord rec = query.record();\
-	BOOST_PP_SEQ_FOR_EACH(DECLARE_FIELD_IDX, ~, FIELD_SEQ) \
-	while (query.next())\
-	{\
-		TYPE value;\
-		BOOST_PP_SEQ_FOR_EACH(ASSIGN_FIELD, query, FIELD_SEQ) \
+    QSqlRecord rec = query.record();\
+    BOOST_PP_SEQ_FOR_EACH(DECLARE_FIELD_IDX, ~, FIELD_SEQ) \
+    while (query.next())\
+    {\
+        TYPE value;\
+        BOOST_PP_SEQ_FOR_EACH(ASSIGN_FIELD, query, FIELD_SEQ) \
         if (FILTER(value)) \
-		    data.push_back(value);\
-	}\
+            data.push_back(value);\
+    }\
 }
 
 #define QN_QUERY_TO_DATA_OBJECT(query, TYPE, data, FIELD_SEQ, ...) QN_QUERY_TO_DATA_OBJECT_FILTERED(query, TYPE, data, FIELD_SEQ, [] (const TYPE&) {return true;})

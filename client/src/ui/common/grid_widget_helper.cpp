@@ -18,19 +18,19 @@ void QnGridWidgetHelper::exportToFile(QTableView *grid, QWidget *parent, const Q
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
     QString fileName;
-    while (true) 
-    {
-        QString selectedFilter;
-        fileName = QnFileDialog::getSaveFileName(parent,
-                                                caption,
-                                                previousDir,
-                                                tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)"),
-                                                &selectedFilter,
-                                                QnCustomFileDialog::fileDialogOptions());
+    while (true) {
+        QScopedPointer<QnCustomFileDialog> dialog(new QnCustomFileDialog(
+                                                      parent,
+                                                      caption,
+                                                      previousDir,
+                                                      tr("HTML file (*.html);;Spread Sheet (CSV) File(*.csv)")));
+        dialog->exec();
+
+        fileName = dialog->selectedFile();
         if (fileName.isEmpty())
             return;
 
-        QString selectedExtension = extractFileExtension(selectedFilter);
+        QString selectedExtension = dialog->selectedExtension();
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 

@@ -14,15 +14,11 @@ class OnvifResourceSearcher : public QnAbstractNetworkResourceSearcher
     OnvifResourceSearcherWsdd& wsddSearcher;
     //OnvifResourceSearcherMdns& mdnsSearcher;
 
-protected:
+public:
     OnvifResourceSearcher();
-
     virtual ~OnvifResourceSearcher();
 
     virtual void pleaseStop() override;
-public:
-
-    static OnvifResourceSearcher& instance();
 
     bool isProxy() const;
 

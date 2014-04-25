@@ -14,14 +14,18 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#ifdef QN_ENABLE_VIDEO_WALL
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_pc_data.h>
-#endif
-#include <core/resource_management/resource_pool.h>
 
+
+#include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
+#include <core/resource/videowall_pc_data.h>
+
+#include <core/resource_management/resource_pool.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/models/resource_pool_model_node.h>
@@ -143,6 +147,17 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QModelIndex &index) con
     return static_cast<QnResourcePoolModelNode *>(index.internalPointer());
 }
 
+QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource, const QString &groupId, const QString &groupName) {
+    RecorderHash recorderHash = m_recorderHashByResource[resource];
+    if (recorderHash.contains(groupId))
+        return recorderHash[groupId];
+
+    QnResourcePoolModelNode* recorder = new QnResourcePoolModelNode(this, Qn::RecorderNode, groupName);
+    recorder->setParent(m_resourceNodeByResource[resource]);
+    recorderHash[groupId] = recorder;
+    return recorder;
+}
+
 void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
     if (
             node->type() == Qn::VideoWallItemNode ||
@@ -203,10 +218,8 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
     if(node->resourceFlags() & QnResource::server)
         return m_rootNodes[Qn::ServersNode];
 
-#ifdef QN_ENABLE_VIDEO_WALL
     if (node->resourceFlags() & QnResource::videowall)
         return m_rootNodes[m_rootNodeType];
-#endif
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
     if(!parentResource || (parentResource->flags() & QnResource::local_server) == QnResource::local_server) {
@@ -225,7 +238,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
             QString groupName = camera->getGroupName();
             QString groupId = camera->getGroupId();
             if(!groupId.isEmpty())
-                parent = parent->recorder(groupId, groupName.isEmpty() ? groupId : groupName);
+                parent = this->node(parentResource, groupId, groupName.isEmpty() ? groupId : groupName);
         }
 
         return parent;
@@ -327,9 +340,7 @@ QHash<int,QByteArray> QnResourcePoolModel::roleNames() const {
 QStringList QnResourcePoolModel::mimeTypes() const {
     QStringList result = QnWorkbenchResource::resourceMimeTypes();
     result.append(QLatin1String(pureTreeResourcesOnlyMimeType));
-#ifdef QN_ENABLE_VIDEO_WALL
     result.append(QnVideoWallItem::mimeType());
-#endif
     return result;
 }
 
@@ -366,26 +377,18 @@ QMimeData *QnResourcePoolModel::mimeData(const QModelIndexList &indexes) const {
             QnWorkbenchResource::serializeResources(resources, types, mimeData);
         }
 
-#ifdef QN_ENABLE_VIDEO_WALL
         if (types.contains(QnVideoWallItem::mimeType())) {
-            QSet<QString> uuids;
+            QSet<QUuid> uuids;
             foreach (const QModelIndex &index, indexes) {
                 QnResourcePoolModelNode *node = this->node(index);
 
                 if (node && (node->type() == Qn::VideoWallItemNode || node->type() == Qn::UserVideoWallItemNode)) {
-                    uuids << node->uuid().toString();
+                    uuids << node->uuid();
                 }
             }
+            QnVideoWallItem::serializeUuids(uuids.toList(), mimeData);
 
-            if (!uuids.isEmpty()) {
-                QByteArray result;
-                QDataStream stream(&result, QIODevice::WriteOnly);
-                stream << uuids.toList();
-
-                mimeData->setData(QnVideoWallItem::mimeType(), result);
-            }
         }
-#endif
 
         if(types.contains(QLatin1String(pureTreeResourcesOnlyMimeType)))
             mimeData->setData(QLatin1String(pureTreeResourcesOnlyMimeType), QByteArray(pureTreeResourcesOnly ? "1" : "0"));
@@ -403,73 +406,30 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         return false;
 
     /* Check if the format is supported. */
-#ifdef QN_ENABLE_VIDEO_WALL
     if(!intersects(mimeData->formats(), QnWorkbenchResource::resourceMimeTypes()) && !mimeData->formats().contains(QnVideoWallItem::mimeType()))
         return base_type::dropMimeData(mimeData, action, row, column, parent);
-#else
-    if(!intersects(mimeData->formats(), QnWorkbenchResource::resourceMimeTypes()))
-        return base_type::dropMimeData(mimeData, action, row, column, parent);
-#endif
 
     /* Decode. */
     QnResourceList resources = QnWorkbenchResource::deserializeResources(mimeData);
 
     /* Check where we're dropping it. */
     QnResourcePoolModelNode *node = this->node(parent);
-    
+
     if(node->type() == Qn::ItemNode)
         node = node->parent(); /* Dropping into an item is the same as dropping into a layout. */
 
     if(node->parent() && (node->parent()->resourceFlags() & QnResource::server))
         node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
-#ifdef QN_ENABLE_VIDEO_WALL
     if (node->type() == Qn::VideoWallItemNode) {
-        QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(node->uuid());
-
-        if (index.isNull())
-            return true;
-
-        // layout that is already attached to this screen (if any)
-        QnVideoWallItem item = index.videowall()->getItem(node->uuid());
-
-        QnLayoutResourcePtr layout = item.layout.isValid()
-                ? qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>()
-                : QnLayoutResourcePtr();
-
-        // index for actions
-        QnVideoWallItemIndexList indexes;
-        indexes << index;
-
-        // dropping resources
-        QnResourceList medias;
-        foreach( QnResourcePtr res, resources )
-        {
-            if(res.dynamicCast<QnMediaResource>())
-                medias << res;
-        }
-
-        //dropping layouts
-        QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
-
-        if (medias.size() > 0) {
-            if (layout) {
-                menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
-            }
-            else {
-                //TODO: #GDM VW combine into single action
-                menu()->trigger(Qn::OpenNewTabAction);
-                menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(medias));
-                menu()->trigger(Qn::ResetVideoWallLayoutAction, QnActionParameters(indexes));
-            }
-        }
-        else if (layouts.size() == 1) {
-            menu()->trigger(Qn::ResetVideoWallLayoutAction, QnActionParameters(indexes).withArgument(Qn::LayoutResourceRole, layouts.first()));
-        }
-    } else 
-#endif
-        
-    if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
+        QnActionParameters parameters;
+        if (mimeData->hasFormat(QnVideoWallItem::mimeType()))
+            parameters = QnActionParameters(qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData)));
+        else
+            parameters = QnActionParameters(resources);
+        parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
+        menu()->trigger(Qn::DropOnVideoWallItemAction, parameters);
+    } else if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
         QnResourceList medias;
         foreach( QnResourcePtr res, resources )
         {
@@ -480,27 +440,14 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
 
-#ifdef QN_ENABLE_VIDEO_WALL
         if (mimeData->hasFormat(QnVideoWallItem::mimeType())) {
-            QByteArray data = mimeData->data(QnVideoWallItem::mimeType());
-            QDataStream stream(&data, QIODevice::ReadOnly);
-            QList<QString> videoWallItemUuids;
-            stream >> videoWallItemUuids;
-
-            QnVideoWallItemIndexList indexes;
-            foreach (QString uuid, videoWallItemUuids) {
-                QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
-                if (!index.isNull())
-                    indexes << index;
-            }
-
+            QnVideoWallItemIndexList indexes = qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
             if (!indexes.isEmpty()) {
                 menu()->trigger(Qn::AddVideoWallItemsToUserAction,
-                                QnActionParameters(indexes).withArgument(Qn::UserResourceRole, user));
+                    QnActionParameters(indexes).withArgument(Qn::UserResourceRole, user));
                 return true; //ignore other resources dropped
             }
         }
-#endif
 
         foreach(const QnResourcePtr &resource, resources) {
             if(resource->getParentId() == user->getId())
@@ -509,13 +456,13 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
             QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
             if(!layout)
                 continue; /* Can drop only layout resources on user. */
-            
+
             menu()->trigger(
                 Qn::SaveLayoutAsAction, 
                 QnActionParameters(layout).
-                    withArgument(Qn::UserResourceRole, user).
-                    withArgument(Qn::ResourceNameRole, layout->getName())
-            );
+                withArgument(Qn::UserResourceRole, user).
+                withArgument(Qn::ResourceNameRole, layout->getName())
+                );
         }
 
 
@@ -528,7 +475,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
                 menu()->trigger(Qn::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::MediaServerResourceRole, server));
         }
     }
-    
+
     return true;
 }
 
@@ -546,7 +493,6 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     connect(resource.data(), SIGNAL(parentIdChanged(const QnResourcePtr &)),                this, SLOT(at_resource_parentIdChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),                    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),                  this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
-    connect(resource.data(), SIGNAL(disabledChanged(const QnResourcePtr &)),                this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(urlChanged(const QnResourcePtr &)),                     this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
     connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),                this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
 
@@ -556,20 +502,19 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         connect(layout.data(), SIGNAL(itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)),  this, SLOT(at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)));
     }
 
-#ifdef QN_ENABLE_VIDEO_WALL
     QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
     if (videoWall) {
         connect(videoWall.data(), SIGNAL(itemAdded(const QnVideoWallResourcePtr &, const QnVideoWallItem &)),   this, SLOT(at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &, const QnVideoWallItem &)));
         connect(videoWall.data(), SIGNAL(itemChanged(const QnVideoWallResourcePtr &, const QnVideoWallItem &)), this, SLOT(at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &, const QnVideoWallItem &)));
         connect(videoWall.data(), SIGNAL(itemRemoved(const QnVideoWallResourcePtr &, const QnVideoWallItem &)), this, SLOT(at_videoWall_itemRemoved(const QnVideoWallResourcePtr &, const QnVideoWallItem &)));
     }
-#endif
 
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
     if (user) {
         connect(user.data(), SIGNAL(videoWallItemAdded(QnUserResourcePtr, QUuid)),          this, SLOT(at_user_videoWallItemAdded(QnUserResourcePtr, QUuid)));
         connect(user.data(), SIGNAL(videoWallItemRemoved(QnUserResourcePtr, QUuid)),         this, SLOT(at_user_videoWallItemRemoved(QnUserResourcePtr, QUuid)));
     }
+
 
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     if(camera) {
@@ -586,7 +531,6 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         foreach(const QnLayoutItemData &item, layout->getItems())
             at_resource_itemAdded(layout, item);
 
-#ifdef QN_ENABLE_VIDEO_WALL
     if (videoWall)
         foreach(const QnVideoWallItem &item, videoWall->getItems())
             at_videoWall_itemAddedOrChanged(videoWall, item);
@@ -594,7 +538,6 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (user)
         foreach (const QUuid &uuid, user->videoWallItems())
             at_user_videoWallItemAdded(user, uuid);
-#endif
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
@@ -647,11 +590,11 @@ void QnResourcePoolModel::at_resource_itemAdded(const QnLayoutResourcePtr &layou
     QnResourcePoolModelNode *node = this->node(item.uuid);
 
     QnResourcePtr resource;
-    //if(item.resource.id.isValid()) { // TODO: #EC2
-        //resource = resourcePool()->getResourceById(item.resource.id);
-    //} else {
+    if(!item.resource.id.isNull()) { // TODO: #EC2
+        resource = resourcePool()->getResourceById(item.resource.id);
+    } else {
         resource = resourcePool()->getResourceByUniqId(item.resource.path);
-    //}
+    }
 
     node->setResource(resource);
     node->setParent(parentNode);
@@ -661,30 +604,14 @@ void QnResourcePoolModel::at_resource_itemRemoved(const QnLayoutResourcePtr &, c
     deleteNode(node(item.uuid));
 }
 
-//TODO: #GDM need complete recorder nodes structure refactor to get rid of this shit
-void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera) {
-    const QString groupId = camera->getGroupId();
-    foreach (QnResourcePoolModelNode* node, m_resourceNodeByResource) {
-        if (!node->m_recorders.contains(groupId))
-            continue;
-        node->m_recorders[groupId]->m_name = camera->getGroupName();
-        node->m_recorders[groupId]->m_displayName = camera->getGroupName();
-        node->changeInternal();
-    }
-}
-
-#ifdef QN_ENABLE_VIDEO_WALL
 void QnResourcePoolModel::at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     QnResourcePoolModelNode *parentNode = this->node(videoWall);
 
     QnResourcePoolModelNode *node = this->node(Qn::VideoWallItemNode, item.uuid, videoWall);
 
     QnResourcePtr resource;
-    if(item.layout.isValid()) {
+    if(!item.layout.isNull())
         resource = resourcePool()->getResourceById(item.layout);
-    } else {
-        resource = QnResourcePtr();
-    }
 
     node->setResource(resource);
     node->setParent(parentNode);
@@ -709,15 +636,15 @@ void QnResourcePoolModel::at_user_videoWallItemAdded(const QnUserResourcePtr &us
 void QnResourcePoolModel::at_user_videoWallItemRemoved(const QnUserResourcePtr &user, const QUuid &uuid) {
     deleteNode(node(Qn::UserVideoWallItemNode, uuid, user));
 }
-#endif
 
-
-
-
-
-
-
-
-
-
-
+void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera) {
+    const QString groupId = camera->getGroupId();
+    foreach (RecorderHash recorderHash, m_recorderHashByResource) {
+        if (!recorderHash.contains(groupId))
+            continue;
+        QnResourcePoolModelNode* recorder = recorderHash[groupId];
+        recorder->m_name = camera->getGroupName();
+        recorder->m_displayName = camera->getGroupName();
+        recorder->changeInternal();
+    }
+}

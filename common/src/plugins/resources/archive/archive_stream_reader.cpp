@@ -1021,8 +1021,6 @@ void QnArchiveStreamReader::setSkipFramesToTime(qint64 skipTime)
         return m_navDelegate->setSkipFramesToTime(skipTime);
     }
 
-    qDebug() << "setSkipFramesToTime(" << QDateTime::fromMSecsSinceEpoch(skipTime / 1000).toString(QLatin1String("hh:mm:ss.zzz"));
-
     setSkipFramesToTime(skipTime, true);
     emit skipFramesTo(skipTime);
 

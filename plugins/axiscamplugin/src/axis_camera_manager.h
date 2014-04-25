@@ -52,7 +52,7 @@ public:
     //!Implementation of nxcip::BaseCameraManager::setAudioEnabled
     virtual int setAudioEnabled( int audioEnabled ) override;
     //!Implementation of nxcip::BaseCameraManager::getPTZManager
-    virtual nxcip::CameraPTZManager* getPTZManager() const override;
+    virtual nxcip::CameraPtzManager* getPtzManager() const override;
     //!Implementation of nxcip::BaseCameraManager::getCameraMotionDataProvider
     virtual nxcip::CameraMotionDataProvider* getCameraMotionDataProvider() const override;
     //!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager

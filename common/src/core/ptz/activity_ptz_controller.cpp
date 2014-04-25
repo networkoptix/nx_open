@@ -4,8 +4,7 @@
 
 QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_mode(mode),
-    m_asynchronous(baseController->hasCapabilities(Qn::AsynchronousPtzCapability))
+    m_mode(mode)
 {
     m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(lit("ptzActiveObject"), QnPtzObject(), this);
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
@@ -14,8 +13,6 @@ QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControlle
      * exactly what we need for local mode. */
     if(m_mode != Local)
         m_adaptor->setResource(resource());
-
-    // TODO: #Elric #PTZ better async support
 }
 
 QnActivityPtzController::~QnActivityPtzController() {
@@ -102,7 +99,7 @@ bool QnActivityPtzController::getActiveObject(QnPtzObject *activeObject) {
 
 bool QnActivityPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
     // TODO: #Elric #PTZ this is a hack. Need to do it better.
-    if(m_asynchronous) {
+    if(baseController()->hasCapabilities(Qn::AsynchronousPtzCapability)) {
         return baseController()->getData(query, data);
     } else {
         return base_type::getData(query, data);

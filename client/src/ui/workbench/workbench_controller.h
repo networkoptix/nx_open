@@ -204,6 +204,7 @@ protected slots:
 
     void updateLayoutInstruments(const QnLayoutResourcePtr &layout);
 
+    void at_ptzProcessStarted(QnMediaResourceWidget *widget);
 private:
     /* Global state. */
 
