@@ -2,10 +2,7 @@
 
 #include <boost/preprocessor/seq/to_tuple.hpp>
 
-#include <utils/fusion/fusion_adaptor.h>
 #include <utils/common/model_functions.h>
-#include <utils/serialization/binary_functions.h>
-#include <utils/serialization/json_functions.h>
 
 #include "api_business_rule_data.h"
 #include "api_camera_data.h"

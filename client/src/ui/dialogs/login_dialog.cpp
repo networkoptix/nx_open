@@ -41,6 +41,7 @@
 #include "compatibility_version_installation_dialog.h"
 #include "version.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
+#include "compatibility.h"
 
 
 namespace {

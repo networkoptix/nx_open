@@ -1,10 +1,14 @@
 #include "transaction_transport_serializer.h"
-#include "common/common_module.h"
+
+#include <common/common_module.h>
+#include <utils/common/model_functions.h>
+
 #include "transaction_message_bus.h"
-#include <utils/serialization/binary_functions.h>
 
 namespace ec2
 {
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TransactionTransportHeader, (binary)(json), TransactionTransportHeader_Fields);
+
 
     QnTransactionTransportSerializer::QnTransactionTransportSerializer(QnTransactionMessageBus& owner): m_owner(owner)
     {

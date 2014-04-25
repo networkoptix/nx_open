@@ -1,12 +1,12 @@
 #ifndef QN_FUSION_AUTOMATION_H
 #define QN_FUSION_AUTOMATION_H
 
-#include <utils/fusion/fusion.h>
-#include <utils/serialization/json.h>
-#include <utils/serialization/lexical.h>
+#include <utils/fusion/fusion_adaptor.h>
+#include <utils/serialization/json_functions.h>
+#include <utils/serialization/lexical_functions.h>
+#include <utils/serialization/binary_functions.h>
 #include <utils/serialization/debug.h>
 #include <utils/serialization/data_stream.h>
-#include <utils/serialization/binary.h>
 #include <utils/math/fuzzy.h>
 
 namespace QnHashAutomation {

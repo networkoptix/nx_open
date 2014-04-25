@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include <QString>
+#include <QtCore/QString>
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_license_data.h"
@@ -155,7 +155,7 @@ namespace ec2
         struct ID
         {
             ID(): sequence(0) {}
-            QUuid peerGUID;
+            QUuid peerGUID; // TODO: #Elric #EC2 rename into sane case
             qint32 sequence;
         };
 
@@ -169,15 +169,7 @@ namespace ec2
     };
 
     typedef QSet<QnId> PeerList;
-}
 
-//QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (sequence) )
-//QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent) (timestamp))
-QN_FUSION_DECLARE_FUNCTIONS(ec2::QnAbstractTransaction::ID, (binary))
-QN_FUSION_DECLARE_FUNCTIONS(ec2::QnAbstractTransaction, (binary))
-
-namespace ec2
-{
     template <class T>
     class QnTransaction: public QnAbstractTransaction
     {
@@ -188,6 +180,9 @@ namespace ec2
         
         T params;
     };
+
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary))
 
     template <class T, class Output>
     void serialize(const QnTransaction<T> &transaction, QnOutputBinaryStream<Output> *stream)
@@ -205,6 +200,6 @@ namespace ec2
     }
 
     int generateRequestID();
-}
+} // namespace ec2
 
 #endif  //EC2_TRANSACTION_H

@@ -3,7 +3,6 @@
 #include "acti_ptz_controller.h"
 
 #include <utils/common/model_functions.h>
-#include <utils/fusion/fusion_adaptor.h>
 
 #include "acti_resource.h"
 

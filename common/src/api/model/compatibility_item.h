@@ -1,3 +1,5 @@
+#ifndef QN_COMPATIBILITY_ITEM_H
+#define QN_COMPATIBILITY_ITEM_H
 
 struct QnCompatibilityItem
 {
@@ -17,6 +19,6 @@ struct QnCompatibilityItem
     QString comp1;
     QString ver2;
 };
+#define QnCompatibilityItem_Fields (ver1)(comp1)(ver2)
 
-//QN_FUSION_DEFINE_FUNCTIONS(QnCompatibilityItem, (binary), (ver1)(comp1)(ver2))
-QN_FUSION_DECLARE_FUNCTIONS(QnCompatibilityItem, (binary))
+#endif // QN_COMPATIBILITY_ITEM_H

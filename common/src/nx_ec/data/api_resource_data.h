@@ -15,8 +15,6 @@ namespace ec2
         QString value;
         QString name;
         bool isResTypeParam;
-
-        //QN_DECLARE_STRUCT_SQL_BINDER();
     };
 #define ApiResourceParamData_Fields (value)(name)(isResTypeParam)
 
@@ -47,8 +45,6 @@ namespace ec2
         QString       url;
         QnId          typeId;
         std::vector<ApiResourceParamData> addParams;
-
-        //QN_DECLARE_STRUCT_SQL_BINDER();
     };
 #define ApiResourceData_Fields (id)(parentGuid)(status)(disabled)(name)(url)(typeId)(addParams)
 
@@ -64,50 +60,9 @@ namespace ec2
     {
         QnId id;
         QnResource::Status status;
-
-        //QN_DECLARE_STRUCT_SQL_BINDER();
     };
 #define ApiSetResourceStatusData_Fields (id)(status)
 
-    //QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceParamData, ApiResourceParamFields);
-
-    /*struct ApiParamList
-    {
-        std::vector<ApiResourceParamData> data;
-        void toResourceList(QnKvPairList& resources) const;
-        void fromResourceList(const QnKvPairList& resources);
-    };*/
-
-    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiParamList, (data) )
-    //QN_FUSION_DECLARE_FUNCTIONS(ApiParamList, (binary))
-        
-
-    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiResourceParams,  (id) (params) )
-    //QN_FUSION_DECLARE_FUNCTIONS(ApiResourceParams, (binary))
-
-    /*void fromResourceToApi(const QnResourcePtr& resource, ApiResourceData& resourceData);
-    void fromApiToResource(const ApiResourceData& resourceData, QnResourcePtr resource);
-
-    //QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceData,  ApiResourceFields)
-
-    struct ApiResourceList: public ApiData {
-        void loadFromQuery(QSqlQuery& query);
-        void toResourceList( QnResourceFactory* resFactory, QnResourceList& resList ) const;
-
-        std::vector<ApiResourceData> data;
-    };
-
-    //QN_DEFINE_STRUCT_BINARY_SERIALIZATION_FUNCTIONS (ApiResourceList,  (data))
-    QN_FUSION_DECLARE_FUNCTIONS(ApiResourceList, (binary))
-
-    //QN_DEFINE_STRUCT_SERIALIZATORS_BINDERS (ApiSetResourceStatusData,  (id) (status) )
-    QN_FUSION_DECLARE_FUNCTIONS(ApiSetResourceStatusData, (binary))
-
-
-
-    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiSetResourceDisabledData,  (id) (disabled) )
-    QN_FUSION_DECLARE_FUNCTIONS(ApiSetResourceDisabledData, (binary))*/
-
-}
+} // namespace ec2
 
 #endif // __RESOURCE_TRANSACTION_DATA_H__

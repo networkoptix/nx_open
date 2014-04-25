@@ -17,9 +17,6 @@ namespace ec2
     };
 #define ApiLockData_Fields (name)(peer)(timestamp)(userData)
 
-//QN_DEFINE_STRUCT_SERIALIZATORS (ApiLockData, (name) (peer) (timestamp) (userData) )
-//QN_FUSION_DECLARE_FUNCTIONS(ApiLockData, (binary))
-
-}
+} // namespace ec2
 
 #endif // __EC2_LOCK_DATA_H_

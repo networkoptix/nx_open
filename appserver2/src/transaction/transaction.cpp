@@ -1,9 +1,12 @@
 #include "transaction.h"
 
 #include <atomic>
+
 #include "common/common_module.h"
 #include "database/db_manager.h"
 #include "utils/common/synctime.h"
+
+#include "utils/common/model_functions.h"
 
 
 namespace ec2
@@ -176,18 +179,14 @@ namespace ec2
         id.sequence = m_sequence.fetchAndAddAcquire(1);
     }
 
-    /*
-    void QnAbstractTransaction::createNewID()
-    {
-        id.peerGUID = qnCommon->moduleGUID();
-        id.tranGUID = QUuid::createUuid();
-    }
-    */
-
     int generateRequestID()
     {
         static std::atomic<int> requestID;
         return ++requestID;
     }
 
-}
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary),   (peerGUID)(sequence))
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary),   (command)(id)(persistent)(timestamp))
+
+} // namespace ec2
+

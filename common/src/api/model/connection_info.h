@@ -5,10 +5,11 @@
 #include <QtCore/QSharedPointer>
 
 #include <utils/common/software_version.h>
+#include <utils/common/model_functions_fwd.h>
 
-#include "compatibility.h"
+#include "compatibility_item.h"
 
-typedef QnSoftwareVersion SoftwareVersionType;
+typedef QnSoftwareVersion SoftwareVersionType; // TODO: #Elric remove?
 
 struct QnConnectionInfoData {
     QnConnectionInfoData(): proxyPort(0) {}
@@ -22,16 +23,13 @@ struct QnConnectionInfoData {
     QString brand;
 };
 
-//QN_DEFINE_STRUCT_SERIALIZATORS (QnConnectionInfoData, (ecUrl)(version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand))
-QN_FUSION_DECLARE_FUNCTIONS(QnConnectionInfoData, (binary))
+QN_FUSION_DECLARE_FUNCTIONS(QnCompatibilityItem, (metatype)(json)(binary))
+QN_FUSION_DECLARE_FUNCTIONS(QnConnectionInfoData, (metatype)(json)(binary))
 
-typedef QnConnectionInfoData QnConnectionInfo;
-Q_DECLARE_METATYPE(QnConnectionInfo);
-
+typedef QnConnectionInfoData QnConnectionInfo; // TODO: #Elric remove?
 
 // TODO: #Elric remove shared pointer?
 typedef QSharedPointer<QnConnectionInfo> QnConnectionInfoPtr;
-
 Q_DECLARE_METATYPE(QnConnectionInfoPtr);
 
 #endif // QN_CONNECTION_INFO_H

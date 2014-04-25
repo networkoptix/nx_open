@@ -5,6 +5,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/enum_name_mapper.h>
+#include <utils/serialization/lexical.h>
 
 #include "resource_media_layout.h"
 

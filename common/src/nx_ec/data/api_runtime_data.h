@@ -19,8 +19,6 @@ namespace ec2
     };
 #define ApiRuntimeData_Fields (publicIp)(sessionKey)(allowCameraChanges)
 
-    //QN_DEFINE_STRUCT_SERIALIZATORS( QnRuntimeInfo, (publicIp)(sessionKey)(allowCameraChanges) )
-    //QN_FUSION_DECLARE_FUNCTIONS(ApiRuntimeData, (binary))
-}
+} // namespace ec2
 
 #endif  //EC2_RUNTIME_INFO_H

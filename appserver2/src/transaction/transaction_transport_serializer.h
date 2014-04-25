@@ -3,23 +3,21 @@
 
 #include "transaction.h"
 #include "common/common_module.h"
-
-/*
-* This class add addition transport header to a transaction
-*/
+#include "utils/serialization/binary_stream.h"
+#include "transaction_transport_header.h"
 
 namespace ec2
 {
+    QN_FUSION_DECLARE_FUNCTIONS(TransactionTransportHeader, (binary)(json))
+
     class QnTransactionMessageBus;
 
-#include "transaction_transport_serializer_i.h"
-#include "utils/serialization/binary_stream.h"
-
-
+    /**
+     * This class add addition transport header to a transaction.
+     */
     class QnTransactionTransportSerializer
     {
     public:
-
         QnTransactionTransportSerializer(QnTransactionMessageBus& owner);
 
         template <class T>
@@ -59,16 +57,14 @@ namespace ec2
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
         }
 
-        
         static bool deserializeTran(const quint8* chunkPayload, int len,  PeerList& processedPeers, PeerList& dstPeers, QByteArray& tranData);
 
     private:
         static void toFormattedHex(quint8* dst, quint32 payloadSize);
+
     private:
         QnTransactionMessageBus& m_owner;
     };
 }
-
-
 
 #endif // __TRANSACTION_TRANSPORT_SERIALIZER_H_

@@ -4,10 +4,22 @@
 #include "binary.h"
 
 #include <utility> /* For std::pair. */
+#include <array>
+#include <vector>
+#include <set>
+#include <map>
 
-#include <QtCore/QUuid>
+#include <boost/preprocessor/tuple/enum.hpp>
+
 #include <QtCore/QString>
 #include <QtCore/QUuid>
+#include <QtCore/QList>
+#include <QtCore/QLinkedList>
+#include <QtCore/QVector>
+#include <QtCore/QMap>
+#include <QtCore/QSet>
+#include <QtCore/QHash>
+#include <QtCore/QVarLengthArray>
 
 #include <utils/common/container.h>
 
@@ -218,7 +230,7 @@ bool deserialize(QnInputBinaryStream<T> *stream, bool *target) {
 
 template <class Output>
 void serialize(const QByteArray &value, QnOutputBinaryStream<Output> *stream) {
-    serialize((qint32) value.size(), stream);
+    serialize(static_cast<qint32>(value.size()), stream);
     stream->write(value.data(), value.size());
 }
 
@@ -254,10 +266,10 @@ void serialize(const QUrl &value, QnOutputBinaryStream<Output> *stream) {
 
 template <class T>
 bool deserialize(QnInputBinaryStream<T> *stream, QUrl *target) {
-    QByteArray data;
+    QString data;
     if(!QnBinary::deserialize(stream, &data))
         return false;
-    *target = QUrl(QString::fromUtf8(data));
+    *target = QUrl(data);
     return true;
 }
 
@@ -276,20 +288,6 @@ bool deserialize(QnInputBinaryStream<Input> *stream, QUuid *target) {
         return false;
     *target = QUuid::fromRfc4122(data);
     return true;
-}
-
-
-template<class T1, class T2, class Output>
-void serialize(const std::pair<T1, T2> &value, QnOutputBinaryStream<Output> *stream) {
-    QnBinary::serialize(value.first, stream);
-    QnBinary::serialize(value.second, stream);
-}
-
-template<class T1, class T2, class Input>
-bool deserialize(QnInputBinaryStream<Input> *stream, std::pair<T1, T2> *target) {
-    return 
-        QnBinary::deserialize(stream, &target->first) &&
-        QnBinary::deserialize(stream, &target->second);
 }
 
 
@@ -325,66 +323,55 @@ bool deserialize(QnInputBinaryStream<Input> *stream, QFlags<T> *target) {
 }
 
 
-template<class T, class T2>
-bool deserialize( T2& value, QnInputBinaryStream<T> *stream, typename std::enable_if<std::is_enum<T2>::value>::type* = NULL )
-{
-    qint32 tmp;
-    if( stream->read(&tmp, sizeof(value)) != sizeof(value) )
-        return false;
-    value = (T2) ntohl(tmp);
+#define QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG) \
+template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Output>                            \
+void serialize(const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> &value, QnOutputBinaryStream<Output> *stream) { \
+    QnBinaryDetail::serialize_container(value, stream);                         \
+}                                                                               \
+                                                                                \
+template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Input>                             \
+bool deserialize(QnInputBinaryStream<Input> *stream, TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> *target) { \
+    return QnBinaryDetail::deserialize_container(stream, target);               \
+}                                                                               \
+
+QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QSet, (class T), (T));
+QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QList, (class T), (T));
+QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QLinkedList, (class T), (T));
+QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QVector, (class T), (T));
+QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QVarLengthArray, (class T, int N), (T, N));
+QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T));
+QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T));
+QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator));
+QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator));
+QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator));
+#undef QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS
+
+template<class T1, class T2, class Output>
+void serialize(const std::pair<T1, T2> &value, QnOutputBinaryStream<Output> *stream) {
+    QnBinary::serialize(value.first, stream);
+    QnBinary::serialize(value.second, stream);
+}
+
+template<class T1, class T2, class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, std::pair<T1, T2> *target) {
+    return 
+        QnBinary::deserialize(stream, &target->first) &&
+        QnBinary::deserialize(stream, &target->second);
+}
+
+template<class T, std::size_t N, class Output>
+void serialize(const std::array<T, N> &value, QnOutputBinaryStream<Output> *stream) {
+    for(const T &element: value)
+        QnBinary::serialize(element, stream);
+}
+
+template<class T, std::size_t N, class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, std::array<T, N> *target) {
+    for(T &element: *target)
+        if(!QnBinary::deserialize(stream, &element))
+            return false;
     return true;
 }
 
-
-
-template <class T, class Allocator, class Output>
-void serialize(const std::vector<T, Allocator> &value, QnOutputBinaryStream<Output> *stream) {
-    QnBinaryDetail::serialize_container(value, stream);
-}
-
-template <class T, class Allocator, class Input>
-bool deserialize(QnInputBinaryStream<Input> *stream, std::vector<T, Allocator> *target) {
-    return QnBinaryDetail::deserialize_container(stream, target);
-}
-
-template <class T, class Output>
-void serialize(const QList<T> &value, QnOutputBinaryStream<Output> *stream) {
-    QnBinaryDetail::serialize_container(value, stream);
-}
-
-template <class T, class Input>
-bool deserialize(QnInputBinaryStream<Input> *stream, QList<T> *target) {
-    return QnBinaryDetail::deserialize_container(stream, target);
-}
-
-template <class Key, class T, class Predicate, class Allocator, class Output>
-void serialize(const std::map<Key, T, Predicate, Allocator> &value, QnOutputBinaryStream<Output> *stream) {
-    QnBinaryDetail::serialize_container(value, stream);
-}
-
-template <class Key, class T, class Predicate, class Allocator, class Input>
-bool deserialize(QnInputBinaryStream<Input> *stream, std::map<Key, T, Predicate, Allocator> *target) {
-    return QnBinaryDetail::deserialize_container(stream, target);
-}
-
-template <class T, class Output>
-void serialize(const QSet<T> &value, QnOutputBinaryStream<Output> *stream) {
-    return QnBinaryDetail::serialize_container(value, stream);
-}
-
-template <class T, class Input>
-bool deserialize(QnInputBinaryStream<Input> *stream, QSet<T> *target) {
-    return QnBinaryDetail::deserialize_container(stream, target);
-}
-
-template <class Key, class T, class Output>
-void serialize(const QMap<Key, T> &value, QnOutputBinaryStream<Output> *stream) {
-    return QnBinaryDetail::serialize_container(value, stream);
-}
-
-template <class Key, class T, class Input>
-bool deserialize(QnInputBinaryStream<Input> *stream, QMap<Key, T> *target) {
-    return QnBinaryDetail::deserialize_container(stream, target);
-}
 
 #endif // QN_SERIALIZATION_BINARY_FUNCTIONS_H

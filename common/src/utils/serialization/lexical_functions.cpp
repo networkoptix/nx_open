@@ -70,14 +70,21 @@ void serialize(const QUuid &value, QString *target) {
 }
 
 bool deserialize(const QString &value, QUuid *target) {
-    /* Also support "0" & "1" during deserialization. */
-
     QUuid result(value);
     if(result.isNull() && value != lit("00000000-0000-0000-0000-000000000000") && value != lit("{00000000-0000-0000-0000-000000000000}"))
         return false;
 
     *target = result;
     return true;
+}
+
+void serialize(const QUrl &value, QString *target) {
+    *target = value.toString();
+}
+
+bool deserialize(const QString &value, QUrl *target) {
+    *target = QUrl(value);
+    return target->isValid();
 }
 
 void serialize(const QColor &value, QString *target) {

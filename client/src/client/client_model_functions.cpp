@@ -1,6 +1,4 @@
 #include <utils/common/model_functions.h>
-#include <utils/serialization/json_functions.h>
-#include <utils/fusion/fusion_adaptor.h>
 
 #include "client_model_types.h"
 

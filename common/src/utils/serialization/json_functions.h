@@ -19,6 +19,7 @@
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
 #include <QtCore/QUuid>
+#include <QtCore/QUrl>
 #include <QtCore/QtNumeric>
 #include <QtGui/QColor>
 #include <QtGui/QRegion>
@@ -120,7 +121,7 @@ namespace QJsonDetail {
         if(!QJson::deserialize(ctx, value, &element))
             return false;
         
-        QnContainer::insert(*target, boost::end(target), std::move(element));
+        QnContainer::insert(*target, boost::end(*target), std::move(element));
         return true;
     }
 
@@ -303,7 +304,6 @@ QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QMap, (class T), (QString, T), 
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QHash, (class T), (QString, T), string_map);
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T), container);
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T), container);
-
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator), container);
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator), container);
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator), container);
@@ -327,7 +327,7 @@ inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QByteArray 
 }
 
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QColor)(QBrush)(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QRegion)(QVector2D)(QVector3D)(QVector4D)(QUuid)(QFont), (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QColor)(QBrush)(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QRegion)(QVector2D)(QVector3D)(QVector4D)(QUuid)(QUrl)(QFont), (json))
 
 void qnJsonFunctionsUnitTest();
 

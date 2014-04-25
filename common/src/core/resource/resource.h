@@ -13,7 +13,7 @@
 
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/from_this_to_shared.h>
-#include <utils/common/model_functions.h>
+#include <utils/common/model_functions_fwd.h>
 #include <utils/common/id.h>
 
 #include <core/datapacket/abstract_data_packet.h>
@@ -450,6 +450,6 @@ public:
 Q_DECLARE_METATYPE(QnResourcePtr);
 Q_DECLARE_METATYPE(QnResourceList);
 
-QN_FUSION_DECLARE_FUNCTIONS(QnResource::Status, (metatype)(json)(binary))
+QN_FUSION_DECLARE_FUNCTIONS(QnResource::Status, (metatype)(json))
 
 #endif // QN_RESOURCE_H

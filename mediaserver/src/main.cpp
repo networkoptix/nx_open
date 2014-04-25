@@ -135,6 +135,7 @@
 #include "utils/network/networkoptixmodulefinder.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
+#include "compatibility.h"
 
 #define USE_SINGLE_STREAMING_PORT
 

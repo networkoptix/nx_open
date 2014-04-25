@@ -55,33 +55,6 @@ namespace ec2
     };
 #define ApiResetBusinessRuleData_Fields (defaultRules)
 
-    /*struct ApiBusinessRule: ApiBusinessRuleData
-    {
-        void toResource(QnBusinessEventRulePtr resource, QnResourcePool* resourcePool) const;
-        void fromResource(const QnBusinessEventRulePtr& resource);
-        QN_DECLARE_STRUCT_SQL_BINDER();
-
-    };
-    //QN_DEFINE_STRUCT_SQL_BINDER(ApiBusinessRule, ApiBusinessRuleFields);
-
-    struct ApiBusinessRuleList: std::vector<ApiBusinessRule>
-    {
-        void loadFromQuery(QSqlQuery& query);
-        QnBusinessEventRuleList toResourceList(QnResourcePool* resourcePool) const;
-        void fromResourceList(const QnBusinessEventRuleList& inData);
-    };
-
-    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiBusinessActionData, ApiBusinessActionDataFields )
-    QN_FUSION_DECLARE_FUNCTIONS(ApiBusinessActionData, (binary))
-
-    struct ApiResetBusinessRuleData: public ApiData
-    {
-        ApiBusinessRuleList defaultRules;
-    };
-
-    //QN_DEFINE_STRUCT_SERIALIZATORS (ApiResetBusinessRuleData, (defaultRules) )
-    QN_FUSION_DECLARE_FUNCTIONS(ApiResetBusinessRuleData, (binary))
-    */
-}
+} // namespace ec2
 
 #endif // __EC2__BUSINESS_RULE_DATA_H_

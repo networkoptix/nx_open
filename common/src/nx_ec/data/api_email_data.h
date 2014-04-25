@@ -16,15 +16,10 @@ namespace ec2
         QString from;
         QString password;
         QnEmail::ConnectionType connectionType;
-
-        /*void fromResource( const QnEmail::Settings& settings );
-        void toResource( QnEmail::Settings& settings ) const;* /*/
     };
 #define ApiEmailSettingsData_Fields (host)(port)(user)(password)(connectionType)
 	
-    //QN_DEFINE_STRUCT_SERIALIZATORS( ApiEmailSettingsData, ApiEmailSettingsFields )
-    //QN_FUSION_DECLARE_FUNCTIONS(ApiEmailSettingsData, (binary))
-	
+
     struct ApiEmailData: ApiData
     {
         ApiEmailData() {}
@@ -46,7 +41,6 @@ namespace ec2
     };
 #define ApiEmailData_Fields (to)(subject)(body)(timeout)
 
-	//QN_FUSION_DECLARE_FUNCTIONS(ApiEmailData, (binary))
-}
+} // namespace ec2
 
 #endif // QN_API_EMAIL_DATA_H
