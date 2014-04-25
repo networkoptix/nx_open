@@ -950,9 +950,9 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
 
 // data migration from previous versions
 
-void QnStorageManager::doMigrateCSVCatalog()
+void QnStorageManager::doMigrateCSVCatalog() {
     for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
-        doMigrateCSVCatalog((static_cast<QnServer::ChunksCatalog>(i));
+        doMigrateCSVCatalog(static_cast<QnServer::ChunksCatalog>(i));
     m_catalogLoaded = true;
     m_rebuildProgress = 1.0;
 }
@@ -973,7 +973,7 @@ QnStorageResourcePtr QnStorageManager::findStorageByOldIndex(int oldIndex, QMap<
 void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalog)
 {
     QMap<QString, QSet<int>> storageIndexes = deserializeStorageFile();
-
+    QDir dir(closeDirPath(getDataDirectory()) + QString("record_catalog/media/") + DeviceFileCatalog::prefixByCatalog(catalog));
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     foreach(QFileInfo fi, list) 
     {
@@ -1025,7 +1025,7 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, const QnCameraB
     if (!storage)
         return false;
 
-    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
+    QnStorageDbPtr sdb = m_chunksDB[storage];
     if (!sdb)
         return false;
 
