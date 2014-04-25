@@ -104,7 +104,7 @@ namespace ec2
     QnTransaction<ApiVideowallControlMessageData> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message)
     {
         QnTransaction<ApiVideowallControlMessageData> tran(command, false);
-        fromMessageToApi(message, tran.params);
+        fromResourceToApi(message, tran.params);
         return tran;
     }
 

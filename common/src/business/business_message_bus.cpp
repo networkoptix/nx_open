@@ -5,6 +5,7 @@
 #include <utils/serialization/binary.h>
 
 #include <nx_ec/data/api_business_rule_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 Q_GLOBAL_STATIC(QnBusinessMessageBus, QnBusinessMessageBus_instance)
 
@@ -53,7 +54,7 @@ int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionP
     QByteArray data;
     QnOutputBinaryStream<QByteArray> stream(&data);
     ec2::ApiBusinessActionData apiData;
-    apiData.fromResource(bAction);
+    fromResourceToApi(bAction, apiData);
     QnBinary::serialize(apiData, &stream);
     QNetworkReply* reply = m_transport.post(request, data);
     m_actionsInProgress.insert(reply, bAction);

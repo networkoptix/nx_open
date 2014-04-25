@@ -12,6 +12,7 @@
 #include <boost/mpl/equal_to.hpp>
 #include <boost/mpl/sizeof.hpp>
 #include <boost/mpl/integral_c.hpp>
+#include <boost/type_traits/detail/yes_no_type.hpp> // TODO: #Elric get rid of this one
 #endif // Q_MOC_RUN
 
 #include <utils/preprocessor/variadic_seq_for_each.h>

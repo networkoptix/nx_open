@@ -26,7 +26,7 @@ namespace ec2
         QString      apiUrl;
         QString      netAddrList;
         Qn::ServerFlags flags;
-        qint32       panicMode;
+        qint32       panicMode; // TODO: #Elric #EC2 use Qn::PanicMode
         QString      streamingUrl;
         QString      version; 
         QString      authKey;

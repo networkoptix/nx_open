@@ -35,7 +35,7 @@ namespace ec2
         void triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran) {
             assert(tran.command == ApiCommand::videowallControl);
             QnVideoWallControlMessage message;
-            fromApiToMessage(tran.params, message);
+            fromApiToResource(tran.params, message);
             emit controlMessage(message);
         }
 

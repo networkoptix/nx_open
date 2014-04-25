@@ -9,12 +9,6 @@
 #include "param.h"
 #include "utils/common/id.h"
 
-class QnResourceType;
-typedef QSharedPointer<QnResourceType> QnResourceTypePtr;
-typedef QList<QnResourceTypePtr> QnResourceTypeList;
-
-Q_DECLARE_METATYPE(QnResourceTypeList)
-
 class QN_EXPORT QnResourceType
 {
 public:
@@ -60,6 +54,7 @@ private:
     mutable bool m_isCameraSet;
 };
 
+Q_DECLARE_METATYPE(QnResourceTypeList)
 
 class QN_EXPORT QnResourceTypePool
 {

@@ -38,7 +38,7 @@ namespace ec2
         ApiServerInfoData serverInfo;
         QnResourceTypeList resTypes;
         QnResourceList resources;
-        QnBusinessEventRuleList bRules;
+        QnBusinessEventRuleList bRules; // TODO: #Elric #EC2 rename
         QnCameraHistoryList cameraHistory;
         QnLicenseList licenses;
     };

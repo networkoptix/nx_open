@@ -6,6 +6,10 @@
 #include <utils/common/model_functions_fwd.h>
 
 namespace ec2 {
+    struct ResourceContext;
+    struct QnFullResourceData; // TODO: #Elric move these out?
+
+
     struct ApiData;
 
     struct ApiBusinessActionData;
@@ -48,6 +52,7 @@ namespace ec2 {
     typedef std::vector<ApiLicenseData> ApiLicenseDataList;
     typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
     typedef std::vector<ApiPropertyTypeData> ApiPropertyTypeDataList;
+    typedef std::vector<ApiResourceData> ApiResourceDataList;
     typedef std::vector<ApiResourceParamData> ApiResourceParamDataList; // TODO: 
     typedef std::vector<ApiResourceTypeData> ApiResourceTypeDataList;
     typedef std::vector<ApiStorageData> ApiStorageDataList;

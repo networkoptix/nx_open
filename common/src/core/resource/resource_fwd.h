@@ -13,9 +13,37 @@
  * but don't need the definitions of the actual resource classes.
  */
 
+// TODO: #Elric move out?
+// <--
+class QnScheduleTask; 
+
+struct QnCameraHistoryItem;
+
+class QnCameraHistory;
+typedef QSharedPointer<QnCameraHistory> QnCameraHistoryPtr;
+typedef QList<QnCameraHistoryPtr> QnCameraHistoryList;
+
+class QnLicense;
+typedef QSharedPointer<QnLicense> QnLicensePtr;
+typedef QList<QnLicensePtr> QnLicenseList;
+
+struct QnParamType;
+typedef QSharedPointer<QnParamType> QnParamTypePtr;
+
+class QnVideoWallControlMessage;
+
+class QnLayoutItemData;
+
+// -->
+
+
 class QnResource;
 typedef QnSharedResourcePointer<QnResource> QnResourcePtr;
 typedef QnSharedResourcePointerList<QnResource> QnResourceList;
+
+class QnResourceType;
+typedef QSharedPointer<QnResourceType> QnResourceTypePtr;
+typedef QList<QnResourceTypePtr> QnResourceTypeList;
 
 class QnVirtualCameraResource;
 typedef QnSharedResourcePointer<QnVirtualCameraResource> QnVirtualCameraResourcePtr;
