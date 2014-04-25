@@ -87,7 +87,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     QnTimePeriodList periods;
     switch (periodsType) {
     case Qn::RecordingContent:
-        periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel);
+        periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
         break;
     case Qn::MotionContent:
         {
@@ -97,7 +97,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
         }
         break;
     case Qn::BookmarksContent:
-        //TODO: #GDM implement me!
+        periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog);
         break;
     default:
         return errLog("Invalid periodsType parameter.");

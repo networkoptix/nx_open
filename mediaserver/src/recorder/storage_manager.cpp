@@ -427,21 +427,26 @@ bool QnStorageManager::isArchiveTimeExists(const QString& physicalId, qint64 tim
 }
 
 
-QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnResourceList &resList, qint64 startTime, qint64 endTime, qint64 detailLevel) {
+QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnResourceList &resList, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs) {
     QVector<QnTimePeriodList> periods;
     foreach (const QnResourcePtr &resource, resList) {
         QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (resource);
         if (!camera)
             continue;
-        
-        if (camera->isDtsBased())
-        {
-            periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
-        }
-        else {
-            QString physicalId = camera->getPhysicalId();
-            getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId.toUtf8(), QnServer::HiQualityCatalog));
-            getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId.toUtf8(), QnServer::LowQualityCatalog));
+
+        QString physicalId = camera->getPhysicalId();
+        for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
+            QnServer::ChunksCatalog catalog = static_cast<QnServer::ChunksCatalog> (i);
+            if (!catalogs.contains(catalog))
+                continue;
+
+            //TODO: #GDM #implement bookmarks for the DTS cameras
+            if (camera->isDtsBased()) {
+                if (catalog == QnServer::HiQualityCatalog) // both hi- and low-quality chunks are loaded with this method
+                    periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
+            } else {
+                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId.toUtf8(), catalog));
+            }
         }
 
     }

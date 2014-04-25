@@ -64,7 +64,8 @@ public:
     DeviceFileCatalogPtr getFileCatalog(const QByteArray& mac, QnServer::ChunksCatalog catalog);
     DeviceFileCatalogPtr getFileCatalog(const QByteArray& mac, const QString &catalogPrefix);
 
-    QnTimePeriodList getRecordedPeriods(const QnResourceList &resList, qint64 startTime, qint64 endTime, qint64 detailLevel);
+    QnTimePeriodList getRecordedPeriods(const QnResourceList &resList, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs);
+
     bool loadFullFileCatalog(const QnStorageResourcePtr &storage, bool isRebuild = false, qreal progressCoeff = 1.0);
     void loadFullFileCatalog();
     QVector<DeviceFileCatalog::Chunk> correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const QVector<DeviceFileCatalog::Chunk>& chunks);
