@@ -1,5 +1,5 @@
-#ifndef QN_API_TYPES_I_H
-#define QN_API_TYPES_I_H
+#ifndef QN_API_GLOBALS_H
+#define QN_API_GLOBALS_H
 
 /** 
  * \file
@@ -30,4 +30,4 @@
 
 #endif // QN_API_TYPES_HEADER
 
-#endif // QN_API_TYPES_I_H
+#endif // QN_API_GLOBALS_H

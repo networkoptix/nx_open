@@ -14,8 +14,6 @@ namespace ec2 {
     };
 #define ApiIdData_Fields (id)
 
-    QN_FUSION_DECLARE_FUNCTIONS(ApiIdData, (binary))
-
 } // namespace ec2
 
 

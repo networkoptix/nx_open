@@ -37,7 +37,7 @@ namespace ec2
 
     struct ApiBusinessActionData: ApiData
     {
-        qint32 actionType;
+        qint32 actionType; // TODO: #Elric #EC2 QnBusiness::ActionType
         QnBusiness::EventState toggleState;
         bool receivedFromRemoteHost;
         std::vector<QnId> resources;
@@ -45,9 +45,6 @@ namespace ec2
         QByteArray runtimeParams;
         QnId businessRuleId;
         qint32 aggregationCount;
-
-        /*void fromResource(const QnAbstractBusinessActionPtr& resource);
-        QnAbstractBusinessActionPtr toResource(QnResourcePool* resourcePool) const;*/
     };
 #define ApiBusinessActionData_Fields (actionType)(toggleState)(receivedFromRemoteHost)(resources)(params)(runtimeParams)(businessRuleId)(aggregationCount)
 

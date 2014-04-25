@@ -43,7 +43,7 @@ namespace ec2
         QByteArray          mac;
         QString             login;
         QString             password;
-        std::vector<ApiScheduleTaskData>  scheduleTask;
+        std::vector<ApiScheduleTaskData>  scheduleTask; // TODO: #Elric #EC2 scheduleTaskSSSSSSSSSSS
         bool                audioEnabled;
         QString             physicalId;
         bool                manuallyAdded;
@@ -53,7 +53,7 @@ namespace ec2
         QString             groupName;
         Qn::SecondStreamQuality    secondaryQuality;
         bool                controlDisabled;
-        qint32              statusFlags;
+        qint32              statusFlags; // TODO: #Elric #EC2 QnSecurityCamResource::StatusFlags
         QByteArray          dewarpingParams;
         QString             vendor;
     };
