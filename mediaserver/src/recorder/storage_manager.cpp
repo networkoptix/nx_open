@@ -116,7 +116,7 @@ QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(D
         qnFileDeletor->deleteFile(fileName);
 
     // add to DB
-    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
+    QnStorageDbPtr sdb = m_chunksDB[storage];
     foreach(const DeviceFileCatalog::Chunk& chunk, newChunks)
         sdb->addRecord(mac, role, chunk);
     sdb->flushRecords();
@@ -124,11 +124,37 @@ QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(D
     return DeviceFileCatalog::mergeChunks(chunks, newChunks);
 }
 
+QMap<QString, QSet<int>> QnStorageManager::deserializeStorageFile()
+{
+    QMap<QString, QSet<int>> storageIndexes;
+
+    QFile storageFile(closeDirPath(getDataDirectory()) + QString("record_catalog/media/storage_index.csv"));
+    if (!storageFile.exists())
+        return storageIndexes;
+    if (!storageFile.open(QFile::ReadOnly))
+        return storageIndexes;
+    // deserialize storage file
+    QString line = storageFile.readLine(); // skip csv header
+    do {
+        line = storageFile.readLine();
+        QStringList params = line.split(';');
+        if (params.size() >= 2) {
+            QString path = toCanonicalPath(params[0]);
+            for (int i = 1; i < params.size(); ++i) {
+                int index = params[i].toInt();
+                storageIndexes[path].insert(index);
+            }
+        }
+    } while (!line.isEmpty());
+    storageFile.close();
+    return storageIndexes;
+}
+
 bool QnStorageManager::loadFullFileCatalog(QnStorageResourcePtr storage, bool isRebuild, qreal progressCoeff)
 {
-    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
+    QnStorageDbPtr sdb = m_chunksDB[storage];
     if (!sdb)
-        sdb = m_chunksDB[storage->getUrl()] = QnStorageDbPtr(new QnStorageDb(storage->getIndex()));
+        sdb = m_chunksDB[storage] = QnStorageDbPtr(new QnStorageDb(storage->getIndex()));
     QString fileName = closeDirPath(storage->getUrl()) + QString::fromLatin1("media.sqlite");
 
     if (!sdb->open(fileName))
@@ -484,7 +510,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         return;
     qint64 toDelete = storage->getSpaceLimit() - freeSpace;
 
-    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
+    QnStorageDbPtr sdb = m_chunksDB[storage];
     sdb->beforeDelete();
 
     while (toDelete > 0)
@@ -821,7 +847,7 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, QnStorag
     if (recordingTime > 0)
         ownCatalog->setLatRecordingTime(recordingTime);
 
-    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
+    QnStorageDbPtr sdb = m_chunksDB[storage];
     sdb->replaceChunks(mac, role, newCatalog->m_chunks);
 }
 
@@ -889,7 +915,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     DeviceFileCatalogPtr catalog = getFileCatalog(mac.toUtf8(), quality);
     if (catalog == 0)
         return false;
-    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
+    QnStorageDbPtr sdb = m_chunksDB[storage];
     sdb->addRecord(mac.toUtf8(), DeviceFileCatalog::roleForPrefix(quality), catalog->updateDuration(durationMs, fileSize));
     return true;
 }
@@ -914,16 +940,31 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
 
 // data migration from previous versions
 
-void QnStorageManager::loadFullFileCatalog()
+void QnStorageManager::doMigrateCSVCatalog()
 {
-    loadFullFileCatalogInternal(QnResource::Role_LiveVideo);
-    loadFullFileCatalogInternal(QnResource::Role_SecondaryLiveVideo);
+    doMigrateCSVCatalog(QnResource::Role_LiveVideo);
+    doMigrateCSVCatalog(QnResource::Role_SecondaryLiveVideo);
     m_catalogLoaded = true;
     m_rebuildProgress = 1.0;
 }
 
-void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole role)
+QnStorageResourcePtr QnStorageManager::findStorageByOldIndex(int oldIndex, QMap<QString, QSet<int>> oldIndexes)
 {
+    for(QMap<QString, QSet<int>>::const_iterator itr = oldIndexes.begin(); itr != oldIndexes.end(); ++itr)
+    {
+        foreach(int idx, itr.value())
+        {
+            if (oldIndex == idx)
+                return getStorageByUrl(itr.key());
+        }
+    }
+    return QnStorageResourcePtr();
+}
+
+void QnStorageManager::doMigrateCSVCatalog(QnResource::ConnectionRole role)
+{
+    QMap<QString, QSet<int>> storageIndexes = deserializeStorageFile();
+
     QDir dir(closeDirPath(getDataDirectory()) + QString("record_catalog/media/") + DeviceFileCatalog::prefixForRole(role));
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     foreach(QFileInfo fi, list) 
@@ -935,9 +976,9 @@ void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole ro
         {
             foreach(const DeviceFileCatalog::Chunk& chunk, catalog->m_chunks) 
             {
-                QnStorageResourcePtr storage = m_storageRoots.value(chunk.storageIndex);
+                QnStorageResourcePtr storage = findStorageByOldIndex(chunk.storageIndex, storageIndexes);
                 if (storage) {
-                    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
+                    QnStorageDbPtr sdb = m_chunksDB[storage];
                     sdb->addRecord(mac, role, chunk);
                 }
             }
