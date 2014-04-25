@@ -27,18 +27,18 @@ static const char DELIMITER('$');
 static const char STRING_LIST_DELIM('\n');
 
 QnBusinessEventParameters::QnBusinessEventParameters():
-    m_eventType(BusinessEventType::NotDefined),
+    m_eventType(QnBusiness::UndefinedEvent),
     m_timestamp(0),
     m_reasonCode(QnBusiness::NoReason)
 {
 
 }
 
-BusinessEventType::Value QnBusinessEventParameters::getEventType()  const {
+QnBusiness::EventType QnBusinessEventParameters::getEventType()  const {
     return  m_eventType;
 }
 
-void QnBusinessEventParameters::setEventType(BusinessEventType::Value value) {
+void QnBusinessEventParameters::setEventType(QnBusiness::EventType value) {
     m_eventType = value;
 }
 
@@ -157,7 +157,7 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
             switch ((Params) i)
             {
                 case eventTypeParam:
-                    result.m_eventType = (BusinessEventType::Value) toInt(field);
+                    result.m_eventType = (QnBusiness::EventType) toInt(field);
                     break;
                 case eventTimestampParam:
                     result.m_timestamp = toInt64(field);
@@ -332,7 +332,7 @@ QnBusinessEventParameters QnBusinessEventParameters::fromBusinessParams(const Qn
             switch (Params( paramIndex))
             {
             case eventTypeParam:
-                result.m_eventType = (BusinessEventType::Value) itr.value().toInt();
+                result.m_eventType = (QnBusiness::EventType) itr.value().toInt();
                 break;
             case eventTimestampParam:
                 result.m_timestamp = itr.value().toLongLong();
@@ -415,14 +415,14 @@ QString QnBusinessEventParameters::getParamsKey() const
 
     switch (getEventType())
     {
-        case BusinessEventType::MediaServer_Failure:
-        case BusinessEventType::Network_Issue:
-        case BusinessEventType::Storage_Failure:
+        case QnBusiness::ServerFailureEvent:
+        case QnBusiness::NetworkIssueEvent:
+        case QnBusiness::StorageFailureEvent:
             paramKey += QLatin1String("_") + QString::number(getReasonCode());
-            if (getReasonCode() == QnBusiness::StorageIssueIoError || getReasonCode() == QnBusiness::StorageIssueNotEnoughSpeed || getReasonCode() == QnBusiness::StorageIssueNotEnoughSpace)
+            if (getReasonCode() == QnBusiness::StorageIoErrorReason || getReasonCode() == QnBusiness::StorageTooSlowReason || getReasonCode() == QnBusiness::StorageNotEnoughSpaceReason)
                 paramKey += QLatin1String("_") + getReasonParamsEncoded();
             break;
-        case BusinessEventType::Camera_Input:
+        case QnBusiness::CameraInputEvent:
             paramKey += QLatin1String("_") + getInputPortId();
             break;
     default:

@@ -574,7 +574,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
     if (toDelete > 0) {
         if (!m_diskFullWarned[storage->getId()]) {
             QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
-            emit storageFailure(storage, QnBusiness::StorageIssueNotEnoughSpace);
+            emit storageFailure(storage, QnBusiness::StorageNotEnoughSpaceReason);
             m_diskFullWarned[storage->getId()] = true;
         }
     }
@@ -633,7 +633,7 @@ void QnStorageManager::changeStorageStatus(QnStorageResourcePtr fileStorage, QnR
     fileStorage->setStatus(status);
     m_storagesStatisticsReady = false;
     if (status == QnResource::Offline)
-        emit storageFailure(fileStorage, QnBusiness::StorageIssueIoError);
+        emit storageFailure(fileStorage, QnBusiness::StorageIoErrorReason);
 }
 
 void QnStorageManager::testOfflineStorages()

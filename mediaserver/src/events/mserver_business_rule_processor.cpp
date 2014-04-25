@@ -36,17 +36,17 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
     if (!result) {
         switch(action->actionType())
         {
-        case BusinessActionType::Bookmark:
+        case QnBusiness::BookmarkAction:
             // TODO: implement me
             break;
-        case BusinessActionType::CameraOutput:
-        case BusinessActionType::CameraOutputInstant:
+        case QnBusiness::CameraOutputAction:
+        case QnBusiness::CameraOutputOnceAction:
             result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
             break;
-        case BusinessActionType::CameraRecording:
+        case QnBusiness::CameraRecordingAction:
             result = executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
             break;
-        case BusinessActionType::PanicRecording:
+        case QnBusiness::PanicRecordingAction:
             result = executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
             break;
         default:
@@ -121,7 +121,7 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
     //    return false;
     //}
 
-    bool instant = action->actionType() == BusinessActionType::CameraOutputInstant;
+    bool instant = action->actionType() == QnBusiness::CameraOutputOnceAction;
 
     int autoResetTimeout = instant
             ? 30*1000
@@ -142,7 +142,7 @@ QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventP
     QImage result;
 
     // By now only motion screenshot is supported
-    if (params.getEventType() != BusinessEventType::Camera_Motion)
+    if (params.getEventType() != QnBusiness::CameraMotionEvent)
         return result;
 
     QnVirtualCameraResourcePtr res = qSharedPointerDynamicCast<QnVirtualCameraResource> (QnResourcePool::instance()->getResourceById(params.getEventResourceId()));

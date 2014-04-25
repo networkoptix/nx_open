@@ -5,7 +5,7 @@ QnMServerFailureBusinessEvent::QnMServerFailureBusinessEvent(
         const QnResourcePtr& resource,
         qint64 timeStamp,
         QnBusiness::EventReason reasonCode):
-    base_type(BusinessEventType::MediaServer_Failure,
+    base_type(QnBusiness::ServerFailureEvent,
                             resource,
                             timeStamp,
                             reasonCode)
@@ -15,7 +15,7 @@ QnMServerFailureBusinessEvent::QnMServerFailureBusinessEvent(
 QnMServerStartedBusinessEvent::QnMServerStartedBusinessEvent(
     const QnResourcePtr& resource,
     qint64 timeStamp):
-base_type(BusinessEventType::MediaServer_Started,
+base_type(QnBusiness::ServerStartEvent,
     resource,
     timeStamp)
 {

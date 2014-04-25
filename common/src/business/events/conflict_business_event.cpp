@@ -1,6 +1,6 @@
 #include "conflict_business_event.h"
 
-QnConflictBusinessEvent::QnConflictBusinessEvent(const BusinessEventType::Value eventType,
+QnConflictBusinessEvent::QnConflictBusinessEvent(const QnBusiness::EventType eventType,
                                                  const QnResourcePtr& resource,
                                                  const qint64 timeStamp,
                                                  const QString& source,

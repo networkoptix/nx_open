@@ -4,7 +4,7 @@
 QnCameraDisconnectedBusinessEvent::QnCameraDisconnectedBusinessEvent(
         const QnResourcePtr& cameraResource,
         qint64 timeStamp):
-    base_type(BusinessEventType::Camera_Disconnect,
+    base_type(QnBusiness::CameraDisconnectEvent,
                             cameraResource,
                             timeStamp)
 {

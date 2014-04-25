@@ -1,16 +1,16 @@
     struct ApiBusinessRuleData: ApiData {
         ApiBusinessRuleData(): 
-            eventType(BusinessEventType::NotDefined), eventState(Qn::UndefinedState), actionType(BusinessActionType::NotDefined), 
+            eventType(QnBusiness::UndefinedEvent), eventState(Qn::UndefinedState), actionType(QnBusiness::UndefinedAction), 
             aggregationPeriod(0), disabled(false), system(false) {}
 
         QnId id;
 
-        BusinessEventType::Value eventType;
+        QnBusiness::EventType eventType;
         std::vector<QnId>  eventResource;
         QByteArray eventCondition;
         Qn::ToggleState eventState;
     
-        BusinessActionType::Value actionType;
+        QnBusiness::ActionType actionType;
         std::vector<QnId> actionResource;
         QByteArray actionParams;
 
