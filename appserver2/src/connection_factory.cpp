@@ -79,7 +79,7 @@ namespace ec2
         //AbstractResourceManager::setResourceDisabled
         registerUpdateFuncHandler<ApiSetResourceDisabledData>( restProcessorPool, ApiCommand::setResourceDisabled );
         //AbstractResourceManager::getKvPairs
-        registerGetFuncHandler<QnId, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getResourceParams );
+        registerGetFuncHandler<QnId, ApiResourceParamsData>( restProcessorPool, ApiCommand::getResourceParams );
         //AbstractResourceManager::save
         registerUpdateFuncHandler<ApiResourceParamDataList>( restProcessorPool, ApiCommand::setResourceParams );
         //AbstractResourceManager::save
@@ -161,7 +161,7 @@ namespace ec2
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStoredFile );
 
         //ApiResourceParamList
-        registerGetFuncHandler<nullptr_t, ApiResourceParamData>( restProcessorPool, ApiCommand::getSettings );
+        registerGetFuncHandler<nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );
         registerUpdateFuncHandler<ApiResourceParamDataList>( restProcessorPool, ApiCommand::saveSettings );
 
         //AbstractECConnection

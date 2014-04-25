@@ -30,8 +30,10 @@
 #ifdef Q_OS_WIN
 #include <launcher/nov_launcher_win.h>
 #endif
-#include "nx_ec/data/ec2_layout_data.h"
+
+#include "nx_ec/data/api_layout_data.h"
 #include "utils/serialization/binary_functions.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
                                        const QnTimePeriod &period,
