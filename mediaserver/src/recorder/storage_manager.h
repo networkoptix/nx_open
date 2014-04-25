@@ -164,7 +164,7 @@ private:
     friend class RebuildAsyncTask;
     RebuildAsyncTask* m_asyncRebuildTask;
 
-    QMap<QString, QnStorageDbPtr> m_chunksDB;
+    QMap<QnStorageResourcePtr, QnStorageDbPtr> m_chunksDB;
 };
 
 #define qnStorageMan QnStorageManager::instance()
