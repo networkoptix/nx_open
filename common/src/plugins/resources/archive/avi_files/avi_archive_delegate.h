@@ -37,7 +37,7 @@ public:
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();
 
-    virtual bool open(QnResourcePtr resource);
+    virtual bool open(const QnResourcePtr &resource);
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();

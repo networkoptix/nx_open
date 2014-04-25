@@ -262,7 +262,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
     return time;
 }
 
-bool QnAviArchiveDelegate::open(QnResourcePtr resource)
+bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
 {
     QMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
 
@@ -281,14 +281,14 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
         m_formatContext->pb = m_ioContext = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
         if (!m_ioContext) {
             close();
-            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccesible
+            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccessible
             return false;
         }
         m_initialized = avformat_open_input(&m_formatContext, "", 0, 0) >= 0;
 
         if (!m_initialized ) {
             close();
-            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccesible
+            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccessible
             return false;
         }
         
