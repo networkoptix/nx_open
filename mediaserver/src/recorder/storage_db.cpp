@@ -15,7 +15,7 @@ QnStorageDb::~QnStorageDb()
 {
 }
 
-bool QnStorageDb::deleteRecords(const QByteArray& mac, QnResource::ConnectionRole role, qint64 startTimeMs)
+bool QnStorageDb::deleteRecords(const QByteArray& mac, QnServer::ChunksCatalog catalog, qint64 startTimeMs)
 {
     QSqlQuery query(m_sdb);
     if (startTimeMs != -1)
@@ -23,7 +23,7 @@ bool QnStorageDb::deleteRecords(const QByteArray& mac, QnResource::ConnectionRol
     else
         query.prepare("DELETE FROM storage_data WHERE unique_id = ? and role = ?");
     query.addBindValue(mac);
-    query.addBindValue((int) role);
+    query.addBindValue((int) catalog);
     if (startTimeMs != -1)
         query.addBindValue(startTimeMs);
     if (!query.exec())
@@ -34,14 +34,14 @@ bool QnStorageDb::deleteRecords(const QByteArray& mac, QnResource::ConnectionRol
     return true;
 }
 
-void QnStorageDb::addRecord(const QByteArray& mac, QnResource::ConnectionRole role, const DeviceFileCatalog::Chunk& chunk)
+void QnStorageDb::addRecord(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
 {
     if (chunk.durationMs <= 0)
         return;
 
     if (m_lastTranTime.elapsed() < COMMIT_INTERVAL) 
     {
-        m_delayedData << DelayedData(mac, role, chunk);
+        m_delayedData << DelayedData(mac, catalog, chunk);
         return;
     }
     flushRecords();
@@ -52,19 +52,19 @@ void QnStorageDb::flushRecords()
 {
     beginTran();
     foreach(const DelayedData& data, m_delayedData)
-        addRecordInternal(data.mac, data.role, data.chunk);
+        addRecordInternal(data.mac, data.catalog, data.chunk);
     commit();
     m_lastTranTime.restart();
     m_delayedData.clear();
 }
 
-bool QnStorageDb::addRecordInternal(const QByteArray& mac, QnResource::ConnectionRole role, const DeviceFileCatalog::Chunk& chunk)
+bool QnStorageDb::addRecordInternal(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
 {
     QSqlQuery query(m_sdb);
     query.prepare("INSERT OR REPLACE INTO storage_data values(?,?,?,?,?,?,?)");
 
     query.addBindValue(mac); // unique_id
-    query.addBindValue(role); // role
+    query.addBindValue(catalog); // role
     query.addBindValue(chunk.startTimeMs); // start_time
     query.addBindValue(chunk.timeZone); // timezone
     query.addBindValue(chunk.fileIndex); // file_index
@@ -78,14 +78,14 @@ bool QnStorageDb::addRecordInternal(const QByteArray& mac, QnResource::Connectio
     return true;
 }
 
-bool QnStorageDb::replaceChunks(const QByteArray& mac, QnResource::ConnectionRole role, const QVector<DeviceFileCatalog::Chunk>& chunks)
+bool QnStorageDb::replaceChunks(const QByteArray& mac, QnServer::ChunksCatalog catalog, const QVector<DeviceFileCatalog::Chunk>& chunks)
 {
     beginTran();
 
     QSqlQuery query(m_sdb);
     query.prepare("DELETE FROM storage_data WHERE unique_id = ? AND role = ?");
     query.addBindValue(mac);
-    query.addBindValue(role);
+    query.addBindValue(catalog);
 
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -95,7 +95,7 @@ bool QnStorageDb::replaceChunks(const QByteArray& mac, QnResource::ConnectionRol
 
     foreach(const DeviceFileCatalog::Chunk& chunk, chunks)
     {
-        if (!addRecordInternal(mac, role, chunk)) {
+        if (!addRecordInternal(mac, catalog, chunk)) {
             rollback();
             return false;
         }
@@ -150,13 +150,13 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog()
 
     DeviceFileCatalogPtr fileCatalog;
     QVector<DeviceFileCatalog::Chunk> chunks;
-    QnResource::ConnectionRole prevRole = QnResource::Role_Default;
+    QnServer::ChunksCatalog prevCatalog = QnServer::ChunksCatalogCount; //should differ form all existing catalogs
     QByteArray prevMac;
     while (query.next())
     {
         QByteArray mac = query.value(macFieldIdx).toByteArray();
-        QnResource::ConnectionRole role = (QnResource::ConnectionRole) query.value(roleFieldIdx).toInt();
-        if (mac != prevMac || role != prevRole) 
+        QnServer::ChunksCatalog catalog = (QnServer::ChunksCatalog) query.value(roleFieldIdx).toInt();
+        if (mac != prevMac || catalog != prevCatalog) 
         {
             if (fileCatalog) {
                 fileCatalog->addChunks(chunks);
@@ -164,9 +164,9 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog()
                 chunks.clear();
             }
 
-            prevRole = role;
+            prevCatalog = catalog;
             prevMac = mac;
-            fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(mac, role));
+            fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(mac, catalog));
         }
         qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
         qint64 filesize = query.value(filesizeFieldIdx).toLongLong();

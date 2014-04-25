@@ -1,22 +1,24 @@
 #include "dualquality_helper.h"
+
+#include <server/server_globals.h>
 #include "recorder/storage_manager.h"
 
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 static const int FIRST_STREAM_FIND_EPS = 1000 * 15;
 
-QnDialQualityHelper::QnDialQualityHelper()
+QnDualQualityHelper::QnDualQualityHelper()
 {
     m_quality = MEDIA_Quality_High;
     m_alreadyOnAltChunk = false;
 }
 
-void QnDialQualityHelper::setResource(QnNetworkResourcePtr netResource)
+void QnDualQualityHelper::setResource(const QnNetworkResourcePtr &netResource)
 {
-    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getPhysicalId().toUtf8(), QnResource::Role_LiveVideo);
-    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId().toUtf8(), QnResource::Role_SecondaryLiveVideo);
+    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getPhysicalId().toUtf8(), QnServer::HiQualityCatalog);
+    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId().toUtf8(), QnServer::LowQualityCatalog);
 }
 
-void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod, bool preciseFind)
+void QnDualQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod, bool preciseFind)
 {
     //qDebug() << "find data for time=" << QDateTime::fromMSecsSinceEpoch(time).toString(QLatin1String("hh:mm:ss.zzz"));
     bool usePreciseFind = m_alreadyOnAltChunk || preciseFind;
@@ -76,7 +78,7 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
     }
 }
 
-void QnDialQualityHelper::setPrefferedQuality(MediaQuality quality)
+void QnDualQualityHelper::setPrefferedQuality(MediaQuality quality)
 {
     if (m_quality != quality) {
         m_quality = quality;

@@ -6,6 +6,7 @@
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include <core/resource/media_server_resource.h>
+#include <core/resource/storage_resource.h>
 
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
@@ -83,10 +84,10 @@ QnStorageManager::QnStorageManager():
     m_testStorageThread = new TestStorageThread(this);
 }
 
-QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(DeviceFileCatalogPtr fileCatalog, QnStorageResourcePtr storage, const QVector<DeviceFileCatalog::Chunk>& chunks)
+QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const QVector<DeviceFileCatalog::Chunk>& chunks)
 {
     const QByteArray& mac = fileCatalog->getMac();
-    QnResource::ConnectionRole role = fileCatalog->getRole();
+    QnServer::ChunksCatalog catalog = fileCatalog->getCatalog();
 
 #if 0
     /* Check real media data at the begin of chunks list readed from DB.
@@ -103,7 +104,7 @@ QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(D
     /* Check new records, absent in the DB
     */
     QStringList emptyFileList;
-    QString rootDir = closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixForRole(role) + QString('/') + mac;
+    QString rootDir = closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixByCatalog(catalog) + QString('/') + mac;
     DeviceFileCatalog::ScanFilter filter;
     if (!chunks.isEmpty())
         filter.scanAfter = chunks.last();
@@ -118,13 +119,13 @@ QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(D
     // add to DB
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     foreach(const DeviceFileCatalog::Chunk& chunk, newChunks)
-        sdb->addRecord(mac, role, chunk);
+        sdb->addRecord(mac, catalog, chunk);
     sdb->flushRecords();
     // merge chunks
     return DeviceFileCatalog::mergeChunks(chunks, newChunks);
 }
 
-bool QnStorageManager::loadFullFileCatalog(QnStorageResourcePtr storage, bool isRebuild, qreal progressCoeff)
+bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, bool isRebuild, qreal progressCoeff)
 {
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     if (!sdb)
@@ -142,14 +143,15 @@ bool QnStorageManager::loadFullFileCatalog(QnStorageResourcePtr storage, bool is
         // load from database
         foreach(DeviceFileCatalogPtr c, sdb->loadFullFileCatalog())
         {
-            DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->getMac(), c->getRole());
+            DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->getMac(), c->getCatalog());
             fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
         }
     }
     else {
         // load from media folder
-        loadFullFileCatalogFromMedia(storage, QnResource::Role_LiveVideo, progressCoeff / 2.0);
-        loadFullFileCatalogFromMedia(storage, QnResource::Role_SecondaryLiveVideo, progressCoeff / 2.0);
+        for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
+            loadFullFileCatalogFromMedia(storage, static_cast<QnServer::ChunksCatalog> (i), progressCoeff / QnServer::ChunksCatalogCount);
+        }
         m_catalogLoaded = true;
         m_rebuildProgress = 1.0;
     }
@@ -234,9 +236,9 @@ bool QnStorageManager::isCatalogLoaded() const
     return m_catalogLoaded;
 }
 
-void QnStorageManager::loadFullFileCatalogFromMedia(QnStorageResourcePtr storage, QnResource::ConnectionRole role, qreal progressCoeff)
+void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, qreal progressCoeff)
 {
-    QDir dir(closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixForRole(role));
+    QDir dir(closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixByCatalog(catalog));
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     foreach(QFileInfo fi, list)
     {
@@ -244,15 +246,15 @@ void QnStorageManager::loadFullFileCatalogFromMedia(QnStorageResourcePtr storage
             return; // cancel rebuild
 
         qint64 rebuildEndTime = qnSyncTime->currentMSecsSinceEpoch() - 100 * 1000;
-        DeviceFileCatalogPtr newCatalog(new DeviceFileCatalog(fi.fileName(), role));
+        DeviceFileCatalogPtr newCatalog(new DeviceFileCatalog(fi.fileName(), catalog));
         QnTimePeriod rebuildPeriod = QnTimePeriod(0, rebuildEndTime);
         newCatalog->doRebuildArchive(storage, rebuildPeriod);
 
         QByteArray mac = fi.fileName().toUtf8();
-        DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(mac, role);
-        replaceChunks(rebuildPeriod, storage, newCatalog, mac, role);
+        DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(mac, catalog);
+        replaceChunks(rebuildPeriod, storage, newCatalog, mac, catalog);
 
-        m_rebuildProgress += progressCoeff / (double) list.size(); // we load catalog twice (HQ and LQ), so, use 0.5 instead of 1.0 for progress
+        m_rebuildProgress += progressCoeff / (double) list.size();
     }
 }
 
@@ -298,13 +300,13 @@ QSet<int> QnStorageManager::getDeprecateIndexList(const QString& p)
     return result;
 }
 
-void QnStorageManager::addStorage(QnStorageResourcePtr storage)
+void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     storage->setIndex(detectStorageIndex(storage->getUrl()));
     QMutexLocker lock(&m_mutexStorages);
     m_storagesStatisticsReady = false;
     
-    cl_log.log(QString(QLatin1String("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently avaiable: %3MiB")).arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+    cl_log.log(QString("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently available: %3MiB").arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
 
     removeStorage(storage); // remove existing storage record if exists
     //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
@@ -328,7 +330,7 @@ QStringList QnStorageManager::getAllStoragePathes() const
     return m_storageIndexes.keys();
 }
 
-void QnStorageManager::removeStorage(QnStorageResourcePtr storage)
+void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
 {
     QMutexLocker lock(&m_mutexStorages);
     m_storagesStatisticsReady = false;
@@ -346,7 +348,7 @@ void QnStorageManager::removeStorage(QnStorageResourcePtr storage)
     }
 }
 
-bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const
+bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& storages, const QnId &id) const
 {
     foreach(const QnAbstractStorageResourcePtr& storage, storages)
     {
@@ -356,7 +358,7 @@ bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& 
     return false;
 }
 
-void QnStorageManager::removeAbsentStorages(QnAbstractStorageResourceList newStorages)
+void QnStorageManager::removeAbsentStorages(const QnAbstractStorageResourceList &newStorages)
 {
     QMutexLocker lock(&m_mutexStorages);
     for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end();)
@@ -393,7 +395,7 @@ QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone)
     return text;
 }
 
-void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList>& cameras, QnNetworkResourcePtr camera, qint64 startTime, qint64 endTime, qint64 detailLevel, DeviceFileCatalogPtr catalog)
+void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList> &cameras, const QnNetworkResourcePtr &camera, qint64 startTime, qint64 endTime, qint64 detailLevel, const DeviceFileCatalogPtr &catalog)
 {
     if (catalog) {
         cameras << catalog->getTimePeriods(startTime, endTime, detailLevel);
@@ -405,9 +407,9 @@ void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList>& cameras,
             {
                 lastPeriod.durationMs = 0;
                 Recorders recorders = QnRecordingManager::instance()->findRecorders(camera);
-                if (catalog->getRole() == QnResource::Role_LiveVideo && recorders.recorderHiRes)
+                if (catalog->getCatalog() == QnServer::HiQualityCatalog && recorders.recorderHiRes)
                     lastPeriod.durationMs = recorders.recorderHiRes->duration()/1000;
-                else if (catalog->getRole() == QnResource::Role_SecondaryLiveVideo && recorders.recorderLowRes)
+                else if (catalog->getCatalog() == QnServer::LowQualityCatalog && recorders.recorderLowRes)
                     lastPeriod.durationMs = recorders.recorderLowRes->duration()/1000;
             }
         }
@@ -416,32 +418,32 @@ void QnStorageManager::getTimePeriodInternal(QVector<QnTimePeriodList>& cameras,
 
 bool QnStorageManager::isArchiveTimeExists(const QString& physicalId, qint64 timeMs)
 {
-    DeviceFileCatalogPtr catalog = getFileCatalog(physicalId.toUtf8(), QnResource::Role_LiveVideo);
+    DeviceFileCatalogPtr catalog = getFileCatalog(physicalId.toUtf8(), QnServer::HiQualityCatalog);
     if (catalog && catalog->containTime(timeMs))
         return true;
 
-    catalog = getFileCatalog(physicalId.toUtf8(), QnResource::Role_SecondaryLiveVideo);
+    catalog = getFileCatalog(physicalId.toUtf8(), QnServer::LowQualityCatalog);
     return catalog && catalog->containTime(timeMs);
 }
 
 
-QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qint64 startTime, qint64 endTime, qint64 detailLevel)
-{
+QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnResourceList &resList, qint64 startTime, qint64 endTime, qint64 detailLevel) {
     QVector<QnTimePeriodList> periods;
-    for (int i = 0; i < resList.size(); ++i)
-    {
-        QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (resList[i]);
-        if (camera) {
-            if (camera->isDtsBased())
-            {
-                periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
-            }
-            else {
-                QString physicalId = camera->getPhysicalId();
-                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId.toUtf8(), QnResource::Role_LiveVideo));
-                getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId.toUtf8(), QnResource::Role_SecondaryLiveVideo));
-            }
+    foreach (const QnResourcePtr &resource, resList) {
+        QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (resource);
+        if (!camera)
+            continue;
+        
+        if (camera->isDtsBased())
+        {
+            periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
         }
+        else {
+            QString physicalId = camera->getPhysicalId();
+            getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId.toUtf8(), QnServer::HiQualityCatalog));
+            getTimePeriodInternal(periods, camera, startTime, endTime, detailLevel, getFileCatalog(physicalId.toUtf8(), QnServer::LowQualityCatalog));
+        }
+
     }
 
     return QnTimePeriodList::mergeTimePeriods(periods);
@@ -494,7 +496,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         DeviceFileCatalogPtr catalog;
         {
             QMutexLocker lock(&m_mutexCatalog);
-            for (FileCatalogMap::const_iterator itr = m_devFileCatalogHi.constBegin(); itr != m_devFileCatalogHi.constEnd(); ++itr)
+            for (FileCatalogMap::const_iterator itr = m_devFileCatalog[QnServer::HiQualityCatalog].constBegin(); itr != m_devFileCatalog[QnServer::HiQualityCatalog].constEnd(); ++itr)
             {
                 qint64 firstTime = itr.value()->firstTime();
                 if (firstTime != (qint64)AV_NOPTS_VALUE && firstTime < minTime)
@@ -504,14 +506,14 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
                 }
             }
             if (!mac.isEmpty())
-                catalog = getFileCatalog(mac, QnResource::Role_LiveVideo);
+                catalog = getFileCatalog(mac, QnServer::HiQualityCatalog);
         }
         if (catalog != 0) 
         {
             qint64 deletedTime = catalog->deleteFirstRecord();
-            sdb->deleteRecords(mac, QnResource::Role_LiveVideo, deletedTime);
+            sdb->deleteRecords(mac, QnServer::HiQualityCatalog, deletedTime);
             
-            DeviceFileCatalogPtr catalogLowRes = getFileCatalog(mac, QnResource::Role_SecondaryLiveVideo);
+            DeviceFileCatalogPtr catalogLowRes = getFileCatalog(mac, QnServer::LowQualityCatalog);
             if (catalogLowRes != 0) 
             {
                 qint64 minTime = catalog->minTime();
@@ -520,12 +522,12 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
                     if (idx != -1) {
                         QVector<qint64> deletedTimeList = catalogLowRes->deleteRecordsBefore(idx);
                         foreach(const qint64& deletedTime, deletedTimeList)
-                            sdb->deleteRecords(mac, QnResource::Role_SecondaryLiveVideo, deletedTime);
+                            sdb->deleteRecords(mac, QnServer::LowQualityCatalog, deletedTime);
                     }
                 }
                 else {
                     catalogLowRes->clear();
-                    sdb->deleteRecords(mac, QnResource::Role_SecondaryLiveVideo);
+                    sdb->deleteRecords(mac, QnServer::LowQualityCatalog);
                 }
 
                 if (catalog->isEmpty() && catalogLowRes->isEmpty())
@@ -564,11 +566,13 @@ void QnStorageManager::at_archiveRangeChanged(const QnAbstractStorageResourcePtr
     Q_UNUSED(newEndTimeMs)
     int storageIndex = detectStorageIndex(resource->getUrl());
 
-    foreach(DeviceFileCatalogPtr catalogHi, m_devFileCatalogHi)
+    foreach(DeviceFileCatalogPtr catalogHi, m_devFileCatalog[QnServer::HiQualityCatalog])
         catalogHi->deleteRecordsByStorage(storageIndex, newStartTimeMs);
     
-    foreach(DeviceFileCatalogPtr catalogLow, m_devFileCatalogLow)
+    foreach(DeviceFileCatalogPtr catalogLow, m_devFileCatalog[QnServer::LowQualityCatalog])
         catalogLow->deleteRecordsByStorage(storageIndex, newStartTimeMs);
+
+    //TODO: #vasilenko should we delete bookmarks here too?
 }
 
 QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
@@ -601,7 +605,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
     return result;
 }
 
-void QnStorageManager::changeStorageStatus(QnStorageResourcePtr fileStorage, QnResource::Status status)
+void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStorage, QnResource::Status status)
 {
     QMutexLocker lock(&m_mutexStorages);
     fileStorage->setStatus(status);
@@ -736,7 +740,7 @@ void QnStorageManager::putFileNumToCache(const QString& base, int fileNum)
     m_fileNumCache[base].second = fileNum;
 }
 
-QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, const QnNetworkResourcePtr camera, const QString& prefix, QnStorageResourcePtr& storage)
+QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, const QnNetworkResourcePtr &camera, const QString& prefix, const QnStorageResourcePtr& storage)
 {
     if (!storage) {
         if (m_storageWarnTimer.elapsed() > 5000) {
@@ -774,21 +778,21 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
     return text + strPadLeft(QString::number(fileNum), 3, '0');
 }
 
-DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QByteArray& mac, const QString& qualityPrefix)
+DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QByteArray& mac, const QString &catalogPrefix)
 {
     if (!m_catalogLoaded)
         return DeviceFileCatalogPtr();
-    return getFileCatalogInternal(mac, DeviceFileCatalog::roleForPrefix(qualityPrefix));
+    return getFileCatalogInternal(mac, DeviceFileCatalog::catalogByPrefix(catalogPrefix));
 }
 
-DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QByteArray& mac, QnResource::ConnectionRole role)
+DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QByteArray& mac, QnServer::ChunksCatalog catalog)
 {
     if (!m_catalogLoaded)
         return DeviceFileCatalogPtr();
-    return getFileCatalogInternal(mac, role);
+    return getFileCatalogInternal(mac, catalog);
 }
 
-void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, QnStorageResourcePtr storage, DeviceFileCatalogPtr newCatalog, const QByteArray& mac, QnResource::ConnectionRole role)
+void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QByteArray& mac, QnServer::ChunksCatalog catalog)
 {
     QMutexLocker lock(&m_mutexCatalog);
     int storageIndex = storage->getIndex();
@@ -797,7 +801,7 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, QnStorag
     qint64 scannedDataLastTime = newCatalog->m_chunks.isEmpty() ? 0 : newCatalog->m_chunks.last().startTimeMs;
     qint64 rebuildLastTime = qMax(rebuildPeriod.endTimeMs(), scannedDataLastTime);
     
-    DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(mac, role);
+    DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(mac, catalog);
     QVector<DeviceFileCatalog::Chunk>::const_iterator itr = qLowerBound(ownCatalog->m_chunks.begin(), ownCatalog->m_chunks.end(), rebuildLastTime);
     for (; itr != ownCatalog->m_chunks.end(); ++itr)
     {
@@ -822,19 +826,18 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, QnStorag
         ownCatalog->setLatRecordingTime(recordingTime);
 
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
-    sdb->replaceChunks(mac, role, newCatalog->m_chunks);
+    sdb->replaceChunks(mac, catalog, newCatalog->m_chunks);
 }
 
-DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QByteArray& mac, QnResource::ConnectionRole role)
+DeviceFileCatalogPtr QnStorageManager::getFileCatalogInternal(const QByteArray& mac, QnServer::ChunksCatalog catalog)
 {
     QMutexLocker lock(&m_mutexCatalog);
-    bool hiQuality = role == QnResource::Role_LiveVideo;
-    FileCatalogMap& catalog = hiQuality ? m_devFileCatalogHi : m_devFileCatalogLow;
-    DeviceFileCatalogPtr fileCatalog = catalog[mac];
+    FileCatalogMap& catalogMap = m_devFileCatalog[catalog];
+    DeviceFileCatalogPtr fileCatalog = catalogMap[mac];
     if (fileCatalog == 0)
     {
-        fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(mac, role));
-        catalog[mac] = fileCatalog;
+        fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(mac, catalog));
+        catalogMap[mac] = fileCatalog;
     }
     return fileCatalog;
 }
@@ -890,7 +893,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     if (catalog == 0)
         return false;
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
-    sdb->addRecord(mac.toUtf8(), DeviceFileCatalog::roleForPrefix(quality), catalog->updateDuration(durationMs, fileSize));
+    sdb->addRecord(mac.toUtf8(), DeviceFileCatalog::catalogByPrefix(quality), catalog->updateDuration(durationMs, fileSize));
     return true;
 }
 
@@ -914,31 +917,30 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, cons
 
 // data migration from previous versions
 
-void QnStorageManager::loadFullFileCatalog()
-{
-    loadFullFileCatalogInternal(QnResource::Role_LiveVideo);
-    loadFullFileCatalogInternal(QnResource::Role_SecondaryLiveVideo);
+void QnStorageManager::loadFullFileCatalog() {
+    for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
+        loadFullFileCatalogInternal(static_cast<QnServer::ChunksCatalog>(i));
     m_catalogLoaded = true;
     m_rebuildProgress = 1.0;
 }
 
-void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole role)
+void QnStorageManager::loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog)
 {
-    QDir dir(closeDirPath(getDataDirectory()) + QString("record_catalog/media/") + DeviceFileCatalog::prefixForRole(role));
+    QDir dir(closeDirPath(getDataDirectory()) + QString("record_catalog/media/") + DeviceFileCatalog::prefixByCatalog(catalog));
     QFileInfoList list = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     foreach(QFileInfo fi, list) 
     {
         QByteArray mac = fi.fileName().toUtf8();
-        DeviceFileCatalogPtr catalog = getFileCatalogInternal(mac, role);
+        DeviceFileCatalogPtr catalogFile = getFileCatalogInternal(mac, catalog);
         QString catalogName = closeDirPath(fi.absoluteFilePath()) + lit("title.csv");
-        if (catalog->fromCSVFile(catalogName)) 
+        if (catalogFile->fromCSVFile(catalogName)) 
         {
-            foreach(const DeviceFileCatalog::Chunk& chunk, catalog->m_chunks) 
+            foreach(const DeviceFileCatalog::Chunk& chunk, catalogFile->m_chunks) 
             {
                 QnStorageResourcePtr storage = m_storageRoots.value(chunk.storageIndex);
                 if (storage) {
                     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
-                    sdb->addRecord(mac, role, chunk);
+                    sdb->addRecord(mac, catalog, chunk);
                 }
             }
             foreach(QnStorageDbPtr sdb, m_chunksDB.values())
@@ -948,4 +950,9 @@ void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole ro
         }
         dir.rmdir(fi.absoluteFilePath());
     }
+}
+
+bool QnStorageManager::isStorageAvailable(int storage_index) const {
+    QnStorageResourcePtr storage = storageRoot(storage_index);
+    return storage && storage->getStatus() == QnResource::Online; 
 }

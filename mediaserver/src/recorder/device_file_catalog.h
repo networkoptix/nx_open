@@ -5,6 +5,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QVector>
 #include <QtCore/QMap>
+
+#include <server/server_globals.h>
+
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
 #include "recording/time_period.h"
@@ -53,7 +56,7 @@ public:
 
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
 
-    DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role);
+    DeviceFileCatalog(const QString& macAddress, QnServer::ChunksCatalog catalog);
     //void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
     Chunk updateDuration(int durationMs, qint64 fileSize);
@@ -75,7 +78,7 @@ public:
     qint64 maxTime() const;
     //bool lastFileDuplicateName() const;
     qint64 firstTime() const;
-    QnResource::ConnectionRole getRole() const { return m_role; }
+    QnServer::ChunksCatalog getCatalog() const { return m_catalog; }
     QByteArray getMac() const { return m_macAddress.toUtf8(); }
 
     // Detail level determine time duration (in microseconds) visible at 1 screen pixel
@@ -85,8 +88,8 @@ public:
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
     void close();
 
-    static QString prefixForRole(QnResource::ConnectionRole role);
-    static QnResource::ConnectionRole roleForPrefix(const QString& prefix);
+    static QString prefixByCatalog(QnServer::ChunksCatalog catalog);
+    static QnServer::ChunksCatalog catalogByPrefix(const QString &prefix);
 
     static void setRebuildArchive(RebuildMethod value);
     static void cancelRebuildArchive();
@@ -124,7 +127,7 @@ private:
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
     QList<QDate> recordedMonthList();
 
-    void readStorageData(QnStorageResourcePtr storage, QnResource::ConnectionRole role, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList);
+    void readStorageData(QnStorageResourcePtr storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList);
     Chunk chunkFromFile(QnStorageResourcePtr storage, const QString& fileName);
     QnTimePeriod timePeriodFromDir(QnStorageResourcePtr storage, const QString& dirName);
     void replaceChunks(int storageIndex, const QVector<Chunk>& newCatalog);
@@ -151,7 +154,7 @@ private:
 
     //bool m_duplicateName;
     //QMap<int,QString> m_prevFileNames;
-    QnResource::ConnectionRole m_role;
+    QnServer::ChunksCatalog m_catalog;
     int m_lastAddIndex; // last added record index. In most cases it is last record
     QMutex m_IOMutex;
     static RebuildMethod m_rebuildArchive;

@@ -3,6 +3,9 @@
 #include <QtCore/QDir>
 
 #include <api/model/storage_space_reply.h>
+
+#include <core/resource/storage_resource.h>
+
 #include <platform/core_platform_abstraction.h>
 #include <utils/network/tcp_connection_priv.h> /* For CODE_OK. */
 #include <utils/common/json.h>

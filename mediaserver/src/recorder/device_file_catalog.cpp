@@ -20,24 +20,26 @@
 #include "core/resource/resource.h"
 #include "utils/common/synctime.h"
 
+#include <boost/array.hpp>
+
 DeviceFileCatalog::RebuildMethod DeviceFileCatalog::m_rebuildArchive = DeviceFileCatalog::Rebuild_None;
 QMutex DeviceFileCatalog::m_rebuildMutex;
 QSet<void*> DeviceFileCatalog::m_pauseList;
 
-QString DeviceFileCatalog::prefixForRole(QnResource::ConnectionRole role)
-{
-    return role == QnResource::Role_LiveVideo ? "hi_quality" : "low_quality";
+namespace {
+    boost::array<QString, QnServer::ChunksCatalogCount> catalogPrefixes = {"low_quality", "hi_quality", "bookmarks"};
 }
 
-QnResource::ConnectionRole DeviceFileCatalog::roleForPrefix(const QString& prefix)
-{
-    if (prefix == "hi_quality")
-        return QnResource::Role_LiveVideo;
-    else
-        return QnResource::Role_SecondaryLiveVideo;
+QString DeviceFileCatalog::prefixByCatalog(QnServer::ChunksCatalog catalog) {
+    return catalogPrefixes[catalog];
 }
 
-
+QnServer::ChunksCatalog DeviceFileCatalog::catalogByPrefix(const QString &prefix) {
+    for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
+        if (catalogPrefixes[i] == prefix)
+            return static_cast<QnServer::ChunksCatalog>(i);
+    return QnServer::LowQualityCatalog; //default value
+}
 
 qint64 DeviceFileCatalog::Chunk::distanceToTime(qint64 timeMs) const
 {
@@ -68,19 +70,19 @@ void DeviceFileCatalog::Chunk::truncate(qint64 timeMs)
     durationMs = qMax(0ll, timeMs - startTimeMs);
 }
 
-DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role):
+DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnServer::ChunksCatalog catalog):
     m_mutex(QMutex::Recursive),
     m_firstDeleteCount(0),
     m_macAddress(macAddress),
     //m_duplicateName(false),
-    m_role(role),
+    m_catalog(catalog),
     m_lastAddIndex(-1),
     m_lastRecordRecording(false),
     m_rebuildStartTime(0)
 {
     /*
     QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/media/");
-    devTitleFile += prefixForRole(role) + "/";
+    devTitleFile += prefixByCatalog(catalog) + "/";
     devTitleFile += m_macAddress + "/";
     devTitleFile += QString("title.csv");
     m_file.setFileName(devTitleFile);
@@ -137,7 +139,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk, bool checkDirOnly)
     if (!storage->isCatalogAccessible())
         return true; // Can't check if file really exists
 
-    QString prefix = closeDirPath(storage->getUrl()) + prefixForRole(m_role) + QString('/') + m_macAddress + QString('/');
+    QString prefix = closeDirPath(storage->getUrl()) + prefixByCatalog(m_catalog) + QString('/') + m_macAddress + QString('/');
 
    
 
@@ -444,9 +446,9 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourceP
     }
 }
 
-void DeviceFileCatalog::readStorageData(QnStorageResourcePtr storage, QnResource::ConnectionRole role, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList)
+void DeviceFileCatalog::readStorageData(QnStorageResourcePtr storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList)
 {
-    QString rootFolder = closeDirPath(storage->getUrl()) + prefixForRole(role) + QString('/') + m_macAddress;
+    QString rootFolder = closeDirPath(storage->getUrl()) + prefixByCatalog(catalog) + QString('/') + m_macAddress;
     scanMediaFiles(rootFolder, storage, allChunks, emptyFileList);
 }
 
@@ -454,7 +456,7 @@ bool DeviceFileCatalog::doRebuildArchive(QnStorageResourcePtr storage, const QnT
 {
     QElapsedTimer t;
     t.restart();
-    qWarning() << "start rebuilding archive for camera " << m_macAddress << prefixForRole(m_role);
+    qWarning() << "start rebuilding archive for camera " << m_macAddress << prefixByCatalog(m_catalog);
     m_rebuildStartTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QMap<qint64, Chunk> allChunks;
@@ -462,7 +464,7 @@ bool DeviceFileCatalog::doRebuildArchive(QnStorageResourcePtr storage, const QnT
         return false;
     }
     QStringList emptyFileList;
-    readStorageData(storage, m_role, allChunks, emptyFileList);
+    readStorageData(storage, m_catalog, allChunks, emptyFileList);
 
     foreach(const QString& fileName, emptyFileList)
         qnFileDeletor->deleteFile(fileName);
@@ -470,7 +472,7 @@ bool DeviceFileCatalog::doRebuildArchive(QnStorageResourcePtr storage, const QnT
     foreach(const Chunk& chunk, allChunks)
         m_chunks << chunk;
 
-    qWarning() << "rebuild archive for camera " << m_macAddress << prefixForRole(m_role) << "finished. time=" << t.elapsed() << "ms. processd files=" << m_chunks.size();
+    qWarning() << "rebuild archive for camera " << m_macAddress << prefixByCatalog(m_catalog) << "finished. time=" << t.elapsed() << "ms. processd files=" << m_chunks.size();
 
     return true;
 }
@@ -796,7 +798,7 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
     if (!storage)
         return QString();
     return closeDirPath(storage->getUrl()) + 
-                prefixForRole(m_role) + QString('/') +
+                prefixByCatalog(m_catalog) + QString('/') +
                 m_macAddress + QString('/') +
                 QnStorageManager::dateTimeStr(chunk.startTimeMs, chunk.timeZone) + 
                 strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 
