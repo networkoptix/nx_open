@@ -13,7 +13,6 @@ QnStorageDb::QnStorageDb(int storageIndex):
 
 QnStorageDb::~QnStorageDb()
 {
-    commit();
 }
 
 bool QnStorageDb::deleteRecords(const QByteArray& mac, QnResource::ConnectionRole role, qint64 startTimeMs)
