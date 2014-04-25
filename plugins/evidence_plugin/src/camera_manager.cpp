@@ -190,8 +190,23 @@ int CameraManager::setAudioEnabled( int audioEnabled )
 //!Implementation of nxcip::BaseCameraManager::getPTZManager
 nxcip::CameraPtzManager* CameraManager::getPtzManager() const
 {
-    //TODO/IMPL
-    return NULL;
+    {
+        QMutexLocker lk( &m_mutex );
+        if( !m_cameraOptionsRead )
+        {
+            const int errCode = const_cast<CameraManager*>(this)->readCameraOptions();
+            if( errCode != nxcip::NX_NO_ERROR )
+                return nullptr;
+        }
+    }
+
+    if( !(m_cameraCapabilities & nxcip::BaseCameraManager::ptzCapability) )
+        return nullptr;
+
+    if( !m_ptzManager.get() )
+        m_ptzManager.reset( new PtzManager(const_cast<CameraManager*>(this), m_cameraParamList, m_paramOptions) );
+    m_ptzManager->addRef();
+    return m_ptzManager.get();
 }
 
 nxcip::CameraMotionDataProvider* CameraManager::getCameraMotionDataProvider() const
@@ -234,6 +249,11 @@ void CameraManager::getLastErrorString( char* errorString ) const
 const nxcip::CameraInfo& CameraManager::cameraInfo() const
 {
     return m_info;
+}
+
+int CameraManager::apiPort() const
+{
+    return DEFAULT_CAMERA_API_PORT;
 }
 
 nxcip::CameraInfo& CameraManager::cameraInfo()
@@ -331,6 +351,34 @@ int CameraManager::setResolution( int encoderNum, const nxcip::Resolution& resol
         return errorCode;
 
     m_currentResolutionCoded = newCurrentResolutionCoded;
+    return nxcip::NX_NO_ERROR;
+}
+
+int CameraManager::doCameraRequest(
+    SyncHttpClient* const httpClient,
+    const QByteArray& requestStr,
+    std::multimap<QByteArray, QByteArray>* const responseParams )
+{
+    const QNetworkReply::NetworkError errorCode = httpClient->get( QString::fromLatin1("/cgi-bin/%1").arg(QLatin1String(requestStr)).toLatin1() );
+    if( errorCode != QNetworkReply::NoError )
+        return nxcip::NX_NETWORK_ERROR;
+
+    if( httpClient->statusCode() != SyncHttpClient::HTTP_OK )
+        return nxcip::NX_NETWORK_ERROR;
+
+    if( !responseParams )
+        return nxcip::NX_NO_ERROR;
+
+    const QByteArray& responseMsgBody = httpClient->readWholeMessageBody();
+    const QList<QByteArray>& paramStrList = responseMsgBody.split('\n');
+    for( const QByteArray& paramStr: paramStrList )
+    {
+        const QList<QByteArray>& paramAndValue = paramStr.split('=');
+        if( paramAndValue.isEmpty() )
+            continue;
+        responseParams->insert( std::make_pair( paramAndValue[0].trimmed(), paramAndValue.size() > 1 ? paramAndValue[1].trimmed() : QByteArray() ) );
+    }
+
     return nxcip::NX_NO_ERROR;
 }
 
@@ -445,11 +493,11 @@ int CameraManager::readCameraOptions()
         return nxcip::NX_NETWORK_ERROR;
     if( http.statusCode() != SyncHttpClient::HTTP_OK )
         return http.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
-    QList<QByteArray> paramList = http.readWholeMessageBody().split( '\n' );
+    m_cameraParamList = http.readWholeMessageBody().split( '\n' );
     bool rtspEnabled = false;
     int inputPortCount = 0;
     int outputPortCount = 0;
-    for( const QByteArray& paramVal: paramList )
+    for( const QByteArray& paramVal: m_cameraParamList )
     {
         const QList<QByteArray>& paramValueList = paramVal.split( '=' );
         if( paramValueList.size() < 2 )
@@ -474,6 +522,8 @@ int CameraManager::readCameraOptions()
         }
         else if( paramValueList[0].startsWith("root.Output.") )
             m_relayParamsStr.push_back( paramVal );
+        else if( paramValueList[0] == "root.Properties.PTZ.PTZ" )
+            m_cameraCapabilities |= nxcip::BaseCameraManager::ptzCapability;
     }
 
     if( inputPortCount > 0 )
@@ -487,11 +537,11 @@ int CameraManager::readCameraOptions()
     if( http.statusCode() != SyncHttpClient::HTTP_OK )
         return http.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;
 
-    paramList = http.readWholeMessageBody().split( '\n' );
+    m_paramOptions = http.readWholeMessageBody().split( '\n' );
     int hiStreamMaxFps = DEFAULT_HI_STREAM_FRAMERATE;
     int loStreamMaxFps = DEFAULT_LO_STREAM_FRAMERATE;
     QByteArray resolutionListStr;
-    for( const QByteArray& paramVal: paramList )
+    for( const QByteArray& paramVal: m_paramOptions )
     {
         const QList<QByteArray>& paramValueList = paramVal.split( '=' );
         if( paramValueList[0] == "root.Framerate.H264" )
