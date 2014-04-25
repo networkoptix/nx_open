@@ -10,13 +10,13 @@
 #include <business/business_action_parameters.h>
 #include <business/business_event_parameters.h>
 
-namespace BusinessActionType
+namespace QnBusiness
 {
     //TODO: #GDM fix to resourceTypeRequired: None, Camera, Server, User, etc
-    bool requiresCameraResource(Value val);
-    bool requiresUserResource(Value val);
+    bool requiresCameraResource(ActionType actionType);
+    bool requiresUserResource(ActionType actionType);
 
-    bool hasToggleState(Value val);
+    bool hasToggleState(ActionType actionType);
 }
 
 
@@ -27,16 +27,16 @@ class QnAbstractBusinessAction
 {
 protected:
 
-    explicit QnAbstractBusinessAction(const BusinessActionType::Value actionType, const QnBusinessEventParameters& runtimeParams);
+    explicit QnAbstractBusinessAction(const QnBusiness::ActionType actionType, const QnBusinessEventParameters& runtimeParams);
 
 public:
     virtual ~QnAbstractBusinessAction();
-    BusinessActionType::Value actionType() const { return m_actionType; }
+    QnBusiness::ActionType actionType() const { return m_actionType; }
 
     /**
      * Resource depend of action type.
-     * see: BusinessActionType::requiresCameraResource()
-     * see: BusinessActionType::requiresUserResource()
+     * see: QnBusiness::requiresCameraResource()
+     * see: QnBusiness::requiresUserResource()
      */
     void setResources(const QVector<QnId>& resources);
 
@@ -70,7 +70,7 @@ public:
     virtual QString getExternalUniqKey() const;
 
 protected:
-    BusinessActionType::Value m_actionType;
+    QnBusiness::ActionType m_actionType;
     Qn::ToggleState m_toggleState;
     bool m_receivedFromRemoteHost;
     QVector<QnId> m_resources;
@@ -88,10 +88,10 @@ public:
         MotionExists = 1
     };
 
-    QnBusinessActionData(): m_actionType(BusinessActionType::NotDefined), m_flags(0) {}
+    QnBusinessActionData(): m_actionType(QnBusiness::UndefinedAction), m_flags(0) {}
 
-    BusinessActionType::Value actionType() const { return m_actionType; }
-    void setActionType(BusinessActionType::Value type) { m_actionType = type; }
+    QnBusiness::ActionType actionType() const { return m_actionType; }
+    void setActionType(QnBusiness::ActionType type) { m_actionType = type; }
 
     void setParams(const QnBusinessActionParameters& params) { m_params = params;}
     const QnBusinessActionParameters& getParams() const { return m_params; }
@@ -106,7 +106,7 @@ public:
     int getAggregationCount() const { return m_aggregationCount; }
 
     qint64 timestamp() const { return m_runtimeParams.getEventTimestamp(); }
-    BusinessEventType::Value eventType() const { return m_runtimeParams.getEventType(); }
+    QnBusiness::EventType eventType() const { return m_runtimeParams.getEventType(); }
 
     void setCompareString(const QString& value) { m_compareString = value; }
     const QString& compareString() const { return m_compareString; }
@@ -116,7 +116,7 @@ public:
     bool hasFlags(int flags) const { return m_flags & flags; }
 
 protected:
-    BusinessActionType::Value m_actionType;
+    QnBusiness::ActionType m_actionType;
     QnBusinessActionParameters m_params;
     QnBusinessEventParameters m_runtimeParams;
     QnId m_businessRuleId; 
@@ -125,7 +125,6 @@ protected:
     int m_flags;
 };
 
-Q_DECLARE_METATYPE(BusinessActionType::Value)
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
 Q_DECLARE_METATYPE(QnAbstractBusinessActionList)
 Q_DECLARE_METATYPE(QnBusinessActionDataList)

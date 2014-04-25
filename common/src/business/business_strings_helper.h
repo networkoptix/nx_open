@@ -10,13 +10,13 @@ class QnBusinessStringsHelper: public QObject
 {
     Q_OBJECT
 public:
-    static QString actionName(BusinessActionType::Value value);
+    static QString actionName(QnBusiness::ActionType value);
 
     /**
      * Name of the event in common, e.g. 'Motion on Camera'
      * Used primarily in lists where all event types are enumerated.
      */
-    static QString eventName(BusinessEventType::Value value);
+    static QString eventName(QnBusiness::EventType value);
 
     /** Event <event> occured on the <resource> */
     static QString eventAtResource(const QnBusinessEventParameters &params, bool useIp);

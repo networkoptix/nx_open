@@ -418,7 +418,7 @@ bool isRuleVisible(QnBusinessRuleViewModel *ruleModel,
     if (filter.isEmpty())
         return true;
 
-    if (BusinessEventType::requiresCameraResource(ruleModel->eventType())) {
+    if (QnBusiness::requiresCameraResource(ruleModel->eventType())) {
         // rule supports any camera (assuming there is any camera that passing filter)
         if (ruleModel->eventResources().isEmpty() && anyCameraPassFilter)
             return true;
@@ -430,7 +430,7 @@ bool isRuleVisible(QnBusinessRuleViewModel *ruleModel,
         }
     }
 
-    if (BusinessActionType::requiresCameraResource(ruleModel->actionType())) {
+    if (QnBusiness::requiresCameraResource(ruleModel->actionType())) {
         foreach (const QnResourcePtr &resource, ruleModel->actionResources()) {
             if (resource->toSearchString().contains(filter, Qt::CaseInsensitive))
                 return true;

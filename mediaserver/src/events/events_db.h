@@ -21,16 +21,16 @@ public:
     QList<QnAbstractBusinessActionPtr> getActions(
         const QnTimePeriod& period,
         const QnResourceList& resList,
-        const BusinessEventType::Value& eventType = BusinessEventType::NotDefined, 
-        const BusinessActionType::Value& actionType = BusinessActionType::NotDefined,
+        const QnBusiness::EventType& eventType = QnBusiness::UndefinedEvent, 
+        const QnBusiness::ActionType& actionType = QnBusiness::UndefinedAction,
         const QnId& businessRuleId = QnId()) const;
 
     void getAndSerializeActions(
         QByteArray& result,
         const QnTimePeriod& period,
         const QnResourceList& resList,
-        const BusinessEventType::Value& eventType, 
-        const BusinessActionType::Value& actionType,
+        const QnBusiness::EventType& eventType, 
+        const QnBusiness::ActionType& actionType,
         const QnId& businessRuleId) const;
 
 
@@ -47,8 +47,8 @@ private:
     QString toSQLDate(qint64 timeMs) const;
     QString getRequestStr(const QnTimePeriod& period,
         const QnResourceList& resList,
-        const BusinessEventType::Value& eventType, 
-        const BusinessActionType::Value& actionType,
+        const QnBusiness::EventType& eventType, 
+        const QnBusiness::ActionType& actionType,
         const QnId& businessRuleId) const;
 private:
     qint64 m_lastCleanuptime;

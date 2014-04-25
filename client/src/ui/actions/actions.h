@@ -171,7 +171,7 @@ namespace Qn {
          * Opens the Business Events Log dialog.
          * Supports cameras list in the resources field as a cameras filter.
          * Parameters:
-         * <tt>BusinessEventType::Value EventTypeRole</tt> --- filter by event type.
+         * <tt>QnBusiness::EventType EventTypeRole</tt> --- filter by event type.
          */
         OpenBusinessLogAction,
 

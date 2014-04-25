@@ -32,8 +32,8 @@ public:
 
     QnBusinessEventParameters();
 
-    BusinessEventType::Value getEventType() const;
-    void setEventType(BusinessEventType::Value value);
+    QnBusiness::EventType getEventType() const;
+    void setEventType(QnBusiness::EventType value);
 
     qint64 getEventTimestamp() const;
     void setEventTimestamp(qint64 value);
@@ -78,7 +78,7 @@ private:
     static int getParamIndex(const QString& key);
 
 private:
-    BusinessEventType::Value m_eventType;
+    QnBusiness::EventType m_eventType;
     qint64 m_timestamp;
     QnId m_resourceId;
     QnId m_actionResourceId;

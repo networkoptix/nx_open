@@ -6,7 +6,7 @@ QnStorageFailureBusinessEvent::QnStorageFailureBusinessEvent(
         qint64 timeStamp,
         QnBusiness::EventReason reasonCode,
         QnResourcePtr storageResource):
-    base_type(BusinessEventType::Storage_Failure,
+    base_type(QnBusiness::StorageFailureEvent,
                             resource,
                             timeStamp,
                             reasonCode)

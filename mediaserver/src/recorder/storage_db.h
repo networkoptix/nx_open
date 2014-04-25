@@ -22,6 +22,9 @@ public:
 
     void beforeDelete();
     void afterDelete();
+    bool replaceChunks(const QByteArray& mac, QnResource::ConnectionRole role, const QVector<DeviceFileCatalog::Chunk>& chunks);
+private:
+    bool addRecordInternal(const QByteArray& mac, QnResource::ConnectionRole role, const DeviceFileCatalog::Chunk& chunk);
 private:
     int m_storageIndex;
     QElapsedTimer m_lastTranTime;

@@ -9,12 +9,12 @@
 
 class QnNotificationLevels {
 public:
-    static Qn::NotificationLevel notificationLevel(BusinessEventType::Value eventType);
+    static Qn::NotificationLevel notificationLevel(QnBusiness::EventType eventType);
     static Qn::NotificationLevel notificationLevel(QnSystemHealth::MessageType messageType);
 
 
     static QColor notificationColor(Qn::NotificationLevel level);
-    static QColor notificationColor(BusinessEventType::Value eventType) {
+    static QColor notificationColor(QnBusiness::EventType eventType) {
         return notificationColor(notificationLevel(eventType));
     }
     static QColor notificationColor(QnSystemHealth::MessageType messageType) {

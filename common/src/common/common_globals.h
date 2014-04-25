@@ -344,9 +344,9 @@ public:
         ActionIsInstantRole,                        /**< Role for instant state for business rule actions. Value of type bool. */
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
 
-        EventTypeRole,                              /**< Role for business event type. Value of type BusinessEventType::Value. */
+        EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */
-        ActionTypeRole,                             /**< Role for business action type. Value of type BusinessActionType::Value. */
+        ActionTypeRole,                             /**< Role for business action type. Value of type QnBusiness::ActionType. */
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */

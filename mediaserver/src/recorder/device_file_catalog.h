@@ -98,7 +98,7 @@ public:
     qint64 m_rebuildStartTime;
 
     //bool readCatalog();
-    bool doRebuildArchive();
+    bool doRebuildArchive(QnStorageResourcePtr storage, const QnTimePeriod& period);
     //void rewriteCatalog(bool isCatalogUsing);
     bool isLastRecordRecording() const { return m_lastRecordRecording; }
     qint64 getLatRecordingTime() const;
@@ -117,6 +117,7 @@ public:
 
     static QVector<Chunk> mergeChunks(const QVector<Chunk>& chunk1, const QVector<Chunk>& chunk2);
     void addChunks(const QVector<Chunk>& chunk);
+    bool fromCSVFile(const QString& fileName);
 private:
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
@@ -126,6 +127,7 @@ private:
     void readStorageData(QnStorageResourcePtr storage, QnResource::ConnectionRole role, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList);
     Chunk chunkFromFile(QnStorageResourcePtr storage, const QString& fileName);
     QnTimePeriod timePeriodFromDir(QnStorageResourcePtr storage, const QString& dirName);
+    void replaceChunks(int storageIndex, const QVector<Chunk>& newCatalog);
 private:
     friend class QnStorageManager;
 

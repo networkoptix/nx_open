@@ -16,8 +16,6 @@ QnServerMessageProcessor::QnServerMessageProcessor():
 
 }
 
-#ifdef PROXY_STRICT_IP
-
 void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QList<QHostAddress>& addrList)
 {
     QStringList addrListStr;
@@ -64,7 +62,25 @@ void QnServerMessageProcessor::updateAllIPList(const QnId& id, const QList<QStri
     }
 
 }
-#endif
+
+void QnServerMessageProcessor::removeIPList(const QnId& id)
+{
+    QMutexLocker lock(&m_mutexAddrList);
+
+    QHash<QnId, QList<QString> >::iterator itr = m_addrById.find(id);
+    if (itr != m_addrById.end()) 
+    {
+        foreach(const QString& addr, itr.value()) 
+        {
+            QHash<QString, int>::iterator itrAddr = m_allIPAddress.find(addr);
+            if (itrAddr != m_allIPAddress.end()) {
+                if (--itrAddr.value() < 1)
+                    m_allIPAddress.erase(itrAddr);
+            }
+        }
+        m_addrById.erase(itr);
+    }
+}
 
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>();
@@ -86,19 +102,16 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
             resource->addFlags( QnResource::foreigner );
         // update all known IP list
         QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
-#ifdef PROXY_STRICT_IP
         updateAllIPList(camRes->getId(), camRes->getHostAddress());
-#endif
     }
 
     if (isServer) 
     {
-        if (resource->getId() != ownMediaServer->getId())
+        if (resource->getId() != ownMediaServer->getId()) {
             resource->addFlags( QnResource::foreigner );
-        // update all known IP list
-#ifdef PROXY_STRICT_IP
-        updateAllIPList(resource->getId(), resource.dynamicCast<QnMediaServerResource>()->getNetAddrList());
-#endif
+            // update all known IP list
+            updateAllIPList(resource->getId(), resource.dynamicCast<QnMediaServerResource>()->getNetAddrList());
+        }
     }
 
     bool needUpdateServer = false;
@@ -123,11 +136,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
 void QnServerMessageProcessor::afterRemovingResource(const QnId& id)
 {
     QnCommonMessageProcessor::afterRemovingResource(id);
-#ifdef PROXY_STRICT_IP
-    updateAllIPList(id, QList<QString>());
-    QMutexLocker lock(&m_mutexAddrList);
-    m_addrById.remove(id);
-#endif
+    removeIPList(id);
 }
 
 void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
@@ -137,14 +146,12 @@ void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     QnCommonMessageProcessor::init(connection);
 }
 
-#ifdef PROXY_STRICT_IP
 bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
 {
     QMutexLocker lock(&m_mutexAddrList);
     //return true;
-    return m_allIPAddress.contains(addr);
+    return !addr.isEmpty() && m_allIPAddress.contains(addr);
 }
-#endif
 
 /*
 * EC2 related processing. Need move to other class
@@ -173,4 +180,14 @@ void QnServerMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool is
 
 void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
     resource->setStatus(status, true);
+}
+
+bool QnServerMessageProcessor::isProxy(void* opaque, const QUrl& url)
+{
+    return static_cast<QnServerMessageProcessor*> (opaque)->isProxy(url);
+}
+
+bool QnServerMessageProcessor::isProxy(const QUrl& url)
+{
+    return isKnownAddr(url.host());
 }
