@@ -20,13 +20,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
     ui->setupUi(this);
 
     m_updateTool = new QnMediaServerUpdateTool(this);
-
-    QList<QnMediaServerResourcePtr> servers;
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server))
-        servers.append(resource.staticCast<QnMediaServerResource>());
-
     m_updatesModel = new QnServerUpdatesModel(this);
-    m_updatesModel->setServers(servers);
 
     ui->tableView->setModel(m_updatesModel);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);

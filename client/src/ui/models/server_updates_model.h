@@ -42,8 +42,15 @@ public:
     QVariant data(const QModelIndex &index, int role) const override;
 
     QList<QnMediaServerResourcePtr> servers() const;
-    void setServers(const QList<QnMediaServerResourcePtr> &servers);
     void setUpdatesInformation(const UpdateInformationHash &updates);
+
+private:
+    void resetResourses();
+
+private slots:
+    void at_resourceAdded(const QnResourcePtr &resource);
+    void at_resourceRemoved(const QnResourcePtr &resource);
+    void at_resourceChanged(const QnResourcePtr &resource);
 
 private:
     QList<QnMediaServerResourcePtr> m_servers;
