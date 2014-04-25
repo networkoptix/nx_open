@@ -20,18 +20,13 @@ class QnWorkbenchBookmarksHandler: public Connective<QObject>, public QnWorkbenc
     typedef Connective<QObject> base_type;
 public:
     QnWorkbenchBookmarksHandler(QObject *parent = NULL);
+
+    QnCameraBookmarkTagsUsage tagsUsage() const;
 private slots:
     void at_bookmarkTimeSelectionAction_triggered();
 
-    void at_resPool_resourceAdded(const QnResourcePtr &resource);
-    void at_resPool_resourceRemoved(const QnResourcePtr &resource);
-
-    void at_camera_bookmarkAdded(const QnSecurityCamResourcePtr &camera, const QnCameraBookmark &bookmark);
-    void at_camera_bookmarkChanged(const QnSecurityCamResourcePtr &camera, const QnCameraBookmark &bookmark);
-    void at_camera_bookmarkRemoved(const QnSecurityCamResourcePtr &camera, const QnCameraBookmark &bookmark);
-
+    void updateTagsUsage();
 private:
-    QHash<QnSecurityCamResourcePtr, QnCameraBookmarkTagsUsage> m_tagsUsageByCamera;
     QnCameraBookmarkTagsUsage m_tagsUsage;
 };
 

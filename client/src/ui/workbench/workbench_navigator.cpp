@@ -941,15 +941,7 @@ void QnWorkbenchNavigator::updateCurrentPeriods() {
 void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type) {
     QnTimePeriodList periods;
 
-    if (type == Qn::BookmarksContent) {
-        if (m_currentWidget) {
-            if (QnVirtualCameraResourcePtr camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>()) {
-                foreach (const QnCameraBookmark &bookmark, camera->getBookmarks())
-                    periods.append(bookmark);
-                qSort(periods);
-            }
-        }
-    } else if(type == Qn::MotionContent && m_currentWidget && !(m_currentWidget->options() & QnResourceWidget::DisplayMotion)) {
+    if (type == Qn::MotionContent && m_currentWidget && !(m_currentWidget->options() & QnResourceWidget::DisplayMotion)) {
         /* Use empty periods. */
     } else if(QnCachingCameraDataLoader *loader = this->loader(m_currentWidget)) {
         periods = loader->periods(type);
@@ -1416,11 +1408,13 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
     connect(widget, SIGNAL(optionsChanged()), this, SLOT(at_widget_optionsChanged()));
     connect(widget->resource(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
 
+    /*
     if (QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>()) {
         connect(camera, &QnVirtualCameraResource::bookmarkAdded, this, [this]() { updateCurrentPeriods(Qn::BookmarksContent); });
         connect(camera, &QnVirtualCameraResource::bookmarkChanged, this, [this]() { updateCurrentPeriods(Qn::BookmarksContent); });
         connect(camera, &QnVirtualCameraResource::bookmarkRemoved, this, [this]() { updateCurrentPeriods(Qn::BookmarksContent); });
     }
+    }*/
 }
 
 void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {

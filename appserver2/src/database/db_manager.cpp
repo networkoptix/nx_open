@@ -997,7 +997,7 @@ ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
 }
 
 ErrorCode QnDbManager::removeCameraBookmarks(qint32 internalId) {
-
+/*
     {
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM vms_bookmark_tag WHERE bookmark_guid IN (SELECT guid from vms_bookmark WHERE camera_id = :id)");
@@ -1017,11 +1017,12 @@ ErrorCode QnDbManager::removeCameraBookmarks(qint32 internalId) {
             return ErrorCode::failure;
         }
     }
-
+*/
     return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::updateCameraBookmarks(const ApiCameraData& data, qint32 internalId) {
+    /*
     ErrorCode result = removeCameraBookmarks(internalId);
     if (result != ErrorCode::ok)
         return result;
@@ -1058,6 +1059,7 @@ ErrorCode QnDbManager::updateCameraBookmarks(const ApiCameraData& data, qint32 i
         }
 
     }
+    */
     return ErrorCode::ok;
 }
 
@@ -1507,7 +1509,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraList& camer
             }
         }
 
-        mergeObjectListData(cameraList.data, bookmarks, &ApiCameraData::bookmarks, &ApiCameraBookmarkWithRef::cameraId);
+//        mergeObjectListData(cameraList.data, bookmarks, &ApiCameraData::bookmarks, &ApiCameraBookmarkWithRef::cameraId);
     }
 
 	return ErrorCode::ok;

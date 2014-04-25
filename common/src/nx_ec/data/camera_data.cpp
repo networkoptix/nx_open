@@ -63,16 +63,6 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr& resource, ApiCameraData
     data.statusFlags = resource->statusFlags();
     data.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(resource->getDewarpingParams());
     data.vendor = resource->getVendor();
-
-    const QnCameraBookmarkMap& cameraBookmarks = resource->getBookmarks();
-    data.bookmarks.clear();
-    data.bookmarks.reserve( cameraBookmarks.size() );
-    for( const QnCameraBookmark& bookmark: cameraBookmarks )
-    {
-        ApiCameraBookmarkData bookmarkData;
-        fromBookmarkToApi(bookmark, bookmarkData);
-        data.bookmarks.push_back(bookmarkData);
-    }
 }
 
 void fromApiToResource(const ApiCameraData &data, QnVirtualCameraResourcePtr& resource) {
@@ -114,14 +104,6 @@ void fromApiToResource(const ApiCameraData &data, QnVirtualCameraResourcePtr& re
 
     resource->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(data.dewarpingParams));
     resource->setVendor(data.vendor);
-
-    QnCameraBookmarkList outBookmarks;
-    for (const ApiCameraBookmarkData &bookmarkData : data.bookmarks) {
-        QnCameraBookmark bookmark;
-        fromApiToBookmark(bookmarkData, bookmark);
-        outBookmarks << bookmark;
-    }
-    resource->setBookmarks(outBookmarks);
 }
 
 template <class T> 

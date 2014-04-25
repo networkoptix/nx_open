@@ -8,7 +8,6 @@
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
 #include "network_resource.h"
-#include <core/resource/camera_bookmark.h>
 
 class QnAbstractArchiveDelegate;
 
@@ -178,17 +177,6 @@ public:
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
 
-
-    void setBookmarks(const QnCameraBookmarkList &bookmarks);
-    void setBookmarks(const QnCameraBookmarkMap &bookmarks);
-    QnCameraBookmarkMap getBookmarks() const;
-    QnCameraBookmark getBookmark(const QUuid &bookmarkUuid) const;
-    bool hasBookmark(const QUuid &bookmarkUuid) const;
-    void addBookmark(const QnCameraBookmark &bookmark);
-    void removeBookmark(const QnCameraBookmark &bookmark);
-    void removeBookmark(const QUuid &bookmarkUuid);
-    void updateBookmark(const QUuid &bookmarkUuid, const QnCameraBookmark &bookmark);
-
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -202,10 +190,6 @@ signals:
     void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
     void groupNameChanged(const QnSecurityCamResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
-
-    void bookmarkAdded(const QnSecurityCamResourcePtr &resource, const QnCameraBookmark &bookmark);
-    void bookmarkRemoved(const QnSecurityCamResourcePtr &resource, const QnCameraBookmark &bookmark);
-    void bookmarkChanged(const QnSecurityCamResourcePtr &resource, const QnCameraBookmark &bookmark);
 
     //!Emitted on camera input port state has been changed
     /*!
@@ -250,12 +234,6 @@ protected:
     QList<QnMotionRegion> m_motionMaskList;
 
 private:
-    void setBookmarksUnderLock(const QnCameraBookmarkMap &bookmarks);
-    void addBookmarkUnderLock(const QnCameraBookmark &bookmark);
-    void updateBookmarkUnderLock(const QUuid &bookmarkUuid, const QnCameraBookmark &bookmark);
-    void removeBookmarkUnderLock(const QUuid &bookmarkUuid);
-
-private:
     QnDataProviderFactory *m_dpFactory;
     QnScheduleTaskList m_scheduleTasks;
     Qn::MotionType m_motionType;
@@ -273,7 +251,6 @@ private:
     QString m_model;
     QString m_vendor;
     QString m_firmware;
-    QnCameraBookmarkMap m_bookmarkByUuid;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

@@ -8,7 +8,6 @@
 #include "core/resource/security_cam_resource.h"
 #include "core/misc/schedule_task.h"
 #include "core/resource/camera_resource.h"
-#include <core/resource/camera_bookmark.h>
 #include "utils/common/id.h"
 
 namespace ec2
