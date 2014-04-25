@@ -15,6 +15,7 @@
 #include <utils/common/warnings.h>
 #include <utils/local_file_cache.h>
 #include "nx_ec/data/api_layout_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
 #include "utils/serialization/binary_functions.h"
 
 namespace {

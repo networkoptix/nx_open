@@ -4,6 +4,7 @@
 
 #include "core/resource/media_server_resource.h"
 #include "nx_ec/data/api_media_server_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 

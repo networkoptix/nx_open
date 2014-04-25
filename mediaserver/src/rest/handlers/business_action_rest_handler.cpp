@@ -4,6 +4,7 @@
 #include <business/business_message_bus.h>
 #include "core/resource_management/resource_pool.h"
 #include "nx_ec/data/api_business_rule_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
 #include "utils/serialization/binary_functions.h"
 
 int QnBusinessActionRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
@@ -29,7 +30,7 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
     ec2::ApiBusinessActionData apiData;
     QnInputBinaryStream<QByteArray> stream(body);
     if (QnBinary::deserialize(&stream, &apiData))
-        action = apiData.toResource(qnResPool);
+        fromApiToResource(apiData, action, qnResPool);
     
     if (action) {
         action->setReceivedFromRemoteHost(true);
