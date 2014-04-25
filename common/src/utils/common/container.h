@@ -5,11 +5,13 @@
 
 #include <type_traits> /* For std::true_type, std::false_type. */
 
+#ifndef Q_MOC_RUN
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/range/mutable_iterator.hpp>
 #include <boost/range/const_iterator.hpp>
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
+#endif
 
 template<class T> class QList;
 template<class Key, class T> class QHash;
