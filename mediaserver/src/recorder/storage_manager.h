@@ -67,8 +67,8 @@ public:
 
     QnTimePeriodList getRecordedPeriods(const QnResourceList &resList, qint64 startTime, qint64 endTime, qint64 detailLevel, const QList<QnServer::ChunksCatalog> &catalogs);
 
+    void doMigrateCSVCatalog();
     bool loadFullFileCatalog(const QnStorageResourcePtr &storage, bool isRebuild = false, qreal progressCoeff = 1.0);
-    void loadFullFileCatalog();
     QVector<DeviceFileCatalog::Chunk> correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const QVector<DeviceFileCatalog::Chunk>& chunks);
 
 
@@ -133,7 +133,9 @@ private:
     DeviceFileCatalogPtr getFileCatalogInternal(const QByteArray& mac, QnServer::ChunksCatalog catalog);
     void loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, qreal progressCoeff);
     void replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QByteArray& mac, QnServer::ChunksCatalog catalog);
-    void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog);
+    void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog);
+    QMap<QString, QSet<int>> deserializeStorageFile();
+    QnStorageResourcePtr findStorageByOldIndex(int oldIndex, QMap<QString, QSet<int>> oldIndexes);
 private:
     StorageMap m_storageRoots;
     typedef QMap<QByteArray, DeviceFileCatalogPtr> FileCatalogMap;
@@ -163,7 +165,7 @@ private:
     friend class RebuildAsyncTask;
     RebuildAsyncTask* m_asyncRebuildTask;
 
-    QMap<QString, QnStorageDbPtr> m_chunksDB;
+    QMap<QnStorageResourcePtr, QnStorageDbPtr> m_chunksDB;
 };
 
 #define qnStorageMan QnStorageManager::instance()

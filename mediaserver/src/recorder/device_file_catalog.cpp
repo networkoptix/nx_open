@@ -417,6 +417,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourceP
                 continue;
 
             Chunk chunk = chunkFromFile(storage, fileName);
+            chunk.setFileSize(fi.size());
 
             if (m_rebuildStartTime) {
                 if (chunk.startTimeMs >= m_rebuildStartTime - (QnRecordingManager::RECORDING_CHUNK_LEN * 1250))
