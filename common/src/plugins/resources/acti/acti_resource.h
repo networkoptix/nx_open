@@ -26,7 +26,7 @@ class QnActiResource
     Q_OBJECT
 
 public:
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     static const int MAX_STREAMS = 2;
 
@@ -38,8 +38,6 @@ public:
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
     bool isInitialized() const;
-
-    virtual bool shoudResolveConflicts() const override;
 
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
     virtual bool hasDualStreaming() const override;

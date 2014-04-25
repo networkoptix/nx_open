@@ -6,7 +6,7 @@
 
 class QGLContext;
 
-class QnColorShaderProgram;
+//class QnColorShaderProgram;
 
 class QnPausedPainter: protected QOpenGLFunctions {
 public:
@@ -19,7 +19,7 @@ public:
     void paint();
 
 private:
-    QSharedPointer<QnColorShaderProgram> m_shader;
+    //QSharedPointer<QnColorShaderProgram> m_shader;
     bool m_initialized;
     GLuint m_buffer;
     int m_vertexOffset, m_colorOffset, m_vertexCount;

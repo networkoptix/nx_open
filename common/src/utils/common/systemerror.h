@@ -31,6 +31,7 @@ namespace SystemError
     static const ErrorCode fileNotFound = ERROR_FILE_NOT_FOUND;
     static const ErrorCode connectionReset = WSAECONNRESET;
     static const ErrorCode notConnected = WSAENOTCONN;
+    static const ErrorCode interrupted = WSAEINTR;
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
@@ -38,6 +39,7 @@ namespace SystemError
     static const ErrorCode fileNotFound = ENOENT;
     static const ErrorCode connectionReset = ECONNRESET;
     static const ErrorCode notConnected = ENOTCONN;
+    static const ErrorCode interrupted = EINTR;
 #endif
 
     //!Returns error code of previous system call

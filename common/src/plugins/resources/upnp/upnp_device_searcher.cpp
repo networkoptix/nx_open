@@ -362,6 +362,7 @@ void UPNPDeviceSearcher::startFetchDeviceXml( const QByteArray& uuidStr, const Q
             this, SLOT(onDeviceDescriptionXmlRequestDone(nx_http::AsyncHttpClientPtr)) );
 
         QMutexLocker lk( &m_mutex );
+        httpClient->terminate();
         m_httpClients.erase( httpClient );
         return;
     }

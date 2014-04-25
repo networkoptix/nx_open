@@ -15,10 +15,13 @@
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/home_ptz_controller.h>
 
+QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent): 
+    base_type(parent) 
+{
+    setConstructionMode(ThreadedControllerConstruction);
+}
+
 void QnServerPtzControllerPool::registerResource(const QnResourcePtr &resource) {
-    // TODO: #Elric we're updating controller on every init call.
-    // Do it only once!!! 
-    // 
     // TODO: #Elric we're creating controller from main thread. 
     // Controller ctor may take some time (several seconds).
     // => main thread will stall.
@@ -32,8 +35,6 @@ void QnServerPtzControllerPool::unregisterResource(const QnResourcePtr &resource
 }
 
 QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourcePtr &resource) const {
-    // qDebug() << ">>>>>>>> createController for" << resource->getName() << resource->isInitialized();
-
     if(resource->flags() & QnResource::foreigner)
         return QnPtzControllerPtr(); /* That's not our resource! */
 
@@ -71,7 +72,12 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
         controller.reset(new QnWorkaroundPtzController(controller));
 
     camera->setPtzCapabilities(controller->getCapabilities());
-    QnAppServerConnectionFactory::createConnection()->saveAsync(camera, NULL, NULL);
+    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addCamera(camera, this, &QnServerPtzControllerPool::at_addCameraDone);
     
     return controller;
+}
+
+void QnServerPtzControllerPool::at_addCameraDone(int, ec2::ErrorCode, const QnVirtualCameraResourceList &)
+{
+
 }

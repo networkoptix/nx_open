@@ -7,6 +7,7 @@
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_path_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/generic/text_button_widget.h>
 #include <ui/graphics/items/generic/ui_elements_widget.h>
 #include <ui/graphics/items/generic/framed_widget.h>
 #include <ui/graphics/items/generic/splash_item.h>
@@ -106,6 +107,10 @@ public:
         setStateOpacity(0, 0.4);
         setStateOpacity(HOVERED, 0.7);
         setStateOpacity(PRESSED, 1.0);
+
+        QFont font = this->font();
+        font.setPixelSize(50);
+        setFont(font);
 
         setFrameColor(QColor(128, 196, 255, 192));
         setWindowColor(QColor(128, 196, 255, 64).lighter(120));

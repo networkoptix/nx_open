@@ -53,12 +53,6 @@ OnvifResourceSearcher::~OnvifResourceSearcher()
 
 }
 
-OnvifResourceSearcher& OnvifResourceSearcher::instance()
-{
-    static OnvifResourceSearcher inst;
-    return inst;
-}
-
 bool OnvifResourceSearcher::isProxy() const
 {
     return false;
@@ -66,7 +60,7 @@ bool OnvifResourceSearcher::isProxy() const
 
 QString OnvifResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlOnvifResource::MANUFACTURE);
+    return QnPlOnvifResource::MANUFACTURE;
 }
 
 
@@ -173,7 +167,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         resource->setVendor( manufacturer );
         resource->setName( modelName );
         //QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
-        if (rt.isValid())
+        if (!rt.isNull())
             resource->setTypeId(rt);
 
         if(!resource->getUniqueId().isEmpty())
@@ -226,7 +220,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     return result;
 }
 
-QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnResourcePtr result;
 
@@ -253,9 +247,9 @@ QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const Q
 
     result->setTypeId(resourceTypeId);
 
-    NX_LOG(lit("OnvifResourceSearcher::createResource: create ONVIF camera resource. TypeID: %1, Parameters: %2.").arg(resourceTypeId.toString()).arg(toDebugString(parameters)), cl_logDEBUG1);
+    NX_LOG(lit("OnvifResourceSearcher::createResource: create ONVIF camera resource. TypeID: %1.").arg(resourceTypeId.toString()), cl_logDEBUG1);
 
-    result->deserialize(parameters);
+    //result->deserialize(parameters);
 
     return result;
 

@@ -40,10 +40,10 @@ class QnGraphicsMessageBox : public Animated<QnFramedWidget> {
     typedef Animated<QnFramedWidget> base_type;
 
 public:
-    explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL, const QString &text = QString(), int timeoutMsec = 0);
+    explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL, const QString &text = QString(), int timeoutMsec = 0, int fontSize = 0);
     ~QnGraphicsMessageBox();
 
-    const QString &text() const;
+    QString text() const;
     void setText(const QString &text);
 
     const QColor &textColor() const;
@@ -51,7 +51,7 @@ public:
 
     int timeout() const;
 
-    static QnGraphicsMessageBox* information(const QString &text);
+    static QnGraphicsMessageBox* information(const QString &text, int timeoutMsec = 0, int fontSize = 0);
 
 public slots:
     void hideImmideately();

@@ -8,6 +8,7 @@
 #include <stack>
 
 #include <QtCore/QDateTime>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtCore/QPair>
@@ -83,7 +84,7 @@ public:
         SIZE_OF_AUDIO_CODECS
     };
 
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
     static QString MEDIA_URL_PARAM_NAME;
     static QString ONVIF_URL_PARAM_NAME;
     static QString MAX_FPS_PARAM_NAME;
@@ -112,7 +113,6 @@ public:
     virtual int getMaxFps() const override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
     virtual bool hasDualStreaming() const override;
-    virtual bool shoudResolveConflicts() const override;
 
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
@@ -185,7 +185,12 @@ public:
 
     //!Relay input with token \a relayToken has changed its state to \a active
     //void notificationReceived( const std::string& relayToken, bool active );
-    void notificationReceived( const oasisWsnB2__NotificationMessageHolderType& notification );
+    /*!
+        Notifications with timestamp earlier than \a minNotificationTime are ignored
+    */
+    void notificationReceived(
+        const oasisWsnB2__NotificationMessageHolderType& notification,
+        time_t minNotificationTime = (time_t)-1 );
     //!Implementation of TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID );
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
@@ -425,6 +430,8 @@ private:
     int m_streamConfCounter;
     CameraDiagnostics::Result m_prevOnvifResultCode; 
     QString m_onvifNotificationSubscriptionReference;
+    QElapsedTimer m_monotonicClock;
+    qint64 m_prevRequestSendClock;
 
     bool createPullPointSubscription();
     bool pullMessages();

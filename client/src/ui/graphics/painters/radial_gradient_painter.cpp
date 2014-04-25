@@ -3,13 +3,13 @@
 #include <utils/common/warnings.h>
 
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/graphics/shaders/color_shader_program.h>
+//#include <ui/graphics/shaders/color_shader_program.h>
 #include <ui/graphics/opengl/gl_buffer_stream.h>
+#include "opengl_renderer.h"
 
 QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor, const QGLContext *context):
     QOpenGLFunctions(context->contextHandle()),
-    m_initialized(false),
-    m_shader(QnColorShaderProgram::instance(context))
+    m_initialized(false)
 {
     if(context != QGLContext::currentContext()) {
         qnWarning("Invalid current OpenGL context.");
@@ -17,7 +17,6 @@ QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &
     }
 
     QByteArray data;
-
     /* Generate vertex data. */
     QnGlBufferStream<GLfloat> vertexStream(&data);
     m_vertexOffset = vertexStream.offset();
@@ -34,11 +33,12 @@ QnRadialGradientPainter::QnRadialGradientPainter(int sectorCount, const QColor &
         colorStream << outerColor;
 
     /* Push data to GPU. */
+    
     glGenBuffers(1, &m_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
     glBufferData(GL_ARRAY_BUFFER, data.size(), data.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+    
     m_initialized = true;
 }
 
@@ -48,27 +48,17 @@ QnRadialGradientPainter::~QnRadialGradientPainter() {
 }
 
 void QnRadialGradientPainter::paint(const QColor &colorMultiplier) {
-    if(!m_initialized)
+    if(!m_initialized || !isAvailable())
         return;
 
-    m_shader->bind();
-    m_shader->setColorMultiplier(colorMultiplier);
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableVertexAttribArray(m_shader->colorLocation());
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
-    glVertexPointer(2, GL_FLOAT, 0, reinterpret_cast<const GLvoid *>(m_vertexOffset));
-    glVertexAttribPointer(m_shader->colorLocation(), 4, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid *>(m_colorOffset));
-    glDrawArrays(GL_TRIANGLE_FAN, 0, m_vertexCount);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glDisableVertexAttribArray(m_shader->colorLocation());
-    glDisableClientState(GL_VERTEX_ARRAY);
-
-    m_shader->release();
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(colorMultiplier);
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawPerVertexColoredPolygon(m_buffer,m_vertexCount);
 }
 
 void QnRadialGradientPainter::paint() {
     paint(Qt::white);
+}
+
+bool QnRadialGradientPainter::isAvailable() const {
+    return hasOpenGLFeature(QOpenGLFunctions::Shaders) && hasOpenGLFeature(QOpenGLFunctions::Buffers);
 }

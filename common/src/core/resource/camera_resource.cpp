@@ -134,33 +134,23 @@ void QnVirtualCameraResource::unLockDTSFactory()
 
 QString QnVirtualCameraResource::getUniqueId() const
 {
+    return getPhysicalId();
+    /*
     if (hasFlags(foreigner))
         return getPhysicalId() + getParentId().toString();
     else 
         return getPhysicalId();
-
-}
-
-void QnVirtualCameraResource::deserialize(const QnResourceParameters &parameters) {
-    QnNetworkResource::deserialize(parameters);
-
-    if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
-        addFlags(motion);
+    */
 }
 
 void QnVirtualCameraResource::save()
 {
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(::toSharedPointer(this)) != 0) {
-        qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
-            << getPhysicalId() << ". Description: " << conn->getLastError();
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    ec2::ErrorCode rez = conn->getCameraManager()->addCameraSync(::toSharedPointer(this));
+    if (rez != ec2::ErrorCode::ok) {
+        qCritical() << Q_FUNC_INFO << ": can't save resource params to Enterprise Controller. Resource physicalId: "
+            << getPhysicalId() << ". Description: " << ec2::toString(rez);
     }
-}
-
-int QnVirtualCameraResource::saveAsync(QObject *target, const char *slot)
-{
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    return conn->saveAsync(::toSharedPointer(this), target, slot);
 }
 
 QString QnVirtualCameraResource::toSearchString() const
@@ -179,12 +169,18 @@ void QnVirtualCameraResource::issueOccured()
         if (!hasStatusFlags(HasIssuesFlag)) {
             addStatusFlags(HasIssuesFlag);
             lock.unlock();
-            saveAsync(this, SLOT(at_saveAsyncFinished(int, const QnResourceList &, int)));
+            saveAsync();
         }
     }
 }
 
-void QnVirtualCameraResource::at_saveAsyncFinished(int, const QnResourceList &, int)
+int QnVirtualCameraResource::saveAsync()
+{
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    return conn->getCameraManager()->addCamera(::toSharedPointer(this), this, &QnVirtualCameraResource::at_saveAsyncFinished);
+}
+
+void QnVirtualCameraResource::at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &)
 {
     // not used
 }
@@ -199,6 +195,6 @@ void QnVirtualCameraResource::noCameraIssues()
     if (m_issueTimes.empty() && hasStatusFlags(HasIssuesFlag)) {
         removeStatusFlags(HasIssuesFlag);
         lock.unlock();
-        saveAsync(this, SLOT(at_saveAsyncFinished(int, const QnResourceList &, int)));
+        saveAsync();
     }
 }

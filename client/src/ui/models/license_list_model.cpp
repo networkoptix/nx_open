@@ -48,6 +48,16 @@ void QnLicenseListModel::setColumns(const QList<Column> &columns) {
     rebuild();
 }
 
+const QnLicensesListModelColors QnLicenseListModel::colors() const {
+    return m_colors;
+}
+
+void QnLicenseListModel::setColors(const QnLicensesListModelColors &colors) {
+    m_colors = colors;
+    rebuild();
+}
+
+
 QString QnLicenseListModel::columnTitle(Column column) {
     switch(column) {
     case TypeColumn:            return tr("Type");
@@ -61,8 +71,9 @@ QString QnLicenseListModel::columnTitle(Column column) {
     }
 }
 
-QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr &license) {
+QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr &license, const QnLicensesListModelColors &colors) {
     QStandardItem *item = new QStandardItem();
+    item->setData(QBrush(colors.normal), Qt::ForegroundRole);
 
     switch(column) {
     case TypeColumn:
@@ -85,10 +96,10 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
         qint64 timeLeft = expirationTime - currentTime;
         if(timeLeft < 0) {
             item->setText(tr("Expired"));
-            item->setData(QBrush(Qt::red), Qt::ForegroundRole);
+            item->setData(QBrush(colors.expired), Qt::ForegroundRole);
         } else {
             if(timeLeft < 5 * day)
-                item->setData(QBrush(Qt::yellow), Qt::ForegroundRole);
+                item->setData(QBrush(colors.warning), Qt::ForegroundRole);
 
             int daysLeft = QDateTime::fromMSecsSinceEpoch(currentTime).date().daysTo(QDateTime::fromMSecsSinceEpoch(expirationTime).date());
             if(daysLeft == 0) {
@@ -122,7 +133,7 @@ void QnLicenseListModel::rebuild() {
     for(int r = 0; r < m_licenses.size(); r++) {
         QList<QStandardItem *> items;
         for(int c = 0; c < m_columns.size(); c++)
-            items.push_back(createItem(m_columns[c], m_licenses[r]));
+            items.push_back(createItem(m_columns[c], m_licenses[r], m_colors));
         items[0]->setData(r, Qt::UserRole);
 
         appendRow(items);

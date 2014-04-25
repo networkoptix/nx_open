@@ -84,8 +84,10 @@ void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
 
     m_updateTimer->start();
 
-    if (!m_imageProvider->image().isNull())
+    if (!m_imageProvider->image().isNull()) {
         ui->imageWidget->setImage(provider->image());
+        at_imageProvider_imageChanged();
+    }
     m_imageProvider->loadAsync();
 }
 

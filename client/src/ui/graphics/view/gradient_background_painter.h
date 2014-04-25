@@ -19,6 +19,43 @@ class VariantAnimator;
 class QnClientSettings;
 class QnRadialGradientPainter;
 
+// TODO: #Elric move out?
+class QnRainbow: public QObject {
+    Q_OBJECT
+public:
+    QnRainbow(QObject *parent = NULL): 
+        QObject(parent) 
+    {
+        m_currentIndex = 0;
+
+        m_colors << 
+            QColor(0xFFFF0000) <<
+            QColor(0xFFFF7F00) <<
+            QColor(0xFFFFFF00) <<
+            QColor(0xFF00FF00) <<
+            QColor(0xFF0000FF) <<
+            QColor(0xFF4B0082) <<
+            QColor(0xFF8B00FF);
+    }
+
+    const QColor &currentColor() const {
+        return m_colors[m_currentIndex];
+    }
+
+    void advance() {
+        m_currentIndex = (m_currentIndex + 1) % m_colors.size();
+        emit currentColorChanged();
+    }
+
+signals:
+    void currentColorChanged();
+
+private:
+    QVector<QColor> m_colors;
+    int m_currentIndex;
+};
+
+
 class QnGradientBackgroundPainter: public Customized<QObject>, public QnLayerPainter, public QnWorkbenchContextAware {
     Q_OBJECT
     Q_PROPERTY(QColor currentColor READ currentColor WRITE setCurrentColor)
@@ -54,7 +91,8 @@ protected:
     VariantAnimator *backgroundColorAnimator();
 
 protected slots:
-    void updateBackgroundColor(bool animate = true);
+    void updateBackgroundColor(bool animate);
+    void updateBackgroundColorAnimated() { updateBackgroundColor(true); }
 
 private:
     QScopedPointer<QnRadialGradientPainter> m_gradientPainter;
@@ -65,6 +103,8 @@ private:
     QnBackgroundColors m_colors;
     QColor m_currentColor;
     qreal m_cycleIntervalSecs;
+    
+    QnRainbow *m_rainbow;
 };
 
 #endif // QN_GRADIENT_BACKROUND_PAINTER_H

@@ -10,10 +10,10 @@
 #include <utils/common/string.h>
 
 namespace {
-    static const qreal speedLowest  = 0.01;
-    static const qreal speedLow     = 0.25;
+    static const qreal speedLowest  = 0.15;
+    static const qreal speedLow     = 0.30;
     static const qreal speedNormal  = 0.5;
-    static const qreal speedHigh    = 0.75;
+    static const qreal speedHigh    = 0.72;
     static const qreal speedHighest = 1.0;
 
     static const QList<qreal> allSpeedValues(QList<qreal>()
@@ -55,32 +55,36 @@ QList<qreal> QnPtzTourSpotsModel::speedValues() {
     return allSpeedValues;
 }
 
+int QnPtzTourSpotsModel::stayTimeToIndex(quint64 time) {
+    return allStayTimeValues.indexOf(time);
+}
+
 QList<quint64> QnPtzTourSpotsModel::stayTimeValues() {
     return allStayTimeValues;
+}
+
+int QnPtzTourSpotsModel::speedToIndex(qreal speed) {
+    int index = -1;
+    qreal minDiff = 1.0;
+    for (int i = 0; i < allSpeedValues.size(); i++) {
+        qreal diff = qAbs(allSpeedValues[i] - speed);
+        if (diff < minDiff) {
+            minDiff = diff;
+            index = i;
+        }
+    }
+    return index;
 }
 
 QString QnPtzTourSpotsModel::speedToString(qreal speed) {
     static QList<QString> names(QList<QString>() << tr("Lowest") << tr("Low") << tr("Normal") << tr("High") << tr("Highest"));
     Q_ASSERT(names.size() == allSpeedValues.size());
 
-    qreal value = qBound(speedLowest, speed, speedHighest);
-    for (int i = 1; i < allSpeedValues.size(); ++i) {
-        if (allSpeedValues[i] < value)
-            continue;
-
-        qreal prev = value - allSpeedValues[i - 1];
-        qreal cur = allSpeedValues[i] - value;
-        if (prev < cur)
-            return names[i - 1];
-        return names[i];
-    }
-
-    //should never come here
-    Q_ASSERT(false);
-    return names[allSpeedValues.indexOf(speedNormal)];
+    int index = speedToIndex(speed);
+    return index == -1 ? QString() : names[index];
 }
 
-QString QnPtzTourSpotsModel::timeToString(quint64 time) {
+QString QnPtzTourSpotsModel::stayTimeToString(quint64 time) {
     if (time == 0)
         return tr("Instant");
     return tr("%n seconds", "", time / second);
@@ -214,7 +218,7 @@ QVariant QnPtzTourSpotsModel::data(const QModelIndex &index, int role) const {
             }
             return tr("<Invalid>");
         case TimeColumn:
-            return timeToString(spot.stayTime);
+            return stayTimeToString(spot.stayTime);
         case SpeedColumn:
             return speedToString(spot.speed);
         default:

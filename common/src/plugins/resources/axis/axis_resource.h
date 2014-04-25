@@ -30,7 +30,7 @@ public:
         QByteArray resolutionStr;
     };
 
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     QnPlAxisResource();
     ~QnPlAxisResource();
@@ -42,8 +42,6 @@ public:
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
     bool isInitialized() const;
-
-    virtual bool shoudResolveConflicts() const override;
 
     AxisResolution getMaxResolution() const;
     AxisResolution getNearestResolution(const QSize& resolution, float aspectRatio) const;

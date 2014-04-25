@@ -1,11 +1,13 @@
 #include "graphics_message_box.h"
 
+#include <QtCore/QTimer>
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleOption>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 
 #include <utils/common/scoped_painter_rollback.h>
+#include <client/client_settings.h>
 
 #include <ui/common/palette.h>
 #include <ui/animation/opacity_animator.h>
@@ -59,10 +61,11 @@ void QnGraphicsMessageBoxItem::paint(QPainter *painter, const QStyleOptionGraphi
 // -------------------------------------------------------------------------- //
 // QnGraphicsMessageBox
 // -------------------------------------------------------------------------- //
-QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString &text, int timeoutMsec):
+QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString &text, int timeoutMsec, int fontSize):
     base_type(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
 {
     m_label = new GraphicsLabel(this);
+    m_label->setAlignment(Qt::AlignCenter);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Horizontal);
     layout->addItem(m_label);
@@ -75,7 +78,7 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
     setRoundingRadius(defaultRoundingRadius);
 
     QFont font = this->font();
-    font.setPixelSize(defaultFontSize);
+    font.setPixelSize(fontSize == 0 ? defaultFontSize : fontSize);
     setFont(font);
 
     setTextColor(QColor(166, 166, 166));
@@ -83,18 +86,22 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
     setWindowColor(QColor(33, 33, 80));
 
     setAcceptedMouseButtons(Qt::NoButton);
-    setOpacity(0.0);
 
-    VariantAnimator *animator = opacityAnimator(this);
-    animator->setEasingCurve(QEasingCurve::Linear);
-    animator->animateTo(1.0);
-    connect(animator, &AbstractAnimator::finished, this, &QnGraphicsMessageBox::at_animationIn_finished);
+    if (qnSettings->lightMode() & Qn::LightModeNoAnimation) {
+        QTimer::singleShot(m_timeout, this, SLOT(hideImmideately()));
+    } else {
+        setOpacity(0.0);
+        VariantAnimator *animator = opacityAnimator(this);
+        animator->setEasingCurve(QEasingCurve::Linear);
+        animator->animateTo(1.0);
+        connect(animator, &AbstractAnimator::finished, this, &QnGraphicsMessageBox::at_animationIn_finished);
+    }
 }
 
 QnGraphicsMessageBox::~QnGraphicsMessageBox() {
 }
 
-const QString &QnGraphicsMessageBox::text() const {
+QString QnGraphicsMessageBox::text() const {
     return m_label->text();
 }
 
@@ -114,11 +121,11 @@ int QnGraphicsMessageBox::timeout() const {
     return m_timeout;
 }
 
-QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text) {
+QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text, int timeoutMsec, int fontSize) {
     if (!instance)
         return NULL;
 
-    QnGraphicsMessageBox* box = new QnGraphicsMessageBox(instance, text);
+    QnGraphicsMessageBox* box = new QnGraphicsMessageBox(instance, text, timeoutMsec, fontSize);
     instance->addItem(box);
     return box;
 }
@@ -143,9 +150,8 @@ void QnGraphicsMessageBox::at_animationIn_finished() {
     animator->setEasingCurve(QEasingCurve::InCubic);
     animator->animateTo(0.6);
     disconnect(animator, 0, this, 0);
-    connect(animator, SIGNAL(animationTick(int)), this, SIGNAL(tick(int)));
-    connect(animator, SIGNAL(finished()), this, SIGNAL(finished()));
-    connect(animator, SIGNAL(finished()), this, SLOT(deleteLater()));
+    connect(animator, &VariantAnimator::animationTick, this, &QnGraphicsMessageBox::tick);
+    connect(animator, &VariantAnimator::finished, this, &QnGraphicsMessageBox::hideImmideately);
 }
 
 /*QSizeF QnGraphicsMessageBox::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {

@@ -11,6 +11,9 @@
 #include <boost/array.hpp>
 #include <boost/operators.hpp>
 
+#include <nx_ec/binary_serialization_helper.h>
+
+
 class QnSoftwareVersion: public boost::equality_comparable1<QnSoftwareVersion, boost::less_than_comparable1<QnSoftwareVersion> > {
 public:
     enum Format {
@@ -38,6 +41,12 @@ public:
         init(QLatin1String(versionString.constData()));
     }
 
+    /**
+     * Creates a software version object from a string. Note that this function
+     * also supports OpenGL style version strings like "2.0.6914 WinXP SSE/SSE2/SSE3/3DNow!".
+     * 
+     * \param versionString             Version string.
+     */
     explicit QnSoftwareVersion(const QString &versionString) {
         init(versionString);
     }
@@ -97,7 +106,12 @@ private:
     void init(const QString &versionString) {
         std::fill(m_data.begin(), m_data.end(), 0);
 
-        QStringList versionList = versionString.split(QLatin1Char('.'));
+        QString s = versionString.trimmed();
+        int index = s.indexOf(L' ');
+        if(index != -1)
+            s = s.mid(0, index);
+
+        QStringList versionList = s.split(QLatin1Char('.'));
         for(int i = 0, count = qMin(4, versionList.size()); i < count; i++)
             m_data[i] = versionList[i].toInt();
     }
@@ -107,5 +121,21 @@ private:
 };
 
 Q_DECLARE_METATYPE(QnSoftwareVersion)
+
+template<class T>
+bool deserialize( QnSoftwareVersion& version, InputBinaryStream<T>* const inputStream )
+{
+    QString versionStr;
+    if( !deserialize( versionStr, inputStream ) )
+        return false;
+    version = QnSoftwareVersion(versionStr);
+    return true;
+}
+
+template<class T>
+void serialize( const QnSoftwareVersion& version, OutputBinaryStream<T>* outputBinaryStream )  
+{
+    serialize<T>( version.toString(), outputBinaryStream );
+}
 
 #endif // QN_SOFTWARE_VERSION_H

@@ -27,7 +27,7 @@ public:
     /**
      *  Register the consumer object.
      *
-     * \param resource          Server resource whous history we want to receive.
+     * \param resource          Server resource whose history we want to receive.
      * \param target            Object that will be notified about new data.
      * \param slot              Slot that will be called when new data will be received.
      */
@@ -36,7 +36,7 @@ public:
     /**
      *  Unregister the consumer object.
      *
-     * \param resource          Server resource whous history we do not want to receive anymore.
+     * \param resource          Server resource whose history we do not want to receive anymore.
      * \param target            Object that will not be notified about new data anymore.
      */
     void unregisterConsumer(const QnMediaServerResourcePtr &resource, QObject *target);
@@ -55,7 +55,7 @@ public:
     void setFlagsFilter(QnStatisticsDeviceType deviceType, int flags);
 
 private:
-    QHash<QString, QnMediaServerStatisticsStorage *> m_statistics;
+    QHash<QUuid, QnMediaServerStatisticsStorage *> m_statistics;
     QHash<QnStatisticsDeviceType, int> m_flagsFilter;
 };
 

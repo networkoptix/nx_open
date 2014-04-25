@@ -16,6 +16,7 @@
 
 #include "socket.h"
 #include "system_socket.h"
+#include "common/common_module.h"
 
 
 #ifndef _WIN32
@@ -24,16 +25,25 @@ const unsigned int NetworkOptixModuleFinder::defaultKeepAliveMultiply;
 #endif
 
 NetworkOptixModuleFinder::NetworkOptixModuleFinder(
+    bool clientOnly,
     const QHostAddress& multicastGroupAddress,
     const unsigned int multicastGroupPort,
     const unsigned int pingTimeoutMillis,
-    const unsigned int keepAliveMultiply )
+    const unsigned int keepAliveMultiply)
 :
+    m_serverSocket( nullptr ),
     m_pingTimeoutMillis( pingTimeoutMillis == 0 ? defaultPingTimeoutMillis : pingTimeoutMillis ),
     m_keepAliveMultiply( keepAliveMultiply == 0 ? keepAliveMultiply : defaultKeepAliveMultiply ),
     m_prevPingClock( 0 ),
     m_compatibilityMode(false)
 {
+    if (!clientOnly)
+    {
+        m_serverSocket = new UDPSocket();
+        m_serverSocket->setReuseAddrFlag(true);
+        m_serverSocket->bind(SocketAddress(HostAddress::anyHost, multicastGroupPort) );
+    }
+
     const QList<QHostAddress>& interfaceAddresses = QNetworkInterface::allAddresses();
     for( QList<QHostAddress>::const_iterator
         addrIter = interfaceAddresses.begin();
@@ -52,8 +62,11 @@ NetworkOptixModuleFinder::NetworkOptixModuleFinder(
             sock->bind( addressToUse.toString(), 0 );
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
             sock->setDestAddr( multicastGroupAddress.toString(), multicastGroupPort );
-            m_sockets.push_back( sock.release() );
+            m_clientSockets.push_back( sock.release() );
             m_localNetworkAdresses.insert( addressToUse.toString() );
+            if (m_serverSocket)
+                m_serverSocket->joinGroup(multicastGroupAddress.toString(), addressToUse.toString());
+
         }
         catch( const std::exception& e )
         {
@@ -66,13 +79,14 @@ NetworkOptixModuleFinder::~NetworkOptixModuleFinder()
 {
     stop();
     
-    qDeleteAll(m_sockets);
-    m_sockets.clear();
+    qDeleteAll(m_clientSockets);
+    m_clientSockets.clear();
+    delete m_serverSocket;
 }
 
 bool NetworkOptixModuleFinder::isValid() const
 {
-    return !m_sockets.empty();
+    return !m_clientSockets.empty();
 }
 
 bool NetworkOptixModuleFinder::isCompatibilityMode() const {
@@ -91,6 +105,130 @@ void NetworkOptixModuleFinder::pleaseStop()
 
 static const unsigned int ERROR_WAIT_TIMEOUT_MS = 1000;
 
+bool NetworkOptixModuleFinder::processDiscoveryRequest(AbstractDatagramSocket* udpSocket)
+{
+    static const size_t READ_BUFFER_SIZE = UDPSocket::MAX_PACKET_SIZE;
+    quint8 readBuffer[READ_BUFFER_SIZE];
+
+    QString remoteAddressStr;
+    unsigned short remotePort = 0;
+    int bytesRead = udpSocket->recvFrom( readBuffer, READ_BUFFER_SIZE, remoteAddressStr, remotePort );
+    if( bytesRead == -1 )
+    {
+        SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+        NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder. Failed to read socket on local address (%1). %2").
+            arg(udpSocket->getLocalAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logERROR );
+        return false;
+    }
+
+    //parsing received request
+    RevealRequest request;
+    const quint8* requestBufStart = readBuffer;
+    if( !request.deserialize( &requestBufStart, readBuffer + bytesRead ) )
+    {
+        //invalid response
+        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Received invalid response from (%1:%2) on local address %3").
+            arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1 );
+        return false;
+    }
+
+    RevealResponse response;
+    response.version = qApp->applicationVersion();
+    QString moduleName = qApp->applicationName();
+    if (moduleName.startsWith(qApp->organizationName()))
+        moduleName = moduleName.mid(qApp->organizationName().length()).trimmed();
+    
+    response.type = moduleName;
+    response.customization = QString::fromLatin1(QN_CUSTOMIZATION_NAME);
+    response.seed = qnCommon->moduleGUID().toString();
+    response.name = qnCommon->localSystemName();
+    response.typeSpecificParameters.insert(lit("port"), QString::number(qnCommon->moduleUrl().port()));
+    quint8* responseBufStart = readBuffer;
+    if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))
+        return false;
+    if (!udpSocket->sendTo(readBuffer, responseBufStart - readBuffer, remoteAddressStr, remotePort)) {
+        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Can't send response to address (%1:%2)").
+            arg(remoteAddressStr).arg(remotePort), cl_logDEBUG1 );
+        return false;
+
+    };
+
+    return true;
+}
+
+bool NetworkOptixModuleFinder::processDiscoveryResponse(AbstractDatagramSocket* udpSocket)
+{
+    static const size_t READ_BUFFER_SIZE = UDPSocket::MAX_PACKET_SIZE;
+    quint8 readBuffer[READ_BUFFER_SIZE];
+
+    //reading socket response
+    QString remoteAddressStr;
+    unsigned short remotePort = 0;
+    int bytesRead = udpSocket->recvFrom( readBuffer, READ_BUFFER_SIZE, remoteAddressStr, remotePort );
+    if( bytesRead == -1 )
+    {
+        SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+        NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder. Failed to read socket on local address (%1). %2").
+            arg(udpSocket->getLocalAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logERROR );
+        return false;
+    }
+
+    //parsing recevied response
+    RevealResponse response;
+    const quint8* responseBufStart = readBuffer;
+    if( !response.deserialize( &responseBufStart, readBuffer + bytesRead ) )
+    {
+        //invalid response
+        NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. Received invalid response from (%1:%2) on local address %3").
+            arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1 );
+        return false;
+    }
+
+    if (response.seed == qnCommon->moduleGUID().toString())
+        return true; // ignore requests to himself
+
+    if(!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower() ) // TODO: #2.1 #Elric #AK check for "default" VS "Vms"
+    {
+        NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
+            arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2 );
+        return false;
+    }
+
+    //received valid response, checking if already know this enterprise controller
+    QHostAddress remoteAddress(remoteAddressStr);
+    std::pair<std::map<QString, ModuleContext>::iterator, bool>
+        p = m_knownEnterpriseControllers.insert( std::make_pair( response.seed, ModuleContext() ) );
+    if( p.second )  //new module
+        p.first->second.response = response;
+    if( p.first->second.signalledAddresses.insert( remoteAddress.toString() ).second )
+    {
+        //new enterprise controller found
+        const QHostAddress& localAddress = QHostAddress(udpSocket->getLocalAddress().address.toString());
+        if( p.second )  //new module found
+        {
+            NX_LOG(QString::fromLatin1("NetworkOptixModuleFinder. New remote server of type %1 found at address (%2:%3) on local interface %4").
+                arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1 );
+        }
+        else    //new address of existing module
+        {
+            NX_LOG( QString::fromLatin1("NetworkOptixModuleFinder. New address (%2:%3) of remote server of type %1 found on local interface %4").
+                arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1 );
+        }
+        emit moduleFound(
+            response.type,
+            response.version,
+            response.name,
+            response.typeSpecificParameters,
+            localAddress.toString(),
+            remoteAddress.toString(),
+            m_localNetworkAdresses.find(remoteAddressStr) != m_localNetworkAdresses.end(),
+            response.seed );
+    }
+    p.first->second.prevResponseReceiveClock = QDateTime::currentMSecsSinceEpoch();
+
+    return true;
+}
+
 void NetworkOptixModuleFinder::run()
 {
     initSystemThreadId();
@@ -107,8 +245,8 @@ void NetworkOptixModuleFinder::run()
     }
 
     for( std::vector<AbstractDatagramSocket*>::const_iterator
-        it = m_sockets.begin();
-        it != m_sockets.end();
+        it = m_clientSockets.begin();
+        it != m_clientSockets.end();
         ++it )
     {
         if( !m_pollSet.add( *it, PollSet::etRead ) )
@@ -116,9 +254,12 @@ void NetworkOptixModuleFinder::run()
             Q_ASSERT( false );
         }
     }
-
-    static const size_t READ_BUFFER_SIZE = UDPSocket::MAX_PACKET_SIZE;
-    QScopedArrayPointer<quint8> readBuffer( new quint8[UDPSocket::MAX_PACKET_SIZE] );
+    if (m_serverSocket) {
+        if( !m_pollSet.add( m_serverSocket, PollSet::etRead ) )
+        {
+            Q_ASSERT( false );
+        }
+    }
 
     while( !needToStop() )
     {
@@ -127,8 +268,8 @@ void NetworkOptixModuleFinder::run()
         {
             //sending request via each socket
             for( std::vector<AbstractDatagramSocket*>::const_iterator
-                it = m_sockets.begin();
-                it != m_sockets.end();
+                it = m_clientSockets.begin();
+                it != m_clientSockets.end();
                 ++it )
             {
                 if( !(*it)->send( searchPacket, searchPacketBufStart - searchPacket ) )
@@ -167,67 +308,14 @@ void NetworkOptixModuleFinder::run()
             AbstractDatagramSocket* udpSocket = dynamic_cast<AbstractDatagramSocket*>(it.socket());
             Q_ASSERT( udpSocket );
 
-            //reading socket response
-            QString remoteAddressStr;
-            unsigned short remotePort = 0;
-            int bytesRead = udpSocket->recvFrom( readBuffer.data(), READ_BUFFER_SIZE, remoteAddressStr, remotePort );
-            if( bytesRead == -1 )
-            {
-                SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                NX_LOG( lit("NetworkOptixModuleFinder. Failed to read socket on local address (%1). %2").
-                    arg(udpSocket->getLocalAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logERROR );
-                continue;
+            if (udpSocket == m_serverSocket) {
+                processDiscoveryRequest(udpSocket);
+            }
+            else {
+                processDiscoveryResponse(udpSocket);
+                    
             }
 
-            //parsing recevied response
-            RevealResponse response;
-            const quint8* responseBufStart = readBuffer.data();
-            if( !response.deserialize( &responseBufStart, readBuffer.data() + bytesRead ) )
-            {
-                //invalid response
-                NX_LOG(lit("NetworkOptixModuleFinder. Received invalid response from (%1:%2) on local address %3").
-                    arg(remoteAddressStr).arg(remotePort).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1 );
-                continue;
-            }
-
-            if(!m_compatibilityMode && response.customization.toLower() != qnProductFeatures().customizationName.toLower() ) // TODO: #2.1 #Elric #AK check for "default" VS "Vms"
-            {
-                NX_LOG( lit("NetworkOptixModuleFinder. Ignoring %1 (%2:%3) with different customization %4 on local address %5").
-                    arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(response.customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2 );
-                continue;
-            }
-
-            //received valid response, checking if already know this enterprise controller
-            QHostAddress remoteAddress(remoteAddressStr);
-            std::pair<std::map<QString, ModuleContext>::iterator, bool>
-                p = m_knownEnterpriseControllers.insert( std::make_pair( response.seed, ModuleContext() ) );
-            if( p.second )  //new module
-                p.first->second.response = response;
-            if( p.first->second.signalledAddresses.insert( remoteAddress.toString() ).second )
-            {
-                //new enterprise controller found
-                const QHostAddress& localAddress = QHostAddress(udpSocket->getLocalAddress().address.toString());
-                if( p.second )  //new module found
-                {
-                    NX_LOG(lit("NetworkOptixModuleFinder. New remote server of type %1 found at address (%2:%3) on local interface %4").
-                        arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1 );
-                }
-                else    //new address of existing module
-                {
-                    NX_LOG( lit("NetworkOptixModuleFinder. New address (%2:%3) of remote server of type %1 found on local interface %4").
-                        arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1 );
-                }
-                emit moduleFound(
-                    response.type,
-                    response.version,
-                    response.typeSpecificParameters,
-                    localAddress.toString(),
-                    remoteAddress.toString(),
-                    m_localNetworkAdresses.find(remoteAddressStr) != m_localNetworkAdresses.end(),
-                    response.seed );
-            }
-
-            p.first->second.prevResponseReceiveClock = currentClock;
         }
 
         //checking for expired known hosts...

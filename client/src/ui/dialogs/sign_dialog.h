@@ -4,7 +4,7 @@
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QVBoxLayout>
 
-#include "plugins/resources/archive/avi_files/avi_resource.h"
+#include <core/resource/resource_fwd.h>
 
 class QDataWidgetMapper;
 class QStandardItemModel;
@@ -16,6 +16,8 @@ class QnResourceWidgetRenderer;
 class QnSignDialogGlWidget;
 class QnCamDisplay;
 class QnSignInfo;
+
+class QnAviResource;
 
 namespace Ui {
     class SignDialog;
@@ -45,7 +47,7 @@ private:
 
     QScopedPointer<Ui::SignDialog> ui;
     
-    QnAviResourcePtr m_resource;
+    QnSharedResourcePointer<QnAviResource> m_resource;
 
     QnCamDisplay *m_camDispay;
     QnAbstractArchiveReader *m_reader;

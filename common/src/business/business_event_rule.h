@@ -21,14 +21,16 @@ public:
 
     QString getUniqueId() const;
 
-    int id() const;
-    void setId(int value);
+    QnId id() const;
+    void setId(const QnId& value);
 
-    BusinessEventType::Value eventType() const;
-    void setEventType(const BusinessEventType::Value value);
+    QnBusiness::EventType eventType() const;
+    void setEventType(const QnBusiness::EventType value);
 
-    QnResourceList eventResources() const;
-    void setEventResources(const QnResourceList &value);
+    QVector<QnId> eventResources() const;
+    void setEventResources(const QVector<QnId> &value);
+    QnResourceList eventResourceObjects() const;
+
 
     QnBusinessEventParameters eventParams() const;
     void setEventParams(const QnBusinessEventParameters& params);
@@ -36,11 +38,12 @@ public:
     Qn::ToggleState eventState() const;
     void setEventState(Qn::ToggleState state);
 
-    BusinessActionType::Value actionType() const;
-    void setActionType(const BusinessActionType::Value value);
+    QnBusiness::ActionType actionType() const;
+    void setActionType(const QnBusiness::ActionType value);
 
-    QnResourceList actionResources() const;
-    void setActionResources(const QnResourceList &value);
+    QVector<QnId> actionResources() const;
+    QnResourceList actionResourceObjects() const;
+    void setActionResources(const QVector<QnId> &value);
 
     QnBusinessActionParameters actionParams() const;
     void setActionParams(const QnBusinessActionParameters& params);
@@ -63,16 +66,23 @@ public:
 
     /* Check if current time allowed in schedule */
     bool isScheduleMatchTime(const QDateTime& datetime) const;
-private:
-    int m_id;
 
-    BusinessEventType::Value m_eventType;
-    QnResourceList m_eventResources;
+    static QnBusinessEventRuleList getDefaultRules();
+
+    QnBusinessEventRule* clone();
+    void removeResource(const QnId& resId);
+private:
+    QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, QnResourcePtr actionRes= QnResourcePtr());
+
+    QnId m_id;
+
+    QnBusiness::EventType m_eventType;
+    QVector<QnId> m_eventResources;
     QnBusinessEventParameters m_eventParams;
     Qn::ToggleState m_eventState;
 
-    BusinessActionType::Value m_actionType;
-    QnResourceList m_actionResources;
+    QnBusiness::ActionType m_actionType;
+    QVector<QnId> m_actionResources;
     QnBusinessActionParameters m_actionParams;
 
     int m_aggregationPeriod;

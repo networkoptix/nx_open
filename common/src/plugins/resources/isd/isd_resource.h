@@ -14,7 +14,7 @@ public:
 
     static QString MAX_FPS_PARAM_NAME;
 
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     QnPlIsdResource();
 

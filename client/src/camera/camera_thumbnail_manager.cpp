@@ -22,6 +22,7 @@ QnCameraThumbnailManager::QnCameraThumbnailManager(QObject *parent) :
     m_refreshingTimer->setInterval(10 * 1000);
 
     connect(m_refreshingTimer,      &QTimer::timeout,                                   this,   &QnCameraThumbnailManager::forceRefreshThumbnails);
+    connect(qnResPool,              &QnResourcePool::statusChanged,                     this,   &QnCameraThumbnailManager::at_resPool_statusChanged);    
     connect(qnResPool,              &QnResourcePool::resourceRemoved,                   this,   &QnCameraThumbnailManager::at_resPool_resourceRemoved);
     connect(this,                   &QnCameraThumbnailManager::thumbnailReadyDelayed,   this,   &QnCameraThumbnailManager::thumbnailReady, Qt::QueuedConnection);
     setThumbnailSize(defaultThumbnailSize);
@@ -72,11 +73,11 @@ void QnCameraThumbnailManager::setThumbnailSize(const QSize &size) {
 }
 
 int QnCameraThumbnailManager::loadThumbnailForResource(const QnResourcePtr &resource) {
-    QnNetworkResourcePtr networkResource = qSharedPointerDynamicCast<QnNetworkResource>(resource);
+    QnNetworkResourcePtr networkResource = resource.dynamicCast<QnNetworkResource>();
     if (!networkResource)
         return 0;
 
-    QnMediaServerResourcePtr serverResource = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(resource->getParentId()));
+    QnMediaServerResourcePtr serverResource = qnResPool->getResourceById(resource->getParentId()).dynamicCast<QnMediaServerResource>();
     if (!serverResource)
         return 0;
 
@@ -85,7 +86,7 @@ int QnCameraThumbnailManager::loadThumbnailForResource(const QnResourcePtr &reso
         return 0;
 
     return serverConnection->getThumbnailAsync(
-                resource.dynamicCast<QnNetworkResource>(),
+                networkResource,
                 -1,
                 m_thumnailSize,
                 QLatin1String("jpg"),
@@ -116,13 +117,40 @@ void QnCameraThumbnailManager::at_thumbnailReceived(int status, const QImage &th
     }
 }
 
+void QnCameraThumbnailManager::at_resPool_statusChanged(const QnResourcePtr &resource) {
+    if (!m_thumbnailByResource.contains(resource))
+        return;
+
+     ThumbnailData &data = m_thumbnailByResource[resource];
+     if (!isUpdateRequired(resource, data.status))
+         return;
+
+     data.status = Refreshing;
+     data.loadingHandle = loadThumbnailForResource(resource);
+}
+
 void QnCameraThumbnailManager::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
     m_thumbnailByResource.remove(resource);
 }
 
+bool QnCameraThumbnailManager::isUpdateRequired(const QnResourcePtr &resource, const ThumbnailStatus status) const {
+    switch (resource->getStatus()) {
+    case QnResource::Recording:
+        return (status != Loading) && (status != Refreshing);
+    case QnResource::Online:
+        return (status == NoData) || (status == NoSignal);
+    default:
+        break;
+    }
+    return false;
+}
+
 void QnCameraThumbnailManager::forceRefreshThumbnails() {
     for (auto it = m_thumbnailByResource.begin(); it != m_thumbnailByResource.end(); ++it) {
-        if (it.key()->getStatus() == QnResource::Recording && it.value().status == Loaded)
-            it.value().status = Refreshing;
+        if (!isUpdateRequired(it.key(), it->status))
+            continue;
+
+        it->status = Refreshing;
+        it->loadingHandle = loadThumbnailForResource(it.key());
     }
 }

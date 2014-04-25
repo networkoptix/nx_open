@@ -119,6 +119,7 @@ public:
         metadataChannelNum(7),
         audioEnabled(false),
 		wasDualStreaming(false),
+        wasCameraControlDisabled(false),
         tcpMode(true),
         transcodedVideoSize(640, 480)
     {
@@ -196,6 +197,7 @@ public:
     int metadataChannelNum;
     bool audioEnabled;
 	bool wasDualStreaming;
+    bool wasCameraControlDisabled;
     bool tcpMode;
     QSize transcodedVideoSize;
 };
@@ -916,23 +918,22 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged()
 
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
     if (cameraResource) {
-        if (cameraResource->isAudioEnabled() != d->audioEnabled) {
-            m_needStop = true;
-            d->socket->close();
-        }
-		if (cameraResource->hasDualStreaming2() != d->wasDualStreaming) {
+        if (cameraResource->isAudioEnabled() != d->audioEnabled ||
+		    cameraResource->hasDualStreaming2() != d->wasDualStreaming ||
+            !cameraResource->isCameraControlDisabled() && d->wasCameraControlDisabled) 
+        {
 			m_needStop = true;
 			d->socket->close();
 		}
     }
 }
 
-void QnRtspConnectionProcessor::at_camera_disabledChanged()
+void QnRtspConnectionProcessor::at_camera_parentIdChanged()
 {
     Q_D(QnRtspConnectionProcessor);
 
     QMutexLocker lock(&d->mutex);
-    if (d->mediaRes->toResource()->isDisabled()) {
+    if (d->mediaRes->toResource()->hasFlags(QnResource::foreigner)) {
         m_needStop = true;
         d->socket->close();
     }
@@ -946,17 +947,17 @@ void QnRtspConnectionProcessor::createDataProvider()
     if (d->mediaRes) {
         camera = qnCameraPool->getVideoCamera(d->mediaRes->toResourcePtr());
         QnNetworkResourcePtr cameraRes = d->mediaRes.dynamicCast<QnNetworkResource>();
-        if (cameraRes && !cameraRes->isInitialized() && !cameraRes->isDisabled())
+        if (cameraRes && !cameraRes->isInitialized() && !cameraRes->hasFlags(QnResource::foreigner))
             cameraRes->initAsync(true);
     }
     if (camera && d->liveMode == Mode_Live)
     {
-        if (!d->liveDpHi && !d->mediaRes->toResource()->isDisabled()) {
+        if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(QnResource::foreigner)) {
             d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
             if (d->liveDpHi) {
-                connect(d->liveDpHi->getResource().data(), SIGNAL(disabledChanged(const QnResourcePtr &)), this, SLOT(at_camera_disabledChanged()), Qt::DirectConnection);
+                connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);
                 connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
-                d->liveDpHi->startIfNotRunning(true);
+                d->liveDpHi->startIfNotRunning();
             }
         }
         if (!d->liveDpLow && d->liveDpHi)
@@ -970,7 +971,7 @@ void QnRtspConnectionProcessor::createDataProvider()
             {
                 d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
                 if (d->liveDpLow)
-                    d->liveDpLow->startIfNotRunning(true);
+                    d->liveDpLow->startIfNotRunning();
             }
         }
     }
@@ -1012,8 +1013,10 @@ void QnRtspConnectionProcessor::checkQuality()
         }
     }
 	QnVirtualCameraResourcePtr cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>();
-	if (cameraRes)
+	if (cameraRes) {
 		d->wasDualStreaming = cameraRes->hasDualStreaming2();
+        d->wasCameraControlDisabled = cameraRes->isCameraControlDisabled();
+    }
 }
 
 void QnRtspConnectionProcessor::createPredefinedTracks(QnConstResourceVideoLayoutPtr videoLayout)
@@ -1155,7 +1158,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->dataProcessor->lockDataQueue();
 
         int copySize = 0;
-        if (!getResource()->toResource()->isDisabled() && (status == QnResource::Online || status == QnResource::Recording)) {
+        if (!getResource()->toResource()->hasFlags(QnResource::foreigner) && (status == QnResource::Online || status == QnResource::Recording)) {
             copySize = d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, 0, d->lastPlayCSeq);
         }
 

@@ -13,13 +13,11 @@ class QnActiResourceSearcher : public QObject, public QnUpnpResourceSearcher
 {
     Q_OBJECT
 
-    QnActiResourceSearcher();
 public:
-    static QnActiResourceSearcher& instance();
-    
+    QnActiResourceSearcher();
     virtual ~QnActiResourceSearcher();
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
 
     virtual QString manufacture() const;
 

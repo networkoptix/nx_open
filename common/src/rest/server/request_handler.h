@@ -31,7 +31,7 @@ public:
     // incoming connection socket
     virtual QString description() const { return QString(); }
     
-    friend class QnRestConnectionProcessor;
+    friend class QnRestProcessorPool;
 
 protected:
     void setPath(const QString &path) { m_path = path; }

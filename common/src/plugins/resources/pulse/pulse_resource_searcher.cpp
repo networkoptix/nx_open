@@ -45,7 +45,7 @@ QnResourceList QnPlPulseSearcher::findResources()
     return result;
 }
 
-QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -58,7 +58,7 @@ QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QnRes
         return result;
     }
 
-    if (resourceType->getManufacture() == QLatin1String(QnPlPulseResource::MANUFACTURE))
+    if (resourceType->getManufacture() == QnPlPulseResource::MANUFACTURE)
     {
         result = QnVirtualCameraResourcePtr( new QnPlPulseResource() );
     }
@@ -68,9 +68,9 @@ QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QnRes
     
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Pulse camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create Pulse camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
 
-    result->deserialize(parameters);
+    //result->deserialize(parameters);
 
     return result;
 }
@@ -95,10 +95,10 @@ QnNetworkResourcePtr QnPlPulseSearcher::createResource(const QString& manufactur
     QnNetworkResourcePtr result = QnNetworkResourcePtr(0);
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture, name);
-    if (!rt.isValid())
+    if (rt.isNull())
         return result;
 
-    if (manufacture == QLatin1String(QnPlPulseResource::MANUFACTURE))
+    if (manufacture == QnPlPulseResource::MANUFACTURE)
     {
         result = QnNetworkResourcePtr(new QnPlPulseResource());
     }

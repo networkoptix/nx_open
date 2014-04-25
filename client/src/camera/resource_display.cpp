@@ -73,6 +73,14 @@ void QnResourceDisplay::beforeDestroy()
 {
 }
 
+const QnResourcePtr &QnResourceDisplay::resource() const {
+    return getResource();
+}
+
+const QnMediaResourcePtr &QnResourceDisplay::mediaResource() const {
+    return m_mediaResource;
+}
+
 void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
     if(runnable == NULL)
         return;

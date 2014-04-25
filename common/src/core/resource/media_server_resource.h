@@ -17,9 +17,8 @@ class QnMediaServerResource : public QnResource
     Q_PROPERTY(QString streamingUrl READ getStreamingUrl WRITE setStreamingUrl)
 
 public:
-    enum PanicMode {PM_None, PM_BusinessEvents, PM_User};
 
-    QnMediaServerResource();
+    QnMediaServerResource(const QnResourceTypePool* resTypePool);
     virtual ~QnMediaServerResource();
 
     virtual QString getUniqueId() const;
@@ -38,33 +37,41 @@ public:
     QnAbstractStorageResourceList getStorages() const;
     void setStorages(const QnAbstractStorageResourceList& storages);
 
-    virtual void updateInner(QnResourcePtr other) override;
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
     QString getPrimaryIF() const;
 
-    void setReserve(bool reserve = true);
-    bool getReserve() const;
+    Qn::PanicMode getPanicMode() const;
+    void setPanicMode(Qn::PanicMode panicMode);
 
-    PanicMode getPanicMode() const;
-    void setPanicMode(PanicMode panicMode);
+    Qn::ServerFlags getServerFlags() const;
+    void setServerFlags(Qn::ServerFlags flags);
 
     //virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
     QString getProxyHost();
     int getProxyPort();
 
+    int getMaxCameras() const;
+    void setMaxCameras(int value);
+
+    void setRedundancy(bool value);
+    int isRedundancy() const;
+
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
-
+    static bool isEdgeServer(const QnResourcePtr &resource);
+    virtual void setStatus(Status newStatus, bool silenceMode = false) override;
+    qint64 currentStatusTime() const;
 private slots:
     void at_pingResponse(QnHTTPRawResponse, int);
     void determineOptimalNetIF_testProxy();
 
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
-    void panicModeChanged(const QnMediaServerResourcePtr &resource);
+    void panicModeChanged(const QnResourcePtr &resource);
 
 private:
     QnMediaServerConnectionPtr m_restConnection;
@@ -75,17 +82,20 @@ private:
     QList<QHostAddress> m_prevNetAddrList;
     QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
-    bool m_reserve;
-    PanicMode m_panicMode;
+    Qn::ServerFlags m_serverFlags;
+    Qn::PanicMode m_panicMode;
     QnSoftwareVersion m_version;
     QMap<int, QString> m_runningIfRequests;
     QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
+    int m_maxCameras;
+    bool m_redundancy;
+    QElapsedTimer m_statusTimer;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory
 {
 public:
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
 };
 
 Q_DECLARE_METATYPE(QnMediaServerResourcePtr);

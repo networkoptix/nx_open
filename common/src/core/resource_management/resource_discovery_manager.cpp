@@ -125,7 +125,7 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
     m_resourceProcessor = processor;
 }
 
-QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnResourcePtr result;
 
@@ -136,9 +136,9 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
     if (resourceType->getName() == QLatin1String("Storage"))
     {
 
-        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(parameters[QLatin1String("url")]));
-        if (result)
-            result->deserialize(parameters);
+        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(params.url));
+        //if (result)
+        //    result->deserialize(parameters);
     }
     else {
         ResourceSearcherList searchersList;
@@ -150,7 +150,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
         int i = 0;
         foreach (QnAbstractResourceSearcher *searcher, searchersList)
         {
-            result = searcher->createResource(resourceTypeId, parameters);
+            result = searcher->createResource(resourceTypeId, QnResourceParams(params.url, params.vendor));
             if (!result.isNull())
                 break;
             i++;
@@ -462,10 +462,14 @@ QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const
 void QnResourceDiscoveryManager::updateSearcherUsage(QnAbstractResourceSearcher *searcher) {
     // TODO: #Elric strictly speaking, we must do this under lock.
 
-    QSet<QString> disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
+    QSet<QString> disabledVendorsForAutoSearch;
+#ifndef EDGE_SERVER
+    disabledVendorsForAutoSearch = QnGlobalSettings::instance()->disabledVendorsSet();
+#endif
 
     searcher->setShouldBeUsed(
-        searcher->isLocal() ||
+        searcher->isLocal() ||                  // local resources should always be found
+        searcher->isVirtualResource() ||        // virtual resources should always be found
         (!disabledVendorsForAutoSearch.contains(searcher->manufacture()) && !disabledVendorsForAutoSearch.contains(lit("all")))
     );
 }

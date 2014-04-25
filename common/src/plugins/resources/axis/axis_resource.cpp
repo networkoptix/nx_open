@@ -16,7 +16,7 @@
 
 using namespace std;
 
-const char* QnPlAxisResource::MANUFACTURE = "Axis";
+const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
 static const float MAX_AR_EPS = 0.04f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 static const quint16 DEFAULT_AXIS_API_PORT = 80;
@@ -40,7 +40,7 @@ bool QnPlAxisResource::isResourceAccessible()
 
 QString QnPlAxisResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnPlAxisResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -53,11 +53,6 @@ QnAbstractStreamDataProvider* QnPlAxisResource::createLiveDataProvider()
     return new QnAxisStreamReader(toSharedPointer());
 }
 
-bool QnPlAxisResource::shoudResolveConflicts() const 
-{
-    return false;
-}
-
 void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
@@ -65,8 +60,7 @@ void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 
 bool QnPlAxisResource::startInputPortMonitoring()
 {
-    if( isDisabled()
-        || hasFlags(QnResource::foreigner)      //we do not own camera
+    if( hasFlags(QnResource::foreigner)      //we do not own camera
         || m_inputPortNameToIndex.empty() )
     {
         return false;
@@ -368,12 +362,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     // determin camera max resolution
 
-    // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
-    {
-        QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-        if (conn->saveSync(::toSharedPointer(this).staticCast<QnVirtualCameraResource>()) != 0)
-            qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
-    }
+    save();
 
     return CameraDiagnostics::NoErrorResult();
 }

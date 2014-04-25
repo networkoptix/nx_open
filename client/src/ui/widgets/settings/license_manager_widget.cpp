@@ -8,7 +8,6 @@
 
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QTreeWidgetItem>
-#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
 
 #include <QtNetwork/QNetworkAccessManager>
@@ -160,7 +159,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
 
     QUrl url(QLatin1String(QN_LICENSE_URL));
     QNetworkRequest request;
-    request.setUrl(url);
+    request.setUrl(url.toString());
 
     QUrlQuery params;
     params.addQueryItem(QLatin1String("license_key"), QLatin1String(licenseKey));
@@ -222,8 +221,11 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     }
 
     if (!licensesToUpdate.isEmpty()) {
-        QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection();
-        int handle = connection->addLicensesAsync(licensesToUpdate, this, SLOT(at_licensesReceived(int,QnLicenseList,int)));
+        auto addLisencesHandler = [this, licensesToUpdate]( int reqID, ec2::ErrorCode errorCode ){
+            at_licensesReceived( reqID, errorCode, licensesToUpdate );
+        };
+        int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager()->addLicenses(
+            licensesToUpdate, this, addLisencesHandler );
         m_handleKeyMap[handle] = licenseKey;
     }
 
@@ -262,7 +264,7 @@ void QnLicenseManagerWidget::updateDetailsButtonEnabled() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licenses, int handle)
+void QnLicenseManagerWidget::at_licensesReceived(int handle, ec2::ErrorCode errorCode, QnLicenseList licenses)
 {
     if (!m_handleKeyMap.contains(handle))
         return;
@@ -274,7 +276,7 @@ void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licen
     QnLicensePtr license = licenseListHelper.getLicenseByKey(licenseKey);
         
     QString message;
-    if (!license || status)
+    if (!license || (errorCode != ec2::ErrorCode::ok))
         message = tr("There was a problem activating your license.");
     else if (license)
         message = tr("License was successfully activated.");
@@ -299,7 +301,7 @@ void QnLicenseManagerWidget::at_downloadError() {
         reply->deleteLater();
 
         /* QNetworkReply slots should not start eventLoop */
-        emit showMessageLater(tr("License Activation"),
+        emit showMessageLater(tr("License Activation ") + reply->errorString(),
                               tr("Network error has occurred during automatic license activation.\nTry to activate your license manually."),
                               true);
 

@@ -85,7 +85,7 @@ QnPlPulseSearcherHelper::WSResult QnPlPulseSearcherHelper::parseReply(const QByt
         return result;
     }
 
-    result.manufacture = QLatin1String(QnPlPulseResource::MANUFACTURE);
+    result.manufacture = QnPlPulseResource::MANUFACTURE;
 
     int mac_index = datagram.indexOf("IPCAMERA");
     if (mac_index<0)

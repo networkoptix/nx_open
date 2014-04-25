@@ -5,7 +5,6 @@
 #include <atomic>
 
 #include <utils/common/warnings.h>
-#include <utils/common/stdext.h>
 #include <utils/network/ssl_socket.h>
 
 #ifdef Q_OS_WIN
@@ -556,7 +555,15 @@ bool Socket::createSocket(int type, int protocol)
 #endif
 
     // Make a new socket
-    return (sockDesc = socket(PF_INET, type, protocol)) > 0;
+    sockDesc = socket(PF_INET, type, protocol);
+    if( sockDesc < 0 )
+        return false;
+
+#ifdef SO_NOSIGPIPE
+    int set = 1;
+    setsockopt(sockDesc, SOL_SOCKET, SO_NOSIGPIPE, (void *)&set, sizeof(int));
+#endif
+    return true;
 }
 
 
@@ -903,7 +910,7 @@ int CommunicatingSocket::recv( void* buffer, unsigned int bufferLen, int flags )
         return -1;
 
     int bytesRead = doInterruptableSystemCallWithTimeout<>(
-        stdext::bind<>(&::recv, sockDesc, (void*)buffer, (size_t)bufferLen, flags),
+        std::bind(&::recv, sockDesc, (void*)buffer, (size_t)bufferLen, flags),
         recvTimeout );
 #endif
     if (bytesRead < 0)
@@ -928,7 +935,7 @@ int CommunicatingSocket::send( const void* buffer, unsigned int bufferLen )
         return -1;
 
     int sended = doInterruptableSystemCallWithTimeout<>(
-        stdext::bind<>(&::send, sockDesc, (const void*)buffer, (size_t)bufferLen, 0),
+        std::bind(&::send, sockDesc, (const void*)buffer, (size_t)bufferLen, MSG_NOSIGNAL),
         sendTimeout );
 #endif
     if (sended < 0)
@@ -1370,7 +1377,7 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
         return -1;
 
     return doInterruptableSystemCallWithTimeout<>(
-        stdext::bind<>(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, 0, (const sockaddr *) &m_destAddr, (socklen_t)sizeof(m_destAddr)),
+        std::bind(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, MSG_NOSIGNAL, (const sockaddr *) &m_destAddr, (socklen_t)sizeof(m_destAddr)),
         sendTimeout ) == bufferLen;
 #endif
 }
@@ -1463,7 +1470,7 @@ int UDPSocket::send( const void* buffer, unsigned int bufferLen )
         return -1;
 
     return doInterruptableSystemCallWithTimeout<>(
-        stdext::bind<>(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, 0, (const sockaddr *) &m_destAddr, (socklen_t)sizeof(m_destAddr)),
+        std::bind(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, 0, (const sockaddr *) &m_destAddr, (socklen_t)sizeof(m_destAddr)),
         sendTimeout );
 #endif
 }
@@ -1502,7 +1509,7 @@ int UDPSocket::recvFrom(
         return -1;
 
     int rtn = doInterruptableSystemCallWithTimeout<>(
-        stdext::bind<>(&::recvfrom, sockDesc, (void*)buffer, (size_t)bufferLen, 0, (sockaddr*)&clntAddr, (socklen_t*)&addrLen),
+        std::bind(&::recvfrom, sockDesc, (void*)buffer, (size_t)bufferLen, 0, (sockaddr*)&clntAddr, (socklen_t*)&addrLen),
         recvTimeout );
 #endif
 

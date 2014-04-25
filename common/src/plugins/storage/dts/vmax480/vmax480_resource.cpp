@@ -13,7 +13,7 @@ QMutex QnPlVmax480Resource::m_chunkReaderMutex;
 QMap<QString, QnVMax480ChunkReader*> QnPlVmax480Resource::m_chunkReaderMap;
 
 
-const char* QnPlVmax480Resource::MANUFACTURE = "VMAX";
+const QString QnPlVmax480Resource::MANUFACTURE(lit("VMAX"));
 
 QnPlVmax480Resource::QnPlVmax480Resource():
     m_startTime(AV_NOPTS_VALUE),
@@ -44,7 +44,7 @@ bool QnPlVmax480Resource::isResourceAccessible()
 
 QString QnPlVmax480Resource::getDriverName() const 
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnPlVmax480Resource::setIframeDistance(int frames, int timems) 
@@ -113,11 +113,6 @@ int QnPlVmax480Resource::eventPort() const
 
     return lst[3].toInt();
     
-}
-
-bool QnPlVmax480Resource::shoudResolveConflicts() const 
-{
-    return false;
 }
 
 QnAbstractStreamDataProvider* QnPlVmax480Resource::createLiveDataProvider()

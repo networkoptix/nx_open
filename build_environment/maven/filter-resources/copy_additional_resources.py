@@ -18,7 +18,7 @@ def get_platform():
         return 'macosx'   
 
 def get_build_arch():
-    if '${arch}' == 'arm':
+    if '${arch}'.startswith('arm'):
         return '${arch}'
     else:
         if platform.architecture()[0] == '64bit':
@@ -114,7 +114,7 @@ if __name__ == '__main__':
     else:     
         lib_source_dir = '${qt.dir}/lib'
         lib_target_dir = join('${project.build.directory}', 'lib')
-        plugin_source_dir = '${environment.dir}/qt5/qtbase-${arch}/plugins'	
+        plugin_source_dir = '${qt.dir}/plugins'	
         target_dir = join('${project.build.directory}', 'bin')
         help_dir = join('${project.build.directory}', 'bin/help')
         

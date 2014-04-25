@@ -17,8 +17,7 @@ class QnTwoStepFileDialog : public QnButtonBoxDialog
 
 public:
     explicit QnTwoStepFileDialog(QWidget *parent = 0, const QString &caption = QString(),
-                                 const QString &initialFile = QString(), const QString &filter = QString(),
-                                 const QStringList &extensions = QStringList());
+                                 const QString &initialFile = QString(), const QString &filter = QString());
     ~QnTwoStepFileDialog();
 
     void setOptions(QFileDialog::Options options);
@@ -31,6 +30,8 @@ public:
     static QFileDialog::Options fileDialogOptions() { return 0; }
     static QFileDialog::Options directoryDialogOptions() { return QFileDialog::ShowDirsOnly; }
 
+    virtual int exec() override;
+
 signals:
     void filterSelected(const QString &filter);
 
@@ -40,6 +41,7 @@ protected:
     QGridLayout *customizedLayout() const;
     void setNameFilters(const QStringList &filters);
     void updateMode();
+    void updateCustomizedLayout();
 
     Q_SLOT void updateFileExistsWarning();
     Q_SLOT void at_browseFolderButton_clicked();
@@ -50,7 +52,6 @@ private:
 
     QFileDialog::FileMode m_mode;
     QString m_filter;
-    QStringList m_extensions;
     QString m_selectedExistingFilter;
 };
 

@@ -135,6 +135,9 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     buttonsLayout->addItem(m_jumpForwardButton);
     buttonsLayout->setAlignment(m_jumpForwardButton, Qt::AlignCenter);
 
+    QnClockLabel *clockLabel = new QnClockLabel(this);
+    clockLabel->setAlignment(Qt::AlignCenter);
+
     QGraphicsLinearLayout *leftLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
     leftLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
     leftLayoutV->setContentsMargins(0, 3, 0, 0);
@@ -142,7 +145,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     leftLayoutV->setMinimumHeight(87.0);
     leftLayoutV->addItem(m_speedSlider);
     leftLayoutV->addItem(buttonsLayout);
-    leftLayoutV->addItem(new QnClockLabel(this));
+    leftLayoutV->addItem(clockLabel);
 
     GraphicsWidget *leftWidget = new GraphicsWidget();
     leftWidget->setLayout(leftLayoutV);
@@ -461,14 +464,14 @@ void QnNavigationItem::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 }
 
 void QnNavigationItem::at_liveButton_clicked() {
+    /* Reset speed. It MUST be done before setLive(true) is called. */
+    navigator()->setSpeed(1.0);
+
     navigator()->setLive(true);
 
     /* Move time scrollbar so that maximum is visible. */
     m_timeSlider->finishAnimations();
     m_timeScrollBar->setValue(m_timeScrollBar->maximum());
-
-    /* Reset speed. */
-    navigator()->setSpeed(1.0);
 
     /* Reset button's checked state. */
     if(!m_liveButton->isChecked())

@@ -4,7 +4,7 @@
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "dlink_stream_reader.h"
 
-const char* QnPlDlinkResource::MANUFACTURE = "Dlink";
+const QString QnPlDlinkResource::MANUFACTURE(lit("Dlink"));
 
 
 QnDlink_cam_info::QnDlink_cam_info():
@@ -119,7 +119,7 @@ bool QnPlDlinkResource::isResourceAccessible()
 
 QString QnPlDlinkResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnPlDlinkResource::setIframeDistance(int /*frames*/, int /*timems*/)

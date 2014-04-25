@@ -8,7 +8,7 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
-#undef PlaySound // TODO: #Elric who includes windows.h?
+#include <utils/common/model_functions_fwd.h>
 
 class QnAbstractBusinessEvent;
 typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;
@@ -32,123 +32,141 @@ class QnBusinessEventRule;
 typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
 typedef QList<QnBusinessEventRulePtr> QnBusinessEventRuleList;
 
-namespace QnBusiness {
+#ifdef Q_MOC_RUN
+class QnBusiness
+#else
+namespace QnBusiness
+#endif
+{
+#ifdef Q_MOC_RUN
+    Q_GADGET
+        Q_ENUMS(EventReason EventType ActionType)
+public:
+#else
+    Q_NAMESPACE
+#endif
+
     enum EventReason {
         NoReason,
-        NetworkIssueNoFrame,
-        NetworkIssueConnectionClosed,
-        NetworkIssueRtpPacketLoss,
-        MServerIssueTerminated,
-        MServerIssueStarted,
-        StorageIssueIoError,
-        StorageIssueNotEnoughSpeed,
-        StorageIssueNotEnoughSpace
+        NetworkNoFrameReason,
+        NetworkConnectionClosedReason,
+        NetworkRtpPacketLossReason,
+        ServerTerminatedReason,
+        ServerStartedReason,
+        StorageIoErrorReason,
+        StorageTooSlowReason,
+        StorageNotEnoughSpaceReason
     };
-}
-Q_DECLARE_METATYPE(QnBusiness::EventReason)
 
-namespace BusinessEventType {
-    enum Value {
+    enum EventType {
+        /** Event type is not defined. Used in rules. */
+        UndefinedEvent,
+
         /** Motion has occured on a camera. */
-        Camera_Motion,
-
-        /** Camera was disconnected. */
-        Camera_Disconnect,
-
-        /** Storage read error has occured. */
-        Storage_Failure,
-
-        /** Network issue: packet lost, RTP timeout, etc. */
-        Network_Issue,
-
-        /** Found some cameras with same IP address. */
-        Camera_Ip_Conflict,
+        CameraMotionEvent,
 
         /** Camera input signal is received. */
-        Camera_Input,
+        CameraInputEvent,
+
+        /** Camera was disconnected. */
+        CameraDisconnectEvent,
+
+        /** Storage read error has occured. */
+        StorageFailureEvent,
+
+        /** Network issue: packet lost, RTP timeout, etc. */
+        NetworkIssueEvent,
+
+        /** Found some cameras with same IP address. */
+        CameraIpConflictEvent,
 
         /** Connection to mediaserver lost. */
-        MediaServer_Failure,
+        ServerFailureEvent,
 
         /** Two or more mediaservers are running. */
-        MediaServer_Conflict,
+        ServerConflictEvent,
 
         /** Media server started */
-        MediaServer_Started,
-
-        /** Event type is not defined. Used in rules. */
-        NotDefined,
+        ServerStartEvent,
 
         /**
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        Count = NotDefined,
+        EventCount, // TODO: #Elric remove
 
         /** System health message. */
-        SystemHealthMessage = 500,
+        SystemHealthEvent = 500,
 
         /** Event group. */
-        AnyCameraIssue = 600,
-        AnyServerIssue = 601,
+        AnyCameraEvent = 600,
+        AnyServerEvent = 601,
         AnyBusinessEvent = 602,
 
         /** Base index for the user defined events. */
-        UserDefined = 1000
+        UserEvent = 1000
     };
-}
 
-namespace BusinessActionType {
-    enum Value {
-        CameraRecording,    // start camera recording
-        PanicRecording,     // activate panic recording mode
-        // these actions can be executed from any endpoint. actually these actions call specified function at ec
-        /*!
-            parameters:\n
-                - emailAddress (string, required)
-        */
-        SendMail,
+    enum ActionType {
+        UndefinedAction,
 
-        ShowPopup,
+        /** Change camera output state.
+         *
+         * Parameters:
+         * - relayOutputID (string, required)          - id of output to trigger.
+         * - relayAutoResetTimeout (uint, optional)    - timeout (in milliseconds) to reset camera state back.
+         */
+        CameraOutputAction,
 
-        //!change camera output state
-        /*!
-            parameters:\n
-                - relayOutputID (string, required)          - id of output to trigger
-                - relayAutoResetTimeout (uint, optional)    - timeout (in milliseconds) to reset camera state back
-        */
-        CameraOutput,
-        CameraOutputInstant,
+        CameraOutputOnceAction,
 
-        /*!
-            parameters:\n
-                - soundUrl (string, required)               - url of sound, contains path to sound on the EC
-        */
-        PlaySound,
-        PlaySoundRepeated,
+        BookmarkAction,
 
-        /*!
-            parameters:\n
-                - sayText (string, required)                - text that will be provided to TTS engine
-        */
-        SayText,
+        /** Start camera recording. */
+        CameraRecordingAction,
+
+        /** Activate panic recording mode. */
+        PanicRecordingAction,     
+
+        /** 
+         * Send an email. This action can be executed from any endpoint. 
+         *
+         * Parameters:
+         * - emailAddress (string, required)
+         */
+        SendMailAction,
+
+        /** Write a record to the server's log. */
+        DiagnosticsAction,
+
+        ShowPopupAction,
 
         /**
-         *  Write a record to the server's log
+         * Parameters:
+         * - soundUrl (string, required)               - url of sound, contains path to sound on the EC.
          */
-        Diagnostics,
+        PlaySoundAction,
 
-        Bookmark,           // mark part of camera archive as undeleted
+        PlaySoundOnceAction,
 
-        // media server based actions
-        NotDefined,
+
+        /**
+         * Parameters:
+         * - sayText (string, required)                - text that will be provided to TTS engine.
+         */
+        SayTextAction,
 
         /**
          * Used when enumerating to build GUI lists, this and followed actions
          * should not be displayed.
          */
-        Count = Bookmark
+        ActionCount // TODO: #Elric remove
     };
-}
+
+    bool isImplemented(ActionType actionType);
+
+} // namespace QnBusiness
+
+QN_DECLARE_FUNCTIONS_FOR_TYPES((QnBusiness::EventReason)(QnBusiness::EventType)(QnBusiness::ActionType), (metatype)(lexical)(json))
 
 #endif // QN_BUSINESS_FWD_H

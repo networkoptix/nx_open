@@ -451,8 +451,6 @@ void QnLayoutSettingsDialog::at_imageStored(const QString &filename, bool ok) {
 }
 
 void QnLayoutSettingsDialog::loadPreview() {
-    if (!this->isVisible())
-        return;
     Q_D(QnLayoutSettingsDialog);
     if (!d->imageFileIsAvailable() || d->imageIsLoading())
         return;
@@ -488,14 +486,11 @@ void QnLayoutSettingsDialog::viewFile() {
 void QnLayoutSettingsDialog::selectFile() {
     Q_D(QnLayoutSettingsDialog);
 
-    QStringList extensions;
-
     QString nameFilter;
     foreach (const QByteArray &format, QImageReader::supportedImageFormats()) {
         if (!nameFilter.isEmpty())
             nameFilter += QLatin1Char(' ');
         nameFilter += QLatin1String("*.") + QLatin1String(format);
-        extensions.append(QLatin1String(format));
     }
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
 
@@ -503,7 +498,6 @@ void QnLayoutSettingsDialog::selectFile() {
                                  tr("Open file"),
                                  qnSettings->backgroundsFolder(),
                                  tr("Pictures %1").arg(nameFilter),
-                                 extensions,
                                  0,
                                  QnCustomFileDialog::fileDialogOptions());
 

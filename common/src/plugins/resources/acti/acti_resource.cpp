@@ -17,7 +17,7 @@
 #include "business/business_event_connector.h"
 
 
-const char* QnActiResource::MANUFACTURE = "ACTI";
+const QString QnActiResource::MANUFACTURE(lit("ACTI"));
 static const int TCP_TIMEOUT = 3000;
 static const int DEFAULT_RTSP_PORT = 7070;
 
@@ -73,7 +73,7 @@ int QnActiResource::eventPort() {
 
 QString QnActiResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnActiResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -84,11 +84,6 @@ void QnActiResource::setIframeDistance(int /*frames*/, int /*timems*/)
 QnAbstractStreamDataProvider* QnActiResource::createLiveDataProvider()
 {
     return new QnActiStreamReader(toSharedPointer());
-}
-
-bool QnActiResource::shoudResolveConflicts() const 
-{
-    return false;
 }
 
 QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const
@@ -393,7 +388,7 @@ bool QnActiResource::startInputPortMonitoring()
     //registering URL commands (one command per input port)
         //GET /cgi-bin/cmd/encoder?EVENT_RSPCMD1=1,[api/camera_event/98/di/activated],[api/camera_event/98/di/deactivated]&EVENT_RSPCMD2=1,[],[]&EVENT_RSPCMD3=1,[],[]
 
-    const QString cgiPath = lit("api/camera_event/%1/di").arg(this->getId());
+    const QString cgiPath = lit("api/camera_event/%1/di").arg(this->getId().toString());
     QString setupURLCommandRequestStr;
     for( int i = 1; i <= m_inputCount; ++i )
     {
@@ -543,7 +538,7 @@ bool QnActiResource::hasDualStreaming() const
     QVariant mediaVariant;
     QnActiResource* this_casted = const_cast<QnActiResource*>(this);
     this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toInt();
+    return mediaVariant.toBool();
 }
 
 QnAbstractPtzController *QnActiResource::createPtzControllerInternal()

@@ -116,15 +116,16 @@ private:
     void loadThumbnailForItem(QnNotificationWidget *item, QnResourcePtr resource, qint64 usecsSinceEpoch = -1);
 
     QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool useResource = true);
-    QnNotificationWidget* findItem(int businessRuleId, const QnResourcePtr &resource, bool useResource = true);
+    QnNotificationWidget* findItem(const QnId& businessRuleId, const QnResourcePtr &resource, bool useResource = true);
 
 private:
+    QnNotificationWidget* findItem(int businessRuleId, const QnResourcePtr &resource);
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
 
     QMultiHash<QnSystemHealth::MessageType, QnNotificationWidget*> m_itemsByMessageType;
     QMultiHash<QString, QnNotificationWidget*> m_itemsByLoadingSound;
-    QMultiHash<int, QnNotificationWidget*> m_itemsByBusinessRuleId;
+    QMultiHash<QnId, QnNotificationWidget*> m_itemsByBusinessRuleId;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
 };
 

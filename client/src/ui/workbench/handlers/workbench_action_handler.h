@@ -9,7 +9,8 @@
 
 #include <api/app_server_connection.h>
 
-#include <core/resource/user_resource.h>
+#include <core/ptz/item_dewarping_params.h>
+#include <nx_ec/ec_api.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
@@ -18,6 +19,8 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/dialogs/event_log_dialog.h>
 #include <ui/dialogs/camera_list_dialog.h>
+
+#include <utils/color_space/image_correction.h>
 
 class QAction;
 class QMenu;
@@ -45,15 +48,14 @@ namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
         Q_OBJECT
     public:
-        QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags);
+        QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources);
 
     public slots:
-        void at_replyReceived(int status, const QnResourceList &resources, int handle);
+        void at_replyReceived(int handle, ec2::ErrorCode errorCode, const QnResourceList& resources);
 
     private:
         QPointer<QnWorkbenchActionHandler> m_handler;
         QnVirtualCameraResourceList m_resources;
-        QList<int> m_oldDisabledFlags;
     };
 
     class QnResourceReplyProcessor: public QObject {
@@ -104,7 +106,7 @@ public:
     virtual ~QnWorkbenchActionHandler();
 
 protected:
-    QnAppServerConnectionPtr connection() const;
+    ec2::AbstractECConnectionPtr connection2() const;
 
     bool canAutoDelete(const QnResourcePtr &resource) const;
 
@@ -191,12 +193,15 @@ protected slots:
     void at_previousLayoutAction_triggered();
     void at_openLayoutsAction_triggered();
     void at_openNewTabAction_triggered();
+
     void at_openInLayoutAction_triggered();
+
     void at_openInCurrentLayoutAction_triggered();
     void at_openInNewLayoutAction_triggered();
+    void at_openInNewWindowAction_triggered();
+
     void at_openLayoutsInNewWindowAction_triggered();
     void at_openCurrentLayoutInNewWindowAction_triggered();
-    void at_openInNewWindowAction_triggered();
     void at_openNewWindowAction_triggered();
 
     void at_moveCameraAction_triggered();
@@ -278,9 +283,10 @@ protected slots:
     void at_setAsBackgroundAction_triggered();
     void at_backgroundImageStored(const QString &filename, bool success);
 
-    void at_resources_saved(int status, const QnResourceList &resources, int handle);
-    void at_resource_deleted(const QnHTTPRawResponse& resource, int handle);
-    void at_resources_statusSaved(int status, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
+    void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnResourceList& resources );
+    void at_resources_properties_saved( int handle, ec2::ErrorCode errorCode );
+    void at_resource_deleted( int handle, ec2::ErrorCode errorCode );
+    void at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources);
 
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();

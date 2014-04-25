@@ -21,7 +21,7 @@ QnStardotResourceSearcher::QnStardotResourceSearcher()
 
 QString QnStardotResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnStardotResource::MANUFACTURE);
+    return QnStardotResource::MANUFACTURE;
 }
 
 // returns all available devices
@@ -98,8 +98,8 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 // in any case let's HTTP do it's job at very end of discovery
                 QnStardotResourcePtr resource( new QnStardotResource() );
                 //resource->setName("AVUNKNOWN");
-                QnId typeId = qnResTypePool->getResourceTypeId(QLatin1String(QnStardotResource::MANUFACTURE), lit("STARDOT_COMMON"));
-                if (!typeId.isValid())
+                QnId typeId = qnResTypePool->getResourceTypeId(QnStardotResource::MANUFACTURE, lit("STARDOT_COMMON"));
+                if (typeId.isNull())
                     continue;
                 resource->setTypeId(typeId);
 
@@ -151,13 +151,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
 
 }
 
-QnStardotResourceSearcher& QnStardotResourceSearcher::instance()
-{
-    static QnStardotResourceSearcher inst;
-    return inst;
-}
-
-QnResourcePtr QnStardotResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnStardotResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -179,8 +173,8 @@ QnResourcePtr QnStardotResourceSearcher::createResource(QnId resourceTypeId, con
     result = QnVirtualCameraResourcePtr(new QnStardotResource());
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Stardot camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create Stardot camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 }
@@ -230,7 +224,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
         return QList<QnResourcePtr>();
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), model);
-    if (!rt.isValid())
+    if (rt.isNull())
         return QList<QnResourcePtr>();
 
 

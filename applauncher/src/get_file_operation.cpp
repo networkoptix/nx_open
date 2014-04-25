@@ -12,7 +12,9 @@
 #include <functional>
 
 #include <utils/common/log.h>
+#include <utils/gzip/gzip_uncompressor.h>
 #include <utils/fs/async_file_processor.h>
+#include <utils/media/custom_output_stream.h>
 
 #include "applauncher_process.h"
 
@@ -39,7 +41,8 @@ namespace detail
         m_fileWritePending( 0 ),
         m_totalBytesDownloaded( 0 ),
         m_totalBytesWritten( 0 ),
-        m_responseReceivedCalled( false )
+        m_responseReceivedCalled( false ),
+        m_fileClosePending( false )
     {
     }
 
@@ -53,21 +56,35 @@ namespace detail
 
     void GetFileOperation::pleaseStop()
     {
-        std::unique_lock<std::mutex> lk( m_mutex );
+        {
+            std::unique_lock<std::mutex> lk( m_mutex );
 
-        if( m_state >= State::sInterrupted )
-            return;
+            if( m_state >= State::sInterrupted )
+                return;
 
-        m_state = State::sInterrupted;
-        setResult( ResultCode::interrupted );
+            m_state = State::sInterrupted;
+            setResult( ResultCode::interrupted );
+        }
+
         if( m_httpClient )
         {
             m_httpClient->terminate();
             m_httpClient.reset();
         }
 
-        if( !m_fileWritePending )
-            m_outFile->closeAsync( this );
+        {
+            std::unique_lock<std::mutex> lk( m_mutex );
+
+            if( !m_fileWritePending && m_outFile )
+            {
+                m_fileDataProcessor->flush();
+                if( !m_fileClosePending )
+                {
+                    m_outFile->closeAsync( this );
+                    m_fileClosePending = true;
+                }
+            }
+        }
     }
 
     //!Implementation of RDirSynchronizationOperation::startAsync
@@ -121,7 +138,12 @@ namespace detail
         if( !m_httpClient || m_state >= State::sInterrupted )
         {
             //closing file
-            m_outFile->closeAsync( this );
+            m_fileDataProcessor->flush();
+            if( !m_fileClosePending )
+            {
+                m_outFile->closeAsync( this );
+                m_fileClosePending = true;
+            }
             return;
         }
 
@@ -129,13 +151,17 @@ namespace detail
         if( !partialMsgBody.isEmpty() )
         {
             m_totalBytesDownloaded += partialMsgBody.size();
-            m_outFile->writeAsync( partialMsgBody, this );
+            m_fileDataProcessor->processData( partialMsgBody );
             m_fileWritePending = 1;
         }
         else if( m_state == State::sWaitingForWriteToFinish )
         {
-            //read all source data
-            m_outFile->closeAsync( this );
+            m_fileDataProcessor->flush();
+            if( !m_fileClosePending )
+            {
+                m_outFile->closeAsync( this );
+                m_fileClosePending = true;
+            }
         }
     }
 
@@ -147,12 +173,12 @@ namespace detail
             std::unique_lock<std::mutex> lk( m_mutex );
             m_state = State::sFinished;
         }
-        NX_LOG( QString::fromLatin1("RDirSyncher. GetFileOperation done. File %1,  bytes written %2").arg(entryPath).arg(m_totalBytesWritten), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1("RDirSyncher. GetFileOperation done. File %1, bytes written %2").arg(entryPath).arg(m_totalBytesWritten), cl_logDEBUG2 );
 
 #ifndef _WIN32
         //setting execution rights to file
-        if( entryPath.endsWith(QN_CLIENT_EXECUTABLE_NAME) )
-            chmod( (m_localDirPath + "/" + entryPath).toUtf8().constData(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH );
+        if( m_fileName.endsWith(QN_CLIENT_EXECUTABLE_NAME) )
+            chmod( (m_localDirPath + "/" + m_fileName).toUtf8().constData(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH );
 #endif
 
         m_handler->operationDone( shared_from_this() );
@@ -173,13 +199,15 @@ namespace detail
                 const nx_http::BufferType& partialMsgBody = m_httpClient->fetchMessageBodyBuffer();
                 if( partialMsgBody.isEmpty() )
                     return;
-
                 m_totalBytesDownloaded += partialMsgBody.size();
 
-                m_outFile->writeAsync( partialMsgBody, this );
+                m_fileDataProcessor->processData( partialMsgBody );
                 m_fileWritePending = 1;
                 break;
             }
+
+            case State::sInterrupted:
+                return;
 
             default:
                 assert( false );
@@ -224,6 +252,7 @@ namespace detail
             }
 
             case State::sDownloadingFile:
+            {
                 if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
                 {
                     setResult( ResultCode::downloadFailure );
@@ -235,8 +264,13 @@ namespace detail
                     return;
                 }
 
+                if( entryPath.endsWith(".gz") )
+                    m_fileName = entryPath.mid( 0, entryPath.size()-(sizeof(".gz")-1) );
+                else
+                    m_fileName = entryPath;
+
                 //opening file
-                m_outFile.reset( new QnFile( m_localDirPath + "/" + entryPath ) );
+                m_outFile.reset( new QnFile( m_localDirPath + "/" + m_fileName ) );
                 if( !m_outFile->open( QIODevice::WriteOnly ) )  //TODO/IMPL have to do that asynchronously
                 {
                     setResult( ResultCode::writeFailure );
@@ -247,7 +281,14 @@ namespace detail
                     m_handler->operationDone( shared_from_this() );
                     return;
                 }
+
+                using namespace std::placeholders;
+                auto func = std::bind( &QnFile::writeAsync, m_outFile, _1, this );
+                m_fileDataProcessor = std::make_shared<CustomOutputStream<decltype(func)>>( func );
+                if( entryPath.endsWith(".gz") )
+                    m_fileDataProcessor = std::make_shared<GZipUncompressor>(m_fileDataProcessor);
                 break;
+            }
 
             default:
                 assert( false );
@@ -292,7 +333,12 @@ namespace detail
         if( m_fileWritePending )
             return;
 
-        m_outFile->closeAsync( this );
+        m_fileDataProcessor->flush();
+        if( !m_fileClosePending )
+        {
+            m_outFile->closeAsync( this );
+            m_fileClosePending = true;
+        }
     }
 
     bool GetFileOperation::startAsyncFilePresenceCheck()

@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.2.0-SNAPSHOT</version>
+    <version>2.3.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -10,18 +10,19 @@
     <scm>
         <connection>scm:hg:file:///${basedir}</connection>
         <developerConnection>scm:hg:file:///${basedir}</developerConnection>
-    </scm>	
+    </scm>  
 
     <distributionManagement>
         <repository>
             <id>nexus-snapshots</id>
             <url>https://noptix.enk.me/nexus/content/repositories/snapshots/</url>
         </repository>
-    </distributionManagement>	
+    </distributionManagement>   
 
     <properties>
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
         <appserver.name>Enterprise Controller</appserver.name>
+        <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <applauncher.name>${company.name} Launcher</applauncher.name>
@@ -35,12 +36,14 @@
         <license.environment>production</license.environment>
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
+        <skip.sign>true</skip.sign>
         <beta>true</beta>
+        <box></box>
 
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
-        <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
@@ -58,8 +61,9 @@
         <customization>default</customization>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
+        <toolchain.version>none</toolchain.version>            
 
-        <additional.defines/>
+        <additional.defines></additional.defines>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>
@@ -78,7 +82,7 @@
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
-        <qtplugin3/>	
+        <qtplugin3/>    
     </properties>
 
     <build>
@@ -138,7 +142,7 @@
                     <doCheck>false</doCheck>
                     <doUpdate>update</doUpdate>
                 </configuration>
-            </plugin>		
+            </plugin>       
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -159,7 +163,7 @@
                                 <resource>
                                     <directory>${basedir}/maven/filter-resources</directory>
                                     <filtering>true</filtering>
-                                </resource>	
+                                </resource> 
                                 <resource>
                                     <directory>${basedir}/maven/bin-resources</directory>
                                     <filtering>false</filtering>
@@ -171,20 +175,20 @@
                                         <exclude>**/_unused/**</exclude>
                                         <exclude>**/intro.*</exclude>
                                     </excludes>
-                                </resource>	   
+                                </resource>    
                                 <resource>
                                     <directory>${customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
                                     <excludes>
                                         <exclude>**/_unused/**</exclude>
                                     </excludes>
-                                </resource>	        	                                                             
+                                </resource>                                                                          
                             </resources>              
                         </configuration>            
                     </execution>
                 </executions>
-            </plugin>			
-        </plugins>			
+            </plugin>           
+        </plugins>          
     </build>
 
     <profiles>
@@ -194,12 +198,12 @@
             <activation>        
                 <file>
                     <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
-                    <missing>build_environment/target/buildenv.timestamp</missing>
+                    <missing>build_environment/target/buildenv1.timestamp</missing>
                 </file> 
             </activation>
-            <modules>	
+            <modules>   
                 <module>build_environment</module>
-            </modules>	
+            </modules>  
         </profile>     
         
         <profile>
@@ -210,9 +214,9 @@
                     <value>true</value>
                 </property>
             </activation>
-            <modules>	
+            <modules>   
                 <module>plugins/quicksyncdecoder</module>       
-            </modules>	
+            </modules>  
         </profile>   
 
         <profile>
@@ -224,9 +228,10 @@
             </activation>
             <modules>
                 <module>build_variables</module>
-                <module>appserver</module>
+                <module>build_environment</module>
                 <module>common</module>
                 <module>hole_punching_mediator</module>
+                <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
         </profile> 
@@ -244,7 +249,7 @@
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>mediaserver</module>
-                <module>mediaproxy</module>
+                <!--<module>mediaproxy</module> -->
                 <!-- <module>testcamera</module> -->
             </modules>            
             <properties>
@@ -252,7 +257,7 @@
             </properties>
         </profile>  
         <profile>        
-            <id>noarm</id>
+            <id>desktop</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
@@ -260,13 +265,10 @@
                     <value>!arm</value>
                 </property>
             </activation>
-            <modules>		                
+            <modules>                       
                 <module>applauncher</module> 
-                <module>client</module>		
-            </modules>	
-            <properties>
-                <toolchain.version>none</toolchain.version>            
-            </properties>
+                <module>client</module>     
+            </modules>  
         </profile>         
         <profile>
             <id>windows</id>
@@ -278,9 +280,9 @@
             <modules>
                 <module>plugins/image_library_plugin</module>                
                 <module>traytool</module>
-                <!-- Vmaxproxy	module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
-                <!--<module>vmaxproxy</module>	-->
-                <module>client</module>		                
+                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
+                <!--<module>vmaxproxy</module>  -->
+                <module>client</module>                     
                 <module>wixsetup/wixsetup-full</module>
                 <module>wixsetup/wixsetup-client-only</module>
             </modules>
@@ -309,7 +311,7 @@
             </activation>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <init.python.dir>${environment.dir}/python/bin</init.python.dir>				
+                <init.python.dir>${environment.dir}/python/bin</init.python.dir>                
                 <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
                 <common.platform>unix</common.platform>
@@ -327,7 +329,7 @@
                     <name>linux</name>
                 </os> 
             </activation>
-            <properties>			
+            <properties>            
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
             </properties>
@@ -336,9 +338,8 @@
                 <module>plugins/image_library_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
-                <module>debsetup/appserver-deb</module>
             </modules>            
-        </profile>	
+        </profile>  
         <profile>
             <id>macosx</id>
             <activation>
@@ -346,7 +347,7 @@
                     <family>mac</family>
                 </os> 
             </activation>
-            <properties>		
+            <properties>        
                 <platform>macosx</platform>
                 <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
@@ -359,7 +360,7 @@
         </profile>        
 
         <profile>
-            <id>linux-arm</id>
+            <id>linux-isd-jaguar</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -367,22 +368,77 @@
                     <name>linux</name>
                 </os> 
                 <property>
-                    <name>arch</name>
-                    <value>arm</value>
+                    <name>box</name>
+                    <value>isd</value>
                 </property>
             </activation>
             <properties>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <toolchain.version>2011.09</toolchain.version>
-                <compiler>${toolchain.version}</compiler>
+                <toolchain.version>codesourcery-2013.11</toolchain.version>
+                <qt.dir>${environment.dir}/qt5/qtbase-${arch}-${toolchain.version}</qt.dir>
+                <compiler>2011.09</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA</additional.defines>
+                <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER</additional.defines>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
             </modules>
-        </profile>	
+        </profile> 
+
+        <profile>
+            <id>linux-isd-s2</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
+                <property>
+                    <name>box</name>
+                    <value>isd_s2</value>
+                </property>
+            </activation>
+            <properties>
+                <toolchain.version>linaro-multilib-2013.09</toolchain.version>
+                <compiler>${toolchain.version}</compiler>
+                <qt.dir>${environment.dir}/qt5/qtbase-${arch}-${toolchain.version}</qt.dir>
+                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
+                <openssl.version>1.0.1f-SNAPSHOT</openssl.version>
+                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
+                <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER</additional.defines>
+            </properties>
+            <modules>
+                <module>plugins/isd_native_plugin</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>linux-arm-rpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>rpi</value>
+                </property>
+            </activation>
+            <properties>
+                <toolchain.version>rpi</toolchain.version>
+                <compiler>${toolchain.version}</compiler>
+                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
+                <qt.dir>${environment.dir}/qt5/qtbase-${arch}-${toolchain.version}</qt.dir>
+                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
+                <additional.defines>DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA</additional.defines>
+            </properties>
+        </profile>
+
         <profile>
             <id>linux-x64</id>
             <activation>
@@ -416,7 +472,7 @@
             <properties>
                 <arch>x86</arch>
             </properties>
-        </profile>	
+        </profile>  
         <profile>
             <id>linux-x86-on-x64</id>
             <activation>
@@ -433,7 +489,7 @@
             <properties>
                 <qt.spec>linux-g++-32</qt.spec>
             </properties>
-        </profile>	        
+        </profile>          
         <profile>
             <id>android</id>
             <activation>
@@ -443,7 +499,7 @@
                 <module>android-client/protobuf-classes</module>
                 <module>android-client/android-main</module>
             </modules>
-        </profile>	
+        </profile>  
         <profile>
             <id>ios</id>
             <activation>
@@ -463,7 +519,8 @@
             </activation>
             <properties>
                 <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
+                <skip.sign>false</skip.sign>
             </properties>
-        </profile>	      
-    </profiles>	
+        </profile>        
+    </profiles> 
 </project>

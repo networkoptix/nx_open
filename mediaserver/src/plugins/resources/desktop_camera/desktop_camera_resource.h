@@ -17,7 +17,7 @@ class QnDesktopCameraResource
     Q_OBJECT
 
 public:
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     static const int MAX_STREAMS = 2;
 
@@ -27,8 +27,6 @@ public:
     virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems) { Q_UNUSED(frames) Q_UNUSED(timems) }
-
-    virtual bool shoudResolveConflicts() const override { return false; }
 
     virtual bool setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS = 0) override;
 

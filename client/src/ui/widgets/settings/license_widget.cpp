@@ -4,7 +4,6 @@
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
 
-#include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
 
 #include <QtNetwork/QNetworkAccessManager>
@@ -99,7 +98,16 @@ void QnLicenseWidget::setSerialKey(const QString &serialKey) {
 }
 
 QByteArray QnLicenseWidget::activationKey() const {
-    return ui->activationKeyTextEdit->toPlainText().toLatin1();
+    QStringList lines = ui->activationKeyTextEdit->toPlainText().split(QLatin1Char('\n'));
+    QStringList filtered_lines;
+    foreach(QString line, lines) {
+        line = line.trimmed();
+        if (!line.isEmpty()) {
+            filtered_lines.append(line);
+        }
+    }
+
+    return filtered_lines.join(QLatin1Char('\n')).toLatin1();
 }
 
 void QnLicenseWidget::updateControls() {
@@ -145,7 +153,6 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
                                                     tr("Open License File"),
                                                     QString(),
                                                     tr("All files (*.*)"),
-                                                    QStringList(),
                                                     0,
                                                     QnCustomFileDialog::fileDialogOptions());
     if (fileName.isEmpty())

@@ -28,7 +28,7 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 
 QString QnPlArecontResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlAreconVisionResource::MANUFACTURE);
+    return QnPlAreconVisionResource::MANUFACTURE;
 }
 
 // returns all available devices
@@ -116,7 +116,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 // in any case let's HTTP do it's job at very end of discovery
                 QnNetworkResourcePtr resource( new QnPlAreconVisionResource() );
                 //resource->setName("AVUNKNOWN");
-                resource->setTypeId(qnResTypePool->getResourceTypeId(QLatin1String(QnPlAreconVisionResource::MANUFACTURE), QLatin1String("ArecontVision_Abstract")));
+                resource->setTypeId(qnResTypePool->getResourceTypeId(QnPlAreconVisionResource::MANUFACTURE, QLatin1String("ArecontVision_Abstract")));
 
                 if (resource==0)
                     continue;
@@ -157,13 +157,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 
 }
 
-QnPlArecontResourceSearcher& QnPlArecontResourceSearcher::instance()
-{
-    static QnPlArecontResourceSearcher inst;
-    return inst;
-}
-
-QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -185,8 +179,8 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, c
     result = QnVirtualCameraResourcePtr(QnPlAreconVisionResource::createResourceByTypeId(resourceTypeId));
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create arecontVision camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create arecontVision camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 }
@@ -245,7 +239,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
 
 
     QnId rt = qnResTypePool->getLikeResourceTypeId(manufacture(), model);
-    if (!rt.isValid())
+    if (rt.isNull())
         return QList<QnResourcePtr>();
 
 

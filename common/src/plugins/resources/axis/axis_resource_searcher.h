@@ -9,18 +9,18 @@
 
 class QnPlAxisResourceSearcher : public QnMdnsResourceSearcher
 {
-    QnPlAxisResourceSearcher();
 
 public:
-    static QnPlAxisResourceSearcher& instance();
+    QnPlAxisResourceSearcher();
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) override;
+    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params) override;
 
     // return the manufacture of the server
     virtual QString manufacture() const override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
-
+private:
+    template <class T> void addMultichannelResources(QList<T>& result);
 protected:
     QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress) override;
 };

@@ -11,8 +11,15 @@
 #include <client/client_settings.h>
 #include <ui/dialogs/message_box.h>
 
+#ifdef Q_OS_LINUX
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#include <GL/glx.h>
+#include <QtX11Extras/QX11Info>
+#endif
+
 void QnPerformanceTest::detectLightMode() {
-    if (qnSettings->lightModeOverride() != -1) {
+    if (qnSettings->lightModeOverride() != 0) {
         qnSettings->setLightMode(qnSettings->lightModeOverride());
         return;
     }
@@ -26,16 +33,22 @@ void QnPerformanceTest::detectLightMode() {
     if (atomCpuRegExp.exactMatch(cpuName))
         poorCpu = true;
 
-    {
-        // It creates OpenGL context
-        QWidget hideWidget;
-        QGLWidget *openGlDummy = new QGLWidget(&hideWidget);
-        openGlDummy->show();
+    // Create OpenGL context and check GL_RENDERER
+    if (Display *display = QX11Info::display()) {
+        GLint attr[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
+        if (XVisualInfo *visual = glXChooseVisual(display, 0, attr)) {
+            if (GLXContext context = glXCreateContext(display, visual, NULL, GL_TRUE)) {
+                glXMakeCurrent(display, DefaultRootWindow(display), context);
 
-        QString renderer = QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
-        QRegExp slowRendererRegExp(lit("Gallium .* on llvmpipe .*"));
-        if (slowRendererRegExp.exactMatch(renderer))
-            poorGpu = true;
+                QString renderer = QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
+                QRegExp slowRendererRegExp(lit("Gallium .* on llvmpipe .*"));
+                if (slowRendererRegExp.exactMatch(renderer))
+                    poorGpu = true;
+
+                glXDestroyContext(display, context);
+            }
+            XFree(visual);
+        }
     }
 #endif
 

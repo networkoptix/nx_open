@@ -62,6 +62,21 @@ int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time)
     return CODE_INVALID_PARAMETER;
 }
 
+PixelFormat updatePixelFormat(PixelFormat fmt)
+{
+    switch(fmt)
+    {
+    case PIX_FMT_YUV420P:
+        return PIX_FMT_YUVJ420P;
+    case PIX_FMT_YUV422P:
+        return PIX_FMT_YUVJ422P;
+    case PIX_FMT_YUV444P:
+        return PIX_FMT_YUVJ444P;
+    default:
+        return fmt;
+    }
+}
+
 int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
@@ -130,6 +145,11 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         result.append("</root>\n");
         return CODE_INVALID_PARAMETER;
     }
+
+#ifdef EDGE_SERVER
+    if (dstSize.height() < 1)
+        dstSize.setHeight(316); // default value
+#endif
 
     bool useHQ = true;
     if ((dstSize.width() > 0 && dstSize.width() <= 480) || (dstSize.height() > 0 && dstSize.height() <= 316))
@@ -236,34 +256,81 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         return CODE_INTERNAL_ERROR;
     }
 
-    PixelFormat ffmpegColorFormat = PIX_FMT_BGRA;
-    QImage::Format qtColorFormat = QImage::Format_ARGB32_Premultiplied;
-    int pixelBytes = 4;
-    if (colorSpace == "gray8") {
-        ffmpegColorFormat = PIX_FMT_GRAY8;
-        qtColorFormat = QImage::Format_Indexed8;
-        pixelBytes = 1;
-    }
-
     const int roundedWidth = qPower2Ceil((unsigned) dstSize.width(), 8);
     const int roundedHeight = qPower2Ceil((unsigned) dstSize.height(), 2);
 
-    int numBytes = avpicture_get_size(ffmpegColorFormat, roundedWidth, roundedHeight);
-    uchar* scaleBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
-    SwsContext* scaleContext = sws_getContext(outFrame->width, outFrame->height, PixelFormat(outFrame->format), 
-                               dstSize.width(), dstSize.height(), ffmpegColorFormat, SWS_BICUBIC, NULL, NULL, NULL);
+    if (format == "jpg" || format == "jpeg")
+    {
+        // prepare image using ffmpeg encoder
 
-    AVPicture dstPict;
-    avpicture_fill(&dstPict, scaleBuffer, (PixelFormat) ffmpegColorFormat, roundedWidth, roundedHeight);
+        int numBytes = avpicture_get_size((PixelFormat) outFrame->format, roundedWidth, roundedHeight);
+        uchar* scaleBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
+        SwsContext* scaleContext = sws_getContext(outFrame->width, outFrame->height, PixelFormat(outFrame->format), 
+            dstSize.width(), dstSize.height(), (PixelFormat) outFrame->format, SWS_BICUBIC, NULL, NULL, NULL);
+
+        AVFrame dstPict;
+        avpicture_fill((AVPicture*) &dstPict, scaleBuffer, (PixelFormat) outFrame->format, roundedWidth, roundedHeight);
+        sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstPict.data, dstPict.linesize);
+
+        AVCodecContext* videoEncoderCodecCtx = avcodec_alloc_context3(0);
+        videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
+        videoEncoderCodecCtx->codec_id = (format == "jpg" || format == "jpeg") ? CODEC_ID_MJPEG : CODEC_ID_PNG;
+        videoEncoderCodecCtx->pix_fmt = updatePixelFormat((PixelFormat) outFrame->format);
+        videoEncoderCodecCtx->width = dstSize.width();
+        videoEncoderCodecCtx->height = dstSize.height();
+        videoEncoderCodecCtx->bit_rate = roundedWidth*roundedHeight;
+        videoEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+        videoEncoderCodecCtx->time_base.num = 1;
+        videoEncoderCodecCtx->time_base.den = 30;
     
-    QImage image(scaleBuffer, dstSize.width(), dstSize.height(), dstPict.linesize[0], qtColorFormat);
-    sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstPict.data, dstPict.linesize);
+        AVCodec* codec = avcodec_find_encoder_by_name(format == "jpg" || format == "jpeg" ? "mjpeg" : format.constData());
+        if (avcodec_open2(videoEncoderCodecCtx, codec, NULL) < 0)
+        {
+            qWarning() << "Can't initialize ffmpeg encoder for encoding image to format " << format;
+        }
+        else {
+            const static int MAX_VIDEO_FRAME = roundedWidth * roundedHeight * 3;
+            quint8* m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
+            int encoded = avcodec_encode_video(videoEncoderCodecCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, &dstPict);
+            result.append((const char*) m_videoEncodingBuffer, encoded);
+            qFreeAligned(m_videoEncodingBuffer);
+            avcodec_close(videoEncoderCodecCtx);
+        }
+        av_freep(&videoEncoderCodecCtx);
+        sws_freeContext(scaleContext);
+        qFreeAligned(scaleBuffer);
+    }
+    else
+    {
+        // prepare image using QT
 
-    QBuffer output(&result);
-    image.save(&output, format);
+        PixelFormat ffmpegColorFormat = PIX_FMT_BGRA;
+        QImage::Format qtColorFormat = QImage::Format_ARGB32_Premultiplied;
+        int pixelBytes = 4;
+        if (colorSpace == "gray8") {
+            ffmpegColorFormat = PIX_FMT_GRAY8;
+            qtColorFormat = QImage::Format_Indexed8;
+            pixelBytes = 1;
+        }
 
-    sws_freeContext(scaleContext);
-    qFreeAligned(scaleBuffer);
+
+        int numBytes = avpicture_get_size(ffmpegColorFormat, roundedWidth, roundedHeight);
+        uchar* scaleBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
+        SwsContext* scaleContext = sws_getContext(outFrame->width, outFrame->height, PixelFormat(outFrame->format), 
+                                   dstSize.width(), dstSize.height(), ffmpegColorFormat, SWS_BICUBIC, NULL, NULL, NULL);
+
+        AVPicture dstPict;
+        avpicture_fill(&dstPict, scaleBuffer, (PixelFormat) ffmpegColorFormat, roundedWidth, roundedHeight);
+    
+        QImage image(scaleBuffer, dstSize.width(), dstSize.height(), dstPict.linesize[0], qtColorFormat);
+        sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstPict.data, dstPict.linesize);
+
+        QBuffer output(&result);
+        image.save(&output, format);
+
+        sws_freeContext(scaleContext);
+        qFreeAligned(scaleBuffer);
+    }
 
     if (result.isEmpty())
     {

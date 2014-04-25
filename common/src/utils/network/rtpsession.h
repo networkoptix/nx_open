@@ -49,6 +49,9 @@ public:
     QnRtspTimeHelper(const QString& resId);
     ~QnRtspTimeHelper();
 
+    /*!
+        \note Overflow of \a rtpTime is not handled here, so be sure to update \a statistics often enough (twice per \a rtpTime full cycle)
+    */
     qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
     QString getResID() const { return m_resId; }
 private:

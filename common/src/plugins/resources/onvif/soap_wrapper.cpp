@@ -276,8 +276,27 @@ DeviceSoapWrapper::~DeviceSoapWrapper()
 
 }
 
+void DeviceSoapWrapper::calcTimeDrift()
+{
+    _onvifDevice__GetSystemDateAndTime request;
+    _onvifDevice__GetSystemDateAndTimeResponse response;
+    int soapRes = GetSystemDateAndTime(request, response);
+
+    if (soapRes == SOAP_OK && response.SystemDateAndTime && response.SystemDateAndTime->UTCDateTime)
+    {
+        onvifXsd__Date* date = response.SystemDateAndTime->UTCDateTime->Date;
+        onvifXsd__Time* time = response.SystemDateAndTime->UTCDateTime->Time;
+
+        QDateTime datetime(QDate(date->Year, date->Month, date->Day), QTime(time->Hour, time->Minute, time->Second), Qt::UTC);
+        m_timeDrift = datetime.toMSecsSinceEpoch()/1000 - QDateTime::currentMSecsSinceEpoch()/1000;
+    }
+}
+
 bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
 {
+    return true;
+    calcTimeDrift();
+
     PasswordList passwords = passwordsData.getPasswordsByManufacturer(manufacturer);
     PasswordList::ConstIterator passwdIter = passwords.begin();
 

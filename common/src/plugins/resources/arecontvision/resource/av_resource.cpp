@@ -16,7 +16,7 @@
 #include "utils/network/nettools.h"
 #include "utils/network/ping.h"
 
-const char* QnPlAreconVisionResource::MANUFACTURE = "ArecontVision";
+const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 #define MAX_RESPONSE_LEN (4*1024)
 
 
@@ -278,7 +278,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 
 QString QnPlAreconVisionResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 bool QnPlAreconVisionResource::isResourceAccessible()
@@ -383,22 +383,30 @@ bool QnPlAreconVisionResource::setParamPhysical(const QnParam &param, const QVar
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString &name)
 {
-    QnId rt = qnResTypePool->getLikeResourceTypeId(QLatin1String(MANUFACTURE), name);
-
-    if (!rt.isValid())
+    QnId rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
+    if (rt.isNull())
     {
-        cl_log.log("Unsupported resource found(!!!): ", name, cl_logERROR);
-        return 0;
+        if ( name.left(2).toLower() == QLatin1String("av") )
+        {
+            QString new_name = name.mid(2);
+            rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, new_name);
+            if (!rt.isNull())
+            {
+                cl_log.log("Unsupported resource found(!!!): ", name, cl_logERROR);
+                return 0;
+            }
+        }
     }
 
     return createResourceByTypeId(rt);
+
 }
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId rt)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
 
-    if (resourceType.isNull() || (resourceType->getManufacture() != QLatin1String(MANUFACTURE)))
+    if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
     {
         cl_log.log("Can't create AV Resource. Resource type is invalid.", rt.toString(), cl_logERROR);
         return 0;

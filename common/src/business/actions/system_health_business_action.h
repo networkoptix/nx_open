@@ -8,7 +8,7 @@ class QnSystemHealthBusinessAction : public QnCommonBusinessAction
 {
     typedef QnCommonBusinessAction base_type;
 public:
-    QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, int eventResourceId = 0);
+    QnSystemHealthBusinessAction(QnSystemHealth::MessageType message, const QnId& eventResourceId = QnId());
 };
 
 typedef QSharedPointer<QnSystemHealthBusinessAction> QnSystemHealthBusinessActionPtr;

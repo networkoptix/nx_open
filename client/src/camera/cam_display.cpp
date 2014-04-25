@@ -519,10 +519,14 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         }
         else if (!m_display[0]->selfSyncUsed()) {
             if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed) {
+                qint64 maxSleepTime = needToSleep * 2;
+                if (qAbs(speed) > 1.0)
+                    maxSleepTime *= speed;
+                maxSleepTime = qAbs(maxSleepTime);  // needToSleep OR speed can be negative, but maxSleepTime should always be positive
                 if (m_isRealTimeSource)
-                    realSleepTime = m_delay.terminatedSleep(needToSleep, needToSleep*qAbs(speed)*2);
+                    realSleepTime = m_delay.terminatedSleep(needToSleep, maxSleepTime);
                 else
-                    realSleepTime = m_delay.sleep(needToSleep, needToSleep*qAbs(speed)*2);
+                    realSleepTime = m_delay.sleep(needToSleep, maxSleepTime);
             }
             else
                 realSleepTime = m_delay.addQuant(needToSleep);
@@ -1676,6 +1680,12 @@ bool QnCamDisplay::isBuffering() const
     if (!isRealTimeSource())
         return true; // if archive position then buffering mark should be resetted event for offline resource
     return m_resource->toResource()->getStatus() == QnResource::Online || m_resource->toResource()->getStatus() == QnResource::Recording;
+}
+
+qreal QnCamDisplay::overridenAspectRatio() const {
+    if (m_display[0])
+        return m_display[0]->overridenAspectRatio();
+    return 0.0;
 }
 
 void QnCamDisplay::setOverridenAspectRatio(qreal aspectRatio) {

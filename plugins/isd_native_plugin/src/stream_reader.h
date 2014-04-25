@@ -6,16 +6,19 @@
 #ifndef ILP_STREAM_READER_H
 #define ILP_STREAM_READER_H
 
+#include <memory>
 #include <stdint.h>
 
-#include <memory>
-#include <mutex>
+#include <QtCore/QMutex>
 
+#ifndef NO_ISD_AUDIO
 #include <isd/amux/amux_iface.h>
+#endif
 #include <isd/vmux/vmux_iface.h>
 
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <utils/media/pts_to_clock_mapper.h>
 
 #include "isd_motion_estimation.h"
 
@@ -32,7 +35,10 @@ public:
     /*!
         \param liveMode In this mode, plays all pictures in a loop
     */
-    StreamReader( nxpt::CommonRefManager* const parentRefManager, int encoderNum);
+    StreamReader(
+        nxpt::CommonRefManager* const parentRefManager,
+        int encoderNum,
+        const char* cameraUid );
     virtual ~StreamReader();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -63,28 +69,36 @@ private:
     nxcip::UsecUTCTimestamp m_lastMotionTime;
     Vmux* m_vmux;
     Vmux* m_vmux_motion;
+#ifndef NO_ISD_AUDIO
     amux_info_t m_audioInfo;
     Amux* m_amux;
+    bool m_audioEnabled;
     nxcip::CompressionType m_audioCodec;
-    mutable std::mutex m_mutex;
     std::unique_ptr<nxcip::AudioFormat> m_audioFormat;
+#endif
+    mutable QMutex m_mutex;
     
     vmux_stream_info_t motion_stream_info;
     ISDMotionEstimation m_motionEstimation;
-    int64_t m_firstFrameTime;
-    int64_t m_prevPts;
-    int64_t m_ptsDelta;
-    bool m_audioEnabled;
-
+    int64_t m_currentTimestamp;
+    unsigned int m_prevPts;
+    int64_t m_timestampDelta;
+    int m_framesSinceTimeResync;
     int m_epollFD;
 
+    PtsToClockMapper m_ptsMapper;
+
     int initializeVMux();
-    int initializeAMux();
     int getVideoPacket( nxcip::MediaDataPacket** packet );
-    int getAudioPacket( nxcip::MediaDataPacket** packet );
     bool registerFD( int fd );
     void unregisterFD( int fd );
+#ifndef NO_ISD_AUDIO
+    int initializeAMux();
+    int getAudioPacket( nxcip::MediaDataPacket** packet );
     void fillAudioFormat( const ISDAudioPacket& audioPacket );
+#endif
+    int64_t calcNextTimestamp( int32_t pts, int64_t absoluteTimeMS );
+    void resyncTime( int64_t absoluteSourceTimeUSec );
 };
 
 #endif  //ILP_STREAM_READER_H

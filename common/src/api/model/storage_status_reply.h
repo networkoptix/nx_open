@@ -4,10 +4,11 @@
 #include <QtCore/QMetaType>
 
 #include <utils/common/json_fwd.h>
+#include "utils/common/id.h"
 
 struct QnStorageSpaceData {
     QString path;
-    int storageId;
+    QnId storageId;
     qint64 totalSpace;
     qint64 freeSpace;
     qint64 reservedSpace;

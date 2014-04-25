@@ -5,7 +5,7 @@
 #include "droid_stream_reader.h"
 
 
-const char* QnDroidResource::MANUFACTURE = "NetworkOptixDroid";
+const QString QnDroidResource::MANUFACTURE(lit("NetworkOptixDroid"));
 
 QnDroidResource::QnDroidResource()
 {
@@ -23,7 +23,7 @@ bool QnDroidResource::isResourceAccessible()
 
 QString QnDroidResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnDroidResource::setIframeDistance(int /*frames*/, int /*timems*/)

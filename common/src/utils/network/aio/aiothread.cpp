@@ -224,9 +224,11 @@ namespace aio
             {
                 if( it->socket == sock && it->eventType == eventType && it->type != taskType )
                 {
-                    //TODO/IMPL if we changing socket handler or socket timeout MUST not remove task
-                    if( it->type == SocketAddRemoveTask::tRemoving )
+                    //TODO/IMPL if we changing socket timeout MUST NOT remove task
+                    if( it->type == SocketAddRemoveTask::tRemoving )     
                     {
+                        if( eventHandler != it->eventHandler )
+                            continue;   //event handler changed, cannot ignore task
                         //cancelling remove task
                         void* userData = pollSet.getUserData( sock, eventType );
                         Q_ASSERT( userData );
@@ -384,11 +386,11 @@ namespace aio
         if( !canAcceptSocket( eventToWatch ) )
             return false;
 
-        if( QThread::currentThread() == this )
-        {
-            //adding socket to pollset right away
-            return m_impl->addSockToPollset( sock, eventToWatch, timeoutMs, eventHandler );
-        }
+        //if( QThread::currentThread() == this )
+        //{
+        //    //adding socket to pollset right away
+        //    return m_impl->addSockToPollset( sock, eventToWatch, timeoutMs, eventHandler );
+        //}
 
         m_impl->pollSetModificationQueue.push_back( SocketAddRemoveTask(sock, eventToWatch, eventHandler, SocketAddRemoveTask::tAdding, timeoutMs) );
         if( eventToWatch == PollSet::etRead )
@@ -397,7 +399,8 @@ namespace aio
             ++m_impl->newWriteMonitorTaskCount;
         else
             Q_ASSERT( false );
-        m_impl->pollSet.interrupt();
+        if( QThread::currentThread() != this )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
+            m_impl->pollSet.interrupt();
 
         return true;
     }
@@ -484,6 +487,10 @@ namespace aio
                 break;
             if( triggeredSocketCount < 0 )
             {
+                NX_LOG( QString::fromLatin1( "Poll failed. %1" ).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+                const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+                if( errorCode == SystemError::interrupted )
+                    continue;
                 NX_LOG( lit( "Poll failed. %1" ).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
                 msleep( ERROR_RESET_TIMEOUT );
                 continue;

@@ -7,8 +7,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent, Qt::WindowFlags windowFlags) :
-    base_type(parent, windowFlags),
+QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent) :
+    base_type(parent),
     ui(new Ui::AdjustVideoDialog),
     m_updateDisabled(false),
     m_widget(0)

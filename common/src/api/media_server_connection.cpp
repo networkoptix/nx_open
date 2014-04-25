@@ -21,9 +21,9 @@
 #include <utils/common/enum_name_mapper.h>
 
 #include <api/serializer/serializer.h>
-#include <api/serializer/pb_serializer.h>
 #include <event_log/events_serializer.h>
 
+#include "network_proxy_factory.h"
 #include "session_manager.h"
 
 namespace {
@@ -89,6 +89,7 @@ namespace {
  * Note that instance of this class will be used from several threads, and
  * must therefore be thread-safe.
  */
+/*
 class QnNetworkProxyFactory: public QObject, public QNetworkProxyFactory {
 public:
     QnNetworkProxyFactory()
@@ -169,7 +170,7 @@ Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
 QPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
     QnNetworkProxyFactory *result(new QnNetworkProxyFactory());
 
-    /* Qt will take ownership of the supplied instance. */
+    // Qt will take ownership of the supplied instance. 
     QNetworkProxyFactory::setApplicationProxyFactory(result); // TODO: #Elric we have a race if this code is run several times from different threads.
 
     return result;
@@ -188,7 +189,7 @@ QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
 }
 
 
-
+*/
 
 // -------------------------------------------------------------------------- //
 // QnMediaServerReplyProcessor
@@ -393,7 +394,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // -------------------------------------------------------------------------- //
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
-QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QString &videoWallKey, QObject *parent):
     base_type(parent),
     m_proxyPort(0)
 {
@@ -401,7 +402,9 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     setNameMapper(new QnEnumNameMapper(QnEnumNameMapper::create<RequestObject>())); // TODO: #Elric no new
 
     QnRequestHeaderList extraHeaders;
-    extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getGuid());
+    extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getId().toString());
+    if (!videoWallKey.isEmpty())
+        extraHeaders << QnRequestHeader(lit("X-NetworkOptix-VideoWall"), videoWallKey);
     setExtraHeaders(extraHeaders);
 }
 
@@ -746,8 +749,8 @@ int QnMediaServerConnection::getStatisticsAsync(QObject *target, const char *slo
 int QnMediaServerConnection::getEventLogAsync(
                   qint64 dateFrom, qint64 dateTo,
                   QnResourceList camList,
-                  BusinessEventType::Value eventType,
-                  BusinessActionType::Value actionType,
+                  QnBusiness::EventType eventType,
+                  QnBusiness::ActionType actionType,
                   QnId businessRuleId,
                   QObject *target, const char *slot)
 {
@@ -760,11 +763,11 @@ int QnMediaServerConnection::getEventLogAsync(
         if (camera)
             params << QnRequestParam( "res_id", camera->getPhysicalId() );
     }
-    if (businessRuleId.isValid())
-        params << QnRequestParam( "brule_id", businessRuleId.toInt() );
-    if (eventType != BusinessEventType::NotDefined)
+    if (!businessRuleId.isNull())
+        params << QnRequestParam( "brule_id", businessRuleId );
+    if (eventType != QnBusiness::UndefinedEvent)
         params << QnRequestParam( "event", (int) eventType);
-    if (actionType != BusinessActionType::NotDefined)
+    if (actionType != QnBusiness::UndefinedAction)
         params << QnRequestParam( "action", (int) actionType);
 
     return sendAsyncGetRequest(EventLogObject, params, QN_STRINGIZE_TYPE(QnBusinessActionDataListPtr), target, slot);

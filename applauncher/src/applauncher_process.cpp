@@ -158,6 +158,14 @@ int ApplauncherProcess::run()
     return 0;
 }
 
+QString ApplauncherProcess::devModeKey() const {
+    return m_devModeKey;
+}
+
+void ApplauncherProcess::setDevModeKey(const QString &devModeKey) {
+    m_devModeKey = devModeKey;
+}
+
 bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
 {
     NX_LOG( QString::fromLatin1("Entered AddingTaskToNamedPipe"), cl_logDEBUG1 );
@@ -302,7 +310,7 @@ bool ApplauncherProcess::startApplication(
         task->appArgs += QString::fromLatin1(" ") + m_settings->value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
 
         if (!appData.verifyInstallation()) {
-            NX_LOG( QString::fromLatin1("Verification failed for version %1 (path %2)").arg(appData.version()).arg(appData.rootPath()), cl_logDEBUG1 );
+            NX_LOG( QString::fromLatin1("Verification failed for version %1 (path %2)").arg(appData.version().toString(QnSoftwareVersion::MinorFormat)).arg(appData.rootPath()), cl_logDEBUG1 );
             response->result = applauncher::api::ResultType::ioError;
 
             if( task->autoRestore )
@@ -319,7 +327,7 @@ bool ApplauncherProcess::startApplication(
 
     //TODO/IMPL start process asynchronously ?
 
-    const QString binPath = appData.executablePath();
+    const QString binPath = appData.executableFilePath();
 
     QStringList environment = QProcess::systemEnvironment();
 #ifdef Q_OS_LINUX
@@ -341,10 +349,14 @@ bool ApplauncherProcess::startApplication(
     }
 #endif
 
+    QStringList arguments = task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts);
+    if (!m_devModeKey.isEmpty())
+        arguments.append(QString::fromLatin1("--dev-mode-key=%1").arg(devModeKey()));
+
     NX_LOG( QString::fromLatin1("Launching version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG2 );
     if( ProcessUtils::startProcessDetached(
             binPath,
-            task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts),
+            arguments,
             QString(),
             environment) )
     {
@@ -465,11 +477,18 @@ bool ApplauncherProcess::isVersionInstalled(
 }
 
 bool ApplauncherProcess::cancelInstallation(
-    const std::shared_ptr<applauncher::api::CancelInstallationRequest>& /*request*/,
+    const std::shared_ptr<applauncher::api::CancelInstallationRequest>& request,
     applauncher::api::CancelInstallationResponse* const response )
 {
-    //TODO/IMPL cancelling by id request->installationID
-    response->result = applauncher::api::ResultType::otherError;
+    auto it = m_activeInstallations.find(request->installationID);
+    if (it == m_activeInstallations.end()) {
+        response->result = applauncher::api::ResultType::otherError;
+        return true;
+    }
+
+    it->second->cancel();
+
+    response->result = applauncher::api::ResultType::ok;
     return true;
 }
 
@@ -518,7 +537,6 @@ void ApplauncherProcess::onInstallationDone( InstallationProcess* installationPr
     if( installationProcess->getStatus() == applauncher::api::InstallationStatus::success )
     {
         m_installationManager->updateInstalledVersionsInformation();
-        m_installationManager->createLatestVersionGhostForVersion(installationProcess->getVersion());
         if( installationProcess->autoStartNeeded() )
         {
             applauncher::api::Response response;

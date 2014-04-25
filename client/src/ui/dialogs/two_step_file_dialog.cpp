@@ -64,12 +64,11 @@ namespace {
 
 }
 
-QnTwoStepFileDialog::QnTwoStepFileDialog(QWidget *parent, const QString &caption, const QString &initialFile, const QString &filter, const QStringList& extensions) :
+QnTwoStepFileDialog::QnTwoStepFileDialog(QWidget *parent, const QString &caption, const QString &initialFile, const QString &filter) :
     base_type(parent),
     ui(new Ui::QnTwoStepFileDialog),
     m_mode(QFileDialog::AnyFile),
-    m_filter(filter),
-    m_extensions(extensions)
+    m_filter(filter)
 {
     ui->setupUi(this);
     setWindowTitle(caption);
@@ -107,15 +106,21 @@ void QnTwoStepFileDialog::setAcceptMode(QFileDialog::AcceptMode mode) {
 }
 
 QString QnTwoStepFileDialog::selectedFile() const {
-
     QString fileName;
+
     switch (m_mode) {
     case QFileDialog::AnyFile: {
+        if (ui->fileNameLineEdit->text().isEmpty())
+            return QString();
+
         QFileInfo info(QDir(ui->directoryLabel->text()), ui->fileNameLineEdit->text());
         fileName = info.absoluteFilePath();
         break;
     }
     case QFileDialog::ExistingFile: {
+        if (ui->existingFileLabel->text().isEmpty())
+            return QString();
+
         fileName = ui->existingFileLabel->text();
         break;
     }
@@ -141,6 +146,11 @@ QString QnTwoStepFileDialog::selectedNameFilter() const {
     }
     Q_ASSERT(false);
     return QString();
+}
+
+int QnTwoStepFileDialog::exec() {
+    ui->optionsGroupBox->setVisible(!ui->optionsLayout->isEmpty());
+    return base_type::exec();
 }
 
 bool QnTwoStepFileDialog::event(QEvent *event) {
@@ -189,7 +199,6 @@ void QnTwoStepFileDialog::at_browseFileButton_clicked() {
                                                     tr("Select file..."),
                                                     ui->existingFileLabel->text(),
                                                     m_filter,
-                                                    m_extensions,
                                                     &m_selectedExistingFilter,
                                                     fileDialogOptions());
     if (fileName.isEmpty()) {

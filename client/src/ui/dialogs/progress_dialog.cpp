@@ -44,7 +44,6 @@
 #include "qshortcut.h"
 #include "qpainter.h"
 #include "qdrawutil.h"
-#include "qlabel.h"
 #include "qprogressbar.h"
 #include "qapplication.h"
 #include "qstyle.h"
@@ -64,12 +63,16 @@
 #include <QtGui/qdesktopwidget.h>
 #endif
 
+#include <ui/widgets/elided_label.h>
+
 
 // If the operation is expected to take this long (as predicted by
 // progress time), show the progress dialog.
 static const int defaultShowTime = 4000;
 // Wait at least this long before attempting to make a prediction.
 static const int minWaitTime = 50;
+// Maximum width of the label when auto-size is disabled.
+static const int maxLabelFixedWidth = 400;
 
 class QnProgressDialogPrivate
 {
@@ -137,7 +140,8 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
     autoReset = true;
     forceHide = false;
     
-    label = new QLabel(labelText, q);
+    label = new QnElidedLabel(q);
+    label->setText(labelText);
     int align = q->style()->styleHint(QStyle::SH_ProgressDialog_TextLabelAlignment, 0, q);
     label->setAlignment(Qt::Alignment(align));
 
@@ -810,6 +814,16 @@ void QnProgressDialog::open(QObject *receiver, const char *member)
     d->receiverToDisconnectOnClose = receiver;
     d->memberToDisconnectOnClose = member;
     base_type::open();
+}
+
+void QnProgressDialog::setAutoSize(bool autoSize)
+{
+    Q_D(QnProgressDialog);
+
+    if (QnElidedLabel *label = qobject_cast<QnElidedLabel*>(d->label))
+        label->setElideMode(autoSize ? Qt::ElideNone : Qt::ElideMiddle);
+
+    d->label->setFixedWidth(autoSize ? -1 : qMax(d->label->sizeHint().width(), maxLabelFixedWidth));
 }
 
 void QnProgressDialog::_q_disconnectOnClose() {

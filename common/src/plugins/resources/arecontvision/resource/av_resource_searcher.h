@@ -7,12 +7,11 @@
 
 class QnPlArecontResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
-    QnPlArecontResourceSearcher();
 
 public:
-    static QnPlArecontResourceSearcher& instance();
+    QnPlArecontResourceSearcher();
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
 
     // returns all available devices
     virtual QnResourceList findResources();

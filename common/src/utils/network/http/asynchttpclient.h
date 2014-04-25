@@ -73,12 +73,21 @@ namespace nx_http
         State state() const;
         //!Returns true, if \a AsyncHttpClient::state() == \a AsyncHttpClient::sFailed
         bool failed() const;
-        //!Start request to \a url
+        //!Start GET request to \a url
         /*!
             \return true, if socket is created and async connect is started. false otherwise
             To get error description use SystemError::getLastOSErrorCode()
         */
         bool doGet( const QUrl& url );
+        //!Start POST request to \a url
+        /*!
+            \todo Infinite POST message body support
+            \return true, if socket is created and async connect is started. false otherwise
+        */
+        bool doPost(
+            const QUrl& url,
+            const nx_http::StringType& contentType,
+            const nx_http::StringType& messageBody );
         /*!
             Response is valid only after signal \a responseReceived() has been emitted
             \return Can be NULL if no response has been received yet
@@ -102,6 +111,9 @@ namespace nx_http
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
 
+        QSharedPointer<AbstractStreamSocket> takeSocket();
+
+        void addRequestHeader(const StringType& key, const StringType& value);
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
         //!Emitted when response headers has been read
@@ -140,18 +152,18 @@ namespace nx_http
         QString m_userName;
         QString m_userPassword;
         bool m_authorizationTried;
-        std::map<BufferType, BufferType> m_customHeaders;
         bool m_terminated;
         mutable QMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
 
-        bool doGetPrivate( const QUrl& url );
+        void resetDataBeforeNewRequest();
+        bool initiateHttpMessageDelivery( const QUrl& url );
         /*!
             \return Number of bytes, read from socket. -1 in case of read error
         */
         int readAndParseHttp();
-        void composeRequest();
+        void composeRequest( const nx_http::StringType& httpMethod );
         void serializeRequest();
         //!Sends request through \a m_socket
         /*!

@@ -36,17 +36,17 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
     if (!result) {
         switch(action->actionType())
         {
-        case BusinessActionType::Bookmark:
+        case QnBusiness::BookmarkAction:
             // TODO: implement me
             break;
-        case BusinessActionType::CameraOutput:
-        case BusinessActionType::CameraOutputInstant:
+        case QnBusiness::CameraOutputAction:
+        case QnBusiness::CameraOutputOnceAction:
             result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
             break;
-        case BusinessActionType::CameraRecording:
+        case QnBusiness::CameraRecordingAction:
             result = executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
             break;
-        case BusinessActionType::PanicRecording:
+        case QnBusiness::PanicRecordingAction:
             result = executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
             break;
         default:
@@ -62,17 +62,17 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr action)
 {
-    QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceByGuid(serverGuid()));
+    QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
     if (!mediaServer)
         return false;
-    if (mediaServer->getPanicMode() == QnMediaServerResource::PM_User)
+    if (mediaServer->getPanicMode() == Qn::PM_User)
         return true; // ignore panic business action if panic mode turn on by user
-
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    QnMediaServerResource::PanicMode val = QnMediaServerResource::PM_None;
+    
+    Qn::PanicMode val = Qn::PM_None;
     if (action->getToggleState() == Qn::OnState)
-        val =  QnMediaServerResource::PM_BusinessEvents;
-    conn->setPanicMode(val);
+        val =  Qn::PM_BusinessEvents;
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    conn->setPanicModeSync(val);
     mediaServer->setPanicMode(val);
     return true;
 }
@@ -97,7 +97,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessA
 
 QString QnMServerBusinessRuleProcessor::getGuid() const
 {
-    return serverGuid();
+    return serverGuid().toString();
 }
 
 bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, QnResourcePtr resource )
@@ -111,7 +111,7 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
     if( !securityCam )
     {
         cl_log.log( lit("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
-            arg(resource->getId()), cl_logWARNING );
+            arg(resource->getId().toString()), cl_logWARNING );
         return false;
     }
     QString relayOutputId = action->getRelayOutputId();
@@ -121,7 +121,7 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
     //    return false;
     //}
 
-    bool instant = action->actionType() == BusinessActionType::CameraOutputInstant;
+    bool instant = action->actionType() == QnBusiness::CameraOutputOnceAction;
 
     int autoResetTimeout = instant
             ? 30*1000
@@ -142,7 +142,7 @@ QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventP
     QImage result;
 
     // By now only motion screenshot is supported
-    if (params.getEventType() != BusinessEventType::Camera_Motion)
+    if (params.getEventType() != QnBusiness::CameraMotionEvent)
         return result;
 
     QnVirtualCameraResourcePtr res = qSharedPointerDynamicCast<QnVirtualCameraResource> (QnResourcePool::instance()->getResourceById(params.getEventResourceId()));

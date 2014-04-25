@@ -23,6 +23,8 @@
 #       include <shlwapi.h>
 #       include <Strsafe.h>
 #   endif
+#else
+#    include <arpa/inet.h>
 #endif
 
 
@@ -127,5 +129,6 @@ extern "C" {
 #include <QtGui/QResizeEvent>
 #include <QFileSystemWatcher>
 #include <QtCore/QUrlQuery>
+#include <QtCore/QUuid>
 
 #endif

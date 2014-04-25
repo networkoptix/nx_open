@@ -269,11 +269,11 @@ protected:
 
     void beforeMethodInvocation();
 
+    int m_timeDrift;
 private:
     QString m_login;
     QString m_passwd;
     bool invoked;
-    int m_timeDrift;
 
     SoapWrapper();
     SoapWrapper(const SoapWrapper<T>&);
@@ -320,6 +320,7 @@ public:
 private:
     DeviceSoapWrapper();
     DeviceSoapWrapper(const DeviceSoapWrapper&);
+    void calcTimeDrift();
 };
 
 class DeviceIOWrapper

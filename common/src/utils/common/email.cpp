@@ -32,7 +32,7 @@ namespace {
     const QLatin1String nameSsl("EMAIL_USE_SSL");
     const QLatin1String nameSimple("EMAIL_SIMPLE");
     const QLatin1String nameTimeout("EMAIL_TIMEOUT");
-    const QLatin1String nameSignature("EMAIL_SIGNATURE");
+    const QLatin1String nameSignature("systemName");
     const int TIMEOUT = 20; //seconds
 
     static QnSmtpPresets smtpServerPresetPresets;
@@ -138,18 +138,27 @@ QnEmail::Settings::Settings(const QnKvPairList &values):
 QnEmail::Settings::~Settings() {
 }
 
+bool QnEmail::Settings::isNull() const {
+    return server.isEmpty();
+}
+
+bool QnEmail::Settings::isValid() const {
+    return !server.isEmpty() && !user.isEmpty() && !password.isEmpty();
+}
+
 QnKvPairList QnEmail::Settings::serialized() const {
     QnKvPairList result;
 
     bool useTls = connectionType == QnEmail::Tls;
     bool useSsl = connectionType == QnEmail::Ssl;
+    bool valid = isValid();
 
     result
     << QnKvPair(nameHost, server)
     << QnKvPair(namePort, port == 0 ? defaultPort(connectionType) : port)
     << QnKvPair(nameUser, user)
     << QnKvPair(nameFrom, user)
-    << QnKvPair(namePassword, password)
+    << QnKvPair(namePassword, valid ? password : QString())
     << QnKvPair(nameTls, useTls)
     << QnKvPair(nameSsl, useSsl)
     << QnKvPair(nameSimple, simple)

@@ -1,6 +1,9 @@
 #include "camera_management_widget.h"
 #include "ui_camera_management_widget.h"
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 #include <api/global_settings.h>
 
 QnCameraManagementWidget::QnCameraManagementWidget(QWidget *parent):
@@ -8,6 +11,8 @@ QnCameraManagementWidget::QnCameraManagementWidget(QWidget *parent):
     ui(new Ui::CameraManagementWidget)
 {
     ui->setupUi(this);
+
+    setHelpTopic(ui->autoDiscoveryCheckBox, Qn::SystemSettings_Server_CameraAutoDiscovery_Help);
 
     connect(ui->autoDiscoveryCheckBox,    SIGNAL(clicked()),                      this,   SLOT(at_autoDiscoveryCheckBox_clicked()));
 }

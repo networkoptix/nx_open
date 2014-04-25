@@ -12,6 +12,9 @@ typedef QSharedPointer<QnPtzMapper> QnPtzMapperPtr;
 class QnAbstractPtzController;
 typedef QSharedPointer<QnAbstractPtzController> QnPtzControllerPtr;
 
+class QnProxyPtzController;
+typedef QSharedPointer<QnProxyPtzController> QnProxyPtzControllerPtr;
+
 struct QnPtzPreset;
 typedef QList<QnPtzPreset> QnPtzPresetList;
 

@@ -68,7 +68,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     auth.setUser(QLatin1String("admin"));
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
         return;
 
 
@@ -131,7 +131,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     }
 }
 
-QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -153,8 +153,8 @@ QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, c
     result = QnVirtualCameraResourcePtr( new QnPlVmax480Resource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Vmax480 resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create Vmax480 resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 
@@ -350,7 +350,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
     QString baseName = QString(QLatin1String("DW-VF")) + QString::number(channels);
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), baseName);
-    if (!rt.isValid())
+    if (rt.isNull())
         return result;
 
     QString groupId = QString(QLatin1String("VMAX480_uuid_%1:%2")).arg(url.host()).arg(apiPort);
@@ -390,7 +390,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
 
 QString QnPlVmax480ResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlVmax480Resource::MANUFACTURE);
+    return QnPlVmax480Resource::MANUFACTURE;
 }
 
 #endif // #ifdef ENABLE_VMAX

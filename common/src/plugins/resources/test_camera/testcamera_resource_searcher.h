@@ -12,19 +12,18 @@ class QnTestCameraResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
     Q_DECLARE_TR_FUNCTIONS(QnTestCameraResourceSearcher)
 public:
-    static QnTestCameraResourceSearcher& instance();
+    QnTestCameraResourceSearcher();
+    virtual ~QnTestCameraResourceSearcher();
 
     QnResourceList findResources(void);
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
     // return the manufacture of the server
     virtual QString manufacture() const;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
 private:
-    QnTestCameraResourceSearcher();
-    virtual ~QnTestCameraResourceSearcher();
 
     void sendBroadcast();
     bool updateSocketList();

@@ -8,6 +8,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx_ec/dummy_handler.h>
+
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
@@ -42,8 +44,8 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     connect(action(Qn::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
 }
 
-QnAppServerConnectionPtr QnWorkbenchLayoutsHandler::connection() const {
-    return QnAppServerConnectionFactory::createConnection();
+ec2::AbstractECConnectionPtr QnWorkbenchLayoutsHandler::connection2() const {
+    return QnAppServerConnectionFactory::getConnection2();
 }
 
 void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName) {
@@ -177,7 +179,8 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     QnLayoutResourcePtr newLayout;
 
     newLayout = QnLayoutResourcePtr(new QnLayoutResource());
-    newLayout->setGuid(QUuid::createUuid().toString());
+    newLayout->setId(QUuid::createUuid());
+    newLayout->setTypeByName(lit("Layout"));
     newLayout->setName(name);
     newLayout->setParentId(user->getId());
     newLayout->setCellSpacing(layout->cellSpacing());
@@ -265,39 +268,41 @@ void QnWorkbenchLayoutsHandler::removeLayouts(const QnLayoutResourceList &layout
         if(snapshotManager()->isLocal(layout))
             resourcePool()->removeResource(layout); /* This one can be simply deleted from resource pool. */
         else
-            connection()->deleteAsync(layout, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
+            connection2()->getLayoutManager()->remove( layout->getId(), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
     }
 }
 
-bool QnWorkbenchLayoutsHandler::closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply) {
+bool QnWorkbenchLayoutsHandler::closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply, bool force) {
     QnLayoutResourceList resources;
     foreach(QnWorkbenchLayout *layout, layouts)
         resources.push_back(layout->resource());
 
-    return closeLayouts(resources, waitForReply);
+    return closeLayouts(resources, waitForReply, force);
 }
 
-bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, bool waitForReply) {
+bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, bool waitForReply, bool force) {
     if(resources.empty())
         return true;
 
     bool needToAsk = false;
     QnLayoutResourceList saveableResources, rollbackResources;
-    foreach(const QnLayoutResourcePtr &resource, resources) {
-        bool changed, saveable;
+    if (!force) {
+        foreach(const QnLayoutResourcePtr &resource, resources) {
+            bool changed, saveable;
 
-        Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
-        changed = flags & Qn::ResourceIsChanged;
-        saveable = accessController()->permissions(resource) & Qn::SavePermission;
+            Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
+            changed = flags & Qn::ResourceIsChanged;
+            saveable = accessController()->permissions(resource) & Qn::SavePermission;
 
-        if(changed && saveable)
-            needToAsk = true;
+            if(changed && saveable)
+                needToAsk = true;
 
-        if(changed) {
-            if(saveable) {
-                saveableResources.push_back(resource);
-            } else {
-                rollbackResources.push_back(resource);
+            if(changed) {
+                if(saveable) {
+                    saveableResources.push_back(resource);
+                } else {
+                    rollbackResources.push_back(resource);
+                }
             }
         }
     }
@@ -409,8 +414,8 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
     }
 }
 
-bool QnWorkbenchLayoutsHandler::closeAllLayouts(bool waitForReply) {
-    return closeLayouts(resourcePool()->getResources().filtered<QnLayoutResource>(), waitForReply);
+bool QnWorkbenchLayoutsHandler::closeAllLayouts(bool waitForReply, bool force) {
+    return closeLayouts(resourcePool()->getResources().filtered<QnLayoutResource>(), waitForReply, force);
 }
 
 // -------------------------------------------------------------------------- //
@@ -464,7 +469,8 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered() {
     } while (button != QMessageBox::Yes);
 
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    layout->setGuid(QUuid::createUuid().toString());
+    layout->setId(QUuid::createUuid());
+    layout->setTypeByName(lit("Layout"));
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
     layout->setUserCanEdit(context()->user() == user);

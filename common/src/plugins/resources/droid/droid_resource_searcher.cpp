@@ -14,12 +14,6 @@ QnPlDroidResourceSearcher::QnPlDroidResourceSearcher()
     m_lastReadSocketTime = 0;
 }
 
-QnPlDroidResourceSearcher& QnPlDroidResourceSearcher::instance()
-{
-    static QnPlDroidResourceSearcher inst;
-    return inst;
-}
-
 QnResourceList QnPlDroidResourceSearcher::findResources(void)
 {
 
@@ -87,7 +81,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
             QnDroidResourcePtr resource ( new QnDroidResource() );
 
             QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("DroidLive"));
-            if (!rt.isValid())
+            if (rt.isNull())
                 continue;
 
             resource->setTypeId(rt);
@@ -109,7 +103,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
     return resList;
 }
 
-QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -128,7 +122,7 @@ QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, con
         return result;
     }
 
-    if (!parameters.value(QLatin1String("url")).contains(QLatin1String("raw://")))
+    if (!params.url.contains(QLatin1String("raw://")))
     {
         return result; // it is not a new droid resource
     }
@@ -137,8 +131,8 @@ QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, con
     result = QnVirtualCameraResourcePtr( new QnDroidResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Droid camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create Droid camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 
@@ -146,7 +140,7 @@ QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, con
 
 QString QnPlDroidResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnDroidResource::MANUFACTURE);
+    return QnDroidResource::MANUFACTURE;
 }
 
 QList<QnResourcePtr> QnPlDroidResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
