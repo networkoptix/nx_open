@@ -39,7 +39,7 @@ QnAuthHelper* QnAuthHelper::instance()
     return m_instance;
 }
 
-bool QnAuthHelper::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response) {
+bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response) {
     QString cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
     int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
     if (customAuthInfoPos >= 0) {
