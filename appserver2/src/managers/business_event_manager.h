@@ -4,6 +4,8 @@
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include "nx_ec/data/api_business_rule_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
+#include "business/business_event_rule.h"
 
 namespace ec2
 {
@@ -27,7 +29,8 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran )
         {
             assert( tran.command == ApiCommand::broadcastBusinessAction );
-            QnAbstractBusinessActionPtr businessAction = tran.params.toResource( m_resCtx.pool );
+            QnAbstractBusinessActionPtr businessAction;
+            fromApiToResource(tran.params, businessAction, m_resCtx.pool);
             emit gotBroadcastAction( businessAction );
         }
 
@@ -41,14 +44,16 @@ namespace ec2
         {
             assert( tran.command == ApiCommand::saveBusinessRule);
             QnBusinessEventRulePtr businessRule( new QnBusinessEventRule() );
-            tran.params.toResource( businessRule, m_resCtx.pool );
+            fromApiToResource(tran.params, businessRule, m_resCtx.pool);
             emit addedOrUpdated( businessRule );
         }
 
         void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran )
         {
             assert( tran.command == ApiCommand::resetBusinessRules);
-            emit businessRuleReset( tran.params.defaultRules.toResourceList(m_resCtx.pool) );
+            QnBusinessEventRuleList rules;
+            fromApiToResourceList(tran.params.defaultRules, rules, m_resCtx.pool);
+            emit businessRuleReset( rules );
         }
         
 

@@ -27,13 +27,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiVideowallList& videowalls) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiVideowallDataList& videowalls) {
             QnVideoWallResourceList outData;
             if( errorCode == ErrorCode::ok )
-                videowalls.toResourceList(outData);
+                fromApiToResourceList(videowalls, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiVideowallList, decltype(queryDoneHandler)> ( ApiCommand::getVideowallList, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowallList, nullptr, queryDoneHandler);
         return reqID;
     }
 

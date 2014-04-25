@@ -24,6 +24,7 @@
 
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_videowall_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 namespace ec2
@@ -162,7 +163,7 @@ namespace ec2
 
         void triggerNotification( const QnTransaction<ApiFullInfoData>& tran ) {
             QnFullResourceData fullResData;
-            tran.params.toResourceList( fullResData, m_resCtx );
+            fromApiToResourceList(tran.params, fullResData, m_resCtx);
             emit initNotification(fullResData);
         }
 
@@ -178,7 +179,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiResourceParamDataList>& tran ) {
             if( tran.command == ApiCommand::saveSettings ) {
                 QnKvPairList newSettings;
-                tran.params.toResourceList(newSettings);
+                fromApiToResourceList(tran.params, newSettings);
                 emit settingsChanged(newSettings);
             }
         }

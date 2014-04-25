@@ -6,6 +6,7 @@
 #include "license_manager_impl.h"
 #include "llutil/hardware_id.h"
 #include "version.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 static const char TEST_LICENSE_NX[] = 
@@ -44,7 +45,7 @@ namespace ec2
 
     bool LicenseManagerImpl::validateLicense(const ApiLicenseData& license) const {
         QnLicense qlicense;
-        license.toResource(qlicense);
+        fromApiToResource(license, qlicense);
 
         return qlicense.isValid(m_hardwareIds, m_brand);
     }

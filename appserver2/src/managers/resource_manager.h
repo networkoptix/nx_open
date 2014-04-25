@@ -6,6 +6,7 @@
 #include "nx_ec/data/api_resource_data.h"
 #include "transaction/transaction.h"
 #include <core/resource_management/resource_pool.h>
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 namespace ec2

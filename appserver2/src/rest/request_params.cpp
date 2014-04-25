@@ -5,10 +5,21 @@
 
 #include "request_params.h"
 
+#include <QtCore/QUrlQuery>
 
 namespace ec2
 {
-    static const QString ID_PARAM_NAME( QLatin1String("id") );
+    static const QString ID_PARAM_NAME( lit("id") );
+    static const QString FOLDER_NAME_PARAM_NAME( lit("folder") );
+
+    void parseHttpRequestParams( const QnRequestParamList& params, ApiStoredFilePath* path )
+    {
+        for (int i = 0; i < params.size(); ++i)
+        {
+            if (params[i].first == lit("folder"))
+                *path = params[i].second;
+        }
+    }
 
     void parseHttpRequestParams( const QnRequestParamList& params, QnId* id)
     {

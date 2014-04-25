@@ -190,7 +190,7 @@ void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, cons
 }
 
 void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst) {
-    //fromApiToResource(*this, dst); // TODO: #Elric #EC2
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst);
 
     dst->setScheduleDisabled(src.scheduleDisabled);
     dst->setMotionType(src.motionType);
@@ -230,7 +230,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
 
 
 void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst) {
-    //fromResourceToApi(resource, *this); // TODO: #Elric
+    fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
     dst.scheduleDisabled = src->isScheduleDisabled();
     dst.motionType = src->getMotionType();
@@ -406,7 +406,7 @@ void fromResourceToApi(const QnLayoutItemData &src, ApiLayoutItemData &dst) {
 }
 
 void fromApiToResource(const ApiLayoutData &src, QnLayoutResourcePtr &dst) {
-    //fromApiToResource((const ApiResourceData &)src, dst); // TODO: #Elric #EC2
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst);
 
     dst->setCellAspectRatio(src.cellAspectRatio);
     dst->setCellSpacing(src.cellSpacingWidth, src.cellSpacingHeight);
@@ -425,7 +425,7 @@ void fromApiToResource(const ApiLayoutData &src, QnLayoutResourcePtr &dst) {
 }
 
 void fromResourceToApi(const QnLayoutResourcePtr &src, ApiLayoutData &dst) {
-    //fromResourceToApi(resource, (ApiResourceData &)data); // TODO: #Elric #EC2
+    fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
     dst.cellAspectRatio = src->cellAspectRatio();
     dst.cellSpacingWidth = src->cellSpacing().width();
@@ -465,6 +465,13 @@ void fromApiToResourceList(const ApiLayoutDataList &src, QnLayoutResourceList &d
     fromApiToResourceList(src, dst, overload_tag());
 }
 
+void fromResourceListToApi(const QnResourceList &src, ApiLayoutDataList &dst) {
+    dst.reserve(dst.size() + src.size());
+    foreach(const QnBusinessEventRulePtr &rule, src) {
+        dst.push_back(QnLayoutResourcePtr(new QnLayoutResource()));
+        fromResourceToApi(rule, dst.back());
+    }
+}
 
 void fromResourceToApi(const QnLicense &src, ApiLicenseData &dst) {
     dst.key = src.key();
@@ -495,36 +502,33 @@ void fromApiToResourceList(const ApiLicenseDataList &src, QnLicenseList &dst) {
 }
 
 
-static void deserializeNetAddrList(QList<QHostAddress>& netAddrList, const QString& netAddrListString)
-{
+static void deserializeNetAddrList(QList<QHostAddress>& netAddrList, const QString& netAddrListString) {
     QStringList addListStrings = netAddrListString.split(QLatin1Char(';'));
     std::transform(addListStrings.begin(), addListStrings.end(), std::back_inserter(netAddrList), [](const QString &address) { return QHostAddress(address); });
 }
 
-static QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
-{
+static QString serializeNetAddrList(const QList<QHostAddress>& netAddrList) {
     QStringList addListStrings;
     std::transform(netAddrList.begin(), netAddrList.end(), std::back_inserter(addListStrings), std::mem_fun_ref(&QHostAddress::toString));
     return addListStrings.join(QLatin1String(";"));
 }
 
-void fromResourceToApi(const QnAbstractStorageResourcePtr &src, ApiStorageData &dst)
-{
-    //fromResourceToApi(src, (ApiResourceData &)dst); // TODO: #Elric #EC2
+void fromResourceToApi(const QnAbstractStorageResourcePtr &src, ApiStorageData &dst) {
+    fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
     dst.spaceLimit = src->getSpaceLimit();
     dst.usedForWriting = src->isUsedForWriting();
 }
 
 void fromApiToResource(const ApiStorageData &src, QnAbstractStorageResourcePtr &dst) {
-    //fromApiToResource((const ApiResourceData &)src, resource); // TODO: #Elric #EC2
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst);
 
     dst->setSpaceLimit(src.spaceLimit);
     dst->setUsedForWriting(src.usedForWriting);
 }
 
 void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &dst) {
-    // fromResourceToApi(src, (ApiResourceData &)dst);  // TODO: #Elric #EC2
+    fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
     dst.netAddrList = serializeNetAddrList(src->getNetAddrList());
     dst.apiUrl = src->getApiUrl();
@@ -543,7 +547,7 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
 }
 
 void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &dst, const ResourceContext &ctx) {
-    //fromApiToResource((const ApiResourceData &)data, resource); // TODO: #Elric #EC2
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst);
 
     QList<QHostAddress> resNetAddrList;
     deserializeNetAddrList(resNetAddrList, src.netAddrList);
@@ -591,8 +595,7 @@ void fromApiToResourceList(const ApiMediaServerDataList &src, QnMediaServerResou
 }
 
 
-void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst)
-{
+void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
     Q_ASSERT(!src->getId().isNull());
     Q_ASSERT(!src->getTypeId().isNull());
 
@@ -701,7 +704,7 @@ void fromApiToResourceList(const ApiResourceTypeDataList &src, QnResourceTypeLis
 
 
 void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
-    //fromApiToResource((const ApiResourceData &)src, dst); // TODO: #Elric #EC2
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst);
 
     dst->setAdmin(src.isAdmin);
     dst->setEmail(src.email);
@@ -711,29 +714,29 @@ void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
     dst->setDigest(src.digest);
 }
 
-void fromResourceToApi(const QnUserResourcePtr &resource, ApiUserData &data) {
-    //fromResourceToApi(resource, (ApiResourceData &)data); // TODO: #Elric #EC2
+void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
+    fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
-    QString password = resource->getPassword();
+    QString password = src->getPassword();
 
     if (!password.isEmpty()) {
         QByteArray salt = QByteArray::number(rand(), 16);
         QCryptographicHash md5(QCryptographicHash::Md5);
         md5.addData(salt);
         md5.addData(password.toUtf8());
-        data.hash = "md5$";
-        data.hash.append(salt);
-        data.hash.append("$");
-        data.hash.append(md5.result().toHex());
+        dst.hash = "md5$";
+        dst.hash.append(salt);
+        dst.hash.append("$");
+        dst.hash.append(md5.result().toHex());
 
         md5.reset();
-        md5.addData(QString(lit("%1:NetworkOptix:%2")).arg(resource->getName(), password).toLatin1());
-        data.digest = md5.result().toHex();
+        md5.addData(QString(lit("%1:NetworkOptix:%2")).arg(src->getName(), password).toLatin1());
+        dst.digest = md5.result().toHex();
     }
 
-    data.isAdmin = resource->isAdmin();
-    data.rights = resource->getPermissions();
-    data.email = resource->getEmail();
+    dst.isAdmin = src->isAdmin();
+    dst.rights = src->getPermissions();
+    dst.email = src->getEmail();
 }
 
 template<class List>
@@ -793,7 +796,7 @@ void fromResourceToApi(const QnVideoWallPcData::PcScreen &src, ApiVideowallScree
 }
 
 void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst) {
-    //fromApiToResource((const ApiResourceData &)data, resource); // TODO: #Elric #EC2
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst);
 
     dst->setAutorun(src.autorun);
     QnVideoWallItemList outItems;
@@ -816,7 +819,8 @@ void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst)
 }
 
 void fromResourceToApi(const QnVideoWallResourcePtr &src, ApiVideowallData &dst) {
-    //fromResourceToApi(src, (ApiResourceData &)dst); // TODO: #Elric #EC2
+    fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
+
     dst.autorun = src->isAutorun();
 
     const QnVideoWallItemMap& resourceItems = src->getItems();

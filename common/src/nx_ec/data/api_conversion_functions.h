@@ -41,6 +41,7 @@ namespace ec2 {
     void fromResourceToApi(const QnLayoutResourcePtr &src, ApiLayoutData &dst);
     void fromApiToResourceList(const ApiLayoutDataList &src, QnResourceList &dst);
     void fromApiToResourceList(const ApiLayoutDataList &src, QnLayoutResourceList &dst);
+    void fromResourceListToApi(const QnResourceList &src, ApiLayoutDataList &dst);
 
     void fromResourceToApi(const QnLicense &src, ApiLicenseData &dst);
     void fromApiToResource(const ApiLicenseData &src, QnLicense &dst);

@@ -60,13 +60,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-		auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraList& cameras) {
+		auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
 			QnVirtualCameraResourceList outData;
 			if( errorCode == ErrorCode::ok )
-				cameras.toResourceList(outData, m_resCtx.resFactory);
+                fromApiToResourceList(cameras, outData, m_resCtx.resFactory);
 			handler->done( reqID, errorCode, outData);
 		};
-		m_queryProcessor->template processQueryAsync<QnId, ApiCameraList, decltype(queryDoneHandler)>
+		m_queryProcessor->template processQueryAsync<QnId, ApiCameraDataList, decltype(queryDoneHandler)>
 			( ApiCommand::getCameras, mediaServerId, queryDoneHandler );
 		return reqID;
     }
@@ -76,13 +76,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraServerItemList& cameraHistory) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraServerItemDataList& cameraHistory) {
             QnCameraHistoryList outData;
             if( errorCode == ErrorCode::ok )
-                cameraHistory.toResourceList(outData);
+                fromApiToResourceList(cameraHistory, outData);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraServerItemList, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
             ApiCommand::getCameraHistoryList, nullptr, queryDoneHandler );
         return reqID;
     }
@@ -128,8 +128,8 @@ namespace ec2
         ApiCommand::Value command,
         const QnVirtualCameraResourcePtr& resource )
     {
-		QnTransaction<ApiCamera> tran(command, true);
-		tran.params.fromResource(resource);
+		QnTransaction<ApiCameraData> tran(command, true);
+        fromResourceToApi(resource, tran.params);
         return tran;
     }
 
@@ -138,8 +138,8 @@ namespace ec2
         ApiCommand::Value command,
         const QnVirtualCameraResourceList& cameras )
     {
-        QnTransaction<ApiCameraList> tran(command, true);
-        tran.params.fromResourceList(cameras);
+        QnTransaction<ApiCameraDataList> tran(command, true);
+        fromResourceListToApi(cameras, tran.params);
         return tran;
     }
 
@@ -148,8 +148,8 @@ namespace ec2
         ApiCommand::Value command,
         const QnCameraHistoryItem& historyItem )
     {
-        QnTransaction<ApiCameraServerItem> tran(command, true);
-        tran.params.fromResource(historyItem);
+        QnTransaction<ApiCameraServerItemData> tran(command, true);
+        fromResourceToApi(historyItem, tran.params);
         return tran;
     }
 

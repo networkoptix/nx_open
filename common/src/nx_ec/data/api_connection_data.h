@@ -9,11 +9,6 @@ namespace ec2
     struct LoginInfo: ApiData 
     {
     };
-
-    ///*inline void parseHttpRequestParams( const QnRequestParamList& /*params*/, ec2::LoginInfo* /*loginInfo*/ )
-    //{
-        //TODO/IMPL
-    //}*/
 }
 
 #endif  //EC2_CONNECTION_DATA_H

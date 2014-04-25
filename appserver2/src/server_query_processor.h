@@ -78,7 +78,7 @@ namespace ec2
         void processUpdateAsync(QnTransaction<ApiLicenseDataList>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::addLicenses);
-            return processMultiUpdateAsync<ApiLicenseList, ApiLicenseData>(tran, handler, ApiCommand::addLicense);
+            return processMultiUpdateAsync<ApiLicenseDataList, ApiLicenseData>(tran, handler, ApiCommand::addLicense);
         }
 
         template<class HandlerType>
@@ -104,7 +104,7 @@ namespace ec2
             if (multiTran.persistent)
                 dbManager->beginTran();
 
-            foreach(const SubDataType& data, multiTran.params.data)
+            foreach(const SubDataType& data, multiTran.params)
             {
                 QnTransaction<SubDataType> tran(command, multiTran.persistent);
                 tran.params = data;

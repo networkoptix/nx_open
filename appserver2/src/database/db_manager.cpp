@@ -1669,7 +1669,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourc
     ApiResourceParamsData params;
     ErrorCode rez = doQueryNoLock(m_adminUserID, params);
     if (rez == ErrorCode::ok)
-        data.data = params.params;
+        data = params.params;
     return rez;
 }
 
@@ -1700,7 +1700,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceP
     if (result != ErrorCode::ok)
         return result;
     */
-    return insertAddParams(tran.params.data, m_adminUserInternalID);
+    return insertAddParams(tran.params, m_adminUserInternalID);
 }
 
 

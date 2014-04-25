@@ -8,6 +8,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "nx_ec/ec_api.h"
 #include "common/common_module.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 namespace ec2
@@ -25,13 +26,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiResourceTypeDataListData& resTypeList ) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiResourceTypeDataList& resTypeList ) {
             QnResourceTypeList outResTypeList;
             if( errorCode == ErrorCode::ok )
-				fromApiToResourceTypeList(resTypeList, outResTypeList);
+				fromApiToResourceList(resTypeList, outResTypeList);
             handler->done( reqID, errorCode, outResTypeList );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiResourceTypeDataListData, decltype(queryDoneHandler)>
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiResourceTypeDataList, decltype(queryDoneHandler)>
             ( ApiCommand::getResourceTypes, nullptr, queryDoneHandler );
         return reqID;
     }
@@ -53,7 +54,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         
-        auto queryDoneHandler = [reqID, handler, resourceId]( ErrorCode errorCode, const ApiResourceParams& params) {
+        auto queryDoneHandler = [reqID, handler, resourceId]( ErrorCode errorCode, const ApiResourceParamsData& params) {
             QnKvPairListsById outData;
             outData.insert(resourceId, QnKvPairList());
             if( errorCode == ErrorCode::ok ) {
@@ -63,7 +64,7 @@ namespace ec2
             }
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<QnId, ApiResourceParams, decltype(queryDoneHandler)>
+        m_queryProcessor->template processQueryAsync<QnId, ApiResourceParamsData, decltype(queryDoneHandler)>
             ( ApiCommand::getResourceParams, resourceId, queryDoneHandler );
         return reqID;
     }
@@ -139,7 +140,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnId& id, const QnKvPairList& kvPairs)
     {
-        QnTransaction<ApiResourceParams> tran(command, true);
+        QnTransaction<ApiResourceParamsData> tran(command, true);
         tran.params.params.reserve(kvPairs.size());
         foreach(const QnKvPair& pair, kvPairs)
             tran.params.params.push_back(ApiResourceParamData(pair.name(), pair.value(), false));

@@ -5,6 +5,8 @@
 
 #include <utils/common/model_functions_fwd.h>
 
+class QString;
+
 namespace ec2 {
     struct ResourceContext;
     struct QnFullResourceData; // TODO: #Elric move these out?
@@ -27,6 +29,7 @@ namespace ec2 {
     struct ApiMediaServerData;
     struct ApiPanicModeData;
     struct ApiPropertyTypeData;
+    struct ApiResetBusinessRuleData;
     struct ApiResourceData;
     struct ApiResourceParamData;
     struct ApiResourceParamsData;
@@ -59,6 +62,10 @@ namespace ec2 {
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
 
+    typedef QString ApiStoredFilePath; // TODO: #Elric struct => extendable?
+    typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
+    struct LoginInfo;
+
 #define QN_EC2_API_DATA_CLASSES \
     (ApiBusinessActionData)\
     (ApiBusinessRuleData)\
@@ -75,6 +82,7 @@ namespace ec2 {
     (ApiMediaServerData)\
     (ApiPanicModeData)\
     (ApiPropertyTypeData)\
+    (ApiResetBusinessRuleData)\
     (ApiResourceData)\
     (ApiResourceParamData)\
     (ApiResourceParamsData)\

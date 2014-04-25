@@ -6,6 +6,7 @@
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include "nx_ec/data/api_user_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 namespace ec2

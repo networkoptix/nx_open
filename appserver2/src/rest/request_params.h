@@ -6,19 +6,17 @@
 #ifndef EC2_REST_REQUEST_PARAMS_H
 #define EC2_REST_REQUEST_PARAMS_H
 
-#include <algorithm>
-
-#include <QtCore/QUrlQuery>
-
-#include <core/resource/resource.h>
-#include <nx_ec/data/api_connection_data.h>
 #include <utils/common/id.h>
 #include <utils/common/request_param.h>
-#include "nx_ec/data/api_stored_file_data.h"
 
+#include <nx_ec/data/api_fwd.h>
+
+class QUrlQuery;
 
 namespace ec2
 {
+    void parseHttpRequestParams( const QnRequestParamList& params, ApiStoredFilePath* path);
+    void parseHttpRequestParams( const QnRequestParamList& params, LoginInfo* loginInfo);
     void parseHttpRequestParams( const QnRequestParamList& params, QnId* id);
     void parseHttpRequestParams( const QnRequestParamList& params, nullptr_t* );
     void toUrlParams( const std::nullptr_t& , QUrlQuery* const query);

@@ -8,6 +8,7 @@
 #include "nx_ec/data/api_data.h"
 #include "nx_ec/data/api_layout_data.h"
 #include "transaction/transaction.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 namespace ec2
@@ -41,7 +42,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran )
         {
             assert(tran.command == ApiCommand::saveLayouts );
-            foreach(const ApiLayoutData& layout, tran.params.data) 
+            foreach(const ApiLayoutData& layout, tran.params) 
             {
                 QnLayoutResourcePtr layoutResource(new QnLayoutResource());
                 fromApiToResource(layout, layoutResource);
