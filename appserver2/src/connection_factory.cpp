@@ -32,7 +32,7 @@ namespace ec2
         //registering ec2 types with Qt meta types system
         qRegisterMetaType<ErrorCode>( "ErrorCode" );
         qRegisterMetaType<AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
-        qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" );
+        qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" ); // TODO: #Elric #EC2 register in a proper place!
 
         ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
     }

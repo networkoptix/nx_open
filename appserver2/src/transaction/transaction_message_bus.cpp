@@ -45,7 +45,7 @@ QnTransactionMessageBus::QnTransactionMessageBus():
     m_thread = new QThread();
     m_thread->setObjectName("QnTransactionMessageBusThread");
     moveToThread(m_thread);
-    qRegisterMetaType<QnTransactionTransport::State>();
+    qRegisterMetaType<QnTransactionTransport::State>(); // TODO: #Elric #EC2 registration
     m_timer = new QTimer();
     connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
     m_timer->start(500);

@@ -16,7 +16,7 @@
 namespace ec2
 {
 
-static QnDbManager* globalInstance = 0;
+static QnDbManager* globalInstance = 0; // TODO: #Elric #EC2 use QnSingleton
 
 
 template <class MainData>
