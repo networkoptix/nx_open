@@ -42,20 +42,9 @@ namespace ec2
         QString manufacture;
         std::vector<QnId> parentId;
         std::vector<ApiPropertyTypeData> propertyTypeList;
-
-        //QN_DECLARE_STRUCT_SQL_BINDER();
     };
 #define ApiResourceTypeData_Fields (id)(name)(manufacture)(parentId)(propertyTypeList)
 
-    /*void fromApiToResource(const ApiPropertyTypeData &data, QnParamTypePtr& resource);
-
-	void fromResourceToApi(const QnResourceTypePtr& resource, ApiResourceTypeData &data);
-	void fromApiToResource(const ApiResourceTypeData &data, QnResourceTypePtr resource);*/
-
-    //QN_DEFINE_STRUCT_SQL_BINDER(ApiResourceTypeData, ApiResourceTypeFields);
-
-	//void loadResourceTypesFromQuery(ApiResourceTypeDataListData &data, QSqlQuery& query);
-	//void fromApiToResourceTypeList(const ApiResourceTypeDataListData &data, QnResourceTypeList& resTypeList);
 }
 
 #endif // __EC2_RESOURCE_TYPE_DATA_H_

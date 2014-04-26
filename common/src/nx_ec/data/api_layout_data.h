@@ -7,15 +7,6 @@
 
 namespace ec2
 {
-    /*void fromApiToResource(const ApiLayoutItemData& data, QnLayoutItemData& resource);
-    void fromResourceToApi(QnLayoutResourcePtr resource, ApiLayoutData& data);
-
-    void fromResourceToApi(const QnLayoutItemData& resource, ApiLayoutItemData& data);
-    void fromApiToResource(const ApiLayoutData& data, QnLayoutResourcePtr resource);*/
-
-
-    //QN_DEFINE_STRUCT_SQL_BINDER(ApiLayoutItemData, ApiLayoutItemFields);
-
 
     struct ApiLayoutItemData: ApiData {
         QByteArray uuid;
@@ -34,8 +25,6 @@ namespace ec2
         QByteArray zoomTargetUuid;
         QByteArray contrastParams;
         QByteArray dewarpingParams;
-
-        //QN_DECLARE_STRUCT_SQL_BINDER();
     };
 #define ApiLayoutItemData_Fields (uuid)(flags)(left)(top)(right)(bottom)(rotation)(resourceId)(resourcePath) \
                                     (zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetUuid)(contrastParams)(dewarpingParams)
@@ -59,31 +48,10 @@ namespace ec2
         qint32  backgroundHeight;
         float backgroundOpacity;
         qint32 userId;
-
-        //QN_DECLARE_STRUCT_SQL_BINDER();
     };
 #define ApiLayoutData_Fields ApiResourceData_Fields (cellAspectRatio)(cellSpacingWidth)(cellSpacingHeight)(items)(userCanEdit)(locked) \
                                 (backgroundImageFilename)(backgroundWidth)(backgroundHeight)(backgroundOpacity) (userId)
 
-
-
-
-    //QN_DEFINE_STRUCT_SQL_BINDER(ApiLayoutData, ApiLayoutFields);
-
-    /*struct ApiLayoutList: std::vector<ApiLayoutData>
-    {
-        void loadFromQuery(QSqlQuery& query);
-        template <class T> void toResourceList(QList<T>& outData) const;
-        template <class T> void fromResourceList(const QList<T>& srcData)
-        {
-            data.reserve( srcData.size() );
-            for( const T& layoutRes: srcData )
-            {
-                data.push_back( ApiLayoutData() );
-                fromResourceToApi(layoutRes, data.back());
-            }
-        }
-    };*/
 }
 
 #endif  //EC2_LAYOUT_DATA_H

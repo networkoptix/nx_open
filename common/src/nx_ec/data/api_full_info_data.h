@@ -21,13 +21,6 @@ namespace ec2
     };
 #define ApiFullInfoData_Fields (resTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(serverInfo)
 
-
-/*
-    struct ApiFullInfo: public ApiFullInfoData
-    {
-        void toResourceList(QnFullResourceData&, const ResourceContext&) const;
-    };
-*/
 } // namespace ec2
 
 #endif // __EC2_FULL_DATA_H_

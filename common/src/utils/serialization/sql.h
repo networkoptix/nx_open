@@ -39,6 +39,11 @@ namespace QnSqlDetail {
         deserialize_field(adl_wrap(value), target);
     }
 
+    struct TrueChecker {
+        template<class T>
+        bool operator()(const T &) const { return true; }
+    };
+
 } // namespace QnSqlDetail
 
 
@@ -60,6 +65,26 @@ namespace QnSql {
         assert(target);
 
         QnSqlDetail::fetch_internal(mapping, value, target);
+    }
+
+    template<class List, class Predicate>
+    void fetch_many_if(QSqlQuery &query, List *target, const Predicate &predicate) {
+        typedef typename List::value_type value_type;
+
+        QSqlRecord record = query.record();
+        QnSqlIndexMapping mapping = QnSql::mapping<value_type>(query);
+        
+        while(query.next()) {
+            target->push_back(value_type());
+            QnSql::fetch(mapping, record, &target->back());
+            if(!predicate(target->back()))
+                target->pop_back();
+        }
+    }
+
+    template<class List>
+    void fetch_many(QSqlQuery &query, List *target) {
+        fetch_many_if(query, target, QnSqlDetail::TrueChecker());
     }
 
     template<class T>

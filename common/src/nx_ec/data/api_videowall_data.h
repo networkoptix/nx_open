@@ -16,8 +16,6 @@ namespace ec2
         int y;
         int w;
         int h;
-
-        //QN_DECLARE_STRUCT_SQL_BINDER();
     };
 #define ApiVideowallItemData_Fields (guid)(pc_guid)(layout_guid)(name)(x)(y)(w)(h)
 
@@ -33,8 +31,6 @@ namespace ec2
         int layout_y;
         int layout_w;
         int layout_h;
-
-        //QN_DECLARE_STRUCT_SQL_BINDER();
     };
 #define ApiVideowallScreenData_Fields (pc_guid)(pc_index)(desktop_x)(desktop_y)(desktop_w)(desktop_h)(layout_x)(layout_y)(layout_w)(layout_h)
 
@@ -47,8 +43,6 @@ namespace ec2
 
         std::vector<ApiVideowallItemData> items;
         std::vector<ApiVideowallScreenData> screens;
-
-        //QN_DECLARE_STRUCT_SQL_BINDER();
     };
 #define ApiVideowallData_Fields ApiResourceData_Fields (autorun)(items)(screens)
 
@@ -61,10 +55,6 @@ namespace ec2
     };
 #define ApiVideowallControlMessageData_Fields (operation)(videowall_guid)(instance_guid)(params)
 
-    /*void fromApiToItem(const ApiVideowallItemData &data, QnVideoWallItem& item);
-    void fromItemToApi(const QnVideoWallItem& item, ApiVideowallItemData &data);*/
-
-    //QN_DEFINE_STRUCT_SQL_BINDER (ApiVideowallItemData, ApiVideowallItemDataFields)
 
     struct ApiVideowallItemWithRefData: public ApiVideowallItemData {
         QnId videowall_guid;
@@ -76,27 +66,6 @@ namespace ec2
         QnId videowall_guid;
     };
 #define ApiVideowallScreenWithRefData_Fields ApiVideowallScreenData_Fields (videowall_guid)
-
-
-    /*void fromApiToScreen(const ApiVideowallScreenData &data, QnVideoWallPcData::PcScreen& screen);
-    void fromScreenToApi(const QnVideoWallPcData::PcScreen& screen, ApiVideowallScreenData& data);
-
-    //QN_DEFINE_STRUCT_SQL_BINDER (ApiVideowallScreenData, ApiVideowallScreenDataFields)
-
-
-    void fromApiToResource(const ApiVideowallData &data, QnVideoWallResourcePtr resource);
-    void fromResourceToApi(const QnVideoWallResourcePtr &resource, ApiVideowallData &data);
-
-    //QN_DEFINE_STRUCT_SQL_BINDER(ApiVideowallData, ApiVideowallDataFields)
-
-    struct ApiVideowallList: std::vector<ApiVideowallData>
-    {
-        void loadFromQuery(QSqlQuery& query);
-        template <class T> void toResourceList(QList<T>& outData) const;
-    };
-
-    void fromApiToMessage(const ApiVideowallControlMessageData &data, QnVideoWallControlMessage &message);
-    void fromMessageToApi(const QnVideoWallControlMessage &message, ApiVideowallControlMessageData &data);*/
 
 } // namespace ec2
 

@@ -60,36 +60,6 @@ namespace ec2
 #define ApiCameraData_Fields ApiResourceData_Fields (scheduleDisabled)(motionType)(region)(mac)(login)(password)(scheduleTask)(audioEnabled)(physicalId)(manuallyAdded)(model) \
                             (firmware)(groupId)(groupName)(secondaryQuality)(controlDisabled)(statusFlags)(dewarpingParams)(vendor)
 
-    /*struct ScheduleTask: ApiScheduleTaskData
-    {
-        static ScheduleTask fromResource(const QnResourcePtr& cameraRes, const QnScheduleTask& resScheduleTask);
-        QnScheduleTask toResource(const QnId& resourceId) const;
-
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
-
-    //QN_DEFINE_STRUCT_SQL_BINDER(ScheduleTask, apiScheduleTaskFields);
-
-    struct ApiCamera: ApiCameraData
-    {
-        void fromResource(const QnVirtualCameraResourcePtr& resource);
-        void toResource(QnVirtualCameraResourcePtr resource) const;
-
-        QN_DECLARE_STRUCT_SQL_BINDER();
-    };
-
-    //QN_DEFINE_STRUCT_SQL_BINDER(ApiCamera, apiCameraDataFields);
-
-    struct ApiCameraList: ApiCameraListData
-    {
-        void loadFromQuery(QSqlQuery& query);
-
-        template <class T> void toResourceList(QList<T>& outData, QnResourceFactory* factory) const;
-        void fromResourceList(const QList<QnVirtualCameraResourcePtr>& cameras);
-    };*/
 } // namespace ec2
-
-//QN_FUSION_DECLARE_FUNCTIONS(ApiScheduleTaskData, (binary))
-
 
 #endif // __API_CAMERA_DATA_H_

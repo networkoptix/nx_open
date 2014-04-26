@@ -13,8 +13,6 @@ namespace ec2
 
         qint64       spaceLimit;
         bool         usedForWriting;
-
-        ///QN_DECLARE_STRUCT_SQL_BINDER();
     };
 #define ApiStorageData_Fields ApiResourceData_Fields (spaceLimit)(usedForWriting)
 
@@ -33,8 +31,6 @@ namespace ec2
         std::vector<ApiStorageData> storages;
         int maxCameras;
         bool redundancy;
-
-        //QN_DECLARE_STRUCT_SQL_BINDER();
     };
 #define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(netAddrList)(flags)(panicMode)(streamingUrl)(version)(authKey)(storages)(maxCameras)(redundancy)
 

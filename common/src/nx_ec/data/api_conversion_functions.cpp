@@ -35,58 +35,6 @@ namespace ec2 {
 
 struct overload_tag {};
 
-#if 0
-    void loadResourceTypesFromQuery(ApiResourceTypeDataListData &data, QSqlQuery& query)
-    {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiResourceTypeData, data.data, (id) (name) (manufacture) );
-    }
-
-    void ApiBusinessRuleList::loadFromQuery(QSqlQuery& query)
-    {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiBusinessRule, data, ApiBusinessRuleFields)
-    }
-
-    void ApiCameraList::loadFromQuery(QSqlQuery& query)
-    {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiCamera, data, apiCameraDataFields ApiResourceFields)
-    }
-
-    void ApiCameraServerItemList::loadFromQuery(QSqlQuery& query) 
-    { 
-        QN_QUERY_TO_DATA_OBJECT(query, ApiCameraServerItem, data, ApiCameraServerItemFields) 
-    }
-
-    void ApiLayoutList::loadFromQuery(QSqlQuery& query)
-    {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiLayoutData, data, ApiLayoutFields ApiResourceFields)
-    }
-
-    void ApiStorageList::loadFromQuery(QSqlQuery& query)
-    {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiStorageData, data, ApiStorageFields ApiResourceFields)
-    }
-
-    void ApiMediaServerList::loadFromQuery(QSqlQuery& query)
-    {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiMediaServerData, data, medisServerDataFields ApiResourceFields)
-    }
-
-    void ApiResourceList::loadFromQuery(QSqlQuery& /*query*/)
-    {
-        //TODO/IMPL
-        assert( false );
-    }
-
-    void ApiUserList::loadFromQuery(QSqlQuery& query)
-    {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiUserData, data, ApiUserFields ApiResourceFields)
-    }
-
-    void ApiVideowallList::loadFromQuery(QSqlQuery& query) {
-        QN_QUERY_TO_DATA_OBJECT(query, ApiVideowallData, data, ApiVideowallDataFields ApiResourceFields)
-    }
-#endif
-
 void fromApiToResource(const ApiBusinessRuleData &src, QnBusinessEventRulePtr &dst, QnResourcePool *) {
     dst->setId(src.id);
     dst->setEventType(src.eventType);

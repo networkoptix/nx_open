@@ -17,20 +17,6 @@ namespace ec2
     };
 #define ApiLicenseData_Fields (key)(licenseBlock)
 
-/*    struct ApiLicense : ApiLicenseData
-    {
-    public:
-        void fromResource( const QnLicense& lic );
-        void toResource( QnLicense& license ) const;
-    };
-
-
-    struct ApiLicenseList : std::vector<ApiLicense>
-    {
-    public:
-        void fromResourceList( const QnLicenseList& licList );
-        void toResourceList( QnLicenseList& licenseList ) const;
-    };*/
 }
 
 #endif  //API_LICENSE_DATA_H
