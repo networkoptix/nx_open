@@ -85,8 +85,6 @@ struct overload_tag {};
     void ApiVideowallList::loadFromQuery(QSqlQuery& query) {
         QN_QUERY_TO_DATA_OBJECT(query, ApiVideowallData, data, ApiVideowallDataFields ApiResourceFields)
     }
-
-
 #endif
 
 void fromApiToResource(const ApiBusinessRuleData &src, QnBusinessEventRulePtr &dst, QnResourcePool *) {
