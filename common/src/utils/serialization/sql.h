@@ -30,13 +30,13 @@ namespace QnSqlDetail {
     }
 
     template<class T>
-    void serialize_field_internal(const T &value, const QString &name, QSqlQuery *target) {
-        serialize_field(value, name, target);
+    void serialize_field_internal(const T &value, QVariant *target) {
+        serialize_field(value, target);
     }
 
     template<class T>
-    void deserialize_field_internal(const QSqlRecord &value, int index, T *target) {
-        deserialize_field(adl_wrap(value), index, target);
+    void deserialize_field_internal(const QVariant &value, T *target) {
+        deserialize_field(adl_wrap(value), target);
     }
 
 } // namespace QnSqlDetail

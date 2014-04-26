@@ -10,7 +10,7 @@
 #include "managers/impl/license_manager_impl.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "utils/serialization/binary_stream.h"
-#include "utils/serialization/sql.h"
+#include "utils/serialization/sql_functions.h"
 
 
 namespace ec2

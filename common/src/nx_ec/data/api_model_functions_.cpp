@@ -26,20 +26,20 @@
 
 /* Some fields are not meant to be bound or fetched. */
 template<class T, class Allocator>
-inline void serialize_field(const std::vector<T, Allocator> &, const QString &, QSqlQuery *) { return; }
+inline void serialize_field(const std::vector<T, Allocator> &, QVariant *) { return; }
 template<class Key, class T, class Predicate, class Allocator>
-inline void serialize_field(const std::map<Key, T, Predicate, Allocator> &, const QString &, QSqlQuery *) { return; }
+inline void serialize_field(const std::map<Key, T, Predicate, Allocator> &, QVariant *) { return; }
 template<class T>
-inline void serialize_field(const QList<T> &, const QString &, QSqlQuery *) { return; }
-inline void serialize_field(const ec2::ApiServerInfoData &, const QString &, QSqlQuery *) { return; }
+inline void serialize_field(const QList<T> &, QVariant *) { return; }
+inline void serialize_field(const ec2::ApiServerInfoData &, QVariant *) { return; }
 
 template<class T, class Allocator>
-inline void deserialize_field(const QSqlRecord &, int, std::vector<T, Allocator> *) { return; }
+inline void deserialize_field(const QVariant &, std::vector<T, Allocator> *) { return; }
 template<class Key, class T, class Predicate, class Allocator>
-inline void deserialize_field(const QSqlRecord &, int, std::map<Key, T, Predicate, Allocator> *) { return; }
+inline void deserialize_field(const QVariant &, std::map<Key, T, Predicate, Allocator> *) { return; }
 template<class T>
-inline void deserialize_field(const QSqlRecord &, int, QList<T> *) { return; }
-inline void deserialize_field(const QSqlRecord &, int, ec2::ApiServerInfoData *) { return; }
+inline void deserialize_field(const QVariant &, QList<T> *) { return; }
+inline void deserialize_field(const QVariant &, ec2::ApiServerInfoData *) { return; }
 
 
 namespace ec2 {
