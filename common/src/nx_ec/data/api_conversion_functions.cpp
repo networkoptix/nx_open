@@ -138,7 +138,7 @@ void fromApiToResourceList(const ApiBusinessRuleDataList &src, QnBusinessEventRu
 
 void fromResourceListToApi(const QnBusinessEventRuleList &src, ApiBusinessRuleDataList &dst) {
     dst.reserve(dst.size() + src.size());
-    foreach(const QnBusinessEventRulePtr &rule, src) {
+    for(const QnBusinessEventRulePtr &rule: src) {
         dst.push_back(ApiBusinessRuleData());
         fromResourceToApi(rule, dst.back());
     }
@@ -188,7 +188,8 @@ void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, cons
 }
 
 void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst) {
-    fromApiToResource(static_cast<const ApiResourceData &>(src), dst);
+    QnResourcePtr tmp = dst;
+    fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 
     dst->setScheduleDisabled(src.scheduleDisabled);
     dst->setMotionType(src.motionType);
@@ -265,7 +266,7 @@ void fromApiToResourceList(const ApiCameraDataList &src, List &dst, QnResourceFa
     for(int i = 0; i < src.size(); ++i) {
         QnVirtualCameraResourcePtr camera = factory->createResource(src[i].typeId, QnResourceParams(src[i].url, src[i].vendor)).dynamicCast<QnVirtualCameraResource>();
         if (camera) {
-            fromApiToResource(src, camera);
+            fromApiToResource(src[i], camera);
             dst.push_back(camera);
         }
     }
@@ -404,7 +405,8 @@ void fromResourceToApi(const QnLayoutItemData &src, ApiLayoutItemData &dst) {
 }
 
 void fromApiToResource(const ApiLayoutData &src, QnLayoutResourcePtr &dst) {
-    fromApiToResource(static_cast<const ApiResourceData &>(src), dst);
+    QnResourcePtr tmp = dst;
+    fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 
     dst->setCellAspectRatio(src.cellAspectRatio);
     dst->setCellSpacing(src.cellSpacingWidth, src.cellSpacingHeight);
@@ -450,7 +452,7 @@ void fromApiToResourceList(const ApiLayoutDataList &src, List &dst, const overlo
     dst.reserve(dst.size() + src.size());
     for(int i = 0; i < src.size(); ++i) {
         QnLayoutResourcePtr layout(new QnLayoutResource());
-        fromApiToResource(data[i], layout);
+        fromApiToResource(src[i], layout);
         dst.push_back(layout);
     }
 }
@@ -463,21 +465,21 @@ void fromApiToResourceList(const ApiLayoutDataList &src, QnLayoutResourceList &d
     fromApiToResourceList(src, dst, overload_tag());
 }
 
-void fromResourceListToApi(const QnResourceList &src, ApiLayoutDataList &dst) {
+void fromResourceListToApi(const QnLayoutResourceList &src, ApiLayoutDataList &dst) {
     dst.reserve(dst.size() + src.size());
-    foreach(const QnBusinessEventRulePtr &rule, src) {
-        dst.push_back(QnLayoutResourcePtr(new QnLayoutResource()));
-        fromResourceToApi(rule, dst.back());
+    for(const QnLayoutResourcePtr &layout: src) {
+        dst.push_back(ApiLayoutData());
+        fromResourceToApi(layout, dst.back());
     }
 }
 
-void fromResourceToApi(const QnLicense &src, ApiLicenseData &dst) {
-    dst.key = src.key();
-    dst.licenseBlock = src.rawLicense();
+void fromResourceToApi(const QnLicensePtr &src, ApiLicenseData &dst) {
+    dst.key = src->key();
+    dst.licenseBlock = src->rawLicense();
 }
 
-void fromApiToResource(const ApiLicenseData &src, QnLicense &dst) {
-    dst.loadLicenseBlock(src.licenseBlock);
+void fromApiToResource(const ApiLicenseData &src, QnLicensePtr &dst) {
+    dst->loadLicenseBlock(src.licenseBlock);
 }
 
 void fromResourceListToApi(const QnLicenseList &src, ApiLicenseDataList &dst) {
@@ -519,7 +521,8 @@ void fromResourceToApi(const QnAbstractStorageResourcePtr &src, ApiStorageData &
 }
 
 void fromApiToResource(const ApiStorageData &src, QnAbstractStorageResourcePtr &dst) {
-    fromApiToResource(static_cast<const ApiResourceData &>(src), dst);
+    QnResourcePtr tmp = dst;
+    fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 
     dst->setSpaceLimit(src.spaceLimit);
     dst->setUsedForWriting(src.usedForWriting);
@@ -545,7 +548,8 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
 }
 
 void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &dst, const ResourceContext &ctx) {
-    fromApiToResource(static_cast<const ApiResourceData &>(src), dst);
+    QnResourcePtr tmp = dst;
+    fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 
     QList<QHostAddress> resNetAddrList;
     deserializeNetAddrList(resNetAddrList, src.netAddrList);
@@ -579,8 +583,9 @@ template<class List>
 void fromApiToResourceList(const ApiMediaServerDataList &src, List &dst, const ResourceContext &ctx, const overload_tag &) {
     dst.reserve(dst.size() + src.size());
     for(int i = 0; i < src.size(); ++i) {
-        dst.push_back(QnMediaServerResourcePtr(new QnMediaServerResource(ctx.resTypePool)));
-        fromApiToResource(data[i], dst.back(), ctx);
+        QnMediaServerResourcePtr dstElement(new QnMediaServerResource(ctx.resTypePool));
+        fromApiToResource(src[i], dstElement, ctx);
+        dst.push_back(std::move(dstElement));
     }
 }
 
@@ -696,13 +701,14 @@ void fromApiToResourceList(const ApiResourceTypeDataList &src, QnResourceTypeLis
 
     for(int i = 0; i < src.size(); ++i) {
         dst.push_back(QnResourceTypePtr(new QnResourceType()));
-        fromApiToResource(src.data[i], dst.back());
+        fromApiToResource(src[i], dst.back());
     }
 }
 
 
 void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
-    fromApiToResource(static_cast<const ApiResourceData &>(src), dst);
+    QnResourcePtr tmp = dst;
+    fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 
     dst->setAdmin(src.isAdmin);
     dst->setEmail(src.email);
@@ -794,7 +800,8 @@ void fromResourceToApi(const QnVideoWallPcData::PcScreen &src, ApiVideowallScree
 }
 
 void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst) {
-    fromApiToResource(static_cast<const ApiResourceData &>(src), dst);
+    QnResourcePtr tmp = dst;
+    fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 
     dst->setAutorun(src.autorun);
     QnVideoWallItemList outItems;
@@ -845,7 +852,7 @@ template<class List>
 void fromApiToResourceList(const ApiVideowallDataList &src, List &dst, const overload_tag &) {
     dst.reserve(dst.size() + src.size());
 
-    for(int i = 0; i < size(); ++i) {
+    for(int i = 0; i < src.size(); ++i) {
         dst.push_back(QnVideoWallResourcePtr(new QnVideoWallResource()));
         fromApiToResource(src[i], dst.back());
     }

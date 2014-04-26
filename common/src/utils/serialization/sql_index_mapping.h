@@ -13,7 +13,7 @@ namespace QnSqlDetail {
 
 class QnSqlIndexMapping {
 public:
-    QnSqlIndexMapping();
+    QnSqlIndexMapping() {}
 
     int index(int field) {
         assert(field >= 0);

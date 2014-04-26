@@ -41,10 +41,10 @@ namespace ec2 {
     void fromResourceToApi(const QnLayoutResourcePtr &src, ApiLayoutData &dst);
     void fromApiToResourceList(const ApiLayoutDataList &src, QnResourceList &dst);
     void fromApiToResourceList(const ApiLayoutDataList &src, QnLayoutResourceList &dst);
-    void fromResourceListToApi(const QnResourceList &src, ApiLayoutDataList &dst);
+    void fromResourceListToApi(const QnLayoutResourceList &src, ApiLayoutDataList &dst);
 
-    void fromResourceToApi(const QnLicense &src, ApiLicenseData &dst);
-    void fromApiToResource(const ApiLicenseData &src, QnLicense &dst);
+    void fromResourceToApi(const QnLicensePtr &src, ApiLicenseData &dst);
+    void fromApiToResource(const ApiLicenseData &src, QnLicensePtr &dst);
     void fromResourceListToApi(const QnLicenseList &src, ApiLicenseDataList &dst);
     void fromApiToResourceList(const ApiLicenseDataList &src, QnLicenseList &dst);
 

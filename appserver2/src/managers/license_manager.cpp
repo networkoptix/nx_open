@@ -69,7 +69,7 @@ namespace ec2
     void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicenseData>& tran )
     {
         QnLicensePtr license(new QnLicense());
-        fromApiToResource(tran.params, *license);
+        fromApiToResource(tran.params, license);
         emit licenseChanged(license);
     }
 

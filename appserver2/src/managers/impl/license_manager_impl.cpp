@@ -44,10 +44,10 @@ namespace ec2
     }
 
     bool LicenseManagerImpl::validateLicense(const ApiLicenseData& license) const {
-        QnLicense qlicense;
+        QnLicensePtr qlicense(new QnLicense);
         fromApiToResource(license, qlicense);
 
-        return qlicense.isValid(m_hardwareIds, m_brand);
+        return qlicense->isValid(m_hardwareIds, m_brand);
     }
 
     ErrorCode LicenseManagerImpl::getLicenses( ApiLicenseDataList* const licList )
