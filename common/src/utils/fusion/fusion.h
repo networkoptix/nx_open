@@ -114,7 +114,8 @@ namespace QnFusion {                                                            
     QnFusion::BOOST_PP_CAT(KEY, _type)
 
 QN_FUSION_DEFINE_KEY(base)
-QN_FUSION_DEFINE_KEY(index)
+QN_FUSION_DEFINE_KEY(member_index)
+QN_FUSION_DEFINE_KEY(member_count)
 QN_FUSION_DEFINE_KEY(object_declval)
 QN_FUSION_DEFINE_KEY(getter)
 QN_FUSION_DEFINE_KEY(setter)
@@ -122,6 +123,7 @@ QN_FUSION_DEFINE_KEY(setter_tag)
 QN_FUSION_DEFINE_KEY(checker)
 QN_FUSION_DEFINE_KEY(name)
 QN_FUSION_DEFINE_KEY(c_name)
+QN_FUSION_DEFINE_KEY(sql_placeholder_name)
 QN_FUSION_DEFINE_KEY(classname)
 QN_FUSION_DEFINE_KEY(c_classname)
 QN_FUSION_DEFINE_KEY(optional)
@@ -129,13 +131,22 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_base ,
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_base(KEY, VALUE) (base, std::declval<VALUE>())
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_index ,
-#define QN_FUSION_PROPERTY_TYPE_FOR_index int
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_member_index ,
+#define QN_FUSION_PROPERTY_TYPE_FOR_member_index int
+
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_member_count ,
+#define QN_FUSION_PROPERTY_TYPE_FOR_member_count int
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_name ,
 #define QN_FUSION_PROPERTY_TYPE_FOR_name QString
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_name ,
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_name(KEY, VALUE) (name, lit(VALUE))(c_name, VALUE)
+#define QN_FUSION_PROPERTY_EXTENSION_FOR_name(KEY, VALUE) (name, QStringLiteral(VALUE))(c_name, VALUE)(sql_placeholder_name, QN_FUSION_LIT_CAT(":", VALUE))
+
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_name ,
+#define QN_FUSION_PROPERTY_TYPE_FOR_c_name const char *
+
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_sql_placeholder_name ,
+#define QN_FUSION_PROPERTY_TYPE_FOR_sql_placeholder_name QString
 
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_setter ,
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, (0, QnFusion::access_setter_category<access_type>::type() /* '0,' is here to make sure it's an rvalue. */)) 
@@ -143,10 +154,7 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname ,
 #define QN_FUSION_PROPERTY_TYPE_FOR_classname QString
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_classname ,
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_classname(KEY, VALUE) (classname, lit(VALUE))(c_classname, VALUE)
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_name ,
-#define QN_FUSION_PROPERTY_TYPE_FOR_c_name const char *
+#define QN_FUSION_PROPERTY_EXTENSION_FOR_classname(KEY, VALUE) (classname, QStringLiteral(VALUE))(c_classname, VALUE)
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_classname ,
 #define QN_FUSION_PROPERTY_TYPE_FOR_c_classname const char *
@@ -235,12 +243,20 @@ namespace QnFusion {
 
     struct member_setter_tag {};
     struct function_setter_tag {};
+    template<class T>
+    struct typed_setter_tag {};
 
     template<class T>
-    struct typed_member_setter_tag: member_setter_tag {};
+    struct typed_member_setter_tag: 
+        member_setter_tag,
+        typed_setter_tag<T>
+    {};
 
     template<class T>
-    struct typed_function_setter_tag: function_setter_tag {};
+    struct typed_function_setter_tag: 
+        function_setter_tag,
+        typed_setter_tag<T>
+    {};
 
     template<class Setter, class T>
     struct setter_category: 
@@ -404,5 +420,17 @@ namespace QnFusionDetail {
 #define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_I(R, PARAMS, CLASS)           \
     QN_FUSION_DEFINE_FUNCTIONS(BOOST_PP_TUPLE_ENUM(CLASS), BOOST_PP_TUPLE_ENUM(PARAMS))
 
+
+/**
+ * \internal
+ */
+#define QN_FUSION_LIT_CAT(A, B)                                                 \
+    QN_FUSION_LIT_CAT_I(A, B)
+
+#ifdef _MSC_VER
+#   define QN_FUSION_LIT_CAT_I(A, B) QStringLiteral(A BOOST_PP_CAT(L, B))
+#else
+#   define QN_FUSION_LIT_CAT_I(A, B) QStringLiteral(A B)
+#endif
 
 #endif // QN_FUSION_H

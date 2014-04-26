@@ -5,6 +5,7 @@
 #include <utils/serialization/json_functions.h>
 #include <utils/serialization/lexical_functions.h>
 #include <utils/serialization/binary_functions.h>
+#include <utils/serialization/sql_functions.h>
 #include <utils/serialization/debug.h>
 #include <utils/serialization/data_stream.h>
 #include <utils/math/fuzzy.h>

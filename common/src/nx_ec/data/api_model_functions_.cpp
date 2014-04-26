@@ -24,6 +24,24 @@
 #include "api_user_data.h"
 #include "api_videowall_data.h"
 
+/* Some fields are not meant to be bound or fetched. */
+template<class T, class Allocator>
+inline void bind_field(const std::vector<T, Allocator> &, const QString &, QSqlQuery *) { return; }
+template<class Key, class T, class Predicate, class Allocator>
+inline void bind_field(const std::map<Key, T, Predicate, Allocator> &, const QString &, QSqlQuery *) { return; }
+template<class T>
+inline void bind_field(const QList<T> &, const QString &, QSqlQuery *) { return; }
+inline void bind_field(const ec2::ApiServerInfoData &, const QString &, QSqlQuery *) { return; }
+
+template<class T, class Allocator>
+inline void fetch_field(const QSqlRecord &, int, std::vector<T, Allocator> *) { return; }
+template<class Key, class T, class Predicate, class Allocator>
+inline void fetch_field(const QSqlRecord &, int, std::map<Key, T, Predicate, Allocator> *) { return; }
+template<class T>
+inline void fetch_field(const QSqlRecord &, int, QList<T> *) { return; }
+inline void fetch_field(const QSqlRecord &, int, ec2::ApiServerInfoData *) { return; }
+
+
 namespace ec2 {
 
 #define QN_EC2_ADAPT_API_DATA_CLASSES(CLASSES)                                  \
@@ -34,7 +52,7 @@ namespace ec2 {
 
 #define QN_EC2_ADAPT_API_DATA_CLASSES_STEP_II(CLASS)                            \
     QN_FUSION_ADAPT_STRUCT(CLASS, BOOST_PP_CAT(CLASS, _Fields))                 \
-    QN_FUSION_DEFINE_FUNCTIONS(CLASS, (binary)(json))
+    QN_FUSION_DEFINE_FUNCTIONS(CLASS, (binary)(json)(sql))
     
     QN_EC2_ADAPT_API_DATA_CLASSES(QN_EC2_API_DATA_CLASSES)
 

@@ -10,6 +10,7 @@
 #include "managers/impl/license_manager_impl.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "utils/serialization/binary_stream.h"
+#include "utils/serialization/sql.h"
 
 
 namespace ec2
@@ -278,7 +279,7 @@ ErrorCode QnDbManager::insertAddParams(const std::vector<ApiResourceParamData>& 
     insQuery.prepare("INSERT OR REPLACE INTO vms_kvpair VALUES(?, NULL, ?, ?, ?)");
     insQuery.bindValue(0, internalId);
     foreach(const ApiResourceParamData& param, params) {
-        param.autoBindValuesOrdered(insQuery, 1);
+        //param.autoBindValuesOrdered(insQuery, 1); // TODO: #EC2
         if (!insQuery.exec()) {
             qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
             return ErrorCode::failure;
@@ -291,7 +292,7 @@ ErrorCode QnDbManager::deleteAddParams(qint32 resourceId)
 {
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("DELETE FROM vms_kvpair WHERE resource_id = ?");
-    insQuery.addBindValue(resourceId);
+    insQuery.addBindValue(resourceId);// TODO: #EC2
     if (insQuery.exec()) {
         return ErrorCode::ok;
     }
@@ -307,7 +308,7 @@ ErrorCode QnDbManager::insertResource(const ApiResourceData& data, qint32* inter
     //insQuery.prepare("INSERT INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status, disabled) VALUES(:id, :typeId, :parentGuid, :name, :url, :status, :disabled)");
     //data.autoBindValues(insQuery);
     insQuery.prepare("INSERT INTO vms_resource VALUES(NULL, ?,?,?,?,?,?,?)");
-    data.autoBindValuesOrdered(insQuery, 0);
+    //data.autoBindValuesOrdered(insQuery, 0);// TODO: #EC2
 	if (!insQuery.exec()) {
 		qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
 		return ErrorCode::failure;
@@ -349,7 +350,8 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
     else {
         query.prepare("INSERT OR REPLACE INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status, disabled) VALUES(:id, :typeId, :parentGuid, :name, :url, :status, :disabled)");
     }
-    data.autoBindValues(query);
+    QnSql::bind(data, &query);
+    //data.autoBindValues(query);
 
 
     if (!query.exec()) {
@@ -379,7 +381,7 @@ ErrorCode QnDbManager::updateResource(const ApiResourceData& data, qint32 intern
 	QSqlQuery insQuery(m_sdb);
 
 	insQuery.prepare("UPDATE vms_resource SET xtype_guid = :typeId, parent_guid = :parentGuid, name = :name, url = :url, status = :status, disabled = :disabled WHERE id = :internalId");
-	data.autoBindValues(insQuery);
+	//data.autoBindValues(insQuery);// TODO: #EC2
     insQuery.bindValue(":internalId", internalId);
 
     if (!insQuery.exec()) {
@@ -418,7 +420,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
         insQuery.prepare("INSERT OR REPLACE INTO auth_user (id, username, is_superuser, email, password, is_staff, is_active, last_login, date_joined) VALUES (:internalId, :name, :isAdmin, :email, :hash, 1, 1, '', '')");
     else
         insQuery.prepare("UPDATE auth_user SET is_superuser=:isAdmin, email=:email where username=:name");
-    data.autoBindValues(insQuery);
+    //data.autoBindValues(insQuery);// TODO: #EC2
     insQuery.bindValue(":internalId", internalId);
     insQuery.bindValue(":name", data.name);
     if (!insQuery.exec())
@@ -432,7 +434,7 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
         insQuery2.prepare("INSERT OR REPLACE INTO vms_userprofile (user_id, resource_ptr_id, digest, rights) VALUES (:internalId, :internalId, :digest, :rights)");
     else
         insQuery2.prepare("UPDATE vms_userprofile SET rights=:rights WHERE user_id=:internalId");
-    data.autoBindValues(insQuery2);
+    //data.autoBindValues(insQuery2);// TODO: #EC2
     insQuery2.bindValue(":internalId", internalId);
     if (!insQuery2.exec())
     {
@@ -450,7 +452,7 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 i
                      mac, model, secondary_quality, status_flags, physical_id, password, login, dewarping_params, resource_ptr_id) VALUES\
                      (:audioEnabled, :controlDisabled, :firmware, :vendor, :manuallyAdded, :id, :region, :scheduleDisabled, :motionType, :groupName, :groupId,\
                      :mac, :model, :secondaryQuality, :statusFlags, :physicalId, :password, :login, :dewarpingParams, :internalId)");
-    data.autoBindValues(insQuery);
+    //data.autoBindValues(insQuery);// TODO: #EC2
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
         return ErrorCode::ok;
@@ -466,7 +468,7 @@ ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO vms_server (api_url, auth_key, streaming_url, version, net_addr_list, flags, panic_mode, max_cameras, redundancy, resource_ptr_id) VALUES\
                      (:apiUrl, :authKey, :streamingUrl, :version, :netAddrList, :flags, :panicMode, :maxCameras, :redundancy, :internalId)");
-    data.autoBindValues(insQuery);
+    //data.autoBindValues(insQuery);// TODO: #EC2
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
         return ErrorCode::ok;
@@ -491,7 +493,7 @@ ErrorCode QnDbManager::insertOrReplaceLayout(const ApiLayoutData& data, qint32 i
                      :cellAspectRatio, :userId, :backgroundWidth, \
                      :backgroundImageFilename, :backgroundHeight, \
                      :cellSpacingWidth, :backgroundOpacity, :internalId)");
-    data.autoBindValues(insQuery);
+    //data.autoBindValues(insQuery);// TODO: #EC2
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
         return ErrorCode::ok;
@@ -540,7 +542,7 @@ ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
         QSqlQuery insQuery(m_sdb);
         insQuery.prepare("INSERT INTO vms_storage (space_limit, used_for_writing, resource_ptr_id) VALUES\
                          (:spaceLimit, :usedForWriting, :internalId)");
-        storage.autoBindValues(insQuery);
+        //storage.autoBindValues(insQuery);// TODO: #EC2
         insQuery.bindValue(":internalId", internalId);
 
         if (!insQuery.exec()) {
@@ -568,7 +570,7 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 in
     insQuery.bindValue(0, internalId);
 	foreach(const ApiScheduleTaskData& task, data.scheduleTask) 
 	{
-		task.autoBindValuesOrdered(insQuery, 1);
+		//task.autoBindValuesOrdered(insQuery, 1);// TODO: #EC2
 		if (!insQuery.exec()) {
             qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
 			return ErrorCode::failure;
@@ -743,7 +745,7 @@ ErrorCode QnDbManager::updateLayoutItems(const ApiLayoutData& data, qint32 inter
                      :dewarpingParams, :left)");
     foreach(const ApiLayoutItemData& item, data.items)
     {
-        item.autoBindValues(insQuery);
+        //item.autoBindValues(insQuery);// TODO: #EC2
         insQuery.bindValue(":layoutId", internalLayoutId);
 
         if (!insQuery.exec()) {
@@ -825,7 +827,7 @@ ErrorCode QnDbManager::insertOrReplaceBusinessRuleTable( const ApiBusinessRuleDa
                           action_params, aggregation_period, disabled, comments, schedule, system) VALUES \
                           (:id, :eventType, :eventCondition, :eventState, :actionType, \
                           :actionParams, :aggregationPeriod, :disabled, :comments, :schedule, :system)"));
-    businessRule.autoBindValues(query);
+    //businessRule.autoBindValues(query);// TODO: #EC2
     if (query.exec()) {
         return ErrorCode::ok;
     }
@@ -927,7 +929,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraSer
 
     QSqlQuery query(m_sdb);
     query.prepare("INSERT INTO vms_cameraserveritem (server_guid, timestamp, physical_id) VALUES(:serverGuid, :timestamp, :physicalId)");
-    tran.params.autoBindValues(query);
+    //tran.params.autoBindValues(query);// TODO: #EC2
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
@@ -1276,7 +1278,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
         return ErrorCode::failure;
     }
 
-    loadResourceTypesFromQuery(data, queryTypes);
+    //loadResourceTypesFromQuery(data, queryTypes);// TODO: #EC2
     mergeIdListData<ApiResourceTypeData>(queryParents, data, &ApiResourceTypeData::parentId);
 
     std::vector<ApiPropertyTypeData> allProperties;
@@ -1320,7 +1322,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataLi
         return ErrorCode::failure;
     }
 
-    layouts.loadFromQuery(query);
+    //layouts.loadFromQuery(query); // TODO: #EC2
     std::vector<ApiLayoutItemWithRefData> items;
     QN_QUERY_TO_DATA_OBJECT(queryItems, ApiLayoutItemWithRefData, items, ApiLayoutItemFields (layoutId));
     mergeObjectListData(layouts, items, &ApiLayoutData::items, &ApiLayoutItemWithRefData::layoutId);
@@ -1382,7 +1384,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& c
         return ErrorCode::failure;
     }
 
-	cameraList.loadFromQuery(queryCameras);
+	//cameraList.loadFromQuery(queryCameras);// TODO: #EC2
 
     std::vector<ApiScheduleTaskWithRefData> sheduleTaskList;
     QN_QUERY_TO_DATA_OBJECT(queryScheduleTask, ApiScheduleTaskWithRefData, sheduleTaskList, apiScheduleTaskFields (sourceId) );
@@ -1426,10 +1428,10 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
         return ErrorCode::failure;
     }
 
-    serverList.loadFromQuery(query);
+    //serverList.loadFromQuery(query);// TODO: #EC2
 
     ApiStorageDataList storageList;
-    storageList.loadFromQuery(queryStorage);
+    //storageList.loadFromQuery(queryStorage);// TODO: #EC2
 
     mergeObjectListData<ApiMediaServerData, ApiStorageData>(serverList, storageList, &ApiMediaServerData::storages, &ApiStorageData::parentGuid);
 
@@ -1447,7 +1449,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServer
         return ErrorCode::failure;
     }
 
-    historyList.loadFromQuery(query);
+    //historyList.loadFromQuery(query);// TODO: #EC2
 
     return ErrorCode::ok;
 }
@@ -1483,7 +1485,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
         return ErrorCode::failure;
     }
 
-    userList.loadFromQuery(query);
+    ///userList.loadFromQuery(query);// TODO: #EC2
     
     std::vector<ApiResourceParamWithRefData> params;
     QN_QUERY_TO_DATA_OBJECT(queryParams, ApiResourceParamWithRefData, params, ApiResourceParamFields (resourceId));
@@ -1505,7 +1507,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
     }
-    videowallList.loadFromQuery(query);
+    //videowallList.loadFromQuery(query);// TODO: #EC2
 
     QSqlQuery queryItems(m_sdb);
     queryItems.setForwardOnly(true);
@@ -1570,7 +1572,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRule
         return ErrorCode::failure;
     }
 
-    businessRuleList.loadFromQuery(query);
+    //businessRuleList.loadFromQuery(query);// TODO: #EC2
 
     // merge data
 
@@ -1839,7 +1841,7 @@ ErrorCode QnDbManager::updateVideowallItems(const ApiVideowallData& data) {
                      (:guid, :pc_guid, :layout_guid, :videowall_guid, :name, :x, :y, :w, :h)");
     foreach(const ApiVideowallItemData& item, data.items)
     {
-        item.autoBindValues(insQuery);
+        //item.autoBindValues(insQuery);// TODO: #EC2
         insQuery.bindValue(":videowall_guid", data.id.toRfc4122());
 
         if (!insQuery.exec()) {
@@ -1870,7 +1872,7 @@ ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowallData& data) {
 
         foreach(const ApiVideowallScreenData& screen, data.screens)
         {
-            screen.autoBindValues(query);
+            //screen.autoBindValues(query);// TODO: #EC2
             pcUuids << screen.pc_guid;
             if (!query.exec()) {
                 qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -1946,7 +1948,7 @@ ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowallData& data, qi
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO vms_videowall (autorun, resource_ptr_id) VALUES\
                      (:autorun, :internalId)");
-    data.autoBindValues(insQuery);
+    //data.autoBindValues(insQuery);// TODO: #EC2
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec())
         return ErrorCode::ok;

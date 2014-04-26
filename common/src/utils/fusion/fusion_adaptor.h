@@ -19,7 +19,12 @@
     QN_FUSION_ADAPT_CLASS_I(                                                    \
         CLASS,                                                                  \
         QN_FUSION_EXTEND_MEMBER_SEQ(MEMBER_SEQ),                                \
-        QN_FUSION_EXTEND_PROPERTY_SEQ((object_declval, std::declval<CLASS>())(classname, BOOST_PP_STRINGIZE(CLASS)) __VA_ARGS__) \
+        QN_FUSION_EXTEND_PROPERTY_SEQ(                                          \
+            (object_declval, std::declval<CLASS>())                             \
+            (classname, BOOST_PP_STRINGIZE(CLASS))                              \
+            (member_count, BOOST_PP_SEQ_SIZE(MEMBER_SEQ))                       \
+            __VA_ARGS__                                                         \
+        )                                                                       \
     )
 
 #define QN_FUSION_ADAPT_CLASS_I(CLASS, MEMBER_SEQ, GLOBAL_SEQ)                  \
@@ -82,7 +87,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
                 enum { value = BOOST_PP_VARIADIC_SEQ_SIZE(PROPERTY_SEQ) };      \
             };                                                                  \
                                                                                 \
-            BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (index, INDEX)) \
+            BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (member_index, INDEX)) \
         };                                                                      \
     };
 

@@ -103,7 +103,7 @@ namespace ec2 {
 
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         QN_EC2_API_DATA_CLASSES,
-        (binary)(json)
+        (binary)(json)(sql)
     );
 
 } // namespace ec2
