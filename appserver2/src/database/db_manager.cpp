@@ -1305,7 +1305,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
     mergeIdListData<ApiResourceTypeData>(queryParents, data, &ApiResourceTypeData::parentId);
 
     std::vector<ApiPropertyTypeData> allProperties;
-    QN_QUERY_TO_DATA_OBJECT(queryProperty, ApiPropertyTypeData, allProperties, ApiPropertyTypeFields);
+    QnSql::fetch_many(queryProperty, &allProperties);
     mergeObjectListData(data, allProperties, &ApiResourceTypeData::propertyTypeList, &ApiPropertyTypeData::resource_type_id);
 
     m_cachedResTypes = data;
@@ -1347,7 +1347,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataLi
 
     QnSql::fetch_many(query, &layouts);
     std::vector<ApiLayoutItemWithRefData> items;
-    QN_QUERY_TO_DATA_OBJECT(queryItems, ApiLayoutItemWithRefData, items, ApiLayoutItemFields (layoutId));
+    QnSql::fetch_many(queryItems, &items);
     mergeObjectListData(layouts, items, &ApiLayoutData::items, &ApiLayoutItemWithRefData::layoutId);
 
     return ErrorCode::ok;
@@ -1410,12 +1410,11 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& c
     QnSql::fetch_many(queryCameras, &cameraList);
 
     std::vector<ApiScheduleTaskWithRefData> sheduleTaskList;
-    QN_QUERY_TO_DATA_OBJECT(queryScheduleTask, ApiScheduleTaskWithRefData, sheduleTaskList, apiScheduleTaskFields (sourceId) );
-
+    QnSql::fetch_many(queryScheduleTask, &sheduleTaskList);
     mergeObjectListData(cameraList, sheduleTaskList, &ApiCameraData::scheduleTask, &ApiScheduleTaskWithRefData::sourceId);
 
     std::vector<ApiResourceParamWithRefData> params;
-    QN_QUERY_TO_DATA_OBJECT(queryParams, ApiResourceParamWithRefData, params, ApiResourceParamFields (resourceId));
+    QnSql::fetch_many(queryParams, &params);
     mergeObjectListData<ApiCameraData>(cameraList, params, &ApiCameraData::addParams, &ApiResourceParamWithRefData::resourceId);
 
 	return ErrorCode::ok;
@@ -1511,7 +1510,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
     QnSql::fetch_many(query, &userList);
 
     std::vector<ApiResourceParamWithRefData> params;
-    QN_QUERY_TO_DATA_OBJECT(queryParams, ApiResourceParamWithRefData, params, ApiResourceParamFields (resourceId));
+    QnSql::fetch_many(queryParams, &params);
     mergeObjectListData<ApiUserData>(userList, params, &ApiUserData::addParams, &ApiResourceParamWithRefData::resourceId);
     
     return ErrorCode::ok;
@@ -1543,7 +1542,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
         return ErrorCode::failure;
     }
     std::vector<ApiVideowallItemWithRefData> items;
-    QN_QUERY_TO_DATA_OBJECT(queryItems, ApiVideowallItemWithRefData, items, ApiVideowallItemDataFields (videowall_guid));
+    QnSql::fetch_many(queryItems, &items);
+
     mergeObjectListData(videowallList, items, &ApiVideowallData::items, &ApiVideowallItemWithRefData::videowall_guid);
     
     QSqlQuery queryScreens(m_sdb);
@@ -1560,7 +1560,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
         return ErrorCode::failure;
     }
     std::vector<ApiVideowallScreenWithRefData> screens;
-    QN_QUERY_TO_DATA_OBJECT(queryScreens, ApiVideowallScreenWithRefData, screens, ApiVideowallScreenDataFields (videowall_guid));
+    QnSql::fetch_many(queryScreens, &screens);
     mergeObjectListData(videowallList, screens, &ApiVideowallData::screens, &ApiVideowallScreenWithRefData::videowall_guid);
 
     return ErrorCode::ok;
@@ -1619,7 +1619,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& resourceId, ApiResourceParamsDa
         return ErrorCode::failure;
     }
 
-    QN_QUERY_TO_DATA_OBJECT(query, ApiResourceParamData, params.params, ApiResourceParamFields);
+    QnSql::fetch_many(query, &params.params);
+
     params.id = resourceId;
     return ErrorCode::ok;
 }
@@ -1673,8 +1674,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
                                 ORDER BY kv.resource_id"));
     if (!queryParams.exec())
         return ErrorCode::failure;
-    QN_QUERY_TO_DATA_OBJECT(queryParams, ApiResourceParamWithRefData, kvPairs, ApiResourceParamFields (resourceId));
-
+    QnSql::fetch_many(queryParams, &kvPairs);
 
     mergeObjectListData<ApiMediaServerData>(data.servers,   kvPairs, &ApiMediaServerData::addParams, &ApiResourceParamWithRefData::resourceId);
     mergeObjectListData<ApiCameraData>(data.cameras,        kvPairs, &ApiCameraData::addParams,      &ApiResourceParamWithRefData::resourceId);
@@ -1777,7 +1777,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicense
         return ErrorCode::failure;
     }
 
-    QN_QUERY_TO_DATA_OBJECT_FILTERED(query, ApiLicenseData, data, ApiLicenseFields, m_licenseManagerImpl->validateLicense);
+    QnSql::fetch_many_if(query, &data, [&](const ec2::ApiLicenseData &license) { return m_licenseManagerImpl->validateLicense(license); });
 
     // m_licenseManagerImpl->getLicenses( &data );
     return ErrorCode::ok;

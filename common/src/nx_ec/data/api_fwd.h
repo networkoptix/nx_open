@@ -108,7 +108,4 @@ namespace ec2 {
 
 } // namespace ec2
 
-#define QN_QUERY_TO_DATA_OBJECT(...) // TODO: #EC2
-#define QN_QUERY_TO_DATA_OBJECT_FILTERED(...) // TODO: #EC2
-
 #endif // QN_EC2_API_FWD_H
