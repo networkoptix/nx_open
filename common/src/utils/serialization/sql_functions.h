@@ -10,24 +10,24 @@
 
 namespace QnSqlDetail {
     template<class T>
-    inline void bind_field_direct(const T &value, const QString &name, QSqlQuery *target) {
-        target->bindValue(name, QVariant::fromValue<T>(value));
+    inline void serialize_field_direct(const T &value, QVariant *target) {
+        *target = QVariant::fromValue<T>(value);
     }
 
     template<class T>
-    inline void fetch_field_direct(const QSqlRecord &value, int index, T *target) {
-        *target = value.value(index).value<T>();
+    inline void deserialize_field_direct(const QVariant &value, T *target) {
+        *target = value.value<T>();
     }
 
 } // namespace QnSqlDetail
 
 #define QN_DEFINE_DIRECT_SQL_FIELD_FUNCTIONS(TYPE)                              \
-inline void bind_field(const TYPE &value, const QString &name, QSqlQuery *target) { \
-    QnSqlDetail::bind_field_direct(value, name, target);                        \
+inline void serialize_field(const TYPE &value, QVariant *target) {              \
+    QnSqlDetail::serialize_field_direct(value, target);                         \
 }                                                                               \
                                                                                 \
-inline void fetch_field(const QSqlRecord &value, int index, TYPE *target) {     \
-    QnSqlDetail::fetch_field_direct(value, index, target);                      \
+inline void deserialize_field(const QVariant &value, TYPE *target) {            \
+    QnSqlDetail::deserialize_field_direct(value, target);                       \
 }
 
 QN_DEFINE_DIRECT_SQL_FIELD_FUNCTIONS(short)
@@ -43,73 +43,73 @@ QN_DEFINE_DIRECT_SQL_FIELD_FUNCTIONS(double)
 QN_DEFINE_DIRECT_SQL_FIELD_FUNCTIONS(QByteArray)
 #undef QN_DEFINE_DIRECT_SQL_FIELD_FUNCTIONS
 
-inline void bind_field(const bool &value, const QString &name, QSqlQuery *target) {
-    target->bindValue(name, value ? 1 : 0);
+inline void serialize_field(const bool &value, QVariant *target) {
+    *target = QVariant::fromValue<int>(value ? 1 : 0);
 }
 
-inline void fetch_field(const QSqlRecord &value, int index, bool *target) { 
-    *target = value.value(index).toBool();
-}
-
-
-inline void bind_field(const unsigned char &value, const QString &name, QSqlQuery *target) {
-    target->bindValue(name, static_cast<unsigned int>(value));
-}
-
-inline void fetch_field(const QSqlRecord &value, int index, unsigned char *target) { 
-    *target = static_cast<unsigned char>(value.value(index).value<unsigned int>());
+inline void deserialize_field(const QVariant &value, bool *target) { 
+    *target = value.toBool();
 }
 
 
-inline void bind_field(const signed char &value, const QString &name, QSqlQuery *target) {
-    target->bindValue(name, static_cast<int>(value));
+inline void serialize_field(const unsigned char &value, QVariant *target) {
+    *target = QVariant::fromValue<unsigned int>(value);
 }
 
-inline void fetch_field(const QSqlRecord &value, int index, signed char *target) { 
-    *target = static_cast<unsigned char>(value.value(index).value<int>());
-}
-
-
-inline void bind_field(const QString &value, const QString &name, QSqlQuery *target) {
-    target->bindValue(name, value.isNull() ? lit("") : value);
-}
-
-inline void fetch_field(const QSqlRecord &value, int index, QString *target) { 
-    *target = value.value(index).toString();
+inline void deserialize_field(const QVariant &value, unsigned char *target) { 
+    *target = value.value<unsigned int>();
 }
 
 
-inline void bind_field(const QUuid &value, const QString &name, QSqlQuery *target) {
-    target->bindValue(name, value.toRfc4122());
+inline void serialize_field(const signed char &value, QVariant *target) {
+    *target = QVariant::fromValue<int>(value);
 }
 
-inline void fetch_field(const QSqlRecord &value, int index, QUuid *target) { 
-    *target = QUuid::fromRfc4122(value.value(index).toByteArray()); 
+inline void deserialize_field(const QVariant &value, signed char *target) { 
+    *target = value.value<int>();
+}
+
+
+inline void serialize_field(const QString &value, QVariant *target) {
+    *target = QVariant::fromValue<QString>(value.isNull() ? lit("") : value);
+}
+
+inline void deserialize_field(const QVariant &value, QString *target) { 
+    *target = value.value<QString>();
+}
+
+
+inline void serialize_field(const QUuid &value, QVariant *target) {
+    *target = QVariant::fromValue<QByteArray>(value.toRfc4122());
+}
+
+inline void deserialize_field(const QVariant &value, QUuid *target) { 
+    *target = QUuid::fromRfc4122(value.value<QByteArray>()); 
 }
 
 
 template<class T>
-void bind_field(const T &value, const QString &name, QSqlQuery *target, typename std::enable_if<std::is_enum<T>::value>::type * = NULL) {
-    QnSql::bind_field(static_cast<qint32>(value), name, target);
+void serialize_field(const T &value, QVariant *target, typename std::enable_if<std::is_enum<T>::value>::type * = NULL) {
+    QnSql::serialize_field(static_cast<qint32>(value), target);
 }
 
 template<class T>
-void fetch_field(const QSqlRecord &value, int index, T *target, typename std::enable_if<std::is_enum<T>::value>::type * = NULL) {
+void deserialize_field(const QVariant &value, T *target, typename std::enable_if<std::is_enum<T>::value>::type * = NULL) {
     qint32 tmp;
-    QnSql::fetch_field(value, index, &tmp);
+    QnSql::deserialize_field(value, &tmp);
     *target = static_cast<T>(tmp);
 }
 
 
 template<class T>
-inline void bind_field(const QFlags<T> &value, const QString &name, QSqlQuery *target) {
-    QnSql::bind_field(static_cast<qint32>(value), name, target);
+inline void serialize_field(const QFlags<T> &value, QVariant *target) {
+    QnSql::serialize_field(static_cast<qint32>(value), target);
 }
 
 template<class T>
-inline void fetch_field(const QSqlRecord &value, int index, QFlags<T> *target) {
+inline void deserialize_field(const QVariant &value, QFlags<T> *target) {
     qint32 tmp;
-    QnSql::fetch_field(value, index, &tmp);
+    QnSql::deserialize_field(value, &tmp);
     *target = static_cast<QFlags<T> >(tmp); 
 }
 

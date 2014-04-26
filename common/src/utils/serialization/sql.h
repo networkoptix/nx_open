@@ -20,16 +20,6 @@ namespace QnSqlDetail {
     }
 
     template<class T>
-    void bind_ordered_internal(const T &value, int startIndex, QSqlQuery *target) {
-        bind(value, startIndex, target);
-    }
-
-    template<class T>
-    void bind_field_internal(const T &value, const QString &name, QSqlQuery *target) {
-        bind_field(value, name, target);
-    }
-
-    template<class T>
     QnSqlIndexMapping mapping_internal(const QSqlQuery &query, const T *dummy) {
         return mapping(adl_wrap(query), dummy);
     }
@@ -40,8 +30,13 @@ namespace QnSqlDetail {
     }
 
     template<class T>
-    void fetch_field_internal(const QSqlRecord &value, int index, T *target) {
-        fetch_field(adl_wrap(value), index, target);
+    void serialize_field_internal(const T &value, const QString &name, QSqlQuery *target) {
+        serialize_field(value, name, target);
+    }
+
+    template<class T>
+    void deserialize_field_internal(const QSqlRecord &value, int index, T *target) {
+        deserialize_field(adl_wrap(value), index, target);
     }
 
 } // namespace QnSqlDetail
@@ -53,20 +48,6 @@ namespace QnSql {
         assert(target);
 
         QnSqlDetail::bind_internal(value, target);
-    }
-
-    template<class T>
-    void bind_ordered(const T &value, int startIndex, QSqlQuery *target) {
-        assert(target);
-
-        QnSqlDetail::bind_ordered_internal(value, startIndex, target);
-    }
-
-    template<class T>
-    void bind_field(const T &value, const QString &name, QSqlQuery *target) {
-        assert(target);
-
-        QnSqlDetail::bind_field_internal(value, name, target);
     }
 
     template<class T>
@@ -82,10 +63,31 @@ namespace QnSql {
     }
 
     template<class T>
-    void fetch_field(const QSqlRecord &value, int index, T *target) {
+    void serialize_field(const T &value, QVariant *target) {
         assert(target);
 
-        QnSqlDetail::fetch_field_internal(value, index, target);
+        QnSqlDetail::serialize_field_internal(value, target);
+    }
+
+    template<class T>
+    QVariant serialized_field(const T &value) {
+        QVariant result;
+        QnSql::serialize_field(value, &result);
+        return std::move(result);
+    }
+
+    template<class T>
+    void deserialize_field(const QVariant &value, T *target) {
+        assert(target);
+
+        QnSqlDetail::deserialize_field_internal(value, target);
+    }
+
+    template<class T>
+    T deserialized_field(const QVariant &value) {
+        T result;
+        QnSql::deserialize_field(value, &result);
+        return std::move(result);
     }
 
 } // namespace QnSql
@@ -102,29 +104,11 @@ namespace QnSqlDetail {
         bool operator()(const T &value, const Access &access) const {
             using namespace QnFusion;
 
-            QnSql::bind_field(invoke(access(getter), value), access(sql_placeholder_name), m_target);
+            m_target->bindValue(access(sql_placeholder_name), QnSql::serialized_field(invoke(access(getter), value)));
             return true;
         }
 
     private:
-        QSqlQuery *m_target;
-    };
-
-
-    class BindOrderedVisitor {
-    public:
-        BindOrderedVisitor(int startIndex, QSqlQuery *target): 
-            m_startIndex(startIndex),
-            m_target(target) 
-        {}
-
-        template<class T, class Access>
-        bool operator()(const T &, const Access &) const {
-            return true; // TODO: #Elric #EC2
-        }
-
-    private:
-        int m_startIndex;
         QSqlQuery *m_target;
     };
 
@@ -191,9 +175,7 @@ namespace QnSqlDetail {
         bool operator()(T &target, const Access &access, int index, const QnFusion::typed_function_setter_tag<Member> &) const {
             using namespace QnFusion;
 
-            Member member;
-            QnSql::fetch_field(m_value, index, &member);
-            invoke(access(setter), target, member);
+            invoke(access(setter), target, QnSql::deserialized_field<Member>(m_value.value(index)));
             return true;
         }
 
@@ -206,7 +188,7 @@ namespace QnSqlDetail {
              * we won't be fetching large data structures from fields, and thus
              * won't save much on copy constructors. */
 
-            QnSql::fetch_field(m_value, index, &(target.*access(setter)));
+            QnSql::deserialize_field(m_value.value(index), &(target.*access(setter)));
             return true;
         }
 
@@ -221,10 +203,6 @@ namespace QnSqlDetail {
 #define QN_FUSION_DEFINE_FUNCTIONS_sql(TYPE, ... /* PREFIX */)                  \
 __VA_ARGS__ void bind(const TYPE &value, QSqlQuery *target) {                   \
     QnFusion::visit_members(value, QnSqlDetail::BindVisitor(target));           \
-}                                                                               \
-                                                                                \
-__VA_ARGS__ void bind_ordered(const TYPE &value, int startIndex, QSqlQuery *target) { \
-    QnFusion::visit_members(value, QnSqlDetail::BindOrderedVisitor(startIndex, target)); \
 }                                                                               \
                                                                                 \
 __VA_ARGS__ QnSqlIndexMapping mapping(const QSqlQuery &query, const TYPE *dummy) { \

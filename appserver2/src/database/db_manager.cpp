@@ -276,10 +276,14 @@ ErrorCode QnDbManager::insertAddParams(const std::vector<ApiResourceParamData>& 
 {
     QSqlQuery insQuery(m_sdb);
     //insQuery.prepare("INSERT INTO vms_kvpair (resource_id, name, value) VALUES(:resourceId, :name, :value)");
-    insQuery.prepare("INSERT OR REPLACE INTO vms_kvpair VALUES(?, NULL, ?, ?, ?)");
+    //insQuery.prepare("INSERT OR REPLACE INTO vms_kvpair VALUES(?, NULL, ?, ?, ?)");
+    insQuery.prepare("INSERT OR REPLACE INTO vms_kvpair(resource_id, name, value isResTypeParam) VALUES(?, ?, ?, ?)");
+
     insQuery.bindValue(0, internalId);
     foreach(const ApiResourceParamData& param, params) {
-        //param.autoBindValuesOrdered(insQuery, 1); // TODO: #EC2
+        insQuery.bindValue(1, QnSql::serialized_field(param.name));
+        insQuery.bindValue(2, QnSql::serialized_field(param.value));
+        insQuery.bindValue(3, QnSql::serialized_field(param.isResTypeParam));
         if (!insQuery.exec()) {
             qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
             return ErrorCode::failure;
@@ -307,8 +311,17 @@ ErrorCode QnDbManager::insertResource(const ApiResourceData& data, qint32* inter
     QSqlQuery insQuery(m_sdb);
     //insQuery.prepare("INSERT INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status, disabled) VALUES(:id, :typeId, :parentGuid, :name, :url, :status, :disabled)");
     //data.autoBindValues(insQuery);
-    insQuery.prepare("INSERT INTO vms_resource VALUES(NULL, ?,?,?,?,?,?,?)");
-    //data.autoBindValuesOrdered(insQuery, 0);// TODO: #EC2
+    //insQuery.prepare("INSERT INTO vms_resource VALUES(NULL, ?,?,?,?,?,?,?)");
+    insQuery.prepare("INSERT INTO vms_resource(status, disabled, name, url, xtype_id, parent_id, guid) VALUES(?,?,?,?,?,?,?)");
+
+    insQuery.bindValue(0, QnSql::serialized_field(data.status));
+    insQuery.bindValue(1, QnSql::serialized_field(data.disabled));
+    insQuery.bindValue(2, QnSql::serialized_field(data.name));
+    insQuery.bindValue(3, QnSql::serialized_field(data.url));
+    insQuery.bindValue(4, QnSql::serialized_field(data.typeId));
+    insQuery.bindValue(5, QnSql::serialized_field(data.parentGuid));
+    insQuery.bindValue(6, QnSql::serialized_field(data.id));
+
 	if (!insQuery.exec()) {
 		qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
 		return ErrorCode::failure;
@@ -566,11 +579,21 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 in
     QSqlQuery insQuery(m_sdb);
     //insQuery.prepare("INSERT INTO vms_scheduletask (source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES\
                      //:sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
-    insQuery.prepare("INSERT INTO vms_scheduletask VALUES (NULL, ?,?,?,?,?,?,?,?,?,?)");
+    insQuery.prepare("INSERT INTO vms_scheduletask(source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES (?,?,?,?,?,?,?,?,?,?)");
+
     insQuery.bindValue(0, internalId);
 	foreach(const ApiScheduleTaskData& task, data.scheduleTask) 
 	{
-		//task.autoBindValuesOrdered(insQuery, 1);// TODO: #EC2
+		insQuery.bindValue(1, QnSql::serialized_field(task.startTime));
+        insQuery.bindValue(2, QnSql::serialized_field(task.endTime));
+        insQuery.bindValue(3, QnSql::serialized_field(task.doRecordAudio));
+        insQuery.bindValue(4, QnSql::serialized_field(task.recordType));
+        insQuery.bindValue(5, QnSql::serialized_field(task.dayOfWeek));
+        insQuery.bindValue(6, QnSql::serialized_field(task.beforeThreshold));
+        insQuery.bindValue(7, QnSql::serialized_field(task.afterThreshold));
+        insQuery.bindValue(8, QnSql::serialized_field(task.streamQuality));
+        insQuery.bindValue(9, QnSql::serialized_field(task.fps));
+
 		if (!insQuery.exec()) {
             qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
 			return ErrorCode::failure;

@@ -224,18 +224,18 @@ namespace QnFusion {
     }
 
     template<class Base, class Derived, class T>
-    void invoke(T Base::*setter, Derived &object, const T &value) {
-        object.*setter = value;
+    void invoke(T Base::*setter, Derived &object, T &&value) {
+        object.*setter = std::forward<T>(value);
     }
 
     template<class Base, class Derived, class R, class P, class T>
-    void invoke(R (Base::*setter)(P), Derived &object, const T &value) {
-        (object.*setter)(value);
+    void invoke(R (Base::*setter)(P), Derived &object, T &&value) {
+        (object.*setter)(std::forward<T>(value));
     }
 
     template<class Setter, class Class, class T>
-    void invoke(const Setter &setter, Class &object, const T &value) {
-        setter(object, value);
+    void invoke(const Setter &setter, Class &object, T &&value) {
+        setter(object, std::forward<T>(value));
     }
 
     struct start_tag {};
