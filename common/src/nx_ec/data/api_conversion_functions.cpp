@@ -212,9 +212,9 @@ template<class List>
 void fromApiToResourceList(const ApiCameraDataList &src, List &dst, QnResourceFactory *factory, const overload_tag &) {
     dst.reserve(dst.size() + src.size());
     for(const ApiCameraData &srcCamera: src) {
-        QnVirtualCameraResourcePtr camera = factory->createResource(src[i].typeId, QnResourceParams(src[i].url, src[i].vendor)).dynamicCast<QnVirtualCameraResource>();
+        QnVirtualCameraResourcePtr camera = factory->createResource(srcCamera.typeId, QnResourceParams(srcCamera.url, srcCamera.vendor)).dynamicCast<QnVirtualCameraResource>();
         if (camera) {
-            fromApiToResource(src[i], camera);
+            fromApiToResource(srcCamera, camera);
             dst.push_back(camera);
         }
     }
