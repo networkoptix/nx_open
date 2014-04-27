@@ -46,7 +46,7 @@ namespace QnBinaryDetail {
     void serialize_container(const Container &value, QnOutputBinaryStream<Output> *stream) {
         QnBinary::serialize(static_cast<qint32>(value.size()), stream);
         for(auto pos = boost::begin(value); pos != boost::end(value); ++pos)
-            serialize_container_element(*pos, stream, QnContainer::container_category<Container>::type());
+            serialize_container_element(*pos, stream, typename QnContainer::container_category<Container>::type());
     }
 
     template<class Container, class Element, class Input>
