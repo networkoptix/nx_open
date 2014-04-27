@@ -149,7 +149,7 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_TYPE_FOR_sql_placeholder_name QString
 
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_setter ,
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, (0, QnFusion::access_setter_category<access_type>::type() /* '0,' is here to make sure it's an rvalue. */)) 
+#define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, (0, typename QnFusion::access_setter_category<access_type>::type() /* '0,' is here to make sure it's an rvalue. */)) 
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname ,
 #define QN_FUSION_PROPERTY_TYPE_FOR_classname QString

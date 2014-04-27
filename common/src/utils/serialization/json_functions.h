@@ -148,7 +148,7 @@ namespace QJsonDetail {
 
     template<class Container>
     bool deserialize_container(QnJsonContext *ctx, const QJsonValue &value, Container *target) {
-        typedef std::iterator_traits<typename boost::range_mutable_iterator<Container>::type>::value_type value_type;
+        typedef typename std::iterator_traits<typename boost::range_mutable_iterator<Container>::type>::value_type value_type;
 
         if(value.type() != QJsonValue::Array)
             return false;
@@ -158,7 +158,7 @@ namespace QJsonDetail {
         QnContainer::reserve(*target, array.size());
 
         for(auto pos = array.begin(); pos != array.end(); pos++)
-            if(!deserialize_container_element(ctx, *pos, target, identity<value_type>(), QnContainer::container_category<Container>::type()))
+            if(!deserialize_container_element(ctx, *pos, target, identity<value_type>(), typename QnContainer::container_category<Container>::type()))
                 return false;
 
         return true;
