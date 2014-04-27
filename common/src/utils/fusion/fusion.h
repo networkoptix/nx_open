@@ -393,7 +393,7 @@ namespace QnFusionDetail {
 
     template<class Visitor, class T, class Access, class Base>
     bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access, const Base &) {
-        typedef typename replace_referent<T, typename std::remove_reference<Base::result_type>::type>::type base_type;
+        typedef typename replace_referent<T, typename std::remove_reference<typename Base::result_type>::type>::type base_type;
 
         return QnFusion::visit_members(std::forward<base_type>(value), no_start_stop_wrap(visitor));
     }

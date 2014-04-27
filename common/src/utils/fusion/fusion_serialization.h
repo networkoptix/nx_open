@@ -103,9 +103,9 @@ namespace QnFusion {
 #define QN_FUSION_REGISTER_SERIALIZATION_VISITOR(DATA_CLASS, SERIALIZATION_VISITOR) \
 namespace QnFusion {                                                            \
     template<>                                                                  \
-    struct serialization_visitor_type<DATA_CLASS>:                              \
-        std::identity<SERIALIZATION_VISITOR>                                    \
-    {};                                                                         \
+    struct serialization_visitor_type<DATA_CLASS> {                             \
+        typedef SERIALIZATION_VISITOR type;                                     \
+    };                                                                          \
 }
 
 /**
@@ -114,9 +114,9 @@ namespace QnFusion {                                                            
 #define QN_FUSION_REGISTER_DESERIALIZATION_VISITOR(DATA_CLASS, DESERIALIZATION_VISITOR) \
 namespace QnFusion {                                                            \
     template<>                                                                  \
-    struct deserialization_visitor_type<DATA_CLASS>:                            \
-        std::identity<DESERIALIZATION_VISITOR>                                  \
-    {};                                                                         \
+    struct deserialization_visitor_type<DATA_CLASS> {                           \
+        typedef DESERIALIZATION_VISITOR type;                                   \
+    };                                                                          \
 }
 
 

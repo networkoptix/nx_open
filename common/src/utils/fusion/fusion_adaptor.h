@@ -33,7 +33,7 @@ struct QnFusionBinding;                                                         
                                                                                 \
 template<>                                                                      \
 struct QnFusionBinding<CLASS> {                                                 \
-    template<int n>                                                             \
+    template<int n, int dummy = 0>                                              \
     struct at_c;                                                                \
                                                                                 \
     template<class T>                                                           \
@@ -73,8 +73,8 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     QN_FUSION_ADAPT_CLASS_OBJECT_STEP_II(INDEX, GLOBAL_SEQ PROPERTY_SEQ)
 
 #define QN_FUSION_ADAPT_CLASS_OBJECT_STEP_II(INDEX, PROPERTY_SEQ)               \
-    template<>                                                                  \
-    struct at_c<INDEX> {                                                        \
+    template<int dummy>                                                         \
+    struct at_c<INDEX, dummy> {                                                 \
         struct type {                                                           \
             typedef type access_type;                                           \
                                                                                 \

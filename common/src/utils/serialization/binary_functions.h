@@ -24,6 +24,11 @@
 #include <utils/common/container.h>
 
 namespace QnBinaryDetail {
+    // TODO: #Elric #EC2 remove / move
+    template<class T>
+    struct identity {
+        typedef T type;
+    };
 
     template<class Element, class Output, class Tag>
     void serialize_container_element(const Element &element, QnOutputBinaryStream<Output> *stream, const Tag &) {
@@ -44,13 +49,13 @@ namespace QnBinaryDetail {
     }
 
     template<class Container, class Element, class Input>
-    bool deserialize_container_element(QnInputBinaryStream<Input> *stream, Container *target, const std::identity<Element> &, const QnContainer::list_tag &) {
+    bool deserialize_container_element(QnInputBinaryStream<Input> *stream, Container *target, const identity<Element> &, const QnContainer::list_tag &) {
         /* Deserialize value right into container. */
         return QnBinary::deserialize(stream, &*QnContainer::insert(*target, boost::end(*target), Element()));
     }
 
     template<class Container, class Element, class Input>
-    bool deserialize_container_element(QnInputBinaryStream<Input> *stream, Container *target, const std::identity<Element> &, const QnContainer::set_tag &) {
+    bool deserialize_container_element(QnInputBinaryStream<Input> *stream, Container *target, const identity<Element> &, const QnContainer::set_tag &) {
         Element element;
         if(!QnBinary::deserialize(stream, &element))
             return false;
@@ -60,7 +65,7 @@ namespace QnBinaryDetail {
     }
 
     template<class Container, class Element, class Input>
-    bool deserialize_container_element(QnInputBinaryStream<Input> *stream, Container *target, const std::identity<Element> &, const QnContainer::map_tag &) {
+    bool deserialize_container_element(QnInputBinaryStream<Input> *stream, Container *target, const identity<Element> &, const QnContainer::map_tag &) {
         typename Container::key_type key;
         if(!QnBinary::deserialize(stream, &key))
             return false;
@@ -84,7 +89,7 @@ namespace QnBinaryDetail {
         QnContainer::reserve(*target, size);
 
         for(int i = 0; i < size; i++)
-            if(!deserialize_container_element(stream, target, std::identity<value_type>(), QnContainer::container_category<Container>::type()))
+            if(!deserialize_container_element(stream, target, identity<value_type>(), QnContainer::container_category<Container>::type()))
                 return false;
         
         return true;

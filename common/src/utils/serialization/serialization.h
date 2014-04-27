@@ -200,7 +200,7 @@ public:
 
     template<class T>
     void registerSerializer() { 
-        registerSerializer(new QnSerialization::default_serializer<Serializer, T>::type()); 
+        registerSerializer(new typename QnSerialization::default_serializer<Serializer, T>::type()); 
     }
 
 private:
@@ -214,7 +214,7 @@ public:
     static QList<Serializer *> serializers() { return Instance()()->serializers(); }
     static void registerSerializer(Serializer *serializer) { Instance()()->registerSerializer(serializer); }
     template<class T>
-    static void registerSerializer() { registerSerializer(new QnSerialization::default_serializer<Serializer, T>::type()); }
+    static void registerSerializer() { registerSerializer(new typename QnSerialization::default_serializer<Serializer, T>::type()); }
 };
 
 
