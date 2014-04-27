@@ -82,7 +82,7 @@ public:
     QnContextSerializer(int type): QnContextSerializerBase(type) {}
 
     void serialize(context_type *ctx, const QVariant &value, data_type *target) const {
-        assert(ctx && value.userType() == m_type && target);
+        assert(ctx && value.userType() == type() && target);
 
         serializeInternal(ctx, value.constData(), target);
     }
@@ -137,7 +137,7 @@ public:
     QnBasicSerializer(int type): QnBasicSerializerBase(type) {}
 
     void serialize(const QVariant &value, data_type *target) const {
-        assert(value.userType() == m_type && target);
+        assert(value.userType() == type() && target);
 
         serializeInternal(value.constData(), target);
     }
@@ -151,7 +151,7 @@ public:
     bool deserialize(const data_type &value, QVariant *target) const {
         assert(target);
 
-        *target = QVariant(m_type, static_cast<const void *>(NULL));
+        *target = QVariant(type(), static_cast<const void *>(NULL));
         return deserializeInternal(value, target->data());
     }
 

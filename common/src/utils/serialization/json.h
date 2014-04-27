@@ -25,8 +25,8 @@
 #include "serialization.h"
 #include "lexical.h"
 
-
 class QnJsonSerializer;
+
 namespace QJsonDetail {
     void serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format = QJsonDocument::Compact);
     bool deserialize_json(const QByteArray &value, QJsonValue *target);
@@ -35,6 +35,18 @@ namespace QJsonDetail {
         QnSerializerStorage<QnJsonSerializer> *operator()() const;
     };
 } // namespace QJsonDetail
+
+
+class QnJsonContext: public QnSerializationContext<QnJsonSerializer> {};
+
+class QnJsonSerializer: public QnContextSerializer<QJsonValue, QnJsonContext>, public QnStaticSerializerStorage<QnJsonSerializer, QJsonDetail::StorageInstance> {
+    typedef QnContextSerializer<QJsonValue, QnJsonContext> base_type;
+public:
+    QnJsonSerializer(int type): base_type(type) {}
+};
+
+template<class T>
+class QnDefaultJsonSerializer: public QnDefaultContextSerializer<T, QnJsonSerializer> {};
 
 
 namespace QJson {
@@ -216,18 +228,6 @@ namespace QJson {
     }
 
 } // namespace QJson
-
-
-class QnJsonContext: public QnSerializationContext<QnJsonSerializer> {};
-
-class QnJsonSerializer: public QnContextSerializer<QJsonValue, QnJsonContext>, public QnStaticSerializerStorage<QnJsonSerializer, QJsonDetail::StorageInstance> {
-    typedef QnContextSerializer<QJsonValue, QnJsonContext> base_type;
-public:
-    QnJsonSerializer(int type): base_type(type) {}
-};
-
-template<class T>
-class QnDefaultJsonSerializer: public QnDefaultContextSerializer<T, QnJsonSerializer> {};
 
 
 namespace QJsonDetail {
