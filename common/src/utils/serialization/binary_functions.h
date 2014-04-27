@@ -329,6 +329,7 @@ bool deserialize(QnInputBinaryStream<Input> *stream, QFlags<T> *target) {
 }
 
 
+#ifndef Q_MOC_RUN
 #define QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG) \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Output>                            \
 void serialize(const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> &value, QnOutputBinaryStream<Output> *stream) { \
@@ -351,6 +352,8 @@ QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(std::vector, (class T, class 
 QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator));
 QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator));
 #undef QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS
+#endif // Q_MOC_RUN
+
 
 template<class T1, class T2, class Output>
 void serialize(const std::pair<T1, T2> &value, QnOutputBinaryStream<Output> *stream) {

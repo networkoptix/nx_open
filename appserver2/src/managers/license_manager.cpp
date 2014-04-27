@@ -1,9 +1,8 @@
-
 #include "license_manager.h"
 
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
-#include "nx_ec\data\api_conversion_functions.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 namespace ec2
