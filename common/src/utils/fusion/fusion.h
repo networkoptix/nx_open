@@ -149,7 +149,7 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_TYPE_FOR_sql_placeholder_name QString
 
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_setter ,
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, (0, typename QnFusion::access_setter_category<access_type>::type() /* '0,' is here to make sure it's an rvalue. */)) 
+#define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, QnFusionDetail::make_access_setter_category(access_type())) 
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname ,
 #define QN_FUSION_PROPERTY_TYPE_FOR_classname QString
@@ -354,6 +354,13 @@ namespace QnFusionDetail {
     struct replace_referent<const T &&, R> {
         typedef const R &&type;
     };
+
+
+    template<class Access>
+    typename QnFusion::access_setter_category<Access>::type
+    make_access_setter_category(const Access &) {
+        return typename QnFusion::access_setter_category<Access>::type();
+    }
 
 
     template<class Base>
