@@ -76,7 +76,7 @@ namespace QnSql {
         
         while(query.next()) {
             target->push_back(value_type());
-            QnSql::fetch(mapping, record, &target->back());
+            QnSql::fetch(mapping, query.record(), &target->back());
             if(!predicate(target->back()))
                 target->pop_back();
         }

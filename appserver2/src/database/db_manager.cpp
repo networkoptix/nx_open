@@ -277,7 +277,7 @@ ErrorCode QnDbManager::insertAddParams(const std::vector<ApiResourceParamData>& 
     QSqlQuery insQuery(m_sdb);
     //insQuery.prepare("INSERT INTO vms_kvpair (resource_id, name, value) VALUES(:resourceId, :name, :value)");
     //insQuery.prepare("INSERT OR REPLACE INTO vms_kvpair VALUES(?, NULL, ?, ?, ?)");
-    insQuery.prepare("INSERT OR REPLACE INTO vms_kvpair(resource_id, name, value isResTypeParam) VALUES(?, ?, ?, ?)");
+    insQuery.prepare("INSERT OR REPLACE INTO vms_kvpair(resource_id, name, value, isResTypeParam) VALUES(?, ?, ?, ?)");
 
     insQuery.bindValue(0, internalId);
     foreach(const ApiResourceParamData& param, params) {
@@ -312,7 +312,7 @@ ErrorCode QnDbManager::insertResource(const ApiResourceData& data, qint32* inter
     //insQuery.prepare("INSERT INTO vms_resource (guid, xtype_guid, parent_guid, name, url, status, disabled) VALUES(:id, :typeId, :parentGuid, :name, :url, :status, :disabled)");
     //data.autoBindValues(insQuery);
     //insQuery.prepare("INSERT INTO vms_resource VALUES(NULL, ?,?,?,?,?,?,?)");
-    insQuery.prepare("INSERT INTO vms_resource(status, disabled, name, url, xtype_id, parent_id, guid) VALUES(?,?,?,?,?,?,?)");
+    insQuery.prepare("INSERT INTO vms_resource(status, disabled, name, url, xtype_guid, parent_guid, guid) VALUES(?,?,?,?,?,?,?)");
 
     insQuery.bindValue(0, QnSql::serialized_field(data.status));
     insQuery.bindValue(1, QnSql::serialized_field(data.disabled));
