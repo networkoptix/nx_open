@@ -298,12 +298,12 @@ namespace QnFusion {
 
         template<class Key>
         typename at<Key, void>::type::result_type operator()(const Key &) const {
-            return at<Key, void>::type()();
+            return typename at<Key, void>::type()();
         }
 
         template<class Key, class T>
         typename at<Key, void>::type::result_type operator()(const Key &, const T &, const typename boost::enable_if<has_key<Key> >::type * = NULL) const {
-            return at<Key, void>::type()();
+            return typename at<Key, void>::type()();
         }
 
         template<class Key, class T>

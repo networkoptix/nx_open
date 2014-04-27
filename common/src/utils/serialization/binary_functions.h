@@ -11,6 +11,7 @@
 
 #include <boost/preprocessor/tuple/enum.hpp>
 
+#include <QtCore/QtEndian>
 #include <QtCore/QString>
 #include <QtCore/QUuid>
 #include <QtCore/QList>
@@ -79,7 +80,7 @@ namespace QnBinaryDetail {
 
     template<class Container, class Input>
     bool deserialize_container(QnInputBinaryStream<Input> *stream, Container *target) {
-        typedef QnContainer::make_assignable<std::iterator_traits<boost::range_mutable_iterator<Container>::type>::value_type>::type value_type;
+        typedef typename QnContainer::make_assignable<typename std::iterator_traits<typename boost::range_mutable_iterator<Container>::type>::value_type>::type value_type;
 
         qint32 size;
         if(!QnBinary::deserialize(stream, &size))
@@ -89,7 +90,7 @@ namespace QnBinaryDetail {
         QnContainer::reserve(*target, size);
 
         for(int i = 0; i < size; i++)
-            if(!deserialize_container_element(stream, target, identity<value_type>(), QnContainer::container_category<Container>::type()))
+            if(!deserialize_container_element(stream, target, identity<value_type>(), typename QnContainer::container_category<Container>::type()))
                 return false;
         
         return true;
@@ -100,25 +101,25 @@ namespace QnBinaryDetail {
 
 template <class Output>
 void serialize(qint32 value, QnOutputBinaryStream<Output> *stream) {
-    qint32 tmp = htonl(value);
+    qint32 tmp = qToBigEndian(value);
     stream->write(&tmp, sizeof(tmp));
 }
 
 template <class Output>
 void serialize(quint32 value, QnOutputBinaryStream<Output> *stream) {
-    quint32 tmp = htonl(value);
+    quint32 tmp = qToBigEndian(value);
     stream->write(&tmp, sizeof(tmp));
 }
 
 template <class Output>
 void serialize(qint16 value, QnOutputBinaryStream<Output> *stream) {
-    qint16 tmp = htons(value);
+    qint16 tmp = qToBigEndian(value);
     stream->write(&tmp, sizeof(tmp));
 }
 
 template <class Output>
 void serialize(quint16 value, QnOutputBinaryStream<Output> *stream) {
-    quint16 tmp = htons(value);
+    quint16 tmp = qToBigEndian(value);
     stream->write(&tmp, sizeof(tmp));
 }
 
@@ -134,7 +135,7 @@ void serialize(quint8 value, QnOutputBinaryStream<Output> *stream) {
 
 template <class Output>
 void serialize(qint64 value, QnOutputBinaryStream<Output> *stream) {
-    qint64 tmp = htonll(value);
+    qint64 tmp = qToBigEndian(value);
     stream->write(&tmp, sizeof(value));
 }
 
@@ -159,7 +160,7 @@ bool deserialize(QnInputBinaryStream<T> *stream, qint32 *target) {
     qint32 tmp;
     if( stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
         return false;
-    *target = ntohl(tmp);
+    *target = qFromBigEndian(tmp);
     return true;
 }
 
@@ -168,7 +169,7 @@ bool deserialize(QnInputBinaryStream<T> *stream, quint32 *target) {
     quint32 tmp;
     if( stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
         return false;
-    *target = ntohl(tmp);
+    *target = qFromBigEndian(tmp);
     return true;
 }
 
@@ -177,7 +178,7 @@ bool deserialize(QnInputBinaryStream<T> *stream, qint16 *target) {
     qint16 tmp;
     if( stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
         return false;
-    *target = ntohs(tmp);
+    *target = qFromBigEndian(tmp);
     return true;
 }
 
@@ -186,7 +187,7 @@ bool deserialize(QnInputBinaryStream<T> *stream, quint16 *target) {
     quint16 tmp;
     if( stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
         return false;
-    *target = ntohs(tmp);
+    *target = qFromBigEndian(tmp);
     return true;
 }
 
@@ -209,7 +210,7 @@ bool deserialize(QnInputBinaryStream<T> *stream, qint64 *target) {
     qint64 tmp;
     if( stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
         return false;
-    *target = ntohll(tmp);
+    *target = qFromBigEndian(tmp);
     return true;
 }
 

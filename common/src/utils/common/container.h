@@ -138,7 +138,7 @@ namespace QnContainer {
 
     template<class Container>
     void reserve(Container &container, int size) {
-        QnContainerDetail::reserve(container, size, QnContainerDetail::has_reserve<Container>::type());
+        QnContainerDetail::reserve(container, size, typename QnContainerDetail::has_reserve<Container>::type());
     }
 
 

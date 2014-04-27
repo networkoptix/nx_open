@@ -108,7 +108,7 @@ namespace QJsonDetail {
 
         for(auto pos = boost::begin(value); pos != boost::end(value); ++pos) {
             QJsonValue element;
-            serialize_container_element(ctx, *pos, &element, QnContainer::container_category<Container>::type());
+            serialize_container_element(ctx, *pos, &element, typename QnContainer::container_category<Container>::type());
             result.push_back(element);
         }
 
