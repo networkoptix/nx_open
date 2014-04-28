@@ -20,7 +20,6 @@ QnBusinessMessageBus* QnBusinessMessageBus::instance()
 
 QnBusinessMessageBus::QnBusinessMessageBus()
 {
-    connect(&m_transport, SIGNAL(finished(QNetworkReply*)), this, SLOT(at_replyFinished(QNetworkReply*)));
 }
 
 QnBusinessMessageBus::~QnBusinessMessageBus()
