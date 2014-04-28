@@ -118,11 +118,7 @@ void QnMediaServerUpdateTool::checkUpdateCoverage() {
             needUpdate = true;
     }
 
-    if (m_targetMustBeNewer && !needUpdate)
-        m_checkResult = NoNewerVersion;
-    else
-        m_checkResult = UpdateFound;
-
+    m_checkResult = needUpdate ? UpdateFound : NoNewerVersion;
     setState(Idle);
 
     return;

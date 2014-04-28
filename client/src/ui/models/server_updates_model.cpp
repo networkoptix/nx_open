@@ -69,7 +69,7 @@ QVariant QnServerUpdatesModel::data(const QModelIndex &index, int role) const {
             case NotFound:
                 return tr("Not found");
             case Found:
-                return updateInformation.version.toString(QnSoftwareVersion::FullFormat);
+                return (updateInformation.version == server->getVersion()) ? tr("Not needed") : updateInformation.version.toString(QnSoftwareVersion::FullFormat);
             case Uploading:
                 return QString::number(updateInformation.progress) + lit("%");
             case Installing:
