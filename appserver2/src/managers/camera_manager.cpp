@@ -127,13 +127,14 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraBookmarkTagsUsage& usage) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraBookmarkTagDataList& tags) {
             QnCameraBookmarkTagsUsage outData;
-            if( errorCode == ErrorCode::ok )
-                outData = usage;
+            if (errorCode == ErrorCode::ok)
+                for (const ApiCameraBookmarkTagData &tagData: tags)
+                    outData << tagData.name;
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraBookmarkTagsUsage, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraBookmarkTagDataList, decltype(queryDoneHandler)> (
             ApiCommand::getCameraBookmarkTagsUsage, nullptr, queryDoneHandler );
         return reqID;
     }

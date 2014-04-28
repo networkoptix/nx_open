@@ -37,7 +37,7 @@ void QnCameraBookmarkDialog::updateTagsList() {
     QString tag = lit("<a style=\"text-decoration:none;\" href=\"%1\"><font style=\"font-size:%2px;\">%3</font><\a><span style=\"text-decoration:none;\">  </span>");
     QString tagFilter = lit("<a style=\"text-decoration:none;\" href=\"%1\"><font style=\"font-size:%2px;color:#009933\">%3</font><\a><span style=\"text-decoration:none;\">  </span>");
 
-    QList<QString> keys = m_tagsUsage.keys();
+    QStringList keys = m_tagsUsage;
     int min_value = 65353;
     int max_value = 0;
     int min_size = 0;
@@ -46,16 +46,13 @@ void QnCameraBookmarkDialog::updateTagsList() {
     float step = 1.0;
 
     foreach(QString key, keys) {
-        int value = m_tagsUsage[key];
+        int value = 1;
         if (value < min_value) min_value = value;
         if (value > max_value) max_value = value;
     }
-    spread = max_value - min_value;
-    if (spread == 0) spread = 1;
-    step = ((float)(max_size - min_size)) / ((float)spread);
 
     foreach(QString key, keys) {
-        int value = min_size + ((m_tagsUsage[key] - min_value) * step);
+        int value = (min_size + max_size) / 2 + min_size;
         if (m_tags.contains(key)) {
             html.append(tagFilter.arg(key).arg(QString::number(12 + (value * 3))).arg(key));
         } else {
@@ -69,11 +66,11 @@ void QnCameraBookmarkDialog::updateTagsList() {
     update();
 }
 
-QHash<QString, int> QnCameraBookmarkDialog::tagsUsage() const {
+QnCameraBookmarkTagsUsage QnCameraBookmarkDialog::tagsUsage() const {
     return m_tagsUsage;
 }
 
-void QnCameraBookmarkDialog::setTagsUsage(const QHash<QString, int> tagsUsage) {
+void QnCameraBookmarkDialog::setTagsUsage(const QnCameraBookmarkTagsUsage &tagsUsage) {
     m_tagsUsage = tagsUsage;
     updateTagsList();
 }

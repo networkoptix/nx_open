@@ -107,7 +107,7 @@ namespace ec2
         //AbstractCameraManager::getCameraHistoryList
         registerGetFuncHandler<nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryList );
         //AbstractCameraManager::getBookmarkTagsUsage
-        registerGetFuncHandler<nullptr_t, ApiCameraBookmarkTagsUsage>( restProcessorPool, ApiCommand::getCameraBookmarkTagsUsage );
+        registerGetFuncHandler<nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTagsUsage );
 
         //TODO AbstractLicenseManager
         registerUpdateFuncHandler<ApiLicenseDataList>( restProcessorPool, ApiCommand::addLicenses );

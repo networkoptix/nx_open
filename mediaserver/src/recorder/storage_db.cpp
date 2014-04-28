@@ -117,7 +117,12 @@ bool QnStorageDb::createDatabase()
     beginTran();
     if (!isObjectExists(lit("table"), lit("storage_data")))
     {
-        if (!execSQLFile(QLatin1String(":/create_storage_db.sql"))) {
+        if (!execSQLFile(lit(":/01_create_storage_db.sql"))) {
+            rollback();
+            return false;
+        }
+
+        if (!execSQLFile(lit(":/02_storage_bookmarks.sql"))) {
             rollback();
             return false;
         }
@@ -129,12 +134,137 @@ bool QnStorageDb::createDatabase()
 }
 
 
-QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog()
+QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() {
+    QVector<DeviceFileCatalogPtr> result;
+    result << loadChunksFileCatalog();
+    result << loadBookmarksFileCatalog();
+    return result;
+}
+
+void QnStorageDb::beforeDelete()
 {
+    beginTran();
+}
+
+void QnStorageDb::afterDelete()
+{
+    commit();
+}
+
+bool QnStorageDb::removeCameraBookmarks(const QByteArray &mac) {
+    {
+        QSqlQuery delQuery(m_sdb);
+        delQuery.prepare("DELETE FROM storage_bookmark_tag WHERE bookmark_guid IN (SELECT guid from storage_bookmark WHERE camera_id = :id)");
+        delQuery.bindValue(":id", mac);
+        if (!delQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+            return false;
+        }
+    }
+
+    {
+        QSqlQuery delQuery(m_sdb);
+        delQuery.prepare("DELETE FROM storage_bookmark WHERE camera_id = :id");
+        delQuery.bindValue(":id", mac);
+        if (!delQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, const QByteArray &mac) {
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO storage_bookmark ( \
+                     guid, camera_id, start_time, duration, \
+                     name, description, timeout \
+                     ) VALUES ( \
+                     :guid, :cameraId, :startTime, :duration, \
+                     :name, :description, :timeout \
+                     )");
+    insQuery.bindValue("guid", bookmark.guid.toRfc4122()); 
+    insQuery.bindValue("cameraId", mac); // unique_id
+    insQuery.bindValue("startTime", bookmark.startTimeMs);
+    insQuery.bindValue("duration", bookmark.durationMs);
+    insQuery.bindValue("name", bookmark.name);
+    insQuery.bindValue("description", bookmark.description);
+    insQuery.bindValue("timeout", bookmark.timeout);
+    if (!insQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+        return false;
+    }
+
+    QSqlQuery tagQuery(m_sdb);
+    tagQuery.prepare("INSERT INTO storage_bookmark_tag ( bookmark_guid, name ) VALUES ( :bookmark_guid, :name )");
+
+    tagQuery.bindValue(":bookmark_guid", bookmark.guid.toRfc4122());
+    for (const QString tag: bookmark.tags) {
+        tagQuery.bindValue(":name", tag);
+        if (!tagQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << tagQuery.lastError().text();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+QList<QnCameraBookmark> QnStorageDb::getBookmarks(const QByteArray &mac)
+{
+    QList<QnCameraBookmark> result;
+    return result;
+    /*
+    {   // load tags
+
+        QSqlQuery queryTags(m_sdb);
+        queryTags.setForwardOnly(true);
+        queryTags.prepare("SELECT \
+                          tag.bookmark_guid as bookmarkGuid, tag.name \
+                          FROM storage_bookmark_tag tag");
+        if (!queryTags.exec()) {
+            qWarning() << Q_FUNC_INFO << queryTags.lastError().text();
+            return result;
+        }
+        
+
+        // load bookmarks
+        QSqlQuery queryBookmarks(m_sdb);
+        queryBookmarks.setForwardOnly(true);
+        queryBookmarks.prepare("SELECT \
+                               r.guid as cameraId, \
+                               bookmark.guid, bookmark.start_time as startTime, bookmark.duration, \
+                               bookmark.name, bookmark.description, bookmark.timeout \
+                               FROM vms_bookmark bookmark \
+                               JOIN vms_resource r on r.id = bookmark.camera_id");
+        if (!queryBookmarks.exec()) {
+            qWarning() << Q_FUNC_INFO << queryBookmarks.lastError().text();
+            return ErrorCode::failure;
+        }
+
+
+        {   // merge tags
+            foreach(const ApiCameraBookmarkTag& tag, tags) {
+                int idx = 0;
+                for (; idx < bookmarks.size() && tag.bookmarkGuid != bookmarks[idx].guid; idx++);
+                if (idx == bookmarks.size())
+                    break;
+                bookmarks[idx].tags.push_back(tag.name);
+            }
+        }
+
+        
+    }*/
+}
+
+QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
     QVector<DeviceFileCatalogPtr> result;
 
     QSqlQuery query(m_sdb);
-    query.prepare("SELECT * FROM storage_data ORDER BY unique_id, role, start_time");
+    query.prepare("SELECT * FROM storage_data WHERE role <= :max_role ORDER BY unique_id, role, start_time");
+    query.bindValue(":max_role", (int)QnServer::HiQualityCatalog);
+
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return result;
@@ -150,7 +280,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog()
 
     DeviceFileCatalogPtr fileCatalog;
     QVector<DeviceFileCatalog::Chunk> chunks;
-    QnServer::ChunksCatalog prevCatalog = QnServer::ChunksCatalogCount; //should differ form all existing catalogs
+    QnServer::ChunksCatalog prevCatalog = QnServer::ChunksCatalogCount; //should differ from all existing catalogs
     QByteArray prevMac;
     while (query.next())
     {
@@ -183,12 +313,44 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog()
     return result;
 }
 
-void QnStorageDb::beforeDelete()
-{
-    beginTran();
-}
+QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
+    QVector<DeviceFileCatalogPtr> result;
 
-void QnStorageDb::afterDelete()
-{
-    commit();
+    QSqlQuery query(m_sdb);
+    query.prepare("SELECT camera_id, start_time, duration FROM storage_bookmark ORDER BY camera_id, start_time");
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return result;
+    }
+    QSqlRecord queryInfo = query.record();
+    int macFieldIdx = queryInfo.indexOf("camera_id");
+    int startTimeFieldIdx = queryInfo.indexOf("start_time");
+    int durationFieldIdx = queryInfo.indexOf("duration");
+
+    DeviceFileCatalogPtr fileCatalog;
+    QVector<DeviceFileCatalog::Chunk> chunks;
+    QByteArray prevMac;
+    while (query.next())
+    {
+        QByteArray mac = query.value(macFieldIdx).toByteArray();
+        if (mac != prevMac) 
+        {
+            if (fileCatalog) {
+                fileCatalog->addChunks(chunks);
+                result << fileCatalog;
+                chunks.clear();
+            }
+            prevMac = mac;
+            fileCatalog = DeviceFileCatalogPtr(new DeviceFileCatalog(mac, QnServer::BookmarksCatalog));
+        }
+        qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
+        int durationMs = query.value(durationFieldIdx).toInt();
+        chunks << DeviceFileCatalog::Chunk(startTime, m_storageIndex, 0, durationMs, 0, 0, 0);
+    }
+    if (fileCatalog) {
+        fileCatalog->addChunks(chunks);
+        result << fileCatalog;
+    }
+
+    return result;
 }

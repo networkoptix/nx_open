@@ -13,6 +13,7 @@
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_camera_server_item_data.h"
+#include "nx_ec/data/api_camera_bookmark_data.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
@@ -93,7 +94,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
 
         //getCameraBookmarkTagsUsage
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookmarkTagsUsage& tagsUsage);
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags);
 
         //getUserList
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList);
@@ -195,8 +196,6 @@ namespace ec2
         ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
         ErrorCode removeCamera(const QnId& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
-        ErrorCode removeCameraBookmarks(qint32 internalId);
-        ErrorCode updateCameraBookmarks(const ApiCameraData& data, qint32 internalId);
 
         ErrorCode insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId);
         ErrorCode updateStorages(const ApiMediaServerData&);

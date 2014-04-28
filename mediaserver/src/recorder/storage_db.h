@@ -3,6 +3,7 @@
 
 #include <QElapsedTimer>
 
+#include <core/resource/camera_bookmark.h>
 #include <server/server_globals.h>
 
 #include "utils/db/db_helper.h"
@@ -26,8 +27,15 @@ public:
     void beforeDelete();
     void afterDelete();
     bool replaceChunks(const QByteArray& mac, QnServer::ChunksCatalog catalog, const QVector<DeviceFileCatalog::Chunk>& chunks);
+
+    bool removeCameraBookmarks(const QByteArray &mac);
+    bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QByteArray &mac);
+    QList<QnCameraBookmark> getBookmarks(const QByteArray &mac);
 private:
     bool addRecordInternal(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
+
+    QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
+    QVector<DeviceFileCatalogPtr> loadBookmarksFileCatalog();
 private:
     int m_storageIndex;
     QElapsedTimer m_lastTranTime;

@@ -9,6 +9,8 @@
 
 #include <recording/time_period.h>
 
+#include <utils/common/model_functions_fwd.h>
+
 class QnCameraBookmark: public QnTimePeriod {
 public:
     QUuid guid;
@@ -34,11 +36,10 @@ public:
     }
 };
 
-typedef QHash<QString, int> QnCameraBookmarkTagsUsage;
+typedef QStringList QnCameraBookmarkTagsUsage;
 
 QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark);
 
-Q_DECLARE_METATYPE(QnCameraBookmark);
 Q_DECLARE_TYPEINFO(QnCameraBookmark, Q_MOVABLE_TYPE);
 
 typedef QList<QnCameraBookmark> QnCameraBookmarkList;
@@ -47,5 +48,7 @@ typedef QHash<QUuid, QnCameraBookmark> QnCameraBookmarkMap;
 Q_DECLARE_METATYPE(QnCameraBookmarkList);
 Q_DECLARE_METATYPE(QnCameraBookmarkMap);
 Q_DECLARE_METATYPE(QnCameraBookmarkTagsUsage);
+
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark, (metatype)(sql))
 
 #endif //QN_CAMERA_BOOKMARK_H

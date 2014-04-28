@@ -32,6 +32,8 @@ namespace ec2
         virtual int save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of AbstractCameraManager::getBookmarkTagsUsage
+        virtual int getBookmarkTagsUsage(impl::GetCameraBookmarkTagsUsageHandlerPtr handler) override;
 
         void triggerNotification( const QnTransaction<ApiCameraData>& tran )
         {

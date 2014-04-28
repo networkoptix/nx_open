@@ -643,10 +643,6 @@ ErrorCode QnDbManager::saveCamera(const ApiCameraData& params)
         return result;
 
     result = updateCameraSchedule(params, internalId);
-    if (result != ErrorCode::ok)
-        return result;
-
-    result = updateCameraBookmarks(params, internalId);
     return result;
 }
 
@@ -1023,73 +1019,6 @@ ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
     }
 }
 
-ErrorCode QnDbManager::removeCameraBookmarks(qint32 internalId) {
-/*
-    {
-        QSqlQuery delQuery(m_sdb);
-        delQuery.prepare("DELETE FROM vms_bookmark_tag WHERE bookmark_guid IN (SELECT guid from vms_bookmark WHERE camera_id = :id)");
-        delQuery.bindValue(":id", internalId);
-        if (!delQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
-            return ErrorCode::failure;
-        }
-    }
-
-    {
-        QSqlQuery delQuery(m_sdb);
-        delQuery.prepare("DELETE FROM vms_bookmark WHERE camera_id = :id");
-        delQuery.bindValue(":id", internalId);
-        if (!delQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
-            return ErrorCode::failure;
-        }
-    }
-*/
-    return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::updateCameraBookmarks(const ApiCameraData& data, qint32 internalId) {
-    /*
-    ErrorCode result = removeCameraBookmarks(internalId);
-    if (result != ErrorCode::ok)
-        return result;
-
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO vms_bookmark ( \
-                     guid, camera_id, start_time, duration, \
-                     name, description, timeout \
-                     ) VALUES ( \
-                     :guid, :cameraId, :startTime, :duration, \
-                     :name, :description, :timeout \
-                     )");
-
-
-    QSqlQuery tagQuery(m_sdb);
-    tagQuery.prepare("INSERT INTO vms_bookmark_tag ( bookmark_guid, name ) VALUES ( :bookmark_guid, :name )");
-
-    foreach(const ApiCameraBookmarkData& bookmark, data.bookmarks) {
-        bookmark.autoBindValues(insQuery);
-        insQuery.bindValue(":cameraId", internalId);
-
-        if (!insQuery.exec()) {
-            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-            return ErrorCode::failure;
-        }
-
-        tagQuery.bindValue(":bookmark_guid", bookmark.guid.toRfc4122());
-        for (const QString tag: bookmark.tags) {
-            tagQuery.bindValue(":name", tag);
-            if (!tagQuery.exec()) {
-                qWarning() << Q_FUNC_INFO << tagQuery.lastError().text();
-                return ErrorCode::failure;
-            }
-        }
-
-    }
-    */
-    return ErrorCode::ok;
-}
-
 ErrorCode QnDbManager::deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName)
 {
     QSqlQuery delQuery(m_sdb);
@@ -1123,10 +1052,6 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
     qint32 id = getResourceInternalId(guid);
 
     ErrorCode err = deleteAddParams(id);
-    if (err != ErrorCode::ok)
-        return err;
-
-    err = removeCameraBookmarks(id);
     if (err != ErrorCode::ok)
         return err;
 
@@ -1495,49 +1420,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& c
     QnSql::fetch_many(queryParams, &params);
     mergeObjectListData<ApiCameraData>(cameraList, params, &ApiCameraData::addParams, &ApiResourceParamWithRefData::resourceId);
 
-    {   // load tags
-        
-        QSqlQuery queryTags(m_sdb);
-        queryTags.setForwardOnly(true);
-        queryTags.prepare("SELECT \
-                               tag.bookmark_guid as bookmarkGuid, tag.name \
-                               FROM vms_bookmark_tag tag");
-        if (!queryTags.exec()) {
-            qWarning() << Q_FUNC_INFO << queryTags.lastError().text();
-            return ErrorCode::failure;
-        }
-        std::vector<ApiCameraBookmarkTag> tags;
-        QN_QUERY_TO_DATA_OBJECT(queryTags, ApiCameraBookmarkTag, tags, ApiCameraBookmarkTagFields);
-        
-        // load bookmarks
-        QSqlQuery queryBookmarks(m_sdb);
-        queryBookmarks.setForwardOnly(true);
-        queryBookmarks.prepare("SELECT \
-                               r.guid as cameraId, \
-                               bookmark.guid, bookmark.start_time as startTime, bookmark.duration, \
-                               bookmark.name, bookmark.description, bookmark.timeout \
-                               FROM vms_bookmark bookmark \
-                               JOIN vms_resource r on r.id = bookmark.camera_id");
-        if (!queryBookmarks.exec()) {
-            qWarning() << Q_FUNC_INFO << queryBookmarks.lastError().text();
-            return ErrorCode::failure;
-        }
-        std::vector<ApiCameraBookmarkWithRef> bookmarks;
-        QN_QUERY_TO_DATA_OBJECT(queryBookmarks, ApiCameraBookmarkWithRef, bookmarks, ApiCameraBookmarkFields (cameraId));
-
-        {   // merge tags
-            foreach(const ApiCameraBookmarkTag& tag, tags) {
-                int idx = 0;
-                for (; idx < bookmarks.size() && tag.bookmarkGuid != bookmarks[idx].guid; idx++);
-                if (idx == bookmarks.size())
-                    break;
-                bookmarks[idx].tags.push_back(tag.name);
-            }
-        }
-
-//        mergeObjectListData(cameraList.data, bookmarks, &ApiCameraData::bookmarks, &ApiCameraBookmarkWithRef::cameraId);
-    }
-
 	return ErrorCode::ok;
 }
 
@@ -1597,16 +1479,15 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServer
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookmarkTagsUsage& tagsUsage) {
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags) {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare("SELECT name, count(*) FROM vms_bookmark_tag GROUP BY name");
+    query.prepare("SELECT name FROM vms_camera_bookmark_tag");
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::failure;
     }
-    while (query.next())
-        tagsUsage[query.value(0).toString()] = query.value(1).toInt();
+    QnSql::fetch_many(query, &tags);
 
     return ErrorCode::ok;
 }

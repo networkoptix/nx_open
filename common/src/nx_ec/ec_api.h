@@ -14,6 +14,7 @@
 #include <api/model/connection_info.h>
 #include <api/model/email_attachment.h>
 
+#include <core/resource/camera_bookmark.h>
 #include <core/resource/videowall_control_message.h>
 
 #include <nx_ec/impl/ec_api_impl.h>

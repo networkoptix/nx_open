@@ -1,3 +1,8 @@
+-- Camera bookmark tags usage table
+CREATE TABLE "vms_camera_bookmark_tag" (
+    name            VARCHAR(30) NOT NULL UNIQUE PRIMARY KEY
+    );
+
 -- Bookmark tags table
 CREATE TABLE "vms_bookmark_tag" (
     bookmark_guid   BLOB(16) NOT NULL,

@@ -7,6 +7,7 @@
 #include "api_business_rule_data.h"
 #include "api_camera_data.h"
 #include "api_camera_server_item_data.h"
+#include "api_camera_bookmark_data.h"
 #include "api_connection_data.h"
 #include "api_data.h"
 #include "api_email_data.h"

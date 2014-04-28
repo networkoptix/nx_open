@@ -54,7 +54,7 @@ namespace ec2
             getCameraHistoryList,
             //!ApiCameraServerItem
             addCameraHistoryItem,
-            //!ApiCameraBookmarkTagsUsage
+            //!ApiCameraBookmarkTagDataList
             getCameraBookmarkTagsUsage,
 
             getMediaServerList,

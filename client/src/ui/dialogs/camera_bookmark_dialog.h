@@ -21,8 +21,8 @@ public:
     explicit QnCameraBookmarkDialog(QWidget *parent = 0);
     ~QnCameraBookmarkDialog();
 
-    QHash<QString, int> tagsUsage() const;
-    void setTagsUsage(const QHash<QString, int> tagsUsage);
+    QnCameraBookmarkTagsUsage tagsUsage() const;
+    void setTagsUsage(const QnCameraBookmarkTagsUsage &tagsUsage);
 
     void loadData(const QnCameraBookmark &bookmark);
     void submitData(QnCameraBookmark &bookmark) const;
@@ -31,7 +31,7 @@ private:
 
 private:
     QScopedPointer<Ui::QnCameraBookmarkDialog> ui;
-    QHash<QString, int> m_tagsUsage;
+    QnCameraBookmarkTagsUsage m_tagsUsage;
     QStringList m_tags;
 };
 

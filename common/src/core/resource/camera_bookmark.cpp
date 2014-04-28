@@ -1,5 +1,7 @@
 #include "camera_bookmark.h"
 
+#include <utils/common/model_functions.h>
+
 QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
     if (bookmark.durationMs > 0)
         dbg.nospace() << "QnCameraBookmark(" << QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs).toString(lit("dd hh:mm"))
@@ -11,3 +13,9 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
     dbg.space() << bookmark.tags.join(lit(", "));
     return dbg.space();
 }
+
+inline void serialize_field(const QStringList &, QVariant *) { return; }
+inline void deserialize_field(const QVariant &, QStringList *) { return; }
+
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmark, (sql), (guid)(name)(description)(timeout) )
