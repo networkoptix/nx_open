@@ -3,7 +3,7 @@
 
 #include "binary.h"
 
-#include <utility> /* For std::pair. */
+#include <utility> /* For std::pair, std::min. */
 #include <array>
 #include <vector>
 #include <set>
@@ -85,9 +85,16 @@ namespace QnBinaryDetail {
         qint32 size;
         if(!QnBinary::deserialize(stream, &size))
             return false;
+        if(size < 0)
+            return false;
+
+        /* Don't reserve too much. Big size may be a result of invalid input,
+         * and in this case we don't want to crash with out-of-memory exception.
+         * Limit: no more than 1024 elements, and no more than 1Mb of memory. */
+        qint32 maxSize = std::min(1024, 1024 * 1024 / static_cast<int>(sizeof(value_type)));
 
         QnContainer::clear(*target);
-        QnContainer::reserve(*target, size);
+        QnContainer::reserve(*target, std::min(size, maxSize));
 
         for(int i = 0; i < size; i++)
             if(!deserialize_container_element(stream, target, identity<value_type>(), typename QnContainer::container_category<Container>::type()))
