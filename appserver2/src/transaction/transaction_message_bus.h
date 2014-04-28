@@ -149,7 +149,7 @@ signals:
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
-        void at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers, QSet<QnId> dstPeers);
+        void at_gotTransaction(QByteArray serializedTran, TransactionTransportHeader transportHeader);
         void doPeriodicTasks();
     private:
         QnTransactionTransportSerializer m_serializer;

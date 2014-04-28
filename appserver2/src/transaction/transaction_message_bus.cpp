@@ -90,7 +90,7 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& 
     }
 }
 
-void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers, QSet<QnId> dstPeers)
+void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, TransactionTransportHeader transportHeader)
 {
     QnTransactionTransport* sender = (QnTransactionTransport*) this->sender();
     if (!sender || sender->getState() != QnTransactionTransport::ReadyForStreaming)
@@ -117,7 +117,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         m_lastTranSeq[tran.id.peerGUID] = tran.id.sequence;
     }
 
-    if (dstPeers.isEmpty() || dstPeers.contains(qnCommon->moduleGUID()))
+    if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(qnCommon->moduleGUID()))
     {
         qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "with time=" << tran.timestamp;
         // process system transactions
@@ -156,22 +156,22 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         }
     }
     else {
-        qDebug() << "skip transaction " << ApiCommand::toString(tran.command) << "for peers" << dstPeers;
+        qDebug() << "skip transaction " << ApiCommand::toString(tran.command) << "for peers" << transportHeader.dstPeers;
     }
 
     QMutexLocker lock(&m_mutex);
     
     // proxy incoming transaction to other peers.
-    if (!dstPeers.isEmpty() && (dstPeers - processedPeers).isEmpty())
+    if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty())
         return; // all dstPeers already processed
 
     QByteArray chunkData;
-    m_serializer.serializeTran(chunkData, serializedTran, processedPeers + peersToSend(tran.command));
+    m_serializer.serializeTran(chunkData, serializedTran, transportHeader.processedPeers + peersToSend(tran.command));
 
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
         QnTransactionTransportPtr transport = *itr;
-        if (!processedPeers.contains(transport->remoteGuid()) && transport->isReadyToSend(tran.command)) 
+        if (!transportHeader.processedPeers.contains(transport->remoteGuid()) && transport->isReadyToSend(tran.command)) 
         {
             Q_ASSERT(transport->remoteGuid() != tran.id.peerGUID);
             transport->addData(chunkData);
