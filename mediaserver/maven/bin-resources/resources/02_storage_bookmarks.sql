@@ -16,7 +16,7 @@ CREATE TABLE "storage_bookmark" (
     timeout         INTEGER NULL                            -- period of time during which the bookmarked archive part should not be deleted
     );
     
-CREATE UNIQUE INDEX idx_bookmark_guid ON vms_bookmark(guid);
+CREATE UNIQUE INDEX idx_bookmark_guid ON storage_bookmark(guid);
 
 -- Index for faster TOP-100 requests
-CREATE INDEX idx_bookmark_duration ON vms_bookmark(duration);
+CREATE INDEX idx_bookmark_duration ON storage_bookmark(duration);
