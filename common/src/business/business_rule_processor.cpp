@@ -29,6 +29,8 @@
 
 #include "nx_ec/data/api_email_data.h"
 #include "common/common_module.h"
+#include "nx_ec/data/api_business_rule_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
@@ -52,7 +54,7 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(qnBusinessMessageBus, SIGNAL(actionDelivered(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDelivered(QnAbstractBusinessActionPtr)));
     connect(qnBusinessMessageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
 
-    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeReceivedAction(QnAbstractBusinessActionPtr)));
+    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeAction(QnAbstractBusinessActionPtr)));
 
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
@@ -105,15 +107,22 @@ bool QnBusinessRuleProcessor::needProxyAction(QnAbstractBusinessActionPtr action
 
 void QnBusinessRuleProcessor::doProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    QnAbstractBusinessActionPtr actionToSend(action);
-    QVector<QnId> dstRes;
-    if (res)
-        dstRes << res->getId();
-    actionToSend->setResources(dstRes);
-
     QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
-    if (routeToServer)
-        qnBusinessMessageBus->deliveryBusinessAction(action, routeToServer->getId());
+    if (routeToServer) 
+    {
+        // todo: it is better to use action.clone here
+        ec2::ApiBusinessActionData actionData;
+        QnAbstractBusinessActionPtr actionToSend;
+
+        ec2::fromResourceToApi(action, actionData);
+        if (res) {
+            actionData.resources.clear();
+            actionData.resources.push_back(res->getId());
+        }
+        ec2::fromApiToResource(actionData, actionToSend, qnResPool);
+
+        qnBusinessMessageBus->deliveryBusinessAction(actionToSend, routeToServer->getId());
+    }
 }
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
@@ -133,21 +142,6 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
     else {
         foreach(QnResourcePtr res, resList)
             executeAction(action, res);
-    }
-}
-
-bool QnBusinessRuleProcessor::executeReceivedAction(QnAbstractBusinessActionPtr action)
-{
-    if (action->getResources().isEmpty()) {
-        return executeActionInternal(action, QnResourcePtr());
-    }
-    else {
-        foreach(const QnId& resId, action->getResources())
-        {
-            if (!executeActionInternal(action, qnResPool->getResourceById(resId)))
-                return false;
-        }
-        return true;
     }
 }
 
