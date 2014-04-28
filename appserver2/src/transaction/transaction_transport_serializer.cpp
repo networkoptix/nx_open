@@ -26,7 +26,7 @@ namespace ec2
         foreach (const QnId& peer, transportHeader.dstPeers)
             Q_ASSERT(!peer.isNull());
 
-        tranData.append((const char*) chunkPayload + stream.getPos(), len - stream.getPos());
+        tranData.append((const char*) chunkPayload + stream.pos(), len - stream.pos());
         return true;
     }
 

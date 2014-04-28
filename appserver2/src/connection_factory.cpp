@@ -315,6 +315,6 @@ namespace ec2
     {
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
-            new FlexibleQueryHttpHandler<InputType, OutputType, decltype(handler)>(cmd, handler) );
+            new FlexibleQueryHttpHandler<InputType, OutputType, HandlerType>(cmd, handler) );
     }
 }

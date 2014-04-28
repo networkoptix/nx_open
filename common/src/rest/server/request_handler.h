@@ -6,8 +6,9 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
+#include <QtCore/QSharedPointer>
+
 #include "utils/common/request_param.h"
-#include <QSharedPointer>
 
 class TCPSocket;
 

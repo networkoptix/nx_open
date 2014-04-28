@@ -6,17 +6,19 @@
 #ifndef SERVER_QUERY_PROCESSOR_H
 #define SERVER_QUERY_PROCESSOR_H
 
+#include <QtCore/QDateTime>
 #include <QtConcurrent>
-#include <QDateTime>
 
 #include <utils/common/scoped_thread_rollback.h>
+
+#include <utils/serialization/json_functions.h>
+#include <utils/serialization/binary_functions.h>
 
 #include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "managers/aux_manager.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
-
 
 namespace ec2
 {

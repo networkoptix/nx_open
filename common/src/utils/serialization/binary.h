@@ -23,8 +23,8 @@ namespace QnBinary {
     template<class T>
     QByteArray serialized(const T &value) {
         QByteArray result;
-        QnOutputBinaryStream<QByteArray> stream;
-        QnBinary::serialize(value, stream);
+        QnOutputBinaryStream<QByteArray> stream(&result);
+        QnBinary::serialize(value, &stream);
         return result;
     }
 
@@ -32,7 +32,7 @@ namespace QnBinary {
     T deserialized(const QByteArray &value, const T &defaultValue = T(), bool *success = NULL) {
         T target;
         QnInputBinaryStream<QByteArray> stream(value);
-        bool result = QnBinary::deserialize(stream, &target);
+        bool result = QnBinary::deserialize(&stream, &target);
         if (success)
             *success = result;
         return result ? target : defaultValue;
