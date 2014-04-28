@@ -4,8 +4,8 @@
 #include <cassert>
 
 #ifndef Q_MOC_RUN
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_and_derived.hpp>
+#include <boost/utility/enable_if.hpp> // TODO: #Elric #EC2 use std::enable_if
+#include <boost/type_traits/is_base_and_derived.hpp> // TODO: #Elric #EC2 also std?
 #endif // Q_MOC_RUN
 
 #include <utils/common/adl_wrapper.h>

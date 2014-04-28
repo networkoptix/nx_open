@@ -3,6 +3,8 @@
 
 #include "binary_fwd.h"
 
+#include <QtCore/QByteArray>
+
 template<>
 class QnInputBinaryStream<QByteArray> {
 public:

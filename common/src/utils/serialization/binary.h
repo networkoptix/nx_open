@@ -1,8 +1,6 @@
 #ifndef QN_SERIALIZATION_BINARY_H
 #define QN_SERIALIZATION_BINARY_H
 
-#include <QtCore/QByteArray>
-
 #include <utils/serialization/serialization.h>
 #include <utils/fusion/fusion_serialization.h>
 
