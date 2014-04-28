@@ -247,7 +247,7 @@ namespace QJsonDetail {
         bool operator()(const T &value, const Access &access) {
             using namespace QnFusion;
 
-            if(invoke(access(checker, TrueChecker()), value))
+            if(!invoke(access(checker, TrueChecker()), value))
                 return true; /* Skipped. */
 
             QJson::serialize(m_ctx, invoke(access(getter), value), access(name), &m_object);
