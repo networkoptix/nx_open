@@ -15,14 +15,20 @@ class QUrlQuery;
 
 namespace ec2
 {
-    void parseHttpRequestParams(const QnRequestParamList &params, ApiStoredFilePath *path);
-    void parseHttpRequestParams(const QnRequestParamList &params, LoginInfo *loginInfo);
-    void parseHttpRequestParams(const QnRequestParamList &params, QnId *id);
-    void parseHttpRequestParams(const QnRequestParamList &params, nullptr_t *);
-    void toUrlParams(const std::nullptr_t &, QUrlQuery *query);
-    void toUrlParams(const QnId & id, QUrlQuery *query);
+    bool parseHttpRequestParams(const QnRequestParamList &params, ApiStoredFilePath *path);
     void toUrlParams(const ApiStoredFilePath &id, QUrlQuery *query);
+
+    bool parseHttpRequestParams(const QnRequestParamList &params, QnId *id);
+    void toUrlParams(const QnId &id, QUrlQuery *query);
+
+    bool parseHttpRequestParams(const QnRequestParamList &params, Qn::SerializationFormat *format);
+    void toUrlParams(const Qn::SerializationFormat& format, QUrlQuery *query);
+
+    bool parseHttpRequestParams(const QnRequestParamList &params, LoginInfo *loginInfo);
     void toUrlParams(const LoginInfo &loginInfo, QUrlQuery *query);
+
+    bool parseHttpRequestParams(const QnRequestParamList &params, nullptr_t *);
+    void toUrlParams(const std::nullptr_t &, QUrlQuery *query);
 }
 
 #endif  //EC2_REST_REQUEST_PARAMS_H

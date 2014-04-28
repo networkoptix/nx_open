@@ -1,12 +1,13 @@
 #ifndef QN_REQUEST_PARAM_H
 #define QN_REQUEST_PARAM_H
 
+#include <algorithm> /* For std::find_if. */
+
 #include <QtCore/QList>
 #include <QtCore/QPair>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
-#include <QtNetwork/QNetworkReply>
-#include "id.h"
+#include <QtCore/QUuid>
 
 class QnRequestParam: public QPair<QString, QString> {
     typedef QPair<QString, QString> base_type;
@@ -15,7 +16,7 @@ public:
     QnRequestParam(const QString &first, const QString &second): base_type(first, second) {}
     QnRequestParam(const char *first, const char *second): base_type(QLatin1String(first), QLatin1String(second)) {}
     QnRequestParam(const char *first, const QString &second): base_type(QLatin1String(first), second) {}
-    QnRequestParam(const char *first, const QnId &second): base_type(QLatin1String(first), second.toString()) {}
+    QnRequestParam(const char *first, const QUuid &second): base_type(QLatin1String(first), second.toString()) {}
     QnRequestParam(const QString &first, const char *second): base_type(first, QLatin1String(second)) {}
     QnRequestParam(const char *first, qint64 second): base_type(QLatin1String(first), QString::number(second)) {}
 };
@@ -42,6 +43,14 @@ public:
             if(pair.first == key)
                 return true;
         return false;
+    }
+
+    iterator find(const Key &key) {
+        return std::find_if(begin(), end(), [&](const value_type &element) { return element.first == key; });
+    }
+
+    const_iterator find(const Key &key) const {
+        return std::find_if(begin(), end(), [&](const value_type &element) { return element.first == key; });
     }
 
     using base_type::insert;

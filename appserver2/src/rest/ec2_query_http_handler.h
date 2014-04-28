@@ -45,6 +45,9 @@ namespace ec2
         {
             InputData inputData;
             parseHttpRequestParams( params, &inputData );
+            
+            Qn::SerializationFormat format = Qn::BnsFormat;
+            parseHttpRequestParams( params, &format );
 
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;
