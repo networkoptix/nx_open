@@ -27,6 +27,9 @@ public:
     virtual void deserialize(const QnResourceParameters& parameters) override;
 
     QString toSearchString() const override;
+    void forceEnableAudio();
+    void forceDisableAudio();
+    bool isForcedAudioSupported() const;
 
 public slots:
     void issueOccured();

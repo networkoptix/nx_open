@@ -495,6 +495,18 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     initIO(&m_videoIO, m_videoParser, RTPSession::TT_VIDEO);
     initIO(&m_audioIO, m_audioParser, RTPSession::TT_AUDIO);
+
+    if (m_role == QnResource::Role_LiveVideo)
+    {
+        if (m_audioIO) {
+            if (!camera->isAudioSupported())
+                camera->forceEnableAudio();
+        }
+        else {
+            camera->forceDisableAudio();
+        }
+    }
+
     if (!m_videoIO && !m_audioIO)
         m_RtpSession.stop();
     m_rtcpReportTimer.restart();
