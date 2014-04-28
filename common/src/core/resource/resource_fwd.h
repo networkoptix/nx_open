@@ -54,6 +54,10 @@ class QnPhysicalCameraResource;
 typedef QnSharedResourcePointer<QnPhysicalCameraResource> QnPhysicalCameraResourcePtr;
 typedef QnSharedResourcePointerList<QnPhysicalCameraResource> QnPhysicalCameraResourceList;
 
+class QnDesktopCameraResource;
+typedef QnSharedResourcePointer<QnDesktopCameraResource> QnDesktopCameraResourcePtr;
+typedef QnSharedResourcePointerList<QnDesktopCameraResource> QnDesktopCameraResourceList;
+
 class QnLayoutResource;
 typedef QnSharedResourcePointer<QnLayoutResource> QnLayoutResourcePtr;
 typedef QnSharedResourcePointerList<QnLayoutResource> QnLayoutResourceList;
