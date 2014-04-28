@@ -102,6 +102,7 @@
 #include <rest/handlers/storage_space_rest_handler.h>
 #include <rest/handlers/storage_status_rest_handler.h>
 #include <rest/handlers/time_rest_handler.h>
+#include <rest/handlers/update_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
 
@@ -941,6 +942,7 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api

@@ -5,9 +5,11 @@
 #include <QtCore/QRegExp>
 #include <QtCore/QMetaType>
 
+#include <boost/operators.hpp>
+
 #include <nx_ec/binary_serialization_helper.h>
 
-class QnSystemInformation {
+class QnSystemInformation : public boost::equality_comparable1<QnSystemInformation> {
 public:
     QnSystemInformation(const QString &platform, const QString &arch) :
         arch(arch),
