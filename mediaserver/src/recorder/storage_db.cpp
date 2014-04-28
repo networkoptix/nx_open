@@ -187,7 +187,7 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
                      :name, :description, :timeout \
                      )");
     QnSql::bind(bookmark, &insQuery);
-    insQuery.bindValue("cameraId", mac); // unique_id
+    insQuery.bindValue(":cameraId", mac); // unique_id
     if (!insQuery.exec()) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return false;

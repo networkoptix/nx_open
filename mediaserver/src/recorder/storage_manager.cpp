@@ -1009,26 +1009,33 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
     QnDualQualityHelper helper;
     helper.openCamera(cameraGuid);
 
-    DeviceFileCatalog::Chunk chunk;
+    DeviceFileCatalog::Chunk chunkBegin, chunkEnd;
     DeviceFileCatalogPtr catalog;
-    helper.findDataForTime(bookmark.startTimeMs, chunk, catalog, DeviceFileCatalog::OnRecordHole_NextChunk, false);
-    if (chunk.startTimeMs < 0)
+    helper.findDataForTime(bookmark.startTimeMs, chunkBegin, catalog, DeviceFileCatalog::OnRecordHole_NextChunk, false);
+    if (chunkBegin.startTimeMs < 0)
         return false; //recorded chunk was not found
 
-    qint64 oldStart = bookmark.startTimeMs;
-    bookmark.startTimeMs = qMax(bookmark.startTimeMs, chunk.startTimeMs); // move bookmark start to the start of the chunk in case of hole
-    if (bookmark.startTimeMs != oldStart)
-        bookmark.durationMs -= (bookmark.startTimeMs - oldStart);
+    helper.findDataForTime(bookmark.endTimeMs(), chunkEnd, catalog, DeviceFileCatalog::OnRecordHole_PrevChunk, false);
+    if (chunkEnd.startTimeMs < 0)
+        return false; //recorded chunk was not found
+
+    qint64 endTimeMs = bookmark.endTimeMs();
+
+    bookmark.startTimeMs = qMax(bookmark.startTimeMs, chunkBegin.startTimeMs);  // move bookmark start to the start of the chunk in case of hole
+    endTimeMs = qMin(endTimeMs, chunkEnd.endTimeMs());
+    bookmark.durationMs = endTimeMs - bookmark.startTimeMs;                     // move bookmark end to the end of the closest chunk in case of hole
+
     if (bookmark.durationMs <= 0)
         return false;   // bookmark ends before the chunk starts
 
-    chunk.startTimeMs = bookmark.startTimeMs;
-    chunk.durationMs = bookmark.durationMs;
+    // this chunk will be added to the bookmark catalog
+    chunkBegin.startTimeMs = bookmark.startTimeMs;
+    chunkBegin.durationMs = bookmark.durationMs;
 
     DeviceFileCatalogPtr bookmarksCatalog = getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
-    bookmarksCatalog->addChunk(chunk);
+    bookmarksCatalog->addChunk(chunkBegin);
 
-    QnStorageResourcePtr storage = storageRoot(chunk.storageIndex);
+    QnStorageResourcePtr storage = storageRoot(chunkBegin.storageIndex);
     if (!storage)
         return false;
 

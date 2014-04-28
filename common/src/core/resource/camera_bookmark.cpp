@@ -14,8 +14,4 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
     return dbg.space();
 }
 
-inline void serialize_field(const QStringList &, QVariant *) { return; }
-inline void deserialize_field(const QVariant &, QStringList *) { return; }
-
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmark, (sql), (guid)(name)(description)(timeout) )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmark, (sql), (startTimeMs)(durationMs)(guid)(name)(description)(timeout) )
