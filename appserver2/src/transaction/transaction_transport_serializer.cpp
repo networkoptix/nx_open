@@ -1,9 +1,14 @@
 #include "transaction_transport_serializer.h"
-#include "common/common_module.h"
+
+#include <common/common_module.h>
+#include <utils/common/model_functions.h>
+
 #include "transaction_message_bus.h"
 
 namespace ec2
 {
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TransactionTransportHeader, (binary)(json), TransactionTransportHeader_Fields);
+
 
     QnTransactionTransportSerializer::QnTransactionTransportSerializer(QnTransactionMessageBus& owner): m_owner(owner)
     {
@@ -13,10 +18,10 @@ namespace ec2
     bool QnTransactionTransportSerializer::deserializeTran(const quint8* chunkPayload, int len,  PeerList& processedPeers, PeerList& dstPeers, QByteArray& tranData)
     {
         QByteArray srcData = QByteArray::fromRawData((const char*) chunkPayload, len);
-        InputBinaryStream<QByteArray> stream(srcData);
-        if (!deserialize(processedPeers, &stream))
+        QnInputBinaryStream<QByteArray> stream(srcData);
+        if (!QnBinary::deserialize(&stream, &processedPeers))
             return false;
-        if (!deserialize(dstPeers, &stream))
+        if (!QnBinary::deserialize(&stream, &dstPeers))
             return false;
         foreach (const QnId& peer, dstPeers)
             Q_ASSERT(!peer.isNull());

@@ -116,6 +116,7 @@ public:
     {}
 };
 
+#ifndef Q_MOC_RUN
 
 #define QN_GENERIC_SCOPED_ROLLBACK_I(TYPE, NAME, ... /* CONSTRUCTOR */) \
     BOOST_PP_TUPLE_ENUM(TYPE) NAME(__VA_ARGS__); Q_UNUSED(NAME);
@@ -126,5 +127,9 @@ public:
 #define QN_SCOPED_VALUE_ROLLBACK(VARIABLE, ... /* VALUE */)                     \
     QN_GENERIC_SCOPED_ROLLBACK((QnScopedValueRollback<boost::remove_reference<decltype(*(VARIABLE))>::type>), VARIABLE, ##__VA_ARGS__)
 
+#else // Q_MOC_RUN
+#define QN_GENERIC_SCOPED_ROLLBACK(...)
+#define QN_SCOPED_VALUE_ROLLBACK(...)
+#endif // Q_MOC_RUN
 
 #endif // QN_SCOPED_VALUE_ROLLBACK_H

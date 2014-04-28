@@ -25,6 +25,7 @@
 #include <utils/common/warnings.h>
 
 #include "version.h"
+#include "compatibility.h"
 
 QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
     QnButtonBoxDialog(parent),

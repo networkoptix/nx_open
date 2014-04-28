@@ -45,7 +45,7 @@ protected:
      * @param toggleState       On/off state of the event if it is toggleable.
      * @param timeStamp         Event date and time in usec from UTC.
      */
-    QnAbstractBusinessEvent(QnBusiness::EventType eventType, const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp);
+    QnAbstractBusinessEvent(QnBusiness::EventType eventType, const QnResourcePtr& resource, QnBusiness::EventState toggleState, qint64 timeStamp);
 
 public:
     virtual ~QnAbstractBusinessEvent();
@@ -65,14 +65,14 @@ public:
     /**
      * @return                  On/off state of the event.
      */
-    Qn::ToggleState getToggleState()     const { return m_toggleState; }
+    QnBusiness::EventState getToggleState()     const { return m_toggleState; }
 
     /**
      * @brief checkCondition    Checks event parameters. 
      * @param params            Parameters of an event that are selected in rule.
      * @return                  True if event should be handled, false otherwise.
      */
-    virtual bool checkCondition(Qn::ToggleState state, const QnBusinessEventParameters& params) const = 0;
+    virtual bool checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters& params) const = 0;
 
     virtual QnBusinessEventParameters getRuntimeParams() const;
 
@@ -95,7 +95,7 @@ private:
     /**
      * @brief m_toggleState     State on/off for togglable events.
      */
-    const Qn::ToggleState m_toggleState;
+    const QnBusiness::EventState m_toggleState;
 };
 
 Q_DECLARE_METATYPE(QnAbstractBusinessEventPtr)

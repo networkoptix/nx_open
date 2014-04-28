@@ -28,11 +28,13 @@ namespace boost {
 #include <QtCore/QHashIterator>
 #include <QtCore/QMutableHashIterator>
 #include <QtCore/QVectorIterator>
+#include <QtCore/QMapIterator>
 #define QListIterator           qt_java_style_iterators_are_forbidden
 #define QLinkedListIterator     qt_java_style_iterators_are_forbidden
 #define QHashIterator           qt_java_style_iterators_are_forbidden
 #define QMutableHashIterator    qt_java_style_iterators_are_forbidden
 #define QVectorIterator         qt_java_style_iterators_are_forbidden
+//#define QMapIterator            qt_java_style_iterators_are_forbidden // TODO: #Elric
 
 
 /* Prevent the usage of Q_GLOBAL_STATIC_WITH_INITIALIZER as it is not thread-safe.

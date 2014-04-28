@@ -6,7 +6,7 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <core/resource_management/resource_discovery_manager.h>
 
-#include <utils/common/json.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/network/tcp_connection_priv.h>
 
 

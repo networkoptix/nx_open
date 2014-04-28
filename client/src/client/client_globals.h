@@ -3,6 +3,8 @@
 
 #include <QtCore/QMetaType>
 
+#include <common/user_permissions.h>
+
 namespace Qn {
 
     /** 
@@ -119,10 +121,8 @@ namespace Qn {
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
 
 
-    #include "user_permissions.h"
     Q_DECLARE_FLAGS(Permissions, Permission)
     Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
-
 
     /**
      * \param permissions               Permission flags containing some deprecated values.

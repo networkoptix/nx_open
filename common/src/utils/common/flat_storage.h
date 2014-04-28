@@ -1,12 +1,10 @@
 #ifndef QN_FLAT_STORAGE_H
 #define QN_FLAT_STORAGE_H
 
+#include <type_traits> /* For std::is_pointer. */
+
 #include <QtCore/QSet>
 #include <QtCore/QtAlgorithms> /* For qDeleteAll. */
-
-#ifndef Q_MOC_RUN
-#include <boost/type_traits/is_pointer.hpp>
-#endif
 
 #include "flat_map.h"
 
@@ -18,7 +16,7 @@ template<class Key, class T>
 class QnFlatStorage: private QnFlatMap<Key, T> {
     typedef QnFlatMap<Key, T> base_type;
 
-    static_assert(boost::is_pointer<T>::value, "Stored type must be a pointer.");
+    static_assert(std::is_pointer<T>::value, "Stored type must be a pointer.");
 
 public:
     QnFlatStorage() {}

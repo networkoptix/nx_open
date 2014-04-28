@@ -47,7 +47,7 @@ public:
 
     template<class Enum>
     static QnTypedEnumNameMapper<Enum> create() {
-        return createEnumNameMapper(adlWrap<Enum *>(NULL));
+        return createEnumNameMapper(adl_wrap(static_cast<Enum *>(NULL)));
     }
 
 private:

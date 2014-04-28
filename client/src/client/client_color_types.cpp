@@ -3,7 +3,8 @@
 #include <ui/style/globals.h>
 
 #include <utils/math/color_transformations.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json_functions.h>
+#include <utils/fusion/fusion_adaptor.h>
 #include <utils/math/math.h>
 
 QnTimeSliderColors::QnTimeSliderColors() {
@@ -116,70 +117,81 @@ QnLicensesListModelColors::QnLicensesListModelColors() {
     expired = QColor(Qt::red);
 }
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnTimeSliderColors, 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnTimeSliderColors,
+    (json),
     (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
         (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)
         (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute), 
-    QJson::Optional
+    (optional, true)
 )
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnTimeScrollBarColors, 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnTimeScrollBarColors,
+    (json),
     (indicator)(border)(handle), 
-    QJson::Optional
+    (optional, true)
 )
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnBackgroundColors, 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnBackgroundColors,
+    (json),
     (normal)(panic), 
-    QJson::Optional
+    (optional, true)
 )
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnCalendarColors, 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnCalendarColors,
+    (json),
     (selection)(primaryRecording)(secondaryRecording)(primaryMotion)(secondaryMotion)(separator), 
-    QJson::Optional
+    (optional, true)
 )
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnStatisticsColors, 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnStatisticsColors,
+    (json),
     (grid)(frame)(cpu)(ram)(hdds)(network), 
-    QJson::Optional
+    (optional, true)
 )
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnScheduleGridColors, 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnScheduleGridColors,
+    (json),
     (normalLabel)(weekendLabel)(selectedLabel)(disabledLabel), 
-    QJson::Optional
+    (optional, true)
 )
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnGridColors, 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnGridColors,
+    (json),
     (grid)(allowed)(disallowed), 
-    QJson::Optional
+    (optional, true)
 )
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnPtzManageModelColors, 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnPtzManageModelColors,
+    (json),
     (title)(invalid)(warning), 
-    QJson::Optional
+    (optional, true)
 )
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnHistogramColors, 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnHistogramColors,
+    (json),
     (background)(border)(histogram)(selection)(grid)(text), 
-    QJson::Optional
+    (optional, true)
 )
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnResourceWidgetFrameColors, 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnResourceWidgetFrameColors,
+    (json),
     (normal)(active)(selected), 
-    QJson::Optional
+    (optional, true)
 )
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnLicensesListModelColors, 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    QnLicensesListModelColors,
+    (json),
     (normal)(warning)(expired), 
-    QJson::Optional
+    (optional, true)
 )

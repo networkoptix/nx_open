@@ -5,6 +5,7 @@
 
 #include <boost/operators.hpp>
 
+#include <utils/common/model_functions_fwd.h>
 #include <utils/math/defines.h>
 
 // TODO: #Elric doesn't really belong in this folder
@@ -31,7 +32,6 @@ struct QnItemDewarpingParams: public boost::equality_comparable1<QnItemDewarping
     friend bool operator==(const QnItemDewarpingParams &l, const QnItemDewarpingParams &r);
 };
 
-Q_DECLARE_METATYPE(QnItemDewarpingParams)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnItemDewarpingParams)
+QN_FUSION_DECLARE_FUNCTIONS(QnItemDewarpingParams, (json)(metatype))
 
 #endif // ITEM_DEWARPING_PARAMS_H

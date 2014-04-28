@@ -4,7 +4,7 @@
 #include "request_handler.h"
 #include "json_rest_result.h"
 
-#include <utils/common/lexical.h>
+#include <utils/serialization/lexical.h>
 
 
 class QnJsonRestHandler: public QnRestRequestHandler {

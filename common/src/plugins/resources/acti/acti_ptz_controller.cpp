@@ -15,10 +15,10 @@ namespace {
         ActiPtzVector(): pan(0), tilt(0), zoom(0) {}
         ActiPtzVector(int pan, int tilt, int zoom): pan(pan), tilt(tilt), zoom(zoom) {}
 
-        QN_DEFINE_STRUCT_OPERATOR_EQ(ActiPtzVector, (pan)(tilt)(zoom), friend);
-
         int pan, tilt, zoom;
     };
+
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ActiPtzVector, (eq), (pan)(tilt)(zoom));
 
     int toActiZoomSpeed(qreal zoomSpeed) {
 #if 0

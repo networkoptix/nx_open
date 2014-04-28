@@ -10,7 +10,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -30,8 +30,7 @@ struct QnStreamSynchronizationState {
     qint64 time;
     qreal speed;
 };
-Q_DECLARE_METATYPE(QnStreamSynchronizationState)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnStreamSynchronizationState)
+QN_FUSION_DECLARE_FUNCTIONS(QnStreamSynchronizationState, (json)(metatype))
 
 /**
  * This class manages the necessary machinery for synchronized playback of

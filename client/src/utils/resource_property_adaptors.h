@@ -5,6 +5,8 @@
 
 #include <client/client_model_types.h>
 
+#include <utils/serialization/json_functions.h> // TODO: #Elric get rid of this include
+
 #include <business/business_fwd.h>
 
 class QnBusinessEventsFilterResourcePropertyAdaptor: public QnLexicalResourcePropertyAdaptor<quint64> {

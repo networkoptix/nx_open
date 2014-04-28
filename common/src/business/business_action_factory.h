@@ -8,7 +8,7 @@
 class QnBusinessActionFactory
 {
 public:
-    static QnAbstractBusinessActionPtr instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, Qn::ToggleState state = Qn::UndefinedState);
+    static QnAbstractBusinessActionPtr instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, QnBusiness::EventState state = QnBusiness::UndefinedState);
 
     static QnAbstractBusinessActionPtr instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, const QnBusinessAggregationInfo& aggregationInfo);
 

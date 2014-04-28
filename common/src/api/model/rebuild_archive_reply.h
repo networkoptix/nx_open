@@ -41,6 +41,7 @@ struct QnRebuildArchiveReply
     
     int progress() const { return m_progress; }
     int state() const { return m_state; }
+
 private:
     int m_progress;
     int m_state;

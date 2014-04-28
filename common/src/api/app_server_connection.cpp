@@ -249,7 +249,7 @@ ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::getConnection2()
     return currentlyUsedEc2Connection;
 }
 
-bool initResourceTypes(ec2::AbstractECConnectionPtr ec2Connection)
+bool initResourceTypes(ec2::AbstractECConnectionPtr ec2Connection) // TODO: #Elric #EC2 pass reference
 {
     QList<QnResourceTypePtr> resourceTypeList;
     const ec2::ErrorCode errorCode = ec2Connection->getResourceManager()->getResourceTypesSync(&resourceTypeList);

@@ -3,7 +3,7 @@
 #define EC2_STORED_FILE_MANAGER_H
 
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/ec2_stored_file_data.h"
+#include "nx_ec/data/api_stored_file_data.h"
 #include "transaction/transaction.h"
 
 

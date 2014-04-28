@@ -2,10 +2,9 @@
 
 #include <utils/common/container.h>
 #include <utils/common/model_functions.h>
-#include <utils/common/json.h>
 
 QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnMediaDewarpingParams::ViewMode, static)
-QN_DEFINE_STRUCT_FUNCTIONS(QnMediaDewarpingParams,      (json)(eq)(debug),    (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnMediaDewarpingParams,      (json)(eq)(debug),    (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius))
 
 namespace {
 

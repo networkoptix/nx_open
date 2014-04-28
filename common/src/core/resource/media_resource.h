@@ -15,25 +15,7 @@ class QnResourceAudioLayout;
 
 namespace Qn {
 
-    enum StreamQuality {
-        QualityLowest,
-        QualityLow,
-        QualityNormal,
-        QualityHigh,
-        QualityHighest,
-        QualityPreSet,
-        QualityNotDefined,
-
-        StreamQualityCount
-    };
-
-    enum SecondStreamQuality { 
-        SSQualityLow, 
-        SSQualityMedium, 
-        SSQualityHigh, 
-        SSQualityNotDefined,
-        SSQualityDontUse
-    };
+    // TODO: #Elric move out!
 
     QString toDisplayString(Qn::StreamQuality value);
     QString toShortDisplayString(Qn::StreamQuality value);

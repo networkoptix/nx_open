@@ -8,6 +8,8 @@
 
 #include <utils/common/id.h>
 
+#include "resource_fwd.h"
+
 enum QN_EXPORT QnDomain
 {
     QnDomainMemory = 1,
@@ -46,8 +48,6 @@ struct QN_EXPORT QnParamType
 
     bool setDefVal(const QVariant &val); // safe way to set value
 };
-
-typedef QSharedPointer<QnParamType> QnParamTypePtr;
 
 
 struct QN_EXPORT QnParam
