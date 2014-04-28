@@ -68,6 +68,8 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
         this, &QnCommonMessageProcessor::on_businessRuleReset );
     connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::gotBroadcastAction,
         this, &QnCommonMessageProcessor::on_broadcastBusinessAction );
+    connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::execBusinessAction,
+        this, &QnCommonMessageProcessor::on_execBusinessAction );
 
     connect( connection->getUserManager().get(), &ec2::AbstractUserManager::addedOrUpdated,
         this, [this](const QnUserResourcePtr &user){updateResource(user);});
@@ -182,6 +184,11 @@ void QnCommonMessageProcessor::on_businessRuleReset( const QnBusinessEventRuleLi
 void QnCommonMessageProcessor::on_broadcastBusinessAction( const QnAbstractBusinessActionPtr& action )
 {
     emit businessActionReceived(action);
+}
+
+void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessActionPtr& action )
+{
+    execBusinessActionInternal(action);
 }
 
 void QnCommonMessageProcessor::on_panicModeChanged(Qn::PanicMode mode) {

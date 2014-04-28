@@ -100,6 +100,17 @@ int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusiness
 }
 
 template<class T>
+int QnBusinessEventManager<T>::sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnId& dstPeer, impl::SimpleHandlerPtr handler )
+{
+    const int reqID = generateRequestID();
+    auto tran = prepareTransaction( ApiCommand::execBusinessAction, businessAction );
+    QnTransactionMessageBus::instance()->sendTransaction(tran, dstPeer);
+    QnScopedThreadRollback ensureFreeThread(1);
+    QtConcurrent::run( std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
+    return reqID;
+}
+
+template<class T>
 int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();

@@ -125,6 +125,8 @@ protected slots:
     * Execute action physically. Return true if action success executed
     */
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res);
+    
+    bool executeReceivedAction(QnAbstractBusinessActionPtr action);
 private slots:
     void at_broadcastBusinessActionFinished(int handle, ec2::ErrorCode errorCode);
     void at_sendEmailFinished(int handle, ec2::ErrorCode errorCode);

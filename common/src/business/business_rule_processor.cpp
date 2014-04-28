@@ -52,7 +52,7 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(qnBusinessMessageBus, SIGNAL(actionDelivered(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDelivered(QnAbstractBusinessActionPtr)));
     connect(qnBusinessMessageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
 
-    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr, QnResourcePtr)), this, SLOT(executeActionInternal(QnAbstractBusinessActionPtr, QnResourcePtr)));
+    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeReceivedAction(QnAbstractBusinessActionPtr)));
 
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
@@ -105,22 +105,15 @@ bool QnBusinessRuleProcessor::needProxyAction(QnAbstractBusinessActionPtr action
 
 void QnBusinessRuleProcessor::doProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    // delivery to other server
-    QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
-    QUrl serverUrl = routeToServer->getApiUrl();
-    QUrl proxyUrl = QnAppServerConnectionFactory::defaultUrl();
-#if 0
-    // do proxy via EC builtin proxy. It is dosn't work. I don't know why
-    proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
-#else
-    // do proxy via CPP media proxy
-    proxyUrl.setScheme(QLatin1String("http"));
-    proxyUrl.setPort(QnAppServerConnectionFactory::defaultMediaProxyPort());
-    proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
-#endif
+    QnAbstractBusinessActionPtr actionToSend(action);
+    QVector<QnId> dstRes;
+    if (res)
+        dstRes << res->getId();
+    actionToSend->setResources(dstRes);
 
-    QString url = proxyUrl.toString();
-    qnBusinessMessageBus->deliveryBusinessAction(action, res, url);
+    QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
+    if (routeToServer)
+        qnBusinessMessageBus->deliveryBusinessAction(action, routeToServer->getId());
 }
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
@@ -140,6 +133,21 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
     else {
         foreach(QnResourcePtr res, resList)
             executeAction(action, res);
+    }
+}
+
+bool QnBusinessRuleProcessor::executeReceivedAction(QnAbstractBusinessActionPtr action)
+{
+    if (action->getResources().isEmpty()) {
+        return executeActionInternal(action, QnResourcePtr());
+    }
+    else {
+        foreach(const QnId& resId, action->getResources())
+        {
+            if (!executeActionInternal(action, qnResPool->getResourceById(resId)))
+                return false;
+        }
+        return true;
     }
 }
 

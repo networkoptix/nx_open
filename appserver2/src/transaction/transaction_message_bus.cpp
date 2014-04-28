@@ -352,6 +352,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiStoredFilePath>(abstractTran, stream);
 
         case ApiCommand::broadcastBusinessAction:
+        case ApiCommand::execBusinessAction:
             return deliveryTransaction<ApiBusinessActionData>(abstractTran, stream);
 
         case ApiCommand::saveSettings:

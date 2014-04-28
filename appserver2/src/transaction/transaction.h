@@ -75,6 +75,8 @@ namespace ec2
             removeBusinessRule,
             //!ApiBusinessActionData
             broadcastBusinessAction,
+            //!ApiBusinessActionData
+            execBusinessAction,
 
             //!ApiResetBusinessRuleData
             resetBusinessRules,

@@ -393,6 +393,12 @@ namespace ec2
             return broadcastBusinessAction( businessAction, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        template<class TargetType, class HandlerType> int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnId& dstPeer, TargetType* target, HandlerType handler ) {
+            return sendBusinessAction( businessAction, dstPeer, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+
         /*!
             \param handler Functor with params: (ErrorCode)
         */
@@ -407,6 +413,7 @@ namespace ec2
         void businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
         void businessRuleReset( const QnBusinessEventRuleList& rules );
         void gotBroadcastAction(const QnAbstractBusinessActionPtr& action);
+        void execBusinessAction(const QnAbstractBusinessActionPtr& action);
 
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
@@ -415,6 +422,7 @@ namespace ec2
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) = 0;
         virtual int deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler ) = 0;
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractBusinessEventManager> AbstractBusinessEventManagerPtr;
