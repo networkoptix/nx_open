@@ -955,7 +955,7 @@ Short for &quot;seconds&quot;</extracomment>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="313"/>
         <source>Downmix audio from 5.1 to 2.1:</source>
-        <translation>Diminuer le mixage&apos;audio de 5.1 à 2.1:</translation>
+        <translation>Diminuer le mixage audio de 5.1 à 2.1:</translation>
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui" line="357"/>
@@ -1321,13 +1321,13 @@ p, li { white-space: pre-wrap; }
         <location filename="../src/ui/dialogs/login_dialog.ui" line="14"/>
         <source>Connect to Enterprise Controller</source>
         <comment>Window Title</comment>
-        <translation>Connectez sur le Contrôleur Entreprise</translation>
+        <translation>Connexion sur Contrôleur Entreprise</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui" line="65"/>
         <source>Connect to Enterprise Controller</source>
         <comment>Groupbox Title</comment>
-        <translation>Connection sur Contrôleur Entreprise</translation>
+        <translation>Connexion sur Contrôleur Entreprise</translation>
     </message>
 </context>
 <context>
