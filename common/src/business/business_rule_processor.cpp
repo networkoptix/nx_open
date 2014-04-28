@@ -29,6 +29,8 @@
 
 #include "nx_ec/data/api_email_data.h"
 #include "common/common_module.h"
+#include "nx_ec/data/api_business_rule_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
@@ -105,15 +107,21 @@ bool QnBusinessRuleProcessor::needProxyAction(QnAbstractBusinessActionPtr action
 
 void QnBusinessRuleProcessor::doProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    QnAbstractBusinessActionPtr actionToSend(action);
-    QVector<QnId> dstRes;
-    if (res)
-        dstRes << res->getId();
-    actionToSend->setResources(dstRes);
-
     QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
-    if (routeToServer)
-        qnBusinessMessageBus->deliveryBusinessAction(action, routeToServer->getId());
+    if (routeToServer) 
+    {
+        // todo: it is better to use action.clone here
+        ec2::ApiBusinessActionData actionData;
+        QnAbstractBusinessActionPtr actionToSend;
+
+        ec2::fromResourceToApi(action, actionData);
+        actionData.resources.clear();
+        if (res)
+            actionData.resources.push_back(res->getId());
+        ec2::fromApiToResource(actionData, actionToSend, qnResPool);
+
+        qnBusinessMessageBus->deliveryBusinessAction(actionToSend, routeToServer->getId());
+    }
 }
 
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)

@@ -32,6 +32,7 @@ namespace ec2
             assert( tran.command == ApiCommand::broadcastBusinessAction || tran.command == ApiCommand::execBusinessAction);
             QnAbstractBusinessActionPtr businessAction;
             fromApiToResource(tran.params, businessAction, m_resCtx.pool);
+            businessAction->setReceivedFromRemoteHost(true);
             if (tran.command == ApiCommand::broadcastBusinessAction)
                 emit gotBroadcastAction( businessAction );
             else
