@@ -3,6 +3,10 @@
 #include <utils/common/util.h>
 #include <utils/math/math.h>
 
+namespace {
+    static const qint64 InvalidValue = INT64_MAX;
+}
+
 QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 timeMs, bool searchForward) const {
     if (isEmpty())
         return end();
@@ -105,8 +109,14 @@ void saveField(QByteArray &stream, qint64 field, quint8 header, int dataLen)
 // 10 - 30 bit to data
 // 11 - 38 bit to data
 // 11 and 0xffffffffff data - full 48 bit data
-void serializeField(QByteArray &stream, qint64 field)
+void serializeField(QByteArray &stream, qint64 field, bool intersected)
 {
+    if (intersected) {
+        qint8 sign = (field < 0 ? -1 : 1);
+        field *= sign;
+        stream.append(((const char*) &sign), 1);
+    }
+
     if (field < 0x4000ll)
         saveField(stream, field, 0, 2);
     else if (field < 0x400000ll)
@@ -122,7 +132,7 @@ void serializeField(QByteArray &stream, qint64 field)
     }
 }
 
-bool QnTimePeriodList::encode(QByteArray &stream)
+bool QnTimePeriodList::encode(QByteArray &stream, bool intersected)
 {
     if (isEmpty())
         return true;
@@ -134,11 +144,11 @@ bool QnTimePeriodList::encode(QByteArray &stream)
     for (int i = 0; i < size(); ++i)
     {
         qint64 timeDelta = at(i).startTimeMs - timePos;
-        if (timeDelta < 0)
+        if (timeDelta < 0 && !intersected)
             return false;
         if (i > 0)
-            serializeField(stream, timeDelta);
-        serializeField(stream, at(i).durationMs+1);
+            serializeField(stream, timeDelta, intersected);
+        serializeField(stream, at(i).durationMs+1, intersected);
         timePos += timeDelta + at(i).durationMs;
     }
     return true;
@@ -147,16 +157,16 @@ bool QnTimePeriodList::encode(QByteArray &stream)
 qint64 decodeValue(const quint8 *&curPtr, const quint8 *end)
 {
     if (curPtr >= end)
-        return -1;
+        return InvalidValue;
     int fieldSize = 2 + (*curPtr >> 6);
     if (end-curPtr < fieldSize)
-        return -1;
+        return InvalidValue;
     qint64 value = *curPtr++ & 0x3f;
     for (int i = 0; i < fieldSize-1; ++i)
         value = (value << 8) + *curPtr++;
     if (value == 0x3fffffffffll) {
         if (end - curPtr < 6)
-            return -1;
+            return InvalidValue;
         value = *curPtr++;
         for (int i = 0; i < 5; ++i)
             value = (value << 8) + *curPtr++;
@@ -164,7 +174,7 @@ qint64 decodeValue(const quint8 *&curPtr, const quint8 *end)
     return value;
 };
 
-bool QnTimePeriodList::decode(const quint8 *data, int dataSize)
+bool QnTimePeriodList::decode(const quint8 *data, int dataSize, bool intersected)
 {
     clear();
 
@@ -184,23 +194,37 @@ bool QnTimePeriodList::decode(const quint8 *data, int dataSize)
     fullStartTime = ntohll(fullStartTime);
 
     qint64 relStartTime = 0;
-    while (relStartTime != -1)
+    while (relStartTime != InvalidValue)
     {
+        qint8 sign = 1;
+        if (intersected && curPtr < end)
+            sign = *curPtr++;
+
         qint64 duration = decodeValue(curPtr, end);
-        if (duration == -1) 
+        if (duration == InvalidValue) 
             return false;
         duration--;
+
+        if (intersected)
+            duration *= sign;
+
         fullStartTime += relStartTime;
         push_back(QnTimePeriod(fullStartTime, duration));
         fullStartTime += duration;
+
+        if (intersected && curPtr < end)
+            sign = *curPtr++;
         relStartTime = decodeValue(curPtr, end);
+
+        if (intersected && relStartTime != InvalidValue)
+            relStartTime *= sign;
     }
     return true;
 }
 
-bool QnTimePeriodList::decode(QByteArray &stream)
+bool QnTimePeriodList::decode(QByteArray &stream, bool intersected)
 {
-    return decode((const quint8 *) stream.constData(), stream.size());
+    return decode((const quint8 *) stream.constData(), stream.size(), intersected);
 }
 
 
@@ -358,37 +382,4 @@ QnTimePeriodList QnTimePeriodList::mergeTimePeriods(const QVector<QnTimePeriodLi
         }
     }
     return result;
-}
-
-bool QnTimePeriodList::zip(QByteArray &stream) {
-    if (isEmpty())
-        return true;
-
-    QByteArray unzipped;
-    auto iter = this->constBegin();
-    while (iter != this->constEnd()) {
-        unzipped
-            .append(QByteArray::number(iter->startTimeMs, 16))
-            .append(' ')
-            .append(QByteArray::number(iter->durationMs, 16))
-            .append(' ');
-        iter++;
-    }
-    stream.append(qCompress(unzipped));
-    return true;
-}
-
-bool QnTimePeriodList::unzip(const QByteArray &stream) {
-    return unzip((const quint8 *) stream.constData(), stream.size());
-}
-
-bool QnTimePeriodList::unzip(const quint8 *data, int dataSize) {
-    clear();
-
-    QByteArray unzipped = qUncompress(data, dataSize);
-    QList<QByteArray> splitted = unzipped.split(' ');
-    for (int i = 0; i < splitted.size() / 2; ++i) {
-        append(QnTimePeriod(splitted[i*2].toLongLong(0, 16), splitted[i*2 + 1].toLongLong(0, 16)));
-    }
-    return true;
 }

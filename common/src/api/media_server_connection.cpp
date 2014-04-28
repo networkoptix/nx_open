@@ -210,9 +210,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         QnTimePeriodList reply;
         if(status == 0) {
             if (response.data.startsWith("BIN")) {
-                reply.decode((const quint8*) response.data.constData() + 3, response.data.size() - 3);
-            } else if (response.data.startsWith("ZIP")) {
-                reply.unzip((const quint8*) response.data.constData() + 3, response.data.size() - 3);
+                reply.decode((const quint8*) response.data.constData() + 3, response.data.size() - 3, false);
+            } else if (response.data.startsWith("BII")) {
+                reply.decode((const quint8*) response.data.constData() + 3, response.data.size() - 3, true);
             } else {
                 qWarning() << "QnMediaServerConnection: unexpected message received.";
                 status = -1;
@@ -474,7 +474,7 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &li
     params << QnRequestParam("endTime", QString::number(endTimeMs));
     params << QnRequestParam("detail", QString::number(detail));
     if (periodsType == Qn::BookmarkTimePeriod)
-        params << QnRequestParam("format", "zip");
+        params << QnRequestParam("format", "bii");
     else
         params << QnRequestParam("format", "bin");
     params << QnRequestParam("periodsType", QString::number(static_cast<int>(periodsType)));

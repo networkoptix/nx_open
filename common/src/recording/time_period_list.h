@@ -53,32 +53,31 @@ public:
 
     /** 
      * Encode (compress) data to a byte array. 
-     * TimePeriods must be arranged by time and must not intersected. If this condition is not met, the function returns false. 
-     * Average compressed QnTimePeriod size is close to 6 bytes.
+     * In high-optimized mode time periods must be arranged by time and must not intersect.
+     * If this condition is not met, the function returns false. 
+     * Average compressed QnTimePeriod size is close to 6 bytes in high-optimized mode and 7 bytes otherwise.
      * 
      * \param stream                    Byte array to compress time periods to. 
+     * \param intersected               Disables high-optimized mode. That allow time periods to be intersected.
      */
-    bool encode(QByteArray &stream);
-
-    bool zip(QByteArray &stream);
+    bool encode(QByteArray &stream, bool intersected = false);
     
     /** 
      * Decode (decompress) data from a byte array. 
      * 
      * \param[in] stream                Byte array to decompress time periods from.
+     * \param[in] intersected           Flag that incoming time periods were encoded as intersected values.
      */
-    bool decode(QByteArray &stream);
+    bool decode(QByteArray &stream, bool intersected = false);
 
     /**
      * Decode (decompress) data from a byte array. 
      * 
      * \param[in] data                  Compressed data pointer.
      * \param[in] dataSize              Size of the compressed data.
+     * \param[in] intersected           Flag that incoming time periods were encoded as intersected values.
      */
-    bool decode(const quint8 *data, int dataSize);
-
-    bool unzip(const QByteArray &stream);
-    bool unzip(const quint8 *data, int dataSize);
+    bool decode(const quint8 *data, int dataSize, bool intersected = false);
 
     /** 
      * Find nearest period for specified time.

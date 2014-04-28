@@ -48,12 +48,12 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
         {
             if (params[i].second == "bin")
                 format = ChunkFormat_Binary;
+            else if (params[i].second == "bii")
+                format = ChunkFormat_BinaryIntersected;
             else if (params[i].second == "xml")
                 format = ChunkFormat_XML;
             else if (params[i].second == "txt")
                 format = ChunkFormat_Text;
-            else if (params[i].second == "zip")
-                format = ChunkFormat_Zip;
             else
                 format = ChunkFormat_Json;
         }
@@ -110,7 +110,11 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     {
         case ChunkFormat_Binary:
             result.append("BIN");
-            periods.encode(result);
+            periods.encode(result, false);
+            break;
+        case ChunkFormat_BinaryIntersected:
+            result.append("BII");
+            periods.encode(result, true);
             break;
         case ChunkFormat_XML:
             result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
@@ -128,10 +132,6 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
                 result.append("</chunk>\n");
             }
             result.append("</root>\n");
-            break;
-        case ChunkFormat_Zip:
-            result.append("ZIP");
-            periods.zip(result);
             break;
         case ChunkFormat_Json:
         default:
