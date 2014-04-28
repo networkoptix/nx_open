@@ -92,13 +92,15 @@ namespace ec2
         */
         AlivePeersMap aliveServerPeers() const;
 
-signals:
+    signals:
         void peerLost(QnId, bool isClient, bool isProxy);
         void peerFound(QnId, bool isClient, bool isProxy);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);
         void gotLockResponse(ApiLockData);
+
+        void transactionProcessed(const QnAbstractTransaction &transaction);
     private:
         friend class QnTransactionTransport;
 

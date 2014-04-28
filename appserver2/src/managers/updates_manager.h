@@ -22,14 +22,18 @@ public:
 protected:
     virtual int sendUpdatePackage(const QString &updateId, const QByteArray &data, const PeerList &peers, impl::SimpleHandlerPtr handler) override;
     virtual int sendUpdateUploadedResponce(const QString &updateId, const QnId &peerId, impl::SimpleHandlerPtr handler) override;
-    virtual int installUpdate(const QString &updateId, impl::SimpleHandlerPtr handler) override;
+    virtual int installUpdate(const QString &updateId, const PeerList &peers, impl::SimpleHandlerPtr handler) override;
 
 private:
     QueryProcessorType* const m_queryProcessor;
 
+    QHash<QnAbstractTransaction::ID, QString> m_requestedUpdateIds;
+
     QnTransaction<ApiUpdateUploadData> prepareTransaction(const QString &updateId, const QByteArray &data) const;
     QnTransaction<ApiUpdateUploadResponceData> prepareTransaction(const QString &updateId, const QnId &peerId) const;
     QnTransaction<ApiUpdateInstallData> prepareTransaction(const QString &updateId) const;
+
+    void at_transactionProcessed(const QnAbstractTransaction &transaction);
 };
 
 } // namespace ec2

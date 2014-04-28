@@ -311,10 +311,8 @@ void QnMediaServerUpdateTool::downloadNextUpdate() {
 }
 
 void QnMediaServerUpdateTool::at_mutexLocked(const QByteArray &) {
-    foreach (const QnMediaServerResourcePtr &server, m_pendingInstallServers) {
-        connection2()->getUpdatesManager()->installUpdate(m_targetVersion.toString(),
-                                                          this, [this](int reqId, ec2::ErrorCode errorCode){});
-    }
+    connection2()->getUpdatesManager()->installUpdate(m_targetVersion.toString(), ec2::PeerList::fromList(m_pendingInstallServers.keys()),
+                                                      this, [this](int reqId, ec2::ErrorCode errorCode){});
     m_distributedMutex->unlock();
     m_distributedMutex.clear();
 }

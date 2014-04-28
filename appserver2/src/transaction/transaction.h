@@ -160,6 +160,14 @@ namespace ec2
             ID(): sequence(0) {}
             QUuid peerGUID;
             qint32 sequence;
+
+            friend uint qHash(const ec2::QnAbstractTransaction::ID &id) {
+                return ::qHash(id.peerGUID, id.sequence);
+            }
+
+            bool operator==(const ID &other) const {
+                return peerGUID == other.peerGUID && sequence == other.sequence;
+            }
         };
 
         ApiCommand::Value command;
@@ -205,5 +213,7 @@ namespace ec2
 
     int generateRequestID();
 }
+
+Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)
 
 #endif  //EC2_TRANSACTION_H

@@ -12,7 +12,9 @@ namespace ec2 {
 template<class QueryProcessorType>
 QnUpdatesManager<QueryProcessorType>::QnUpdatesManager(QueryProcessorType * const queryProcessor) :
     m_queryProcessor(queryProcessor)
-{}
+{
+    connect(QnTransactionMessageBus::instance(), &QnTransactionMessageBus::transactionProcessed, this, &QnUpdatesManager::at_transactionProcessed);
+}
 
 template<class QueryProcessorType>
 QnUpdatesManager<QueryProcessorType>::~QnUpdatesManager() {}
@@ -24,7 +26,7 @@ int QnUpdatesManager<QueryProcessorType>::sendUpdatePackage(const QString &updat
 
     QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
     QnScopedThreadRollback ensureFreeThread(1);
-    QtConcurrent::run(std::bind(&impl::SimpleHandler::done, handler, reqId, ErrorCode::ok));
+    QtConcurrent::run([handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
 
     return reqId;
 }
@@ -35,18 +37,19 @@ int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadedResponce(const QStri
     auto transaction = prepareTransaction(updateId, peerId);
 
     using namespace std::placeholders;
-    m_queryProcessor->processUpdateAsync(transaction, std::bind(&impl::SimpleHandler::done, handler, reqId, _1));
+    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
 
     return reqId;
 }
 
 template<class QueryProcessorType>
-int QnUpdatesManager<QueryProcessorType>::installUpdate(const QString &updateId, impl::SimpleHandlerPtr handler) {
+int QnUpdatesManager<QueryProcessorType>::installUpdate(const QString &updateId, const PeerList &peers, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(updateId);
 
-    using namespace std::placeholders;
-    m_queryProcessor->processUpdateAsync(transaction, std::bind(&impl::SimpleHandler::done, handler, reqId, _1));
+    QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
+    QnScopedThreadRollback ensureFreeThread(1);
+    QtConcurrent::run([handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
 
     return reqId;
 }
@@ -69,7 +72,7 @@ QnTransaction<ApiUpdateUploadResponceData> QnUpdatesManager<QueryProcessorType>:
 
 template<class QueryProcessorType>
 QnTransaction<ApiUpdateInstallData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId) const {
-    QnTransaction<ApiUpdateInstallData> transaction(ApiCommand::installUpdate, true);
+    QnTransaction<ApiUpdateInstallData> transaction(ApiCommand::installUpdate, false);
     transaction.params = updateId;
     return transaction;
 }
@@ -89,7 +92,19 @@ void QnUpdatesManager<QueryProcessorType>::triggerNotification(const QnTransacti
 template<class QueryProcessorType>
 void QnUpdatesManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction) {
     assert(transaction.command == ApiCommand::installUpdate);
-    emit updateInstallationRequested(transaction.params);
+    m_requestedUpdateIds.insert(transaction.id, transaction.params);
+}
+
+template<class QueryProcessorType>
+void QnUpdatesManager<QueryProcessorType>::at_transactionProcessed(const QnAbstractTransaction &transaction) {
+    if (transaction.command != ApiCommand::installUpdate)
+        return;
+
+    QString requestedUpdateId = m_requestedUpdateIds.take(transaction.id);
+    if (requestedUpdateId.isEmpty())
+        return;
+
+    emit updateInstallationRequested(requestedUpdateId);
 }
 
 template class QnUpdatesManager<ServerQueryProcessor>;

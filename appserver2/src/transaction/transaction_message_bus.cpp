@@ -45,6 +45,7 @@ QnTransactionMessageBus::QnTransactionMessageBus():
     m_thread->setObjectName("QnTransactionMessageBusThread");
     moveToThread(m_thread);
     qRegisterMetaType<QnTransactionTransport::State>();
+    qRegisterMetaType<QnAbstractTransaction>("QnAbstractTransaction");
     m_timer = new QTimer();
     connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
     m_timer->start(500);
@@ -166,8 +167,10 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
     QMutexLocker lock(&m_mutex);
     
     // proxy incoming transaction to other peers.
-    if (!dstPeers.isEmpty() && (dstPeers - processedPeers).isEmpty())
+    if (!dstPeers.isEmpty() && (dstPeers - processedPeers).isEmpty()) {
+        emit transactionProcessed(tran);
         return; // all dstPeers already processed
+    }
 
     QByteArray chunkData;
     m_serializer.serializeTran(chunkData, serializedTran, processedPeers + peersToSend(tran.command));
@@ -181,6 +184,8 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
             transport->addData(chunkData);
         }
     }
+
+    emit transactionProcessed(tran);
 }
 
 void QnTransactionMessageBus::sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData, const PeerList& dstPeers)
