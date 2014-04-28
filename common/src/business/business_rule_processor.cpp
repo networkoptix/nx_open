@@ -54,7 +54,7 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(qnBusinessMessageBus, SIGNAL(actionDelivered(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDelivered(QnAbstractBusinessActionPtr)));
     connect(qnBusinessMessageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
 
-    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeReceivedAction(QnAbstractBusinessActionPtr)));
+    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeAction(QnAbstractBusinessActionPtr)));
 
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
@@ -115,9 +115,10 @@ void QnBusinessRuleProcessor::doProxyAction(QnAbstractBusinessActionPtr action, 
         QnAbstractBusinessActionPtr actionToSend;
 
         ec2::fromResourceToApi(action, actionData);
-        actionData.resources.clear();
-        if (res)
+        if (res) {
+            actionData.resources.clear();
             actionData.resources.push_back(res->getId());
+        }
         ec2::fromApiToResource(actionData, actionToSend, qnResPool);
 
         qnBusinessMessageBus->deliveryBusinessAction(actionToSend, routeToServer->getId());
@@ -141,21 +142,6 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
     else {
         foreach(QnResourcePtr res, resList)
             executeAction(action, res);
-    }
-}
-
-bool QnBusinessRuleProcessor::executeReceivedAction(QnAbstractBusinessActionPtr action)
-{
-    if (action->getResources().isEmpty()) {
-        return executeActionInternal(action, QnResourcePtr());
-    }
-    else {
-        foreach(const QnId& resId, action->getResources())
-        {
-            if (!executeActionInternal(action, qnResPool->getResourceById(resId)))
-                return false;
-        }
-        return true;
     }
 }
 
