@@ -1206,6 +1206,9 @@ void QnMain::run()
 #endif
         if (!isLocal)
             serverFlags |= Qn::SF_RemoteEC;
+        if (!publicAddress.isNull())
+            serverFlags |= Qn::SF_HasPublicIP;
+
         server->setServerFlags((Qn::ServerFlags) serverFlags);
 
         QHostAddress appserverHost;

@@ -79,6 +79,7 @@ public:
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
     QnResourceList getAllCameras(const QnResourcePtr &mServer) const;
+    QnMediaServerResourceList getAllServers() const;
     QnResourceList getResourcesByParentId(const QnId& parentId) const;
 
     // returns list of resources with such flag

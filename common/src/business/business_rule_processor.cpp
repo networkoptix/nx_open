@@ -74,45 +74,72 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (action->actionType() == QnBusiness::SendMailAction || action->actionType() == QnBusiness::DiagnosticsAction)
+    if (action->actionType() == QnBusiness::SendMailAction) {
+        // looking for server with public IP address
+        QnMediaServerResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
+            return QnMediaServerResourcePtr(); // do not proxy
+        foreach (QnMediaServerResourcePtr mServer, qnResPool->getAllServers())
+        {
+            if ((mServer->getServerFlags() & Qn::SF_HasPublicIP) && mServer->getStatus() == QnResource::Online)
+                return mServer;
+        }
+        return QnMediaServerResourcePtr();
+    }
+
+    if (!res)
+        return QnMediaServerResourcePtr();
+
+    if (action->actionType() == QnBusiness::DiagnosticsAction)
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
     return qnResPool->getResourceById(res->getParentId()).dynamicCast<QnMediaServerResource>();
 }
 
+bool QnBusinessRuleProcessor::needProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
+{
+    QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
+    return routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getId() != getGuid();
+}
+
+void QnBusinessRuleProcessor::doProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
+{
+    // delivery to other server
+    QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
+    QUrl serverUrl = routeToServer->getApiUrl();
+    QUrl proxyUrl = QnAppServerConnectionFactory::defaultUrl();
+#if 0
+    // do proxy via EC builtin proxy. It is dosn't work. I don't know why
+    proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
+#else
+    // do proxy via CPP media proxy
+    proxyUrl.setScheme(QLatin1String("http"));
+    proxyUrl.setPort(QnAppServerConnectionFactory::defaultMediaProxyPort());
+    proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
+#endif
+
+    QString url = proxyUrl.toString();
+    qnBusinessMessageBus->deliveryBusinessAction(action, res, url);
+}
+
+void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
+{
+    if (needProxyAction(action, res))
+        doProxyAction(action, res);
+    else
+        executeActionInternal(action, res);
+}
+
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
     QnResourceList resList = action->getResourceObjects().filtered<QnNetworkResource>();
     if (resList.isEmpty()) {
-        executeActionInternal(action, QnResourcePtr());
+        executeAction(action, QnResourcePtr());
     }
     else {
-        for (int i = 0; i < resList.size(); ++i)
-        {
-            QnMediaServerResourcePtr routeToServer = getDestMServer(action, resList[i]);
-            if (routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getId() != getGuid())
-            {
-                // delivery to other server
-                QUrl serverUrl = routeToServer->getApiUrl();
-                QUrl proxyUrl = QnAppServerConnectionFactory::defaultUrl();
-#if 0
-                // do proxy via EC builtin proxy. It is dosn't work. I don't know why
-                proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
-#else
-                // do proxy via CPP media proxy
-                proxyUrl.setScheme(QLatin1String("http"));
-                proxyUrl.setPort(QnAppServerConnectionFactory::defaultMediaProxyPort());
-                proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
-#endif
-
-                QString url = proxyUrl.toString();
-                qnBusinessMessageBus->deliveryBusinessAction(action, resList[i], url); 
-            }
-            else {
-                executeActionInternal(action, resList[i]);
-            }
-        }
+        foreach(QnResourcePtr res, resList)
+            executeAction(action, res);
     }
 }
 

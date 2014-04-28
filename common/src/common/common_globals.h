@@ -201,7 +201,8 @@ public:
     enum ServerFlag { 
         SF_None     = 0, 
         SF_Edge     = 1,
-        SF_RemoteEC = 2
+        SF_RemoteEC = 2,
+        SF_HasPublicIP = 4
     };
     Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 
