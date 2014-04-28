@@ -3,20 +3,17 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QJsonDocument>
 
-#include <quazip/quazip.h>
-#include <quazip/quazipfile.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <api/app_server_connection.h>
 #include <nx_ec/ec_api.h>
+#include <utils/update/update_utils.h>
 
 #include <version.h>
 
 namespace {
 
 const qint64 maxUpdateFileSize = 100 * 1024 * 1024; // 100 MB
-const QString infoEntryName = lit("update.json");
 const QString QN_UPDATES_URL = lit("http://localhost:8000/updates");
 const QString buildInformationSuffix(lit("update"));
 const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
@@ -78,24 +75,10 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
             continue;
 
         QString fileName = m_localUpdateDir.absoluteFilePath(entry);
+        QnSoftwareVersion version;
+        QnSystemInformation sysInfo;
 
-        QuaZipFile infoFile(fileName, infoEntryName);
-        if (!infoFile.open(QuaZipFile::ReadOnly))
-            continue;
-
-        QVariantMap info = QJsonDocument::fromJson(infoFile.readAll()).toVariant().toMap();
-        if (info.isEmpty())
-            continue;
-
-        QnSystemInformation sysInfo(info.value(lit("platform")).toString(), info.value(lit("arch")).toString());
-        if (!sysInfo.isValid())
-            continue;
-
-        QnSoftwareVersion version(info.value(lit("version")).toString());
-        if (version.isNull())
-            continue;
-
-        if (!info.contains(lit("executable")))
+        if (!verifyUpdatePackage(fileName, &version, &sysInfo))
             continue;
 
         m_updates.insert(sysInfo, UpdateInformation(version, fileName));
