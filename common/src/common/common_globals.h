@@ -384,7 +384,6 @@ public:
     enum SerializationFormat {
         JsonFormat,
         BnsFormat,
-        XmlFormat,
     };
 
 
