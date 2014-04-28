@@ -82,7 +82,7 @@ namespace ec2
         //AbstractResourceManager::getKvPairs
         registerGetFuncHandler<QnId, ApiResourceParamsData>( restProcessorPool, ApiCommand::getResourceParams );
         //AbstractResourceManager::save
-        registerUpdateFuncHandler<ApiResourceParamDataList>( restProcessorPool, ApiCommand::setResourceParams );
+        registerUpdateFuncHandler<ApiResourceParamsData>( restProcessorPool, ApiCommand::setResourceParams );
         //AbstractResourceManager::save
         registerUpdateFuncHandler<ApiResourceData>( restProcessorPool, ApiCommand::saveResource );
         //AbstractResourceManager::remove

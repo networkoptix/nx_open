@@ -299,7 +299,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiSetResourceDisabledData>(abstractTran, stream);
         //!ApiResourceParams
         case ApiCommand::setResourceParams:
-            return deliveryTransaction<ApiResourceParamDataList>(abstractTran, stream);
+            return deliveryTransaction<ApiResourceParamsData>(abstractTran, stream);
         case ApiCommand::saveResource:
             return deliveryTransaction<ApiResourceData>(abstractTran, stream);
         case ApiCommand::removeResource:
