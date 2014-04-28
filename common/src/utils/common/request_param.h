@@ -20,12 +20,45 @@ public:
     QnRequestParam(const char *first, qint64 second): base_type(QLatin1String(first), QString::number(second)) {}
 };
 
+
+// TODO: #Elric remove, use QHash?
+template<class Key, class Value>
+class QnListMap: public QList<QPair<Key, Value> > {
+    typedef QList<QPair<Key, Value> > base_type;
+public:
+    QnListMap() {}
+
+    QnListMap(const base_type &other): base_type(other) {}
+
+    Value value(const Key &key, const Value &defaultValue = Value()) const {
+        for(const QPair<Key, Value> &pair: *this)
+            if(pair.first == key)
+                return pair.second;
+        return defaultValue;
+    }
+
+    bool contains(const Key &key) const {
+        for(const QPair<Key, Value> &pair: *this)
+            if(pair.first == key)
+                return true;
+        return false;
+    }
+
+    using base_type::insert;
+
+    void insert(const Key &key, const Value &value) {
+        push_back(qMakePair(key, value));
+    }
+};
+
 typedef QPair<QString, QString> QnRequestHeader;
 
-typedef QList<QPair<QString, QString> > QnRequestParamList;
-typedef QList<QPair<QString, QString> > QnRequestHeaderList;
-typedef QList<QNetworkReply::RawHeaderPair> QnReplyHeaderList;
+typedef QnListMap<QString, QString> QnRequestHeaderList;
+typedef QnListMap<QString, QString> QnRequestParamList;
+typedef QnListMap<QByteArray, QByteArray> QnReplyHeaderList;
+
 typedef QHash<QString, QString> QnRequestParams;
+
 
 struct QnHTTPRawResponse
 {
