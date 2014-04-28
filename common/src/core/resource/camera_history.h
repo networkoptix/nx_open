@@ -7,7 +7,7 @@
 #include "resource.h"
 #include "resource_fwd.h"
 
-struct QN_EXPORT QnCameraHistoryItem
+struct QnCameraHistoryItem
 {
     QnCameraHistoryItem(const QString& physicalId_, qint64 timestamp_, const QString& mediaServerGuid_)
         : physicalId(physicalId_),
@@ -22,7 +22,7 @@ struct QN_EXPORT QnCameraHistoryItem
 };
 typedef QSharedPointer<QnCameraHistoryItem> QnCameraHistoryItemPtr;
 
-struct QN_EXPORT QnCameraTimePeriod: QnTimePeriod
+struct QnCameraTimePeriod: QnTimePeriod
 {
     QnCameraTimePeriod(qint64 startTimeMs, qint64 durationMs, QString serverGuid): QnTimePeriod(startTimeMs, durationMs), mediaServerGuid(serverGuid) {}
 
@@ -33,7 +33,7 @@ struct QN_EXPORT QnCameraTimePeriod: QnTimePeriod
 
 typedef QList<QnCameraTimePeriod> QnCameraTimePeriodList;
 
-class QN_EXPORT QnCameraHistory
+class QnCameraHistory
 {
 public:
     QnCameraHistory();
@@ -69,11 +69,6 @@ private:
     QString m_physicalId;
     mutable QMutex m_mutex;
 };
-
-
-typedef QSharedPointer<QnCameraHistory> QnCameraHistoryPtr;
-typedef QList<QnCameraHistoryPtr> QnCameraHistoryList;
-typedef QSharedPointer<QnCameraHistoryList> QnCameraHistoryListPtr;
 
 Q_DECLARE_METATYPE(QnCameraHistoryList)
 Q_DECLARE_METATYPE(QnCameraHistoryItemPtr)

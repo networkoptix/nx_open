@@ -1,13 +1,14 @@
-
 #ifndef EC2_TRANSACTION_H
 #define EC2_TRANSACTION_H
 
-#include <QString>
 #include <vector>
-#include "nx_ec/binary_serialization_helper.h"
+
+#include <QtCore/QString>
+
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/ec2_license.h"
-#include "nx_ec/data/ec2_email.h"
+#include "nx_ec/data/api_license_data.h"
+#include "nx_ec/data/api_email_data.h"
+#include "utils/serialization/binary.h"
 
 
 namespace ec2
@@ -156,7 +157,7 @@ namespace ec2
         struct ID
         {
             ID(): sequence(0) {}
-            QUuid peerGUID;
+            QUuid peerGUID; // TODO: #Elric #EC2 rename into sane case
             qint32 sequence;
         };
 
@@ -170,13 +171,7 @@ namespace ec2
     };
 
     typedef QSet<QnId> PeerList;
-}
 
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (sequence) )
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent) (timestamp))
-
-namespace ec2
-{
     template <class T>
     class QnTransaction: public QnAbstractTransaction
     {
@@ -188,22 +183,25 @@ namespace ec2
         T params;
     };
 
-    template <class TranParamType, class T2>
-    void serialize( const QnTransaction<TranParamType>& tran, OutputBinaryStream<T2>* stream )
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary))
+
+    template <class T, class Output>
+    void serialize(const QnTransaction<T> &transaction, QnOutputBinaryStream<Output> *stream)
     {
-        serialize( (const QnAbstractTransaction&)tran, stream);
-        serialize(tran.params, stream);
+        QnBinary::serialize(static_cast<const QnAbstractTransaction &>(transaction), stream);
+        QnBinary::serialize(transaction.params, stream);
     }
 
-    template <class TranParamType, class T2>
-    bool deserialize( QnTransaction<TranParamType>& tran, InputBinaryStream<T2>* stream )
+    template <class T, class Input>
+    bool deserialize(QnInputBinaryStream<Input>* stream, QnTransaction<T> *transaction)
     {
-        return deserialize( (QnAbstractTransaction&)tran, stream) &&
-            deserialize(tran.params, stream);
-            //params.deserialize(stream);
+        return 
+            QnBinary::deserialize(stream, static_cast<QnAbstractTransaction *>(transaction)) &&
+            QnBinary::deserialize(stream, &transaction->params);
     }
 
     int generateRequestID();
-}
+} // namespace ec2
 
 #endif  //EC2_TRANSACTION_H

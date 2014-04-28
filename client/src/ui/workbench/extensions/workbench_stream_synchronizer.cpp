@@ -23,10 +23,9 @@
 
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 
-#include <utils/common/json.h>
 #include <utils/common/model_functions.h>
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (started)(time)(speed))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (started)(time)(speed))
 
 QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     QObject(parent),

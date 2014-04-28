@@ -243,10 +243,10 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
     case QnBusiness::PlaySoundAction:
     {
         switch (businessAction->getToggleState()) {
-        case Qn::OnState:
+        case QnBusiness::ActiveState:
             addBusinessAction(businessAction);
             break;
-        case Qn::OffState:
+        case QnBusiness::InactiveState:
             emit businessActionRemoved(businessAction);
             break;
         default:

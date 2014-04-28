@@ -7,7 +7,6 @@
 
 #include "utils/common/id.h"
 #include "core/dataprovider/media_streamdataprovider.h"
-#include "schedule_recording_type.h"
 
 class QnScheduleTask
 {

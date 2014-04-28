@@ -132,7 +132,7 @@ struct QnLicensesListModelColors {
     QColor expired;
 };
 
-QN_DECLARE_FUNCTIONS_FOR_TYPES(
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors)(QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors), 
     (metatype)(json)
 );

@@ -10,7 +10,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 
-#include <nx_ec/data/ec2_license.h>
+#include <nx_ec/data/api_license_data.h>
 
 #include "transaction/transaction.h"
 
@@ -27,11 +27,11 @@ namespace ec2
     public:
         LicenseManagerImpl();
 
-        ErrorCode getLicenses( ApiLicenseList* const licList );
-        ErrorCode addLicenses( const ApiLicenseList& licenses );
+        ErrorCode getLicenses( ApiLicenseDataList* const licList );
+        ErrorCode addLicenses( const ApiLicenseDataList& licenses );
 
-        void getHardwareId( ServerInfo* const serverInfo );
-        bool validateLicense(const ApiLicense& license) const;
+        void getHardwareId( ApiServerInfoData* const serverInfo );
+        bool validateLicense(const ApiLicenseData& license) const;
 
     private:
         QList<QByteArray> m_hardwareIds;

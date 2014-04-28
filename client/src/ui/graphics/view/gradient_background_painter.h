@@ -5,7 +5,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QScopedPointer>
 
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 
 #include <client/client_color_types.h>
 

@@ -5,7 +5,7 @@
 
 #include <common/common_globals.h>
 
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 class QnTimePeriod;
 
@@ -89,8 +89,6 @@ bool operator<(const QnTimePeriod &other, qint64 first);
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
-Q_DECLARE_METATYPE(QnTimePeriod);
-
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnTimePeriod);
+QN_FUSION_DECLARE_FUNCTIONS(QnTimePeriod, (json)(metatype));
 
 #endif // QN_TIME_PERIOD_H

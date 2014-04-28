@@ -9,6 +9,7 @@
 
 //TODO: #GDM rename/move this module to something sane or get rid of it
 
+// TODO: #Elric move somewhere.
 /*
  * Helper serialization functions. Not related to any specific serialization format.
  */

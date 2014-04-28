@@ -6,8 +6,9 @@
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_data.h"
-#include "nx_ec/data/ec2_layout_data.h"
+#include "nx_ec/data/api_layout_data.h"
 #include "transaction/transaction.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 namespace ec2
@@ -38,10 +39,10 @@ namespace ec2
             emit addedOrUpdated( layoutResource );
         }
 
-        void triggerNotification( const QnTransaction<ApiLayoutList>& tran )
+        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran )
         {
             assert(tran.command == ApiCommand::saveLayouts );
-            foreach(const ApiLayoutData& layout, tran.params.data) 
+            foreach(const ApiLayoutData& layout, tran.params) 
             {
                 QnLayoutResourcePtr layoutResource(new QnLayoutResource());
                 fromApiToResource(layout, layoutResource);
@@ -51,7 +52,7 @@ namespace ec2
 
     private:
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
-        QnTransaction<ApiLayoutList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );
+        QnTransaction<ApiLayoutDataList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );
 
     private:
         QueryProcessorType* const m_queryProcessor;

@@ -1,4 +1,9 @@
 #include "transaction_log.h"
+
+#include <QtCore/QCryptographicHash>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
+
 #include "common/common_module.h"
 #include "database/db_manager.h"
 #include "transaction.h"

@@ -9,7 +9,7 @@ QnBusinessEventRule::QnBusinessEventRule()
 :
     m_id(),
     m_eventType(QnBusiness::UndefinedEvent),
-    m_eventState(Qn::OnState), //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
+    m_eventState(QnBusiness::ActiveState), //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
     m_actionType(QnBusiness::UndefinedAction),
     m_aggregationPeriod(0),
     m_disabled(false),
@@ -66,11 +66,11 @@ void QnBusinessEventRule::setEventParams(const QnBusinessEventParameters &params
     m_eventParams = params;
 }
 
-Qn::ToggleState QnBusinessEventRule::eventState() const {
+QnBusiness::EventState QnBusinessEventRule::eventState() const {
     return m_eventState;
 }
 
-void QnBusinessEventRule::setEventState(Qn::ToggleState state) {
+void QnBusinessEventRule::setEventState(QnBusiness::EventState state) {
     m_eventState = state;
 }
 
@@ -179,7 +179,7 @@ QnBusinessEventRule::QnBusinessEventRule(int internalId, int aggregationPeriod, 
                                          QnResourcePtr actionRes)
 {
     m_disabled = false;
-    m_eventState = Qn::UndefinedState;
+    m_eventState = QnBusiness::UndefinedState;
     
     m_id = intToGuid(internalId);
     m_aggregationPeriod = aggregationPeriod;

@@ -5,10 +5,13 @@
 
 #include <utils/math/math.h>
 #include <utils/common/util.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json_functions.h>
+#include <utils/fusion/fusion_adaptor.h>
+
+QN_FUSION_ADAPT_STRUCT(QnTimePeriod, (startTimeMs)(durationMs))
 
 namespace detail {
-    QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnTimePeriod, (startTimeMs)(durationMs), static)
+    QN_FUSION_DEFINE_FUNCTIONS(QnTimePeriod, (json), static)
 }
 
 

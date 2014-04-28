@@ -11,7 +11,7 @@
 #include <QtCore/QMutex>
 
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/connection_data.h"
+#include "nx_ec/data/api_connection_data.h"
 #include "client_query_processor.h"
 #include "server_query_processor.h"
 #include "ec2_connection.h"

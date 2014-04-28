@@ -4,7 +4,7 @@
 
 #include <api/global_settings.h>
 
-#include <utils/common/lexical.h>
+#include <utils/serialization/lexical.h>
 
 #include <core/resource_management/resource_pool.h>
 

@@ -27,8 +27,8 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent CameraDataType ToggleState SystemComponent ItemDataRole)
-    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes)
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent CameraDataType SystemComponent ItemDataRole StreamQuality SecondStreamQuality PanicMode RecordingType)
+    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes ServerFlags)
 public:
 #else
     Q_NAMESPACE
@@ -192,12 +192,18 @@ public:
     };
     Q_DECLARE_FLAGS(MotionTypes, MotionType);
 
-    enum PanicMode {PM_None, PM_BusinessEvents, PM_User};
-    enum ServerFlags { 
+    enum PanicMode {
+        PM_None, 
+        PM_BusinessEvents, 
+        PM_User
+    };
+
+    enum ServerFlag { 
         SF_None     = 0, 
         SF_Edge     = 1,
         SF_RemoteEC = 2
     };
+    Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 
     enum TimePeriodType {
         NullTimePeriod      = 0x1,  /**< No period. */
@@ -223,13 +229,6 @@ public:
 
         CameraDataTypeCount
     };
-
-    enum ToggleState {
-        OffState,
-        OnState,
-        UndefinedState /**< Also used in event rule to associate non-toggle action with event with any toggle state. */
-    };
-
 
     enum SystemComponent {
         EnterpriseControllerComponent,
@@ -353,6 +352,35 @@ public:
 
     };
 
+    enum StreamQuality {
+        QualityLowest,
+        QualityLow,
+        QualityNormal,
+        QualityHigh,
+        QualityHighest,
+        QualityPreSet,
+        QualityNotDefined,
+
+        StreamQualityCount
+    };
+
+    enum SecondStreamQuality { 
+        SSQualityLow, 
+        SSQualityMedium, 
+        SSQualityHigh, 
+        SSQualityNotDefined,
+        SSQualityDontUse
+    };
+
+    // TODO: #Elric #EC2 rename
+    enum RecordingType {
+        RecordingType_Run,
+        RecordingType_MotionOnly,
+        RecordingType_Never,
+        RecordingType_MotionPlusLQ,
+
+        RecordingType_Count
+    };
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -381,7 +409,12 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
-QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner)(Qn::CameraDataType), (metatype))
-QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities), (metatype)(lexical)(json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner)(Qn::CameraDataType), (metatype))
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities)
+        (Qn::MotionType)(Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlags)(Qn::PanicMode)(Qn::RecordingType), 
+    (metatype)(lexical)(json)
+)
 
 #endif // QN_COMMON_GLOBALS_H

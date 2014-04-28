@@ -41,14 +41,14 @@
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
-    QString toggleStateToString(Qn::ToggleState value, bool prolonged) {
+    QString toggleStateToString(QnBusiness::EventState value, bool prolonged) {
         switch( value )
         {
-            case Qn::OffState:
+            case QnBusiness::InactiveState:
                 return QObject::tr("Stops");
-            case Qn::OnState:
+            case QnBusiness::ActiveState:
                 return QObject::tr("Starts");
-            case Qn::UndefinedState:
+            case QnBusiness::UndefinedState:
             if (prolonged)
                 return QObject::tr("Starts/Stops");
             else
@@ -314,7 +314,7 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
         return;
 
     int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();
-    Qn::ToggleState val = (Qn::ToggleState) typeIdx;
+    QnBusiness::EventState val = (QnBusiness::EventState) typeIdx;
     m_model->setEventState(val);
 }
 
