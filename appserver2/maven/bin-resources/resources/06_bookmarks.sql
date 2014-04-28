@@ -17,3 +17,6 @@ CREATE TABLE "vms_bookmark" (
     );
     
 CREATE UNIQUE INDEX idx_bookmark_guid ON vms_bookmark(guid);
+
+-- Index for faster TOP-100 requests
+CREATE INDEX idx_bookmark_duration ON vms_bookmark(duration);
