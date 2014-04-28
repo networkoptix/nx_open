@@ -13,12 +13,12 @@ QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, PanicMode)
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, RecordingType)
 
 QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(Qn::StreamQuality, 
-    ((Qn::QualityLowest,  "lowest"))
-    ((Qn::QualityLow,     "low"))
-    ((Qn::QualityNormal,  "normal"))
-    ((Qn::QualityHigh,    "high"))
-    ((Qn::QualityHighest, "highest"))
-    ((Qn::QualityPreSet,  "preset"))
+    (Qn::QualityLowest,  "lowest")
+    (Qn::QualityLow,     "low")
+    (Qn::QualityNormal,  "normal")
+    (Qn::QualityHigh,    "high")
+    (Qn::QualityHighest, "highest")
+    (Qn::QualityPreSet,  "preset")
 )
 
 

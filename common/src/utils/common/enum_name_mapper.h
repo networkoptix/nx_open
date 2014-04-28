@@ -4,7 +4,7 @@
 #include <cassert>
 
 #ifndef Q_MOC_RUN
-#include <boost/preprocessor/seq/for_each.hpp>
+#include <utils/preprocessor/variadic_seq_for_each.h>
 #include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/cat.hpp>
@@ -96,7 +96,7 @@ namespace QnEnumDetail {
  * 
  * Example usage:
  * <pre>
- * QN_DEFINE_NAME_MAPPED_ENUM(Token, ((IdToken, "ID"))((ClassToken, "CLASS"))((TokenCount, NULL)))
+ * QN_DEFINE_NAME_MAPPED_ENUM(Token, (IdToken, "ID")(ClassToken, "CLASS")(TokenCount, NULL))
  * </pre>
  * 
  * \param ENUM                          Name of the enumeration.
@@ -105,7 +105,7 @@ namespace QnEnumDetail {
  */
 #define QN_DEFINE_NAME_MAPPED_ENUM(ENUM, ELEMENTS, ... /* PREFIX */)            \
 enum ENUM {                                                                     \
-    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_NAME_MAPPED_ENUM_VALUE_I, ~, ELEMENTS)      \
+    BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_DEFINE_NAME_MAPPED_ENUM_VALUE_I, ~, ELEMENTS) \
 };                                                                              \
 QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS, ##__VA_ARGS__)
 
@@ -113,7 +113,7 @@ QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS, ##__VA_ARGS__)
 #define QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(ENUM, ELEMENTS, ... /* PREFIX */)  \
 __VA_ARGS__ QnTypedEnumNameMapper<ENUM> createEnumNameMapper(ENUM *) {          \
     QnTypedEnumNameMapper<ENUM> result;                                         \
-    BOOST_PP_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING_VALUE_I, ~, ELEMENTS) \
+    BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING_VALUE_I, ~, ELEMENTS) \
     return result;                                                              \
 }
 
