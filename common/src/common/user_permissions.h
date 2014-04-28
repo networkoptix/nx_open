@@ -1,6 +1,8 @@
 #ifndef QN_USER_PERMISSIONS_H
 #define QN_USER_PERMISSIONS_H
 
+namespace Qn {
+
     /**
      * Flags describing the actions permitted for the user to do with the 
      * selected resource.
@@ -60,5 +62,7 @@
             
         AllPermissions                          = 0xFFFFFFFF
     };
+
+} // namespace Qn
 
 #endif //QN_USER_PERMISSIONS_H

@@ -192,11 +192,11 @@ namespace ec2
     }
 
     template <class T, class Input>
-    bool deserialize(QnOutputBinaryStream<Input>* stream, QnTransaction<T> *transaction)
+    bool deserialize(QnInputBinaryStream<Input>* stream, QnTransaction<T> *transaction)
     {
         return 
             QnBinary::deserialize(stream, static_cast<QnAbstractTransaction *>(transaction)) &&
-            QnBinary::deserialize(stream, &transaction->params, stream);
+            QnBinary::deserialize(stream, &transaction->params);
     }
 
     int generateRequestID();

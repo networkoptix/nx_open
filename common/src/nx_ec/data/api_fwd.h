@@ -23,6 +23,7 @@ namespace ec2 {
     struct ApiFullInfoData;
     struct ApiIdData;
     struct ApiLayoutItemData;
+    struct ApiLayoutItemWithRefData;
     struct ApiLayoutData;
     struct ApiLicenseData;
     struct ApiLockData;
@@ -32,10 +33,12 @@ namespace ec2 {
     struct ApiResetBusinessRuleData;
     struct ApiResourceData;
     struct ApiResourceParamData;
+    struct ApiResourceParamWithRefData;
     struct ApiResourceParamsData;
     struct ApiResourceTypeData;
     struct ApiRuntimeData;
     struct ApiScheduleTaskData;
+    struct ApiScheduleTaskWithRefData;
     struct ApiServerAliveData;
     struct ApiServerInfoData;
     struct ApiSetResourceDisabledData;
@@ -46,7 +49,9 @@ namespace ec2 {
     struct ApiVideowallControlMessageData;
     struct ApiVideowallData;
     struct ApiVideowallItemData;
+    struct ApiVideowallItemWithRefData;
     struct ApiVideowallScreenData;
+    struct ApiVideowallScreenWithRefData;
 
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
@@ -76,6 +81,7 @@ namespace ec2 {
     (ApiFullInfoData)\
     (ApiIdData)\
     (ApiLayoutItemData)\
+    (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\
     (ApiLicenseData)\
     (ApiLockData)\
@@ -85,10 +91,12 @@ namespace ec2 {
     (ApiResetBusinessRuleData)\
     (ApiResourceData)\
     (ApiResourceParamData)\
+    (ApiResourceParamWithRefData)\
     (ApiResourceParamsData)\
     (ApiResourceTypeData)\
     (ApiRuntimeData)\
     (ApiScheduleTaskData)\
+    (ApiScheduleTaskWithRefData)\
     (ApiServerAliveData)\
     (ApiServerInfoData)\
     (ApiSetResourceDisabledData)\
@@ -99,7 +107,9 @@ namespace ec2 {
     (ApiVideowallControlMessageData)\
     (ApiVideowallData)\
     (ApiVideowallItemData)\
+    (ApiVideowallItemWithRefData)\
     (ApiVideowallScreenData)\
+    (ApiVideowallScreenWithRefData)\
 
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         QN_EC2_API_DATA_CLASSES,

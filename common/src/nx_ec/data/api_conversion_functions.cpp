@@ -212,10 +212,10 @@ template<class List>
 void fromApiToResourceList(const ApiCameraDataList &src, List &dst, QnResourceFactory *factory, const overload_tag &) {
     dst.reserve(dst.size() + src.size());
     for(const ApiCameraData &srcCamera: src) {
-        QnVirtualCameraResourcePtr camera = factory->createResource(srcCamera.typeId, QnResourceParams(srcCamera.url, srcCamera.vendor)).dynamicCast<QnVirtualCameraResource>();
-        if (camera) {
-            fromApiToResource(srcCamera, camera);
-            dst.push_back(camera);
+        QnVirtualCameraResourcePtr dstCamera = factory->createResource(srcCamera.typeId, QnResourceParams(srcCamera.url, srcCamera.vendor)).dynamicCast<QnVirtualCameraResource>();
+        if (dstCamera) {
+            fromApiToResource(srcCamera, dstCamera);
+            dst.push_back(dstCamera);
         }
     }
 }
@@ -399,9 +399,9 @@ template<class List>
 void fromApiToResourceList(const ApiLayoutDataList &src, List &dst, const overload_tag &) {
     dst.reserve(dst.size() + src.size());
     for(const ApiLayoutData &srcLayout: src) {
-        QnLayoutResourcePtr layout(new QnLayoutResource());
-        fromApiToResource(srcLayout, layout);
-        dst.push_back(layout);
+        QnLayoutResourcePtr dstLayout(new QnLayoutResource());
+        fromApiToResource(srcLayout, dstLayout);
+        dst.push_back(dstLayout);
     }
 }
 
@@ -529,9 +529,9 @@ template<class List>
 void fromApiToResourceList(const ApiMediaServerDataList &src, List &dst, const ResourceContext &ctx, const overload_tag &) {
     dst.reserve(dst.size() + src.size());
     for(const ApiMediaServerData &srcServer: src) {
-        QnMediaServerResourcePtr dstElement(new QnMediaServerResource(ctx.resTypePool));
-        fromApiToResource(srcServer, dstElement, ctx);
-        dst.push_back(std::move(dstElement));
+        QnMediaServerResourcePtr dstServer(new QnMediaServerResource(ctx.resTypePool));
+        fromApiToResource(srcServer, dstServer, ctx);
+        dst.push_back(std::move(dstServer));
     }
 }
 
@@ -690,8 +690,9 @@ void fromApiToResourceList(const ApiUserDataList &src, List &dst, const overload
     dst.reserve(dst.size() + src.size());
 
     for(const ApiUserData &srcUser: src) {
-        dst.push_back(QnUserResourcePtr(new QnUserResource()));
-        fromApiToResource(srcUser, dst.back());
+        QnUserResourcePtr dstUser(new QnUserResource());
+        fromApiToResource(srcUser, dstUser);
+        dst.push_back(std::move(dstUser));
     }
 }
 
@@ -795,8 +796,9 @@ void fromApiToResourceList(const ApiVideowallDataList &src, List &dst, const ove
     dst.reserve(dst.size() + src.size());
 
     for(const ApiVideowallData &srcVideowall: src) {
-        dst.push_back(QnVideoWallResourcePtr(new QnVideoWallResource()));
-        fromApiToResource(srcVideowall, dst.back());
+        QnVideoWallResourcePtr dstVideowall(new QnVideoWallResource());
+        fromApiToResource(srcVideowall, dstVideowall);
+        dst.push_back(std::move(dstVideowall));
     }
 }
 

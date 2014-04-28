@@ -11,11 +11,13 @@
 #include <QtCore/QMutexLocker>
 #include <QtCore/QWaitCondition>
 
+#include <common/common_module.h>
+
 #include <rest/server/request_handler.h>
 #include <utils/network/http/httptypes.h>
+#include <transaction/transaction.h>
 
 #include "server_query_processor.h"
-#include "common/common_module.h"
 
 
 namespace ec2
