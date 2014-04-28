@@ -1004,7 +1004,7 @@ bool QnStorageManager::isStorageAvailable(int storage_index) const {
     return storage && storage->getStatus() == QnResource::Online; 
 }
 
-bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, const QnCameraBookmark &bookmark) {
+bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
 
     QnDualQualityHelper helper;
     helper.openCamera(cameraGuid);
@@ -1014,6 +1014,13 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, const QnCameraB
     helper.findDataForTime(bookmark.startTimeMs, chunk, catalog, DeviceFileCatalog::OnRecordHole_NextChunk, false);
     if (chunk.startTimeMs < 0)
         return false; //recorded chunk was not found
+
+    qint64 oldStart = bookmark.startTimeMs;
+    bookmark.startTimeMs = qMax(bookmark.startTimeMs, chunk.startTimeMs); // move bookmark start to the start of the chunk in case of hole
+    if (bookmark.startTimeMs != oldStart)
+        bookmark.durationMs -= (bookmark.startTimeMs - oldStart);
+    if (bookmark.durationMs <= 0)
+        return false;   // bookmark ends before the chunk starts
 
     chunk.startTimeMs = bookmark.startTimeMs;
     chunk.durationMs = bookmark.durationMs;
@@ -1029,6 +1036,6 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, const QnCameraB
     if (!sdb)
         return false;
 
-    sdb->addRecord(cameraGuid, QnServer::BookmarksCatalog, chunk);
+    sdb->addOrUpdateCameraBookmark(bookmark, cameraGuid);
     return true;
 }

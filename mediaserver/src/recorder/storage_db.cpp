@@ -2,6 +2,8 @@
 #include "qsqlquery.h"
 #include <QtSql>
 
+#include <utils/serialization/sql.h>
+
 static const int COMMIT_INTERVAL = 1000 * 60 * 5;
 
 QnStorageDb::QnStorageDb(int storageIndex):
@@ -181,16 +183,11 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
                      guid, camera_id, start_time, duration, \
                      name, description, timeout \
                      ) VALUES ( \
-                     :guid, :cameraId, :startTime, :duration, \
+                     :guid, :cameraId, :startTimeMs, :durationMs, \
                      :name, :description, :timeout \
                      )");
-    insQuery.bindValue("guid", bookmark.guid.toRfc4122()); 
+    QnSql::bind(bookmark, &insQuery);
     insQuery.bindValue("cameraId", mac); // unique_id
-    insQuery.bindValue("startTime", bookmark.startTimeMs);
-    insQuery.bindValue("duration", bookmark.durationMs);
-    insQuery.bindValue("name", bookmark.name);
-    insQuery.bindValue("description", bookmark.description);
-    insQuery.bindValue("timeout", bookmark.timeout);
     if (!insQuery.exec()) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return false;

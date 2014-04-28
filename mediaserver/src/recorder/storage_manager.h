@@ -101,7 +101,7 @@ public:
     */
     QStringList getAllStoragePathes() const;
 
-    bool addBookmark(const QByteArray &cameraGuid, const QnCameraBookmark &bookmark);
+    bool addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
