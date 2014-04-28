@@ -21,6 +21,8 @@
 
 namespace ec2
 {
+    // TODO: #Elric #EC2 remove? It's not used anyway.
+
     //!Http request handler for GET requests
     template<class InputData, class OutputData, class ChildType>
     class BaseQueryHttpHandler

@@ -52,13 +52,19 @@ namespace ec2
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;
 
-            auto queryDoneHandler = [&result, &errorCode, &contentType, &finished, this]( ErrorCode _errorCode, const OutputData& outputData )
+            auto queryDoneHandler = [&]( ErrorCode _errorCode, const OutputData& outputData )
             {
                 if( _errorCode == ErrorCode::ok )
                 {
-                    QnOutputBinaryStream<QByteArray> stream( &result );
-                    QnBinary::serialize( outputData, &stream );
-                    contentType = "application/octet-stream";
+                    if(format == Qn::BnsFormat) {
+                        result = QnBinary::serialized(outputData);
+                        contentType = "application/octet-stream";
+                    } else if(format == Qn::JsonFormat) {
+                        result = QJson::serialized(outputData);
+                        contentType = "application/json";
+                    } else {
+                        assert(false);
+                    }
                 }
                 errorCode = _errorCode;
 
@@ -66,10 +72,7 @@ namespace ec2
                 finished = true;
                 m_cond.wakeAll();
             };
-            m_queryProcessor->template processQueryAsync<InputData, OutputData, decltype(queryDoneHandler)>(
-                m_cmdCode,
-                inputData,
-                queryDoneHandler );
+            m_queryProcessor->template processQueryAsync<InputData, OutputData>(m_cmdCode, inputData, queryDoneHandler);
 
             QMutexLocker lk( &m_mutex );
             while( !finished )
