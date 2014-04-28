@@ -4,16 +4,15 @@
 #include <cassert>
 
 #ifndef Q_MOC_RUN
-#include <utils/preprocessor/variadic_seq_for_each.h>
 #include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/mpl/bool.hpp>
 #endif
 
 #include <QtCore/QMetaEnum>
 #include <QtCore/QMetaObject>
 
+#include <utils/preprocessor/variadic_seq_for_each.h>
 #include <utils/common/warnings.h>
 #include <utils/common/forward.h>
 
