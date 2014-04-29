@@ -65,6 +65,7 @@ public:
         /** Also used in event rule to associate non-toggle action with event with any toggle state. */
         UndefinedState = 2
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventState)
 
     enum EventType {
         /** Event type is not defined. Used in rules. */
@@ -114,6 +115,7 @@ public:
         /** Base index for the user defined events. */
         UserEvent = 1000
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventType)
 
     enum ActionType {
         UndefinedAction = 0,
@@ -170,6 +172,7 @@ public:
          */
         ActionCount // TODO: #Elric remove
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 
     bool isImplemented(ActionType actionType);
 

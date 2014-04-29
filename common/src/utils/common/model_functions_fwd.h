@@ -8,6 +8,7 @@
 #include <utils/serialization/data_stream_fwd.h>
 #include <utils/serialization/binary_fwd.h>
 #include <utils/serialization/sql_fwd.h>
+#include <utils/serialization/enum_fwd.h>
 
 #define QN_FUSION_DECLARE_FUNCTIONS_hash(TYPE, ... /* PREFIX */)                \
 __VA_ARGS__ uint qHash(const TYPE &value, uint seed);

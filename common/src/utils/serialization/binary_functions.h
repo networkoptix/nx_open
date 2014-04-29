@@ -21,6 +21,8 @@
 
 #include <utils/common/container.h>
 
+#include "enum.h"
+
 
 namespace QnBinaryDetail {
     // TODO: #Elric #EC2 remove / move
@@ -305,11 +307,15 @@ bool deserialize(QnInputBinaryStream<Input> *stream, QUuid *target) {
 
 template<class T, class Output>
 void serialize(const QFlags<T> &value, QnOutputBinaryStream<Output> *stream) {
+    QnSerialization::check_enum_binary<T>();
+
     QnBinary::serialize(static_cast<qint32>(value), stream);
 }
 
 template<class T, class Input>
 bool deserialize(QnInputBinaryStream<Input> *stream, QFlags<T> *target) {
+    QnSerialization::check_enum_binary<T>();
+
     qint32 tmp;
     if(!QnBinary::deserialize(stream, &tmp))
         return false;
@@ -324,11 +330,15 @@ bool deserialize(QnInputBinaryStream<Input> *stream, QFlags<T> *target) {
 
 template<class T, class Output>
 void serialize(const T &value, QnOutputBinaryStream<Output> *stream, typename std::enable_if<std::is_enum<T>::value>::type * = NULL) {
+    QnSerialization::check_enum_binary<T>();
+
     QnBinary::serialize(static_cast<qint32>(value), stream);
 }
 
 template<class T, class Input>
 bool deserialize(QnInputBinaryStream<Input> *stream, T *target, typename std::enable_if<std::is_enum<T>::value>::type* = NULL) {
+    QnSerialization::check_enum_binary<T>();
+
     qint32 tmp;
     if(!QnBinary::deserialize(stream, &tmp))
         return false;

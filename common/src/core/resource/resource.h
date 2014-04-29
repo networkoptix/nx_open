@@ -402,6 +402,8 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnResource::Status) // TODO: #Elric #EC2 move status out, clean up
+
 template<class Resource>
 QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     if(resource == NULL) {
