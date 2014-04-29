@@ -61,7 +61,7 @@ namespace {
         (ImageObject,              "image")
         (CameraDiagnosticsObject,  "doCameraDiagnosticsStep")
         (RebuildArchiveObject,     "rebuildArchive")
-        ((BookmarkAddObject,        "cameraBookmarks/add"))
+        (BookmarkAddObject,        "cameraBookmarks/add")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
