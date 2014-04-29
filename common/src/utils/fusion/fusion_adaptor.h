@@ -16,7 +16,16 @@
 #include "fusion.h"
 
 /**
+ * Main API entry point for fusion adaptors.
+ *
+ * Registers a fusion adaptor for the given class.
  * 
+ * \param CLASS                         Class to register adaptor for.
+ * \param MEMBER_SEQ                    Preprocessor sequence of member parameter
+ *                                      sequences for the given class.
+ * \param GLOBAL_SEQ                    Global parameters sequence that will
+ *                                      be appended to each one of individual
+ *                                      member parameter sequences.
  */
 #define QN_FUSION_ADAPT_CLASS(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)          \
     QN_FUSION_ADAPT_CLASS_I(                                                    \
@@ -170,6 +179,9 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * \internal
  * 
  * Converts a field sequence into a standard member sequence.
+ * 
+ * \param STRUCT                        Name of the struct.
+ * \param FIELD_SEQ                     Preprocessor sequence of field names.
  */
 #define QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ)                    \
     BOOST_PP_SEQ_FOR_EACH(QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ_STEP_I, STRUCT, FIELD_SEQ)
@@ -218,6 +230,11 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 /**
  * \internal
+ * 
+ * Applies property extensions to the given member sequence, returning a new
+ * member sequence.
+ * 
+ * \param MEMBER_SEQ
  */
 #define QN_FUSION_EXTEND_MEMBER_SEQ(MEMBER_SEQ)                                 \
     BOOST_PP_SEQ_FOR_EACH(QN_FUSION_EXTEND_MEMBER_SEQ_STEP_I, ~, MEMBER_SEQ)
@@ -228,6 +245,11 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 /**
  * \internal
+ * 
+ * Applies property extensions to the given property sequence, returning a new
+ * property sequence.
+ * 
+ * \param PROPERTY_SEQ
  */
 #define QN_FUSION_EXTEND_PROPERTY_SEQ(PROPERTY_SEQ)                             \
     BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_EXTEND_PROPERTY_SEQ_STEP_I, ~, PROPERTY_SEQ)
@@ -246,12 +268,13 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * To override the default return value for some key <tt>some_key</tt>, use
  * the following code:
  * \code
- * #define QN_FUSION_PROPERTY_IS_TYPED_FOR_some_key ,
+ * #define QN_FUSION_PROPERTY_IS_TYPED_FOR_some_key true
  * #define QN_FUSION_PROPERTY_TYPE_FOR_some_key QString // Or your custom type
  * \endcode
  * 
  * This might be useful when <tt>decltype</tt> cannot be used because
- * <tt>VALUE</tt> might be a lambda.
+ * <tt>VALUE</tt> might be a lambda. This is also a way of saving compilation
+ * tio
  *
  * \param KEY                           Fusion key.
  * \param VALUE                         Value specified by the user for this key.
