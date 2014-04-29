@@ -16,13 +16,14 @@
 #include <utils/media/media_stream_cache.h>
 #include <version.h>
 
+#include "camera/camera_pool.h"
 #include "hls_archive_playlist_manager.h"
 #include "hls_live_playlist_manager.h"
 #include "hls_session_pool.h"
 #include "hls_types.h"
-#include "../streaming_chunk_cache.h"
-#include "../streaming_params.h"
-#include "../../camera/camera_pool.h"
+#include "streaming/streaming_chunk_cache.h"
+#include "streaming/streaming_params.h"
+#include "utils/network/tcp_connection_priv.h"
 
 
 using namespace nx_http;
@@ -119,6 +120,10 @@ namespace nx_hls
 
     bool QnHttpLiveStreamingProcessor::receiveRequest()
     {
+        Q_D(QnTCPConnectionProcessor);
+        if( !d->clientRequest.isEmpty() )
+            m_readBuffer = std::move(d->clientRequest);
+
         if( m_readBuffer.isEmpty() )
         {
             m_readBuffer.resize( READ_BUFFER_SIZE );
