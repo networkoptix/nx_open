@@ -87,7 +87,7 @@ namespace nx_hls
                     if( m_useChunkedTransfer )
                         bytesSent = sendChunk( m_writeBuffer ) ? m_writeBuffer.size() : -1;
                     else
-                        bytesSent = sendData( m_writeBuffer );
+                        bytesSent = sendData( m_writeBuffer ) ? m_writeBuffer.size() : -1;;
                     if( bytesSent < 0 )
                     {
                         NX_LOG( QString::fromLatin1("Error sending data to %1 (%2). Terminating connection...").
@@ -422,6 +422,7 @@ namespace nx_hls
         nx_hls::VariantPlaylistData playlistData;
         playlistData.url = baseUrl;
         playlistData.url.setPath( request.requestLine.url.path() );
+        playlistData.bandwidth = 1280000;   //TODO/IMPL add real bitrate
         QList<QPair<QString, QString> > queryItems = QUrlQuery(request.requestLine.url.query()).queryItems();
         //removing SESSION_ID_PARAM_NAME
         for( QList<QPair<QString, QString> >::iterator
