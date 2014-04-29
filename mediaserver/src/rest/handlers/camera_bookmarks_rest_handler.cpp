@@ -4,6 +4,7 @@
 #include <recorder/storage_manager.h>
 
 #include <utils/network/tcp_connection_priv.h>
+#include <utils/serialization/json_functions.h>
 
 int QnCameraBookmarksRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
     QString action = extractAction(path);
@@ -51,7 +52,7 @@ int QnCameraBookmarksRestHandler::getCameraBookmarkAction(const QnRequestParams 
     if (!qnStorageMan->getBookmarks(id.toUtf8(), filter, bookmarks))
         return CODE_INVALID_PARAMETER;
 
-    result.setReply(bookmarks.first()); //TODO: #GDM WTF? What else should I do to deserialize QnCameraBookmarkList ???
+    result.setReply(bookmarks);
     return CODE_OK;
 }
 
