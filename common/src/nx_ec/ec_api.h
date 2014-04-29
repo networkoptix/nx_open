@@ -164,9 +164,12 @@ namespace ec2
         }
         
         ErrorCode getServersSync(QnMediaServerResourceList* const serverList ) {
-            using namespace std::placeholders;
-            int(AbstractMediaServerManager::*fn)(impl::GetServersHandlerPtr) = &AbstractMediaServerManager::getServers;
-            return impl::doSyncCall<impl::GetServersHandler>( std::bind(fn, this, _1), serverList );
+            return impl::doSyncCall<impl::GetServersHandler>( 
+                [=](const impl::GetServersHandlerPtr &handler) {
+                    return this->getServers(handler);
+                }, 
+                serverList 
+            );
         }
 
         /*!
@@ -177,9 +180,12 @@ namespace ec2
         }
 
         ErrorCode saveSync( const QnMediaServerResourcePtr& serverRes, QnMediaServerResourcePtr* const server ) {
-            using namespace std::placeholders;
-            int(AbstractMediaServerManager::*fn)(const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr) = &AbstractMediaServerManager::save;
-            return impl::doSyncCall<impl::SaveServerHandler>( std::bind(fn, this, serverRes, _1), server );
+            return impl::doSyncCall<impl::SaveServerHandler>( 
+                [=](const impl::SaveServerHandlerPtr &handler) {
+                    return this->save(serverRes, handler);
+                },
+                server 
+            );
         }
 
         /*!

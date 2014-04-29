@@ -27,14 +27,16 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole StreamQuality SecondStreamQuality PanicMode RecordingType)
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace 
+            PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
+            StreamQuality SecondStreamQuality PanicMode RecordingType SerializationFormat)
     Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes ServerFlags)
 public:
 #else
     Q_NAMESPACE
 #endif
 
-    // TODO: #Elric #5.0 use Qt::Edge
+    // TODO: #Elric #5.0 use Qt::Edge ?
     /**
      * Generic enumeration describing borders of a rectangle.
      */
@@ -177,6 +179,7 @@ public:
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
 
+    // TODO: #Elric rename
     enum StreamFpsSharingMethod {
         shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
         sharePixels, //if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
@@ -198,6 +201,7 @@ public:
         PM_User
     };
 
+    // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag { 
         SF_None     = 0, 
         SF_Edge     = 1,
@@ -206,6 +210,7 @@ public:
     };
     Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 
+
     enum TimePeriodType {
         NullTimePeriod      = 0x1,  /**< No period. */
         EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
@@ -213,7 +218,6 @@ public:
     };
     Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
     Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes);
-
 
     enum TimePeriodContent {
         RecordingContent,
@@ -344,6 +348,7 @@ public:
 
     };
 
+    // TODO: #Elric #EC2 rename
     enum StreamQuality {
         QualityLowest,
         QualityLow,
@@ -356,6 +361,7 @@ public:
         StreamQualityCount
     };
 
+    // TODO: #Elric #EC2 rename
     enum SecondStreamQuality { 
         SSQualityLow, 
         SSQualityMedium, 
@@ -374,6 +380,13 @@ public:
         RecordingType_Count
     };
 
+
+    enum SerializationFormat {
+        JsonFormat,
+        BnsFormat,
+    };
+
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -389,6 +402,7 @@ public:
 
 } // namespace Qn
 
+
 /** 
  * \def lit
  * Helper macro to mark strings that are not to be translated. 
@@ -401,11 +415,13 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities)
-        (Qn::MotionType)(Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlags)(Qn::PanicMode)(Qn::RecordingType), 
+        (Qn::MotionType)(Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlags)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::SerializationFormat), 
     (metatype)(lexical)(json)
 )
 

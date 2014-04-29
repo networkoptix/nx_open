@@ -3,8 +3,9 @@
 
 #include <type_traits> /* For std::is_pointer. */
 
-#include <QtCore/QSet>
-#include <QtCore/QtAlgorithms> /* For qDeleteAll. */
+#ifndef QN_NO_QT
+#   include <QtCore/QSet>
+#endif
 
 #include "flat_map.h"
 
@@ -22,15 +23,16 @@ public:
     QnFlatStorage() {}
 
     ~QnFlatStorage() {
-        qDeleteAll(m_owned);
+        for(T value: m_owned)
+            delete value;
     }
 
     using base_type::empty;
     using base_type::clear;
     using base_type::value;
 
-    QList<T> values() const {
-        return m_owned.toList();
+    const QSet<T> &values() const {
+        return m_owned;
     }
 
     void insert(const Key &key, T value, bool claimOwnership = true) {
