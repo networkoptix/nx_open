@@ -365,9 +365,10 @@ bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
 
 void QnMediaServerResource::setStatus(Status newStatus, bool silenceMode)
 {
-    QMutexLocker lock(&m_mutex);
-    if (getStatus() != newStatus)
+    if (getStatus() != newStatus) {
+        QMutexLocker lock(&m_mutex);
         m_statusTimer.restart();
+    }
     QnResource::setStatus(newStatus, silenceMode);
 }
 

@@ -3,10 +3,9 @@
 
 #include <cassert>
 
-#ifndef Q_MOC_RUN
-#include <boost/utility/enable_if.hpp>
-#include <boost/type_traits/is_base_and_derived.hpp>
-#endif // Q_MOC_RUN
+#include <type_traits> /* For std::enable_if, std::is_base_of, std::integral_constant. */
+
+#include <QtCore/QVariant>
 
 #include <utils/common/adl_wrapper.h>
 #include <utils/common/flat_map.h>
@@ -190,7 +189,7 @@ public:
         return m_storage.value(type);
     }
 
-    QList<Serializer *> serializers() {
+    QSet<Serializer *> serializers() {
         return m_storage.values();
     }
 
@@ -211,7 +210,7 @@ template<class Serializer, class Instance>
 class QnStaticSerializerStorage {
 public:
     static Serializer *serializer(int type) { return Instance()()->serializer(type); }
-    static QList<Serializer *> serializers() { return Instance()()->serializers(); }
+    static QSet<Serializer *> serializers() { return Instance()()->serializers(); }
     static void registerSerializer(Serializer *serializer) { Instance()()->registerSerializer(serializer); }
     template<class T>
     static void registerSerializer() { registerSerializer(new typename QnSerialization::default_serializer<Serializer, T>::type()); }
@@ -264,10 +263,12 @@ namespace QnSerializationDetail {
     // TODO: #Elric qMetaTypeId uses atomics for custom types. Maybe introduce local cache?
 
     template<class T>
-    struct is_metatype_defined: boost::mpl::bool_<QMetaTypeId2<T>::Defined> {};
+    struct is_metatype_defined: 
+        std::integral_constant<bool, QMetaTypeId2<T>::Defined> 
+    {};
 
     template<class Context, class T, class D>
-    void serialize_value(Context *ctx, const T &value, D *target, typename boost::enable_if<is_metatype_defined<T> >::type * = NULL) {
+    void serialize_value(Context *ctx, const T &value, D *target, typename std::enable_if<is_metatype_defined<T>::value>::type * = NULL) {
         typename Context::serializer_type *serializer = ctx->serializer(qMetaTypeId<T>());
         if(serializer) {
             serializer->serialize(ctx, static_cast<const void *>(&value), target);
@@ -277,12 +278,12 @@ namespace QnSerializationDetail {
     }
 
     template<class Context, class T, class D>
-    void serialize_value(Context *ctx, const T &value, D *target, typename boost::disable_if<is_metatype_defined<T> >::type * = NULL) {
+    void serialize_value(Context *ctx, const T &value, D *target, typename std::enable_if<!is_metatype_defined<T>::value>::type * = NULL) {
         serialize_value_direct(ctx, value, target);
     }
 
     template<class Context, class T, class D>
-    bool deserialize_value(Context *ctx, const D &value, T *target, typename boost::enable_if<is_metatype_defined<T> >::type * = NULL) {
+    bool deserialize_value(Context *ctx, const D &value, T *target, typename std::enable_if<is_metatype_defined<T>::value>::type * = NULL) {
         typename Context::serializer_type *serializer = ctx->serializer(qMetaTypeId<T>());
         if(serializer) {
             return serializer->deserialize(ctx, value, static_cast<void *>(target));
@@ -292,7 +293,7 @@ namespace QnSerializationDetail {
     }
 
     template<class Context, class T, class D>
-    bool deserialize_value(Context *ctx, const D &value, T *target, typename boost::disable_if<is_metatype_defined<T> >::type * = NULL) {
+    bool deserialize_value(Context *ctx, const D &value, T *target, typename std::enable_if<!is_metatype_defined<T>::value>::type * = NULL) {
         return deserialize_value_direct(ctx, value, target);
     }
 
@@ -333,12 +334,12 @@ namespace QnSerialization {
     }
 
     template<class Serializer, class T>
-    struct default_serializer<Serializer, T, typename boost::enable_if<boost::is_base_and_derived<QnContextSerializerBase, Serializer> >::type> {
+    struct default_serializer<Serializer, T, typename std::enable_if<std::is_base_of<QnContextSerializerBase, Serializer>::value>::type> {
         typedef QnDefaultContextSerializer<T, Serializer> type;
     };
 
     template<class Serializer, class T>
-    struct default_serializer<Serializer, T, typename boost::enable_if<boost::is_base_and_derived<QnBasicSerializerBase, Serializer> >::type> {
+    struct default_serializer<Serializer, T, typename std::enable_if<std::is_base_of<QnBasicSerializerBase, Serializer>::value>::type> {
         typedef QnDefaultBasicSerializer<T, Serializer> type;
     };
 

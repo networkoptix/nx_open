@@ -28,38 +28,38 @@
 
 namespace {
     QN_DEFINE_NAME_MAPPED_ENUM(RequestObject,
-        ((StorageStatusObject,      "storageStatus"))
-        ((StorageSpaceObject,       "storageSpace"))
-        ((TimePeriodsObject,        "RecordedTimePeriods"))
-        ((StatisticsObject,         "statistics"))
-        ((PtzContinuousMoveObject,  "ptz"))
-        ((PtzAbsoluteMoveObject,    "ptz"))
-        ((PtzViewportMoveObject,    "ptz"))
-        ((PtzGetPositionObject,     "ptz"))
-        ((PtzCreatePresetObject,    "ptz"))
-        ((PtzUpdatePresetObject,    "ptz"))
-        ((PtzRemovePresetObject,    "ptz"))
-        ((PtzActivatePresetObject,  "ptz"))
-        ((PtzGetPresetsObject,      "ptz"))
-        ((PtzCreateTourObject,      "ptz"))
-        ((PtzRemoveTourObject,      "ptz"))
-        ((PtzActivateTourObject,    "ptz"))
-        ((PtzGetToursObject,        "ptz"))
-        ((PtzGetHomeObjectObject,   "ptz"))
-        ((PtzGetActiveObjectObject, "ptz"))
-        ((PtzUpdateHomeObjectObject, "ptz"))
-        ((PtzGetDataObject,         "ptz"))
-        ((GetParamsObject,          "getCameraParam"))
-        ((SetParamsObject,          "setCameraParam"))
-        ((TimeObject,               "gettime"))
-        ((CameraSearchStartObject,  "manualCamera/search"))
-        ((CameraSearchStatusObject, "manualCamera/status"))
-        ((CameraSearchStopObject,   "manualCamera/stop"))
-        ((CameraAddObject,          "manualCamera/add"))
-        ((EventLogObject,           "events"))
-        ((ImageObject,              "image"))
-        ((CameraDiagnosticsObject,  "doCameraDiagnosticsStep"))
-        ((RebuildArchiveObject,     "rebuildArchive"))
+        (StorageStatusObject,      "storageStatus")
+        (StorageSpaceObject,       "storageSpace")
+        (TimePeriodsObject,        "RecordedTimePeriods")
+        (StatisticsObject,         "statistics")
+        (PtzContinuousMoveObject,  "ptz")
+        (PtzAbsoluteMoveObject,    "ptz")
+        (PtzViewportMoveObject,    "ptz")
+        (PtzGetPositionObject,     "ptz")
+        (PtzCreatePresetObject,    "ptz")
+        (PtzUpdatePresetObject,    "ptz")
+        (PtzRemovePresetObject,    "ptz")
+        (PtzActivatePresetObject,  "ptz")
+        (PtzGetPresetsObject,      "ptz")
+        (PtzCreateTourObject,      "ptz")
+        (PtzRemoveTourObject,      "ptz")
+        (PtzActivateTourObject,    "ptz")
+        (PtzGetToursObject,        "ptz")
+        (PtzGetHomeObjectObject,   "ptz")
+        (PtzGetActiveObjectObject, "ptz")
+        (PtzUpdateHomeObjectObject, "ptz")
+        (PtzGetDataObject,         "ptz")
+        (GetParamsObject,          "getCameraParam")
+        (SetParamsObject,          "setCameraParam")
+        (TimeObject,               "gettime")
+        (CameraSearchStartObject,  "manualCamera/search")
+        (CameraSearchStatusObject, "manualCamera/status")
+        (CameraSearchStopObject,   "manualCamera/stop")
+        (CameraAddObject,          "manualCamera/add")
+        (EventLogObject,           "events")
+        (ImageObject,              "image")
+        (CameraDiagnosticsObject,  "doCameraDiagnosticsStep")
+        (RebuildArchiveObject,     "rebuildArchive")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -402,9 +402,9 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     setNameMapper(new QnEnumNameMapper(QnEnumNameMapper::create<RequestObject>())); // TODO: #Elric no new
 
     QnRequestHeaderList extraHeaders;
-    extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getId().toString());
+    extraHeaders.insert(lit("x-server-guid"), mserver->getId().toString());
     if (!videoWallKey.isEmpty())
-        extraHeaders << QnRequestHeader(lit("X-NetworkOptix-VideoWall"), videoWallKey);
+        extraHeaders.insert(lit("X-NetworkOptix-VideoWall"), videoWallKey);
     setExtraHeaders(extraHeaders);
 }
 
