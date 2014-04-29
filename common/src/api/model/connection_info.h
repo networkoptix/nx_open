@@ -11,8 +11,8 @@
 
 typedef QnSoftwareVersion SoftwareVersionType; // TODO: #Elric remove?
 
-struct QnConnectionInfoData {
-    QnConnectionInfoData(): proxyPort(0) {}
+struct QnConnectionInfo {
+    QnConnectionInfo(): proxyPort(0) {}
 
     QUrl ecUrl;
     SoftwareVersionType version;
@@ -24,9 +24,7 @@ struct QnConnectionInfoData {
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCompatibilityItem, (metatype)(json)(binary))
-QN_FUSION_DECLARE_FUNCTIONS(QnConnectionInfoData, (metatype)(json)(binary))
-
-typedef QnConnectionInfoData QnConnectionInfo; // TODO: #Elric remove?
+QN_FUSION_DECLARE_FUNCTIONS(QnConnectionInfo, (metatype)(json)(binary))
 
 // TODO: #Elric remove shared pointer?
 typedef QSharedPointer<QnConnectionInfo> QnConnectionInfoPtr;
