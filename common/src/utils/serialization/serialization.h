@@ -187,7 +187,7 @@ public:
         return m_storage.value(type);
     }
 
-    QList<Serializer *> serializers() {
+    QSet<Serializer *> serializers() {
         return m_storage.values();
     }
 
@@ -208,7 +208,7 @@ template<class Serializer, class Instance>
 class QnStaticSerializerStorage {
 public:
     static Serializer *serializer(int type) { return Instance()()->serializer(type); }
-    static QList<Serializer *> serializers() { return Instance()()->serializers(); }
+    static QSet<Serializer *> serializers() { return Instance()()->serializers(); }
     static void registerSerializer(Serializer *serializer) { Instance()()->registerSerializer(serializer); }
     template<class T>
     static void registerSerializer() { registerSerializer(new typename QnSerialization::default_serializer<Serializer, T>::type()); }
