@@ -23,7 +23,7 @@ public:
         return m_storage.value(key);
     }
 
-    QList<T> values() const {
+    QSet<T> values() const {
         std::unique_lock<std::mutex> guard(m_mutex);
 
         return m_storage.values();

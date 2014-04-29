@@ -149,6 +149,7 @@ namespace nx_http
 
     namespace StatusCode
     {
+        // TODO: #Elric enum naming
         enum Value
         {
             undefined = 0,

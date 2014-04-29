@@ -83,6 +83,8 @@ namespace ec2
                     return "removeBusinessRule";
                 case broadcastBusinessAction:
                     return "broadcastBusinessAction";
+                case execBusinessAction:
+                    return "execBusinessAction";
                 case getBusinessRuleList:
                     return "getBusinessRuleList";
                 case resetBusinessRules:

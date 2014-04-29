@@ -1,6 +1,8 @@
 #ifndef QN_SERIALIZATION_BINARY_FWD_H
 #define QN_SERIALIZATION_BINARY_FWD_H
 
+class QByteArray;
+
 //!Stream providing read operation
 template<class Input>
 class QnInputBinaryStream;

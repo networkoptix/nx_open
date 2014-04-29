@@ -29,6 +29,8 @@
 
 #include "nx_ec/data/api_email_data.h"
 #include "common/common_module.h"
+#include "nx_ec/data/api_business_rule_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
@@ -52,7 +54,7 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(qnBusinessMessageBus, SIGNAL(actionDelivered(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDelivered(QnAbstractBusinessActionPtr)));
     connect(qnBusinessMessageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
 
-    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr, QnResourcePtr)), this, SLOT(executeActionInternal(QnAbstractBusinessActionPtr, QnResourcePtr)));
+    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeAction(QnAbstractBusinessActionPtr)));
 
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
@@ -74,45 +76,72 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (action->actionType() == QnBusiness::SendMailAction || action->actionType() == QnBusiness::DiagnosticsAction)
+    if (action->actionType() == QnBusiness::SendMailAction) {
+        // looking for server with public IP address
+        QnMediaServerResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
+            return QnMediaServerResourcePtr(); // do not proxy
+        foreach (QnMediaServerResourcePtr mServer, qnResPool->getAllServers())
+        {
+            if ((mServer->getServerFlags() & Qn::SF_HasPublicIP) && mServer->getStatus() == QnResource::Online)
+                return mServer;
+        }
+        return QnMediaServerResourcePtr();
+    }
+
+    if (!res)
+        return QnMediaServerResourcePtr();
+
+    if (action->actionType() == QnBusiness::DiagnosticsAction)
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
     return qnResPool->getResourceById(res->getParentId()).dynamicCast<QnMediaServerResource>();
 }
 
+bool QnBusinessRuleProcessor::needProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
+{
+    QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
+    return routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getId() != getGuid();
+}
+
+void QnBusinessRuleProcessor::doProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
+{
+    QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
+    if (routeToServer) 
+    {
+        // todo: it is better to use action.clone here
+        ec2::ApiBusinessActionData actionData;
+        QnAbstractBusinessActionPtr actionToSend;
+
+        ec2::fromResourceToApi(action, actionData);
+        if (res) {
+            actionData.resources.clear();
+            actionData.resources.push_back(res->getId());
+        }
+        ec2::fromApiToResource(actionData, actionToSend, qnResPool);
+
+        qnBusinessMessageBus->deliveryBusinessAction(actionToSend, routeToServer->getId());
+    }
+}
+
+void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
+{
+    if (needProxyAction(action, res))
+        doProxyAction(action, res);
+    else
+        executeActionInternal(action, res);
+}
+
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
     QnResourceList resList = action->getResourceObjects().filtered<QnNetworkResource>();
     if (resList.isEmpty()) {
-        executeActionInternal(action, QnResourcePtr());
+        executeAction(action, QnResourcePtr());
     }
     else {
-        for (int i = 0; i < resList.size(); ++i)
-        {
-            QnMediaServerResourcePtr routeToServer = getDestMServer(action, resList[i]);
-            if (routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getId() != getGuid())
-            {
-                // delivery to other server
-                QUrl serverUrl = routeToServer->getApiUrl();
-                QUrl proxyUrl = QnAppServerConnectionFactory::defaultUrl();
-#if 0
-                // do proxy via EC builtin proxy. It is dosn't work. I don't know why
-                proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
-#else
-                // do proxy via CPP media proxy
-                proxyUrl.setScheme(QLatin1String("http"));
-                proxyUrl.setPort(QnAppServerConnectionFactory::defaultMediaProxyPort());
-                proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
-#endif
-
-                QString url = proxyUrl.toString();
-                qnBusinessMessageBus->deliveryBusinessAction(action, resList[i], url); 
-            }
-            else {
-                executeActionInternal(action, resList[i]);
-            }
-        }
+        foreach(QnResourcePtr res, resList)
+            executeAction(action, res);
     }
 }
 

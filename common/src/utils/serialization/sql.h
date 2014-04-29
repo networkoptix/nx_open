@@ -9,6 +9,7 @@
 #include <QtSql/QSqlQuery>
 
 #include <utils/common/adl_wrapper.h>
+#include <utils/fusion/fusion.h>
 
 #include "sql_fwd.h"
 #include "sql_index_mapping.h"
