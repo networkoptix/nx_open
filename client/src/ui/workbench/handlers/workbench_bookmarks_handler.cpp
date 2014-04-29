@@ -56,7 +56,6 @@ void QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered() {
     if (!server)
         return; // TODO: #GDM show some diagnostic messages
 
-    qDebug() << "adding bookmark..." << bookmark;
     int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkAdded(int, const QnCameraBookmark &, int)));
     m_addingBookmarks[handle] = camera;
 }
@@ -100,8 +99,6 @@ QnMediaServerResourcePtr QnWorkbenchBookmarksHandler::getMediaServerOnTime(const
 }
 
 void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle) {
-    qDebug() << "bookmark added" << bookmark;
-
     QnResourcePtr camera = m_addingBookmarks.take(handle);
     if (status != 0 || !camera)
         return;
