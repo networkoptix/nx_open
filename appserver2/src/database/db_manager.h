@@ -54,10 +54,7 @@ namespace ec2
         {
             QnDbTransactionLocker lock(&m_tran);
             ErrorCode result = executeTransactionNoLock(tran);
-            
-            if (result == ErrorCode::skipped)
-                return ErrorCode::ok;
-            else if (result != ErrorCode::ok)
+            if (result != ErrorCode::ok)
                 return result;
 
             result = transactionLog->saveTransaction( tran, serializedTran);
