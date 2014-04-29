@@ -3,7 +3,11 @@
 
 #include "binary_fwd.h"
 
-#include <QtCore/QByteArray>
+#ifndef QN_NO_QT
+#   include <QtCore/QByteArray>
+#endif
+
+#ifndef QN_NO_QT
 
 template<>
 class QnInputBinaryStream<QByteArray> {
@@ -52,6 +56,8 @@ public:
 private:
     QByteArray *m_data;
 };
+
+#endif // QN_NO_QT
 
 
 /* Disable ADL wrapping for stream types as they are not convertible to anything
