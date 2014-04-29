@@ -273,17 +273,22 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
  * \endcode
  * 
  * This might be useful when <tt>decltype</tt> cannot be used because
- * <tt>VALUE</tt> might be a lambda. This is also a way of saving compilation
- * tio
+ * <tt>VALUE</tt> might be a lambda. This is also a way of saving on 
+ * <tt>decltype</tt> calls when property type is known at key definition time.
  *
  * \param KEY                           Fusion key.
  * \param VALUE                         Value specified by the user for this key.
  * \returns                             Type expression that should be used for
  *                                      return type of a property getter function.
  */
-#define QN_FUSION_PROPERTY_TYPE(KEY, VALUE)                                          \
-    BOOST_PP_OVERLOAD(QN_FUSION_PROPERTY_TYPE_I_, ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_TYPED_FOR_, KEY) ~)(KEY, VALUE)
-    
+#define QN_FUSION_PROPERTY_TYPE(KEY, VALUE)                                     \
+    BOOST_PP_OVERLOAD(                                                          \
+        QN_FUSION_PROPERTY_TYPE_I_,                                             \
+        ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_TYPED_CHECK_, BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_TYPED_FOR_, KEY)) ~ \
+    )(KEY, VALUE)
+ 
+#define QN_FUSION_PROPERTY_IS_TYPED_CHECK_true ,
+
 #define QN_FUSION_PROPERTY_TYPE_I_1(KEY, VALUE) decltype(VALUE)
 #define QN_FUSION_PROPERTY_TYPE_I_2(KEY, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_TYPE_FOR_, KEY)
 
@@ -291,26 +296,32 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 /**
  * \internal
  * 
- * This macro returns one or several property pairs that should be used instead
- * of the original property pair. By default it simply returns <tt>(KEY, VALUE)</tt>.
+ * This macro returns property extension for the provided property pair, 
+ * which essentially is a sequence of property pairs that should be used instead
+ * of the original one. By default it simply returns <tt>(KEY, VALUE)</tt>.
  * 
- * To override the default return value for some key <tt>some_key</tt>, use
+ * To specify a property extension for some key <tt>some_key</tt>, use
  * the following code:
  * \code
- * #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_some_key ,
- * #define QN_FUSION_PROPERTY_EXTENSION_FOR_some_key(KEY, VALUE) (KEY, QLatin1Literal(VALUE)) // Or your custom extension
+ * #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_some_key true
+ * #define QN_FUSION_PROPERTY_EXTENSION_FOR_some_key(KEY, VALUE) (KEY, VALUE)(BOOST_PP_CAT(qt_, KEY), QLatin1Literal(VALUE)) // Or your custom extension
  * \endcode
  * 
  * \param KEY                           Fusion key.
  * \param VALUE                         Value specified by the user for this key.
- * \returns                             Expression that should be used in the
- *                                      return statement of a property getter function.
+ * \returns                             Property extension.
  */
-#define QN_FUSION_PROPERTY_EXTENSION(KEY, VALUE)                                         \
-    BOOST_PP_OVERLOAD(QN_FUSION_PROPERTY_EXTENSION_I_, ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_EXTENDED_FOR_, KEY) ~)(KEY, VALUE)
+#define QN_FUSION_PROPERTY_EXTENSION(KEY, VALUE)                                \
+    BOOST_PP_OVERLOAD(                                                          \
+        QN_FUSION_PROPERTY_EXTENSION_I_,                                        \
+        ~ BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_EXTENDED_CHECK_, BOOST_PP_CAT(QN_FUSION_PROPERTY_IS_EXTENDED_FOR_, KEY)) ~ \
+    )(KEY, VALUE)
+
+#define QN_FUSION_PROPERTY_IS_EXTENDED_CHECK_true ,
 
 #define QN_FUSION_PROPERTY_EXTENSION_I_1(KEY, VALUE) (KEY, VALUE)
 #define QN_FUSION_PROPERTY_EXTENSION_I_2(KEY, VALUE) BOOST_PP_CAT(QN_FUSION_PROPERTY_EXTENSION_FOR_, KEY)(KEY, VALUE)
+
 
 
 #endif // QN_FUSION_ADAPTOR_H

@@ -131,29 +131,29 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_base true
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_base(KEY, VALUE) (base, std::declval<VALUE>())
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_name ,
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_name true
 #define QN_FUSION_PROPERTY_TYPE_FOR_name QString
-#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_name ,
+#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_name true
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_name(KEY, VALUE) (name, QStringLiteral(VALUE))(c_name, VALUE)(sql_placeholder_name, QN_FUSION_LIT_CAT(":", VALUE))
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_name ,
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_name true
 #define QN_FUSION_PROPERTY_TYPE_FOR_c_name const char *
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_sql_placeholder_name ,
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_sql_placeholder_name true
 #define QN_FUSION_PROPERTY_TYPE_FOR_sql_placeholder_name QString
 
-#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_setter ,
+#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_setter true
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, QnFusionDetail::make_access_setter_category(access_type())) 
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname ,
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname true
 #define QN_FUSION_PROPERTY_TYPE_FOR_classname QString
-#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_classname ,
+#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_classname true
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_classname(KEY, VALUE) (classname, QStringLiteral(VALUE))(c_classname, VALUE)
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_classname ,
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_classname true
 #define QN_FUSION_PROPERTY_TYPE_FOR_c_classname const char *
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_optional ,
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_optional true
 #define QN_FUSION_PROPERTY_TYPE_FOR_optional bool
 
 
