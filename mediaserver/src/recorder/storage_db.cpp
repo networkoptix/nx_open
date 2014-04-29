@@ -212,28 +212,59 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
 
 bool QnStorageDb::getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result) {
 
+    QString filterStr;
+    QStringList bindings;
+
+    auto addFilter = [&](const QString &text) {
+        if (filterStr.isEmpty())
+            filterStr = "WHERE " + text;
+        else
+            filterStr = filterStr + " AND " + text;
+        bindings.append(text.mid(text.lastIndexOf(':')));
+    };
+
+    if (!cameraGuid.isEmpty())
+        addFilter("book.camera_id = :cameraGuid");
+    if (filter.minStartTimeMs > 0)
+        addFilter("startTimeMs >= :minStartTimeMs");
+    if (filter.maxStartTimeMs < INT64_MAX)
+        addFilter("startTimeMs <= :maxStartTimeMs");
+    if (filter.minDurationMs > 0)
+        addFilter("durationMs >= :minDurationMs");
+
+    // hack because QT is unable to bind list values properly --gdm
+    if (!filter.tags.isEmpty())
+        addFilter("tagName in ('" + filter.tags.join("','") + "')");
+
+    QString queryStr("SELECT \
+                     book.guid as guid, \
+                     book.start_time as startTimeMs, \
+                     book.duration as durationMs, \
+                     book.name as name, \
+                     book.description as description, \
+                     book.timeout as timeout, \
+                     tag.name as tagName \
+                     FROM storage_bookmark book \
+                     LEFT JOIN storage_bookmark_tag tag \
+                     ON book.guid = tag.bookmark_guid " 
+                     + filterStr +
+                     " ORDER BY guid");
+
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
-    query.prepare("SELECT \
-                  book.guid as guid, \
-                  book.start_time as startTimeMs, \
-                  book.duration as durationMs, \
-                  book.name as name, \
-                  book.description as description, \
-                  book.timeout as timeout, \
-                  tag.name as tagName \
-                  FROM storage_bookmark book \
-                  LEFT JOIN storage_bookmark_tag tag \
-                  ON book.guid = tag.bookmark_guid \
-                  WHERE book.camera_id = :cameraGuid \
-                  AND startTimeMs >= :minStartTimeMs \
-                  AND startTimeMs <= :maxStartTimeMs \
-                  AND durationMs >= :minDurationMs \
-                  ORDER BY guid");
-    query.bindValue(":cameraGuid", cameraGuid);
-    query.bindValue(":minStartTimeMs", filter.minStartTimeMs);
-    query.bindValue(":maxStartTimeMs", filter.maxStartTimeMs);
-    query.bindValue(":minDurationMs", filter.minDurationMs);
+    query.prepare(queryStr);
+    
+    auto checkedBind = [&](const QString &placeholder, const QVariant &value) {
+        if (!bindings.contains(placeholder))
+            return;
+        query.bindValue(placeholder, value);
+    };
+
+    checkedBind(":cameraGuid", cameraGuid);
+    checkedBind(":minStartTimeMs", filter.minStartTimeMs);
+    checkedBind(":maxStartTimeMs", filter.maxStartTimeMs);
+    checkedBind(":minDurationMs", filter.minDurationMs);
+
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return false;

@@ -49,7 +49,7 @@ struct QnCameraBookmarkSearchFilter {
 
     qint64 minDurationMs;
 
-    //QStringList tagsFilter;
+    QStringList tags;
 
     QnCameraBookmarkSearchFilter();
 

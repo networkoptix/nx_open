@@ -41,12 +41,13 @@ int QnCameraBookmarksRestHandler::getCameraBookmarkAction(const QnRequestParams 
     QString id = params.value("id");
     QnCameraBookmarkSearchFilter filter;
     bool ok;
-    if (qint64 value = params["minStartTimeMs"].toLongLong(&ok) && ok)
+    if (qint64 value = params["minDurationMs"].toLongLong(&ok) && ok)
         filter.minDurationMs = value;
     if (qint64 value = params["minStartTimeMs"].toLongLong(&ok) && ok)
         filter.minStartTimeMs = value;
     if (qint64 value = params["maxStartTimeMs"].toLongLong(&ok) && ok)
         filter.maxStartTimeMs = value;
+    filter.tags = params["tags"].split(',', QString::SkipEmptyParts);
 
     QnCameraBookmarkList bookmarks;
     if (!qnStorageMan->getBookmarks(id.toUtf8(), filter, bookmarks))
