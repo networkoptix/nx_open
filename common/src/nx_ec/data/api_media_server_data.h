@@ -11,8 +11,8 @@ namespace ec2
     {
         ApiStorageData(): spaceLimit(0), usedForWriting(0) {}
 
-        qint64       spaceLimit;
-        bool         usedForWriting;
+        qint64          spaceLimit;
+        bool            usedForWriting;
     };
 #define ApiStorageData_Fields ApiResourceData_Fields (spaceLimit)(usedForWriting)
 
@@ -21,16 +21,16 @@ namespace ec2
     {
         ApiMediaServerData(): flags(Qn::SF_None), panicMode(0), maxCameras(0), redundancy(false) {}
 
-        QString      apiUrl;
-        QString      netAddrList;
+        QString         apiUrl;
+        QString         netAddrList; // TODO: #Elric #EC2 rename
         Qn::ServerFlags flags;
-        qint32       panicMode; // TODO: #Elric #EC2 use Qn::PanicMode
-        QString      streamingUrl;
-        QString      version; 
-        QString      authKey;
+        qint32          panicMode; // TODO: #Elric #EC2 use Qn::PanicMode
+        QString         streamingUrl;
+        QString         version; 
+        QString         authKey;
         std::vector<ApiStorageData> storages;
-        int maxCameras;
-        bool redundancy;
+        int             maxCameras;
+        bool            redundancy; // TODO: #Elric #EC2 wtf?
     };
 #define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(netAddrList)(flags)(panicMode)(streamingUrl)(version)(authKey)(storages)(maxCameras)(redundancy)
 

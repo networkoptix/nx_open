@@ -16,23 +16,23 @@ namespace ec2
         QnId id;
 
         QnBusiness::EventType eventType;
-        std::vector<QnId>  eventResource;
+        std::vector<QnId>  eventResourceIds;
         QByteArray eventCondition;
         QnBusiness::EventState eventState;
 
         QnBusiness::ActionType actionType;
-        std::vector<QnId> actionResource;
+        std::vector<QnId> actionResourceIds;
         QByteArray actionParams;
 
         qint32 aggregationPeriod; // msecs
         bool disabled;
-        QString comments;
+        QString comment;
         QString schedule;
 
         bool system; // system rule cannot be deleted 
     };
-#define ApiBusinessRuleData_Fields (id)(eventType)(eventResource)(eventCondition)(eventState)(actionType)(actionResource)(actionParams) \
-    (aggregationPeriod)(disabled)(comments)(schedule)(system)
+#define ApiBusinessRuleData_Fields (id)(eventType)(eventResourceIds)(eventCondition)(eventState)(actionType)(actionResourceIds)(actionParams) \
+    (aggregationPeriod)(disabled)(comment)(schedule)(system)
 
 
     struct ApiBusinessActionData: ApiData
@@ -40,13 +40,13 @@ namespace ec2
         qint32 actionType; // TODO: #Elric #EC2 QnBusiness::ActionType
         QnBusiness::EventState toggleState;
         bool receivedFromRemoteHost;
-        std::vector<QnId> resources;
+        std::vector<QnId> resourceIds;
         QByteArray params;
         QByteArray runtimeParams;
-        QnId businessRuleId;
+        QnId ruleId;
         qint32 aggregationCount;
     };
-#define ApiBusinessActionData_Fields (actionType)(toggleState)(receivedFromRemoteHost)(resources)(params)(runtimeParams)(businessRuleId)(aggregationCount)
+#define ApiBusinessActionData_Fields (actionType)(toggleState)(receivedFromRemoteHost)(resourceIds)(params)(runtimeParams)(ruleId)(aggregationCount)
 
     
     struct ApiResetBusinessRuleData: public ApiData

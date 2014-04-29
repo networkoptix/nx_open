@@ -33,8 +33,8 @@ QnBusiness::EventType QnBusinessEventRule::eventType() const {
     return m_eventType;
 }
 
-void QnBusinessEventRule::setEventType(const QnBusiness::EventType value) {
-    m_eventType = value;
+void QnBusinessEventRule::setEventType(QnBusiness::EventType eventType) {
+    m_eventType = eventType;
 }
 
 
@@ -78,8 +78,8 @@ QnBusiness::ActionType QnBusinessEventRule::actionType() const {
     return m_actionType;
 }
 
-void QnBusinessEventRule::setActionType(const QnBusiness::ActionType value) {
-    m_actionType = value;
+void QnBusinessEventRule::setActionType(QnBusiness::ActionType actionType) {
+    m_actionType = actionType;
     //TODO: #GDM fill action params with default values? filter action resources?
 }
 
@@ -120,36 +120,36 @@ void QnBusinessEventRule::setAggregationPeriod(int msecs) {
     m_aggregationPeriod = msecs;
 }
 
-bool QnBusinessEventRule::disabled() const {
+bool QnBusinessEventRule::isDisabled() const {
     return m_disabled;
 }
 
-void QnBusinessEventRule::setDisabled(bool value) {
-    m_disabled = value;
+void QnBusinessEventRule::setDisabled(bool disabled) {
+    m_disabled = disabled;
 }
 
-QString QnBusinessEventRule::comments() const {
-    return m_comments;
+QString QnBusinessEventRule::comment() const {
+    return m_comment;
 }
 
-void QnBusinessEventRule::setComments(const QString value) {
-    m_comments = value;
+void QnBusinessEventRule::setComment(const QString &comment) {
+    m_comment = value;
 }
 
 QString QnBusinessEventRule::schedule() const {
     return m_schedule;
 }
 
-void QnBusinessEventRule::setSchedule(const QString value) {
-    m_schedule = value;
+void QnBusinessEventRule::setSchedule(const QString &schedule) {
+    m_schedule = schedule;
     m_binSchedule = QByteArray::fromHex(m_schedule.toUtf8());
 }
 
-bool QnBusinessEventRule::system() const {
+bool QnBusinessEventRule::isSystem() const {
     return m_system;
 }
 
-void QnBusinessEventRule::setSystem(bool value) {
+void QnBusinessEventRule::setSystem(bool system) {
     m_system = value;
 }
 
@@ -209,7 +209,7 @@ QnBusinessEventRule* QnBusinessEventRule::clone()
     newRule->m_disabled = m_disabled;
     newRule->m_schedule = m_schedule;
     newRule->m_binSchedule = m_binSchedule;
-    newRule->m_comments = m_comments;
+    newRule->m_comment = m_comment;
     newRule->m_system = m_system;
     return newRule;
 }

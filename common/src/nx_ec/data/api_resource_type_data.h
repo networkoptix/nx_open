@@ -39,7 +39,7 @@ namespace ec2
     struct ApiResourceTypeData: ApiData {
         QnId id;
         QString name;
-        QString manufacture;
+        QString manufacture; // TODO: #Elric #EC2 evil leaking out
         std::vector<QnId> parentId;
         std::vector<ApiPropertyTypeData> propertyTypeList;
     };
