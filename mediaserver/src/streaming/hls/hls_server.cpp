@@ -321,41 +321,6 @@ namespace nx_hls
 
     typedef std::multimap<QString, QString> RequestParamsType;
 
-    //!Represents host and port (e.g. 127.0.0.1:1234)
-    class SocketAddress
-    {
-    public:
-        QString host;
-        OptionalField<int> port;
-
-        SocketAddress()
-        {
-        }
-
-        SocketAddress( const QString& str )
-        {
-            int sepPos = str.indexOf(QLatin1Char(':'));
-            if( sepPos == -1 )
-            {
-                host = str;
-            }
-            else
-            {
-                host = str.mid( 0, sepPos );
-                port = str.mid( sepPos+1 ).toInt();
-            }
-        }
-
-        QString toString() const
-        {
-            return
-                host +
-                (port.present ? QString::fromLatin1(":%1").arg(port.value) : QString());
-        }
-    };
-
-    //TODO/IMPL move SocketAddress somewhere else...
-
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getHLSPlaylist(
         const nx_http::Request& request,
         const QStringRef& uniqueResourceID,
@@ -413,11 +378,13 @@ namespace nx_hls
         if( hostIter != request.headers.end() )
         {
             SocketAddress sockAddress( hostIter->second );
-            baseUrl.setHost( sockAddress.host );
-            if( sockAddress.port.present )
+            baseUrl.setHost( sockAddress.address.toString() );
+            if( sockAddress.port > 0 )
                 baseUrl.setPort( sockAddress.port );
             baseUrl.setScheme( QLatin1String("http") );
         }
+
+        //TODO: #ak check resource stream type. Only h.264 is OK for HLS
 
         nx_hls::VariantPlaylistData playlistData;
         playlistData.url = baseUrl;
@@ -529,8 +496,8 @@ namespace nx_hls
         if( hostIter != request.headers.end() )
         {
             SocketAddress sockAddress( hostIter->second );
-            baseChunkUrl.setHost( sockAddress.host );
-            if( sockAddress.port.present )
+            baseChunkUrl.setHost( sockAddress.address.toString() );
+            if( sockAddress.port > 0 )
                 baseChunkUrl.setPort( sockAddress.port );
             baseChunkUrl.setScheme( QLatin1String("http") );
         }
