@@ -212,7 +212,7 @@ void QnCachingCameraDataLoader::load(Qn::CameraDataType type) {
         }
         break;
     case Qn::BookmarkData:
-        //TODO: #GDM implement me
+        m_handles[type] = loader->load(m_loadedPeriod, QString());
         break;
     default:
         assert(false); //should never get here

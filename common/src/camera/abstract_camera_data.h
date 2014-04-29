@@ -17,7 +17,7 @@ public:
     virtual QnAbstractCameraDataPtr merge(const QVector<QnAbstractCameraDataPtr> &source);
 
     virtual QnTimePeriodList dataSource() const;
-    bool isEmpty() const;
+    virtual bool isEmpty() const;
 
     virtual void clear();
 

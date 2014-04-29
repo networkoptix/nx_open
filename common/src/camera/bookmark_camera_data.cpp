@@ -37,10 +37,19 @@ bool QnBookmarkCameraData::trimDataSource(qint64 trimTime) {
 }
 
 QnAbstractCameraDataPtr QnBookmarkCameraData::merge(const QVector<QnAbstractCameraDataPtr> &source) {
-    throw std::exception();
+    QnCameraBookmarkList merged(m_data);
+    foreach (const QnAbstractCameraDataPtr &other, source) {
+        if (QnBookmarkCameraData* other_casted = dynamic_cast<QnBookmarkCameraData*>(other.data()))
+            merged.append(other_casted->m_data);
+    }
+    return QnAbstractCameraDataPtr(new QnBookmarkCameraData(merged)); //TODO: #GDM implement real merge
 }
 
 bool QnBookmarkCameraData::operator==(const QnAbstractCameraDataPtr &other) const {
     throw std::exception();
+}
+
+bool QnBookmarkCameraData::isEmpty() const {
+    return m_data.isEmpty();
 }
 

@@ -13,6 +13,7 @@ public:
     virtual QnTimePeriodList dataSource() const override;
     virtual void clear() override;
     virtual bool trimDataSource(qint64 trimTime) override;
+    virtual bool isEmpty() const override;
 
     virtual QnAbstractCameraDataPtr merge(const QVector<QnAbstractCameraDataPtr> &source) override;
 
