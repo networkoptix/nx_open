@@ -14,7 +14,7 @@
 #include "streaming_chunk.h"
 
 #ifdef _DEBUG
-#define SAVE_INPUT_STREAM_TO_FILE
+//#define SAVE_INPUT_STREAM_TO_FILE
 #endif
 
 
