@@ -52,7 +52,8 @@ namespace ec2 {
     struct ApiVideowallItemWithRefData;
     struct ApiVideowallScreenData;
     struct ApiVideowallScreenWithRefData;
-    struct ApiUploadUpdateResponceData;
+    struct ApiUpdateUploadData;
+    struct ApiUpdateUploadResponceData;
 
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
@@ -112,7 +113,8 @@ namespace ec2 {
     (ApiVideowallItemWithRefData)\
     (ApiVideowallScreenData)\
     (ApiVideowallScreenWithRefData)\
-    (ApiUploadUpdateResponceData)\
+    (ApiUpdateUploadData)\
+    (ApiUpdateUploadResponceData)\
 
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         QN_EC2_API_DATA_CLASSES,

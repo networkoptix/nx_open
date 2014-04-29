@@ -122,6 +122,8 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnSoftwareVersion>();
     qRegisterMetaTypeStreamOperators<QnSoftwareVersion>();
+    qRegisterMetaType<QnSystemInformation>();
+    qRegisterMetaTypeStreamOperators<QnSystemInformation>();
     qRegisterMetaType<QnUpdateInfoItem>();
     qRegisterMetaType<QnUpdateInfoItemList>();
 

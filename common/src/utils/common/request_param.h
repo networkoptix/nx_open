@@ -45,18 +45,18 @@ public:
         return false;
     }
 
-    iterator find(const Key &key) {
-        return std::find_if(begin(), end(), [&](const value_type &element) { return element.first == key; });
+    typename base_type::iterator find(const Key &key) {
+        return std::find_if(base_type::begin(), base_type::end(), [&](const typename base_type::value_type &element) { return element.first == key; });
     }
 
-    const_iterator find(const Key &key) const {
-        return std::find_if(begin(), end(), [&](const value_type &element) { return element.first == key; });
+    typename base_type::const_iterator find(const Key &key) const {
+        return std::find_if(base_type::begin(), base_type::end(), [&](const typename base_type::value_type &element) { return element.first == key; });
     }
 
     using base_type::insert;
 
     void insert(const Key &key, const Value &value) {
-        push_back(qMakePair(key, value));
+        base_type::push_back(qMakePair(key, value));
     }
 };
 

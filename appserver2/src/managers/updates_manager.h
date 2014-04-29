@@ -2,7 +2,7 @@
 #define EC2_UPDATES_MANAGER_H
 
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/ec2_update_data.h"
+#include "nx_ec/data/api_update_data.h"
 #include "transaction/transaction.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"

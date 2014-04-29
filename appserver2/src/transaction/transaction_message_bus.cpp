@@ -168,7 +168,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, Trans
     QMutexLocker lock(&m_mutex);
     
     // proxy incoming transaction to other peers.
-    if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty())
+    if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
         emit transactionProcessed(tran);
         return; // all dstPeers already processed
     }

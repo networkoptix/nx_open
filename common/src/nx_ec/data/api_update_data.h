@@ -9,7 +9,7 @@ struct ApiUpdateUploadData : public ApiData {
     QString updateId;
     QByteArray data;
 };
-#define ApiUpdateUploadData_Fields ApiData_Fields (updateId)(data)
+#define ApiUpdateUploadData_Fields (updateId)(data)
 
 struct ApiUpdateUploadResponceData : public ApiIdData {
 public:

@@ -5,6 +5,8 @@
 
 #include <type_traits> /* For std::enable_if, std::is_base_of, std::integral_constant. */
 
+#include <QtCore/QVariant>
+
 #include <utils/common/adl_wrapper.h>
 #include <utils/common/flat_map.h>
 #include <utils/common/synchronized_flat_storage.h>

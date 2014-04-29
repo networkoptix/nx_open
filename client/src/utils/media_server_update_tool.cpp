@@ -2,6 +2,9 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QJsonDocument>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkReply>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
