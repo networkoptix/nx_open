@@ -30,7 +30,7 @@ public:
 
     bool removeCameraBookmarks(const QByteArray &mac);
     bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QByteArray &mac);
-    QnCameraBookmarkList getBookmarks(const QByteArray &mac);
+    bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
 private:
     bool addRecordInternal(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
 

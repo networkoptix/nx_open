@@ -1049,5 +1049,11 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
 }
 
 bool QnStorageManager::getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result) {
+    foreach (const QnStorageDbPtr &sdb, m_chunksDB) {
+        if (!sdb)
+            continue;
+        if (!sdb->getBookmarks(cameraGuid, filter, result))
+            return false;
+    }
     return true;
 }

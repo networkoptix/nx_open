@@ -210,51 +210,57 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
     return true;
 }
 
-QnCameraBookmarkList QnStorageDb::getBookmarks(const QByteArray &mac)
-{
-    QList<QnCameraBookmark> result;
-    return result;
-    /*
-    {   // load tags
+bool QnStorageDb::getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result) {
 
-        QSqlQuery queryTags(m_sdb);
-        queryTags.setForwardOnly(true);
-        queryTags.prepare("SELECT \
-                          tag.bookmark_guid as bookmarkGuid, tag.name \
-                          FROM storage_bookmark_tag tag");
-        if (!queryTags.exec()) {
-            qWarning() << Q_FUNC_INFO << queryTags.lastError().text();
-            return result;
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT \
+                  book.guid as guid, \
+                  book.start_time as startTimeMs, \
+                  book.duration as durationMs, \
+                  book.name as name, \
+                  book.description as description, \
+                  book.timeout as timeout, \
+                  tag.name as tagName \
+                  FROM storage_bookmark book \
+                  LEFT JOIN storage_bookmark_tag tag \
+                  ON book.guid = tag.bookmark_guid \
+                  WHERE book.camera_id = :cameraGuid \
+                  AND startTimeMs >= :minStartTimeMs \
+                  AND startTimeMs <= :maxStartTimeMs \
+                  AND durationMs >= :minDurationMs \
+                  ORDER BY guid");
+    query.bindValue(":cameraGuid", cameraGuid);
+    query.bindValue(":minStartTimeMs", filter.minStartTimeMs);
+    query.bindValue(":maxStartTimeMs", filter.maxStartTimeMs);
+    query.bindValue(":minDurationMs", filter.minDurationMs);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return false;
+    }
+
+    QnSqlIndexMapping mapping = QnSql::mapping<QnCameraBookmark>(query);
+
+    QSqlRecord queryInfo = query.record();
+    int guidFieldIdx = queryInfo.indexOf("guid");
+    int tagNameFieldIdx = queryInfo.indexOf("tagName");
+
+    QUuid prevGuid;
+
+    while (query.next()) {
+        QUuid guid = QUuid::fromRfc4122(query.value(guidFieldIdx).toByteArray());
+        if (guid != prevGuid) {
+            prevGuid = guid;
+            result.push_back(QnCameraBookmark());
+            QnSql::fetch(mapping, query.record(), &result.back());
         }
-        
 
-        // load bookmarks
-        QSqlQuery queryBookmarks(m_sdb);
-        queryBookmarks.setForwardOnly(true);
-        queryBookmarks.prepare("SELECT \
-                               r.guid as cameraId, \
-                               bookmark.guid, bookmark.start_time as startTime, bookmark.duration, \
-                               bookmark.name, bookmark.description, bookmark.timeout \
-                               FROM vms_bookmark bookmark \
-                               JOIN vms_resource r on r.id = bookmark.camera_id");
-        if (!queryBookmarks.exec()) {
-            qWarning() << Q_FUNC_INFO << queryBookmarks.lastError().text();
-            return ErrorCode::failure;
-        }
+        QString tag = query.value(tagNameFieldIdx).toString();
+        if (!tag.isEmpty())
+            result.back().tags.append(tag);
+    }
 
-
-        {   // merge tags
-            foreach(const ApiCameraBookmarkTag& tag, tags) {
-                int idx = 0;
-                for (; idx < bookmarks.size() && tag.bookmarkGuid != bookmarks[idx].guid; idx++);
-                if (idx == bookmarks.size())
-                    break;
-                bookmarks[idx].tags.push_back(tag.name);
-            }
-        }
-
-        
-    }*/
+    return true;
 }
 
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
