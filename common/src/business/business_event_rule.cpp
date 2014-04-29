@@ -133,7 +133,7 @@ QString QnBusinessEventRule::comment() const {
 }
 
 void QnBusinessEventRule::setComment(const QString &comment) {
-    m_comment = value;
+    m_comment = comment;
 }
 
 QString QnBusinessEventRule::schedule() const {
@@ -150,7 +150,7 @@ bool QnBusinessEventRule::isSystem() const {
 }
 
 void QnBusinessEventRule::setSystem(bool system) {
-    m_system = value;
+    m_system = system;
 }
 
 QString QnBusinessEventRule::getUniqueId() const
