@@ -27,6 +27,10 @@ template<class Key, class Value>
 class QnListMap: public QList<QPair<Key, Value> > {
     typedef QList<QPair<Key, Value> > base_type;
 public:
+    typedef typename base_type::iterator iterator;
+    typedef typename base_type::const_iterator const_iterator;
+    typedef typename base_type::value_type value_type;
+
     QnListMap() {}
 
     QnListMap(const base_type &other): base_type(other) {}
@@ -46,17 +50,17 @@ public:
     }
 
     iterator find(const Key &key) {
-        return std::find_if(begin(), end(), [&](const value_type &element) { return element.first == key; });
+        return std::find_if(base_type::begin(), base_type::end(), [&](const value_type &element) { return element.first == key; });
     }
 
     const_iterator find(const Key &key) const {
-        return std::find_if(begin(), end(), [&](const value_type &element) { return element.first == key; });
+        return std::find_if(base_type::begin(), base_type::end(), [&](const value_type &element) { return element.first == key; });
     }
 
     using base_type::insert;
 
     void insert(const Key &key, const Value &value) {
-        push_back(qMakePair(key, value));
+        base_type::push_back(qMakePair(key, value));
     }
 };
 
