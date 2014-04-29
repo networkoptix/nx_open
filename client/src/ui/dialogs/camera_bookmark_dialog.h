@@ -3,7 +3,7 @@
 
 #include <QtCore/QScopedPointer>
 
-#include <core/resource/camera_bookmark.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <ui/dialogs/button_box_dialog.h>
 

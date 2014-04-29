@@ -7,6 +7,7 @@
 #include "core/resource/camera_resource.h"
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
@@ -1044,5 +1045,9 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
         return false;
 
     sdb->addOrUpdateCameraBookmark(bookmark, cameraGuid);
+    return true;
+}
+
+bool QnStorageManager::getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result) {
     return true;
 }

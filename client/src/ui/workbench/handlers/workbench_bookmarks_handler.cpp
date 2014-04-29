@@ -8,6 +8,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <recording/time_period.h>
 

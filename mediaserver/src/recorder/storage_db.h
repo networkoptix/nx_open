@@ -3,7 +3,7 @@
 
 #include <QElapsedTimer>
 
-#include <core/resource/camera_bookmark.h>
+#include <core/resource/camera_bookmark_fwd.h>
 #include <server/server_globals.h>
 
 #include "utils/db/db_helper.h"
@@ -30,7 +30,7 @@ public:
 
     bool removeCameraBookmarks(const QByteArray &mac);
     bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QByteArray &mac);
-    QList<QnCameraBookmark> getBookmarks(const QByteArray &mac);
+    QnCameraBookmarkList getBookmarks(const QByteArray &mac);
 private:
     bool addRecordInternal(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
 

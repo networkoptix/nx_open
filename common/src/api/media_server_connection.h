@@ -22,13 +22,12 @@
 #include <core/ptz/ptz_preset.h>
 #include <core/ptz/ptz_tour.h>
 #include <core/ptz/ptz_data.h>
+#include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
 #include <recording/time_period_list.h>
 
 #include "abstract_connection.h"
-
-class QnCameraBookmark;
 
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
 typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
@@ -65,6 +64,7 @@ signals:
     void finished(int status, const QnPtzObject &reply, int handle);
     void finished(int status, const QnPtzData &reply, int handle);
     void finished(int status, const QnCameraBookmark &reply, int handle);
+    void finished(int status, const QnCameraBookmarkList &reply, int handle);
 
 private:
     friend class QnAbstractReplyProcessor;
@@ -231,6 +231,7 @@ public:
     int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
 
     int addBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot);
 
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;

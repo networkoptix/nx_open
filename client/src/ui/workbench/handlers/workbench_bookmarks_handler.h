@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/camera_bookmark.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 

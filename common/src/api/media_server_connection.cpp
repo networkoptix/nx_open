@@ -62,6 +62,7 @@ namespace {
         (CameraDiagnosticsObject,  "doCameraDiagnosticsStep")
         (RebuildArchiveObject,     "rebuildArchive")
         (BookmarkAddObject,        "cameraBookmarks/add")
+        (BookmarkGetObject,        "cameraBookmarks/get")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -386,10 +387,12 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, info, handle);
         break;
     }
-    case BookmarkAddObject: {
+    case BookmarkAddObject: 
         processJsonReply<QnCameraBookmark>(this, response, handle);
         break;
-    }
+    case BookmarkGetObject:
+        processJsonReply<QnCameraBookmarkList>(this, response, handle);
+        break;
     default:
         assert(false); /* We should never get here. */
         break;
@@ -791,8 +794,21 @@ int QnMediaServerConnection::addBookmarkAsync(const QnNetworkResourcePtr &camera
     headers << QnRequestParam("content-type",   "application/json");
 
     QnRequestParamList params;
-    params << QnRequestParam("id", camera->getPhysicalId());    
+    params << QnRequestParam("id",      QnLexical::serialized(camera->getPhysicalId()));
 
     return sendAsyncPostRequest(BookmarkAddObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
+}
+
+int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot) {
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
+
+    QnRequestParamList params;
+    params << QnRequestParam("id",               QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("minStartTimeMs",   QnLexical::serialized(filter.minStartTimeMs));
+    params << QnRequestParam("maxStartTimeMs",   QnLexical::serialized(filter.maxStartTimeMs));
+    params << QnRequestParam("minDurationMs",    QnLexical::serialized(filter.minDurationMs));
+    
+    return sendAsyncGetRequest(BookmarkGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 

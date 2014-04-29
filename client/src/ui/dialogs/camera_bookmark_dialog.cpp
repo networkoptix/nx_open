@@ -1,6 +1,8 @@
 #include "camera_bookmark_dialog.h"
 #include "ui_camera_bookmark_dialog.h"
 
+#include <core/resource/camera_bookmark.h>
+
 namespace {
     const int defaultTimeoutIdx = 3;
 }

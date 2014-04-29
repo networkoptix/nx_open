@@ -2,6 +2,8 @@
 #include "qsqlquery.h"
 #include <QtSql>
 
+#include <core/resource/camera_bookmark.h>
+
 #include <utils/serialization/sql.h>
 
 static const int COMMIT_INTERVAL = 1000 * 60 * 5;
@@ -208,7 +210,7 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
     return true;
 }
 
-QList<QnCameraBookmark> QnStorageDb::getBookmarks(const QByteArray &mac)
+QnCameraBookmarkList QnStorageDb::getBookmarks(const QByteArray &mac)
 {
     QList<QnCameraBookmark> result;
     return result;

@@ -11,6 +11,7 @@
 #include <server/server_globals.h>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include "recording/time_period_list.h"
 #include "device_file_catalog.h"
@@ -21,7 +22,6 @@
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
-class QnCameraBookmark;
 
 class QnStorageManager: public QObject
 {
@@ -102,6 +102,7 @@ public:
     QStringList getAllStoragePathes() const;
 
     bool addBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark);
+    bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
