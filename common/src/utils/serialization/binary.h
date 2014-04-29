@@ -48,6 +48,12 @@ namespace QnBinaryDetail {
             m_stream(stream) 
         {}
 
+        /*template<class T, class Access>
+        bool operator()(const T &, const Access &access, const QnFusion::start_tag &) {
+            using namespace QnFusion;
+            return true;
+        }*/
+
         template<class T, class Access>
         bool operator()(const T &value, const Access &access) {
             using namespace QnFusion;

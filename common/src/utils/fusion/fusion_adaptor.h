@@ -1,6 +1,9 @@
 #ifndef QN_FUSION_ADAPTOR_H
 #define QN_FUSION_ADAPTOR_H
 
+#include <utility>      /* For std::forward. */
+#include <type_traits>  /* For std::integral_constant, std::declval. */
+
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/for_each_i.hpp>
@@ -22,7 +25,7 @@
         QN_FUSION_EXTEND_PROPERTY_SEQ(                                          \
             (object_declval, std::declval<CLASS>())                             \
             (classname, BOOST_PP_STRINGIZE(CLASS))                              \
-            (member_count, BOOST_PP_SEQ_SIZE(MEMBER_SEQ))                       \
+            (member_count, (std::integral_constant<int, BOOST_PP_SEQ_SIZE(MEMBER_SEQ)>())) \
             __VA_ARGS__                                                         \
         )                                                                       \
     )
@@ -87,7 +90,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
                 enum { value = BOOST_PP_VARIADIC_SEQ_SIZE(PROPERTY_SEQ) };      \
             };                                                                  \
                                                                                 \
-            BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (member_index, INDEX)) \
+            BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_ADAPT_CLASS_OBJECT_STEP_STEP_I, ~, PROPERTY_SEQ (member_index, (std::integral_constant<int, INDEX>()))) \
         };                                                                      \
     };
 
