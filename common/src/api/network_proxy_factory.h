@@ -14,13 +14,13 @@
 class QnNetworkProxyFactory: public QObject, public QNetworkProxyFactory {
 public:
     QnNetworkProxyFactory();
-    virtual     ~QnNetworkProxyFactory();
+    virtual ~QnNetworkProxyFactory();
 
-    void        removeFromProxyList(const QUrl& url);
+    void removeFromProxyList(const QUrl& url);
 
-    void        addToProxyList(const QUrl& url, const QString& addr, int port);
+    void addToProxyList(const QUrl& url, const QString& addr, int port);
 
-    void        clearProxyList();
+    void clearProxyList();
 
     static QnNetworkProxyFactory* instance();
 

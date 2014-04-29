@@ -3,22 +3,21 @@
 
 #include "transaction.h"
 #include "common/common_module.h"
-
-/*
-* This class add addition transport header to a transaction
-*/
+#include "utils/serialization/binary_stream.h"
+#include "transaction_transport_header.h"
 
 namespace ec2
 {
+    QN_FUSION_DECLARE_FUNCTIONS(TransactionTransportHeader, (binary)(json))
+
     class QnTransactionMessageBus;
 
-#include "transaction_transport_serializer_i.h"
-
-
+    /**
+     * This class add addition transport header to a transaction.
+     */
     class QnTransactionTransportSerializer
     {
     public:
-
         QnTransactionTransportSerializer(QnTransactionMessageBus& owner);
 
         template <class T>
@@ -28,11 +27,11 @@ namespace ec2
                 Q_ASSERT(!peer.isNull());
                 Q_ASSERT(peer != qnCommon->moduleGUID());
             }
-            OutputBinaryStream<QByteArray> stream(&buffer);
+            QnOutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("00000000\r\n",10);
             stream.write("0000", 4);
-            serialize(ttHeader, &stream);
-            serialize( tran, &stream );
+            QnBinary::serialize(ttHeader, &stream);
+            QnBinary::serialize( tran, &stream );
             stream.write("\r\n",2); // chunk end
             quint32 payloadSize = buffer.size() - 12;
             quint32* payloadSizePtr = (quint32*) (buffer.data() + 10);
@@ -46,10 +45,10 @@ namespace ec2
                 Q_ASSERT(!peer.isNull());
                 Q_ASSERT(peer != qnCommon->moduleGUID());
             }
-            OutputBinaryStream<QByteArray> stream(&buffer);
+            QnOutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("00000000\r\n",10);
             stream.write("0000", 4);
-            serialize(ttHeader, &stream);
+            QnBinary::serialize(ttHeader, &stream);
             stream.write(serializedTran.data(), serializedTran.size());
             stream.write("\r\n",2); // chunk end
             quint32 payloadSize = buffer.size() - 12;
@@ -58,16 +57,14 @@ namespace ec2
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
         }
 
-        
-        static bool deserializeTran(const quint8* chunkPayload, int len,  PeerList& processedPeers, PeerList& dstPeers, QByteArray& tranData);
+        static bool deserializeTran(const quint8* chunkPayload, int len,  TransactionTransportHeader& transportHeader, QByteArray& tranData);
 
     private:
         static void toFormattedHex(quint8* dst, quint32 payloadSize);
+
     private:
         QnTransactionMessageBus& m_owner;
     };
 }
-
-
 
 #endif // __TRANSACTION_TRANSPORT_SERIALIZER_H_

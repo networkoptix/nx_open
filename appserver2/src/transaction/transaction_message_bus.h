@@ -1,16 +1,19 @@
 #ifndef __TRANSACTION_MESSAGE_BUS_H_
 #define __TRANSACTION_MESSAGE_BUS_H_
 
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
+
 #include <nx_ec/ec_api.h>
-#include "nx_ec/data/camera_data.h"
-#include "nx_ec/data/ec2_resource_data.h"
+#include "nx_ec/data/api_camera_data.h"
+#include "nx_ec/data/api_resource_data.h"
+#include "nx_ec/data/api_lock_data.h"
 #include "transaction.h"
 #include "utils/network/http/asynchttpclient.h"
 #include "transaction_transport_serializer.h"
 #include "transaction_transport.h"
-#include "nx_ec/data/ec2_lock_data.h"
 #include "common/common_module.h"
+
+class QTimer;
 
 namespace ec2
 {
@@ -108,7 +111,7 @@ signals:
         class AbstractHandler
         {
         public:
-            virtual bool processTransaction(QnTransactionTransport* sender, QnAbstractTransaction& tran, InputBinaryStream<QByteArray>& stream) = 0;
+            virtual bool processTransaction(QnTransactionTransport* sender, QnAbstractTransaction& tran, QnInputBinaryStream<QByteArray>& stream) = 0;
             virtual void* getHandler() const = 0;
             virtual ~AbstractHandler() {}
         };
@@ -119,10 +122,10 @@ signals:
         public:
             CustomHandler(T* handler): m_handler(handler) {}
 
-            virtual bool processTransaction(QnTransactionTransport* sender, QnAbstractTransaction& tran, InputBinaryStream<QByteArray>& stream) override;
+            virtual bool processTransaction(QnTransactionTransport* sender, QnAbstractTransaction& tran, QnInputBinaryStream<QByteArray>& stream) override;
             virtual void* getHandler() const override { return m_handler; }
         private:
-            template <class T2> bool deliveryTransaction(const QnAbstractTransaction&  abstractTran, InputBinaryStream<QByteArray>& stream);
+            template <class T2> bool deliveryTransaction(const QnAbstractTransaction&  abstractTran, QnInputBinaryStream<QByteArray>& stream);
         private:
             T* m_handler;
         };
@@ -132,21 +135,21 @@ signals:
     private:
         //void gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data);
         void sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData, const PeerList& dstPeers = PeerList());
-        bool onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
-        void onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream);
-        void onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, InputBinaryStream<QByteArray>&);
+        bool onGotTransactionSyncRequest(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>& stream);
+        void onGotTransactionSyncResponse(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>& stream);
+        void onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, QnInputBinaryStream<QByteArray>&);
         void queueSyncRequest(QnTransactionTransport* transport);
 
         void connectToPeerEstablished(const QnId& id, bool isClient);
         void connectToPeerLost(const QnId& id);
         void sendServerAliveMsg(const QnId& id, bool isAlive, bool isClient);
         bool isPeerUsing(const QUrl& url);
-        void onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream);
+        void onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, QnInputBinaryStream<QByteArray>& stream);
         QSet<QUuid> peersToSend(ApiCommand::Value command) const;
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
-        void at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers, QSet<QnId> dstPeers);
+        void at_gotTransaction(QByteArray serializedTran, TransactionTransportHeader transportHeader);
         void doPeriodicTasks();
     private:
         QnTransactionTransportSerializer m_serializer;

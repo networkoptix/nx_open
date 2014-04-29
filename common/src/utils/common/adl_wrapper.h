@@ -1,6 +1,8 @@
 #ifndef QN_ADL_WRAPPER_H
 #define QN_ADL_WRAPPER_H
 
+// TODO: #Elric move to serialization
+
 /**
  * A wrapper class that can be used to wrap values before invoking functions
  * that are to be found via ADL.
@@ -22,7 +24,7 @@ private:
 };
 
 template<class T>
-QnAdlWrapper<T> adlWrap(const T &value) {
+QnAdlWrapper<T> adl_wrap(const T &value) {
     return QnAdlWrapper<T>(value);
 }
 

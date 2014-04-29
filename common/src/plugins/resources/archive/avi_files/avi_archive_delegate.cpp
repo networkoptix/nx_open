@@ -24,7 +24,7 @@ extern "C"
 
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/nalUnits.h"
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 
 class QnAviAudioLayout: public QnResourceAudioLayout
 {

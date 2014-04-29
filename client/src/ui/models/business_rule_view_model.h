@@ -83,8 +83,8 @@ public:
     QnBusinessEventParameters eventParams() const;
     void setEventParams(const QnBusinessEventParameters& params);
 
-    Qn::ToggleState eventState() const;
-    void setEventState(Qn::ToggleState state);
+    QnBusiness::EventState eventState() const;
+    void setEventState(QnBusiness::EventState state);
 
     QnBusiness::ActionType actionType() const;
     void setActionType(const QnBusiness::ActionType value);
@@ -134,9 +134,9 @@ private:
 
     QString getAggregationText() const;
 
-    static QString toggleStateToModelString(Qn::ToggleState value);
-    static QString toggleStateToString(Qn::ToggleState state);
-    static QString eventTypeString(QnBusiness::EventType eventType, Qn::ToggleState eventState, QnBusiness::ActionType actionType);
+    static QString toggleStateToModelString(QnBusiness::EventState value);
+    static QString toggleStateToString(QnBusiness::EventState state);
+    static QString eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType);
 private:
     QnId m_id;
     bool m_modified;
@@ -144,7 +144,7 @@ private:
     QnBusiness::EventType m_eventType;
     QnResourceList m_eventResources;
     QnBusinessEventParameters m_eventParams;
-    Qn::ToggleState m_eventState;
+    QnBusiness::EventState m_eventState;
 
     QnBusiness::ActionType m_actionType;
     QnResourceList m_actionResources;

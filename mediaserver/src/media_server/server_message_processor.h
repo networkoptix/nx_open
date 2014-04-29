@@ -22,6 +22,7 @@ protected:
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status ) override;
     virtual void init(ec2::AbstractECConnectionPtr connection);
     virtual void afterRemovingResource(const QnId& id) override;
+    void execBusinessActionInternal(QnAbstractBusinessActionPtr action) override;
 private slots:
     void at_remotePeerFound(QnId id, bool isClient, bool isProxy);
     void at_remotePeerLost(QnId id, bool isClient, bool isProxy);

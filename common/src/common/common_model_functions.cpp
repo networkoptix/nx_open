@@ -1,16 +1,38 @@
 #include "common_globals.h"
 
-#include <utils/common/json.h>
-#include <utils/common/lexical.h>
 #include <utils/common/enum_name_mapper.h>
+#include <utils/serialization/json_functions.h>
+#include <utils/serialization/lexical.h>
 
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, PtzCommand)
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, PtzCoordinateSpace)
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, PtzObjectType)
+QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, MotionType)
+QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, SecondStreamQuality)
+QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, PanicMode)
+QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, RecordingType)
+
+QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(Qn::StreamQuality, 
+    ((Qn::QualityLowest,  "lowest"))
+    ((Qn::QualityLow,     "low"))
+    ((Qn::QualityNormal,  "normal"))
+    ((Qn::QualityHigh,    "high"))
+    ((Qn::QualityHighest, "highest"))
+    ((Qn::QualityPreSet,  "preset"))
+)
+
 
 QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCommand)
 QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCoordinateSpace)
 QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzObjectType)
+QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::MotionType)
+QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::StreamQuality)
+QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::SecondStreamQuality)
+QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::PanicMode)
+QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::RecordingType)
 
 QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzDataFields)
 QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::PtzCapabilities)
+QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::ServerFlags)
+
+

@@ -6,6 +6,7 @@
 #include "license_manager_impl.h"
 #include "llutil/hardware_id.h"
 #include "version.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 static const char TEST_LICENSE_NX[] = 
@@ -42,35 +43,35 @@ namespace ec2
         m_brand = lit(QN_PRODUCT_NAME_SHORT);
     }
 
-    bool LicenseManagerImpl::validateLicense(const ApiLicense& license) const {
-        QnLicense qlicense;
-        license.toResource(qlicense);
+    bool LicenseManagerImpl::validateLicense(const ApiLicenseData& license) const {
+        QnLicensePtr qlicense(new QnLicense);
+        fromApiToResource(license, qlicense);
 
-        return qlicense.isValid(m_hardwareIds, m_brand);
+        return qlicense->isValid(m_hardwareIds, m_brand);
     }
 
-    ErrorCode LicenseManagerImpl::getLicenses( ApiLicenseList* const licList )
+    ErrorCode LicenseManagerImpl::getLicenses( ApiLicenseDataList* const licList )
     {
         //TODO/IMPL
 
-        ApiLicense license;
+        ApiLicenseData license;
 
         license.licenseBlock = TEST_LICENSE_NX;
-        licList->data.push_back( license );
+        licList->push_back( license );
 
         license.licenseBlock = TEST_LICENSE_DW;
-        licList->data.push_back( license );
+        licList->push_back( license );
 
         return ErrorCode::ok;
     }
 
-    ErrorCode LicenseManagerImpl::addLicenses( const ApiLicenseList& /*licenses*/ )
+    ErrorCode LicenseManagerImpl::addLicenses( const ApiLicenseDataList& /*licenses*/ )
     {
         //TODO/IMPL
         return ErrorCode::notImplemented;
     }
 
-    void LicenseManagerImpl::getHardwareId( ServerInfo* const serverInfo )
+    void LicenseManagerImpl::getHardwareId( ApiServerInfoData* const serverInfo )
     {
         int guidCompatibility = 0;
 

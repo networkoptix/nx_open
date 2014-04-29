@@ -125,6 +125,8 @@ protected slots:
     * Execute action physically. Return true if action success executed
     */
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res);
+    
+    bool executeReceivedAction(QnAbstractBusinessActionPtr action);
 private slots:
     void at_broadcastBusinessActionFinished(int handle, ec2::ErrorCode errorCode);
     void at_sendEmailFinished(int handle, ec2::ErrorCode errorCode);
@@ -161,7 +163,9 @@ private:
     QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     bool checkRuleCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const;
     QString formatEmailList(const QStringList& value);
-
+    bool needProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res);
+    void doProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res);
+    void executeAction(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 private:
     QList<QnBusinessEventRulePtr> m_rules;
     //QnBusinessMessageBus m_messageBus;

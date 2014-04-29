@@ -3,9 +3,10 @@
 #define RESOURCE_MANAGER_H
 
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/ec2_resource_data.h"
+#include "nx_ec/data/api_resource_data.h"
 #include "transaction/transaction.h"
 #include <core/resource_management/resource_pool.h>
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 namespace ec2
@@ -50,7 +51,7 @@ namespace ec2
             emit disabledChanged( QnId(tran.params.id), tran.params.disabled );
         }
 
-        void triggerNotification( const QnTransaction<ApiResourceParams>& tran ) {
+        void triggerNotification( const QnTransaction<ApiResourceParamsData>& tran ) {
             QnKvPairList outData;
 
             for( const ApiResourceParamData& param: tran.params.params )
@@ -68,7 +69,7 @@ namespace ec2
 
         QnTransaction<ApiSetResourceStatusData> prepareTransaction( ApiCommand::Value cmd, const QnId& id, QnResource::Status status);
         QnTransaction<ApiSetResourceDisabledData> prepareTransaction( ApiCommand::Value command, const QnId& id, bool disabled );
-        QnTransaction<ApiResourceParams> prepareTransaction(ApiCommand::Value cmd, const QnId& id, const QnKvPairList& kvPairs);
+        QnTransaction<ApiResourceParamsData> prepareTransaction(ApiCommand::Value cmd, const QnId& id, const QnKvPairList& kvPairs);
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value cmd, const QnId& id);
         QnTransaction<ApiResourceData> prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource );
     };

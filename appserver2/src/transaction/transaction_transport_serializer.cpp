@@ -1,24 +1,29 @@
 #include "transaction_transport_serializer.h"
-#include "common/common_module.h"
+
+#include <common/common_module.h>
+#include <utils/common/model_functions.h>
+
 #include "transaction_message_bus.h"
 
 namespace ec2
 {
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TransactionTransportHeader, (binary)(json), TransactionTransportHeader_Fields);
+
 
     QnTransactionTransportSerializer::QnTransactionTransportSerializer(QnTransactionMessageBus& owner): m_owner(owner)
     {
 
     }
 
-    bool QnTransactionTransportSerializer::deserializeTran(const quint8* chunkPayload, int len,  PeerList& processedPeers, PeerList& dstPeers, QByteArray& tranData)
+    bool QnTransactionTransportSerializer::deserializeTran(const quint8* chunkPayload, int len,  TransactionTransportHeader& transportHeader, QByteArray& tranData)
     {
         QByteArray srcData = QByteArray::fromRawData((const char*) chunkPayload, len);
-        InputBinaryStream<QByteArray> stream(srcData);
-        if (!deserialize(processedPeers, &stream))
+        QnInputBinaryStream<QByteArray> stream(srcData);
+
+        if (!deserialize(&stream, &transportHeader))
             return false;
-        if (!deserialize(dstPeers, &stream))
-            return false;
-        foreach (const QnId& peer, dstPeers)
+
+        foreach (const QnId& peer, transportHeader.dstPeers)
             Q_ASSERT(!peer.isNull());
 
         tranData.append((const char*) chunkPayload + stream.getPos(), len - stream.getPos());

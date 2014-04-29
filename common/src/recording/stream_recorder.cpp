@@ -16,7 +16,7 @@
 #include "transcoding/filters/time_image_filter.h"
 #include "transcoding/filters/fisheye_image_filter.h"
 
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
