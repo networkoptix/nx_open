@@ -4,7 +4,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMetaType>
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMap>
@@ -12,11 +12,10 @@
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
 
-class QnLicense;
-typedef QSharedPointer<QnLicense> QnLicensePtr;
+#include "core/resource/resource_fwd.h"
 
 const QString LICENSE_TYPE_PROFESSIONAL = lit("digital");
-const QString LICENSE_TYPE_ANALOG = lit("analog");
+const QString LICENSE_TYPE_ANALOG = lit("analog"); // TODO: #Elric #EC2 TOTALLY EVIL!!!!!!!!!
 const QString LICENSE_TYPE_EDGE = lit("edge");
 
 class QnLicense {
@@ -105,7 +104,6 @@ private:
 
 Q_DECLARE_METATYPE(QnLicensePtr)
 
-typedef QList<QnLicensePtr> QnLicenseList;
 typedef QMap<QByteArray, QnLicensePtr> QnLicenseDict;
 
 class QnLicenseListHelper

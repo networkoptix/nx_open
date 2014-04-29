@@ -27,14 +27,16 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole)
-    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes)
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace 
+            PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
+            StreamQuality SecondStreamQuality PanicMode RecordingType SerializationFormat)
+    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes ServerFlags)
 public:
 #else
     Q_NAMESPACE
 #endif
 
-    // TODO: #Elric #5.0 use Qt::Edge
+    // TODO: #Elric #5.0 use Qt::Edge ?
     /**
      * Generic enumeration describing borders of a rectangle.
      */
@@ -177,6 +179,7 @@ public:
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
 
+    // TODO: #Elric rename
     enum StreamFpsSharingMethod {
         shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
         sharePixels, //if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
@@ -192,12 +195,21 @@ public:
     };
     Q_DECLARE_FLAGS(MotionTypes, MotionType);
 
-    enum PanicMode {PM_None, PM_BusinessEvents, PM_User};
-    enum ServerFlags { 
+    enum PanicMode {
+        PM_None, 
+        PM_BusinessEvents, 
+        PM_User
+    };
+
+    // TODO: #Elric #EC2 talk to Roma, write comments
+    enum ServerFlag { 
         SF_None     = 0, 
         SF_Edge     = 1,
-        SF_RemoteEC = 2
+        SF_RemoteEC = 2,
+        SF_HasPublicIP = 4
     };
+    Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
+
 
     enum TimePeriodType {
         NullTimePeriod      = 0x1,  /**< No period. */
@@ -207,18 +219,10 @@ public:
     Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
     Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes);
 
-
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
         TimePeriodContentCount
-    };
-
-
-    enum ToggleState {
-        OffState,
-        OnState,
-        UndefinedState /**< Also used in event rule to associate non-toggle action with event with any toggle state. */
     };
 
 
@@ -335,13 +339,51 @@ public:
         ActionIsInstantRole,                        /**< Role for instant state for business rule actions. Value of type bool. */
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
 
-        EventTypeRole,                              /**< Role for business event type. Value of type BusinessEventType::Value. */
+        EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QnResourceList. */
-        ActionTypeRole,                             /**< Role for business action type. Value of type BusinessActionType::Value. */
+        ActionTypeRole,                             /**< Role for business action type. Value of type QnBusiness::ActionType. */
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QnResourceList. */
 
         SoftwareVersionRole,                        /**< Role for software version. Value of type QnSoftwareVersion. */
 
+    };
+
+    // TODO: #Elric #EC2 rename
+    enum StreamQuality {
+        QualityLowest,
+        QualityLow,
+        QualityNormal,
+        QualityHigh,
+        QualityHighest,
+        QualityPreSet,
+        QualityNotDefined,
+
+        StreamQualityCount
+    };
+
+    // TODO: #Elric #EC2 rename
+    enum SecondStreamQuality { 
+        SSQualityLow, 
+        SSQualityMedium, 
+        SSQualityHigh, 
+        SSQualityNotDefined,
+        SSQualityDontUse
+    };
+
+    // TODO: #Elric #EC2 rename
+    enum RecordingType {
+        RecordingType_Run,
+        RecordingType_MotionOnly,
+        RecordingType_Never,
+        RecordingType_MotionPlusLQ,
+
+        RecordingType_Count
+    };
+
+
+    enum SerializationFormat {
+        JsonFormat,
+        BnsFormat,
     };
 
 
@@ -360,6 +402,7 @@ public:
 
 } // namespace Qn
 
+
 /** 
  * \def lit
  * Helper macro to mark strings that are not to be translated. 
@@ -372,7 +415,14 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
-QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
-QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities), (metatype)(lexical)(json))
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities)
+        (Qn::MotionType)(Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlags)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::SerializationFormat), 
+    (metatype)(lexical)(json)
+)
 
 #endif // QN_COMMON_GLOBALS_H

@@ -61,9 +61,8 @@ public:
  */
 typedef QHash<QString, QnWorkbenchState> QnWorkbenchStateHash;
 
-Q_DECLARE_METATYPE(QnWorkbenchState);
 Q_DECLARE_METATYPE(QnWorkbenchStateHash);
-QN_DECLARE_FUNCTIONS(QnWorkbenchState, (datastream));
+QN_FUSION_DECLARE_FUNCTIONS(QnWorkbenchState, (datastream)(metatype));
 
 
 // -------------------------------------------------------------------------- //
@@ -79,9 +78,8 @@ struct QnServerStorageKey {
 
 typedef QHash<QnServerStorageKey, qint64> QnServerStorageStateHash;
 
-Q_DECLARE_METATYPE(QnServerStorageKey);
 Q_DECLARE_METATYPE(QnServerStorageStateHash);
-QN_DECLARE_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash));
+QN_FUSION_DECLARE_FUNCTIONS(QnServerStorageKey, (datastream)(eq)(hash)(metatype));
 
 
 // -------------------------------------------------------------------------- //
@@ -98,9 +96,8 @@ struct QnLicenseWarningState {
  */
 typedef QHash<QByteArray, QnLicenseWarningState> QnLicenseWarningStateHash;
 
-Q_DECLARE_METATYPE(QnLicenseWarningState);
 Q_DECLARE_METATYPE(QnLicenseWarningStateHash);
-QN_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream));
+QN_FUSION_DECLARE_FUNCTIONS(QnLicenseWarningState, (datastream)(metatype));
 
 
 /**
@@ -127,13 +124,12 @@ struct QnPtzHotkey {
 
 typedef QHash<int, QString> QnPtzHotkeyHash;
 
-Q_DECLARE_METATYPE(QnPtzHotkey);
-QN_DECLARE_FUNCTIONS(QnPtzHotkey, (json));
+QN_FUSION_DECLARE_FUNCTIONS(QnPtzHotkey, (json)(metatype));
+
 
 // -------------------------------------------------------------------------- //
 // QnVideowallAttachSettings
 // -------------------------------------------------------------------------- //
-
 struct QnVideowallAttachSettings {
     enum AttachMode {
         AttachWindow,

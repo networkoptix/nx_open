@@ -6,17 +6,19 @@
 #ifndef SERVER_QUERY_PROCESSOR_H
 #define SERVER_QUERY_PROCESSOR_H
 
+#include <QtCore/QDateTime>
 #include <QtConcurrent>
-#include <QDateTime>
 
 #include <utils/common/scoped_thread_rollback.h>
+
+#include <utils/serialization/json_functions.h>
+#include <utils/serialization/binary_functions.h>
 
 #include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "managers/aux_manager.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
-
 
 namespace ec2
 {
@@ -56,8 +58,8 @@ namespace ec2
             std::unique_ptr<ServerQueryProcessor, decltype(scopedGuardFunc)> scopedGuard( this, scopedGuardFunc );
 
             QByteArray serializedTran;
-            OutputBinaryStream<QByteArray> stream( &serializedTran );
-            serialize( tran, &stream );
+            QnOutputBinaryStream<QByteArray> stream( &serializedTran );
+            QnBinary::serialize( tran, &stream );
 
             errorCode = auxManager->executeTransaction(tran);
             if( errorCode != ErrorCode::ok )
@@ -75,38 +77,38 @@ namespace ec2
         }
 
         template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiLicenseList>& tran, HandlerType handler )
+        void processUpdateAsync(QnTransaction<ApiLicenseDataList>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::addLicenses);
-            return processMultiUpdateAsync<ApiLicenseList, ApiLicense>(tran, handler, ApiCommand::addLicense);
+            return processMultiUpdateAsync<ApiLicenseDataList, ApiLicenseData>(tran, handler, ApiCommand::addLicense);
         }
 
         template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiLayoutList>& tran, HandlerType handler )
+        void processUpdateAsync(QnTransaction<ApiLayoutDataList>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::saveLayouts);
-            return processMultiUpdateAsync<ApiLayoutList, ApiLayoutData>(tran, handler, ApiCommand::saveLayout);
+            return processMultiUpdateAsync<ApiLayoutDataList, ApiLayoutData>(tran, handler, ApiCommand::saveLayout);
         }
 
         template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiCameraList>& tran, HandlerType handler )
+        void processUpdateAsync(QnTransaction<ApiCameraDataList>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.command == ApiCommand::saveCameras);
-            return processMultiUpdateAsync<ApiCameraList, ApiCamera>(tran, handler, ApiCommand::saveCamera);
+            return processMultiUpdateAsync<ApiCameraDataList, ApiCameraData>(tran, handler, ApiCommand::saveCamera);
         }
 
-        template<class QueryDataType, class subDataType, class HandlerType>
+        template<class QueryDataType, class SubDataType, class HandlerType>
         void processMultiUpdateAsync(QnTransaction<QueryDataType>& multiTran, HandlerType handler, ApiCommand::Value command)
         {
             ErrorCode errorCode = ErrorCode::ok;
-            QList<QPair<QnTransaction<subDataType>, QByteArray>> processedTran;
+            QList<QPair<QnTransaction<SubDataType>, QByteArray>> processedTran;
             
             if (multiTran.persistent)
                 dbManager->beginTran();
 
-            foreach(const subDataType& data, multiTran.params.data)
+            foreach(const SubDataType& data, multiTran.params)
             {
-                QnTransaction<subDataType> tran(command, multiTran.persistent);
+                QnTransaction<SubDataType> tran(command, multiTran.persistent);
                 tran.params = data;
                 tran.fillSequence();
                 tran.localTransaction = multiTran.localTransaction;
@@ -118,8 +120,8 @@ namespace ec2
                 std::unique_ptr<ServerQueryProcessor, decltype(scopedGuardFunc)> scopedGuard( this, scopedGuardFunc );
 
                 QByteArray serializedTran;
-                OutputBinaryStream<QByteArray> stream( &serializedTran );
-                serialize( tran, &stream );
+                QnOutputBinaryStream<QByteArray> stream( &serializedTran );
+                QnBinary::serialize( tran, &stream );
 
                 errorCode = auxManager->executeTransaction(tran);
                 if( errorCode != ErrorCode::ok ) {
@@ -135,7 +137,7 @@ namespace ec2
                         return;
                     }
                 }
-                processedTran << QPair<QnTransaction<subDataType>, QByteArray>(tran, serializedTran);
+                processedTran << QPair<QnTransaction<SubDataType>, QByteArray>(tran, serializedTran);
             }
 
             if (multiTran.persistent)

@@ -7,9 +7,10 @@
 #include "transaction_transport.h"
 #include "transaction_transport_serializer.h"
 #include "utils/common/synctime.h"
-#include "nx_ec/data/server_alive_data.h"
+#include "nx_ec/data/api_server_alive_data.h"
 #include "transaction_log.h"
 #include "api/app_server_connection.h"
+#include <utils/serialization/binary_functions.h>
 
 namespace ec2
 {
@@ -44,7 +45,7 @@ QnTransactionMessageBus::QnTransactionMessageBus():
     m_thread = new QThread();
     m_thread->setObjectName("QnTransactionMessageBusThread");
     moveToThread(m_thread);
-    qRegisterMetaType<QnTransactionTransport::State>();
+    qRegisterMetaType<QnTransactionTransport::State>(); // TODO: #Elric #EC2 registration
     qRegisterMetaType<QnAbstractTransaction>("QnAbstractTransaction");
     m_timer = new QTimer();
     connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
@@ -67,10 +68,10 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
-void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream)
+void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, QnInputBinaryStream<QByteArray>& stream)
 {
     QnTransaction<ApiServerAliveData> tran(abstractTran);
-    if (!deserialize(tran.params, &stream)) {
+    if (!QnBinary::deserialize(&stream, &tran.params)) {
         qWarning() << "Got invalid ApiServerAliveData transaction. Ignoring";
         return;
     }
@@ -90,15 +91,15 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& 
     }
 }
 
-void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<QnId> processedPeers, QSet<QnId> dstPeers)
+void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, TransactionTransportHeader transportHeader)
 {
     QnTransactionTransport* sender = (QnTransactionTransport*) this->sender();
     if (!sender || sender->getState() != QnTransactionTransport::ReadyForStreaming)
         return;
 
     QnAbstractTransaction tran;
-    InputBinaryStream<QByteArray> stream(serializedTran);
-    if (!deserialize(tran, &stream)) {
+    QnInputBinaryStream<QByteArray> stream(serializedTran);
+    if (!QnBinary::deserialize(&stream, &tran)) {
         qWarning() << Q_FUNC_INFO << "Ignore bad transaction data. size=" << serializedTran.size();
         sender->setState(QnTransactionTransport::Error);
         return;
@@ -117,7 +118,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         m_lastTranSeq[tran.id.peerGUID] = tran.id.sequence;
     }
 
-    if (dstPeers.isEmpty() || dstPeers.contains(qnCommon->moduleGUID()))
+    if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(qnCommon->moduleGUID()))
     {
         qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "with time=" << tran.timestamp;
         // process system transactions
@@ -161,24 +162,24 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, QSet<
         }
     }
     else {
-        qDebug() << "skip transaction " << ApiCommand::toString(tran.command) << "for peers" << dstPeers;
+        qDebug() << "skip transaction " << ApiCommand::toString(tran.command) << "for peers" << transportHeader.dstPeers;
     }
 
     QMutexLocker lock(&m_mutex);
     
     // proxy incoming transaction to other peers.
-    if (!dstPeers.isEmpty() && (dstPeers - processedPeers).isEmpty()) {
+    if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty())
         emit transactionProcessed(tran);
         return; // all dstPeers already processed
     }
 
     QByteArray chunkData;
-    m_serializer.serializeTran(chunkData, serializedTran, processedPeers + peersToSend(tran.command));
+    m_serializer.serializeTran(chunkData, serializedTran, transportHeader.processedPeers + peersToSend(tran.command));
 
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
         QnTransactionTransportPtr transport = *itr;
-        if (!processedPeers.contains(transport->remoteGuid()) && transport->isReadyToSend(tran.command)) 
+        if (!transportHeader.processedPeers.contains(transport->remoteGuid()) && transport->isReadyToSend(tran.command)) 
         {
             Q_ASSERT(transport->remoteGuid() != tran.id.peerGUID);
             transport->addData(chunkData);
@@ -225,10 +226,10 @@ void QnTransactionMessageBus::sendTransactionInternal(const QnAbstractTransactio
 
 template <class T>
 template <class T2>
-bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbstractTransaction&  abstractTran, InputBinaryStream<QByteArray>& stream)
+bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbstractTransaction&  abstractTran, QnInputBinaryStream<QByteArray>& stream)
 {
     QnTransaction<T2> tran(abstractTran);
-    if (!deserialize(tran.params, &stream))
+    if (!QnBinary::deserialize(&stream, &tran.params))
         return false;
     
     if (abstractTran.persistent && transactionLog && transactionLog->contains(tran))
@@ -241,10 +242,10 @@ bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnAbst
     return true;
 }
 
-void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, InputBinaryStream<QByteArray>& stream)
+void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, QnInputBinaryStream<QByteArray>& stream)
 {
     ApiLockData params;
-    if (!deserialize(params, &stream)) {
+    if (!QnBinary::deserialize(&stream, &params)) {
         qWarning() << "Bad stream! Ignore transaction " << ApiCommand::toString(tran.command);
     }
     
@@ -254,17 +255,17 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractT
         emit gotLockResponse(params);
 }
 
-void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, InputBinaryStream<QByteArray>&)
+void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>&)
 {
 	sender->setReadSync(true);
 }
 
-bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, InputBinaryStream<QByteArray>& stream)
+bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>& stream)
 {
     sender->setWriteSync(true);
 
     QnTranState params;
-    if (deserialize(params, &stream))
+    if (QnBinary::deserialize(&stream, &params))
     {
 
         QList<QByteArray> transactions;
@@ -293,12 +294,12 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
 }
 
 template <class T>
-bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransactionTransport* /*sender*/, QnAbstractTransaction& abstractTran, InputBinaryStream<QByteArray>& stream)
+bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransactionTransport* /*sender*/, QnAbstractTransaction& abstractTran, QnInputBinaryStream<QByteArray>& stream)
 {
     switch (abstractTran.command)
     {
         case ApiCommand::getAllDataList:
-            return deliveryTransaction<ApiFullInfo>(abstractTran, stream);
+            return deliveryTransaction<ApiFullInfoData>(abstractTran, stream);
 
         //!ApiSetResourceStatusData
         case ApiCommand::setResourceStatus:
@@ -308,7 +309,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiSetResourceDisabledData>(abstractTran, stream);
         //!ApiResourceParams
         case ApiCommand::setResourceParams:
-            return deliveryTransaction<ApiResourceParams>(abstractTran, stream);
+            return deliveryTransaction<ApiResourceParamsData>(abstractTran, stream);
         case ApiCommand::saveResource:
             return deliveryTransaction<ApiResourceData>(abstractTran, stream);
         case ApiCommand::removeResource:
@@ -317,13 +318,13 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiPanicModeData>(abstractTran, stream);
             
         case ApiCommand::saveCamera:
-            return deliveryTransaction<ApiCamera>(abstractTran, stream);
+            return deliveryTransaction<ApiCameraData>(abstractTran, stream);
         case ApiCommand::saveCameras:
-            return deliveryTransaction<ApiCameraList>(abstractTran, stream);
+            return deliveryTransaction<ApiCameraDataList>(abstractTran, stream);
         case ApiCommand::removeCamera:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::addCameraHistoryItem:
-            return deliveryTransaction<ApiCameraServerItem>(abstractTran, stream);
+            return deliveryTransaction<ApiCameraServerItemData>(abstractTran, stream);
 
         case ApiCommand::saveMediaServer:
             return deliveryTransaction<ApiMediaServerData>(abstractTran, stream);
@@ -336,12 +337,12 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveBusinessRule:
-            return deliveryTransaction<ApiBusinessRule>(abstractTran, stream);
+            return deliveryTransaction<ApiBusinessRuleData>(abstractTran, stream);
         case ApiCommand::removeBusinessRule:
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
 
         case ApiCommand::saveLayouts:
-            return deliveryTransaction<ApiLayoutList>(abstractTran, stream);
+            return deliveryTransaction<ApiLayoutDataList>(abstractTran, stream);
         case ApiCommand::saveLayout:
             return deliveryTransaction<ApiLayoutData>(abstractTran, stream);
         case ApiCommand::removeLayout:
@@ -361,14 +362,15 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiStoredFilePath>(abstractTran, stream);
 
         case ApiCommand::broadcastBusinessAction:
+        case ApiCommand::execBusinessAction:
             return deliveryTransaction<ApiBusinessActionData>(abstractTran, stream);
 
         case ApiCommand::saveSettings:
-            return deliveryTransaction<ApiParamList>(abstractTran, stream);
+            return deliveryTransaction<ApiResourceParamDataList>(abstractTran, stream);
         case ApiCommand::addLicenses:
-            return deliveryTransaction<ApiLicenseList>(abstractTran, stream);
+            return deliveryTransaction<ApiLicenseDataList>(abstractTran, stream);
         case ApiCommand::addLicense:
-            return deliveryTransaction<ApiLicense>(abstractTran, stream);
+            return deliveryTransaction<ApiLicenseData>(abstractTran, stream);
 
         case ApiCommand::testEmailSettings:
             abstractTran.localTransaction = true;
@@ -583,7 +585,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         return;
     }
 
-    QnTransaction<ApiFullInfo> tran;
+    QnTransaction<ApiFullInfoData> tran;
     if (isClient) 
     {
         /*

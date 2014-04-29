@@ -36,6 +36,5 @@ Q_DECLARE_METATYPE(QHostAddress);
 Q_DECLARE_METATYPE(QAuthenticator);
 Q_DECLARE_METATYPE(Qt::ConnectionType);
 Q_DECLARE_METATYPE(Qt::Orientations);
-Q_DECLARE_METATYPE(Qn::PanicMode);
 
 #endif // QN_COMMON_META_TYPES_H

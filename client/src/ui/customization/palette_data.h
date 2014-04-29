@@ -5,7 +5,7 @@
 #include <QtCore/QExplicitlySharedDataPointer>
 #include <QtGui/QPalette>
 
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 class QnPaletteDataPrivate;
 
@@ -30,7 +30,7 @@ public:
     const QColor &color(QPalette::ColorGroup group, QPalette::ColorRole role) const;
     void setColor(QPalette::ColorGroup group, QPalette::ColorRole role, const QColor &color);
 
-    QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPaletteData, friend)
+    QN_FUSION_DECLARE_FUNCTIONS(QnPaletteData, (json), friend)
 
 private:
     QExplicitlySharedDataPointer<QnPaletteDataPrivate> d;

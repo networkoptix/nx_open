@@ -1,6 +1,7 @@
 #ifndef QN_MEDIA_SERVER_RESOURCE_H
 #define QN_MEDIA_SERVER_RESOURCE_H
 
+#include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 
 #include <api/media_server_connection.h>

@@ -3,8 +3,9 @@
 #include <business/actions/abstract_business_action.h>
 #include <business/business_message_bus.h>
 #include "core/resource_management/resource_pool.h"
-#include "nx_ec/binary_serialization_helper.h"
-#include "nx_ec/data/ec2_business_rule_data.h"
+#include "nx_ec/data/api_business_rule_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
+#include "utils/serialization/binary_functions.h"
 
 int QnBusinessActionRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
@@ -27,9 +28,9 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
 
     QnAbstractBusinessActionPtr action;
     ec2::ApiBusinessActionData apiData;
-    InputBinaryStream<QByteArray> stream(body);
-    if (deserialize(apiData, &stream))
-        action = apiData.toResource(qnResPool);
+    QnInputBinaryStream<QByteArray> stream(body);
+    if (QnBinary::deserialize(&stream, &apiData))
+        fromApiToResource(apiData, action, qnResPool);
     
     if (action) {
         action->setReceivedFromRemoteHost(true);
@@ -41,8 +42,8 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
                 resId = params[i].second;
         }
 
-        QnResourcePtr res = qnResPool->getResourceById(resId);
-        qnBusinessMessageBus->at_actionReceived(action, res);
+        //QnResourcePtr res = qnResPool->getResourceById(resId);
+        qnBusinessMessageBus->at_actionReceived(action);
     }
 
     result.append("<root>");

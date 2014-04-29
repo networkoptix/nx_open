@@ -135,3 +135,23 @@ bool QnDbHelper::isObjectExists(const QString& objectType, const QString& object
     return !value.isEmpty();
 }
 
+void QnDbHelper::beginTran()
+{
+    m_tran.beginTran();
+}
+
+void QnDbHelper::rollback()
+{
+    m_tran.rollback();
+}
+
+void QnDbHelper::commit()
+{
+    m_tran.commit();
+}
+
+void QnDbHelper::addDatabase(const QString& fileName, const QString& dbname)
+{
+    m_sdb = QSqlDatabase::addDatabase(lit("QSQLITE"), dbname);
+    m_sdb.setDatabaseName(fileName);
+}

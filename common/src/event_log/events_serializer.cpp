@@ -40,7 +40,7 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
     for (int i = 0; i < sz; ++i) {
         QnBusinessActionData& action = events[i];
         action.setFlags(readInt(curPtr));
-        action.setActionType((BusinessActionType::Value) readInt(curPtr));
+        action.setActionType((QnBusiness::ActionType) readInt(curPtr));
         action.setBusinessRuleId(readQnId(curPtr));
         action.setAggregationCount(readInt(curPtr));
         int runTimeParamsLen = readInt(curPtr);

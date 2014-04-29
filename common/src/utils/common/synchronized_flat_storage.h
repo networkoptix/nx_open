@@ -1,11 +1,8 @@
 #ifndef QN_PROTECTED_STORAGE_H
 #define QN_PROTECTED_STORAGE_H
 
-#include <QtCore/QReadWriteLock>
-#include <QtCore/QReadLocker>
-#include <QtCore/QWriteLocker>
+#include <mutex>
 
-#include "warnings.h"
 #include "flat_storage.h"
 
 /**
@@ -13,7 +10,7 @@
  * of the items inside it.
  */
 template<class Key, class T>
-class QnSynchronizedFlatStorage: private QnFlatStorage<Key, T> {
+class QnSynchronizedFlatStorage {
     typedef QnFlatStorage<Key, T> base_type;
 public:
     QnSynchronizedFlatStorage() {}
@@ -21,40 +18,46 @@ public:
     ~QnSynchronizedFlatStorage() {}
 
     T value(const Key &key) const {
-        QReadLocker guard(&m_lock);
+        std::unique_lock<std::mutex> guard(m_mutex);
 
-        return base_type::value(key);
+        return m_storage.value(key);
     }
 
-    QList<T> values() const {
-        QReadLocker guard(&m_lock);
+    QSet<T> values() const {
+        std::unique_lock<std::mutex> guard(m_mutex);
 
-        return base_type::values();
+        return m_storage.values();
     }
 
     void insert(const Key &key, T value, bool claimOwnership = true) {
-        QWriteLocker guard(&m_lock);
+        std::unique_lock<std::mutex> guard(m_mutex);
 
-        base_type::insert(key, value, claimOwnership);
+        m_storage.insert(key, value, claimOwnership);
     }
 
     void clear() {
-        QWriteLocker guard(&m_lock);
+        std::unique_lock<std::mutex> guard(m_mutex);
 
-        base_type::clear();
+        m_storage.clear();
     }
 
     bool empty() const {
-        QReadLocker guard(&m_lock);
+        std::unique_lock<std::mutex> guard(m_mutex);
 
-        return base_type::empty();
+        return m_storage.empty();
     }
 
 private:
     Q_DISABLE_COPY(QnSynchronizedFlatStorage);
 
 private:
-    mutable QReadWriteLock m_lock;
+    /** Mutex that protects all operations. Note that we're not using a 
+     * shared/read-write mutex as it is more heavyweight than a regular mutex,
+     * and the read operations are extremely fast anyway. */
+    mutable std::mutex m_mutex;
+
+    /** Underlying storage. */
+    QnFlatStorage<Key, T> m_storage;
 };
 
 #endif // QN_PROTECTED_STORAGE_H

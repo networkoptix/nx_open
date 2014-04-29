@@ -8,9 +8,9 @@
 QnBusinessEventRule::QnBusinessEventRule()
 :
     m_id(),
-    m_eventType(BusinessEventType::NotDefined),
-    m_eventState(Qn::OnState), //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
-    m_actionType(BusinessActionType::NotDefined),
+    m_eventType(QnBusiness::UndefinedEvent),
+    m_eventState(QnBusiness::ActiveState), //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
+    m_actionType(QnBusiness::UndefinedAction),
     m_aggregationPeriod(0),
     m_disabled(false),
     m_system(false)
@@ -29,11 +29,11 @@ void QnBusinessEventRule::setId(const QnId& value) {
     m_id = value;
 }
 
-BusinessEventType::Value QnBusinessEventRule::eventType() const {
+QnBusiness::EventType QnBusinessEventRule::eventType() const {
     return m_eventType;
 }
 
-void QnBusinessEventRule::setEventType(const BusinessEventType::Value value) {
+void QnBusinessEventRule::setEventType(const QnBusiness::EventType value) {
     m_eventType = value;
 }
 
@@ -66,19 +66,19 @@ void QnBusinessEventRule::setEventParams(const QnBusinessEventParameters &params
     m_eventParams = params;
 }
 
-Qn::ToggleState QnBusinessEventRule::eventState() const {
+QnBusiness::EventState QnBusinessEventRule::eventState() const {
     return m_eventState;
 }
 
-void QnBusinessEventRule::setEventState(Qn::ToggleState state) {
+void QnBusinessEventRule::setEventState(QnBusiness::EventState state) {
     m_eventState = state;
 }
 
-BusinessActionType::Value QnBusinessEventRule::actionType() const {
+QnBusiness::ActionType QnBusinessEventRule::actionType() const {
     return m_actionType;
 }
 
-void QnBusinessEventRule::setActionType(const BusinessActionType::Value value) {
+void QnBusinessEventRule::setActionType(const QnBusiness::ActionType value) {
     m_actionType = value;
     //TODO: #GDM fill action params with default values? filter action resources?
 }
@@ -175,11 +175,11 @@ bool QnBusinessEventRule::isScheduleMatchTime(const QDateTime& datetime) const
     return rez;
 }
 
-QnBusinessEventRule::QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, BusinessActionType::Value bActionType, BusinessEventType::Value bEventType,
+QnBusinessEventRule::QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType,
                                          QnResourcePtr actionRes)
 {
     m_disabled = false;
-    m_eventState = Qn::UndefinedState;
+    m_eventState = QnBusiness::UndefinedState;
     
     m_id = intToGuid(internalId);
     m_aggregationPeriod = aggregationPeriod;
@@ -235,24 +235,24 @@ QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
     QnResourcePtr admin = qnResPool->getResourceById(QUuid("e3219e00-cb8f-496c-81a0-28abc1b3a830"));
 
     QnBusinessEventRuleList result;
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(1,  30,    "{ \"userGroup\" : 0 }",  0, BusinessActionType::ShowPopup,   BusinessEventType::Camera_Disconnect));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(2,  30,    QByteArray(),             0, BusinessActionType::ShowPopup,   BusinessEventType::Storage_Failure));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(3,  30,    QByteArray(),             0, BusinessActionType::ShowPopup,   BusinessEventType::Network_Issue));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(4,  30,    QByteArray(),             0, BusinessActionType::ShowPopup,   BusinessEventType::Camera_Ip_Conflict));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(5,  30,    QByteArray(),             0, BusinessActionType::ShowPopup,   BusinessEventType::MediaServer_Failure));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(6,  30,    QByteArray(),             0, BusinessActionType::ShowPopup,   BusinessEventType::MediaServer_Conflict));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(7,  21600, QByteArray(),             0, BusinessActionType::SendMail,    BusinessEventType::Camera_Disconnect, admin));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(8,  21600, QByteArray(),             0, BusinessActionType::SendMail,    BusinessEventType::Storage_Failure, admin));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(9,  21600, QByteArray(),             0, BusinessActionType::SendMail,    BusinessEventType::Network_Issue, admin));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(10, 21600, QByteArray(),             0, BusinessActionType::SendMail,    BusinessEventType::Camera_Ip_Conflict, admin));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(11, 21600, QByteArray(),             0, BusinessActionType::SendMail,    BusinessEventType::MediaServer_Failure, admin));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(12, 21600, QByteArray(),             0, BusinessActionType::SendMail,    BusinessEventType::MediaServer_Conflict, admin));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(13, 30,    QByteArray(),             1, BusinessActionType::Diagnostics, BusinessEventType::Camera_Disconnect));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(14, 30,    QByteArray(),             1, BusinessActionType::Diagnostics, BusinessEventType::Storage_Failure));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(15, 30,    QByteArray(),             1, BusinessActionType::Diagnostics, BusinessEventType::Network_Issue));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(16, 30,    QByteArray(),             1, BusinessActionType::Diagnostics, BusinessEventType::Camera_Ip_Conflict));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(17, 30,    QByteArray(),             1, BusinessActionType::Diagnostics, BusinessEventType::MediaServer_Failure));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(18, 30,    QByteArray(),             1, BusinessActionType::Diagnostics, BusinessEventType::MediaServer_Conflict));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(1,  30,    "{ \"userGroup\" : 0 }",  0, QnBusiness::ShowPopupAction,   QnBusiness::CameraDisconnectEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(2,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::StorageFailureEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(3,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::NetworkIssueEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(4,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::CameraIpConflictEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(5,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::ServerFailureEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(6,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::ServerConflictEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(7,  21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::CameraDisconnectEvent, admin));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(8,  21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::StorageFailureEvent, admin));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(9,  21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::NetworkIssueEvent, admin));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(10, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::CameraIpConflictEvent, admin));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(11, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::ServerFailureEvent, admin));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(12, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::ServerConflictEvent, admin));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(13, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::CameraDisconnectEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(14, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::StorageFailureEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(15, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::NetworkIssueEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(16, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::CameraIpConflictEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(17, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::ServerFailureEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(18, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::ServerConflictEvent));
 
     return result;
 }

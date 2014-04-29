@@ -158,13 +158,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiParamList& settings) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiResourceParamDataList& settings) {
             QnKvPairList outData;
             if( errorCode == ErrorCode::ok )
-                settings.toResourceList(outData);
+                fromApiToResourceList(settings, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiParamList, decltype(queryDoneHandler)> ( ApiCommand::getSettings, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiResourceParamDataList, decltype(queryDoneHandler)> ( ApiCommand::getSettings, nullptr, queryDoneHandler);
         return reqID;
     }
 
@@ -173,8 +173,8 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        QnTransaction<ApiParamList> tran(ApiCommand::saveSettings, true);
-        tran.params.fromResourceList(kvPairs);
+        QnTransaction<ApiResourceParamDataList> tran(ApiCommand::saveSettings, true);
+        fromResourceListToApi(kvPairs, tran.params);
 
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );

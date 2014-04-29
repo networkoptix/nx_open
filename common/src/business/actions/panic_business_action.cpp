@@ -2,6 +2,6 @@
 #include "core/resource/resource.h"
 
 QnPanicBusinessAction::QnPanicBusinessAction(const QnBusinessEventParameters &runtimeParams) :
-    base_type(BusinessActionType::PanicRecording, runtimeParams)
+    base_type(QnBusiness::PanicRecordingAction, runtimeParams)
 {
 }

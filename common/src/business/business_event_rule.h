@@ -24,8 +24,8 @@ public:
     QnId id() const;
     void setId(const QnId& value);
 
-    BusinessEventType::Value eventType() const;
-    void setEventType(const BusinessEventType::Value value);
+    QnBusiness::EventType eventType() const;
+    void setEventType(const QnBusiness::EventType value);
 
     QVector<QnId> eventResources() const;
     void setEventResources(const QVector<QnId> &value);
@@ -35,11 +35,11 @@ public:
     QnBusinessEventParameters eventParams() const;
     void setEventParams(const QnBusinessEventParameters& params);
 
-    Qn::ToggleState eventState() const;
-    void setEventState(Qn::ToggleState state);
+    QnBusiness::EventState eventState() const;
+    void setEventState(QnBusiness::EventState state);
 
-    BusinessActionType::Value actionType() const;
-    void setActionType(const BusinessActionType::Value value);
+    QnBusiness::ActionType actionType() const;
+    void setActionType(const QnBusiness::ActionType value);
 
     QVector<QnId> actionResources() const;
     QnResourceList actionResourceObjects() const;
@@ -72,16 +72,16 @@ public:
     QnBusinessEventRule* clone();
     void removeResource(const QnId& resId);
 private:
-    QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, BusinessActionType::Value bActionType, BusinessEventType::Value bEventType, QnResourcePtr actionRes= QnResourcePtr());
+    QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, QnResourcePtr actionRes= QnResourcePtr());
 
     QnId m_id;
 
-    BusinessEventType::Value m_eventType;
+    QnBusiness::EventType m_eventType;
     QVector<QnId> m_eventResources;
     QnBusinessEventParameters m_eventParams;
-    Qn::ToggleState m_eventState;
+    QnBusiness::EventState m_eventState;
 
-    BusinessActionType::Value m_actionType;
+    QnBusiness::ActionType m_actionType;
     QVector<QnId> m_actionResources;
     QnBusinessActionParameters m_actionParams;
 
