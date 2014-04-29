@@ -15,17 +15,47 @@
 
 #include "fusion.h"
 
+
 /**
  * Main API entry point for fusion adaptors.
  *
- * Registers a fusion adaptor for the given class.
+ * Registers a fusion adaptor for the given class. This macro is supposed to
+ * be used from the same namespace where the class was defined, as the
+ * generated code must be accessible via ADL.
  * 
- * \param CLASS                         Class to register adaptor for.
+ * Member sequence is of the form:
+ * 
+ * \code
+ * ((KEY0, VALUE0)(KEY1, VALUE1)...)
+ * ((KEY0, VALUE0)(KEY1, VALUE1)...)
+ * ...
+ * \endcode
+ * 
+ * Here <tt>KEY*</tt> are fusion keys previously defined with 
+ * <tt>QN_FUSION_DEFINE_KEY</tt>, and <tt>VALUE*</tt> are associated values.
+ * A working example might look like this:
+ * 
+ * \code
+ * QN_FUSION_ADAPT_CLASS(
+ *      QSize,
+ *      ((getter, &QSize::width)(setter, &QSize::setWidth)(name, "width"))
+ *      ((getter, &QSize::height)(setter, &QSize::setHeight)(name, "height")),
+ *      (optional, true)
+ * )
+ * \endcode
+ * 
+ * This code defines two members for <tt>QSize</tt>, and the last parameter
+ * marks them as optional.
+ * 
+ * 
+ * \param CLASS                         Class to register fusion adaptor for.
  * \param MEMBER_SEQ                    Preprocessor sequence of member parameter
  *                                      sequences for the given class.
  * \param GLOBAL_SEQ                    Global parameters sequence that will
  *                                      be appended to each one of individual
  *                                      member parameter sequences.
+ *                                      
+ * \see QN_FUSION_DEFINE_KEY
  */
 #define QN_FUSION_ADAPT_CLASS(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)          \
     QN_FUSION_ADAPT_CLASS_I(                                                    \
@@ -130,45 +160,92 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 
 
 /**
- * 
+ * \see QN_FUSION_ADAPT_CLASS
  */
 #define QN_FUSION_ADAPT_CLASS_SHORT(CLASS, KEYS_TUPLE, MEMBER_SEQ, ... /* GLOBAL_SEQ */) \
     QN_FUSION_ADAPT_CLASS(CLASS, QN_FUSION_UNROLL_SHORTCUT_SEQ(KEYS_TUPLE, MEMBER_SEQ), ##__VA_ARGS__)
 
+
 /**
+ * A shortcut for <tt>QN_FUSION_ADAPT_CLASS</tt>. Each property sequence of the
+ * proveded member sequence is expected to start with a tuple of size 3 consisting
+ * of values for fusion keys <tt>getter</tt>, <tt>setter</tt> and <tt>name</tt>.
  * 
+ * Note that <tt>GSN</tt> in the macro name stands for GetterSetterName.
+ * 
+ * Example usage:
+ * 
+ * \code
+ * QN_FUSION_ADAPT_CLASS_GSN(
+ *      QSize,
+ *      ((&QSize::width, &QSize::setWidth, "width")(optional, true))
+ *      ((&QSize::height, &QSize::setHeight, "height"))
+ * )
+ * \endcode
+ *
+ * This code defines two members for class <tt>QSize</tt>, with <tt>width</tt>
+ * as optional.
+ *
+ * \see QN_FUSION_ADAPT_CLASS
  */
 #define QN_FUSION_ADAPT_CLASS_GSN(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)      \
     QN_FUSION_ADAPT_CLASS_SHORT(CLASS, (getter, setter, name), MEMBER_SEQ, ##__VA_ARGS__)
 
+
 /**
- * 
+ * \see QN_FUSION_ADAPT_CLASS_GSN
  */
 #define QN_FUSION_ADAPT_CLASS_GSNC(CLASS, MEMBER_SEQ, ... /* GLOBAL_SEQ */)     \
     QN_FUSION_ADAPT_CLASS_SHORT(CLASS, (getter, setter, name, checker), MEMBER_SEQ, ##__VA_ARGS__)
 
+
 /**
- *
+ * A shortcut for <tt>QN_FUSION_ADAPT_CLASS</tt>. Can be used for simple struct
+ * types where field names to be used are the same as the field names in C++ code.
+ * 
+ * Example usage:
+ * 
+ * \code
+ * struct Point { int x, y, z; }
+ * 
+ * QN_FUSION_ADAPT_STRUCT(Point, (x)(y)(z), (optinal, true))
+ * \endcode
+ * 
+ * This code defines three members for class <tt>Point</tt>, all of them optional.
+ * 
+ * \param STRUCT                        Struct to register fusion adaptor for.
+ * \param FIELD_SEQ                     Preprocessor sequence of the struct's
+ *                                      field names.
+ * \param GLOBAL_SEQ                    Preprocessor sequence of global parameters 
+ *                                      that will be applied to each of the
+ *                                      struct's fields.
+ * \see QN_FUSION_ADAPT_CLASS
  */
 #define QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, ... /* GLOBAL_SEQ */)         \
     QN_FUSION_ADAPT_CLASS(STRUCT, QN_FUSION_FIELD_SEQ_TO_MEMBER_SEQ(STRUCT, FIELD_SEQ), ##__VA_ARGS__)
 
+
 /**
- * 
+ * \see QN_FUSION_ADAPT_CLASS
+ * \see QN_FUSION_DEFINE_FUNCTIONS
  */
 #define QN_FUSION_ADAPT_CLASS_FUNCTIONS(CLASS, FUNCTION_SEQ, MEMBER_SEQ, ... /* GLOBAL_SEQ, PREFIX */) \
     QN_FUSION_ADAPT_CLASS(CLASS, MEMBER_SEQ, BOOST_PP_VARIADIC_ELEM(0, ##__VA_ARGS__,,)) \
     QN_FUSION_DEFINE_FUNCTIONS(CLASS, FUNCTION_SEQ, BOOST_PP_VARIADIC_ELEM(1, ##__VA_ARGS__,,))
 
+
 /**
- * 
+ * \see QN_FUSION_ADAPT_CLASS_GSN
+ * \see QN_FUSION_DEFINE_FUNCTIONS
  */
 #define QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(CLASS, FUNCTION_SEQ, MEMBER_SEQ, ... /* GLOBAL_SEQ, PREFIX */) \
     QN_FUSION_ADAPT_CLASS_GSN(CLASS, MEMBER_SEQ, BOOST_PP_VARIADIC_ELEM(0, ##__VA_ARGS__,,)) \
     QN_FUSION_DEFINE_FUNCTIONS(CLASS, FUNCTION_SEQ, BOOST_PP_VARIADIC_ELEM(1, ##__VA_ARGS__,,))
 
+
 /**
- * 
+ * \see QN_FUSION_ADAPT_STRUCT
+ * \see QN_FUSION_DEFINE_FUNCTIONS
  */
 #define QN_FUSION_ADAPT_STRUCT_FUNCTIONS(STRUCT, FUNCTION_SEQ, FIELD_SEQ, ... /* GLOBAL_SEQ, PREFIX */) \
     QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, BOOST_PP_VARIADIC_ELEM(0, ##__VA_ARGS__,,)) \
