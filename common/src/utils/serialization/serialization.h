@@ -276,7 +276,7 @@ namespace QnSerializationDetail {
     }
 
     template<class Context, class T, class D>
-    void serialize_value(Context *ctx, const T &value, D *target, typename std::disable_if<is_metatype_defined<T>::value>::type * = NULL) {
+    void serialize_value(Context *ctx, const T &value, D *target, typename std::enable_if<!is_metatype_defined<T>::value>::type * = NULL) {
         serialize_value_direct(ctx, value, target);
     }
 
@@ -291,7 +291,7 @@ namespace QnSerializationDetail {
     }
 
     template<class Context, class T, class D>
-    bool deserialize_value(Context *ctx, const D &value, T *target, typename std::disable_if<is_metatype_defined<T>::value>::type * = NULL) {
+    bool deserialize_value(Context *ctx, const D &value, T *target, typename std::enable_if<!is_metatype_defined<T>::value>::type * = NULL) {
         return deserialize_value_direct(ctx, value, target);
     }
 
