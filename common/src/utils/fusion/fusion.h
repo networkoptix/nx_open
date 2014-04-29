@@ -131,12 +131,6 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_base ,
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_base(KEY, VALUE) (base, std::declval<VALUE>())
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_member_index ,
-#define QN_FUSION_PROPERTY_TYPE_FOR_member_index int
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_member_count ,
-#define QN_FUSION_PROPERTY_TYPE_FOR_member_count int
-
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_name ,
 #define QN_FUSION_PROPERTY_TYPE_FOR_name QString
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_name ,
