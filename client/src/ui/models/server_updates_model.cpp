@@ -26,7 +26,7 @@ int QnServerUpdatesModel::rowCount(const QModelIndex &parent) const {
     if(parent.isValid())
         return 0;
 
-    return m_servers.size();
+    return m_items.size();
 }
 
 QVariant QnServerUpdatesModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -49,29 +49,116 @@ QVariant QnServerUpdatesModel::data(const QModelIndex &index, int role) const {
     if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
-    QnMediaServerResourcePtr server = m_servers[index.row()];
+    Item *item = reinterpret_cast<Item*>(index.internalPointer());
 
+    return item->data(index.column(), role);
+}
+
+QModelIndex QnServerUpdatesModel::index(int row, int column, const QModelIndex &parent) const {
+    Q_UNUSED(parent)
+
+    return createIndex(row, column, m_items[row]);
+}
+
+QModelIndex QnServerUpdatesModel::index(const QnMediaServerResourcePtr &server) const {
+    auto it = std::find_if(m_items.begin(), m_items.end(), [&server](Item *item){ return item->server() == server; });
+    if (it == m_items.end())
+        return QModelIndex();
+
+    return base_type::index(it - m_items.begin(), 0);
+}
+
+QnMediaServerResourceList QnServerUpdatesModel::servers() const {
+    QnMediaServerResourceList servers;
+
+    foreach (const Item *item, m_items)
+        servers.append(item->server());
+
+    return servers;
+}
+
+void QnServerUpdatesModel::setUpdatesInformation(const UpdateInformationHash &updates) {
+    m_updates = updates;
+    foreach (Item *item, m_items)
+        item->m_updateInfo = m_updates.value(item->server()->getSystemInfo());
+
+    if (!m_items.isEmpty())
+        emit dataChanged(index(0, UpdateColumn), index(m_items.size() - 1, UpdateColumn));
+}
+
+void QnServerUpdatesModel::resetResourses() {
+    beginResetModel();
+
+    qDeleteAll(m_items);
+    m_items.clear();
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
+        QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
+        m_items.append(new Item(server, m_updates.value(server->getSystemInfo())));
+    }
+
+    endResetModel();
+}
+
+void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
+
+    beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
+    m_items.append(new Item(server, m_updates.value(server->getSystemInfo())));
+    endInsertRows();
+}
+
+void QnServerUpdatesModel::at_resourceRemoved(const QnResourcePtr &resource) {
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
+
+    QModelIndex idx = index(server);
+
+    beginRemoveRows(QModelIndex(), idx.row(), idx.row());
+    m_items.removeAt(idx.row());
+    endRemoveRows();
+
+    delete static_cast<Item*>(idx.internalPointer());
+}
+
+void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+    if (!server)
+        return;
+
+    QModelIndex idx = index(server);
+
+    emit dataChanged(idx, idx.sibling(idx.row(), LastColumn));
+}
+
+
+QnMediaServerResourcePtr QnServerUpdatesModel::Item::server() const {
+    return m_server;
+}
+
+QnServerUpdatesModel::UpdateInformation QnServerUpdatesModel::Item::updateInformation() const {
+    return m_updateInfo;
+}
+
+QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
     switch (role) {
     case Qt::DisplayRole:
     case Qt::ToolTipRole:
-        switch (index.column()) {
+        switch (column) {
         case ResourceNameColumn:
-            return getResourceName(server);
+            return getResourceName(m_server);
         case CurrentVersionColumn:
-            return server->getVersion().toString(QnSoftwareVersion::FullFormat);
+            return m_server->getVersion().toString(QnSoftwareVersion::FullFormat);
         case UpdateColumn: {
-            auto it = m_updates.find(server->getSystemInfo());
-            if (it == m_updates.end())
-                break;
-
-            const UpdateInformation &updateInformation = it.value();
-            switch (updateInformation.status) {
+            switch (m_updateInfo.status) {
             case NotFound:
                 return tr("Not found");
             case Found:
-                return (updateInformation.version == server->getVersion()) ? tr("Not needed") : updateInformation.version.toString(QnSoftwareVersion::FullFormat);
+                return (m_updateInfo.version == m_server->getVersion()) ? tr("Not needed") : m_updateInfo.version.toString(QnSoftwareVersion::FullFormat);
             case Uploading:
-                return QString::number(updateInformation.progress) + lit("%");
+                return QString::number(m_updateInfo.progress) + lit("%");
             case Installing:
                 return tr("Installing...");
             case Installed:
@@ -83,68 +170,14 @@ QVariant QnServerUpdatesModel::data(const QModelIndex &index, int role) const {
         }
         break;
     case Qt::DecorationRole:
-        if (index.column() == ResourceNameColumn)
-            return qnResIconCache->icon(server->flags(), server->getStatus());
+        if (column == ResourceNameColumn)
+            return qnResIconCache->icon(m_server->flags(), m_server->getStatus());
         break;
     case Qt::BackgroundRole:
         break;
+    case Qn::MediaServerResourceRole:
+        return QVariant::fromValue<QnMediaServerResourcePtr>(m_server);
     }
 
     return QVariant();
-}
-
-QList<QnMediaServerResourcePtr> QnServerUpdatesModel::servers() const {
-    return m_servers;
-}
-
-void QnServerUpdatesModel::setUpdatesInformation(const UpdateInformationHash &updates) {
-    m_updates = updates;
-    if (!m_servers.isEmpty())
-        emit dataChanged(index(0, UpdateColumn), index(m_servers.size() - 1, UpdateColumn));
-}
-
-void QnServerUpdatesModel::resetResourses() {
-    beginResetModel();
-
-    m_servers.clear();
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server))
-        m_servers.append(resource.staticCast<QnMediaServerResource>());
-
-    endResetModel();
-}
-
-void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
-    beginInsertRows(QModelIndex(), m_servers.size(), m_servers.size());
-    m_servers.append(server);
-    endInsertRows();
-}
-
-void QnServerUpdatesModel::at_resourceRemoved(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
-    int index = m_servers.indexOf(server);
-    if (index == -1)
-        return;
-
-    beginRemoveRows(QModelIndex(), index, index);
-    m_servers.removeAt(index);
-    endRemoveRows();
-}
-
-void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
-    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server)
-        return;
-
-    int i = m_servers.indexOf(server);
-    if (i == -1)
-        return;
-
-    emit dataChanged(index(i, 0), index(i, ColumnCount));
 }
