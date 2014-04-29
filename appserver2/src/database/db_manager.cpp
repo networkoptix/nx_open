@@ -11,6 +11,7 @@
 #include "nx_ec/data/api_business_rule_data.h"
 #include "utils/serialization/binary_stream.h"
 #include "utils/serialization/sql_functions.h"
+#include "business/business_fwd.h"
 
 
 namespace ec2
@@ -222,6 +223,128 @@ bool QnDbManager::updateGuids()
     return true;
 }
 
+namespace oldBusinessData
+{
+    enum BusinessEventType
+    {
+        NotDefinedEvent,
+        Camera_Motion,
+        Camera_Input,
+        Camera_Disconnect,
+        Storage_Failure,
+        Network_Issue,
+        Camera_Ip_Conflict,
+        MediaServer_Failure,
+        MediaServer_Conflict,
+        MediaServer_Started
+    };
+
+    enum BusinessActionType
+    {
+        UndefinedAction,
+        CameraOutput,
+        Bookmark,
+        CameraRecording,
+        PanicRecording,
+        SendMail,
+        Diagnostics,
+        ShowPopup,
+        CameraOutputInstant,
+        PlaySound,
+        SayText,
+        PlaySoundRepeated
+    };
+}
+
+int EventRemapData[][2] =
+{
+    { oldBusinessData::Camera_Motion,        QnBusiness::CameraMotionEvent     },
+    { oldBusinessData::Camera_Input,         QnBusiness::CameraInputEvent      },
+    { oldBusinessData::Camera_Disconnect,    QnBusiness::CameraDisconnectEvent },
+    { oldBusinessData::Storage_Failure,      QnBusiness::StorageFailureEvent   },
+    { oldBusinessData::Network_Issue,        QnBusiness::NetworkIssueEvent     },
+    { oldBusinessData::Camera_Ip_Conflict,   QnBusiness::CameraIpConflictEvent },
+    { oldBusinessData::MediaServer_Failure,  QnBusiness::ServerFailureEvent    },
+    { oldBusinessData::MediaServer_Conflict, QnBusiness::ServerConflictEvent   },
+    { oldBusinessData::MediaServer_Started,  QnBusiness::ServerStartEvent      },
+    { -1,                                    -1                                }
+};
+
+int ActionRemapData[][2] =
+{
+    { oldBusinessData::CameraOutput,        QnBusiness::CameraOutputAction     },
+    { oldBusinessData::Bookmark,            QnBusiness::BookmarkAction         },
+    { oldBusinessData::CameraRecording,     QnBusiness::CameraRecordingAction  },
+    { oldBusinessData::PanicRecording,      QnBusiness::PanicRecordingAction   },
+    { oldBusinessData::SendMail,            QnBusiness::SendMailAction         },
+    { oldBusinessData::Diagnostics,         QnBusiness::DiagnosticsAction      },
+    { oldBusinessData::ShowPopup,           QnBusiness::ShowPopupAction        },
+    { oldBusinessData::CameraOutputInstant, QnBusiness::CameraOutputOnceAction },
+    { oldBusinessData::PlaySound,           QnBusiness::PlaySoundOnceAction    },
+    { oldBusinessData::SayText,             QnBusiness::SayTextAction          },
+    { oldBusinessData::PlaySoundRepeated,   QnBusiness::PlaySoundAction        },
+    { -1,                                   -1                                 }
+};
+
+int remapValue(int oldVal, const int remapData[][2])
+{
+    for (int i = 0; remapData[i][0] >= 0; ++i) 
+    {
+        if (remapData[i][0] == oldVal)
+            return remapData[i][1];
+    }
+    return oldVal;
+}
+
+bool QnDbManager::doRemap(int id, int newVal, const QString& fieldName)
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    QString sqlText = QString(lit("UPDATE vms_businessrule set %1 = ? where id = ?")).arg(fieldName);
+    query.prepare(sqlText);
+    query.addBindValue(newVal);
+    query.addBindValue(id);
+    return query.exec();
+}
+
+struct BeRemapData
+{
+    BeRemapData(): id(0), eventType(0), actionType(0) {}
+
+    int id;
+    int eventType;
+    int actionType;
+};
+
+bool QnDbManager::migrateBusinessEvents()
+{
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT id,event_type, action_type from vms_businessrule");
+    if (!query.exec())
+        return false;
+    
+    QVector<BeRemapData> oldData;
+    while (query.next())
+    {
+        BeRemapData data;
+        data.id = query.value("id").toInt();
+        data.eventType = query.value("event_type").toInt();
+        data.actionType = query.value("action_type").toInt();
+        oldData << data;
+    }
+
+    foreach(const BeRemapData& remapData, oldData) 
+    {
+        if (!doRemap(remapData.id, remapValue(remapData.eventType, EventRemapData), "event_type"))
+            return false;
+        if (!doRemap(remapData.id, remapValue(remapData.actionType, ActionRemapData), "action_type"))
+            return false;
+    }
+
+    return true;
+}
+
 bool QnDbManager::createDatabase()
 {
     QnDbTransactionLocker lock(&m_tran);
@@ -230,7 +353,12 @@ bool QnDbManager::createDatabase()
     {
         if (!execSQLFile(lit(":/01_createdb.sql")))
             return false;
+        if (!migrateBusinessEvents())
+            return false;
+    }
 
+    if (!isObjectExists(lit("table"), lit("transaction_log")))
+    {
 #ifdef EDGE_SERVER
         if (!execSQLFile(lit(":/02_insert_3thparty_vendor.sql")))
             return false;
