@@ -246,11 +246,11 @@ void QnTimePeriodCameraData::append(const QnAbstractCameraDataPtr &other) {
     QnTimePeriodList otherList;
     if (QnTimePeriodCameraData* other_casted = dynamic_cast<QnTimePeriodCameraData*>(other.data()))
         otherList = other_casted->m_data;
-    if (m_data.isEmpty())
+    if (otherList.isEmpty())
         return;
 
     QVector<QnTimePeriodList> allPeriods;
-    if (!otherList.isEmpty() && !m_data.isEmpty() && m_data.last().durationMs == -1) 
+    if (!m_data.isEmpty() && m_data.last().durationMs == -1) 
         if (otherList.last().startTimeMs >= m_data.last().startTimeMs) // TODO: #Elric should this be otherList.last().startTimeMs?
             m_data.last().durationMs = 0;
     allPeriods << m_data << otherList;

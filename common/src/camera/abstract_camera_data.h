@@ -3,8 +3,6 @@
 
 #include <common/common_globals.h>
 
-//#include <recording/time_period_list.h>
-
 class QnTimePeriodList;
 
 class QnAbstractCameraData;
@@ -12,7 +10,6 @@ typedef QSharedPointer<QnAbstractCameraData> QnAbstractCameraDataPtr;
 
 class QnAbstractCameraData {
 public:
-    //QnAbstractCameraData(): m_dataType(Qn::CameraDataTypeCount) {}
     QnAbstractCameraData(const Qn::CameraDataType dataType);
     
     virtual void append(const QnAbstractCameraDataPtr &other);

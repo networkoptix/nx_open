@@ -1,8 +1,11 @@
 #include "generic_camera_data_loader.h"
 
+#include <camera/bookmark_camera_data.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
@@ -10,6 +13,8 @@
 
 namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
+
+    const int maxBookmarksPerTimeline = 100;
 }
 
 QnGenericCameraDataLoader::QnGenericCameraDataLoader(const QnMediaServerConnectionPtr &connection, const QnNetworkResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent):
@@ -120,16 +125,36 @@ int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad) {
             this, 
             SLOT(at_timePeriodsReceived(int, const QnTimePeriodList &, int))
         );
+    case Qn::BookmarkData:
+        {
+            QnCameraBookmarkSearchFilter bookmarkFilter;
+            bookmarkFilter.minStartTimeMs = periodToLoad.startTimeMs;
+            bookmarkFilter.maxStartTimeMs = periodToLoad.startTimeMs + periodToLoad.durationMs;
+            bookmarkFilter.minDurationMs = periodToLoad.durationMs / maxBookmarksPerTimeline;
+            bookmarkFilter.tags = m_filter.split(L',');
+
+            return m_connection->getBookmarksAsync( 
+                m_resource.dynamicCast<QnNetworkResource>(),
+                bookmarkFilter,
+                this,
+                SLOT(at_bookmarksReceived(int, const QnCameraBookmarkList &, int))
+                );
+        }
     default:
-        assert(false); //TODO: #GDM implement me!
+        assert(false); //should never get here
         break;
     }
     return -1;
 }
 
-void QnGenericCameraDataLoader::at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requstHandle) {
+void QnGenericCameraDataLoader::at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle) {
    QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(m_dataType, timePeriods));
-   handleDataLoaded(status, data, requstHandle);
+   handleDataLoaded(status, data, requestHandle);
+}
+
+void QnGenericCameraDataLoader::at_bookmarksReceived(int status, const QnCameraBookmarkList &bookmarks, int requestHandle) {
+    QnAbstractCameraDataPtr data(new QnBookmarkCameraData(bookmarks));
+    handleDataLoaded(status, data, requestHandle);
 }
 
 void QnGenericCameraDataLoader::updateLoadedPeriods(QnTimePeriod loadedPeriod) {

@@ -7,6 +7,7 @@
 #include <api/media_server_connection.h>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <camera/abstract_camera_data.h>
 #include <camera/loaders/abstract_camera_data_loader.h>
@@ -44,7 +45,8 @@ public:
     virtual void discardCachedData() override;
 
 private slots:
-    void at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requstHandle);
+    void at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle);
+    void at_bookmarksReceived(int status, const QnCameraBookmarkList &bookmarks, int requestHandle);
 
 private:
     int sendRequest(const QnTimePeriod &periodToLoad);

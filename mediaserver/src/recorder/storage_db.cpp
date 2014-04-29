@@ -248,7 +248,7 @@ bool QnStorageDb::getBookmarks(const QByteArray &cameraGuid, const QnCameraBookm
                      LEFT JOIN storage_bookmark_tag tag \
                      ON book.guid = tag.bookmark_guid " 
                      + filterStr +
-                     " ORDER BY guid");
+                     " ORDER BY guid, startTimeMs");
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
