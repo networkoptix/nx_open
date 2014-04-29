@@ -49,6 +49,6 @@ Q_DECLARE_METATYPE(QnCameraBookmarkList);
 Q_DECLARE_METATYPE(QnCameraBookmarkMap);
 Q_DECLARE_METATYPE(QnCameraBookmarkTagsUsage);
 
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark, (metatype)(sql))
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark, (metatype)(sql)(json))
 
 #endif //QN_CAMERA_BOOKMARK_H

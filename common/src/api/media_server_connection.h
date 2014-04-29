@@ -64,6 +64,7 @@ signals:
     void finished(int status, const QnPtzTourList &reply, int handle);
     void finished(int status, const QnPtzObject &reply, int handle);
     void finished(int status, const QnPtzData &reply, int handle);
+    void finished(int status, const QnCameraBookmark &reply, int handle);
 
 private:
     friend class QnAbstractReplyProcessor;

@@ -387,8 +387,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     }
     case BookmarkAddObject: {
-        qDebug() << "bookmark added" << response.status << response.data;
-        emitFinished(this, response.status, handle);
+        processJsonReply<QnCameraBookmark>(this, response, handle);
         break;
     }
     default:
@@ -788,12 +787,12 @@ int QnMediaServerConnection::getEventLogAsync(
 }
 
 int QnMediaServerConnection::addBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot) {
-    QnRequestParamList params;
-    params 
-        << QnRequestParam("id", camera->getPhysicalId())
-        << QnRequestParam("startTime", bookmark.startTimeMs)
-        << QnRequestParam("duration", bookmark.durationMs);    
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
 
-    return sendAsyncGetRequest(BookmarkAddObject, params, NULL, target, slot);
+    QnRequestParamList params;
+    params << QnRequestParam("id", camera->getPhysicalId());    
+
+    return sendAsyncPostRequest(BookmarkAddObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
 }
 

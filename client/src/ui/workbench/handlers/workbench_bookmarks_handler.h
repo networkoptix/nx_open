@@ -24,7 +24,7 @@ public:
     QnCameraBookmarkTagsUsage tagsUsage() const;
 private slots:
     void at_bookmarkTimeSelectionAction_triggered();
-    void at_bookmarkAdded(int status, const QVariant &data, int handle);
+    void at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle);
 
     void updateTagsUsage();
 private:

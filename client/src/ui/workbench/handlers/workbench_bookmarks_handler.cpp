@@ -56,7 +56,8 @@ void QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered() {
     if (!server)
         return; // TODO: #GDM show some diagnostic messages
 
-    int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkAdded(int, const QVariant &, int)));
+    qDebug() << "adding bookmark..." << bookmark;
+    int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkAdded(int, const QnCameraBookmark &, int)));
     m_addingBookmarks[handle] = camera;
 }
 
@@ -98,7 +99,9 @@ QnMediaServerResourcePtr QnWorkbenchBookmarksHandler::getMediaServerOnTime(const
     return mediaServer;
 }
 
-void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QVariant &data, int handle) {
+void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle) {
+    qDebug() << "bookmark added" << bookmark;
+
     QnResourcePtr camera = m_addingBookmarks.take(handle);
     if (status != 0 || !camera)
         return;
@@ -107,6 +110,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QVariant &d
     if (!loader)
         return;
 
+    //TODO: #GDM append bookmark to loader instead of forced update
     loader->forceUpdate();
 }
 
