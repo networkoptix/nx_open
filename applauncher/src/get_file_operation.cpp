@@ -174,7 +174,8 @@ namespace detail
             std::unique_lock<std::mutex> lk( m_mutex );
             m_state = State::sFinished;
         }
-        NX_LOG( QString::fromLatin1("RDirSyncher. GetFileOperation done. File %1, bytes written %2").arg(entryPath).arg(m_totalBytesWritten), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1("RDirSyncher. GetFileOperation done. File %1, bytes written %2, result %3").
+            arg(entryPath).arg(m_totalBytesWritten).arg(ResultCode::toString(result())), cl_logDEBUG2 );
 
 #ifndef _WIN32
         //setting execution rights to file
@@ -306,14 +307,33 @@ namespace detail
 
     void GetFileOperation::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     {
-        NX_LOG( QString::fromLatin1("GetFileOperation::onHttpDone. file %1").arg(entryPath), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1("GetFileOperation::onHttpDone. file %1, state %2. http result %3").
+            arg(entryPath).arg((int)m_state).arg(!httpClient->failed()), cl_logDEBUG2 );
 
-        //TODO/IMPL in case of error we'll be here in state State::sCheckingLocalFile
+        switch( m_state )
+        {
+            case State::sCheckingLocalFile:
+                if( !httpClient->failed() )
+                    return;
+
+                {
+                    std::unique_lock<std::mutex> lk( m_mutex );
+                    setResult( ResultCode::downloadFailure );
+                    setErrorText( httpClient->response() ? httpClient->response()->statusLine.reasonPhrase : "FAILURE" );    //TODO proper error text
+                    m_state = State::sFinished;
+                }
+                NX_LOG( QString::fromLatin1("RDirSyncher. GetFileOperation::onHttpDone. Failed to get file %1 size").arg(entryPath), cl_logDEBUG2 );
+                m_handler->operationDone( shared_from_this() );
+                return;
+
+            case State::sDownloadingFile:
+                break;
+
+            default:
+                return;
+        }
 
         std::unique_lock<std::mutex> lk( m_mutex );
-
-        if( m_state != State::sDownloadingFile )
-            return;
 
         assert( m_httpClient == httpClient );
 
@@ -322,7 +342,15 @@ namespace detail
         {
             //downloading has been interrupted unexpectedly
             setResult( ResultCode::downloadFailure );
-            setErrorText( httpClient->response()->statusLine.reasonPhrase );    //TODO proper error text
+            setErrorText( httpClient->response() ? httpClient->response()->statusLine.reasonPhrase : "FAILURE" );    //TODO proper error text
+
+            if( !m_outFile.get() )  //TODO: #ak this condition should be replaced with one more state
+            {
+                m_state = State::sFinished;
+                lk.unlock();
+                m_handler->operationDone( shared_from_this() );
+                return;
+            }
         }
         else
         {

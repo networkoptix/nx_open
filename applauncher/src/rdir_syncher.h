@@ -201,6 +201,7 @@ private:
     QString m_lastErrorText;
     QString m_failedEntryPath;
     QUrl m_currentMirror;
+    int m_downloadRetryCount;
 
     //!Starts multiple operations by calling \a RDirSyncher::startNextOperation()
     void startOperations( std::list<RSyncEventTrigger*>& eventToTrigger );
