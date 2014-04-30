@@ -98,16 +98,17 @@ namespace nx_hls
             HLSSession* const session,
             const nx_http::Request& request,
             const QStringRef& uniqueResourceID,
+            const QnSecurityCamResourcePtr& camResource,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
         nx_http::StatusCode::Value getLiveChunkPlaylist(
             HLSSession* const session,
-            QnMediaResourcePtr mediaResource,
+            const QnSecurityCamResourcePtr& camResource,
             const std::multimap<QString, QString>& requestParams,
             std::vector<nx_hls::AbstractPlaylistManager::ChunkData>* const chunkList );
         nx_http::StatusCode::Value getArchiveChunkPlaylist(
             HLSSession* const session,
-            const QnMediaResourcePtr& mediaResource,
+            const QnSecurityCamResourcePtr& camResource,
             const std::multimap<QString, QString>& requestParams,
             std::vector<nx_hls::AbstractPlaylistManager::ChunkData>* const chunkList,
             bool* const isPlaylistClosed );

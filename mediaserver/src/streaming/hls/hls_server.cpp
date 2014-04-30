@@ -11,6 +11,7 @@
 #include <map>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/security_cam_resource.h>
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/media/media_stream_cache.h>
@@ -41,7 +42,8 @@ namespace nx_hls
     static const QLatin1String HLS_PREFIX( "/hls/" );
     static const QLatin1String HLS_SESSION_PARAM_NAME( "hls_session" );
     static const quint64 MS_IN_SEC = 1000;
-    static const quint64 MICROS_IN_MS = 1000;
+    static const quint64 USEC_IN_MSEC = 1000;
+    static const quint64 USEC_IN_SEC = MS_IN_SEC * USEC_IN_MSEC;
 
     QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner )
     :
@@ -59,7 +61,9 @@ namespace nx_hls
     {
         if( m_currentChunk )
         {
-            disconnect( m_currentChunk, SIGNAL(newDataIsAvailable(StreamingChunk*, quint64)), this, SLOT(chunkDataAvailable(StreamingChunk*, quint64)) );
+            //TODO: #ak fix synchronization error: possibly, StreamingChunk::newDataIsAvailable signal 
+                //can be delivered to already deleted QnHttpLiveStreamingProcessor
+            disconnect( m_currentChunk, &StreamingChunk::newDataIsAvailable, this, &QnHttpLiveStreamingProcessor::chunkDataAvailable );
             StreamingChunkCache::instance()->putBackUsedItem( m_currentChunkKey, m_currentChunk );
         }
     }
@@ -149,10 +153,7 @@ namespace nx_hls
                 arg(remoteHostAddress().toString()).arg(m_httpStreamReader.errorText()), cl_logWARNING );
             return false;
         }
-        if( bytesProcessed == (size_t)m_readBuffer.size() )
-            m_readBuffer.clear();    //small optimization. may be excessive
-        else
-            m_readBuffer.remove( 0, bytesProcessed );
+        m_readBuffer.remove( 0, bytesProcessed );
 
         switch( m_httpStreamReader.state() )
         {
@@ -199,7 +200,7 @@ namespace nx_hls
             "Date",
             QLocale(QLocale::English).toString(QDateTime::currentDateTime(), "ddd, d MMM yyyy hh:mm:ss GMT").toLatin1() ) );     //TODO/IMPL/HLS get timezone
         response.headers.insert( std::make_pair( "Server", QN_APPLICATION_NAME " " QN_APPLICATION_VERSION ) );
-        response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //findRequestedFile can override this
+        response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //getRequestedFile can override this
 
         response.statusLine.statusCode = getRequestedFile( request, &response );
         if( response.statusLine.reasonPhrase.isEmpty() )
@@ -327,9 +328,26 @@ namespace nx_hls
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
     {
+        //searching for requested resource
+        QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqId( uniqueResourceID.toString() );
+        if( !resource )
+        {
+            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getHLSPlaylist. Requested resource %1 not found").
+                arg(QString::fromRawData(uniqueResourceID.data(), uniqueResourceID.size())), cl_logDEBUG1 );
+            return nx_http::StatusCode::notFound;
+        }
+
+        QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
+        if( !camResource )
+        {
+            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getHLSPlaylist. Requested resource %1 is not camera").
+                arg(QString::fromRawData(uniqueResourceID.data(), uniqueResourceID.size())), cl_logDEBUG1 );
+            return nx_http::StatusCode::notFound;
+        }
+
         //searching for session (if specified)
         std::multimap<QString, QString>::const_iterator sessionIDIter = requestParams.find( StreamingParams::SESSION_ID_PARAM_NAME );
-        QString sessionID = sessionIDIter != requestParams.end()
+        const QString& sessionID = sessionIDIter != requestParams.end()
             ? sessionIDIter->second
             : HLSSessionPool::generateUniqueID();
 
@@ -348,12 +366,14 @@ namespace nx_hls
             {
                 //TODO/IMPL/HLS
                     //converting startDatetime to timestamp
-                quint64 startTimestamp = 0;
+                const quint64 startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
                 //generating sliding playlist, holding not more than CHUNK_COUNT_IN_ARCHIVE_PLAYLIST archive chunks
                 session->setPlaylistManager( QSharedPointer<AbstractPlaylistManager>(
                     new ArchivePlaylistManager(
+                        camResource,
                         startTimestamp,
-                        CHUNK_COUNT_IN_ARCHIVE_PLAYLIST)) );
+                        CHUNK_COUNT_IN_ARCHIVE_PLAYLIST,
+                        DEFAULT_TARGET_DURATION * USEC_IN_SEC)) );
             }
         }
 
@@ -361,7 +381,7 @@ namespace nx_hls
         if( chunkedParamIter == requestParams.end() )
             return getHLSVariantPlaylist( session, request, uniqueResourceID, requestParams, response );
         else
-            return getHLSChunkedPlaylist( session, request, uniqueResourceID, requestParams, response );
+            return getHLSChunkedPlaylist( session, request, uniqueResourceID, camResource, requestParams, response );
     }
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getHLSVariantPlaylist(
@@ -422,26 +442,10 @@ namespace nx_hls
         HLSSession* const session,
         const nx_http::Request& request,
         const QStringRef& uniqueResourceID,
+        const QnSecurityCamResourcePtr& camResource,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
     {
-        //searching for requested resource
-        QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqId( uniqueResourceID.toString() );
-        if( !resource )
-        {
-            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getHLSPlaylist. Requested resource %1 not found").
-                arg(QString::fromRawData(uniqueResourceID.data(), uniqueResourceID.size())), cl_logDEBUG1 );
-            return nx_http::StatusCode::notFound;
-        }
-
-        QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
-        if( !mediaResource )
-        {
-            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getHLSPlaylist. Requested resource %1 is not media resource").
-                arg(QString::fromRawData(uniqueResourceID.data(), uniqueResourceID.size())), cl_logDEBUG1 );
-            return nx_http::StatusCode::notFound;
-        }
-
         Q_ASSERT( session );
 
         std::vector<nx_hls::AbstractPlaylistManager::ChunkData> chunkList;
@@ -449,12 +453,12 @@ namespace nx_hls
         const nx_http::StatusCode::Value playlistResult = session->isLive()
             ? getLiveChunkPlaylist(
                 session,
-                mediaResource,
+                camResource,
                 requestParams,
                 &chunkList )
             : getArchiveChunkPlaylist(
                 session,
-                mediaResource,
+                camResource,
                 requestParams,
                 &chunkList,
                 &isPlaylistClosed );
@@ -510,7 +514,7 @@ namespace nx_hls
             nx_hls::Chunk hlsChunk;
             hlsChunk.duration = chunkList[i].duration / 1000000.0;
             hlsChunk.url = baseChunkUrl;
-            hlsChunk.url.setPath( HLS_PREFIX + mediaResource->toResource()->getUniqueId() );
+            hlsChunk.url.setPath( HLS_PREFIX + camResource->getUniqueId() );
             QUrlQuery hlsChunkUrlQuery( hlsChunk.url.query() );
             foreach( RequestParamsType::value_type param, commonChunkParams )
                 hlsChunkUrlQuery.addQueryItem( param.first, param.second );
@@ -532,21 +536,21 @@ namespace nx_hls
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getLiveChunkPlaylist(
         HLSSession* const /*session*/,
-        QnMediaResourcePtr mediaResource,
+        const QnSecurityCamResourcePtr& camResource,
         const std::multimap<QString, QString>& /*requestParams*/,
         std::vector<nx_hls::AbstractPlaylistManager::ChunkData>* const chunkList )
     {
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera( mediaResource->toResourcePtr() );
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera( camResource );
         if( !camera )
         {
-            NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 which is not camera").arg(mediaResource->toResource()->getUniqueId()), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 which is not camera").arg(camResource->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::forbidden;
         }
 
         //starting live caching, if it is not started
         if( !camera->ensureLiveCacheStarted() )
         {
-            NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 with no live cache").arg(mediaResource->toResource()->getUniqueId()), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 with no live cache").arg(camResource->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::internalServerError;
         }
 
@@ -556,11 +560,11 @@ namespace nx_hls
         const unsigned int chunksGenerated = camera->hlsLivePlaylistManager()->generateChunkList( chunkList, NULL );
         if( chunksGenerated == 0 )
         {
-            NX_LOG( QString::fromLatin1("Failed to get live chunks of resource %1").arg(mediaResource->toResource()->getUniqueId()), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("Failed to get live chunks of resource %1").arg(camResource->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::noContent;
         }
 
-        NX_LOG( QString::fromLatin1("Prepared live playlist of resource %1 (%2 chunks)").arg(mediaResource->toResource()->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1("Prepared live playlist of resource %1 (%2 chunks)").arg(camResource->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
 
         return nx_http::StatusCode::ok;
     }
@@ -569,17 +573,17 @@ namespace nx_hls
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getArchiveChunkPlaylist(
         HLSSession* const session,
-        const QnMediaResourcePtr& mediaResource,
+        const QnSecurityCamResourcePtr& camResource,
         const std::multimap<QString, QString>& /*requestParams*/,
         std::vector<nx_hls::AbstractPlaylistManager::ChunkData>* const chunkList,
         bool* const isPlaylistClosed )
     {
         Q_ASSERT( session );
 
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera( mediaResource->toResourcePtr() );
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera( camResource );
         if( !camera )
         {
-            NX_LOG( QString::fromLatin1("Error. Requested hls playlist of resource %1 which is not camera").arg(mediaResource->toResource()->getUniqueId()), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("Error. Requested hls playlist of resource %1 which is not camera").arg(camResource->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::forbidden;
         }
 
@@ -588,11 +592,11 @@ namespace nx_hls
         const unsigned int chunksGenerated = session->playlistManager()->generateChunkList( chunkList, isPlaylistClosed );
         if( chunksGenerated == 0 )
         {
-            NX_LOG( QString::fromLatin1("Failed to get archive chunks of resource %1").arg(mediaResource->toResource()->getUniqueId()), cl_logWARNING );
+            NX_LOG( QString::fromLatin1("Failed to get archive chunks of resource %1").arg(camResource->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::noContent;
         }
 
-        NX_LOG( QString::fromLatin1("Prepared archive playlist of resource %1 (%2 chunks)").arg(mediaResource->toResource()->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
+        NX_LOG( QString::fromLatin1("Prepared archive playlist of resource %1 (%2 chunks)").arg(camResource->getUniqueId()).arg(chunksGenerated), cl_logDEBUG2 );
 
         return nx_http::StatusCode::ok;
     }
@@ -643,7 +647,7 @@ namespace nx_hls
             startTimestamp,
             durationIter != requestParams.end()
                 ? durationIter->second.toLongLong()
-                : DEFAULT_TARGET_DURATION * MS_IN_SEC * MICROS_IN_MS,
+                : DEFAULT_TARGET_DURATION * MS_IN_SEC * USEC_IN_MSEC,
                 //: std::numeric_limits<quint64>::max(),  //TODO/IMPL support downloading to the end, but that chunk MUST not be cached!
             //endTimestampIter != requestParams.end()
             //    ? QDateTime::fromString(endTimestampIter->second, Qt::ISODate)
@@ -662,20 +666,20 @@ namespace nx_hls
         //streaming chunk
         if( m_currentChunk )
         {
-            disconnect( m_currentChunk, SIGNAL(newDataIsAvailable(StreamingChunk*, quint64)), this, SLOT(chunkDataAvailable(StreamingChunk*, quint64)) );
+            disconnect( m_currentChunk, &StreamingChunk::newDataIsAvailable, this, &QnHttpLiveStreamingProcessor::chunkDataAvailable );
             StreamingChunkCache::instance()->putBackUsedItem( m_currentChunkKey, m_currentChunk );
         }
 
         m_currentChunk = chunk;
         connect(
-            m_currentChunk, SIGNAL(newDataIsAvailable(StreamingChunk*, quint64)),
-            this,           SLOT(chunkDataAvailable(StreamingChunk*, quint64)),
+            m_currentChunk, &StreamingChunk::newDataIsAvailable,
+            this,           &QnHttpLiveStreamingProcessor::chunkDataAvailable,
             Qt::DirectConnection );
         m_chunkReadCtx = StreamingChunk::SequentialReadingContext();
 
         response->headers.insert( make_pair( "Content-Type", m_currentChunk->mimeType().toLatin1() ) );
         if( m_currentChunk->isClosed() && m_currentChunk->sizeInBytes() > 0 )   //TODO/IMPL is condition sutisfying?
-	  response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
+            response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
         else
             response->headers.insert( make_pair( "Transfer-Encoding", "chunked" ) );
         response->statusLine.version = nx_http::Version::http_1_1;

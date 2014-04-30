@@ -76,7 +76,7 @@ protected:
 private:
     struct TranscodeContext
     {
-        QnMediaResourcePtr mediaResource;
+        QnSecurityCamResourcePtr mediaResource;
         QSharedPointer<AbstractOnDemandDataProvider> dataSource;
         StreamingChunkCacheKey transcodeParams;
         StreamingChunk* const chunk;
@@ -96,7 +96,7 @@ private:
 
     bool startTranscoding(
         int transcodingID,
-        const QnMediaResourcePtr& mediaResource,
+        const QnSecurityCamResourcePtr& mediaResource,
         QSharedPointer<AbstractOnDemandDataProvider> dataSource,
         const StreamingChunkCacheKey& transcodeParams,
         StreamingChunk* const chunk );

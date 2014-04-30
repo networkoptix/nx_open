@@ -8,7 +8,7 @@
 
 #include <core/dataprovider/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/resource/media_resource.h>
+#include <core/resource/security_cam_resource.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <utils/common/log.h>
@@ -75,8 +75,8 @@ bool StreamingChunkTranscoder::transcodeAsync(
         return false;
     }
 
-    QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
-    if( !mediaResource )
+    QnSecurityCamResourcePtr cameraResource = resource.dynamicCast<QnSecurityCamResource>();
+    if( !cameraResource )
     {
         NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 is not media resource").
             arg(transcodeParams.srcResourceUniqueID()), cl_logDEBUG1 );
@@ -114,7 +114,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
             //requested data is in live cache (at least, partially)
             if( startTranscoding(
                     p.first->first,
-                    mediaResource,
+                    cameraResource,
                     liveMediaCacheReader,
                     transcodeParams,
                     chunk ) )
@@ -145,7 +145,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     }
 
     //creating archive reader
-    QSharedPointer<QnAbstractStreamDataProvider> dp( mediaResource->toResource()->createDataProvider( QnResource::Role_Archive ) );
+    QSharedPointer<QnAbstractStreamDataProvider> dp( cameraResource->createDataProvider( QnResource::Role_Archive ) );
     if( !dp )
     {
         NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Failed (1) to create archive data provider (resource %1)").
@@ -168,7 +168,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     {
         if( startTranscoding(
                 p.first->first,
-                mediaResource,
+                cameraResource,
                 onDemandArchiveReader,
                 transcodeParams,
                 chunk ) )
@@ -183,7 +183,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     }
 
     NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Failed to find source. "
-        "Resource %1, statTime %2, duration %3").arg(mediaResource->toResource()->getUniqueId()).
+        "Resource %1, statTime %2, duration %3").arg(cameraResource->getUniqueId()).
         arg(transcodeParams.startTimestamp()).arg(transcodeParams.endTimestamp()), cl_logWARNING );
 
     m_transcodings.erase( p.first );
@@ -238,7 +238,7 @@ void StreamingChunkTranscoder::onTimer( const quint64& timerID )
 
 bool StreamingChunkTranscoder::startTranscoding(
     int transcodingID,
-    const QnMediaResourcePtr& mediaResource,
+    const QnSecurityCamResourcePtr& mediaResource,
     QSharedPointer<AbstractOnDemandDataProvider> dataSource,
     const StreamingChunkCacheKey& transcodeParams,
     StreamingChunk* const chunk )
@@ -257,8 +257,8 @@ bool StreamingChunkTranscoder::startTranscoding(
     //TODO/IMPL/HLS setting correct video parameters
     CodecID codecID = CODEC_ID_NONE;
     QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
-    const CodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO/IMPL/HLS get codec of resource video stream
-    QSize videoResolution = QSize( 1280, 720 );  //TODO/IMPL/HLS get resolution of resource video stream
+    const CodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO: #ak get codec of resource video stream. For HLS h264 is OK
+    QSize videoResolution = QSize( 1280, 720 );  //TODO: #ak get resolution of resource video stream. This resolution is ignored when TM_DirectStreamCopy is used
     if( transcodeParams.videoCodec().isEmpty() && !transcodeParams.pictureSizePixels().isValid() )
     {
         codecID = resourceVideoStreamCodecID;

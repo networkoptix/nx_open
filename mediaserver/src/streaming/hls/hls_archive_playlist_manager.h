@@ -7,12 +7,20 @@
 
 #include "hls_playlist_manager.h"
 
+#include <deque>
+
+#include <QtCore/QMutex>
+
+#include <core/resource/resource_fwd.h>
+#include <plugins/resources/archive/avi_files/thumbnails_archive_delegate.h>
+
 
 namespace nx_hls
 {
     //!Generates sliding chunk list for archive playback
     /*!
-        It is necessary to make archive playlist sliding since archive can be very long and playlist would be quite large (~ 25Mb for a month archive)
+        From hls point view this class generates "LIVE" playlist
+        \note It is necessary to make archive playlist sliding since archive can be very long and playlist would be quite large (~ 25Mb for a month archive)
     */
     class ArchivePlaylistManager
     :
@@ -20,8 +28,11 @@ namespace nx_hls
     {
     public:
         ArchivePlaylistManager(
+            const QnSecurityCamResourcePtr& camResource,
             quint64 startTimestamp,
-            unsigned int maxChunkNumberInPlaylist );
+            unsigned int maxChunkNumberInPlaylist,
+            quint64 targetDurationUsec );
+        virtual ~ArchivePlaylistManager();
 
         //!Implementantion of AbstractPlaylistManager::generateChunkList
         virtual unsigned int generateChunkList(
@@ -29,10 +40,25 @@ namespace nx_hls
             bool* const endOfStreamReached ) const;
 
     private:
+        const QnSecurityCamResourcePtr m_camResource;
         quint64 m_startTimestamp;
         unsigned int m_maxChunkNumberInPlaylist;
+        quint64 m_targetDurationUsec;
+        mutable QMutex m_mutex;
+        std::deque<AbstractPlaylistManager::ChunkData> m_chunks;
+        quint64 m_totalPlaylistDuration;
+        quint64 m_prevChunkEndTimestamp;
+        bool m_eof;
+        int m_chunkMediaSequence;
+        QnAbstractArchiveDelegate* m_archiveDelegate;
+        QnThumbnailsArchiveDelegate* m_delegate;
 
-        quint64 endTimestamp() const;
+        bool addOneMoreChunk();
+        /*!
+            \return -1, if end of archive has been reached
+        */
+        qint64 getNextStepArchiveTimestamp() const;
+        qint64 endTimestamp() const;
     };
 }
 

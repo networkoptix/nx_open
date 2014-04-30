@@ -495,7 +495,9 @@ bool QnVideoCamera::ensureLiveCacheStarted( QnAbstractMediaStreamDataProviderPtr
         return false;
 
     m_liveCache.reset( new MediaStreamCache( MEDIA_CACHE_SIZE_MILLIS, &m_mediaIndex ) );
-    m_hlsLivePlaylistManager.reset( new nx_hls::HLSLivePlaylistManager( m_liveCache.get(), &m_mediaIndex ) );
+    m_hlsLivePlaylistManager.reset( new nx_hls::HLSLivePlaylistManager(
+        m_liveCache.get(),
+        &m_mediaIndex ) );
     //connecting live cache to reader
     primaryReader->addDataProcessor( m_liveCache.get() );
     m_cameraUsers << this;
