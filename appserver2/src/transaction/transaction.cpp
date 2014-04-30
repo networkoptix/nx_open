@@ -58,8 +58,6 @@ namespace ec2
                     return "getCameras";
                 case getCameraHistoryList:
                     return "getCameraHistoryList";
-                case getCameraBookmarkTagsUsage:
-                    return "getCameraBookmarkTagsUsage";
                 case addCameraHistoryItem:
                     return "addCameraHistoryItem";
 
@@ -145,6 +143,9 @@ namespace ec2
                     return "lockResponse";
                 case unlockRequest:
                     return "unlockRequest";
+
+                case getCameraBookmarkTagsUsage:
+                    return "getCameraBookmarkTagsUsage";
 
                 default:
                     return "unknown " + QString::number((int)val);

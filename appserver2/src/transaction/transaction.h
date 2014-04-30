@@ -54,8 +54,6 @@ namespace ec2
             getCameraHistoryList = 18,
             //!ApiCameraServerItem
             addCameraHistoryItem = 19,
-            //!ApiCameraBookmarkTagDataList
-            getCameraBookmarkTagsUsage,
 
             getMediaServerList = 20,
             //!ApiMediaServer
@@ -141,6 +139,9 @@ namespace ec2
             lockRequest = 56,
             lockResponse = 57,
             unlockRequest = 58,
+
+            //!ApiCameraBookmarkTagDataList
+            getCameraBookmarkTagsUsage = 59,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
