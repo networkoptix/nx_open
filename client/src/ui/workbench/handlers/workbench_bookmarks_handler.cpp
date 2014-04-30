@@ -28,7 +28,9 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(Qn::BookmarkTimeSelectionAction),    &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered);
+    connect(action(Qn::AddCameraBookmarkAction),    &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
+    connect(action(Qn::EditCameraBookmarkAction),   &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered);
+    connect(action(Qn::RemoveCameraBookmarkAction), &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
 
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchBookmarksHandler::updateTags);
 
@@ -44,7 +46,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
 }
 
 
-void QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered() {
+void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
     if (!camera)
@@ -122,15 +124,19 @@ void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBoo
     m_tags.append(bookmark.tags);
     m_tags.removeDuplicates();
 
-    QnCachingCameraDataLoader* loader = navigator()->loader(camera);
-    if (!loader)
-        return;
-
-    //TODO: #GDM append bookmark to loader instead of forced update
-    loader->forceUpdate();
+    if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
+        loader->addBookmark(bookmark);
 }
 
 ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
     return QnAppServerConnectionFactory::getConnection2();
+}
+
+void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
+
+}
+
+void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
+
 }
 

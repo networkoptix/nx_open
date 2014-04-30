@@ -23,6 +23,7 @@ extern "C"
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/cam_display.h>
@@ -1220,13 +1221,25 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     if(m_timeSlider->isSelectionValid())
         selection = QnTimePeriod(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd() - m_timeSlider->selectionStart());
 
+    qint64 position = m_timeSlider->valueFromPosition(pos);
+
+    QnActionParameters parameters(currentTarget(Qn::SliderScope));
+    parameters.setArgument(Qn::TimePeriodRole, selection);
+    parameters.setArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)); // TODO: #Elric move this out into global scope!
+    parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
+    if (m_currentWidget && m_timeSlider->timePeriods(CurrentLine, Qn::BookmarksContent).containTime(position)) {
+        QnCameraBookmark bookmark;
+        if (QnCachingCameraDataLoader *loader = this->loader(m_currentMediaWidget))
+            bookmark = loader->bookmarkByTime(position);
+        if (!bookmark.guid.isNull())
+            parameters.setArgument(Qn::CameraBookmarkRole, /*bookmarkByTime(position)*/ true);
+    }
+    
+
     QScopedPointer<QMenu> menu(manager->newMenu(
         Qn::SliderScope,
         mainWindow(),
-        QnActionParameters(currentTarget(Qn::SliderScope)).
-            withArgument(Qn::TimePeriodRole, selection).
-            withArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)). // TODO: #Elric move this out into global scope!
-            withArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent))
+        parameters
     ));
     if(menu->isEmpty())
         return;
@@ -1242,11 +1255,9 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
 
     /* Process slider-local actions. */
     if(action == m_startSelectionAction) {
-        qint64 position = m_timeSlider->valueFromPosition(pos);
         m_timeSlider->setSelection(position, position);
         m_timeSlider->setSelectionValid(true);
     } else if(action == m_endSelectionAction) {
-        qint64 position = m_timeSlider->valueFromPosition(pos);
         m_timeSlider->setSelection(qMin(position, m_timeSlider->selectionStart()), qMax(position, m_timeSlider->selectionEnd()));
         m_timeSlider->setSelectionValid(true);
     } else if(action == m_clearSelectionAction) {

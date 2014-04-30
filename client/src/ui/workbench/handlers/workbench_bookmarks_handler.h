@@ -25,7 +25,9 @@ public:
 
     QnCameraBookmarkTags tags() const;
 private slots:
-    void at_bookmarkTimeSelectionAction_triggered();
+    void at_addCameraBookmarkAction_triggered();
+    void at_editCameraBookmarkAction_triggered();
+    void at_removeCameraBookmarkAction_triggered();
     void at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle);
 
     void updateTags();

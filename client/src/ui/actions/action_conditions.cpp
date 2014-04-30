@@ -396,9 +396,6 @@ Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters
     if(!parameters.hasArgument(Qn::TimePeriodRole))
         return Qn::InvisibleAction;
 
-    if(m_centralItemRequired && !context()->workbench()->item(Qn::CentralRole))
-        return m_nonMatchingVisibility;
-
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     if(!(m_periodTypes & period.type())) {
         return m_nonMatchingVisibility;
@@ -433,6 +430,12 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
         if(!periods.intersects(period))
             return Qn::DisabledAction;
     }
+    return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnModifyBookmarkActionCondition::check(const QnActionParameters &parameters) {
+    if(!parameters.hasArgument(Qn::CameraBookmarkRole))
+        return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
 

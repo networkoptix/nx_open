@@ -5,6 +5,7 @@
 #include <api/serializer/serializer.h>
 
 #include <core/resource/network_resource.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
@@ -268,9 +269,17 @@ void QnCachingCameraDataLoader::at_syncTime_timeChanged() {
     }
 }
 
-void QnCachingCameraDataLoader::forceUpdate() {
-    m_loaders[Qn::BookmarkTimePeriod]->discardCachedData();
-    load(Qn::BookmarkTimePeriod);
+// 
+// void QnCachingCameraDataLoader::forceUpdate() {
+//     m_loaders[Qn::BookmarkTimePeriod]->discardCachedData();
+//     load(Qn::BookmarkTimePeriod);
+// }
+
+void QnCachingCameraDataLoader::addBookmark(const QnCameraBookmark &bookmark) {
+    throw std::logic_error("The method or operation is not implemented.");
 }
 
 
+QnCameraBookmark QnCachingCameraDataLoader::bookmarkByTime(qint64 position) const {
+    throw std::logic_error("The method or operation is not implemented.");
+}

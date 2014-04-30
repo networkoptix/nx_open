@@ -346,6 +346,7 @@ public:
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
+        CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */

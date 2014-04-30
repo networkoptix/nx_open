@@ -1371,34 +1371,48 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Mark Selection Start")).
         shortcut(tr("[")).
         shortcutContext(Qt::WidgetShortcut).
-        condition(new QnTimePeriodActionCondition(Qn::NullTimePeriod, Qn::InvisibleAction, false, this));
+        condition(new QnTimePeriodActionCondition(Qn::NullTimePeriod, Qn::InvisibleAction, this));
 
     factory(Qn::EndTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Mark Selection End")).
         shortcut(tr("]")).
         shortcutContext(Qt::WidgetShortcut).
-        condition(new QnTimePeriodActionCondition(Qn::EmptyTimePeriod, Qn::InvisibleAction, false, this));
+        condition(new QnTimePeriodActionCondition(Qn::EmptyTimePeriod, Qn::InvisibleAction, this));
 
     factory(Qn::ClearTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Clear Selection")).
-        condition(new QnTimePeriodActionCondition(Qn::EmptyTimePeriod | Qn::NormalTimePeriod, Qn::InvisibleAction, false, this));
+        condition(new QnTimePeriodActionCondition(Qn::EmptyTimePeriod | Qn::NormalTimePeriod, Qn::InvisibleAction, this));
 
     factory(Qn::ZoomToTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Zoom to Selection")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::InvisibleAction, false, this));
+        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::InvisibleAction, this));
+
+    factory(Qn::AddCameraBookmarkAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Bookmark Selection...")).
+        condition(new QnExportActionCondition(true, this));
+
+    factory(Qn::EditCameraBookmarkAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Edit Bookmark...")).
+        condition(new QnModifyBookmarkActionCondition(this));
+
+    factory(Qn::RemoveCameraBookmarkAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Remove Bookmark...")).
+        condition(new QnModifyBookmarkActionCondition(this));
+
+    factory().
+        flags(Qn::Slider | Qn::SingleTarget).
+        separator();
 
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Export Selected Area...")).
         requiredPermissions(Qn::ExportPermission).
-        condition(new QnExportActionCondition(true, this));
-
-    factory(Qn::BookmarkTimeSelectionAction).
-        flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Bookmark Selection")).
         condition(new QnExportActionCondition(true, this));
 
     factory(Qn::ExportLayoutAction).

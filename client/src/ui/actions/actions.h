@@ -877,7 +877,17 @@ namespace Qn {
         /** 
          * Bookmark selected range.
          */
-        BookmarkTimeSelectionAction,
+        AddCameraBookmarkAction,
+
+        /**
+         * Edit selected bookmark.
+         */
+        EditCameraBookmarkAction,
+
+        /**
+         * Remove selected bookmark.
+         */
+        RemoveCameraBookmarkAction,
 
         /**
          * Opens new layout for Quick Search.

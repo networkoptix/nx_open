@@ -6,6 +6,7 @@
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
@@ -39,7 +40,8 @@ public:
 
     QnTimePeriodList periods(Qn::TimePeriodContent type);
 
-    void forceUpdate();
+    void addBookmark(const QnCameraBookmark &bookmark);
+    QnCameraBookmark bookmarkByTime(qint64 position) const;
 signals:
     void periodsChanged(Qn::TimePeriodContent type);
     void loadingFailed();
@@ -61,6 +63,7 @@ private:
     void init();
     void initLoaders(QnAbstractCameraDataLoader **loaders);
     static bool createLoaders(const QnResourcePtr &resource, QnAbstractCameraDataLoader **loaders);
+    
 private:
     QnResourcePtr m_resource;
     bool m_resourceIsLocal;
