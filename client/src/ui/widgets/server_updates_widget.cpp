@@ -4,7 +4,7 @@
 #include <QtWidgets/QMessageBox>
 
 #include <core/resource_management/resource_pool.h>
-#include <ui/models/server_updates_model.h>
+#include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/build_number_dialog.h>
@@ -22,7 +22,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(this);
 
-    ui->tableView->setModel(m_updatesModel);
+    QnSortedServerUpdatesModel *model = new QnSortedServerUpdatesModel(this);
+    model->setSourceModel(m_updatesModel);
+
+    ui->tableView->setModel(model);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::ResourceNameColumn, QHeaderView::Stretch);
 
