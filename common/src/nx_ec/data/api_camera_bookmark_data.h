@@ -7,6 +7,9 @@ namespace ec2
 {
     struct ApiCameraBookmarkTagData: ApiData {
         QString name;
+
+        ApiCameraBookmarkTagData(){};
+        ApiCameraBookmarkTagData(const QString &name): name(name) {}
     };
     #define ApiCameraBookmarkTagData_Fields (name)
 }

@@ -2,6 +2,8 @@
 
 #include <QtCore/QDir>
 
+#include <api/app_server_connection.h>
+
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
@@ -1045,6 +1047,11 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
         return false;
 
     sdb->addOrUpdateCameraBookmark(bookmark, cameraGuid);
+
+    if (!bookmark.tags.isEmpty())
+        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addBookmarkTags(bookmark.tags, this, [](int reqID, ec2::ErrorCode errorCode) {});
+    
+
     return true;
 }
 

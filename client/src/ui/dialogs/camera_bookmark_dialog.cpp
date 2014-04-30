@@ -68,11 +68,11 @@ void QnCameraBookmarkDialog::updateTagsList() {
     update();
 }
 
-QnCameraBookmarkTagsUsage QnCameraBookmarkDialog::tagsUsage() const {
+QnCameraBookmarkTags QnCameraBookmarkDialog::tagsUsage() const {
     return m_tagsUsage;
 }
 
-void QnCameraBookmarkDialog::setTagsUsage(const QnCameraBookmarkTagsUsage &tagsUsage) {
+void QnCameraBookmarkDialog::setTagsUsage(const QnCameraBookmarkTags &tagsUsage) {
     m_tagsUsage = tagsUsage;
     updateTagsList();
 }

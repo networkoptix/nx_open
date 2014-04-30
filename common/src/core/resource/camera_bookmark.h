@@ -28,7 +28,7 @@ struct QnCameraBookmark {
 
     qint64 endTimeMs() const;
 
-    QStringList tags;
+    QnCameraBookmarkTags tags;
 
     QnCameraBookmark():
         startTimeMs(0),
@@ -61,6 +61,6 @@ Q_DECLARE_METATYPE(QnCameraBookmark)
 Q_DECLARE_TYPEINFO(QnCameraBookmark, Q_MOVABLE_TYPE);
 
 Q_DECLARE_METATYPE(QnCameraBookmarkList)
-Q_DECLARE_METATYPE(QnCameraBookmarkTagsUsage)
+Q_DECLARE_METATYPE(QnCameraBookmarkTags)
 
 #endif //QN_CAMERA_BOOKMARK_H

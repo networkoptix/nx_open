@@ -32,8 +32,13 @@ namespace ec2
         virtual int save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler ) override;
         //!Implementation of AbstractCameraManager::remove
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
-        //!Implementation of AbstractCameraManager::getBookmarkTagsUsage
-        virtual int getBookmarkTagsUsage(impl::GetCameraBookmarkTagsUsageHandlerPtr handler) override;
+
+        //!Implementation of AbstractCameraManager::addBookmarkTags
+        virtual int addBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) override;
+        //!Implementation of AbstractCameraManager::getBookmarkTags
+        virtual int getBookmarkTags(impl::GetCameraBookmarkTagsHandlerPtr handler) override;
+        //!Implementation of AbstractCameraManager::removeBookmarkTags
+        virtual int removeBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) override;
 
         void triggerNotification( const QnTransaction<ApiCameraData>& tran )
         {
@@ -76,6 +81,25 @@ namespace ec2
             emit cameraHistoryChanged( cameraHistoryItem );
         }
 
+        void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran )
+        {
+            QnCameraBookmarkTags tags;
+            fromApiToResource(tran.params, tags);
+            if (tags.isEmpty())
+                return;
+
+            switch (tran.command) {
+            case ApiCommand::addCameraBookmarkTags:
+                emit cameraBookmarkTagsAdded(tags);
+                break;
+            case ApiCommand::removeCameraBookmarkTags:
+                emit cameraBookmarkTagsRemoved(tags);
+                break;
+            default:
+                assert(false);  //should never get here
+                break;
+            }
+        }
     private:
         QueryProcessorType* const m_queryProcessor;
 		ResourceContext m_resCtx;
@@ -84,6 +108,7 @@ namespace ec2
         QnTransaction<ApiCameraDataList> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourceList& cameras );
         QnTransaction<ApiCameraServerItemData> prepareTransaction( ApiCommand::Value cmd, const QnCameraHistoryItem& historyItem );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
+        QnTransaction<ApiCameraBookmarkTagDataList> prepareTransaction( ApiCommand::Value command, const QnCameraBookmarkTags& tags );
     };
 }
 

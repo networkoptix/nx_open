@@ -94,7 +94,7 @@ namespace ec2
         //getCameraServerItems
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
 
-        //getCameraBookmarkTagsUsage
+        //getCameraBookmarkTags
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags);
 
         //getUserList
@@ -155,6 +155,9 @@ namespace ec2
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicenseDataList>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicenseData>& tran);
+
+        /* Add or remove camera bookmark tags */
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
 
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiEmailSettingsData>&) {
@@ -228,6 +231,9 @@ namespace ec2
         ErrorCode updateBusinessRule(const ApiBusinessRuleData& rule);
 
         ErrorCode saveLicense(const ApiLicenseData& license);
+
+        ErrorCode addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
+        ErrorCode removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
 
         bool createDatabase();
         bool migrateBusinessEvents();

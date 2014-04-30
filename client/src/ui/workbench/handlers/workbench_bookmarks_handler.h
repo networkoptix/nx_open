@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 
+#include <nx_ec/ec_api.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 
@@ -21,16 +23,17 @@ class QnWorkbenchBookmarksHandler: public Connective<QObject>, public QnWorkbenc
 public:
     QnWorkbenchBookmarksHandler(QObject *parent = NULL);
 
-    QnCameraBookmarkTagsUsage tagsUsage() const;
+    QnCameraBookmarkTags tagsUsage() const;
 private slots:
     void at_bookmarkTimeSelectionAction_triggered();
     void at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle);
 
     void updateTagsUsage();
 private:
+    ec2::AbstractECConnectionPtr connection() const;
     QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 time) const;
 
-    QnCameraBookmarkTagsUsage m_tagsUsage;
+    QnCameraBookmarkTags m_tagsUsage;
     QHash<int, QnResourcePtr> m_addingBookmarks; 
 };
 

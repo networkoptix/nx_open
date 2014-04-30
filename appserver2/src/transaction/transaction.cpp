@@ -144,8 +144,12 @@ namespace ec2
                 case unlockRequest:
                     return "unlockRequest";
 
-                case getCameraBookmarkTagsUsage:
-                    return "getCameraBookmarkTagsUsage";
+                case addCameraBookmarkTags:
+                    return "addCameraBookmarkTags";
+                case getCameraBookmarkTags:
+                    return "getCameraBookmarkTags";
+                case removeCameraBookmarkTags:
+                    return "removeCameraBookmarkTags";
 
                 default:
                     return "unknown " + QString::number((int)val);

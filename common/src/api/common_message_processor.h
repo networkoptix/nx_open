@@ -39,6 +39,9 @@ signals:
     void execBusinessAction(const QnAbstractBusinessActionPtr& action);
 
     void videowallControlMessageReceived(const QnVideoWallControlMessage &message);
+
+    void cameraBookmarkTagsAdded(const QnCameraBookmarkTags &tags);
+    void cameraBookmarkTagsRemoved(const QnCameraBookmarkTags &tags);
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) = 0;

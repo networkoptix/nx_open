@@ -1,6 +1,7 @@
 #include "workbench_bookmarks_handler.h"
 
 #include <api/app_server_connection.h>
+#include <api/common_message_processor.h>
 
 #include <camera/loaders/caching_camera_data_loader.h>
 
@@ -30,6 +31,16 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(action(Qn::BookmarkTimeSelectionAction),    &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered);
 
     connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchBookmarksHandler::updateTagsUsage);
+
+    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsAdded, this, [this](const QnCameraBookmarkTags &tags) {
+        m_tagsUsage.append(tags);
+        m_tagsUsage.removeDuplicates();
+    });
+
+    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsRemoved, this, [this](const QnCameraBookmarkTags &tags) {
+        for (const QString &tag: tags)
+            m_tagsUsage.removeAll(tag);
+    });
 }
 
 
@@ -40,6 +51,14 @@ void QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered() {
         return;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+
+    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, period.startTimeMs);
+    if (!server || server->getStatus() != QnResource::Online) {
+        QMessageBox::warning(mainWindow(),
+            tr("Error"),
+            tr("Bookmark can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
+        return;
+    }
 
     QnCameraBookmark bookmark;
     bookmark.guid = QUuid::createUuid();
@@ -53,10 +72,6 @@ void QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered() {
         return;
     dialog->submitData(bookmark);
 
-    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, bookmark.startTimeMs);
-    if (!server)
-        return; // TODO: #GDM show some diagnostic messages
-
     int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkAdded(int, const QnCameraBookmark &, int)));
     m_addingBookmarks[handle] = camera;
 }
@@ -68,7 +83,7 @@ void QnWorkbenchBookmarksHandler::updateTagsUsage() {
         return;
     }
     
-    QnAppServerConnectionFactory::getConnection2()->getCameraManager()->getBookmarkTagsUsage(this, [this](int reqID, ec2::ErrorCode code, const QnCameraBookmarkTagsUsage &usage) {
+    connection()->getCameraManager()->getBookmarkTags(this, [this](int reqID, ec2::ErrorCode code, const QnCameraBookmarkTags &usage) {
         Q_UNUSED(reqID);
         if (code != ec2::ErrorCode::ok)
             return;
@@ -76,7 +91,7 @@ void QnWorkbenchBookmarksHandler::updateTagsUsage() {
     });
 }
 
-QnCameraBookmarkTagsUsage QnWorkbenchBookmarksHandler::tagsUsage() const {
+QnCameraBookmarkTags QnWorkbenchBookmarksHandler::tagsUsage() const {
     return m_tagsUsage;
 }
 
@@ -104,11 +119,18 @@ void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBoo
     if (status != 0 || !camera)
         return;
 
+    m_tagsUsage.append(bookmark.tags);
+    m_tagsUsage.removeDuplicates();
+
     QnCachingCameraDataLoader* loader = navigator()->loader(camera);
     if (!loader)
         return;
 
     //TODO: #GDM append bookmark to loader instead of forced update
     loader->forceUpdate();
+}
+
+ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
+    return QnAppServerConnectionFactory::getConnection2();
 }
 

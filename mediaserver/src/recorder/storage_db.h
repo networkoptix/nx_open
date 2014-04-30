@@ -29,7 +29,7 @@ public:
     bool replaceChunks(const QByteArray& mac, QnServer::ChunksCatalog catalog, const QVector<DeviceFileCatalog::Chunk>& chunks);
 
     bool removeCameraBookmarks(const QByteArray &mac);
-    bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QByteArray &mac);
+    bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QByteArray &mac); //TODO: #GDM add or UPDATE
     bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
 private:
     bool addRecordInternal(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);

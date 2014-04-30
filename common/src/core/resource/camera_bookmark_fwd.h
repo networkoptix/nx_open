@@ -10,7 +10,7 @@ typedef QList<QnCameraBookmark> QnCameraBookmarkList;
 
 struct QnCameraBookmarkSearchFilter;
 
-typedef QStringList QnCameraBookmarkTagsUsage;
+typedef QStringList QnCameraBookmarkTags;
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark, (sql)(json)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(eq))

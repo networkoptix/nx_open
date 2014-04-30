@@ -109,7 +109,7 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnCameraBookmark>();
     qRegisterMetaType<QnCameraBookmarkList>();
-    qRegisterMetaType<QnCameraBookmarkTagsUsage>();
+    qRegisterMetaType<QnCameraBookmarkTags>("QnCameraBookmarkTags");/* The underlying type is identical to QStringList. */
 
     qRegisterMetaType<QnLicensePtr>();
     qRegisterMetaType<QnLicenseList>();

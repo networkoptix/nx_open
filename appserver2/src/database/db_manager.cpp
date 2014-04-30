@@ -1907,6 +1907,53 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicenseDa
 //    return m_licenseManagerImpl->addLicenses( tran.params );
 }
 
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraBookmarkTagDataList> &tran) {
+
+    using std::tr1::function;
+    function<ec2::ErrorCode (const ApiCameraBookmarkTagData &)> processTag;
+
+    switch (tran.command) {
+    case ApiCommand::addCameraBookmarkTags:
+        processTag = [this](const ApiCameraBookmarkTagData &tag) {return addCameraBookmarkTag(tag);};
+        break;
+    case ApiCommand::removeCameraBookmarkTags:
+        processTag = [this](const ApiCameraBookmarkTagData &tag) {return removeCameraBookmarkTag(tag);};
+        break;
+    default:
+        assert(false); //should never get here
+        break;
+    }
+
+    for (const ApiCameraBookmarkTagData &tag: tran.params) {
+        ErrorCode result = processTag(tag);
+        if (result != ErrorCode::ok)
+            return result;
+    }
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag) {
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT OR REPLACE INTO vms_camera_bookmark_tag (name) VALUES (:name)");
+    QnSql::bind(tag, &insQuery);
+    if (insQuery.exec())
+        return ErrorCode::ok;
+
+    qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+    return ErrorCode::failure;
+}
+
+ErrorCode QnDbManager::removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag) {
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_camera_bookmark_tag WHERE name=:name");
+    QnSql::bind(tag, &delQuery);
+    if (delQuery.exec())
+        return ErrorCode::ok;
+
+    qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+    return ErrorCode::failure;
+}
+
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data)
 {
     QSqlQuery query(m_sdb);

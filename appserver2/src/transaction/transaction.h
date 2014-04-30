@@ -141,7 +141,9 @@ namespace ec2
             unlockRequest = 58,
 
             //!ApiCameraBookmarkTagDataList
-            getCameraBookmarkTagsUsage = 59,
+            addCameraBookmarkTags = 59,
+            getCameraBookmarkTags = 60,
+            removeCameraBookmarkTags = 61,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

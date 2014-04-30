@@ -283,10 +283,24 @@ namespace ec2
         }
 
         /*!
-            \param handler Functor with params: (ErrorCode, const QnCameraBookmarkTagsUsage& usage)
+            \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int getBookmarkTagsUsage( TargetType* target, HandlerType handler ) {
-            return getBookmarkTagsUsage( std::static_pointer_cast<impl::GetCameraBookmarkTagsUsageHandler>(std::make_shared<impl::CustomGetCameraBookmarkTagsUsageHandler<TargetType, HandlerType>>(target, handler)) );
+        template<class TargetType, class HandlerType> int addBookmarkTags( const QnCameraBookmarkTags &tags, TargetType* target, HandlerType handler ) {
+            return addBookmarkTags(tags, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+        /*!
+            \param handler Functor with params: (ErrorCode, const QnCameraBookmarkTags& usage)
+        */
+        template<class TargetType, class HandlerType> int getBookmarkTags( TargetType* target, HandlerType handler ) {
+            return getBookmarkTags( std::static_pointer_cast<impl::GetCameraBookmarkTagsHandler>(std::make_shared<impl::CustomGetCameraBookmarkTagsHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+        /*!
+            \param handler Functor with params: (ErrorCode)
+        */
+        template<class TargetType, class HandlerType> int removeBookmarkTags( const QnCameraBookmarkTags &tags, TargetType* target, HandlerType handler ) {
+            return removeBookmarkTags(tags, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
     signals:
@@ -294,6 +308,8 @@ namespace ec2
         void cameraHistoryChanged( QnCameraHistoryItemPtr cameraHistory );
         void cameraRemoved( QnId id );
 
+        void cameraBookmarkTagsAdded(const QnCameraBookmarkTags &tags);
+        void cameraBookmarkTagsRemoved(const QnCameraBookmarkTags &tags);
     protected:
         virtual int addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) = 0;
         virtual int addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler ) = 0;
@@ -301,7 +317,10 @@ namespace ec2
         virtual int getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler ) = 0;
         virtual int save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler ) = 0;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int getBookmarkTagsUsage( impl::GetCameraBookmarkTagsUsageHandlerPtr handler ) = 0;
+        
+        virtual int addBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) = 0;
+        virtual int getBookmarkTags(impl::GetCameraBookmarkTagsHandlerPtr handler) = 0;
+        virtual int removeBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractCameraManager> AbstractCameraManagerPtr;
 
