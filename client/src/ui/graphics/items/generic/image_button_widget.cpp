@@ -160,7 +160,8 @@ void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap) {
 }
 
 QIcon QnImageButtonWidget::icon() const {
-    return QIcon(); // TODO: #Elric what this method for?
+    static const QIcon emptyIcon;
+    return emptyIcon; // TODO: #Elric #ec2: change to anything appropriate
 }
 
 void QnImageButtonWidget::setIcon(const QIcon &icon) {

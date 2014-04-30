@@ -67,8 +67,11 @@ namespace ec2
 
             if (tran.persistent) {
                 errorCode = dbManager->executeTransaction( tran, serializedTran);
-                if( errorCode != ErrorCode::ok )
+                if( errorCode != ErrorCode::ok ) {
+                    if (errorCode == ErrorCode::skipped)
+                        errorCode = ErrorCode::ok;
                     return;
+                }
             }
 
             // delivering transaction to remote peers
@@ -132,6 +135,8 @@ namespace ec2
 
                 if (tran.persistent) {
                     errorCode = dbManager->executeNestedTransaction( tran, serializedTran);
+					if (errorCode == ErrorCode::skipped)
+						continue;
                     if( errorCode != ErrorCode::ok ) {
                         dbManager->rollback();
                         return;
@@ -149,7 +154,7 @@ namespace ec2
                 if (!tranData.first.localTransaction)
                     QnTransactionMessageBus::instance()->sendTransaction(tranData.first, tranData.second);
             }
-
+            errorCode = ErrorCode::ok;
         }
 
 
@@ -159,7 +164,7 @@ namespace ec2
             if (tran.persistent)
             {
                 ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
-                if( errorCode != ErrorCode::ok )
+                if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
                     return false;
             }
             return true;

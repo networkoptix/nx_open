@@ -10,7 +10,7 @@ namespace ec2
         ApiCameraServerItemData(): timestamp(0) {}
 
         QString  physicalId;
-        QString  serverGuid;
+        QString  serverGuid; // TODO: #Elric #EC2 is it server id?
         qint64   timestamp;
     };
 #define ApiCameraServerItemData_Fields (physicalId)(serverGuid)(timestamp)

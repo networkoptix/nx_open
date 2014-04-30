@@ -7,6 +7,8 @@
 namespace ec2
 {
 
+    // TODO: #Elric #EC2 totally evil naming
+
     struct ApiVideowallItemData {
         QnId guid;
         QnId pc_guid;

@@ -14,7 +14,7 @@ namespace ec2
 
         QString value;
         QString name;
-        bool isResTypeParam;
+        bool isResTypeParam; // TODO: #Elric #EC2 rename
     };
 #define ApiResourceParamData_Fields (value)(name)(isResTypeParam)
 
@@ -38,15 +38,15 @@ namespace ec2
         ApiResourceData(): status(QnResource::Offline), disabled(false) {}
 
         QnId          id;
-        QnId          parentGuid;
+        QnId          parentId;
         QnResource::Status    status;
-        bool          disabled;
+        bool          disabled; // TODO: #Elric #EC2 is it still around?
         QString       name;
         QString       url;
         QnId          typeId;
         std::vector<ApiResourceParamData> addParams;
     };
-#define ApiResourceData_Fields (id)(parentGuid)(status)(disabled)(name)(url)(typeId)(addParams)
+#define ApiResourceData_Fields (id)(parentId)(status)(disabled)(name)(url)(typeId)(addParams)
 
 
     struct ApiSetResourceDisabledData: ApiData {

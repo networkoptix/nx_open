@@ -23,7 +23,7 @@ namespace ec2
         float zoomRight;
         float zoomBottom;
         QByteArray zoomTargetUuid;
-        QByteArray contrastParams;
+        QByteArray contrastParams; // TODO: #Elric #EC2 rename
         QByteArray dewarpingParams;
     };
 #define ApiLayoutItemData_Fields (uuid)(flags)(left)(top)(right)(bottom)(rotation)(resourceId)(resourcePath) \

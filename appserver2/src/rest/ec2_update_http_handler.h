@@ -81,7 +81,7 @@ namespace ec2
             if (errorCode == ErrorCode::ok)
                 m_connection->triggerNotification(tran);
 
-            return (errorCode == ErrorCode::ok || errorCode == ErrorCode::skipped)
+            return (errorCode == ErrorCode::ok)
                 ? nx_http::StatusCode::ok
                 : nx_http::StatusCode::internalServerError;
         }

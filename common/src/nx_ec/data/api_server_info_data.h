@@ -15,8 +15,8 @@ namespace ec2 {
         QString systemName;
         QString sessionKey;
 
-        QString armBox;
-        bool allowCameraChanges;
+        QString armBox; // TODO: #Elric #EC2 what is this?
+        bool allowCameraChanges; // TODO: #Elric #EC2 use "enabled"
     };
 #define ApiServerInfoData_Fields (mainHardwareIds)(compatibleHardwareIds)(publicIp)(systemName)(sessionKey)(armBox)(allowCameraChanges)
 

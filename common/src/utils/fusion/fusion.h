@@ -34,7 +34,7 @@ namespace QnFusionDetail {
     boost::type_traits::no_type has_visit_members_test(...);
 
     template<class T>
-    struct has_visit_members: 
+    struct is_adapted: 
         boost::mpl::equal_to<
             boost::mpl::sizeof_<boost::type_traits::yes_type>, 
             boost::mpl::size_t<sizeof(has_visit_members_test(std::declval<T>()))>
@@ -128,38 +128,32 @@ QN_FUSION_DEFINE_KEY(classname)
 QN_FUSION_DEFINE_KEY(c_classname)
 QN_FUSION_DEFINE_KEY(optional)
 
-#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_base ,
+#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_base true
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_base(KEY, VALUE) (base, std::declval<VALUE>())
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_member_index ,
-#define QN_FUSION_PROPERTY_TYPE_FOR_member_index int
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_member_count ,
-#define QN_FUSION_PROPERTY_TYPE_FOR_member_count int
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_name ,
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_name true
 #define QN_FUSION_PROPERTY_TYPE_FOR_name QString
-#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_name ,
+#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_name true
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_name(KEY, VALUE) (name, QStringLiteral(VALUE))(c_name, VALUE)(sql_placeholder_name, QN_FUSION_LIT_CAT(":", VALUE))
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_name ,
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_name true
 #define QN_FUSION_PROPERTY_TYPE_FOR_c_name const char *
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_sql_placeholder_name ,
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_sql_placeholder_name true
 #define QN_FUSION_PROPERTY_TYPE_FOR_sql_placeholder_name QString
 
-#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_setter ,
+#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_setter true
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, QnFusionDetail::make_access_setter_category(access_type())) 
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname ,
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname true
 #define QN_FUSION_PROPERTY_TYPE_FOR_classname QString
-#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_classname ,
+#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_classname true
 #define QN_FUSION_PROPERTY_EXTENSION_FOR_classname(KEY, VALUE) (classname, QStringLiteral(VALUE))(c_classname, VALUE)
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_classname ,
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_classname true
 #define QN_FUSION_PROPERTY_TYPE_FOR_c_classname const char *
 
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_optional ,
+#define QN_FUSION_PROPERTY_IS_TYPED_FOR_optional true
 #define QN_FUSION_PROPERTY_TYPE_FOR_optional bool
 
 
@@ -178,18 +172,20 @@ namespace QnFusion {
      * 
      * Visitor is expected to define <tt>operator()</tt> of the following form:
      * \code
-     * template<class T, class Adaptor>
-     * bool operator()(const T &, const Adaptor &);
+     * template<class T, class Access>
+     * bool operator()(const T &, const Access &);
      * \endcode
      *
-     * Here <tt>Adaptor</tt> template parameter presents an interface defined
-     * by <tt>MemberAdaptor</tt> class. Return value of false indicates that
-     * iteration should be stopped, and in this case the function will
+     * Here <tt>Access</tt> template parameter presents an access interface, 
+     * defined by <tt>AccessAdaptor</tt> class. Return value of false indicates 
+     * that iteration should be stopped, and in this case this function will
      * return false.
      *
-     * Visitor can also optionally define <tt>operator()(const T &)</tt> that will then 
-     * be invoked before the iteration takes place. If this operator returns 
-     * false, then iteration won't start and the function will also return false.
+     * Visitor can also optionally define <tt>operator()</tt> with additinal
+     * parameter <tt>QnFusion::start_tag</tt> (or <tt>QnFusion::end_tag</tt>).
+     * This operator will then be invoked before (or after) the iteration takes place. 
+     * If this operator returns false, then iteration will stop and this 
+     * function will also return false.
      *
      * \param value                     Value to iterate through.
      * \param visitor                   Visitor class to apply to members.
@@ -258,6 +254,12 @@ namespace QnFusion {
         typed_setter_tag<T>
     {};
 
+    /**
+     * This metafunction returns a category of the given setter.
+     *
+     * \tparam Setter                   Setter type.
+     * \tparam T                        Setter parameter type.
+     */
     template<class Setter, class T>
     struct setter_category: 
         boost::mpl::if_<
@@ -267,6 +269,13 @@ namespace QnFusion {
         >
     {};
 
+    /**
+     * This metafunction returns a category of the setter specified by the
+     * given access type.
+     * 
+     * \tparam Access                   Access type.
+     * \see QnFusion::AccessAdaptor
+     */
     template<class Access>
     struct access_setter_category:
         setter_category<
@@ -280,8 +289,8 @@ namespace QnFusion {
 
 
     /**
-     * This class is the external interface that is to be used by visitor
-     * classes.
+     * This class defines the access interface, which is an external interface 
+     * that is to be used by visitor classes.
      */
     template<class Base>
     struct AccessAdaptor {
@@ -314,11 +323,13 @@ namespace QnFusion {
 
 
     /**
+     * This metafunction returns whether the given type is fusion-adapted.
      * 
+     * \tparam T                        Type to check.
      */
     template<class T>
-    struct has_visit_members: 
-        QnFusionDetail::has_visit_members<T>
+    struct is_adapted: 
+        QnFusionDetail::is_adapted<T>
     {};
 
 } // namespace QnFusion
@@ -409,7 +420,22 @@ namespace QnFusionDetail {
 
 
 /**
- *
+ * This macro generates several functions for the given fusion-adapted type. 
+ * Tokens for the functions to generate are passed in FUNCTION_SEQ parameter. 
+ * Accepted tokens are:
+ * <ul>
+ * <li> <tt>hash</tt>           --- <tt>qHash</tt> function. </li>
+ * <li> <tt>datastream</tt>     --- <tt>QDataStream</tt> (de)serialization functions. </li>
+ * <li> <tt>eq</tt>             --- <tt>operator==</tt> and <tt>operator!=</tt>. </li>
+ * <li> <tt>debug</tt>          --- <tt>QDebug</tt> streaming functions. </li>
+ * <li> <tt>json</tt>           --- json (de)serialization functions. </li>
+ * <li> <tt>binary</tt>         --- bns (de)serialization functions. </li>
+ * <li> <tt>sql</tt>            --- sql bind/fetch functions. </li>
+ * </ul>
+ * 
+ * \param TYPE                          Fusion-adapted type to define functions for.
+ * \param FUNCTION_SEQ                  Preprocessor sequence of functions to define.
+ * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
  */
 #define QN_FUSION_DEFINE_FUNCTIONS(CLASS, FUNCTION_SEQ, ... /* PREFIX */)       \
     BOOST_PP_SEQ_FOR_EACH(QN_FUSION_DEFINE_FUNCTIONS_STEP_I, (CLASS, ##__VA_ARGS__), FUNCTION_SEQ)
@@ -419,7 +445,14 @@ namespace QnFusionDetail {
 
 
 /**
- * TODO: Note why BOOST_PP_VARIADIC_SEQ_FOR_EACH
+ * Same as QN_FUSION_DEFINE_FUNCTIONS, but for several types.
+ * 
+ * \param CLASS_SEQ                     Preprocessor sequence of fusion-adapted types
+ *                                      to define functions for.
+ * \param FUNCTION_SEQ                  Preprocessor sequence of functions to define.
+ * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
+ * 
+ * \see QN_FUSION_DEFINE_FUNCTIONS
  */
 #define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(CLASS_SEQ, FUNCTION_SEQ, ... /* PREFIX */) \
     BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_I, (FUNCTION_SEQ, ##__VA_ARGS__), CLASS_SEQ)
@@ -430,6 +463,9 @@ namespace QnFusionDetail {
 
 /**
  * \internal
+ * 
+ * Produces a <tt>QStringLiteral</tt> from the given character literals.
+ * Works around a MSVC bug that prevents us to simply use <tt>QStringLiteral("a" "b")</tt>.
  */
 #define QN_FUSION_LIT_CAT(A, B)                                                 \
     QN_FUSION_LIT_CAT_I(A, B)
