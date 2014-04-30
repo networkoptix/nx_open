@@ -86,6 +86,13 @@ void QnServerUpdatesModel::setUpdatesInformation(const UpdateInformationHash &up
         emit dataChanged(index(0, UpdateColumn), index(m_items.size() - 1, UpdateColumn));
 }
 
+void QnServerUpdatesModel::setProgress(const QnMediaServerResourcePtr &server, int progress) {
+    foreach (Item *item, m_items) {
+        if (item->server() == server)
+            item->m_updateInfo.progress = progress;
+    }
+}
+
 void QnServerUpdatesModel::resetResourses() {
     beginResetModel();
 

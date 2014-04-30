@@ -67,9 +67,12 @@ public:
 
     QnSoftwareVersion targetVersion() const;
 
+    int uploadProgress(const QnId &peerId) const;
+
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);
+    void serverProgressChanged(const QnMediaServerResourcePtr &server, int progress);
 
 public slots:
     void checkForUpdates();
@@ -104,6 +107,13 @@ private:
     void installUpdatesToServers();
 
 private:
+    struct UploadData {
+        QnMediaServerResourcePtr server;
+        int progress;
+
+        UploadData(const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) : server(server), progress(0) {}
+    };
+
     State m_state;
     CheckResult m_checkResult;
     UpdateResult m_updateResult;
@@ -115,7 +125,7 @@ private:
     QnSoftwareVersion m_targetVersion;
     bool m_targetMustBeNewer;
 
-    QHash<QnId, QnMediaServerResourcePtr> m_pendingUploadServers;
+    QHash<QnId, UploadData> m_pendingUploads;
     QMultiHash<QnSystemInformation, QnId> m_serverIdBySystemInformation;
 
     QHash<QnId, QnMediaServerResourcePtr> m_pendingInstallServers;

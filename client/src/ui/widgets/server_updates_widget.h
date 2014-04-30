@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QWidget>
 
+#include <core/resource/media_server_resource.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
@@ -23,6 +24,7 @@ private slots:
     void at_installSpecificBuildButton_clicked();
     void at_updateFromLocalSourceButton_clicked();
     void at_updateButton_clicked();
+    void at_updateTool_serverProgressChanged(const QnMediaServerResourcePtr &server, int progress);
 
     void updateUpdatesList();
     void updateUi();

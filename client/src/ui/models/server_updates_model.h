@@ -69,6 +69,8 @@ public:
     QnMediaServerResourceList servers() const;
     void setUpdatesInformation(const UpdateInformationHash &updates);
 
+    void setProgress(const QnMediaServerResourcePtr &server, int progress);
+
 private:
     void resetResourses();
 

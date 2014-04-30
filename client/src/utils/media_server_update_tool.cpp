@@ -223,6 +223,14 @@ QnSoftwareVersion QnMediaServerUpdateTool::targetVersion() const {
     return m_targetVersion;
 }
 
+int QnMediaServerUpdateTool::uploadProgress(const QnId &peerId) const {
+    auto it = m_pendingUploads.find(peerId);
+    if (it == m_pendingUploads.end())
+        return m_pendingInstallServers.contains(peerId) ? 100 : 0;
+
+    return it->progress;
+}
+
 void QnMediaServerUpdateTool::checkForUpdates() {
     if (m_state >= CheckingForUpdates)
         return;
@@ -262,11 +270,13 @@ void QnMediaServerUpdateTool::at_updateUploaded(const QString &updateId, const Q
     if (updateId != m_targetVersion.toString())
         return;
 
-    m_pendingInstallServers.insert(peerId, m_pendingUploadServers.take(peerId));
+    UploadData uploadData = m_pendingUploads.take(peerId);
+    m_pendingInstallServers.insert(peerId, uploadData.server);
 
-    emit progressChanged(m_pendingInstallServers.size() * 100 / (m_pendingInstallServers.size() + m_pendingUploadServers.size()));
+    emit progressChanged(m_pendingInstallServers.size() * 100 / (m_pendingInstallServers.size() + m_pendingUploads.size()));
+    emit serverProgressChanged(uploadData.server, 100);
 
-    if (m_pendingUploadServers.isEmpty())
+    if (m_pendingUploads.isEmpty())
         installUpdatesToServers();
 }
 
@@ -325,14 +335,16 @@ void QnMediaServerUpdateTool::checkBuildOnline() {
 void QnMediaServerUpdateTool::uploadUpdatesToServers() {
     setState(UploadingUpdate);
 
-    m_pendingUploadServers.clear();
+    emit progressChanged(0);
+
+    m_pendingUploads.clear();
     m_serverIdBySystemInformation.clear();
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
         QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
         if (server->getStatus() != QnResource::Online)
             continue;
 
-        m_pendingUploadServers.insert(server->getId(), server);
+        m_pendingUploads.insert(server->getId(), UploadData(server));
         m_serverIdBySystemInformation.insert(server->getSystemInfo(), server->getId());
     }
 

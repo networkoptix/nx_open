@@ -38,6 +38,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
 
     connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,           &QnServerUpdatesWidget::updateUi);
     connect(m_updateTool,       &QnMediaServerUpdateTool::progressChanged,      ui->updateProgessBar,   &QProgressBar::setValue);
+    connect(m_updateTool,       &QnMediaServerUpdateTool::serverProgressChanged,this,           &QnServerUpdatesWidget::at_updateTool_serverProgressChanged);
 
     updateUi();
     // hide them for the first time only
@@ -85,6 +86,10 @@ void QnServerUpdatesWidget::at_updateButton_clicked() {
     }
 
     m_updateTool->updateServers();
+}
+
+void QnServerUpdatesWidget::at_updateTool_serverProgressChanged(const QnMediaServerResourcePtr &server, int progress) {
+    m_updatesModel->setProgress(server, progress);
 }
 
 void QnServerUpdatesWidget::updateUpdatesList() {
