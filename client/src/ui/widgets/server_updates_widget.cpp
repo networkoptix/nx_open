@@ -79,10 +79,9 @@ void QnServerUpdatesWidget::at_updateButton_clicked() {
     }
 
     if (haveOffline) {
-        QMessageBox::critical(this, tr("Cannot start update"),
+        QMessageBox::warning(this, tr("Warning"),
                               tr("Some servers in your system are offline now.\n"
-                                 "Bring them up to continue update."));
-        return;
+                                 "They will be not upgraded now."));
     }
 
     m_updateTool->updateServers();

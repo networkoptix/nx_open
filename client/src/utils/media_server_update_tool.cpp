@@ -329,7 +329,7 @@ void QnMediaServerUpdateTool::uploadUpdatesToServers() {
     m_serverIdBySystemInformation.clear();
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
         QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-        if (server->getStatus() == QnResource::Offline)
+        if (server->getStatus() != QnResource::Online)
             continue;
 
         m_pendingUploadServers.insert(server->getId(), server);
