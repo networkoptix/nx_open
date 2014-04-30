@@ -51,11 +51,11 @@ namespace ec2
             if (!tran.id.sequence)
                 tran.fillSequence();
 
-            auto scopedGuardFunc = [&errorCode, &handler]( ServerQueryProcessor* ){
+            auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
                 QnScopedThreadRollback ensureFreeThread(1);
                 QtConcurrent::run( std::bind( handler, errorCode ) );
             };
-            std::unique_ptr<ServerQueryProcessor, decltype(scopedGuardFunc)> scopedGuard( this, scopedGuardFunc );
+            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
             QByteArray serializedTran;
             QnOutputBinaryStream<QByteArray> stream( &serializedTran );
@@ -116,11 +116,11 @@ namespace ec2
                 tran.fillSequence();
                 tran.localTransaction = multiTran.localTransaction;
 
-                auto scopedGuardFunc = [&errorCode, &handler]( ServerQueryProcessor* ){
+                auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
                     QnScopedThreadRollback ensureFreeThread(1);
                     QtConcurrent::run( std::bind( handler, errorCode ) );
                 };
-                std::unique_ptr<ServerQueryProcessor, decltype(scopedGuardFunc)> scopedGuard( this, scopedGuardFunc );
+                std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
                 QByteArray serializedTran;
                 QnOutputBinaryStream<QByteArray> stream( &serializedTran );
