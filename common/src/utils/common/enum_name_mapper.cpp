@@ -10,8 +10,11 @@ QnEnumNameMapper::QnEnumNameMapper(const QMetaObject *metaObject, const char *en
     }
 
     QMetaEnum enumerator = metaObject->enumerator(index);
-    for(int i = 0; i < enumerator.keyCount(); i++)
+    QString scope = QLatin1String(metaObject->className()) + QStringLiteral("::");
+    for(int i = 0; i < enumerator.keyCount(); i++) {
         insert(enumerator.value(i), QLatin1String(enumerator.key(i)));
+        insert(enumerator.value(i), scope + QLatin1String(enumerator.key(i))); /* Also support scoped names when deserializing. */
+    }
 }
 
 void QnEnumNameMapper::insert(int value, const char *name) {
