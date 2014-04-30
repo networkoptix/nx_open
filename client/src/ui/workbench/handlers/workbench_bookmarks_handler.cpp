@@ -30,16 +30,16 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
 {
     connect(action(Qn::BookmarkTimeSelectionAction),    &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered);
 
-    connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchBookmarksHandler::updateTagsUsage);
+    connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchBookmarksHandler::updateTags);
 
     connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsAdded, this, [this](const QnCameraBookmarkTags &tags) {
-        m_tagsUsage.append(tags);
-        m_tagsUsage.removeDuplicates();
+        m_tags.append(tags);
+        m_tags.removeDuplicates();
     });
 
     connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsRemoved, this, [this](const QnCameraBookmarkTags &tags) {
         for (const QString &tag: tags)
-            m_tagsUsage.removeAll(tag);
+            m_tags.removeAll(tag);
     });
 }
 
@@ -66,7 +66,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered() {
     bookmark.durationMs = period.durationMs;
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
-    dialog->setTagsUsage(m_tagsUsage);
+    dialog->setTags(m_tags);
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;
@@ -77,22 +77,22 @@ void QnWorkbenchBookmarksHandler::at_bookmarkTimeSelectionAction_triggered() {
 }
 
 
-void QnWorkbenchBookmarksHandler::updateTagsUsage() {
+void QnWorkbenchBookmarksHandler::updateTags() {
     if (!context()->user()) {
-        m_tagsUsage.clear();
+        m_tags.clear();
         return;
     }
     
-    connection()->getCameraManager()->getBookmarkTags(this, [this](int reqID, ec2::ErrorCode code, const QnCameraBookmarkTags &usage) {
+    connection()->getCameraManager()->getBookmarkTags(this, [this](int reqID, ec2::ErrorCode code, const QnCameraBookmarkTags &tags) {
         Q_UNUSED(reqID);
         if (code != ec2::ErrorCode::ok)
             return;
-        m_tagsUsage = usage;
+        m_tags = tags;
     });
 }
 
-QnCameraBookmarkTags QnWorkbenchBookmarksHandler::tagsUsage() const {
-    return m_tagsUsage;
+QnCameraBookmarkTags QnWorkbenchBookmarksHandler::tags() const {
+    return m_tags;
 }
 
 
@@ -119,8 +119,8 @@ void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBoo
     if (status != 0 || !camera)
         return;
 
-    m_tagsUsage.append(bookmark.tags);
-    m_tagsUsage.removeDuplicates();
+    m_tags.append(bookmark.tags);
+    m_tags.removeDuplicates();
 
     QnCachingCameraDataLoader* loader = navigator()->loader(camera);
     if (!loader)

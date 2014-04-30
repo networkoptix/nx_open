@@ -23,17 +23,17 @@ class QnWorkbenchBookmarksHandler: public Connective<QObject>, public QnWorkbenc
 public:
     QnWorkbenchBookmarksHandler(QObject *parent = NULL);
 
-    QnCameraBookmarkTags tagsUsage() const;
+    QnCameraBookmarkTags tags() const;
 private slots:
     void at_bookmarkTimeSelectionAction_triggered();
     void at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle);
 
-    void updateTagsUsage();
+    void updateTags();
 private:
     ec2::AbstractECConnectionPtr connection() const;
     QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 time) const;
 
-    QnCameraBookmarkTags m_tagsUsage;
+    QnCameraBookmarkTags m_tags;
     QHash<int, QnResourcePtr> m_addingBookmarks; 
 };
 
