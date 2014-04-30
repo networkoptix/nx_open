@@ -31,12 +31,12 @@ void QnLexicalEnumSerializerData::insert(const QMetaObject *metaObject, const ch
     m_enumName = scope + QLatin1String(enumName);
 }
 
-void QnLexicalEnumSerializerData::serialize(int value, QString *target) {
+void QnLexicalEnumSerializerData::serializeEnum(int value, QString *target) {
     /* Return empty string in case of failure. */
     *target = m_nameByValue.value(value); 
 }
 
-bool QnLexicalEnumSerializerData::deserialize(const QString &value, int *target) {
+bool QnLexicalEnumSerializerData::deserializeEnum(const QString &value, int *target) {
     auto pos = m_valueByName.find(value);
     if(pos == m_valueByName.end())
         return false;
@@ -90,7 +90,7 @@ bool QnLexicalEnumSerializerData::deserializeFlags(const QString &value, int *ta
         }
 
         int nameValue;
-        if(!deserialize(trimmedName, &nameValue)) {
+        if(!deserializeEnum(trimmedName, &nameValue)) {
             if(trimmedName.size() >= 3 && trimmedName.startsWith(QStringLiteral("0x"))) {
                 bool ok = false;
                 nameValue = trimmedName.toInt(&ok, 16);
