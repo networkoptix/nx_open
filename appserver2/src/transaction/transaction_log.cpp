@@ -36,11 +36,11 @@ void QnTransactionLog::init()
             m_updateHistory.insert(QUuid::fromRfc4122(query2.value(0).toByteArray()), query2.value(1).toLongLong());
     }
 
-    m_relativeOffset = 0;
+    m_relativeOffset = 1;
     QSqlQuery queryTime(m_dbManager->getDB());
     queryTime.prepare("SELECT max(timestamp) FROM transaction_log");
     if (queryTime.exec() && queryTime.next()) {
-        m_relativeOffset = qMax(0ll, queryTime.value(0).toLongLong());
+        m_relativeOffset = qMax(1ll, queryTime.value(0).toLongLong());
     }
 
     QSqlQuery querySequence(m_dbManager->getDB());
