@@ -13,6 +13,8 @@
 #include "get_file_operation.h"
 
 
+static const int MAX_DOWNLOAD_RETRY_COUNT = 15;
+
 RDirSyncher::EventReceiver::~EventReceiver()
 {
 }
@@ -69,7 +71,8 @@ RDirSyncher::RDirSyncher(
     m_mirrors( mirrors ),
     m_localDirPath( localDirPath ),
     m_eventReceiver( eventReceiver ),
-    m_state( sInit )
+    m_state( sInit ),
+    m_downloadRetryCount( 0 )
 {
     assert( !m_mirrors.empty() );
     m_currentMirror = m_mirrors.front();
@@ -194,7 +197,7 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
 
     std::list<RSyncEventTrigger*> eventsToTrigger;
     //creating auto guard which will trigger all events stored in eventsToTrigger
-    auto scopedExitFunc = [&eventsToTrigger](RDirSyncher* /*pThis*/)
+    auto SCOPED_GUARD_FUNC = [&eventsToTrigger](RDirSyncher* /*pThis*/)
     {
         for( RSyncEventTrigger* event: eventsToTrigger )
         {
@@ -202,7 +205,7 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
             delete event;
         }
     };
-    std::unique_ptr<RDirSyncher, decltype(scopedExitFunc)> eventsToTriggerGuard( this, scopedExitFunc );
+    std::unique_ptr<RDirSyncher, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
     //events are triggered with m_mutex unlocked, so that no dead-lock can occur if m_eventReceiver calls some method of this class 
 
@@ -211,7 +214,7 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
     std::map<int, std::shared_ptr<detail::RDirSynchronizationOperation>>::iterator opIter = m_runningOperations.find( operation->id );
     if( opIter == m_runningOperations.end() )
     {
-        //TODO: unknown operation. What's the huy?
+        //TODO: unknown operation. What's the whooy?
         assert( false );
         return;
     }
@@ -266,6 +269,18 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
         //starting next task(s)
         startOperations( eventsToTrigger );
         return;
+    }
+
+    //TODO: #ak refactor rest of this function in default branch
+
+    if( operation->remoteSideFailure() )
+    {
+        if( m_downloadRetryCount < MAX_DOWNLOAD_RETRY_COUNT )
+        {
+            //repeating current operation
+            ++m_downloadRetryCount;
+            return startOperations( eventsToTrigger );
+        }
     }
 
     //preventing multiple mirror switch (e.g., if multiple simultaneous operations fail on same mirror, only one mirror change MUST occur)
