@@ -24,6 +24,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
 
     QnSortedServerUpdatesModel *model = new QnSortedServerUpdatesModel(this);
     model->setSourceModel(m_updatesModel);
+    model->sort(0); // the column does not matter because the model uses column-independent sorting
 
     ui->tableView->setModel(model);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
