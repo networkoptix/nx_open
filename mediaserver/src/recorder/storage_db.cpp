@@ -181,7 +181,7 @@ bool QnStorageDb::removeCameraBookmarks(const QByteArray &mac) {
 
 bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, const QByteArray &mac) {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO storage_bookmark ( \
+    insQuery.prepare("INSERT OR REPLACE INTO storage_bookmark ( \
                      guid, camera_id, start_time, duration, \
                      name, description, timeout \
                      ) VALUES ( \
