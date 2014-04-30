@@ -21,6 +21,7 @@
 #include <nx_ec/data/api_server_info_data.h>
 #include <nx_ec/data/api_email_data.h>
 #include <nx_ec/data/api_runtime_data.h>
+#include <nx_ec/data/api_server_alive_data.h>
 
 
 class QnRestProcessorPool;
@@ -773,8 +774,8 @@ namespace ec2
         void initNotification(QnFullResourceData fullData);
         void runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
 
-        void remotePeerFound(QnId id, bool isClient, bool isProxy);
-        void remotePeerLost(QnId id, bool isClient, bool isProxy);
+        void remotePeerFound(ec2::ApiServerAliveData data, bool isProxy);
+        void remotePeerLost(ec2::ApiServerAliveData data, bool isProxy);
 
         void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);

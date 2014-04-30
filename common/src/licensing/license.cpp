@@ -161,11 +161,23 @@ bool QnLicense::isValid(const QList<QByteArray>& hardwareIds, const QString& bra
     // 1. edge licenses can be activated only if box is "isd"
     // 2. if box is "isd" only edge licenses AND any trial can be activated
 
-    //TODO: may be better check edge flag?
-    bool isISDBox = box == lit("isd") || box == lit("isd_s2");
+    if (!m_isValid1 && !m_isValid2)
+        return false;
+
+    if (!hardwareIds.contains(m_hardwareId))
+        return false;
+
+    if (!m_brand.isEmpty() && m_brand != brand)
+        return false;
+
+    if (expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > expirationTime()) // TODO: #Elric make NEVER an INT64_MAX
+        return false; // license is out of date
     
-    return (m_isValid1 || m_isValid2) && hardwareIds.contains(m_hardwareId) && (m_brand == brand || m_brand.isEmpty()) && \
-        (((box.isEmpty() || box == lit("rpi")) && m_class != lit("edge")) || (isISDBox && (m_class == lit("edge") || !m_expiration.isEmpty())));
+    bool isEdgeBox = box == lit("isd") || box == lit("isd_s2");
+    if (isEdgeBox)
+        return m_class == lit("edge") || !m_expiration.isEmpty();
+    else
+        return m_class != lit("edge");
 }
 
 bool QnLicense::isAnalog() const {
@@ -314,11 +326,11 @@ int QnLicenseListHelper::totalCamerasByClass(bool analog) const
 {
     int result = 0;
 
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    foreach (QnLicensePtr license, m_licenseDict.values())
-        if (license->isAnalog() == analog && (license->expirationTime() < 0 || currentTime < license->expirationTime())) // TODO: #Elric make NEVER an INT64_MAX
+    foreach (QnLicensePtr license, m_licenseDict.values()) 
+    {
+        if (license->isAnalog() == analog && license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT)))
             result += license->cameraCount();
-
+    }
     return result;
 }
 
@@ -350,15 +362,19 @@ bool QnLicensePool::isLicenseMatchesCurrentSystem(const QnLicensePtr &license) {
     return license->isValid(m_mainHardwareIds + m_compatibleHardwareIds, brand);
 }
 
+bool QnLicensePool::isLicenseValid(QnLicensePtr license) const
+{
+    return license->isValid(allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT));
+}
+
 bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
 {
-    // We check if m_brand is empty to allow v1.4 licenses to still work
-    if (license && isLicenseMatchesCurrentSystem(license)) {
-        m_licenseDict[license->key()] = license;
-        return true;
-    }
+    if (!license)
+        return false;
 
-    return false;
+    m_licenseDict[license->key()] = license;
+    // We check if m_brand is empty to allow v1.4 licenses to still work
+    return isLicenseMatchesCurrentSystem(license);
 }
 
 void QnLicensePool::addLicense(const QnLicensePtr &license)
@@ -439,6 +455,12 @@ QList<QByteArray> QnLicensePool::allHardwareIds() const
 {
     return m_mainHardwareIds + m_compatibleHardwareIds;
 }
+
+QList<QByteArray> QnLicensePool::remoteHardwareIds() const
+{
+    return m_remoteHardwareIds;
+}
+
 QByteArray QnLicensePool::currentHardwareId() const
 {
     return m_mainHardwareIds.isEmpty() ? QByteArray() : m_mainHardwareIds.last();

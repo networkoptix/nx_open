@@ -58,8 +58,8 @@ namespace ec2
         void at_gotLockRequest(ApiLockData lockInfo);
         void at_gotLockResponse(ApiLockData lockInfo);
         //void at_gotUnlockRequest(ApiLockData lockInfo);
-        void at_newPeerFound(QnId peer, bool isClient);
-        void at_peerLost(QnId peer, bool isClient);
+        void at_newPeerFound(ec2::ApiServerAliveData data);
+        void at_peerLost(ec2::ApiServerAliveData data);
         void at_timeout();
     private:
         bool isAllPeersReady() const;

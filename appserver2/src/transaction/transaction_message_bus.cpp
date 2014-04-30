@@ -82,10 +82,10 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& 
     AlivePeersMap::iterator itr = m_alivePeers.find(tran.params.serverId);
     if (tran.params.isAlive && itr == m_alivePeers.end()) {
         m_alivePeers.insert(tran.params.serverId, AlivePeerInfo(tran.params.isClient, true));
-        emit peerFound(tran.params.serverId, tran.params.isClient, true);
+        emit peerFound(tran.params, true);
     }
     else if (!tran.params.isAlive && itr != m_alivePeers.end()) {
-        emit peerLost(tran.params.serverId, tran.params.isClient, true);
+        emit peerLost(tran.params, true);
         m_alivePeers.remove(tran.params.serverId);
     }
 }
@@ -420,12 +420,13 @@ void QnTransactionMessageBus::sendServerAliveMsg(const QnId& serverId, bool isAl
     tran.params.serverId = serverId;
     tran.params.isAlive = isAlive;
     tran.params.isClient = isClient;
+    tran.params.hardwareIds = qnLicensePool->allHardwareIds(); // + qnLicensePool->remoteHardwareIds();
     tran.fillSequence();
     sendTransaction(tran);
     if (isAlive)
-        emit peerFound(serverId, isClient, false);
+        emit peerFound(tran.params, false);
     else
-        emit peerLost(serverId, isClient, false);
+        emit peerLost(tran.params, false);
 }
 
 QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }

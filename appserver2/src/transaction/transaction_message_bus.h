@@ -98,8 +98,8 @@ namespace ec2
         AlivePeersMap aliveServerPeers() const;
 
 signals:
-        void peerLost(QnId, bool isClient, bool isProxy);
-        void peerFound(QnId, bool isClient, bool isProxy);
+        void peerLost(ApiServerAliveData data, bool isProxy);
+        void peerFound(ApiServerAliveData data, bool isProxy);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);

@@ -116,6 +116,9 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
         assert(false);
     }
 
+    if (!qnLicensePool->isLicenseValid(license))
+        item->setData(QBrush(colors.expired), Qt::ForegroundRole);
+
     return item;
 }
 

@@ -11,6 +11,7 @@
 
 #include <utils/common/singleton.h>
 #include "nx_ec/ec_api.h"
+#include "nx_ec/data/api_server_alive_data.h"
 
 class QnCommonMessageProcessor: public QObject, public Singleton<QnCommonMessageProcessor>
 {
@@ -71,6 +72,10 @@ private slots:
     void on_execBusinessAction( const QnAbstractBusinessActionPtr& action );
 
     void on_panicModeChanged(Qn::PanicMode mode);
+
+    void at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy);
+    void at_remotePeerLost(ec2::ApiServerAliveData data, bool isProxy);
+
 protected:
     ec2::AbstractECConnectionPtr m_connection;
     QMap<QnId, QnBusinessEventRulePtr> m_rules;

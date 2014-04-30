@@ -98,9 +98,21 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::controlMessage,
         this, &QnCommonMessageProcessor::videowallControlMessageReceived );
 
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::at_remotePeerFound );
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::at_remotePeerLost );
+
     connection->startReceivingNotifications(true);
 }
 
+void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy)
+{
+    int gg = 4;
+}
+
+void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData data, bool isProxy)
+{
+    int gg = 4;
+}
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
 {

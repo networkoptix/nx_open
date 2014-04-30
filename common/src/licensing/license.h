@@ -165,7 +165,11 @@ public:
     QList<QByteArray> compatibleHardwareIds() const;
 
     QList<QByteArray> allHardwareIds() const;
+    QList<QByteArray> remoteHardwareIds() const;
+
     QByteArray currentHardwareId() const;
+    bool isLicenseValid(QnLicensePtr license) const;
+
 signals:
     void licensesChanged();
 
@@ -180,6 +184,7 @@ private:
 private:
     QList<QByteArray> m_mainHardwareIds;
     QList<QByteArray> m_compatibleHardwareIds;
+    QList<QByteArray> m_remoteHardwareIds;
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
 };
