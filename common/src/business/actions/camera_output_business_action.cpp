@@ -4,8 +4,8 @@
 
 QnCameraOutputBusinessAction::QnCameraOutputBusinessAction(bool instant, const QnBusinessEventParameters &runtimeParams):
     base_type(instant
-              ? BusinessActionType::CameraOutputInstant
-              : BusinessActionType::CameraOutput, runtimeParams)
+              ? QnBusiness::CameraOutputOnceAction
+              : QnBusiness::CameraOutputAction, runtimeParams)
 {
 }
 

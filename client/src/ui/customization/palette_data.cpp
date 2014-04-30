@@ -4,7 +4,7 @@
 
 #include <boost/array.hpp>
 
-#include <utils/common/json.h>
+#include <utils/serialization/json_functions.h>
 
 
 // -------------------------------------------------------------------------- //

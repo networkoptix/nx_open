@@ -1,6 +1,4 @@
-
 #include "dummy_handler.h"
-
 
 namespace ec2
 {

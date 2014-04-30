@@ -4,6 +4,8 @@
 #include <QtCore/QMetaType>
 #include <QtGui/QPen>
 
+#include <utils/common/model_functions_fwd.h>
+
 class QnPenData {
 public:
     enum Field {
@@ -39,7 +41,7 @@ public:
     Qt::PenJoinStyle joinStyle() const { return m_joinStyle; }
     void setJoinStyle(Qt::PenJoinStyle joinStyle) { m_joinStyle = joinStyle; m_fields |= JoinStyle; }
 
-    QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnPenData, friend)
+    QN_FUSION_DECLARE_FUNCTIONS(QnPenData, (json), friend)
 
 private:
     Fields m_fields;

@@ -23,7 +23,7 @@
 #include "rest/request_params.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
-
+#include "utils/serialization/binary_functions.h"
 
 namespace ec2
 {
@@ -58,8 +58,8 @@ namespace ec2
             requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
 
             QByteArray tranBuffer;
-            OutputBinaryStream<QByteArray> outputStream( &tranBuffer );
-            serialize( tran, &outputStream );
+            QnOutputBinaryStream<QByteArray> outputStream( &tranBuffer );
+            QnBinary::serialize( tran, &outputStream );
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
@@ -170,9 +170,9 @@ namespace ec2
             }
 
             const QByteArray& msgBody = httpClient->fetchMessageBodyBuffer();
-            InputBinaryStream<QByteArray> inputStream( msgBody );
+            QnInputBinaryStream<QByteArray> inputStream( msgBody );
             OutputData outputData;
-            if( !deserialize( outputData, &inputStream ) )
+            if( !QnBinary::deserialize( &inputStream, &outputData ) )
                 handler( ErrorCode::badResponse, outputData );
             else
                 handler( ErrorCode::ok, outputData );

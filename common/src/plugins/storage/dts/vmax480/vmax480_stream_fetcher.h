@@ -10,13 +10,11 @@
 
 #include "core/resource/resource_fwd.h"
 #include "core/datapacket/media_data_packet.h"
-#include "vmax480_tcp_server.h"
 #include "core/resource/network_resource.h"
 #include "recording/time_period_list.h"
 #include "plugins/resources/archive/playbackmask_helper.h"
 
 class VMaxStreamFetcherPtr;
-
 class QnVmax480DataConsumer
 {
 public:

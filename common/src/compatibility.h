@@ -5,22 +5,15 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 
-#include <nx_ec/binary_serialization_helper.h>
 #include <utils/common/software_version.h>
+#include <utils/common/model_functions_fwd.h>
+#include <api/model/compatibility_item.h>
 
+// TODO: #Elric move and rename file.
 
-// Presense of an entry in global table means
+// Presence of an entry in global table means
 // that component of ver1 is compatible (or has compatibility mode)
 // with EVERY component of ver2
-
-QString stripVersion(const QString& version);
-
-#include "compatibility_i.h"
-
-inline uint qHash(const QnCompatibilityItem &item)
-{
-    return qHash(item.ver1) + 7 * qHash(item.comp1) + 11 * qHash(item.ver2);
-}
 
 class QnCompatibilityChecker
 {
@@ -33,9 +26,11 @@ public:
     int size() const;
 
 private:
-    typedef QSet<QnCompatibilityItem> QnCompatibilityMatrixType;
-    QnCompatibilityMatrixType m_compatibilityMatrix;
+    QSet<QnCompatibilityItem> m_compatibilityMatrix;
 };
+
+
+QString stripVersion(const QString& version);
 
 // This functions is defined in generated compatibility_info.cpp file.
 QList<QnCompatibilityItem> localCompatibilityItems();

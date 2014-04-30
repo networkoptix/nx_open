@@ -5,6 +5,7 @@
 
 #include "common/common_module.h"
 #include "managers/impl/email_manager_impl.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 namespace ec2
@@ -33,7 +34,7 @@ QnAuxManager* QnAuxManager::instance()
 ErrorCode QnAuxManager::executeTransaction(const QnTransaction<ApiEmailSettingsData>& tran)
 {
     QnEmail::Settings settings;
-    tran.params.toResource(settings);
+    fromApiToResource(tran.params, settings);
     return m_emailManagerImpl->testConnection(settings) ? ErrorCode::ok : ErrorCode::failure;
 }
 

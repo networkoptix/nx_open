@@ -1,4 +1,3 @@
-
 #ifndef DUMMY_HANDLER_H
 #define DUMMY_HANDLER_H
 

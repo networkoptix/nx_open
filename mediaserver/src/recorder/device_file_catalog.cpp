@@ -78,6 +78,7 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     m_lastRecordRecording(false),
     m_rebuildStartTime(0)
 {
+    /*
     QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/media/");
     devTitleFile += prefixForRole(role) + "/";
     devTitleFile += m_macAddress + "/";
@@ -85,37 +86,10 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     m_file.setFileName(devTitleFile);
     QDir dir;
     dir.mkpath(QnFile::absolutePath(devTitleFile));
-
-    /*
-    if (m_rebuildArchive == Rebuild_All || 
-        (m_rebuildArchive == Rebuild_HQ && m_role == QnResource::Role_LiveVideo) ||
-        (m_rebuildArchive == Rebuild_LQ && m_role == QnResource::Role_SecondaryLiveVideo)
-        )
-    {
-        doRebuildArchive();
-    }
-    else 
-    {
-        if (!m_file.open(QFile::ReadWrite))
-        {
-            cl_log.log("Can't create title file ", devTitleFile, cl_logERROR);
-            return;
-        }
-
-        if (m_file.size() == 0) 
-        {
-            QTextStream str(&m_file);
-            str << "timezone; start; storage; index; duration\n"; // write CSV header
-            str.flush();
-
-        }
-        else {
-            deserializeTitleFile();
-        }
-    }
     */
 }
 
+/*
 bool DeviceFileCatalog::readCatalog()
 {
     if (!m_file.open(QFile::ReadWrite))
@@ -136,6 +110,7 @@ bool DeviceFileCatalog::readCatalog()
     }
     return true;
 }
+*/
 
 /*
 bool DeviceFileCatalog::lastFileDuplicateName() const
@@ -276,6 +251,20 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     return rez;
 }
 
+void DeviceFileCatalog::replaceChunks(int storageIndex, const QVector<Chunk>& newCatalog)
+{
+    QMutexLocker lock(&m_mutex);
+
+    QVector<Chunk> filteredData;
+    foreach(const Chunk& chunk, m_chunks)
+    {
+        if (chunk.storageIndex != storageIndex)
+            filteredData << chunk;
+    }
+    m_chunks.resize(filteredData.size() + newCatalog.size());
+    std::merge(filteredData.begin(), filteredData.end(), newCatalog.begin(), newCatalog.end(), m_chunks.begin());
+}
+
 QList<QDate> DeviceFileCatalog::recordedMonthList()
 {
     QVector<DeviceFileCatalog::Chunk>::iterator curItr = m_chunks.begin();
@@ -312,6 +301,21 @@ bool DeviceFileCatalog::addChunk(const Chunk& chunk)
     return false;
 }
 
+void DeviceFileCatalog::addChunks(const QVector<Chunk>& chunks)
+{
+    QVector<Chunk> existChunks = m_chunks;
+    m_chunks.resize(existChunks.size() + chunks.size());
+    std::merge(existChunks.begin(), existChunks.end(), chunks.begin(), chunks.end(), m_chunks.begin());
+}
+
+QVector<DeviceFileCatalog::Chunk> DeviceFileCatalog::mergeChunks(const QVector<Chunk>& chunk1, const QVector<Chunk>& chunk2)
+{
+    QVector<Chunk> result;
+    result.resize(chunk1.size() + chunk2.size());
+    std::merge(chunk1.begin(), chunk1.end(), chunk2.begin(), chunk2.end(), result.begin());
+    return result;
+}
+
 DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(QnStorageResourcePtr storage, const QString& fileName)
 {
     Chunk chunk;
@@ -336,6 +340,34 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(QnStorageResourcePtr s
     return chunk;
 }
 
+QnTimePeriod DeviceFileCatalog::timePeriodFromDir(QnStorageResourcePtr storage, const QString& dirName)
+{
+    QnTimePeriod timePeriod;
+    QString sUrl = storage->getUrl();
+    QStringList folders = dirName.mid(sUrl.size()).split('/').mid(3);
+
+    QString timestamp(lit("%1/%2/%3T%4:00:00"));
+    for (int i = 0; i < folders.size(); ++i)
+        timestamp = timestamp.arg(folders[i].toInt(), i == 0 ? 4 : 2, 10, QChar('0'));
+    for (int i = folders.size(); i < 4; ++i)
+        timestamp = timestamp.arg(i == 3 ? 0 : 1, 2, 10, QChar('0')); // mm and dd from 1, hours from 0
+    QDateTime dtStart = QDateTime::fromString(timestamp, Qt::ISODate);
+    QDateTime dtEnd = dtStart;
+    if (folders.size() == 4)
+        dtEnd = dtEnd.addSecs(3600);
+    else if (folders.size() == 3)
+        dtEnd = dtEnd.addDays(1);
+    else if (folders.size() == 2)
+        dtEnd = dtEnd.addMonths(1);
+    else if (folders.size() == 1)
+        dtEnd = dtEnd.addYears(1);
+
+    timePeriod.startTimeMs = dtStart.toMSecsSinceEpoch();
+    timePeriod.durationMs = dtEnd.toMSecsSinceEpoch() - timePeriod.startTimeMs;
+
+    return timePeriod;
+}
+
 void DeviceFileCatalog::rebuildPause(void* value)
 {
     QMutexLocker lock(&m_rebuildMutex);
@@ -354,24 +386,41 @@ bool DeviceFileCatalog::needRebuildPause()
     return !m_pauseList.isEmpty();
 }
 
-void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList)
+void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList, const ScanFilter& filter)
 {
+    QString filteredChunkFile;
+    if (!filter.isEmpty())
+        filteredChunkFile = fullFileName(filter.scanAfter);
+
+
     QDir dir(folder);
     foreach(const QFileInfo& fi, dir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name))
     {
         while (m_rebuildArchive != Rebuild_None && needRebuildPause())
             QnLongRunnable::msleep(100);
 
-        if (m_rebuildArchive == Rebuild_None)
+        if (m_rebuildArchive == Rebuild_Canceled)
             return; // cancceled
 
-        if (fi.isDir())
-            scanMediaFiles(fi.absoluteFilePath(), storage, allChunks, emptyFileList);
-        else {
-            Chunk chunk = chunkFromFile(storage, fi.absoluteFilePath());
+        if (fi.isDir()) {
+            QnTimePeriod folderPeriod = timePeriodFromDir(storage, fi.absoluteFilePath());
+            if (!filter.isEmpty() && !filter.intersects(folderPeriod))
+                continue;
+            scanMediaFiles(fi.absoluteFilePath(), storage, allChunks, emptyFileList, filter);
+        }
+        else 
+        {
+            QString fileName = fi.absoluteFilePath();
+            if (!filter.isEmpty() && fileName <= filteredChunkFile)
+                continue;
 
-            if (chunk.startTimeMs >= m_rebuildStartTime - (QnRecordingManager::RECORDING_CHUNK_LEN * 1250))
-                return; // do not rebuild archive after rebuild start point
+            Chunk chunk = chunkFromFile(storage, fileName);
+            chunk.setFileSize(fi.size());
+
+            if (m_rebuildStartTime) {
+                if (chunk.startTimeMs >= m_rebuildStartTime - (QnRecordingManager::RECORDING_CHUNK_LEN * 1250))
+                    return; // do not rebuild archive after rebuild start point
+            }
 
             if (chunk.durationMs > 0 && chunk.startTimeMs > 0) {
                 QMap<qint64, Chunk>::iterator itr = allChunks.insert(chunk.startTimeMs, chunk);
@@ -402,7 +451,7 @@ void DeviceFileCatalog::readStorageData(QnStorageResourcePtr storage, QnResource
     scanMediaFiles(rootFolder, storage, allChunks, emptyFileList);
 }
 
-bool DeviceFileCatalog::doRebuildArchive()
+bool DeviceFileCatalog::doRebuildArchive(QnStorageResourcePtr storage, const QnTimePeriod& period)
 {
     QElapsedTimer t;
     t.restart();
@@ -410,46 +459,14 @@ bool DeviceFileCatalog::doRebuildArchive()
     m_rebuildStartTime = qnSyncTime->currentMSecsSinceEpoch();
 
     QMap<qint64, Chunk> allChunks;
-//    bool canceled = false;
-    foreach(QnStorageResourcePtr storage, qnStorageMan->getStorages()) {
-        if (m_rebuildArchive == Rebuild_None) {
-            return false;
-        }
-        QStringList emptyFileList;
-        readStorageData(storage, m_role, allChunks, emptyFileList);
-
-        foreach(const QString& fileName, emptyFileList)
-            qnFileDeletor->deleteFile(fileName);
-        /*
-        int lastIndex = emptyFileList.size();
-        QnResourcePtr res = qnResPool->getResourceByUniqId(m_macAddress);
-        if (res && res->getStatus() == QnResource::Recording)
-            lastIndex--; // do not delete last empty file because of it can be written 
-        for (int i = 0; i < lastIndex; ++i)
-        {
-            qnFileDeletor->deleteFile(emptyFileList[i]);
-        }
-        */
+    if (m_rebuildArchive == Rebuild_None || m_rebuildArchive == Rebuild_Canceled) {
+        return false;
     }
+    QStringList emptyFileList;
+    readStorageData(storage, m_role, allChunks, emptyFileList);
 
-    /*
-    if (canceled) {
-        // canceled, restore archive
-        m_file.close();
-        if (m_file.open(QFile::ReadWrite)) {
-            if (m_file.size() == 0) 
-            {
-                QTextStream str(&m_file);
-                str << "timezone; start; storage; index; duration\n"; // write CSV header
-                str.flush();
-            }
-            else {
-                deserializeTitleFile();
-            }
-        }
-        return; 
-    }
-    */
+    foreach(const QString& fileName, emptyFileList)
+        qnFileDeletor->deleteFile(fileName);
 
     foreach(const Chunk& chunk, allChunks)
         m_chunks << chunk;
@@ -459,6 +476,7 @@ bool DeviceFileCatalog::doRebuildArchive()
     return true;
 }
 
+/*
 void DeviceFileCatalog::deserializeTitleFile()
 {
     QElapsedTimer t;
@@ -527,16 +545,6 @@ void DeviceFileCatalog::deserializeTitleFile()
             }
             //storage->addWritedSpace(chunkFileSize);
 
-            /*
-            if (lastFileDuplicateName()) {
-                if (m_chunks.isEmpty())
-                    m_chunks << chunk;
-                else
-                    m_chunks.last() = chunk;
-                needRewriteCatalog = true;
-            }       
-            else 
-            */
             {
                 needRewriteCatalog |= addChunk(chunk);
             }
@@ -555,7 +563,9 @@ void DeviceFileCatalog::deserializeTitleFile()
 
     NX_LOG(QString("Check archive for camera %1 for role %2 time: %3 ms").arg(m_macAddress).arg(m_role).arg(t.elapsed()), cl_logINFO);
 }
+*/
 
+/*
 void DeviceFileCatalog::rewriteCatalog(bool isLastRecordRecording)
 {
     QFile newFile(m_file.fileName() + QString(".tmp"));
@@ -586,6 +596,7 @@ void DeviceFileCatalog::rewriteCatalog(bool isLastRecordRecording)
     }
     m_lastRecordRecording = isLastRecordRecording;
 }
+*/
 
 void DeviceFileCatalog::addRecord(const Chunk& chunk)
 {
@@ -596,17 +607,7 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
         ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
         itr = m_chunks.insert(itr, chunk);
         m_lastAddIndex = itr - m_chunks.begin();
-        //if (m_lastAddIndex < m_chunks.size()-1)
-        //    itr->durationMs = 0; // if insert to the archive middle, reset 'continue recording' mark
     }
-
-    QMutexLocker lock(&m_IOMutex);
-    QTextStream str(&m_file);
-    str << chunk.timeZone << ';' << chunk.startTimeMs << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';';
-    if (chunk.durationMs >= 0)
-        str << chunk.durationMs  << '\n';
-    m_lastRecordRecording = chunk.durationMs < 0;
-    str.flush();
 }
 
 qint64 DeviceFileCatalog::getLatRecordingTime() const
@@ -632,30 +633,32 @@ void DeviceFileCatalog::setLatRecordingTime(qint64 value)
     }
 }
 
-void DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize)
+DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize)
 {
     Q_ASSERT(durationMs < 1000 * 1000);
-    {
-        QMutexLocker lock(&m_mutex);
-        //m_chunks.last().durationMs = durationMs;
-        if (m_lastAddIndex >= 0) {
-            m_chunks[m_lastAddIndex].durationMs = durationMs;
-            m_chunks[m_lastAddIndex].setFileSize(fileSize);
-        }
-    }
-
-    QMutexLocker lock(&m_IOMutex);
-    QTextStream str(&m_file);
-    str << durationMs << '\n';
-    str.flush();
+    QMutexLocker lock(&m_mutex);
+    //m_chunks.last().durationMs = durationMs;
     m_lastRecordRecording = false;
+    if (m_lastAddIndex >= 0) {
+        m_chunks[m_lastAddIndex].durationMs = durationMs;
+        m_chunks[m_lastAddIndex].setFileSize(fileSize);
+        return m_chunks[m_lastAddIndex];
+    }
+    else {
+        return Chunk();
+    }
 }
 
-void DeviceFileCatalog::deleteRecordsBefore(int idx)
+QVector<qint64> DeviceFileCatalog::deleteRecordsBefore(int idx)
 {
     int count = idx - m_firstDeleteCount; // m_firstDeleteCount may be changed during delete
-    for (int i = 0; i < count; ++i)
-        deleteFirstRecord();
+    QVector<qint64> result;
+    for (int i = 0; i < count; ++i) {
+        qint64 deletedTime = deleteFirstRecord();
+        if (deletedTime)
+            result << deletedTime;
+    }
+    return result;
 }
 
 void DeviceFileCatalog::clear()
@@ -697,15 +700,16 @@ bool DeviceFileCatalog::isEmpty() const
     return m_chunks.isEmpty();
 }
 
-void DeviceFileCatalog::deleteFirstRecord()
+qint64 DeviceFileCatalog::deleteFirstRecord()
 {
     QnStorageResourcePtr storage;
     QString delFileName;
     QString motionDirName;
+    qint64 deletedTime = 0;
     {
         QMutexLocker lock(&m_mutex);
         if (m_chunks.isEmpty())
-            return;
+            return deletedTime;
 
         static const int DELETE_COEFF = 1000;
 
@@ -713,6 +717,7 @@ void DeviceFileCatalog::deleteFirstRecord()
         {
             storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
             delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
+            deletedTime = m_chunks[m_firstDeleteCount].startTimeMs;
 
             QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
 
@@ -747,6 +752,8 @@ void DeviceFileCatalog::deleteFirstRecord()
         if (!motionDirName.isEmpty())
             storage->removeDir(motionDirName);
     }
+
+    return deletedTime;
 }
 
 int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) const
@@ -864,15 +871,8 @@ void DeviceFileCatalog::setRebuildArchive(RebuildMethod value)
     m_rebuildArchive = value;
 }
 
-void DeviceFileCatalog::beforeRebuildArchive()
-{
-    QMutexLocker lock(&m_mutex);
-    m_file.close();
-}
-
 void DeviceFileCatalog::close()
 {
-    m_file.close();
 }
 
 QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel)
@@ -906,6 +906,93 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
     return result;
 }
 
+bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
+{
+    QFile file(fileName);
+
+    if (!file.open(QFile::ReadOnly))
+    {
+        cl_log.log("Can't open title file ", file.fileName(), cl_logERROR);
+        return false;
+    }
+
+    // deserializeTitleFile()
+
+    bool needRewriteCatalog = false;
+
+    int timeZoneExist = 0;
+    QByteArray headerLine = file.readLine();
+    if (headerLine.contains("timezone"))
+        timeZoneExist = 1;
+    QByteArray line;
+    bool checkDirOnly = false;
+    do {
+        line = file.readLine();
+        QList<QByteArray> fields = line.split(';');
+        if (fields.size() < 4 + timeZoneExist) {
+            continue;
+        }
+        int coeff = 1; // compabiliy with previous version (convert usec to ms)
+        if (fields[0+timeZoneExist].length() >= 16)
+            coeff = 1000;
+        qint16 timeZone = timeZoneExist ? fields[0].toInt() : -1;
+        qint64 startTime = fields[0+timeZoneExist].toLongLong()/coeff;
+        QString durationStr = fields[3+timeZoneExist].trimmed();
+        int duration = fields[3+timeZoneExist].trimmed().toInt()/coeff;
+        Chunk chunk(startTime, fields[1+timeZoneExist].toInt(), fields[2+timeZoneExist].toInt(), duration, timeZone);
+
+        QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
+        if (fields[3+timeZoneExist].trimmed().isEmpty()) 
+        {
+            // duration unknown. server restart occured. Duration for chunk is unknown
+            if (qnStorageMan->isStorageAvailable(chunk.storageIndex))
+            {
+                needRewriteCatalog = true;
+                //chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs, storage);
+                storage->removeFile(fullFileName(chunk));
+                continue;
+            }
+            else {
+                chunk.durationMs = 0;
+            }
+        }
+
+        //qint64 chunkFileSize = 0;
+        if (!qnStorageMan->isStorageAvailable(chunk.storageIndex)) 
+        {
+             needRewriteCatalog |= addChunk(chunk);
+        }
+        else if (fileExists(chunk, checkDirOnly))
+        {
+            //chunk.setFileSize(chunkFileSize);
+
+            // optimization. Since we have got first file, check dirs only. It is required to check files at begin to determine archive start point
+            checkDirOnly = true; 
+
+            if (chunk.durationMs > QnRecordingManager::RECORDING_CHUNK_LEN*1000 * 2 || chunk.durationMs < 1)
+            {
+                const QString fileName = fullFileName(chunk);
+
+                qWarning() << "File " << fileName << "has invalid duration " << chunk.durationMs/1000.0 << "s and corrupted. Delete file from catalog";
+                storage->removeFile(fileName);
+                needRewriteCatalog = true;
+                continue;
+            }
+            needRewriteCatalog |= addChunk(chunk);
+        }
+        else {
+            needRewriteCatalog = true;
+        }
+
+    } while (!line.isEmpty());
+    
+    if (!timeZoneExist)
+        needRewriteCatalog = true; // update catalog to new version
+
+
+    return true;
+}
+
 bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other)
 { 
     return first < other.startTimeMs;
@@ -920,4 +1007,3 @@ bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog:
 { 
     return first.startTimeMs < other.startTimeMs;
 }
-

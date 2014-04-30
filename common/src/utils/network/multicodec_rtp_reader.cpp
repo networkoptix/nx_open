@@ -230,11 +230,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         QString reasonParamsEncoded;
         QnBusiness::EventReason reason;
         if (elapsed > MAX_FRAME_DURATION*2) {
-            reason = QnBusiness::NetworkIssueNoFrame;
+            reason = QnBusiness::NetworkNoFrameReason;
             reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodeTimeoutMsecs(elapsed);
         }
         else {
-            reason = QnBusiness::NetworkIssueConnectionClosed;
+            reason = QnBusiness::NetworkConnectionClosedReason;
             reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodePrimaryStream(m_role != QnResource::Role_SecondaryLiveVideo);
         }
         emit networkIssue(getResource(),
@@ -402,7 +402,7 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 
     emit networkIssue(getResource(),
                       qnSyncTime->currentUSecsSinceEpoch(),
-                      QnBusiness::NetworkIssueRtpPacketLoss,
+                      QnBusiness::NetworkRtpPacketLossReason,
                       QnNetworkIssueBusinessEvent::encodePacketLossSequence(prev, next));
 
 }
@@ -495,6 +495,8 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     initIO(&m_videoIO, m_videoParser, RTPSession::TT_VIDEO);
     initIO(&m_audioIO, m_audioParser, RTPSession::TT_AUDIO);
+
+
     if (!m_videoIO && !m_audioIO)
         m_RtpSession.stop();
     m_rtcpReportTimer.restart();

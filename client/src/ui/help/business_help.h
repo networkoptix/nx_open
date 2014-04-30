@@ -6,8 +6,8 @@
 
 namespace QnBusiness {
 
-    int eventHelpId(BusinessEventType::Value type);
-    int actionHelpId(BusinessActionType::Value type);
+    int eventHelpId(QnBusiness::EventType type);
+    int actionHelpId(QnBusiness::ActionType type);
     int healthHelpId(QnSystemHealth::MessageType type);
 
 } // namespace QnBusiness 

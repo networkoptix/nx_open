@@ -8,8 +8,10 @@
 #include <QtCore/QTimer>
 
 #include <QtNetwork/QNetworkCookie>
+#include <QtNetwork/QSslError>
 
 #include "utils/common/request_param.h"
+
 
 class QNetworkReply;
 class QNetworkAccessManager;

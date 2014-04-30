@@ -27,7 +27,7 @@
 #include <ui/style/warning_style.h>
 #include <ui/models/license_list_model.h>
 #include <utils/license_usage_helper.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/common/product_features.h>
 
 #define QN_LICENSE_URL "http://networkoptix.com/nolicensed_vms/activate.php"

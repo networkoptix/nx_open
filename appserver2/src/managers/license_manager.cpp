@@ -1,8 +1,8 @@
-
 #include "license_manager.h"
 
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 namespace ec2
@@ -19,13 +19,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiLicenseList& licenses ) {
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiLicenseDataList& licenses ) {
             QnLicenseList outData;
             if( errorCode == ErrorCode::ok )
-                licenses.toResourceList(outData);
+                fromApiToResourceList(licenses, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiLicenseList, decltype(queryDoneHandler)>( ApiCommand::getLicenses, nullptr, queryDoneHandler );
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiLicenseDataList, decltype(queryDoneHandler)>( ApiCommand::getLicenses, nullptr, queryDoneHandler );
         return reqID;
     }
     
@@ -46,18 +46,18 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiLicenseList> QnLicenseManager<T>::prepareTransaction( ApiCommand::Value cmd, const QnLicenseList& licenses )
+    QnTransaction<ApiLicenseDataList> QnLicenseManager<T>::prepareTransaction( ApiCommand::Value cmd, const QnLicenseList& licenses )
     {
-        QnTransaction<ApiLicenseList> tran( cmd, true );
-        tran.params.fromResourceList( licenses );
+        QnTransaction<ApiLicenseDataList> tran( cmd, true );
+        fromResourceListToApi(licenses, tran.params);
         return tran;
     }
 
     template<class T>
-    void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicenseList>& tran )
+    void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicenseDataList>& tran )
     {
         QnLicenseList licenseList;
-        tran.params.toResourceList(licenseList);
+        fromApiToResourceList(tran.params, licenseList);
 
         foreach (const QnLicensePtr& license, licenseList) {
             emit licenseChanged(license);
@@ -65,10 +65,10 @@ namespace ec2
     }
 
     template<class T>
-    void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicense>& tran )
+    void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicenseData>& tran )
     {
         QnLicensePtr license(new QnLicense());
-        tran.params.toResource(*license.data());
+        fromApiToResource(tran.params, license);
         emit licenseChanged(license);
     }
 

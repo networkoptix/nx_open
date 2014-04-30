@@ -4,7 +4,7 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 
 class QnJsonRestResult {
 public:
@@ -29,9 +29,11 @@ public:
         QJson::serialize(reply, &m_reply);
     }
 
-    QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnJsonRestResult, friend)
+    QN_FUSION_DECLARE_FUNCTIONS(QnJsonRestResult, (json), friend)
 
 private:
+    QN_FUSION_ENABLE_PRIVATE();
+
     QString m_errorString;
     Error m_error;
     QJsonValue m_reply;

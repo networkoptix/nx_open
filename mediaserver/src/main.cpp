@@ -135,6 +135,7 @@
 #include "utils/network/networkoptixmodulefinder.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
+#include "compatibility.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -304,6 +305,7 @@ void ffmpegInit()
         qCritical() << "Failed to register ffmpeg lock manager";
     }
 
+    // TODO: #Elric we need comments about true/false at call site => bad api design, use flags instead
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
     QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
 }
@@ -846,7 +848,7 @@ void QnMain::at_serverSaved(int, ec2::ErrorCode err)
 void QnMain::at_connectionOpened()
 {
     if (m_firstRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::MServerIssueStarted);
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::ServerStartedReason);
     if (!m_startMessageSent) {
         qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
         m_startMessageSent = true;
@@ -1169,6 +1171,7 @@ void QnMain::run()
         ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
 
     initTcpListener();
+    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(messageProcessor.data(), QnServerMessageProcessor::isProxy);
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
@@ -1197,12 +1200,15 @@ void QnMain::run()
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
         bool isLocal = appserverHostString.isEmpty() || QUrl(appserverHostString).scheme() == "file";
 
-        int serverFlags = Qn::SF_None;
+        int serverFlags = Qn::SF_None; // TODO: #Elric #EC2 type safety has just walked out of the window.
 #ifdef EDGE_SERVER
         serverFlags |= Qn::SF_Edge;
 #endif
         if (!isLocal)
             serverFlags |= Qn::SF_RemoteEC;
+        if (!publicAddress.isNull())
+            serverFlags |= Qn::SF_HasPublicIP;
+
         server->setServerFlags((Qn::ServerFlags) serverFlags);
 
         QHostAddress appserverHost;
@@ -1275,7 +1281,7 @@ void QnMain::run()
 
     
 
-    qnStorageMan->loadFullFileCatalog();
+    qnStorageMan->doMigrateCSVCatalog();
 
     initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
     

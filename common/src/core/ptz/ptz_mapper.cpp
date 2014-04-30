@@ -1,6 +1,6 @@
 #include "ptz_mapper.h"
 
-#include <utils/common/json.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/common/enum_name_mapper.h>
 #include <utils/math/math.h>
 
@@ -10,8 +10,8 @@ QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, ExtrapolationMode)
 QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qn::ExtrapolationMode)
 
 QN_DEFINE_NAME_MAPPED_ENUM(AngleSpace,
-    ((DegreesSpace,     "Degrees"))
-    ((Mm35EquivSpace,   "35MmEquiv"))
+    (DegreesSpace,     "Degrees")
+    (Mm35EquivSpace,   "35MmEquiv")
 )
 QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(AngleSpace)
 

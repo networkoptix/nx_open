@@ -2,7 +2,7 @@
 
 #include <utils/common/model_functions.h>
 
-QN_DEFINE_STRUCT_FUNCTIONS(QnAviArchiveCustomData,      (json),    (overridenAr))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAviArchiveCustomData,      (json),    (overridenAr))
 
 QnAviArchiveCustomData::QnAviArchiveCustomData():
     overridenAr(0.0) {}

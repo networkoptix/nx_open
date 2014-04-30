@@ -375,7 +375,7 @@
     <message>
         <location filename="../src/business/business_strings_helper.cpp" line="66"/>
         <source>Media Server Conflict</source>
-        <translation>メディアサーバー不良</translation>
+        <translation>メディアサーバー重複</translation>
     </message>
     <message>
         <source>Any camera issue</source>

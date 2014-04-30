@@ -6,7 +6,7 @@ QnNetworkIssueBusinessEvent::QnNetworkIssueBusinessEvent(
         qint64 timeStamp,
         QnBusiness::EventReason reasonCode,
         const QString &reasonParamsEncoded):
-    base_type(BusinessEventType::Network_Issue,
+    base_type(QnBusiness::NetworkIssueEvent,
               resource,
               timeStamp,
               reasonCode,

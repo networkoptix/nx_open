@@ -12,11 +12,11 @@
 class QnCameraInputEvent: public QnProlongedBusinessEvent {
     typedef QnProlongedBusinessEvent base_type;
 public:
-    QnCameraInputEvent(const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp, const QString& inputPortID);
+    QnCameraInputEvent(const QnResourcePtr& resource, QnBusiness::EventState toggleState, qint64 timeStamp, const QString& inputPortID);
 
     const QString& inputPortID() const;
 
-    virtual bool checkCondition(Qn::ToggleState state, const QnBusinessEventParameters &params) const override;
+    virtual bool checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params) const override;
 
     virtual QnBusinessEventParameters getRuntimeParams() const override;
 private:

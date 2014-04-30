@@ -130,6 +130,7 @@
 #include "ui/dialogs/adjust_video_dialog.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/widgets/palette_widget.h"
+#include "compatibility.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -1377,14 +1378,14 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
 
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    BusinessEventType::Value eventType = parameters.argument(Qn::EventTypeRole, BusinessEventType::AnyBusinessEvent);
+    QnBusiness::EventType eventType = parameters.argument(Qn::EventTypeRole, QnBusiness::AnyBusinessEvent);
     QnVirtualCameraResourceList cameras = parameters.resources().filtered<QnVirtualCameraResource>();
 
     // show diagnostics if Issues action was triggered
-    if (eventType != BusinessEventType::AnyBusinessEvent || !cameras.isEmpty()) {
+    if (eventType != QnBusiness::AnyBusinessEvent || !cameras.isEmpty()) {
         businessEventsLogDialog()->disableUpdateData();
         businessEventsLogDialog()->setEventType(eventType);
-        businessEventsLogDialog()->setActionType(BusinessActionType::Diagnostics);
+        businessEventsLogDialog()->setActionType(QnBusiness::DiagnosticsAction);
         QDate date = QDateTime::currentDateTime().date();
         businessEventsLogDialog()->setDateRange(date, date);
         businessEventsLogDialog()->setCameraList(cameras);
@@ -1837,7 +1838,7 @@ void QnWorkbenchActionHandler::at_cameraIssuesAction_triggered()
 {
     menu()->trigger(Qn::OpenBusinessLogAction,
                     menu()->currentParameters(sender())
-                    .withArgument(Qn::EventTypeRole, BusinessEventType::AnyCameraIssue));
+                    .withArgument(Qn::EventTypeRole, QnBusiness::AnyCameraEvent));
 }
 
 void QnWorkbenchActionHandler::at_cameraBusinessRulesAction_triggered() {
@@ -2004,7 +2005,7 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_serverIssuesAction_triggered() {
     menu()->trigger(Qn::OpenBusinessLogAction,
-                    QnActionParameters().withArgument(Qn::EventTypeRole, BusinessEventType::AnyServerIssue));
+                    QnActionParameters().withArgument(Qn::EventTypeRole, QnBusiness::AnyServerEvent));
 }
 
 void QnWorkbenchActionHandler::at_pingAction_triggered() {

@@ -10,9 +10,14 @@ class QnDbHelper
 {
 public:
     QnDbHelper();
-protected:
+
     bool execSQLFile(const QString& fileName);
     bool execSQLQuery(const QString& query);
+
+    void beginTran();
+    void rollback();
+    void commit();
+
 protected:
     class QnDbTransactionLocker;
 
@@ -44,7 +49,7 @@ protected:
     };
 
     bool isObjectExists(const QString& objectType, const QString& objectName);
-
+    void addDatabase(const QString& fileName, const QString& dbname);
 protected:
     QSqlDatabase m_sdb;
     QnDbTransaction m_tran;

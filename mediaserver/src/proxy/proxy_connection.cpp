@@ -69,6 +69,8 @@ bool QnProxyConnectionProcessor::doProxyData(fd_set* read_set, AbstractStreamSoc
         if (readed < 1)
             return false;
         int sended = dstSocket->send(buffer, readed);
+        if (sended == -1)
+            return false; // connection closed
         Q_ASSERT(sended == readed);
     }
     return true;
@@ -126,6 +128,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
     Q_D(QnProxyConnectionProcessor);
 
     QUrl url = d->request.requestLine.url;
+    QString host = url.host();
     QString urlPath = url.path();
 
     if (urlPath.startsWith("proxy") || urlPath.startsWith("/proxy"))
@@ -139,23 +142,11 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
             hostEndPos = urlPath.size();
 
         QString protocol = urlPath.mid(proxyEndPos+1, protocolEndPos - proxyEndPos-1);
-        QString host = urlPath.mid(protocolEndPos+1, hostEndPos - protocolEndPos-1);
+        host = urlPath.mid(protocolEndPos+1, hostEndPos - protocolEndPos-1);
         if (host.startsWith("{"))
             xServerGUID = host;
 
         urlPath = urlPath.mid(hostEndPos);
-        if (urlPath.isEmpty())
-            urlPath = "/";
-
-        d->request.requestLine.url.setPath(urlPath);
-
-        for (nx_http::HttpHeaders::iterator itr = d->request.headers.begin(); itr != d->request.headers.end(); ++itr)
-        {
-            if (itr->first.toLower() == "host")
-                itr->second = host.toUtf8();
-        }
-        d->clientRequest.clear();
-        d->request.serialize(&d->clientRequest);
 
         // get dst ip and port
         QStringList hostAndPort = host.split(':');
@@ -168,11 +159,20 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
         dstUrl = QUrl(lit("%1://%2:%3").arg(url.scheme()).arg(url.host()).arg(url.port(defaultPort)));
     }
 
+    if (urlPath.isEmpty())
+        urlPath = "/";
+    d->request.requestLine.url = urlPath;
+
     for (nx_http::HttpHeaders::iterator itr = d->request.headers.begin(); itr != d->request.headers.end(); ++itr)
     {
-        if (itr->first == "x-server-guid")
+        if (itr->first.toLower() == "host" && !host.isEmpty())
+            itr->second = host.toUtf8();
+        else if (itr->first == "x-server-guid")
             xServerGUID = itr->second;
     }
+
+    d->clientRequest.clear();
+    d->request.serialize(&d->clientRequest);
 
     return true;
 }

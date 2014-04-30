@@ -15,8 +15,7 @@ PredefinedUsageCalculator::PredefinedUsageCalculator(
 :
     m_rns( rns ),
     m_predefinedDataFilePath( predefinedDataFilePath ),
-    m_usageWatcher( usageWatcher ),
-    m_currentTree( NULL )
+    m_usageWatcher( usageWatcher )
 {
     updateTree();
 }
@@ -79,7 +78,7 @@ void PredefinedUsageCalculator::updateTree()
     if( !newTree )
         return;
 
-    std::unique_ptr<stree::AbstractNode> oldTree; //TODO: #ak auto_ptr is deprecated
+    std::unique_ptr<stree::AbstractNode> oldTree;
     {
         QMutexLocker lk( &m_treeMutex );
         oldTree = std::move(m_currentTree);

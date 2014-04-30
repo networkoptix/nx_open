@@ -43,7 +43,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::ActionTypeField) {
-        bool instant = (model->actionType() == BusinessActionType::CameraOutputInstant);
+        bool instant = (model->actionType() == QnBusiness::CameraOutputOnceAction);
         if (instant) {
             ui->autoResetCheckBox->setEnabled(false);
             ui->autoResetCheckBox->setChecked(true);
@@ -81,7 +81,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
         if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
             ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));
 
-        bool instant = (model->actionType() == BusinessActionType::CameraOutputInstant);
+        bool instant = (model->actionType() == QnBusiness::CameraOutputOnceAction);
         if (!instant) {
             int autoReset = params.getRelayAutoResetTimeout() / 1000;
             ui->autoResetCheckBox->setChecked(autoReset > 0);
