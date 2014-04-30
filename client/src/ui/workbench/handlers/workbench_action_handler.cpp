@@ -628,6 +628,10 @@ QnLoginDialog *QnWorkbenchActionHandler::loginDialog() const {
     return m_loginDialog.data();
 }
 
+QnSystemAdministrationDialog *QnWorkbenchActionHandler::systemAdministrationDialog() const {
+    return m_systemAdministrationDialog.data();
+}
+
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
     if(!cameraSettingsDialog())
         return;
@@ -1367,9 +1371,16 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
-    QScopedPointer<QnSystemAdministrationDialog> dialog(new QnSystemAdministrationDialog(context(), mainWindow()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    bool newlyCreated = false;
+    if (!m_systemAdministrationDialog) {
+        m_systemAdministrationDialog = new QnSystemAdministrationDialog(context(), mainWindow());
+        newlyCreated = true;
+    }
+
+    QRect oldGeometry = systemAdministrationDialog()->geometry();
+    systemAdministrationDialog()->show();
+    if (newlyCreated)
+        systemAdministrationDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {

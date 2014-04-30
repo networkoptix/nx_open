@@ -42,6 +42,7 @@ class QnLoginDialog;
 class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
+class QnSystemAdministrationDialog;
 
 // TODO: #Elric get rid of these processors here
 namespace detail {
@@ -167,6 +168,8 @@ protected:
     QnCameraAdditionDialog *cameraAdditionDialog() const;
 
     QnLoginDialog *loginDialog() const;
+
+    QnSystemAdministrationDialog *systemAdministrationDialog() const;
 
     QnWorkbenchNotificationsHandler* notificationsHandler() const;
 
@@ -341,6 +344,7 @@ private:
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QPointer<QnLoginDialog> m_loginDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
+    QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
 
 
     /** Whether the set of selected resources was changed and settings
