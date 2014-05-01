@@ -183,8 +183,8 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.motionType = src->getMotionType();
 
     QList<QnMotionRegion> regions;
-    dst.region = serializeMotionRegionList(src->getMotionRegionList()).toLocal8Bit();
-    dst.mac = src->getMAC().toString().toLocal8Bit();
+    dst.region = serializeMotionRegionList(src->getMotionRegionList()).toLatin1();
+    dst.mac = src->getMAC().toString().toLatin1();
     dst.login = src->getAuth().user();
     dst.password = src->getAuth().password();
     

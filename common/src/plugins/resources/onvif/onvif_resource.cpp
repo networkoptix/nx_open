@@ -2117,7 +2117,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer()
     request.TerminationTime = &initialTerminationTime;
     if( !m_onvifNotificationSubscriptionID.isEmpty() )
     {
-        sprintf( buf, "<dom0:SubscriptionId xmlns:dom0=\"(null)\">%s</dom0:SubscriptionId>", m_onvifNotificationSubscriptionID.toLocal8Bit().data() );
+        sprintf( buf, "<dom0:SubscriptionId xmlns:dom0=\"(null)\">%s</dom0:SubscriptionId>", m_onvifNotificationSubscriptionID.toLatin1().data() );
         request.__any.push_back( buf );
     }
     _oasisWsnB2__RenewResponse response;

@@ -29,9 +29,10 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
 
     for (int i = 0; i < params.size(); ++i)
     {
-        if (params[i].first.toLocal8Bit() == "res_id" || params[i].first.toLocal8Bit() == "guid")
+        // TODO: #API OH FUCK!!!!! WHY WERE YOU USING toLocal8Bit HERE??????????
+        if (params[i].first == QLatin1String("res_id") || params[i].first == QLatin1String("guid"))
             resourceId = params[i].second;
-        else if (params[i].first.toLocal8Bit() == "event_type")
+        else if (params[i].first == QLatin1String("event_type"))
             eventType = params[i].second;
     }
     if (resourceId.isEmpty())

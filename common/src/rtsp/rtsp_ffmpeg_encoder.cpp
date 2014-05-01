@@ -162,7 +162,7 @@ QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
 {
     if (!m_codecCtxData.isEmpty()) {
         QString result(lit("a=fmtp:%1 config=%2\r\n"));
-        return result.arg((int)getPayloadtype()).arg(QLatin1String(m_codecCtxData.toBase64())).toLocal8Bit();
+        return result.arg((int)getPayloadtype()).arg(QLatin1String(m_codecCtxData.toBase64())).toLatin1();
     }
     else {
         return QByteArray();
