@@ -47,7 +47,7 @@ public:
     }
 
     template<class T>
-    void deserialize(const QString &value, T *target) const {
+    bool deserialize(const QString &value, T *target) const {
         int tmp;
         if(!(QnLexicalDetail::is_flags<T>() ? deserializeFlags : deserializeEnum)(value, &tmp))
             return false;
