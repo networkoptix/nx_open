@@ -8,7 +8,7 @@
 #include <utils/serialization/lexical_functions.h>
 #include <utils/fusion/fusion_adaptors.h>
 
-QN_DEFINE_METAOBJECT_LEXICAL_ENUM_FUNCTIONS(Qt, BrushStyle, static)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, BrushStyle, static)
 
 QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::BrushStyle, static)
 QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QColor)

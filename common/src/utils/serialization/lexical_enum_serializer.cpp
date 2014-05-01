@@ -11,7 +11,7 @@
 // -------------------------------------------------------------------------- //
 // QnLexicalEnumSerializerData
 // -------------------------------------------------------------------------- //
-void QnLexicalEnumSerializerData::load(const QMetaObject *metaObject, const char *enumName) {
+void QnEnumLexicalSerializerData::load(const QMetaObject *metaObject, const char *enumName) {
     assert(metaObject && enumName);
 
     clear();
@@ -31,38 +31,38 @@ void QnLexicalEnumSerializerData::load(const QMetaObject *metaObject, const char
     m_enumName = scope + QLatin1String(enumName);
 }
 
-void QnLexicalEnumSerializerData::insert(int value, const QString &name) {
+void QnEnumLexicalSerializerData::insert(int value, const QString &name) {
     if(!m_valueByName.contains(name))
         m_valueByName[name] = value;
     if(!m_nameByValue.contains(value))
         m_nameByValue[value] = name;
 }
 
-void QnLexicalEnumSerializerData::insert(int value, const char *name) {
+void QnEnumLexicalSerializerData::insert(int value, const char *name) {
     insert(value, QLatin1String(name));
 }
 
-void QnLexicalEnumSerializerData::clear() {
+void QnEnumLexicalSerializerData::clear() {
     m_nameByValue.clear();
     m_valueByName.clear();
     m_enumName.clear();
     m_flagged = false;
 }
 
-bool QnLexicalEnumSerializerData::isFlagged() const {
+bool QnEnumLexicalSerializerData::isFlagged() const {
     return m_flagged;
 }
 
-void QnLexicalEnumSerializerData::setFlagged(bool flagged) {
+void QnEnumLexicalSerializerData::setFlagged(bool flagged) {
     m_flagged = flagged;
 }
 
-void QnLexicalEnumSerializerData::serializeEnum(int value, QString *target) const {
+void QnEnumLexicalSerializerData::serializeEnum(int value, QString *target) const {
     /* Return empty string in case of failure. */
     *target = m_nameByValue.value(value); 
 }
 
-bool QnLexicalEnumSerializerData::deserializeEnum(const QString &value, int *target) const {
+bool QnEnumLexicalSerializerData::deserializeEnum(const QString &value, int *target) const {
     auto pos = m_valueByName.find(value);
     if(pos == m_valueByName.end())
         return false;
@@ -71,7 +71,7 @@ bool QnLexicalEnumSerializerData::deserializeEnum(const QString &value, int *tar
     return true;
 }
 
-void QnLexicalEnumSerializerData::serializeFlags(int value, QString *target) const {
+void QnEnumLexicalSerializerData::serializeFlags(int value, QString *target) const {
     target->clear();
 
     int v = value;
@@ -99,7 +99,7 @@ void QnLexicalEnumSerializerData::serializeFlags(int value, QString *target) con
     }
 }
 
-bool QnLexicalEnumSerializerData::deserializeFlags(const QString &value, int *target) const {
+bool QnEnumLexicalSerializerData::deserializeFlags(const QString &value, int *target) const {
     QStringList names = value.split(L'|');
 
     *target = 0;
@@ -133,12 +133,12 @@ bool QnLexicalEnumSerializerData::deserializeFlags(const QString &value, int *ta
     return true;
 }
 
-void QnLexicalEnumSerializerData::serialize(int value, QString *target) const {
+void QnEnumLexicalSerializerData::serialize(int value, QString *target) const {
     m_flagged ? serializeFlags(value, target) : serializeEnum(value, target);
 
 }
 
-bool QnLexicalEnumSerializerData::deserialize(const QString &value, int *target) const {
+bool QnEnumLexicalSerializerData::deserialize(const QString &value, int *target) const {
     return m_flagged ? deserializeFlags(value, target) : deserializeEnum(value, target);
 }
 

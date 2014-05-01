@@ -12,7 +12,7 @@
 #include <utils/common/model_functions.h>
 
 
-QN_DEFINE_METAOBJECT_LEXICAL_ENUM_FUNCTIONS(QnEmail, ConnectionType);
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnEmail, ConnectionType);
 QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnEmail::ConnectionType);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnEmail::SmtpServerPreset, (json), (server)(connectionType)(port))

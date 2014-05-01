@@ -30,9 +30,9 @@ namespace QnLexicalDetail {
 } // namespace QnLexicalDetail
 
 
-class QnLexicalEnumSerializerData {
+class QnEnumLexicalSerializerData {
 public:
-    QnLexicalEnumSerializerData(): m_flagged(false) {}
+    QnEnumLexicalSerializerData(): m_flagged(false) {}
 
     void load(const QMetaObject *metaObject, const char *enumName);
 
@@ -77,16 +77,16 @@ private:
 
 
 template<class T>
-class QnLexicalEnumSerializer: public QnLexicalSerializer {
+class QnEnumLexicalSerializer: public QnLexicalSerializer {
     static_assert(sizeof(T) <= sizeof(int), "Enumeration types larger than int in size are not supported.");
     typedef QnLexicalSerializer base_type;
 
 public:
-    QnLexicalEnumSerializer(): 
+    QnEnumLexicalSerializer(): 
         base_type(qMetaTypeId<T>())
     {}
 
-    QnLexicalEnumSerializer(const QnLexicalEnumSerializerData &data): 
+    QnEnumLexicalSerializer(const QnEnumLexicalSerializerData &data): 
         base_type(qMetaTypeId<T>()),
         m_data(data)
     {}
@@ -101,18 +101,18 @@ protected:
     }
 
 private:
-    QnLexicalEnumSerializerData m_data;
+    QnEnumLexicalSerializerData m_data;
 };
 
 
 namespace QnLexical {
     template<class T, class Integer>
-    QnLexicalEnumSerializer<Integer> *newEnumSerializer() {
-        return new QnLexicalEnumSerializer<Integer>(create_lexical_enum_serializer_data(static_cast<const T *>(NULL)));
+    QnEnumLexicalSerializer<Integer> *newEnumSerializer() {
+        return new QnEnumLexicalSerializer<Integer>(create_enum_lexical_serializer_data(static_cast<const T *>(NULL)));
     }
 
     template<class T>
-    QnLexicalEnumSerializer<T> *newEnumSerializer() {
+    QnEnumLexicalSerializer<T> *newEnumSerializer() {
         return newEnumSerializer<T, T>();
     }
 } // namespace QnLexical
@@ -136,7 +136,7 @@ namespace QnLexical {
 enum ENUM {                                                                     \
     BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_DEFINE_LEXICAL_ENUM_STEP_I, ~, ELEMENTS)  \
 };                                                                              \
-QN_DEFINE_EXPLICIT_LEXICAL_ENUM_FUNCTIONS(ENUM, ELEMENTS, ##__VA_ARGS__)
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ENUM, ELEMENTS, ##__VA_ARGS__)
 
 #define QN_DEFINE_LEXICAL_ENUM_STEP_I(R, DATA, ELEMENT)                         \
     BOOST_PP_TUPLE_ELEM(0, ELEMENT),
@@ -145,9 +145,9 @@ QN_DEFINE_EXPLICIT_LEXICAL_ENUM_FUNCTIONS(ENUM, ELEMENTS, ##__VA_ARGS__)
 /**
  * \see QN_DEFINE_LEXICAL_ENUM
  */
-#define QN_DEFINE_EXPLICIT_LEXICAL_ENUM_FUNCTIONS(ENUM, ELEMENTS, ... /* PREFIX */)  \
-    QN_DEFINE_EXPLICIT_LEXICAL_ENUM_SERIALIZER_FACTORY_FUNCTION(ENUM, ELEMENTS, ##__VA_ARGS__) \
-    QN_DEFINE_FACTORY_LEXICAL_ENUM_FUNCTIONS(ENUM, ##__VA_ARGS__)
+#define QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ENUM, ELEMENTS, ... /* PREFIX */)  \
+    QN_DEFINE_EXPLICIT_ENUM_LEXICAL_SERIALIZER_FACTORY_FUNCTION(ENUM, ELEMENTS, ##__VA_ARGS__) \
+    QN_DEFINE_FACTORY_ENUM_LEXICAL_FUNCTIONS(ENUM, ##__VA_ARGS__)
 
 
 /**
@@ -157,23 +157,23 @@ QN_DEFINE_EXPLICIT_LEXICAL_ENUM_FUNCTIONS(ENUM, ELEMENTS, ##__VA_ARGS__)
  *
  * Example usage:
  * \code
- * QN_DEFINE_METAOBJECT_LEXICAL_ENUM_FUNCTIONS(Qt, Orientations)
+ * QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, Orientations)
  * \endcode
  *
  * \param SCOPE                         Enumeration's scope.
  * \param ENUM                          Name of the enumeration.
  */
-#define QN_DEFINE_METAOBJECT_LEXICAL_ENUM_FUNCTIONS(SCOPE, ENUM, ... /* PREFIX */) \
-    QN_DEFINE_METAOBJECT_LEXICAL_ENUM_SERIALIZATION_FACTORY_FUNCTION(SCOPE, ENUM, ##__VA_ARGS__) \
-    QN_DEFINE_FACTORY_LEXICAL_ENUM_FUNCTIONS(SCOPE::ENUM, ##__VA_ARGS__)
+#define QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(SCOPE, ENUM, ... /* PREFIX */) \
+    QN_DEFINE_METAOBJECT_ENUM_LEXICAL_SERIALIZATION_FACTORY_FUNCTION(SCOPE, ENUM, ##__VA_ARGS__) \
+    QN_DEFINE_FACTORY_ENUM_LEXICAL_FUNCTIONS(SCOPE::ENUM, ##__VA_ARGS__)
 
 
 /**
  * \internal
  */
-#define QN_DEFINE_EXPLICIT_LEXICAL_ENUM_SERIALIZER_FACTORY_FUNCTION(ENUM, ELEMENTS, ... /* PREFIX */) \
-__VA_ARGS__ QnLexicalEnumSerializerData create_lexical_enum_serializer_data(const ENUM *) { \
-    QnLexicalEnumSerializerData data;                                           \
+#define QN_DEFINE_EXPLICIT_ENUM_LEXICAL_SERIALIZER_FACTORY_FUNCTION(ENUM, ELEMENTS, ... /* PREFIX */) \
+__VA_ARGS__ QnEnumLexicalSerializerData create_enum_lexical_serializer_data(const ENUM *) { \
+    QnEnumLexicalSerializerData data;                                           \
     BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_LEXICAL_ENUM_SERIALIZER_FACTORY_FUNCTION_STEP_I, ~, ELEMENTS) \
     return std::move(data);                                                     \
 }
@@ -186,9 +186,9 @@ __VA_ARGS__ QnLexicalEnumSerializerData create_lexical_enum_serializer_data(cons
 /**
  * \internal
  */
-#define QN_DEFINE_METAOBJECT_LEXICAL_ENUM_SERIALIZATION_FACTORY_FUNCTION(SCOPE, ENUM, ... /* PREFIX */)   \
-__VA_ARGS__ QnLexicalEnumSerializerData create_lexical_enum_serializer_data(const SCOPE::ENUM *) { \
-    QnLexicalEnumSerializerData data;                                           \
+#define QN_DEFINE_METAOBJECT_ENUM_LEXICAL_SERIALIZATION_FACTORY_FUNCTION(SCOPE, ENUM, ... /* PREFIX */)   \
+__VA_ARGS__ QnEnumLexicalSerializerData create_enum_lexical_serializer_data(const SCOPE::ENUM *) { \
+    QnEnumLexicalSerializerData data;                                           \
     data.load(&SCOPE::staticMetaObject, BOOST_PP_STRINGIZE(ENUM));              \
     return std::move(data);                                                     \
 }
@@ -197,14 +197,14 @@ __VA_ARGS__ QnLexicalEnumSerializerData create_lexical_enum_serializer_data(cons
 /**
  * \internal
  */
-#define QN_DEFINE_FACTORY_LEXICAL_ENUM_FUNCTIONS(TYPE, ... /* PREFIX */)  \
-    QN_DEFINE_FACTORY_LEXICAL_ENUM_FUNCTIONS_I(TYPE, BOOST_PP_CAT(qn_lexicalEnumSerializerData_instance, __LINE__), ##__VA_ARGS__)
+#define QN_DEFINE_FACTORY_ENUM_LEXICAL_FUNCTIONS(TYPE, ... /* PREFIX */)  \
+    QN_DEFINE_FACTORY_ENUM_LEXICAL_FUNCTIONS_I(TYPE, BOOST_PP_CAT(qn_enumLexicalSerializerData_instance, __LINE__), ##__VA_ARGS__)
 
-#define QN_DEFINE_FACTORY_LEXICAL_ENUM_FUNCTIONS_I(TYPE, STATIC_NAME, ... /* PREFIX */) \
+#define QN_DEFINE_FACTORY_ENUM_LEXICAL_FUNCTIONS_I(TYPE, STATIC_NAME, ... /* PREFIX */) \
 template<class T> void this_macro_cannot_be_used_in_header_files();             \
 template<> void this_macro_cannot_be_used_in_header_files<TYPE>() {};           \
                                                                                 \
-Q_GLOBAL_STATIC_WITH_ARGS(QnLexicalEnumSerializerData, STATIC_NAME, (create_lexical_enum_serializer_data(static_cast<const TYPE *>(NULL)))) \
+Q_GLOBAL_STATIC_WITH_ARGS(QnEnumLexicalSerializerData, STATIC_NAME, (create_enum_lexical_serializer_data(static_cast<const TYPE *>(NULL)))) \
                                                                                 \
 __VA_ARGS__ void serialize(const TYPE &value, QString *target) {                \
     STATIC_NAME()->serialize(value, target);                                    \

@@ -6,7 +6,7 @@
 
 #include "session_manager.h"
 
-Q_GLOBAL_STATIC(QnLexicalEnumSerializer<int>, qn_abstractConnection_emptySerializer);
+Q_GLOBAL_STATIC(QnEnumLexicalSerializer<int>, qn_abstractConnection_emptySerializer);
 
 void QnAbstractReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle) {
     Q_UNUSED(response);
