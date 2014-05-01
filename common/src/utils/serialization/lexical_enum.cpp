@@ -1,4 +1,4 @@
-#include "lexical_enum_serializer.h"
+#include "lexical_enum.h"
 
 #include <cassert>
 

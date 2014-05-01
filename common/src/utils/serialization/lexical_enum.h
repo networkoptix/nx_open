@@ -1,5 +1,5 @@
-#ifndef QN_LEXICAL_ENUM_SERIALIZER_H
-#define QN_LEXICAL_ENUM_SERIALIZER_H
+#ifndef QN_LEXICAL_ENUM_H
+#define QN_LEXICAL_ENUM_H
 
 #include "lexical.h"
 
@@ -174,11 +174,11 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ENUM, ELEMENTS, ##__VA_ARGS__)
 #define QN_DEFINE_EXPLICIT_ENUM_LEXICAL_SERIALIZER_FACTORY_FUNCTION(ENUM, ELEMENTS, ... /* PREFIX */) \
 __VA_ARGS__ QnEnumLexicalSerializerData create_enum_lexical_serializer_data(const ENUM *) { \
     QnEnumLexicalSerializerData data;                                           \
-    BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_LEXICAL_ENUM_SERIALIZER_FACTORY_FUNCTION_STEP_I, ~, ELEMENTS) \
+    BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_ENUM_LEXICAL_SERIALIZER_FACTORY_FUNCTION_STEP_I, ~, ELEMENTS) \
     return std::move(data);                                                     \
 }
 
-#define QN_DEFINE_EXPLICIT_LEXICAL_ENUM_SERIALIZER_FACTORY_FUNCTION_STEP_I(R, DATA, ELEMENT) \
+#define QN_DEFINE_EXPLICIT_ENUM_LEXICAL_SERIALIZER_FACTORY_FUNCTION_STEP_I(R, DATA, ELEMENT) \
     if(!QnLexicalDetail::isNullString(BOOST_PP_TUPLE_ELEM(1, ELEMENT)))         \
         data.insert ELEMENT;
 
@@ -223,4 +223,4 @@ namespace Qt {
 }
 
 
-#endif // QN_LEXICAL_ENUM_SERIALIZER_H
+#endif // QN_LEXICAL_ENUM_H

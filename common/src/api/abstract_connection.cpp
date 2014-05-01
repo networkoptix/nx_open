@@ -2,7 +2,7 @@
 
 #include <cstring> /* For std::strstr. */
 
-#include <utils/serialization/lexical_enum_serializer.h>
+#include <utils/serialization/lexical_enum.h>
 
 #include "session_manager.h"
 
