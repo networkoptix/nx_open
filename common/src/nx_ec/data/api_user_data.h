@@ -11,7 +11,7 @@ namespace ec2
 
         //QString password;
         bool isAdmin;
-        qint64 rights;
+        qint64 rights; // TODO: #API rename 'permissions' for consistency with other parts of the system.
         QString email;
         QByteArray digest;
         QByteArray hash; 

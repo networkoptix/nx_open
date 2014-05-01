@@ -10,7 +10,7 @@ namespace ec2
     {
         ApiLockData(): timestamp(0) {}
 
-        QByteArray name;
+        QByteArray name; // TODO: #API I suggest to use QString here.
         QnId peer;
         qint64 timestamp;
         QByteArray userData;

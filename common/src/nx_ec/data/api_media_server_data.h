@@ -22,15 +22,15 @@ namespace ec2
         ApiMediaServerData(): flags(Qn::SF_None), panicMode(0), maxCameras(0), redundancy(false) {}
 
         QString         apiUrl;
-        QString         netAddrList; // TODO: #Elric #EC2 rename
+        QString         netAddrList; // TODO: #API rename 'networkAddresses'. We don't use -List suffix in naming, we use plurals.
         Qn::ServerFlags flags;
-        qint32          panicMode; // TODO: #Elric #EC2 use Qn::PanicMode
+        qint32          panicMode; // TODO: #API use Qn::PanicMode
         QString         streamingUrl;
         QString         version; 
         QString         authKey;
         std::vector<ApiStorageData> storages;
         int             maxCameras;
-        bool            redundancy; // TODO: #Elric #EC2 wtf?
+        bool            redundancy; // TODO: #API what is this? Naming is unclear and I don't know how to rename it. Add comments to QnMediaServerResource::isRedundancy at least.
     };
 #define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(netAddrList)(flags)(panicMode)(streamingUrl)(version)(authKey)(storages)(maxCameras)(redundancy)
 

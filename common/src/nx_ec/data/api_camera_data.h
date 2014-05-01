@@ -37,9 +37,13 @@ namespace ec2
         ApiCameraData(): scheduleDisabled(false), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryStreamQuality(Qn::SSQualityNotDefined),
                          controlDisabled(false), statusFlags(0) {}
 
-        bool                scheduleDisabled; // TODO: #Elric #EC2 ENABLED!!!!
+        // TODO: #API using xyzDisabled as a field name is a bad practice.
+        // It leads to constructs like if(!isDisabled()), which are difficult to parse.
+        // As a rule of thumb, name fields in a way that would not lead to double negation in code as in case of !isDisabled.
+
+        bool                scheduleDisabled; // TODO: #API rename 'scheduleEnabled'
         Qn::MotionType      motionType;
-        QByteArray          region; // TODO: #Elric #EC2 rename. what region?
+        QByteArray          region; // TODO: #API rename. What kind of region is this? Or maybe there are many regions inside?
         QnLatin1Array       mac;
         QString             login;
         QString             password;
@@ -52,8 +56,8 @@ namespace ec2
         QString             groupId;
         QString             groupName;
         Qn::SecondStreamQuality    secondaryStreamQuality;
-        bool                controlDisabled; // TODO: #Elric ENABLED!!!
-        qint32              statusFlags; // TODO: #Elric #EC2 QnSecurityCamResource::StatusFlags
+        bool                controlDisabled; // TODO: #API rename 'controlEnabled'
+        qint32              statusFlags; // TODO: #API use bool here. We have exactly one flag, and I don't see why we would need more. And use bool in security cam resource.
         QByteArray          dewarpingParams;
         QString             vendor;
     };
