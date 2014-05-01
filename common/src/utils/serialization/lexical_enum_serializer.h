@@ -113,7 +113,7 @@ private:
  */
 #define QN_DEFINE_LEXICAL_ENUM(ENUM, ELEMENTS, ... /* PREFIX */)   \
 enum ENUM {                                                                     \
-    BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_DEFINE_LEXICAL_ENUM_STEP_I, ~, ELEMENTS) \
+    BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_DEFINE_LEXICAL_ENUM_STEP_I, ~, ELEMENTS)  \
 };                                                                              \
 QN_DEFINE_EXPLICIT_LEXICAL_ENUM_FUNCTIONS(ENUM, ELEMENTS, ##__VA_ARGS__)
 

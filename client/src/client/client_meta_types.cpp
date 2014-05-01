@@ -93,7 +93,7 @@ void QnClientMetaTypes::initialize() {
 
     QnJsonSerializer::registerSerializer<QnPaletteData>();
     QnJsonSerializer::registerSerializer<QnPenData>();
-    QnJsonSerializer::registerSerializer<QVector<QColor> >();
+    QnJsonSerializer::registerSerializer<QVector<QColor> >(); // TODO: #Elric integrate with QVariant iteration?
     QnJsonSerializer::registerSerializer<QVector<QUuid> >();
 
     qn_clientMetaTypes_initialized = true;
