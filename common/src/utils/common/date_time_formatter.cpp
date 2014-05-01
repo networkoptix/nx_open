@@ -87,8 +87,6 @@ static QString zeroPad(long value, int width)
         return QString::number(value).rightJustified(width, QLatin1Char('0'), true);
 }
 
-#undef fromLocal8Bit
-
 static QString timeZone()
 {
 #if defined(Q_OS_WINCE)

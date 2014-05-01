@@ -9,6 +9,9 @@
 
 #ifdef __cplusplus
 
+#include <boost/preprocessor/control/if.hpp>
+#include <boost/preprocessor/facilities/is_empty.hpp>
+
 /* Prevent the usage of boost pointer containers. */
 namespace boost {
     struct ptr_vector {};
@@ -37,8 +40,17 @@ namespace boost {
 //#define QMapIterator            qt_java_style_iterators_are_forbidden // TODO: #Elric
 
 
-/* Prevent the usage of local 8-bit encodings for QString. */
-#define toLocal8Bit toLocal8Bit_is_forbidden
+/* Prevent the usage of local 8-bit encodings for QString. Use toLatin1 instead. */
+#define toLocal8Bit                                                             \
+    BOOST_PP_IF(                                                                \
+        BOOST_PP_IS_EMPTY(QTSERVICE_H), /* Make sure QtService compiles. */     \
+        toLocal8Bit,                                                            \
+        toLocal8Bit_is_forbidden                                                \
+    ) 
+
+/* qPrintable uses toLocal8Bit, so we have to redefine it. Not a big loss. */
+#undef qPrintable
+#define qPrintable(string) QString(string).toLatin1().constData()
 
 
 /* Prevent the usage of Q_GLOBAL_STATIC_WITH_INITIALIZER as it is not thread-safe.
