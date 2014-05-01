@@ -101,7 +101,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                     continue;
                 processedMac << mac;
 
-                resource->setMAC(mac);
+                resource->setMAC(QnMacAddress(mac));
                 resource->setDiscoveryAddr(info.ifAddr);
                 resource->setUrl(QLatin1String("tcp://") + sender + QLatin1Char(':') + QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]));
                 resources.insert(mac, resource);

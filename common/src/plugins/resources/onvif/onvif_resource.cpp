@@ -2969,7 +2969,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetDeviceInformationPriv( b
             const QString& mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
 
             if (!mac.isEmpty()) 
-                setMAC(mac);
+                setMAC(QnMacAddress(mac));
         }
         if (getPhysicalId().isEmpty())
         {

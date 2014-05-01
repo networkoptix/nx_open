@@ -146,7 +146,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     parseMotionRegionList(regions, src.region);
     dst->setMotionRegionList(regions, QnDomainMemory);
 
-    dst->setMAC(src.mac);
+    dst->setMAC(QnMacAddress(src.mac));
     QAuthenticator auth;
     auth.setUser(src.login);
     auth.setPassword(src.password);
