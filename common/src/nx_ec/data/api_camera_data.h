@@ -40,7 +40,7 @@ namespace ec2
         bool                scheduleDisabled; // TODO: #Elric #EC2 ENABLED!!!!
         Qn::MotionType      motionType;
         QByteArray          region; // TODO: #Elric #EC2 rename. what region?
-        QByteArray          mac;
+        QnLatin1Array       mac;
         QString             login;
         QString             password;
         std::vector<ApiScheduleTaskData>  scheduleTasks;

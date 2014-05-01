@@ -1,7 +1,8 @@
-#ifndef QN_BYTE_STRING_H
-#define QN_BYTE_STRING_H
+#ifndef QN_LATIN1_ARRAY_H
+#define QN_LATIN1_ARRAY_H
 
 #include <QtCore/QByteArray>
+
 
 /**
  * A byte array that is to be treated by serialization / deserialization 
@@ -14,4 +15,5 @@ public:
     QnLatin1Array(const QByteArray &other): QByteArray(other) {}
 };
 
-#endif // QN_BYTE_STRING_H
+
+#endif // QN_LATIN1_ARRAY_H
