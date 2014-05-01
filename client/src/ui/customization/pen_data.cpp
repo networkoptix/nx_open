@@ -2,16 +2,14 @@
 
 #include <cassert>
 
-#include <utils/serialization/json_functions.h>
-#include <utils/fusion/fusion_adaptor.h>
-#include <utils/common/enum_name_mapper.h>
+#include <utils/common/model_functions.h>
 
-QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, PenStyle, static)
-QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, PenCapStyle, static)
-QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, PenJoinStyle, static)
-QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenStyle, static)
-QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenCapStyle, static)
-QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenJoinStyle, static)
+QN_DEFINE_METAOBJECT_LEXICAL_ENUM_FUNCTIONS(Qt, PenStyle, static)
+QN_DEFINE_METAOBJECT_LEXICAL_ENUM_FUNCTIONS(Qt, PenCapStyle, static)
+QN_DEFINE_METAOBJECT_LEXICAL_ENUM_FUNCTIONS(Qt, PenJoinStyle, static)
+QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenStyle, static)
+QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenCapStyle, static)
+QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenJoinStyle, static)
 
 namespace QnPenDataDetail {
     template<QnPenData::Field field>

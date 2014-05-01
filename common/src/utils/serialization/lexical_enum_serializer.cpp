@@ -8,20 +8,20 @@
 #include <utils/common/warnings.h>
 
 
-void QnLexicalEnumSerializerData::insert(int value, const QString &name) {
-    if(!m_valueByName.contains(name))
-        m_valueByName[name] = value;
-    if(!m_nameByValue.contains(value))
-        m_nameByValue[value] = name;
-}
-
-void QnLexicalEnumSerializerData::insert(const QMetaObject *metaObject, const char *enumName) {
+// -------------------------------------------------------------------------- //
+// QnLexicalEnumSerializerData
+// -------------------------------------------------------------------------- //
+void QnLexicalEnumSerializerData::load(const QMetaObject *metaObject, const char *enumName) {
     assert(metaObject && enumName);
+
+    clear();
 
     int index = metaObject->indexOfEnumerator(enumName);
     assert(index >= 0); /* Getting an assert here? Do your class actually contain the provided enumeration? */
 
     QMetaEnum enumerator = metaObject->enumerator(index);
+    m_flagged = enumerator.isFlag();
+
     QString scope = QLatin1String(metaObject->className()) + QStringLiteral("::");
     for(int i = 0; i < enumerator.keyCount(); i++) {
         insert(enumerator.value(i), QLatin1String(enumerator.key(i)));
@@ -31,12 +31,38 @@ void QnLexicalEnumSerializerData::insert(const QMetaObject *metaObject, const ch
     m_enumName = scope + QLatin1String(enumName);
 }
 
-void QnLexicalEnumSerializerData::serializeEnum(int value, QString *target) {
+void QnLexicalEnumSerializerData::insert(int value, const QString &name) {
+    if(!m_valueByName.contains(name))
+        m_valueByName[name] = value;
+    if(!m_nameByValue.contains(value))
+        m_nameByValue[value] = name;
+}
+
+void QnLexicalEnumSerializerData::insert(int value, const char *name) {
+    insert(value, QLatin1String(name));
+}
+
+void QnLexicalEnumSerializerData::clear() {
+    m_nameByValue.clear();
+    m_valueByName.clear();
+    m_enumName.clear();
+    m_flagged = false;
+}
+
+bool QnLexicalEnumSerializerData::isFlagged() const {
+    return m_flagged;
+}
+
+void QnLexicalEnumSerializerData::setFlagged(bool flagged) {
+    m_flagged = flagged;
+}
+
+void QnLexicalEnumSerializerData::serializeEnum(int value, QString *target) const {
     /* Return empty string in case of failure. */
     *target = m_nameByValue.value(value); 
 }
 
-bool QnLexicalEnumSerializerData::deserializeEnum(const QString &value, int *target) {
+bool QnLexicalEnumSerializerData::deserializeEnum(const QString &value, int *target) const {
     auto pos = m_valueByName.find(value);
     if(pos == m_valueByName.end())
         return false;
@@ -45,7 +71,7 @@ bool QnLexicalEnumSerializerData::deserializeEnum(const QString &value, int *tar
     return true;
 }
 
-void QnLexicalEnumSerializerData::serializeFlags(int value, QString *target) {
+void QnLexicalEnumSerializerData::serializeFlags(int value, QString *target) const {
     target->clear();
 
     int v = value;
@@ -73,7 +99,7 @@ void QnLexicalEnumSerializerData::serializeFlags(int value, QString *target) {
     }
 }
 
-bool QnLexicalEnumSerializerData::deserializeFlags(const QString &value, int *target) {
+bool QnLexicalEnumSerializerData::deserializeFlags(const QString &value, int *target) const {
     QStringList names = value.split(L'|');
 
     *target = 0;
@@ -107,3 +133,23 @@ bool QnLexicalEnumSerializerData::deserializeFlags(const QString &value, int *ta
     return true;
 }
 
+void QnLexicalEnumSerializerData::serialize(int value, QString *target) const {
+    m_flagged ? serializeFlags(value, target) : serializeEnum(value, target);
+
+}
+
+bool QnLexicalEnumSerializerData::deserialize(const QString &value, int *target) const {
+    return m_flagged ? deserializeFlags(value, target) : deserializeEnum(value, target);
+}
+
+
+
+// -------------------------------------------------------------------------- //
+// QtStaticMetaObject
+// -------------------------------------------------------------------------- //
+class QtStaticMetaObject: public QObject {
+public:
+    using QObject::staticQtMetaObject;
+};
+
+const QMetaObject &Qt::staticMetaObject = QtStaticMetaObject::staticQtMetaObject;

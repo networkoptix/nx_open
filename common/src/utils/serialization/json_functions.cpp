@@ -5,12 +5,12 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QVarLengthArray>
 
-#include <utils/common/enum_name_mapper.h> // TODO: #Elric move into sxn
+#include <utils/serialization/lexical_functions.h>
 #include <utils/fusion/fusion_adaptors.h>
 
-QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qt, BrushStyle, static)
-QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::BrushStyle, static)
+QN_DEFINE_METAOBJECT_LEXICAL_ENUM_FUNCTIONS(Qt, BrushStyle, static)
 
+QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::BrushStyle, static)
 QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QColor)
 QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QUrl)
 

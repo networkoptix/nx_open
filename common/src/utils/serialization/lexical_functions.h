@@ -6,6 +6,7 @@
 #include <QtGui/QColor>
 
 #include "lexical.h"
+#include "lexical_enum_serializer.h"
 
 namespace QnLexicalDetail {
     template<class T, class Temporary>

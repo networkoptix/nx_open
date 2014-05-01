@@ -2,11 +2,11 @@
 
 #include <cstring> /* For std::strstr. */
 
-#include <utils/common/enum_name_mapper.h>
+#include <utils/serialization/lexical_enum_serializer.h>
 
 #include "session_manager.h"
 
-Q_GLOBAL_STATIC(QnEnumNameMapper, qn_abstractConnection_emptyNameMapper);
+Q_GLOBAL_STATIC(QnLexicalEnumSerializer<int>, qn_abstractConnection_emptySerializer);
 
 void QnAbstractReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle) {
     Q_UNUSED(response);
@@ -45,12 +45,14 @@ void QnAbstractConnection::setUrl(const QUrl &url) {
     m_url = url;
 }
 
-QnEnumNameMapper *QnAbstractConnection::nameMapper() const {
-    return m_nameMapper.data() ? m_nameMapper.data() : qn_abstractConnection_emptyNameMapper();
+QnLexicalSerializer *QnAbstractConnection::serializer() const {
+    return m_serializer.data() ? m_serializer.data() : qn_abstractConnection_emptySerializer();
 }
 
-void QnAbstractConnection::setNameMapper(QnEnumNameMapper *nameMapper) {
-    m_nameMapper.reset(nameMapper);
+void QnAbstractConnection::setSerializer(QnLexicalSerializer *serializer) {
+    assert(serializer->type() == QMetaType::Int);
+
+    m_serializer.reset(serializer);
 }
 
 int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot) {
@@ -70,10 +72,13 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
     if(!m_extraHeaders.isEmpty())
         actualHeaders.append(m_extraHeaders);
 
+    QString objectName;    
+    serializer()->serialize(processor->object(), &objectName);
+
     return QnSessionManager::instance()->sendAsyncRequest(
         operation,
         m_url, 
-        nameMapper()->name(processor->object()), 
+        objectName, 
         actualHeaders, 
         params, 
         data,
@@ -103,11 +108,14 @@ int QnAbstractConnection::sendSyncRequest(int operation, int object, const QnReq
     if(!m_extraHeaders.isEmpty())
         actualHeaders.append(m_extraHeaders);
 
+    QString objectName;
+    serializer()->serialize(object, &objectName);
+
     QnHTTPRawResponse response;
     int status = QnSessionManager::instance()->sendSyncRequest(
         operation,
         m_url,
-        nameMapper()->name(object),
+        objectName,
         actualHeaders,
         params,
         data,

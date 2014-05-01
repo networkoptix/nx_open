@@ -3,6 +3,8 @@
 
 #include "lexical.h"
 
+#include <cassert>
+
 #include <type_traits> /* For std::true_type, std::false_type. */
 #include <utility> /* For std::move. */
 
@@ -30,72 +32,91 @@ namespace QnLexicalDetail {
 
 class QnLexicalEnumSerializerData {
 public:
-    QnLexicalEnumSerializerData() {}
+    QnLexicalEnumSerializerData(): m_flagged(false) {}
+
+    void load(const QMetaObject *metaObject, const char *enumName);
 
     void insert(int value, const QString &name);
-    void insert(const QMetaObject *metaObject, const char *enumName);
+    void insert(int value, const char *name);
+    void clear();
 
-    void serializeEnum(int value, QString *target);
-    bool deserializeEnum(const QString &value, int *target);
+    bool isFlagged() const;
+    void setFlagged(bool flagged);
 
-    void serializeFlags(int value, QString *target);
-    bool deserializeFlags(const QString &value, int *target);
+    void serialize(int value, QString *target) const;
+    bool deserialize(const QString &value, int *target) const;
 
     template<class T>
-    void serialize(const T &value, QString *target) const {
-        (QnLexicalDetail::is_flags<T>() ? serializeFlags : serializeEnum)(value, target);
+    void serialize(T value, QString *target) const {
+        serialize(static_cast<int>(value), target);
     }
 
     template<class T>
     bool deserialize(const QString &value, T *target) const {
         int tmp;
-        if(!(QnLexicalDetail::is_flags<T>() ? deserializeFlags : deserializeEnum)(value, &tmp))
+        if(!deserialize(value, &tmp))
             return false;
+
         *target = static_cast<T>(tmp);
         return true;
     }
+
+protected:
+    void serializeEnum(int value, QString *target) const;
+    bool deserializeEnum(const QString &value, int *target) const;
+
+    void serializeFlags(int value, QString *target) const;
+    bool deserializeFlags(const QString &value, int *target) const;
 
 private:
     QHash<int, QString> m_nameByValue;
     QHash<QString, int> m_valueByName;
     QString m_enumName;
+    bool m_flagged;
 };
 
 
-template<class Enum>
+template<class T>
 class QnLexicalEnumSerializer: public QnLexicalSerializer {
-    static_assert(sizeof(Enum) <= sizeof(int), "Enumeration types larger than int in size are not supported.");
+    static_assert(sizeof(T) <= sizeof(int), "Enumeration types larger than int in size are not supported.");
     typedef QnLexicalSerializer base_type;
 
 public:
     QnLexicalEnumSerializer(): 
-        base_type(qMetaTypeId<Enum>()) 
+        base_type(qMetaTypeId<T>())
     {}
 
     QnLexicalEnumSerializer(const QnLexicalEnumSerializerData &data): 
-        base_type(qMetaTypeId<Enum>()),
+        base_type(qMetaTypeId<T>()),
         m_data(data)
     {}
 
-    const QnLexicalEnumSerializerData &data() const {
-        return m_data;
-    }
-
 protected:
     virtual void serializeInternal(const void *value, QString *target) const override {
-        m_data.deserialize(*static_cast<const Enum *>(value), target);
+        m_data.serialize(*static_cast<const T *>(value), target);
     }
 
     virtual bool deserializeInternal(const QString &value, void *target) const override {
-        int tmp;
-        if(!m_data.deserialize(value, &tmp))
-            return false;
-        *static_cast<Enum *>(target) = static_cast<Enum>(tmp);
+        return m_data.deserialize(value, static_cast<T *>(target));
     }
 
 private:
     QnLexicalEnumSerializerData m_data;
 };
+
+
+namespace QnLexical {
+    template<class T, class Integer>
+    QnLexicalEnumSerializer<Integer> *newEnumSerializer() {
+        return new QnLexicalEnumSerializer<Integer>(create_lexical_enum_serializer_data(static_cast<const T *>(NULL)));
+    }
+
+    template<class T>
+    QnLexicalEnumSerializer<T> *newEnumSerializer() {
+        return newEnumSerializer<T, T>();
+    }
+} // namespace QnLexical
+
 
 
 /**
@@ -151,10 +172,10 @@ QN_DEFINE_EXPLICIT_LEXICAL_ENUM_FUNCTIONS(ENUM, ELEMENTS, ##__VA_ARGS__)
  * \internal
  */
 #define QN_DEFINE_EXPLICIT_LEXICAL_ENUM_SERIALIZER_FACTORY_FUNCTION(ENUM, ELEMENTS, ... /* PREFIX */) \
-__VA_ARGS__ QnLexicalEnumSerializer<ENUM> new_lexical_serializer(ENUM *) {      \
+__VA_ARGS__ QnLexicalEnumSerializerData create_lexical_enum_serializer_data(const ENUM *) { \
     QnLexicalEnumSerializerData data;                                           \
     BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_DEFINE_EXPLICIT_LEXICAL_ENUM_SERIALIZER_FACTORY_FUNCTION_STEP_I, ~, ELEMENTS) \
-    return new QnLexicalEnumSerializer<ENUM>(std::move(data));                  \
+    return std::move(data);                                                     \
 }
 
 #define QN_DEFINE_EXPLICIT_LEXICAL_ENUM_SERIALIZER_FACTORY_FUNCTION_STEP_I(R, DATA, ELEMENT) \
@@ -166,10 +187,10 @@ __VA_ARGS__ QnLexicalEnumSerializer<ENUM> new_lexical_serializer(ENUM *) {      
  * \internal
  */
 #define QN_DEFINE_METAOBJECT_LEXICAL_ENUM_SERIALIZATION_FACTORY_FUNCTION(SCOPE, ENUM, ... /* PREFIX */)   \
-__VA_ARGS__ QnLexicalEnumSerializer<SCOPE::ENUM> new_lexical_serializer(SCOPE::ENUM *) { \
+__VA_ARGS__ QnLexicalEnumSerializerData create_lexical_enum_serializer_data(const SCOPE::ENUM *) { \
     QnLexicalEnumSerializerData data;                                           \
-    data.insert(&SCOPE::staticMetaObject, BOOST_PP_STRINGIZE(ENUM));            \
-    return new QnLexicalEnumSerializer<ENUM>(std::move(data));                  \
+    data.load(&SCOPE::staticMetaObject, BOOST_PP_STRINGIZE(ENUM));              \
+    return std::move(data);                                                     \
 }
 
 
@@ -177,22 +198,29 @@ __VA_ARGS__ QnLexicalEnumSerializer<SCOPE::ENUM> new_lexical_serializer(SCOPE::E
  * \internal
  */
 #define QN_DEFINE_FACTORY_LEXICAL_ENUM_FUNCTIONS(TYPE, ... /* PREFIX */)  \
-    QN_DEFINE_FACTORY_LEXICAL_ENUM_FUNCTIONS_I(TYPE, BOOST_PP_CAT(qn_lexicalEnumSerializer_instance, __LINE__), ##__VA_ARGS__)
+    QN_DEFINE_FACTORY_LEXICAL_ENUM_FUNCTIONS_I(TYPE, BOOST_PP_CAT(qn_lexicalEnumSerializerData_instance, __LINE__), ##__VA_ARGS__)
 
 #define QN_DEFINE_FACTORY_LEXICAL_ENUM_FUNCTIONS_I(TYPE, STATIC_NAME, ... /* PREFIX */) \
 template<class T> void this_macro_cannot_be_used_in_header_files();             \
 template<> void this_macro_cannot_be_used_in_header_files<TYPE>() {};           \
                                                                                 \
-Q_GLOBAL_STATIC_WITH_ARGS(QnLexicalEnumSerializer<TYPE>, STATIC_NAME, (new_lexical_serializer(static_cast<TYPE *>(NULL)))) \
+Q_GLOBAL_STATIC_WITH_ARGS(QnLexicalEnumSerializerData, STATIC_NAME, (create_lexical_enum_serializer_data(static_cast<const TYPE *>(NULL)))) \
                                                                                 \
 __VA_ARGS__ void serialize(const TYPE &value, QString *target) {                \
-    STATIC_NAME()->data().serialize(value, target);                             \
+    STATIC_NAME()->serialize(value, target);                                    \
 }                                                                               \
                                                                                 \
 __VA_ARGS__ bool deserialize(const QString &value, TYPE *target) {              \
-    return STATIC_NAME()->data().deserialize(value, target);                    \
+    return STATIC_NAME()->deserialize(value, target);                           \
 }
 
+
+namespace Qt {
+    /**
+     * Workaround for accessing Qt namespace metaobject.
+     */
+    extern const QMetaObject &staticMetaObject;
+}
 
 
 #endif // QN_LEXICAL_ENUM_SERIALIZER_H
