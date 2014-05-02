@@ -105,8 +105,8 @@ private:
     QFont m_labelsFont;
     QFont m_gridFont;
 
-    QColor m_cellColors[Qn::RecordingType_Count];
-    QColor m_insideColors[Qn::RecordingType_Count];
+    QColor m_cellColors[Qn::RT_Count];
+    QColor m_insideColors[Qn::RT_Count];
     QnScheduleGridColors m_colors;
 
     bool m_enabled;

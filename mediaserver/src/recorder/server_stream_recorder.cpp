@@ -43,7 +43,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     QnScheduleTask::Data scheduleData;
     scheduleData.m_startTime = 0;
     scheduleData.m_endTime = 24*3600*7;
-    scheduleData.m_recordType = Qn::RecordingType_Run;
+    scheduleData.m_recordType = Qn::RT_Always;
     scheduleData.m_streamQuality = Qn::QualityHighest;
     scheduleData.m_fps = getFpsForValue(0);
 
@@ -156,7 +156,7 @@ void QnServerStreamRecorder::updateStreamParams()
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
         if (m_role == QnResource::Role_LiveVideo) {
-            if (m_currentScheduleTask.getRecordingType() != Qn::RecordingType_Never) {
+            if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never) {
                 liveProvider->setFps(m_currentScheduleTask.getFps());
                 liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
             }
@@ -174,8 +174,8 @@ void QnServerStreamRecorder::updateStreamParams()
 bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 {
     QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
-    return recType == Qn::RecordingType_MotionOnly || 
-           (m_role == QnResource::Role_LiveVideo && recType == Qn::RecordingType_MotionPlusLQ && camera->hasDualStreaming2());
+    return recType == Qn::RT_MotionOnly || 
+           (m_role == QnResource::Role_LiveVideo && recType == Qn::RT_MotionAndLowQuality && camera->hasDualStreaming2());
 }
 
 void QnServerStreamRecorder::beforeProcessData(QnConstAbstractMediaDataPtr media)
@@ -195,7 +195,7 @@ void QnServerStreamRecorder::beforeProcessData(QnConstAbstractMediaDataPtr media
     }
 
     const QnScheduleTask task = currentScheduleTask();
-    bool isRecording = task.getRecordingType() != Qn::RecordingType_Never && qnStorageMan->isWritableStoragesAvailable();
+    bool isRecording = task.getRecordingType() != Qn::RT_Never && qnStorageMan->isWritableStoragesAvailable();
     if (!m_device->hasFlags(QnResource::foreigner)) {
         if (isRecording) {
             if(m_device->getStatus() == QnResource::Online)
@@ -233,7 +233,7 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
 bool QnServerStreamRecorder::needSaveData(QnConstAbstractMediaDataPtr media)
 {
     qint64 afterThreshold = 5 * 1000000ll;
-    if (m_currentScheduleTask.getRecordingType() == Qn::RecordingType_MotionOnly)
+    if (m_currentScheduleTask.getRecordingType() == Qn::RT_MotionOnly)
         afterThreshold = m_currentScheduleTask.getAfterThreshold()*1000000ll;
     bool isMotionContinue = m_lastMotionTimeUsec != (qint64)AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + afterThreshold;
     if (!isMotionContinue)
@@ -246,11 +246,11 @@ bool QnServerStreamRecorder::needSaveData(QnConstAbstractMediaDataPtr media)
     QnScheduleTask task = currentScheduleTask();
     QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
 
-    if (task.getRecordingType() == Qn::RecordingType_Run)
+    if (task.getRecordingType() == Qn::RT_Always)
         return true;
-    else if (task.getRecordingType() == Qn::RecordingType_MotionPlusLQ && (m_role == QnResource::Role_SecondaryLiveVideo || !camera->hasDualStreaming2()))
+    else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_role == QnResource::Role_SecondaryLiveVideo || !camera->hasDualStreaming2()))
         return true;
-    else if (task.getRecordingType() == Qn::RecordingType_Never)
+    else if (task.getRecordingType() == Qn::RT_Never)
     {
         close();
         if (media->dataType == QnAbstractMediaData::META_V1)
@@ -280,7 +280,7 @@ bool QnServerStreamRecorder::needSaveData(QnConstAbstractMediaDataPtr media)
 int QnServerStreamRecorder::getFpsForValue(int fps)
 {
     QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
-    if (camera->streamFpsSharingMethod() == Qn::shareFps)
+    if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
     {
         if (m_role == QnResource::Role_LiveVideo)
             return fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2;
@@ -311,7 +311,7 @@ void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int
         int currentWeekSeconds = (dt.date().dayOfWeek()-1)*3600*24 + dt.time().hour()*3600 + dt.time().minute()*60 +  dt.time().second();
         scheduleData.m_endTime = currentWeekSeconds + maxDuration;
     }
-    scheduleData.m_recordType = Qn::RecordingType_Run;
+    scheduleData.m_recordType = Qn::RT_Always;
     scheduleData.m_streamQuality = quality;
     
     m_forcedSchedileRecord.setData(scheduleData);
@@ -339,7 +339,7 @@ void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleT
     {
         // switch from motion to non-motion recording
         QnSecurityCamResourcePtr camRes = getResource().dynamicCast<QnSecurityCamResource>();
-        bool isNoRec = scheduleTask.getRecordingType() == Qn::RecordingType_Never;
+        bool isNoRec = scheduleTask.getRecordingType() == Qn::RT_Never;
         bool usedInRecordAction = camRes && camRes->isRecordingEventAttached();
         int prebuffer = usedInRecordAction && isNoRec ? 1 : 0; // prebuffer 1 usec if camera used in recording action (for keeping last GOP)
         setPrebufferingUsec(prebuffer);
@@ -390,7 +390,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;
-    QnScheduleTask noRecordTask(QnId(), 1, 0, 0, Qn::RecordingType_Never, 0, 0);
+    QnScheduleTask noRecordTask(QnId(), 1, 0, 0, Qn::RT_Never, 0, 0);
 
     if (!m_schedule.isEmpty())
     {

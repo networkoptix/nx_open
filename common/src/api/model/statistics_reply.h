@@ -6,7 +6,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QLinkedList>
 
-// TODO: #Elric global enum without suffixes. BAD!!!
+// TODO: #GDM global enum without suffixes. Rename and move to some namespace.
 enum QnStatisticsDeviceType {
     CPU,                /**< CPU load in percents. */
     RAM,                /**< RAM load in percents. */
