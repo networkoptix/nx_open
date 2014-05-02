@@ -5,16 +5,20 @@
 #include <type_traits>  /* For std::integral_constant, std::declval. */
 
 #ifndef Q_MOC_RUN
+#include <boost/preprocessor/seq/size.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/for_each_i.hpp>
+#include <boost/preprocessor/seq/to_tuple.hpp>
 #include <boost/preprocessor/variadic/elem.hpp>
 #include <boost/preprocessor/tuple/size.hpp>
+#include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #endif // Q_MOC_RUN
 
-#include "fusion.h"
+#include <utils/preprocessor/variadic_seq_for_each.h>
 
+#include "fusion.h"
 
 /**
  * Main API entry point for fusion adaptors.

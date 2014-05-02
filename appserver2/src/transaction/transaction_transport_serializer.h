@@ -35,7 +35,7 @@ namespace ec2
             stream.write("\r\n",2); // chunk end
             quint32 payloadSize = buffer.size() - 12;
             quint32* payloadSizePtr = (quint32*) (buffer.data() + 10);
-            *payloadSizePtr = htonl(payloadSize);
+            *payloadSizePtr = htonl(payloadSize - 4);
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
         }
 
@@ -53,7 +53,7 @@ namespace ec2
             stream.write("\r\n",2); // chunk end
             quint32 payloadSize = buffer.size() - 12;
             quint32* payloadSizePtr = (quint32*) (buffer.data() + 10);
-            *payloadSizePtr = htonl(payloadSize);
+            *payloadSizePtr = htonl(payloadSize - 4);
             toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
         }
 
