@@ -5,6 +5,8 @@
 
 #include "camera_diagnose_tool.h"
 
+#include <QtNetwork/QNetworkReply>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>

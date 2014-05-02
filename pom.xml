@@ -198,7 +198,7 @@
             <activation>        
                 <file>
                     <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
-                    <missing>build_environment/target/buildenv.timestamp</missing>
+                    <missing>build_environment/target/buildenv1.timestamp</missing>
                 </file> 
             </activation>
             <modules>   
@@ -276,8 +276,7 @@
                     <family>Windows</family>
                 </os>
             </activation>
-            <modules>
-                <module>plugins/image_library_plugin</module>                
+            <modules>     
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
@@ -334,9 +333,6 @@
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
-                <module>plugins/image_library_plugin</module>
-                <module>debsetup/client-deb</module>
-                <module>debsetup/mediaserver-deb</module>
             </modules>            
         </profile>  
         <profile>
@@ -358,6 +354,25 @@
             </modules>            
         </profile>        
 
+        <profile>        
+            <id>linux-noarm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+            <modules>                       
+                <module>debsetup/client-deb</module>
+                <module>debsetup/mediaserver-deb</module>
+            </modules>  
+        </profile>         
+        
         <profile>
             <id>linux-isd-jaguar</id>
             <activation>

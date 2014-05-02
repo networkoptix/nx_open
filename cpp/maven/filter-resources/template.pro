@@ -112,7 +112,8 @@ win* {
   LIBS += ${windows.oslibs}
   DEFINES += ${windows.defines}  
   win32-msvc* {
-    QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR
+    # Note on /bigobj: http://stackoverflow.com/questions/15110580/penalty-of-the-msvs-linker-flag-bigobj
+    QMAKE_CXXFLAGS += -MP /Fd$$OBJECTS_DIR /bigobj
 	# /OPT:NOREF is here for a reason, see http://stackoverflow.com/questions/6363991/visual-studio-debug-information-in-release-build.
 	QMAKE_CXXFLAGS_RELEASE += /Zi /wd4250
 	QMAKE_LFLAGS_RELEASE += /DEBUG /OPT:NOREF 

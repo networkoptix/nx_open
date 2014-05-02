@@ -21,8 +21,18 @@
 
 namespace ec2
 {
+    // TODO: #MSAPI 
+    //
+    // Think of inheriting this one from QnBasicRestHandler (ex-QnJsonRestHandler)
+    // and sharing the implementation of format handling.
+    // 
+    // Btw, it would also make sense to do some renamings. This one is a 
+    // rest handler, so should be named as such. ec2::BasicRestHandler?
+    // 
+    //
+
     //!Http request handler for GET requests
-    template<class InputData, class OutputData, class ChildType>
+    template<class InputData, class OutputData, class Derived>
     class BaseQueryHttpHandler
     :
         public QnRestRequestHandler
@@ -44,16 +54,25 @@ namespace ec2
             InputData inputData;
             parseHttpRequestParams( params, &inputData );
 
+            Qn::SerializationFormat format = Qn::BnsFormat;
+            parseHttpRequestParams( params, &format );
+
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;
 
-            auto queryDoneHandler = [&result, &errorCode, &contentType, &finished, this]( ErrorCode _errorCode, const OutputData& outputData )
+            auto queryDoneHandler = [&]( ErrorCode _errorCode, const OutputData& outputData )
             {
                 if( _errorCode == ErrorCode::ok )
                 {
-                    OutputBinaryStream<QByteArray> stream( &result );
-                    serialize( outputData, &stream );
-                    contentType = "application/octet-stream";
+                    if(format == Qn::BnsFormat) {
+                        result = QnBinary::serialized(outputData);
+                        contentType = "application/octet-stream";
+                    } else if(format == Qn::JsonFormat) {
+                        result = QJson::serialized(outputData);
+                        contentType = "application/json";
+                    } else {
+                        assert(false);
+                    }
                 }
                 errorCode = _errorCode;
 
@@ -62,7 +81,7 @@ namespace ec2
                 m_cond.wakeAll();
             };
 
-            static_cast<ChildType*>(this)->template processQueryAsync<decltype(queryDoneHandler)>(
+            static_cast<Derived*>(this)->processQueryAsync(
                 m_cmdCode,
                 inputData,
                 queryDoneHandler );
@@ -150,7 +169,8 @@ namespace ec2
         public BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> >
     {
     public:
-        typedef BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> > parent_type;
+        // TODO: #MSAPI our code convention is to name this one base_type, and make it private. Tell Andrey.
+        typedef BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> > parent_type; 
 
         FlexibleQueryHttpHandler( ApiCommand::Value cmdCode, QueryHandlerType queryHandler )
         :

@@ -79,11 +79,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, resources)
     {
-        if (!resource->toSharedPointer())
-        {
-            qnWarning("Resource '%1' does not have an associated shared pointer. Did you forget to use QnSharedResourcePointer?", resource->metaObject()->className());
-            QnSharedResourcePointer<QnResource>::initialize(resource);
-        }
+        assert(resource->toSharedPointer()); /* Getting an assert here? Did you forget to use QnSharedResourcePointer? */
 
         if(resource->resourcePool() != NULL)
             qnWarning("Given resource '%1' is already in the pool.", resource->metaObject()->className());
@@ -300,6 +296,20 @@ QnResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer) const
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if (camResource && (parentId.isNull() || camResource->getParentId() == parentId))
             result << camResource;
+    }
+
+    return result;
+}
+
+QnMediaServerResourceList QnResourcePool::getAllServers() const 
+{
+    QMutexLocker locker(&m_resourcesMtx);
+    QnMediaServerResourceList result;
+    foreach (const QnResourcePtr &resource, m_resources) 
+    {
+        QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
+        if (mServer)
+            result << mServer;
     }
 
     return result;

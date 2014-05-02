@@ -11,11 +11,13 @@
 #include <QtCore/QMutexLocker>
 #include <QtCore/QWaitCondition>
 
+#include <common/common_module.h>
+
 #include <rest/server/request_handler.h>
 #include <utils/network/http/httptypes.h>
+#include <transaction/transaction.h>
 
 #include "server_query_processor.h"
-#include "common/common_module.h"
 
 
 namespace ec2
@@ -52,9 +54,8 @@ namespace ec2
             QByteArray& /*contentType*/ )
         {
             QnTransaction<RequestDataType> tran;
-            //tran.command = ;
-            InputBinaryStream<QByteArray> stream( body );
-            if (!deserialize(tran, &stream))
+            QnInputBinaryStream<QByteArray> stream( body );
+            if (!QnBinary::deserialize(&stream, &tran))
                 return nx_http::StatusCode::badRequest;
             
             // replace client GUID to own GUID (take transaction ownership).
@@ -80,7 +81,7 @@ namespace ec2
             if (errorCode == ErrorCode::ok)
                 m_connection->triggerNotification(tran);
 
-            return (errorCode == ErrorCode::ok || errorCode == ErrorCode::skipped)
+            return (errorCode == ErrorCode::ok)
                 ? nx_http::StatusCode::ok
                 : nx_http::StatusCode::internalServerError;
         }

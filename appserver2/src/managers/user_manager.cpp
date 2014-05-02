@@ -9,6 +9,7 @@
 #include "database/db_manager.h"
 #include "transaction/transaction_log.h"
 #include "server_query_processor.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 namespace ec2
@@ -27,13 +28,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiUserList& users) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiUserDataList& users) {
             QnUserResourceList outData;
             if( errorCode == ErrorCode::ok )
-                users.toResourceList(outData);
+                fromApiToResourceList(users, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiUserList, decltype(queryDoneHandler)> ( ApiCommand::getUserList, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUserList, nullptr, queryDoneHandler);
         return reqID;
     }
 
@@ -65,10 +66,10 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiUser> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource )
+    QnTransaction<ApiUserData> QnUserManager<T>::prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource )
     {
-        QnTransaction<ApiUser> tran(command, true);
-        tran.params.fromResource( resource );
+        QnTransaction<ApiUserData> tran(command, true);
+        fromResourceToApi(resource, tran.params);
         return tran;
     }
 

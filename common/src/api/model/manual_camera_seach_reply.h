@@ -6,7 +6,7 @@
 #include <QtCore/QList>
 #include <QtCore/QUuid>
 
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 /**
  * State of the running manual camera search process.
@@ -36,8 +36,6 @@ struct QnManualCameraSearchStatus {
     int total;
 };
 
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchStatus)
-
 struct QnManualCameraSearchSingleCamera {
     QString name;
     QString url;
@@ -54,9 +52,6 @@ struct QnManualCameraSearchSingleCamera {
         return QString(QLatin1String("%1 (%2 - %3)")).arg(name).arg(url).arg(vendor);
     }
 };
-Q_DECLARE_METATYPE(QnManualCameraSearchSingleCamera)
-
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchSingleCamera)
 
 typedef QList<QnManualCameraSearchSingleCamera> QnManualCameraSearchCameraList;
 
@@ -84,7 +79,6 @@ struct QnManualCameraSearchReply {
     QnManualCameraSearchCameraList cameras;
 };
 
-Q_DECLARE_METATYPE(QnManualCameraSearchReply)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnManualCameraSearchReply)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnManualCameraSearchStatus)(QnManualCameraSearchSingleCamera)(QnManualCameraSearchReply), (json)(metatype))
 
 #endif // QN_MANUAL_CAMERA_SEARCH_REPLY_H

@@ -5,42 +5,60 @@
 
 #include "request_params.h"
 
+#include <QtCore/QUrlQuery>
+
+#include <utils/serialization/lexical_functions.h>
 
 namespace ec2
 {
-    static const QString ID_PARAM_NAME( QLatin1String("id") );
-
-    void parseHttpRequestParams( const QnRequestParamList& params, QnId* id)
-    {
-        foreach( const QnRequestParamList::value_type& val, params )
-        {
-            if( val.first == ID_PARAM_NAME )
-            {
-                *id = val.second;
-                return;
-            }
+    template<class T>
+    bool deserialize(const QnRequestParamList &value, const QString &key, T *target) {
+        auto pos = value.find(key);
+        if(pos == value.end()) {
+            return false;
+        } else {
+            return QnLexical::deserialize(pos->second, target);
         }
     }
 
-    void parseHttpRequestParams( const QnRequestParamList& /*params*/, nullptr_t* ) {}
-
-    void toUrlParams( const std::nullptr_t& , QUrlQuery* const /*query*/)
-    {
-        // nothing to do
+    template<class T>
+    void serialize(const T &value, const QString &key, QUrlQuery *target) {
+        target->addQueryItem(key, QnLexical::serialized(value));
     }
 
-    void toUrlParams( const QnId& id, QUrlQuery* const query)
-    {
-        query->addQueryItem( ID_PARAM_NAME, id.toString() );
+
+    bool parseHttpRequestParams(const QnRequestParamList &params, ApiStoredFilePath *path) {
+        return deserialize(params, lit("folder"), path);
     }
 
-    void toUrlParams( const ApiStoredFilePath& name, QUrlQuery* const query)
-    {
-        query->addQueryItem( FOLDER_NAME_PARAM_NAME, name );
+    void toUrlParams(const ApiStoredFilePath &name, QUrlQuery *query) {
+        serialize(name, lit("folder"), query);
     }
 
-    void toUrlParams( const LoginInfo& /*loginInfo*/, QUrlQuery* const /*query*/)
-    {
-        //TODO/IMPL
+
+    bool parseHttpRequestParams(const QnRequestParamList &params, QnId *id) {
+        return deserialize(params, lit("id"), id);
     }
+
+    void toUrlParams(const QnId &id, QUrlQuery *query) {
+        serialize(id, lit("id"), query);
+    }
+
+
+    bool parseHttpRequestParams(const QnRequestParamList &params, Qn::SerializationFormat *format) {
+        return deserialize(params, lit("format"), format);
+    }
+
+    void toUrlParams(const Qn::SerializationFormat& format, QUrlQuery *query) {
+        serialize(format, lit("format"), query);
+    }
+
+
+    bool parseHttpRequestParams(const QnRequestParamList &, LoginInfo *) { return true; }
+    void toUrlParams(const LoginInfo &, QUrlQuery *) {}
+
+    bool parseHttpRequestParams(const QnRequestParamList &, nullptr_t *) { return true; }
+    void toUrlParams(const std::nullptr_t &, QUrlQuery *) {}
+
 }
+

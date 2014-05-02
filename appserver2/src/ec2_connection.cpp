@@ -5,6 +5,7 @@
 
 #include "ec2_connection.h"
 #include "mutex/distributed_mutex.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 namespace ec2
@@ -27,13 +28,12 @@ namespace ec2
         ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
 
         m_dbManager->init();
-        m_transactionLog->init();
 
-        ApiParamList paramList;
+        ApiResourceParamDataList paramList;
         m_dbManager->doQueryNoLock(nullptr, paramList);
 
         QnKvPairList kvPairs;
-        paramList.toResourceList(kvPairs);
+        fromApiToResourceList(paramList, kvPairs);
 
         m_emailManagerImpl.configure(kvPairs);
         QnTransactionMessageBus::instance()->setHandler(this);

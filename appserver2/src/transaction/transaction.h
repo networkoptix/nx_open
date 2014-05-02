@@ -1,13 +1,14 @@
-
 #ifndef EC2_TRANSACTION_H
 #define EC2_TRANSACTION_H
 
-#include <QString>
 #include <vector>
-#include "nx_ec/binary_serialization_helper.h"
+
+#include <QtCore/QString>
+
 #include "nx_ec/ec_api.h"
-#include "nx_ec/data/ec2_license.h"
-#include "nx_ec/data/ec2_email.h"
+#include "nx_ec/data/api_license_data.h"
+#include "nx_ec/data/api_email_data.h"
+#include "utils/serialization/binary.h"
 
 
 namespace ec2
@@ -16,127 +17,130 @@ namespace ec2
     {
         enum Value
         {
-		    NotDefined,
+		    NotDefined = 0,
 
-            testConnection,
-            connect,
+            testConnection = 1,
+            connect = 2,
 
-            clientInstanceId,
+            clientInstanceId = 3,
 
             //!ApiResourceTypeList
-            getResourceTypes,
+            getResourceTypes = 4,
             //!ApiResource
-            getResource,
+            getResource = 5,
             //!ApiSetResourceStatusData
-            setResourceStatus,
+            setResourceStatus = 6,
             //!ApiSetResourceDisabledData
-            setResourceDisabled,
+            setResourceDisabled = 7,
             //!ApiResourceParams
-            setResourceParams,
-            getResourceParams,
+            setResourceParams = 8,
+            getResourceParams = 9,
             //!ApiResource
-            saveResource,
-            removeResource,
+            saveResource = 10,
+            removeResource = 11,
             //!ApiPanicModeData
-            setPanicMode,
+            setPanicMode = 12,
             //!ApiFullInfo,
-            getAllDataList,
+            getAllDataList = 13,
             
             //!ApiCamera
-            saveCamera,
+            saveCamera = 14,
             //!ApiCameraList
-            saveCameras,
+            saveCameras = 15,
             //!ApiIdData
-            removeCamera,
-            getCameras,
+            removeCamera = 16,
+            getCameras = 17,
             //!ApiCameraServerItemList
-            getCameraHistoryList,
+            getCameraHistoryList = 18,
             //!ApiCameraServerItem
-            addCameraHistoryItem,
+            addCameraHistoryItem = 19,
 
-            getMediaServerList,
+            getMediaServerList = 20,
             //!ApiMediaServer
-            saveMediaServer,
+            saveMediaServer = 21,
             //!ApiIdData
-            removeMediaServer,
+            removeMediaServer = 22,
 
             //!ApiUser
-            saveUser,
-            getUserList,
+            saveUser = 23,
+            getUserList = 24,
             //!ApiIdData
-            removeUser,
+            removeUser = 25,
 
             //!ApiBusinessRuleList
-            getBusinessRuleList,
+            getBusinessRuleList = 26,
             //!ApiBusinessRule
-            saveBusinessRule,
+            saveBusinessRule = 27,
             //!ApiIdData
-            removeBusinessRule,
+            removeBusinessRule = 28,
             //!ApiBusinessActionData
-            broadcastBusinessAction,
+            broadcastBusinessAction = 29,
+            //!ApiBusinessActionData
+            execBusinessAction = 30,
 
             //!ApiResetBusinessRuleData
-            resetBusinessRules,
+            resetBusinessRules = 31,
 
             //!ApiLayout
-            saveLayouts,
+            saveLayouts = 32,
             //!ApiLayoutList
-            saveLayout,
+            saveLayout = 33,
             //!ApiLayoutList
-            getLayoutList,
+            getLayoutList = 34,
             //!ApiIdData
-            removeLayout,
+            removeLayout = 35,
             
             //!ApiVideowall
-            saveVideowall,
-            getVideowallList,
+            saveVideowall = 36,
+            getVideowallList = 37,
             //!ApiIdData
-            removeVideowall,
+            removeVideowall = 38,
 
             //!ApiVideoWallControlMessage
-            videowallControl,
+            videowallControl = 39,
 
             //!
-            listDirectory,
+            listDirectory = 40,
             //!ApiStoredFileData
-            getStoredFile,
+            getStoredFile = 41,
             //!ApiStoredFileData
-            addStoredFile,
+            addStoredFile = 42,
             //!ApiStoredFileData
-            updateStoredFile,
+            updateStoredFile = 43,
             //!QString
-            removeStoredFile,
+            removeStoredFile = 44,
 
             //!ApiLicenseList
-            addLicenses,
+            addLicenses = 45,
             //!ApiLicense
-            addLicense,
+            addLicense = 46,
             //!ApiLicenseList
-            getLicenses,
+            getLicenses = 47,
 
             // ApiEmailSettingsData
-            testEmailSettings,
+            testEmailSettings = 48,
 
             // ApiEmailData
-            sendEmail,
+            sendEmail = 49,
 
             //!ApiResourceParamList
-            getSettings,
+            getSettings = 50,
             //!ApiResourceParamList
-            saveSettings,
+            saveSettings = 51,
 
-            getCurrentTime,
+            getCurrentTime = 52,
 
-            tranSyncRequest,
-            tranSyncResponse,
+            tranSyncRequest = 53,
+            tranSyncResponse = 54,
             
-            serverAliveInfo,
+            serverAliveInfo = 55,
             
             //!ApiLockInfo
-            lockRequest,
-            lockResponse,
-            unlockRequest,
+            lockRequest = 56,
+            lockResponse = 57,
+            unlockRequest = 58,
         };
+        QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
         QString toString( Value val );
         bool isSystem( Value val );
@@ -154,7 +158,7 @@ namespace ec2
         struct ID
         {
             ID(): sequence(0) {}
-            QUuid peerGUID;
+            QUuid peerGUID; // TODO: #Elric #EC2 rename into sane case
             qint32 sequence;
         };
 
@@ -168,13 +172,7 @@ namespace ec2
     };
 
     typedef QSet<QnId> PeerList;
-}
 
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction::ID, (peerGUID) (sequence) )
-QN_DEFINE_STRUCT_SERIALIZATORS(ec2::QnAbstractTransaction, (command) (id) (persistent) (timestamp))
-
-namespace ec2
-{
     template <class T>
     class QnTransaction: public QnAbstractTransaction
     {
@@ -186,22 +184,25 @@ namespace ec2
         T params;
     };
 
-    template <class TranParamType, class T2>
-    void serialize( const QnTransaction<TranParamType>& tran, OutputBinaryStream<T2>* stream )
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary))
+
+    template <class T, class Output>
+    void serialize(const QnTransaction<T> &transaction, QnOutputBinaryStream<Output> *stream)
     {
-        serialize( (const QnAbstractTransaction&)tran, stream);
-        serialize(tran.params, stream);
+        QnBinary::serialize(static_cast<const QnAbstractTransaction &>(transaction), stream);
+        QnBinary::serialize(transaction.params, stream);
     }
 
-    template <class TranParamType, class T2>
-    bool deserialize( QnTransaction<TranParamType>& tran, InputBinaryStream<T2>* stream )
+    template <class T, class Input>
+    bool deserialize(QnInputBinaryStream<Input>* stream, QnTransaction<T> *transaction)
     {
-        return deserialize( (QnAbstractTransaction&)tran, stream) &&
-            deserialize(tran.params, stream);
-            //params.deserialize(stream);
+        return 
+            QnBinary::deserialize(stream, static_cast<QnAbstractTransaction *>(transaction)) &&
+            QnBinary::deserialize(stream, &transaction->params);
     }
 
     int generateRequestID();
-}
+} // namespace ec2
 
 #endif  //EC2_TRANSACTION_H

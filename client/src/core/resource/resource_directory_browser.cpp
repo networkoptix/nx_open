@@ -14,7 +14,9 @@
 
 #include <utils/common/warnings.h>
 #include <utils/local_file_cache.h>
-#include "nx_ec/data/ec2_layout_data.h"
+#include "nx_ec/data/api_layout_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
+#include "utils/serialization/binary_functions.h"
 
 namespace {
     const int maxResourceCount = 1024;
@@ -129,16 +131,16 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     delete layoutFile;
     
     QnLayoutResourcePtr layout(new QnLayoutResource());
-    ec2::ApiLayout apiLayout;
-    InputBinaryStream<QByteArray> stream(layoutData);
-    if (deserialize(apiLayout, &stream))
-        apiLayout.toResource(layout);
+    ec2::ApiLayoutData apiLayout;
+    QnInputBinaryStream<QByteArray> stream(layoutData);
+    if (QnBinary::deserialize(&stream, &apiLayout))
+        fromApiToResource(apiLayout, layout);
     else
         return QnLayoutResourcePtr();
     QnLayoutItemDataList orderedItems;
-    foreach(const ec2::ApiLayoutItem& item, apiLayout.items) {
+    foreach(const ec2::ApiLayoutItemData& item, apiLayout.items) {
         orderedItems << QnLayoutItemData();
-        item.toResource(orderedItems.last());
+        fromApiToResource(item, orderedItems.last());
     }
 
     QIODevice *uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);

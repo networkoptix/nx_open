@@ -4,8 +4,9 @@
 #include <QtCore/QAtomicInt>
 
 #include <utils/common/connective.h>
-#include <utils/common/json.h>
-#include <utils/common/lexical.h>
+
+#include <utils/serialization/json.h>
+#include <utils/serialization/lexical.h>
 
 #include <core/resource/resource_fwd.h>
 

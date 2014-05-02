@@ -241,7 +241,7 @@ int QnPlColdStoreStorage::getChunkLen() const
 bool QnPlColdStoreStorage::isStorageAvailable() 
 {
     Veracity::SFSClient csConnection;
-    QByteArray ipba = coldstoreAddr().toLocal8Bit();
+    QByteArray ipba = coldstoreAddr().toLatin1();
     char* ip = ipba.data();
 
     if (csConnection.Connect(ip) != Veracity::ISFS::STATUS_SUCCESS)

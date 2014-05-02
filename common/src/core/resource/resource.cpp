@@ -9,7 +9,8 @@
 #include <QtCore/QMetaProperty>
 #include <QtCore/QRunnable>
 
-#include "utils/common/warnings.h"
+#include <utils/common/warnings.h>
+#include <utils/common/model_functions.h>
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "core/resource_management/resource_pool.h"
@@ -21,6 +22,9 @@
 
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnResource, Status)
+QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnResource::Status)
 
 bool QnResource::m_appStopping = false;
 QnInitResPool QnResource::m_initAsyncPool;

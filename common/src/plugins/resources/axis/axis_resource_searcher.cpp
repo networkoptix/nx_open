@@ -104,7 +104,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     resource->setTypeId(typeId);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(mac);
+    resource->setMAC(QnMacAddress(mac));
     //resource->setHostAddress(host, QnDomainMemory);
     QUrl finalUrl(url);
     finalUrl.setScheme(QLatin1String("http"));
@@ -203,7 +203,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(smac);
+    resource->setMAC(QnMacAddress(smac));
 
 
     local_results.push_back(resource);

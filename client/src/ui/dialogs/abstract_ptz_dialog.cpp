@@ -12,7 +12,6 @@
 #include <core/ptz/ptz_data.h>
 
 #include <ui/widgets/dialog_button_box.h>
-#include "utils/common/lexical.h"
 
 QnAbstractPtzDialog::QnAbstractPtzDialog(QWidget *parent, Qt::WindowFlags windowFlags) :
     base_type(parent, windowFlags),

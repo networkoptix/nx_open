@@ -29,9 +29,9 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
 
     for (int i = 0; i < params.size(); ++i)
     {
-        if (params[i].first.toLocal8Bit() == "res_id" || params[i].first.toLocal8Bit() == "guid")
+        if (params[i].first == QLatin1String("res_id") || params[i].first == QLatin1String("guid"))
             resourceId = params[i].second;
-        else if (params[i].first.toLocal8Bit() == "event_type")
+        else if (params[i].first == QLatin1String("event_type"))
             eventType = params[i].second;
     }
     if (resourceId.isEmpty())
@@ -52,7 +52,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
         {
             emit mserverFailure(resource,
                  qnSyncTime->currentUSecsSinceEpoch(),
-                 QnBusiness::MServerIssueTerminated);
+                 QnBusiness::ServerTerminatedReason);
             //qnBusinessRuleConnector->at_mserverFailure(resource,
             //                                           qnSyncTime->currentUSecsSinceEpoch(),
             //                                           QnBusiness::MServerIssueTerminated);

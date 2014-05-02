@@ -30,7 +30,10 @@
 #ifdef Q_OS_WIN
 #include <launcher/nov_launcher_win.h>
 #endif
-#include "nx_ec/data/ec2_layout_data.h"
+
+#include "nx_ec/data/api_layout_data.h"
+#include "utils/serialization/binary_functions.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
                                        const QnTimePeriod &period,
@@ -132,10 +135,10 @@ bool QnLayoutExportTool::start() {
     delete itemTimezonesIO;
 
     QByteArray layoutData;
-    ec2::ApiLayout layoutObject;
-    layoutObject.fromResource(m_layout);
-    OutputBinaryStream<QByteArray> stream(&layoutData);
-    serialize(layoutObject, &stream);
+    ec2::ApiLayoutData layoutObject;
+    fromResourceToApi(m_layout, layoutObject);
+    QnOutputBinaryStream<QByteArray> stream(&layoutData);
+    QnBinary::serialize(layoutObject, &stream);
 
 
     QIODevice* device = m_storage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);

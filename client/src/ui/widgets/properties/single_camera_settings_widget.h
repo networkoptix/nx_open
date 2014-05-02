@@ -2,12 +2,22 @@
 #define CAMERA_SETTINGS_DIALOG_H
 
 #include <QtWidgets/QWidget>
-#include "api/media_server_connection.h"
-#include <core/resource/resource_fwd.h>
-#include "camera_settings_tab.h"
+#include <QtNetwork/QNetworkReply>
+
+#ifdef WEBKIT_PRESENT
+#include <QtWebKitWidgets/QtWebKitWidgets>
+#endif
+
 #include "utils/camera_advanced_settings_xml_parser.h"
-#include "ui/workbench/workbench_context_aware.h"
 #include "utils/common/connective.h"
+
+#include <core/resource/resource_fwd.h>
+
+#include "api/media_server_connection.h"
+
+#include "ui/workbench/workbench_context_aware.h"
+
+#include "camera_settings_tab.h"
 
 namespace Ui {
     class SingleCameraSettingsWidget;
@@ -149,6 +159,12 @@ private:
     void loadAdvancedSettings();
 
     void cleanAdvancedSettings();
+#ifdef WEBKIT_PRESENT
+    void updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView);
+#endif
+    Q_SLOT void at_sslErrors(QNetworkReply* reply, const QList<QSslError> &);
+    Q_SLOT void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
+    Q_SLOT void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
 
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
@@ -187,6 +203,7 @@ private:
     mutable QnMediaServerConnectionPtr m_serverConnection;
 
     QHash<QnId, QnImageProvider*> m_imageProvidersByResourceId;
+	QUrl m_lastSiteUrl;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

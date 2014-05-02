@@ -13,12 +13,14 @@
 
 #include <utils/common/request_param.h>
 #include <utils/common/warnings.h>
-#include <utils/common/json.h>
 #include <utils/common/connective.h>
-#include <utils/common/enum_name_mapper.h>
+#include <utils/serialization/json.h>
 
 #include <nx_ec/ec_api.h>
 #include <rest/server/json_rest_handler.h>
+
+class QnLexicalSerializer;
+
 
 namespace QnStringizeTypeDetail { template<class T> void check_type() {} }
 
@@ -182,8 +184,8 @@ public:
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) = 0;
 
-    QnEnumNameMapper *nameMapper() const;
-    void setNameMapper(QnEnumNameMapper *nameMapper);
+    QnLexicalSerializer *serializer() const;
+    void setSerializer(QnLexicalSerializer *serializer);
 
     const QnRequestHeaderList &extraHeaders() const;
     void setExtraHeaders(const QnRequestHeaderList &extraHeaders);
@@ -211,8 +213,12 @@ protected:
             return status;
 
         int replyType = qMetaTypeId<T>();
-        if(replyVariant.userType() != replyType)
-            qnWarning("Invalid return type of request '%1': expected '%2', got '%3'.", m_nameMapper->name(object), QMetaType::typeName(replyType), replyVariant.typeName());
+        if(replyVariant.userType() != replyType) {
+            QString objectName;
+            m_serializer->serialize(object, &objectName);
+
+            qnWarning("Invalid return type of request '%1': expected '%2', got '%3'.", objectName, QMetaType::typeName(replyType), replyVariant.typeName());
+        }
 
         *reply = replyVariant.value<T>();
         return status;
@@ -233,7 +239,7 @@ private:
 
 private:
     QUrl m_url;
-    QScopedPointer<QnEnumNameMapper> m_nameMapper;
+    QScopedPointer<QnLexicalSerializer> m_serializer;
     QnRequestHeaderList m_extraHeaders;
 };
 

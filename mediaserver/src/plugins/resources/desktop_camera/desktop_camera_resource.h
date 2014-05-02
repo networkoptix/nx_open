@@ -38,7 +38,6 @@ public:
     QString getUserName() const;
     QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider);
 };
-typedef QSharedPointer<QnDesktopCameraResource> QnDesktopCameraResourcePtr;
 
 #endif //ENABLE_DESKTOP_CAMERA
 

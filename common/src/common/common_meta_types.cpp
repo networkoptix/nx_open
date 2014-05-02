@@ -4,7 +4,7 @@
 
 #include <utils/network/mac_address.h>
 #include <utils/common/request_param.h>
-#include <utils/common/json_serializer.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/appcast/update_info.h>
 #include <utils/network/networkoptixmodulerevealcommon.h>
 #include <utils/math/space_mapper.h>
@@ -171,8 +171,6 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnConnectionInfo>();
     qRegisterMetaType<Qn::PanicMode>();
-
-    QnJsonSerializer::registerSerializer<QUuid>();
 
     qn_commonMetaTypes_initialized = true;
 }

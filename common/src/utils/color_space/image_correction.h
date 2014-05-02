@@ -9,7 +9,7 @@
 #include <QtCore/QRectF>
 #include <QtCore/QMetaType>
 
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 
 struct ImageCorrectionParams
@@ -48,8 +48,7 @@ struct ImageCorrectionParams
     bool enabled;
 };
 
-Q_DECLARE_METATYPE(ImageCorrectionParams)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(ImageCorrectionParams)
+QN_FUSION_DECLARE_FUNCTIONS(ImageCorrectionParams, (json)(metatype))
 
 struct ImageCorrectionResult
 {

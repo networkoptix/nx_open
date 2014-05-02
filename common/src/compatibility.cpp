@@ -2,6 +2,10 @@
 
 #include <QtCore/QStringList>
 
+inline uint qHash(const QnCompatibilityItem &item)
+{
+    return qHash(item.ver1) + 7 * qHash(item.comp1) + 11 * qHash(item.ver2);
+}
 
 QString stripVersion(const QString& version)
 {
@@ -11,7 +15,7 @@ QString stripVersion(const QString& version)
 
 QnCompatibilityChecker::QnCompatibilityChecker(const QList<QnCompatibilityItem> compatiblityInfo)
 {
-    m_compatibilityMatrix = QnCompatibilityMatrixType::fromList(compatiblityInfo);
+    m_compatibilityMatrix = compatiblityInfo.toSet();
 }
 
 bool QnCompatibilityChecker::isCompatible(const QString& comp1, const QString& ver1, const QString& comp2, const QString& ver2) const

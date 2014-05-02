@@ -3,7 +3,7 @@
 #include <QtCore/QFile>
 
 #include <utils/common/warnings.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json_functions.h>
 #include <core/resource/camera_resource.h>
 
 struct QnResourceDataPoolChunk {
@@ -44,14 +44,18 @@ QnResourceData QnResourceDataPool::data(const QnVirtualCameraResourcePtr &camera
     vendor = m_shortVendorByName.value(vendor, vendor);
     QString model = camera->getModel().toLower();
 
-    QString key0 = lit("*|") + model;
-    QString key1 = vendor + lit("|") + model;
-    QString key2 = key1 + lit("|") + camera->getFirmware().toLower();
+    QString key0 = lit("*|*");
+    QString key1 = vendor + lit("|*");
+    QString key2 = lit("*|") + model;
+    QString key3 = vendor + lit("|") + model;
+    QString key4 = key1 + lit("|") + camera->getFirmware().toLower();
 
     QnResourceData result;
     result.add(m_dataByKey.value(key0));
     result.add(m_dataByKey.value(key1));
     result.add(m_dataByKey.value(key2));
+    result.add(m_dataByKey.value(key3));
+    result.add(m_dataByKey.value(key4));
     return result;
 }
 

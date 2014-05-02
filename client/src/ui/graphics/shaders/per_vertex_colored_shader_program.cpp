@@ -17,14 +17,20 @@ bool QnPerVertexColoredGLShaderProgramm::compile()
         vColor = aColor;
     }
     ));
-    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
-        precision mediump float;
-    uniform vec4 uColor;
-    varying vec4 vColor;
-    void main() {
-        gl_FragColor = uColor*vColor;
-    }
-    ));
+
+     QByteArray shader(QN_SHADER_SOURCE(
+     uniform vec4 uColor;
+     varying vec4 vColor;
+     void main() {
+         gl_FragColor = uColor*vColor;
+     }
+     ));
+
+#ifdef QT_OPENGL_ES_2
+    shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
+    addShaderFromSourceCode(QGLShader::Fragment, shader);
 
     return link();
 };

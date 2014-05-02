@@ -30,13 +30,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiMediaServerList& servers) {
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiMediaServerDataList& servers) {
             QnMediaServerResourceList outData;
             if( errorCode == ErrorCode::ok )
-                servers.toResourceList(outData, m_resCtx);
+                fromApiToResourceList(servers, outData, m_resCtx);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiMediaServerList, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiMediaServerDataList, decltype(queryDoneHandler)> (
             ApiCommand::getMediaServerList, nullptr, queryDoneHandler);
         return reqID;
     }
@@ -77,10 +77,10 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiMediaServer> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource )
+    QnTransaction<ApiMediaServerData> QnMediaServerManager<T>::prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource )
     {
-        QnTransaction<ApiMediaServer> tran(command, true);
-        tran.params.fromResource(resource);
+        QnTransaction<ApiMediaServerData> tran(command, true);
+        fromResourceToApi(resource, tran.params);
         return tran;
     }
 

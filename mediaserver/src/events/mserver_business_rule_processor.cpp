@@ -36,17 +36,17 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
     if (!result) {
         switch(action->actionType())
         {
-        case BusinessActionType::Bookmark:
+        case QnBusiness::BookmarkAction:
             // TODO: implement me
             break;
-        case BusinessActionType::CameraOutput:
-        case BusinessActionType::CameraOutputInstant:
+        case QnBusiness::CameraOutputAction:
+        case QnBusiness::CameraOutputOnceAction:
             result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
             break;
-        case BusinessActionType::CameraRecording:
+        case QnBusiness::CameraRecordingAction:
             result = executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
             break;
-        case BusinessActionType::PanicRecording:
+        case QnBusiness::PanicRecordingAction:
             result = executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
             break;
         default:
@@ -69,7 +69,7 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr
         return true; // ignore panic business action if panic mode turn on by user
     
     Qn::PanicMode val = Qn::PM_None;
-    if (action->getToggleState() == Qn::OnState)
+    if (action->getToggleState() == QnBusiness::ActiveState)
         val =  Qn::PM_BusinessEvents;
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     conn->setPanicModeSync(val);
@@ -85,7 +85,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessA
     bool rez = false;
     if (camera) {
         // todo: if camera is offline function return false. Need some tries on timer event
-        if (action->getToggleState() == Qn::OnState)
+        if (action->getToggleState() == QnBusiness::ActiveState)
             rez = qnRecordingManager->startForcedRecording(camera, action->getStreamQuality(), action->getFps(), 
                                                             action->getRecordBefore(), action->getRecordAfter(), 
                                                             action->getRecordDuration());
@@ -121,14 +121,14 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
     //    return false;
     //}
 
-    bool instant = action->actionType() == BusinessActionType::CameraOutputInstant;
+    bool instant = action->actionType() == QnBusiness::CameraOutputOnceAction;
 
     int autoResetTimeout = instant
             ? 30*1000
             : qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     bool on = instant
             ? true
-            : action->getToggleState() == Qn::OnState;
+            : action->getToggleState() == QnBusiness::ActiveState;
 
     return securityCam->setRelayOutputState(
                 relayOutputId,
@@ -142,7 +142,7 @@ QImage QnMServerBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventP
     QImage result;
 
     // By now only motion screenshot is supported
-    if (params.getEventType() != BusinessEventType::Camera_Motion)
+    if (params.getEventType() != QnBusiness::CameraMotionEvent)
         return result;
 
     QnVirtualCameraResourcePtr res = qSharedPointerDynamicCast<QnVirtualCameraResource> (QnResourcePool::instance()->getResourceById(params.getEventResourceId()));

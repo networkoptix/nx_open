@@ -27,13 +27,13 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiVideowallList& videowalls) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiVideowallDataList& videowalls) {
             QnVideoWallResourceList outData;
             if( errorCode == ErrorCode::ok )
-                videowalls.toResourceList(outData);
+                fromApiToResourceList(videowalls, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiVideowallList, decltype(queryDoneHandler)> ( ApiCommand::getVideowallList, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowallList, nullptr, queryDoneHandler);
         return reqID;
     }
 
@@ -85,10 +85,10 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiVideowall> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallResourcePtr &resource)
+    QnTransaction<ApiVideowallData> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallResourcePtr &resource)
     {
-        QnTransaction<ApiVideowall> tran(command, true);
-        tran.params.fromResource( resource );
+        QnTransaction<ApiVideowallData> tran(command, true);
+        fromResourceToApi( resource, tran.params );
         return tran;
     }
 
@@ -101,10 +101,10 @@ namespace ec2
     }
 
     template<class T>
-    QnTransaction<ApiVideowallControlMessage> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message)
+    QnTransaction<ApiVideowallControlMessageData> QnVideowallManager<T>::prepareTransaction(ApiCommand::Value command, const QnVideoWallControlMessage &message)
     {
-        QnTransaction<ApiVideowallControlMessage> tran(command, false);
-        tran.params.fromMessage(message);
+        QnTransaction<ApiVideowallControlMessageData> tran(command, false);
+        fromResourceToApi(message, tran.params);
         return tran;
     }
 
