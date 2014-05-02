@@ -5,7 +5,9 @@
 
 #include <type_traits> /* For std::enable_if, std::is_base_of, std::integral_constant. */
 
+#ifndef QN_NO_QT
 #include <QtCore/QVariant>
+#endif
 
 #include <utils/common/adl_wrapper.h>
 #include <utils/common/flat_map.h>
@@ -80,25 +82,29 @@ public:
 
     QnContextSerializer(int type): QnContextSerializerBase(type) {}
 
+#ifndef QN_NO_QT
     void serialize(context_type *ctx, const QVariant &value, data_type *target) const {
         assert(ctx && value.userType() == type() && target);
 
         serializeInternal(ctx, value.constData(), target);
     }
-
+#endif
+    
     void serialize(context_type *ctx, const void *value, data_type *target) const {
         assert(ctx && value && target);
 
         serializeInternal(ctx, value, target);
     }
 
+#ifndef QN_NO_QT
     bool deserialize(context_type *ctx, const data_type &value, QVariant *target) const {
         assert(ctx && target);
 
         *target = QVariant(type(), static_cast<const void *>(NULL));
         return deserializeInternal(ctx, value, target->data());
     }
-
+#endif
+    
     bool deserialize(context_type *ctx, const data_type &value, void *target) const {
         assert(ctx && target);
 
@@ -135,25 +141,29 @@ public:
 
     QnBasicSerializer(int type): QnBasicSerializerBase(type) {}
 
+#ifndef QN_NO_QT
     void serialize(const QVariant &value, data_type *target) const {
         assert(value.userType() == type() && target);
 
         serializeInternal(value.constData(), target);
     }
-
+#endif
+    
     void serialize(const void *value, data_type *target) const {
         assert(value && target);
 
         serializeInternal(value, target);
     }
 
+#ifndef QN_NO_QT
     bool deserialize(const data_type &value, QVariant *target) const {
         assert(target);
 
         *target = QVariant(type(), static_cast<const void *>(NULL));
         return deserializeInternal(value, target->data());
     }
-
+#endif
+    
     bool deserialize(const data_type &value, void *target) const {
         assert(target);
 
@@ -264,7 +274,7 @@ namespace QnSerializationDetail {
 
     template<class T>
     struct is_metatype_defined: 
-        std::integral_constant<bool, QMetaTypeId2<T>::Defined> 
+        std::integral_constant<bool, QMetaTypeId2<T>::Defined>
     {};
 
     template<class Context, class T, class D>
