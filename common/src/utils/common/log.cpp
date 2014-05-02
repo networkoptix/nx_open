@@ -243,7 +243,7 @@ void QnLog::log(QnLogLevel logLevel, const char* format, ...) {
     vsnprintf(buffer, MAX_MESSAGE_SIZE, format, args);
 #endif
 
-    d->log(QString::fromLocal8Bit(buffer), logLevel);
+    d->log(QString::fromLatin1(buffer), logLevel);
     va_end(args);
 }
 

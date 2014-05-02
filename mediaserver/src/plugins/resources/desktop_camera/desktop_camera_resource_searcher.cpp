@@ -106,7 +106,7 @@ void QnDesktopCameraResourceSearcher::cleanupConnections()
             {
                 conn.timer.restart();                
                 QString request = QString(lit("KEEP-ALIVE %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(++conn.cSeq);
-                if (conn.socket->send(request.toLocal8Bit()) < 1) {
+                if (conn.socket->send(request.toLatin1()) < 1) {
                     conn.socket->close();
                     itr = m_connections.erase(itr);
                     continue;

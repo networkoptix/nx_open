@@ -9,7 +9,6 @@
 class QnBusinessEventParameters
 {
 public:
-
     enum Params 
     {
         // base for any event type

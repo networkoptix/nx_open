@@ -44,17 +44,7 @@ inline void deserialize_field(const QVariant &, ec2::ApiServerInfoData *) { retu
 
 namespace ec2 {
 
-#define QN_EC2_ADAPT_API_DATA_CLASSES(CLASSES)                                  \
-    BOOST_PP_REPEAT(BOOST_PP_SEQ_SIZE(CLASSES), QN_EC2_ADAPT_API_DATA_CLASSES_STEP_I, BOOST_PP_SEQ_TO_TUPLE(CLASSES))
-
-#define QN_EC2_ADAPT_API_DATA_CLASSES_STEP_I(Z, I, CLASSES)                     \
-    QN_EC2_ADAPT_API_DATA_CLASSES_STEP_II(BOOST_PP_TUPLE_ELEM(I, CLASSES))
-
-#define QN_EC2_ADAPT_API_DATA_CLASSES_STEP_II(CLASS)                            \
-    QN_FUSION_ADAPT_STRUCT(CLASS, BOOST_PP_CAT(CLASS, _Fields))                 \
-    QN_FUSION_DEFINE_FUNCTIONS(CLASS, (binary)(json)(sql))
-    
-    QN_EC2_ADAPT_API_DATA_CLASSES(QN_EC2_API_DATA_CLASSES)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_EC2_API_DATA_CLASSES, (binary)(json)(sql), _Fields)
 
 } // namespace ec2
 

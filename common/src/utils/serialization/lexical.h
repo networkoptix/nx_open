@@ -9,6 +9,25 @@
 
 #include <utils/serialization/serialization.h>
 
+class QnLexicalSerializer;
+
+namespace QnLexicalDetail {
+    struct StorageInstance { 
+        QnSerializerStorage<QnLexicalSerializer> *operator()() const;
+    };
+} // namespace QJsonDetail
+
+
+class QnLexicalSerializer: public QnBasicSerializer<QString>, public QnStaticSerializerStorage<QnLexicalSerializer, QnLexicalDetail::StorageInstance> {
+    typedef QnBasicSerializer<QString> base_type;
+public:
+    QnLexicalSerializer(int type): base_type(type) {}
+};
+
+template<class T>
+class QnDefaultLexicalSerializer: public QnDefaultBasicSerializer<T, QnLexicalSerializer> {};
+
+
 namespace QnLexical {
     template<class T>
     void serialize(const T &value, QString *target) {

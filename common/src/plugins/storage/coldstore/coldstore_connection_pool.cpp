@@ -4,12 +4,12 @@
 
 
 QnColdStoreConnection::QnColdStoreConnection(const QString& addr):
-m_opened(false),
-m_mutex(QMutex::Recursive)
+    m_opened(false),
+    m_mutex(QMutex::Recursive)
 {
     QMutexLocker lock(&m_mutex);
 
-    QByteArray ipba = addr.toLocal8Bit();
+    QByteArray ipba = addr.toLatin1();
     char* ip = ipba.data();
 
     m_isConnected = false;

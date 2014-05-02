@@ -142,7 +142,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setTypeId(rt);
             resource->setName(name);
             resource->setModel(name);
-            resource->setMAC(smac);
+            resource->setMAC(QnMacAddress(smac));
             resource->setHostAddress(sender, QnDomainMemory);
 
             resource->setDiscoveryAddr(iface.address);
@@ -216,7 +216,7 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
 
     resource->setTypeId(rt);
     resource->setName(name);
-    resource->setMAC(mac);
+    resource->setMAC(QnMacAddress(mac));
     (resource.dynamicCast<QnPlDlinkResource>())->setModel(name);
     resource->setHostAddress(host, QnDomainMemory);
     resource->setAuth(auth);

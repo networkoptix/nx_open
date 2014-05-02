@@ -69,7 +69,13 @@ private:
     friend class QnAbstractReplyProcessor;
 };
 
-
+// TODO: #MSAPI move to api/model or even to common_globals, 
+// add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
+// 
+// Check serialization/deserialization in QnMediaServerConnection::doRebuildArchiveAsync
+// and in handler.
+// 
+// And name them sanely =)
 enum RebuildAction
 {
     RebuildAction_ShowProgress,
@@ -91,8 +97,13 @@ public:
 
     int getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
 
-
+    // TODO: #MSAPI 
+    // move to api/model or even to common_globals, 
+    // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
+    // 
+    // And name them sanely =)
     enum RoundMethod { IFrameBeforeTime, Precise, IFrameAfterTime };
+
     /** 
      * Get \a camera thumbnail for specified time. 
      * 
