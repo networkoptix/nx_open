@@ -116,12 +116,6 @@ namespace ec2 {
         QN_EC2_API_DATA_CLASSES,
         (binary)(json)(sql)
     );
-#else
-//    QN_FUSION_DECLARE_FUNCTIONS(ApiBusinessActionData, (binary), ApiBusinessActionData_Fields)
-//    QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-//        QN_EC2_API_DATA_CLASSES,
-//        (binary)
-//        );
 #endif
     
 } // namespace ec2
