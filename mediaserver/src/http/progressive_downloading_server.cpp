@@ -21,6 +21,7 @@
 #include "cached_output_stream.h"
 #include "network/authenticate_helper.h"
 #include <media_server/settings.h>
+#include "utils/serialization/lexical.h"
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
@@ -458,7 +459,7 @@ void QnProgressiveDownloadingConsumer::run()
 
         Qn::StreamQuality quality = Qn::QualityNormal;
         if( decodedUrlQuery.hasQueryItem(QnCodecParams::quality) )
-            quality = Qn::fromString<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality));
+            quality = QnLexical::deserialized<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality), Qn::QualityNotDefined);
 
         QnCodecParams::Value codecParams;
         QList<QPair<QString, QString> > queryItems = decodedUrlQuery.queryItems();
