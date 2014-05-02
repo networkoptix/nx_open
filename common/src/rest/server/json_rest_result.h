@@ -6,6 +6,12 @@
 
 #include <utils/serialization/json.h>
 
+// TODO: #MSAPI rename to QnRestResult.
+// 
+// Add format field (Qn::SerializationFormat) that will be set in QnJsonRestHandler (to be renamed).
+// In setReply do QByteArray serialization right away, don't store in an 
+// intermediate QVariant/QJsonValue.
+
 class QnJsonRestResult {
 public:
     enum Error {

@@ -12,6 +12,11 @@
 
 class TCPSocket;
 
+// TODO: #MSAPI header-class naming inconsistency. As all derived classes
+// are named XyzRestHandler I suggest to rename this one to either
+// QnAbstractRestHandler or simply to QnRestHandler. And rename the header.
+
+
 /**
  * QnRestRequestHandler must be thread-safe.
  *  
