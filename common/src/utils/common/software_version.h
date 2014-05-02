@@ -3,8 +3,10 @@
 
 #include <array>
 
+#ifndef QN_NO_QT
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
+#endif
 
 #include <boost/operators.hpp>
 
