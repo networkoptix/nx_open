@@ -9,6 +9,7 @@ class QnRecordedChunksRestHandler: public QnRestRequestHandler
 {
     Q_OBJECT
 public:
+    // TODO: #Elric #enum
 	enum ChunkFormat {ChunkFormat_Unknown, ChunkFormat_Binary, ChunkFormat_XML, ChunkFormat_Json, ChunkFormat_Text};
 
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);

@@ -16,6 +16,7 @@ class QnAbstractVideoDecoder;
 class AbstractDecoderEventReceiver
 {
 public:
+    // TODO: #Elric #enum
     enum DecoderBehaviour
     {
         dbContinueHardWork,

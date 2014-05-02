@@ -6,7 +6,10 @@
 #include <QtCore/QHash>
 #include <QtCore/QLinkedList>
 
-// TODO: #GDM global enum without suffixes. Rename and move to some namespace.
+// TODO: 
+// #MSAPI global enum without suffixes. Rename and move to some namespace (Qn probably).
+// Note that it will be used in api.
+
 enum QnStatisticsDeviceType {
     CPU,                /**< CPU load in percents. */
     RAM,                /**< RAM load in percents. */

@@ -26,7 +26,7 @@ public:
         QualityParam,
         RecordTypeParam,
         DiffersFlagParam,
-        ParamType_Count 
+        ParamType_Count // TODO: #Elric #enum
     };
 
     void setDefaultParam(ParamType number, const QVariant& value);

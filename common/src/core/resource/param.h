@@ -10,7 +10,8 @@
 
 #include "resource_fwd.h"
 
-enum QN_EXPORT QnDomain
+// TODO: #Elric #enum
+enum QnDomain
 {
     QnDomainMemory = 1,
     QnDomainDatabase = 2,
@@ -19,6 +20,7 @@ enum QN_EXPORT QnDomain
 
 struct QN_EXPORT QnParamType
 {
+    // TODO: #Elric #enum
     enum DataType { None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };
 
     QnParamType();

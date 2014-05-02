@@ -30,7 +30,9 @@ class QnStreamRecorder : public QnAbstractDataConsumer
     Q_ENUMS(StreamRecorderError)
     Q_ENUMS(Role)
 public:
+    // TODO: #Elric #enum
     enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithEmptyContext};
+
     enum StreamRecorderError {
         NoError = 0,
         ContainerNotFoundError,

@@ -55,7 +55,7 @@ public:
         ServerStartedReason,
         StorageIoErrorReason,
         StorageTooSlowReason,
-        StorageNotEnoughSpaceReason
+        StorageNotEnoughSpaceReason // TODO: #Elric #enum think of a better name.
     };
 
     enum EventState {

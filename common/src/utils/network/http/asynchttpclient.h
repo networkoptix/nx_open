@@ -47,6 +47,7 @@ namespace nx_http
         Q_OBJECT
 
     public:
+        // TODO: #Elric #enum
         enum State
         {
             sInit,

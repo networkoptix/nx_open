@@ -42,6 +42,7 @@ namespace CameraDiagnostics
         Q_OBJECT
 
     public:
+        // TODO: #Elric #enum
         enum State
         {
             //!Diagnostics has not been started yet

@@ -81,7 +81,7 @@ public:
         G711,
         AAC,
         AMR,
-        SIZE_OF_AUDIO_CODECS
+        SIZE_OF_AUDIO_CODECS // TODO: #Elric #enum
     };
 
     static const QString MANUFACTURE;
@@ -279,6 +279,7 @@ private slots:
     void onRenewSubscriptionTimer();
 
 private:
+    // TODO: #Elric #enum
     enum EventMonitorType
     {
         emtNone,
@@ -338,6 +339,7 @@ private:
         virtual bool endElement( const QString& namespaceURI, const QString& localName, const QString& qName ) override;
 
     private:
+        // TODO: #Elric #enum
         enum State
         {
             init,

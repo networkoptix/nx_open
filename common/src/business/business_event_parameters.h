@@ -9,6 +9,7 @@
 class QnBusinessEventParameters
 {
 public:
+    // TODO: #Elric #enum
     enum Params 
     {
         // base for any event type

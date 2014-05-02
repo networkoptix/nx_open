@@ -28,6 +28,7 @@ extern "C"
 
 struct AVCodecContext;
 
+// TODO: #Elric #enum
 enum MediaQuality { MEDIA_Quality_High,  // high quality
                     MEDIA_Quality_Low,   // low quality
                     // At current version MEDIA_Quality_ForceHigh is very similar to MEDIA_Quality_High. It used for export to 'avi' or 'mkv'. 
@@ -81,6 +82,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     };
     Q_DECLARE_FLAGS(MediaFlags, MediaFlag)
 
+    // TODO: #Elric #enum
     enum DataType {
         VIDEO, 
         AUDIO, 
@@ -189,6 +191,7 @@ protected:
 typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
 typedef QSharedPointer<const QnCompressedVideoData> QnConstCompressedVideoDataPtr;
 
+// TODO: #Elric #enum
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 

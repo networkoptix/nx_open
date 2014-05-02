@@ -10,7 +10,7 @@ namespace ec2
         QnId resource_type_id; // TODO: #API we don't use under_scores, we use camelCase.
 
         QString name;
-        int type;
+        int type; // TODO: #API use QnParamType::DataType
 
         // MinMaxStep
         qint32 min;
