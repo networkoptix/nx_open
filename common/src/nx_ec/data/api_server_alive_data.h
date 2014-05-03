@@ -17,4 +17,6 @@ namespace ec2
 
 } // namespace ec2
 
+Q_DECLARE_METATYPE(ec2::ApiServerAliveData);
+
 #endif // __SERVER_ALIVE_DATA_H_

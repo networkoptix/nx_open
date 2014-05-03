@@ -774,8 +774,8 @@ namespace ec2
         void initNotification(QnFullResourceData fullData);
         void runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
 
-        void remotePeerFound(ec2::ApiServerAliveData data, bool isProxy);
-        void remotePeerLost(ec2::ApiServerAliveData data, bool isProxy);
+        void remotePeerFound(ApiServerAliveData data, bool isProxy);
+        void remotePeerLost(ApiServerAliveData data, bool isProxy);
 
         void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);
