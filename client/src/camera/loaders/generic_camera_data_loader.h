@@ -40,25 +40,30 @@ public:
      */
     static QnGenericCameraDataLoader *newInstance(const QnMediaServerResourcePtr &serverResource, const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent = NULL);
     
-    virtual int load(const QnTimePeriod &timePeriod, const QString &filter) override;
+    virtual int load(const QnTimePeriod &timePeriod, const QString &filter, const qint64 resolutionMs) override;
 
-    virtual void discardCachedData() override;
+    virtual void discardCachedData(const qint64 resolutionMs = 0) override;
 
 private slots:
     void at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle);
     void at_bookmarksReceived(int status, const QnCameraBookmarkList &bookmarks, int requestHandle);
 
 private:
-    int sendRequest(const QnTimePeriod &periodToLoad);
+    int sendRequest(const QnTimePeriod &periodToLoad, const qint64 resolutionMs);
     void handleDataLoaded(int status, const QnAbstractCameraDataPtr &data, int requstHandle);
-    void updateLoadedPeriods(QnTimePeriod loadedPeriod);
+    void updateLoadedPeriods(const QnTimePeriod &loadedPeriod, const qint64 resolutionMs);
 private:
     struct LoadingInfo 
     {
-        LoadingInfo(const QnTimePeriod &period, int handle): period(period), handle(handle) {}
+        LoadingInfo(const QnTimePeriod &period, qint64 resolutionMs, int handle): 
+            period(period),
+            resolutionMs(resolutionMs),
+            handle(handle) {}
 
         /** Period for which chunks are being loaded. */
         QnTimePeriod period;
+
+        qint64 resolutionMs;
 
         /** Real loading handle, provided by the server connection object. */
         int handle;
@@ -75,8 +80,11 @@ private:
     
     QList<LoadingInfo> m_loading;
 
-    QnAbstractCameraDataPtr m_loadedData;
-    QnTimePeriodList m_loadedPeriods;
+    /** Loaded data, grouped by resolution. */
+    QMap<qint64, QnAbstractCameraDataPtr> m_loadedData;
+
+    /** Loaded periods, grouped by resolution. */
+    QMap<qint64, QnTimePeriodList> m_loadedPeriods;
 };
 
 #endif // QN_GENERIC_CAMERA_DATA_LOADER_H

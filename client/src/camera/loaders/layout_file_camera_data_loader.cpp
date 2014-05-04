@@ -102,7 +102,7 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QnTimePeriod &period, const Q
     return handle;
 }
 
-int QnLayoutFileCameraDataLoader::load(const QnTimePeriod &period, const QString &filter)
+int QnLayoutFileCameraDataLoader::load(const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs)
 {
     switch (m_dataType) {
     case Qn::RecordedTimePeriod:

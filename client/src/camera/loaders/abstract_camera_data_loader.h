@@ -24,9 +24,10 @@ public:
     /**
      * \param timePeriod                Time period to get data for.
      * \param filter                    Custom data filter.
+     * \param resolutionMs              Minimal length of the data period that should be loaded, in milliseconds.
      * \returns                         Request handle.
      */
-    virtual int load(const QnTimePeriod &period, const QString &filter) = 0;
+    virtual int load(const QnTimePeriod &period, const QString &filter = QString(), const qint64 resolutionMs = 1) = 0;
 
     /**
      * \returns                         Resource that this loader works with.
@@ -36,9 +37,9 @@ public:
     /**
      * Discards cached data, if any.
      * 
-     * \note                            This function is thread-safe.
+     * \param resolutionMs              Resolution, data for which should be discarded. All data should be discarded if parameter equals to 0 (default).
      */
-    Q_SLOT virtual void discardCachedData() {}
+    Q_SLOT virtual void discardCachedData(const qint64 resolutionMs = 0);
 
 signals:
     /**

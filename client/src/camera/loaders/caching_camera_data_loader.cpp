@@ -9,6 +9,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
+#include <utils/common/model_functions.h>
 
 #include <camera/loaders/multi_server_camera_data_loader.h>
 #include <camera/loaders/layout_file_camera_data_loader.h>
@@ -18,6 +19,43 @@ namespace {
     const qint64 defaultUpdateInterval = 10 * 1000;
 }
 
+//TODO: #GDM integrate with timeSlider steps
+class QnBookmarkStepStorage {
+public:
+    QnBookmarkStepStorage() {
+        m_steps <<  
+            1ll *                               10 <<
+            1ll *                               50 <<
+            1ll *                               100 <<
+            1ll *                               500 <<
+            1000ll *                            1 <<
+            1000ll *                            5 <<
+            1000ll *                            10 <<
+            1000ll *                            30 <<
+            1000ll * 60 *                       1 <<
+            1000ll * 60 *                       5 <<
+            1000ll * 60 *                       10 <<
+            1000ll * 60 *                       30<<
+            1000ll * 60 * 60 *                  1 <<
+            1000ll * 60 * 60 *                  3 <<
+            1000ll * 60 * 60 *                  12 <<
+            1000ll * 60 * 60 * 24 *             1 <<
+            1000ll * 60 * 60 * 24 * 31 *        1 <<
+            1000ll * 60 * 60 * 24 * 365 *       1 <<
+            1000ll * 60 * 60 * 24 * 365 *       5 <<
+            1000ll * 60 * 60 * 24 * 365 *       10;
+    }
+
+    const QVector<qint64> &steps() const {
+        return m_steps;
+    }
+
+
+private:
+    QVector<qint64> m_steps;
+};
+
+Q_GLOBAL_STATIC(QnBookmarkStepStorage, bookmarkSteps);
 
 QnCachingCameraDataLoader::QnCachingCameraDataLoader(const QnResourcePtr &resource, QObject *parent):
     QObject(parent),
@@ -99,8 +137,10 @@ bool QnCachingCameraDataLoader::createLoaders(const QnResourcePtr &resource, QnA
     if(success)
         return true;
 
-    for(int i = 0; i < Qn::CameraDataTypeCount; i++)
+    for (int i = 0; i < Qn::CameraDataTypeCount; i++) {
         delete loaders[i];
+        loaders[i] = NULL;
+    }
     return false;
 }
 
@@ -139,6 +179,7 @@ const QnTimePeriod &QnCachingCameraDataLoader::loadedPeriod() const {
 }
 
 void QnCachingCameraDataLoader::setTargetPeriods(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod) {
+    //TODO: #GDM this logic does not work for bookmarks, we need update them if target period differs from loaded depending on resolution (at least half a step further).
     if(m_loadedPeriod.contains(targetPeriod)) 
         return;
     
@@ -200,8 +241,10 @@ void QnCachingCameraDataLoader::load(Qn::CameraDataType type) {
 
     switch (type) {
     case Qn::RecordedTimePeriod:
+        m_handles[type] = loader->load(m_loadedPeriod);
+        break;
     case Qn::BookmarkTimePeriod:
-        m_handles[type] = loader->load(m_loadedPeriod, QString());
+        m_handles[type] = loader->load(m_loadedPeriod, m_bookmarkTags.join(L','));  //TODO: #GDM process tags list on the server side
         break;
     case Qn::MotionTimePeriod:
         if(!isMotionRegionsEmpty()) {
@@ -212,23 +255,23 @@ void QnCachingCameraDataLoader::load(Qn::CameraDataType type) {
             emit periodsChanged(Qn::MotionContent);
         }
         break;
-    case Qn::BookmarkData:
-        m_handles[type] = loader->load(m_loadedPeriod, QString());
-        break;
+    case Qn::BookmarkData: 
+        { 
+            qint64 resolutionMs = bookmarkResolution(m_loadedPeriod.durationMs);
+            qDebug() << "Caching: requesting bookmarks with resolution" << resolutionMs;
+            m_handles[type] = loader->load(m_loadedPeriod, m_bookmarkTags.join(L','), resolutionMs);
+            break;
+        }
     default:
         assert(false); //should never get here
     }
 }
 
-void QnCachingCameraDataLoader::trim(Qn::CameraDataType type, qint64 trimTime) {
+bool QnCachingCameraDataLoader::trim(Qn::CameraDataType type, qint64 trimTime) {
     if (!m_data[type])
-        return;
+        return false;
 
-    if (!m_data[type]->trimDataSource(trimTime))
-        return;
-  
-    //TODO: #GDM implement
-    //emit periodsChanged(type);
+    return m_data[type]->trimDataSource(trimTime);
 }
 
 
@@ -236,29 +279,53 @@ void QnCachingCameraDataLoader::trim(Qn::CameraDataType type, qint64 trimTime) {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &data, int handle) {
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
-        Qn::TimePeriodContent contentType = static_cast<Qn::TimePeriodContent>(i);
-        Qn::CameraDataType dataType = timePeriodToDataType(contentType);
+    for (int i = 0; i < Qn::CameraDataTypeCount; ++i) {
+        Qn::CameraDataType dataType = static_cast<Qn::CameraDataType>(i);
+        if (handle != m_handles[dataType])
+            continue;
 
-        if(handle == m_handles[dataType] && !(m_data[dataType] && m_data[dataType].data() == data)) {
-            m_data[dataType] = data;
-            emit periodsChanged(contentType);
+        m_handles[dataType] = -1;
+        if (m_data[dataType] && m_data[dataType].data() == data)
+            return;
+
+        m_data[dataType] = data;
+        switch (dataType) {
+        case Qn::RecordedTimePeriod:
+        case Qn::MotionTimePeriod:
+        case Qn::BookmarkTimePeriod:
+            emit periodsChanged(dataTypeToPeriod(dataType));
+            break;
+        case Qn::BookmarkData:
+            emit bookmarksChanged();
+            break;
+        default:
+            break;
         }
+        return;
     }
-
-    //TODO: #GDM implement bookmarksChanged notify
 }
 
 void QnCachingCameraDataLoader::at_loader_failed(int /*status*/, int handle) {
     for(int i = 0; i < Qn::CameraDataTypeCount; i++) {
-        if(handle == m_handles[i]) {
-            m_handles[i] = -1;
-            emit loadingFailed();
+        Qn::CameraDataType dataType = static_cast<Qn::CameraDataType>(i);
+        if (handle != m_handles[dataType])
+            continue;
 
-            qint64 trimTime = qnSyncTime->currentMSecsSinceEpoch();
-            for(int j = 0; j < Qn::CameraDataTypeCount; j++)
-                trim(static_cast<Qn::CameraDataType>(j), trimTime);
+        m_handles[i] = -1;
+        emit loadingFailed();
+
+        switch (dataType) {
+        case Qn::RecordedTimePeriod:
+        case Qn::MotionTimePeriod:
+        case Qn::BookmarkTimePeriod:
+            // live time periods should be trimmed to fixed time
+            if (trim(dataType, qnSyncTime->currentMSecsSinceEpoch())) // why are we trimming this by the error reply time?
+                emit periodsChanged(dataTypeToPeriod(dataType));
+            break;
+        default:
+            break;
         }
+        return;
     }
 }
 
@@ -269,12 +336,6 @@ void QnCachingCameraDataLoader::at_syncTime_timeChanged() {
     }
 }
 
-// 
-// void QnCachingCameraDataLoader::forceUpdate() {
-//     m_loaders[Qn::BookmarkTimePeriod]->discardCachedData();
-//     load(Qn::BookmarkTimePeriod);
-// }
-
 void QnCachingCameraDataLoader::addBookmark(const QnCameraBookmark &bookmark) {
     throw std::logic_error("The method or operation is not implemented.");
 }
@@ -282,4 +343,26 @@ void QnCachingCameraDataLoader::addBookmark(const QnCameraBookmark &bookmark) {
 
 QnCameraBookmark QnCachingCameraDataLoader::bookmarkByTime(qint64 position) const {
     throw std::logic_error("The method or operation is not implemented.");
+}
+
+QnCameraBookmarkTags QnCachingCameraDataLoader::bookmarkTags() const {
+    return m_bookmarkTags;
+}
+
+void QnCachingCameraDataLoader::setBookmarkTags(const QnCameraBookmarkTags &tags) {
+    if (m_bookmarkTags == tags)
+        return;
+
+    m_bookmarkTags = tags;
+    load(Qn::BookmarkData);
+}
+
+qint64 QnCachingCameraDataLoader::bookmarkResolution(qint64 periodDuration) const {
+    //TODO: #GDM integrate with timeSlider steps
+
+    const int maxPeriodsPerTimeline = 8;
+    qint64 maxPeriodLength = periodDuration / maxPeriodsPerTimeline;
+
+    auto step = std::lower_bound(bookmarkSteps->steps().begin(), bookmarkSteps->steps().end(), maxPeriodLength);
+    return *step;
 }

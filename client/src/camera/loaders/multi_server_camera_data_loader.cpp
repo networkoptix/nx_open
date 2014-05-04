@@ -25,7 +25,7 @@ QnMultiServerCameraDataLoader *QnMultiServerCameraDataLoader::newInstance(const 
     return new QnMultiServerCameraDataLoader(netRes, dataType, parent);
 }
 
-int QnMultiServerCameraDataLoader::load(const QnTimePeriod &period, const QString &filter) {
+int QnMultiServerCameraDataLoader::load(const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) {
     if (period.isNull()) {
         qnNullWarning(period);
         return -1;
@@ -37,7 +37,7 @@ int QnMultiServerCameraDataLoader::load(const QnTimePeriod &period, const QStrin
     QnNetworkResourcePtr camera = m_resource.dynamicCast<QnNetworkResource>();
     QnResourceList serverList = QnCameraHistoryPool::instance()->getAllCameraServers(camera, period);
     foreach(const QnResourcePtr& server, serverList) {
-        int handle = loadInternal(server.dynamicCast<QnMediaServerResource>(), camera, period, filter);
+        int handle = loadInternal(server.dynamicCast<QnMediaServerResource>(), camera, period, filter, resolutionMs);
         if (handle > 0)
             handles << handle;
     }
@@ -50,12 +50,12 @@ int QnMultiServerCameraDataLoader::load(const QnTimePeriod &period, const QStrin
     return multiHandle;
 }
 
-void QnMultiServerCameraDataLoader::discardCachedData() {
+void QnMultiServerCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
     foreach(QnAbstractCameraDataLoader *loader, m_cache)
-        loader->discardCachedData();
+        loader->discardCachedData(resolutionMs);
 }
 
-int QnMultiServerCameraDataLoader::loadInternal(const QnMediaServerResourcePtr &mServer, const QnNetworkResourcePtr &networkResource, const QnTimePeriod &period, const QString &filter) {
+int QnMultiServerCameraDataLoader::loadInternal(const QnMediaServerResourcePtr &mServer, const QnNetworkResourcePtr &networkResource, const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) {
     QnAbstractCameraDataLoader *loader;
     QString cacheKey = mServer->getId().toString() + networkResource->getId().toString();
     auto itr = m_cache.find(cacheKey);
@@ -70,7 +70,7 @@ int QnMultiServerCameraDataLoader::loadInternal(const QnMediaServerResourcePtr &
         connect(loader, &QnAbstractCameraDataLoader::failed, this, &QnMultiServerCameraDataLoader::onLoadingFailed);
         m_cache.insert(cacheKey, loader);
     }
-    return loader->load(period, filter);
+    return loader->load(period, filter, resolutionMs);
 }
 
 void QnMultiServerCameraDataLoader::onDataLoaded(const QnAbstractCameraDataPtr &data, int handle) {

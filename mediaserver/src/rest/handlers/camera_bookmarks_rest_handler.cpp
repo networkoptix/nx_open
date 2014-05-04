@@ -38,16 +38,20 @@ int QnCameraBookmarksRestHandler::addCameraBookmarkAction(const QnRequestParams 
 }
 
 int QnCameraBookmarksRestHandler::getCameraBookmarkAction(const QnRequestParams & params, QnJsonRestResult & result) {
+    //TODO: #GDM check time periods existence via qnStorageMan
+
     QString id = params.value("id");
     QnCameraBookmarkSearchFilter filter;
     bool ok;
-    if (qint64 value = params["minDurationMs"].toLongLong(&ok) && ok)
-        filter.minDurationMs = value;
-    if (qint64 value = params["minStartTimeMs"].toLongLong(&ok) && ok)
-        filter.minStartTimeMs = value;
-    if (qint64 value = params["maxStartTimeMs"].toLongLong(&ok) && ok)
-        filter.maxStartTimeMs = value;
+    if (qint64 value = params["minDurationMs"].toLongLong(&ok))
+        if (ok) filter.minDurationMs = value;
+    if (qint64 value = params["minStartTimeMs"].toLongLong(&ok))
+        if (ok) filter.minStartTimeMs = value;
+    if (qint64 value = params["maxStartTimeMs"].toLongLong(&ok))
+        if (ok) filter.maxStartTimeMs = value;
     filter.tags = params["tags"].split(',', QString::SkipEmptyParts);
+
+    qDebug() << "bookmarks requested with resolution" << filter.minDurationMs;
 
     QnCameraBookmarkList bookmarks;
     if (!qnStorageMan->getBookmarks(id.toUtf8(), filter, bookmarks))

@@ -19,16 +19,16 @@ public:
     QnMultiServerCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent = 0);
     static QnMultiServerCameraDataLoader *newInstance(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent = 0);
 
-    virtual int load(const QnTimePeriod &period, const QString &filter) override;
+    virtual int load(const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) override;
 
-    virtual void discardCachedData() override;
+    virtual void discardCachedData(const qint64 resolutionMs = 0) override;
 
 private slots:
     void onDataLoaded(const QnAbstractCameraDataPtr &data, int handle);
     void onLoadingFailed(int code, int handle);
 
 private:
-    int loadInternal(const QnMediaServerResourcePtr &mServer, const QnNetworkResourcePtr &networkResource, const QnTimePeriod &period, const QString &filter);
+    int loadInternal(const QnMediaServerResourcePtr &mServer, const QnNetworkResourcePtr &networkResource, const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs);
 
 private:
     QMap<QString, QnAbstractCameraDataLoader *> m_cache;

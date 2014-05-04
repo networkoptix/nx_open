@@ -40,10 +40,14 @@ public:
 
     QnTimePeriodList periods(Qn::TimePeriodContent type);
 
+    QnCameraBookmarkTags bookmarkTags() const;
+    void setBookmarkTags(const QnCameraBookmarkTags &tags);
+
     void addBookmark(const QnCameraBookmark &bookmark);
     QnCameraBookmark bookmarkByTime(qint64 position) const;
 signals:
     void periodsChanged(Qn::TimePeriodContent type);
+    void bookmarksChanged();
     void loadingFailed();
 
 private slots:
@@ -53,7 +57,7 @@ private slots:
 
 protected:
     void load(Qn::CameraDataType type);
-    void trim(Qn::CameraDataType type, qint64 trimTime);
+    bool trim(Qn::CameraDataType type, qint64 trimTime);
 
     QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod) const;
 
@@ -64,6 +68,7 @@ private:
     void initLoaders(QnAbstractCameraDataLoader **loaders);
     static bool createLoaders(const QnResourcePtr &resource, QnAbstractCameraDataLoader **loaders);
     
+    qint64 bookmarkResolution(qint64 periodDuration) const;
 private:
     QnResourcePtr m_resource;
     bool m_resourceIsLocal;
@@ -74,6 +79,7 @@ private:
     QnAbstractCameraDataPtr m_data[Qn::CameraDataTypeCount];
     qreal m_loadingMargin;
     qint64 m_updateInterval;
+    QnCameraBookmarkTags m_bookmarkTags;
 };
 
 

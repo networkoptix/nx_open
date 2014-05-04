@@ -21,7 +21,7 @@ public:
     QnLayoutFileCameraDataLoader(const QnResourcePtr &resource, Qn::CameraDataType dataType, const QnAbstractCameraDataPtr& data, QObject *parent);
     virtual ~QnLayoutFileCameraDataLoader();
     static QnLayoutFileCameraDataLoader* newInstance(const QnResourcePtr &resource, Qn::CameraDataType dataType, QObject *parent = 0);
-    virtual int load(const QnTimePeriod &period, const QString &filter) override;
+    virtual int load(const QnTimePeriod &period, const QString &filter, const qint64 resolutionMs) override;
 private:
     int loadChunks(const QnTimePeriod &period);
     int loadMotion(const QnTimePeriod &period, const QList<QRegion> &motionRegions);
