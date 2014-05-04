@@ -290,10 +290,10 @@ bool QnTimePeriodCameraData::trimDataSource(qint64 trimTime) {
         return false;
 
     QnTimePeriod period = m_data.last();
-    qint64 trimmedDurationMs = qMax(0ll, trimTime - period.startTimeMs);
-    if(period.durationMs != -1 && period.durationMs <= trimmedDurationMs)
+    if(period.durationMs != -1)
         return false;
 
+    qint64 trimmedDurationMs = qMax(0ll, trimTime - period.startTimeMs);
     period.durationMs = trimmedDurationMs;
     if(period.durationMs == 0) {
         m_data.pop_back();
