@@ -18,7 +18,7 @@
 namespace {
     static const int defaultMaxFps = 15;
     static const int defaultReservedSecondStreamFps = 2;
-    static const Qn::StreamFpsSharingMethod defaultStreamFpsSharingMethod = Qn::sharePixels;
+    static const Qn::StreamFpsSharingMethod defaultStreamFpsSharingMethod = Qn::PixelsFpsSharing;
     static const Qn::MotionType defaultMotionType = Qn::MT_MotionWindow;
 
     static const int defaultSecondStreamFpsLow = 2;
@@ -266,18 +266,18 @@ Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
 
     QString sval = val.toString();
     if (sval == lit("shareFps"))
-        return Qn::shareFps;
+        return Qn::BasicFpsSharing;
     if (sval == lit("noSharing"))
-        return Qn::noSharing;
-    return Qn::sharePixels;
+        return Qn::NoFpsSharing;
+    return Qn::PixelsFpsSharing;
 }
 
 void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value) 
 {
     QString strVal;
-    if (value == Qn::shareFps)
+    if (value == Qn::BasicFpsSharing)
         strVal = lit("shareFps");
-    else if (value == Qn::noSharing)
+    else if (value == Qn::NoFpsSharing)
         strVal = lit("noSharing");
     else
         strVal = lit("sharePixels");

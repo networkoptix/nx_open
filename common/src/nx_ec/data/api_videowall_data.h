@@ -7,7 +7,7 @@
 namespace ec2
 {
 
-    // TODO: #Elric #EC2 totally evil naming
+    // TODO: #API totally awful naming here. Use camelCase.
 
     struct ApiVideowallItemData {
         QnId guid;

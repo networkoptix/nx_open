@@ -285,7 +285,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
         resource->setName(model); 
     else
         resource->setName(manufacturer + model); 
-    resource->setMAC(mac);
+    resource->setMAC(QnMacAddress(mac));
     resource->setFirmware(firmware);
 
     if (!mac.size())

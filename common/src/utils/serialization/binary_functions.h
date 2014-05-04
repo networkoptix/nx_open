@@ -21,6 +21,10 @@
 
 #include <utils/common/container.h>
 
+#ifndef QN_NO_QT
+#   include <utils/common/latin1_array.h>
+#endif
+
 #include "enum.h"
 
 
@@ -256,6 +260,17 @@ bool deserialize(QnInputBinaryStream<T> *stream, QByteArray *target) {
         return false;
     target->resize(size);
     return stream->read(target->data(), size) == size;
+}
+
+
+template<class Output>
+void serialize(const QnLatin1Array &value, QnOutputBinaryStream<Output> *stream) {
+    serialize(static_cast<const QByteArray &>(value), stream);
+}
+
+template<class T>
+bool deserialize(QnInputBinaryStream<T> *stream, QnLatin1Array *target) {
+    return deserialize(stream, static_cast<QByteArray *>(target));
 }
 
 

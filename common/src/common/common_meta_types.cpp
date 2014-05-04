@@ -185,7 +185,5 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<Qn::CameraDataType>();
     qRegisterMetaType<QnAbstractCameraDataPtr>();
 
-    QnJsonSerializer::registerSerializer<QUuid>();
-
     qn_commonMetaTypes_initialized = true;
 }

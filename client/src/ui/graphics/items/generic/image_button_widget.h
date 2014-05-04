@@ -34,6 +34,7 @@ class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> >, protecte
     typedef Animated<Clickable<GraphicsWidget> > base_type;
 
 public:
+    // TODO: #Elric #enum
     enum StateFlag {
         DEFAULT = 0,        /**< Default button state. */
         CHECKED = 0x1,      /**< Button is checkable and is checked. */

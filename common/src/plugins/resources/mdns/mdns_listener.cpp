@@ -67,7 +67,7 @@ QString QnMdnsListener::getBestLocalAddress(const QString& remoteAddress)
     int bestIndex = 0;
     for (int i = 0; i < m_localAddressList.size(); ++i)
     {
-        int eq = strEqualAmount(m_localAddressList[i].toLocal8Bit().constData(), remoteAddress.toLocal8Bit().constData());
+        int eq = strEqualAmount(m_localAddressList[i].toLatin1().constData(), remoteAddress.toLatin1().constData());
         if (eq > bestEq) {
             bestEq = eq;
             bestIndex = i;

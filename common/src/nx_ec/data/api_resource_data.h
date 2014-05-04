@@ -14,7 +14,7 @@ namespace ec2
 
         QString value;
         QString name;
-        bool isResTypeParam; // TODO: #Elric #EC2 rename
+        bool isResTypeParam; // TODO: #API rename into something more sane. Right now it's not clear what is this and I don't know what to rename it into. 
     };
 #define ApiResourceParamData_Fields (value)(name)(isResTypeParam)
 
@@ -40,7 +40,7 @@ namespace ec2
         QnId          id;
         QnId          parentId;
         QnResource::Status    status;
-        bool          disabled; // TODO: #Elric #EC2 is it still around?
+        bool          disabled; // TODO: #API I thought we got rid of this one?
         QString       name;
         QString       url;
         QnId          typeId;
@@ -51,7 +51,7 @@ namespace ec2
 
     struct ApiSetResourceDisabledData: ApiData {
         QnId id;
-        bool disabled;
+        bool disabled; // TODO: #API huh?
     };
 #define ApiSetResourceDisabledData_Fields (id)(disabled)
 

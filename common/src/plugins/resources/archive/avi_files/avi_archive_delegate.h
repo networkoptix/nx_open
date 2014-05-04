@@ -18,6 +18,7 @@ class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
     Q_OBJECT;
 
 public:
+    // TODO: #Elric #enum
     enum Tag { 
         Tag_startTime, 
         Tag_endTime, 

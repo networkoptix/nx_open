@@ -15,6 +15,7 @@ namespace CameraDiagnostics
 {
     namespace Step
     {
+        // TODO: #Elric #enum
         enum Value
         {
             none = 0,
@@ -36,6 +37,7 @@ namespace CameraDiagnostics
     //!Contains error codes
     namespace ErrorCode
     {
+        // TODO: #Elric #enum
         enum Value
         {
             noError = 0,

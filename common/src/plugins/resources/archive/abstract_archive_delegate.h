@@ -28,6 +28,7 @@ signals:
     // delete itself change quality
     void qualityChanged(MediaQuality quality);
 public:
+    // TODO: #Elric #enum
     enum Flag 
     { 
         Flag_SlowSource = 1, 

@@ -6,6 +6,9 @@
 #include <QtGui/QColor>
 
 #include "lexical.h"
+#include "lexical_enum.h"
+
+#include <utils/common/latin1_array.h>
 
 namespace QnLexicalDetail {
     template<class T, class Temporary>
@@ -81,6 +84,18 @@ QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(unsigned char)
 QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(short)
 QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS(unsigned short)
 #undef QN_DEFINE_INTEGER_CONVERSION_LEXICAL_SERIALIZATION_FUNCTIONS
+
+
+inline void serialize(const QnLatin1Array &value, QString *target) {
+    *target = QString::fromLatin1(value);
+}
+
+inline bool deserialize(const QString &value, QnLatin1Array *target) {
+    *target = value.toLatin1(); /* We don't check for errors... */
+    return true;
+}
+
+
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((bool)(QUuid)(QUrl)(QColor), (lexical))
 

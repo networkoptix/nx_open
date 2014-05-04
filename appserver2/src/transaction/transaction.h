@@ -15,6 +15,7 @@ namespace ec2
 {
     namespace ApiCommand
     {
+        // TODO: #Elric #enum
         enum Value
         {
 		    NotDefined = 0,

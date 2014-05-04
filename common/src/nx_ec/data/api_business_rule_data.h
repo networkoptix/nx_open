@@ -17,7 +17,7 @@ namespace ec2
 
         QnBusiness::EventType eventType;
         std::vector<QnId>  eventResourceIds;
-        QByteArray eventCondition;
+        QByteArray eventCondition; 
         QnBusiness::EventState eventState;
 
         QnBusiness::ActionType actionType;
@@ -37,7 +37,7 @@ namespace ec2
 
     struct ApiBusinessActionData: ApiData
     {
-        qint32 actionType; // TODO: #Elric #EC2 QnBusiness::ActionType
+        qint32 actionType; // TODO: #API use QnBusiness::ActionType
         QnBusiness::EventState toggleState;
         bool receivedFromRemoteHost;
         std::vector<QnId> resourceIds;

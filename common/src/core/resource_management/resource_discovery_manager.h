@@ -65,8 +65,8 @@ class QnResourceDiscoveryManager : public QnLongRunnable, public QnResourceFacto
 public:
     enum State
     {
-        initialSearch,
-        periodicSearch
+        InitialSearch,
+        PeriodicSearch
     };
 
 

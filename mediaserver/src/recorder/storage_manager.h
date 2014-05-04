@@ -27,7 +27,7 @@ class QnStorageManager: public QObject
 {
     Q_OBJECT
 public:
-
+    // TODO: #Elric #enum
     enum RebuildState {
         RebuildState_None,
         RebuildState_WaitForRecordersStopped,

@@ -297,7 +297,7 @@ QStringList QnAVIDvdArchiveDelegate::getPlaylist(const QString& url)
 
         if (path.length() == 3 && path.endsWith(QLatin1String(":/")))
             path = path.left(2); // physical mode access under WIN32 expects path in 2-letter format.
-        m_dvdReader = DVDOpen(path.toLocal8Bit().constData());
+        m_dvdReader = DVDOpen(path.toLatin1().constData());
         if (!m_dvdReader)
             return rez;
     }

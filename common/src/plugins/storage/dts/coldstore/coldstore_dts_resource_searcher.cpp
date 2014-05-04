@@ -21,7 +21,7 @@ QString macFromString(QString str)
     str = str.toUpper();
 
     
-    QByteArray ba = str.toLocal8Bit();
+    QByteArray ba = str.toLatin1();
     const char* cstr = ba.data();
 
     int count = 0;
@@ -185,7 +185,7 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
 {
     Veracity::ISFS* sfs_client = new Veracity::SFSClient();
 
-    QByteArray ipba = addr.toString().toLocal8Bit();
+    QByteArray ipba = addr.toString().toLatin1();
     const char* ip = ipba.data();
     
 //	cl_log.log(QLatin1String("CS checking for files"), cl_logALWAYS);

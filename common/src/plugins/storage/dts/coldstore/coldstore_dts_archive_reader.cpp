@@ -92,7 +92,7 @@ bool QnColdStoreDelegate::open(const QnResourcePtr &resource)
 
     m_csConnection = new Veracity::SFSClient();
     QString ips = m_csAddr.toString();
-    QByteArray ipba = ips.toLocal8Bit();
+    QByteArray ipba = ips.toLatin1();
     char* ip = ipba.data();
 
     if (m_csConnection->Connect(ip) != Veracity::ISFS::STATUS_SUCCESS)
@@ -408,7 +408,7 @@ bool QnColdStoreDelegate::openCSFile(int f_index, int event_index)
     
 
 
-    QByteArray ba = file.name.toLocal8Bit();
+    QByteArray ba = file.name.toLatin1();
     char* cfilename = ba.data();
 
 
@@ -561,7 +561,7 @@ bool QnColdStoreDelegate::openEventFile(int f_index)
 
     ColdstoreFile file = m_eventfileList.at(f_index);
 
-    QByteArray ba = file.name.toLocal8Bit();
+    QByteArray ba = file.name.toLatin1();
     char* cfilename = ba.data();
 
 

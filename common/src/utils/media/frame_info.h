@@ -47,6 +47,7 @@ public:
         std::atomic<int> usageCounter;
     };
 
+    // TODO: #Elric #enum
     enum PicStorageType
     {
         //!Picture data is stored in memory
