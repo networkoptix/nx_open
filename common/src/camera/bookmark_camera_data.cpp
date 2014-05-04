@@ -32,10 +32,6 @@ void QnBookmarkCameraData::clear() {
     m_data.clear();
 }
 
-bool QnBookmarkCameraData::trimDataSource(qint64 trimTime) {
-    throw std::exception();
-}
-
 QnAbstractCameraDataPtr QnBookmarkCameraData::merge(const QVector<QnAbstractCameraDataPtr> &source) {
     QnCameraBookmarkList merged(m_data);
     foreach (const QnAbstractCameraDataPtr &other, source) {
