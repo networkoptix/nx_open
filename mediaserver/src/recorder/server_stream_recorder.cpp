@@ -249,7 +249,7 @@ bool QnServerStreamRecorder::needSaveData(QnConstAbstractMediaDataPtr media)
 
     if (task.getRecordingType() == Qn::RT_Always)
         return true;
-    else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_role == m_catalog == QnServer::LowQualityCatalog || !camera->hasDualStreaming2()))
+    else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_catalog == QnServer::LowQualityCatalog || !camera->hasDualStreaming2()))
         return true;
     else if (task.getRecordingType() == Qn::RT_Never)
     {

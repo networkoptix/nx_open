@@ -5,6 +5,7 @@
 #include <QSharedPointer>
 #include "utils/common/threadqueue.h"
 
+#include <libavutil/avutil.h>
 
 class QnAbstractStreamDataProvider;
 
