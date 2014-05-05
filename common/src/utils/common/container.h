@@ -22,6 +22,8 @@ template<class T> class QSet;
 class QJsonObject;
 
 
+// TODO: #Elric rename QnCollection, more Java-like =)
+
 namespace QnContainer {
     struct list_tag {};
     struct set_tag {};

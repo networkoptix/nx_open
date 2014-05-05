@@ -276,13 +276,14 @@ namespace QnFusionDetail {
  * Tokens for the functions to generate are passed in FUNCTION_SEQ parameter. 
  * Accepted tokens are:
  * <ul>
- * <li> <tt>hash</tt>           --- <tt>qHash</tt> function. </li>
- * <li> <tt>datastream</tt>     --- <tt>QDataStream</tt> (de)serialization functions. </li>
- * <li> <tt>eq</tt>             --- <tt>operator==</tt> and <tt>operator!=</tt>. </li>
- * <li> <tt>debug</tt>          --- <tt>QDebug</tt> streaming functions. </li>
- * <li> <tt>json</tt>           --- json (de)serialization functions. </li>
  * <li> <tt>binary</tt>         --- bns (de)serialization functions. </li>
- * <li> <tt>sql</tt>            --- sql bind/fetch functions. </li>
+ * <li> <tt>csv_record</tt>     --- csv record serialization functions. </li>
+ * <li> <tt>datastream</tt>     --- <tt>QDataStream</tt> (de)serialization functions. </li>
+ * <li> <tt>debug</tt>          --- <tt>QDebug</tt> streaming functions. </li>
+ * <li> <tt>eq</tt>             --- <tt>operator==</tt> and <tt>operator!=</tt>. </li>
+ * <li> <tt>json</tt>           --- json (de)serialization functions. </li>
+ * <li> <tt>hash</tt>           --- <tt>qHash</tt> function. </li>
+ * <li> <tt>sql_record</tt>     --- sql record bind/fetch functions. </li>
  * </ul>
  * 
  * \param TYPE                          Fusion-adapted type to define functions for.
