@@ -13,6 +13,10 @@ QnBookmarkCameraData::QnBookmarkCameraData(const QnCameraBookmarkList &data):
     QnAbstractCameraData(Qn::BookmarkData),
     m_data(data)
 {
+    QVector<QnTimePeriodList> periods;
+    foreach (const QnCameraBookmark &bookmark, m_data)
+        periods.append(QnTimePeriodList(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs)));
+    m_dataSource = QnTimePeriodList::mergeTimePeriods(periods); //TODO: #GDM need an analogue for the single periods
 }
 
 void QnBookmarkCameraData::append(const QnAbstractCameraDataPtr &other) {
@@ -22,14 +26,22 @@ void QnBookmarkCameraData::append(const QnAbstractCameraDataPtr &other) {
     if (QnBookmarkCameraData* other_casted = dynamic_cast<QnBookmarkCameraData*>(other.data()))
         otherList = other_casted->m_data;
     m_data.append(otherList);   //TODO: #GDM merge sort
+
+    QVector<QnTimePeriodList> periods;
+    periods.append(m_dataSource);
+    foreach (const QnCameraBookmark &bookmark, otherList)
+        periods.append(QnTimePeriodList(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs)));
+
+    m_dataSource = QnTimePeriodList::mergeTimePeriods(periods);
 }
 
 QnTimePeriodList QnBookmarkCameraData::dataSource() const {
-    throw std::exception();
+    return m_dataSource;
 }
 
 void QnBookmarkCameraData::clear() {
     m_data.clear();
+    m_dataSource.clear();
 }
 
 QnAbstractCameraDataPtr QnBookmarkCameraData::merge(const QVector<QnAbstractCameraDataPtr> &source) {

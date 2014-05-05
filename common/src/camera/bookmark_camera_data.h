@@ -4,6 +4,7 @@
 #include <camera/abstract_camera_data.h>
 #include <common/common_globals.h>
 #include <core/resource/camera_bookmark_fwd.h>
+#include <recording/time_period_list.h>
 
 class QnBookmarkCameraData: public QnAbstractCameraData {
 public:
@@ -19,6 +20,7 @@ public:
     virtual bool operator==(const QnAbstractCameraDataPtr &other) const override;
 private:
     QnCameraBookmarkList m_data;
+    QnTimePeriodList m_dataSource;
 };
 
 #endif // __QN_BOOKMARK_CAMERA_DATA_H__

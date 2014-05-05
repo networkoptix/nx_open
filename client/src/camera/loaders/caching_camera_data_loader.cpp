@@ -237,7 +237,6 @@ void QnCachingCameraDataLoader::load(Qn::CameraDataType type, const QnTimePeriod
     case Qn::BookmarkData: 
         { 
             qint64 resolutionMs = bookmarkResolution(targetPeriod.durationMs);
-            qDebug() << "Caching: requesting bookmarks with resolution" << resolutionMs;
             m_handles[type] = loader->load(targetPeriod, m_bookmarkTags.join(L','), resolutionMs);
             break;
         }
@@ -271,8 +270,11 @@ void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &d
         switch (dataType) {
         case Qn::RecordedTimePeriod:
         case Qn::MotionTimePeriod:
-        case Qn::BookmarkTimePeriod:
             emit periodsChanged(dataTypeToPeriod(dataType));
+            break;
+        case Qn::BookmarkTimePeriod:
+            updateBookmarks();
+            emit periodsChanged(Qn::BookmarksContent);
             break;
         case Qn::BookmarkData:
             emit bookmarksChanged();
@@ -375,6 +377,9 @@ void QnCachingCameraDataLoader::updateBookmarks() {
         return;
 
     QnTimePeriod requestedPeriod = addLoadingMargins(m_targetPeriod[Qn::BookmarkData], m_boundingPeriod, step * 2);
+    if (!periods(Qn::BookmarksContent).intersects(requestedPeriod)) // check that there are any bookmarks in this time period
+        return;
+
     requestedPeriods = QnTimePeriodList::mergeTimePeriods(QVector<QnTimePeriodList>() << requestedPeriods << QnTimePeriodList(requestedPeriod));
     load(Qn::BookmarkData, requestedPeriod);
 }
