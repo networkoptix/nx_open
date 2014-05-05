@@ -32,8 +32,12 @@ void QnEnumLexicalSerializerData::load(const QMetaObject *metaObject, const char
 }
 
 void QnEnumLexicalSerializerData::insert(int value, const QString &name) {
+    QString lowerName = name.toLower();
+
     if(!m_valueByName.contains(name))
         m_valueByName[name] = value;
+    if(!m_valueByLowerName.contains(lowerName))
+        m_valueByLowerName[lowerName] = value;
     if(!m_nameByValue.contains(value))
         m_nameByValue[value] = name;
 }
@@ -57,16 +61,32 @@ void QnEnumLexicalSerializerData::setFlagged(bool flagged) {
     m_flagged = flagged;
 }
 
+Qt::CaseSensitivity QnEnumLexicalSerializerData::caseSensitivity() const {
+    return m_caseSensitivity;
+}
+
+void QnEnumLexicalSerializerData::setCaseSensitivity(Qt::CaseSensitivity caseSensitivity) {
+    m_caseSensitivity = caseSensitivity;
+}
+
 void QnEnumLexicalSerializerData::serializeEnum(int value, QString *target) const {
     /* Return empty string in case of failure. */
     *target = m_nameByValue.value(value); 
 }
 
 bool QnEnumLexicalSerializerData::deserializeEnum(const QString &value, int *target) const {
-    auto pos = m_valueByName.find(value);
-    if(pos == m_valueByName.end())
+    if(m_caseSensitivity == Qt::CaseSensitive) {
+        return deserializeEnumInternal(m_valueByName, value, target);
+    } else {
+        return deserializeEnumInternal(m_valueByLowerName, value.toLower(), target);
+    }
+}
+
+bool QnEnumLexicalSerializerData::deserializeEnumInternal(const QHash<QString, int> &hash, const QString &value, int *target) const {
+    auto pos = hash.find(value);
+    if(pos == hash.end())
         return false;
-    
+
     *target = *pos;
     return true;
 }

@@ -22,6 +22,7 @@ class FoundEnterpriseControllersModel
     Q_OBJECT
 
 public:
+    // TODO: #Elric #GDM use global roles from Qn
     enum Role
     {
         UrlRole = Qt::UserRole + 1,

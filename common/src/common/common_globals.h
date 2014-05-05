@@ -181,11 +181,15 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
 
 
-    // TODO: #Elric rename
     enum StreamFpsSharingMethod {
-        shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
-        sharePixels, //if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
-        noSharing // second stream does not subtract first stream fps 
+        /** If second stream is running whatever fps it has, first stream can get maximumFps - secondstreamFps. */
+        BasicFpsSharing, 
+
+        /** If second stream is running whatever megapixel it has, first stream can get maxMegapixels - secondstreamPixels. */
+        PixelsFpsSharing, 
+
+        /** Second stream does not affect first stream's fps. */
+        NoFpsSharing 
     };
 
 
@@ -231,6 +235,7 @@ public:
 
     Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
     Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes);
+
 
     enum TimePeriodContent {
         RecordingContent,
@@ -390,18 +395,18 @@ public:
     // TODO: #Elric #EC2 rename
     enum RecordingType {
         /** Record always. */
-        RecordingType_Run = 0,
+        RT_Always = 0,
 
         /** Record only when motion was detected. */
-        RecordingType_MotionOnly = 1,
+        RT_MotionOnly = 1,
 
         /** Don't record. */
-        RecordingType_Never = 2,
+        RT_Never = 2,
 
         /** Record LQ stream always and HQ stream only on motion. */
-        RecordingType_MotionPlusLQ = 3,
+        RT_MotionAndLowQuality = 3,
 
-        RecordingType_Count
+        RT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
 

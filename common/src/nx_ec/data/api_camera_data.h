@@ -9,7 +9,7 @@ namespace ec2
 {
     struct ApiScheduleTaskData : ApiData
     {
-        ApiScheduleTaskData(): startTime(0), endTime(0), recordAudio(false), recordingType(Qn::RecordingType_Run), dayOfWeek(1), 
+        ApiScheduleTaskData(): startTime(0), endTime(0), recordAudio(false), recordingType(Qn::RT_Always), dayOfWeek(1), 
                         beforeThreshold(0), afterThreshold(0), streamQuality(Qn::QualityNotDefined), fps(0.0) {}
 
         qint32              startTime;

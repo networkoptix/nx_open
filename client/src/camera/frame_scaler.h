@@ -6,6 +6,7 @@
 class QnFrameScaler
 {
 public:
+    // TODO: #Elric #enum
     enum DownscaleFactor {
         factor_any = 0, 
         factor_1 = 1, 

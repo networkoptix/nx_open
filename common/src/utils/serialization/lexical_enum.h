@@ -32,7 +32,7 @@ namespace QnLexicalDetail {
 
 class QnEnumLexicalSerializerData {
 public:
-    QnEnumLexicalSerializerData(): m_flagged(false) {}
+    QnEnumLexicalSerializerData(): m_caseSensitivity(Qt::CaseSensitive), m_flagged(false) {}
 
     void load(const QMetaObject *metaObject, const char *enumName);
 
@@ -42,6 +42,9 @@ public:
 
     bool isFlagged() const;
     void setFlagged(bool flagged);
+
+    Qt::CaseSensitivity caseSensitivity() const;
+    void setCaseSensitivity(Qt::CaseSensitivity caseSensitivity);
 
     void serialize(int value, QString *target) const;
     bool deserialize(const QString &value, int *target) const;
@@ -64,6 +67,7 @@ public:
 protected:
     void serializeEnum(int value, QString *target) const;
     bool deserializeEnum(const QString &value, int *target) const;
+    bool deserializeEnumInternal(const QHash<QString, int> &hash, const QString &value, int *target) const;
 
     void serializeFlags(int value, QString *target) const;
     bool deserializeFlags(const QString &value, int *target) const;
@@ -71,7 +75,9 @@ protected:
 private:
     QHash<int, QString> m_nameByValue;
     QHash<QString, int> m_valueByName;
+    QHash<QString, int> m_valueByLowerName;
     QString m_enumName;
+    Qt::CaseSensitivity m_caseSensitivity;
     bool m_flagged;
 };
 
@@ -125,14 +131,16 @@ namespace QnLexical {
  * 
  * Example usage:
  * \code
- * QN_DEFINE_LEXICAL_SERIALIZABLE_ENUM(Token, (IdToken, "ID")(ClassToken, "CLASS")(TokenCount, NULL))
+ * QN_DEFINE_LEXICAL_ENUM(Token, (IdToken, "ID")(ClassToken, "CLASS")(TokenCount, NULL))
  * \endcode
  * 
  * \param ENUM                          Name of the enumeration.
  * \param ELEMENTS                      Sequence of enumeration's elements with
  *                                      their string representation.
+ * \param PREFIX                        Optional function definition prefix,
+ *                                      e.g. <tt>inline</tt>.
  */
-#define QN_DEFINE_LEXICAL_ENUM(ENUM, ELEMENTS, ... /* PREFIX */)   \
+#define QN_DEFINE_LEXICAL_ENUM(ENUM, ELEMENTS, ... /* PREFIX */)                \
 enum ENUM {                                                                     \
     BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_DEFINE_LEXICAL_ENUM_STEP_I, ~, ELEMENTS)  \
 };                                                                              \

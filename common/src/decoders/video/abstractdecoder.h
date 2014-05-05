@@ -22,6 +22,7 @@ class QGLContext;
 class QnAbstractVideoDecoder
 {
 public:
+    // TODO: #Elric #enum
     // for movies: full = IPB, fast == IP only, fastest = I only
     enum DecodeMode {
         DecodeMode_NotDefined, 
@@ -30,6 +31,7 @@ public:
         DecodeMode_Fastest
     };
 
+    // TODO: #Elric #enum
     //!Decoder capabilities
     enum DecoderCaps
     {
@@ -114,6 +116,7 @@ protected:
 class CLVideoDecoderFactory
 {
 public:
+    // TODO: #Elric #enum
     enum CLCodecManufacture
     {
         FFMPEG,

@@ -15,6 +15,7 @@ class QN_EXPORT QnNetworkResource : public QnResource
     //Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
 
 public:
+    // TODO: #Elric #enum Qn prefix?
     enum QnNetworkStatus
     {
         BadHostAddr = 0x01,
@@ -110,7 +111,7 @@ private:
 
     QHostAddress m_localAddress; // address used to discover this resource ( in case if machine has more than one NIC/address
 
-    unsigned long m_networkStatus;
+    unsigned long m_networkStatus; // TODO: #Elric #enum type safety has just walked out of the window.
 
     unsigned int m_networkTimeout;
 

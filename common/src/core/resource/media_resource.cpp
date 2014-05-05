@@ -65,16 +65,6 @@ QString Qn::toShortDisplayString(Qn::StreamQuality value) {
     return QnStreamQualityStrings::shortDisplayString(value);
 }
 
-template<>
-Qn::StreamQuality Qn::fromString<Qn::StreamQuality>(const QString &string) {
-    return QnLexical::deserialized<Qn::StreamQuality>(string, Qn::QualityNotDefined);
-}
-
-template<>
-QString Qn::toString<Qn::StreamQuality>(Qn::StreamQuality value) {
-    return QnLexical::serialized(value);
-}
-
 
 // -------------------------------------------------------------------------- //
 // QnMediaResource

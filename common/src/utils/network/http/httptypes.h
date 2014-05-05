@@ -149,7 +149,7 @@ namespace nx_http
 
     namespace StatusCode
     {
-        // TODO: #Elric enum naming
+        // TODO: #Elric #enum naming
         enum Value
         {
             undefined = 0,
@@ -231,6 +231,7 @@ namespace nx_http
 
     namespace MessageType
     {
+        // TODO: #Elric #enum
         enum Value
         {
             none,
@@ -266,6 +267,7 @@ namespace nx_http
         //!Http authentication scheme enumeration
         namespace AuthScheme
         {
+            // TODO: #Elric #enum
             enum Value
             {
                 none,

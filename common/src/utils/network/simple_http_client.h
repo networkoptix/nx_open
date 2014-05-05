@@ -28,6 +28,7 @@ typedef QSharedPointer<AbstractStreamSocket> TCPSocketPtr;
 
 class CLSimpleHTTPClient
 {
+    // TODO: #Elric #enum
     enum { Basic, Digestaccess };
 
 public:
