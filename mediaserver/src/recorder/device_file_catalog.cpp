@@ -612,6 +612,24 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
     }
 }
 
+DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64 durationMs) {
+    QMutexLocker lock(&m_mutex);
+    
+    ChunkMap::iterator itr = qUpperBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), startTimeMs);
+    if (itr > m_chunks.begin() + m_firstDeleteCount)
+        --itr;
+    while (itr > m_chunks.begin() + m_firstDeleteCount && itr->startTimeMs == startTimeMs && itr->durationMs != durationMs)
+        --itr;
+
+    if (itr->startTimeMs == startTimeMs && itr->durationMs == durationMs) {
+        Chunk result = *itr;
+        m_chunks.erase(itr);
+        return result;
+    }
+
+    return Chunk();
+}
+
 qint64 DeviceFileCatalog::getLatRecordingTime() const
 {
     QMutexLocker lock(&m_mutex);

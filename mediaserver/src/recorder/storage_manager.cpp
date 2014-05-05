@@ -1046,7 +1046,8 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
     if (!sdb)
         return false;
 
-    sdb->addOrUpdateCameraBookmark(bookmark, cameraGuid);
+    if (!sdb->addOrUpdateCameraBookmark(bookmark, cameraGuid))
+        return false;
 
     if (!bookmark.tags.isEmpty())
         QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addBookmarkTags(bookmark.tags, this, [](int reqID, ec2::ErrorCode errorCode) {});
@@ -1056,7 +1057,6 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
 }
 
 bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
-
     DeviceFileCatalogPtr catalog = qnStorageMan->getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
     int idx = catalog->findFileIndex(bookmark.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
     if (idx < 0)
@@ -1069,10 +1069,36 @@ bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBook
     if (!sdb)
         return false;
 
-    sdb->addOrUpdateCameraBookmark(bookmark, cameraGuid);
+    if (!sdb->addOrUpdateCameraBookmark(bookmark, cameraGuid))
+        return false;
 
     if (!bookmark.tags.isEmpty())
         QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addBookmarkTags(bookmark.tags, this, [](int reqID, ec2::ErrorCode errorCode) {});
+
+    return true;
+}
+
+
+bool QnStorageManager::deleteBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
+    DeviceFileCatalogPtr catalog = qnStorageMan->getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
+    if (!catalog)
+        return false;
+
+    //TODO: #GDM #Bookmark cast int64 to int
+    DeviceFileCatalog::Chunk chunk = catalog->takeChunk(bookmark.startTimeMs, bookmark.durationMs);
+    if (chunk.durationMs == 0)
+        return false;
+
+    QnStorageResourcePtr storage = storageRoot(chunk.storageIndex);
+    if (!storage)
+        return false;
+
+    QnStorageDbPtr sdb = m_chunksDB[storage];
+    if (!sdb)
+        return false;
+
+    if (!sdb->deleteCameraBookmark(bookmark, cameraGuid))
+        return false;
 
     return true;
 }

@@ -217,6 +217,26 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
     return true;
 }
 
+bool QnStorageDb::deleteCameraBookmark(const QnCameraBookmark &bookmark, const QByteArray &mac) {
+    QSqlQuery cleanTagQuery(m_sdb);
+    cleanTagQuery.prepare("DELETE FROM storage_bookmark_tag WHERE bookmark_guid = ?");
+    cleanTagQuery.addBindValue(bookmark.guid.toRfc4122());
+    if (!cleanTagQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << cleanTagQuery.lastError().text();
+        return false;
+    }
+
+    QSqlQuery cleanQuery(m_sdb);
+    cleanQuery.prepare("DELETE FROM storage_bookmark WHERE guid = ?");
+    cleanQuery.addBindValue(bookmark.guid.toRfc4122());
+    if (!cleanQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << cleanQuery.lastError().text();
+        return false;
+    }
+
+    return true;
+}
+
 bool QnStorageDb::getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result) {
 
     QString filterStr;

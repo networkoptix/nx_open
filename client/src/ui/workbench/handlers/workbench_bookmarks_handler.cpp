@@ -124,17 +124,15 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
     if (!camera)
         return;
 
-    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+    QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
-    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, period.startTimeMs);
+    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != QnResource::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
             tr("Bookmark can only be edited on an online server.")); //TODO: #Elric ec2 update text if needed
         return;
     }
-
-    QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
     dialog->setTags(m_tags);
@@ -148,7 +146,30 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
 }
 
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
 
+    QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+
+    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, bookmark.startTimeMs);
+    if (!server || server->getStatus() != QnResource::Online) {
+        QMessageBox::warning(mainWindow(),
+            tr("Error"),
+            tr("Bookmark can only be edited on an online server.")); //TODO: #Elric ec2 update text if needed
+        return;
+    }
+
+    if (QMessageBox::information(mainWindow(),
+            tr("Confirm delete"),
+            tr("Are you sure you want to delete this bookmark?"),
+            QMessageBox::Ok | QMessageBox::Cancel, 
+            QMessageBox::Cancel) != QMessageBox::Ok)
+        return;
+
+    int handle = server->apiConnection()->deleteBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkUpdated(int, const QnCameraBookmark &, int)));
+    m_processingBookmarks[handle] = camera;
 }
 
 void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle) {
