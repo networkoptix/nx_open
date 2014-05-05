@@ -38,7 +38,7 @@ int QnCameraBookmarksRestHandler::addCameraBookmarkAction(const QnRequestParams 
 }
 
 int QnCameraBookmarksRestHandler::getCameraBookmarkAction(const QnRequestParams & params, QnJsonRestResult & result) {
-    //TODO: #GDM check time periods existence via qnStorageMan
+    //TODO: #GDM #Bookmarks check time periods existence via qnStorageMan
 
     QString id = params.value("id");
     QnCameraBookmarkSearchFilter filter;

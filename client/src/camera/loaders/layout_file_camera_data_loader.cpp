@@ -118,7 +118,7 @@ int QnLayoutFileCameraDataLoader::load(const QnTimePeriod &period, const QString
             }
             qWarning() << "empty motion region";
         }
-        //TODO: #GDM intended fall-through to get assert, make sure it is safe in release
+        //TODO: #GDM #Bookmarks intended fall-through to get assert, implement saving and loading bookmarks in layouts and files
     default:
         assert(false);
     }

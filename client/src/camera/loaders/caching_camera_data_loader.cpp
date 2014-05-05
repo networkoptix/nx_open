@@ -223,7 +223,7 @@ void QnCachingCameraDataLoader::load(Qn::CameraDataType type, const QnTimePeriod
         m_handles[type] = loader->load(targetPeriod);
         break;
     case Qn::BookmarkTimePeriod:
-        m_handles[type] = loader->load(targetPeriod, m_bookmarkTags.join(L','));  //TODO: #GDM process tags list on the server side
+        m_handles[type] = loader->load(targetPeriod, m_bookmarkTags.join(L','));  //TODO: #GDM #Bookmarks process tags list on the server side
         break;
     case Qn::MotionTimePeriod:
         if(!isMotionRegionsEmpty()) {

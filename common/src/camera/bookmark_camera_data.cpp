@@ -16,7 +16,7 @@ QnBookmarkCameraData::QnBookmarkCameraData(const QnCameraBookmarkList &data):
     QVector<QnTimePeriodList> periods;
     foreach (const QnCameraBookmark &bookmark, m_data)
         periods.append(QnTimePeriodList(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs)));
-    m_dataSource = QnTimePeriodList::mergeTimePeriods(periods); //TODO: #GDM need an analogue for the single periods
+    m_dataSource = QnTimePeriodList::mergeTimePeriods(periods); //TODO: #GDM #Bookmarks need an analogue for the single periods
 }
 
 void QnBookmarkCameraData::append(const QnAbstractCameraDataPtr &other) {
@@ -25,7 +25,7 @@ void QnBookmarkCameraData::append(const QnAbstractCameraDataPtr &other) {
     QnCameraBookmarkList otherList;
     if (QnBookmarkCameraData* other_casted = dynamic_cast<QnBookmarkCameraData*>(other.data()))
         otherList = other_casted->m_data;
-    m_data.append(otherList);   //TODO: #GDM merge sort
+    m_data.append(otherList);   //TODO: #GDM #Bookmarks merge sort
 
     QVector<QnTimePeriodList> periods;
     periods.append(m_dataSource);
@@ -50,7 +50,7 @@ QnAbstractCameraDataPtr QnBookmarkCameraData::merge(const QVector<QnAbstractCame
         if (QnBookmarkCameraData* other_casted = dynamic_cast<QnBookmarkCameraData*>(other.data()))
             merged.append(other_casted->m_data);
     }
-    return QnAbstractCameraDataPtr(new QnBookmarkCameraData(merged)); //TODO: #GDM implement real merge
+    return QnAbstractCameraDataPtr(new QnBookmarkCameraData(merged)); //TODO: #GDM #Bookmarks implement real merge
 }
 
 bool QnBookmarkCameraData::operator==(const QnAbstractCameraDataPtr &other) const {
