@@ -18,6 +18,7 @@ namespace QnBinary {
         return QnSerialization::deserialize(stream, target);
     }
 
+#ifndef QN_NO_QT
     template<class T>
     QByteArray serialized(const T &value) {
         QByteArray result;
@@ -35,6 +36,7 @@ namespace QnBinary {
             *success = result;
         return result ? target : defaultValue;
     }
+#endif
 
 
 } // namespace QnBinary
@@ -49,7 +51,22 @@ namespace QnBinaryDetail {
         {}
 
         template<class T, class Access>
-        bool operator()(const T &value, const Access &access) {
+        bool operator()(const T &, const Access &access, const QnFusion::start_tag &) const {
+            using namespace QnFusion;
+
+            typedef decltype(access(member_count)) member_count_type;
+            static_assert(member_count_type::value < 32, "Only structures with up to 32 members are supported.");
+
+            /* Write out 1-byte header:
+             * 
+             * 0 .... 2  3 ........ 7
+             * Reserved  Member Count */
+            QnBinary::serialize(static_cast<unsigned char>(access(member_count)), m_stream);
+            return true;
+        }
+
+        template<class T, class Access>
+        bool operator()(const T &value, const Access &access) const {
             using namespace QnFusion;
 
             QnBinary::serialize(invoke(access(getter), value), m_stream);
@@ -68,8 +85,29 @@ namespace QnBinaryDetail {
         {}
 
         template<class T, class Access>
+        bool operator()(const T &, const Access &access, const QnFusion::start_tag &) {
+            using namespace QnFusion;
+
+            unsigned char header;
+            QnBinary::deserialize(m_stream, &header);
+            if(header & 0xE0)
+                return false; /* Reserved fields are expected to be zero. A packet from next version? */
+
+            m_count = header;
+            if(access(member_count) < m_count)
+                return false; /* Looks like a packet from the next version. */
+            
+            return true;
+        }
+
+        template<class T, class Access>
         bool operator()(T &target, const Access &access) {
             using namespace QnFusion;
+
+            // TODO: #Elric 
+            // we need a global "walker" abstraction to implement this more efficiently.
+            if(access(member_index) >= m_count)
+                return true;
 
             return operator()(target, access, access(setter_tag));
         }
@@ -95,6 +133,7 @@ namespace QnBinaryDetail {
 
     private:
         QnInputBinaryStream<Input> *m_stream;
+        int m_count;
     };
 
 } // namespace QnBinaryDetail

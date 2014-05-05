@@ -87,6 +87,7 @@ namespace ec2
     class AbstractECConnection;
     typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
 
+    // TODO: #Elric #enum
     enum class ErrorCode
     {
         ok,

@@ -21,13 +21,6 @@ namespace Qn {
 
     QString toDisplayString(Qn::StreamQuality value);
     QString toShortDisplayString(Qn::StreamQuality value);
-
-    // TODO: #Elric move out as generic interface
-    template<class Enum> Enum fromString(const QString &string);
-    template<class Enum> QString toString(Enum value);
-
-    template<> Qn::StreamQuality fromString<Qn::StreamQuality>(const QString &string);
-    template<> QString toString<Qn::StreamQuality>(Qn::StreamQuality value);
 }
 
 /*!

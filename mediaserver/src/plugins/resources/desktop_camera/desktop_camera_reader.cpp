@@ -35,7 +35,7 @@ CameraDiagnostics::Result QnDesktopCameraStreamReader::openStream()
             return CameraDiagnostics::CannotEstablishConnectionResult(0);
         quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
         QString request = QString(lit("PLAY %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(cseq);
-        m_socket->send(request.toLocal8Bit());
+        m_socket->send(request.toLatin1());
         m_keepaliveTimer.restart();
     }
 
@@ -48,7 +48,7 @@ void QnDesktopCameraStreamReader::closeStream()
         QString userName = m_resource.dynamicCast<QnDesktopCameraResource>()->getUserName();
         quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
         QString request = QString(lit("TEARDOWN %1 RTSP/1.0\r\nSeq: %2\r\n\r\n")).arg("*").arg(cseq);
-        m_socket->send(request.toLocal8Bit());
+        m_socket->send(request.toLatin1());
         QnDesktopCameraResourceSearcher::instance()->releaseConnection(m_socket);
     }
     m_socket.clear();
@@ -150,7 +150,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
             QString userName = m_resource.dynamicCast<QnDesktopCameraResource>()->getUserName();
             quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
             QString request = QString(lit("KEEP-ALIVE %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(cseq);
-            if (m_socket->send(request.toLocal8Bit()) < request.size())
+            if (m_socket->send(request.toLatin1()) < request.size())
             {
                 m_socket->close();
                 return result;

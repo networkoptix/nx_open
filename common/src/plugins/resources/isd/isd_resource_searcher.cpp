@@ -125,7 +125,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(mac);
+    resource->setMAC(QnMacAddress(mac));
     resource->setHostAddress(host, QnDomainMemory);
     resource->setAuth(auth);
 
@@ -218,7 +218,7 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceLis
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(smac);
+    resource->setMAC(QnMacAddress(smac));
 
     local_result.push_back(resource);
 

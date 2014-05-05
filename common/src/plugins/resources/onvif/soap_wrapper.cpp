@@ -185,7 +185,7 @@ void SoapWrapper<T>::setPassword(const QString &password) {
 void correctTimeInternal(char* buffer, const QDateTime& dt)
 {
     if (strlen(buffer) > 19) {
-        QByteArray datetime = dt.toString(Qt::ISODate).toLocal8Bit();
+        QByteArray datetime = dt.toString(Qt::ISODate).toLatin1();
         memcpy(buffer, datetime.data(), 19);
     }
 }

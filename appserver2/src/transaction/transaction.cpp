@@ -179,6 +179,8 @@ namespace ec2
     void QnAbstractTransaction::fillSequence()
     {
         id.sequence = m_sequence.fetchAndAddAcquire(1);
+        if (!timestamp)
+            timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getRelativeTime() : 0;
     }
 
     int generateRequestID()

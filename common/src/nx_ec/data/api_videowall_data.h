@@ -7,6 +7,8 @@
 namespace ec2
 {
 
+    // TODO: #API totally awful naming here. Use camelCase.
+
     struct ApiVideowallItemData {
         QnId guid;
         QnId pc_guid;

@@ -176,15 +176,22 @@ public:
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
     };
+
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
 
-    // TODO: #Elric rename
+
     enum StreamFpsSharingMethod {
-        shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
-        sharePixels, //if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
-        noSharing // second stream does not subtract first stream fps 
+        /** If second stream is running whatever fps it has, first stream can get maximumFps - secondstreamFps. */
+        BasicFpsSharing, 
+
+        /** If second stream is running whatever megapixel it has, first stream can get maxMegapixels - secondstreamPixels. */
+        PixelsFpsSharing, 
+
+        /** Second stream does not affect first stream's fps. */
+        NoFpsSharing 
     };
+
 
     enum MotionType {
         MT_Default = 0, 
@@ -193,13 +200,19 @@ public:
         MT_MotionWindow = 4, 
         MT_NoMotion = 8
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionType)
+
     Q_DECLARE_FLAGS(MotionTypes, MotionType);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes);
+
 
     enum PanicMode {
-        PM_None, 
-        PM_BusinessEvents, 
-        PM_User
+        PM_None = 0, 
+        PM_BusinessEvents = 1, 
+        PM_User = 2
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PanicMode)
+
 
     // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag { 
@@ -208,7 +221,10 @@ public:
         SF_RemoteEC = 2,
         SF_HasPublicIP = 4
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
+
     Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags);
 
 
     enum TimePeriodType {
@@ -216,8 +232,10 @@ public:
         EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
         NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
     };
+
     Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
     Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes);
+
 
     enum TimePeriodContent {
         RecordingContent,
@@ -350,35 +368,47 @@ public:
 
     // TODO: #Elric #EC2 rename
     enum StreamQuality {
-        QualityLowest,
-        QualityLow,
-        QualityNormal,
-        QualityHigh,
-        QualityHighest,
-        QualityPreSet,
-        QualityNotDefined,
+        QualityLowest = 0,
+        QualityLow = 1,
+        QualityNormal = 2,
+        QualityHigh = 3,
+        QualityHighest = 4,
+        QualityPreSet = 5,
+        QualityNotDefined = 6,
 
         StreamQualityCount
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamQuality)
+
 
     // TODO: #Elric #EC2 rename
     enum SecondStreamQuality { 
-        SSQualityLow, 
-        SSQualityMedium, 
-        SSQualityHigh, 
-        SSQualityNotDefined,
-        SSQualityDontUse
+        SSQualityLow = 0, 
+        SSQualityMedium = 1, 
+        SSQualityHigh = 2, 
+        SSQualityNotDefined = 3,
+        SSQualityDontUse = 4
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SecondStreamQuality)
+
 
     // TODO: #Elric #EC2 rename
     enum RecordingType {
-        RecordingType_Run,
-        RecordingType_MotionOnly,
-        RecordingType_Never,
-        RecordingType_MotionPlusLQ,
+        /** Record always. */
+        RT_Always = 0,
 
-        RecordingType_Count
+        /** Record only when motion was detected. */
+        RT_MotionOnly = 1,
+
+        /** Don't record. */
+        RT_Never = 2,
+
+        /** Record LQ stream always and HQ stream only on motion. */
+        RT_MotionAndLowQuality = 3,
+
+        RT_Count
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
 
 
     enum SerializationFormat {

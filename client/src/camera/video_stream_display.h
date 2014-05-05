@@ -28,6 +28,7 @@ class QnVideoStreamDisplay
     public QnStoppable, public ScreenshotInterface
 {
 public:
+    // TODO: #Elric #enum
     enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
 
     QnVideoStreamDisplay(bool can_downscale, int channelNumber);

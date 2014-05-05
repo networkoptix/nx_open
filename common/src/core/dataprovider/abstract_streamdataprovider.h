@@ -20,9 +20,6 @@ class QN_EXPORT QnAbstractStreamDataProvider : public QnLongRunnable, public QnR
 {
     Q_OBJECT
 public:
-
-    //enum QnStreamQuality {CLSLowest, CLSLow, CLSNormal, CLSHigh, CLSHighest};
-
     explicit QnAbstractStreamDataProvider(QnResourcePtr resource);
     virtual ~QnAbstractStreamDataProvider();
 

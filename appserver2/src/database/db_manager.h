@@ -56,6 +56,7 @@ namespace ec2
             ErrorCode result = executeTransactionNoLock(tran);
             if (result != ErrorCode::ok)
                 return result;
+
             result = transactionLog->saveTransaction( tran, serializedTran);
             if (result == ErrorCode::ok)
                 lock.commit();

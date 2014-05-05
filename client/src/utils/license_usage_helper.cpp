@@ -66,7 +66,7 @@ void QnLicenseUsageHelper::update() {
 }
 
 int QnLicenseUsageHelper::totalDigital() const {
-    return 100;
+    //return 100;
     return m_licenses.totalDigital();
 }
 

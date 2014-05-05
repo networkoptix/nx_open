@@ -9,7 +9,10 @@
 #include "time_reply.h"
 #include "connection_info.h"
 
-// TODO: #Elric move fields out, closer to struct definitions!
+// TODO: #MSAPI Use a scheme similar to one in EC API: 
+// 
+// Define a _Fields macro where the struct/class definition is.
+// Then generate all functions using a single QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES invocation.
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraDiagnosticsReply,          (json)(binary), (performedStep)(errorCode)(errorParams))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnManualCameraSearchStatus,        (json)(binary), (state)(current)(total))

@@ -14,10 +14,11 @@ class QnEmail {
     Q_ENUMS(ConnectionType)
 
 public:
+    // TODO: #Elric #EC2 move out, rename?
     enum ConnectionType {
-        Unsecure,
-        Ssl,
-        Tls,
+        Unsecure = 0,
+        Ssl = 1,
+        Tls = 2,
         ConnectionTypeCount
     };
 
@@ -86,6 +87,7 @@ private:
     QString m_email;
 };
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnEmail::ConnectionType)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (json))
 
 #endif // QN_EMAIL_H

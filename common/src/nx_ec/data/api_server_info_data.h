@@ -15,8 +15,8 @@ namespace ec2 {
         QString systemName;
         QString sessionKey;
 
-        QString armBox;
-        bool allowCameraChanges;
+        QString armBox; // TODO: #Elric #API what is this? Rename into something more sane.
+        bool allowCameraChanges; // TODO: #API I believe we have implemented this in kvpairs. Remove.
     };
 #define ApiServerInfoData_Fields (mainHardwareIds)(compatibleHardwareIds)(publicIp)(systemName)(sessionKey)(armBox)(allowCameraChanges)
 

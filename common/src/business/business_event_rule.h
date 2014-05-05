@@ -25,12 +25,11 @@ public:
     void setId(const QnId& value);
 
     QnBusiness::EventType eventType() const;
-    void setEventType(const QnBusiness::EventType value);
+    void setEventType(QnBusiness::EventType eventType);
 
     QVector<QnId> eventResources() const;
     void setEventResources(const QVector<QnId> &value);
     QnResourceList eventResourceObjects() const;
-
 
     QnBusinessEventParameters eventParams() const;
     void setEventParams(const QnBusinessEventParameters& params);
@@ -39,7 +38,7 @@ public:
     void setEventState(QnBusiness::EventState state);
 
     QnBusiness::ActionType actionType() const;
-    void setActionType(const QnBusiness::ActionType value);
+    void setActionType(QnBusiness::ActionType actionType);
 
     QVector<QnId> actionResources() const;
     QnResourceList actionResourceObjects() const;
@@ -52,17 +51,17 @@ public:
     int aggregationPeriod() const;
     void setAggregationPeriod(int secs);
 
-    bool disabled() const;
-    void setDisabled(bool value);
+    bool isDisabled() const;
+    void setDisabled(bool disabled);
 
     QString schedule() const;
-    void setSchedule(const QString value);
+    void setSchedule(const QString &schedule);
 
-    QString comments() const;
-    void setComments(const QString value);
+    QString comment() const;
+    void setComment(const QString &comment);
 
-    bool system() const;
-    void setSystem(bool value);
+    bool isSystem() const;
+    void setSystem(bool system);
 
     /* Check if current time allowed in schedule */
     bool isScheduleMatchTime(const QDateTime& datetime) const;
@@ -71,6 +70,7 @@ public:
 
     QnBusinessEventRule* clone();
     void removeResource(const QnId& resId);
+
 private:
     QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, QnResourcePtr actionRes= QnResourcePtr());
 
@@ -90,7 +90,7 @@ private:
 
     QString m_schedule;
     QByteArray m_binSchedule;
-    QString m_comments;
+    QString m_comment;
 
     bool m_system;
 };

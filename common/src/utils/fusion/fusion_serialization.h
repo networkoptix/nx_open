@@ -44,7 +44,7 @@ namespace QnFusion {
 
     template<class T, class D>
     void serialize(const T &value, D *target) {
-        static_assert(QnFusion::has_visit_members<T>::value, "Type T must have a fusion adaptor defined.");
+        static_assert(QnFusion::is_adapted<T>::value, "Type T must have a fusion adaptor defined.");
         static_assert(QnFusion::has_serialization_visitor_type<D>::value, "Type D must have a fusion serialization visitor defined.");
 
         typename QnFusion::serialization_visitor_type<D>::type visitor(*target);
@@ -53,7 +53,7 @@ namespace QnFusion {
 
     template<class T, class D>
     bool deserialize(const D &value, T *target) {
-        static_assert(QnFusion::has_visit_members<T>::value, "Type T must have a fusion adaptor defined.");
+        static_assert(QnFusion::is_adapted<T>::value, "Type T must have a fusion adaptor defined.");
         static_assert(QnFusion::has_deserialization_visitor_type<D>::value, "Type D must have a fusion deserialization visitor defined.");
 
         typename QnFusion::deserialization_visitor_type<D>::type visitor(value);
@@ -62,7 +62,7 @@ namespace QnFusion {
 
     template<class T, class D, class Context>
     void serialize(Context *ctx, const T &value, D *target) {
-        static_assert(QnFusion::has_visit_members<T>::value, "Type T must have a fusion adaptor defined.");
+        static_assert(QnFusion::is_adapted<T>::value, "Type T must have a fusion adaptor defined.");
         static_assert(QnFusion::has_serialization_visitor_type<D>::value, "Type D must have a fusion serialization visitor defined.");
 
         typename QnFusion::serialization_visitor_type<D>::type visitor(ctx, *target);
@@ -71,7 +71,7 @@ namespace QnFusion {
 
     template<class T, class D, class Context>
     bool deserialize(Context *ctx, const D &value, T *target) {
-        static_assert(QnFusion::has_visit_members<T>::value, "Type T must have a fusion adaptor defined.");
+        static_assert(QnFusion::is_adapted<T>::value, "Type T must have a fusion adaptor defined.");
         static_assert(QnFusion::has_deserialization_visitor_type<D>::value, "Type D must have a fusion deserialization visitor defined.");
 
         typename QnFusion::deserialization_visitor_type<D>::type visitor(ctx, value);
