@@ -13,6 +13,7 @@
 
 #include <camera/loaders/multi_server_camera_data_loader.h>
 #include <camera/loaders/layout_file_camera_data_loader.h>
+#include <camera/bookmark_camera_data.h>
 
 namespace {
     const qint64 minTimePeriodLoadingMargin = 60 * 60 * 1000; /* 1 hour. */
@@ -186,10 +187,49 @@ bool QnCachingCameraDataLoader::isMotionRegionsEmpty() const {
     return true;
 }
 
-QnTimePeriodList QnCachingCameraDataLoader::periods(Qn::TimePeriodContent timePeriodType) {
+QnTimePeriodList QnCachingCameraDataLoader::periods(Qn::TimePeriodContent timePeriodType) const {
     if (QnTimePeriodCameraData* list = dynamic_cast<QnTimePeriodCameraData*>(m_data[timePeriodToDataType(timePeriodType)].data()))
         return list->dataSource();
     return QnTimePeriodList();
+}
+
+QnCameraBookmarkList QnCachingCameraDataLoader::bookmarks() const {
+    return QnCameraBookmarkList(); //TODO: #GDM #Bookmarks implement me
+}
+
+QnCameraBookmarkTags QnCachingCameraDataLoader::bookmarkTags() const {
+    return m_bookmarkTags;
+}
+
+void QnCachingCameraDataLoader::setBookmarkTags(const QnCameraBookmarkTags &tags) {
+    if (m_bookmarkTags == tags)
+        return;
+
+    m_bookmarkTags = tags;
+    m_requestedBookmarkPeriodsByResolution.clear();
+    updateBookmarks();
+}
+
+void QnCachingCameraDataLoader::addBookmark(const QnCameraBookmark &bookmark) {
+    QnAbstractCameraDataPtr bookmarkData(new QnBookmarkCameraData(QnCameraBookmarkList() << bookmark));
+    if (m_data[Qn::BookmarkData])
+        m_data[Qn::BookmarkData]->append(bookmarkData);
+    else
+        m_data[Qn::BookmarkData] = bookmarkData;
+
+    QnTimePeriod bookmarkPeriod(bookmark.startTimeMs, bookmark.durationMs);
+    QnAbstractCameraDataPtr periodData(new QnTimePeriodCameraData(Qn::BookmarkTimePeriod, QnTimePeriodList(bookmarkPeriod)));
+    if (m_data[Qn::BookmarkTimePeriod])
+        m_data[Qn::BookmarkTimePeriod]->append(periodData);
+    else 
+        m_data[Qn::BookmarkTimePeriod] = periodData;
+
+    emit periodsChanged(Qn::BookmarksContent);
+    emit bookmarksChanged();
+}
+
+QnCameraBookmark QnCachingCameraDataLoader::bookmarkByTime(qint64 position) const {
+    throw std::logic_error("The method or operation is not implemented.");
 }
 
 QnTimePeriod QnCachingCameraDataLoader::addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod, const qint64 minMargin) const {
@@ -263,10 +303,14 @@ void QnCachingCameraDataLoader::at_loader_ready(const QnAbstractCameraDataPtr &d
             continue;
 
         m_handles[dataType] = -1;
-        if (m_data[dataType] && m_data[dataType].data() == data)
+        if (m_data[dataType] && m_data[dataType]->contains(data))
             return;
 
-        m_data[dataType] = data;
+        if (m_data[dataType])
+            m_data[dataType]->append(data);
+        else 
+            m_data[dataType] = data;
+
         switch (dataType) {
         case Qn::RecordedTimePeriod:
         case Qn::MotionTimePeriod:
@@ -320,28 +364,6 @@ void QnCachingCameraDataLoader::at_syncTime_timeChanged() {
         updateTimePeriods(timePeriodToDataType(timePeriod));
     }
 
-    m_requestedBookmarkPeriodsByResolution.clear();
-    updateBookmarks();
-}
-
-void QnCachingCameraDataLoader::addBookmark(const QnCameraBookmark &bookmark) {
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
-
-QnCameraBookmark QnCachingCameraDataLoader::bookmarkByTime(qint64 position) const {
-    throw std::logic_error("The method or operation is not implemented.");
-}
-
-QnCameraBookmarkTags QnCachingCameraDataLoader::bookmarkTags() const {
-    return m_bookmarkTags;
-}
-
-void QnCachingCameraDataLoader::setBookmarkTags(const QnCameraBookmarkTags &tags) {
-    if (m_bookmarkTags == tags)
-        return;
-
-    m_bookmarkTags = tags;
     m_requestedBookmarkPeriodsByResolution.clear();
     updateBookmarks();
 }

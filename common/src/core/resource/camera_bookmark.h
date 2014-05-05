@@ -55,6 +55,8 @@ struct QnCameraBookmarkSearchFilter {
 
 };
 
+bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other);
+
 QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark);
 
 Q_DECLARE_METATYPE(QnCameraBookmark)

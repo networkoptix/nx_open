@@ -8,6 +8,11 @@ qint64 QnCameraBookmark::endTimeMs() const {
     return startTimeMs + durationMs;
 }
 
+bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other) {
+    if (first.startTimeMs == other.startTimeMs)
+        return first.guid.toRfc4122() < other.guid.toRfc4122();
+    return first.startTimeMs < other.startTimeMs;
+}
 
 QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
     if (bookmark.durationMs > 0)
@@ -26,6 +31,7 @@ QnCameraBookmarkSearchFilter::QnCameraBookmarkSearchFilter():
     maxStartTimeMs(INT64_MAX),
     minDurationMs(0)
 {}
+
 
 void serialize_field(const QStringList& /*value*/, QVariant* /*target*/) {return ;}
 void deserialize_field(const QVariant& /*value*/, QStringList* /*target*/) {return ;}

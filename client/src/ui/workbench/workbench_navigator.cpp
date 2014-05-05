@@ -1254,7 +1254,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         if (QnCachingCameraDataLoader *loader = this->loader(m_currentMediaWidget))
             bookmark = loader->bookmarkByTime(position);
         if (!bookmark.guid.isNull())
-            parameters.setArgument(Qn::CameraBookmarkRole, /*bookmarkByTime(position)*/ true);
+            parameters.setArgument(Qn::CameraBookmarkRole, bookmark);
     }
     
 
@@ -1307,7 +1307,7 @@ void QnWorkbenchNavigator::updateLoaderPeriods(QnCachingCameraDataLoader *loader
     if(m_syncedResources.contains(resource))
         updateSyncedPeriods(type);
 
-    if(m_centralWidget && m_centralWidget->resource() == resource)
+    if(m_centralWidget && m_centralWidget->resource() == resource && type == Qn::RecordedTimePeriod)
         updateThumbnailsLoader();
 }
 

@@ -17,7 +17,7 @@ public:
 
     virtual QnAbstractCameraDataPtr merge(const QVector<QnAbstractCameraDataPtr> &source) override;
 
-    virtual bool operator==(const QnAbstractCameraDataPtr &other) const override;
+    virtual bool contains(const QnAbstractCameraDataPtr &other) const override;
 private:
     QnCameraBookmarkList m_data;
     QnTimePeriodList m_dataSource;

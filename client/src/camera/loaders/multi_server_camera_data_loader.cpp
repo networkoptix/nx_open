@@ -105,7 +105,8 @@ void QnMultiServerCameraDataLoader::onLoadingFailed(int status, int handle) {
         if (itr->isEmpty()) {
             if (!m_multiLoadData[multiHandle].isEmpty())
             {
-                QnAbstractCameraDataPtr result = m_multiLoadData[multiHandle].first()->merge(m_multiLoadData[multiHandle]); //TODO: #GDM #Bookmarks merging with itself
+                QnAbstractCameraDataPtr first = m_multiLoadData[multiHandle].takeFirst();
+                QnAbstractCameraDataPtr result = first->merge(m_multiLoadData[multiHandle]);
                 emit ready(result, multiHandle);
             }
             else {

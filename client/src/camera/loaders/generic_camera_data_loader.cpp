@@ -137,7 +137,6 @@ int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, con
             bookmarkFilter.minDurationMs = resolutionMs;
             bookmarkFilter.tags = m_filter.split(L',');
 
-            qDebug() << "Requesting bookmarks with resolution" << resolutionMs;
             return m_connection->getBookmarksAsync( 
                 m_resource.dynamicCast<QnNetworkResource>(),
                 bookmarkFilter,
@@ -153,8 +152,8 @@ int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, con
 }
 
 void QnGenericCameraDataLoader::at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle) {
-   QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(m_dataType, timePeriods));
-   handleDataLoaded(status, data, requestHandle);
+    QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(m_dataType, timePeriods));
+    handleDataLoaded(status, data, requestHandle);
 }
 
 void QnGenericCameraDataLoader::at_bookmarksReceived(int status, const QnCameraBookmarkList &bookmarks, int requestHandle) {

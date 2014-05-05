@@ -12,6 +12,8 @@ class QnAbstractCameraData {
 public:
     QnAbstractCameraData(const Qn::CameraDataType dataType);
     
+    Qn::CameraDataType dataType() const;
+
     virtual void append(const QnAbstractCameraDataPtr &other);
 
     virtual QnAbstractCameraDataPtr merge(const QVector<QnAbstractCameraDataPtr> &source);
@@ -23,9 +25,7 @@ public:
 
     virtual bool trimDataSource(qint64 trimTime);
 
-    virtual bool operator==(const QnAbstractCameraDataPtr &other) const;
-
-    Qn::CameraDataType dataType() const;
+    virtual bool contains(const QnAbstractCameraDataPtr & data) const;
 protected:
     const Qn::CameraDataType m_dataType;
 };

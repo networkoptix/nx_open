@@ -281,10 +281,14 @@ QnAbstractCameraDataPtr QnTimePeriodCameraData::merge(const QVector<QnAbstractCa
     return QnAbstractCameraDataPtr(new QnTimePeriodCameraData(m_dataType, QnTimePeriodList::mergeTimePeriods(allPeriods)));
 }
 
-bool QnTimePeriodCameraData::operator==(const QnAbstractCameraDataPtr &other) const {
-    if (QnTimePeriodCameraData* other_casted = dynamic_cast<QnTimePeriodCameraData*>(other.data()))
-        return other_casted->m_data == m_data;
-    return false;
+bool QnTimePeriodCameraData::contains(const QnAbstractCameraDataPtr &other) const {
+    QnTimePeriodCameraData* other_casted = dynamic_cast<QnTimePeriodCameraData*>(other.data());
+    if (!other_casted)
+        return false;
+    foreach (const QnTimePeriod &period, other_casted->m_data)
+        if (!m_data.containPeriod(period))
+            return false;
+    return true;
 }
 
 QnTimePeriodList QnTimePeriodCameraData::dataSource() const  {

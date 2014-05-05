@@ -20,11 +20,6 @@ QnAbstractCameraDataPtr QnAbstractCameraData::merge(const QVector<QnAbstractCame
     return QnAbstractCameraDataPtr();
 }
 
-bool QnAbstractCameraData::operator==(const QnAbstractCameraDataPtr &other) const { 
-    Q_UNUSED(other);
-    return false; 
-}
-
 Qn::CameraDataType QnAbstractCameraData::dataType() const {
     return m_dataType;
 }
@@ -39,6 +34,11 @@ void QnAbstractCameraData::clear() {
 
 bool QnAbstractCameraData::trimDataSource(qint64 trimTime) {
     Q_UNUSED(trimTime)
+    return false;
+}
+
+bool QnAbstractCameraData::contains(const QnAbstractCameraDataPtr & data) const {
+    Q_UNUSED(data)
     return false;
 }
 
