@@ -63,7 +63,7 @@ private:
     bool startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
     void checkLicenses();
     bool isResourceDisabled(QnResourcePtr res) const;
-    void calcUsingLicenses(int* recordingAnalog, int* recordingDigital);
+    void calcUsingLicenses(int* recordingDigital, int* recordingAnalog);
     QnResourceList getLocalControlledCameras();
 
     void beforeDeleteRecorder(const Recorders& recorders);

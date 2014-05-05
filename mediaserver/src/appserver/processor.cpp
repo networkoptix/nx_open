@@ -103,7 +103,6 @@ void QnAppserverResourceProcessor::at_mutexLocked(QByteArray name)
 
     LockData data = m_lockInProgress.value(name);
     if (!data.mutex) {
-        Q_ASSERT_X(0, "It should not be!!!", Q_FUNC_INFO);
         return;
     }
 

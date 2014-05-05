@@ -544,7 +544,7 @@ void QnRecordingManager::onTimer()
     checkLicenses();
 }
 
-void QnRecordingManager::calcUsingLicenses(int* recordingAnalog, int* recordingDigital)
+void QnRecordingManager::calcUsingLicenses(int* recordingDigital, int* recordingAnalog)
 {
     QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
     int recordingCameras = 0;
@@ -566,9 +566,9 @@ void QnRecordingManager::calcUsingLicenses(int* recordingAnalog, int* recordingD
 
         if (!camera->isScheduleDisabled()) {
             if (camera->isAnalog())
-                recordingAnalog++;
+                ++(*recordingAnalog);
             else
-                recordingDigital++;
+                ++(*recordingDigital);
         }
     }
 }
