@@ -79,6 +79,8 @@ void QnCameraBookmarkDialog::loadData(const QnCameraBookmark &bookmark) {
     m_selectedTags = bookmark.tags;
     m_selectedTags.removeDuplicates();
     ui->tagsLineEdit->setText(m_selectedTags.join(lit(", ")));
+
+    updateTagsList();
 }
 
 void QnCameraBookmarkDialog::submitData(QnCameraBookmark &bookmark) const {

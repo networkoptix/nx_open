@@ -17,6 +17,8 @@ int QnCameraBookmarksRestHandler::executePost(const QString &path, const QnReque
     QString action = extractAction(path);
     if (action == "add")
         return addCameraBookmarkAction(params, body, result);
+    if (action == "update")
+        return updateCameraBookmarkAction(params, body, result);
     return CODE_NOT_FOUND;
 }
 
@@ -31,6 +33,20 @@ int QnCameraBookmarksRestHandler::addCameraBookmarkAction(const QnRequestParams 
         return CODE_INVALID_PARAMETER;
 
     if (!qnStorageMan->addBookmark(id.toUtf8(), bookmark)) 
+        return CODE_INVALID_PARAMETER;
+
+    result.setReply(bookmark);
+    return CODE_OK;
+}
+
+
+int QnCameraBookmarksRestHandler::updateCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) {
+    QString id = params.value("id");
+    QnCameraBookmark bookmark;
+    if (id.isEmpty() || !QJson::deserialize(body, &bookmark))
+        return CODE_INVALID_PARAMETER;
+
+    if (!qnStorageMan->updateBookmark(id.toUtf8(), bookmark)) 
         return CODE_INVALID_PARAMETER;
 
     result.setReply(bookmark);

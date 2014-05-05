@@ -228,6 +228,19 @@ void QnCachingCameraDataLoader::addBookmark(const QnCameraBookmark &bookmark) {
     emit bookmarksChanged();
 }
 
+
+void QnCachingCameraDataLoader::updateBookmark(const QnCameraBookmark &bookmark) {
+    QnAbstractCameraDataPtr bookmarkData(new QnBookmarkCameraData(QnCameraBookmarkList() << bookmark));
+    if (!m_data[Qn::BookmarkData]) {
+        qWarning() << "updating non-existent bookmark" << bookmark;
+        return;
+    }
+    QnBookmarkCameraData* list = dynamic_cast<QnBookmarkCameraData*>(m_data[Qn::BookmarkData].data());
+    list->updateBookmark(bookmark);
+        
+    emit bookmarksChanged();
+}
+
 QnCameraBookmark QnCachingCameraDataLoader::bookmarkByTime(qint64 position) const {
     if (!m_data[Qn::BookmarkData])
         return QnCameraBookmark();

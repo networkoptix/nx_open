@@ -20,6 +20,7 @@ public:
     virtual bool contains(const QnAbstractCameraDataPtr &other) const override;
 
     QnCameraBookmark find(const qint64 position) const;
+    void updateBookmark(const QnCameraBookmark &bookmark);
 private:
     QnCameraBookmarkList m_data;
     QnTimePeriodList m_dataSource;

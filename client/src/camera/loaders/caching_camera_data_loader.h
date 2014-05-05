@@ -48,6 +48,7 @@ public:
     void setBookmarkTags(const QnCameraBookmarkTags &tags);
 
     void addBookmark(const QnCameraBookmark &bookmark);
+    void updateBookmark(const QnCameraBookmark &bookmark);
     QnCameraBookmark bookmarkByTime(qint64 position) const;
 signals:
     void periodsChanged(Qn::TimePeriodContent type);

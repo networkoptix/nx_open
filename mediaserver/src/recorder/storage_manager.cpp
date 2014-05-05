@@ -1055,6 +1055,29 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
     return true;
 }
 
+bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBookmark &bookmark) {
+
+    DeviceFileCatalogPtr catalog = qnStorageMan->getFileCatalog(cameraGuid, QnServer::BookmarksCatalog);
+    int idx = catalog->findFileIndex(bookmark.startTimeMs, DeviceFileCatalog::OnRecordHole_NextChunk);
+    if (idx < 0)
+        return false;
+    QnStorageResourcePtr storage = storageRoot(catalog->chunkAt(idx).storageIndex);
+    if (!storage)
+        return false;
+
+    QnStorageDbPtr sdb = m_chunksDB[storage];
+    if (!sdb)
+        return false;
+
+    sdb->addOrUpdateCameraBookmark(bookmark, cameraGuid);
+
+    if (!bookmark.tags.isEmpty())
+        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addBookmarkTags(bookmark.tags, this, [](int reqID, ec2::ErrorCode errorCode) {});
+
+    return true;
+}
+
+
 bool QnStorageManager::getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result) {
     foreach (const QnStorageDbPtr &sdb, m_chunksDB) {
         if (!sdb)

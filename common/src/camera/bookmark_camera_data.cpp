@@ -10,8 +10,6 @@ namespace {
         if(lists.size() == 1)
             return lists[0];
 
-        qDebug() << "merging bookmark lists" << lists;
-
         QVector<int> minIndexes;
         minIndexes.resize(lists.size());
         QnCameraBookmarkList result;
@@ -45,7 +43,6 @@ namespace {
             }
         }
 
-        qDebug() << "merge result" << result;
         return result;
     }
 
@@ -129,5 +126,21 @@ QnCameraBookmark QnBookmarkCameraData::find(const qint64 position) const {
             result = bookmark;
     }
     return result;
+}
+
+void QnBookmarkCameraData::updateBookmark(const QnCameraBookmark &bookmark) {
+    for (int i = 0; i < m_data.size(); ++i) {
+        QnCameraBookmark existing = m_data[i];
+        // stop if we overcome the position, bookmarks are sorted by start time
+        if (existing.startTimeMs > bookmark.startTimeMs)
+            break;
+
+        if (existing.guid != bookmark.guid)
+            continue;
+
+        m_data[i] = bookmark;
+        return;
+    }
+    qWarning() << "updating non-existent bookmark" << bookmark;
 }
 

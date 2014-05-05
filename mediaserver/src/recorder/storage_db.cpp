@@ -195,9 +195,16 @@ bool QnStorageDb::addOrUpdateCameraBookmark(const QnCameraBookmark& bookmark, co
         return false;
     }
 
+    QSqlQuery cleanTagQuery(m_sdb);
+    cleanTagQuery.prepare("DELETE FROM storage_bookmark_tag WHERE bookmark_guid = ?");
+    cleanTagQuery.addBindValue(bookmark.guid.toRfc4122());
+    if (!cleanTagQuery.exec()) {
+        qWarning() << Q_FUNC_INFO << cleanTagQuery.lastError().text();
+        return false;
+    }
+
     QSqlQuery tagQuery(m_sdb);
     tagQuery.prepare("INSERT INTO storage_bookmark_tag ( bookmark_guid, name ) VALUES ( :bookmark_guid, :name )");
-
     tagQuery.bindValue(":bookmark_guid", bookmark.guid.toRfc4122());
     for (const QString tag: bookmark.tags) {
         tagQuery.bindValue(":name", tag);

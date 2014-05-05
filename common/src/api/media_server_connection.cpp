@@ -61,6 +61,7 @@ namespace {
         (CameraDiagnosticsObject,  "doCameraDiagnosticsStep")
         (RebuildArchiveObject,     "rebuildArchive")
         (BookmarkAddObject,        "cameraBookmarks/add")
+        (BookmarkUpdateObject,     "cameraBookmarks/update")
         (BookmarkGetObject,        "cameraBookmarks/get")
     );
 
@@ -387,6 +388,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     }
     case BookmarkAddObject: 
+    case BookmarkUpdateObject: 
         processJsonReply<QnCameraBookmark>(this, response, handle);
         break;
     case BookmarkGetObject:
@@ -796,6 +798,16 @@ int QnMediaServerConnection::addBookmarkAsync(const QnNetworkResourcePtr &camera
     params << QnRequestParam("id",      QnLexical::serialized(camera->getPhysicalId()));
 
     return sendAsyncPostRequest(BookmarkAddObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
+}
+
+int QnMediaServerConnection::updateBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot) {
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
+
+    QnRequestParamList params;
+    params << QnRequestParam("id",      QnLexical::serialized(camera->getPhysicalId()));
+
+    return sendAsyncPostRequest(BookmarkUpdateObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
 }
 
 int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot) {

@@ -29,6 +29,7 @@ private slots:
     void at_editCameraBookmarkAction_triggered();
     void at_removeCameraBookmarkAction_triggered();
     void at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle);
+    void at_bookmarkUpdated(int status, const QnCameraBookmark &bookmark, int handle);
 
     void updateTags();
 private:
@@ -36,7 +37,7 @@ private:
     QnMediaServerResourcePtr getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 time) const;
 
     QnCameraBookmarkTags m_tags;
-    QHash<int, QnResourcePtr> m_addingBookmarks; 
+    QHash<int, QnResourcePtr> m_processingBookmarks; 
 };
 
 #endif // WORKBENCH_BOOKMARKS_HANDLER_H
