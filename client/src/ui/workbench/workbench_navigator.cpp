@@ -909,28 +909,50 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
     if (!m_currentWidgetLoaded) 
         return;
 
-    /* Update target time period for time period loaders. 
-     * If playback is synchronized, do it for all cameras. */
-    QnTimePeriod targetPeriod(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
+    /* Do not update periods if lines are hidden. */
+    if (!(m_currentWidgetFlags & WidgetSupportsPeriods))
+        return;
+
+    /* Update target time period for time period loaders. */
+    QnTimePeriod timeSliderPeriod(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
     QnTimePeriod boundingPeriod(m_timeSlider->minimum(), m_timeSlider->maximum() - m_timeSlider->minimum());
-    // todo: #ELRIC. Invalid boundingPeriod near daylight time
+    //TODO: #Elric Invalid boundingPeriod near daylight time
     boundingPeriod = boundingPeriod.intersected(QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch()));
 
+    /* Some time periods should also be displayed on the calendar so we are loading them for the whole month. */
+    QnTimePeriod calendarPeriod(timeSliderPeriod);
     if (m_calendar) {
         QDate date(m_calendar->yearShown(), m_calendar->monthShown(), 1);
-        QnTimePeriod calendarPeriod(QDateTime(date).toMSecsSinceEpoch(), QDateTime(date.addMonths(1)).toMSecsSinceEpoch() - QDateTime(date).toMSecsSinceEpoch());
-        targetPeriod.addPeriod(boundingPeriod.intersected(calendarPeriod));
+        QnTimePeriod monthPeriod(QDateTime(date).toMSecsSinceEpoch(), QDateTime(date.addMonths(1)).toMSecsSinceEpoch() - QDateTime(date).toMSecsSinceEpoch());
+        calendarPeriod.addPeriod(boundingPeriod.intersected(monthPeriod));
     }
 
-    // TODO: #Elric 'All cameras' line is shown even when SYNC is off, so this condition is not valid.
-    // We need to set all targets every time.
-    if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods)) {
-        foreach(QnResourceWidget *widget, m_syncedWidgets)
-            if(QnCachingCameraDataLoader *loader = this->loader(widget))
-                loader->setTargetPeriods(targetPeriod, boundingPeriod);
-    } else if(m_currentWidgetFlags & WidgetSupportsPeriods) {
-        if(QnCachingCameraDataLoader *loader = this->loader(m_currentWidget))
-            loader->setTargetPeriods(targetPeriod, boundingPeriod);
+    QSet<QnMediaResourceWidget*> widgets = m_syncedWidgets;
+    if (m_currentMediaWidget)
+        widgets.insert(m_currentMediaWidget);
+
+    foreach(QnMediaResourceWidget *widget, widgets) {
+        QnCachingCameraDataLoader *loader = this->loader(widget);
+        if (!loader)
+            continue;
+
+        loader->setBoundingPeriod(boundingPeriod);
+        for (int i = 0; i < Qn::CameraDataTypeCount; ++i) {
+            Qn::CameraDataType dataType = static_cast<Qn::CameraDataType>(i);
+            switch (dataType) {
+            case Qn::RecordedTimePeriod:
+            case Qn::MotionTimePeriod:
+                loader->setTargetPeriod(calendarPeriod, dataType);
+                break;
+            case Qn::BookmarkTimePeriod:
+            case Qn::BookmarkData:
+                loader->setTargetPeriod(timeSliderPeriod, dataType);
+                break;
+            default:
+                break;
+            }
+        }
+
     }
 }
 

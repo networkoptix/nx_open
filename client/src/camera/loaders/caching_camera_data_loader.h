@@ -31,8 +31,11 @@ public:
     qint64 updateInterval() const;
     void setUpdateInterval(qint64 msecs);
 
-    const QnTimePeriod &loadedPeriod() const;
-    void setTargetPeriods(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod);
+    QnTimePeriod boundingPeriod() const;
+    void setBoundingPeriod(const QnTimePeriod &boundingPeriod);
+
+    QnTimePeriod targetPeriod(Qn::CameraDataType dataType) const;
+    void setTargetPeriod(const QnTimePeriod &targetPeriod, Qn::CameraDataType dataType);
     
     const QList<QRegion> &motionRegions() const;
     void setMotionRegions(const QList<QRegion> &motionRegions);
@@ -56,10 +59,10 @@ private slots:
     void at_syncTime_timeChanged();
 
 protected:
-    void load(Qn::CameraDataType type);
+    void load(Qn::CameraDataType type, const QnTimePeriod &targetPeriod);
     bool trim(Qn::CameraDataType type, qint64 trimTime);
 
-    QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod) const;
+    QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod, const qint64 minMargin) const;
 
 private:
     QnCachingCameraDataLoader(QnAbstractCameraDataLoader **loaders, QObject *parent);
@@ -69,10 +72,18 @@ private:
     static bool createLoaders(const QnResourcePtr &resource, QnAbstractCameraDataLoader **loaders);
     
     qint64 bookmarkResolution(qint64 periodDuration) const;
+    void updateTimePeriods(Qn::CameraDataType dataType);
+    void updateBookmarks();
 private:
     QnResourcePtr m_resource;
     bool m_resourceIsLocal;
-    QnTimePeriod m_loadedPeriod;
+
+    QnTimePeriod m_targetPeriod[Qn::CameraDataTypeCount];
+    QnTimePeriod m_boundingPeriod;
+
+    QnTimePeriodList m_requestedTimePeriods[Qn::TimePeriodContentCount];
+    QMap<qint64, QnTimePeriodList> m_requestedBookmarkPeriodsByResolution;  // should we enumerate by resolution set index?
+
     QnAbstractCameraDataLoader *m_loaders[Qn::CameraDataTypeCount];
     int m_handles[Qn::CameraDataTypeCount];
     QList<QRegion> m_motionRegions;

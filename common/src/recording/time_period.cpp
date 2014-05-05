@@ -127,11 +127,12 @@ bool QnTimePeriod::operator==(const QnTimePeriod &other) const
 }
 
 QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {
+    const QString fmt = lit("dd.MM.yy - hh:mm:ss:zzz");
     if (period.durationMs >= 0)
-        dbg.nospace() << "QnTimePeriod(" << QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("dd hh:mm"))
-                      << " - " << QDateTime::fromMSecsSinceEpoch(period.startTimeMs + period.durationMs).toString(lit("dd hh:mm")) << ')';
+        dbg.nospace() << "QnTimePeriod(" << QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(fmt)
+                      << " - " << QDateTime::fromMSecsSinceEpoch(period.startTimeMs + period.durationMs).toString(fmt) << ')';
     else
-        dbg.nospace() << "QnTimePeriod(" << QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(lit("dd hh:mm"))
+        dbg.nospace() << "QnTimePeriod(" << QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(fmt)
                       << " - Now)";
     return dbg.space();
 }

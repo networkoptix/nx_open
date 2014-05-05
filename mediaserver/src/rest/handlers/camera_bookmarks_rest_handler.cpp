@@ -51,7 +51,8 @@ int QnCameraBookmarksRestHandler::getCameraBookmarkAction(const QnRequestParams 
         if (ok) filter.maxStartTimeMs = value;
     filter.tags = params["tags"].split(',', QString::SkipEmptyParts);
 
-    qDebug() << "bookmarks requested with resolution" << filter.minDurationMs;
+    QnTimePeriod period(filter.minStartTimeMs, filter.maxStartTimeMs - filter.minStartTimeMs);
+    qDebug() << "bookmarks requested with resolution" << filter.minDurationMs << "for" << period;
 
     QnCameraBookmarkList bookmarks;
     if (!qnStorageMan->getBookmarks(id.toUtf8(), filter, bookmarks))

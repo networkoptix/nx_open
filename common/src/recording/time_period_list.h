@@ -18,6 +18,7 @@ class QnTimePeriodListTimeIterator;
 class QnTimePeriodList: public QVector<QnTimePeriod> {
 public:
     QnTimePeriodList(): QVector<QnTimePeriod>() {}
+    QnTimePeriodList(const QnTimePeriod &singlePeriod);
 
     /**
      * \param timeMs                    Time value to search for, in milliseconds.
@@ -37,6 +38,8 @@ public:
     bool intersects(const QnTimePeriod &period) const;
 
     bool containTime(qint64 timeMs) const;
+
+    bool containPeriod(const QnTimePeriod &period) const;
 
     QnTimePeriodList intersected(const QnTimePeriod &period) const;
 

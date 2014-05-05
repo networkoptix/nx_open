@@ -7,6 +7,11 @@ namespace {
     static const qint64 InvalidValue = INT64_MAX;
 }
 
+QnTimePeriodList::QnTimePeriodList(const QnTimePeriod &singlePeriod): 
+    QVector<QnTimePeriod>() {
+        append(singlePeriod);
+}
+
 QnTimePeriodList::const_iterator QnTimePeriodList::findNearestPeriod(qint64 timeMs, bool searchForward) const {
     if (isEmpty())
         return end();
@@ -61,6 +66,11 @@ bool QnTimePeriodList::containTime(qint64 timeMs) const
         return firstPos->contains(timeMs);
     else
         return false;
+}
+
+bool QnTimePeriodList::containPeriod(const QnTimePeriod &period) const {
+    auto found = std::find_if(constBegin(), constEnd(), [period](const QnTimePeriod &p){return p.contains(period);});
+    return found != constEnd();
 }
 
 QnTimePeriodList QnTimePeriodList::intersected(const QnTimePeriod &period) const {
