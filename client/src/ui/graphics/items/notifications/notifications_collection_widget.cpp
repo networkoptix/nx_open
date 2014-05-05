@@ -375,8 +375,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         break;
     }
     case QnBusiness::ServerConflictEvent:
-    case QnBusiness::ServerStartEvent: 
-    case QnBusiness::LicenseRecordingDisabled: {
+    case QnBusiness::ServerStartEvent: {
         item->addActionButton(
             qnSkin->icon("events/server.png"),
             QString(),
