@@ -1907,7 +1907,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicense
         return ErrorCode::failure;
     }
 
-    QnSql::fetch_many_if(query, &data, [&](const ec2::ApiLicenseData &license) { return m_licenseManagerImpl->validateLicense(license); });
+    //QnSql::fetch_many_if(query, &data, [&](const ec2::ApiLicenseData &license) { return m_licenseManagerImpl->validateLicense(license); });
+    QnSql::fetch_many(query, &data);
 
     // m_licenseManagerImpl->getLicenses( &data );
     return ErrorCode::ok;
