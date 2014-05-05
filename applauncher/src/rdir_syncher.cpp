@@ -13,6 +13,7 @@
 #include "get_file_operation.h"
 
 
+static const int MAX_SIMULTANEOUS_DOWNLOADS = 10;
 static const int MAX_DOWNLOAD_RETRY_COUNT = 15;
 
 RDirSyncher::EventReceiver::~EventReceiver()
@@ -71,8 +72,7 @@ RDirSyncher::RDirSyncher(
     m_mirrors( mirrors ),
     m_localDirPath( localDirPath ),
     m_eventReceiver( eventReceiver ),
-    m_state( sInit ),
-    m_downloadRetryCount( 0 )
+    m_state( sInit )
 {
     assert( !m_mirrors.empty() );
     m_currentMirror = m_mirrors.front();
@@ -275,10 +275,10 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
 
     if( operation->remoteSideFailure() )
     {
-        if( m_downloadRetryCount < MAX_DOWNLOAD_RETRY_COUNT )
+        if( completedTaskIter->retryCount < MAX_DOWNLOAD_RETRY_COUNT )
         {
             //repeating current operation
-            ++m_downloadRetryCount;
+            ++completedTaskIter->retryCount;
             return startOperations( eventsToTrigger );
         }
     }
@@ -307,8 +307,6 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
     //repeating operation with new mirror
     startOperations( eventsToTrigger );
 }
-
-static const int MAX_SIMULTANEOUS_DOWNLOADS = 10;
 
 void RDirSyncher::startOperations( std::list<RSyncEventTrigger*>& eventsToTrigger )
 {
@@ -367,7 +365,6 @@ RDirSyncher::OperationStartResult RDirSyncher::startNextOperation( std::shared_p
 
     std::shared_ptr<detail::RDirSynchronizationOperation> opCtx;
     const int operationID = ++m_prevOperationID;
-//    detail::RDirSynchronizationOperation * op;
     switch( taskToStart.type )
     {
         case detail::RSyncOperationType::listDirectory: {
@@ -389,6 +386,7 @@ RDirSyncher::OperationStartResult RDirSyncher::startNextOperation( std::shared_p
                 taskToStart.entryPath,
                 m_localDirPath,
                 taskToStart.hashTypeName,
+                taskToStart.entrySize,
                 this ) );
             break;
         }
