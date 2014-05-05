@@ -106,7 +106,8 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 
 void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy)
 {
-    qnLicensePool->addRemoteHardwareIds(data.serverId, data.hardwareIds);
+    if (!data.isClient)
+        qnLicensePool->addRemoteHardwareIds(data.serverId, data.hardwareIds);
 }
 
 void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData data, bool isProxy)
