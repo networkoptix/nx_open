@@ -133,7 +133,32 @@ ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
 }
 
 void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnVirtualCameraResourcePtr camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return;
 
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+
+    QnMediaServerResourcePtr server = getMediaServerOnTime(camera, period.startTimeMs);
+    if (!server || server->getStatus() != QnResource::Online) {
+        QMessageBox::warning(mainWindow(),
+            tr("Error"),
+            tr("Bookmark can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
+        return;
+    }
+
+    QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
+
+    QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
+    dialog->setTags(m_tags);
+    dialog->loadData(bookmark);
+    if (!dialog->exec())
+        return;
+    dialog->submitData(bookmark);
+
+    int handle = server->apiConnection()->addBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkAdded(int, const QnCameraBookmark &, int)));
+    m_addingBookmarks[handle] = camera;
 }
 
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {

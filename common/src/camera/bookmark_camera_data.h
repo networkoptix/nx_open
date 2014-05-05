@@ -18,6 +18,8 @@ public:
     virtual QnAbstractCameraDataPtr merge(const QVector<QnAbstractCameraDataPtr> &source) override;
 
     virtual bool contains(const QnAbstractCameraDataPtr &other) const override;
+
+    QnCameraBookmark find(const qint64 position) const;
 private:
     QnCameraBookmarkList m_data;
     QnTimePeriodList m_dataSource;

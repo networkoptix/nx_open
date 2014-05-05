@@ -52,13 +52,14 @@ int QnCameraBookmarksRestHandler::getCameraBookmarkAction(const QnRequestParams 
     filter.tags = params["tags"].split(',', QString::SkipEmptyParts);
 
     QnTimePeriod period(filter.minStartTimeMs, filter.maxStartTimeMs - filter.minStartTimeMs);
-    qDebug() << "bookmarks requested with resolution" << filter.minDurationMs << "for" << period;
+    qDebug() << "bookmarks requested with resolution" << filter.minDurationMs << "for" << period;   //TODO: #GDM #Bookmarks remove when profiling will be finished
 
     QnCameraBookmarkList bookmarks;
     if (!qnStorageMan->getBookmarks(id.toUtf8(), filter, bookmarks))
         return CODE_INVALID_PARAMETER;
 
     result.setReply(bookmarks);
+    qDebug() << "returning" << bookmarks.size() << "bookmarks" << bookmarks;
     return CODE_OK;
 }
 

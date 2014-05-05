@@ -118,3 +118,16 @@ bool QnBookmarkCameraData::isEmpty() const {
     return m_data.isEmpty();
 }
 
+QnCameraBookmark QnBookmarkCameraData::find(const qint64 position) const {
+    QnCameraBookmark result;
+    foreach (const QnCameraBookmark &bookmark, m_data) {
+        // stop if we overcome the position, bookmarks are sorted by start time
+        if (bookmark.startTimeMs > position)
+            break;
+
+        if (bookmark.endTimeMs() >= position && bookmark.durationMs > result.durationMs)
+            result = bookmark;
+    }
+    return result;
+}
+

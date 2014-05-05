@@ -60,7 +60,7 @@ private slots:
     void at_syncTime_timeChanged();
 
 protected:
-    void load(Qn::CameraDataType type, const QnTimePeriod &targetPeriod);
+    void load(Qn::CameraDataType type, const QnTimePeriod &targetPeriod, const qint64 resolutionMs = 1);
     bool trim(Qn::CameraDataType type, qint64 trimTime);
 
     QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod, const qint64 minMargin) const;
