@@ -2,19 +2,13 @@
 #define QN_FUSION_H
 
 #include <utility> /* For std::forward and std::declval. */
-#include <type_traits> /* For std::remove_*. */
+#include <type_traits> /* For std::remove_*, std::enable_if, std::is_same, std::integral_constant. */
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/tuple/enum.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/mpl/equal_to.hpp>
-#include <boost/mpl/sizeof.hpp>
-#include <boost/mpl/not.hpp>
-#include <boost/mpl/integral_c.hpp>
-#include <boost/type_traits/detail/yes_no_type.hpp> // TODO: #Elric get rid of this one
-#include <boost/type_traits/is_same.hpp>
+#include <boost/mpl/if.hpp>
 #endif // Q_MOC_RUN
 
 #include <utils/preprocessor/variadic_seq_for_each.h>
@@ -23,6 +17,8 @@
 
 namespace QnFusionDetail {
     struct na {};
+    struct yes_type { char dummy; };
+    struct no_type { char dummy[64]; };
 
     template<class T, class Visitor>
     bool visit_members_internal(T &&value, Visitor &&visitor) {
@@ -30,62 +26,56 @@ namespace QnFusionDetail {
     }
 
     template<class T>
-    boost::type_traits::yes_type has_visit_members_test(const T &, const decltype(visit_members(std::declval<T>(), std::declval<na>())) * = NULL);
-    boost::type_traits::no_type has_visit_members_test(...);
+    yes_type has_visit_members_test(const T &, const decltype(visit_members(std::declval<T>(), std::declval<na>())) * = NULL);
+    no_type has_visit_members_test(...);
 
     template<class T>
     struct is_adapted: 
-        boost::mpl::equal_to<
-            boost::mpl::sizeof_<boost::type_traits::yes_type>, 
-            boost::mpl::size_t<sizeof(has_visit_members_test(std::declval<T>()))>
-        > 
+        std::integral_constant<bool, sizeof(yes_type) == sizeof(has_visit_members_test(std::declval<T>()))>
     {};
 
     template<class T>
-    boost::type_traits::yes_type has_operator_call_test(const T &, const decltype(std::declval<T>()()) * = NULL);
+    yes_type has_operator_call_test(const T &, const decltype(std::declval<T>()()) * = NULL);
     template<class T, class Arg0>
-    boost::type_traits::yes_type has_operator_call_test(const T &, const Arg0 &, const decltype(std::declval<T>()(std::declval<Arg0>())) * = NULL);
+    yes_type has_operator_call_test(const T &, const Arg0 &, const decltype(std::declval<T>()(std::declval<Arg0>())) * = NULL);
     template<class T, class Arg0, class Arg1>
-    boost::type_traits::yes_type has_operator_call_test(const T &, const Arg0 &, const Arg1 &, const decltype(std::declval<T>()(std::declval<Arg0>(), std::declval<Arg1>())) * = NULL);
+    yes_type has_operator_call_test(const T &, const Arg0 &, const Arg1 &, const decltype(std::declval<T>()(std::declval<Arg0>(), std::declval<Arg1>())) * = NULL);
     template<class T, class Arg0, class Arg1, class Arg2>
-    boost::type_traits::yes_type has_operator_call_test(const T &, const Arg0 &, const Arg1 &, const Arg2 &, const decltype(std::declval<T>()(std::declval<Arg0>(), std::declval<Arg1>(), std::declval<Arg2>())) * = NULL);
-    boost::type_traits::no_type has_operator_call_test(...);
+    yes_type has_operator_call_test(const T &, const Arg0 &, const Arg1 &, const Arg2 &, const decltype(std::declval<T>()(std::declval<Arg0>(), std::declval<Arg1>(), std::declval<Arg2>())) * = NULL);
+    no_type has_operator_call_test(...);
 
     template<class T, class Arg0, class Arg1, class Arg2>
     struct sizeof_has_operator_call_test: 
-        boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>(), std::declval<Arg1>(), std::declval<Arg2>()))>
+        std::integral_constant<std::size_t, sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>(), std::declval<Arg1>(), std::declval<Arg2>()))>
     {};
 
     template<class T, class Arg0, class Arg1>
     struct sizeof_has_operator_call_test<T, Arg0, Arg1, na>: 
-        boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>(), std::declval<Arg1>()))>
+        std::integral_constant<std::size_t, sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>(), std::declval<Arg1>()))>
     {};
 
     template<class T, class Arg0>
     struct sizeof_has_operator_call_test<T, Arg0, na, na>: 
-        boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>()))>
+        std::integral_constant<std::size_t, sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>()))>
     {};
 
     template<class T>
     struct sizeof_has_operator_call_test<T, na, na, na>: 
-        boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>()))>
+        std::integral_constant<std::size_t, sizeof(has_operator_call_test(std::declval<T>()))>
     {};
 
     template<class T, class Arg0 = na, class Arg1 = na, class Arg2 = na>
     struct has_operator_call:
-        boost::mpl::equal_to<
-            boost::mpl::sizeof_<boost::type_traits::yes_type>,
-            sizeof_has_operator_call_test<T, Arg0, Arg1, Arg2>
-        >
+        std::integral_constant<bool, sizeof(yes_type) == sizeof_has_operator_call_test<T, Arg0, Arg1, Arg2>::value>
     {};
 
     template<class T, class Arg0, class Arg1, class Arg2>
-    bool safe_operator_call(T &&functor, Arg0 &&arg0, Arg1 &&arg1, Arg2 &&arg2, const typename boost::enable_if<has_operator_call<T, Arg0, Arg1, Arg2> >::type * = NULL) {
+    bool safe_operator_call(T &&functor, Arg0 &&arg0, Arg1 &&arg1, Arg2 &&arg2, const typename std::enable_if<has_operator_call<T, Arg0, Arg1, Arg2>::value>::type * = NULL) {
         return functor(std::forward<Arg0>(arg0), std::forward<Arg1>(arg1), std::forward<Arg2>(arg2));
     }
 
     template<class T, class Arg0, class Arg1, class Arg2>
-    bool safe_operator_call(T &&, Arg0 &&, Arg1 &&, Arg2 &&, const typename boost::disable_if<has_operator_call<T, Arg0, Arg1, Arg2> >::type * = NULL) {
+    bool safe_operator_call(T &&, Arg0 &&, Arg1 &&, Arg2 &&, const typename std::enable_if<!has_operator_call<T, Arg0, Arg1, Arg2>::value>::type * = NULL) {
         return true;
     }
 
@@ -302,7 +292,7 @@ namespace QnFusion {
 
         template<class Key>
         struct has_key:
-            boost::mpl::not_<boost::is_same<typename at<Key, void>::type, void> > // TODO: #Elric move to base?
+            std::integral_constant<bool, !std::is_same<typename at<Key, void>::type, void>::value>
         {};
 
         template<class Key>
@@ -311,12 +301,12 @@ namespace QnFusion {
         }
 
         template<class Key, class T>
-        typename at<Key, void>::type::result_type operator()(const Key &, const T &, const typename boost::enable_if<has_key<Key> >::type * = NULL) const {
+        typename at<Key, void>::type::result_type operator()(const Key &, const T &, const typename std::enable_if<has_key<Key>::value>::type * = NULL) const {
             return typename at<Key, void>::type()();
         }
 
         template<class Key, class T>
-        T operator()(const Key &, const T &defaultValue, const typename boost::disable_if<has_key<Key> >::type * = NULL) const {
+        T operator()(const Key &, const T &defaultValue, const typename std::enable_if<!has_key<Key>::value>::type * = NULL) const {
             return defaultValue;
         }
     };
