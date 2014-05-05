@@ -453,12 +453,43 @@ QList<QByteArray> QnLicensePool::compatibleHardwareIds() const
 
 QList<QByteArray> QnLicensePool::allHardwareIds() const
 {
-    return m_mainHardwareIds + m_compatibleHardwareIds;
+    return m_mainHardwareIds + m_compatibleHardwareIds + m_remoteHardwareIds;
 }
 
-QList<QByteArray> QnLicensePool::remoteHardwareIds() const
+QList<QByteArray> QnLicensePool::allRemoteHardwareIds() const
 {
     return m_remoteHardwareIds;
+}
+
+QMap<QnId, QList<QByteArray>> QnLicensePool::remoteHardwareIds() const
+{
+    return m_remoteHardwareIdsMap;
+}
+
+void QnLicensePool::addRemoteHardwareIds(const QnId& peer, const QList<QByteArray>& hardwareIds)
+{
+    m_remoteHardwareIdsMap.insert(peer, hardwareIds);
+    updateRemoteIdList();
+}
+
+void QnLicensePool::setRemoteHardwareIds(const QMap<QnId, QList<QByteArray>>& hardwareIds)
+{
+    m_remoteHardwareIdsMap = hardwareIds;
+    updateRemoteIdList();
+}
+
+void QnLicensePool::removeRemoteHardwareIds(const QnId& peer)
+{
+    m_remoteHardwareIdsMap.remove(peer);
+    updateRemoteIdList();
+}
+
+void QnLicensePool::updateRemoteIdList()
+{
+    QList<QByteArray> allHwId;
+    foreach(const QList<QByteArray>& hwIDs, m_remoteHardwareIdsMap.values())
+        allHwId << hwIDs;
+    m_remoteHardwareIds = allHwId;
 }
 
 QByteArray QnLicensePool::currentHardwareId() const

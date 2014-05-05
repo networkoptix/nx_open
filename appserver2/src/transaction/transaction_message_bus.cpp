@@ -420,7 +420,7 @@ void QnTransactionMessageBus::sendServerAliveMsg(const QnId& serverId, bool isAl
     tran.params.serverId = serverId;
     tran.params.isAlive = isAlive;
     tran.params.isClient = isClient;
-    tran.params.hardwareIds = qnLicensePool->allHardwareIds(); // + qnLicensePool->remoteHardwareIds();
+    tran.params.hardwareIds = qnLicensePool->allHardwareIds();
     tran.fillSequence();
     sendTransaction(tran);
     if (isAlive)

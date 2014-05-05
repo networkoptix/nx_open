@@ -106,12 +106,12 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 
 void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy)
 {
-    int gg = 4;
+    qnLicensePool->addRemoteHardwareIds(data.serverId, data.hardwareIds);
 }
 
 void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData data, bool isProxy)
 {
-    int gg = 4;
+    qnLicensePool->removeRemoteHardwareIds(data.serverId);
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
@@ -229,6 +229,7 @@ void QnCommonMessageProcessor::updateHardwareIds(const ec2::QnFullResourceData& 
 {
     qnLicensePool->setMainHardwareIds(fullData.serverInfo.mainHardwareIds);
     qnLicensePool->setCompatibleHardwareIds(fullData.serverInfo.compatibleHardwareIds);
+    qnLicensePool->setRemoteHardwareIds( fullData.serverInfo.remoteHardwareIds);
 }
 
 void QnCommonMessageProcessor::processResources(const QnResourceList& resources)

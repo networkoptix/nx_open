@@ -78,5 +78,6 @@ namespace ec2
         // TODO: #Ivan, add guidCompatibility to settings
         serverInfo->mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
         serverInfo->compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
+        serverInfo->remoteHardwareIds = qnLicensePool->remoteHardwareIds();
     }
 }

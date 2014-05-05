@@ -20,6 +20,13 @@
 #include <business/business_rule_processor.h>
 #include <business/business_event_connector.h>
 #include <media_server/serverutil.h>
+#include "licensing/license.h"
+#include "mutex/camera_data_handler.h"
+#include "common/common_module.h"
+#include "transaction/transaction_log.h"
+
+
+static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24;
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
@@ -37,6 +44,9 @@ void QnRecordingManager::start()
     connect(&m_scheduleWatchingTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
 
     m_scheduleWatchingTimer.start(1000);
+
+    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::locked, this, &QnRecordingManager::at_licenseMutexLocked);
+    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout);
 
     QThread::start();
 }
@@ -530,8 +540,131 @@ void QnRecordingManager::onTimer()
         if (stopTime <= time*1000ll)
             stopForcedRecording(itrDelayedStop.key(), false);
     }
+    checkLicenses();
 }
 
+void QnRecordingManager::calcUsingLicenses(int* recordingAnalog, int* recordingDigital)
+{
+    QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
+    int recordingCameras = 0;
+    qint64 relativeTime = ec2::QnTransactionLog::instance()->getRelativeTime();
+    foreach(QnResourcePtr camRes, cameras)
+    {
+        QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
+        QnMediaServerResourcePtr mServer = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+        if (!mServer)
+            continue;
+        if (mServer->getStatus() == QnResource::Offline) 
+        {
+            ec2::ApiSetResourceStatusData params;
+            params.id = mServer->getId();
+            qint64 lastStatusTime = ec2::QnTransactionLog::instance()->getTransactionTime(params);
+            if (relativeTime - lastStatusTime < LICENSE_RECORDING_STOP_TIME)
+                continue;
+        }
+
+        if (!camera->isScheduleDisabled()) {
+            if (camera->isAnalog())
+                recordingAnalog++;
+            else
+                recordingDigital++;
+        }
+    }
+}
+
+QnResourceList QnRecordingManager::getLocalControlledCameras()
+{
+    // return own cameras + cameras from media servers without DB (remote connected servers)
+    QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
+    QnResourceList result;
+    int recordingCameras = 0;
+    qint64 relativeTime = ec2::QnTransactionLog::instance()->getRelativeTime();
+    foreach(QnResourcePtr camRes, cameras)
+    {
+        QnMediaServerResourcePtr mServer = camRes->getParentResource().dynamicCast<QnMediaServerResource>();
+        if (!mServer)
+            continue;
+        if (mServer->getId() == qnCommon->moduleGUID() || (mServer->getServerFlags() | Qn::SF_RemoteEC))
+            result << camRes;
+    }
+    return result;
+}
+
+void QnRecordingManager::checkLicenses()
+{
+    if (!ec2::QnTransactionLog::instance() || m_licenseMutex)
+        return;
+
+    QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
+    int maxDigital = licenseListHelper.totalDigital();
+    int maxAnalog = licenseListHelper.totalAnalog();
+
+    int recordingDigital = 0;
+    int recordingAnalog = 0;
+    calcUsingLicenses(&recordingDigital, &recordingAnalog);
+
+    bool isOverflowTotal = recordingDigital + recordingAnalog > maxDigital + maxAnalog;
+    if (recordingDigital > maxDigital  || isOverflowTotal) 
+    {
+        // Too many licenses. check if server has own recording cameras and force to disable recording
+        QnResourceList ownCameras = getLocalControlledCameras();
+        foreach(QnResourcePtr camRes, ownCameras)
+        {
+            QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
+            if (!camera->isScheduleDisabled())
+            {
+                if (recordingDigital > maxDigital && !camera->isAnalog() || isOverflowTotal) {
+                    // found. remove recording from some of them
+                    m_licenseMutex = ec2::QnDistributedMutexManager::instance()->getLock("__LICENSE_OVERFLOW__");
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void QnRecordingManager::at_licenseMutexLocked()
+{
+    QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
+    int maxDigital = licenseListHelper.totalDigital();
+    int maxAnalog = licenseListHelper.totalAnalog();
+
+    int recordingDigital = 0;
+    int recordingAnalog = 0;
+    calcUsingLicenses(&recordingDigital, &recordingAnalog);
+    
+    // Too many licenses. check if server has own recording cameras and force to disable recording
+    QnResourceList ownCameras = getLocalControlledCameras();
+    foreach(QnResourcePtr camRes, ownCameras)
+    {
+        bool licenseOverflow = recordingDigital > maxDigital  || recordingDigital + recordingAnalog > maxDigital + maxAnalog;
+        if (!licenseOverflow)
+            break;
+
+        QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
+        if (!camera->isScheduleDisabled())
+        {
+            camera->setScheduleDisabled(true);
+            ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addCameraSync(camera);
+            if (errCode != ec2::ErrorCode::ok)
+            {
+                qWarning() << "Can't turn off recording for camera:" << camera->getUniqueId() << "error:" << ec2::toString(errCode);
+                camera->setScheduleDisabled(false); // rollback
+                continue;
+            }
+            if (camera->isAnalog())
+                recordingAnalog--;
+            else
+                recordingDigital--;
+        }
+    }
+    m_licenseMutex.clear();
+}
+
+void QnRecordingManager::at_licenseMutexTimeout()
+{
+    m_licenseMutex.clear();
+}
 
 //Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)
 static QnRecordingManager* staticInstance = NULL;

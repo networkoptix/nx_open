@@ -7,6 +7,7 @@
 #include "core/resource/resource.h"
 #include "core/resource/security_cam_resource.h"
 #include "core/misc/schedule_task.h"
+#include "mutex/distributed_mutex.h"
 
 class QnServerStreamRecorder;
 class QnVideoCamera;
@@ -58,17 +59,24 @@ private:
 
     QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
     bool startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
+    void checkLicenses();
     bool isResourceDisabled(QnResourcePtr res) const;
+    void calcUsingLicenses(int* recordingAnalog, int* recordingDigital);
+    QnResourceList getLocalControlledCameras();
 
     void beforeDeleteRecorder(const Recorders& recorders);
     void deleteRecorder(const Recorders& recorders);
     bool updateCameraHistory(QnResourcePtr res);
+
+    void at_licenseMutexLocked();
+    void at_licenseMutexTimeout();
 private:
     mutable QMutex m_mutex;
     QSet<QnResourcePtr> m_onlineCameras;
     QMap<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;
     QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;
+    ec2::QnDistributedMutexPtr m_licenseMutex;
 };
 
 class QnServerDataProviderFactory: public QnDataProviderFactory

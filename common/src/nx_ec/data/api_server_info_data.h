@@ -10,6 +10,7 @@ namespace ec2 {
     {
         QList<QByteArray> mainHardwareIds;
         QList<QByteArray> compatibleHardwareIds;
+        QMap<QnId, QList<QByteArray>> remoteHardwareIds;
 
         QString publicIp;
         QString systemName;
@@ -18,7 +19,8 @@ namespace ec2 {
         QString armBox; // TODO: #Elric #EC2 what is this?
         bool allowCameraChanges; // TODO: #Elric #EC2 use "enabled"
     };
-#define ApiServerInfoData_Fields (mainHardwareIds)(compatibleHardwareIds)(publicIp)(systemName)(sessionKey)(armBox)(allowCameraChanges)
+
+#define ApiServerInfoData_Fields (mainHardwareIds)(compatibleHardwareIds)(remoteHardwareIds)(publicIp)(systemName)(sessionKey)(armBox)(allowCameraChanges)
 
 } // namespace ec2
 

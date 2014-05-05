@@ -13,6 +13,7 @@
 #include <QtCore/QTextStream>
 
 #include "core/resource/resource_fwd.h"
+#include "utils/common/id.h"
 
 const QString LICENSE_TYPE_PROFESSIONAL = lit("digital");
 const QString LICENSE_TYPE_ANALOG = lit("analog"); // TODO: #Elric #EC2 TOTALLY EVIL!!!!!!!!!
@@ -165,7 +166,12 @@ public:
     QList<QByteArray> compatibleHardwareIds() const;
 
     QList<QByteArray> allHardwareIds() const;
-    QList<QByteArray> remoteHardwareIds() const;
+
+    QMap<QnId, QList<QByteArray>> remoteHardwareIds() const;
+    QList<QByteArray> allRemoteHardwareIds() const;
+    void setRemoteHardwareIds(const QMap<QnId, QList<QByteArray>>& hardwareIds);
+    void addRemoteHardwareIds(const QnId& peer, const QList<QByteArray>& hardwareIds);
+    void removeRemoteHardwareIds(const QnId& peer);
 
     QByteArray currentHardwareId() const;
     bool isLicenseValid(QnLicensePtr license) const;
@@ -180,13 +186,15 @@ private:
     bool isLicenseMatchesCurrentSystem(const QnLicensePtr &license);
     bool addLicense_i(const QnLicensePtr &license);
     bool addLicenses_i(const QnLicenseList &licenses);
-
+    void updateRemoteIdList();
 private:
     QList<QByteArray> m_mainHardwareIds;
     QList<QByteArray> m_compatibleHardwareIds;
-    QList<QByteArray> m_remoteHardwareIds;
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
+
+    QList<QByteArray> m_remoteHardwareIds;
+    QMap<QnId, QList<QByteArray>> m_remoteHardwareIdsMap;
 };
 
 #define qnLicensePool QnLicensePool::instance()
