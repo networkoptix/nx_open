@@ -71,8 +71,7 @@ RDirSyncher::RDirSyncher(
     m_mirrors( mirrors ),
     m_localDirPath( localDirPath ),
     m_eventReceiver( eventReceiver ),
-    m_state( sInit ),
-    m_downloadRetryCount( 0 )
+    m_state( sInit )
 {
     assert( !m_mirrors.empty() );
     m_currentMirror = m_mirrors.front();
@@ -275,10 +274,10 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
 
     if( operation->remoteSideFailure() )
     {
-        if( m_downloadRetryCount < MAX_DOWNLOAD_RETRY_COUNT )
+        if( completedTaskIter->retryCount < MAX_DOWNLOAD_RETRY_COUNT )
         {
             //repeating current operation
-            ++m_downloadRetryCount;
+            ++completedTaskIter->retryCount;
             return startOperations( eventsToTrigger );
         }
     }
