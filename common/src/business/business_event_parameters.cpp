@@ -419,7 +419,7 @@ QString QnBusinessEventParameters::getParamsKey() const
         case QnBusiness::NetworkIssueEvent:
         case QnBusiness::StorageFailureEvent:
             paramKey += QLatin1String("_") + QString::number(getReasonCode());
-            if (getReasonCode() == QnBusiness::StorageIoErrorReason || getReasonCode() == QnBusiness::StorageTooSlowReason || getReasonCode() == QnBusiness::StorageNotEnoughSpaceReason)
+            if (getReasonCode() == QnBusiness::StorageIoErrorReason || getReasonCode() == QnBusiness::StorageTooSlowReason || getReasonCode() == QnBusiness::StorageNotEnoughSpaceReason || getReasonCode() == QnBusiness::LicenseRemoved)
                 paramKey += QLatin1String("_") + getReasonParamsEncoded();
             break;
         case QnBusiness::CameraInputEvent:

@@ -16,7 +16,7 @@ public:
     virtual QString description() const override;
 
 signals:
-    void mserverFailure(QnResourcePtr resource, qint64 time, QnBusiness::EventReason reason);
+    void mserverFailure(QnResourcePtr resource, qint64 time, QnBusiness::EventReason reason, const QString& reasonText);
 };
 
 #endif // QN_FILE_SYSTEM_HANDLER_H

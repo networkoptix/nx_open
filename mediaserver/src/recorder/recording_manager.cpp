@@ -30,6 +30,7 @@ static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24;
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
+    connect(this, &QnRecordingManager::recordingDisabled, qnBusinessRuleConnector, &QnBusinessEventConnector::at_mserverFailure);
 }
 
 QnRecordingManager::~QnRecordingManager()
@@ -631,6 +632,7 @@ void QnRecordingManager::at_licenseMutexLocked()
 
     int recordingDigital = 0;
     int recordingAnalog = 0;
+    int disabledCameras = 0;
     calcUsingLicenses(&recordingDigital, &recordingAnalog);
     
     // Too many licenses. check if server has own recording cameras and force to disable recording
@@ -652,6 +654,7 @@ void QnRecordingManager::at_licenseMutexLocked()
                 camera->setScheduleDisabled(false); // rollback
                 continue;
             }
+            disabledCameras++;
             if (camera->isAnalog())
                 recordingAnalog--;
             else
@@ -659,6 +662,11 @@ void QnRecordingManager::at_licenseMutexLocked()
         }
     }
     m_licenseMutex.clear();
+
+    if (disabledCameras > 0) {
+        QnResourcePtr resource = qnResPool->getResourceById(qnCommon->moduleGUID());
+        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, QString::number(disabledCameras));
+    }
 }
 
 void QnRecordingManager::at_licenseMutexTimeout()

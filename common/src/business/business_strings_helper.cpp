@@ -350,6 +350,11 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
         break;
     }
+    case LicenseRemoved: {
+        QString disabledCameras = reasonParamsEncoded;
+        result = tr("Recording on %n camera(s) is disabled. The number of active licenses is less than the number of recorded cameras.", NULL, disabledCameras.toInt());
+        break;
+    }
     default:
         break;
     }

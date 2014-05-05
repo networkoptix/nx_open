@@ -17,6 +17,7 @@ Qn::NotificationLevel QnNotificationLevels::notificationLevel(QnBusiness::EventT
     case QnBusiness::CameraIpConflictEvent:
     case QnBusiness::ServerFailureEvent:
     case QnBusiness::ServerConflictEvent:
+    case QnBusiness::LicenseRecordingDisabled:
         return Qn::CriticalNotification;
     default:                                        
         qnWarning("Invalid business event type '%1'.", static_cast<int>(eventType));

@@ -13,9 +13,9 @@
 QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()
 {
     QnBusinessEventConnector* connector = qnBusinessRuleConnector;
-    connect(this, SIGNAL(mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason)),
+    connect(this, SIGNAL(mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason, QString())),
             connector,
-            SLOT(at_mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason)));
+            SLOT(at_mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason, QString())));
 }
 
 int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
@@ -52,7 +52,8 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
         {
             emit mserverFailure(resource,
                  qnSyncTime->currentUSecsSinceEpoch(),
-                 QnBusiness::ServerTerminatedReason);
+                 QnBusiness::ServerTerminatedReason,
+                 QString());
             //qnBusinessRuleConnector->at_mserverFailure(resource,
             //                                           qnSyncTime->currentUSecsSinceEpoch(),
             //                                           QnBusiness::MServerIssueTerminated);

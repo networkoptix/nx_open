@@ -8,6 +8,7 @@
 #include "core/resource/security_cam_resource.h"
 #include "core/misc/schedule_task.h"
 #include "mutex/distributed_mutex.h"
+#include "business/business_fwd.h"
 
 class QnServerStreamRecorder;
 class QnVideoCamera;
@@ -44,7 +45,8 @@ public:
     bool startForcedRecording(QnSecurityCamResourcePtr camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
 
     bool stopForcedRecording(QnSecurityCamResourcePtr camRes, bool afterThresholdCheck = true);
-
+signals:
+    void recordingDisabled(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 private slots:
     void onNewResource(const QnResourcePtr &resource);
     void onRemoveResource(const QnResourcePtr &resource);

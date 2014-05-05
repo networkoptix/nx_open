@@ -55,7 +55,8 @@ public:
         ServerStartedReason,
         StorageIoErrorReason,
         StorageTooSlowReason,
-        StorageNotEnoughSpaceReason
+        StorageNotEnoughSpaceReason,
+        LicenseRemoved
     };
 
     enum EventState {
@@ -97,6 +98,7 @@ public:
 
         /** Media server started */
         ServerStartEvent = 9,
+
 
         /**
          * Used when enumerating to build GUI lists, this and followed actions
