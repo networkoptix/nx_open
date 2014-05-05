@@ -27,6 +27,7 @@ namespace detail
         const QString& filePath,
         const QString& localDirPath,
         const QString& hashTypeName,
+        qint64 remoteFileSize,
         AbstractRDirSynchronizationEventHandler* _handler )
     :
         RDirSynchronizationOperation(
@@ -44,6 +45,13 @@ namespace detail
         m_responseReceivedCalled( false ),
         m_fileClosePending( false )
     {
+        if( remoteFileSize >= 0 )
+            m_remoteFileSize = remoteFileSize;
+
+        if( entryPath.endsWith(".gz") )
+            m_filePath = entryPath.mid( 0, entryPath.size()-(sizeof(".gz")-1) );
+        else
+            m_filePath = entryPath;
     }
 
     GetFileOperation::~GetFileOperation()
@@ -179,8 +187,8 @@ namespace detail
 
 #ifndef _WIN32
         //setting execution rights to file
-        if( m_fileName.endsWith(QN_CLIENT_EXECUTABLE_NAME) )
-            chmod( (m_localDirPath + "/" + m_fileName).toUtf8().constData(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH );
+        if( m_filePath.endsWith(QN_CLIENT_EXECUTABLE_NAME) )
+            chmod( (m_localDirPath + "/" + m_filePath).toUtf8().constData(), S_IRUSR | S_IWUSR | S_IXUSR | S_IRGRP | S_IWGRP | S_IXGRP | S_IROTH );
 #endif
 
         m_handler->operationDone( shared_from_this() );
@@ -266,13 +274,8 @@ namespace detail
                     return;
                 }
 
-                if( entryPath.endsWith(".gz") )
-                    m_fileName = entryPath.mid( 0, entryPath.size()-(sizeof(".gz")-1) );
-                else
-                    m_fileName = entryPath;
-
                 //opening file
-                m_outFile.reset( new QnFile( m_localDirPath + "/" + m_fileName ) );
+                m_outFile.reset( new QnFile( m_localDirPath + "/" + m_filePath ) );
                 if( !m_outFile->open( QIODevice::WriteOnly ) )  //TODO/IMPL have to do that asynchronously
                 {
                     setResult( ResultCode::writeFailure );
@@ -372,15 +375,24 @@ namespace detail
 
     bool GetFileOperation::startAsyncFilePresenceCheck()
     {
-        //m_state = State::sDownloadingFile;
         m_state = State::sCheckingLocalFile;
 
         //checking file presense
         using namespace std::placeholders;
         if( !AsyncFileProcessor::instance()->statAsync(
-                m_localDirPath + "/" + entryPath,
+                m_localDirPath + "/" + m_filePath,
                 std::bind( std::mem_fn(&GetFileOperation::asyncStatDone), this, _1, _2 ) ) )
             return false;
+
+        if( m_remoteFileSize )              //remote file size is already known
+            return true;
+
+        if( entryPath.endsWith(".gz") )     //remote file is compressed, compressed size is of no interest to us
+        {
+            //TODO: #ak can check last 4 bytes of remote file to get uncompressed file size
+            m_remoteFileSize = -1;
+            return true;
+        }
 
         //starting async http request to get remote file size
         QUrl downloadUrl = baseUrl;
@@ -415,7 +427,7 @@ namespace detail
         assert( m_localFileSize && m_remoteFileSize );
         assert( m_state == State::sCheckingLocalFile );
 
-        if( m_localFileSize >= 0 && m_localFileSize == m_remoteFileSize )
+        if( m_localFileSize.get() >= 0 && m_localFileSize.get() == m_remoteFileSize.get() )
         {
             //file valid, no need to download
             {

@@ -13,6 +13,7 @@
 #include "get_file_operation.h"
 
 
+static const int MAX_SIMULTANEOUS_DOWNLOADS = 10;
 static const int MAX_DOWNLOAD_RETRY_COUNT = 15;
 
 RDirSyncher::EventReceiver::~EventReceiver()
@@ -307,8 +308,6 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
     startOperations( eventsToTrigger );
 }
 
-static const int MAX_SIMULTANEOUS_DOWNLOADS = 10;
-
 void RDirSyncher::startOperations( std::list<RSyncEventTrigger*>& eventsToTrigger )
 {
     //starting multiple operations
@@ -366,7 +365,6 @@ RDirSyncher::OperationStartResult RDirSyncher::startNextOperation( std::shared_p
 
     std::shared_ptr<detail::RDirSynchronizationOperation> opCtx;
     const int operationID = ++m_prevOperationID;
-//    detail::RDirSynchronizationOperation * op;
     switch( taskToStart.type )
     {
         case detail::RSyncOperationType::listDirectory: {
@@ -388,6 +386,7 @@ RDirSyncher::OperationStartResult RDirSyncher::startNextOperation( std::shared_p
                 taskToStart.entryPath,
                 m_localDirPath,
                 taskToStart.hashTypeName,
+                taskToStart.entrySize,
                 this ) );
             break;
         }
