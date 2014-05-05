@@ -166,6 +166,7 @@ public:
     QList<QByteArray> compatibleHardwareIds() const;
 
     QList<QByteArray> allHardwareIds() const;
+    QList<QByteArray> allLocalHardwareIds() const;
 
     QMap<QnId, QList<QByteArray>> remoteHardwareIds() const;
     QList<QByteArray> allRemoteHardwareIds() const;

@@ -456,6 +456,11 @@ QList<QByteArray> QnLicensePool::allHardwareIds() const
     return m_mainHardwareIds + m_compatibleHardwareIds + m_remoteHardwareIds;
 }
 
+QList<QByteArray> QnLicensePool::allLocalHardwareIds() const
+{
+    return m_mainHardwareIds + m_compatibleHardwareIds;
+}
+
 QList<QByteArray> QnLicensePool::allRemoteHardwareIds() const
 {
     return m_remoteHardwareIds;
