@@ -53,6 +53,7 @@ protected:
     void processCameraServerItems(const QnCameraHistoryList &cameraHistoryList);
 public slots:
     void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
+    void on_licenseChanged(const QnLicensePtr &license);
 private slots:
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
     void on_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
@@ -63,7 +64,6 @@ private slots:
 
     void on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory);
 
-    void on_licenseChanged(const QnLicensePtr &license);
 
     void on_businessEventRemoved(const QnId &id);
     void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);

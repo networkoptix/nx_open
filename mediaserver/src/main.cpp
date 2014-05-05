@@ -830,6 +830,20 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         foreach(const QnBusinessEventRulePtr &rule, rules)
             messageProcessor->on_businessEventAddedOrUpdated(rule);
     }
+
+    {
+        // load licenses
+        QnLicenseList licenses;
+        while( (rez = ec2Connection->getLicenseManager()->getLicensesSync(&licenses)) != ec2::ErrorCode::ok )
+        {
+            qDebug() << "QnMain::run(): Can't get license list. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        }
+
+        foreach(const QnLicensePtr &license, licenses)
+            messageProcessor->on_licenseChanged(license);
+    }
+
 }
 
 void QnMain::at_localInterfacesChanged()

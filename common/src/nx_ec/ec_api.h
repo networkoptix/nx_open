@@ -315,6 +315,16 @@ namespace ec2
         template<class TargetType, class HandlerType> int getLicenses( TargetType* target, HandlerType handler ) {
             return getLicenses( std::static_pointer_cast<impl::GetLicensesHandler>(std::make_shared<impl::CustomGetLicensesHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        ErrorCode getLicensesSync(QnLicenseList* const licenseList ) {
+            return impl::doSyncCall<impl::GetLicensesHandler>( 
+                [=](const impl::GetLicensesHandlerPtr &handler) {
+                    return this->getLicenses(handler);
+            }, 
+                licenseList 
+                );
+        }
+
+
         /*!
             \param handler Functor with params: (ErrorCode)
         */
