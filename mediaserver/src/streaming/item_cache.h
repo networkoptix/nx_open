@@ -26,6 +26,10 @@ public:
     Caches items of \a CachedType.
     Takes ownership of stored items, so any item could be deleted on item insertion.
     \param KeyType MUST have operator < defined
+    \param ItemProviderType MUST provide following method:\n
+        \code{*.cpp}
+            CachedType* get( const KeyType& key, int* const itemCost ) throw();
+        \endcode
     \note All methods are thread-safe
     \note operator== and qHash(KeyType) is required for \a KeyType
     \todo make cache 2-level: introduce persistent storage

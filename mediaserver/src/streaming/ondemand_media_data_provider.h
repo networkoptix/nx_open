@@ -17,7 +17,7 @@
 
 class QnAbstractStreamDataProvider;
 
-//!Provides "pull" inteface to \a QnAbstractStreamDataProvider object
+//!Provides "pull" interface to \a QnAbstractStreamDataProvider object
 class OnDemandMediaDataProvider
 :
     public AbstractOnDemandDataProvider,
@@ -53,7 +53,7 @@ private:
     QSharedPointer<QnAbstractStreamDataProvider> m_dataProvider;
     mutable QMutex m_mutex;
     std::queue<QnAbstractDataPacketPtr> m_dataQueue;
-    quint64 m_prevPacketTimestamp;
+    qint64 m_prevPacketTimestamp;
 };
 
 #endif  //ONDEMAND_MEDIA_DATA_PROVIDER_H

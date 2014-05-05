@@ -61,11 +61,13 @@ namespace nx_hls
     {
         if( m_currentChunk )
         {
-            //TODO: #ak fix synchronization error: possibly, StreamingChunk::newDataIsAvailable signal 
+            //TODO/HLS: #ak fix synchronization error: possibly, StreamingChunk::newDataIsAvailable signal 
                 //can be delivered to already deleted QnHttpLiveStreamingProcessor
             disconnect( m_currentChunk, &StreamingChunk::newDataIsAvailable, this, &QnHttpLiveStreamingProcessor::chunkDataAvailable );
             StreamingChunkCache::instance()->putBackUsedItem( m_currentChunkKey, m_currentChunk );
         }
+
+        //TODO/HLS: #ak clean up archive chunk data, since we do not cache archive chunks
     }
 
     void QnHttpLiveStreamingProcessor::run()
@@ -198,7 +200,7 @@ namespace nx_hls
         response.statusLine.version = request.requestLine.version;
         response.headers.insert( std::make_pair(
             "Date",
-            QLocale(QLocale::English).toString(QDateTime::currentDateTime(), "ddd, d MMM yyyy hh:mm:ss GMT").toLatin1() ) );     //TODO/IMPL/HLS get timezone
+            QLocale(QLocale::English).toString(QDateTime::currentDateTime(), "ddd, d MMM yyyy hh:mm:ss GMT").toLatin1() ) );     //TODO/HLS: #ak get timezone
         response.headers.insert( std::make_pair( "Server", QN_APPLICATION_NAME " " QN_APPLICATION_VERSION ) );
         response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //getRequestedFile can override this
 
@@ -333,7 +335,7 @@ namespace nx_hls
         if( !resource )
         {
             NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getHLSPlaylist. Requested resource %1 not found").
-                arg(QString::fromRawData(uniqueResourceID.data(), uniqueResourceID.size())), cl_logDEBUG1 );
+                arg(QString::fromRawData(uniqueResourceID.constData(), uniqueResourceID.size())), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
 
@@ -341,7 +343,7 @@ namespace nx_hls
         if( !camResource )
         {
             NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getHLSPlaylist. Requested resource %1 is not camera").
-                arg(QString::fromRawData(uniqueResourceID.data(), uniqueResourceID.size())), cl_logDEBUG1 );
+                arg(QString::fromRawData(uniqueResourceID.constData(), uniqueResourceID.size())), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
 
@@ -364,16 +366,23 @@ namespace nx_hls
             HLSSessionPool::instance()->add( session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT );
             if( startDatetimeIter != requestParams.end() )
             {
-                //TODO/IMPL/HLS
-                    //converting startDatetime to timestamp
+                //converting startDatetime to timestamp
                 const quint64 startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
                 //generating sliding playlist, holding not more than CHUNK_COUNT_IN_ARCHIVE_PLAYLIST archive chunks
-                session->setPlaylistManager( QSharedPointer<AbstractPlaylistManager>(
+                QSharedPointer<ArchivePlaylistManager> archivePlaylistManager(
                     new ArchivePlaylistManager(
                         camResource,
                         startTimestamp,
                         CHUNK_COUNT_IN_ARCHIVE_PLAYLIST,
-                        DEFAULT_TARGET_DURATION * USEC_IN_SEC)) );
+                        DEFAULT_TARGET_DURATION * USEC_IN_SEC) );
+                if( !archivePlaylistManager->initialize() )
+                {
+                    NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getHLSPlaylist. Failed to initialize archive playlist for camera %1").
+                        arg(QString::fromRawData(uniqueResourceID.constData(), uniqueResourceID.size())), cl_logDEBUG1 );
+                    return nx_http::StatusCode::internalServerError;
+                }
+
+                session->setPlaylistManager( archivePlaylistManager );
             }
         }
 
@@ -404,12 +413,12 @@ namespace nx_hls
             baseUrl.setScheme( QLatin1String("http") );
         }
 
-        //TODO: #ak check resource stream type. Only h.264 is OK for HLS
+        //TODO/HLS: #ak check resource stream type. Only h.264 is OK for HLS
 
         nx_hls::VariantPlaylistData playlistData;
         playlistData.url = baseUrl;
         playlistData.url.setPath( request.requestLine.url.path() );
-        playlistData.bandwidth = 1280000;   //TODO/IMPL add real bitrate
+        playlistData.bandwidth = 1280000;   //TODO/HLS: #ak add real bitrate
         QList<QPair<QString, QString> > queryItems = QUrlQuery(request.requestLine.url.query()).queryItems();
         //removing SESSION_ID_PARAM_NAME
         for( QList<QPair<QString, QString> >::iterator
@@ -429,7 +438,7 @@ namespace nx_hls
         playlistData.url.setQuery(playlistDataQuery);
         playlist.playlists.push_back(playlistData);
 
-        //TODO/IMPL/HLS adding low quality playlist url (if there is low quality stream for resource)
+        //TODO/HLS: #ak adding low quality playlist url (if there is low quality stream for resource)
 
         response->messageBody = playlist.toString();
         response->headers.insert( make_pair("Content-Type", "audio/mpegurl") );
@@ -474,7 +483,7 @@ namespace nx_hls
             playlist.mediaSequence = chunkList[0].mediaSequence;
         playlist.closed = isPlaylistClosed;
 
-        //TODO/IMPL/HLS special processing for empty playlist
+        //TODO/HLS: #ak special processing for empty playlist
         //if( playlist.chunks.empty() )
         //{
         //    //no media data cached yet
@@ -569,7 +578,7 @@ namespace nx_hls
         return nx_http::StatusCode::ok;
     }
 
-    //TODO/IMPL/HLS looks like it is possible to merge getLiveChunkPlaylist and getArchiveChunkPlaylist
+    //TODO/HLS: #ak looks like it is possible to merge getLiveChunkPlaylist and getArchiveChunkPlaylist
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getArchiveChunkPlaylist(
         HLSSession* const session,
@@ -632,9 +641,9 @@ namespace nx_hls
             std::multimap<QString, QString>::const_iterator startDatetimeIter = requestParams.find(QLatin1String(StreamingParams::START_DATETIME_PARAM_NAME));
             if( startDatetimeIter != requestParams.end() )
             {
-                QDateTime startDatetime = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate);
-                //TODO/IMPL converting startDatetime to startTimestamp
+                //converting startDatetime to startTimestamp
                     //this is secondary functionality, not used by this HLS implementation (since all chunks are referenced by npt timestamps)
+                startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
             }
         }
 
@@ -648,7 +657,7 @@ namespace nx_hls
             durationIter != requestParams.end()
                 ? durationIter->second.toLongLong()
                 : DEFAULT_TARGET_DURATION * MS_IN_SEC * USEC_IN_MSEC,
-                //: std::numeric_limits<quint64>::max(),  //TODO/IMPL support downloading to the end, but that chunk MUST not be cached!
+                //: std::numeric_limits<quint64>::max(),  //TODO/HLS: #ak support downloading to the end, but that chunk MUST not be cached!
             //endTimestampIter != requestParams.end()
             //    ? QDateTime::fromString(endTimestampIter->second, Qt::ISODate)
             //    : QDateTime::fromTime_t(0xffffffff),
@@ -678,7 +687,7 @@ namespace nx_hls
         m_chunkReadCtx = StreamingChunk::SequentialReadingContext();
 
         response->headers.insert( make_pair( "Content-Type", m_currentChunk->mimeType().toLatin1() ) );
-        if( m_currentChunk->isClosed() && m_currentChunk->sizeInBytes() > 0 )   //TODO/IMPL is condition sutisfying?
+        if( m_currentChunk->isClosed() && m_currentChunk->sizeInBytes() > 0 )   //TODO/HLS: #ak is condition sutisfying?
             response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
         else
             response->headers.insert( make_pair( "Transfer-Encoding", "chunked" ) );

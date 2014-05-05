@@ -4,7 +4,7 @@
 
 #include "streaming_chunk_transcoder.h"
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 #include <core/dataprovider/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
@@ -25,9 +25,11 @@
 using namespace std;
 
 //!Maximum time (in micros) by which requested chunk start time may be in future
-static const double MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS = 30000000;
+static const double MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS = 30*1000*1000;
 static const int TRANSCODE_THREAD_COUNT = 1;
-static const int MICROS_IN_SECOND = 1000000;
+static const int USEC_IN_MSEC = 1000;
+static const int MSEC_IN_SEC = 1000;
+static const int MICROS_IN_SECOND = MSEC_IN_SEC*USEC_IN_MSEC;
 
 StreamingChunkTranscoder::TranscodeContext::TranscodeContext()
 :
@@ -94,7 +96,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     Q_ASSERT( transcodeParams.startTimestamp() <= transcodeParams.endTimestamp() );
 
     pair<map<int, TranscodeContext>::iterator, bool> p = m_transcodings.insert(
-        make_pair( m_newTranscodeID.fetchAndAddAcquire(1), TranscodeContext() ) );  //TODO/IMPL/HLS
+        make_pair( m_newTranscodeID.fetchAndAddAcquire(1), TranscodeContext() ) );  //TODO/HLS: #ak ???
     Q_ASSERT( p.second );
 
     //checking requested time region:
@@ -155,39 +157,37 @@ bool StreamingChunkTranscoder::transcodeAsync(
     }
 
     QSharedPointer<QnAbstractArchiveReader> archiveReader = dp.dynamicCast<QnAbstractArchiveReader>();
-    if( !archiveReader )
+    if( !archiveReader || !archiveReader->open() )
     {
         NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Failed (2) to create archive data provider (resource %1)").
             arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
         m_transcodings.erase( p.first );
         return false;
     }
+    archiveReader->setQuality(MEDIA_Quality_High, true);    //TODO/HLS: #ak set proper quality
+    archiveReader->setPlaybackRange( QnTimePeriod( transcodeParams.startTimestamp() / USEC_IN_MSEC, transcodeParams.duration() ) );
 
-    QSharedPointer<OnDemandMediaDataProvider> onDemandArchiveReader( new OnDemandMediaDataProvider( dp ) );
-    if( onDemandArchiveReader->seek( transcodeParams.startTimestamp() ) )
+    if( !startTranscoding(
+            p.first->first,
+            cameraResource,
+            QSharedPointer<OnDemandMediaDataProvider>( new OnDemandMediaDataProvider( dp ) ),
+            transcodeParams,
+            chunk ) )
     {
-        if( startTranscoding(
-                p.first->first,
-                cameraResource,
-                onDemandArchiveReader,
-                transcodeParams,
-                chunk ) )
-        {
-            chunk->openForModification();
-            archiveReader->start();
-            return true;
-        }
-
         m_transcodings.erase( p.first );
         return false;
     }
 
-    NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Failed to find source. "
-        "Resource %1, statTime %2, duration %3").arg(cameraResource->getUniqueId()).
-        arg(transcodeParams.startTimestamp()).arg(transcodeParams.endTimestamp()), cl_logWARNING );
+    chunk->openForModification();
+    archiveReader->start();
+    return true;
 
-    m_transcodings.erase( p.first );
-    return false;
+    //NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Failed to find source. "
+    //    "Resource %1, statTime %2, duration %3").arg(cameraResource->getUniqueId()).
+    //    arg(transcodeParams.startTimestamp()).arg(transcodeParams.endTimestamp()), cl_logWARNING );
+
+    //m_transcodings.erase( p.first );
+    //return false;
 }
 
 Q_GLOBAL_STATIC_WITH_ARGS( StreamingChunkTranscoder, streamingChunkTranscoderInstance, (StreamingChunkTranscoder::fBeginOfRangeInclusive) );
@@ -246,7 +246,6 @@ bool StreamingChunkTranscoder::startTranscoding(
     //launching transcoding:
         //creating transcoder
     std::auto_ptr<QnFfmpegTranscoder> transcoder( new QnFfmpegTranscoder() );
-    //if( transcoder->setContainer( "flv" ) != 0 )
     if( transcoder->setContainer( transcodeParams.containerFormat() ) != 0 )
     {
         NX_LOG( QString::fromLatin1("Failed to create transcoder with container \"%1\" to transcode chunk (%2 - %3) of resource %4").
@@ -254,11 +253,11 @@ bool StreamingChunkTranscoder::startTranscoding(
             arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
         return false;
     }
-    //TODO/IMPL/HLS setting correct video parameters
+    //TODO/HLS: #ak setting correct video parameters, now they are hard-coded for HLS with no transcoding
     CodecID codecID = CODEC_ID_NONE;
     QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
-    const CodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO: #ak get codec of resource video stream. For HLS h264 is OK
-    QSize videoResolution = QSize( 1280, 720 );  //TODO: #ak get resolution of resource video stream. This resolution is ignored when TM_DirectStreamCopy is used
+    const CodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO/HLS #ak get codec of resource video stream. For HLS h264 is OK
+    QSize videoResolution = QSize( 1280, 720 );  //TODO/HLS #ak get resolution of resource video stream. This resolution is ignored when TM_DirectStreamCopy is used
     if( transcodeParams.videoCodec().isEmpty() && !transcodeParams.pictureSizePixels().isValid() )
     {
         codecID = resourceVideoStreamCodecID;
@@ -291,7 +290,7 @@ bool StreamingChunkTranscoder::startTranscoding(
         return false;
     }
 
-    //TODO/IMPL/HLS audio
+    //TODO/HLS #ak audio
     if( !transcodeParams.audioCodec().isEmpty() )
     {
         //if( transcoder->setAudioCodec( CODEC_ID_AAC, QnTranscoder::TM_FfmpegTranscode ) != 0 )
@@ -303,7 +302,7 @@ bool StreamingChunkTranscoder::startTranscoding(
         //}
     }
 
-    //TODO/IMPL/HLS selecting least used transcoding thread from pool
+    //TODO/HLS #ak selecting least used transcoding thread from pool
     StreamingChunkTranscoderThread* transcoderThread = m_transcodeThreads[rand() % m_transcodeThreads.size()];
 
     //adding transcoder to transcoding thread
@@ -332,6 +331,6 @@ bool StreamingChunkTranscoder::scheduleTranscoding(
 
 bool StreamingChunkTranscoder::validateTranscodingParameters( const StreamingChunkCacheKey& /*transcodeParams*/ )
 {
-    //TODO/IMPL/HLS
+    //TODO/HLS #ak
     return true;
 }

@@ -10,6 +10,11 @@ H264Mp4ToAnnexB::H264Mp4ToAnnexB( const QSharedPointer<AbstractOnDemandDataProvi
     AbstractMediaDataFilter( dataSource ),
     m_isFirstPacket( true )
 {
+    connect( dataSource.data(), &AbstractOnDemandDataProvider::dataAvailable,
+             this, [this]( AbstractOnDemandDataProvider* /*pThis*/ ) {
+                emit dataAvailable(this);
+             },  //TODO/HLS: #ak remove it from here
+             Qt::DirectConnection );
 }
 
 QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* const data )
@@ -19,9 +24,9 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
     if( !srcMediaPacket || srcMediaPacket->compressionType != CODEC_ID_H264 )
         return *data;
     if( srcMediaPacket->data.data()[3] == 1 )
-        return *data;   //already in annexb format. TODO/IMPL format validation is too weak
+        return *data;   //already in annexb format. TODO/HLS: #ak format validation is too weak
 
-    //TODO/IMPL/HLS copying packet
+    //TODO/HLS: #ak copying packet
     QnAbstractMediaDataPtr mediaPacket = srcMediaPacket;
 
     //replacing NALU size with {0 0 0 1}
@@ -50,7 +55,7 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
             mediaPacket->data = mediaDataWithSeqHeader;
             m_isFirstPacket = false;
 
-            //TODO/IMPL/HLS monitor sequence header change
+            //TODO/HLS: #ak monitor sequence header change
         }
 
         m_newContext->ctx()->extradata_size = 0;

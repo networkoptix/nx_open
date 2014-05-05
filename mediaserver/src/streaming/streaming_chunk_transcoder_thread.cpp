@@ -87,8 +87,8 @@ bool StreamingChunkTranscoderThread::startTranscoding(
     m_dataSourceToID.insert( make_pair( dataSource.data(), transcodingID ) );
 
     connect(
-        dataSource.data(), SIGNAL(dataAvailable(AbstractOnDemandDataProvider*)),
-        this, SLOT(onStreamDataAvailable(AbstractOnDemandDataProvider*)),
+        dataSource.data(), &AbstractOnDemandDataProvider::dataAvailable,
+        this, &StreamingChunkTranscoderThread::onStreamDataAvailable,
         Qt::DirectConnection );
 
     m_cond.wakeAll();
@@ -112,6 +112,8 @@ void StreamingChunkTranscoderThread::pleaseStop()
     QnLongRunnable::pleaseStop();
     m_cond.wakeAll();
 }
+
+static const int THREAD_STOP_CHECK_TIMEOUT_MS = 1000;
 
 void StreamingChunkTranscoderThread::run()
 {
@@ -141,7 +143,7 @@ void StreamingChunkTranscoderThread::run()
         if( transcodeIter == m_transcodeContext.end() || !transcodeIter->second->dataAvailable )
         {
             //nothing to do
-            m_cond.wait( lk.mutex(), 1000 );
+            m_cond.wait( lk.mutex(), THREAD_STOP_CHECK_TIMEOUT_MS );
             continue;
         }
 

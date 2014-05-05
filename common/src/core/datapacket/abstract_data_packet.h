@@ -1,8 +1,10 @@
 #ifndef abstract_data_h_1112
 #define abstract_data_h_1112
 
+#include <libavutil/avutil.h>
+
 #include <QSharedPointer>
-#include <QSharedPointer>
+
 #include "utils/common/threadqueue.h"
 
 

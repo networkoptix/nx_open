@@ -12,6 +12,8 @@
 #include <device_plugins/server_archive/server_archive_delegate.h>
 
 
+static const qint64 USEC_IN_MSEC = 1000;
+
 namespace nx_hls
 {
     ArchivePlaylistManager::ArchivePlaylistManager(
@@ -28,27 +30,41 @@ namespace nx_hls
         m_prevChunkEndTimestamp( 0 ),
         m_eof( false ),
         m_chunkMediaSequence( 0 ),
-        m_archiveDelegate( nullptr ),
-        m_delegate( nullptr )
+        m_delegate( nullptr ),
+        m_timerCorrection( 0 ),
+        m_initialPlaylistCreated( false ),
+        m_prevGeneratedChunkDuration( 0 )
     {
-        m_archiveDelegate = camResource->createArchiveDelegate();
-        if( !m_archiveDelegate )
-            m_archiveDelegate = new QnServerArchiveDelegate(); // default value
-
-        m_archiveDelegate->setQuality(MEDIA_Quality_High, true);
-        m_delegate = new QnThumbnailsArchiveDelegate(QnAbstractArchiveDelegatePtr(m_archiveDelegate));
-        m_delegate->setRange( m_startTimestamp, endTimestamp(), targetDurationUsec );
-
-        m_prevChunkEndTimestamp = getNextStepArchiveTimestamp();
+        assert( m_maxChunkNumberInPlaylist > 0 );
     }
 
     ArchivePlaylistManager::~ArchivePlaylistManager()
     {
         delete m_delegate;
         m_delegate = nullptr;
+    }
 
-        delete m_archiveDelegate;
-        m_archiveDelegate = nullptr;
+    bool ArchivePlaylistManager::initialize()
+    {
+        QnAbstractArchiveDelegatePtr archiveDelegate( m_camResource->createArchiveDelegate() );
+        if( !archiveDelegate )
+        {
+            archiveDelegate = QnAbstractArchiveDelegatePtr(new QnServerArchiveDelegate()); // default value
+            if( !archiveDelegate->open(m_camResource) )
+                return false;
+        }
+
+        if( !archiveDelegate->setQuality(MEDIA_Quality_High, true) )    //TODO/HLS: #ak set proper quality
+            return false;
+        m_delegate = new QnThumbnailsArchiveDelegate(archiveDelegate);
+        m_delegate->setRange( m_startTimestamp, endTimestamp(), m_targetDurationUsec );
+
+        m_prevChunkEndTimestamp = getNextStepArchiveTimestamp();
+        if( m_prevChunkEndTimestamp == -1 )
+            return false;
+
+        m_initialPlaylistCreated = false;
+        return true;
     }
 
     unsigned int ArchivePlaylistManager::generateChunkList(
@@ -57,10 +73,36 @@ namespace nx_hls
     {
         QMutexLocker lk( &m_mutex );
 
+        const_cast<ArchivePlaylistManager*>(this)->generateChunksIfNeeded();
+
         std::copy( m_chunks.begin(), m_chunks.end(), std::back_inserter(*chunkList) );
         if( endOfStreamReached )
             *endOfStreamReached = m_eof;
         return m_chunks.size();
+    }
+
+    void ArchivePlaylistManager::generateChunksIfNeeded()
+    {
+        if( !m_initialPlaylistCreated )
+        {
+            //creating initial playlist
+            for( int i = 0; i < m_maxChunkNumberInPlaylist; ++i )
+            {
+                if( !addOneMoreChunk() )
+                    break;
+            }
+            m_initialPlaylistCreated = true;
+            m_playlistUpdateTimer.start();
+            m_timerCorrection = 0;
+        }
+        else
+        {
+            if( (m_playlistUpdateTimer.elapsed() * USEC_IN_MSEC - m_timerCorrection) > m_prevGeneratedChunkDuration )
+            {
+                addOneMoreChunk();
+                m_timerCorrection += m_prevGeneratedChunkDuration;
+            }
+        }
     }
 
     bool ArchivePlaylistManager::addOneMoreChunk()
@@ -80,7 +122,7 @@ namespace nx_hls
         AbstractPlaylistManager::ChunkData chunkData;
         chunkData.mediaSequence = ++m_chunkMediaSequence;
         chunkData.startTimestamp = m_prevChunkEndTimestamp;
-        chunkData.duration = m_targetDurationUsec;   //TODO: #ak get real chunk duration
+        chunkData.duration = nextChunkEndTimestamp - chunkData.startTimestamp;   //TODO: #ak take into account gaps in archive
         m_totalPlaylistDuration += chunkData.duration;
         m_chunks.push_back( chunkData );
 
@@ -91,6 +133,7 @@ namespace nx_hls
         }
 
         m_prevChunkEndTimestamp = nextChunkEndTimestamp;
+        m_prevGeneratedChunkDuration = chunkData.duration;
 
         return true;
     }

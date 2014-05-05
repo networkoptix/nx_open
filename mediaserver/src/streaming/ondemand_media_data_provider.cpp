@@ -4,15 +4,15 @@
 
 #include "ondemand_media_data_provider.h"
 
-#include <QMutexLocker>
+#include <QtCore/QMutexLocker>
 
 
-static const size_t MAX_DATA_QUEUE_SIZE = 16;
+static const size_t MAX_DATA_QUEUE_SIZE = 16;   //TODO/HLS: #ak why 16?
 
 OnDemandMediaDataProvider::OnDemandMediaDataProvider( const QSharedPointer<QnAbstractStreamDataProvider>& dataProvider ) throw()
 :
     m_dataProvider( dataProvider ),
-    m_prevPacketTimestamp( 0 )
+    m_prevPacketTimestamp( -1 )
 {
     m_dataProvider->addDataProcessor( this );
 }
@@ -40,7 +40,7 @@ quint64 OnDemandMediaDataProvider::currentPos() const
 {
     QMutexLocker lk( &m_mutex );
 
-    //TODO/IMPL/HLS
+    //TODO/HLS: #ak
     //Q_ASSERT( false );
     return m_prevPacketTimestamp;
 }

@@ -9,6 +9,7 @@
 
 #include <deque>
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QMutex>
 
 #include <core/resource/resource_fwd.h>
@@ -34,6 +35,8 @@ namespace nx_hls
             quint64 targetDurationUsec );
         virtual ~ArchivePlaylistManager();
 
+        bool initialize();
+
         //!Implementantion of AbstractPlaylistManager::generateChunkList
         virtual unsigned int generateChunkList(
             std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
@@ -50,9 +53,13 @@ namespace nx_hls
         quint64 m_prevChunkEndTimestamp;
         bool m_eof;
         int m_chunkMediaSequence;
-        QnAbstractArchiveDelegate* m_archiveDelegate;
         QnThumbnailsArchiveDelegate* m_delegate;
+        QElapsedTimer m_playlistUpdateTimer;
+        qint64 m_timerCorrection;
+        bool m_initialPlaylistCreated;
+        qint64 m_prevGeneratedChunkDuration;
 
+        void generateChunksIfNeeded();
         bool addOneMoreChunk();
         /*!
             \return -1, if end of archive has been reached
