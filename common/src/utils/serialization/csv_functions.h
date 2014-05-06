@@ -20,16 +20,6 @@
 
 
 namespace QnCsvDetail {
-    template<class Collection, class Output>
-    void serialize_collection(const Collection &value, QnCsvStreamWriter<Output> *stream) {
-        typedef typename std::iterator_traits<typename boost::range_mutable_iterator<Collection>::type>::value_type value_type;
-        typedef typename QnCsv::csv_category<value_type>::type category_type;
-
-        serialize_collection_header(value_type(), stream, category_type());
-        for(const auto &element: value)
-            serialize_collection_element(element, stream, category_type());
-    }
-
     template<class Element, class Output>
     void serialize_collection_header(const Element &, QnCsvStreamWriter<Output> *stream, const QnCsv::field_tag &) {
         stream->writeField(lit("value"));
@@ -54,6 +44,15 @@ namespace QnCsvDetail {
         stream->writeEndline();
     }
 
+    template<class Collection, class Output>
+    void serialize_collection(const Collection &value, QnCsvStreamWriter<Output> *stream) {
+        typedef typename std::iterator_traits<typename boost::range_mutable_iterator<Collection>::type>::value_type value_type;
+        typedef typename QnCsv::csv_category<value_type>::type category_type;
+
+        serialize_collection_header(value_type(), stream, category_type());
+        for(const auto &element: value)
+            serialize_collection_element(element, stream, category_type());
+    }
 
 } // namespace QnCsvDetail
 
