@@ -82,18 +82,21 @@ private:
     QnResourcePtr m_resource;
     bool m_resourceIsLocal;
 
+    qreal m_loadingMargin;
+    qint64 m_updateInterval;
+
     QnTimePeriod m_targetPeriod[Qn::CameraDataTypeCount];
     QnTimePeriod m_boundingPeriod;
 
     QnTimePeriodList m_requestedTimePeriods[Qn::TimePeriodContentCount];
-    QMap<qint64, QnTimePeriodList> m_requestedBookmarkPeriodsByResolution;  // should we enumerate by resolution set index?
+    QMap<qint64, QnTimePeriodList> m_requestedBookmarkPeriodsByResolution;  //TODO: #GDM #Bookmarks should we enumerate by resolution set index?
 
     QnAbstractCameraDataLoader *m_loaders[Qn::CameraDataTypeCount];
     int m_handles[Qn::CameraDataTypeCount];
-    QList<QRegion> m_motionRegions;
+    
     QnAbstractCameraDataPtr m_data[Qn::CameraDataTypeCount];
-    qreal m_loadingMargin;
-    qint64 m_updateInterval;
+
+    QList<QRegion> m_motionRegions;
     QnCameraBookmarkTags m_bookmarkTags;
 };
 

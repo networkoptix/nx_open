@@ -104,8 +104,9 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
 
     QnCameraBookmark bookmark;
     bookmark.guid = QUuid::createUuid();
+    bookmark.name = tr("Bookmark");
     bookmark.startTimeMs = period.startTimeMs;  //this should be assigned before loading data to the dialog
-    bookmark.durationMs = period.durationMs;
+    bookmark.durationMs = period.durationMs;    //TODO: #GDM #Bookmarks should we generate description based on these values or show them in the dialog?
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
     dialog->setTags(m_tags);

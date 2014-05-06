@@ -30,11 +30,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="nameLineEdit">
-       <property name="text">
-        <string>Bookmark</string>
-       </property>
-      </widget>
+      <widget class="QLineEdit" name="nameLineEdit"/>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="descriptionLabel">
