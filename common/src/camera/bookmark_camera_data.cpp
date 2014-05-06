@@ -153,3 +153,7 @@ void QnBookmarkCameraData::updateDataSource() {
     m_dataSource = QnTimePeriodList::mergeTimePeriods(periods); //TODO: #GDM #Bookmarks need an analogue for the single periods
 }
 
+QnCameraBookmarkList QnBookmarkCameraData::data() const {
+    return m_data;
+}
+

@@ -14,23 +14,24 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 
-#include <utils/common/warnings.h>
-#include <utils/common/scoped_painter_rollback.h>
-#include <utils/common/checked_cast.h>
-#include <utils/math/math.h>
-
 #include <camera/thumbnails_loader.h>
 
-#include <utils/math/color_transformations.h>
+#include <core/resource/camera_bookmark.h>
+
 #include <ui/common/geometry.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
+#include <ui/graphics/items/controls/time_slider_pixmap_cache.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 
-#include "time_slider_pixmap_cache.h"
+#include <utils/common/warnings.h>
+#include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/checked_cast.h>
+#include <utils/math/math.h>
+#include <utils/math/color_transformations.h>
 
 namespace {
 
@@ -721,6 +722,14 @@ void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodContent type, const Qn
         return;
 
     m_lineData[line].timeStorage.setPeriods(type, timePeriods);
+}
+
+QnCameraBookmarkList QnTimeSlider::bookmarks() const {
+    return m_bookmarks;
+}
+
+void QnTimeSlider::setBookmarks(const QnCameraBookmarkList &bookmarks) {
+    m_bookmarks = bookmarks;
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const {
@@ -1621,6 +1630,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     QRectF dateBarRect = positionRect(rulerRect, dateBarPosition);
     QRectF lineBarRect = positionRect(rulerRect, lineBarPosition);
     QRectF tickmarkBarRect = positionRect(rulerRect, tickmarkBarPosition);
+    QRectF bookmarkRect = lineBarRect;
     
     qreal lineTop, lineUnit = qFuzzyIsNull(m_totalLineStretch) ? 0.0 : lineBarRect.height() / m_totalLineStretch;
 
@@ -1713,6 +1723,9 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
     /* Draw dates. */
     drawDates(painter, dateBarRect);
+
+    /* Draw bookmarks. */
+    drawBookmarks(painter, bookmarkRect);
 
     /* Draw position marker. */
     drawMarker(painter, sliderPosition(), m_colors.positionMarker);
@@ -2102,6 +2115,41 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
     painter->setOpacity(opacity);
 }
 
+//TODO: #GDM #Bookmarks check drawBookmarks() against m_localOffset
+void QnTimeSlider::drawBookmarks(QPainter *painter, const QRectF &rect) {
+    qint64 windowLength = m_windowEnd - m_windowStart;
+    qint64 minBookmarkDuration = windowLength / 16;
+    QnCameraBookmarkList displaying;
+
+    QnTimePeriod window(m_windowStart, m_windowEnd - m_windowStart);
+    foreach(const QnCameraBookmark &bookmark, m_bookmarks) {
+        if (bookmark.name.isEmpty())
+            continue;
+        if (QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs).intersected(window).durationMs < minBookmarkDuration)
+            continue;
+        displaying << bookmark;
+    }
+
+    if (displaying.isEmpty())
+        return;
+    
+    /* Do some precalculations. */
+    const qreal textHeight = rect.height() * 0.7;
+    const qreal textTopMargin = rect.height() * 0.15;
+
+    QnScopedPainterPenRollback penRollback(painter);
+    QnScopedPainterBrushRollback brushRollback(painter);
+    
+    /* Draw highlight. */
+
+    foreach (const QnCameraBookmark &bookmark, displaying) {
+        qreal x = quickPositionFromValue(qMax(bookmark.startTimeMs, m_windowStart));
+        QPixmap pixmap = m_pixmapCache->textPixmap(bookmark.name, textHeight);
+
+        QRectF textRect(x, rect.top() + textTopMargin, pixmap.width(), pixmap.height());
+        drawCroppedPixmap(painter, textRect, rect, pixmap, pixmap.rect());
+    }
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers

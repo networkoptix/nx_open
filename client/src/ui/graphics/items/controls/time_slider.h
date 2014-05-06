@@ -9,7 +9,10 @@
 
 #include <recording/time_period_list.h>
 #include <recording/time_period_storage.h>
+
 #include <camera/thumbnail.h>
+
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <ui/graphics/items/generic/tool_tip_slider.h>
 #include <ui/processors/kinetic_process_handler.h>
@@ -109,6 +112,9 @@ public:
 
     QnTimePeriodList timePeriods(int line, Qn::TimePeriodContent type) const;
     void setTimePeriods(int line, Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods);
+
+    QnCameraBookmarkList bookmarks() const;
+    void setBookmarks(const QnCameraBookmarkList &bookmarks);
 
     Options options() const;
     void setOptions(Options options);
@@ -285,6 +291,7 @@ private:
     void drawDates(QPainter *painter, const QRectF &rect);
     void drawThumbnails(QPainter *painter, const QRectF &rect);
     void drawThumbnail(QPainter *painter, const ThumbnailData &data, const QRectF &targetRect, const QRectF &boundingRect);
+    void drawBookmarks(QPainter *painter, const QRectF &rect);
 
     void updatePixmapCache();
     void updateVisibleLineCount();
@@ -358,6 +365,7 @@ private:
     int m_lineCount;
     qreal m_totalLineStretch;
     QVector<LineData> m_lineData;
+    QnCameraBookmarkList m_bookmarks;
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;

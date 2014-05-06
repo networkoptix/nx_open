@@ -531,8 +531,10 @@ QnCachingCameraDataLoader *QnWorkbenchNavigator::loader(const QnResourcePtr &res
         return *pos;
 
     QnCachingCameraDataLoader *loader = QnCachingCameraDataLoader::newInstance(resource, this);
-    if(loader)
-        connect(loader, &QnCachingCameraDataLoader::periodsChanged, this, &QnWorkbenchNavigator::at_loader_periodsChanged);
+    if(loader) {
+        connect(loader, &QnCachingCameraDataLoader::periodsChanged, this, [this](Qn::TimePeriodContent type) {updateLoaderPeriods(checked_cast<QnCachingCameraDataLoader *>(sender()), type);} );
+        connect(loader, &QnCachingCameraDataLoader::bookmarksChanged, this, [this]() {updateLoaderBookmarks(checked_cast<QnCachingCameraDataLoader *>(sender()));} );
+    }
 
     m_loaderByResource[resource] = loader;
     return loader;
@@ -741,6 +743,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 
     updateLocalOffset();
     updateCurrentPeriods();
+    updateCurrentBookmarks();
     updateLiveSupported();
     updateLive();
     updatePlayingSupported();
@@ -975,6 +978,13 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodContent type) {
         m_calendar->setCurrentTimePeriods(type, periods);
     if(m_dayTimeWidget)
         m_dayTimeWidget->setPrimaryTimePeriods(type, periods);
+}
+
+void QnWorkbenchNavigator::updateCurrentBookmarks() {
+    QnCameraBookmarkList bookmarks;
+    if (QnCachingCameraDataLoader *loader = this->loader(m_currentWidget))
+        bookmarks = loader->bookmarks();
+    m_timeSlider->setBookmarks(bookmarks);
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods() {
@@ -1294,11 +1304,10 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     }
 }
 
-void QnWorkbenchNavigator::at_loader_periodsChanged(Qn::TimePeriodContent  type) {
-    updateLoaderPeriods(checked_cast<QnCachingCameraDataLoader *>(sender()), type);
-}
-
 void QnWorkbenchNavigator::updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type) {
+    if (!loader)
+        return;
+
     QnResourcePtr resource = loader->resource();
 
     if(m_currentWidget && m_currentWidget->resource() == resource)
@@ -1309,6 +1318,19 @@ void QnWorkbenchNavigator::updateLoaderPeriods(QnCachingCameraDataLoader *loader
 
     if(m_centralWidget && m_centralWidget->resource() == resource && type == Qn::RecordedTimePeriod)
         updateThumbnailsLoader();
+}
+
+void QnWorkbenchNavigator::updateLoaderBookmarks(QnCachingCameraDataLoader *loader) {
+    if (!loader)
+        return;
+
+    QnResourcePtr resource = loader->resource();
+
+    if(!m_currentWidget || m_currentWidget->resource() != resource)
+        return;
+
+    QnCameraBookmarkList bookmarks = loader->bookmarks();
+    m_timeSlider->setBookmarks(bookmarks);
 }
 
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
@@ -1440,14 +1462,6 @@ void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
     connect(widget, SIGNAL(aspectRatioChanged()), this, SLOT(updateThumbnailsLoader()));
     connect(widget, SIGNAL(optionsChanged()), this, SLOT(at_widget_optionsChanged()));
     connect(widget->resource(), SIGNAL(flagsChanged(const QnResourcePtr &)), this, SLOT(at_resource_flagsChanged(const QnResourcePtr &)));
-
-    /*
-    if (QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>()) {
-        connect(camera, &QnVirtualCameraResource::bookmarkAdded, this, [this]() { updateCurrentPeriods(Qn::BookmarksContent); });
-        connect(camera, &QnVirtualCameraResource::bookmarkChanged, this, [this]() { updateCurrentPeriods(Qn::BookmarksContent); });
-        connect(camera, &QnVirtualCameraResource::bookmarkRemoved, this, [this]() { updateCurrentPeriods(Qn::BookmarksContent); });
-    }
-    }*/
 }
 
 void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {

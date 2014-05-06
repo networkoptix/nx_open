@@ -20,11 +20,11 @@ public:
     virtual bool contains(const QnAbstractCameraDataPtr &other) const override;
 
     QnCameraBookmark find(const qint64 position) const;
+    QnCameraBookmarkList data() const;
     void updateBookmark(const QnCameraBookmark &bookmark);
     void removeBookmark(const QnCameraBookmark & bookmark);
 private:
     void updateDataSource();
-
     QnCameraBookmarkList m_data;
     QnTimePeriodList m_dataSource;
 };

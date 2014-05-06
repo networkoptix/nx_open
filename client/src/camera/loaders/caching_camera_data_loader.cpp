@@ -195,7 +195,9 @@ QnTimePeriodList QnCachingCameraDataLoader::periods(Qn::TimePeriodContent timePe
 }
 
 QnCameraBookmarkList QnCachingCameraDataLoader::bookmarks() const {
-    return QnCameraBookmarkList(); //TODO: #GDM #Bookmarks implement me
+    if (QnBookmarkCameraData* list = dynamic_cast<QnBookmarkCameraData*>(m_data[Qn::BookmarkData].data()))
+        return list->data();
+    return QnCameraBookmarkList();
 }
 
 QnCameraBookmarkTags QnCachingCameraDataLoader::bookmarkTags() const {
