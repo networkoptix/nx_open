@@ -39,20 +39,20 @@ void fromApiToResource(const ApiBusinessRuleData &src, QnBusinessEventRulePtr &d
     dst->setId(src.id);
     dst->setEventType(src.eventType);
 
-    dst->setEventResources(QVector<QnId>::fromStdVector(src.eventResource));
+    dst->setEventResources(QVector<QnId>::fromStdVector(src.eventResourceIds));
 
     dst->setEventParams(QnBusinessEventParameters::fromBusinessParams(deserializeBusinessParams(src.eventCondition)));
 
     dst->setEventState(src.eventState);
     dst->setActionType(src.actionType);
 
-    dst->setActionResources(QVector<QnId>::fromStdVector(src.actionResource));
+    dst->setActionResources(QVector<QnId>::fromStdVector(src.actionResourceIds));
 
     dst->setActionParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.actionParams)));
 
     dst->setAggregationPeriod(src.aggregationPeriod);
     dst->setDisabled(src.disabled);
-    dst->setComments(src.comments);
+    dst->setComment(src.comment);
     dst->setSchedule(src.schedule);
     dst->setSystem(src.system);
 }
@@ -61,8 +61,8 @@ void fromResourceToApi(const QnBusinessEventRulePtr &src, ApiBusinessRuleData &d
     dst.id = src->id();
     dst.eventType = src->eventType();
 
-    dst.eventResource = src->eventResources().toStdVector();
-    dst.actionResource = src->actionResources().toStdVector();
+    dst.eventResourceIds = src->eventResources().toStdVector();
+    dst.actionResourceIds = src->actionResources().toStdVector();
 
     dst.eventCondition = serializeBusinessParams(src->eventParams().toBusinessParams());
     dst.actionParams = serializeBusinessParams(src->actionParams().toBusinessParams());
@@ -70,10 +70,10 @@ void fromResourceToApi(const QnBusinessEventRulePtr &src, ApiBusinessRuleData &d
     dst.eventState = src->eventState();
     dst.actionType = src->actionType();
     dst.aggregationPeriod = src->aggregationPeriod();
-    dst.disabled = src->disabled();
-    dst.comments = src->comments();
+    dst.disabled = src->isDisabled();
+    dst.comment = src->comment();
     dst.schedule = src->schedule();
-    dst.system = src->system();
+    dst.system = src->isSystem();
 }
 
 void fromApiToResourceList(const ApiBusinessRuleDataList &src, QnBusinessEventRuleList &dst, QnResourcePool *resourcePool) {
@@ -96,12 +96,12 @@ void fromResourceToApi(const QnAbstractBusinessActionPtr &src, ApiBusinessAction
     dst.actionType = src->actionType();
     dst.toggleState = src->getToggleState();
     dst.receivedFromRemoteHost = src->isReceivedFromRemoteHost();
-    dst.resources = src->getResources().toStdVector();
+    dst.resourceIds = src->getResources().toStdVector();
 
     dst.params = serializeBusinessParams(src->getParams().toBusinessParams());
     dst.runtimeParams = serializeBusinessParams(src->getRuntimeParams().toBusinessParams());
 
-    dst.businessRuleId = src->getBusinessRuleId();
+    dst.ruleId = src->getBusinessRuleId();
     dst.aggregationCount = src->getAggregationCount();
 }
 
@@ -111,19 +111,19 @@ void fromApiToResource(const ApiBusinessActionData &src, QnAbstractBusinessActio
     dst->setToggleState(src.toggleState);
     dst->setReceivedFromRemoteHost(src.receivedFromRemoteHost);
 
-    dst->setResources(QVector<QnId>::fromStdVector(src.resources));
+    dst->setResources(QVector<QnId>::fromStdVector(src.resourceIds));
 
     dst->setParams(QnBusinessActionParameters::fromBusinessParams(deserializeBusinessParams(src.params)));
 
-    dst->setBusinessRuleId(src.businessRuleId);
+    dst->setBusinessRuleId(src.ruleId);
     dst->setAggregationCount(src.aggregationCount);
 }
 
 void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst) {
     dst.startTime = src.getStartTime();
     dst.endTime = src.getEndTime();
-    dst.doRecordAudio = src.getDoRecordAudio();
-    dst.recordType = src.getRecordingType();
+    dst.recordAudio = src.getDoRecordAudio();
+    dst.recordingType = src.getRecordingType();
     dst.dayOfWeek = src.getDayOfWeek();
     dst.beforeThreshold = src.getBeforeThreshold();
     dst.afterThreshold = src.getAfterThreshold();
@@ -132,7 +132,7 @@ void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst) {
 }
 
 void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnId &resourceId) {
-    dst = QnScheduleTask(resourceId, src.dayOfWeek, src.startTime, src.endTime, src.recordType, src.beforeThreshold, src.afterThreshold, src.streamQuality, src.fps, src.doRecordAudio);
+    dst = QnScheduleTask(resourceId, src.dayOfWeek, src.startTime, src.endTime, src.recordingType, src.beforeThreshold, src.afterThreshold, src.streamQuality, src.fps, src.recordAudio);
 }
 
 void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst) {
@@ -146,15 +146,15 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     parseMotionRegionList(regions, src.region);
     dst->setMotionRegionList(regions, QnDomainMemory);
 
-    dst->setMAC(src.mac);
+    dst->setMAC(QnMacAddress(src.mac));
     QAuthenticator auth;
     auth.setUser(src.login);
     auth.setPassword(src.password);
     dst->setAuth(auth);
 
     QnScheduleTaskList tasks;
-    tasks.reserve(src.scheduleTask.size());
-    for(const ApiScheduleTaskData &srcTask: src.scheduleTask) {
+    tasks.reserve(src.scheduleTasks.size());
+    for(const ApiScheduleTaskData &srcTask: src.scheduleTasks) {
         tasks.push_back(QnScheduleTask());
         fromApiToResource(srcTask, tasks.back(), src.id);
     }
@@ -167,7 +167,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setFirmware(src.firmware);
     dst->setGroupId(src.groupId);
     dst->setGroupName(src.groupName);
-    dst->setSecondaryStreamQuality(src.secondaryQuality);
+    dst->setSecondaryStreamQuality(src.secondaryStreamQuality);
     dst->setCameraControlDisabled(src.controlDisabled);
     dst->setStatusFlags(static_cast<QnSecurityCamResource::StatusFlags>(src.statusFlags));
 
@@ -183,15 +183,15 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.motionType = src->getMotionType();
 
     QList<QnMotionRegion> regions;
-    dst.region = serializeMotionRegionList(src->getMotionRegionList()).toLocal8Bit();
-    dst.mac = src->getMAC().toString().toLocal8Bit();
+    dst.region = serializeMotionRegionList(src->getMotionRegionList()).toLatin1();
+    dst.mac = src->getMAC().toString().toLatin1();
     dst.login = src->getAuth().user();
     dst.password = src->getAuth().password();
     
-    dst.scheduleTask.clear();
+    dst.scheduleTasks.clear();
     for(const QnScheduleTask &srcTask: src->getScheduleTasks()) {
-        dst.scheduleTask.push_back(ApiScheduleTaskData());
-        fromResourceToApi(srcTask, dst.scheduleTask.back());
+        dst.scheduleTasks.push_back(ApiScheduleTaskData());
+        fromResourceToApi(srcTask, dst.scheduleTasks.back());
     }
 
     dst.audioEnabled = src->isAudioEnabled();
@@ -201,7 +201,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.firmware = src->getFirmware();
     dst.groupId = src->getGroupId();
     dst.groupName = src->getGroupName();
-    dst.secondaryQuality = src->secondaryStreamQuality();
+    dst.secondaryStreamQuality = src->secondaryStreamQuality();
     dst.controlDisabled = src->isCameraControlDisabled();
     dst.statusFlags = src->statusFlags();
     dst.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(src->getDewarpingParams());
@@ -303,7 +303,7 @@ void fromApiToResource(const ApiEmailSettingsData &src, QnEmail::Settings &dst) 
 
 
 void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, const ResourceContext &ctx) {
-    fromApiToResourceList(src.resTypes, dst.resTypes);
+    fromApiToResourceList(src.resourceTypes, dst.resTypes);
     for(const QnResourceTypePtr &resType: dst.resTypes)
         const_cast<QnResourceTypePool*>(ctx.resTypePool)->addResourceType(resType); // TODO: #AK refactor it!
 
@@ -550,7 +550,7 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
 
     dst.id = src->getId();
     dst.typeId = src->getTypeId();
-    dst.parentGuid = src->getParentId();
+    dst.parentId = src->getParentId();
     dst.name = src->getName();
     dst.url = src->getUrl();
     dst.status = src->getStatus();
@@ -565,7 +565,7 @@ void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
     dst->setId(src.id);
     //dst->setGuid(guid);
     dst->setTypeId(src.typeId);
-    dst->setParentId(src.parentGuid);
+    dst->setParentId(src.parentId);
     dst->setName(src.name);
     dst->setUrl(src.url);
     dst->setStatus(src.status, true);

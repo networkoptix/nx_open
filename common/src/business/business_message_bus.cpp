@@ -6,6 +6,7 @@
 
 #include <nx_ec/data/api_business_rule_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include "api/app_server_connection.h"
 
 Q_GLOBAL_STATIC(QnBusinessMessageBus, QnBusinessMessageBus_instance)
 
@@ -19,7 +20,6 @@ QnBusinessMessageBus* QnBusinessMessageBus::instance()
 
 QnBusinessMessageBus::QnBusinessMessageBus()
 {
-    connect(&m_transport, SIGNAL(finished(QNetworkReply*)), this, SLOT(at_replyFinished(QNetworkReply*)));
 }
 
 QnBusinessMessageBus::~QnBusinessMessageBus()
@@ -35,53 +35,27 @@ int QnBusinessMessageBus::deliveryBusinessEvent(QnAbstractBusinessEventPtr bEven
 }
 */
 
-int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QnResourcePtr &res, const QUrl& url)
+int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QnId& dstPeer)
 {
-    QMutexLocker lock(&m_mutex);
-    QNetworkRequest request;
-
-    QUrl u(url);
-    if (res)
-    {
-        QUrlQuery urlQuery(u.query());
-        urlQuery.addQueryItem(QLatin1String("resource"), res->getId().toString()); // execute action for 1 resource only
-        u.setQuery(urlQuery);
-    }
-
-    request.setUrl(u);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("application/data"));
-
-    QByteArray data;
-    QnOutputBinaryStream<QByteArray> stream(&data);
-    ec2::ApiBusinessActionData apiData;
-    fromResourceToApi(bAction, apiData);
-    QnBinary::serialize(apiData, &stream);
-    QNetworkReply* reply = m_transport.post(request, data);
-    m_actionsInProgress.insert(reply, bAction);
-
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    int handle = ec2Connection->getBusinessEventManager()->sendBusinessAction(bAction, dstPeer, this, &QnBusinessMessageBus::at_DeliveryBusinessActionFinished);
+    m_sendingActions.insert(handle, bAction);
     return 0;
 }
 
-void QnBusinessMessageBus::at_replyFinished(QNetworkReply* reply)
+void QnBusinessMessageBus::at_DeliveryBusinessActionFinished( int handle, ec2::ErrorCode errorCode )
 {
-    QnAbstractBusinessActionPtr action;
-    QNetworkReply::NetworkError replyResultCode = QNetworkReply::NoError;
-    {
-        QMutexLocker lock(&m_mutex);
-        ActionMap::Iterator itr =  m_actionsInProgress.find(reply);
-        Q_ASSERT(itr != m_actionsInProgress.end());
-        action = itr.value();
-        m_actionsInProgress.erase(itr);
-        replyResultCode = reply->error();
-        reply->deleteLater();
-    }
-    if( replyResultCode == QNetworkReply::NoError )
+    QnAbstractBusinessActionPtr action = m_sendingActions.value(handle);
+    m_sendingActions.remove(handle);
+    if (errorCode == ec2::ErrorCode::ok)
         emit actionDelivered(action);
-    else
+    else {
+        qWarning() << "error delivering exec action message #" << handle << "error:" << ec2::toString(errorCode);
         emit actionDeliveryFail(action);
+    }
 }
 
-void QnBusinessMessageBus::at_actionReceived(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &res)
+void QnBusinessMessageBus::at_actionReceived(const QnAbstractBusinessActionPtr &action)
 {
-    emit actionReceived(action, res);
+    emit actionReceived(action);
 }

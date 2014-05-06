@@ -681,7 +681,7 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
 
 void QnWorkbenchActionHandler::submitInstantDrop() {
 
-    if (QnResourceDiscoveryManager::instance()->state() == QnResourceDiscoveryManager::initialSearch) {
+    if (QnResourceDiscoveryManager::instance()->state() == QnResourceDiscoveryManager::InitialSearch) {
         // local resources is not ready yet
         QTimer::singleShot(100, this, SLOT(submitInstantDrop()));
         return;
@@ -728,25 +728,26 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(QnId()).filtered<QnLayoutResource>())
             if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
                 resourcePool()->removeResource(layout);
+    }
 
-        /* Sometimes we get here when 'New layout' has already been added. But all user's layouts must be created AFTER this method.
-         * Otherwise the user will see uncreated layouts in layout selection menu.
-         * As temporary workaround we can just remove that layouts. */
-        // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
-        if (user) {
-            foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
-                if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
-                    resourcePool()->removeResource(layout);
-            }
-        }
-
-        /* Close all other layouts. */
-        foreach(QnWorkbenchLayout *layout, workbench()->layouts()) {
-            QnLayoutResourcePtr resource = layout->resource();
-            if(resource->getParentId() != user->getId())
-                workbench()->removeLayout(layout);
+    /* Sometimes we get here when 'New layout' has already been added. But all user's layouts must be created AFTER this method.
+    * Otherwise the user will see uncreated layouts in layout selection menu.
+    * As temporary workaround we can just remove that layouts. */
+    // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
+    if (user) {
+        foreach(const QnLayoutResourcePtr &layout, context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>()) {
+            if(snapshotManager()->isLocal(layout) && !snapshotManager()->isFile(layout))
+                resourcePool()->removeResource(layout);
         }
     }
+
+    /* Close all other layouts. */
+    foreach(QnWorkbenchLayout *layout, workbench()->layouts()) {
+        QnLayoutResourcePtr resource = layout->resource();
+        if(resource->getParentId() != user->getId())
+            workbench()->removeLayout(layout);
+    }
+
 
     submitDelayedDrops();
 }

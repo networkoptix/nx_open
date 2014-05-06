@@ -153,7 +153,7 @@ int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
 
     QString guid = QUuid::createUuid().toString();
     guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
-    QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLocal8Bit();
+    QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLatin1();
 
     qSocket->sendTo(data.data(), data.size(), QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
     return SOAP_OK;
@@ -175,7 +175,7 @@ int gsoapFsendSmallUnicast(struct soap *soap, const char *s, size_t n)
 
     QString guid = QUuid::createUuid().toString();
     guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
-    QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLocal8Bit();
+    QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLatin1();
 
     //socket.connectToHost(QHostAddress(QString::fromLatin1(soap->host)), WSDD_MULTICAST_PORT);
     //socket.write(data);

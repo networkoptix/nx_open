@@ -161,7 +161,9 @@ private:
     QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
     bool checkRuleCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const;
     QString formatEmailList(const QStringList& value);
-
+    bool needProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res);
+    void doProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res);
+    void executeAction(QnAbstractBusinessActionPtr action, QnResourcePtr res);
 private:
     QList<QnBusinessEventRulePtr> m_rules;
     //QnBusinessMessageBus m_messageBus;

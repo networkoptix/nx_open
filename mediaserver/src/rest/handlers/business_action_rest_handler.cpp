@@ -42,8 +42,8 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
                 resId = params[i].second;
         }
 
-        QnResourcePtr res = qnResPool->getResourceById(resId);
-        qnBusinessMessageBus->at_actionReceived(action, res);
+        //QnResourcePtr res = qnResPool->getResourceById(resId);
+        qnBusinessMessageBus->at_actionReceived(action);
     }
 
     result.append("<root>");

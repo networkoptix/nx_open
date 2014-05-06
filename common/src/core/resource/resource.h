@@ -59,6 +59,7 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
 
 
 public:
+    // TODO: #Elric #enum
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
 
     enum Status {
@@ -69,7 +70,14 @@ public:
         NotDefined,
 
         /** Locked status used in layouts only */
-        Locked = Recording
+        Locked = Recording 
+        
+        // TODO: #EC2 #API #MSAPI Locked status was a bad idea in the first place. 
+        // Just add locked bool field to layout, and a proper migration script.
+        // 
+        // Think of how this is supposed to look in json API. 
+        // "layout": { "status": "Recording" }
+        // => Layout is locked. ZOMG!
     };
 
     enum Flag {
@@ -401,6 +409,8 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnResource::Status) // TODO: #Elric #EC2 move status out, clean up
 
 template<class Resource>
 QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {

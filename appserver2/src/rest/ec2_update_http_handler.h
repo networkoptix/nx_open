@@ -54,7 +54,6 @@ namespace ec2
             QByteArray& /*contentType*/ )
         {
             QnTransaction<RequestDataType> tran;
-            //tran.command = ;
             QnInputBinaryStream<QByteArray> stream( body );
             if (!QnBinary::deserialize(&stream, &tran))
                 return nx_http::StatusCode::badRequest;
@@ -82,7 +81,7 @@ namespace ec2
             if (errorCode == ErrorCode::ok)
                 m_connection->triggerNotification(tran);
 
-            return (errorCode == ErrorCode::ok || errorCode == ErrorCode::skipped)
+            return (errorCode == ErrorCode::ok)
                 ? nx_http::StatusCode::ok
                 : nx_http::StatusCode::internalServerError;
         }

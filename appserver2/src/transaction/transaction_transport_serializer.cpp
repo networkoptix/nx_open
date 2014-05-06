@@ -15,18 +15,18 @@ namespace ec2
 
     }
 
-    bool QnTransactionTransportSerializer::deserializeTran(const quint8* chunkPayload, int len,  PeerList& processedPeers, PeerList& dstPeers, QByteArray& tranData)
+    bool QnTransactionTransportSerializer::deserializeTran(const quint8* chunkPayload, int len,  TransactionTransportHeader& transportHeader, QByteArray& tranData)
     {
         QByteArray srcData = QByteArray::fromRawData((const char*) chunkPayload, len);
         QnInputBinaryStream<QByteArray> stream(srcData);
-        if (!QnBinary::deserialize(&stream, &processedPeers))
+
+        if (!deserialize(&stream, &transportHeader))
             return false;
-        if (!QnBinary::deserialize(&stream, &dstPeers))
-            return false;
-        foreach (const QnId& peer, dstPeers)
+
+        foreach (const QnId& peer, transportHeader.dstPeers)
             Q_ASSERT(!peer.isNull());
 
-        tranData.append((const char*) chunkPayload + stream.getPos(), len - stream.getPos());
+        tranData.append((const char*) chunkPayload + stream.pos(), len - stream.pos());
         return true;
     }
 

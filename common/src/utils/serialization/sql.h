@@ -9,6 +9,7 @@
 #include <QtSql/QSqlQuery>
 
 #include <utils/common/adl_wrapper.h>
+#include <utils/fusion/fusion.h>
 
 #include "sql_fwd.h"
 #include "sql_index_mapping.h"
@@ -225,7 +226,7 @@ namespace QnSqlDetail {
 } // namespace QnBinaryDetail
 
 
-#define QN_FUSION_DEFINE_FUNCTIONS_sql(TYPE, ... /* PREFIX */)                  \
+#define QN_FUSION_DEFINE_FUNCTIONS_sql_record(TYPE, ... /* PREFIX */)           \
 __VA_ARGS__ void bind(const TYPE &value, QSqlQuery *target) {                   \
     QnFusion::visit_members(value, QnSqlDetail::BindVisitor(target));           \
 }                                                                               \

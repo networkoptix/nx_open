@@ -22,6 +22,8 @@ template<class T> class QSet;
 class QJsonObject;
 
 
+// TODO: #Elric rename QnCollection, more Java-like =)
+
 namespace QnContainer {
     struct list_tag {};
     struct set_tag {};
@@ -264,10 +266,10 @@ range_end(const CONTAINER<Key, T> &x) {                                         
     return typename boost::range_const_iterator<CONTAINER<Key, T> >::type(x.end()); \
 }
 
-QN_REGISTER_QT_STL_MAP_ITERATOR(QT_PREPEND_NAMESPACE(QHash));
-QN_REGISTER_QT_STL_MAP_ITERATOR(QT_PREPEND_NAMESPACE(QMultiHash));
-QN_REGISTER_QT_STL_MAP_ITERATOR(QT_PREPEND_NAMESPACE(QMap));
-QN_REGISTER_QT_STL_MAP_ITERATOR(QT_PREPEND_NAMESPACE(QMultiMap));
+QN_REGISTER_QT_STL_MAP_ITERATOR(QHash);
+QN_REGISTER_QT_STL_MAP_ITERATOR(QMultiHash);
+QN_REGISTER_QT_STL_MAP_ITERATOR(QMap);
+QN_REGISTER_QT_STL_MAP_ITERATOR(QMultiMap);
 #undef QN_REGISTER_QT_STL_MAP_ITERATOR
 
 #if 0

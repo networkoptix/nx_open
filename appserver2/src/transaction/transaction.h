@@ -15,129 +15,133 @@ namespace ec2
 {
     namespace ApiCommand
     {
+        // TODO: #Elric #enum
         enum Value
         {
-		    NotDefined,
+		    NotDefined = 0,
 
-            testConnection,
-            connect,
+            testConnection = 1,
+            connect = 2,
 
-            clientInstanceId,
+            clientInstanceId = 3,
 
             //!ApiResourceTypeList
-            getResourceTypes,
+            getResourceTypes = 4,
             //!ApiResource
-            getResource,
+            getResource = 5,
             //!ApiSetResourceStatusData
-            setResourceStatus,
+            setResourceStatus = 6,
             //!ApiSetResourceDisabledData
-            setResourceDisabled,
+            setResourceDisabled = 7,
             //!ApiResourceParams
-            setResourceParams,
-            getResourceParams,
+            setResourceParams = 8,
+            getResourceParams = 9,
             //!ApiResource
-            saveResource,
-            removeResource,
+            saveResource = 10,
+            removeResource = 11,
             //!ApiPanicModeData
-            setPanicMode,
+            setPanicMode = 12,
             //!ApiFullInfo,
-            getAllDataList,
+            getAllDataList = 13,
             
             //!ApiCamera
-            saveCamera,
+            saveCamera = 14,
             //!ApiCameraList
-            saveCameras,
+            saveCameras = 15,
             //!ApiIdData
-            removeCamera,
-            getCameras,
+            removeCamera = 16,
+            getCameras = 17,
             //!ApiCameraServerItemList
-            getCameraHistoryList,
+            getCameraHistoryList = 18,
             //!ApiCameraServerItem
-            addCameraHistoryItem,
+            addCameraHistoryItem = 19,
 
-            getMediaServerList,
+            getMediaServerList = 20,
             //!ApiMediaServer
-            saveMediaServer,
+            saveMediaServer = 21,
             //!ApiIdData
-            removeMediaServer,
+            removeMediaServer = 22,
 
             //!ApiUser
-            saveUser,
-            getUserList,
+            saveUser = 23,
+            getUserList = 24,
             //!ApiIdData
-            removeUser,
+            removeUser = 25,
 
             //!ApiBusinessRuleList
-            getBusinessRuleList,
+            getBusinessRuleList = 26,
             //!ApiBusinessRule
-            saveBusinessRule,
+            saveBusinessRule = 27,
             //!ApiIdData
-            removeBusinessRule,
+            removeBusinessRule = 28,
             //!ApiBusinessActionData
-            broadcastBusinessAction,
+            broadcastBusinessAction = 29,
+            //!ApiBusinessActionData
+            execBusinessAction = 30,
 
             //!ApiResetBusinessRuleData
-            resetBusinessRules,
+            resetBusinessRules = 31,
 
             //!ApiLayout
-            saveLayouts,
+            saveLayouts = 32,
             //!ApiLayoutList
-            saveLayout,
+            saveLayout = 33,
             //!ApiLayoutList
-            getLayoutList,
+            getLayoutList = 34,
             //!ApiIdData
-            removeLayout,
+            removeLayout = 35,
             
             //!ApiVideowall
-            saveVideowall,
-            getVideowallList,
+            saveVideowall = 36,
+            getVideowallList = 37,
             //!ApiIdData
-            removeVideowall,
+            removeVideowall = 38,
 
             //!ApiVideoWallControlMessage
-            videowallControl,
+            videowallControl = 39,
 
             //!
-            listDirectory,
+            listDirectory = 40,
             //!ApiStoredFileData
-            getStoredFile,
+            getStoredFile = 41,
             //!ApiStoredFileData
-            addStoredFile,
+            addStoredFile = 42,
             //!ApiStoredFileData
-            updateStoredFile,
+            updateStoredFile = 43,
             //!QString
-            removeStoredFile,
+            removeStoredFile = 44,
 
             //!ApiLicenseList
-            addLicenses,
+            addLicenses = 45,
             //!ApiLicense
-            addLicense,
+            addLicense = 46,
             //!ApiLicenseList
-            getLicenses,
+            getLicenses = 47,
 
             // ApiEmailSettingsData
-            testEmailSettings,
+            testEmailSettings = 48,
 
             // ApiEmailData
-            sendEmail,
+            sendEmail = 49,
 
             //!ApiResourceParamList
-            getSettings,
+            getSettings = 50,
             //!ApiResourceParamList
-            saveSettings,
+            saveSettings = 51,
 
-            getCurrentTime,
+            getCurrentTime = 52,
 
-            tranSyncRequest,
-            tranSyncResponse,
+            tranSyncRequest = 53,
+            tranSyncResponse = 54,
             
-            serverAliveInfo,
+            serverAliveInfo = 55,
             
             //!ApiLockInfo
-            lockRequest,
-            lockResponse,
-            unlockRequest,
+            lockRequest = 56,
+            lockResponse = 57,
+            unlockRequest = 58,
         };
+        QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
         QString toString( Value val );
         bool isSystem( Value val );

@@ -156,7 +156,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(smac);
+    resource->setMAC(QnMacAddress(smac));
 
     local_results.push_back(resource);
 

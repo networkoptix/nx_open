@@ -3,7 +3,7 @@
 
 #include "binary.h"
 
-#include <utility> /* For std::pair. */
+#include <utility> /* For std::pair, std::min. */
 #include <array>
 #include <vector>
 #include <set>
@@ -11,18 +11,22 @@
 
 #include <boost/preprocessor/tuple/enum.hpp>
 
-#include <QtCore/QtEndian>
-#include <QtCore/QString>
-#include <QtCore/QUuid>
-#include <QtCore/QList>
-#include <QtCore/QLinkedList>
-#include <QtCore/QVector>
-#include <QtCore/QMap>
-#include <QtCore/QSet>
-#include <QtCore/QHash>
-#include <QtCore/QVarLengthArray>
+#ifndef QN_NO_QT
+#   include <QtCore/QtEndian>
+#   include <QtCore/QString>
+#   include <QtCore/QByteArray>
+#   include <QtCore/QUrl>
+#   include <QtCore/QUuid>
+#endif
 
 #include <utils/common/container.h>
+
+#ifndef QN_NO_QT
+#   include <utils/common/latin1_array.h>
+#endif
+
+#include "enum.h"
+
 
 namespace QnBinaryDetail {
     // TODO: #Elric #EC2 remove / move
@@ -85,9 +89,16 @@ namespace QnBinaryDetail {
         qint32 size;
         if(!QnBinary::deserialize(stream, &size))
             return false;
+        if(size < 0)
+            return false;
+
+        /* Don't reserve too much. Big size may be a result of invalid input,
+         * and in this case we don't want to crash with out-of-memory exception.
+         * Limit: no more than 1024 elements, and no more than 1Mb of memory. */
+        qint32 maxSize = std::min(1024, 1024 * 1024 / static_cast<int>(sizeof(value_type)));
 
         QnContainer::clear(*target);
-        QnContainer::reserve(*target, size);
+        QnContainer::reserve(*target, std::min(size, maxSize));
 
         for(int i = 0; i < size; i++)
             if(!deserialize_container_element(stream, target, identity<value_type>(), typename QnContainer::container_category<Container>::type()))
@@ -99,133 +110,133 @@ namespace QnBinaryDetail {
 } // namespace QnBinaryDetail
 
 
-template <class Output>
+template<class Output>
 void serialize(qint32 value, QnOutputBinaryStream<Output> *stream) {
     qint32 tmp = qToBigEndian(value);
     stream->write(&tmp, sizeof(tmp));
 }
 
-template <class Output>
+template<class Output>
 void serialize(quint32 value, QnOutputBinaryStream<Output> *stream) {
     quint32 tmp = qToBigEndian(value);
     stream->write(&tmp, sizeof(tmp));
 }
 
-template <class Output>
+template<class Output>
 void serialize(qint16 value, QnOutputBinaryStream<Output> *stream) {
     qint16 tmp = qToBigEndian(value);
     stream->write(&tmp, sizeof(tmp));
 }
 
-template <class Output>
+template<class Output>
 void serialize(quint16 value, QnOutputBinaryStream<Output> *stream) {
     quint16 tmp = qToBigEndian(value);
     stream->write(&tmp, sizeof(tmp));
 }
 
-template <class Output>
+template<class Output>
 void serialize(qint8 value, QnOutputBinaryStream<Output> *stream) {
     stream->write(&value, sizeof(value));
 }
 
-template <class Output>
+template<class Output>
 void serialize(quint8 value, QnOutputBinaryStream<Output> *stream) {
     stream->write(&value, sizeof(value));
 }
 
-template <class Output>
+template<class Output>
 void serialize(qint64 value, QnOutputBinaryStream<Output> *stream) {
     qint64 tmp = qToBigEndian(value);
     stream->write(&tmp, sizeof(value));
 }
 
-template <class Output>
+template<class Output>
 void serialize(float value, QnOutputBinaryStream<Output> *stream) {
     stream->write(&value, sizeof(value));
 }
 
-template <class Output>
+template<class Output>
 void serialize(double value, QnOutputBinaryStream<Output> *stream) {
     stream->write(&value, sizeof(value));
 }
 
-template <class Output>
+template<class Output>
 void serialize(bool value, QnOutputBinaryStream<Output> *stream) {
     quint8 t = value ? 0xff : 0;
     stream->write(&t, 1);
 }
 
-template <class T>
-bool deserialize(QnInputBinaryStream<T> *stream, qint32 *target) {
+template<class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, qint32 *target) {
     qint32 tmp;
-    if( stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
+    if(stream->read(&tmp, sizeof(tmp)) != sizeof(tmp))
         return false;
     *target = qFromBigEndian(tmp);
     return true;
 }
 
-template <class T>
-bool deserialize(QnInputBinaryStream<T> *stream, quint32 *target) {
+template<class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, quint32 *target) {
     quint32 tmp;
-    if( stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
+    if(stream->read(&tmp, sizeof(tmp)) != sizeof(tmp))
         return false;
     *target = qFromBigEndian(tmp);
     return true;
 }
 
-template <class T>
-bool deserialize(QnInputBinaryStream<T> *stream, qint16 *target) {
+template<class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, qint16 *target) {
     qint16 tmp;
-    if( stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
+    if(stream->read(&tmp, sizeof(tmp)) != sizeof(tmp))
         return false;
     *target = qFromBigEndian(tmp);
     return true;
 }
 
-template <class T>
-bool deserialize(QnInputBinaryStream<T> *stream, quint16 *target) {
+template<class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, quint16 *target) {
     quint16 tmp;
-    if( stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
+    if(stream->read(&tmp, sizeof(tmp)) != sizeof(tmp))
         return false;
     *target = qFromBigEndian(tmp);
     return true;
 }
 
-template <class T>
-bool deserialize(QnInputBinaryStream<T> *stream, qint8 *target) {
-    if( stream->read(target, sizeof(*target)) != sizeof(*target) )
+template<class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, qint8 *target) {
+    if(stream->read(target, sizeof(*target)) != sizeof(*target))
         return false;
     return true;
 }
 
-template <class T>
-bool deserialize(QnInputBinaryStream<T> *stream, quint8 *target) {
-    if( stream->read(target, sizeof(*target)) != sizeof(*target) )
+template<class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, quint8 *target) {
+    if(stream->read(target, sizeof(*target)) != sizeof(*target))
         return false;
     return true;
 }
 
-template <class T>
-bool deserialize(QnInputBinaryStream<T> *stream, qint64 *target) {
+template<class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, qint64 *target) {
     qint64 tmp;
-    if( stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
+    if(stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
         return false;
     *target = qFromBigEndian(tmp);
     return true;
 }
 
-template <class T>
-bool deserialize(QnInputBinaryStream<T> *stream, float *target) {
+template<class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, float *target) {
     return stream->read(target, sizeof(*target)) == sizeof(*target);
 }
 
-template <class T>
-bool deserialize(QnInputBinaryStream<T> *stream, double *target) {
+template<class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, double *target) {
     return stream->read(target, sizeof(*target)) == sizeof(*target);
 }
 
-template <class T>
-bool deserialize(QnInputBinaryStream<T> *stream, bool *target) {
+template<class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, bool *target) {
     quint8 tmp;
     if(stream->read(&tmp, 1) != 1)
         return false;
@@ -234,13 +245,15 @@ bool deserialize(QnInputBinaryStream<T> *stream, bool *target) {
 }
 
 
-template <class Output>
+#ifndef QN_NO_QT
+
+template<class Output>
 void serialize(const QByteArray &value, QnOutputBinaryStream<Output> *stream) {
     serialize(static_cast<qint32>(value.size()), stream);
     stream->write(value.data(), value.size());
 }
 
-template <class T>
+template<class T>
 bool deserialize(QnInputBinaryStream<T> *stream, QByteArray *target) {
     qint32 size;
     if(!QnBinary::deserialize(stream, &size))
@@ -250,7 +263,18 @@ bool deserialize(QnInputBinaryStream<T> *stream, QByteArray *target) {
 }
 
 
-template <class Output>
+template<class Output>
+void serialize(const QnLatin1Array &value, QnOutputBinaryStream<Output> *stream) {
+    serialize(static_cast<const QByteArray &>(value), stream);
+}
+
+template<class T>
+bool deserialize(QnInputBinaryStream<T> *stream, QnLatin1Array *target) {
+    return deserialize(stream, static_cast<QByteArray *>(target));
+}
+
+
+template<class Output>
 void serialize(const QString &value, QnOutputBinaryStream<Output> *stream) {
     serialize(value.toUtf8(), stream);
 }
@@ -296,35 +320,44 @@ bool deserialize(QnInputBinaryStream<Input> *stream, QUuid *target) {
     return true;
 }
 
-
-// TODO: #Elric #ec2 check all enums we're using for explicit values.
-
-template<class T, class Output>
-void serialize(const T &value, QnOutputBinaryStream<Output> *stream, typename std::enable_if<std::is_enum<T>::value>::type * = NULL) {
-    QnBinary::serialize(static_cast<qint32>(value), stream);
-}
-
-template<class T, class Input>
-bool deserialize(QnInputBinaryStream<Input> *stream, T *target, typename std::enable_if<std::is_enum<T>::value>::type* = NULL) {
-    qint32 tmp;
-    if(!QnBinary::deserialize(stream, &tmp))
-        return false;
-    *target = static_cast<T>(tmp);
-    return true;
-}
-
-
 template<class T, class Output>
 void serialize(const QFlags<T> &value, QnOutputBinaryStream<Output> *stream) {
+    QnSerialization::check_enum_binary<T>();
+
     QnBinary::serialize(static_cast<qint32>(value), stream);
 }
 
 template<class T, class Input>
 bool deserialize(QnInputBinaryStream<Input> *stream, QFlags<T> *target) {
+    QnSerialization::check_enum_binary<T>();
+
     qint32 tmp;
     if(!QnBinary::deserialize(stream, &tmp))
         return false;
     *target = static_cast<QFlags<T> >(tmp);
+    return true;
+}
+
+#endif // QN_NO_QT
+
+
+// TODO: #Elric #ec2 check all enums we're using for explicit values.
+
+template<class T, class Output>
+void serialize(const T &value, QnOutputBinaryStream<Output> *stream, typename std::enable_if<std::is_enum<T>::value>::type * = NULL) {
+    QnSerialization::check_enum_binary<T>();
+
+    QnBinary::serialize(static_cast<qint32>(value), stream);
+}
+
+template<class T, class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, T *target, typename std::enable_if<std::is_enum<T>::value>::type* = NULL) {
+    QnSerialization::check_enum_binary<T>();
+
+    qint32 tmp;
+    if(!QnBinary::deserialize(stream, &tmp))
+        return false;
+    *target = static_cast<T>(tmp);
     return true;
 }
 
@@ -340,6 +373,15 @@ template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Input>                             
 bool deserialize(QnInputBinaryStream<Input> *stream, TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> *target) { \
     return QnBinaryDetail::deserialize_container(stream, target);               \
 }                                                                               \
+
+template<class T> class QSet;
+template<class T> class QList;
+template<class T> class QLinkedList;
+template<class T> class QVector;
+template<class T, int N> class QVarLengthArray;
+template<class Key, class T> class QMap;
+template<class Key, class T> class QHash;
+/* Forward-declaring STL containers is undefined behavior... */ 
 
 QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QSet, (class T), (T));
 QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QList, (class T), (T));

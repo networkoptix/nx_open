@@ -578,6 +578,7 @@ QHostAddress resolveAddress(const QString& addrString)
     return QHostAddress();
 }
 
+// TODO: #Elric I want to kill
 int strEqualAmount(const char* str1, const char* str2)
 {
     int rez = 0;
@@ -592,7 +593,7 @@ int strEqualAmount(const char* str1, const char* str2)
 
 bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress)
 {
-    int eq1 = strEqualAmount(host.toLocal8Bit().constData(), newAddress.toLocal8Bit().constData());
-    int eq2 = strEqualAmount(host.toLocal8Bit().constData(), oldAddress.toLocal8Bit().constData());
+    int eq1 = strEqualAmount(host.toLatin1().constData(), newAddress.toLatin1().constData());
+    int eq2 = strEqualAmount(host.toLatin1().constData(), oldAddress.toLatin1().constData());
     return eq1 > eq2;
 }

@@ -164,9 +164,12 @@ namespace ec2
         }
         
         ErrorCode getServersSync(QnMediaServerResourceList* const serverList ) {
-            using namespace std::placeholders;
-            int(AbstractMediaServerManager::*fn)(impl::GetServersHandlerPtr) = &AbstractMediaServerManager::getServers;
-            return impl::doSyncCall<impl::GetServersHandler>( std::bind(fn, this, _1), serverList );
+            return impl::doSyncCall<impl::GetServersHandler>( 
+                [=](const impl::GetServersHandlerPtr &handler) {
+                    return this->getServers(handler);
+                }, 
+                serverList 
+            );
         }
 
         /*!
@@ -177,9 +180,12 @@ namespace ec2
         }
 
         ErrorCode saveSync( const QnMediaServerResourcePtr& serverRes, QnMediaServerResourcePtr* const server ) {
-            using namespace std::placeholders;
-            int(AbstractMediaServerManager::*fn)(const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr) = &AbstractMediaServerManager::save;
-            return impl::doSyncCall<impl::SaveServerHandler>( std::bind(fn, this, serverRes, _1), server );
+            return impl::doSyncCall<impl::SaveServerHandler>( 
+                [=](const impl::SaveServerHandlerPtr &handler) {
+                    return this->save(serverRes, handler);
+                },
+                server 
+            );
         }
 
         /*!
@@ -393,6 +399,12 @@ namespace ec2
             return broadcastBusinessAction( businessAction, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        template<class TargetType, class HandlerType> int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnId& dstPeer, TargetType* target, HandlerType handler ) {
+            return sendBusinessAction( businessAction, dstPeer, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+
         /*!
             \param handler Functor with params: (ErrorCode)
         */
@@ -407,6 +419,7 @@ namespace ec2
         void businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
         void businessRuleReset( const QnBusinessEventRuleList& rules );
         void gotBroadcastAction(const QnAbstractBusinessActionPtr& action);
+        void execBusinessAction(const QnAbstractBusinessActionPtr& action);
 
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
@@ -415,6 +428,7 @@ namespace ec2
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) = 0;
         virtual int deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler ) = 0;
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractBusinessEventManager> AbstractBusinessEventManagerPtr;

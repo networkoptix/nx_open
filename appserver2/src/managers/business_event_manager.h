@@ -24,14 +24,19 @@ namespace ec2
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) override;
         virtual int deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler ) override;
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) override;
+        virtual int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnId& dstPeer, impl::SimpleHandlerPtr handler ) override;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) override;
 
         void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran )
         {
-            assert( tran.command == ApiCommand::broadcastBusinessAction );
+            assert( tran.command == ApiCommand::broadcastBusinessAction || tran.command == ApiCommand::execBusinessAction);
             QnAbstractBusinessActionPtr businessAction;
             fromApiToResource(tran.params, businessAction, m_resCtx.pool);
-            emit gotBroadcastAction( businessAction );
+            businessAction->setReceivedFromRemoteHost(true);
+            if (tran.command == ApiCommand::broadcastBusinessAction)
+                emit gotBroadcastAction( businessAction );
+            else
+                emit execBusinessAction( businessAction );
         }
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran )

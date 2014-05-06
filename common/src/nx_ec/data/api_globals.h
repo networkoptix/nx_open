@@ -12,22 +12,20 @@
  * If this macro is not defined, then default types from Qt will be used.
  */
 
-#ifdef QN_API_GLOBALS_HEADER
-#   include QN_API_GLOBALS_HEADER
-#else
+#ifndef QN_NO_QT
+#   include <QtCore/QString>
+#   include <QtCore/QByteArray>
+#endif
 
-#include <QtCore/QString>
-#include <QtCore/QByteArray>
+#ifndef QN_NO_BASE
+#   include <utils/common/id.h>
+#   include <utils/common/email.h>
+#   include <utils/common/latin1_array.h>
+#   include <api/model/email_attachment.h>
+#   include <core/resource/media_resource.h>
+#   include <business/business_fwd.h>
+#endif
 
-#include <api/model/email_attachment.h>
-
-#include <utils/common/id.h>
-#include <business/business_fwd.h>
-#include <core/resource/media_resource.h>
-#include <utils/common/email.h>
-
-#include "api_fwd.h"
-
-#endif // QN_API_TYPES_HEADER
+#   include "api_fwd.h"
 
 #endif // QN_API_GLOBALS_H

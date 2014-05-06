@@ -16,6 +16,7 @@ class DeviceFileCatalog: public QObject
 signals:
     void firstDataRemoved(int n);
 public:
+    // TODO: #Elric #enum
     enum RebuildMethod {
         Rebuild_None,    // do not rebuild chunk's database
         Rebuild_Canceled,
@@ -51,6 +52,7 @@ public:
         quint32 fileSizeLo;
     };
 
+    // TODO: #Elric #enum
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
 
     DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role);

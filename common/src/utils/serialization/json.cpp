@@ -24,12 +24,15 @@ void QJsonDetail::serialize_json(const QJsonValue &value, QByteArray *target, QJ
         }
         break;
     }
-    case QJsonValue::String:
-        target->clear();
-        target->append('\"');
-        target->append(value.toString().toUtf8());
-        target->append('\"');
+    case QJsonValue::String: {
+        /* We convert a string via QJsonDocument because escaping the special
+         * characters is not that easy. */
+        QJsonArray array;
+        array.push_back(value);
+        QByteArray result = QJsonDocument(array).toJson(QJsonDocument::Compact);
+        *target = result.mid(1, result.size() - 2);
         break;
+    }
     case QJsonValue::Array:
         *target = QJsonDocument(value.toArray()).toJson(format);
         break;
@@ -116,13 +119,25 @@ bool QJsonDetail::deserialize_json(const QByteArray &value, QJsonValue *target) 
         return ok;
     }
     case QJsonValue::String: {
-        QByteArray trimmed = value.trimmed();
-        if(trimmed.startsWith('\"') && trimmed.endsWith('\"')) {
-            *target = QJsonValue(QString::fromUtf8(trimmed.constData() + 1, trimmed.size() - 2));
-            return true;
-        } else {
+        /* We convert string through QJsonDocument because handling escaping is
+         * not that easy. */
+        QByteArray arrayValue;
+        arrayValue.reserve(value.size() + 2);
+        arrayValue.append("[");
+        arrayValue.append(value);
+        arrayValue.append("]");
+
+        QJsonParseError error;
+        QJsonDocument document = QJsonDocument::fromJson(arrayValue, &error);
+        if(error.error != QJsonParseError::NoError)
             return false;
-        }
+
+        QJsonArray array = document.array();
+        if(array.size() != 1)
+            return false;
+        
+        *target = array[0];
+        return true;
     }
     case QJsonValue::Array:
     case QJsonValue::Object: {
@@ -147,8 +162,10 @@ bool QJsonDetail::deserialize_json(const QByteArray &value, QJsonValue *target) 
 class QnJsonSerializerStorage: public QnSerializerStorage<QnJsonSerializer> {
 public:
     QnJsonSerializerStorage() {
-        registerSerializer<QString>();
-        registerSerializer<double>();
+        registerSerializer<QJsonValue>();
+        registerSerializer<QJsonArray>();
+        registerSerializer<QJsonObject>();
+
         registerSerializer<bool>();
         registerSerializer<char>();
         registerSerializer<signed char>();
@@ -161,9 +178,26 @@ public:
         registerSerializer<unsigned long>();
         registerSerializer<long long>();
         registerSerializer<unsigned long long>();
+        registerSerializer<float>();
+        registerSerializer<double>();
 
+        registerSerializer<QString>();
+        registerSerializer<QByteArray>();
+        
         registerSerializer<QColor>();
         registerSerializer<QBrush>();
+        registerSerializer<QSize>();
+        registerSerializer<QSizeF>();
+        registerSerializer<QRect>();
+        registerSerializer<QRectF>();
+        registerSerializer<QPoint>();
+        registerSerializer<QPointF>();
+        registerSerializer<QRegion>();
+        registerSerializer<QVector2D>();
+        registerSerializer<QVector3D>();
+        registerSerializer<QVector4D>();
+        registerSerializer<QUuid>();
+        registerSerializer<QUrl>();
         registerSerializer<QFont>();
     }
 };

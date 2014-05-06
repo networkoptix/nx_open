@@ -5,6 +5,8 @@
 
 #include <QtCore/QUuid>
 
+#include "enum.h"
+
 // TODO: #Elric enumz!
 // TODO: #Elric #EC2 static assert for enum size.
 
@@ -90,11 +92,15 @@ inline void deserialize_field(const QVariant &value, QUuid *target) {
 
 template<class T>
 void serialize_field(const T &value, QVariant *target, typename std::enable_if<std::is_enum<T>::value>::type * = NULL) {
+    QnSerialization::check_enum_binary<T>();
+
     QnSql::serialize_field(static_cast<qint32>(value), target);
 }
 
 template<class T>
 void deserialize_field(const QVariant &value, T *target, typename std::enable_if<std::is_enum<T>::value>::type * = NULL) {
+    QnSerialization::check_enum_binary<T>();
+
     qint32 tmp;
     QnSql::deserialize_field(value, &tmp);
     *target = static_cast<T>(tmp);
@@ -103,11 +109,15 @@ void deserialize_field(const QVariant &value, T *target, typename std::enable_if
 
 template<class T>
 inline void serialize_field(const QFlags<T> &value, QVariant *target) {
+    QnSerialization::check_enum_binary<T>();
+
     QnSql::serialize_field(static_cast<qint32>(value), target);
 }
 
 template<class T>
 inline void deserialize_field(const QVariant &value, QFlags<T> *target) {
+    QnSerialization::check_enum_binary<T>();
+
     qint32 tmp;
     QnSql::deserialize_field(value, &tmp);
     *target = static_cast<QFlags<T> >(tmp); 

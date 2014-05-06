@@ -111,11 +111,13 @@ namespace ec2 {
     (ApiVideowallScreenData)\
     (ApiVideowallScreenWithRefData)\
 
+#ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         QN_EC2_API_DATA_CLASSES,
-        (binary)(json)(sql)
+        (binary)(json)(sql_record)(csv_record)
     );
-
+#endif
+    
 } // namespace ec2
 
 #endif // QN_EC2_API_FWD_H

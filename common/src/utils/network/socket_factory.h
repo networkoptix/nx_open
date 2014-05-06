@@ -16,6 +16,7 @@
 class SocketFactory
 {
 public:
+    // TODO: #Elric #enum
     enum NatTraversalType
     {
         nttAuto,

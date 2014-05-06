@@ -2,15 +2,22 @@
 #define CAMERA_SETTINGS_DIALOG_H
 
 #include <QtWidgets/QWidget>
-#include "api/media_server_connection.h"
-#include <core/resource/resource_fwd.h>
-#include "camera_settings_tab.h"
-#include "utils/camera_advanced_settings_xml_parser.h"
-#include "ui/workbench/workbench_context_aware.h"
-#include "utils/common/connective.h"
+#include <QtNetwork/QNetworkReply>
+
 #ifdef WEBKIT_PRESENT
 #include <QtWebKitWidgets/QtWebKitWidgets>
 #endif
+
+#include "utils/camera_advanced_settings_xml_parser.h"
+#include "utils/common/connective.h"
+
+#include <core/resource/resource_fwd.h>
+
+#include "api/media_server_connection.h"
+
+#include "ui/workbench/workbench_context_aware.h"
+
+#include "camera_settings_tab.h"
 
 namespace Ui {
     class SingleCameraSettingsWidget;
