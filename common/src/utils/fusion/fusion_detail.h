@@ -11,6 +11,11 @@
 #include "fusion_fwd.h"
 #include "fusion_keys.h"
 
+namespace QnFusion {
+    template<class T, class Visitor>
+    bool visit_members(T &&value, Visitor &&visitor);
+} // namespace QnFusion
+
 namespace QnFusionDetail {
     struct na {};
     struct yes_type { char dummy; };
