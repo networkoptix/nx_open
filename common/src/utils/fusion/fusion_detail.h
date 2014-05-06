@@ -9,6 +9,7 @@
 #endif 
 
 #include "fusion_fwd.h"
+#include "fusion_keys.h"
 
 namespace QnFusionDetail {
     struct na {};
