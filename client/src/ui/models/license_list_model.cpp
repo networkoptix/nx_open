@@ -4,6 +4,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
+#include "utils/math/math.h"
 
 QnLicenseListModel::QnLicenseListModel(QObject *parent):
     base_type(parent)
@@ -88,16 +89,16 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
     case ExpirationDateColumn:
         item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString());
         break;
-    case ExpiresInColumn: {
-        qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-        qint64 expirationTime = license->expirationTime();
+    case ExpiresInColumn: 
+    {
+        QnLicense::ErrorCode errCode;
+        if (qnLicensePool->isLicenseValid(license, &errCode))
+        {
+            qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+            qint64 expirationTime = license->expirationTime();
 
-        qint64 day = 1000ll * 60ll * 60ll * 24ll;
-        qint64 timeLeft = expirationTime - currentTime;
-        if(timeLeft < 0) {
-            item->setText(tr("Expired"));
-            item->setData(QBrush(colors.expired), Qt::ForegroundRole);
-        } else {
+            qint64 day = 1000ll * 60ll * 60ll * 24ll;
+            qint64 timeLeft = expirationTime - currentTime;
             if(timeLeft < 5 * day)
                 item->setData(QBrush(colors.warning), Qt::ForegroundRole);
 
@@ -106,9 +107,13 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
                 item->setText(tr("Today"));
             } else if(daysLeft == 1) {
                 item->setText(tr("Tomorrow"));
-            } else {
+            } else if (qBetween(0, daysLeft, 10000)) {
                 item->setText(tr("In %n days", 0, daysLeft));
             }
+        }
+        else {
+            item->setText(license->errorMessage(errCode));
+            item->setData(QBrush(colors.expired), Qt::ForegroundRole);
         }
         break;
     }

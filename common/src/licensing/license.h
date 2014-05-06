@@ -32,6 +32,16 @@ public:
         Invalid
     };
 
+    enum ErrorCode {
+        NoError,
+        InvalidSignature,
+        InvalidHardwareID,
+        InvalidBrand,
+        Expired,
+        InvalidType
+
+    };
+
     QnLicense();
     QnLicense(const QByteArray& licenseBlock);
 
@@ -40,7 +50,9 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(const QList<QByteArray> &hardwareIds, const QString &brand) const;
+    bool isValid(const QList<QByteArray> &hardwareIds, const QString &brand, ErrorCode* errCode = 0) const;
+
+    static QString errorMessage(ErrorCode errCode);
 
     /**
      * @returns                         Whether this license is for analog cameras.
@@ -175,8 +187,7 @@ public:
     void removeRemoteHardwareIds(const QnId& peer);
 
     QByteArray currentHardwareId() const;
-    bool isLicenseValid(QnLicensePtr license) const;
-
+    bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
 signals:
     void licensesChanged();
 
