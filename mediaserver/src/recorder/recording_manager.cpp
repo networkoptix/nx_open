@@ -48,8 +48,8 @@ void QnRecordingManager::start()
 
     m_scheduleWatchingTimer.start(1000);
 
-    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::locked, this, &QnRecordingManager::at_licenseMutexLocked);
-    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout);
+    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::locked, this, &QnRecordingManager::at_licenseMutexLocked, Qt::QueuedConnection);
+    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout, Qt::QueuedConnection);
 
     QThread::start();
 }
@@ -676,6 +676,7 @@ void QnRecordingManager::at_licenseMutexLocked(QByteArray name)
                 recordingDigital--;
         }
     }
+    m_licenseMutex->unlock();
     m_licenseMutex.clear();
 
     if (disabledCameras > 0) {
@@ -684,9 +685,10 @@ void QnRecordingManager::at_licenseMutexLocked(QByteArray name)
     }
 }
 
-void QnRecordingManager::at_licenseMutexTimeout()
+void QnRecordingManager::at_licenseMutexTimeout(QByteArray name)
 {
-    m_licenseMutex.clear();
+    if (name == LICENSE_OVERFLOW_LOCK_NAME)
+        m_licenseMutex.clear();
 }
 
 //Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)

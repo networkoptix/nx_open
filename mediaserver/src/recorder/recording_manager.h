@@ -71,7 +71,7 @@ private:
     bool updateCameraHistory(QnResourcePtr res);
 
     void at_licenseMutexLocked(QByteArray name);
-    void at_licenseMutexTimeout();
+    void at_licenseMutexTimeout(QByteArray name);
 private:
     mutable QMutex m_mutex;
     QSet<QnResourcePtr> m_onlineCameras;
