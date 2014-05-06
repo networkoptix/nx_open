@@ -23,17 +23,15 @@ namespace QnCsvDetail {
     template<class Collection, class Output>
     void serialize_collection(const Collection &value, QnCsvStreamWriter<Output> *stream) {
         typedef typename std::iterator_traits<typename boost::range_mutable_iterator<Collection>::type>::value_type value_type;
+        typedef typename QnCsv::csv_category<value_type>::type category_type;
 
-        serialize_collection_header(value_type(), stream, typename QnCsv::csv_category<value_type>::type());
-
-        for(const auto &element: value) {
-            QnCsv::serialize_record(element, stream);
-            stream->writeEndline();
-        }
+        serialize_collection_header(value_type(), stream, category_type());
+        for(const auto &element: value)
+            serialize_collection_element(element, stream, category_type());
     }
 
     template<class Element, class Output>
-    void serialize_collection_header(const Element &value, QnCsvStreamWriter<Output> *stream, const QnCsv::field_tag &) {
+    void serialize_collection_header(const Element &, QnCsvStreamWriter<Output> *stream, const QnCsv::field_tag &) {
         stream->writeField(lit("value"));
         stream->writeEndline();
     }
@@ -41,6 +39,18 @@ namespace QnCsvDetail {
     template<class Element, class Output>
     void serialize_collection_header(const Element &value, QnCsvStreamWriter<Output> *stream, const QnCsv::record_tag &) {
         QnCsv::serialize_record_header(value, QString(), stream);
+        stream->writeEndline();
+    }
+
+    template<class Element, class Output>
+    void serialize_collection_element(const Element &value, QnCsvStreamWriter<Output> *stream, const QnCsv::field_tag &) {
+        QnCsv::serialize_field(value, stream);
+        stream->writeEndline();
+    }
+
+    template<class Element, class Output>
+    void serialize_collection_element(const Element &value, QnCsvStreamWriter<Output> *stream, const QnCsv::record_tag &) {
+        QnCsv::serialize_record(value, stream);
         stream->writeEndline();
     }
 
