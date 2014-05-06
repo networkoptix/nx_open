@@ -6,6 +6,7 @@
 #include <core/resource/media_server_resource.h>
 #include <utils/common/system_information.h>
 #include <utils/common/software_version.h>
+#include <utils/media_server_update_tool.h>
 
 class QnServerUpdatesModel : public QAbstractTableModel {
     Q_OBJECT
@@ -21,37 +22,20 @@ public:
         ColumnCount
     };
 
-    enum UpdateStatus {
-        NotFound,
-        Found,
-        Uploading,
-        Installing,
-        Installed
-    };
-
-    struct UpdateInformation {
-        UpdateStatus status;
-        QnSoftwareVersion version;
-        int progress;
-
-        UpdateInformation() : progress(0) {}
-    };
-    typedef QHash<QnSystemInformation, UpdateInformation> UpdateInformationHash;
-
     class Item {
     public:
-        Item(const QnMediaServerResourcePtr &server, const UpdateInformation &updateInfo) :
+        Item(const QnMediaServerResourcePtr &server, const QnMediaServerUpdateTool::PeerUpdateInformation &updateInfo) :
             m_server(server), m_updateInfo(updateInfo)
         {}
 
         QnMediaServerResourcePtr server() const;
-        UpdateInformation updateInformation() const;
+        QnMediaServerUpdateTool::PeerUpdateInformation updateInformation() const;
 
         QVariant data(int column, int role) const;
 
     private:
         QnMediaServerResourcePtr m_server;
-        UpdateInformation m_updateInfo;
+        QnMediaServerUpdateTool::PeerUpdateInformation m_updateInfo;
 
         friend class QnServerUpdatesModel;
     };
@@ -67,9 +51,8 @@ public:
     QModelIndex index(const QnMediaServerResourcePtr &server) const;
 
     QnMediaServerResourceList servers() const;
-    void setUpdatesInformation(const UpdateInformationHash &updates);
-
-    void setProgress(const QnMediaServerResourcePtr &server, int progress);
+    void setUpdatesInformation(const QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> &updates);
+    void setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update);
 
 private:
     void resetResourses();
@@ -81,7 +64,7 @@ private slots:
 
 private:
     QList<Item*> m_items;
-    UpdateInformationHash m_updates;
+    QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> m_updates;
 };
 
 #endif // SERVER_UPDATES_MODEL_H

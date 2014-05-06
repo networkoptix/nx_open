@@ -174,7 +174,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, Trans
     }
 
     QByteArray chunkData;
-    m_serializer.serializeTran(chunkData, serializedTran, transportHeader.processedPeers + peersToSend(tran.command));
+    m_serializer.serializeTran(chunkData, serializedTran, TransactionTransportHeader(transportHeader.processedPeers + peersToSend(tran.command)));
 
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {

@@ -38,7 +38,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
 
     connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,           &QnServerUpdatesWidget::updateUi);
     connect(m_updateTool,       &QnMediaServerUpdateTool::progressChanged,      ui->updateProgessBar,   &QProgressBar::setValue);
-    connect(m_updateTool,       &QnMediaServerUpdateTool::serverProgressChanged,this,           &QnServerUpdatesWidget::at_updateTool_serverProgressChanged);
+    connect(m_updateTool,       &QnMediaServerUpdateTool::peerChanged,          this,           &QnServerUpdatesWidget::at_updateTool_peerChanged);
 
     updateUi();
     // hide them for the first time only
@@ -47,6 +47,16 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
 }
 
 QnServerUpdatesWidget::~QnServerUpdatesWidget() {}
+
+bool QnServerUpdatesWidget::cancelUpdate() {
+    if (m_updateTool->isUpdating())
+        return m_updateTool->cancelUpdate();
+    return true;
+}
+
+bool QnServerUpdatesWidget::isUpdating() const {
+    return m_updateTool->isUpdating();
+}
 
 void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {
     m_updateTool->checkForUpdates();
@@ -88,36 +98,8 @@ void QnServerUpdatesWidget::at_updateButton_clicked() {
     m_updateTool->updateServers();
 }
 
-void QnServerUpdatesWidget::at_updateTool_serverProgressChanged(const QnMediaServerResourcePtr &server, int progress) {
-    m_updatesModel->setProgress(server, progress);
-}
-
-void QnServerUpdatesWidget::updateUpdatesList() {
-    QnServerUpdatesModel::UpdateInformationHash modelUpdates;
-
-    QHash<QnSystemInformation, QnMediaServerUpdateTool::UpdateInformation> updates = m_updateTool->availableUpdates();
-    QnMediaServerUpdateTool::State toolState = m_updateTool->state();
-
-    for (auto it = updates.begin(); it != updates.end(); ++it) {
-        QnServerUpdatesModel::UpdateInformation updateInfo;
-        updateInfo.version = it.value().version;
-        switch (toolState) {
-        case QnMediaServerUpdateTool::Idle:
-        case QnMediaServerUpdateTool::CheckingForUpdates:
-        case QnMediaServerUpdateTool::DownloadingUpdate:
-            updateInfo.status = updateInfo.version.isNull() ? QnServerUpdatesModel::NotFound : QnServerUpdatesModel::Found;
-            break;
-        case QnMediaServerUpdateTool::UploadingUpdate:
-            updateInfo.status = QnServerUpdatesModel::Uploading;
-            break;
-        case QnMediaServerUpdateTool::InstallingUpdate:
-            updateInfo.status = QnServerUpdatesModel::Installing;
-            break;
-        }
-        modelUpdates.insert(it.key(), updateInfo);
-    }
-
-    m_updatesModel->setUpdatesInformation(modelUpdates);
+void QnServerUpdatesWidget::at_updateTool_peerChanged(const QnId &peerId) {
+    m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(peerId));
 }
 
 void QnServerUpdatesWidget::updateUi() {
@@ -125,35 +107,68 @@ void QnServerUpdatesWidget::updateUi() {
     bool updateFound = false;
     bool applying = false;
     bool cancellable = false;
+    bool hideLabel = false;
 
     switch (m_updateTool->state()) {
     case QnMediaServerUpdateTool::Idle:
-        switch (m_updateTool->updateCheckResult()) {
-        case QnMediaServerUpdateTool::UpdateFound:
-            updateFound = true;
-            break;
-        case QnMediaServerUpdateTool::InternetProblem: {
-            int result = QMessageBox::warning(this,
-                                              tr("Check for updates failed"),
-                                              tr("Cannot check for updates via the Internet.\n"
-                                                 "Do you want to create a download helper to download updates on the computer which is connected to the internet?"),
-                                              QMessageBox::Yes, QMessageBox::No);
-            if (result == QDialog::Accepted)
-                createUpdatesDownloader();
+        if (m_previousToolState <= QnMediaServerUpdateTool::CheckingForUpdates) {
+            switch (m_updateTool->updateCheckResult()) {
+            case QnMediaServerUpdateTool::UpdateFound:
+                updateFound = true;
+                break;
+            case QnMediaServerUpdateTool::InternetProblem: {
+                int result = QMessageBox::warning(this,
+                                                  tr("Check for updates failed"),
+                                                  tr("Cannot check for updates via the Internet.\n"
+                                                     "Do you want to create a download helper to download updates on the computer which is connected to the internet?"),
+                                                  QMessageBox::Yes, QMessageBox::No);
+                if (result == QDialog::Accepted)
+                    createUpdatesDownloader();
 
-            ui->noUpdatesLabel->setText(tr("Check for updates failed"));
-            break;
-        }
-        case QnMediaServerUpdateTool::NoNewerVersion:
-            ui->noUpdatesLabel->setText(tr("No updates found"));
-            break;
-        case QnMediaServerUpdateTool::NoSuchBuild:
-            QMessageBox::critical(this, tr("Wrong build number"), tr("There is no such build on the update server"));
-            ui->noUpdatesLabel->setText(tr("No updates found"));
-            break;
-        case QnMediaServerUpdateTool::UpdateImpossible:
-            ui->noUpdatesLabel->setText(tr("Update is impossible"));
-            break;
+                ui->noUpdatesLabel->setText(tr("Check for updates failed"));
+                break;
+            }
+            case QnMediaServerUpdateTool::NoNewerVersion:
+                ui->noUpdatesLabel->setText(tr("No updates found"));
+                break;
+            case QnMediaServerUpdateTool::NoSuchBuild:
+                QMessageBox::critical(this, tr("Wrong build number"), tr("There is no such build on the update server"));
+                ui->noUpdatesLabel->setText(tr("No updates found"));
+                break;
+            case QnMediaServerUpdateTool::UpdateImpossible:
+                ui->noUpdatesLabel->setText(tr("Update is impossible"));
+                break;
+            }
+        } else {
+            switch (m_updateTool->updateResult()) {
+            case QnMediaServerUpdateTool::UpdateSuccessful:
+                QMessageBox::information(this,
+                                         tr("Update successfull"),
+                                         tr("Update has been successfully finished.\n"
+                                            "Client will be restarted and updated."));
+                break;
+            case QnMediaServerUpdateTool::Cancelled:
+                QMessageBox::information(this,
+                                         tr("Update cancelled"),
+                                         tr("Update has been cancelled."));
+                break;
+            case QnMediaServerUpdateTool::DownloadingFailed:
+                QMessageBox::critical(this,
+                                      tr("Update failed"),
+                                      tr("Could not download updates."));
+                break;
+            case QnMediaServerUpdateTool::UploadingFailed:
+                QMessageBox::critical(this,
+                                      tr("Update failed"),
+                                      tr("Could not upload updates to servers."));
+                break;
+            case QnMediaServerUpdateTool::InstallationFailed:
+                QMessageBox::critical(this,
+                                      tr("Update failed"),
+                                      tr("Could not install updates on one or more servers."));
+                break;
+            }
+            hideLabel = true;
         }
         break;
     case QnMediaServerUpdateTool::CheckingForUpdates:
@@ -177,7 +192,8 @@ void QnServerUpdatesWidget::updateUi() {
         break;
     }
 
-    updateUpdatesList();
+    foreach (const QnMediaServerResourcePtr &server, m_updatesModel->servers())
+        m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(server->getId()));
 
     if (checkingForUpdates)
         ui->buttonBox->showProgress(tr("Checking for updates..."));
@@ -187,8 +203,10 @@ void QnServerUpdatesWidget::updateUi() {
     ui->updateButton->setVisible(updateFound);
     ui->cancelButton->setVisible(applying);
     ui->cancelButton->setEnabled(cancellable);
-    ui->noUpdatesLabel->setVisible(!applying && !ui->updateButton->isVisible());
+    ui->noUpdatesLabel->setVisible(!hideLabel && !applying && !ui->updateButton->isVisible());
     ui->updateStateWidget->setVisible(applying);
+
+    m_previousToolState = m_updateTool->state();
 }
 
 void QnServerUpdatesWidget::createUpdatesDownloader() {

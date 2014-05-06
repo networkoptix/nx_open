@@ -77,19 +77,24 @@ QnMediaServerResourceList QnServerUpdatesModel::servers() const {
     return servers;
 }
 
-void QnServerUpdatesModel::setUpdatesInformation(const UpdateInformationHash &updates) {
-    m_updates = updates;
+void QnServerUpdatesModel::setUpdatesInformation(const QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> &updates) {
     foreach (Item *item, m_items)
-        item->m_updateInfo = m_updates.value(item->server()->getSystemInfo());
+        item->m_updateInfo = updates[item->server()->getId()];
 
     if (!m_items.isEmpty())
         emit dataChanged(index(0, UpdateColumn), index(m_items.size() - 1, UpdateColumn));
 }
 
-void QnServerUpdatesModel::setProgress(const QnMediaServerResourcePtr &server, int progress) {
-    foreach (Item *item, m_items) {
-        if (item->server() == server)
-            item->m_updateInfo.progress = progress;
+void QnServerUpdatesModel::setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update) {
+    m_updates[update.server->getId()] = update;
+
+    for (int i = 0; i < m_items.size(); i++) {
+        Item *item = m_items[i];
+        if (item->server() == update.server) {
+            item->m_updateInfo = update;
+            emit dataChanged(index(i, UpdateColumn), index(i, UpdateColumn));
+            break;
+        }
     }
 }
 
@@ -98,9 +103,10 @@ void QnServerUpdatesModel::resetResourses() {
 
     qDeleteAll(m_items);
     m_items.clear();
+
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
         QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-        m_items.append(new Item(server, m_updates.value(server->getSystemInfo())));
+        m_items.append(new Item(server, m_updates[server->getId()]));
     }
 
     endResetModel();
@@ -112,7 +118,7 @@ void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
         return;
 
     beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
-    m_items.append(new Item(server, m_updates.value(server->getSystemInfo())));
+    m_items.append(new Item(server, m_updates[server->getId()]));
     endInsertRows();
 }
 
@@ -145,7 +151,7 @@ QnMediaServerResourcePtr QnServerUpdatesModel::Item::server() const {
     return m_server;
 }
 
-QnServerUpdatesModel::UpdateInformation QnServerUpdatesModel::Item::updateInformation() const {
+QnMediaServerUpdateTool::PeerUpdateInformation QnServerUpdatesModel::Item::updateInformation() const {
     return m_updateInfo;
 }
 
@@ -159,17 +165,30 @@ QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
         case CurrentVersionColumn:
             return m_server->getVersion().toString(QnSoftwareVersion::FullFormat);
         case UpdateColumn: {
-            switch (m_updateInfo.status) {
-            case NotFound:
+            switch (m_updateInfo.state) {
+            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateNotFound:
                 return tr("Not found");
-            case Found:
-                return (m_updateInfo.version == m_server->getVersion()) ? tr("Not needed") : m_updateInfo.version.toString(QnSoftwareVersion::FullFormat);
-            case Uploading:
+            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateFound:
+                return (m_updateInfo.sourceVersion == m_updateInfo.updateInformation->version)
+                        ? tr("Not needed") : m_updateInfo.updateInformation->version.toString(QnSoftwareVersion::FullFormat);
+            case QnMediaServerUpdateTool::PeerUpdateInformation::PendingDownloading:
+                return tr("Pending...");
+            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateDownloading:
                 return QString::number(m_updateInfo.progress) + lit("%");
-            case Installing:
+            case QnMediaServerUpdateTool::PeerUpdateInformation::PendingUpload:
+                return tr("Downloaded");
+            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateUploading:
+                return QString::number(m_updateInfo.progress) + lit("%");
+            case QnMediaServerUpdateTool::PeerUpdateInformation::PendingInstallation:
+                return tr("Uploaded");
+            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateInstalling:
                 return tr("Installing...");
-            case Installed:
-                return tr("Installed");
+            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateFinished:
+                return tr("Finished");
+            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateFailed:
+                return tr("Failed");
+            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateCanceled:
+                return tr("Canceled");
             }
         }
         default:

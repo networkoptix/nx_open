@@ -14,21 +14,47 @@ class QNetworkAccessManager;
 class QnMediaServerUpdateTool : public QObject {
     Q_OBJECT
 public:
-    struct UpdateInformation {
+    struct UpdateFileInformation {
         QnSoftwareVersion version;
         QString fileName;
         QString baseFileName;
         QUrl url;
 
-        UpdateInformation() {}
+        UpdateFileInformation() {}
 
-        UpdateInformation(const QnSoftwareVersion &version, const QString &fileName) :
+        UpdateFileInformation(const QnSoftwareVersion &version, const QString &fileName) :
             version(version), fileName(fileName)
         {}
 
-        UpdateInformation(const QnSoftwareVersion &version, const QUrl &url) :
+        UpdateFileInformation(const QnSoftwareVersion &version, const QUrl &url) :
             version(version), url(url)
         {}
+    };
+    typedef QSharedPointer<UpdateFileInformation> UpdateFileInformationPtr;
+
+    struct PeerUpdateInformation {
+        enum State {
+            UpdateNotFound,
+            UpdateFound,
+            PendingDownloading,
+            UpdateDownloading,
+            PendingUpload,
+            UpdateUploading,
+            PendingInstallation,
+            UpdateInstalling,
+            UpdateFinished,
+            UpdateFailed,
+            UpdateCanceled
+        };
+
+        QnMediaServerResourcePtr server;
+        State state;
+        QnSoftwareVersion sourceVersion;
+        UpdateFileInformationPtr updateInformation;
+
+        int progress;
+
+        PeerUpdateInformation(const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr());
     };
 
     enum State {
@@ -36,7 +62,7 @@ public:
         CheckingForUpdates,
         DownloadingUpdate,
         UploadingUpdate,
-        InstallingUpdate
+        InstallingUpdate,
     };
 
     enum CheckResult {
@@ -59,26 +85,28 @@ public:
 
     State state() const;
 
+    bool isUpdating() const;
+
     CheckResult updateCheckResult() const;
+    UpdateResult updateResult() const;
 
     void updateServers();
 
-    QHash<QnSystemInformation, UpdateInformation> availableUpdates() const;
-
     QnSoftwareVersion targetVersion() const;
 
-    int uploadProgress(const QnId &peerId) const;
+    PeerUpdateInformation updateInformation(const QnId &peerId) const;
 
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);
     void serverProgressChanged(const QnMediaServerResourcePtr &server, int progress);
+    void peerChanged(const QnId &peerId);
 
 public slots:
     void checkForUpdates();
     void checkForUpdates(const QnSoftwareVersion &version);
     void checkForUpdates(const QString &path);
-    void cancelUpdate();
+    bool cancelUpdate();
 
 protected:
     ec2::AbstractECConnectionPtr connection2() const;
@@ -99,21 +127,20 @@ private slots:
     void at_mutexLocked(const QByteArray &);
     void at_mutexTimeout(const QByteArray &);
 
+    void at_resourceChanged(const QnResourcePtr &resource);
+    void at_installationTimeout();
+
 private:
     void setState(State state);
+    void setCheckResult(CheckResult result);
+    void setUpdateResult(UpdateResult result);
+    void setPeerState(const QnId &peerId, PeerUpdateInformation::State state);
     void checkBuildOnline();
 
     void uploadUpdatesToServers();
     void installUpdatesToServers();
 
 private:
-    struct UploadData {
-        QnMediaServerResourcePtr server;
-        int progress;
-
-        UploadData(const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) : server(server), progress(0) {}
-    };
-
     State m_state;
     CheckResult m_checkResult;
     UpdateResult m_updateResult;
@@ -125,16 +152,18 @@ private:
     QnSoftwareVersion m_targetVersion;
     bool m_targetMustBeNewer;
 
-    QHash<QnId, UploadData> m_pendingUploads;
-    QMultiHash<QnSystemInformation, QnId> m_serverIdBySystemInformation;
+    QMultiHash<QnSystemInformation, QnId> m_idBySystemInformation;
 
-    QHash<QnId, QnMediaServerResourcePtr> m_pendingInstallServers;
+    QSet<QnId> m_pendingUploads;
+    QSet<QnId> m_pendingInstallations;
 
-    QHash<QnSystemInformation, UpdateInformation> m_updates;
-    QHash<QnSystemInformation, UpdateInformation> m_downloadingUpdates;
+    QHash<QnSystemInformation, UpdateFileInformationPtr> m_updateFiles;
+    QSet<QnSystemInformation> m_downloadingUpdates;
 
     QNetworkAccessManager *m_networkAccessManager;
     ec2::QnDistributedMutexPtr m_distributedMutex;
+
+    QHash<QnId, PeerUpdateInformation> m_updateInformationById;
 };
 
 #endif // QN_MEDIA_SERVER_UPDATE_TOOL_H

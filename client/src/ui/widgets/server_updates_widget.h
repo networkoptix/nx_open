@@ -19,14 +19,16 @@ public:
     QnServerUpdatesWidget(QnWorkbenchContext *context, QWidget *parent = 0);
     ~QnServerUpdatesWidget();
 
+    bool cancelUpdate();
+    bool isUpdating() const;
+
 private slots:
     void at_checkForUpdatesButton_clicked();
     void at_installSpecificBuildButton_clicked();
     void at_updateFromLocalSourceButton_clicked();
     void at_updateButton_clicked();
-    void at_updateTool_serverProgressChanged(const QnMediaServerResourcePtr &server, int progress);
+    void at_updateTool_peerChanged(const QnId &peerId);
 
-    void updateUpdatesList();
     void updateUi();
     void createUpdatesDownloader();
 
@@ -35,6 +37,7 @@ private:
 
     QnServerUpdatesModel *m_updatesModel;
     QnMediaServerUpdateTool *m_updateTool;
+    int m_previousToolState;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H

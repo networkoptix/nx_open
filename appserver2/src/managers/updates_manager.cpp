@@ -86,6 +86,7 @@ void QnUpdatesManager<QueryProcessorType>::triggerNotification(const QnTransacti
 template<class QueryProcessorType>
 void QnUpdatesManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiUpdateUploadResponceData> &transaction) {
     assert(transaction.command == ApiCommand::uploadUpdateResponce);
+    qDebug() << "Update responce from: " << transaction.params.id;
     emit updateUploaded(transaction.params.updateId, transaction.params.id);
 }
 
