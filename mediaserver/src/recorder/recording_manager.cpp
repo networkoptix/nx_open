@@ -24,6 +24,7 @@
 #include "mutex/camera_data_handler.h"
 #include "common/common_module.h"
 #include "transaction/transaction_log.h"
+#include "database/db_manager.h"
 
 
 static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24;
@@ -555,6 +556,8 @@ void QnRecordingManager::calcUsingLicenses(int* recordingDigital, int* recording
         QnMediaServerResourcePtr mServer = camera->getParentResource().dynamicCast<QnMediaServerResource>();
         if (!mServer)
             continue;
+
+        /*
         if (mServer->getStatus() == QnResource::Offline) 
         {
             ec2::ApiSetResourceStatusData params;
@@ -563,6 +566,7 @@ void QnRecordingManager::calcUsingLicenses(int* recordingDigital, int* recording
             if (relativeTime - lastStatusTime < LICENSE_RECORDING_STOP_TIME)
                 continue;
         }
+        */
 
         if (!camera->isScheduleDisabled()) {
             if (camera->isAnalog())
@@ -605,8 +609,12 @@ void QnRecordingManager::checkLicenses()
     calcUsingLicenses(&recordingDigital, &recordingAnalog);
 
     bool isOverflowTotal = recordingDigital + recordingAnalog > maxDigital + maxAnalog;
-    if (recordingDigital > maxDigital  || isOverflowTotal) 
+    if (recordingDigital > maxDigital  || isOverflowTotal)
     {
+        ec2::QnDbManager::instance()->markLicenseOverflow(true, qnSyncTime->currentMSecsSinceEpoch());
+        if (qnSyncTime->currentMSecsSinceEpoch() - ec2::QnDbManager::instance()->licenseOverflowTime() < LICENSE_RECORDING_STOP_TIME)
+            return; // not enough license, but timeout not reached yet
+
         // Too many licenses. check if server has own recording cameras and force to disable recording
         QnResourceList ownCameras = getLocalControlledCameras();
         foreach(QnResourcePtr camRes, ownCameras)
@@ -621,6 +629,9 @@ void QnRecordingManager::checkLicenses()
                 }
             }
         }
+    }
+    else {
+        ec2::QnDbManager::instance()->markLicenseOverflow(false, 0);
     }
 }
 

@@ -118,6 +118,8 @@ namespace ec2
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
 
 		// --------- misc -----------------------------
+        bool markLicenseOverflow(bool value, qint64 time);
+        qint64 licenseOverflowTime() const;
 
     private:
         friend class QnTransactionLog;
@@ -246,6 +248,8 @@ namespace ec2
         QnId m_adminUserID;
         int m_adminUserInternalID;
         ApiResourceTypeDataList m_cachedResTypes;
+        bool m_licenseOverflowMarked;
+        qint64 m_licenseOverflowTime;
 
         void fillServerInfo( ApiServerInfoData* const serverInfo );
     };

@@ -12,12 +12,14 @@
 #include "utils/serialization/binary_stream.h"
 #include "utils/serialization/sql_functions.h"
 #include "business/business_fwd.h"
+#include "utils/common/synctime.h"
 
 
 namespace ec2
 {
 
 static QnDbManager* globalInstance = 0; // TODO: #Elric #EC2 use QnSingleton
+static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 
 
 template <class MainData>
@@ -71,7 +73,9 @@ QnDbManager::QnDbManager(
     const QString& dbFilePath )
 :
     QnDbHelper(),
-    m_licenseManagerImpl( licenseManagerImpl )
+    m_licenseManagerImpl( licenseManagerImpl ),
+    m_licenseOverflowMarked(false),
+    m_licenseOverflowTime(0)
 {
     m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
@@ -143,6 +147,15 @@ bool QnDbManager::init()
         QnOutputBinaryStream<QByteArray> stream(&serializedTran);
         QnBinary::serialize(tran, &stream);
         transactionLog->saveTransaction(tran, serializedTran);
+    }
+
+    // read license overflow time
+    QSqlQuery query(m_sdb);
+    query.prepare("SELECT data from misc_data where key = ?");
+    query.addBindValue(LICENSE_EXPIRED_TIME_KEY);
+    if (query.exec() && query.next()) {
+        m_licenseOverflowTime = query.value(0).toByteArray().toLongLong();
+        m_licenseOverflowMarked = m_licenseOverflowTime > 0;
     }
 
     return true;
@@ -383,8 +396,9 @@ bool QnDbManager::createDatabase()
             if (!updateTableGuids("vms_resourcetype", "guid", guids))
                 return false;
         }
-
     }
+
+
     lock.commit();
 #ifdef DB_DEBUG
     qDebug() << "database created successfully";
@@ -1962,6 +1976,7 @@ void QnDbManager::fillServerInfo( ApiServerInfoData* const serverInfo )
 {
     serverInfo->armBox = QLatin1String(QN_ARM_BOX);
     m_licenseManagerImpl->getHardwareId( serverInfo );
+    serverInfo->prematureLicenseExperationDate = licenseOverflowTime();
 }
 
 ErrorCode QnDbManager::saveVideowall(const ApiVideowallData& params) {
@@ -2138,6 +2153,25 @@ void QnDbManager::commit()
 void QnDbManager::rollback()
 {
     m_tran.rollback();
+}
+
+bool QnDbManager::markLicenseOverflow(bool value, qint64 time)
+{
+    if (m_licenseOverflowMarked == value)
+        return true;
+    m_licenseOverflowMarked = value;
+    m_licenseOverflowTime = value ? time : 0;
+
+    QSqlQuery query(m_sdb);
+    query.prepare("INSERT OR REPLACE into misc_data (key, data) values(?, ?) ");
+    query.addBindValue(LICENSE_EXPIRED_TIME_KEY);
+    query.addBindValue(QByteArray::number(m_licenseOverflowTime));
+    return query.exec();
+}
+
+qint64 QnDbManager::licenseOverflowTime() const
+{
+    return m_licenseOverflowTime;
 }
 
 }

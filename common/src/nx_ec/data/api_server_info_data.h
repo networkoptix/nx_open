@@ -18,9 +18,10 @@ namespace ec2 {
 
         QString armBox; // TODO: #Elric #EC2 what is this?
         bool allowCameraChanges; // TODO: #Elric #EC2 use "enabled"
+        qint64 prematureLicenseExperationDate; // Not enough license for recording. Some recording will be stopped in a nearest future
     };
 
-#define ApiServerInfoData_Fields (mainHardwareIds)(compatibleHardwareIds)(remoteHardwareIds)(publicIp)(systemName)(sessionKey)(armBox)(allowCameraChanges)
+#define ApiServerInfoData_Fields (mainHardwareIds)(compatibleHardwareIds)(remoteHardwareIds)(publicIp)(systemName)(sessionKey)(armBox)(allowCameraChanges)(prematureLicenseExperationDate)
 
 } // namespace ec2
 
