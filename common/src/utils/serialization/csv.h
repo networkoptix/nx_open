@@ -9,6 +9,13 @@
 
 namespace QnCsv {
 
+    // TODO: #Elric simplify API:
+    //
+    // serialize
+    // serialize_header(T *)
+    // serialize_document
+
+
     template<class T, class Output>
     void serialize_field(const T &value, QnCsvStreamWriter<Output> *stream) {
         QnCsvDetail::serialize_field_internal(value, stream);
