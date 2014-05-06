@@ -383,6 +383,15 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         );
         break;
     }
+    case QnBusiness::LicenseIssueEvent: {
+        item->addActionButton(
+            qnSkin->icon("events/server.png"), // todo: add license icon here
+            QString(),
+            Qn::PreferencesLicensesTabAction
+            );
+        break;
+                                       }
+
     default:
         break;
     }
