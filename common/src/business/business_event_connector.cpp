@@ -63,6 +63,12 @@ void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, 
     qnBusinessRuleProcessor->processBusinessEvent(mserverEvent);
 }
 
+void QnBusinessEventConnector::at_licenseIssueEvent(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText)
+{
+    QnLicenseIssueBusinessEventPtr bEvent(new QnLicenseIssueBusinessEvent(resource, timeStamp, reasonCode, reasonText));
+    qnBusinessRuleProcessor->processBusinessEvent(bEvent);
+}
+
 void QnBusinessEventConnector::at_mserverStarted(const QnResourcePtr &resource, qint64 timeStamp)
 {
     QnMServerStartedBusinessEventPtr mserverEvent(new QnMServerStartedBusinessEvent(resource, timeStamp));

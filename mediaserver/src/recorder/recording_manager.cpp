@@ -32,7 +32,7 @@ static const char LICENSE_OVERFLOW_LOCK_NAME[] = "__LICENSE_OVERFLOW__";
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
-    connect(this, &QnRecordingManager::recordingDisabled, qnBusinessRuleConnector, &QnBusinessEventConnector::at_mserverFailure);
+    connect(this, &QnRecordingManager::recordingDisabled, qnBusinessRuleConnector, &QnBusinessEventConnector::at_licenseIssueEvent);
 }
 
 QnRecordingManager::~QnRecordingManager()
