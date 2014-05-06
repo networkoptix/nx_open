@@ -28,6 +28,7 @@
 
 
 static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24;
+static const char LICENSE_OVERFLOW_LOCK_NAME[] = "__LICENSE_OVERFLOW__";
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
@@ -624,7 +625,7 @@ void QnRecordingManager::checkLicenses()
             {
                 if (recordingDigital > maxDigital && !camera->isAnalog() || isOverflowTotal) {
                     // found. remove recording from some of them
-                    m_licenseMutex = ec2::QnDistributedMutexManager::instance()->getLock("__LICENSE_OVERFLOW__");
+                    m_licenseMutex = ec2::QnDistributedMutexManager::instance()->getLock(LICENSE_OVERFLOW_LOCK_NAME);
                     break;
                 }
             }
@@ -635,8 +636,11 @@ void QnRecordingManager::checkLicenses()
     }
 }
 
-void QnRecordingManager::at_licenseMutexLocked()
+void QnRecordingManager::at_licenseMutexLocked(QByteArray name)
 {
+    if (name != LICENSE_OVERFLOW_LOCK_NAME)
+        return;
+
     QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
     int maxDigital = licenseListHelper.totalDigital();
     int maxAnalog = licenseListHelper.totalAnalog();
