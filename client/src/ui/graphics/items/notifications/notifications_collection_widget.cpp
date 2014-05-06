@@ -385,7 +385,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     }
     case QnBusiness::LicenseIssueEvent: {
         item->addActionButton(
-            qnSkin->icon("events/server.png"), // todo: add license icon here
+            qnSkin->icon("events/license.png"),
             QString(),
             Qn::PreferencesLicensesTabAction
             );
