@@ -522,8 +522,8 @@ CameraSettings& CameraSettingsWidgetsTreeCreator::getAdditionalInfo()
 void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings* settings)
 {
     m_settings = settings;
-
-    CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
+    if ( !m_id.isNull() )
+        CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
 }
 
 QString CameraSettingsWidgetsTreeCreator::getId() const
@@ -547,9 +547,9 @@ QStackedLayout* CameraSettingsWidgetsTreeCreator::getRootLayout()
 }
 
 #ifdef WEBKIT_PRESENT
-QWebView* CameraSettingsWidgetsTreeCreator::getWebView()
+QWebView** CameraSettingsWidgetsTreeCreator::getWebView()
 {
-    return m_webView;
+    return &m_webView;
 }
 #endif
 
