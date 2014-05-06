@@ -232,7 +232,7 @@ QByteArray QnLicense::toString() const
 
 qint64 QnLicense::expirationTime() const {
 
-    return QDateTime::currentMSecsSinceEpoch() + 1000 * 1000;
+    //return QDateTime::currentMSecsSinceEpoch() + 1000 * 1000;
 
 
     if(m_expiration.isEmpty())
