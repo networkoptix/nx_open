@@ -13,6 +13,7 @@
 
 #include <utils/serialization/json_functions.h>
 #include <utils/serialization/binary_functions.h>
+#include <utils/serialization/csv_functions.h>
 
 #include "cluster/cluster_manager.h"
 #include "database/db_manager.h"

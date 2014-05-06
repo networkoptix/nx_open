@@ -5,14 +5,16 @@
 #include <type_traits>  /* For std::integral_constant, std::declval. */
 
 #ifndef Q_MOC_RUN
+#include <boost/preprocessor/facilities/overload.hpp>
+#include <boost/preprocessor/repetition/repeat.hpp>
 #include <boost/preprocessor/seq/size.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/for_each_i.hpp>
 #include <boost/preprocessor/seq/to_tuple.hpp>
-#include <boost/preprocessor/variadic/elem.hpp>
 #include <boost/preprocessor/tuple/size.hpp>
 #include <boost/preprocessor/tuple/elem.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
+#include <boost/preprocessor/variadic/elem.hpp>
+#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #endif // Q_MOC_RUN
 
