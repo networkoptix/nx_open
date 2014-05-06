@@ -3,6 +3,7 @@
 
 #include <QSharedPointer>
 #include <QSharedPointer>
+#include <libavutil/avutil.h>
 #include "utils/common/threadqueue.h"
 
 #include <libavutil/avutil.h>

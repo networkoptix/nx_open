@@ -45,7 +45,7 @@ inline void deserialize_field(const QVariant &, ec2::ApiServerInfoData *) { retu
 
 namespace ec2 {
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_EC2_API_DATA_CLASSES, (binary)(json)(sql), _Fields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_EC2_API_DATA_CLASSES, (binary)(json)(sql_record)(csv_record), _Fields)
 
 } // namespace ec2
 

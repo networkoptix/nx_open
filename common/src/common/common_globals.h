@@ -424,6 +424,7 @@ public:
     enum SerializationFormat {
         JsonFormat,
         BnsFormat,
+        CsvFormat
     };
 
 
