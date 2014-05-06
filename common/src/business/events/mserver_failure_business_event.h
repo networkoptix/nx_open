@@ -21,4 +21,13 @@ public:
 
 typedef QSharedPointer<QnMServerStartedBusinessEvent> QnMServerStartedBusinessEventPtr;
 
+class QnLicenseIssueBusinessEvent: public QnReasonedBusinessEvent
+{
+    typedef QnReasonedBusinessEvent base_type;
+public:
+    QnLicenseIssueBusinessEvent(const QnResourcePtr& resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
+};
+
+typedef QSharedPointer<QnLicenseIssueBusinessEvent> QnLicenseIssueBusinessEventPtr;
+
 #endif // __MSERVER_FAILURE_BUSINESS_EVENT_H__

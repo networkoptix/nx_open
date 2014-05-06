@@ -98,7 +98,9 @@ public:
 
         /** Media server started */
         ServerStartEvent = 9,
-
+        
+        /** Not enough licenses */
+        LicenseIssueEvent = 10,
 
         /**
          * Used when enumerating to build GUI lists, this and followed actions
