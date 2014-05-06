@@ -57,6 +57,7 @@ namespace ec2
             ErrorCode result = executeTransactionNoLock(tran);
             if (result != ErrorCode::ok)
                 return result;
+
             result = transactionLog->saveTransaction( tran, serializedTran);
             if (result == ErrorCode::ok)
                 lock.commit();
@@ -232,6 +233,8 @@ namespace ec2
         ErrorCode saveLicense(const ApiLicenseData& license);
 
         bool createDatabase();
+        bool migrateBusinessEvents();
+        bool doRemap(int id, int newVal, const QString& fieldName);
         
         qint32 getResourceInternalId( const QnId& guid );
         QnId getResourceGuid(const qint32 &internalId);

@@ -122,22 +122,22 @@ typedef QnSharedResourcePointer<QnPlIsdResource> QnPlIsdResourcePtr;
 typedef QnSharedResourcePointerList<QnPlIsdResource> QnPlIsdResourceList;
 
 class QnPlPulseResource;
-typedef QSharedPointer<QnPlPulseResource> QnPlPulseResourcePtr;
+typedef QnSharedResourcePointer<QnPlPulseResource> QnPlPulseResourcePtr;
 typedef QnSharedResourcePointerList<QnPlPulseResource> QnPlPulseResourceList;
 
 class QnPlIqResource;
-typedef QSharedPointer<QnPlIqResource> QnPlIqResourcePtr;
+typedef QnSharedResourcePointer<QnPlIqResource> QnPlIqResourcePtr;
 typedef QnSharedResourcePointerList<QnPlIqResource> QnPlIqResourceList;
 
 class QnPlWatchDogResource;
-typedef QSharedPointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
+typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
 typedef QnSharedResourcePointerList<QnPlWatchDogResource> QnPlWatchDogResourceList;
 
 class QnDesktopResource;
-typedef QSharedPointer<QnDesktopResource> QnDesktopResourcePtr;
+typedef QnSharedResourcePointer<QnDesktopResource> QnDesktopResourcePtr;
 
 class QnThirdPartyResource;
-typedef QSharedPointer<QnThirdPartyResource> QnThirdPartyResourcePtr;
+typedef QnSharedResourcePointer<QnThirdPartyResource> QnThirdPartyResourcePtr;
 
 class QnVideoWallResource;
 typedef QnSharedResourcePointer<QnVideoWallResource> QnVideoWallResourcePtr;

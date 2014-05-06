@@ -116,8 +116,8 @@ void QnBusinessRuleProcessor::doProxyAction(QnAbstractBusinessActionPtr action, 
 
         ec2::fromResourceToApi(action, actionData);
         if (res) {
-            actionData.resources.clear();
-            actionData.resources.push_back(res->getId());
+            actionData.resourceIds.clear();
+            actionData.resourceIds.push_back(res->getId());
         }
         ec2::fromApiToResource(actionData, actionToSend, qnResPool);
 
@@ -398,7 +398,7 @@ QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(QnAbstractBus
     QnAbstractBusinessActionList result;
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
-        if (rule->disabled() || rule->eventType() != bEvent->getEventType())
+        if (rule->isDisabled() || rule->eventType() != bEvent->getEventType())
             continue;
         bool condOK = checkEventCondition(bEvent, rule);
         if (condOK)
@@ -556,9 +556,9 @@ void QnBusinessRuleProcessor::at_businessRuleChanged_i(QnBusinessEventRulePtr bR
     {
         if (m_rules[i]->id() == bRule->id())
         {
-            if( !m_rules[i]->disabled() )
+            if( !m_rules[i]->isDisabled() )
                 notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
-            if( !bRule->disabled() )
+            if( !bRule->isDisabled() )
                 notifyResourcesAboutEventIfNeccessary( bRule, true );
             terminateRunningRule(m_rules[i]);
             m_rules[i] = bRule;
@@ -568,7 +568,7 @@ void QnBusinessRuleProcessor::at_businessRuleChanged_i(QnBusinessEventRulePtr bR
 
     //adding new rule
     m_rules << bRule;
-    if( !bRule->disabled() )
+    if( !bRule->isDisabled() )
         notifyResourcesAboutEventIfNeccessary( bRule, true );
 }
 
@@ -585,7 +585,7 @@ void QnBusinessRuleProcessor::at_businessRuleReset(QnBusinessEventRuleList rules
     // Remove all rules
     for (int i = 0; i < m_rules.size(); ++i)
     {
-        if( !m_rules[i]->disabled() )
+        if( !m_rules[i]->isDisabled() )
             notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
         terminateRunningRule(m_rules[i]);
     }
@@ -638,7 +638,7 @@ void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
     {
         if (m_rules[i]->id() == id)
         {
-            if( !m_rules[i]->disabled() )
+            if( !m_rules[i]->isDisabled() )
                 notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
             terminateRunningRule(m_rules[i]);
             m_rules.removeAt(i);

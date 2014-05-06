@@ -25,6 +25,7 @@ struct QnMotionWindow
 class QnMotionRegion
 {
 public:
+    // TODO: #Elric #enum btw, associated API is also totally evil
     enum RegionValid{VALID, WINDOWS, MASKS, SENS};
 
     QnMotionRegion();

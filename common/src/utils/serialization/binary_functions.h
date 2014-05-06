@@ -21,6 +21,12 @@
 
 #include <utils/common/container.h>
 
+#ifndef QN_NO_QT
+#   include <utils/common/latin1_array.h>
+#endif
+
+#include "enum.h"
+
 
 namespace QnBinaryDetail {
     // TODO: #Elric #EC2 remove / move
@@ -258,6 +264,17 @@ bool deserialize(QnInputBinaryStream<T> *stream, QByteArray *target) {
 
 
 template<class Output>
+void serialize(const QnLatin1Array &value, QnOutputBinaryStream<Output> *stream) {
+    serialize(static_cast<const QByteArray &>(value), stream);
+}
+
+template<class T>
+bool deserialize(QnInputBinaryStream<T> *stream, QnLatin1Array *target) {
+    return deserialize(stream, static_cast<QByteArray *>(target));
+}
+
+
+template<class Output>
 void serialize(const QString &value, QnOutputBinaryStream<Output> *stream) {
     serialize(value.toUtf8(), stream);
 }
@@ -305,11 +322,15 @@ bool deserialize(QnInputBinaryStream<Input> *stream, QUuid *target) {
 
 template<class T, class Output>
 void serialize(const QFlags<T> &value, QnOutputBinaryStream<Output> *stream) {
+    QnSerialization::check_enum_binary<T>();
+
     QnBinary::serialize(static_cast<qint32>(value), stream);
 }
 
 template<class T, class Input>
 bool deserialize(QnInputBinaryStream<Input> *stream, QFlags<T> *target) {
+    QnSerialization::check_enum_binary<T>();
+
     qint32 tmp;
     if(!QnBinary::deserialize(stream, &tmp))
         return false;
@@ -324,11 +345,15 @@ bool deserialize(QnInputBinaryStream<Input> *stream, QFlags<T> *target) {
 
 template<class T, class Output>
 void serialize(const T &value, QnOutputBinaryStream<Output> *stream, typename std::enable_if<std::is_enum<T>::value>::type * = NULL) {
+    QnSerialization::check_enum_binary<T>();
+
     QnBinary::serialize(static_cast<qint32>(value), stream);
 }
 
 template<class T, class Input>
 bool deserialize(QnInputBinaryStream<Input> *stream, T *target, typename std::enable_if<std::is_enum<T>::value>::type* = NULL) {
+    QnSerialization::check_enum_binary<T>();
+
     qint32 tmp;
     if(!QnBinary::deserialize(stream, &tmp))
         return false;

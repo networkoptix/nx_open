@@ -69,6 +69,8 @@ bool QnProxyConnectionProcessor::doProxyData(fd_set* read_set, AbstractStreamSoc
         if (readed < 1)
             return false;
         int sended = dstSocket->send(buffer, readed);
+        if (sended == -1)
+            return false; // connection closed
         Q_ASSERT(sended == readed);
     }
     return true;

@@ -174,7 +174,5 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnConnectionInfo>();
     qRegisterMetaType<Qn::PanicMode>();
 
-    QnJsonSerializer::registerSerializer<QUuid>();
-
     qn_commonMetaTypes_initialized = true;
 }

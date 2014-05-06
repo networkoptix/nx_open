@@ -28,7 +28,6 @@ namespace ec2
         ec2::QnDistributedMutexManager::initStaticInstance( new ec2::QnDistributedMutexManager() );
 
         m_dbManager->init();
-        m_transactionLog->init();
 
         ApiResourceParamDataList paramList;
         m_dbManager->doQueryNoLock(nullptr, paramList);

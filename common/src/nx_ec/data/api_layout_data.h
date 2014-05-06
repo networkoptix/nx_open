@@ -9,7 +9,7 @@ namespace ec2
 {
 
     struct ApiLayoutItemData: ApiData {
-        QByteArray uuid;
+        QByteArray uuid; // TODO: #API rename to 'id'.
         qint32 flags;
         float left;
         float top;
@@ -22,8 +22,8 @@ namespace ec2
         float zoomTop;
         float zoomRight;
         float zoomBottom;
-        QByteArray zoomTargetUuid;
-        QByteArray contrastParams;
+        QByteArray zoomTargetUuid; // TODO: #API rename 'zoomTargetId'
+        QByteArray contrastParams; // TODO: #API I'll think about this one.
         QByteArray dewarpingParams;
     };
 #define ApiLayoutItemData_Fields (uuid)(flags)(left)(top)(right)(bottom)(rotation)(resourceId)(resourcePath) \
@@ -38,16 +38,16 @@ namespace ec2
 
     struct ApiLayoutData : ApiResourceData {
         float cellAspectRatio;
-        float cellSpacingWidth;
-        float cellSpacingHeight;
+        float cellSpacingWidth; // TODO: #API rename 'horizontalSpacing'
+        float cellSpacingHeight; // TODO: #API rename 'verticalSpacing'
         std::vector<ApiLayoutItemData> items;
-        bool   userCanEdit;
-        bool   locked;
+        bool   userCanEdit; // TODO: #API rename 'editable'
+        bool   locked; 
         QString backgroundImageFilename;
         qint32  backgroundWidth;
         qint32  backgroundHeight;
         float backgroundOpacity;
-        qint32 userId;
+        qint32 userId; // TODO: #API what is this? It certainly doesn't belong to public API. Remove?
     };
 #define ApiLayoutData_Fields ApiResourceData_Fields (cellAspectRatio)(cellSpacingWidth)(cellSpacingHeight)(items)(userCanEdit)(locked) \
                                 (backgroundImageFilename)(backgroundWidth)(backgroundHeight)(backgroundOpacity) (userId)

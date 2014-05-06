@@ -498,20 +498,11 @@ namespace nxcip
     };
 
 
-    // {B0F07EAF-A59E-41fc-8F9E-86C323218554}
-    static const nxpl::NX_GUID IID_Iteratable = { { 0xb0, 0xf0, 0x7e, 0xaf, 0xa5, 0x9e, 0x41, 0xfc, 0x8f, 0x9e, 0x86, 0xc3, 0x23, 0x21, 0x85, 0x54 } };
+    // {8006CC9F-7BDD-4a4c-8920-AC5546D4924A}
+    static const nxpl::NX_GUID IID_TimePeriods = { { 0x80, 0x06, 0xcc, 0x9f, 0x7b, 0xdd, 0x4a, 0x4c, 0x89, 0x20, 0xac, 0x55, 0x46, 0xd4, 0x92, 0x4a } };
 
-    //!Interface for class-container with element iterating support
-    /*!
-        \code{.cpp}
-        Iteratable* it;
-        for( it->goToBeginning(); !it->atEnd(); it->next() )
-        {
-            //processing data ...
-        }
-        \endcode
-    */
-    class Iteratable
+    //!Array of time periods
+    class TimePeriods
     :
         public nxpl::PluginInterface
     {
@@ -523,21 +514,9 @@ namespace nxcip
         */
         virtual bool next() = 0;
         /*!
-            \return false, if cursor is already at end
+            \return true, if cursor is already at end
         */
         virtual bool atEnd() const = 0;
-    };
-
-
-    // {8006CC9F-7BDD-4a4c-8920-AC5546D4924A}
-    static const nxpl::NX_GUID IID_TimePeriods = { { 0x80, 0x06, 0xcc, 0x9f, 0x7b, 0xdd, 0x4a, 0x4c, 0x89, 0x20, 0xac, 0x55, 0x46, 0xd4, 0x92, 0x4a } };
-
-    //!Array of time periods
-    class TimePeriods
-    :
-        public Iteratable
-    {
-    public:
         /*!
             \param[out] start Start of time period (usec since 1970-01-01, UTC)
             \param[out] end End of time period (usec since 1970-01-01, UTC)

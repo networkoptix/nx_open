@@ -3,8 +3,10 @@
 
 #include <array>
 
+#ifndef QN_NO_QT
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
+#endif
 
 #include <boost/operators.hpp>
 
@@ -77,7 +79,7 @@ public:
     friend bool operator<(const QnSoftwareVersion &l, const QnSoftwareVersion &r);
     friend bool operator==(const QnSoftwareVersion &l, const QnSoftwareVersion &r);
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnSoftwareVersion, (json)(lexical)(binary)(datastream), friend)
+    QN_FUSION_DECLARE_FUNCTIONS(QnSoftwareVersion, (json)(lexical)(binary)(datastream)(csv_field), friend)
 
 private:
     std::array<int, 4> m_data;

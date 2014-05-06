@@ -15,7 +15,7 @@ namespace ec2
     {
         QString publicIp;
         QByteArray sessionKey;
-        bool allowCameraChanges;
+        bool allowCameraChanges; // TODO: #API STOP, this should not be here. We have implemented it using kv-pairs. Remove it from here.
     };
 #define ApiRuntimeData_Fields (publicIp)(sessionKey)(allowCameraChanges)
 

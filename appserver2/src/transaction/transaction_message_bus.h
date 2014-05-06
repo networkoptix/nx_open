@@ -61,6 +61,7 @@ namespace ec2
         template <class T>
         void sendTransaction(const QnTransaction<T>& tran, const PeerList& dstPeers = PeerList())
         {
+            Q_ASSERT(tran.command != ApiCommand::NotDefined);
             QMutexLocker lock(&m_mutex);
             QByteArray buffer;
             m_serializer.serializeTran(buffer, tran, TransactionTransportHeader(peersToSend(tran.command) << qnCommon->moduleGUID(), dstPeers));
@@ -70,6 +71,7 @@ namespace ec2
         template <class T>
         void sendTransaction(const QnTransaction<T>& tran, const QnId& dstPeer)
         {
+            Q_ASSERT(tran.command != ApiCommand::NotDefined);
             PeerList pList;
             if (!dstPeer.isNull())
                 pList << dstPeer;

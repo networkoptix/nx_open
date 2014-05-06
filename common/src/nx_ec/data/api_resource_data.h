@@ -14,7 +14,7 @@ namespace ec2
 
         QString value;
         QString name;
-        bool isResTypeParam;
+        bool isResTypeParam; // TODO: #API rename into something more sane. Right now it's not clear what is this and I don't know what to rename it into. 
     };
 #define ApiResourceParamData_Fields (value)(name)(isResTypeParam)
 
@@ -38,20 +38,20 @@ namespace ec2
         ApiResourceData(): status(QnResource::Offline), disabled(false) {}
 
         QnId          id;
-        QnId          parentGuid;
+        QnId          parentId;
         QnResource::Status    status;
-        bool          disabled;
+        bool          disabled; // TODO: #API I thought we got rid of this one?
         QString       name;
         QString       url;
         QnId          typeId;
         std::vector<ApiResourceParamData> addParams;
     };
-#define ApiResourceData_Fields (id)(parentGuid)(status)(disabled)(name)(url)(typeId)(addParams)
+#define ApiResourceData_Fields (id)(parentId)(status)(disabled)(name)(url)(typeId)(addParams)
 
 
     struct ApiSetResourceDisabledData: ApiData {
         QnId id;
-        bool disabled;
+        bool disabled; // TODO: #API huh?
     };
 #define ApiSetResourceDisabledData_Fields (id)(disabled)
 

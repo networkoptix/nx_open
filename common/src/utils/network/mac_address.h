@@ -9,10 +9,10 @@
 class QnMacAddress: public boost::equality_comparable<QnMacAddress, boost::less_than_comparable<QnMacAddress> > {
 public:
     QnMacAddress();
-    QnMacAddress(const unsigned char *mac);
-    QnMacAddress(const QString &mac);
-    QnMacAddress(const QLatin1String &mac);
-    QnMacAddress(const QByteArray &mac);
+    explicit QnMacAddress(const unsigned char *mac);
+    explicit QnMacAddress(const QString &mac);
+    explicit QnMacAddress(const QLatin1String &mac);
+    explicit QnMacAddress(const QByteArray &mac);
     ~QnMacAddress();
 
     bool isNull() const;

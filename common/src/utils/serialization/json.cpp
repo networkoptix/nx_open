@@ -162,8 +162,10 @@ bool QJsonDetail::deserialize_json(const QByteArray &value, QJsonValue *target) 
 class QnJsonSerializerStorage: public QnSerializerStorage<QnJsonSerializer> {
 public:
     QnJsonSerializerStorage() {
-        registerSerializer<QString>();
-        registerSerializer<double>();
+        registerSerializer<QJsonValue>();
+        registerSerializer<QJsonArray>();
+        registerSerializer<QJsonObject>();
+
         registerSerializer<bool>();
         registerSerializer<char>();
         registerSerializer<signed char>();
@@ -176,9 +178,26 @@ public:
         registerSerializer<unsigned long>();
         registerSerializer<long long>();
         registerSerializer<unsigned long long>();
+        registerSerializer<float>();
+        registerSerializer<double>();
 
+        registerSerializer<QString>();
+        registerSerializer<QByteArray>();
+        
         registerSerializer<QColor>();
         registerSerializer<QBrush>();
+        registerSerializer<QSize>();
+        registerSerializer<QSizeF>();
+        registerSerializer<QRect>();
+        registerSerializer<QRectF>();
+        registerSerializer<QPoint>();
+        registerSerializer<QPointF>();
+        registerSerializer<QRegion>();
+        registerSerializer<QVector2D>();
+        registerSerializer<QVector3D>();
+        registerSerializer<QVector4D>();
+        registerSerializer<QUuid>();
+        registerSerializer<QUrl>();
         registerSerializer<QFont>();
     }
 };

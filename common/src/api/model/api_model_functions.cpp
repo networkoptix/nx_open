@@ -1,5 +1,4 @@
-#include <utils/serialization/json_functions.h>
-#include <utils/serialization/binary_functions.h>
+#include <utils/common/model_functions.h>
 #include <utils/fusion/fusion_adaptor.h>
 
 #include "camera_diagnostics_reply.h"
@@ -9,7 +8,10 @@
 #include "time_reply.h"
 #include "connection_info.h"
 
-// TODO: #Elric move fields out, closer to struct definitions!
+// TODO: #MSAPI Use a scheme similar to one in EC API: 
+// 
+// Define a _Fields macro where the struct/class definition is.
+// Then generate all functions using a single QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES invocation.
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraDiagnosticsReply,          (json)(binary), (performedStep)(errorCode)(errorParams))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnManualCameraSearchStatus,        (json)(binary), (state)(current)(total))
@@ -19,5 +21,5 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStorageSpaceReply,               (json)(binar
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStorageSpaceData,                (json)(binary), (path)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStorageStatusReply,              (json)(binary), (pluginExists)(storage))
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTimeReply,                       (json)(binary), (utcTime)(timeZoneOffset))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnConnectionInfoData,              (json)(binary), (ecUrl)(version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCompatibilityItem,               (json)(binary), QnCompatibilityItem_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnConnectionInfo,                  (json)(binary)(csv_record), QnConnectionInfo_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCompatibilityItem,               (json)(binary)(csv_record), QnCompatibilityItem_Fields)

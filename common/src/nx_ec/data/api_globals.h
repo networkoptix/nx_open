@@ -20,11 +20,12 @@
 #ifndef QN_NO_BASE
 #   include <utils/common/id.h>
 #   include <utils/common/email.h>
+#   include <utils/common/latin1_array.h>
 #   include <api/model/email_attachment.h>
 #   include <core/resource/media_resource.h>
 #   include <business/business_fwd.h>
 #endif
 
-#include "api_fwd.h"
+#   include "api_fwd.h"
 
 #endif // QN_API_GLOBALS_H

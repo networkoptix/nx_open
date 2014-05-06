@@ -13,6 +13,7 @@
 
 #include <utils/serialization/json_functions.h>
 #include <utils/serialization/binary_functions.h>
+#include <utils/serialization/csv_functions.h>
 
 #include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
@@ -51,11 +52,11 @@ namespace ec2
             if (!tran.id.sequence)
                 tran.fillSequence();
 
-            auto scopedGuardFunc = [&errorCode, &handler]( ServerQueryProcessor* ){
+            auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
                 QnScopedThreadRollback ensureFreeThread(1);
                 QtConcurrent::run( std::bind( handler, errorCode ) );
             };
-            std::unique_ptr<ServerQueryProcessor, decltype(scopedGuardFunc)> scopedGuard( this, scopedGuardFunc );
+            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
             QByteArray serializedTran;
             QnOutputBinaryStream<QByteArray> stream( &serializedTran );
@@ -67,8 +68,11 @@ namespace ec2
 
             if (tran.persistent) {
                 errorCode = dbManager->executeTransaction( tran, serializedTran);
-                if( errorCode != ErrorCode::ok )
+                if( errorCode != ErrorCode::ok ) {
+                    if (errorCode == ErrorCode::skipped)
+                        errorCode = ErrorCode::ok;
                     return;
+                }
             }
 
             // delivering transaction to remote peers
@@ -113,11 +117,11 @@ namespace ec2
                 tran.fillSequence();
                 tran.localTransaction = multiTran.localTransaction;
 
-                auto scopedGuardFunc = [&errorCode, &handler]( ServerQueryProcessor* ){
+                auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
                     QnScopedThreadRollback ensureFreeThread(1);
                     QtConcurrent::run( std::bind( handler, errorCode ) );
                 };
-                std::unique_ptr<ServerQueryProcessor, decltype(scopedGuardFunc)> scopedGuard( this, scopedGuardFunc );
+                std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
                 QByteArray serializedTran;
                 QnOutputBinaryStream<QByteArray> stream( &serializedTran );
@@ -132,6 +136,8 @@ namespace ec2
 
                 if (tran.persistent) {
                     errorCode = dbManager->executeNestedTransaction( tran, serializedTran);
+					if (errorCode == ErrorCode::skipped)
+						continue;
                     if( errorCode != ErrorCode::ok ) {
                         dbManager->rollback();
                         return;
@@ -149,7 +155,7 @@ namespace ec2
                 if (!tranData.first.localTransaction)
                     QnTransactionMessageBus::instance()->sendTransaction(tranData.first, tranData.second);
             }
-
+            errorCode = ErrorCode::ok;
         }
 
 
@@ -159,7 +165,7 @@ namespace ec2
             if (tran.persistent)
             {
                 ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
-                if( errorCode != ErrorCode::ok )
+                if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
                     return false;
             }
             return true;

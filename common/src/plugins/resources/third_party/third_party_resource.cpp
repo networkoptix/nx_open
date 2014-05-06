@@ -355,11 +355,11 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     else
         setMotionType( Qn::MT_SoftwareGrid );
     if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
-		setStreamFpsSharingMethod(Qn::shareFps);
+		setStreamFpsSharingMethod(Qn::BasicFpsSharing);
     else if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
-		setStreamFpsSharingMethod(Qn::sharePixels);
+		setStreamFpsSharingMethod(Qn::PixelsFpsSharing);
     else 
-        setStreamFpsSharingMethod(Qn::noSharing);
+        setStreamFpsSharingMethod(Qn::NoFpsSharing);
 
     QVector<EncoderData> encoderDataTemp;
     encoderDataTemp.resize( m_encoderCount );

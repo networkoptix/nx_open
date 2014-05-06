@@ -11,6 +11,7 @@ class QnAutoTester: public QObject {
     Q_ENUMS(State);
 
 public:
+    // TODO: #Elric #enum
     enum Test {
         RESOURCE_SUBSTRING = 0x1 /**< Test for the presence of a substring in resource names. */
     };

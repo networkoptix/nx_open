@@ -17,23 +17,20 @@ public:
         m_pos(0)
     {}
 
-    /*!
-        \return Bytes actually read
-    */
-    int read(void *buffer, int maxSize) {
-        int toRead = qMin(m_data.size() - m_pos, maxSize);
+    /**
+     * \param buffer
+     * \param size
+     * \returns                         Number of bytes actually read.
+     */
+    int read(void *buffer, int size) {
+        int toRead = qMin(m_data.size() - m_pos, size);
         memcpy(buffer, m_data.constData() + m_pos, toRead);
         m_pos += toRead;
         return toRead;
     }
 
-    //!Resets internal cursor position
-    void reset() {
-        m_pos = 0;
-    }
-
     const QByteArray &buffer() const { return m_data; }
-    int pos() const { return m_pos; } // TODO: #Elric is this one needed?
+    int pos() const { return m_pos; }
 
 private:
     const QByteArray& m_data;

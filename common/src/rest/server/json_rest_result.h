@@ -6,6 +6,18 @@
 
 #include <utils/serialization/json.h>
 
+// TODO: #MSAPI rename to QnRestResult.
+// 
+// Add format field (Qn::SerializationFormat) that will be set in QnJsonRestHandler (to be renamed).
+// In setReply do QByteArray serialization right away, don't store in an 
+// intermediate QVariant/QJsonValue.
+// 
+// And it also might make sense to get rid of "error" in reply. Looks like it 
+// was a bad idea in the first place. This way we'll send a reply if there was
+// no error, and some HTTP error code otherwise. And maybe a text/plain 
+// description of the error.
+// 
+
 class QnJsonRestResult {
 public:
     enum Error {

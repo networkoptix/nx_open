@@ -217,7 +217,11 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
         case QnBusiness::ShowPopupAction:
         {
             QnBusinessActionParameters params = m_actionParams;
-            params.setUserGroup((QnBusinessActionParameters::UserGroup)value.toInt());
+
+            // TODO: #GDM you're implicitly relying on what enum values are, which is very bad.
+            // This code will fail silently if someone changes the header. Please write it properly.
+            
+            params.setUserGroup((QnBusinessActionParameters::UserGroup)value.toInt()); 
             setActionParams(params);
             break;
         }
@@ -273,10 +277,10 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 
     m_aggregationPeriod = businessRule->aggregationPeriod();
 
-    m_disabled = businessRule->disabled();
-    m_comments = businessRule->comments();
+    m_disabled = businessRule->isDisabled();
+    m_comments = businessRule->comment();
     m_schedule = businessRule->schedule();
-    m_system = businessRule->system();
+    m_system = businessRule->isSystem();
 
     updateActionTypesModel();//TODO: #GDM connect on dataChanged?
 
@@ -314,7 +318,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
     rule->setActionParams(m_actionParams); //TODO: #GDM filtered
     rule->setAggregationPeriod(m_aggregationPeriod);
     rule->setDisabled(m_disabled);
-    rule->setComments(m_comments);
+    rule->setComment(m_comments);
     rule->setSchedule(m_schedule);
     return rule;
 }

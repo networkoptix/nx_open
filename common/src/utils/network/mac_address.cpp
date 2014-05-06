@@ -1,10 +1,6 @@
 #include "mac_address.h"
 #include "nettools.h"
 
-static QnMacAddress parseMacAddress(const QString &mac) {
-
-}
-
 QnMacAddress::QnMacAddress() {
     memset(m_data, 0, 6);
 }

@@ -40,14 +40,14 @@ namespace QnBusiness
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-        Q_ENUMS(EventReason EventState EventType ActionType)
+    Q_ENUMS(EventReason EventState EventType ActionType)
 public:
 #else
     Q_NAMESPACE
 #endif
 
     enum EventReason {
-        NoReason,
+        NoReason = 0,
         NetworkNoFrameReason,
         NetworkConnectionClosedReason,
         NetworkRtpPacketLossReason,
@@ -55,47 +55,48 @@ public:
         ServerStartedReason,
         StorageIoErrorReason,
         StorageTooSlowReason,
-        StorageNotEnoughSpaceReason
+        StorageNotEnoughSpaceReason // TODO: #Elric #enum think of a better name.
     };
 
     enum EventState {
-        InactiveState,
-        ActiveState,
+        InactiveState = 0,
+        ActiveState = 1,
 
         /** Also used in event rule to associate non-toggle action with event with any toggle state. */
-        UndefinedState 
+        UndefinedState = 2
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventState)
 
     enum EventType {
         /** Event type is not defined. Used in rules. */
-        UndefinedEvent,
+        UndefinedEvent = 0,
 
         /** Motion has occured on a camera. */
-        CameraMotionEvent,
+        CameraMotionEvent = 1,
 
         /** Camera input signal is received. */
-        CameraInputEvent,
+        CameraInputEvent = 2,
 
         /** Camera was disconnected. */
-        CameraDisconnectEvent,
+        CameraDisconnectEvent = 3,
 
         /** Storage read error has occured. */
-        StorageFailureEvent,
+        StorageFailureEvent = 4,
 
         /** Network issue: packet lost, RTP timeout, etc. */
-        NetworkIssueEvent,
+        NetworkIssueEvent = 5,
 
         /** Found some cameras with same IP address. */
-        CameraIpConflictEvent,
+        CameraIpConflictEvent = 6,
 
         /** Connection to mediaserver lost. */
-        ServerFailureEvent,
+        ServerFailureEvent = 7,
 
         /** Two or more mediaservers are running. */
-        ServerConflictEvent,
+        ServerConflictEvent = 8,
 
         /** Media server started */
-        ServerStartEvent,
+        ServerStartEvent = 9,
 
         /**
          * Used when enumerating to build GUI lists, this and followed actions
@@ -114,27 +115,29 @@ public:
         /** Base index for the user defined events. */
         UserEvent = 1000
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventType)
 
     enum ActionType {
-        UndefinedAction,
+        UndefinedAction = 0,
 
-        /** Change camera output state.
+        /** 
+         * Change camera output state.
          *
          * Parameters:
          * - relayOutputID (string, required)          - id of output to trigger.
          * - relayAutoResetTimeout (uint, optional)    - timeout (in milliseconds) to reset camera state back.
          */
-        CameraOutputAction,
+        CameraOutputAction = 1,
 
-        CameraOutputOnceAction,
+        CameraOutputOnceAction = 2,
 
-        BookmarkAction,
+        BookmarkAction = 3,
 
         /** Start camera recording. */
-        CameraRecordingAction,
+        CameraRecordingAction = 4,
 
         /** Activate panic recording mode. */
-        PanicRecordingAction,     
+        PanicRecordingAction = 5,
 
         /** 
          * Send an email. This action can be executed from any endpoint. 
@@ -142,27 +145,26 @@ public:
          * Parameters:
          * - emailAddress (string, required)
          */
-        SendMailAction,
+        SendMailAction = 6,
 
         /** Write a record to the server's log. */
-        DiagnosticsAction,
+        DiagnosticsAction = 7,
 
-        ShowPopupAction,
+        ShowPopupAction = 8,
 
         /**
          * Parameters:
          * - soundUrl (string, required)               - url of sound, contains path to sound on the EC.
          */
-        PlaySoundAction,
+        PlaySoundAction = 9,
 
-        PlaySoundOnceAction,
-
+        PlaySoundOnceAction = 10,
 
         /**
          * Parameters:
          * - sayText (string, required)                - text that will be provided to TTS engine.
          */
-        SayTextAction,
+        SayTextAction = 11,
 
         /**
          * Used when enumerating to build GUI lists, this and followed actions
@@ -170,6 +172,7 @@ public:
          */
         ActionCount // TODO: #Elric remove
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 
     bool isImplemented(ActionType actionType);
 
