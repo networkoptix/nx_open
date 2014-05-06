@@ -195,6 +195,20 @@ namespace QnFusion {
     {};
 
     /**
+     * This metafuction returns the type of the field specified by the given
+     * access type.
+     * 
+     * \param Access                    Access type.
+     */
+    template<class Access>
+    struct access_member_type:
+        remove_cvr<decltype(invoke(
+            std::declval<typename Access::template at<getter_type, void>::type::result_type>(), 
+            std::declval<typename Access::template at<object_declval_type, void>::type::result_type>()
+        ))>
+    {}; // TODO: #Elric can be simplified with std::declval<Access>
+
+    /**
      * This metafunction returns a category of the setter specified by the
      * given access type.
      * 
@@ -205,10 +219,7 @@ namespace QnFusion {
     struct access_setter_category:
         setter_category<
             typename Access::template at<setter_type, void>::type,
-            typename remove_cvr<decltype(invoke(
-                std::declval<typename Access::template at<getter_type, void>::type::result_type>(), 
-                std::declval<typename Access::template at<object_declval_type, void>::type::result_type>()
-            ))>::type
+            typename access_member_type<Access>::type
         >
     {};
 

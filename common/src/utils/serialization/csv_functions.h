@@ -1,14 +1,80 @@
 #ifndef QN_SERIALIZATION_CSV_FUNCTIONS_H
 #define QN_SERIALIZATION_CSV_FUNCTIONS_H
 
+#include <map>
+#include <vector>
+#include <set>
+#include <iterator> /* For std::iterator_traits. */
+
+#include <boost/range/mutable_iterator.hpp>
+
+#include <QtCore/QList>
+#include <QtCore/QLinkedList>
+#include <QtCore/QVector>
+#include <QtCore/QSet>
+#include <QtCore/QVarLengthArray>
+#include <QtCore/QUuid>
+#include <QtCore/QUrl>
+
 #include "csv.h"
+
+
+namespace QnCsvDetail {
+    template<class Collection, class Output>
+    void serialize_collection(const Collection &value, QnCsvStreamWriter<Output> *stream) {
+        typedef typename std::iterator_traits<typename boost::range_mutable_iterator<Collection>::type>::value_type value_type;
+
+        serialize_collection_header(value_type(), stream, typename QnCsv::csv_category<value_type>::type());
+
+        for(const auto &element: value) {
+            QnCsv::serialize_record(element, stream);
+            stream->writeEndline();
+        }
+    }
+
+    template<class Element, class Output>
+    void serialize_collection_header(const Element &value, QnCsvStreamWriter<Output> *stream, const QnCsv::field_tag &) {
+        stream->writeField(lit("value"));
+        stream->writeEndline();
+    }
+
+    template<class Element, class Output>
+    void serialize_collection_header(const Element &value, QnCsvStreamWriter<Output> *stream, const QnCsv::record_tag &) {
+        QnCsv::serialize_record_header(value, QString(), stream);
+        stream->writeEndline();
+    }
+
+
+} // namespace QnCsvDetail
+
+
+template<class Output>
+void serialize_field(const QString &value, QnCsvStreamWriter<Output> *stream) {
+    stream->writeField(value);
+}
+
+template<class Output>
+void serialize_field(const QUuid &value, QnCsvStreamWriter<Output> *stream) {
+    stream->writeLatin1Field(value.toByteArray());
+}
+
+template<class Output>
+void serialize_field(const QUrl &value, QnCsvStreamWriter<Output> *stream) {
+    stream->writeField(value.toString(QUrl::FullyEncoded));
+}
+
+template<class Output>
+void serialize_field(const QByteArray &value, QnCsvStreamWriter<Output> *stream) {
+    stream->writeLatin1Field(value.toBase64());
+}
+
 
 #define QN_DEFINE_NUMERIC_CSV_FIELD_SERIALIZATION_FUNCTIONS(TYPE, TYPE_GETTER, ... /* NUMBER_FORMAT */) \
 template<class Output>                                                          \
 void serialize_field(const TYPE &value, QnCsvStreamWriter<Output> *stream) {    \
     stream->writeLatin1Field(QByteArray::number(value, ##__VA_ARGS__));         \
 }
-                                                 
+
 QN_DEFINE_NUMERIC_CSV_FIELD_SERIALIZATION_FUNCTIONS(int,                toInt)
 QN_DEFINE_NUMERIC_CSV_FIELD_SERIALIZATION_FUNCTIONS(unsigned int,       toUInt)
 QN_DEFINE_NUMERIC_CSV_FIELD_SERIALIZATION_FUNCTIONS(long,               toLong)
@@ -23,7 +89,7 @@ QN_DEFINE_NUMERIC_CSV_FIELD_SERIALIZATION_FUNCTIONS(double,             toDouble
 #define QN_DEFINE_INTEGER_CONVERSION_CSV_FIELD_SERIALIZATION_FUNCTIONS(TYPE)    \
 template<class Output>                                                          \
 void serialize_field(const TYPE &value, QnCsvStreamWriter<Output> *stream) {    \
-    serialize_field(static_cast<int>(value), target);                           \
+    serialize_field(static_cast<int>(value), stream);                           \
 }
 
 QN_DEFINE_INTEGER_CONVERSION_CSV_FIELD_SERIALIZATION_FUNCTIONS(char)
@@ -34,17 +100,23 @@ QN_DEFINE_INTEGER_CONVERSION_CSV_FIELD_SERIALIZATION_FUNCTIONS(unsigned short)
 #undef QN_DEFINE_INTEGER_CONVERSION_CSV_FIELD_SERIALIZATION_FUNCTIONS
 
 
-template<class Output>
-void serialize(const QString &value, QnCsvStreamWriter<Output> *stream) {
-    stream->writeField(value);
+#ifndef Q_MOC_RUN
+#define QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG) \
+template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Output>                            \
+void serialize_document(const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> &value, QnCsvStreamWriter<Output> *stream) { \
+    QnCsvDetail::serialize_collection(value, stream);                           \
 }
 
-template<class Collection, class Output>
-void serialize_document(const Collection &value, QnCsvStreamWriter<Output> *stream) {
-    QnCsv::serialize_record_header(value, QString(), stream);
-    
-    for(const auto &element: value)
-        QnCsv::serialize_record(element, stream);
-}
+QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(QSet, (class T), (T));
+QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(QList, (class T), (T));
+QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(QLinkedList, (class T), (T));
+QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(QVector, (class T), (T));
+QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(QVarLengthArray, (class T, int N), (T, N));
+QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator));
+QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator));
+QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator)); // TODO: #Elric should not be here
+#undef QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS
+#endif // Q_MOC_RUN
+
 
 #endif // QN_SERIALIZATION_CSV_FUNCTIONS_H

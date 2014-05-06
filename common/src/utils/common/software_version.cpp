@@ -8,6 +8,7 @@
 #include <utils/serialization/binary_functions.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/serialization/lexical_functions.h>
+#include <utils/serialization/csv_functions.h>
 
 QString QnSoftwareVersion::toString(QnSoftwareVersion::Format format) const {
     QString result = QString::number(m_data[0]);
@@ -70,4 +71,8 @@ void serialize(const QnSoftwareVersion &value, QnOutputBinaryStream<QByteArray> 
 
 bool deserialize(QnInputBinaryStream<QByteArray> *stream, QnSoftwareVersion *target) {
     return QnBinary::deserialize(stream, &target->m_data);
+}
+
+void serialize_field(const QnSoftwareVersion &value, QnCsvStreamWriter<QByteArray> *target) {
+    target->writeField(value.toString());
 }
