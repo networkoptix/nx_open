@@ -17,7 +17,7 @@ private:
     int addCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
     int updateCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
     int deleteCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
-    int getCameraBookmarkAction(const QnRequestParams & params, QnJsonRestResult &result);
+    int getCameraBookmarksAction(const QnRequestParams & params, QnJsonRestResult &result);
 };
 
 #endif // QN_CAMERA_BOOKMARKS_REST_HANDLER_H

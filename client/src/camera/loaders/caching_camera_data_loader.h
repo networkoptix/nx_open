@@ -49,6 +49,7 @@ public:
 
     void addBookmark(const QnCameraBookmark &bookmark);
     void updateBookmark(const QnCameraBookmark &bookmark);
+    void removeBookmark(const QnCameraBookmark & bookmark);
     QnCameraBookmark bookmarkByTime(qint64 position) const;
 signals:
     void periodsChanged(Qn::TimePeriodContent type);
@@ -76,6 +77,7 @@ private:
     qint64 bookmarkResolution(qint64 periodDuration) const;
     void updateTimePeriods(Qn::CameraDataType dataType);
     void updateBookmarks();
+    
 private:
     QnResourcePtr m_resource;
     bool m_resourceIsLocal;

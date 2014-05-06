@@ -21,7 +21,10 @@ public:
 
     QnCameraBookmark find(const qint64 position) const;
     void updateBookmark(const QnCameraBookmark &bookmark);
+    void removeBookmark(const QnCameraBookmark & bookmark);
 private:
+    void updateDataSource();
+
     QnCameraBookmarkList m_data;
     QnTimePeriodList m_dataSource;
 };

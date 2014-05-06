@@ -57,10 +57,7 @@ QnBookmarkCameraData::QnBookmarkCameraData(const QnCameraBookmarkList &data):
     QnAbstractCameraData(Qn::BookmarkData),
     m_data(data)
 {
-    QVector<QnTimePeriodList> periods;
-    foreach (const QnCameraBookmark &bookmark, m_data)
-        periods.append(QnTimePeriodList(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs)));
-    m_dataSource = QnTimePeriodList::mergeTimePeriods(periods); //TODO: #GDM #Bookmarks need an analogue for the single periods
+    updateDataSource();
 }
 
 void QnBookmarkCameraData::append(const QnAbstractCameraDataPtr &other) {
@@ -142,5 +139,17 @@ void QnBookmarkCameraData::updateBookmark(const QnCameraBookmark &bookmark) {
         return;
     }
     qWarning() << "updating non-existent bookmark" << bookmark;
+}
+
+void QnBookmarkCameraData::removeBookmark(const QnCameraBookmark & bookmark) {
+    m_data.erase(std::remove_if(m_data.begin(), m_data.end(), [bookmark](const QnCameraBookmark &value){ return value.guid == bookmark.guid; }), m_data.end());
+    updateDataSource();
+}
+
+void QnBookmarkCameraData::updateDataSource() {
+    QVector<QnTimePeriodList> periods;
+    foreach (const QnCameraBookmark &bookmark, m_data)
+        periods.append(QnTimePeriodList(QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs)));
+    m_dataSource = QnTimePeriodList::mergeTimePeriods(periods); //TODO: #GDM #Bookmarks need an analogue for the single periods
 }
 

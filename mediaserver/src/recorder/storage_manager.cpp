@@ -1084,7 +1084,6 @@ bool QnStorageManager::deleteBookmark(const QByteArray &cameraGuid, QnCameraBook
     if (!catalog)
         return false;
 
-    //TODO: #GDM #Bookmark cast int64 to int
     DeviceFileCatalog::Chunk chunk = catalog->takeChunk(bookmark.startTimeMs, bookmark.durationMs);
     if (chunk.durationMs == 0)
         return false;

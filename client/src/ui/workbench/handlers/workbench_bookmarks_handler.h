@@ -30,6 +30,7 @@ private slots:
     void at_removeCameraBookmarkAction_triggered();
     void at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle);
     void at_bookmarkUpdated(int status, const QnCameraBookmark &bookmark, int handle);
+    void at_bookmarkDeleted(int status, const QnCameraBookmark &bookmark, int handle);
 
     void updateTags();
 private:

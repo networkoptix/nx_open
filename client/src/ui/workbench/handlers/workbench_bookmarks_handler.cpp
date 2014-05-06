@@ -157,18 +157,18 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
     if (!server || server->getStatus() != QnResource::Online) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
-            tr("Bookmark can only be edited on an online server.")); //TODO: #Elric ec2 update text if needed
+            tr("Bookmark can only be deleted from an online server.")); //TODO: #Elric ec2 update text if needed
         return;
     }
 
     if (QMessageBox::information(mainWindow(),
             tr("Confirm delete"),
-            tr("Are you sure you want to delete this bookmark?"),
+            tr("Are you sure you want to delete this bookmark %1?").arg(bookmark.name),
             QMessageBox::Ok | QMessageBox::Cancel, 
             QMessageBox::Cancel) != QMessageBox::Ok)
         return;
 
-    int handle = server->apiConnection()->deleteBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkUpdated(int, const QnCameraBookmark &, int)));
+    int handle = server->apiConnection()->deleteBookmarkAsync(camera, bookmark, this, SLOT(at_bookmarkDeleted(int, const QnCameraBookmark &, int)));
     m_processingBookmarks[handle] = camera;
 }
 
@@ -195,5 +195,14 @@ void QnWorkbenchBookmarksHandler::at_bookmarkUpdated(int status, const QnCameraB
 
     if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
         loader->updateBookmark(bookmark);
+}
+
+void QnWorkbenchBookmarksHandler::at_bookmarkDeleted(int status, const QnCameraBookmark &bookmark, int handle) {
+    QnResourcePtr camera = m_processingBookmarks.take(handle);
+    if (status != 0 || !camera)
+        return;
+
+    if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
+        loader->removeBookmark(bookmark);
 }
 

@@ -63,7 +63,7 @@ namespace {
         (BookmarkAddObject,        "cameraBookmarks/add")
         (BookmarkUpdateObject,     "cameraBookmarks/update")
         (BookmarkDeleteObject,     "cameraBookmarks/delete")
-        (BookmarkGetObject,        "cameraBookmarks/get")
+        (BookmarksGetObject,       "cameraBookmarks/get")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -390,12 +390,10 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     }
     case BookmarkAddObject: 
     case BookmarkUpdateObject: 
+    case BookmarkDeleteObject:
         processJsonReply<QnCameraBookmark>(this, response, handle);
         break;
-    case BookmarkDeleteObject:
-        emitFinished(this, response.status, handle);
-        break;
-    case BookmarkGetObject:
+    case BookmarksGetObject:
         processJsonReply<QnCameraBookmarkList>(this, response, handle);
         break;
     default:
@@ -821,7 +819,7 @@ int QnMediaServerConnection::deleteBookmarkAsync(const QnNetworkResourcePtr &cam
     QnRequestParamList params;
     params << QnRequestParam("id",      QnLexical::serialized(camera->getPhysicalId()));
 
-    return sendAsyncPostRequest(BookmarkDeleteObject, headers, params, QJson::serialized(bookmark), NULL, target, slot);
+    return sendAsyncPostRequest(BookmarkDeleteObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
 }
 
 int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot) {
@@ -835,6 +833,6 @@ int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camer
     params << QnRequestParam("minDurationMs",    QnLexical::serialized(filter.minDurationMs));
     params << QnRequestParam("tags",             QnLexical::serialized(filter.tags.join(L',')));
     
-    return sendAsyncGetRequest(BookmarkGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
+    return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 

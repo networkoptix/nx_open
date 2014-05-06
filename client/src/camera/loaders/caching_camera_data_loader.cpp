@@ -177,6 +177,7 @@ void QnCachingCameraDataLoader::setMotionRegions(const QList<QRegion> &motionReg
 
     m_motionRegions = motionRegions;
     m_requestedTimePeriods[Qn::MotionContent].clear();
+    m_data[Qn::MotionContent].clear();
     updateTimePeriods(Qn::MotionTimePeriod);
 }
 
@@ -230,9 +231,9 @@ void QnCachingCameraDataLoader::addBookmark(const QnCameraBookmark &bookmark) {
 
 
 void QnCachingCameraDataLoader::updateBookmark(const QnCameraBookmark &bookmark) {
-    QnAbstractCameraDataPtr bookmarkData(new QnBookmarkCameraData(QnCameraBookmarkList() << bookmark));
     if (!m_data[Qn::BookmarkData]) {
         qWarning() << "updating non-existent bookmark" << bookmark;
+        addBookmark(bookmark);
         return;
     }
     QnBookmarkCameraData* list = dynamic_cast<QnBookmarkCameraData*>(m_data[Qn::BookmarkData].data());
@@ -240,6 +241,24 @@ void QnCachingCameraDataLoader::updateBookmark(const QnCameraBookmark &bookmark)
         
     emit bookmarksChanged();
 }
+
+void QnCachingCameraDataLoader::removeBookmark(const QnCameraBookmark & bookmark) {
+    if (!m_data[Qn::BookmarkData]) {
+        qWarning() << "removing non-existent bookmark" << bookmark;
+        return;
+    }
+    QnBookmarkCameraData* list = dynamic_cast<QnBookmarkCameraData*>(m_data[Qn::BookmarkData].data());
+    list->removeBookmark(bookmark);
+
+    m_requestedTimePeriods[Qn::BookmarksContent].clear();
+    m_data[Qn::BookmarkTimePeriod].clear();
+    if (m_loaders[Qn::BookmarkTimePeriod])
+        m_loaders[Qn::BookmarkTimePeriod]->discardCachedData();
+    updateTimePeriods(Qn::BookmarkTimePeriod);
+
+    emit bookmarksChanged();
+}
+
 
 QnCameraBookmark QnCachingCameraDataLoader::bookmarkByTime(qint64 position) const {
     if (!m_data[Qn::BookmarkData])
@@ -372,8 +391,11 @@ void QnCachingCameraDataLoader::at_loader_failed(int /*status*/, int handle) {
 }
 
 void QnCachingCameraDataLoader::at_syncTime_timeChanged() {
-    for(int i = 0; i < Qn::CameraDataTypeCount; i++)
-        m_loaders[i]->discardCachedData();
+    for(int i = 0; i < Qn::CameraDataTypeCount; i++) {
+        m_data[i].clear();
+        if (m_loaders[i])
+            m_loaders[i]->discardCachedData();
+    }
 
     for (int i = 0; i < Qn::TimePeriodContentCount; ++i) {
         Qn::TimePeriodContent timePeriod = static_cast<Qn::TimePeriodContent>(i);

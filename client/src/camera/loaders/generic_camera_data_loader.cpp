@@ -108,7 +108,7 @@ void QnGenericCameraDataLoader::discardCachedData(const qint64 resolutionMs) {
         m_loadedData.clear();
         m_loadedPeriods.clear();
     } else {
-        std::remove_if(m_loading.begin(), m_loading.end(), [resolutionMs](const LoadingInfo &info) { return info.resolutionMs == resolutionMs; });
+        m_loading.erase(std::remove_if(m_loading.begin(), m_loading.end(), [resolutionMs](const LoadingInfo &info) { return info.resolutionMs == resolutionMs; }), m_loading.end());
         m_loadedData[resolutionMs].clear();
         m_loadedPeriods[resolutionMs].clear();
     }

@@ -9,7 +9,7 @@
 int QnCameraBookmarksRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
     QString action = extractAction(path);
     if (action == "get")
-        return getCameraBookmarkAction(params, result);
+        return getCameraBookmarksAction(params, result);
     return CODE_NOT_FOUND;
 }
 
@@ -64,11 +64,12 @@ int QnCameraBookmarksRestHandler::deleteCameraBookmarkAction(const QnRequestPara
     if (!qnStorageMan->deleteBookmark(id.toUtf8(), bookmark))
         return CODE_INVALID_PARAMETER;
 
+    result.setReply(bookmark);
     return CODE_OK;
 }
 
 
-int QnCameraBookmarksRestHandler::getCameraBookmarkAction(const QnRequestParams & params, QnJsonRestResult & result) {
+int QnCameraBookmarksRestHandler::getCameraBookmarksAction(const QnRequestParams & params, QnJsonRestResult & result) {
     //TODO: #GDM #Bookmarks check time periods existence via qnStorageMan
 
     QString id = params.value("id");

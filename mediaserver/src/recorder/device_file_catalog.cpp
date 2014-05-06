@@ -621,7 +621,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64
     while (itr > m_chunks.begin() + m_firstDeleteCount && itr->startTimeMs == startTimeMs && itr->durationMs != durationMs)
         --itr;
 
-    if (itr->startTimeMs == startTimeMs && itr->durationMs == durationMs) {
+    if (itr != m_chunks.end() && itr->startTimeMs == startTimeMs && itr->durationMs == durationMs) {
         Chunk result = *itr;
         m_chunks.erase(itr);
         return result;
