@@ -51,48 +51,28 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
     if (urlPath.endsWith(QLatin1String("/")))
         urlPath.chop(1);
 
-    
     if (/*urlPath.isEmpty() || */urlPath == QLatin1String("api/ping")) {
         rez << QNetworkProxy(QNetworkProxy::NoProxy);
         return rez;
     }
     QUrl url = query.url();
-    
-
     QString url_host = url.host();
-    int port = url.port();
-
-
-    QString userAdmin = url.userName();
-    QString userPassword = url.password();
-
 
     url.setPath(QString());
     url.setUserInfo(QString());
     url.setQuery(QUrlQuery());
 
-
     QMutexLocker locker(&m_mutex);
 
     QMap<QString, ProxyInfo>::const_iterator itr;
-    for ( itr = m_proxyInfo.begin() ; itr != m_proxyInfo.end() ; itr++ )
-    {
-        qDebug() << "proxy can be" << itr.key();
-    }
-
-    QString host = url_host;//QString(QLatin1String("%1:%2")).arg(url_host).arg(port);
-
-    itr = m_proxyInfo.find(host);
+    itr = m_proxyInfo.find(url_host);
     if (itr == m_proxyInfo.end())
     {
-        qDebug() << "proxy disagree" << urlPath << "   " << url;
         rez << QNetworkProxy(QNetworkProxy::NoProxy);
     }
     else
     {
-        qDebug() << "proxy agree" << urlPath << "   " << url << "proxy url" << itr.value().addr << "proxy port"<<  itr.value().port;
-        QNetworkProxy proxy(QNetworkProxy::HttpProxy, itr.value().addr, itr.value().port,userAdmin,userPassword);
-        rez << proxy;
+        rez << QNetworkProxy(QNetworkProxy::HttpProxy, itr.value().addr, itr.value().port);
     }
     return rez;
 }

@@ -39,7 +39,7 @@ QnAuthHelper* QnAuthHelper::instance()
     return m_instance;
 }
 
-bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response) {
+bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy) {
     QString cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
     int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
     if (customAuthInfoPos >= 0) {
@@ -55,8 +55,10 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         return (!qnResPool->getResourceById(QUuid(videoWall_auth)).dynamicCast<QnVideoWallResource>().isNull());
 
     nx_http::StringType authorization = nx_http::getHeaderValue( request.headers, "Authorization" );
+    if (authorization.isEmpty())
+        authorization = nx_http::getHeaderValue( request.headers, "Proxy-Authorization" );
     if (authorization.isEmpty()) {
-        addAuthHeader(response);
+        addAuthHeader(response, isProxy);
         return false;
     }
 
@@ -68,7 +70,7 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         authData = authorization.mid(pos+1);
     }
     if (authType == "digest")
-        return doDigestAuth( request.requestLine.method, authData, response);
+        return doDigestAuth(request.requestLine.method, authData, response, isProxy);
     else if (authType == "basic")
         return doBasicAuth(authData, response);
     else
@@ -112,7 +114,7 @@ static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter
     return rez;
 }
 
-bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders)
+bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy)
 {
     const QList<QByteArray>& authParams = smartSplit(authData, ',');
 
@@ -193,7 +195,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
         }
     }
 
-    addAuthHeader(responseHeaders);
+    addAuthHeader(responseHeaders, isProxy);
     return false;
 }
 
@@ -245,10 +247,11 @@ bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::Re
     return false;
 }
 
-void QnAuthHelper::addAuthHeader(nx_http::Response& response)
+void QnAuthHelper::addAuthHeader(nx_http::Response& response, bool isProxy)
 {
     QString auth(lit("Digest realm=\"%1\",nonce=\"%2\""));
-    response.headers.insert( nx_http::HttpHeader( "WWW-Authenticate", auth.arg(REALM).arg(QLatin1String(getNonce())).toLatin1() ) );
+	QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
+	response.headers.insert( nx_http::HttpHeader(headerName, auth.arg(REALM).arg(QLatin1String(getNonce())).toLatin1() ) );
 }
 
 bool QnAuthHelper::isNonceValid(const QByteArray& nonce) const
