@@ -67,6 +67,7 @@ namespace nx_hls
             return false;
         }
         m_prevChunkEndTimestamp = nextData->timestamp;
+        m_currentArchiveChunk = m_delegate->getLastUsedChunkInfo();
 
         m_initialPlaylistCreated = false;
         return true;
@@ -128,15 +129,29 @@ namespace nx_hls
         AbstractPlaylistManager::ChunkData chunkData;
         chunkData.mediaSequence = ++m_chunkMediaSequence;
         chunkData.startTimestamp = m_prevChunkEndTimestamp;
-        chunkData.duration = (nextData->flags & QnAbstractMediaData::MediaFlags_BOF)
-            ? m_targetDurationUsec                                  //taking into account gaps in archive
-            : currentChunkEndTimestamp - chunkData.startTimestamp;
+        if( nextData->flags & QnAbstractMediaData::MediaFlags_BOF )
+        {
+            //gap in archive detected
+            if( m_prevChunkEndTimestamp >= m_currentArchiveChunk.startTimeUsec && 
+                m_prevChunkEndTimestamp < (m_currentArchiveChunk.startTimeUsec + m_currentArchiveChunk.durationUsec) )
+            {
+                chunkData.duration = m_currentArchiveChunk.durationUsec - (m_prevChunkEndTimestamp - m_currentArchiveChunk.startTimeUsec);
+            }
+            else
+            {
+                //TODO/HLS: #ak some correction is required to call addOneMoreChunk() at appropriate time
+                chunkData.duration = m_targetDurationUsec;
+            }
+            m_discontinuityDetected = true;
+        }
+        else
+        {
+            chunkData.duration = currentChunkEndTimestamp - chunkData.startTimestamp;
+            m_discontinuityDetected = false;
+        }
         chunkData.discontinuity = m_discontinuityDetected;
-        m_discontinuityDetected = (nextData->flags & QnAbstractMediaData::MediaFlags_BOF) > 0;
         m_totalPlaylistDuration += chunkData.duration;
         m_chunks.push_back( chunkData );
-
-        //TODO: #ak timer correction is required in case of discontinuity
 
         if( m_chunks.size() > m_maxChunkNumberInPlaylist )
         {
@@ -146,6 +161,7 @@ namespace nx_hls
 
         m_prevChunkEndTimestamp = currentChunkEndTimestamp;
         m_prevGeneratedChunkDuration = chunkData.duration;
+        m_currentArchiveChunk = m_delegate->getLastUsedChunkInfo();
 
         return true;
     }

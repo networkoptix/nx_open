@@ -59,6 +59,8 @@ namespace nx_hls
         bool m_initialPlaylistCreated;
         qint64 m_prevGeneratedChunkDuration;
         bool m_discontinuityDetected;
+        //!archive chunk, that holds last found position
+        QnAbstractArchiveDelegate::ArchiveChunkInfo m_currentArchiveChunk;
 
         void generateChunksIfNeeded();
         bool addOneMoreChunk();
