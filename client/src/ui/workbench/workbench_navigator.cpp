@@ -1263,7 +1263,7 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         QnCameraBookmark bookmark;
         if (QnCachingCameraDataLoader *loader = this->loader(m_currentMediaWidget))
             bookmark = loader->bookmarkByTime(position);
-        if (!bookmark.guid.isNull())
+        if (!bookmark.isNull())
             parameters.setArgument(Qn::CameraBookmarkRole, bookmark);
     }
     

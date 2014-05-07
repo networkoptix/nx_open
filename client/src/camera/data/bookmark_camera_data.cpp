@@ -58,6 +58,10 @@ QnBookmarkCameraData::QnBookmarkCameraData(const QnCameraBookmarkList &data):
     updateDataSource();
 }
 
+bool QnBookmarkCameraData::isEmpty() const {
+    return m_data.isEmpty();
+}
+
 void QnBookmarkCameraData::append(const QnAbstractCameraDataPtr &other) {
     if (!other)
         return;
@@ -77,8 +81,15 @@ void QnBookmarkCameraData::append(const QnAbstractCameraDataPtr &other) {
     m_dataSource = QnTimePeriodList::mergeTimePeriods(periods);
 }
 
-QnTimePeriodList QnBookmarkCameraData::dataSource() const {
-    return m_dataSource;
+void QnBookmarkCameraData::append(const QList<QnAbstractCameraDataPtr> &source) {
+    QVector<QnCameraBookmarkList> lists;
+    lists.append(m_data);
+    foreach (const QnAbstractCameraDataPtr &other, source) {
+        if (QnBookmarkCameraData* other_casted = dynamic_cast<QnBookmarkCameraData*>(other.data()))
+            lists.append(other_casted->m_data);
+    }
+    m_data = mergeBookmarks(lists);
+    updateDataSource();
 }
 
 void QnBookmarkCameraData::clear() {
@@ -86,29 +97,23 @@ void QnBookmarkCameraData::clear() {
     m_dataSource.clear();
 }
 
-QnAbstractCameraDataPtr QnBookmarkCameraData::merge(const QVector<QnAbstractCameraDataPtr> &source) {
-    QVector<QnCameraBookmarkList> lists;
-    lists.append(m_data);
-    foreach (const QnAbstractCameraDataPtr &other, source) {
-        if (QnBookmarkCameraData* other_casted = dynamic_cast<QnBookmarkCameraData*>(other.data()))
-            lists.append(other_casted->m_data);
-    }
-    return QnAbstractCameraDataPtr(new QnBookmarkCameraData(mergeBookmarks(lists)));
-}
-
 bool QnBookmarkCameraData::contains(const QnAbstractCameraDataPtr &other) const {
     QnBookmarkCameraData* other_casted = dynamic_cast<QnBookmarkCameraData*>(other.data());
     if (!other_casted)
         return false;
 
+    QSet<QUuid> lookedUp;
     foreach (const QnCameraBookmark &bookmark, other_casted->m_data)
-        if (!m_data.contains(bookmark))
-            return false;
-    return true;
+        lookedUp.insert(bookmark.guid);
+
+    foreach (const QnCameraBookmark &bookmark, m_data)
+        lookedUp.remove(bookmark.guid);
+
+    return lookedUp.isEmpty();
 }
 
-bool QnBookmarkCameraData::isEmpty() const {
-    return m_data.isEmpty();
+QnTimePeriodList QnBookmarkCameraData::dataSource() const {
+    return m_dataSource;
 }
 
 QnCameraBookmark QnBookmarkCameraData::find(const qint64 position) const {
@@ -124,7 +129,12 @@ QnCameraBookmark QnBookmarkCameraData::find(const qint64 position) const {
     return result;
 }
 
+QnCameraBookmarkList QnBookmarkCameraData::data() const {
+    return m_data;
+}
+
 void QnBookmarkCameraData::updateBookmark(const QnCameraBookmark &bookmark) {
+    int idx = -1;
     for (int i = 0; i < m_data.size(); ++i) {
         QnCameraBookmark existing = m_data[i];
         // stop if we overcome the position, bookmarks are sorted by start time
@@ -133,11 +143,34 @@ void QnBookmarkCameraData::updateBookmark(const QnCameraBookmark &bookmark) {
 
         if (existing.guid != bookmark.guid)
             continue;
+        idx = i;
+        break;
+    }
 
-        m_data[i] = bookmark;
+    if (idx < 0) {
+        qWarning() << "updating non-existent bookmark" << bookmark;
         return;
     }
-    qWarning() << "updating non-existent bookmark" << bookmark;
+
+    bool dataSourceChanged = m_data[idx].startTimeMs != bookmark.startTimeMs ||
+            m_data[idx].durationMs != bookmark.durationMs;
+    m_data[idx] = bookmark;
+
+    if (!dataSourceChanged) 
+        return;
+
+    //TODO: #GDM #Bookmarks Implement binary search sometime. Lowest priority because is not used at all for now.
+    // try to move bookmark backward to maintain sorting order
+    int i = idx;
+    while (i > 0 && m_data[i - 1].startTimeMs > bookmark.startTimeMs)
+        i--;
+    if (i == idx) // try to move bookmark forward to maintain sorting order
+        while (i < m_data.size() - 1 && m_data[i + 1].startTimeMs < bookmark.startTimeMs)
+            i++;
+
+    if (i != idx)
+        m_data.move(idx, i);
+    updateDataSource();
 }
 
 void QnBookmarkCameraData::removeBookmark(const QnCameraBookmark & bookmark) {
@@ -152,7 +185,4 @@ void QnBookmarkCameraData::updateDataSource() {
     m_dataSource = QnTimePeriodList::mergeTimePeriods(periods); //TODO: #GDM #Bookmarks need an analogue for the single periods
 }
 
-QnCameraBookmarkList QnBookmarkCameraData::data() const {
-    return m_data;
-}
 

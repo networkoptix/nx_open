@@ -1,35 +1,5 @@
 #include "abstract_camera_data.h"
 
-#include <recording/time_period_list.h>
-
-QnAbstractCameraData::QnAbstractCameraData() {
-}
-
-bool QnAbstractCameraData::isEmpty() const { 
-    return dataSource().isEmpty(); 
-};
-
-void QnAbstractCameraData::append(const QnAbstractCameraDataPtr &other) {
-    Q_UNUSED(other);
-};
-
-QnAbstractCameraDataPtr QnAbstractCameraData::merge(const QVector<QnAbstractCameraDataPtr> &source) {
-    Q_UNUSED(source);
-    return QnAbstractCameraDataPtr();
-}
-
-QnTimePeriodList QnAbstractCameraData::dataSource() const {
-    return QnTimePeriodList();
-}
-
-void QnAbstractCameraData::clear() {
-}
-
-bool QnAbstractCameraData::contains(const QnAbstractCameraDataPtr & data) const {
-    Q_UNUSED(data)
-    return false;
-}
-
 Qn::CameraDataType timePeriodToDataType(const Qn::TimePeriodContent timePeriodType) {
     switch (timePeriodType) {
     case Qn::RecordingContent:

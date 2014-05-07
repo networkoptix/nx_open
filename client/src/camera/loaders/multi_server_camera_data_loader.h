@@ -34,7 +34,7 @@ private:
     QMap<QString, QnAbstractCameraDataLoader *> m_cache;
 
     QMap<int, QList<int> > m_multiLoadProgress;
-    QMap<int, QVector<QnAbstractCameraDataPtr> > m_multiLoadData;
+    QMap<int, QList<QnAbstractCameraDataPtr> > m_multiLoadData;
 };
 
 #endif // QN_MULTI_SERVER_CAMERA_DATA_LOADER_H

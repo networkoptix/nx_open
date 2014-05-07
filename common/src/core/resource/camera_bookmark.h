@@ -28,6 +28,8 @@ struct QnCameraBookmark {
 
     qint64 endTimeMs() const;
 
+    bool isNull() const;
+
     QnCameraBookmarkTags tags;
 
     QnCameraBookmark():

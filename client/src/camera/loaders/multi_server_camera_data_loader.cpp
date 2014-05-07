@@ -84,10 +84,10 @@ void QnMultiServerCameraDataLoader::onDataLoaded(const QnAbstractCameraDataPtr &
         itr->removeOne(handle);
 
         if (itr->isEmpty()) { // if that was the last piece then merge and notify...
-            QnAbstractCameraDataPtr result = data->merge(m_multiLoadData[multiHandle]);
+            data->append(m_multiLoadData[multiHandle]); //bulk append works faster than appending elements one-by-one
             m_multiLoadData.remove(multiHandle);
             m_multiLoadProgress.erase(itr);
-            emit ready(result, multiHandle);
+            emit ready(data, multiHandle);
         } else { // ... else just store temporary result
             m_multiLoadData[multiHandle] << data;
         }
@@ -106,9 +106,9 @@ void QnMultiServerCameraDataLoader::onLoadingFailed(int status, int handle) {
         if (itr->isEmpty()) {
             if (!m_multiLoadData[multiHandle].isEmpty())
             {
-                QnAbstractCameraDataPtr first = m_multiLoadData[multiHandle].takeFirst();
-                QnAbstractCameraDataPtr result = first->merge(m_multiLoadData[multiHandle]);
-                emit ready(result, multiHandle);
+                QnAbstractCameraDataPtr data = m_multiLoadData[multiHandle].takeFirst();
+                data->append(m_multiLoadData[multiHandle]);
+                emit ready(data, multiHandle);
             }
             else {
                 emit failed(status, multiHandle);

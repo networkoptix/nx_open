@@ -7,26 +7,57 @@
 
 class QnTimePeriodList;
 
+/**
+ * @brief The QnAbstractCameraData class            Interface class for storing and handling camera archive metadata.
+ */
 class QnAbstractCameraData {
 public:
-    QnAbstractCameraData();
+    QnAbstractCameraData(){}
+
+    /**
+     * @brief isEmpty                               Check that there is some data in the struct.
+     * @return                                      True if there is at least one piece of data.
+     */
+    virtual bool isEmpty() const = 0;
     
-    virtual void append(const QnAbstractCameraDataPtr &other);
+    /**
+     * @brief append                                Append other piece of data.
+     * @param other                                 Other data struct.
+     */
+    virtual void append(const QnAbstractCameraDataPtr &other) = 0;
 
-    virtual QnAbstractCameraDataPtr merge(const QVector<QnAbstractCameraDataPtr> &source);
+    /**
+     * @brief append                                Append several pieces of data at once.
+     * @param source                                List of data structs to append.
+     */
+    virtual void append(const QList<QnAbstractCameraDataPtr> &source) = 0;
 
-    virtual QnTimePeriodList dataSource() const;
-    virtual bool isEmpty() const;
+    /**
+     * @brief clear                                 Remove all data from the struct.
+     */
+    virtual void clear() = 0;
 
-    virtual void clear();
+    /**
+     * @brief contains                              Check that some piece of data is fully covered with stored data.
+     * @param data                                  Checked data.
+     * @return                                      True if the data contains all the checked data.
+     */
+    virtual bool contains(const QnAbstractCameraDataPtr &data) const = 0;
 
-    virtual bool contains(const QnAbstractCameraDataPtr & data) const;
+    /**
+     * @brief dataSource                            Get the source time for the stored metadata.
+     * @return                                      Sorted list of time periods containing the metadata.
+     */
+    virtual QnTimePeriodList dataSource() const = 0;
 };
 
-Q_DECLARE_METATYPE(QnAbstractCameraDataPtr);
+Q_DECLARE_METATYPE(QnAbstractCameraDataPtr)
 
 //TODO: #GDM #Bookmarks move these functions to more common place
+/** Convert Qn::TimePeriodContent value to the corresponding value of the Qn::CameraDataType. */
 Qn::CameraDataType timePeriodToDataType(const Qn::TimePeriodContent timePeriodType);
+
+/** Convert Qn::CameraDataType value to the corresponding value of the Qn::TimePeriodContent. */
 Qn::TimePeriodContent dataTypeToPeriod(const Qn::CameraDataType dataType);
 
 #endif // __QN_ABSTRACT_CAMERA_DATA_H__

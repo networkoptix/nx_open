@@ -209,10 +209,10 @@ void QnCachingCameraDataLoader::setBookmarkTags(const QnCameraBookmarkTags &tags
 
 void QnCachingCameraDataLoader::addBookmark(const QnCameraBookmark &bookmark) {
     QnAbstractCameraDataPtr bookmarkData(new QnBookmarkCameraData(QnCameraBookmarkList() << bookmark));
-    m_bookmarkCameraData.append(bookmarkData);
+    m_bookmarkCameraData.append(bookmarkData); //TODO: #GDM #Bookmarks additional method for appending a single bookmark is required
 
     QnTimePeriod bookmarkPeriod(bookmark.startTimeMs, bookmark.durationMs);
-    m_timePeriodCameraData[Qn::BookmarksContent].append(QnTimePeriodList(bookmarkPeriod));
+    m_timePeriodCameraData[Qn::BookmarksContent].append(QnTimePeriodList(bookmarkPeriod));  //TODO: #GDM #Bookmarks additional method for appending a single period is required
 
     emit periodsChanged(Qn::BookmarksContent);
     emit bookmarksChanged();

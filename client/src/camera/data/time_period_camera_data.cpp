@@ -7,7 +7,6 @@
 QnTimePeriodCameraData::QnTimePeriodCameraData():
     QnAbstractCameraData()
 {
-
 }
 
 QnTimePeriodCameraData::QnTimePeriodCameraData(const QnTimePeriodList &data):
@@ -16,11 +15,24 @@ QnTimePeriodCameraData::QnTimePeriodCameraData(const QnTimePeriodList &data):
 {
 }
 
+bool QnTimePeriodCameraData::isEmpty() const {
+    return m_data.isEmpty();
+}
+
 void QnTimePeriodCameraData::append(const QnAbstractCameraDataPtr &other) {
     if (!other)
         return;
-    if (QnTimePeriodCameraData* other_casted = dynamic_cast<QnTimePeriodCameraData*>(other.data()))
-        append(other_casted->m_data);
+    append(other->dataSource());
+}
+
+void QnTimePeriodCameraData::append(const QList<QnAbstractCameraDataPtr> &source) {
+    QVector<QnTimePeriodList> allPeriods;
+    allPeriods << m_data;
+
+    foreach (const QnAbstractCameraDataPtr &other, source)
+        if (other)
+            allPeriods << other->dataSource();
+    m_data = QnTimePeriodList::mergeTimePeriods(allPeriods);
 }
 
 void QnTimePeriodCameraData::append(const QnTimePeriodList &other) {
@@ -29,27 +41,19 @@ void QnTimePeriodCameraData::append(const QnTimePeriodList &other) {
 
     QVector<QnTimePeriodList> allPeriods;
     if (!m_data.isEmpty() && m_data.last().durationMs == -1) 
-        if (other.last().startTimeMs >= m_data.last().startTimeMs) // TODO: #Elric should this be otherList.last().startTimeMs?
-            m_data.last().durationMs = 0;
+        if (other.last().startTimeMs >= m_data.last().startTimeMs)
+            m_data.removeLast();    //cut "recording" piece
     allPeriods << m_data << other;
     m_data = QnTimePeriodList::mergeTimePeriods(allPeriods); // union data
 }
 
-
-QnAbstractCameraDataPtr QnTimePeriodCameraData::merge(const QVector<QnAbstractCameraDataPtr> &source) {
-    QVector<QnTimePeriodList> allPeriods;
-    allPeriods << m_data;
-
-    foreach (const QnAbstractCameraDataPtr &other, source) {
-        if (!other)
-            continue;
-        if (QnTimePeriodCameraData* other_casted = dynamic_cast<QnTimePeriodCameraData*>(other.data()))
-            allPeriods << other_casted->m_data;
-    }
-    return QnAbstractCameraDataPtr(new QnTimePeriodCameraData(QnTimePeriodList::mergeTimePeriods(allPeriods)));
+void QnTimePeriodCameraData::clear() {
+    m_data.clear();
 }
 
 bool QnTimePeriodCameraData::contains(const QnAbstractCameraDataPtr &other) const {
+    if (!other)
+        return true;
     foreach (const QnTimePeriod &period, other->dataSource())
         if (!m_data.containPeriod(period))
             return false;
@@ -58,10 +62,6 @@ bool QnTimePeriodCameraData::contains(const QnAbstractCameraDataPtr &other) cons
 
 QnTimePeriodList QnTimePeriodCameraData::dataSource() const  {
     return m_data;
-}
-
-void QnTimePeriodCameraData::clear() {
-    m_data.clear();
 }
 
 bool QnTimePeriodCameraData::trim(qint64 trimTime) {
