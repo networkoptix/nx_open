@@ -302,9 +302,9 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
 
     qint64 currentTime = qnSyncTime->currentUSecsSinceEpoch();
 
+    bool isFirstCall = !m_aggregateActions.contains(eventKey);
     QnProcessorAggregationInfo& aggInfo = m_aggregateActions[eventKey];
-    bool isFirstCall = !aggInfo.initialized();
-    if (isFirstCall)
+    if (!aggInfo.initialized())
         aggInfo.init(bEvent, rule, currentTime);
 
     aggInfo.append(bEvent->getRuntimeParams());

@@ -44,6 +44,7 @@ public:
     void reset(qint64 timestamp){
         m_timestamp = timestamp;
         m_info.clear();
+        m_initialized = false;
     }
 
     void append(const QnBusinessEventParameters& runtimeParams) {
