@@ -18,9 +18,10 @@
 
 #include <utils/common/exception.h>
 
+// TODO: #Elric move somewhere.
 
 /*
- * Helper serialization functions. Not related to any specific serializarion format.
+ * Helper serialization functions. Not related to any specific serialization format.
  */
 
 void parseRegion(QRegion& region, const QString& regionString);

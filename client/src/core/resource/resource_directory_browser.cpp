@@ -14,7 +14,9 @@
 
 #include <utils/common/warnings.h>
 #include <utils/local_file_cache.h>
-#include "nx_ec/data/ec2_layout_data.h"
+#include "nx_ec/data/api_layout_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
+#include "utils/serialization/binary_functions.h"
 
 namespace {
     const int maxResourceCount = 1024;
@@ -130,8 +132,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     
     QnLayoutResourcePtr layout(new QnLayoutResource());
     ec2::ApiLayoutData apiLayout;
-    InputBinaryStream<QByteArray> stream(layoutData);
-    if (deserialize(apiLayout, &stream))
+    QnInputBinaryStream<QByteArray> stream(layoutData);
+    if (QnBinary::deserialize(&stream, &apiLayout))
         fromApiToResource(apiLayout, layout);
     else
         return QnLayoutResourcePtr();

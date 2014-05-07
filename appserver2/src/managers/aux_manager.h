@@ -3,9 +3,9 @@
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
-#include "nx_ec/data/camera_data.h"
-#include "nx_ec/data/ec2_resource_type_data.h"
-#include "nx_ec/data/ec2_stored_file_data.h"
+#include "nx_ec/data/api_camera_data.h"
+#include "nx_ec/data/api_resource_type_data.h"
+#include "nx_ec/data/api_stored_file_data.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 

@@ -14,7 +14,7 @@
 #include "core/resource/user_resource.h"
 
 #include "utils/common/sleep.h"
-#include "utils/common/enum_name_mapper.h"
+#include <utils/common/model_functions.h>
 #include "utils/common/synctime.h"
 #include "session_manager.h"
 #include "common_message_processor.h"
@@ -249,7 +249,7 @@ ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::getConnection2()
     return currentlyUsedEc2Connection;
 }
 
-bool initResourceTypes(ec2::AbstractECConnectionPtr ec2Connection)
+bool initResourceTypes(ec2::AbstractECConnectionPtr ec2Connection) // TODO: #Elric #EC2 pass reference
 {
     QList<QnResourceTypePtr> resourceTypeList;
     const ec2::ErrorCode errorCode = ec2Connection->getResourceManager()->getResourceTypesSync(&resourceTypeList);

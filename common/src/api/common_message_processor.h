@@ -36,11 +36,13 @@ signals:
     void businessRuleDeleted(const QnId &id);
     void businessRuleReset(const QnBusinessEventRuleList &rules);
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
+    void execBusinessAction(const QnAbstractBusinessActionPtr& action);
 
     void videowallControlMessageReceived(const QnVideoWallControlMessage &message);
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) = 0;
+    virtual void execBusinessActionInternal(QnAbstractBusinessActionPtr action) {}
     
     virtual void afterRemovingResource(const QnId &id);
 
@@ -52,7 +54,7 @@ public slots:
     void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
 private slots:
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
-    void on_runtimeInfoChanged(const ec2::QnRuntimeInfo &runtimeInfo);
+    void on_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
 
     void on_resourceStatusChanged(const QnId &resourceId, QnResource::Status status );
     void on_resourceParamsChanged(const QnId& resourceId, const QnKvPairList& kvPairs );
@@ -66,6 +68,7 @@ private slots:
     void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);
     void on_businessRuleReset(const QnBusinessEventRuleList &rules);
     void on_broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
+    void on_execBusinessAction( const QnAbstractBusinessActionPtr& action );
 
     void on_panicModeChanged(Qn::PanicMode mode);
 protected:

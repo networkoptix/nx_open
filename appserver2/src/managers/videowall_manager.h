@@ -6,7 +6,8 @@
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
-#include "nx_ec/data/ec2_videowall_data.h"
+#include "nx_ec/data/api_videowall_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 namespace ec2
 {
@@ -35,7 +36,7 @@ namespace ec2
         void triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran) {
             assert(tran.command == ApiCommand::videowallControl);
             QnVideoWallControlMessage message;
-            fromApiToMessage(tran.params, message);
+            fromApiToResource(tran.params, message);
             emit controlMessage(message);
         }
 

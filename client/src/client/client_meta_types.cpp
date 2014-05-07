@@ -3,7 +3,7 @@
 #include <common/common_meta_types.h>
 
 #include <utils/color_space/image_correction.h>
-#include <utils/common/json_serializer.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/ping_utility.h>
 
 #include <camera/thumbnail.h>
@@ -93,7 +93,7 @@ void QnClientMetaTypes::initialize() {
 
     QnJsonSerializer::registerSerializer<QnPaletteData>();
     QnJsonSerializer::registerSerializer<QnPenData>();
-    QnJsonSerializer::registerSerializer<QVector<QColor> >();
+    QnJsonSerializer::registerSerializer<QVector<QColor> >(); // TODO: #Elric integrate with QVariant iteration?
     QnJsonSerializer::registerSerializer<QVector<QUuid> >();
 
     qn_clientMetaTypes_initialized = true;

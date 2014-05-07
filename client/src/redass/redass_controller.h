@@ -51,6 +51,7 @@ private:
     bool isFFSpeed(double speed) const;
     bool existstBufferingDisplay() const;
 private:
+    // TODO: #Elric #enum
     enum FindMethod {Find_Biggest, Find_Least};
     enum LQReason {Reason_None, Reason_Small, Reason_Network, Reason_CPU, Reson_FF};
     struct RedAssInfo

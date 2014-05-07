@@ -107,7 +107,7 @@ namespace QnBusiness
     }
 }
 
-QnAbstractBusinessEvent::QnAbstractBusinessEvent(QnBusiness::EventType eventType, const QnResourcePtr& resource, Qn::ToggleState toggleState, qint64 timeStamp):
+QnAbstractBusinessEvent::QnAbstractBusinessEvent(QnBusiness::EventType eventType, const QnResourcePtr& resource, QnBusiness::EventState toggleState, qint64 timeStamp):
     m_eventType(eventType),
     m_timeStamp(timeStamp),
     m_resource(resource),

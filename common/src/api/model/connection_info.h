@@ -1,26 +1,42 @@
 #ifndef QN_CONNECTION_INFO_H
 #define QN_CONNECTION_INFO_H
 
+#ifndef QN_NO_QT
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
+#endif
 
-#include <nx_ec/binary_serialization_helper.h>
+#ifndef QN_NO_BASE
 #include <utils/common/software_version.h>
+#include <utils/common/model_functions_fwd.h>
 
-#include "compatibility.h"
+#include "compatibility_item.h"
 
-typedef QnSoftwareVersion SoftwareVersionType;
+typedef QnSoftwareVersion SoftwareVersionType; // TODO: #Elric remove?
+#endif
 
-#include "connection_info_i.h"
 
-typedef QnConnectionInfoData QnConnectionInfo;
+struct QnConnectionInfo {
+    QnConnectionInfo(): proxyPort(0) {}
 
-Q_DECLARE_METATYPE( QnConnectionInfo );
+    QUrl ecUrl;
+    SoftwareVersionType version;
+    QList<QnCompatibilityItem> compatibilityItems;
+    int proxyPort;
+    QString ecsGuid;
+    QString publicIp;
+    QString brand;
+};
 
+#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand)
+
+#ifndef QN_NO_QT
+QN_FUSION_DECLARE_FUNCTIONS(QnCompatibilityItem, (metatype)(json)(binary)(csv_record))
+QN_FUSION_DECLARE_FUNCTIONS(QnConnectionInfo, (metatype)(json)(binary)(csv_record))
 
 // TODO: #Elric remove shared pointer?
 typedef QSharedPointer<QnConnectionInfo> QnConnectionInfoPtr;
-
 Q_DECLARE_METATYPE(QnConnectionInfoPtr);
+#endif
 
 #endif // QN_CONNECTION_INFO_H

@@ -28,6 +28,7 @@ namespace nx_http
     class HttpStreamReader
     {
     public:
+        // TODO: #Elric #enum
         enum ReadState
         {
             waitingMessageStart,
@@ -65,6 +66,7 @@ namespace nx_http
         void flush();
 
     private:
+        // TODO: #Elric #enum
         enum ChunkStreamParseState
         {
             waitingChunkStart,

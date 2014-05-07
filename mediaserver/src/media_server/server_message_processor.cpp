@@ -8,6 +8,7 @@
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
+#include "business/business_message_bus.h"
 
 
 QnServerMessageProcessor::QnServerMessageProcessor():
@@ -190,4 +191,9 @@ bool QnServerMessageProcessor::isProxy(void* opaque, const QUrl& url)
 bool QnServerMessageProcessor::isProxy(const QUrl& url)
 {
     return isKnownAddr(url.host());
+}
+
+void QnServerMessageProcessor::execBusinessActionInternal(QnAbstractBusinessActionPtr action)
+{
+    qnBusinessMessageBus->at_actionReceived(action);
 }

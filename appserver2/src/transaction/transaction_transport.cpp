@@ -1,4 +1,8 @@
 #include "transaction_transport.h"
+
+#include <QtCore/QUrlQuery>
+#include <QtCore/QTimer>
+
 #include "transaction_message_bus.h"
 #include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
@@ -158,11 +162,10 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                         const int fullChunkLen = m_chunkHeaderLen + m_chunkLen + 2;
                         if (m_readBufferLen == fullChunkLen) 
                         {
-                            QSet<QnId> processedPeers;
-                            QSet<QnId> dstPeers;
                             QByteArray serializedTran;
-                            QnTransactionTransportSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, processedPeers, dstPeers, serializedTran);
-                            emit gotTransaction(serializedTran, processedPeers, dstPeers);
+                            TransactionTransportHeader transportHeader;
+                            QnTransactionTransportSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+                            emit gotTransaction(serializedTran, transportHeader);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
                     }
@@ -382,11 +385,10 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         int fullChunkLen = m_chunkHeaderLen + m_chunkLen + 2;
         if (bufferLen >= fullChunkLen)
         {
-            QSet<QnId> processedPeers;
-            QSet<QnId> dstPeers;
             QByteArray serializedTran;
-            QnTransactionTransportSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, processedPeers, dstPeers, serializedTran);
-            emit gotTransaction(serializedTran, processedPeers, dstPeers);
+            TransactionTransportHeader transportHeader;
+            QnTransactionTransportSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+            emit gotTransaction(serializedTran, transportHeader);
 
             buffer += fullChunkLen;
             bufferLen -= fullChunkLen;

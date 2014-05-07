@@ -56,6 +56,7 @@ private:
     bool initFormatConvertRule(QnAudioFormat format);
 
 private:
+    // TODO: #Elric #enum
     enum SampleConvertMethod {SampleConvert_None, SampleConvert_Float2Int32, SampleConvert_Float2Int16, SampleConvert_Int32ToInt16};
 
     QMutex m_guiSync;

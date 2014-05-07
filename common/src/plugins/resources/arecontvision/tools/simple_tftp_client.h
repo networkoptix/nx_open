@@ -14,7 +14,7 @@ class QnByteArray;
 // this class is designed just to be friendly with AV cams;( I doubd it can be usefull with smth else)
 class CLSimpleTFTPClient
 {
-
+    // TODO: #Elric #enum
     enum {all_ok,  time_out};
     enum {blk_size=1450, double_blk_size=2904};
 

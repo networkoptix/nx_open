@@ -28,6 +28,7 @@ namespace aio
     class SocketAddRemoveTask
     {
     public:
+        // TODO: #Elric #enum
         enum TaskType
         {
             tAdding,

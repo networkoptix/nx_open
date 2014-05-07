@@ -148,7 +148,7 @@ QPixmap QnWinAudioDeviceInfoPrivate::getDeviceIcon() {
         int percent2 = params[0].indexOf(QLatin1Char('%'), percent1+1);
         if (percent2 > percent1) {
             QString metaVal = params[0].mid(percent1, percent2-percent1+1);
-            QString val = QString::fromLocal8Bit(qgetenv(metaVal.mid(1, metaVal.length()-2).toLocal8Bit().constData()));
+            QString val = QString::fromLocal8Bit(qgetenv(metaVal.mid(1, metaVal.length()-2).toLatin1().constData()));
             params[0].replace(metaVal, val);
         }
         percent1 = params[0].indexOf(QLatin1Char('%'));

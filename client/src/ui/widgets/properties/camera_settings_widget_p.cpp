@@ -25,7 +25,7 @@ void QnCameraSettingsWidgetPrivate::calculateMaxFps(int *maxFps, int *maxDualStr
     {
         int cameraFps = camera->getMaxFps();
         int cameraDualStreamingFps = cameraFps;
-        bool shareFps = camera->streamFpsSharingMethod() == Qn::shareFps;
+        bool shareFps = camera->streamFpsSharingMethod() == Qn::BasicFpsSharing;
         Qn::MotionType motionType = motionTypeOverride == Qn::MT_Default
                 ? camera->getMotionType()
                 : motionTypeOverride;

@@ -69,7 +69,7 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(QnPanicBusinessActionPtr
         return true; // ignore panic business action if panic mode turn on by user
     
     Qn::PanicMode val = Qn::PM_None;
-    if (action->getToggleState() == Qn::OnState)
+    if (action->getToggleState() == QnBusiness::ActiveState)
         val =  Qn::PM_BusinessEvents;
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
     conn->setPanicModeSync(val);
@@ -85,7 +85,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessA
     bool rez = false;
     if (camera) {
         // todo: if camera is offline function return false. Need some tries on timer event
-        if (action->getToggleState() == Qn::OnState)
+        if (action->getToggleState() == QnBusiness::ActiveState)
             rez = qnRecordingManager->startForcedRecording(camera, action->getStreamQuality(), action->getFps(), 
                                                             action->getRecordBefore(), action->getRecordAfter(), 
                                                             action->getRecordDuration());
@@ -128,7 +128,7 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
             : qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     bool on = instant
             ? true
-            : action->getToggleState() == Qn::OnState;
+            : action->getToggleState() == QnBusiness::ActiveState;
 
     return securityCam->setRelayOutputState(
                 relayOutputId,

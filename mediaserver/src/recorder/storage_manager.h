@@ -23,7 +23,7 @@ class QnStorageManager: public QObject
 {
     Q_OBJECT
 public:
-
+    // TODO: #Elric #enum
     enum RebuildState {
         RebuildState_None,
         RebuildState_WaitForRecordersStopped,
@@ -164,7 +164,7 @@ private:
     friend class RebuildAsyncTask;
     RebuildAsyncTask* m_asyncRebuildTask;
 
-    QMap<QString, QnStorageDbPtr> m_chunksDB;
+    QMap<QnStorageResourcePtr, QnStorageDbPtr> m_chunksDB;
 };
 
 #define qnStorageMan QnStorageManager::instance()

@@ -27,14 +27,16 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole)
-    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes)
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace 
+            PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
+            StreamQuality SecondStreamQuality PanicMode RecordingType SerializationFormat)
+    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes ServerFlags)
 public:
 #else
     Q_NAMESPACE
 #endif
 
-    // TODO: #Elric #5.0 use Qt::Edge
+    // TODO: #Elric #5.0 use Qt::Edge ?
     /**
      * Generic enumeration describing borders of a rectangle.
      */
@@ -174,14 +176,22 @@ public:
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
     };
+
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
 
+
     enum StreamFpsSharingMethod {
-        shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
-        sharePixels, //if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
-        noSharing // second stream does not subtract first stream fps 
+        /** If second stream is running whatever fps it has, first stream can get maximumFps - secondstreamFps. */
+        BasicFpsSharing, 
+
+        /** If second stream is running whatever megapixel it has, first stream can get maxMegapixels - secondstreamPixels. */
+        PixelsFpsSharing, 
+
+        /** Second stream does not affect first stream's fps. */
+        NoFpsSharing 
     };
+
 
     enum MotionType {
         MT_Default = 0, 
@@ -190,20 +200,39 @@ public:
         MT_MotionWindow = 4, 
         MT_NoMotion = 8
     };
-    Q_DECLARE_FLAGS(MotionTypes, MotionType);
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionType)
 
-    enum PanicMode {PM_None, PM_BusinessEvents, PM_User};
-    enum ServerFlags { 
+    Q_DECLARE_FLAGS(MotionTypes, MotionType);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes);
+
+
+    enum PanicMode {
+        PM_None = 0, 
+        PM_BusinessEvents = 1, 
+        PM_User = 2
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PanicMode)
+
+
+    // TODO: #Elric #EC2 talk to Roma, write comments
+    enum ServerFlag { 
         SF_None     = 0, 
         SF_Edge     = 1,
-        SF_RemoteEC = 2
+        SF_RemoteEC = 2,
+        SF_HasPublicIP = 4
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
+
+    Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags);
+
 
     enum TimePeriodType {
         NullTimePeriod      = 0x1,  /**< No period. */
         EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
         NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
     };
+
     Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
     Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes);
 
@@ -212,13 +241,6 @@ public:
         RecordingContent,
         MotionContent,
         TimePeriodContentCount
-    };
-
-
-    enum ToggleState {
-        OffState,
-        OnState,
-        UndefinedState /**< Also used in event rule to associate non-toggle action with event with any toggle state. */
     };
 
 
@@ -344,6 +366,57 @@ public:
 
     };
 
+    // TODO: #Elric #EC2 rename
+    enum StreamQuality {
+        QualityLowest = 0,
+        QualityLow = 1,
+        QualityNormal = 2,
+        QualityHigh = 3,
+        QualityHighest = 4,
+        QualityPreSet = 5,
+        QualityNotDefined = 6,
+
+        StreamQualityCount
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamQuality)
+
+
+    // TODO: #Elric #EC2 rename
+    enum SecondStreamQuality { 
+        SSQualityLow = 0, 
+        SSQualityMedium = 1, 
+        SSQualityHigh = 2, 
+        SSQualityNotDefined = 3,
+        SSQualityDontUse = 4
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SecondStreamQuality)
+
+
+    // TODO: #Elric #EC2 rename
+    enum RecordingType {
+        /** Record always. */
+        RT_Always = 0,
+
+        /** Record only when motion was detected. */
+        RT_MotionOnly = 1,
+
+        /** Don't record. */
+        RT_Never = 2,
+
+        /** Record LQ stream always and HQ stream only on motion. */
+        RT_MotionAndLowQuality = 3,
+
+        RT_Count
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
+
+
+    enum SerializationFormat {
+        JsonFormat,
+        BnsFormat,
+        CsvFormat
+    };
+
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -360,6 +433,7 @@ public:
 
 } // namespace Qn
 
+
 /** 
  * \def lit
  * Helper macro to mark strings that are not to be translated. 
@@ -372,7 +446,14 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
-QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
-QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities), (metatype)(lexical)(json))
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities)
+        (Qn::MotionType)(Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlags)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::SerializationFormat), 
+    (metatype)(lexical)(json)
+)
 
 #endif // QN_COMMON_GLOBALS_H

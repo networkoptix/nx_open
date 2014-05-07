@@ -19,6 +19,7 @@ namespace nx_http
     class MultipartContentParserHelper
     {
     public:
+        // TODO: #Elric #enum
         enum State
         {
             readingBoundary,
@@ -27,6 +28,7 @@ namespace nx_http
             readingData
         };
 
+        // TODO: #Elric #enum
         enum ResultCode
         {
             needMoreData,

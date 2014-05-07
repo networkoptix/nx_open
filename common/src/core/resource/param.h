@@ -8,7 +8,10 @@
 
 #include <utils/common/id.h>
 
-enum QN_EXPORT QnDomain
+#include "resource_fwd.h"
+
+// TODO: #Elric #enum
+enum QnDomain
 {
     QnDomainMemory = 1,
     QnDomainDatabase = 2,
@@ -17,6 +20,7 @@ enum QN_EXPORT QnDomain
 
 struct QN_EXPORT QnParamType
 {
+    // TODO: #Elric #enum
     enum DataType { None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };
 
     QnParamType();
@@ -46,8 +50,6 @@ struct QN_EXPORT QnParamType
 
     bool setDefVal(const QVariant &val); // safe way to set value
 };
-
-typedef QSharedPointer<QnParamType> QnParamTypePtr;
 
 
 struct QN_EXPORT QnParam

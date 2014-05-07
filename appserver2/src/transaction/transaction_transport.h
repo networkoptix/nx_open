@@ -9,6 +9,7 @@
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/common/id.h"
 #include "transaction.h"
+#include "transaction_transport_header.h"
 
 namespace ec2
 {
@@ -32,7 +33,7 @@ public:
     ~QnTransactionTransport();
 
 signals:
-    void gotTransaction(QByteArray data, QSet<QnId> processedPeers, QSet<QnId> dstPeers);
+    void gotTransaction(QByteArray data, TransactionTransportHeader transportHeader);
     void stateChanged(State state);
 public:
     void doOutgoingConnect(QUrl remoteAddr);

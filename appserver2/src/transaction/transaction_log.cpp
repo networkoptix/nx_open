@@ -1,4 +1,9 @@
 #include "transaction_log.h"
+
+#include <QtCore/QCryptographicHash>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
+
 #include "common/common_module.h"
 #include "database/db_manager.h"
 #include "transaction.h"
@@ -31,11 +36,11 @@ void QnTransactionLog::init()
             m_updateHistory.insert(QUuid::fromRfc4122(query2.value(0).toByteArray()), query2.value(1).toLongLong());
     }
 
-    m_relativeOffset = 0;
+    m_relativeOffset = 1;
     QSqlQuery queryTime(m_dbManager->getDB());
     queryTime.prepare("SELECT max(timestamp) FROM transaction_log");
     if (queryTime.exec() && queryTime.next()) {
-        m_relativeOffset = qMax(0ll, queryTime.value(0).toLongLong());
+        m_relativeOffset = qMax(1ll, queryTime.value(0).toLongLong());
     }
 
     QSqlQuery querySequence(m_dbManager->getDB());
@@ -72,6 +77,7 @@ QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data
 ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QUuid& hash, const QByteArray& data)
 {
     Q_ASSERT_X(!tran.id.peerGUID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
+    Q_ASSERT(tran.id.peerGUID != qnCommon->moduleGUID() || tran.timestamp > 0);
 
     QSqlQuery query(m_dbManager->getDB());
     //query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, sequence, timestamp, tran_guid, tran_data) values (?, ?, ?, ?, ?)");
@@ -119,7 +125,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     foreach(const QUuid& peerGuid, m_state.keys())
     {
         QSqlQuery query(m_dbManager->getDB());
-        query.prepare("SELECT tran_data FROM transaction_log WHERE peer_guid = ? and sequence > ?  order by timestamp");
+        query.prepare("SELECT tran_data FROM transaction_log WHERE peer_guid = ? and sequence > ?  order by timestamp, peer_guid, sequence");
         query.bindValue(0, peerGuid.toRfc4122());
         query.bindValue(1, state.value(peerGuid));
         if (!query.exec())

@@ -104,7 +104,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 resource->setTypeId(typeId);
 
                 resource->setHostAddress(sender, QnDomainMemory);
-                resource->setMAC(QLatin1String(mac));
+                resource->setMAC(QnMacAddress(mac));
                 resource->setDiscoveryAddr(iface.address);
                 resource->setModel(QLatin1String(model));
                 resource->setName(QLatin1String(model));
@@ -240,7 +240,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     res->setTypeId(rt);
     res->setName(model);
     res->setModel(model);
-    res->setMAC(mac);
+    res->setMAC(QnMacAddress(mac));
     res->setHostAddress(host, QnDomainMemory);
     res->setAuth(auth);
 

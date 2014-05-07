@@ -37,7 +37,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_modified(false),
     m_eventType(QnBusiness::CameraDisconnectEvent),
-    m_eventState(Qn::UndefinedState),
+    m_eventState(QnBusiness::UndefinedState),
     m_actionType(QnBusiness::ShowPopupAction),
     m_aggregationPeriod(60),
     m_disabled(false),
@@ -58,9 +58,9 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_eventTypesModel->appendRow(row);
     }
 
-    QList<Qn::ToggleState> values;
-    values << Qn::OnState << Qn::OffState;
-    foreach (Qn::ToggleState val, values) {
+    QList<QnBusiness::EventState> values;
+    values << QnBusiness::ActiveState << QnBusiness::InactiveState;
+    foreach (QnBusiness::EventState val, values) {
         QStandardItem *item = new QStandardItem(toggleStateToModelString(val));
         item->setData(val);
 
@@ -217,7 +217,11 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
         case QnBusiness::ShowPopupAction:
         {
             QnBusinessActionParameters params = m_actionParams;
-            params.setUserGroup((QnBusinessActionParameters::UserGroup)value.toInt());
+
+            // TODO: #GDM you're implicitly relying on what enum values are, which is very bad.
+            // This code will fail silently if someone changes the header. Please write it properly.
+            
+            params.setUserGroup((QnBusinessActionParameters::UserGroup)value.toInt()); 
             setActionParams(params);
             break;
         }
@@ -273,10 +277,10 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 
     m_aggregationPeriod = businessRule->aggregationPeriod();
 
-    m_disabled = businessRule->disabled();
-    m_comments = businessRule->comments();
+    m_disabled = businessRule->isDisabled();
+    m_comments = businessRule->comment();
     m_schedule = businessRule->schedule();
-    m_system = businessRule->system();
+    m_system = businessRule->isSystem();
 
     updateActionTypesModel();//TODO: #GDM connect on dataChanged?
 
@@ -314,7 +318,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
     rule->setActionParams(m_actionParams); //TODO: #GDM filtered
     rule->setAggregationPeriod(m_aggregationPeriod);
     rule->setDisabled(m_disabled);
-    rule->setComments(m_comments);
+    rule->setComment(m_comments);
     rule->setSchedule(m_schedule);
     return rule;
 }
@@ -359,11 +363,11 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value) {
         fields |= QnBusiness::EventResourcesField;
     }
 
-    if (!QnBusiness::hasToggleState(m_eventType) && m_eventState != Qn::UndefinedState){
-        m_eventState = Qn::UndefinedState;
+    if (!QnBusiness::hasToggleState(m_eventType) && m_eventState != QnBusiness::UndefinedState){
+        m_eventState = QnBusiness::UndefinedState;
         fields |= QnBusiness::EventStateField;
     } else if (QnBusiness::hasToggleState(m_eventType) && !QnBusiness::hasToggleState(m_actionType)) {
-        m_eventState = Qn::OnState;
+        m_eventState = QnBusiness::ActiveState;
         fields |= QnBusiness::EventStateField;
     }
     if (!QnBusiness::hasToggleState(m_eventType) && QnBusiness::hasToggleState(m_actionType)) {
@@ -419,11 +423,11 @@ void QnBusinessRuleViewModel::setEventParams(const QnBusinessEventParameters &pa
     emit dataChanged(this, QnBusiness::EventParamsField | QnBusiness::ModifiedField);
 }
 
-Qn::ToggleState QnBusinessRuleViewModel::eventState() const {
+QnBusiness::EventState QnBusinessRuleViewModel::eventState() const {
     return m_eventState;
 }
 
-void QnBusinessRuleViewModel::setEventState(Qn::ToggleState state) {
+void QnBusinessRuleViewModel::setEventState(QnBusiness::EventState state) {
     if (m_eventState == state)
         return;
 
@@ -469,8 +473,8 @@ void QnBusinessRuleViewModel::setActionType(const QnBusiness::ActionType value) 
 
     if (QnBusiness::hasToggleState(m_eventType) &&
             !QnBusiness::hasToggleState(m_actionType) &&
-            m_eventState == Qn::UndefinedState) {
-        m_eventState = Qn::OnState;
+            m_eventState == QnBusiness::UndefinedState) {
+        m_eventState = QnBusiness::ActiveState;
         fields |= QnBusiness::EventStateField;
     }
 
@@ -892,24 +896,24 @@ QString QnBusinessRuleViewModel::getAggregationText() const {
     return tr("Every %n seconds", "", m_aggregationPeriod);
 }
 
-QString QnBusinessRuleViewModel::toggleStateToModelString(Qn::ToggleState value) {
+QString QnBusinessRuleViewModel::toggleStateToModelString(QnBusiness::EventState value) {
     switch( value )
     {
-    case Qn::OffState:
+    case QnBusiness::InactiveState:
         return tr("Stops");
-    case Qn::OnState:
+    case QnBusiness::ActiveState:
         return tr("Starts");
-    case Qn::UndefinedState:
+    case QnBusiness::UndefinedState:
         return tr("Starts/Stops");
     }
     return QString();
 }
 
-QString QnBusinessRuleViewModel::toggleStateToString(Qn::ToggleState state) {
+QString QnBusinessRuleViewModel::toggleStateToString(QnBusiness::EventState state) {
     switch (state) {
-    case Qn::OnState:
+    case QnBusiness::ActiveState:
         return tr("start");
-    case Qn::OffState:
+    case QnBusiness::InactiveState:
         return tr("stop");
     default:
         break;
@@ -917,7 +921,7 @@ QString QnBusinessRuleViewModel::toggleStateToString(Qn::ToggleState state) {
     return QString();
 }
 
-QString QnBusinessRuleViewModel::eventTypeString(QnBusiness::EventType eventType, Qn::ToggleState eventState, QnBusiness::ActionType actionType) {
+QString QnBusinessRuleViewModel::eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType) {
     QString typeStr = QnBusinessStringsHelper::eventName(eventType);
     if (QnBusiness::hasToggleState(actionType))
         return tr("While %1").arg(typeStr);

@@ -13,6 +13,7 @@
 
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/from_this_to_shared.h>
+#include <utils/common/model_functions_fwd.h>
 #include <utils/common/id.h>
 
 #include <core/datapacket/abstract_data_packet.h>
@@ -58,6 +59,7 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
 
 
 public:
+    // TODO: #Elric #enum
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
 
     enum Status {
@@ -68,7 +70,14 @@ public:
         NotDefined,
 
         /** Locked status used in layouts only */
-        Locked = Recording
+        Locked = Recording 
+        
+        // TODO: #EC2 #API #MSAPI Locked status was a bad idea in the first place. 
+        // Just add locked bool field to layout, and a proper migration script.
+        // 
+        // Think of how this is supposed to look in json API. 
+        // "layout": { "status": "Recording" }
+        // => Layout is locked. ZOMG!
     };
 
     enum Flag {
@@ -401,6 +410,8 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnResource::Status) // TODO: #Elric #EC2 move status out, clean up
+
 template<class Resource>
 QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     if(resource == NULL) {
@@ -446,14 +457,9 @@ public:
 };
 
 
-// for future use
-class QnRecorder : public QnResource
-{
-};
-
-
-Q_DECLARE_METATYPE(QnResource::Status);
 Q_DECLARE_METATYPE(QnResourcePtr);
 Q_DECLARE_METATYPE(QnResourceList);
+
+QN_FUSION_DECLARE_FUNCTIONS(QnResource::Status, (metatype)(json))
 
 #endif // QN_RESOURCE_H

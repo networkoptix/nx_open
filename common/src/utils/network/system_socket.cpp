@@ -1394,7 +1394,7 @@ bool UDPSocket::setMulticastTTL(unsigned char multicastTTL)  {
 bool UDPSocket::setMulticastIF(const QString& multicastIF)
 {
     struct in_addr localInterface;
-    localInterface.s_addr = inet_addr(multicastIF.toLocal8Bit().data());
+    localInterface.s_addr = inet_addr(multicastIF.toLatin1().data());
     if (setsockopt(sockDesc, IPPROTO_IP, IP_MULTICAST_IF, (raw_type *) &localInterface, sizeof(localInterface)) < 0) 
     {
         qnWarning("Multicast TTL set failed (setsockopt()).");

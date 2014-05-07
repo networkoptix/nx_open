@@ -4,7 +4,19 @@
 #include <QtCore/QJsonValue>
 #include <QtCore/QString>
 
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
+
+// TODO: #MSAPI rename to QnRestResult.
+// 
+// Add format field (Qn::SerializationFormat) that will be set in QnJsonRestHandler (to be renamed).
+// In setReply do QByteArray serialization right away, don't store in an 
+// intermediate QVariant/QJsonValue.
+// 
+// And it also might make sense to get rid of "error" in reply. Looks like it 
+// was a bad idea in the first place. This way we'll send a reply if there was
+// no error, and some HTTP error code otherwise. And maybe a text/plain 
+// description of the error.
+// 
 
 class QnJsonRestResult {
 public:
@@ -29,9 +41,11 @@ public:
         QJson::serialize(reply, &m_reply);
     }
 
-    QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnJsonRestResult, friend)
+    QN_FUSION_DECLARE_FUNCTIONS(QnJsonRestResult, (json), friend)
 
 private:
+    QN_FUSION_ENABLE_PRIVATE();
+
     QString m_errorString;
     Error m_error;
     QJsonValue m_reply;

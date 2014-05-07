@@ -1,6 +1,8 @@
 #include "business_rule_processor.h"
 
 #include <QtCore/QList>
+#include <QtCore/QBuffer>
+#include <QtGui/QImage>
 
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
@@ -25,10 +27,10 @@
 #include "business_strings_helper.h"
 #include "version.h"
 
-#include "nx_ec/data/ec2_email.h"
-#include <QtCore/QBuffer>
-#include <QtGui/QImage>
+#include "nx_ec/data/api_email_data.h"
 #include "common/common_module.h"
+#include "nx_ec/data/api_business_rule_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
@@ -52,7 +54,7 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(qnBusinessMessageBus, SIGNAL(actionDelivered(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDelivered(QnAbstractBusinessActionPtr)));
     connect(qnBusinessMessageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
 
-    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr, QnResourcePtr)), this, SLOT(executeActionInternal(QnAbstractBusinessActionPtr, QnResourcePtr)));
+    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeAction(QnAbstractBusinessActionPtr)));
 
     connect(QnCommonMessageProcessor::instance(),       SIGNAL(businessRuleChanged(QnBusinessEventRulePtr)),
             this, SLOT(at_businessRuleChanged(QnBusinessEventRulePtr)));
@@ -74,45 +76,72 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res)
 {
-    if (action->actionType() == QnBusiness::SendMailAction || action->actionType() == QnBusiness::DiagnosticsAction)
+    if (action->actionType() == QnBusiness::SendMailAction) {
+        // looking for server with public IP address
+        QnMediaServerResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+        if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
+            return QnMediaServerResourcePtr(); // do not proxy
+        foreach (QnMediaServerResourcePtr mServer, qnResPool->getAllServers())
+        {
+            if ((mServer->getServerFlags() & Qn::SF_HasPublicIP) && mServer->getStatus() == QnResource::Online)
+                return mServer;
+        }
+        return QnMediaServerResourcePtr();
+    }
+
+    if (!res)
+        return QnMediaServerResourcePtr();
+
+    if (action->actionType() == QnBusiness::DiagnosticsAction)
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!res)
         return QnMediaServerResourcePtr(); // can not find routeTo resource
     return qnResPool->getResourceById(res->getParentId()).dynamicCast<QnMediaServerResource>();
 }
 
+bool QnBusinessRuleProcessor::needProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
+{
+    QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
+    return routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getId() != getGuid();
+}
+
+void QnBusinessRuleProcessor::doProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
+{
+    QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
+    if (routeToServer) 
+    {
+        // todo: it is better to use action.clone here
+        ec2::ApiBusinessActionData actionData;
+        QnAbstractBusinessActionPtr actionToSend;
+
+        ec2::fromResourceToApi(action, actionData);
+        if (res) {
+            actionData.resourceIds.clear();
+            actionData.resourceIds.push_back(res->getId());
+        }
+        ec2::fromApiToResource(actionData, actionToSend, qnResPool);
+
+        qnBusinessMessageBus->deliveryBusinessAction(actionToSend, routeToServer->getId());
+    }
+}
+
+void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action, QnResourcePtr res)
+{
+    if (needProxyAction(action, res))
+        doProxyAction(action, res);
+    else
+        executeActionInternal(action, res);
+}
+
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
     QnResourceList resList = action->getResourceObjects().filtered<QnNetworkResource>();
     if (resList.isEmpty()) {
-        executeActionInternal(action, QnResourcePtr());
+        executeAction(action, QnResourcePtr());
     }
     else {
-        for (int i = 0; i < resList.size(); ++i)
-        {
-            QnMediaServerResourcePtr routeToServer = getDestMServer(action, resList[i]);
-            if (routeToServer && !action->isReceivedFromRemoteHost() && routeToServer->getId() != getGuid())
-            {
-                // delivery to other server
-                QUrl serverUrl = routeToServer->getApiUrl();
-                QUrl proxyUrl = QnAppServerConnectionFactory::defaultUrl();
-#if 0
-                // do proxy via EC builtin proxy. It is dosn't work. I don't know why
-                proxyUrl.setPath(QString(QLatin1String("/proxy/http/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
-#else
-                // do proxy via CPP media proxy
-                proxyUrl.setScheme(QLatin1String("http"));
-                proxyUrl.setPort(QnAppServerConnectionFactory::defaultMediaProxyPort());
-                proxyUrl.setPath(QString(QLatin1String("/proxy/%1:%2/api/execAction/")).arg(serverUrl.host()).arg(serverUrl.port()));
-#endif
-
-                QString url = proxyUrl.toString();
-                qnBusinessMessageBus->deliveryBusinessAction(action, resList[i], url); 
-            }
-            else {
-                executeActionInternal(action, resList[i]);
-            }
-        }
+        foreach(QnResourcePtr res, resList)
+            executeAction(action, res);
     }
 }
 
@@ -125,12 +154,12 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
         if (res)
             actionKey += QString(L'_') + res->getUniqueId();
 
-        if (action->getToggleState() == Qn::OnState)
+        if (action->getToggleState() == QnBusiness::ActiveState)
         {
             if (++m_actionInProgress[actionKey] > 1)
                 return true; // ignore duplicated start
         }
-        else if (action->getToggleState() == Qn::OffState)
+        else if (action->getToggleState() == QnBusiness::InactiveState)
         {
             if (--m_actionInProgress[actionKey] > 0)
                 return true; // ignore duplicated stop
@@ -243,7 +272,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
 
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
 
-    if (bEvent->getToggleState() == Qn::OffState && !runtimeRule.resources.isEmpty())
+    if (bEvent->getToggleState() == QnBusiness::InactiveState && !runtimeRule.resources.isEmpty())
         return QnAbstractBusinessActionPtr(); // ignore 'Off' event if some event resources still running
 
     if (!runtimeRule.isActionRunning.isEmpty())
@@ -251,15 +280,15 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(QnAbstr
         // Toggle event repeated with some interval with state 'on'.
         // if toggled action is used and condition is no longer valid - stop action
         // Or toggle event goes to 'off'. stop action
-        if (!condOK || bEvent->getToggleState() == Qn::OffState)
-            action = QnBusinessActionFactory::instantiateAction(rule, bEvent, Qn::OffState);
+        if (!condOK || bEvent->getToggleState() == QnBusiness::InactiveState)
+            action = QnBusinessActionFactory::instantiateAction(rule, bEvent, QnBusiness::InactiveState);
         else
             return QnAbstractBusinessActionPtr(); // ignore repeating 'On' event
     }
     else if (condOK)
         action = QnBusinessActionFactory::instantiateAction(rule, bEvent);
 
-    bool isActionRunning = action && action->getToggleState() == Qn::OnState;
+    bool isActionRunning = action && action->getToggleState() == QnBusiness::ActiveState;
     if (isActionRunning)
         runtimeRule.isActionRunning.insert(QnId());
     else
@@ -278,7 +307,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
         RunningRuleInfo& runtimeRule = itr.value();
         QnId resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnId();
 
-        if (condOK && bEvent->getToggleState() == Qn::OnState) {
+        if (condOK && bEvent->getToggleState() == QnBusiness::ActiveState) {
             if (runtimeRule.isActionRunning.contains(resId))
                 return QnAbstractBusinessActionPtr(); // action by rule already was ran. Allow separate action for each resource of source event but ingore repeated 'on' state
             else
@@ -291,7 +320,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(QnAbst
     if (!condOK)
         return QnAbstractBusinessActionPtr();
 
-    if (rule->eventState() != Qn::UndefinedState && rule->eventState() != bEvent->getToggleState())
+    if (rule->eventState() != QnBusiness::UndefinedState && rule->eventState() != bEvent->getToggleState())
         return QnAbstractBusinessActionPtr();
 
 
@@ -356,7 +385,7 @@ bool QnBusinessRuleProcessor::checkEventCondition(QnAbstractBusinessEventPtr bEv
     // for continue event put information to m_eventsInProgress
     QnId resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnId();
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
-    if (bEvent->getToggleState() == Qn::OnState)
+    if (bEvent->getToggleState() == QnBusiness::ActiveState)
         runtimeRule.resources[resId] = bEvent;
     else 
         runtimeRule.resources.remove(resId);
@@ -369,7 +398,7 @@ QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(QnAbstractBus
     QnAbstractBusinessActionList result;
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
-        if (rule->disabled() || rule->eventType() != bEvent->getEventType())
+        if (rule->isDisabled() || rule->eventType() != bEvent->getEventType())
             continue;
         bool condOK = checkEventCondition(bEvent, rule);
         if (condOK)
@@ -527,9 +556,9 @@ void QnBusinessRuleProcessor::at_businessRuleChanged_i(QnBusinessEventRulePtr bR
     {
         if (m_rules[i]->id() == bRule->id())
         {
-            if( !m_rules[i]->disabled() )
+            if( !m_rules[i]->isDisabled() )
                 notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
-            if( !bRule->disabled() )
+            if( !bRule->isDisabled() )
                 notifyResourcesAboutEventIfNeccessary( bRule, true );
             terminateRunningRule(m_rules[i]);
             m_rules[i] = bRule;
@@ -539,7 +568,7 @@ void QnBusinessRuleProcessor::at_businessRuleChanged_i(QnBusinessEventRulePtr bR
 
     //adding new rule
     m_rules << bRule;
-    if( !bRule->disabled() )
+    if( !bRule->isDisabled() )
         notifyResourcesAboutEventIfNeccessary( bRule, true );
 }
 
@@ -556,7 +585,7 @@ void QnBusinessRuleProcessor::at_businessRuleReset(QnBusinessEventRuleList rules
     // Remove all rules
     for (int i = 0; i < m_rules.size(); ++i)
     {
-        if( !m_rules[i]->disabled() )
+        if( !m_rules[i]->isDisabled() )
             notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
         terminateRunningRule(m_rules[i]);
     }
@@ -583,7 +612,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(QnBusinessEventRulePtr rule)
             else
                 bEvent = runtimeRule.resources.begin().value(); // for continues action resourceID is not specified and only one record is used
             if (bEvent) {
-                QnAbstractBusinessActionPtr action = QnBusinessActionFactory::instantiateAction(rule, bEvent, Qn::OffState);
+                QnAbstractBusinessActionPtr action = QnBusinessActionFactory::instantiateAction(rule, bEvent, QnBusiness::InactiveState);
                 if (action)
                     executeAction(action);
             }
@@ -609,7 +638,7 @@ void QnBusinessRuleProcessor::at_businessRuleDeleted(QnId id)
     {
         if (m_rules[i]->id() == id)
         {
-            if( !m_rules[i]->disabled() )
+            if( !m_rules[i]->isDisabled() )
                 notifyResourcesAboutEventIfNeccessary( m_rules[i], false );
             terminateRunningRule(m_rules[i]);
             m_rules.removeAt(i);

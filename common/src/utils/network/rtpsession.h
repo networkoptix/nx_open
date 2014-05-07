@@ -126,6 +126,7 @@ class RTPSession: public QObject
 {
     Q_OBJECT;
 public:
+    // TODO: #Elric #enum
     enum DefaultAuthScheme {
         authNone,
         authBasic,

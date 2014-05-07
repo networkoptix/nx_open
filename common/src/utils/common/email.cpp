@@ -8,11 +8,28 @@
 
 #include <QtCore/QCoreApplication>
 
-#include "enum_name_mapper.h"
+#include <utils/fusion/fusion_adaptor.h>
+#include <utils/common/model_functions.h>
 
-QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(QnEmail, ConnectionType);
-QN_DEFINE_ENUM_MAPPED_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnEmail::ConnectionType);
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS(QnEmail::SmtpServerPreset, (server)(connectionType)(port))
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnEmail, ConnectionType);
+QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnEmail::ConnectionType);
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnEmail::SmtpServerPreset, (json), (server)(connectionType)(port))
+
+void serialize(const QnEmail::ConnectionType &value, QJsonValue *target) {
+    QJson::serialize(static_cast<int>(value), target);
+}
+
+bool deserialize(const QJsonValue &value, QnEmail::ConnectionType *target) {
+    int tmp;
+    if(!QJson::deserialize(value, &tmp))
+        return false;
+
+    *target = static_cast<QnEmail::ConnectionType>(tmp);
+    return true;
+}
+
 
 namespace {
     typedef QHash<QString, QnEmail::SmtpServerPreset> QnSmtpPresets;

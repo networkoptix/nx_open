@@ -15,35 +15,10 @@ class QnResourceAudioLayout;
 
 namespace Qn {
 
-    enum StreamQuality {
-        QualityLowest,
-        QualityLow,
-        QualityNormal,
-        QualityHigh,
-        QualityHighest,
-        QualityPreSet,
-        QualityNotDefined,
-
-        StreamQualityCount
-    };
-
-    enum SecondStreamQuality { 
-        SSQualityLow, 
-        SSQualityMedium, 
-        SSQualityHigh, 
-        SSQualityNotDefined,
-        SSQualityDontUse
-    };
+    // TODO: #Elric move out!
 
     QString toDisplayString(Qn::StreamQuality value);
     QString toShortDisplayString(Qn::StreamQuality value);
-
-    // TODO: #Elric move out as generic interface
-    template<class Enum> Enum fromString(const QString &string);
-    template<class Enum> QString toString(Enum value);
-
-    template<> Qn::StreamQuality fromString<Qn::StreamQuality>(const QString &string);
-    template<> QString toString<Qn::StreamQuality>(Qn::StreamQuality value);
 }
 
 /*!

@@ -1,5 +1,6 @@
 #include "fisheye_calibrator.h"
 
+// TODO: #Elric #enum we have it!!!!
 enum Corner {
     LeftTop,
     RightTop,

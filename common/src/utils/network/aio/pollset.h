@@ -25,6 +25,7 @@ class PollSet
 public:
     static const int INFINITE_TIMEOUT = -1;
 
+    // TODO: #Elric #enum
     enum EventType
     {
         etNone = 0,

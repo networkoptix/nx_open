@@ -33,11 +33,11 @@ public:
 
     //!Implementation of nxcip::TimePeriods::get
     virtual bool get( nxcip::UsecUTCTimestamp* start, nxcip::UsecUTCTimestamp* end ) const override;
-    //!Implementation of nxcip::Iteratable::goToBeginning
+    //!Implementation of nxcip::TimePeriods::goToBeginning
     virtual void goToBeginning() override;
-    //!Implementation of nxcip::Iteratable::next
+    //!Implementation of nxcip::TimePeriods::next
     virtual bool next() override;
-    //!Implementation of nxcip::Iteratable::atEnd
+    //!Implementation of nxcip::TimePeriods::atEnd
     virtual bool atEnd() const override;
 
 private:
