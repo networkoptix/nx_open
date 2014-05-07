@@ -70,7 +70,7 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     case ServerFailureEvent:    return tr("Media Server Failure");
     case ServerConflictEvent:   return tr("Media Server Conflict");
     case ServerStartEvent:      return tr("Media Server Started");
-    case LicenseIssueEvent:     return tr("License issue");
+    case LicenseIssueEvent:     return tr("License Issue");
     case AnyCameraEvent:        return tr("Any Camera Issue");
     case AnyServerEvent:        return tr("Any Server Issue");
     case AnyBusinessEvent:      return tr("Any Event");

@@ -49,7 +49,8 @@ void QnWorkbenchLicenseNotifier::checkLicenses() {
     QList<QnLicensePtr> licenses;
     bool warn = false;
 
-    foreach(const QnLicensePtr &license, qnLicensePool->getLicenses()) {
+    foreach(const QnLicensePtr &license, qnLicensePool->getLicenses()) 
+    {
         qint64 expirationTime = license->expirationTime();
         // skip infinite lcense
         if(expirationTime < 0)

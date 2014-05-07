@@ -65,7 +65,7 @@ QString QnLicenseListModel::columnTitle(Column column) {
     case CameraCountColumn:     return tr("Cameras");
     case LicenseKeyColumn:      return tr("License Key");
     case ExpirationDateColumn:  return tr("Expiration Date");
-    case ExpiresInColumn:       return tr("Expires in");
+    case LicenseStatusColumn:   return tr("Status");
     default:
         assert(false);
         return QString();
@@ -89,34 +89,42 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
     case ExpirationDateColumn:
         item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString());
         break;
-    case ExpiresInColumn: 
-    {
-        QnLicense::ErrorCode errCode;
-        if (qnLicensePool->isLicenseValid(license, &errCode))
+    case LicenseStatusColumn: 
         {
-            qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-            qint64 expirationTime = license->expirationTime();
+            QnLicense::ErrorCode errCode;
+            if (qnLicensePool->isLicenseValid(license, &errCode))
+            {
+                qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+                qint64 expirationTime = license->expirationTime();
 
-            qint64 day = 1000ll * 60ll * 60ll * 24ll;
-            qint64 timeLeft = expirationTime - currentTime;
-            if(timeLeft < 5 * day)
-                item->setData(QBrush(colors.warning), Qt::ForegroundRole);
-
-            int daysLeft = QDateTime::fromMSecsSinceEpoch(currentTime).date().daysTo(QDateTime::fromMSecsSinceEpoch(expirationTime).date());
-            if(daysLeft == 0) {
-                item->setText(tr("Today"));
-            } else if(daysLeft == 1) {
-                item->setText(tr("Tomorrow"));
-            } else if (qBetween(0, daysLeft, 10000)) {
-                item->setText(tr("In %n days", 0, daysLeft));
+                qint64 day = 1000ll * 60ll * 60ll * 24ll;
+                qint64 timeLeft = expirationTime - currentTime;
+                if(timeLeft < 0) {
+                    item->setText(tr("Expired"));
+                    item->setData(QBrush(colors.expired), Qt::ForegroundRole);
+                } 
+                else if(timeLeft < 15 * day) 
+                {
+                        item->setData(QBrush(colors.warning), Qt::ForegroundRole);
+                        int daysLeft = QDateTime::fromMSecsSinceEpoch(currentTime).date().daysTo(QDateTime::fromMSecsSinceEpoch(expirationTime).date());
+                        if(daysLeft == 0) {
+                            item->setText(tr("Today"));
+                        } else if(daysLeft == 1) {
+                            item->setText(tr("Tomorrow"));
+                        } else {
+                            item->setText(tr("In %n days", 0, daysLeft));
+                        }
+                }
+                else {
+                    item->setText(tr("OK"));
+                }
             }
+            else {
+                item->setText(license->errorMessage(errCode));
+                item->setData(QBrush(colors.expired), Qt::ForegroundRole);
+            }
+            break;
         }
-        else {
-            item->setText(license->errorMessage(errCode));
-            item->setData(QBrush(colors.expired), Qt::ForegroundRole);
-        }
-        break;
-    }
     default:
         assert(false);
     }

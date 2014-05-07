@@ -12,7 +12,7 @@ QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget *parent, Qt::Wi
     ui->setupUi(this);
 
     QList<QnLicenseListModel::Column> columns;
-    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn << QnLicenseListModel::ExpiresInColumn;
+    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn  << QnLicenseListModel::LicenseStatusColumn;
 
     m_model = new QnLicenseListModel(this);
     m_model->setColumns(columns);
