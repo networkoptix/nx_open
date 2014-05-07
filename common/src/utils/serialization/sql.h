@@ -241,5 +241,6 @@ __VA_ARGS__ void fetch(const QnSqlIndexMapping &mapping, const QSqlRecord &value
     QnFusion::visit_members(*target, QnSqlDetail::FetchVisitor(mapping, value)); \
 }
 
+// TODO: #Elric we have undefined behaviour here (mapping^): dereferencing NULL.
 
 #endif // QN_SERIALIZATION_SQL_H

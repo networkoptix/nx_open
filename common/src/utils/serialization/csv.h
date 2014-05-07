@@ -7,69 +7,30 @@
 #include "csv_stream.h"
 #include "csv_detail.h"
 
+// TODO: #Elric proper enum handling. Use lexical functions.
+
 namespace QnCsv {
 
-    // TODO: #Elric simplify API:
-    //
-    // serialize
-    // serialize_header(T *)
-    // serialize_document
-
-
     template<class T, class Output>
-    void serialize_field(const T &value, QnCsvStreamWriter<Output> *stream) {
-        QnCsvDetail::serialize_field_internal(value, stream);
+    void serialize(const T &value, QnCsvStreamWriter<Output> *stream) {
+        QnSerialization::serialize(value, stream);
     }
 
     template<class T, class Output>
-    void serialize_record(const T &value, QnCsvStreamWriter<Output> *stream) {
-        QnCsvDetail::serialize_record_internal(value, stream);
-    }
-
-    template<class T, class Output>
-    void serialize_record_header(const T &value, const QString &prefix, QnCsvStreamWriter<Output> *stream) {
-        QnCsvDetail::serialize_record_header_internal(value, prefix, stream);
-    }
-
-    template<class T, class Output>
-    void serialize_document(const T &value, QnCsvStreamWriter<Output> *stream) {
-        QnCsvDetail::serialize_document_internal(value, stream);
+    void serialize_header(const QString &prefix, QnCsvStreamWriter<Output> *stream, const T *dummy = NULL) {
+        QnCsvDetail::serialize_header_internal(prefix, stream, dummy);
     }
 
     template<class T, class Output = QByteArray>
-    struct csv_category:
-        QnCsvDetail::csv_category<T, Output>
+    struct type_category:
+        QnCsvDetail::type_category<T, Output>
     {};
 
     template<class T>
     QByteArray serialized(const T &value) {
-        return serialized(value, typename csv_category<T, QByteArray>::type());
-    }
-
-    template<class T>
-    QByteArray serialized(const T &value, const field_tag &) {
         QByteArray result;
         QnCsvStreamWriter<QByteArray> stream(&result);
-        QnCsv::serialize_field(value, &stream);
-        return result;
-    }
-
-    template<class T>
-    QByteArray serialized(const T &value, const record_tag &) {
-        QByteArray result;
-        QnCsvStreamWriter<QByteArray> stream(&result);
-        QnCsv::serialize_record_header(value, QString(), &stream);
-        stream.writeEndline();
-        QnCsv::serialize_record(value, &stream);
-        stream.writeEndline();
-        return result;
-    }
-
-    template<class T>
-    QByteArray serialized(const T &value, const document_tag &) {
-        QByteArray result;
-        QnCsvStreamWriter<QByteArray> stream(&result);
-        QnCsv::serialize_document(value, &stream);
+        QnCsv::serialize(value, &stream);
         return result;
     }
 
@@ -92,48 +53,35 @@ namespace QnCsvDetail {
         bool operator()(const T &value, const Access &access) {
             using namespace QnFusion;
 
-            return operator()(value, access, typename access_setter_category<Access>::type());
+            return visit(value, access, typename access_setter_category<Access>::type());
         }
 
     private:
         template<class T, class Access, class Member>
-        bool operator()(const T &value, const Access &access, const QnFusion::typed_setter_tag<Member> &) {
+        bool visit(const T &value, const Access &access, const QnFusion::typed_setter_tag<Member> &) {
             using namespace QnFusion;
 
-            typedef typename QnCsv::csv_category<Member>::type category_type;
+            typedef typename QnCsv::type_category<Member>::type category_type;
             static_assert(!std::is_same<category_type, void>::value, "CSV serialization functions are not defined for type Member.");
 
-            return operator()(value, access, category_type());
+            return visit(value, access, static_cast<const Member *>(NULL), category_type());
         }
 
-        template<class T, class Access>
-        bool operator()(const T &value, const Access &access, const QnCsv::field_tag &) {
+        template<class T, class Access, class Tag, class Member>
+        bool visit(const T &value, const Access &access, const Member *, const Tag &) {
             using namespace QnFusion;
 
             if(m_needComma)
                 m_stream->writeComma();
 
-            QnCsv::serialize_field(invoke(access(getter), value), m_stream);
-            m_needComma = true;
-
-            return true;
-        }
-
-        template<class T, class Access>
-        bool operator()(const T &value, const Access &access, const QnCsv::record_tag &) {
-            using namespace QnFusion;
-
-            if(m_needComma)
-                m_stream->writeComma();
-            
-            QnCsv::serialize_record(invoke(access(getter), value), m_stream);
+            QnCsv::serialize(invoke(access(getter), value), m_stream);
             m_needComma = true; /* Assume non-empty record. */
 
             return true;
         }
         
-        template<class T, class Access>
-        bool operator()(const T &, const Access &, const QnCsv::document_tag &) {
+        template<class T, class Access, class Member>
+        bool visit(const T &, const Access &, const Member *, const QnCsv::document_tag &) {
             return true; /* Just skip it. */
         }
 
@@ -156,48 +104,39 @@ namespace QnCsvDetail {
         bool operator()(const T &value, const Access &access) {
             using namespace QnFusion;
 
-            return operator()(value, access, typename access_setter_category<Access>::type());
+            return visit(value, access, typename access_setter_category<Access>::type());
         }
 
     private:
         template<class T, class Access, class Member>
-        bool operator()(const T &value, const Access &access, const QnFusion::typed_setter_tag<Member> &) {
+        bool visit(const T &value, const Access &access, const QnFusion::typed_setter_tag<Member> &) {
             using namespace QnFusion;
 
-            typedef typename QnCsv::csv_category<Member>::type category_type;
+            typedef typename QnCsv::type_category<Member>::type category_type;
             static_assert(!std::is_same<category_type, void>::value, "CSV serialization functions are not defined for type Member.");
 
-            return operator()(value, access, category_type());
+            return visit(value, access, static_cast<const Member *>(NULL), category_type());
         }
 
-        template<class T, class Access>
-        bool operator()(const T &, const Access &access, const QnCsv::field_tag &) {
+        template<class T, class Access, class Member, class Tag>
+        bool visit(const T &, const Access &access, const Member *, const Tag &) {
             using namespace QnFusion;
 
             if(m_needComma)
                 m_stream->writeComma();
 
-            m_stream->writeField(m_prefix + access(name));
+            if(std::is_same<Tag, QnCsv::field_tag>::value) {
+                m_stream->writeField(m_prefix + access(name));
+            } else {
+                QnCsv::serialize_header<Member>(m_prefix + access(name) + L'.', m_stream);
+            }
             m_needComma = true;
 
             return true;
         }
 
-        template<class T, class Access>
-        bool operator()(const T &value, const Access &access, const QnCsv::record_tag &) {
-            using namespace QnFusion;
-
-            if(m_needComma)
-                m_stream->writeComma();
-
-            QnCsv::serialize_record_header(invoke(access(getter), value), m_prefix + access(name) + L'.', m_stream);
-            m_needComma = true; /* Assume non-empty record. */
-
-            return true;
-        }
-
-        template<class T, class Access>
-        bool operator()(const T &, const Access &, const QnCsv::document_tag &) {
+        template<class T, class Access, class Member>
+        bool visit(const T &, const Access &, const Member *, const QnCsv::document_tag &) {
             return true; /* Just skip it. */
         }
 
@@ -212,15 +151,17 @@ namespace QnCsvDetail {
 
 
 #define QN_FUSION_DEFINE_FUNCTIONS_csv_record(TYPE, ... /* PREFIX */)           \
-__VA_ARGS__ void serialize_record(const TYPE &value, QnCsvStreamWriter<QByteArray> *stream) { \
+__VA_ARGS__ void serialize(const TYPE &value, QnCsvStreamWriter<QByteArray> *stream) { \
     QnCsvDetail::SerializationVisitor<QByteArray> visitor(stream);              \
     QnFusion::visit_members(value, visitor);                                    \
 }                                                                               \
                                                                                 \
-__VA_ARGS__ void serialize_record_header(const TYPE &value, const QString &prefix, QnCsvStreamWriter<QByteArray> *stream) { \
+__VA_ARGS__ void serialize_header(const QString &prefix, QnCsvStreamWriter<QByteArray> *stream, const TYPE *dummy) { \
     QnCsvDetail::HeaderVisitor<QByteArray> visitor(prefix, stream);             \
-    QnFusion::visit_members(value, visitor);                                    \
+    QnFusion::visit_members(*dummy, visitor);                                   \
 }                                                                               \
+
+// TODO: #Elric we have undefined behaviour here^: dereferencing NULL.
 
 
 #endif // QN_SERIALIZATION_CSV_H
