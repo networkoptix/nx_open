@@ -22,12 +22,15 @@ namespace nx_hls
             quint64 duration;
             //!sequential number of this chunk
             unsigned int mediaSequence;
+            //!if true, there is discontinuity between this chunk and preceding one
+            bool discontinuity;
 
             ChunkData();
             ChunkData(
                 quint64 _startTimestamp,
                 quint64 _duration,
-                unsigned int _mediaSequence );
+                unsigned int _mediaSequence,
+                bool _discontinuity = false );
         };
 
         //!Generates chunks and appends them to \a chunkList

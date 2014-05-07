@@ -58,13 +58,10 @@ namespace nx_hls
         qint64 m_timerCorrection;
         bool m_initialPlaylistCreated;
         qint64 m_prevGeneratedChunkDuration;
+        bool m_discontinuityDetected;
 
         void generateChunksIfNeeded();
         bool addOneMoreChunk();
-        /*!
-            \return -1, if end of archive has been reached
-        */
-        qint64 getNextStepArchiveTimestamp() const;
         qint64 endTimestamp() const;
     };
 }

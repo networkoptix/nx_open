@@ -52,6 +52,8 @@ namespace nx_hls
     public:
         double duration;
         QUrl url;
+        //!if true, there is discontinuity between this chunk and previous one
+        bool discontinuity;
 
         Chunk();
     };

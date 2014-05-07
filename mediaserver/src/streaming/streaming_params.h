@@ -26,6 +26,8 @@ namespace StreamingParams
     //!Used to differ playlist with reference to other playlists from playlist with chunks
     static const QLatin1String CHUNKED_PARAM_NAME( "chunked" );
     static const QLatin1String SESSION_ID_PARAM_NAME( "sessionID" );
+    static const QLatin1String HI_QUALITY_PARAM_NAME( "hi" );
+    static const QLatin1String LO_QUALITY_PARAM_NAME( "lo" );
 }
 
 #endif  //STREAMING_PARAMS_H

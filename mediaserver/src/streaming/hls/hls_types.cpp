@@ -11,7 +11,8 @@ namespace nx_hls
 {
     Chunk::Chunk()
     :
-        duration( 0 )
+        duration( 0 ),
+        discontinuity( false )
     {
     }
 
@@ -47,6 +48,8 @@ namespace nx_hls
             i < chunks.size();
             ++i )
         {
+            if( chunks[i].discontinuity )
+                playlistStr += "#EXT-X-DISCONTINUITY\r\n";
             playlistStr += "#EXTINF:"+QByteArray::number(chunks[i].duration, 'f', 3)+",\r\n";
             playlistStr += chunks[i].url.toString().toLatin1()+"\r\n";
         }
