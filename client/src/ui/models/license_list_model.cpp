@@ -99,11 +99,11 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
 
                 qint64 day = 1000ll * 60ll * 60ll * 24ll;
                 qint64 timeLeft = expirationTime - currentTime;
-                if(timeLeft < 0) {
+                if(expirationTime > 0 && timeLeft < 0) {
                     item->setText(tr("Expired"));
                     item->setData(QBrush(colors.expired), Qt::ForegroundRole);
                 } 
-                else if(timeLeft < 15 * day) 
+                else if(expirationTime > 0 && timeLeft < 15 * day) 
                 {
                         item->setData(QBrush(colors.warning), Qt::ForegroundRole);
                         int daysLeft = QDateTime::fromMSecsSinceEpoch(currentTime).date().daysTo(QDateTime::fromMSecsSinceEpoch(expirationTime).date());
