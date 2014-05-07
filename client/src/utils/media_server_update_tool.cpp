@@ -60,7 +60,7 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     connect(m_uploader,                                 &QnUpdateUploader::finished,                    this,   &QnMediaServerUpdateTool::at_uploader_finished);
     connect(m_uploader,                                 &QnUpdateUploader::failed,                      this,   &QnMediaServerUpdateTool::at_uploader_failed);
     connect(m_uploader,                                 &QnUpdateUploader::progressChanged,             this,   &QnMediaServerUpdateTool::at_uploader_progressChanged);
-    connect(m_uploader,                                 &QnUpdateUploader::peerProgressChanged,         this,   &QnMediaServerUpdateTool::peerProgressChanged);
+    connect(m_uploader,                                 &QnUpdateUploader::peerProgressChanged,         this,   &QnMediaServerUpdateTool::at_uploader_peerProgressChanged);
     connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::locked,        this,   &QnMediaServerUpdateTool::at_mutexLocked, Qt::QueuedConnection);
     connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::lockTimeout,   this,   &QnMediaServerUpdateTool::at_mutexTimeout, Qt::QueuedConnection);
 }
@@ -428,6 +428,10 @@ void QnMediaServerUpdateTool::uploadNextUpdate() {
     }
 
     QnSystemInformation sysInfo = m_pendingUploads.takeFirst();
+
+    foreach (const QnId &peerId, m_idBySystemInformation.values(sysInfo))
+        setPeerState(peerId, PeerUpdateInformation::UpdateUploading);
+
     if (!m_uploader->uploadUpdate(m_targetVersion.toString(), m_updateFiles[sysInfo]->fileName, QSet<QnId>::fromList(m_idBySystemInformation.values(sysInfo))))
         setUpdateResult(UploadingFailed);
 }
@@ -467,7 +471,12 @@ void QnMediaServerUpdateTool::at_uploader_progressChanged(int progress) {
     int finished = peers - m_pendingUploadPeers.size();
     int current = m_uploader->peers().size();
 
-    emit progressChanged((finished + current * progress / 100) * 100 / peers);
+    emit progressChanged((finished * 100 + current * progress) / peers);
+}
+
+void QnMediaServerUpdateTool::at_uploader_peerProgressChanged(const QnId &peerId, int progress) {
+    m_updateInformationById[peerId].progress = progress;
+    emit peerChanged(peerId);
 }
 
 void QnMediaServerUpdateTool::installUpdatesToServers() {

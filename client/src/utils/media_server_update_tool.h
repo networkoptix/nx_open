@@ -99,7 +99,6 @@ public:
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);
-    void peerProgressChanged(const QnId &id, int progress);
     void peerChanged(const QnId &peerId);
 
 public slots:
@@ -125,6 +124,7 @@ private slots:
     void at_uploader_finished();
     void at_uploader_failed();
     void at_uploader_progressChanged(int progress);
+    void at_uploader_peerProgressChanged(const QnId &peerId, int progress);
 
 
     void at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal);

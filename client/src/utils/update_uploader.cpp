@@ -79,8 +79,8 @@ void QnUpdateUploader::markChunkUploaded(const QnId &peerId, qint64 offset) {
             if (m_leftChunks > 0)
                 --m_leftChunks;
 
-            emit peerProgressChanged(peerId, 100 * left / m_chunkCount);
-            emit progressChanged(100 * m_leftChunks / (m_peers.size() * m_chunkCount));
+            emit peerProgressChanged(peerId, 100 - (100 * left / m_chunkCount));
+            emit progressChanged(100 - (100 * m_leftChunks / (m_peers.size() * m_chunkCount)));
 
             if (left == 0)
                 finalize(peerId);
