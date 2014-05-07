@@ -13,8 +13,8 @@ namespace ec2
         bool isAdmin;
         qint64 rights; // TODO: #API rename 'permissions' for consistency with other parts of the system.
         QString email;
-        QByteArray digest;
-        QByteArray hash; 
+        QnLatin1Array digest;
+        QnLatin1Array hash; 
     };
 #define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(rights)(email)(digest)(hash)
 

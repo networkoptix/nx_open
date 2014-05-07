@@ -9,7 +9,7 @@ namespace ec2
 {
 
     struct ApiLayoutItemData: ApiData {
-        QByteArray uuid; // TODO: #API rename to 'id'.
+        QnLatin1Array uuid; // TODO: #API rename to 'id'.
         qint32 flags;
         float left;
         float top;
@@ -22,9 +22,9 @@ namespace ec2
         float zoomTop;
         float zoomRight;
         float zoomBottom;
-        QByteArray zoomTargetUuid; // TODO: #API rename 'zoomTargetId'
-        QByteArray contrastParams; // TODO: #API I'll think about this one.
-        QByteArray dewarpingParams;
+        QnLatin1Array zoomTargetUuid; // TODO: #API rename 'zoomTargetId'
+        QnLatin1Array contrastParams; // TODO: #API I'll think about this one.
+        QnLatin1Array dewarpingParams;
     };
 #define ApiLayoutItemData_Fields (uuid)(flags)(left)(top)(right)(bottom)(rotation)(resourceId)(resourcePath) \
                                     (zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetUuid)(contrastParams)(dewarpingParams)
