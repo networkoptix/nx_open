@@ -4621,6 +4621,7 @@ An error has occurred while trying to restart in compatibility mode.</source>
         <translation type="unfinished">You are about to connect to Enterprise Controller with a different version:
  - Client version: %1.
  - EC version: %2.
+Would you like to restart in compatibility mode?</translation>
 An error has occurred while trying to restart in compatibility mode.</translation>
     </message>
     <message>
@@ -4632,6 +4633,7 @@ Would you like to restart in compatibility mode?</source>
         <translation>You are about to connect to Enterprise Controller with a different version:
  - Client version: %1.
  - EC version: %2.
+Compatibility mode for versions lower than %3 is not supported.</translation>
 Would you like to restart in compatibility mode?</translation>
     </message>
     <message>

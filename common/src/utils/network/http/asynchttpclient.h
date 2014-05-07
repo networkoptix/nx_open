@@ -93,7 +93,7 @@ namespace nx_http
             Response is valid only after signal \a responseReceived() has been emitted
             \return Can be NULL if no response has been received yet
         */
-        const HttpResponse* response() const;
+        const Response* response() const;
         StringType contentType() const;
         //!Returns current message body buffer, clearing it
         /*!
@@ -142,7 +142,7 @@ namespace nx_http
 
     private:
         State m_state;
-        HttpRequest m_request;
+        Request m_request;
         QSharedPointer<AbstractStreamSocket> m_socket;
         BufferType m_requestBuffer;
         size_t m_requestBytesSent;
@@ -178,7 +178,7 @@ namespace nx_http
         */
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
-        bool resendRequestWithAuthorization( const nx_http::HttpResponse& response );
+        bool resendRequestWithAuthorization( const nx_http::Response& response );
         void eventTriggeredPrivate( AbstractSocket* sock, PollSet::EventType eventType );
 
         static const char* toString( State state );

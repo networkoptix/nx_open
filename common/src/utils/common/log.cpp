@@ -179,6 +179,12 @@ static QAtomicPointer<QnLog> qnLogInstance;
 //static QGlobalStatic<QnLog> qnLogInstance = { Q_BASIC_ATOMIC_INITIALIZER(0), false };
 //Q_GLOBAL_STATIC_WITH_ARGS( QnLog, qnLogInstance, qn_logPrivateInstance() );
 
+QnLog::QnLog()
+:
+    d( new QnLogPrivate() )
+{
+}
+
 QnLog::QnLog(QnLogPrivate *d): d(d) {}
 
 QnLog* QnLog::instance()

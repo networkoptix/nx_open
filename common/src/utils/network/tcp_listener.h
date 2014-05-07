@@ -22,7 +22,7 @@ class QnTcpListener: public QnLongRunnable
 {
 public:
 #ifdef USE_NX_HTTP
-    bool authenticate(const nx_http::HttpRequest& headers, nx_http::HttpResponse& responseHeaders) const;
+    bool authenticate(const nx_http::Request& headers, nx_http::Response& responseHeaders) const;
 #else
     bool authenticate(const QHttpRequestHeader& headers, QHttpResponseHeader& responseHeaders) const;
 #endif

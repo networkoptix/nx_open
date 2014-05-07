@@ -327,7 +327,7 @@ void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
 
 #ifdef USE_NX_HTTP
     d->responseBody.clear();
-    d->response = nx_http::HttpResponse();
+    d->response = nx_http::Response();
     d->response.statusLine.version = d->request.requestLine.version;
     d->response.statusLine.statusCode = code;
     d->response.statusLine.reasonPhrase = message.toUtf8();
@@ -1241,13 +1241,11 @@ int QnRtspConnectionProcessor::composePlay()
         //d->responseHeaders.setValue("RTP-Info", rtpInfo.arg(d->requestHeaders.path()).arg(0).arg(0));
         QString rtpInfo("url=%1;seq=%2");
 #ifdef USE_NX_HTTP
-        d->response.headers["RTP-Info"] = rtpInfo.arg(d->request.requestLine.url.path()).arg(0).toLatin1();
+        d->response.headers.insert( std::make_pair("RTP-Info", rtpInfo.arg(d->request.requestLine.url.path()).arg(0).toLatin1()) );
 #else
         d->responseHeaders.setValue("RTP-Info", rtpInfo.arg(d->requestHeaders.path()).arg(0));
 #endif
     }
-    
-
 
     if (currentDP) 
         currentDP->start();
@@ -1371,7 +1369,7 @@ void QnRtspConnectionProcessor::processRequest()
     if (method == "OPTIONS")
     {
 #ifdef USE_NX_HTTP
-        d->response.headers["Public"] = "DESCRIBE, SETUP, TEARDOWN, PLAY, PAUSE, GET_PARAMETER, SET_PARAMETER";
+        d->response.headers.insert( std::make_pair("Public", "DESCRIBE, SETUP, TEARDOWN, PLAY, PAUSE, GET_PARAMETER, SET_PARAMETER") );
 #else
         d->responseHeaders.addValue("Public", "DESCRIBE, SETUP, TEARDOWN, PLAY, PAUSE, GET_PARAMETER, SET_PARAMETER");
 #endif

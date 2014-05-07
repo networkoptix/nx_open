@@ -13,6 +13,8 @@ class QnLogPrivate;
 
 class QN_EXPORT QnLog {
 public:
+    QnLog();
+
     bool create(const QString &baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel);
 
     void setLogLevel(QnLogLevel logLevel);

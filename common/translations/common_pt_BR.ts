@@ -35,7 +35,7 @@
         <location filename="../src/translation/translation_manager.cpp" line="156"/>
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-        <translation>pt_BR</translation>
+        <translation>pt-BR</translation>
     </message>
     <message>
         <location filename="../src/translation/translation_manager.cpp" line="153"/>

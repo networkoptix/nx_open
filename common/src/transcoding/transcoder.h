@@ -172,7 +172,7 @@ public:
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected
     * @param addition codec params. Not used if directStreamCopy = true
     */
-    virtual bool setAudioCodec(CodecID codec, TranscodeMethod method);
+    virtual int setAudioCodec(CodecID codec, TranscodeMethod method);
 
     /*
     * Transcode media data and write it to specified QnByteArray

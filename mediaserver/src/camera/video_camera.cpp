@@ -334,6 +334,9 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnResource::ConnectionRole 
             createReader(QnResource::Role_LiveVideo);
         else if (role == QnResource::Role_SecondaryLiveVideo && m_secondaryReader == 0)
             createReader(QnResource::Role_SecondaryLiveVideo);
+
+        if( m_primaryReader )
+            ensureLiveCacheStarted( m_primaryReader );
     }
 	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
 	if ( cameraResource && !cameraResource->hasDualStreaming2() && role == QnResource::Role_SecondaryLiveVideo )
@@ -442,4 +445,61 @@ void QnVideoCamera::stopIfNoActivity()
     if (needStopSecondary)
         m_secondaryReader->stop();
     */
+}
+
+const MediaStreamCache* QnVideoCamera::liveCache() const
+{
+    return m_liveCache.get();
+}
+
+MediaStreamCache* QnVideoCamera::liveCache()
+{
+    return m_liveCache.get();
+}
+
+const MediaIndex* QnVideoCamera::mediaIndex() const
+{
+    return &m_mediaIndex;
+}
+
+MediaIndex* QnVideoCamera::mediaIndex()
+{
+    return &m_mediaIndex;
+}
+
+const nx_hls::HLSLivePlaylistManager* QnVideoCamera::hlsLivePlaylistManager() const
+{
+    return m_hlsLivePlaylistManager.get();
+}
+
+static unsigned int MEDIA_CACHE_SIZE_MILLIS = 10000;
+
+//!Starts caching live stream, if not started
+/*!
+    \return true, if started, false if failed to start
+*/
+bool QnVideoCamera::ensureLiveCacheStarted()
+{
+    return getLiveReader(QnResource::Role_LiveVideo);
+}
+
+//!Starts caching live stream, if not started
+/*!
+    \return true, if started, false if failed to start
+*/
+bool QnVideoCamera::ensureLiveCacheStarted( QnAbstractMediaStreamDataProviderPtr primaryReader )
+{
+    if( m_liveCache.get() )
+        return true;
+    if( !primaryReader )
+        return false;
+
+    m_liveCache.reset( new MediaStreamCache( MEDIA_CACHE_SIZE_MILLIS, &m_mediaIndex ) );
+    m_hlsLivePlaylistManager.reset( new nx_hls::HLSLivePlaylistManager(
+        m_liveCache.get(),
+        &m_mediaIndex ) );
+    //connecting live cache to reader
+    primaryReader->addDataProcessor( m_liveCache.get() );
+    m_cameraUsers << this;
+    return true;
 }

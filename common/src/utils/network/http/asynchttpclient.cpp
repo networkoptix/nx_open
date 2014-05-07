@@ -213,7 +213,7 @@ namespace nx_http
                         arg(m_url.toString()).arg(m_httpStreamReader.message().response->statusLine.statusCode).
                         arg(QLatin1String(m_httpStreamReader.message().response->statusLine.reasonPhrase)), cl_logDEBUG2 );
 
-                    const HttpResponse* response = m_httpStreamReader.message().response;
+                    const Response* response = m_httpStreamReader.message().response;
                     if( response->statusLine.statusCode == StatusCode::unauthorized
                         && !m_authorizationTried && (!m_userName.isEmpty() || !m_userPassword.isEmpty()) )
                     {
@@ -353,10 +353,10 @@ namespace nx_http
         resetDataBeforeNewRequest();
         m_url = url;
         composeRequest( nx_http::Method::POST );
-        m_request.headers["Content-Type"] = contentType;
-        m_request.headers["Content-Length"] = StringType::number(messageBody.size());
+        m_request.headers.insert( make_pair("Content-Type", contentType) );
+        m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO/IMPL support chunked encoding & compression
-        m_request.headers["Content-Encoding"] = "identity";
+        m_request.headers.insert( make_pair("Content-Encoding", "identity") );
         m_request.messageBody = messageBody;
         return initiateHttpMessageDelivery( url );
     }
@@ -364,15 +364,15 @@ namespace nx_http
     /*!
         Response is valid only after signal \a responseReceived() has been emitted
     */
-    const HttpResponse* AsyncHttpClient::response() const
+    const Response* AsyncHttpClient::response() const
     {
-        const HttpMessage& httpMsg = m_httpStreamReader.message();
+        const Message& httpMsg = m_httpStreamReader.message();
         return httpMsg.type == MessageType::response ? httpMsg.response : NULL;
     }
 
     StringType AsyncHttpClient::contentType() const
     {
-        const HttpMessage& httpMsg = m_httpStreamReader.message();
+        const Message& httpMsg = m_httpStreamReader.message();
         if( httpMsg.type == MessageType::none )
             return StringType();
         HttpHeaders::const_iterator contentTypeIter = httpMsg.headers().find( "Content-Type" );
@@ -541,26 +541,31 @@ namespace nx_http
         m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
         m_request.requestLine.version = useHttp11 ? nx_http::Version::http_1_1 : nx_http::Version::http_1_0;
         if( !m_userAgent.isEmpty() )
-            m_request.headers["User-Agent"] = m_userAgent.toLatin1();
+            m_request.headers.insert( std::make_pair("User-Agent", m_userAgent.toLatin1()) );
         if( useHttp11 )
         {
-            m_request.headers["Accept"] = "*/*";
+            m_request.headers.insert( std::make_pair("Accept", "*/*") );
             if( m_contentEncodingUsed )
-                m_request.headers["Accept-Encoding"] = "gzip;q=1.0, identity;q=0.5, *;q=0";
+                m_request.headers.insert( std::make_pair("Accept-Encoding", "gzip;q=1.0, identity;q=0.5, *;q=0") );
             else
-                m_request.headers["Accept-Encoding"] = "identity;q=1.0, *;q=0";
-            m_request.headers["Cache-Control"] = "max-age=0";
-            //m_request.headers["Connection"] = "keep-alive";
-            m_request.headers["Host"] = m_url.host().toLatin1();
+                m_request.headers.insert( std::make_pair("Accept-Encoding", "identity;q=1.0, *;q=0") );
+            m_request.headers.insert( std::make_pair("Cache-Control", "max-age=0") );
+            //m_request.headers.insert( std::make_pair("Connection", "keep-alive") );
+            m_request.headers.insert( std::make_pair("Host", m_url.host().toLatin1()) );
         }
         //adding user credentials
         if( !m_userName.isEmpty() || !m_userPassword.isEmpty() )
-            m_request.headers[Header::Authorization::NAME] = Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString();
+        {
+            m_request.headers.erase( Header::Authorization::NAME );
+            m_request.headers.insert( std::make_pair(
+                Header::Authorization::NAME,
+                Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
+        }
     }
 
     void AsyncHttpClient::addRequestHeader(const StringType& key, const StringType& value)
     {
-        m_request.headers[key] = value;
+        m_request.headers.insert( make_pair(key, value) );
     }
 
     void AsyncHttpClient::serializeRequest()
@@ -670,7 +675,7 @@ namespace nx_http
 //        &digestAuthorizationHeader );
 
 
-    bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::HttpResponse& response )
+    bool AsyncHttpClient::resendRequestWithAuthorization( const nx_http::Response& response )
     {
         //if response contains WWW-Authenticate with Digest authentication, generating "Authorization: Digest" header and adding it to custom headers
         Q_ASSERT( response.statusLine.statusCode == StatusCode::unauthorized );
@@ -742,7 +747,8 @@ namespace nx_http
 
         BufferType authorizationStr;
         digestAuthorizationHeader.serialize( &authorizationStr );
-        m_request.headers[Header::Authorization::NAME] = authorizationStr;
+        m_request.headers.erase( Header::Authorization::NAME );
+        m_request.headers.insert( make_pair(Header::Authorization::NAME, authorizationStr) );
 
         m_authorizationTried = true;
         return initiateHttpMessageDelivery( m_url );
