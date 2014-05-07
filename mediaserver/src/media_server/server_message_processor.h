@@ -27,7 +27,7 @@ private slots:
     void at_remotePeerFound(QnId id, bool isClient, bool isProxy);
     void at_remotePeerLost(QnId id, bool isClient, bool isProxy);
 
-    void at_updateReceived(const QString &updateId, const QByteArray &data);
+    void at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
     void at_updateInstallationRequested(const QString &updateId);
 
 private:

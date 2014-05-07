@@ -7,9 +7,8 @@
 #include <utils/common/system_information.h>
 #include <mutex/distributed_mutex.h>
 
-// TODO: add tracking to the newly added servers
-
 class QNetworkAccessManager;
+class QnUpdateUploader;
 
 class QnMediaServerUpdateTool : public QObject {
     Q_OBJECT
@@ -99,7 +98,7 @@ public:
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);
-    void serverProgressChanged(const QnMediaServerResourcePtr &server, int progress);
+    void peerProgressChanged(const QnId &id, int progress);
     void peerChanged(const QnId &peerId);
 
 public slots:
@@ -119,7 +118,13 @@ private slots:
     void at_updateReply_finished();
     void at_buildReply_finished();
     void at_downloadReply_finished();
-    void at_updateUploaded(const QString &updateId, const QnId &peerId);
+    void at_updateChunkUploaded(const QString &updateId, const QnId &peerId, qint64 offset);
+
+    void uploadNextUpdate();
+    void at_uploader_finished();
+    void at_uploader_failed();
+    void at_uploader_progressChanged(int progress);
+
 
     void at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
     void downloadNextUpdate();
@@ -154,8 +159,11 @@ private:
 
     QMultiHash<QnSystemInformation, QnId> m_idBySystemInformation;
 
-    QSet<QnId> m_pendingUploads;
+    QList<QnSystemInformation> m_pendingUploads;
+    QSet<QnId> m_pendingUploadPeers;
     QSet<QnId> m_pendingInstallations;
+
+    QnUpdateUploader *m_uploader;
 
     QHash<QnSystemInformation, UpdateFileInformationPtr> m_updateFiles;
     QSet<QnSystemInformation> m_downloadingUpdates;

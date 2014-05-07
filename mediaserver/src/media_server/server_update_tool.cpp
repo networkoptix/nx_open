@@ -10,6 +10,8 @@
 
 #include <media_server/settings.h>
 #include <utils/common/log.h>
+#include <api/app_server_connection.h>
+#include <common/common_module.h>
 
 #include <version.h>
 
@@ -36,6 +38,10 @@ namespace {
             dir.mkdir(updateId);
         dir.cd(updateId);
         return dir;
+    }
+
+    QString getUpdateFilePath(const QString &updateId) {
+        return getUpdatesDir().absoluteFilePath(updateId + lit(".zip"));
     }
 
     bool extractZipArchive(QuaZip *zip, const QDir &dir) {
@@ -100,23 +106,18 @@ namespace {
         return true;
     }
 
+    ec2::AbstractECConnectionPtr connection2() {
+        return QnAppServerConnectionFactory::getConnection2();
+    }
+
 } // anonymous namespace
 
 QnServerUpdateTool *QnServerUpdateTool::m_instance = NULL;
 
-QnServerUpdateTool::QnServerUpdateTool() {
-}
+QnServerUpdateTool::QnServerUpdateTool() {}
 
-QnServerUpdateTool *QnServerUpdateTool::instance() {
-    if (!m_instance)
-        m_instance = new QnServerUpdateTool();
-
-    return m_instance;
-}
-
-bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray &data) {
-    QBuffer buffer(const_cast<QByteArray*>(&data)); // we're goint to read data, so const_cast is ok here
-    QuaZip zip(&buffer);
+bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice) {
+    QuaZip zip(ioDevice);
     if (!zip.open(QuaZip::mdUnzip)) {
         cl_log.log("Could not open update package.", cl_logWARNING);
         return false;
@@ -134,6 +135,63 @@ bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray
         cl_log.log("Could not extract update package to ", updateDir.path(), cl_logWARNING);
 
     return ok;
+}
+
+QnServerUpdateTool *QnServerUpdateTool::instance() {
+    if (!m_instance)
+        m_instance = new QnServerUpdateTool();
+
+    return m_instance;
+}
+
+bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray &data) {
+    QBuffer buffer(const_cast<QByteArray*>(&data)); // we're goint to read data, so const_cast is ok here
+    return processUpdate(updateId, &buffer);
+}
+
+bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset) {
+    if (m_bannedUpdates.contains(updateId))
+        return false;
+
+    TransferInfo *transfer = m_transfers[updateId];
+    if (!transfer) {
+        transfer = new TransferInfo;
+        transfer->file.reset(new QFile(getUpdateFilePath(updateId)));
+        if (!transfer->file->open(QFile::WriteOnly)) {
+            cl_log.log("Could not save update to ", transfer->file->fileName(), cl_logERROR);
+            m_bannedUpdates.insert(updateId);
+            delete transfer;
+            return false;
+        }
+        m_transfers[updateId] = transfer;
+    }
+
+    if (data.isEmpty()) { // it means we're just got the size of the file
+        transfer->length = offset;
+    } else {
+        transfer->file->seek(offset);
+        transfer->file->write(data);
+        transfer->addChunk(offset, offset + data.size());
+
+        connection2()->getUpdatesManager()->sendUpdateUploadedResponce(updateId, qnCommon->moduleGUID(), offset,
+                                                                       this, [this](int reqID, ec2::ErrorCode errorCode) {});
+    }
+
+    if (transfer->isComplete()) {
+        transfer->file->close();
+        m_transfers.remove(updateId);
+
+        bool ok = processUpdate(updateId, transfer->file.data());
+
+        if (ok)
+            connection2()->getUpdatesManager()->sendUpdateUploadedResponce(updateId, qnCommon->moduleGUID(), -1,
+                                                                           this, [this](int reqID, ec2::ErrorCode errorCode) {});
+
+        delete transfer;
+        return ok;
+    }
+
+    return true;
 }
 
 bool QnServerUpdateTool::installUpdate(const QString &updateId) {
@@ -195,4 +253,41 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     QDir::setCurrent(currentDir);
 
     return true;
+}
+
+
+QnServerUpdateTool::TransferInfo::TransferInfo() : length(-1) {}
+
+QnServerUpdateTool::TransferInfo::~TransferInfo() {}
+
+void QnServerUpdateTool::TransferInfo::addChunk(qint64 start, qint64 end) {
+    int i = 0;
+    for ( ; i < chunks.size() && chunks[i].start <= start; i++) {}
+
+    if (i > 0)
+        i--;
+
+    if (i < chunks.size()) {
+        Chunk *chunk = &(chunks[i]);
+
+        if (start == chunk->start)
+            chunk->end = qMax(chunk->end, end);
+        else if (start == chunk->end)
+            chunk->end = end;
+        else if (!(start >= chunk->start && end <= chunk->end))
+            chunks.insert(++i, Chunk(start, end));
+    } else {
+        chunks.append(Chunk(start, end));
+    }
+
+    if (i < chunks.size() - 1) {
+        if (chunks[i].end >= chunks[i + 1].start) {
+            chunks[i].end = chunks[i + 1].end;
+            chunks.removeAt(i + 1);
+        }
+    }
+}
+
+bool QnServerUpdateTool::TransferInfo::isComplete() const {
+    return length != -1 && chunks.size() == 1 && chunks.first().start == 0 && chunks.first().end == length;
 }

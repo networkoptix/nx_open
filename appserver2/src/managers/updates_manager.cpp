@@ -20,9 +20,9 @@ template<class QueryProcessorType>
 QnUpdatesManager<QueryProcessorType>::~QnUpdatesManager() {}
 
 template<class QueryProcessorType>
-int QnUpdatesManager<QueryProcessorType>::sendUpdatePackage(const QString &updateId, const QByteArray &data, const PeerList &peers, impl::SimpleHandlerPtr handler) {
+int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const PeerList &peers, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(updateId, data);
+    auto transaction = prepareTransaction(updateId, data, offset);
 
     QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
     QnScopedThreadRollback ensureFreeThread(1);
@@ -32,9 +32,9 @@ int QnUpdatesManager<QueryProcessorType>::sendUpdatePackage(const QString &updat
 }
 
 template<class QueryProcessorType>
-int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadedResponce(const QString &updateId, const QnId &peerId, impl::SimpleHandlerPtr handler) {
+int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadedResponce(const QString &updateId, const QnId &peerId, qint64 offset, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(updateId, peerId);
+    auto transaction = prepareTransaction(updateId, peerId, offset);
 
     using namespace std::placeholders;
     m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
@@ -55,18 +55,20 @@ int QnUpdatesManager<QueryProcessorType>::installUpdate(const QString &updateId,
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiUpdateUploadData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QByteArray &data) const {
+QnTransaction<ApiUpdateUploadData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QByteArray &data, qint64 offset) const {
     QnTransaction<ApiUpdateUploadData> transaction(ApiCommand::uploadUpdate, false);
     transaction.params.updateId = updateId;
     transaction.params.data = data;
+    transaction.params.offset = offset;
     return transaction;
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiUpdateUploadResponceData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QnId &peerId) const {
-    QnTransaction<ApiUpdateUploadResponceData> transaction(ApiCommand::uploadUpdateResponce, true);
+QnTransaction<ApiUpdateUploadResponceData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QnId &peerId, qint64 offset) const {
+    QnTransaction<ApiUpdateUploadResponceData> transaction(ApiCommand::uploadUpdateResponce, false);
     transaction.params.id = peerId;
     transaction.params.updateId = updateId;
+    transaction.params.offset = offset;
     return transaction;
 }
 
@@ -80,14 +82,13 @@ QnTransaction<ApiUpdateInstallData> QnUpdatesManager<QueryProcessorType>::prepar
 template<class QueryProcessorType>
 void QnUpdatesManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiUpdateUploadData> &transaction) {
     assert(transaction.command == ApiCommand::uploadUpdate);
-    emit updateReceived(transaction.params.updateId, transaction.params.data);
+    emit updateChunkReceived(transaction.params.updateId, transaction.params.data, transaction.params.offset);
 }
 
 template<class QueryProcessorType>
 void QnUpdatesManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiUpdateUploadResponceData> &transaction) {
     assert(transaction.command == ApiCommand::uploadUpdateResponce);
-    qDebug() << "Update responce from: " << transaction.params.id;
-    emit updateUploaded(transaction.params.updateId, transaction.params.id);
+    emit updateChunkUploaded(transaction.params.updateId, transaction.params.id, transaction.params.offset);
 }
 
 template<class QueryProcessorType>

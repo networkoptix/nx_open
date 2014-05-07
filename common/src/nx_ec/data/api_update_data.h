@@ -8,14 +8,16 @@ namespace ec2 {
 struct ApiUpdateUploadData : public ApiData {
     QString updateId;
     QByteArray data;
+    qint64 offset;
 };
-#define ApiUpdateUploadData_Fields (updateId)(data)
+#define ApiUpdateUploadData_Fields (updateId)(data)(offset)
 
 struct ApiUpdateUploadResponceData : public ApiIdData {
 public:
     QString updateId;
+    qint64 offset;
 };
-#define ApiUpdateUploadResponceData_Fields ApiIdData_Fields (updateId)
+#define ApiUpdateUploadResponceData_Fields ApiIdData_Fields (updateId)(offset)
 
 }
 

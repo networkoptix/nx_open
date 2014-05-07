@@ -668,13 +668,13 @@ namespace ec2
     public:
         virtual ~AbstractUpdatesManager() {}
 
-        template<class TargetType, class HandlerType> int sendUpdatePackage(const QString &updateId, const QByteArray &data, const PeerList &peers, TargetType *target, HandlerType handler) {
-            return sendUpdatePackage(updateId, data, peers, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const PeerList &peers, TargetType *target, HandlerType handler) {
+            return sendUpdatePackageChunk(updateId, data, offset, peers, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int sendUpdateUploadedResponce(const QString &updateId, const QnId &peerId, TargetType *target, HandlerType handler) {
-            return sendUpdateUploadedResponce(updateId, peerId, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int sendUpdateUploadedResponce(const QString &updateId, const QnId &peerId, qint64 offset, TargetType *target, HandlerType handler) {
+            return sendUpdateUploadedResponce(updateId, peerId, offset, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
@@ -684,13 +684,13 @@ namespace ec2
         }
 
     signals:
-        void updateReceived(const QString &updateId, const QByteArray &data);
-        void updateUploaded(const QString &updateId, const QnId &peerId);
+        void updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
+        void updateChunkUploaded(const QString &updateId, const QnId &peerId, qint64 offset);
         void updateInstallationRequested(const QString &updateId);
 
     protected:
-        virtual int sendUpdatePackage(const QString &updateId, const QByteArray &data, const PeerList &peers, impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendUpdateUploadedResponce(const QString &updateId, const QnId &peerId, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const PeerList &peers, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendUpdateUploadedResponce(const QString &updateId, const QnId &peerId, qint64 offset, impl::SimpleHandlerPtr handler) = 0;
         virtual int installUpdate(const QString &updateId, const PeerList &peers, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
