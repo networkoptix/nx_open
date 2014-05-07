@@ -62,7 +62,6 @@ private:
     QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
     bool startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
     bool isResourceDisabled(QnResourcePtr res) const;
-    void calcUsingLicenses(int* recordingDigital, int* recordingAnalog);
     QnResourceList getLocalControlledCameras();
 
     void beforeDeleteRecorder(const Recorders& recorders);

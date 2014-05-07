@@ -550,27 +550,6 @@ void QnRecordingManager::onTimer()
     }
 }
 
-void QnRecordingManager::calcUsingLicenses(int* recordingDigital, int* recordingAnalog)
-{
-    QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
-    int recordingCameras = 0;
-    qint64 relativeTime = ec2::QnTransactionLog::instance()->getRelativeTime();
-    foreach(QnResourcePtr camRes, cameras)
-    {
-        QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
-        QnMediaServerResourcePtr mServer = camera->getParentResource().dynamicCast<QnMediaServerResource>();
-        if (!mServer)
-            continue;
-
-        if (!camera->isScheduleDisabled()) {
-            if (camera->isAnalog())
-                ++(*recordingAnalog);
-            else
-                ++(*recordingDigital);
-        }
-    }
-}
-
 QnResourceList QnRecordingManager::getLocalControlledCameras()
 {
     // return own cameras + cameras from media servers without DB (remote connected servers)
@@ -598,9 +577,8 @@ void QnRecordingManager::at_checkLicenses()
     int maxDigital = licenseListHelper.totalDigital();
     int maxAnalog = licenseListHelper.totalAnalog();
 
-    int recordingDigital = 0;
-    int recordingAnalog = 0;
-    calcUsingLicenses(&recordingDigital, &recordingAnalog);
+    int recordingDigital = qnResPool->activeCamerasByClass(false);
+    int recordingAnalog = qnResPool->activeCamerasByClass(true);
 
     bool isOverflowTotal = recordingDigital + recordingAnalog > maxDigital + maxAnalog;
     if (recordingDigital > maxDigital  || isOverflowTotal)
@@ -643,10 +621,9 @@ void QnRecordingManager::at_licenseMutexLocked(QByteArray name)
     int maxDigital = licenseListHelper.totalDigital();
     int maxAnalog = licenseListHelper.totalAnalog();
 
-    int recordingDigital = 0;
-    int recordingAnalog = 0;
+    int recordingDigital = qnResPool->activeCamerasByClass(false);
+    int recordingAnalog = qnResPool->activeCamerasByClass(true);
     int disabledCameras = 0;
-    calcUsingLicenses(&recordingDigital, &recordingAnalog);
     
     // Too many licenses. check if server has own recording cameras and force to disable recording
     QnResourceList ownCameras = getLocalControlledCameras();
