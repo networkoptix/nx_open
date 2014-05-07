@@ -114,7 +114,7 @@ QnYv12ToRgbWithGammaShaderProgram::QnYv12ToRgbWithGammaShaderProgram(const QGLCo
 #ifdef QT_OPENGL_ES_2
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
-
+    addShaderFromSourceCode(QGLShader::Fragment, shader);
     link();
 }
 
@@ -203,7 +203,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    return QString(QLatin1String(QN_SHADER_SOURCE(shader))).arg(gammaStr());
+    return QString(QLatin1String(shader)).arg(gammaStr());
 }
 
 // ------------------------- QnFisheyeEquirectangularHProgram -----------------------------
@@ -293,8 +293,8 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
 #ifdef QT_OPENGL_ES_2
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
-
-    return QString(QLatin1String(QN_SHADER_SOURCE(shader))).arg(gammaStr());
+    
+    return QString(QLatin1String(shader)).arg(gammaStr());
 }
 
 // ----------------------------------------- QnFisheyeEquirectangularVProgram ---------------------------------------
@@ -385,7 +385,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    return QString(QLatin1String(QN_SHADER_SOURCE(shader))).arg(gammaStr());
+    return QString(QLatin1String(shader)).arg(gammaStr());
 }
 
 // ------------------------- QnAbstractRGBAShaderProgram ------------------------------
@@ -486,7 +486,7 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    return QLatin1String(QN_SHADER_SOURCE(shader));
+    return QLatin1String(shader);
 }
 
 // ------------------------- QnFisheyeRGBEquirectangularHProgram -----------------------------
@@ -563,7 +563,7 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    return QLatin1String(QN_SHADER_SOURCE(shader));
+    return QLatin1String(shader);
 }
 
 // ----------------------------------------- QnFisheyeRGBEquirectangularVProgram ---------------------------------------
@@ -640,7 +640,7 @@ QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    return QLatin1String(QN_SHADER_SOURCE(shader));
+    return QLatin1String(shader);
 }
 
 // ============================ QnYv12ToRgbaShaderProgram ==================================
@@ -681,7 +681,7 @@ QnYv12ToRgbaShaderProgram::QnYv12ToRgbaShaderProgram(const QGLContext *context, 
     shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
 #endif
 
-    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(shader));
+    addShaderFromSourceCode(QGLShader::Fragment, shader);
 
     link();
 }
