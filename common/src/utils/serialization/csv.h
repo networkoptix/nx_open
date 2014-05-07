@@ -78,6 +78,8 @@ namespace QnCsv {
 
 namespace QnCsvDetail {
 
+    // TODO: #Elric merge two classes?
+
     template<class Output>
     class SerializationVisitor {
     public:
