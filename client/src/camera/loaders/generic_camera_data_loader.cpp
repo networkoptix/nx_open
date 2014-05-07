@@ -1,6 +1,8 @@
 #include "generic_camera_data_loader.h"
 
-#include <camera/bookmark_camera_data.h>
+#include <camera/data/abstract_camera_data.h>
+#include <camera/data/time_period_camera_data.h>
+#include <camera/data/bookmark_camera_data.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/network_resource.h>
@@ -152,7 +154,7 @@ int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, con
 }
 
 void QnGenericCameraDataLoader::at_timePeriodsReceived(int status, const QnTimePeriodList &timePeriods, int requestHandle) {
-    QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(m_dataType, timePeriods));
+    QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(timePeriods));
     handleDataLoaded(status, data, requestHandle);
 }
 

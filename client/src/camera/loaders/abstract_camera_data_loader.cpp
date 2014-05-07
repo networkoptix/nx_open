@@ -1,5 +1,7 @@
 #include "abstract_camera_data_loader.h"
 
+#include <camera/data/abstract_camera_data.h>
+
 QnAbstractCameraDataLoader::QnAbstractCameraDataLoader(const QnResourcePtr &resource, const Qn::CameraDataType dataType, QObject *parent): 
     QObject(parent),
     m_resource(resource),

@@ -18,8 +18,6 @@
 #include <api/model/kvpair.h>
 #include <api/model/connection_info.h>
 
-#include <camera/abstract_camera_data.h>
-
 #include <recording/time_period_list.h>
 
 #include <core/resource/resource_fwd.h>
@@ -183,7 +181,6 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<Qn::PanicMode>();
 
     qRegisterMetaType<Qn::CameraDataType>();
-    qRegisterMetaType<QnAbstractCameraDataPtr>();
 
     qn_commonMetaTypes_initialized = true;
 }

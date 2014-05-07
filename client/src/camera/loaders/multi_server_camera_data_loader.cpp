@@ -1,6 +1,7 @@
 #include "multi_server_camera_data_loader.h"
 #include "utils/common/warnings.h"
 
+#include <camera/data/abstract_camera_data.h>
 #include <camera/loaders/generic_camera_data_loader.h>
 
 #include <core/resource/network_resource.h>

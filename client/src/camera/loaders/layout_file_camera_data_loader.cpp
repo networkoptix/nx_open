@@ -2,6 +2,10 @@
 
 #include <api/serializer/serializer.h>
 
+#include <camera/data/abstract_camera_data.h>
+#include <camera/data/time_period_camera_data.h>
+#include <camera/data/bookmark_camera_data.h>
+
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 
@@ -43,7 +47,7 @@ QnLayoutFileCameraDataLoader* QnLayoutFileCameraDataLoader::newInstance(const Qn
     case Qn::RecordedTimePeriod: 
         {
             QnTimePeriodList chunks = storage->getTimePeriods(resource);
-            return new QnLayoutFileCameraDataLoader(resource, dataType, QnTimePeriodCameraDataPtr(new QnTimePeriodCameraData(dataType, chunks)), parent);
+            return new QnLayoutFileCameraDataLoader(resource, dataType, QnAbstractCameraDataPtr(new QnTimePeriodCameraData(chunks)), parent);
         }
     default:
         return new QnLayoutFileCameraDataLoader(resource, dataType, parent);
@@ -91,7 +95,7 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QnTimePeriod &period, const Q
         }
     }
     QnTimePeriodList merged = QnTimePeriodList::mergeTimePeriods(periods);
-    QnAbstractCameraDataPtr result(new QnTimePeriodCameraData(Qn::MotionTimePeriod, merged));
+    QnAbstractCameraDataPtr result(new QnTimePeriodCameraData(merged));
 
     for (int i = 0; i < masks.size(); ++i)
         qFreeAligned(masks[i]);

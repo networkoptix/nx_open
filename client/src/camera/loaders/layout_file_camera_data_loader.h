@@ -4,7 +4,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QMutex>
 
-#include <camera/abstract_camera_data.h>
+#include <camera/data/camera_data_fwd.h>
 #include <camera/loaders/abstract_camera_data_loader.h>
 
 #include <common/common_globals.h>

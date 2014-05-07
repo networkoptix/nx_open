@@ -2,9 +2,7 @@
 
 #include <recording/time_period_list.h>
 
-QnAbstractCameraData::QnAbstractCameraData(const Qn::CameraDataType dataType):
-    m_dataType(dataType)
-{
+QnAbstractCameraData::QnAbstractCameraData() {
 }
 
 bool QnAbstractCameraData::isEmpty() const { 
@@ -20,21 +18,11 @@ QnAbstractCameraDataPtr QnAbstractCameraData::merge(const QVector<QnAbstractCame
     return QnAbstractCameraDataPtr();
 }
 
-Qn::CameraDataType QnAbstractCameraData::dataType() const {
-    return m_dataType;
-}
-
 QnTimePeriodList QnAbstractCameraData::dataSource() const {
     return QnTimePeriodList();
 }
 
 void QnAbstractCameraData::clear() {
-
-}
-
-bool QnAbstractCameraData::trimDataSource(qint64 trimTime) {
-    Q_UNUSED(trimTime)
-    return false;
 }
 
 bool QnAbstractCameraData::contains(const QnAbstractCameraDataPtr & data) const {

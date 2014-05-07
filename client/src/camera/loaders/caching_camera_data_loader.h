@@ -3,6 +3,9 @@
 
 #include <QtCore/QObject>
 
+#include <camera/data/bookmark_camera_data.h>
+#include <camera/data/time_period_camera_data.h>
+
 #include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
@@ -63,8 +66,7 @@ private slots:
 
 protected:
     void load(Qn::CameraDataType type, const QnTimePeriod &targetPeriod, const qint64 resolutionMs = 1);
-    bool trim(Qn::CameraDataType type, qint64 trimTime);
-
+    
     QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod, const qint64 minMargin) const;
 
 private:
@@ -89,12 +91,13 @@ private:
     QnTimePeriod m_boundingPeriod;
 
     QnTimePeriodList m_requestedTimePeriods[Qn::TimePeriodContentCount];
+    QnTimePeriodCameraData m_timePeriodCameraData[Qn::TimePeriodContentCount];
+
     QMap<qint64, QnTimePeriodList> m_requestedBookmarkPeriodsByResolution;  //TODO: #GDM #Bookmarks should we enumerate by resolution set index?
+    QnBookmarkCameraData m_bookmarkCameraData;
 
     QnAbstractCameraDataLoader *m_loaders[Qn::CameraDataTypeCount];
     int m_handles[Qn::CameraDataTypeCount];
-    
-    QnAbstractCameraDataPtr m_data[Qn::CameraDataTypeCount];
 
     QList<QRegion> m_motionRegions;
     QnCameraBookmarkTags m_bookmarkTags;

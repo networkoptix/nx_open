@@ -2116,6 +2116,9 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
 }
 
 //TODO: #GDM #Bookmarks check drawBookmarks() against m_localOffset
+//TODO: #GDM #Bookmarks check text length to fit right edge
+//TODO: #GDM #Bookmarks check text overlapping - paint longest if overlaps
+//TODO: #GDM #Bookmarks move text from left edge a bit
 void QnTimeSlider::drawBookmarks(QPainter *painter, const QRectF &rect) {
     qint64 windowLength = m_windowEnd - m_windowStart;
     qint64 minBookmarkDuration = windowLength / 16;

@@ -5,7 +5,7 @@
 #include <QtGui/QRegion>
 #include <QtCore/QList>
 
-#include <camera/abstract_camera_data.h>
+#include <camera/data/camera_data_fwd.h>
 
 #include <common/common_globals.h>
 

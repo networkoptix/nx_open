@@ -91,7 +91,6 @@ int QnCameraBookmarksRestHandler::getCameraBookmarksAction(const QnRequestParams
         return CODE_INVALID_PARAMETER;
 
     result.setReply(bookmarks);
-    qDebug() << "returning" << bookmarks.size() << "bookmarks" << bookmarks;
     return CODE_OK;
 }
 

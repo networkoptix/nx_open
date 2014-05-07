@@ -7,8 +7,6 @@
 
 #include "time_period.h"
 
-#include <camera/abstract_camera_data.h>
-
 class QnTimePeriodListTimeIterator;
 
 /**
@@ -177,23 +175,5 @@ inline QnTimePeriodListTimeIterator QnTimePeriodList::timeEnd() const {
 }
 
 Q_DECLARE_METATYPE(QnTimePeriodList);
-
-class QnTimePeriodCameraData: public QnAbstractCameraData {
-public:
-    QnTimePeriodCameraData(Qn::CameraDataType dataType);
-    QnTimePeriodCameraData(Qn::CameraDataType dataType, const QnTimePeriodList &data);
-    virtual void append(const QnAbstractCameraDataPtr &other) override;
-    virtual QnTimePeriodList dataSource() const override;
-    virtual void clear() override;
-    virtual bool trimDataSource(qint64 trimTime) override;
-
-    virtual QnAbstractCameraDataPtr merge(const QVector<QnAbstractCameraDataPtr> &source) override;
-
-    virtual bool contains(const QnAbstractCameraDataPtr &other) const override;
-private:
-    QnTimePeriodList m_data;
-};
-
-typedef QSharedPointer<QnTimePeriodCameraData> QnTimePeriodCameraDataPtr;
 
 #endif // QN_TIME_PERIOD_LIST_H

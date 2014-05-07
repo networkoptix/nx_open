@@ -3,17 +3,14 @@
 
 #include <common/common_globals.h>
 
-class QnTimePeriodList;
+#include <camera/data/camera_data_fwd.h>
 
-class QnAbstractCameraData;
-typedef QSharedPointer<QnAbstractCameraData> QnAbstractCameraDataPtr;
+class QnTimePeriodList;
 
 class QnAbstractCameraData {
 public:
-    QnAbstractCameraData(const Qn::CameraDataType dataType);
+    QnAbstractCameraData();
     
-    Qn::CameraDataType dataType() const;
-
     virtual void append(const QnAbstractCameraDataPtr &other);
 
     virtual QnAbstractCameraDataPtr merge(const QVector<QnAbstractCameraDataPtr> &source);
@@ -23,11 +20,7 @@ public:
 
     virtual void clear();
 
-    virtual bool trimDataSource(qint64 trimTime);
-
     virtual bool contains(const QnAbstractCameraDataPtr & data) const;
-protected:
-    const Qn::CameraDataType m_dataType;
 };
 
 Q_DECLARE_METATYPE(QnAbstractCameraDataPtr);

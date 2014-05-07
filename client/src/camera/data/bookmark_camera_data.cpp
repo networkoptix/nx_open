@@ -2,8 +2,6 @@
 
 #include <core/resource/camera_bookmark.h>
 
-#include <recording/time_period_list.h>
-
 namespace {
 
     QnCameraBookmarkList mergeBookmarks(const QVector<QnCameraBookmarkList> lists) {
@@ -49,12 +47,12 @@ namespace {
 }
 
 QnBookmarkCameraData::QnBookmarkCameraData():
-    QnAbstractCameraData(Qn::BookmarkData)
+    QnAbstractCameraData()
 {
 }
 
 QnBookmarkCameraData::QnBookmarkCameraData(const QnCameraBookmarkList &data):
-    QnAbstractCameraData(Qn::BookmarkData),
+    QnAbstractCameraData(),
     m_data(data)
 {
     updateDataSource();
@@ -102,6 +100,7 @@ bool QnBookmarkCameraData::contains(const QnAbstractCameraDataPtr &other) const 
     QnBookmarkCameraData* other_casted = dynamic_cast<QnBookmarkCameraData*>(other.data());
     if (!other_casted)
         return false;
+
     foreach (const QnCameraBookmark &bookmark, other_casted->m_data)
         if (!m_data.contains(bookmark))
             return false;
