@@ -531,7 +531,7 @@ QnConstResourceAudioLayoutPtr QnMulticodecRtpReader::getAudioLayout() const
     if (m_audioParser)
         return m_audioParser->getAudioLayout();
     else
-        return nullptr;
+        return QnConstResourceAudioLayoutPtr();
 }
 
 void QnMulticodecRtpReader::pleaseStop()

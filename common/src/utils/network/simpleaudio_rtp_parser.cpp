@@ -5,15 +5,14 @@
 #include "core/datapacket/media_data_packet.h"
 
 QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
-    QnRtpAudioStreamParser()
+    QnRtpAudioStreamParser(),
+    m_audioLayout( new QnRtspAudioLayout() )
 {
     m_frequency = 8000;
     m_channels = 1;
     m_codecId = CODEC_ID_PCM_MULAW;
     m_sampleFormat = AV_SAMPLE_FMT_U8;
     m_bits_per_coded_sample = 8;
-
-    m_audioLayout.reset( new QnRtspAudioLayout() );
 }
 
 QnSimpleAudioRtpParser::~QnSimpleAudioRtpParser()

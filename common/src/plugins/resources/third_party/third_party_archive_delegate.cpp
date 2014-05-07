@@ -119,13 +119,13 @@ qint64 ThirdPartyArchiveDelegate::seek( qint64 time, bool findIFrame )
     }
 }
 
-static std::shared_ptr<QnDefaultResourceVideoLayout> videoLayout( new QnDefaultResourceVideoLayout() );
+static QSharedPointer<QnDefaultResourceVideoLayout> videoLayout( new QnDefaultResourceVideoLayout() );
 QnResourceVideoLayoutPtr ThirdPartyArchiveDelegate::getVideoLayout()
 {
     return videoLayout;
 }
 
-static std::shared_ptr<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
+static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
 QnResourceAudioLayoutPtr ThirdPartyArchiveDelegate::getAudioLayout()
 {
     return audioLayout;
