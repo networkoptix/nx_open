@@ -20,6 +20,9 @@
 #include "core/resource/resource.h"
 #include "utils/common/synctime.h"
 
+#include <recording/time_period.h>
+#include <recording/time_period_list.h>
+
 #include <boost/array.hpp>
 
 DeviceFileCatalog::RebuildMethod DeviceFileCatalog::m_rebuildArchive = DeviceFileCatalog::Rebuild_None;
@@ -1026,4 +1029,8 @@ bool operator < (const DeviceFileCatalog::Chunk& first, qint64 other)
 bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog::Chunk& other) 
 { 
     return first.startTimeMs < other.startTimeMs;
+}
+
+bool DeviceFileCatalog::ScanFilter::intersects(const QnTimePeriod& period) const {
+    return QnTimePeriod(scanAfter.startTimeMs, scanAfter.durationMs).intersects(period);
 }

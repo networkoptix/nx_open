@@ -17,6 +17,8 @@
 
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
+#include <recording/time_period.h>
+
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>

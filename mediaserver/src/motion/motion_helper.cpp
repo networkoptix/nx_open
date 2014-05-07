@@ -7,6 +7,8 @@
 #include "recorder/file_deletor.h"
 #include <media_server/serverutil.h>
 
+#include <recording/time_period_list.h>
+
 
 QnMotionHelper::QnMotionHelper()
 {

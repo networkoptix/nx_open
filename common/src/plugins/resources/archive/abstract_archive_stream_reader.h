@@ -4,8 +4,8 @@
 #include "abstract_archive_delegate.h"
 #include "utils/common/adaptive_sleep.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
-#include "recording/time_period.h"
 
+class QnTimePeriod;
 class QnTimePeriodList;
 
 class QnAbstractNavigator

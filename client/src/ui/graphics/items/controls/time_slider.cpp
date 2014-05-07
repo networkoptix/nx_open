@@ -18,6 +18,8 @@
 
 #include <core/resource/camera_bookmark.h>
 
+#include <recording/time_period_list.h>
+
 #include <ui/common/geometry.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>

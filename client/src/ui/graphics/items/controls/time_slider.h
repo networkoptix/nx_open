@@ -7,7 +7,6 @@
 
 #include <client/client_color_types.h>
 
-#include <recording/time_period_list.h>
 #include <recording/time_period_storage.h>
 
 #include <camera/thumbnail.h>
@@ -27,6 +26,7 @@ class QTimer;
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
+class QnTimePeriodList;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT

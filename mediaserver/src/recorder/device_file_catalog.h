@@ -10,8 +10,10 @@
 
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
-#include "recording/time_period.h"
 #include <QtCore/QFileInfo>
+
+class QnTimePeriodList;
+class QnTimePeriod;
 
 class DeviceFileCatalog: public QObject
 {
@@ -115,7 +117,7 @@ public:
         Chunk scanAfter;
 
         bool isEmpty() const { return scanAfter.durationMs == 0; }
-        bool intersects(const QnTimePeriod& period) const { return QnTimePeriod(scanAfter.startTimeMs, scanAfter.durationMs).intersects(period); }
+        bool intersects(const QnTimePeriod& period) const;
     };
 
     void scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList,

@@ -13,6 +13,8 @@
 #include "user_resource.h"
 #include "common/common_module.h"
 
+#include <recording/time_period_list.h>
+
 #define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
 
 namespace {

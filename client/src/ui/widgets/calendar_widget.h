@@ -5,10 +5,10 @@
 #include <QtWidgets/QTableView>
 
 #include <recording/time_period.h>
-#include <recording/time_period_list.h>
 #include <recording/time_period_storage.h>
 
 class QnCalendarItemDelegate;
+class QnTimePeriodList;
 
 /**
  * Widget for displaying calendar supporting cell highlighting

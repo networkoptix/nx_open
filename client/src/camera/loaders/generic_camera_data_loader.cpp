@@ -9,6 +9,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_bookmark.h>
 
+#include <recording/time_period_list.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>

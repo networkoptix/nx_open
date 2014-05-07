@@ -1,5 +1,6 @@
 #include "abstract_archive_stream_reader.h"
 
+#include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
 #include "utils/common/util.h"

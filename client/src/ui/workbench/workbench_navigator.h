@@ -5,7 +5,6 @@
 #include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
-#include <recording/time_period.h>
 
 #include <client/client_globals.h>
 

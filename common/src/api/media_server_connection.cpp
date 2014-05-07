@@ -23,6 +23,8 @@
 #include <api/serializer/serializer.h>
 #include <event_log/events_serializer.h>
 
+#include <recording/time_period_list.h>
+
 #include "network_proxy_factory.h"
 #include "session_manager.h"
 

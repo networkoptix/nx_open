@@ -9,7 +9,8 @@
 #include "core/resource/network_resource.h"
 #include "recorder/device_file_catalog.h"
 #include "motion_archive.h"
-#include "recording/time_period_list.h"
+
+class QnTimePeriodList;
 
 class QnMotionHelper
 {
