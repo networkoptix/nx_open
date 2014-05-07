@@ -64,7 +64,7 @@ public:
     /*!
         \todo Should remove it from here
     */
-    const nx_hls::HLSLivePlaylistManager* hlsLivePlaylistManager() const;
+    QSharedPointer<nx_hls::HLSLivePlaylistManager> hlsLivePlaylistManager() const;
 
     //!Starts caching live stream, if not started
     /*!
@@ -87,8 +87,8 @@ private:
     QnVideoCameraGopKeeper* m_secondaryGopKeeper;
     QSet<void*> m_cameraUsers;
     QnCompressedAudioDataPtr m_lastAudioFrame;
-    std::auto_ptr<MediaStreamCache> m_liveCache;
-    std::auto_ptr<nx_hls::HLSLivePlaylistManager> m_hlsLivePlaylistManager;
+    std::unique_ptr<MediaStreamCache> m_liveCache;
+    QSharedPointer<nx_hls::HLSLivePlaylistManager> m_hlsLivePlaylistManager;
     MediaIndex m_mediaIndex;
 
     bool ensureLiveCacheStarted( QnAbstractMediaStreamDataProviderPtr primaryReader );

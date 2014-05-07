@@ -87,31 +87,20 @@ namespace nx_hls
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
         //!Generates variant playlist (containing references to other playlists providing different qualities)
-        nx_http::StatusCode::Value getHLSVariantPlaylist(
+        nx_http::StatusCode::Value getVariantPlaylist(
             HLSSession* session,
             const nx_http::Request& request,
             const QStringRef& uniqueResourceID,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
         //!Generates playlist with chunks inside
-        nx_http::StatusCode::Value getHLSChunkedPlaylist(
+        nx_http::StatusCode::Value getChunkedPlaylist(
             HLSSession* const session,
             const nx_http::Request& request,
             const QStringRef& uniqueResourceID,
             const QnSecurityCamResourcePtr& camResource,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
-        nx_http::StatusCode::Value getLiveChunkPlaylist(
-            HLSSession* const session,
-            const QnSecurityCamResourcePtr& camResource,
-            const std::multimap<QString, QString>& requestParams,
-            std::vector<nx_hls::AbstractPlaylistManager::ChunkData>* const chunkList );
-        nx_http::StatusCode::Value getArchiveChunkPlaylist(
-            HLSSession* const session,
-            const QnSecurityCamResourcePtr& camResource,
-            const std::multimap<QString, QString>& requestParams,
-            std::vector<nx_hls::AbstractPlaylistManager::ChunkData>* const chunkList,
-            bool* const isPlaylistClosed );
         nx_http::StatusCode::Value getResourceChunk(
             const nx_http::Request& request,
             const QStringRef& uniqueResourceID,

@@ -94,7 +94,11 @@ template <class Base>
 class QnFisheyeShaderProgram : public Base {
     typedef Base base_type;
 public:
-    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL): Base(context, parent, false) {}
+    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL)
+        : Base(context, parent, false),
+          m_add_shader(false)
+    {
+    }
 
     using base_type::uniformLocation;
     using base_type::setUniformValue;
@@ -146,7 +150,11 @@ public:
     }
 
     virtual bool link() override {
-        addShaderFromSourceCode(QGLShader::Fragment, getShaderText());
+        if ( !m_add_shader )
+        {
+            addShaderFromSourceCode(QGLShader::Fragment, getShaderText());
+            m_add_shader = true;
+        }        
         bool rez = base_type::link();
         if (rez) {
             m_xShiftLocation = uniformLocation("xShift");
@@ -184,6 +192,7 @@ protected:
     
     int m_maxXLocation;
     int m_maxYLocation;
+    bool m_add_shader;
 };
 
 // --------- fisheye YUV (with optional gamma) ---------------

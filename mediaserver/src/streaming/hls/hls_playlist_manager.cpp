@@ -11,18 +11,21 @@ namespace nx_hls
     :
         startTimestamp( 0 ),
         duration( 0 ),
-        mediaSequence( 0 )
+        mediaSequence( 0 ),
+        discontinuity( false )
     {
     }
 
     AbstractPlaylistManager::ChunkData::ChunkData(
         quint64 _startTimestamp,
         quint64 _duration,
-        unsigned int _mediaSequence )
+        unsigned int _mediaSequence,
+        bool _discontinuity )
     :
         startTimestamp( _startTimestamp ),
         duration( _duration ),
-        mediaSequence( _mediaSequence )
+        mediaSequence( _mediaSequence ),
+        discontinuity( _discontinuity )
     {
     }
 }
