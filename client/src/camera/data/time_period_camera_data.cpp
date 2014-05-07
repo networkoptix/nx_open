@@ -50,11 +50,7 @@ QnAbstractCameraDataPtr QnTimePeriodCameraData::merge(const QVector<QnAbstractCa
 }
 
 bool QnTimePeriodCameraData::contains(const QnAbstractCameraDataPtr &other) const {
-    QnTimePeriodCameraData* other_casted = dynamic_cast<QnTimePeriodCameraData*>(other.data());
-    if (!other_casted)
-        return false;
-
-    foreach (const QnTimePeriod &period, other_casted->m_data)
+    foreach (const QnTimePeriod &period, other->dataSource())
         if (!m_data.containPeriod(period))
             return false;
     return true;
@@ -85,8 +81,4 @@ bool QnTimePeriodCameraData::trim(qint64 trimTime) {
     }
 
     return true;
-}
-
-QnTimePeriodList QnTimePeriodCameraData::data() const {
-    return m_data;
 }

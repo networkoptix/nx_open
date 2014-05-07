@@ -271,22 +271,19 @@ void QnCachingCameraDataLoader::load(Qn::CameraDataType type, const QnTimePeriod
         m_handles[type] = loader->load(targetPeriod);
         break;
     case Qn::BookmarkTimePeriod:
-        m_handles[type] = loader->load(targetPeriod, m_bookmarkTags.join(L','));  //TODO: #GDM #Bookmarks process tags list on the server side
+    case Qn::BookmarkData:
+        m_handles[type] = loader->load(targetPeriod, m_bookmarkTags.join(L','), resolutionMs);  //TODO: #GDM #Bookmarks process tags list on the server side
         break;
     case Qn::MotionTimePeriod:
         if(!isMotionRegionsEmpty()) {
             QString filter = serializeRegionList(m_motionRegions);
             m_handles[type] = loader->load(targetPeriod, filter);
         } else if(!m_timePeriodCameraData[Qn::MotionContent].isEmpty()) {
+            m_requestedTimePeriods[Qn::MotionContent].clear();
             m_timePeriodCameraData[Qn::MotionContent].clear();
             emit periodsChanged(Qn::MotionContent);
         }
         break;
-    case Qn::BookmarkData: 
-        { 
-            m_handles[type] = loader->load(targetPeriod, m_bookmarkTags.join(L','), resolutionMs);
-            break;
-        }
     default:
         assert(false); //should never get here
     }

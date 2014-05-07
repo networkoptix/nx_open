@@ -25,6 +25,7 @@ public:
 
 Q_DECLARE_METATYPE(QnAbstractCameraDataPtr);
 
+//TODO: #GDM #Bookmarks move these functions to more common place
 Qn::CameraDataType timePeriodToDataType(const Qn::TimePeriodContent timePeriodType);
 Qn::TimePeriodContent dataTypeToPeriod(const Qn::CameraDataType dataType);
 

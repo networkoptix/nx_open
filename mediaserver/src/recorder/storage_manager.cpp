@@ -471,7 +471,7 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(const QnResourceList &resL
             if (!catalogs.contains(catalog))
                 continue;
 
-            //TODO: #GDM #Bookmarks implement bookmarks for the DTS cameras
+            //TODO: #GDM #Bookmarks forbid bookmarks for the DTS cameras
             if (camera->isDtsBased()) {
                 if (catalog == QnServer::HiQualityCatalog) // both hi- and low-quality chunks are loaded with this method
                     periods << camera->getDtsTimePeriods(startTime, endTime, detailLevel);
