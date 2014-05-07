@@ -39,12 +39,8 @@ QnAuthHelper* QnAuthHelper::instance()
     return m_instance;
 }
 
-<<<<<<< local
-bool QnAuthHelper::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response, bool isProxy) 
+bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy) 
 {
-=======
-bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response) {
->>>>>>> other
     QString cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
     int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
     if (customAuthInfoPos >= 0) {
@@ -119,11 +115,7 @@ static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter
     return rez;
 }
 
-<<<<<<< local
-bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::HttpResponse& responseHeaders, bool isProxy)
-=======
-bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders)
->>>>>>> other
+bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy)
 {
     const QList<QByteArray>& authParams = smartSplit(authData, ',');
 
@@ -256,11 +248,7 @@ bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::Re
     return false;
 }
 
-<<<<<<< local
-void QnAuthHelper::addAuthHeader(nx_http::HttpResponse& response, bool isProxy)
-=======
-void QnAuthHelper::addAuthHeader(nx_http::Response& response)
->>>>>>> other
+void QnAuthHelper::addAuthHeader(nx_http::Response& response, bool isProxy)
 {
     QString auth(lit("Digest realm=\"%1\",nonce=\"%2\""));
 	QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
