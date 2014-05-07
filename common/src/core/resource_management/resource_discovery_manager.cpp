@@ -70,7 +70,7 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 QnResourceDiscoveryManager::QnResourceDiscoveryManager( const CameraDriverRestrictionList* cameraDriverRestrictionList )
 :
     m_ready( false ),
-    m_state( initialSearch ),
+    m_state( InitialSearch ),
     m_cameraDriverRestrictionList( cameraDriverRestrictionList )
 {
     connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
@@ -183,7 +183,7 @@ void QnResourceDiscoveryManager::run()
     QnResourceDiscoveryManagerTimeoutDelegate timoutDelegate( this );
     connect( m_timer.get(), SIGNAL(timeout()), &timoutDelegate, SLOT(onTimeout()) );
     m_timer->start( 0 );    //immediate execution
-    m_state = initialSearch;
+    m_state = InitialSearch;
 
     exec();
 
@@ -205,7 +205,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 
     switch( m_state )
     {
-        case initialSearch:
+        case InitialSearch:
             foreach (QnAbstractResourceSearcher *searcher, searchersList)
             {
                 if (searcher->shouldBeUsed() && searcher->isLocal())
@@ -215,10 +215,10 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
                 }
             }
             emit localSearchDone();
-            m_state = periodicSearch;
+            m_state = PeriodicSearch;
             break;
 
-        case periodicSearch:
+        case PeriodicSearch:
         {
             if( !m_ready )
                 break;

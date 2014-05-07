@@ -19,6 +19,7 @@ static const unsigned long MAX_WAIT_TIMEOUT_MS = 15000;
 
 namespace HttpStatusCode
 {
+    // TODO: #Elric #enum
     enum Value
     {
         ok = 200,
@@ -30,6 +31,7 @@ namespace HttpStatusCode
 int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType)
 {
     Q_UNUSED(contentType)
+        // TODO: #Elric #enum
     enum CmdType
     {
         ctSetParam,

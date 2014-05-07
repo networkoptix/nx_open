@@ -4,8 +4,6 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMutex>
 
-#include <utils/common/enum_name_mapper.h>
-
 #include <core/ptz/ptz_fwd.h>
 
 #include <rest/server/json_rest_handler.h>

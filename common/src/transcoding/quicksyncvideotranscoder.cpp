@@ -106,6 +106,7 @@ int QnQuickSyncVideoTranscoder::transcodePacket( QnAbstractMediaDataPtr inputAU,
         break;
     }
 
+    // TODO: #Elric #enum
     enum State
     {
         decoding,

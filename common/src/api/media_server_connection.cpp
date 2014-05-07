@@ -17,8 +17,7 @@
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
-#include <utils/serialization/json_functions.h>
-#include <utils/common/enum_name_mapper.h>
+#include <utils/common/model_functions.h>
 
 #include <api/serializer/serializer.h>
 #include <event_log/events_serializer.h>
@@ -27,7 +26,7 @@
 #include "session_manager.h"
 
 namespace {
-    QN_DEFINE_NAME_MAPPED_ENUM(RequestObject,
+    QN_DEFINE_LEXICAL_ENUM(RequestObject,
         (StorageStatusObject,      "storageStatus")
         (StorageSpaceObject,       "storageSpace")
         (TimePeriodsObject,        "RecordedTimePeriods")
@@ -399,7 +398,7 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
     m_proxyPort(0)
 {
     setUrl(mserver->getApiUrl());
-    setNameMapper(new QnEnumNameMapper(QnEnumNameMapper::create<RequestObject>())); // TODO: #Elric no new
+    setSerializer(QnLexical::newEnumSerializer<RequestObject, int>());
 
     QnRequestHeaderList extraHeaders;
     extraHeaders.insert(lit("x-server-guid"), mserver->getId().toString());

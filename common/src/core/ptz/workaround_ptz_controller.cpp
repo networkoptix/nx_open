@@ -22,9 +22,10 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
 
     m_octagonal = resourceData.value<bool>(lit("octagonalPtz"), false);
     
-    QString ptzCapabilities = resourceData.value<QString>(lit("ptzCapabilities"));
+    QString ptzCapabilities = resourceData.value<QString>(lit("ptzCapabilities")); 
+    
     if(!ptzCapabilities.isEmpty()) {
-        // TODO: #Elric evil. implement via enum name mapper flags.
+        // TODO: #Elric #enum evil. implement via enum name mapper flags.
 
         if(ptzCapabilities == lit("NoPtzCapabilities")) {
             m_overrideCapabilities = true;

@@ -238,7 +238,7 @@ bool QnDbManager::updateGuids()
     return true;
 }
 
-namespace oldBusinessData
+namespace oldBusinessData // TODO: #Elric #EC2 sane naming
 {
     enum BusinessEventType
     {

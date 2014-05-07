@@ -5,16 +5,22 @@
 #include <type_traits>  /* For std::integral_constant, std::declval. */
 
 #ifndef Q_MOC_RUN
+#include <boost/preprocessor/facilities/overload.hpp>
+#include <boost/preprocessor/repetition/repeat.hpp>
+#include <boost/preprocessor/seq/size.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/for_each_i.hpp>
-#include <boost/preprocessor/variadic/elem.hpp>
+#include <boost/preprocessor/seq/to_tuple.hpp>
 #include <boost/preprocessor/tuple/size.hpp>
-#include <boost/preprocessor/repetition/repeat.hpp>
+#include <boost/preprocessor/tuple/elem.hpp>
+#include <boost/preprocessor/variadic/elem.hpp>
+#include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #endif // Q_MOC_RUN
 
-#include "fusion.h"
+#include <utils/preprocessor/variadic_seq_for_each.h>
 
+#include "fusion.h"
 
 /**
  * Main API entry point for fusion adaptors.
@@ -250,6 +256,53 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
 #define QN_FUSION_ADAPT_STRUCT_FUNCTIONS(STRUCT, FUNCTION_SEQ, FIELD_SEQ, ... /* GLOBAL_SEQ, PREFIX */) \
     QN_FUSION_ADAPT_STRUCT(STRUCT, FIELD_SEQ, BOOST_PP_VARIADIC_ELEM(0, ##__VA_ARGS__,,)) \
     QN_FUSION_DEFINE_FUNCTIONS(STRUCT, FUNCTION_SEQ, BOOST_PP_VARIADIC_ELEM(1, ##__VA_ARGS__,,))
+
+
+/**
+ * Same as QN_FUSION_ADAPT_STRUCT_FUNCTIONS, but for several types. Field
+ * sequences are expected to be defined elsewhere as 
+ * <tt>[TYPE_NAME][FIELD_SUFFIX]</tt> tokens, with <tt>FIELD_SUFFIX</tt> then
+ * passed to this macro.
+ * 
+ * Example usage:
+ * 
+ * \code
+ * struct Point { int x, y, z; }
+ * #define Point_Fields (x)(y)(z)
+ * 
+ * struct Segment { Point a, b; }
+ * #define Segment_Fields (a)(b)
+ * 
+ * QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((Point)(Segment), (json)(eq)(hash), _Fields,, inline)
+ * \endcode
+ * 
+ * Note that this obviously won't work for type names consisting of several 
+ * preprocessing tokens, e.g. for templates and type names with specified
+ * scope such as <tt>std::size_t</tt>.
+ * 
+ * \param STRUCT_SEQ
+ * \param FUNCTION_SEQ
+ * \param FIELD_SUFFIX
+ * \param GLOBAL_SEQ
+ * \param PREFIX
+ * \see QN_FUSION_ADAPT_STRUCT_FUNCTIONS
+ */
+#define QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(STRUCT_SEQ, FUNCTION_SEQ, FIELD_SUFFIX, ... /* GLOBAL_SEQ, PREFIX */) \
+    BOOST_PP_REPEAT(BOOST_PP_SEQ_SIZE(STRUCT_SEQ), QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES_STEP_I, (BOOST_PP_SEQ_TO_TUPLE(STRUCT_SEQ), FUNCTION_SEQ, FIELD_SUFFIX, ##__VA_ARGS__,,))
+
+#define QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES_STEP_I(Z, I, PARAMS)         \
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES_STEP_II(                         \
+        BOOST_PP_TUPLE_ELEM(I, BOOST_PP_TUPLE_ELEM(0, PARAMS)),                 \
+        BOOST_PP_TUPLE_ELEM(1, PARAMS),                                         \
+        BOOST_PP_TUPLE_ELEM(2, PARAMS),                                         \
+        BOOST_PP_TUPLE_ELEM(3, PARAMS),                                         \
+        BOOST_PP_TUPLE_ELEM(4, PARAMS)                                          \
+    )
+
+#define QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES_STEP_II(STRUCT, FUNCTION_SEQ, FIELD_SUFFIX, GLOBAL_SEQ, PREFIX) \
+    QN_FUSION_ADAPT_STRUCT(STRUCT, BOOST_PP_CAT(STRUCT, FIELD_SUFFIX), GLOBAL_SEQ) \
+    QN_FUSION_DEFINE_FUNCTIONS(STRUCT, FUNCTION_SEQ, PREFIX)
+
 
 
 /**

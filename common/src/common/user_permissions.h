@@ -1,7 +1,9 @@
 #ifndef QN_USER_PERMISSIONS_H
 #define QN_USER_PERMISSIONS_H
 
+#ifndef QN_NO_NAMESPACES
 namespace Qn {
+#endif
 
     /**
      * Flags describing the actions permitted for the user to do with the 
@@ -63,6 +65,8 @@ namespace Qn {
         AllPermissions                          = 0xFFFFFFFF
     };
 
+#ifndef QN_NO_NAMESPACES
 } // namespace Qn
+#endif
 
 #endif //QN_USER_PERMISSIONS_H

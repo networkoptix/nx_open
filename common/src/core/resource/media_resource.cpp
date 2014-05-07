@@ -4,7 +4,6 @@
 #include <QtCore/QCoreApplication>
 
 #include <utils/common/warnings.h>
-#include <utils/common/enum_name_mapper.h>
 #include <utils/serialization/lexical.h>
 
 #include "resource_media_layout.h"
@@ -64,16 +63,6 @@ QString Qn::toDisplayString(Qn::StreamQuality value) {
 
 QString Qn::toShortDisplayString(Qn::StreamQuality value) {
     return QnStreamQualityStrings::shortDisplayString(value);
-}
-
-template<>
-Qn::StreamQuality Qn::fromString<Qn::StreamQuality>(const QString &string) {
-    return QnLexical::deserialized<Qn::StreamQuality>(string, Qn::QualityNotDefined);
-}
-
-template<>
-QString Qn::toString<Qn::StreamQuality>(Qn::StreamQuality value) {
-    return QnLexical::serialized(value);
 }
 
 

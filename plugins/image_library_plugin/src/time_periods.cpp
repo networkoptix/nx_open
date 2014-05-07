@@ -20,11 +20,6 @@ void* TimePeriods::queryInterface( const nxpl::NX_GUID& interfaceID )
         addRef();
         return static_cast<nxcip::TimePeriods*>(this);
     }
-    if( memcmp( &interfaceID, &nxcip::IID_Iteratable, sizeof(nxcip::IID_Iteratable) ) == 0 )
-    {
-        addRef();
-        return static_cast<nxcip::Iteratable*>(this);
-    }
     return NULL;
 }
 
@@ -50,13 +45,11 @@ bool TimePeriods::get( nxcip::UsecUTCTimestamp* start, nxcip::UsecUTCTimestamp* 
     return true;
 }
 
-//!Implementation of nxcip::Iteratable::goToBeginning
 void TimePeriods::goToBeginning()
 {
     m_pos = timePeriods.begin();
 }
 
-//!Implementation of nxcip::Iteratable::next
 bool TimePeriods::next()
 {
     return (++m_pos) != timePeriods.end();

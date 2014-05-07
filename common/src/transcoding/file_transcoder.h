@@ -121,6 +121,7 @@ protected:
     virtual void run() override;
 
 private:
+    // TODO: #Elric #enum
     enum State
     {
         sInit,

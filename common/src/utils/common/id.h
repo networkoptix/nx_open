@@ -27,7 +27,7 @@ inline int guidToInt(const QnId& guid)
 inline QString guidToSqlString(const QnId& guid)
 {
     QByteArray data = guid.toRfc4122().toHex();
-    return QString(lit("x'%1'")).arg(QString::fromLocal8Bit(data));
+    return QString(lit("x'%1'")).arg(QString::fromLatin1(data));
 }
 
 

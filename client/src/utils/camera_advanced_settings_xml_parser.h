@@ -245,7 +245,7 @@ public:
     QTreeWidget* getRootWidget();
     QStackedLayout* getRootLayout();
 #ifdef WEBKIT_PRESENT
-    QWebView* getWebView();
+    QWebView** getWebView();
 #endif
 };
 

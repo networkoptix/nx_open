@@ -1,4 +1,3 @@
-
 #include "business_event_parameters.h"
 
 #include <QtCore/QVariant>

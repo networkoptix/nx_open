@@ -217,7 +217,11 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
         case QnBusiness::ShowPopupAction:
         {
             QnBusinessActionParameters params = m_actionParams;
-            params.setUserGroup((QnBusinessActionParameters::UserGroup)value.toInt());
+
+            // TODO: #GDM you're implicitly relying on what enum values are, which is very bad.
+            // This code will fail silently if someone changes the header. Please write it properly.
+            
+            params.setUserGroup((QnBusinessActionParameters::UserGroup)value.toInt()); 
             setActionParams(params);
             break;
         }

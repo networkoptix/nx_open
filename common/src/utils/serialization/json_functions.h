@@ -29,9 +29,11 @@
 #include <QtGui/QFont>
 
 #include <utils/common/container.h>
+#include <utils/common/latin1_array.h>
 
 #include "json.h"
 #include "lexical.h"
+
 
 inline void serialize(QnJsonContext *, const QJsonValue &value, QJsonValue *target) {
     *target = value;
@@ -332,7 +334,7 @@ inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QByteArray 
 }
 
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QColor)(QBrush)(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QRegion)(QVector2D)(QVector3D)(QVector4D)(QUuid)(QUrl)(QFont), (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnLatin1Array)(QColor)(QBrush)(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QRegion)(QVector2D)(QVector3D)(QVector4D)(QUuid)(QUrl)(QFont), (json))
 
 void qnJsonFunctionsUnitTest();
 

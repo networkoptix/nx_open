@@ -24,6 +24,8 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
 
 public:
+    // TODO: #API This one probably does not deserve to be a flag.
+    // Do we intend to add more status flags?
     enum StatusFlag {
         HasIssuesFlag = 0x1
     };

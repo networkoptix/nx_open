@@ -13,6 +13,7 @@
 
 namespace DecoderParameter
 {
+    // TODO: #Elric #enum
     enum Value
     {
         //string

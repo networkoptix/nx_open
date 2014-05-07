@@ -21,6 +21,16 @@
 
 namespace ec2
 {
+    // TODO: #MSAPI 
+    //
+    // Think of inheriting this one from QnBasicRestHandler (ex-QnJsonRestHandler)
+    // and sharing the implementation of format handling.
+    // 
+    // Btw, it would also make sense to do some renamings. This one is a 
+    // rest handler, so should be named as such. ec2::BasicRestHandler?
+    // 
+    //
+
     //!Http request handler for GET requests
     template<class InputData, class OutputData, class Derived>
     class BaseQueryHttpHandler
@@ -60,6 +70,9 @@ namespace ec2
                     } else if(format == Qn::JsonFormat) {
                         result = QJson::serialized(outputData);
                         contentType = "application/json";
+                    } else if(format == Qn::CsvFormat) {
+                        result = QnCsv::serialized(outputData);
+                        contentType = "text/csv";
                     } else {
                         assert(false);
                     }
@@ -159,7 +172,8 @@ namespace ec2
         public BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> >
     {
     public:
-        typedef BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> > parent_type;
+        // TODO: #MSAPI our code convention is to name this one base_type, and make it private. Tell Andrey.
+        typedef BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> > parent_type; 
 
         FlexibleQueryHttpHandler( ApiCommand::Value cmdCode, QueryHandlerType queryHandler )
         :

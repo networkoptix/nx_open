@@ -21,7 +21,7 @@
 namespace ec2
 {
 
-    // TODO: #Elric #EC2 remove? It's not used anyway.
+    // TODO: #MSAPI Remove? This one seem not to be not used. Ask Andrey first.
 
     //!Http request handler for GET requests
     template<class InputData, class OutputData>

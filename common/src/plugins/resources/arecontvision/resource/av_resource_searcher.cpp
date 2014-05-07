@@ -122,7 +122,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                     continue;
 
                 resource->setHostAddress(sender, QnDomainMemory);
-                resource->setMAC(mac);
+                resource->setMAC(QnMacAddress(mac));
                 resource->setDiscoveryAddr(iface.address);
                 resource->setName(QLatin1String("ArecontVision_Abstract"));
 
@@ -260,7 +260,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
     res->setTypeId(rt);
     res->setName(model);
     res->setModel(model);
-    res->setMAC(mac);
+    res->setMAC(QnMacAddress(mac));
     res->setHostAddress(host, QnDomainMemory);
     res->setAuth(auth);
 

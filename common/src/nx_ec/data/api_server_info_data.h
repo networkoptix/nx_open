@@ -16,8 +16,8 @@ namespace ec2 {
         QString systemName;
         QByteArray sessionKey;
 
-        QString armBox; // TODO: #Elric #EC2 what is this?
-        bool allowCameraChanges; // TODO: #Elric #EC2 use "enabled"
+        QString armBox; // TODO: #Elric #API what is this? Rename into something more sane.
+        bool allowCameraChanges; // TODO: #API I believe we have implemented this in kvpairs. Remove.
         qint64 prematureLicenseExperationDate; // Not enough license for recording. Some recording will be stopped in a nearest future
     };
 

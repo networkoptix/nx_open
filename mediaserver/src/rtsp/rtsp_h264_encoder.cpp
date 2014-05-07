@@ -43,7 +43,7 @@ QByteArray QnRtspH264Encoder::getAdditionSDP()
     }
 
     QString result("a=fmtp:%1 packetization-mode=1; profile-level-id=%2; sprop-parameter-sets=%3\r\n");
-    return result.arg(getPayloadtype()).arg(profileParam).arg(propParam).toLocal8Bit();
+    return result.arg(getPayloadtype()).arg(profileParam).arg(propParam).toLatin1();
 }
 
 void QnRtspH264Encoder::goNextNal()

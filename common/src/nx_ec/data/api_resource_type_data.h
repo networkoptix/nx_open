@@ -7,10 +7,10 @@
 namespace ec2 
 {
     struct ApiPropertyTypeData: ApiData {
-        QnId resource_type_id;
+        QnId resource_type_id; // TODO: #API we don't use under_scores, we use camelCase.
 
         QString name;
-        int type;
+        int type; // TODO: #API use QnParamType::DataType
 
         // MinMaxStep
         qint32 min;
@@ -19,19 +19,19 @@ namespace ec2
 
         // Enumaration
         QString values;
-        QString ui_values;
+        QString ui_values; // TODO: #API camelCase
 
         // Value
-        QString default_value;
+        QString default_value; // TODO: #API camelCase
 
         QString group;
-        QString sub_group;
+        QString sub_group; // TODO: #API camelCase
         QString description;
 
         bool ui;
-        bool readonly;
+        bool readonly; // TODO: #API camelCase => readOnly
 
-        QString netHelper;
+        QString netHelper; // TODO: #API I have no idea what this is. What is this, actually?
     };
 #define ApiPropertyTypeData_Fields (resource_type_id)(name)(type)(min)(max)(step)(values)(ui_values)(default_value)(group)(sub_group)(description)(ui)(readonly)(netHelper)
 
@@ -39,9 +39,9 @@ namespace ec2
     struct ApiResourceTypeData: ApiData {
         QnId id;
         QString name;
-        QString manufacture; // TODO: #Elric #EC2 evil leaking out
+        QString manufacture; // TODO: #API and now it's our bad naming leaking out. Rename 'vendor'.
         std::vector<QnId> parentId;
-        std::vector<ApiPropertyTypeData> propertyTypeList;
+        std::vector<ApiPropertyTypeData> propertyTypeList; // TODO: #API We don't use -List suffix, we use plurals. Rename 'propertyTypes'.
     };
 #define ApiResourceTypeData_Fields (id)(name)(manufacture)(parentId)(propertyTypeList)
 
