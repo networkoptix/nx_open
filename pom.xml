@@ -40,7 +40,7 @@
         <beta>true</beta>
         <box></box>
 
-        <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
+        <qt.dir>${environment.dir}/qt5webkit/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
@@ -77,7 +77,8 @@
         <qtlib9>Gui</qtlib9>
         <qtlib10>X11Extras</qtlib10>                    
         <!-- qtlib11 is used in macos profile only -->
-        <qtlib12/>
+        <qtlib11 />
+        <qtlib12>WebKit</qtlib12>
 
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
