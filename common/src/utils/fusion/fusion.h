@@ -2,160 +2,20 @@
 #define QN_FUSION_H
 
 #include <utility> /* For std::forward and std::declval. */
-#include <type_traits> /* For std::remove_*. */
+#include <type_traits> /* For std::remove_*, std::enable_if, std::is_same, std::integral_constant. */
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/tuple/enum.hpp>
 #include <boost/preprocessor/cat.hpp>
-#include <boost/utility/enable_if.hpp>
-#include <boost/mpl/equal_to.hpp>
-#include <boost/mpl/sizeof.hpp>
-#include <boost/mpl/not.hpp>
-#include <boost/mpl/integral_c.hpp>
-#include <boost/type_traits/detail/yes_no_type.hpp> // TODO: #Elric get rid of this one
-#include <boost/type_traits/is_same.hpp>
+#include <boost/mpl/if.hpp>
 #endif // Q_MOC_RUN
 
 #include <utils/preprocessor/variadic_seq_for_each.h>
 
 #include "fusion_fwd.h"
-
-namespace QnFusionDetail {
-    struct na {};
-
-    template<class T, class Visitor>
-    bool visit_members_internal(T &&value, Visitor &&visitor) {
-        return visit_members(std::forward<T>(value), std::forward<Visitor>(visitor)); /* That's the place where ADL kicks in. */
-    }
-
-    template<class T>
-    boost::type_traits::yes_type has_visit_members_test(const T &, const decltype(visit_members(std::declval<T>(), std::declval<na>())) * = NULL);
-    boost::type_traits::no_type has_visit_members_test(...);
-
-    template<class T>
-    struct is_adapted: 
-        boost::mpl::equal_to<
-            boost::mpl::sizeof_<boost::type_traits::yes_type>, 
-            boost::mpl::size_t<sizeof(has_visit_members_test(std::declval<T>()))>
-        > 
-    {};
-
-    template<class T>
-    boost::type_traits::yes_type has_operator_call_test(const T &, const decltype(std::declval<T>()()) * = NULL);
-    template<class T, class Arg0>
-    boost::type_traits::yes_type has_operator_call_test(const T &, const Arg0 &, const decltype(std::declval<T>()(std::declval<Arg0>())) * = NULL);
-    template<class T, class Arg0, class Arg1>
-    boost::type_traits::yes_type has_operator_call_test(const T &, const Arg0 &, const Arg1 &, const decltype(std::declval<T>()(std::declval<Arg0>(), std::declval<Arg1>())) * = NULL);
-    template<class T, class Arg0, class Arg1, class Arg2>
-    boost::type_traits::yes_type has_operator_call_test(const T &, const Arg0 &, const Arg1 &, const Arg2 &, const decltype(std::declval<T>()(std::declval<Arg0>(), std::declval<Arg1>(), std::declval<Arg2>())) * = NULL);
-    boost::type_traits::no_type has_operator_call_test(...);
-
-    template<class T, class Arg0, class Arg1, class Arg2>
-    struct sizeof_has_operator_call_test: 
-        boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>(), std::declval<Arg1>(), std::declval<Arg2>()))>
-    {};
-
-    template<class T, class Arg0, class Arg1>
-    struct sizeof_has_operator_call_test<T, Arg0, Arg1, na>: 
-        boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>(), std::declval<Arg1>()))>
-    {};
-
-    template<class T, class Arg0>
-    struct sizeof_has_operator_call_test<T, Arg0, na, na>: 
-        boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>(), std::declval<Arg0>()))>
-    {};
-
-    template<class T>
-    struct sizeof_has_operator_call_test<T, na, na, na>: 
-        boost::mpl::size_t<sizeof(has_operator_call_test(std::declval<T>()))>
-    {};
-
-    template<class T, class Arg0 = na, class Arg1 = na, class Arg2 = na>
-    struct has_operator_call:
-        boost::mpl::equal_to<
-            boost::mpl::sizeof_<boost::type_traits::yes_type>,
-            sizeof_has_operator_call_test<T, Arg0, Arg1, Arg2>
-        >
-    {};
-
-    template<class T, class Arg0, class Arg1, class Arg2>
-    bool safe_operator_call(T &&functor, Arg0 &&arg0, Arg1 &&arg1, Arg2 &&arg2, const typename boost::enable_if<has_operator_call<T, Arg0, Arg1, Arg2> >::type * = NULL) {
-        return functor(std::forward<Arg0>(arg0), std::forward<Arg1>(arg1), std::forward<Arg2>(arg2));
-    }
-
-    template<class T, class Arg0, class Arg1, class Arg2>
-    bool safe_operator_call(T &&, Arg0 &&, Arg1 &&, Arg2 &&, const typename boost::disable_if<has_operator_call<T, Arg0, Arg1, Arg2> >::type * = NULL) {
-        return true;
-    }
-
-} // namespace QnFusionDetail
-
-
-/**
- * This macro defines a new fusion key. It must be used in global namespace.
- * Defined key can then be accessed from the QnFusion namespace.
- * 
- * \param KEY                           Key to define.
- */
-#define QN_FUSION_DEFINE_KEY(KEY)                                               \
-namespace QnFusion {                                                            \
-    struct BOOST_PP_CAT(KEY, _type) {};                                         \
-    namespace {                                                                 \
-        const BOOST_PP_CAT(KEY, _type) KEY = {};                                \
-    }                                                                           \
-}
-
-/**
- * \param KEY                           Fusion key.
- * \returns                             C++ type of the provided fusion key.
- */
-#define QN_FUSION_KEY_TYPE(KEY)                                                 \
-    QnFusion::BOOST_PP_CAT(KEY, _type)
-
-QN_FUSION_DEFINE_KEY(base)
-QN_FUSION_DEFINE_KEY(member_index)
-QN_FUSION_DEFINE_KEY(member_count)
-QN_FUSION_DEFINE_KEY(object_declval)
-QN_FUSION_DEFINE_KEY(getter)
-QN_FUSION_DEFINE_KEY(setter)
-QN_FUSION_DEFINE_KEY(setter_tag)
-QN_FUSION_DEFINE_KEY(checker)
-QN_FUSION_DEFINE_KEY(name)
-QN_FUSION_DEFINE_KEY(c_name)
-QN_FUSION_DEFINE_KEY(sql_placeholder_name)
-QN_FUSION_DEFINE_KEY(classname)
-QN_FUSION_DEFINE_KEY(c_classname)
-QN_FUSION_DEFINE_KEY(optional)
-
-#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_base true
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_base(KEY, VALUE) (base, std::declval<VALUE>())
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_name true
-#define QN_FUSION_PROPERTY_TYPE_FOR_name QString
-#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_name true
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_name(KEY, VALUE) (name, QStringLiteral(VALUE))(c_name, VALUE)(sql_placeholder_name, QN_FUSION_LIT_CAT(":", VALUE))
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_name true
-#define QN_FUSION_PROPERTY_TYPE_FOR_c_name const char *
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_sql_placeholder_name true
-#define QN_FUSION_PROPERTY_TYPE_FOR_sql_placeholder_name QString
-
-#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_setter true
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, QnFusionDetail::make_access_setter_category(access_type())) 
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname true
-#define QN_FUSION_PROPERTY_TYPE_FOR_classname QString
-#define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_classname true
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_classname(KEY, VALUE) (classname, QStringLiteral(VALUE))(c_classname, VALUE)
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_c_classname true
-#define QN_FUSION_PROPERTY_TYPE_FOR_c_classname const char *
-
-#define QN_FUSION_PROPERTY_IS_TYPED_FOR_optional true
-#define QN_FUSION_PROPERTY_TYPE_FOR_optional bool
-
+#include "fusion_detail.h"
+#include "fusion_keys.h"
 
 namespace QnFusion {
     template<class T>
@@ -270,6 +130,20 @@ namespace QnFusion {
     {};
 
     /**
+     * This metafuction returns the type of the field specified by the given
+     * access type.
+     * 
+     * \param Access                    Access type.
+     */
+    template<class Access>
+    struct access_member_type:
+        remove_cvr<decltype(invoke(
+            std::declval<typename Access::template at<getter_type, void>::type::result_type>(), 
+            std::declval<typename Access::template at<object_declval_type, void>::type::result_type>()
+        ))>
+    {}; // TODO: #Elric can be simplified with std::declval<Access>
+
+    /**
      * This metafunction returns a category of the setter specified by the
      * given access type.
      * 
@@ -280,10 +154,7 @@ namespace QnFusion {
     struct access_setter_category:
         setter_category<
             typename Access::template at<setter_type, void>::type,
-            typename remove_cvr<decltype(invoke(
-                std::declval<typename Access::template at<getter_type, void>::type::result_type>(), 
-                std::declval<typename Access::template at<object_declval_type, void>::type::result_type>()
-            ))>::type
+            typename access_member_type<Access>::type
         >
     {};
 
@@ -302,7 +173,7 @@ namespace QnFusion {
 
         template<class Key>
         struct has_key:
-            boost::mpl::not_<boost::is_same<typename at<Key, void>::type, void> > // TODO: #Elric move to base?
+            std::integral_constant<bool, !std::is_same<typename at<Key, void>::type, void>::value>
         {};
 
         template<class Key>
@@ -311,12 +182,12 @@ namespace QnFusion {
         }
 
         template<class Key, class T>
-        typename at<Key, void>::type::result_type operator()(const Key &, const T &, const typename boost::enable_if<has_key<Key> >::type * = NULL) const {
+        typename at<Key, void>::type::result_type operator()(const Key &, const T &, const typename std::enable_if<has_key<Key>::value>::type * = NULL) const {
             return typename at<Key, void>::type()();
         }
 
         template<class Key, class T>
-        T operator()(const Key &, const T &defaultValue, const typename boost::disable_if<has_key<Key> >::type * = NULL) const {
+        T operator()(const Key &, const T &defaultValue, const typename std::enable_if<!has_key<Key>::value>::type * = NULL) const {
             return defaultValue;
         }
     };
@@ -336,84 +207,11 @@ namespace QnFusion {
 
 
 namespace QnFusionDetail {
-    template<class T, class R>
-    struct replace_referent {
-        typedef R type;
-    };
-
-    template<class T, class R>
-    struct replace_referent<T &, R> {
-        typedef R &type;
-    };
-
-    template<class T, class R>
-    struct replace_referent<T &&, R> {
-        typedef R &&type;
-    };
-
-    template<class T, class R>
-    struct replace_referent<const T, R> {
-        typedef const R type;
-    };
-
-    template<class T, class R>
-    struct replace_referent<const T &, R> {
-        typedef const R &type;
-    };
-
-    template<class T, class R>
-    struct replace_referent<const T &&, R> {
-        typedef const R &&type;
-    };
-
 
     template<class Access>
     typename QnFusion::access_setter_category<Access>::type
     make_access_setter_category(const Access &) {
         return typename QnFusion::access_setter_category<Access>::type();
-    }
-
-
-    template<class Base>
-    struct NoStartStopVisitorWrapper: Base {
-    public:
-        template<class T, class Access>
-        bool operator()(const T &value, const Access &access) {
-            return Base::operator()(value, access);
-        }
-
-        template<class T, class Access>
-        bool operator()(const T &value, const Access &access) const {
-            return Base::operator()(value, access);
-        }
-    };
-
-    template<class Visitor>
-    NoStartStopVisitorWrapper<Visitor> &no_start_stop_wrap(Visitor &visitor) {
-        return static_cast<NoStartStopVisitorWrapper<Visitor> &>(visitor);
-    }
-
-    template<class Visitor>
-    NoStartStopVisitorWrapper<Visitor> &no_start_stop_wrap(const Visitor &visitor) {
-        return static_cast<const NoStartStopVisitorWrapper<Visitor> &>(visitor);
-    }
-
-
-    template<class Visitor, class T, class Access>
-    bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access) {
-        return dispatch_visit(std::forward<Visitor>(visitor), std::forward<T>(value), access, typename Access::template at<QnFusion::base_type, na>::type());
-    }
-
-    template<class Visitor, class T, class Access>
-    bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access, const na &) {
-        return visitor(std::forward<T>(value), access);
-    }
-
-    template<class Visitor, class T, class Access, class Base>
-    bool dispatch_visit(Visitor &&visitor, T &&value, const Access &, const Base &) {
-        typedef typename replace_referent<T, typename std::remove_reference<typename Base::result_type>::type>::type base_type;
-
-        return QnFusion::visit_members(std::forward<base_type>(value), no_start_stop_wrap(visitor));
     }
 
 } // namespace QnFusionDetail
@@ -424,13 +222,14 @@ namespace QnFusionDetail {
  * Tokens for the functions to generate are passed in FUNCTION_SEQ parameter. 
  * Accepted tokens are:
  * <ul>
- * <li> <tt>hash</tt>           --- <tt>qHash</tt> function. </li>
- * <li> <tt>datastream</tt>     --- <tt>QDataStream</tt> (de)serialization functions. </li>
- * <li> <tt>eq</tt>             --- <tt>operator==</tt> and <tt>operator!=</tt>. </li>
- * <li> <tt>debug</tt>          --- <tt>QDebug</tt> streaming functions. </li>
- * <li> <tt>json</tt>           --- json (de)serialization functions. </li>
  * <li> <tt>binary</tt>         --- bns (de)serialization functions. </li>
- * <li> <tt>sql</tt>            --- sql bind/fetch functions. </li>
+ * <li> <tt>csv_record</tt>     --- csv record serialization functions. </li>
+ * <li> <tt>datastream</tt>     --- <tt>QDataStream</tt> (de)serialization functions. </li>
+ * <li> <tt>debug</tt>          --- <tt>QDebug</tt> streaming functions. </li>
+ * <li> <tt>eq</tt>             --- <tt>operator==</tt> and <tt>operator!=</tt>. </li>
+ * <li> <tt>json</tt>           --- json (de)serialization functions. </li>
+ * <li> <tt>hash</tt>           --- <tt>qHash</tt> function. </li>
+ * <li> <tt>sql_record</tt>     --- sql record bind/fetch functions. </li>
  * </ul>
  * 
  * \param TYPE                          Fusion-adapted type to define functions for.
@@ -460,20 +259,5 @@ namespace QnFusionDetail {
 #define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_I(R, PARAMS, CLASS)           \
     QN_FUSION_DEFINE_FUNCTIONS(BOOST_PP_TUPLE_ENUM(CLASS), BOOST_PP_TUPLE_ENUM(PARAMS))
 
-
-/**
- * \internal
- * 
- * Produces a <tt>QStringLiteral</tt> from the given character literals.
- * Works around a MSVC bug that prevents us to simply use <tt>QStringLiteral("a" "b")</tt>.
- */
-#define QN_FUSION_LIT_CAT(A, B)                                                 \
-    QN_FUSION_LIT_CAT_I(A, B)
-
-#ifdef _MSC_VER
-#   define QN_FUSION_LIT_CAT_I(A, B) QStringLiteral(A BOOST_PP_CAT(L, B))
-#else
-#   define QN_FUSION_LIT_CAT_I(A, B) QStringLiteral(A B)
-#endif
 
 #endif // QN_FUSION_H

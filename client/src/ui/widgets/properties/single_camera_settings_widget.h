@@ -155,7 +155,7 @@ private:
     void disconnectFromMotionWidget();
     void connectToMotionWidget();
 
-    void initAdvancedTab();
+    bool initAdvancedTab();
     void loadAdvancedSettings();
 
     void cleanAdvancedSettings();

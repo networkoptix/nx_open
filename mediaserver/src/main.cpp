@@ -954,11 +954,11 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
-    m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
+    //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
+    //m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("HTTP", "*");
 
     m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
     m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
-
 
     if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
         m_universalTcpListener->disableAuth();

@@ -226,7 +226,7 @@ namespace QnSqlDetail {
 } // namespace QnBinaryDetail
 
 
-#define QN_FUSION_DEFINE_FUNCTIONS_sql(TYPE, ... /* PREFIX */)                  \
+#define QN_FUSION_DEFINE_FUNCTIONS_sql_record(TYPE, ... /* PREFIX */)           \
 __VA_ARGS__ void bind(const TYPE &value, QSqlQuery *target) {                   \
     QnFusion::visit_members(value, QnSqlDetail::BindVisitor(target));           \
 }                                                                               \
