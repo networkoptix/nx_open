@@ -15,7 +15,8 @@
 QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidget *parent) :
     QWidget(parent),
     QnWorkbenchContextAware(context),
-    ui(new Ui::QnServerUpdatesWidget)
+    ui(new Ui::QnServerUpdatesWidget),
+    m_specificBuildCheck(false)
 {
     ui->setupUi(this);
 
@@ -67,6 +68,7 @@ void QnServerUpdatesWidget::at_installSpecificBuildButton_clicked() {
     if (dialog.exec() == QDialog::Rejected)
         return;
 
+    m_specificBuildCheck = true;
     QnSoftwareVersion version(lit(QN_APPLICATION_VERSION));
     m_updateTool->checkForUpdates(QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber()));
 }
@@ -114,6 +116,18 @@ void QnServerUpdatesWidget::updateUi() {
         if (m_previousToolState <= QnMediaServerUpdateTool::CheckingForUpdates) {
             switch (m_updateTool->updateCheckResult()) {
             case QnMediaServerUpdateTool::UpdateFound:
+                if (m_specificBuildCheck) {
+                    m_specificBuildCheck = false;
+
+                    QnSoftwareVersion currentVersion(QN_APPLICATION_VERSION);
+                    QnSoftwareVersion foundVersion = m_updateTool->targetVersion();
+
+                    if (currentVersion.major() != foundVersion.major() || currentVersion.minor() != foundVersion.minor()) {
+                        QMessageBox::critical(this, tr("Wrong build number"), tr("There is no such build on the update server"));
+                        ui->noUpdatesLabel->setText(tr("No updates found"));
+                        break;
+                    }
+                }
                 updateFound = true;
                 break;
             case QnMediaServerUpdateTool::InternetProblem: {

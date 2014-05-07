@@ -16,6 +16,7 @@ public:
     struct UpdateFileInformation {
         QnSoftwareVersion version;
         QString fileName;
+        qint64 fileSize;
         QString baseFileName;
         QUrl url;
 

@@ -195,7 +195,7 @@ void QnMediaServerUpdateTool::checkBuildOnline() {
     setState(CheckingForUpdates);
     m_targetMustBeNewer = false;
 
-    QUrl url(m_updateLocationPrefix + m_targetVersion.toString() + lit("/") + buildInformationSuffix);
+    QUrl url(m_updateLocationPrefix + QString::number(m_targetVersion.build()) + lit("/") + buildInformationSuffix);
     QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(url));
     connect(reply, &QNetworkReply::finished, this, &QnMediaServerUpdateTool::at_buildReply_finished);
 }
@@ -263,15 +263,27 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
         return;
     }
 
-    QString urlPrefix = m_updateLocationPrefix + m_targetVersion.toString() + lit("/");
-
     QByteArray data = reply->readAll();
-    QVariantMap platforms = QJsonDocument::fromJson(data).toVariant().toMap();
-    for (auto platform = platforms.begin(); platform != platforms.end(); ++platform) {
+    QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
+
+    m_targetVersion = QnSoftwareVersion(map.value(lit("version")).toString());
+
+    if (m_targetVersion.isNull()) {
+        setCheckResult(NoSuchBuild);
+        return;
+    }
+
+    QString urlPrefix = m_updateLocationPrefix + QString::number(m_targetVersion.build()) + lit("/");
+
+    QVariantMap packages = map.value(lit("packages")).toMap();
+    for (auto platform = packages.begin(); platform != packages.end(); ++platform) {
         QVariantMap architectures = platform.value().toMap();
         for (auto arch = architectures.begin(); arch != architectures.end(); ++arch) {
-            UpdateFileInformationPtr info(new UpdateFileInformation(m_targetVersion, QUrl(urlPrefix + arch.value().toString())));
-            info->baseFileName = arch.value().toString();
+            QVariantMap package = arch.value().toMap();
+            QString fileName = package.value(lit("file")).toString();
+            UpdateFileInformationPtr info(new UpdateFileInformation(m_targetVersion, QUrl(urlPrefix + fileName)));
+            info->baseFileName = fileName;
+            info->fileSize = package.value(lit("size")).toLongLong();
             m_updateFiles.insert(QnSystemInformation(platform.key(), arch.key()), info);
         }
     }
@@ -308,7 +320,7 @@ void QnMediaServerUpdateTool::updateServers() {
 
     setState(DownloadingUpdate);
 
-    m_downloadingUpdates = QSet<QnSystemInformation>::fromList(m_updateFiles.keys());
+    m_downloadingUpdates = QSet<QnSystemInformation>::fromList(m_idBySystemInformation.uniqueKeys());
     downloadNextUpdate();
 }
 
@@ -347,6 +359,7 @@ void QnMediaServerUpdateTool::downloadNextUpdate() {
     foreach (const QnId &peerId, m_idBySystemInformation.values(*it))
         setPeerState(peerId, PeerUpdateInformation::UpdateDownloading);
 
+    qDebug() << "Getting: " << QUrl(m_updateFiles[*it]->url);
     QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(QUrl(m_updateFiles[*it]->url)));
     connect(reply,  &QNetworkReply::finished,           this,   &QnMediaServerUpdateTool::at_downloadReply_finished);
     connect(reply,  &QNetworkReply::downloadProgress,   this,   &QnMediaServerUpdateTool::at_downloadReply_downloadProgress);

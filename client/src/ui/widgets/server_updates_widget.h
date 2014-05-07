@@ -38,6 +38,7 @@ private:
     QnServerUpdatesModel *m_updatesModel;
     QnMediaServerUpdateTool *m_updateTool;
     int m_previousToolState;
+    bool m_specificBuildCheck;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H
