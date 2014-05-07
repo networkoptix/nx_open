@@ -81,11 +81,14 @@ void QnBookmarkCameraData::append(const QnAbstractCameraDataPtr &other) {
     m_dataSource = QnTimePeriodList::mergeTimePeriods(periods);
 }
 
-void QnBookmarkCameraData::append(const QList<QnAbstractCameraDataPtr> &source) {
+void QnBookmarkCameraData::append(const QList<QnAbstractCameraDataPtr> &other) {
+    if (other.isEmpty())
+        return;
+
     QVector<QnCameraBookmarkList> lists;
     lists.append(m_data);
-    foreach (const QnAbstractCameraDataPtr &other, source) {
-        if (QnBookmarkCameraData* other_casted = dynamic_cast<QnBookmarkCameraData*>(other.data()))
+    foreach (const QnAbstractCameraDataPtr &other_data, other) {
+        if (QnBookmarkCameraData* other_casted = dynamic_cast<QnBookmarkCameraData*>(other_data.data()))
             lists.append(other_casted->m_data);
     }
     m_data = mergeBookmarks(lists);

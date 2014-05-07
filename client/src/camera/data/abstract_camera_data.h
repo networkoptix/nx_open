@@ -28,9 +28,9 @@ public:
 
     /**
      * @brief append                                Append several pieces of data at once.
-     * @param source                                List of data structs to append.
+     * @param other                                 List of data structs to append.
      */
-    virtual void append(const QList<QnAbstractCameraDataPtr> &source) = 0;
+    virtual void append(const QList<QnAbstractCameraDataPtr> &other) = 0;
 
     /**
      * @brief clear                                 Remove all data from the struct.

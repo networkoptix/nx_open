@@ -25,13 +25,16 @@ void QnTimePeriodCameraData::append(const QnAbstractCameraDataPtr &other) {
     append(other->dataSource());
 }
 
-void QnTimePeriodCameraData::append(const QList<QnAbstractCameraDataPtr> &source) {
+void QnTimePeriodCameraData::append(const QList<QnAbstractCameraDataPtr> &other) {
+    if (other.isEmpty())
+        return;
+
     QVector<QnTimePeriodList> allPeriods;
     allPeriods << m_data;
 
-    foreach (const QnAbstractCameraDataPtr &other, source)
-        if (other)
-            allPeriods << other->dataSource();
+    foreach (const QnAbstractCameraDataPtr &other_data, other)
+        if (other_data)
+            allPeriods << other_data->dataSource();
     m_data = QnTimePeriodList::mergeTimePeriods(allPeriods);
 }
 

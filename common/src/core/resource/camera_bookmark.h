@@ -1,7 +1,6 @@
 #ifndef QN_CAMERA_BOOKMARK_H
 #define QN_CAMERA_BOOKMARK_H
 
-#include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
 #include <QtCore/QStringList>
@@ -11,25 +10,35 @@
 
 #include <utils/common/model_functions_fwd.h>
 
+/**
+ * @brief The QnCameraBookmark struct               Bookmarked part of the camera archive.
+ */
 struct QnCameraBookmark {
+    /** Unique id. */
     QUuid guid;
-    QString name;
-    QString description;
-    qint64 timeout;         /**< Time during which recorded period should be preserved, ms. */
 
-        /** Start time in milliseconds. */
+    /** Name of the bookmark.*/
+    QString name;
+
+    /** Description of the bookmark. */
+    QString description;
+
+    /** Time during which recorded period should be preserved, in milliseconds. */
+    qint64 timeout;
+
+    /** Start time in milliseconds since epoch. */
     qint64 startTimeMs;
 
-    /** Duration in milliseconds. 
-     * 
-     * -1 if duration is infinite or unknown. It may be the case if this time period 
-     * represents a video chunk that is being recorded at the moment. */
+    /** Duration in milliseconds. */
     qint64 durationMs;
 
+    /** \returns End time in milliseconds since epoch. */
     qint64 endTimeMs() const;
 
+    /** \returns True if bookmark is null, false otherwise. */
     bool isNull() const;
 
+    /** List of tags attached to the bookmark. */
     QnCameraBookmarkTags tags;
 
     QnCameraBookmark():
@@ -39,18 +48,21 @@ struct QnCameraBookmark {
     {}
 };
 
+/**
+ * @brief The QnCameraBookmarkSearchFilter struct   Bookmarks search request parameters.
+ */
 struct QnCameraBookmarkSearchFilter {
-    //QString nameFilter;
-    //QString descriptionFilter;
-    
+    //TODO: #GDM #Bookmarks change minStartTimeMs to maxEndTimeMs to load bookmarks that end in the current window.
+    /** Minimum start time for the bookmark. */
     qint64 minStartTimeMs;
+
+    /** Maximum start time for the bookmark. */
     qint64 maxStartTimeMs;
 
-    //qint64 minEndTimeMs;
-    //qint64 maxEndTimeMs;
-
+    /** Minimum bookmark duration. */
     qint64 minDurationMs;
 
+    //TODO: #GDM #Bookmarks change tags to String filter (for name and tags together)
     QStringList tags;
 
     QnCameraBookmarkSearchFilter();

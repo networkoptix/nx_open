@@ -27,9 +27,9 @@ public:
 
     /**
      * @brief append                                Append several sets of time periods at once.
-     * @param source                                List of data structs to append.
+     * @param other                                 List of data structs to append.
      */
-    virtual void append(const QList<QnAbstractCameraDataPtr> &source) override;
+    virtual void append(const QList<QnAbstractCameraDataPtr> &other) override;
 
     /**
      * @brief append                                Append other set of time periods.
