@@ -32,6 +32,7 @@ static const char LICENSE_OVERFLOW_LOCK_NAME[] = "__LICENSE_OVERFLOW__";
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
+    m_tooManyRecordingCnt = 0;
     connect(this, &QnRecordingManager::recordingDisabled, qnBusinessRuleConnector, &QnBusinessEventConnector::at_licenseIssueEvent);
 }
 
@@ -45,8 +46,10 @@ void QnRecordingManager::start()
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(&m_scheduleWatchingTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
+    connect(&m_licenseTimer, &QTimer::timeout, this, &QnRecordingManager::at_checkLicenses);
 
     m_scheduleWatchingTimer.start(1000);
+    m_licenseTimer.start(1000 * 60);
 
     connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::locked, this, &QnRecordingManager::at_licenseMutexLocked, Qt::QueuedConnection);
     connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout, Qt::QueuedConnection);
@@ -543,7 +546,6 @@ void QnRecordingManager::onTimer()
         if (stopTime <= time*1000ll)
             stopForcedRecording(itrDelayedStop.key(), false);
     }
-    checkLicenses();
 }
 
 void QnRecordingManager::calcUsingLicenses(int* recordingDigital, int* recordingAnalog)
@@ -557,17 +559,6 @@ void QnRecordingManager::calcUsingLicenses(int* recordingDigital, int* recording
         QnMediaServerResourcePtr mServer = camera->getParentResource().dynamicCast<QnMediaServerResource>();
         if (!mServer)
             continue;
-
-        /*
-        if (mServer->getStatus() == QnResource::Offline) 
-        {
-            ec2::ApiSetResourceStatusData params;
-            params.id = mServer->getId();
-            qint64 lastStatusTime = ec2::QnTransactionLog::instance()->getTransactionTime(params);
-            if (relativeTime - lastStatusTime < LICENSE_RECORDING_STOP_TIME)
-                continue;
-        }
-        */
 
         if (!camera->isScheduleDisabled()) {
             if (camera->isAnalog())
@@ -596,7 +587,7 @@ QnResourceList QnRecordingManager::getLocalControlledCameras()
     return result;
 }
 
-void QnRecordingManager::checkLicenses()
+void QnRecordingManager::at_checkLicenses()
 {
     if (!ec2::QnTransactionLog::instance() || m_licenseMutex)
         return;
@@ -612,6 +603,10 @@ void QnRecordingManager::checkLicenses()
     bool isOverflowTotal = recordingDigital + recordingAnalog > maxDigital + maxAnalog;
     if (recordingDigital > maxDigital  || isOverflowTotal)
     {
+        if (++m_tooManyRecordingCnt < 5)
+            return; // do not report license problem immediatly. Server should wait several minutes, probably other media servers will be available soon
+
+
         ec2::QnDbManager::instance()->markLicenseOverflow(true, qnSyncTime->currentMSecsSinceEpoch());
         if (qnSyncTime->currentMSecsSinceEpoch() - ec2::QnDbManager::instance()->licenseOverflowTime() < LICENSE_RECORDING_STOP_TIME)
             return; // not enough license, but timeout not reached yet
@@ -633,6 +628,7 @@ void QnRecordingManager::checkLicenses()
     }
     else {
         ec2::QnDbManager::instance()->markLicenseOverflow(false, 0);
+        m_tooManyRecordingCnt = 0;
     }
 }
 

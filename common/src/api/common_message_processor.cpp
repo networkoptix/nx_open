@@ -124,10 +124,11 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResour
     onGotInitialNotification(fullData);
 }
 
-void QnCommonMessageProcessor::on_runtimeInfoChanged( const ec2::ApiRuntimeData& runtimeInfo )
+void QnCommonMessageProcessor::on_runtimeInfoChanged( const ec2::ApiServerInfoData& runtimeInfo )
 {
     QnAppServerConnectionFactory::setPublicIp(runtimeInfo.publicIp);
     QnAppServerConnectionFactory::setSessionKey(runtimeInfo.sessionKey);
+    QnAppServerConnectionFactory::setPrematureLicenseExperationDate(runtimeInfo.prematureLicenseExperationDate);
 }
 
 void QnCommonMessageProcessor::on_resourceStatusChanged( const QnId& resourceId, QnResource::Status status )
@@ -261,6 +262,6 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     processResources(fullData.resources);
     processLicenses(fullData.licenses);
     processCameraServerItems(fullData.cameraHistory);
-
+    on_runtimeInfoChanged(fullData.serverInfo);
     qnSyncTime->reset();
 }

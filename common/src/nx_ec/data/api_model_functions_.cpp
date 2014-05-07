@@ -17,7 +17,6 @@
 #include "api_media_server_data.h"
 #include "api_resource_data.h"
 #include "api_resource_type_data.h"
-#include "api_runtime_data.h"
 #include "api_server_alive_data.h"
 #include "api_server_info_data.h"
 #include "api_stored_file_data.h"

@@ -14,7 +14,7 @@ namespace ec2 {
 
         QString publicIp;
         QString systemName;
-        QString sessionKey;
+        QByteArray sessionKey;
 
         QString armBox; // TODO: #Elric #EC2 what is this?
         bool allowCameraChanges; // TODO: #Elric #EC2 use "enabled"

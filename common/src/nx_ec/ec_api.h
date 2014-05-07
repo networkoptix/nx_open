@@ -20,7 +20,6 @@
 #include <nx_ec/impl/sync_handler.h>
 #include <nx_ec/data/api_server_info_data.h>
 #include <nx_ec/data/api_email_data.h>
-#include <nx_ec/data/api_runtime_data.h>
 #include <nx_ec/data/api_server_alive_data.h>
 
 
@@ -782,7 +781,7 @@ namespace ec2
             \param cameraHistoryItems
         */
         void initNotification(QnFullResourceData fullData);
-        void runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
+        void runtimeInfoChanged(const ec2::ApiServerInfoData& runtimeInfo);
 
         void remotePeerFound(ApiServerAliveData data, bool isProxy);
         void remotePeerLost(ApiServerAliveData data, bool isProxy);

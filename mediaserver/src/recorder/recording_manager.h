@@ -55,13 +55,12 @@ private slots:
     void at_camera_statusChanged(const QnResourcePtr &resource);
     void at_camera_resourceChanged(const QnResourcePtr &resource);
     void at_camera_initAsyncFinished(const QnResourcePtr &resource, bool state);
-
+    void at_checkLicenses();
 private:
     void updateCamera(QnSecurityCamResourcePtr camera);
 
     QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
     bool startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
-    void checkLicenses();
     bool isResourceDisabled(QnResourcePtr res) const;
     void calcUsingLicenses(int* recordingDigital, int* recordingAnalog);
     QnResourceList getLocalControlledCameras();
@@ -77,8 +76,10 @@ private:
     QSet<QnResourcePtr> m_onlineCameras;
     QMap<QnResourcePtr, Recorders> m_recordMap;
     QTimer m_scheduleWatchingTimer;
+    QTimer m_licenseTimer;
     QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;
     ec2::QnDistributedMutexPtr m_licenseMutex;
+    int m_tooManyRecordingCnt;
 };
 
 class QnServerDataProviderFactory: public QnDataProviderFactory
