@@ -70,6 +70,8 @@ public:
     void setProxyPoolSize(int value);
 
     void disableAuth();
+
+    bool isProxy(const QUrl& url);
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) override;
     virtual void doPeriodicTasks() override;

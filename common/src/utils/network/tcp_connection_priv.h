@@ -28,12 +28,24 @@ static const QByteArray STATIC_UNAUTHORIZED_HTML("\
     </HTML>"
 );
 
+static const QByteArray STATIC_PROXY_UNAUTHORIZED_HTML("\
+    <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
+    <HTML>\
+    <HEAD>\
+    <TITLE>Error</TITLE>\
+    <META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=ISO-8859-1\">\
+    </HEAD>\
+    <BODY><H1>407 Proxy Unauthorized.</H1></BODY>\
+    </HTML>"
+);
+
 
 // TODO: #vasilenko these are part of a public interface and are used throughout the codebase.
 // Why they are in a private header???
 static const int CODE_OK = 200;
 static const int CODE_AUTH_REQUIRED = 401;
 static const int CODE_NOT_FOUND = 404;
+static const int CODE_PROXY_AUTH_REQUIRED = 407;
 static const int CODE_INVALID_PARAMETER = 451;
 static const int CODE_UNSPOORTED_TRANSPORT = 461;
 static const int CODE_NOT_IMPLEMETED = 501;
