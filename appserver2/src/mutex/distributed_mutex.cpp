@@ -35,7 +35,7 @@ void QnDistributedMutexManager::setUserDataHandler(QnMutexUserDataHandler* userD
     m_userDataHandler = userDataHandler;
 }
 
-QnDistributedMutexPtr QnDistributedMutexManager::getLock(const QByteArray& name, int timeoutMs)
+QnDistributedMutexPtr QnDistributedMutexManager::getLock(const QString& name, int timeoutMs)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -53,7 +53,7 @@ QnDistributedMutexPtr QnDistributedMutexManager::getLock(const QByteArray& name,
     return netMutex;
 }
 
-void QnDistributedMutexManager::releaseMutex(const QByteArray& name)
+void QnDistributedMutexManager::releaseMutex(const QString& name)
 {
     m_mutexList.remove(name);
 }
@@ -181,7 +181,7 @@ void QnDistributedMutex::at_timeout()
     emit lockTimeout(m_name);
 }
 
-void QnDistributedMutex::lockAsync(const QByteArray& name, int timeoutMs)
+void QnDistributedMutex::lockAsync(const QString& name, int timeoutMs)
 {
     QMutexLocker lock(&m_mutex);
     

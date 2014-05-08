@@ -98,7 +98,7 @@ void QnAppserverResourceProcessor::addNewCamera(QnVirtualCameraResourcePtr camer
     m_lockInProgress.insert(name, LockData(mutex, cameraResource));
 }
 
-void QnAppserverResourceProcessor::at_mutexLocked(QByteArray name)
+void QnAppserverResourceProcessor::at_mutexLocked(QString name)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -129,7 +129,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(QnVirtualCameraResourceP
         NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
 }
 
-void QnAppserverResourceProcessor::at_mutexTimeout(QByteArray name)
+void QnAppserverResourceProcessor::at_mutexTimeout(QString name)
 {
     QMutexLocker lock(&m_mutex);
 

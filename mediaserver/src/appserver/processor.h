@@ -49,8 +49,8 @@ private slots:
     //void requestFinished(const QnHTTPRawResponse& response, int handle);
     void requestFinished2( int reqID, ec2::ErrorCode errCode, const QnId& id );
 
-    void at_mutexLocked(QByteArray name);
-    void at_mutexTimeout(QByteArray name);
+    void at_mutexLocked(QString name);
+    void at_mutexTimeout(QString name);
 };
 
 #endif //_server_appserver_processor_h_

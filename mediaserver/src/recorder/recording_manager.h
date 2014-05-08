@@ -68,8 +68,8 @@ private:
     void deleteRecorder(const Recorders& recorders);
     bool updateCameraHistory(QnResourcePtr res);
 
-    void at_licenseMutexLocked(QByteArray name);
-    void at_licenseMutexTimeout(QByteArray name);
+    void at_licenseMutexLocked(QString name);
+    void at_licenseMutexTimeout(QString name);
 private:
     mutable QMutex m_mutex;
     QSet<QnResourcePtr> m_onlineCameras;

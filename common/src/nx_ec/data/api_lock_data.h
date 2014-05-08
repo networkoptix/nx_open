@@ -10,7 +10,7 @@ namespace ec2
     {
         ApiLockData(): timestamp(0) {}
 
-        QnLatin1Array name;
+        QString name;
         QnId peer;
         qint64 timestamp;
         QByteArray userData;

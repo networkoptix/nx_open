@@ -28,7 +28,7 @@
 
 
 static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24;
-static const char LICENSE_OVERFLOW_LOCK_NAME[] = "__LICENSE_OVERFLOW__";
+static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
@@ -612,7 +612,7 @@ void QnRecordingManager::at_checkLicenses()
     }
 }
 
-void QnRecordingManager::at_licenseMutexLocked(QByteArray name)
+void QnRecordingManager::at_licenseMutexLocked(QString name)
 {
     if (name != LICENSE_OVERFLOW_LOCK_NAME)
         return;
@@ -660,7 +660,7 @@ void QnRecordingManager::at_licenseMutexLocked(QByteArray name)
     }
 }
 
-void QnRecordingManager::at_licenseMutexTimeout(QByteArray name)
+void QnRecordingManager::at_licenseMutexTimeout(QString name)
 {
     if (name == LICENSE_OVERFLOW_LOCK_NAME)
         m_licenseMutex.clear();
