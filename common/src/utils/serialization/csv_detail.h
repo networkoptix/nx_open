@@ -6,6 +6,8 @@
 
 #ifndef Q_MOC_RUN
 #include <boost/mpl/if.hpp>
+#include <boost/mpl/or.hpp>
+#include <boost/range/has_range_iterator.hpp>
 #endif // Q_MOC_RUN
 
 #include "csv_fwd.h"
@@ -13,24 +15,18 @@
 
 namespace QnCsvDetail {
 
-    template<class T, class Output>
-    void serialize_field_internal(const T &value, QnCsvStreamWriter<Output> *stream) {
-        serialize_field(value, adl_wrap(stream)); /* That's where ADL kicks in. */
+    namespace AdlProtected {
+        template<class Output>
+        void serialize_header(const QString &prefix, QnCsvStreamWriter<Output> *stream, const void *) {
+            stream->writeField(prefix + QStringLiteral("value"));
+        }
     }
 
     template<class T, class Output>
-    void serialize_record_internal(const T &value, QnCsvStreamWriter<Output> *stream) {
-        serialize_record(value, adl_wrap(stream)); /* That's where ADL kicks in. */
-    }
+    void serialize_header_internal(const QString &prefix, QnCsvStreamWriter<Output> *stream, const T *dummy) {
+        using namespace AdlProtected;
 
-    template<class T, class Output>
-    void serialize_record_header_internal(const T &value, const QString &prefix, QnCsvStreamWriter<Output> *stream) {
-        serialize_record_header(value, prefix, adl_wrap(stream)); /* That's where ADL kicks in. */
-    }
-
-    template<class T, class Output>
-    void serialize_document_internal(const T &value, QnCsvStreamWriter<Output> *stream) {
-        serialize_document(value, adl_wrap(stream)); /* That's where ADL kicks in. */
+        serialize_header(prefix, adl_wrap(stream), dummy); /* That's where ADL kicks in. */
     }
 
 
@@ -45,43 +41,33 @@ namespace QnCsvDetail {
 
 
     template<class T0, class T1>
-    yes_type has_serialize_field_test(const T0 &, const T1 &, const decltype(serialize_field(std::declval<T0>(), std::declval<T1>())) * = NULL);
-    no_type has_serialize_field_test(...);
+    yes_type has_serialize_test(const T0 &, const T1 &, const decltype(serialize(std::declval<T0>(), std::declval<T1>())) * = NULL);
+    no_type has_serialize_test(...);
 
     template<class T0, class T1>
-    yes_type has_serialize_record_test(const T0 &, const T1 &, const decltype(serialize_record(std::declval<T0>(), std::declval<T1>())) * = NULL);
-    no_type has_serialize_record_test(...);
-
-    template<class T0, class T1>
-    yes_type has_serialize_document_test(const T0 &, const T1 &, const decltype(serialize_document(std::declval<T0>(), std::declval<T1>())) * = NULL);
-    no_type has_serialize_document_test(...);
+    yes_type has_serialize_header_test(const T0 &, const T1 &, const decltype(serialize_header(std::declval<T0>(), std::declval<T1>())) * = NULL);
+    no_type has_serialize_header_test(...);
 
     template<class T, class Output>
-    struct is_field: 
-        std::integral_constant<bool, sizeof(yes_type) == sizeof(has_serialize_field_test(std::declval<T>(), std::declval<QnCsvStreamWriter<Output> *>()))>
+    struct has_serialize: 
+        std::integral_constant<bool, sizeof(yes_type) == sizeof(has_serialize_test(std::declval<T>(), std::declval<QnCsvStreamWriter<Output> *>()))>
     {};
 
     template<class T, class Output>
-    struct is_record: 
-        std::integral_constant<bool, sizeof(yes_type) == sizeof(has_serialize_record_test(std::declval<T>(), std::declval<QnCsvStreamWriter<Output> *>()))>
+    struct has_serialize_header: 
+        std::integral_constant<bool, sizeof(yes_type) == sizeof(has_serialize_header_test(std::declval<T>(), std::declval<QnCsvStreamWriter<Output> *>()))>
     {};
 
     template<class T, class Output>
-    struct is_document: 
-        std::integral_constant<bool, sizeof(yes_type) == sizeof(has_serialize_document_test(std::declval<T>(), std::declval<QnCsvStreamWriter<Output> *>()))>
-    {};
-
-
-    template<class T, class Output>
-    struct csv_category:
+    struct type_category:
         boost::mpl::if_<
-            is_document<T, Output>,
+            boost::mpl::or_<boost::has_range_const_iterator<T>, boost::has_range_iterator<T> >,
             identity<identity<QnCsv::document_tag> >,
             boost::mpl::if_<
-                is_record<T, Output>,
+                has_serialize_header<T, Output>,
                 identity<QnCsv::record_tag>,
                 boost::mpl::if_<
-                    is_field<T, Output>,
+                    has_serialize<T, Output>,
                     QnCsv::field_tag,
                     void
                 >

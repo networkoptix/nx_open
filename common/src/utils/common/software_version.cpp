@@ -73,6 +73,6 @@ bool deserialize(QnInputBinaryStream<QByteArray> *stream, QnSoftwareVersion *tar
     return QnBinary::deserialize(stream, &target->m_data);
 }
 
-void serialize_field(const QnSoftwareVersion &value, QnCsvStreamWriter<QByteArray> *target) {
+void serialize(const QnSoftwareVersion &value, QnCsvStreamWriter<QByteArray> *target) {
     target->writeField(value.toString());
 }

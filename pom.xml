@@ -77,7 +77,9 @@
         <qtlib9>Gui</qtlib9>
         <qtlib10>X11Extras</qtlib10>                    
         <!-- qtlib11 is used in macos profile only -->
-        <qtlib12/>
+        <qtlib11 />
+        <!-- <qtlib12>WebKit</qtlib12> 
+        <qtlib13>WebKitWidgets</qtlib13>-->
 
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>

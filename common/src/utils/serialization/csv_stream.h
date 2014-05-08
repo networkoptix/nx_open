@@ -42,6 +42,10 @@ public:
         m_stream.write(changed_field.data(), changed_field.size());
     }
 
+    void writeLatin1Field(const char *field) {
+        writeLatin1Field(QByteArray::fromRawData(field, qstrlen(field)));
+    }
+
     void writeComma() {
         m_stream.write(",", 1);
     }
