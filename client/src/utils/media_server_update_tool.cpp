@@ -32,6 +32,18 @@ QString updateFilePath(const QString &fileName) {
     return dir.absoluteFilePath(fileName);
 }
 
+QString generateUpdateId(const QString &baseId) {
+    const char chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const int suffixLength = 4;
+
+    QString result = baseId;
+    result.append(lit("_"));
+    for (int i = 0; i < suffixLength; i++)
+        result.append(QChar::fromLatin1(chars[qrand() % (sizeof(chars) - 1)]));
+
+    return result;
+}
+
 } // anonymous namespace
 
 QnMediaServerUpdateTool::PeerUpdateInformation::PeerUpdateInformation(const QnMediaServerResourcePtr &server) :
@@ -302,6 +314,8 @@ void QnMediaServerUpdateTool::updateServers() {
     m_downloadingUpdates.clear();
     m_updateInformationById.clear();
 
+    m_updateId = generateUpdateId(m_targetVersion.toString());
+
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
         QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
         if (server->getStatus() != QnResource::Online)
@@ -462,7 +476,7 @@ void QnMediaServerUpdateTool::uploadNextUpdate() {
     foreach (const QnId &peerId, m_idBySystemInformation.values(sysInfo))
         setPeerState(peerId, PeerUpdateInformation::UpdateUploading);
 
-    if (!m_uploader->uploadUpdate(m_targetVersion.toString(), m_updateFiles[sysInfo]->fileName, QSet<QnId>::fromList(m_idBySystemInformation.values(sysInfo))))
+    if (!m_uploader->uploadUpdate(m_updateId, m_updateFiles[sysInfo]->fileName, QSet<QnId>::fromList(m_idBySystemInformation.values(sysInfo))))
         finishUpdate(UploadingFailed);
 }
 
@@ -507,7 +521,7 @@ void QnMediaServerUpdateTool::installUpdatesToServers() {
 
     connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnMediaServerUpdateTool::at_resourceChanged);
 
-    connection2()->getUpdatesManager()->installUpdate(m_targetVersion.toString(), m_pendingInstallations,
+    connection2()->getUpdatesManager()->installUpdate(m_updateId, m_pendingInstallations,
                                                       this, [this](int, ec2::ErrorCode){});
 
     QTimer::singleShot(installationTimeout, this, SLOT(at_installationTimeout()));

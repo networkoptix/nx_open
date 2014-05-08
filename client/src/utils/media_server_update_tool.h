@@ -163,6 +163,8 @@ private:
     QnSoftwareVersion m_targetVersion;
     bool m_targetMustBeNewer;
 
+    QString m_updateId;
+
     QMultiHash<QnSystemInformation, QnId> m_idBySystemInformation;
 
     QList<QnSystemInformation> m_pendingUploads;
