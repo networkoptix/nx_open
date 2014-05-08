@@ -77,7 +77,7 @@ namespace nx_hls
         return true;
     }
 
-    unsigned int ArchivePlaylistManager::generateChunkList(
+    size_t ArchivePlaylistManager::generateChunkList(
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
         bool* const endOfStreamReached ) const
     {

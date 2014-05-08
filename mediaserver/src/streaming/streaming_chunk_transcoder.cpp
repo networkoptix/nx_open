@@ -96,7 +96,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     Q_ASSERT( transcodeParams.startTimestamp() <= transcodeParams.endTimestamp() );
 
     pair<map<int, TranscodeContext>::iterator, bool> p = m_transcodings.insert(
-        make_pair( m_newTranscodeID.fetchAndAddAcquire(1), TranscodeContext() ) );  //TODO/HLS: #ak ???
+        make_pair( m_newTranscodeID.fetchAndAddAcquire(1), TranscodeContext() ) );
     Q_ASSERT( p.second );
 
     //checking requested time region:
@@ -248,11 +248,10 @@ bool StreamingChunkTranscoder::startTranscoding(
             arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
         return false;
     }
-    //TODO/HLS: #ak setting correct video parameters, now they are hard-coded for HLS with no transcoding
     CodecID codecID = CODEC_ID_NONE;
     QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
-    const CodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO/HLS #ak get codec of resource video stream. For HLS h264 is OK
-    QSize videoResolution = QSize( 1280, 720 );  //TODO/HLS #ak get resolution of resource video stream. This resolution is ignored when TM_DirectStreamCopy is used
+    const CodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO/HLS #ak get codec of resource video stream. For HLS only h264 is OK
+    QSize videoResolution;
     if( transcodeParams.videoCodec().isEmpty() && !transcodeParams.pictureSizePixels().isValid() )
     {
         codecID = resourceVideoStreamCodecID;
@@ -271,11 +270,18 @@ bool StreamingChunkTranscoder::startTranscoding(
                 arg(mediaResource->toResource()->getUniqueId()).arg(transcodeParams.videoCodec()), cl_logWARNING );
             return false;
         }
-        transcodeMethod = codecID == resourceVideoStreamCodecID ?
+        transcodeMethod = codecID == resourceVideoStreamCodecID ?   //TODO: #ak and resolusion did not change
             QnTranscoder::TM_DirectStreamCopy :
             QnTranscoder::TM_FfmpegTranscode;
         if( transcodeParams.pictureSizePixels().isValid() )
+        {
             videoResolution = transcodeParams.pictureSizePixels();
+        }
+        else
+        {
+            assert( false );
+            videoResolution = QSize( 1280, 720 );  //TODO: #ak get resolution of resource video stream. This resolution is ignored when TM_DirectStreamCopy is used
+        }
     }
     if( transcoder->setVideoCodec( codecID, transcodeMethod, Qn::QualityNormal, videoResolution ) != 0 )
     {

@@ -20,7 +20,7 @@ public:
         Does not wait for transcoding to complete, so returned chunk is still filled with data, or transcoding could be not even started if chunk time is in future
         \return Returned chunk is in \a opened state. Ownership is passed to the caller
     */
-    StreamingChunk* get( const StreamingChunkCacheKey& key, int* const itemCost );
+    bool get( const StreamingChunkCacheKey& key, int* const itemCost, StreamingChunkPtr* const chunk );
 };
 
 #endif  //STREAMINGCHUNKPROVIDER_H

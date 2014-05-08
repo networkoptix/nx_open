@@ -16,7 +16,7 @@
 */
 class StreamingChunkCache
 :
-    public ItemCache<StreamingChunkCacheKey, StreamingChunk, StreamingChunkProvider>
+    public ItemCache<StreamingChunkCacheKey, StreamingChunkPtr, StreamingChunkProvider>
 {
 public:
     StreamingChunkCache();

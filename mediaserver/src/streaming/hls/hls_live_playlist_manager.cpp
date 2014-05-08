@@ -37,7 +37,7 @@ namespace nx_hls
     /*!
         \return Number of chunks generated
     */
-    unsigned int HLSLivePlaylistManager::generateChunkList(
+    size_t HLSLivePlaylistManager::generateChunkList(
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
         bool* const endOfStreamReached ) const
     {

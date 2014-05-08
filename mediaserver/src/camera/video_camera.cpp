@@ -332,17 +332,9 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnResource::ConnectionRole 
     if (!m_resource->hasFlags(QnResource::foreigner) && m_resource->isInitialized()) 
     {
         if (role == QnResource::Role_LiveVideo && m_primaryReader == 0)
-        {
             createReader(QnResource::Role_LiveVideo);
-            if( m_primaryReader )
-                ensureLiveCacheStarted( MEDIA_Quality_High, m_primaryReader );
-        }
         else if (role == QnResource::Role_SecondaryLiveVideo && m_secondaryReader == 0)
-        {
             createReader(QnResource::Role_SecondaryLiveVideo);
-            if( m_secondaryReader )
-                ensureLiveCacheStarted( MEDIA_Quality_Low, m_secondaryReader );
-        }
     }
 	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
 	if ( cameraResource && !cameraResource->hasDualStreaming2() && role == QnResource::Role_SecondaryLiveVideo )
@@ -429,7 +421,7 @@ void QnVideoCamera::updateActivity()
     if (m_secondaryGopKeeper)
         m_secondaryGopKeeper->updateCameraActivity();
     stopIfNoActivity();
-};
+}
 
 void QnVideoCamera::stopIfNoActivity()
 {
@@ -475,7 +467,26 @@ QSharedPointer<nx_hls::HLSLivePlaylistManager> QnVideoCamera::hlsLivePlaylistMan
 bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality )
 {
     assert( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Low );
-    return getLiveReader( streamQuality == MEDIA_Quality_High ? QnResource::Role_LiveVideo : QnResource::Role_SecondaryLiveVideo ).data() != nullptr;
+
+    if( streamQuality == MEDIA_Quality_High )
+    {
+        if( !m_primaryReader )
+            getLiveReader( QnResource::Role_LiveVideo );
+        if( !m_primaryReader )
+            return false;
+        return ensureLiveCacheStarted( streamQuality, m_primaryReader );
+    }
+
+    if( streamQuality == MEDIA_Quality_Low )
+    {
+        if( !m_secondaryReader )
+            getLiveReader( QnResource::Role_SecondaryLiveVideo );
+        if( !m_secondaryReader )
+            return false;
+        return ensureLiveCacheStarted( streamQuality, m_secondaryReader );
+    }
+
+    return false;
 }
 
 //!Starts caching live stream, if not started

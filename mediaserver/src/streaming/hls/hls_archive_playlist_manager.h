@@ -39,9 +39,9 @@ namespace nx_hls
         bool initialize();
 
         //!Implementantion of AbstractPlaylistManager::generateChunkList
-        virtual unsigned int generateChunkList(
+        virtual size_t generateChunkList(
             std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
-            bool* const endOfStreamReached ) const;
+            bool* const endOfStreamReached ) const override;
 
     private:
         const QnSecurityCamResourcePtr m_camResource;

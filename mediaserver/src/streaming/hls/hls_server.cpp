@@ -27,10 +27,10 @@
 #include "utils/network/tcp_connection_priv.h"
 
 
+using std::make_pair;
 using namespace nx_http;
-using namespace std;
 
-extern QnLog* requestsLog;
+extern QnLog* requestsLog;  //TODO #ak: not good
 
 namespace nx_hls
 {
@@ -49,7 +49,6 @@ namespace nx_hls
     :
         QnTCPConnectionProcessor( socket ),
         m_state( sReceiving ),
-        m_currentChunk( NULL ),
         m_switchToChunkedTransfer( false ),
         m_useChunkedTransfer( false )
     {
@@ -59,15 +58,18 @@ namespace nx_hls
 
     QnHttpLiveStreamingProcessor::~QnHttpLiveStreamingProcessor()
     {
+        //while we are here only QnHttpLiveStreamingProcessor::chunkDataAvailable slot can be called
+
         if( m_currentChunk )
         {
-            //TODO/HLS: #ak fix synchronization error: possibly, StreamingChunk::newDataIsAvailable signal 
-                //can be delivered to already deleted QnHttpLiveStreamingProcessor
-            disconnect( m_currentChunk, &StreamingChunk::newDataIsAvailable, this, &QnHttpLiveStreamingProcessor::chunkDataAvailable );
+            //disconnecting and waiting for already-emmitted signals from m_currentChunk to be delivered and processed
+            m_currentChunk->disconnectAndJoin( this );
             StreamingChunkCache::instance()->putBackUsedItem( m_currentChunkKey, m_currentChunk );
+            m_currentChunk.reset();
         }
 
         //TODO/HLS: #ak clean up archive chunk data, since we do not cache archive chunks
+            //this should be done automatically by cache: should mark archive chunks as "uncachable"
     }
 
     void QnHttpLiveStreamingProcessor::run()
@@ -242,10 +244,28 @@ namespace nx_hls
             fileName = path.midRef( fileNameStartIndex+1 );
         }
 
-        //removing query from fileName
-        const int querySepPos = fileName.indexOf( QChar('&') );
-        if( querySepPos != -1 )
-            fileName = fileName.mid( 0, querySepPos );
+        const int extensionSepPos = fileName.indexOf( QChar('.') );
+        const QStringRef& extension = extensionSepPos != -1 ? fileName.mid( extensionSepPos+1 ) : QStringRef();
+        const QStringRef& shortFileName = fileName.mid( 0, extensionSepPos );
+
+        //searching for requested resource
+        QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqId( shortFileName.toString() );
+        if( !resource )
+        {
+            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getPlaylist. Requested resource %1 not found").
+                arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())), cl_logDEBUG1 );
+            return nx_http::StatusCode::notFound;
+        }
+
+        QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
+        if( !camResource )
+        {
+            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getPlaylist. Requested resource %1 is not camera").
+                arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())), cl_logDEBUG1 );
+            return nx_http::StatusCode::notFound;
+        }
+
+        //TODO/HLS: #ak check resource stream type. Only h.264 is OK for HLS
 
         //parsing request parameters
         const QList<QPair<QString, QString> >& queryItemsList = QUrlQuery(request.requestLine.url.query()).queryItems();
@@ -259,25 +279,24 @@ namespace nx_hls
             requestParams.insert( std::make_pair( it->first, it->second ) );
         }
 
-        const int extensionSepPos = fileName.indexOf( QChar('.') );
-        const QStringRef& extension = extensionSepPos != -1 ? fileName.mid( extensionSepPos+1 ) : QStringRef();
         if( extension.isEmpty() || extension == QLatin1String("ts") )
         {
             //no extension, assuming media stream has been requested...
             return getResourceChunk(
                 request,
                 fileName,
+                camResource,
                 requestParams,
                 response );
         }
         else
         {
             //found extension
-            const QStringRef& shortFileName = fileName.mid( 0, extensionSepPos );
             if( extension.compare(QLatin1String("m3u")) == 0 || extension.compare(QLatin1String("m3u8")) == 0 )
                 return getPlaylist(
                     request,
                     shortFileName,
+                    camResource,
                     requestParams,
                     response );
         }
@@ -332,26 +351,10 @@ namespace nx_hls
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getPlaylist(
         const nx_http::Request& request,
         const QStringRef& uniqueResourceID,
+        const QnSecurityCamResourcePtr& camResource,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
     {
-        //searching for requested resource
-        QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqId( uniqueResourceID.toString() );
-        if( !resource )
-        {
-            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getPlaylist. Requested resource %1 not found").
-                arg(QString::fromRawData(uniqueResourceID.constData(), uniqueResourceID.size())), cl_logDEBUG1 );
-            return nx_http::StatusCode::notFound;
-        }
-
-        QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
-        if( !camResource )
-        {
-            NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getPlaylist. Requested resource %1 is not camera").
-                arg(QString::fromRawData(uniqueResourceID.constData(), uniqueResourceID.size())), cl_logDEBUG1 );
-            return nx_http::StatusCode::notFound;
-        }
-
         std::multimap<QString, QString>::const_iterator chunkedParamIter = requestParams.find( StreamingParams::CHUNKED_PARAM_NAME );
 
         //searching for session (if specified)
@@ -431,8 +434,6 @@ namespace nx_hls
             baseUrl.setScheme( QLatin1String("http") );
         }
 
-        //TODO/HLS: #ak check resource stream type. Only h.264 is OK for HLS
-
         nx_hls::VariantPlaylistData playlistData;
         playlistData.url = baseUrl;
         playlistData.url.setPath( request.requestLine.url.path() );
@@ -507,7 +508,7 @@ namespace nx_hls
             return nx_http::StatusCode::notFound;
         }
 
-        const unsigned int chunksGenerated = playlistManager->generateChunkList( &chunkList, &isPlaylistClosed );
+        const size_t chunksGenerated = playlistManager->generateChunkList( &chunkList, &isPlaylistClosed );
         if( chunksGenerated == 0 )   //no chunks generated
         {
             NX_LOG( QString::fromLatin1("Failed to get chunks of resource %1").arg(camResource->getUniqueId()), cl_logWARNING );
@@ -581,6 +582,7 @@ namespace nx_hls
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getResourceChunk(
         const nx_http::Request& request,
         const QStringRef& uniqueResourceID,
+        const QnSecurityCamResourcePtr& /*camResource*/,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
     {
@@ -632,15 +634,11 @@ namespace nx_hls
                 ? durationIter->second.toLongLong()
                 : DEFAULT_TARGET_DURATION * MS_IN_SEC * USEC_IN_MSEC,
             streamQuality,
-                //: std::numeric_limits<quint64>::max(),  //TODO/HLS: #ak support downloading to the end, but that chunk MUST not be cached!
-            //endTimestampIter != requestParams.end()
-            //    ? QDateTime::fromString(endTimestampIter->second, Qt::ISODate)
-            //    : QDateTime::fromTime_t(0xffffffff),
             requestParams );
 
         //retrieving streaming chunk
-        StreamingChunk* chunk = StreamingChunkCache::instance()->takeForUse( m_currentChunkKey );
-        if( !chunk )
+        StreamingChunkPtr chunk;
+        if( !StreamingChunkCache::instance()->takeForUse( m_currentChunkKey, &chunk ) )
         {
             NX_LOG( QString::fromLatin1("Could not get chunk %1 of resource %2 requested by %3").
                 arg(request.requestLine.url.query()).arg(uniqueResourceID.toString()).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
@@ -650,14 +648,16 @@ namespace nx_hls
         //streaming chunk
         if( m_currentChunk )
         {
-            disconnect( m_currentChunk, &StreamingChunk::newDataIsAvailable, this, &QnHttpLiveStreamingProcessor::chunkDataAvailable );
+            //disconnecting and waiting for already-emmitted signals from m_currentChunk to be delivered and processed
+            m_currentChunk->disconnectAndJoin( this );
             StreamingChunkCache::instance()->putBackUsedItem( m_currentChunkKey, m_currentChunk );
+            m_currentChunk.reset();
         }
 
         m_currentChunk = chunk;
         connect(
-            m_currentChunk, &StreamingChunk::newDataIsAvailable,
-            this,           &QnHttpLiveStreamingProcessor::chunkDataAvailable,
+            m_currentChunk.get(), &StreamingChunk::newDataIsAvailable,
+            this,                 &QnHttpLiveStreamingProcessor::chunkDataAvailable,
             Qt::DirectConnection );
         m_chunkReadCtx = StreamingChunk::SequentialReadingContext();
 
@@ -668,9 +668,7 @@ namespace nx_hls
             response->headers.insert( make_pair( "Transfer-Encoding", "chunked" ) );
         response->statusLine.version = nx_http::Version::http_1_1;
 
-        nx_http::HttpHeaders::const_iterator rangeIter = request.headers.find( "Range" );
-
-        return rangeIter != request.headers.end() ? nx_http::StatusCode::partialContent : nx_http::StatusCode::ok;
+        return nx_http::StatusCode::ok;
     }
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::createSession(
@@ -745,7 +743,7 @@ namespace nx_hls
         return nx_http::StatusCode::ok;
     }
 
-    void QnHttpLiveStreamingProcessor::chunkDataAvailable( StreamingChunk* /*pThis*/, quint64 /*newSizeBytes*/ )
+    void QnHttpLiveStreamingProcessor::chunkDataAvailable( StreamingChunkPtr /*chunk*/, quint64 /*newSizeBytes*/ )
     {
         QMutexLocker lk( &m_mutex );
         m_cond.wakeAll();

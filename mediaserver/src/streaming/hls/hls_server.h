@@ -57,7 +57,7 @@ namespace nx_hls
         State m_state;
         nx_http::BufferType m_readBuffer;
         nx_http::BufferType m_writeBuffer;
-        StreamingChunk* m_currentChunk;
+        StreamingChunkPtr m_currentChunk;
         StreamingChunk::SequentialReadingContext m_chunkReadCtx;
         QMutex m_mutex;
         QWaitCondition m_cond;
@@ -84,6 +84,7 @@ namespace nx_hls
         nx_http::StatusCode::Value getPlaylist(
             const nx_http::Request& request,
             const QStringRef& uniqueResourceID,
+            const QnSecurityCamResourcePtr& camResource,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
         //!Generates variant playlist (containing references to other playlists providing different qualities)
@@ -105,6 +106,7 @@ namespace nx_hls
         nx_http::StatusCode::Value getResourceChunk(
             const nx_http::Request& request,
             const QStringRef& uniqueResourceID,
+            const QnSecurityCamResourcePtr& camResource,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
 
@@ -116,7 +118,7 @@ namespace nx_hls
             HLSSession** session );
 
     private slots:
-        void chunkDataAvailable( StreamingChunk* pThis, quint64 newSizeBytes );
+        void chunkDataAvailable( StreamingChunkPtr chunk, quint64 newSizeBytes );
     };
 }
 
