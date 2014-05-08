@@ -249,7 +249,7 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
 
     QString logFileName;
     if (initializeUpdateLog(updateId, &logFileName))
-        arguments.append(logFileName);cat
+        arguments.append(logFileName);
     else
         cl_log.log("Could not create or open update log file.", cl_logWARNING);
 
