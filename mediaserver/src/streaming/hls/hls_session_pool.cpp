@@ -9,11 +9,20 @@
 
 namespace nx_hls
 {
-    HLSSession::HLSSession( const QString& id, bool _isLive )
+    HLSSession::HLSSession(
+        const QString& id,
+        bool _isLive,
+        MediaQuality streamQuality )
     :
         m_id( id ),
-        m_live( _isLive )
+        m_live( _isLive ),
+        m_streamQuality( streamQuality )
     {
+        //verifying m_playlistManagers will not take much memory
+        static_assert(
+            ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
+            "MediaQuality enum suddenly contains too large values: consider changing HLSSession::m_playlistManagers type" );  
+        m_playlistManagers.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     }
 
     const QString& HLSSession::id() const
@@ -26,14 +35,21 @@ namespace nx_hls
         return m_live;
     }
 
-    void HLSSession::setPlaylistManager( const QSharedPointer<AbstractPlaylistManager>& value )
+    MediaQuality HLSSession::streamQuality() const
     {
-        m_playlistManager = value;
+        return m_streamQuality;
     }
 
-    AbstractPlaylistManager* HLSSession::playlistManager() const
+    void HLSSession::setPlaylistManager( MediaQuality streamQuality, const QSharedPointer<AbstractPlaylistManager>& value )
     {
-        return m_playlistManager.data();
+        assert( streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low );
+        m_playlistManagers[streamQuality] = value;
+    }
+
+    const QSharedPointer<AbstractPlaylistManager>& HLSSession::playlistManager( MediaQuality streamQuality ) const
+    {
+        assert( streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low );
+        return m_playlistManagers[streamQuality];
     }
 
 

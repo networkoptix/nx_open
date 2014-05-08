@@ -81,7 +81,7 @@ namespace nx_hls
             \return false, if no more data to send (reached end of file)
         */
         bool prepareDataToSend();
-        nx_http::StatusCode::Value getHLSPlaylist(
+        nx_http::StatusCode::Value getPlaylist(
             const nx_http::Request& request,
             const QStringRef& uniqueResourceID,
             const std::multimap<QString, QString>& requestParams,
@@ -91,6 +91,7 @@ namespace nx_hls
             HLSSession* session,
             const nx_http::Request& request,
             const QStringRef& uniqueResourceID,
+            const QnSecurityCamResourcePtr& camResource,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
         //!Generates playlist with chunks inside
@@ -106,6 +107,13 @@ namespace nx_hls
             const QStringRef& uniqueResourceID,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
+
+        nx_http::StatusCode::Value createSession(
+            const QString& sessionID,
+            const std::multimap<QString, QString>& requestParams,
+            const QnSecurityCamResourcePtr& camResource,
+            MediaQuality streamQuality,
+            HLSSession** session );
 
     private slots:
         void chunkDataAvailable( StreamingChunk* pThis, quint64 newSizeBytes );

@@ -38,7 +38,7 @@ namespace nx_hls
         QByteArray playlistStr;
         playlistStr += 
             "#EXTM3U\r\n"
-            "#EXT-X-VERSION:3\r\n";
+            "#EXT-X-VERSION:3\r\n"; //TODO/HLS: #ak really need version 3?
         playlistStr += "#EXT-X-TARGETDURATION:"+QByteArray::number(targetDuration)+"\r\n";
         playlistStr += "#EXT-X-MEDIA-SEQUENCE:"+QByteArray::number(mediaSequence)+"\r\n";
         playlistStr += "\r\n";

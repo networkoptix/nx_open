@@ -13,6 +13,7 @@
 #include <QString>
 #include <QWaitCondition>
 
+#include <core/datapacket/media_data_packet.h>
 #include <utils/common/timermanager.h>
 
 #include "hls_playlist_manager.h"
@@ -25,18 +26,26 @@ namespace nx_hls
     class HLSSession
     {
     public:
-        HLSSession( const QString& id, bool _isLive );
+        /*!
+            \param streamQuality If \a MEDIA_Quality_Auto, than both qualities (if available) can be streamed
+        */
+        HLSSession(
+            const QString& id,
+            bool _isLive,
+            MediaQuality streamQuality );
 
         const QString& id() const;
         bool isLive() const;
+        MediaQuality streamQuality() const;
 
-        void setPlaylistManager( const QSharedPointer<AbstractPlaylistManager>& value );
-        AbstractPlaylistManager* playlistManager() const;
+        void setPlaylistManager( MediaQuality streamQuality, const QSharedPointer<AbstractPlaylistManager>& value );
+        const QSharedPointer<AbstractPlaylistManager>& playlistManager( MediaQuality streamQuality ) const;
 
     private:
         QString m_id;
         bool m_live;
-        QSharedPointer<AbstractPlaylistManager> m_playlistManager;
+        MediaQuality m_streamQuality;
+        std::vector<QSharedPointer<AbstractPlaylistManager> > m_playlistManagers;
     };
 
     /*!
