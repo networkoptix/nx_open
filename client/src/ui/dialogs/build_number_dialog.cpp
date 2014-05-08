@@ -2,6 +2,7 @@
 #include "ui_build_number_dialog.h"
 
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QPushButton>
 
 namespace {
     const char passwordChars[] = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -34,6 +35,7 @@ QnBuildNumberDialog::QnBuildNumberDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->buildNumberEdit->setValidator(new QIntValidator(ui->buildNumberEdit));
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Update"));
 }
 
 QnBuildNumberDialog::~QnBuildNumberDialog() {}

@@ -37,7 +37,6 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
     connect(ui->updateFromLocalSourceButton,        &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked);
     connect(ui->checkForUpdatesButton,              &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_checkForUpdatesButton_clicked);
     connect(ui->installSpecificBuildButton,         &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_installSpecificBuildButton_clicked);
-    connect(ui->updateButton,                       &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_updateButton_clicked);
     connect(ui->cancelButton,                       &QPushButton::clicked,      m_updateTool,   &QnMediaServerUpdateTool::cancelUpdate);
 
     connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,           &QnServerUpdatesWidget::updateUi);
@@ -46,9 +45,6 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
 
     m_previousToolState = m_updateTool->state();
     updateUi();
-    // hide them for the first time only
-    ui->noUpdatesLabel->hide();
-    ui->updateButton->hide();
 }
 
 QnServerUpdatesWidget::~QnServerUpdatesWidget() {}
@@ -110,10 +106,8 @@ void QnServerUpdatesWidget::at_updateTool_peerChanged(const QnId &peerId) {
 
 void QnServerUpdatesWidget::updateUi() {
     bool checkingForUpdates = false;
-    bool updateFound = false;
     bool applying = false;
     bool cancellable = false;
-    bool hideLabel = false;
     bool startUpdate = false;
 
     switch (m_updateTool->state()) {
@@ -129,7 +123,6 @@ void QnServerUpdatesWidget::updateUi() {
 
                     if (currentVersion.major() != foundVersion.major() || currentVersion.minor() != foundVersion.minor()) {
                         QMessageBox::critical(this, tr("Wrong build number"), tr("There is no such build on the update server"));
-                        ui->noUpdatesLabel->setText(tr("Update is not found"));
                         break;
                     }
                 }
@@ -139,7 +132,6 @@ void QnServerUpdatesWidget::updateUi() {
                                                        tr("Do you want to update your system to version %1?").arg(m_updateTool->targetVersion().toString()),
                                                        QMessageBox::Yes | QMessageBox::No);
                     startUpdate = (result == QMessageBox::Yes);
-                    updateFound = true;
                 }
                 break;
             case QnMediaServerUpdateTool::InternetProblem: {
@@ -151,20 +143,16 @@ void QnServerUpdatesWidget::updateUi() {
                 if (result == QMessageBox::Yes)
                     createUpdatesDownloader();
 
-                ui->noUpdatesLabel->setText(tr("Check for updates failed"));
                 break;
             }
             case QnMediaServerUpdateTool::NoNewerVersion:
                 QMessageBox::information(this, tr("Update is not found"), tr("All component in your system are already up to date."));
-                ui->noUpdatesLabel->setText(tr("Update is not found"));
                 break;
             case QnMediaServerUpdateTool::NoSuchBuild:
                 QMessageBox::critical(this, tr("Wrong build number"), tr("There is no such build on the update server"));
-                ui->noUpdatesLabel->setText(tr("Update is not found"));
                 break;
             case QnMediaServerUpdateTool::UpdateImpossible:
                 QMessageBox::critical(this, tr("Update is impossible"), tr("Cannot start update.\nUpdate for one or more servers were not found."));
-                ui->noUpdatesLabel->setText(tr("Update is impossible"));
                 break;
             }
         } else {
@@ -179,6 +167,11 @@ void QnServerUpdatesWidget::updateUi() {
                 QMessageBox::information(this,
                                          tr("Update cancelled"),
                                          tr("Update has been cancelled."));
+                break;
+            case QnMediaServerUpdateTool::LockFailed:
+                QMessageBox::critical(this,
+                                      tr("Update failed"),
+                                      tr("Someone has already started an update."));
                 break;
             case QnMediaServerUpdateTool::DownloadingFailed:
                 QMessageBox::critical(this,
@@ -196,7 +189,6 @@ void QnServerUpdatesWidget::updateUi() {
                                       tr("Could not install updates on one or more servers."));
                 break;
             }
-            hideLabel = true;
         }
         break;
     case QnMediaServerUpdateTool::CheckingForUpdates:
@@ -228,12 +220,8 @@ void QnServerUpdatesWidget::updateUi() {
     else
         ui->buttonBox->hideProgress();
 
-    ui->updateButton->setVisible(updateFound);
-    if (updateFound)
-        ui->updateButton->setFocus();
     ui->cancelButton->setVisible(applying);
     ui->cancelButton->setEnabled(cancellable);
-    ui->noUpdatesLabel->setVisible(!hideLabel && !applying && !ui->updateButton->isVisible());
     ui->updateStateWidget->setVisible(applying);
 
     m_previousToolState = m_updateTool->state();
