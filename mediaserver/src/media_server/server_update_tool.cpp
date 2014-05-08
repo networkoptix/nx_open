@@ -108,26 +108,6 @@ namespace {
         return true;
     }
 
-    bool removeDirRecursively(const QString &path, bool removeRoot = false) {
-        QDir dir(path);
-        bool result = true;
-
-        foreach (const QFileInfo &info, dir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot)) {
-            if (info.isDir())
-                result = removeDirRecursively(info.absoluteFilePath(), true);
-            else
-                result = QFile::remove(info.absoluteFilePath());
-
-            if (!result)
-                return false;
-        }
-
-        if (result && removeRoot)
-            result = dir.rmdir(path);
-
-        return result;
-    }
-
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
     }
@@ -302,5 +282,5 @@ bool QnServerUpdateTool::isComplete() const {
 }
 
 void QnServerUpdateTool::clearUpdatesLocation() {
-    removeDirRecursively(getUpdatesDir().absolutePath());
+    getUpdatesDir().removeRecursively();
 }
