@@ -231,6 +231,7 @@ ios-client/build
 ios-client/dist
 ios-client/target
 ios-client/ihdwitness.xcworkspace/xcuserdata
+ios-client/HDWitness/HDWitness/HDWitness.xcconfig
 ios-client/deploy.plist
 ios-client/deploy_index.html
 

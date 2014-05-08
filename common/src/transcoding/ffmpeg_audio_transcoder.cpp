@@ -177,7 +177,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, 
                         m_decoderContext->sample_rate,
                         m_encoderCtx->sample_fmt,
                         m_decoderContext->sample_fmt,
-                        16, 10, 1, 2.0);
+                        16, 10, 0, 1.0);
                     m_resampleBuffer = (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE*2, 32);
                 }
                 int inSamples = out_size / sampleSize(m_decoderContext->sample_fmt);

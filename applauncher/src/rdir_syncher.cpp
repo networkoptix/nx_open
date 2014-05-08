@@ -13,6 +13,9 @@
 #include "get_file_operation.h"
 
 
+static const int MAX_SIMULTANEOUS_DOWNLOADS = 10;
+static const int MAX_DOWNLOAD_RETRY_COUNT = 15;
+
 RDirSyncher::EventReceiver::~EventReceiver()
 {
 }
@@ -194,7 +197,7 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
 
     std::list<RSyncEventTrigger*> eventsToTrigger;
     //creating auto guard which will trigger all events stored in eventsToTrigger
-    auto scopedExitFunc = [&eventsToTrigger](RDirSyncher* /*pThis*/)
+    auto SCOPED_GUARD_FUNC = [&eventsToTrigger](RDirSyncher* /*pThis*/)
     {
         for( RSyncEventTrigger* event: eventsToTrigger )
         {
@@ -202,7 +205,7 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
             delete event;
         }
     };
-    std::unique_ptr<RDirSyncher, decltype(scopedExitFunc)> eventsToTriggerGuard( this, scopedExitFunc );
+    std::unique_ptr<RDirSyncher, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
     //events are triggered with m_mutex unlocked, so that no dead-lock can occur if m_eventReceiver calls some method of this class 
 
@@ -211,7 +214,7 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
     std::map<int, std::shared_ptr<detail::RDirSynchronizationOperation>>::iterator opIter = m_runningOperations.find( operation->id );
     if( opIter == m_runningOperations.end() )
     {
-        //TODO: unknown operation. What's the huy?
+        //TODO: unknown operation. What's the whooy?
         assert( false );
         return;
     }
@@ -268,6 +271,18 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
         return;
     }
 
+    //TODO: #ak refactor rest of this function in default branch
+
+    if( operation->remoteSideFailure() )
+    {
+        if( completedTaskIter->retryCount < MAX_DOWNLOAD_RETRY_COUNT )
+        {
+            //repeating current operation
+            ++completedTaskIter->retryCount;
+            return startOperations( eventsToTrigger );
+        }
+    }
+
     //preventing multiple mirror switch (e.g., if multiple simultaneous operations fail on same mirror, only one mirror change MUST occur)
     if( !operation->remoteSideFailure() ||  //if problem on local side, assuming synchronization as failed
         !useNextMirror(operation->baseUrl) )                  //no mirrors left to try: failure
@@ -292,8 +307,6 @@ void RDirSyncher::operationDone( const std::shared_ptr<detail::RDirSynchronizati
     //repeating operation with new mirror
     startOperations( eventsToTrigger );
 }
-
-static const int MAX_SIMULTANEOUS_DOWNLOADS = 1;
 
 void RDirSyncher::startOperations( std::list<RSyncEventTrigger*>& eventsToTrigger )
 {
@@ -352,7 +365,6 @@ RDirSyncher::OperationStartResult RDirSyncher::startNextOperation( std::shared_p
 
     std::shared_ptr<detail::RDirSynchronizationOperation> opCtx;
     const int operationID = ++m_prevOperationID;
-//    detail::RDirSynchronizationOperation * op;
     switch( taskToStart.type )
     {
         case detail::RSyncOperationType::listDirectory: {
@@ -374,6 +386,7 @@ RDirSyncher::OperationStartResult RDirSyncher::startNextOperation( std::shared_p
                 taskToStart.entryPath,
                 m_localDirPath,
                 taskToStart.hashTypeName,
+                taskToStart.entrySize,
                 this ) );
             break;
         }

@@ -780,7 +780,7 @@ int QnRtspConnectionProcessor::composeSetup()
     }
 
 #ifdef USE_NX_HTTP
-    int trackId = extractTrackId(d->request.requestLine.url.path());
+    int trackId = extractTrackId(d->request.requestLine.url.toString());
 #else
     int trackId = extractTrackId(d->requestHeaders.path());
 #endif

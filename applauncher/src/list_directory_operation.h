@@ -25,11 +25,13 @@ namespace detail
         RDirEntry(
             QString _entryPath = QString(),
             detail::RSyncOperationType _type = detail::RSyncOperationType::none,
-            QString _hashTypeName = QString() )
+            QString _hashTypeName = QString(),
+            qint64 _entrySize = -1 )
         :
             entryPath( _entryPath ),
             type( _type ),
-            hashTypeName( _hashTypeName )
+            hashTypeName( _hashTypeName ),
+            entrySize( _entrySize )
         {
         }
 
@@ -44,6 +46,7 @@ namespace detail
             Currently, only md5 is supported
         */
         QString hashTypeName;
+        qint64 entrySize;
     };
 
     /*!

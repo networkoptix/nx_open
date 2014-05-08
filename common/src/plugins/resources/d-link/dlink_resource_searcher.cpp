@@ -54,7 +54,11 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
     QnResourceList result;
 
     std::unique_ptr<AbstractDatagramSocket> recvSocket( SocketFactory::createDatagramSocket() );
-    if (!recvSocket->bind(BROADCAST_ADDRESS, 0))
+#ifdef Q_OS_WIN
+    if (!recvSocket->bind(SocketAddress( HostAddress::anyHost, 0 )))
+#else
+	if (!recvSocket->bind(BROADCAST_ADDRESS, 0))
+#endif
         return QnResourceList();
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
