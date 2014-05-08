@@ -17,7 +17,7 @@ public:
     bool uploadUpdate(const QString &updateId, const QString &fileName, const QSet<QnId> &peers);
     void markChunkUploaded(const QnId &peerId, qint64 offset);
 
-    QString uploadId() const;
+    QString updateId() const;
     QSet<QnId> peers() const;
 
     void cancel();
@@ -30,10 +30,7 @@ signals:
 
 private slots:
     void sendNextChunk();
-    void requestSendNextChunk();
-    void finalize(const QnId &id = QnId());
-    void continueSending();
-    void pauseSending();
+    void at_updateManager_updateUploadProgress(const QString &updateId, const QnId &peerId, int chunks);
 
 private:
     void chunkUploaded(int reqId, ec2::ErrorCode errorCode);
@@ -41,25 +38,12 @@ private:
 
 private:
     QString m_updateId;
-    QScopedPointer<QFile> m_updateFile;
-
-    struct ChunkData {
-        int index;
-        QSet<QnId> peers;
-    };
-
-    qint64 m_size;
-    int m_chunkCount;
     QSet<QnId> m_peers;
+    QScopedPointer<QFile> m_updateFile;
     int m_chunkSize;
-    QList<ChunkData> m_chunks;
-    QHash<QnId, int> m_leftChunksById;
-    int m_leftChunks;
-    int m_currentIndex;
+    int m_chunkCount;
 
-    QSet<QnId> m_pendingFinalizations;
-
-    bool m_pause;
+    QHash<QnId, int> m_progressById;
 };
 
 #endif // UPDATE_UPLOADER_H

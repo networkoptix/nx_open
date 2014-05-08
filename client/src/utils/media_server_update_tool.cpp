@@ -56,7 +56,6 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     m_uploader(new QnUpdateUploader(this)),
     m_networkAccessManager(new QNetworkAccessManager(this))
 {
-    connect(connection2()->getUpdatesManager().get(),   &ec2::AbstractUpdatesManager::updateChunkUploaded,   this,   &QnMediaServerUpdateTool::at_updateChunkUploaded);
     connect(m_uploader,                                 &QnUpdateUploader::finished,                    this,   &QnMediaServerUpdateTool::at_uploader_finished);
     connect(m_uploader,                                 &QnUpdateUploader::failed,                      this,   &QnMediaServerUpdateTool::at_uploader_failed);
     connect(m_uploader,                                 &QnUpdateUploader::progressChanged,             this,   &QnMediaServerUpdateTool::at_uploader_progressChanged);
@@ -434,16 +433,6 @@ void QnMediaServerUpdateTool::uploadNextUpdate() {
 
     if (!m_uploader->uploadUpdate(m_targetVersion.toString(), m_updateFiles[sysInfo]->fileName, QSet<QnId>::fromList(m_idBySystemInformation.values(sysInfo))))
         setUpdateResult(UploadingFailed);
-}
-
-void QnMediaServerUpdateTool::at_updateChunkUploaded(const QString &updateId, const QnId &peerId, qint64 offset) {
-    if (m_state != UploadingUpdate)
-        return;
-
-    if (updateId != m_targetVersion.toString())
-        return;
-
-    m_uploader->markChunkUploaded(peerId, offset);
 }
 
 void QnMediaServerUpdateTool::at_uploader_finished() {

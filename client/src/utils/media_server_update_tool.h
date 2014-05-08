@@ -118,7 +118,6 @@ private slots:
     void at_updateReply_finished();
     void at_buildReply_finished();
     void at_downloadReply_finished();
-    void at_updateChunkUploaded(const QString &updateId, const QnId &peerId, qint64 offset);
 
     void uploadNextUpdate();
     void at_uploader_finished();

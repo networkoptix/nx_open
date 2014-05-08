@@ -23,6 +23,7 @@ namespace {
     const QString updateInfoFileName = lit("update.json");
     const QString updateLogFileName = lit("update.log");
     const int readBufferSize = 1024 * 16;
+    const int replyDelay = 200;
 
     QDir getUpdatesDir() {
         QDir dir = QDir::temp();
@@ -137,6 +138,23 @@ bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDev
     return ok;
 }
 
+void QnServerUpdateTool::sendReply(const QString &updateId, int code) {
+    TransferInfo *transfer = m_transfers[updateId];
+    if (!transfer)
+        return;
+
+    if (code == 0) {
+        qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+        if (currentTime - transfer->replyTime < replyDelay)
+            return;
+
+        transfer->replyTime = currentTime;
+    }
+
+    connection2()->getUpdatesManager()->sendUpdateUploadResponce(updateId, qnCommon->moduleGUID(), code == 0 ? transfer->chunks.size() : code,
+                                                                 this, [this](int reqID, ec2::ErrorCode errorCode) {});
+}
+
 QnServerUpdateTool *QnServerUpdateTool::instance() {
     if (!m_instance)
         m_instance = new QnServerUpdateTool();
@@ -171,22 +189,18 @@ bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
     } else {
         transfer->file->seek(offset);
         transfer->file->write(data);
-        transfer->addChunk(offset, offset + data.size());
-
-        connection2()->getUpdatesManager()->sendUpdateUploadedResponce(updateId, qnCommon->moduleGUID(), offset,
-                                                                       this, [this](int reqID, ec2::ErrorCode errorCode) {});
+        transfer->chunks.insert(offset, data.size());
+        sendReply(updateId);
     }
 
     if (transfer->isComplete()) {
         transfer->file->close();
-        m_transfers.remove(updateId);
 
         bool ok = processUpdate(updateId, transfer->file.data());
 
-        if (ok)
-            connection2()->getUpdatesManager()->sendUpdateUploadedResponce(updateId, qnCommon->moduleGUID(), -1,
-                                                                           this, [this](int reqID, ec2::ErrorCode errorCode) {});
+        sendReply(updateId, ok ? ec2::AbstractUpdatesManager::Finished : ec2::AbstractUpdatesManager::Failed);
 
+        m_transfers.remove(updateId);
         delete transfer;
         return ok;
     }
@@ -256,38 +270,21 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
 }
 
 
-QnServerUpdateTool::TransferInfo::TransferInfo() : length(-1) {}
+QnServerUpdateTool::TransferInfo::TransferInfo() : length(-1), replyTime(0) {}
 
 QnServerUpdateTool::TransferInfo::~TransferInfo() {}
 
-void QnServerUpdateTool::TransferInfo::addChunk(qint64 start, qint64 end) {
-    int i = 0;
-    for ( ; i < chunks.size() && chunks[i].start <= start; i++) {}
-
-    if (i > 0)
-        i--;
-
-    if (i < chunks.size()) {
-        Chunk *chunk = &(chunks[i]);
-
-        if (start == chunk->start)
-            chunk->end = qMax(chunk->end, end);
-        else if (start == chunk->end)
-            chunk->end = end;
-        else if (!(start >= chunk->start && end <= chunk->end))
-            chunks.insert(++i, Chunk(start, end));
-    } else {
-        chunks.append(Chunk(start, end));
-    }
-
-    if (i < chunks.size() - 1) {
-        if (chunks[i].end >= chunks[i + 1].start) {
-            chunks[i].end = chunks[i + 1].end;
-            chunks.removeAt(i + 1);
-        }
-    }
+void QnServerUpdateTool::TransferInfo::addChunk(qint64 offset, int length) {
+    chunks[offset] = length;
 }
 
 bool QnServerUpdateTool::TransferInfo::isComplete() const {
-    return length != -1 && chunks.size() == 1 && chunks.first().start == 0 && chunks.first().end == length;
+    if (length == -1)
+        return false;
+
+    if (chunks.size() == 1)
+        return chunks.firstKey() == 0 && chunks.first() == length;
+
+    int chunkCount = (length + chunks.first() - 1) / chunks.first();
+    return chunks.size() == chunkCount;
 }

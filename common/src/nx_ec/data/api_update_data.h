@@ -15,9 +15,9 @@ struct ApiUpdateUploadData : public ApiData {
 struct ApiUpdateUploadResponceData : public ApiIdData {
 public:
     QString updateId;
-    qint64 offset;
+    int chunks;
 };
-#define ApiUpdateUploadResponceData_Fields ApiIdData_Fields (updateId)(offset)
+#define ApiUpdateUploadResponceData_Fields ApiIdData_Fields (updateId)(chunks)
 
 }
 

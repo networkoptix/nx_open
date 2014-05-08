@@ -21,7 +21,7 @@ public:
 
 protected:
     virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const PeerList &peers, impl::SimpleHandlerPtr handler) override;
-    virtual int sendUpdateUploadedResponce(const QString &updateId, const QnId &peerId, qint64 offset, impl::SimpleHandlerPtr handler) override;
+    virtual int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) override;
     virtual int installUpdate(const QString &updateId, const PeerList &peers, impl::SimpleHandlerPtr handler) override;
 
 private:
@@ -30,7 +30,7 @@ private:
     QHash<QnAbstractTransaction::ID, QString> m_requestedUpdateIds;
 
     QnTransaction<ApiUpdateUploadData> prepareTransaction(const QString &updateId, const QByteArray &data, qint64 offset) const;
-    QnTransaction<ApiUpdateUploadResponceData> prepareTransaction(const QString &updateId, const QnId &peerId, qint64 offset) const;
+    QnTransaction<ApiUpdateUploadResponceData> prepareTransaction(const QString &updateId, const QnId &peerId, int chunks) const;
     QnTransaction<ApiUpdateInstallData> prepareTransaction(const QString &updateId) const;
 
     void at_transactionProcessed(const QnAbstractTransaction &transaction);

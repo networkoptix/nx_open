@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
+#include <QtCore/QMap>
 #include <QtCore/QSet>
 
 #include <utils/common/system_information.h>
@@ -22,35 +23,30 @@ public:
     static QnServerUpdateTool *instance();
 
     bool addUpdateFile(const QString &updateId, const QByteArray &data);
-
     bool addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset);
-
     bool installUpdate(const QString &updateId);
 
 protected:
     explicit QnServerUpdateTool();
 
+private:
     bool processUpdate(const QString &updateId, QIODevice *ioDevice);
+    void sendReply(const QString &updateId, int code = false);
 
 private:
     static QnServerUpdateTool *m_instance;
 
-    struct Chunk {
-        qint64 start;
-        qint64 end;
-
-        Chunk(qint64 start, qint64 end) : start(start), end(end) {}
-    };
-
     struct TransferInfo {
         QScopedPointer<QFile> file;
+
         qint64 length;
-        QList<Chunk> chunks;
+        QMap<qint64, int> chunks;
+        qint64 replyTime;
 
         TransferInfo();
         ~TransferInfo();
 
-        void addChunk(qint64 start, qint64 end);
+        void addChunk(qint64 offset, int length);
         bool isComplete() const;
     };
 

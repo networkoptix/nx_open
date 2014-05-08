@@ -32,9 +32,9 @@ int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(const QString &
 }
 
 template<class QueryProcessorType>
-int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadedResponce(const QString &updateId, const QnId &peerId, qint64 offset, impl::SimpleHandlerPtr handler) {
+int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(updateId, peerId, offset);
+    auto transaction = prepareTransaction(updateId, peerId, chunks);
 
     using namespace std::placeholders;
     m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
@@ -64,11 +64,11 @@ QnTransaction<ApiUpdateUploadData> QnUpdatesManager<QueryProcessorType>::prepare
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiUpdateUploadResponceData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QnId &peerId, qint64 offset) const {
+QnTransaction<ApiUpdateUploadResponceData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QnId &peerId, int chunks) const {
     QnTransaction<ApiUpdateUploadResponceData> transaction(ApiCommand::uploadUpdateResponce, false);
     transaction.params.id = peerId;
     transaction.params.updateId = updateId;
-    transaction.params.offset = offset;
+    transaction.params.chunks = chunks;
     return transaction;
 }
 
@@ -88,7 +88,7 @@ void QnUpdatesManager<QueryProcessorType>::triggerNotification(const QnTransacti
 template<class QueryProcessorType>
 void QnUpdatesManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiUpdateUploadResponceData> &transaction) {
     assert(transaction.command == ApiCommand::uploadUpdateResponce);
-    emit updateChunkUploaded(transaction.params.updateId, transaction.params.id, transaction.params.offset);
+    emit updateUploadProgress(transaction.params.updateId, transaction.params.id, transaction.params.chunks);
 }
 
 template<class QueryProcessorType>

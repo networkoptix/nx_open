@@ -7,7 +7,7 @@
 
 namespace {
     const int chunkSize = 1024 * 1024;
-    const int roundDelay = 500;
+    const int chunkDelay = 10; // short delay between sendUpdateChunk commands
 
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
@@ -16,9 +16,21 @@ namespace {
 
 QnUpdateUploader::QnUpdateUploader(QObject *parent) :
     QObject(parent),
-    m_pause(false)
+    m_chunkSize(chunkSize)
 {
-    m_chunkSize = chunkSize;
+    connect(connection2()->getUpdatesManager().get(),   &ec2::AbstractUpdatesManager::updateUploadProgress,   this,   &QnUpdateUploader::at_updateManager_updateUploadProgress);
+}
+
+QString QnUpdateUploader::updateId() const {
+    return m_updateId;
+}
+
+QSet<QnId> QnUpdateUploader::peers() const {
+    return m_peers;
+}
+
+void QnUpdateUploader::cancel() {
+    cleanUp();
 }
 
 bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &fileName, const QSet<QnId> &peers) {
@@ -33,131 +45,29 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
 
     m_updateId = updateId;
     m_peers = peers;
-    m_size = m_updateFile->size();
+    m_chunkCount = (m_updateFile->size() + m_chunkSize - 1) / m_chunkSize;
 
-    // now split file to chunks and start transfer
-    m_chunkCount = (m_size + m_chunkSize - 1) / m_chunkSize;
-    for (int i = 0; i < m_chunkCount; i++) {
-        ChunkData chunk;
-        chunk.index = i;
-        chunk.peers = peers;
-        m_chunks.append(chunk);
-    }
+    m_progressById.clear();
+    foreach (const QnId &peerId, peers)
+        m_progressById[peerId] = 0;
 
-    foreach (const QnId &id, peers)
-        m_leftChunksById[id] = m_chunkCount;
-    m_leftChunks = m_chunkCount * m_peers.size();
-
-    m_currentIndex = 0;
-    m_pendingFinalizations = peers;
-
-    requestSendNextChunk();
-
+    sendNextChunk();
     return true;
 }
 
-void QnUpdateUploader::markChunkUploaded(const QnId &peerId, qint64 offset) {
-    if (offset == -1) {
-        m_pendingFinalizations.remove(peerId);
-
-        if (m_pendingFinalizations.isEmpty()) {
-            cleanUp();
-            emit finished();
-        }
-        return;
-    }
-
-    int index = offset / m_chunkSize;
-    for (int i = 0; i < m_chunks.size(); i++) {
-        if (m_chunks[i].index == index) {
-            m_chunks[i].peers.remove(peerId);
-
-            int &left = m_leftChunksById[peerId];
-            if (left > 0)
-                left--;
-
-            if (m_leftChunks > 0)
-                --m_leftChunks;
-
-            emit peerProgressChanged(peerId, 100 - (100 * left / m_chunkCount));
-            emit progressChanged(100 - (100 * m_leftChunks / (m_peers.size() * m_chunkCount)));
-
-            if (left == 0)
-                finalize(peerId);
-
-            break;
-        }
-    }
-}
-
-QString QnUpdateUploader::uploadId() const {
-    return m_updateId;
-}
-
-QSet<QnId> QnUpdateUploader::peers() const {
-    return m_peers;
-}
-
-void QnUpdateUploader::cancel() {
-    cleanUp();
-}
-
 void QnUpdateUploader::sendNextChunk() {
-    ChunkData *chunk = 0;
-    for (;;) {
-        if (m_currentIndex >= m_chunks.size()) {
-            if (m_chunks.isEmpty()) {
-                m_updateFile->close();
-                m_updateFile.reset();
-                return;
-            } else {
-                m_currentIndex = 0;
-            }
-        }
-
-        chunk = &(m_chunks[m_currentIndex]);
-        if (chunk->peers.isEmpty())
-            m_chunks.removeAt(m_currentIndex);
-        else
-            break;
-    }
-
-    qint64 offset = chunk->index * m_chunkSize;
-    m_updateFile->seek(offset);
+    qint64 offset = m_updateFile->pos();
     QByteArray data = m_updateFile->read(m_chunkSize);
 
-    connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, data, offset, chunk->peers,
+    connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, data, offset, m_peers,
                                                                this, &QnUpdateUploader::chunkUploaded);
 
-    m_currentIndex++;
-    if (m_currentIndex == m_chunks.size())
-        pauseSending();
-}
+    if (data.size() > 0 && m_updateFile->atEnd()) {
+        // send tailing request just after the last chunk
 
-void QnUpdateUploader::requestSendNextChunk() {
-    if (m_pause || !m_updateFile)
-        return;
-
-    sendNextChunk();
-}
-
-void QnUpdateUploader::finalize(const QnId &id) {
-    if (!id.isNull() && !m_pendingFinalizations.contains(id))
-        return;
-
-    connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, QByteArray(), m_size,
-                                                               id.isNull() ? m_pendingFinalizations : (ec2::PeerList() << id),
-                                                               this, [this](int, ec2::ErrorCode){});
-}
-
-void QnUpdateUploader::continueSending() {
-    m_pause = false;
-    requestSendNextChunk();
-}
-
-void QnUpdateUploader::pauseSending() {
-    m_pause = true;
-    QTimer::singleShot(roundDelay, this, SLOT(continueSending()));
+        connection2()->getUpdatesManager()->sendUpdatePackageChunk(m_updateId, QByteArray(), m_updateFile->size(), m_peers,
+                                                                   this, &QnUpdateUploader::chunkUploaded);
+    }
 }
 
 void QnUpdateUploader::chunkUploaded(int reqId, ec2::ErrorCode errorCode) {
@@ -169,11 +79,47 @@ void QnUpdateUploader::chunkUploaded(int reqId, ec2::ErrorCode errorCode) {
         return;
     }
 
-    requestSendNextChunk();
+    if (!m_updateFile->atEnd())
+        QTimer::singleShot(chunkDelay, this, SLOT(sendNextChunk()));
+}
+
+void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &updateId, const QnId &peerId, int chunks) {
+    if (updateId != m_updateId)
+        return;
+
+    auto it = m_progressById.find(peerId);
+    if (it == m_progressById.end()) // it means we have already done upload for this peer
+        return;
+
+    int progress = 0;
+
+    if (chunks < 0) {
+        m_progressById.erase(it);
+
+        if (chunks == ec2::AbstractUpdatesManager::Failed) {
+            emit failed();
+            cleanUp();
+        } else {
+            progress = 100;
+        }
+    } else {
+        *it = progress = qMax(*it, chunks * 100 / m_chunkCount);
+    }
+
+    emit peerProgressChanged(peerId, progress);
+
+    qint64 wholeProgress = (m_peers.size() - m_progressById.size()) * 100;
+    foreach (int progress, m_progressById)
+        wholeProgress += progress;
+    emit progressChanged(wholeProgress / m_peers.size());
+
+    if (m_progressById.isEmpty()) {
+        emit finished();
+        cleanUp();
+    }
 }
 
 void QnUpdateUploader::cleanUp() {
-    m_chunks.clear();
     m_updateFile.reset();
     m_updateId.clear();
 }
