@@ -87,6 +87,10 @@ public:
     */
     qint64 duration() const;
     size_t sizeInBytes() const;
+    /*!
+        \return -1, if bitrate unknown
+    */
+    int getMaxBitrate() const;
 
     //!Returns packet with timestamp == \a desiredTimestamp or packet with closest (from the left) timestamp
     /*!

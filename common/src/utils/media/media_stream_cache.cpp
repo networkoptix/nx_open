@@ -13,6 +13,8 @@
 
 using namespace std;
 
+static const int USEC_PER_SEC = 1000*1000;
+
 MediaStreamCache::SequentialReadContext::SequentialReadContext(
     MediaStreamCache* cache,
     quint64 startTimestamp )
@@ -183,6 +185,8 @@ quint64 MediaStreamCache::currentTimestamp() const
 qint64 MediaStreamCache::duration() const
 {
     QMutexLocker lk( &m_mutex );
+    if( m_packetsByTimestamp.empty() )
+        return 0;
     return m_packetsByTimestamp.rbegin()->first - m_packetsByTimestamp.begin()->first;
 }
 
@@ -190,6 +194,15 @@ size_t MediaStreamCache::sizeInBytes() const
 {
     QMutexLocker lk( &m_mutex );
     return m_cacheSizeInBytes;
+}
+
+int MediaStreamCache::getMaxBitrate() const
+{
+    QMutexLocker lk( &m_mutex );
+    const qint64 durationUSec = m_packetsByTimestamp.empty() ? 0 : (m_packetsByTimestamp.rbegin()->first - m_packetsByTimestamp.begin()->first);
+    if( durationUSec == 0 )
+        return -1;
+    return ((qint64)m_cacheSizeInBytes) * USEC_PER_SEC / durationUSec * CHAR_BIT;
 }
 
 //!Returns packet with timestamp == \a timestamp or packet with closest (from the left) timestamp

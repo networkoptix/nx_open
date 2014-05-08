@@ -16,8 +16,9 @@
 
 #include "hls_playlist_manager.h"
 #include "../streaming_chunk.h"
-#include "../streaming_chunk_cache_key.h"
 
+
+class QnVideoCamera;
 
 namespace nx_hls
 {
@@ -63,7 +64,6 @@ namespace nx_hls
         QWaitCondition m_cond;
         bool m_switchToChunkedTransfer;
         bool m_useChunkedTransfer;
-        StreamingChunkCacheKey m_currentChunkKey;
 
         /*!
             \return false in case if error
@@ -83,23 +83,22 @@ namespace nx_hls
         bool prepareDataToSend();
         nx_http::StatusCode::Value getPlaylist(
             const nx_http::Request& request,
-            const QStringRef& uniqueResourceID,
             const QnSecurityCamResourcePtr& camResource,
+            QnVideoCamera* const videoCamera,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
         //!Generates variant playlist (containing references to other playlists providing different qualities)
         nx_http::StatusCode::Value getVariantPlaylist(
             HLSSession* session,
             const nx_http::Request& request,
-            const QStringRef& uniqueResourceID,
             const QnSecurityCamResourcePtr& camResource,
+            QnVideoCamera* const videoCamera,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
         //!Generates playlist with chunks inside
         nx_http::StatusCode::Value getChunkedPlaylist(
             HLSSession* const session,
             const nx_http::Request& request,
-            const QStringRef& uniqueResourceID,
             const QnSecurityCamResourcePtr& camResource,
             const std::multimap<QString, QString>& requestParams,
             nx_http::Response* const response );
@@ -114,8 +113,14 @@ namespace nx_hls
             const QString& sessionID,
             const std::multimap<QString, QString>& requestParams,
             const QnSecurityCamResourcePtr& camResource,
+            QnVideoCamera* const videoCamera,
             MediaQuality streamQuality,
             HLSSession** session );
+        int estimateStreamBitrate(
+            HLSSession* const session,
+            QnSecurityCamResourcePtr camResource,
+            QnVideoCamera* const videoCamera,
+            MediaQuality streamQuality );
 
     private slots:
         void chunkDataAvailable( StreamingChunkPtr chunk, quint64 newSizeBytes );

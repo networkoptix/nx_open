@@ -43,6 +43,8 @@ namespace nx_hls
         virtual size_t generateChunkList(
             std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
             bool* const endOfStreamReached ) const override;
+        //!Implementation of AbstractPlaylistManager::getMaxBitrate
+        virtual int getMaxBitrate() const override;
 
     private:
         MediaStreamCache* const m_mediaStreamCache;

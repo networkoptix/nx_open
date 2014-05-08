@@ -72,8 +72,8 @@ namespace nx_hls
             ++i )
         {
             str += "#EXT-X-STREAM-INF:";
-            if( playlists[i].bandwidth.present )
-                str += "BANDWIDTH="+QByteArray::number(playlists[i].bandwidth.value);
+            if( playlists[i].bandwidth )
+                str += "BANDWIDTH="+QByteArray::number(playlists[i].bandwidth.get());
             str += "\r\n";
             str += playlists[i].url.toString().toLatin1();
             str += "\r\n";

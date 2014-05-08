@@ -6,23 +6,33 @@
 
 #include <QMutexLocker>
 
+#include "camera/video_camera.h"
+
 
 namespace nx_hls
 {
     HLSSession::HLSSession(
         const QString& id,
         bool _isLive,
-        MediaQuality streamQuality )
+        MediaQuality streamQuality,
+        QnVideoCamera* const videoCamera )
     :
         m_id( id ),
         m_live( _isLive ),
-        m_streamQuality( streamQuality )
+        m_streamQuality( streamQuality ),
+        m_videoCamera( videoCamera )
     {
         //verifying m_playlistManagers will not take much memory
         static_assert(
             ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
             "MediaQuality enum suddenly contains too large values: consider changing HLSSession::m_playlistManagers type" );  
         m_playlistManagers.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
+        m_videoCamera->inUse( this );
+    }
+
+    HLSSession::~HLSSession()
+    {
+        m_videoCamera->notInUse( this );
     }
 
     const QString& HLSSession::id() const

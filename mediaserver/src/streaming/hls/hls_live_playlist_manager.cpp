@@ -48,6 +48,11 @@ namespace nx_hls
         return m_chunks.size();
     }
 
+    int HLSLivePlaylistManager::getMaxBitrate() const
+    {
+        return m_mediaStreamCache->getMaxBitrate();
+    }
+
     //!Implementation of AbstractMediaCacheEventReceiver::onKeyFrame
     void HLSLivePlaylistManager::onKeyFrame( quint64 currentPacketTimestampUSec )
     {

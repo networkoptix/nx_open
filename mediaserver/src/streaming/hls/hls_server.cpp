@@ -44,6 +44,9 @@ namespace nx_hls
     static const quint64 MS_IN_SEC = 1000;
     static const quint64 USEC_IN_MSEC = 1000;
     static const quint64 USEC_IN_SEC = MS_IN_SEC * USEC_IN_MSEC;
+    static const int COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO = 5;
+    static const int DEFAULT_PRIMARY_STREAM_BITRATE = 4*1024*1024;
+    static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
 
     QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*owner*/ )
     :
@@ -64,7 +67,7 @@ namespace nx_hls
         {
             //disconnecting and waiting for already-emmitted signals from m_currentChunk to be delivered and processed
             m_currentChunk->disconnectAndJoin( this );
-            StreamingChunkCache::instance()->putBackUsedItem( m_currentChunkKey, m_currentChunk );
+            StreamingChunkCache::instance()->putBackUsedItem( m_currentChunk->params(), m_currentChunk );
             m_currentChunk.reset();
         }
 
@@ -265,7 +268,22 @@ namespace nx_hls
             return nx_http::StatusCode::notFound;
         }
 
-        //TODO/HLS: #ak check resource stream type. Only h.264 is OK for HLS
+        //checking resource stream type. Only h.264 is OK for HLS
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera( camResource );
+        if( !camera )
+        {
+            NX_LOG( QString::fromLatin1("Error. HLS request to resource %1 which is not camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
+            return nx_http::StatusCode::forbidden;
+        }
+
+        QnConstCompressedVideoDataPtr lastVideoFrame = camera->getLastVideoFrame( true );
+        if( lastVideoFrame && (lastVideoFrame->compressionType != CODEC_ID_H264) && (lastVideoFrame->compressionType != CODEC_ID_NONE) )
+        {
+            //video is not in h.264 format
+            NX_LOG( QString::fromLatin1("Error. HLS request to resource %1 with codec %2").
+                arg(camResource->getUniqueId()).arg(codecIDToString(lastVideoFrame->compressionType)), cl_logWARNING );
+            return nx_http::StatusCode::forbidden;
+        }
 
         //parsing request parameters
         const QList<QPair<QString, QString> >& queryItemsList = QUrlQuery(request.requestLine.url.query()).queryItems();
@@ -295,8 +313,8 @@ namespace nx_hls
             if( extension.compare(QLatin1String("m3u")) == 0 || extension.compare(QLatin1String("m3u8")) == 0 )
                 return getPlaylist(
                     request,
-                    shortFileName,
                     camResource,
+                    camera,
                     requestParams,
                     response );
         }
@@ -350,8 +368,8 @@ namespace nx_hls
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getPlaylist(
         const nx_http::Request& request,
-        const QStringRef& uniqueResourceID,
         const QnSecurityCamResourcePtr& camResource,
+        QnVideoCamera* const videoCamera,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
     {
@@ -400,6 +418,7 @@ namespace nx_hls
                 sessionID,
                 requestParams,
                 camResource,
+                videoCamera,
                 streamQuality,
                 &session );
             if( result != nx_http::StatusCode::ok )
@@ -408,16 +427,16 @@ namespace nx_hls
         }
 
         if( chunkedParamIter == requestParams.end() )
-            return getVariantPlaylist( session, request, uniqueResourceID, camResource, requestParams, response );
+            return getVariantPlaylist( session, request, camResource, videoCamera, requestParams, response );
         else
-            return getChunkedPlaylist( session, request, uniqueResourceID, camResource, requestParams, response );
+            return getChunkedPlaylist( session, request, camResource, requestParams, response );
     }
 
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getVariantPlaylist(
         HLSSession* session,
         const nx_http::Request& request,
-        const QStringRef& /*uniqueResourceID*/,
         const QnSecurityCamResourcePtr& camResource,
+        QnVideoCamera* const videoCamera,
         const std::multimap<QString, QString>& /*requestParams*/,
         nx_http::Response* const response )
     {
@@ -456,7 +475,11 @@ namespace nx_hls
 
         if( session->streamQuality() == MEDIA_Quality_High || session->streamQuality() == MEDIA_Quality_Auto )
         {
-            playlistData.bandwidth = 1280000;   //TODO/HLS: #set add real bitrate
+            playlistData.bandwidth = estimateStreamBitrate(
+                session,
+                camResource,
+                videoCamera,
+                MEDIA_Quality_High );
             playlistDataQuery.addQueryItem( StreamingParams::HI_QUALITY_PARAM_NAME, QString() );
             playlistData.url.setQuery(playlistDataQuery);
             playlist.playlists.push_back(playlistData);
@@ -464,8 +487,11 @@ namespace nx_hls
 
         if( (session->streamQuality() == MEDIA_Quality_Low || session->streamQuality() == MEDIA_Quality_Auto) && camResource->hasDualStreaming() )
         {
-            //adding low quality playlist url (if there is low quality stream for resource)
-            playlistData.bandwidth = 512000;   //TODO/HLS: #ak set real bitrate
+            playlistData.bandwidth = estimateStreamBitrate(
+                session,
+                camResource,
+                videoCamera,
+                MEDIA_Quality_Low );
             playlistDataQuery.removeQueryItem( StreamingParams::HI_QUALITY_PARAM_NAME );
             playlistDataQuery.addQueryItem( StreamingParams::LO_QUALITY_PARAM_NAME, QString() );
             playlistData.url.setQuery(playlistDataQuery);
@@ -485,7 +511,6 @@ namespace nx_hls
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getChunkedPlaylist(
         HLSSession* const session,
         const nx_http::Request& request,
-        const QStringRef& /*uniqueResourceID*/,
         const QnSecurityCamResourcePtr& camResource,
         const std::multimap<QString, QString>& requestParams,
         nx_http::Response* const response )
@@ -623,7 +648,7 @@ namespace nx_hls
             }
         }
 
-        m_currentChunkKey = StreamingChunkCacheKey(
+        StreamingChunkCacheKey currentChunkKey(
             uniqueResourceID.toString(),
             channelIter != requestParams.end()
                 ? channelIter->second.toInt()
@@ -638,7 +663,7 @@ namespace nx_hls
 
         //retrieving streaming chunk
         StreamingChunkPtr chunk;
-        if( !StreamingChunkCache::instance()->takeForUse( m_currentChunkKey, &chunk ) )
+        if( !StreamingChunkCache::instance()->takeForUse( currentChunkKey, &chunk ) )
         {
             NX_LOG( QString::fromLatin1("Could not get chunk %1 of resource %2 requested by %3").
                 arg(request.requestLine.url.query()).arg(uniqueResourceID.toString()).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
@@ -650,7 +675,7 @@ namespace nx_hls
         {
             //disconnecting and waiting for already-emmitted signals from m_currentChunk to be delivered and processed
             m_currentChunk->disconnectAndJoin( this );
-            StreamingChunkCache::instance()->putBackUsedItem( m_currentChunkKey, m_currentChunk );
+            StreamingChunkCache::instance()->putBackUsedItem( currentChunkKey, m_currentChunk );
             m_currentChunk.reset();
         }
 
@@ -675,6 +700,7 @@ namespace nx_hls
         const QString& sessionID,
         const std::multimap<QString, QString>& requestParams,
         const QnSecurityCamResourcePtr& camResource,
+        QnVideoCamera* const videoCamera,
         MediaQuality streamQuality,
         HLSSession** session )
     {
@@ -690,34 +716,27 @@ namespace nx_hls
             new HLSSession(
                 sessionID,
                 startDatetimeIter == requestParams.end(),   //if no start date specified, providing live stream
-                streamQuality ) );
+                streamQuality,
+                videoCamera ) );
         if( newHlsSession->isLive() )
         {
             //LIVE session
-            QnVideoCamera* camera = qnCameraPool->getVideoCamera( camResource );
-            if( !camera )
-            {
-                NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 which is not camera").arg(camResource->getUniqueId()), cl_logWARNING );
-                return nx_http::StatusCode::forbidden;
-            }
-
             //starting live caching, if it is not started
             for( const MediaQuality quality: requiredQualities )
             {
-                if( !camera->ensureLiveCacheStarted(quality) )
+                if( !videoCamera->ensureLiveCacheStarted(quality) )
                 {
                     NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 with no live cache").arg(camResource->getUniqueId()), cl_logDEBUG1 );
                     return nx_http::StatusCode::internalServerError;
                 }
-                assert( camera->hlsLivePlaylistManager(quality) );
-                newHlsSession->setPlaylistManager( quality, camera->hlsLivePlaylistManager(quality) );
+                assert( videoCamera->hlsLivePlaylistManager(quality) );
+                newHlsSession->setPlaylistManager( quality, videoCamera->hlsLivePlaylistManager(quality) );
             }
         }
         else
         {
             //converting startDatetime to timestamp
             const quint64 startTimestamp = QDateTime::fromString(startDatetimeIter->second, Qt::ISODate).toMSecsSinceEpoch() * USEC_IN_MSEC;
-
             for( const MediaQuality quality: requiredQualities )
             {
                 //generating sliding playlist, holding not more than CHUNK_COUNT_IN_ARCHIVE_PLAYLIST archive chunks
@@ -741,6 +760,27 @@ namespace nx_hls
 
         *session = newHlsSession.release();
         return nx_http::StatusCode::ok;
+    }
+
+    int QnHttpLiveStreamingProcessor::estimateStreamBitrate(
+        HLSSession* const session,
+        QnSecurityCamResourcePtr camResource,
+        QnVideoCamera* const videoCamera,
+        MediaQuality streamQuality )
+    {
+        int bandwidth = session->playlistManager(streamQuality)->getMaxBitrate();
+        if( (bandwidth == -1) && videoCamera->liveCache(streamQuality) )
+            bandwidth = videoCamera->liveCache(streamQuality)->getMaxBitrate();
+        if( bandwidth == -1 )
+        {
+            //estimating bitrate as we can
+            QnConstCompressedVideoDataPtr videoFrame = videoCamera->getLastVideoFrame( streamQuality == MEDIA_Quality_High );
+            if( videoFrame )
+                bandwidth = videoFrame->data.size() * CHAR_BIT / COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO * camResource->getMaxFps();
+        }
+        if( bandwidth == -1 )
+            bandwidth = DEFAULT_PRIMARY_STREAM_BITRATE;
+        return bandwidth;
     }
 
     void QnHttpLiveStreamingProcessor::chunkDataAvailable( StreamingChunkPtr /*chunk*/, quint64 /*newSizeBytes*/ )

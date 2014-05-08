@@ -91,6 +91,12 @@ namespace nx_hls
         return m_chunks.size();
     }
 
+    int ArchivePlaylistManager::getMaxBitrate() const
+    {
+        //TODO/HLS: #ak
+        return -1;
+    }
+
     void ArchivePlaylistManager::generateChunksIfNeeded()
     {
         if( !m_initialPlaylistCreated )

@@ -19,6 +19,8 @@
 #include "hls_playlist_manager.h"
 
 
+class QnVideoCamera;
+
 namespace nx_hls
 {
     class AbstractPlaylistManager;
@@ -32,7 +34,9 @@ namespace nx_hls
         HLSSession(
             const QString& id,
             bool _isLive,
-            MediaQuality streamQuality );
+            MediaQuality streamQuality,
+            QnVideoCamera* const videoCamera );
+        ~HLSSession();
 
         const QString& id() const;
         bool isLive() const;
@@ -45,6 +49,7 @@ namespace nx_hls
         QString m_id;
         bool m_live;
         MediaQuality m_streamQuality;
+        QnVideoCamera* const m_videoCamera;
         std::vector<QSharedPointer<AbstractPlaylistManager> > m_playlistManagers;
     };
 
