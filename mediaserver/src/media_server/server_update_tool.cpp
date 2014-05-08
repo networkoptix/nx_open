@@ -108,6 +108,26 @@ namespace {
         return true;
     }
 
+    bool removeDirRecursively(const QString &path, bool removeRoot = false) {
+        QDir dir(path);
+        bool result = true;
+
+        foreach (const QFileInfo &info, dir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot)) {
+            if (info.isDir())
+                result = removeDirRecursively(info.absoluteFilePath(), true);
+            else
+                result = QFile::remove(info.absoluteFilePath());
+
+            if (!result)
+                return false;
+        }
+
+        if (result && removeRoot)
+            result = dir.rmdir(path);
+
+        return result;
+    }
+
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
     }
@@ -116,7 +136,16 @@ namespace {
 
 QnServerUpdateTool *QnServerUpdateTool::m_instance = NULL;
 
-QnServerUpdateTool::QnServerUpdateTool() {}
+QnServerUpdateTool::QnServerUpdateTool() : m_length(-1), m_replyTime(0) {}
+
+QnServerUpdateTool::~QnServerUpdateTool() {}
+
+QnServerUpdateTool *QnServerUpdateTool::instance() {
+    if (!m_instance)
+        m_instance = new QnServerUpdateTool();
+
+    return m_instance;
+}
 
 bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice) {
     QuaZip zip(ioDevice);
@@ -139,31 +168,21 @@ bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDev
     return ok;
 }
 
-void QnServerUpdateTool::sendReply(const QString &updateId, int code) {
-    TransferInfo *transfer = m_transfers[updateId];
-    if (!transfer)
-        return;
-
+void QnServerUpdateTool::sendReply(int code) {
     if (code == 0) {
         qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        if (currentTime - transfer->replyTime < replyDelay)
+        if (currentTime - m_replyTime < replyDelay)
             return;
 
-        transfer->replyTime = currentTime;
+        m_replyTime = currentTime;
     }
 
-    connection2()->getUpdatesManager()->sendUpdateUploadResponce(updateId, qnCommon->moduleGUID(), code == 0 ? transfer->chunks.size() : code,
-                                                                 this, [this](int reqID, ec2::ErrorCode errorCode) {});
-}
-
-QnServerUpdateTool *QnServerUpdateTool::instance() {
-    if (!m_instance)
-        m_instance = new QnServerUpdateTool();
-
-    return m_instance;
+    connection2()->getUpdatesManager()->sendUpdateUploadResponce(m_updateId, qnCommon->moduleGUID(), code == 0 ? m_chunks.size() : code,
+                                                                 this, [this](int, ec2::ErrorCode) {});
 }
 
 bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray &data) {
+    clearUpdatesLocation();
     QBuffer buffer(const_cast<QByteArray*>(&data)); // we're goint to read data, so const_cast is ok here
     return processUpdate(updateId, &buffer);
 }
@@ -172,37 +191,40 @@ bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
     if (m_bannedUpdates.contains(updateId))
         return false;
 
-    TransferInfo *transfer = m_transfers[updateId];
-    if (!transfer) {
-        transfer = new TransferInfo;
-        transfer->file.reset(new QFile(getUpdateFilePath(updateId)));
-        if (!transfer->file->open(QFile::WriteOnly)) {
-            cl_log.log("Could not save update to ", transfer->file->fileName(), cl_logERROR);
+    if (m_updateId != updateId) {
+        m_chunks.clear();
+        m_file.reset();
+        clearUpdatesLocation();
+        m_updateId = updateId;
+    }
+
+    if (!m_file) {
+        m_file.reset(new QFile(getUpdateFilePath(updateId)));
+        if (!m_file->open(QFile::WriteOnly)) {
+            cl_log.log("Could not save update to ", m_file->fileName(), cl_logERROR);
             m_bannedUpdates.insert(updateId);
-            delete transfer;
             return false;
         }
-        m_transfers[updateId] = transfer;
     }
 
     if (data.isEmpty()) { // it means we're just got the size of the file
-        transfer->length = offset;
+        m_length = offset;
     } else {
-        transfer->file->seek(offset);
-        transfer->file->write(data);
-        transfer->chunks.insert(offset, data.size());
-        sendReply(updateId);
+        m_file->seek(offset);
+        m_file->write(data);
+        m_chunks.insert(offset, data.size());
+        sendReply();
     }
 
-    if (transfer->isComplete()) {
-        transfer->file->close();
+    if (isComplete()) {
+        m_file->close();
 
-        bool ok = processUpdate(updateId, transfer->file.data());
+        bool ok = processUpdate(updateId, m_file.data());
 
-        sendReply(updateId, ok ? ec2::AbstractUpdatesManager::Finished : ec2::AbstractUpdatesManager::Failed);
+        m_file.reset();
 
-        m_transfers.remove(updateId);
-        delete transfer;
+        sendReply(ok ? ec2::AbstractUpdatesManager::Finished : ec2::AbstractUpdatesManager::Failed);
+
         return ok;
     }
 
@@ -264,22 +286,21 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     return true;
 }
 
-
-QnServerUpdateTool::TransferInfo::TransferInfo() : length(-1), replyTime(0) {}
-
-QnServerUpdateTool::TransferInfo::~TransferInfo() {}
-
-void QnServerUpdateTool::TransferInfo::addChunk(qint64 offset, int length) {
-    chunks[offset] = length;
+void QnServerUpdateTool::addChunk(qint64 offset, int length) {
+    m_chunks[offset] = length;
 }
 
-bool QnServerUpdateTool::TransferInfo::isComplete() const {
-    if (length == -1)
+bool QnServerUpdateTool::isComplete() const {
+    if (m_length == -1)
         return false;
 
-    if (chunks.size() == 1)
-        return chunks.firstKey() == 0 && chunks.first() == length;
+    if (m_chunks.size() == 1)
+        return m_chunks.firstKey() == 0 && m_chunks.first() == m_length;
 
-    int chunkCount = (length + chunks.first() - 1) / chunks.first();
-    return chunks.size() == chunkCount;
+    int chunkCount = (m_length + m_chunks.first() - 1) / m_chunks.first();
+    return m_chunks.size() == chunkCount;
+}
+
+void QnServerUpdateTool::clearUpdatesLocation() {
+    removeDirRecursively(getUpdatesDir().absolutePath());
 }

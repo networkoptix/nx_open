@@ -26,31 +26,28 @@ public:
     bool addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset);
     bool installUpdate(const QString &updateId);
 
+    ~QnServerUpdateTool();
+
 protected:
     explicit QnServerUpdateTool();
 
 private:
     bool processUpdate(const QString &updateId, QIODevice *ioDevice);
-    void sendReply(const QString &updateId, int code = false);
+    void sendReply(int code = false);
+    void addChunk(qint64 offset, int m_length);
+    bool isComplete() const;
+    void clearUpdatesLocation();
 
 private:
     static QnServerUpdateTool *m_instance;
 
-    struct TransferInfo {
-        QScopedPointer<QFile> file;
+    QString m_updateId;
+    QScopedPointer<QFile> m_file;
 
-        qint64 length;
-        QMap<qint64, int> chunks;
-        qint64 replyTime;
+    qint64 m_length;
+    QMap<qint64, int> m_chunks;
+    qint64 m_replyTime;
 
-        TransferInfo();
-        ~TransferInfo();
-
-        void addChunk(qint64 offset, int length);
-        bool isComplete() const;
-    };
-
-    QHash<QString, TransferInfo*> m_transfers;
     QSet<QString> m_bannedUpdates;
 };
 
