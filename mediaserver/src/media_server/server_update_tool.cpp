@@ -9,6 +9,7 @@
 #include <quazip/quazipfile.h>
 
 #include <media_server/settings.h>
+#include <media_server/serverutil.h>
 #include <utils/common/log.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
@@ -84,7 +85,7 @@ namespace {
     }
 
     bool initializeUpdateLog(const QString &targetVersion, QString *logFileName) {
-        QString logDir = MSSettings::roSettings()->value(lit("logDir")).toString();
+        QString logDir = MSSettings::roSettings()->value(lit("logDir"), getDataDirectory() + lit("/log/")).toString();
         if (logDir.isEmpty())
             return false;
 
