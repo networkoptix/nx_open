@@ -699,15 +699,23 @@ ErrorCode QnDbManager::updateStorages(const ApiMediaServerData& data)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 internalId)
+ErrorCode QnDbManager::removeCameraSchedule(qint32 internalId)
 {
-	QSqlQuery delQuery(m_sdb);
-	delQuery.prepare("DELETE FROM vms_scheduletask where source_id = ?");
-	delQuery.addBindValue(internalId);
-	if (!delQuery.exec()) {
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_scheduletask where source_id = ?");
+    delQuery.addBindValue(internalId);
+    if (!delQuery.exec()) {
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::failure;
     }
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 internalId)
+{
+	ErrorCode errCode = removeCameraSchedule(internalId);
+    if (errCode != ErrorCode::ok)
+        return errCode;
 
     QSqlQuery insQuery(m_sdb);
     //insQuery.prepare("INSERT INTO vms_scheduletask (source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES\
@@ -1184,6 +1192,10 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
     qint32 id = getResourceInternalId(guid);
 
     ErrorCode err = deleteAddParams(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = removeCameraSchedule(id);
     if (err != ErrorCode::ok)
         return err;
 

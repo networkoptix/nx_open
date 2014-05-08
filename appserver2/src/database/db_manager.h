@@ -193,6 +193,7 @@ namespace ec2
         ErrorCode saveCamera(const ApiCameraData& params);
         ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
         ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
+        ErrorCode removeCameraSchedule(qint32 internalId);
         ErrorCode removeCamera(const QnId& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
