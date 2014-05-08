@@ -90,6 +90,11 @@ void QnMediaServerUpdateTool::setUpdateResult(QnMediaServerUpdateTool::UpdateRes
     setState(Idle);
 }
 
+void QnMediaServerUpdateTool::finishUpdate(QnMediaServerUpdateTool::UpdateResult result) {
+    unlockMutex();
+    setUpdateResult(result);
+}
+
 void QnMediaServerUpdateTool::setPeerState(const QnId &peerId, QnMediaServerUpdateTool::PeerUpdateInformation::State state) {
     auto it = m_updateInformationById.find(peerId);
     if (it == m_updateInformationById.end())
@@ -337,6 +342,8 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
         break;
     }
 
+    unlockMutex();
+
     for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
         it->state = PeerUpdateInformation::UpdateCanceled;
 
@@ -360,7 +367,7 @@ void QnMediaServerUpdateTool::downloadNextUpdate() {
 
     m_downloadFile.reset(new QFile(updateFilePath(m_updateFiles[*it]->baseFileName)));
     if (!m_downloadFile->open(QFile::WriteOnly)) {
-        setUpdateResult(DownloadingFailed);
+        finishUpdate(DownloadingFailed);
         return;
     }
 
@@ -382,7 +389,7 @@ void QnMediaServerUpdateTool::at_downloadReply_downloadProgress(qint64 bytesRece
     QByteArray data = reply->readAll();
     if (data.size() != m_downloadFile->write(data)) {
         m_downloadFile->reset();
-        setUpdateResult(DownloadingFailed);
+        finishUpdate(DownloadingFailed);
         return;
     }
 
@@ -403,7 +410,7 @@ void QnMediaServerUpdateTool::at_downloadReply_finished() {
         return;
 
     if (reply->error() != QNetworkReply::NoError) {
-        setUpdateResult(DownloadingFailed);
+        finishUpdate(DownloadingFailed);
         return;
     }
 
@@ -416,7 +423,7 @@ void QnMediaServerUpdateTool::at_downloadReply_finished() {
 
     if (!ok) {
         m_downloadFile.reset();
-        setUpdateResult(DownloadingFailed);
+        finishUpdate(DownloadingFailed);
         return;
     }
 
@@ -438,7 +445,7 @@ void QnMediaServerUpdateTool::uploadUpdatesToServers() {
     m_pendingUploadPeers = QSet<QnId>::fromList(m_updateInformationById.keys());
     m_pendingUploads = m_idBySystemInformation.uniqueKeys();
 
-    uploadNextUpdate();
+    m_distributedMutex = ec2::QnDistributedMutexManager::instance()->getLock(mutexName);
 }
 
 void QnMediaServerUpdateTool::uploadNextUpdate() {
@@ -456,7 +463,7 @@ void QnMediaServerUpdateTool::uploadNextUpdate() {
         setPeerState(peerId, PeerUpdateInformation::UpdateUploading);
 
     if (!m_uploader->uploadUpdate(m_targetVersion.toString(), m_updateFiles[sysInfo]->fileName, QSet<QnId>::fromList(m_idBySystemInformation.values(sysInfo))))
-        setUpdateResult(UploadingFailed);
+        finishUpdate(UploadingFailed);
 }
 
 void QnMediaServerUpdateTool::at_uploader_finished() {
@@ -475,7 +482,7 @@ void QnMediaServerUpdateTool::at_uploader_finished() {
 void QnMediaServerUpdateTool::at_uploader_failed() {
     foreach (const QnId &peerId, m_uploader->peers()) {
         setPeerState(peerId, PeerUpdateInformation::UpdateFailed);
-        setUpdateResult(UploadingFailed);
+        finishUpdate(UploadingFailed);
     }
 }
 
@@ -498,23 +505,28 @@ void QnMediaServerUpdateTool::installUpdatesToServers() {
 
     setState(InstallingUpdate);
 
-    m_distributedMutex = ec2::QnDistributedMutexManager::instance()->getLock(mutexName);
-}
-
-void QnMediaServerUpdateTool::at_mutexLocked(const QByteArray &) {
     connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnMediaServerUpdateTool::at_resourceChanged);
 
     connection2()->getUpdatesManager()->installUpdate(m_targetVersion.toString(), m_pendingInstallations,
                                                       this, [this](int, ec2::ErrorCode){});
-    m_distributedMutex->unlock();
-    m_distributedMutex.clear();
 
     QTimer::singleShot(installationTimeout, this, SLOT(at_installationTimeout()));
 }
 
+void QnMediaServerUpdateTool::unlockMutex() {
+    if (m_distributedMutex) {
+        m_distributedMutex->unlock();
+        m_distributedMutex.clear();
+    }
+}
+
+void QnMediaServerUpdateTool::at_mutexLocked(const QByteArray &) {
+    uploadNextUpdate();
+}
+
 void QnMediaServerUpdateTool::at_mutexTimeout(const QByteArray &) {
     m_distributedMutex.clear();
-    setUpdateResult(InstallationFailed);
+    finishUpdate(LockFailed);
 }
 
 void QnMediaServerUpdateTool::at_resourceChanged(const QnResourcePtr &resource) {
@@ -536,7 +548,7 @@ void QnMediaServerUpdateTool::at_resourceChanged(const QnResourcePtr &resource) 
 
     if (m_pendingInstallations.isEmpty()) {
         disconnect(qnResPool, &QnResourcePool::resourceChanged, this, &QnMediaServerUpdateTool::at_resourceChanged);
-        setUpdateResult(UpdateSuccessful);
+        finishUpdate(UpdateSuccessful);
     }
 }
 

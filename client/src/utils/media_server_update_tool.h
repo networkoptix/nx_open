@@ -76,6 +76,7 @@ public:
     enum UpdateResult {
         UpdateSuccessful,
         Cancelled,
+        LockFailed,
         DownloadingFailed,
         UploadingFailed,
         InstallationFailed
@@ -139,11 +140,14 @@ private:
     void setState(State state);
     void setCheckResult(CheckResult result);
     void setUpdateResult(UpdateResult result);
+    void finishUpdate(UpdateResult result);
     void setPeerState(const QnId &peerId, PeerUpdateInformation::State state);
     void checkBuildOnline();
 
     void uploadUpdatesToServers();
     void installUpdatesToServers();
+
+    void unlockMutex();
 
 private:
     State m_state;
