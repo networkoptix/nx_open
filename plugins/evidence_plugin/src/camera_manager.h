@@ -7,6 +7,7 @@
 #define AXIS_CAMERA_MANAGER_H
 
 #include <functional>
+#include <map>
 #include <memory>
 #include <set>
 #include <vector>
@@ -17,6 +18,8 @@
 
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+
+#include "ptz_manager.h"
 
 
 class CameraPlugin;
@@ -68,6 +71,7 @@ public:
     virtual void getLastErrorString( char* errorString ) const override;
 
     const nxcip::CameraInfo& cameraInfo() const;
+    int apiPort() const;
     nxcip::CameraInfo& cameraInfo();
     const QAuthenticator& credentials() const;
     /*!
@@ -118,6 +122,10 @@ public:
         SyncHttpClient* const httpClient,
         const QByteArray& paramName,
         const QByteArray& paramValue );
+    static int doCameraRequest(
+        SyncHttpClient* const httpClient,
+        const QByteArray& requestStr,
+        std::multimap<QByteArray, QByteArray>* const responseParams = nullptr );
 
     int setResolution( int encoderNum, const nxcip::Resolution& resolution );
 
@@ -149,7 +157,8 @@ private:
     mutable std::vector<MediaEncoder*> m_encoders;
     bool m_audioEnabled;
     mutable bool m_relayIOInfoRead;
-    mutable std::auto_ptr<RelayIOManager> m_relayIOManager;
+    mutable std::unique_ptr<RelayIOManager> m_relayIOManager;
+    mutable std::unique_ptr<PtzManager> m_ptzManager;
     mutable unsigned int m_cameraCapabilities;
     //!set<pair<hi_stream_res, lo_stream_res> >
     std::set<ResolutionPair, std::greater<ResolutionPair> > m_supportedResolutions;
@@ -163,6 +172,8 @@ private:
     int m_rtspPort;
     QStringList m_currentResolutionCoded;
     std::vector<QByteArray> m_relayParamsStr;
+    QList<QByteArray> m_cameraParamList;
+    QList<QByteArray> m_paramOptions;
 
     int readCameraOptions();
     void parseResolutionList( const QByteArray& resListStr, int hiStreamMaxFps, int loStreamMaxFps );

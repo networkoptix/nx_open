@@ -65,8 +65,6 @@ private slots:
     void getPriv( const QNetworkRequest& request );
     void onReplyReadyRead();
     void onConnectionFinished( QNetworkReply* reply );
-    //!Reads reply message body to \a m_messageBody
-    void readWholeMessageBodyPriv();
 };
 
 #endif  //SYNC_HTTP_CLIENT_DELEGATE_H

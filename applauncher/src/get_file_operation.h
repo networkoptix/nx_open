@@ -46,6 +46,7 @@ namespace detail
             const QString& filePath,
             const QString& localDirPath,
             const QString& hashTypeName,
+            qint64 remoteFileSize,
             AbstractRDirSynchronizationEventHandler* _handler );
         virtual ~GetFileOperation();
 
@@ -71,7 +72,6 @@ namespace detail
             sFinished
         };
 
-        const QString m_filePath;
         nx_http::AsyncHttpClientPtr m_httpClient;
         State m_state;
         const QString m_localDirPath;
@@ -86,7 +86,7 @@ namespace detail
         bool m_responseReceivedCalled;
         std::shared_ptr<AbstractByteStreamFilter> m_fileDataProcessor;
         bool m_fileClosePending;
-        QString m_fileName;
+        QString m_filePath;
 
         void asyncStatDone( SystemError::ErrorCode errorCode, qint64 fileSize );
         //!Implementation of QnFile::AbstractWriteHandler::onAsyncWriteFinished

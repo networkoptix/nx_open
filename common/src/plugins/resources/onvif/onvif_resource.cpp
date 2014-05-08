@@ -44,6 +44,7 @@ const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
 QString QnPlOnvifResource::MEDIA_URL_PARAM_NAME = QLatin1String("MediaUrl");
 QString QnPlOnvifResource::ONVIF_URL_PARAM_NAME = QLatin1String("DeviceUrl");
 QString QnPlOnvifResource::MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
+QString QnPlOnvifResource::FORCED_AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("forcedIsAudioSupported");
 QString QnPlOnvifResource::AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("isAudioSupported");
 QString QnPlOnvifResource::DUAL_STREAMING_PARAM_NAME = QLatin1String("hasDualStreaming");
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;

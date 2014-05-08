@@ -26,6 +26,9 @@ public:
     virtual QString getUniqueId() const override;
 
     QString toSearchString() const override;
+    void forceEnableAudio();
+    void forceDisableAudio();
+    bool isForcedAudioSupported() const;
 
 public slots:
     void issueOccured();

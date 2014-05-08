@@ -215,10 +215,15 @@ void QnResourceSearchSynchronizer::at_model_rowsInserted(const QModelIndex &pare
     if(!m_update)
         return;
 
+    if (!parent.isValid())
+        return;
+
     QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
     for (int row = start; row <= end; ++row) {
         const QModelIndex index = parent.child(row, 0);
+        if (!index.model())
+            continue;
 
         if (index.model()->hasChildren(index))
             at_model_rowsInserted(index, 0, index.model()->rowCount(index) - 1);
@@ -235,10 +240,15 @@ void QnResourceSearchSynchronizer::at_model_rowsAboutToBeRemoved(const QModelInd
     if (!m_update)
         return;
 
+    if (!parent.isValid())
+        return;
+
     QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
     for (int row = start; row <= end; ++row) {
         const QModelIndex index = parent.child(row, 0);
+        if (!index.model())
+            continue;
 
         if (index.model()->hasChildren(index))
             at_model_rowsAboutToBeRemoved(index, 0, index.model()->rowCount(index) - 1);
