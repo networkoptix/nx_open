@@ -245,22 +245,16 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     QString currentDir = QDir::currentPath();
     QDir::setCurrent(updateDir.absolutePath());
 
-    QProcess process;
+    QStringList arguments;
 
     QString logFileName;
     if (initializeUpdateLog(updateId, &logFileName))
-        process.setStandardOutputFile(logFileName, QFile::Append);
+        arguments.append(logFileName);cat
     else
         cl_log.log("Could not create or open update log file.", cl_logWARNING);
 
-    process.start(updateDir.absoluteFilePath(executable));
-    process.waitForFinished(10 * 60 * 1000); // wait for ten minutes
-
-    // possibly we'll be killed by updater and wont get here
-
-    if (process.exitStatus() == QProcess::NormalExit && process.exitCode() == 0) {
-        cl_log.log("Update finished successfully but server has not been restarted", cl_logWARNING);
-        stopServer(0); // TODO: #dklychkov make other way to stop server
+    if (QProcess::startDetached(updateDir.absoluteFilePath(executable), arguments)) {
+        cl_log.log("Update has been started.", cl_logINFO);
     } else {
         cl_log.log("Update failed. See update log for details: ", logFileName, cl_logERROR);
     }
