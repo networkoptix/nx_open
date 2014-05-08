@@ -804,15 +804,15 @@ private:
 
 QnConstResourceAudioLayoutPtr QnDesktopDataProvider::getAudioLayout()
 {
-    if (!audioLayout)
-        audioLayout.reset(new QnDesktopAudioLayout() );
-    if (m_audioCodecCtx && audioLayout->channelCount() == 0)
+    if (!m_audioLayout)
+        m_audioLayout.reset(new QnDesktopAudioLayout() );
+    if (m_audioCodecCtx && m_audioLayout->channelCount() == 0)
     {
         QnResourceAudioLayout::AudioTrack track;
         track.codecContext = QnAbstractMediaContextPtr(new QnMediaContext(m_audioCodecCtx));
-        audioLayout->setAudioTrackInfo(track);
+        m_audioLayout->setAudioTrackInfo(track);
     }
-    return audioLayout;
+    return m_audioLayout;
 }
 
 qint64 QnDesktopDataProvider::currentTime() const

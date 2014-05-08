@@ -132,7 +132,7 @@ private:
     bool m_isInitialized;
 
     class QnDesktopAudioLayout;
-    std::shared_ptr<QnDesktopAudioLayout> audioLayout;
+    QSharedPointer<QnDesktopAudioLayout> m_audioLayout;
 
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,  DWORD_PTR dwParam1, DWORD_PTR dwParam2);
 };
