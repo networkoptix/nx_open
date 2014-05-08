@@ -154,6 +154,8 @@ private:
     QUrl m_onlineUpdateUrl;
     QString m_updateLocationPrefix;
 
+    QScopedPointer<QFile> m_downloadFile;
+
     QnSoftwareVersion m_targetVersion;
     bool m_targetMustBeNewer;
 

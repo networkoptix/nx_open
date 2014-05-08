@@ -358,16 +358,36 @@ void QnMediaServerUpdateTool::downloadNextUpdate() {
     foreach (const QnId &peerId, m_idBySystemInformation.values(*it))
         setPeerState(peerId, PeerUpdateInformation::UpdateDownloading);
 
-    qDebug() << "Getting: " << QUrl(m_updateFiles[*it]->url);
+    m_downloadFile.reset(new QFile(updateFilePath(m_updateFiles[*it]->baseFileName)));
+    if (!m_downloadFile->open(QFile::WriteOnly)) {
+        setUpdateResult(DownloadingFailed);
+        return;
+    }
+
     QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(QUrl(m_updateFiles[*it]->url)));
     connect(reply,  &QNetworkReply::finished,           this,   &QnMediaServerUpdateTool::at_downloadReply_finished);
     connect(reply,  &QNetworkReply::downloadProgress,   this,   &QnMediaServerUpdateTool::at_downloadReply_downloadProgress);
 }
 
 void QnMediaServerUpdateTool::at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal) {
-    int baseProgress = (m_updateFiles.size() - m_downloadingUpdates.size()) * 100 / m_updateFiles.size();
-    baseProgress += (bytesReceived * (100 / m_updateFiles.size()) / bytesTotal);
-    emit progressChanged(baseProgress);
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    if (!reply) {
+        Q_ASSERT_X(0, "This function must be called only from QNetworkReply", Q_FUNC_INFO);
+        return;
+    }
+
+    if (m_state != DownloadingUpdate)
+        return;
+
+    QByteArray data = reply->readAll();
+    if (data.size() != m_downloadFile->write(data)) {
+        m_downloadFile->reset();
+        setUpdateResult(DownloadingFailed);
+        return;
+    }
+
+    int finished = m_idBySystemInformation.uniqueKeys().size() - m_downloadingUpdates.size();
+    emit progressChanged((finished * 100 + bytesReceived * 100 / bytesTotal) / m_updateFiles.size());
 }
 
 void QnMediaServerUpdateTool::at_downloadReply_finished() {
@@ -391,15 +411,19 @@ void QnMediaServerUpdateTool::at_downloadReply_finished() {
     UpdateFileInformationPtr info = m_updateFiles[systemInformation];
 
     QByteArray data = reply->readAll();
-    QFile file(updateFilePath(info->baseFileName));
-    if (!file.open(QFile::WriteOnly) || file.write(data) != data.size()) {
+    bool ok = (data.size() == m_downloadFile->write(data));
+    m_downloadFile->close();
+
+    if (!ok) {
+        m_downloadFile.reset();
         setUpdateResult(DownloadingFailed);
         return;
     }
-    file.close();
 
-    info->fileName = file.fileName();
+    info->fileName = m_downloadFile->fileName();
     m_downloadingUpdates.erase(m_downloadingUpdates.begin());
+
+    m_downloadFile.reset();
 
     foreach (const QnId &peerId, m_idBySystemInformation.values(systemInformation))
         setPeerState(peerId, PeerUpdateInformation::PendingUpload);
