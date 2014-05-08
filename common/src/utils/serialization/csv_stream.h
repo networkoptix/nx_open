@@ -19,6 +19,10 @@ public:
         m_stream.write(field.data(), field.size()); // TODO: #Elric escaping!
     }
 
+    void writeLatin1Field(const char *field) {
+        writeLatin1Field(QByteArray::fromRawData(field, qstrlen(field)));
+    }
+
     void writeComma() {
         m_stream.write(",", 1);
     }

@@ -139,8 +139,8 @@ namespace QnBinaryDetail {
 } // namespace QnBinaryDetail
 
 
-QN_FUSION_REGISTER_SERIALIZATION_VISITOR(QnOutputBinaryStream<QByteArray> *, QnBinaryDetail::SerializationVisitor<QByteArray>)
-QN_FUSION_REGISTER_DESERIALIZATION_VISITOR(QnInputBinaryStream<QByteArray> *, QnBinaryDetail::DeserializationVisitor<QByteArray>)
+QN_FUSION_REGISTER_SERIALIZATION_VISITOR_TPL((class Output), (QnOutputBinaryStream<Output> *), (QnBinaryDetail::SerializationVisitor<Output>))
+QN_FUSION_REGISTER_DESERIALIZATION_VISITOR_TPL((class Input), (QnInputBinaryStream<Input> *), (QnBinaryDetail::DeserializationVisitor<Input>))
 
 
 #define QN_FUSION_DEFINE_FUNCTIONS_binary(TYPE, ... /* PREFIX */)               \
