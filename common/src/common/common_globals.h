@@ -29,7 +29,7 @@ namespace Qn
     Q_GADGET
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace 
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
-            StreamQuality SecondStreamQuality PanicMode RecordingType SerializationFormat)
+            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat)
     Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes ServerFlags)
 public:
 #else
@@ -410,6 +410,17 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
 
+    enum PropertyDataType { 
+        PDT_None, 
+        PDT_Value, 
+        PDT_OnOff, 
+        PDT_Boolen, 
+        PDT_MinMaxStep, 
+        PDT_Enumeration, 
+        PDT_Button 
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PropertyDataType)
+
 
     enum SerializationFormat {
         JsonFormat,
@@ -451,7 +462,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (meta
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities)
-        (Qn::MotionType)(Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlags)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::MotionType)(Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlags)(Qn::PanicMode)(Qn::RecordingType)(Qn::PropertyDataType)
         (Qn::SerializationFormat), 
     (metatype)(lexical)(json)
 )

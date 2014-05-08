@@ -96,11 +96,10 @@ namespace ec2
         }
 
         /*!
-            \param handler Functor with params: (ErrorCode)
-        */
         template<class TargetType, class HandlerType> int setResourceDisabled( const QnId& resourceId, bool disabled, TargetType* target, HandlerType handler ) {
             return setResourceDisabled( resourceId, disabled, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
+        */
 
         //!Saves changes to common resource's properties (e.g., name). Accepts any resource
         /*!
@@ -130,7 +129,7 @@ namespace ec2
 
     signals:
         void statusChanged( const QnId& resourceId, QnResource::Status status );
-        void disabledChanged( const QnId& resourceId, bool disabled );
+        //void disabledChanged( const QnId& resourceId, bool disabled );
         void resourceChanged( const QnResourcePtr& resource );
         void resourceParamsChanged( const QnId& resourceId, const QnKvPairList& kvPairs );
         void resourceRemoved( const QnId& resourceId );
@@ -138,7 +137,7 @@ namespace ec2
     protected:
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) = 0;
         virtual int setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler ) = 0;
-        virtual int setResourceDisabled( const QnId& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) = 0;
+        //virtual int setResourceDisabled( const QnId& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) = 0;
         virtual int save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;

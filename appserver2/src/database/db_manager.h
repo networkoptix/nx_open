@@ -134,7 +134,7 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceStatusData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceDisabledData>& tran);
+        //ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceDisabledData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceParamsData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiPanicModeData>& tran);

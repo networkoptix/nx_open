@@ -200,20 +200,20 @@ SettingsEditorFactory::SettingsEditorFactory() : QItemEditorFactory()
 QWidget *SettingsEditorFactory::createEditor(const QnParam &param, QWidget *parent) const
 {
     switch (param.type()) {
-    case QnParamType::OnOff:
+    case Qn::PDT_OnOff:
         return new SettingsOnOffWidget(param);
 
-    case QnParamType::MinMaxStep:
+    case Qn::PDT_MinMaxStep:
         return new SettingsMinMaxStepWidget(param);
 
-    case QnParamType::Enumeration:
+    case Qn::PDT_Enumeration:
         return new SettingsEnumerationWidget(param);
 
-    case QnParamType::Button:
+    case Qn::PDT_Button:
         return new SettingsButtonWidget(param);
 
-    case QnParamType::Boolen: // default true/false combobox
-    case QnParamType::Value: // value-based
+    case Qn::PDT_Boolen: // default true/false combobox
+    case Qn::PDT_Value: // value-based
     default:
         break;
     }
@@ -225,14 +225,14 @@ QWidget *SettingsEditorFactory::createEditor(const QnParam &param, QWidget *pare
 QByteArray SettingsEditorFactory::valuePropertyName(const QnParam &param) const
 {
     switch (param.type()) {
-    case QnParamType::OnOff:
-    case QnParamType::MinMaxStep:
-    case QnParamType::Enumeration:
-    case QnParamType::Button:
+    case Qn::PDT_OnOff:
+    case Qn::PDT_MinMaxStep:
+    case Qn::PDT_Enumeration:
+    case Qn::PDT_Button:
         return "paramValue";
 
-    case QnParamType::Boolen: // default true/false combobox
-    case QnParamType::Value: // value-based
+    case Qn::PDT_Boolen: // default true/false combobox
+    case Qn::PDT_Value: // value-based
     default:
         break;
     }

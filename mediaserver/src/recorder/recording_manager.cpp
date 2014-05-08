@@ -160,7 +160,7 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(res->getParentId()));
-    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getId().toString());
+    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getId().toByteArray());
 
     ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
     ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);

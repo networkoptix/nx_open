@@ -256,7 +256,7 @@ void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryLis
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
-    QnAppServerConnectionFactory::setBox(fullData.serverInfo.armBox);
+    QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
 
     updateHardwareIds(fullData);
     processResources(fullData.resources);

@@ -79,7 +79,7 @@ namespace ec2
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiSetResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
         //AbstractResourceManager::setResourceDisabled
-        registerUpdateFuncHandler<ApiSetResourceDisabledData>( restProcessorPool, ApiCommand::setResourceDisabled );
+        //registerUpdateFuncHandler<ApiSetResourceDisabledData>( restProcessorPool, ApiCommand::setResourceDisabled );
         //AbstractResourceManager::getKvPairs
         registerGetFuncHandler<QnId, ApiResourceParamsData>( restProcessorPool, ApiCommand::getResourceParams );
         //AbstractResourceManager::save

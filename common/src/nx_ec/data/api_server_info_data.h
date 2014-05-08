@@ -16,12 +16,12 @@ namespace ec2 {
         QString systemName;
         QByteArray sessionKey;
 
-        QString armBox; // TODO: #Elric #API what is this? Rename into something more sane.
+        QString platform;
         bool allowCameraChanges; // TODO: #API I believe we have implemented this in kvpairs. Remove.
         qint64 prematureLicenseExperationDate; // Not enough license for recording. Some recording will be stopped in a nearest future
     };
 
-#define ApiServerInfoData_Fields (mainHardwareIds)(compatibleHardwareIds)(remoteHardwareIds)(publicIp)(systemName)(sessionKey)(armBox)(allowCameraChanges)(prematureLicenseExperationDate)
+#define ApiServerInfoData_Fields (mainHardwareIds)(compatibleHardwareIds)(remoteHardwareIds)(publicIp)(systemName)(sessionKey)(platform)(allowCameraChanges)(prematureLicenseExperationDate)
 
 } // namespace ec2
 

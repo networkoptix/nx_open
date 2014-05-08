@@ -32,7 +32,7 @@ namespace ec2
             //!ApiSetResourceStatusData
             setResourceStatus = 6,
             //!ApiSetResourceDisabledData
-            setResourceDisabled = 7,
+            //setResourceDisabled = 7,
             //!ApiResourceParams
             setResourceParams = 8,
             getResourceParams = 9,

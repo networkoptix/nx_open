@@ -19,20 +19,20 @@ namespace ec2
 
     struct ApiMediaServerData: ApiResourceData
     {
-        ApiMediaServerData(): flags(Qn::SF_None), panicMode(0), maxCameras(0), redundancy(false) {}
+        ApiMediaServerData(): flags(Qn::SF_None), panicMode(Qn::PM_None), maxCameras(0), allowAutoRedundancy(false) {}
 
         QString         apiUrl;
-        QString         netAddrList; // TODO: #API rename 'networkAddresses'. We don't use -List suffix in naming, we use plurals.
+        QString         networkAddresses;
         Qn::ServerFlags flags;
-        qint32          panicMode; // TODO: #API use Qn::PanicMode
+        Qn::PanicMode   panicMode;
         QString         streamingUrl;
         QString         version; 
         QString         authKey;
         std::vector<ApiStorageData> storages;
         int             maxCameras;
-        bool            redundancy; // TODO: #API what is this? Naming is unclear and I don't know how to rename it. Add comments to QnMediaServerResource::isRedundancy at least.
+        bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
     };
-#define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(netAddrList)(flags)(panicMode)(streamingUrl)(version)(authKey)(storages)(maxCameras)(redundancy)
+#define ApiMediaServerData_Fields ApiResourceData_Fields (apiUrl)(networkAddresses)(flags)(panicMode)(streamingUrl)(version)(authKey)(storages)(maxCameras)(allowAutoRedundancy)
 
 
     struct ApiPanicModeData: public ApiData
