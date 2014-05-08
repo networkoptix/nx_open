@@ -40,9 +40,11 @@ namespace nx_hls
         /*!
             \return Number of chunks generated
         */
-        unsigned int generateChunkList(
+        virtual size_t generateChunkList(
             std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
-            bool* const endOfStreamReached ) const;
+            bool* const endOfStreamReached ) const override;
+        //!Implementation of AbstractPlaylistManager::getMaxBitrate
+        virtual int getMaxBitrate() const override;
 
     private:
         MediaStreamCache* const m_mediaStreamCache;
@@ -50,7 +52,7 @@ namespace nx_hls
         std::deque<AbstractPlaylistManager::ChunkData> m_chunks;
         quint64 m_targetDurationUSec;
         quint64 m_prevTimestamp;
-        size_t m_mediaSequence;
+        unsigned int m_mediaSequence;
         AbstractPlaylistManager::ChunkData m_currentChunk;
         mutable QMutex m_mutex;
         quint64 m_totalPlaylistDuration;

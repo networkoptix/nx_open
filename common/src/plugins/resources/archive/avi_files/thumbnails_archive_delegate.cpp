@@ -107,3 +107,8 @@ void QnThumbnailsArchiveDelegate::setGroupId(const QByteArray& groupId)
 {
     m_baseDelegate->setGroupId(groupId);
 }
+
+QnAbstractArchiveDelegate::ArchiveChunkInfo QnThumbnailsArchiveDelegate::getLastUsedChunkInfo() const
+{
+    return m_baseDelegate->getLastUsedChunkInfo();
+}

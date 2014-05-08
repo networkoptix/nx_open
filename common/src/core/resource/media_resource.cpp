@@ -82,7 +82,7 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::Stream
     return QImage();
 }
 
-static std::shared_ptr<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
 QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     QVariant val;
@@ -108,7 +108,7 @@ void QnMediaResource::setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLay
     toResource()->setParam(QLatin1String("VideoLayout"), newLayout->toString(), QnDomainMemory);
 }
 
-static std::shared_ptr<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
+static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
 QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
 {
     return audioLayout;

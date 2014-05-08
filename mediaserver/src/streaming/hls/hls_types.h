@@ -7,42 +7,11 @@
 
 #include <vector>
 
+#include <boost/optional.hpp>
+
 #include <QByteArray>
 #include <QUrl>
 
-
-//TODO/IMPL move OptionalField somewhere else...
-template<class T>
-    class OptionalField
-{
-public:
-    bool present;
-    T value;
-
-    OptionalField()
-    :
-        present( false ),
-        value( T() )
-    {
-    }
-
-    OptionalField( const T& val )
-    :
-        present( true ),
-        value( val )
-    {
-    }
-
-    operator T() const
-    {
-        return value;
-    }
-
-    operator T()
-    {
-        return value;
-    }
-};
 
 //!Consolidates hls implementation types
 namespace nx_hls
@@ -74,7 +43,7 @@ namespace nx_hls
     {
     public:
         QUrl url;
-        OptionalField<unsigned int> bandwidth;
+        boost::optional<int> bandwidth;
     };
 
     class VariantPlaylist

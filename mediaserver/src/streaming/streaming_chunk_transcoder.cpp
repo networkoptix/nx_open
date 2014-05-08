@@ -96,20 +96,20 @@ bool StreamingChunkTranscoder::transcodeAsync(
     Q_ASSERT( transcodeParams.startTimestamp() <= transcodeParams.endTimestamp() );
 
     pair<map<int, TranscodeContext>::iterator, bool> p = m_transcodings.insert(
-        make_pair( m_newTranscodeID.fetchAndAddAcquire(1), TranscodeContext() ) );  //TODO/HLS: #ak ???
+        make_pair( m_newTranscodeID.fetchAndAddAcquire(1), TranscodeContext() ) );
     Q_ASSERT( p.second );
 
     //checking requested time region:
         //whether data is present (in archive or cache)
     if( transcodeParams.live() )
     {
-        if( !camera->liveCache() )
+        if( !camera->liveCache(transcodeParams.streamQuality()) )
             return false;
 
-        const quint64 cacheStartTimestamp = camera->liveCache()->startTimestamp();
-        const quint64 cacheEndTimestamp = camera->liveCache()->currentTimestamp();
+        const quint64 cacheStartTimestamp = camera->liveCache(transcodeParams.streamQuality())->startTimestamp();
+        const quint64 cacheEndTimestamp = camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
         const quint64 actualStartTimestamp = std::max<>( cacheStartTimestamp, transcodeParams.startTimestamp() );
-        QSharedPointer<LiveMediaCacheReader> liveMediaCacheReader( new LiveMediaCacheReader( camera->liveCache(), actualStartTimestamp ) );
+        QSharedPointer<LiveMediaCacheReader> liveMediaCacheReader( new LiveMediaCacheReader( camera->liveCache(transcodeParams.streamQuality()), actualStartTimestamp ) );
         if( transcodeParams.startTimestamp() < cacheEndTimestamp &&
             transcodeParams.endTimestamp() > cacheStartTimestamp )
         {
@@ -146,6 +146,8 @@ bool StreamingChunkTranscoder::transcodeAsync(
         return true;
     }
 
+    //TODO/HLS: #ak optimization: take existing archive reader which is already at required position (from previous chunk)
+
     //creating archive reader
     QSharedPointer<QnAbstractStreamDataProvider> dp( cameraResource->createDataProvider( QnResource::Role_Archive ) );
     if( !dp )
@@ -164,7 +166,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
         m_transcodings.erase( p.first );
         return false;
     }
-    archiveReader->setQuality(MEDIA_Quality_High, true);    //TODO/HLS: #ak set proper quality
+    archiveReader->setQuality(transcodeParams.streamQuality(), true);
     archiveReader->setPlaybackRange( QnTimePeriod( transcodeParams.startTimestamp() / USEC_IN_MSEC, transcodeParams.duration() ) );
 
     if( !startTranscoding(
@@ -181,13 +183,6 @@ bool StreamingChunkTranscoder::transcodeAsync(
     chunk->openForModification();
     archiveReader->start();
     return true;
-
-    //NX_LOG( QString::fromLatin1("StreamingChunkTranscoder::transcodeAsync. Failed to find source. "
-    //    "Resource %1, statTime %2, duration %3").arg(cameraResource->getUniqueId()).
-    //    arg(transcodeParams.startTimestamp()).arg(transcodeParams.endTimestamp()), cl_logWARNING );
-
-    //m_transcodings.erase( p.first );
-    //return false;
 }
 
 Q_GLOBAL_STATIC_WITH_ARGS( StreamingChunkTranscoder, streamingChunkTranscoderInstance, (StreamingChunkTranscoder::fBeginOfRangeInclusive) );
@@ -253,11 +248,10 @@ bool StreamingChunkTranscoder::startTranscoding(
             arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
         return false;
     }
-    //TODO/HLS: #ak setting correct video parameters, now they are hard-coded for HLS with no transcoding
     CodecID codecID = CODEC_ID_NONE;
     QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
-    const CodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO/HLS #ak get codec of resource video stream. For HLS h264 is OK
-    QSize videoResolution = QSize( 1280, 720 );  //TODO/HLS #ak get resolution of resource video stream. This resolution is ignored when TM_DirectStreamCopy is used
+    const CodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO/HLS #ak get codec of resource video stream. For HLS only h264 is OK
+    QSize videoResolution;
     if( transcodeParams.videoCodec().isEmpty() && !transcodeParams.pictureSizePixels().isValid() )
     {
         codecID = resourceVideoStreamCodecID;
@@ -276,11 +270,18 @@ bool StreamingChunkTranscoder::startTranscoding(
                 arg(mediaResource->toResource()->getUniqueId()).arg(transcodeParams.videoCodec()), cl_logWARNING );
             return false;
         }
-        transcodeMethod = codecID == resourceVideoStreamCodecID ?
+        transcodeMethod = codecID == resourceVideoStreamCodecID ?   //TODO: #ak and resolusion did not change
             QnTranscoder::TM_DirectStreamCopy :
             QnTranscoder::TM_FfmpegTranscode;
         if( transcodeParams.pictureSizePixels().isValid() )
+        {
             videoResolution = transcodeParams.pictureSizePixels();
+        }
+        else
+        {
+            assert( false );
+            videoResolution = QSize( 1280, 720 );  //TODO: #ak get resolution of resource video stream. This resolution is ignored when TM_DirectStreamCopy is used
+        }
     }
     if( transcoder->setVideoCodec( codecID, transcodeMethod, Qn::QualityNormal, videoResolution ) != 0 )
     {

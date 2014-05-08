@@ -37,7 +37,7 @@ namespace nx_hls
     /*!
         \return Number of chunks generated
     */
-    unsigned int HLSLivePlaylistManager::generateChunkList(
+    size_t HLSLivePlaylistManager::generateChunkList(
         std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
         bool* const endOfStreamReached ) const
     {
@@ -46,6 +46,11 @@ namespace nx_hls
         if( endOfStreamReached )
             *endOfStreamReached = false;
         return m_chunks.size();
+    }
+
+    int HLSLivePlaylistManager::getMaxBitrate() const
+    {
+        return m_mediaStreamCache->getMaxBitrate();
     }
 
     //!Implementation of AbstractMediaCacheEventReceiver::onKeyFrame

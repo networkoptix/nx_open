@@ -491,7 +491,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaDa
         m_itemDewarpingParams.enabled;
 
     QnConstResourceVideoLayoutPtr layout = mediaDev->getVideoLayout(m_mediaProvider);
-    QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.get());
+    QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.data());
     {
         if (!isTranscode)
             av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_LayoutInfo, fileExt), layoutStr.toLatin1().data(), 0);

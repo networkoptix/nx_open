@@ -11,6 +11,8 @@
 #include <QSize>
 #include <QString>
 
+#include <core/datapacket/media_data_packet.h>
+
 
 /*!
     Identifies chunk in cache by following parameters:
@@ -31,6 +33,7 @@ public:
         \param containerFormat E.g., ts for mpeg2/ts
         \param startTimestamp In micros
         \param duration In micros
+        \param streamQuality \a MEDIA_Quality_High or MEDIA_Quality_Low
         \param auxiliaryParams
     */
     StreamingChunkCacheKey(
@@ -39,6 +42,7 @@ public:
         const QString& containerFormat,
         quint64 startTimestamp,
         quint64 duration,
+        MediaQuality streamQuality,
         const std::multimap<QString, QString>& auxiliaryParams );
 
     //!data source (camera id, stream id)
@@ -50,6 +54,7 @@ public:
     quint64 duration() const;
     //!startTimestamp() + duration
     quint64 endTimestamp() const;
+    MediaQuality streamQuality() const;
     //!Video resolution
     /*!
         \return If no resolution specified, returns invalid \a QSize.
@@ -74,6 +79,7 @@ private:
     QString m_containerFormat;
     quint64 m_startTimestamp;
     quint64 m_duration;
+    MediaQuality m_streamQuality;
     bool m_isLive;
     QSize m_pictureSizePixels;
     QString m_videoCodec;

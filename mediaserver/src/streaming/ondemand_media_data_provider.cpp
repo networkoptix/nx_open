@@ -7,7 +7,7 @@
 #include <QtCore/QMutexLocker>
 
 
-static const size_t MAX_DATA_QUEUE_SIZE = 16;   //TODO/HLS: #ak why 16?
+static const size_t MAX_DATA_QUEUE_SIZE = 16;   //TODO: #ak is queue really needed here?
 
 OnDemandMediaDataProvider::OnDemandMediaDataProvider( const QSharedPointer<QnAbstractStreamDataProvider>& dataProvider ) throw()
 :
@@ -40,9 +40,11 @@ quint64 OnDemandMediaDataProvider::currentPos() const
 {
     QMutexLocker lk( &m_mutex );
 
-    //TODO/HLS: #ak
-    //Q_ASSERT( false );
-    return m_prevPacketTimestamp;
+    if( m_prevPacketTimestamp != -1 )
+        return m_prevPacketTimestamp;
+    if( !m_dataQueue.empty() )
+        return m_dataQueue.front()->timestamp;
+    return -1;
 }
 
 bool OnDemandMediaDataProvider::canAcceptData() const
@@ -62,13 +64,4 @@ void OnDemandMediaDataProvider::putData( QnAbstractDataPacketPtr data )
 
     if( dataBecameAvailable )
         emit dataAvailable( this );
-}
-
-bool OnDemandMediaDataProvider::seek( quint64 /*positionToSeek*/ )
-{
-    QMutexLocker lk( &m_mutex );
-
-    //TODO/IMPL/HLS
-    //Q_ASSERT( false );
-    return true;
 }

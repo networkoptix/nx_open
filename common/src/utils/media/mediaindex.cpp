@@ -46,7 +46,7 @@ void MediaIndex::addPoint(
     m_timestampIndex.insert(currentPacketTimestamp);
 }
 
-unsigned int MediaIndex::generateChunkList(
+size_t MediaIndex::generateChunkList(
     quint64 desiredStartTime,
     unsigned int targetDurationMSec,
     unsigned int chunksToGenerate,
@@ -65,7 +65,7 @@ unsigned int MediaIndex::generateChunkList(
         true );
 }
 
-unsigned int MediaIndex::generateChunkListForLivePlayback(
+size_t MediaIndex::generateChunkListForLivePlayback(
     unsigned int targetDurationMSec,
     unsigned int chunksToGenerate,
     std::vector<ChunkData>* const chunkList ) const
@@ -101,7 +101,7 @@ quint64 MediaIndex::getClosestChunkStartTimestamp( quint64 desiredStartTime, uns
     return *it;
 }
 
-unsigned int MediaIndex::generateChunkListNonSafe(
+size_t MediaIndex::generateChunkListNonSafe(
     const quint64 desiredStartTime,
     const unsigned int targetDurationMicros,
     const unsigned int chunksToGenerate,
@@ -144,5 +144,5 @@ unsigned int MediaIndex::generateChunkListNonSafe(
         curChunkIter = nextChunkStartIter;
     }
 
-    return chunksGenerated > 0;
+    return chunksGenerated;
 }

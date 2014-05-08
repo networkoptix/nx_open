@@ -10,6 +10,9 @@ AbstractMediaDataFilter::AbstractMediaDataFilter( const QSharedPointer<AbstractO
     m_dataSource( dataSource )
 {
     Q_ASSERT( m_dataSource );
+    connect( dataSource.data(), &AbstractOnDemandDataProvider::dataAvailable,
+             this, [this]( AbstractOnDemandDataProvider* /*pThis*/ ) { emit dataAvailable(this); },
+             Qt::DirectConnection );
 }
 
 bool AbstractMediaDataFilter::tryRead( QnAbstractDataPacketPtr* const data )

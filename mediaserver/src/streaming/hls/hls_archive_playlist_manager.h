@@ -32,21 +32,25 @@ namespace nx_hls
             const QnSecurityCamResourcePtr& camResource,
             quint64 startTimestamp,
             unsigned int maxChunkNumberInPlaylist,
-            quint64 targetDurationUsec );
+            quint64 targetDurationUsec,
+            MediaQuality streamQuality );
         virtual ~ArchivePlaylistManager();
 
         bool initialize();
 
-        //!Implementantion of AbstractPlaylistManager::generateChunkList
-        virtual unsigned int generateChunkList(
+        //!Implementation of AbstractPlaylistManager::generateChunkList
+        virtual size_t generateChunkList(
             std::vector<AbstractPlaylistManager::ChunkData>* const chunkList,
-            bool* const endOfStreamReached ) const;
+            bool* const endOfStreamReached ) const override;
+        //!Implementation of AbstractPlaylistManager::getMaxBitrate
+        virtual int getMaxBitrate() const override;
 
     private:
         const QnSecurityCamResourcePtr m_camResource;
         quint64 m_startTimestamp;
         unsigned int m_maxChunkNumberInPlaylist;
         quint64 m_targetDurationUsec;
+        MediaQuality m_streamQuality;
         mutable QMutex m_mutex;
         std::deque<AbstractPlaylistManager::ChunkData> m_chunks;
         quint64 m_totalPlaylistDuration;
@@ -59,6 +63,8 @@ namespace nx_hls
         bool m_initialPlaylistCreated;
         qint64 m_prevGeneratedChunkDuration;
         bool m_discontinuityDetected;
+        //!archive chunk, that holds last found position
+        QnAbstractArchiveDelegate::ArchiveChunkInfo m_currentArchiveChunk;
 
         void generateChunksIfNeeded();
         bool addOneMoreChunk();

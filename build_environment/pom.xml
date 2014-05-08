@@ -180,7 +180,7 @@
                             <workingDirectory>${project.build.directory}</workingDirectory>     
                         </configuration>
                     </execution>     
-                    <execution>
+<!--                     <execution>
                         <id>install-packages-x86</id>
                         <phase>generate-resources</phase>
                         <goals>
@@ -234,7 +234,7 @@
                             <skip>${windows}</skip>
                         </configuration>
 
-                    </execution>                    
+                    </execution>    -->                
                 </executions>
             </plugin>   
         </plugins>      

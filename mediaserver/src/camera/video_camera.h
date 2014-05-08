@@ -55,22 +55,19 @@ public:
     /*!
         \return Can be NULL
     */
-    const MediaStreamCache* liveCache() const;
-    MediaStreamCache* liveCache();
-
-    const MediaIndex* mediaIndex() const;
-    MediaIndex* mediaIndex();
+    const MediaStreamCache* liveCache( MediaQuality streamQuality ) const;
+    MediaStreamCache* liveCache( MediaQuality streamQuality );
 
     /*!
         \todo Should remove it from here
     */
-    QSharedPointer<nx_hls::HLSLivePlaylistManager> hlsLivePlaylistManager() const;
+    QSharedPointer<nx_hls::HLSLivePlaylistManager> hlsLivePlaylistManager( MediaQuality streamQuality ) const;
 
     //!Starts caching live stream, if not started
     /*!
         \return true, if started, false if failed to start
     */
-    bool ensureLiveCacheStarted();
+    bool ensureLiveCacheStarted( MediaQuality streamQuality );
 
 private:
     void createReader(QnResource::ConnectionRole role);
@@ -87,11 +84,14 @@ private:
     QnVideoCameraGopKeeper* m_secondaryGopKeeper;
     QSet<void*> m_cameraUsers;
     QnCompressedAudioDataPtr m_lastAudioFrame;
-    std::unique_ptr<MediaStreamCache> m_liveCache;
-    QSharedPointer<nx_hls::HLSLivePlaylistManager> m_hlsLivePlaylistManager;
-    MediaIndex m_mediaIndex;
+    //!index - is a \a MediaQuality element
+    std::vector<std::unique_ptr<MediaStreamCache> > m_liveCache;
+    //!index - is a \a MediaQuality element
+    std::vector<std::unique_ptr<MediaIndex> > m_mediaIndexes;
+    //!index - is a \a MediaQuality element
+    std::vector<QSharedPointer<nx_hls::HLSLivePlaylistManager> > m_hlsLivePlaylistManager;
 
-    bool ensureLiveCacheStarted( QnAbstractMediaStreamDataProviderPtr primaryReader );
+    bool ensureLiveCacheStarted( MediaQuality streamQuality, QnAbstractMediaStreamDataProviderPtr primaryReader );
 };
 
 #endif // __VIDEO_CAMERA_H__

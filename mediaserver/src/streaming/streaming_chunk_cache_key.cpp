@@ -31,6 +31,7 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     const QString& containerFormat,
     quint64 startTimestamp,
     quint64 duration,
+    MediaQuality streamQuality,
     const std::multimap<QString, QString>& auxiliaryParams )
 :
     m_uniqueResourceID( uniqueResourceID ),
@@ -38,7 +39,8 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     m_containerFormat( containerFormat ),
     m_startTimestamp( startTimestamp ),
     m_duration( duration ),
-    m_isLive( false )
+    m_isLive( false ),
+    m_streamQuality( streamQuality )
     //,m_auxiliaryParams( auxiliaryParams )
 {
     Q_ASSERT( !containerFormat.isEmpty() );
@@ -93,6 +95,11 @@ quint64 StreamingChunkCacheKey::endTimestamp() const
     return m_startTimestamp + m_duration;
 }
 
+MediaQuality StreamingChunkCacheKey::streamQuality() const
+{
+    return m_streamQuality;
+}
+
 //!Video resolution
 const QSize& StreamingChunkCacheKey::pictureSizePixels() const
 {
@@ -124,47 +131,52 @@ bool StreamingChunkCacheKey::operator<( const StreamingChunkCacheKey& right ) co
 {
     if( m_uniqueResourceID < right.m_uniqueResourceID )
         return true;
-    else if( m_uniqueResourceID > right.m_uniqueResourceID )
+    if( m_uniqueResourceID > right.m_uniqueResourceID )
         return false;
 
     if( m_channel < right.m_channel )
         return true;
-    else if( m_channel > right.m_channel )
+    if( m_channel > right.m_channel )
         return false;
 
     if( m_containerFormat < right.m_containerFormat )
         return true;
-    else if( m_containerFormat > right.m_containerFormat )
+    if( m_containerFormat > right.m_containerFormat )
         return false;
 
     if( m_startTimestamp < right.m_startTimestamp )
         return true;
-    else if( m_startTimestamp > right.m_startTimestamp )
+    if( m_startTimestamp > right.m_startTimestamp )
         return false;
 
     if( m_duration < right.m_duration )
         return true;
-    else if( m_duration > right.m_duration )
+    if( m_duration > right.m_duration )
         return false;
 
     if( m_pictureSizePixels.width() < right.m_pictureSizePixels.width() )
         return true;
-    else if( m_pictureSizePixels.width() > right.m_pictureSizePixels.width() )
+    if( m_pictureSizePixels.width() > right.m_pictureSizePixels.width() )
         return false;
 
     if( m_pictureSizePixels.height() < right.m_pictureSizePixels.height() )
         return true;
-    else if( m_pictureSizePixels.height() > right.m_pictureSizePixels.height() )
+    if( m_pictureSizePixels.height() > right.m_pictureSizePixels.height() )
         return false;
 
     if( m_videoCodec < right.m_videoCodec )
         return true;
-    else if( m_videoCodec > right.m_videoCodec )
+    if( m_videoCodec > right.m_videoCodec )
         return false;
 
     if( m_audioCodec < right.m_audioCodec )
         return true;
-    else if( m_audioCodec > right.m_audioCodec )
+    if( m_audioCodec > right.m_audioCodec )
+        return false;
+
+    if( m_streamQuality < right.m_streamQuality )
+        return true;
+    if( m_streamQuality > right.m_streamQuality )
         return false;
 
     //if( m_auxiliaryParams < right.m_auxiliaryParams )
@@ -186,7 +198,8 @@ bool StreamingChunkCacheKey::operator==( const StreamingChunkCacheKey& right ) c
         && (m_channel == right.m_channel)
         && (m_containerFormat == right.m_containerFormat)
         && (m_startTimestamp == right.m_startTimestamp)
-        && (m_duration == right.m_duration);
+        && (m_duration == right.m_duration)
+        && (m_streamQuality == right.m_streamQuality);
         //&& (m_auxiliaryParams == right.m_auxiliaryParams);
 }
 
@@ -202,6 +215,7 @@ uint qHash( const StreamingChunkCacheKey& key )
         + key.startTimestamp()
         + key.duration()
         + key.endTimestamp()
+        + key.streamQuality()
         + key.pictureSizePixels().width()
         + key.pictureSizePixels().height()
         + qHash(key.containerFormat())

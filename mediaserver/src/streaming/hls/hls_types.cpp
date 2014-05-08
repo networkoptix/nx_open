@@ -38,7 +38,7 @@ namespace nx_hls
         QByteArray playlistStr;
         playlistStr += 
             "#EXTM3U\r\n"
-            "#EXT-X-VERSION:3\r\n";
+            "#EXT-X-VERSION:3\r\n"; //TODO/HLS: #ak really need version 3?
         playlistStr += "#EXT-X-TARGETDURATION:"+QByteArray::number(targetDuration)+"\r\n";
         playlistStr += "#EXT-X-MEDIA-SEQUENCE:"+QByteArray::number(mediaSequence)+"\r\n";
         playlistStr += "\r\n";
@@ -72,8 +72,8 @@ namespace nx_hls
             ++i )
         {
             str += "#EXT-X-STREAM-INF:";
-            if( playlists[i].bandwidth.present )
-                str += "BANDWIDTH="+QByteArray::number(playlists[i].bandwidth.value);
+            if( playlists[i].bandwidth )
+                str += "BANDWIDTH="+QByteArray::number(playlists[i].bandwidth.get());
             str += "\r\n";
             str += playlists[i].url.toString().toLatin1();
             str += "\r\n";

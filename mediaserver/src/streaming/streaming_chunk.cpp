@@ -81,7 +81,8 @@ void StreamingChunk::appendData( const QByteArray& data )
         m_data.append( data );
     }
 
-    emit newDataIsAvailable( this, data.size() );
+    QMutexLocker lk( &m_signalEmitMutex );
+    emit newDataIsAvailable( shared_from_this(), data.size() );
 }
 
 void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
@@ -92,7 +93,8 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
         m_isOpenedForModification = false;
     }
 
-    emit newDataIsAvailable( this, 0 );
+    QMutexLocker lk( &m_signalEmitMutex );
+    emit newDataIsAvailable( shared_from_this(), 0 );
 }
 
 bool StreamingChunk::isClosed() const
@@ -105,4 +107,10 @@ size_t StreamingChunk::sizeInBytes() const
 {
     QMutexLocker lk( &m_mutex );
     return m_data.size();
+}
+
+void StreamingChunk::disconnectAndJoin( QObject* receiver )
+{
+    disconnect( this, nullptr, receiver, nullptr );
+    QMutexLocker lk( &m_signalEmitMutex );
 }

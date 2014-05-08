@@ -10,11 +10,6 @@ H264Mp4ToAnnexB::H264Mp4ToAnnexB( const QSharedPointer<AbstractOnDemandDataProvi
     AbstractMediaDataFilter( dataSource ),
     m_isFirstPacket( true )
 {
-    connect( dataSource.data(), &AbstractOnDemandDataProvider::dataAvailable,
-             this, [this]( AbstractOnDemandDataProvider* /*pThis*/ ) {
-                emit dataAvailable(this);
-             },  //TODO/HLS: #ak remove it from here
-             Qt::DirectConnection );
 }
 
 QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* const data )

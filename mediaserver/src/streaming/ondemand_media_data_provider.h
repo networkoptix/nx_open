@@ -43,12 +43,6 @@ public:
     */
     virtual void putData( QnAbstractDataPacketPtr data ) override;
 
-    //!Seeks absolute position (micros) from archive start
-    /*!
-        \return false if requested position was not found or error occured during seeking
-    */
-    bool seek( quint64 positionToSeek );
-
 private:
     QSharedPointer<QnAbstractStreamDataProvider> m_dataProvider;
     mutable QMutex m_mutex;

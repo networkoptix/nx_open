@@ -55,13 +55,13 @@ public:
         \note Does not clear \a chunkList, but appends data to it
         \note Resulting chunk may exceed \a targetDurationMSec by GOP duration
     */
-    unsigned int generateChunkList(
+    size_t generateChunkList(
         quint64 desiredStartTime,
         unsigned int targetDurationMSec,
         unsigned int chunksToGenerate,
         std::vector<ChunkData>* const chunkList ) const;
     //!Same as \a generateChunkList, but returns \a chunksToGenerate last chunks of available data
-    unsigned int generateChunkListForLivePlayback(
+    size_t generateChunkListForLivePlayback(
         unsigned int targetDurationMSec,
         unsigned int chunksToGenerate,
         std::vector<ChunkData>* const chunkList ) const;
@@ -83,7 +83,7 @@ private:
     quint64 getClosestChunkStartTimestamp(
         quint64 desiredStartTime,
         unsigned int targetDurationMicros ) const;
-    unsigned int generateChunkListNonSafe(
+    size_t generateChunkListNonSafe(
         quint64 desiredStartTime,
         unsigned int targetDurationMicros,
         unsigned int chunksToGenerate,

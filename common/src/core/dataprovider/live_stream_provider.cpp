@@ -20,7 +20,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
 
     m_role = QnResource::Role_LiveVideo;
     m_timeSinceLastMetaData.restart();
-    m_layout = 0;
+    m_layout = QnConstResourceVideoLayoutPtr();
     m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
     Q_ASSERT(m_cameraRes);
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();

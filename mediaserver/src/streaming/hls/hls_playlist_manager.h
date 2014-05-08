@@ -38,9 +38,11 @@ namespace nx_hls
             \param endOfStreamReached Can be NULL
             \return Number of chunks generated
         */
-        virtual unsigned int generateChunkList(
+        virtual size_t generateChunkList(
             std::vector<ChunkData>* const chunkList,
             bool* const endOfStreamReached ) const = 0;
+        //!Returns maximum stream bitrate in bps
+        virtual int getMaxBitrate() const = 0;
     };
 }
 

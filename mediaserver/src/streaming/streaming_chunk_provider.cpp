@@ -11,13 +11,14 @@
 
 static const unsigned int MICROS_PER_SECOND = 1000*1000;
 
-StreamingChunk* StreamingChunkProvider::get( const StreamingChunkCacheKey& key, int* const itemCost )
+bool StreamingChunkProvider::get( const StreamingChunkCacheKey& key, int* const itemCost, StreamingChunkPtr* const chunk )
 {
-    std::auto_ptr<StreamingChunk> chunk( new StreamingChunk( key ) );
-    if( !StreamingChunkTranscoder::instance()->transcodeAsync( key, chunk.get() ) )
-        return NULL;
+    StreamingChunkPtr newChunk = std::make_shared<StreamingChunk>( key );
+    if( !StreamingChunkTranscoder::instance()->transcodeAsync( key, newChunk.get() ) )
+        return false;
 
     //NOTE at this time chunk size in bytes is unknown, since transcoding is about to be started
     *itemCost = key.duration() / MICROS_PER_SECOND;
-    return chunk.release();
+    *chunk = newChunk;
+    return true;
 }

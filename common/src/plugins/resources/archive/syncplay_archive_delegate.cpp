@@ -140,3 +140,8 @@ void QnSyncPlayArchiveDelegate::setSendMotion(bool value)
 {
     m_ownerDelegate->setSendMotion(value);
 }
+
+QnAbstractArchiveDelegate::ArchiveChunkInfo QnSyncPlayArchiveDelegate::getLastUsedChunkInfo() const
+{
+    return m_ownerDelegate->getLastUsedChunkInfo();
+}
