@@ -1683,6 +1683,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     
     QSqlQuery queryScreens(m_sdb);
     queryScreens.setForwardOnly(true);
+    // todo: #GDM remove unused columns
     queryScreens.prepare("SELECT \
                          pc.videowall_guid, pc.pc_guid, \
                          screen.pc_guid, screen.pc_index, \
