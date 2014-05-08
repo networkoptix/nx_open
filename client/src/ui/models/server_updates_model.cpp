@@ -201,8 +201,12 @@ QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
         break;
     case Qt::BackgroundRole:
         break;
-    case Qn::MediaServerResourceRole:
-        return QVariant::fromValue<QnMediaServerResourcePtr>(m_server);
+    case StateRole:
+        return m_updateInfo.state;
+    case ProgressRole:
+        return m_updateInfo.progress;
+    default:
+        break;
     }
 
     return QVariant();

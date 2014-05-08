@@ -22,6 +22,11 @@ public:
         ColumnCount
     };
 
+    enum Roles {
+        StateRole = Qt::UserRole + 1,
+        ProgressRole
+    };
+
     class Item {
     public:
         Item(const QnMediaServerResourcePtr &server, const QnMediaServerUpdateTool::PeerUpdateInformation &updateInfo) :

@@ -8,6 +8,7 @@
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/build_number_dialog.h>
+#include <ui/delegates/update_status_item_delegate.h>
 #include <utils/media_server_update_tool.h>
 
 #include <version.h>
@@ -30,6 +31,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
     ui->tableView->setModel(model);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::ResourceNameColumn, QHeaderView::Stretch);
+    // TODO: #dklychkov fix progress bar painting and uncomment the line below
+//    ui->tableView->setItemDelegateForColumn(QnServerUpdatesModel::UpdateColumn, new QnUpdateStatusItemDelegate(ui->tableView));
 
     connect(ui->updateFromLocalSourceButton,        &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked);
     connect(ui->checkForUpdatesButton,              &QPushButton::clicked,      this,           &QnServerUpdatesWidget::at_checkForUpdatesButton_clicked);
