@@ -2,21 +2,44 @@
 #define QN_SERIALIZATION_CSV_STREAM_H
 
 #include "binary_stream.h"
-
+#include <hash_set>
 template<class Output>
 class QnCsvStreamWriter {
 public:
     QnCsvStreamWriter(Output *data):
         m_stream(data)
-    {}
-
-    void writeField(const QString &field) {
-        QByteArray utf8 = field.toUtf8();
-        m_stream.write(utf8.data(), utf8.size()); // TODO: #Elric escaping!
+    {
     }
 
-    void writeLatin1Field(const QByteArray &field) {
-        m_stream.write(field.data(), field.size()); // TODO: #Elric escaping!
+    void writeField(const QString &field) 
+    {
+        QByteArray utf8 = field.toUtf8();
+        writeLatin1Field(utf8);
+    }
+
+    unsigned char toHexChar(unsigned char digit)
+    {
+        return digit <= 9 ? '0' + digit : 'A' + (digit-10);
+    }
+
+    void writeLatin1Field(const QByteArray &field) 
+    {
+        QByteArray changed_field;
+        for (int i = 0 ; i < field.size() ; i++)
+        {
+            unsigned char ch = field[i];
+            if ( ch < 32 ) {
+                changed_field.push_back('\\');
+                changed_field.push_back(toHexChar(ch / 16));
+                changed_field.push_back(toHexChar(ch % 16));
+            } 
+            else {
+                if ( ch == ',' || ch == '\\' )
+                    changed_field.push_back('\\');
+                changed_field.push_back(ch);
+            }
+        };
+        m_stream.write(changed_field.data(), changed_field.size());
     }
 
     void writeComma() {
