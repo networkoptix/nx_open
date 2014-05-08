@@ -74,5 +74,20 @@
                 </plugins>
             </build>
         </profile>  
+        <profile>
+            <id>widgets</id>
+            <activation>
+                <os>
+                    <family>webkit</family>
+                </os>
+                <property>
+                    <name>webkit</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <properties>
+                <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
+            </properties>
+        </profile>  
     </profiles>
 </project>

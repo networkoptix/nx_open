@@ -40,7 +40,7 @@
         <beta>true</beta>
         <box></box>
 
-        <qt.dir>${environment.dir}/qt5webkit/qtbase-${arch}</qt.dir>
+        <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
@@ -535,6 +535,21 @@
                 <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
                 <skip.sign>false</skip.sign>
             </properties>
-        </profile>        
+        </profile>     
+        <profile>
+            <id>webkit</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>webkit</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <properties>
+                <qt.dir>${environment.dir}/qt5webkit/qtbase-${arch}</qt.dir>
+            </properties>
+        </profile>          
     </profiles> 
 </project>
