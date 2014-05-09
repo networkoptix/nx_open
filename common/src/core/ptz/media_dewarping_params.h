@@ -3,12 +3,10 @@
 
 #include <QtCore/QMetaType>
 
-#include <boost/operators.hpp>
-
 #include <utils/common/model_functions_fwd.h>
 
 // TODO: #Elric doesn't really belong in this folder
-struct QnMediaDewarpingParams: public boost::equality_comparable1<QnMediaDewarpingParams> {
+struct QnMediaDewarpingParams {
     Q_GADGET
     Q_ENUMS(ViewMode)
 
@@ -31,6 +29,7 @@ public:
     }
 
     friend bool operator==(const QnMediaDewarpingParams &l, const QnMediaDewarpingParams &r);
+    friend bool operator!=(const QnMediaDewarpingParams &l, const QnMediaDewarpingParams &r);
     friend QDebug &operator<<(QDebug &stream, const QnMediaDewarpingParams &params);
 
     /**
