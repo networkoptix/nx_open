@@ -9,6 +9,9 @@
 
 // TODO: #Elric doesn't really belong in this folder
 struct QnMediaDewarpingParams: public boost::equality_comparable1<QnMediaDewarpingParams> {
+    Q_GADGET
+    Q_ENUMS(ViewMode)
+
 public:
     enum ViewMode {
         Horizontal,
@@ -40,6 +43,7 @@ public:
 
     /** List of all possible panoFactor values for the selected view mode. */
     static const QList<int>& allowedPanoFactorValues(ViewMode mode);
+
 public:
     /** Whether dewarping is currently enabled. */
     bool enabled;
