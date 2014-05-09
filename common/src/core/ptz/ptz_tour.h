@@ -19,6 +19,7 @@ struct QnPtzTourSpot: public boost::equality_comparable1<QnPtzTourSpot> {
     qint64 stayTime;
     qreal speed;
 };
+#define QnPtzTourSpot_Fields (presetId)(stayTime)(speed)
 
 
 struct QnPtzTour: public boost::equality_comparable1<QnPtzTour> {
@@ -45,6 +46,7 @@ struct QnPtzTour: public boost::equality_comparable1<QnPtzTour> {
     QString name;
     QnPtzTourSpotList spots;
 };
+#define QnPtzTour_Fields (id)(name)(spots)
 
 Q_DECLARE_METATYPE(QnPtzTourSpot)
 Q_DECLARE_METATYPE(QnPtzTour)

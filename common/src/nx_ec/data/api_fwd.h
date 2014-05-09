@@ -71,7 +71,7 @@ namespace ec2 {
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
     struct LoginInfo;
 
-#define QN_EC2_API_DATA_CLASSES \
+#define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
     (ApiBusinessRuleData)\
     (ApiCameraData)\
@@ -113,7 +113,7 @@ namespace ec2 {
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-        QN_EC2_API_DATA_CLASSES,
+        QN_EC2_API_DATA_TYPES,
         (binary)(json)(sql_record)(csv_record)
     );
 #endif
