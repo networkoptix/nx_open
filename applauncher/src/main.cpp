@@ -79,7 +79,7 @@ int main( int argc, char* argv[] )
     QnLongRunnablePool runnablePool;
 
     QString logLevel = "WARN";
-    QString logFilePath;
+    QString logFilePath = InstallationManager::defaultDirectoryForInstallations() + "/applauncher";
     QString mirrorListUrl;
     bool quitMode = false;
     bool displayHelp = false;
@@ -134,7 +134,7 @@ int main( int argc, char* argv[] )
     //initialize logging based on args
     if( !logFilePath.isEmpty() && !logLevel.isEmpty() )
     {
-        cl_log.create( logFilePath, 1024*1024*10, 5, cl_logDEBUG1 );
+        cl_log.create( logFilePath, 1024*1024*10, 5, cl_logWARNING );
         QnLog::initLog( logLevel );
     }
 
@@ -186,6 +186,9 @@ int main( int argc, char* argv[] )
 
     return status;
 }
+
+//--rsync --url=http://downloads.hdwitness.com/test/x64/ --dir=c:/tmp/appl/
+//--install --customization=digitalwatchdog --version=1.5
 
 int syncDir( const QString& localDir, const QString& remoteUrl )
 {

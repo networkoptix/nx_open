@@ -1078,6 +1078,16 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
     data.dewarpingParams.panoFactor = 1; // zoom target must always be dewarped by 90 degrees
 
+    QnResourceWidget::Buttons buttons = widget->checkedButtons();
+    // TODO: #Elric Strange magic with enabled flag in ItemDewarpingParams and MediaDewarpingParams.
+    // Maybe we should do this less hacky...
+    // 
+    // WTF! Dewarping params should be enabled or disabled another way.
+    // Now it is done with side-effect from checking invisible button and it is a HELL! --gdm
+    if (zoomTargetWidget->dewarpingParams().enabled)
+        buttons |= QnMediaResourceWidget::FishEyeButton;
+    else
+        buttons &= ~QnMediaResourceWidget::FishEyeButton;  // Bug #3270
     int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
             ? 1
             : qnSettings->maxSceneVideoItems();

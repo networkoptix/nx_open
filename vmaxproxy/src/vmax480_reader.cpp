@@ -280,7 +280,7 @@ void QnVMax480Provider::archivePlayInternal(const VMaxParamList& params, quint8 
     if (!m_archivePlayProcessing) {
         qDebug() << "Forward play. pos=" << fromNativeTimestamp(startDate, startTime, 0).toString("dd.MM.yyyy hh:mm.ss") << "speed=" << speed << "seq=" << sequence;
         m_archivePlayProcessing = true;
-        m_ACSStream->requestPlayMode(playMode, 1, startDate, startTime, false);
+        m_ACSStream->requestPlayMode(playMode, speed > 1 ? 8 : 1, startDate, startTime, false);
     }
     else {
         m_newPlayCommand = params;

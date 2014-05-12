@@ -1184,7 +1184,10 @@ void QnWorkbenchNavigator::updateThumbnailsLoader() {
         }
     }
 
-    if(!resource || aspectRatio < 0) {
+    QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
+    bool isPanoramicCamera = mediaResource && mediaResource->getVideoLayout()->size().width() > 1;
+
+    if(!resource || aspectRatio < 0 || isPanoramicCamera) {
         m_timeSlider->setThumbnailsLoader(NULL, -1);
     } else if(!m_timeSlider->thumbnailsLoader() || m_timeSlider->thumbnailsLoader()->resource() != resource) {
         m_timeSlider->setThumbnailsLoader(thumbnailLoader(resource), aspectRatio);

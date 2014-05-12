@@ -31,7 +31,7 @@ public:
         etNone = 0,
         etRead = 1,
         etWrite = 2,
-        //!Error occured on socket. Output only event
+        //!Error occured on socket. Output only event. TODO: #ak report socket error code
         etError = 4,
         //!Used for periodic operations and for socket timers
         etTimedOut = 8,

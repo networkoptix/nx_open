@@ -1,5 +1,5 @@
-#ifndef QN_CLIENT_COLOR_TYPES
-#define QN_CLIENT_COLOR_TYPES
+#ifndef QN_CLIENT_COLOR_TYPES_H
+#define QN_CLIENT_COLOR_TYPES_H
 
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>
@@ -37,6 +37,10 @@ public:
     QColor pastLastMinute;
     QColor futureLastMinute;
 };
+#define QnTimeSliderColors_Fields (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)\
+    (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)\
+    (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute)
+
 
 struct QnTimeScrollBarColors {
     QnTimeScrollBarColors();
@@ -45,6 +49,8 @@ struct QnTimeScrollBarColors {
     QColor border;
     QColor handle;
 };
+#define QnTimeScrollBarColors_Fields (indicator)(border)(handle)
+
 
 struct QnBackgroundColors {
     QnBackgroundColors();
@@ -52,6 +58,8 @@ struct QnBackgroundColors {
     QColor normal;
     QColor panic;
 };
+#define QnBackgroundColors_Fields (normal)(panic)
+
 
 struct QnCalendarColors {
     QnCalendarColors();
@@ -67,6 +75,8 @@ struct QnCalendarColors {
     QColor primary(int fillType) const;
     QColor secondary(int fillType) const;
 };
+#define QnCalendarColors_Fields (selection)(primaryRecording)(secondaryRecording)(primaryMotion)(secondaryMotion)(separator)
+
 
 struct QnStatisticsColors {
     QnStatisticsColors();
@@ -78,6 +88,8 @@ struct QnStatisticsColors {
     QVector<QColor> hdds;
     QVector<QColor> network;
 };
+#define QnStatisticsColors_Fields (grid)(frame)(cpu)(ram)(hdds)(network)
+
 
 struct QnScheduleGridColors {
 public:
@@ -88,6 +100,8 @@ public:
     QColor selectedLabel;
     QColor disabledLabel;
 };
+#define QnScheduleGridColors_Fields (normalLabel)(weekendLabel)(selectedLabel)(disabledLabel)
+
 
 struct QnGridColors {
     QnGridColors();
@@ -96,6 +110,8 @@ struct QnGridColors {
     QColor allowed;
     QColor disallowed;
 };
+#define QnGridColors_Fields (grid)(allowed)(disallowed)
+
 
 struct QnPtzManageModelColors {
     QnPtzManageModelColors();
@@ -104,6 +120,8 @@ struct QnPtzManageModelColors {
     QColor invalid;
     QColor warning;
 };
+#define QnPtzManageModelColors_Fields (title)(invalid)(warning)
+
 
 struct QnHistogramColors {
     QnHistogramColors();
@@ -115,6 +133,8 @@ struct QnHistogramColors {
     QColor grid;
     QColor text;
 };
+#define QnHistogramColors_Fields (background)(border)(histogram)(selection)(grid)(text)
+
 
 struct QnResourceWidgetFrameColors {
     QnResourceWidgetFrameColors();
@@ -123,6 +143,8 @@ struct QnResourceWidgetFrameColors {
     QColor active;
     QColor selected;
 };
+#define QnResourceWidgetFrameColors_Fields (normal)(active)(selected)
+
 
 struct QnLicensesListModelColors {
     QnLicensesListModelColors();
@@ -131,10 +153,18 @@ struct QnLicensesListModelColors {
     QColor warning;
     QColor expired;
 };
+#define QnLicensesListModelColors_Fields (normal)(warning)(expired)
+
+
+#define QN_CLIENT_COLOR_TYPES                                                   \
+    (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
+    (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
+    (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors)
+
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors)(QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors)(QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors), 
+    QN_CLIENT_COLOR_TYPES,
     (metatype)(json)
 );
 
-#endif // QN_CLIENT_COLOR_TYPES
+#endif // QN_CLIENT_COLOR_TYPES_H

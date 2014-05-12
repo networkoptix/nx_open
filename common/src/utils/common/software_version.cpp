@@ -63,7 +63,7 @@ QDataStream &operator>>(QDataStream &stream, QnSoftwareVersion &version) {
     return stream;
 }
 
-QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnSoftwareVersion)
+QN_DEFINE_LEXICAL_JSON_FUNCTIONS(QnSoftwareVersion)
 
 void serialize(const QnSoftwareVersion &value, QnOutputBinaryStream<QByteArray> *stream) {
     QnBinary::serialize(value.m_data, stream);
@@ -73,6 +73,6 @@ bool deserialize(QnInputBinaryStream<QByteArray> *stream, QnSoftwareVersion *tar
     return QnBinary::deserialize(stream, &target->m_data);
 }
 
-void serialize_field(const QnSoftwareVersion &value, QnCsvStreamWriter<QByteArray> *target) {
+void serialize(const QnSoftwareVersion &value, QnCsvStreamWriter<QByteArray> *target) {
     target->writeField(value.toString());
 }

@@ -120,82 +120,11 @@ QnLicensesListModelColors::QnLicensesListModelColors() {
     expired = QColor(Qt::red);
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnTimeSliderColors,
-    (json),
-    (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
-        (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)
         (pastBookmark)(futureBookmark)
-        (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute), 
-    (optional, true)
-)
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnTimeScrollBarColors,
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    QN_CLIENT_COLOR_TYPES,
     (json),
-    (indicator)(border)(handle), 
-    (optional, true)
-)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnBackgroundColors,
-    (json),
-    (normal)(panic), 
-    (optional, true)
-)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnCalendarColors,
-    (json),
-    (selection)(primaryRecording)(secondaryRecording)(primaryMotion)(secondaryMotion)(separator), 
-    (optional, true)
-)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnStatisticsColors,
-    (json),
-    (grid)(frame)(cpu)(ram)(hdds)(network), 
-    (optional, true)
-)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnScheduleGridColors,
-    (json),
-    (normalLabel)(weekendLabel)(selectedLabel)(disabledLabel), 
-    (optional, true)
-)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnGridColors,
-    (json),
-    (grid)(allowed)(disallowed), 
-    (optional, true)
-)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnPtzManageModelColors,
-    (json),
-    (title)(invalid)(warning), 
-    (optional, true)
-)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnHistogramColors,
-    (json),
-    (background)(border)(histogram)(selection)(grid)(text), 
-    (optional, true)
-)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnResourceWidgetFrameColors,
-    (json),
-    (normal)(active)(selected), 
-    (optional, true)
-)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    QnLicensesListModelColors,
-    (json),
-    (normal)(warning)(expired), 
+    _Fields,
     (optional, true)
 )

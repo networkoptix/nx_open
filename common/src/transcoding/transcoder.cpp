@@ -287,7 +287,7 @@ int QnTranscoder::setVideoCodec(
         case TM_FfmpegTranscode:
             ffmpegTranscoder = new QnFfmpegVideoTranscoder(codec);
             ffmpegTranscoder->setVideoLayout(m_vLayout);
-            if (getCPUString().toLower().contains(QLatin1String("atom")))
+            //if (getCPUString().toLower().contains(QLatin1String("atom")))
                 ffmpegTranscoder->setMTMode(true);
             m_vTranscoder = QnVideoTranscoderPtr(ffmpegTranscoder);
             break;

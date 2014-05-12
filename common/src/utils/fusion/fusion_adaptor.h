@@ -205,6 +205,7 @@ bool visit_members(CLASS &value, Visitor &&visitor) {                           
     QN_FUSION_ADAPT_CLASS_SHORT(CLASS, (getter, setter, name, checker), MEMBER_SEQ, ##__VA_ARGS__)
 
 
+// TODO: #Elric support empty FIELD_SEQ. Better assert on it.
 /**
  * A shortcut for <tt>QN_FUSION_ADAPT_CLASS</tt>. Can be used for simple struct
  * types where field names to be used are the same as the field names in C++ code.
