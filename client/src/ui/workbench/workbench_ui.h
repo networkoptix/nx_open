@@ -184,7 +184,7 @@ protected:
 
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
 
-    void createNotificationsGuiElements();
+    
 
     QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX);
     void updateViewportMargins();
@@ -220,6 +220,16 @@ protected:
     QRectF updatedSearchGeometry(const QRectF &sliderGeometry);
 
 private:
+    void createControlsWidget();
+    void createFpsWidget();
+    void createTreeWidget();
+    void createTitleWidget();
+    void createNotificationsWidget();
+    void createCalendarWidget();
+    void createSliderWidget();
+    void createDebugWidget();
+    void createSearchWidget();
+
     Panels openedPanels() const;
     void setOpenedPanels(Panels panels, bool animate = true, bool save = true);
 
