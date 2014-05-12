@@ -244,13 +244,15 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
         return false;
     }
 
+    QString version = map.value(lit("version")).toString();
+
     QString currentDir = QDir::currentPath();
     QDir::setCurrent(updateDir.absolutePath());
 
     QStringList arguments;
 
     QString logFileName;
-    if (initializeUpdateLog(updateId, &logFileName))
+    if (initializeUpdateLog(version, &logFileName))
         arguments.append(logFileName);
     else
         cl_log.log("Could not create or open update log file.", cl_logWARNING);
