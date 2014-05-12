@@ -19,6 +19,8 @@ extern "C"
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 
+#include <client/client_settings.h>
+
 #include <camera/resource_display.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -53,7 +55,6 @@ extern "C"
 
 #include "camera/thumbnails_loader.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "handlers/workbench_action_handler.h"
 #include "redass/redass_controller.h"
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
@@ -1589,4 +1590,24 @@ void QnWorkbenchNavigator::setBookmarksSearchWidget(QnSearchLineEdit *bookmarksS
         if(isValid())
             initialize();
     }
+}
+
+QnCameraBookmarkTags QnWorkbenchNavigator::bookmarkTags() const {
+    return m_bookmarkTags;
+}
+
+void QnWorkbenchNavigator::setBookmarkTags(const QnCameraBookmarkTags &tags) {
+    if (m_bookmarkTags == tags)
+        return;
+    m_bookmarkTags = tags;
+
+    if (!isValid())
+        return;
+
+    QCompleter *completer = new QCompleter(m_bookmarkTags);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setCompletionMode(QCompleter::InlineCompletion);
+
+    m_bookmarksSearchWidget->lineEdit()->setCompleter(completer);
+    m_bookmarkTagsCompleter.reset(completer);
 }

@@ -3,22 +3,6 @@
 
 #include <QtWidgets/QLineEdit>
 
-class QnSearchButton;
-
-/**
-    Clear button on the right hand side of the search widget.
-    Hidden by default
-    "A circle with an X in it"
- */
-class QnClearButton : public QAbstractButton {
-    Q_OBJECT
-public:
-    QnClearButton(QWidget *parent = 0);
-    void paintEvent(QPaintEvent *event);
-public slots:
-    void textChanged(const QString &text);
-};
-
 class QnSearchLineEdit : public QWidget
 {
     Q_OBJECT
@@ -44,8 +28,8 @@ protected:
     void initStyleOption(QStyleOptionFrameV2 *option) const;
 
     QLineEdit *m_lineEdit;
-    QnClearButton *m_clearButton;
-    QnSearchButton *m_searchButton;
+    QAbstractButton *m_clearButton;
+    QAbstractButton *m_searchButton;
 };
 
 #endif // SEARCH_LINE_EDIT_H

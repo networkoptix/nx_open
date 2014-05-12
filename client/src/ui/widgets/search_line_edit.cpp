@@ -15,77 +15,83 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleOptionFrameV2>
 
-/** Search icon on the left hand side */
-class QnSearchButton : public QAbstractButton {
-public:
-    QnSearchButton(QWidget *parent = 0): 
-        QAbstractButton(parent)
-    {
-        setObjectName(QLatin1String("SearchButton"));
+namespace {
+    /** Search icon on the left hand side */
+    class QnSearchButton : public QAbstractButton {
+    public:
+        QnSearchButton(QWidget *parent = 0): 
+            QAbstractButton(parent)
+        {
+            setObjectName(QLatin1String("SearchButton"));
 #ifndef QT_NO_CURSOR
-        setCursor(Qt::ArrowCursor);
+            setCursor(Qt::ArrowCursor);
 #endif //QT_NO_CURSOR
-        setFocusPolicy(Qt::NoFocus);
-    }
+            setFocusPolicy(Qt::NoFocus);
+        }
 
-    void paintEvent(QPaintEvent *event) {
-        Q_UNUSED(event);
-        QPainterPath myPath;
+        void paintEvent(QPaintEvent *event) {
+            Q_UNUSED(event);
+            QPainterPath myPath;
 
-        int radius = (height() / 5) * 2;
-        QRect circle(height() / 3 - 1, height() / 4, radius, radius);
-        myPath.addEllipse(circle);
+            int radius = (height() / 5) * 2;
+            QRect circle(height() / 3 - 1, height() / 4, radius, radius);
+            myPath.addEllipse(circle);
 
-        myPath.arcMoveTo(circle, 300);
-        QPointF c = myPath.currentPosition();
-        int diff = height() / 7;
-        myPath.lineTo(qMin(width() - 2, (int)c.x() + diff), c.y() + diff);
+            myPath.arcMoveTo(circle, 300);
+            QPointF c = myPath.currentPosition();
+            int diff = height() / 7;
+            myPath.lineTo(qMin(width() - 2, (int)c.x() + diff), c.y() + diff);
 
-        QPainter painter(this);
-        painter.setRenderHint(QPainter::Antialiasing, true);
-        painter.setPen(QPen(Qt::darkGray, 2));
-        painter.drawPath(myPath);
-        painter.end();
-    }
-};
+            QPainter painter(this);
+            painter.setRenderHint(QPainter::Antialiasing, true);
+            painter.setPen(QPen(Qt::darkGray, 2));
+            painter.drawPath(myPath);
+            painter.end();
+        }
+    };
 
 
-QnClearButton::QnClearButton(QWidget *parent):
-    QAbstractButton(parent)
-{
+    /**
+    Clear button on the right hand side of the search widget.
+    Hidden by default
+    "A circle with an X in it"
+    */
+    class QnClearButton : public QAbstractButton {
+    public:
+        QnClearButton(QWidget *parent = 0):
+            QAbstractButton(parent)
+        {
 #ifndef QT_NO_CURSOR
-    setCursor(Qt::ArrowCursor);
+            setCursor(Qt::ArrowCursor);
 #endif // QT_NO_CURSOR
-    setToolTip(tr("Clear"));
-    setVisible(false);
-    setFocusPolicy(Qt::NoFocus);
+            setToolTip(tr("Clear"));
+            setVisible(false);
+            setFocusPolicy(Qt::NoFocus);
+        }
+
+        void QnClearButton::paintEvent(QPaintEvent *event) {
+            Q_UNUSED(event);
+            QPainter painter(this);
+            int height = this->height();
+
+            painter.setRenderHint(QPainter::Antialiasing, true);
+            painter.setBrush(isDown()
+                ? palette().color(QPalette::Dark)
+                : palette().color(QPalette::Mid));
+            painter.setPen(painter.brush().color());
+            int size = width();
+            int offset = size / 5;
+            int radius = size - offset * 2;
+            painter.drawEllipse(offset, offset, radius, radius);
+
+            painter.setPen(palette().color(QPalette::Base));
+            int border = offset * 2;
+            painter.drawLine(border, border, width() - border, height - border);
+            painter.drawLine(border, height - border, width() - border, border);
+        }
+    };
+
 }
-
-void QnClearButton::paintEvent(QPaintEvent *event) {
-    Q_UNUSED(event);
-    QPainter painter(this);
-    int height = this->height();
-
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setBrush(isDown()
-        ? palette().color(QPalette::Dark)
-        : palette().color(QPalette::Mid));
-    painter.setPen(painter.brush().color());
-    int size = width();
-    int offset = size / 5;
-    int radius = size - offset * 2;
-    painter.drawEllipse(offset, offset, radius, radius);
-
-    painter.setPen(palette().color(QPalette::Base));
-    int border = offset * 2;
-    painter.drawLine(border, border, width() - border, height - border);
-    painter.drawLine(border, height - border, width() - border, border);
-}
-
-void QnClearButton::textChanged(const QString &text) {
-    setVisible(!text.isEmpty());
-}
-
 
 QnSearchLineEdit::QnSearchLineEdit(QWidget *parent) :
     QWidget(parent),
@@ -112,10 +118,10 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent) :
     m_lineEdit->setPalette(clearPalette);
 
     // clearButton
-    connect(m_clearButton, SIGNAL(clicked()),
-        m_lineEdit, SLOT(clear()));
-    connect(m_lineEdit, SIGNAL(textChanged(QString)),
-        m_clearButton, SLOT(textChanged(QString)));
+    connect(m_clearButton, &QAbstractButton::clicked, m_lineEdit, &QLineEdit::clear);
+    connect(m_lineEdit, &QLineEdit::textChanged, this, [this](const QString &text) {
+        m_clearButton->setVisible(!text.isEmpty());
+    });
 
     connect(m_lineEdit, SIGNAL(textChanged(QString)),
         this, SIGNAL(textChanged(QString)));

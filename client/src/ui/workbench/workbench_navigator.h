@@ -5,6 +5,7 @@
 #include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <client/client_globals.h>
 
@@ -62,6 +63,9 @@ public:
 
     QnSearchLineEdit *bookmarksSearchWidget() const;
     void setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget);
+
+    QnCameraBookmarkTags bookmarkTags() const;
+    void setBookmarkTags(const QnCameraBookmarkTags &tags);
 
     bool isLive() const;
     Q_SLOT bool setLive(bool live);
@@ -245,6 +249,9 @@ private:
     QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;
     
     QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
+
+    QnCameraBookmarkTags m_bookmarkTags;
+    QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);
