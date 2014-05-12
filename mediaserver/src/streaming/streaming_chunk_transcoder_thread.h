@@ -35,7 +35,9 @@ public:
         QSharedPointer<AbstractOnDemandDataProvider> dataSource,
         const StreamingChunkCacheKey& transcodeParams,
         QnFfmpegTranscoder* transcoder );
-    void cancel( int transcodingID );
+    //void cancel( int transcodingID );
+
+    size_t ongoingTranscodings() const;
 
 public slots:
     virtual void pleaseStop() override;
@@ -72,7 +74,7 @@ private:
     std::map<int, TranscodeContext*> m_transcodeContext;
     //map<data source, transcoding id>
     std::map<AbstractOnDemandDataProvider*, int> m_dataSourceToID;
-    QMutex m_mutex;
+    mutable QMutex m_mutex;
     QWaitCondition m_cond;
 
     void removeTranscodingNonSafe(

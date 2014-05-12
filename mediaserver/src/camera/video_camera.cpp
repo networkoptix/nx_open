@@ -438,13 +438,6 @@ void QnVideoCamera::stopIfNoActivity()
         m_primaryReader->pleaseStop();
     if (needStopSecondary)
         m_secondaryReader->pleaseStop();
-
-    /*
-    if (needStopPrimary)
-        m_primaryReader->stop();
-    if (needStopSecondary)
-        m_secondaryReader->stop();
-    */
 }
 
 const MediaStreamCache* QnVideoCamera::liveCache( MediaQuality streamQuality ) const
@@ -473,7 +466,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality )
     if( streamQuality == MEDIA_Quality_High )
     {
         if( !m_primaryReader )
-            getLiveReader( QnResource::Role_LiveVideo );
+            getLiveReader( QnServer::HiQualityCatalog );
         if( !m_primaryReader )
             return false;
         return ensureLiveCacheStarted( streamQuality, m_primaryReader );
@@ -482,7 +475,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality )
     if( streamQuality == MEDIA_Quality_Low )
     {
         if( !m_secondaryReader )
-            getLiveReader( QnResource::Role_SecondaryLiveVideo );
+            getLiveReader( QnServer::LowQualityCatalog );
         if( !m_secondaryReader )
             return false;
         return ensureLiveCacheStarted( streamQuality, m_secondaryReader );

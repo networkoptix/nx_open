@@ -18,6 +18,8 @@
 #endif
 
 
+static const int RESERVED_TRANSCODED_PACKET_SIZE = 4096;
+
 using namespace std;
 
 StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext()
@@ -95,16 +97,22 @@ bool StreamingChunkTranscoderThread::startTranscoding(
     return true;
 }
 
-void StreamingChunkTranscoderThread::cancel( int transcodingID )
+size_t StreamingChunkTranscoderThread::ongoingTranscodings() const
 {
     QMutexLocker lk( &m_mutex );
-
-    map<int, TranscodeContext*>::iterator it = m_transcodeContext.find( transcodingID );
-    if( it == m_transcodeContext.end() )
-        return;
-    disconnect( it->second->dataSource.data(), 0, this, 0 );
-    removeTranscodingNonSafe( it, true );
+    return m_transcodeContext.size();
 }
+
+//void StreamingChunkTranscoderThread::cancel( int transcodingID )
+//{
+//    QMutexLocker lk( &m_mutex );
+//
+//    map<int, TranscodeContext*>::iterator it = m_transcodeContext.find( transcodingID );
+//    if( it == m_transcodeContext.end() )
+//        return;
+//    disconnect( it->second->dataSource.data(), 0, this, 0 );
+//    removeTranscodingNonSafe( it, true );
+//}
 
 void StreamingChunkTranscoderThread::pleaseStop()
 {
@@ -135,7 +143,7 @@ void StreamingChunkTranscoderThread::run()
             if( transcodeIter == m_transcodeContext.end() )
                 transcodeIter = m_transcodeContext.begin();
             if( transcodeIter->second->dataAvailable )
-                break;      //TODO/IMPL using dataAvailable looks unreliable, since logic based on AbstractOnDemandDataProvider::dataAvailable is event-triggered
+                break;      //TODO/HLS #ak: using dataAvailable looks unreliable, since logic based on AbstractOnDemandDataProvider::dataAvailable is event-triggered
                                 //but AbstractOnDemandDataProvider::tryRead is level-triggered, which is better
             ++transcodeIter;
         }
@@ -161,14 +169,14 @@ void StreamingChunkTranscoderThread::run()
         {
             NX_LOG( QString::fromLatin1("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
                 arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).arg(transcodeIter->second->msTranscoded), cl_logDEBUG1 );
-            //TODO/IMPL/HLS remove transcoding or consider that data may appear later?
+            //TODO/HLS #ak: remove transcoding or consider that data may appear later?
         }
 
         QnAbstractMediaDataPtr srcMediaData = srcPacket.dynamicCast<QnAbstractMediaData>();
         Q_ASSERT( srcMediaData );
 
-        QnByteArray resultStream( 1, 1024 );
-        //TODO/IMPL/HLS releasing mutex lock for transcodePacket call
+        QnByteArray resultStream( 1, RESERVED_TRANSCODED_PACKET_SIZE );
+        //TODO/HLS #ak: releasing mutex lock for transcodePacket call
 #ifdef SAVE_INPUT_STREAM_TO_FILE
         m_inputFile.write( srcMediaData->data.constData(), srcMediaData->data.size() );
 #endif
@@ -183,7 +191,7 @@ void StreamingChunkTranscoderThread::run()
 
         ++transcodeIter->second->packetsTranscoded;
 
-        //TODO/IMPL/HLS protect from discontinuity in timestamp
+        //TODO/HLS #ak: protect from discontinuity in timestamp
         if( transcodeIter->second->prevPacketTimestamp == -1 )
             transcodeIter->second->prevPacketTimestamp = srcMediaData->timestamp;
         if( qAbs(srcMediaData->timestamp - transcodeIter->second->prevPacketTimestamp) > 3600*1000*1000UL )
@@ -247,11 +255,11 @@ void StreamingChunkTranscoderThread::removeTranscodingNonSafe(
 
     if( !transcodingFinishedSuccessfully )
     {
-        //TODO/IMPL/HLS MUST remove chunk from cache
+        //TODO/HLS #ak: MUST remove chunk from cache
     }
 
     m_dataSourceToID.erase( transcodingIter->second->dataSource.data() );
     m_transcodeContext.erase( transcodingIter );
 
-    //TODO/IMPL/HLS emit some signal?
+    //TODO/HLS #ak: emit some signal?
 }
