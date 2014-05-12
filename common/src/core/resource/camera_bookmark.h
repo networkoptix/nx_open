@@ -40,9 +40,9 @@ struct QnCameraBookmark {
     QnCameraBookmarkTags tags;
 
     QnCameraBookmark():
+        timeout(-1),
         startTimeMs(0),
-        durationMs(0),
-        timeout(-1)
+        durationMs(0)
     {}
 };
 #define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)

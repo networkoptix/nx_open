@@ -74,14 +74,14 @@ void DeviceFileCatalog::Chunk::truncate(qint64 timeMs)
 }
 
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnServer::ChunksCatalog catalog):
+    m_rebuildStartTime(0),
     m_mutex(QMutex::Recursive),
     m_firstDeleteCount(0),
     m_macAddress(macAddress),
     //m_duplicateName(false),
     m_catalog(catalog),
     m_lastAddIndex(-1),
-    m_lastRecordRecording(false),
-    m_rebuildStartTime(0)
+    m_lastRecordRecording(false)
 {
     /*
     QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/media/");
