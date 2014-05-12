@@ -745,11 +745,13 @@ void QnWorkbenchUi::setSliderOpacity(qreal opacity, bool animate) {
         m_sliderOpacityAnimatorGroup->pause();
         opacityAnimator(m_sliderItem)->setTargetValue(opacity);
         opacityAnimator(m_sliderShowButton)->setTargetValue(opacity);
+        opacityAnimator(m_searchWidget)->setTargetValue(opacity);
         m_sliderOpacityAnimatorGroup->start();
     } else {
         m_sliderOpacityAnimatorGroup->stop();
         m_sliderItem->setOpacity(opacity);
         m_sliderShowButton->setOpacity(opacity);
+        m_searchWidget->setOpacity(opacity);
     }
 
     m_sliderResizerWidget->setVisible(!qFuzzyIsNull(opacity));
@@ -1638,6 +1640,7 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
     updateCalendarGeometry();
     updateSliderZoomButtonsGeometry();
     updateDayTimeWidgetGeometry();
+    updateSearchGeometry();
 
     QRectF geometry = m_sliderItem->geometry();
     m_sliderShowButton->setPos(QPointF(
@@ -2447,7 +2450,7 @@ void QnWorkbenchUi::createDebugWidget() {
 }
 
 QRectF QnWorkbenchUi::updatedSearchGeometry(const QRectF &sliderGeometry) {
-    QRectF geometry = m_searchItem->paintGeometry();
+    QRectF geometry = m_searchWidget->paintGeometry();
     geometry.moveRight(m_controlsWidgetRect.right());
     geometry.moveBottom(sliderGeometry.top());
     return geometry;
@@ -2456,10 +2459,10 @@ QRectF QnWorkbenchUi::updatedSearchGeometry(const QRectF &sliderGeometry) {
 void QnWorkbenchUi::updateSearchGeometry() {
     /* Update painting rect the "fair" way. */
     QRectF geometry = updatedSearchGeometry(m_sliderItem->geometry());
-    m_searchItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
+    m_searchWidget->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
 
     /* Always change position. */
-    m_searchItem->setPos(geometry.topLeft());
+    m_searchWidget->setPos(geometry.topLeft());
 }
 
 void QnWorkbenchUi::at_searchItem_paintGeometryChanged() {
@@ -2470,12 +2473,15 @@ void QnWorkbenchUi::at_searchItem_paintGeometryChanged() {
 }
 
 void QnWorkbenchUi::createSearchWidget() {
-    m_searchWidget = new QnSearchLineEdit(NULL);
-    m_searchWidget->setAttribute(Qt::WA_TranslucentBackground);
+    QnSearchLineEdit *searchLine = new QnSearchLineEdit();
+    searchLine->setAttribute(Qt::WA_TranslucentBackground);
+    navigator()->setBookmarksSearchWidget(searchLine);
 
-    m_searchItem = new QnMaskedProxyWidget(m_controlsWidget);
-    m_searchItem->setWidget(m_searchWidget);
+    m_searchWidget = new QnMaskedProxyWidget(m_controlsWidget);
+    m_searchWidget->setWidget(searchLine);
+    connect(m_searchWidget,   &QnMaskedProxyWidget::paintRectChanged,     this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
+    connect(m_searchWidget,   &QGraphicsWidget::geometryChanged,          this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
 
-    connect(m_searchItem,   &QnMaskedProxyWidget::paintRectChanged,     this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
-    connect(m_searchItem,   &QGraphicsWidget::geometryChanged,          this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
+    m_sliderOpacityProcessor->addTargetItem(m_searchWidget);
+    m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_searchWidget));
 }

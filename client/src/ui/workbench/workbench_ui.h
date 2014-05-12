@@ -510,10 +510,8 @@ private:
 
     VariantAnimator *m_dayTimeSizeAnimator;
 
-
     /* Search widget */
-    QnMaskedProxyWidget *m_searchItem;
-    QnSearchLineEdit *m_searchWidget;
+    QnMaskedProxyWidget *m_searchWidget;
     bool m_inSearchGeometryUpdate;
 
     qreal m_pinOffset;
