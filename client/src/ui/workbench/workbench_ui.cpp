@@ -2475,6 +2475,8 @@ void QnWorkbenchUi::at_searchItem_paintGeometryChanged() {
 void QnWorkbenchUi::createSearchWidget() {
     QnSearchLineEdit *searchLine = new QnSearchLineEdit();
     searchLine->setAttribute(Qt::WA_TranslucentBackground);
+    searchLine->resize(250, 21);
+
     navigator()->setBookmarksSearchWidget(searchLine);
 
     m_searchWidget = new QnMaskedProxyWidget(m_controlsWidget);

@@ -15,6 +15,41 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleOptionFrameV2>
 
+/** Search icon on the left hand side */
+class QnSearchButton : public QAbstractButton {
+public:
+    QnSearchButton(QWidget *parent = 0): 
+        QAbstractButton(parent)
+    {
+        setObjectName(QLatin1String("SearchButton"));
+#ifndef QT_NO_CURSOR
+        setCursor(Qt::ArrowCursor);
+#endif //QT_NO_CURSOR
+        setFocusPolicy(Qt::NoFocus);
+    }
+
+    void paintEvent(QPaintEvent *event) {
+        Q_UNUSED(event);
+        QPainterPath myPath;
+
+        int radius = (height() / 5) * 2;
+        QRect circle(height() / 3 - 1, height() / 4, radius, radius);
+        myPath.addEllipse(circle);
+
+        myPath.arcMoveTo(circle, 300);
+        QPointF c = myPath.currentPosition();
+        int diff = height() / 7;
+        myPath.lineTo(qMin(width() - 2, (int)c.x() + diff), c.y() + diff);
+
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.setPen(QPen(Qt::darkGray, 2));
+        painter.drawPath(myPath);
+        painter.end();
+    }
+};
+
+
 QnClearButton::QnClearButton(QWidget *parent):
     QAbstractButton(parent)
 {
@@ -55,7 +90,8 @@ void QnClearButton::textChanged(const QString &text) {
 QnSearchLineEdit::QnSearchLineEdit(QWidget *parent) :
     QWidget(parent),
     m_lineEdit(new QLineEdit(this)),
-    m_clearButton(new QnClearButton(this))
+    m_clearButton(new QnClearButton(this)),
+    m_searchButton(new QnSearchButton(this))
 {
     setFocusPolicy(m_lineEdit->focusPolicy());
     setAttribute(Qt::WA_InputMethodEnabled);
@@ -80,6 +116,13 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent) :
         m_lineEdit, SLOT(clear()));
     connect(m_lineEdit, SIGNAL(textChanged(QString)),
         m_clearButton, SLOT(textChanged(QString)));
+
+    connect(m_lineEdit, SIGNAL(textChanged(QString)),
+        this, SIGNAL(textChanged(QString)));
+    m_lineEdit->setPlaceholderText(tr("Search"));
+
+    QSizePolicy policy = sizePolicy();
+    setSizePolicy(QSizePolicy::Preferred, policy.verticalPolicy());
 }
 
 void QnSearchLineEdit::resizeEvent(QResizeEvent *event) {
@@ -87,18 +130,20 @@ void QnSearchLineEdit::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
 }
 
-void QnSearchLineEdit::updateGeometries()
-{
+void QnSearchLineEdit::updateGeometries() {
+
     QStyleOptionFrameV2 panel;
     initStyleOption(&panel);
     QRect rect = style()->subElementRect(QStyle::SE_LineEditContents, &panel, this);
 
+    int height = rect.height();
     int width = rect.width();
 
-    int clearButtonWidth = this->height(); // square button
-    m_lineEdit->setGeometry(0, 0, width - clearButtonWidth, this->height());
-    m_clearButton->setGeometry(this->width() - clearButtonWidth, 0,
-        clearButtonWidth, this->height());
+    int buttonSize = height;
+    
+    m_searchButton->setGeometry(rect.x(), rect.y(), buttonSize, buttonSize);
+    m_lineEdit->setGeometry(m_searchButton->x() + buttonSize, 0, width - buttonSize*2, height);
+    m_clearButton->setGeometry(width - buttonSize, 0, buttonSize, buttonSize);
 }
 
 void QnSearchLineEdit::initStyleOption(QStyleOptionFrameV2 *option) const
@@ -153,7 +198,6 @@ bool QnSearchLineEdit::event(QEvent *event) {
 
 void QnSearchLineEdit::paintEvent(QPaintEvent *event) {
     Q_UNUSED(event)
-
     QPainter p(this);
     QStyleOptionFrameV2 panel;
     initStyleOption(&panel);

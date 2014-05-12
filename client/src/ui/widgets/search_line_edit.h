@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QLineEdit>
 
+class QnSearchButton;
+
 /**
     Clear button on the right hand side of the search widget.
     Hidden by default
@@ -43,6 +45,7 @@ protected:
 
     QLineEdit *m_lineEdit;
     QnClearButton *m_clearButton;
+    QnSearchButton *m_searchButton;
 };
 
 #endif // SEARCH_LINE_EDIT_H
