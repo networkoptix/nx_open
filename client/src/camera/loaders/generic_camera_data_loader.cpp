@@ -139,7 +139,7 @@ int QnGenericCameraDataLoader::sendRequest(const QnTimePeriod &periodToLoad, con
             bookmarkFilter.minStartTimeMs = periodToLoad.startTimeMs;
             bookmarkFilter.maxStartTimeMs = periodToLoad.startTimeMs + periodToLoad.durationMs;
             bookmarkFilter.minDurationMs = resolutionMs;
-            bookmarkFilter.tags = m_filter.split(L',');
+            bookmarkFilter.text = m_filter;
 
             return m_connection->getBookmarksAsync( 
                 m_resource.dynamicCast<QnNetworkResource>(),

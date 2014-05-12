@@ -120,8 +120,6 @@ QnLicensesListModelColors::QnLicensesListModelColors() {
     expired = QColor(Qt::red);
 }
 
-        (pastBookmark)(futureBookmark)
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
     (json),

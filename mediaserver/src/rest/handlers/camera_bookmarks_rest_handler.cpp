@@ -81,7 +81,7 @@ int QnCameraBookmarksRestHandler::getCameraBookmarksAction(const QnRequestParams
         if (ok) filter.minStartTimeMs = value;
     if (qint64 value = params["maxStartTimeMs"].toLongLong(&ok))
         if (ok) filter.maxStartTimeMs = value;
-    filter.tags = params["tags"].split(',', QString::SkipEmptyParts);
+    filter.text = params["text"];
 
     QnTimePeriod period(filter.minStartTimeMs, filter.maxStartTimeMs - filter.minStartTimeMs);
     qDebug() << "bookmarks requested with resolution" << filter.minDurationMs << "for" << period;   //TODO: #GDM #Bookmarks remove when profiling will be finished

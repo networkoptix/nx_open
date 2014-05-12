@@ -8,8 +8,6 @@
 
 #include "camera_bookmark_fwd.h"
 
-#include <utils/common/model_functions_fwd.h>
-
 /**
  * @brief The QnCameraBookmark struct               Bookmarked part of the camera archive.
  */
@@ -47,9 +45,11 @@ struct QnCameraBookmark {
         timeout(-1)
     {}
 };
+#define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)
 
 /**
- * @brief The QnCameraBookmarkSearchFilter struct   Bookmarks search request parameters.
+ * @brief The QnCameraBookmarkSearchFilter struct   Bookmarks search request parameters. Used for loading bookmarks for the fixed time period
+ *                                                  with length exceeding fixed minimal, with name and/or tags containing fixed string.
  */
 struct QnCameraBookmarkSearchFilter {
     //TODO: #GDM #Bookmarks change minStartTimeMs to maxEndTimeMs to load bookmarks that end in the current window.
@@ -62,12 +62,12 @@ struct QnCameraBookmarkSearchFilter {
     /** Minimum bookmark duration. */
     qint64 minDurationMs;
 
-    //TODO: #GDM #Bookmarks change tags to String filter (for name and tags together)
-    QStringList tags;
+    /** Text-search filter string. */
+    QString text;
 
     QnCameraBookmarkSearchFilter();
-
 };
+#define QnCameraBookmarkSearchFilter_Fields (minStartTimeMs)(maxStartTimeMs)(minDurationMs)(text)
 
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other);
 

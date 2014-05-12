@@ -259,9 +259,10 @@ bool QnStorageDb::getBookmarks(const QByteArray &cameraGuid, const QnCameraBookm
     if (filter.minDurationMs > 0)
         addFilter("durationMs >= :minDurationMs");
 
+    //TODO: #GDM #Bookmarks implement name search
     // hack because QT is unable to bind list values properly --gdm
-    if (!filter.tags.isEmpty())
-        addFilter("tagName in ('" + filter.tags.join("','") + "')");
+    if (!filter.text.isEmpty())
+        addFilter("tagName in ('" + filter.text + "')");
 
     QString queryStr("SELECT \
                      book.guid as guid, \

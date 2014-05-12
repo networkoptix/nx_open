@@ -833,7 +833,7 @@ int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camer
     params << QnRequestParam("minStartTimeMs",   QnLexical::serialized(filter.minStartTimeMs));
     params << QnRequestParam("maxStartTimeMs",   QnLexical::serialized(filter.maxStartTimeMs));
     params << QnRequestParam("minDurationMs",    QnLexical::serialized(filter.minDurationMs));
-    params << QnRequestParam("tags",             QnLexical::serialized(filter.tags.join(L',')));
+    params << QnRequestParam("text",             QnLexical::serialized(filter.text));
     
     return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
