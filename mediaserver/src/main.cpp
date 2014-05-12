@@ -89,6 +89,7 @@
 #include <rest/handlers/business_action_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
+#include <rest/handlers/camera_bookmarks_rest_handler.h>
 #include <rest/handlers/external_business_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
 #include <rest/handlers/image_rest_handler.h>
@@ -934,6 +935,7 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
@@ -946,11 +948,11 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
-    m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
+    //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
+    //m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("HTTP", "*");
 
     m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
     m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
-
 
     if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
         m_universalTcpListener->disableAuth();

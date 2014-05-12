@@ -19,9 +19,17 @@
     "data": [
 		{
             "keys": [
-                "*|*"
+                "ISD|*"
             ],
-            "show_url": true
+            "show_url": true,
+			"url_locale_path": "priv/cam.html"
+        },
+        {
+            "keys": [
+                "ISD_NATIVE|*"
+            ],
+            "show_url": true,
+			"url_locale_path": "priv/cam.html"
         },
         {
             "keys": [

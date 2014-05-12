@@ -353,7 +353,7 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("vms_resource")))
     {
-        if (!execSQLFile(QLatin1String(":/01_createdb.sql")))
+        if (!execSQLFile(lit(":/01_createdb.sql")))
             return false;
         if (!migrateBusinessEvents())
             return false;
@@ -362,27 +362,30 @@ bool QnDbManager::createDatabase()
     if (!isObjectExists(lit("table"), lit("transaction_log")))
     {
 #ifdef EDGE_SERVER
-        if (!execSQLFile(QLatin1String(":/02_insert_3thparty_vendor.sql")))
+        if (!execSQLFile(lit(":/02_insert_3thparty_vendor.sql")))
             return false;
 #else
-        if (!execSQLFile(QLatin1String(":/02_insert_all_vendors.sql")))
+        if (!execSQLFile(lit(":/02_insert_all_vendors.sql")))
             return false;
 #endif
 
-        if (!execSQLFile(QLatin1String(":/03_update_2.2_stage1.sql")))
+        if (!execSQLFile(lit(":/03_update_2.2_stage1.sql")))
             return false;
         if (!updateGuids())
             return false;
-        if (!execSQLFile(QLatin1String(":/04_update_2.2_stage2.sql")))
+        if (!execSQLFile(lit(":/04_update_2.2_stage2.sql")))
             return false;
 
         { //Videowall-related scripts
-            if (!execSQLFile(QLatin1String(":/05_videowall.sql")))
+            if (!execSQLFile(lit(":/05_videowall.sql")))
                 return false;
             QMap<int, QnId> guids = getGuidList("SELECT rt.id, rt.name || '-' as guid from vms_resourcetype rt WHERE rt.name == 'Videowall'");
             if (!updateTableGuids("vms_resourcetype", "guid", guids))
                 return false;
         }
+
+        if (!execSQLFile(lit(":/06_bookmarks.sql")))
+            return false;
 
     }
     lock.commit();
@@ -707,8 +710,8 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 in
     }
 
     QSqlQuery insQuery(m_sdb);
-    //insQuery.prepare("INSERT INTO vms_scheduletask (source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES\
-                     //:sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
+    //insQuery.prepare("INSERT INTO vms_scheduletask (source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) 
+    //                  VALUES :sourceId, :startTime, :endTime, :doRecordAudio, :recordType, :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps)");
     insQuery.prepare("INSERT INTO vms_scheduletask(source_id, start_time, end_time, do_record_audio, record_type, day_of_week, before_threshold, after_threshold, stream_quality, fps) VALUES (?,?,?,?,?,?,?,?,?,?)");
 
     insQuery.bindValue(0, internalId);
@@ -762,11 +765,11 @@ ErrorCode QnDbManager::saveCamera(const ApiCameraData& params)
 {
     qint32 internalId;
     ErrorCode result = insertOrReplaceResource(params, &internalId);
-    if (result !=ErrorCode::ok)
+    if (result != ErrorCode::ok)
         return result;
 
     result = insertOrReplaceCamera(params, internalId);
-    if (result !=ErrorCode::ok)
+    if (result != ErrorCode::ok)
         return result;
 
     result = updateCameraSchedule(params, internalId);
@@ -1618,6 +1621,19 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServer
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags) {
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT name FROM vms_camera_bookmark_tag");
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::failure;
+    }
+    QnSql::fetch_many(query, &tags);
+
+    return ErrorCode::ok;
+}
+
 //getUsers
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList)
 {
@@ -1903,6 +1919,52 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicenseDa
     return ErrorCode::ok;
 
 //    return m_licenseManagerImpl->addLicenses( tran.params );
+}
+
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraBookmarkTagDataList> &tran) {
+
+    std::function<ec2::ErrorCode (const ApiCameraBookmarkTagData &)> processTag;
+
+    switch (tran.command) {
+    case ApiCommand::addCameraBookmarkTags:
+        processTag = [this](const ApiCameraBookmarkTagData &tag) {return addCameraBookmarkTag(tag);};
+        break;
+    case ApiCommand::removeCameraBookmarkTags:
+        processTag = [this](const ApiCameraBookmarkTagData &tag) {return removeCameraBookmarkTag(tag);};
+        break;
+    default:
+        assert(false); //should never get here
+        break;
+    }
+
+    for (const ApiCameraBookmarkTagData &tag: tran.params) {
+        ErrorCode result = processTag(tag);
+        if (result != ErrorCode::ok)
+            return result;
+    }
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag) {
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT OR REPLACE INTO vms_camera_bookmark_tag (name) VALUES (:name)");
+    QnSql::bind(tag, &insQuery);
+    if (insQuery.exec())
+        return ErrorCode::ok;
+
+    qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+    return ErrorCode::failure;
+}
+
+ErrorCode QnDbManager::removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag) {
+    QSqlQuery delQuery(m_sdb);
+    delQuery.prepare("DELETE FROM vms_camera_bookmark_tag WHERE name=:name");
+    QnSql::bind(tag, &delQuery);
+    if (delQuery.exec())
+        return ErrorCode::ok;
+
+    qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+    return ErrorCode::failure;
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data)

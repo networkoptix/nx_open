@@ -21,6 +21,7 @@ struct QnPtzLimits: public boost::equality_comparable1<QnPtzLimits> {
     qreal minFov;
     qreal maxFov;
 };
+#define QnPtzLimits_Fields (minPan)(maxPan)(minTilt)(maxTilt)(minFov)(maxFov)
 
 Q_DECLARE_TYPEINFO(QnPtzLimits, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(QnPtzLimits);

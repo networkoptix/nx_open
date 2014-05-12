@@ -4,22 +4,7 @@
 #ifdef ENABLE_AXIS
 #ifdef ENABLE_ONVIF
 
-#include <map>
-
-#include <QtCore/QMutex>
-
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
-#include "utils/network/simple_http_client.h"
-#include "utils/network/http/linesplitter.h"
-#include "core/datapacket/media_data_packet.h"
-#include "../onvif/onvif_resource.h"
-
-
-namespace nx_http
-{
-    class AsyncHttpClient;
-}
+#include <plugins/resources/onvif/onvif_resource.h>
 
 class QnAxisOnvifResource : public QnPlOnvifResource
 {

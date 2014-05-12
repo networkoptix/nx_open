@@ -13,8 +13,9 @@
 #include "api/app_server_connection.h"
 #include "motion_data_picture.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-#include "third_party_stream_reader.h"
 #include "third_party_archive_delegate.h"
+#include "third_party_ptz_controller.h"
+#include "third_party_stream_reader.h"
 
 
 static const QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
@@ -40,10 +41,12 @@ QnThirdPartyResource::~QnThirdPartyResource()
     stopInputPortMonitoring();
 }
 
-QnAbstractPtzController *QnThirdPartyResource::createPtzControllerInternal()
+QnAbstractPtzController* QnThirdPartyResource::createPtzControllerInternal()
 {
-    //TODO/IMPL
-    return NULL;
+    nxcip::CameraPtzManager* ptzManager = m_camManager.getPtzManager();
+    if( !ptzManager )
+        return NULL;
+    return new QnThirdPartyPtzController( toSharedPointer().staticCast<QnThirdPartyResource>(), ptzManager );
 }
 
 bool QnThirdPartyResource::isResourceAccessible()
@@ -338,8 +341,32 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
     if( cameraCapabilities & nxcip::BaseCameraManager::ptzCapability )
     {
-        //setPtzCapability( Qn::AbsolutePtzCapability, true );
-        //TODO/IMPL requesting nxcip::CameraPtzManager interface and setting capabilities
+        nxcip::CameraPtzManager* ptzManager = m_camManager.getPtzManager();
+        if( ptzManager )
+        {
+            const int ptzCapabilities = ptzManager->getCapabilities();
+            if( ptzCapabilities & nxcip::CameraPtzManager::ContinuousPanCapability )
+                setPtzCapability( Qn::ContinuousPanCapability, true );
+            if( ptzCapabilities & nxcip::CameraPtzManager::ContinuousTiltCapability )
+                setPtzCapability( Qn::ContinuousTiltCapability, true );
+            if( ptzCapabilities & nxcip::CameraPtzManager::ContinuousZoomCapability )
+                setPtzCapability( Qn::ContinuousZoomCapability, true );
+            if( ptzCapabilities & nxcip::CameraPtzManager::AbsolutePanCapability )
+                setPtzCapability( Qn::AbsolutePanCapability, true );
+            if( ptzCapabilities & nxcip::CameraPtzManager::AbsoluteTiltCapability )
+                setPtzCapability( Qn::AbsoluteTiltCapability, true );
+            if( ptzCapabilities & nxcip::CameraPtzManager::AbsoluteZoomCapability )
+                setPtzCapability( Qn::AbsoluteZoomCapability, true );
+            if( ptzCapabilities & nxcip::CameraPtzManager::FlipPtzCapability )
+                setPtzCapability( Qn::FlipPtzCapability, true );
+            if( ptzCapabilities & nxcip::CameraPtzManager::LimitsPtzCapability )
+                setPtzCapability( Qn::LimitsPtzCapability, true );
+            if( ptzCapabilities & nxcip::CameraPtzManager::DevicePositioningPtzCapability )
+                setPtzCapability( Qn::DevicePositioningPtzCapability, true );
+            if( ptzCapabilities & nxcip::CameraPtzManager::LogicalPositioningPtzCapability )
+                setPtzCapability( Qn::LogicalPositioningPtzCapability, true );
+        }
+        ptzManager->releaseRef();
     }
     if( cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
         setAudioEnabled( true );

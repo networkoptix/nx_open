@@ -44,7 +44,7 @@ namespace ec2
             //!ApiFullInfo,
             getAllDataList = 13,
             
-            //!ApiCamera
+            //!ApiCameraData
             saveCamera = 14,
             //!ApiCameraList
             saveCameras = 15,
@@ -147,6 +147,11 @@ namespace ec2
             uploadUpdateResponce = 60,
             //!ApiUpdateInstallData
             installUpdate = 61,
+
+            //!ApiCameraBookmarkTagDataList
+            addCameraBookmarkTags = 62,
+            getCameraBookmarkTags = 63,
+            removeCameraBookmarkTags = 64,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

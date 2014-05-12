@@ -41,7 +41,7 @@ public:
     QString getPhysicalId() const;
     void setPhysicalId(const QString& physicalId);
 
-    QnMediaServerResourcePtr getMediaServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod, bool gotOfflineCameras);
+    QnMediaServerResourcePtr getMediaServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod, bool allowOfflineServer);
     QnMediaServerResourcePtr getNextMediaServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod);
     QnResourceList getAllCameraServers(const QnTimePeriod& timePeriod);
     QnResourceList getAllCameraServers();

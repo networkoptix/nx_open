@@ -27,7 +27,7 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace 
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             StreamQuality SecondStreamQuality PanicMode RecordingType SerializationFormat)
     Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes ServerFlags)
@@ -79,8 +79,8 @@ public:
         RelayOutputCapability               = 0x010,
         ShareIpCapability                   = 0x020 
     };
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
 
     enum PtzCommand {
         ContinuousMovePtzCommand,
@@ -128,6 +128,8 @@ public:
         NoPtzFields             = 0x000,
         AllPtzFields            = 0xFFF
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzDataField)
+
     Q_DECLARE_FLAGS(PtzDataFields, PtzDataField)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
 
@@ -176,9 +178,10 @@ public:
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzCapability)
 
-    Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
+    Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities)
 
 
     enum StreamFpsSharingMethod {
@@ -194,16 +197,16 @@ public:
 
 
     enum MotionType {
-        MT_Default = 0, 
-        MT_HardwareGrid = 1, 
-        MT_SoftwareGrid = 2, 
-        MT_MotionWindow = 4, 
-        MT_NoMotion = 8
+        MT_Default      = 0x0, 
+        MT_HardwareGrid = 0x1, 
+        MT_SoftwareGrid = 0x2, 
+        MT_MotionWindow = 0x4, 
+        MT_NoMotion     = 0x8
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionType)
 
-    Q_DECLARE_FLAGS(MotionTypes, MotionType);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes);
+    Q_DECLARE_FLAGS(MotionTypes, MotionType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes)
 
 
     enum PanicMode {
@@ -216,10 +219,10 @@ public:
 
     // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag { 
-        SF_None     = 0, 
-        SF_Edge     = 1,
-        SF_RemoteEC = 2,
-        SF_HasPublicIP = 4
+        SF_None         = 0x0, 
+        SF_Edge         = 0x1,
+        SF_RemoteEC     = 0x2,
+        SF_HasPublicIP  = 0x4
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
@@ -233,16 +236,25 @@ public:
         NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
     };
 
-    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes);
+    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes)
 
 
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
+        BookmarksContent,
         TimePeriodContentCount
     };
 
+    enum CameraDataType {
+        RecordedTimePeriod,
+        MotionTimePeriod,
+        BookmarkTimePeriod,
+        BookmarkData,
+
+        CameraDataTypeCount
+    };
 
     enum SystemComponent {
         EnterpriseControllerComponent,
@@ -342,6 +354,7 @@ public:
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
+        CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
@@ -446,12 +459,11 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner)(Qn::CameraDataType)(Qn::PtzDataFields), (metatype))
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities)
-        (Qn::MotionType)(Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlags)(Qn::PanicMode)(Qn::RecordingType)
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
+        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::SerializationFormat), 
     (metatype)(lexical)(json)
 )

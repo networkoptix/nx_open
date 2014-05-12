@@ -5,6 +5,9 @@
 
 namespace ec2
 {
+    // TODO: #EC2 #Elric doesn't conform to API naming conventions.
+    // And what it is, anyway? Why just an empty struct?
+
     //!Parameters of connect request
     struct LoginInfo: ApiData 
     {

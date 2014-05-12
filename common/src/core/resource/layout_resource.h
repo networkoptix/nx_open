@@ -8,7 +8,6 @@
 
 #include "resource.h"
 #include "layout_item_data.h"
-#include "recording/time_period.h"
 
 class QnLayoutResource: public QnResource {
     Q_OBJECT

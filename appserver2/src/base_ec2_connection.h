@@ -212,6 +212,10 @@ namespace ec2
             m_updatesManager->triggerNotification(tran);
         }
 
+        void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList> &tran) {
+            return m_cameraManager->triggerNotification(tran);
+        }
+
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
     protected:
         QueryProcessorType* m_queryProcessor;

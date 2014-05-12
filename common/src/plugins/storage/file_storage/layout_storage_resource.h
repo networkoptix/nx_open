@@ -8,9 +8,9 @@ extern "C"
     #include <libavformat/avio.h>
 }
 #include "core/resource/storage_resource.h"
-#include "recording/time_period_list.h"
 
 class QnLayoutFile;
+class QnTimePeriodList;
 
 /*
 * QnLayoutFileStorageResource uses for layout export
@@ -50,7 +50,7 @@ public:
 
     bool switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile);
 
-    QnTimePeriodList getTimePeriods(QnResourcePtr res);
+    QnTimePeriodList getTimePeriods(const QnResourcePtr &resource);
 
     static QString updateNovParent(const QString& novName, const QString& itemName);
 

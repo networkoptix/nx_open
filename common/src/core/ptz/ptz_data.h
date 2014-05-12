@@ -29,6 +29,7 @@ struct QnPtzData {
     QnPtzObject activeObject;
     QnPtzObject homeObject;
 };
+#define QnPtzData_Fields (query)(fields)(capabilities)(logicalPosition)(devicePosition)(logicalLimits)(deviceLimits)(flip)(presets)(tours)(activeObject)(homeObject)
 
 Q_DECLARE_METATYPE(QnPtzData)
 

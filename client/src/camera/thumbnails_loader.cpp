@@ -32,6 +32,8 @@ extern "C"
 #include "thumbnails_loader_helper.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
+#include <recording/time_period.h>
+
 namespace {
     const qint64 defaultUpdateInterval = 10 * 1000; /* 10 seconds. */
 

@@ -18,7 +18,6 @@
 #include <api/model/kvpair.h>
 #include <api/model/connection_info.h>
 
-#include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
 #include <core/resource/resource_fwd.h>
@@ -32,10 +31,15 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_history.h>
 
+#include <core/resource/camera_bookmark_fwd.h>
+#include <core/resource/camera_bookmark.h>
+
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_control_message.h>
+
+#include <recording/time_period.h>
 
 #include <core/misc/schedule_task.h>
 #include <core/ptz/ptz_data.h>
@@ -100,6 +104,10 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnCameraHistoryList>();
     qRegisterMetaType<QnCameraHistoryItemPtr>();
+
+    qRegisterMetaType<QnCameraBookmark>();
+    qRegisterMetaType<QnCameraBookmarkList>();
+    qRegisterMetaType<QnCameraBookmarkTags>("QnCameraBookmarkTags");/* The underlying type is identical to QStringList. */
 
     qRegisterMetaType<QnLicensePtr>();
     qRegisterMetaType<QnLicenseList>();
@@ -175,6 +183,8 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<Qn::PanicMode>();
 
     qRegisterMetaType<QnModuleInformation>();
+
+    qRegisterMetaType<Qn::CameraDataType>();
 
     qn_commonMetaTypes_initialized = true;
 }

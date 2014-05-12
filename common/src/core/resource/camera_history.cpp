@@ -66,10 +66,10 @@ QnCameraTimePeriodList::const_iterator QnCameraHistory::getMediaServerOnTimeItr(
     return itr;
 }
 
-QnMediaServerResourcePtr QnCameraHistory::getMediaServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod, bool gotOfflineCameras)
+QnMediaServerResourcePtr QnCameraHistory::getMediaServerOnTime(qint64 timestamp, bool searchForward, QnTimePeriod& currentPeriod, bool allowOfflineServers)
 {
     QMutexLocker lock(&m_mutex);
-    QnCameraTimePeriodList timePeriods = gotOfflineCameras ? m_fullTimePeriods : getOnlineTimePeriods();
+    QnCameraTimePeriodList timePeriods = allowOfflineServers ? m_fullTimePeriods : getOnlineTimePeriods();
 
     QnCameraTimePeriodList::const_iterator itr;
     if (timestamp == DATETIME_NOW && !timePeriods.isEmpty())

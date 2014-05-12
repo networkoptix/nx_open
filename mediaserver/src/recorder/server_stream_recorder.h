@@ -1,6 +1,8 @@
 #ifndef __SERVER_STREAM_RECORDER_H__
 #define __SERVER_STREAM_RECORDER_H__
 
+#include <server/server_globals.h>
+
 #include "recording/stream_recorder.h"
 #include "core/misc/schedule_task.h"
 #include "recorder/device_file_catalog.h"
@@ -15,7 +17,7 @@ class QnServerStreamRecorder: public QnStreamRecorder
 {
     Q_OBJECT
 public:
-    QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider);
+    QnServerStreamRecorder(const QnResourcePtr &dev, QnServer::ChunksCatalog catalog, QnAbstractMediaStreamDataProvider* mediaProvider);
     ~QnServerStreamRecorder();
 
     void updateCamera(QnSecurityCamResourcePtr cameraRes);
@@ -81,7 +83,7 @@ private:
     //bool m_lastMotionContainData;
     //bool m_needUpdateStreamParams;
     mutable qint64 m_lastWarningTime;
-    QnResource::ConnectionRole m_role;
+    QnServer::ChunksCatalog m_catalog;
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     QnDualStreamingHelperPtr m_dualStreamingHelper;
     QnMediaServerResourcePtr m_mediaServer;

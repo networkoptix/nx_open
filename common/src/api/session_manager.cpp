@@ -312,12 +312,13 @@ void QnSessionManager::at_aboutToBeStopped() {
     m_accessManager = 0;
 }
 
-void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * )
+void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & reply, QAuthenticator* authenticator)
 {
-    // not used
+    QString user = QnAppServerConnectionFactory::defaultUrl().userName();
+    QString password = QnAppServerConnectionFactory::defaultUrl().password();
+    authenticator->setUser(user);
+    authenticator->setPassword(password);
 }
-
-
 
 void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
 {

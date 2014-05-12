@@ -143,6 +143,28 @@ QString QnVirtualCameraResource::getUniqueId() const
     */
 }
 
+bool QnVirtualCameraResource::isForcedAudioSupported() const {
+    QVariant val;
+    if (!getParam(lit("forcedIsAudioSupported"), val, QnDomainMemory))
+        return false;
+    return val.toUInt() > 0;
+}
+
+void QnVirtualCameraResource::forceEnableAudio()
+{ 
+	if (isForcedAudioSupported())
+        return;
+    setParam(lit("forcedIsAudioSupported"), 1, QnDomainDatabase); 
+    save(); 
+};
+void QnVirtualCameraResource::forceDisableAudio()
+{ 
+    if (!isForcedAudioSupported())
+        return;
+    setParam(lit("forcedIsAudioSupported"), 0, QnDomainDatabase); 
+    save(); 
+};
+
 void QnVirtualCameraResource::save()
 {
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();

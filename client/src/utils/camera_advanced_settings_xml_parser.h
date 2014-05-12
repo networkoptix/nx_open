@@ -6,7 +6,7 @@
 #include <QtCore/QSet>
 #include <QtWidgets/QTreeWidgetItem>
 #include <QtWidgets/QStackedLayout>
-#ifdef WEBKIT_PRESENT
+#ifdef QT_WEBKITWIDGETS_LIB
 #include <QtWebKitWidgets/QtWebKitWidgets>
 #endif
 
@@ -203,7 +203,7 @@ class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSet
     typedef CameraSettingsWidgetsCreator::SettingsWidgetsById SettingsWidgetsById;
     typedef CameraSettingsWidgetsCreator::EmptyGroupsById EmptyGroupsById;
 
-#ifdef WEBKIT_PRESENT
+#ifdef QT_WEBKITWIDGETS_LIB
     QWebView* m_webView;
 #endif
     QTreeWidget& m_rootWidget;
@@ -230,7 +230,7 @@ public:
         const QString& id,
         QTreeWidget& rootWidget,
         QStackedLayout& rootLayout,
-#ifdef WEBKIT_PRESENT
+#ifdef QT_WEBKITWIDGETS_LIB
         QWebView* webView,
 #endif
         QObject* handler);
@@ -244,8 +244,8 @@ public:
     QString getCameraId() const;
     QTreeWidget* getRootWidget();
     QStackedLayout* getRootLayout();
-#ifdef WEBKIT_PRESENT
-    QWebView* getWebView();
+#ifdef QT_WEBKITWIDGETS_LIB
+    QWebView** getWebView();
 #endif
 };
 

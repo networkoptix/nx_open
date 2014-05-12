@@ -879,6 +879,21 @@ namespace Qn {
          */
         ExportLayoutAction,
 
+        /** 
+         * Bookmark selected range.
+         */
+        AddCameraBookmarkAction,
+
+        /**
+         * Edit selected bookmark.
+         */
+        EditCameraBookmarkAction,
+
+        /**
+         * Remove selected bookmark.
+         */
+        RemoveCameraBookmarkAction,
+
         /**
          * Opens new layout for Quick Search.
          *

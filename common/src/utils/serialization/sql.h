@@ -14,6 +14,8 @@
 #include "sql_fwd.h"
 #include "sql_index_mapping.h"
 
+#include <utils/fusion/fusion.h> // #TODO: #Elric EC2
+
 namespace QnSqlDetail {
     template<class T>
     void bind_internal(const T &value, QSqlQuery *target) {
@@ -241,5 +243,6 @@ __VA_ARGS__ void fetch(const QnSqlIndexMapping &mapping, const QSqlRecord &value
     QnFusion::visit_members(*target, QnSqlDetail::FetchVisitor(mapping, value)); \
 }
 
+// TODO: #Elric we have undefined behaviour here (mapping^): dereferencing NULL.
 
 #endif // QN_SERIALIZATION_SQL_H

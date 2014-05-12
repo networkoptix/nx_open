@@ -7,6 +7,7 @@
 #include "api_business_rule_data.h"
 #include "api_camera_data.h"
 #include "api_camera_server_item_data.h"
+#include "api_camera_bookmark_data.h"
 #include "api_connection_data.h"
 #include "api_data.h"
 #include "api_email_data.h"
@@ -45,7 +46,7 @@ inline void deserialize_field(const QVariant &, ec2::ApiServerInfoData *) { retu
 
 namespace ec2 {
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_EC2_API_DATA_CLASSES, (binary)(json)(sql_record)(csv_record), _Fields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_EC2_API_DATA_TYPES, (binary)(json)(sql_record)(csv_record), _Fields)
 
 } // namespace ec2
 

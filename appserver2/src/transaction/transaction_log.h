@@ -74,6 +74,7 @@ namespace ec2
     private:
         bool contains(const QnAbstractTransaction& tran, const QUuid& hash);
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
+        QUuid makeHash(const ApiCommand::Value command, const ApiCameraBookmarkTagDataList& data);
 
         QUuid transactionHash(const QnTransaction<ApiCameraData>& tran)                 { return tran.params.id; }
         QUuid transactionHash(const QnTransaction<ApiMediaServerData>& tran)            { return tran.params.id; }
@@ -94,6 +95,7 @@ namespace ec2
         QUuid transactionHash(const QnTransaction<ApiLicenseData>& tran)                { return makeHash(tran.params.key, "ApiLicense"); }    //TODO
         QUuid transactionHash(const QnTransaction<ApiResetBusinessRuleData>& /*tran*/)  { return makeHash("reset_brule", ADD_HASH_DATA); }
         QUuid transactionHash(const QnTransaction<ApiUpdateUploadResponceData>& tran)   { return makeHash(tran.params.id.toRfc4122(), tran.params.updateId.toUtf8()); }
+        QUuid transactionHash(const QnTransaction<ApiCameraBookmarkTagDataList> &tran)  { return makeHash(tran.command, tran.params); }   //TODO: #Elric ec2 make sure it is the correct way
         
         QUuid transactionHash(const QnTransaction<ApiFullInfoData>& )                   { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTransaction<ApiCameraDataList>& )                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }

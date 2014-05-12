@@ -6,8 +6,9 @@ sys.path.append(basedir + '/' + '../..')
 
 from main import get_environment_variable, cd
 
-qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}', '${qtlib9}', '${qtlib10}', '${qtlib11}', '${qtlib12}']
+qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}', '${qtlib9}', '${qtlib10}', '${qtlib11}', '${qtlib12}', '${qtlib13}', '${qtlib14}', '${qtlib15}', '${qtlib16}', '${qtlib17}']
 qtplugins = ['${qtplugin1}', '${qtplugin2}', '${qtplugin3}']
+qtbasedir = '${qt.dir}/..'
 
 def get_platform():
     if sys.platform == 'win32':
@@ -59,9 +60,9 @@ if __name__ == '__main__':
             
     if get_platform() == 'windows':        
         for arch in ('x86', 'x64'):
-            plugin_source_dir = '${environment.dir}/qt5/qtbase-%s/plugins' % arch
-            lib_source_dir = '${environment.dir}/qt5/qtbase-%s/bin' % arch
-            pdb_source_dir = '${environment.dir}/qt5/qtbase-%s/lib' % arch
+            plugin_source_dir = '%s/qtbase-%s/plugins' % (qtbasedir, arch)
+            lib_source_dir = '%s/qtbase-%s/bin' % (qtbasedir, arch)
+            pdb_source_dir = '%s/qtbase-%s/lib' % (qtbasedir, arch)
             target_dir = join('${project.build.directory}', arch, 'bin')
             lib_target_dir = join('${project.build.directory}', arch, 'lib')
             help_dir = join('${project.build.directory}', arch, 'bin/help')
@@ -109,6 +110,10 @@ if __name__ == '__main__':
                 target_plugins = join(target_dir, config, 'plugins')
                 if not os.path.exists(target_plugins):
                     os.makedirs(join(target_dir, config, 'plugins'))
+                for file in os.listdir(lib_source_dir):
+                    if fnmatch.fnmatch(file, 'icu*.dll'):
+                        print (join(lib_source_dir, file))
+                        shutil.copy2(join(lib_source_dir, file), join(target_dir, config))                    
                 #shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target_vox)                        z
 
     else:     

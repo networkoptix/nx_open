@@ -5,6 +5,8 @@
 
 #include "camera_diagnostics_rest_handler.h"
 
+#include <server/server_globals.h>
+
 #include <api/model/camera_diagnostics_reply.h>
 #include <core/dataprovider/spush_media_stream_provider.h>
 #include <core/resource_management/resource_pool.h>
@@ -100,7 +102,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::tryAcquireCameraMediaS
     QnVideoCamera* videoCamera )
 {
     Q_UNUSED(cameraRes)
-    QnAbstractMediaStreamDataProviderPtr streamReader = videoCamera->getLiveReader( QnResource::Role_LiveVideo );
+    QnAbstractMediaStreamDataProviderPtr streamReader = videoCamera->getLiveReader(QnServer::HiQualityCatalog);
     if( !streamReader )
         return CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::unknown, "no stream reader" ); //NOTE we should never get here 
 

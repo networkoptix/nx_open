@@ -20,10 +20,13 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
 {
     stop();
 }
-
+bool QnUniversalTcpListener::isProxy(const QUrl& url)
+{
+    return (m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(m_proxyInfo.proxyOpaque, url));
+};
 QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const QUrl& url)
 {
-    if (m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(m_proxyInfo.proxyOpaque, url))
+    if (isProxy(url))
         return m_proxyInfo.proxyHandler(clientSocket, this);
 
     QString path = url.path();

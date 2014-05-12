@@ -54,6 +54,7 @@ namespace ec2 {
     struct ApiVideowallScreenWithRefData;
     struct ApiUpdateUploadData;
     struct ApiUpdateUploadResponceData;
+    struct ApiCameraBookmarkTagData;
 
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
@@ -68,13 +69,14 @@ namespace ec2 {
     typedef std::vector<ApiStorageData> ApiStorageDataList;
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
+    typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
 
     typedef QString ApiStoredFilePath; // TODO: #Elric struct => extendable?
     typedef QString ApiUpdateInstallData; // TODO: #Elric struct => extendable?
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
     struct LoginInfo;
 
-#define QN_EC2_API_DATA_CLASSES \
+#define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
     (ApiBusinessRuleData)\
     (ApiCameraData)\
@@ -115,10 +117,11 @@ namespace ec2 {
     (ApiVideowallScreenWithRefData)\
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
+    (ApiCameraBookmarkTagData)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-        QN_EC2_API_DATA_CLASSES,
+        QN_EC2_API_DATA_TYPES,
         (binary)(json)(sql_record)(csv_record)
     );
 #endif

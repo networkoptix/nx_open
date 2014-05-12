@@ -24,7 +24,7 @@
 #include "utils/common/util.h"
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnResource, Status)
-QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnResource::Status)
+QN_DEFINE_LEXICAL_JSON_FUNCTIONS(QnResource::Status)
 
 bool QnResource::m_appStopping = false;
 QnInitResPool QnResource::m_initAsyncPool;
@@ -316,21 +316,15 @@ bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*
 
 bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) const
 {
-    getResourceParamList();
-    if (!m_resourceParamList.contains(name))
+    const QnParamList& resourceParamList = getResourceParamList();
+    if (!resourceParamList.contains(name))
     {
         emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
         return false;
     }
 
-    //m_mutex.lock();
-    //QnParam &param = m_resourceParamList[name];
-    //val = param.value();
-    //m_mutex.unlock();
-    m_mutex.lock();
-    QnParam param = m_resourceParamList[name];
+    const QnParam& param = resourceParamList[name];
     val = param.value();
-    m_mutex.unlock();
 
     if (domain == QnDomainMemory)
     {
@@ -383,9 +377,8 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         return true;
     }
 
-
-    getResourceParamList(); // paramList loaded once. No more changes, instead of param value. So, use mutex for value only
-    if (!m_resourceParamList.contains(name))
+    const QnParamList& resourceParamList = getResourceParamList(); // paramList loaded once. No more changes, instead of param value. So, use mutex for value only
+    if (!resourceParamList.contains(name))
     {
         qWarning() << "Can't set parameter. Parameter" << name << "does not exists for resource" << getName();
         emit asyncParamSetDone(toSharedPointer(this), name, val, false);

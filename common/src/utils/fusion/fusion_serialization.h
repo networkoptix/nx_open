@@ -1,6 +1,10 @@
 #ifndef QN_FUSION_SERIALIZATION_H
 #define QN_FUSION_SERIALIZATION_H
 
+#ifndef Q_MOC_RUN
+#include <boost/preprocessor/tuple/enum.hpp>
+#endif 
+
 #include "fusion.h"
 #include "fusion_detail.h"
 
@@ -73,6 +77,7 @@ namespace QnFusion {
 
 } // namespace QnFusion
 
+#ifndef Q_MOC_RUN
 
 /**
  * This macro registers fusion visitors that are to be used when serializing
@@ -90,27 +95,51 @@ namespace QnFusion {
     QN_FUSION_REGISTER_SERIALIZATION_VISITOR(DATA_CLASS, SERIALIZATION_VISITOR) \
     QN_FUSION_REGISTER_DESERIALIZATION_VISITOR(DATA_CLASS, DESERIALIZATION_VISITOR)
 
+#define QN_FUSION_REGISTER_SERIALIZATION_VISITORS_TPL(TPL_DEF, DATA_CLASS, SERIALIZATION_VISITOR, DESERIALIZATION_VISITOR) \
+    QN_FUSION_REGISTER_SERIALIZATION_VISITOR(TPL_DEF, DATA_CLASS, SERIALIZATION_VISITOR) \
+    QN_FUSION_REGISTER_DESERIALIZATION_VISITOR(TPL_DEF, DATA_CLASS, DESERIALIZATION_VISITOR)
+
+
 /**
  * \see QN_FUSION_REGISTER_VISITORS
  */
 #define QN_FUSION_REGISTER_SERIALIZATION_VISITOR(DATA_CLASS, SERIALIZATION_VISITOR) \
+    QN_FUSION_REGISTER_SERIALIZATION_VISITOR_TPL((), (DATA_CLASS), (SERIALIZATION_VISITOR))
+
+#define QN_FUSION_REGISTER_SERIALIZATION_VISITOR_TPL(TPL_DEF, DATA_CLASS, SERIALIZATION_VISITOR) \
 namespace QnFusion {                                                            \
-    template<>                                                                  \
-    struct serialization_visitor_type<DATA_CLASS> {                             \
-        typedef SERIALIZATION_VISITOR type;                                     \
+    template<BOOST_PP_TUPLE_ENUM(TPL_DEF)>                                      \
+    struct serialization_visitor_type<BOOST_PP_TUPLE_ENUM(DATA_CLASS)> {        \
+        typedef BOOST_PP_TUPLE_ENUM(SERIALIZATION_VISITOR) type;                \
     };                                                                          \
 }
+
 
 /**
  * \see QN_FUSION_REGISTER_VISITORS
  */
 #define QN_FUSION_REGISTER_DESERIALIZATION_VISITOR(DATA_CLASS, DESERIALIZATION_VISITOR) \
+    QN_FUSION_REGISTER_DESERIALIZATION_VISITOR_TPL((), (DATA_CLASS), (DESERIALIZATION_VISITOR))
+
+#define QN_FUSION_REGISTER_DESERIALIZATION_VISITOR_TPL(TPL_DEF, DATA_CLASS, DESERIALIZATION_VISITOR) \
 namespace QnFusion {                                                            \
-    template<>                                                                  \
-    struct deserialization_visitor_type<DATA_CLASS> {                           \
-        typedef DESERIALIZATION_VISITOR type;                                   \
+    template<BOOST_PP_TUPLE_ENUM(TPL_DEF)>                                      \
+    struct deserialization_visitor_type<BOOST_PP_TUPLE_ENUM(DATA_CLASS)> {      \
+        typedef BOOST_PP_TUPLE_ENUM(DESERIALIZATION_VISITOR) type;              \
     };                                                                          \
 }
+
+#else // Q_MOC_RUN
+
+/* Qt moc chokes on these. We make its life easier. */
+#define QN_FUSION_REGISTER_SERIALIZATION_VISITORS(...)
+#define QN_FUSION_REGISTER_SERIALIZATION_VISITORS_TPL(...)
+#define QN_FUSION_REGISTER_SERIALIZATION_VISITOR(...)
+#define QN_FUSION_REGISTER_SERIALIZATION_VISITOR_TPL(...)
+#define QN_FUSION_REGISTER_DESERIALIZATION_VISITOR(...)
+#define QN_FUSION_REGISTER_DESERIALIZATION_VISITOR_TPL(...)
+
+#endif // Q_MOC_RUN
 
 
 #endif // QN_FUSION_SERIALIZATION_H

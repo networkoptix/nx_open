@@ -19,6 +19,7 @@ public:
     QString id;
     QString name;
 };
+#define QnPtzPreset_Fields (id)(name)
 
 Q_DECLARE_METATYPE(QnPtzPreset)
 Q_DECLARE_METATYPE(QnPtzPresetList)
