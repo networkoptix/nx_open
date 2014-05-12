@@ -16,8 +16,6 @@
 
 #include <version.h>
 
-void stopServer(int signal);
-
 namespace {
 
     const QString updatesDirSuffix = lit("mediaserver/updates");
@@ -35,15 +33,17 @@ namespace {
     }
 
     QDir getUpdateDir(const QString &updateId) {
+        QString id = updateId.mid(1, updateId.length() - 2);
         QDir dir = getUpdatesDir();
-        if (!dir.exists(updateId))
-            dir.mkdir(updateId);
-        dir.cd(updateId);
+        if (!dir.exists(id))
+            dir.mkdir(id);
+        dir.cd(id);
         return dir;
     }
 
     QString getUpdateFilePath(const QString &updateId) {
-        return getUpdatesDir().absoluteFilePath(updateId + lit(".zip"));
+        QString id = updateId.mid(1, updateId.length() - 2);
+        return getUpdatesDir().absoluteFilePath(id + lit(".zip"));
     }
 
     bool extractZipArchive(QuaZip *zip, const QDir &dir) {

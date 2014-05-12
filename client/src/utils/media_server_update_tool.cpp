@@ -32,18 +32,6 @@ QString updateFilePath(const QString &fileName) {
     return dir.absoluteFilePath(fileName);
 }
 
-QString generateUpdateId(const QString &baseId) {
-    const char chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    const int suffixLength = 4;
-
-    QString result = baseId;
-    result.append(lit("_"));
-    for (int i = 0; i < suffixLength; i++)
-        result.append(QChar::fromLatin1(chars[qrand() % (sizeof(chars) - 1)]));
-
-    return result;
-}
-
 } // anonymous namespace
 
 QnMediaServerUpdateTool::PeerUpdateInformation::PeerUpdateInformation(const QnMediaServerResourcePtr &server) :
@@ -314,7 +302,7 @@ void QnMediaServerUpdateTool::updateServers() {
     m_downloadingUpdates.clear();
     m_updateInformationById.clear();
 
-    m_updateId = generateUpdateId(m_targetVersion.toString());
+    m_updateId = QUuid::createUuid().toString();
 
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
         QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
