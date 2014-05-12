@@ -44,7 +44,7 @@ ThirdPartyArchiveDelegate::~ThirdPartyArchiveDelegate()
     ThirdPartyArchiveDelegate_count.fetchAndAddOrdered( -1 );
 }
 
-bool ThirdPartyArchiveDelegate::open( QnResourcePtr resource )
+bool ThirdPartyArchiveDelegate::open(const QnResourcePtr &resource )
 {
     if( m_resource != resource )
         return false;

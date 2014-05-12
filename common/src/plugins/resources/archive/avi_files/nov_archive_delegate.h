@@ -17,7 +17,7 @@ public:
 
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual qint64 seek (qint64 time, bool findIFrame) override;
-    virtual bool open(QnResourcePtr resource);
+    virtual bool open(const QnResourcePtr &resource) override;
 private:
     QnTimePeriodList m_chunks;
     qint64 m_skipFramesBeforeTime;

@@ -54,6 +54,10 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
         this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
     connect( connection->getCameraManager().get(), &ec2::AbstractCameraManager::cameraRemoved,
         this, &QnCommonMessageProcessor::on_resourceRemoved );
+    connect( connection->getCameraManager().get(), &ec2::AbstractCameraManager::cameraBookmarkTagsAdded,
+        this, &QnCommonMessageProcessor::cameraBookmarkTagsAdded );
+    connect( connection->getCameraManager().get(), &ec2::AbstractCameraManager::cameraBookmarkTagsRemoved,
+        this, &QnCommonMessageProcessor::cameraBookmarkTagsRemoved );
 
     connect( connection->getLicenseManager().get(), &ec2::AbstractLicenseManager::licenseChanged,
         this, &QnCommonMessageProcessor::on_licenseChanged );

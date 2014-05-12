@@ -72,7 +72,7 @@ QnColdStoreDelegate::~QnColdStoreDelegate()
 }
 
 
-bool QnColdStoreDelegate::open(QnResourcePtr resource)
+bool QnColdStoreDelegate::open(const QnResourcePtr &resource)
 {
 
     m_resource = resource;

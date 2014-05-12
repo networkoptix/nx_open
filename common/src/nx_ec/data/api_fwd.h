@@ -52,6 +52,7 @@ namespace ec2 {
     struct ApiVideowallItemWithRefData;
     struct ApiVideowallScreenData;
     struct ApiVideowallScreenWithRefData;
+    struct ApiCameraBookmarkTagData;
 
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
@@ -66,6 +67,7 @@ namespace ec2 {
     typedef std::vector<ApiStorageData> ApiStorageDataList;
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
+    typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
 
     typedef QString ApiStoredFilePath; // TODO: #Elric struct => extendable?
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
@@ -110,6 +112,7 @@ namespace ec2 {
     (ApiVideowallItemWithRefData)\
     (ApiVideowallScreenData)\
     (ApiVideowallScreenWithRefData)\
+    (ApiCameraBookmarkTagData)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

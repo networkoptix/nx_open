@@ -8,7 +8,7 @@ extern "C"
 #include "buffered_file.h"
 #include <QSharedPointer>
 #include "utils/common/util.h"
-#include "core/resource/resource_fwd.h"
+#include <core/resource/storage_resource.h>
 #include "recorder/storage_manager.h"
 
 #ifdef Q_OS_WIN

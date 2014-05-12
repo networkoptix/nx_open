@@ -24,6 +24,9 @@ QnTimeSliderColors::QnTimeSliderColors() {
     pastMotion = QColor(255, 0, 0, 128);
     futureMotion = QColor(255, 0, 0, 64);
 
+    pastBookmark = QColor(0, 0, 255, 128);
+    futureBookmark = QColor(0, 0, 255, 64);
+
     separator = QColor(255, 255, 255, 64);
 
     dateOverlay = QColor(255, 255, 255, 48);
@@ -116,7 +119,6 @@ QnLicensesListModelColors::QnLicensesListModelColors() {
     warning = QColor(Qt::yellow);
     expired = QColor(Qt::red);
 }
-
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

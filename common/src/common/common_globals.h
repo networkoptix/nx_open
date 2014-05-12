@@ -27,7 +27,7 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace 
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             StreamQuality SecondStreamQuality PanicMode RecordingType SerializationFormat)
     Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes ServerFlags)
@@ -243,9 +243,18 @@ public:
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
+        BookmarksContent,
         TimePeriodContentCount
     };
 
+    enum CameraDataType {
+        RecordedTimePeriod,
+        MotionTimePeriod,
+        BookmarkTimePeriod,
+        BookmarkData,
+
+        CameraDataTypeCount
+    };
 
     enum SystemComponent {
         EnterpriseControllerComponent,
@@ -345,6 +354,7 @@ public:
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
+        CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
@@ -449,8 +459,7 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner)(Qn::PtzDataFields), (metatype))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner)(Qn::CameraDataType)(Qn::PtzDataFields), (metatype))
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
