@@ -179,6 +179,8 @@ private:
     QNetworkAccessManager *m_networkAccessManager;
     ec2::QnDistributedMutexPtr m_distributedMutex;
 
+    QSet<QnId> m_restartingServers;
+
     QHash<QnId, PeerUpdateInformation> m_updateInformationById;
 };
 

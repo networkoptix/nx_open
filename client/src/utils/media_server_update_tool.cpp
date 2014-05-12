@@ -509,6 +509,8 @@ void QnMediaServerUpdateTool::installUpdatesToServers() {
 
     connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnMediaServerUpdateTool::at_resourceChanged);
 
+    m_restartingServers = m_pendingInstallations;
+
     connection2()->getUpdatesManager()->installUpdate(m_updateId, m_pendingInstallations,
                                                       this, [this](int, ec2::ErrorCode){});
 
@@ -537,6 +539,9 @@ void QnMediaServerUpdateTool::at_resourceChanged(const QnResourcePtr &resource) 
        return;
     }
 
+    if (resource->getStatus() == QnResource::Offline)
+        m_restartingServers.remove(resource->getId());
+
     auto it = m_pendingInstallations.find(resource->getId());
     if (it == m_pendingInstallations.end())
         return;
@@ -551,6 +556,19 @@ void QnMediaServerUpdateTool::at_resourceChanged(const QnResourcePtr &resource) 
     if (m_pendingInstallations.isEmpty()) {
         disconnect(qnResPool, &QnResourcePool::resourceChanged, this, &QnMediaServerUpdateTool::at_resourceChanged);
         finishUpdate(UpdateSuccessful);
+    }
+
+    if (m_restartingServers.isEmpty()) {
+        bool pending = false;
+        foreach (const QnId &id, m_pendingInstallations) {
+            if (m_updateInformationById[id].server->getStatus() == QnResource::Offline) {
+                pending = true;
+                break;
+            }
+        }
+
+        if (!pending)
+            setUpdateResult(InstallationFailed);
     }
 }
 
