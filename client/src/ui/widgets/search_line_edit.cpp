@@ -22,7 +22,7 @@ namespace {
         QnSearchButton(QWidget *parent = 0): 
             QAbstractButton(parent)
         {
-            setObjectName(QLatin1String("SearchButton"));
+            setObjectName(QLatin1String("QnSearchButton"));
 #ifndef QT_NO_CURSOR
             setCursor(Qt::ArrowCursor);
 #endif //QT_NO_CURSOR
@@ -31,25 +31,30 @@ namespace {
 
         void paintEvent(QPaintEvent *event) {
             Q_UNUSED(event);
-            QPainterPath myPath;
 
-            int radius = (height() / 5) * 2;
-            QRect circle(height() / 3 - 1, height() / 4, radius, radius);
-            myPath.addEllipse(circle);
+            int size = height(); //assuming height and width are equal
+            QPainterPath &path = m_pathCacheBySize[size];
+            if (path.isEmpty()) {
+                int radius = (size / 5) * 2;
+                QRect circle(size / 3 - 1, size / 4, radius, radius);
+                path.addEllipse(circle);
 
-            myPath.arcMoveTo(circle, 300);
-            QPointF c = myPath.currentPosition();
-            int diff = height() / 7;
-            myPath.lineTo(qMin(width() - 2, (int)c.x() + diff), c.y() + diff);
+                path.arcMoveTo(circle, 300);
+                QPointF c = path.currentPosition();
+                int diff = size / 7;
+                path.lineTo(qMin(width() - 2, (int)c.x() + diff), c.y() + diff);
+            }
 
             QPainter painter(this);
             painter.setRenderHint(QPainter::Antialiasing, true);
-            painter.setPen(QPen(Qt::darkGray, 2));
-            painter.drawPath(myPath);
+            painter.setPen(QPen(Qt::darkGray, 2));  //TODO: #GDM #Bookmarks should we customize this?
+            painter.drawPath(path);                 //TODO: #GDM #Bookmarks should we cache pixmap?
             painter.end();
         }
-    };
 
+    private:
+        QMap<int, QPainterPath> m_pathCacheBySize;
+    };
 
     /**
     Clear button on the right hand side of the search widget.
@@ -64,7 +69,6 @@ namespace {
 #ifndef QT_NO_CURSOR
             setCursor(Qt::ArrowCursor);
 #endif // QT_NO_CURSOR
-            setToolTip(tr("Clear"));
             setVisible(false);
             setFocusPolicy(Qt::NoFocus);
         }
@@ -72,23 +76,29 @@ namespace {
         void QnClearButton::paintEvent(QPaintEvent *event) {
             Q_UNUSED(event);
             QPainter painter(this);
-            int height = this->height();
+            int size = height(); //assuming height and width are equal
 
             painter.setRenderHint(QPainter::Antialiasing, true);
             painter.setBrush(isDown()
                 ? palette().color(QPalette::Dark)
                 : palette().color(QPalette::Mid));
+            //TODO: #GDM #Bookmarks should we customize this?
+            //TODO: #GDM #Bookmarks should we cache pixmap?
+
             painter.setPen(painter.brush().color());
-            int size = width();
+
             int offset = size / 5;
             int radius = size - offset * 2;
             painter.drawEllipse(offset, offset, radius, radius);
 
             painter.setPen(palette().color(QPalette::Base));
             int border = offset * 2;
-            painter.drawLine(border, border, width() - border, height - border);
-            painter.drawLine(border, height - border, width() - border, border);
+            painter.drawLine(border, border, size - border, size - border);
+            painter.drawLine(border, size - border, size - border, border);
         }
+
+    private:
+        QMap<int, QPainterPath> m_pathCacheBySize;
     };
 
 }
@@ -122,6 +132,7 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent) :
     connect(m_lineEdit, &QLineEdit::textChanged, this, [this](const QString &text) {
         m_clearButton->setVisible(!text.isEmpty());
     });
+    m_clearButton->setToolTip(tr("Clear"));
 
     connect(m_lineEdit, SIGNAL(textChanged(QString)),
         this, SIGNAL(textChanged(QString)));
