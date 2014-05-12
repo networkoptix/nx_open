@@ -120,6 +120,7 @@
 #include <utils/network/multicodec_rtp_reader.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
+#include <utils/network/modulefinder.h>
 
 
 #include <media_server/server_message_processor.h>
@@ -134,7 +135,7 @@
 #include "plugins/resources/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
-#include "utils/network/networkoptixmodulefinder.h"
+#include "utils/network/modulefinder.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
 #include "compatibility.h"
@@ -892,35 +893,23 @@ void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
-void QnMain::at_peerFound(
-    const QString& moduleType,
-    const QString& moduleVersion,
-    const QString& systemName,
-    const TypeSpecificParamMap& moduleParameters,
-    const QString& localInterfaceAddress,
-    const QString& remoteHostAddress,
-    bool isLocal,
-    const QString& moduleSeed )
-{
-    if (moduleVersion == QN_APPLICATION_VERSION && systemName == qnCommon->localSystemName()) 
-    {
-        int port = moduleParameters.value("port").toInt();
-        QString url = QString(lit("http://%1:%2")).arg(remoteHostAddress).arg(port);
+void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
+    Q_UNUSED(localInterfaceAddress)
+
+    if (moduleInformation.version == QnSoftwareVersion(QN_APPLICATION_VERSION) && moduleInformation.systemName == qnCommon->localSystemName()) {
+        int port = moduleInformation.parameters.value("port").toInt();
+        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
         ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-        ec2Connection->addRemotePeer(url, false, moduleSeed);
+        ec2Connection->addRemotePeer(url, false, moduleInformation.id);
     }
 }
-void QnMain::at_peerLost(
-    const QString& moduleType,
-    const TypeSpecificParamMap& moduleParameters,
-    const QString& remoteHostAddress,
-    bool isLocal,
-    const QString& moduleSeed )
-{
-    int port = moduleParameters.value("port").toInt();
-    QString url = QString(lit("http://%1:%2")).arg(remoteHostAddress).arg(port);
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    ec2Connection->deleteRemotePeer(url);
+void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
+    int port = moduleInformation.parameters.value("port").toInt();
+    foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
+        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
+        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        ec2Connection->deleteRemotePeer(url);
+    }
 }
 
 void QnMain::initTcpListener()
@@ -1296,21 +1285,12 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
-    m_moduleFinder = new NetworkOptixModuleFinder(false);
+    m_moduleFinder = new QnModuleFinder(false);
     //if (cmdLineArguments.devModeKey == lit("raz-raz-raz"))
         m_moduleFinder->setCompatibilityMode(true);
-    QObject::connect(
-        m_moduleFinder,
-        SIGNAL(moduleFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-        this,
-        SLOT(at_peerFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-        Qt::DirectConnection );
-    QObject::connect(
-        m_moduleFinder,
-        SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
-        this,
-        SLOT(at_peerLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
-        Qt::DirectConnection );
+    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
+    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
+
     QUrl url = ec2Connection->connectionInfo().ecUrl;
 #if 1
     if (url.scheme() == "file") {

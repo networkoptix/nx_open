@@ -28,6 +28,7 @@
 #include <ui/workaround/gl_widget_factory.h>
 
 #include <utils/applauncher_utils.h>
+#include <utils/network/modulefinder.h>
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
@@ -127,23 +128,18 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     resetConnectionsModel();
     updateFocus();
 
-    m_moduleFinder = new NetworkOptixModuleFinder(true);
+    m_moduleFinder = new QnModuleFinder(true);
+    m_moduleFinder->setParent(this);
     if (qnSettings->isDevMode())
         m_moduleFinder->setCompatibilityMode(true);
-    connect(m_moduleFinder,    SIGNAL(moduleFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-            this,               SLOT(at_moduleFinder_moduleFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
-    connect(m_moduleFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
-            this,               SLOT(at_moduleFinder_moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)));
+    connect(m_moduleFinder,     &QnModuleFinder::moduleFound,     this,   &QnLoginDialog::at_moduleFinder_moduleFound);
+    connect(m_moduleFinder,     &QnModuleFinder::moduleLost,      this,   &QnLoginDialog::at_moduleFinder_moduleLost);
     m_moduleFinder->start();
 }
 
-QnLoginDialog::~QnLoginDialog() {
-    delete m_moduleFinder;
-    return;
-}
+QnLoginDialog::~QnLoginDialog() {}
 
-void QnLoginDialog::updateFocus() 
-{
+void QnLoginDialog::updateFocus() {
     ui->passwordLineEdit->setFocus();
 }
 
@@ -665,46 +661,37 @@ void QnLoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleFound(const QString& moduleID, const QString& moduleVersion, const QString& systemName,
-                                                const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
+void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
     Q_UNUSED(localInterfaceAddress)
-
-    QString portId = QLatin1String("port");
 
     //if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
     //    return;
 
-    QString host = isLocal ? QLatin1String("127.0.0.1") : remoteHostAddress;
+    QString host = moduleInformation.isLocal ? QLatin1String("127.0.0.1") : remoteAddress;
     QUrl url;
     url.setHost(host);
 
-    QString port = moduleParameters[portId];
+    QString port = moduleInformation.parameters[lit("port")];
     url.setPort(port.toInt());
 
-    QMultiHash<QString, QnEcData>::iterator i = m_foundEcs.find(seed);
-    while (i != m_foundEcs.end() && i.key() == seed) {
-        QUrl found = i.value().url;
-        if (found.host() == url.host() && found.port() == url.port())
+    foreach (const QnEcData &data, m_foundEcs.values(moduleInformation.id)) {
+        if (data.url.host() == url.host() && data.url.port() == url.port())
             return; // found the same host, e.g. two interfaces on local controller
-        ++i;
     }
 
     QnEcData data;
     data.url = url;
-    data.version = moduleVersion;
-    data.systemName = systemName;
-    m_foundEcs.insert(seed, data);
+    data.version = moduleInformation.version.toString();
+    data.systemName = moduleInformation.systemName;
+    m_foundEcs.insert(moduleInformation.id, data);
     resetAutoFoundConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
-    Q_UNUSED(moduleParameters)
-    Q_UNUSED(remoteHostAddress)
-    Q_UNUSED(isLocal)
-
-    if( moduleID != nxMediaServerId )
+void QnLoginDialog::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
+    if (moduleInformation.type != nxMediaServerId)
         return;
-    m_foundEcs.remove(seed);
+
+    m_foundEcs.remove(moduleInformation.id);
 
     resetAutoFoundConnectionsModel();
 }
