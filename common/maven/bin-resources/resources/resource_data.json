@@ -301,6 +301,12 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "VISTA|*"
+            ],
+            "forceArFromPrimaryStream": true
         }
     ]
 }

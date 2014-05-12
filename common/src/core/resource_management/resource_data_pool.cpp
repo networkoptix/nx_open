@@ -47,11 +47,13 @@ QnResourceData QnResourceDataPool::data(const QnVirtualCameraResourcePtr &camera
     QString key0 = lit("*|") + model;
     QString key1 = vendor + lit("|") + model;
     QString key2 = key1 + lit("|") + camera->getFirmware().toLower();
+    QString key3 = vendor + lit("|*");
 
     QnResourceData result;
     result.add(m_dataByKey.value(key0));
     result.add(m_dataByKey.value(key1));
     result.add(m_dataByKey.value(key2));
+    result.add(m_dataByKey.value(key3));
     return result;
 }
 
