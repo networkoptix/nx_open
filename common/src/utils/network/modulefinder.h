@@ -74,6 +74,8 @@ public:
     //! \param compatibilityMode         New compatibility mode state.
     void setCompatibilityMode(bool compatibilityMode);
 
+    QList<QnModuleInformation> revealedModules() const;
+
 public slots:
     virtual void pleaseStop() override;
 

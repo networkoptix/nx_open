@@ -87,6 +87,15 @@ void QnModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
+QList<QnModuleInformation> QnModuleFinder::revealedModules() const {
+    QList<QnModuleInformation> modules;
+
+    foreach (const ModuleContext &moduleCOntext, m_knownEnterpriseControllers)
+        modules.append(moduleCOntext.moduleInformation);
+
+    return modules;
+}
+
 void QnModuleFinder::pleaseStop() {
     QnLongRunnable::pleaseStop();
     m_pollSet.interrupt();
