@@ -1380,7 +1380,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui" line="20"/>
         <source>System Settings</source>
-        <translation>Настройки ситемы</translation>
+        <translation>Настройки системы</translation>
     </message>
     <message>
         <source>General</source>
@@ -5424,7 +5424,7 @@ An error has occurred while trying to restart in compatibility mode.</source>
         <translation>Другая версия Enterprise Controller: 
  - Клиент: %1.
  - Enterprise Controller: %2.
-Потребуется перезапуск клиента в режиме совместимости.</translation>
+Произошла ошибка при перезапуске клиента в режиме совместимости.</translation>
     </message>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.cpp" line="443"/>

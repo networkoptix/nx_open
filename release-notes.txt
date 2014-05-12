@@ -74,6 +74,7 @@ Improvements:
     If click on it, the selection has been zoomed. If there are no selection on timeline, "Zoom to selection" is not available.
 25. Ability to view client logs and clear cache.
 26. Added dewarping for pictures.
+27. Added Fast Forward for VMAX.
     
 Bugs Fixed:
 1. Tray tool. Incorrect EC port in the list if it has been changed.Fixed.
@@ -105,12 +106,14 @@ Bugs Fixed:
 27. "IP address" in Media Server Settings is disabled for changing.
 28. Multiple select hours in calendar doesn't work. Fixed.
 29. Axis encoder PTZ issues are resolved.
+30. Fixed issue with time for grouped events. 
 
 Removed features:
 1. Hardware acceleration has been removed. 
 2. Panic recording buuton from front pannel has been removed.
 3. Analog license message has been removed (old analog licenses still can be activated).
 4. Capture Mode is removed from the Screen Recording settings. Right now only application window can be recorded.
+5. Removed thumbnails for panoramic cameras.
 
 New cameras supported
 Arecont cameras: MegaBalls2 & MegaDomes2.
