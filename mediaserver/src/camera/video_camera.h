@@ -5,6 +5,8 @@
 
 #include <QScopedPointer>
 
+#include <server/server_globals.h>
+
 #include <core/dataconsumer/abstract_data_consumer.h>
 #include <core/resource/resource_consumer.h>
 #include "core/dataprovider/media_streamdataprovider.h"
@@ -27,7 +29,7 @@ class QnVideoCamera: public QObject
 public:
     QnVideoCamera(QnResourcePtr resource);
     virtual ~QnVideoCamera();
-    QnLiveStreamProviderPtr getLiveReader(QnResource::ConnectionRole role);
+    QnLiveStreamProviderPtr getLiveReader(QnServer::ChunksCatalog catalog);
     int copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue, int cseq);
 
     //QnMediaContextPtr getVideoCodecContext(bool primaryLiveStream);
@@ -70,8 +72,7 @@ public:
     bool ensureLiveCacheStarted( MediaQuality streamQuality );
 
 private:
-    void createReader(QnResource::ConnectionRole role);
-
+    void createReader(QnServer::ChunksCatalog catalog);
     void stop();
 private:
     QMutex m_readersMutex;

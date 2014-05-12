@@ -52,7 +52,7 @@ public:
     const QPixmap &pixmap(StateFlags flags) const;
     void setPixmap(StateFlags flags, const QPixmap &pixmap);
     
-    const QIcon &icon() const;
+    QIcon icon() const;
     void setIcon(const QIcon &icon);
 
     bool isCheckable() const { return m_checkable; }

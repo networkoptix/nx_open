@@ -14,15 +14,6 @@
 struct QMetaObject;
 
 namespace QnLexicalDetail {
-    template<class T>
-    struct is_flags:
-        std::false_type
-    {};
-
-    template<class Enum>
-    struct is_flags<QFlags<Enum> >:
-        std::true_type
-    {};
 
     inline bool isNullString(const char *s) { return s == NULL; }
     inline bool isNullString(const QString &s) { return s.isNull(); }

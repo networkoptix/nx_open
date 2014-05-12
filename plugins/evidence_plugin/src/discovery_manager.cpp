@@ -54,7 +54,7 @@ unsigned int CameraDiscoveryManager::releaseRef()
     return m_refManager.releaseRef();
 }
 
-static const char* VENDOR_NAME = "E-VIDENCE";
+static const char* VENDOR_NAME = "evidence";
 
 void CameraDiscoveryManager::getVendorName( char* buf ) const
 {
@@ -302,7 +302,7 @@ int CameraDiscoveryManager::getReservedModelList( char** modelList, int* count )
     if( *count >= 1 )
     {
         *count = 1;
-        strcpy( modelList[0], "*1344*" );
+        strcpy( modelList[0], "*Apix*" );
     }
     else
     {

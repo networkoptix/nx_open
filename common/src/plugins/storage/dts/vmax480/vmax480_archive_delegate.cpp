@@ -39,7 +39,7 @@ QnVMax480ArchiveDelegate::~QnVMax480ArchiveDelegate()
     close();
 }
 
-bool QnVMax480ArchiveDelegate::open(QnResourcePtr resource)
+bool QnVMax480ArchiveDelegate::open(const QnResourcePtr &resource)
 {
     Q_UNUSED(resource)
 

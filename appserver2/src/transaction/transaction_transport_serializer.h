@@ -23,10 +23,12 @@ namespace ec2
         template <class T>
         void serializeTran(QByteArray& buffer, const QnTransaction<T>& tran, const TransactionTransportHeader& ttHeader)
         {
+#ifdef _DEBUG
             foreach (const QnId& peer, ttHeader.dstPeers) {
                 Q_ASSERT(!peer.isNull());
                 Q_ASSERT(peer != qnCommon->moduleGUID());
             }
+#endif
             QnOutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("00000000\r\n",10);
             stream.write("0000", 4);
@@ -41,10 +43,12 @@ namespace ec2
 
         void serializeTran(QByteArray& buffer, const QByteArray& serializedTran, const TransactionTransportHeader& ttHeader)
         {
+#ifdef _DEBUG
             foreach (const QnId& peer, ttHeader.dstPeers) {
                 Q_ASSERT(!peer.isNull());
                 Q_ASSERT(peer != qnCommon->moduleGUID());
             }
+#endif
             QnOutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("00000000\r\n",10);
             stream.write("0000", 4);

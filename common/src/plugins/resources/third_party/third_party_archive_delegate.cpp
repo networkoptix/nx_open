@@ -38,7 +38,7 @@ ThirdPartyArchiveDelegate::~ThirdPartyArchiveDelegate()
     m_archiveReader->releaseRef();
 }
 
-bool ThirdPartyArchiveDelegate::open( QnResourcePtr resource )
+bool ThirdPartyArchiveDelegate::open(const QnResourcePtr &resource )
 {
     if( m_resource != resource )
         return false;

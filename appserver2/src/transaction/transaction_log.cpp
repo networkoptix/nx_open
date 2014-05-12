@@ -74,6 +74,14 @@ QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data
     return QUuid::fromRfc4122(hash.result());
 }
 
+QUuid QnTransactionLog::makeHash(const ApiCommand::Value command, const ApiCameraBookmarkTagDataList& data) {
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    hash.addData(ApiCommand::toString(command).toUtf8());
+    for(const ApiCameraBookmarkTagData tag: data)
+        hash.addData(tag.name.toUtf8());
+    return QUuid::fromRfc4122(hash.result());
+}
+
 ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QUuid& hash, const QByteArray& data)
 {
     Q_ASSERT_X(!tran.id.peerGUID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");

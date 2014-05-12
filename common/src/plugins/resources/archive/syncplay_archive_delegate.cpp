@@ -20,7 +20,7 @@ QnSyncPlayArchiveDelegate::~QnSyncPlayArchiveDelegate()
     delete m_ownerDelegate;
 }
 
-bool QnSyncPlayArchiveDelegate::open(QnResourcePtr resource)
+bool QnSyncPlayArchiveDelegate::open(const QnResourcePtr &resource)
 {
     return m_ownerDelegate->open(resource);
 }

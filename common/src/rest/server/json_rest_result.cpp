@@ -32,7 +32,6 @@ const QJsonValue &QnJsonRestResult::reply() const {
     return m_reply;
 }
 
-QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnJsonRestResult::Error)
 
 QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(QnJsonRestResult, 
     (json),

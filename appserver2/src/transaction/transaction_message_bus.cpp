@@ -372,6 +372,10 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
         case ApiCommand::serverAliveInfo:
             break; // nothing to do
 
+        case ApiCommand::addCameraBookmarkTags:
+        case ApiCommand::removeCameraBookmarkTags:
+            return deliveryTransaction<ApiCameraBookmarkTagDataList>(abstractTran, stream);
+
         default:
             Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
             break;

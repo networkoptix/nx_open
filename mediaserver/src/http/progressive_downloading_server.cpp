@@ -1,10 +1,13 @@
+#include "progressive_downloading_server.h"
 
 #include <memory>
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QSettings>
 #include <QtCore/QUrlQuery>
-#include "progressive_downloading_server.h"
+
+#include <server/server_globals.h>
+
 #include <utils/fs/file.h>
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
@@ -548,7 +551,7 @@ void QnProgressiveDownloadingConsumer::run()
                 sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
                 return;
             }
-            QnLiveStreamProviderPtr liveReader = camera->getLiveReader(QnResource::Role_LiveVideo);
+            QnLiveStreamProviderPtr liveReader = camera->getLiveReader(QnServer::HiQualityCatalog);
             dataProvider = liveReader;
             if (liveReader) {
                 dataConsumer.copyLastGopFromCamera(camera);

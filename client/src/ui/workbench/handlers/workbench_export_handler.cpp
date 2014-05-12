@@ -7,7 +7,7 @@
 
 #include <common/common_globals.h>
 
-#include <camera/caching_time_period_loader.h>
+#include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/client_video_camera.h>
 #include <camera/client_video_camera_export_tool.h>
 
@@ -18,6 +18,8 @@
 #include <plugins/resources/archive/archive_stream_reader.h>
 #include <plugins/resources/archive/avi_files/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
+
+#include <recording/time_period.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -290,7 +292,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         dewarpingParams.enabled &= doTranscode;
 
         if (dialog->selectedNameFilter().contains(aviFileFilter)) {
-            QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource()->toResourcePtr());
+            QnCachingCameraDataLoader* loader = navigator()->loader(widget->resource()->toResourcePtr());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
             if (loader && archive) {
                 QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);

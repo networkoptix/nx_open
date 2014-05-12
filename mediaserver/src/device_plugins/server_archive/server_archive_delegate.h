@@ -21,7 +21,7 @@ public:
 
     //virtual void setSendMotion(bool value) override;
 
-    virtual bool open(QnResourcePtr resource);
+    virtual bool open(const QnResourcePtr &resource);
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();
@@ -81,7 +81,7 @@ private:
     bool m_sendMotion;
     bool m_eof;
     MediaQuality m_quality;
-    QnDialQualityHelper m_dialQualityHelper;
+    QnDualQualityHelper m_dialQualityHelper;
 
     ArchiveChunkInfo m_currentChunkInfo;
 

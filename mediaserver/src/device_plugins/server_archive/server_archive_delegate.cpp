@@ -1,6 +1,8 @@
 
 #include <QtCore/QMutexLocker>
 
+#include <server/server_globals.h>
+
 #include "server_archive_delegate.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
@@ -78,7 +80,7 @@ qint64 QnServerArchiveDelegate::endTime()
     return rez;
 }
 
-bool QnServerArchiveDelegate::open(QnResourcePtr resource)
+bool QnServerArchiveDelegate::open(const QnResourcePtr &resource)
 {
     QMutexLocker lk( &m_mutex );
 
@@ -89,8 +91,8 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
     Q_ASSERT(netResource != 0);
     m_dialQualityHelper.setResource(netResource);
 
-    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getPhysicalId().toUtf8(), QnResource::Role_LiveVideo);
-    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId().toUtf8(), QnResource::Role_SecondaryLiveVideo);
+    m_catalogHi = qnStorageMan->getFileCatalog(netResource->getPhysicalId().toUtf8(), QnServer::HiQualityCatalog);
+    m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId().toUtf8(), QnServer::LowQualityCatalog);
 
     m_currentChunkCatalog = m_quality == MEDIA_Quality_Low ? m_catalogLow : m_catalogHi;
     m_opened = true;

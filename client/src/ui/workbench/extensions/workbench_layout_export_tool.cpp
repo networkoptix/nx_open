@@ -5,7 +5,7 @@
 
 #include <client/client_settings.h>
 
-#include <camera/caching_time_period_loader.h>
+#include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/client_video_camera.h>
 
 #include <core/resource/resource.h>
@@ -168,7 +168,7 @@ bool QnLayoutExportTool::start() {
     foreach (const QnMediaResourcePtr resource, m_resources) {
         QString uniqId = resource->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        QnCachingTimePeriodLoader* loader = navigator()->loader(resource->toResourcePtr());
+        QnCachingCameraDataLoader* loader = navigator()->loader(resource->toResourcePtr());
         if (loader) {
             QIODevice* device = m_storage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).completeBaseName()), QIODevice::WriteOnly);
             QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_period);

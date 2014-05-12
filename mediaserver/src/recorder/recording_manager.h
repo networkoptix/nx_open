@@ -4,7 +4,9 @@
 #include <QtCore/QTimer>
 #include <QtCore/QObject>
 #include <QtCore/QMap>
-#include "core/resource/resource.h"
+
+#include <server/server_globals.h>
+
 #include "core/resource/security_cam_resource.h"
 #include "core/misc/schedule_task.h"
 
@@ -56,7 +58,7 @@ private slots:
 private:
     void updateCamera(QnSecurityCamResourcePtr camera);
 
-    QnServerStreamRecorder* createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role);
+    QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, QnVideoCamera* camera, QnServer::ChunksCatalog catalog);
     bool startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
     bool isResourceDisabled(QnResourcePtr res) const;
 
