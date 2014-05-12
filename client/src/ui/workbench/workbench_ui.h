@@ -47,6 +47,8 @@ class QnGraphicsMessageBoxItem;
 class QnNotificationsCollectionWidget;
 class QnDayTimeWidget;
 
+class QnSearchLineEdit;
+
 class QnWorkbenchUi: public Disconnective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
     Q_OBJECT
     Q_ENUMS(Flags Flag)
@@ -214,6 +216,9 @@ protected:
 
     bool isHovered() const;
 
+    void updateSearchGeometry();
+    QRectF updatedSearchGeometry(const QRectF &sliderGeometry);
+
 private:
     Panels openedPanels() const;
     void setOpenedPanels(Panels panels, bool animate = true, bool save = true);
@@ -294,6 +299,8 @@ private slots:
     void at_calendarWidget_dateClicked(const QDate &date);
 
     void at_tabBar_tabTextChanged();
+
+    void at_searchItem_paintGeometryChanged();
 private:
     /* Global state. */
 
@@ -494,9 +501,10 @@ private:
     VariantAnimator *m_dayTimeSizeAnimator;
 
 
-
-
-
+    /* Search widget */
+    QnMaskedProxyWidget *m_searchItem;
+    QnSearchLineEdit *m_searchWidget;
+    bool m_inSearchGeometryUpdate;
 
     qreal m_pinOffset;
 };

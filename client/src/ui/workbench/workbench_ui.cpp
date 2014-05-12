@@ -62,6 +62,7 @@
 #include <ui/widgets/day_time_widget.h>
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
+#include <ui/widgets/search_line_edit.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/workaround/qtbug_workaround.h>
@@ -293,7 +294,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_notificationsOpacityAnimatorGroup(NULL),
 
     m_inCalendarGeometryUpdate(false),
-    m_inDayTimeGeometryUpdate(false)
+    m_inDayTimeGeometryUpdate(false),
+    m_inSearchGeometryUpdate(false)
 {
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -340,6 +342,15 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(action(Qn::ShowFpsAction),  &QAction::toggled,                                                                          this,                           &QnWorkbenchUi::setFpsVisible);
     connect(m_fpsItem,                  &QGraphicsWidget::geometryChanged,                                                          this,                           &QnWorkbenchUi::at_fpsItem_geometryChanged);
     setFpsVisible(false);
+
+    m_searchWidget = new QnSearchLineEdit(NULL);
+    m_searchWidget->setAttribute(Qt::WA_TranslucentBackground);
+
+    m_searchItem = new QnMaskedProxyWidget(m_controlsWidget);
+    m_searchItem->setWidget(m_searchWidget);
+
+    connect(m_searchItem,   &QnMaskedProxyWidget::paintRectChanged,     this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
+    connect(m_searchItem,   &QGraphicsWidget::geometryChanged,          this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
 
     /* Tree panel. */
     m_treeWidget = new QnResourceBrowserWidget(NULL, context());
@@ -2080,6 +2091,7 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
     updateCalendarGeometry();
     updateSliderZoomButtonsGeometry();
     updateDayTimeWidgetGeometry();
+    updateSearchGeometry();
 
     QRectF geometry = m_sliderItem->geometry();
     m_sliderShowButton->setPos(QPointF(
@@ -2417,4 +2429,27 @@ void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date) {
 
 void QnWorkbenchUi::at_tabBar_tabTextChanged() {
     m_titleItem->layout()->updateGeometry();
+}
+
+QRectF QnWorkbenchUi::updatedSearchGeometry(const QRectF &sliderGeometry) {
+    QRectF geometry = m_searchItem->paintGeometry();
+    geometry.moveRight(m_controlsWidgetRect.right());
+    geometry.moveBottom(sliderGeometry.top());
+    return geometry;
+}
+
+void QnWorkbenchUi::updateSearchGeometry() {
+    /* Update painting rect the "fair" way. */
+    QRectF geometry = updatedSearchGeometry(m_sliderItem->geometry());
+    m_searchItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
+
+    /* Always change position. */
+    m_searchItem->setPos(geometry.topLeft());
+}
+
+void QnWorkbenchUi::at_searchItem_paintGeometryChanged() {
+    if(m_inSearchGeometryUpdate)
+        return;
+    QN_SCOPED_VALUE_ROLLBACK(&m_inSearchGeometryUpdate, true);
+    updateSearchGeometry();
 }
