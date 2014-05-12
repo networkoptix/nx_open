@@ -23,8 +23,10 @@ namespace ec2
         if (!deserialize(&stream, &transportHeader))
             return false;
 
+#ifdef _DEBUG
         foreach (const QnId& peer, transportHeader.dstPeers)
             Q_ASSERT(!peer.isNull());
+#endif
 
         tranData.append((const char*) chunkPayload + stream.pos(), len - stream.pos());
         return true;

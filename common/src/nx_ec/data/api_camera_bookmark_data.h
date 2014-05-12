@@ -14,4 +14,4 @@ namespace ec2
     #define ApiCameraBookmarkTagData_Fields (name)
 }
 
-#endif __EC2_BOOKMARK_DATA_H_
+#endif //__EC2_BOOKMARK_DATA_H_
