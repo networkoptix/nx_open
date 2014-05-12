@@ -532,7 +532,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
 
     // add new outgoing connections
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    for (QMap<QUrl, RemoveUrlConnectInfo>::iterator itr = m_removeUrls.begin(); itr != m_removeUrls.end(); ++itr)
+    for (QMap<QUrl, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
     {
         const QUrl& url = itr.key();
         bool isClient = itr.value().isClient;
@@ -629,14 +629,14 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
 void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient, const QUuid& peer)
 {
     QMutexLocker lock(&m_mutex);
-    m_removeUrls.insert(url, RemoveUrlConnectInfo(isClient, peer));
+    m_remoteUrls.insert(url, RemoteUrlConnectInfo(isClient, peer));
     QTimer::singleShot(0, this, SLOT(doPeriodicTasks()));
 }
 
 void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
 {
     QMutexLocker lock(&m_mutex);
-    m_removeUrls.remove(url);
+    m_remoteUrls.remove(url);
     QString urlStr = getUrlAddr(url);
     foreach(QnTransactionTransportPtr transport, m_connections.values())
     {
