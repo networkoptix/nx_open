@@ -109,8 +109,8 @@ qint64 QnDistributedMutexManager::newTimestamp()
 
 QnDistributedMutex::QnDistributedMutex(QnDistributedMutexManager* owner): 
     QObject(),
-    m_owner(owner),
-    m_locked(false)
+    m_locked(false),
+    m_owner(owner)
 {
     connect(qnTransactionBus, &QnTransactionMessageBus::peerFound,         this, &QnDistributedMutex::at_newPeerFound, Qt::DirectConnection);
     connect(qnTransactionBus, &QnTransactionMessageBus::peerLost,          this, &QnDistributedMutex::at_peerLost, Qt::DirectConnection);
