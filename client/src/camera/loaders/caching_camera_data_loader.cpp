@@ -194,17 +194,30 @@ QnCameraBookmarkList QnCachingCameraDataLoader::bookmarks() const {
     return m_bookmarkCameraData.data();
 }
 
-QnCameraBookmarkTags QnCachingCameraDataLoader::bookmarkTags() const {
-    return m_bookmarkTags;
+QString QnCachingCameraDataLoader::bookmarksTextFilter() const {
+    return m_bookmarksTextFilter;
 }
 
-void QnCachingCameraDataLoader::setBookmarkTags(const QnCameraBookmarkTags &tags) {
-    if (m_bookmarkTags == tags)
+void QnCachingCameraDataLoader::setBookmarksTextFilter(const QString &filter) {
+    if (m_bookmarksTextFilter == filter)
         return;
 
-    m_bookmarkTags = tags;
+    m_bookmarksTextFilter = filter;
+
+    //TODO: #GDM #Bookmarks clearing cache too often, possibly search in cache by name/tags will be faster
+    m_requestedTimePeriods[Qn::BookmarksContent].clear();
+    m_timePeriodCameraData[Qn::BookmarksContent].clear();
+    if (m_loaders[Qn::BookmarkTimePeriod])
+        m_loaders[Qn::BookmarkTimePeriod]->discardCachedData();
+    updateTimePeriods(Qn::BookmarkTimePeriod);
+    emit periodsChanged(Qn::BookmarksContent);
+
     m_requestedBookmarkPeriodsByResolution.clear();
+    m_bookmarkCameraData.clear();
+    if (m_loaders[Qn::BookmarkData])
+        m_loaders[Qn::BookmarkData]->discardCachedData();
     updateBookmarks();
+    emit bookmarksChanged();
 }
 
 void QnCachingCameraDataLoader::addBookmark(const QnCameraBookmark &bookmark) {
@@ -272,7 +285,7 @@ void QnCachingCameraDataLoader::load(Qn::CameraDataType type, const QnTimePeriod
         break;
     case Qn::BookmarkTimePeriod:
     case Qn::BookmarkData:
-        m_handles[type] = loader->load(targetPeriod, m_bookmarkTags.join(L','), resolutionMs);  //TODO: #GDM #Bookmarks process tags list on the server side
+        m_handles[type] = loader->load(targetPeriod, m_bookmarksTextFilter, resolutionMs);  //TODO: #GDM #Bookmarks process tags list on the server side
         break;
     case Qn::MotionTimePeriod:
         if(!isMotionRegionsEmpty()) {

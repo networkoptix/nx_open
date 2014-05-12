@@ -47,8 +47,8 @@ public:
     QnTimePeriodList periods(Qn::TimePeriodContent type) const;
     QnCameraBookmarkList bookmarks() const;
 
-    QnCameraBookmarkTags bookmarkTags() const;
-    void setBookmarkTags(const QnCameraBookmarkTags &tags);
+    QString bookmarksTextFilter() const;
+    void setBookmarksTextFilter(const QString &filter);
 
     void addBookmark(const QnCameraBookmark &bookmark);
     void updateBookmark(const QnCameraBookmark &bookmark);
@@ -100,7 +100,7 @@ private:
     int m_handles[Qn::CameraDataTypeCount];
 
     QList<QRegion> m_motionRegions;
-    QnCameraBookmarkTags m_bookmarkTags;
+    QString m_bookmarksTextFilter;
 };
 
 

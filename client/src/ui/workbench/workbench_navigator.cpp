@@ -245,7 +245,12 @@ void QnWorkbenchNavigator::initialize() {
 
     connect(m_dayTimeWidget,                    SIGNAL(timeClicked(const QTime &)),                 this,   SLOT(at_dayTimeWidget_timeClicked(const QTime &)));
 
-    connect(m_bookmarksSearchWidget->lineEdit(), &QLineEdit::textChanged, this, [this](const QString &text) {});
+    connect(m_bookmarksSearchWidget->lineEdit(), &QLineEdit::textChanged, this, [this](const QString &text) {
+        if (!m_currentMediaWidget)
+            return;
+        //TODO: #GDM #Bookmarks do not search till the full tag or at least 3 letters will be entered, search once in 2-3 seconds
+        loader(m_currentMediaWidget)->setBookmarksTextFilter(text); //TODO: #GDM #Bookmarks synced widgets? clear previous?
+    });
 
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
     connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),           this,   SLOT(updateLocalOffset()));
