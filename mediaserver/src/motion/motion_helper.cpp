@@ -7,6 +7,8 @@
 #include "recorder/file_deletor.h"
 #include <media_server/serverutil.h>
 
+#include <recording/time_period_list.h>
+
 
 QnMotionHelper::QnMotionHelper()
 {
@@ -55,7 +57,7 @@ QnTimePeriodList QnMotionHelper::mathImage(const QList<QRegion>& regions, QnReso
 {
     QVector<QnTimePeriodList> data;
     mathImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
-    return QnTimePeriod::mergeTimePeriods(data);
+    return QnTimePeriodList::mergeTimePeriods(data);
 }
 
 QnTimePeriodList QnMotionHelper::mathImage(const QList<QRegion>& regions, QnResourceList resList, qint64 msStartTime, qint64 msEndTime, int detailLevel)
@@ -63,8 +65,8 @@ QnTimePeriodList QnMotionHelper::mathImage(const QList<QRegion>& regions, QnReso
     QVector<QnTimePeriodList> data;
     foreach(QnResourcePtr res, resList)
         mathImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
-    //NOTE could just call prev method instead of private one, but that will result in multiple QnTimePeriod::mergeTimePeriods calls, which could worsen performance
-    return QnTimePeriod::mergeTimePeriods(data);
+    //NOTE could just call prev method instead of private one, but that will result in multiple QnTimePeriodList::mergeTimePeriods calls, which could worsen performance
+    return QnTimePeriodList::mergeTimePeriods(data);
 }
 
 void QnMotionHelper::mathImage(

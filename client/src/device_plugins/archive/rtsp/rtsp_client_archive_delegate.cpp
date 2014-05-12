@@ -194,7 +194,7 @@ QnResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 time)
 
 }
 
-bool QnRtspClientArchiveDelegate::open(QnResourcePtr resource)
+bool QnRtspClientArchiveDelegate::open(const QnResourcePtr &resource)
 {
     m_resource = resource;
     bool rez = openInternal();

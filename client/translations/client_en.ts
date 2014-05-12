@@ -401,8 +401,6 @@ It might take a few seconds for the cameras to populate in the tree.</numerusfor
     </message>
 </context>
 <context>
-Would you like to restart in compatibility mode?</translation>
-Compatibility mode for versions lower than %3 is not supported.</translation>
     <name>QnMultipleCameraSettingsWidget</name>
     <message numerus="yes">
         <source>%n digital license(s) are used out of %1.</source>

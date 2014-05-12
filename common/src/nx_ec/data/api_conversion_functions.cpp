@@ -15,11 +15,13 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/camera_bookmark.h>
 
 #include <nx_ec/ec_api.h>
 
 #include "api_business_rule_data.h"
 #include "api_camera_data.h"
+#include "api_camera_bookmark_data.h"
 #include "api_camera_server_item_data.h"
 #include "api_email_data.h"
 #include "api_full_info_data.h"
@@ -830,6 +832,17 @@ void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallCon
         data.params.insert(std::pair<QString, QString>(iter.key(), iter.value()));
         ++iter;
     }
+}
+
+void fromApiToResource(const ApiCameraBookmarkTagDataList &data, QnCameraBookmarkTags &tags) {
+    for (const ApiCameraBookmarkTagData &tag: data)
+        tags << tag.name;
+}
+
+void fromResourceToApi(const QnCameraBookmarkTags &tags, ApiCameraBookmarkTagDataList &data) {
+    data.reserve(data.size() + tags.size());
+    for (const QString &tag: tags)
+        data.push_back(ApiCameraBookmarkTagData(tag));
 }
 
 } // namespace ec2

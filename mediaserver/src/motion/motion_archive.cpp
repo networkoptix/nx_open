@@ -4,6 +4,9 @@
 #include "utils/common/util.h"
 #include "motion_helper.h"
 
+#include <recording/time_period.h>
+#include <recording/time_period_list.h>
+
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
 #endif

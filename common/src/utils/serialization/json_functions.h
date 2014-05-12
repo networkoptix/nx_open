@@ -32,7 +32,9 @@
 #include <utils/common/latin1_array.h>
 
 #include "json.h"
+#include "enum.h"
 #include "lexical.h"
+#include "lexical_functions.h"
 
 
 inline void serialize(QnJsonContext *, const QJsonValue &value, QJsonValue *target) {
@@ -85,11 +87,6 @@ inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, float *targ
 
 
 namespace QJsonDetail {
-    // TODO: #Elric #EC2 remove / move
-    template<class T>
-    struct identity {
-        typedef T type;
-    };
 
     template<class Element, class Tag>
     void serialize_container_element(QnJsonContext *ctx, const Element &element, QJsonValue *target, const Tag &) {
@@ -118,12 +115,12 @@ namespace QJsonDetail {
     }
 
     template<class Container, class Element>
-    bool deserialize_container_element(QnJsonContext *ctx, const QJsonValue &value, Container *target, const identity<Element> &, const QnContainer::list_tag &) {
+    bool deserialize_container_element(QnJsonContext *ctx, const QJsonValue &value, Container *target, const Element *, const QnContainer::list_tag &) {
         return QJson::deserialize(ctx, value, &*QnContainer::insert(*target, boost::end(*target), Element()));
     }
 
     template<class Container, class Element>
-    bool deserialize_container_element(QnJsonContext *ctx, const QJsonValue &value, Container *target, const identity<Element> &, const QnContainer::set_tag &) {
+    bool deserialize_container_element(QnJsonContext *ctx, const QJsonValue &value, Container *target, const Element *, const QnContainer::set_tag &) {
         Element element;
         if(!QJson::deserialize(ctx, value, &element))
             return false;
@@ -133,7 +130,7 @@ namespace QJsonDetail {
     }
 
     template<class Container, class Element>
-    bool deserialize_container_element(QnJsonContext *ctx, const QJsonValue &value, Container *target, const identity<Element> &, const QnContainer::map_tag &) {
+    bool deserialize_container_element(QnJsonContext *ctx, const QJsonValue &value, Container *target, const Element *, const QnContainer::map_tag &) {
         if(value.type() != QJsonValue::Object)
             return false;
         QJsonObject element = value.toObject();
@@ -160,7 +157,7 @@ namespace QJsonDetail {
         QnContainer::reserve(*target, array.size());
 
         for(auto pos = array.begin(); pos != array.end(); pos++)
-            if(!deserialize_container_element(ctx, *pos, target, identity<value_type>(), typename QnContainer::container_category<Container>::type()))
+            if(!deserialize_container_element(ctx, *pos, target, static_cast<const value_type *>(NULL), typename QnContainer::container_category<Container>::type()))
                 return false;
 
         return true;
@@ -332,6 +329,30 @@ inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QByteArray 
     *target = QByteArray::fromBase64(string.toLatin1());
     return true;
 }
+
+
+template<class T>
+void serialize(QnJsonContext *ctx, const T &value, QJsonValue *target, typename std::enable_if<QnSerialization::is_enum_or_flags<T>::value>::type * = NULL) {
+    QnSerialization::check_enum_binary<T>();
+
+    ::serialize(ctx, static_cast<qint32>(value), target); /* Note the direct call instead of invocation through QJson. */
+}
+
+template<class T>
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, T *target, typename std::enable_if<QnSerialization::is_enum_or_flags<T>::value>::type * = NULL) {
+    QnSerialization::check_enum_binary<T>();
+
+    /* Older version did it with lexical functions, so we have to support it. */
+    if(value.type() == QJsonValue::String)
+        return QnLexical::deserialize(value.toString(), target);
+
+    qint32 tmp;
+    if(!::deserialize(ctx, value, &tmp)) /* Note the direct call instead of invocation through QJson. */
+        return false;
+    *target = static_cast<T>(tmp);
+    return true;
+}
+
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnLatin1Array)(QColor)(QBrush)(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QRegion)(QVector2D)(QVector3D)(QVector4D)(QUuid)(QUrl)(QFont), (json))

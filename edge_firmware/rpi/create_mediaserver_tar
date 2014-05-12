@@ -27,6 +27,9 @@ CUSTOMIZATION=$(get_var "QN_CUSTOMIZATION_NAME")
 PRODUCT_NAME=$(get_var "QN_PRODUCT_NAME_SHORT")
 MODULE_NAME=mediaserver
 VERSION=$(get_var "ENGINE_VERSION")
+MAJOR_VERSION="`echo $VERSION | cut -d . -f 1 --output-delimiter=`"
+MINOR_VERSION="`echo $VERSION | cut -d . -f 2 --output-delimiter=`"
+BUILD_VERSION="`echo $VERSION | cut -d . -f 3 --output-delimiter=`"
 
 PACKAGE_NAME=$CUSTOMIZATION-$PRODUCT_NAME-$MODULE_NAME-$VERSION-$BOX.tar.gz
 
@@ -60,8 +63,8 @@ libavdevice.so.54.0.100 \
 libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
-libcommon.so.230.0.0 \
-libappserver2.so.2.3.0 \
+libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libappserver2.so.$MAJOR_VERSION.$MINOR_VERSION.$BUILD_VERSION \
 libpostproc.so.52.0.100 \
 libQt5Concurrent.so.5.2.1 \
 libQt5Core.so.5.2.1 \

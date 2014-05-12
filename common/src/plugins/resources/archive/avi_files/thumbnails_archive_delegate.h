@@ -10,7 +10,7 @@ public:
     QnThumbnailsArchiveDelegate(QnAbstractArchiveDelegatePtr baseDelegate);
 
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual bool open(QnResourcePtr resource) override;
+    virtual bool open(const QnResourcePtr &resource) override;
     virtual void close() override;
     virtual qint64 startTime() override;
     virtual qint64 endTime() override;

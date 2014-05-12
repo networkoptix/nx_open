@@ -58,7 +58,7 @@ void VMaxStreamFetcher::updatePlaybackMask()
     QVector<QnTimePeriodList> allChunks;
     for (ConsumersMap::const_iterator itr = m_dataConsumers.begin(); itr != m_dataConsumers.end(); ++itr)
         allChunks << itr.key()->chunks();
-    m_playbackMaskHelper.setPlaybackMask(QnTimePeriod::mergeTimePeriods(allChunks));
+    m_playbackMaskHelper.setPlaybackMask(QnTimePeriodList::mergeTimePeriods(allChunks));
 }
 
 qint64 VMaxStreamFetcher::findRoundTime(qint64 timeUsec, bool* dataFound) const

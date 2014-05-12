@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
+#include <recording/time_period.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <utils/common/log.h>
 #include <utils/common/timermanager.h>
@@ -54,13 +55,7 @@ StreamingChunkTranscoder::StreamingChunkTranscoder( Flags flags )
 
 StreamingChunkTranscoder::~StreamingChunkTranscoder()
 {
-    for( std::vector<StreamingChunkTranscoderThread*>::size_type
-        i = 0;
-        i < m_transcodeThreads.size();
-        ++i )
-    {
-        delete m_transcodeThreads[i];
-    }
+    std::for_each( m_transcodeThreads.begin(), m_transcodeThreads.end(), std::default_delete<StreamingChunkTranscoderThread>() );
     m_transcodeThreads.clear();
 }
 
@@ -106,6 +101,8 @@ bool StreamingChunkTranscoder::transcodeAsync(
         if( !camera->liveCache(transcodeParams.streamQuality()) )
             return false;
 
+        chunk->openForModification();
+
         const quint64 cacheStartTimestamp = camera->liveCache(transcodeParams.streamQuality())->startTimestamp();
         const quint64 cacheEndTimestamp = camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
         const quint64 actualStartTimestamp = std::max<>( cacheStartTimestamp, transcodeParams.startTimestamp() );
@@ -121,9 +118,9 @@ bool StreamingChunkTranscoder::transcodeAsync(
                     transcodeParams,
                     chunk ) )
             {
-                chunk->openForModification();
                 return true;
             }
+            chunk->doneModification( StreamingChunk::rcError );
             m_transcodings.erase( p.first );
             return false;
         }
@@ -134,16 +131,16 @@ bool StreamingChunkTranscoder::transcodeAsync(
             //chunk is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS
             if( scheduleTranscoding(
                     p.first->first,
-                    (transcodeParams.startTimestamp() - cacheEndTimestamp) / MICROS_IN_SECOND + 1 ) )
+                    (transcodeParams.startTimestamp() - cacheEndTimestamp) / USEC_IN_MSEC + 1 ) )
             {
-                chunk->openForModification();
                 return true;
             }
+            chunk->doneModification( StreamingChunk::rcError );
             m_transcodings.erase( p.first );
             return false;
         }
 
-        return true;
+        return false;   //no data
     }
 
     //TODO/HLS: #ak optimization: take existing archive reader which is already at required position (from previous chunk)
@@ -169,6 +166,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     archiveReader->setQuality(transcodeParams.streamQuality(), true);
     archiveReader->setPlaybackRange( QnTimePeriod( transcodeParams.startTimestamp() / USEC_IN_MSEC, transcodeParams.duration() ) );
 
+    chunk->openForModification();
     if( !startTranscoding(
             p.first->first,
             cameraResource,
@@ -176,11 +174,11 @@ bool StreamingChunkTranscoder::transcodeAsync(
             transcodeParams,
             chunk ) )
     {
+        chunk->doneModification( StreamingChunk::rcError );
         m_transcodings.erase( p.first );
         return false;
     }
 
-    chunk->openForModification();
     archiveReader->start();
     return true;
 }
@@ -250,7 +248,7 @@ bool StreamingChunkTranscoder::startTranscoding(
     }
     CodecID codecID = CODEC_ID_NONE;
     QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
-    const CodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO/HLS #ak get codec of resource video stream. For HLS only h264 is OK
+    const CodecID resourceVideoStreamCodecID = CODEC_ID_H264;   //TODO/HLS #ak: get codec of resource video stream. For HLS only h.264 is OK
     QSize videoResolution;
     if( transcodeParams.videoCodec().isEmpty() && !transcodeParams.pictureSizePixels().isValid() )
     {
@@ -303,27 +301,34 @@ bool StreamingChunkTranscoder::startTranscoding(
         //}
     }
 
-    //TODO/HLS #ak selecting least used transcoding thread from pool
-    StreamingChunkTranscoderThread* transcoderThread = m_transcodeThreads[rand() % m_transcodeThreads.size()];
+    //selecting least used transcoding thread from pool
+    StreamingChunkTranscoderThread* transcoderThread = *std::max_element( m_transcodeThreads.cbegin(), m_transcodeThreads.cend(), 
+        [](StreamingChunkTranscoderThread* one, StreamingChunkTranscoderThread* two){
+            return one->ongoingTranscodings() < two->ongoingTranscodings();
+        } );
 
     //adding transcoder to transcoding thread
-    transcoderThread->startTranscoding(
-        transcodingID,
-        chunk,
-        AbstractOnDemandDataProviderPtr( new H264Mp4ToAnnexB( dataSource ) ),
-        transcodeParams,
-        transcoder.release() );
+    if( !transcoderThread->startTranscoding(
+            transcodingID,
+            chunk,
+            AbstractOnDemandDataProviderPtr( new H264Mp4ToAnnexB( dataSource ) ),
+            transcodeParams,
+            transcoder.get() ) )
+    {
+        return false;
+    }
 
+    transcoder.release();
     return true;
 }
 
 bool StreamingChunkTranscoder::scheduleTranscoding(
     const int transcodeID,
-    int delaySec )
+    int delayMSec )
 {
     const quint64 taskID = TimerManager::instance()->addTimer(
         this,
-        delaySec );
+        delayMSec );
 
     QMutexLocker lk( &m_mutex );
     m_taskIDToTranscode[taskID] = transcodeID;

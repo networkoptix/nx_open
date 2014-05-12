@@ -1,6 +1,7 @@
 #ifndef __PLAYBACK_MASK_HELPER_H__
 #define __PLAYBACK_MASK_HELPER_H__
 
+#include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
 class QnPlaybackMaskHelper

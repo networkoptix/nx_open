@@ -58,25 +58,6 @@ namespace QnLexical {
 } // namespace QnLexical
 
 
-#define QN_DEFINE_ENUM_CAST_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, ... /* PREFIX */) \
-__VA_ARGS__ void serialize(const TYPE &value, QString *target) {                \
-    static_assert(sizeof(TYPE) <= sizeof(int), "Enumeration types larger than int in size are not supported."); \
-                                                                                \
-    QnLexical::serialize(static_cast<int>(value), target);                      \
-}                                                                               \
-                                                                                \
-__VA_ARGS__ bool deserialize(const QString &value, TYPE *target) {              \
-    static_assert(sizeof(TYPE) <= sizeof(int), "Enumeration types larger than int in size are not supported."); \
-                                                                                \
-    int intValue;                                                               \
-    if(!QnLexical::deserialize(value, &intValue))                               \
-        return false;                                                           \
-                                                                                \
-    *target = static_cast<TYPE>(intValue);                                      \
-    return true;                                                                \
-}
-
-
 #include "lexical_functions.h"
 
 #endif // QN_SERIALIZATION_LEXICAL_H

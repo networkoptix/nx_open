@@ -2,7 +2,7 @@
 #define QN_SERIALIZATION_CSV_STREAM_H
 
 #include "binary_stream.h"
-#include <hash_set>
+
 template<class Output>
 class QnCsvStreamWriter {
 public:

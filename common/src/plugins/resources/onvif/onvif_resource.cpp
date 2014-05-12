@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <climits>
+#include <cstring>
 #include <cmath>
 #include <sstream>
 #include <type_traits>

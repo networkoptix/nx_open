@@ -1,4 +1,5 @@
 #include "server_stream_recorder.h"
+
 #include "motion/motion_helper.h"
 #include "storage_manager.h"
 #include "core/dataprovider/media_streamdataprovider.h"
@@ -19,10 +20,10 @@
 static const int MAX_BUFFERED_SIZE = 1024*1024*20;
 static const int MOTION_PREBUFFER_SIZE = 8;
 
-QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
+QnServerStreamRecorder::QnServerStreamRecorder(const QnResourcePtr &dev, QnServer::ChunksCatalog catalog, QnAbstractMediaStreamDataProvider* mediaProvider):
     QnStreamRecorder(dev),
     m_scheduleMutex(QMutex::Recursive),
-    m_role(role),
+    m_catalog(catalog),
     m_mediaProvider(mediaProvider),
     m_dualStreamingHelper(0),
     m_usedPanicMode(false),
@@ -155,7 +156,7 @@ void QnServerStreamRecorder::updateStreamParams()
     if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
-        if (m_role == QnResource::Role_LiveVideo) {
+        if (m_catalog == QnServer::HiQualityCatalog) {
             if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never) {
                 liveProvider->setFps(m_currentScheduleTask.getFps());
                 liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
@@ -175,7 +176,7 @@ bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 {
     QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
     return recType == Qn::RT_MotionOnly || 
-           (m_role == QnResource::Role_LiveVideo && recType == Qn::RT_MotionAndLowQuality && camera->hasDualStreaming2());
+           (m_catalog == QnServer::HiQualityCatalog && recType == Qn::RT_MotionAndLowQuality && camera->hasDualStreaming2());
 }
 
 void QnServerStreamRecorder::beforeProcessData(QnConstAbstractMediaDataPtr media)
@@ -248,7 +249,7 @@ bool QnServerStreamRecorder::needSaveData(QnConstAbstractMediaDataPtr media)
 
     if (task.getRecordingType() == Qn::RT_Always)
         return true;
-    else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_role == QnResource::Role_SecondaryLiveVideo || !camera->hasDualStreaming2()))
+    else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_catalog == QnServer::LowQualityCatalog || !camera->hasDualStreaming2()))
         return true;
     else if (task.getRecordingType() == Qn::RT_Never)
     {
@@ -282,14 +283,14 @@ int QnServerStreamRecorder::getFpsForValue(int fps)
     QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
     if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
     {
-        if (m_role == QnResource::Role_LiveVideo)
+        if (m_catalog == QnServer::HiQualityCatalog)
             return fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2;
         else
             return fps ? qMax(2, qMin(camera->desiredSecondStreamFps(), camera->getMaxFps()-fps)) : 2;
     }
     else
     {
-        if (m_role == QnResource::Role_LiveVideo)
+        if (m_catalog == QnServer::HiQualityCatalog)
             return fps ? fps : camera->getMaxFps();
         else
             return camera->desiredSecondStreamFps();
@@ -463,7 +464,7 @@ QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* 
         m_storage = qnStorageMan->getOptimalStorageRoot(provider);
         if (m_storage)
             setTruncateInterval(m_storage->getChunkLen());
-        return qnStorageMan->getFileName(m_startDateTime/1000, m_currentTimeZone, netResource, DeviceFileCatalog::prefixForRole(m_role), m_storage);
+        return qnStorageMan->getFileName(m_startDateTime/1000, m_currentTimeZone, netResource, DeviceFileCatalog::prefixByCatalog(m_catalog), m_storage);
     }
     else {
         return m_fixedFileName;

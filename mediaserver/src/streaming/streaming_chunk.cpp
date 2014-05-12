@@ -56,8 +56,8 @@ QByteArray StreamingChunk::data() const
 bool StreamingChunk::tryRead( SequentialReadingContext* const ctx, QByteArray* const dataBuffer )
 {
     QMutexLocker lk( &m_mutex );
-    if( ctx->m_currentOffset >= m_data.size() )
-        return !m_isOpenedForModification;  //if opened, expecting more data to arrive to chunk
+    if( ctx->m_currentOffset >= m_data.size() ) //all data has been read
+        return !m_isOpenedForModification;      //if opened, expecting more data to arrive to chunk
     dataBuffer->append( m_data.mid( ctx->m_currentOffset ) );
     ctx->m_currentOffset = m_data.size();
     return true;

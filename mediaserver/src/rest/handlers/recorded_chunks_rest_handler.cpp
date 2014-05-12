@@ -9,16 +9,6 @@
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"
 
-
-QRect QnRecordedChunksRestHandler::deserializeMotionRect(const QString& rectStr)
-{
-    QList<QString> params = rectStr.split(",");
-    if (params.size() != 4)
-        return QRect();
-    else
-        return QRect(params[0].toInt(), params[1].toInt(), params[2].toInt(), params[3].toInt());
-}
-
 int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
@@ -29,15 +19,12 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     bool urlFound = false;
     
     ChunkFormat format = ChunkFormat_Unknown;
-    QList<QRegion> motionRegions;
     QString callback;
+    Qn::TimePeriodContent periodsType;
+    QString filter;
 
     for (int i = 0; i < params.size(); ++i)
     {
-        if (params[i].first == "motionRegions")
-        {
-            parseRegionList(motionRegions, params[i].second);
-        }
         if (params[i].first == "physicalId" || params[i].first == "mac") // use 'mac' name for compatibility with previous client version
         {
             urlFound = true;
@@ -61,6 +48,8 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
         {
             if (params[i].second == "bin")
                 format = ChunkFormat_Binary;
+            else if (params[i].second == "bii")
+                format = ChunkFormat_BinaryIntersected;
             else if (params[i].second == "xml")
                 format = ChunkFormat_XML;
             else if (params[i].second == "txt")
@@ -70,6 +59,10 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
         }
         else if (params[i].first == "callback")
             callback = params[i].second;
+        else if (params[i].first == "filter")
+            filter = params[i].second;
+        else if (params[i].first == "periodsType")
+            periodsType = static_cast<Qn::TimePeriodContent>(params[i].second.toInt());
     }
     if (!urlFound)
         errStr += "Parameter physicalId must be provided. \n";
@@ -83,25 +76,52 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     if (resList.isEmpty())
         errStr += errStrPhysicalId;
 
-    if (!errStr.isEmpty())
-    {
+    auto errLog = [&](const QString &errText) {
         result.append("<root>\n");
-        result.append(errStr);
+        result.append(errText);
         result.append("</root>\n");
         return CODE_INVALID_PARAMETER;
+    };
+
+    if (!errStr.isEmpty())
+        return errLog(errStr);
+    
+    QnTimePeriodList periods;
+    switch (periodsType) {
+    case Qn::RecordingContent:
+        qDebug() << "recorded chunks requested";
+        periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
+        break;
+    case Qn::MotionContent:
+        {
+            QList<QRegion> motionRegions;
+            parseRegionList(motionRegions, filter);
+            periods = QnMotionHelper::instance()->mathImage(motionRegions, resList, startTime, endTime, detailLevel);
+        }
+        break;
+    case Qn::BookmarksContent:
+        {
+            QnCameraBookmarkTags tags;
+            if (!filter.isEmpty())
+                tags = filter.split(L',');
+            //TODO: #GDM #Bookmarks use tags to filter periods?
+            periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog);
+            break;
+        }
+    default:
+        return errLog("Invalid periodsType parameter.");
     }
 
-    QnTimePeriodList periods;
-    if (motionRegions.isEmpty())
-        periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel);
-    else
-        periods = QnMotionHelper::instance()->mathImage(motionRegions, resList, startTime, endTime, detailLevel);
     
     switch(format) 
     {
         case ChunkFormat_Binary:
             result.append("BIN");
-            periods.encode(result);
+            periods.encode(result, false);
+            break;
+        case ChunkFormat_BinaryIntersected:
+            result.append("BII");
+            periods.encode(result, true);
             break;
         case ChunkFormat_XML:
             result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
@@ -139,6 +159,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             }
                 
             result.append("]);");
+            break;
     }
 
     return CODE_OK;

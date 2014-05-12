@@ -122,6 +122,43 @@ namespace ec2
         return reqID;
     }
 
+    template<class QueryProcessorType>
+    int QnCameraManager<QueryProcessorType>::addBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+        auto tran = prepareTransaction( ApiCommand::addCameraBookmarkTags, tags );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
+    int QnCameraManager<QueryProcessorType>::getBookmarkTags(impl::GetCameraBookmarkTagsHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiCameraBookmarkTagDataList& tags) {
+            QnCameraBookmarkTags outData;
+            if (errorCode == ErrorCode::ok)
+                for (const ApiCameraBookmarkTagData &tagData: tags)
+                    outData << tagData.name;
+            handler->done( reqID, errorCode, outData);
+        };
+        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraBookmarkTagDataList, decltype(queryDoneHandler)> (
+            ApiCommand::getCameraBookmarkTags, nullptr, queryDoneHandler );
+        return reqID;
+    }
+
+    template<class QueryProcessorType>
+    int QnCameraManager<QueryProcessorType>::removeBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler)
+    {
+        const int reqID = generateRequestID();
+        auto tran = prepareTransaction( ApiCommand::removeCameraBookmarkTags, tags );
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1 ) );
+        return reqID;
+    }
+
 
     template<class QueryProcessorType>
     QnTransaction<ApiCameraData> QnCameraManager<QueryProcessorType>::prepareTransaction(
@@ -158,6 +195,15 @@ namespace ec2
     {
         QnTransaction<ApiIdData> tran(command, true);
         tran.params.id = id;
+        return tran;
+    }
+
+
+    template<class T>
+    QnTransaction<ApiCameraBookmarkTagDataList> QnCameraManager<T>::prepareTransaction(ApiCommand::Value command, const QnCameraBookmarkTags& tags)
+    {
+        QnTransaction<ApiCameraBookmarkTagDataList> tran(command, true);
+        fromResourceToApi(tags, tran.params);
         return tran;
     }
 

@@ -10,7 +10,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
-#include <recording/time_period.h>
 
 #include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>

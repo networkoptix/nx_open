@@ -8,7 +8,6 @@
 #include <utils/common/model_functions_fwd.h>
 
 class QnTimePeriod;
-class QnTimePeriodList;
 
 class QN_EXPORT QnTimePeriod {
 public:
@@ -26,10 +25,6 @@ public:
     QnTimePeriod(qint64 startTimeMs, qint64 durationMs): startTimeMs(startTimeMs), durationMs(durationMs) {}
 
     bool operator==(const QnTimePeriod &other) const;
-
-    static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods);
-    static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
-    
 
     bool contains(qint64 timeMs) const;
     bool contains(const QnTimePeriod &timePeriod) const;

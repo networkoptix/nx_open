@@ -24,7 +24,7 @@ public:
 
     void setResource(QnResourcePtr resource);
     void setServer(QnResourcePtr mServer);
-    virtual bool open(QnResourcePtr resource);
+    virtual bool open(const QnResourcePtr &resource);
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();

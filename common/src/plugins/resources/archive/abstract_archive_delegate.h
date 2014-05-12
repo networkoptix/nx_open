@@ -55,7 +55,7 @@ public:
     QnAbstractArchiveDelegate(): m_flags(0) {}
     virtual ~QnAbstractArchiveDelegate() {}
 
-    virtual bool open(QnResourcePtr resource) = 0;
+    virtual bool open(const QnResourcePtr &resource) = 0;
     virtual void close() = 0;
     virtual qint64 startTime() = 0;
     virtual qint64 endTime() = 0;
