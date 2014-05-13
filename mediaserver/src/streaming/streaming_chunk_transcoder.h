@@ -8,17 +8,20 @@
 #include <map>
 #include <vector>
 
-#include <QAtomicInt>
-#include <QMutex>
-#include <QThread>
+#include <QtCore/QAtomicInt>
+#include <QtCore/QObject>
+#include <QtCore/QMutex>
+#include <QtCore/QThread>
 
+#include <core/dataprovider/abstract_ondemand_data_provider.h>
 #include <core/resource/media_resource.h>
+#include <streaming/ondemand_media_data_provider.h>
 #include <utils/common/timermanager.h>
 
+#include "data_source_cache.h"
 #include "streaming_chunk_cache_key.h"
 
 
-class AbstractOnDemandDataProvider;
 class StreamingChunkCacheKey;
 class StreamingChunk;
 class StreamingChunkTranscoderThread;
@@ -31,8 +34,11 @@ class QnTranscoder;
 */
 class StreamingChunkTranscoder
 :
+    public QObject,
     public TimerEventHandler
 {
+    Q_OBJECT
+
 public:
     enum Flags
     {
@@ -77,33 +83,44 @@ private:
     struct TranscodeContext
     {
         QnSecurityCamResourcePtr mediaResource;
-        QSharedPointer<AbstractOnDemandDataProvider> dataSource;
+        DataSourceContextPtr dataSourceCtx;
         StreamingChunkCacheKey transcodeParams;
-        StreamingChunk* const chunk;
+        StreamingChunk* chunk;
         QnTranscoder* transcoder;
 
         TranscodeContext();
     };
 
+    bool m_terminated;
     Flags m_flags;
     QMutex m_mutex;
     //!map<transcoding id, data>
-    std::map<int, TranscodeContext> m_transcodings;
+    std::map<int, TranscodeContext> m_scheduledTranscodings;
     //!map<task id, transcoding id>
     std::map<quint64, int> m_taskIDToTranscode;
-    QAtomicInt m_newTranscodeID;
+    QAtomicInt m_transcodeIDSeq;
     std::vector<StreamingChunkTranscoderThread*> m_transcodeThreads;
+    DataSourceCache m_dataSourceCache;
 
     bool startTranscoding(
         int transcodingID,
-        const QnSecurityCamResourcePtr& mediaResource,
-        QSharedPointer<AbstractOnDemandDataProvider> dataSource,
+        DataSourceContextPtr dataSourceCtx,
         const StreamingChunkCacheKey& transcodeParams,
         StreamingChunk* const chunk );
     bool scheduleTranscoding(
         const int transcodeID,
         int delayMSec );
     bool validateTranscodingParameters( const StreamingChunkCacheKey& transcodeParams );
+    QnTranscoder* createTranscoder(
+        const QnSecurityCamResourcePtr& mediaResource,
+        const StreamingChunkCacheKey& transcodeParams );
+
+private slots:
+    void onTranscodingFinished(
+        int transcodingID,
+        bool result,
+        const StreamingChunkCacheKey& key,
+        DataSourceContextPtr data );
 };
 
 #endif  //STREAMINGCHUNKTRANSCODER_H

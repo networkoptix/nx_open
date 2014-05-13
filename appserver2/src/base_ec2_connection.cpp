@@ -29,8 +29,8 @@ namespace ec2
         m_videowallManager( new QnVideowallManager<T>(m_queryProcessor, resCtx) ),
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) )
     {
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(QnId, bool, bool)), this, SIGNAL(remotePeerFound(QnId, bool, bool)), Qt::DirectConnection);
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerLost(QnId, bool, bool)),  this, SIGNAL(remotePeerLost(QnId, bool, bool)), Qt::DirectConnection);
+        connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(ApiServerAliveData, bool)), this, SIGNAL(remotePeerFound(ApiServerAliveData, bool)), Qt::DirectConnection);
+        connect (QnTransactionMessageBus::instance(), SIGNAL(peerLost(ApiServerAliveData, bool)),  this, SIGNAL(remotePeerLost(ApiServerAliveData, bool)), Qt::DirectConnection);
     }
 
     template<class T>

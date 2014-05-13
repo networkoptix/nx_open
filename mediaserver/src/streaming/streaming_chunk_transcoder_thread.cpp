@@ -24,8 +24,7 @@ using namespace std;
 
 StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext()
 :
-    chunk( NULL ),
-    transcoder( NULL ),
+    chunk( nullptr ),
     dataAvailable( true ),
     msTranscoded( 0 ),
     packetsTranscoded( 0 ),
@@ -35,14 +34,12 @@ StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext()
 
 StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext(
     StreamingChunk* const _chunk,
-    QSharedPointer<AbstractOnDemandDataProvider> _dataSource,
-    const StreamingChunkCacheKey& _transcodeParams,
-    QnFfmpegTranscoder* _transcoder )
+    DataSourceContextPtr _dataSourceCtx,
+    const StreamingChunkCacheKey& _transcodeParams )
 :
     chunk( _chunk ),
-    dataSource( _dataSource ),
+    dataSourceCtx( _dataSourceCtx ),
     transcodeParams( _transcodeParams ),
-    transcoder( _transcoder ),
     dataAvailable( true ),
     msTranscoded( 0 ),
     packetsTranscoded( 0 ),
@@ -57,39 +54,32 @@ StreamingChunkTranscoderThread::StreamingChunkTranscoderThread()
 
 StreamingChunkTranscoderThread::~StreamingChunkTranscoderThread()
 {
-    for( std::map<int, TranscodeContext*>::const_iterator
-        it = m_transcodeContext.begin();
-        it != m_transcodeContext.end();
-        ++it )
-    {
-        delete it->second;
-    }
+    std::for_each( m_transcodeContext.cbegin(), m_transcodeContext.cend(),
+        []( const std::pair<int, TranscodeContext*>& p ){ delete p.second; } );
     m_transcodeContext.clear();
 }
 
 bool StreamingChunkTranscoderThread::startTranscoding(
     int transcodingID,
     StreamingChunk* const chunk,
-    QSharedPointer<AbstractOnDemandDataProvider> dataSource,
-    const StreamingChunkCacheKey& transcodeParams,
-    QnFfmpegTranscoder* transcoder )
+    DataSourceContextPtr dataSourceCtx,
+    const StreamingChunkCacheKey& transcodeParams )
 {
     QMutexLocker lk( &m_mutex );
 
     //checking transcodingID uniqueness
     pair<map<int, TranscodeContext*>::iterator, bool>
-        p = m_transcodeContext.insert( make_pair( transcodingID, (TranscodeContext*)NULL ) );
+        p = m_transcodeContext.insert( make_pair( transcodingID, (TranscodeContext*)nullptr ) );
     if( !p.second )
         return false;
     p.first->second = new TranscodeContext(
         chunk,
-        dataSource,
-        transcodeParams,
-        transcoder );
-    m_dataSourceToID.insert( make_pair( dataSource.data(), transcodingID ) );
+        dataSourceCtx,
+        transcodeParams );
+    m_dataSourceToID.insert( make_pair( dataSourceCtx->mediaDataProvider.get(), transcodingID ) );
 
     connect(
-        dataSource.data(), &AbstractOnDemandDataProvider::dataAvailable,
+        dataSourceCtx->mediaDataProvider.get(), &AbstractOnDemandDataProvider::dataAvailable,
         this, &StreamingChunkTranscoderThread::onStreamDataAvailable,
         Qt::DirectConnection );
 
@@ -111,7 +101,7 @@ size_t StreamingChunkTranscoderThread::ongoingTranscodings() const
 //    if( it == m_transcodeContext.end() )
 //        return;
 //    disconnect( it->second->dataSource.data(), 0, this, 0 );
-//    removeTranscodingNonSafe( it, true );
+//    removeTranscodingNonSafe( it, true, &lk );
 //}
 
 void StreamingChunkTranscoderThread::pleaseStop()
@@ -159,7 +149,7 @@ void StreamingChunkTranscoderThread::run()
 
         //performing transcode
         QnAbstractDataPacketPtr srcPacket;
-        if( !transcodeIter->second->dataSource->tryRead( &srcPacket ) )
+        if( !transcodeIter->second->dataSourceCtx->mediaDataProvider->tryRead( &srcPacket ) )
         {
             transcodeIter->second->dataAvailable = false;
             continue;
@@ -169,29 +159,29 @@ void StreamingChunkTranscoderThread::run()
         {
             NX_LOG( QString::fromLatin1("End of file reached while transcoding resource %1 data. Transcoded %2 ms of source data").
                 arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).arg(transcodeIter->second->msTranscoded), cl_logDEBUG1 );
-            //TODO/HLS #ak: remove transcoding or consider that data may appear later?
+            removeTranscodingNonSafe( transcodeIter, false, &lk );
+            continue;
         }
 
         QnAbstractMediaDataPtr srcMediaData = srcPacket.dynamicCast<QnAbstractMediaData>();
         Q_ASSERT( srcMediaData );
 
         QnByteArray resultStream( 1, RESERVED_TRANSCODED_PACKET_SIZE );
-        //TODO/HLS #ak: releasing mutex lock for transcodePacket call
 #ifdef SAVE_INPUT_STREAM_TO_FILE
         m_inputFile.write( srcMediaData->data.constData(), srcMediaData->data.size() );
 #endif
-        int res = transcodeIter->second->transcoder->transcodePacket( srcMediaData, &resultStream );
+        int res = transcodeIter->second->dataSourceCtx->transcoder->transcodePacket( srcMediaData, &resultStream );
         if( res )
         {
             NX_LOG( QString::fromLatin1("Error transcoding resource %1 data, error code %2. Transcoded %3 ms of source data").
                 arg(transcodeIter->second->transcodeParams.srcResourceUniqueID()).arg(res).arg(transcodeIter->second->msTranscoded), cl_logWARNING );
-            removeTranscodingNonSafe( transcodeIter, false );
+            removeTranscodingNonSafe( transcodeIter, false, &lk );
             continue;
         }
 
         ++transcodeIter->second->packetsTranscoded;
 
-        //TODO/HLS #ak: protect from discontinuity in timestamp
+        //protecting from discontinuity in timestamp
         if( transcodeIter->second->prevPacketTimestamp == -1 )
             transcodeIter->second->prevPacketTimestamp = srcMediaData->timestamp;
         if( qAbs(srcMediaData->timestamp - transcodeIter->second->prevPacketTimestamp) > 3600*1000*1000UL )
@@ -206,7 +196,7 @@ void StreamingChunkTranscoderThread::run()
         if( resultStream.size() > 0 )
             transcodeIter->second->chunk->appendData( QByteArray::fromRawData(resultStream.constData(), resultStream.size()) );
 
-        if( transcodeIter->second->dataSource->currentPos() >= transcodeIter->second->transcodeParams.endTimestamp() )
+        if( transcodeIter->second->dataSourceCtx->mediaDataProvider->currentPos() >= transcodeIter->second->transcodeParams.endTimestamp() )
         {
 #ifdef SAVE_INPUT_STREAM_TO_FILE
             m_inputFile.close();
@@ -215,14 +205,14 @@ void StreamingChunkTranscoderThread::run()
             for( ;; )
             {
                 resultStream.clear();
-                int res = transcodeIter->second->transcoder->transcodePacket( QnAbstractMediaDataPtr( new QnEmptyMediaData() ), &resultStream );
+                int res = transcodeIter->second->dataSourceCtx->transcoder->transcodePacket( QnAbstractMediaDataPtr( new QnEmptyMediaData() ), &resultStream );
                 if( res || resultStream.size() == 0 )
                     break;
                 transcodeIter->second->chunk->appendData( QByteArray::fromRawData(resultStream.constData(), resultStream.size()) );
             }
 
             //removing transcoding
-            removeTranscodingNonSafe( transcodeIter, true );
+            removeTranscodingNonSafe( transcodeIter, true, &lk );
         }
     }
 
@@ -249,17 +239,23 @@ void StreamingChunkTranscoderThread::onStreamDataAvailable( AbstractOnDemandData
 
 void StreamingChunkTranscoderThread::removeTranscodingNonSafe(
     const std::map<int, TranscodeContext*>::iterator& transcodingIter,
-    bool transcodingFinishedSuccessfully )
+    bool transcodingFinishedSuccessfully,
+    QMutexLocker* const lk )
 {
-    transcodingIter->second->chunk->doneModification( transcodingFinishedSuccessfully ? StreamingChunk::rcEndOfData : StreamingChunk::rcError );
+    StreamingChunk* chunk = transcodingIter->second->chunk;
 
-    if( !transcodingFinishedSuccessfully )
-    {
-        //TODO/HLS #ak: MUST remove chunk from cache
-    }
-
-    m_dataSourceToID.erase( transcodingIter->second->dataSource.data() );
+    m_dataSourceToID.erase( transcodingIter->second->dataSourceCtx->mediaDataProvider.get() );
+    TranscodeContext* tc = transcodingIter->second;
+    const int transcodingID = transcodingIter->first;
     m_transcodeContext.erase( transcodingIter );
 
-    //TODO/HLS #ak: emit some signal?
+    lk->unlock();
+    chunk->doneModification( transcodingFinishedSuccessfully ? StreamingChunk::rcEndOfData : StreamingChunk::rcError );
+    emit transcodingFinished(
+        transcodingID,
+        transcodingFinishedSuccessfully,
+        tc->transcodeParams,
+        tc->dataSourceCtx );
+    delete tc;
+    lk->relock();
 }

@@ -13,6 +13,7 @@ public:
     QnLatin1Array() {}
     
     QnLatin1Array(const QByteArray &other): QByteArray(other) {}
+    QnLatin1Array(const char* data): QByteArray(data) {}
 };
 
 

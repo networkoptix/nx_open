@@ -33,7 +33,8 @@ namespace nx_hls
     public:
         HLSLivePlaylistManager(
             MediaStreamCache* const mediaStreamCache,
-            MediaIndex* const mediaIndex );
+            MediaIndex* const mediaIndex,
+            quint64 targetDurationUSec );
         ~HLSLivePlaylistManager();
 
         //!Returns playlist for live data

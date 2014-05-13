@@ -5,12 +5,12 @@
 #include "abstract_media_data_filter.h"
 
 
-AbstractMediaDataFilter::AbstractMediaDataFilter( const QSharedPointer<AbstractOnDemandDataProvider>& dataSource )
+AbstractMediaDataFilter::AbstractMediaDataFilter( const AbstractOnDemandDataProviderPtr& dataSource )
 :
     m_dataSource( dataSource )
 {
     Q_ASSERT( m_dataSource );
-    connect( dataSource.data(), &AbstractOnDemandDataProvider::dataAvailable,
+    connect( dataSource.get(), &AbstractOnDemandDataProvider::dataAvailable,
              this, [this]( AbstractOnDemandDataProvider* /*pThis*/ ) { emit dataAvailable(this); },
              Qt::DirectConnection );
 }

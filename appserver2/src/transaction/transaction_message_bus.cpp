@@ -81,11 +81,11 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& 
     // proxy alive info from non-direct connected host
     AlivePeersMap::iterator itr = m_alivePeers.find(tran.params.serverId);
     if (tran.params.isAlive && itr == m_alivePeers.end()) {
-        m_alivePeers.insert(tran.params.serverId, AlivePeerInfo(tran.params.isClient, true));
-        emit peerFound(tran.params.serverId, tran.params.isClient, true);
+        m_alivePeers.insert(tran.params.serverId, AlivePeerInfo(tran.params.isClient, true, tran.params.hardwareIds));
+        emit peerFound(tran.params, true);
     }
     else if (!tran.params.isAlive && itr != m_alivePeers.end()) {
-        emit peerLost(tran.params.serverId, tran.params.isClient, true);
+        emit peerLost(tran.params, true);
         m_alivePeers.remove(tran.params.serverId);
     }
 }
@@ -294,9 +294,11 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
         //!ApiSetResourceStatusData
         case ApiCommand::setResourceStatus:
             return deliveryTransaction<ApiSetResourceStatusData>(abstractTran, stream);
+        /*
         //!ApiSetResourceDisabledData
         case ApiCommand::setResourceDisabled:
             return deliveryTransaction<ApiSetResourceDisabledData>(abstractTran, stream);
+        */
         //!ApiResourceParams
         case ApiCommand::setResourceParams:
             return deliveryTransaction<ApiResourceParamsData>(abstractTran, stream);
@@ -404,32 +406,34 @@ void QnTransactionMessageBus::connectToPeerLost(const QnId& id)
 {
     if (m_alivePeers.contains(id)) {
         bool isClient = m_alivePeers.value(id).isClient;
+        QList<QByteArray> hwList = m_alivePeers.value(id).hwList;
         m_alivePeers.remove(id);
-        sendServerAliveMsg(id, false, isClient);
+        sendServerAliveMsg(id, false, isClient, hwList);
     }
 }
 
-void QnTransactionMessageBus::connectToPeerEstablished(const QnId& id, bool isClient)
+void QnTransactionMessageBus::connectToPeerEstablished(const QnId& id, bool isClient, const QList<QByteArray>& hwList)
 {
     if (!m_alivePeers.contains(id)) {
-        m_alivePeers.insert(id, AlivePeerInfo(isClient, false));
-        sendServerAliveMsg(id, true, isClient);
+        m_alivePeers.insert(id, AlivePeerInfo(isClient, false, hwList));
+        sendServerAliveMsg(id, true, isClient, hwList);
     }
 }
 
-void QnTransactionMessageBus::sendServerAliveMsg(const QnId& serverId, bool isAlive, bool isClient)
+void QnTransactionMessageBus::sendServerAliveMsg(const QnId& serverId, bool isAlive, bool isClient, const QList<QByteArray>& hwList)
 {
     m_aliveSendTimer.restart();
     QnTransaction<ApiServerAliveData> tran(ApiCommand::serverAliveInfo, false);
     tran.params.serverId = serverId;
     tran.params.isAlive = isAlive;
     tran.params.isClient = isClient;
+    tran.params.hardwareIds = hwList;
     tran.fillSequence();
     sendTransaction(tran);
     if (isAlive)
-        emit peerFound(serverId, isClient, false);
+        emit peerFound(tran.params, false);
     else
-        emit peerLost(serverId, isClient, false);
+        emit peerLost(tran.params, false);
 }
 
 QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
@@ -477,7 +481,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         // if sync already done or in progress do not send new request
         if (!transport->isClientPeer())
             queueSyncRequest(transport);
-        connectToPeerEstablished(transport->remoteGuid(), transport->isClientPeer());
+        connectToPeerEstablished(transport->remoteGuid(), transport->isClientPeer(), transport->hwList());
         break;
     case QnTransactionTransport::Closed:
         for (int i = m_connectingConnections.size() -1; i >= 0; --i) 
@@ -530,6 +534,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
 
             itr.value().lastConnectedTime = currentTime;
             QnTransactionTransportPtr transport(new QnTransactionTransport(true, isClient));
+            transport->setHwList(qnLicensePool->allLocalHardwareIds());
             connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
             connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
             transport->doOutgoingConnect(url);
@@ -539,7 +544,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
 
     // send keep-alive if we connected to cloud
     if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL)
-        sendServerAliveMsg(qnCommon->moduleGUID(), true, qnCommon->isCloudMode());
+        sendServerAliveMsg(qnCommon->moduleGUID(), true, qnCommon->isCloudMode(), qnLicensePool->allLocalHardwareIds());
 
     // check if some server not accessible any more
     for (AlivePeersMap::iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
@@ -564,7 +569,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
     }
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& remoteGuid, qint64 timediff)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& remoteGuid, qint64 timediff, QList<QByteArray> hwList)
 {
     if (!dbManager)
     {
@@ -591,6 +596,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     }
 
     QnTransactionTransportPtr transport(new QnTransactionTransport(false, isClient, socket, remoteGuid));
+    transport->setHwList(hwList);
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
 

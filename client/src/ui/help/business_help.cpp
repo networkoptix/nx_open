@@ -22,6 +22,8 @@ int QnBusiness::eventHelpId(QnBusiness::EventType type) {
         return Qn::EventsActions_MediaServerConflict_Help;
     case ServerStartEvent:
         return Qn::EventsActions_MediaServerStarted_Help;
+    case LicenseIssueEvent:
+        return Qn::EventsActions_LicenseIssue_Help;
     default:
         return -1;
     }

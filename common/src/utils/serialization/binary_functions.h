@@ -253,6 +253,9 @@ bool deserialize(QnInputBinaryStream<T> *stream, QByteArray *target) {
     qint32 size;
     if(!QnBinary::deserialize(stream, &size))
         return false;
+    if(size < 0)
+        return false;
+
     target->resize(size);
     return stream->read(target->data(), size) == size;
 }

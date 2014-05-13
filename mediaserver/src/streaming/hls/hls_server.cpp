@@ -5,6 +5,7 @@
 #include "hls_server.h"
 
 #include <QtCore/QUrlQuery>
+#include <QtCore/QTimeZone>
 
 #include <algorithm>
 #include <limits>
@@ -35,7 +36,7 @@ extern QnLog* requestsLog;  //TODO #ak: not good
 namespace nx_hls
 {
     static const size_t READ_BUFFER_SIZE = 64*1024;
-    static const double DEFAULT_TARGET_DURATION = 10;
+    static const double DEFAULT_TARGET_DURATION = 5;
     static const int DEFAULT_HLS_SESSION_LIVE_TIMEOUT = (int)DEFAULT_TARGET_DURATION * 7;
     static const int MIN_CHUNK_COUNT_IN_PLAYLIST = 3;
     static const int CHUNK_COUNT_IN_ARCHIVE_PLAYLIST = 3;
@@ -112,7 +113,7 @@ namespace nx_hls
                     if( !prepareDataToSend() )
                     {
                         NX_LOG( QString::fromLatin1("Finished uploading %1 data to %2. Closing connection...").
-                            arg(QLatin1String("entity_path")).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
+                            arg(m_currentFileName).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
                         //sending empty chunk to signal EOF
                         if( m_useChunkedTransfer )
                             sendChunk( QByteArray() );
@@ -205,7 +206,7 @@ namespace nx_hls
         response.statusLine.version = request.requestLine.version;
         response.headers.insert( std::make_pair(
             "Date",
-            QLocale(QLocale::English).toString(QDateTime::currentDateTime(), "ddd, d MMM yyyy hh:mm:ss GMT").toLatin1() ) );     //TODO/HLS: #ak get timezone
+            QLocale(QLocale::English).toString(QDateTime::currentDateTime(), lit("ddd, d MMM yyyy hh:mm:ss t")).toLatin1() ) );
         response.headers.insert( std::make_pair( "Server", QN_APPLICATION_NAME " " QN_APPLICATION_VERSION ) );
         response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //getRequestedFile can override this
 
@@ -246,6 +247,7 @@ namespace nx_hls
         {
             fileName = path.midRef( fileNameStartIndex+1 );
         }
+        m_currentFileName = fileName.toString();
 
         const int extensionSepPos = fileName.indexOf( QChar('.') );
         const QStringRef& extension = extensionSepPos != -1 ? fileName.mid( extensionSepPos+1 ) : QStringRef();
@@ -593,8 +595,11 @@ namespace nx_hls
                 hlsChunkUrlQuery.addQueryItem( StreamingParams::LIVE_PARAM_NAME, QString() );
             hlsChunk.url.setQuery( hlsChunkUrlQuery );
             hlsChunk.discontinuity = chunkList[i].discontinuity;
+            hlsChunk.programDateTime = QDateTime::fromMSecsSinceEpoch(chunkList[i].startTimestamp / USEC_IN_MSEC, QTimeZone(QTimeZone::systemTimeZoneId()));
             playlist.chunks.push_back( hlsChunk );
         }
+
+        //playlist.allowCache = !session->isLive(); //TODO: #ak uncomment when done
 
         response->messageBody = playlist.toString();
 
@@ -687,7 +692,7 @@ namespace nx_hls
         m_chunkReadCtx = StreamingChunk::SequentialReadingContext();
 
         response->headers.insert( make_pair( "Content-Type", m_currentChunk->mimeType().toLatin1() ) );
-        if( m_currentChunk->isClosed() && m_currentChunk->sizeInBytes() > 0 )   //TODO/HLS: #ak is condition sutisfying?
+        if( m_currentChunk->isClosed() && m_currentChunk->sizeInBytes() > 0 )
             response->headers.insert( make_pair( "Content-Length", nx_http::StringType::number((qlonglong)m_currentChunk->sizeInBytes()) ) );
         else
             response->headers.insert( make_pair( "Transfer-Encoding", "chunked" ) );
@@ -724,10 +729,10 @@ namespace nx_hls
             //starting live caching, if it is not started
             for( const MediaQuality quality: requiredQualities )
             {
-                if( !videoCamera->ensureLiveCacheStarted(quality) )
+                if( !videoCamera->ensureLiveCacheStarted(quality, DEFAULT_TARGET_DURATION * USEC_IN_SEC) )
                 {
                     NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 with no live cache").arg(camResource->getUniqueId()), cl_logDEBUG1 );
-                    return nx_http::StatusCode::internalServerError;
+                    return nx_http::StatusCode::noContent;
                 }
                 assert( videoCamera->hlsLivePlaylistManager(quality) );
                 newHlsSession->setPlaylistManager( quality, videoCamera->hlsLivePlaylistManager(quality) );

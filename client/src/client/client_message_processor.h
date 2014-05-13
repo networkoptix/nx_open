@@ -22,8 +22,8 @@ protected:
 private:
     bool m_opened;
 private slots:
-    void at_remotePeerFound(QnId id, bool isClient, bool isProxy);
-    void at_remotePeerLost(QnId id, bool isClient, bool isProxy);
+    void at_remotePeerFound(ec2::ApiServerAliveData, bool isProxy);
+    void at_remotePeerLost(ec2::ApiServerAliveData, bool isProxy);
 private:
     void determineOptimalIF(const QnMediaServerResourcePtr &resource);
     void updateServerTmpStatus(const QnId& id, QnResource::Status status);

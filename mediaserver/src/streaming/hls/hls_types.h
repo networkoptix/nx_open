@@ -10,6 +10,7 @@
 #include <boost/optional.hpp>
 
 #include <QByteArray>
+#include <QDateTime>
 #include <QUrl>
 
 
@@ -23,6 +24,8 @@ namespace nx_hls
         QUrl url;
         //!if true, there is discontinuity between this chunk and previous one
         bool discontinuity;
+        //!#EXT-X-PROGRAM-DATE-TIME tag
+        boost::optional<QDateTime> programDateTime;
 
         Chunk();
     };
@@ -33,6 +36,7 @@ namespace nx_hls
         unsigned int mediaSequence;
         bool closed;
         std::vector<Chunk> chunks;
+        boost::optional<bool> allowCache;
 
         Playlist();
 

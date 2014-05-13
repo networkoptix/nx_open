@@ -40,7 +40,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->setupUi(this);
 
     QList<QnLicenseListModel::Column> columns;
-    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn << QnLicenseListModel::ExpirationDateColumn;
+    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn << QnLicenseListModel::ExpirationDateColumn << QnLicenseListModel::LicenseStatusColumn;
 
     m_model = new QnLicenseListModel(this);
     m_model->setColumns(columns);

@@ -34,6 +34,8 @@ public:
     static QUrl publicUrl();
     static QByteArray prevSessionKey();
     static QByteArray sessionKey();
+    static qint64 prematureLicenseExperationDate();
+    static void setPrematureLicenseExperationDate(qint64 value);
     static int defaultMediaProxyPort();
     static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
@@ -68,6 +70,7 @@ private:
     QByteArray m_sessionKey;
     QByteArray m_prevSessionKey;
     QString m_box;
+    qint64 m_prematureLicenseExperationDate;
 
     int m_defaultMediaProxyPort;
     QnSoftwareVersion m_currentVersion;

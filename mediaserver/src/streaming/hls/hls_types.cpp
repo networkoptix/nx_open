@@ -6,6 +6,8 @@
 
 #include <cmath>
 
+#include <QTimeZone>
+
 
 namespace nx_hls
 {
@@ -38,9 +40,15 @@ namespace nx_hls
         QByteArray playlistStr;
         playlistStr += 
             "#EXTM3U\r\n"
-            "#EXT-X-VERSION:3\r\n"; //TODO/HLS: #ak really need version 3?
+            "#EXT-X-VERSION:3\r\n";
         playlistStr += "#EXT-X-TARGETDURATION:"+QByteArray::number(targetDuration)+"\r\n";
         playlistStr += "#EXT-X-MEDIA-SEQUENCE:"+QByteArray::number(mediaSequence)+"\r\n";
+        if( allowCache )
+        {
+            playlistStr += "#EXT-X-ALLOW-CACHE:";
+            playlistStr += allowCache.get() ? "YES" : "NO";
+            playlistStr += "\r\n";
+        }
         playlistStr += "\r\n";
 
         for( std::vector<Chunk>::size_type
@@ -50,16 +58,22 @@ namespace nx_hls
         {
             if( chunks[i].discontinuity )
                 playlistStr += "#EXT-X-DISCONTINUITY\r\n";
+            //generating string 2010-02-19T14:54:23.031+08:00, since QDateTime::setTimeSpec() and QDateTime::toString(Qt::ISODate) do not provide expected result
+            if( chunks[i].programDateTime )
+                playlistStr += "#EXT-X-PROGRAM-DATE-TIME:"+
+                    chunks[i].programDateTime.get().toString(Qt::ISODate)+"."+                      // data/time
+                    QString::number((chunks[i].programDateTime.get().toMSecsSinceEpoch() % 1000))+  //millis
+                    "+"+QTime(0,0,0).addSecs(chunks[i].programDateTime.get().timeZone().offsetFromUtc(chunks[i].programDateTime.get())).toString(lit("hh:mm"))+ //timezone
+                    "\r\n";
             playlistStr += "#EXTINF:"+QByteArray::number(chunks[i].duration, 'f', 3)+",\r\n";
             playlistStr += chunks[i].url.toString().toLatin1()+"\r\n";
         }
-        
+
         if( closed )
             playlistStr += "#EXT-X-ENDLIST\r\n";
 
         return playlistStr;
     }
-
 
     QByteArray VariantPlaylist::toString() const
     {

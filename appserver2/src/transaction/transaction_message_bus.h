@@ -30,7 +30,7 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url, bool isClient, const QUuid& peer = QUuid());
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& removeGuid, qint64 timediff);
+        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& removeGuid, qint64 timediff, QList<QByteArray> hwList);
         
         void start();
 
@@ -80,10 +80,12 @@ namespace ec2
 
         struct AlivePeerInfo
         {
-            AlivePeerInfo(bool isClient = false, bool isProxy = false): isClient(isClient), isProxy(isProxy) { lastActivity.restart(); }
+            AlivePeerInfo(): isClient(false), isProxy(false) { lastActivity.restart(); }
+            AlivePeerInfo(bool isClient, bool isProxy, QList<QByteArray> hwList): isClient(isClient), isProxy(isProxy), hwList(hwList) { lastActivity.restart(); }
             bool isClient;
             bool isProxy;
             QElapsedTimer lastActivity;
+            QList<QByteArray> hwList;
         };
         typedef QMap<QnId, AlivePeerInfo> AlivePeersMap;
 
@@ -98,8 +100,8 @@ namespace ec2
         AlivePeersMap aliveServerPeers() const;
 
 signals:
-        void peerLost(QnId, bool isClient, bool isProxy);
-        void peerFound(QnId, bool isClient, bool isProxy);
+        void peerLost(ApiServerAliveData data, bool isProxy);
+        void peerFound(ApiServerAliveData data, bool isProxy);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);
@@ -142,9 +144,9 @@ signals:
         void onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, QnInputBinaryStream<QByteArray>&);
         void queueSyncRequest(QnTransactionTransport* transport);
 
-        void connectToPeerEstablished(const QnId& id, bool isClient);
+        void connectToPeerEstablished(const QnId& id, bool isClient, const QList<QByteArray>& hwList);
         void connectToPeerLost(const QnId& id);
-        void sendServerAliveMsg(const QnId& id, bool isAlive, bool isClient);
+        void sendServerAliveMsg(const QnId& id, bool isAlive, bool isClient, const QList<QByteArray>& hwList);
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, QnInputBinaryStream<QByteArray>& stream);
         QSet<QUuid> peersToSend(ApiCommand::Value command) const;

@@ -5,7 +5,7 @@
 #include "streaming_chunk_cache.h"
 
 
-static const unsigned int MAX_CACHE_COST = 1800;    //TODO move to some setting
+static const unsigned int MAX_CACHE_COST = 120;    //TODO #ak: move to some setting
 
 Q_GLOBAL_STATIC( StreamingChunkCache, streamingChunkCacheInstance );
 

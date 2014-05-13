@@ -229,10 +229,12 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     if (m_state == ConnectingStage1)
     {
         q.removeQueryItem("time");
+        q.removeQueryItem("hwList");
         qint64 localTime = -1;
         if (QnTransactionLog::instance())
             localTime = QnTransactionLog::instance()->getRelativeTime();
         q.addQueryItem("time", QByteArray::number(localTime));
+        q.addQueryItem("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds()));
     }
     if( m_isClientPeer ) {
         q.removeQueryItem("isClient");
@@ -331,6 +333,7 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
 {
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
     nx_http::HttpHeaders::const_iterator itrTime = client->response()->headers.find("time");
+    nx_http::HttpHeaders::const_iterator itrHwList = client->response()->headers.find("hwList");
 
     if (itrGuid == client->response()->headers.end() || itrTime == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
@@ -350,6 +353,7 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
                 if (remoteTime != -1)
                     setTimeDiff(remoteTime - localTime);
             }
+            setHwList(decodeHWList(itrHwList->second));
             setState(ConnectingStage2);
         }
         else {
@@ -411,4 +415,21 @@ bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
      // allow to send system command immediately, without tranSyncRequest
     return ApiCommand::isSystem(command) ? true : m_writeSync;
 }
+
+QByteArray QnTransactionTransport::encodeHWList(const QList<QByteArray> hwList)
+{
+    QByteArray result;
+    foreach(const QByteArray& hw, hwList) {
+        if (!result.isEmpty())
+            result.append("-");
+        result.append(hw);
+    }
+    return result;
+}
+
+QList<QByteArray> QnTransactionTransport::decodeHWList(const QByteArray data)
+{
+    return data.split('-');
+}
+
 }

@@ -5,6 +5,7 @@
 #ifndef ONDEMAND_MEDIA_DATA_PROVIDER_H
 #define ONDEMAND_MEDIA_DATA_PROVIDER_H
 
+#include <memory>
 #include <queue>
 
 #include <QMutex>
@@ -49,5 +50,7 @@ private:
     std::queue<QnAbstractDataPacketPtr> m_dataQueue;
     qint64 m_prevPacketTimestamp;
 };
+
+typedef std::shared_ptr<OnDemandMediaDataProvider> OnDemandMediaDataProviderPtr;
 
 #endif  //ONDEMAND_MEDIA_DATA_PROVIDER_H

@@ -12,10 +12,11 @@
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
 #include <utils/common/long_runnable.h>
 
+#include "data_source_cache.h"
 #include "streaming_chunk_cache_key.h"
 
 
-class QnFfmpegTranscoder;
+class QnTranscoder;
 class StreamingChunk;
 class StreamingChunkCacheKey;
 
@@ -32,9 +33,8 @@ public:
     bool startTranscoding(
         int transcodingID,
         StreamingChunk* const chunk,
-        QSharedPointer<AbstractOnDemandDataProvider> dataSource,
-        const StreamingChunkCacheKey& transcodeParams,
-        QnFfmpegTranscoder* transcoder );
+        DataSourceContextPtr dataSourceCtx,
+        const StreamingChunkCacheKey& transcodeParams );
     //void cancel( int transcodingID );
 
     size_t ongoingTranscodings() const;
@@ -48,14 +48,20 @@ protected:
 protected slots:
     void onStreamDataAvailable( AbstractOnDemandDataProvider* pThis );
 
+signals:
+    void transcodingFinished(
+        int transcodingID,
+        bool result,
+        const StreamingChunkCacheKey& key,
+        DataSourceContextPtr data );
+
 private:
     class TranscodeContext
     {
     public:
         StreamingChunk* const chunk;
-        QSharedPointer<AbstractOnDemandDataProvider> dataSource;
+        DataSourceContextPtr dataSourceCtx;
         StreamingChunkCacheKey transcodeParams;
-        QnFfmpegTranscoder* transcoder;
         bool dataAvailable;
         quint64 msTranscoded; 
         quint64 packetsTranscoded;
@@ -65,9 +71,8 @@ private:
         TranscodeContext();
         TranscodeContext(
             StreamingChunk* const _chunk,
-            QSharedPointer<AbstractOnDemandDataProvider> _dataSource,
-            const StreamingChunkCacheKey& _transcodeParams,
-            QnFfmpegTranscoder* _transcoder );
+            DataSourceContextPtr dataSourceCtx,
+            const StreamingChunkCacheKey& _transcodeParams );
     };
 
     //map<transcodingID, TranscodeContext>
@@ -79,7 +84,8 @@ private:
 
     void removeTranscodingNonSafe(
         const std::map<int, TranscodeContext*>::iterator& transcodingIter,
-        bool transcodingFinishedSuccessfully );
+        bool transcodingFinishedSuccessfully,
+        QMutexLocker* const lk );
 };
 
 #endif  //STREAMING_CHUNK_TRANSCODER_THREAD_H

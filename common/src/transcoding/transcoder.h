@@ -241,4 +241,6 @@ private:
     bool m_packetizedMode;
 };
 
+typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
+
 #endif  // __TRANSCODER_H
