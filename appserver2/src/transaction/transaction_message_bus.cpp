@@ -46,6 +46,7 @@ QnTransactionMessageBus::QnTransactionMessageBus():
     m_thread->setObjectName("QnTransactionMessageBusThread");
     moveToThread(m_thread);
     qRegisterMetaType<QnTransactionTransport::State>(); // TODO: #Elric #EC2 registration
+    qRegisterMetaType<QnAbstractTransaction>("QnAbstractTransaction");
     m_timer = new QTimer();
     connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
     m_timer->start(500);
@@ -152,6 +153,11 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, Trans
                 sender->setState(QnTransactionTransport::Error);
                 return;
             }
+
+            // this is required to allow client place transactions directly into transaction message bus
+            if (tran.command == ApiCommand::getAllDataList)
+                sender->setWriteSync(true);
+
             break;
         }
     }
@@ -162,11 +168,13 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, Trans
     QMutexLocker lock(&m_mutex);
     
     // proxy incoming transaction to other peers.
-    if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty())
+    if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
+        emit transactionProcessed(tran);
         return; // all dstPeers already processed
+    }
 
     QByteArray chunkData;
-    m_serializer.serializeTran(chunkData, serializedTran, transportHeader.processedPeers + peersToSend(tran.command));
+    m_serializer.serializeTran(chunkData, serializedTran, TransactionTransportHeader(transportHeader.processedPeers + peersToSend(tran.command)));
 
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
     {
@@ -177,6 +185,8 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, Trans
             transport->addData(chunkData);
         }
     }
+
+    emit transactionProcessed(tran);
 }
 
 void QnTransactionMessageBus::sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData, const PeerList& dstPeers)
@@ -371,6 +381,13 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
         case ApiCommand::resetBusinessRules:
             return deliveryTransaction<ApiResetBusinessRuleData>(abstractTran, stream);
 
+        case ApiCommand::uploadUpdate:
+            return deliveryTransaction<ApiUpdateUploadData>(abstractTran, stream);
+        case ApiCommand::uploadUpdateResponce:
+            return deliveryTransaction<ApiUpdateUploadResponceData>(abstractTran, stream);
+        case ApiCommand::installUpdate:
+            return deliveryTransaction<QString>(abstractTran, stream);
+
         case ApiCommand::serverAliveInfo:
             break; // nothing to do
 
@@ -523,7 +540,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
 
     // add new outgoing connections
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    for (QMap<QUrl, RemoveUrlConnectInfo>::iterator itr = m_removeUrls.begin(); itr != m_removeUrls.end(); ++itr)
+    for (QMap<QUrl, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
     {
         const QUrl& url = itr.key();
         bool isClient = itr.value().isClient;
@@ -610,6 +627,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         QByteArray buffer;
         m_serializer.serializeTran(buffer, tran, PeerList() << transport->remoteGuid() << qnCommon->moduleGUID());
         transport->addData(buffer);
+        transport->setReadSync(true);
     }
     
     QMutexLocker lock(&m_mutex);
@@ -621,14 +639,14 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
 void QnTransactionMessageBus::addConnectionToPeer(const QUrl& url, bool isClient, const QUuid& peer)
 {
     QMutexLocker lock(&m_mutex);
-    m_removeUrls.insert(url, RemoveUrlConnectInfo(isClient, peer));
+    m_remoteUrls.insert(url, RemoteUrlConnectInfo(isClient, peer));
     QTimer::singleShot(0, this, SLOT(doPeriodicTasks()));
 }
 
 void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
 {
     QMutexLocker lock(&m_mutex);
-    m_removeUrls.remove(url);
+    m_remoteUrls.remove(url);
     QString urlStr = getUrlAddr(url);
     foreach(QnTransactionTransportPtr transport, m_connections.values())
     {

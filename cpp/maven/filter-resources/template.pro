@@ -87,6 +87,7 @@ LIBS += ${global.libs}
 
 INCLUDEPATH +=  ${qt.dir}/include \
                 ${qt.dir}/include/QtCore \
+                ${qt.dir}/include/QtZlib \
                 ${project.build.sourceDirectory} \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
