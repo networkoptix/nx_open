@@ -21,7 +21,7 @@ const qint64 maxUpdateFileSize = 100 * 1024 * 1024; // 100 MB
 const QString QN_UPDATES_URL = lit("http://localhost:8000/updates");
 const QString buildInformationSuffix(lit("update"));
 const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
-const QByteArray mutexName = "auto_update";
+const QString mutexName = lit("auto_update");
 const int installationTimeout = 5 * 60 * 1000; // 5 minutes
 
 QString updateFilePath(const QString &fileName) {
@@ -524,11 +524,11 @@ void QnMediaServerUpdateTool::unlockMutex() {
     }
 }
 
-void QnMediaServerUpdateTool::at_mutexLocked(const QByteArray &) {
+void QnMediaServerUpdateTool::at_mutexLocked() {
     uploadNextUpdate();
 }
 
-void QnMediaServerUpdateTool::at_mutexTimeout(const QByteArray &) {
+void QnMediaServerUpdateTool::at_mutexTimeout() {
     m_distributedMutex.clear();
     finishUpdate(LockFailed);
 }

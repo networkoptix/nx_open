@@ -130,8 +130,8 @@ private slots:
     void at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
     void downloadNextUpdate();
 
-    void at_mutexLocked(const QByteArray &);
-    void at_mutexTimeout(const QByteArray &);
+    void at_mutexLocked();
+    void at_mutexTimeout();
 
     void at_resourceChanged(const QnResourcePtr &resource);
     void at_installationTimeout();
