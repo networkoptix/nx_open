@@ -14,6 +14,11 @@ public:
     QSize sizeHint() const;
 
     QVariant inputMethodQuery(Qt::InputMethodQuery property) const;
+
+signals:
+    void prevButtonClicked();
+    void nextButtonClicked();
+    void textChanged(const QString &text);
 protected:
     void focusInEvent(QFocusEvent *event);
     void focusOutEvent(QFocusEvent *event);
@@ -27,8 +32,10 @@ protected:
     void updateGeometries();
     void initStyleOption(QStyleOptionFrameV2 *option) const;
 
-    QLineEdit *m_lineEdit;
-    QAbstractButton *m_clearButton;
+    QLineEdit* m_lineEdit;
+    QLabel* m_occurencesLabel;
+    QAbstractButton *m_prevButton;
+    QAbstractButton *m_nextButton;
     QAbstractButton *m_searchButton;
 };
 
