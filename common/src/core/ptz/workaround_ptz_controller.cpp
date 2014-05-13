@@ -18,7 +18,7 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     if(!camera)
         return;
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(camera);
+    QnResourceData resourceData = qnCommon->dataPool()->data(camera, true);
 
     m_octagonal = resourceData.value<bool>(lit("octagonalPtz"), false);
     
