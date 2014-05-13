@@ -103,6 +103,7 @@
 #include <rest/handlers/storage_space_rest_handler.h>
 #include <rest/handlers/storage_status_rest_handler.h>
 #include <rest/handlers/time_rest_handler.h>
+#include <rest/handlers/update_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
 
@@ -118,9 +119,11 @@
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
+#include <utils/common/system_information.h>
 #include <utils/network/multicodec_rtp_reader.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
+#include <utils/network/modulefinder.h>
 
 
 #include <media_server/server_message_processor.h>
@@ -135,7 +138,7 @@
 #include "plugins/resources/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
-#include "utils/network/networkoptixmodulefinder.h"
+#include "utils/network/modulefinder.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
 #include "compatibility.h"
@@ -926,35 +929,23 @@ void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
-void QnMain::at_peerFound(
-    const QString& moduleType,
-    const QString& moduleVersion,
-    const QString& systemName,
-    const TypeSpecificParamMap& moduleParameters,
-    const QString& localInterfaceAddress,
-    const QString& remoteHostAddress,
-    bool isLocal,
-    const QString& moduleSeed )
-{
-    if (moduleVersion == QN_APPLICATION_VERSION && systemName == qnCommon->localSystemName()) 
-    {
-        int port = moduleParameters.value("port").toInt();
-        QString url = QString(lit("http://%1:%2")).arg(remoteHostAddress).arg(port);
+void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
+    Q_UNUSED(localInterfaceAddress)
+
+    if (moduleInformation.version == QnSoftwareVersion(QN_APPLICATION_VERSION) && moduleInformation.systemName == qnCommon->localSystemName()) {
+        int port = moduleInformation.parameters.value("port").toInt();
+        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
         ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-        ec2Connection->addRemotePeer(url, false, moduleSeed);
+        ec2Connection->addRemotePeer(url, false, moduleInformation.id);
     }
 }
-void QnMain::at_peerLost(
-    const QString& moduleType,
-    const TypeSpecificParamMap& moduleParameters,
-    const QString& remoteHostAddress,
-    bool isLocal,
-    const QString& moduleSeed )
-{
-    int port = moduleParameters.value("port").toInt();
-    QString url = QString(lit("http://%1:%2")).arg(remoteHostAddress).arg(port);
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    ec2Connection->deleteRemotePeer(url);
+void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
+    int port = moduleInformation.parameters.value("port").toInt();
+    foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
+        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
+        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        ec2Connection->deleteRemotePeer(url);
+    }
 }
 
 void QnMain::initTcpListener()
@@ -978,6 +969,7 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
@@ -1234,6 +1226,7 @@ void QnMain::run()
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
         }
         server->setVersion(QnSoftwareVersion(QN_ENGINE_VERSION));
+        server->setSystemInfo(QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH));
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
         bool isLocal = appserverHostString.isEmpty() || QUrl(appserverHostString).scheme() == "file";
@@ -1330,21 +1323,12 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
-    m_moduleFinder = new NetworkOptixModuleFinder(false);
+    m_moduleFinder = new QnModuleFinder(false);
     //if (cmdLineArguments.devModeKey == lit("raz-raz-raz"))
         m_moduleFinder->setCompatibilityMode(true);
-    QObject::connect(
-        m_moduleFinder,
-        SIGNAL(moduleFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-        this,
-        SLOT(at_peerFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-        Qt::DirectConnection );
-    QObject::connect(
-        m_moduleFinder,
-        SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
-        this,
-        SLOT(at_peerLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
-        Qt::DirectConnection );
+    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
+    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
+
     QUrl url = ec2Connection->connectionInfo().ecUrl;
 #if 1
     if (url.scheme() == "file") {

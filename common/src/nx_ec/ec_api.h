@@ -34,6 +34,8 @@ class QnUniversalTcpListener;
 */
 namespace ec2
 {
+    typedef QSet<QnId> PeerList;
+
     struct QnFullResourceData
     {
         ApiServerInfoData serverInfo;
@@ -698,6 +700,43 @@ namespace ec2
     };
     typedef std::shared_ptr<AbstractStoredFileManager> AbstractStoredFileManagerPtr;
 
+    class AbstractUpdatesManager : public QObject {
+        Q_OBJECT
+    public:
+        enum ReplyCode {
+            Finished = -1,
+            Failed = -2
+        };
+
+        virtual ~AbstractUpdatesManager() {}
+
+        template<class TargetType, class HandlerType> int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const PeerList &peers, TargetType *target, HandlerType handler) {
+            return sendUpdatePackageChunk(updateId, data, offset, peers, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, TargetType *target, HandlerType handler) {
+            return sendUpdateUploadResponce(updateId, peerId, chunks, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int installUpdate(const QString &updateId, const PeerList &peers, TargetType *target, HandlerType handler) {
+            return installUpdate(updateId, peers, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+    signals:
+        void updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
+        void updateUploadProgress(const QString &updateId, const QnId &peerId, int chunks);
+        void updateInstallationRequested(const QString &updateId);
+
+    protected:
+        virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const PeerList &peers, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) = 0;
+        virtual int installUpdate(const QString &updateId, const PeerList &peers, impl::SimpleHandlerPtr handler) = 0;
+    };
+    typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
+
     /*!
         \note All methods are asynchronous if other not specified
     */
@@ -729,6 +768,7 @@ namespace ec2
         virtual AbstractLayoutManagerPtr getLayoutManager() = 0;
         virtual AbstractVideowallManagerPtr getVideowallManager() = 0;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() = 0;
+        virtual AbstractUpdatesManagerPtr getUpdatesManager() = 0;
 
         /*!
             \param handler Functor with params: (ErrorCode)

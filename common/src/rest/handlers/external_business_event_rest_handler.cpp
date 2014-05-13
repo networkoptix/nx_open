@@ -13,9 +13,7 @@
 QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()
 {
     QnBusinessEventConnector* connector = qnBusinessRuleConnector;
-    connect(this, SIGNAL(mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason, QString())),
-            connector,
-            SLOT(at_mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason, QString())));
+    connect(this, &QnExternalBusinessEventRestHandler::mserverFailure, connector, &QnBusinessEventConnector::at_mserverFailure);
 }
 
 int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
@@ -54,9 +52,6 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
                  qnSyncTime->currentUSecsSinceEpoch(),
                  QnBusiness::ServerTerminatedReason,
                  QString());
-            //qnBusinessRuleConnector->at_mserverFailure(resource,
-            //                                           qnSyncTime->currentUSecsSinceEpoch(),
-            //                                           QnBusiness::MServerIssueTerminated);
         }
         //else if (eventType == "UserEvent")
         //    bEvent = new QnUserDefinedBusinessEvent(); // todo: not implemented

@@ -351,6 +351,11 @@ namespace Qn {
          */
         CameraListAction,
 
+        /**
+         * System administration dialog.
+         */
+        SystemAdministrationAction,
+
         //ShowMediaServerLogs,
 
 
@@ -928,6 +933,10 @@ namespace Qn {
          */
         ToggleSliderAction,
 
+        /** 
+         * Shows/hides bookmarks search panel.
+         */
+        ToggleBookmarksSearchAction,
 
         PinNotificationsAction,
 

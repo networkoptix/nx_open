@@ -27,6 +27,9 @@ protected:
 private slots:
     void at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy);
     void at_remotePeerLost(ec2::ApiServerAliveData data, bool isProxy);
+
+    void at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
+    void at_updateInstallationRequested(const QString &updateId);
 private:
     void updateAllIPList(const QnId& id, const QList<QHostAddress>& addrList);
     void updateAllIPList(const QnId& id, const QList<QString>& addr);

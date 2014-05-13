@@ -99,13 +99,15 @@ namespace ec2
         */
         AlivePeersMap aliveServerPeers() const;
 
-signals:
+    signals:
         void peerLost(ApiServerAliveData data, bool isProxy);
         void peerFound(ApiServerAliveData data, bool isProxy);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);
         void gotLockResponse(ApiLockData);
+
+        void transactionProcessed(const QnAbstractTransaction &transaction);
     private:
         friend class QnTransactionTransport;
 
@@ -160,14 +162,14 @@ signals:
         //typedef QMap<QUrl, QSharedPointer<QnTransactionTransport>> RemoveUrlMap;
 
         //RemoveUrlMap m_remoteUrls;
-        struct RemoveUrlConnectInfo {
-            RemoveUrlConnectInfo(bool isClient = false, const QUuid& peer = QUuid()): isClient(isClient), peer(peer), lastConnectedTime(0) {}
+        struct RemoteUrlConnectInfo {
+            RemoteUrlConnectInfo(bool isClient = false, const QUuid& peer = QUuid()): isClient(isClient), peer(peer), lastConnectedTime(0) {}
             bool isClient;
             QUuid peer;
             qint64 lastConnectedTime;
         };
 
-        QMap<QUrl, RemoveUrlConnectInfo> m_removeUrls;
+        QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;
         AbstractHandler* m_handler;
         QTimer* m_timer;
         mutable QMutex m_mutex;

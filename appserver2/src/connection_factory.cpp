@@ -164,6 +164,13 @@ namespace ec2
         //AbstractStoredFileManager::deleteStoredFile
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStoredFile );
 
+        //AbstractUpdatesManager::uploadUpdate
+        registerUpdateFuncHandler<ApiUpdateUploadData>( restProcessorPool, ApiCommand::uploadUpdate );
+        //AbstractUpdatesManager::uploadUpdateResponce
+        registerUpdateFuncHandler<ApiUpdateUploadResponceData>( restProcessorPool, ApiCommand::uploadUpdateResponce );
+        //AbstractUpdatesManager::installUpdate
+        registerUpdateFuncHandler<QString>( restProcessorPool, ApiCommand::installUpdate );
+
         //ApiResourceParamList
         registerGetFuncHandler<nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );
         registerUpdateFuncHandler<ApiResourceParamDataList>( restProcessorPool, ApiCommand::saveSettings );

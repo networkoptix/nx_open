@@ -5,14 +5,15 @@ static const int MAX_AUDIO_JITTER = 1000 * 200;
 
 QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(CodecID codecId):
     QnAudioTranscoder(codecId),
+    m_audioEncodingBuffer(0),
+    m_resampleBuffer(0),
     m_encoderCtx(0),
     m_decoderContext(0),
     m_firstEncodedPts(AV_NOPTS_VALUE),
     m_lastTimestamp(AV_NOPTS_VALUE),
     m_downmixAudio(false),
     m_frameNum(0),
-    m_resampleCtx(0),
-    m_resampleBuffer(0)
+    m_resampleCtx(0)
 {
     m_bitrate = 128*1000;
     m_audioEncodingBuffer = (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE*2, 32);

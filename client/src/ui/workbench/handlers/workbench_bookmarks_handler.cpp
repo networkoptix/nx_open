@@ -37,17 +37,20 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsAdded, this, [this](const QnCameraBookmarkTags &tags) {
         m_tags.append(tags);
         m_tags.removeDuplicates();
+        context()->navigator()->setBookmarkTags(m_tags);
     });
 
     connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsRemoved, this, [this](const QnCameraBookmarkTags &tags) {
         for (const QString &tag: tags)
             m_tags.removeAll(tag);
+        context()->navigator()->setBookmarkTags(m_tags);
     });
 }
 
 void QnWorkbenchBookmarksHandler::updateTags() {
     if (!context()->user()) {
         m_tags.clear();
+        context()->navigator()->setBookmarkTags(m_tags);
         return;
     }
     
@@ -56,6 +59,7 @@ void QnWorkbenchBookmarksHandler::updateTags() {
         if (code != ec2::ErrorCode::ok)
             return;
         m_tags = tags;
+        context()->navigator()->setBookmarkTags(m_tags);
     });
 }
 
@@ -180,6 +184,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBoo
 
     m_tags.append(bookmark.tags);
     m_tags.removeDuplicates();
+    context()->navigator()->setBookmarkTags(m_tags);
 
     if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
         loader->addBookmark(bookmark);
@@ -193,6 +198,7 @@ void QnWorkbenchBookmarksHandler::at_bookmarkUpdated(int status, const QnCameraB
 
     m_tags.append(bookmark.tags);
     m_tags.removeDuplicates();
+    context()->navigator()->setBookmarkTags(m_tags);
 
     if (QnCachingCameraDataLoader* loader = navigator()->loader(camera))
         loader->updateBookmark(bookmark);

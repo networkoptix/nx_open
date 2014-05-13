@@ -19,6 +19,8 @@ extern "C"
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 
+#include <client/client_settings.h>
+
 #include <camera/resource_display.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -39,6 +41,7 @@ extern "C"
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
+#include <ui/widgets/search_line_edit.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
@@ -52,7 +55,6 @@ extern "C"
 
 #include "camera/thumbnails_loader.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "handlers/workbench_action_handler.h"
 #include "redass/redass_controller.h"
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
@@ -63,6 +65,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_timeScrollBar(NULL),
     m_calendar(NULL),
     m_dayTimeWidget(NULL),
+    m_bookmarksSearchWidget(NULL),
     m_centralWidget(NULL),
     m_currentWidget(NULL),
     m_currentMediaWidget(NULL),
@@ -116,7 +119,7 @@ void QnWorkbenchNavigator::setTimeSlider(QnTimeSlider *timeSlider) {
     m_timeSlider = timeSlider;
 
     if(m_timeSlider) {
-        connect(m_timeSlider, SIGNAL(destroyed()), this, SLOT(at_timeSlider_destroyed()));
+        connect(m_timeSlider, &QObject::destroyed, this, [this](){setTimeSlider(NULL);});
 
         if(isValid())
             initialize();
@@ -141,7 +144,7 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar) {
     m_timeScrollBar = scrollBar;
 
     if(m_timeScrollBar) {
-        connect(m_timeScrollBar, SIGNAL(destroyed()), this, SLOT(at_timeScrollBar_destroyed()));
+        connect(m_timeScrollBar, &QObject::destroyed, this, [this](){setTimeScrollBar(NULL);});
 
         if(isValid())
             initialize();
@@ -166,7 +169,7 @@ void QnWorkbenchNavigator::setCalendar(QnCalendarWidget *calendar){
     m_calendar = calendar;
 
     if(m_calendar) {
-        connect(m_calendar, SIGNAL(destroyed()), this, SLOT(at_calendar_destroyed()));
+        connect(m_calendar, &QObject::destroyed, this, [this](){setCalendar(NULL);});
 
         if(isValid())
             initialize();
@@ -191,7 +194,7 @@ void QnWorkbenchNavigator::setDayTimeWidget(QnDayTimeWidget *dayTimeWidget) {
     m_dayTimeWidget = dayTimeWidget;
 
     if(m_dayTimeWidget) {
-        connect(m_dayTimeWidget, SIGNAL(destroyed()), this, SLOT(at_dayTimeWidget_destroyed()));
+        connect(m_dayTimeWidget, &QObject::destroyed, this, [this](){setDayTimeWidget(NULL);});
 
         if(isValid())
             initialize();
@@ -199,7 +202,7 @@ void QnWorkbenchNavigator::setDayTimeWidget(QnDayTimeWidget *dayTimeWidget) {
 }
 
 bool QnWorkbenchNavigator::isValid() {
-    return m_timeSlider && m_timeScrollBar && m_calendar;
+    return m_timeSlider && m_timeScrollBar && m_calendar && m_bookmarksSearchWidget;
 }
 
 void QnWorkbenchNavigator::initialize() {
@@ -241,6 +244,13 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_calendar,                         SIGNAL(currentPageChanged(int,int)),                this,   SLOT(updateTargetPeriod()));
 
     connect(m_dayTimeWidget,                    SIGNAL(timeClicked(const QTime &)),                 this,   SLOT(at_dayTimeWidget_timeClicked(const QTime &)));
+
+    connect(m_bookmarksSearchWidget->lineEdit(), &QLineEdit::textChanged, this, [this](const QString &text) {
+        if (!m_currentMediaWidget)
+            return;
+        //TODO: #GDM #Bookmarks do not search till the full tag or at least 3 letters will be entered, search once in 2-3 seconds
+        loader(m_currentMediaWidget)->setBookmarksTextFilter(text); //TODO: #GDM #Bookmarks synced widgets? clear previous?
+    });
 
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
     connect(qnSettings->notifier(QnClientSettings::TIME_MODE), SIGNAL(valueChanged(int)),           this,   SLOT(updateLocalOffset()));
@@ -740,6 +750,8 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         QMetaObject::invokeMethod(this, "updatePlaying", Qt::QueuedConnection); // TODO: #Elric evil hacks...
         QMetaObject::invokeMethod(this, "updateSpeed", Qt::QueuedConnection);
     }
+
+    action(Qn::ToggleBookmarksSearchAction)->setEnabled(m_currentMediaWidget && m_currentWidget->resource()->flags() & QnResource::utc);
 
     updateLocalOffset();
     updateCurrentPeriods();
@@ -1515,18 +1527,6 @@ void QnWorkbenchNavigator::at_resource_flagsChanged(const QnResourcePtr &resourc
     updateCurrentWidgetFlags();
 }
 
-void QnWorkbenchNavigator::at_timeSlider_destroyed() {
-    setTimeSlider(NULL);
-}
-
-void QnWorkbenchNavigator::at_timeScrollBar_destroyed() {
-    setTimeScrollBar(NULL);
-}
-
-void QnWorkbenchNavigator::at_calendar_destroyed() {
-    setCalendar(NULL);
-}
-
 void QnWorkbenchNavigator::at_timeScrollBar_sliderPressed() {
     m_timeSlider->setOption(QnTimeSlider::AdjustWindowToPosition, false);
 }
@@ -1552,10 +1552,6 @@ void QnWorkbenchNavigator::at_calendar_dateClicked(const QDate &date){
     }
 }
 
-void QnWorkbenchNavigator::at_dayTimeWidget_destroyed() {
-    setDayTimeWidget(NULL);
-}
-
 void QnWorkbenchNavigator::at_dayTimeWidget_timeClicked(const QTime &time) {
     QDate date = m_calendar->selectedDate();
     if(!date.isValid())
@@ -1576,4 +1572,49 @@ void QnWorkbenchNavigator::at_dayTimeWidget_timeClicked(const QTime &time) {
     } else {
         m_timeSlider->setWindow(startMSec, endMSec, true);
     }
+}
+
+QnSearchLineEdit * QnWorkbenchNavigator::bookmarksSearchWidget() const {
+    return m_bookmarksSearchWidget;
+}
+
+void QnWorkbenchNavigator::setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget) {
+    if(m_bookmarksSearchWidget == bookmarksSearchWidget)
+        return;
+
+    if(m_bookmarksSearchWidget) {
+        disconnect(m_bookmarksSearchWidget, NULL, this, NULL);
+
+        if(isValid())
+            deinitialize();
+    }
+
+    m_bookmarksSearchWidget = bookmarksSearchWidget;
+
+    if(m_bookmarksSearchWidget) {
+        connect(m_bookmarksSearchWidget, &QObject::destroyed, this, [this](){setBookmarksSearchWidget(NULL);});
+
+        if(isValid())
+            initialize();
+    }
+}
+
+QnCameraBookmarkTags QnWorkbenchNavigator::bookmarkTags() const {
+    return m_bookmarkTags;
+}
+
+void QnWorkbenchNavigator::setBookmarkTags(const QnCameraBookmarkTags &tags) {
+    if (m_bookmarkTags == tags)
+        return;
+    m_bookmarkTags = tags;
+
+    if (!isValid())
+        return;
+
+    QCompleter *completer = new QCompleter(m_bookmarkTags);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setCompletionMode(QCompleter::InlineCompletion);
+
+    m_bookmarksSearchWidget->lineEdit()->setCompleter(completer);
+    m_bookmarkTagsCompleter.reset(completer);
 }

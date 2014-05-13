@@ -21,6 +21,7 @@
 #include "managers/resource_manager.h"
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
+#include "managers/updates_manager.h"
 
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_videowall_data.h"
@@ -48,6 +49,7 @@ namespace ec2
         virtual AbstractLayoutManagerPtr getLayoutManager() override;
         virtual AbstractVideowallManagerPtr getVideowallManager() override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
+        virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
 
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) override;
@@ -174,8 +176,16 @@ namespace ec2
         }
 
         void triggerNotification( const QnTransaction<QString>& tran ) {
-            if( tran.command == ApiCommand::removeStoredFile )
-                m_storedFileManager->triggerNotification( tran );
+            switch (tran.command) {
+            case ApiCommand::removeStoredFile:
+                m_storedFileManager->triggerNotification(tran);
+                break;
+            case ApiCommand::installUpdate:
+                m_updatesManager->triggerNotification(tran);
+                break;
+            default:
+                assert(false); // we should never get here
+            }
         }
 
         void triggerNotification( const QnTransaction<ApiResourceParamDataList>& tran ) {
@@ -196,6 +206,14 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiEmailData>&  ) {
         }
 
+        void triggerNotification(const QnTransaction<ApiUpdateUploadData> &tran) {
+            m_updatesManager->triggerNotification(tran);
+        }
+
+        void triggerNotification(const QnTransaction<ApiUpdateUploadResponceData> &tran) {
+            m_updatesManager->triggerNotification(tran);
+        }
+
         void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList> &tran) {
             return m_cameraManager->triggerNotification(tran);
         }
@@ -213,6 +231,7 @@ namespace ec2
         std::shared_ptr<QnLayoutManager<QueryProcessorType>> m_layoutManager;
         std::shared_ptr<QnVideowallManager<QueryProcessorType>> m_videowallManager;
         std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
+        std::shared_ptr<QnUpdatesManager<QueryProcessorType>> m_updatesManager;
 
     private:
         QnTransaction<ApiPanicModeData> prepareTransaction( ApiCommand::Value cmd, const Qn::PanicMode& mode);
