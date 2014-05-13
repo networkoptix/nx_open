@@ -90,7 +90,7 @@ namespace nx_hls
 
                 Q_ASSERT( !m_chunks.empty() );
 
-                while( !m_timestampToBlock.empty() && m_timestampToBlock.front().second <= m_chunks.front().startTimestamp )
+                while( !m_timestampToBlock.empty() && (m_timestampToBlock.front().second <= m_chunks.front().startTimestamp) )
                 {
                     m_timestampToBlock.pop();
                     Q_ASSERT( !m_timestampToBlock.empty() );

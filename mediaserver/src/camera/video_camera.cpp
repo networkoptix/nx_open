@@ -330,21 +330,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog catalog)
 {
     QMutexLocker lock(&m_getReaderMutex);
-
-    if (!m_resource->hasFlags(QnResource::foreigner) && m_resource->isInitialized()) 
-    {
-        if( (catalog == QnServer::HiQualityCatalog && m_primaryReader == 0) ||
-            (catalog == QnServer::LowQualityCatalog && m_secondaryReader == 0) )
-        {
-            createReader(catalog);
-        }
-    }
-	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
-	if ( cameraResource && !cameraResource->hasDualStreaming2() && catalog == QnServer::LowQualityCatalog )
-	{
-		return QnLiveStreamProviderPtr();		
-	}
-    return catalog == QnServer::HiQualityCatalog ? m_primaryReader : m_secondaryReader;
+    return getLiveReaderNonSafe( catalog );
 }
 
 int QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue, int cseq)
@@ -432,8 +418,8 @@ void QnVideoCamera::stopIfNoActivity()
     if (isSomeActivity())
         return;
 
-    bool needStopPrimary = m_primaryReader && m_primaryReader->isRunning();
-    bool needStopSecondary = m_secondaryReader && m_secondaryReader->isRunning();
+    const bool needStopPrimary = m_primaryReader && m_primaryReader->isRunning();
+    const bool needStopSecondary = m_secondaryReader && m_secondaryReader->isRunning();
 
     if (needStopPrimary)
         m_primaryReader->pleaseStop();
@@ -468,12 +454,14 @@ QSharedPointer<nx_hls::HLSLivePlaylistManager> QnVideoCamera::hlsLivePlaylistMan
 */
 bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 targetDurationUSec )
 {
+    QMutexLocker lock(&m_getReaderMutex);
+ 
     assert( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Low );
 
     if( streamQuality == MEDIA_Quality_High )
     {
         if( !m_primaryReader )
-            getLiveReader( QnServer::HiQualityCatalog );
+            getLiveReaderNonSafe( QnServer::HiQualityCatalog );
         if( !m_primaryReader )
             return false;
         return ensureLiveCacheStarted( streamQuality, m_primaryReader, targetDurationUSec );
@@ -482,7 +470,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 t
     if( streamQuality == MEDIA_Quality_Low )
     {
         if( !m_secondaryReader )
-            getLiveReader( QnServer::LowQualityCatalog );
+            getLiveReaderNonSafe( QnServer::LowQualityCatalog );
         if( !m_secondaryReader )
             return false;
         return ensureLiveCacheStarted( streamQuality, m_secondaryReader, targetDurationUSec );
@@ -491,13 +479,31 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 t
     return false;
 }
 
+QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCatalog catalog)
+{
+    if (!m_resource->hasFlags(QnResource::foreigner) && m_resource->isInitialized()) 
+    {
+        if( (catalog == QnServer::HiQualityCatalog && m_primaryReader == 0) ||
+            (catalog == QnServer::LowQualityCatalog && m_secondaryReader == 0) )
+        {
+            createReader(catalog);
+        }
+    }
+	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
+	if ( cameraResource && !cameraResource->hasDualStreaming2() && catalog == QnServer::LowQualityCatalog )
+	{
+		return QnLiveStreamProviderPtr();		
+	}
+    return catalog == QnServer::HiQualityCatalog ? m_primaryReader : m_secondaryReader;
+}
+
 //!Starts caching live stream, if not started
 /*!
     \return true, if started, false if failed to start
 */
 bool QnVideoCamera::ensureLiveCacheStarted(
     MediaQuality streamQuality,
-    QnAbstractMediaStreamDataProviderPtr primaryReader,
+    QnLiveStreamProviderPtr primaryReader,
     qint64 targetDurationUSec )
 {
     //ensuring that vectors will not take much memory
@@ -508,6 +514,8 @@ bool QnVideoCamera::ensureLiveCacheStarted(
     m_liveCache.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_mediaIndexes.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_hlsLivePlaylistManager.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
+
+    primaryReader->startIfNotRunning();
 
     if( m_liveCache[streamQuality].get() )
         return true;

@@ -96,7 +96,10 @@ void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
 
     //calculating timestamp, because we cannot rely on data->timestamp, since it may contain discontinuity in case of reconnect to camera
     if( m_prevPacketSrcTimestamp == -1 )
+    {
         m_prevPacketSrcTimestamp = data->timestamp;
+        m_currentPacketTimestamp = data->timestamp;
+    }
 
     if( qAbs(data->timestamp - m_prevPacketSrcTimestamp) > MAX_ALLOWED_TIMESTAMP_DIFF )
     {

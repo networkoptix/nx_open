@@ -732,7 +732,7 @@ namespace nx_hls
                 if( !videoCamera->ensureLiveCacheStarted(quality, DEFAULT_TARGET_DURATION * USEC_IN_SEC) )
                 {
                     NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 with no live cache").arg(camResource->getUniqueId()), cl_logDEBUG1 );
-                    return nx_http::StatusCode::internalServerError;
+                    return nx_http::StatusCode::noContent;
                 }
                 assert( videoCamera->hlsLivePlaylistManager(quality) );
                 newHlsSession->setPlaylistManager( quality, videoCamera->hlsLivePlaylistManager(quality) );
