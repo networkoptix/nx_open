@@ -13,6 +13,7 @@
 #include <QtCore/QTextStream>
 
 #include "core/resource/resource_fwd.h"
+#include "utils/common/id.h"
 
 const QString LICENSE_TYPE_PROFESSIONAL = lit("digital");
 const QString LICENSE_TYPE_ANALOG = lit("analog"); // TODO: #Elric #EC2 TOTALLY EVIL!!!!!!!!!
@@ -31,6 +32,16 @@ public:
         Invalid
     };
 
+    enum ErrorCode {
+        NoError,
+        InvalidSignature,
+        InvalidHardwareID,
+        InvalidBrand,
+        Expired,
+        InvalidType
+
+    };
+
     QnLicense();
     QnLicense(const QByteArray& licenseBlock);
 
@@ -39,7 +50,9 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(const QList<QByteArray> &hardwareIds, const QString &brand) const;
+    bool isValid(const QList<QByteArray> &hardwareIds, const QString &brand, ErrorCode* errCode = 0) const;
+
+    static QString errorMessage(ErrorCode errCode);
 
     /**
      * @returns                         Whether this license is for analog cameras.
@@ -165,7 +178,16 @@ public:
     QList<QByteArray> compatibleHardwareIds() const;
 
     QList<QByteArray> allHardwareIds() const;
+    QList<QByteArray> allLocalHardwareIds() const;
+
+    QMap<QnId, QList<QByteArray>> remoteHardwareIds() const;
+    QList<QByteArray> allRemoteHardwareIds() const;
+    void setRemoteHardwareIds(const QMap<QnId, QList<QByteArray>>& hardwareIds);
+    void addRemoteHardwareIds(const QnId& peer, const QList<QByteArray>& hardwareIds);
+    void removeRemoteHardwareIds(const QnId& peer);
+
     QByteArray currentHardwareId() const;
+    bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
 signals:
     void licensesChanged();
 
@@ -176,12 +198,15 @@ private:
     bool isLicenseMatchesCurrentSystem(const QnLicensePtr &license);
     bool addLicense_i(const QnLicensePtr &license);
     bool addLicenses_i(const QnLicenseList &licenses);
-
+    void updateRemoteIdList();
 private:
     QList<QByteArray> m_mainHardwareIds;
     QList<QByteArray> m_compatibleHardwareIds;
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
+
+    QList<QByteArray> m_remoteHardwareIds;
+    QMap<QnId, QList<QByteArray>> m_remoteHardwareIdsMap;
 };
 
 #define qnLicensePool QnLicensePool::instance()

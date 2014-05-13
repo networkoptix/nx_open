@@ -462,9 +462,11 @@ int QnResourcePool::activeCamerasByClass(bool analog) const
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera || camera->hasFlags(QnResource::foreigner) || camera->isScheduleDisabled() || camera->isAnalog() != analog)
-            continue;
-        count++;
+        if (camera && !camera->hasFlags(QnResource::foreigner) && !camera->isScheduleDisabled() && camera->isAnalog() == analog) {
+            QnResourcePtr mServer = getResourceById(camera->getId());
+            if (mServer && mServer->getStatus() != QnResource::Offline)
+                count++;
+        }
     }
     return count;
 }

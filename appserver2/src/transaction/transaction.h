@@ -32,7 +32,7 @@ namespace ec2
             //!ApiSetResourceStatusData
             setResourceStatus = 6,
             //!ApiSetResourceDisabledData
-            setResourceDisabled = 7,
+            //setResourceDisabled = 7,
             //!ApiResourceParams
             setResourceParams = 8,
             getResourceParams = 9,
@@ -141,10 +141,17 @@ namespace ec2
             lockResponse = 57,
             unlockRequest = 58,
 
+            //!ApiUpdateUploadData
+            uploadUpdate = 59,
+            //!ApiUpdateUploadResponceData
+            uploadUpdateResponce = 60,
+            //!ApiUpdateInstallData
+            installUpdate = 61,
+
             //!ApiCameraBookmarkTagDataList
-            addCameraBookmarkTags = 59,
-            getCameraBookmarkTags = 60,
-            removeCameraBookmarkTags = 61,
+            addCameraBookmarkTags = 62,
+            getCameraBookmarkTags = 63,
+            removeCameraBookmarkTags = 64,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
@@ -166,6 +173,14 @@ namespace ec2
             ID(): sequence(0) {}
             QUuid peerGUID; // TODO: #Elric #EC2 rename into sane case
             qint32 sequence;
+
+            friend uint qHash(const ec2::QnAbstractTransaction::ID &id) {
+                return ::qHash(id.peerGUID, id.sequence);
+            }
+
+            bool operator==(const ID &other) const {
+                return peerGUID == other.peerGUID && sequence == other.sequence;
+            }
         };
 
         ApiCommand::Value command;
@@ -176,8 +191,6 @@ namespace ec2
         static QAtomicInt m_sequence;
         bool localTransaction; // do not propagate transactions to other server peers
     };
-
-    typedef QSet<QnId> PeerList;
 
     template <class T>
     class QnTransaction: public QnAbstractTransaction
@@ -210,5 +223,7 @@ namespace ec2
 
     int generateRequestID();
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)
 
 #endif  //EC2_TRANSACTION_H

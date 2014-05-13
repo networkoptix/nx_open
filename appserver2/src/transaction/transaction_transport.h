@@ -32,6 +32,9 @@ public:
     QnTransactionTransport(bool isOriginator, bool isClient, QSharedPointer<AbstractStreamSocket> socket = QSharedPointer<AbstractStreamSocket>(), const QUuid& remoteGuid = QUuid());
     ~QnTransactionTransport();
 
+    static QByteArray encodeHWList(const QList<QByteArray> hwList);
+    static QList<QByteArray> decodeHWList(const QByteArray data);
+
 signals:
     void gotTransaction(QByteArray data, TransactionTransportHeader transportHeader);
     void stateChanged(State state);
@@ -43,6 +46,8 @@ public:
     // these getters/setters are using from a single thread
     bool isOriginator() const { return m_originator; }
     bool isClientPeer() const { return m_isClientPeer; }
+    QList<QByteArray> hwList() const { return m_hwList; }
+    void setHwList(const QList<QByteArray>& value) { m_hwList = value; }
     QUuid remoteGuid() const  { return m_remoteGuid; }
     qint64 lastConnectTime() { return m_lastConnectTime; }
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
@@ -71,6 +76,7 @@ private:
     QUuid m_remoteGuid;
     bool m_originator;
     bool m_isClientPeer;
+    QList<QByteArray> m_hwList;
 
     mutable QMutex m_mutex;
     QSharedPointer<AbstractStreamSocket> m_socket;

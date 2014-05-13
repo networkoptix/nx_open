@@ -17,8 +17,8 @@ CONFIG_FILE="$ETC_DIR/mediaserver.conf"
 BIN_DIR="$BASE_DIR/bin"
 CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 
-ECS_CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
-ECS_CFG_HELPER="$BIN_DIR/config_helper.py $ECS_CONFIG_FILE"
+#ECS_CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
+#ECS_CFG_HELPER="$BIN_DIR/config_helper.py $ECS_CONFIG_FILE"
 
 # This is necessary because changed configuration options should take effect 
 # immediately.
@@ -27,17 +27,18 @@ if status $COMPANY_NAME-mediaserver | grep "start/running" > /dev/null; then
 fi
 
 # Default ECS connection parameters
-ECS_HOST_DEFAULT="localhost"
-if [ -f "$ECS_CONFIG_FILE" ]; then
-    ECS_PORT_DEFAULT=$($ECS_CFG_HELPER port)
-else
-    ECS_PORT_DEFAULT="7001"
-fi
-ECS_LOGIN_DEFAULT="admin"
+#ECS_HOST_DEFAULT="localhost"
+#if [ -f "$ECS_CONFIG_FILE" ]; then
+#    ECS_PORT_DEFAULT=$($ECS_CFG_HELPER port)
+#else
+#    ECS_PORT_DEFAULT="7001"
+#fi
+#ECS_LOGIN_DEFAULT="admin"
 
 # Default MS parameters
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
+SYSTEM_NAME=$COMPANY_NAME
 
 function to_int {
     local -i num="10#${1}"
@@ -110,30 +111,35 @@ function validate_storage {
 
 case "$1" in
   configure)
-      ECS_HOST="$($CFG_HELPER appserverHost)"
-      [ -z "$ECS_HOST" ] && ECS_HOST=$ECS_HOST_DEFAULT
-      ECS_HOST=$(ask_for_value appserverHost "$ECS_HOST")
-      $CFG_HELPER appserverHost "$ECS_HOST"
+#      ECS_HOST="$($CFG_HELPER appserverHost)"
+#      [ -z "$ECS_HOST" ] && ECS_HOST=$ECS_HOST_DEFAULT
+#      ECS_HOST=$(ask_for_value appserverHost "$ECS_HOST")
+#      $CFG_HELPER appserverHost "$ECS_HOST"
 
-      ECS_PORT="$($CFG_HELPER appserverPort)"
-      [ -z "$ECS_PORT" ] && ECS_PORT=$ECS_PORT_DEFAULT
-      ECS_PORT=$(ask_for_value appserverPort "$ECS_PORT")
-      $CFG_HELPER appserverPort "$ECS_PORT"
+#      ECS_PORT="$($CFG_HELPER appserverPort)"
+#      [ -z "$ECS_PORT" ] && ECS_PORT=$ECS_PORT_DEFAULT
+#      ECS_PORT=$(ask_for_value appserverPort "$ECS_PORT")
+#      $CFG_HELPER appserverPort "$ECS_PORT"
 
-      ECS_LOGIN="$($CFG_HELPER appserverLogin)"
-      [ -z "$ECS_LOGIN" ] && ECS_LOGIN=$ECS_LOGIN_DEFAULT
-      ECS_LOGIN=$(ask_for_value appserverLogin "$ECS_LOGIN")
-      $CFG_HELPER appserverLogin "$ECS_LOGIN"
+#      ECS_LOGIN="$($CFG_HELPER appserverLogin)"
+#      [ -z "$ECS_LOGIN" ] && ECS_LOGIN=$ECS_LOGIN_DEFAULT
+#      ECS_LOGIN=$(ask_for_value appserverLogin "$ECS_LOGIN")
+#      $CFG_HELPER appserverLogin "$ECS_LOGIN"
 
-      ECS_PASSWORD="$($CFG_HELPER appserverPassword)"
-      [ -z "$ECS_PASSWORD" ] && ECS_PASSWORD=$ECS_PASSWORD_DEFAULT
-      ECS_PASSWORD=$(ask_for_value appserverPassword "$ECS_PASSWORD")
-      $CFG_HELPER appserverPassword "$ECS_PASSWORD"
+#      ECS_PASSWORD="$($CFG_HELPER appserverPassword)"
+#      [ -z "$ECS_PASSWORD" ] && ECS_PASSWORD=$ECS_PASSWORD_DEFAULT
+#      ECS_PASSWORD=$(ask_for_value appserverPassword "$ECS_PASSWORD")
+#      $CFG_HELPER appserverPassword "$ECS_PASSWORD"
 
       TRANSPORT="$($CFG_HELPER transport)"
       [ -z "$ECS_TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT
       TRANSPORT=$(ask_for_value transport "$TRANSPORT")
       $CFG_HELPER transport "$TRANSPORT"
+
+      SYSTEM_NAME="$($CFG_HELPER systemName)"
+      [ -z "$SYSTEM_NAME" ] && SYSTEM_NAME=$SYSTEM_NAME_DEFAULT
+      SYSTEM_NAME=$(ask_for_value systemName "$systemName")
+      $CFG_HELPER systemName "$SYSTEM_NAME"
   ;;
 
   abort-upgrade|abort-remove|abort-configure)

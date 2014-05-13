@@ -20,6 +20,7 @@ CREATE UNIQUE INDEX idx_resource_guid     ON vms_resource(guid);
 CREATE INDEX idx_resource_parent          ON vms_resource(parent_guid);
 
 ALTER TABLE "vms_server" ADD flags number;
+ALTER TABLE "vms_server" ADD COLUMN "system_info" varchar(1024);
 ALTER TABLE "vms_server" ADD max_cameras number;
 ALTER TABLE "vms_server" ADD redundancy bool;
 
@@ -29,3 +30,4 @@ INSERT INTO "vms_license_tmp" (license_key, license_block)
 DROP TABLE vms_license;
 ALTER TABLE "vms_license_tmp" RENAME TO "vms_license";
 
+CREATE TABLE misc_data (key VARCHAR(64), data BLOB(128));

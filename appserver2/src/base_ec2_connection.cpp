@@ -27,10 +27,11 @@ namespace ec2
         m_businessEventManager( new QnBusinessEventManager<T>(m_queryProcessor, resCtx) ),
         m_layoutManager( new QnLayoutManager<T>(m_queryProcessor, resCtx) ),
         m_videowallManager( new QnVideowallManager<T>(m_queryProcessor, resCtx) ),
-        m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) )
+        m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) ),
+        m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) )
     {
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(QnId, bool, bool)), this, SIGNAL(remotePeerFound(QnId, bool, bool)), Qt::DirectConnection);
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerLost(QnId, bool, bool)),  this, SIGNAL(remotePeerLost(QnId, bool, bool)), Qt::DirectConnection);
+        connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(ApiServerAliveData, bool)), this, SIGNAL(remotePeerFound(ApiServerAliveData, bool)), Qt::DirectConnection);
+        connect (QnTransactionMessageBus::instance(), SIGNAL(peerLost(ApiServerAliveData, bool)),  this, SIGNAL(remotePeerLost(ApiServerAliveData, bool)), Qt::DirectConnection);
     }
 
     template<class T>
@@ -85,6 +86,12 @@ namespace ec2
     AbstractStoredFileManagerPtr BaseEc2Connection<T>::getStoredFileManager()
     {
         return m_storedFileManager;
+    }
+
+    template<class T>
+    AbstractUpdatesManagerPtr BaseEc2Connection<T>::getUpdatesManager()
+    {
+        return m_updatesManager;
     }
 
     template<class T>

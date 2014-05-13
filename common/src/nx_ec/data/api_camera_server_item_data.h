@@ -10,11 +10,10 @@ namespace ec2
         ApiCameraServerItemData(): timestamp(0) {}
 
         QString  physicalId;
-        QString  serverGuid; // TODO: #API Don't use GUID in naming as what we're actually using are UUIDs, not GUIDs (google for difference in binary encoding). 
-                            // Besides, I believe the intended name was 'serverId'?
+        QnLatin1Array  serverId;
         qint64   timestamp;
     };
-#define ApiCameraServerItemData_Fields (physicalId)(serverGuid)(timestamp)
+#define ApiCameraServerItemData_Fields (physicalId)(serverId)(timestamp)
 
 }
 

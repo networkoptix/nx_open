@@ -34,6 +34,7 @@ namespace ec2
         qRegisterMetaType<AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
         qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<TransactionTransportHeader>( "TransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
+        qRegisterMetaType<ApiServerAliveData>( "ApiServerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
 
         ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
     }
@@ -78,7 +79,7 @@ namespace ec2
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiSetResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
         //AbstractResourceManager::setResourceDisabled
-        registerUpdateFuncHandler<ApiSetResourceDisabledData>( restProcessorPool, ApiCommand::setResourceDisabled );
+        //registerUpdateFuncHandler<ApiSetResourceDisabledData>( restProcessorPool, ApiCommand::setResourceDisabled );
         //AbstractResourceManager::getKvPairs
         registerGetFuncHandler<QnId, ApiResourceParamsData>( restProcessorPool, ApiCommand::getResourceParams );
         //AbstractResourceManager::save
@@ -162,6 +163,13 @@ namespace ec2
         registerUpdateFuncHandler<ApiStoredFileData>( restProcessorPool, ApiCommand::updateStoredFile );
         //AbstractStoredFileManager::deleteStoredFile
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStoredFile );
+
+        //AbstractUpdatesManager::uploadUpdate
+        registerUpdateFuncHandler<ApiUpdateUploadData>( restProcessorPool, ApiCommand::uploadUpdate );
+        //AbstractUpdatesManager::uploadUpdateResponce
+        registerUpdateFuncHandler<ApiUpdateUploadResponceData>( restProcessorPool, ApiCommand::uploadUpdateResponce );
+        //AbstractUpdatesManager::installUpdate
+        registerUpdateFuncHandler<QString>( restProcessorPool, ApiCommand::installUpdate );
 
         //ApiResourceParamList
         registerGetFuncHandler<nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );

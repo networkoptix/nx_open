@@ -87,6 +87,7 @@ LIBS += ${global.libs}
 
 INCLUDEPATH +=  ${qt.dir}/include \
                 ${qt.dir}/include/QtCore \
+                ${qt.dir}/include/QtZlib \
                 ${project.build.sourceDirectory} \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
@@ -134,6 +135,7 @@ win* {
 unix: {
   DEFINES += override=
   DEFINES += QN_EXPORT=  
+  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder
   arm {
     QMAKE_CXXFLAGS += -std=c++0x 
   } else {

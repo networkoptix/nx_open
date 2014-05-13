@@ -20,9 +20,20 @@
 #include <business/business_rule_processor.h>
 #include <business/business_event_connector.h>
 #include <media_server/serverutil.h>
+#include "licensing/license.h"
+#include "mutex/camera_data_handler.h"
+#include "common/common_module.h"
+#include "transaction/transaction_log.h"
+#include "database/db_manager.h"
+
+
+static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24;
+static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
+    m_tooManyRecordingCnt = 0;
+    connect(this, &QnRecordingManager::recordingDisabled, qnBusinessRuleConnector, &QnBusinessEventConnector::at_licenseIssueEvent);
 }
 
 QnRecordingManager::~QnRecordingManager()
@@ -35,8 +46,15 @@ void QnRecordingManager::start()
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(&m_scheduleWatchingTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
-
     m_scheduleWatchingTimer.start(1000);
+    
+#ifndef EDGE_SERVER
+    connect(&m_licenseTimer, &QTimer::timeout, this, &QnRecordingManager::at_checkLicenses);
+    m_licenseTimer.start(1000 * 60);
+#endif
+
+    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::locked, this, &QnRecordingManager::at_licenseMutexLocked, Qt::QueuedConnection);
+    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout, Qt::QueuedConnection);
 
     QThread::start();
 }
@@ -142,7 +160,7 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(res->getParentId()));
-    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getId().toString());
+    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getId().toByteArray());
 
     ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
     ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);
@@ -532,6 +550,121 @@ void QnRecordingManager::onTimer()
     }
 }
 
+QnResourceList QnRecordingManager::getLocalControlledCameras()
+{
+    // return own cameras + cameras from media servers without DB (remote connected servers)
+    QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
+    QnResourceList result;
+    int recordingCameras = 0;
+    qint64 relativeTime = ec2::QnTransactionLog::instance()->getRelativeTime();
+    foreach(QnResourcePtr camRes, cameras)
+    {
+        QnMediaServerResourcePtr mServer = camRes->getParentResource().dynamicCast<QnMediaServerResource>();
+        if (!mServer)
+            continue;
+        if (mServer->getId() == qnCommon->moduleGUID() || (mServer->getServerFlags() | Qn::SF_RemoteEC))
+            result << camRes;
+    }
+    return result;
+}
+
+void QnRecordingManager::at_checkLicenses()
+{
+    if (!ec2::QnTransactionLog::instance() || m_licenseMutex)
+        return;
+
+    QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
+    int maxDigital = licenseListHelper.totalDigital();
+    int maxAnalog = licenseListHelper.totalAnalog();
+
+    int recordingDigital = qnResPool->activeCamerasByClass(false);
+    int recordingAnalog = qnResPool->activeCamerasByClass(true);
+
+    bool isOverflowTotal = recordingDigital + recordingAnalog > maxDigital + maxAnalog;
+    if (recordingDigital > maxDigital  || isOverflowTotal)
+    {
+        if (++m_tooManyRecordingCnt < 5)
+            return; // do not report license problem immediatly. Server should wait several minutes, probably other media servers will be available soon
+
+
+        ec2::QnDbManager::instance()->markLicenseOverflow(true, qnSyncTime->currentMSecsSinceEpoch());
+        if (qnSyncTime->currentMSecsSinceEpoch() - ec2::QnDbManager::instance()->licenseOverflowTime() < LICENSE_RECORDING_STOP_TIME)
+            return; // not enough license, but timeout not reached yet
+
+        // Too many licenses. check if server has own recording cameras and force to disable recording
+        QnResourceList ownCameras = getLocalControlledCameras();
+        foreach(QnResourcePtr camRes, ownCameras)
+        {
+            QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
+            if (!camera->isScheduleDisabled())
+            {
+                if (recordingDigital > maxDigital && !camera->isAnalog() || isOverflowTotal) {
+                    // found. remove recording from some of them
+                    m_licenseMutex = ec2::QnDistributedMutexManager::instance()->getLock(LICENSE_OVERFLOW_LOCK_NAME);
+                    break;
+                }
+            }
+        }
+    }
+    else {
+        ec2::QnDbManager::instance()->markLicenseOverflow(false, 0);
+        m_tooManyRecordingCnt = 0;
+    }
+}
+
+void QnRecordingManager::at_licenseMutexLocked(QString name)
+{
+    if (name != LICENSE_OVERFLOW_LOCK_NAME)
+        return;
+
+    QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
+    int maxDigital = licenseListHelper.totalDigital();
+    int maxAnalog = licenseListHelper.totalAnalog();
+
+    int recordingDigital = qnResPool->activeCamerasByClass(false);
+    int recordingAnalog = qnResPool->activeCamerasByClass(true);
+    int disabledCameras = 0;
+    
+    // Too many licenses. check if server has own recording cameras and force to disable recording
+    QnResourceList ownCameras = getLocalControlledCameras();
+    foreach(QnResourcePtr camRes, ownCameras)
+    {
+        bool licenseOverflow = recordingDigital > maxDigital  || recordingDigital + recordingAnalog > maxDigital + maxAnalog;
+        if (!licenseOverflow)
+            break;
+
+        QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
+        if (!camera->isScheduleDisabled())
+        {
+            camera->setScheduleDisabled(true);
+            ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addCameraSync(camera);
+            if (errCode != ec2::ErrorCode::ok)
+            {
+                qWarning() << "Can't turn off recording for camera:" << camera->getUniqueId() << "error:" << ec2::toString(errCode);
+                camera->setScheduleDisabled(false); // rollback
+                continue;
+            }
+            disabledCameras++;
+            if (camera->isAnalog())
+                recordingAnalog--;
+            else
+                recordingDigital--;
+        }
+    }
+    m_licenseMutex->unlock();
+    m_licenseMutex.clear();
+
+    if (disabledCameras > 0) {
+        QnResourcePtr resource = qnResPool->getResourceById(qnCommon->moduleGUID());
+        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, QString::number(disabledCameras));
+    }
+}
+
+void QnRecordingManager::at_licenseMutexTimeout(QString name)
+{
+    if (name == LICENSE_OVERFLOW_LOCK_NAME)
+        m_licenseMutex.clear();
+}
 
 //Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)
 static QnRecordingManager* staticInstance = NULL;

@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <media_server/server_update_tool.h>
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
@@ -144,6 +145,12 @@ void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 {
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnServerMessageProcessor::at_remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnServerMessageProcessor::at_remotePeerLost );
+
+    connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
+        this, &QnServerMessageProcessor::at_updateChunkReceived );
+    connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
+        this, &QnServerMessageProcessor::at_updateInstallationRequested );
+
     QnCommonMessageProcessor::init(connection);
 }
 
@@ -158,20 +165,20 @@ bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
 * EC2 related processing. Need move to other class
 */
 
-void QnServerMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool isProxy)
+void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy)
 {
-    QnResourcePtr res = qnResPool->getResourceById(id);
+    QnResourcePtr res = qnResPool->getResourceById(data.serverId);
     if (res)
         res->setStatus(QnResource::Online);
 
 }
 
-void QnServerMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool isProxy)
+void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData data, bool isProxy)
 {
-    QnResourcePtr res = qnResPool->getResourceById(id);
+    QnResourcePtr res = qnResPool->getResourceById(data.serverId);
     if (res) {
         res->setStatus(QnResource::Offline);
-        if (isClient) {
+        if (data.isClient) {
             // This media server hasn't own DB
             foreach(QnResourcePtr camera, qnResPool->getAllCameras(res))
                 camera->setStatus(QnResource::Offline);
@@ -183,17 +190,22 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     resource->setStatus(status, true);
 }
 
-bool QnServerMessageProcessor::isProxy(void* opaque, const QUrl& url)
-{
+bool QnServerMessageProcessor::isProxy(void* opaque, const QUrl& url) {
     return static_cast<QnServerMessageProcessor*> (opaque)->isProxy(url);
 }
 
-bool QnServerMessageProcessor::isProxy(const QUrl& url)
-{
+bool QnServerMessageProcessor::isProxy(const QUrl& url) {
     return isKnownAddr(url.host());
 }
 
-void QnServerMessageProcessor::execBusinessActionInternal(QnAbstractBusinessActionPtr action)
-{
+void QnServerMessageProcessor::execBusinessActionInternal(QnAbstractBusinessActionPtr action) {
     qnBusinessMessageBus->at_actionReceived(action);
+}
+
+void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset) {
+    QnServerUpdateTool::instance()->addUpdateFileChunk(updateId, data, offset);
+}
+
+void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
+    QnServerUpdateTool::instance()->installUpdate(updateId);
 }

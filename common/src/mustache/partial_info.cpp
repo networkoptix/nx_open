@@ -54,6 +54,13 @@ QnPartialInfo::QnPartialInfo (QnBusiness::EventType value) {
             eventLogoFilename = lit("server.png");
             break;
         }
+                                           
+        case QnBusiness::LicenseIssueEvent: {
+            attrName = lit("license_issue");
+            eventLogoFilename = lit("server.png");
+            break;
+        }
+        
     default:
         break;
     }
