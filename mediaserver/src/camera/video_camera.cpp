@@ -292,8 +292,8 @@ void QnVideoCamera::at_camera_resourceChanged()
 
 void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 {
-    bool primaryLiveStream = catalog == QnServer::HiQualityCatalog;
-    QnResource::ConnectionRole role = primaryLiveStream ? QnResource::Role_LiveVideo : QnResource::Role_SecondaryLiveVideo;
+    const bool primaryLiveStream = catalog == QnServer::HiQualityCatalog;
+    const QnResource::ConnectionRole role = primaryLiveStream ? QnResource::Role_LiveVideo : QnResource::Role_SecondaryLiveVideo;
 
 	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
 	
@@ -332,10 +332,11 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog cat
 
     if (!m_resource->hasFlags(QnResource::foreigner) && m_resource->isInitialized()) 
     {
-        if (catalog == QnResource::Role_LiveVideo && m_primaryReader == 0)
-            createReader(QnServer::HiQualityCatalog);
-        else if (catalog == QnResource::Role_SecondaryLiveVideo && m_secondaryReader == 0)
-            createReader(QnServer::LowQualityCatalog);
+        if( (catalog == QnServer::HiQualityCatalog && m_primaryReader == 0) ||
+            (catalog == QnServer::LowQualityCatalog && m_secondaryReader == 0) )
+        {
+            createReader(catalog);
+        }
     }
 	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
 	if ( cameraResource && !cameraResource->hasDualStreaming2() && catalog == QnServer::LowQualityCatalog )
