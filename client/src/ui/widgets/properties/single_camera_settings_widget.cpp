@@ -197,12 +197,12 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
     if ( qnCommon )
     {
         QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
-        bool show_url = resourceData.value<bool>(lit("show_url"), false);
-        if ( show_url && m_camera->getStatus() != QnResource::Offline )
+        bool showUrl = resourceData.value<bool>(lit("showUrl"), false);
+        if ( showUrl && m_camera->getStatus() != QnResource::Offline )
         {
             QString camera_host = m_camera->getHostAddress();
             int camera_port = m_camera->httpPort();
-            QString local_path = resourceData.value<QString>(lit("url_locale_path"), QString());
+            QString local_path = resourceData.value<QString>(lit("urlLocalePath"), QString());
 
             QString url_camera_name = QString(QLatin1String("http://%1:%2/%3")).arg(camera_host).arg(camera_port).arg(local_path);
             QString proxy_url = QnAppServerConnectionFactory::defaultUrl().host();
@@ -237,22 +237,22 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
     QWebView* advancedWebView = 0;
 #endif
     setAnyCameraChanges(false);
-    bool is_camera_settings_id = false;
-    bool show_url = false;
+    bool isCameraSettingsId = false;
+    bool showUrl = false;
     
     if ( m_camera )
     {
         m_camera->getParam(lit("cameraSettingsId"), id, QnDomainDatabase);
-        is_camera_settings_id = !id.isNull();
+        isCameraSettingsId = !id.isNull();
         
         if ( qnCommon && qnCommon->dataPool() )
         {
             QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
-            show_url = resourceData.value<bool>(lit("show_url"), false);
+            showUrl = resourceData.value<bool>(lit("showUrl"), false);
         };
     }
-	bool showOldSettings = (is_camera_settings_id && !show_url);
-    if (is_camera_settings_id || show_url)
+	bool showOldSettings = (isCameraSettingsId && !showUrl);
+    if (isCameraSettingsId || showUrl)
     {
         if (!m_widgetsRecreator)
         {

@@ -21,15 +21,15 @@
             "keys": [
                 "ISD|*"
             ],
-            "show_url": true,
-			"url_locale_path": "priv/cam.html"
+            "showUrl": true,
+			"urlLocalePath": "priv/cam.html"
         },
         {
             "keys": [
                 "ISD_NATIVE|*"
             ],
-            "show_url": true,
-			"url_locale_path": "priv/cam.html"
+            "showUrl": true,
+			"urlLocalePath": "priv/cam.html"
         },
         {
             "keys": [
