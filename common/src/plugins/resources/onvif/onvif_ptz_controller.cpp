@@ -28,6 +28,14 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     m_limits.minFov = 0.0;
     m_limits.maxFov = 1.0;
 
+    m_xNativeVelocityCoeff.first = 1.0;
+    m_xNativeVelocityCoeff.second = -1.0;
+    m_yNativeVelocityCoeff.first = 1.0;
+    m_yNativeVelocityCoeff.second  = -1.0;
+    m_zoomNativeVelocityCoeff.first = 1.0;
+    m_zoomNativeVelocityCoeff.second = -1.0;
+
+
     m_capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability | Qn::LimitsPtzCapability | Qn::FlipPtzCapability;
     if(m_resource->getPtzUrl().isEmpty())
         m_capabilities = Qn::NoPtzCapabilities;
