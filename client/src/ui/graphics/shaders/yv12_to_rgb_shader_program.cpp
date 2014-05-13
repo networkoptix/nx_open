@@ -1,7 +1,8 @@
 #include "yv12_to_rgb_shader_program.h"
 
 QnAbstractYv12ToRgbShaderProgram::QnAbstractYv12ToRgbShaderProgram(const QGLContext *context, QObject *parent):
-    QnAbstractBaseGLShaderProgramm(context, parent) 
+    QnAbstractBaseGLShaderProgramm(context, parent),
+    m_wasLinked(false)
 {
     addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
         attribute vec4 aPosition;
@@ -20,14 +21,14 @@ QnAbstractYv12ToRgbShaderProgram::QnAbstractYv12ToRgbShaderProgram(const QGLCont
 
 bool QnAbstractYv12ToRgbShaderProgram::link()
 {
-    bool rez = QnAbstractBaseGLShaderProgramm::link();
-    if (rez) {
+    m_wasLinked = QnAbstractBaseGLShaderProgramm::link();
+    if (m_wasLinked) {
         m_yTextureLocation = uniformLocation("yTexture");
         m_uTextureLocation = uniformLocation("uTexture");
         m_vTextureLocation = uniformLocation("vTexture");
         m_opacityLocation = uniformLocation("opacity");
     }
-    return rez;
+    return m_wasLinked;
 }
 
 // ============================= QnYv12ToRgbShaderProgram ==================

@@ -233,6 +233,8 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
     case LIGHT_MODE_OVERRIDE:
     case PTZ_PRESET_IN_USE_WARNING_DISABLED:
     case VIDEO_WALL_MODE:
+    case SOFTWARE_YUV:
+    case RAINBOW_MODE:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);
