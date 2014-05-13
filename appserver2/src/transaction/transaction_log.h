@@ -65,12 +65,10 @@ namespace ec2
         qint64 getRelativeTime() const;
         void init();
 
-        template <class T>
-        qint64 getTransactionTime(const T& data) const { return getTransactionTimeInternal(transactionHash(data)); }
-
     private:
         bool contains(const QnAbstractTransaction& tran, const QUuid& hash) const;
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray()) const;
+        QUuid makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data);
 
         QUuid transactionHash(const ApiCameraData& params) const                 { return params.id; }
         QUuid transactionHash(const ApiMediaServerData& params) const            { return params.id; }
@@ -89,8 +87,8 @@ namespace ec2
         QUuid transactionHash(const ApiStoredFilePath& params) const             { return makeHash(params.toUtf8()); }
         QUuid transactionHash(const ApiResourceData& params) const               { return makeHash(params.id.toRfc4122(), "resource"); }
         QUuid transactionHash(const ApiLicenseData& params) const                { return makeHash(params.key, "ApiLicense"); }    //TODO
-        QUuid transactionHash(const ApiResetBusinessRuleData& /*tran*/) const  { return makeHash("reset_brule", ADD_HASH_DATA); }
-        QUuid transactionHash(const QnTransaction<ApiCameraBookmarkTagDataList> &tran)  { return makeHash(tran.command, tran.params); }   //TODO: #Elric ec2 make sure it is the correct way
+        QUuid transactionHash(const ApiResetBusinessRuleData& /*tran*/) const    { return makeHash("reset_brule", ADD_HASH_DATA); }
+        QUuid transactionHash(const ApiCameraBookmarkTagDataList& params)        { return makeHash("add_bookmark_tags", params); }
         
         QUuid transactionHash(const ApiFullInfoData& ) const                   { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiCameraDataList& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }

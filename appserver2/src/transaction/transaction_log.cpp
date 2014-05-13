@@ -74,9 +74,9 @@ QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data
     return QUuid::fromRfc4122(hash.result());
 }
 
-QUuid QnTransactionLog::makeHash(const ApiCommand::Value command, const ApiCameraBookmarkTagDataList& data) {
+QUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) {
     QCryptographicHash hash(QCryptographicHash::Md5);
-    hash.addData(ApiCommand::toString(command).toUtf8());
+    hash.addData(extraData.toUtf8());
     for(const ApiCameraBookmarkTagData tag: data)
         hash.addData(tag.name.toUtf8());
     return QUuid::fromRfc4122(hash.result());
@@ -146,12 +146,6 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     }
     
     return ErrorCode::ok;
-}
-
-qint64 QnTransactionLog::getTransactionTimeInternal(const QUuid& hash) const
-{
-    QReadLocker lock(&m_dbManager->getMutex());
-    return m_updateHistory.value(hash);
 }
 
 }

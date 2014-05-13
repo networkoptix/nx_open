@@ -474,7 +474,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner)(Qn::Ca
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-        (Qn::MotionType)(Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlags)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::SerializationFormat), 
     (metatype)(lexical)(json)
 )
