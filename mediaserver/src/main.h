@@ -20,7 +20,7 @@ class QnRtspListener;
 class QnRestServer;
 class QNetworkReply;
 class QnServerMessageProcessor;
-class QnModuleInformation;
+struct QnModuleInformation;
 class QnModuleFinder;
 
 class QnMain : public QnLongRunnable

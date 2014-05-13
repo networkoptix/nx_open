@@ -11,7 +11,7 @@
 
 #include <utils/network/networkoptixmodulerevealcommon.h>
 
-class QnModuleInformation;
+struct QnModuleInformation;
 class QnModuleFinder;
 
 //!Connects to NetworkOptixModuleFinder and holds found enterprise controllers list
