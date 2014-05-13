@@ -242,27 +242,28 @@ bool QnStorageDb::getBookmarks(const QByteArray &cameraGuid, const QnCameraBookm
     QString filterStr;
     QStringList bindings;
 
-    auto addFilter = [&](const QString &text) {
+    auto addFilter = [&](const QString &text, bool skipBinding) {
         if (filterStr.isEmpty())
             filterStr = "WHERE " + text;
         else
             filterStr = filterStr + " AND " + text;
-        bindings.append(text.mid(text.lastIndexOf(':')));
+        if (!skipBinding)
+            bindings.append(text.mid(text.lastIndexOf(':')));
     };
 
     if (!cameraGuid.isEmpty())
-        addFilter("book.camera_id = :cameraGuid");
+        addFilter("book.camera_id = :cameraGuid", false);
     if (filter.minStartTimeMs > 0)
-        addFilter("startTimeMs >= :minStartTimeMs");
+        addFilter("startTimeMs >= :minStartTimeMs", false);
     if (filter.maxStartTimeMs < INT64_MAX)
-        addFilter("startTimeMs <= :maxStartTimeMs");
+        addFilter("startTimeMs <= :maxStartTimeMs", false);
     if (filter.minDurationMs > 0)
-        addFilter("durationMs >= :minDurationMs");
+        addFilter("durationMs >= :minDurationMs", false);
 
     //TODO: #GDM #Bookmarks implement name search
     // hack because QT is unable to bind list values properly --gdm
     if (!filter.text.isEmpty())
-        addFilter("tagName in ('" + filter.text + "')");
+        addFilter("tagName in ('" + filter.text + "')", true);
 
     QString queryStr("SELECT \
                      book.guid as guid, \
