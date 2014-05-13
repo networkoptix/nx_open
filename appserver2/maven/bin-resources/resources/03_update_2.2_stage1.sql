@@ -1,17 +1,23 @@
 update vms_resource set guid = id
 where guid = "";
 
+DELETE FROM vms_businessrule_action_resources where resource_id in (SELECT id from vms_resource where disabled > 0);
+DELETE FROM vms_businessrule_event_resources where resource_id in (SELECT id from vms_resource where disabled > 0);
+DELETE FROM vms_scheduletask WHERE source_id in (SELECT id from vms_resource where disabled > 0);
+DELETE FROM vms_camera WHERE resource_ptr_id in (SELECT id from vms_resource where disabled > 0);
+DELETE FROM vms_kvpair WHERE resource_id in (SELECT id from vms_resource where disabled > 0);
+DELETE FROM vms_resource WHERE disabled > 0;
+
 ALTER TABLE "vms_resource" RENAME TO vms_resource_tmp;
 
 CREATE TABLE "vms_resource" (id INTEGER PRIMARY KEY AUTOINCREMENT,
                              guid BLOB(16) NULL UNIQUE,
 			     parent_guid BLOB(16),
                              status SMALLINT NOT NULL, 
-			     disabled BOOL NOT NULL DEFAULT 0, 
                              name VARCHAR(200) NOT NULL, 
 			     url VARCHAR(200), 
 			     xtype_guid BLOB(16));
-INSERT INTO "vms_resource" (id, status,disabled,name,url) SELECT id, status,disabled,name,url FROM vms_resource_tmp;
+INSERT INTO "vms_resource" (id, status,name,url) SELECT id, status,name,url FROM vms_resource_tmp;
 
 ALTER TABLE "vms_businessrule" ADD guid BLOB(16);
 ALTER TABLE "vms_resourcetype" ADD guid BLOB(16);

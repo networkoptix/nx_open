@@ -112,9 +112,9 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource:
     }
 }
 
-void QnClientMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool isProxy)
+void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy)
 {
-    if (id == qnCommon->moduleGUID())
+    if (data.serverId == qnCommon->moduleGUID())
         return;
 
     if (isProxy) {
@@ -128,7 +128,7 @@ void QnClientMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool i
     }
 }
 
-void QnClientMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool isProxy)
+void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData, bool isProxy)
 {
     if (isProxy) {
         //updateTmpStatus(id, QnResource::Offline);

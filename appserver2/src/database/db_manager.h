@@ -123,6 +123,8 @@ namespace ec2
         ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
 
 		// --------- misc -----------------------------
+        bool markLicenseOverflow(bool value, qint64 time);
+        qint64 licenseOverflowTime() const;
 
     private:
         friend class QnTransactionLog;
@@ -137,7 +139,7 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceStatusData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceDisabledData>& tran);
+        //ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceDisabledData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceParamsData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiPanicModeData>& tran);
@@ -205,6 +207,7 @@ namespace ec2
         ErrorCode saveCamera(const ApiCameraData& params);
         ErrorCode insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId);
         ErrorCode updateCameraSchedule(const ApiCameraData& data, qint32 internalId);
+        ErrorCode removeCameraSchedule(qint32 internalId);
         ErrorCode removeCamera(const QnId& guid);
         ErrorCode deleteCameraServerItemTable(qint32 id);
 
@@ -263,6 +266,8 @@ namespace ec2
         QnId m_adminUserID;
         int m_adminUserInternalID;
         ApiResourceTypeDataList m_cachedResTypes;
+        bool m_licenseOverflowMarked;
+        qint64 m_licenseOverflowTime;
 
         void fillServerInfo( ApiServerInfoData* const serverInfo );
     };

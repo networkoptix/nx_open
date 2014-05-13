@@ -24,6 +24,7 @@
 #   include <api/model/email_attachment.h>
 #   include <core/resource/media_resource.h>
 #   include <business/business_fwd.h>
+#   include "utils/common/latin1_array.h"
 #endif
 
 #   include "api_fwd.h"

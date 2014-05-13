@@ -151,7 +151,7 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-bool QnLicense::isValid(const QList<QByteArray>& hardwareIds, const QString& brand) const
+bool QnLicense::isValid(const QList<QByteArray>& hardwareIds, const QString& brand, ErrorCode* errCode) const
 {
     // >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
     // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
@@ -161,11 +161,64 @@ bool QnLicense::isValid(const QList<QByteArray>& hardwareIds, const QString& bra
     // 1. edge licenses can be activated only if box is "isd"
     // 2. if box is "isd" only edge licenses AND any trial can be activated
 
-    //TODO: may be better check edge flag?
-    bool isISDBox = box == lit("isd") || box == lit("isd_s2");
+    if (!m_isValid1 && !m_isValid2) {
+        if (errCode)
+            *errCode = InvalidSignature;
+        return false;
+    }
+
+    if (!hardwareIds.contains(m_hardwareId)) {
+        if (errCode)
+            *errCode = InvalidHardwareID;
+        return false;
+    }
+
+    if (!m_brand.isEmpty() && m_brand != brand) {
+        if (errCode)
+            *errCode = InvalidBrand;
+        return false;
+    }
+
+    if (expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > expirationTime()) // TODO: #Elric make NEVER an INT64_MAX
+    {
+        if (errCode)
+            *errCode = Expired;
+        return false; // license is out of date
+    }
     
-    return (m_isValid1 || m_isValid2) && hardwareIds.contains(m_hardwareId) && (m_brand == brand || m_brand.isEmpty()) && \
-        (((box.isEmpty() || box == lit("rpi")) && m_class != lit("edge")) || (isISDBox && (m_class == lit("edge") || !m_expiration.isEmpty())));
+    bool isEdgeBox = box == lit("isd") || box == lit("isd_s2");
+    bool classOK;
+    if (isEdgeBox)
+        classOK = (m_class == lit("edge") || !m_expiration.isEmpty());
+    else
+        classOK  = m_class != lit("edge");
+    
+    if (errCode)
+        *errCode = classOK ? NoError : InvalidType;
+    return classOK;
+}
+
+QString QnLicense::errorMessage(ErrorCode errCode)
+{
+    switch (errCode)
+    {
+        case NoError:
+            return QString();
+        case InvalidSignature:
+            return tr("Invalid signature");
+        case InvalidHardwareID:
+            return tr("Server with necessary hardware ID is not found");
+        case InvalidBrand:
+            return tr("Invalid customization");
+        case Expired:
+            return tr("Expired"); // license is out of date
+        case InvalidType:
+            return tr("Invalid type");
+        default:
+            return tr("Unknown error");
+    }
+
+    return QString();
 }
 
 bool QnLicense::isAnalog() const {
@@ -178,6 +231,10 @@ QByteArray QnLicense::toString() const
 }
 
 qint64 QnLicense::expirationTime() const {
+
+    //return QDateTime::currentMSecsSinceEpoch() + 1000 * 1000;
+
+
     if(m_expiration.isEmpty())
         return -1;
 
@@ -314,11 +371,11 @@ int QnLicenseListHelper::totalCamerasByClass(bool analog) const
 {
     int result = 0;
 
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    foreach (QnLicensePtr license, m_licenseDict.values())
-        if (license->isAnalog() == analog && (license->expirationTime() < 0 || currentTime < license->expirationTime())) // TODO: #Elric make NEVER an INT64_MAX
+    foreach (QnLicensePtr license, m_licenseDict.values()) 
+    {
+        if (license->isAnalog() == analog && license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT)))
             result += license->cameraCount();
-
+    }
     return result;
 }
 
@@ -350,15 +407,19 @@ bool QnLicensePool::isLicenseMatchesCurrentSystem(const QnLicensePtr &license) {
     return license->isValid(m_mainHardwareIds + m_compatibleHardwareIds, brand);
 }
 
+bool QnLicensePool::isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode) const
+{
+    return license->isValid(allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT), errCode);
+}
+
 bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
 {
-    // We check if m_brand is empty to allow v1.4 licenses to still work
-    if (license && isLicenseMatchesCurrentSystem(license)) {
-        m_licenseDict[license->key()] = license;
-        return true;
-    }
+    if (!license)
+        return false;
 
-    return false;
+    m_licenseDict[license->key()] = license;
+    // We check if m_brand is empty to allow v1.4 licenses to still work
+    return isLicenseMatchesCurrentSystem(license);
 }
 
 void QnLicensePool::addLicense(const QnLicensePtr &license)
@@ -437,8 +498,50 @@ QList<QByteArray> QnLicensePool::compatibleHardwareIds() const
 
 QList<QByteArray> QnLicensePool::allHardwareIds() const
 {
+    return m_mainHardwareIds + m_compatibleHardwareIds + m_remoteHardwareIds;
+}
+
+QList<QByteArray> QnLicensePool::allLocalHardwareIds() const
+{
     return m_mainHardwareIds + m_compatibleHardwareIds;
 }
+
+QList<QByteArray> QnLicensePool::allRemoteHardwareIds() const
+{
+    return m_remoteHardwareIds;
+}
+
+QMap<QnId, QList<QByteArray>> QnLicensePool::remoteHardwareIds() const
+{
+    return m_remoteHardwareIdsMap;
+}
+
+void QnLicensePool::addRemoteHardwareIds(const QnId& peer, const QList<QByteArray>& hardwareIds)
+{
+    m_remoteHardwareIdsMap.insert(peer, hardwareIds);
+    updateRemoteIdList();
+}
+
+void QnLicensePool::setRemoteHardwareIds(const QMap<QnId, QList<QByteArray>>& hardwareIds)
+{
+    m_remoteHardwareIdsMap = hardwareIds;
+    updateRemoteIdList();
+}
+
+void QnLicensePool::removeRemoteHardwareIds(const QnId& peer)
+{
+    m_remoteHardwareIdsMap.remove(peer);
+    updateRemoteIdList();
+}
+
+void QnLicensePool::updateRemoteIdList()
+{
+    QList<QByteArray> allHwId;
+    foreach(const QList<QByteArray>& hwIDs, m_remoteHardwareIdsMap.values())
+        allHwId << hwIDs;
+    m_remoteHardwareIds = allHwId;
+}
+
 QByteArray QnLicensePool::currentHardwareId() const
 {
     return m_mainHardwareIds.isEmpty() ? QByteArray() : m_mainHardwareIds.last();

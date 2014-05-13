@@ -70,6 +70,7 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {
     case ServerFailureEvent:    return tr("Media Server Failure");
     case ServerConflictEvent:   return tr("Media Server Conflict");
     case ServerStartEvent:      return tr("Media Server Started");
+    case LicenseIssueEvent:     return tr("License Issue");
     case AnyCameraEvent:        return tr("Any Camera Issue");
     case AnyServerEvent:        return tr("Any Server Issue");
     case AnyBusinessEvent:      return tr("Any Event");
@@ -112,6 +113,8 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
 
     case ServerStartEvent:
         return tr("Media Server \"%1\" Started").arg(resourceName);
+    case LicenseIssueEvent:
+        return tr("Media Server \"%1\" had license issue").arg(resourceName);
 
     default:
         break;
@@ -180,7 +183,9 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     }
     case StorageFailureEvent:
     case NetworkIssueEvent:
-    case ServerFailureEvent: {
+    case ServerFailureEvent: 
+    case LicenseIssueEvent:
+    {
         result += tr("Reason: %1").arg(eventReason(params));
         break;
     }
@@ -205,7 +210,6 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     }
     case ServerStartEvent: 
         break;
-    
     default:
         break;
     }
@@ -348,6 +352,11 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     case StorageNotEnoughSpaceReason: {
         QString storageUrl = reasonParamsEncoded;
         result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
+        break;
+    }
+    case LicenseRemoved: {
+        QString disabledCameras = reasonParamsEncoded;
+        result = tr("Recording on %n camera(s) is disabled. The number of active licenses is less than the number of recorded cameras.", NULL, disabledCameras.toInt());
         break;
     }
     default:

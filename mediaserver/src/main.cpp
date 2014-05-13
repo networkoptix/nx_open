@@ -834,6 +834,20 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         foreach(const QnBusinessEventRulePtr &rule, rules)
             messageProcessor->on_businessEventAddedOrUpdated(rule);
     }
+
+    {
+        // load licenses
+        QnLicenseList licenses;
+        while( (rez = ec2Connection->getLicenseManager()->getLicensesSync(&licenses)) != ec2::ErrorCode::ok )
+        {
+            qDebug() << "QnMain::run(): Can't get license list. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        }
+
+        foreach(const QnLicensePtr &license, licenses)
+            messageProcessor->on_licenseChanged(license);
+    }
+
 }
 
 void QnMain::at_localInterfacesChanged()
@@ -852,7 +866,7 @@ void QnMain::at_serverSaved(int, ec2::ErrorCode err)
 void QnMain::at_connectionOpened()
 {
     if (m_firstRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::ServerStartedReason);
+        qnBusinessRuleConnector->at_mserverFailure(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), m_firstRunningTime*1000, QnBusiness::ServerStartedReason, QString());
     if (!m_startMessageSent) {
         qnBusinessRuleConnector->at_mserverStarted(qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>(), qnSyncTime->currentUSecsSinceEpoch());
         m_startMessageSent = true;

@@ -10,13 +10,13 @@ namespace ec2
     struct ApiResourceParamData: ApiData
     {
         ApiResourceParamData() {}
-        ApiResourceParamData(const QString& name, const QString& value, bool isResTypeParam): value(value), name(name), isResTypeParam(isResTypeParam) {}
+        ApiResourceParamData(const QString& name, const QString& value, bool predefinedParam): value(value), name(name), predefinedParam(predefinedParam) {}
 
         QString value;
         QString name;
-        bool isResTypeParam; // TODO: #API rename into something more sane. Right now it's not clear what is this and I don't know what to rename it into. 
+        bool predefinedParam;
     };
-#define ApiResourceParamData_Fields (value)(name)(isResTypeParam)
+#define ApiResourceParamData_Fields (value)(name)(predefinedParam)
 
 
     struct ApiResourceParamWithRefData: ApiResourceParamData
@@ -35,26 +35,25 @@ namespace ec2
 
 
     struct ApiResourceData: ApiData {
-        ApiResourceData(): status(QnResource::Offline), disabled(false) {}
+        ApiResourceData(): status(QnResource::Offline) {}
 
         QnId          id;
         QnId          parentId;
         QnResource::Status    status;
-        bool          disabled; // TODO: #API I thought we got rid of this one?
         QString       name;
         QString       url;
         QnId          typeId;
         std::vector<ApiResourceParamData> addParams;
     };
-#define ApiResourceData_Fields (id)(parentId)(status)(disabled)(name)(url)(typeId)(addParams)
+#define ApiResourceData_Fields (id)(parentId)(status)(name)(url)(typeId)(addParams)
 
-
+/*
     struct ApiSetResourceDisabledData: ApiData {
         QnId id;
-        bool disabled; // TODO: #API huh?
+        bool disabled;
     };
 #define ApiSetResourceDisabledData_Fields (id)(disabled)
-
+*/
 
     struct ApiSetResourceStatusData: ApiData
     {

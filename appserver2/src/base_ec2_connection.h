@@ -131,9 +131,11 @@ namespace ec2
             m_resourceManager->triggerNotification( tran );
         }
 
+        /*
         void triggerNotification( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
             m_resourceManager->triggerNotification( tran );
         }
+        */
 
         void triggerNotification( const QnTransaction<ApiResourceParamsData>& tran ) {
             m_resourceManager->triggerNotification( tran );

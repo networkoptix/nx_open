@@ -14,13 +14,8 @@ public:
 
     void writeField(const QString &field) 
     {
-        QString str;
-        for ( int i = 0 ; i < 127 ; i++ )
-        {
-            str.push_back(i);
-        }
         // unicode symbols will not escaped http://en.wikipedia.org/wiki/UTF-8
-        QByteArray utf8 = str.toUtf8();
+        QByteArray utf8 = field.toUtf8();
         writeLatin1Field(utf8);
     }
 

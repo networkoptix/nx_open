@@ -7,16 +7,16 @@
 namespace ec2
 {
     struct ApiUserData : ApiResourceData {
-        ApiUserData(): isAdmin(false), rights(0) {}
+        ApiUserData(): isAdmin(false), permissions(0) {}
 
         //QString password;
         bool isAdmin;
-        qint64 rights; // TODO: #API rename 'permissions' for consistency with other parts of the system.
+        qint64 permissions;
         QString email;
-        QByteArray digest;
-        QByteArray hash; 
+        QnLatin1Array digest;
+        QnLatin1Array hash; 
     };
-#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(rights)(email)(digest)(hash)
+#define ApiUserData_Fields ApiResourceData_Fields (isAdmin)(permissions)(email)(digest)(hash)
 
 }
 
