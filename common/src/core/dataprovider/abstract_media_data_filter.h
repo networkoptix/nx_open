@@ -17,7 +17,7 @@ public:
     /*!
         \param dataSource MUST NOT be NULL
     */
-    AbstractMediaDataFilter( const QSharedPointer<AbstractOnDemandDataProvider>& dataSource );
+    AbstractMediaDataFilter( const AbstractOnDemandDataProviderPtr& dataSource );
 
     //!Implementation of AbstractOnDemandDataProvider::tryRead
     /*!
@@ -31,7 +31,7 @@ public:
     virtual quint64 currentPos() const override;
 
 protected:
-    QSharedPointer<AbstractOnDemandDataProvider> m_dataSource;
+    AbstractOnDemandDataProviderPtr m_dataSource;
 
     /*!
         Whether to copy source data or perform in-place processing is up to implementation

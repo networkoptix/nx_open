@@ -69,7 +69,7 @@ public:
     /*!
         \return true, if started, false if failed to start
     */
-    bool ensureLiveCacheStarted( MediaQuality streamQuality );
+    bool ensureLiveCacheStarted( MediaQuality streamQuality, qint64 targetDurationUSec );
 
 private:
     void createReader(QnServer::ChunksCatalog catalog);
@@ -92,7 +92,10 @@ private:
     //!index - is a \a MediaQuality element
     std::vector<QSharedPointer<nx_hls::HLSLivePlaylistManager> > m_hlsLivePlaylistManager;
 
-    bool ensureLiveCacheStarted( MediaQuality streamQuality, QnAbstractMediaStreamDataProviderPtr primaryReader );
+    bool ensureLiveCacheStarted(
+        MediaQuality streamQuality,
+        QnAbstractMediaStreamDataProviderPtr primaryReader,
+        qint64 targetDurationUSec );
 };
 
 #endif // __VIDEO_CAMERA_H__

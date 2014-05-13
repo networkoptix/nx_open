@@ -64,6 +64,7 @@ namespace nx_hls
         QWaitCondition m_cond;
         bool m_switchToChunkedTransfer;
         bool m_useChunkedTransfer;
+        QString m_currentFileName;
 
         /*!
             \return false in case if error

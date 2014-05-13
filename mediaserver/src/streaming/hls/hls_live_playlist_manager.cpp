@@ -9,15 +9,14 @@
 
 namespace nx_hls
 {
-    static const double DEFAULT_TARGET_DURATION_USEC = 10*1000*1000;
-
     HLSLivePlaylistManager::HLSLivePlaylistManager(
         MediaStreamCache* const mediaStreamCache,
-        MediaIndex* const mediaIndex )
+        MediaIndex* const mediaIndex,
+        quint64 targetDurationUSec )
     :
         m_mediaStreamCache( mediaStreamCache ),
         m_mediaIndex( mediaIndex ),
-        m_targetDurationUSec( DEFAULT_TARGET_DURATION_USEC ),
+        m_targetDurationUSec( targetDurationUSec ),
         m_prevTimestamp( 0 ),
         m_mediaSequence( 0 ),
         m_totalPlaylistDuration( 0 ),

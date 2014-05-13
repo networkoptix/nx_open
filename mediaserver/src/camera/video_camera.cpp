@@ -443,24 +443,30 @@ void QnVideoCamera::stopIfNoActivity()
 
 const MediaStreamCache* QnVideoCamera::liveCache( MediaQuality streamQuality ) const
 {
-    return m_liveCache[streamQuality].get();
+    return streamQuality < m_liveCache.size()
+        ? m_liveCache[streamQuality].get()
+        : nullptr;
 }
 
 MediaStreamCache* QnVideoCamera::liveCache( MediaQuality streamQuality )
 {
-    return m_liveCache[streamQuality].get();
+    return streamQuality < m_liveCache.size()
+        ? m_liveCache[streamQuality].get()
+        : nullptr;
 }
 
 QSharedPointer<nx_hls::HLSLivePlaylistManager> QnVideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
 {
-    return m_hlsLivePlaylistManager[streamQuality];
+    return streamQuality < m_hlsLivePlaylistManager.size()
+        ? m_hlsLivePlaylistManager[streamQuality]
+        : QSharedPointer<nx_hls::HLSLivePlaylistManager>();
 }
 
 //!Starts caching live stream, if not started
 /*!
     \return true, if started, false if failed to start
 */
-bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality )
+bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, qint64 targetDurationUSec )
 {
     assert( streamQuality == MEDIA_Quality_High || streamQuality == MEDIA_Quality_Low );
 
@@ -470,7 +476,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality )
             getLiveReader( QnServer::HiQualityCatalog );
         if( !m_primaryReader )
             return false;
-        return ensureLiveCacheStarted( streamQuality, m_primaryReader );
+        return ensureLiveCacheStarted( streamQuality, m_primaryReader, targetDurationUSec );
     }
 
     if( streamQuality == MEDIA_Quality_Low )
@@ -479,7 +485,7 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality )
             getLiveReader( QnServer::LowQualityCatalog );
         if( !m_secondaryReader )
             return false;
-        return ensureLiveCacheStarted( streamQuality, m_secondaryReader );
+        return ensureLiveCacheStarted( streamQuality, m_secondaryReader, targetDurationUSec );
     }
 
     return false;
@@ -489,7 +495,10 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality )
 /*!
     \return true, if started, false if failed to start
 */
-bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, QnAbstractMediaStreamDataProviderPtr primaryReader )
+bool QnVideoCamera::ensureLiveCacheStarted(
+    MediaQuality streamQuality,
+    QnAbstractMediaStreamDataProviderPtr primaryReader,
+    qint64 targetDurationUSec )
 {
     //ensuring that vectors will not take much memory
     static_assert(
@@ -510,7 +519,8 @@ bool QnVideoCamera::ensureLiveCacheStarted( MediaQuality streamQuality, QnAbstra
     m_hlsLivePlaylistManager[streamQuality] = QSharedPointer<nx_hls::HLSLivePlaylistManager>(
         new nx_hls::HLSLivePlaylistManager(
             m_liveCache[streamQuality].get(),
-            m_mediaIndexes[streamQuality].get() ) );
+            m_mediaIndexes[streamQuality].get(),
+            targetDurationUSec ) );
     //connecting live cache to reader
     primaryReader->addDataProcessor( m_liveCache[streamQuality].get() );
     m_cameraUsers << this;

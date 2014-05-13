@@ -5,6 +5,8 @@
 #ifndef ABSTRACTONDEMANDDATAPROVIDER_H
 #define ABSTRACTONDEMANDDATAPROVIDER_H
 
+#include <memory>
+
 #include <QObject>
 
 #include "../datapacket/abstract_data_packet.h"
@@ -37,6 +39,6 @@ signals:
     void dataAvailable( AbstractOnDemandDataProvider* pThis );
 };
 
-typedef QSharedPointer<AbstractOnDemandDataProvider> AbstractOnDemandDataProviderPtr;
+typedef std::shared_ptr<AbstractOnDemandDataProvider> AbstractOnDemandDataProviderPtr;
 
 #endif  //ABSTRACTONDEMANDDATAPROVIDER_H

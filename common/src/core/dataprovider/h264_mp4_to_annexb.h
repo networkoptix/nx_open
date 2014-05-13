@@ -21,7 +21,7 @@ class H264Mp4ToAnnexB
     public AbstractMediaDataFilter
 {
 public:
-    H264Mp4ToAnnexB( const QSharedPointer<AbstractOnDemandDataProvider>& dataSource );
+    H264Mp4ToAnnexB( const AbstractOnDemandDataProviderPtr& dataSource );
 
 protected:
     //!Implementation of AbstractMediaDataFilter::processData
