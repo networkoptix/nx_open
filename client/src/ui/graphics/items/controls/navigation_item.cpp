@@ -260,6 +260,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     addAction(action(Qn::ToggleMuteAction));
     addAction(action(Qn::ToggleSyncAction));
     addAction(action(Qn::ToggleCalendarAction));
+    addAction(action(Qn::ToggleBookmarksSearchAction));
 
     //connect(speedDownAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepBackward())); // TODO
     //connect(speedUpAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepForward())); // TODO

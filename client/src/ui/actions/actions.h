@@ -928,6 +928,10 @@ namespace Qn {
          */
         ToggleSliderAction,
 
+        /** 
+         * Shows/hides bookmarks search panel.
+         */
+        ToggleBookmarksSearchAction,
 
         PinNotificationsAction,
 

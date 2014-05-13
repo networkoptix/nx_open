@@ -751,6 +751,8 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         QMetaObject::invokeMethod(this, "updateSpeed", Qt::QueuedConnection);
     }
 
+    action(Qn::ToggleBookmarksSearchAction)->setEnabled(m_currentMediaWidget && m_currentWidget->resource()->flags() & QnResource::utc);
+
     updateLocalOffset();
     updateCurrentPeriods();
     updateCurrentBookmarks();
