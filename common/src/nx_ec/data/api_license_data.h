@@ -12,8 +12,8 @@
 namespace ec2
 {
     struct ApiLicenseData : ApiData {
-        QByteArray key;
-        QByteArray licenseBlock;
+        QnLatin1Array key;
+        QnLatin1Array licenseBlock;
     };
 #define ApiLicenseData_Fields (key)(licenseBlock)
 

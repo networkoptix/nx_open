@@ -362,7 +362,7 @@ bool QnPlAreconVisionResource::setParamPhysical(const QnParam &param, const QVar
     CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 
     QString request = QLatin1String("set?") + param.netHelper();
-    if (param.type() != QnParamType::None && param.type() != QnParamType::Button)
+    if (param.type() != Qn::PDT_None && param.type() != Qn::PDT_Button)
         request += QLatin1Char('=') + val.toString();
 
     CLHttpStatus status = connection.doGET(request);

@@ -37,6 +37,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if (cameraResource.isNull())
             continue;
 
+        Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(cameraResource->getPhysicalId()).isEmpty());
 
         cameraResource->setParentId(m_serverId);
     }
@@ -92,18 +93,19 @@ void QnAppserverResourceProcessor::addNewCamera(QnVirtualCameraResourcePtr camer
     if (m_lockInProgress.contains(name))
         return; // camera already adding (in progress)
 
-    Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(name).isEmpty());
+    if (!qnResPool->getAllNetResourceByPhysicalId(name).isEmpty())
+        return; // already added. Camera has been found twice
+
     ec2::QnDistributedMutexPtr mutex = ec2::QnDistributedMutexManager::instance()->getLock(name);
     m_lockInProgress.insert(name, LockData(mutex, cameraResource));
 }
 
-void QnAppserverResourceProcessor::at_mutexLocked(QByteArray name)
+void QnAppserverResourceProcessor::at_mutexLocked(QString name)
 {
     QMutexLocker lock(&m_mutex);
 
     LockData data = m_lockInProgress.value(name);
     if (!data.mutex) {
-        Q_ASSERT_X(0, "It should not be!!!", Q_FUNC_INFO);
         return;
     }
 
@@ -129,7 +131,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(QnVirtualCameraResourceP
         NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
 }
 
-void QnAppserverResourceProcessor::at_mutexTimeout(QByteArray name)
+void QnAppserverResourceProcessor::at_mutexTimeout(QString name)
 {
     QMutexLocker lock(&m_mutex);
 

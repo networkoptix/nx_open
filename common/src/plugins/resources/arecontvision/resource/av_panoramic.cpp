@@ -87,7 +87,7 @@ bool QnArecontPanoramicResource::setParamPhysical(const QnParam &param, const QV
     if (param.netHelper().isEmpty()) // check if we have paramNetHelper command for this param
         return false;
 
-    if (param.type()==QnParamType::None || param.type()==QnParamType::Button)
+    if (param.type()==Qn::PDT_None || param.type()==Qn::PDT_Button)
     {
         CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 

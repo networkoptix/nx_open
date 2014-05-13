@@ -65,7 +65,7 @@ QnTransactionLog* QnTransactionLog::instance()
     return globalInstance;
 }
 
-QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data2)
+QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data2) const
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(data1);
@@ -112,11 +112,13 @@ QnTranState QnTransactionLog::getTransactionsState()
     return m_state;
 }
 
-bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash)
+bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash) const
 {
+    QReadLocker lock(&m_dbManager->getMutex());
+
     if (m_state.value(tran.id.peerGUID) >= tran.id.sequence)
         return true;
-    QMap<QUuid, qint64>::iterator itr = m_updateHistory.find(hash);
+    QMap<QUuid, qint64>::const_iterator itr = m_updateHistory.find(hash);
     if (itr == m_updateHistory.end())
         return false;
 
@@ -144,6 +146,12 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     }
     
     return ErrorCode::ok;
+}
+
+qint64 QnTransactionLog::getTransactionTimeInternal(const QUuid& hash) const
+{
+    QReadLocker lock(&m_dbManager->getMutex());
+    return m_updateHistory.value(hash);
 }
 
 }

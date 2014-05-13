@@ -41,6 +41,8 @@ namespace ec2
         // TODO: #Ivan, support compatibility mode
         m_hardwareIds = LLUtil::getMainHardwareIds(0);
         m_brand = lit(QN_PRODUCT_NAME_SHORT);
+        qnLicensePool->setMainHardwareIds(m_hardwareIds);
+        qnLicensePool->setCompatibleHardwareIds(LLUtil::getCompatibleHardwareIds(0));
     }
 
     bool LicenseManagerImpl::validateLicense(const ApiLicenseData& license) const {
@@ -78,5 +80,6 @@ namespace ec2
         // TODO: #Ivan, add guidCompatibility to settings
         serverInfo->mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
         serverInfo->compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
+        serverInfo->remoteHardwareIds = qnLicensePool->remoteHardwareIds();
     }
 }
