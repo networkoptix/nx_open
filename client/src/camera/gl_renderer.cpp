@@ -631,12 +631,7 @@ bool QnGLRenderer::isYV12ToRgbShaderUsed() const
     return !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_shaders->yv12ToRgb
-        && !m_shaders->yv12ToRgb->isLinked();
-    /*
-    return !(features() & QnGlFunctions::ShadersBroken)
-        && !m_decodedPictureProvider.isForcedSoftYUV()
-        && m_shaders->yv12ToRgb
-        && m_shaders->yv12ToRgb->isLinked();*/
+        && m_shaders->yv12ToRgb->wasLinked();
 }
 
 bool QnGLRenderer::isYV12ToRgbaShaderUsed() const
@@ -644,7 +639,7 @@ bool QnGLRenderer::isYV12ToRgbaShaderUsed() const
     return !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_shaders->yv12ToRgba
-        && !m_shaders->yv12ToRgba->isLinked();
+        && m_shaders->yv12ToRgba->wasLinked();
 }
 
 bool QnGLRenderer::isNV12ToRgbShaderUsed() const
@@ -652,7 +647,7 @@ bool QnGLRenderer::isNV12ToRgbShaderUsed() const
     return !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_shaders->nv12ToRgb
-        && !m_shaders->nv12ToRgb->isLinked();
+        && m_shaders->nv12ToRgb->wasLinked();
 }
 
 void QnGLRenderer::setDisplayedRect(const QRectF& rect)

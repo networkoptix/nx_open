@@ -33,7 +33,9 @@ public:
     }
 
     virtual bool link() override; 
+    bool wasLinked(){ return m_wasLinked; };
 private:
+    bool m_wasLinked;
     int m_yTextureLocation;
     int m_uTextureLocation;
     int m_vTextureLocation;

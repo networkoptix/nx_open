@@ -47,12 +47,13 @@ public:
     }
 
     static QMatrix4x4 colorTransform(Colorspace colorspace, bool fullRange = true);
-
+    bool wasLinked(){ return m_wasLinked; };
 private:
     int m_yTextureLocation;
     int m_uvTextureLocation;
     int m_colorTransformLocation;
     int m_opacityLocation;
+    bool m_wasLinked;
 };
 
 
