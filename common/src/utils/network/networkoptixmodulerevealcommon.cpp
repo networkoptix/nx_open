@@ -32,15 +32,6 @@ bool RevealRequest::deserialize(const quint8 **bufStart, const quint8 *bufEnd) {
     return true;
 }
 
-/*
-{
-    'version' : APPLICATION_VERSION,
-    'port' : port,
-    'application' : APPLICATION_NAME,
-    'customization' : CUSTOMIZATION
-}
-*/
-
 bool RevealResponse::serialize(quint8 **const bufStart, const quint8 *bufEnd) {
     QVariantMap map;
     map[lit("application")] = type;
@@ -48,6 +39,7 @@ bool RevealResponse::serialize(quint8 **const bufStart, const quint8 *bufEnd) {
     map[lit("customization")] = customization;
     map[lit("seed")] = seed;
     map[lit("systemName")] = name;
+    map[lit("systemInformation")] = systemInformation;
     for (auto it = typeSpecificParameters.begin(); it != typeSpecificParameters.end(); ++it)
         map[it.key()] = it.value();
 
@@ -68,6 +60,7 @@ bool RevealResponse::deserialize(const quint8 **bufStart, const quint8 *bufEnd) 
     QVariantMap map = QJsonDocument::fromJson(data).toVariant().toMap();
     type = map.take(lit("application")).toString();
     version = map.take(lit("version")).toString();
+    systemInformation = map.take(lit("systemInformation")).toString();
     customization = map.take(lit("customization")).toString();
     name = map.take(lit("systemName")).toString();
     seed = map.take(lit("seed")).toString();

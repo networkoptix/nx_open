@@ -38,6 +38,7 @@ public:
     //!Name of module (enterprise controller, media server, etc...)
     QString type;
     QString version;
+    QString systemInformation;
     QString customization;
     QString name;
     //!random string, unique for particular module instance

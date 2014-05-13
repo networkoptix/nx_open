@@ -30,7 +30,7 @@ namespace ec2
     };
 
     /*
-    * Ricart–Agrawala algorithm
+    * Ricart-Agrawala algorithm
     */
 
     class QnDistributedMutex: public QObject

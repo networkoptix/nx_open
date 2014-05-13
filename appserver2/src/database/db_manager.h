@@ -15,6 +15,7 @@
 #include "nx_ec/data/api_camera_server_item_data.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
 #include "nx_ec/data/api_media_server_data.h"
+#include "nx_ec/data/api_update_data.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 
@@ -143,13 +144,14 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiPanicModeData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFileData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFilePath>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<QString> &tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiUserData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceParamDataList>& tran); // save settings
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallData>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallDataList>& tran);
 
         // delete camera, server, layout, any resource, etc.
@@ -180,6 +182,11 @@ namespace ec2
         }
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallControlMessageData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiUpdateUploadData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }

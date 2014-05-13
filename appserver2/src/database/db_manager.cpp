@@ -615,8 +615,8 @@ ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 i
 ErrorCode QnDbManager::insertOrReplaceMediaServer(const ApiMediaServerData& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_server (api_url, auth_key, streaming_url, version, net_addr_list, flags, panic_mode, max_cameras, redundancy, resource_ptr_id) VALUES\
-                     (:apiUrl, :authKey, :streamingUrl, :version, :networkAddresses, :flags, :panicMode, :maxCameras, :allowAutoRedundancy, :internalId)");
+    insQuery.prepare("INSERT OR REPLACE INTO vms_server (api_url, auth_key, streaming_url, version, net_addr_list, system_info, flags, panic_mode, max_cameras, redundancy, resource_ptr_id) VALUES\
+                     (:apiUrl, :authKey, :streamingUrl, :version, :networkAddresses, :systemInfo, :flags, :panicMode, :maxCameras, :allowAutoRedundancy, :internalId)");
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
     if (insQuery.exec()) {
@@ -1072,6 +1072,10 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowall
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiUpdateUploadResponceData> &tran) {
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceParamsData>& tran)
 {
     qint32 internalId = getResourceInternalId(tran.params.id);
@@ -1307,16 +1311,24 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiStoredFil
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiStoredFilePath>& tran)
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<QString>& tran)
 {
-    assert( tran.command == ApiCommand::removeStoredFile );
-
-    QSqlQuery query(m_sdb);
-    query.prepare("DELETE FROM vms_storedFiles WHERE path = :path");
-    query.bindValue(":path", tran.params);
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::failure;
+    switch (tran.command) {
+    case ApiCommand::removeStoredFile: {
+        QSqlQuery query(m_sdb);
+        query.prepare("DELETE FROM vms_storedFiles WHERE path = :path");
+        query.bindValue(":path", tran.params);
+        if (!query.exec()) {
+            qWarning() << Q_FUNC_INFO << query.lastError().text();
+            return ErrorCode::failure;
+        }
+        break;
+    }
+    case ApiCommand::installUpdate:
+        break;
+    default:
+        Q_ASSERT_X(0, "Unsupported transaction", Q_FUNC_INFO);
+        return ErrorCode::notImplemented;
     }
 
     return ErrorCode::ok;
@@ -1578,8 +1590,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerD
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare(QString("select r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
-                          s.api_url as apiUrl, s.auth_key as authKey, s.streaming_url as streamingUrl, s.version, s.net_addr_list as networkAddresses, s.flags, s.panic_mode as panicMode, s.max_cameras as maxCameras, \
-                          s.redundancy as allowAutoRedundancy \
+                          s.api_url as apiUrl, s.auth_key as authKey, s.streaming_url as streamingUrl, s.version, s.net_addr_list as networkAddresses, s.system_info as systemInfo, s.flags, s.panic_mode as panicMode, s.max_cameras as maxCameras, \
                           from vms_resource r \
                           join vms_server s on s.resource_ptr_id = r.id order by r.guid"));
 
@@ -1779,7 +1790,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& resourceId, ApiResourceParamsDa
                                 JOIN vms_resource r on r.id = kv.resource_id WHERE r.guid = :guid"));
     query.bindValue(QLatin1String(":guid"), resourceId.toRfc4122());
     if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        qWarning() << Q_FUNC_INFO << query.lastError().text() << query.lastQuery();
         return ErrorCode::failure;
     }
 

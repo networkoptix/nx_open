@@ -44,6 +44,13 @@
             <type>tar.gz</type>
             <classifier>${profile.classifier}-${compiler}</classifier>
         </dependency>                                   
+        <dependency>
+            <groupId>net.sourceforge</groupId>
+            <artifactId>quazip</artifactId>
+            <version>${quazip.version}</version>
+            <type>tar.gz</type>
+            <classifier>${profile.classifier}-${compiler}</classifier>
+        </dependency>
 
         <!--   
         <dependency>                 
