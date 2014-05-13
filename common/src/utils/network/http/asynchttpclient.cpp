@@ -19,6 +19,7 @@
 
 static const int DEFAULT_CONNECT_TIMEOUT = 3000;
 static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
+static const int DEFAULT_HTTP_PORT = 80;
 
 using std::make_pair;
 
@@ -101,7 +102,7 @@ namespace nx_http
 
                         case PollSet::etTimedOut:
                         case PollSet::etError:
-                            NX_LOG( lit("Failed to connect to %1:%2").arg(m_url.host()).arg(m_url.port()), cl_logDEBUG1 );
+                            NX_LOG( lit("Failed to connect to %1:%2. %3").arg(m_url.host()).arg(m_url.port(DEFAULT_HTTP_PORT)).arg(eventType), cl_logDEBUG1 );
                             if( reconnectIfAppropriate() )
                                 break;
                             m_state = sFailed;

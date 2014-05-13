@@ -1,10 +1,7 @@
 #include "serializer.h"
 
-#include <core/resource/resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/layout_resource.h>
+// TODO: #Elric get rid of this definition
+#include <core/resource/resource_media_layout.h>  //for CL_MAX_CHANNELS
 
 void parseRegion(QRegion& region, const QString& regionString)
 {

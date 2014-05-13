@@ -435,6 +435,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
         }
 
         if (connectionInfo->version > QnSoftwareVersion(QN_ENGINE_VERSION)) {
+#ifndef Q_OS_MACX
             QnMessageBox::warning(
                 this,
                 Qn::VersionMismatch_Help,
@@ -446,15 +447,28 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
                 ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
                 QMessageBox::Ok
             );
+#else
+            QnMessageBox::warning(
+                this,
+                Qn::VersionMismatch_Help,
+                tr("Could not connect to Enterprise Controller"),
+                tr("Selected Enterprise controller has a different version:\n"
+                    " - Client version: %1.\n"
+                    " - EC version: %2.\n"
+                    "The other version of client is needed in order to establish the connection to this server."
+                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                QMessageBox::Ok
+            );
+#endif
             m_restartPending = false;
         }
 
         if(m_restartPending) {
-            for( ;; )
-            {
+            for (;;) {
                 bool isInstalled = false;
-                if( applauncher::isVersionInstalled(connectionInfo->version, &isInstalled) != applauncher::api::ResultType::ok )
+                if (applauncher::isVersionInstalled(connectionInfo->version, &isInstalled) != applauncher::api::ResultType::ok)
                 {
+#ifndef Q_OS_MACX
                     QnMessageBox::warning(
                         this,
                         Qn::VersionMismatch_Help,
@@ -466,6 +480,19 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
                         ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
                         QMessageBox::Ok
                     );
+#else
+                    QnMessageBox::warning(
+                        this,
+                        Qn::VersionMismatch_Help,
+                        tr("Could not connect to Enterprise Controller"),
+                        tr("Selected Enterprise controller has a different version:\n"
+                            " - Client version: %1.\n"
+                            " - EC version: %2.\n"
+                            "The other version of client is needed in order to establish the connection to this server."
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                        QMessageBox::Ok
+                    );
+#endif
                     m_restartPending = false;
                 }
                 else if(isInstalled) {

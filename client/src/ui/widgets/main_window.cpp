@@ -35,6 +35,7 @@
 #include <ui/dialogs/ptz_manage_dialog.h>
 
 #include <ui/workbench/handlers/workbench_action_handler.h>
+#include <ui/workbench/handlers/workbench_bookmarks_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
 #include <ui/workbench/handlers/workbench_export_handler.h>
@@ -206,6 +207,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
     context->instance<QnWorkbenchVideoWallHandler>();
+    context->instance<QnWorkbenchBookmarksHandler>();
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
 

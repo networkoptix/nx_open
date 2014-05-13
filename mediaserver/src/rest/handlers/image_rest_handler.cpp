@@ -14,7 +14,6 @@ extern "C"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/camera_resource.h"
 #include "device_plugins/server_archive/server_archive_delegate.h"
-#include "device_plugins/server_archive/server_archive_delegate.h"
 #include "core/datapacket/media_data_packet.h"
 #include "decoders/video/ffmpeg.h"
 #include "camera/camera_pool.h"
@@ -306,11 +305,9 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
 
         PixelFormat ffmpegColorFormat = PIX_FMT_BGRA;
         QImage::Format qtColorFormat = QImage::Format_ARGB32_Premultiplied;
-        int pixelBytes = 4;
         if (colorSpace == "gray8") {
             ffmpegColorFormat = PIX_FMT_GRAY8;
             qtColorFormat = QImage::Format_Indexed8;
-            pixelBytes = 1;
         }
 
 

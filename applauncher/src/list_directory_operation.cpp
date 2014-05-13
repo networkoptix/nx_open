@@ -43,7 +43,8 @@ namespace detail
         :
             totalsize( -1 ),
             m_readingContents( false ),
-            m_entries( entries )
+            m_entries( entries ),
+            m_fileSize( -1 )
         {
         }
 
@@ -74,6 +75,8 @@ namespace detail
             {
                 if( !m_readingContents )
                     return false;
+                int sizeArgPos = atts.index(QString::fromLatin1("size"));
+                m_fileSize = sizeArgPos >= 0 ? atts.value(sizeArgPos).toLongLong() : -1;
                 m_openedElement = qName;
                 return true;
             }
@@ -117,7 +120,7 @@ namespace detail
             if( m_openedElement == QLatin1String("directory") )
                 m_entries->push_back( RDirEntry(ch, RSyncOperationType::listDirectory) );
             else if( m_openedElement == QLatin1String("file") )
-                m_entries->push_back( RDirEntry(ch, RSyncOperationType::getFile) );
+                m_entries->push_back( RDirEntry(ch, RSyncOperationType::getFile, QString(), m_fileSize) );
 
             return true;
         }
@@ -146,6 +149,7 @@ namespace detail
         bool m_readingContents;
         QString m_openedElement;
         std::list<detail::RDirEntry>* const m_entries;
+        qint64 m_fileSize;
     };
 
 

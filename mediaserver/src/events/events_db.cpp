@@ -10,6 +10,7 @@
 #include "business/business_action_factory.h"
 #include "core/resource_management/resource_pool.h"
 #include "recorder/storage_manager.h"
+#include <recording/time_period.h>
 #include <media_server/settings.h>
 
 

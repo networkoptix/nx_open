@@ -13,6 +13,8 @@
 #include "user_resource.h"
 #include "common/common_module.h"
 
+#include <recording/time_period_list.h>
+
 #define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
 
 namespace {
@@ -353,7 +355,13 @@ bool QnSecurityCamResource::isAudioSupported() const {
     QVariant val;
     if (!getParam(lit("isAudioSupported"), val, QnDomainMemory))
         return false;
-    return val.toBool();
+    if (val.toBool())
+        return true;
+
+    if (!getParam(lit("forcedIsAudioSupported"), val, QnDomainMemory))
+        return false;
+
+    return val.toInt() > 0;
 }
 
 Qn::MotionType QnSecurityCamResource::getCameraBasedMotionType() const {

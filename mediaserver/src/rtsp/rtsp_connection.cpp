@@ -780,7 +780,7 @@ int QnRtspConnectionProcessor::composeSetup()
     }
 
 #ifdef USE_NX_HTTP
-    int trackId = extractTrackId(d->request.requestLine.url.path());
+    int trackId = extractTrackId(d->request.requestLine.url.toString());
 #else
     int trackId = extractTrackId(d->requestHeaders.path());
 #endif
@@ -953,7 +953,7 @@ void QnRtspConnectionProcessor::createDataProvider()
     if (camera && d->liveMode == Mode_Live)
     {
         if (!d->liveDpHi && !d->mediaRes->toResource()->hasFlags(QnResource::foreigner)) {
-            d->liveDpHi = camera->getLiveReader(QnResource::Role_LiveVideo);
+            d->liveDpHi = camera->getLiveReader(QnServer::HiQualityCatalog);
             if (d->liveDpHi) {
                 connect(d->liveDpHi->getResource().data(), SIGNAL(parentIdChanged(const QnResourcePtr &)), this, SLOT(at_camera_parentIdChanged()), Qt::DirectConnection);
                 connect(d->liveDpHi->getResource().data(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_camera_resourceChanged()), Qt::DirectConnection);
@@ -969,7 +969,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 
             if (canRunSecondStream)
             {
-                d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+                d->liveDpLow = camera->getLiveReader(QnServer::LowQualityCatalog);
                 if (d->liveDpLow)
                     d->liveDpLow->startIfNotRunning();
             }

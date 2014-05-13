@@ -7,6 +7,7 @@
 #include <utils/ping_utility.h>
 
 #include <camera/thumbnail.h>
+#include <camera/data/abstract_camera_data.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_parameters.h>
@@ -78,6 +79,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnResourceWidgetFrameColors>();
     qRegisterMetaType<QnPtzManageModelColors>();
     qRegisterMetaType<QnLicensesListModelColors>();
+
+    qRegisterMetaType<QnAbstractCameraDataPtr>();
 
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
     QnJsonSerializer::registerSerializer<QnTimeScrollBarColors>();

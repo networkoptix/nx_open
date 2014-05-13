@@ -50,6 +50,11 @@ public:
     QnScheduleTask()
         : m_resourceId() //, m_id(0)
     {}
+
+    QnScheduleTask(QnId resourceId)
+        : m_resourceId(resourceId)
+    {}
+
     QnScheduleTask(const Data& data)
         : m_resourceId(), m_data(data) // m_id(0)
     {

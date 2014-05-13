@@ -172,7 +172,8 @@ private:
         SynchronizationTask( const detail::RDirEntry& _entry )
         :
             RDirEntry( _entry ),
-            running( false )
+            running( false ),
+            retryCount( 0 )
         {
         }
 
@@ -182,11 +183,13 @@ private:
             QString _hashTypeName = QString() )
         :
             RDirEntry( _entryPath, _type, _hashTypeName ),
-            running( false )
+            running( false ),
+            retryCount( 0 )
         {
         }
 
         bool running;
+        int retryCount;
     };
 
     std::forward_list<QUrl> m_mirrors;

@@ -7,9 +7,11 @@
 
 #include <client/client_color_types.h>
 
-#include <recording/time_period_list.h>
 #include <recording/time_period_storage.h>
+
 #include <camera/thumbnail.h>
+
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <ui/graphics/items/generic/tool_tip_slider.h>
 #include <ui/processors/kinetic_process_handler.h>
@@ -24,6 +26,7 @@ class QTimer;
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
+class QnTimePeriodList;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT
@@ -109,6 +112,9 @@ public:
 
     QnTimePeriodList timePeriods(int line, Qn::TimePeriodContent type) const;
     void setTimePeriods(int line, Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods);
+
+    QnCameraBookmarkList bookmarks() const;
+    void setBookmarks(const QnCameraBookmarkList &bookmarks);
 
     Options options() const;
     void setOptions(Options options);
@@ -275,7 +281,7 @@ private:
 
     bool scaleWindow(qreal factor, qint64 anchor);
 
-    void drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QRectF &rect);
+    void drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QnTimePeriodList &bookmarks, const QRectF &rect);
     void drawTickmarks(QPainter *painter, const QRectF &rect);
     void drawSolidBackground(QPainter *painter, const QRectF &rect);
     void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
@@ -285,6 +291,7 @@ private:
     void drawDates(QPainter *painter, const QRectF &rect);
     void drawThumbnails(QPainter *painter, const QRectF &rect);
     void drawThumbnail(QPainter *painter, const ThumbnailData &data, const QRectF &targetRect, const QRectF &boundingRect);
+    void drawBookmarks(QPainter *painter, const QRectF &rect);
 
     void updatePixmapCache();
     void updateVisibleLineCount();
@@ -358,6 +365,7 @@ private:
     int m_lineCount;
     qreal m_totalLineStretch;
     QVector<LineData> m_lineData;
+    QnCameraBookmarkList m_bookmarks;
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;

@@ -4,8 +4,9 @@
 #include <QtSql/QtSql>
 #include "business/actions/abstract_business_action.h"
 #include "business/events/abstract_business_event.h"
-#include "recording/time_period.h"
 #include "utils/db/db_helper.h"
+
+class QnTimePeriod;
 
 namespace pb {
     class BusinessActionList;

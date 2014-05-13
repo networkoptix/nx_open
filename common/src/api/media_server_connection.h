@@ -22,16 +22,16 @@
 #include <core/ptz/ptz_preset.h>
 #include <core/ptz/ptz_tour.h>
 #include <core/ptz/ptz_data.h>
+#include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
-#include <recording/time_period_list.h>
 
 #include "abstract_connection.h"
 
-class QnMediaServerResource;
-
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
 typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
+
+class QnTimePeriodList;
 
 Q_DECLARE_METATYPE(QnStringBoolPairList);
 Q_DECLARE_METATYPE(QnStringVariantPairList);
@@ -64,6 +64,8 @@ signals:
     void finished(int status, const QnPtzTourList &reply, int handle);
     void finished(int status, const QnPtzObject &reply, int handle);
     void finished(int status, const QnPtzData &reply, int handle);
+    void finished(int status, const QnCameraBookmark &reply, int handle);
+    void finished(int status, const QnCameraBookmarkList &reply, int handle);
 
 private:
     friend class QnAbstractReplyProcessor;
@@ -95,7 +97,15 @@ public:
     int getProxyPort() { return m_proxyPort; }
     QString getProxyHost() { return m_proxyAddr; }
 
-    int getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
+    int getTimePeriodsAsync(
+        const QnNetworkResourceList &list,
+        qint64 startTimeMs, 
+        qint64 endTimeMs, 
+        qint64 detail, 
+        Qn::TimePeriodContent periodsType,
+        const QString &filter,
+        QObject *target, 
+        const char *slot);
 
     // TODO: #MSAPI 
     // move to api/model or even to common_globals, 
@@ -232,10 +242,14 @@ public:
      */
     int doRebuildArchiveAsync(RebuildAction action, QObject *target, const char *slot);
 
+    int addBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int updateBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int deleteBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
+    int getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot);
+
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
 
-    static QnRequestParamList createTimePeriodsRequest(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
     static QnRequestParamList createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params);
     static QnRequestParamList createSetParamsRequest(const QnNetworkResourcePtr &camera, const QnStringVariantPairList &params);
 

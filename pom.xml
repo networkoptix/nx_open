@@ -76,10 +76,13 @@
         <qtlib8>Widgets</qtlib8>
         <qtlib9>Gui</qtlib9>
         <qtlib10>X11Extras</qtlib10>                    
-        <!-- qtlib11 is used in macos profile only -->
-        <qtlib11 />
-        <!-- <qtlib12>WebKit</qtlib12> 
-        <qtlib13>WebKitWidgets</qtlib13>-->
+        <qtlib11>PrintSupport</qtlib11>
+        <qtlib12>WebKit</qtlib12> 
+        <qtlib13>WebKitWidgets</qtlib13>
+        <qtlib14>MultimediaWidgets</qtlib14>
+        <qtlib15>Quick</qtlib15>
+        <qtlib16>Qml</qtlib16>
+        <qtlib17>Positioning</qtlib17>
 
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
@@ -349,7 +352,6 @@
                 <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>
-                <qtlib11>PrintSupport</qtlib11>
             </properties>
             <modules>
                 <module>macsetup/client-dmg</module>
@@ -537,6 +539,21 @@
                 <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
                 <skip.sign>false</skip.sign>
             </properties>
-        </profile>        
+        </profile>     
+        <profile>
+            <id>webkit</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>webkit</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <properties>
+                <qt.dir>${environment.dir}/qt5webkit/qtbase-${arch}</qt.dir>
+            </properties>
+        </profile>          
     </profiles> 
 </project>

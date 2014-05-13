@@ -14,6 +14,8 @@
 #include "sql_fwd.h"
 #include "sql_index_mapping.h"
 
+#include <utils/fusion/fusion.h> // #TODO: #Elric EC2
+
 namespace QnSqlDetail {
     template<class T>
     void bind_internal(const T &value, QSqlQuery *target) {

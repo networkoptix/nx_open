@@ -77,6 +77,7 @@ namespace QnFusion {
 
 } // namespace QnFusion
 
+#ifndef Q_MOC_RUN
 
 /**
  * This macro registers fusion visitors that are to be used when serializing
@@ -127,6 +128,18 @@ namespace QnFusion {                                                            
         typedef BOOST_PP_TUPLE_ENUM(DESERIALIZATION_VISITOR) type;              \
     };                                                                          \
 }
+
+#else // Q_MOC_RUN
+
+/* Qt moc chokes on these. We make its life easier. */
+#define QN_FUSION_REGISTER_SERIALIZATION_VISITORS(...)
+#define QN_FUSION_REGISTER_SERIALIZATION_VISITORS_TPL(...)
+#define QN_FUSION_REGISTER_SERIALIZATION_VISITOR(...)
+#define QN_FUSION_REGISTER_SERIALIZATION_VISITOR_TPL(...)
+#define QN_FUSION_REGISTER_DESERIALIZATION_VISITOR(...)
+#define QN_FUSION_REGISTER_DESERIALIZATION_VISITOR_TPL(...)
+
+#endif // Q_MOC_RUN
 
 
 #endif // QN_FUSION_SERIALIZATION_H
