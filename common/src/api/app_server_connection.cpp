@@ -26,8 +26,8 @@
 Q_GLOBAL_STATIC(QnAppServerConnectionFactory, qn_appServerConnectionFactory_instance)
 
 QnAppServerConnectionFactory::QnAppServerConnectionFactory(): 
-    m_defaultMediaProxyPort(0),
-    m_prematureLicenseExperationDate(0)
+    m_prematureLicenseExperationDate(0),
+    m_defaultMediaProxyPort(0)
 {}
 
 QnAppServerConnectionFactory::~QnAppServerConnectionFactory() {

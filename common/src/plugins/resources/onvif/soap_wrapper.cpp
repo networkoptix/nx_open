@@ -137,10 +137,12 @@ SoapWrapper<T>::SoapWrapper(
     int _timeDrift,
     bool tcpKeepAlive )
 :
-  m_login(login),
-  m_passwd(passwd),
-  invoked(false),
-  m_timeDrift(_timeDrift)
+    m_soapProxy(nullptr),
+    m_endpoint(nullptr),
+    m_timeDrift(_timeDrift),
+    m_login(login),
+    m_passwd(passwd),
+    invoked(false)
 {
     //Q_ASSERT(!endpoint.empty());
     Q_ASSERT_X(!endpoint.empty(), Q_FUNC_INFO, "Onvif URL is empty!!! It is debug only check.");
