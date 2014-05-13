@@ -55,7 +55,8 @@ public:
         ServerStartedReason,
         StorageIoErrorReason,
         StorageTooSlowReason,
-        StorageNotEnoughSpaceReason // TODO: #Elric #enum think of a better name.
+        StorageNotEnoughSpaceReason,  // TODO: #Elric #enum think of a better name.
+        LicenseRemoved
     };
 
     enum EventState {
@@ -97,6 +98,9 @@ public:
 
         /** Media server started */
         ServerStartEvent = 9,
+        
+        /** Not enough licenses */
+        LicenseIssueEvent = 10,
 
         /**
          * Used when enumerating to build GUI lists, this and followed actions

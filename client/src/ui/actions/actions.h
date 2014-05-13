@@ -351,6 +351,11 @@ namespace Qn {
          */
         CameraListAction,
 
+        /**
+         * System administration dialog.
+         */
+        SystemAdministrationAction,
+
         //ShowMediaServerLogs,
 
 

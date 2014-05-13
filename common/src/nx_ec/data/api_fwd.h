@@ -36,12 +36,11 @@ namespace ec2 {
     struct ApiResourceParamWithRefData;
     struct ApiResourceParamsData;
     struct ApiResourceTypeData;
-    struct ApiRuntimeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
     struct ApiServerAliveData;
     struct ApiServerInfoData;
-    struct ApiSetResourceDisabledData;
+    //struct ApiSetResourceDisabledData;
     struct ApiSetResourceStatusData;
     struct ApiStorageData;
     struct ApiStoredFileData;
@@ -52,6 +51,8 @@ namespace ec2 {
     struct ApiVideowallItemWithRefData;
     struct ApiVideowallScreenData;
     struct ApiVideowallScreenWithRefData;
+    struct ApiUpdateUploadData;
+    struct ApiUpdateUploadResponceData;
     struct ApiCameraBookmarkTagData;
 
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
@@ -70,6 +71,7 @@ namespace ec2 {
     typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
 
     typedef QString ApiStoredFilePath; // TODO: #Elric struct => extendable?
+    typedef QString ApiUpdateInstallData; // TODO: #Elric struct => extendable?
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
     struct LoginInfo;
 
@@ -96,12 +98,10 @@ namespace ec2 {
     (ApiResourceParamWithRefData)\
     (ApiResourceParamsData)\
     (ApiResourceTypeData)\
-    (ApiRuntimeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\
     (ApiServerAliveData)\
     (ApiServerInfoData)\
-    (ApiSetResourceDisabledData)\
     (ApiSetResourceStatusData)\
     (ApiStorageData)\
     (ApiStoredFileData)\
@@ -112,6 +112,8 @@ namespace ec2 {
     (ApiVideowallItemWithRefData)\
     (ApiVideowallScreenData)\
     (ApiVideowallScreenWithRefData)\
+    (ApiUpdateUploadData)\
+    (ApiUpdateUploadResponceData)\
     (ApiCameraBookmarkTagData)\
 
 #ifndef QN_NO_BASE

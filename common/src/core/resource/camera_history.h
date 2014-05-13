@@ -9,7 +9,7 @@
 
 struct QnCameraHistoryItem
 {
-    QnCameraHistoryItem(const QString& physicalId_, qint64 timestamp_, const QString& mediaServerGuid_)
+    QnCameraHistoryItem(const QString& physicalId_, qint64 timestamp_, const QByteArray& mediaServerGuid_)
         : physicalId(physicalId_),
           timestamp(timestamp_),
           mediaServerGuid(mediaServerGuid_)
@@ -18,17 +18,17 @@ struct QnCameraHistoryItem
 
     QString physicalId;
     qint64 timestamp;
-    QString mediaServerGuid;
+    QByteArray mediaServerGuid;
 };
 typedef QSharedPointer<QnCameraHistoryItem> QnCameraHistoryItemPtr;
 
 struct QnCameraTimePeriod: QnTimePeriod
 {
-    QnCameraTimePeriod(qint64 startTimeMs, qint64 durationMs, QString serverGuid): QnTimePeriod(startTimeMs, durationMs), mediaServerGuid(serverGuid) {}
+    QnCameraTimePeriod(qint64 startTimeMs, qint64 durationMs, QByteArray serverGuid): QnTimePeriod(startTimeMs, durationMs), mediaServerGuid(serverGuid) {}
 
     QnId getServerId() const;
 
-    QString mediaServerGuid;
+    QByteArray mediaServerGuid;
 };
 
 typedef QList<QnCameraTimePeriod> QnCameraTimePeriodList;

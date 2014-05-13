@@ -20,13 +20,11 @@ enum QnDomain
 
 struct QN_EXPORT QnParamType
 {
-    // TODO: #Elric #enum
-    enum DataType { None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };
 
     QnParamType();
     //QnParamType(const QString& name, const QVariant &val);
 
-    DataType type;
+    Qn::PropertyDataType type;
 
     //QnId id;
     QString name;
@@ -72,7 +70,7 @@ struct QN_EXPORT QnParam
     const QString &subGroup() const { return m_paramType->subgroup; }
     double minValue() const { return m_paramType->min_val; }
     double maxValue() const { return m_paramType->max_val; }
-    QnParamType::DataType type() const { return m_paramType->type;}
+    Qn::PropertyDataType type() const { return m_paramType->type;}
     const QList<QVariant> &uiPossibleValues() const { return m_paramType->ui_possible_values; }
     const QList<QVariant> &possibleValues() const { return m_paramType->possible_values; }
     const QString &description() const { return m_paramType->description; }

@@ -11,9 +11,12 @@ namespace ec2
         QnId serverId;
         bool isAlive;
         bool isClient;
+        QList<QByteArray> hardwareIds;
     };
-#define ApiServerAliveData_Fields (serverId)(isAlive)(isClient)
+#define ApiServerAliveData_Fields (serverId)(isAlive)(isClient)(hardwareIds)
 
 } // namespace ec2
+
+Q_DECLARE_METATYPE(ec2::ApiServerAliveData);
 
 #endif // __SERVER_ALIVE_DATA_H_

@@ -83,7 +83,7 @@ void NetworkOptixModuleRevealer::pleaseStop()
     QnLongRunnable::pleaseStop();
 }
 
-static const unsigned int ERROR_WAIT_TIMEOUT_MS = 1000;
+static const unsigned int errorWaitTimeoutMs = 1000;
 static const unsigned int MULTICAST_GROUP_JOIN_TIMEOUT_MS = 60000;
 
 void NetworkOptixModuleRevealer::run()
@@ -125,7 +125,7 @@ void NetworkOptixModuleRevealer::run()
         {
             const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
             cl_log.log( lit("NetworkOptixModuleRevealer. poll failed. ").arg(SystemError::toString(prevErrorCode)), cl_logERROR );
-            msleep( ERROR_WAIT_TIMEOUT_MS );
+            msleep( errorWaitTimeoutMs );
             continue;
         }
 

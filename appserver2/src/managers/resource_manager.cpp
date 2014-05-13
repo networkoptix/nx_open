@@ -69,6 +69,7 @@ namespace ec2
         return reqID;
     }
 
+    /*
     template<class T>
     int QnResourceManager<T>::setResourceDisabled( const QnId& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler )
     {
@@ -80,6 +81,7 @@ namespace ec2
         m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SetResourceDisabledHandler::done ), handler, reqID, _1, resourceId));
         return reqID;
     }
+    */
 
     template<class T>
     int QnResourceManager<T>::save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler )
@@ -166,6 +168,7 @@ namespace ec2
         return tran;
     }
 
+    /*
     template<class T>
     QnTransaction<ApiSetResourceDisabledData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id, bool disabled )
     {
@@ -174,6 +177,7 @@ namespace ec2
         tran.params.disabled = disabled;
         return tran;
     }
+    */
 
     template<class T>
     QnTransaction<ApiResourceData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource )

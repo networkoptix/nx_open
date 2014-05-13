@@ -480,7 +480,7 @@ int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &li
     params << QnRequestParam("startTime", QString::number(startTimeMs));
     params << QnRequestParam("endTime", QString::number(endTimeMs));
     params << QnRequestParam("detail", QString::number(detail));
-    if (periodsType == Qn::BookmarkTimePeriod)
+    if (periodsType == Qn::BookmarksContent)
         params << QnRequestParam("format", "bii");
     else
         params << QnRequestParam("format", "bin");

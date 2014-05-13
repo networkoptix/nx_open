@@ -12,7 +12,7 @@ QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget *parent, Qt::Wi
     ui->setupUi(this);
 
     QList<QnLicenseListModel::Column> columns;
-    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn << QnLicenseListModel::ExpiresInColumn;
+    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn  << QnLicenseListModel::LicenseStatusColumn;
 
     m_model = new QnLicenseListModel(this);
     m_model->setColumns(columns);
@@ -32,16 +32,15 @@ void QnLicenseNotificationDialog::setLicenses(const QList<QnLicensePtr> &license
 
     // TODO: #Elric this code does not belong here.
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    int expiredCount = 0;
+    int invalidCount = 0;
     foreach(const QnLicensePtr &license, licenses)
-        if(license->expirationTime() < currentTime)
-            expiredCount++;
+        if (!qnLicensePool->isLicenseValid(license))
+            invalidCount++;
 
-    if(expiredCount > 0) {
-        ui->label->setText(tr("Some of your licenses have expired."));
-    } else {
+    if(invalidCount > 0)
+        ui->label->setText(tr("Some of your licenses is unavailable."));
+    else
         ui->label->setText(tr("Some of your licenses will soon expire."));
-    }
 
     for(int c = 0; c < ui->treeView->model()->columnCount(); c++)
         ui->treeView->resizeColumnToContents(c);

@@ -6,7 +6,7 @@
 #include <utils/common/request_param.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/appcast/update_info.h>
-#include <utils/network/networkoptixmodulerevealcommon.h>
+#include <utils/network/modulefinder.h>
 #include <utils/math/space_mapper.h>
 
 #include <api/model/storage_space_reply.h>
@@ -130,6 +130,8 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnSoftwareVersion>();
     qRegisterMetaTypeStreamOperators<QnSoftwareVersion>();
+    qRegisterMetaType<QnSystemInformation>();
+    qRegisterMetaTypeStreamOperators<QnSystemInformation>();
     qRegisterMetaType<QnUpdateInfoItem>();
     qRegisterMetaType<QnUpdateInfoItemList>();
 
@@ -179,6 +181,8 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnConnectionInfo>();
     qRegisterMetaType<Qn::PanicMode>();
+
+    qRegisterMetaType<QnModuleInformation>();
 
     qRegisterMetaType<Qn::CameraDataType>();
 

@@ -65,7 +65,7 @@ QnTransactionLog* QnTransactionLog::instance()
     return globalInstance;
 }
 
-QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data2)
+QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data2) const
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(data1);
@@ -74,9 +74,9 @@ QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data
     return QUuid::fromRfc4122(hash.result());
 }
 
-QUuid QnTransactionLog::makeHash(const ApiCommand::Value command, const ApiCameraBookmarkTagDataList& data) {
+QUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) {
     QCryptographicHash hash(QCryptographicHash::Md5);
-    hash.addData(ApiCommand::toString(command).toUtf8());
+    hash.addData(extraData.toUtf8());
     for(const ApiCameraBookmarkTagData tag: data)
         hash.addData(tag.name.toUtf8());
     return QUuid::fromRfc4122(hash.result());
@@ -112,11 +112,13 @@ QnTranState QnTransactionLog::getTransactionsState()
     return m_state;
 }
 
-bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash)
+bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash) const
 {
+    QReadLocker lock(&m_dbManager->getMutex());
+
     if (m_state.value(tran.id.peerGUID) >= tran.id.sequence)
         return true;
-    QMap<QUuid, qint64>::iterator itr = m_updateHistory.find(hash);
+    QMap<QUuid, qint64>::const_iterator itr = m_updateHistory.find(hash);
     if (itr == m_updateHistory.end())
         return false;
 

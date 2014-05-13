@@ -7,7 +7,6 @@
 
 #include <api/model/connection_info.h>
 #include <nx_ec/ec_api.h>
-#include <utils/network/networkoptixmodulefinder.h>
 #include <utils/network/foundenterprisecontrollersmodel.h>
 
 #include <client/client_settings.h>
@@ -24,6 +23,7 @@ class QnWorkbenchContext;
 class QnAbstractArchiveReader;
 class QnResourceWidgetRenderer;
 class QnRenderingWidget;
+class ModuleInformation;
 
 namespace Ui {
     class LoginDialog;
@@ -86,9 +86,8 @@ private slots:
     void at_ec2ConnectFinished( int, ec2::ErrorCode, ec2::AbstractECConnectionPtr );
 #endif
 
-    void at_moduleFinder_moduleFound(const QString& moduleID, const QString& moduleVersion, const QString& systemName, 
-                                     const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed);
-    void at_moduleFinder_moduleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed );
+    void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress);
+    void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
 private:
     QScopedPointer<Ui::LoginDialog> ui;
@@ -101,7 +100,7 @@ private:
     QnConnectionInfoPtr m_connectInfo;
 
     QnRenderingWidget *m_renderingWidget;
-    NetworkOptixModuleFinder *m_moduleFinder;
+    QnModuleFinder *m_moduleFinder;
 
     struct QnEcData {
         QUrl url;

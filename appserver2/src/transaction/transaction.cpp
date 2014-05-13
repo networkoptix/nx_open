@@ -34,8 +34,8 @@ namespace ec2
                     return "getResource";
                 case setResourceStatus:
                     return "setResourceStatus";
-                case setResourceDisabled:
-                    return "setResourceDisabled";
+                //case setResourceDisabled:
+                //    return "setResourceDisabled";
                 case setResourceParams:
                     return "setResourceParams";
                 case getResourceParams:
@@ -143,6 +143,13 @@ namespace ec2
                     return "lockResponse";
                 case unlockRequest:
                     return "unlockRequest";
+
+                case uploadUpdate:
+                    return "uploadUpdate";
+                case uploadUpdateResponce:
+                    return "uploadUpdateResponce";
+                case installUpdate:
+                    return "installUpdate";
 
                 case addCameraBookmarkTags:
                     return "addCameraBookmarkTags";
