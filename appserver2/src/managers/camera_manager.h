@@ -77,7 +77,7 @@ namespace ec2
             QnCameraHistoryItemPtr cameraHistoryItem( new QnCameraHistoryItem(
                 tran.params.physicalId,
                 tran.params.timestamp,
-                tran.params.serverGuid ) );
+                tran.params.serverId ) );
             emit cameraHistoryChanged( cameraHistoryItem );
         }
 

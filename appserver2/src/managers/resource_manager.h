@@ -23,8 +23,7 @@ namespace ec2
         virtual int getResourceTypes( impl::GetResourceTypesHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::setResourceStatus
         virtual int setResourceStatus( const QnId& resourceId, QnResource::Status status, impl::SetResourceStatusHandlerPtr handler ) override;
-        //!Implementation of AbstractResourceManager::setResourceDisabled
-        virtual int setResourceDisabled( const QnId& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) override;
+        //virtual int setResourceDisabled( const QnId& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::getKvPairs
         virtual int getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler ) override;
         //!Implementation of AbstractResourceManager::save
@@ -47,9 +46,11 @@ namespace ec2
             emit statusChanged( QnId(tran.params.id), tran.params.status );
         }
 
+        /*
         void triggerNotification( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
             emit disabledChanged( QnId(tran.params.id), tran.params.disabled );
         }
+        */
 
         void triggerNotification( const QnTransaction<ApiResourceParamsData>& tran ) {
             QnKvPairList outData;
@@ -68,7 +69,7 @@ namespace ec2
         const ResourceContext& m_resCtx;
 
         QnTransaction<ApiSetResourceStatusData> prepareTransaction( ApiCommand::Value cmd, const QnId& id, QnResource::Status status);
-        QnTransaction<ApiSetResourceDisabledData> prepareTransaction( ApiCommand::Value command, const QnId& id, bool disabled );
+        //QnTransaction<ApiSetResourceDisabledData> prepareTransaction( ApiCommand::Value command, const QnId& id, bool disabled );
         QnTransaction<ApiResourceParamsData> prepareTransaction(ApiCommand::Value cmd, const QnId& id, const QnKvPairList& kvPairs);
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value cmd, const QnId& id);
         QnTransaction<ApiResourceData> prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource );

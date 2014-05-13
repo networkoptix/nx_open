@@ -26,7 +26,8 @@
 Q_GLOBAL_STATIC(QnAppServerConnectionFactory, qn_appServerConnectionFactory_instance)
 
 QnAppServerConnectionFactory::QnAppServerConnectionFactory(): 
-    m_defaultMediaProxyPort(0)
+    m_defaultMediaProxyPort(0),
+    m_prematureLicenseExperationDate(0)
 {}
 
 QnAppServerConnectionFactory::~QnAppServerConnectionFactory() {
@@ -68,6 +69,22 @@ void QnAppServerConnectionFactory::setSessionKey(const QByteArray& sessionKey)
         if (sessionKey != factory->m_sessionKey) {
             factory->m_prevSessionKey = factory->m_sessionKey;
             factory->m_sessionKey = sessionKey.trimmed();
+        }
+    }
+}
+
+qint64 QnAppServerConnectionFactory::prematureLicenseExperationDate()
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
+        return factory->m_prematureLicenseExperationDate;
+    return 0;
+}
+
+void QnAppServerConnectionFactory::setPrematureLicenseExperationDate(qint64 value)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        if (value != factory->m_prematureLicenseExperationDate) {
+            factory->m_prematureLicenseExperationDate = value;
         }
     }
 }

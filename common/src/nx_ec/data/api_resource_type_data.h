@@ -7,10 +7,10 @@
 namespace ec2 
 {
     struct ApiPropertyTypeData: ApiData {
-        QnId resource_type_id; // TODO: #API we don't use under_scores, we use camelCase.
+        QnId resourceTypeId;
 
         QString name;
-        int type; // TODO: #API use QnParamType::DataType
+        Qn::PropertyDataType type;
 
         // MinMaxStep
         qint32 min;
@@ -19,31 +19,31 @@ namespace ec2
 
         // Enumaration
         QString values;
-        QString ui_values; // TODO: #API camelCase
+        QString uiValues;
 
         // Value
-        QString default_value; // TODO: #API camelCase
+        QString defaultValue;
 
         QString group;
-        QString sub_group; // TODO: #API camelCase
+        QString subGroup;
         QString description;
 
         bool ui;
-        bool readonly; // TODO: #API camelCase => readOnly
+        bool readOnly;
 
-        QString netHelper; // TODO: #API I have no idea what this is. What is this, actually?
+        QString internalData; // additional parameter data used for internal software purpose
     };
-#define ApiPropertyTypeData_Fields (resource_type_id)(name)(type)(min)(max)(step)(values)(ui_values)(default_value)(group)(sub_group)(description)(ui)(readonly)(netHelper)
+#define ApiPropertyTypeData_Fields (resourceTypeId)(name)(type)(min)(max)(step)(values)(uiValues)(defaultValue)(group)(subGroup)(description)(ui)(readOnly)(internalData)
 
 
     struct ApiResourceTypeData: ApiData {
         QnId id;
         QString name;
-        QString manufacture; // TODO: #API and now it's our bad naming leaking out. Rename 'vendor'.
+        QString vendor;
         std::vector<QnId> parentId;
-        std::vector<ApiPropertyTypeData> propertyTypeList; // TODO: #API We don't use -List suffix, we use plurals. Rename 'propertyTypes'.
+        std::vector<ApiPropertyTypeData> propertyTypes;
     };
-#define ApiResourceTypeData_Fields (id)(name)(manufacture)(parentId)(propertyTypeList)
+#define ApiResourceTypeData_Fields (id)(name)(vendor)(parentId)(propertyTypes)
 
 }
 

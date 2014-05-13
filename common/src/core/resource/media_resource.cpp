@@ -135,8 +135,10 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
 void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&)
 {
     QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
-    if (other_casted)
+    if (other_casted) {
         m_dewarpingParams = other_casted->m_dewarpingParams;
+        m_customVideoLayout = other_casted->m_customVideoLayout;
+    }
 }
 
 QString QnMediaResource::customAspectRatioKey() {

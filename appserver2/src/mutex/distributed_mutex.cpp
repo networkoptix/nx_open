@@ -35,7 +35,7 @@ void QnDistributedMutexManager::setUserDataHandler(QnMutexUserDataHandler* userD
     m_userDataHandler = userDataHandler;
 }
 
-QnDistributedMutexPtr QnDistributedMutexManager::getLock(const QByteArray& name, int timeoutMs)
+QnDistributedMutexPtr QnDistributedMutexManager::getLock(const QString& name, int timeoutMs)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -53,7 +53,7 @@ QnDistributedMutexPtr QnDistributedMutexManager::getLock(const QByteArray& name,
     return netMutex;
 }
 
-void QnDistributedMutexManager::releaseMutex(const QByteArray& name)
+void QnDistributedMutexManager::releaseMutex(const QString& name)
 {
     m_mutexList.remove(name);
 }
@@ -146,28 +146,28 @@ void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCom
     qnTransactionBus->sendTransaction(tran, dstPeer);
 }
 
-void QnDistributedMutex::at_newPeerFound(QnId peer, bool isClient)
+void QnDistributedMutex::at_newPeerFound(ec2::ApiServerAliveData data)
 {
-    if (isClient)
+    if (data.isClient)
         return;
 
     QMutexLocker lock(&m_mutex);
-    Q_ASSERT(peer != qnCommon->moduleGUID());
+    Q_ASSERT(data.serverId != qnCommon->moduleGUID());
     if (!m_selfLock.isEmpty())
-        sendTransaction(m_selfLock, ApiCommand::lockRequest, peer);
+        sendTransaction(m_selfLock, ApiCommand::lockRequest, data.serverId);
 }
 
-void QnDistributedMutex::at_peerLost(QnId peer, bool isClient)
+void QnDistributedMutex::at_peerLost(ec2::ApiServerAliveData data)
 {
-    if (isClient)
+    if (data.isClient)
         return;
 
     QMutexLocker lock(&m_mutex);
 
-    m_proccesedPeers.remove(peer);
+    m_proccesedPeers.remove(data.serverId);
     for (LockedMap::iterator itr = m_peerLockInfo.begin(); itr != m_peerLockInfo.end();)
     {
-        if (itr.key().peer == peer)
+        if (itr.key().peer == data.serverId)
             itr = m_peerLockInfo.erase(itr);
         else
             ++itr;
@@ -181,7 +181,7 @@ void QnDistributedMutex::at_timeout()
     emit lockTimeout(m_name);
 }
 
-void QnDistributedMutex::lockAsync(const QByteArray& name, int timeoutMs)
+void QnDistributedMutex::lockAsync(const QString& name, int timeoutMs)
 {
     QMutexLocker lock(&m_mutex);
     

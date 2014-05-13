@@ -13,8 +13,7 @@
 #include <camera/loaders/abstract_camera_data_loader.h>
 
 #include <recording/time_period.h>
-
-class QnTimePeriodList;
+#include <recording/time_period_list.h>
 
 /**
  * Per-camera data loader that caches loaded data. 

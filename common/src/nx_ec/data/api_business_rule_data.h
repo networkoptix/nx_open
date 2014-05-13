@@ -37,7 +37,7 @@ namespace ec2
 
     struct ApiBusinessActionData: ApiData
     {
-        qint32 actionType; // TODO: #API use QnBusiness::ActionType
+        QnBusiness::ActionType actionType;
         QnBusiness::EventState toggleState;
         bool receivedFromRemoteHost;
         std::vector<QnId> resourceIds;

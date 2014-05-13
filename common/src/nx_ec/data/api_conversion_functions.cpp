@@ -145,7 +145,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setMotionType(src.motionType);
 
     QList<QnMotionRegion> regions;
-    parseMotionRegionList(regions, src.region);
+    parseMotionRegionList(regions, src.motionMask);
     dst->setMotionRegionList(regions, QnDomainMemory);
 
     dst->setMAC(QnMacAddress(src.mac));
@@ -185,7 +185,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.motionType = src->getMotionType();
 
     QList<QnMotionRegion> regions;
-    dst.region = serializeMotionRegionList(src->getMotionRegionList()).toLatin1();
+    dst.motionMask = serializeMotionRegionList(src->getMotionRegionList()).toLatin1();
     dst.mac = src->getMAC().toString().toLatin1();
     dst.login = src->getAuth().user();
     dst.password = src->getAuth().password();
@@ -241,23 +241,23 @@ void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraData
 
 void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst) {
     dst.physicalId = src.physicalId;
-    dst.serverGuid = src.mediaServerGuid;
+    dst.serverId = src.mediaServerGuid;
     dst.timestamp = src.timestamp;
 }
 
 void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst) {
     dst.physicalId = src.physicalId;
-    dst.mediaServerGuid = src.serverGuid;
+    dst.mediaServerGuid = src.serverId;
     dst.timestamp = src.timestamp;
 }
 
 void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst) {
     /* CameraMAC -> (Timestamp -> ServerGuid). */
-    QMap<QString, QMap<qint64, QString> > history;
+    QMap<QString, QMap<qint64, QByteArray> > history;
 
     /* Fill temporary history map. */
     for (auto pos = src.begin(); pos != src.end(); ++pos)
-        history[pos->physicalId][pos->timestamp] = pos->serverGuid;
+        history[pos->physicalId][pos->timestamp] = pos->serverId;
 
     for(auto pos = history.begin(); pos != history.end(); ++pos) {
         QnCameraHistoryPtr cameraHistory = QnCameraHistoryPtr(new QnCameraHistory());
@@ -265,7 +265,7 @@ void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHisto
         if (pos.value().isEmpty())
             continue;
 
-        QMapIterator<qint64, QString> camit(pos.value());
+        QMapIterator<qint64, QByteArray> camit(pos.value());
         camit.toFront();
 
         qint64 duration;
@@ -323,20 +323,20 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
 
 
 void fromApiToResource(const ApiLayoutItemData &src, QnLayoutItemData &dst) {
-    dst.uuid = src.uuid;
+    dst.uuid = src.id;
     dst.flags = src.flags;
     dst.combinedGeometry = QRectF(QPointF(src.left, src.top), QPointF(src.right, src.bottom));
     dst.rotation = src.rotation;
     dst.resource.id =  src.resourceId;
     dst.resource.path = src.resourcePath;
     dst.zoomRect = QRectF(QPointF(src.zoomLeft, src.zoomTop), QPointF(src.zoomRight, src.zoomBottom));
-    dst.zoomTargetUuid = src.zoomTargetUuid;
+    dst.zoomTargetUuid = src.zoomTargetId;
     dst.contrastParams = ImageCorrectionParams::deserialize(src.contrastParams);
     dst.dewarpingParams = QJson::deserialized<QnItemDewarpingParams>(src.dewarpingParams);
 }
 
 void fromResourceToApi(const QnLayoutItemData &src, ApiLayoutItemData &dst) {
-    dst.uuid = src.uuid.toByteArray();
+    dst.id = src.uuid.toByteArray();
     dst.flags = src.flags;
     dst.left = src.combinedGeometry.topLeft().x();
     dst.top = src.combinedGeometry.topLeft().y();
@@ -349,7 +349,7 @@ void fromResourceToApi(const QnLayoutItemData &src, ApiLayoutItemData &dst) {
     dst.zoomTop = src.zoomRect.topLeft().y();
     dst.zoomRight = src.zoomRect.bottomRight().x();
     dst.zoomBottom = src.zoomRect.bottomRight().y();
-    dst.zoomTargetUuid = src.zoomTargetUuid.toByteArray();
+    dst.zoomTargetId = src.zoomTargetUuid.toByteArray();
     dst.contrastParams = src.contrastParams.serialize();
     dst.dewarpingParams = QJson::serialized(src.dewarpingParams);
 }
@@ -359,8 +359,8 @@ void fromApiToResource(const ApiLayoutData &src, QnLayoutResourcePtr &dst) {
     fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 
     dst->setCellAspectRatio(src.cellAspectRatio);
-    dst->setCellSpacing(src.cellSpacingWidth, src.cellSpacingHeight);
-    dst->setUserCanEdit(src.userCanEdit);
+    dst->setCellSpacing(src.horizontalSpacing, src.verticalSpacing);
+    dst->setUserCanEdit(src.editable);
     dst->setLocked(src.locked);
     dst->setBackgroundImageFilename(src.backgroundImageFilename);
     dst->setBackgroundSize(QSize(src.backgroundWidth, src.backgroundHeight));
@@ -378,9 +378,9 @@ void fromResourceToApi(const QnLayoutResourcePtr &src, ApiLayoutData &dst) {
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
     dst.cellAspectRatio = src->cellAspectRatio();
-    dst.cellSpacingWidth = src->cellSpacing().width();
-    dst.cellSpacingHeight = src->cellSpacing().height();
-    dst.userCanEdit = src->userCanEdit();
+    dst.horizontalSpacing = src->cellSpacing().width();
+    dst.verticalSpacing = src->cellSpacing().height();
+    dst.editable = src->userCanEdit();
     dst.locked = src->locked();
     dst.backgroundImageFilename = src->backgroundImageFilename();
     dst.backgroundWidth = src->backgroundSize().width();
@@ -479,14 +479,14 @@ void fromApiToResource(const ApiStorageData &src, QnAbstractStorageResourcePtr &
 void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &dst) {
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
-    dst.netAddrList = serializeNetAddrList(src->getNetAddrList());
+    dst.networkAddresses = serializeNetAddrList(src->getNetAddrList());
     dst.apiUrl = src->getApiUrl();
     dst.flags = src->getServerFlags();
     dst.panicMode = src->getPanicMode();
     dst.streamingUrl = src->getStreamingUrl();
     dst.version = src->getVersion().toString();
     dst.maxCameras = src->getMaxCameras();
-    dst.redundancy = src->isRedundancy();
+    dst.allowAutoRedundancy = src->isRedundancy();
     //authKey = resource->getAuthKey();
 
     QnAbstractStorageResourceList storageList = src->getStorages();
@@ -500,7 +500,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 
     QList<QHostAddress> resNetAddrList;
-    deserializeNetAddrList(resNetAddrList, src.netAddrList);
+    deserializeNetAddrList(resNetAddrList, src.networkAddresses);
 
     dst->setApiUrl(src.apiUrl);
     dst->setNetAddrList(resNetAddrList);
@@ -509,7 +509,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setStreamingUrl(src.streamingUrl);
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setMaxCameras(src.maxCameras);
-    dst->setRedundancy(src.redundancy);
+    dst->setRedundancy(src.allowAutoRedundancy);
     //dst->setAuthKey(authKey);
 
     QnResourceTypePtr resType = ctx.resTypePool->getResourceTypeByName(lit("Storage"));
@@ -573,7 +573,7 @@ void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
     dst->setStatus(src.status, true);
 
     for(const ApiResourceParamData &srcParam: src.addParams) {
-        if (srcParam.isResTypeParam)
+        if (srcParam.predefinedParam)
             dst->setParam(srcParam.name, srcParam.value, QnDomainDatabase);
         else
             dst->setProperty(srcParam.name, srcParam.value);
@@ -605,35 +605,35 @@ void fromApiToResourceList(const ApiResourceParamDataList &src, QnKvPairList &ds
 void fromApiToResource(const ApiPropertyTypeData &src, QnParamTypePtr &dst) {
     //resource->id = id;
     dst->name = src.name;
-    dst->type = (QnParamType::DataType) src.type;
+    dst->type = src.type;
     dst->min_val = src.min;
     dst->max_val = src.max;
     dst->step = src.step;
     foreach(const QString &val, src.values.split(QLatin1Char(',')))
         dst->possible_values << val.trimmed();
-    foreach(const QString &val, src.ui_values.split(QLatin1Char(',')))
+    foreach(const QString &val, src.uiValues.split(QLatin1Char(',')))
         dst->ui_possible_values << val.trimmed();
-    dst->default_value = src.default_value;
+    dst->default_value = src.defaultValue;
     dst->group = src.group;
-    dst->subgroup = src.sub_group;
+    dst->subgroup = src.subGroup;
     dst->description = src.description;
     dst->ui = src.ui;
-    dst->isReadOnly = src.readonly;
-    dst->paramNetHelper = src.netHelper;
+    dst->isReadOnly = src.readOnly;
+    dst->paramNetHelper = src.internalData;
 }
 
 
 void fromApiToResource(const ApiResourceTypeData &src, QnResourceTypePtr &dst) {
     dst->setId(src.id);
     dst->setName(src.name);
-    dst->setManufacture(src.manufacture);
+    dst->setManufacture(src.vendor);
 
     if (!src.parentId.empty())
         dst->setParentId(src.parentId[0]);
     for (int i = 1; i < src.parentId.size(); ++i)
         dst->addAdditionalParent(src.parentId[i]);
 
-    for(const ApiPropertyTypeData &p: src.propertyTypeList) {
+    for(const ApiPropertyTypeData &p: src.propertyTypes) {
         QnParamTypePtr param(new QnParamType());
         fromApiToResource(p, param);
         dst->addParamType(param);
@@ -658,7 +658,7 @@ void fromApiToResource(const ApiUserData &src, QnUserResourcePtr &dst) {
     dst->setEmail(src.email);
     dst->setHash(src.hash);
 
-    dst->setPermissions(src.rights);
+    dst->setPermissions(src.permissions);
     dst->setDigest(src.digest);
 }
 
@@ -683,7 +683,7 @@ void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
     }
 
     dst.isAdmin = src->isAdmin();
-    dst.rights = src->getPermissions();
+    dst.permissions = src->getPermissions();
     dst.email = src->getEmail();
 }
 

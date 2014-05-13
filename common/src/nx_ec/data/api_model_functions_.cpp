@@ -18,7 +18,6 @@
 #include "api_media_server_data.h"
 #include "api_resource_data.h"
 #include "api_resource_type_data.h"
-#include "api_runtime_data.h"
 #include "api_server_alive_data.h"
 #include "api_server_info_data.h"
 #include "api_stored_file_data.h"
@@ -30,6 +29,8 @@ template<class T, class Allocator>
 inline void serialize_field(const std::vector<T, Allocator> &, QVariant *) { return; }
 template<class Key, class T, class Predicate, class Allocator>
 inline void serialize_field(const std::map<Key, T, Predicate, Allocator> &, QVariant *) { return; }
+template<class Key, class T>
+inline void serialize_field(const QMap<Key, T> &, QVariant *) { return; }
 template<class T>
 inline void serialize_field(const QList<T> &, QVariant *) { return; }
 inline void serialize_field(const ec2::ApiServerInfoData &, QVariant *) { return; }
@@ -38,6 +39,8 @@ template<class T, class Allocator>
 inline void deserialize_field(const QVariant &, std::vector<T, Allocator> *) { return; }
 template<class Key, class T, class Predicate, class Allocator>
 inline void deserialize_field(const QVariant &, std::map<Key, T, Predicate, Allocator> *) { return; }
+template<class Key, class T>
+inline void deserialize_field(const QVariant &, QMap<Key, T> *) { return; }
 template<class T>
 inline void deserialize_field(const QVariant &, QList<T> *) { return; }
 inline void deserialize_field(const QVariant &, ec2::ApiServerInfoData *) { return; }
