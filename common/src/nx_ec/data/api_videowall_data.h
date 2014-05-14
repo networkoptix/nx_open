@@ -6,35 +6,31 @@
 
 namespace ec2
 {
-
-    // TODO: #API totally awful naming here. Use camelCase.
-
     struct ApiVideowallItemData {
         QnId guid;
-        QnId pc_guid;
-        QnId layout_guid;
+        QnId pcGuid;
+        QnId layoutGuid;
         QString name;
-        int x;
-        int y;
-        int w;
-        int h;
+        int left;
+        int top;
+        int width;
+        int height;
     };
-#define ApiVideowallItemData_Fields (guid)(pc_guid)(layout_guid)(name)(x)(y)(w)(h)
-
+#define ApiVideowallItemData_Fields (guid)(pcGuid)(layoutGuid)(name)(left)(top)(width)(height)
 
     struct ApiVideowallScreenData {
-        QnId pc_guid;
-        int pc_index;
-        int desktop_x;
-        int desktop_y;
-        int desktop_w;
-        int desktop_h;
-        int layout_x;
-        int layout_y;
-        int layout_w;
-        int layout_h;
+        QnId pcGuid;
+        int pcIndex;
+        int desktopLeft;
+        int desktopTop;
+        int desktopWidth;
+        int desktopHeight;
+        int layoutLeft;
+        int layoutTop;
+        int layoutWidth;
+        int layoutHeight;
     };
-#define ApiVideowallScreenData_Fields (pc_guid)(pc_index)(desktop_x)(desktop_y)(desktop_w)(desktop_h)(layout_x)(layout_y)(layout_w)(layout_h)
+#define ApiVideowallScreenData_Fields (pcGuid)(pcIndex)(desktopLeft)(desktopTop)(desktopWidth)(desktopHeight)(layoutLeft)(layoutTop)(layoutWidth)(layoutHeight)
 
 
     struct ApiVideowallData: ApiResourceData
@@ -51,23 +47,23 @@ namespace ec2
 
     struct ApiVideowallControlMessageData {
         int operation;
-        QnId videowall_guid;
-        QnId instance_guid;
+        QnId videowallGuid;
+        QnId instanceGuid;
         std::map<QString, QString> params;
     };
-#define ApiVideowallControlMessageData_Fields (operation)(videowall_guid)(instance_guid)(params)
+#define ApiVideowallControlMessageData_Fields (operation)(videowallGuid)(instanceGuid)(params)
 
 
     struct ApiVideowallItemWithRefData: public ApiVideowallItemData {
-        QnId videowall_guid;
+        QnId videowallGuid;
     };
-#define ApiVideowallItemWithRefData_Fields ApiVideowallItemData_Fields (videowall_guid)
+#define ApiVideowallItemWithRefData_Fields ApiVideowallItemData_Fields (videowallGuid)
 
 
     struct ApiVideowallScreenWithRefData: public ApiVideowallScreenData {
-        QnId videowall_guid;
+        QnId videowallGuid;
     };
-#define ApiVideowallScreenWithRefData_Fields ApiVideowallScreenData_Fields (videowall_guid)
+#define ApiVideowallScreenWithRefData_Fields ApiVideowallScreenData_Fields (videowallGuid)
 
 } // namespace ec2
 

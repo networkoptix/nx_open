@@ -1697,7 +1697,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     QString filter; // todo: add data filtering by user here
     query.setForwardOnly(true);
     query.prepare(QString("SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
-                          l.autorun, l.resource_ptr_id as id \
+                          l.autorun \
                           FROM vms_videowall l \
                           JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.id").arg(filter));
     if (!query.exec()) {
@@ -1709,8 +1709,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     QSqlQuery queryItems(m_sdb);
     queryItems.setForwardOnly(true);
     queryItems.prepare("SELECT \
-                       item.guid, item.pc_guid, item.layout_guid, item.videowall_guid, \
-                       item.name, item.x, item.y, item.w, item.h \
+                       item.guid, item.pc_guid as pcGuid, item.layout_guid as layoutGuid, \
+                       item.videowall_guid as videowallGuid, item.name, \
+                       item.x as left, item.y as top, item.w as width, item.h as height \
                        FROM vms_videowall_item item");
     if (!queryItems.exec()) {
         qWarning() << Q_FUNC_INFO << queryItems.lastError().text();
@@ -1719,16 +1720,18 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     std::vector<ApiVideowallItemWithRefData> items;
     QnSql::fetch_many(queryItems, &items);
 
-    mergeObjectListData(videowallList, items, &ApiVideowallData::items, &ApiVideowallItemWithRefData::videowall_guid);
+    mergeObjectListData(videowallList, items, &ApiVideowallData::items, &ApiVideowallItemWithRefData::videowallGuid);
     
     QSqlQuery queryScreens(m_sdb);
     queryScreens.setForwardOnly(true);
-    // todo: #GDM remove unused columns
+
     queryScreens.prepare("SELECT \
-                         pc.videowall_guid, pc.pc_guid, \
-                         screen.pc_guid, screen.pc_index, \
-                         screen.desktop_x, screen.desktop_y, screen.desktop_w, screen.desktop_h, \
-                         screen.layout_x, screen.layout_y, screen.layout_w, screen.layout_h \
+                         pc.videowall_guid as videowallGuid, \
+                         screen.pc_guid as pcGuid, screen.pc_index as pcIndex, \
+                         screen.desktop_x as desktopLeft, screen.desktop_y as desktopTop, \
+                         screen.desktop_w as desktopWidth, screen.desktop_h as desktopHeight, \
+                         screen.layout_x as layoutLeft, screen.layout_y as layoutTop, \
+                         screen.layout_w as layoutWidth, screen.layout_h as layoutHeight \
                          FROM vms_videowall_screen screen \
                          JOIN vms_videowall_pcs pc on pc.pc_guid = screen.pc_guid");
     if (!queryScreens.exec()) {
@@ -1737,7 +1740,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     }
     std::vector<ApiVideowallScreenWithRefData> screens;
     QnSql::fetch_many(queryScreens, &screens);
-    mergeObjectListData(videowallList, screens, &ApiVideowallData::screens, &ApiVideowallScreenWithRefData::videowall_guid);
+    mergeObjectListData(videowallList, screens, &ApiVideowallData::screens, &ApiVideowallScreenWithRefData::videowallGuid);
 
     return ErrorCode::ok;
 }
@@ -2085,7 +2088,7 @@ ErrorCode QnDbManager::updateVideowallItems(const ApiVideowallData& data) {
     insQuery.prepare("INSERT INTO vms_videowall_item \
                      (guid, pc_guid, layout_guid, videowall_guid, name, x, y, w, h) \
                      VALUES \
-                     (:guid, :pc_guid, :layout_guid, :videowall_guid, :name, :x, :y, :w, :h)");
+                     (:guid, :pcGuid, :layoutGuid, :videowall_guid, :name, :left, :top, :width, :height)");
     foreach(const ApiVideowallItemData& item, data.items)
     {
         QnSql::bind(item, &insQuery);
@@ -2113,14 +2116,14 @@ ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowallData& data) {
                       desktop_x, desktop_y, desktop_w, desktop_h, \
                       layout_x, layout_y, layout_w, layout_h) \
                       VALUES \
-                      (:pc_guid, :pc_index, \
-                      :desktop_x, :desktop_y, :desktop_w, :desktop_h, \
-                      :layout_x, :layout_y, :layout_w, :layout_h)");
+                      (:pcGuid, :pcIndex, \
+                      :desktopLeft, :desktopTop, :desktopWidth, :desktopHeight, \
+                      :layoutLeft, :layoutTop, :layoutWidth, :layoutHeight)");
 
         foreach(const ApiVideowallScreenData& screen, data.screens)
         {
             QnSql::bind(screen, &query);
-            pcUuids << screen.pc_guid;
+            pcUuids << screen.pcGuid;
             if (!query.exec()) {
                 qWarning() << Q_FUNC_INFO << query.lastError().text();
                 return ErrorCode::failure;

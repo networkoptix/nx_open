@@ -758,6 +758,8 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         {
             NX_LOG( lit("QnMain::run(). Can't get media servers."), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
         foreach(const QnMediaServerResourcePtr &mediaServer, mediaServerList) 
             messageProcessor->updateResource(mediaServer);
@@ -770,7 +772,9 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QnId(), &cameras)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(10000);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
 
         QnManualCameraInfoMap manualCameras;
@@ -789,7 +793,9 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         while (( rez = ec2Connection->getCameraManager()->getCameraHistoryListSync(&cameraHistoryList)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(1000);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
 
         foreach(QnCameraHistoryPtr history, cameraHistoryList)
@@ -803,6 +809,8 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         {
             qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
 
         foreach(const QnUserResourcePtr &user, users)
@@ -816,6 +824,8 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         {
             qDebug() << "QnMain::run(): Can't get videowalls. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
 
         foreach(const QnVideoWallResourcePtr &videowall, videowalls)
@@ -829,6 +839,8 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         {
             qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
 
         foreach(const QnBusinessEventRulePtr &rule, rules)
@@ -842,6 +854,8 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         {
             qDebug() << "QnMain::run(): Can't get license list. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
 
         foreach(const QnLicensePtr &license, licenses)
