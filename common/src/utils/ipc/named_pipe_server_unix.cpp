@@ -82,7 +82,7 @@ SystemError::ErrorCode NamedPipeServer::listen( const QString& pipeName )
     \param timeoutMillis max time to wait for incoming connection (millis)
     \param sock If return value \a SystemError::noError, \a *sock is assigned with newly-created socket. It must be freed by calling party
 */
-SystemError::ErrorCode NamedPipeServer::accept( NamedPipeSocket** sock, int timeoutMillis )
+SystemError::ErrorCode NamedPipeServer::accept( NamedPipeSocket** sock, int /*timeoutMillis*/ )
 {
     //TODO/IMPL: #ak timeoutMillis support
 

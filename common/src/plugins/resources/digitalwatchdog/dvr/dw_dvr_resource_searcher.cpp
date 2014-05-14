@@ -34,7 +34,7 @@ DwDvrResourceSearcher& DwDvrResourceSearcher::instance()
     return inst;
 }
 
-QnResourcePtr DwDvrResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
+QnResourcePtr DwDvrResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 

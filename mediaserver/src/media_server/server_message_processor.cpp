@@ -165,7 +165,7 @@ bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
 * EC2 related processing. Need move to other class
 */
 
-void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy)
+void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool /*isProxy*/)
 {
     QnResourcePtr res = qnResPool->getResourceById(data.serverId);
     if (res)

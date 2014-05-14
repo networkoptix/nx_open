@@ -220,7 +220,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     return result;
 }
 
-QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
+QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnResourcePtr result;
 

@@ -77,13 +77,13 @@ bool QnThirdPartyPtzController::getPosition(Qn::PtzCoordinateSpace space, QVecto
     return true;
 }
 
-bool QnThirdPartyPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits)
+bool QnThirdPartyPtzController::getLimits(Qn::PtzCoordinateSpace /*space*/, QnPtzLimits* /*limits*/)
 {
     //TODO/IMPL
     return false;
 }
 
-bool QnThirdPartyPtzController::getFlip(Qt::Orientations *flip)
+bool QnThirdPartyPtzController::getFlip(Qt::Orientations* /*flip*/)
 {
     //TODO/IMPL
     return false;

@@ -1072,7 +1072,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowall
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiUpdateUploadResponceData> &tran) {
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiUpdateUploadResponceData>& /*tran*/) {
     return ErrorCode::ok;
 }
 

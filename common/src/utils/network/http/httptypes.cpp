@@ -513,6 +513,8 @@ namespace nx_http
             case MessageType::response:
                 response->serialize( &str );
                 break;
+            default:
+                break;
         }
         return str;
     }

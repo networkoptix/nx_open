@@ -92,7 +92,7 @@ private:
     //!index - is a \a MediaQuality element
     std::vector<QSharedPointer<nx_hls::HLSLivePlaylistManager> > m_hlsLivePlaylistManager;
 
-    QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCatalog catalog);
+    QnLiveStreamProviderPtr getLiveReaderNonSafe(QnServer::ChunksCatalog catalog);
     bool ensureLiveCacheStarted(
         MediaQuality streamQuality,
         QnLiveStreamProviderPtr primaryReader,

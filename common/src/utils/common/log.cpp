@@ -270,7 +270,7 @@ void QnLog::log(QnLogLevel logLevel, const char* format, ...) {
     va_end(args);
 }
 
-void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg) {
+void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& /*ctx*/, const QString& msg) {
     //TODO: #Elric use ctx
 
     QnLogLevel logLevel;

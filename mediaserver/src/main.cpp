@@ -1300,7 +1300,6 @@ void QnMain::run()
 
     syncStoragesToSettings(m_mediaServer);
 
-    int status;
     do {
     } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), QnResource::Online) != ec2::ErrorCode::ok);
 

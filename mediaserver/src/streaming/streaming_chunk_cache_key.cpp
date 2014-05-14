@@ -39,8 +39,8 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     m_containerFormat( containerFormat ),
     m_startTimestamp( startTimestamp ),
     m_duration( duration ),
-    m_isLive( false ),
-    m_streamQuality( streamQuality )
+    m_streamQuality( streamQuality ),
+    m_isLive( false )
     //,m_auxiliaryParams( auxiliaryParams )
 {
     Q_ASSERT( !containerFormat.isEmpty() );

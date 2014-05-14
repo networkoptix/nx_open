@@ -44,7 +44,7 @@ bool QnExtIODeviceStorageResource::removeFile( const QString& path )
     return true;
 }
 
-QFileInfoList QnExtIODeviceStorageResource::getFileList( const QString& dirName )
+QFileInfoList QnExtIODeviceStorageResource::getFileList( const QString& /*dirName*/ )
 {
     //TODO/IMPL
     return QFileInfoList();
