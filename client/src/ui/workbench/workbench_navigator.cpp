@@ -1331,7 +1331,7 @@ void QnWorkbenchNavigator::updateLoaderPeriods(QnCachingCameraDataLoader *loader
     if(m_syncedResources.contains(resource))
         updateSyncedPeriods(type);
 
-    if(m_centralWidget && m_centralWidget->resource() == resource && type == Qn::RecordedTimePeriod)
+    if(m_centralWidget && m_centralWidget->resource() == resource && type == Qn::RecordingContent)
         updateThumbnailsLoader();
 }
 

@@ -265,7 +265,7 @@ protected:
             return false;
         }
 
-        if(result.type() != QMetaType::QColor)
+        if(static_cast<QMetaType::Type>(result.type()) != QMetaType::QColor)
             return false;
 
         *static_cast<QColor *>(target) = *static_cast<QColor *>(result.data());

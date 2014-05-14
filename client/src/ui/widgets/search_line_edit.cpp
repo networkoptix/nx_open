@@ -70,7 +70,7 @@ namespace {
             setCursor(Qt::ArrowCursor);
         }
 
-        void QnArrowButton::paintEvent(QPaintEvent *event) {
+        void paintEvent(QPaintEvent *event) {
             Q_UNUSED(event);
             QPainter painter(this);
             int size = height(); //assuming height and width are equal
