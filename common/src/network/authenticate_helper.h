@@ -20,19 +20,19 @@ public:
     static void initStaticInstance(QnAuthHelper* instance);
     static QnAuthHelper* instance();
     
-    bool authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response, bool isProxy = false);
+    bool authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false);
 
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &);
 
 private:
-    void addAuthHeader(nx_http::HttpResponse& responseHeaders, bool isProxy);
+    void addAuthHeader(nx_http::Response& responseHeaders, bool isProxy);
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce) const;
-    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::HttpResponse& responseHeaders, bool isProxy);
-    bool doBasicAuth(const QByteArray& authData, nx_http::HttpResponse& responseHeaders);
-    bool doCustomAuthorization(const QByteArray& authData, nx_http::HttpResponse& response, const QByteArray& sesionKey);
+    bool doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy);
+    bool doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders);
+    bool doCustomAuthorization(const QByteArray& authData, nx_http::Response& response, const QByteArray& sesionKey);
 
 private:
     QMutex m_mutex;

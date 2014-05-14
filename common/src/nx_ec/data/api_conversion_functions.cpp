@@ -683,6 +683,12 @@ void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
         md5.addData(QString(lit("%1:NetworkOptix:%2")).arg(src->getName(), password).toLatin1());
         dst.digest = md5.result().toHex();
     }
+    else
+    {
+        //hash and digest already calculated?
+        dst.hash = src->getHash();
+        dst.digest = src->getDigest();
+    }
 
     dst.isAdmin = src->isAdmin();
     dst.permissions = src->getPermissions();

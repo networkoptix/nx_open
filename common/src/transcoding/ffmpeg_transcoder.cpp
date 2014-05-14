@@ -105,6 +105,7 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
         qWarning() << m_lastErrMessage;
         return -1;
     }
+    //outputCtx->flags |= AVFMT_VARIABLE_FPS;
 
     int err = avformat_alloc_output_context2(&m_formatCtx, outputCtx, 0, "");
     if (err != 0)
@@ -175,10 +176,9 @@ int QnFfmpegTranscoder::open(QnConstCompressedVideoDataPtr video, QnConstCompres
             if (video->context && video->context->ctx()) {
                 avcodec_copy_context(m_videoEncoderCodecCtx, video->context->ctx());
             }
-            else {
-                m_videoEncoderCodecCtx->width = videoWidth;
-                m_videoEncoderCodecCtx->height = videoHeight;
-            }
+
+            m_videoEncoderCodecCtx->width = videoWidth;
+            m_videoEncoderCodecCtx->height = videoHeight;
             m_videoEncoderCodecCtx->bit_rate = videoWidth * videoHeight; // auto fill bitrate. 2Mbit for full HD, 1Mbit for 720x768
         }
         m_videoEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;

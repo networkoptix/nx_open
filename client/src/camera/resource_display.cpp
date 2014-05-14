@@ -131,10 +131,10 @@ void QnResourceDisplay::disconnectFromResource() {
 
 QnConstResourceVideoLayoutPtr QnResourceDisplay::videoLayout() const {
     if(m_mediaProvider == NULL)
-        return NULL;
+        return QnConstResourceVideoLayoutPtr();
 
     if(m_mediaResource == NULL)
-        return NULL;
+        return QnConstResourceVideoLayoutPtr();
 
     return m_mediaResource->getVideoLayout(m_mediaProvider);
 }

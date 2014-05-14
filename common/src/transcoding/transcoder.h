@@ -172,7 +172,7 @@ public:
     * @param bitrate Bitrate after transcode. By default bitrate is autodetected
     * @param addition codec params. Not used if directStreamCopy = true
     */
-    virtual bool setAudioCodec(CodecID codec, TranscodeMethod method);
+    virtual int setAudioCodec(CodecID codec, TranscodeMethod method);
 
     /*
     * Transcode media data and write it to specified QnByteArray
@@ -240,5 +240,7 @@ private:
     int m_eofCounter;
     bool m_packetizedMode;
 };
+
+typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
 
 #endif  // __TRANSCODER_H

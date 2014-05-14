@@ -52,7 +52,7 @@ namespace nx_http
         return m_asyncHttpClient->state() != AsyncHttpClient::sFailed;
     }
 
-    const HttpResponse* HttpClient::response() const
+    const Response* HttpClient::response() const
     {
         return m_asyncHttpClient->response();
     }

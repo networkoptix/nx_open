@@ -60,7 +60,7 @@ private:
 private:
     QFile m_currentFile;
     qint64 m_totalContentLength;
-    std::shared_ptr<QnDefaultResourceVideoLayout> m_defaultVideoLayout;
+    QSharedPointer<QnDefaultResourceVideoLayout> m_defaultVideoLayout;
 };
 
 #endif // QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H

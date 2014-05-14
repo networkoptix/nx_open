@@ -107,6 +107,8 @@
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
 
+#include <streaming/hls/hls_server.h>
+
 #include <rtsp/rtsp_connection.h>
 #include <rtsp/rtsp_listener.h>
 
@@ -174,8 +176,16 @@ class CmdLineArguments
 {
 public:
     QString logLevel;
+    //!Log level of http requests log
+    QString msgLogLevel;
     QString rebuildArchive;
     QString devModeKey;
+
+    CmdLineArguments()
+    :
+        msgLogLevel( lit("none") )
+    {
+    }
 };
 
 static CmdLineArguments cmdLineArguments;
@@ -558,7 +568,24 @@ int serverMain(int argc, char *argv[])
 
     initLog(cmdLineArguments.logLevel);
 
-    if (cmdLineArguments.rebuildArchive == "all")
+    QString logLevel;
+    QString rebuildArchive;
+
+    QnCommandLineParser commandLineParser;
+    commandLineParser.addParameter(&logLevel, "--log-level", NULL, QString());
+    commandLineParser.addParameter(&rebuildArchive, "--rebuild", NULL, QString(), "all");
+    commandLineParser.parse(argc, argv, stderr);
+
+    QnLog::initLog(logLevel);
+
+    if( cmdLineArguments.msgLogLevel != lit("none") )
+        QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
+            dataLocation + QLatin1String("/log/http_log"),
+            10*1024*1024,
+            5,
+            QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
+
+    if (rebuildArchive == "all")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
     else if (cmdLineArguments.rebuildArchive == "hq")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_HQ);
@@ -978,6 +1005,7 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
+    m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
     //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
     //m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("HTTP", "*");
 
@@ -1646,6 +1674,7 @@ int main(int argc, char* argv[])
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, QString());
+    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--msg-log-level", NULL, QString(), "none");
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, QString(), "all");
     //commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
     commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, QString());
@@ -1694,6 +1723,7 @@ static void printHelp()
 #else
             "INFO\n"
 #endif
+        "  --msg-log-level          Log value for http_log.log. Supported values same as above. Default is none (no logging)\n"
         "  --rebuild                Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)\n"
         "  --conf-file              Path to config file. By default "<<MSSettings::defaultROSettingsFilePath().toStdString()<<"\n"
         "  --runtime-conf-file      Path to config file which is used to save some. By default "<<MSSettings::defaultRunTimeSettingsFilePath().toStdString()<<"\n"

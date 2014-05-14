@@ -305,13 +305,13 @@ qint64 QnColdStoreDelegate::seek(qint64 time, bool findIFrame)
 
 }
 
-static std::shared_ptr<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
 QnResourceVideoLayoutPtr QnColdStoreDelegate::getVideoLayout()
 {
     return defaultVideoLayout;
 }
 
-static std::shared_ptr<QnEmptyResourceAudioLayout> defaultAudioLayout( new QnEmptyResourceAudioLayout() );
+static QSharedPointer<QnEmptyResourceAudioLayout> defaultAudioLayout( new QnEmptyResourceAudioLayout() );
 QnResourceAudioLayoutPtr QnColdStoreDelegate::getAudioLayout()
 {
     return defaultAudioLayout;

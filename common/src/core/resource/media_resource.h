@@ -12,6 +12,8 @@
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
+class MediaStreamCache;
+class MediaIndex;
 
 namespace Qn {
 

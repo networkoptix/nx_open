@@ -240,7 +240,7 @@ namespace detail
         {
             //downloading has been interrupted unexpectedly
             setResult( ResultCode::downloadFailure );
-            const nx_http::HttpResponse *response = httpClient->response();
+            const nx_http::Response *response = httpClient->response();
             if (response)
                 setErrorText(response->statusLine.reasonPhrase);
             m_httpClient->terminate();

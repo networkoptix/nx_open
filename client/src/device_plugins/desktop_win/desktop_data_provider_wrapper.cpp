@@ -27,7 +27,7 @@ void QnDesktopDataProviderWrapper::putData(QnAbstractDataPacketPtr data)
     QMutexLocker mutex(&m_mutex);
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
-        QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
+        QnAbstractDataReceptor* dp = m_dataprocessors.at(i);
         if (dp->canAcceptData()) 
         {
             if (media->dataType == QnAbstractMediaData::VIDEO)

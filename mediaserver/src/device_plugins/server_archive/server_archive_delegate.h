@@ -36,6 +36,8 @@ public:
     virtual bool setQuality(MediaQuality quality, bool fastSwitch);
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
 
+    virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
+
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog);
     qint64 seekInternal(qint64 time, bool findIFrame, bool recursive);
@@ -80,6 +82,8 @@ private:
     bool m_eof;
     MediaQuality m_quality;
     QnDualQualityHelper m_dialQualityHelper;
+
+    ArchiveChunkInfo m_currentChunkInfo;
 
     mutable QMutex m_mutex;
 };

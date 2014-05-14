@@ -10,8 +10,6 @@
 #include "third_party_stream_reader.h"
 
 
-static QAtomicInt ThirdPartyArchiveDelegate_count = 0;
-
 ThirdPartyArchiveDelegate::ThirdPartyArchiveDelegate(
     const QnResourcePtr& resource,
     nxcip::DtsArchiveReader* archiveReader )
@@ -31,8 +29,6 @@ ThirdPartyArchiveDelegate::ThirdPartyArchiveDelegate(
     m_flags |= QnAbstractArchiveDelegate::Flag_CanSeekImmediatly;
     m_flags |= QnAbstractArchiveDelegate::Flag_CanOfflineLayout;
     m_flags |= QnAbstractArchiveDelegate::Flag_UnsyncTime;
-
-    ThirdPartyArchiveDelegate_count.fetchAndAddOrdered( 1 );
 }
 
 ThirdPartyArchiveDelegate::~ThirdPartyArchiveDelegate()
@@ -40,8 +36,6 @@ ThirdPartyArchiveDelegate::~ThirdPartyArchiveDelegate()
     if( m_streamReader )
         m_streamReader->releaseRef();
     m_archiveReader->releaseRef();
-
-    ThirdPartyArchiveDelegate_count.fetchAndAddOrdered( -1 );
 }
 
 bool ThirdPartyArchiveDelegate::open(const QnResourcePtr &resource )
@@ -125,13 +119,13 @@ qint64 ThirdPartyArchiveDelegate::seek( qint64 time, bool findIFrame )
     }
 }
 
-static std::shared_ptr<QnDefaultResourceVideoLayout> videoLayout( new QnDefaultResourceVideoLayout() );
+static QSharedPointer<QnDefaultResourceVideoLayout> videoLayout( new QnDefaultResourceVideoLayout() );
 QnResourceVideoLayoutPtr ThirdPartyArchiveDelegate::getVideoLayout()
 {
     return videoLayout;
 }
 
-static std::shared_ptr<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
+static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
 QnResourceAudioLayoutPtr ThirdPartyArchiveDelegate::getAudioLayout()
 {
     return audioLayout;

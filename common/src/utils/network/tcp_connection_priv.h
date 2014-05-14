@@ -56,7 +56,9 @@ class QnTCPConnectionProcessorPrivate
 public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
-    QnTCPConnectionProcessorPrivate()
+    QnTCPConnectionProcessorPrivate():
+        socket(0),
+        clientRequestOffset(0)
     {
         tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
         socketTimeout = 5 * 1000;
@@ -70,8 +72,8 @@ public:
 public:
     QSharedPointer<AbstractStreamSocket> socket;
 #ifdef USE_NX_HTTP
-    nx_http::HttpRequest request;
-    nx_http::HttpResponse response;
+    nx_http::Request request;
+    nx_http::Response response;
 #else
     QHttpRequestHeader requestHeaders;
     QHttpResponseHeader responseHeaders;
@@ -86,6 +88,7 @@ public:
     quint8* tcpReadBuffer;
     int socketTimeout;
     bool chunkedMode;
+    int clientRequestOffset;
 };
 
 #endif // __TCP_CONNECTION_PRIV_H__

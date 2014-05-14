@@ -128,7 +128,7 @@ void QnArchiveStreamReader::resumeMedia()
         emit streamResumed();
         m_delegate->setSingleshotMode(false);
         m_singleShot = false;
-        resumeDataProcessors();
+        //resumeDataProcessors();
         QMutexLocker lock(&m_jumpMtx);
         m_singleShowWaitCond.wakeAll();
     }
@@ -265,12 +265,14 @@ qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
         QMutexLocker mutex(&m_mutex);
-         QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
-         if (dp->isRealTimeSource())
-             return DATETIME_NOW;
-         timeSource = dynamic_cast<QnlTimeSource*>(dp);
-         if (timeSource) 
-             break;
+        QnAbstractDataConsumer* dp = dynamic_cast<QnAbstractDataConsumer*>(m_dataprocessors.at(i));
+        if( !dp )
+            continue;
+        if (dp->isRealTimeSource())
+            return DATETIME_NOW;
+        timeSource = dynamic_cast<QnlTimeSource*>(dp);
+        if (timeSource) 
+            break;
     }
 
     if (timeSource) {
@@ -1164,7 +1166,9 @@ void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)
     m_speed = value;
     for (int i = 0; i < m_dataprocessors.size(); ++i)
     {
-        QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
+        QnAbstractDataConsumer* dp = dynamic_cast<QnAbstractDataConsumer*>(m_dataprocessors.at(i));
+        if( !dp )
+            continue;
         dp->setSpeed(value);
     }
     setReverseMode(value < 0, currentTimeHint);

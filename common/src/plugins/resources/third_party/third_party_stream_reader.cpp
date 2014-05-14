@@ -346,7 +346,7 @@ void ThirdPartyStreamReader::updateStreamParamsBasedOnFps()
 QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
 {
     return m_liveStreamReader
-        ? m_audioLayout    //TODO/IMPL
+        ? m_audioLayout.staticCast<const QnResourceAudioLayout>()    //TODO/IMPL
         : m_rtpStreamParser.getAudioLayout();
 }
 

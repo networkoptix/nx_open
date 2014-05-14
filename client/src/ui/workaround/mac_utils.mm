@@ -233,7 +233,6 @@ QString mac_getSaveFileName(const QString &caption, const QString &dir, const QS
 
             // ... and remove after
             file.remove();
-        }
 
         return toQString(panel.URL.path);
     }

@@ -70,7 +70,7 @@ namespace {
     const qreal noAspectRatio = -1.0;
 
     //Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
-    std::shared_ptr<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() ); // TODO: #Elric get rid of this
+    QSharedPointer<QnDefaultResourceVideoLayout> qn_resourceWidget_defaultContentLayout( new QnDefaultResourceVideoLayout() ); // TODO: #Elric get rid of this
 
     void splitFormat(const QString &format, QString *left, QString *right) {
         int index = format.indexOf(QLatin1Char('\t'));
