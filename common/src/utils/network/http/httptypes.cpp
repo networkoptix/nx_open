@@ -195,16 +195,22 @@ namespace nx_http
                     return StringType("Moved");
                 case badRequest:
                     return StringType("Bad Request");
-                case forbidden:
-                    return StringType("Forbidden");
                 case unauthorized:
                     return StringType("Unauthorized");
+                case forbidden:
+                    return StringType("Forbidden");
                 case notFound:
                     return StringType("Not Found");
+                case notAllowed:
+                    return StringType("Not Allowed");
+                case proxyAuthenticationRequired:
+                    return StringType("Proxy Authentication Required");
                 case internalServerError:
                     return StringType("Internal Server Error");
                 case notImplemented:
                     return StringType("Not Implemented");
+                case serviceUnavailable:
+                    return StringType("Service Unavailable");
                 default:
                     return StringType("Unknown_") + StringType::number(val);
             }

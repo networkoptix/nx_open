@@ -174,7 +174,13 @@ namespace nx_http
 
     namespace StatusCode
     {
-        // TODO: #Elric #enum naming
+        /*!
+            enum has name "Value" for unification purpose only. Real enumeration name is StatusCode (name of namespace). 
+            Enum is referred to as StatusCode::Value, if assign real name to enum it will be StatusCode::StatusCode.
+            Namespace is used to associate enum with corresponding functions like toString() and fromString().
+            Namespace is required, since not all such functions can be put to global namespace. 
+            E.g. this namespace has convenience function toString( int httpStatusCode )
+        */
         enum Value
         {
             undefined = 0,
@@ -189,9 +195,10 @@ namespace nx_http
             forbidden = 403,
             notFound = 404,
             notAllowed = 405,
+            proxyAuthenticationRequired = 407,
             internalServerError = 500,
-            serviceUnavailable = 503,
-            notImplemented = 501
+            notImplemented = 501,
+            serviceUnavailable = 503
         };
 
         StringType toString( Value );
