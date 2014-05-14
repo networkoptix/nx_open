@@ -31,8 +31,6 @@
 using std::make_pair;
 using namespace nx_http;
 
-extern QnLog* requestsLog;  //TODO #ak: not good
-
 namespace nx_hls
 {
     static const size_t READ_BUFFER_SIZE = 64*1024;
@@ -172,8 +170,7 @@ namespace nx_hls
             case HttpStreamReader::messageDone:
             case HttpStreamReader::readingMessageBody:
             case HttpStreamReader::waitingMessageStart:
-                if( requestsLog )
-                    requestsLog->log( QString::fromLatin1("Received %1 from %2:\n%3-------------------\n\n\n").
+                    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received %1 from %2:\n%3-------------------\n\n\n").
                         arg(nx_http::MessageType::toString(m_httpStreamReader.message().type)).
                         arg(remoteHostAddress().toString()).
                         arg(QString::fromLatin1(m_httpStreamReader.message().toString())), cl_logDEBUG1 );
@@ -333,8 +330,7 @@ namespace nx_hls
         m_writeBuffer.clear();
         response.serialize( &m_writeBuffer );
 
-        if( requestsLog )
-            requestsLog->log( QString::fromLatin1("Sending response to %1:\n%2-------------------\n\n\n").
+            NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2-------------------\n\n\n").
                 arg(remoteHostAddress().toString()).
                 arg(QString::fromLatin1(m_writeBuffer)), cl_logDEBUG1 );
 

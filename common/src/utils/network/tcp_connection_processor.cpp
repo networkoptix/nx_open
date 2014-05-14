@@ -135,7 +135,6 @@ bool QnTCPConnectionProcessor::sendBuffer(const QByteArray& sendBuffer)
     Q_D(QnTCPConnectionProcessor);
 
     QMutexLocker lock(&d->sockMutex);
-    int bytesSent = 0;
     return sendData(sendBuffer.data(), sendBuffer.size());
 }
 
@@ -229,6 +228,10 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
 
     if (displayDebug)
         NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getPeerAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
+
+    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2-------------------\n\n\n").
+        arg(d->socket->getPeerAddress().toString()).
+        arg(QString::fromLatin1(response)), cl_logDEBUG1 );
 
     QMutexLocker lock(&d->sockMutex);
     sendData(response.data(), response.size());
@@ -329,6 +332,9 @@ bool QnTCPConnectionProcessor::readRequest()
             d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
             if (isFullMessage(d->clientRequest))
             {
+                NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
+                    arg(d->socket->getPeerAddress().toString()).
+                    arg(QString::fromLatin1(d->clientRequest)), cl_logDEBUG1 );
                 return true;
             }
             else if (d->clientRequest.size() > MAX_REQUEST_SIZE)

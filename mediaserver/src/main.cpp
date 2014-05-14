@@ -176,8 +176,16 @@ class CmdLineArguments
 {
 public:
     QString logLevel;
+    //!Log level of http requests log
+    QString msgLogLevel;
     QString rebuildArchive;
     QString devModeKey;
+
+    CmdLineArguments()
+    :
+        msgLogLevel( lit("none") )
+    {
+    }
 };
 
 static CmdLineArguments cmdLineArguments;
@@ -517,11 +525,6 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
-#ifdef _DEBUG
-#define ENABLE_HTTP_LOGGING
-#endif
-QnLog* requestsLog = NULL;
-
 /** Initialize log. */
 void initLog(const QString &logLevel) {
     if(logLevel == lit("none"))
@@ -565,11 +568,6 @@ int serverMain(int argc, char *argv[])
 
     initLog(cmdLineArguments.logLevel);
 
-#ifdef ENABLE_HTTP_LOGGING
-    requestsLog = new QnLog();
-    requestsLog->create( dataLocation + QLatin1String("/log/msg_log"), 1024*1024*10, 5, cl_logDEBUG1 );
-#endif
-
     QString logLevel;
     QString rebuildArchive;
 
@@ -579,6 +577,14 @@ int serverMain(int argc, char *argv[])
     commandLineParser.parse(argc, argv, stderr);
 
     QnLog::initLog(logLevel);
+
+    if( cmdLineArguments.msgLogLevel != lit("none") )
+        QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
+            dataLocation + QLatin1String("/log/http_log"),
+            10*1024*1024,
+            5,
+            QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
+
     if (rebuildArchive == "all")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
     else if (cmdLineArguments.rebuildArchive == "hq")
@@ -1652,6 +1658,7 @@ int main(int argc, char* argv[])
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, QString());
+    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--msg-log-level", NULL, QString(), "none");
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, QString(), "all");
     //commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
     commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, QString());
@@ -1700,6 +1707,7 @@ static void printHelp()
 #else
             "INFO\n"
 #endif
+        "  --msg-log-level          Log value for http_log.log. Supported values same as above. Default is none (no logging)\n"
         "  --rebuild                Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)\n"
         "  --conf-file              Path to config file. By default "<<MSSettings::defaultROSettingsFilePath().toStdString()<<"\n"
         "  --runtime-conf-file      Path to config file which is used to save some. By default "<<MSSettings::defaultRunTimeSettingsFilePath().toStdString()<<"\n"
