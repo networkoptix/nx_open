@@ -711,39 +711,39 @@ void fromApiToResourceList(const ApiUserDataList &src, QnUserResourceList &dst) 
 
 void fromApiToResource(const ApiVideowallItemData &src, QnVideoWallItem &dst) {
     dst.uuid       = src.guid;
-    dst.layout     = src.layout_guid;
-    dst.pcUuid     = src.pc_guid;
+    dst.layout     = src.layoutGuid;
+    dst.pcUuid     = src.pcGuid;
     dst.name       = src.name;
-    dst.geometry   = QRect(src.x, src.y, src.w, src.h);
+    dst.geometry   = QRect(src.left, src.top, src.width, src.height);
 }
 
 void fromResourceToApi(const QnVideoWallItem &src, ApiVideowallItemData &dst) {
     dst.guid        = src.uuid;
-    dst.layout_guid = src.layout;
-    dst.pc_guid     = src.pcUuid;
+    dst.layoutGuid  = src.layout;
+    dst.pcGuid      = src.pcUuid;
     dst.name        = src.name;
-    dst.x           = src.geometry.x();
-    dst.y           = src.geometry.y();
-    dst.w           = src.geometry.width();
-    dst.h           = src.geometry.height();
+    dst.left        = src.geometry.x();
+    dst.top         = src.geometry.y();
+    dst.width       = src.geometry.width();
+    dst.height      = src.geometry.height();
 }
 
 void fromApiToResource(const ApiVideowallScreenData &src, QnVideoWallPcData::PcScreen &dst) {
-    dst.index            = src.pc_index;
-    dst.desktopGeometry  = QRect(src.desktop_x, src.desktop_y, src.desktop_w, src.desktop_h);
-    dst.layoutGeometry   = QRect(src.layout_x, src.layout_y, src.layout_w, src.layout_h);
+    dst.index            = src.pcIndex;
+    dst.desktopGeometry  = QRect(src.desktopLeft, src.desktopTop, src.desktopWidth, src.desktopHeight);
+    dst.layoutGeometry   = QRect(src.layoutLeft, src.layoutTop, src.layoutWidth, src.layoutHeight);
 }
 
 void fromResourceToApi(const QnVideoWallPcData::PcScreen &src, ApiVideowallScreenData &dst) {
-    dst.pc_index    = src.index;
-    dst.desktop_x   = src.desktopGeometry.x();
-    dst.desktop_y   = src.desktopGeometry.y();
-    dst.desktop_w   = src.desktopGeometry.width();
-    dst.desktop_h   = src.desktopGeometry.height();
-    dst.layout_x    = src.layoutGeometry.x();
-    dst.layout_y    = src.layoutGeometry.y();
-    dst.layout_w    = src.layoutGeometry.width();
-    dst.layout_h    = src.layoutGeometry.height();
+    dst.pcIndex         = src.index;
+    dst.desktopLeft     = src.desktopGeometry.x();
+    dst.desktopTop      = src.desktopGeometry.y();
+    dst.desktopWidth    = src.desktopGeometry.width();
+    dst.desktopHeight   = src.desktopGeometry.height();
+    dst.layoutLeft      = src.layoutGeometry.x();
+    dst.layoutTop       = src.layoutGeometry.y();
+    dst.layoutWidth     = src.layoutGeometry.width();
+    dst.layoutHeight    = src.layoutGeometry.height();
 }
 
 void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst) {
@@ -762,8 +762,8 @@ void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst)
     for (const ApiVideowallScreenData &screen: src.screens) {
         QnVideoWallPcData::PcScreen outScreen;
         fromApiToResource(screen, outScreen);
-        QnVideoWallPcData& outPc = pcs[screen.pc_guid];
-        outPc.uuid = screen.pc_guid;
+        QnVideoWallPcData& outPc = pcs[screen.pcGuid];
+        outPc.uuid = screen.pcGuid;
         outPc.screens << outScreen;
     }
     dst->setPcs(pcs);
@@ -789,7 +789,7 @@ void fromResourceToApi(const QnVideoWallResourcePtr &src, ApiVideowallData &dst)
         for (const QnVideoWallPcData::PcScreen &screen: pc.screens) {
             ApiVideowallScreenData screenData;
             fromResourceToApi(screen, screenData);
-            screenData.pc_guid = pc.uuid;
+            screenData.pcGuid = pc.uuid;
             dst.screens.push_back(screenData);
         }
     }
@@ -816,8 +816,8 @@ void fromApiToResourceList(const ApiVideowallDataList &src, QnVideoWallResourceL
 
 void fromApiToResource(const ApiVideowallControlMessageData &data, QnVideoWallControlMessage &message) {
     message.operation = static_cast<QnVideoWallControlMessage::QnVideoWallControlOperation>(data.operation);
-    message.videoWallGuid = data.videowall_guid;
-    message.instanceGuid = data.instance_guid;
+    message.videoWallGuid = data.videowallGuid;
+    message.instanceGuid = data.instanceGuid;
     message.params.clear();
     for (const std::pair<QString, QString> &pair : data.params)
         message.params[pair.first] = pair.second;
@@ -825,8 +825,8 @@ void fromApiToResource(const ApiVideowallControlMessageData &data, QnVideoWallCo
 
 void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallControlMessageData &data) {
     data.operation = static_cast<int>(message.operation);
-    data.videowall_guid = message.videoWallGuid;
-    data.instance_guid = message.instanceGuid;
+    data.videowallGuid = message.videoWallGuid;
+    data.instanceGuid = message.instanceGuid;
     data.params.clear();
     auto iter = message.params.constBegin();
 
