@@ -2088,7 +2088,7 @@ ErrorCode QnDbManager::updateVideowallItems(const ApiVideowallData& data) {
     insQuery.prepare("INSERT INTO vms_videowall_item \
                      (guid, pc_guid, layout_guid, videowall_guid, name, x, y, w, h) \
                      VALUES \
-                     (:guid, :pcGuid, :layoutGuid, :videowallGuid, :name, :left, :top, :width, :height)");
+                     (:guid, :pcGuid, :layoutGuid, :videowall_guid, :name, :left, :top, :width, :height)");
     foreach(const ApiVideowallItemData& item, data.items)
     {
         QnSql::bind(item, &insQuery);
@@ -2117,7 +2117,7 @@ ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowallData& data) {
                       layout_x, layout_y, layout_w, layout_h) \
                       VALUES \
                       (:pcGuid, :pcIndex, \
-                      :desktopLeft, :desktopTop, :desktopWidth, :desktopHeigth, \
+                      :desktopLeft, :desktopTop, :desktopWidth, :desktopHeight, \
                       :layoutLeft, :layoutTop, :layoutWidth, :layoutHeight)");
 
         foreach(const ApiVideowallScreenData& screen, data.screens)
@@ -2134,7 +2134,7 @@ ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowallData& data) {
     {
         QSqlQuery query(m_sdb);
         query.prepare("INSERT OR REPLACE INTO vms_videowall_pcs \
-                      (videowall_guid, pc_guid) VALUES (:videowallGuid, :pcGuid)");
+                      (videowall_guid, pc_guid) VALUES (:videowall_guid, :pc_guid)");
         foreach (const QnId &pcUuid, pcUuids) {
             query.bindValue(":videowall_guid", data.id.toRfc4122());
             query.bindValue(":pc_guid", pcUuid.toRfc4122());
