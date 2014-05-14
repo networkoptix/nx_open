@@ -74,10 +74,10 @@
             </build>
         </profile>  
         <profile>
-            <id>widgets</id>
+            <id>webkit</id>
             <activation>
                 <os>
-                    <family>webkit</family>
+                    <family>Windows</family>
                 </os>
                 <property>
                     <name>webkit</name>

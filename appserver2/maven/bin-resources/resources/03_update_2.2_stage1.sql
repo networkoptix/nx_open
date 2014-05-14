@@ -19,6 +19,34 @@ CREATE TABLE "vms_resource" (id INTEGER PRIMARY KEY AUTOINCREMENT,
 			     xtype_guid BLOB(16));
 INSERT INTO "vms_resource" (id, status,name,url) SELECT id, status,name,url FROM vms_resource_tmp;
 
+
+ALTER TABLE "vms_layout" RENAME TO "vms_layout_tmp";
+
+-- Removing "user_id" field from the old database
+CREATE TABLE "vms_layout" (
+    "resource_ptr_id"           INTEGER PRIMARY KEY AUTOINCREMENT,
+    "cell_aspect_ratio"         REAL NOT NULL DEFAULT -1.0,
+    "cell_spacing_height"       REAL NOT NULL DEFAULT -1.0,
+    "cell_spacing_width"        REAL NOT NULL DEFAULT -1.0,
+    "user_can_edit"             BOOL NOT NULL DEFAULT 0,
+    "locked"                    BOOL NOT NULL DEFAULT 0,
+    "background_width"          INTEGER NOT NULL DEFAULT 1,
+    "background_image_filename" TEXT NULL,
+    "background_height"         INTEGER NOT NULL DEFAULT 1,
+    "background_opacity"        REAL NOT NULL    
+    );
+    
+INSERT INTO vms_layout (
+    resource_ptr_id, cell_aspect_ratio, cell_spacing_height, cell_spacing_width, user_can_edit, locked,
+    background_width, background_image_filename, background_height, background_opacity
+    ) 
+    SELECT 
+    resource_ptr_id, cell_aspect_ratio, cell_spacing_height, cell_spacing_width, user_can_edit, locked,
+    background_width, background_image_filename, background_height, background_opacity 
+    FROM vms_layout_tmp;    
+    
+DROP TABLE vms_layout_tmp;
+
 ALTER TABLE "vms_businessrule" ADD guid BLOB(16);
 ALTER TABLE "vms_resourcetype" ADD guid BLOB(16);
 
