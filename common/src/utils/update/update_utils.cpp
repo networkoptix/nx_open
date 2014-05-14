@@ -18,7 +18,7 @@ bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *versio
     if (info.isEmpty())
         return false;
 
-    QnSystemInformation locSysInfo(info.value(lit("platform")).toString(), info.value(lit("arch")).toString());
+    QnSystemInformation locSysInfo(info.value(lit("platform")).toString(), info.value(lit("arch")).toString(), info.value(lit("modification")).toString());
     if (!locSysInfo.isValid())
         return false;
 

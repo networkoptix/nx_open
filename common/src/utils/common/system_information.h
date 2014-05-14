@@ -7,7 +7,7 @@
 
 class QnSystemInformation {
 public:
-    QnSystemInformation(const QString &platform, const QString &arch);
+    QnSystemInformation(const QString &platform, const QString &arch, const QString &modification = QString());
     QnSystemInformation(const QString &infoString);
     QnSystemInformation() {}
 
@@ -16,8 +16,9 @@ public:
 
     QString arch;
     QString platform;
+    QString modification;
 };
-#define QnSystemInformation_Fields (arch)(platform)
+#define QnSystemInformation_Fields (arch)(platform)(modification)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnSystemInformation, (json)(binary)(datastream)(eq)(hash)(metatype))
 
