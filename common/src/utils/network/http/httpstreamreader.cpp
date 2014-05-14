@@ -124,7 +124,7 @@ namespace nx_http
     /*!
         \return Actual only after state changed from \a readingMessageHeaders to \a waitingMessageStart or \a readingMessageBody
     */
-    const HttpMessage& HttpStreamReader::message() const
+    const Message& HttpStreamReader::message() const
     {
         return m_httpMessage;
     }
@@ -213,12 +213,12 @@ namespace nx_http
                     return false;
                 if( *pos == ' ' )  //considering message to be request (first token does not contain /, so it looks like METHOD)
                 {
-                    m_httpMessage = HttpMessage( MessageType::request );
+                    m_httpMessage = Message( MessageType::request );
                     m_httpMessage.request->requestLine.parse( data );
                 }
                 else    //response
                 {
-                    m_httpMessage = HttpMessage( MessageType::response );
+                    m_httpMessage = Message( MessageType::response );
                     m_httpMessage.response->statusLine.parse( data );
                 }
                 m_state = readingMessageHeaders;

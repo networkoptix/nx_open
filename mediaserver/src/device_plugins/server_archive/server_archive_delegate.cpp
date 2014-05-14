@@ -12,6 +12,7 @@
 
 static const qint64 MOTION_LOAD_STEP = 1000ll * 3600;
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
+static const int USEC_IN_MSEC = 1000;
 
 QnServerArchiveDelegate::QnServerArchiveDelegate(): 
     QnAbstractArchiveDelegate(),
@@ -129,6 +130,8 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
     bool isePrecSeek = !m_reverseMode &&  m_quality == MEDIA_Quality_High; // do not try short LQ chunk if ForcedHigh quality and do not try short HQ chunk for LQ quality
     m_dialQualityHelper.findDataForTime(timeMs, newChunk, newChunkCatalog, findMethod, isePrecSeek); // use precise find if no REW mode
+    m_currentChunkInfo.startTimeUsec = newChunk.startTimeMs * USEC_IN_MSEC;
+    m_currentChunkInfo.durationUsec = newChunk.durationMs * USEC_IN_MSEC;
     if (!m_reverseMode && newChunk.endTimeMs() < timeMs)
     {
         m_eof = true;
@@ -341,6 +344,11 @@ QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getMotionConnectio
     QMutexLocker lk( &m_mutex );
 
     return QnMotionHelper::instance()->createConnection(m_resource, channel);
+}
+
+QnAbstractArchiveDelegate::ArchiveChunkInfo QnServerArchiveDelegate::getLastUsedChunkInfo() const
+{
+    return m_currentChunkInfo;
 }
 
 QnResourceVideoLayoutPtr QnServerArchiveDelegate::getVideoLayout()

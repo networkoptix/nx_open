@@ -43,7 +43,7 @@ void QnAbstractDataConsumer::run()
 
         if (!get)
         {
-            CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("queue is empty "), (int)(long)(&m_dataQueue),cl_logDEBUG2);
+            NX_LOG( lit("QnAbstractDataConsumer::run. queue is empty %1").arg((int)(long)(&m_dataQueue)), cl_logDEBUG2 );
             QnSleep::msleep(10);
             continue;
         }

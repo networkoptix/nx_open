@@ -2693,6 +2693,7 @@ bool QnPlOnvifResource::fetchRelayOutputInfo( const std::string& outputID, Relay
         }
     }
 
+    return false;
     return false; //there is no output with id outputID
 }
 

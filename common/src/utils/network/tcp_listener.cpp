@@ -34,7 +34,7 @@ public:
 // ------------------------ QnRtspListener ---------------------------
 
 #ifdef USE_NX_HTTP
-bool QnTcpListener::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response) const
+bool QnTcpListener::authenticate(const nx_http::Request& request, nx_http::Response& response) const
 {
     Q_D(const QnTcpListener);
     if (d->authDigest.isEmpty())
@@ -48,7 +48,10 @@ bool QnTcpListener::authenticate(const nx_http::HttpRequest& request, nx_http::H
     if (data[0].toLower() == "basic" && data.size() > 1)
         rez = data[1] == d->authDigest;
     if (!rez)
-        response.headers["WWW-Authenticate"] = "Basic realm=\"Secure Area\"";
+    {
+        response.headers.erase("WWW-Authenticate");
+        response.headers.insert( std::make_pair("WWW-Authenticate", "Basic realm=\"Secure Area\"") );
+    }
     return rez;
 }
 #else

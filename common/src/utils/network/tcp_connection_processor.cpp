@@ -86,7 +86,7 @@ void QnTCPConnectionProcessor::parseRequest()
 //    qDebug() << "Client request from " << d->socket->getPeerAddress().address.toString();
 //    qDebug() << d->clientRequest;
 
-    d->request = nx_http::HttpRequest();
+    d->request = nx_http::Request();
     if( !d->request.parse( d->clientRequest ) )
     {
         qWarning() << Q_FUNC_INFO << "Invalid request format.";
@@ -145,15 +145,15 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
     {
         int sended = 0;
         sended = d->socket->send(data, size);
-        if (sended > 0) {
-#ifdef DEBUG_RTSP
-            dumpRtspData(data, sended);
-#endif
-            data += sended;
-            size -= sended;
-        }
-    }
+        if( sended <= 0 )
+            break;
 
+#ifdef DEBUG_RTSP
+        dumpRtspData(data, sended);
+#endif
+        data += sended;
+        size -= sended;
+    }
     return d->socket->isConnected();
 }
 
@@ -229,16 +229,30 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     if (displayDebug)
         NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getPeerAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
 
+    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2-------------------\n\n\n").
+        arg(d->socket->getPeerAddress().toString()).
+        arg(QString::fromLatin1(response)), cl_logDEBUG1 );
+
     QMutexLocker lock(&d->sockMutex);
     sendData(response.data(), response.size());
 }
 
-bool QnTCPConnectionProcessor::sendChunk(const QnByteArray& chunk)
+bool QnTCPConnectionProcessor::sendChunk( const QnByteArray& chunk )
+{
+    return sendChunk( chunk.data(), chunk.size() );
+}
+
+bool QnTCPConnectionProcessor::sendChunk( const QByteArray& chunk )
+{
+    return sendChunk( chunk.data(), chunk.size() );
+}
+
+bool QnTCPConnectionProcessor::sendChunk( const char* data, int size )
 {
     Q_D(QnTCPConnectionProcessor);
-    QByteArray result = QByteArray::number(chunk.size(),16);
+    QByteArray result = QByteArray::number(size,16);
     result.append("\r\n");
-    result.append(chunk.data(), chunk.size());
+    result.append(data, size);  //TODO/IMPL avoid copying by implementing writev in socket
     result.append("\r\n");
 
     int sended;
@@ -286,14 +300,20 @@ int QnTCPConnectionProcessor::getSocketTimeout()
     return d->socketTimeout;
 }
 
+int QnTCPConnectionProcessor::readSocket( quint8* buffer, int bufSize )
+{
+    Q_D(QnTCPConnectionProcessor);
+    return d->socket->recv( buffer, bufSize );
+}
+
 bool QnTCPConnectionProcessor::readRequest()
 {
     Q_D(QnTCPConnectionProcessor);
 
     //QElapsedTimer globalTimeout;
 #ifdef USE_NX_HTTP
-    d->request = nx_http::HttpRequest();
-    d->response = nx_http::HttpResponse();
+    d->request = nx_http::Request();
+    d->response = nx_http::Response();
 #else
     d->requestHeaders = QHttpRequestHeader();
     d->responseHeaders = QHttpResponseHeader();
@@ -312,6 +332,9 @@ bool QnTCPConnectionProcessor::readRequest()
             d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
             if (isFullMessage(d->clientRequest))
             {
+                NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
+                    arg(d->socket->getPeerAddress().toString()).
+                    arg(QString::fromLatin1(d->clientRequest)), cl_logDEBUG1 );
                 return true;
             }
             else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
@@ -353,6 +376,12 @@ void QnTCPConnectionProcessor::execute(QMutex& mutex)
     mutex.unlock();
     run();
     mutex.lock();
+}
+
+SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->socket ? d->socket->getPeerAddress() : SocketAddress();
 }
 
 void QnTCPConnectionProcessor::releaseSocket()

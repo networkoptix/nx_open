@@ -20,7 +20,6 @@ public:
     virtual ~QnDesktopResource();
 
     virtual QString toString() const override;
-    bool isRendererSlow() const;
 
     void addConnection(QnMediaServerResourcePtr mServer);
     void removeConnection(QnMediaServerResourcePtr mServer);

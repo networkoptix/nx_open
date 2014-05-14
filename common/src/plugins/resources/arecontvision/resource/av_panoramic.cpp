@@ -199,7 +199,8 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const Q
     QMutexLocker lock(&m_mutex);
 
     const QnConstResourceVideoLayoutPtr& layout = QnPlAreconVisionResource::getVideoLayout(dataProvider);
-    const QnConstCustomResourceVideoLayoutPtr& customLayout = std::dynamic_pointer_cast<const QnCustomResourceVideoLayout>(layout);
+    //const QnConstCustomResourceVideoLayoutPtr& customLayout = std::dynamic_pointer_cast<const QnCustomResourceVideoLayout>(layout);
+    const QnConstCustomResourceVideoLayoutPtr& customLayout = layout.dynamicCast<const QnCustomResourceVideoLayout>();
     updateFlipState();
     if (m_isRotated && customLayout)
     {

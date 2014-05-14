@@ -39,7 +39,7 @@ namespace nx_http
             const QUrl& url,
             const nx_http::StringType& contentType,
             const nx_http::StringType& messageBody );
-        const HttpResponse* response() const;
+        const Response* response() const;
         //!
         bool eof() const;
         //!

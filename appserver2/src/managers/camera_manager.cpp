@@ -5,7 +5,6 @@
 
 #include <QtConcurrent>
 
-#include "cluster/cluster_manager.h"
 #include "core/resource/camera_resource.h"
 #include "database/db_manager.h"
 #include "fixed_url_client_query_processor.h"

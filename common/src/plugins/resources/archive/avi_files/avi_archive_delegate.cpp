@@ -348,7 +348,7 @@ const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
     return entry ? entry->value : 0;
 }
 
-static std::shared_ptr<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
 QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
 {
     if (!m_initialized)
@@ -381,7 +381,7 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
         {
             AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,getTagName(Tag_LayoutInfo, format), 0, 0);
             if (layoutInfo)
-                deserializeLayout(m_videoLayout.get(), QLatin1String(layoutInfo->value));
+                deserializeLayout(m_videoLayout.data(), QLatin1String(layoutInfo->value));
 
             if (m_useAbsolutePos)
             {

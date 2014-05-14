@@ -8,6 +8,7 @@
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 #include "common/common_module.h"
+#include "transaction/transaction_message_bus.h"
 
 
 namespace ec2

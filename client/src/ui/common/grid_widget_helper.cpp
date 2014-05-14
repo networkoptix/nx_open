@@ -8,6 +8,7 @@
 
 #include <client/client_settings.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/file_dialog.h>
 
 #include <utils/common/string.h>
 

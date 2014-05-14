@@ -18,7 +18,6 @@
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/network/http/asynchttpclient.h>
 
-#include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "rest/request_params.h"
 #include "transaction/transaction.h"

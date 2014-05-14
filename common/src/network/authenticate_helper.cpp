@@ -39,9 +39,8 @@ QnAuthHelper* QnAuthHelper::instance()
     return m_instance;
 }
 
-bool QnAuthHelper::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response, bool isProxy) 
-{
-    QString cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
+bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy) {
+    const QString& cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
     int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
     if (customAuthInfoPos >= 0) {
         QString digest = cookie.mid(customAuthInfoPos + QByteArray("authinfo=").length(), 32);
@@ -51,13 +50,13 @@ bool QnAuthHelper::authenticate(const nx_http::HttpRequest& request, nx_http::Ht
             return true;
     }
 
-    nx_http::StringType videoWall_auth = nx_http::getHeaderValue( request.headers, "X-NetworkOptix-VideoWall" );
+    const nx_http::StringType& videoWall_auth = nx_http::getHeaderValue( request.headers, "X-NetworkOptix-VideoWall" );
     if (!videoWall_auth.isEmpty())
         return (!qnResPool->getResourceById(QUuid(videoWall_auth)).dynamicCast<QnVideoWallResource>().isNull());
 
-    nx_http::StringType authorization = nx_http::getHeaderValue( request.headers, "Authorization" );
-    if (authorization.isEmpty())
-        authorization = nx_http::getHeaderValue( request.headers, "Proxy-Authorization" );
+    const nx_http::StringType& authorization = isProxy
+        ? nx_http::getHeaderValue( request.headers, "Proxy-Authorization" )
+        : nx_http::getHeaderValue( request.headers, "Authorization" );
     if (authorization.isEmpty()) {
         addAuthHeader(response, isProxy);
         return false;
@@ -115,7 +114,7 @@ static QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter
     return rez;
 }
 
-bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::HttpResponse& responseHeaders, bool isProxy)
+bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy)
 {
     const QList<QByteArray>& authParams = smartSplit(authData, ',');
 
@@ -200,7 +199,7 @@ bool QnAuthHelper::doDigestAuth(const QByteArray& method, const QByteArray& auth
     return false;
 }
 
-bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::HttpResponse& /*response*/)
+bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*response*/)
 {
     QByteArray digest = QByteArray::fromBase64(authData);
     int pos = digest.indexOf(':');
@@ -231,7 +230,7 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::HttpResponse
     return false;
 }
 
-bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::HttpResponse& /*response*/, const QByteArray& sesionKey)
+bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::Response& /*response*/, const QByteArray& sesionKey)
 {
     QByteArray digestBin = QByteArray::fromHex(authData);
     QByteArray sessionKeyBin = QByteArray::fromHex(sesionKey);
@@ -248,7 +247,7 @@ bool QnAuthHelper::doCustomAuthorization(const QByteArray& authData, nx_http::Ht
     return false;
 }
 
-void QnAuthHelper::addAuthHeader(nx_http::HttpResponse& response, bool isProxy)
+void QnAuthHelper::addAuthHeader(nx_http::Response& response, bool isProxy)
 {
     QString auth(lit("Digest realm=\"%1\",nonce=\"%2\""));
 	QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";

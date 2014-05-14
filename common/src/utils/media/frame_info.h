@@ -3,9 +3,6 @@
 
 #include <atomic>
 
-#ifdef _WIN32
-#include <D3D9.h>
-#endif
 #include <QtCore/QAtomicInt>
 
 extern "C"
@@ -102,6 +99,8 @@ public:
 };
 
 #ifdef _WIN32
+struct IDirect3DSurface9;
+
 //!Holds picture as DXVA surface
 class D3DPictureData
 :

@@ -6,6 +6,7 @@
 #include "ec2_connection.h"
 #include "mutex/distributed_mutex.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "transaction/transaction_message_bus.h"
 
 
 namespace ec2
