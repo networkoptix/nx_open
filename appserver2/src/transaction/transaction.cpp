@@ -88,6 +88,8 @@ namespace ec2
                 case resetBusinessRules:
                     return "resetBusinessRules";
 
+                case saveLayout:
+                    return "saveLayout";
                 case saveLayouts:
                     return "addOrUpdateLayouts";
                 case getLayoutList:
