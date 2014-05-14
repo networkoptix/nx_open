@@ -24,6 +24,8 @@ struct QnCameraDiagnosticsReply
     }
 };
 
+#define QnCameraDiagnosticsReply_Fields (performedStep)(errorCode)(errorParams)
+
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraDiagnosticsReply, (json)(metatype))
 
 #endif // QN_TIME_REPLY_H

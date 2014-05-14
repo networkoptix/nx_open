@@ -14,6 +14,8 @@ struct QnStorageSpaceReply {
     QList<QString> storageProtocols;
 };
 
+#define QnStorageSpaceReply_Fields (storages)(storageProtocols)
+
 QN_FUSION_DECLARE_FUNCTIONS(QnStorageSpaceReply, (json)(metatype))
 
 #endif // QN_STORAGE_SPACE_DATA_H

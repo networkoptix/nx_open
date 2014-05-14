@@ -8,18 +8,16 @@
 #include "time_reply.h"
 #include "connection_info.h"
 
-// TODO: #MSAPI Use a scheme similar to one in EC API: 
-// 
-// Define a _Fields macro where the struct/class definition is.
-// Then generate all functions using a single QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES invocation.
+#define QN_MS_API_DATA_TYPES \
+    (QnCameraDiagnosticsReply)\
+    (QnManualCameraSearchStatus)\
+    (QnManualCameraSearchSingleCamera)\
+    (QnManualCameraSearchReply)\
+    (QnStorageSpaceReply)\
+    (QnStorageSpaceData)\
+    (QnStorageStatusReply)\
+    (QnTimeReply)\
+    (QnConnectionInfo)\
+    (QnCompatibilityItem)\
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraDiagnosticsReply,          (json)(binary), (performedStep)(errorCode)(errorParams))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnManualCameraSearchStatus,        (json)(binary), (state)(current)(total))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnManualCameraSearchSingleCamera,  (json)(binary), (name)(url)(manufacturer)(vendor)(existsInPool))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnManualCameraSearchReply,         (json)(binary), (status)(processUuid)(cameras))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStorageSpaceReply,               (json)(binary), (storages)(storageProtocols))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStorageSpaceData,                (json)(binary), (path)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStorageStatusReply,              (json)(binary), (pluginExists)(storage))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTimeReply,                       (json)(binary), (utcTime)(timeZoneOffset))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnConnectionInfo,                  (json)(binary)(csv_record), QnConnectionInfo_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCompatibilityItem,               (json)(binary)(csv_record), QnCompatibilityItem_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_MS_API_DATA_TYPES, (json)(binary)(csv_record), _Fields)
