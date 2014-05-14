@@ -340,9 +340,12 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
                 
             
 
-            connect(advancedWebView->page()->networkAccessManager(), SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)), this, SLOT(at_sslErrors(QNetworkReply*,QList<QSslError>)));
-            connect(advancedWebView->page()->networkAccessManager(), SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator *)), this, SLOT(at_authenticationRequired(QNetworkReply*, QAuthenticator *)), Qt::DirectConnection);
-            connect(advancedWebView->page()->networkAccessManager(), SIGNAL(proxyAuthenticationRequired(const QNetworkProxy&, QAuthenticator *)), this, SLOT(at_proxyAuthenticationRequired(const QNetworkProxy&, QAuthenticator *)), Qt::DirectConnection);
+            connect(advancedWebView->page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
+                    this, &QnSingleCameraSettingsWidget::at_sslErrors );
+            connect(advancedWebView->page()->networkAccessManager(), &QNetworkAccessManager::authenticationRequired,
+                    this, &QnSingleCameraSettingsWidget::at_authenticationRequired, Qt::DirectConnection );
+            connect(advancedWebView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
+                    this, &QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired, Qt::DirectConnection);
            
             stacked_layout->addWidget(advancedWebView);
             updateWebPage(stacked_layout,advancedWebView);
