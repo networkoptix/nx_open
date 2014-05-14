@@ -19,6 +19,7 @@
 #include "rest/ec2_update_http_handler.h"
 #include "rest/server/rest_connection_processor.h"
 #include "transaction/transaction.h"
+#include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
 #include "version.h"
 

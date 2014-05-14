@@ -15,11 +15,12 @@
 #include <utils/serialization/binary_functions.h>
 #include <utils/serialization/csv_functions.h>
 
-#include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "managers/aux_manager.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
+#include "transaction/transaction_message_bus.h"
+
 
 namespace ec2
 {

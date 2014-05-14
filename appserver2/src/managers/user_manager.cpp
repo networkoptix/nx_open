@@ -5,7 +5,6 @@
 #include <QtConcurrent>
 
 #include "fixed_url_client_query_processor.h"
-#include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "transaction/transaction_log.h"
 #include "server_query_processor.h"
