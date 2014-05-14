@@ -1,7 +1,13 @@
 #include "resource_icon_cache.h"
+
 #include <QtGui/QPixmap>
 #include <QtGui/QPainter>
-#include "skin.h"
+
+#include <core/resource/resource.h>
+#include <core/resource/layout_resource.h>
+
+#include <ui/style/skin.h>
+
 
 Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
@@ -26,9 +32,6 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(Layout | Locked,         qnSkin->icon("tree/layout_locked.png"));
 
     m_cache.insert(Offline,                 qnSkin->icon("tree/offline.png"));
-#if 0
-    m_cache.insert(Unauthorized,            Skin::icon("tree/unauthorized.png"));
-#endif
 }
 
 QnResourceIconCache::~QnResourceIconCache() {
@@ -66,12 +69,16 @@ QIcon QnResourceIconCache::icon(Key key, bool unchecked) {
     return icon;
 }
 
-QIcon QnResourceIconCache::icon(QnResource::Flags flags, QnResource::Status status) {
-    return icon(key(flags, status));
+QIcon QnResourceIconCache::icon(const QnResourcePtr &resource) {
+    if (!resource)
+        return QIcon();
+    return icon(key(resource));
 }
 
-QnResourceIconCache::Key QnResourceIconCache::key(QnResource::Flags flags, QnResource::Status status) {
+QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr &resource) {
     Key key = Unknown;
+
+    QnResource::Flags flags = resource->flags();
 
     if ((flags & QnResource::local_server) == QnResource::local_server) {
         key = Local;
@@ -93,6 +100,24 @@ QnResourceIconCache::Key QnResourceIconCache::key(QnResource::Flags flags, QnRes
         key = VideoWall;
     }
 
-    return Key(key | ((status + 1) << 8));
+    Key status = Unknown;
+    if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
+        status = layout->locked() ? Locked : Unknown;
+    else
+    switch (resource->getStatus()) {
+    case QnResource::Online:
+        status = Online;
+        break;
+    case QnResource::Offline:
+        status = Offline;
+        break;
+    case QnResource::Unauthorized:
+        status = Unauthorized;
+        break;
+    default:
+        break;
+    }
+
+    return Key(key | status);
 }
 

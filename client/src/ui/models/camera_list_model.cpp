@@ -65,9 +65,9 @@ QVariant QnCameraListModel::data(const QModelIndex &index, int role) const {
         case RecordingColumn: 
             return QnRecordingStatusHelper::icon(QnRecordingStatusHelper::currentRecordingMode(context(), camera));
         case NameColumn: 
-            return qnResIconCache->icon(camera->flags(), camera->getStatus());
+            return qnResIconCache->icon(camera);
         case ServerColumn:
-            return server ? qnResIconCache->icon(server->flags(), server->getStatus()) : QVariant();
+            return qnResIconCache->icon(server);
         default:
             break;
         }

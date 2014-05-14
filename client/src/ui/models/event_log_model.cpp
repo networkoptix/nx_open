@@ -360,11 +360,7 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
         break;
     }
 
-    QnResourcePtr res = getResourceById(resId);
-    if (res)
-        return qnResIconCache->icon(res->flags(), res->getStatus());
-    else
-        return QVariant();
+    return qnResIconCache->icon(getResourceById(resId));
 }
 
 QString QnEventLogModel::getResourceNameString(QnId id) {

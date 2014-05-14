@@ -162,7 +162,7 @@ void QnResourcePoolModelNode::update() {
             m_flags = m_resource->flags();
             m_status = m_resource->getStatus();
             m_searchString = m_resource->toSearchString();
-            m_icon = qnResIconCache->icon(m_flags, m_status);
+            m_icon = qnResIconCache->icon(m_resource);
             m_displayName = getResourceName(m_resource);
         }
     } else if (m_type == Qn::VideoWallItemNode || m_type == Qn::UserVideoWallItemNode) {
