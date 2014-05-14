@@ -1576,12 +1576,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Pin Notifications")).
         toggledText(tr("Unpin Notifications"));
 
+#ifdef QN_ENABLE_BOOKMARKS
     factory(Qn::ToggleBookmarksSearchAction).
         flags(Qn::GlobalHotkey).
         text(tr("Show Search Panel")).
         toggledText(tr("Hide Search Panel")).
         shortcut(tr("Ctrl+F")).
         autoRepeat(false);
+#endif
 }
 
 QnActionManager::~QnActionManager() {

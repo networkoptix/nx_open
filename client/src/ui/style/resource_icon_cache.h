@@ -3,7 +3,8 @@
 
 #include <QtCore/QObject>
 #include <QtGui/QIcon>
-#include <core/resource/resource.h>
+
+#include <core/resource/resource_fwd.h>
 
 /**
  * Cache for resource icons with overlaid status.
@@ -29,13 +30,13 @@ public:
         Users,
         VideoWall,
         VideoWallItem,
-        TypeMask = 0xFF,
+        TypeMask        = 0xFF,
 
-        Offline = (QnResource::Offline + 1) << 8,
-        Unauthorized = (QnResource::Unauthorized + 1) << 8,
-        Online = (QnResource::Online + 1) << 8,
-        Locked = (QnResource::Locked + 1) << 8,
-        StatusMask = 0xFF00
+        Offline         = 1 << 8,
+        Unauthorized    = 2 << 8,
+        Online          = 3 << 8,
+        Locked          = 4 << 8,
+        StatusMask      = 0xFF00
     };
     Q_DECLARE_FLAGS(Key, KeyPart)
 
@@ -43,7 +44,7 @@ public:
 
     virtual ~QnResourceIconCache();
 
-    QIcon icon(QnResource::Flags flags, QnResource::Status status);
+    QIcon icon(const QnResourcePtr &resource);
 
     /**
      * @brief icon
@@ -53,7 +54,7 @@ public:
      */
     QIcon icon(Key key, bool unchecked = false);
 
-    static Key key(QnResource::Flags flags, QnResource::Status status);
+    static Key key(const QnResourcePtr &resource);
 
     static QnResourceIconCache *instance();
 

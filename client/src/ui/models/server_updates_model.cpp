@@ -197,7 +197,7 @@ QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
         break;
     case Qt::DecorationRole:
         if (column == ResourceNameColumn)
-            return qnResIconCache->icon(m_server->flags(), m_server->getStatus());
+            return qnResIconCache->icon(m_server);
         break;
     case Qt::BackgroundRole:
         break;

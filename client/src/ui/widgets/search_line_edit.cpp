@@ -15,6 +15,8 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleOptionFrameV2>
 
+#include <ui/common/palette.h>
+
 namespace {
     /** Search icon on the left hand side */
     class QnSearchButton : public QAbstractButton {
@@ -58,22 +60,17 @@ namespace {
 
     /**
     Clear button on the right hand side of the search widget.
-    Hidden by default
-    "A circle with an X in it"
     */
-    class QnClearButton : public QAbstractButton {
+    class QnArrowButton : public QAbstractButton {
     public:
-        QnClearButton(QWidget *parent = 0):
-            QAbstractButton(parent)
+        QnArrowButton(bool left, QWidget *parent = 0):
+            QAbstractButton(parent),
+            m_left(left)
         {
-#ifndef QT_NO_CURSOR
             setCursor(Qt::ArrowCursor);
-#endif // QT_NO_CURSOR
-            setVisible(false);
-            setFocusPolicy(Qt::NoFocus);
         }
 
-        void QnClearButton::paintEvent(QPaintEvent *event) {
+        void paintEvent(QPaintEvent *event) {
             Q_UNUSED(event);
             QPainter painter(this);
             int size = height(); //assuming height and width are equal
@@ -88,17 +85,24 @@ namespace {
             painter.setPen(painter.brush().color());
 
             int offset = size / 5;
+            int center = size / 2;
             int radius = size - offset * 2;
             painter.drawEllipse(offset, offset, radius, radius);
 
-            painter.setPen(palette().color(QPalette::Base));
+            painter.setPen(Qt::white);
             int border = offset * 2;
-            painter.drawLine(border, border, size - border, size - border);
-            painter.drawLine(border, size - border, size - border, border);
-        }
+            int dx = size / 10;
 
+            if (m_left) {
+                painter.drawLine(center + dx, border, center - dx, center);
+                painter.drawLine(center + dx, size - border, center - dx, center);
+            } else {
+                painter.drawLine(center - dx, border, center + dx, center);
+                painter.drawLine(center - dx, size - border, center + dx, center);
+            }
+        }
     private:
-        QMap<int, QPainterPath> m_pathCacheBySize;
+        bool m_left;
     };
 
 }
@@ -106,7 +110,9 @@ namespace {
 QnSearchLineEdit::QnSearchLineEdit(QWidget *parent) :
     QWidget(parent),
     m_lineEdit(new QLineEdit(this)),
-    m_clearButton(new QnClearButton(this)),
+    m_occurencesLabel(new QLabel(this)),
+    m_prevButton(new QnArrowButton(true, this)),
+    m_nextButton(new QnArrowButton(false, this)),
     m_searchButton(new QnSearchButton(this))
 {
     setFocusPolicy(m_lineEdit->focusPolicy());
@@ -126,17 +132,21 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent) :
     QPalette clearPalette = m_lineEdit->palette();
     clearPalette.setBrush(QPalette::Base, QBrush(Qt::transparent));
     m_lineEdit->setPalette(clearPalette);
-
-    // clearButton
-    connect(m_clearButton, &QAbstractButton::clicked, m_lineEdit, &QLineEdit::clear);
-    connect(m_lineEdit, &QLineEdit::textChanged, this, [this](const QString &text) {
-        m_clearButton->setVisible(!text.isEmpty());
-    });
-    m_clearButton->setToolTip(tr("Clear"));
-
-    connect(m_lineEdit, SIGNAL(textChanged(QString)),
-        this, SIGNAL(textChanged(QString)));
     m_lineEdit->setPlaceholderText(tr("Search"));
+    connect(m_lineEdit, &QLineEdit::textChanged, this, &QnSearchLineEdit::textChanged);
+
+    // prevButton
+    m_prevButton->setToolTip(tr("Previous"));
+    connect(m_prevButton, &QAbstractButton::clicked, this, &QnSearchLineEdit::prevButtonClicked);
+
+    // nextButton
+    m_nextButton->setToolTip(tr("Next"));
+    connect(m_nextButton, &QAbstractButton::clicked, this, &QnSearchLineEdit::nextButtonClicked);
+
+    m_occurencesLabel->setText(lit("25/1920"));
+    m_occurencesLabel->setAutoFillBackground(true);
+    setPaletteColor(m_occurencesLabel, QPalette::Base, QColor(50, 127, 50));
+
 
     QSizePolicy policy = sizePolicy();
     setSizePolicy(QSizePolicy::Preferred, policy.verticalPolicy());
@@ -158,9 +168,22 @@ void QnSearchLineEdit::updateGeometries() {
 
     int buttonSize = height;
     
+    // left edge
     m_searchButton->setGeometry(rect.x(), rect.y(), buttonSize, buttonSize);
-    m_lineEdit->setGeometry(m_searchButton->x() + buttonSize, 0, width - buttonSize*2, height);
-    m_clearButton->setGeometry(width - buttonSize, 0, buttonSize, buttonSize);
+
+    // rightmost
+    m_nextButton->setGeometry(width - buttonSize, 0, buttonSize, buttonSize);
+    
+    // to the left from "Next"
+    m_prevButton->setGeometry(m_nextButton->x() - buttonSize, 0, buttonSize, buttonSize);
+
+    int labelWidth = m_occurencesLabel->sizeHint().width();
+    int labelOffset = 2;
+
+    m_occurencesLabel->setGeometry(m_prevButton->x() - labelWidth, labelOffset, labelWidth, height - labelOffset*2);
+
+    m_lineEdit->setGeometry(m_searchButton->x() + buttonSize, 0, m_occurencesLabel->x() - buttonSize, height);
+    
 }
 
 void QnSearchLineEdit::initStyleOption(QStyleOptionFrameV2 *option) const

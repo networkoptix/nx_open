@@ -33,11 +33,11 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     ui(new Ui::MultipleCameraSettingsWidget),
     m_hasDbChanges(false),
     m_hasScheduleChanges(false),
+    m_loginWasEmpty(true),
+    m_passwordWasEmpty(true),
     m_hasScheduleControlsChanges(false),
     m_readOnly(false),
-    m_inUpdateMaxFps(false),
-    m_loginWasEmpty(true),
-    m_passwordWasEmpty(true)
+    m_inUpdateMaxFps(false)
 {
     ui->setupUi(this);
 
