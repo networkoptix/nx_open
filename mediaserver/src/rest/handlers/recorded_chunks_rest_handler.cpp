@@ -89,7 +89,6 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     QnTimePeriodList periods;
     switch (periodsType) {
     case Qn::RecordingContent:
-        qDebug() << "recorded chunks requested";
         periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog);
         break;
     case Qn::MotionContent:
@@ -99,6 +98,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             periods = QnMotionHelper::instance()->mathImage(motionRegions, resList, startTime, endTime, detailLevel);
         }
         break;
+#ifdef QN_ENABLE_BOOKMARKS
     case Qn::BookmarksContent:
         {
             QnCameraBookmarkTags tags;
@@ -108,6 +108,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
             periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel, QList<QnServer::ChunksCatalog>() << QnServer::BookmarksCatalog);
             break;
         }
+#endif
     default:
         return errLog("Invalid periodsType parameter.");
     }
