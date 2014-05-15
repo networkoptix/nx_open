@@ -324,6 +324,14 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
     setParam(MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
     setParam(DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
+
+    //detecting and saving selected resolutions
+    CameraMediaStreams mediaStreams;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution[0], CODEC_ID_H264 ) );
+    if( !m_resolution[1].isEmpty() )
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution[1], CODEC_ID_H264 ) );
+    saveResolutionList( mediaStreams );
+
     save();
 
     return CameraDiagnostics::NoErrorResult();

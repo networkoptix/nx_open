@@ -36,7 +36,7 @@ bool QnDlink_cam_info::inited() const
 }
 
 // returns resolution with width not less than width
-QSize QnDlink_cam_info::resolutionCloseTo(int width)
+QSize QnDlink_cam_info::resolutionCloseTo(int width) const
 {
     if (resolutions.size()==0)
     {
@@ -100,6 +100,16 @@ int QnDlink_cam_info::frameRateCloseTo(int fr)
     }
 
     return result;
+}
+
+QSize QnDlink_cam_info::primaryStreamResolution() const
+{
+    return resolutions.at(0);
+}
+
+QSize QnDlink_cam_info::secondaryStreamResolution() const
+{
+    return resolutionCloseTo(480);
 }
 
 
@@ -314,6 +324,18 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else
             ++it;
     }
+
+    //detecting and saving selected resolutions
+    const CodecID supportedCodec = !m_camInfo.hasH264.isEmpty()
+        ? CODEC_ID_H264
+        : (m_camInfo.hasMPEG4 ? CODEC_ID_MPEG4 : CODEC_ID_MJPEG);
+    CameraMediaStreams mediaStreams;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_camInfo.primaryStreamResolution(), supportedCodec) );
+    if( m_camInfo.secondaryStreamResolution().width() > 0 )
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_camInfo.secondaryStreamResolution(), supportedCodec ) );
+    saveResolutionList( mediaStreams );
+
+    save();
 
     return CameraDiagnostics::NoErrorResult();
 

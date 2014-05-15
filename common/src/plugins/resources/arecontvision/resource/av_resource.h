@@ -53,6 +53,7 @@ public:
     //virtual QnMediaInfo getMediaInfo() const;
 
     int totalMdZones() const;
+    bool isH264() const;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
