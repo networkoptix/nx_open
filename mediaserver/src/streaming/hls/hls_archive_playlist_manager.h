@@ -30,9 +30,9 @@ namespace nx_hls
     public:
         ArchivePlaylistManager(
             const QnSecurityCamResourcePtr& camResource,
-            quint64 startTimestamp,
+            qint64 startTimestamp,
             unsigned int maxChunkNumberInPlaylist,
-            quint64 targetDurationUsec,
+            qint64 targetDurationUsec,
             MediaQuality streamQuality );
         virtual ~ArchivePlaylistManager();
 
@@ -47,14 +47,14 @@ namespace nx_hls
 
     private:
         const QnSecurityCamResourcePtr m_camResource;
-        quint64 m_startTimestamp;
+        qint64 m_startTimestamp;
         unsigned int m_maxChunkNumberInPlaylist;
-        quint64 m_targetDurationUsec;
+        qint64 m_targetDurationUsec;
         MediaQuality m_streamQuality;
         mutable QMutex m_mutex;
         std::deque<AbstractPlaylistManager::ChunkData> m_chunks;
-        quint64 m_totalPlaylistDuration;
-        quint64 m_prevChunkEndTimestamp;
+        qint64 m_totalPlaylistDuration;
+        qint64 m_prevChunkEndTimestamp;
         bool m_eof;
         int m_chunkMediaSequence;
         QnThumbnailsArchiveDelegate* m_delegate;

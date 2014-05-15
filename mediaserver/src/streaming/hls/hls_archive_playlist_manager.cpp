@@ -20,9 +20,9 @@ namespace nx_hls
 {
     ArchivePlaylistManager::ArchivePlaylistManager(
         const QnSecurityCamResourcePtr& camResource,
-        quint64 startTimestamp,
+        qint64 startTimestamp,
         unsigned int maxChunkNumberInPlaylist,
-        quint64 targetDurationUsec,
+        qint64 targetDurationUsec,
         MediaQuality streamQuality )
     :
         m_camResource( camResource ),
@@ -102,7 +102,7 @@ namespace nx_hls
         if( !m_initialPlaylistCreated )
         {
             //creating initial playlist
-            for( int i = 0; i < m_maxChunkNumberInPlaylist; ++i )
+            for( size_t i = 0; i < m_maxChunkNumberInPlaylist; ++i )
             {
                 if( !addOneMoreChunk() )
                     break;

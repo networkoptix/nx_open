@@ -207,13 +207,13 @@ QnAbstractMediaDataPtr QnVMax480ArchiveDelegate::getNextData()
     return result;
 }
 
-static std::shared_ptr<QnDefaultResourceVideoLayout> videoLayout( new QnDefaultResourceVideoLayout() );
+static QSharedPointer<QnDefaultResourceVideoLayout> videoLayout( new QnDefaultResourceVideoLayout() );
 QnResourceVideoLayoutPtr QnVMax480ArchiveDelegate::getVideoLayout()
 {
     return videoLayout;
 }
 
-static std::shared_ptr<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
+static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
 QnResourceAudioLayoutPtr QnVMax480ArchiveDelegate::getAudioLayout()
 {
     return audioLayout;

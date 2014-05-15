@@ -68,7 +68,7 @@ void QnShadowItem::ensureShadowShape() const {
     } else {
         m_shadowShape = QPolygonF();
     }
-    m_shapeValid = true;
+    m_shapeValid = m_shadowShape.size() > 0;
 }
 
 void QnShadowItem::ensureShadowParameters() const {
@@ -76,6 +76,8 @@ void QnShadowItem::ensureShadowParameters() const {
         return;
 
     ensureShadowShape();
+    if (!m_shapeValid)
+        return;
 
     m_painterPath = QPainterPath();
     m_painterPath.addPolygon(m_shadowShape);
@@ -85,18 +87,21 @@ void QnShadowItem::ensureShadowParameters() const {
 
 QRectF QnShadowItem::boundingRect() const {
     ensureShadowParameters();
-
+    //TODO: #GDM what should we return if the rect is not valid?
     return m_boundingRect;
 }
 
 QPainterPath QnShadowItem::shape() const {
     ensureShadowParameters();
-
+    //TODO: #GDM what should we return if the rect is not valid?
     return m_painterPath;
 }
 
 void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     ensureShadowShape();
+
+    if (!m_shapeValid)
+        return;
 
 #if 0
     QN_SCOPED_PAINTER_BRUSH_ROLLBACK(painter, m_color);

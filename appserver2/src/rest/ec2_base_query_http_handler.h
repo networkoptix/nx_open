@@ -85,7 +85,6 @@ namespace ec2
             };
 
             static_cast<Derived*>(this)->processQueryAsync(
-                m_cmdCode,
                 inputData,
                 queryDoneHandler );
 
@@ -129,23 +128,22 @@ namespace ec2
     :
         public BaseQueryHttpHandler<InputData, OutputData, QueryHttpHandler2<InputData, OutputData> >
     {
-    public:
-        typedef BaseQueryHttpHandler<InputData, OutputData, QueryHttpHandler2<InputData, OutputData> > parent_type;
+        typedef BaseQueryHttpHandler<InputData, OutputData, QueryHttpHandler2<InputData, OutputData> > base_type;
 
+    public:
         QueryHttpHandler2(
             ApiCommand::Value cmdCode,
             ServerQueryProcessor* const queryProcessor )
         :
-            parent_type( cmdCode ),
+            base_type( cmdCode ),
             m_cmdCode( cmdCode ),
             m_queryProcessor( queryProcessor )
         {
         }
 
         template<class HandlerType>
-        void processQueryAsync( ApiCommand::Value /*cmdCode*/, const InputData& inputData, HandlerType handler )
+        void processQueryAsync( const InputData& inputData, HandlerType handler )
         {
-            // TODO: #Elric maybe compare m_cmdCode and passed cmdCode?
             m_queryProcessor->template processQueryAsync<InputData, OutputData, HandlerType>(
                 m_cmdCode,
                 inputData,
@@ -171,19 +169,18 @@ namespace ec2
     :
         public BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> >
     {
-    public:
-        // TODO: #MSAPI our code convention is to name this one base_type, and make it private. Tell Andrey.
-        typedef BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> > parent_type; 
+        typedef BaseQueryHttpHandler<InputData, OutputData, FlexibleQueryHttpHandler<InputData, OutputData, QueryHandlerType> > base_type; 
 
+    public:
         FlexibleQueryHttpHandler( ApiCommand::Value cmdCode, QueryHandlerType queryHandler )
         :
-            parent_type( cmdCode ),
+            base_type( cmdCode ),
             m_queryHandler( queryHandler )
         {
         }
 
         template<class HandlerType>
-        void processQueryAsync( ApiCommand::Value /*cmdCode*/, const InputData& inputData, HandlerType handler )
+        void processQueryAsync( const InputData& inputData, HandlerType handler )
         {
             QnScopedThreadRollback ensureFreeThread(1);
             QtConcurrent::run( [this, inputData, handler]() {
