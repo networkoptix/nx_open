@@ -23,11 +23,13 @@ namespace Qn {
         RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
         EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
 
-        VideoWallItemNode,      /**< Node that represents a video wall item. Has a guid and can have resource. */
-        VideoWallHistoryNode,   /**< Node that represents a video wall history item. Has both guid and resource. */
+        VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */
+        VideoWallHistoryNode,   /**< Node that represents a videowall history item. Has both guid and resource. */
 
-        UserVideoWallNode,      /**< Node that represents a video wall having items that user is allowed to edit. Has both guid and resource. */
-        UserVideoWallItemNode,  /**< Node that represents a video wall item that user is allowed to edit. Has a guid. */
+        UserVideoWallNode,      /**< Node that represents a videowall having items that user is allowed to edit. Has both guid and resource. */
+        UserVideoWallItemNode,  /**< Node that represents a videowall item that user is allowed to edit. Has a guid. */
+
+        VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */
 
         NodeTypeCount
     };

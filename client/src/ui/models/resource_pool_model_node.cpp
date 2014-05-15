@@ -184,6 +184,18 @@ void QnResourcePoolModelNode::update() {
         } else {
             m_displayName = m_name = QString();
         }
+    } else if (m_type == Qn::VideoWallMatrixNode) {
+        //TODO: #GDM #VW additional flag requested? icon? drag-n-drop support?
+        m_status = QnResource::Online;
+        m_searchString = QString();
+        m_flags = 0; 
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
+        foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>()) {
+            if (!videowall->matrices()->hasItem(m_uuid))
+                continue;
+            m_displayName = m_name = videowall->matrices()->getItem(m_uuid).name;
+            break;
+        }
     }
 
     /* Update bastard state. */
@@ -193,6 +205,7 @@ void QnResourcePoolModelNode::update() {
         bastard = m_resource.isNull();
         break;
     case Qn::VideoWallItemNode:
+    case Qn::VideoWallMatrixNode:
         bastard = false;
         break;
     case Qn::UserVideoWallItemNode:
@@ -416,7 +429,12 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
             return static_cast<int>(m_flags);
         break;
     case Qn::ItemUuidRole:
-        if(m_type == Qn::ItemNode || m_type == Qn::VideoWallItemNode || m_type == Qn::UserVideoWallItemNode)
+        if (
+            m_type == Qn::ItemNode 
+            || m_type == Qn::VideoWallItemNode 
+            || m_type == Qn::UserVideoWallItemNode 
+            || m_type == Qn::VideoWallMatrixNode
+            )
             return QVariant::fromValue<QUuid>(m_uuid);
         break;
     case Qn::ResourceSearchStringRole:
