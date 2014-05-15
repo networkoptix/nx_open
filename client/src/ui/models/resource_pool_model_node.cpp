@@ -30,6 +30,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
 {
     assert(type == Qn::LocalNode ||
            type == Qn::ServersNode ||
+           type == Qn::OtherSystemsNode ||
            type == Qn::UsersNode ||
            type == Qn::RootNode ||
            type == Qn::BastardNode ||
@@ -45,6 +46,10 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         break;
     case Qn::ServersNode:
         m_displayName = m_name = tr("System");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
+        break;
+    case Qn::OtherSystemsNode:
+        m_displayName = m_name = tr("Other Systems");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
         break;
     case Qn::UsersNode:

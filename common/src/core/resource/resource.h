@@ -67,7 +67,8 @@ public:
         Unauthorized,
         Online,
         Recording,
-        NotDefined
+        NotDefined,
+        Incompatible
     };
 
     enum Flag {

@@ -59,7 +59,7 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, bool isFlat,
     m_rootNodeType(rootNodeType),
     m_flat(isFlat)
 {
-    m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::RootNode << Qn::BastardNode;
+    m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::OtherSystemsNode << Qn::RootNode << Qn::BastardNode;
 
     /* Create top-level nodes. */
     foreach(Qn::NodeType t, m_rootNodeTypes)
@@ -215,8 +215,11 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
     if (node->type() == Qn::EdgeNode)
         return m_rootNodes[Qn::ServersNode];
 
-    if(node->resourceFlags() & QnResource::server)
+    if (node->resourceFlags() & QnResource::server) {
+        if (node->resourceStatus() == QnResource::Incompatible)
+            return m_rootNodes[Qn::OtherSystemsNode];
         return m_rootNodes[Qn::ServersNode];
+    }
 
     if (node->resourceFlags() & QnResource::videowall)
         return m_rootNodes[m_rootNodeType];

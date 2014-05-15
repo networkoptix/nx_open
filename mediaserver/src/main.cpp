@@ -952,19 +952,66 @@ void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
 void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
     Q_UNUSED(localInterfaceAddress)
 
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+
     if (moduleInformation.version == QnSoftwareVersion(QN_APPLICATION_VERSION) && moduleInformation.systemName == qnCommon->localSystemName()) {
         int port = moduleInformation.parameters.value("port").toInt();
         QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
-        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
         ec2Connection->addRemotePeer(url, false, moduleInformation.id);
+    } else {
+        QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
+
+        bool newServer = false;
+        if (!server) {
+            server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
+            server->setId(moduleInformation.id);
+            server->setVersion(moduleInformation.version);
+            server->setSystemInfo(moduleInformation.systemInformation);
+            server->setStatus(QnResource::Incompatible);
+            newServer = true;
+        }
+
+        Qn::ServerFlags serverFlags = Qn::SF_None;
+        if (!moduleInformation.isLocal)
+            serverFlags |= Qn::SF_RemoteEC;
+        server->setServerFlags(serverFlags);
+
+        QHostAddress serverAddress(remoteAddress);
+        if (!moduleInformation.isLocal) {
+            foreach (const QString &address, moduleInformation.remoteAddresses) {
+                serverAddress = resolveHost(address);
+                if (serverAddress.toIPv4Address() != 0)
+                    break;
+            }
+        }
+        setServerNameAndUrls(server, serverAddress.toString(), moduleInformation.parameters.value("port").toInt());
+
+        QList<QHostAddress> serverInterfaceList;
+        foreach (const QString &address, moduleInformation.remoteAddresses)
+            serverInterfaceList.append(QHostAddress(address));
+        server->setNetAddrList(serverInterfaceList);
+
+        if (newServer)
+            ec2Connection->getResourceManager()->save(server, this, [this](int, ec2::ErrorCode, QnResourcePtr){});
+        ec2Connection->getMediaServerManager()->save(server, this, [this](int, ec2::ErrorCode, QnMediaServerResourcePtr){});
     }
 }
 void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
-    int port = moduleInformation.parameters.value("port").toInt();
-    foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
-        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
-        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-        ec2Connection->deleteRemotePeer(url);
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+
+    if (moduleInformation.version == QnSoftwareVersion(QN_APPLICATION_VERSION) && moduleInformation.systemName == qnCommon->localSystemName()) {
+        int port = moduleInformation.parameters.value("port").toInt();
+        foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
+            QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
+            ec2Connection->deleteRemotePeer(url);
+        }
+    } else {
+        QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).staticCast<QnMediaServerResource>();
+        if (server) {
+            ec2Connection->getMediaServerManager()->remove(moduleInformation.id, this, [this](int, ec2::ErrorCode){});
+            ec2Connection->getResourceManager()->remove(moduleInformation.id, this, [this](int, ec2::ErrorCode){});
+            qnResPool->removeResource(server);
+        }
     }
 }
 
