@@ -5,15 +5,26 @@
 
 #include <utils/common/warnings.h>
 
+template <class T> class QnResourceItemStorage;
+
+/**
+ * @brief The QnResourceItemStorageNotifier class       Notification interface for the QnResourceItemStorage class.
+ */
 template <class T>
 class QnResourceItemStorageNotifier {
-public:
+protected:
     virtual void storedItemAdded(const T &item) = 0;
     virtual void storedItemRemoved(const T &item) = 0;
     virtual void storedItemChanged(const T &item) = 0;
+
+private:
+    friend class QnResourceItemStorage<T>;
 };
 
-
+/**
+ * @brief The QnResourceItemStorage class               Utility class for storing and handling set of custom items.
+ *                                                      Item class T should have "uuid" field and it must be unique.
+ */
 template <class T>
 class QnResourceItemStorage {
 public:
