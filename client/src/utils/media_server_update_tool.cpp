@@ -283,12 +283,21 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
     for (auto platform = packages.begin(); platform != packages.end(); ++platform) {
         QVariantMap architectures = platform.value().toMap();
         for (auto arch = architectures.begin(); arch != architectures.end(); ++arch) {
+            // We suppose arch name does not contain '_' char. E.g. arm_isd_s2 will be split to "arm" and "isd_s2"
+            QString architecture = arch.key();
+            QString modification;
+            int i = architecture.indexOf(QChar::fromLatin1('_'));
+            if (i != -1) {
+                modification = architecture.mid(i + 1);
+                architecture = architecture.left(i);
+            }
+
             QVariantMap package = arch.value().toMap();
             QString fileName = package.value(lit("file")).toString();
             UpdateFileInformationPtr info(new UpdateFileInformation(m_targetVersion, QUrl(urlPrefix + fileName)));
             info->baseFileName = fileName;
             info->fileSize = package.value(lit("size")).toLongLong();
-            m_updateFiles.insert(QnSystemInformation(platform.key(), arch.key()), info);
+            m_updateFiles.insert(QnSystemInformation(platform.key(), architecture, modification), info);
         }
     }
 

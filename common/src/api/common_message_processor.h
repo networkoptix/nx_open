@@ -46,7 +46,7 @@ signals:
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) = 0;
-    virtual void execBusinessActionInternal(QnAbstractBusinessActionPtr action) {}
+    virtual void execBusinessActionInternal(QnAbstractBusinessActionPtr /*action*/) {}
     
     virtual void afterRemovingResource(const QnId &id);
 

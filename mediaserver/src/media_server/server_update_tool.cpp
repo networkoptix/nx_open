@@ -243,6 +243,13 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
         cl_log.log("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
         return false;
     }
+    //TODO: #dklychkov ask about QN_ARM_BOX and uncomment
+    /*
+    if (map.value(lit("modification")) != lit(QN_ARM_BOX)) {
+        cl_log.log("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
+        return false;
+    }
+    */
 
     QString version = map.value(lit("version")).toString();
 

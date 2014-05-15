@@ -16,6 +16,8 @@
 #include <QtCore/QUuid>
 #include <QtCore/QUrl>
 
+#include <utils/common/latin1_array.h>
+
 #include "csv.h"
 
 namespace QnCsvDetail {
@@ -33,6 +35,11 @@ namespace QnCsvDetail {
     }
 
 } // namespace QnCsvDetail
+
+
+QN_DECLARE_CSV_TYPE_CATEGORY(QString, QnCsv::field_tag)
+QN_DECLARE_CSV_TYPE_CATEGORY(QByteArray, QnCsv::field_tag)
+QN_DECLARE_CSV_TYPE_CATEGORY(QnLatin1Array, QnCsv::field_tag)
 
 
 template<class Output>
@@ -53,6 +60,11 @@ void serialize(const QUrl &value, QnCsvStreamWriter<Output> *stream) {
 template<class Output>
 void serialize(const QByteArray &value, QnCsvStreamWriter<Output> *stream) {
     stream->writeUtf8Field(value.toBase64());
+}
+
+template<class Output>
+void serialize(const QnLatin1Array &value, QnCsvStreamWriter<Output> *stream) {
+    stream->writeUtf8Field(value);
 }
 
 
