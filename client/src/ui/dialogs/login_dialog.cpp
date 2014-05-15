@@ -35,6 +35,7 @@
 #include "plugins/resources/archive/filetypesupport.h"
 
 #include <client/client_settings.h>
+#include <common/common_module.h>
 
 #include "connection_testing_dialog.h"
 
@@ -585,6 +586,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
 
     QnAppServerConnectionFactory::setEc2Connection( connection );
     m_connectInfo = connectionInfo;
+    qnCommon->setLocalSystemName(connectionInfo->systemName);
     base_type::accept();
 }
 

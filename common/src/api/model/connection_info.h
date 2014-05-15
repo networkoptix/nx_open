@@ -26,9 +26,10 @@ struct QnConnectionInfo {
     QString ecsGuid;
     QString publicIp;
     QString brand;
+    QString systemName;
 };
 
-#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand)
+#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand)(systemName)
 
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS(QnCompatibilityItem, (metatype)(json)(binary)(csv_record))

@@ -34,6 +34,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
            type == Qn::UsersNode ||
            type == Qn::RootNode ||
            type == Qn::BastardNode ||
+           type == Qn::SystemNode ||
            type == Qn::RecorderNode);
 
     switch(type) {
@@ -64,6 +65,10 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         m_displayName = m_name = name;
         m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
         m_bastard = true; /* Invisible by default until has children. */
+        break;
+    case Qn::SystemNode:
+        m_displayName = m_name = name;
+        m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
         break;
     default:
         break;

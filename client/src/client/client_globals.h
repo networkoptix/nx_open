@@ -30,6 +30,8 @@ namespace Qn {
         UserVideoWallNode,      /**< Node that represents a video wall having items that user is allowed to edit. Has both guid and resource. */
         UserVideoWallItemNode,  /**< Node that represents a video wall item that user is allowed to edit. Has a guid. */
 
+        SystemNode,             /**< Node that represents systems but the current. */
+
         NodeTypeCount
     };
 

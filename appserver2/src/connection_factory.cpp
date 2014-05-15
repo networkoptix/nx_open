@@ -275,6 +275,7 @@ namespace ec2
         connectionInfo->version = QnSoftwareVersion(lit(QN_APPLICATION_VERSION));
         connectionInfo->brand = lit(QN_PRODUCT_NAME_SHORT);
         connectionInfo->ecsGuid = lit( "ECS_HUID" );
+        connectionInfo->systemName = qnCommon->localSystemName();
 
         return ErrorCode::ok;
     }

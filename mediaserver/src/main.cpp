@@ -965,11 +965,12 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
         if (!server) {
             server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
             server->setId(moduleInformation.id);
-            server->setVersion(moduleInformation.version);
-            server->setSystemInfo(moduleInformation.systemInformation);
             server->setStatus(QnResource::Incompatible);
             newServer = true;
         }
+        server->setSystemInfo(moduleInformation.systemInformation);
+        server->setVersion(moduleInformation.version);
+        server->setSystemName(moduleInformation.systemName);
 
         Qn::ServerFlags serverFlags = Qn::SF_None;
         if (!moduleInformation.isLocal)
@@ -1004,13 +1005,6 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
         foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
             QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
             ec2Connection->deleteRemotePeer(url);
-        }
-    } else {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).staticCast<QnMediaServerResource>();
-        if (server) {
-            ec2Connection->getMediaServerManager()->remove(moduleInformation.id, this, [this](int, ec2::ErrorCode){});
-            ec2Connection->getResourceManager()->remove(moduleInformation.id, this, [this](int, ec2::ErrorCode){});
-            qnResPool->removeResource(server);
         }
     }
 }
@@ -1296,6 +1290,7 @@ void QnMain::run()
         }
         server->setVersion(QnSoftwareVersion(QN_ENGINE_VERSION));
         server->setSystemInfo(QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH));
+        server->setSystemName(qnCommon->localSystemName());
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
         bool isLocal = appserverHostString.isEmpty() || QUrl(appserverHostString).scheme() == "file";

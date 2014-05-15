@@ -7,6 +7,7 @@
 
 #include <utils/common/checked_cast.h>
 #include <common/common_meta_types.h>
+#include <common/common_module.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
@@ -98,6 +99,7 @@ QnResourcePoolModel::~QnResourcePoolModel() {
     /* Free memory. */
     qDeleteAll(m_resourceNodeByResource);
     qDeleteAll(m_itemNodeByUuid);
+    qDeleteAll(m_systemNodeBySystemName);
     foreach(Qn::NodeType t, m_rootNodeTypes) {
         delete m_rootNodes[t];
         qDeleteAll(m_nodes[t]);
@@ -158,6 +160,17 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
     return recorder;
 }
 
+QnResourcePoolModelNode *QnResourcePoolModel::systemNode(const QString &systemName) {
+    QnResourcePoolModelNode *node = m_systemNodeBySystemName[systemName];
+    if (node)
+        return node;
+
+    node = new QnResourcePoolModelNode(this, Qn::SystemNode, systemName);
+    node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
+    m_systemNodeBySystemName[systemName] = node;
+    return node;
+}
+
 void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
     if (
             node->type() == Qn::VideoWallItemNode ||
@@ -216,8 +229,15 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
         return m_rootNodes[Qn::ServersNode];
 
     if (node->resourceFlags() & QnResource::server) {
-        if (node->resourceStatus() == QnResource::Incompatible)
-            return m_rootNodes[Qn::OtherSystemsNode];
+        if (node->resourceStatus() == QnResource::Incompatible) {
+            QnMediaServerResourcePtr server = node->resource().staticCast<QnMediaServerResource>();
+
+            QString systemName = server->getSystemName();
+            if (systemName == qnCommon->localSystemName())
+                return m_rootNodes[Qn::ServersNode];
+
+            return systemName.isEmpty() ? m_rootNodes[Qn::OtherSystemsNode] : systemNode(systemName);
+        }
         return m_rootNodes[Qn::ServersNode];
     }
 

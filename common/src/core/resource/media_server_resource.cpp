@@ -282,6 +282,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_streamingUrl = localOther->getStreamingUrl();
         m_version = localOther->getVersion();
         m_systemInfo = localOther->getSystemInfo();
+        m_systemName = localOther->getSystemName();
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
@@ -368,6 +369,18 @@ void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo)
     QMutexLocker lock(&m_mutex);
 
     m_systemInfo = systemInfo;
+}
+
+QString QnMediaServerResource::getSystemName() const {
+    QMutexLocker lock(&m_mutex);
+
+    return m_systemName;
+}
+
+void QnMediaServerResource::setSystemName(const QString &systemName) {
+    QMutexLocker lock(&m_mutex);
+
+    m_systemName = systemName;
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {

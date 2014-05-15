@@ -68,6 +68,9 @@ public:
     QnSystemInformation getSystemInfo() const;
     void setSystemInfo(const QnSystemInformation &systemInfo);
 
+    QString getSystemName() const;
+    void setSystemName(const QString &systemName);
+
     static bool isEdgeServer(const QnResourcePtr &resource);
     virtual void setStatus(Status newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
@@ -92,6 +95,7 @@ private:
     Qn::PanicMode m_panicMode;
     QnSoftwareVersion m_version;
     QnSystemInformation m_systemInfo;
+    QString m_systemName;
     QMap<int, QString> m_runningIfRequests;
     QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
     int m_maxCameras;
