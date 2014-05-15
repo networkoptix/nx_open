@@ -318,7 +318,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
         }
     }
 
-    bool intfListChanged = intfList.size() != m_ifaceToSock.size();
+    bool intfListChanged = (unsigned int)intfList.size() != m_ifaceToSock.size();
     if( !intfListChanged )
         for( const QnInterfaceAndAddr& intf: intfList )
         {

@@ -23,11 +23,11 @@ QVariant QnFoundEnterpriseControllersModel::data( const QModelIndex& index, int 
 
     if( index.column() != 0 )
         return QVariant();
-    size_t foundModuleIndex = 0;
-    size_t moduleAddressIndex = 0;
+    int foundModuleIndex = 0;
+    int moduleAddressIndex = 0;
     if( index.internalId() == 0 )
     {
-        if( index.row() >= static_cast<int>(m_foundModules.size()) )
+        if( index.row() >= m_foundModules.size() )
             return QVariant();
         foundModuleIndex = index.row();
         moduleAddressIndex = 0;
@@ -37,8 +37,8 @@ QVariant QnFoundEnterpriseControllersModel::data( const QModelIndex& index, int 
     else
     {
         foundModuleIndex = index.internalId() & 0x00ffffff;
-        if( foundModuleIndex >= static_cast<int>(m_foundModules.size()) ||
-            index.row() >= static_cast<int>(m_foundModules[foundModuleIndex].ipAddresses.size()) )   //invalid address index
+        if( foundModuleIndex >= m_foundModules.size() ||
+            index.row() >= m_foundModules[foundModuleIndex].ipAddresses.size() )   //invalid address index
         {
             return QVariant();
         }
@@ -77,7 +77,7 @@ bool QnFoundEnterpriseControllersModel::hasChildren( const QModelIndex& parent )
     if( parent.internalId() != 0 ||
         parent.column() > 0 ||
         parent.row() < 0 ||
-        parent.row() >= static_cast<int>(m_foundModules.size()) )
+        parent.row() >= m_foundModules.size() )
     {
         return false;
     }
@@ -111,7 +111,7 @@ QModelIndex	QnFoundEnterpriseControllersModel::parent( const QModelIndex& index 
         return QModelIndex();
 
     const int foundModuleIndex = index.internalId() & 0x00ffffff;
-    if( foundModuleIndex >= static_cast<int>(m_foundModules.size()) )
+    if( foundModuleIndex >= m_foundModules.size() )
         return QModelIndex();
 
     return createIndex( foundModuleIndex, 0, (void*)0 );
@@ -132,7 +132,7 @@ int	QnFoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) con
     if( parent.internalId() != 0 || //element with ip address
         parent.column() != 0 ||
         parent.row() < 0 ||
-        parent.row() >= static_cast<int>(m_foundModules.size()) )
+        parent.row() >= m_foundModules.size() )
     {
         return 0;
     }
@@ -231,14 +231,14 @@ QModelIndex	QnFoundEnterpriseControllersModel::indexNonSafe( int row, int column
         return QModelIndex();
     if( !parent.isValid() )
     {
-        if( row >= static_cast<int>(m_foundModules.size()) )
+        if( row >= m_foundModules.size() )
             return QModelIndex();
         return createIndex( row, column, (void*)0 );
     }
     else
     {
         if( parent.internalId() != 0 ||
-            parent.row() >= static_cast<int>(m_foundModules.size()) ||
+            parent.row() >= m_foundModules.size() ||
             parent.column() > 0 )
         {
             return QModelIndex();
