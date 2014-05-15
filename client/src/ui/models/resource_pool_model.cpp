@@ -532,7 +532,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
             at_resource_itemAdded(layout, item);
 
     if (videoWall)
-        foreach(const QnVideoWallItem &item, videoWall->getItems())
+        foreach(const QnVideoWallItem &item, videoWall->items()->getItems())
             at_videoWall_itemAddedOrChanged(videoWall, item);
 
     if (user)

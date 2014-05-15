@@ -715,9 +715,9 @@ Qn::ActionVisibility QnDetachFromVideoWallActionCondition::check(const QnActionP
     foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
         if (index.isNull())
             continue;
-        if (!index.videowall()->hasItem(index.uuid()))
+        if (!index.videowall()->items()->hasItem(index.uuid()))
             continue;
-        if (index.videowall()->getItem(index.uuid()).layout.isNull())
+        if (index.videowall()->items()->getItem(index.uuid()).layout.isNull())
             continue;
         return Qn::EnabledAction;
     }

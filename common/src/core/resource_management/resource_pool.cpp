@@ -214,11 +214,11 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
         if (resource.dynamicCast<QnLayoutResource>()) {
             foreach (const QnVideoWallResourcePtr &videowall, getResources().filtered<QnVideoWallResource>()) { // TODO: #Elric this is way beyond what one may call 'suboptimal'.
-                foreach (QnVideoWallItem item, videowall->getItems()) {
+                foreach (QnVideoWallItem item, videowall->items()->getItems()) {
                     if (item.layout != resource->getId())
                         continue;
                     item.layout = QUuid();
-                    videowall->updateItem(item.uuid, item);
+                    videowall->items()->updateItem(item.uuid, item);
                 }
             }
         }
@@ -499,7 +499,7 @@ bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHas
 QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QUuid &uuid) const {
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
-        if (!videoWall || !videoWall->hasItem(uuid))
+        if (!videoWall || !videoWall->items()->hasItem(uuid))
             continue;
         return QnVideoWallItemIndex(videoWall, uuid);
     }

@@ -762,7 +762,7 @@ void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst)
         outItems << QnVideoWallItem();
         fromApiToResource(item, outItems.last());
     }
-    dst->setItems(outItems);
+    dst->items()->setItems(outItems);
 
     QnVideoWallPcDataMap pcs;
     for (const ApiVideowallScreenData &screen: src.screens) {
@@ -772,7 +772,7 @@ void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst)
         outPc.uuid = screen.pcGuid;
         outPc.screens << outScreen;
     }
-    dst->setPcs(pcs);
+    dst->pcs()->setItems(pcs);
 
 }
 
@@ -781,7 +781,7 @@ void fromResourceToApi(const QnVideoWallResourcePtr &src, ApiVideowallData &dst)
 
     dst.autorun = src->isAutorun();
 
-    const QnVideoWallItemMap& resourceItems = src->getItems();
+    const QnVideoWallItemMap& resourceItems = src->items()->getItems();
     dst.items.clear();
     dst.items.reserve(resourceItems.size());
     for (const QnVideoWallItem &item: resourceItems) {
@@ -791,7 +791,7 @@ void fromResourceToApi(const QnVideoWallResourcePtr &src, ApiVideowallData &dst)
     }
 
     dst.screens.clear();
-    for (const QnVideoWallPcData &pc: src->getPcs()) {
+    for (const QnVideoWallPcData &pc: src->pcs()->getItems()) {
         for (const QnVideoWallPcData::PcScreen &screen: pc.screens) {
             ApiVideowallScreenData screenData;
             fromResourceToApi(screen, screenData);

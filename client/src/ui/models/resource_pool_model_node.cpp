@@ -173,7 +173,7 @@ void QnResourcePoolModelNode::update() {
 
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
         if (!index.isNull()) {
-            QnVideoWallItem item = index.videowall()->getItem(m_uuid);
+            QnVideoWallItem item = index.videowall()->items()->getItem(m_uuid);
 
             if(m_resource.isNull()) {
                 m_displayName = m_name = item.name;
