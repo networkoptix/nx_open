@@ -555,8 +555,6 @@ QnResourceList QnRecordingManager::getLocalControlledCameras()
     // return own cameras + cameras from media servers without DB (remote connected servers)
     QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
     QnResourceList result;
-    int recordingCameras = 0;
-    qint64 relativeTime = ec2::QnTransactionLog::instance()->getRelativeTime();
     foreach(QnResourcePtr camRes, cameras)
     {
         QnMediaServerResourcePtr mServer = camRes->getParentResource().dynamicCast<QnMediaServerResource>();
