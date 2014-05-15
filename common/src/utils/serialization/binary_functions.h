@@ -368,8 +368,12 @@ QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QList, (class T), (T));
 QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QLinkedList, (class T), (T));
 QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QVector, (class T), (T));
 QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QVarLengthArray, (class T, int N), (T, N));
+
+#ifndef QN_NO_QT
 QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T));
 QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T));
+#endif
+
 QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator));
 QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator));
 QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator));
