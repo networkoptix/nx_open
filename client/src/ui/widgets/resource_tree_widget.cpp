@@ -68,7 +68,13 @@ protected:
         Qn::NodeType leftNode = left.data(Qn::NodeTypeRole).value<Qn::NodeType>();
         Qn::NodeType rightNode = right.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
-        /* Local node must be the last one in a list. */
+        /* "Other Systems" must be the last element */
+        bool leftOtherSystems = leftNode == Qn::OtherSystemsNode;
+        bool rightOtherSystems = rightNode == Qn::OtherSystemsNode;
+        if(leftOtherSystems ^ rightOtherSystems) /* One of the nodes is an "other systems" node, but not both. */
+            return rightOtherSystems;
+
+        /* Local node must be just before "other systems". */
         bool leftLocal = leftNode == Qn::LocalNode;
         bool rightLocal = rightNode == Qn::LocalNode;
         if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
