@@ -15,7 +15,6 @@
 #include "ec2_connection.h"
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
-#include "rest/ec2_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
 #include "rest/server/rest_connection_processor.h"
 #include "transaction/transaction.h"

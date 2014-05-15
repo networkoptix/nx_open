@@ -76,11 +76,12 @@ bool QnProxyConnectionProcessor::doProxyData(fd_set* read_set, AbstractStreamSoc
     return true;
 }
 
+#ifdef PROXY_STRICT_IP
 static bool isLocalAddress(const QString& addr)
 {
     return addr == lit("localhost") || addr == lit("127.0.0.1");
 }
-
+#endif
 
 QString QnProxyConnectionProcessor::connectToRemoteHost(const QString& guid, const QUrl& url)
 {
@@ -89,9 +90,9 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QString& guid, con
     d->dstSocket = (dynamic_cast<QnUniversalTcpListener*> (d->owner))->getProxySocket(guid, CONNECT_TIMEOUT);
     if (!d->dstSocket) {
 
-        QnServerMessageProcessor* processor = dynamic_cast<QnServerMessageProcessor*> (QnServerMessageProcessor::instance());
 #ifdef PROXY_STRICT_IP
-        if (!processor->isKnownAddr(url.host()) && ! isLocalAddress(url.host()))
+        QnServerMessageProcessor* processor = dynamic_cast<QnServerMessageProcessor*> (QnServerMessageProcessor::instance());
+        if (processor && !processor->isKnownAddr(url.host()) && ! isLocalAddress(url.host()))
             return QString();
 #endif
 
