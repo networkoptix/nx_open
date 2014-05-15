@@ -4,6 +4,7 @@
 #ifndef QN_NO_QT
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QUrl>
 #endif
 
 #ifndef QN_NO_BASE

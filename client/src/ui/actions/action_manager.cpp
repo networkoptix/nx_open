@@ -1417,7 +1417,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::AddCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Bookmark Selection...")).
-        condition(new QnExportActionCondition(true, this));
+        condition(new QnAddBookmarkActionCondition(this));
 
     factory(Qn::EditCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).

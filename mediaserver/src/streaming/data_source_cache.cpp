@@ -42,15 +42,13 @@ DataSourceContextPtr DataSourceCache::find( const StreamingChunkCacheKey& key )
             it->first.containerFormat() == key.containerFormat() &&
             it->first.videoCodec() == key.videoCodec() &&
             it->first.audioCodec() == key.audioCodec() &&
-            it->first.live() == key.live() )
+            it->first.live() == key.live() &&
+            it->second->mediaDataProvider->currentPos() == key.startTimestamp() )
         {
-            if( it->second->mediaDataProvider->currentPos() == key.startTimestamp() )
-            {
-                //taking existing reader which is already at required position (from previous chunk)
-                DataSourceContextPtr item = it->second;
-                m_cachedDataProviders.erase( it++ );
-                return item;
-            }
+            //taking existing reader which is already at required position (from previous chunk)
+            DataSourceContextPtr item = it->second;
+            m_cachedDataProviders.erase( it++ );
+            return item;
         }
         else
         {
