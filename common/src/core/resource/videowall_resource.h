@@ -23,7 +23,7 @@ public:
 
     QnResourceItemStorage<QnVideoWallItem> *items() const;
     QnResourceItemStorage<QnVideoWallPcData> *pcs() const;
-    QnResourceItemStorage<QnVideoWallMatrix> *matrixes() const;
+    QnResourceItemStorage<QnVideoWallMatrix> *matrices() const;
 
     /** \returns Whether the videowall should be started when the PC boots up. */
     bool isAutorun() const;
@@ -61,7 +61,7 @@ private:
    
     QScopedPointer<QnResourceItemStorage<QnVideoWallItem> > m_items;
     QScopedPointer<QnResourceItemStorage<QnVideoWallPcData> > m_pcs;
-    QScopedPointer<QnResourceItemStorage<QnVideoWallMatrix> > m_matrixes;
+    QScopedPointer<QnResourceItemStorage<QnVideoWallMatrix> > m_matrices;
 
     bool m_autorun;
 };

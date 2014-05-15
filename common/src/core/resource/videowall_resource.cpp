@@ -5,7 +5,7 @@ QnVideoWallResource::QnVideoWallResource() :
     m_autorun(false),
     m_items(new QnResourceItemStorage<QnVideoWallItem>(&m_mutex, this)),
     m_pcs(new QnResourceItemStorage<QnVideoWallPcData>(&m_mutex, this)),
-    m_matrixes(new QnResourceItemStorage<QnVideoWallMatrix>(&m_mutex, this))
+    m_matrices(new QnResourceItemStorage<QnVideoWallMatrix>(&m_mutex, this))
 {
     setStatus(Online, true);
     addFlags(QnResource::videowall | QnResource::remote);
@@ -19,8 +19,8 @@ QnResourceItemStorage<QnVideoWallPcData> * QnVideoWallResource::pcs() const {
     return m_pcs.data();
 }
 
-QnResourceItemStorage<QnVideoWallMatrix> * QnVideoWallResource::matrixes() const {
-    return m_matrixes.data();
+QnResourceItemStorage<QnVideoWallMatrix> * QnVideoWallResource::matrices() const {
+    return m_matrices.data();
 }
 
 void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
@@ -30,7 +30,7 @@ void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArra
     if(localOther) {
         m_items->setItemsUnderLock(localOther->items());
         m_pcs->setItemsUnderLock(localOther->pcs());
-        m_matrixes->setItemsUnderLock(localOther->matrixes());
+        m_matrices->setItemsUnderLock(localOther->matrices());
         if (m_autorun != localOther->m_autorun) {
             m_autorun = localOther->m_autorun;
             modifiedFields << "autorunChanged";

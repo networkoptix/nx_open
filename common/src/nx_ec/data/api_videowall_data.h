@@ -57,9 +57,9 @@ namespace ec2
 
         std::vector<ApiVideowallItemData> items;
         std::vector<ApiVideowallScreenData> screens;
-        std::vector<ApiVideowallMatrixData> matrixes;
+        std::vector<ApiVideowallMatrixData> matrices;
     };
-#define ApiVideowallData_Fields ApiResourceData_Fields (autorun)(items)(screens)
+#define ApiVideowallData_Fields ApiResourceData_Fields (autorun)(items)(screens)(matrices)
 
 
     struct ApiVideowallControlMessageData: ApiData {
