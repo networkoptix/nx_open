@@ -245,7 +245,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(action(Qn::PushMyScreenToVideowallAction),  &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered);
         connect(action(Qn::VideowallSettingsAction),        &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered);
         connect(action(Qn::SaveVideowallMatrixAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered);
-
+        connect(action(Qn::LoadVideowallMatrixAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered);
 
         connect(display(),     &QnWorkbenchDisplay::widgetAdded,                        this,   &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
         connect(display(),     &QnWorkbenchDisplay::widgetAboutToBeRemoved,             this,   &QnWorkbenchVideoWallHandler::at_display_widgetAboutToBeRemoved);
@@ -1705,6 +1705,48 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered() {
     }
 
     videowall->matrices()->addItem(matrix);
+    connection2()->getVideowallManager()->save(videowall, this, [](){});
+}
+
+
+void QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered() {
+    //TODO: #GDM VW move to action condition
+    if (!context()->user())
+        return;
+
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnVideoWallResourcePtr videowall = parameters.resource().dynamicCast<QnVideoWallResource>();
+    if (!videowall)
+        return;
+
+    QUuid key = parameters.argument<QUuid>(Qn::UuidRole);
+    if (!videowall->matrices()->hasItem(key))
+        return;
+
+    QnVideoWallMatrix matrix = videowall->matrices()->getItem(key);
+    QnVideoWallItemMap items = videowall->items()->getItems();
+
+    bool hasChanges = false;
+    foreach (QnVideoWallItem item, items) {
+        if (!matrix.layoutByItem.contains(item.uuid))
+            continue;
+
+        QUuid layoutUuid = matrix.layoutByItem[item.uuid];
+        if (!layoutUuid.isNull() && !qnResPool->getResourceById(layoutUuid))
+            layoutUuid = QUuid();
+
+        if (item.layout == layoutUuid)
+            continue;
+
+        item.layout = layoutUuid;
+        videowall->items()->updateItem(item.uuid, item);
+        hasChanges = true;
+    }
+
+    if (!hasChanges)
+        return;
+    
     connection2()->getVideowallManager()->save(videowall, this, [](){});
 }
 

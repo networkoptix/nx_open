@@ -13,6 +13,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
@@ -158,4 +159,39 @@ QMenu* QnEdgeNodeActionFactory::newMenu(const QnActionParameters &parameters, QW
         return NULL;
 
     return menu()->newMenu(Qn::NoAction, Qn::TreeScope, parentWidget, QnActionParameters(edgeCamera->getParentResource()));
+}
+
+QList<QAction *> QnLoadVideowallMatrixActionFactory::newActions(const QnActionParameters &parameters, QObject *parent) {
+    QList<QAction *> result;
+
+    QnVideoWallResourcePtr videowall = parameters.resource().dynamicCast<QnVideoWallResource>();
+    if (!videowall)
+        return result;
+
+    foreach(const QnVideoWallMatrix &matrix, videowall->matrices()->getItems()) {
+        QAction *action = new QAction(parent);
+        action->setText(matrix.name);
+
+        action->setData(QVariant::fromValue(
+            QnActionParameters(parameters)
+            .withArgument(Qn::UuidRole, matrix.uuid)
+            ));
+        connect(action, &QAction::triggered, this, &QnLoadVideowallMatrixActionFactory::at_action_triggered);
+
+        result.push_back(action);
+    }
+    qSort(result.begin(), result.end(), [](const QAction *l, const QAction *r) {
+        return naturalStringCaseInsensitiveLessThan(l->text(), r->text());
+    });
+
+    return result;
+}
+
+void QnLoadVideowallMatrixActionFactory::at_action_triggered() {
+    QAction *action = dynamic_cast<QAction *>(sender());
+    if(!action)
+        return;
+
+    QnActionParameters parameters = action->data().value<QnActionParameters>();
+    menu()->trigger(Qn::LoadVideowallMatrixAction, parameters);
 }

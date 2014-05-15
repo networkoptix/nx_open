@@ -915,6 +915,19 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(hasFlags(QnResource::videowall));
 
+    factory(Qn::LoadVideowallMatrixAction).
+        flags(Qn::SingleTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission). //TODO: #GDM VW User permission?
+        condition(hasFlags(QnResource::videowall));
+
+    factory().
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission). //TODO: #GDM VW User permission?
+        childFactory(new QnLoadVideowallMatrixActionFactory(this)).
+        text(tr("Load Matrix...")).
+        autoRepeat(false).
+        condition(hasFlags(QnResource::videowall));
+
     factory(Qn::ResetVideoWallLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         text(tr("Update Layout")).
