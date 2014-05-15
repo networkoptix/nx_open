@@ -315,6 +315,44 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "SONY|SNC-EP580"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-0.94448, 0.94448],
+                        "logical": [    -170,     170]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1.33,  -1],
+                        "logical": [15,   -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [     0,   0.52],
+                        "logical": [1.0000,   20.0],
+                        "logicalMultiplier": 36.0,
+                        "space": "35MmEquiv"
+                    }
+                },
+                "toCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1.0, 1.0],
+                        "logical": [-170, 170]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1,     -1],
+                        "logical": [15,   -90]
+                    }
+                }
+            }
         }
     ]
 }
