@@ -15,17 +15,14 @@
 
 namespace QnCsvDetail {
 
-    namespace AdlProtected {
-        template<class Output>
-        void serialize_header(const QString &prefix, QnCsvStreamWriter<Output> *stream, const void *) {
-            stream->writeField(prefix + QStringLiteral("value"));
-        }
+    template<class Output>
+    void serialize_header(const QString &prefix, QnCsvStreamWriter<Output> *stream, const void *) {
+        /* Default implementation for field types. */
+        stream->writeField(prefix + QStringLiteral("value"));
     }
 
     template<class T, class Output>
     void serialize_header_internal(const QString &prefix, QnCsvStreamWriter<Output> *stream, const T *dummy) {
-        using namespace AdlProtected;
-
         serialize_header(prefix, adl_wrap(stream), dummy); /* That's where ADL kicks in. */
     }
 
@@ -48,6 +45,10 @@ namespace QnCsvDetail {
     yes_type has_serialize_header_test(const T0 &, const T1 &, const decltype(serialize_header(std::declval<T0>(), std::declval<T1>())) * = NULL);
     no_type has_serialize_header_test(...);
 
+    template<class T0>
+    yes_type has_csv_type_category_test(const T0 &, const decltype(csv_type_category(std::declval<T0>())) * = NULL);
+    no_type has_csv_type_category_test(...);
+
     template<class T, class Output>
     struct has_serialize: 
         std::integral_constant<bool, sizeof(yes_type) == sizeof(has_serialize_test(std::declval<T>(), std::declval<QnCsvStreamWriter<Output> *>()))>
@@ -58,8 +59,14 @@ namespace QnCsvDetail {
         std::integral_constant<bool, sizeof(yes_type) == sizeof(has_serialize_header_test(std::declval<T>(), std::declval<QnCsvStreamWriter<Output> *>()))>
     {};
 
+    template<class T>
+    struct has_csv_type_category:
+        std::integral_constant<bool, sizeof(yes_type) == sizeof(has_csv_type_category_test(std::declval<const T *>()))>
+    {};
+
+
     template<class T, class Output>
-    struct type_category:
+    struct type_category_internal:
         boost::mpl::if_<
             boost::mpl::or_<boost::has_range_const_iterator<T>, boost::has_range_iterator<T> >,
             identity<identity<QnCsv::document_tag> >,
@@ -74,6 +81,21 @@ namespace QnCsvDetail {
             >
         >::type::type
     {};
+
+    template<class T>
+    struct type_category_predefined {
+        typedef decltype(csv_type_category(std::declval<const T *>())) type;
+    };
+
+    template<class T, class Output>
+    struct type_category:
+        boost::mpl::if_<
+            has_csv_type_category<T>,
+            type_category_predefined<T>,
+            type_category_internal<T, Output>
+        >::type
+    {};
+    
 
 } // namespace QnCsvDetail
 
