@@ -12,8 +12,12 @@ namespace ec2
         bool isAlive;
         bool isClient;
         QList<QByteArray> hardwareIds;
+        QString systemName;
+        QString version;
+        QString systemInformation;
+        int port;
     };
-#define ApiServerAliveData_Fields (serverId)(isAlive)(isClient)(hardwareIds)
+#define ApiServerAliveData_Fields (serverId)(isAlive)(isClient)(hardwareIds)(systemName)(version)(systemInformation)(port)
 
 } // namespace ec2
 

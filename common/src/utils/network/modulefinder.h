@@ -6,7 +6,6 @@
 #ifndef NETWORKOPTIXMODULEFINDER_H
 #define NETWORKOPTIXMODULEFINDER_H
 
-#include <QtCore/QSet>
 #include <QtCore/QHash>
 #include <QtNetwork/QHostAddress>
 
@@ -14,24 +13,12 @@
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 
+#include "module_information.h"
 #include "networkoptixmodulerevealcommon.h"
 #include "aio/pollset.h"
 #include "system_socket.h"
 
 class AbstractDatagramSocket;
-
-struct QnModuleInformation {
-    QString type;
-    QnSoftwareVersion version;
-    QnSystemInformation systemInformation;
-    QString systemName;
-    TypeSpecificParamMap parameters;
-    QSet<QString> remoteAddresses;
-    bool isLocal; //!< true if at least one address from \a remoteHostAddress is a local address
-    QString id;
-
-    QnModuleInformation() : isLocal(false) {}
-};
 
 //!Searches for all Network Optix enterprise controllers in local network environment using multicast
 /*!
