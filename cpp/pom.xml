@@ -311,5 +311,23 @@
                 </plugins>	
             </build>			
         </profile>	
+		
+        <profile>
+            <id>linux-arm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
+                <property>
+                    <name>arch</name>
+                    <value>arm</value>
+                </property>
+            </activation>
+            <build>
+                <directory>${arch}-${box}</directory>
+            </build>
+        </profile> 		
     </profiles>	
 </project>
