@@ -1742,6 +1742,38 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     QnSql::fetch_many(queryScreens, &screens);
     mergeObjectListData(videowallList, screens, &ApiVideowallData::screens, &ApiVideowallScreenWithRefData::videowallGuid);
 
+
+    QSqlQuery queryMatrixItems(m_sdb);
+    queryMatrixItems.setForwardOnly(true);
+    queryMatrixItems.prepare("SELECT \
+                             item.matrix_guid as matrixGuid, \
+                             item.item_guid as itemGuid, \
+                             item.layout_guid as layoutGuid \
+                             FROM vms_videowall_matrix_items item");
+    if (!queryMatrixItems.exec()) {
+        qWarning() << Q_FUNC_INFO << queryMatrixItems.lastError().text();
+        return ErrorCode::failure;
+    }
+    std::vector<ApiVideowallMatrixItemWithRefData> matrixItems;
+    QnSql::fetch_many(queryMatrixItems, &matrixItems);
+
+    QSqlQuery queryMatrixes(m_sdb);
+    queryMatrixes.setForwardOnly(true);
+    queryMatrixes.prepare("SELECT \
+                          matrix.guid as id, \
+                          matrix.name, \
+                          matrix.videowall_guid as videowallGuid \
+                          FROM vms_videowall_matrix");
+    if (!queryMatrixes.exec()) {
+        qWarning() << Q_FUNC_INFO << queryMatrixes.lastError().text();
+        return ErrorCode::failure;
+    }
+    std::vector<ApiVideowallMatrixWithRefData> matrixes;
+    QnSql::fetch_many(queryMatrixes, &matrixes);
+    mergeObjectListData(matrixes, matrixItems, &ApiVideowallMatrixData::items, &ApiVideowallMatrixItemWithRefData::matrixGuid);
+
+    mergeObjectListData(videowallList, matrixes, &ApiVideowallData::matrixes, &ApiVideowallMatrixWithRefData::videowallGuid);
+
     return ErrorCode::ok;
 }
 

@@ -46,6 +46,7 @@ CREATE UNIQUE INDEX idx_videowall_item_guid ON vms_videowall_item(guid);
 -- Videowall matrix - set of layouts attached to set of items
 CREATE TABLE "vms_videowall_matrix" (
     guid            BLOB(16) NOT NULL UNIQUE PRIMARY KEY,
+    videowall_guid  BLOB(16) NOT NULL,
     name            VARCHAR(200) NOT NULL
 );
 
