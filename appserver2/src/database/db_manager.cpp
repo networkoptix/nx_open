@@ -1762,7 +1762,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
                           matrix.guid as id, \
                           matrix.name, \
                           matrix.videowall_guid as videowallGuid \
-                          FROM vms_videowall_matrix");
+                          FROM vms_videowall_matrix matrix");
     if (!queryMatrices.exec()) {
         qWarning() << Q_FUNC_INFO << queryMatrices.lastError().text();
         return ErrorCode::failure;

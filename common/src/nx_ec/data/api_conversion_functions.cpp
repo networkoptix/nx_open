@@ -714,7 +714,6 @@ void fromApiToResourceList(const ApiUserDataList &src, QnUserResourceList &dst) 
     fromApiToResourceList(src, dst, overload_tag());
 }
 
-
 void fromApiToResource(const ApiVideowallItemData &src, QnVideoWallItem &dst) {
     dst.uuid       = src.guid;
     dst.layout     = src.layoutGuid;
@@ -733,6 +732,28 @@ void fromResourceToApi(const QnVideoWallItem &src, ApiVideowallItemData &dst) {
     dst.width       = src.geometry.width();
     dst.height      = src.geometry.height();
 }
+
+void fromApiToResource(const ApiVideowallMatrixData &src, QnVideoWallMatrix &dst) {
+    dst.uuid       = src.id;
+    dst.name       = src.name;
+    dst.layoutByItem.clear();
+    for (const ApiVideowallMatrixItemData &item: src.items)
+        dst.layoutByItem[item.itemGuid] = item.layoutGuid;
+}
+
+void fromResourceToApi(const QnVideoWallMatrix &src, ApiVideowallMatrixData &dst) {
+    dst.id          = src.uuid;
+    dst.name        = src.name;
+    dst.items.clear();
+    dst.items.reserve(src.layoutByItem.size());
+    for (auto it = src.layoutByItem.constBegin(); it != src.layoutByItem.constEnd(); ++it) {
+        ApiVideowallMatrixItemData item;
+        item.itemGuid = it.key();
+        item.layoutGuid = it.value();
+        dst.items.push_back(item);
+    }
+}
+
 
 void fromApiToResource(const ApiVideowallScreenData &src, QnVideoWallPcData::PcScreen &dst) {
     dst.index            = src.pcIndex;
@@ -774,6 +795,13 @@ void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst)
     }
     dst->pcs()->setItems(pcs);
 
+    QnVideoWallMatrixList outMatrices;
+    for (const ApiVideowallMatrixData &matrixData: src.matrices) {
+        outMatrices << QnVideoWallMatrix();
+        fromApiToResource(matrixData, outMatrices.last());
+    }
+    dst->matrices()->setItems(outMatrices);
+
 }
 
 void fromResourceToApi(const QnVideoWallResourcePtr &src, ApiVideowallData &dst) {
@@ -798,6 +826,15 @@ void fromResourceToApi(const QnVideoWallResourcePtr &src, ApiVideowallData &dst)
             screenData.pcGuid = pc.uuid;
             dst.screens.push_back(screenData);
         }
+    }
+
+    const QnVideoWallMatrixMap &matrices = src->matrices()->getItems();
+    dst.matrices.clear();
+    dst.matrices.reserve(matrices.size());
+    for (const QnVideoWallMatrix &matrix: matrices) {
+        ApiVideowallMatrixData matrixData;
+        fromResourceToApi(matrix, matrixData);
+        dst.matrices.push_back(matrixData);
     }
 }
 

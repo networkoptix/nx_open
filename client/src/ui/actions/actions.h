@@ -209,7 +209,6 @@ namespace Qn {
          */
         DropOnVideoWallItemAction,
 
-
         /**
          * Tries to restart the application as soon as all modal dialogs are closed.
          * Parameters:
@@ -793,9 +792,14 @@ namespace Qn {
         StopVideoWallAction,
 
         /**
-         * Display an identification message on
+         * Display identification messages on the videowall screens.
          */
         IdentifyVideoWallAction,
+
+        /** 
+         * Save current videowall matrix. 
+         */
+        SaveVideowallMatrixAction,
 
         /**
          * Open target videowall item after user logged in.

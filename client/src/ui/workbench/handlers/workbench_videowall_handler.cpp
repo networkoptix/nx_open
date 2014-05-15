@@ -244,6 +244,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(action(Qn::DropOnVideoWallItemAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered);
         connect(action(Qn::PushMyScreenToVideowallAction),  &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered);
         connect(action(Qn::VideowallSettingsAction),        &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered);
+        connect(action(Qn::SaveVideowallMatrixAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered);
 
 
         connect(display(),     &QnWorkbenchDisplay::widgetAdded,                        this,   &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
@@ -1681,6 +1682,29 @@ void QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered() {
         return;
 
     dialog->submitToResource(videowall);
+    connection2()->getVideowallManager()->save(videowall, this, [](){});
+}
+
+void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered() {
+    //TODO: #GDM VW move to action condition
+    if (!context()->user())
+        return;
+
+    QnVideoWallResourcePtr videowall = menu()->currentParameters(sender()).resource().dynamicCast<QnVideoWallResource>();
+    if (!videowall)
+        return;
+
+    QnVideoWallMatrix matrix;
+    matrix.name = tr("New Matrix %1").arg(videowall->matrices()->getItems().size() + 1);
+    matrix.uuid = QUuid::createUuid();
+
+    foreach (const QnVideoWallItem &item, videowall->items()->getItems()) {
+        if (item.layout.isNull() || !qnResPool->getResourceById(item.layout))
+            continue;
+        matrix.layoutByItem[item.uuid] = item.layout;
+    }
+
+    videowall->matrices()->addItem(matrix);
     connection2()->getVideowallManager()->save(videowall, this, [](){});
 }
 

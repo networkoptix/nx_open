@@ -908,6 +908,13 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(hasFlags(QnResource::videowall));
 
+    factory(Qn::SaveVideowallMatrixAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission). //TODO: #GDM VW User permission?
+        text(tr("Save Current Matrix")).
+        autoRepeat(false).
+        condition(hasFlags(QnResource::videowall));
+
     factory(Qn::ResetVideoWallLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         text(tr("Update Layout")).
