@@ -10,7 +10,7 @@ QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 

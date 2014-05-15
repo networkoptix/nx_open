@@ -103,6 +103,7 @@
 #include <rest/handlers/storage_space_rest_handler.h>
 #include <rest/handlers/storage_status_rest_handler.h>
 #include <rest/handlers/time_rest_handler.h>
+#include <rest/handlers/update_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
 
@@ -118,9 +119,11 @@
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
+#include <utils/common/system_information.h>
 #include <utils/network/multicodec_rtp_reader.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
+#include <utils/network/modulefinder.h>
 
 
 #include <media_server/server_message_processor.h>
@@ -135,7 +138,7 @@
 #include "plugins/resources/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
-#include "utils/network/networkoptixmodulefinder.h"
+#include "utils/network/modulefinder.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
 #include "compatibility.h"
@@ -173,8 +176,16 @@ class CmdLineArguments
 {
 public:
     QString logLevel;
+    //!Log level of http requests log
+    QString msgLogLevel;
     QString rebuildArchive;
     QString devModeKey;
+
+    CmdLineArguments()
+    :
+        msgLogLevel( lit("none") )
+    {
+    }
 };
 
 static CmdLineArguments cmdLineArguments;
@@ -514,11 +525,6 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
     qnLogMsgHandler(type, ctx, msg);
 }
 
-#ifdef _DEBUG
-#define ENABLE_HTTP_LOGGING
-#endif
-QnLog* requestsLog = NULL;
-
 /** Initialize log. */
 void initLog(const QString &logLevel) {
     if(logLevel == lit("none"))
@@ -562,11 +568,6 @@ int serverMain(int argc, char *argv[])
 
     initLog(cmdLineArguments.logLevel);
 
-#ifdef ENABLE_HTTP_LOGGING
-    requestsLog = new QnLog();
-    requestsLog->create( dataLocation + QLatin1String("/log/msg_log"), 1024*1024*10, 5, cl_logDEBUG1 );
-#endif
-
     QString logLevel;
     QString rebuildArchive;
 
@@ -576,6 +577,14 @@ int serverMain(int argc, char *argv[])
     commandLineParser.parse(argc, argv, stderr);
 
     QnLog::initLog(logLevel);
+
+    if( cmdLineArguments.msgLogLevel != lit("none") )
+        QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
+            dataLocation + QLatin1String("/log/http_log"),
+            10*1024*1024,
+            5,
+            QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
+
     if (rebuildArchive == "all")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_All);
     else if (cmdLineArguments.rebuildArchive == "hq")
@@ -776,6 +785,8 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         {
             NX_LOG( lit("QnMain::run(). Can't get media servers."), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
         foreach(const QnMediaServerResourcePtr &mediaServer, mediaServerList) 
             messageProcessor->updateResource(mediaServer);
@@ -788,7 +799,9 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         while ((rez = ec2Connection->getCameraManager()->getCamerasSync(QnId(), &cameras)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(10000);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
 
         QnManualCameraInfoMap manualCameras;
@@ -807,7 +820,9 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         while (( rez = ec2Connection->getCameraManager()->getCameraHistoryListSync(&cameraHistoryList)) != ec2::ErrorCode::ok)
         {
             qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(1000);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
 
         foreach(QnCameraHistoryPtr history, cameraHistoryList)
@@ -821,6 +836,8 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         {
             qDebug() << "QnMain::run(): Can't get users. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
 
         foreach(const QnUserResourcePtr &user, users)
@@ -834,6 +851,8 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         {
             qDebug() << "QnMain::run(): Can't get videowalls. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
 
         foreach(const QnVideoWallResourcePtr &videowall, videowalls)
@@ -847,6 +866,8 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         {
             qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
 
         foreach(const QnBusinessEventRulePtr &rule, rules)
@@ -860,6 +881,8 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
         {
             qDebug() << "QnMain::run(): Can't get license list. Reason: " << ec2::toString(rez);
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
         }
 
         foreach(const QnLicensePtr &license, licenses)
@@ -926,35 +949,23 @@ void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
-void QnMain::at_peerFound(
-    const QString& moduleType,
-    const QString& moduleVersion,
-    const QString& systemName,
-    const TypeSpecificParamMap& moduleParameters,
-    const QString& localInterfaceAddress,
-    const QString& remoteHostAddress,
-    bool isLocal,
-    const QString& moduleSeed )
-{
-    if (moduleVersion == QN_APPLICATION_VERSION && systemName == qnCommon->localSystemName()) 
-    {
-        int port = moduleParameters.value("port").toInt();
-        QString url = QString(lit("http://%1:%2")).arg(remoteHostAddress).arg(port);
+void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
+    Q_UNUSED(localInterfaceAddress)
+
+    if (moduleInformation.version == QnSoftwareVersion(QN_APPLICATION_VERSION) && moduleInformation.systemName == qnCommon->localSystemName()) {
+        int port = moduleInformation.parameters.value("port").toInt();
+        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
         ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-        ec2Connection->addRemotePeer(url, false, moduleSeed);
+        ec2Connection->addRemotePeer(url, false, moduleInformation.id);
     }
 }
-void QnMain::at_peerLost(
-    const QString& moduleType,
-    const TypeSpecificParamMap& moduleParameters,
-    const QString& remoteHostAddress,
-    bool isLocal,
-    const QString& moduleSeed )
-{
-    int port = moduleParameters.value("port").toInt();
-    QString url = QString(lit("http://%1:%2")).arg(remoteHostAddress).arg(port);
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    ec2Connection->deleteRemotePeer(url);
+void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
+    int port = moduleInformation.parameters.value("port").toInt();
+    foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
+        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
+        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        ec2Connection->deleteRemotePeer(url);
+    }
 }
 
 void QnMain::initTcpListener()
@@ -978,7 +989,10 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
+#ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
+#endif
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
     QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
@@ -992,7 +1006,8 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
-    m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
+    //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
+    //m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("HTTP", "*");
 
     m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
     m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
@@ -1233,6 +1248,7 @@ void QnMain::run()
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
         }
         server->setVersion(QnSoftwareVersion(QN_ENGINE_VERSION));
+        server->setSystemInfo(QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH));
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
         bool isLocal = appserverHostString.isEmpty() || QUrl(appserverHostString).scheme() == "file";
@@ -1284,7 +1300,6 @@ void QnMain::run()
 
     syncStoragesToSettings(m_mediaServer);
 
-    int status;
     do {
     } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), QnResource::Online) != ec2::ErrorCode::ok);
 
@@ -1329,21 +1344,12 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
-    m_moduleFinder = new NetworkOptixModuleFinder(false);
+    m_moduleFinder = new QnModuleFinder(false);
     //if (cmdLineArguments.devModeKey == lit("raz-raz-raz"))
         m_moduleFinder->setCompatibilityMode(true);
-    QObject::connect(
-        m_moduleFinder,
-        SIGNAL(moduleFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-        this,
-        SLOT(at_peerFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-        Qt::DirectConnection );
-    QObject::connect(
-        m_moduleFinder,
-        SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
-        this,
-        SLOT(at_peerLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
-        Qt::DirectConnection );
+    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
+    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
+
     QUrl url = ec2Connection->connectionInfo().ecUrl;
 #if 1
     if (url.scheme() == "file") {
@@ -1667,6 +1673,7 @@ int main(int argc, char* argv[])
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, QString());
+    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--msg-log-level", NULL, QString(), "none");
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, QString(), "all");
     //commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
     commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, QString());
@@ -1715,6 +1722,7 @@ static void printHelp()
 #else
             "INFO\n"
 #endif
+        "  --msg-log-level          Log value for http_log.log. Supported values same as above. Default is none (no logging)\n"
         "  --rebuild                Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)\n"
         "  --conf-file              Path to config file. By default "<<MSSettings::defaultROSettingsFilePath().toStdString()<<"\n"
         "  --runtime-conf-file      Path to config file which is used to save some. By default "<<MSSettings::defaultRunTimeSettingsFilePath().toStdString()<<"\n"

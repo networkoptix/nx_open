@@ -920,7 +920,7 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged()
     if (cameraResource) {
         if (cameraResource->isAudioEnabled() != d->audioEnabled ||
 		    cameraResource->hasDualStreaming2() != d->wasDualStreaming ||
-            !cameraResource->isCameraControlDisabled() && d->wasCameraControlDisabled) 
+            (!cameraResource->isCameraControlDisabled() && d->wasCameraControlDisabled)) 
         {
 			m_needStop = true;
 			d->socket->close();

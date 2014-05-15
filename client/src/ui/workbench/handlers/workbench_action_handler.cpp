@@ -28,7 +28,6 @@
 #include <utils/common/email.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
-#include <utils/mac_utils.h>
 
 #include <api/session_manager.h>
 
@@ -82,6 +81,7 @@
 #include <ui/dialogs/notification_sound_manager_dialog.h>
 #include <ui/dialogs/picture_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
+#include <ui/dialogs/system_administration_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -222,6 +222,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
+    connect(action(Qn::SystemAdministrationAction),             SIGNAL(triggered()),    this,   SLOT(at_systemAdministrationAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
@@ -624,6 +625,10 @@ QnCameraAdditionDialog *QnWorkbenchActionHandler::cameraAdditionDialog() const {
 
 QnLoginDialog *QnWorkbenchActionHandler::loginDialog() const {
     return m_loginDialog.data();
+}
+
+QnSystemAdministrationDialog *QnWorkbenchActionHandler::systemAdministrationDialog() const {
+    return m_systemAdministrationDialog.data();
 }
 
 void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
@@ -1363,6 +1368,19 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     url.setPassword(QString());
     url.setPath(QLatin1String("/web/"));
     QDesktopServices::openUrl(url);
+}
+
+void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
+    bool newlyCreated = false;
+    if (!m_systemAdministrationDialog) {
+        m_systemAdministrationDialog = new QnSystemAdministrationDialog(context(), mainWindow());
+        newlyCreated = true;
+    }
+
+    QRect oldGeometry = systemAdministrationDialog()->geometry();
+    systemAdministrationDialog()->show();
+    if (newlyCreated)
+        systemAdministrationDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {

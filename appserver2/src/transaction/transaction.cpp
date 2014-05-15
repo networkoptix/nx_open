@@ -88,6 +88,8 @@ namespace ec2
                 case resetBusinessRules:
                     return "resetBusinessRules";
 
+                case saveLayout:
+                    return "saveLayout";
                 case saveLayouts:
                     return "addOrUpdateLayouts";
                 case getLayoutList:
@@ -143,6 +145,13 @@ namespace ec2
                     return "lockResponse";
                 case unlockRequest:
                     return "unlockRequest";
+
+                case uploadUpdate:
+                    return "uploadUpdate";
+                case uploadUpdateResponce:
+                    return "uploadUpdateResponce";
+                case installUpdate:
+                    return "installUpdate";
 
                 case addCameraBookmarkTags:
                     return "addCameraBookmarkTags";

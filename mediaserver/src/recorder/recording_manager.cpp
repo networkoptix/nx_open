@@ -598,7 +598,7 @@ void QnRecordingManager::at_checkLicenses()
             QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
             if (!camera->isScheduleDisabled())
             {
-                if (recordingDigital > maxDigital && !camera->isAnalog() || isOverflowTotal) {
+                if ((recordingDigital > maxDigital && !camera->isAnalog()) || isOverflowTotal) {
                     // found. remove recording from some of them
                     m_licenseMutex = ec2::QnDistributedMutexManager::instance()->getLock(LICENSE_OVERFLOW_LOCK_NAME);
                     break;

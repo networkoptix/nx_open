@@ -6,6 +6,7 @@
 #include "remote_ec_connection.h"
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
+#include "mutex/distributed_mutex.h"
 
 
 namespace ec2
@@ -19,6 +20,8 @@ namespace ec2
         m_queryProcessor( queryProcessor ),
         m_connectionInfo( connectionInfo )
     {
+        ec2::QnDistributedMutexManager::initStaticInstance(new ec2::QnDistributedMutexManager());
+
         QnTransactionMessageBus::instance()->setHandler(this);
     }
 

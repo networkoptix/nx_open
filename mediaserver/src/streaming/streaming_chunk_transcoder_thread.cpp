@@ -184,7 +184,7 @@ void StreamingChunkTranscoderThread::run()
         //protecting from discontinuity in timestamp
         if( transcodeIter->second->prevPacketTimestamp == -1 )
             transcodeIter->second->prevPacketTimestamp = srcMediaData->timestamp;
-        if( qAbs(srcMediaData->timestamp - transcodeIter->second->prevPacketTimestamp) > 3600*1000*1000UL )
+        if( qAbs(srcMediaData->timestamp - transcodeIter->second->prevPacketTimestamp) > 3600*1000*1000L )
             transcodeIter->second->prevPacketTimestamp = srcMediaData->timestamp;   //discontinuity
         if( srcMediaData->timestamp > transcodeIter->second->prevPacketTimestamp )
         {

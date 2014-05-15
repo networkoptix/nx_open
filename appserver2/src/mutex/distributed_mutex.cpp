@@ -17,7 +17,8 @@ QnDistributedMutexManager* QnDistributedMutexManager::instance()
 
 void QnDistributedMutexManager::initStaticInstance(QnDistributedMutexManager* value)
 {
-    delete m_staticInstance;
+    if (m_staticInstance)
+        delete m_staticInstance;
     m_staticInstance = value;
 }
 

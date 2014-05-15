@@ -16,6 +16,8 @@
 #include <QtCore/QUuid>
 #include <QtCore/QUrl>
 
+#include <utils/common/latin1_array.h>
+
 #include "csv.h"
 
 namespace QnCsvDetail {
@@ -35,6 +37,11 @@ namespace QnCsvDetail {
 } // namespace QnCsvDetail
 
 
+QN_DECLARE_CSV_TYPE_CATEGORY(QString, QnCsv::field_tag)
+QN_DECLARE_CSV_TYPE_CATEGORY(QByteArray, QnCsv::field_tag)
+QN_DECLARE_CSV_TYPE_CATEGORY(QnLatin1Array, QnCsv::field_tag)
+
+
 template<class Output>
 void serialize(const QString &value, QnCsvStreamWriter<Output> *stream) {
     stream->writeField(value);
@@ -42,24 +49,29 @@ void serialize(const QString &value, QnCsvStreamWriter<Output> *stream) {
 
 template<class Output>
 void serialize(const QUuid &value, QnCsvStreamWriter<Output> *stream) {
-    stream->writeLatin1Field(value.toByteArray());
+    stream->writeUtf8Field(value.toByteArray());
 }
 
 template<class Output>
 void serialize(const QUrl &value, QnCsvStreamWriter<Output> *stream) {
-    stream->writeField(value.toString(QUrl::FullyEncoded));
+    stream->writeUtf8Field(value.toEncoded());
 }
 
 template<class Output>
 void serialize(const QByteArray &value, QnCsvStreamWriter<Output> *stream) {
-    stream->writeLatin1Field(value.toBase64());
+    stream->writeUtf8Field(value.toBase64());
+}
+
+template<class Output>
+void serialize(const QnLatin1Array &value, QnCsvStreamWriter<Output> *stream) {
+    stream->writeUtf8Field(value);
 }
 
 
 #define QN_DEFINE_NUMERIC_CSV_SERIALIZATION_FUNCTIONS(TYPE, TYPE_GETTER, ... /* NUMBER_FORMAT */) \
 template<class Output>                                                          \
 void serialize(const TYPE &value, QnCsvStreamWriter<Output> *stream) {          \
-    stream->writeLatin1Field(QByteArray::number(value, ##__VA_ARGS__));         \
+    stream->writeUtf8Field(QByteArray::number(value, ##__VA_ARGS__));         \
 }
 
 QN_DEFINE_NUMERIC_CSV_SERIALIZATION_FUNCTIONS(int,                toInt)

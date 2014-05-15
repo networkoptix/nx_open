@@ -1657,7 +1657,11 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
                 painter,
                 m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),
                 m_lineData[line].timeStorage.aggregated(Qn::MotionContent),
+#ifdef QN_ENABLE_BOOKMARKS
                 m_lineData[line].timeStorage.aggregated(Qn::BookmarksContent),
+#else
+                QnTimePeriodList(),
+#endif
                 lineRect
             );
 
@@ -1726,8 +1730,10 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     /* Draw dates. */
     drawDates(painter, dateBarRect);
 
+#ifdef QN_ENABLE_BOOKMARKS
     /* Draw bookmarks. */
     drawBookmarks(painter, bookmarkRect);
+#endif
 
     /* Draw position marker. */
     drawMarker(painter, sliderPosition(), m_colors.positionMarker);
@@ -1887,6 +1893,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
 
     chunkPainter.stop();
 }
+
 
 void QnTimeSlider::drawSolidBackground(QPainter *painter, const QRectF &rect) {
     qreal leftPos = quickPositionFromValue(windowStart());

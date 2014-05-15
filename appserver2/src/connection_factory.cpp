@@ -19,6 +19,7 @@
 #include "rest/ec2_update_http_handler.h"
 #include "rest/server/rest_connection_processor.h"
 #include "transaction/transaction.h"
+#include "transaction/transaction_message_bus.h"
 #include "http/ec2_transaction_tcp_listener.h"
 #include "version.h"
 
@@ -163,6 +164,13 @@ namespace ec2
         registerUpdateFuncHandler<ApiStoredFileData>( restProcessorPool, ApiCommand::updateStoredFile );
         //AbstractStoredFileManager::deleteStoredFile
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeStoredFile );
+
+        //AbstractUpdatesManager::uploadUpdate
+        registerUpdateFuncHandler<ApiUpdateUploadData>( restProcessorPool, ApiCommand::uploadUpdate );
+        //AbstractUpdatesManager::uploadUpdateResponce
+        registerUpdateFuncHandler<ApiUpdateUploadResponceData>( restProcessorPool, ApiCommand::uploadUpdateResponce );
+        //AbstractUpdatesManager::installUpdate
+        registerUpdateFuncHandler<QString>( restProcessorPool, ApiCommand::installUpdate );
 
         //ApiResourceParamList
         registerGetFuncHandler<nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );

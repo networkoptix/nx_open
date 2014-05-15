@@ -39,9 +39,8 @@ QnAuthHelper* QnAuthHelper::instance()
     return m_instance;
 }
 
-bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy) 
-{
-    QString cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
+bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy) {
+    const QString& cookie = QLatin1String(nx_http::getHeaderValue( request.headers, "Cookie" ));
     int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
     if (customAuthInfoPos >= 0) {
         QString digest = cookie.mid(customAuthInfoPos + QByteArray("authinfo=").length(), 32);
@@ -51,13 +50,13 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
             return true;
     }
 
-    nx_http::StringType videoWall_auth = nx_http::getHeaderValue( request.headers, "X-NetworkOptix-VideoWall" );
+    const nx_http::StringType& videoWall_auth = nx_http::getHeaderValue( request.headers, "X-NetworkOptix-VideoWall" );
     if (!videoWall_auth.isEmpty())
         return (!qnResPool->getResourceById(QUuid(videoWall_auth)).dynamicCast<QnVideoWallResource>().isNull());
 
-    nx_http::StringType authorization = nx_http::getHeaderValue( request.headers, "Authorization" );
-    if (authorization.isEmpty())
-        authorization = nx_http::getHeaderValue( request.headers, "Proxy-Authorization" );
+    const nx_http::StringType& authorization = isProxy
+        ? nx_http::getHeaderValue( request.headers, "Proxy-Authorization" )
+        : nx_http::getHeaderValue( request.headers, "Authorization" );
     if (authorization.isEmpty()) {
         addAuthHeader(response, isProxy);
         return false;

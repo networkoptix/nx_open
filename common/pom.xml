@@ -24,7 +24,7 @@
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <!--Global libs-->
         <!-- <qt.libs>core gui network opengl xml multimedia sql</qt.libs> -->
-        <global.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lonvif</global.libs>
+        <global.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc -lonvif -lquazip</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar</windows.oslibs>
         <linux.oslibs>-lssl -lsigar</linux.oslibs>

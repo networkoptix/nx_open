@@ -40,7 +40,7 @@
         <beta>true</beta>
         <box></box>
 
-        <qt.dir>${environment.dir}/qt5webkit/qtbase-${arch}</qt.dir>
+        <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
@@ -56,6 +56,7 @@
         <festival.version>2.1-SNAPSHOT</festival.version>
         <boost.version>1.54-SNAPSHOT</boost.version>
         <bespin.version>1.2-SNAPSHOT</bespin.version>
+        <quazip.version>0.6.2-SNAPSHOT</quazip.version>
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->         
         <customization>default</customization>

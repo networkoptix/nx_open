@@ -5,6 +5,7 @@
 #include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <client/client_globals.h>
 
@@ -28,6 +29,7 @@ class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
+class QnSearchLineEdit;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -58,6 +60,12 @@ public:
 
     QnDayTimeWidget *dayTimeWidget() const;
     void setDayTimeWidget(QnDayTimeWidget *dayTimeWidget);
+
+    QnSearchLineEdit *bookmarksSearchWidget() const;
+    void setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget);
+
+    QnCameraBookmarkTags bookmarkTags() const;
+    void setBookmarkTags(const QnCameraBookmarkTags &tags);
 
     bool isLive() const;
     Q_SLOT bool setLive(bool live);
@@ -181,17 +189,13 @@ protected slots:
     void at_timeSlider_selectionReleased();
     void at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
     void updateTimeSliderWindowSizePolicy();
-    void at_timeSlider_destroyed();
     void at_timeSlider_thumbnailClicked();
 
     void at_timeScrollBar_sliderPressed();
     void at_timeScrollBar_sliderReleased();
-    void at_timeScrollBar_destroyed();
     
-    void at_calendar_destroyed();
     void at_calendar_dateClicked(const QDate &date);
 
-    void at_dayTimeWidget_destroyed();
     void at_dayTimeWidget_timeClicked(const QTime &time);
 
 private:
@@ -201,6 +205,7 @@ private:
     QnTimeScrollBar *m_timeScrollBar;
     QnCalendarWidget *m_calendar;
     QnDayTimeWidget *m_dayTimeWidget;
+    QnSearchLineEdit *m_bookmarksSearchWidget;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
@@ -244,6 +249,9 @@ private:
     QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;
     
     QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
+
+    QnCameraBookmarkTags m_bookmarkTags;
+    QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

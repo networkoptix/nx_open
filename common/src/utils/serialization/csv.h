@@ -149,6 +149,19 @@ namespace QnCsvDetail {
 } // namespace QnCsvDetail
 
 
+/**
+ * This macro explicitly defines the csv category of the given type. This may 
+ * come handy when the automatic category assignment machinery doesn't work as
+ * expected, e.g. for string types which are containers and thus are
+ * classified as csv documents.
+ * 
+ * \param TYPE                          Type to explicitly specify csv category for.
+ * \param CATEGORY                      Csv category, one of <tt>QnCsv::field_tag</tt>, 
+ *                                      <tt>QnCsv::record_tag</tt> and <tt>QnCsv::document_tag</tt>.
+ */
+#define QN_DECLARE_CSV_TYPE_CATEGORY(TYPE, CATEGORY)                            \
+    CATEGORY csv_type_category(const TYPE *);
+
 
 #define QN_FUSION_DEFINE_FUNCTIONS_csv_record(TYPE, ... /* PREFIX */)           \
 __VA_ARGS__ void serialize(const TYPE &value, QnCsvStreamWriter<QByteArray> *stream) { \
@@ -160,6 +173,7 @@ __VA_ARGS__ void serialize_header(const QString &prefix, QnCsvStreamWriter<QByte
     QnCsvDetail::HeaderVisitor<QByteArray> visitor(prefix, stream);             \
     QnFusion::visit_members(*dummy, visitor);                                   \
 }                                                                               \
+
 
 // TODO: #Elric we have undefined behaviour here^: dereferencing NULL.
 

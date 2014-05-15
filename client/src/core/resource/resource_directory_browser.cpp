@@ -133,7 +133,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QnLayoutResourcePtr layout(new QnLayoutResource());
     ec2::ApiLayoutData apiLayout;
     QnInputBinaryStream<QByteArray> stream(layoutData);
-    if (QnBinary::deserialize(&stream, &apiLayout))
+    if (QnBinary::deserialize(&stream, &apiLayout)) //TODO: #Elric 2.2 compatibility is highly required here
         fromApiToResource(apiLayout, layout);
     else
         return QnLayoutResourcePtr();

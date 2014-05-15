@@ -36,6 +36,8 @@ struct QnManualCameraSearchStatus {
     int total;
 };
 
+#define QnManualCameraSearchStatus_Fields (state)(current)(total)
+
 struct QnManualCameraSearchSingleCamera {
     QString name;
     QString url;
@@ -52,6 +54,8 @@ struct QnManualCameraSearchSingleCamera {
         return QString(QLatin1String("%1 (%2 - %3)")).arg(name).arg(url).arg(vendor);
     }
 };
+
+#define QnManualCameraSearchSingleCamera_Fields (name)(url)(manufacturer)(vendor)(existsInPool)
 
 typedef QList<QnManualCameraSearchSingleCamera> QnManualCameraSearchCameraList;
 
@@ -78,6 +82,8 @@ struct QnManualCameraSearchReply {
     QnManualCameraSearchStatus status;
     QnManualCameraSearchCameraList cameras;
 };
+
+#define QnManualCameraSearchReply_Fields (status)(processUuid)(cameras)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnManualCameraSearchStatus)(QnManualCameraSearchSingleCamera)(QnManualCameraSearchReply), (json)(metatype))
 

@@ -642,7 +642,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
             return qnResIconCache->icon(QnResourceIconCache::Servers);
         } else if (resources.size() == 1) {
             QnResourcePtr resource = resources.first();
-            return qnResIconCache->icon(resource->flags(), resource->getStatus());
+            return qnResIconCache->icon(resource);
         } else if (QnBusiness::requiresServerResource(m_eventType)){
             return qnResIconCache->icon(QnResourceIconCache::Server);
         } else /* ::requiresCameraResource(m_eventType) */ {
@@ -680,7 +680,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
             return qnResIconCache->icon(QnResourceIconCache::Servers);
         } else if (resources.size() == 1) {
             QnResourcePtr resource = resources.first();
-            return qnResIconCache->icon(resource->flags(), resource->getStatus());
+            return qnResIconCache->icon(resource);
         } else if (resources.isEmpty()) {
             return qnResIconCache->icon(QnResourceIconCache::Offline, true);
         } else {

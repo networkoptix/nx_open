@@ -157,7 +157,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 
 }
 
-QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 

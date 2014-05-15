@@ -15,7 +15,7 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
         return QByteArray();
 }
 
-bool QnMutexCameraDataHandler::checkUserData(const QString& name, const QByteArray& data)
+bool QnMutexCameraDataHandler::checkUserData(const QString& /*name*/, const QByteArray& data)
 {
     return data.isEmpty() || data == qnCommon->moduleGUID().toRfc4122();
 }

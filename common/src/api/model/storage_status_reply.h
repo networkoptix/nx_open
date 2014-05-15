@@ -17,10 +17,14 @@ struct QnStorageSpaceData {
     bool isUsedForWriting;
 };
 
+#define QnStorageSpaceData_Fields (path)(storageId)(totalSpace)(freeSpace)(reservedSpace)(isExternal)(isWritable)(isUsedForWriting)
+
 struct QnStorageStatusReply {
     bool pluginExists;
     QnStorageSpaceData storage;
 };
+
+#define QnStorageStatusReply_Fields (pluginExists)(storage)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnStorageStatusReply, (json)(metatype))
 

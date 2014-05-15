@@ -111,8 +111,8 @@ public:
     QnActiPtzControllerPrivate(const QnActiResourcePtr &resource): 
         resource(resource), 
         pendingCommand(Qn::InvalidPtzCommand),
-        currentPosition(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue),
-        currentSpeed(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue)
+        currentSpeed(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue),
+        currentPosition(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue)
     {}
 
     virtual ~QnActiPtzControllerPrivate() {}

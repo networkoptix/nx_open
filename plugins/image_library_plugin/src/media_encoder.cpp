@@ -16,8 +16,8 @@ MediaEncoder::MediaEncoder(
 :
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
-    m_encoderNumber( encoderNumber ),
-    m_frameDurationUsec( frameDurationUsec )
+    m_frameDurationUsec( frameDurationUsec ),
+    m_encoderNumber( encoderNumber )
 {
 }
 
