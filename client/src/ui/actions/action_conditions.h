@@ -348,6 +348,13 @@ private:
     bool m_centralItemRequired;
 };
 
+class QnAddBookmarkActionCondition: public QnActionCondition {
+public:
+    QnAddBookmarkActionCondition(QObject *parent):
+        QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 class QnModifyBookmarkActionCondition: public QnActionCondition {
 public:
     QnModifyBookmarkActionCondition(QObject *parent):
