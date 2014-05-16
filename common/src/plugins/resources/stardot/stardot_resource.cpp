@@ -159,6 +159,12 @@ CameraDiagnostics::Result QnStardotResource::initInternal()
     //setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
     setParam(MAX_FPS_PARAM_NAME, m_maxFps, QnDomainDatabase);
     //setParam(DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
+
+    //detecting and saving selected resolutions
+    CameraMediaStreams mediaStreams;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution, CODEC_ID_H264 ) ); //QnStardotStreamReader always requests h.264
+    saveResolutionList( mediaStreams );
+
     save();
 
     setMotionMaskPhysical(0);

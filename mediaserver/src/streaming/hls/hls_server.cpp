@@ -15,6 +15,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
+#include <utils/media/ffmpeg_helper.h>
 #include <utils/media/media_stream_cache.h>
 #include <version.h>
 

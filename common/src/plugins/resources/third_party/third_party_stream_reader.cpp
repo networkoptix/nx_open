@@ -17,9 +17,6 @@
 #include "motion_data_picture.h"
 
 
-static const int PRIMARY_ENCODER_NUMBER = 0;
-static const int SECONDARY_ENCODER_NUMBER = 1;
-
 ThirdPartyStreamReader::ThirdPartyStreamReader(
     QnResourcePtr res,
     nxcip::BaseCameraManager* camManager )
@@ -51,8 +48,6 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
     if( m_mediaEncoder2Ref )
         m_mediaEncoder2Ref->releaseRef();
 }
-
-static const nxcip::Resolution DEFAULT_SECOND_STREAM_RESOLUTION = nxcip::Resolution(480, 316);
 
 void ThirdPartyStreamReader::onGotVideoFrame( QnCompressedVideoDataPtr videoData )
 {
@@ -118,10 +113,13 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
 
     QnResource::ConnectionRole role = getRole();
     m_rtpStreamParser.setRole(role);
-    const int encoderNumber = role == QnResource::Role_LiveVideo ? PRIMARY_ENCODER_NUMBER : SECONDARY_ENCODER_NUMBER;
+
+    const int encoderIndex = role == QnResource::Role_LiveVideo
+        ? QnThirdPartyResource::PRIMARY_ENCODER_INDEX
+        : QnThirdPartyResource::SECONDARY_ENCODER_INDEX;
 
     nxcip::CameraMediaEncoder* intf = NULL;
-    int result = m_camManager.getEncoder( encoderNumber, &intf );
+    int result = m_camManager.getEncoder( encoderIndex, &intf );
     if( result != nxcip::NX_NO_ERROR )
     {
         QUrl requestedUrl;
@@ -135,9 +133,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
     if( m_camManager.setAudioEnabled( m_thirdPartyRes->isAudioEnabled() ) != nxcip::NX_NO_ERROR )
         return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("audio"));
 
-    const nxcip::Resolution& resolution = (role == QnResource::Role_LiveVideo) 
-        ? getMaxResolution(encoderNumber)
-        : getSecondStreamResolution(cameraEncoder);
+    const nxcip::Resolution& resolution = m_thirdPartyRes->getSelectedResolutionForEncoder( encoderIndex );
     if( resolution.width*resolution.height > 0 )
         if( cameraEncoder.setResolution( resolution ) != nxcip::NX_NO_ERROR )
             return CameraDiagnostics::CannotConfigureMediaStreamResult(QLatin1String("resolution"));
@@ -489,63 +485,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     if( packet->data() )
         mediaPacket->data.write( (const char*)packet->data(), packet->dataSize() );
     return mediaPacket;
-}
-
-static bool resolutionLess( const nxcip::Resolution& left, const nxcip::Resolution& right )
-{
-    return left.width*left.height < right.width*right.height;
-}
-
-nxcip::Resolution ThirdPartyStreamReader::getMaxResolution( int encoderNumber ) const
-{
-    const QList<nxcip::Resolution>& resolutionList = m_thirdPartyRes->getEncoderResolutionList( encoderNumber );
-    QList<nxcip::Resolution>::const_iterator maxResIter = std::max_element( resolutionList.constBegin(), resolutionList.constEnd(), resolutionLess );
-    return maxResIter != resolutionList.constEnd() ? *maxResIter : nxcip::Resolution();
-}
-
-nxcip::Resolution ThirdPartyStreamReader::getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const
-{
-    const QList<nxcip::Resolution>& resolutionList = m_thirdPartyRes->getEncoderResolutionList( encoderNumber );
-    nxcip::Resolution foundResolution;
-    foreach( nxcip::Resolution resolution, resolutionList )
-    {
-        if( resolution.width*resolution.height <= desiredResolution.width*desiredResolution.height &&
-            resolution.width*resolution.height > foundResolution.width*foundResolution.height )
-        {
-            foundResolution = resolution;
-        }
-    }
-    return foundResolution;
-}
-
-nxcip::Resolution ThirdPartyStreamReader::getSecondStreamResolution( const nxcip_qt::CameraMediaEncoder& cameraEncoder )
-{
-    const nxcip::Resolution& primaryStreamResolution = getMaxResolution( PRIMARY_ENCODER_NUMBER );
-    const float currentAspect = QnPhysicalCameraResource::getResolutionAspectRatio( QSize(primaryStreamResolution.width, primaryStreamResolution.height) );
-
-    QVector<nxcip::ResolutionInfo> infoList;
-    if( cameraEncoder.getResolutionList( &infoList ) != nxcip::NX_NO_ERROR )
-        return DEFAULT_SECOND_STREAM_RESOLUTION;
-
-    //preparing data in format suitable for getNearestResolution
-    QList<QSize> resList;
-    std::transform(
-        infoList.begin(), infoList.end(), std::back_inserter(resList),
-        []( const nxcip::ResolutionInfo& resInfo ){ return QSize(resInfo.resolution.width, resInfo.resolution.height); } );
-
-    QSize secondaryResolution = QnPhysicalCameraResource::getNearestResolution(
-        QSize(DEFAULT_SECOND_STREAM_RESOLUTION.width, DEFAULT_SECOND_STREAM_RESOLUTION.height),
-        currentAspect,
-        SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(),
-        resList );
-    if( secondaryResolution == EMPTY_RESOLUTION_PAIR )
-        secondaryResolution = QnPhysicalCameraResource::getNearestResolution(
-            QSize(DEFAULT_SECOND_STREAM_RESOLUTION.width, DEFAULT_SECOND_STREAM_RESOLUTION.height),
-            0.0,        //ignoring aspect ratio
-            SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(),
-            resList );
-
-    return nxcip::Resolution( secondaryResolution.width(), secondaryResolution.height() );
 }
 
 void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& audioFormat )

@@ -38,7 +38,7 @@
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
         <beta>true</beta>
-        <box></box>
+        <box/>
 
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
@@ -64,7 +64,7 @@
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
         <toolchain.version>none</toolchain.version>            
 
-        <additional.defines></additional.defines>
+        <additional.defines/>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) --> 
         <qtlib1>Core</qtlib1>
@@ -211,7 +211,7 @@
                 <module>build_environment</module>
             </modules>  
         </profile>     
-        
+
         <profile>
             <id>quicksync</id>
             <activation>
@@ -377,7 +377,33 @@
                 <module>debsetup/mediaserver-deb</module>
             </modules>  
         </profile>         
-        
+
+        <profile>
+            <id>linux-arm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
+                <property>
+                    <name>arch</name>
+                    <value>arm</value>
+                </property>
+            </activation>
+            <properties>
+                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
+                <qt.dir>${environment.dir}/qt5/qtbase-${arch}-${toolchain.version}</qt.dir>
+                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
+                <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER</additional.defines>
+                <libdir>${root.dir}/build_environment/target-${box}</libdir>
+            </properties>
+            <build>
+                <directory>target-${box}</directory>
+            </build>
+        </profile> 
+
         <profile>
             <id>linux-isd-jaguar</id>
             <activation>
@@ -392,19 +418,14 @@
                 </property>
             </activation>
             <properties>
-                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <toolchain.version>codesourcery-2013.11</toolchain.version>
-                <qt.dir>${environment.dir}/qt5/qtbase-${arch}-${toolchain.version}</qt.dir>
                 <compiler>2011.09</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
-                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-                <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER</additional.defines>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
-            </modules>
-        </profile> 
+            </modules>            
+        </profile>
 
         <profile>
             <id>linux-isd-s2</id>
@@ -422,16 +443,11 @@
             <properties>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
-                <qt.dir>${environment.dir}/qt5/qtbase-${arch}-${toolchain.version}</qt.dir>
-                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
                 <openssl.version>1.0.1f-SNAPSHOT</openssl.version>
-                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-                <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER</additional.defines>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
-            </modules>
+            </modules>            
         </profile>
 
         <profile>
@@ -450,11 +466,7 @@
             <properties>
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
-                <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <qt.dir>${environment.dir}/qt5/qtbase-${arch}-${toolchain.version}</qt.dir>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
-                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-                <additional.defines>DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA</additional.defines>
             </properties>
         </profile>
 

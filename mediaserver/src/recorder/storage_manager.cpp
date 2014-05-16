@@ -1050,7 +1050,7 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
         return false;
 
     if (!bookmark.tags.isEmpty())
-        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addBookmarkTags(bookmark.tags, this, [](int reqID, ec2::ErrorCode errorCode) {});
+        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addBookmarkTags(bookmark.tags, this, [](int /*reqID*/, ec2::ErrorCode /*errorCode*/) {});
     
 
     return true;
@@ -1073,7 +1073,7 @@ bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBook
         return false;
 
     if (!bookmark.tags.isEmpty())
-        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addBookmarkTags(bookmark.tags, this, [](int reqID, ec2::ErrorCode errorCode) {});
+        QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addBookmarkTags(bookmark.tags, this, [](int /*reqID*/, ec2::ErrorCode /*errorCode*/) {});
 
     return true;
 }
