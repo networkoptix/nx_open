@@ -135,3 +135,4 @@ fi
 popd
 
 cp $BUILD_DIR/$PACKAGE_NAME .
+rm -Rf $BUILD_DIR
