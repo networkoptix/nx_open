@@ -63,7 +63,7 @@ QDataStream &operator>>(QDataStream &stream, QnSoftwareVersion &version) {
     return stream;
 }
 
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(QnSoftwareVersion)
+QN_FUSION_DEFINE_FUNCTIONS(QnSoftwareVersion, (json_lexical))
 
 void serialize(const QnSoftwareVersion &value, QnOutputBinaryStream<QByteArray> *stream) {
     QnBinary::serialize(value.m_data, stream);

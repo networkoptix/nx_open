@@ -55,7 +55,7 @@ QnMulticodecRtpReader::~QnMulticodecRtpReader()
 {
     delete m_videoParser;
     delete m_audioParser;
-    for (int i = 0; i < m_demuxedData.size(); ++i)
+    for (unsigned int i = 0; i < m_demuxedData.size(); ++i)
         delete m_demuxedData[i];
 }
 
@@ -525,7 +525,7 @@ void QnMulticodecRtpReader::closeStream()
 {
     m_RtpSession.sendTeardown();
     m_RtpSession.stop();
-    for (int i = 0; i < m_demuxedData.size(); ++i) {
+    for (unsigned int i = 0; i < m_demuxedData.size(); ++i) {
         if (m_demuxedData[i])
             m_demuxedData[i]->clear();
     }

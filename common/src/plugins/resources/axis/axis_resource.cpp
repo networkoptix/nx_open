@@ -256,7 +256,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
 
-    //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
+    //TODO #ak check firmware version. it must be >= 5.0.0 to support I/O ports
     {
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
         CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version"));
@@ -350,6 +350,21 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
             //m_initMutex is locked up the stack
     
     qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
+
+    //detecting primary & secondary resolution
+    m_resolutions[PRIMARY_ENCODER_INDEX] = getMaxResolution();
+    m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(
+        QSize(480,316),
+        getResolutionAspectRatio(getMaxResolution()) );
+    if (m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty())
+        m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
+
+    //detecting and saving selected resolutions
+    CameraMediaStreams mediaStreams;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolutions[PRIMARY_ENCODER_INDEX].size, CODEC_ID_H264 ) );
+    if( !m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty() )
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolutions[SECONDARY_ENCODER_INDEX].size, CODEC_ID_H264 ) );
+    saveResolutionList( mediaStreams );
 
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
@@ -873,6 +888,13 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClientPtr httpClient 
 
 QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
     return new QnAxisPtzController(toSharedPointer(this));
+}
+
+QnPlAxisResource::AxisResolution QnPlAxisResource::getResolution( int encoderIndex ) const
+{
+    return (unsigned int)encoderIndex < sizeof(m_resolutions)/sizeof(*m_resolutions)
+        ? m_resolutions[encoderIndex]
+        : QnPlAxisResource::AxisResolution();
 }
 
 int QnPlAxisResource::getChannel() const

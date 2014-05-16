@@ -69,11 +69,7 @@ private:
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     unsigned int m_cameraCapabilities;
 
-    nxcip::Resolution getMaxResolution( int encoderNumber ) const;
-    //!Returns resolution with pixel count equal or less than \a desiredResolution
-    nxcip::Resolution getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const;
     QnAbstractMediaDataPtr readLiveStreamReader();
-    nxcip::Resolution getSecondStreamResolution( const nxcip_qt::CameraMediaEncoder& cameraEncoder );
     void initializeAudioContext( const nxcip::AudioFormat& audioFormat );
 };
 

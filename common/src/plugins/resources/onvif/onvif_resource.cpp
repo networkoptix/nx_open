@@ -488,7 +488,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if( !relayOutputs.empty() )
     {
         setCameraCapability( Qn::RelayOutputCapability, true );
-        setCameraCapability( Qn::RelayInputCapability, true );    //TODO it's not clear yet how to get input port list for sure (on DW cam getDigitalInputs returns nothing)
+        //TODO #ak it's not clear yet how to get input port list for sure (on DW cam getDigitalInputs returns nothing)
+            //but all cameras i've seen have either both input & output or none
+        setCameraCapability( Qn::RelayInputCapability, true );
 
         //resetting all ports states to inactive
         for( std::vector<QnPlOnvifResource::RelayOutputInfo>::size_type
@@ -517,8 +519,12 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
-    //if( !m_relayInputs.empty() )
-    //    setCameraCapability( Qn::relayInput, true );
+    //detecting and saving selected resolutions
+    CameraMediaStreams mediaStreams;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_primaryResolution, m_primaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
+    if( m_secondaryResolution.width() > 0 )
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_secondaryResolution, m_secondaryCodec == H264 ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
+    saveResolutionList( mediaStreams );
 
     save();
 

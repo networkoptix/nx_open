@@ -27,7 +27,7 @@ public:
         bool rez = QnTextureColorGLShaderProgramm::link();
         if (rez) {
             m_texture1 = uniformLocation("uTexture1");
-            m_progressLocation = uniformLocation("uProgress");
+            m_progressLocation = uniformLocation("aProgress");
         }
         return rez;
     }

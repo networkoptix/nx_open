@@ -6,13 +6,16 @@
 #include "ptz_math.h"
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ExtrapolationMode)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qn::ExtrapolationMode)
 
 QN_DEFINE_LEXICAL_ENUM(AngleSpace,
     (DegreesSpace,     "Degrees")
     (Mm35EquivSpace,   "35MmEquiv")
 )
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(AngleSpace)
+
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
+    (Qn::ExtrapolationMode)(AngleSpace), 
+    (json_lexical)
+)
 
 typedef boost::array<QnSpaceMapperPtr<qreal>, 3> PtzMapperPart;
 

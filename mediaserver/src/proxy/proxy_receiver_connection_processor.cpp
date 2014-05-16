@@ -21,10 +21,10 @@ QnProxyReceiverConnection::QnProxyReceiverConnection(QSharedPointer<AbstractStre
     setObjectName( lit("QnProxyReceiverConnection") );
 }
 
-static bool isLocalAddress(const QString& addr)
-{
-    return addr == lit("localhost") || addr == lit("127.0.0.1");
-}
+//static bool isLocalAddress(const QString& addr)
+//{
+//    return addr == lit("localhost") || addr == lit("127.0.0.1");
+//}
 
 void QnProxyReceiverConnection::run()
 {

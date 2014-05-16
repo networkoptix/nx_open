@@ -435,10 +435,40 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     return Qn::EnabledAction;
 }
 
+Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameters &parameters) {
+#ifdef QN_ENABLE_BOOKMARKS
+    if(!parameters.hasArgument(Qn::TimePeriodRole))
+        return Qn::InvisibleAction;
+
+    QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+    if(!(Qn::NormalTimePeriod & period.type()))
+        return Qn::DisabledAction;
+
+    if(!context()->workbench()->item(Qn::CentralRole))
+        return Qn::DisabledAction;
+
+    QnResourcePtr resource = parameters.resource();
+    if(resource->flags() & QnResource::sync) {
+        QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
+        if(!periods.intersects(period))
+            return Qn::DisabledAction;
+    }
+
+    return Qn::EnabledAction;
+#else
+    return Qn::InvisibleAction;
+#endif
+}
+
+
 Qn::ActionVisibility QnModifyBookmarkActionCondition::check(const QnActionParameters &parameters) {
+#ifdef QN_ENABLE_BOOKMARKS
     if(!parameters.hasArgument(Qn::CameraBookmarkRole))
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
+#else
+    return Qn::InvisibleAction;
+#endif
 }
 
 Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &parameters) {

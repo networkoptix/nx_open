@@ -13,7 +13,7 @@
 
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnEmail, ConnectionType);
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(QnEmail::ConnectionType);
+QN_FUSION_DEFINE_FUNCTIONS(QnEmail::ConnectionType, (json_lexical))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnEmail::SmtpServerPreset, (json), (server)(connectionType)(port))
 
