@@ -206,6 +206,12 @@
             </Component>                         
             <Component>
                 <File Id="ClientlibEGL$(var.suffix).dll" Name="libEGL$(var.suffix).dll" Source="$(var.SourceDir)\libEGL$(var.suffix).dll"  />                
+            </Component>            
+            <Component>
+                <File Id="Clientquazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll"  />                
+            </Component>
+            <Component>
+                <File Id="Clientzlibwapi.dll" Name="zlibwapi.dll" Source="$(var.SourceDir)\zlibwapi.dll"  />                
             </Component>                                           
         </ComponentGroup>
 
