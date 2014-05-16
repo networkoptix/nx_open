@@ -405,6 +405,9 @@
             <build>
                 <directory>target-${box}</directory>
             </build>
+            <modules>                       
+                <module>edge_firmware</module>
+            </modules>              
         </profile> 
 
         <profile>
