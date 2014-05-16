@@ -1,41 +1,41 @@
 #!/bin/bash
 
-SRC_DIR=../../
+# SRC_DIR=../../..
 
 
-function printHelp()
-{
-    echo "--target-dir={dir to copy packet to}"
-    echo
-}
+# function printHelp()
+# {
+#     echo "--target-dir={dir to copy packet to}"
+#     echo
+# }
 
-function get_var()
-{
-    local h="`grep -R $1 $SRC_DIR/mediaserver/arm/version.h | sed 's/.*"\(.*\)".*/\1/'`"
-    if [[ "$1" == "QN_CUSTOMIZATION_NAME" && "$h" == "default" ]]; then
-        h=networkoptix
-    fi
-    echo "$h"
-}
+# function get_var()
+# {
+#     local h="`grep -R $1 $SRC_DIR/mediaserver/arm/version.h | sed 's/.*"\(.*\)".*/\1/'`"
+#     if [[ "$1" == "QN_CUSTOMIZATION_NAME" && "$h" == "default" ]]; then
+#         h=networkoptix
+#     fi
+#     echo "$h"
+# }
 
 
 
-CUSTOMIZATION=$(get_var "QN_CUSTOMIZATION_NAME")
-PRODUCT_NAME=$(get_var "QN_PRODUCT_NAME_SHORT")
+CUSTOMIZATION=${deb.customization.company.name}
+PRODUCT_NAME=${product.name.short}
 MODULE_NAME=mediaserver
-VERSION=$(get_var "ENGINE_VERSION")
-MAJOR_VERSION="`echo $VERSION | cut -d . -f 1 --output-delimiter=`"
-MINOR_VERSION="`echo $VERSION | cut -d . -f 2 --output-delimiter=`"
-BUILD_VERSION="`echo $VERSION | cut -d . -f 3 --output-delimiter=`"
+VERSION=${release.version}.${buildNumber}
+MAJOR_VERSION="${parsedVersion.majorVersion}"
+MINOR_VERSION="${parsedVersion.minorVersion}"
+BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
-BOX_NAME=$(get_var "QN_ARM_BOX")
+BOX_NAME=${box}
 
 PACKAGE_NAME=$CUSTOMIZATION-$PRODUCT_NAME-$MODULE_NAME-$VERSION-$BOX_NAME.tar.gz
 
 BUILD_DIR=/tmp/hdw_isd_build.tmp
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
 
-BUILD_OUTPUT_DIR=$SRC_DIR/build_environment/target
+BUILD_OUTPUT_DIR=${libdir}-${box}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
 
 STRIP="`find ../../mediaserver/ -name 'Makefile*' | head -n 1 | xargs grep -E 'STRIP\s+=' | cut -d= -f 2 | tr -d ' '`"
@@ -53,9 +53,6 @@ do
     fi
 done
 
-
-
-
 LIBS_TO_COPY=\
 ( libavcodec.so.54.23.100 \
 libavdevice.so.54.0.100 \
@@ -72,6 +69,7 @@ libQt5Multimedia.so.5.2.1 \
 libQt5Network.so.5.2.1 \
 libQt5Sql.so.5.2.1 \
 libQt5Xml.so.5.2.1 \
+libquazip.so.1.0.0 \
 libsigar.so \
 libvpx.so.1.2.0 \
 libswresample.so.0.15.100 \
@@ -90,7 +88,7 @@ echo "$VERSION" > $BUILD_DIR/$PREFIX_DIR/version.txt
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
 for var in "${LIBS_TO_COPY[@]}"
 do
-  cp $LIBS_DIR/${var} $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
+  cp $LIBS_DIR/${var}   $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
   if [ ! -z "$STRIP" ]; then
      $STRIP $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
   fi
@@ -118,11 +116,11 @@ cp $BUILD_OUTPUT_DIR/bin/release/plugins/libisd_native_plugin.so $BUILD_DIR/$PRE
 
 #conf
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
-cp $SRC_DIR/edge_firmware/isd/maven/filter-resources/usr/local/apps/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
+cp ./usr/local/apps/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
 
 #start script
 mkdir -p $BUILD_DIR/etc/init.d/
-install -m 755 $SRC_DIR/edge_firmware/isd/maven/filter-resources/etc/init.d/S99networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/S99$CUSTOMIZATION-$MODULE_NAME
+install -m 755 ./etc/init.d/S99networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/S99$CUSTOMIZATION-$MODULE_NAME
 sed -i "s/\${customization}/$CUSTOMIZATION/" $BUILD_DIR/etc/init.d/S99$CUSTOMIZATION-$MODULE_NAME
 
 

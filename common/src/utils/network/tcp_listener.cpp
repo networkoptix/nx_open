@@ -33,7 +33,6 @@ public:
 
 // ------------------------ QnRtspListener ---------------------------
 
-#ifdef USE_NX_HTTP
 bool QnTcpListener::authenticate(const nx_http::Request& request, nx_http::Response& response) const
 {
     Q_D(const QnTcpListener);
@@ -54,22 +53,6 @@ bool QnTcpListener::authenticate(const nx_http::Request& request, nx_http::Respo
     }
     return rez;
 }
-#else
-bool QnTcpListener::authenticate(const QHttpRequestHeader& headers, QHttpResponseHeader& responseHeaders) const
-{
-    Q_D(const QnTcpListener);
-    if (d->authDigest.isEmpty())
-        return true;
-    QList<QByteArray> data = headers.value(QLatin1String("Authorization")).toUtf8().split(' ');
-    bool rez = false;
-    if (data[0].toLower() == "basic" && data.size() > 1)
-        rez = data[1] == d->authDigest;
-    if (!rez) {
-        responseHeaders.addValue(QLatin1String("WWW-Authenticate"), QLatin1String("Basic realm=\"Secure Area\""));
-    }
-    return rez;
-}
-#endif
 
 void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& password)
 {
