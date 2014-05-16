@@ -93,16 +93,33 @@ public:
     /**
      * @brief getVideoWallItemByUuid            Find videowall item by uuid.
      * @param uuid                              Unique id of the item.
-     * @return                                  Pair of videowall containing the item and item's uuid.
+     * @return                                  Index containing the videowall and item's uuid.
      */
     QnVideoWallItemIndex getVideoWallItemByUuid(const QUuid &uuid) const;
 
     /**
-     * @brief getVideoWallItemsByUuid           Find list of videowall items by their uuid.
+     * @brief getVideoWallItemsByUuid           Find list of videowall items by their uuids.
      * @param uuids                             Unique ids of the items.
-     * @return                                  List of pairs of videowall containing the item and item's uuid.
+     * @return                                  List of indices containing the videowall and items' uuid.
      */
     QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QUuid> &uuids) const;
+
+    
+    /**
+     * @brief getVideoWallMatrixByUuid          Find videowall matrix by uuid.
+     * @param uuid                              Unique id of the matrix.
+     * @return                                  Index containing the videowall and matrix's uuid.
+     */
+    QnVideoWallMatrixIndex getVideoWallMatrixByUuid(const QUuid &uuid) const;
+
+    /**
+     * @brief getVideoWallMatricesByUuid        Find list of videowall matrices by their uuids.
+     * @param uuids                             Unique ids of the matrices.
+     * @return                                  List of indices containing the videowall and matrices' uuid.
+     */
+    QnVideoWallMatrixIndexList getVideoWallMatricesByUuid(const QList<QUuid> &uuids) const;
+
+
 
     QStringList allTags() const;
 
