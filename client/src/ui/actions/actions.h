@@ -807,6 +807,11 @@ namespace Qn {
         LoadVideowallMatrixAction,
 
         /**
+         * Delete saved videowall matrix.
+         */
+        DeleteVideowallMatrixAction,
+
+        /**
          * Open target videowall item after user logged in.
          */
         DelayedOpenVideoWallItemAction,

@@ -247,6 +247,8 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(action(Qn::VideowallSettingsAction),        &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered);
         connect(action(Qn::SaveVideowallMatrixAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered);
         connect(action(Qn::LoadVideowallMatrixAction),      &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered);
+        connect(action(Qn::DeleteVideowallMatrixAction),    &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered);
+        
 
         connect(display(),     &QnWorkbenchDisplay::widgetAdded,                        this,   &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
         connect(display(),     &QnWorkbenchDisplay::widgetAboutToBeRemoved,             this,   &QnWorkbenchVideoWallHandler::at_display_widgetAboutToBeRemoved);
@@ -1717,6 +1719,13 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered() {
         matrix.layoutByItem[item.uuid] = item.layout;
     }
 
+    if (matrix.layoutByItem.isEmpty()) {
+        QMessageBox::information(mainWindow(),
+            tr("Invalid matrix"),
+            tr("You have no layouts on the screens. Matrix cannot be saved.")); //TODO: #Elric #TR check the text please
+        return;
+    }
+
     videowall->matrices()->addItem(matrix);
     connection2()->getVideowallManager()->save(videowall, this, [](){});
 }
@@ -1762,6 +1771,23 @@ void QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered() {
         return;
     
     connection2()->getVideowallManager()->save(videowall, this, [](){});
+}
+
+void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered() {
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnVideoWallMatrixIndexList matrices = parameters.videoWallMatrices();
+    QList<QnVideoWallResourcePtr> videoWalls;
+
+    foreach (const QnVideoWallMatrixIndex &matrix, matrices) {
+        if (!matrix.videowall())
+            continue;
+        matrix.videowall()->matrices()->removeItem(matrix.uuid());
+        if (!videoWalls.contains(matrix.videowall()))
+            videoWalls << matrix.videowall();
+    }
+
+    foreach (const QnVideoWallResourcePtr &videowall, videoWalls)
+        connection2()->getVideowallManager()->save(videowall, this, [](){});    
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_layout_saved(int status, const QnResourceList &resources, int handle) {

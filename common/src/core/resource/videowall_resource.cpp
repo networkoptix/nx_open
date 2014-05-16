@@ -60,8 +60,19 @@ void QnVideoWallResource::storedItemAdded(const QnVideoWallItem &item) {
 void QnVideoWallResource::storedItemRemoved(const QnVideoWallItem &item) {
     emit itemRemoved(::toSharedPointer(this), item);
 
-    QUuid pcUuid = item.pcUuid;
+    // removing item from the matrices and removing empty matrices (if any)
+    QnVideoWallMatrixMap matrices = m_matrices->getItems();
+    foreach (QnVideoWallMatrix matrix, matrices) {
+        if (!matrix.layoutByItem.contains(item.uuid))
+            continue;
+        matrix.layoutByItem.remove(item.uuid);
+        if (matrix.layoutByItem.isEmpty())
+            m_matrices->removeItem(matrix.uuid);
+        else
+            m_matrices->updateItem(matrix.uuid, matrix);
+    }
 
+    QUuid pcUuid = item.pcUuid;
     foreach(const QnVideoWallItem &item, m_items->getItems())
         if (item.pcUuid == pcUuid)
             return;
