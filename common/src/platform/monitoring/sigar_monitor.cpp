@@ -8,6 +8,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
+#include <utils/common/log.h>
 
 extern "C"
 {
@@ -124,7 +125,10 @@ public:
         result.path = QLatin1String(fileSystem.dir_name);
         result.freeBytes = usage.free * 1024;
         result.sizeBytes = usage.total * 1024;
-        result.type = partitionType(fileSystem.type);
+        if( strcmp( fileSystem.sys_type_name, "fuseblk" ) == 0 )
+            result.type = QnPlatformMonitor::LocalDiskPartition;      //TODO #ak this is workaround, have to fix it correctly
+        else
+            result.type = partitionType(fileSystem.type);
 
         return result;
     }
