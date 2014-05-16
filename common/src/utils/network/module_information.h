@@ -6,6 +6,7 @@
 
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
+#include <utils/common/id.h>
 
 struct QnModuleInformation {
     QString type;
@@ -15,7 +16,7 @@ struct QnModuleInformation {
     QMap<QString, QString> parameters;
     QSet<QString> remoteAddresses;
     bool isLocal; //!< true if at least one address from \a remoteHostAddress is a local address
-    QString id;
+    QnId id;
 
     QnModuleInformation() : isLocal(false) {}
 };

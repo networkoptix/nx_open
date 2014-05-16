@@ -99,14 +99,9 @@ namespace ec2
         */
         AlivePeersMap aliveServerPeers() const;
 
-        void sendServerAliveMsg(const ApiServerAliveData &data);
-
     signals:
         void peerLost(ApiServerAliveData data, bool isProxy);
         void peerFound(ApiServerAliveData data, bool isProxy);
-
-        void incompatiblePeerFound(const ApiServerAliveData &data);
-        void incompatiblePeerLost(const ApiServerAliveData &data);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);

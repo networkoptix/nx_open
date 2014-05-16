@@ -1,7 +1,9 @@
 #include "global_module_finder.h"
 
+#include <utils/network/modulefinder.h>
 #include <common/common_module.h>
 #include <api/app_server_connection.h>
+#include <nx_ec/data/api_module_data.h>
 
 QnGlobalModuleFinder::QnGlobalModuleFinder(QObject *parent) :
     QObject(parent)
@@ -9,65 +11,89 @@ QnGlobalModuleFinder::QnGlobalModuleFinder(QObject *parent) :
 }
 
 void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &connection) {
-    if (m_connection) {
-        disconnect(m_connection.get(),      &ec2::AbstractECConnection::remotePeerFound,        this,   &QnGlobalModuleFinder::at_peerFound);
-        disconnect(m_connection.get(),      &ec2::AbstractECConnection::remotePeerLost,         this,   &QnGlobalModuleFinder::at_peerLost);
-        disconnect(connection.get(),        &ec2::AbstractECConnection::incompatiblePeerFound,  this,   &QnGlobalModuleFinder::at_peerFound);
-        disconnect(connection.get(),        &ec2::AbstractECConnection::incompatiblePeerLost,   this,   &QnGlobalModuleFinder::at_peerLost);
-    }
+    if (m_connection)
+        disconnect(m_connection->getModuleInformationManager().get(),   &ec2::AbstractModuleInformationManager::moduleChanged,  this,   &QnGlobalModuleFinder::at_moduleChanged);
 
     m_connection = connection;
 
-    if (connection) {
-        connect(connection.get(),           &ec2::AbstractECConnection::remotePeerFound,        this,   &QnGlobalModuleFinder::at_peerFound);
-        connect(connection.get(),           &ec2::AbstractECConnection::remotePeerLost,         this,   &QnGlobalModuleFinder::at_peerLost);
-        connect(connection.get(),           &ec2::AbstractECConnection::incompatiblePeerFound,  this,   &QnGlobalModuleFinder::at_peerFound);
-        connect(connection.get(),           &ec2::AbstractECConnection::incompatiblePeerLost,   this,   &QnGlobalModuleFinder::at_peerLost);
+    if (connection)
+        connect(connection->getModuleInformationManager().get(),        &ec2::AbstractModuleInformationManager::moduleChanged,  this,   &QnGlobalModuleFinder::at_moduleChanged);
+}
+
+void QnGlobalModuleFinder::setModuleFinder(QnModuleFinder *moduleFinder) {
+    if (m_moduleFinder){
+        disconnect(m_moduleFinder.data(),   &QnModuleFinder::moduleFound,   this,   &QnGlobalModuleFinder::at_moduleFinder_moduleFound);
+        disconnect(m_moduleFinder.data(),   &QnModuleFinder::moduleLost,    this,   &QnGlobalModuleFinder::at_moduleFinder_moduleLost);
+    }
+
+    m_moduleFinder = moduleFinder;
+
+
+    if (moduleFinder) {
+        foreach (const QnModuleInformation &moduleInformation, moduleFinder->revealedModules())
+            at_moduleFinder_moduleFound(moduleInformation);
+
+        connect(moduleFinder,               &QnModuleFinder::moduleFound,   this,   &QnGlobalModuleFinder::at_moduleFinder_moduleFound);
+        connect(moduleFinder,               &QnModuleFinder::moduleLost,    this,   &QnGlobalModuleFinder::at_moduleFinder_moduleLost);
     }
 }
 
-void QnGlobalModuleFinder::at_peerFound(ec2::ApiServerAliveData data) {
-    if (data.serverId == qnCommon->moduleGUID())
-        return;
+void QnGlobalModuleFinder::fillApiModuleData(const QnModuleInformation &moduleInformation, ec2::ApiModuleData *data) {
+    data->type = moduleInformation.type;
+    data->id = moduleInformation.id;
+    data->systemName = moduleInformation.systemName;
+    data->version = moduleInformation.version.toString();
+    data->systemInformation = moduleInformation.systemInformation.toString();
+    data->port = moduleInformation.parameters.value(lit("port")).toInt();
+    data->isAlive = true;
+}
 
-    if (data.isClient)
-        return;
+void QnGlobalModuleFinder::fillFromApiModuleData(const ec2::ApiModuleData &data, QnModuleInformation *moduleInformation) {
+    moduleInformation->type = data.type;
+    moduleInformation->id = data.id;
+    moduleInformation->systemName = data.systemName;
+    moduleInformation->version = QnSoftwareVersion(data.version);
+    moduleInformation->systemInformation = QnSystemInformation(data.systemInformation);
+    moduleInformation->parameters.insert(lit("port"), QString::number(data.port));
+}
 
-    bool newPeer = false;
+QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {
+    return m_moduleInformationById.values();
+}
 
-    auto it = m_moduleInformationById.find(data.serverId);
-    if (it == m_moduleInformationById.end()) {
-        it = m_moduleInformationById.insert(data.serverId, QnModuleInformation());
-        it->type = lit("Media Server");
-        it->id = data.serverId.toString();
-        it->systemInformation = QnSystemInformation(data.systemInformation);
-
-        newPeer = true;
-    }
-    it->version = QnSoftwareVersion(data.version);
-    it->systemName = data.systemName;
-    it->parameters[lit("port")] = data.port;
-
-    if (newPeer)
-        emit peerFound(*it);
+void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive) {
+    if (isAlive)
+        at_moduleFinder_moduleFound(moduleInformation);
     else
-        emit peerChanged(*it);
-
-    qDebug() << "Peer found: " << it->type << it->id << it->version.toString() << it->systemName;
+        at_moduleFinder_moduleLost(moduleInformation);
 }
 
-void QnGlobalModuleFinder::at_peerLost(ec2::ApiServerAliveData data) {
-    if (data.serverId == qnCommon->moduleGUID())
+void QnGlobalModuleFinder::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
+    if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
-    if (data.isClient)
+    auto it = m_moduleInformationById.find(moduleInformation.id);
+
+    if (it == m_moduleInformationById.end()) {
+        m_moduleInformationById[moduleInformation.id] = moduleInformation;
+        emit peerFound(moduleInformation);
+        qDebug() << "Module found: " << moduleInformation.systemName << moduleInformation.version.toString() << moduleInformation.id;
+    } else {
+        *it = moduleInformation;
+        emit peerChanged(moduleInformation);
+        qDebug() << "Module refound: " << moduleInformation.systemName << moduleInformation.version.toString() << moduleInformation.id;
+    }
+}
+
+void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
+    if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
-    auto it = m_moduleInformationById.find(data.serverId);
-    if (it == m_moduleInformationById.end())
-        return;
+    auto it = m_moduleInformationById.find(moduleInformation.id);
 
-    emit peerLost(*it);
-    m_moduleInformationById.erase(it);
-    qDebug() << "Peer lost" << it->id;
+    if (it != m_moduleInformationById.end()) {
+        m_moduleInformationById.erase(it);
+        emit peerLost(moduleInformation);
+        qDebug() << "Module lost: " << moduleInformation.systemName << moduleInformation.version.toString() << moduleInformation.id;
+    }
 }

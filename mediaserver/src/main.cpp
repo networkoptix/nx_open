@@ -959,17 +959,9 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
     if (moduleInformation.version == QnSoftwareVersion(QN_APPLICATION_VERSION) && moduleInformation.systemName == qnCommon->localSystemName()) {
         int port = moduleInformation.parameters.value("port").toInt();
         QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
-        ec2Connection->addRemotePeer(url, false, moduleInformation.id);
+        ec2Connection->addRemotePeer(url, false, moduleInformation.id.toString());
     } else {
-        ec2::ApiServerAliveData data;
-        data.isAlive = true;
-        data.serverId = moduleInformation.id;
-        data.version = moduleInformation.version.toString();
-        data.systemInformation = moduleInformation.systemInformation.toString();
-        data.port = moduleInformation.parameters[lit("port")].toInt();
-        data.isClient = false;
-        qnTransactionBus->sendServerAliveMsg(data);
-        qDebug() << "Send found: " << data.systemName << data.serverId << data.version;
+
     }
 }
 void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
@@ -982,15 +974,7 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
             ec2Connection->deleteRemotePeer(url);
         }
     } else {
-        ec2::ApiServerAliveData data;
-        data.isAlive = false;
-        data.serverId = moduleInformation.id;
-        data.version = moduleInformation.version.toString();
-        data.systemInformation = moduleInformation.systemInformation.toString();
-        data.port = moduleInformation.parameters[lit("port")].toInt();
-        data.isClient = false;
-        qnTransactionBus->sendServerAliveMsg(data);
-        qDebug() << "Send lost: " << data.systemName << data.serverId << data.version;
+
     }
 }
 
@@ -1389,6 +1373,7 @@ void QnMain::run()
 
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
     globalModuleFinder->setConnection(ec2Connection);
+    globalModuleFinder->setModuleFinder(m_moduleFinder);
 
     //===========================================================================
     //IPPH264Decoder::dll.init();

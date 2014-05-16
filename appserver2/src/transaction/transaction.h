@@ -152,6 +152,9 @@ namespace ec2
             addCameraBookmarkTags = 62,
             getCameraBookmarkTags = 63,
             removeCameraBookmarkTags = 64,
+
+            //!ApiModuleData
+            moduleInfo,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

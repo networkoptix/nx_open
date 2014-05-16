@@ -109,7 +109,7 @@ private:
     };
 
     /** Hash list of automatically found Enterprise Controllers based on seed as key. */
-    QMultiHash<QString, QnEcData> m_foundEcs;
+    QMultiHash<QnId, QnEcData> m_foundEcs;
     std::unique_ptr<CompatibilityVersionInstallationDialog> m_installationDialog;
 
     bool m_restartPending;

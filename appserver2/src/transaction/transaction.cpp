@@ -160,6 +160,9 @@ namespace ec2
                 case removeCameraBookmarkTags:
                     return "removeCameraBookmarkTags";
 
+                case moduleInfo:
+                    return "moduleInfo";
+
                 default:
                     return "unknown " + QString::number((int)val);
             }

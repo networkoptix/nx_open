@@ -11,6 +11,7 @@
 #include "transaction_log.h"
 #include "api/app_server_connection.h"
 #include <utils/serialization/binary_functions.h>
+#include <utils/network/global_module_finder.h>
 
 #include "version.h"
 
@@ -80,14 +81,6 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& 
 
     if (tran.params.serverId == qnCommon->moduleGUID())
         return; // ignore himself
-
-    if (tran.params.systemName != qnCommon->localSystemName() || tran.params.version != lit(QN_APPLICATION_VERSION)) {
-        if (tran.params.isAlive)
-            emit incompatiblePeerFound(tran.params);
-        else
-            emit incompatiblePeerLost(tran.params);
-        return;
-    }
 
     // proxy alive info from non-direct connected host
     AlivePeersMap::iterator itr = m_alivePeers.find(tran.params.serverId);
@@ -405,6 +398,9 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
         case ApiCommand::removeCameraBookmarkTags:
             return deliveryTransaction<ApiCameraBookmarkTagDataList>(abstractTran, stream);
 
+        case ApiCommand::moduleInfo:
+            return deliveryTransaction<ApiModuleData>(abstractTran, stream);
+
         default:
             Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
             break;
@@ -458,37 +454,10 @@ void QnTransactionMessageBus::sendServerAliveMsg(const QnId& serverId, bool isAl
     tran.fillSequence();
     sendTransaction(tran);
 
-    if (tran.params.systemName != qnCommon->localSystemName() || tran.params.version != lit(QN_APPLICATION_VERSION)) {
-        if (isAlive)
-            emit incompatiblePeerFound(tran.params);
-        else
-            emit incompatiblePeerLost(tran.params);
-    } else {
-        if (isAlive)
-            emit peerFound(tran.params, false);
-        else
-            emit peerLost(tran.params, false);
-    }
-}
-
-void QnTransactionMessageBus::sendServerAliveMsg(const ApiServerAliveData &data) {
-    m_aliveSendTimer.restart();
-    QnTransaction<ApiServerAliveData> tran(ApiCommand::serverAliveInfo, false);
-    tran.params = data;
-    tran.fillSequence();
-    sendTransaction(tran);
-
-    if (tran.params.systemName != qnCommon->localSystemName() || tran.params.version != lit(QN_APPLICATION_VERSION)) {
-        if (data.isAlive)
-            emit incompatiblePeerFound(tran.params);
-        else
-            emit incompatiblePeerLost(tran.params);
-    } else {
-        if (data.isAlive)
-            emit peerFound(tran.params, false);
-        else
-            emit peerLost(tran.params, false);
-    }
+    if (isAlive)
+        emit peerFound(tran.params, false);
+    else
+        emit peerLost(tran.params, false);
 }
 
 QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
@@ -647,6 +616,13 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
             qWarning() << "Can't execute query for sync with client peer!";
             QnTransactionTransport::connectDone(remoteGuid); // release connection
             return;
+        }
+
+        /* fill module information */
+        foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules()) {
+            ApiModuleData data;
+            QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
+            tran.params.foundModules.push_back(data);
         }
     }
 

@@ -299,5 +299,5 @@ QnModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)
     moduleInformation.systemInformation = QnSystemInformation(response.systemInformation);
     moduleInformation.systemName = response.name;
     moduleInformation.parameters = response.typeSpecificParameters;
-    moduleInformation.id = response.seed;
+    moduleInformation.id = QnId(response.seed);
 }

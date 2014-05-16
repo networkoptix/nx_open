@@ -10,6 +10,7 @@
 #include <QtCore/QUrl>
 
 #include <utils/common/email.h>
+#include <utils/network/module_information.h>
 
 #include <api/model/connection_info.h>
 #include <api/model/email_attachment.h>
@@ -737,6 +738,22 @@ namespace ec2
     };
     typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
 
+    class AbstractModuleInformationManager : public QObject {
+        Q_OBJECT
+    public:
+        template<class TargetType, class HandlerType> int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, TargetType *target, HandlerType handler) {
+            return sendModuleInformation(moduleInformation, isAlive, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+    signals:
+        void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive);
+
+    protected:
+        virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) = 0;
+    };
+    typedef std::shared_ptr<AbstractModuleInformationManager> AbstractModuleInformationManagerPtr;
+
     /*!
         \note All methods are asynchronous if other not specified
     */
@@ -769,6 +786,7 @@ namespace ec2
         virtual AbstractVideowallManagerPtr getVideowallManager() = 0;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() = 0;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() = 0;
+        virtual AbstractModuleInformationManagerPtr getModuleInformationManager() = 0;
 
         /*!
             \param handler Functor with params: (ErrorCode)
@@ -852,8 +870,6 @@ namespace ec2
 
         void remotePeerFound(ApiServerAliveData data, bool isProxy);
         void remotePeerLost(ApiServerAliveData data, bool isProxy);
-        void incompatiblePeerFound(ApiServerAliveData data);
-        void incompatiblePeerLost(ApiServerAliveData data);
 
         void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);

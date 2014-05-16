@@ -29,12 +29,11 @@ namespace ec2
         m_layoutManager( new QnLayoutManager<T>(m_queryProcessor, resCtx) ),
         m_videowallManager( new QnVideowallManager<T>(m_queryProcessor, resCtx) ),
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) ),
-        m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) )
+        m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) ),
+        m_moduleInformationManager( new QnModuleInformationManager<T>(m_queryProcessor) )
     {
         connect(qnTransactionBus,   &QnTransactionMessageBus::peerFound,                this,   &BaseEc2Connection<T>::remotePeerFound,         Qt::DirectConnection);
         connect(qnTransactionBus,   &QnTransactionMessageBus::peerLost,                 this,   &BaseEc2Connection<T>::remotePeerLost,          Qt::DirectConnection);
-        connect(qnTransactionBus,   &QnTransactionMessageBus::incompatiblePeerFound,    this,   &BaseEc2Connection<T>::incompatiblePeerFound,   Qt::DirectConnection);
-        connect(qnTransactionBus,   &QnTransactionMessageBus::incompatiblePeerLost,     this,   &BaseEc2Connection<T>::incompatiblePeerLost,    Qt::DirectConnection);
     }
 
     template<class T>
@@ -95,6 +94,12 @@ namespace ec2
     AbstractUpdatesManagerPtr BaseEc2Connection<T>::getUpdatesManager()
     {
         return m_updatesManager;
+    }
+
+    template<class T>
+    AbstractModuleInformationManagerPtr BaseEc2Connection<T>::getModuleInformationManager()
+    {
+        return m_moduleInformationManager;
     }
 
     template<class T>

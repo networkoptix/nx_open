@@ -157,11 +157,11 @@ void QnFoundEnterpriseControllersModel::remoteModuleFound(const QnModuleInformat
     bool isNewElement = false;
 
     auto it = std::find_if(m_foundModules.begin(), m_foundModules.end(),
-                           [&moduleInformation](const FoundModuleData &data) { return data.seed == moduleInformation.id; });
+                           [&moduleInformation](const FoundModuleData &data) { return data.seed == moduleInformation.id.toString(); });
     if (it == m_foundModules.end()) {
         FoundModuleData newModuleData;
         newModuleData.url = url;
-        newModuleData.seed = moduleInformation.id;
+        newModuleData.seed = moduleInformation.id.toString();
 
         //searching place to insert new element in order of increase of url
         it = std::lower_bound(m_foundModules.begin(), m_foundModules.end(), newModuleData);
@@ -195,7 +195,7 @@ void QnFoundEnterpriseControllersModel::remoteModuleLost(const QnModuleInformati
         return;
 
     auto it = std::find_if(m_foundModules.begin(), m_foundModules.end(),
-                           [&moduleInformation](const FoundModuleData &data) { return data.seed == moduleInformation.id; });
+                           [&moduleInformation](const FoundModuleData &data) { return data.seed == moduleInformation.id.toString(); });
     if (it == m_foundModules.end())
         return;
 

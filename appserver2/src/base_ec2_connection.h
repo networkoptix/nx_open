@@ -22,6 +22,7 @@
 #include "managers/user_manager.h"
 #include "managers/videowall_manager.h"
 #include "managers/updates_manager.h"
+#include "managers/module_information_manager.h"
 
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_videowall_data.h"
@@ -50,6 +51,7 @@ namespace ec2
         virtual AbstractVideowallManagerPtr getVideowallManager() override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
+        virtual AbstractModuleInformationManagerPtr getModuleInformationManager() override;
 
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) override;
@@ -169,6 +171,7 @@ namespace ec2
             QnFullResourceData fullResData;
             fromApiToResourceList(tran.params, fullResData, m_resCtx);
             emit initNotification(fullResData);
+            m_moduleInformationManager->triggerNotification(tran.params.foundModules);
         }
 
         void triggerNotification( const QnTransaction<ApiPanicModeData>& tran ) {
@@ -218,6 +221,10 @@ namespace ec2
             return m_cameraManager->triggerNotification(tran);
         }
 
+        void triggerNotification(const QnTransaction<ApiModuleData> &tran) {
+            return m_moduleInformationManager->triggerNotification(tran);
+        }
+
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
     protected:
         QueryProcessorType* m_queryProcessor;
@@ -232,6 +239,7 @@ namespace ec2
         std::shared_ptr<QnVideowallManager<QueryProcessorType>> m_videowallManager;
         std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
         std::shared_ptr<QnUpdatesManager<QueryProcessorType>> m_updatesManager;
+        std::shared_ptr<QnModuleInformationManager<QueryProcessorType>> m_moduleInformationManager;
 
     private:
         QnTransaction<ApiPanicModeData> prepareTransaction( ApiCommand::Value cmd, const Qn::PanicMode& mode);

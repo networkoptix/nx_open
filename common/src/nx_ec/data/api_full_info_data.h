@@ -4,6 +4,7 @@
 #include "api_globals.h"
 #include "api_data.h"
 #include "api_server_info_data.h"
+#include "api_module_data.h"
 
 namespace ec2 
 {
@@ -18,8 +19,9 @@ namespace ec2
         ApiCameraServerItemDataList cameraHistory;
         ApiLicenseDataList licenses;
         ApiServerInfoData serverInfo;
+        ApiModuleDataList foundModules;
     };
-#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(serverInfo)
+#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(serverInfo)(foundModules)
 
 } // namespace ec2
 
