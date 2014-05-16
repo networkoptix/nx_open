@@ -2131,13 +2131,21 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
 void QnWorkbenchActionHandler::at_renameAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnResourcePtr resource = parameters.resource();
+    QnResourcePtr resource;
+
+    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
+    switch (nodeType)
+    {
+    case Qn::ResourceNode:
+    case Qn::EdgeNode:
+    case Qn::RecorderNode:
+        resource = parameters.resource();
+        break;
+    default:
+        break;
+    }
     if(!resource)
         return;
-
-    Qn::NodeType nodeType = parameters.hasArgument(Qn::NodeTypeRole)
-            ? parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>()
-            : Qn::ResourceNode;
 
     QnVirtualCameraResourcePtr camera;
     if (nodeType == Qn::RecorderNode) {

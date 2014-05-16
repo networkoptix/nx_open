@@ -18,7 +18,7 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_pc_data.h>
-
+#include <core/resource/videowall_matrix.h>
 
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
@@ -53,7 +53,7 @@ namespace {
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
 QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, bool isFlat, QObject *parent):
-    QAbstractItemModel(parent), 
+    base_type(parent), 
     QnWorkbenchContextAware(parent),
     m_urlsShown(true),
     m_rootNodeType(rootNodeType),
@@ -71,11 +71,11 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, bool isFlat,
             m_rootNodes[t]->setParent(m_rootNodes[parentNodeType]);
 
     /* Connect to context. */
-    connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)), Qt::QueuedConnection);
-    connect(resourcePool(),     SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(at_resPool_resourceRemoved(QnResourcePtr)), Qt::QueuedConnection);
-    connect(snapshotManager(),  SIGNAL(flagsChanged(const QnLayoutResourcePtr &)),  this, SLOT(at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &)));
-    connect(accessController(), SIGNAL(permissionsChanged(const QnResourcePtr &)),  this, SLOT(at_accessController_permissionsChanged(const QnResourcePtr &)));
-    connect(context(),          SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(at_context_userChanged()), Qt::QueuedConnection);
+    connect(resourcePool(),     &QnResourcePool::resourceAdded,                     this,   &QnResourcePoolModel::at_resPool_resourceAdded, Qt::QueuedConnection);
+    connect(resourcePool(),     &QnResourcePool::resourceRemoved,                   this,   &QnResourcePoolModel::at_resPool_resourceRemoved, Qt::QueuedConnection);
+    connect(snapshotManager(),  &QnWorkbenchLayoutSnapshotManager::flagsChanged,    this,   &QnResourcePoolModel::at_snapshotManager_flagsChanged);
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged,   this,   &QnResourcePoolModel::at_accessController_permissionsChanged);
+    connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourcePoolModel::at_context_userChanged, Qt::QueuedConnection);
 
     QnResourceList resources = resourcePool()->getResources(); 
 
@@ -159,22 +159,15 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
 }
 
 void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
-    if (
-            node->type() == Qn::VideoWallItemNode ||
-            node->type() == Qn::VideoWallHistoryNode ||
-            node->type() == Qn::UserVideoWallNode ||
-            node->type() == Qn::UserVideoWallItemNode) {
+    switch(node->type()) {
+    case Qn::VideoWallItemNode:
+    case Qn::VideoWallHistoryNode:
+    case Qn::UserVideoWallNode:
+    case Qn::UserVideoWallItemNode:
+    case Qn::VideoWallMatrixNode:
         deleteNode(node->type(), node->uuid(), node->resource());
         return;
-    }
 
-
-    assert(node->type() == Qn::ResourceNode ||
-           node->type() == Qn::ItemNode ||
-           node->type() == Qn::RecorderNode
-          );
-
-    switch(node->type()) {
     case Qn::ResourceNode:
         m_resourceNodeByResource.remove(node->resource());
         break;
@@ -183,8 +176,10 @@ void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
         if (node->resource())
             m_itemNodesByResource[node->resource()].removeAll(node);
         break;
+    case Qn::RecorderNode:
+        break;  //nothing special
     default:
-        break;
+        assert(false); //should never come here
     }
 
     delete node;
@@ -490,35 +485,37 @@ Qt::DropActions QnResourcePoolModel::supportedDropActions() const {
 void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource) {
     assert(resource);
 
-    connect(resource.data(), SIGNAL(parentIdChanged(const QnResourcePtr &)),                this, SLOT(at_resource_parentIdChanged(const QnResourcePtr &)));
-    connect(resource.data(), SIGNAL(nameChanged(const QnResourcePtr &)),                    this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
-    connect(resource.data(), SIGNAL(statusChanged(const QnResourcePtr &)),                  this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
-    connect(resource.data(), SIGNAL(urlChanged(const QnResourcePtr &)),                     this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
-    connect(resource.data(), SIGNAL(resourceChanged(const QnResourcePtr &)),                this, SLOT(at_resource_resourceChanged(const QnResourcePtr &)));
+    connect(resource,       &QnResource::parentIdChanged,                this,  &QnResourcePoolModel::at_resource_parentIdChanged);
+    connect(resource,       &QnResource::nameChanged,                    this,  &QnResourcePoolModel::at_resource_resourceChanged);
+    connect(resource,       &QnResource::statusChanged,                  this,  &QnResourcePoolModel::at_resource_resourceChanged);
+    connect(resource,       &QnResource::urlChanged,                     this,  &QnResourcePoolModel::at_resource_resourceChanged);
+    connect(resource,       &QnResource::resourceChanged,                this,  &QnResourcePoolModel::at_resource_resourceChanged);
 
     QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
     if(layout) {
-        connect(layout.data(), SIGNAL(itemAdded(const QnLayoutResourcePtr &, const QnLayoutItemData &)),    this, SLOT(at_resource_itemAdded(const QnLayoutResourcePtr &, const QnLayoutItemData &)));
-        connect(layout.data(), SIGNAL(itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)),  this, SLOT(at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)));
+        connect(layout,     &QnLayoutResource::itemAdded,               this,   &QnResourcePoolModel::at_layout_itemAdded);
+        connect(layout,     &QnLayoutResource::itemRemoved,             this,   &QnResourcePoolModel::at_layout_itemRemoved);
     }
 
     QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
     if (videoWall) {
-        connect(videoWall.data(), SIGNAL(itemAdded(const QnVideoWallResourcePtr &, const QnVideoWallItem &)),   this, SLOT(at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &, const QnVideoWallItem &)));
-        connect(videoWall.data(), SIGNAL(itemChanged(const QnVideoWallResourcePtr &, const QnVideoWallItem &)), this, SLOT(at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &, const QnVideoWallItem &)));
-        connect(videoWall.data(), SIGNAL(itemRemoved(const QnVideoWallResourcePtr &, const QnVideoWallItem &)), this, SLOT(at_videoWall_itemRemoved(const QnVideoWallResourcePtr &, const QnVideoWallItem &)));
+        connect(videoWall,  &QnVideoWallResource::itemAdded,            this,   &QnResourcePoolModel::at_videoWall_itemAddedOrChanged);
+        connect(videoWall,  &QnVideoWallResource::itemChanged,          this,   &QnResourcePoolModel::at_videoWall_itemAddedOrChanged);
+        connect(videoWall,  &QnVideoWallResource::itemRemoved,          this,   &QnResourcePoolModel::at_videoWall_itemRemoved);
+
+        connect(videoWall,  &QnVideoWallResource::matrixAdded,          this,   &QnResourcePoolModel::at_videoWall_matrixAddedOrChanged);
+        connect(videoWall,  &QnVideoWallResource::matrixChanged,        this,   &QnResourcePoolModel::at_videoWall_matrixAddedOrChanged);
+        connect(videoWall,  &QnVideoWallResource::matrixRemoved,        this,   &QnResourcePoolModel::at_videoWall_matrixRemoved);
     }
 
     QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
     if (user) {
-        connect(user.data(), SIGNAL(videoWallItemAdded(QnUserResourcePtr, QUuid)),          this, SLOT(at_user_videoWallItemAdded(QnUserResourcePtr, QUuid)));
-        connect(user.data(), SIGNAL(videoWallItemRemoved(QnUserResourcePtr, QUuid)),         this, SLOT(at_user_videoWallItemRemoved(QnUserResourcePtr, QUuid)));
+        connect(user,       &QnUserResource::videoWallItemAdded,        this,   &QnResourcePoolModel::at_user_videoWallItemAdded);
+        connect(user,       &QnUserResource::videoWallItemRemoved,      this,   &QnResourcePoolModel::at_user_videoWallItemRemoved);
     }
 
-
-    QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-    if(camera) {
-        connect(camera.data(), &QnVirtualCameraResource::groupNameChanged, this, &QnResourcePoolModel::at_camera_groupNameChanged);
+    if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
+        connect(camera,     &QnVirtualCameraResource::groupNameChanged, this,   &QnResourcePoolModel::at_camera_groupNameChanged);
     }
 
     QnResourcePoolModelNode *node = this->node(resource);
@@ -529,11 +526,14 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     if(layout)
         foreach(const QnLayoutItemData &item, layout->getItems())
-            at_resource_itemAdded(layout, item);
+            at_layout_itemAdded(layout, item);
 
-    if (videoWall)
-        foreach(const QnVideoWallItem &item, videoWall->getItems())
+    if (videoWall) {
+        foreach(const QnVideoWallItem &item, videoWall->items()->getItems())
             at_videoWall_itemAddedOrChanged(videoWall, item);
+        foreach(const QnVideoWallMatrix &matrix, videoWall->matrices()->getItems())
+            at_videoWall_matrixAddedOrChanged(videoWall, matrix);
+    }
 
     if (user)
         foreach (const QUuid &uuid, user->videoWallItems())
@@ -541,7 +541,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
-    disconnect(resource.data(), NULL, this, NULL);
+    disconnect(resource, NULL, this, NULL);
 
     if (!resource)
         return;
@@ -585,7 +585,7 @@ void QnResourcePoolModel::at_resource_resourceChanged(const QnResourcePtr &resou
         node->update();
 }
 
-void QnResourcePoolModel::at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item) {
+void QnResourcePoolModel::at_layout_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item) {
     QnResourcePoolModelNode *parentNode = this->node(layout);
     QnResourcePoolModelNode *node = this->node(item.uuid);
 
@@ -600,7 +600,7 @@ void QnResourcePoolModel::at_resource_itemAdded(const QnLayoutResourcePtr &layou
     node->setParent(parentNode);
 }
 
-void QnResourcePoolModel::at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &item) {
+void QnResourcePoolModel::at_layout_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &item) {
     deleteNode(node(item.uuid));
 }
 
@@ -621,6 +621,20 @@ void QnResourcePoolModel::at_videoWall_itemAddedOrChanged(const QnVideoWallResou
 void QnResourcePoolModel::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     Q_UNUSED(videoWall)
     deleteNode(Qn::VideoWallItemNode, item.uuid, videoWall);
+}
+
+void QnResourcePoolModel::at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix) {
+    QnResourcePoolModelNode *parentNode = this->node(videoWall);
+
+    QnResourcePoolModelNode *node = this->node(Qn::VideoWallMatrixNode, matrix.uuid, videoWall);
+
+    node->setParent(parentNode);
+    node->update(); // in case of _changed method call
+}
+
+void QnResourcePoolModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix) {
+    Q_UNUSED(videoWall)
+    deleteNode(Qn::VideoWallMatrixNode, matrix.uuid, videoWall);
 }
 
 void QnResourcePoolModel::at_user_videoWallItemAdded(const QnUserResourcePtr &user, const QUuid &uuid) {

@@ -422,7 +422,7 @@ void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button) {
 }
 
 void QnVideowallItemWidget::updateLayout() {
-    QnVideoWallItem item = m_videowall->getItem(m_itemUuid);
+    QnVideoWallItem item = m_videowall->items()->getItem(m_itemUuid);
     QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
     if (m_layout == layout)
         return;
@@ -454,7 +454,7 @@ void QnVideowallItemWidget::updateInfo() {
         m_footerLabel->setText(m_layout->getName());
     else
         m_footerLabel->setText(QString());
-    m_headerLabel->setText(m_videowall->getItem(m_itemUuid).name);
+    m_headerLabel->setText(m_videowall->items()->getItem(m_itemUuid).name);
     //TODO: #GDM VW update layout in case of transition "long name -> short name"
 }
 

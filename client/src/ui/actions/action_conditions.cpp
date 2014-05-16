@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
@@ -306,18 +307,21 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
 
 
 Qn::ActionVisibility QnRenameActionCondition::check(const QnActionParameters &parameters) {
-    Qn::NodeType nodeType = parameters.hasArgument(Qn::NodeTypeRole)
-            ? parameters.argument(Qn::NodeTypeRole).value<Qn::NodeType>()
-            : Qn::ResourceNode;
+    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
 
-    if (nodeType == Qn::RecorderNode)
+    switch (nodeType) {
+    case Qn::ResourceNode:
+    case Qn::EdgeNode:
+        return QnEdgeServerCondition::check(parameters.resources());
+    case Qn::RecorderNode:
+    case Qn::VideoWallItemNode:
+    case Qn::VideoWallMatrixNode:
         return Qn::EnabledAction;
+    default:
+        break;
+    }
 
-    return parameters.resources().size() == 1
-            ? QnEdgeServerCondition::check(parameters.resources())
-            : parameters.videoWallItems().size() == 1
-                ? Qn::EnabledAction
-                : Qn::InvisibleAction;
+    return Qn::InvisibleAction;
 }
 
 
@@ -456,6 +460,7 @@ Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameter
 
     return Qn::EnabledAction;
 #else
+    Q_UNUSED(parameters)
     return Qn::InvisibleAction;
 #endif
 }
@@ -467,6 +472,7 @@ Qn::ActionVisibility QnModifyBookmarkActionCondition::check(const QnActionParame
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
 #else
+    Q_UNUSED(parameters)
     return Qn::InvisibleAction;
 #endif
 }
@@ -745,9 +751,9 @@ Qn::ActionVisibility QnDetachFromVideoWallActionCondition::check(const QnActionP
     foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
         if (index.isNull())
             continue;
-        if (!index.videowall()->hasItem(index.uuid()))
+        if (!index.videowall()->items()->hasItem(index.uuid()))
             continue;
-        if (index.videowall()->getItem(index.uuid()).layout.isNull())
+        if (index.videowall()->items()->getItem(index.uuid()).layout.isNull())
             continue;
         return Qn::EnabledAction;
     }

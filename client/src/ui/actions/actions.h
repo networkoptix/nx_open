@@ -209,7 +209,6 @@ namespace Qn {
          */
         DropOnVideoWallItemAction,
 
-
         /**
          * Tries to restart the application as soon as all modal dialogs are closed.
          * Parameters:
@@ -793,9 +792,24 @@ namespace Qn {
         StopVideoWallAction,
 
         /**
-         * Display an identification message on
+         * Display identification messages on the videowall screens.
          */
         IdentifyVideoWallAction,
+
+        /** 
+         * Save current videowall matrix. 
+         */
+        SaveVideowallMatrixAction,
+
+        /**
+         * Load previously saved videowall matrix.
+         */
+        LoadVideowallMatrixAction,
+
+        /**
+         * Delete saved videowall matrix.
+         */
+        DeleteVideowallMatrixAction,
 
         /**
          * Open target videowall item after user logged in.
@@ -1020,7 +1034,8 @@ namespace Qn {
         WidgetType              = 0x00000400,           /**< Resource widget, <tt>QnResourceWidget *</tt>. Convertible to layout item and resource. */
         LayoutType              = 0x00000800,           /**< Workbench layout, <tt>QnWorkbenchLayout *</tt>. Convertible to resource. */
         VideoWallItemType       = 0x00001000,           /**< Videowall item, <tt>QnVideoWallItemIndex</tt>. Convertible to resource. */
-        OtherType               = 0x00002000,           /**< Some other type. */
+        VideoWallMatrixType     = 0x00002000,           /**< Videowall matrix, <tt>QnVideoWallMatrixIndex</tt>. */
+        OtherType               = 0x00004000,           /**< Some other type. */
         TargetTypeMask          = 0x0000FF00
     };
     Q_DECLARE_FLAGS(ActionParameterTypes, ActionParameterType)
@@ -1049,6 +1064,9 @@ namespace Qn {
 
         /** Action accepts videowall items as target. */
         VideoWallItemTarget     = VideoWallItemType,
+
+        /** Action accepts videowall matrices as target. */
+        VideoWallMatrixTarget   = VideoWallMatrixType,
 
         /** Action has a hotkey that is intentionally ambiguous.
          * It is up to the user to ensure that proper action conditions make it

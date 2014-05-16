@@ -157,7 +157,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
                 QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(uuid);
                 if (index.isNull())
                     continue;
-                QnVideoWallItem item = index.videowall()->getItem(uuid);
+                QnVideoWallItem item = index.videowall()->items()->getItem(uuid);
                 if (item.layout == layout->getId())
                     return user == m_user ? Qn::FullLayoutPermissions : Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
             }
@@ -214,7 +214,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoW
     if(m_userPermissions & Qn::GlobalEditVideoWallPermission) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
     } else {
-        foreach(const QnVideoWallItem &item, videoWall->getItems())
+        foreach(const QnVideoWallItem &item, videoWall->items()->getItems())
             if (m_user && m_user->videoWallItems().contains(item.uuid))
                 return Qn::ReadPermission;
         return 0;
