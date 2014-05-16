@@ -35,7 +35,7 @@ PACKAGE_NAME=$CUSTOMIZATION-$PRODUCT_NAME-$MODULE_NAME-$VERSION-$BOX_NAME.tar.gz
 BUILD_DIR=/tmp/hdw_isd_build.tmp
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
 
-BUILD_OUTPUT_DIR=${libdir}-${box}
+BUILD_OUTPUT_DIR=${libdir}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
 
 STRIP="`find ../../mediaserver/ -name 'Makefile*' | head -n 1 | xargs grep -E 'STRIP\s+=' | cut -d= -f 2 | tr -d ' '`"
