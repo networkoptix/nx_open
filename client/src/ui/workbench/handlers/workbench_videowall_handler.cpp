@@ -1661,10 +1661,6 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
 }
 
 void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
-    //TODO: #GDM VW move to action condition
-    if (!context()->user())
-        return;
-
     // Desktop_camera_{e87e9b3d-facf-4870-abef-455861829ed3}_admin
     //TODO: #GDM VW ask Roma to do some more stable way to find correct desktop camera
     QRegExp desktopCameraNameRegExp(QString(lit("Desktop_camera_\\{.{36,36}\\}_%1")).arg(context()->user()->getName()));
@@ -1693,10 +1689,6 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
 }
 
 void QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered() {
-    //TODO: #GDM VW move to action condition
-    if (!context()->user())
-        return;
-
     QnVideoWallResourcePtr videowall = menu()->currentParameters(sender()).resource().dynamicCast<QnVideoWallResource>();
     if (!videowall)
         return;
@@ -1711,10 +1703,6 @@ void QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered() {
 }
 
 void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered() {
-    //TODO: #GDM VW move to action condition
-    if (!context()->user())
-        return;
-
     QnVideoWallResourcePtr videowall = menu()->currentParameters(sender()).resource().dynamicCast<QnVideoWallResource>();
     if (!videowall)
         return;
@@ -1735,21 +1723,22 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered() {
 
 
 void QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered() {
-    //TODO: #GDM VW move to action condition
-    if (!context()->user())
-        return;
-
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnVideoWallResourcePtr videowall = parameters.resource().dynamicCast<QnVideoWallResource>();
-    if (!videowall)
+    QnVideoWallMatrixIndexList matrices = parameters.videoWallMatrices();
+    if (matrices.size() != 1)
         return;
 
-    QUuid key = parameters.argument<QUuid>(Qn::UuidRole);
-    if (!videowall->matrices()->hasItem(key))
+    QnVideoWallMatrixIndex index = matrices.first();
+    if (index.isNull())
         return;
 
-    QnVideoWallMatrix matrix = videowall->matrices()->getItem(key);
+    QnVideoWallResourcePtr videowall = index.videowall();
+    if (!videowall->matrices()->hasItem(index.uuid()))
+        return;
+    
+    QnVideoWallMatrix matrix = videowall->matrices()->getItem(index.uuid());
+
     QnVideoWallItemMap items = videowall->items()->getItems();
 
     bool hasChanges = false;

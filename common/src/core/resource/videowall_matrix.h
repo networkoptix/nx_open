@@ -17,6 +17,7 @@ public:
 
     friend bool operator==(const QnVideoWallMatrix &l, const QnVideoWallMatrix &r) {
         return (l.uuid == r.uuid &&
+                l.name == r.name &&
                 l.layoutByItem == r.layoutByItem);
     }
 };
