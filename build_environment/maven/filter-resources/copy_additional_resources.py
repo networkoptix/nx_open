@@ -111,7 +111,7 @@ if __name__ == '__main__':
                 if not os.path.exists(target_plugins):
                     os.makedirs(join(target_dir, config, 'plugins'))
                 for file in os.listdir(lib_source_dir):
-                    if fnmatch.fnmatch(file, 'icu*.dll') && fnmatch.fnmatch(file, 'lib*.dll'):
+                    if fnmatch.fnmatch(file, 'icu*.dll') and fnmatch.fnmatch(file, 'lib*.dll'):
                         print (join(lib_source_dir, file))
                         shutil.copy2(join(lib_source_dir, file), join(target_dir, config))                    
                 #shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target_vox)                        z
