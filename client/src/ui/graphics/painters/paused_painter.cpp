@@ -23,14 +23,21 @@ QnPausedPainter::QnPausedPainter(const QGLContext *context):
     m_vertexOffset = vertexStream.offset();
     GLfloat d = 1.0f / 3.0f;
     vertexStream 
-        << -1.0 << -1.0
-        << -d   << -1.0
-        << -d   <<  1.0
-        << -1.0 <<  1.0
-        <<  d   << -1.0
-        <<  1.0 << -1.0
-        <<  1.0 <<  1.0
-        <<  d   <<  1.0;
+        << -1.0 << -1.0 //0
+        << -d   << -1.0 //1
+        << -d   <<  1.0 //2
+
+        << -d   <<  1.0 //2
+        << -1.0 <<  1.0 //3
+        << -1.0 << -1.0 //0
+
+        <<  d   << -1.0 //0
+        <<  1.0 << -1.0 //1
+        <<  1.0 <<  1.0 //2
+
+        <<  1.0 <<  1.0 //2
+        <<  d   <<  1.0 //3
+        <<  d   << -1.0;//0
     m_vertexCount = 8;
     
     /* Generate color data. */
@@ -58,7 +65,7 @@ void QnPausedPainter::paint(qreal opacity) {
     if(!m_initialized)
         return;
     QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(QVector4D(1.0, 1.0, 1.0, opacity));
-    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawPerVertexColoredPolygon(m_buffer,m_vertexCount,GL_QUADS);
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawPerVertexColoredPolygon(m_buffer,m_vertexCount,GL_TRIANGLES);
 }
 
 void QnPausedPainter::paint() {

@@ -84,6 +84,9 @@
         <qtlib15>Quick</qtlib15>
         <qtlib16>Qml</qtlib16>
         <qtlib17>Positioning</qtlib17>
+        <qtlib18>Sensors</qtlib18>
+        <qtlib19></qtlib19>
+        <qtlib20></qtlib20>
 
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
@@ -283,7 +286,7 @@
                 </os>
             </activation>
             <modules>     
-                <module>traytool</module>
+                <!-- <module>traytool</module> -->
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
                 <module>client</module>                     

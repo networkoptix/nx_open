@@ -1916,7 +1916,7 @@ static int glRGBFormat( PixelFormat format )
             case PIX_FMT_RGB24:
                 return GL_RGB;
             case PIX_FMT_BGR24:
-                return GL_BGR_EXT;
+                return GL_BGRA_EXT; //TODO: #asinaisky 
             default:
                 break;
         }
