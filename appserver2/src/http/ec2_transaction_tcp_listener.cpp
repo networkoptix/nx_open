@@ -88,6 +88,10 @@ void QnTransactionTcpProcessor::run()
             return;
         }
         parseRequest();
+
+        d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
+        d->response.headers.insert(nx_http::HttpHeader("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds())));
     }
 
     query = QUrlQuery(d->request.requestLine.url.query());
