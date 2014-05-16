@@ -406,9 +406,6 @@
             <build>
                 <directory>target-${box}</directory>
             </build>
-            <modules>                       
-                <module>edge_firmware</module>
-            </modules>              
         </profile> 
 
         <profile>
@@ -431,6 +428,7 @@
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
+		<module>edge_firmware</module>
             </modules>            
         </profile>
 
@@ -454,6 +452,7 @@
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
+		<module>edge_firmware</module>
             </modules>            
         </profile>
 
