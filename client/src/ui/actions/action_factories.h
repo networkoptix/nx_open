@@ -63,15 +63,4 @@ public:
     virtual QMenu* newMenu(const QnActionParameters &parameters,  QWidget *parentWidget) override;
 };
 
-class QnLoadVideowallMatrixActionFactory: public QnActionFactory {
-    Q_OBJECT
-public:
-    QnLoadVideowallMatrixActionFactory(QObject* parent = NULL): QnActionFactory(parent) {}
-
-    virtual QList<QAction *> newActions(const QnActionParameters &parameters, QObject *parent) override;
-
-private slots:
-    void at_action_triggered();
-};
-
 #endif // QN_ACTION_FACTORIES_H

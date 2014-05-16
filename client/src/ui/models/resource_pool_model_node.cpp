@@ -8,6 +8,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
+#include <core/resource/videowall_matrix_index.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
@@ -368,27 +369,40 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
 
     Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
 
+    if (!m_editable.checked) {
+        switch(m_type) {
+        case Qn::ResourceNode:
+        case Qn::EdgeNode:
+            m_editable.value = m_model->context()->menu()->canTrigger(Qn::RenameAction, QnActionParameters(m_resource)); //TODO: #GDM #VW make this context-aware?
+            break;
+        case Qn::VideoWallItemNode:
+        case Qn::VideoWallMatrixNode:
+            m_editable.value = (m_model->context()->accessController()->globalPermissions() & Qn::GlobalEditVideoWallPermission);   //TODO: #GDM #VW make this context-aware?
+            break;
+        case Qn::RecorderNode:
+            m_editable.value = true;
+            break;
+        default:
+            m_editable.value = false;
+            break;
+        }
+        m_editable.checked = true;
+    }
+
+    if(m_editable.value)
+        result |= Qt::ItemIsEditable;
+
     switch(m_type) {
     case Qn::ResourceNode:
     case Qn::EdgeNode:
-        if (!m_editable.checked) {
-            m_editable.value = m_model->context()->menu()->canTrigger(Qn::RenameAction, QnActionParameters(m_resource));
-            m_editable.checked = true;
-        }
-        if(m_editable.value)
-            result |= Qt::ItemIsEditable;
-        /* Fall through. */
     case Qn::ItemNode:
         if(m_flags & (QnResource::media | QnResource::layout | QnResource::server | QnResource::user | QnResource::videowall))
             result |= Qt::ItemIsDragEnabled;
         break;
-    case Qn::VideoWallItemNode:
-    case Qn::UserVideoWallItemNode:
-        result |= Qt::ItemIsDragEnabled; //TODO: #GDM VW drag of empty item on scene should create new layout
-        result |= Qt::ItemIsEditable;    //TODO: #GDM VW we should be able to rename it only if we have permissions
-        break;
+    case Qn::VideoWallItemNode: //TODO: #GDM VW drag of empty item on scene should create new layout
+    case Qn::UserVideoWallItemNode: 
     case Qn::RecorderNode:
-        result |= Qt::ItemIsDragEnabled | Qt::ItemIsEditable;
+        result |= Qt::ItemIsDragEnabled; 
         break;
     default:
         break;
@@ -491,6 +505,11 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
         if (index.isNull())
             return false;
         parameters = QnActionParameters(QnVideoWallItemIndexList() << index).withArgument(Qn::ResourceNameRole, value.toString());
+    } else if (m_type == Qn::VideoWallMatrixNode) {
+        QnVideoWallMatrixIndex index = qnResPool->getVideoWallMatrixByUuid(m_uuid);
+        if (index.isNull())
+            return false;
+        parameters = QnActionParameters(QnVideoWallMatrixIndexList() << index).withArgument(Qn::ResourceNameRole, value.toString());
     } else if (m_type == Qn::RecorderNode) {
         //sending first camera to get groupId and check WriteName permission
         if (this->children().isEmpty())

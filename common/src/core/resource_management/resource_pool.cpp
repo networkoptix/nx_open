@@ -12,6 +12,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
+#include <core/resource/videowall_matrix_index.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -510,6 +511,26 @@ QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QUu
     QnVideoWallItemIndexList result;
     foreach (const QUuid &uuid, uuids) {
         QnVideoWallItemIndex index = getVideoWallItemByUuid(uuid);
+        if (!index.isNull())
+            result << index;
+    }
+    return result;
+}
+
+QnVideoWallMatrixIndex QnResourcePool::getVideoWallMatrixByUuid(const QUuid &uuid) const {
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+        if (!videoWall || !videoWall->matrices()->hasItem(uuid))
+            continue;
+        return QnVideoWallMatrixIndex(videoWall, uuid);
+    }
+    return QnVideoWallMatrixIndex();
+}
+
+QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(const QList<QUuid> &uuids) const {
+    QnVideoWallMatrixIndexList result;
+    foreach (const QUuid &uuid, uuids) {
+        QnVideoWallMatrixIndex index = getVideoWallMatrixByUuid(uuid);
         if (!index.isNull())
             result << index;
     }

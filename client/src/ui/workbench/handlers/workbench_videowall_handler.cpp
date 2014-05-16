@@ -25,6 +25,7 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_matrix.h>
+#include <core/resource/videowall_matrix_index.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <core/ptz/item_dewarping_params.h>
@@ -1422,26 +1423,50 @@ void QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered() 
 
 void QnWorkbenchVideoWallHandler::at_renameAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
-    QnVideoWallItemIndexList items = parameters.videoWallItems();
-    if (items.isEmpty())
-        return;
 
+    Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
     QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
 
+     QList<QnVideoWallResourcePtr> videoWalls;
+    switch (nodeType) {
+    case Qn::VideoWallItemNode:
+        {
+            QnVideoWallItemIndexList items = parameters.videoWallItems();
+            if (items.isEmpty())
+                return;
 
-    QList<QnVideoWallResourcePtr> videoWalls;
+            foreach (const QnVideoWallItemIndex &item, items) {
+                if (!item.videowall())
+                    continue;
 
-    foreach (const QnVideoWallItemIndex &item, items) {
-        if (!item.videowall())
-            continue;
+                QnVideoWallItem existingItem = item.videowall()->items()->getItem(item.uuid());
+                existingItem.name = name;
+                item.videowall()->items()->updateItem(item.uuid(), existingItem);
 
-        QnVideoWallItem existingItem = item.videowall()->items()->getItem(item.uuid());
-        existingItem.name = name;
-        item.videowall()->items()->updateItem(item.uuid(), existingItem);
+                if (!videoWalls.contains(item.videowall()))
+                    videoWalls << item.videowall();
+            }
+        }
+    case Qn::VideoWallMatrixNode:
+        {
+            QnVideoWallMatrixIndexList matrices = parameters.videoWallMatrices();
+            if (matrices.isEmpty())
+                return;
 
-        if (!videoWalls.contains(item.videowall()))
-            videoWalls << item.videowall();
+            foreach (const QnVideoWallMatrixIndex &matrix, matrices) {
+                if (!matrix.videowall())
+                    continue;
 
+                QnVideoWallMatrix existingMatrix = matrix.videowall()->matrices()->getItem(matrix.uuid());
+                existingMatrix.name = name;
+                matrix.videowall()->matrices()->updateItem(matrix.uuid(), existingMatrix);
+
+                if (!videoWalls.contains(matrix.videowall()))
+                    videoWalls << matrix.videowall();
+            }
+        }
+    default:
+        break;
     }
 
     foreach (const QnVideoWallResourcePtr &videowall, videoWalls) {

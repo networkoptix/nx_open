@@ -100,6 +100,8 @@ public:
 
     QnVideoWallItemIndexList selectedVideoWallItems() const;
 
+    QnVideoWallMatrixIndexList selectedVideoWallMatrices() const;
+
     virtual Qn::ActionScope currentScope() const override;
 
     QComboBox *typeComboBox() const;
