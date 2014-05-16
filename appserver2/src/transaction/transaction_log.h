@@ -82,8 +82,7 @@ namespace ec2
         QUuid transactionHash(const ApiLayoutData& params) const                 { return params.id; }
         QUuid transactionHash(const ApiVideowallData& params) const              { return params.id; }
         QUuid transactionHash(const ApiBusinessRuleData& params) const           { return params.id; }
-        QUuid transactionHash(const ApiIdData& params) const                     { return makeHash(params.id.toRfc4122(), "ApiIdData"); } // TODO: #Elric allocation on every call => bad.
-        //QUuid transactionHash(const ApiSetResourceDisabledData& params) const    { return makeHash(params.id.toRfc4122(), "disabled"); }
+        QUuid transactionHash(const ApiIdData& params) const                     { return params.id; }
         QUuid transactionHash(const ApiCameraServerItemData&) const              { return QUuid::createUuid() ; }
         QUuid transactionHash(const ApiSetResourceStatusData& params) const      { return makeHash(params.id.toRfc4122(), "status"); }
         QUuid transactionHash(const ApiPanicModeData&) const                     { return makeHash("panic_mode", ADD_HASH_DATA) ; }
