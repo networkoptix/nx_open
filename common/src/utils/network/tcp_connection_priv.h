@@ -8,13 +8,8 @@ static const int TCP_READ_BUFFER_SIZE = 65536;
 
 #include "tcp_connection_processor.h"
 
-#ifdef USE_NX_HTTP
-#include "utils/network/http/httptypes.h"
-#else
-#include <QHttpRequestHeader>
-#endif
-
 #include "utils/common/byte_array.h"
+#include "utils/network/http/httptypes.h"
 
 
 static const QByteArray STATIC_UNAUTHORIZED_HTML("\
@@ -71,13 +66,8 @@ public:
 
 public:
     QSharedPointer<AbstractStreamSocket> socket;
-#ifdef USE_NX_HTTP
     nx_http::Request request;
     nx_http::Response response;
-#else
-    QHttpRequestHeader requestHeaders;
-    QHttpResponseHeader responseHeaders;
-#endif
 
     QByteArray protocol;
     QByteArray requestBody;
