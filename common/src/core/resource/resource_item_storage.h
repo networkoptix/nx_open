@@ -117,7 +117,7 @@ private:
     }
 
     void updateItemUnderLock(const QUuid &uuid, const T &item) {
-        ItemMap::iterator pos = m_itemByUuid.find(uuid);
+        typename ItemMap::iterator pos = m_itemByUuid.find(uuid);
         if(pos == m_itemByUuid.end()) {
             qnWarning("There is no item with UUID %1.", uuid.toString());
             return;
@@ -136,7 +136,7 @@ private:
     }
 
     void removeItemUnderLock(const QUuid &uuid) {
-        ItemMap::iterator pos = m_itemByUuid.find(uuid);
+        typename ItemMap::iterator pos = m_itemByUuid.find(uuid);
         if(pos == m_itemByUuid.end())
             return;
 
