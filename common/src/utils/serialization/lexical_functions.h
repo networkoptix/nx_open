@@ -44,6 +44,15 @@ inline bool deserialize(const QString &value, QString *target) {
     return true;
 }
 
+inline void serialize( const QByteArray& value, QString* target ) {
+    *target = QLatin1String(value.toBase64());
+}
+
+inline bool deserialize(const QString &value, QByteArray *target) {
+    *target = QByteArray::fromBase64( value.toLatin1() );
+    return true;
+}
+
 
 #define QN_DEFINE_DIRECT_LEXICAL_SERIALIZATION_FUNCTIONS(TYPE, TYPE_GETTER, ... /* NUMBER_FORMAT */) \
 inline void serialize(const TYPE &value, QString *target) {                     \

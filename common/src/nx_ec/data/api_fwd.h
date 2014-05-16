@@ -58,6 +58,7 @@ namespace ec2 {
     struct ApiUpdateUploadData;
     struct ApiUpdateUploadResponceData;
     struct ApiCameraBookmarkTagData;
+    struct ApiLoginData;
 
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
@@ -77,7 +78,6 @@ namespace ec2 {
     typedef QString ApiStoredFilePath; // TODO: #Elric struct => extendable?
     typedef QString ApiUpdateInstallData; // TODO: #Elric struct => extendable?
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
-    struct LoginInfo;
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
@@ -123,6 +123,7 @@ namespace ec2 {
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
     (ApiCameraBookmarkTagData)\
+    (ApiLoginData)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

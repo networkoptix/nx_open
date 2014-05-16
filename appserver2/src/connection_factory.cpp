@@ -10,6 +10,7 @@
 #include <QtCore/QMutexLocker>
 #include <QtConcurrent>
 
+#include <network/authenticate_helper.h>
 #include <network/universal_tcp_listener.h>
 
 #include "ec2_connection.h"
@@ -180,10 +181,10 @@ namespace ec2
 
 
         //AbstractECConnectionFactory
-        registerFunctorHandler<LoginInfo, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
-            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
-        registerFunctorHandler<LoginInfo, QnConnectionInfo>( restProcessorPool, ApiCommand::testConnection,
-            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
+        registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
+            std::bind( &Ec2DirectConnectionFactory::processRemoteConnectionRequest, this, _1, _2 ) );
+        registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::testConnection,
+            std::bind( &Ec2DirectConnectionFactory::processRemoteTestConnectionRequest, this, _1, _2 ) );
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
@@ -195,7 +196,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        LoginInfo loginInfo;
+        ApiLoginData loginInfo;
         QnConnectionInfo connectionInfo;
         fillConnectionInfo( loginInfo, &connectionInfo );   //todo: #ak not appropriate here
         connectionInfo.ecUrl = url;
@@ -221,16 +222,18 @@ namespace ec2
         //        AbstractECConnectionPtr connection = it->second.second;
         //}
 
-        LoginInfo loginInfo;
+        ApiLoginData loginInfo;
+        loginInfo.login = addr.userName();
+        loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
 #if 1
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
-        m_remoteQueryProcessor.processQueryAsync<LoginInfo, QnConnectionInfo>(
+        m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             addr, ApiCommand::connect, loginInfo, func );
 #else
         //TODO: #ak investigate, what's wrong with following code
         using namespace std::placeholders;
-        m_remoteQueryProcessor.processQueryAsync<LoginInfo, QnConnectionInfo>(
+        m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             ApiCommand::connect, loginInfo, std::bind(&Ec2DirectConnectionFactory::remoteConnectionFinished, this, _1, _2) );
 #endif
         return reqID;
@@ -266,14 +269,35 @@ namespace ec2
         return handler->done( reqID, errorCode, connectionInfo );
     }
 
-    ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
-        const LoginInfo& /*loginInfo*/,
+    ErrorCode Ec2DirectConnectionFactory::processRemoteTestConnectionRequest(
+        const ApiLoginData& loginInfo,
         QnConnectionInfo* const connectionInfo )
     {
-        //TODO/IMPL
+        //performing authentication
+        if( !qnAuthHelper->authenticate( loginInfo.login, loginInfo.passwordHash ) )
+            return ErrorCode::unauthorized;
+
+        return fillConnectionInfo( loginInfo, connectionInfo );
+    }
+
+    ErrorCode Ec2DirectConnectionFactory::processRemoteConnectionRequest(
+        const ApiLoginData& loginInfo,
+        QnConnectionInfo* const connectionInfo )
+    {
+        //performing authentication
+        if( !qnAuthHelper->authenticate( loginInfo.login, loginInfo.passwordHash ) )
+            return ErrorCode::unauthorized;
+
+        return fillConnectionInfo( loginInfo, connectionInfo );
+    }
+
+    ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
+        const ApiLoginData& /*loginInfo*/,
+        QnConnectionInfo* const connectionInfo )
+    {
         connectionInfo->version = QnSoftwareVersion(lit(QN_APPLICATION_VERSION));
         connectionInfo->brand = lit(QN_PRODUCT_NAME_SHORT);
-        connectionInfo->ecsGuid = lit( "ECS_HUID" );
+        connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
 
         return ErrorCode::ok;
     }
@@ -282,7 +306,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnConnectionInfo connectionInfo;
-        fillConnectionInfo( LoginInfo(), &connectionInfo );
+        fillConnectionInfo( ApiLoginData(), &connectionInfo );
         QnScopedThreadRollback ensureFreeThread(1);
         QtConcurrent::run( std::bind( &impl::TestConnectionHandler::done, handler, reqID, ec2::ErrorCode::ok, connectionInfo ) );
         return reqID;
@@ -292,10 +316,12 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        LoginInfo loginInfo;
+        ApiLoginData loginInfo;
+        loginInfo.login = addr.userName();
+        loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteTestConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
-        m_remoteQueryProcessor.processQueryAsync<LoginInfo, QnConnectionInfo>(
+        m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             addr, ApiCommand::testConnection, loginInfo, func );
         return reqID;
     }

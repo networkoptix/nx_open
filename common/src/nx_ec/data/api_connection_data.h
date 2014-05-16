@@ -3,15 +3,20 @@
 
 #include "api_data.h"
 
+#include <QByteArray>
+#include <QString>
+
+
 namespace ec2
 {
-    // TODO: #EC2 #Elric doesn't conform to API naming conventions.
-    // And what it is, anyway? Why just an empty struct?
-
     //!Parameters of connect request
-    struct LoginInfo: ApiData 
+    struct ApiLoginData: ApiData 
     {
+        QString login;
+        QByteArray passwordHash;
     };
+
+#define ApiLoginData_Fields (login)(passwordHash)
 }
 
 #endif  //EC2_CONNECTION_DATA_H

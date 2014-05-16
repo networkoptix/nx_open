@@ -18,6 +18,7 @@
 #include <core/resource/camera_bookmark.h>
 
 #include <nx_ec/ec_api.h>
+#include <network/authenticate_helper.h>
 
 #include "api_business_rule_data.h"
 #include "api_camera_data.h"
@@ -32,6 +33,7 @@
 #include "api_resource_type_data.h"
 #include "api_user_data.h"
 #include "api_videowall_data.h"
+
 
 namespace ec2 {
 
@@ -679,9 +681,7 @@ void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
         dst.hash.append("$");
         dst.hash.append(md5.result().toHex());
 
-        md5.reset();
-        md5.addData(QString(lit("%1:NetworkOptix:%2")).arg(src->getName(), password).toLatin1());
-        dst.digest = md5.result().toHex();
+        dst.digest = QnAuthHelper::createUserPasswordDigest( src->getName(), password );
     }
     else
     {
