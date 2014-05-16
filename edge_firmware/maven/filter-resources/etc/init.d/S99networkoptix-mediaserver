@@ -1,0 +1,100 @@
+#!/bin/sh
+
+RETVAL=0
+
+SERVICE_NAME=mediaserver
+CUSTOMIZATION=${customization}
+PREFIX=/usr/local/apps/$CUSTOMIZATION/mediaserver/
+BIN_NAME=mediaserver
+BIN_PATH=$PREFIX/bin/$BIN_NAME
+STORAGE_PATH=/media/mmcblk0p1
+LOG_LEVEL=none
+
+export LD_LIBRARY_PATH=$PREFIX/lib
+export VMS_PLUGIN_DIR=$PREFIX/plugins
+
+start() {
+    SERVICE_PID="`/bin/pidof $BIN_NAME`"
+    if [ ! -z "$SERVICE_PID" ]
+    then
+       echo "$SERVICE_NAME is already running with pid $SERVICE_PID"
+       exit 0
+    fi
+
+    touch $STORAGE_PATH 2>/dev/null 1>&2
+    if [ $? -ne 0 ]; then
+        #echo "RO"
+        mount -o rw,remount $STORAGE_PATH
+    fi
+
+    echo -n "Starting $BIN_NAME..... "
+    $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --log-level=$LOG_LEVEL 2>/dev/null 1>&2&
+    if [ `/bin/pidof $BIN_NAME` ]
+    then
+        echo "OK"
+    fi
+}
+
+startquiet() {
+    start
+}
+
+stop() {
+    echo -n "Stopping $BIN_NAME..... "
+    /usr/bin/killall $BIN_NAME 1>/dev/null
+    while [ `/bin/pidof $BIN_NAME` ]
+    do
+        /bin/sleep 1
+    done
+    echo "OK"
+}
+
+
+#
+#   Main script
+#
+case "$1" in
+    start)
+        start
+        ;;
+    startquiet)
+        start
+        ;;
+    start_console)
+        $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --log-level=$LOG_LEVEL
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        SERVICE_PID="`/bin/pidof $BIN_NAME`"
+        if [ ! -z $SERVICE_PID ]
+        then
+            echo "$SERVICE_NAME is running with pid $SERVICE_PID"
+            exit 0
+        else
+            echo "$SERVICE_NAME is stopped"
+            exit 1
+        fi
+        ;;
+    server_status)
+        if [ `/bin/pidof $BIN_NAME` ]
+        then
+            echo "1"
+        fi
+        ;;
+    restart|reload|force-reload)
+        stop
+        while [ `/bin/pidof $BIN_NAME` ]
+        do
+            /bin/sleep 1
+        done
+        start
+        ;;
+    *)
+        echo "Usage: $0 {start|startquiet|stop|restart|status}"
+        exit 1
+esac
+
+exit $RETVAL
+

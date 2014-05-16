@@ -1,0 +1,66 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!--
+    Example pom for delegating maven goals to msbuild so it builds the "solution"
+ 
+    A solution can be a group of projects, but here we only have one.
+    It should also be possible to have one maven project per solution project, 
+    and have a parent pom to deletegate the build.
+  -->
+    <parent>
+        <artifactId>hdwitness</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+		<version>2.3.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+	<version>2.3.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>edge_firmware</artifactId>
+    <packaging>pom</packaging>
+    <name>Common POM for ARM projects</name>	
+
+    <properties>
+        <!-- Change it to point relatively to the root-->
+        <root.dir>${basedir}/..</root.dir>
+    </properties>
+
+    <build>
+        <directory>target-${box}</directory>
+        <plugins>	
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>clean</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <exec dir="${basedir}" executable="rm" failifexecutionfails="false">
+                                    <arg line="-Rf ${project.build.directory}"/>
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>	
+                    <execution>
+                        <id>pack</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>							
+                                <chmod file="${project.build.directory}/*.sh" perm="755"/>							
+                                <exec dir="${project.build.directory}" executable="${project.build.directory}/create_mediaserver_tar.sh" failifexecutionfails="true" />                                        
+                            </target>
+                        </configuration>
+                    </execution>					
+                </executions>
+            </plugin>	
+        </plugins>	        
+    </build>				
+</project>
