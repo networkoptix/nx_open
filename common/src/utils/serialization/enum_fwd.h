@@ -3,7 +3,7 @@
 
 /**
  * This macro enables serialization of the provided enumeration by casting it
- * to integer. Currently this can be used when serializing an enum to bns 
+ * to integer. Currently this can be used when serializing an enum to a binary
  * representation, or when storing it in a database.
  * 
  * Allowing such serialization for an enum requires a healthy dose of

@@ -26,15 +26,13 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::SerializationFormat,
     (Qn::CsvFormat,         "csv")
 )
 
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)(Qn::StreamQuality)
+    (Qn::SecondStreamQuality)(Qn::PanicMode)(Qn::RecordingType)(Qn::PropertyDataType)(Qn::SerializationFormat),
+    (json_lexical)
+)
 
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qn::PtzObjectType)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qn::PtzCommand)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qn::PtzCoordinateSpace)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qn::MotionType)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qn::StreamQuality)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qn::SecondStreamQuality)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qn::PanicMode)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qn::RecordingType)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qn::PropertyDataType)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qn::SerializationFormat)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qn::ServerFlags)
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
+    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::PtzCapabilities),
+    (lexical_numeric_enum)(json_numeric_enum)
+)

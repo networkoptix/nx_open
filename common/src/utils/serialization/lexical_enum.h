@@ -11,9 +11,30 @@
 #include <QtCore/QHash>
 #include <QtCore/QString>
 
+#include "enum.h"
+
 struct QMetaObject;
 
 namespace QnLexicalDetail {
+
+    template<class T>
+    void serialize_numeric_enum(const T &value, QString *target) {
+        QnSerialization::check_enum_binary<T>();
+
+        QnLexical::serialize(static_cast<qint32>(value), target);
+    }
+
+    template<class T>
+    bool deserialize_numeric_enum(const QString &value, T *target) {
+        QnSerialization::check_enum_binary<T>();
+
+        qint32 tmp;
+        if(!QnLexical::deserialize(value, &tmp))
+            return false;
+        *target = static_cast<T>(tmp);
+        return true;
+    }
+
 
     inline bool isNullString(const char *s) { return s == NULL; }
     inline bool isNullString(const QString &s) { return s.isNull(); }
@@ -114,6 +135,18 @@ namespace QnLexical {
     }
 } // namespace QnLexical
 
+
+/**
+ * 
+ */
+#define QN_FUSION_DEFINE_FUNCTIONS_lexical_numeric_enum(TYPE, ... /* PREFIX */) \
+__VA_ARGS__ void serialize(const TYPE &value, QString *target) {                \
+    QnLexicalDetail::serialize_numeric_enum(value, target);                     \
+}                                                                               \
+                                                                                \
+__VA_ARGS__ bool deserialize(const QString &value, TYPE *target) {              \
+    return QnLexicalDetail::deserialize_numeric_enum(value, target);            \
+}
 
 
 /**

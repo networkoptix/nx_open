@@ -7,7 +7,6 @@
 
 #include "lexical.h"
 #include "lexical_enum.h"
-#include "enum.h"
 
 #include <utils/common/latin1_array.h>
 
@@ -93,25 +92,6 @@ inline void serialize(const QnLatin1Array &value, QString *target) {
 
 inline bool deserialize(const QString &value, QnLatin1Array *target) {
     *target = value.toLatin1(); /* We don't check for errors... */
-    return true;
-}
-
-
-template<class T>
-void serialize(const T &value, QString *target, typename std::enable_if<QnSerialization::is_enum_or_flags<T>::value>::type * = NULL) {
-    QnSerialization::check_enum_binary<T>();
-
-    QnLexical::serialize(static_cast<qint32>(value), target);
-}
-
-template<class T>
-bool deserialize(const QString &value, T *target, typename std::enable_if<QnSerialization::is_enum_or_flags<T>::value>::type * = NULL) {
-    QnSerialization::check_enum_binary<T>();
-
-    qint32 tmp;
-    if(!QnLexical::deserialize(value, &tmp))
-        return false;
-    *target = static_cast<T>(tmp);
     return true;
 }
 
