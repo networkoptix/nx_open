@@ -154,9 +154,9 @@ void AsyncFileProcessor::run()
     }
 }
 
-void AsyncFileProcessor::doOpenFile( const OpenFileTask* task )
+void AsyncFileProcessor::doOpenFile( const OpenFileTask* /*task*/ )
 {
-    //TODO/IMPL
+    //TODO #ak implement and use in applauncher
 }
 
 void AsyncFileProcessor::doWriteFile( const WriteFileTask* task )
