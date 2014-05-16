@@ -38,23 +38,4 @@ private:
     QMap<QString, ProxyInfo> m_proxyInfo;
 };
 
-Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
-
-QPointer<QnNetworkProxyFactory> createGlobalProxyFactory();
-
-Q_GLOBAL_STATIC_WITH_ARGS(QPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, (createGlobalProxyFactory()));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #endif

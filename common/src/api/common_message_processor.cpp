@@ -108,13 +108,13 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connection->startReceivingNotifications(true);
 }
 
-void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy)
+void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool /*isProxy*/)
 {
     if (!data.isClient)
         qnLicensePool->addRemoteHardwareIds(data.serverId, data.hardwareIds);
 }
 
-void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData data, bool isProxy)
+void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData data, bool /*isProxy*/)
 {
     qnLicensePool->removeRemoteHardwareIds(data.serverId);
 }

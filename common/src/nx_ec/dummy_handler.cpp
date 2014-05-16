@@ -19,7 +19,7 @@ namespace ec2
         return DummyHandler_instance;
     }
 
-    void DummyHandler::onRequestDone( int reqID, ec2::ErrorCode errorCode )
+    void DummyHandler::onRequestDone( int /*reqID*/, ec2::ErrorCode /*errorCode*/ )
     {
         //TODO/IMPL
     }

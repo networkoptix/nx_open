@@ -632,7 +632,7 @@ void fromApiToResource(const ApiResourceTypeData &src, QnResourceTypePtr &dst) {
 
     if (!src.parentId.empty())
         dst->setParentId(src.parentId[0]);
-    for (int i = 1; i < src.parentId.size(); ++i)
+    for (size_t i = 1; i < src.parentId.size(); ++i)
         dst->addAdditionalParent(src.parentId[i]);
 
     for(const ApiPropertyTypeData &p: src.propertyTypes) {
