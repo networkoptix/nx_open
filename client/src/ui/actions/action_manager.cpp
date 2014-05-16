@@ -741,7 +741,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SystemAdministrationAction).
         flags(Qn::Main | Qn::Tree).
-        text(tr("System Administration"));
+        text(tr("System Administration")).
+        condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
     factory(Qn::PreferencesServerTabAction).
         flags(Qn::Tree | Qn::NoTarget).
