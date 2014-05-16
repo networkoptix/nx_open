@@ -9,11 +9,12 @@
 #include <utils/fusion/fusion_adaptors.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, BrushStyle, static)
+QN_FUSION_DEFINE_FUNCTIONS(Qt::BrushStyle, (json_lexical), static)
 
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qt::BrushStyle, static)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(QnLatin1Array)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(QColor)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(QUrl)
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
+    (QnLatin1Array)(QColor)(QUrl),
+    (json_lexical)
+)
 
 QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
     (QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QVector2D)(QVector3D)(QVector4D),

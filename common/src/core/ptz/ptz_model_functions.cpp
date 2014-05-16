@@ -7,7 +7,7 @@
 #include "ptz_object.h"
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, Orientations)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qt::Orientations)
+QN_FUSION_DEFINE_FUNCTIONS(Qt::Orientations, (json_lexical))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (QnPtzPreset)(QnPtzTourSpot)(QnPtzTour)(QnPtzLimits)(QnPtzObject)(QnPtzData),

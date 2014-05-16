@@ -71,7 +71,7 @@ void serialize(const QnLatin1Array &value, QnCsvStreamWriter<Output> *stream) {
 #define QN_DEFINE_NUMERIC_CSV_SERIALIZATION_FUNCTIONS(TYPE, TYPE_GETTER, ... /* NUMBER_FORMAT */) \
 template<class Output>                                                          \
 void serialize(const TYPE &value, QnCsvStreamWriter<Output> *stream) {          \
-    stream->writeUtf8Field(QByteArray::number(value, ##__VA_ARGS__));         \
+    stream->writeUtf8Field(QByteArray::number(value, ##__VA_ARGS__));           \
 }
 
 QN_DEFINE_NUMERIC_CSV_SERIALIZATION_FUNCTIONS(int,                toInt)
