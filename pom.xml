@@ -84,6 +84,9 @@
         <qtlib15>Quick</qtlib15>
         <qtlib16>Qml</qtlib16>
         <qtlib17>Positioning</qtlib17>
+        <qtlib18>Sensors</qtlib18>
+        <qtlib19></qtlib19>
+        <qtlib20></qtlib20>
 
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
