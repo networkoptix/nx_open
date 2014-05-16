@@ -738,9 +738,6 @@ Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnAction
     if (accessController()->globalPermissions() & Qn::GlobalEditVideoWallPermission)
         return Qn::EnabledAction;
 
-    QnVideoWallItemIndex index = parameters.videoWallItems().first();
-    if (context()->user()->videoWallItems().contains(index.uuid()))
-        return Qn::EnabledAction;
     return Qn::InvisibleAction;
 }
 

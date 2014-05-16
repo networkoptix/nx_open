@@ -111,11 +111,6 @@ QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
     return m_itemByUuid.value(itemUuid);
 }
 
-QString QnLayoutResource::getUniqueId() const
-{
-    return getId().toString();
-}
-
 void QnLayoutResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
     base_type::updateInner(other, modifiedFields);
 

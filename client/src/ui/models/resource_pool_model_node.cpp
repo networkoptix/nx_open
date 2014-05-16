@@ -166,7 +166,7 @@ void QnResourcePoolModelNode::update() {
             m_icon = qnResIconCache->icon(m_resource);
             m_displayName = getResourceName(m_resource);
         }
-    } else if (m_type == Qn::VideoWallItemNode || m_type == Qn::UserVideoWallItemNode) {
+    } else if (m_type == Qn::VideoWallItemNode) {
         m_status = QnResource::Online;
         m_searchString = QString();
         m_flags = QnResource::videowall_item;
@@ -208,9 +208,6 @@ void QnResourcePoolModelNode::update() {
     case Qn::VideoWallItemNode:
     case Qn::VideoWallMatrixNode:
         bastard = false;
-        break;
-    case Qn::UserVideoWallItemNode:
-        bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditVideoWallPermission);
         break;
     case Qn::ResourceNode:
         bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
@@ -339,7 +336,7 @@ void QnResourcePoolModelNode::setParent(QnResourcePoolModelNode *parent) {
             setState(m_parent->state());
             m_parent->addChildInternal(this);
 
-            if (m_type == Qn::VideoWallItemNode || m_type == Qn::UserVideoWallItemNode)
+            if (m_type == Qn::VideoWallItemNode)
                 update();
         }
     } else {
@@ -400,7 +397,6 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
             result |= Qt::ItemIsDragEnabled;
         break;
     case Qn::VideoWallItemNode: //TODO: #GDM VW drag of empty item on scene should create new layout
-    case Qn::UserVideoWallItemNode: 
     case Qn::RecorderNode:
         result |= Qt::ItemIsDragEnabled; 
         break;
@@ -446,7 +442,6 @@ QVariant QnResourcePoolModelNode::data(int role, int column) const {
         if (
             m_type == Qn::ItemNode 
             || m_type == Qn::VideoWallItemNode 
-            || m_type == Qn::UserVideoWallItemNode 
             || m_type == Qn::VideoWallMatrixNode
             )
             return QVariant::fromValue<QUuid>(m_uuid);
@@ -500,16 +495,16 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
         return false;
 
     QnActionParameters parameters;
-    if (m_type == Qn::VideoWallItemNode || m_type == Qn::UserVideoWallItemNode) {
+    if (m_type == Qn::VideoWallItemNode) {
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
         if (index.isNull())
             return false;
-        parameters = QnActionParameters(QnVideoWallItemIndexList() << index).withArgument(Qn::ResourceNameRole, value.toString());
+        parameters = QnActionParameters(QnVideoWallItemIndexList() << index);
     } else if (m_type == Qn::VideoWallMatrixNode) {
         QnVideoWallMatrixIndex index = qnResPool->getVideoWallMatrixByUuid(m_uuid);
         if (index.isNull())
             return false;
-        parameters = QnActionParameters(QnVideoWallMatrixIndexList() << index).withArgument(Qn::ResourceNameRole, value.toString());
+        parameters = QnActionParameters(QnVideoWallMatrixIndexList() << index);
     } else if (m_type == Qn::RecorderNode) {
         //sending first camera to get groupId and check WriteName permission
         if (this->children().isEmpty())
@@ -517,10 +512,11 @@ bool QnResourcePoolModelNode::setData(const QVariant &value, int role, int colum
         QnResourcePoolModelNode* child = this->child(0);
         if (!child->resource())
             return false;
-        parameters = QnActionParameters(child->resource()).withArgument(Qn::ResourceNameRole, value.toString());
+        parameters = QnActionParameters(child->resource());
     } else {
-        parameters = QnActionParameters(m_resource).withArgument(Qn::ResourceNameRole, value.toString());
+        parameters = QnActionParameters(m_resource);
     }
+    parameters.setArgument(Qn::ResourceNameRole, value.toString());
     parameters.setArgument(Qn::NodeTypeRole, m_type);
 
     m_model->context()->menu()->trigger(Qn::RenameAction, parameters);

@@ -19,8 +19,6 @@ public:
 
     QnLayoutResourcePtr clone() const;
 
-    virtual QString getUniqueId() const override;
-
     void setItems(const QnLayoutItemDataList &items);
 
     void setItems(const QnLayoutItemDataMap &items);

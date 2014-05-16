@@ -77,7 +77,6 @@ private slots:
     void at_delayedOpenVideoWallItemAction_triggered();
     void at_renameAction_triggered();
     void at_identifyVideoWallAction_triggered();
-    void at_addVideoWallItemsToUserAction_triggered();
     void at_startVideoWallControlAction_triggered();
     void at_openVideoWallsReviewAction_triggered();
     void at_saveVideoWallReviewAction_triggered();

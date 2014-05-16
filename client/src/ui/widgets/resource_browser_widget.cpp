@@ -447,7 +447,7 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
     QItemSelectionModel *selectionModel = currentSelectionModel();
 
     Qn::NodeType nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if(nodeType == Qn::VideoWallItemNode || nodeType == Qn::UserVideoWallItemNode)
+    if(nodeType == Qn::VideoWallItemNode)
         return QVariant::fromValue(selectedVideoWallItems());
 
     if (nodeType == Qn::VideoWallMatrixNode)

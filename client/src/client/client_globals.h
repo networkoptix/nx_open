@@ -24,11 +24,6 @@ namespace Qn {
         EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
 
         VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */
-        VideoWallHistoryNode,   /**< Node that represents a videowall history item. Has both guid and resource. */
-
-        UserVideoWallNode,      /**< Node that represents a videowall having items that user is allowed to edit. Has both guid and resource. */
-        UserVideoWallItemNode,  /**< Node that represents a videowall item that user is allowed to edit. Has a guid. */
-
         VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */
 
         NodeTypeCount

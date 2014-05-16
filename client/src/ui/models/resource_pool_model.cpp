@@ -161,9 +161,6 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
 void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
     switch(node->type()) {
     case Qn::VideoWallItemNode:
-    case Qn::VideoWallHistoryNode:
-    case Qn::UserVideoWallNode:
-    case Qn::UserVideoWallItemNode:
     case Qn::VideoWallMatrixNode:
         deleteNode(node->type(), node->uuid(), node->resource());
         return;
@@ -377,7 +374,7 @@ QMimeData *QnResourcePoolModel::mimeData(const QModelIndexList &indexes) const {
             foreach (const QModelIndex &index, indexes) {
                 QnResourcePoolModelNode *node = this->node(index);
 
-                if (node && (node->type() == Qn::VideoWallItemNode || node->type() == Qn::UserVideoWallItemNode)) {
+                if (node && (node->type() == Qn::VideoWallItemNode)) {
                     uuids << node->uuid();
                 }
             }
@@ -434,16 +431,6 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
 
         menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutResourceRole, layout));
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
-
-        if (mimeData->hasFormat(QnVideoWallItem::mimeType())) {
-            QnVideoWallItemIndexList indexes = qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
-            if (!indexes.isEmpty()) {
-                menu()->trigger(Qn::AddVideoWallItemsToUserAction,
-                    QnActionParameters(indexes).withArgument(Qn::UserResourceRole, user));
-                return true; //ignore other resources dropped
-            }
-        }
-
         foreach(const QnResourcePtr &resource, resources) {
             if(resource->getParentId() == user->getId())
                 continue; /* Dropping resource into its owner does nothing. */
@@ -508,12 +495,6 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         connect(videoWall,  &QnVideoWallResource::matrixRemoved,        this,   &QnResourcePoolModel::at_videoWall_matrixRemoved);
     }
 
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if (user) {
-        connect(user,       &QnUserResource::videoWallItemAdded,        this,   &QnResourcePoolModel::at_user_videoWallItemAdded);
-        connect(user,       &QnUserResource::videoWallItemRemoved,      this,   &QnResourcePoolModel::at_user_videoWallItemRemoved);
-    }
-
     if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
         connect(camera,     &QnVirtualCameraResource::groupNameChanged, this,   &QnResourcePoolModel::at_camera_groupNameChanged);
     }
@@ -534,10 +515,6 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
         foreach(const QnVideoWallMatrix &matrix, videoWall->matrices()->getItems())
             at_videoWall_matrixAddedOrChanged(videoWall, matrix);
     }
-
-    if (user)
-        foreach (const QUuid &uuid, user->videoWallItems())
-            at_user_videoWallItemAdded(user, uuid);
 }
 
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
@@ -635,20 +612,6 @@ void QnResourcePoolModel::at_videoWall_matrixAddedOrChanged(const QnVideoWallRes
 void QnResourcePoolModel::at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix) {
     Q_UNUSED(videoWall)
     deleteNode(Qn::VideoWallMatrixNode, matrix.uuid, videoWall);
-}
-
-void QnResourcePoolModel::at_user_videoWallItemAdded(const QnUserResourcePtr &user, const QUuid &uuid) {
-    QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(uuid);
-    if (index.isNull())
-        return;
-
-    QnResourcePoolModelNode *node = this->node(Qn::UserVideoWallItemNode, uuid, user);
-    QnResourcePoolModelNode *parentNode = this->node(user);
-    node->setParent(parentNode);
-}
-
-void QnResourcePoolModel::at_user_videoWallItemRemoved(const QnUserResourcePtr &user, const QUuid &uuid) {
-    deleteNode(node(Qn::UserVideoWallItemNode, uuid, user));
 }
 
 void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera) {

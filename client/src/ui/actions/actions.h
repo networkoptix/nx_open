@@ -182,14 +182,6 @@ namespace Qn {
         OpenBusinessRulesAction,
 
         /**
-         * Adds provided videowall items to the target user and saves it.
-         *
-         * Parameters:
-         * <tt>QnUserResourcePtr UserResourceRole</tt> --- user to add items to.
-         */
-        AddVideoWallItemsToUserAction,
-
-        /**
          * Opens videowall control layouts for all items in the provided QnVideoWallItemIndexList.
          */
         StartVideoWallControlAction,
