@@ -294,6 +294,7 @@
                 <module>wixsetup/wixsetup-client-only</module>
             </modules>
             <properties>
+                <qt.dir>${environment.dir}/qt5webkit/qtbase-${arch}</qt.dir>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>                
@@ -560,18 +561,18 @@
             </properties>
         </profile>     
         <profile>
-            <id>webkit</id>
+            <id>no-webkit</id>
             <activation>
                 <os>
                     <family>Windows</family>
                 </os>
                 <property>
                     <name>webkit</name>
-                    <value>true</value>
+                    <value>false</value>
                 </property>                
             </activation>
             <properties>
-                <qt.dir>${environment.dir}/qt5webkit/qtbase-${arch}</qt.dir>
+                <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
             </properties>
         </profile>          
     </profiles> 
