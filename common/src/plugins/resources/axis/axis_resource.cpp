@@ -892,7 +892,7 @@ QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
 
 QnPlAxisResource::AxisResolution QnPlAxisResource::getResolution( int encoderIndex ) const
 {
-    return encoderIndex < sizeof(m_resolutions)/sizeof(*m_resolutions)
+    return (unsigned int)encoderIndex < sizeof(m_resolutions)/sizeof(*m_resolutions)
         ? m_resolutions[encoderIndex]
         : QnPlAxisResource::AxisResolution();
 }

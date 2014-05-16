@@ -610,7 +610,15 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
     {
         QMutexLocker lock(&m_mutex);
         ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
-        itr = m_chunks.insert(itr, chunk);
+        if( itr != m_chunks.end() )
+        {
+            itr = m_chunks.insert(itr, chunk);  //triggers assert if itr == end()
+        }
+        else
+        {
+            m_chunks.push_back( chunk );
+            itr = m_chunks.begin() + (m_chunks.size()-1);
+        }
         m_lastAddIndex = itr - m_chunks.begin();
     }
 }
