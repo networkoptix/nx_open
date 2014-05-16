@@ -58,12 +58,11 @@ protected:
     virtual void storedItemRemoved(const QnVideoWallMatrix &item) override;
     virtual void storedItemChanged(const QnVideoWallMatrix &item) override;
 private:
-   
+    bool m_autorun;
+
     QScopedPointer<QnResourceItemStorage<QnVideoWallItem> > m_items;
     QScopedPointer<QnResourceItemStorage<QnVideoWallPcData> > m_pcs;
     QScopedPointer<QnResourceItemStorage<QnVideoWallMatrix> > m_matrices;
-
-    bool m_autorun;
 };
 
 Q_DECLARE_METATYPE(QnVideoWallResourcePtr)
