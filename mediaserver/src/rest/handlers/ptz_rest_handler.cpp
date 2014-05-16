@@ -224,7 +224,7 @@ int QnPtzRestHandler::executeGetPresets(const QnPtzControllerPtr &controller, co
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &, const QByteArray &body, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &, const QByteArray &body, QnJsonRestResult& /*result*/) {
     QnPtzTour tour;
     if(!QJson::deserialize(body, &tour))
         return CODE_INVALID_PARAMETER;
