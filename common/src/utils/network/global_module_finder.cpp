@@ -28,7 +28,6 @@ void QnGlobalModuleFinder::setModuleFinder(QnModuleFinder *moduleFinder) {
 
     m_moduleFinder = moduleFinder;
 
-
     if (moduleFinder) {
         foreach (const QnModuleInformation &moduleInformation, moduleFinder->revealedModules())
             at_moduleFinder_moduleFound(moduleInformation);
@@ -77,11 +76,9 @@ void QnGlobalModuleFinder::at_moduleFinder_moduleFound(const QnModuleInformation
     if (it == m_moduleInformationById.end()) {
         m_moduleInformationById[moduleInformation.id] = moduleInformation;
         emit peerFound(moduleInformation);
-        qDebug() << "Module found: " << moduleInformation.systemName << moduleInformation.version.toString() << moduleInformation.id;
     } else {
         *it = moduleInformation;
         emit peerChanged(moduleInformation);
-        qDebug() << "Module refound: " << moduleInformation.systemName << moduleInformation.version.toString() << moduleInformation.id;
     }
 }
 
@@ -94,6 +91,5 @@ void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation 
     if (it != m_moduleInformationById.end()) {
         m_moduleInformationById.erase(it);
         emit peerLost(moduleInformation);
-        qDebug() << "Module lost: " << moduleInformation.systemName << moduleInformation.version.toString() << moduleInformation.id;
     }
 }
