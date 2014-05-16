@@ -184,6 +184,9 @@
                 <File Id="ClientQt5MultimediaWidgets$(var.suffix).dll" Name="Qt5MultimediaWidgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5MultimediaWidgets$(var.suffix).dll"  />                
             </Component>             
             <Component>
+                <File Id="ClientQt5Qml$(var.suffix).dll" Name="Qt5Qml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Qml$(var.suffix).dll"  />                
+            </Component>       
+            <Component>
                 <File Id="ClientQt5Quick$(var.suffix).dll" Name="Qt5Quick$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Quick$(var.suffix).dll"  />                
             </Component>             
             <Component>
