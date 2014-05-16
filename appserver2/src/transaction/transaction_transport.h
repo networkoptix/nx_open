@@ -28,6 +28,7 @@ public:
         Closed,
         Error
     };
+    static QString toString( State state );
 
     QnTransactionTransport(bool isOriginator, bool isClient, QSharedPointer<AbstractStreamSocket> socket = QSharedPointer<AbstractStreamSocket>(), const QUuid& remoteGuid = QUuid());
     ~QnTransactionTransport();
