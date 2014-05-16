@@ -39,6 +39,7 @@
 
 #include "connection_testing_dialog.h"
 
+#include <utils/network/global_module_finder.h>
 #include <api/model/connection_info.h>
 #include "compatibility_version_installation_dialog.h"
 #include "version.h"
@@ -587,6 +588,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
     QnAppServerConnectionFactory::setEc2Connection( connection );
     m_connectInfo = connectionInfo;
     qnCommon->setLocalSystemName(connectionInfo->systemName);
+    QnGlobalModuleFinder::instance()->setConnection(connection);
     base_type::accept();
 }
 

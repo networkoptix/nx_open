@@ -12,6 +12,8 @@
 #include "api/app_server_connection.h"
 #include <utils/serialization/binary_functions.h>
 
+#include "version.h"
+
 namespace ec2
 {
 
@@ -78,6 +80,14 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnAbstractTransaction& 
 
     if (tran.params.serverId == qnCommon->moduleGUID())
         return; // ignore himself
+
+    if (tran.params.systemName != qnCommon->localSystemName() || tran.params.version != lit(QN_APPLICATION_VERSION)) {
+        if (tran.params.isAlive)
+            emit incompatiblePeerFound(tran.params);
+        else
+            emit incompatiblePeerLost(tran.params);
+        return;
+    }
 
     // proxy alive info from non-direct connected host
     AlivePeersMap::iterator itr = m_alivePeers.find(tran.params.serverId);
@@ -447,10 +457,38 @@ void QnTransactionMessageBus::sendServerAliveMsg(const QnId& serverId, bool isAl
     tran.params.hardwareIds = hwList;
     tran.fillSequence();
     sendTransaction(tran);
-    if (isAlive)
-        emit peerFound(tran.params, false);
-    else
-        emit peerLost(tran.params, false);
+
+    if (tran.params.systemName != qnCommon->localSystemName() || tran.params.version != lit(QN_APPLICATION_VERSION)) {
+        if (isAlive)
+            emit incompatiblePeerFound(tran.params);
+        else
+            emit incompatiblePeerLost(tran.params);
+    } else {
+        if (isAlive)
+            emit peerFound(tran.params, false);
+        else
+            emit peerLost(tran.params, false);
+    }
+}
+
+void QnTransactionMessageBus::sendServerAliveMsg(const ApiServerAliveData &data) {
+    m_aliveSendTimer.restart();
+    QnTransaction<ApiServerAliveData> tran(ApiCommand::serverAliveInfo, false);
+    tran.params = data;
+    tran.fillSequence();
+    sendTransaction(tran);
+
+    if (tran.params.systemName != qnCommon->localSystemName() || tran.params.version != lit(QN_APPLICATION_VERSION)) {
+        if (data.isAlive)
+            emit incompatiblePeerFound(tran.params);
+        else
+            emit incompatiblePeerLost(tran.params);
+    } else {
+        if (data.isAlive)
+            emit peerFound(tran.params, false);
+        else
+            emit peerLost(tran.params, false);
+    }
 }
 
 QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }

@@ -13,6 +13,8 @@
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 
+#include "version.h"
+
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
     QObject(parent)
 {
@@ -110,12 +112,16 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 
 void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy)
 {
+    Q_UNUSED(isProxy)
+
     if (!data.isClient)
         qnLicensePool->addRemoteHardwareIds(data.serverId, data.hardwareIds);
 }
 
 void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData data, bool isProxy)
 {
+    Q_UNUSED(isProxy)
+
     qnLicensePool->removeRemoteHardwareIds(data.serverId);
 }
 

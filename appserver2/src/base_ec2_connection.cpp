@@ -31,8 +31,10 @@ namespace ec2
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) ),
         m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) )
     {
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(ApiServerAliveData, bool)), this, SIGNAL(remotePeerFound(ApiServerAliveData, bool)), Qt::DirectConnection);
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerLost(ApiServerAliveData, bool)),  this, SIGNAL(remotePeerLost(ApiServerAliveData, bool)), Qt::DirectConnection);
+        connect(qnTransactionBus,   &QnTransactionMessageBus::peerFound,                this,   &BaseEc2Connection<T>::remotePeerFound,         Qt::DirectConnection);
+        connect(qnTransactionBus,   &QnTransactionMessageBus::peerLost,                 this,   &BaseEc2Connection<T>::remotePeerLost,          Qt::DirectConnection);
+        connect(qnTransactionBus,   &QnTransactionMessageBus::incompatiblePeerFound,    this,   &BaseEc2Connection<T>::incompatiblePeerFound,   Qt::DirectConnection);
+        connect(qnTransactionBus,   &QnTransactionMessageBus::incompatiblePeerLost,     this,   &BaseEc2Connection<T>::incompatiblePeerLost,    Qt::DirectConnection);
     }
 
     template<class T>

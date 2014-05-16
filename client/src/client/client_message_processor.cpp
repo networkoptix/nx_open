@@ -8,6 +8,8 @@
 #include "common/common_module.h"
 #include "device_plugins/server_camera/server_camera.h"
 
+#include "version.h"
+
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),
     m_opened(false)
@@ -128,7 +130,7 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, 
     }
 }
 
-void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData, bool isProxy)
+void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData data, bool isProxy)
 {
     if (isProxy) {
         //updateTmpStatus(id, QnResource::Offline);

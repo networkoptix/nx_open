@@ -11,6 +11,8 @@
 #include "transaction/transaction_message_bus.h"
 #include "business/business_message_bus.h"
 
+#include "version.h"
+
 
 QnServerMessageProcessor::QnServerMessageProcessor():
         base_type()
@@ -165,8 +167,10 @@ bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
 * EC2 related processing. Need move to other class
 */
 
-void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool /*isProxy*/)
+void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy)
 {
+    Q_UNUSED(isProxy)
+
     QnResourcePtr res = qnResPool->getResourceById(data.serverId);
     if (res)
         res->setStatus(QnResource::Online);
@@ -175,6 +179,8 @@ void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, 
 
 void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData data, bool isProxy)
 {
+    Q_UNUSED(isProxy)
+
     QnResourcePtr res = qnResPool->getResourceById(data.serverId);
     if (res) {
         res->setStatus(QnResource::Offline);

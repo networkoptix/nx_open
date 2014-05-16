@@ -53,6 +53,7 @@
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
+#include <transaction/transaction_message_bus.h>
 
 #include <platform/core_platform_abstraction.h>
 
@@ -124,6 +125,7 @@
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
 #include <utils/network/modulefinder.h>
+#include <utils/network/global_module_finder.h>
 
 
 #include <media_server/server_message_processor.h>
@@ -959,42 +961,15 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
         QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
         ec2Connection->addRemotePeer(url, false, moduleInformation.id);
     } else {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
-
-        bool newServer = false;
-        if (!server) {
-            server = QnMediaServerResourcePtr(new QnMediaServerResource(qnResTypePool));
-            server->setId(moduleInformation.id);
-            server->setStatus(QnResource::Incompatible);
-            newServer = true;
-        }
-        server->setSystemInfo(moduleInformation.systemInformation);
-        server->setVersion(moduleInformation.version);
-        server->setSystemName(moduleInformation.systemName);
-
-        Qn::ServerFlags serverFlags = Qn::SF_None;
-        if (!moduleInformation.isLocal)
-            serverFlags |= Qn::SF_RemoteEC;
-        server->setServerFlags(serverFlags);
-
-        QHostAddress serverAddress(remoteAddress);
-        if (!moduleInformation.isLocal) {
-            foreach (const QString &address, moduleInformation.remoteAddresses) {
-                serverAddress = resolveHost(address);
-                if (serverAddress.toIPv4Address() != 0)
-                    break;
-            }
-        }
-        setServerNameAndUrls(server, serverAddress.toString(), moduleInformation.parameters.value("port").toInt());
-
-        QList<QHostAddress> serverInterfaceList;
-        foreach (const QString &address, moduleInformation.remoteAddresses)
-            serverInterfaceList.append(QHostAddress(address));
-        server->setNetAddrList(serverInterfaceList);
-
-        if (newServer)
-            ec2Connection->getResourceManager()->save(server, this, [this](int, ec2::ErrorCode, QnResourcePtr){});
-        ec2Connection->getMediaServerManager()->save(server, this, [this](int, ec2::ErrorCode, QnMediaServerResourcePtr){});
+        ec2::ApiServerAliveData data;
+        data.isAlive = true;
+        data.serverId = moduleInformation.id;
+        data.version = moduleInformation.version.toString();
+        data.systemInformation = moduleInformation.systemInformation.toString();
+        data.port = moduleInformation.parameters[lit("port")].toInt();
+        data.isClient = false;
+        qnTransactionBus->sendServerAliveMsg(data);
+        qDebug() << "Send found: " << data.systemName << data.serverId << data.version;
     }
 }
 void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
@@ -1006,6 +981,16 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
             QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
             ec2Connection->deleteRemotePeer(url);
         }
+    } else {
+        ec2::ApiServerAliveData data;
+        data.isAlive = false;
+        data.serverId = moduleInformation.id;
+        data.version = moduleInformation.version.toString();
+        data.systemInformation = moduleInformation.systemInformation.toString();
+        data.port = moduleInformation.parameters[lit("port")].toInt();
+        data.isClient = false;
+        qnTransactionBus->sendServerAliveMsg(data);
+        qDebug() << "Send lost: " << data.systemName << data.serverId << data.version;
     }
 }
 
@@ -1402,6 +1387,8 @@ void QnMain::run()
 #endif
     // ------------------------------------------
 
+    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
+    globalModuleFinder->setConnection(ec2Connection);
 
     //===========================================================================
     //IPPH264Decoder::dll.init();

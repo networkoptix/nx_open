@@ -852,6 +852,8 @@ namespace ec2
 
         void remotePeerFound(ApiServerAliveData data, bool isProxy);
         void remotePeerLost(ApiServerAliveData data, bool isProxy);
+        void incompatiblePeerFound(ApiServerAliveData data);
+        void incompatiblePeerLost(ApiServerAliveData data);
 
         void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);

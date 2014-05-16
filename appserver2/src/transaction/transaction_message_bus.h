@@ -99,9 +99,14 @@ namespace ec2
         */
         AlivePeersMap aliveServerPeers() const;
 
+        void sendServerAliveMsg(const ApiServerAliveData &data);
+
     signals:
         void peerLost(ApiServerAliveData data, bool isProxy);
         void peerFound(ApiServerAliveData data, bool isProxy);
+
+        void incompatiblePeerFound(const ApiServerAliveData &data);
+        void incompatiblePeerLost(const ApiServerAliveData &data);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);
@@ -185,6 +190,6 @@ namespace ec2
         QElapsedTimer m_aliveSendTimer;
     };
 }
-#define qnTransactionBus QnTransactionMessageBus::instance()
+#define qnTransactionBus ec2::QnTransactionMessageBus::instance()
 
 #endif // __TRANSACTION_MESSAGE_BUS_H_
