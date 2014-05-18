@@ -49,6 +49,11 @@ def extract(tar_url, extract_path='.'):
     tar.close() 
     os.unlink(file)
 if __name__ == '__main__':        
+
+    buildenv = join(get_build_dir(), '../buildenv2.timestamp')
+    if os.path.exists(buildenv): 
+        os.unlink(buildenv)
+
     print '+++++++++++++++++++++ EXPANDING LIBS +++++++++++++++++++++'
             
     for file in os.listdir('.'):
@@ -162,3 +167,5 @@ if __name__ == '__main__':
                     if os.path.exists(target):
                         shutil.rmtree(target)
                     shutil.copytree(join(plugin_source_dir, qtplugin), target)                          
+    if not os.path.exists(buildenv): 
+        open(buildenv, 'w').close() 
