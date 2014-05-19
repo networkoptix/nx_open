@@ -62,18 +62,32 @@ QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {
     return m_moduleInformationById.values();
 }
 
-void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive) {
+QList<QnId> QnGlobalModuleFinder::discoverers(const QnId &moduleId) {
+    return m_discovererIdByServerId.values(moduleId);
+}
+
+void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer) {
     if (isAlive)
-        at_moduleFinder_moduleFound(moduleInformation);
+        addModule(moduleInformation, discoverer);
     else
-        at_moduleFinder_moduleLost(moduleInformation);
+        removeModule(moduleInformation, discoverer);
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
+    addModule(moduleInformation, QnId(qnCommon->moduleGUID()));
+}
+
+void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
+    removeModule(moduleInformation, QnId(qnCommon->moduleGUID()));
+}
+
+void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformation, const QnId &discoverer) {
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
     auto it = m_moduleInformationById.find(moduleInformation.id);
+
+    m_discovererIdByServerId.insert(moduleInformation.id, discoverer);
 
     if (it == m_moduleInformationById.end()) {
         m_moduleInformationById[moduleInformation.id] = moduleInformation;
@@ -82,9 +96,11 @@ void QnGlobalModuleFinder::at_moduleFinder_moduleFound(const QnModuleInformation
         *it = moduleInformation;
         emit peerChanged(moduleInformation);
     }
+
+    qDebug() << "Add module: " << moduleInformation.id << " discoverers: " << discoverers(moduleInformation.id);
 }
 
-void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
+void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInformation, const QnId &discoverer) {
     if (moduleInformation.id == qnCommon->moduleGUID())
         return;
 
@@ -92,6 +108,9 @@ void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation 
 
     if (it != m_moduleInformationById.end()) {
         m_moduleInformationById.erase(it);
+        m_discovererIdByServerId.remove(moduleInformation.id, discoverer);
         emit peerLost(moduleInformation);
     }
+
+    qDebug() << "Remove module: " << moduleInformation.id << " discoverers: " << discoverers(moduleInformation.id);
 }

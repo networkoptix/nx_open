@@ -19,7 +19,7 @@ template<class QueryProcessorType>
 void QnModuleInformationManager<QueryProcessorType>::triggerNotification(const QnTransaction<ec2::ApiModuleData> &transaction) {
     QnModuleInformation moduleInformation;
     QnGlobalModuleFinder::fillFromApiModuleData(transaction.params, &moduleInformation);
-    emit moduleChanged(moduleInformation, transaction.params.isAlive);
+    emit moduleChanged(moduleInformation, transaction.params.isAlive, transaction.params.discoverer);
 }
 
 template<class QueryProcessorType>
@@ -27,7 +27,7 @@ void QnModuleInformationManager<QueryProcessorType>::triggerNotification(const A
     foreach (const ApiModuleData &data, moduleDataList) {
         QnModuleInformation moduleInformation;
         QnGlobalModuleFinder::fillFromApiModuleData(data, &moduleInformation);
-        emit moduleChanged(moduleInformation, data.isAlive);
+        emit moduleChanged(moduleInformation, data.isAlive, data.discoverer);
     }
 }
 
@@ -47,6 +47,7 @@ QnTransaction<ApiModuleData> QnModuleInformationManager<QueryProcessorType>::pre
     QnTransaction<ApiModuleData> transaction(ApiCommand::moduleInfo, false);
     QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &transaction.params);
     transaction.params.isAlive = isAlive;
+    transaction.params.discoverer = QnId(qnCommon->moduleGUID());
 
     return transaction;
 }

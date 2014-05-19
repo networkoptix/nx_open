@@ -754,7 +754,7 @@ namespace ec2
         }
 
     signals:
-        void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive);
+        void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer);
 
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) = 0;

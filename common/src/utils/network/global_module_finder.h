@@ -23,20 +23,27 @@ public:
 
     QList<QnModuleInformation> foundModules() const;
 
+    QList<QnId> discoverers(const QnId &moduleId);
+
 signals:
     void peerFound(const QnModuleInformation &moduleInformation);
     void peerChanged(const QnModuleInformation &moduleInformation);
     void peerLost(const QnModuleInformation &moduleInformation);
 
 private slots:
-    void at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive);
+    void at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer);
     void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
+
+private:
+    void addModule(const QnModuleInformation &moduleInformation, const QnId &discoverer);
+    void removeModule(const QnModuleInformation &moduleInformation, const QnId &discoverer);
 
 private:
     ec2::AbstractECConnectionPtr m_connection;  // just to know from where to disconnect
     QPointer<QnModuleFinder> m_moduleFinder;
     QHash<QnId, QnModuleInformation> m_moduleInformationById;
+    QMultiHash<QnId, QnId> m_discovererIdByServerId;
 };
 
 #endif // GLOBAL_MODULE_FINDER_H

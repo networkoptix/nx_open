@@ -624,6 +624,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules()) {
             ApiModuleData data;
             QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
+            data.discoverer = QnId(qnCommon->moduleGUID());
             tran.params.foundModules.push_back(data);
         }
     }
