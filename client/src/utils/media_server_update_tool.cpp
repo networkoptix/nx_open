@@ -304,7 +304,7 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
     checkUpdateCoverage();
 }
 
-void QnMediaServerUpdateTool::updateServers() {
+void QnMediaServerUpdateTool::updateServers(const QSet<QnId> &targets) {
     // here we fix the list of servers to be updated
 
     m_idBySystemInformation.clear();
@@ -313,9 +313,14 @@ void QnMediaServerUpdateTool::updateServers() {
 
     m_updateId = QUuid::createUuid().toString();
 
+    bool checkTargets = !targets.isEmpty();
+
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
         QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
         if (server->getStatus() != QnResource::Online)
+            continue;
+
+        if (checkTargets && !targets.contains(server->getId()))
             continue;
 
         PeerUpdateInformation info(server);

@@ -219,5 +219,6 @@ void QnServerMessageProcessor::at_updateInstallationRequested(const QString &upd
 }
 
 void QnServerMessageProcessor::at_updateRequested(const QString &updateId, const QByteArray &data, const QString &targetId) {
-    QnServerUpdateTool::instance()->uploadAndInstallUpdate(updateId, data, targetId);
+    Q_UNUSED(updateId)
+    QnServerUpdateTool::instance()->uploadAndInstallUpdate(targetId, data);
 }

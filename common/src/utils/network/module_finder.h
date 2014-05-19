@@ -65,6 +65,8 @@ public:
 
     QList<QnModuleInformation> revealedModules() const;
 
+    QnModuleInformation moduleInformation(const QString &moduleId) const;
+
 public slots:
     virtual void pleaseStop() override;
 

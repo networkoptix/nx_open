@@ -12,6 +12,7 @@
 
 class QFile;
 class QIODevice;
+class QNetworkAccessManager;
 
 class QnServerUpdateTool : public QObject, public Singleton<QnServerUpdateTool> {
     Q_OBJECT
@@ -27,7 +28,8 @@ public:
     bool addUpdateFile(const QString &updateId, const QByteArray &data);
     bool addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset);
     bool installUpdate(const QString &updateId);
-    bool uploadAndInstallUpdate(const QString &updateId, const QByteArray &data, const QString &targetId);
+    /*! This function pushes the update to the server with updateId. It not installs the update on the current server! */
+    bool uploadAndInstallUpdate(const QString &updateId, const QByteArray &data);
 
 private:
     bool processUpdate(const QString &updateId, QIODevice *ioDevice);
@@ -35,6 +37,9 @@ private:
     void addChunk(qint64 offset, int m_length);
     bool isComplete() const;
     void clearUpdatesLocation();
+
+private slots:
+    void at_uploadFinished();
 
 private:
     QString m_updateId;
@@ -45,6 +50,8 @@ private:
     qint64 m_replyTime;
 
     QSet<QString> m_bannedUpdates;
+
+    QNetworkAccessManager *m_networkAccessManager;
 };
 
 #endif // SERVER_UPDATE_UTIL_H

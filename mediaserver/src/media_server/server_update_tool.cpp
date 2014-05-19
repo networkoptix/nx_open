@@ -4,6 +4,8 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QProcess>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
@@ -13,6 +15,7 @@
 #include <utils/common/log.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
+#include <utils/network/module_finder.h>
 
 #include <version.h>
 
@@ -114,7 +117,11 @@ namespace {
 
 } // anonymous namespace
 
-QnServerUpdateTool::QnServerUpdateTool() : m_length(-1), m_replyTime(0) {}
+QnServerUpdateTool::QnServerUpdateTool() :
+    m_length(-1),
+    m_replyTime(0),
+    m_networkAccessManager(new QNetworkAccessManager(this))
+{}
 
 QnServerUpdateTool::~QnServerUpdateTool() {}
 
@@ -266,10 +273,6 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     return true;
 }
 
-bool QnServerUpdateTool::uploadAndInstallUpdate(const QString &updateId, const QByteArray &data, const QString &targetId) {
-
-}
-
 void QnServerUpdateTool::addChunk(qint64 offset, int length) {
     m_chunks[offset] = length;
 }
@@ -287,4 +290,38 @@ bool QnServerUpdateTool::isComplete() const {
 
 void QnServerUpdateTool::clearUpdatesLocation() {
     getUpdatesDir().removeRecursively();
+}
+
+
+bool QnServerUpdateTool::uploadAndInstallUpdate(const QString &targetId, const QByteArray &data) {
+    QnModuleInformation moduleInformation = QnModuleFinder::instance()->moduleInformation(targetId);
+    if (moduleInformation.id.isNull())
+        return false;
+
+    // compatibility checks
+    if (moduleInformation.version < QnSoftwareVersion(2, 3, 0, 0))
+        return false;
+
+    int port = moduleInformation.parameters.value(lit("port")).toInt();
+
+    if (moduleInformation.remoteAddresses.isEmpty() || port == 0)
+        return false;
+
+    QString address = *moduleInformation.remoteAddresses.begin();
+    QUrl url(QString(lit("http://%1:%2")).arg(address).arg(port));
+
+    QNetworkReply *reply = m_networkAccessManager->post(QNetworkRequest(url), data);
+    connect(reply, &QNetworkReply::finished, this, &QnServerUpdateTool::at_uploadFinished);
+
+    return true;
+}
+
+void QnServerUpdateTool::at_uploadFinished() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    if (!reply)
+        return;
+
+    reply->deleteLater();
+
+    // TODO: #dklychkov error handling
 }

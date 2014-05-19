@@ -97,6 +97,16 @@ QList<QnModuleInformation> QnModuleFinder::revealedModules() const {
     return modules;
 }
 
+QnModuleInformation QnModuleFinder::moduleInformation(const QString &moduleId) const {
+    QMutexLocker lk(&m_mutex);
+
+    auto it = m_knownEnterpriseControllers.find(moduleId);
+    if (it == m_knownEnterpriseControllers.end())
+        return QnModuleInformation();
+
+    return it->moduleInformation;
+}
+
 void QnModuleFinder::pleaseStop() {
     QnLongRunnable::pleaseStop();
     m_pollSet.interrupt();

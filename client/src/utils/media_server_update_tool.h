@@ -91,7 +91,7 @@ public:
     CheckResult updateCheckResult() const;
     UpdateResult updateResult() const;
 
-    void updateServers();
+    void updateServers(const QSet<QnId> &targets = QSet<QnId>());
 
     QnSoftwareVersion targetVersion() const;
 
