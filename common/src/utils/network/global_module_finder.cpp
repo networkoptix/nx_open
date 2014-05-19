@@ -96,8 +96,6 @@ void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformatio
         *it = moduleInformation;
         emit peerChanged(moduleInformation);
     }
-
-    qDebug() << "Add module: " << moduleInformation.id << " discoverers: " << discoverers(moduleInformation.id);
 }
 
 void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInformation, const QnId &discoverer) {
@@ -111,6 +109,4 @@ void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInforma
         m_discovererIdByServerId.remove(moduleInformation.id, discoverer);
         emit peerLost(moduleInformation);
     }
-
-    qDebug() << "Remove module: " << moduleInformation.id << " discoverers: " << discoverers(moduleInformation.id);
 }
