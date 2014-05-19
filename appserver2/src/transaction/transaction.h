@@ -147,14 +147,16 @@ namespace ec2
             uploadUpdateResponce = 60,
             //!ApiUpdateInstallData
             installUpdate = 61,
+            //!ApiUpdateUploadResponceData
+            uploadAndInstallUpdate = 62,
 
             //!ApiCameraBookmarkTagDataList
-            addCameraBookmarkTags = 62,
-            getCameraBookmarkTags = 63,
-            removeCameraBookmarkTags = 64,
+            addCameraBookmarkTags = 63,
+            getCameraBookmarkTags = 64,
+            removeCameraBookmarkTags = 65,
 
             //!ApiModuleData
-            moduleInfo,
+            moduleInfo = 66,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

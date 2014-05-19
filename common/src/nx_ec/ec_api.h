@@ -726,15 +726,22 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
+        template<class TargetType, class HandlerType> int sendAndInstallUpdate(const QString &updateId, const QByteArray &data, const QString &targetId, const QnId &peerId, TargetType *target, HandlerType handler) {
+            return sendAndInstallUpdate(updateId, data, targetId, peerId, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
     signals:
         void updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
         void updateUploadProgress(const QString &updateId, const QnId &peerId, int chunks);
         void updateInstallationRequested(const QString &updateId);
+        void updateRequested(const QString &updateId, const QByteArray &data, const QString &targetId);
 
     protected:
         virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const PeerList &peers, impl::SimpleHandlerPtr handler) = 0;
         virtual int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) = 0;
         virtual int installUpdate(const QString &updateId, const PeerList &peers, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendAndInstallUpdate(const QString &updateId, const QByteArray &data, const QString &targetId, const QnId &peerId, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
 

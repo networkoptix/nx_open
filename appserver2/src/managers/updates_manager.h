@@ -18,11 +18,13 @@ public:
     void triggerNotification(const QnTransaction<ApiUpdateUploadData> &transaction);
     void triggerNotification(const QnTransaction<ApiUpdateUploadResponceData> &transaction);
     void triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction);
+    void triggerNotification(const QnTransaction<ApiUpdateUploadAndInstallData> &transaction);
 
 protected:
     virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const PeerList &peers, impl::SimpleHandlerPtr handler) override;
     virtual int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) override;
     virtual int installUpdate(const QString &updateId, const PeerList &peers, impl::SimpleHandlerPtr handler) override;
+    virtual int sendAndInstallUpdate(const QString &updateId, const QByteArray &data, const QString &targetId, const QnId &peerId, impl::SimpleHandlerPtr handler);
 
 private:
     QueryProcessorType* const m_queryProcessor;
@@ -32,6 +34,7 @@ private:
     QnTransaction<ApiUpdateUploadData> prepareTransaction(const QString &updateId, const QByteArray &data, qint64 offset) const;
     QnTransaction<ApiUpdateUploadResponceData> prepareTransaction(const QString &updateId, const QnId &peerId, int chunks) const;
     QnTransaction<ApiUpdateInstallData> prepareTransaction(const QString &updateId) const;
+    QnTransaction<ApiUpdateUploadAndInstallData> prepareTransaction(const QString &updateId, const QByteArray &data, const QString &targetId) const;
 
     void at_transactionProcessed(const QnAbstractTransaction &transaction);
 };

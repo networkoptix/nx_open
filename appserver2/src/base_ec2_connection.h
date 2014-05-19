@@ -217,6 +217,10 @@ namespace ec2
             m_updatesManager->triggerNotification(tran);
         }
 
+        void triggerNotification(const QnTransaction<ApiUpdateUploadAndInstallData> &tran) {
+            m_updatesManager->triggerNotification(tran);
+        }
+
         void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList> &tran) {
             return m_cameraManager->triggerNotification(tran);
         }

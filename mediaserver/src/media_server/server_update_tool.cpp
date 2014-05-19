@@ -275,6 +275,10 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     return true;
 }
 
+bool QnServerUpdateTool::uploadAndInstallUpdate(const QString &updateId, const QByteArray &data, const QString &targetId) {
+
+}
+
 void QnServerUpdateTool::addChunk(qint64 offset, int length) {
     m_chunks[offset] = length;
 }

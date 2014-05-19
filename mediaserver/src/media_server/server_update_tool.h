@@ -25,6 +25,7 @@ public:
     bool addUpdateFile(const QString &updateId, const QByteArray &data);
     bool addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset);
     bool installUpdate(const QString &updateId);
+    bool uploadAndInstallUpdate(const QString &updateId, const QByteArray &data, const QString &targetId);
 
     ~QnServerUpdateTool();
 
