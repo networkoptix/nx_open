@@ -72,7 +72,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     ui(new Ui::LoginDialog),
     m_requestHandle(-1),
     m_renderingWidget(NULL),
-    m_moduleFinder(NULL),
     m_restartPending(false),
     m_autoConnectPending(false)
 {
@@ -130,15 +129,11 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     resetConnectionsModel();
     updateFocus();
 
-    m_moduleFinder = new QnModuleFinder(true);
-    m_moduleFinder->setParent(this);
-    if (qnSettings->isDevMode())
-        m_moduleFinder->setCompatibilityMode(true);
-    connect(m_moduleFinder,     &QnModuleFinder::moduleFound,     this,   &QnLoginDialog::at_moduleFinder_moduleFound);
-    connect(m_moduleFinder,     &QnModuleFinder::moduleLost,      this,   &QnLoginDialog::at_moduleFinder_moduleLost);
+    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleFound,     this,   &QnLoginDialog::at_moduleFinder_moduleFound);
+    connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleLost,      this,   &QnLoginDialog::at_moduleFinder_moduleLost);
 
-    QnGlobalModuleFinder::instance()->setModuleFinder(m_moduleFinder);
-    m_moduleFinder->start();
+    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->revealedModules())
+        at_moduleFinder_moduleFound(moduleInformation, *moduleInformation.remoteAddresses.begin(), QString());
 }
 
 QnLoginDialog::~QnLoginDialog() {}

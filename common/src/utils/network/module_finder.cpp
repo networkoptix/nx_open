@@ -88,8 +88,9 @@ void QnModuleFinder::setCompatibilityMode(bool compatibilityMode) {
 }
 
 QList<QnModuleInformation> QnModuleFinder::revealedModules() const {
-    QList<QnModuleInformation> modules;
+    QMutexLocker lk(&m_mutex);
 
+    QList<QnModuleInformation> modules;
     foreach (const ModuleContext &moduleCOntext, m_knownEnterpriseControllers)
         modules.append(moduleCOntext.moduleInformation);
 
@@ -183,6 +184,8 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
         return false;
     }
 
+    QMutexLocker lk(&m_mutex);
+
     //received valid response, checking if already know this enterprise controller
     auto it = m_knownEnterpriseControllers.find(response.seed);
     bool newModule = (it == m_knownEnterpriseControllers.end());
@@ -275,6 +278,7 @@ void QnModuleFinder::run() {
                 processDiscoveryResponse(udpSocket);
         }
 
+        QMutexLocker lk(&m_mutex);
         //checking for expired known hosts...
         for (auto it = m_knownEnterpriseControllers.begin(); it != m_knownEnterpriseControllers.end(); /* no inc */) {
             if(it->prevResponseReceiveClock + m_pingTimeoutMillis*m_keepAliveMultiply > currentClock) {

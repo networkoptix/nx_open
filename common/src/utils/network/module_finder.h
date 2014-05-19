@@ -7,11 +7,13 @@
 #define NETWORKOPTIXMODULEFINDER_H
 
 #include <QtCore/QHash>
+#include <QtCore/QMutex>
 #include <QtNetwork/QHostAddress>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
+#include <utils/common/singleton.h>
 
 #include "module_information.h"
 #include "networkoptixmodulerevealcommon.h"
@@ -28,7 +30,7 @@ class AbstractDatagramSocket;
 
     \note Requests are sent via all available local network interfaces
 */
-class QnModuleFinder : public QnLongRunnable {
+class QnModuleFinder : public QnLongRunnable, public Singleton<QnModuleFinder> {
     Q_OBJECT
 public:
     //!Creates socket and binds it to random unused udp port
@@ -93,6 +95,7 @@ private:
         ModuleContext(const RevealResponse &response);
     };
 
+    mutable QMutex m_mutex;
     PollSet m_pollSet;
     QList<AbstractDatagramSocket*> m_clientSockets;
     UDPSocket *m_serverSocket;

@@ -108,6 +108,7 @@ extern "C"
 #include "ui/dialogs/message_box.h"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
+#include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
 
 #ifdef Q_OS_MAC
@@ -460,7 +461,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     //clientMessageProcessor->init(QnAppServerConnectionFactory::getConnection2());
+
+    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true));
+    moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
+    moduleFinder->start();
+
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
+    globalModuleFinder->setModuleFinder(moduleFinder.data());
 
     qnSettings->save();
     if (!QDir(qnSettings->mediaFolder()).exists())

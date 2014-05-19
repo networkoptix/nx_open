@@ -100,7 +100,6 @@ private:
     QnConnectionInfoPtr m_connectInfo;
 
     QnRenderingWidget *m_renderingWidget;
-    QnModuleFinder *m_moduleFinder;
 
     struct QnEcData {
         QUrl url;
