@@ -159,12 +159,15 @@ CREATE TABLE "vms_kvpair" (
 
 CREATE TABLE "vms_layout" (
     "user_can_edit" bool NOT NULL DEFAULT 0,
-    "cell_spacing_height" real NOT NULL DEFAULT -1.0, "locked" bool NOT NULL DEFAULT 0,
-    "cell_aspect_ratio" real NOT NULL DEFAULT -1.0, "user_id" integer NOT NULL,
+    "cell_spacing_height" real NOT NULL DEFAULT -1.0,
+    "locked" bool NOT NULL DEFAULT 0,
+    "cell_aspect_ratio" real NOT NULL DEFAULT -1.0,
+    "user_id" integer NOT NULL,
     "background_width" integer NOT NULL DEFAULT 1,
     "background_image_filename" varchar(1024),
     "background_height" integer NOT NULL DEFAULT 1,
-    "cell_spacing_width" real NOT NULL DEFAULT -1.0, "background_opacity" real NOT NULL,
+    "cell_spacing_width" real NOT NULL DEFAULT -1.0, 
+    "background_opacity" real NOT NULL,
     "resource_ptr_id" integer PRIMARY KEY autoincrement );
 
 
