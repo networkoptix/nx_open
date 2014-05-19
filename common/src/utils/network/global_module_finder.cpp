@@ -1,6 +1,6 @@
 #include "global_module_finder.h"
 
-#include <utils/network/modulefinder.h>
+#include <utils/network/module_finder.h>
 #include <common/common_module.h>
 #include <api/app_server_connection.h>
 #include <nx_ec/data/api_module_data.h>

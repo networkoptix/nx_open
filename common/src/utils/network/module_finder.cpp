@@ -2,7 +2,7 @@
 * 30 oct 2012
 * a.kolesnikov
 ***********************************************************/
-#include "modulefinder.h"
+#include "module_finder.h"
 
 #include <memory>
 

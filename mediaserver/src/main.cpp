@@ -124,7 +124,7 @@
 #include <utils/network/multicodec_rtp_reader.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
-#include <utils/network/modulefinder.h>
+#include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
 
 
@@ -140,7 +140,6 @@
 #include "plugins/resources/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
-#include "utils/network/modulefinder.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
 #include "compatibility.h"

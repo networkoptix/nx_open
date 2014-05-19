@@ -9,7 +9,7 @@
 
 #include <QtCore/QMutexLocker>
 
-#include <utils/network/modulefinder.h>
+#include <utils/network/module_finder.h>
 
 QnFoundEnterpriseControllersModel::QnFoundEnterpriseControllersModel(QnModuleFinder* const finder) {
     connect(finder,     &QnModuleFinder::moduleFound,   this,   &QnFoundEnterpriseControllersModel::remoteModuleFound,  Qt::DirectConnection);
