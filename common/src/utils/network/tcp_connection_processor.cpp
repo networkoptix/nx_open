@@ -161,11 +161,7 @@ bool QnTCPConnectionProcessor::sendData(const char* data, int size)
 QString QnTCPConnectionProcessor::extractPath() const
 {
     Q_D(const QnTCPConnectionProcessor);
-#ifdef USE_NX_HTTP
     return d->request.requestLine.url.path();
-#else
-    return extractPath(d->requestHeaders.path());
-#endif
 }
 
 QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
@@ -183,7 +179,6 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
 {
     Q_D(QnTCPConnectionProcessor);
 
-#ifdef USE_NX_HTTP
     d->response.statusLine.version = d->request.requestLine.version;
     d->response.statusLine.statusCode = code;
     d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)code);
@@ -198,33 +193,11 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
         d->response.headers.insert( nx_http::HttpHeader( "Content-Length", QByteArray::number(d->responseBody.length()) ) );
 
     QByteArray response = d->response.toString();
-    response.replace(0,4,transport);    //TODO: #ak looks too bad. Add support for any protocol to nx_http (nx_http has to be renamed in this case)
+    response.replace(0,4,transport);    //TODO #ak: looks too bad. Add support for any protocol to nx_http (nx_http has to be renamed in this case)
     if (!d->responseBody.isEmpty())
     {
         response += d->responseBody;
     }
-#else
-    d->responseHeaders.setStatusLine(code, codeToMessage(code), d->requestHeaders.majorVersion(), d->requestHeaders.minorVersion());
-    if (d->chunkedMode)
-    {
-        d->responseHeaders.setValue(QLatin1String("Transfer-Encoding"), QLatin1String("chunked"));
-        d->responseHeaders.setContentType(QLatin1String(contentType));
-    }
-
-    if (!contentEncoding.isEmpty())
-        d->responseHeaders.setValue(QLatin1String("Content-Encoding"), QLatin1String(contentEncoding));
-    if (!contentType.isEmpty())
-        d->responseHeaders.setValue(QLatin1String("Content-Type"), QLatin1String(contentType));
-    if (!d->chunkedMode)
-        d->responseHeaders.setValue(QLatin1String("Content-Length"), QString::number(d->responseBody.length()));
-
-    QByteArray response = d->responseHeaders.toString().toUtf8();
-    response.replace(0,4,transport);
-    if (!d->responseBody.isEmpty())
-    {
-        response += d->responseBody;
-    }
-#endif
 
     if (displayDebug)
         NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getPeerAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
@@ -311,13 +284,8 @@ bool QnTCPConnectionProcessor::readRequest()
     Q_D(QnTCPConnectionProcessor);
 
     //QElapsedTimer globalTimeout;
-#ifdef USE_NX_HTTP
     d->request = nx_http::Request();
     d->response = nx_http::Response();
-#else
-    d->requestHeaders = QHttpRequestHeader();
-    d->responseHeaders = QHttpResponseHeader();
-#endif
     d->clientRequest.clear();
     d->requestBody.clear();
     d->responseBody.clear();
@@ -361,13 +329,7 @@ void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& oth
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const
 {
     Q_D(const QnTCPConnectionProcessor);
-#ifdef USE_NX_HTTP
     return d->request.requestLine.url;
-#else
-    QByteArray data = d->requestHeaders.path().toUtf8();
-    data = data.replace("+", "%20");
-    return QUrl::fromEncoded(data);
-#endif
 }
 
 void QnTCPConnectionProcessor::execute(QMutex& mutex)

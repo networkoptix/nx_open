@@ -77,13 +77,15 @@ private slots:
     void at_delayedOpenVideoWallItemAction_triggered();
     void at_renameAction_triggered();
     void at_identifyVideoWallAction_triggered();
-    void at_addVideoWallItemsToUserAction_triggered();
     void at_startVideoWallControlAction_triggered();
     void at_openVideoWallsReviewAction_triggered();
     void at_saveVideoWallReviewAction_triggered();
     void at_dropOnVideoWallItemAction_triggered();
     void at_pushMyScreenToVideowallAction_triggered();
     void at_videowallSettingsAction_triggered();
+    void at_saveVideowallMatrixAction_triggered();
+    void at_loadVideowallMatrixAction_triggered();
+    void at_deleteVideowallMatrixAction_triggered();
 
     void at_videoWall_layout_saved(int status, const QnResourceList &resources, int handle);
 

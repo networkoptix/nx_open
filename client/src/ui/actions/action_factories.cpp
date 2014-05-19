@@ -13,6 +13,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/actions/action_manager.h>

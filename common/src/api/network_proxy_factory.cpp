@@ -86,6 +86,11 @@ QPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
     return result;
 }
 
+
+Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
+//QPointer<QnNetworkProxyFactory> createGlobalProxyFactory();
+Q_GLOBAL_STATIC_WITH_ARGS(QPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, (createGlobalProxyFactory()));
+
 QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
 {
     QPointer<QnNetworkProxyFactory> *result = qn_globalProxyFactory();

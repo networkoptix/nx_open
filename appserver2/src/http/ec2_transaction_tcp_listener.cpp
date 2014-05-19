@@ -52,14 +52,14 @@ void QnTransactionTcpProcessor::run()
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
     bool isClient = query.hasQueryItem("isClient");
     QUuid remoteGuid  = query.queryItemValue(lit("guid"));
-    qint64 removeTime  = query.queryItemValue(lit("time")).toLongLong();
+    qint64 remoteTime  = query.queryItemValue(lit("time")).toLongLong();
     QByteArray remoteHwList = query.queryItemValue(lit("hwList")).toLocal8Bit();
     qint64 localTime = -1;
     qint64 timeDiff = 0;
     if (QnTransactionLog::instance()) {
         localTime = QnTransactionLog::instance()->getRelativeTime();
-        if (removeTime != -1)
-            timeDiff = removeTime - localTime;
+        if (remoteTime != -1)
+            timeDiff = remoteTime - localTime;
     }
 
     if (remoteGuid.isNull()) {
@@ -88,14 +88,15 @@ void QnTransactionTcpProcessor::run()
             return;
         }
         parseRequest();
+
+        d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
+        d->response.headers.insert(nx_http::HttpHeader("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds())));
     }
 
     query = QUrlQuery(d->request.requestLine.url.query());
     bool fail = query.hasQueryItem("canceled") || !QnTransactionTransport::tryAcquireConnected(remoteGuid, false);
     d->chunkedMode = true;
-    d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
-    d->response.headers.insert(nx_http::HttpHeader("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds())));
     sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
     if (fail) {
         QnTransactionTransport::connectingCanceled(remoteGuid, false);

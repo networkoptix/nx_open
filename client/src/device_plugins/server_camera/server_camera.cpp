@@ -66,11 +66,6 @@ QnAbstractStreamDataProvider* QnServerCamera::createLiveDataProvider()
     return result;
 }
 
-QString QnServerCamera::getUniqueId() const
-{
-    return getPhysicalId();
-}
-
 // --------------------------- QnServerCameraFactory -----------------------------
 
 QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const QnResourceParams&)

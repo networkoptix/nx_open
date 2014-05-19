@@ -77,6 +77,24 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         return false;
 }
 
+bool QnAuthHelper::authenticate( const QString& login, const QByteArray& digest ) const
+{
+    QMutexLocker lock(&m_mutex);
+    foreach(QnUserResourcePtr user, m_users)
+    {
+        if (user->getName().toLower() == login.toLower())
+            return user->getDigest() == digest;
+    }
+    return false;
+}
+
+QByteArray QnAuthHelper::createUserPasswordDigest( const QString& userName, const QString& password )
+{
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(QString(lit("%1:NetworkOptix:%2")).arg(userName, password).toLatin1());
+    return md5.result().toHex();
+}
+
 //!Splits \a data by \a delimiter not closed within quotes
 /*!
     E.g.: 

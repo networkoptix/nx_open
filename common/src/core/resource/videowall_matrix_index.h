@@ -1,5 +1,5 @@
-#ifndef VIDEOWALL_ITEM_INDEX_H
-#define VIDEOWALL_ITEM_INDEX_H
+#ifndef VIDEOWALL_MATRIX_INDEX_H
+#define VIDEOWALL_MATRIX_INDEX_H
 
 #include <QtCore/QMetaType>
 #include <QtCore/QUuid>
@@ -8,13 +8,13 @@
 #include <core/resource/resource_fwd.h>
 
 /**
- * This class contains all the necessary information to look up a videowall item.
+ * This class contains all the necessary information to look up a videowall matrix.
  */
-class QnVideoWallItemIndex {
+class QnVideoWallMatrixIndex {
 public:
-    QnVideoWallItemIndex() {}
+    QnVideoWallMatrixIndex() {}
 
-    QnVideoWallItemIndex(const QnVideoWallResourcePtr &videowall, const QUuid &uuid):
+    QnVideoWallMatrixIndex(const QnVideoWallResourcePtr &videowall, const QUuid &uuid):
         m_videowall(videowall), m_uuid(uuid)
     {}
 
@@ -43,8 +43,8 @@ private:
     QUuid m_uuid;
 };
 
-Q_DECLARE_METATYPE(QnVideoWallItemIndex)
-Q_DECLARE_METATYPE(QnVideoWallItemIndexList)
+Q_DECLARE_METATYPE(QnVideoWallMatrixIndex)
+Q_DECLARE_METATYPE(QnVideoWallMatrixIndexList)
 
 
-#endif // VIDEOWALL_ITEM_INDEX_H
+#endif // VIDEOWALL_MATRIX_INDEX_H

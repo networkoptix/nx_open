@@ -1,4 +1,3 @@
-
 #include "db_manager.h"
 
 #include "version.h"
@@ -1742,6 +1741,38 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     QnSql::fetch_many(queryScreens, &screens);
     mergeObjectListData(videowallList, screens, &ApiVideowallData::screens, &ApiVideowallScreenWithRefData::videowallGuid);
 
+
+    QSqlQuery queryMatrixItems(m_sdb);
+    queryMatrixItems.setForwardOnly(true);
+    queryMatrixItems.prepare("SELECT \
+                             item.matrix_guid as matrixGuid, \
+                             item.item_guid as itemGuid, \
+                             item.layout_guid as layoutGuid \
+                             FROM vms_videowall_matrix_items item");
+    if (!queryMatrixItems.exec()) {
+        qWarning() << Q_FUNC_INFO << queryMatrixItems.lastError().text();
+        return ErrorCode::failure;
+    }
+    std::vector<ApiVideowallMatrixItemWithRefData> matrixItems;
+    QnSql::fetch_many(queryMatrixItems, &matrixItems);
+
+    QSqlQuery queryMatrices(m_sdb);
+    queryMatrices.setForwardOnly(true);
+    queryMatrices.prepare("SELECT \
+                          matrix.guid as id, \
+                          matrix.name, \
+                          matrix.videowall_guid as videowallGuid \
+                          FROM vms_videowall_matrix matrix");
+    if (!queryMatrices.exec()) {
+        qWarning() << Q_FUNC_INFO << queryMatrices.lastError().text();
+        return ErrorCode::failure;
+    }
+    std::vector<ApiVideowallMatrixWithRefData> matrices;
+    QnSql::fetch_many(queryMatrices, &matrices);
+    mergeObjectListData(matrices, matrixItems, &ApiVideowallMatrixData::items, &ApiVideowallMatrixItemWithRefData::matrixGuid);
+
+    mergeObjectListData(videowallList, matrices, &ApiVideowallData::matrices, &ApiVideowallMatrixWithRefData::videowallGuid);
+
     return ErrorCode::ok;
 }
 
@@ -2076,6 +2107,10 @@ ErrorCode QnDbManager::saveVideowall(const ApiVideowallData& params) {
         return result;
 
     result = updateVideowallScreens(params);
+    if (result != ErrorCode::ok)
+        return result;
+
+    result = updateVideowallMatrices(params);
     return result;
 }
 
@@ -2100,7 +2135,6 @@ ErrorCode QnDbManager::updateVideowallItems(const ApiVideowallData& data) {
         }
     }
     return ErrorCode::ok;
-
 }
 
 ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowallData& data) {
@@ -2147,6 +2181,44 @@ ErrorCode QnDbManager::updateVideowallScreens(const ApiVideowallData& data) {
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::updateVideowallMatrices(const ApiVideowallData &data) {
+    ErrorCode result = deleteVideowallMatrices(data.id);
+    if (result != ErrorCode::ok)
+        return result;
+
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO vms_videowall_matrix \
+                     (guid, videowall_guid, name) \
+                     VALUES \
+                     (:id, :videowall_guid, :name)");
+
+    QSqlQuery insItemsQuery(m_sdb);
+    insItemsQuery.prepare("INSERT INTO vms_videowall_matrix_items \
+                     (matrix_guid, item_guid, layout_guid) \
+                     VALUES \
+                     (:matrix_guid, :itemGuid, :layoutGuid)");
+
+    foreach(const ApiVideowallMatrixData &matrix, data.matrices) {
+        QnSql::bind(matrix, &insQuery);
+        insQuery.bindValue(":videowall_guid", data.id.toRfc4122());
+
+        if (!insQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
+            return ErrorCode::failure;
+        }
+
+        insItemsQuery.bindValue(":matrix_guid", matrix.id.toRfc4122());
+        foreach(const ApiVideowallMatrixItemData &item, matrix.items) {
+            QnSql::bind(item, &insItemsQuery);
+            if (!insItemsQuery.exec()) {
+                qWarning() << Q_FUNC_INFO << insItemsQuery.lastError().text();
+                return ErrorCode::failure;
+            }    
+        }
+    }
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::deleteVideowallItems(const QnId &videowall_guid) {
     ErrorCode err = deleteTableRecord(videowall_guid, "vms_videowall_item", "videowall_guid");
     if (err != ErrorCode::ok)
@@ -2169,6 +2241,24 @@ ErrorCode QnDbManager::deleteVideowallItems(const QnId &videowall_guid) {
             return ErrorCode::failure;
         }
     }
+
+    return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::deleteVideowallMatrices(const QnId &videowall_guid) {
+    ErrorCode err = deleteTableRecord(videowall_guid, "vms_videowall_matrix", "videowall_guid");
+    if (err != ErrorCode::ok)
+        return err;
+
+    { // delete unused matrix items
+        QSqlQuery delQuery(m_sdb);
+        delQuery.prepare("DELETE FROM vms_videowall_matrix_items WHERE matrix_guid NOT IN (SELECT guid from vms_videowall_matrix) ");
+        if (!delQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+            return ErrorCode::failure;
+        }
+    }
+
     return ErrorCode::ok;
 }
 
@@ -2176,6 +2266,10 @@ ErrorCode QnDbManager::removeVideowall(const QnId& guid) {
     qint32 id = getResourceInternalId(guid);
 
     ErrorCode err = deleteAddParams(id);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteVideowallMatrices(guid);
     if (err != ErrorCode::ok)
         return err;
 

@@ -60,9 +60,15 @@ namespace ec2
             const QnConnectionInfo& connectionInfo,
             const QUrl& ecURL,
             impl::TestConnectionHandlerPtr handler );
+        ErrorCode processRemoteTestConnectionRequest(
+            const ApiLoginData& loginInfo,
+            QnConnectionInfo* const connectionInfo );
+        ErrorCode processRemoteConnectionRequest(
+            const ApiLoginData& loginInfo,
+            QnConnectionInfo* const connectionInfo );
         //!Called on server side to handle connection request from remote host
         ErrorCode fillConnectionInfo(
-            const LoginInfo& loginInfo,
+            const ApiLoginData& loginInfo,
             QnConnectionInfo* const connectionInfo );
         int testDirectConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );
         int testRemoteConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );

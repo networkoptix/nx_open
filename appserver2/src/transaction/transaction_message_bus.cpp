@@ -620,7 +620,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     transport->setState(QnTransactionTransport::Connected);
     transport->setTimeDiff(timediff);
 
-    // send fullsync to a client immediatly
+    // send fullsync to a client immediately
     if (isClient) 
     {
         transport->setWriteSync(true);

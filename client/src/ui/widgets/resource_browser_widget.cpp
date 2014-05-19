@@ -24,6 +24,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_item_index.h>
 #include <core/resource/videowall_item_index.h>
+#include <core/resource/videowall_matrix_index.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -420,6 +421,21 @@ QnVideoWallItemIndexList QnResourceBrowserWidget::selectedVideoWallItems() const
     return result;
 }
 
+QnVideoWallMatrixIndexList QnResourceBrowserWidget::selectedVideoWallMatrices() const {
+    QnVideoWallMatrixIndexList result;
+
+    foreach (const QModelIndex &modelIndex, currentSelectionModel()->selectedRows()) {
+        QUuid uuid = modelIndex.data(Qn::ItemUuidRole).value<QUuid>();
+        if(uuid.isNull())
+            continue;
+        QnVideoWallMatrixIndex index = qnResPool->getVideoWallMatrixByUuid(uuid);
+        if (!index.isNull())
+            result.push_back(index);
+    }
+
+    return result;
+}
+
 Qn::ActionScope QnResourceBrowserWidget::currentScope() const {
     return Qn::TreeScope;
 }
@@ -431,8 +447,11 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
     QItemSelectionModel *selectionModel = currentSelectionModel();
 
     Qn::NodeType nodeType = selectionModel->currentIndex().data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if(nodeType == Qn::VideoWallItemNode || nodeType == Qn::UserVideoWallItemNode)
+    if(nodeType == Qn::VideoWallItemNode)
         return QVariant::fromValue(selectedVideoWallItems());
+
+    if (nodeType == Qn::VideoWallMatrixNode)
+        return QVariant::fromValue(selectedVideoWallMatrices());
 
     if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QUuid>().isNull()) /* If it's a layout item. */
         return QVariant::fromValue(selectedLayoutItems());

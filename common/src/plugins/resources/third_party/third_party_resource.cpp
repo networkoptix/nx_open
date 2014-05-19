@@ -291,7 +291,7 @@ bool QnThirdPartyResource::hasDualStreaming() const
 nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder( int encoderIndex ) const
 {
     QMutexLocker lk( &m_mutex );
-    if( encoderIndex < m_selectedEncoderResolutions.size() )
+    if( (size_t)encoderIndex < m_selectedEncoderResolutions.size() )
         return m_selectedEncoderResolutions[encoderIndex];
     return nxcip::Resolution();
 }

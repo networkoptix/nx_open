@@ -51,6 +51,8 @@ public:
 
     QnActionParameters(const QnVideoWallItemIndexList &videoWallItems, const ArgumentHash &arguments = ArgumentHash());
 
+    QnActionParameters(const QnVideoWallMatrixIndexList &videoWallMatrices, const ArgumentHash &arguments = ArgumentHash());    
+
     QVariant items() const {
         return argument(-1);
     }
@@ -70,6 +72,8 @@ public:
     QnLayoutItemIndexList layoutItems(int key = -1) const;
 
     QnVideoWallItemIndexList videoWallItems(int key = -1) const;
+
+    QnVideoWallMatrixIndexList videoWallMatrices(int key = -1) const;
 
     QnWorkbenchLayoutList layouts(int key = -1) const;
 

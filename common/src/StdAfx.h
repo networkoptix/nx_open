@@ -81,9 +81,6 @@ extern "C" {
 #include <QtGui/QFont>
 #include <QtGui/QFontMetrics>
 #include <QtNetwork/QHostAddress>
-#ifndef USE_NX_HTTP
-#include <QHttp>
-#endif
 #include <QtCore/QIODevice>
 #include <QtGui/QKeyEvent>
 #include <QtCore/QList>

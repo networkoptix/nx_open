@@ -85,7 +85,8 @@ QUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookma
 ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QUuid& hash, const QByteArray& data)
 {
     Q_ASSERT_X(!tran.id.peerGUID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
-    Q_ASSERT(tran.id.peerGUID != qnCommon->moduleGUID() || tran.timestamp > 0);
+    //Q_ASSERT(tran.id.peerGUID != qnCommon->moduleGUID() || tran.timestamp > 0);
+        //if we clean DB we can receive our old transaction with negative timestamp
 
     QSqlQuery query(m_dbManager->getDB());
     //query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, sequence, timestamp, tran_guid, tran_data) values (?, ?, ?, ?, ?)");

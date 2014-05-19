@@ -21,6 +21,9 @@ public:
     static QnAuthHelper* instance();
     
     bool authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false);
+    bool authenticate( const QString& login, const QByteArray& digest ) const;
+
+    static QByteArray createUserPasswordDigest( const QString& userName, const QString& password );
 
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &);
@@ -35,7 +38,7 @@ private:
     bool doCustomAuthorization(const QByteArray& authData, nx_http::Response& response, const QByteArray& sesionKey);
 
 private:
-    QMutex m_mutex;
+    mutable QMutex m_mutex;
     static QnAuthHelper* m_instance;
     //QMap<QByteArray, QElapsedTimer> m_nonces;
     QMap<QnId, QnUserResourcePtr> m_users;

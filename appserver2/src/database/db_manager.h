@@ -234,6 +234,8 @@ namespace ec2
         ErrorCode updateVideowallItems(const ApiVideowallData& data);
         ErrorCode updateVideowallScreens(const ApiVideowallData& data);
         ErrorCode removeLayoutFromVideowallItems(const QnId &layout_id);
+        ErrorCode deleteVideowallMatrices(const QnId &videowall_guid);
+        ErrorCode updateVideowallMatrices(const ApiVideowallData &data);
 
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);

@@ -11,18 +11,21 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 
+#include <utils/common/connective.h>
+
 class QnResourceModelPrivate;
 class QnResourcePool;
 class QnLayoutItemData;
 class QnVideoWallItem;
+class QnVideoWallMatrix;
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
 class QnResourcePoolModelNode;
 
-class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContextAware {
+class QnResourcePoolModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware {
     Q_OBJECT
 
-    typedef QAbstractItemModel base_type;
+    typedef Connective<QAbstractItemModel> base_type;
 public:
     explicit QnResourcePoolModel(Qn::NodeType rootNodeType = Qn::RootNode, bool isFlat = false, QObject *parent = NULL);
     virtual ~QnResourcePoolModel();
@@ -73,15 +76,15 @@ private slots:
 
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
     void at_resource_resourceChanged(const QnResourcePtr &resource);
-    void at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
-    void at_resource_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
+
+    void at_layout_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
+    void at_layout_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
 
     void at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
     void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
 
-    void at_user_videoWallItemAdded(const QnUserResourcePtr &user, const QUuid &uuid);
-    void at_user_videoWallItemRemoved(const QnUserResourcePtr &user, const QUuid &uuid);
-
+    void at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
+    void at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
 
     void at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera);
 private:
