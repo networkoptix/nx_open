@@ -92,7 +92,8 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
 {
     assert(model != NULL);
     assert(nodeType == Qn::ResourceNode ||
-           nodeType == Qn::EdgeNode);
+           nodeType == Qn::EdgeNode ||
+           nodeType == Qn::IncompatibleServerNode);
 
     setResource(resource);
 
@@ -133,8 +134,11 @@ void QnResourcePoolModelNode::clear() {
     if (m_type == Qn::ItemNode ||
         m_type == Qn::ResourceNode || 
         m_type == Qn::VideoWallItemNode || 
-        m_type == Qn::EdgeNode)
+        m_type == Qn::EdgeNode ||
+        m_type == Qn::IncompatibleServerNode)
+    {
         setResource(QnResourcePtr());
+    }
 }
 
 void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
@@ -142,7 +146,8 @@ void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
         m_type == Qn::ItemNode ||
         m_type == Qn::ResourceNode || 
         m_type == Qn::VideoWallItemNode || 
-        m_type == Qn::EdgeNode);
+        m_type == Qn::EdgeNode ||
+        m_type == Qn::IncompatibleServerNode);
 
     if(m_resource == resource)
         return;
@@ -160,7 +165,7 @@ void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
 
 void QnResourcePoolModelNode::update() {
     /* Update stored fields. */
-    if(m_type == Qn::ResourceNode || m_type == Qn::ItemNode || m_type == Qn::EdgeNode) {
+    if(m_type == Qn::ResourceNode || m_type == Qn::ItemNode || m_type == Qn::EdgeNode || m_type == Qn::IncompatibleServerNode) {
         if(m_resource.isNull()) {
             m_displayName = m_name = QString();
             m_flags = 0;
@@ -233,6 +238,9 @@ void QnResourcePoolModelNode::update() {
         bastard = true;
         break;
     case Qn::RecorderNode:
+        bastard = m_children.size() == 0;
+        break;
+    case Qn::SystemNode:
         bastard = m_children.size() == 0;
         break;
     default:

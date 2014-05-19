@@ -104,6 +104,9 @@ public:
      */
     QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QUuid> &uuids) const;
 
+    QnResourcePtr getIncompatibleResourceById(const QnId &id) const;
+    QnResourceList getAllIncompatibleResources() const;
+
     QStringList allTags() const;
 
     int activeCamerasByClass(bool analog) const;
@@ -132,6 +135,7 @@ private:
     bool m_tranInProgress;
     QnResourceList m_tmpResources;
     QHash<QString, QnResourcePtr> m_resources;
+    QHash<QString, QnResourcePtr> m_incompatibleResources;
 
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource

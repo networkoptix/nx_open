@@ -116,11 +116,13 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
 
     QHash<QnResourcePtr, QnResourcePoolModelNode *>::iterator pos = m_resourceNodeByResource.find(resource);
     if(pos == m_resourceNodeByResource.end()) {
-        Qn::NodeType nodeType = QnMediaServerResource::isEdgeServer(resource->getParentResource())
-            ? Qn::EdgeNode
-            : Qn::ResourceNode;
-        pos = m_resourceNodeByResource.insert(resource, new QnResourcePoolModelNode(this, resource, nodeType));
+        Qn::NodeType nodeType = Qn::ResourceNode;
+        if (resource->getStatus() == QnResource::Incompatible)
+            nodeType = Qn::IncompatibleServerNode;
+        else if (QnMediaServerResource::isEdgeServer(resource->getParentResource()))
+            nodeType = Qn::EdgeNode;
 
+        pos = m_resourceNodeByResource.insert(resource, new QnResourcePoolModelNode(this, resource, nodeType));
     }
     return *pos;
 }
@@ -212,7 +214,7 @@ void QnResourcePoolModel::deleteNode(Qn::NodeType nodeType, const QUuid &uuid, c
 }
 
 QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModelNode *node) {
-    assert(node->type() == Qn::ResourceNode || node->type() == Qn::EdgeNode);
+    assert(node->type() == Qn::ResourceNode || node->type() == Qn::EdgeNode || node->type() == Qn::IncompatibleServerNode);
 
     if(!node->resource())
         return m_rootNodes[m_rootNodeType];

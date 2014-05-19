@@ -107,12 +107,17 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, resources)
     {
+        bool incompatible = resource->getStatus() == QnResource::Incompatible;
+
         if( insertOrUpdateResource(
                 resource,
-                &m_resources ) )
+                incompatible ? &m_incompatibleResources : &m_resources ) )
         {
             newResources.insert(resource->getId(), resource);
         }
+
+        if (!incompatible)
+            m_incompatibleResources.remove(resource->getUniqueId());
     }
 
     m_resourcesMtx.unlock();
@@ -514,4 +519,14 @@ QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QUu
             result << index;
     }
     return result;
+}
+
+QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QnId &id) const {
+    QMutexLocker locker(&m_resourcesMtx);
+    return m_incompatibleResources.value(id.toString());
+}
+
+QnResourceList QnResourcePool::getAllIncompatibleResources() const {
+    QMutexLocker locker(&m_resourcesMtx);
+    return m_incompatibleResources.values();
 }
