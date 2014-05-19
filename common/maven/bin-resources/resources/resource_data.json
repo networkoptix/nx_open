@@ -54,6 +54,13 @@
         },
         {
             "keys": [
+		"VISTA|*PTW"
+            ],
+            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
+            "onvifPanFlipped": true
+        },
+        {
+            "keys": [
                 "DW|DWC-MPTZ20X"
             ],
             "ptzMapper": {

@@ -29,6 +29,9 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
         if(ptzCapabilities == lit("NoPtzCapabilities")) {
             m_overrideCapabilities = true;
             m_capabilities = Qn::NoPtzCapabilities;
+        } else if(ptzCapabilities == lit("ContinuousPanCapability|ContinuousTiltCapability")) {
+            m_overrideCapabilities = true;
+            m_capabilities = Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability;
         } else if(ptzCapabilities == lit("ContinuousZoomCapability")) {
             m_overrideCapabilities = true;
             m_capabilities = Qn::ContinuousZoomCapability;
