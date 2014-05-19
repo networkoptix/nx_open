@@ -29,6 +29,10 @@ QnMediaServerResourcePtr makeResource(const QnModuleInformation &moduleInformati
     return server;
 }
 
+bool isSuitable(const QnModuleInformation &moduleInformation) {
+    return moduleInformation.version >= QnSoftwareVersion(2, 3, 0, 0);
+}
+
 } // anonymous namespace
 
 QnIncompatibleServerAdder::QnIncompatibleServerAdder(QObject *parent) :
@@ -53,6 +57,10 @@ void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &module
 
     // don't touch normal servers
     if (server && server->getStatus() != QnResource::Incompatible)
+        return;
+
+    // don't add servers having version < 2.3 because they cannot be connected to the system anyway
+    if (!isSuitable(moduleInformation))
         return;
 
     QnMediaServerResourcePtr newServer = makeResource(moduleInformation);
