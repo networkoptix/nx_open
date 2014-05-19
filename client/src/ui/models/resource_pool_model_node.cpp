@@ -395,6 +395,9 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
     case Qn::RecorderNode:
         result |= Qt::ItemIsDragEnabled | Qt::ItemIsEditable;
         break;
+    case Qn::IncompatibleServerNode:
+        result |= Qt::ItemIsDragEnabled;
+        break;
     default:
         break;
     }

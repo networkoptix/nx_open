@@ -420,6 +420,19 @@ QnVideoWallItemIndexList QnResourceBrowserWidget::selectedVideoWallItems() const
     return result;
 }
 
+QnResourceList QnResourceBrowserWidget::selectedIncompatibleServers() const {
+    QnResourceList result;
+
+    foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
+        if (index.data(Qn::NodeTypeRole).value<Qn::NodeType>() != Qn::IncompatibleServerNode)
+            continue;
+
+        result.append(index.data(Qn::ResourceRole).value<QnResourcePtr>());
+    }
+
+    return result;
+}
+
 Qn::ActionScope QnResourceBrowserWidget::currentScope() const {
     return Qn::TreeScope;
 }
@@ -436,6 +449,9 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
 
     if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QUuid>().isNull()) /* If it's a layout item. */
         return QVariant::fromValue(selectedLayoutItems());
+
+    if(nodeType == Qn::IncompatibleServerNode)
+        return QVariant::fromValue(selectedIncompatibleServers());
 
     return QVariant::fromValue(selectedResources());
 }

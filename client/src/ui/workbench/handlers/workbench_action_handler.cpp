@@ -223,6 +223,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
     connect(action(Qn::SystemAdministrationAction),             SIGNAL(triggered()),    this,   SLOT(at_systemAdministrationAction_triggered()));
+    connect(action(Qn::ConnectToCurrentSystem),                 SIGNAL(triggered()),    this,   SLOT(at_connectToCurrentSystemAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
@@ -1381,6 +1382,10 @@ void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
     systemAdministrationDialog()->show();
     if (newlyCreated)
         systemAdministrationDialog()->setGeometry(oldGeometry);
+}
+
+void QnWorkbenchActionHandler::at_connectToCurrentSystemAction_triggered() {
+
 }
 
 void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {

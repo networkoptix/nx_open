@@ -115,6 +115,18 @@ private:
     QList<QnActionCondition*> m_conditions;
 };
 
+class QnNegativeActionCondition: public QnActionCondition {
+public:
+    QnNegativeActionCondition(QnActionCondition *condition, QObject *parent = NULL) : QnActionCondition(parent), m_condition(condition) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+    virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+    virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts) override;
+private:
+    QnActionCondition *m_condition;
+};
 
 /**
  * Condition for a single resource widget that checks its zoomed state.

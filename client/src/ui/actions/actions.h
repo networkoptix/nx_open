@@ -673,6 +673,11 @@ namespace Qn {
          */
         ToggleRadassAction,
 
+        /**
+         * Connect incompatible server to current system
+         */
+        ConnectToCurrentSystem,
+
         /* PTZ Actions */
 
         /**

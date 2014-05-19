@@ -140,6 +140,46 @@ Qn::ActionVisibility QnConjunctionActionCondition::check(const QnWorkbenchLayout
     return result;
 }
 
+Qn::ActionVisibility QnNegativeActionCondition::check(const QnActionParameters &parameters) {
+    Qn::ActionVisibility result = m_condition->check(parameters);
+    if (result == Qn::InvisibleAction)
+        return Qn::EnabledAction;
+    else
+        return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnNegativeActionCondition::check(const QnResourceList &resources) {
+    Qn::ActionVisibility result = m_condition->check(resources);
+    if (result == Qn::InvisibleAction)
+        return Qn::EnabledAction;
+    else
+        return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnNegativeActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
+    Qn::ActionVisibility result = m_condition->check(layoutItems);
+    if (result == Qn::InvisibleAction)
+        return Qn::EnabledAction;
+    else
+        return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnNegativeActionCondition::check(const QnResourceWidgetList &widgets) {
+    Qn::ActionVisibility result = m_condition->check(widgets);
+    if (result == Qn::InvisibleAction)
+        return Qn::EnabledAction;
+    else
+        return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnNegativeActionCondition::check(const QnWorkbenchLayoutList &layouts) {
+    Qn::ActionVisibility result = m_condition->check(layouts);
+    if (result == Qn::InvisibleAction)
+        return Qn::EnabledAction;
+    else
+        return Qn::InvisibleAction;
+}
+
 Qn::ActionVisibility QnItemZoomedActionCondition::check(const QnResourceWidgetList &widgets) {
     if(widgets.size() != 1 || !widgets[0])
         return Qn::InvisibleAction;
@@ -312,6 +352,9 @@ Qn::ActionVisibility QnRenameActionCondition::check(const QnActionParameters &pa
 
     if (nodeType == Qn::RecorderNode)
         return Qn::EnabledAction;
+
+    if (nodeType == Qn::IncompatibleServerNode)
+        return Qn::InvisibleAction;
 
     return parameters.resources().size() == 1
             ? QnEdgeServerCondition::check(parameters.resources())
@@ -560,6 +603,9 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     bool isExportedLayout = snapshotManager()->isFile(layout);
 
     foreach (const QnResourcePtr &resource, resources) {
+        if (resource->getStatus() == QnResource::Incompatible)
+            continue;
+
         //TODO: #GDM refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
         bool isVideowall = resource->hasFlags(QnResource::videowall);
