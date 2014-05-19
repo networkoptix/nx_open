@@ -8,11 +8,12 @@
 
 #include <utils/common/system_information.h>
 #include <utils/common/software_version.h>
+#include <utils/common/singleton.h>
 
 class QFile;
 class QIODevice;
 
-class QnServerUpdateTool : public QObject {
+class QnServerUpdateTool : public QObject, public Singleton<QnServerUpdateTool> {
     Q_OBJECT
 public:
     struct UpdateInformation {
@@ -20,17 +21,13 @@ public:
         QnSoftwareVersion version;
     };
 
-    static QnServerUpdateTool *instance();
+    QnServerUpdateTool();
+    ~QnServerUpdateTool();
 
     bool addUpdateFile(const QString &updateId, const QByteArray &data);
     bool addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset);
     bool installUpdate(const QString &updateId);
     bool uploadAndInstallUpdate(const QString &updateId, const QByteArray &data, const QString &targetId);
-
-    ~QnServerUpdateTool();
-
-protected:
-    explicit QnServerUpdateTool();
 
 private:
     bool processUpdate(const QString &updateId, QIODevice *ioDevice);
@@ -40,8 +37,6 @@ private:
     void clearUpdatesLocation();
 
 private:
-    static QnServerUpdateTool *m_instance;
-
     QString m_updateId;
     QScopedPointer<QFile> m_file;
 

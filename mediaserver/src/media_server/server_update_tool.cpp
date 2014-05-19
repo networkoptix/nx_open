@@ -114,18 +114,9 @@ namespace {
 
 } // anonymous namespace
 
-QnServerUpdateTool *QnServerUpdateTool::m_instance = NULL;
-
 QnServerUpdateTool::QnServerUpdateTool() : m_length(-1), m_replyTime(0) {}
 
 QnServerUpdateTool::~QnServerUpdateTool() {}
-
-QnServerUpdateTool *QnServerUpdateTool::instance() {
-    if (!m_instance)
-        m_instance = new QnServerUpdateTool();
-
-    return m_instance;
-}
 
 bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice) {
     QuaZip zip(ioDevice);

@@ -126,6 +126,7 @@
 #include <utils/network/ssl_socket.h>
 #include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
+#include <media_server/server_update_tool.h>
 
 
 #include <media_server/server_message_processor.h>
@@ -676,7 +677,6 @@ QnMain::QnMain(int argc, char* argv[])
     m_argv(argv),
     m_startMessageSent(false),
     m_firstRunningTime(0),
-    m_moduleFinder(0),
     m_rtspListener(0),
     m_restServer(0),
     m_progressiveDownloadingServer(0),
@@ -745,12 +745,6 @@ void QnMain::stopObjects()
     {
         delete m_rtspListener;
         m_rtspListener = 0;
-    }
-
-    if (m_moduleFinder)
-    {
-        delete m_moduleFinder;
-        m_moduleFinder = 0;
     }
 
 }
@@ -1354,25 +1348,27 @@ void QnMain::run()
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
 
-    m_moduleFinder = new QnModuleFinder(false);
+    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(false));
     //if (cmdLineArguments.devModeKey == lit("raz-raz-raz"))
-        m_moduleFinder->setCompatibilityMode(true);
-    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
-    QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
+        moduleFinder->setCompatibilityMode(true);
+    QObject::connect(moduleFinder.data(),   &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
+    QObject::connect(moduleFinder.data(),   &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
 
     QUrl url = ec2Connection->connectionInfo().ecUrl;
 #if 1
     if (url.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
         qnCommon->setCloudMode(true);
-        m_moduleFinder->start();
+        moduleFinder->start();
     }
 #endif
     // ------------------------------------------
 
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
     globalModuleFinder->setConnection(ec2Connection);
-    globalModuleFinder->setModuleFinder(m_moduleFinder);
+    globalModuleFinder->setModuleFinder(moduleFinder.data());
+
+    QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
 
     //===========================================================================
     //IPPH264Decoder::dll.init();
