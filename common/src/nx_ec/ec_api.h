@@ -745,7 +745,7 @@ namespace ec2
     };
     typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
 
-    class AbstractModuleInformationManager : public QObject {
+    class AbstractMiscManager : public QObject {
         Q_OBJECT
     public:
         template<class TargetType, class HandlerType> int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, TargetType *target, HandlerType handler) {
@@ -753,13 +753,20 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
+        template<class TargetType, class HandlerType> int changeSystemName(const QString &targetId, const QString &systemName, const QnId &peerId, TargetType *target, HandlerType handler) {
+            return sendModuleInformation(targetId, systemName, peerId, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
     signals:
         void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer);
+        void changeSystemNameRequested(const QString &targetId, const QString &systemName);
 
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) = 0;
+        virtual int changeSystemName(const QString &targetId, const QString &systemName, const QnId &peerId, impl::SimpleHandlerPtr handler) = 0;
     };
-    typedef std::shared_ptr<AbstractModuleInformationManager> AbstractModuleInformationManagerPtr;
+    typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -793,7 +800,7 @@ namespace ec2
         virtual AbstractVideowallManagerPtr getVideowallManager() = 0;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() = 0;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() = 0;
-        virtual AbstractModuleInformationManagerPtr getModuleInformationManager() = 0;
+        virtual AbstractMiscManagerPtr getMiscManager() = 0;
 
         /*!
             \param handler Functor with params: (ErrorCode)

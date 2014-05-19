@@ -78,6 +78,11 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode saveTransaction(const QnTransaction<ApiSystemNameData>& , const QByteArray&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
         qint64 getRelativeTime() const;
         void init();
 
@@ -119,6 +124,7 @@ namespace ec2
         QUuid transactionHash(const ApiUpdateUploadResponceData& ) const       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiUpdateUploadAndInstallData& ) const     { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiModuleData& ) const                     { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiSystemNameData& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);

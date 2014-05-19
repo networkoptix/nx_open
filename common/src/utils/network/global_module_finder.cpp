@@ -12,12 +12,12 @@ QnGlobalModuleFinder::QnGlobalModuleFinder(QObject *parent) :
 
 void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &connection) {
     if (m_connection)
-        disconnect(m_connection->getModuleInformationManager().get(),   &ec2::AbstractModuleInformationManager::moduleChanged,  this,   &QnGlobalModuleFinder::at_moduleChanged);
+        disconnect(m_connection->getMiscManager().get(),   &ec2::AbstractMiscManager::moduleChanged,  this,   &QnGlobalModuleFinder::at_moduleChanged);
 
     m_connection = connection;
 
     if (connection)
-        connect(connection->getModuleInformationManager().get(),        &ec2::AbstractModuleInformationManager::moduleChanged,  this,   &QnGlobalModuleFinder::at_moduleChanged);
+        connect(connection->getMiscManager().get(),        &ec2::AbstractMiscManager::moduleChanged,  this,   &QnGlobalModuleFinder::at_moduleChanged);
 }
 
 void QnGlobalModuleFinder::setModuleFinder(QnModuleFinder *moduleFinder) {

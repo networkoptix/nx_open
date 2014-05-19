@@ -201,6 +201,11 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiSystemNameData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
         ErrorCode deleteTableRecord(const QnId& id, const QString& tableName, const QString& fieldName);
         ErrorCode deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName);
 

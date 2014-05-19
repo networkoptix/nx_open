@@ -174,8 +174,11 @@ namespace ec2
         //AbstractUpdatesManager::uploadAndInstallUpdate
         registerUpdateFuncHandler<ApiUpdateUploadAndInstallData>( restProcessorPool, ApiCommand::uploadAndInstallUpdate );
 
-        //AbstractModuleInformationManager::moduleInfo
+        //AbstractMiscManager::moduleInfo
         registerUpdateFuncHandler<ApiModuleData>(restProcessorPool, ApiCommand::moduleInfo);
+
+        //AbstractMiscManager::changeSystemName
+        registerUpdateFuncHandler<ApiSystemNameData>(restProcessorPool, ApiCommand::changeSystemName);
 
         //ApiResourceParamList
         registerGetFuncHandler<nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );
