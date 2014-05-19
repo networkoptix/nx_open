@@ -94,7 +94,9 @@ namespace ec2
 
             return errorCode == ErrorCode::ok
                 ? nx_http::StatusCode::ok
-                : nx_http::StatusCode::internalServerError;
+                : (errorCode == ErrorCode::unauthorized
+                   ? nx_http::StatusCode::unauthorized
+                   : nx_http::StatusCode::internalServerError);
         }
 
         //!Implementation of QnRestRequestHandler::executePost
