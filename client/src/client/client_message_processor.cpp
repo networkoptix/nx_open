@@ -7,12 +7,14 @@
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
 #include "device_plugins/server_camera/server_camera.h"
+#include "utils/incompatible_server_adder.h"
 
 #include "version.h"
 
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),
-    m_opened(false)
+    m_opened(false),
+    m_incompatibleServerAdder(NULL)
 {
 }
 
@@ -150,7 +152,12 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData data, b
 
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
+    if (m_incompatibleServerAdder)
+        delete m_incompatibleServerAdder;
+
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     QnResourceDiscoveryManager::instance()->setReady(true);
     //emit connectionOpened();
+
+    m_incompatibleServerAdder = new QnIncompatibleServerAdder(this);
 }

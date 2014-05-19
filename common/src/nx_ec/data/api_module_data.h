@@ -11,11 +11,12 @@ namespace ec2 {
         QString systemName;
         QString version;
         QString systemInformation;
+        QStringList addresses;
         int port;
         bool isAlive;
     };
 
-#define ApiModuleData_Fields (type)(id)(systemName)(version)(systemInformation)(port)(isAlive)
+#define ApiModuleData_Fields (type)(id)(systemName)(version)(systemInformation)(addresses)(port)(isAlive)
 
 } // namespace ec2
 

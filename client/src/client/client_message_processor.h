@@ -6,6 +6,8 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 
+class QnIncompatibleServerAdder;
+
 class QnClientMessageProcessor : public QnCommonMessageProcessor
 {
     Q_OBJECT
@@ -21,6 +23,7 @@ protected:
     virtual void processResources(const QnResourceList& resources) override;
 private:
     bool m_opened;
+    QnIncompatibleServerAdder *m_incompatibleServerAdder;
 private slots:
     void at_remotePeerFound(ec2::ApiServerAliveData, bool isProxy);
     void at_remotePeerLost(ec2::ApiServerAliveData, bool isProxy);

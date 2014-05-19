@@ -136,6 +136,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
         m_moduleFinder->setCompatibilityMode(true);
     connect(m_moduleFinder,     &QnModuleFinder::moduleFound,     this,   &QnLoginDialog::at_moduleFinder_moduleFound);
     connect(m_moduleFinder,     &QnModuleFinder::moduleLost,      this,   &QnLoginDialog::at_moduleFinder_moduleLost);
+
+    QnGlobalModuleFinder::instance()->setModuleFinder(m_moduleFinder);
     m_moduleFinder->start();
 }
 
