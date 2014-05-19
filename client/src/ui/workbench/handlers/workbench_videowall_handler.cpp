@@ -1150,11 +1150,24 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::findExistingResourceLayout(cons
 
 QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourceList &resources) const {
 
+    if (resources.size() == 1) {
+        // If there is only one layout, return it
+        if (QnLayoutResourcePtr layout = resources.first().dynamicCast<QnLayoutResource>())
+            return layout;
+
+        // If there is only one resource, try to find already created layout and return it
+        if (QnLayoutResourcePtr layout = findExistingResourceLayout(resources.first()))
+            return layout;
+    }
+
     QnResourceList filtered;
     QMap<qreal, int> aspectRatios;
     qreal defaultAr = qnGlobals->defaultLayoutCellAspectRatio();
 
-    foreach (const QnResourcePtr &resource, resources) {
+    auto addToFiltered = [&](const QnResourcePtr &resource) {
+        if (!resource)
+            return;
+
         if (resource.dynamicCast<QnMediaResource>())
             filtered << resource;
         else if (resource.dynamicCast<QnMediaServerResource>())
@@ -1164,7 +1177,18 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
         if (QnNetworkResourcePtr networkResource = resource.dynamicCast<QnNetworkResource>())
             ar = qnSettings->resourceAspectRatios().value(networkResource->getPhysicalId(), defaultAr);
         aspectRatios[ar] = aspectRatios[ar] + 1;
+    };
+
+    foreach (const QnResourcePtr &resource, resources) {
+        if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+            foreach (const QnLayoutItemData &item, layout->getItems()) {
+                addToFiltered(qnResPool->getResourceByUniqId(item.resource.path));
+            }
+        } else {            
+            addToFiltered(resource);
+        }
     }
+    
     if (filtered.isEmpty())
         return QnLayoutResourcePtr();
 
@@ -1607,31 +1631,43 @@ void QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered() {
 void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUuid targetUuid = parameters.argument(Qn::VideoWallItemGuidRole).value<QUuid>();
-    QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(targetUuid);
-    if (index.isNull())
+    QnVideoWallItemIndex targetIndex = qnResPool->getVideoWallItemByUuid(targetUuid);
+    if (targetIndex.isNull())
         return;
+    QnLayoutResourcePtr currentLayout = qnResPool->getResourceById(targetIndex.videowall()->items()->getItem(targetIndex.uuid()).layout).dynamicCast<QnLayoutResource>();
 
+    Qt::KeyboardModifiers keyboardModifiers = parameters.argument<Qt::KeyboardModifiers>(Qn::KeyboardModifiersRole);
     QnVideoWallItemIndexList videoWallItems = parameters.videoWallItems();
     QnResourceList resources = parameters.resources();
-    QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
-    QnLayoutResourcePtr targetLayout;
+
+    QnResourceList targetResources;
 
     if (!videoWallItems.isEmpty()) {
-        QnVideoWallItemIndex sourceIndex = videoWallItems.first();
-        if (!sourceIndex.isNull())
-            targetLayout = qnResPool->getResourceById(sourceIndex.videowall()->items()->getItem(sourceIndex.uuid()).layout).dynamicCast<QnLayoutResource>();
-    } else if (!layouts.isEmpty()) {
-        targetLayout = layouts.first();
-    } else if (!resources.isEmpty()) {
-        if (resources.size() == 1)
-            targetLayout = findExistingResourceLayout(resources.first());
-        if (!targetLayout)
-            targetLayout = constructLayout(resources);
+        foreach (const QnVideoWallItemIndex &index, videoWallItems) {
+            if (index.isNull())
+                continue;
+            if (QnLayoutResourcePtr layout = qnResPool->getResourceById(index.videowall()->items()->getItem(index.uuid()).layout).dynamicCast<QnLayoutResource>())
+                targetResources << layout;
+        }
+
+        // dragging single videowall item causing swap (if Shift is not pressed)
+        if (videoWallItems.size() == 1 && !videoWallItems.first().isNull() && !(Qt::ShiftModifier & keyboardModifiers) && currentLayout) {
+            resetLayout(QnVideoWallItemIndexList() << videoWallItems.first(), currentLayout, false);
+        }
+
+    } else {
+        targetResources = resources;
     }
 
+    // if Control pressed, add items to current layout
+    if (Qt::ControlModifier & keyboardModifiers && currentLayout) {
+            targetResources << currentLayout;
+    }
+    
+    QnLayoutResourcePtr targetLayout = constructLayout(targetResources);
+
     if (targetLayout)
-        menu()->trigger(Qn::ResetVideoWallLayoutAction,
-                        QnActionParameters(QnVideoWallItemIndexList() << index).withArgument(Qn::LayoutResourceRole, targetLayout));
+        resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout, false);
 
 }
 

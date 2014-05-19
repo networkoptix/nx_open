@@ -13,7 +13,7 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     Q_INIT_RESOURCE(common);
     m_cloudMode = false;
 
-    QnCommonMetaTypes::initilize();
+    QnCommonMetaTypes::initialize();
     
     /* Init statics. */
     qnProductFeatures();

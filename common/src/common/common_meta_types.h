@@ -28,7 +28,7 @@ inline QDataStream &operator>>(QDataStream &stream, ENUM &value) {              
  */
 class QnCommonMetaTypes {
 public:
-    static void initilize();
+    static void initialize();
 };
 
 Q_DECLARE_METATYPE(QUuid);

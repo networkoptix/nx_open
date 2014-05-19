@@ -34,8 +34,9 @@ void QnClientMetaTypes::initialize() {
     if(qn_clientMetaTypes_initialized)
         return;
 
-    QnCommonMetaTypes::initilize();
+    QnCommonMetaTypes::initialize();
 
+    qRegisterMetaType<Qt::KeyboardModifiers>();
     qRegisterMetaType<QVector<QUuid> >();
     qRegisterMetaType<QVector<QColor> >();
 
