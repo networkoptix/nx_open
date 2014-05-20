@@ -234,6 +234,9 @@ void QnResourcePoolModelNode::update() {
     case Qn::ServersNode:
         bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
         break;
+    case Qn::OtherSystemsNode:
+        bastard = m_children.size() == 0;
+        break;
     case Qn::BastardNode:
         bastard = true;
         break;
