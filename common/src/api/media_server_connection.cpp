@@ -66,6 +66,7 @@ namespace {
         (BookmarkUpdateObject,     "cameraBookmarks/update")
         (BookmarkDeleteObject,     "cameraBookmarks/delete")
         (BookmarksGetObject,       "cameraBookmarks/get")
+        (ChangeSystemNameObject,   "changeSystemName")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -397,6 +398,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         break;
     case BookmarksGetObject:
         processJsonReply<QnCameraBookmarkList>(this, response, handle);
+        break;
+    case ChangeSystemNameObject:
+        emitFinished(this, response.status, handle);
         break;
     default:
         assert(false); /* We should never get here. */
@@ -838,5 +842,12 @@ int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camer
     params << QnRequestParam("text",             QnLexical::serialized(filter.text));
     
     return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
+}
+
+int QnMediaServerConnection::changeSystemNameAsync(const QString &systemName, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("systemName", systemName);
+
+    return sendAsyncGetRequest(ChangeSystemNameObject, params, NULL, target, slot);
 }
 
