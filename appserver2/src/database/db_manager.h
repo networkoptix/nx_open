@@ -16,6 +16,8 @@
 #include "nx_ec/data/api_camera_bookmark_data.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
+#include "nx_ec/data/api_module_data.h"
+#include "nx_ec/data/api_system_name_data.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 
