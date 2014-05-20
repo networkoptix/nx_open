@@ -157,9 +157,6 @@ namespace ec2
 
             //!ApiModuleData
             moduleInfo = 66,
-
-            //!ApiSystemNameData
-            changeSystemName = 67,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

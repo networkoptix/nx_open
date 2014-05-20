@@ -32,11 +32,6 @@ void QnMiscManager<QueryProcessorType>::triggerNotification(const ApiModuleDataL
 }
 
 template<class QueryProcessorType>
-void QnMiscManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiSystemNameData> &transaction) {
-    emit changeSystemNameRequested(transaction.params.targetId, transaction.params.systemName);
-}
-
-template<class QueryProcessorType>
 int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(moduleInformation, isAlive);
@@ -48,32 +43,11 @@ int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInfor
 }
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::changeSystemName(const QString &targetId, const QString &systemName, const QnId &peerId, impl::SimpleHandlerPtr handler) {
-    const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(targetId, systemName);
-
-    QnTransactionMessageBus::instance()->sendTransaction(transaction, peerId);
-    QnScopedThreadRollback ensureFreeThread(1);
-    QtConcurrent::run([handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
-
-    return reqId;
-}
-
-template<class QueryProcessorType>
 QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const {
     QnTransaction<ApiModuleData> transaction(ApiCommand::moduleInfo, false);
     QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &transaction.params);
     transaction.params.isAlive = isAlive;
     transaction.params.discoverer = QnId(qnCommon->moduleGUID());
-
-    return transaction;
-}
-
-template<class QueryProcessorType>
-QnTransaction<ApiSystemNameData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QString &targetId, const QString &systemName) const {
-    QnTransaction<ApiSystemNameData> transaction(ApiCommand::changeSystemName, false);
-    transaction.params.targetId = targetId;
-    transaction.params.systemName = systemName;
 
     return transaction;
 }

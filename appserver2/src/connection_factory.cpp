@@ -177,9 +177,6 @@ namespace ec2
         //AbstractMiscManager::moduleInfo
         registerUpdateFuncHandler<ApiModuleData>(restProcessorPool, ApiCommand::moduleInfo);
 
-        //AbstractMiscManager::changeSystemName
-        registerUpdateFuncHandler<ApiSystemNameData>(restProcessorPool, ApiCommand::changeSystemName);
-
         //ApiResourceParamList
         registerGetFuncHandler<nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );
         registerUpdateFuncHandler<ApiResourceParamDataList>( restProcessorPool, ApiCommand::saveSettings );

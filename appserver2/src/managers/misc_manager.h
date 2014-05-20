@@ -3,7 +3,6 @@
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_module_data.h>
-#include <nx_ec/data/api_system_name_data.h>
 #include <transaction/transaction.h>
 
 namespace ec2 {
@@ -16,17 +15,14 @@ namespace ec2 {
 
         void triggerNotification(const QnTransaction<ApiModuleData> &transaction);
         void triggerNotification(const ApiModuleDataList &moduleDataList);
-        void triggerNotification(const QnTransaction<ApiSystemNameData> &transaction);
 
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) override;
-        virtual int changeSystemName(const QString &targetId, const QString &systemName, const QnId &peerId, impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiModuleData> prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const;
-        QnTransaction<ApiSystemNameData> prepareTransaction(const QString &targetId, const QString &systemName) const;
     };
 
 } // namespace ec2

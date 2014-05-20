@@ -753,18 +753,11 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int changeSystemName(const QString &targetId, const QString &systemName, const QnId &peerId, TargetType *target, HandlerType handler) {
-            return sendModuleInformation(targetId, systemName, peerId, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
     signals:
         void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer);
-        void changeSystemNameRequested(const QString &targetId, const QString &systemName);
 
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) = 0;
-        virtual int changeSystemName(const QString &targetId, const QString &systemName, const QnId &peerId, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 

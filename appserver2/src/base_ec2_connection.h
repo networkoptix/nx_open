@@ -229,10 +229,6 @@ namespace ec2
             m_miscManager->triggerNotification(tran);
         }
 
-        void triggerNotification(const QnTransaction<ApiSystemNameData> &tran) {
-            m_miscManager->triggerNotification(tran);
-        }
-
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
     protected:
         QueryProcessorType* m_queryProcessor;

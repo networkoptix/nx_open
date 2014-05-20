@@ -163,9 +163,6 @@ namespace ec2
                 case moduleInfo:
                     return "moduleInfo";
 
-                case changeSystemName:
-                    return "changeSystemName";
-
                 default:
                     return "unknown " + QString::number((int)val);
             }
