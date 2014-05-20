@@ -179,8 +179,15 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
     double coeff1, coeff2;
     QSize secondary1 = QnPlOnvifResource::findSecondaryResolution(max1Res, s1.resolutions, &coeff1);
     QSize secondary2 = QnPlOnvifResource::findSecondaryResolution(max2Res, s2.resolutions, &coeff2);
-    if (qAbs(coeff1 - coeff2) > 1e-4)
+    if (qAbs(coeff1 - coeff2) > 1e-4) {
+
+        if (!s1.isH264 && s2.isH264)
+            coeff2 /= 1.3;
+        else if (s1.isH264 && !s2.isH264)
+            coeff1 /= 1.3;
+
         return coeff1 < coeff2; // less coeff is better
+    }
 
     // if some option doesn't have H264 it "less"
     if (!s1.isH264 && s2.isH264)
