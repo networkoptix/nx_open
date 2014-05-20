@@ -343,13 +343,14 @@ void QnVideowallItemWidget::dragLeaveEvent(QGraphicsSceneDragDropEvent *event) {
 }
 
 void QnVideowallItemWidget::dropEvent(QGraphicsSceneDragDropEvent *event) {
-
     QnActionParameters parameters;
     if (!m_dragged.videoWallItems.isEmpty())
         parameters = QnActionParameters(m_dragged.videoWallItems);
     else
         parameters = QnActionParameters(m_dragged.resources);
     parameters.setArgument(Qn::VideoWallItemGuidRole, m_itemUuid);
+    parameters.setArgument(Qn::KeyboardModifiersRole, event->modifiers());
+
     menu()->trigger(Qn::DropOnVideoWallItemAction, parameters);
 
     event->acceptProposedAction();
@@ -378,8 +379,6 @@ void QnVideowallItemWidget::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 }
 
 void QnVideowallItemWidget::startDrag(DragInfo *info) {
-    Q_UNUSED(info)
-
     QDrag *drag = new QDrag(this);
     QMimeData *mimeData = new QMimeData();
 
@@ -387,7 +386,12 @@ void QnVideowallItemWidget::startDrag(DragInfo *info) {
     mimeData->setData(Qn::NoSceneDrop, QByteArray());
 
     drag->setMimeData(mimeData);
-    drag->exec();
+
+    Qt::DropAction dropAction = Qt::MoveAction;
+    if (info && info->modifiers() & Qt::ControlModifier)
+        dropAction = Qt::CopyAction;
+
+    drag->exec(dropAction, dropAction);
 
     m_dragProcessor->reset();
 }

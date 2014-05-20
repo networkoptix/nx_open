@@ -761,7 +761,6 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
         return;
 
     menu()->trigger(Qn::OpenNewTabAction);
-    //submitDelayedDrops();
 }
 
 void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
@@ -791,6 +790,7 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
 void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
     action(Qn::RadassAutoAction)->setChecked(true);
     qnRedAssController->setMode(Qn::AutoResolution);
+    submitDelayedDrops();
 }
 
 void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
@@ -993,7 +993,7 @@ void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
 
     QnResourceList filtered;
     foreach (const QnResourcePtr &resource, parameters.resources()) {
-        if (resource->hasFlags(QnResource::media | QnResource::server))    //servers are handled in "Monitor" action set
+        if (resource->hasFlags(QnResource::media) || resource->hasFlags(QnResource::server))
             filtered << resource;
     }
     if (filtered.isEmpty())

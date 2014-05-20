@@ -61,7 +61,7 @@ namespace {
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
 
-void QnCommonMetaTypes::initilize() {
+void QnCommonMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK, 
      * so we don't need heavyweight synchronization here. */
     if(qn_commonMetaTypes_initialized)

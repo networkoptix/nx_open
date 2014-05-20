@@ -186,7 +186,6 @@ void QnResourcePoolModelNode::update() {
             m_displayName = m_name = QString();
         }
     } else if (m_type == Qn::VideoWallMatrixNode) {
-        //TODO: #GDM #VW additional flag requested? icon? drag-n-drop support?
         m_status = QnResource::Online;
         m_searchString = QString();
         m_flags = 0; 

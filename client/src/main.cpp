@@ -391,8 +391,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
-    if(authentication.isValid())
+    if(authentication.isValid()) {
+        if (!videoWallItemGuid.isNull())
+            authentication.setUserName(videoWallItemGuid.toString());
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
+    }
 
     qnSettings->setVSyncEnabled(!noVSync);
 

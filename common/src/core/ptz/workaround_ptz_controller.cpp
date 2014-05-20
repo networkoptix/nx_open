@@ -23,16 +23,9 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     m_octagonal = resourceData.value<bool>(lit("octagonalPtz"), false);
     
     QString ptzCapabilities = resourceData.value<QString>(lit("ptzCapabilities")); 
-    
     if(!ptzCapabilities.isEmpty()) {
-        // TODO: #Elric #enum evil. implement via enum name mapper flags.
-
-        if(ptzCapabilities == lit("NoPtzCapabilities")) {
+        if(QnLexical::deserialize(ptzCapabilities, &m_capabilities)) {
             m_overrideCapabilities = true;
-            m_capabilities = Qn::NoPtzCapabilities;
-        } else if(ptzCapabilities == lit("ContinuousZoomCapability")) {
-            m_overrideCapabilities = true;
-            m_capabilities = Qn::ContinuousZoomCapability;
         } else {
             qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
         }

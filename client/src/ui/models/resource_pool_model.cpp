@@ -390,6 +390,8 @@ QMimeData *QnResourcePoolModel::mimeData(const QModelIndexList &indexes) const {
 }
 
 bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction action, int row, int column, const QModelIndex &parent) {
+    qDebug() << "Qt::DropAction" << action;
+
     if (!mimeData)
         return false;
 
