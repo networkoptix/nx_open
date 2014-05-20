@@ -15,7 +15,7 @@ QnVistaResource::~QnVistaResource()
 
 int QnVistaResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
 {
-    int result = QnPlOnvifResource::suggestBitrateKbps(q, resolution, fps) * 1.5;
+    int result = QnPlOnvifResource::suggestBitrateKbps(q, resolution, fps);
 
     return result;
 }
