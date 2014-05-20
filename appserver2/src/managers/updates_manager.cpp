@@ -55,18 +55,6 @@ int QnUpdatesManager<QueryProcessorType>::installUpdate(const QString &updateId,
 }
 
 template<class QueryProcessorType>
-int QnUpdatesManager<QueryProcessorType>::sendAndInstallUpdate(const QString &updateId, const QByteArray &data, const QString &targetId, const QnId &peerId, impl::SimpleHandlerPtr handler) {
-    const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(updateId, data, targetId);
-
-    QnTransactionMessageBus::instance()->sendTransaction(transaction, ec2::PeerList() << peerId);
-    QnScopedThreadRollback ensureFreeThread(1);
-    QtConcurrent::run([handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
-
-    return reqId;
-}
-
-template<class QueryProcessorType>
 QnTransaction<ApiUpdateUploadData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QByteArray &data, qint64 offset) const {
     QnTransaction<ApiUpdateUploadData> transaction(ApiCommand::uploadUpdate, false);
     transaction.params.updateId = updateId;
@@ -92,15 +80,6 @@ QnTransaction<ApiUpdateInstallData> QnUpdatesManager<QueryProcessorType>::prepar
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiUpdateUploadAndInstallData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QByteArray &data, const QString &targetId) const {
-    QnTransaction<ApiUpdateUploadAndInstallData> transaction(ApiCommand::uploadAndInstallUpdate, false);
-    transaction.params.updateId = updateId;
-    transaction.params.data = data;
-    transaction.params.targetId = targetId;
-    return transaction;
-}
-
-template<class QueryProcessorType>
 void QnUpdatesManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiUpdateUploadData> &transaction) {
     assert(transaction.command == ApiCommand::uploadUpdate);
     emit updateChunkReceived(transaction.params.updateId, transaction.params.data, transaction.params.offset);
@@ -116,12 +95,6 @@ template<class QueryProcessorType>
 void QnUpdatesManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction) {
     assert(transaction.command == ApiCommand::installUpdate);
     m_requestedUpdateIds.insert(transaction.id, transaction.params);
-}
-
-template<class QueryProcessorType>
-void QnUpdatesManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiUpdateUploadAndInstallData> &transaction) {
-    assert(transaction.command == ApiCommand::uploadAndInstallUpdate);
-    emit updateRequested(transaction.params.updateId, transaction.params.data, transaction.params.targetId);
 }
 
 template<class QueryProcessorType>

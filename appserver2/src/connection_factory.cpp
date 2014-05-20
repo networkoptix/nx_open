@@ -171,8 +171,6 @@ namespace ec2
         registerUpdateFuncHandler<ApiUpdateUploadResponceData>( restProcessorPool, ApiCommand::uploadUpdateResponce );
         //AbstractUpdatesManager::installUpdate
         registerUpdateFuncHandler<QString>( restProcessorPool, ApiCommand::installUpdate );
-        //AbstractUpdatesManager::uploadAndInstallUpdate
-        registerUpdateFuncHandler<ApiUpdateUploadAndInstallData>( restProcessorPool, ApiCommand::uploadAndInstallUpdate );
 
         //AbstractMiscManager::moduleInfo
         registerUpdateFuncHandler<ApiModuleData>(restProcessorPool, ApiCommand::moduleInfo);

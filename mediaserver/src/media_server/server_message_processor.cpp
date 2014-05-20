@@ -152,8 +152,6 @@ void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
             this, &QnServerMessageProcessor::at_updateChunkReceived);
     connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
             this, &QnServerMessageProcessor::at_updateInstallationRequested);
-    connect(connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateRequested,
-            this, &QnServerMessageProcessor::at_updateRequested);
 
     QnCommonMessageProcessor::init(connection);
 }
@@ -216,9 +214,4 @@ void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, c
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
     QnServerUpdateTool::instance()->installUpdate(updateId);
-}
-
-void QnServerMessageProcessor::at_updateRequested(const QString &updateId, const QByteArray &data, const QString &targetId) {
-    Q_UNUSED(updateId)
-    QnServerUpdateTool::instance()->uploadAndInstallUpdate(targetId, data);
 }

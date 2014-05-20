@@ -390,8 +390,6 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiUpdateUploadResponceData>(abstractTran, stream);
         case ApiCommand::installUpdate:
             return deliveryTransaction<QString>(abstractTran, stream);
-        case ApiCommand::uploadAndInstallUpdate:
-            return deliveryTransaction<ApiUpdateUploadAndInstallData>(abstractTran, stream);
 
         case ApiCommand::serverAliveInfo:
             break; // nothing to do

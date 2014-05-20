@@ -28,8 +28,6 @@ public:
     bool addUpdateFile(const QString &updateId, const QByteArray &data);
     bool addUpdateFileChunk(const QString &updateId, const QByteArray &data, qint64 offset);
     bool installUpdate(const QString &updateId);
-    /*! This function pushes the update to the server with updateId. It not installs the update on the current server! */
-    bool uploadAndInstallUpdate(const QString &updateId, const QByteArray &data);
 
 private:
     bool processUpdate(const QString &updateId, QIODevice *ioDevice);

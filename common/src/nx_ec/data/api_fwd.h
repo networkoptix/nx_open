@@ -53,7 +53,6 @@ namespace ec2 {
     struct ApiVideowallScreenWithRefData;
     struct ApiUpdateUploadData;
     struct ApiUpdateUploadResponceData;
-    struct ApiUpdateUploadAndInstallData;
     struct ApiCameraBookmarkTagData;
     struct ApiModuleData;
 
@@ -117,7 +116,6 @@ namespace ec2 {
     (ApiVideowallScreenWithRefData)\
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
-    (ApiUpdateUploadAndInstallData)\
     (ApiCameraBookmarkTagData)\
     (ApiModuleData)\
 

@@ -30,7 +30,6 @@ private slots:
 
     void at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
     void at_updateInstallationRequested(const QString &updateId);
-    void at_updateRequested(const QString &updateId, const QByteArray &data, const QString &targetId);
 private:
     void updateAllIPList(const QnId& id, const QList<QHostAddress>& addrList);
     void updateAllIPList(const QnId& id, const QList<QString>& addr);

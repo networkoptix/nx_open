@@ -15,7 +15,6 @@
 #include <utils/common/log.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
-#include <utils/network/module_finder.h>
 
 #include <version.h>
 
@@ -290,30 +289,6 @@ bool QnServerUpdateTool::isComplete() const {
 
 void QnServerUpdateTool::clearUpdatesLocation() {
     getUpdatesDir().removeRecursively();
-}
-
-
-bool QnServerUpdateTool::uploadAndInstallUpdate(const QString &targetId, const QByteArray &data) {
-    QnModuleInformation moduleInformation = QnModuleFinder::instance()->moduleInformation(targetId);
-    if (moduleInformation.id.isNull())
-        return false;
-
-    // compatibility checks
-    if (moduleInformation.version < QnSoftwareVersion(2, 3, 0, 0))
-        return false;
-
-    int port = moduleInformation.parameters.value(lit("port")).toInt();
-
-    if (moduleInformation.remoteAddresses.isEmpty() || port == 0)
-        return false;
-
-    QString address = *moduleInformation.remoteAddresses.begin();
-    QUrl url(QString(lit("http://%1:%2")).arg(address).arg(port));
-
-    QNetworkReply *reply = m_networkAccessManager->post(QNetworkRequest(url), data);
-    connect(reply, &QNetworkReply::finished, this, &QnServerUpdateTool::at_uploadFinished);
-
-    return true;
 }
 
 void QnServerUpdateTool::at_uploadFinished() {

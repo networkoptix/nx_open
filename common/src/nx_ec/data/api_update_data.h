@@ -19,13 +19,6 @@ public:
 };
 #define ApiUpdateUploadResponceData_Fields ApiIdData_Fields (updateId)(chunks)
 
-struct ApiUpdateUploadAndInstallData : public ApiData {
-    QString updateId;
-    QByteArray data;
-    QString targetId;
-};
-#define ApiUpdateUploadAndInstallData_Fields (updateId)(data)(targetId)
-
 }
 
 #endif // EC2_UPDATE_DATA_H
