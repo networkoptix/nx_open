@@ -523,7 +523,17 @@ QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QUu
 
 QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QnId &id) const {
     QMutexLocker locker(&m_resourcesMtx);
-    return m_incompatibleResources.value(id.toString());
+
+    auto it = std::find_if(m_incompatibleResources.begin(), m_incompatibleResources.end(), MatchResourceByID(id));
+    if (it != m_incompatibleResources.end())
+        return it.value();
+
+    return QnResourcePtr();
+}
+
+QnResourcePtr QnResourcePool::getIncompatibleResourceByUniqueId(const QString &uid) const {
+    QMutexLocker locker(&m_resourcesMtx);
+    return m_incompatibleResources.value(uid);
 }
 
 QnResourceList QnResourcePool::getAllIncompatibleResources() const {
