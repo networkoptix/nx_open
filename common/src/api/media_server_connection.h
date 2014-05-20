@@ -247,7 +247,7 @@ public:
     int deleteBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot);
     int getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot);
 
-    int changeSystemNameAsync(const QString &systemName, QObject *target, const char *slot);
+    int changeSystemNameAsync(const QString &systemName, bool reboot, QObject *target, const char *slot);
 
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
