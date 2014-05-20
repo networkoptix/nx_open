@@ -1157,6 +1157,9 @@ ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
     if (query.value("cnt").toInt() > 1)
         return ErrorCode::ok; // camera instance on a other media server still present
 
+
+#if 0
+    // do not delete because of camera can be found in the future again but camera archive can be still accessible
     QSqlQuery delQuery(m_sdb);
     delQuery.prepare("DELETE FROM vms_cameraserveritem where physical_id = :physical_id");
     delQuery.bindValue(QLatin1String(":physical_id"), query.value("physical_id").toString());
@@ -1167,6 +1170,9 @@ ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
         return ErrorCode::dbError;
     }
+#endif
+
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::deleteTableRecord(const qint32& internalId, const QString& tableName, const QString& fieldName)
