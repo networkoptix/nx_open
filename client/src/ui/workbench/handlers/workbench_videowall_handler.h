@@ -35,7 +35,7 @@ private:
     ec2::AbstractECConnectionPtr connection2() const;
 
     void attachLayout(const QnVideoWallResourcePtr &videoWall, const QnLayoutResourcePtr &layout, const QnVideowallAttachSettings &settings);
-    void resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout, bool closeClient);
+    void resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout);
     void swapLayouts(const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout);
 
     /** Updates item's layout with provided value. Provided layout should be saved. */

@@ -68,6 +68,7 @@
 #define VER_COMPANYDOMAIN_STR           "${company.url}"
 
 #define QN_ARM_BOX                      "${box}"
+#define QN_IOS_PLAYBUTTON_TINT          "${ios.playButton.tint}"
 /* BORIS, a note personally to you. If you continue adding defines to this block, I'll rip you a new asshole. You will not enjoy it. */
 
 #endif // ${project.artifactId}_VERSION_H

@@ -250,10 +250,11 @@ void serialize(const QByteArray &value, QnOutputBinaryStream<Output> *stream) {
 
 template<class T>
 bool deserialize(QnInputBinaryStream<T> *stream, QByteArray *target) {
+    static const maxSize = 1024 * 1024 * 100; // 100 MB
     qint32 size;
     if(!QnBinary::deserialize(stream, &size))
         return false;
-    if(size < 0)
+    if(size < 0 || size > maxSize) // do not allow to deserialize too much
         return false;
 
     target->resize(size);

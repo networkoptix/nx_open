@@ -593,7 +593,7 @@ void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, 
 }
 
 void fromResourceListToApi(const QnKvPairList &src, ApiResourceParamDataList &dst) {
-    dst.resize(dst.size() + src.size());
+    dst.reserve(dst.size() + src.size());
     for (const QnKvPair &srcParam: src)
         dst.push_back(ApiResourceParamData(srcParam.name(), srcParam.value(), false));
 }

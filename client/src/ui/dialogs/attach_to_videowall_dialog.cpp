@@ -37,7 +37,6 @@ QnVideowallAttachSettings QnAttachToVideowallDialog::settings() const {
         result.attachMode = QnVideowallAttachSettings::AttachWindow;
 
     result.autoFill = ui->autoFillCheckBox->isChecked();
-    result.closeClient = ui->closeClientCheckBox->isChecked();
 
     return result;
 }
@@ -75,7 +74,6 @@ void QnAttachToVideowallDialog::loadSettings(const QnVideowallAttachSettings &se
     }
 
     ui->autoFillCheckBox->setChecked(settings.autoFill);
-    ui->closeClientCheckBox->setChecked(settings.closeClient);
 }
 
 void QnAttachToVideowallDialog::loadLayoutsList(const QnLayoutResourceList &layouts) {

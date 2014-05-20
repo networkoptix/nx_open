@@ -427,6 +427,8 @@ ErrorCode QnDbManager::insertAddParams(const std::vector<ApiResourceParamData>& 
 
     insQuery.bindValue(0, internalId);
     foreach(const ApiResourceParamData& param, params) {
+        assert(!param.name.isEmpty());
+
         insQuery.bindValue(1, QnSql::serialized_field(param.name));
         insQuery.bindValue(2, QnSql::serialized_field(param.value));
         insQuery.bindValue(3, QnSql::serialized_field(param.predefinedParam));

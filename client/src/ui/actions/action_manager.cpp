@@ -361,7 +361,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::DelayedOpenVideoWallItemAction).
         flags(Qn::NoTarget).
-        text(tr("Delayed Open VideoWall"));
+        text(tr("Delayed Open Video Wall"));
 
     factory(Qn::DelayedDropResourcesAction).
         flags(Qn::NoTarget).
@@ -445,7 +445,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-        text(tr("Start Videowall control"));
+        text(tr("Control Video Wall")); //TODO: #VW #TR
 
     //TODO: #GDM VW check desktop camera availability
     factory(Qn::PushMyScreenToVideowallAction).
@@ -616,7 +616,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SaveVideoWallReviewAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey | Qn::IntentionallyAmbiguous).
-        text(tr("Save VideoWall View")).
+        text(tr("Save Video Wall View")). //TODO: #VW #TR
         shortcut(tr("Ctrl+S")).
         autoRepeat(false).
         condition(new QnVideoWallReviewModeCondition(false, this));
@@ -872,7 +872,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenVideoWallsReviewAction).
        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-       text(tr("Open VideoWall(s)")).
+       text(tr("Open Video Wall(s)")). //TODO: #VW #TR
        condition(hasFlags(QnResource::videowall));
 
     factory(Qn::OpenInFolderAction).
@@ -893,14 +893,14 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::AttachToVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-        text(tr("Attach to Video Wall")).
+        text(tr("Attach to Video Wall...")).
         autoRepeat(false).
         condition(hasFlags(QnResource::videowall));
 
     factory(Qn::StartVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-        text(tr("Start Video Wall")).
+        text(tr("Switch to Video Wall mode...")).  //TODO: #VW #TR
         autoRepeat(false).
         condition(hasFlags(QnResource::videowall));
 
@@ -1253,7 +1253,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::VideowallSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Videowall Settings...")).
+        text(tr("Video Wall Settings...")).     //TODO: #VW #TR
         condition(new QnResourceActionCondition(hasFlags(QnResource::videowall), Qn::ExactlyOne, this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
