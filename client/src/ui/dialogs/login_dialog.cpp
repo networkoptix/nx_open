@@ -172,13 +172,7 @@ void QnLoginDialog::accept() {
         return;
     }
 
-#ifdef OLD_EC
-    QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
-    m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, QnConnectionInfoPtr, int)));
-#else
     QnAppServerConnectionFactory::ec2ConnectionFactory()->connect( url, this, &QnLoginDialog::at_ec2ConnectFinished );
-#endif
-
     updateUsability();
 }
 
@@ -343,7 +337,6 @@ void QnLoginDialog::updateUsability() {
 // Handlers
 // -------------------------------------------------------------------------- //
 
-#ifndef OLD_EC
 void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::AbstractECConnectionPtr connection )
 {
     updateUsability();
@@ -357,32 +350,12 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
         success = qnSettings->isDevMode() || _connectionInfo.brand.isEmpty()
                 || _connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
     }
-#else
-void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectionInfo, int requestHandle) {
-    if(m_requestHandle != requestHandle) 
-        return;
-    m_requestHandle = -1;
-
-    updateUsability();
-
-    bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
-            || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
-    bool success = (status == 0) && compatibleProduct;
-#endif
 
     QString detail;
 
-#ifdef OLD_EC
-    if (status == 202) {
-#else
     if (errorCode == ec2::ErrorCode::unauthorized) {
-#endif
         detail = tr("Login or password you have entered are incorrect, please try again.");
-#ifdef OLD_EC
-    } else if (status != 0) {
-#else
     } else if (errorCode != ec2::ErrorCode::ok) {
-#endif
         detail = tr("Connection to the Enterprise Controller could not be established.\n"
                                "Connection details that you have entered are incorrect, please try again.\n\n"
                                "If this error persists, please contact your VMS administrator.");
