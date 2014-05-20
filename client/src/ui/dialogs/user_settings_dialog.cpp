@@ -470,7 +470,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
     previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
     previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
     previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportPermission, previous);
-    previous = createAccessRightCheckBox(tr("Can edit videowalls"), Qn::GlobalEditVideoWallPermission, previous);
+    previous = createAccessRightCheckBox(tr("Can edit Video Walls"), Qn::GlobalEditVideoWallPermission, previous);  //TODO: #VW #TR
 
     updateDependantPermissions();
 }

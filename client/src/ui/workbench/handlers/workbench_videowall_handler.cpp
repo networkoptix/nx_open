@@ -391,8 +391,6 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
     int currentScreen = desktop->screenNumber(mainWindow());
     QUuid pcUuid = qnSettings->pcUuid();
     
-    bool closeClient = settings.closeClient;
-
     auto newItem = [&]() {
         QnVideoWallItem result;
 
@@ -483,7 +481,7 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
 
     // If layout should be saved, attach it after videowall saving.
     connection2()->getVideowallManager()->save(videoWall,  this, 
-        [this, items, layout, closeClient, videoWall]( int reqID, ec2::ErrorCode errorCode ) {
+        [this, items, layout, videoWall]( int reqID, ec2::ErrorCode errorCode ) {
             Q_UNUSED(reqID);
             if (errorCode != ec2::ErrorCode::ok)
                 return;
@@ -504,27 +502,21 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
                 }
             }
             if (updateLayout)
-                resetLayout(items, layout, closeClient);
-            // if all async events are done, close client - else it will be closed in reset action
-            else if (closeClient)
-                startVideowallAndExit(items.first().videowall());
+                resetLayout(items, layout);
     } );
 
-    if (!settings.closeClient)
-        menu()->trigger(Qn::OpenVideoWallsReviewAction, QnActionParameters(videoWall));
+    menu()->trigger(Qn::OpenVideoWallsReviewAction, QnActionParameters(videoWall));
 }
 
-void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout, bool closeClient) {
+void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout) {
     if (items.isEmpty())
         return;
 
     layout->setCellSpacing(QSizeF(0.0, 0.0));
     layout->setUserCanEdit(true);
 
-    auto reset = [this](const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout, bool closeClient) {
+    auto reset = [this](const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout) {
         updateItemsLayout(items, layout->getId());
-        if (closeClient)
-            startVideowallAndExit(items.first().videowall());
     };
 
     if (snapshotManager()->isLocal(layout) || snapshotManager()->isModified(layout)) {
@@ -532,17 +524,17 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
         unsavedLayouts << layout;
         QnWorkbenchLayoutReplyProcessor *processor = new QnWorkbenchLayoutReplyProcessor(snapshotManager(), unsavedLayouts);
         connect(processor, &QnWorkbenchLayoutReplyProcessor::finished, this,
-            [this, items, layout, closeClient, reset](int status, const QnResourceList &resources, int handle) {
+            [this, items, layout, reset](int status, const QnResourceList &resources, int handle) {
             Q_UNUSED(resources)
             Q_UNUSED(handle)
             if (status != 0)
                 QMessageBox::warning(mainWindow(), tr("Error"), tr("Unexpected error has occurred. Changes cannot be saved."));
             else
-                reset(items, layout, closeClient);
+                reset(items, layout);
         });
         snapshotManager()->save(unsavedLayouts, processor);
     } else {
-        reset(items, layout, closeClient);
+        reset(items, layout);
     }
 }
 
@@ -611,10 +603,11 @@ void QnWorkbenchVideoWallHandler::updateItemsLayout(const QnVideoWallItemIndexLi
 bool QnWorkbenchVideoWallHandler::startVideoWall(const QnVideoWallResourcePtr &videoWall) {
     QUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull()) {
-        qWarning() << "Warning: pc UUID is null, cannot start videowall on this pc";
+        qWarning() << "Warning: pc UUID is null, cannot start Video Wall on this pc";
         return false;
     }
 
+    //TODO: #GDM #VW show dialog with text, "Do not ask me more"
     bool itemFound = false;
     foreach (const QnVideoWallItem &item, videoWall->items()->getItems()) {
         if (item.pcUuid != pcUuid)
@@ -623,7 +616,7 @@ bool QnWorkbenchVideoWallHandler::startVideoWall(const QnVideoWallResourcePtr &v
         break;
     }
     if (!itemFound) {
-        qWarning() << "Warning: no items for this pc, cannot start videowall";
+        qWarning() << "Warning: no items for this pc, cannot start Video Wall";
         return false;
     }
 
@@ -641,7 +634,7 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
     else
         QMessageBox::warning(mainWindow(),
         tr("Error"),
-        tr("Cannot start videowall on this PC."));
+        tr("Cannot start Video Wall on this PC.")); //TODO: #VW #TR
 }
 
 void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args) {
@@ -1293,15 +1286,15 @@ void QnWorkbenchVideoWallHandler::at_connection_opened() {
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     //TODO: #GDM VW refactor to corresponding dialog
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
-    dialog->setWindowTitle(tr("New Video Wall"));
-    dialog->setText(tr("Enter the name of the video wall to create:"));
+    dialog->setWindowTitle(tr("New Video Wall..."));
+    dialog->setText(tr("Enter the name of the Video Wall to create:")); //TODO: #VW #TR
     dialog->setName(
         generateUniqueString([] () {
                 QStringList used;
                 foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::videowall))
                     used << resource->getName();
                 return used;
-            }(), tr("Videowall"), tr("Videowall %1") )
+            }(), tr("Video Wall"), tr("Video Wall %1") )
     );
     dialog->setWindowModality(Qt::ApplicationModal);
 
@@ -1384,7 +1377,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
             break;
 
         targetLayout = currentLayout->clone();
-        targetLayout->setName(generateUniqueLayoutName(context()->user(), tr("VideoWall Layout"),  tr("VideoWall Layout %1")));
+        targetLayout->setName(generateUniqueLayoutName(context()->user(), tr("Video Wall Layout"),  tr("Video Wall Layout %1")));
         targetLayout->setParentId(context()->user()->getId());
         targetLayout->addFlags(QnResource::local);
         targetLayout->setCellSpacing(QSizeF(0.0, 0.0));
@@ -1428,7 +1421,7 @@ void QnWorkbenchVideoWallHandler::at_resetVideoWallLayoutAction_triggered() {
     QnLayoutResourcePtr layout = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole,
                                                                           workbench()->currentLayout()->resource());
 
-    resetLayout(items, layout, false);
+    resetLayout(items, layout);
 }
 
 void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered() {
@@ -1455,7 +1448,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered() {
     QnVideoWallResourcePtr videoWall = menu()->currentParameters(sender()).resource().dynamicCast<QnVideoWallResource>();
     if(videoWall.isNull())
         return;
-    startVideoWall(videoWall);
+    startVideowallAndExit(videoWall);
 }
 
 void QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered() {
@@ -1711,7 +1704,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
     if (currentLayout && !sourceIndex.isNull() && targetLayout)
         swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
     else if (targetLayout)
-        resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout, false);
+        resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout);
 
 }
 
@@ -1775,7 +1768,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered() {
     if (matrix.layoutByItem.isEmpty()) {
         QMessageBox::information(mainWindow(),
             tr("Invalid matrix"),
-            tr("You have no layouts on the screens. Matrix cannot be saved.")); //TODO: #Elric #TR check the text please
+            tr("You have no layouts on the screens. Matrix cannot be saved.")); //TODO: #VW #TR
         return;
     }
 
