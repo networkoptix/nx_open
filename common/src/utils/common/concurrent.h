@@ -9,12 +9,14 @@
 #include <cassert>
 #include <functional>
 #include <vector>
+#include <type_traits>
 #include <utility>
 
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 #include <QtCore/QWaitCondition>
 #include <QtCore/QThreadPool>
+#include <QtCore/QSharedPointer>
 
 
 /*!
@@ -186,7 +188,7 @@ namespace QnConcurrent
         public:
             typedef typename Container::size_type size_type;
 
-            safe_forward_iterator( Container& container, typename Container::iterator&& startIter = container.begin() )
+            safe_forward_iterator( Container& container, typename Container::iterator&& startIter )
             :
                 m_container( container ),
                 m_currentIter( startIter ),
@@ -226,13 +228,15 @@ namespace QnConcurrent
         class TaskExecuter
         {
         public:
+            typedef QnFutureImpl<typename std::result_of<Function(typename Container::value_type)>::type> FutureImplType;
+
             TaskExecuter(
                 QThreadPool& threadPool,
                 int priority,
                 Container& container,
                 Function function,
-                typename QSharedPointer<typename QnFutureImpl<typename std::result_of<Function(typename Container::value_type)>::type> > futureImpl,
-                typename QSharedPointer<typename detail::safe_forward_iterator<Container> > safeIter )
+                QSharedPointer<FutureImplType> futureImpl,
+                QSharedPointer<detail::safe_forward_iterator<Container> > safeIter )
             :
                 m_threadPool( threadPool ),
                 m_priority( priority ),
@@ -248,9 +252,9 @@ namespace QnConcurrent
                 auto futureImplStrongRef = m_futureImpl.toStrongRef();
                 assert( futureImplStrongRef );
 
-                auto& result = m_function( *val.first );
+                const auto& result = m_function( *val.first );
                 //launching next task
-                typename std::pair<typename Container::iterator, int>& nextElement = m_safeIter->fetchAndMoveToNextPos();
+                const typename std::pair<typename Container::iterator, int>& nextElement = m_safeIter->fetchAndMoveToNextPos();
                 if( nextElement.first != m_container.end() && futureImplStrongRef->incStartedTaskCountIfAllowed() )
                 {
                     auto functor = std::bind( &detail::TaskExecuter<Container, Function>::operator(), this, nextElement );
@@ -266,8 +270,8 @@ namespace QnConcurrent
             int m_priority;
             Container& m_container;
             Function m_function;
-            QWeakPointer<typename QnFutureImpl<typename std::result_of<Function(typename Container::value_type)>::type> > m_futureImpl;
-            typename QSharedPointer<typename detail::safe_forward_iterator<Container> > m_safeIter;
+            QWeakPointer<FutureImplType> m_futureImpl;
+            QSharedPointer<detail::safe_forward_iterator<Container> > m_safeIter;
         };
     }
 
@@ -281,10 +285,11 @@ namespace QnConcurrent
     class QnFuture
     {
     public:
-        typedef typename detail::QnFutureImpl<T>::value_type value_type;
-        typedef typename detail::QnFutureImpl<T>::size_type size_type;
+        typedef typename detail::QnFutureImpl<T> FutureImplType;
+        typedef typename FutureImplType::value_type value_type;
+        typedef typename FutureImplType::size_type size_type;
 
-        QnFuture() : m_impl( new detail::QnFutureImpl<T>() ) {}
+        QnFuture() : m_impl( new FutureImplType() ) {}
 
         void waitForFinished() { m_impl->waitForFinished(); }
         void cancel() { m_impl->cancel(); }
@@ -297,10 +302,10 @@ namespace QnConcurrent
         T& resultAt( size_type index ) { return m_impl->resultAt( index ); }
         const T& resultAt( size_type index ) const { return m_impl->resultAt( index ); }
 
-        QSharedPointer<detail::QnFutureImpl<T> > impl() { return m_impl; }
+        QSharedPointer<FutureImplType> impl() { return m_impl; }
 
     private:
-        QSharedPointer<detail::QnFutureImpl<T> > m_impl;
+        QSharedPointer<FutureImplType> m_impl;
     };
 
     /*!
@@ -316,12 +321,14 @@ namespace QnConcurrent
         Container& container,
         Function function )
     {
-        QnFuture<typename std::result_of<Function(typename Container::value_type)>::type> future;
+        typedef QnFuture<typename std::result_of<Function(typename Container::value_type)>::type> FutureType;
+
+        FutureType future;
         auto futureImpl = future.impl();
         futureImpl->setTotalTasksToRun( container.size() );
-        typename QSharedPointer<typename detail::safe_forward_iterator<Container> > safeIter( new detail::safe_forward_iterator<Container>( container, container.begin() ) );
+        QSharedPointer<detail::safe_forward_iterator<Container> > safeIter( new detail::safe_forward_iterator<Container>( container, container.begin() ) );
 
-        detail::TaskExecuter<Container, Function>* taskExecutor =
+        typename detail::TaskExecuter<Container, Function>* taskExecutor =
             new detail::TaskExecuter<Container, Function>(
                 *threadPool, priority, container, function, futureImpl, safeIter );
         futureImpl->setCleanupFunc( std::function<void()>( [taskExecutor](){ delete taskExecutor; } ) );    //TODO #ak not good! Think over again
@@ -332,7 +339,7 @@ namespace QnConcurrent
             tasksLaunched < maxTasksToLaunch;
             ++tasksLaunched )
         {
-            std::pair<Container::iterator, int>& nextElement = safeIter->fetchAndMoveToNextPos();
+            const typename std::pair<typename Container::iterator, int>& nextElement = safeIter->fetchAndMoveToNextPos();
             if( nextElement.first == container.end() )
                 break;  //all tasks processed
 
