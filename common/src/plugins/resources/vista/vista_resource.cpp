@@ -6,7 +6,7 @@
 QnVistaResource::QnVistaResource():
     QnPlOnvifResource()
 {
-    setVendor(lit("Digital Watchdog"));
+    setVendor(lit("VISTA"));
 }
 
 QnVistaResource::~QnVistaResource()
