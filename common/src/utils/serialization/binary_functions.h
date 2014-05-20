@@ -250,15 +250,39 @@ void serialize(const QByteArray &value, QnOutputBinaryStream<Output> *stream) {
 
 template<class T>
 bool deserialize(QnInputBinaryStream<T> *stream, QByteArray *target) {
-    static const qint32 maxSize = 1024 * 1024 * 100; // 100 MB
     qint32 size;
     if(!QnBinary::deserialize(stream, &size))
         return false;
-    if(size < 0 || size > maxSize) // do not allow to deserialize too much
+    if(size < 0)
         return false;
 
-    target->resize(size);
-    return stream->read(target->data(), size) == size;
+    const qint32 chunkSize = 16 * 1024 * 1024;
+    if(size < chunkSize) {
+        /* If it's less than 16Mb then just read it as a whole chunk. */
+        target->resize(size);
+        return stream->read(target->data(), size) == size;
+    } else {
+        /* Otherwise there is a high probability that the stream is corrupted, 
+         * but we cannot be 100% sure. Read it chunk-by-chunk, then assemble. */
+        QVector<QByteArray> chunks;
+
+        for(qint32 pos = 0; pos < size; pos += chunkSize) {
+            QByteArray chunk;
+            chunk.resize(std::min(chunkSize, size - pos));
+
+            if(stream->read(chunk.data(), chunk.size()) != chunk.size())
+                return false; /* The stream was indeed corrupted. */
+
+            chunks.push_back(chunk);
+        }
+
+        /* Assemble the chunks. */
+        target->clear();
+        target->reserve(size);
+        for(const QByteArray chunk: chunks)
+            target->append(chunk);
+        return true;
+    }
 }
 
 
