@@ -1538,9 +1538,6 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& c
 
 
     QSqlQuery queryScheduleTask(m_sdb);
-    QString filterStr2;
-    if (!mServerId.isNull()) 
-        filterStr2 = QString("AND r.parent_guid = %1").arg(guidToSqlString(mServerId));
     
     queryScheduleTask.setForwardOnly(true);
     queryScheduleTask.prepare(QString("SELECT r.guid as sourceId, st.start_time as startTime, st.end_time as endTime, st.do_record_audio as recordAudio, \
@@ -1551,12 +1548,15 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& c
 
     QSqlQuery queryParams(m_sdb);
     queryParams.setForwardOnly(true);
+    QString filterStr2;
+    if (!mServerId.isNull())
+        filterStr2 = QString("WHERE r.parent_guid = %1").arg(guidToSqlString(mServerId));
     queryParams.prepare(QString("SELECT r.guid as resourceId, kv.value, kv.name, kv.isResTypeParam as predefinedParam\
                                  FROM vms_kvpair kv \
                                  JOIN vms_camera c on c.resource_ptr_id = kv.resource_id \
                                  JOIN vms_resource r on r.id = kv.resource_id \
-                                 WHERE kv.isResTypeParam = 1 \
-                                 %1 ORDER BY kv.resource_id").arg(filterStr2));
+                                 %1 \
+                                 ORDER BY kv.resource_id").arg(filterStr2));
 
 	if (!queryCameras.exec()) {
         qWarning() << Q_FUNC_INFO << queryCameras.lastError().text();
@@ -1884,10 +1884,10 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     queryParams.prepare(QString("SELECT r.guid as resourceId, kv.value, kv.name, kv.isResTypeParam as predefinedParam\
                                 FROM vms_kvpair kv \
                                 JOIN vms_resource r on r.id = kv.resource_id \
-                                WHERE kv.isResTypeParam = 1 \
                                 ORDER BY kv.resource_id"));
     if (!queryParams.exec())
         return ErrorCode::dbError;
+
     QnSql::fetch_many(queryParams, &kvPairs);
 
     mergeObjectListData<ApiMediaServerData>(data.servers,   kvPairs, &ApiMediaServerData::addParams, &ApiResourceParamWithRefData::resourceId);

@@ -27,7 +27,7 @@ class QnResourcePoolModel : public Connective<QAbstractItemModel>, public QnWork
 
     typedef Connective<QAbstractItemModel> base_type;
 public:
-    explicit QnResourcePoolModel(Qn::NodeType rootNodeType = Qn::RootNode, bool isFlat = false, QObject *parent = NULL);
+    explicit QnResourcePoolModel(Qn::NodeType rootNodeType = Qn::RootNode, QObject *parent = NULL);
     virtual ~QnResourcePoolModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
@@ -120,9 +120,6 @@ private:
 
     /** Type of root node - for the models with narrowed scopes */
     Qn::NodeType m_rootNodeType;
-
-    /** If set to true only top-level resources should be displayed */
-    bool m_flat;
 };
 
 #endif // QN_RESOURCE_POOL_MODEL_H

@@ -52,12 +52,11 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
-QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, bool isFlat, QObject *parent):
+QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, QObject *parent):
     base_type(parent), 
     QnWorkbenchContextAware(parent),
     m_urlsShown(true),
-    m_rootNodeType(rootNodeType),
-    m_flat(isFlat)
+    m_rootNodeType(rootNodeType)
 {
     m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::RootNode << Qn::BastardNode;
 
@@ -221,9 +220,6 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
             return NULL;
         }
     } else {
-        if (m_flat)
-            return m_rootNodes[Qn::BastardNode];
-
         QnResourcePoolModelNode* parent = this->node(parentResource);
 
         if (QnSecurityCamResourcePtr camera = node->resource().dynamicCast<QnSecurityCamResource>()) {

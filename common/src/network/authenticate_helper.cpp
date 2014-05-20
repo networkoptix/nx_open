@@ -85,7 +85,8 @@ bool QnAuthHelper::authenticate( const QString& login, const QByteArray& digest 
         if (user->getName().toLower() == login.toLower())
             return user->getDigest() == digest;
     }
-    return false;
+    //checking if it videowall connect
+    return !qnResPool->getResourceById(QUuid(login)).dynamicCast<QnVideoWallResource>().isNull();
 }
 
 QByteArray QnAuthHelper::createUserPasswordDigest( const QString& userName, const QString& password )

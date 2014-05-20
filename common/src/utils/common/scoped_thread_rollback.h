@@ -3,6 +3,10 @@
 
 #include <QtCore/QThreadPool>
 
+
+/*!
+    Intended for use in thread of thread pool
+*/
 class QnScopedThreadRollback {
 public:
     QnScopedThreadRollback(int increaseThreadCount):
