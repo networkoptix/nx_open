@@ -55,6 +55,7 @@ public:
 
     int save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot);
     int save(const QnLayoutResourceList &resources, QObject *object, const char *slot);
+    int save(const QnLayoutResourceList &resources, QnWorkbenchLayoutReplyProcessor *replyProcessor);
 
     void store(const QnLayoutResourcePtr &resource);
     void restore(const QnLayoutResourcePtr &resource);

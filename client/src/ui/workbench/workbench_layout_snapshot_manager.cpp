@@ -118,15 +118,18 @@ int QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &resource, 
 }
 
 int QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourceList &resources, QObject *object, const char *slot) {
+    QnWorkbenchLayoutReplyProcessor *processor = new QnWorkbenchLayoutReplyProcessor(this, resources);
+    connect(processor, SIGNAL(finished(int, const QnResourceList &, int)), object, slot);
+    return save(resources, processor);
+}
+
+int QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourceList &resources, QnWorkbenchLayoutReplyProcessor *replyProcessor) {
     /* Submit all changes from workbench to resource. */
     foreach(const QnLayoutResourcePtr &resource, resources)
         if(QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource))
             synchronizer->submit();
 
-    QnWorkbenchLayoutReplyProcessor *processor = new QnWorkbenchLayoutReplyProcessor(this, resources);
-    processor->connect(SIGNAL(finished(int, const QnResourceList &, int)), object, slot);
-
-    int handle = connection2()->getLayoutManager()->save( resources, processor, &QnWorkbenchLayoutReplyProcessor::processReply );
+    int handle = connection2()->getLayoutManager()->save(resources, replyProcessor, &QnWorkbenchLayoutReplyProcessor::processReply );
 
     foreach(const QnLayoutResourcePtr &resource, resources)
         setFlags(resource, flags(resource) | Qn::ResourceIsBeingSaved);

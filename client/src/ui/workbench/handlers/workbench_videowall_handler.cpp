@@ -252,8 +252,6 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         connect(display(),     &QnWorkbenchDisplay::widgetAdded,                        this,   &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
         connect(display(),     &QnWorkbenchDisplay::widgetAboutToBeRemoved,             this,   &QnWorkbenchVideoWallHandler::at_display_widgetAboutToBeRemoved);
 
-        connect(context(),     &QnWorkbenchContext::userChanged,                        this,   &QnWorkbenchVideoWallHandler::at_context_userChanged);
-
         connect(workbench(),   &QnWorkbench::currentLayoutAboutToBeChanged,             this,   &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutAboutToBeChanged);
         connect(workbench(),   &QnWorkbench::currentLayoutChanged,                      this,   &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutChanged);
 
@@ -392,9 +390,8 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
     }
     int currentScreen = desktop->screenNumber(mainWindow());
     QUuid pcUuid = qnSettings->pcUuid();
-    AttachData attachData;
-    attachData.closeClient = settings.closeClient;
-    attachData.layout = layout;
+    
+    bool closeClient = settings.closeClient;
 
     auto newItem = [&]() {
         QnVideoWallItem result;
@@ -434,7 +431,8 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
   //  mainWindow()->setGeometry(item.geometry);   // WYSIWYG
 
     videoWall->items()->addItem(item);
-    attachData.items << QnVideoWallItemIndex(videoWall, item.uuid);
+    QnVideoWallItemIndexList items;
+    items << QnVideoWallItemIndex(videoWall, item.uuid);
 
     if (settings.autoFill) {
         switch (settings.attachMode) {
@@ -446,7 +444,7 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
                 QnVideoWallItem fillItem = newItem();
                 fillItem.geometry = desktop->screenGeometry(i);
                 videoWall->items()->addItem(fillItem);
-                attachData.items << QnVideoWallItemIndex(videoWall, fillItem.uuid);
+                items << QnVideoWallItemIndex(videoWall, fillItem.uuid);
             }
             break;
         }
@@ -464,7 +462,7 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
                     QnVideoWallItem fillItem = newItem();
                     fillItem.geometry = geometry;
                     videoWall->items()->addItem(fillItem);
-                    attachData.items << QnVideoWallItemIndex(videoWall, fillItem.uuid);
+                    items << QnVideoWallItemIndex(videoWall, fillItem.uuid);
                 }
             }
             break;
@@ -485,16 +483,16 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
 
     // If layout should be saved, attach it after videowall saving.
     connection2()->getVideowallManager()->save(videoWall,  this, 
-        [this, attachData, videoWall]( int reqID, ec2::ErrorCode errorCode ) {
+        [this, items, layout, closeClient, videoWall]( int reqID, ec2::ErrorCode errorCode ) {
             Q_UNUSED(reqID);
             if (errorCode != ec2::ErrorCode::ok)
                 return;
 
-            if (attachData.items.isEmpty())
+            if (items.isEmpty())
                 return;
 
-            bool updateLayout = !attachData.layout.isNull();
-            foreach(const QnVideoWallItemIndex &index, attachData.items) {
+            bool updateLayout = !layout.isNull();
+            foreach(const QnVideoWallItemIndex &index, items) {
                 if (index.isNull())
                     continue;
                 QnVideoWallResourcePtr videowall = index.videowall();
@@ -506,10 +504,10 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
                 }
             }
             if (updateLayout)
-                resetLayout(attachData.items, attachData.layout, attachData.closeClient);
+                resetLayout(items, layout, closeClient);
             // if all async events are done, close client - else it will be closed in reset action
-            else if (attachData.closeClient)
-                startVideowallAndExit(attachData.items.first().videowall());
+            else if (closeClient)
+                startVideowallAndExit(items.first().videowall());
     } );
 
     if (!settings.closeClient)
@@ -523,21 +521,68 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
     layout->setCellSpacing(QSizeF(0.0, 0.0));
     layout->setUserCanEdit(true);
 
+    auto reset = [this](const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout, bool closeClient) {
+        updateItemsLayout(items, layout->getId());
+        if (closeClient)
+            startVideowallAndExit(items.first().videowall());
+    };
+
     if (snapshotManager()->isLocal(layout) || snapshotManager()->isModified(layout)) {
-        int requestId = snapshotManager()->save(layout, this, SLOT(at_videoWall_layout_saved(int, const QnResourceList &, int)));
-        if (requestId <= 0)
-            return;
-
-        ResetData data;
-        data.items = items;
-        data.closeClient = closeClient;
-        m_resetting.insert(requestId, data);
-        return;
+        QnLayoutResourceList unsavedLayouts;
+        unsavedLayouts << layout;
+        QnWorkbenchLayoutReplyProcessor *processor = new QnWorkbenchLayoutReplyProcessor(snapshotManager(), unsavedLayouts);
+        connect(processor, &QnWorkbenchLayoutReplyProcessor::finished, this,
+            [this, items, layout, closeClient, reset](int status, const QnResourceList &resources, int handle) {
+            Q_UNUSED(resources)
+            Q_UNUSED(handle)
+            if (status != 0)
+                QMessageBox::warning(mainWindow(), tr("Error"), tr("Unexpected error has occurred. Changes cannot be saved."));
+            else
+                reset(items, layout, closeClient);
+        });
+        snapshotManager()->save(unsavedLayouts, processor);
+    } else {
+        reset(items, layout, closeClient);
     }
+}
 
-    updateItemsLayout(items, layout->getId());
-    if (closeClient)
-        startVideowallAndExit(items.first().videowall());
+void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout) {
+    QnLayoutResourceList unsavedLayouts;
+    if (snapshotManager()->isLocal(firstLayout) || snapshotManager()->isModified(firstLayout))
+        unsavedLayouts << firstLayout;
+
+    if (snapshotManager()->isLocal(secondLayout) || snapshotManager()->isModified(secondLayout))
+        unsavedLayouts << secondLayout;
+
+    auto swap = [this](const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout) {
+        QnVideoWallItem firstItem = firstIndex.videowall()->items()->getItem(firstIndex.uuid());
+        firstItem.layout = firstLayout->getId();
+        firstIndex.videowall()->items()->updateItem(firstIndex.uuid(), firstItem);
+
+        QnVideoWallItem secondItem = secondIndex.videowall()->items()->getItem(secondIndex.uuid());
+        secondItem.layout = secondLayout->getId();
+        secondIndex.videowall()->items()->updateItem(secondIndex.uuid(), secondItem);
+
+        connection2()->getVideowallManager()->save(firstIndex.videowall(), this, [](){});
+        if (firstIndex.videowall() != secondIndex.videowall())
+            connection2()->getVideowallManager()->save(secondIndex.videowall(), this, [](){});
+    };
+
+    if (!unsavedLayouts.isEmpty()) {
+        QnWorkbenchLayoutReplyProcessor *processor = new QnWorkbenchLayoutReplyProcessor(snapshotManager(), unsavedLayouts);
+        connect(processor, &QnWorkbenchLayoutReplyProcessor::finished, this, 
+            [this, firstIndex, firstLayout, secondIndex, secondLayout, swap](int status, const QnResourceList &resources, int handle) {
+            Q_UNUSED(resources)
+            Q_UNUSED(handle)
+            if (status != 0)
+                QMessageBox::warning(mainWindow(), tr("Error"), tr("Unexpected error has occurred. Changes cannot be saved."));
+            else
+                swap(firstIndex, firstLayout, secondIndex, secondLayout);
+        });
+        snapshotManager()->save(unsavedLayouts, processor);
+    } else {
+        swap(firstIndex, firstLayout, secondIndex, secondLayout);
+    }
 }
 
 void QnWorkbenchVideoWallHandler::updateItemsLayout(const QnVideoWallItemIndexList &items, const QnId &layoutId) {
@@ -548,6 +593,9 @@ void QnWorkbenchVideoWallHandler::updateItemsLayout(const QnVideoWallItemIndexLi
             continue;
 
         QnVideoWallItem existingItem = item.videowall()->items()->getItem(item.uuid());
+        if (existingItem.layout == layoutId)
+            continue;
+
         existingItem.layout = layoutId;
         item.videowall()->items()->updateItem(item.uuid(), existingItem);
 
@@ -556,9 +604,8 @@ void QnWorkbenchVideoWallHandler::updateItemsLayout(const QnVideoWallItemIndexLi
 
     }
 
-    foreach (const QnVideoWallResourcePtr &videowall, videoWalls) {
+    foreach (const QnVideoWallResourcePtr &videowall, videoWalls)
         connection2()->getVideowallManager()->save(videowall, this, [](){});
-    };
 }
 
 bool QnWorkbenchVideoWallHandler::startVideoWall(const QnVideoWallResourcePtr &videoWall) {
@@ -1243,10 +1290,6 @@ void QnWorkbenchVideoWallHandler::at_connection_opened() {
         sendInstanceGuid();
 }
 
-void QnWorkbenchVideoWallHandler::at_context_userChanged() {
-    m_resetting.clear();
-}
-
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     //TODO: #GDM VW refactor to corresponding dialog
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
@@ -1641,6 +1684,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
     QnResourceList resources = parameters.resources();
 
     QnResourceList targetResources;
+    QnVideoWallItemIndex sourceIndex;
 
     if (!videoWallItems.isEmpty()) {
         foreach (const QnVideoWallItemIndex &index, videoWallItems) {
@@ -1651,10 +1695,8 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
         }
 
         // dragging single videowall item causing swap (if Shift is not pressed)
-        if (videoWallItems.size() == 1 && !videoWallItems.first().isNull() && !(Qt::ShiftModifier & keyboardModifiers) && currentLayout) {
-            resetLayout(QnVideoWallItemIndexList() << videoWallItems.first(), currentLayout, false);
-        }
-
+        if (videoWallItems.size() == 1 && !videoWallItems.first().isNull() && !(Qt::ShiftModifier & keyboardModifiers) && currentLayout)
+            sourceIndex = videoWallItems.first();
     } else {
         targetResources = resources;
     }
@@ -1666,7 +1708,9 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
     
     QnLayoutResourcePtr targetLayout = constructLayout(targetResources);
 
-    if (targetLayout)
+    if (currentLayout && !sourceIndex.isNull() && targetLayout)
+        swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
+    else if (targetLayout)
         resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout, false);
 
 }
@@ -1797,27 +1841,6 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered() {
 
     foreach (const QnVideoWallResourcePtr &videowall, videoWalls)
         connection2()->getVideowallManager()->save(videowall, this, [](){});    
-}
-
-void QnWorkbenchVideoWallHandler::at_videoWall_layout_saved(int status, const QnResourceList &resources, int handle) {
-    QnLayoutResourcePtr layout;
-    if (!resources.isEmpty())
-        layout = resources.first().dynamicCast<QnLayoutResource>();
-
-    if (status != 0 || !layout) {
-        m_resetting.remove(handle);
-        QMessageBox::warning(mainWindow(), tr("Error"), tr("Unexpected error has occurred. Changes cannot be saved."));
-        return;
-    }
-
-    if (m_resetting.contains(handle)) {
-        ResetData data = m_resetting.take(handle);
-        if (data.items.isEmpty())
-            return;
-        updateItemsLayout(data.items, layout->getId());
-        if (data.closeClient)
-            startVideowallAndExit(data.items.first().videowall());
-    }
 }
 
 void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &resource) {
