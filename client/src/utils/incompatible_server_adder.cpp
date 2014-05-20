@@ -63,6 +63,9 @@ void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &module
     if (!isSuitable(moduleInformation))
         return;
 
+    if (!server)
+        server = qnResPool->getIncompatibleResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
+
     QnMediaServerResourcePtr newServer = makeResource(moduleInformation);
 
     if (server)

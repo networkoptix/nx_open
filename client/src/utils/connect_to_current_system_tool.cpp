@@ -7,6 +7,7 @@
 
 QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject *parent) :
     QObject(parent),
+    m_running(false),
     m_changeSystemNameTask(new QnChangeSystemNamePeerTask(this))
 {
     connect(m_changeSystemNameTask,     &QnNetworkPeerTask::finished,       this,       &QnConnectToCurrentSystemTool::at_changeSystemnameTask_finished);
@@ -16,6 +17,7 @@ void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QnId> &targ
     if (m_running)
         return;
 
+    m_running = true;
     m_targets = targets;
     m_changeSystemNameTask->setSystemName(qnCommon->localSystemName());
     m_changeSystemNameTask->start(targets);
@@ -32,6 +34,6 @@ void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {
 
 void QnConnectToCurrentSystemTool::at_changeSystemnameTask_finished(int errorCode, const QSet<QnId> &failedPeers) {
     if (errorCode == 0) {
-        emit finished(NoError);
+        finish(NoError);
     }
 }

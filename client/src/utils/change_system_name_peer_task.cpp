@@ -2,16 +2,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <api/app_server_connection.h>
 #include <utils/network/global_module_finder.h>
-
-namespace {
-
-    ec2::AbstractECConnectionPtr connection2() {
-        return QnAppServerConnectionFactory::getConnection2();
-    }
-
-} // anonymous namespace
 
 QnChangeSystemNamePeerTask::QnChangeSystemNamePeerTask(QObject *parent) :
     QnNetworkPeerTask(parent)
@@ -28,14 +19,18 @@ void QnChangeSystemNamePeerTask::setSystemName(const QString &systemName) {
 
 void QnChangeSystemNamePeerTask::doStart() {
     foreach (const QnId &id, peers()) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server) {
             m_failedPeers.insert(id);
             continue;
         }
 
-        m_pendingPeers.insert(server->apiConnection()->changeSystemNameAsync(m_systemName, this, SLOT(processReply(int,int))), id);
+        int handle = server->apiConnection()->changeSystemNameAsync(m_systemName, true, this, SLOT(processReply(int,int)));
+        m_pendingPeers.insert(handle, id);
     }
+
+    if (m_pendingPeers.isEmpty())
+        finish(m_failedPeers.isEmpty() ? 0 : 1, m_failedPeers);
 }
 
 void QnChangeSystemNamePeerTask::processReply(int status, int handle) {
