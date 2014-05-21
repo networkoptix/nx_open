@@ -1,6 +1,7 @@
 #ifndef QN_SERIALIZATION_CSV_FUNCTIONS_H
 #define QN_SERIALIZATION_CSV_FUNCTIONS_H
 
+#include <type_traits>
 #include <map>
 #include <vector>
 #include <set>
@@ -117,6 +118,13 @@ QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Al
 QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator));
 #undef QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS
 #endif // Q_MOC_RUN
+
+
+template<class T, class Output>
+void serialize(const T &value, QnCsvStreamWriter<Output> *stream, typename std::enable_if<QnSerialization::is_enum_or_flags<T>::value>::type * = NULL) {
+    /* All enums are by default lexically serialized. */
+    stream->writeField(QnLexical::serialized(value));
+}
 
 
 #endif // QN_SERIALIZATION_CSV_FUNCTIONS_H

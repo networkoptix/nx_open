@@ -1,6 +1,7 @@
 #ifndef QN_SERIALIZATION_XML_FUNCTIONS_H
 #define QN_SERIALIZATION_XML_FUNCTIONS_H
 
+#include <type_traits>
 #include <set>
 #include <map>
 #include <vector>
@@ -17,6 +18,7 @@
 #include "collection_fwd.h"
 #include "xml.h"
 #include "lexical_functions.h"
+#include "enum.h"
 
 
 namespace QnXmlDetail {
@@ -80,6 +82,12 @@ QN_DEFINE_COLLECTION_XML_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, 
 #undef QN_DEFINE_COLLECTION_XML_SERIALIZATION_FUNCTIONS
 #endif // Q_MOC_RUN
 
+
+template<class T>
+void serialize(const T &value, QXmlStreamWriter *stream, typename std::enable_if<QnSerialization::is_enum_or_flags<T>::value>::type * = NULL) {
+    /* All enums are by default lexically serialized. */
+    stream->writeCharacters(QnLexical::serialized(value));
+}
 
 
 #endif // QN_SERIALIZATION_XML_FUNCTIONS_H
