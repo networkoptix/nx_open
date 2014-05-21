@@ -1075,7 +1075,10 @@ bool QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 	*/
 #if !defined(DEBUG_CPU_MODE) && (defined(__i386) || defined(__amd64) || defined(_WIN32))
     // do not calc motion if resolution just changed
-    if (m_frames[0]->width == m_frames[1]->width && m_frames[0]->height == m_frames[1]->height  && m_frames[0]->format == m_frames[1]->format) 
+    if (m_frames[0]->width == m_frames[1]->width
+        && m_frames[0]->height == m_frames[1]->height
+        && m_frames[0]->format == m_frames[1]->format
+        && (m_frames[idx]->width >= MD_WIDTH && m_frames[idx]->height >= MD_HEIGHT)) 
     {
         // calculate difference between frames
         if (m_xStep == 8)
