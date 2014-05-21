@@ -1,29 +1,35 @@
 #include "videowall_control_message.h"
 
-const QByteArray QnVideoWallControlOperationName[] = {
-    "Exit",
-    "Identify",
-    "ControlStarted",
-    "ControlStopped",
+#include <utils/common/model_functions.h>
 
-    "ItemRoleChanged",
-    "LayoutDataChanged",
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
+    QnVideoWallControlMessage::Operation, 
+    (QnVideoWallControlMessage::Exit,                           "Exit")
+    (QnVideoWallControlMessage::Identify,                       "Identify")
 
-    "LayoutItemAdded",
-    "LayoutItemRemoved",
-    "LayoutItemDataChanged",
+    (QnVideoWallControlMessage::ControlStarted,                 "ControlStarted")
+    (QnVideoWallControlMessage::ControlStopped,                 "ControlStopped")
 
-    "ZoomLinkAdded",
-    "ZoomLinkRemoved",
+    (QnVideoWallControlMessage::ItemRoleChanged,                "ItemRoleChanged")
+    (QnVideoWallControlMessage::LayoutDataChanged,              "LayoutDataChanged")
 
-    "NavigatorPositionChanged",
-    "NavigatorSpeedChanged",
+    (QnVideoWallControlMessage::LayoutItemAdded,                "LayoutItemAdded")
+    (QnVideoWallControlMessage::LayoutItemRemoved,              "LayoutItemRemoved")
+    (QnVideoWallControlMessage::LayoutItemDataChanged,          "LayoutItemDataChanged")
 
-    "SynchronizationChanged",
-    "MotionSelectionChanged"
-};
+    (QnVideoWallControlMessage::ZoomLinkAdded,                  "ZoomLinkAdded")
+    (QnVideoWallControlMessage::ZoomLinkRemoved,                "ZoomLinkRemoved")
 
-QDebug operator<<(QDebug dbg, const QnVideoWallControlMessage &message) {
-    dbg.nospace() << "QnVideoWallControlMessage(" << QnVideoWallControlOperationName[message.operation] << ") seq:" << message[QLatin1String("sequence")];
-    return dbg.space();
+    (QnVideoWallControlMessage::NavigatorPositionChanged,       "NavigatorPositionChanged")
+    (QnVideoWallControlMessage::NavigatorSpeedChanged,          "NavigatorSpeedChanged")
+
+    (QnVideoWallControlMessage::SynchronizationChanged,         "SynchronizationChanged")
+    (QnVideoWallControlMessage::MotionSelectionChanged,         "MotionSelectionChanged")
+    (QnVideoWallControlMessage::MediaDewarpingParamsChanged,    "MediaDewarpingParamsChanged")
+    )
+
+
+    QDebug operator<<(QDebug dbg, const QnVideoWallControlMessage &message) {
+        dbg.nospace() << "QnVideoWallControlMessage(" << QnLexical::serialized(message.operation) << ") seq:" << message[QLatin1String("sequence")];
+        return dbg.space();
 }

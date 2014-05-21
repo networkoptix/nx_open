@@ -749,7 +749,7 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
     if (sequence >= 0)
         m_videoWallMode.sequenceByPcUuid[controllerUuid] = sequence;
 
-    switch (static_cast<QnVideoWallControlMessage::QnVideoWallControlOperation>(message.operation)) {
+    switch (static_cast<QnVideoWallControlMessage::Operation>(message.operation)) {
     case QnVideoWallControlMessage::Exit:
     {
         closeInstanceDelayed();
