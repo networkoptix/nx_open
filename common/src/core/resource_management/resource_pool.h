@@ -104,7 +104,7 @@ public:
      */
     QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QUuid> &uuids) const;
 
-    QnResourcePtr getIncompatibleResourceById(const QnId &id) const;
+    QnResourcePtr getIncompatibleResourceById(const QnId &id, bool useCompatible = false) const;
     QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
     QnResourceList getAllIncompatibleResources() const;
 

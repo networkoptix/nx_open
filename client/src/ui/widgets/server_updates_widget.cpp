@@ -24,11 +24,11 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidge
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(this);
 
-    QnSortedServerUpdatesModel *model = new QnSortedServerUpdatesModel(this);
-    model->setSourceModel(m_updatesModel);
-    model->sort(0); // the column does not matter because the model uses column-independent sorting
+    m_sortedUpdatesModel = new QnSortedServerUpdatesModel(this);
+    m_sortedUpdatesModel->setSourceModel(m_updatesModel);
+    m_sortedUpdatesModel->sort(0); // the column does not matter because the model uses column-independent sorting
 
-    ui->tableView->setModel(model);
+    ui->tableView->setModel(m_sortedUpdatesModel);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::ResourceNameColumn, QHeaderView::Stretch);
     // TODO: #dklychkov fix progress bar painting and uncomment the line below
@@ -57,6 +57,11 @@ bool QnServerUpdatesWidget::cancelUpdate() {
 
 bool QnServerUpdatesWidget::isUpdating() const {
     return m_updateTool->isUpdating();
+}
+
+void QnServerUpdatesWidget::setTargets(const QSet<QnId> &targets) {
+    m_sortedUpdatesModel->setFilter(targets);
+    m_updateTool->setTargets(targets);
 }
 
 void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {

@@ -131,6 +131,21 @@ QnMediaServerUpdateTool::PeerUpdateInformation QnMediaServerUpdateTool::updateIn
     return info;
 }
 
+QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
+    return m_targets;
+}
+
+void QnMediaServerUpdateTool::setTargets(const QSet<QnId> &targets) {
+    m_targets.clear();
+
+    foreach (const QnId &id, targets) {
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+        m_targets.append(server);
+    }
+}
+
 void QnMediaServerUpdateTool::checkForUpdates() {
     if (m_state >= CheckingForUpdates)
         return;
@@ -304,7 +319,7 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
     checkUpdateCoverage();
 }
 
-void QnMediaServerUpdateTool::updateServers(const QSet<QnId> &targets) {
+void QnMediaServerUpdateTool::updateServers() {
     // here we fix the list of servers to be updated
 
     m_idBySystemInformation.clear();
@@ -313,14 +328,14 @@ void QnMediaServerUpdateTool::updateServers(const QSet<QnId> &targets) {
 
     m_updateId = QUuid::createUuid().toString();
 
-    bool checkTargets = !targets.isEmpty();
 
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
-        QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
+    if (m_targets.isEmpty()) {
+        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server))
+            m_targets.append(resource.staticCast<QnMediaServerResource>());
+    }
+
+    foreach (const QnMediaServerResourcePtr &server, m_targets) {
         if (server->getStatus() != QnResource::Online)
-            continue;
-
-        if (checkTargets && !targets.contains(server->getId()))
             continue;
 
         PeerUpdateInformation info(server);

@@ -11,6 +11,7 @@ class QnServerUpdatesWidget;
 }
 
 class QnServerUpdatesModel;
+class QnSortedServerUpdatesModel;
 class QnMediaServerUpdateTool;
 
 class QnServerUpdatesWidget : public QWidget, public QnWorkbenchContextAware {
@@ -21,6 +22,8 @@ public:
 
     bool cancelUpdate();
     bool isUpdating() const;
+
+    void setTargets(const QSet<QnId> &targets);
 
 private slots:
     void at_checkForUpdatesButton_clicked();
@@ -36,6 +39,7 @@ private:
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;
 
     QnServerUpdatesModel *m_updatesModel;
+    QnSortedServerUpdatesModel *m_sortedUpdatesModel;
     QnMediaServerUpdateTool *m_updateTool;
     int m_previousToolState;
     bool m_specificBuildCheck;

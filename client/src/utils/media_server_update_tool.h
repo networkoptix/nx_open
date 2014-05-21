@@ -91,11 +91,14 @@ public:
     CheckResult updateCheckResult() const;
     UpdateResult updateResult() const;
 
-    void updateServers(const QSet<QnId> &targets = QSet<QnId>());
+    void updateServers();
 
     QnSoftwareVersion targetVersion() const;
 
     PeerUpdateInformation updateInformation(const QnId &peerId) const;
+
+    QnMediaServerResourceList targets() const;
+    void setTargets(const QSet<QnId> &targets);
 
 signals:
     void stateChanged(int state);
@@ -182,6 +185,8 @@ private:
     QSet<QnId> m_restartingServers;
 
     QHash<QnId, PeerUpdateInformation> m_updateInformationById;
+
+    QnMediaServerResourceList m_targets;
 };
 
 #endif // QN_MEDIA_SERVER_UPDATE_TOOL_H

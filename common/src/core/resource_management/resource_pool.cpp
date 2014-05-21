@@ -521,12 +521,15 @@ QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QUu
     return result;
 }
 
-QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QnId &id) const {
+QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QnId &id, bool useCompatible) const {
     QMutexLocker locker(&m_resourcesMtx);
 
     auto it = std::find_if(m_incompatibleResources.begin(), m_incompatibleResources.end(), MatchResourceByID(id));
     if (it != m_incompatibleResources.end())
         return it.value();
+
+    if (useCompatible)
+        return getResourceById(id);
 
     return QnResourcePtr();
 }
