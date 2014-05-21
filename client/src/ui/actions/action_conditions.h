@@ -506,6 +506,18 @@ private:
     bool m_disableIfPtzDialogVisible;
 };
 
+class QnNonEmptyVideowallActionCondition: public QnActionCondition {
+public:
+    QnNonEmptyVideowallActionCondition(QObject* parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+class QnStartVideowallActionCondition: public QnActionCondition {
+public:
+    QnStartVideowallActionCondition(QObject* parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
 class QnIdentifyVideoWallActionCondition: public QnActionCondition {
 public:
     QnIdentifyVideoWallActionCondition(QObject* parent): QnActionCondition(parent) {}
