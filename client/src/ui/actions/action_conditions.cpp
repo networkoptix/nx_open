@@ -598,12 +598,11 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
     foreach (const QnResourcePtr &resource, resources) {
         //TODO: #GDM refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
-        bool isVideowall = resource->hasFlags(QnResource::videowall);
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
             && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
-        bool allowed = isServer || isMediaResource || isVideowall;
-        bool forbidden = isExportedLayout && (isServer || isLocalResource || isVideowall);
+        bool allowed = isServer || isMediaResource;
+        bool forbidden = isExportedLayout && (isServer || isLocalResource);
         if(allowed && !forbidden)
             return Qn::EnabledAction;
     }
@@ -710,17 +709,54 @@ bool QnPtzActionCondition::check(const QnPtzControllerPtr &controller) {
     return controller && controller->hasCapabilities(m_capabilities);
 }
 
+
+Qn::ActionVisibility QnNonEmptyVideowallActionCondition::check(const QnResourceList &resources) {
+    foreach(const QnResourcePtr &resource, resources) {
+        if(!resource->hasFlags(QnResource::videowall)) 
+            continue;
+
+        QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
+        if (!videowall)
+            continue;
+
+        if (videowall->items()->getItems().isEmpty())
+            continue;
+
+        return Qn::EnabledAction;
+    }
+
+    return Qn::InvisibleAction;
+}
+
+
+Qn::ActionVisibility QnStartVideowallActionCondition::check(const QnResourceList &resources) {
+    QUuid pcUuid = qnSettings->pcUuid();
+    if (pcUuid.isNull()) 
+        return Qn::InvisibleAction;
+
+    foreach(const QnResourcePtr &resource, resources) {
+        if(!resource->hasFlags(QnResource::videowall)) 
+            continue;
+
+        QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
+        if (!videowall)
+            continue;
+
+        if (!videowall->pcs()->hasItem(pcUuid))
+            continue;
+
+        foreach (const QnVideoWallItem &item, videowall->items()->getItems())
+            if (item.pcUuid == pcUuid)
+               return Qn::EnabledAction;
+    }
+    return Qn::InvisibleAction;
+}
+
+
 Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionParameters &parameters) {
     if (parameters.videoWallItems().size() > 0)
         return Qn::EnabledAction;
     return QnActionCondition::check(parameters);
-}
-
-Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnResourceList &resources) {
-    foreach(const QnResourcePtr &resource, resources)
-        if(resource->hasFlags(QnResource::videowall))
-            return Qn::EnabledAction;
-    return Qn::InvisibleAction;
 }
 
 Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnActionParameters &parameters) {

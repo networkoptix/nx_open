@@ -17,6 +17,8 @@
 
 #include "collection_fwd.h"
 #include "csv.h"
+#include "lexical.h"
+
 
 namespace QnCsvDetail {
     template<class Collection, class Output>

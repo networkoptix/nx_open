@@ -86,21 +86,24 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         if(hasStorage)
             continue;
 
+        const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong();
+
         QnStorageSpaceData data;
         data.path = partition.path + lit(QN_MEDIA_FOLDER_NAME) + QDir::separator();
         data.storageId = QnId();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
-        data.reservedSpace = -1;
+        data.reservedSpace = defaultStorageSpaceLimit;
         data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.isUsedForWriting = false;
 
-        if( data.totalSpace < MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong() )
+        if( data.totalSpace < defaultStorageSpaceLimit )
             continue;
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.path, false));
         if (storage) {
             storage->setUrl(data.path); /* createStorage does not fill url. */
+            storage->setSpaceLimit( defaultStorageSpaceLimit );
             data.isWritable = storage->isStorageAvailableForWriting();
         } else {
             data.isWritable = false;

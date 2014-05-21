@@ -68,10 +68,21 @@ bool QnProxyConnectionProcessor::doProxyData(fd_set* read_set, AbstractStreamSoc
 
         if (readed < 1)
             return false;
-        int sended = dstSocket->send(buffer, readed);
-        if (sended == -1)
-            return false; // connection closed
-        Q_ASSERT(sended == readed);
+        for( ;; )
+        {
+            int sended = dstSocket->send(buffer, readed);
+            if( sended < 0 )
+            {
+                NX_LOG( lit("QnProxyConnectionProcessor::doProxyData. Socket error: %1").arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
+                return false;
+            }
+            if( sended == 0 )
+                return false;   //socket closed
+            if( sended == readed )
+                return true;    //sent everything
+            buffer += sended;
+            readed -= sended;
+        }
     }
     return true;
 }

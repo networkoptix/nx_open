@@ -9,7 +9,7 @@
 
 class QnVideoWallControlMessage {
 public:
-    enum QnVideoWallControlOperation {
+    enum Operation {
         Exit,
         Identify,
 
@@ -37,12 +37,12 @@ public:
     };
 
     QnVideoWallControlMessage() {}
-    QnVideoWallControlMessage(QnVideoWallControlOperation operation):
+    QnVideoWallControlMessage(Operation operation):
         operation(operation){}
 
     QUuid videoWallGuid;
     QUuid instanceGuid;
-    QnVideoWallControlOperation operation;
+    Operation operation;
     QHash<QString, QString> params;
 
     QString& operator[](const QString &key) { return params[key]; }

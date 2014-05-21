@@ -181,7 +181,8 @@ QnCheckableMessageBox::question(QWidget *parent, int helpTopicId, const QString 
     mb.setWindowTitle(title);
     mb.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
     mb.setText(question);
-    mb.setCheckBoxText(checkBoxText);
+    if (!checkBoxText.isEmpty())
+        mb.setCheckBoxText(checkBoxText);
     mb.setChecked(*checkBoxSetting);
     mb.setStandardButtons(buttons);
     mb.setDefaultButton(defaultButton);
@@ -202,7 +203,8 @@ QnCheckableMessageBox::warning(QWidget *parent, int helpTopicId, const QString &
     mb.setWindowTitle(title);
     mb.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Warning));
     mb.setText(warning);
-    mb.setCheckBoxText(checkBoxText);
+    if (!checkBoxText.isEmpty())
+        mb.setCheckBoxText(checkBoxText);
     mb.setChecked(*checkBoxSetting);
     mb.setStandardButtons(buttons);
     mb.setDefaultButton(defaultButton);

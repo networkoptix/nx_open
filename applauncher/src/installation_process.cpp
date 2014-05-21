@@ -42,7 +42,7 @@ InstallationProcess::InstallationProcess(
 InstallationProcess::~InstallationProcess()
 {
     pleaseStop();
-    wait();
+    join();
 }
 
 void InstallationProcess::pleaseStop()
@@ -50,7 +50,7 @@ void InstallationProcess::pleaseStop()
     //TODO/IMPL
 }
 
-void InstallationProcess::wait()
+void InstallationProcess::join()
 {
     //TODO/IMPL
 }
@@ -189,9 +189,9 @@ void InstallationProcess::finished(
 }
 
 void InstallationProcess::failed(
-    const std::shared_ptr<RDirSyncher>& syncher,
-    const QString& failedFilePath,
-    const QString& errorText )
+    const std::shared_ptr<RDirSyncher>& /*syncher*/,
+    const QString& /*failedFilePath*/,
+    const QString& /*errorText*/ )
 {
     //TODO/IMPL
 }
