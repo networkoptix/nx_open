@@ -137,7 +137,7 @@ QnGraphicsMessageBox* QnGraphicsMessageBox::informationTicking(const QString &te
     QPointer<QnGraphicsMessageBox> box = new QnGraphicsMessageBox(instance, QString(), timeoutMsec, fontSize);
     instance->addItem(box);
 
-    auto tickHandler = [box, text](int tick) {
+    const auto tickHandler = [box, text](int tick) {
         if (!box)
             return;
 
@@ -149,7 +149,7 @@ QnGraphicsMessageBox* QnGraphicsMessageBox::informationTicking(const QString &te
         else
             box->hideImmideately();
     };
-    connect(box, &QnGraphicsMessageBox::tick, instance, tickHandler);
+    connect(box.data(), &QnGraphicsMessageBox::tick, instance, tickHandler);
     tickHandler(0);
 
     return box;
