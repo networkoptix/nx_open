@@ -24,6 +24,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::SerializationFormat,
     (Qn::JsonFormat,        "json")
     (Qn::BnsFormat,         "bns")
     (Qn::CsvFormat,         "csv")
+    (Qn::XmlFormat,         "xml")
 )
 
 QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(

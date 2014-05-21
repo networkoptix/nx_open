@@ -3,6 +3,9 @@
 
 #include <type_traits> /* For std::is_same. */
 
+#include <utils/fusion/fusion.h>
+#include <utils/serialization/serialization.h>
+
 #include "csv_fwd.h"
 #include "csv_stream.h"
 #include "csv_detail.h"

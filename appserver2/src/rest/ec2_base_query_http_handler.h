@@ -73,6 +73,9 @@ namespace ec2
                     } else if(format == Qn::CsvFormat) {
                         result = QnCsv::serialized(outputData);
                         contentType = "text/csv";
+                    } else if(format == Qn::XmlFormat) {
+                        result = QnXml::serialized(outputData, lit("reply"));
+                        contentType = "application/xml";
                     } else {
                         assert(false);
                     }

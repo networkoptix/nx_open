@@ -7,17 +7,14 @@
 #include <iterator> /* For std::iterator_traits. */
 
 #include <boost/range/mutable_iterator.hpp>
+#include <boost/preprocessor/tuple/enum.hpp>
 
-#include <QtCore/QList>
-#include <QtCore/QLinkedList>
-#include <QtCore/QVector>
-#include <QtCore/QSet>
-#include <QtCore/QVarLengthArray>
 #include <QtCore/QUuid>
 #include <QtCore/QUrl>
 
 #include <utils/common/latin1_array.h>
 
+#include "collection_fwd.h"
 #include "csv.h"
 
 namespace QnCsvDetail {
@@ -41,6 +38,10 @@ QN_DECLARE_CSV_TYPE_CATEGORY(QString, QnCsv::field_tag)
 QN_DECLARE_CSV_TYPE_CATEGORY(QByteArray, QnCsv::field_tag)
 QN_DECLARE_CSV_TYPE_CATEGORY(QnLatin1Array, QnCsv::field_tag)
 
+template<class Output>
+void serialize(const bool &value, QnCsvStreamWriter<Output> *stream) {
+    stream->writeUtf8Field(value ? "true" : "false");
+}
 
 template<class Output>
 void serialize(const QString &value, QnCsvStreamWriter<Output> *stream) {

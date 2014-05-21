@@ -20,9 +20,9 @@
 
 #include <utils/common/unused.h>
 #include <utils/fusion/fusion_serialization.h>
+#include <utils/serialization/serialization.h>
 
 #include "json_fwd.h"
-#include "serialization.h"
 #include "lexical.h"
 
 class QnJsonSerializer;

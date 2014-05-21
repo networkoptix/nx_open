@@ -5,13 +5,8 @@
 #include <set>
 #include <map>
 
-#include <QtCore/QList>
-#include <QtCore/QLinkedList>
-#include <QtCore/QVector>
-#include <QtCore/QMap>
-#include <QtCore/QSet>
-#include <QtCore/QHash>
-#include <QtCore/QVarLengthArray>
+#include <boost/preprocessor/tuple/enum.hpp>
+
 #include <QtCore/QSize>
 #include <QtCore/QSizeF>
 #include <QtCore/QRect>
@@ -31,8 +26,8 @@
 #include <utils/common/container.h>
 #include <utils/common/latin1_array.h>
 
+#include "collection_fwd.h"
 #include "json.h"
-#include "lexical.h"
 #include "lexical_functions.h"
 
 QN_FUSION_DECLARE_FUNCTIONS(qint32, (json)) /* Needed for (de)serialize_numeric_enum below. */ 
@@ -331,14 +326,16 @@ QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QList, (class T), (T), containe
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QLinkedList, (class T), (T), container);
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QVector, (class T), (T), container);
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QVarLengthArray, (class T, int N), (T, N), container);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QMap, (class T), (QString, T), string_map);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QHash, (class T), (QString, T), string_map);
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T), container);
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T), container);
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator), container);
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator), container);
 QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator), container);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(std::map, (class T, class Predicate, class Allocator), (QString, T, Predicate, Allocator), container);
+
+QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QMap, (class T), (QString, T), string_map);
+QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QHash, (class T), (QString, T), string_map);
+QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(std::map, (class T, class Predicate, class Allocator), (QString, T, Predicate, Allocator), string_map);
+
 #undef QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS
 #endif // Q_MOC_RUN
 
