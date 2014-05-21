@@ -23,7 +23,7 @@
 #include <QtGui/QVector4D>
 #include <QtGui/QFont>
 
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 #include <utils/common/latin1_array.h>
 
 #include "collection_fwd.h"

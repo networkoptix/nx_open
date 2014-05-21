@@ -6,7 +6,7 @@
 
 #include <ui/style/globals.h>
 
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 #include <utils/common/string.h>
 
 namespace {

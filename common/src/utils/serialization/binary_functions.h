@@ -19,7 +19,7 @@
 #   include <QtCore/QUuid>
 #endif
 
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 
 #ifndef QN_NO_BASE
 #   include <utils/common/latin1_array.h>

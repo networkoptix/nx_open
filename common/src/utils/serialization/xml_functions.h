@@ -12,7 +12,7 @@
 
 #include <utils/fusion/fusion.h>
 #include <utils/common/latin1_array.h>
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 
 #include "collection_fwd.h"
 #include "xml.h"
