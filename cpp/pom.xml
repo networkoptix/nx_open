@@ -196,6 +196,12 @@
                                                 <![CDATA[<RootNamespace>${project.artifactId}</RootNamespace><LocalDebuggerWorkingDirectory>$(OutputDirectory)</LocalDebuggerWorkingDirectory>]]></value>
                                         </replacement> -->
  
+                                        <!-- Disabling optimization for debug builds -->
+                                        <replacement>
+                                            <token><![CDATA[<WarningLevel>Level3</WarningLevel>]]></token>
+                                            <value><![CDATA[<WarningLevel>Level3</WarningLevel><Optimization>Disabled</Optimization>]]></value>
+                                        </replacement>
+ 
                                         <replacement>
                                             <token>
                                                 <![CDATA[</RootNamespace>]]></token>
