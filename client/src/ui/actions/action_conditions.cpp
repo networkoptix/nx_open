@@ -759,13 +759,6 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
     return QnActionCondition::check(parameters);
 }
 
-Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnResourceList &resources) {
-    foreach(const QnResourcePtr &resource, resources)
-        if(resource->hasFlags(QnResource::videowall))
-            return Qn::EnabledAction;
-    return Qn::InvisibleAction;
-}
-
 Qn::ActionVisibility QnResetVideoWallLayoutActionCondition::check(const QnActionParameters &parameters) {
     if (!context()->user() || parameters.videoWallItems().isEmpty())
         return Qn::InvisibleAction;

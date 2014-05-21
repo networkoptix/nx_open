@@ -518,11 +518,10 @@ public:
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
-class QnIdentifyVideoWallActionCondition: public QnActionCondition {
+class QnIdentifyVideoWallActionCondition: public QnNonEmptyVideowallActionCondition {
 public:
-    QnIdentifyVideoWallActionCondition(QObject* parent): QnActionCondition(parent) {}
+    QnIdentifyVideoWallActionCondition(QObject* parent): QnNonEmptyVideowallActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
-    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
 class QnResetVideoWallLayoutActionCondition: public QnActionCondition {
