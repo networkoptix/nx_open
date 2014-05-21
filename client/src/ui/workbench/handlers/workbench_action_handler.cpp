@@ -133,6 +133,9 @@
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
+
+    const int videowallReconnectTimeoutMSec = 5000;
+    const int videowallCloseTimeoutMSec = 10000;
 }
 
 //!time that is given to process to exit. After that, appauncher (if present) will try to terminate it
@@ -1518,20 +1521,43 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         QnConnectionRequestResult result;
         QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
             connectionData.url, &result, &QnConnectionRequestResult::processEc2Reply );
-        if(result.exec() != 0)
+
+        QnGraphicsMessageBox* connectingMessageBox = qnSettings->isVideoWallMode()
+            ? QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX)
+            : NULL;
+
+        //here we are going to inner event loop
+        int errCode = result.exec();
+        if (connectingMessageBox)
+            connectingMessageBox->hideImmideately();
+        
+        if (errCode != 0) {
+            if (qnSettings->isVideoWallMode()) {
+                QnGraphicsMessageBox* reconnectingMessageBox = QnGraphicsMessageBox::informationTicking(tr("Connection failed. Reconnecting in %1..."), videowallReconnectTimeoutMSec);
+                connect(reconnectingMessageBox, &QnGraphicsMessageBox::finished, action(Qn::ReconnectAction), &QAction::trigger);
+            }
             return;
+        }
 
         QnAppServerConnectionFactory::setEc2Connection( result.connection());
         connectionInfo = result.reply<QnConnectionInfoPtr>();
     }
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
 
-    // TODO: #Elric maybe we need to check server-client compatibility here? --done //GDM
+    auto incompatibilityHandler = [this]() {
+        if (!qnSettings->isVideoWallMode())
+            return;
+        QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Incompatible server. Closing in %1..."), videowallCloseTimeoutMSec);
+        connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished, action(Qn::ExitAction), &QAction::trigger);
+    };
+
     { // I think we should move this common code to common place --gdm
         bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
                 || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
-        if (!compatibleProduct)
+        if (!compatibleProduct) {
+            incompatibilityHandler();
             return;
+        }
 
         QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
         QnCompatibilityChecker localChecker(localCompatibilityItems());
@@ -1542,8 +1568,10 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
             compatibilityChecker = &localChecker;
         }
 
-        if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version))
+        if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version)) {
+            incompatibilityHandler();
             return;
+        }
     }
 
 
