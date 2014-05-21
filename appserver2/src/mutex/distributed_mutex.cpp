@@ -44,8 +44,7 @@ QnDistributedMutexPtr QnDistributedMutexManager::getLock(const QString& name, in
 
     Q_ASSERT(!m_mutexList.value(name));
 
-
-    QnDistributedMutexPtr netMutex(new QnDistributedMutex(this), qnDeleteLater);
+    QnDistributedMutexPtr netMutex(new QnDistributedMutex(this));
     m_mutexList.insert(name, netMutex);
 
     connect(netMutex.data(), &QnDistributedMutex::locked,      this, &QnDistributedMutexManager::locked, Qt::DirectConnection);

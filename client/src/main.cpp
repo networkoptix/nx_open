@@ -500,6 +500,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QnLocalFileProcessor localFileProcessor;
     QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
+    localFileProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(&localFileProcessor);
 
     //============================

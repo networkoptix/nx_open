@@ -1131,7 +1131,8 @@ void QnMain::run()
 
     QSettings* settings = MSSettings::roSettings();
 
-    QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList));
+    std::unique_ptr<QnMServerResourceDiscoveryManager> mserverResourceDiscoveryManager( new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList) );
+    QnResourceDiscoveryManager::init( mserverResourceDiscoveryManager.get() );
     initAppServerConnection(*settings);
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
@@ -1365,6 +1366,7 @@ void QnMain::run()
     UPNPDeviceSearcher::initGlobalInstance( new UPNPDeviceSearcher() );
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
+    serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
 
     //NOTE plugins have higher priority than built-in drivers
@@ -1511,9 +1513,11 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->stop();
     QnResource::stopAsyncTasks();
 
-    delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
+    mserverResourceDiscoveryManager.reset();
 
+    //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
+        //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
     serverResourceProcessor.reset();
 
 #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
