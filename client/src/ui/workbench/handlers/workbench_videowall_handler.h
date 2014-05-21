@@ -41,12 +41,16 @@ private:
     /** Updates item's layout with provided value. Provided layout should be saved. */
     void updateItemsLayout(const QnVideoWallItemIndexList &items, const QnId &layoutId);
 
-    bool startVideoWall(const QnVideoWallResourcePtr &videoWall);
+    bool canStartVideowall(const QnVideoWallResourcePtr &videowall);
+
+    /** Sync check that we can close client silently. Ask about unsaved layouts etc. */
+    bool canClose();
+
     void startVideowallAndExit(const QnVideoWallResourcePtr &videoWall);
 
     void openNewWindow(const QStringList &args);
     void openVideoWallItem(const QnVideoWallResourcePtr &videoWall);
-    void closeInstance();
+    void closeInstanceDelayed();
     void sendInstanceGuid();
 
     void setControlMode(bool active);
