@@ -57,7 +57,7 @@
 
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 #include <utils/serialization/json.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/common/string.h>
