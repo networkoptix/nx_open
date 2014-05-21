@@ -29,7 +29,7 @@ namespace QnXmlDetail {
     }
 
     template<class Element>
-    void serialize_collection_element(const Element &element, QXmlStreamWriter *stream, const QnContainer::map_tag &) {
+    void serialize_collection_element(const Element &element, QXmlStreamWriter *stream, const QnCollection::map_tag &) {
         stream->writeStartElement(lit("element"));
         
         stream->writeStartElement(lit("key"));
@@ -46,7 +46,7 @@ namespace QnXmlDetail {
     template<class Collection>
     void serialize_collection(const Collection &value, QXmlStreamWriter *stream) {
         for(auto pos = boost::begin(value); pos != boost::end(value); ++pos)
-            serialize_collection_element(*pos, stream, typename QnContainer::container_category<Collection>::type());
+            serialize_collection_element(*pos, stream, typename QnCollection::collection_category<Collection>::type());
     }
 
 } // namespace QnXmlDetail

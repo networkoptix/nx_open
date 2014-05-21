@@ -184,9 +184,9 @@ protected:
                         return false;
                 } else {
                     if(conforms) {
-                        QnContainer::insert(*conforming, conforming->end(), QPoint(c, r));
+                        QnCollection::insert(*conforming, conforming->end(), QPoint(c, r));
                     } else {
-                        QnContainer::insert(*nonconforming, nonconforming->end(), QPoint(c, r));
+                        QnCollection::insert(*nonconforming, nonconforming->end(), QPoint(c, r));
                     }
                 }
             }

@@ -37,7 +37,7 @@ namespace QnBinaryDetail {
     }
 
     template<class Element, class Output>
-    void serialize_collection_element(const Element &element, QnOutputBinaryStream<Output> *stream, const QnContainer::map_tag &) {
+    void serialize_collection_element(const Element &element, QnOutputBinaryStream<Output> *stream, const QnCollection::map_tag &) {
         QnBinary::serialize(element.first, stream);
         QnBinary::serialize(element.second, stream);
     }
@@ -46,27 +46,27 @@ namespace QnBinaryDetail {
     void serialize_collection(const Collection &value, QnOutputBinaryStream<Output> *stream) {
         QnBinary::serialize(static_cast<qint32>(value.size()), stream);
         for(auto pos = boost::begin(value); pos != boost::end(value); ++pos)
-            serialize_collection_element(*pos, stream, typename QnContainer::container_category<Collection>::type());
+            serialize_collection_element(*pos, stream, typename QnCollection::collection_category<Collection>::type());
     }
 
     template<class Collection, class Element, class Input>
-    bool deserialize_collection_element(QnInputBinaryStream<Input> *stream, Collection *target, const Element *, const QnContainer::list_tag &) {
+    bool deserialize_collection_element(QnInputBinaryStream<Input> *stream, Collection *target, const Element *, const QnCollection::list_tag &) {
         /* Deserialize value right into list. */
-        return QnBinary::deserialize(stream, &*QnContainer::insert(*target, boost::end(*target), Element()));
+        return QnBinary::deserialize(stream, &*QnCollection::insert(*target, boost::end(*target), Element()));
     }
 
     template<class Collection, class Element, class Input>
-    bool deserialize_collection_element(QnInputBinaryStream<Input> *stream, Collection *target, const Element *, const QnContainer::set_tag &) {
+    bool deserialize_collection_element(QnInputBinaryStream<Input> *stream, Collection *target, const Element *, const QnCollection::set_tag &) {
         Element element;
         if(!QnBinary::deserialize(stream, &element))
             return false;
         
-        QnContainer::insert(*target, boost::end(*target), std::move(element));
+        QnCollection::insert(*target, boost::end(*target), std::move(element));
         return true;
     }
 
     template<class Collection, class Element, class Input>
-    bool deserialize_collection_element(QnInputBinaryStream<Input> *stream, Collection *target, const Element *, const QnContainer::map_tag &) {
+    bool deserialize_collection_element(QnInputBinaryStream<Input> *stream, Collection *target, const Element *, const QnCollection::map_tag &) {
         typename Collection::key_type key;
         if(!QnBinary::deserialize(stream, &key))
             return false;
@@ -80,7 +80,7 @@ namespace QnBinaryDetail {
 
     template<class Collection, class Input>
     bool deserialize_collection(QnInputBinaryStream<Input> *stream, Collection *target) {
-        typedef typename QnContainer::make_assignable<typename std::iterator_traits<typename boost::range_mutable_iterator<Collection>::type>::value_type>::type value_type;
+        typedef typename QnCollection::make_assignable<typename std::iterator_traits<typename boost::range_mutable_iterator<Collection>::type>::value_type>::type value_type;
 
         qint32 size;
         if(!QnBinary::deserialize(stream, &size))
@@ -93,11 +93,11 @@ namespace QnBinaryDetail {
          * Limit: no more than 1024 elements, and no more than 1Mb of memory. */
         qint32 maxSize = std::min(1024, 1024 * 1024 / static_cast<int>(sizeof(value_type)));
 
-        QnContainer::clear(*target);
-        QnContainer::reserve(*target, std::min(size, maxSize));
+        QnCollection::clear(*target);
+        QnCollection::reserve(*target, std::min(size, maxSize));
 
         for(int i = 0; i < size; i++)
-            if(!deserialize_collection_element(stream, target, static_cast<const value_type *>(NULL), typename QnContainer::container_category<Collection>::type()))
+            if(!deserialize_collection_element(stream, target, static_cast<const value_type *>(NULL), typename QnCollection::collection_category<Collection>::type()))
                 return false;
         
         return true;

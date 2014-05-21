@@ -85,53 +85,53 @@ inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, float *targ
 namespace QJsonDetail {
 
     template<class Element, class Tag>
-    void serialize_container_element(QnJsonContext *ctx, const Element &element, QJsonValue *target, const Tag &) {
+    void serialize_collection_element(QnJsonContext *ctx, const Element &element, QJsonValue *target, const Tag &) {
         QJson::serialize(ctx, element, target);
     }
 
     template<class Element>
-    void serialize_container_element(QnJsonContext *ctx, const Element &element, QJsonValue *target, const QnContainer::map_tag &) {
+    void serialize_collection_element(QnJsonContext *ctx, const Element &element, QJsonValue *target, const QnCollection::map_tag &) {
         QJsonObject map;
         QJson::serialize(ctx, element.first, lit("key"), &map);
         QJson::serialize(ctx, element.second, lit("value"), &map);
         *target = map;
     }
 
-    template<class Container>
-    void serialize_container(QnJsonContext *ctx, const Container &value, QJsonValue *target) {
+    template<class Collection>
+    void serialize_collection(QnJsonContext *ctx, const Collection &value, QJsonValue *target) {
         QJsonArray result;
 
         for(auto pos = boost::begin(value); pos != boost::end(value); ++pos) {
             QJsonValue element;
-            serialize_container_element(ctx, *pos, &element, typename QnContainer::container_category<Container>::type());
+            serialize_collection_element(ctx, *pos, &element, typename QnCollection::collection_category<Collection>::type());
             result.push_back(element);
         }
 
         *target = result;
     }
 
-    template<class Container, class Element>
-    bool deserialize_container_element(QnJsonContext *ctx, const QJsonValue &value, Container *target, const Element *, const QnContainer::list_tag &) {
-        return QJson::deserialize(ctx, value, &*QnContainer::insert(*target, boost::end(*target), Element()));
+    template<class Collection, class Element>
+    bool deserialize_collection_element(QnJsonContext *ctx, const QJsonValue &value, Collection *target, const Element *, const QnCollection::list_tag &) {
+        return QJson::deserialize(ctx, value, &*QnCollection::insert(*target, boost::end(*target), Element()));
     }
 
-    template<class Container, class Element>
-    bool deserialize_container_element(QnJsonContext *ctx, const QJsonValue &value, Container *target, const Element *, const QnContainer::set_tag &) {
+    template<class Collection, class Element>
+    bool deserialize_collection_element(QnJsonContext *ctx, const QJsonValue &value, Collection *target, const Element *, const QnCollection::set_tag &) {
         Element element;
         if(!QJson::deserialize(ctx, value, &element))
             return false;
         
-        QnContainer::insert(*target, boost::end(*target), std::move(element));
+        QnCollection::insert(*target, boost::end(*target), std::move(element));
         return true;
     }
 
-    template<class Container, class Element>
-    bool deserialize_container_element(QnJsonContext *ctx, const QJsonValue &value, Container *target, const Element *, const QnContainer::map_tag &) {
+    template<class Collection, class Element>
+    bool deserialize_collection_element(QnJsonContext *ctx, const QJsonValue &value, Collection *target, const Element *, const QnCollection::map_tag &) {
         if(value.type() != QJsonValue::Object)
             return false;
         QJsonObject element = value.toObject();
 
-        typename Container::key_type key;
+        typename Collection::key_type key;
         if(!QJson::deserialize(ctx, element, lit("key"), &key))
             return false;
 
@@ -141,19 +141,19 @@ namespace QJsonDetail {
         return true;
     }
 
-    template<class Container>
-    bool deserialize_container(QnJsonContext *ctx, const QJsonValue &value, Container *target) {
-        typedef typename std::iterator_traits<typename boost::range_mutable_iterator<Container>::type>::value_type value_type;
+    template<class Collection>
+    bool deserialize_collection(QnJsonContext *ctx, const QJsonValue &value, Collection *target) {
+        typedef typename std::iterator_traits<typename boost::range_mutable_iterator<Collection>::type>::value_type value_type;
 
         if(value.type() != QJsonValue::Array)
             return false;
         QJsonArray array = value.toArray();
         
-        QnContainer::clear(*target);
-        QnContainer::reserve(*target, array.size());
+        QnCollection::clear(*target);
+        QnCollection::reserve(*target, array.size());
 
         for(auto pos = array.begin(); pos != array.end(); pos++)
-            if(!deserialize_container_element(ctx, *pos, target, static_cast<const value_type *>(NULL), typename QnContainer::container_category<Container>::type()))
+            if(!deserialize_collection_element(ctx, *pos, target, static_cast<const value_type *>(NULL), typename QnCollection::collection_category<Collection>::type()))
                 return false;
 
         return true;
@@ -178,8 +178,8 @@ namespace QJsonDetail {
             return false;
         QJsonObject map = value.toObject();
 
-        QnContainer::clear(*target);
-        QnContainer::reserve(*target, map.size());
+        QnCollection::clear(*target);
+        QnCollection::reserve(*target, map.size());
 
         for(auto pos = map.begin(); pos != map.end(); pos++)
             if(!QJson::deserialize(ctx, pos.value(), &(*target)[pos.key()]))
@@ -310,7 +310,7 @@ QN_DEFINE_INTEGER_STRING_JSON_SERIALIZATION_FUNCTIONS(unsigned long long)
 #undef QN_DEFINE_INTEGER_STRING_JSON_SERIALIZATION_FUNCTIONS
 
 
-#define QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG, IMPL) \
+#define QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG, IMPL) \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF)>                                          \
 void serialize(QnJsonContext *ctx, const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> &value, QJsonValue *target) { \
     QJsonDetail::BOOST_PP_CAT(serialize_, IMPL)(ctx, value, target);            \
@@ -321,22 +321,22 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE<BOOST_PP_TUPL
     return QJsonDetail::BOOST_PP_CAT(deserialize_, IMPL)(ctx, value, target);   \
 }                                                                               \
 
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QSet, (class T), (T), container);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QList, (class T), (T), container);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QLinkedList, (class T), (T), container);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QVector, (class T), (T), container);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QVarLengthArray, (class T, int N), (T, N), container);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T), container);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T), container);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator), container);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator), container);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator), container);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QSet, (class T), (T), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QList, (class T), (T), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QLinkedList, (class T), (T), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QVector, (class T), (T), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QVarLengthArray, (class T, int N), (T, N), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator), collection);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator), collection);
 
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QMap, (class T), (QString, T), string_map);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(QHash, (class T), (QString, T), string_map);
-QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS(std::map, (class T, class Predicate, class Allocator), (QString, T, Predicate, Allocator), string_map);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QMap, (class T), (QString, T), string_map);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(QHash, (class T), (QString, T), string_map);
+QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::map, (class T, class Predicate, class Allocator), (QString, T, Predicate, Allocator), string_map);
 
-#undef QN_DEFINE_CONTAINER_JSON_SERIALIZATION_FUNCTIONS
+#undef QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS
 #endif // Q_MOC_RUN
 
 
