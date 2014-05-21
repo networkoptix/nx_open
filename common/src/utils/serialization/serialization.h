@@ -229,7 +229,7 @@ public:
 
 namespace QnSerializationDetail {
 
-    // TODO: #Elric #ec2 also adl_wrap the value?
+    // TODO: #Elric #ec2 also disable_user_conversions the value?
 
     /* Internal interface for (de)serializers that do not use context. */
 
@@ -246,10 +246,10 @@ namespace QnSerializationDetail {
          * ADL would find only overloads with it as the first parameter. 
          * Otherwise other overloads could also be discovered. 
          *
-         * Also note that adl_wrap is also looked up via ADL, and thus
-         * ADL wrapping for the data type can actually be disabled by
-         * overloading adl_wrap. */
-        return deserialize(adl_wrap(value), target);
+         * Also note that disable_user_conversions is also looked up via ADL, and thus
+         * conversion wrapping for the data type can actually be disabled by
+         * overloading disable_user_conversions. */
+        return deserialize(disable_user_conversions(value), target);
     }
 
     /* Internal interface for (de)serializers that use context. */
@@ -263,10 +263,10 @@ namespace QnSerializationDetail {
     bool deserialize_direct(Context *ctx, const D &value, T *target) {
         /* That's the place where ADL kicks in.
          * 
-         * Note that we wrap a json value into a wrapper so that
-         * ADL would find only overloads with QJsonValue as the first parameter. 
-         * Otherwise other overloads could be discovered. */
-        return deserialize(ctx, adl_wrap(value), target);
+         * Note that we wrap a serialized type into a wrapper so that
+         * ADL would find only overloads with it as the first parameter. 
+         * Otherwise other overloads could also be discovered. */
+        return deserialize(ctx, disable_user_conversions(value), target);
     }
 
 

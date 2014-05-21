@@ -23,7 +23,7 @@ namespace QnCsvDetail {
 
     template<class T, class Output>
     void serialize_header_internal(const QString &prefix, QnCsvStreamWriter<Output> *stream, const T *dummy) {
-        serialize_header(prefix, adl_wrap(stream), dummy); /* That's where ADL kicks in. */
+        serialize_header(prefix, disable_user_conversions(stream), dummy); /* That's where ADL kicks in. */
     }
 
 

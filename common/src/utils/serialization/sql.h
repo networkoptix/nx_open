@@ -22,12 +22,12 @@ namespace QnSqlDetail {
 
     template<class T>
     QnSqlIndexMapping mapping_internal(const QSqlQuery &query, const T *dummy) {
-        return mapping(adl_wrap(query), dummy);
+        return mapping(disable_user_conversions(query), dummy);
     }
 
     template<class T>
     void fetch_internal(const QnSqlIndexMapping &mapping, const QSqlRecord &value, T *target) {
-        fetch(mapping, adl_wrap(value), target);
+        fetch(mapping, disable_user_conversions(value), target);
     }
 
     template<class T>
@@ -37,7 +37,7 @@ namespace QnSqlDetail {
 
     template<class T>
     void deserialize_field_internal(const QVariant &value, T *target) {
-        deserialize_field(adl_wrap(value), target);
+        deserialize_field(disable_user_conversions(value), target);
     }
 
     struct TrueChecker {

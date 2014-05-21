@@ -88,11 +88,11 @@ private:
 };
 
 
-/* Disable ADL wrapping for stream types as they are not convertible to anything
+/* Disable conversion wrapping for stream types as they are not convertible to anything
  * anyway. Also when wrapping is enabled, ADL fails to find template overloads. */
 
 template<class Output>
-QnCsvStreamWriter<Output> *adl_wrap(QnCsvStreamWriter<Output> *value) {
+QnCsvStreamWriter<Output> *disable_user_conversions(QnCsvStreamWriter<Output> *value) {
     return value;
 }
 
