@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>457</width>
-    <height>279</height>
+    <height>302</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -111,6 +111,16 @@
     <widget class="QCheckBox" name="autoFillCheckBox">
      <property name="text">
       <string>Fill the free space the same way</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="shortcutCheckbox">
+     <property name="text">
+      <string>Create shortcut on the desktop</string>
      </property>
      <property name="checked">
       <bool>true</bool>

@@ -645,16 +645,22 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
         return;
     }
 
-    bool doNotAskAgain = qnSettings->isVideoWallSilentStart();
-    QDialogButtonBox::StandardButton button = QnCheckableMessageBox::question(
-        mainWindow(),
-        tr("Client will be closed."),
-        tr("Client will be closed and reopened as Video Wall."), //TODO: #VW #TR
-        QString(),
-        &doNotAskAgain,
-        QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Yes
-        );
+    bool doNotAskAgain = false;
+    int startMode = qnSettings->videoWallStartMode();
+    QDialogButtonBox::StandardButton button = QDialogButtonBox::Yes; 
+    if (startMode < 0) {
+        button = QnCheckableMessageBox::question(
+            mainWindow(),
+            tr("Client will be closed."),
+            tr("Client will be closed and reopened as Video Wall."), //TODO: #VW #TR
+            QString(),
+            &doNotAskAgain,
+            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+            QDialogButtonBox::Yes
+            );
+    } else {
+        button = static_cast<QDialogButtonBox::StandardButton>(startMode);
+    }
 
     if (button == QDialogButtonBox::Cancel)
         return;
@@ -664,7 +670,8 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
             closeInstanceDelayed();
     }
     
-    qnSettings->setVideoWallSilentStart(doNotAskAgain);
+    if (doNotAskAgain)
+        qnSettings->setVideoWallStartMode(static_cast<int>(button));
 
     QStringList arguments;
     arguments << QLatin1String("--videowall");
@@ -1391,6 +1398,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     dialog->loadLayoutsList(layouts);
     dialog->setCanClone(canClone);
     dialog->loadSettings(m_attachSettings);
+    dialog->setCreateShortcut(!shortcutExists(videoWall));
     if (!dialog->exec())
         return;
     m_attachSettings = dialog->settings();
@@ -1424,6 +1432,9 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     }
 
     attachLayout(videoWall, targetLayout, m_attachSettings);
+
+    if (dialog->isCreateShortcut())
+        createShortcut(videoWall);
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered() {
@@ -2403,4 +2414,25 @@ void QnWorkbenchVideoWallHandler::at_controlModeCacheTimer_timeout() {
         }
         sendMessage(message);
     }
+}
+
+bool QnWorkbenchVideoWallHandler::shortcutExists(const QnVideoWallResourcePtr &videowall) const {
+    return false;
+}
+
+void QnWorkbenchVideoWallHandler::createShortcut(const QnVideoWallResourcePtr &videowall) {
+
+    QStringList arguments;
+    arguments << QLatin1String("--videowall");
+    arguments << videowall->getId().toString();
+
+    QUrl url = qnSettings->lastUsedConnection().url;
+    url.setUserName(QString());
+    url.setPassword(QString());
+
+    arguments << QLatin1String("--auth");
+    arguments << QLatin1String(url.toEncoded());
+
+    QProcess::startDetached(qApp->applicationFilePath(), arguments);
+
 }

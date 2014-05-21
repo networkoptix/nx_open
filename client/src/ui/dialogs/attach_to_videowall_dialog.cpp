@@ -83,6 +83,19 @@ void QnAttachToVideowallDialog::loadLayoutsList(const QnLayoutResourceList &layo
     ui->layoutCustom->setEnabled(!layouts.isEmpty());
 }
 
-void QnAttachToVideowallDialog::setCanClone(bool canClone) {
-    ui->layoutClone->setEnabled(canClone);
+bool QnAttachToVideowallDialog::canClone() const {
+    return ui->layoutClone->isEnabled();
 }
+
+void QnAttachToVideowallDialog::setCanClone(bool value) {
+    ui->layoutClone->setEnabled(value);
+}
+
+bool QnAttachToVideowallDialog::isCreateShortcut() const {
+    return ui->shortcutCheckbox->isChecked();
+}
+
+void QnAttachToVideowallDialog::setCreateShortcut(bool value) {
+    ui->shortcutCheckbox->setChecked(value);
+}
+
