@@ -74,6 +74,19 @@ QUuid QnTransactionLog::makeHash(const QByteArray& data1, const QByteArray& data
     return QUuid::fromRfc4122(hash.result());
 }
 
+QUuid QnTransactionLog::transactionHash(const ApiResourceParamsData& params) const
+{
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    hash.addData("res_params");
+    hash.addData(params.id.toRfc4122());
+    foreach(const ApiResourceParamData& param, params.params) {
+        hash.addData(param.name.toUtf8());
+        if (param.predefinedParam)
+            hash.addData("1");
+    }
+    return QUuid::fromRfc4122(hash.result());
+}
+
 QUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData(extraData.toUtf8());

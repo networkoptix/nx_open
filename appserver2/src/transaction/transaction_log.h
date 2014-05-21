@@ -86,7 +86,7 @@ namespace ec2
         QUuid transactionHash(const ApiCameraServerItemData&) const              { return QUuid::createUuid() ; }
         QUuid transactionHash(const ApiSetResourceStatusData& params) const      { return makeHash(params.id.toRfc4122(), "status"); }
         QUuid transactionHash(const ApiPanicModeData&) const                     { return makeHash("panic_mode", ADD_HASH_DATA) ; }
-        QUuid transactionHash(const ApiResourceParamsData& params) const         { return makeHash(params.id.toRfc4122(), "res_params") ; }
+        QUuid transactionHash(const ApiResourceParamsData& params) const;
         QUuid transactionHash(const ApiResourceParamDataList& /*tran*/) const    { return makeHash("settings", ADD_HASH_DATA) ; }
         QUuid transactionHash(const ApiStoredFileData& params) const             { return makeHash(params.path.toUtf8()); }
         QUuid transactionHash(const ApiStoredFilePath& params) const             { return makeHash(params.toUtf8()); }
