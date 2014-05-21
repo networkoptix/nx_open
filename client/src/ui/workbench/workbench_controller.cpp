@@ -591,10 +591,8 @@ void QnWorkbenchController::startRecording() {
     action(Qn::ToggleScreenRecordingAction)->setChecked(true);
 
     m_countdownCanceled = false;
-    m_recordingCountdownLabel = QnGraphicsMessageBox::information(QString(), recordingCountdownMs);
+    m_recordingCountdownLabel = QnGraphicsMessageBox::informationTicking(tr("Recording in...%1"), recordingCountdownMs);
     connect(m_recordingCountdownLabel, &QnGraphicsMessageBox::finished, this, &QnWorkbenchController::at_recordingAnimation_finished);
-    connect(m_recordingCountdownLabel, &QnGraphicsMessageBox::tick,     this, &QnWorkbenchController::at_recordingAnimation_tick);
-    at_recordingAnimation_tick(0);
 }
 
 void QnWorkbenchController::stopRecording() {
@@ -622,22 +620,6 @@ void QnWorkbenchController::at_recordingAnimation_finished() {
     m_countdownCanceled = false;
 }
 
-void QnWorkbenchController::at_recordingAnimation_tick(int tick) {
-    if (!m_recordingCountdownLabel)
-        return;
-
-    if (m_countdownCanceled) {
-        m_recordingCountdownLabel->setText(tr("Canceled"));
-        return;
-    }
-    int left = m_recordingCountdownLabel->timeout() - tick;
-    int n = (left + 500) / 1000;
-
-    if (n >= 1)
-        m_recordingCountdownLabel->setText(tr("Recording in...%1").arg(n));
-    else
-        m_recordingCountdownLabel->setOpacity(0.0);
-}
 
 void QnWorkbenchController::at_screenRecorder_recordingStarted() {
     if (!m_recordingCountdownLabel)
