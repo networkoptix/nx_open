@@ -5,7 +5,7 @@
 #include <utils/math/math.h>
 #include <utils/math/space_mapper.h>
 #include <utils/network/simple_http_client.h>
-#include <utils/serialization/lexical.h>
+#include <utils/serialization/lexical_functions.h>
 
 #include "axis_resource.h"
 

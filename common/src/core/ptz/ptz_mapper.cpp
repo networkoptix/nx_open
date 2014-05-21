@@ -12,11 +12,6 @@ QN_DEFINE_LEXICAL_ENUM(AngleSpace,
     (Mm35EquivSpace,   "35MmEquiv")
 )
 
-QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
-    (Qn::ExtrapolationMode)(AngleSpace), 
-    (json_lexical)
-)
-
 typedef boost::array<QnSpaceMapperPtr<qreal>, 3> PtzMapperPart;
 
 

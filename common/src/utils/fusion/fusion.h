@@ -2,7 +2,7 @@
 #define QN_FUSION_H
 
 #include <utility> /* For std::forward and std::declval. */
-#include <type_traits> /* For std::remove_*, std::enable_if, std::is_same, std::integral_constant. */
+#include <type_traits> /* For std::enable_if, std::is_same, std::integral_constant. */
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
@@ -13,19 +13,13 @@
 #endif // Q_MOC_RUN
 
 #include <utils/preprocessor/variadic_seq_for_each.h>
+#include <utils/common/type_traits.h>
 
 #include "fusion_fwd.h"
 #include "fusion_detail.h"
 #include "fusion_keys.h"
 
 namespace QnFusion {
-    template<class T>
-    struct remove_cvr:
-        std::remove_cv<
-            typename std::remove_reference<T>::type
-        >
-    {};
-
 
     /**
      * Main API entry point. Iterates through the members of a previously 
@@ -138,7 +132,7 @@ namespace QnFusion {
      */
     template<class Access>
     struct access_member_type:
-        remove_cvr<decltype(invoke(
+        QnTypeTraits::remove_cvr<decltype(invoke(
             std::declval<typename Access::template at<getter_type, void>::type::result_type>(), 
             std::declval<typename Access::template at<object_declval_type, void>::type::result_type>()
         ))>

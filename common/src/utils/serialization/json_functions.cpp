@@ -9,7 +9,6 @@
 #include <utils/fusion/fusion_adaptors.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, BrushStyle, static)
-QN_FUSION_DEFINE_FUNCTIONS(Qt::BrushStyle, (json_lexical), static)
 
 QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
     (QnLatin1Array)(QColor)(QUrl),
