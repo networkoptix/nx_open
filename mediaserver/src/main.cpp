@@ -1337,9 +1337,6 @@ void QnMain::run()
 
     initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
     
-
-    std::auto_ptr<QnAppserverResourceProcessor> m_processor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
-
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
@@ -1367,7 +1364,8 @@ void QnMain::run()
     //============================
     UPNPDeviceSearcher::initGlobalInstance( new UPNPDeviceSearcher() );
 
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
+    std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
 
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher thirdPartyResourceSearcher( &cameraDriverRestrictionList );
@@ -1516,7 +1514,7 @@ void QnMain::run()
     delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
 
-    m_processor.reset();
+    serverResourceProcessor.reset();
 
 #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
     delete QnPlVmax480ResourceSearcher::instance();
