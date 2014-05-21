@@ -1,5 +1,5 @@
-#ifndef QN_ADL_WRAPPER_H
-#define QN_ADL_WRAPPER_H
+#ifndef QN_CONVERSION_WRAPPER_H
+#define QN_CONVERSION_WRAPPER_H
 
 // TODO: #Elric move to serialization
 
@@ -28,4 +28,4 @@ QnAdlWrapper<T> adl_wrap(const T &value) {
     return QnAdlWrapper<T>(value);
 }
 
-#endif // QN_ADL_WRAPPER_H
+#endif // QN_CONVERSION_WRAPPER_H

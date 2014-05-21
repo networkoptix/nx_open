@@ -9,7 +9,7 @@
 #include <QtCore/QVariant>
 #endif
 
-#include <utils/common/adl_wrapper.h>
+#include <utils/common/conversion_wrapper.h>
 #include <utils/common/flat_map.h>
 #include <utils/common/synchronized_flat_storage.h>
 

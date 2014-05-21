@@ -8,7 +8,7 @@
 #include <QtSql/QSqlRecord>
 #include <QtSql/QSqlQuery>
 
-#include <utils/common/adl_wrapper.h>
+#include <utils/common/conversion_wrapper.h>
 #include <utils/fusion/fusion.h>
 
 #include "sql_fwd.h"
