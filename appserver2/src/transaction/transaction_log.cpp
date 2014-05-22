@@ -129,9 +129,11 @@ QnTranState QnTransactionLog::getTransactionsState()
 bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash) const
 {
     QReadLocker lock(&m_dbManager->getMutex());
-
-    if (m_state.value(tran.id.peerGUID) >= tran.id.sequence)
+    Q_ASSERT(tran.id.sequence != 0);
+    if (m_state.value(tran.id.peerGUID) >= tran.id.sequence) {
+        qDebug() << "Transaction log contains tranasction " << ApiCommand::toString(tran.command) << "because of precessed seq:" << m_state.value(tran.id.peerGUID) << ">=" << tran.id.sequence;
         return true;
+    }
     QMap<QUuid, qint64>::const_iterator itr = m_updateHistory.find(hash);
     if (itr == m_updateHistory.end())
         return false;
@@ -139,6 +141,9 @@ bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& 
     const qint64 lastTime = itr.value();
     bool rez = lastTime > tran.timestamp ||
         (lastTime == tran.timestamp && tran.id.peerGUID > qnCommon->moduleGUID());
+    if (rez)
+        qDebug() << "Transaction log contains tranasction " << ApiCommand::toString(tran.command) << "because of timestamp:" << lastTime << ">=" << tran.timestamp;
+
    return rez;
 }
 
