@@ -27,7 +27,27 @@ namespace ec2
 
     class QnDbManager;
 
-    typedef QMap<QUuid, qint32> QnTranState;
+    struct QnTranStateKey {
+        QnTranStateKey() {}
+        QnTranStateKey(QUuid peerID, QUuid dbID): peerID(peerID), dbID(dbID) {}
+        QUuid peerID;
+        QUuid dbID;
+
+        bool operator<(const QnTranStateKey& other) const {
+            if (peerID != other.peerID)
+                return peerID < other.peerID;
+            return dbID < other.dbID;
+        }
+        bool operator>(const QnTranStateKey& other) const {
+            if (peerID != other.peerID)
+                return peerID > other.peerID;
+            return dbID > other.dbID;
+        }
+    };
+    QN_FUSION_DECLARE_FUNCTIONS(QnTranStateKey, (binary))
+
+
+    typedef QMap<QnTranStateKey, qint32> QnTranState;
 
     class QnTransactionLog
     {

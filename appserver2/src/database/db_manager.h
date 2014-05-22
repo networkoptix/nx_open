@@ -125,7 +125,7 @@ namespace ec2
 		// --------- misc -----------------------------
         bool markLicenseOverflow(bool value, qint64 time);
         qint64 licenseOverflowTime() const;
-
+        QUuid getID() const;
     private:
         friend class QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
@@ -270,6 +270,7 @@ namespace ec2
         ApiResourceTypeDataList m_cachedResTypes;
         bool m_licenseOverflowMarked;
         qint64 m_licenseOverflowTime;
+        QUuid m_dbInstanceId;
 
         void fillServerInfo( ApiServerInfoData* const serverInfo );
     };

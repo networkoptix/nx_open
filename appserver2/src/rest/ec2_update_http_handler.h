@@ -59,7 +59,9 @@ namespace ec2
                 return nx_http::StatusCode::badRequest;
             
             // replace client GUID to own GUID (take transaction ownership).
-            tran.id.peerGUID = qnCommon->moduleGUID();
+            tran.id.peerID = qnCommon->moduleGUID();
+            if (QnDbManager::instance())
+                tran.id.dbID = QnDbManager::instance()->getID();
 
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;

@@ -171,15 +171,16 @@ namespace ec2
         struct ID
         {
             ID(): sequence(0) {}
-            QUuid peerGUID; // TODO: #Elric #EC2 rename into sane case
+            QUuid peerID;
+            QUuid dbID;
             qint32 sequence;
 
             friend uint qHash(const ec2::QnAbstractTransaction::ID &id) {
-                return ::qHash(id.peerGUID, id.sequence);
+                return ::qHash(id.peerID.toRfc4122().append(id.dbID.toRfc4122()), id.sequence);
             }
 
             bool operator==(const ID &other) const {
-                return peerGUID == other.peerGUID && sequence == other.sequence;
+                return peerID == other.peerID && dbID == other.dbID && sequence == other.sequence;
             }
         };
 

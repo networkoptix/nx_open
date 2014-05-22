@@ -19,6 +19,7 @@ namespace ec2
 
 static QnDbManager* globalInstance = 0; // TODO: #Elric #EC2 use QnSingleton
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
+static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
 
 template <class MainData>
@@ -155,6 +156,21 @@ bool QnDbManager::init()
     if (query.exec() && query.next()) {
         m_licenseOverflowTime = query.value(0).toByteArray().toLongLong();
         m_licenseOverflowMarked = m_licenseOverflowTime > 0;
+    }
+    query.addBindValue(DB_INSTANCE_KEY);
+    if (query.exec() && query.next()) {
+        m_dbInstanceId = QUuid::fromRfc4122(query.value(0).toByteArray());
+    }
+    else {
+        m_dbInstanceId = QUuid::createUuid();
+        QSqlQuery insQuery(m_sdb);
+        insQuery.prepare("INSERT INTO misc_data (key, data) values (?,?)");
+        insQuery.addBindValue(DB_INSTANCE_KEY);
+        insQuery.addBindValue(m_dbInstanceId.toRfc4122());
+        if (!insQuery.exec()) {
+            qWarning() << "can't initialize sqlLite database!";
+            return false;
+        }
     }
 
     return true;
@@ -2363,6 +2379,11 @@ bool QnDbManager::markLicenseOverflow(bool value, qint64 time)
 qint64 QnDbManager::licenseOverflowTime() const
 {
     return m_licenseOverflowTime;
+}
+
+QUuid QnDbManager::getID() const
+{
+    return m_dbInstanceId;
 }
 
 }

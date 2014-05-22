@@ -108,14 +108,14 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, Trans
 
     tran.timestamp -= sender->timeDiff();
 
-    AlivePeersMap:: iterator itr = m_alivePeers.find(tran.id.peerGUID);
+    AlivePeersMap:: iterator itr = m_alivePeers.find(tran.id.peerID);
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
 
     if (isSystem(tran.command)) {
-        if (m_lastTranSeq[tran.id.peerGUID] >= tran.id.sequence)
+        if (m_lastTranSeq[tran.id.peerID] >= tran.id.sequence)
             return; // already processed
-        m_lastTranSeq[tran.id.peerGUID] = tran.id.sequence;
+        m_lastTranSeq[tran.id.peerID] = tran.id.sequence;
     }
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(qnCommon->moduleGUID()))
@@ -181,7 +181,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, Trans
         QnTransactionTransportPtr transport = *itr;
         if (!transportHeader.processedPeers.contains(transport->remoteGuid()) && transport->isReadyToSend(tran.command)) 
         {
-            Q_ASSERT(transport->remoteGuid() != tran.id.peerGUID);
+            Q_ASSERT(transport->remoteGuid() != tran.id.peerID);
             transport->addData(chunkData);
         }
     }
@@ -603,7 +603,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
             QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(remoteGuid, QnResource::Online);
         */
         tran.command = ApiCommand::getAllDataList;
-        tran.id.peerGUID = qnCommon->moduleGUID();
+        tran.id.peerID = qnCommon->moduleGUID();
         const ErrorCode errorCode = dbManager->doQuery(nullptr, tran.params);
         if (errorCode != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
