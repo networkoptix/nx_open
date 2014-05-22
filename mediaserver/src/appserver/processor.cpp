@@ -13,8 +13,8 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
 {
     connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
 
-    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::locked, this, &QnAppserverResourceProcessor::at_mutexLocked);
-    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::lockTimeout, this, &QnAppserverResourceProcessor::at_mutexTimeout);
+    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::locked, this, &QnAppserverResourceProcessor::at_mutexLocked, Qt::QueuedConnection);
+    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::lockTimeout, this, &QnAppserverResourceProcessor::at_mutexTimeout, Qt::QueuedConnection);
 
     m_cameraDataHandler = new ec2::QnMutexCameraDataHandler();
     ec2::QnDistributedMutexManager::instance()->setUserDataHandler(m_cameraDataHandler);
