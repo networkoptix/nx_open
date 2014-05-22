@@ -32,32 +32,36 @@
                 "AXIS|AXISP3344", "AXIS|AXISP1344",
                 "*|IPC-HDB3200C", "*|N53F-F",
                 "IPC|LR01", "hs0130|LR01", "H18A2|IPCAM_M1", "H18A3|IPCAM_M1", "H18A4|RL01", "H18A5|IPCAM_M1", "HI9712_51ÊÒÍâ|LR01",
-		"VISTA|*VRD"
-                
+                "VISTA|*VRD"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
         {
             "keys": [
                 "DW|DWC-MPTZ20X", "DW|DWC-MPTZ5X",
-                "ACTI|KCM8111",
-                "*|FW3471-PS-E"
+                "ACTI|KCM8111", "*|FW3471-PS-E"
             ],
             "octagonalPtz": true
         },
         {
             "keys": [
                 "ACTI|KCM3311",
-		"VISTA|*f"
+                "VISTA|*f"
             ],
             "ptzCapabilities": "ContinuousZoomCapability"
         },
         {
             "keys": [
-		"VISTA|*PTW"
+                "VISTA|*PTW"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
             "onvifPanFlipped": true
+        },
+        {
+            "keys": [
+                "VISTA|*"
+            ],
+            "forceArFromPrimaryStream": true
         },
         {
             "keys": [
@@ -313,9 +317,30 @@
         },
         {
             "keys": [
-                "VISTA|*"
+                "VISTA|VK2-1080XPTZ"
             ],
-            "forceArFromPrimaryStream": true
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [   1,  -1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO": "Actual tilt range is [0, -180].",
+                        "device":  [0.9,   0],
+                        "logical": [0,   -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [    -1,   -0.9,   -0.8,   -0.7,   -0.6,   -0.5,   -0.4,   -0.3,   -0.2,   -0.1,      0,    0.1,    0.2,    0.3,    0.4,    0.5,    0.6,     0.7,     0.8,     0.9,       1],
+                        "logical": [1.0000, 1.0859, 1.1797, 1.2891, 1.4141, 1.5703, 1.7422, 1.9453, 2.2031, 2.5000, 2.8672, 3.3281, 3.9297, 4.7344, 5.7188, 7.0313, 8.7969, 12.1481, 14.8011, 19.6882, 29.3229],
+                        "logicalMultiplier": 30.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
     ]
 }
