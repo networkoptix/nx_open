@@ -4,6 +4,7 @@
 #include <QHostAddress>
 #include "utils/network/tcp_connection_processor.h"
 
+
 class QnAbstractStreamDataProvider;
 class QnProxyConnectionProcessorPrivate;
 
@@ -18,7 +19,7 @@ protected:
     virtual void run() override;
 	virtual void pleaseStop() override;
 private:
-    static bool doProxyData(fd_set* read_set, AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize);
+    static bool doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize);
     static int getDefaultPortByProtocol(const QString& protocol);
     QString connectToRemoteHost(const QString& guid, const QUrl& url); // return new client request buffer size or -1 if error
     bool isProtocol(const QString& protocol) const;
