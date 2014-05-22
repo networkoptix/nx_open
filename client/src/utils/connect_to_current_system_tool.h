@@ -19,6 +19,7 @@ public:
     };
 
     explicit QnConnectToCurrentSystemTool(QObject *parent = 0);
+    ~QnConnectToCurrentSystemTool();
 
     void connectToCurrentSystem(const QSet<QnId> &targets);
 
@@ -39,7 +40,7 @@ private:
     QSet<QnId> m_targets;
 
     QnChangeSystemNamePeerTask *m_changeSystemNameTask;
-    QnUpdateDialog *m_updateDialog;
+    QScopedPointer<QnUpdateDialog> m_updateDialog;
     QnMediaServerUpdateTool *m_updateTool;
     int m_prevToolState;
 };

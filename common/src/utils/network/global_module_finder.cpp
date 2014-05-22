@@ -66,6 +66,10 @@ QList<QnId> QnGlobalModuleFinder::discoverers(const QnId &moduleId) {
     return m_discovererIdByServerId.values(moduleId);
 }
 
+QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QnId &id) const {
+    return m_moduleInformationById[id];
+}
+
 void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer) {
     if (isAlive)
         addModule(moduleInformation, discoverer);

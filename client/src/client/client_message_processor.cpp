@@ -8,6 +8,7 @@
 #include "common/common_module.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "utils/incompatible_server_adder.h"
+#include "utils/network/global_module_finder.h"
 
 #include "version.h"
 
@@ -34,6 +35,17 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
     QnResourcePtr ownResource;
 
     ownResource = qnResPool->getResourceById(resource->getId());
+
+    QnModuleInformation moduleInformation = QnGlobalModuleFinder::instance()->moduleInformation(resource->getId());
+    if (!moduleInformation.id.isNull()) {
+        if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) {
+            mediaServer->setVersion(moduleInformation.version);
+            mediaServer->setSystemInfo(moduleInformation.systemInformation);
+            mediaServer->setSystemName(moduleInformation.systemName);
+            if (moduleInformation.systemName != qnCommon->localSystemName() || moduleInformation.version != QnSoftwareVersion(QN_APPLICATION_VERSION))
+                mediaServer->setStatus(QnResource::Incompatible);
+        }
+    }
 
     if (ownResource.isNull()) {
         qnResPool->addResource(resource);

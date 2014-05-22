@@ -16,12 +16,13 @@ QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject *parent) :
     m_changeSystemNameTask(new QnChangeSystemNamePeerTask(this)),
     m_updateDialog(new QnUpdateDialog())
 {
-    m_updateDialog->QObject::setParent(this);
     m_updateTool = m_updateDialog->updateTool();
 
     connect(m_changeSystemNameTask,     &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_changeSystemNameTask_finished);
     connect(m_updateTool,               &QnMediaServerUpdateTool::stateChanged,     this,       &QnConnectToCurrentSystemTool::at_updateTool_stateChanged);
 }
+
+QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
 
 void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QnId> &targets) {
     if (m_running)
@@ -46,7 +47,21 @@ void QnConnectToCurrentSystemTool::at_changeSystemNameTask_finished(int errorCod
     Q_UNUSED(failedPeers)
 
     if (errorCode == 0) {
-        m_updateTool->setTargets(m_targets);
+        QSet<QnId> targets;
+        foreach (const QnId &id, m_targets) {
+            QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+            if (!server)
+                continue;
+
+            if (server->getVersion() != QnSoftwareVersion(lit(QN_APPLICATION_VERSION)))
+                targets.insert(id);
+        }
+        if (targets.isEmpty()) {
+            finish(NoError);
+            return;
+        }
+
+        m_updateTool->setTargets(targets);
         m_updateDialog->show();
         m_prevToolState = QnMediaServerUpdateTool::CheckingForUpdates;
         m_updateTool->checkForUpdates(QnSoftwareVersion(lit(QN_APPLICATION_VERSION)));

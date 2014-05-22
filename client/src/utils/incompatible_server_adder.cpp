@@ -66,6 +66,8 @@ void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &module
             server->setSystemInfo(moduleInformation.systemInformation);
             server->setSystemName(moduleInformation.systemName);
             server->setStatus(QnResource::Incompatible);
+            // now put server to 'other systems' subtree
+            server->parentIdChanged(server);
         }
         return;
     }

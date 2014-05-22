@@ -25,6 +25,8 @@ public:
 
     QList<QnId> discoverers(const QnId &moduleId);
 
+    QnModuleInformation moduleInformation(const QnId &id) const;
+
 signals:
     void peerFound(const QnModuleInformation &moduleInformation);
     void peerChanged(const QnModuleInformation &moduleInformation);

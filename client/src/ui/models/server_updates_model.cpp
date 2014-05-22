@@ -77,6 +77,9 @@ void QnServerUpdatesModel::setUpdatesInformation(const QHash<QnId, QnMediaServer
 }
 
 void QnServerUpdatesModel::setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update) {
+    if (!update.server)
+        return;
+
     m_updates[update.server->getId()] = update;
 
     for (int i = 0; i < m_items.size(); i++) {
