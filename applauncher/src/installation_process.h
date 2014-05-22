@@ -50,8 +50,8 @@ public:
 
     //!Implementation of QnStoppable::pleaseStop()
     virtual void pleaseStop() override;
-    //!Implementation of QnJoinable::wait()
-    virtual void wait() override;
+    //!Implementation of QnJoinable::join()
+    virtual void join() override;
 
     bool start( const QString& mirrorListUrl );
 

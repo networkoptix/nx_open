@@ -24,15 +24,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::SerializationFormat,
     (Qn::JsonFormat,        "json")
     (Qn::BnsFormat,         "bns")
     (Qn::CsvFormat,         "csv")
+    (Qn::XmlFormat,         "xml")
 )
 
-QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)(Qn::StreamQuality)
-    (Qn::SecondStreamQuality)(Qn::PanicMode)(Qn::RecordingType)(Qn::PropertyDataType)(Qn::SerializationFormat),
-    (json_lexical)
-)
-
-QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
-    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::PtzCapabilities),
-    (lexical_numeric_enum)(json_numeric_enum)
-)

@@ -6,13 +6,17 @@
 #ifndef QN_CONCURRENT_H
 #define QN_CONCURRENT_H
 
+#include <cassert>
+#include <functional>
 #include <vector>
+#include <type_traits>
 #include <utility>
 
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 #include <QtCore/QWaitCondition>
 #include <QtCore/QThreadPool>
+#include <QtCore/QSharedPointer>
 
 
 /*!
@@ -31,7 +35,7 @@ namespace QnConcurrent
         {
             Function m_function;
         public:
-            QnRunnableTask( Function function ) : m_function( function ) {}
+            QnRunnableTask( Function function ) : m_function( function ) { setAutoDelete(true); }
             virtual void run() override { m_function(); }
         };
 
@@ -45,8 +49,16 @@ namespace QnConcurrent
             QnFutureImpl()
             :
                 m_totalTasksToRun( 0 ),
-                m_tasksCompleted( 0 )
+                m_tasksCompleted( 0 ),
+                m_startedTaskCount( 0 ),
+                m_isCancelled( false )
             {
+            }
+
+            ~QnFutureImpl()
+            {
+                if( m_cleanupFunc )
+                    m_cleanupFunc();
             }
 
             void setTotalTasksToRun( size_type totalTasksToRun )
@@ -58,19 +70,23 @@ namespace QnConcurrent
             void waitForFinished()
             {
                 QMutexLocker lk( &m_mutex );
-                while( m_tasksCompleted < m_totalTasksToRun )
+                while( (!m_isCancelled && (m_tasksCompleted < m_totalTasksToRun)) ||
+                       (m_isCancelled && (m_startedTaskCount > 0)) )
+                {
                     m_cond.wait( lk.mutex() );
+                }
             }
 
             void cancel()
             {
-                //TODO #ak
+                QMutexLocker lk( &m_mutex );
+                m_isCancelled = true;
             }
 
             bool isCanceled() const
             {
-                //TOOD #ak
-                return false;
+                QMutexLocker lk( &m_mutex );
+                return m_isCancelled;
             }
 
             size_type progressValue() const
@@ -121,6 +137,7 @@ namespace QnConcurrent
                 m_results[index].first = result;
                 m_results[index].second = true;
                 ++m_tasksCompleted;
+                taskStoppedNonSafe();
                 m_cond.wakeAll();
             }
 
@@ -130,7 +147,22 @@ namespace QnConcurrent
                 m_results[index].first = result;
                 m_results[index].second = true;
                 ++m_tasksCompleted;
+                taskStoppedNonSafe();
                 m_cond.wakeAll();
+            }
+
+            bool incStartedTaskCountIfAllowed()
+            {
+                QMutexLocker lk( &m_mutex );
+                if( m_isCancelled )
+                    return false;
+                ++m_startedTaskCount;
+                return true;
+            }
+
+            void setCleanupFunc( std::function<void()> cleanupFunc )
+            {
+                m_cleanupFunc = cleanupFunc;
             }
 
         private:
@@ -139,6 +171,107 @@ namespace QnConcurrent
             size_t m_totalTasksToRun;
             size_t m_tasksCompleted;
             std::vector<std::pair<T, bool> > m_results;
+            size_type m_startedTaskCount;
+            bool m_isCancelled;
+            std::function<void()> m_cleanupFunc;
+
+            void taskStoppedNonSafe()
+            {
+                --m_startedTaskCount;
+                assert( m_startedTaskCount >= 0 );
+            }
+        };
+
+        template<typename Container>
+        class safe_forward_iterator
+        {
+        public:
+            typedef typename Container::size_type size_type;
+
+            safe_forward_iterator( Container& container, typename Container::iterator&& startIter )
+            :
+                m_container( container ),
+                m_currentIter( startIter ),
+                m_currentIndex( std::distance( container.begin(), startIter ) )
+            {
+            }
+
+            std::pair<typename Container::iterator, int> fetchAndMoveToNextPos()
+            {
+                QMutexLocker lk( &m_mutex );
+
+                std::pair<typename Container::iterator, int> curVal( m_currentIter, m_currentIndex );
+                if( m_currentIter != m_container.end() )
+                {
+                    ++m_currentIter;
+                    ++m_currentIndex;
+                }
+                return curVal;
+            }
+
+            void moveToEnd()
+            {
+                QMutexLocker lk( &m_mutex );
+                m_currentIter = m_container.end();
+                m_currentIndex = m_container.size();
+            }
+
+        private:
+            QMutex m_mutex;
+            Container& m_container;
+            typename Container::iterator m_currentIter;
+            size_type m_currentIndex;
+        };
+
+        //!Executes task on element of a dictionary (used by \a QnConcurrent::mapped)
+        template<typename Container, typename Function>
+        class TaskExecuter
+        {
+        public:
+            typedef QnFutureImpl<typename std::result_of<Function(typename Container::value_type)>::type> FutureImplType;
+
+            TaskExecuter(
+                QThreadPool& threadPool,
+                int priority,
+                Container& container,
+                Function function,
+                QSharedPointer<FutureImplType> futureImpl,
+                QSharedPointer<detail::safe_forward_iterator<Container> > safeIter )
+            :
+                m_threadPool( threadPool ),
+                m_priority( priority ),
+                m_container( container ),
+                m_function( function ),
+                m_futureImpl( futureImpl.toWeakRef() ),
+                m_safeIter( safeIter )
+            {
+            }
+
+            void operator()( const std::pair<typename Container::iterator, int>& val )
+            {
+                auto futureImplStrongRef = m_futureImpl.toStrongRef();
+                assert( futureImplStrongRef );
+
+                const auto& result = m_function( *val.first );
+                //launching next task
+                const typename std::pair<typename Container::iterator, int>& nextElement = m_safeIter->fetchAndMoveToNextPos();
+                if( nextElement.first != m_container.end() && futureImplStrongRef->incStartedTaskCountIfAllowed() )
+                {
+                    auto functor = std::bind( &detail::TaskExecuter<Container, Function>::operator(), this, nextElement );
+                    m_threadPool.start(
+                        new detail::QnRunnableTask<decltype(functor)>( std::move(functor) ),
+                        m_priority );
+                }
+                futureImplStrongRef->setResultAt( val.second, std::move(result) );
+            }
+
+        private:
+            QThreadPool& m_threadPool;
+            int m_priority;
+            Container& m_container;
+            Function m_function;
+            QWeakPointer<FutureImplType> m_futureImpl;
+            QSharedPointer<detail::safe_forward_iterator<Container> > m_safeIter;
         };
     }
 
@@ -152,10 +285,11 @@ namespace QnConcurrent
     class QnFuture
     {
     public:
-        typedef typename detail::QnFutureImpl<T>::value_type value_type;
-        typedef typename detail::QnFutureImpl<T>::size_type size_type;
+        typedef typename detail::QnFutureImpl<T> FutureImplType;
+        typedef typename FutureImplType::value_type value_type;
+        typedef typename FutureImplType::size_type size_type;
 
-        QnFuture() : m_impl( new detail::QnFutureImpl<T>() ) {}
+        QnFuture() : m_impl( new FutureImplType() ) {}
 
         void waitForFinished() { m_impl->waitForFinished(); }
         void cancel() { m_impl->cancel(); }
@@ -168,15 +302,17 @@ namespace QnConcurrent
         T& resultAt( size_type index ) { return m_impl->resultAt( index ); }
         const T& resultAt( size_type index ) const { return m_impl->resultAt( index ); }
 
-        QSharedPointer<detail::QnFutureImpl<T> > impl() { return m_impl; }
+        QSharedPointer<FutureImplType> impl() { return m_impl; }
 
     private:
-        QSharedPointer<detail::QnFutureImpl<T> > m_impl;
+        QSharedPointer<FutureImplType> m_impl;
     };
 
     /*!
+        \param threadPool
         \param priority Priority of execution in \a threadPool. 0 is a default priority
-        \param function To pass member-function here, you have to use std::mem_fn
+        \param container
+        \param function To pass member-function here, you have to use std::mem_fn (for now)
     */
     template<typename Container, typename Function>
     QnFuture<typename std::result_of<Function(typename Container::value_type)>::type> mapped(
@@ -185,31 +321,43 @@ namespace QnConcurrent
         Container& container,
         Function function )
     {
-        QnFuture<typename std::result_of<Function(typename Container::value_type)>::type> future;
+        typedef QnFuture<typename std::result_of<Function(typename Container::value_type)>::type> FutureType;
+
+        FutureType future;
         auto futureImpl = future.impl();
         futureImpl->setTotalTasksToRun( container.size() );
-        size_t index = 0;
-        //TODO #ak should enqueue tasks as they complete so that to allow other concurrent functions to run
-        for( Container::iterator
-            it = container.begin();
-            it != container.end();
-            ++it )
+        QSharedPointer<detail::safe_forward_iterator<Container> > safeIter( new detail::safe_forward_iterator<Container>( container, container.begin() ) );
+
+        typename detail::TaskExecuter<Container, Function>* taskExecutor =
+            new detail::TaskExecuter<Container, Function>(
+                *threadPool, priority, container, function, futureImpl, safeIter );
+        futureImpl->setCleanupFunc( std::function<void()>( [taskExecutor](){ delete taskExecutor; } ) );    //TODO #ak not good! Think over again
+
+        //launching maximum threadPool->maxThreadCount() tasks, other tasks added to threadPool's queue after completion of added tasks
+        const int maxTasksToLaunch = threadPool->maxThreadCount();
+        for( int tasksLaunched = 0;
+            tasksLaunched < maxTasksToLaunch;
+            ++tasksLaunched )
         {
-            auto& val = *it;
-            auto taskRunFunction = [&val, function, futureImpl, index](){
-                futureImpl->setResultAt( index, function( val ) );
-            };
-            auto task = new detail::QnRunnableTask<decltype(taskRunFunction)>( taskRunFunction );
-            task->setAutoDelete( true );
-            threadPool->start( task, priority );
-            ++index;
+            const typename std::pair<typename Container::iterator, int>& nextElement = safeIter->fetchAndMoveToNextPos();
+            if( nextElement.first == container.end() )
+                break;  //all tasks processed
+
+            if( !futureImpl->incStartedTaskCountIfAllowed() )
+            {
+                Q_ASSERT( false );
+            }
+            auto functor = std::bind( &detail::TaskExecuter<Container, Function>::operator(), taskExecutor, nextElement );
+            threadPool->start(
+                new detail::QnRunnableTask<decltype(functor)>( std::move(functor) ),
+                priority );
         }
         return future;
     }
 
     /*!
         Executes with default priority
-        \param function To pass member-function here, you have to use std::mem_fn
+        \param function To pass member-function here, you have to use std::mem_fn (for now)
     */
     template<typename Container, typename Function>
     QnFuture<typename std::result_of<Function(typename Container::value_type)>::type> mapped(
@@ -222,7 +370,7 @@ namespace QnConcurrent
 
     /*!
         Executes in global thread pool with default priority
-        \param function To pass member-function here, you have to use std::mem_fn
+        \param function To pass member-function here, you have to use std::mem_fn (for now)
     */
     template<typename Container, typename Function>
     QnFuture<typename std::result_of<Function(typename Container::value_type)>::type> mapped(
@@ -234,7 +382,6 @@ namespace QnConcurrent
 
     /*!
         Runs \a function in \a threadPool with \a priority
-
         \note Execution cannot be canceled
     */
     template<typename Function>
@@ -246,9 +393,13 @@ namespace QnConcurrent
         auto taskRunFunction = [function, futureImpl]() {
             futureImpl->setResultAt( 0, function() );
         };
-        auto task = new detail::QnRunnableTask<decltype(taskRunFunction)>( taskRunFunction );
-        task->setAutoDelete( true );
-        threadPool->start( task, priority );
+        if( !futureImpl->incStartedTaskCountIfAllowed() )
+        {
+            Q_ASSERT( false );
+        }
+        threadPool->start(
+            new detail::QnRunnableTask<decltype(taskRunFunction)>( taskRunFunction ),
+            priority );
         return future;
     }
 

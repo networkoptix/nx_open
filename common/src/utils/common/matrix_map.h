@@ -11,7 +11,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/hash.h>
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 
 /**
  * Matrix map is an abstraction of an infinite two-dimensional sparse array.
@@ -184,9 +184,9 @@ protected:
                         return false;
                 } else {
                     if(conforms) {
-                        QnContainer::insert(*conforming, conforming->end(), QPoint(c, r));
+                        QnCollection::insert(*conforming, conforming->end(), QPoint(c, r));
                     } else {
-                        QnContainer::insert(*nonconforming, nonconforming->end(), QPoint(c, r));
+                        QnCollection::insert(*nonconforming, nonconforming->end(), QPoint(c, r));
                     }
                 }
             }

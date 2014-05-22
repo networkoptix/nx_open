@@ -1,10 +1,9 @@
 #include "media_dewarping_params.h"
 
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 #include <utils/common/model_functions.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnMediaDewarpingParams, ViewMode)
-QN_FUSION_DEFINE_FUNCTIONS(QnMediaDewarpingParams::ViewMode, (json_lexical))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnMediaDewarpingParams,      (json)(eq)(debug),    (enabled)(viewMode)(fovRot)(xCenter)(yCenter)(radius))
 

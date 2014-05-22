@@ -902,14 +902,14 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Switch to Video Wall mode...")).  //TODO: #VW #TR
         autoRepeat(false).
-        condition(hasFlags(QnResource::videowall));
+        condition(new QnStartVideowallActionCondition(this));
 
     factory(Qn::SaveVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Save Current Matrix")).
         autoRepeat(false).
-        condition(hasFlags(QnResource::videowall));
+        condition(new QnNonEmptyVideowallActionCondition(this));
 
     factory(Qn::LoadVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::VideoWallMatrixTarget).
@@ -938,7 +938,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Stop Video Wall")).
         autoRepeat(false).
-        condition(hasFlags(QnResource::videowall));
+        condition(new QnNonEmptyVideowallActionCondition(this));
 
     factory(Qn::DetachFromVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).

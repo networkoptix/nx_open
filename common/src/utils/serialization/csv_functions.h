@@ -1,24 +1,24 @@
 #ifndef QN_SERIALIZATION_CSV_FUNCTIONS_H
 #define QN_SERIALIZATION_CSV_FUNCTIONS_H
 
+#include <type_traits>
 #include <map>
 #include <vector>
 #include <set>
 #include <iterator> /* For std::iterator_traits. */
 
 #include <boost/range/mutable_iterator.hpp>
+#include <boost/preprocessor/tuple/enum.hpp>
 
-#include <QtCore/QList>
-#include <QtCore/QLinkedList>
-#include <QtCore/QVector>
-#include <QtCore/QSet>
-#include <QtCore/QVarLengthArray>
 #include <QtCore/QUuid>
 #include <QtCore/QUrl>
 
 #include <utils/common/latin1_array.h>
 
+#include "collection_fwd.h"
 #include "csv.h"
+#include "lexical.h"
+
 
 namespace QnCsvDetail {
     template<class Collection, class Output>
@@ -41,6 +41,10 @@ QN_DECLARE_CSV_TYPE_CATEGORY(QString, QnCsv::field_tag)
 QN_DECLARE_CSV_TYPE_CATEGORY(QByteArray, QnCsv::field_tag)
 QN_DECLARE_CSV_TYPE_CATEGORY(QnLatin1Array, QnCsv::field_tag)
 
+template<class Output>
+void serialize(const bool &value, QnCsvStreamWriter<Output> *stream) {
+    stream->writeUtf8Field(value ? "true" : "false");
+}
 
 template<class Output>
 void serialize(const QString &value, QnCsvStreamWriter<Output> *stream) {
@@ -116,6 +120,13 @@ QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Al
 QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator));
 #undef QN_DEFINE_COLLECTION_CSV_SERIALIZATION_FUNCTIONS
 #endif // Q_MOC_RUN
+
+
+template<class T, class Output>
+void serialize(const T &value, QnCsvStreamWriter<Output> *stream, typename std::enable_if<QnSerialization::is_enum_or_flags<T>::value>::type * = NULL) {
+    /* All enums are by default lexically serialized. */
+    stream->writeField(QnLexical::serialized(value));
+}
 
 
 #endif // QN_SERIALIZATION_CSV_FUNCTIONS_H

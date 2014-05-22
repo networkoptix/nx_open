@@ -31,6 +31,8 @@
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
+#include <platform/platform_abstraction.h>
+
 #include <recording/time_period.h>
 
 #include <ui/actions/action.h>
@@ -40,6 +42,7 @@
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/videowall_settings_dialog.h>
+#include <ui/dialogs/checkable_message_box.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -57,7 +60,7 @@
 
 #include <utils/color_space/image_correction.h>
 #include <utils/common/checked_cast.h>
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 #include <utils/serialization/json.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/common/string.h>
@@ -600,41 +603,82 @@ void QnWorkbenchVideoWallHandler::updateItemsLayout(const QnVideoWallItemIndexLi
         connection2()->getVideowallManager()->save(videowall, this, [](){});
 }
 
-bool QnWorkbenchVideoWallHandler::startVideoWall(const QnVideoWallResourcePtr &videoWall) {
+bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr &videowall) {
     QUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull()) {
         qWarning() << "Warning: pc UUID is null, cannot start Video Wall on this pc";
         return false;
     }
 
-    //TODO: #GDM #VW show dialog with text, "Do not ask me more"
-    bool itemFound = false;
-    foreach (const QnVideoWallItem &item, videoWall->items()->getItems()) {
+    foreach (const QnVideoWallItem &item, videowall->items()->getItems()) {
         if (item.pcUuid != pcUuid)
             continue;
-        itemFound = true;
-        break;
+        return true;
     }
-    if (!itemFound) {
-        qWarning() << "Warning: no items for this pc, cannot start Video Wall";
-        return false;
+    return false;
+}
+
+
+bool QnWorkbenchVideoWallHandler::canClose() {
+    if (!context()->user())
+        return true;
+    //TODO: #GDM implement real check. Think about circular dependencies
+    /*
+    if (businessRulesDialog() && businessRulesDialog()->isVisible()) {
+        businessRulesDialog()->activateWindow();
+        if (!businessRulesDialog()->canClose())
+            return;
+        businessRulesDialog()->hide();
     }
 
+    menu()->trigger(Qn::ClearCameraSettingsAction);
+    if(!context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true))
+        return;*/
+    return true;
+}
+
+
+void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourcePtr &videoWall) {
+
+    if (!canStartVideowall(videoWall)) {
+        QMessageBox::warning(mainWindow(),
+            tr("Error"),
+            tr("This PC is not attached to Video Wall.")); //TODO: #VW #TR
+        return;
+    }
+
+    bool doNotAskAgain = false;
+    int startMode = qnSettings->videoWallStartMode();
+    QDialogButtonBox::StandardButton button = QDialogButtonBox::Yes; 
+    if (startMode < 0) {
+        button = QnCheckableMessageBox::question(
+            mainWindow(),
+            tr("Client will be closed."),
+            tr("Client will be closed and reopened as Video Wall."), //TODO: #VW #TR
+            QString(),
+            &doNotAskAgain,
+            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+            QDialogButtonBox::Yes
+            );
+    } else {
+        button = static_cast<QDialogButtonBox::StandardButton>(startMode);
+    }
+
+    if (button == QDialogButtonBox::Cancel)
+        return;
+
+    if (button == QDialogButtonBox::Yes) {
+        if (canClose())
+            closeInstanceDelayed();
+    }
+    
+    if (doNotAskAgain)
+        qnSettings->setVideoWallStartMode(static_cast<int>(button));
 
     QStringList arguments;
     arguments << QLatin1String("--videowall");
     arguments << videoWall->getId().toString();
     openNewWindow(arguments);
-    return true;
-}
-
-void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourcePtr &videoWall) {
-    if (startVideoWall(videoWall))
-        closeInstance();
-    else
-        QMessageBox::warning(mainWindow(),
-        tr("Error"),
-        tr("Cannot start Video Wall on this PC.")); //TODO: #VW #TR
 }
 
 void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args) {
@@ -649,7 +693,6 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args) {
 
 #ifdef SENDER_DEBUG
     qDebug() << "arguments" << arguments;
-    //--videowall {1f91dc77-229a-4b1e-9b07-99a5c2650a5a} --auth https://127.0.0.1:7011
 #endif
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
 }
@@ -657,7 +700,7 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args) {
 void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr &videoWall) {
     if (!videoWall) {
         qWarning() << "Warning: videowall not exists anymore, cannot open videowall item";
-        closeInstance();
+        closeInstanceDelayed();
         return;
     }
 
@@ -679,7 +722,7 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
     sendInstanceGuid();
 }
 
-void QnWorkbenchVideoWallHandler::closeInstance() {
+void QnWorkbenchVideoWallHandler::closeInstanceDelayed() {
     QTimer::singleShot(10, action(Qn::ExitAction), SLOT(trigger()));
 }
 
@@ -715,10 +758,10 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
     if (sequence >= 0)
         m_videoWallMode.sequenceByPcUuid[controllerUuid] = sequence;
 
-    switch (static_cast<QnVideoWallControlMessage::QnVideoWallControlOperation>(message.operation)) {
+    switch (static_cast<QnVideoWallControlMessage::Operation>(message.operation)) {
     case QnVideoWallControlMessage::Exit:
     {
-        closeInstance();
+        closeInstanceDelayed();
         return;
     }
     case QnVideoWallControlMessage::ControlStarted:
@@ -1060,14 +1103,14 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen() {
             qWarning() << "Warning: videowall not exists, cannot start videowall on this pc";
         else
             qWarning() << "Warning: videowall is empty, cannot start videowall on this pc";
-        closeInstance();
+        closeInstanceDelayed();
         return;
     }
 
     QUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull()) {
         qWarning() << "Warning: pc UUID is null, cannot start videowall on this pc";
-        closeInstance();
+        closeInstanceDelayed();
         return;
     }
 
@@ -1353,10 +1396,15 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     if (m_attachSettings.layoutId.isNull() || qnIndexOf(layouts, [&](const QnLayoutResourcePtr &layout) {return layout->getId() == m_attachSettings.layoutId;}) < 0)
         m_attachSettings.layoutId = currentLayout->getId();
 
+    bool shortcutsSupported = qnPlatform->shortcuts()->supported();
+
     QScopedPointer<QnAttachToVideowallDialog> dialog(new QnAttachToVideowallDialog(mainWindow()));
     dialog->loadLayoutsList(layouts);
     dialog->setCanClone(canClone);
     dialog->loadSettings(m_attachSettings);
+    dialog->setShortcutsSupported(shortcutsSupported);
+    if (shortcutsSupported)
+        dialog->setCreateShortcut(!shortcutExists(videoWall));
     if (!dialog->exec())
         return;
     m_attachSettings = dialog->settings();
@@ -1390,6 +1438,9 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     }
 
     attachLayout(videoWall, targetLayout, m_attachSettings);
+
+    if (shortcutsSupported && dialog->isCreateShortcut())
+        createShortcut(videoWall);
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered() {
@@ -1884,7 +1935,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr
             return;
 
         QnVideowallAutoStarter(resource->getId(), this).setAutoStartEnabled(false); //TODO: #GDM VW clean nonexistent videowalls sometimes
-        closeInstance();
+        closeInstanceDelayed();
     } else {
         if (QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>()) {
             disconnect(videoWall, NULL, this, NULL);
@@ -2012,7 +2063,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode(const QnVi
 void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_activeMode(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     if (videoWall->getId() != m_videoWallMode.guid || item.uuid != m_videoWallMode.instanceGuid)
         return;
-    closeInstance();
+    closeInstanceDelayed();
 }
 
 void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(const QnVideoWallControlMessage &message) {
@@ -2370,3 +2421,40 @@ void QnWorkbenchVideoWallHandler::at_controlModeCacheTimer_timeout() {
         sendMessage(message);
     }
 }
+
+QString QnWorkbenchVideoWallHandler::shortcutPath() {
+    QString result = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    if (result.isEmpty())
+        result = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    return result;
+}
+
+
+bool QnWorkbenchVideoWallHandler::shortcutExists(const QnVideoWallResourcePtr &videowall) const {
+    QString destinationPath = shortcutPath();
+    if (destinationPath.isEmpty())
+        return false;
+
+    return qnPlatform->shortcuts()->shortcutExists(destinationPath, videowall->getName());
+}
+
+bool QnWorkbenchVideoWallHandler::createShortcut(const QnVideoWallResourcePtr &videowall) {
+
+    QString destinationPath = shortcutPath();
+    if (destinationPath.isEmpty())
+        return false;
+
+    QStringList arguments;
+    arguments << QLatin1String("--videowall");
+    arguments << videowall->getId().toString();
+
+    QUrl url = qnSettings->lastUsedConnection().url;
+    url.setUserName(QString());
+    url.setPassword(QString());
+
+    arguments << QLatin1String("--auth");
+    arguments << QLatin1String(url.toEncoded());
+
+    return qnPlatform->shortcuts()->createShortcut(qApp->applicationFilePath(), destinationPath, videowall->getName(), arguments);
+}
+

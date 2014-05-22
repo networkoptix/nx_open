@@ -3,6 +3,9 @@
 
 #include <type_traits> /* For std::is_same. */
 
+#include <utils/fusion/fusion.h>
+#include <utils/serialization/serialization.h>
+
 #include "csv_fwd.h"
 #include "csv_stream.h"
 #include "csv_detail.h"
@@ -158,9 +161,10 @@ namespace QnCsvDetail {
  * \param TYPE                          Type to explicitly specify csv category for.
  * \param CATEGORY                      Csv category, one of <tt>QnCsv::field_tag</tt>, 
  *                                      <tt>QnCsv::record_tag</tt> and <tt>QnCsv::document_tag</tt>.
+ * \param PREFIX                        Optional function definition prefix.
  */
-#define QN_DECLARE_CSV_TYPE_CATEGORY(TYPE, CATEGORY)                            \
-    CATEGORY csv_type_category(const TYPE *);
+#define QN_DECLARE_CSV_TYPE_CATEGORY(TYPE, CATEGORY, ... /* PREFIX */)          \
+__VA_ARGS__ CATEGORY csv_type_category(const TYPE *);
 
 
 #define QN_FUSION_DEFINE_FUNCTIONS_csv_record(TYPE, ... /* PREFIX */)           \

@@ -28,6 +28,25 @@ namespace QnLexicalDetail {
         return true;
     }
 
+
+    template<class T>
+    void serialize_numeric_enum(const T &value, QString *target) {
+        QnSerialization::check_enum_binary<T>();
+
+        QnLexical::serialize(static_cast<qint32>(value), target);
+    }
+
+    template<class T>
+    bool deserialize_numeric_enum(const QString &value, T *target) {
+        QnSerialization::check_enum_binary<T>();
+
+        qint32 tmp;
+        if(!QnLexical::deserialize(value, &tmp))
+            return false;
+        *target = static_cast<T>(tmp);
+        return true;
+    }
+
 } // namespace QnLexicalDetail
 
 
@@ -102,6 +121,17 @@ inline void serialize(const QnLatin1Array &value, QString *target) {
 inline bool deserialize(const QString &value, QnLatin1Array *target) {
     *target = value.toLatin1(); /* We don't check for errors... */
     return true;
+}
+
+
+template<class T>
+void serialize(const T &value, QString *target, typename std::enable_if<QnLexical::is_numerically_serializable_enum_or_flags<T>::value>::type * = NULL) {
+    QnLexicalDetail::serialize_numeric_enum(value, target);
+}
+
+template<class T>
+bool deserialize(const QString &value, T *target, typename std::enable_if<QnLexical::is_numerically_serializable_enum_or_flags<T>::value>::type * = NULL) {
+    return QnLexicalDetail::deserialize_numeric_enum(value, target);
 }
 
 

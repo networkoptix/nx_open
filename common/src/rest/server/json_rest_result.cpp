@@ -31,7 +31,7 @@ const QJsonValue &QnJsonRestResult::reply() const {
     return m_reply;
 }
 
-QN_FUSION_DEFINE_FUNCTIONS(QnJsonRestResult::Error, (json_numeric_enum))
+QN_FUSION_DEFINE_FUNCTIONS(QnJsonRestResult::Error, (numeric))
 
 QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(QnJsonRestResult, 
     (json),

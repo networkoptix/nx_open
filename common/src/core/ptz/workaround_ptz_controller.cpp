@@ -1,9 +1,11 @@
 #include "workaround_ptz_controller.h"
 
+#include <common/common_module.h>
+
 #include <utils/math/math.h>
 #include <utils/math/coordinate_transformations.h>
+#include <utils/serialization/lexical_functions.h>
 
-#include <common/common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_data_pool.h>

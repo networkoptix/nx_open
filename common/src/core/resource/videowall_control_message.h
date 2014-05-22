@@ -1,6 +1,7 @@
 #ifndef VIDEOWALL_CONTROL_MESSAGE_H
 #define VIDEOWALL_CONTROL_MESSAGE_H
 
+#include <QtCore/QObject>
 #include <QtCore/QUuid>
 #include <QtCore/QHash>
 #include <QtCore/QString>
@@ -8,8 +9,10 @@
 #include <QtCore/QDebug>
 
 class QnVideoWallControlMessage {
+    Q_GADGET
+    Q_ENUMS(Operation)
 public:
-    enum QnVideoWallControlOperation {
+    enum Operation {
         Exit,
         Identify,
 
@@ -37,12 +40,12 @@ public:
     };
 
     QnVideoWallControlMessage() {}
-    QnVideoWallControlMessage(QnVideoWallControlOperation operation):
+    QnVideoWallControlMessage(Operation operation):
         operation(operation){}
 
     QUuid videoWallGuid;
     QUuid instanceGuid;
-    QnVideoWallControlOperation operation;
+    Operation operation;
     QHash<QString, QString> params;
 
     QString& operator[](const QString &key) { return params[key]; }

@@ -5,9 +5,10 @@
 
 #include <QtCore/QString>
 
+#include <utils/serialization/serialization.h>
+
 #include "lexical_fwd.h"
 
-#include <utils/serialization/serialization.h>
 
 class QnLexicalSerializer;
 
@@ -57,8 +58,5 @@ namespace QnLexical {
 
 } // namespace QnLexical
 
-
-#include "lexical_enum.h"
-#include "lexical_functions.h"
 
 #endif // QN_SERIALIZATION_LEXICAL_H

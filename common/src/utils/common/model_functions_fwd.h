@@ -10,6 +10,7 @@
 #include <utils/serialization/json_fwd.h>
 #include <utils/serialization/lexical_fwd.h>
 #include <utils/serialization/sql_fwd.h>
+#include <utils/serialization/xml_fwd.h>
 
 #define QN_FUSION_DECLARE_FUNCTIONS_hash(TYPE, ... /* PREFIX */)                \
 __VA_ARGS__ uint qHash(const TYPE &value, uint seed);

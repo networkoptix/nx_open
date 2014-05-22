@@ -4,7 +4,7 @@
 #include "request_handler.h"
 #include "json_rest_result.h"
 
-#include <utils/serialization/lexical.h>
+#include <utils/serialization/lexical_functions.h>
 
 // TODO: #MSAPI 
 // 

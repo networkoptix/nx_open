@@ -856,7 +856,7 @@ void fromApiToResourceList(const ApiVideowallDataList &src, QnVideoWallResourceL
 }
 
 void fromApiToResource(const ApiVideowallControlMessageData &data, QnVideoWallControlMessage &message) {
-    message.operation = static_cast<QnVideoWallControlMessage::QnVideoWallControlOperation>(data.operation);
+    message.operation = static_cast<QnVideoWallControlMessage::Operation>(data.operation);
     message.videoWallGuid = data.videowallGuid;
     message.instanceGuid = data.instanceGuid;
     message.params.clear();

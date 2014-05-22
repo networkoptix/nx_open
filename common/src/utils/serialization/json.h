@@ -20,9 +20,9 @@
 
 #include <utils/common/unused.h>
 #include <utils/fusion/fusion_serialization.h>
+#include <utils/serialization/serialization.h>
 
 #include "json_fwd.h"
-#include "serialization.h"
 #include "lexical.h"
 
 class QnJsonSerializer;
@@ -30,12 +30,6 @@ class QnJsonSerializer;
 namespace QJsonDetail {
     void serialize_json(const QJsonValue &value, QByteArray *target, QJsonDocument::JsonFormat format = QJsonDocument::Compact);
     bool deserialize_json(const QByteArray &value, QJsonValue *target);
-
-    /* These are in json_functions.h */
-    template<class T>
-    void serialize_numeric_enum(QnJsonContext *ctx, const T &value, QJsonValue *target);
-    template<class T>
-    bool deserialize_numeric_enum(QnJsonContext *ctx, const QJsonValue &value, T *target);
 
     struct StorageInstance { 
         QnSerializerStorage<QnJsonSerializer> *operator()() const;
@@ -331,16 +325,6 @@ __VA_ARGS__ void serialize(QnJsonContext *, const TYPE &value, QJsonValue *targe
 __VA_ARGS__ bool deserialize(QnJsonContext *, const QJsonValue &value, TYPE *target) { \
     QString string;                                                             \
     return QJson::deserialize(value, &string) && QnLexical::deserialize(string, target); \
-}
-
-
-#define QN_FUSION_DEFINE_FUNCTIONS_json_numeric_enum(TYPE, ... /* PREFIX */)    \
-__VA_ARGS__ void serialize(QnJsonContext *ctx, const TYPE &value, QJsonValue *target) { \
-    QJsonDetail::serialize_numeric_enum(ctx, value, target);                    \
-}                                                                               \
-                                                                                \
-__VA_ARGS__ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, TYPE *target) { \
-    return QJsonDetail::deserialize_numeric_enum(ctx, value, target);           \
 }
 
 

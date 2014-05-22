@@ -1131,7 +1131,8 @@ void QnMain::run()
 
     QSettings* settings = MSSettings::roSettings();
 
-    QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList));
+    std::unique_ptr<QnMServerResourceDiscoveryManager> mserverResourceDiscoveryManager( new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList) );
+    QnResourceDiscoveryManager::init( mserverResourceDiscoveryManager.get() );
     initAppServerConnection(*settings);
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
@@ -1337,9 +1338,6 @@ void QnMain::run()
 
     initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
     
-
-    std::auto_ptr<QnAppserverResourceProcessor> m_processor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
-
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
@@ -1367,7 +1365,9 @@ void QnMain::run()
     //============================
     UPNPDeviceSearcher::initGlobalInstance( new UPNPDeviceSearcher() );
 
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
+    std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
+    serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
 
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher thirdPartyResourceSearcher( &cameraDriverRestrictionList );
@@ -1513,10 +1513,12 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->stop();
     QnResource::stopAsyncTasks();
 
-    delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
+    mserverResourceDiscoveryManager.reset();
 
-    m_processor.reset();
+    //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
+        //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
+    serverResourceProcessor.reset();
 
 #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
     delete QnPlVmax480ResourceSearcher::instance();

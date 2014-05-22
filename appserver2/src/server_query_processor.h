@@ -10,10 +10,7 @@
 #include <QtConcurrent>
 
 #include <utils/common/scoped_thread_rollback.h>
-
-#include <utils/serialization/json_functions.h>
-#include <utils/serialization/binary_functions.h>
-#include <utils/serialization/csv_functions.h>
+#include <utils/common/model_functions.h>
 
 #include "database/db_manager.h"
 #include "managers/aux_manager.h"

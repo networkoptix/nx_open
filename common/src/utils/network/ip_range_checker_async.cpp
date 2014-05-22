@@ -12,6 +12,8 @@
 #include "socket.h"
 
 
+static const int MAX_HOSTS_CHECKED_SIMULTANEOUSLY = 256;
+
 QnIpRangeCheckerAsync::QnIpRangeCheckerAsync()
 :
     m_terminated( false ),
@@ -44,8 +46,6 @@ void QnIpRangeCheckerAsync::join()
         m_cond.wait( lk.mutex() );
 }
 
-static const int MAX_HOSTS_CHECKED_SIMULTANEOUSLY = 256;
-
 QStringList QnIpRangeCheckerAsync::onlineHosts( const QHostAddress& startAddr, const QHostAddress& endAddr, int portToScan )
 {
     {
@@ -76,6 +76,11 @@ size_t QnIpRangeCheckerAsync::hostsChecked() const
 {
     QMutexLocker lk( &m_mutex );
     return (m_nextIPToCheck - m_startIpv4) - m_socketsBeingScanned.size();
+}
+
+int QnIpRangeCheckerAsync::maxHostsCheckedSimultaneously()
+{
+    return MAX_HOSTS_CHECKED_SIMULTANEOUSLY;
 }
 
 bool QnIpRangeCheckerAsync::launchHostCheck()

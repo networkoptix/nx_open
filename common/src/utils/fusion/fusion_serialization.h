@@ -79,6 +79,10 @@ namespace QnFusion {
 
 #ifndef Q_MOC_RUN
 
+
+
+// TODO: get rid of these. There is no real profit here.
+
 /**
  * This macro registers fusion visitors that are to be used when serializing
  * and deserializing to/from the given data class. This macro must be used 

@@ -10,7 +10,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>

@@ -13,7 +13,7 @@
 
 #include "compatibility_item.h"
 
-typedef QnSoftwareVersion SoftwareVersionType; // TODO: #Elric remove?
+typedef QnSoftwareVersion SoftwareVersionType; // TODO: #Elric #ec2 remove
 #endif
 
 
@@ -32,8 +32,10 @@ struct QnConnectionInfo {
 #define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand)
 
 #ifndef QN_NO_QT
-QN_FUSION_DECLARE_FUNCTIONS(QnCompatibilityItem, (metatype)(json)(binary)(csv_record))
-QN_FUSION_DECLARE_FUNCTIONS(QnConnectionInfo, (metatype)(json)(binary)(csv_record))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (QnCompatibilityItem)(QnConnectionInfo), 
+    (metatype)(xml)(json)(binary)(csv_record)
+)
 
 // TODO: #Elric remove shared pointer?
 typedef QSharedPointer<QnConnectionInfo> QnConnectionInfoPtr;

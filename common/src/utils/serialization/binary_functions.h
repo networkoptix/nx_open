@@ -19,54 +19,55 @@
 #   include <QtCore/QUuid>
 #endif
 
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 
 #ifndef QN_NO_BASE
 #   include <utils/common/latin1_array.h>
 #endif
 
+#include "collection_fwd.h"
 #include "enum.h"
 
 
 namespace QnBinaryDetail {
 
     template<class Element, class Output, class Tag>
-    void serialize_container_element(const Element &element, QnOutputBinaryStream<Output> *stream, const Tag &) {
+    void serialize_collection_element(const Element &element, QnOutputBinaryStream<Output> *stream, const Tag &) {
         QnBinary::serialize(element, stream);
     }
 
     template<class Element, class Output>
-    void serialize_container_element(const Element &element, QnOutputBinaryStream<Output> *stream, const QnContainer::map_tag &) {
+    void serialize_collection_element(const Element &element, QnOutputBinaryStream<Output> *stream, const QnCollection::map_tag &) {
         QnBinary::serialize(element.first, stream);
         QnBinary::serialize(element.second, stream);
     }
 
-    template<class Container, class Output>
-    void serialize_container(const Container &value, QnOutputBinaryStream<Output> *stream) {
+    template<class Collection, class Output>
+    void serialize_collection(const Collection &value, QnOutputBinaryStream<Output> *stream) {
         QnBinary::serialize(static_cast<qint32>(value.size()), stream);
         for(auto pos = boost::begin(value); pos != boost::end(value); ++pos)
-            serialize_container_element(*pos, stream, typename QnContainer::container_category<Container>::type());
+            serialize_collection_element(*pos, stream, typename QnCollection::collection_category<Collection>::type());
     }
 
-    template<class Container, class Element, class Input>
-    bool deserialize_container_element(QnInputBinaryStream<Input> *stream, Container *target, const Element *, const QnContainer::list_tag &) {
-        /* Deserialize value right into container. */
-        return QnBinary::deserialize(stream, &*QnContainer::insert(*target, boost::end(*target), Element()));
+    template<class Collection, class Element, class Input>
+    bool deserialize_collection_element(QnInputBinaryStream<Input> *stream, Collection *target, const Element *, const QnCollection::list_tag &) {
+        /* Deserialize value right into list. */
+        return QnBinary::deserialize(stream, &*QnCollection::insert(*target, boost::end(*target), Element()));
     }
 
-    template<class Container, class Element, class Input>
-    bool deserialize_container_element(QnInputBinaryStream<Input> *stream, Container *target, const Element *, const QnContainer::set_tag &) {
+    template<class Collection, class Element, class Input>
+    bool deserialize_collection_element(QnInputBinaryStream<Input> *stream, Collection *target, const Element *, const QnCollection::set_tag &) {
         Element element;
         if(!QnBinary::deserialize(stream, &element))
             return false;
         
-        QnContainer::insert(*target, boost::end(*target), std::move(element));
+        QnCollection::insert(*target, boost::end(*target), std::move(element));
         return true;
     }
 
-    template<class Container, class Element, class Input>
-    bool deserialize_container_element(QnInputBinaryStream<Input> *stream, Container *target, const Element *, const QnContainer::map_tag &) {
-        typename Container::key_type key;
+    template<class Collection, class Element, class Input>
+    bool deserialize_collection_element(QnInputBinaryStream<Input> *stream, Collection *target, const Element *, const QnCollection::map_tag &) {
+        typename Collection::key_type key;
         if(!QnBinary::deserialize(stream, &key))
             return false;
 
@@ -77,9 +78,9 @@ namespace QnBinaryDetail {
         return true;
     }
 
-    template<class Container, class Input>
-    bool deserialize_container(QnInputBinaryStream<Input> *stream, Container *target) {
-        typedef typename QnContainer::make_assignable<typename std::iterator_traits<typename boost::range_mutable_iterator<Container>::type>::value_type>::type value_type;
+    template<class Collection, class Input>
+    bool deserialize_collection(QnInputBinaryStream<Input> *stream, Collection *target) {
+        typedef typename QnCollection::make_assignable<typename std::iterator_traits<typename boost::range_mutable_iterator<Collection>::type>::value_type>::type value_type;
 
         qint32 size;
         if(!QnBinary::deserialize(stream, &size))
@@ -92,11 +93,11 @@ namespace QnBinaryDetail {
          * Limit: no more than 1024 elements, and no more than 1Mb of memory. */
         qint32 maxSize = std::min(1024, 1024 * 1024 / static_cast<int>(sizeof(value_type)));
 
-        QnContainer::clear(*target);
-        QnContainer::reserve(*target, std::min(size, maxSize));
+        QnCollection::clear(*target);
+        QnCollection::reserve(*target, std::min(size, maxSize));
 
         for(int i = 0; i < size; i++)
-            if(!deserialize_container_element(stream, target, static_cast<const value_type *>(NULL), typename QnContainer::container_category<Container>::type()))
+            if(!deserialize_collection_element(stream, target, static_cast<const value_type *>(NULL), typename QnCollection::collection_category<Collection>::type()))
                 return false;
         
         return true;
@@ -250,15 +251,39 @@ void serialize(const QByteArray &value, QnOutputBinaryStream<Output> *stream) {
 
 template<class T>
 bool deserialize(QnInputBinaryStream<T> *stream, QByteArray *target) {
-    static const qint32 maxSize = 1024 * 1024 * 100; // 100 MB
     qint32 size;
     if(!QnBinary::deserialize(stream, &size))
         return false;
-    if(size < 0 || size > maxSize) // do not allow to deserialize too much
+    if(size < 0)
         return false;
 
-    target->resize(size);
-    return stream->read(target->data(), size) == size;
+    const qint32 chunkSize = 16 * 1024 * 1024;
+    if(size < chunkSize) {
+        /* If it's less than 16Mb then just read it as a whole chunk. */
+        target->resize(size);
+        return stream->read(target->data(), size) == size;
+    } else {
+        /* Otherwise there is a high probability that the stream is corrupted, 
+         * but we cannot be 100% sure. Read it chunk-by-chunk, then assemble. */
+        QVector<QByteArray> chunks;
+
+        for(qint32 pos = 0; pos < size; pos += chunkSize) {
+            QByteArray chunk;
+            chunk.resize(std::min(chunkSize, size - pos));
+
+            if(stream->read(chunk.data(), chunk.size()) != chunk.size())
+                return false; /* The stream was indeed corrupted. */
+
+            chunks.push_back(chunk);
+        }
+
+        /* Assemble the chunks. */
+        target->clear();
+        target->reserve(size);
+        for(const QByteArray chunk: chunks)
+            target->append(chunk);
+        return true;
+    }
 }
 
 
@@ -344,41 +369,28 @@ bool deserialize(QnInputBinaryStream<Input> *stream, T *target, typename std::en
 
 
 #ifndef Q_MOC_RUN
-#define QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG) \
+#define QN_DEFINE_COLLECTION_BINARY_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG) \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Output>                            \
 void serialize(const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> &value, QnOutputBinaryStream<Output> *stream) { \
-    QnBinaryDetail::serialize_container(value, stream);                         \
+    QnBinaryDetail::serialize_collection(value, stream);                         \
 }                                                                               \
                                                                                 \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Input>                             \
 bool deserialize(QnInputBinaryStream<Input> *stream, TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> *target) { \
-    return QnBinaryDetail::deserialize_container(stream, target);               \
+    return QnBinaryDetail::deserialize_collection(stream, target);               \
 }                                                                               \
 
-template<class T> class QSet;
-template<class T> class QList;
-template<class T> class QLinkedList;
-template<class T> class QVector;
-template<class T, int N> class QVarLengthArray;
-template<class Key, class T> class QMap;
-template<class Key, class T> class QHash;
-/* Forward-declaring STL containers is undefined behavior... */ 
-
-QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QSet, (class T), (T));
-QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QList, (class T), (T));
-QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QLinkedList, (class T), (T));
-QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QVector, (class T), (T));
-QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QVarLengthArray, (class T, int N), (T, N));
-
-#ifndef QN_NO_QT
-QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T));
-QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T));
-#endif
-
-QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator));
-QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator));
-QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator));
-#undef QN_DEFINE_CONTAINER_BINARY_SERIALIZATION_FUNCTIONS
+QN_DEFINE_COLLECTION_BINARY_SERIALIZATION_FUNCTIONS(QSet, (class T), (T));
+QN_DEFINE_COLLECTION_BINARY_SERIALIZATION_FUNCTIONS(QList, (class T), (T));
+QN_DEFINE_COLLECTION_BINARY_SERIALIZATION_FUNCTIONS(QLinkedList, (class T), (T));
+QN_DEFINE_COLLECTION_BINARY_SERIALIZATION_FUNCTIONS(QVector, (class T), (T));
+QN_DEFINE_COLLECTION_BINARY_SERIALIZATION_FUNCTIONS(QVarLengthArray, (class T, int N), (T, N));
+QN_DEFINE_COLLECTION_BINARY_SERIALIZATION_FUNCTIONS(QMap, (class Key, class T), (Key, T));
+QN_DEFINE_COLLECTION_BINARY_SERIALIZATION_FUNCTIONS(QHash, (class Key, class T), (Key, T));
+QN_DEFINE_COLLECTION_BINARY_SERIALIZATION_FUNCTIONS(std::vector, (class T, class Allocator), (T, Allocator));
+QN_DEFINE_COLLECTION_BINARY_SERIALIZATION_FUNCTIONS(std::set, (class Key, class Predicate, class Allocator), (Key, Predicate, Allocator));
+QN_DEFINE_COLLECTION_BINARY_SERIALIZATION_FUNCTIONS(std::map, (class Key, class T, class Predicate, class Allocator), (Key, T, Predicate, Allocator));
+#undef QN_DEFINE_COLLECTION_BINARY_SERIALIZATION_FUNCTIONS
 #endif // Q_MOC_RUN
 
 

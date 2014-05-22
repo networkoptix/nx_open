@@ -44,6 +44,8 @@ public:
     QStringList onlineHosts( const QHostAddress& startAddr, const QHostAddress& endAddr, int portToScan );
     size_t hostsChecked() const;
 
+    static int maxHostsCheckedSimultaneously();
+
 private:
     bool m_terminated;
     QStringList m_openedIPs;
@@ -56,8 +58,6 @@ private:
     quint32 m_endIpv4;
     quint32 m_nextIPToCheck;
 
-    //!Returns immediately if no scan is running
-    void waitForScanToFinish();
     bool launchHostCheck();
 
 private slots:

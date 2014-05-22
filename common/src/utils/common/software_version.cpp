@@ -5,10 +5,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QDataStream>
 
-#include <utils/serialization/binary_functions.h>
-#include <utils/serialization/json_functions.h>
-#include <utils/serialization/lexical_functions.h>
-#include <utils/serialization/csv_functions.h>
+#include <utils/common/model_functions.h>
 
 QString QnSoftwareVersion::toString(QnSoftwareVersion::Format format) const {
     QString result = QString::number(m_data[0]);
@@ -63,7 +60,7 @@ QDataStream &operator>>(QDataStream &stream, QnSoftwareVersion &version) {
     return stream;
 }
 
-QN_FUSION_DEFINE_FUNCTIONS(QnSoftwareVersion, (json_lexical))
+QN_FUSION_DEFINE_FUNCTIONS(QnSoftwareVersion, (json_lexical)(xml_lexical))
 
 void serialize(const QnSoftwareVersion &value, QnOutputBinaryStream<QByteArray> *stream) {
     QnBinary::serialize(value.m_data, stream);

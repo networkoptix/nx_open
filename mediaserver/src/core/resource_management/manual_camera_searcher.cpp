@@ -19,6 +19,9 @@
 
 
 static const int MAX_PERCENT = 100;
+//assuming that scanning ports is ten times faster than plugin check
+static const int PORT_SCAN_MAX_PROGRESS_PERCENT = 10;
+static_assert( PORT_SCAN_MAX_PROGRESS_PERCENT < MAX_PERCENT, "PORT_SCAN_MAX_PROGRESS_PERCENT must be less than MAX_PERCENT" );
 
 namespace {
     /**
@@ -176,13 +179,12 @@ bool QnManualCameraSearcher::run( QThreadPool* threadPool, const QString &startA
 
     {
         QnConcurrent::QnFuture<QnManualCameraSearchCameraList> results;
-        //const int onlineScanThreadCount = threadPool.maxThreadCount();
-        //QN_INCREASE_MAX_THREADS(onlineScanThreadCount);   TODO #ak modify and uncomment?
         {
             QMutexLocker lock(&m_mutex);
             if (m_state == QnManualCameraSearchStatus::Aborted)
                 return false;
             m_state = QnManualCameraSearchStatus::CheckingHost;
+            QnScopedThreadRollback ensureFreeThread( 1 );
             results = QnConcurrent::mapped( threadPool, checkers, std::mem_fn(&SinglePluginChecker::mapFunction) );
             m_scanProgress = &results;
         }
@@ -259,13 +261,13 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const {
         break;
     case QnManualCameraSearchStatus::CheckingOnline:
         //considering it to be half of entire job
-        result.status = QnManualCameraSearchStatus( m_state, (int)m_ipChecker.hostsChecked()*(MAX_PERCENT/2)/m_hostRangeSize, MAX_PERCENT );
+        result.status = QnManualCameraSearchStatus( m_state, (int)m_ipChecker.hostsChecked()*PORT_SCAN_MAX_PROGRESS_PERCENT/m_hostRangeSize, MAX_PERCENT );
         NX_LOG( lit(" -----------------2 %1 : %2").arg(result.status.current).arg(result.status.total), cl_logDEBUG1 );
         break;
     case QnManualCameraSearchStatus::CheckingHost:
     {
         if (!m_scanProgress) {
-            result.status = QnManualCameraSearchStatus(m_state, 0, MAX_PERCENT);
+            result.status = QnManualCameraSearchStatus(m_state, PORT_SCAN_MAX_PROGRESS_PERCENT, MAX_PERCENT);
             NX_LOG( lit(" -----------------3 %1 : %2").arg(result.status.current).arg(result.status.total), cl_logDEBUG1 );
         } else {
             const int maxProgress = m_scanProgress->progressMaximum() - m_scanProgress->progressMinimum();
@@ -274,7 +276,7 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const {
             //considering it to be second half of entire job
             result.status = QnManualCameraSearchStatus(
                 m_state,
-                (MAX_PERCENT/2) + currentProgress*(MAX_PERCENT/2)/(maxProgress > 0 ? maxProgress : currentProgress),
+                PORT_SCAN_MAX_PROGRESS_PERCENT + currentProgress*(MAX_PERCENT - PORT_SCAN_MAX_PROGRESS_PERCENT)/(maxProgress > 0 ? maxProgress : currentProgress),
                 MAX_PERCENT );
             NX_LOG( lit(" -----------------4 %1 : %2").arg(result.status.current).arg(result.status.total), cl_logDEBUG1 );
         }
