@@ -56,35 +56,33 @@ int QnProxyConnectionProcessor::getDefaultPortByProtocol(const QString& protocol
         return -1;
 }
 
-bool QnProxyConnectionProcessor::doProxyData(fd_set* read_set, AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize)
+bool QnProxyConnectionProcessor::doProxyData(AbstractStreamSocket* srcSocket, AbstractStreamSocket* dstSocket, char* buffer, int bufferSize)
 {
-    if(FD_ISSET(srcSocket->handle(), read_set))
-    {
-        int readed = srcSocket->recv(buffer, bufferSize);
-#       ifndef Q_OS_WIN32
-            if( readed == -1 && errno == EINTR )
-                return true;
-#       endif
+    int readed = srcSocket->recv(buffer, bufferSize);
+#ifndef Q_OS_WIN32
+        if( readed == -1 && errno == EINTR )
+            return true;
+#endif
 
-        if (readed < 1)
-            return false;
-        for( ;; )
+    if (readed < 1)
+        return false;
+    for( ;; )
+    {
+        int sended = dstSocket->send(buffer, readed);
+        if( sended < 0 )
         {
-            int sended = dstSocket->send(buffer, readed);
-            if( sended < 0 )
-            {
-                NX_LOG( lit("QnProxyConnectionProcessor::doProxyData. Socket error: %1").arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
-                return false;
-            }
-            if( sended == 0 )
-                return false;   //socket closed
-            if( sended == readed )
-                return true;    //sent everything
-            buffer += sended;
-            readed -= sended;
+            if( SystemError::getLastOSErrorCode() == SystemError::interrupted )
+                continue;   //retrying interrupted call
+            NX_LOG( lit("QnProxyConnectionProcessor::doProxyData. Socket error: %1").arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
+            return false;
         }
+        if( sended == 0 )
+            return false;   //socket closed
+        if( sended == readed )
+            return true;    //sent everything
+        buffer += sended;
+        readed -= sended;
     }
-    return true;
 }
 
 #ifdef PROXY_STRICT_IP
@@ -241,6 +239,9 @@ void QnProxyConnectionProcessor::run()
     if (!openProxyDstConnection())
         return;
 
+    d->pollSet.add( d->socket.data(), PollSet::etRead );
+    d->pollSet.add( d->dstSocket.data(), PollSet::etRead );
+
     bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
     if (!isWebSocket && (d->protocol.toLower() == "http" || d->protocol.toLower() == "https"))
     {
@@ -258,119 +259,108 @@ void QnProxyConnectionProcessor::doRawProxy()
 {
     Q_D(QnProxyConnectionProcessor);
 
-    fd_set read_set;
     char buffer[1024*64];
-    int nfds = qMax(d->socket->handle(), d->dstSocket->handle()) + 1;
 
     while (!m_needStop)
     {
-        timeval timeVal;
-        timeVal.tv_sec  = IO_TIMEOUT/1000;
-        timeVal.tv_usec = (IO_TIMEOUT%1000)*1000;
-
-        FD_ZERO(&read_set);
-        FD_SET(d->socket->handle(), &read_set);
-        FD_SET(d->dstSocket->handle(), &read_set);
-
-        int rez = ::select(nfds, &read_set, NULL, NULL, &timeVal);
-#ifndef Q_OS_WIN32
-        if( rez == -1 && errno == EINTR )
+        int rez = d->pollSet.poll( IO_TIMEOUT );
+        if( rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted )
             continue;
-#endif
 
         if (rez < 1)
-            break; // error or timeout
-        if (!doProxyData(&read_set, d->socket.data(), d->dstSocket.data(), buffer, sizeof(buffer)))
-            break;
-        if (!doProxyData(&read_set, d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
-            break;
-
+            return; // error or timeout
+        for( PollSet::const_iterator
+            it = d->pollSet.begin();
+            it != d->pollSet.end();
+            ++it )
+        {
+            if( it.eventType() != PollSet::etRead )
+                return;
+            if( it.socket() == d->socket )
+                if (!doProxyData(d->socket.data(), d->dstSocket.data(), buffer, sizeof(buffer)))
+                    return;
+            if( it.socket() == d->dstSocket )
+                if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
+                    return;
+        }
     }
-
 }
 
 void QnProxyConnectionProcessor::doSmartProxy()
 {
     Q_D(QnProxyConnectionProcessor);
 
-    fd_set read_set;
     char buffer[1024*64];
-    int nfds = qMax(d->socket->handle(), d->dstSocket->handle()) + 1;
-
     d->clientRequest.clear();
 
     while (!m_needStop)
     {
-        timeval timeVal;
-        timeVal.tv_sec  = IO_TIMEOUT/1000;
-        timeVal.tv_usec = (IO_TIMEOUT%1000)*1000;
-
-        FD_ZERO(&read_set);
-        FD_SET(d->socket->handle(), &read_set);
-        FD_SET(d->dstSocket->handle(), &read_set);
-
-        int rez = ::select(nfds, &read_set, NULL, NULL, &timeVal);
-#ifndef Q_OS_WIN32
-        if( rez == -1 && errno == EINTR )
+        int rez = d->pollSet.poll( IO_TIMEOUT );
+        if( rez == -1 && SystemError::getLastOSErrorCode() == SystemError::interrupted )
             continue;
-#endif
         if (rez < 1)
-            break; // error or timeout
+            return; // error or timeout
 
-        if(FD_ISSET(d->socket->handle(), &read_set))
+        for( PollSet::const_iterator
+            it = d->pollSet.begin();
+            it != d->pollSet.end();
+            ++it )
         {
-            int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
-#           ifndef Q_OS_WIN32
-                if( readed == -1 && errno == EINTR )
-                    continue;
-#           endif
-
-            if (readed < 1) 
-                break;
-            d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-            if (isFullMessage(d->clientRequest)) 
+            if( it.eventType() != PollSet::etRead )
+                return;
+            if( it.socket() == d->socket )
             {
-                parseRequest();
-                QString path = d->request.requestLine.url.path();
-                // parse next request and change dst if required
-                QUrl dstUrl;
-                QString xServerGUID;
-                updateClientRequest(dstUrl, xServerGUID);
-                bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
-                bool isSameAddr = d->lastConnectedUrl == xServerGUID || d->lastConnectedUrl == dstUrl;
-                if (isSameAddr) 
+                int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+                if (readed < 1) 
+                    return;
+
+                d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
+                if (isFullMessage(d->clientRequest)) 
                 {
-                    d->dstSocket->send(d->clientRequest);
-                    if (isWebSocket) 
+                    parseRequest();
+                    QString path = d->request.requestLine.url.path();
+                    // parse next request and change dst if required
+                    QUrl dstUrl;
+                    QString xServerGUID;
+                    updateClientRequest(dstUrl, xServerGUID);
+                    bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
+                    bool isSameAddr = d->lastConnectedUrl == xServerGUID || d->lastConnectedUrl == dstUrl;
+                    if (isSameAddr) 
                     {
-                        if (!doProxyData(&read_set, d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
-                            break; // send rest of data
-                        doRawProxy(); // switch to binary mode
-                        return;
+                        d->dstSocket->send(d->clientRequest);
+                        if (isWebSocket) 
+                        {
+                            if( rez == 2 ) //same as FD_ISSET(d->dstSocket->handle(), &read_set), since we have only 2 sockets
+                                if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
+                                    return; // send rest of data
+                            doRawProxy(); // switch to binary mode
+                            return;
+                        }
                     }
-                }
-                else {
-                    // new server
-                    d->lastConnectedUrl = connectToRemoteHost(xServerGUID , dstUrl);
-                    if (d->lastConnectedUrl.isEmpty()) {
-                        d->socket->close();
-                        return; // invalid dst address
-                    }
+                    else {
+                        // new server
+                        d->lastConnectedUrl = connectToRemoteHost(xServerGUID , dstUrl);
+                        if (d->lastConnectedUrl.isEmpty()) {
+                            d->socket->close();
+                            return; // invalid dst address
+                        }
 
-                    d->dstSocket->send(d->clientRequest.data(), d->clientRequest.size());
+                        d->dstSocket->send(d->clientRequest.data(), d->clientRequest.size());
 
-                    if (isWebSocket) 
-                    {
-                        doRawProxy(); // switch to binary mode
-                        return;
+                        if (isWebSocket) 
+                        {
+                            doRawProxy(); // switch to binary mode
+                            return;
+                        }
                     }
+                    d->clientRequest.clear();
                 }
-                d->clientRequest.clear();
+            }
+            else if( it.socket() == d->dstSocket )
+            {
+                if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
+                    return;
             }
         }
-
-        if (!doProxyData(&read_set, d->dstSocket.data(), d->socket.data(), buffer, sizeof(buffer)))
-            break;
-
     }
 }
