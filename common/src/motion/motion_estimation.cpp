@@ -1024,6 +1024,8 @@ bool QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 
     if (m_decoder == 0 && !(videoData->flags & AV_PKT_FLAG_KEY))
         return false;
+    if( !m_motionMask )
+        return false;   //no motion mask set
     if (m_decoder == 0 || m_decoder->getContext()->codec_id != videoData->compressionType)
     {
         delete m_decoder;
