@@ -165,7 +165,7 @@ CameraDiagnostics::Result QnStardotResource::initInternal()
     mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution, CODEC_ID_H264 ) ); //QnStardotStreamReader always requests h.264
     saveResolutionList( mediaStreams );
 
-    save();
+    saveParams();
 
     setMotionMaskPhysical(0);
     return CameraDiagnostics::NoErrorResult();

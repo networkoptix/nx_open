@@ -146,7 +146,7 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
     mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(640, 480), CODEC_ID_H264 ) );
     saveResolutionList( mediaStreams );
 
-    save();
+    saveParams();
 
     QMutexLocker lock(&m_chunkReaderMutex);
     QnVMax480ChunkReader* chunkReader = m_chunkReaderMap.value(getHostAddress());

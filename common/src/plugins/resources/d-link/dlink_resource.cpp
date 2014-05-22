@@ -335,7 +335,7 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         mediaStreams.streams.push_back( CameraMediaStreamInfo( m_camInfo.secondaryStreamResolution(), supportedCodec ) );
     saveResolutionList( mediaStreams );
 
-    save();
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
 

@@ -275,7 +275,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 
     const QString firmware = getResourceParamList().value(QLatin1String("Firmware version")).value().toString();
     setFirmware(firmware);
-    save();
+    saveParams();
 
     setParam(QLatin1String("Zone size"), zone_size, QnDomainPhysical);
     setMotionMaskPhysical(0);

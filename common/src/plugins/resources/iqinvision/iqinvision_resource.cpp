@@ -83,7 +83,7 @@ CameraDiagnostics::Result QnPlIqResource::initInternal()
     mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(1920, 1080), isRtp() ? CODEC_ID_H264 : CODEC_ID_MJPEG ) );
     saveResolutionList( mediaStreams );
 
-    save();
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
 }

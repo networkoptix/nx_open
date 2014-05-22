@@ -377,7 +377,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     // determin camera max resolution
 
-    save();
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
 }

@@ -253,7 +253,6 @@ private:
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
-    QString m_firmware;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

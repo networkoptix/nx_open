@@ -114,7 +114,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         
         if (channel == 0 && !hasRunningLiveProvider(rpResource)) {
             resource->calcTimeDrift();
-            if (!resource->fetchAndSetDeviceInformation(true))
+            if (!resource->readDeviceInformation())
                 return resList; // no answer from camera
         }
         else if (rpResource->getStatus() == QnResource::Offline)
@@ -135,7 +135,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     }
 
     resource->calcTimeDrift();
-    if (resource->fetchAndSetDeviceInformation(false))
+    
+    if (resource->readDeviceInformation())
     {
         // Clarify resource type
         QString fullName = resource->getName();

@@ -41,7 +41,7 @@ public slots:
 private slots:
     void at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &);
 protected:
-    void save();
+    void saveParams();
     int saveAsync();
 
 private:

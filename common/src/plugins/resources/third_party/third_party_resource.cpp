@@ -482,7 +482,7 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 
     saveResolutionList( mediaStreams );
 
-    save();
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
 }

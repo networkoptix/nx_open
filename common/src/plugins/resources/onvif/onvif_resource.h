@@ -43,6 +43,19 @@ class VideoOptionsLocal;
 
 class QDomElement;
 
+/*
+* This structure is used during discovery process. These data are read by getDeviceInformation request and may override data from multicast packet
+*/
+struct OnvifResExtInfo
+{
+    QString name;
+    QString model;
+    QString firmware;
+    QString vendor;
+    QString hardwareId;
+    QString mac;
+};
+
 class QnPlOnvifResource
 :
     public QnPhysicalCameraResource,
@@ -182,7 +195,10 @@ public:
 
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
-    bool fetchAndSetDeviceInformation(bool performSimpleCheck);
+    //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
+    static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl, const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
+    CameraDiagnostics::Result readDeviceInformation();
+
 
     //!Relay input with token \a relayToken has changed its state to \a active
     //void notificationReceived( const std::string& relayToken, bool active );
@@ -452,6 +468,7 @@ private:
         bool active,
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
+    CameraDiagnostics::Result getFullUrlInfo();
 };
 
 #endif //ENABLE_ONVIF

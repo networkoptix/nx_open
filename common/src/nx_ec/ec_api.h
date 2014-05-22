@@ -117,9 +117,19 @@ namespace ec2
             \param handler Functor with params: (ErrorCode, const QnKvPairListsById&)
         */
         template<class TargetType, class HandlerType> 
-        int save( const QnId& resourceId, const QnKvPairList& kvPairs, TargetType* target, HandlerType handler ) {
-            return save(resourceId, kvPairs,  std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
+        int save( const QnId& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, TargetType* target, HandlerType handler ) {
+            return save(resourceId, kvPairs,  isPredefinedParams, std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
+
+        ErrorCode saveSync( const QnId& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, QnKvPairListsById* const outData) {
+            return impl::doSyncCall<impl::SaveKvPairsHandler>( 
+                [=](const impl::SaveKvPairsHandlerPtr &handler) {
+                    return this->save(resourceId, kvPairs, isPredefinedParams, handler);
+            },
+                outData 
+                );
+        }
+
 
         //!Convenient method to remove resource of any type
         /*!
@@ -143,7 +153,7 @@ namespace ec2
         //virtual int setResourceDisabled( const QnId& resourceId, bool disabled, impl::SetResourceDisabledHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnId &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         virtual int save( const QnResourcePtr &resource, impl::SaveResourceHandlerPtr handler ) = 0;
-        virtual int save( const QnId& resourceId, const QnKvPairList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
+        virtual int save( const QnId& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
     typedef std::shared_ptr<AbstractResourceManager> AbstractResourceManagerPtr;

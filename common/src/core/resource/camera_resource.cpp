@@ -198,7 +198,7 @@ void QnVirtualCameraResource::forceEnableAudio()
 	if (isForcedAudioSupported())
         return;
     setParam(lit("forcedIsAudioSupported"), 1, QnDomainDatabase); 
-    save(); 
+    saveParams(); 
 }
 
 void QnVirtualCameraResource::forceDisableAudio()
@@ -206,13 +206,23 @@ void QnVirtualCameraResource::forceDisableAudio()
     if (!isForcedAudioSupported())
         return;
     setParam(lit("forcedIsAudioSupported"), 0, QnDomainDatabase); 
-    save(); 
+    saveParams(); 
 }
 
-void QnVirtualCameraResource::save()
+void QnVirtualCameraResource::saveParams()
 {
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
-    ec2::ErrorCode rez = conn->getCameraManager()->addCameraSync(::toSharedPointer(this));
+    QnKvPairList params;
+
+    foreach(const QnParam& param, getResourceParamList().list())
+    {
+        if (param.domain() == QnDomainDatabase)
+            params << QnKvPair(param.name(), param.value().toString());
+    }
+
+    QnKvPairListsById  outData;
+    ec2::ErrorCode rez = conn->getResourceManager()->saveSync(getId(), params, true, &outData);
+
     if (rez != ec2::ErrorCode::ok) {
         qCritical() << Q_FUNC_INFO << ": can't save resource params to Enterprise Controller. Resource physicalId: "
             << getPhysicalId() << ". Description: " << ec2::toString(rez);

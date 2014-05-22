@@ -398,6 +398,9 @@ bool QnDbManager::createDatabase()
 
         if (!execSQLFile(lit(":/06_bookmarks.sql")))
             return false;
+
+        if (!execSQLFile(lit(":/07_refactor_firmware.sql")))
+            return false;
     }
 
 
@@ -598,9 +601,9 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
 ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_camera (audio_enabled, control_disabled, firmware, vendor, manually_added, resource_ptr_id, region, schedule_disabled, motion_type, group_name, group_id,\
+    insQuery.prepare("INSERT OR REPLACE INTO vms_camera (audio_enabled, control_disabled, vendor, manually_added, resource_ptr_id, region, schedule_disabled, motion_type, group_name, group_id,\
                      mac, model, secondary_quality, status_flags, physical_id, password, login, dewarping_params, resource_ptr_id) VALUES\
-                     (:audioEnabled, :controlDisabled, :firmware, :vendor, :manuallyAdded, :id, :motionMask, :scheduleDisabled, :motionType, :groupName, :groupId,\
+                     (:audioEnabled, :controlDisabled, :vendor, :manuallyAdded, :id, :motionMask, :scheduleDisabled, :motionType, :groupName, :groupId,\
                      :mac, :model, :secondaryStreamQuality, :statusFlags, :physicalId, :password, :login, :dewarpingParams, :internalId)");
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
@@ -1537,7 +1540,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& c
 	}
     queryCameras.setForwardOnly(true);
 	queryCameras.prepare(QString("SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
-		c.audio_enabled as audioEnabled, c.control_disabled as controlDisabled, c.firmware, c.vendor, c.manually_added as manuallyAdded, \
+		c.audio_enabled as audioEnabled, c.control_disabled as controlDisabled, c.vendor, c.manually_added as manuallyAdded, \
 		c.region as motionMask, c.schedule_disabled as scheduleDisabled, c.motion_type as motionType, \
 		c.group_name as groupName, c.group_id as groupId, c.mac, c. model, c.secondary_quality as secondaryStreamQuality, \
 		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login, c.dewarping_params as dewarpingParams \

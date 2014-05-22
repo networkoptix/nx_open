@@ -168,7 +168,6 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setPhysicalId(src.physicalId);
     dst->setManuallyAdded(src.manuallyAdded);
     dst->setModel(src.model);
-    dst->setFirmware(src.firmware);
     dst->setGroupId(src.groupId);
     dst->setGroupName(src.groupName);
     dst->setSecondaryStreamQuality(src.secondaryStreamQuality);
@@ -202,7 +201,6 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.physicalId = src->getPhysicalId();
     dst.manuallyAdded = src->isManuallyAdded();
     dst.model = src->getModel();
-    dst.firmware = src->getFirmware();
     dst.groupId = src->getGroupId();
     dst.groupName = src->getGroupName();
     dst.secondaryStreamQuality = src->secondaryStreamQuality();
