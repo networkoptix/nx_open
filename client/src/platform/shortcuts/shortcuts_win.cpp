@@ -26,8 +26,10 @@ namespace {
             m_success = SUCCEEDED(hres);
             if (!m_success)
             {
-                if (hres == RPC_E_CHANGED_MODE)
+                if (hres == RPC_E_CHANGED_MODE) {
+                    m_success = true;
                     m_needUninitialize = false;
+                }
                 else {
                     qWarning() << "Failed to initialize COM library. Error code = 0x"  << hres;
                 }
@@ -57,10 +59,8 @@ namespace {
     //                including the file name.
     // lpszPathLink - Address of a buffer that contains the path where the 
     //                Shell link is to be stored, including the file name.
-    // lpszDesc     - Address of a buffer that contains a description of the 
-    //                Shell link, stored in the Comment field of the link
-    //                properties.
-    HRESULT CreateLink(LPCWSTR lpszPathObj, LPCSTR lpszPathLink, LPCWSTR lpszDesc) 
+    // lpszArgs     - Address of a buffer that contains parameters of the executable file.
+    HRESULT CreateLink(LPCWSTR lpszPathObj, LPCWSTR lpszPathLink, LPCWSTR lpszArgs) 
     { 
         HRESULT hres; 
         IShellLink* psl; 
@@ -74,7 +74,7 @@ namespace {
 
             // Set the path to the shortcut target and add the description. 
             psl->SetPath(lpszPathObj); 
-            psl->SetDescription(lpszDesc); 
+            psl->SetArguments(lpszArgs);
 
             // Query IShellLink for the IPersistFile interface, used for saving the 
             // shortcut in persistent storage. 
@@ -82,16 +82,16 @@ namespace {
 
             if (SUCCEEDED(hres)) 
             { 
-                WCHAR wsz[MAX_PATH]; 
+              //  WCHAR wsz[MAX_PATH]; 
 
                 // Ensure that the string is Unicode. 
-                MultiByteToWideChar(CP_ACP, 0, lpszPathLink, -1, wsz, MAX_PATH); 
+              //  MultiByteToWideChar(CP_ACP, 0, lpszPathLink, -1, wsz, MAX_PATH); 
 
                 // Add code here to check return value from MultiByteWideChar 
                 // for success.
 
                 // Save the link by calling IPersistFile::Save. 
-                hres = ppf->Save(wsz, TRUE); 
+                hres = ppf->Save(lpszPathLink, TRUE); 
                 ppf->Release(); 
             } 
             psl->Release(); 
@@ -108,30 +108,40 @@ QnWindowsShortcuts::QnWindowsShortcuts(QObject *parent /*= NULL*/):
 
 }
 
+wchar_t* qnStringToPWChar(const QString &value) {
+    int len = value.length() + 1;
+    wchar_t* result = new wchar_t[len];
+    wmemset(result, 0, len);
+    value.toWCharArray(result);
+    return result;
+}
+
+
 bool QnWindowsShortcuts::createShortcut(const QString &sourceFile, const QString &destinationPath, const QString &name, const QStringList &arguments) {
     QnComInitializer comInit;
     if (!comInit.success())
         return false;
 
-    wchar_t* lpszSrcFile = new wchar_t[sourceFile.length() + 1];
-    sourceFile.toWCharArray(lpszSrcFile);
+    wchar_t* lpszSrcFile = qnStringToPWChar(sourceFile);
 
-    wchar_t * lpszDstPath = new wchar_t[destinationPath.length() + 1];
-    destinationPath.toWCharArray(lpszDstPath);
+    QString fullPath = QDir::toNativeSeparators(destinationPath) + lit("\\") + name + lit(".lnk");
 
-    wchar_t * lpszName = new wchar_t[name.length() + 1];
-    name.toWCharArray(lpszName);
+    wchar_t * lpszDstPath = qnStringToPWChar(fullPath);
 
-    HRESULT rc = CreateLink(lpszSrcFile, lpszDstPath, lpszName);
+    QString args = arguments.join(L' ');
+
+    wchar_t * lpszArgs = qnStringToPWChar(args);
+
+    HRESULT rc = CreateLink(lpszSrcFile, lpszDstPath, lpszArgs);
 
     delete[] lpszSrcFile;
     delete[] lpszDstPath;
-    delete[] lpszName;
+    delete[] lpszArgs;
 
     return SUCCEEDED(rc);
 }
 
-bool QnWindowsShortcuts::shortcutExists(const QString &destinationPath, const QString &name) const 
-{
-    return false;
+bool QnWindowsShortcuts::shortcutExists(const QString &destinationPath, const QString &name) const {
+    QString fullPath = QDir::toNativeSeparators(destinationPath) + lit("\\") + name + lit(".lnk");
+    return QFileInfo::exists(fullPath);
 }

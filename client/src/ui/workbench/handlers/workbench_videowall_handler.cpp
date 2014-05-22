@@ -31,6 +31,8 @@
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
+#include <platform/platform_abstraction.h>
+
 #include <recording/time_period.h>
 
 #include <ui/actions/action.h>
@@ -2416,11 +2418,27 @@ void QnWorkbenchVideoWallHandler::at_controlModeCacheTimer_timeout() {
     }
 }
 
-bool QnWorkbenchVideoWallHandler::shortcutExists(const QnVideoWallResourcePtr &videowall) const {
-    return false;
+QString QnWorkbenchVideoWallHandler::shortcutPath() {
+    QString result = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+    if (result.isEmpty())
+        result = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    return result;
 }
 
-void QnWorkbenchVideoWallHandler::createShortcut(const QnVideoWallResourcePtr &videowall) {
+
+bool QnWorkbenchVideoWallHandler::shortcutExists(const QnVideoWallResourcePtr &videowall) const {
+    QString destinationPath = shortcutPath();
+    if (destinationPath.isEmpty())
+        return false;
+
+    return qnPlatform->shortcuts()->shortcutExists(destinationPath, videowall->getName());
+}
+
+bool QnWorkbenchVideoWallHandler::createShortcut(const QnVideoWallResourcePtr &videowall) {
+
+    QString destinationPath = shortcutPath();
+    if (destinationPath.isEmpty())
+        return false;
 
     QStringList arguments;
     arguments << QLatin1String("--videowall");
@@ -2433,6 +2451,6 @@ void QnWorkbenchVideoWallHandler::createShortcut(const QnVideoWallResourcePtr &v
     arguments << QLatin1String("--auth");
     arguments << QLatin1String(url.toEncoded());
 
-    QProcess::startDetached(qApp->applicationFilePath(), arguments);
-
+    return qnPlatform->shortcuts()->createShortcut(qApp->applicationFilePath(), destinationPath, videowall->getName(), arguments);
 }
+

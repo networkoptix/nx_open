@@ -68,8 +68,9 @@ private:
     QnLayoutResourcePtr findExistingResourceLayout(const QnResourcePtr &resource) const;
     QnLayoutResourcePtr constructLayout(const QnResourceList &resources) const;
 
+    static QString shortcutPath();
     bool shortcutExists(const QnVideoWallResourcePtr &videowall) const;
-    void createShortcut(const QnVideoWallResourcePtr &videowall);
+    bool createShortcut(const QnVideoWallResourcePtr &videowall);
 private slots:
     void at_connection_opened();
 
