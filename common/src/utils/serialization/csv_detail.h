@@ -5,15 +5,16 @@
 #include <type_traits> /* For std::integral_constant. */
 
 #ifndef Q_MOC_RUN
-#include <boost/mpl/if.hpp>
-#include <boost/mpl/or.hpp>
 #include <boost/range/has_range_iterator.hpp>
 #endif // Q_MOC_RUN
+
+#include <utils/common/type_traits.h>
 
 #include "csv_fwd.h"
 
 
 namespace QnCsvDetail {
+    using namespace QnTypeTraits;
 
     template<class Output>
     void serialize_header(const QString &prefix, QnCsvStreamWriter<Output> *stream, const void *) {
@@ -25,16 +26,6 @@ namespace QnCsvDetail {
     void serialize_header_internal(const QString &prefix, QnCsvStreamWriter<Output> *stream, const T *dummy) {
         serialize_header(prefix, disable_user_conversions(stream), dummy); /* That's where ADL kicks in. */
     }
-
-
-    // TODO: #Elric #EC2 remove / move
-    template<class T>
-    struct identity {
-        typedef T type;
-    };
-
-    struct yes_type { char dummy; };
-    struct no_type { char dummy[64]; };
 
 
     template<class T0, class T1>
@@ -66,7 +57,7 @@ namespace QnCsvDetail {
 
 
     template<class T, class Output>
-    struct type_category_internal:
+    struct type_category_automatic:
         boost::mpl::if_<
             boost::mpl::or_<boost::has_range_const_iterator<T>, boost::has_range_iterator<T> >,
             identity<identity<QnCsv::document_tag> >,
@@ -83,7 +74,7 @@ namespace QnCsvDetail {
     {};
 
     template<class T>
-    struct type_category_predefined {
+    struct type_category_user_defined {
         typedef decltype(csv_type_category(std::declval<const T *>())) type;
     };
 
@@ -91,11 +82,10 @@ namespace QnCsvDetail {
     struct type_category:
         boost::mpl::if_<
             has_csv_type_category<T>,
-            type_category_predefined<T>,
-            type_category_internal<T, Output>
+            type_category_user_defined<T>,
+            type_category_automatic<T, Output>
         >::type
     {};
-    
 
 } // namespace QnCsvDetail
 

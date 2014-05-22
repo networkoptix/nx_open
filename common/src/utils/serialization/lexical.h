@@ -59,7 +59,4 @@ namespace QnLexical {
 } // namespace QnLexical
 
 
-#include "lexical_enum.h"
-#include "lexical_functions.h"
-
 #endif // QN_SERIALIZATION_LEXICAL_H

@@ -1,8 +1,10 @@
 #include "distributed_mutex.h"
 
 #include "transaction/transaction_message_bus.h"
-#include "utils/common/synctime.h"
 #include "common/common_module.h"
+#include "utils/common/synctime.h"
+#include "utils/common/delete_later.h"
+
 
 namespace ec2
 {
@@ -41,7 +43,6 @@ QnDistributedMutexPtr QnDistributedMutexManager::getLock(const QString& name, in
     QMutexLocker lock(&m_mutex);
 
     Q_ASSERT(!m_mutexList.value(name));
-
 
     QnDistributedMutexPtr netMutex(new QnDistributedMutex(this));
     m_mutexList.insert(name, netMutex);

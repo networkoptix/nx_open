@@ -223,14 +223,14 @@ namespace QJsonDetail {
     }
 
     template<class T>
-    void serialize_numeric_enum(QnJsonContext *ctx, const T &value, QJsonValue *target) {
+    void serialize_enum(QnJsonContext *ctx, const T &value, QJsonValue *target, typename std::enable_if<QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
         QnSerialization::check_enum_binary<T>();
 
         ::serialize(ctx, static_cast<qint32>(value), target); /* Note the direct call instead of invocation through QJson. */
     }
 
     template<class T>
-    bool deserialize_numeric_enum(QnJsonContext *ctx, const QJsonValue &value, T *target) {
+    bool deserialize_enum(QnJsonContext *ctx, const QJsonValue &value, T *target, typename std::enable_if<QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
         QnSerialization::check_enum_binary<T>();
 
         qint32 tmp;
@@ -246,6 +246,19 @@ namespace QJsonDetail {
             return false;
         *target = static_cast<T>(tmp);
         return true;
+    }
+
+    template<class T>
+    void serialize_enum(QnJsonContext *ctx, const T &value, QJsonValue *target, typename std::enable_if<!QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
+        QString tmp;
+        QnLexical::serialize(value, &tmp);
+        ::serialize(ctx, tmp, target); /* Note the direct call instead of invocation through QJson. */
+    }
+
+    template<class T>
+    bool deserialize_enum(QnJsonContext *ctx, const QJsonValue &value, T *target, typename std::enable_if<!QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
+        QString tmp;
+        return ::deserialize(ctx, value, &tmp) && QnLexical::deserialize(tmp, target);
     }
 
 } // namespace QJsonDetail
@@ -352,6 +365,17 @@ inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QByteArray 
     // TODO: #Elric we don't check for validity, this is not good.
     *target = QByteArray::fromBase64(string.toLatin1());
     return true;
+}
+
+
+template<class T>
+void serialize(QnJsonContext *ctx, const T &value, QJsonValue *target, typename std::enable_if<QnSerialization::is_enum_or_flags<T>::value>::type * = NULL) {
+    QJsonDetail::serialize_enum(ctx, value, target);
+}
+
+template<class T>
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, T *target, typename std::enable_if<QnSerialization::is_enum_or_flags<T>::value>::type * = NULL) {
+    return QJsonDetail::deserialize_enum(ctx, value, target);
 }
 
 

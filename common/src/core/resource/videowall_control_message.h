@@ -1,6 +1,7 @@
 #ifndef VIDEOWALL_CONTROL_MESSAGE_H
 #define VIDEOWALL_CONTROL_MESSAGE_H
 
+#include <QtCore/QObject>
 #include <QtCore/QUuid>
 #include <QtCore/QHash>
 #include <QtCore/QString>
@@ -8,6 +9,8 @@
 #include <QtCore/QDebug>
 
 class QnVideoWallControlMessage {
+    Q_GADGET
+    Q_ENUMS(Operation)
 public:
     enum Operation {
         Exit,

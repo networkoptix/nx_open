@@ -36,6 +36,14 @@ public:
 
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
 
+#ifdef __arm__
+    static const qint64 DEFAULT_SPACE_LIMIT =    100*1024*1024; // 100MB
+#else
+    static const qint64 DEFAULT_SPACE_LIMIT = 5*1024*1024*1024ll; // 5gb
+#endif
+    static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
+
+
     QnStorageManager();
     virtual ~QnStorageManager();
     static QnStorageManager* instance();
@@ -78,13 +86,6 @@ public:
     void clearSpace();
 
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
-
-#ifdef __arm__
-    static const qint64 DEFAULT_SPACE_LIMIT = 100*1024*1024; // 100MB
-#else
-    static const qint64 DEFAULT_SPACE_LIMIT = 1000000000ll * 5; // 5gb
-#endif
-    static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
     bool isArchiveTimeExists(const QString& physicalId, qint64 timeMs);
     void stopAsyncTasks();
