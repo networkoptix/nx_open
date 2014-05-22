@@ -122,33 +122,6 @@ bool QnDbManager::init()
     bool rez = queryServers.exec();
     Q_ASSERT(rez);
 
-    QSqlQuery queryCameras(m_sdb);
-    // select cameras from media servers without DB and local cameras
-    queryCameras.setForwardOnly(true);
-    queryCameras.prepare("SELECT r.guid FROM vms_resource r \
-                          JOIN vms_camera c on c.resource_ptr_id = r.id \
-                          JOIN vms_resource sr on sr.guid = r.parent_guid \
-                          JOIN vms_server s on s.resource_ptr_id = sr.id \
-                          WHERE r.status != ? AND ((s.flags & 2) or sr.guid = ?)");
-    queryCameras.bindValue(0, QnResource::Offline);
-    queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
-    if (!queryCameras.exec()) {
-        qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
-        Q_ASSERT(0);
-    }
-    while (queryCameras.next()) 
-    {
-        QnTransaction<ApiSetResourceStatusData> tran(ApiCommand::setResourceStatus, true);
-        tran.fillSequence();
-        tran.params.id = QnId::fromRfc4122(queryCameras.value(0).toByteArray());
-        tran.params.status = QnResource::Offline;
-        executeTransactionNoLock(tran);
-        QByteArray serializedTran;
-        QnOutputBinaryStream<QByteArray> stream(&serializedTran);
-        QnBinary::serialize(tran, &stream);
-        transactionLog->saveTransaction(tran, serializedTran);
-    }
-
     // read license overflow time
     QSqlQuery query(m_sdb);
     query.prepare("SELECT data from misc_data where key = ?");
@@ -172,6 +145,35 @@ bool QnDbManager::init()
             return false;
         }
     }
+
+    QSqlQuery queryCameras(m_sdb);
+    // Update cameras status
+    // select cameras from media servers without DB and local cameras
+    queryCameras.setForwardOnly(true);
+    queryCameras.prepare("SELECT r.guid FROM vms_resource r \
+                         JOIN vms_camera c on c.resource_ptr_id = r.id \
+                         JOIN vms_resource sr on sr.guid = r.parent_guid \
+                         JOIN vms_server s on s.resource_ptr_id = sr.id \
+                         WHERE r.status != ? AND ((s.flags & 2) or sr.guid = ?)");
+    queryCameras.bindValue(0, QnResource::Offline);
+    queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
+    if (!queryCameras.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
+        Q_ASSERT(0);
+    }
+    while (queryCameras.next()) 
+    {
+        QnTransaction<ApiSetResourceStatusData> tran(ApiCommand::setResourceStatus, true);
+        tran.fillSequence();
+        tran.params.id = QnId::fromRfc4122(queryCameras.value(0).toByteArray());
+        tran.params.status = QnResource::Offline;
+        executeTransactionNoLock(tran);
+        QByteArray serializedTran;
+        QnOutputBinaryStream<QByteArray> stream(&serializedTran);
+        QnBinary::serialize(tran, &stream);
+        transactionLog->saveTransaction(tran, serializedTran);
+    }
+
 
     return true;
 }
