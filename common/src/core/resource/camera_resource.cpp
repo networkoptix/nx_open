@@ -68,8 +68,12 @@ float QnPhysicalCameraResource::getResolutionAspectRatio(const QSize& resolution
 }
 
 QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, float aspectRatio,
-                                              double maxResolutionSquare, const QList<QSize>& resolutionList)
+                                              double maxResolutionSquare, const QList<QSize>& resolutionList,
+                                              double* coeff)
 {
+	if (coeff)
+		*coeff = INT_MAX;
+
     double requestSquare = resolution.width() * resolution.height();
     if (requestSquare < MAX_EPS || requestSquare > maxResolutionSquare) return EMPTY_RESOLUTION_PAIR;
 
@@ -99,6 +103,8 @@ QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, fl
         if (matchCoeff <= bestMatchCoeff + MAX_EPS) {
             bestIndex = i;
             bestMatchCoeff = matchCoeff;
+            if (coeff)
+                *coeff = bestMatchCoeff;
         }
     }
 

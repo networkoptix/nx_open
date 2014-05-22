@@ -20,10 +20,11 @@ public:
     QnResourceData data(const QString &key) const;
 
     /**
-     * \param                           Camera resource to get data for.
+     * \param camera                    resource to get data for.
+     * \param useWildcard               do general wildcard search. It more slow method but allow to find values with '*' in the middle of a key value
      * \returns                         Resource data for the given camera.
      */
-    QnResourceData data(const QnVirtualCameraResourcePtr &camera) const;
+    QnResourceData data(const QnVirtualCameraResourcePtr &camera, bool useWildcard = false) const;
     
     bool load(const QString &fileName);
 
