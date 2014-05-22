@@ -100,6 +100,8 @@ public:
     QnMediaServerResourceList targets() const;
     void setTargets(const QSet<QnId> &targets);
 
+    QnMediaServerResourceList actualTargets() const;
+
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);

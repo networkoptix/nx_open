@@ -16,6 +16,9 @@ protected slots:
     void at_connectToCurrentSystemAction_triggered();
 
 private:
+    QnConnectToCurrentSystemTool *connectToCurrentSystemTool();
+
+private:
     QnConnectToCurrentSystemTool *m_connectToCurrentSystemTool;
 };
 

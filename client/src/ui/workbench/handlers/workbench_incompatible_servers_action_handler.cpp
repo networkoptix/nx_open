@@ -11,13 +11,15 @@
 QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActionHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_connectToCurrentSystemTool(new QnConnectToCurrentSystemTool(this))
+    m_connectToCurrentSystemTool(NULL)
 {
     connect(action(Qn::ConnectToCurrentSystem),         SIGNAL(triggered()),    this,   SLOT(at_connectToCurrentSystemAction_triggered()));
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered() {
-    if (m_connectToCurrentSystemTool->isRunning()) {
+    QnConnectToCurrentSystemTool *tool = connectToCurrentSystemTool();
+
+    if (tool->isRunning()) {
         QMessageBox::critical(mainWindow(), tr("Error"), tr("Please, wait before the previously requested servers will be added to your system."));
         return;
     }
@@ -31,5 +33,11 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
     if (targets.isEmpty())
         return;
 
-    m_connectToCurrentSystemTool->connectToCurrentSystem(targets);
+    tool->connectToCurrentSystem(targets);
+}
+
+QnConnectToCurrentSystemTool *QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystemTool() {
+    if (!m_connectToCurrentSystemTool)
+        m_connectToCurrentSystemTool = new QnConnectToCurrentSystemTool(this);
+    return m_connectToCurrentSystemTool;
 }

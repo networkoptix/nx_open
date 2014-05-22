@@ -4,7 +4,6 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/media_server_resource.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
 class QnServerUpdatesWidget;
@@ -14,16 +13,18 @@ class QnServerUpdatesModel;
 class QnSortedServerUpdatesModel;
 class QnMediaServerUpdateTool;
 
-class QnServerUpdatesWidget : public QWidget, public QnWorkbenchContextAware {
+class QnServerUpdatesWidget : public QWidget {
     Q_OBJECT
 public:
-    QnServerUpdatesWidget(QnWorkbenchContext *context, QWidget *parent = 0);
+    QnServerUpdatesWidget(QWidget *parent = 0);
     ~QnServerUpdatesWidget();
 
     bool cancelUpdate();
     bool isUpdating() const;
 
     void setTargets(const QSet<QnId> &targets);
+
+    QnMediaServerUpdateTool *updateTool() const;
 
 private slots:
     void at_checkForUpdatesButton_clicked();

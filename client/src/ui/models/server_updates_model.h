@@ -55,7 +55,6 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
     QModelIndex index(const QnMediaServerResourcePtr &server) const;
 
-    QnMediaServerResourceList servers() const;
     void setUpdatesInformation(const QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> &updates);
     void setUpdateInformation(const QnMediaServerUpdateTool::PeerUpdateInformation &update);
 

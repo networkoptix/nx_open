@@ -12,7 +12,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QnWorkbenchContext *c
 {
     ui->setupUi(this);
 
-    m_updatesWidget = new QnServerUpdatesWidget(context, this);
+    m_updatesWidget = new QnServerUpdatesWidget(this);
     ui->tabWidget->addTab(m_updatesWidget, tr("Updates"));
 }
 

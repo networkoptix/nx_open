@@ -146,6 +146,19 @@ void QnMediaServerUpdateTool::setTargets(const QSet<QnId> &targets) {
     }
 }
 
+QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
+    QnMediaServerResourceList result;
+
+    if (m_targets.isEmpty()) {
+        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server))
+            result.append(resource.staticCast<QnMediaServerResource>());
+    } else {
+        result = m_targets;
+    }
+
+    return result;
+}
+
 void QnMediaServerUpdateTool::checkForUpdates() {
     if (m_state >= CheckingForUpdates)
         return;
@@ -328,13 +341,7 @@ void QnMediaServerUpdateTool::updateServers() {
 
     m_updateId = QUuid::createUuid().toString();
 
-
-    if (m_targets.isEmpty()) {
-        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server))
-            m_targets.append(resource.staticCast<QnMediaServerResource>());
-    }
-
-    foreach (const QnMediaServerResourcePtr &server, m_targets) {
+    foreach (const QnMediaServerResourcePtr &server, actualTargets()) {
         if (server->getStatus() != QnResource::Online)
             continue;
 

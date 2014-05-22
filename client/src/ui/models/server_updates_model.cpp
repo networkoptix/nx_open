@@ -68,15 +68,6 @@ QModelIndex QnServerUpdatesModel::index(const QnMediaServerResourcePtr &server) 
     return base_type::index(it - m_items.begin(), 0);
 }
 
-QnMediaServerResourceList QnServerUpdatesModel::servers() const {
-    QnMediaServerResourceList servers;
-
-    foreach (const Item *item, m_items)
-        servers.append(item->server());
-
-    return servers;
-}
-
 void QnServerUpdatesModel::setUpdatesInformation(const QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> &updates) {
     foreach (Item *item, m_items)
         item->m_updateInfo = updates[item->server()->getId()];

@@ -13,9 +13,8 @@
 
 #include <version.h>
 
-QnServerUpdatesWidget::QnServerUpdatesWidget(QnWorkbenchContext *context, QWidget *parent) :
+QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     QWidget(parent),
-    QnWorkbenchContextAware(context),
     ui(new Ui::QnServerUpdatesWidget),
     m_specificBuildCheck(false)
 {
@@ -64,6 +63,10 @@ void QnServerUpdatesWidget::setTargets(const QSet<QnId> &targets) {
     m_updateTool->setTargets(targets);
 }
 
+QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
+    return m_updateTool;
+}
+
 void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {
     m_updateTool->checkForUpdates();
 }
@@ -88,8 +91,7 @@ void QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked() {
 
 void QnServerUpdatesWidget::at_updateButton_clicked() {
     bool haveOffline = false;
-    QList<QnMediaServerResourcePtr> servers = m_updatesModel->servers();
-    foreach (const QnMediaServerResourcePtr &resource, servers) {
+    foreach (const QnMediaServerResourcePtr &resource, m_updateTool->actualTargets()) {
         if (resource->getStatus() == QnResource::Offline) {
             haveOffline = true;
             break;
@@ -217,7 +219,7 @@ void QnServerUpdatesWidget::updateUi() {
         break;
     }
 
-    foreach (const QnMediaServerResourcePtr &server, m_updatesModel->servers())
+    foreach (const QnMediaServerResourcePtr &server, m_updateTool->actualTargets())
         m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(server->getId()));
 
     if (checkingForUpdates)

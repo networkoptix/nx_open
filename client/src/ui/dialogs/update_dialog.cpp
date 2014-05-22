@@ -12,3 +12,7 @@ QnUpdateDialog::QnUpdateDialog(QWidget *parent) :
 }
 
 QnUpdateDialog::~QnUpdateDialog() {}
+
+QnMediaServerUpdateTool *QnUpdateDialog::updateTool() const {
+    return m_updatesWidget->updateTool();
+}
