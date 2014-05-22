@@ -20,6 +20,20 @@ QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
     (json)
 )
 
+void serialize(QnJsonContext *ctx, const QByteArray &value, QJsonValue *target) {
+    ::serialize(ctx, QString::fromLatin1(value.toBase64()), target); /* Note the direct call instead of invocation through QJson. */
+}
+
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QByteArray *target) {
+    QString string;
+    if(!::deserialize(ctx, value, &string)) /* Note the direct call instead of invocation through QJson. */
+        return false;
+
+    // TODO: #Elric we don't check for validity, this is not good.
+    *target = QByteArray::fromBase64(string.toLatin1());
+    return true;
+}
+
 void serialize(QnJsonContext *ctx, const QRegion &value, QJsonValue *target) {
     QJson::serialize(ctx, value.rects(), target);
 }
