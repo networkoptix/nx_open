@@ -39,31 +39,19 @@ QnResourceData QnResourceDataPool::data(const QString &key) const {
     return m_dataByKey.value(key.toLower());
 }
 
-QnResourceData QnResourceDataPool::data(const QnVirtualCameraResourcePtr &camera, bool useWildcard) const {
+QnResourceData QnResourceDataPool::data(const QnVirtualCameraResourcePtr &camera) const {
     QString vendor = camera->getVendor().toLower();
     vendor = m_shortVendorByName.value(vendor, vendor);
     QString model = camera->getModel().toLower();
 
-    QnResourceData result;
+    QString key0 = lit("*|") + model;
     QString key1 = vendor + lit("|") + model;
-    result.add(m_dataByKey.value(key1 + lit("|") + camera->getFirmware().toLower()));
+    QString key2 = key1 + lit("|") + camera->getFirmware().toLower();
 
-    if (!useWildcard) 
-    {
-        result.add(m_dataByKey.value(lit("*|") + model));
-        result.add(m_dataByKey.value(key1));
-        result.add(m_dataByKey.value(vendor + lit("|*")));
-    }
-    else
-    {
-        for(auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr)
-        {
-            QRegExp regExpr(itr.key(), Qt::CaseInsensitive, QRegExp::Wildcard);
-            if (regExpr.exactMatch(key1))
-                result.add(itr.value());
-        }
-    }
-
+    QnResourceData result;
+    result.add(m_dataByKey.value(key0));
+    result.add(m_dataByKey.value(key1));
+    result.add(m_dataByKey.value(key2));
     return result;
 }
 

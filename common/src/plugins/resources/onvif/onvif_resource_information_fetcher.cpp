@@ -9,7 +9,6 @@
 #include "core/resource_management/resource_pool.h"
 #include "plugins/resources/flex_watch/flexwatch_resource.h"
 #include "plugins/resources/axis/axis_onvif_resource.h"
-#include "../vista/vista_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
@@ -336,8 +335,6 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
     else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))
         resource = QnPlOnvifResourcePtr(new QnFlexWatchResource());
-    else if (manufacture.toLower().contains(QLatin1String("vista")))
-        resource = QnPlOnvifResourcePtr(new QnVistaResource());
 #ifdef ENABLE_AXIS
     else if (manufacture.toLower().contains(QLatin1String("axis")))
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());

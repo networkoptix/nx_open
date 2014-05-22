@@ -211,7 +211,6 @@ public:
     void beforeConfigureStream();
     void afterConfigureStream();
 
-    static QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
 protected:
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
