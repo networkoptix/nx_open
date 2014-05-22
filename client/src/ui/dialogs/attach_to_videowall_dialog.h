@@ -26,6 +26,9 @@ public:
     bool canClone() const;
     void setCanClone(bool value);
 
+    bool isShortcutsSupported() const;
+    void setShortcutsSupported(bool value);
+
     bool isCreateShortcut() const;
     void setCreateShortcut(bool value);
 private:

@@ -99,3 +99,11 @@ void QnAttachToVideowallDialog::setCreateShortcut(bool value) {
     ui->shortcutCheckbox->setChecked(value);
 }
 
+bool QnAttachToVideowallDialog::isShortcutsSupported() const {
+    return ui->shortcutCheckbox->isVisible();
+}
+
+void QnAttachToVideowallDialog::setShortcutsSupported(bool value) {
+    ui->shortcutCheckbox->setVisible(value);
+}
+

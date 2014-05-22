@@ -32,6 +32,8 @@ public:
      */
     virtual bool shortcutExists(const QString &destinationPath, const QString &name) const = 0;
 
+    virtual bool supported() const = 0;
+
 private:
     Q_DISABLE_COPY(QnPlatformShortcuts)
 };

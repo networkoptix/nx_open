@@ -1396,11 +1396,15 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     if (m_attachSettings.layoutId.isNull() || qnIndexOf(layouts, [&](const QnLayoutResourcePtr &layout) {return layout->getId() == m_attachSettings.layoutId;}) < 0)
         m_attachSettings.layoutId = currentLayout->getId();
 
+    bool shortcutsSupported = qnPlatform->shortcuts()->supported();
+
     QScopedPointer<QnAttachToVideowallDialog> dialog(new QnAttachToVideowallDialog(mainWindow()));
     dialog->loadLayoutsList(layouts);
     dialog->setCanClone(canClone);
     dialog->loadSettings(m_attachSettings);
-    dialog->setCreateShortcut(!shortcutExists(videoWall));
+    dialog->setShortcutsSupported(shortcutsSupported);
+    if (shortcutsSupported)
+        dialog->setCreateShortcut(!shortcutExists(videoWall));
     if (!dialog->exec())
         return;
     m_attachSettings = dialog->settings();
@@ -1435,7 +1439,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
 
     attachLayout(videoWall, targetLayout, m_attachSettings);
 
-    if (dialog->isCreateShortcut())
+    if (shortcutsSupported && dialog->isCreateShortcut())
         createShortcut(videoWall);
 }
 

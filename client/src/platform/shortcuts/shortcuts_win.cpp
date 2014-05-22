@@ -145,3 +145,7 @@ bool QnWindowsShortcuts::shortcutExists(const QString &destinationPath, const QS
     QString fullPath = QDir::toNativeSeparators(destinationPath) + lit("\\") + name + lit(".lnk");
     return QFileInfo::exists(fullPath);
 }
+
+bool QnWindowsShortcuts::supported() const {
+    return true;
+}
