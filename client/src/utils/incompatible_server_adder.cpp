@@ -53,25 +53,24 @@ void QnIncompatibleServerAdder::at_peerFound(const QnModuleInformation &moduleIn
 }
 
 void QnIncompatibleServerAdder::at_peerChanged(const QnModuleInformation &moduleInformation) {
-    QnMediaServerResourcePtr server = qnResPool->getResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
-
-    // don't touch normal servers
-    if (server && server->getStatus() != QnResource::Incompatible)
-        return;
+    QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(moduleInformation.id, true).dynamicCast<QnMediaServerResource>();
 
     // don't add servers having version < 2.3 because they cannot be connected to the system anyway
     if (!isSuitable(moduleInformation))
         return;
 
-    if (!server)
-        server = qnResPool->getIncompatibleResourceById(moduleInformation.id).dynamicCast<QnMediaServerResource>();
+    // don't touch normal servers
+    if (server) {
+        if (server->getStatus() == QnResource::Offline || server->getStatus() == QnResource::Incompatible) {
+            server->setVersion(moduleInformation.version);
+            server->setSystemInfo(moduleInformation.systemInformation);
+            server->setSystemName(moduleInformation.systemName);
+            server->setStatus(QnResource::Incompatible);
+        }
+        return;
+    }
 
-    QnMediaServerResourcePtr newServer = makeResource(moduleInformation);
-
-    if (server)
-        server->update(newServer);
-    else
-        qnResPool->addResource(newServer);
+    qnResPool->addResource(makeResource(moduleInformation));
 }
 
 void QnIncompatibleServerAdder::at_peerLost(const QnModuleInformation &moduleInformation) {
@@ -81,6 +80,10 @@ void QnIncompatibleServerAdder::at_peerLost(const QnModuleInformation &moduleInf
     if (server && server->getStatus() != QnResource::Incompatible)
         return;
 
-    if (server)
-        qnResPool->removeResource(server);
+    QnResourcePtr incompatibleResource = qnResPool->getIncompatibleResourceById(moduleInformation.id);
+
+    if (incompatibleResource)
+        qnResPool->removeResource(incompatibleResource);
+    else if (server)
+        server->setStatus(QnResource::Offline);
 }
