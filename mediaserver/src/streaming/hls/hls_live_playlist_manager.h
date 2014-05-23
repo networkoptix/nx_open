@@ -49,10 +49,8 @@ namespace nx_hls
 
     private:
         MediaStreamCache* const m_mediaStreamCache;
-        MediaIndex* const m_mediaIndex;
         std::deque<AbstractPlaylistManager::ChunkData> m_chunks;
         quint64 m_targetDurationUSec;
-        quint64 m_prevTimestamp;
         unsigned int m_mediaSequence;
         AbstractPlaylistManager::ChunkData m_currentChunk;
         mutable QMutex m_mutex;

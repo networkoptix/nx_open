@@ -19,6 +19,7 @@ public:
     QnAppserverResourceProcessor(QnId serverId);
     virtual ~QnAppserverResourceProcessor();
 
+    virtual bool isBusy() const override;
     void processResources(const QnResourceList &resources);
 
 private:

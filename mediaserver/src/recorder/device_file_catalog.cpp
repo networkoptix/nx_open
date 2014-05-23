@@ -237,7 +237,7 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     recorder.setStartOffset(startTimeMs*1000);
 
     QnAbstractMediaDataPtr packet;
-    while (packet = avi->getNextData())
+    while( (packet = avi->getNextData()) )
     {
         packet->dataProvider = reader;
         recorder.processData(packet);
@@ -456,7 +456,7 @@ void DeviceFileCatalog::readStorageData(QnStorageResourcePtr storage, QnServer::
     scanMediaFiles(rootFolder, storage, allChunks, emptyFileList);
 }
 
-bool DeviceFileCatalog::doRebuildArchive(QnStorageResourcePtr storage, const QnTimePeriod& period)
+bool DeviceFileCatalog::doRebuildArchive(QnStorageResourcePtr storage, const QnTimePeriod& /*period*/)
 {
     QElapsedTimer t;
     t.restart();

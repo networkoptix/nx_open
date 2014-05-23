@@ -35,7 +35,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if (cameraResource.isNull())
             continue;
 
-        Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(cameraResource->getPhysicalId()).isEmpty());
+        //Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(cameraResource->getPhysicalId()).isEmpty());
 
         cameraResource->setParentId(m_serverId);
     }
@@ -175,4 +175,10 @@ void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr
         updateResourceStatusAsync(resource);
     else
         m_awaitingSetStatus << resource->getId();
+}
+
+bool QnAppserverResourceProcessor::isBusy() const
+{
+    bool rez = !m_lockInProgress.isEmpty();
+    return rez;
 }

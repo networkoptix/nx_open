@@ -444,6 +444,7 @@ public:
     virtual ~QnResourceProcessor() {}
 
     virtual void processResources(const QnResourceList &resources) = 0;
+    virtual bool isBusy() const { return false; }
 };
 
 

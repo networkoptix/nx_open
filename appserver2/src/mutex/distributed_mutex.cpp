@@ -106,15 +106,16 @@ qint64 QnDistributedMutexManager::newTimestamp()
 
 QnDistributedMutex::QnDistributedMutex(QnDistributedMutexManager* owner, const QString& name):
     QObject(),
+    m_name(name),
+    m_timer(nullptr),
     m_locked(false),
-    m_owner(owner),
-    m_name(name)
+    m_owner(owner)
 {
     connect(qnTransactionBus, &QnTransactionMessageBus::peerFound,         this, &QnDistributedMutex::at_newPeerFound, Qt::DirectConnection);
     connect(qnTransactionBus, &QnTransactionMessageBus::peerLost,          this, &QnDistributedMutex::at_peerLost, Qt::DirectConnection);
-
-    connect(&timer, &QTimer::timeout, this, &QnDistributedMutex::at_timeout);
-    timer.setSingleShot(true);
+    m_timer = new QTimer();
+    connect(m_timer, &QTimer::timeout, this, &QnDistributedMutex::at_timeout);
+    m_timer->setSingleShot(true);
 }
 
 QnDistributedMutex::~QnDistributedMutex()
@@ -175,7 +176,10 @@ void QnDistributedMutex::at_peerLost(ec2::ApiServerAliveData data)
 
 void QnDistributedMutex::at_timeout()
 {
-    unlock();
+    QMutexLocker lock(&m_mutex);
+    if (m_locked)
+        return;
+    unlockInternal();
     emit lockTimeout();
 }
 
@@ -186,7 +190,7 @@ void QnDistributedMutex::lockAsync(int timeoutMs)
     if (m_owner->m_userDataHandler)
         m_selfLock.userData = m_owner->m_userDataHandler->getUserData(m_name);
     sendTransaction(m_selfLock, ApiCommand::lockRequest, QnId()); // send broadcast
-    timer.start(timeoutMs);
+    m_timer->start(timeoutMs);
     m_peerLockInfo.insert(m_selfLock, 0);
     checkForLocked();
 }
@@ -194,6 +198,15 @@ void QnDistributedMutex::lockAsync(int timeoutMs)
 void QnDistributedMutex::unlock()
 {
     QMutexLocker lock(&m_mutex);
+    unlockInternal();
+}
+
+void QnDistributedMutex::unlockInternal()
+{
+    if (m_timer) {
+        m_timer->deleteLater();
+        m_timer = 0;
+    }
 
     /*
     ApiLockData data;
@@ -214,7 +227,6 @@ void QnDistributedMutex::unlock()
         m_selfLock.clear();
     }
     m_locked = false;
-    timer.stop();
     m_proccesedPeers.clear();
     m_peerLockInfo.clear();
     m_owner->releaseMutex(m_name);
@@ -258,8 +270,12 @@ void QnDistributedMutex::at_gotUnlockRequest(ApiLockData lockData)
 
 void QnDistributedMutex::checkForLocked()
 {
-    if (!m_selfLock.isEmpty() && isAllPeersReady()) {
-        timer.stop();
+    if (!m_selfLock.isEmpty() && isAllPeersReady()) 
+    {
+        if (m_timer) {
+            m_timer->deleteLater();
+            m_timer = 0;
+        }
         if (!m_locked) {
             m_locked = true;
             emit locked();

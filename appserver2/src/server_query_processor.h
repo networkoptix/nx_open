@@ -24,7 +24,7 @@ namespace ec2
     class CommonRequestsProcessor
     {
     public:
-        static ErrorCode getCurrentTime( nullptr_t, qint64* curTime )
+        static ErrorCode getCurrentTime( std::nullptr_t, qint64* curTime )
         {
             *curTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
             return ErrorCode::ok;

@@ -7,7 +7,6 @@
 
 LiveMediaCacheReader::LiveMediaCacheReader( MediaStreamCache* mediaCache, quint64 startTimestamp )
 :
-    m_mediaCache( mediaCache ),
     m_readCtx( mediaCache, startTimestamp )
 {
 }

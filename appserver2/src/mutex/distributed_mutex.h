@@ -66,13 +66,14 @@ namespace ec2
         bool isAllPeersReady() const;
         void checkForLocked();
         void sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnId& dstPeer);
+        void unlockInternal();
     private:
         QString m_name;
         LockRuntimeInfo m_selfLock;
         typedef QMap<LockRuntimeInfo, int> LockedMap;
         LockedMap m_peerLockInfo;
         QSet<QnId> m_proccesedPeers;
-        QTimer timer;
+        QTimer* m_timer;
         mutable QMutex m_mutex;
         bool m_locked;
         QQueue<ApiLockData> m_delayedResponse;
