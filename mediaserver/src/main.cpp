@@ -559,7 +559,8 @@ int serverMain(int argc, char *argv[])
 
     QCoreApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
     QCoreApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
-    QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
+    if (QCoreApplication::applicationVersion().isEmpty())
+        QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
     const QString& dataLocation = getDataDirectory();
     QDir::setCurrent(qApp->applicationDirPath());
@@ -1681,6 +1682,7 @@ int main(int argc, char* argv[])
     QString rwConfigFilePath;
     bool showVersion = false;
     bool showHelp = false;
+    QString overrideVersion;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, QString());
@@ -1691,6 +1693,7 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, QString());
     commandLineParser.addParameter(&showVersion, "--version", NULL, QString(), true);
     commandLineParser.addParameter(&showHelp, "--help", NULL, QString(), true);
+    commandLineParser.addParameter(&overrideVersion, "--override-version", NULL, QString());
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
 
     if( showVersion )
@@ -1703,6 +1706,14 @@ int main(int argc, char* argv[])
     {
         printHelp();
         return 0;
+    }
+
+    if (!overrideVersion.isEmpty()) {
+        QnSoftwareVersion version(overrideVersion);
+        if (!version.isNull()) {
+            cl_log.log("Starting with overrided version: ", version.toString(), cl_logALWAYS);
+            qApp->setApplicationVersion(version.toString());
+        }
     }
 
     if( !configFilePath.isEmpty() )

@@ -323,6 +323,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool noVSync = false;
     QString sVideoWallGuid;
     QString sVideoWallItemGuid;
+    QString overrideVersion;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -345,6 +346,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
     commandLineParser.addParameter(&sVideoWallGuid,         "--videowall",                  NULL,   QString());
     commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
+    commandLineParser.addParameter(&overrideVersion,        "--override-version",           NULL,   QString());
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
@@ -353,6 +355,14 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Dev mode. */
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
         qnSettings->setDevMode(true);
+    }
+
+    if (!overrideVersion.isEmpty()) {
+        QnSoftwareVersion version(overrideVersion);
+        if (!version.isNull()) {
+            cl_log.log("Starting with overrided version: ", version.toString(), cl_logALWAYS);
+            qApp->setApplicationVersion(version.toString());
+        }
     }
 
     QUuid videoWallGuid(sVideoWallGuid);
