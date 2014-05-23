@@ -1710,6 +1710,7 @@ static void printVersion()
     std::cout<<"  "<<QN_APPLICATION_NAME" v."<<QN_APPLICATION_VERSION<<std::endl;
 }
 
+// TODO: #Elric we have QnCommandLineParser::print for that.
 static void printHelp()
 {
     printVersion();
