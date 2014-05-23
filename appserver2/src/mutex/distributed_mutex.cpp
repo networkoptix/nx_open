@@ -175,7 +175,10 @@ void QnDistributedMutex::at_peerLost(ec2::ApiServerAliveData data)
 
 void QnDistributedMutex::at_timeout()
 {
-    unlock();
+    QMutexLocker lock(&m_mutex);
+    if (m_locked)
+        return;
+    unlockInternal();
     emit lockTimeout();
 }
 
@@ -194,6 +197,11 @@ void QnDistributedMutex::lockAsync(int timeoutMs)
 void QnDistributedMutex::unlock()
 {
     QMutexLocker lock(&m_mutex);
+    unlockInternal();
+}
+
+void QnDistributedMutex::unlockInternal()
+{
     if (timer) {
         timer->deleteLater();
         timer = 0;

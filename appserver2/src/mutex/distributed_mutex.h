@@ -66,6 +66,7 @@ namespace ec2
         bool isAllPeersReady() const;
         void checkForLocked();
         void sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnId& dstPeer);
+        void unlockInternal();
     private:
         QString m_name;
         LockRuntimeInfo m_selfLock;
