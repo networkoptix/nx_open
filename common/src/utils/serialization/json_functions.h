@@ -221,46 +221,6 @@ namespace QJsonDetail {
             return false;
         }
     }
-
-    template<class T>
-    void serialize_enum(QnJsonContext *ctx, const T &value, QJsonValue *target, typename std::enable_if<QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
-        QnSerialization::check_enum_binary<T>();
-
-        ::serialize(ctx, static_cast<qint32>(value), target); /* Note the direct call instead of invocation through QJson. */
-    }
-
-    template<class T>
-    bool deserialize_enum(QnJsonContext *ctx, const QJsonValue &value, T *target, typename std::enable_if<QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
-        QnSerialization::check_enum_binary<T>();
-
-        qint32 tmp;
-
-        /* Older version did it with lexical functions, so we have to support it. */
-        if(value.type() == QJsonValue::String) {
-            if(!QnLexical::deserialize(value.toString(), &tmp))
-                return false;
-            *target = static_cast<T>(tmp);
-        }
-
-        if(!::deserialize(ctx, value, &tmp)) /* Note the direct call instead of invocation through QJson. */
-            return false;
-        *target = static_cast<T>(tmp);
-        return true;
-    }
-
-    template<class T>
-    void serialize_enum(QnJsonContext *ctx, const T &value, QJsonValue *target, typename std::enable_if<!QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
-        QString tmp;
-        QnLexical::serialize(value, &tmp);
-        ::serialize(ctx, tmp, target); /* Note the direct call instead of invocation through QJson. */
-    }
-
-    template<class T>
-    bool deserialize_enum(QnJsonContext *ctx, const QJsonValue &value, T *target, typename std::enable_if<!QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
-        QString tmp;
-        return ::deserialize(ctx, value, &tmp) && QnLexical::deserialize(tmp, target);
-    }
-
 } // namespace QJsonDetail
 
 
@@ -353,19 +313,48 @@ QN_DEFINE_COLLECTION_JSON_SERIALIZATION_FUNCTIONS(std::map, (class T, class Pred
 #endif // Q_MOC_RUN
 
 
-inline void serialize(QnJsonContext *ctx, const QByteArray &value, QJsonValue *target) {
-    ::serialize(ctx, QString::fromLatin1(value.toBase64()), target); /* Note the direct call instead of invocation through QJson. */
-}
+namespace QJsonDetail {
 
-inline bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QByteArray *target) {
-    QString string;
-    if(!::deserialize(ctx, value, &string)) /* Note the direct call instead of invocation through QJson. */
-        return false;
+    template<class T>
+    void serialize_enum(QnJsonContext *ctx, const T &value, QJsonValue *target, typename std::enable_if<QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
+        QnSerialization::check_enum_binary<T>();
 
-    // TODO: #Elric we don't check for validity, this is not good.
-    *target = QByteArray::fromBase64(string.toLatin1());
-    return true;
-}
+        ::serialize(ctx, static_cast<qint32>(value), target); /* Note the direct call instead of invocation through QJson. */
+    }
+
+    template<class T>
+    bool deserialize_enum(QnJsonContext *ctx, const QJsonValue &value, T *target, typename std::enable_if<QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
+        QnSerialization::check_enum_binary<T>();
+
+        qint32 tmp;
+
+        /* Older version did it with lexical functions, so we have to support it. */
+        if(value.type() == QJsonValue::String) {
+            if(!QnLexical::deserialize(value.toString(), &tmp))
+                return false;
+            *target = static_cast<T>(tmp);
+        }
+
+        if(!::deserialize(ctx, value, &tmp)) /* Note the direct call instead of invocation through QJson. */
+            return false;
+        *target = static_cast<T>(tmp);
+        return true;
+    }
+
+    template<class T>
+    void serialize_enum(QnJsonContext *ctx, const T &value, QJsonValue *target, typename std::enable_if<!QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
+        QString tmp;
+        QnLexical::serialize(value, &tmp);
+        ::serialize(ctx, tmp, target); /* Note the direct call instead of invocation through QJson. */
+    }
+
+    template<class T>
+    bool deserialize_enum(QnJsonContext *ctx, const QJsonValue &value, T *target, typename std::enable_if<!QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
+        QString tmp;
+        return ::deserialize(ctx, value, &tmp) && QnLexical::deserialize(tmp, target);
+    }
+
+} // namespace QJsonDetail
 
 
 template<class T>
@@ -379,7 +368,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, T *target, typenam
 }
 
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnLatin1Array)(QColor)(QBrush)(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QRegion)(QVector2D)(QVector3D)(QVector4D)(QUuid)(QUrl)(QFont), (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QByteArray)(QnLatin1Array)(QColor)(QBrush)(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QRegion)(QVector2D)(QVector3D)(QVector4D)(QUuid)(QUrl)(QFont), (json))
 
 void qnJsonFunctionsUnitTest();
 

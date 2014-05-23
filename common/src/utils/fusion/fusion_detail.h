@@ -147,12 +147,6 @@ namespace QnFusionDetail {
     }
 
 
-
-    template<class Visitor, class T, class Access>
-    bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access) {
-        return dispatch_visit(std::forward<Visitor>(visitor), std::forward<T>(value), access, typename Access::template at<QnFusion::base_type, na>::type());
-    }
-
     template<class Visitor, class T, class Access>
     bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access, const na &) {
         return visitor(std::forward<T>(value), access);
@@ -163,6 +157,11 @@ namespace QnFusionDetail {
         typedef typename replace_referent<T, typename std::remove_reference<typename Base::result_type>::type>::type base_type;
 
         return QnFusion::visit_members(std::forward<base_type>(value), no_start_stop_wrap(visitor));
+    }
+
+    template<class Visitor, class T, class Access>
+    bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access) {
+        return dispatch_visit(std::forward<Visitor>(visitor), std::forward<T>(value), access, typename Access::template at<QnFusion::base_type, na>::type());
     }
 
 } // namespace QnFusionDetail

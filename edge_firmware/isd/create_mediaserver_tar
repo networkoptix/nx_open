@@ -11,11 +11,12 @@ function printHelp()
 
 function get_var()
 {
-    local h="`grep -R $1 $SRC_DIR/mediaserver/arm/version.h | sed 's/.*"\(.*\)".*/\1/'`"
+    VERSION_H_PATH="`find $SRC_DIR/mediaserver/ -name version.h`"
+    local h="`grep -R $1 $VERSION_H_PATH | sed 's/.*"\(.*\)".*/\1/'`"
     if [[ "$1" == "QN_CUSTOMIZATION_NAME" && "$h" == "default" ]]; then
         h=networkoptix
     fi
-    echo "$h"
+    echo "$h" | head -n 1
 }
 
 
@@ -33,9 +34,16 @@ BOX_NAME=$(get_var "QN_ARM_BOX")
 PACKAGE_NAME=$CUSTOMIZATION-$PRODUCT_NAME-$MODULE_NAME-$VERSION-$BOX_NAME.tar.gz
 
 BUILD_DIR=/tmp/hdw_isd_build.tmp
+
+touch "/tmp" 2>/dev/null 1>&2
+if [ "$?" != 0 ]; then
+    echo "Failure: Cannot write to /tmp directory. Cannot continue. Exiting..."
+    exit 1
+fi
+
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
 
-BUILD_OUTPUT_DIR=$SRC_DIR/build_environment/target
+BUILD_OUTPUT_DIR=$SRC_DIR/build_environment/target-$BOX_NAME
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
 
 STRIP="`find ../../mediaserver/ -name 'Makefile*' | head -n 1 | xargs grep -E 'STRIP\s+=' | cut -d= -f 2 | tr -d ' '`"
@@ -75,7 +83,8 @@ libQt5Xml.so.5.2.1 \
 libsigar.so \
 libvpx.so.1.2.0 \
 libswresample.so.0.15.100 \
-libswscale.so.2.1.100 )
+libswscale.so.2.1.100 \
+libquazip.so.1.0.0 )
 
 if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
   LIBS_TO_COPY+=( libvpx.so.1.2.0 )

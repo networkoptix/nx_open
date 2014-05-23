@@ -76,7 +76,8 @@ libQt5Xml.so.5.2.1 \
 libsigar.so \
 libvpx.so.1.2.0 \
 libswresample.so.0.15.100 \
-libswscale.so.2.1.100 )
+libswscale.so.2.1.100 \
+libquazip.so.1.0.0 )
 
 if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
   LIBS_TO_COPY+=( libvpx.so.1.2.0 )
