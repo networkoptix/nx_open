@@ -6,6 +6,7 @@
 
 #include <utils/common/singleton.h>
 #include <utils/common/instance_storage.h>
+#include <utils/common/software_version.h>
 
 class QnSessionManager;
 class QnResourceDataPool;
@@ -43,6 +44,9 @@ public:
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
 
+    QnSoftwareVersion engineVersion() const;
+    void setEngineVersion(const QnSoftwareVersion &version);
+
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName);
 
@@ -53,6 +57,7 @@ private:
     QUuid m_uuid;
     QUrl m_url;
     bool m_cloudMode;
+    QnSoftwareVersion m_engineVersion;
 };
 
 #define qnCommon (QnCommonModule::instance())

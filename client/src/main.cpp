@@ -323,7 +323,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool noVSync = false;
     QString sVideoWallGuid;
     QString sVideoWallItemGuid;
-    QString overrideVersion;
+    QString engineVersion;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -346,7 +346,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
     commandLineParser.addParameter(&sVideoWallGuid,         "--videowall",                  NULL,   QString());
     commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
-    commandLineParser.addParameter(&overrideVersion,        "--override-version",           NULL,   QString());
+    commandLineParser.addParameter(&engineVersion,          "--override-version",           NULL,   QString());
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
@@ -357,11 +357,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         qnSettings->setDevMode(true);
     }
 
-    if (!overrideVersion.isEmpty()) {
-        QnSoftwareVersion version(overrideVersion);
+    if (!engineVersion.isEmpty()) {
+        QnSoftwareVersion version(engineVersion);
         if (!version.isNull()) {
-            cl_log.log("Starting with overrided version: ", version.toString(), cl_logALWAYS);
-            qApp->setApplicationVersion(version.toString());
+            qWarning() << "Starting with overrided version: " << version.toString();
+            qnCommon->setEngineVersion(version);
         }
     }
 
@@ -495,7 +495,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     qApp->installEventFilter(&helpHandler);
 
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
-    cl_log.log("Software version: ", qApp->applicationVersion(), cl_logALWAYS);
+    cl_log.log("Software version: ", QApplication::applicationVersion(), cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);

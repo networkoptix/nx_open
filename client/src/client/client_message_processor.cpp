@@ -44,7 +44,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
                 mediaServer->setVersion(moduleInformation.version);
                 mediaServer->setSystemInfo(moduleInformation.systemInformation);
                 mediaServer->setSystemName(moduleInformation.systemName);
-                if (moduleInformation.systemName != qnCommon->localSystemName() || moduleInformation.version != QnSoftwareVersion(qApp->applicationVersion()))
+                if (moduleInformation.systemName != qnCommon->localSystemName() || moduleInformation.version != qnCommon->engineVersion())
                     mediaServer->setStatus(QnResource::Incompatible);
             }
         }

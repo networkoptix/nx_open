@@ -275,8 +275,6 @@ void QnLoginDialog::resetSavedSessionsModel() {
 
 void QnLoginDialog::resetAutoFoundConnectionsModel() {
     QnCompatibilityChecker checker(localCompatibilityItems());
-    QnSoftwareVersion clientVersion(QN_ENGINE_VERSION);
-
 
     m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
     if (m_foundEcs.size() == 0) {
@@ -288,7 +286,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
             QUrl url = data.url;
 
             QnSoftwareVersion ecVersion(data.version);
-            bool isCompatible = checker.isCompatible(QLatin1String("Client"), clientVersion,
+            bool isCompatible = checker.isCompatible(QLatin1String("Client"), qnCommon->engineVersion(),
                                                      QLatin1String("ECS"),    ecVersion);
 
 
@@ -410,7 +408,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
         compatibilityChecker = &localChecker;
     }
 
-    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version)) {
+    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), qnCommon->engineVersion(), QLatin1String("ECS"), connectionInfo->version)) {
         QnSoftwareVersion minSupportedVersion("1.4"); 
 
         m_restartPending = true;
@@ -423,13 +421,13 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
                     " - Client version: %1.\n"
                     " - EC version: %2.\n"
                     "Compatibility mode for versions lower than %3 is not supported."
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()).arg(minSupportedVersion.toString()),
+                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo->version.toString()).arg(minSupportedVersion.toString()),
                 QMessageBox::Ok
             );
             m_restartPending = false;
         }
 
-        if (connectionInfo->version > QnSoftwareVersion(QN_ENGINE_VERSION)) {
+        if (connectionInfo->version > qnCommon->engineVersion()) {
 #ifndef Q_OS_MACX
             QnMessageBox::warning(
                 this,
@@ -439,7 +437,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
                     " - Client version: %1.\n"
                     " - EC version: %2.\n"
                     "An error has occurred while trying to restart in compatibility mode."
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo->version.toString()),
                 QMessageBox::Ok
             );
 #else
@@ -451,7 +449,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
                     " - Client version: %1.\n"
                     " - EC version: %2.\n"
                     "The other version of client is needed in order to establish the connection to this server."
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo->version.toString()),
                 QMessageBox::Ok
             );
 #endif
@@ -472,7 +470,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
                             "An error has occurred while trying to restart in compatibility mode."
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                        ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo->version.toString()),
                         QMessageBox::Ok
                     );
 #else
@@ -484,7 +482,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
                             "The other version of client is needed in order to establish the connection to this server."
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                        ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo->version.toString()),
                         QMessageBox::Ok
                     );
 #endif
@@ -499,7 +497,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
                             "Would you like to restart in compatibility mode?"
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                        ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo->version.toString()),
                         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel), 
                         QMessageBox::Cancel
                     );
@@ -557,7 +555,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
                             " - EC version: %2.\n"
                             "Client version %3 is required to connect to this Enterprise Controller.\n"
                             "Download version %3?"
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()).arg(connectionInfo->version.toString(QnSoftwareVersion::MinorFormat)),
+                        ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo->version.toString()).arg(connectionInfo->version.toString(QnSoftwareVersion::MinorFormat)),
                         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
                         QMessageBox::Cancel
                     );

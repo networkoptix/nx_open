@@ -6,6 +6,7 @@
 #include <utils/network/tcp_connection_priv.h>
 #include <media_server/server_update_tool.h>
 #include <utils/update/update_utils.h>
+#include <common/common_module.h>
 
 #include <version.h>
 
@@ -33,7 +34,7 @@ int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParamLi
             return CODE_INVALID_PARAMETER;
     }
 
-    if (version == QnSoftwareVersion(qApp->applicationVersion()))
+    if (version == qnCommon->engineVersion())
         return CODE_OK;
 
     if (sysInfo != QnSystemInformation(lit(QN_APPLICATION_PLATFORM), lit(QN_APPLICATION_ARCH)))

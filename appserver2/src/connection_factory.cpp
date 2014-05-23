@@ -275,7 +275,7 @@ namespace ec2
         QnConnectionInfo* const connectionInfo )
     {
         //TODO/IMPL
-        connectionInfo->version = QnSoftwareVersion(qApp->applicationVersion());
+        connectionInfo->version = qnCommon->engineVersion();
         connectionInfo->brand = lit(QN_PRODUCT_NAME_SHORT);
         connectionInfo->ecsGuid = lit( "ECS_HUID" );
         connectionInfo->systemName = qnCommon->localSystemName();

@@ -5,6 +5,7 @@
 #include <utils/appcast/update_checker.h>
 #include <utils/common/warnings.h>
 #include <client/client_settings.h>
+#include <common/common_module.h>
 
 #include "version.h"
 
@@ -27,7 +28,7 @@ QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject *parent):
         return; 
 
     QString platform = QString(QLatin1String("%1-%2")).arg(QLatin1String(QN_APPLICATION_PLATFORM)).arg(QLatin1String(QN_APPLICATION_ARCH));
-    QString version = QLatin1String(QN_ENGINE_VERSION);
+    QString version = qnCommon->engineVersion().toString();
 
     qnDebug("Settings up update watcher for %1 build of version %2 at %3.", platform, version, updateFeedUrl);
 
@@ -52,7 +53,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updatesAvailable(QnUpdateInfoItemList 
     qSort(updates.begin(), updates.end(), UpdateEngineVersionLess());
     QnUpdateInfoItem lastUpdate = updates.last();
 
-    QnSoftwareVersion currentVersion = QnSoftwareVersion(QLatin1String(QN_ENGINE_VERSION));
+    QnSoftwareVersion currentVersion = qnCommon->engineVersion();
     if(lastUpdate.engineVersion <= currentVersion)
         return;
 

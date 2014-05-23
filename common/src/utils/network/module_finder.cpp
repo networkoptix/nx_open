@@ -137,7 +137,7 @@ bool QnModuleFinder::processDiscoveryRequest(AbstractDatagramSocket *udpSocket) 
     }
 
     RevealResponse response;
-    response.version = qApp->applicationVersion();
+    response.version = qnCommon->engineVersion().toString();
     QString moduleName = qApp->applicationName();
     if (moduleName.startsWith(qApp->organizationName()))
         moduleName = moduleName.mid(qApp->organizationName().length()).trimmed();

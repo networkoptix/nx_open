@@ -597,7 +597,7 @@ int serverMain(int argc, char *argv[])
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_LQ);
     
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
-    cl_log.log("Software version: ", qApp->applicationVersion(), cl_logALWAYS);
+    cl_log.log("Software version: ", QCoreApplication::applicationVersion(), cl_logALWAYS);
     cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
@@ -666,7 +666,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     QUrlQuery appServerEventsUrlQuery;
     appServerEventsUrlQuery.addQueryItem("xid", mediaServer->getId().toString());
     appServerEventsUrlQuery.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
-    appServerEventsUrlQuery.addQueryItem("version", QN_ENGINE_VERSION);
+    appServerEventsUrlQuery.addQueryItem("version", qnCommon->engineVersion().toString());
     appServerEventsUrlQuery.addQueryItem("format", "pb");
     appServerEventsUrl.setQuery( appServerEventsUrlQuery );
 
@@ -951,7 +951,7 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
-    if (moduleInformation.version == QnSoftwareVersion(qApp->applicationVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
+    if (moduleInformation.version == qnCommon->engineVersion() && moduleInformation.systemName == qnCommon->localSystemName()) {
         int port = moduleInformation.parameters.value("port").toInt();
         QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
         ec2Connection->addRemotePeer(url, false, moduleInformation.id.toString());
@@ -962,7 +962,7 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
 void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
-    if (moduleInformation.version == QnSoftwareVersion(qApp->applicationVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
+    if (moduleInformation.version == qnCommon->engineVersion() && moduleInformation.systemName == qnCommon->localSystemName()) {
         int port = moduleInformation.parameters.value("port").toInt();
         foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
             QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
@@ -1203,7 +1203,7 @@ void QnMain::run()
     else
         compatibilityChecker = &localChecker;
 
-    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, QnSoftwareVersion(QN_ENGINE_VERSION), "ECS", connectInfo->version))
+    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, qnCommon->engineVersion(), "ECS", connectInfo->version))
     {
         cl_log.log(cl_logERROR, "Incompatible Enterprise Controller version detected! Giving up.");
         return;
@@ -1253,7 +1253,7 @@ void QnMain::run()
             server->setPanicMode(pm);
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
         }
-        server->setVersion(QnSoftwareVersion(QN_ENGINE_VERSION));
+        server->setVersion(qnCommon->engineVersion());
         server->setSystemInfo(QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH));
         server->setSystemName(qnCommon->localSystemName());
 
@@ -1594,12 +1594,19 @@ public:
         setServiceDescription(SERVICE_NAME);
     }
 
+    void setOverrideVersion(const QnSoftwareVersion &version) {
+        m_overrideVersion = version;
+    }
+
 protected:
     virtual int executeApplication() override { 
         QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
         
+        if (!m_overrideVersion.isNull())
+            qnCommon->setEngineVersion(m_overrideVersion);
+
         m_main.reset(new QnMain(m_argc, m_argv));
 
         return application()->exec();
@@ -1643,6 +1650,7 @@ private:
     int m_argc;
     char **m_argv;
     QScopedPointer<QnMain> m_main;
+    QnSoftwareVersion m_overrideVersion;
 };
 
 void stopServer(int signal)
@@ -1682,7 +1690,7 @@ int main(int argc, char* argv[])
     QString rwConfigFilePath;
     bool showVersion = false;
     bool showHelp = false;
-    QString overrideVersion;
+    QString engineVersion;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, QString());
@@ -1693,7 +1701,7 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, QString());
     commandLineParser.addParameter(&showVersion, "--version", NULL, QString(), true);
     commandLineParser.addParameter(&showHelp, "--help", NULL, QString(), true);
-    commandLineParser.addParameter(&overrideVersion, "--override-version", NULL, QString());
+    commandLineParser.addParameter(&engineVersion, "--override-version", NULL, QString());
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
 
     if( showVersion )
@@ -1708,26 +1716,27 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    if (!overrideVersion.isEmpty()) {
-        QnSoftwareVersion version(overrideVersion);
-        if (!version.isNull()) {
-            cl_log.log("Starting with overrided version: ", version.toString(), cl_logALWAYS);
-            qApp->setApplicationVersion(version.toString());
-        }
-    }
-
     if( !configFilePath.isEmpty() )
         MSSettings::initializeROSettingsFromConfFile( configFilePath );
     if( !rwConfigFilePath.isEmpty() )
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
 
     QnVideoService service( argc, argv );
+
+    if (!engineVersion.isEmpty()) {
+        QnSoftwareVersion version(engineVersion);
+        if (!version.isNull()) {
+            qWarning() << "Starting with overrided version: " << version.toString();
+            service.setOverrideVersion(version);
+        }
+    }
+
     return service.exec();
 }
 
 static void printVersion()
 {
-    std::cout<<"  "<<QN_APPLICATION_NAME" v."<<qApp->applicationVersion().toUtf8().data()<<std::endl;
+    std::cout << "  " << QN_APPLICATION_NAME << " v." << QCoreApplication::applicationVersion().toUtf8().data() << std::endl;
 }
 
 static void printHelp()

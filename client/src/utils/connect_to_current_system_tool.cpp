@@ -55,7 +55,7 @@ void QnConnectToCurrentSystemTool::at_changeSystemNameTask_finished(int errorCod
             if (!server)
                 continue;
 
-            if (server->getVersion() != QnSoftwareVersion(qApp->applicationVersion()))
+            if (server->getVersion() != qnCommon->engineVersion())
                 targets.insert(id);
         }
         if (targets.isEmpty()) {
@@ -66,7 +66,7 @@ void QnConnectToCurrentSystemTool::at_changeSystemNameTask_finished(int errorCod
         m_updateTool->setTargets(targets);
         m_updateDialog->show();
         m_prevToolState = QnMediaServerUpdateTool::CheckingForUpdates;
-        m_updateTool->checkForUpdates(QnSoftwareVersion(qApp->applicationVersion()));
+        m_updateTool->checkForUpdates(qnCommon->engineVersion());
     } else {
         finish(SystemNameChangeFailed);
     }

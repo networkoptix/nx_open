@@ -8,6 +8,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <common/common_module.h>
 #include <api/app_server_connection.h>
 #include <nx_ec/ec_api.h>
 #include <utils/update/update_utils.h>
@@ -237,7 +238,7 @@ void QnMediaServerUpdateTool::checkOnlineUpdates(const QnSoftwareVersion &versio
     setState(CheckingForUpdates);
 
     if (m_denyMajorUpdates && !version.isNull()) {
-        QnSoftwareVersion currentVersion(qApp->applicationVersion());
+        QnSoftwareVersion currentVersion = qnCommon->engineVersion();
         if (version.major() != currentVersion.major() || version.minor() != currentVersion.minor()) {
             setCheckResult(NoSuchBuild);
             return;

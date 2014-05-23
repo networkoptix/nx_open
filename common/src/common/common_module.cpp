@@ -12,6 +12,7 @@
 QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);
     m_cloudMode = false;
+    m_engineVersion = QnSoftwareVersion(QN_ENGINE_VERSION);
 
     QnCommonMetaTypes::initilize();
     
@@ -29,6 +30,14 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
 QnCommonModule::~QnCommonModule() {
     delete m_sessionManager;
     return;
+}
+
+QnSoftwareVersion QnCommonModule::engineVersion() const {
+    return m_engineVersion;
+}
+
+void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version) {
+    m_engineVersion = version;
 }
 
 void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName) {

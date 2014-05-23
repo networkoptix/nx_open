@@ -4,6 +4,7 @@
 #include <QtWidgets/QMessageBox>
 
 #include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
 #include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
@@ -86,7 +87,7 @@ void QnServerUpdatesWidget::at_installSpecificBuildButton_clicked() {
         return;
 
     m_updateTool->setDenyMajorUpdates(true);
-    QnSoftwareVersion version(qApp->applicationVersion());
+    QnSoftwareVersion version = qnCommon->engineVersion();
     m_updateTool->checkForUpdates(QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber()));
 }
 
