@@ -52,11 +52,13 @@ void QnRestUpdatePeerTask::doStart() {
         m_serverBySystemInformation.insert(server->getSystemInfo(), server);
     }
 
-    else
-        installNextUpdate();
+    installNextUpdate();
 }
 
 void QnRestUpdatePeerTask::installNextUpdate() {
+    m_shortTimer->stop();
+    m_longTimer->stop();
+
     if (m_currentServers.isEmpty()) {
         if (m_serverBySystemInformation.isEmpty()) {
             finish(NoError);
@@ -82,8 +84,7 @@ void QnRestUpdatePeerTask::installNextUpdate() {
 }
 
 void QnRestUpdatePeerTask::finishPeer() {
-    disconnect(server.data(), &QnMediaServerResource::resourceChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
-    m_currentServers.removeFirst();
+    QnMediaServerResourcePtr server = m_currentServers.takeFirst();
     emit peerFinished(server->getId());
     installNextUpdate();
 }
@@ -104,8 +105,10 @@ void QnRestUpdatePeerTask::at_updateInstalled(int status, int handle) {
 
 void QnRestUpdatePeerTask::at_resourceChanged() {
     QnMediaServerResourcePtr server = m_currentServers.first();
-    if (server->getVersion() == m_version)
+    if (server->getVersion() == m_version) {
+        disconnect(server.data(), &QnMediaServerResource::resourceChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
         finishPeer();
+    }
 }
 
 void QnRestUpdatePeerTask::at_shortTimeout() {
@@ -122,12 +125,14 @@ void QnRestUpdatePeerTask::at_shortTimeout() {
         return;
     }
 
+    disconnect(server.data(), &QnMediaServerResource::resourceChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
     finishPeer();
 }
 
 void QnRestUpdatePeerTask::at_longTimeout() {
     /* After the long timeout the server must finish the upgrade process. */
     QnMediaServerResourcePtr server = m_currentServers.first();
+    disconnect(server.data(), &QnMediaServerResource::resourceChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
 
     if (server->getVersion() != m_version) {
         finish(InstallationError);
