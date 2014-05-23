@@ -115,7 +115,9 @@ void QnRecordingSettingsWidget::submitToSettings()
 
 Qn::DecoderQuality QnRecordingSettingsWidget::decoderQuality() const
 {
-    return (Qn::DecoderQuality)ui->qualityComboBox->currentIndex();
+    // TODO: #Elric. Very bad. Text is set in Designer, enum values in C++ code. 
+    // Text should be filled in code, and no assumptions should be made about enum values.
+    return (Qn::DecoderQuality)ui->qualityComboBox->currentIndex(); 
 }
 
 void QnRecordingSettingsWidget::setDecoderQuality(Qn::DecoderQuality q)
@@ -124,6 +126,7 @@ void QnRecordingSettingsWidget::setDecoderQuality(Qn::DecoderQuality q)
 }
 
 Qn::Resolution QnRecordingSettingsWidget::resolution() const {
+    // TODO: #Elric same thing here. ^
     int index = ui->resolutionComboBox->currentIndex();
     return (Qn::Resolution) index;
 }

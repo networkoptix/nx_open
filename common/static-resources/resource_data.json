@@ -54,7 +54,8 @@
             "keys": [
                 "DW|DWC-MPTZ20X", "DW|DWC-MPTZ5X",
                 "ACTI|KCM8111",
-                "*|FW3471-PS-E"
+                "*|FW3471-PS-E",
+                "*|DW-CP04"
             ],
             "octagonalPtz": true
         },
