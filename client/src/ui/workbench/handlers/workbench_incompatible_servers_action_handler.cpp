@@ -53,7 +53,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_
         QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not change system name for the selected servers."));
         break;
     case QnConnectToCurrentSystemTool::UpdateFailed:
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not update the selected servers."));
+        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not update the selected servers.\nYou can try to update the servers again in the System Administration."));
         break;
     default:
         break;

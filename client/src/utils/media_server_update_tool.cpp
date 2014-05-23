@@ -48,6 +48,8 @@ ec2::AbstractECConnectionPtr QnMediaServerUpdateTool::connection2() const {
     return QnAppServerConnectionFactory::getConnection2();
 }
 
+// TODO: #dklychkov Split this class to a set of QnNetworkPeerTask
+
 QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     QObject(parent),
     m_state(Idle),
