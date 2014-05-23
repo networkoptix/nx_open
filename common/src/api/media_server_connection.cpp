@@ -67,6 +67,7 @@ namespace {
         (BookmarkDeleteObject,     "cameraBookmarks/delete")
         (BookmarksGetObject,       "cameraBookmarks/get")
         (ChangeSystemNameObject,   "changeSystemName")
+        (installUpdateObject,      "installUpdate")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -402,6 +403,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case ChangeSystemNameObject:
         emitFinished(this, response.status, handle);
         break;
+    case installUpdateObject:
+        emitFinished(this, response.status, handle);
+        emit
     default:
         assert(false); /* We should never get here. */
         break;
@@ -851,5 +855,12 @@ int QnMediaServerConnection::changeSystemNameAsync(const QString &systemName, bo
         params << QnRequestParam("reboot", true);
 
     return sendAsyncGetRequest(ChangeSystemNameObject, params, NULL, target, slot);
+}
+
+int QnMediaServerConnection::installUpdate(const QString &updateId, const QByteArray &data, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("updateId", updateId);
+
+    return sendAsyncPostRequest(installUpdateObject, params, data, NULL, target, slot);
 }
 

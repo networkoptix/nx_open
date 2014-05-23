@@ -73,7 +73,7 @@ bool QnServerUpdatesWidget::isMinimalMode() const {
 
 void QnServerUpdatesWidget::setMinimalMode(bool minimalMode) {
     m_minimalMode = minimalMode;
-    ui->topButtonBar->setVisible(m_minimalMode);
+    ui->topButtonBar->setVisible(!m_minimalMode);
 }
 
 void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {

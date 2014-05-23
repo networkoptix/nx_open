@@ -248,6 +248,7 @@ public:
     int getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot);
 
     int changeSystemNameAsync(const QString &systemName, bool reboot, QObject *target, const char *slot);
+    int installUpdate(const QString &updateId, const QByteArray &data, QObject *target, const char *slot);
 
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;

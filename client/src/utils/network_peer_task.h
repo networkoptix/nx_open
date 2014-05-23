@@ -17,6 +17,9 @@ public:
 
 signals:
     void finished(int errorCode, const QSet<QnId> &failedPeers);
+    void peerFinished(const QnId &peerId);
+    void peerProgressChanged(const QnId &peerId, int progress);
+    void progressChanged(int progress);
 
 protected:
     void finish(int errorCode, const QSet<QnId> &failedPeers = QSet<QnId>());

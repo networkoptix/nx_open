@@ -138,11 +138,14 @@ private slots:
     void at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
     void downloadNextUpdate();
 
-    void at_mutexLocked();
-    void at_mutexTimeout();
+    void at_mutexLocked(const QString &name);
+    void at_mutexTimeout(const QString &name);
 
     void at_resourceChanged(const QnResourcePtr &resource);
     void at_installationTimeout();
+
+    void installNextIncompatibleUpdate();
+    void at_incompatibleUpdateInstalled(int status, int handle);
 
 private:
     void setState(State state);
@@ -154,6 +157,7 @@ private:
 
     void uploadUpdatesToServers();
     void installUpdatesToServers();
+    void installIncompatiblePeers();
 
     void unlockMutex();
 
@@ -180,6 +184,7 @@ private:
     QList<QnSystemInformation> m_pendingUploads;
     QSet<QnId> m_pendingUploadPeers;
     QSet<QnId> m_pendingInstallations;
+    QSet<QnId> m_incompatiblePeers;
 
     QnUpdateUploader *m_uploader;
 
