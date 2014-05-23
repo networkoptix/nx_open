@@ -176,3 +176,9 @@ void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr
     else
         m_awaitingSetStatus << resource->getId();
 }
+
+bool QnAppserverResourceProcessor::isBusy() const
+{
+    bool rez = !m_lockInProgress.isEmpty();
+    return rez;
+}
