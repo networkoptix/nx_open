@@ -237,7 +237,7 @@ void QnMediaServerUpdateTool::checkOnlineUpdates(const QnSoftwareVersion &versio
     setState(CheckingForUpdates);
 
     if (m_denyMajorUpdates && !version.isNull()) {
-        QnSoftwareVersion currentVersion(lit(QN_APPLICATION_VERSION));
+        QnSoftwareVersion currentVersion(qApp->applicationVersion());
         if (version.major() != currentVersion.major() || version.minor() != currentVersion.minor()) {
             setCheckResult(NoSuchBuild);
             return;

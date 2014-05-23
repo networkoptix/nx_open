@@ -86,7 +86,7 @@ void QnServerUpdatesWidget::at_installSpecificBuildButton_clicked() {
         return;
 
     m_updateTool->setDenyMajorUpdates(true);
-    QnSoftwareVersion version(lit(QN_APPLICATION_VERSION));
+    QnSoftwareVersion version(qApp->applicationVersion());
     m_updateTool->checkForUpdates(QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber()));
 }
 

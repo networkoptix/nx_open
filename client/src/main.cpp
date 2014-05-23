@@ -485,7 +485,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     qApp->installEventFilter(&helpHandler);
 
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
-    cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
+    cl_log.log("Software version: ", qApp->applicationVersion(), cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);

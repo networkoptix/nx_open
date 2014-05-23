@@ -1,6 +1,7 @@
 #include "update_rest_handler.h"
 
 #include <QtCore/QBuffer>
+#include <QtCore/QCoreApplication>
 
 #include <utils/network/tcp_connection_priv.h>
 #include <media_server/server_update_tool.h>
@@ -32,7 +33,7 @@ int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParamLi
             return CODE_INVALID_PARAMETER;
     }
 
-    if (version == QnSoftwareVersion(lit(QN_APPLICATION_VERSION)))
+    if (version == QnSoftwareVersion(qApp->applicationVersion()))
         return CODE_OK;
 
     if (sysInfo != QnSystemInformation(lit(QN_APPLICATION_PLATFORM), lit(QN_APPLICATION_ARCH)))

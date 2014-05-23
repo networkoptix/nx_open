@@ -84,7 +84,7 @@ void QnAboutDialog::retranslateUi()
             "Built for %5-%6 with %7.<br/>\n"
         ).
         arg(QLatin1String(QN_APPLICATION_NAME)).
-        arg(QLatin1String(QN_APPLICATION_VERSION)).
+        arg(qApp->applicationVersion()).
         arg(QLatin1String(QN_APPLICATION_REVISION)).
         arg(QLatin1String(QN_APPLICATION_PLATFORM)).
         arg(QLatin1String(QN_APPLICATION_ARCH)).

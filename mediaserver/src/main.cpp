@@ -596,7 +596,7 @@ int serverMain(int argc, char *argv[])
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_LQ);
     
     cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
-    cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
+    cl_log.log("Software version: ", qApp->applicationVersion(), cl_logALWAYS);
     cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
@@ -950,7 +950,7 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
-    if (moduleInformation.version == QnSoftwareVersion(QN_APPLICATION_VERSION) && moduleInformation.systemName == qnCommon->localSystemName()) {
+    if (moduleInformation.version == QnSoftwareVersion(qApp->applicationVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
         int port = moduleInformation.parameters.value("port").toInt();
         QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
         ec2Connection->addRemotePeer(url, false, moduleInformation.id.toString());
@@ -961,7 +961,7 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
 void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
-    if (moduleInformation.version == QnSoftwareVersion(QN_APPLICATION_VERSION) && moduleInformation.systemName == qnCommon->localSystemName()) {
+    if (moduleInformation.version == QnSoftwareVersion(qApp->applicationVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
         int port = moduleInformation.parameters.value("port").toInt();
         foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
             QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
@@ -1716,7 +1716,7 @@ int main(int argc, char* argv[])
 
 static void printVersion()
 {
-    std::cout<<"  "<<QN_APPLICATION_NAME" v."<<QN_APPLICATION_VERSION<<std::endl;
+    std::cout<<"  "<<QN_APPLICATION_NAME" v."<<qApp->applicationVersion().toUtf8().data()<<std::endl;
 }
 
 static void printHelp()
