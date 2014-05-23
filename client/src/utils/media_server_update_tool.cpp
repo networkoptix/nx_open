@@ -53,6 +53,7 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     m_state(Idle),
     m_checkResult(UpdateFound),
     m_onlineUpdateUrl(QN_UPDATES_URL),
+    m_denyMajorUpdates(false),
     m_uploader(new QnUpdateUploader(this)),
     m_networkAccessManager(new QNetworkAccessManager(this))
 {
@@ -82,11 +83,52 @@ void QnMediaServerUpdateTool::setState(State state) {
 
 void QnMediaServerUpdateTool::setCheckResult(QnMediaServerUpdateTool::CheckResult result) {
     m_checkResult = result;
+
+    switch (result) {
+    case QnMediaServerUpdateTool::UpdateFound:
+        m_resultString = tr("Update has been successfully finished.");
+        break;
+    case QnMediaServerUpdateTool::InternetProblem:
+        m_resultString = tr("Check for updates failed.");
+        break;
+    case QnMediaServerUpdateTool::NoNewerVersion:
+        m_resultString = tr("All component in your system are already up to date.");
+        break;
+    case QnMediaServerUpdateTool::NoSuchBuild:
+        m_resultString = tr("There is no such build on the update server");
+        break;
+    case QnMediaServerUpdateTool::UpdateImpossible:
+        m_resultString = tr("Cannot start update.\nUpdate for one or more servers were not found.");
+        break;
+    }
+
     setState(Idle);
 }
 
 void QnMediaServerUpdateTool::setUpdateResult(QnMediaServerUpdateTool::UpdateResult result) {
     m_updateResult = result;
+
+    switch (result) {
+    case QnMediaServerUpdateTool::UpdateSuccessful:
+        m_resultString = tr("Update has been successfully finished.");
+        break;
+    case QnMediaServerUpdateTool::Cancelled:
+        m_resultString = tr("Update has been cancelled.");
+        break;
+    case QnMediaServerUpdateTool::LockFailed:
+        m_resultString = tr("Someone has already started an update.");
+        break;
+    case QnMediaServerUpdateTool::DownloadingFailed:
+        m_resultString = tr("Could not download updates.");
+        break;
+    case QnMediaServerUpdateTool::UploadingFailed:
+        m_resultString = tr("Could not upload updates to servers.");
+        break;
+    case QnMediaServerUpdateTool::InstallationFailed:
+        m_resultString = tr("Could not install updates on one or more servers.");
+        break;
+    }
+
     setState(Idle);
 }
 
@@ -114,8 +156,16 @@ QnMediaServerUpdateTool::UpdateResult QnMediaServerUpdateTool::updateResult() co
     return m_updateResult;
 }
 
+QString QnMediaServerUpdateTool::resultString() const {
+    return m_resultString;
+}
+
 QnSoftwareVersion QnMediaServerUpdateTool::targetVersion() const {
     return m_targetVersion;
+}
+
+void QnMediaServerUpdateTool::setDenyMajorUpdates(bool denyMajorUpdates) {
+    m_denyMajorUpdates = denyMajorUpdates;
 }
 
 QnMediaServerUpdateTool::PeerUpdateInformation QnMediaServerUpdateTool::updateInformation(const QnId &peerId) const {
@@ -183,6 +233,14 @@ void QnMediaServerUpdateTool::checkForUpdates(const QString &path) {
 
 void QnMediaServerUpdateTool::checkOnlineUpdates(const QnSoftwareVersion &version) {
     setState(CheckingForUpdates);
+
+    if (m_denyMajorUpdates && !version.isNull()) {
+        QnSoftwareVersion currentVersion(lit(QN_APPLICATION_VERSION));
+        if (version.major() != currentVersion.major() || version.minor() != currentVersion.minor()) {
+            setCheckResult(NoSuchBuild);
+            return;
+        }
+    }
 
     m_updateFiles.clear();
     m_updateInformationById.clear();

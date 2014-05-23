@@ -37,7 +37,25 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 }
 
 QnConnectToCurrentSystemTool *QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystemTool() {
-    if (!m_connectToCurrentSystemTool)
+    if (!m_connectToCurrentSystemTool) {
         m_connectToCurrentSystemTool = new QnConnectToCurrentSystemTool(this);
+        connect(m_connectToCurrentSystemTool, &QnConnectToCurrentSystemTool::finished, this, &QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_finished);
+    }
     return m_connectToCurrentSystemTool;
+}
+
+void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_finished(int errorCode) {
+    switch (errorCode) {
+    case QnConnectToCurrentSystemTool::NoError:
+        QMessageBox::information(mainWindow(), tr("Information"), tr("The selected servers has been successfully connected to your system!"));
+        break;
+    case QnConnectToCurrentSystemTool::SystemNameChangeFailed:
+        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not change system name for the selected servers."));
+        break;
+    case QnConnectToCurrentSystemTool::UpdateFailed:
+        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not update the selected servers."));
+        break;
+    default:
+        break;
+    }
 }

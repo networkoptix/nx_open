@@ -26,6 +26,9 @@ public:
 
     QnMediaServerUpdateTool *updateTool() const;
 
+    bool isMinimalMode() const;
+    void setMinimalMode(bool minimalMode);
+
 private slots:
     void at_checkForUpdatesButton_clicked();
     void at_installSpecificBuildButton_clicked();
@@ -38,12 +41,12 @@ private slots:
 
 private:
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;
+    bool m_minimalMode;
 
     QnServerUpdatesModel *m_updatesModel;
     QnSortedServerUpdatesModel *m_sortedUpdatesModel;
     QnMediaServerUpdateTool *m_updateTool;
     int m_previousToolState;
-    bool m_specificBuildCheck;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H

@@ -90,10 +90,13 @@ public:
 
     CheckResult updateCheckResult() const;
     UpdateResult updateResult() const;
+    QString resultString() const;
 
     void updateServers();
 
     QnSoftwareVersion targetVersion() const;
+
+    void setDenyMajorUpdates(bool denyMajorUpdates);
 
     PeerUpdateInformation updateInformation(const QnId &peerId) const;
 
@@ -158,6 +161,7 @@ private:
     State m_state;
     CheckResult m_checkResult;
     UpdateResult m_updateResult;
+    QString m_resultString;
 
     QDir m_localUpdateDir;
     QUrl m_onlineUpdateUrl;
@@ -167,6 +171,7 @@ private:
 
     QnSoftwareVersion m_targetVersion;
     bool m_targetMustBeNewer;
+    bool m_denyMajorUpdates;
 
     QString m_updateId;
 

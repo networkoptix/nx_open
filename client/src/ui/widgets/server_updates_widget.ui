@@ -6,48 +6,55 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>481</width>
-    <height>431</height>
+    <width>479</width>
+    <height>429</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="updateFromLocalSourceButton">
-       <property name="text">
-        <string>Update from local source</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="installSpecificBuildButton">
-       <property name="text">
-        <string>Install specific build</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="checkForUpdatesButton">
-       <property name="text">
-        <string>Check for updates</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QWidget" name="topButtonBar" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QPushButton" name="updateFromLocalSourceButton">
+        <property name="text">
+         <string>Update from local source</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="installSpecificBuildButton">
+        <property name="text">
+         <string>Install specific build</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="checkForUpdatesButton">
+        <property name="text">
+         <string>Check for updates</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+     <zorder></zorder>
+     <zorder>updateFromLocalSourceButton</zorder>
+     <zorder>installSpecificBuildButton</zorder>
+     <zorder>horizontalSpacer</zorder>
+     <zorder>checkForUpdatesButton</zorder>
+    </widget>
    </item>
    <item>
     <widget class="QTableView" name="tableView"/>

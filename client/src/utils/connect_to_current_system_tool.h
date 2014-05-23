@@ -26,7 +26,7 @@ public:
     bool isRunning() const;
 
 signals:
-    void finished(ErrorCode errorCode);
+    void finished(int errorCode);
 
 private:
     void finish(ErrorCode errorCode);

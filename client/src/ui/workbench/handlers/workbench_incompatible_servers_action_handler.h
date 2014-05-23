@@ -18,6 +18,9 @@ protected slots:
 private:
     QnConnectToCurrentSystemTool *connectToCurrentSystemTool();
 
+private slots:
+    void at_connectToCurrentSystemTool_finished(int errorCode);
+
 private:
     QnConnectToCurrentSystemTool *m_connectToCurrentSystemTool;
 };

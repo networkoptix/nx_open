@@ -15,8 +15,7 @@
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::QnServerUpdatesWidget),
-    m_specificBuildCheck(false)
+    ui(new Ui::QnServerUpdatesWidget)
 {
     ui->setupUi(this);
 
@@ -67,7 +66,17 @@ QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
     return m_updateTool;
 }
 
+bool QnServerUpdatesWidget::isMinimalMode() const {
+    return m_minimalMode;
+}
+
+void QnServerUpdatesWidget::setMinimalMode(bool minimalMode) {
+    m_minimalMode = minimalMode;
+    ui->topButtonBar->setVisible(m_minimalMode);
+}
+
 void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {
+    m_updateTool->setDenyMajorUpdates(false);
     m_updateTool->checkForUpdates();
 }
 
@@ -76,7 +85,7 @@ void QnServerUpdatesWidget::at_installSpecificBuildButton_clicked() {
     if (dialog.exec() == QDialog::Rejected)
         return;
 
-    m_specificBuildCheck = true;
+    m_updateTool->setDenyMajorUpdates(true);
     QnSoftwareVersion version(lit(QN_APPLICATION_VERSION));
     m_updateTool->checkForUpdates(QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber()));
 }
@@ -86,6 +95,7 @@ void QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked() {
     if (sourceDir.isEmpty())
         return;
 
+    m_updateTool->setDenyMajorUpdates(false);
     m_updateTool->checkForUpdates(sourceDir);
 }
 
@@ -122,19 +132,7 @@ void QnServerUpdatesWidget::updateUi() {
         if (m_previousToolState <= QnMediaServerUpdateTool::CheckingForUpdates) {
             switch (m_updateTool->updateCheckResult()) {
             case QnMediaServerUpdateTool::UpdateFound:
-                if (m_specificBuildCheck) {
-                    m_specificBuildCheck = false;
-
-                    QnSoftwareVersion currentVersion(QN_APPLICATION_VERSION);
-                    QnSoftwareVersion foundVersion = m_updateTool->targetVersion();
-
-                    if (currentVersion.major() != foundVersion.major() || currentVersion.minor() != foundVersion.minor()) {
-                        QMessageBox::critical(this, tr("Wrong build number"), tr("There is no such build on the update server"));
-                        break;
-                    }
-                }
-
-                if (!m_updateTool->targetVersion().isNull()) { // null version means we've got here first time after the dialog has been showed
+                if (!m_updateTool->targetVersion().isNull() && !m_minimalMode) { // null version means we've got here first time after the dialog has been showed
                     int result = QMessageBox::question(this, tr("Update is found"),
                                                        tr("Do you want to update your system to version %1?").arg(m_updateTool->targetVersion().toString()),
                                                        QMessageBox::Yes | QMessageBox::No);
@@ -153,47 +151,38 @@ void QnServerUpdatesWidget::updateUi() {
                 break;
             }
             case QnMediaServerUpdateTool::NoNewerVersion:
-                QMessageBox::information(this, tr("Update is not found"), tr("All component in your system are already up to date."));
+                if (!m_minimalMode)
+                    QMessageBox::information(this, tr("Update is not found"), m_updateTool->resultString());
                 break;
             case QnMediaServerUpdateTool::NoSuchBuild:
-                QMessageBox::critical(this, tr("Wrong build number"), tr("There is no such build on the update server"));
+                if (!m_minimalMode)
+                    QMessageBox::critical(this, tr("Wrong build number"), m_updateTool->resultString());
                 break;
             case QnMediaServerUpdateTool::UpdateImpossible:
-                QMessageBox::critical(this, tr("Update is impossible"), tr("Cannot start update.\nUpdate for one or more servers were not found."));
+                if (!m_minimalMode)
+                    QMessageBox::critical(this, tr("Update is impossible"), m_updateTool->resultString());
                 break;
             }
         } else {
             switch (m_updateTool->updateResult()) {
             case QnMediaServerUpdateTool::UpdateSuccessful:
-                QMessageBox::information(this,
-                                         tr("Update is successfull"),
-                                         tr("Update has been successfully finished.\n"
-                                            "Client will be restarted and updated."));
+                if (!m_minimalMode) {
+                    QMessageBox::information(this,
+                                             tr("Update is successfull"),
+                                             tr("Update has been successfully finished.\n"
+                                                "Client will be restarted and updated."));
+                }
                 break;
             case QnMediaServerUpdateTool::Cancelled:
-                QMessageBox::information(this,
-                                         tr("Update cancelled"),
-                                         tr("Update has been cancelled."));
+                if (!m_minimalMode)
+                    QMessageBox::information(this, tr("Update cancelled"), m_updateTool->resultString());
                 break;
             case QnMediaServerUpdateTool::LockFailed:
-                QMessageBox::critical(this,
-                                      tr("Update failed"),
-                                      tr("Someone has already started an update."));
-                break;
             case QnMediaServerUpdateTool::DownloadingFailed:
-                QMessageBox::critical(this,
-                                      tr("Update failed"),
-                                      tr("Could not download updates."));
-                break;
             case QnMediaServerUpdateTool::UploadingFailed:
-                QMessageBox::critical(this,
-                                      tr("Update failed"),
-                                      tr("Could not upload updates to servers."));
-                break;
             case QnMediaServerUpdateTool::InstallationFailed:
-                QMessageBox::critical(this,
-                                      tr("Update failed"),
-                                      tr("Could not install updates on one or more servers."));
+                if (!m_minimalMode)
+                    QMessageBox::critical(this, tr("Update failed"), m_updateTool->resultString());
                 break;
             }
         }
