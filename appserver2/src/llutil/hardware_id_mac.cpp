@@ -1,5 +1,8 @@
 #include <string>
 #include <IOKit/IOKitLib.h>
+#include <cassert>
+
+#include <QList>
 
 #include "hardware_id.h"
 
@@ -17,7 +20,28 @@ inline std::string trim(const std::string& str)
 
 }
 
-void LLUtil::fillHardwareIds(std::vector<std::string>& hardwareIds);
+QByteArray getHardwareId(int version, bool guidCompatibility)
+{
+    assert( false );
+    return QByteArray();
+}
+
+QList<QByteArray> getMainHardwareIds(int guidCompatibility)
+{
+    assert( false );
+    return QList<QByteArray>();
+}
+
+QList<QByteArray> getCompatibleHardwareIds(int guidCompatibility)
+{
+    assert( false );
+    return QList<QByteArray>();
+}
+
+
+namespace LLUtil
+{
+void fillHardwareIds(QList<QByteArray>& hardwareIds)
 {
     #define MAX_HWID_SIZE 1024
 
@@ -30,4 +54,5 @@ void LLUtil::fillHardwareIds(std::vector<std::string>& hardwareIds);
     CFRelease(uuidCf);
 
     hardwareIds[0] = hardwareIds[1] = hardwareIds[2] = hardwareIds[3] = hardwareIds[4] = hardwareIds[5] = buf;
+}
 }

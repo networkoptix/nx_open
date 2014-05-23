@@ -76,7 +76,7 @@ namespace ec2
         }
 
         //getCurrentTime
-        ErrorCode doQuery(const nullptr_t& /*dummy*/, qint64& currentTime);
+        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, qint64& currentTime);
 
         //getStoragePath
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -84,43 +84,43 @@ namespace ec2
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileData& data);
 
         //getResourceTypes
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
         ErrorCode doQueryNoLock(const QnId& mServerId, ApiCameraDataList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
 
         //getCameraServerItems
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
 
         //getCameraBookmarkTags
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags);
 
         //getUserList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList);
 
         //getVideowallList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getResourceParams
         ErrorCode doQueryNoLock(const QnId& resourceId, ApiResourceParamsData& params);
 
         // ApiFullInfo
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiFullInfoData& data);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiFullInfoData& data);
 
         //getLicenses
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data);
 
         //getParams
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
 
 		// --------- misc -----------------------------
         bool markLicenseOverflow(bool value, qint64 time);
