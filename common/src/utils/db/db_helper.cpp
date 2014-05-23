@@ -87,7 +87,10 @@ bool QnDbHelper::execSQLQuery(const QString& queryStr)
 {
     QSqlQuery query(m_sdb);
     query.prepare(queryStr);
-    return query.exec(queryStr);
+    bool rez = query.exec(queryStr);
+    if (!rez)
+        qWarning() << "Cant exec query:" << query.lastError();
+    return rez;
 }
 
 bool QnDbHelper::execSQLFile(const QString& fileName)
