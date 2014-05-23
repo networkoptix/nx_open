@@ -39,7 +39,8 @@
         {
             "keys": [
                 "DW|DWC-MPTZ20X", "DW|DWC-MPTZ5X",
-                "ACTI|KCM8111", "*|FW3471-PS-E"
+                "ACTI|KCM8111", "*|FW3471-PS-E",
+                "VISTA|VK2-ENCODER"
             ],
             "octagonalPtz": true
         },
