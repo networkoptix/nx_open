@@ -72,7 +72,7 @@ namespace ec2
         typedef QMap<LockRuntimeInfo, int> LockedMap;
         LockedMap m_peerLockInfo;
         QSet<QnId> m_proccesedPeers;
-        QTimer timer;
+        QTimer* timer;
         mutable QMutex m_mutex;
         bool m_locked;
         QQueue<ApiLockData> m_delayedResponse;
