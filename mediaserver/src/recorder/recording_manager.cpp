@@ -33,6 +33,7 @@ static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
     m_tooManyRecordingCnt = 0;
+    m_licenseMutex = 0;
     connect(this, &QnRecordingManager::recordingDisabled, qnBusinessRuleConnector, &QnBusinessEventConnector::at_licenseIssueEvent);
 }
 
@@ -52,9 +53,6 @@ void QnRecordingManager::start()
     connect(&m_licenseTimer, &QTimer::timeout, this, &QnRecordingManager::at_checkLicenses);
     m_licenseTimer.start(1000 * 60);
 #endif
-
-    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::locked, this, &QnRecordingManager::at_licenseMutexLocked, Qt::QueuedConnection);
-    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout, Qt::QueuedConnection);
 
     QThread::start();
 }
@@ -598,7 +596,11 @@ void QnRecordingManager::at_checkLicenses()
             {
                 if ((recordingDigital > maxDigital && !camera->isAnalog()) || isOverflowTotal) {
                     // found. remove recording from some of them
-                    m_licenseMutex = ec2::QnDistributedMutexManager::instance()->getLock(LICENSE_OVERFLOW_LOCK_NAME);
+
+                    m_licenseMutex = ec2::QnDistributedMutexManager::instance()->createMutex(LICENSE_OVERFLOW_LOCK_NAME);
+                    connect(m_licenseMutex, &ec2::QnDistributedMutex::locked, this, &QnRecordingManager::at_licenseMutexLocked, Qt::QueuedConnection);
+                    connect(m_licenseMutex, &ec2::QnDistributedMutex::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout, Qt::QueuedConnection);
+                    m_licenseMutex->lockAsync();
                     break;
                 }
             }
@@ -610,10 +612,8 @@ void QnRecordingManager::at_checkLicenses()
     }
 }
 
-void QnRecordingManager::at_licenseMutexLocked(QString name)
+void QnRecordingManager::at_licenseMutexLocked()
 {
-    if (name != LICENSE_OVERFLOW_LOCK_NAME)
-        return;
 
     QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
     int maxDigital = licenseListHelper.totalDigital();
@@ -650,7 +650,8 @@ void QnRecordingManager::at_licenseMutexLocked(QString name)
         }
     }
     m_licenseMutex->unlock();
-    m_licenseMutex.clear();
+    m_licenseMutex->deleteLater();
+    m_licenseMutex = 0;
 
     if (disabledCameras > 0) {
         QnResourcePtr resource = qnResPool->getResourceById(qnCommon->moduleGUID());
@@ -658,10 +659,10 @@ void QnRecordingManager::at_licenseMutexLocked(QString name)
     }
 }
 
-void QnRecordingManager::at_licenseMutexTimeout(QString name)
+void QnRecordingManager::at_licenseMutexTimeout()
 {
-    if (name == LICENSE_OVERFLOW_LOCK_NAME)
-        m_licenseMutex.clear();
+    m_licenseMutex->deleteLater();
+    m_licenseMutex = 0;
 }
 
 //Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)

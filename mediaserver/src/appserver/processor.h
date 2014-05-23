@@ -30,10 +30,10 @@ private:
 
     struct LockData 
     {
-        LockData() {}
-        LockData(ec2::QnDistributedMutexPtr mutex, QnVirtualCameraResourcePtr cameraResource): mutex(mutex), cameraResource(cameraResource) {}
+        LockData(): mutex(0) {}
+        LockData(ec2::QnDistributedMutex* mutex, QnVirtualCameraResourcePtr cameraResource): mutex(mutex), cameraResource(cameraResource) {}
 
-        ec2::QnDistributedMutexPtr mutex;
+        ec2::QnDistributedMutex* mutex;
         QnVirtualCameraResourcePtr cameraResource;
     };
     QMap<QString, LockData> m_lockInProgress;
@@ -49,8 +49,8 @@ private slots:
     //void requestFinished(const QnHTTPRawResponse& response, int handle);
     void requestFinished2( int reqID, ec2::ErrorCode errCode, const QnId& id );
 
-    void at_mutexLocked(QString name);
-    void at_mutexTimeout(QString name);
+    void at_mutexLocked();
+    void at_mutexTimeout();
 };
 
 #endif //_server_appserver_processor_h_

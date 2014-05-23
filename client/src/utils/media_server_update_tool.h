@@ -177,7 +177,7 @@ private:
     QSet<QnSystemInformation> m_downloadingUpdates;
 
     QNetworkAccessManager *m_networkAccessManager;
-    ec2::QnDistributedMutexPtr m_distributedMutex;
+    ec2::QnDistributedMutex* m_distributedMutex;
 
     QSet<QnId> m_restartingServers;
 

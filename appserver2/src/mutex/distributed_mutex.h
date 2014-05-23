@@ -37,23 +37,24 @@ namespace ec2
     {
         Q_OBJECT
     public:
+        static const int DEFAULT_LOCK_TIMEOUT = 1000 * 30;
+        void lockAsync(int timeoutMs = DEFAULT_LOCK_TIMEOUT);
         void unlock();
         bool checkUserData() const;
         virtual ~QnDistributedMutex();
+
+        QString name() const { return m_name; }
     private:
         friend class QnDistributedMutexManager;
 
-        static const int DEFAULT_LOCK_TIMEOUT = 1000 * 30;
-
-        QnDistributedMutex(QnDistributedMutexManager* owner);
+        QnDistributedMutex(QnDistributedMutexManager* owner, const QString& name);
         
         /* Try to lock within timeout */
-        void lockAsync(const QString& name, int timeoutMs = DEFAULT_LOCK_TIMEOUT);
         bool isLocking() const;
         bool isLocked() const;
     signals:
-        void locked(QString name);
-        void lockTimeout(QString name);
+        void locked();
+        void lockTimeout();
     private slots:
         void at_gotLockRequest(ApiLockData lockInfo);
         void at_gotLockResponse(ApiLockData lockInfo);
@@ -78,7 +79,7 @@ namespace ec2
         QnDistributedMutexManager* m_owner;
         QByteArray m_userData;
     };
-    typedef QSharedPointer<QnDistributedMutex> QnDistributedMutexPtr;
+    //typedef QSharedPointer<QnDistributedMutex> QnDistributedMutexPtr;
     
     /*
     * This class is using for provide extra information
@@ -102,15 +103,12 @@ namespace ec2
         static const int DEFAULT_TIMEOUT = 1000 * 30;
 
         QnDistributedMutexManager();
-        QnDistributedMutexPtr getLock(const QString& name, int timeoutMs = DEFAULT_TIMEOUT);
+        QnDistributedMutex* createMutex(const QString& name);
 
         static void initStaticInstance(QnDistributedMutexManager*);
         static QnDistributedMutexManager* instance();
 
         void setUserDataHandler(QnMutexUserDataHandler* userDataHandler);
-    signals:
-        void locked(QString name);
-        void lockTimeout(QString name);
     private:
         qint64 newTimestamp();
     private:
@@ -123,7 +121,7 @@ namespace ec2
         void at_peerLost(QnId peer);
         void releaseMutex(const QString& name);
     private:
-        QMap<QString, QnDistributedMutexPtr> m_mutexList;
+        QMap<QString, QnDistributedMutex*> m_mutexList;
         mutable QMutex m_mutex;
         qint64 m_timestamp;
         QnMutexUserDataHandler* m_userDataHandler;
