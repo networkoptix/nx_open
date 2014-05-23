@@ -34,16 +34,19 @@ void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
 void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
     QnResourcePtr ownResource;
 
-    ownResource = qnResPool->getResourceById(resource->getId());
+    ownResource = qnResPool->getIncompatibleResourceById(resource->getId(), true);
 
-    QnModuleInformation moduleInformation = QnGlobalModuleFinder::instance()->moduleInformation(resource->getId());
-    if (!moduleInformation.id.isNull()) {
-        if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) {
-            mediaServer->setVersion(moduleInformation.version);
-            mediaServer->setSystemInfo(moduleInformation.systemInformation);
-            mediaServer->setSystemName(moduleInformation.systemName);
-            if (moduleInformation.systemName != qnCommon->localSystemName() || moduleInformation.version != QnSoftwareVersion(QN_APPLICATION_VERSION))
-                mediaServer->setStatus(QnResource::Incompatible);
+    // Use discovery information to update offline servers. They may be just incompatible.
+    if (resource->getStatus() == QnResource::Offline) {
+        QnModuleInformation moduleInformation = QnGlobalModuleFinder::instance()->moduleInformation(resource->getId());
+        if (!moduleInformation.id.isNull()) {
+            if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) {
+                mediaServer->setVersion(moduleInformation.version);
+                mediaServer->setSystemInfo(moduleInformation.systemInformation);
+                mediaServer->setSystemName(moduleInformation.systemName);
+                if (moduleInformation.systemName != qnCommon->localSystemName() || moduleInformation.version != QnSoftwareVersion(QN_APPLICATION_VERSION))
+                    mediaServer->setStatus(QnResource::Incompatible);
+            }
         }
     }
 
@@ -54,14 +57,21 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
     }
     else {
         bool mserverStatusChanged = false;
+        bool compatibleStatusChanged = false;
         QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>();
-        if (mediaServer)
+        if (mediaServer) {
             mserverStatusChanged = ownResource->getStatus() != resource->getStatus();
+            compatibleStatusChanged = mserverStatusChanged && (ownResource->getStatus() == QnResource::Incompatible || resource->getStatus() == QnResource::Incompatible);
+        }
 
         ownResource->update(resource);
 
         if (mserverStatusChanged && mediaServer)
             determineOptimalIF(mediaServer);
+
+        // move server into the other subtree if compatibility has been changed
+        if (compatibleStatusChanged && mediaServer)
+            mediaServer->parentIdChanged(mediaServer);
     }
 
     // TODO: #Elric #2.3 don't update layout if we're re-reading resources, 
