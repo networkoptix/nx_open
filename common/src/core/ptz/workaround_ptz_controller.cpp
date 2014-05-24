@@ -51,6 +51,9 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
         } else if(ptzCapabilities == lit("ContinuousPanCapability|ContinuousTiltCapability")) {
             m_overrideCapabilities = true;
             m_capabilities = Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability;
+        } else if(ptzCapabilities == lit("ContinuousPanCapability|ContinuousTiltCapability|AbsolutePanCapability|AbsoluteTiltCapability|DevicePositioningPtzCapability")) {
+            m_overrideCapabilities = true;
+            m_capabilities = Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability | Qn::AbsolutePanCapability | Qn::AbsoluteTiltCapability | Qn::DevicePositioningPtzCapability;
         } else {
             qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
         }
