@@ -41,7 +41,6 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
         m_capabilities = Qn::NoPtzCapabilities;
 
     m_stopBroken = qnCommon->dataPool()->data(resource, true).value<bool>(lit("onvifPtzStopBroken"), false);
-    m_panFlipped = qnCommon->dataPool()->data(resource, true).value<bool>(lit("onvifPanFlipped"), false);
 
     initCoefficients();
 
@@ -148,9 +147,6 @@ bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
     onvifXsd__Vector2D onvifPanTiltSpeed;
     onvifPanTiltSpeed.x = normalizeSpeed(speed.x(), m_xNativeVelocityCoeff, 1.0);
     onvifPanTiltSpeed.y = normalizeSpeed(speed.y(), m_yNativeVelocityCoeff, 1.0);;
-
-    if (m_panFlipped)
-        onvifPanTiltSpeed.x *= -1.0;
 
     onvifXsd__Vector1D onvifZoomSpeed;
     onvifZoomSpeed.x = normalizeSpeed(speed.z(), m_zoomNativeVelocityCoeff, 1.0);

@@ -38,7 +38,6 @@ private:
     QnPlOnvifResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
     bool m_stopBroken;
-    bool m_panFlipped;
 
     QPair<qreal, qreal> m_xNativeVelocityCoeff; // first for positive value, second for negative
     QPair<qreal, qreal> m_yNativeVelocityCoeff;
