@@ -68,6 +68,12 @@
         },
         {
             "keys": [
+                "VISTA|VK2-600PTZ"
+            ],
+            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability"
+        }
+        {
+            "keys": [
                 "DW|DWC-MPTZ20X"
             ],
             "ptzMapper": {
