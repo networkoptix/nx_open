@@ -198,13 +198,14 @@ namespace ec2
             // delete master object if need (server->cameras required to delete master object, layoutList->layout doesn't)
             if (isParentObjectTran) 
             {
+                multiTran.fillSequence();
+
                 QByteArray serializedTran;
                 QnOutputBinaryStream<QByteArray> stream( &serializedTran );
                 QnBinary::serialize( multiTran, &stream );
                 errorCode = ErrorCode::ok;
                 if (multiTran.persistent) 
                 {
-                    multiTran.fillSequence();
                     errorCode = dbManager->executeNestedTransaction( multiTran, serializedTran);
                     if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped) {
                         dbManager->rollback();
