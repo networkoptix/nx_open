@@ -50,8 +50,8 @@ void QnTransactionLog::init()
     QSqlQuery querySequence(m_dbManager->getDB());
     int startSequence = 1;
     queryTime.prepare("SELECT max(sequence) FROM transaction_log where peer_guid = ? and db_guid = ?");
-    queryTime.bindValue(0, qnCommon->moduleGUID().toRfc4122());
-    queryTime.bindValue(0, m_dbManager->getID().toRfc4122());
+    queryTime.addBindValue(qnCommon->moduleGUID().toRfc4122());
+    queryTime.addBindValue(m_dbManager->getID().toRfc4122());
     if (queryTime.exec() && queryTime.next())
         startSequence = queryTime.value(0).toInt() + 1;
     QnAbstractTransaction::setStartSequence(startSequence);
