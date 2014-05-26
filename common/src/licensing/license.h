@@ -15,6 +15,10 @@
 #include "core/resource/resource_fwd.h"
 #include "utils/common/id.h"
 
+#ifdef __APPLE__
+#undef verify
+#endif
+
 const QString LICENSE_TYPE_PROFESSIONAL = lit("digital");
 const QString LICENSE_TYPE_ANALOG = lit("analog"); // TODO: #Elric #EC2 TOTALLY EVIL!!!!!!!!!
 const QString LICENSE_TYPE_EDGE = lit("edge");
