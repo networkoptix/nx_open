@@ -204,6 +204,7 @@ namespace ec2
                 errorCode = ErrorCode::ok;
                 if (multiTran.persistent) 
                 {
+                    multiTran.fillSequence();
                     errorCode = dbManager->executeNestedTransaction( multiTran, serializedTran);
                     if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped) {
                         dbManager->rollback();
