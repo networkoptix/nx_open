@@ -1238,7 +1238,7 @@ void QnMain::run()
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(publicAddress.toString()).arg(m_universalTcpListener->getPort()));
 
     Qn::PanicMode pm;
-    while (m_mediaServer.isNull())
+    while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection, &pm);
 
@@ -1298,10 +1298,15 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
 
+    if (needToStop())
+        return;
+
 
     syncStoragesToSettings(m_mediaServer);
 
     do {
+        if (needToStop())
+            return;
     } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), QnResource::Online) != ec2::ErrorCode::ok);
 
 
