@@ -85,6 +85,24 @@ namespace nx_hls
     {
     }
 
+    HLSSessionPool::~HLSSessionPool()
+    {
+        while( !m_sessionByID.empty() )
+        {
+            HLSSessionContext sessionCtx;
+            {
+                QMutexLocker lk( &m_mutex );
+                if( m_sessionByID.empty() )
+                    break;
+                sessionCtx = m_sessionByID.begin()->second;
+                m_taskToSessionID.erase( sessionCtx.removeTaskID );
+                m_sessionByID.erase( m_sessionByID.begin() );
+            }
+
+            delete sessionCtx.session;
+            TimerManager::instance()->joinAndDeleteTimer( sessionCtx.removeTaskID );
+        }
+    }
 
     bool HLSSessionPool::add( HLSSession* session, int keepAliveTimeoutSec )
     {

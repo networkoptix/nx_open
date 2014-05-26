@@ -88,6 +88,8 @@ namespace nx_hls
             const QString m_id;
         };
 
+        virtual ~HLSSessionPool();
+
         //!Add new session
         /*!
             \param session Object ownership is moved to \a HLSSessionPool instance
@@ -117,8 +119,8 @@ namespace nx_hls
         class HLSSessionContext
         {
         public:
-            HLSSession* const session;
-            const int keepAliveTimeoutSec;
+            HLSSession* session;
+            int keepAliveTimeoutSec;
             quint64 removeTaskID;
 
             HLSSessionContext();

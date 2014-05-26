@@ -422,7 +422,10 @@ namespace nx_hls
                 &session );
             if( result != nx_http::StatusCode::ok )
                 return result;
-            HLSSessionPool::instance()->add( session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT );
+            if( !HLSSessionPool::instance()->add( session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT ) )
+            {
+                assert( false );
+            }
         }
 
         if( chunkedParamIter == requestParams.end() )
