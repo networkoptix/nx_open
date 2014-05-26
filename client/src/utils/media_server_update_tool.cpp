@@ -176,7 +176,7 @@ QnMediaServerUpdateTool::PeerUpdateInformation QnMediaServerUpdateTool::updateIn
     if (it != m_updateInformationById.end())
         return it.value();
 
-    PeerUpdateInformation info(qnResPool->getResourceById(peerId).dynamicCast<QnMediaServerResource>());
+    PeerUpdateInformation info(qnResPool->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>());
     if (info.server && m_state == Idle) {
         info.updateInformation = m_updateFiles[info.server->getSystemInfo()];
         info.state = info.updateInformation ? PeerUpdateInformation::UpdateFound : PeerUpdateInformation::UpdateNotFound;
@@ -205,6 +205,12 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
     if (m_targets.isEmpty()) {
         foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server))
             result.append(resource.staticCast<QnMediaServerResource>());
+
+        foreach (const QnResourcePtr &resource, qnResPool->getAllIncompatibleResources()) {
+            if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+                result.append(server);
+        }
+
     } else {
         result = m_targets;
     }
@@ -295,8 +301,7 @@ void QnMediaServerUpdateTool::checkBuildOnline() {
 
 void QnMediaServerUpdateTool::checkUpdateCoverage() {
     bool needUpdate = false;
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
-        QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
+    foreach (const QnMediaServerResourcePtr &server, actualTargets()) {
         UpdateFileInformationPtr updateFileInformation = m_updateFiles[server->getSystemInfo()];
         if (!updateFileInformation) {
             setCheckResult(UpdateImpossible);
