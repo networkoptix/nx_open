@@ -64,6 +64,10 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
             compatibleStatusChanged = mserverStatusChanged && (ownResource->getStatus() == QnResource::Incompatible || resource->getStatus() == QnResource::Incompatible);
         }
 
+        // move incompatible resource to the main pool if it became normal
+        if (ownResource && ownResource->getStatus() == QnResource::Incompatible && resource->getStatus() != QnResource::Incompatible)
+            qnResPool->makeResourceNormal(ownResource);
+
         ownResource->update(resource);
 
         if (mserverStatusChanged && mediaServer)

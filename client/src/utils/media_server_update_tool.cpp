@@ -622,6 +622,11 @@ void QnMediaServerUpdateTool::at_restUpdateTask_finished(int errorCode) {
         return;
     }
 
+    if ((m_targetPeerIds - m_incompatiblePeerIds).isEmpty()) {
+        finishUpdate(UpdateSuccessful);
+        return;
+    }
+
     lockMutex();
 }
 

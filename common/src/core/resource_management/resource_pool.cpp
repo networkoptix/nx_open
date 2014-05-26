@@ -543,3 +543,13 @@ QnResourceList QnResourcePool::getAllIncompatibleResources() const {
     QMutexLocker locker(&m_resourcesMtx);
     return m_incompatibleResources.values();
 }
+
+void QnResourcePool::makeResourceNormal(const QnResourcePtr &resource) {
+    QMutexLocker locker(&m_resourcesMtx);
+    auto it = m_incompatibleResources.find(resource->getUniqueId());
+    if (it == m_incompatibleResources.end() || it.value() != resource)
+        return;
+
+    m_incompatibleResources.erase(it);
+    insertOrUpdateResource(resource, &m_resources);
+}

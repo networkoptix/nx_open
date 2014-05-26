@@ -107,6 +107,7 @@ public:
     QnResourcePtr getIncompatibleResourceById(const QnId &id, bool useCompatible = false) const;
     QnResourcePtr getIncompatibleResourceByUniqueId(const QString &uid) const;
     QnResourceList getAllIncompatibleResources() const;
+    void makeResourceNormal(const QnResourcePtr &resource);
 
     QStringList allTags() const;
 
