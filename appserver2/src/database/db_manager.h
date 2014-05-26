@@ -126,6 +126,9 @@ namespace ec2
         bool markLicenseOverflow(bool value, qint64 time);
         qint64 licenseOverflowTime() const;
         QUuid getID() const;
+
+        ApiCommand::Value getCommandForDeleteObject(const QnId& objectId);
+        std::vector<ApiIdData> QnDbManager::getNestedObjects(ApiCommand::Value command, const QnId& id);
     private:
         friend class QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
@@ -199,7 +202,7 @@ namespace ec2
         ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
         //ErrorCode insertOrReplaceResource(const ApiResourceData& data);
         ErrorCode deleteRecordFromResourceTable(const qint32 id);
-        ErrorCode removeResource(const QnId& id);
+        ErrorCode removeObject(ApiCommand::Value command, const QnId& id);
 
         ErrorCode insertAddParams(const std::vector<ApiResourceParamData>& params, qint32 internalId);
         ErrorCode deleteAddParams(qint32 resourceId);

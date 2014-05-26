@@ -50,8 +50,7 @@ namespace ec2
             }
         }
 
-        template <class T>
-        void sendTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
+        void sendTransaction(const QnAbstractTransaction& tran, const QByteArray& serializedTran)
         {
             QMutexLocker lock(&m_mutex);
             QByteArray buffer;
