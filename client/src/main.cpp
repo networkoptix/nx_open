@@ -360,7 +360,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if (!engineVersion.isEmpty()) {
         QnSoftwareVersion version(engineVersion);
         if (!version.isNull()) {
-            qWarning() << "Starting with overrided version: " << version.toString();
+            qWarning() << "Starting with overriden version: " << version.toString();
             qnCommon->setEngineVersion(version);
         }
     }

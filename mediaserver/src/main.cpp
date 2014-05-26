@@ -1726,7 +1726,7 @@ int main(int argc, char* argv[])
     if (!engineVersion.isEmpty()) {
         QnSoftwareVersion version(engineVersion);
         if (!version.isNull()) {
-            qWarning() << "Starting with overrided version: " << version.toString();
+            qWarning() << "Starting with overriden version: " << version.toString();
             service.setOverrideVersion(version);
         }
     }
