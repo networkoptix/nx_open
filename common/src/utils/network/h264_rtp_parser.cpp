@@ -10,6 +10,7 @@ static const int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
 
 CLH264RtpParser::CLH264RtpParser():
         QnRtpVideoStreamParser(),
+        m_spsInitialized(false),
         m_frequency(90000), // default value
         m_rtpChannel(98),
         m_prevSequenceNum(-1),
@@ -143,6 +144,7 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
     {
         m_sps.decodeBuffer( (const quint8*) data.data() + sizeof(H264_NAL_PREFIX), (const quint8*) data.data() + data.size());
         m_sps.deserialize();
+        m_spsInitialized = true;
 
     } catch(BitStreamException& e)
     {
@@ -159,8 +161,8 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffe
 
     QnCompressedVideoDataPtr result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoFrameSize + addheaderSize));
     result->compressionType = CODEC_ID_H264;
-    result->width = m_sps.getWidth();
-    result->height = m_sps.getHeight();
+    result->width = m_spsInitialized ? m_sps.getWidth() : -1;
+    result->height = m_spsInitialized ? m_sps.getHeight() : -1;
     if (m_keyDataExists) {
         result->flags = QnAbstractMediaData::MediaFlags_AVKey;
         if (!m_builtinSpsFound || !m_builtinPpsFound)
