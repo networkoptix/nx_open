@@ -15,9 +15,6 @@ static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
 static const int AUTHORIZED_TIMEOUT = 60 * 1000;
 static const int MAX_AUTH_RETRY_COUNT = 3;
 
-static QMap<QString, qint64> authorizedList;
-static QMutex authorizationCacheMutex;
-
 
 QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 {
@@ -47,14 +44,6 @@ QnTCPConnectionProcessor(priv, socket)
 bool QnUniversalRequestProcessor::authenticate()
 {
     Q_D(QnUniversalRequestProcessor);
-
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    QString addr = d->socket->getForeignAddress().address.toString();
-    {
-        QMutexLocker lock(&authorizationCacheMutex);
-        if (currentTime - authorizedList.value(addr) < AUTHORIZED_TIMEOUT)
-            return true;
-    }
 
     int retryCount = 0;
     if (d->needAuth &&  d->protocol.toLower() == "http")
@@ -88,8 +77,6 @@ bool QnUniversalRequestProcessor::authenticate()
         }
     }
 
-    QMutexLocker lock(&authorizationCacheMutex);
-    authorizedList.insert(addr, currentTime);
     return true;
 }
 

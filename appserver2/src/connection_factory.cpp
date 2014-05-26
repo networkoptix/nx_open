@@ -182,9 +182,9 @@ namespace ec2
 
         //AbstractECConnectionFactory
         registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
-            std::bind( &Ec2DirectConnectionFactory::processRemoteConnectionRequest, this, _1, _2 ) );
+            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
         registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::testConnection,
-            std::bind( &Ec2DirectConnectionFactory::processRemoteTestConnectionRequest, this, _1, _2 ) );
+            std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
     }
 
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
@@ -267,28 +267,6 @@ namespace ec2
         impl::TestConnectionHandlerPtr handler )
     {
         return handler->done( reqID, errorCode, connectionInfo );
-    }
-
-    ErrorCode Ec2DirectConnectionFactory::processRemoteTestConnectionRequest(
-        const ApiLoginData& loginInfo,
-        QnConnectionInfo* const connectionInfo )
-    {
-        //performing authentication
-        if( !qnAuthHelper->authenticate( loginInfo.login, loginInfo.passwordHash ) )
-            return ErrorCode::unauthorized;
-
-        return fillConnectionInfo( loginInfo, connectionInfo );
-    }
-
-    ErrorCode Ec2DirectConnectionFactory::processRemoteConnectionRequest(
-        const ApiLoginData& loginInfo,
-        QnConnectionInfo* const connectionInfo )
-    {
-        //performing authentication
-        if( !qnAuthHelper->authenticate( loginInfo.login, loginInfo.passwordHash ) )
-            return ErrorCode::unauthorized;
-
-        return fillConnectionInfo( loginInfo, connectionInfo );
     }
 
     ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
