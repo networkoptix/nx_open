@@ -16,7 +16,10 @@ public:
     virtual bool continuousMove(const QVector3D &speed) override;
 
 private:
-    bool m_octagonal;
+    bool m_overrideContinuousMove;
+    Qt::Orientations m_flip;
+    Qn::PtzRestriction m_restriction;
+
     bool m_overrideCapabilities;
     Qn::PtzCapabilities m_capabilities;
 };

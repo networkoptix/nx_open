@@ -142,6 +142,7 @@ private:
     QBasicTimer m_movementTimer;
 
     Movement m_movement;
+    Qt::Orientations m_movementOrientations;
 
     bool m_isClick;
     bool m_isDoubleClick;

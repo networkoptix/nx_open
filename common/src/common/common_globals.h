@@ -27,7 +27,7 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole)
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole PtzRestriction)
     Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes)
 public:
 #else
@@ -176,6 +176,14 @@ public:
     };
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
+
+
+    enum PtzRestriction {
+        UnrestrictedPtz = 0,
+        EightWayPtz = 1,
+        FourWayPtz = 2,
+    };
+
 
     enum StreamFpsSharingMethod {
         shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
@@ -347,7 +355,6 @@ public:
     const T &_id(const T &value) { return value; }
 
 } // namespace Qn
-
 /** 
  * \def lit
  * Helper macro to mark strings that are not to be translated. 
@@ -361,6 +368,6 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #endif
 
 QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
-QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities), (metatype)(lexical)(json))
+QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities)(Qn::PtzRestriction), (metatype)(lexical)(json))
 
 #endif // QN_COMMON_GLOBALS_H

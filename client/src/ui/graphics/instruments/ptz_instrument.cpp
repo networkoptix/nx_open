@@ -176,7 +176,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget *widget) {
         bool isFisheye = data.hasCapabilities(Qn::VirtualPtzCapability);
         bool isFisheyeEnabled = widget->dewarpingParams().enabled;
 
-        overlayWidget->manipulatorWidget()->setVisible(data.hasCapabilities(Qn::ContinuousPanTiltCapabilities));
+        overlayWidget->manipulatorWidget()->setVisible(data.hasCapabilities(Qn::ContinuousPanCapability) || data.hasCapabilities(Qn::ContinuousTiltCapability));
         overlayWidget->zoomInButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
         overlayWidget->zoomOutButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
         
@@ -432,10 +432,16 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
             manipulator = NULL;
     }
 
+    const PtzData &data = m_dataByWidget[target];
     if(manipulator) {
         m_movement = ContinuousMovement;
+
+        m_movementOrientations = 0;
+        if(data.hasCapabilities(Qn::ContinuousPanCapability))
+            m_movementOrientations |= Qt::Horizontal;
+        if(data.hasCapabilities(Qn::ContinuousTiltCapability))
+            m_movementOrientations |= Qt::Vertical;
     } else {
-        const PtzData &data = m_dataByWidget[target];
         if(data.hasCapabilities(Qn::VirtualPtzCapability | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability)) {
             m_movement = VirtualMovement;
         } else if(data.hasCapabilities(Qn::ViewportPtzCapability)) {
@@ -508,7 +514,15 @@ void PtzInstrument::dragMove(DragInfo *info) {
 
     switch(m_movement) {
     case ContinuousMovement: {
-        QPointF delta = info->mouseItemPos() - target()->rect().center();
+        QPointF mouseItemPos = info->mouseItemPos();
+        QPointF itemCenter = target()->rect().center();
+
+        if(!(m_movementOrientations & Qt::Horizontal))
+            mouseItemPos.setX(itemCenter.x());
+        if(!(m_movementOrientations & Qt::Vertical))
+            mouseItemPos.setY(itemCenter.y());
+
+        QPointF delta = mouseItemPos - itemCenter;
         QSizeF size = target()->size();
         qreal scale = qMax(size.width(), size.height()) / 2.0;
         QPointF speed(qBound(-1.0, delta.x() / scale, 1.0), qBound(-1.0, -delta.y() / scale, 1.0));
@@ -518,7 +532,8 @@ void PtzInstrument::dragMove(DragInfo *info) {
 
         ensureElementsWidget();
         PtzArrowItem *arrowItem = elementsWidget()->arrowItem();
-        arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()), elementsWidget()->mapFromItem(target(), info->mouseItemPos()));
+
+        arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()), elementsWidget()->mapFromItem(target(), mouseItemPos));
         arrowItem->setSize(QSizeF(arrowSize, arrowSize));
 
         ptzMove(target(), QVector3D(speed));
