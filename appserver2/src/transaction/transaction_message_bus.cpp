@@ -560,6 +560,8 @@ void QnTransactionMessageBus::doPeriodicTasks()
     }
 
     // send keep-alive if we connected to cloud
+    if( !m_aliveSendTimer.isValid() )
+        m_aliveSendTimer.restart();
     if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL)
         sendServerAliveMsg(qnCommon->moduleGUID(), true, qnCommon->isCloudMode(), qnLicensePool->allLocalHardwareIds());
 

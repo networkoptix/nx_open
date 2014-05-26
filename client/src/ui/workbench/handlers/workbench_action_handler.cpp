@@ -120,6 +120,10 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
+#ifdef Q_OS_MACX
+#include <utils/mac_utils.h>
+#endif
+
 #include "version.h"
 
 // TODO: #Elric remove this include

@@ -11,13 +11,11 @@ namespace nx_hls
 {
     HLSLivePlaylistManager::HLSLivePlaylistManager(
         MediaStreamCache* const mediaStreamCache,
-        MediaIndex* const mediaIndex,
+        MediaIndex* const /*mediaIndex*/,
         quint64 targetDurationUSec )
     :
         m_mediaStreamCache( mediaStreamCache ),
-        m_mediaIndex( mediaIndex ),
         m_targetDurationUSec( targetDurationUSec ),
-        m_prevTimestamp( 0 ),
         m_mediaSequence( 0 ),
         m_totalPlaylistDuration( 0 ),
         m_blockID( -1 )

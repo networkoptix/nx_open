@@ -8,7 +8,7 @@ PREFIX=/usr/local/apps/$CUSTOMIZATION/mediaserver/
 BIN_NAME=mediaserver
 BIN_PATH=$PREFIX/bin/$BIN_NAME
 STORAGE_PATH=/media/mmcblk0p1
-LOG_LEVEL=none
+LOG_LEVEL=WARN
 
 export LD_LIBRARY_PATH=$PREFIX/lib
 export VMS_PLUGIN_DIR=$PREFIX/plugins

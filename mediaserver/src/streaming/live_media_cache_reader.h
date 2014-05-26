@@ -22,7 +22,6 @@ public:
     virtual quint64 currentPos() const override;
 
 private:
-    MediaStreamCache* m_mediaCache;
     MediaStreamCache::SequentialReadContext m_readCtx;
 };
 

@@ -1,6 +1,8 @@
 #ifndef __H264_RTP_PARSER_H
 #define __H264_RTP_PARSER_H
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 
@@ -21,6 +23,7 @@ private:
     QMap <int, QByteArray> m_allNonSliceNal;
     QList<QByteArray> m_sdpSpsPps;
     SPSUnit m_sps;
+    bool m_spsInitialized;
     int m_frequency;
     int m_rtpChannel;
     int m_prevSequenceNum;

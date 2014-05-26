@@ -337,7 +337,7 @@ QnTranscoder* StreamingChunkTranscoder::createTranscoder(
         NX_LOG( QString::fromLatin1("Failed to create transcoder with container \"%1\" to transcode chunk (%2 - %3) of resource %4").
             arg(transcodeParams.containerFormat()).arg(transcodeParams.startTimestamp()).
             arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
-        return false;
+        return nullptr;
     }
     CodecID codecID = CODEC_ID_NONE;
     QnTranscoder::TranscodeMethod transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
@@ -359,7 +359,7 @@ QnTranscoder* StreamingChunkTranscoder::createTranscoder(
         {
             NX_LOG( QString::fromLatin1("Cannot start transcoding of streaming chunk of resource %1. No codec %2 found in FFMPEG library").
                 arg(mediaResource->toResource()->getUniqueId()).arg(transcodeParams.videoCodec()), cl_logWARNING );
-            return false;
+            return nullptr;
         }
         transcodeMethod = codecID == resourceVideoStreamCodecID ?   //TODO: #ak and resolusion did not change
             QnTranscoder::TM_DirectStreamCopy :
@@ -379,7 +379,7 @@ QnTranscoder* StreamingChunkTranscoder::createTranscoder(
         NX_LOG( QString::fromLatin1("Failed to create transcoder with video codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
             arg(transcodeParams.videoCodec()).arg(transcodeParams.startTimestamp()).
             arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
-        return false;
+        return nullptr;
     }
 
     //TODO/HLS #ak audio
@@ -390,7 +390,7 @@ QnTranscoder* StreamingChunkTranscoder::createTranscoder(
         //    NX_LOG( QString::fromLatin1("Failed to create transcoder with audio codec \"%1\" to transcode chunk (%2 - %3) of resource %4").
         //        arg(transcodeParams.audioCodec()).arg(transcodeParams.startTimestamp()).
         //        arg(transcodeParams.endTimestamp()).arg(transcodeParams.srcResourceUniqueID()), cl_logWARNING );
-        //    return false;
+        //    return nullptr;
         //}
     }
 

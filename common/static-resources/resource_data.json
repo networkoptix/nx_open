@@ -33,7 +33,7 @@
         },
         {
             "keys": [
-                "VIVOTEK|SD8362", "VIVOTEK|SD83X3", "VIVOTEK|SD81X1", "VIVOTEK|SD83X1"
+                "VIVOTEK|*"
             ],
             "onvifPtzStopBroken": true
         },
@@ -54,7 +54,8 @@
             "keys": [
                 "DW|DWC-MPTZ20X", "DW|DWC-MPTZ5X",
                 "ACTI|KCM8111",
-                "*|FW3471-PS-E"
+                "*|FW3471-PS-E",
+                "*|DW-CP04"
             ],
             "octagonalPtz": true
         },

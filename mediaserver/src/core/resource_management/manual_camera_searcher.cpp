@@ -191,7 +191,7 @@ bool QnManualCameraSearcher::run( QThreadPool* threadPool, const QString &startA
         results.waitForFinished();
         {
              QMutexLocker lock(&m_mutex);
-             for (int i = 0; i < results.resultCount(); ++i) {
+             for (size_t i = 0; i < results.resultCount(); ++i) {
                  if (!results.isResultReadyAt(i))
                      continue;
                  m_results << results.resultAt(i);
@@ -237,7 +237,7 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const {
     switch(m_state) {
     case QnManualCameraSearchStatus::CheckingHost:
         if (m_scanProgress) {
-            for (int i = 0; i < m_scanProgress->resultCount(); ++i) {
+            for (size_t i = 0; i < m_scanProgress->resultCount(); ++i) {
                 if (!m_scanProgress->isResultReadyAt(i))
                     continue;
                 result.cameras << m_scanProgress->resultAt(i);

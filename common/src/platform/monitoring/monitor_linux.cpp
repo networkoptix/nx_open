@@ -99,8 +99,8 @@ public:
 
         updatePartitions();
 
-        const qint64 elapsed = m_hddStatCalcTimer.elapsed();
-        if( !m_hddStatCalcTimer.isValid() || elapsed == 0 )
+        const qint64 elapsed = m_hddStatCalcTimer.isValid() ? m_hddStatCalcTimer.elapsed() : 0;
+        if( elapsed == 0 )
         {
             m_hddStatCalcTimer.restart();
             return zeroLoad();
@@ -253,8 +253,8 @@ protected:
 
     void calcNetworkStat()
     {
-        const qint64 elapsed = m_networkStatCalcTimer.elapsed();
-        if( m_networkStatCalcTimer.isValid() && elapsed > 0 )
+        const qint64 elapsed = m_networkStatCalcTimer.isValid() ? m_networkStatCalcTimer.elapsed() : 0;
+        if( elapsed > 0 )
         {
             //listing /sys/class/net/
             QDir sysClassNet( QLatin1String("/sys/class/net/") );

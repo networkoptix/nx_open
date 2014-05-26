@@ -50,8 +50,8 @@ void QnTransactionLog::init()
     QSqlQuery querySequence(m_dbManager->getDB());
     int startSequence = 1;
     queryTime.prepare("SELECT max(sequence) FROM transaction_log where peer_guid = ? and db_guid = ?");
-    queryTime.bindValue(0, qnCommon->moduleGUID().toRfc4122());
-    queryTime.bindValue(0, m_dbManager->getID().toRfc4122());
+    queryTime.addBindValue(qnCommon->moduleGUID().toRfc4122());
+    queryTime.addBindValue(m_dbManager->getID().toRfc4122());
     if (queryTime.exec() && queryTime.next())
         startSequence = queryTime.value(0).toInt() + 1;
     QnAbstractTransaction::setStartSequence(startSequence);
@@ -140,7 +140,7 @@ bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& 
     QnTranStateKey key (tran.id.peerID, tran.id.dbID);
     Q_ASSERT(tran.id.sequence != 0);
     if (m_state.value(key) >= tran.id.sequence) {
-        qDebug() << "Transaction log contains tranasction " << ApiCommand::toString(tran.command) << "because of precessed seq:" << m_state.value(key) << ">=" << tran.id.sequence;
+        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << "because of precessed seq:" << m_state.value(key) << ">=" << tran.id.sequence;
         return true;
     }
     QMap<QUuid, qint64>::const_iterator itr = m_updateHistory.find(hash);
@@ -154,7 +154,7 @@ bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& 
         rez = key > locakKey;
     }
     if (rez)
-        qDebug() << "Transaction log contains tranasction " << ApiCommand::toString(tran.command) << "because of timestamp:" << lastTime << ">=" << tran.timestamp;
+        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << "because of timestamp:" << lastTime << ">=" << tran.timestamp;
 
    return rez;
 }

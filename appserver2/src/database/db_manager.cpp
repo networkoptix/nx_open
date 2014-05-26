@@ -14,6 +14,8 @@
 #include "utils/common/synctime.h"
 
 
+using std::nullptr_t;
+
 namespace ec2
 {
 
@@ -25,7 +27,7 @@ static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 template <class MainData>
 void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<QnId> MainData::*subList)
 {
-    int idx = 0;
+    size_t idx = 0;
     QSqlRecord rec = query.record();
     int idIdx = rec.indexOf("id");
     int parentIdIdx = rec.indexOf("parentId");
@@ -44,7 +46,7 @@ void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<
 template <class MainData, class SubData, class MainSubData, class MainOrParentType, class IdType, class SubOrParentType>
 void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<MainSubData> MainOrParentType::*subDataListField, IdType SubOrParentType::*parentIdField)
 {
-    int idx = 0;
+    size_t idx = 0;
     foreach(const SubData& subData, subDataList)
     {
         for (; idx < data.size() && subData.*parentIdField != data[idx].id; idx++);
@@ -112,9 +114,6 @@ bool QnDbManager::init()
         m_adminUserInternalID = queryAdminUser.value(1).toInt();
     }
 
-    if (QnTransactionLog::instance())
-        QnTransactionLog::instance()->init();
-
     QSqlQuery queryServers(m_sdb);
     queryServers.prepare("UPDATE vms_resource set status = ? WHERE xtype_guid = ?"); // todo: only mserver without DB?
     queryServers.bindValue(0, QnResource::Offline);
@@ -145,6 +144,10 @@ bool QnDbManager::init()
             return false;
         }
     }
+
+    if (QnTransactionLog::instance())
+        QnTransactionLog::instance()->init();
+
 
     QSqlQuery queryCameras(m_sdb);
     // Update cameras status
@@ -1774,7 +1777,6 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     QnSql::fetch_many(queryScreens, &screens);
     mergeObjectListData(videowallList, screens, &ApiVideowallData::screens, &ApiVideowallScreenWithRefData::videowallGuid);
 
-//#if 0
     QSqlQuery queryMatrixItems(m_sdb);
     queryMatrixItems.setForwardOnly(true);
     queryMatrixItems.prepare("SELECT \
@@ -1805,7 +1807,6 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     mergeObjectListData(matrices, matrixItems, &ApiVideowallMatrixData::items, &ApiVideowallMatrixItemWithRefData::matrixGuid);
 
     mergeObjectListData(videowallList, matrices, &ApiVideowallData::matrices, &ApiVideowallMatrixWithRefData::videowallGuid);
-//#endif
 
     return ErrorCode::ok;
 }

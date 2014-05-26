@@ -304,12 +304,12 @@ bool QnPlAreconVisionResource::updateMACAddress()
     return true;
 }
 
-Qn::StreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize /*size*/) const
+Qn::StreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const
 {
     return Qn::QualityNormal;
 }
 
-QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/)
+QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
 {
     return QImage();
 }

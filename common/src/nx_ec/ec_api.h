@@ -245,7 +245,7 @@ namespace ec2
             \param handler Functor with params: (ErrorCode)
         */
         template<class TargetType, class HandlerType> int addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, TargetType* target, HandlerType handler ) {
-            return addCameraHistoryItem( std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return addCameraHistoryItem( cameraHistoryItem, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
         ErrorCode addCameraHistoryItemSync( const QnCameraHistoryItem& historyItem) {
             using namespace std::placeholders;
@@ -257,7 +257,7 @@ namespace ec2
             \param handler Functor with params: (ErrorCode, const QnVirtualCameraResourceList& cameras)
         */
         template<class TargetType, class HandlerType> int getCameras( const QnId& mediaServerId, TargetType* target, HandlerType handler ) {
-            return getCameras( std::static_pointer_cast<impl::GetCamerasHandler>(std::make_shared<impl::CustomGetCamerasHandler<TargetType, HandlerType>>(target, handler)) );
+            return getCameras( mediaServerId, std::static_pointer_cast<impl::GetCamerasHandler>(std::make_shared<impl::CustomGetCamerasHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         ErrorCode getCamerasSync(const QnId& mServerId, QnVirtualCameraResourceList* const cameraList ) {
@@ -497,8 +497,8 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode, const QnUserResourceList&)
         */
-        template<class TargetType, class HandlerType> int getUsers( QnUserResourceList& users, TargetType* target, HandlerType handler ) {
-            return getUsers( getUsers, std::static_pointer_cast<impl::GetUsersHandler>(
+        template<class TargetType, class HandlerType> int getUsers( TargetType* target, HandlerType handler ) {
+            return getUsers( std::static_pointer_cast<impl::GetUsersHandler>(
                 std::make_shared<impl::CustomGetUsersHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
@@ -595,8 +595,8 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode, const QnUserResourceList&)
         */
-        template<class TargetType, class HandlerType> int getVideowalls( QnVideoWallResourceList& videowalls, TargetType* target, HandlerType handler ) {
-            return getVideowalls( getVideowalls, std::static_pointer_cast<impl::GetVideowallsHandler>(
+        template<class TargetType, class HandlerType> int getVideowalls( TargetType* target, HandlerType handler ) {
+            return getVideowalls( std::static_pointer_cast<impl::GetVideowallsHandler>(
                 std::make_shared<impl::CustomGetVideowallsHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
