@@ -152,6 +152,9 @@
 static const char COMPONENT_NAME[] = "MediaServer";
 
 static QString SERVICE_NAME = QString(QLatin1String(VER_COMPANYNAME_STR)) + QString(QLatin1String(" Media Server"));
+static const size_t DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
+static const size_t DEFAULT_LOG_ARCHIVE_SIZE = 25;
+static const size_t DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -536,7 +539,11 @@ void initLog(const QString &logLevel) {
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
     const QString& logFileName = logFileLocation + QLatin1String("/log_file");
-    if (!cl_log.create(logFileName, 1024*1024*10, 25, cl_logDEBUG1))
+    if (!cl_log.create(
+            logFileName,
+            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
+            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
+            cl_logDEBUG1))
         cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
     MSSettings::roSettings()->setValue("logFile", logFileName);
     cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
@@ -581,8 +588,8 @@ int serverMain(int argc, char *argv[])
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
             dataLocation + QLatin1String("/log/http_log"),
-            10*1024*1024,
-            5,
+            DEFAULT_MAX_LOG_FILE_SIZE,
+            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
 
     if (rebuildArchive == "all")
