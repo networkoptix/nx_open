@@ -533,6 +533,7 @@ void QnMediaServerUpdateTool::installIncompatiblePeers() {
 
     m_restUpdatePeerTask->setUpdateId(m_updateId);
     m_restUpdatePeerTask->setUpdateFiles(updateFiles);
+    m_restUpdatePeerTask->setVersion(m_targetVersion);
     m_restUpdatePeerTask->start(m_incompatiblePeerIds);
 }
 
