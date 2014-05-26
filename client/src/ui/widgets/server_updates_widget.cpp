@@ -182,6 +182,7 @@ void QnServerUpdatesWidget::updateUi() {
             case QnMediaServerUpdateTool::DownloadingFailed:
             case QnMediaServerUpdateTool::UploadingFailed:
             case QnMediaServerUpdateTool::InstallationFailed:
+            case QnMediaServerUpdateTool::RestInstallationFailed:
                 if (!m_minimalMode)
                     QMessageBox::critical(this, tr("Update failed"), m_updateTool->resultString());
                 break;
@@ -195,6 +196,11 @@ void QnServerUpdatesWidget::updateUi() {
         applying = true;
         cancellable = true;
         ui->updateStateLabel->setText(tr("Downloading updates"));
+        break;
+    case QnMediaServerUpdateTool::InstallingToIncompatiblePeers:
+        applying = true;
+        cancellable = true;
+        ui->updateStateLabel->setText(tr("Installing udates to incompatible servers"));
         break;
     case QnMediaServerUpdateTool::UploadingUpdate:
         applying = true;

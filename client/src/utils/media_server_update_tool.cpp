@@ -127,6 +127,7 @@ void QnMediaServerUpdateTool::setUpdateResult(QnMediaServerUpdateTool::UpdateRes
         m_resultString = tr("Could not upload updates to servers.");
         break;
     case QnMediaServerUpdateTool::InstallationFailed:
+    case QnMediaServerUpdateTool::RestInstallationFailed:
         m_resultString = tr("Could not install updates on one or more servers.");
         break;
     }
@@ -435,7 +436,7 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
     case DownloadingUpdate:
         m_downloadUpdatesPeerTask->cancel();
         break;
-    case InstallingAtIncompatiblePeers:
+    case InstallingToIncompatiblePeers:
         m_restUpdatePeerTask->cancel();
         break;
     case UploadingUpdate:
@@ -520,7 +521,7 @@ void QnMediaServerUpdateTool::installIncompatiblePeers() {
         }
     }
 
-    setState(InstallingAtIncompatiblePeers);
+    setState(InstallingToIncompatiblePeers);
 
     m_restUpdatePeerTask->setUpdateId(m_updateId);
     m_restUpdatePeerTask->setUpdateFiles(updateFiles);
@@ -542,7 +543,7 @@ void QnMediaServerUpdateTool::at_mutexLocked(const QString &name) {
     if (name != mutexName)
         return;
 
-    installUpdatesToServers();
+    uploadUpdatesToServers();
 }
 
 void QnMediaServerUpdateTool::at_mutexTimeout(const QString &name) {
@@ -554,21 +555,34 @@ void QnMediaServerUpdateTool::at_mutexTimeout(const QString &name) {
 }
 
 void QnMediaServerUpdateTool::at_downloadTask_finished(int errorCode) {
+    if (m_state != DownloadingUpdate)
+        return;
+
     if (errorCode != 0) {
         for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
             setPeerState(it.key(), PeerUpdateInformation::UpdateFailed);
-        setUpdateResult(DownloadingFailed);
+        finishUpdate(DownloadingFailed);
         return;
+    }
+
+    QHash<QUrl, QString> resultingFiles = m_downloadUpdatesPeerTask->resultingFiles();
+
+    for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
+        if (resultingFiles.contains(it.value()->url))
+            it.value()->fileName = resultingFiles[it.value()->url];
     }
 
     installIncompatiblePeers();
 }
 
 void QnMediaServerUpdateTool::at_uploadTask_finished(int errorCode) {
+    if (m_state != UploadingUpdate)
+        return;
+
     if (errorCode != 0) {
         for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
             setPeerState(it.key(), PeerUpdateInformation::UpdateFailed);
-        setUpdateResult(DownloadingFailed);
+        finishUpdate(UploadingFailed);
         return;
     }
 
@@ -576,22 +590,27 @@ void QnMediaServerUpdateTool::at_uploadTask_finished(int errorCode) {
 }
 
 void QnMediaServerUpdateTool::at_installTask_finished(int errorCode) {
+    if (m_state != InstallingUpdate)
+        return;
+
     if (errorCode != 0) {
         for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
             setPeerState(it.key(), PeerUpdateInformation::UpdateFailed);
-        setUpdateResult(DownloadingFailed);
+        finishUpdate(InstallationFailed);
         return;
     }
 
-    unlockMutex();
-    setUpdateResult(UpdateSuccessful);
+    finishUpdate(UpdateSuccessful);
 }
 
 void QnMediaServerUpdateTool::at_restUpdateTask_finished(int errorCode) {
+    if (m_state != InstallingToIncompatiblePeers)
+        return;
+
     if (errorCode != 0) {
         for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
             setPeerState(it.key(), PeerUpdateInformation::UpdateFailed);
-        setUpdateResult(DownloadingFailed);
+        finishUpdate(RestInstallationFailed);
         return;
     }
 

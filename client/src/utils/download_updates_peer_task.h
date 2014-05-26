@@ -19,7 +19,8 @@ public:
     explicit QnDownloadUpdatesPeerTask(QObject *parent = 0);
 
     void setTargetDir(const QString &path);
-    void setTargets(const QHash<QUrl, QString> &targets);
+    void setTargets(const QHash<QUrl, QString> &resultingFiles);
+    QHash<QUrl, QString> resultingFiles() const;
     void setPeerAssociations(const QMultiHash<QUrl, QnId> &peersByUrl);
 
 protected:
@@ -37,11 +38,11 @@ private:
     QString m_targetDirPath;
     QHash<QUrl, QString> m_targets;
     QMultiHash<QUrl, QnId> m_peersByUrl;
+    QHash<QUrl, QString> m_resultingFiles;
 
-    QUrl m_currentUrl;
+    QList<QUrl> m_pendingDownloads;
     QSet<QnId> m_currentPeers;
 
-    int m_allTargets;
     QScopedPointer<QFile> m_file;
     QNetworkAccessManager *m_networkAccessManager;
 };

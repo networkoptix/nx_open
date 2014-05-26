@@ -40,7 +40,10 @@ void QnDownloadUpdatesPeerTask::setTargetDir(const QString &path) {
 
 void QnDownloadUpdatesPeerTask::setTargets(const QHash<QUrl, QString> &targets) {
     m_targets = targets;
-    m_allTargets = targets.size();
+}
+
+QHash<QUrl, QString> QnDownloadUpdatesPeerTask::resultingFiles() const {
+    return m_resultingFiles;
 }
 
 void QnDownloadUpdatesPeerTask::setPeerAssociations(const QMultiHash<QUrl, QnId> &peersByUrl) {
@@ -48,26 +51,30 @@ void QnDownloadUpdatesPeerTask::setPeerAssociations(const QMultiHash<QUrl, QnId>
 }
 
 void QnDownloadUpdatesPeerTask::doStart() {
+    m_resultingFiles.clear();
+    m_pendingDownloads = m_targets.keys();
     downloadNextUpdate();
 }
 
 void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
-    if (m_targets.isEmpty()) {
+    if (m_pendingDownloads.isEmpty()) {
         finish(NoError);
         return;
     }
 
-    auto it = m_targets.begin();
-    m_currentUrl = it.key();
-    m_currentPeers = QnIdSet::fromList(m_peersByUrl.values(m_currentUrl));
+    QUrl url = m_pendingDownloads.first();
+    m_currentPeers = QnIdSet::fromList(m_peersByUrl.values(url));
 
-    m_file.reset(new QFile(updateFilePath(m_targetDirPath, *it)));
+    QString fileName = updateFilePath(m_targetDirPath, m_targets[url]);
+    m_resultingFiles.insert(url, fileName);
+
+    m_file.reset(new QFile(fileName));
     if (!m_file->open(QFile::WriteOnly)) {
         finish(FileError);
         return;
     }
 
-    QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(m_currentUrl));
+    QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(url));
     connect(reply,  &QNetworkReply::readyRead,          this,   &QnDownloadUpdatesPeerTask::at_downloadReply_readyRead);
     connect(reply,  &QNetworkReply::finished,           this,   &QnDownloadUpdatesPeerTask::at_downloadReply_finished);
     connect(reply,  &QNetworkReply::downloadProgress,   this,   &QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress);
@@ -95,6 +102,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
     foreach (const QnId &peerId, m_currentPeers)
         emit peerFinished(peerId);
 
+    m_pendingDownloads.removeFirst();
     downloadNextUpdate();
 }
 
@@ -108,8 +116,8 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress(qint64 bytesRe
     foreach (const QnId &peerId, m_currentPeers)
         emit peerProgressChanged(peerId, bytesReceived * 100 / bytesTotal);
 
-    int finished = m_allTargets - m_targets.size();
-    emit progressChanged((finished * 100 + bytesReceived * 100 / bytesTotal) / m_allTargets);
+    int finished = m_targets.size() - m_pendingDownloads.size();
+    emit progressChanged((finished * 100 + bytesReceived * 100 / bytesTotal) / m_targets.size());
 }
 
 void QnDownloadUpdatesPeerTask::at_downloadReply_readyRead() {

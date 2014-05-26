@@ -68,6 +68,7 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
     if (m_pendingPeers.isEmpty()) {
         disconnect(qnResPool, &QnResourcePool::resourceChanged, this, &QnInstallUpdatesPeerTask::at_resourceChanged);
         finish(NoError);
+        return;
     }
 
     if (m_restartingPeers.isEmpty()) {

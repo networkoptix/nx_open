@@ -66,7 +66,7 @@ public:
         Idle,
         CheckingForUpdates,
         DownloadingUpdate,
-        InstallingAtIncompatiblePeers,
+        InstallingToIncompatiblePeers,
         UploadingUpdate,
         InstallingUpdate,
     };
@@ -85,7 +85,8 @@ public:
         LockFailed,
         DownloadingFailed,
         UploadingFailed,
-        InstallationFailed
+        InstallationFailed,
+        RestInstallationFailed
     };
 
     QnMediaServerUpdateTool(QObject *parent = 0);

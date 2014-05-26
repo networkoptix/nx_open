@@ -67,6 +67,7 @@ void QnUploadUpdatesPeerTask::at_uploader_finished() {
         m_finishedPeers.insert(id);
     }
 
+    m_pendingUploads.removeFirst();
     uploadNextUpdate();
 }
 
