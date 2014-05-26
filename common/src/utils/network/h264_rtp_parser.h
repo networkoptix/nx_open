@@ -22,7 +22,8 @@ public:
 private:
     QMap <int, QByteArray> m_allNonSliceNal;
     QList<QByteArray> m_sdpSpsPps;
-    boost::optional<SPSUnit> m_sps;
+    SPSUnit m_sps;
+    bool m_spsInitialized;
     int m_frequency;
     int m_rtpChannel;
     int m_prevSequenceNum;
