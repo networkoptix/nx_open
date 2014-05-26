@@ -114,9 +114,6 @@ bool QnDbManager::init()
         m_adminUserInternalID = queryAdminUser.value(1).toInt();
     }
 
-    if (QnTransactionLog::instance())
-        QnTransactionLog::instance()->init();
-
     QSqlQuery queryServers(m_sdb);
     queryServers.prepare("UPDATE vms_resource set status = ? WHERE xtype_guid = ?"); // todo: only mserver without DB?
     queryServers.bindValue(0, QnResource::Offline);
@@ -147,6 +144,10 @@ bool QnDbManager::init()
             return false;
         }
     }
+
+    if (QnTransactionLog::instance())
+        QnTransactionLog::instance()->init();
+
 
     QSqlQuery queryCameras(m_sdb);
     // Update cameras status
