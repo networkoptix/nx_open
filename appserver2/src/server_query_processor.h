@@ -82,17 +82,38 @@ namespace ec2
         void processUpdateAsync(QnTransaction<ApiIdData>& tran, HandlerType handler )
         {
             Q_ASSERT(tran.persistent);
-
             switch (tran.command)
             {
             case ApiCommand::removeMediaServer:
-                return processMultiUpdateAsync<ApiIdData, ApiIdData>(tran, handler, ApiCommand::removeCamera, dbManager->getNestedObjects(ApiCommand::removeMediaServer, tran.params.id), true);
+                return processMultiUpdateAsync<ApiIdData, ApiIdData>(tran, handler, ApiCommand::removeCamera, dbManager->getNestedObjects(ApiObjectInfo(ApiObject_Server, tran.params.id)).toIdList(), true);
             case ApiCommand::removeUser:
-                return processMultiUpdateAsync<ApiIdData, ApiIdData>(tran, handler, ApiCommand::removeLayout, dbManager->getNestedObjects(ApiCommand::removeUser, tran.params.id), true);
+                return processMultiUpdateAsync<ApiIdData, ApiIdData>(tran, handler, ApiCommand::removeLayout, dbManager->getNestedObjects(ApiObjectInfo(ApiObject_User, tran.params.id)).toIdList(), true);
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;
-                updatedTran.command = dbManager->getCommandForDeleteObject(tran.params.id);
+                switch(dbManager->getObjectType(tran.params.id))
+                {
+                case ApiObject_Server:
+                    updatedTran.command = ApiCommand::removeMediaServer;
+                    break;
+                case ApiObject_Camera:
+                    updatedTran.command = ApiCommand::removeCamera;
+                    break;
+                case ApiObject_User:
+                    updatedTran.command = ApiCommand::removeUser;
+                    break;
+                case ApiObject_Layout:
+                    updatedTran.command = ApiCommand::removeLayout;
+                    break;
+                case ApiObject_Videowall:
+                    updatedTran.command = ApiCommand::removeVideowall;
+                    break;
+                case ApiObject_BusinessRule:
+                    updatedTran.command = ApiCommand::removeBusinessRule;
+                    break;
+                default:
+                    return processUpdateAsync(tran, handler, 0); // call default handler
+                }
                 return processUpdateAsync(updatedTran, handler);
             }
             default:
