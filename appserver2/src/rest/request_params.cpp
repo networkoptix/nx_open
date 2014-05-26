@@ -69,7 +69,7 @@ namespace ec2
         serialize( data.passwordHash, lit("digest"), query );
     }
 
-    bool parseHttpRequestParams(const QnRequestParamList &, nullptr_t *) { return true; }
+    bool parseHttpRequestParams(const QnRequestParamList &, std::nullptr_t *) { return true; }
     void toUrlParams(const std::nullptr_t &, QUrlQuery *) {}
 
 }

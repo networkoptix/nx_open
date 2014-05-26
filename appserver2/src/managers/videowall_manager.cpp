@@ -32,7 +32,7 @@ namespace ec2
                 fromApiToResourceList(videowalls, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowallList, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowallList, nullptr, queryDoneHandler);
         return reqID;
     }
 

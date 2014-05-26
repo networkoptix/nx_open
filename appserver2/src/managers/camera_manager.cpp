@@ -81,7 +81,7 @@ namespace ec2
                 fromApiToResourceList(cameraHistory, outData);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
             ApiCommand::getCameraHistoryList, nullptr, queryDoneHandler );
         return reqID;
     }
@@ -143,7 +143,7 @@ namespace ec2
                     outData << tagData.name;
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiCameraBookmarkTagDataList, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiCameraBookmarkTagDataList, decltype(queryDoneHandler)> (
             ApiCommand::getCameraBookmarkTags, nullptr, queryDoneHandler );
         return reqID;
     }
