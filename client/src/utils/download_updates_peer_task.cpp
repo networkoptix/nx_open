@@ -18,6 +18,14 @@ namespace {
         }
     }
 
+    QString updateFilePath(const QString &updatesDirPath, const QString &fileName) {
+        QDir dir = QDir::temp();
+        if (!dir.exists(updatesDirPath))
+            dir.mkdir(updatesDirPath);
+        dir.cd(updatesDirPath);
+        return dir.absoluteFilePath(fileName);
+    }
+
 } // anonymous namespace
 
 QnDownloadUpdatesPeerTask::QnDownloadUpdatesPeerTask(QObject *parent) :
@@ -58,7 +66,7 @@ void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
     m_currentUrl = it.key();
     m_currentPeers = m_peersByUrl.values(m_currentUrl);
 
-    m_file.reset(new QFile(m_targetDirPath.absoluteFilePath(*it)));
+    m_file.reset(new QFile(updateFilePath(m_targetDirPath, *it)));
     if (!m_file->open(QFile::WriteOnly)) {
         finish(FileError);
         return;
@@ -103,7 +111,7 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress(qint64 bytesRe
     }
 
     foreach (const QnId &peerId, m_currentPeers)
-        emit peerProgressChanged(bytesReceived * 100 / bytesTotal);
+        emit peerProgressChanged(peerId, bytesReceived * 100 / bytesTotal);
 
     int finished = m_allTargets - m_targets.size();
     emit progressChanged((finished * 100 + bytesReceived * 100 / bytesTotal) / m_allTargets);

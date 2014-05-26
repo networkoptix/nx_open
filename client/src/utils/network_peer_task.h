@@ -15,6 +15,8 @@ public:
 
     QSet<QnId> peers() const;
 
+    virtual void cancel() {}
+
 signals:
     void finished(int errorCode, const QSet<QnId> &failedPeers);
     void peerFinished(const QnId &peerId);
