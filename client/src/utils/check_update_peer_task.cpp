@@ -3,9 +3,13 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
+namespace {
+    const QString buildInformationSuffix = lit("update");
+}
+
 QnCheckUpdatePeerTask::QnCheckUpdatePeerTask(QObject *parent) :
     QnNetworkPeerTask(parent),
-    m_networkAccessManager(this)
+    m_networkAccessManager(new QNetworkAccessManager(this))
 {
 }
 
@@ -18,7 +22,7 @@ void QnCheckUpdatePeerTask::setUpdateLocationPrefix(const QString &updateLocatio
 }
 
 void QnCheckUpdatePeerTask::doStart() {
-    QUrl url(m_updateLocationPrefix + QString::number(m_targetVersion.build()) + lit("/") + buildInformationSuffix);
+    QUrl url(m_updateLocationPrefix + QString::number(m_version.build()) + lit("/") + buildInformationSuffix);
     QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(url));
     connect(reply, &QNetworkReply::finished, this, &QnCheckUpdatePeerTask::at_reply_finished);
 }

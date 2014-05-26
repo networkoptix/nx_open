@@ -34,7 +34,7 @@ private slots:
     void at_downloadReply_readyRead();
 
 private:
-    QDir m_targetDirPath;
+    QString m_targetDirPath;
     QHash<QUrl, QString> m_targets;
     QMultiHash<QUrl, QnId> m_peersByUrl;
 

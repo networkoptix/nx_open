@@ -35,7 +35,7 @@ QnDownloadUpdatesPeerTask::QnDownloadUpdatesPeerTask(QObject *parent) :
 }
 
 void QnDownloadUpdatesPeerTask::setTargetDir(const QString &path) {
-    m_targetDirPath = QDir(path);
+    m_targetDirPath = path;
 }
 
 void QnDownloadUpdatesPeerTask::setTargets(const QHash<QUrl, QString> &targets) {
@@ -48,11 +48,6 @@ void QnDownloadUpdatesPeerTask::setPeerAssociations(const QMultiHash<QUrl, QnId>
 }
 
 void QnDownloadUpdatesPeerTask::doStart() {
-    if (!m_targetDirPath.exists()) {
-        finish(FileError);
-        return;
-    }
-
     downloadNextUpdate();
 }
 
@@ -64,7 +59,7 @@ void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
 
     auto it = m_targets.begin();
     m_currentUrl = it.key();
-    m_currentPeers = m_peersByUrl.values(m_currentUrl);
+    m_currentPeers = QnIdSet::fromList(m_peersByUrl.values(m_currentUrl));
 
     m_file.reset(new QFile(updateFilePath(m_targetDirPath, *it)));
     if (!m_file->open(QFile::WriteOnly)) {

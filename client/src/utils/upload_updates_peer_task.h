@@ -30,7 +30,6 @@ private slots:
     void at_uploader_finished();
     void at_uploader_failed();
     void at_uploader_progressChanged(int progress);
-    void at_uploader_peerProgressChanged(const QnId &peerId, int progress);
 
 private:
     QString m_updateId;

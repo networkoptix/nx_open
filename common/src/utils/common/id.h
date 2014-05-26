@@ -30,6 +30,6 @@ inline QString guidToSqlString(const QnId& guid)
     return QString(lit("x'%1'")).arg(QString::fromLatin1(data));
 }
 
-
+typedef QSet<QnId> QnIdSet;
 
 #endif // QN_ID_H

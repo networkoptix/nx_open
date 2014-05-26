@@ -130,7 +130,6 @@ protected:
 private slots:
     void at_updateReply_finished();
     void at_buildReply_finished();
-    void at_downloadReply_finished();
 
     void at_mutexLocked(const QString &name);
     void at_mutexTimeout(const QString &name);
@@ -184,6 +183,7 @@ private:
     ec2::QnDistributedMutexPtr m_distributedMutex;
 
     QHash<QnId, PeerUpdateInformation> m_updateInformationById;
+    QMultiHash<QnSystemInformation, QnId> m_idBySystemInformation;
 
     QnMediaServerResourceList m_targets;
 
@@ -192,7 +192,8 @@ private:
     QnInstallUpdatesPeerTask *m_installUpdatesPeerTask;
     QnRestUpdatePeerTask *m_restUpdatePeerTask;
 
-    QSet<QnId> m_incompatiblePeers;
+    QSet<QnId> m_incompatiblePeerIds;
+    QSet<QnId> m_targetPeerIds;
 };
 
 #endif // QN_MEDIA_SERVER_UPDATE_TOOL_H
