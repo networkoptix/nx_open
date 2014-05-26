@@ -141,8 +141,9 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
 {
     try
     {
-        m_sps.decodeBuffer( (const quint8*) data.data() + sizeof(H264_NAL_PREFIX), (const quint8*) data.data() + data.size());
-        m_sps.deserialize();
+        m_sps = SPSUnit();
+        m_sps.get().decodeBuffer( (const quint8*) data.data() + sizeof(H264_NAL_PREFIX), (const quint8*) data.data() + data.size());
+        m_sps.get().deserialize();
 
     } catch(BitStreamException& e)
     {
@@ -159,8 +160,8 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffe
 
     QnCompressedVideoDataPtr result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoFrameSize + addheaderSize));
     result->compressionType = CODEC_ID_H264;
-    result->width = m_sps.getWidth();
-    result->height = m_sps.getHeight();
+    result->width = m_sps ? m_sps.get().getWidth() : -1;
+    result->height = m_sps ? m_sps.get().getHeight() : -1;
     if (m_keyDataExists) {
         result->flags = QnAbstractMediaData::MediaFlags_AVKey;
         if (!m_builtinSpsFound || !m_builtinPpsFound)
