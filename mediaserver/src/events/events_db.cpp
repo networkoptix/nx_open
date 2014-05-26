@@ -45,8 +45,8 @@ bool QnEventsDB::createDatabase()
     versionQuery.prepare("SELECT sql from sqlite_master where name = 'runtime_actions'");
     if (versionQuery.exec() && versionQuery.next())
     {
-        versionQuery.clear();
         QByteArray sql = versionQuery.value("sql").toByteArray();
+        versionQuery.clear();
         if (!sql.contains("business_rule_guid")) {
             if (!execSQLQuery("drop index 'timeAndCamIdx'")) {
                 return false;

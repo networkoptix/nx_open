@@ -91,7 +91,6 @@ namespace ec2
         qint64 getRelativeTime() const;
         void init();
 
-    private:
         bool contains(const QnAbstractTransaction& tran, const QUuid& hash) const;
         QUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray()) const;
         QUuid makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data);

@@ -24,9 +24,45 @@ namespace ec2
 {
     class LicenseManagerImpl;
 
+    enum ApiOjectType
+    {
+        ApiObject_NotDefined,
+        ApiObject_Resource,
+        ApiObject_Server,
+        ApiObject_Camera,
+        ApiObject_User,
+        ApiObject_Layout,
+        ApiObject_Videowall,
+        ApiObject_BusinessRule,
+        ApiObject_Dummy
+    };
+    struct ApiObjectInfo
+    {
+        ApiObjectInfo() {}
+        ApiObjectInfo(const ApiOjectType& type, const QnId& id): type(type), id(id) {}
+
+        ApiOjectType type;
+        QnId id;
+    };
+    class ApiObjectInfoList: public std::vector<ApiObjectInfo>
+    {
+    public:
+        std::vector<ApiIdData> toIdList() 
+        {
+            std::vector<ApiIdData> result;
+            for (int i = 0; i < size(); ++i) {
+                ApiIdData data;
+                data.id = at(i).id;
+                result.push_back(data);
+            }
+            return result;
+        }
+    };
+
     class QnDbManager: public QnDbHelper
     {
     public:
+
         QnDbManager(
             QnResourceFactory* factory,
             LicenseManagerImpl* const licenseManagerImpl,
@@ -126,6 +162,9 @@ namespace ec2
         bool markLicenseOverflow(bool value, qint64 time);
         qint64 licenseOverflowTime() const;
         QUuid getID() const;
+
+        ApiOjectType getObjectType(const QnId& objectId);
+        ApiObjectInfoList getNestedObjects(const ApiObjectInfo& parentObject);
     private:
         friend class QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
@@ -199,7 +238,7 @@ namespace ec2
         ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
         //ErrorCode insertOrReplaceResource(const ApiResourceData& data);
         ErrorCode deleteRecordFromResourceTable(const qint32 id);
-        ErrorCode removeResource(const QnId& id);
+        ErrorCode removeObject(const ApiObjectInfo& apiObject);
 
         ErrorCode insertAddParams(const std::vector<ApiResourceParamData>& params, qint32 internalId);
         ErrorCode deleteAddParams(qint32 resourceId);

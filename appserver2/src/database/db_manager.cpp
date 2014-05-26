@@ -979,25 +979,7 @@ ErrorCode QnDbManager::removeUser( const QnId& guid )
 {
     qint32 internalId = getResourceInternalId(guid);
 
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare( "SELECT vms_resource.id, vms_resource.guid FROM vms_resource, vms_layout "
-                   "WHERE vms_resource.parent_guid = :user_guid AND vms_resource.id=vms_layout.resource_ptr_id" );
-    query.bindValue(":user_guid", guid.toRfc4122());
-    if (!query.exec())
-    {
-        NX_LOG( lit("Error executing SQL query \"%1\": %2").arg(query.executedQuery()).arg(query.lastError().text()), cl_logWARNING );
-        return ErrorCode::dbError;
-    }
-
     ErrorCode err = ErrorCode::ok;
-    while (query.next()) {
-        const qint32 layoutInternalId = query.value(0).toInt();
-        const QnId layoutId = query.value(1).toString();
-        err = removeLayoutInternal(layoutId, layoutInternalId);
-        if (err != ErrorCode::ok)
-            return err;
-    }
 
     err = deleteAddParams(internalId);
     if (err != ErrorCode::ok)
@@ -1269,22 +1251,6 @@ ErrorCode QnDbManager::removeServer(const QnId& guid)
     ErrorCode err;
     qint32 id = getResourceInternalId(guid);
 
-    QSqlQuery queryCameras(m_sdb);
-    queryCameras.setForwardOnly(true);
-    queryCameras.prepare("SELECT r.guid from vms_camera c JOIN vms_resource r on r.id = c.resource_ptr_id WHERE r.parent_guid = ?");
-    queryCameras.addBindValue(guid.toRfc4122());
-
-    ApiCameraDataList cameraList;
-    if (!queryCameras.exec()) {
-        qWarning() << Q_FUNC_INFO << queryCameras.lastError().text();
-        return ErrorCode::dbError;
-    }
-    while(queryCameras.next()) {
-        err = removeCamera(QUuid::fromRfc4122(queryCameras.value(0).toByteArray()));
-        if (err != ErrorCode::ok)
-            return err;
-    }
-
     err = deleteAddParams(id);
     if (err != ErrorCode::ok)
         return err;
@@ -1380,36 +1346,71 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiUserData>
     return insertOrReplaceUser(tran.params, internalId);
 }
 
-ErrorCode QnDbManager::removeResource(const QnId& id)
+ApiOjectType QnDbManager::getObjectType(const QnId& objectId)
 {
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare("SELECT \
-                    (CASE WHEN c.resource_ptr_id is null then rt.name else 'Camera' end) as name\
-                    FROM vms_resource r\
-                    JOIN vms_resourcetype rt on rt.guid = r.xtype_guid\
-                    LEFT JOIN vms_camera c on c.resource_ptr_id = r.id\
-                    WHERE r.guid = :guid");
-    query.bindValue(":guid", id.toRfc4122());
+                  (CASE WHEN c.resource_ptr_id is null then rt.name else 'Camera' end) as name\
+                  FROM vms_resource r\
+                  JOIN vms_resourcetype rt on rt.guid = r.xtype_guid\
+                  LEFT JOIN vms_camera c on c.resource_ptr_id = r.id\
+                  WHERE r.guid = :guid");
+    query.bindValue(":guid", objectId.toRfc4122());
     if (!query.exec())
-        return ErrorCode::dbError;
+        return ApiObject_NotDefined;
     if( !query.next() )
-        return ErrorCode::ok;   //Record already deleted. That's exactly what we wanted
+        return ApiObject_NotDefined;   //Record already deleted. That's exactly what we wanted
     QString objectType = query.value("name").toString();
-    ErrorCode result;
     if (objectType == "Camera")
-        result = removeCamera(id);
+        return ApiObject_Camera;
     else if (objectType == "Server")
-        result = removeServer(id);
+        return ApiObject_Server;
     else if (objectType == "User")
-        result = removeUser(id);
+        return ApiObject_Server;
     else if (objectType == "Layout")
-        result = removeLayout(id);
+        return ApiObject_Layout;
     else if (objectType == "Videowall")
-        result = removeVideowall(id);
-    else {
+        return ApiObject_Videowall;
+    else 
+    {
         Q_ASSERT_X(0, "Unknown object type", Q_FUNC_INFO);
-        return ErrorCode::notImplemented;
+        return ApiObject_NotDefined;
+    }
+}
+
+ApiObjectInfoList QnDbManager::getNestedObjects(const ApiObjectInfo& parentObject)
+{
+    ApiObjectInfoList result;
+
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+
+    switch(parentObject.type)
+    {
+        case ApiObject_Server:
+            query.prepare("SELECT ?, r.guid from vms_camera c JOIN vms_resource r on r.id = c.resource_ptr_id WHERE r.parent_guid = ?");
+            query.addBindValue((int) ApiObject_Camera);
+            break;
+        case ApiObject_User:
+            query.prepare( "SELECT ?, r.guid FROM vms_resource r, vms_layout WHERE r.parent_guid = ? AND r.id = vms_layout.resource_ptr_id" );
+            query.addBindValue((int) ApiObject_Layout);
+            break;
+        default:
+            //Q_ASSERT_X(0, "Not implemented!", Q_FUNC_INFO);
+            return result;
+    }
+    query.addBindValue(parentObject.id.toRfc4122());
+
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return result;
+    }
+    while(query.next()) {
+        ApiObjectInfo info;
+        info.type = (ApiOjectType) query.value(0).toInt();
+        info.id = QnId::fromRfc4122(query.value(1).toByteArray());
+        result.push_back(info);
     }
 
     return result;
@@ -1417,36 +1418,61 @@ ErrorCode QnDbManager::removeResource(const QnId& id)
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiIdData>& tran)
 {
+    switch(tran.command) {
+        case ApiCommand::removeCamera:
+            return removeObject(ApiObjectInfo(ApiObject_Camera, tran.params.id));
+        case ApiCommand::removeMediaServer:
+            return removeObject(ApiObjectInfo(ApiObject_Server, tran.params.id));
+        case ApiCommand::removeLayout:
+            return removeObject(ApiObjectInfo(ApiObject_Layout, tran.params.id));
+        case ApiCommand::removeBusinessRule:
+            return removeObject(ApiObjectInfo(ApiObject_BusinessRule, tran.params.id));
+        case ApiCommand::removeUser:
+            return removeObject(ApiObjectInfo(ApiObject_User, tran.params.id));
+        default:
+            return removeObject(ApiObjectInfo(ApiObject_Resource, tran.params.id));
+    }
+}
+
+ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
+{
     ErrorCode result;
-    switch (tran.command)
+    
+    ApiObjectInfoList nestedList = getNestedObjects(apiObject);
+    foreach(const ApiObjectInfo& nestedObject, nestedList)
+        removeObject(nestedObject);
+
+    switch (apiObject.type)
     {
-    case ApiCommand::removeCamera:
-        result = removeCamera(tran.params.id);
+    case ApiObject_Camera:
+        result = removeCamera(apiObject.id);
         break;
-    case ApiCommand::removeMediaServer:
-        result = removeServer(tran.params.id);
+    case ApiObject_Server:
+        result = removeServer(apiObject.id);
         break;
-    case ApiCommand::removeLayout:
-        result = removeLayout(tran.params.id);
+    case ApiObject_Layout:
+        result = removeLayout(apiObject.id);
         break;
-    case ApiCommand::removeBusinessRule:
-        result = removeBusinessRule( tran.params.id );
+    case ApiObject_BusinessRule:
+        result = removeBusinessRule(apiObject.id);
         break;
-    case ApiCommand::removeUser:
-        result = removeUser( tran.params.id );
+    case ApiObject_User:
+        result = removeUser(apiObject.id);
         break;
-    case ApiCommand::removeResource:
-        result = removeResource( tran.params.id );
+    case ApiObject_Resource:
+        result = removeObject(ApiObjectInfo(getObjectType(apiObject.id), apiObject.id));
+        break;
+    case ApiCommand::NotDefined:
+        result = ErrorCode::ok; // object already removed
         break;
     default:
-        qWarning() << "Remove operation is not implemented for command" << toString(tran.command);
+        qWarning() << "Remove operation is not implemented for object type" << apiObject.type;
         Q_ASSERT_X(0, "Remove operation is not implemented for command", Q_FUNC_INFO);
         return ErrorCode::unsupported;
     }
 
     return result;
 }
-
 
 /* 
 -------------------------------------------------------------

@@ -152,9 +152,9 @@
 static const char COMPONENT_NAME[] = "MediaServer";
 
 static QString SERVICE_NAME = QString(QLatin1String(VER_COMPANYNAME_STR)) + QString(QLatin1String(" Media Server"));
-static const size_t DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
-static const size_t DEFAULT_LOG_ARCHIVE_SIZE = 25;
-static const size_t DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
+static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
+static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
+static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
