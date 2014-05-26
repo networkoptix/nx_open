@@ -6,6 +6,7 @@
 #include <utils/network/tcp_connection_priv.h>
 #include <media_server/server_update_tool.h>
 #include <utils/update/update_utils.h>
+#include <utils/common/log.h>
 #include <common/common_module.h>
 
 #include <version.h>
@@ -30,8 +31,10 @@ int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParamLi
 
     {
         QBuffer buffer(const_cast<QByteArray*>(&body)); // we're going to read data, so const_cast is safe
-        if (!verifyUpdatePackage(&buffer, &version, &sysInfo))
+        if (!verifyUpdatePackage(&buffer, &version, &sysInfo)) {
+            cl_log.log("An upload has been received but not veryfied", cl_logWARNING);
             return CODE_INVALID_PARAMETER;
+        }
     }
 
     if (version == qnCommon->engineVersion())

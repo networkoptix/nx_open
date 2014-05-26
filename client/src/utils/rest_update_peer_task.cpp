@@ -86,6 +86,8 @@ void QnRestUpdatePeerTask::installNextUpdate() {
 void QnRestUpdatePeerTask::finishPeer() {
     QnMediaServerResourcePtr server = m_currentServers.takeFirst();
     emit peerFinished(server->getId());
+    if (m_currentServers.isEmpty())
+        m_serverBySystemInformation.erase(m_serverBySystemInformation.begin());
     installNextUpdate();
 }
 

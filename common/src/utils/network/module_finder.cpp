@@ -146,6 +146,7 @@ bool QnModuleFinder::processDiscoveryRequest(AbstractDatagramSocket *udpSocket) 
     response.customization = QString::fromLatin1(QN_CUSTOMIZATION_NAME);
     response.seed = qnCommon->moduleGUID().toString();
     response.name = qnCommon->localSystemName();
+    response.systemInformation = QnSystemInformation(lit(QN_APPLICATION_PLATFORM), lit(QN_APPLICATION_ARCH), lit(QN_ARM_BOX)).toString();
     response.typeSpecificParameters.insert(lit("port"), QString::number(qnCommon->moduleUrl().port()));
     quint8 *responseBufStart = readBuffer;
     if (!response.serialize(&responseBufStart, readBuffer + READ_BUFFER_SIZE))

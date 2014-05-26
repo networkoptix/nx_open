@@ -405,6 +405,9 @@ void QnMediaServerUpdateTool::updateServers() {
         if (server->getStatus() != QnResource::Online && !incompatible)
             continue;
 
+        if (!server->getSystemInfo().isValid())
+            continue;
+
         QnId peerId = server->getId();
 
         m_targetPeerIds.insert(peerId);

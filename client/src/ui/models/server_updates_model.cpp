@@ -55,7 +55,8 @@ QVariant QnServerUpdatesModel::data(const QModelIndex &index, int role) const {
 }
 
 QModelIndex QnServerUpdatesModel::index(int row, int column, const QModelIndex &parent) const {
-    Q_UNUSED(parent)
+    if (!hasIndex(row, column, parent))
+        return QModelIndex();
 
     return createIndex(row, column, m_items[row]);
 }

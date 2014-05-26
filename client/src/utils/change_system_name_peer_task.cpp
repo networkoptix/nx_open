@@ -5,7 +5,8 @@
 #include <utils/network/global_module_finder.h>
 
 QnChangeSystemNamePeerTask::QnChangeSystemNamePeerTask(QObject *parent) :
-    QnNetworkPeerTask(parent)
+    QnNetworkPeerTask(parent),
+    m_rebootPeers(true)
 {
 }
 
@@ -17,6 +18,10 @@ void QnChangeSystemNamePeerTask::setSystemName(const QString &systemName) {
     m_systemName = systemName;
 }
 
+void QnChangeSystemNamePeerTask::setRebootPeers(bool rebootPeers) {
+    m_rebootPeers = rebootPeers;
+}
+
 void QnChangeSystemNamePeerTask::doStart() {
     foreach (const QnId &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
@@ -25,7 +30,7 @@ void QnChangeSystemNamePeerTask::doStart() {
             continue;
         }
 
-        int handle = server->apiConnection()->changeSystemNameAsync(m_systemName, true, this, SLOT(processReply(int,int)));
+        int handle = server->apiConnection()->changeSystemNameAsync(m_systemName, m_rebootPeers, this, SLOT(processReply(int,int)));
         m_pendingPeers.insert(handle, id);
     }
 

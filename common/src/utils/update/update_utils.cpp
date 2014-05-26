@@ -48,6 +48,9 @@ bool verifyUpdatePackage(const QString &fileName, QnSoftwareVersion *version, Qn
 
 bool verifyUpdatePackage(QIODevice *device, QnSoftwareVersion *version, QnSystemInformation *sysInfo) {
     QuaZip zip(device);
+    if (!zip.open(QuaZip::mdUnzip))
+        return false;
+
     zip.setCurrentFile(infoEntryName);
     QuaZipFile infoFile(&zip);
     return verifyUpdatePackageInternal(&infoFile, version, sysInfo);
