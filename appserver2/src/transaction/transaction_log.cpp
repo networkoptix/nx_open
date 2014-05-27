@@ -105,8 +105,8 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
     Q_ASSERT_X(!tran.id.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     Q_ASSERT_X(!tran.id.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     Q_ASSERT_X(tran.id.sequence, Q_FUNC_INFO, "Transaction sequence MUST be filled!");
-    //Q_ASSERT(tran.id.peerGUID != qnCommon->moduleGUID() || tran.timestamp > 0);
-        //if we clean DB we can receive our old transaction with negative timestamp
+    if (tran.id.peerID == qnCommon->moduleGUID() && tran.id.dbID == m_dbManager->instance()->getID())
+        Q_ASSERT(tran.timestamp > 0);
 
     QSqlQuery query(m_dbManager->getDB());
     //query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, db_guid, sequence, timestamp, tran_guid, tran_data) values (?, ?, ?, ?, ?)");
