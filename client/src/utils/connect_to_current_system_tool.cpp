@@ -68,6 +68,7 @@ void QnConnectToCurrentSystemTool::updatePeers() {
     }
 
     m_updateFailed = false;
+    m_restartAllPeers = false;
     m_updateDialog->setTargets(m_updateTargets);
     m_updateDialog->show();
     m_prevToolState = QnMediaServerUpdateTool::CheckingForUpdates;
