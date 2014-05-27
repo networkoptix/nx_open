@@ -19,7 +19,7 @@
 
 namespace {
 
-const QString QN_UPDATES_URL = lit("http://localhost:8000/updates");
+const QString QN_UPDATES_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/updates");
 const QString buildInformationSuffix(lit("update"));
 const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
 const QString mutexName = lit("auto_update");
