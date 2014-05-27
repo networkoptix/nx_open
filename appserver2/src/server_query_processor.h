@@ -44,6 +44,7 @@ namespace ec2
         template<class QueryDataType, class HandlerType>
             void processUpdateAsync(QnTransaction<QueryDataType>& tran, HandlerType handler, void* dummy = 0 )
         {
+            Q_UNUSED(dummy)
             //TODO/IMPL this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
 

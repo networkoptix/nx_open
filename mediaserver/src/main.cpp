@@ -963,7 +963,7 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
         int port = moduleInformation.parameters.value("port").toInt();
         QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
         ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-        ec2Connection->addRemotePeer(url, false, moduleInformation.id);
+        ec2Connection->addRemotePeer(url, moduleInformation.id);
     }
 }
 void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
