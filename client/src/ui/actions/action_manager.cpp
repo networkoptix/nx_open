@@ -361,7 +361,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::DelayedOpenVideoWallItemAction).
         flags(Qn::NoTarget).
-        text(tr("Delayed Open VideoWall"));
+        text(tr("Delayed Open Video Wall"));
 
     factory(Qn::DelayedDropResourcesAction).
         flags(Qn::NoTarget).
@@ -442,19 +442,15 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Alarm/Event Rules..."));
 
-    factory(Qn::AddVideoWallItemsToUserAction).
-        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-        text(tr("Assign Screen to User"));
-
-    //TODO: #GDM VW check permissions
     factory(Qn::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
-        text(tr("Start Videowall control"));
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        text(tr("Control Video Wall")); //TODO: #VW #TR
 
-    //TODO: #GDM VW check permissions and desktop camera availability
+    //TODO: #GDM VW check desktop camera availability
     factory(Qn::PushMyScreenToVideowallAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Push my screen"));
 
     factory(Qn::QueueAppRestartAction).
@@ -620,7 +616,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SaveVideoWallReviewAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey | Qn::IntentionallyAmbiguous).
-        text(tr("Save VideoWall View")).
+        text(tr("Save Video Wall View")). //TODO: #VW #TR
         shortcut(tr("Ctrl+S")).
         autoRepeat(false).
         condition(new QnVideoWallReviewModeCondition(false, this));
@@ -880,7 +876,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenVideoWallsReviewAction).
        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-       text(tr("Open VideoWall(s)")).
+       text(tr("Open Video Wall(s)")). //TODO: #VW #TR
        condition(hasFlags(QnResource::videowall));
 
     factory(Qn::OpenInFolderAction).
@@ -893,7 +889,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::IdentifyVideoWallAction).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::VideoWallItemTarget).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission). //TODO: #GDM VW may be this action should be attached to the screens and require user permission?
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Identify")).
         autoRepeat(false).
         condition(new QnIdentifyVideoWallActionCondition(this));
@@ -901,17 +897,35 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::AttachToVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-//        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::SavePermission). //TODO: #GDM VW what if current layout is already saved and not ours?
-        text(tr("Attach to Video Wall")).
+        text(tr("Attach to Video Wall...")).
         autoRepeat(false).
         condition(hasFlags(QnResource::videowall));
 
     factory(Qn::StartVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission). //TODO: #GDM VW User permission?
-        text(tr("Start Video Wall")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        text(tr("Switch to Video Wall mode...")).  //TODO: #VW #TR
         autoRepeat(false).
-        condition(hasFlags(QnResource::videowall));
+        condition(new QnStartVideowallActionCondition(this));
+
+    factory(Qn::SaveVideowallMatrixAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        text(tr("Save Current Matrix")).
+        autoRepeat(false).
+        condition(new QnNonEmptyVideowallActionCondition(this));
+
+    factory(Qn::LoadVideowallMatrixAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::VideoWallMatrixTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        text(tr("Load Matrix"));
+
+    factory(Qn::DeleteVideowallMatrixAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallMatrixTarget | Qn::IntentionallyAmbiguous).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        text(tr("Delete")).
+        shortcut(tr("Del")).
+        autoRepeat(false);
 
     factory(Qn::ResetVideoWallLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
@@ -928,11 +942,11 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Stop Video Wall")).
         autoRepeat(false).
-        condition(hasFlags(QnResource::videowall));
+        condition(new QnNonEmptyVideowallActionCondition(this));
 
     factory(Qn::DetachFromVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).    //TODO: #GDM VW User permission!
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Detach Layout")).
         autoRepeat(false).
         condition(new QnDetachFromVideoWallActionCondition(this));
@@ -1173,7 +1187,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::RenameAction).
-        flags(Qn::Tree | Qn::SingleTarget |  Qn::ResourceTarget | Qn::VideoWallItemTarget).
+        flags(Qn::Tree | Qn::SingleTarget |  Qn::ResourceTarget | Qn::VideoWallItemTarget | Qn::VideoWallMatrixTarget).
         requiredPermissions(Qn::WritePermission | Qn::WriteNamePermission).
         text(tr("Rename")).
         shortcut(tr("F2")).
@@ -1243,7 +1257,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::VideowallSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Videowall Settings...")).
+        text(tr("Video Wall Settings...")).     //TODO: #VW #TR
         condition(new QnResourceActionCondition(hasFlags(QnResource::videowall), Qn::ExactlyOne, this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
@@ -1418,7 +1432,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::AddCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Bookmark Selection...")).
-        condition(new QnExportActionCondition(true, this));
+        condition(new QnAddBookmarkActionCondition(this));
 
     factory(Qn::EditCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).

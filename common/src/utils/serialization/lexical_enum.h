@@ -1,19 +1,33 @@
 #ifndef QN_LEXICAL_ENUM_H
 #define QN_LEXICAL_ENUM_H
 
-#include "lexical.h"
-
 #include <cassert>
 
-#include <type_traits> /* For std::true_type, std::false_type. */
+#include <type_traits> /* For std::integral_constant, std::declval, std::enable_if. */
 #include <utility> /* For std::move. */
 
 #include <QtCore/QHash>
 #include <QtCore/QString>
 
+#include <utils/common/type_traits.h>
+
+#include "lexical.h"
+#include "enum.h"
+
 struct QMetaObject;
 
 namespace QnLexicalDetail {
+    using namespace QnTypeTraits;
+
+    template<class T>
+    yes_type lexical_numeric_check_test(const T &, const decltype(lexical_numeric_check(std::declval<const T *>())) * = NULL);
+    no_type lexical_numeric_check_test(...);
+
+    template<class T>
+    struct is_numerically_serializable:
+        std::integral_constant<bool, sizeof(lexical_numeric_check_test(std::declval<T>())) == sizeof(yes_type)>
+    {};
+
 
     inline bool isNullString(const char *s) { return s == NULL; }
     inline bool isNullString(const QString &s) { return s.isNull(); }
@@ -112,8 +126,35 @@ namespace QnLexical {
     QnEnumLexicalSerializer<T> *newEnumSerializer() {
         return newEnumSerializer<T, T>();
     }
+
+    /**
+     * This metafunction returns whether the lexical serialization functions
+     * for the given enum type use numeric serialization, i.e. serialize
+     * it as a number.
+     */
+    template<class T>
+    struct is_numerically_serializable:
+        QnLexicalDetail::is_numerically_serializable<T>
+    {};
+
+    template<class T>
+    struct is_numerically_serializable_enum_or_flags:
+        std::integral_constant<
+            bool, 
+            is_numerically_serializable<T>::value && QnSerialization::is_enum_or_flags<T>::value
+        >
+    {};
+
+
 } // namespace QnLexical
 
+
+/**
+ * This macro is here just for the uniformity. It performs the same function
+ * as the corresponding declaration macro, and thus is redundant.
+ */
+#define QN_FUSION_DEFINE_FUNCTIONS_numeric(TYPE, ... /* PREFIX */)              \
+__VA_ARGS__ bool lexical_numeric_check(const TYPE *);
 
 
 /**

@@ -4,7 +4,7 @@
 
 #include <core/ptz/ptz_preset.h>
 
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 
 namespace {
     const qreal minimalSpeed = 0.01;

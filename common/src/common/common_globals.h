@@ -355,6 +355,8 @@ public:
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
+        UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
+        KeyboardModifiersRole,                      /**< Role for keyboard modifiers. Used in some Drop actions. */
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
@@ -424,13 +426,13 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
 
     enum PropertyDataType { 
-        PDT_None, 
-        PDT_Value, 
-        PDT_OnOff, 
-        PDT_Boolen, 
-        PDT_MinMaxStep, 
-        PDT_Enumeration, 
-        PDT_Button 
+        PDT_None        = 0, 
+        PDT_Value       = 1, 
+        PDT_OnOff       = 2, 
+        PDT_Boolen      = 3, 
+        PDT_MinMaxStep  = 4, 
+        PDT_Enumeration = 5, 
+        PDT_Button      = 6 
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PropertyDataType)
 
@@ -438,7 +440,8 @@ public:
     enum SerializationFormat {
         JsonFormat,
         BnsFormat,
-        CsvFormat
+        CsvFormat,
+        XmlFormat
     };
 
 
@@ -470,13 +473,21 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner)(Qn::CameraDataType)(Qn::PtzDataFields), (metatype))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::TimePeriodContent)(Qn::Corner)(Qn::CameraDataType), 
+    (metatype)
+)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
-        (Qn::SerializationFormat), 
-    (metatype)(lexical)(json)
+        (Qn::SerializationFormat)(Qn::PropertyDataType), 
+    (metatype)(lexical)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::PtzCapabilities),
+    (metatype)(numeric)
 )
 
 #endif // QN_COMMON_GLOBALS_H

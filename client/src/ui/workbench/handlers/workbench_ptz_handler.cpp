@@ -6,7 +6,7 @@
 
 #include <api/app_server_connection.h>
 
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 #include <utils/resource_property_adaptors.h>
 
 #include <common/common_globals.h>
@@ -243,8 +243,8 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered() {
     if(!getDevicePosition(controller, &position))
         return;
 
-    qreal startZ = -1.0;
-    qreal endZ = 1.0;
+    qreal startZ = 0.0;
+    qreal endZ = 0.521385;
 
     for(int i = 0; i <= 20; i++) {
         position.setZ(startZ + (endZ - startZ) * i / 20.0);
@@ -261,7 +261,7 @@ void QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered() {
         getDevicePosition(controller, &cameraPosition);
         qDebug() << "SENT POSITION" << position << "GOT POSITION" << cameraPosition;
 
-        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(position.z(), 0, 'f', 2)));
+        menu()->trigger(Qn::TakeScreenshotAction, QnActionParameters(widget).withArgument<QString>(Qn::FileNameRole, tr("PTZ_CALIBRATION_%1.jpg").arg(position.z(), 0, 'f', 4)));
     }
 }
 

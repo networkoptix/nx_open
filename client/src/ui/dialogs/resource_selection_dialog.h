@@ -42,7 +42,6 @@ public:
 
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
-    virtual bool event(QEvent *event) override;
 
     QnResourceList selectedResourcesInner(const QModelIndex &parent = QModelIndex()) const;
     int setSelectedResourcesInner(const QnResourceList &selected, const QModelIndex &parent = QModelIndex());
@@ -54,8 +53,7 @@ private slots:
     QModelIndex itemIndexAt(const QPoint &pos) const;
     void updateThumbnail(const QModelIndex &index);
 private:
-    void init(SelectionTarget target);
-
+    void init();
 private:
     QScopedPointer<Ui::ResourceSelectionDialog> ui;
     QnResourcePoolModel *m_resourceModel;

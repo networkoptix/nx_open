@@ -29,6 +29,8 @@ public:
 
     static QnVideoWallItemIndexList videoWallItems(const QVariant &items);
 
+    static QnVideoWallMatrixIndexList videoWallMatrices(const QVariant &items);
+
     static QnWorkbenchLayoutList layouts(const QVariant &items);
 
     static QnResourceWidgetList widgets(const QVariant &items);

@@ -10,15 +10,29 @@
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, BrushStyle, static)
 
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(Qt::BrushStyle, static)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(QnLatin1Array)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(QColor)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(QUrl)
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
+    (QnLatin1Array)(QColor)(QUrl),
+    (json_lexical)
+)
 
 QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
     (QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QVector2D)(QVector3D)(QVector4D),
     (json)
 )
+
+void serialize(QnJsonContext *ctx, const QByteArray &value, QJsonValue *target) {
+    ::serialize(ctx, QString::fromLatin1(value.toBase64()), target); /* Note the direct call instead of invocation through QJson. */
+}
+
+bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QByteArray *target) {
+    QString string;
+    if(!::deserialize(ctx, value, &string)) /* Note the direct call instead of invocation through QJson. */
+        return false;
+
+    // TODO: #Elric we don't check for validity, this is not good.
+    *target = QByteArray::fromBase64(string.toLatin1());
+    return true;
+}
 
 void serialize(QnJsonContext *ctx, const QRegion &value, QJsonValue *target) {
     QJson::serialize(ctx, value.rects(), target);

@@ -140,7 +140,13 @@ CameraDiagnostics::Result QnPlVmax480Resource::initInternal()
     QnPhysicalCameraResource::initInternal();
     Qn::CameraCapabilities addFlags = Qn::PrimaryStreamSoftMotionCapability;
     setCameraCapabilities(getCameraCapabilities() | addFlags);
-    save();
+
+    //detecting and saving selected resolutions
+    CameraMediaStreams mediaStreams;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(640, 480), CODEC_ID_H264 ) );
+    saveResolutionList( mediaStreams );
+
+    saveParams();
 
     QMutexLocker lock(&m_chunkReaderMutex);
     QnVMax480ChunkReader* chunkReader = m_chunkReaderMap.value(getHostAddress());

@@ -132,8 +132,8 @@ private slots:
     void at_updateReply_finished();
     void at_buildReply_finished();
 
-    void at_mutexLocked(const QString &name);
-    void at_mutexTimeout(const QString &name);
+    void at_mutexLocked();
+    void at_mutexTimeout();
 
     void at_downloadTask_finished(int errorCode);
     void at_uploadTask_finished(int errorCode);
@@ -181,7 +181,7 @@ private:
     QHash<QnSystemInformation, UpdateFileInformationPtr> m_updateFiles;
 
     QNetworkAccessManager *m_networkAccessManager;
-    ec2::QnDistributedMutexPtr m_distributedMutex;
+    ec2::QnDistributedMutex *m_distributedMutex;
 
     QHash<QnId, PeerUpdateInformation> m_updateInformationById;
     QMultiHash<QnSystemInformation, QnId> m_idBySystemInformation;

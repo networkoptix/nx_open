@@ -21,10 +21,10 @@ QnProxyReceiverConnection::QnProxyReceiverConnection(QSharedPointer<AbstractStre
     setObjectName( lit("QnProxyReceiverConnection") );
 }
 
-static bool isLocalAddress(const QString& addr)
-{
-    return addr == lit("localhost") || addr == lit("127.0.0.1");
-}
+//static bool isLocalAddress(const QString& addr)
+//{
+//    return addr == lit("localhost") || addr == lit("127.0.0.1");
+//}
 
 void QnProxyReceiverConnection::run()
 {
@@ -49,11 +49,7 @@ void QnProxyReceiverConnection::run()
 
 
     sendResponse("PROXY", 200, QByteArray());
-#ifdef USE_NX_HTTP
     QString guid = d->request.requestLine.url.path();
-#else
-    QString guid = d->requestHeaders.path();
-#endif
     if ((dynamic_cast<QnUniversalTcpListener*>(d->owner))->registerProxyReceiverConnection(guid, d->socket)) {
         d->takeSocketOwnership = true; // remove ownership from socket
         d->socket.clear();

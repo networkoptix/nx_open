@@ -1,9 +1,11 @@
 #include "workaround_ptz_controller.h"
 
+#include <common/common_module.h>
+
 #include <utils/math/math.h>
 #include <utils/math/coordinate_transformations.h>
+#include <utils/serialization/lexical_functions.h>
 
-#include <common/common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -23,16 +25,9 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     m_octagonal = resourceData.value<bool>(lit("octagonalPtz"), false);
     
     QString ptzCapabilities = resourceData.value<QString>(lit("ptzCapabilities")); 
-    
     if(!ptzCapabilities.isEmpty()) {
-        // TODO: #Elric #enum evil. implement via enum name mapper flags.
-
-        if(ptzCapabilities == lit("NoPtzCapabilities")) {
+        if(QnLexical::deserialize(ptzCapabilities, &m_capabilities)) {
             m_overrideCapabilities = true;
-            m_capabilities = Qn::NoPtzCapabilities;
-        } else if(ptzCapabilities == lit("ContinuousZoomCapability")) {
-            m_overrideCapabilities = true;
-            m_capabilities = Qn::ContinuousZoomCapability;
         } else {
             qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
         }

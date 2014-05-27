@@ -100,6 +100,8 @@ namespace ec2
         //!Response parse error
         badResponse,
         skipped,
+        //!Error executing DB request
+        dbError,
         //!Method is not implemented yet
         notImplemented
     };

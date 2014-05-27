@@ -52,7 +52,6 @@ namespace ec2
         QString             physicalId;
         bool                manuallyAdded;
         QString             model;
-        QString             firmware;
         QString             groupId;
         QString             groupName;
         Qn::SecondStreamQuality    secondaryStreamQuality;
@@ -62,7 +61,7 @@ namespace ec2
         QString             vendor;
     };
 #define ApiCameraData_Fields ApiResourceData_Fields (scheduleDisabled)(motionType)(motionMask)(mac)(login)(password)(scheduleTasks)(audioEnabled)(physicalId)(manuallyAdded)(model) \
-                            (firmware)(groupId)(groupName)(secondaryStreamQuality)(controlDisabled)(statusFlags)(dewarpingParams)(vendor)
+                            (groupId)(groupName)(secondaryStreamQuality)(controlDisabled)(statusFlags)(dewarpingParams)(vendor)
 
 } // namespace ec2
 

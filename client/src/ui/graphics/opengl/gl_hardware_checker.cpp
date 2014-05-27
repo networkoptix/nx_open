@@ -22,10 +22,12 @@ bool QnGlHardwareChecker::checkCurrentContext(bool displayWarnings) {
     bool softwareTrouble = false;
     bool hardwareTrouble = false;
 
-    QnSoftwareVersion version(versionString);
-    if (version < QnSoftwareVersion(2, 0, 0, 0)) {
-        qnWarning("OpenGL version %1 is not supported.", versionString);
-        softwareTrouble = true;
+    if (!versionString.contains("ES 2.0")) { //TODO: #asinaisky more strict check required
+        QnSoftwareVersion version(versionString);
+        if (version < QnSoftwareVersion(2, 0, 0, 0)) {
+            qnWarning("OpenGL version %1 is not supported.", versionString);
+            softwareTrouble = true;
+        }
     }
 
     /* Note that message will be shown in destructor, 

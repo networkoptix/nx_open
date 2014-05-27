@@ -5,8 +5,8 @@
 
 #include <utils/common/connective.h>
 
-#include <utils/serialization/json.h>
-#include <utils/serialization/lexical.h>
+#include <utils/serialization/json_functions.h>
+#include <utils/serialization/lexical_functions.h>
 
 #include <core/resource/resource_fwd.h>
 

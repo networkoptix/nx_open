@@ -10,12 +10,12 @@
 #include <QtCore/QMutexLocker>
 #include <QtConcurrent>
 
+#include <network/authenticate_helper.h>
 #include <network/universal_tcp_listener.h>
 
 #include "ec2_connection.h"
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
-#include "rest/ec2_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
 #include "rest/server/rest_connection_processor.h"
 #include "transaction/transaction.h"
@@ -74,9 +74,9 @@ namespace ec2
         using namespace std::placeholders;
 
         //AbstractResourceManager::getResourceTypes
-        registerGetFuncHandler<nullptr_t, ApiResourceTypeDataList>( restProcessorPool, ApiCommand::getResourceTypes );
+        registerGetFuncHandler<std::nullptr_t, ApiResourceTypeDataList>( restProcessorPool, ApiCommand::getResourceTypes );
         //AbstractResourceManager::getResource
-        //registerGetFuncHandler<nullptr_t, ApiResourceData>( restProcessorPool, ApiCommand::getResource );
+        //registerGetFuncHandler<std::nullptr_t, ApiResourceData>( restProcessorPool, ApiCommand::getResource );
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiSetResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
         //AbstractResourceManager::setResourceDisabled
@@ -92,7 +92,7 @@ namespace ec2
 
 
         //AbstractMediaServerManager::getServers
-        registerGetFuncHandler<nullptr_t, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServerList );
+        registerGetFuncHandler<std::nullptr_t, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServerList );
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>( restProcessorPool, ApiCommand::saveMediaServer );
         //AbstractMediaServerManager::remove
@@ -108,16 +108,16 @@ namespace ec2
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
         //AbstractCameraManager::getCameraHistoryList
-        registerGetFuncHandler<nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryList );
+        registerGetFuncHandler<std::nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryList );
         //AbstractCameraManager::getBookmarkTags
-        registerGetFuncHandler<nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
+        registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
 
         //TODO AbstractLicenseManager
         registerUpdateFuncHandler<ApiLicenseDataList>( restProcessorPool, ApiCommand::addLicenses );
 
 
         //AbstractBusinessEventManager::getBusinessRules
-        registerGetFuncHandler<nullptr_t, ApiBusinessRuleDataList>( restProcessorPool, ApiCommand::getBusinessRuleList );
+        registerGetFuncHandler<std::nullptr_t, ApiBusinessRuleDataList>( restProcessorPool, ApiCommand::getBusinessRuleList );
         //AbstractBusinessEventManager::save
         registerUpdateFuncHandler<ApiBusinessRuleData>( restProcessorPool, ApiCommand::saveBusinessRule );
         //AbstractBusinessEventManager::deleteRule
@@ -132,14 +132,14 @@ namespace ec2
 
 
         //AbstractUserManager::getUsers
-        registerGetFuncHandler<nullptr_t, ApiUserDataList>( restProcessorPool, ApiCommand::getUserList );
+        registerGetFuncHandler<std::nullptr_t, ApiUserDataList>( restProcessorPool, ApiCommand::getUserList );
         //AbstractUserManager::save
         registerUpdateFuncHandler<ApiUserData>( restProcessorPool, ApiCommand::saveUser );
         //AbstractUserManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeUser );
 
         //AbstractVideowallManager::getVideowalls
-        registerGetFuncHandler<nullptr_t, ApiVideowallDataList>( restProcessorPool, ApiCommand::getVideowallList );
+        registerGetFuncHandler<std::nullptr_t, ApiVideowallDataList>( restProcessorPool, ApiCommand::getVideowallList );
         //AbstractVideowallManager::save
         registerUpdateFuncHandler<ApiVideowallData>( restProcessorPool, ApiCommand::saveVideowall );
         //AbstractVideowallManager::remove
@@ -147,7 +147,7 @@ namespace ec2
         registerUpdateFuncHandler<ApiVideowallControlMessageData>( restProcessorPool, ApiCommand::videowallControl );
 
         //AbstractLayoutManager::getLayouts
-        registerGetFuncHandler<nullptr_t, ApiLayoutDataList>( restProcessorPool, ApiCommand::getLayoutList );
+        registerGetFuncHandler<std::nullptr_t, ApiLayoutDataList>( restProcessorPool, ApiCommand::getLayoutList );
         //AbstractLayoutManager::save
         registerUpdateFuncHandler<ApiLayoutDataList>( restProcessorPool, ApiCommand::saveLayouts );
         //AbstractLayoutManager::remove
@@ -176,17 +176,17 @@ namespace ec2
         registerUpdateFuncHandler<ApiModuleData>(restProcessorPool, ApiCommand::moduleInfo);
 
         //ApiResourceParamList
-        registerGetFuncHandler<nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );
+        registerGetFuncHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );
         registerUpdateFuncHandler<ApiResourceParamDataList>( restProcessorPool, ApiCommand::saveSettings );
 
         //AbstractECConnection
-        registerGetFuncHandler<nullptr_t, qint64>( restProcessorPool, ApiCommand::getCurrentTime );
+        registerGetFuncHandler<std::nullptr_t, qint64>( restProcessorPool, ApiCommand::getCurrentTime );
 
 
         //AbstractECConnectionFactory
-        registerFunctorHandler<LoginInfo, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
+        registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
             std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
-        registerFunctorHandler<LoginInfo, QnConnectionInfo>( restProcessorPool, ApiCommand::testConnection,
+        registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::testConnection,
             std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
     }
 
@@ -199,7 +199,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        LoginInfo loginInfo;
+        ApiLoginData loginInfo;
         QnConnectionInfo connectionInfo;
         fillConnectionInfo( loginInfo, &connectionInfo );   //todo: #ak not appropriate here
         connectionInfo.ecUrl = url;
@@ -225,16 +225,18 @@ namespace ec2
         //        AbstractECConnectionPtr connection = it->second.second;
         //}
 
-        LoginInfo loginInfo;
+        ApiLoginData loginInfo;
+        loginInfo.login = addr.userName();
+        loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
 #if 1
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
-        m_remoteQueryProcessor.processQueryAsync<LoginInfo, QnConnectionInfo>(
+        m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             addr, ApiCommand::connect, loginInfo, func );
 #else
         //TODO: #ak investigate, what's wrong with following code
         using namespace std::placeholders;
-        m_remoteQueryProcessor.processQueryAsync<LoginInfo, QnConnectionInfo>(
+        m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             ApiCommand::connect, loginInfo, std::bind(&Ec2DirectConnectionFactory::remoteConnectionFinished, this, _1, _2) );
 #endif
         return reqID;
@@ -271,14 +273,13 @@ namespace ec2
     }
 
     ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
-        const LoginInfo& /*loginInfo*/,
+        const ApiLoginData& /*loginInfo*/,
         QnConnectionInfo* const connectionInfo )
     {
-        //TODO/IMPL
         connectionInfo->version = qnCommon->engineVersion();
         connectionInfo->brand = lit(QN_PRODUCT_NAME_SHORT);
-        connectionInfo->ecsGuid = lit( "ECS_HUID" );
         connectionInfo->systemName = qnCommon->localSystemName();
+        connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
 
         return ErrorCode::ok;
     }
@@ -287,7 +288,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         QnConnectionInfo connectionInfo;
-        fillConnectionInfo( LoginInfo(), &connectionInfo );
+        fillConnectionInfo( ApiLoginData(), &connectionInfo );
         QnScopedThreadRollback ensureFreeThread(1);
         QtConcurrent::run( std::bind( &impl::TestConnectionHandler::done, handler, reqID, ec2::ErrorCode::ok, connectionInfo ) );
         return reqID;
@@ -297,10 +298,12 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        LoginInfo loginInfo;
+        ApiLoginData loginInfo;
+        loginInfo.login = addr.userName();
+        loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteTestConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
-        m_remoteQueryProcessor.processQueryAsync<LoginInfo, QnConnectionInfo>(
+        m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             addr, ApiCommand::testConnection, loginInfo, func );
         return reqID;
     }

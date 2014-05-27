@@ -57,16 +57,16 @@ private:
 #endif // QN_NO_QT
 
 
-/* Disable ADL wrapping for stream types as they are not convertible to anything
+/* Disable conversion wrapping for stream types as they are not convertible to anything
  * anyway. Also when wrapping is enabled, ADL fails to find template overloads. */
 
 template<class Input>
-QnInputBinaryStream<Input> *adl_wrap(QnInputBinaryStream<Input> *value) {
+QnInputBinaryStream<Input> *disable_user_conversions(QnInputBinaryStream<Input> *value) {
     return value;
 }
 
 template<class Output>
-QnOutputBinaryStream<Output> adl_wrap(QnOutputBinaryStream<Output> *value) {
+QnOutputBinaryStream<Output> disable_user_conversions(QnOutputBinaryStream<Output> *value) {
     return value;
 }
 

@@ -16,6 +16,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
+#include <utils/media/ffmpeg_helper.h>
 #include <utils/media/media_stream_cache.h>
 #include <version.h>
 
@@ -422,7 +423,10 @@ namespace nx_hls
                 &session );
             if( result != nx_http::StatusCode::ok )
                 return result;
-            HLSSessionPool::instance()->add( session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT );
+            if( !HLSSessionPool::instance()->add( session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT ) )
+            {
+                assert( false );
+            }
         }
 
         if( chunkedParamIter == requestParams.end() )

@@ -218,14 +218,15 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
 
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
-    //!MUST be overridden for camera with input port. Default implementation does noting
+    //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
-        Excess calls of this method is legal and MUST be correctly handled in implementation
+        \warning Excess calls of this method is legal and MUST be correctly handled in implementation
+        \return true, if started input port monitoring
     */
     virtual bool startInputPortMonitoring();
-    //!MUST be overridden for camera with input port. Default implementation does noting
+    //!MUST be overridden for camera with input port. Default implementation does nothing
     /*!
-        Excess calls of this method is legal and MUST be correctly handled in implementation
+        \warning Excess calls of this method is legal and MUST be correctly handled in implementation
     */
     virtual void stopInputPortMonitoring();
     virtual bool isInputPortMonitored() const;
@@ -252,7 +253,6 @@ private:
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
-    QString m_firmware;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

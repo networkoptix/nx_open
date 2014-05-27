@@ -139,7 +139,7 @@ namespace ec2
                 outData = currentTime;
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, qint64, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, qint64, decltype(queryDoneHandler)> (
             ApiCommand::getCurrentTime, nullptr, queryDoneHandler );
 
         return reqID;
@@ -172,7 +172,7 @@ namespace ec2
                 fromApiToResourceList(settings, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiResourceParamDataList, decltype(queryDoneHandler)> ( ApiCommand::getSettings, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiResourceParamDataList, decltype(queryDoneHandler)> ( ApiCommand::getSettings, nullptr, queryDoneHandler);
         return reqID;
     }
 

@@ -6,7 +6,7 @@ sys.path.append(basedir + '/' + '../..')
 
 from main import get_environment_variable, cd
 
-qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}', '${qtlib9}', '${qtlib10}', '${qtlib11}', '${qtlib12}', '${qtlib13}', '${qtlib14}', '${qtlib15}', '${qtlib16}', '${qtlib17}']
+qtlibs = ['${qtlib1}', '${qtlib2}', '${qtlib3}', '${qtlib4}', '${qtlib5}', '${qtlib6}', '${qtlib7}', '${qtlib8}', '${qtlib9}', '${qtlib10}', '${qtlib11}', '${qtlib12}', '${qtlib13}', '${qtlib14}', '${qtlib15}', '${qtlib16}', '${qtlib17}', '${qtlib18}', '${qtlib19}', '${qtlib20}']
 qtplugins = ['${qtplugin1}', '${qtplugin2}', '${qtplugin3}']
 qtbasedir = '${qt.dir}/..'
 
@@ -49,6 +49,11 @@ def extract(tar_url, extract_path='.'):
     tar.close() 
     os.unlink(file)
 if __name__ == '__main__':        
+
+    buildenv = join('${project.build.directory}', 'buildenv2.timestamp')
+    if os.path.exists(buildenv): 
+        os.unlink(buildenv)
+
     print '+++++++++++++++++++++ EXPANDING LIBS +++++++++++++++++++++'
             
     for file in os.listdir('.'):
@@ -111,7 +116,7 @@ if __name__ == '__main__':
                 if not os.path.exists(target_plugins):
                     os.makedirs(join(target_dir, config, 'plugins'))
                 for file in os.listdir(lib_source_dir):
-                    if fnmatch.fnmatch(file, 'icu*.dll'):
+                    if fnmatch.fnmatch(file, 'icu*.dll') or fnmatch.fnmatch(file, 'lib*.dll'):
                         print (join(lib_source_dir, file))
                         shutil.copy2(join(lib_source_dir, file), join(target_dir, config))                    
                 #shutil.copytree(join('${project.build.directory}/bin', config, 'vox'), target_vox)                        z
@@ -162,3 +167,5 @@ if __name__ == '__main__':
                     if os.path.exists(target):
                         shutil.rmtree(target)
                     shutil.copytree(join(plugin_source_dir, qtplugin), target)                          
+    if not os.path.exists(buildenv): 
+        open(buildenv, 'w').close() 

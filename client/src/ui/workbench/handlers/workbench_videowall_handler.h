@@ -35,17 +35,22 @@ private:
     ec2::AbstractECConnectionPtr connection2() const;
 
     void attachLayout(const QnVideoWallResourcePtr &videoWall, const QnLayoutResourcePtr &layout, const QnVideowallAttachSettings &settings);
-    void resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout, bool closeClient);
+    void resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout);
+    void swapLayouts(const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout);
 
     /** Updates item's layout with provided value. Provided layout should be saved. */
     void updateItemsLayout(const QnVideoWallItemIndexList &items, const QnId &layoutId);
 
-    bool startVideoWall(const QnVideoWallResourcePtr &videoWall);
+    bool canStartVideowall(const QnVideoWallResourcePtr &videowall);
+
+    /** Sync check that we can close client silently. Ask about unsaved layouts etc. */
+    bool canClose();
+
     void startVideowallAndExit(const QnVideoWallResourcePtr &videoWall);
 
     void openNewWindow(const QStringList &args);
     void openVideoWallItem(const QnVideoWallResourcePtr &videoWall);
-    void closeInstance();
+    void closeInstanceDelayed();
     void sendInstanceGuid();
 
     void setControlMode(bool active);
@@ -63,9 +68,11 @@ private:
     QnLayoutResourcePtr findExistingResourceLayout(const QnResourcePtr &resource) const;
     QnLayoutResourcePtr constructLayout(const QnResourceList &resources) const;
 
+    static QString shortcutPath();
+    bool shortcutExists(const QnVideoWallResourcePtr &videowall) const;
+    bool createShortcut(const QnVideoWallResourcePtr &videowall);
 private slots:
     void at_connection_opened();
-    void at_context_userChanged();
 
     void at_newVideoWallAction_triggered();
     void at_attachToVideoWallAction_triggered();
@@ -77,15 +84,15 @@ private slots:
     void at_delayedOpenVideoWallItemAction_triggered();
     void at_renameAction_triggered();
     void at_identifyVideoWallAction_triggered();
-    void at_addVideoWallItemsToUserAction_triggered();
     void at_startVideoWallControlAction_triggered();
     void at_openVideoWallsReviewAction_triggered();
     void at_saveVideoWallReviewAction_triggered();
     void at_dropOnVideoWallItemAction_triggered();
     void at_pushMyScreenToVideowallAction_triggered();
     void at_videowallSettingsAction_triggered();
-
-    void at_videoWall_layout_saved(int status, const QnResourceList &resources, int handle);
+    void at_saveVideowallMatrixAction_triggered();
+    void at_loadVideowallMatrixAction_triggered();
+    void at_deleteVideowallMatrixAction_triggered();
 
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
@@ -207,19 +214,6 @@ private:
     } m_controlMode;
 
     QHash<QUuid, ScreenSnaps> m_screenSnapsByUuid;
-
-    struct AttachData {
-        QnVideoWallItemIndexList items;
-        QnLayoutResourcePtr layout;
-        bool closeClient;
-    };
-
-    struct ResetData {
-        QnVideoWallItemIndexList items;
-        bool closeClient;
-    };
-    QHash<int, ResetData> m_resetting;
-
     QnVideowallAttachSettings m_attachSettings;
 };
 

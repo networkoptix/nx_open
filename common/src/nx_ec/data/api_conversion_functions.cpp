@@ -18,6 +18,7 @@
 #include <core/resource/camera_bookmark.h>
 
 #include <nx_ec/ec_api.h>
+#include <network/authenticate_helper.h>
 
 #include "api_business_rule_data.h"
 #include "api_camera_data.h"
@@ -32,6 +33,7 @@
 #include "api_resource_type_data.h"
 #include "api_user_data.h"
 #include "api_videowall_data.h"
+
 
 namespace ec2 {
 
@@ -79,7 +81,7 @@ void fromResourceToApi(const QnBusinessEventRulePtr &src, ApiBusinessRuleData &d
 }
 
 void fromApiToResourceList(const ApiBusinessRuleDataList &src, QnBusinessEventRuleList &dst, QnResourcePool *resourcePool) {
-    dst.reserve(dst.size() + src.size());
+    dst.reserve(dst.size() + (int)src.size());
     for(const ApiBusinessRuleData &srcRule: src) {
         dst.push_back(QnBusinessEventRulePtr(new QnBusinessEventRule()));
         fromApiToResource(srcRule, dst.back(), resourcePool);
@@ -155,7 +157,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setAuth(auth);
 
     QnScheduleTaskList tasks;
-    tasks.reserve(src.scheduleTasks.size());
+    tasks.reserve((int)src.scheduleTasks.size());
     for(const ApiScheduleTaskData &srcTask: src.scheduleTasks) {
         tasks.push_back(QnScheduleTask());
         fromApiToResource(srcTask, tasks.back(), src.id);
@@ -166,7 +168,6 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setPhysicalId(src.physicalId);
     dst->setManuallyAdded(src.manuallyAdded);
     dst->setModel(src.model);
-    dst->setFirmware(src.firmware);
     dst->setGroupId(src.groupId);
     dst->setGroupName(src.groupName);
     dst->setSecondaryStreamQuality(src.secondaryStreamQuality);
@@ -200,7 +201,6 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.physicalId = src->getPhysicalId();
     dst.manuallyAdded = src->isManuallyAdded();
     dst.model = src->getModel();
-    dst.firmware = src->getFirmware();
     dst.groupId = src->getGroupId();
     dst.groupName = src->getGroupName();
     dst.secondaryStreamQuality = src->secondaryStreamQuality();
@@ -212,7 +212,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
 
 template<class List> 
 void fromApiToResourceList(const ApiCameraDataList &src, List &dst, QnResourceFactory *factory, const overload_tag &) {
-    dst.reserve(dst.size() + src.size());
+    dst.reserve(dst.size() + (int)src.size());
     for(const ApiCameraData &srcCamera: src) {
         QnVirtualCameraResourcePtr dstCamera = factory->createResource(srcCamera.typeId, QnResourceParams(srcCamera.url, srcCamera.vendor)).dynamicCast<QnVirtualCameraResource>();
         if (dstCamera) {
@@ -399,7 +399,7 @@ void fromResourceToApi(const QnLayoutResourcePtr &src, ApiLayoutData &dst) {
 
 template<class List>
 void fromApiToResourceList(const ApiLayoutDataList &src, List &dst, const overload_tag &) {
-    dst.reserve(dst.size() + src.size());
+    dst.reserve(dst.size() + (int)src.size());
     for(const ApiLayoutData &srcLayout: src) {
         QnLayoutResourcePtr dstLayout(new QnLayoutResource());
         fromApiToResource(srcLayout, dstLayout);
@@ -442,7 +442,7 @@ void fromResourceListToApi(const QnLicenseList &src, ApiLicenseDataList &dst) {
 }
 
 void fromApiToResourceList(const ApiLicenseDataList &src, QnLicenseList &dst) {
-    dst.reserve(dst.size() + src.size());
+    dst.reserve(dst.size() + (int)src.size());
     for(const ApiLicenseData &srcLicense: src) {
         dst.push_back(QnLicensePtr(new QnLicense()));
         fromApiToResource(srcLicense, dst.back());
@@ -533,7 +533,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
 
 template<class List> 
 void fromApiToResourceList(const ApiMediaServerDataList &src, List &dst, const ResourceContext &ctx, const overload_tag &) {
-    dst.reserve(dst.size() + src.size());
+    dst.reserve(dst.size() + (int)src.size());
     for(const ApiMediaServerData &srcServer: src) {
         QnMediaServerResourcePtr dstServer(new QnMediaServerResource(ctx.resTypePool));
         fromApiToResource(srcServer, dstServer, ctx);
@@ -585,7 +585,7 @@ void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
 }
 
 void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, QnResourceFactory *factory) {
-    dst.reserve(dst.size() + src.size());
+    dst.reserve(dst.size() + (int)src.size());
     for(const ApiResourceData &srcResource: src) {
         dst.push_back(factory->createResource(srcResource.typeId, QnResourceParams(srcResource.url, QString())));
         fromApiToResource(srcResource, dst.back());
@@ -593,13 +593,13 @@ void fromApiToResourceList(const ApiResourceDataList &src, QnResourceList &dst, 
 }
 
 void fromResourceListToApi(const QnKvPairList &src, ApiResourceParamDataList &dst) {
-    dst.resize(dst.size() + src.size());
+    dst.reserve(dst.size() + src.size());
     for (const QnKvPair &srcParam: src)
         dst.push_back(ApiResourceParamData(srcParam.name(), srcParam.value(), false));
 }
 
 void fromApiToResourceList(const ApiResourceParamDataList &src, QnKvPairList &dst) {
-    dst.reserve(dst.size() + src.size());
+    dst.reserve(dst.size() + (int)src.size());
 
     for(const ApiResourceParamData &srcParam: src)
         dst.push_back(QnKvPair(srcParam.name, srcParam.value));
@@ -634,7 +634,7 @@ void fromApiToResource(const ApiResourceTypeData &src, QnResourceTypePtr &dst) {
 
     if (!src.parentId.empty())
         dst->setParentId(src.parentId[0]);
-    for (int i = 1; i < src.parentId.size(); ++i)
+    for (size_t i = 1; i < src.parentId.size(); ++i)
         dst->addAdditionalParent(src.parentId[i]);
 
     for(const ApiPropertyTypeData &p: src.propertyTypes) {
@@ -645,7 +645,7 @@ void fromApiToResource(const ApiResourceTypeData &src, QnResourceTypePtr &dst) {
 }
 
 void fromApiToResourceList(const ApiResourceTypeDataList &src, QnResourceTypeList &dst) {
-    dst.reserve(src.size() + dst.size());
+    dst.reserve((int)src.size() + dst.size());
 
     for(const ApiResourceTypeData &srcType: src) {
         dst.push_back(QnResourceTypePtr(new QnResourceType()));
@@ -681,9 +681,7 @@ void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
         dst.hash.append("$");
         dst.hash.append(md5.result().toHex());
 
-        md5.reset();
-        md5.addData(QString(lit("%1:NetworkOptix:%2")).arg(src->getName(), password).toLatin1());
-        dst.digest = md5.result().toHex();
+        dst.digest = QnAuthHelper::createUserPasswordDigest( src->getName(), password );
     }
     else
     {
@@ -699,7 +697,7 @@ void fromResourceToApi(const QnUserResourcePtr &src, ApiUserData &dst) {
 
 template<class List>
 void fromApiToResourceList(const ApiUserDataList &src, List &dst, const overload_tag &) {
-    dst.reserve(dst.size() + src.size());
+    dst.reserve(dst.size() + (int)src.size());
 
     for(const ApiUserData &srcUser: src) {
         QnUserResourcePtr dstUser(new QnUserResource());
@@ -715,7 +713,6 @@ void fromApiToResourceList(const ApiUserDataList &src, QnResourceList &dst) {
 void fromApiToResourceList(const ApiUserDataList &src, QnUserResourceList &dst) {
     fromApiToResourceList(src, dst, overload_tag());
 }
-
 
 void fromApiToResource(const ApiVideowallItemData &src, QnVideoWallItem &dst) {
     dst.uuid       = src.guid;
@@ -735,6 +732,28 @@ void fromResourceToApi(const QnVideoWallItem &src, ApiVideowallItemData &dst) {
     dst.width       = src.geometry.width();
     dst.height      = src.geometry.height();
 }
+
+void fromApiToResource(const ApiVideowallMatrixData &src, QnVideoWallMatrix &dst) {
+    dst.uuid       = src.id;
+    dst.name       = src.name;
+    dst.layoutByItem.clear();
+    for (const ApiVideowallMatrixItemData &item: src.items)
+        dst.layoutByItem[item.itemGuid] = item.layoutGuid;
+}
+
+void fromResourceToApi(const QnVideoWallMatrix &src, ApiVideowallMatrixData &dst) {
+    dst.id          = src.uuid;
+    dst.name        = src.name;
+    dst.items.clear();
+    dst.items.reserve(src.layoutByItem.size());
+    for (auto it = src.layoutByItem.constBegin(); it != src.layoutByItem.constEnd(); ++it) {
+        ApiVideowallMatrixItemData item;
+        item.itemGuid = it.key();
+        item.layoutGuid = it.value();
+        dst.items.push_back(item);
+    }
+}
+
 
 void fromApiToResource(const ApiVideowallScreenData &src, QnVideoWallPcData::PcScreen &dst) {
     dst.index            = src.pcIndex;
@@ -764,7 +783,7 @@ void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst)
         outItems << QnVideoWallItem();
         fromApiToResource(item, outItems.last());
     }
-    dst->setItems(outItems);
+    dst->items()->setItems(outItems);
 
     QnVideoWallPcDataMap pcs;
     for (const ApiVideowallScreenData &screen: src.screens) {
@@ -774,7 +793,14 @@ void fromApiToResource(const ApiVideowallData &src, QnVideoWallResourcePtr &dst)
         outPc.uuid = screen.pcGuid;
         outPc.screens << outScreen;
     }
-    dst->setPcs(pcs);
+    dst->pcs()->setItems(pcs);
+
+    QnVideoWallMatrixList outMatrices;
+    for (const ApiVideowallMatrixData &matrixData: src.matrices) {
+        outMatrices << QnVideoWallMatrix();
+        fromApiToResource(matrixData, outMatrices.last());
+    }
+    dst->matrices()->setItems(outMatrices);
 
 }
 
@@ -783,7 +809,7 @@ void fromResourceToApi(const QnVideoWallResourcePtr &src, ApiVideowallData &dst)
 
     dst.autorun = src->isAutorun();
 
-    const QnVideoWallItemMap& resourceItems = src->getItems();
+    const QnVideoWallItemMap& resourceItems = src->items()->getItems();
     dst.items.clear();
     dst.items.reserve(resourceItems.size());
     for (const QnVideoWallItem &item: resourceItems) {
@@ -793,7 +819,7 @@ void fromResourceToApi(const QnVideoWallResourcePtr &src, ApiVideowallData &dst)
     }
 
     dst.screens.clear();
-    for (const QnVideoWallPcData &pc: src->getPcs()) {
+    for (const QnVideoWallPcData &pc: src->pcs()->getItems()) {
         for (const QnVideoWallPcData::PcScreen &screen: pc.screens) {
             ApiVideowallScreenData screenData;
             fromResourceToApi(screen, screenData);
@@ -801,11 +827,20 @@ void fromResourceToApi(const QnVideoWallResourcePtr &src, ApiVideowallData &dst)
             dst.screens.push_back(screenData);
         }
     }
+
+    const QnVideoWallMatrixMap &matrices = src->matrices()->getItems();
+    dst.matrices.clear();
+    dst.matrices.reserve(matrices.size());
+    for (const QnVideoWallMatrix &matrix: matrices) {
+        ApiVideowallMatrixData matrixData;
+        fromResourceToApi(matrix, matrixData);
+        dst.matrices.push_back(matrixData);
+    }
 }
 
 template<class List>
 void fromApiToResourceList(const ApiVideowallDataList &src, List &dst, const overload_tag &) {
-    dst.reserve(dst.size() + src.size());
+    dst.reserve(dst.size() + (int)src.size());
 
     for(const ApiVideowallData &srcVideowall: src) {
         QnVideoWallResourcePtr dstVideowall(new QnVideoWallResource());
@@ -823,7 +858,7 @@ void fromApiToResourceList(const ApiVideowallDataList &src, QnVideoWallResourceL
 }
 
 void fromApiToResource(const ApiVideowallControlMessageData &data, QnVideoWallControlMessage &message) {
-    message.operation = static_cast<QnVideoWallControlMessage::QnVideoWallControlOperation>(data.operation);
+    message.operation = static_cast<QnVideoWallControlMessage::Operation>(data.operation);
     message.videoWallGuid = data.videowallGuid;
     message.instanceGuid = data.instanceGuid;
     message.params.clear();

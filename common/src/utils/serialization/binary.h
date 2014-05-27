@@ -88,9 +88,10 @@ namespace QnBinaryDetail {
         bool operator()(const T &, const Access &access, const QnFusion::start_tag &) {
             using namespace QnFusion;
 
-            unsigned char header;
-            QnBinary::deserialize(m_stream, &header);
-            if(header & 0xE0)
+            unsigned char header = 0;
+            if(!QnBinary::deserialize(m_stream, &header))
+                return false;
+            if(header & 0xE0)   //TODO: #Elric what does 0xE0 mean?
                 return false; /* Reserved fields are expected to be zero. A packet from next version? */
 
             m_count = header;

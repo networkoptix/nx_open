@@ -46,6 +46,10 @@
 #define QN_BUILDENV_PATH                "${environment.dir}"
 #define QN_MIRRORLIST_URL               "${mirrorListUrl}"
 #define QN_HELP_URL                     "${helpUrl}/${customization}/${parsedVersion.majorVersion}/${parsedVersion.minorVersion}/url"
+#define QN_ARM_BOX                      "${box}"
+#define QN_IOS_PLAYBUTTON_TINT          "${ios.playButton.tint}"
+
+
 /* 
  * These constants are here for windows resource file.
  *
@@ -66,8 +70,6 @@
 #define VER_ORIGINALFILENAME_STR        "${project.artifactId}.exe"
 #define VER_PRODUCTNAME_STR             "${project.artifactId}"
 #define VER_COMPANYDOMAIN_STR           "${company.url}"
-
-#define QN_ARM_BOX                      "${box}"
-/* BORIS, a note personally to you. If you continue adding defines to this block, I'll rip you a new asshole. You will not enjoy it. */
+/* Dear Developer. Please add new constants to the code block above (QN_* definitions). Thank you. */
 
 #endif // ${project.artifactId}_VERSION_H

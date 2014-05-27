@@ -24,10 +24,10 @@ namespace ec2
     bool parseHttpRequestParams(const QnRequestParamList &params, Qn::SerializationFormat *format);
     void toUrlParams(const Qn::SerializationFormat& format, QUrlQuery *query);
 
-    bool parseHttpRequestParams(const QnRequestParamList &params, LoginInfo *loginInfo);
-    void toUrlParams(const LoginInfo &loginInfo, QUrlQuery *query);
+    bool parseHttpRequestParams(const QnRequestParamList &params, ApiLoginData *loginInfo);
+    void toUrlParams(const ApiLoginData &, QUrlQuery *query);
 
-    bool parseHttpRequestParams(const QnRequestParamList &params, nullptr_t *);
+    bool parseHttpRequestParams(const QnRequestParamList &params, std::nullptr_t *);
     void toUrlParams(const std::nullptr_t &, QUrlQuery *query);
 }
 

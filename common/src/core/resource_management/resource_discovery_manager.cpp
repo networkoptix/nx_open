@@ -225,15 +225,13 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 
             updateLocalNetworkInterfaces();
 
-            QnResourceList result = findNewResources();
-
-            if (!result.isEmpty())
+            if (!m_resourceProcessor->isBusy()) 
             {
-                m_resourceProcessor->processResources(result);
+                QnResourceList result = findNewResources();
+                if (!result.isEmpty())
+                    m_resourceProcessor->processResources(result);
             }
 
-            int global_delay_between_search = 1000;
-            smartSleep(global_delay_between_search);
             ++m_runNumber;
             break;
         }

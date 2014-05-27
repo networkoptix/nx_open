@@ -24,7 +24,6 @@
 #include "utils/common/util.h"
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnResource, Status)
-QN_DEFINE_LEXICAL_JSON_FUNCTIONS(QnResource::Status)
 
 bool QnResource::m_appStopping = false;
 QnInitResPool QnResource::m_initAsyncPool;

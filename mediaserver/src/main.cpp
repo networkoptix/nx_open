@@ -156,6 +156,9 @@
 static const char COMPONENT_NAME[] = "MediaServer";
 
 static QString SERVICE_NAME = QString(QLatin1String(VER_COMPANYNAME_STR)) + QString(QLatin1String(" Media Server"));
+static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
+static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
+static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -540,7 +543,11 @@ void initLog(const QString &logLevel) {
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
     const QString& logFileName = logFileLocation + QLatin1String("/log_file");
-    if (!cl_log.create(logFileName, 1024*1024*10, 25, cl_logDEBUG1))
+    if (!cl_log.create(
+            logFileName,
+            MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
+            MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
+            cl_logDEBUG1))
         cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
     MSSettings::roSettings()->setValue("logFile", logFileName);
     cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
@@ -586,8 +593,8 @@ int serverMain(int argc, char *argv[])
     if( cmdLineArguments.msgLogLevel != lit("none") )
         QnLog::instance(QnLog::HTTP_LOG_INDEX)->create(
             dataLocation + QLatin1String("/log/http_log"),
-            10*1024*1024,
-            5,
+            DEFAULT_MAX_LOG_FILE_SIZE,
+            DEFAULT_MSG_LOG_ARCHIVE_SIZE,
             QnLog::logLevelFromString(cmdLineArguments.msgLogLevel) );
 
     if (rebuildArchive == "all")
@@ -1139,7 +1146,8 @@ void QnMain::run()
 
     QSettings* settings = MSSettings::roSettings();
 
-    QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList));
+    std::unique_ptr<QnMServerResourceDiscoveryManager> mserverResourceDiscoveryManager( new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList) );
+    QnResourceDiscoveryManager::init( mserverResourceDiscoveryManager.get() );
     initAppServerConnection(*settings);
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
@@ -1346,9 +1354,6 @@ void QnMain::run()
 
     initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
     
-
-    std::auto_ptr<QnAppserverResourceProcessor> m_processor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
-
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
@@ -1381,7 +1386,9 @@ void QnMain::run()
     //============================
     UPNPDeviceSearcher::initGlobalInstance( new UPNPDeviceSearcher() );
 
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
+    std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
+    serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
 
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher thirdPartyResourceSearcher( &cameraDriverRestrictionList );
@@ -1527,10 +1534,12 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->stop();
     QnResource::stopAsyncTasks();
 
-    delete QnResourceDiscoveryManager::instance();
     QnResourceDiscoveryManager::init( NULL );
+    mserverResourceDiscoveryManager.reset();
 
-    m_processor.reset();
+    //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now
+        //TODO refactoring of discoveryManager <-> resourceProcessor interaction is required
+    serverResourceProcessor.reset();
 
 #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
     delete QnPlVmax480ResourceSearcher::instance();
@@ -1741,6 +1750,7 @@ static void printVersion()
     std::cout << "  " << QN_APPLICATION_NAME << " v." << QCoreApplication::applicationVersion().toUtf8().data() << std::endl;
 }
 
+// TODO: #Elric we have QnCommandLineParser::print for that.
 static void printHelp()
 {
     printVersion();

@@ -7,7 +7,9 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <nx_ec/data/api_connection_data.h>
 #include <utils/serialization/lexical_functions.h>
+
 
 namespace ec2
 {
@@ -54,10 +56,20 @@ namespace ec2
     }
 
 
-    bool parseHttpRequestParams(const QnRequestParamList &, LoginInfo *) { return true; }
-    void toUrlParams(const LoginInfo &, QUrlQuery *) {}
+    bool parseHttpRequestParams(const QnRequestParamList& params, ApiLoginData* data)
+    {
+        return 
+            deserialize(params, lit("login"), &data->login) &&
+            deserialize(params, lit("digest"), &data->passwordHash);
+    }
 
-    bool parseHttpRequestParams(const QnRequestParamList &, nullptr_t *) { return true; }
+    void toUrlParams(const ApiLoginData& data, QUrlQuery* query) 
+    {
+        serialize( data.login, lit("login"), query );
+        serialize( data.passwordHash, lit("digest"), query );
+    }
+
+    bool parseHttpRequestParams(const QnRequestParamList &, std::nullptr_t *) { return true; }
     void toUrlParams(const std::nullptr_t &, QUrlQuery *) {}
 
 }

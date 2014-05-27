@@ -20,4 +20,4 @@
     (QnConnectionInfo)\
     (QnCompatibilityItem)\
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_MS_API_DATA_TYPES, (json)(binary)(csv_record), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_MS_API_DATA_TYPES, (xml)(json)(binary)(csv_record), _Fields)

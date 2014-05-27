@@ -14,10 +14,7 @@ public:
     virtual ~QnJoinable() {}
 
     //!Blocks till instance does what it should before destruction
-    /*!
-        \todo Name \a wait has been chosen only for compatibility with \a QnLongRunnable. Correct name for this is \a join()
-    */
-    virtual void wait() = 0;
+    virtual void join() = 0;
 };
 
 #endif  //QNJOINABLE_H

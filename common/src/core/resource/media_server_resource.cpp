@@ -283,6 +283,8 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_version = localOther->getVersion();
         m_systemInfo = localOther->getSystemInfo();
         m_systemName = localOther->getSystemName();
+        m_redundancy = localOther->isRedundancy();
+        m_maxCameras = localOther->getMaxCameras();
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         

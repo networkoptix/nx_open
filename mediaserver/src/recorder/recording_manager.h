@@ -67,11 +67,11 @@ private:
     QnResourceList getLocalControlledCameras();
 
     void beforeDeleteRecorder(const Recorders& recorders);
-    void deleteRecorder(const Recorders& recorders);
+    void deleteRecorder(const Recorders& recorders, const QnResourcePtr& resource);
     bool updateCameraHistory(QnResourcePtr res);
 
-    void at_licenseMutexLocked(QString name);
-    void at_licenseMutexTimeout(QString name);
+    void at_licenseMutexLocked();
+    void at_licenseMutexTimeout();
 private:
     mutable QMutex m_mutex;
     QSet<QnResourcePtr> m_onlineCameras;
@@ -79,7 +79,7 @@ private:
     QTimer m_scheduleWatchingTimer;
     QTimer m_licenseTimer;
     QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;
-    ec2::QnDistributedMutexPtr m_licenseMutex;
+    ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;
 };
 

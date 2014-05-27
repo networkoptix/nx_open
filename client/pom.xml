@@ -73,16 +73,17 @@
                 </plugins>
             </build>
         </profile>  
+
         <profile>
-            <id>webkit</id>
+            <id>webkit-win</id>
             <activation>
                 <os>
                     <family>Windows</family>
-                </os>
+                </os>    
                 <property>
                     <name>webkit</name>
-                    <value>true</value>
-                </property>                
+                    <value>!false</value>
+                </property>                  
             </activation>
             <properties>
                 <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>

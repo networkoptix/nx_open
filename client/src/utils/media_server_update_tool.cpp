@@ -45,14 +45,12 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     m_onlineUpdateUrl(QN_UPDATES_URL),
     m_denyMajorUpdates(false),
     m_networkAccessManager(new QNetworkAccessManager(this)),
+    m_distributedMutex(0),
     m_downloadUpdatesPeerTask(new QnDownloadUpdatesPeerTask(this)),
     m_uploadUpdatesPeerTask(new QnUploadUpdatesPeerTask(this)),
     m_installUpdatesPeerTask(new QnInstallUpdatesPeerTask(this)),
     m_restUpdatePeerTask(new QnRestUpdatePeerTask(this))
 {
-    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::locked,        this,   &QnMediaServerUpdateTool::at_mutexLocked, Qt::QueuedConnection);
-    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::lockTimeout,   this,   &QnMediaServerUpdateTool::at_mutexTimeout, Qt::QueuedConnection);
-
     connect(m_downloadUpdatesPeerTask,                  &QnNetworkPeerTask::finished,                   this,   &QnMediaServerUpdateTool::at_downloadTask_finished);
     connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::finished,                   this,   &QnMediaServerUpdateTool::at_uploadTask_finished);
     connect(m_installUpdatesPeerTask,                   &QnNetworkPeerTask::finished,                   this,   &QnMediaServerUpdateTool::at_installTask_finished);
@@ -538,28 +536,32 @@ void QnMediaServerUpdateTool::installIncompatiblePeers() {
 }
 
 void QnMediaServerUpdateTool::lockMutex() {
-    m_distributedMutex = ec2::QnDistributedMutexManager::instance()->getLock(mutexName);
+    m_distributedMutex = ec2::QnDistributedMutexManager::instance()->createMutex(mutexName);
+    connect(m_distributedMutex, &ec2::QnDistributedMutex::locked,        this,   &QnMediaServerUpdateTool::at_mutexLocked, Qt::QueuedConnection);
+    connect(m_distributedMutex, &ec2::QnDistributedMutex::lockTimeout,   this,   &QnMediaServerUpdateTool::at_mutexTimeout, Qt::QueuedConnection);
 }
 
 void QnMediaServerUpdateTool::unlockMutex() {
     if (m_distributedMutex) {
         m_distributedMutex->unlock();
-        m_distributedMutex.clear();
+        m_distributedMutex->deleteLater();
+        m_distributedMutex = 0;
     }
 }
 
-void QnMediaServerUpdateTool::at_mutexLocked(const QString &name) {
+void QnMediaServerUpdateTool::at_mutexLocked() {
     if (name != mutexName)
         return;
 
     uploadUpdatesToServers();
 }
 
-void QnMediaServerUpdateTool::at_mutexTimeout(const QString &name) {
+void QnMediaServerUpdateTool::at_mutexTimeout() {
     if (name != mutexName)
         return;
 
-    m_distributedMutex.clear();
+    m_distributedMutex->deleteLater();
+    m_distributedMutex = 0;
     finishUpdate(LockFailed);
 }
 

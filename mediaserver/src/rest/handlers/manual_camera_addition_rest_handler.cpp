@@ -1,18 +1,38 @@
+
 #include "manual_camera_addition_rest_handler.h"
 
+#include <boost/bind.hpp>
+#include <thread>
+
+#include <QtCore/QThreadPool>
 #include <QtNetwork/QAuthenticator>
-#include <QtConcurrent/QtConcurrentRun>
 
 #include <api/model/manual_camera_seach_reply.h>
 #include <core/resource_management/resource_discovery_manager.h>
 
-#include <utils/serialization/json_functions.h>
+#include <utils/common/scoped_thread_rollback.h>
 #include <utils/network/tcp_connection_priv.h>
+#include <utils/serialization/json_functions.h>
 
 
-namespace {
-    static const int searchThreadCount = 4;
-}
+class ManualSearchThreadPoolHolder
+{
+public:
+    QThreadPool pool;
+
+    ManualSearchThreadPoolHolder()
+    {
+        pool.setMaxThreadCount(
+#ifdef __arm__
+            8
+#else
+            32
+#endif
+            );
+    }
+};
+
+static ManualSearchThreadPoolHolder manualSearchThreadPoolHolder;
 
 QnManualCameraAdditionRestHandler::QnManualCameraAdditionRestHandler()
 {
@@ -23,10 +43,6 @@ QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler() {
         process->cancel();
         delete process;
     }
-}
-
-static void searchResourcesAsync(QnManualCameraSearcher* searcher, const QString &startAddr, const QString &endAddr, const QAuthenticator& auth, int port) {
-    searcher->run(startAddr, endAddr, auth, port);
 }
 
 int QnManualCameraAdditionRestHandler::searchStartAction(const QnRequestParams &params,  QnJsonRestResult &result)
@@ -54,7 +70,13 @@ int QnManualCameraAdditionRestHandler::searchStartAction(const QnRequestParams &
         m_searchProcesses.insert(processUuid, searcher);
     }
 
-    m_searchProcessRuns.insert(processUuid, QtConcurrent::run(&searchResourcesAsync, searcher, addr1, addr2, auth, port));
+    //TODO #ak better not to use concurrent here, since calling QtConcurrent::run from running task looks unreliable in some extreme case
+        //consider using async fsm here (this one should be quite simple)
+    //NOTE boost::bind is here temporarily: till QnConcurrent::run supports any number of arguments
+    m_searchProcessRuns.insert( processUuid,
+        QnConcurrent::run( 
+            &manualSearchThreadPoolHolder.pool,
+            boost::bind( &QnManualCameraSearcher::run, searcher, &manualSearchThreadPoolHolder.pool, addr1, addr2, auth, port) ) );
 
     QnManualCameraSearchReply reply(processUuid, getSearchStatus(processUuid));
     result.setReply(reply);

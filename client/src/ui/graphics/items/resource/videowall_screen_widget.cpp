@@ -24,7 +24,7 @@
 #include <ui/style/skin.h>
 
 #include <utils/common/warnings.h>
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 
 QnVideowallScreenWidget::QnVideowallScreenWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     base_type(context, item, parent),
@@ -44,10 +44,10 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(QnWorkbenchContext *context, Qn
     connect(m_videowall, &QnVideoWallResource::itemRemoved,   this, &QnVideowallScreenWidget::at_videoWall_itemRemoved);
 
     m_pcUuid = item->data(Qn::VideoWallPcGuidRole).value<QUuid>();
-    if (!m_videowall->hasPc(m_pcUuid))
+    if (!m_videowall->pcs()->hasItem(m_pcUuid))
         return;
 
-    QnVideoWallPcData pc = m_videowall->getPc(m_pcUuid);
+    QnVideoWallPcData pc = m_videowall->pcs()->getItem(m_pcUuid);
     QList<int> screenIndices = item->data(Qn::VideoWallPcScreenIndicesRole).value<QList<int> >();
 
     foreach(const QnVideoWallPcData::PcScreen &screen, pc.screens) {
@@ -60,7 +60,7 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(QnWorkbenchContext *context, Qn
     if (m_desktopGeometry.isValid())
         setAspectRatio((qreal)m_desktopGeometry.width() / m_desktopGeometry.height());
 
-    foreach (const QnVideoWallItem &item, m_videowall->getItems())
+    foreach (const QnVideoWallItem &item, m_videowall->items()->getItems())
         at_videoWall_itemAdded(m_videowall, item);
 
     m_thumbnailManager = context->instance<QnCameraThumbnailManager>();
@@ -99,7 +99,7 @@ QnResourceWidget::Buttons QnVideowallScreenWidget::calculateButtonsVisibility() 
 
 QString QnVideowallScreenWidget::calculateTitleText() const {
     QStringList pcUuids;
-    foreach (const QUuid &uuid, m_videowall->getPcs().keys())
+    foreach (const QUuid &uuid, m_videowall->pcs()->getItems().keys())
         pcUuids.append(uuid.toString());
     pcUuids.sort(Qt::CaseInsensitive);
     int idx = pcUuids.indexOf(m_pcUuid.toString());

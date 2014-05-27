@@ -318,7 +318,7 @@ void QnTransactionTransport::cancelConnecting()
 {
     if (getState() == ConnectingStage2)
         QnTransactionTransport::connectingCanceled(m_remoteGuid, true);
-    qWarning() << Q_FUNC_INFO << "Connection canceled from state " << getState();
+    qWarning() << Q_FUNC_INFO << "Connection canceled from state " << toString(getState());
     setState(Error);
 }
 
@@ -430,6 +430,31 @@ QByteArray QnTransactionTransport::encodeHWList(const QList<QByteArray> hwList)
 QList<QByteArray> QnTransactionTransport::decodeHWList(const QByteArray data)
 {
     return data.split('-');
+}
+
+QString QnTransactionTransport::toString( State state )
+{
+    switch( state )
+    {
+        case NotDefined:
+            return lit("NotDefined");
+        case ConnectingStage1:
+            return lit("ConnectingStage1");
+        case ConnectingStage2:
+            return lit("ConnectingStage2");
+        case Connected:
+            return lit("Connected");
+        case NeedStartStreaming:
+            return lit("NeedStartStreaming");
+        case ReadyForStreaming:
+            return lit("ReadyForStreaming");
+        case Closed:
+            return lit("Closed");
+        case Error:
+            return lit("Error");
+        default:
+            return lit("unknown");
+    }
 }
 
 }

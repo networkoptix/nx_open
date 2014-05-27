@@ -27,7 +27,7 @@ namespace {
 
         for (int r = region.top(); r <= region.bottom(); r++)
             for (int c = region.left(); c <= region.right(); c++)
-                QnContainer::insert(*points, points->end(), QPoint(c, r));
+                QnCollection::insert(*points, points->end(), QPoint(c, r));
     }
 
 } // anonymous namespace

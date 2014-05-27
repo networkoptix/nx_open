@@ -130,6 +130,31 @@ QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text, int
     return box;
 }
 
+QnGraphicsMessageBox* QnGraphicsMessageBox::informationTicking(const QString &text, int timeoutMsec, int fontSize) {
+    if (!instance)
+        return NULL;
+
+    QPointer<QnGraphicsMessageBox> box = new QnGraphicsMessageBox(instance, QString(), timeoutMsec, fontSize);
+    instance->addItem(box);
+
+    const auto tickHandler = [box, text](int tick) {
+        if (!box)
+            return;
+
+        int left = box->timeout() - tick;
+        int n = (left + 500) / 1000;
+
+        if (n > 0)
+            box->setText(text.arg(n));
+        else
+            box->hideImmideately();
+    };
+    connect(box.data(), &QnGraphicsMessageBox::tick, instance, tickHandler);
+    tickHandler(0);
+
+    return box;
+}
+
 void QnGraphicsMessageBox::hideImmideately() {
     VariantAnimator *animator = opacityAnimator(this);
     disconnect(animator, 0, this, 0);

@@ -237,7 +237,7 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     recorder.setStartOffset(startTimeMs*1000);
 
     QnAbstractMediaDataPtr packet;
-    while (packet = avi->getNextData())
+    while( (packet = avi->getNextData()) )
     {
         packet->dataProvider = reader;
         recorder.processData(packet);
@@ -456,7 +456,7 @@ void DeviceFileCatalog::readStorageData(QnStorageResourcePtr storage, QnServer::
     scanMediaFiles(rootFolder, storage, allChunks, emptyFileList);
 }
 
-bool DeviceFileCatalog::doRebuildArchive(QnStorageResourcePtr storage, const QnTimePeriod& period)
+bool DeviceFileCatalog::doRebuildArchive(QnStorageResourcePtr storage, const QnTimePeriod& /*period*/)
 {
     QElapsedTimer t;
     t.restart();
@@ -610,7 +610,15 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
     {
         QMutexLocker lock(&m_mutex);
         ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
-        itr = m_chunks.insert(itr, chunk);
+        if( itr != m_chunks.end() )
+        {
+            itr = m_chunks.insert(itr, chunk);  //triggers assert if itr == end()
+        }
+        else
+        {
+            m_chunks.push_back( chunk );
+            itr = m_chunks.begin() + (m_chunks.size()-1);
+        }
         m_lastAddIndex = itr - m_chunks.begin();
     }
 }

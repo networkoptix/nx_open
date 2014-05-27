@@ -3,13 +3,15 @@
 
 #include <vector>
 
+#ifndef QN_NO_QT
 #include <QtCore/QString>
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_email_data.h"
-#include "utils/serialization/binary.h"
+#endif
 
+#include "utils/serialization/binary.h"
 
 namespace ec2
 {
@@ -174,15 +176,18 @@ namespace ec2
         struct ID
         {
             ID(): sequence(0) {}
-            QUuid peerGUID; // TODO: #Elric #EC2 rename into sane case
+            QUuid peerID;
+            QUuid dbID;
             qint32 sequence;
 
+#ifndef QN_NO_QT
             friend uint qHash(const ec2::QnAbstractTransaction::ID &id) {
-                return ::qHash(id.peerGUID, id.sequence);
+                return ::qHash(id.peerID.toRfc4122().append(id.dbID.toRfc4122()), id.sequence);
             }
+#endif
 
             bool operator==(const ID &other) const {
-                return peerGUID == other.peerGUID && sequence == other.sequence;
+                return peerID == other.peerID && dbID == other.dbID && sequence == other.sequence;
             }
         };
 
@@ -194,6 +199,10 @@ namespace ec2
         static QAtomicInt m_sequence;
         bool localTransaction; // do not propagate transactions to other server peers
     };
+
+    typedef QnAbstractTransaction::ID QnAbstractTransaction_ID;
+#define QnAbstractTransaction_ID_Fields (peerID)(dbID)(sequence)
+#define QnAbstractTransaction_Fields (command)(id)(persistent)(timestamp)        
 
     template <class T>
     class QnTransaction: public QnAbstractTransaction
@@ -227,6 +236,8 @@ namespace ec2
     int generateRequestID();
 } // namespace ec2
 
+#ifndef QN_NO_QT
 Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)
+#endif
 
 #endif  //EC2_TRANSACTION_H

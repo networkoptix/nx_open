@@ -8,11 +8,6 @@ QnUserResource::QnUserResource():
     addFlags(QnResource::user | QnResource::remote);
 }
 
-QString QnUserResource::getUniqueId() const
-{
-    return getId().toString();
-}
-
 QByteArray QnUserResource::getHash() const
 {
     QMutexLocker locker(&m_mutex);
@@ -94,58 +89,6 @@ void QnUserResource::setEmail(const QString& email)
     emit emailChanged(::toSharedPointer(this));
 }
 
-QSet<QUuid> QnUserResource::videoWallItems() const {
-    QMutexLocker locker(&m_mutex);
-    return m_videoWallItemUuids;
-}
-
-void QnUserResource::setVideoWallItems(QSet<QUuid> uuids) {
-    QMutexLocker locker(&m_mutex);
-
-    foreach(const QUuid &uuid, m_videoWallItemUuids)
-        if(!uuids.contains(uuid))
-            removeVideoWallItemUnderLock(uuid);
-
-    foreach(const QUuid &uuid, uuids) {
-        if(!m_videoWallItemUuids.contains(uuid)) {
-            addVideoWallItemUnderLock(uuid);
-        }
-    }
-}
-
-void QnUserResource::addVideoWallItem(const QUuid &uuid) {
-    QMutexLocker locker(&m_mutex);
-    addVideoWallItemUnderLock(uuid);
-}
-
-void QnUserResource::removeVideoWallItem(const QUuid &uuid) {
-    QMutexLocker locker(&m_mutex);
-    removeVideoWallItemUnderLock(uuid);
-}
-
-void QnUserResource::addVideoWallItemUnderLock(const QUuid &uuid) {
-    if(m_videoWallItemUuids.contains(uuid))
-        return;
-
-    m_videoWallItemUuids << uuid;
-
-    m_mutex.unlock();
-    emit videoWallItemAdded(::toSharedPointer(this), uuid);
-    m_mutex.lock();
-}
-
-void QnUserResource::removeVideoWallItemUnderLock(const QUuid &uuid) {
-    if (!m_videoWallItemUuids.contains(uuid))
-        return;
-
-    m_videoWallItemUuids.remove(uuid);
-
-    m_mutex.unlock();
-    emit videoWallItemRemoved(::toSharedPointer(this), uuid);
-    m_mutex.lock();
-}
-
-
 void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
     base_type::updateInner(other, modifiedFields);
@@ -158,6 +101,5 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
         setPermissions(localOther->getPermissions());
         setAdmin(localOther->isAdmin());
         setEmail(localOther->getEmail());
-        setVideoWallItems(localOther->videoWallItems());
     }
 }

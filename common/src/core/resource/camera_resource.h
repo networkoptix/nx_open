@@ -3,9 +3,14 @@
 
 #include <QtCore/QMetaType>
 
-#include "security_cam_resource.h"
 #include <deque>
+
 #include "nx_ec/impl/ec_api_impl.h"
+#include "security_cam_resource.h"
+#include "utils/fusion/fusion_fwd.h"
+#include "utils/serialization/json.h"
+#include <utils/common/model_functions_fwd.h>
+
 
 class QnAbstractDTSFactory;
 
@@ -36,7 +41,7 @@ public slots:
 private slots:
     void at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &);
 protected:
-    void save();
+    void saveParams();
     int saveAsync();
 
 private:
@@ -47,6 +52,8 @@ private:
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);
 const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
 const QSize SECONDARY_STREAM_MAX_RESOLUTION(1024, 768);
+
+class CameraMediaStreams;
 
 class QN_EXPORT QnPhysicalCameraResource : public QnVirtualCameraResource
 {
@@ -64,11 +71,46 @@ public:
 
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList); // find resolution helper function
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
+    void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
+
 private:
     int m_channelNumber; // video/audio source number
 };
+
+class CameraMediaStreamInfo
+{
+public:
+    //!has format "1920x1080" or "*" to notify that any resolution is supported
+    QString resolution;
+    //!transport method that can be used to receive this stream
+    /*!
+        Possible values:\n
+            - rtsp
+            - webm (webm over http)
+            - hls (Apple Http Live Streaming)
+            - mjpg (motion jpeg over http)
+    */
+    std::vector<QString> transports;
+    //!if \a true this stream is produced by transcoding one of native (having this flag set to \a false) stream
+    bool transcodingRequired;
+    CodecID codec;
+
+    CameraMediaStreamInfo();
+    CameraMediaStreamInfo( const QSize& _resolution, CodecID _codec );
+};
+#define CameraMediaStreamInfo_Fields (resolution)(transports)(transcodingRequired)
+
+class CameraMediaStreams
+{
+public:
+    std::vector<CameraMediaStreamInfo> streams;
+};
+#define CameraMediaStreams_Fields (streams)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json) )
 
 Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
 Q_DECLARE_METATYPE(QnVirtualCameraResourceList);

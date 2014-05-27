@@ -1,6 +1,7 @@
 #ifndef __PROXY_CONNECTION_PROCESSOR_PRIV_H_
 #define __PROXY_CONNECTION_PROCESSOR_PRIV_H_
 
+#include "utils/network/aio/pollset.h"
 #include "utils/network/socket.h"
 #include "utils/network/tcp_connection_priv.h"
 
@@ -18,6 +19,7 @@ public:
     QSharedPointer<AbstractStreamSocket> dstSocket;
     QnTcpListener* owner;
     QUrl lastConnectedUrl;
+    PollSet pollSet;
 };
 
 #endif // __PROXY_CONNECTION_PROCESSOR_PRIV_H_

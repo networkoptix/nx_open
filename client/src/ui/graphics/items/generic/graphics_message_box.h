@@ -52,6 +52,7 @@ public:
     int timeout() const;
 
     static QnGraphicsMessageBox* information(const QString &text, int timeoutMsec = 0, int fontSize = 0);
+    static QnGraphicsMessageBox* informationTicking(const QString &text, int timeoutMsec = 0, int fontSize = 0);
 
 public slots:
     void hideImmideately();

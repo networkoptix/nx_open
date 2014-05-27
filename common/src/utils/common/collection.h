@@ -1,7 +1,7 @@
 /* This file was derived from ArXLib with permission of the copyright holder. 
  * See http://code.google.com/p/arxlib/. */
-#ifndef QN_CONTAINER_H
-#define QN_CONTAINER_H
+#ifndef QN_COLLECTION_H
+#define QN_COLLECTION_H
 
 #include <type_traits> /* For std::true_type, std::false_type. */
 
@@ -22,79 +22,77 @@ template<class T> class QSet;
 class QJsonObject;
 
 
-// TODO: #Elric rename QnCollection, more Java-like =)
-
-namespace QnContainer {
+namespace QnCollection {
     struct list_tag {};
     struct set_tag {};
     struct map_tag {};
-} // namespace QnContainer
+} // namespace QnCollection
 
 
-namespace QnContainerDetail {
-    template<class Container>
-    std::true_type has_reserve_test(const Container &, const decltype(&Container::reserve) * = NULL);
+namespace QnCollectionDetail {
+    template<class Collection>
+    std::true_type has_reserve_test(const Collection &, const decltype(&Collection::reserve) * = NULL);
     std::false_type has_reserve_test(...);
 
-    template<class Container>
+    template<class Collection>
     struct has_reserve {
-        typedef decltype(has_reserve_test(std::declval<Container>())) type;
+        typedef decltype(has_reserve_test(std::declval<Collection>())) type;
     };
 
-    template<class Container>
-    std::true_type has_key_type_test(const Container &, const typename Container::key_type * = NULL);
+    template<class Collection>
+    std::true_type has_key_type_test(const Collection &, const typename Collection::key_type * = NULL);
     std::false_type has_key_type_test(...);
 
-    template<class Container>
+    template<class Collection>
     struct has_key_type {
-        typedef decltype(has_key_type_test(std::declval<Container>())) type;
+        typedef decltype(has_key_type_test(std::declval<Collection>())) type;
     };
 
-    template<class Container>
-    std::true_type has_mapped_type_test(const Container &, const typename Container::mapped_type * = NULL);
+    template<class Collection>
+    std::true_type has_mapped_type_test(const Collection &, const typename Collection::mapped_type * = NULL);
     std::false_type has_mapped_type_test(...);
 
-    template<class Container>
+    template<class Collection>
     struct has_mapped_type {
-        typedef decltype(has_mapped_type_test(std::declval<Container>())) type;
+        typedef decltype(has_mapped_type_test(std::declval<Collection>())) type;
     };
 
-    template<class Container, bool hasKeyType = has_key_type<Container>::type::value, bool hasMappedType = has_mapped_type<Container>::type::value>
-    struct container_category;
+    template<class Collection, bool hasKeyType = has_key_type<Collection>::type::value, bool hasMappedType = has_mapped_type<Collection>::type::value>
+    struct collection_category;
 
-    template<class Container>
-    struct container_category<Container, false, false> {
-        typedef QnContainer::list_tag type;
+    template<class Collection>
+    struct collection_category<Collection, false, false> {
+        typedef QnCollection::list_tag type;
     };
 
-    template<class Container>
-    struct container_category<Container, true, false> {
-        typedef QnContainer::set_tag type;
+    template<class Collection>
+    struct collection_category<Collection, true, false> {
+        typedef QnCollection::set_tag type;
     };
 
-    template<class Container>
-    struct container_category<Container, true, true> {
-        typedef QnContainer::map_tag type;
+    template<class Collection>
+    struct collection_category<Collection, true, true> {
+        typedef QnCollection::map_tag type;
     };
 
-    template<class Container>
-    void reserve(Container &container, int size, const std::true_type &) {
-        container.reserve(size);
+    template<class Collection>
+    void reserve(Collection &collection, int size, const std::true_type &) {
+        collection.reserve(size);
     }
 
-    template<class Container>
-    void reserve(Container &, int, const std::false_type &) {
+    template<class Collection>
+    void reserve(Collection &, int, const std::false_type &) {
         return;
     }
 
-} // namespace QnContainerDetail
+} // namespace QnCollectionDetail
 
 
-namespace QnContainer {
+namespace QnCollection {
 
-    template<class Container, class Iterator, class Element>
-    typename Container::iterator insert(Container &container, const Iterator &pos, Element &&element) {
-        return container.insert(pos, std::forward<Element>(element));
+    template<class Collection, class Iterator, class Element>
+    typename Collection::iterator insert(Collection &collection, const Iterator &pos, Element &&element) {
+        return collection.insert(pos, std::forward<Element>(element));
     }
 
     /**
@@ -107,21 +105,21 @@ namespace QnContainer {
      */
 
     template<class T, class Iterator, class Element>
-    typename QSet<T>::iterator insert(QSet<T> &container, const Iterator &, Element &&element) {
-        return container.insert(std::forward<Element>(element));
+    typename QSet<T>::iterator insert(QSet<T> &collection, const Iterator &, Element &&element) {
+        return collection.insert(std::forward<Element>(element));
     }
 
-#define QN_REGISTER_QT_CONTAINER_INSERT(CONTAINER)                              \
+#define QN_REGISTER_QT_COLLECTION_INSERT(COLLECTION)                            \
     template<class Key, class T, class Iterator, class Element>                 \
-    void insert(CONTAINER<Key, T> &container, const Iterator &, Element &&element) { \
-        container.insert(element.first, element.second);                        \
+    void insert(COLLECTION<Key, T> &collection, const Iterator &, Element &&element) { \
+        collection.insert(element.first, element.second);                        \
     }
 
-    QN_REGISTER_QT_CONTAINER_INSERT(QHash);
-    QN_REGISTER_QT_CONTAINER_INSERT(QMultiHash);
-    QN_REGISTER_QT_CONTAINER_INSERT(QMap);
-    QN_REGISTER_QT_CONTAINER_INSERT(QMultiMap);
-#undef QN_REGISTER_QT_CONTAINER_INSERT
+    QN_REGISTER_QT_COLLECTION_INSERT(QHash);
+    QN_REGISTER_QT_COLLECTION_INSERT(QMultiHash);
+    QN_REGISTER_QT_COLLECTION_INSERT(QMap);
+    QN_REGISTER_QT_COLLECTION_INSERT(QMultiMap);
+#undef QN_REGISTER_QT_COLLECTION_INSERT
 
 
     template<class List>
@@ -138,15 +136,15 @@ namespace QnContainer {
     }
 
 
-    template<class Container>
-    void reserve(Container &container, int size) {
-        QnContainerDetail::reserve(container, size, typename QnContainerDetail::has_reserve<Container>::type());
+    template<class Collection>
+    void reserve(Collection &collection, int size) {
+        QnCollectionDetail::reserve(collection, size, typename QnCollectionDetail::has_reserve<Collection>::type());
     }
 
 
-    template<class Container>
-    void clear(Container &container) {
-        container.clear();
+    template<class Collection>
+    void clear(Collection &collection) {
+        collection.clear();
     }
     
 
@@ -168,9 +166,9 @@ namespace QnContainer {
     }
 
 
-    template<class Container>
-    struct container_category: 
-        QnContainerDetail::container_category<Container>
+    template<class Collection>
+    struct collection_category: 
+        QnCollectionDetail::collection_category<Collection>
     {};
 
 
@@ -187,7 +185,7 @@ namespace QnContainer {
         > type;
     };
 
-} // namespace QnContainer
+} // namespace QnCollection
 
 
 /**
@@ -229,47 +227,49 @@ private:
 };
 
 
-#define QN_REGISTER_QT_STL_MAP_ITERATOR(CONTAINER)                              \
+#define QN_REGISTER_QT_STL_MAP_ITERATOR(COLLECTION)                             \
 namespace boost {                                                               \
     template<class Key, class T>                                                \
-    struct range_mutable_iterator<CONTAINER<Key, T> > {                         \
-        typedef QnStlMapIterator<typename CONTAINER<Key, T>::iterator, std::pair<const Key, T>, std::pair<const Key &, T &> > type; \
+    struct range_mutable_iterator<COLLECTION<Key, T> > {                        \
+        typedef QnStlMapIterator<typename COLLECTION<Key, T>::iterator, std::pair<const Key, T>, std::pair<const Key &, T &> > type; \
     };                                                                          \
                                                                                 \
     template<class Key, class T>                                                \
-    struct range_const_iterator<CONTAINER<Key, T> > {                           \
-        typedef QnStlMapIterator<typename CONTAINER<Key, T>::const_iterator, std::pair<const Key, T>, std::pair<const Key &, const T &> > type; \
+    struct range_const_iterator<COLLECTION<Key, T> > {                          \
+        typedef QnStlMapIterator<typename COLLECTION<Key, T>::const_iterator, std::pair<const Key, T>, std::pair<const Key &, const T &> > type; \
     };                                                                          \
 } /* namespace boost */                                                         \
                                                                                 \
 template<class Key, class T>                                                    \
-inline typename boost::range_mutable_iterator<CONTAINER<Key, T> >::type         \
-range_begin(CONTAINER<Key, T> &x) {                                             \
-    return typename boost::range_mutable_iterator<CONTAINER<Key, T> >::type(x.begin()); \
+inline typename boost::range_mutable_iterator<COLLECTION<Key, T> >::type        \
+range_begin(COLLECTION<Key, T> &x) {                                            \
+    return typename boost::range_mutable_iterator<COLLECTION<Key, T> >::type(x.begin()); \
 }                                                                               \
                                                                                 \
 template<class Key, class T>                                                    \
-inline typename boost::range_const_iterator<CONTAINER<Key, T> >::type           \
-range_begin(const CONTAINER<Key, T> &x) {                                       \
-    return typename boost::range_const_iterator<CONTAINER<Key, T> >::type(x.begin()); \
+inline typename boost::range_const_iterator<COLLECTION<Key, T> >::type          \
+range_begin(const COLLECTION<Key, T> &x) {                                      \
+    return typename boost::range_const_iterator<COLLECTION<Key, T> >::type(x.begin()); \
 }                                                                               \
                                                                                 \
 template<class Key, class T>                                                    \
-inline typename boost::range_mutable_iterator<CONTAINER<Key, T> >::type         \
-range_end(CONTAINER<Key, T> &x) {                                               \
-    return typename boost::range_mutable_iterator<CONTAINER<Key, T> >::type(x.end()); \
+inline typename boost::range_mutable_iterator<COLLECTION<Key, T> >::type        \
+range_end(COLLECTION<Key, T> &x) {                                              \
+    return typename boost::range_mutable_iterator<COLLECTION<Key, T> >::type(x.end()); \
 }                                                                               \
                                                                                 \
 template<class Key, class T>                                                    \
-inline typename boost::range_const_iterator<CONTAINER<Key, T> >::type           \
-range_end(const CONTAINER<Key, T> &x) {                                         \
-    return typename boost::range_const_iterator<CONTAINER<Key, T> >::type(x.end()); \
+inline typename boost::range_const_iterator<COLLECTION<Key, T> >::type          \
+range_end(const COLLECTION<Key, T> &x) {                                        \
+    return typename boost::range_const_iterator<COLLECTION<Key, T> >::type(x.end()); \
 }
 
+#ifndef QN_NO_QT
 QN_REGISTER_QT_STL_MAP_ITERATOR(QHash);
 QN_REGISTER_QT_STL_MAP_ITERATOR(QMultiHash);
 QN_REGISTER_QT_STL_MAP_ITERATOR(QMap);
 QN_REGISTER_QT_STL_MAP_ITERATOR(QMultiMap);
+#endif // QN_NO_QT
 #undef QN_REGISTER_QT_STL_MAP_ITERATOR
 
 #if 0
@@ -313,17 +313,17 @@ range_end(const QJsonObject &x) {
 
 template<class List>
 void qnResizeList(List &list, int size) {
-    QnContainer::resize(list, size);
+    QnCollection::resize(list, size);
 }
 
 template<class List, class Pred>
 int qnIndexOf(const List &list, int from, const Pred &pred) {
-    return QnContainer::indexOf(list, from, pred);
+    return QnCollection::indexOf(list, from, pred);
 }
 
 template<class List, class Pred>
 int qnIndexOf(const List &list, const Pred &pred) {
-    return QnContainer::indexOf(list, pred);
+    return QnCollection::indexOf(list, pred);
 }
 
-#endif // QN_CONTAINER
+#endif // QN_COLLECTION_H

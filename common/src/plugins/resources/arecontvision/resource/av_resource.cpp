@@ -210,17 +210,17 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
     
+    QVariant maxSensorWidth;
+    QVariant maxSensorHeight;
     {
         // TODO: #Elric is this needed? This was a call to setCroppingPhysical
-        QVariant maxSensorWidth;
-        QVariant maxSensorHight;
         getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
-        getParam(QLatin1String("MaxSensorHeight"), maxSensorHight, QnDomainMemory);
+        getParam(QLatin1String("MaxSensorHeight"), maxSensorHeight, QnDomainMemory);
 
         setParamAsync(QLatin1String("sensorleft"), 0, QnDomainPhysical);
         setParamAsync(QLatin1String("sensortop"), 0, QnDomainPhysical);
         setParamAsync(QLatin1String("sensorwidth"), maxSensorWidth, QnDomainPhysical);
-        setParamAsync(QLatin1String("sensorheight"), maxSensorHight, QnDomainPhysical);
+        setParamAsync(QLatin1String("sensorheight"), maxSensorHeight, QnDomainPhysical);
     }
 
     QVariant val;
@@ -251,9 +251,6 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
         m_totalMdZones = 1024;
 
     // lets set zone size
-    QVariant maxSensorWidth;
-    getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
-
     //one zone - 32x32 pixels; zone sizes are 1-15
 
     int optimal_zone_size_pixels = maxSensorWidth.toInt() / (m_totalMdZones == 64 ? 8 : 32);
@@ -266,9 +263,19 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     if (zone_size<1)
         zone_size = 1;
 
+    //detecting and saving selected resolutions
+    CameraMediaStreams mediaStreams;
+    const CodecID streamCodec = isH264() ? CODEC_ID_H264 : CODEC_ID_MJPEG;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt(), maxSensorHeight.toInt()), streamCodec ) );
+    QVariant hasDualStreaming;
+    getParam(QLatin1String("hasDualStreaming"), hasDualStreaming, QnDomainMemory);
+    if( hasDualStreaming.toInt() > 0 )
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt()/2, maxSensorHeight.toInt()/2), streamCodec ) );
+    saveResolutionList( mediaStreams );
+
     const QString firmware = getResourceParamList().value(QLatin1String("Firmware version")).value().toString();
     setFirmware(firmware);
-    save();
+    saveParams();
 
     setParam(QLatin1String("Zone size"), zone_size, QnDomainPhysical);
     setMotionMaskPhysical(0);
@@ -297,12 +304,12 @@ bool QnPlAreconVisionResource::updateMACAddress()
     return true;
 }
 
-Qn::StreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize /*size*/) const
+Qn::StreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const
 {
     return Qn::QualityNormal;
 }
 
-QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/)
+QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
 {
     return QImage();
 }
@@ -314,6 +321,16 @@ void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 int QnPlAreconVisionResource::totalMdZones() const
 {
     return m_totalMdZones;
+}
+
+bool QnPlAreconVisionResource::isH264() const
+{
+    if (!hasParam(QLatin1String("Codec")))
+        return false;
+
+    QVariant val;
+    getParam(QLatin1String("Codec"), val, QnDomainMemory);
+    return val==QLatin1String("H.264");
 }
 
 //===============================================================================================================================

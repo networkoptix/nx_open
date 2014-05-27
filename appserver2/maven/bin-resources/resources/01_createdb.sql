@@ -159,12 +159,15 @@ CREATE TABLE "vms_kvpair" (
 
 CREATE TABLE "vms_layout" (
     "user_can_edit" bool NOT NULL DEFAULT 0,
-    "cell_spacing_height" real NOT NULL DEFAULT -1.0, "locked" bool NOT NULL DEFAULT 0,
-    "cell_aspect_ratio" real NOT NULL DEFAULT -1.0, "user_id" integer NOT NULL,
+    "cell_spacing_height" real NOT NULL DEFAULT -1.0,
+    "locked" bool NOT NULL DEFAULT 0,
+    "cell_aspect_ratio" real NOT NULL DEFAULT -1.0,
+    "user_id" integer NOT NULL,
     "background_width" integer NOT NULL DEFAULT 1,
     "background_image_filename" varchar(1024),
     "background_height" integer NOT NULL DEFAULT 1,
-    "cell_spacing_width" real NOT NULL DEFAULT -1.0, "background_opacity" real NOT NULL,
+    "cell_spacing_width" real NOT NULL DEFAULT -1.0, 
+    "background_opacity" real NOT NULL,
     "resource_ptr_id" integer PRIMARY KEY autoincrement );
 
 
@@ -489,3 +492,5 @@ INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES (
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '4','Storage',NULL,NULL );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '5','Local',NULL,NULL );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '6','Camera',NULL,NULL );
+
+INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '17238','6','mediaStreams','1',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0' );

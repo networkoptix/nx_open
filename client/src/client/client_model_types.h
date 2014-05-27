@@ -147,13 +147,11 @@ struct QnVideowallAttachSettings {
     LayoutMode layoutMode;
     QnId layoutId;               /**< for custom layout */
     bool autoFill;
-    bool closeClient;
 
     QnVideowallAttachSettings():
         attachMode(AttachScreen),
         layoutMode(LayoutClone),
-        autoFill(true),
-        closeClient(false)
+        autoFill(true)
         {}
 };
 

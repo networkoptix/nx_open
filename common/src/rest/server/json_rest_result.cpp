@@ -1,7 +1,6 @@
 #include "json_rest_result.h"
 
-#include <utils/fusion/fusion_adaptor.h>
-#include <utils/serialization/json_functions.h>
+#include <utils/common/model_functions.h>
 
 QnJsonRestResult::QnJsonRestResult(): 
     m_error(NoError) 
@@ -32,6 +31,7 @@ const QJsonValue &QnJsonRestResult::reply() const {
     return m_reply;
 }
 
+QN_FUSION_DEFINE_FUNCTIONS(QnJsonRestResult::Error, (numeric))
 
 QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(QnJsonRestResult, 
     (json),

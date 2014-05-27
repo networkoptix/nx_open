@@ -38,6 +38,7 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_control_message.h>
+#include <core/resource/videowall_matrix.h>
 
 #include <recording/time_period.h>
 
@@ -60,7 +61,7 @@ namespace {
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
 
-void QnCommonMetaTypes::initilize() {
+void QnCommonMetaTypes::initialize() {
     /* Note that running the code twice is perfectly OK, 
      * so we don't need heavyweight synchronization here. */
     if(qn_commonMetaTypes_initialized)
@@ -116,6 +117,8 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnVideoWallItem>();
     qRegisterMetaType<QnVideoWallPcData>();
     qRegisterMetaType<QnVideoWallControlMessage>();
+    qRegisterMetaType<QnVideoWallMatrix>();
+
     qRegisterMetaType<QnMotionRegion>();
     qRegisterMetaType<QnScheduleTask>();
     qRegisterMetaType<QnScheduleTaskList>();

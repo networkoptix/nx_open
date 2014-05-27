@@ -290,7 +290,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 static QVector<QnId> toIdList(const QnResourceList& list)
 {
     QVector<QnId> result;
-    result.resize(list.size());
+    result.reserve(list.size());
     for (int i = 0; i < list.size(); ++i)
         result << list[i]->getId();
     return result;

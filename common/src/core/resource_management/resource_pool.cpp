@@ -12,6 +12,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
+#include <core/resource/videowall_matrix_index.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -219,11 +220,11 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
         if (resource.dynamicCast<QnLayoutResource>()) {
             foreach (const QnVideoWallResourcePtr &videowall, getResources().filtered<QnVideoWallResource>()) { // TODO: #Elric this is way beyond what one may call 'suboptimal'.
-                foreach (QnVideoWallItem item, videowall->getItems()) {
+                foreach (QnVideoWallItem item, videowall->items()->getItems()) {
                     if (item.layout != resource->getId())
                         continue;
                     item.layout = QUuid();
-                    videowall->updateItem(item.uuid, item);
+                    videowall->items()->updateItem(item.uuid, item);
                 }
             }
         }
@@ -501,26 +502,6 @@ bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHas
     }
 }
 
-QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QUuid &uuid) const {
-    foreach (const QnResourcePtr &resource, m_resources) {
-        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
-        if (!videoWall || !videoWall->hasItem(uuid))
-            continue;
-        return QnVideoWallItemIndex(videoWall, uuid);
-    }
-    return QnVideoWallItemIndex();
-}
-
-QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QUuid> &uuids) const {
-    QnVideoWallItemIndexList result;
-    foreach (const QUuid &uuid, uuids) {
-        QnVideoWallItemIndex index = getVideoWallItemByUuid(uuid);
-        if (!index.isNull())
-            result << index;
-    }
-    return result;
-}
-
 QnResourcePtr QnResourcePool::getIncompatibleResourceById(const QnId &id, bool useCompatible) const {
     QMutexLocker locker(&m_resourcesMtx);
 
@@ -552,4 +533,45 @@ void QnResourcePool::makeResourceNormal(const QnResourcePtr &resource) {
 
     m_incompatibleResources.erase(it);
     insertOrUpdateResource(resource, &m_resources);
+}
+
+QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QUuid &uuid) const {
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+        if (!videoWall || !videoWall->items()->hasItem(uuid))
+            continue;
+        return QnVideoWallItemIndex(videoWall, uuid);
+    }
+    return QnVideoWallItemIndex();
+}
+
+QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QUuid> &uuids) const {
+    QnVideoWallItemIndexList result;
+    foreach (const QUuid &uuid, uuids) {
+        QnVideoWallItemIndex index = getVideoWallItemByUuid(uuid);
+        if (!index.isNull())
+            result << index;
+    }
+    return result;
+}
+
+QnVideoWallMatrixIndex QnResourcePool::getVideoWallMatrixByUuid(const QUuid &uuid) const {
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+        if (!videoWall || !videoWall->matrices()->hasItem(uuid))
+            continue;
+        return QnVideoWallMatrixIndex(videoWall, uuid);
+    }
+    return QnVideoWallMatrixIndex();
+}
+
+
+QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(const QList<QUuid> &uuids) const {
+    QnVideoWallMatrixIndexList result;
+    foreach (const QUuid &uuid, uuids) {
+        QnVideoWallMatrixIndex index = getVideoWallMatrixByUuid(uuid);
+        if (!index.isNull())
+            result << index;
+    }
+    return result;
 }

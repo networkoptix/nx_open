@@ -88,7 +88,7 @@ private:
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnEmail::ConnectionType)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (lexical))
 
 #endif // QN_EMAIL_H
 

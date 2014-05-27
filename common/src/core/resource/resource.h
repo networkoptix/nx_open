@@ -445,12 +445,13 @@ public:
     virtual ~QnResourceProcessor() {}
 
     virtual void processResources(const QnResourceList &resources) = 0;
+    virtual bool isBusy() const { return false; }
 };
 
 
 Q_DECLARE_METATYPE(QnResourcePtr);
 Q_DECLARE_METATYPE(QnResourceList);
 
-QN_FUSION_DECLARE_FUNCTIONS(QnResource::Status, (metatype)(json))
+QN_FUSION_DECLARE_FUNCTIONS(QnResource::Status, (metatype)(lexical))
 
 #endif // QN_RESOURCE_H

@@ -181,17 +181,21 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     setMaxFps(fpsList.at(0));
 
-    save();
+    CameraMediaStreams mediaStreams;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution1, CODEC_ID_H264 ) );
+    if( m_resolution2.width() > 0 )
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution2, CODEC_ID_H264 ) );
+    saveResolutionList( mediaStreams );
+
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
-
 }
 
 QSize QnPlIsdResource::getPrimaryResolution() const
 {
     QMutexLocker lock(&m_mutex);
     return m_resolution1;
-
 }
 
 QSize QnPlIsdResource::getSecondaryResolution() const
@@ -203,7 +207,6 @@ QSize QnPlIsdResource::getSecondaryResolution() const
 
 QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 {
-
     return new QnISDStreamReader(toSharedPointer());
 }
 

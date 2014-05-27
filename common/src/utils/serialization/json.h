@@ -20,9 +20,9 @@
 
 #include <utils/common/unused.h>
 #include <utils/fusion/fusion_serialization.h>
+#include <utils/serialization/serialization.h>
 
 #include "json_fwd.h"
-#include "serialization.h"
 #include "lexical.h"
 
 class QnJsonSerializer;
@@ -317,7 +317,7 @@ namespace QJsonDetail {
 QN_FUSION_REGISTER_SERIALIZATION_VISITORS(QJsonValue, QJsonDetail::SerializationVisitor, QJsonDetail::DeserializationVisitor)
 
 
-#define QN_DEFINE_LEXICAL_JSON_FUNCTIONS(TYPE, ... /* PREFIX */)                \
+#define QN_FUSION_DEFINE_FUNCTIONS_json_lexical(TYPE, ... /* PREFIX */)         \
 __VA_ARGS__ void serialize(QnJsonContext *, const TYPE &value, QJsonValue *target) { \
     *target = QnLexical::serialized(value);                                     \
 }                                                                               \

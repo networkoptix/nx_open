@@ -115,7 +115,6 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_audioEnabled = other_casted->m_audioEnabled;
         m_manuallyAdded = other_casted->m_manuallyAdded;
         m_model = other_casted->m_model;
-        m_firmware = other_casted->m_firmware;
         m_vendor = other_casted->m_vendor;
     }
 }
@@ -492,11 +491,14 @@ void QnSecurityCamResource::setModel(const QString &model) {
 }
 
 QString QnSecurityCamResource::getFirmware() const {
-    SAFE(return m_firmware)
+    QVariant val;
+    if (!getParam(lit("firmware"), val, QnDomainMemory))
+        return QString();
+    return val.toString();
 }
 
 void QnSecurityCamResource::setFirmware(const QString &firmware) {
-    SAFE(m_firmware = firmware)
+    setParam(lit("firmware"), firmware, QnDomainDatabase);
 }
 
 QString QnSecurityCamResource::getVendor() const {

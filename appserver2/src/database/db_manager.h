@@ -25,9 +25,45 @@ namespace ec2
 {
     class LicenseManagerImpl;
 
+    enum ApiOjectType
+    {
+        ApiObject_NotDefined,
+        ApiObject_Resource,
+        ApiObject_Server,
+        ApiObject_Camera,
+        ApiObject_User,
+        ApiObject_Layout,
+        ApiObject_Videowall,
+        ApiObject_BusinessRule,
+        ApiObject_Dummy
+    };
+    struct ApiObjectInfo
+    {
+        ApiObjectInfo() {}
+        ApiObjectInfo(const ApiOjectType& type, const QnId& id): type(type), id(id) {}
+
+        ApiOjectType type;
+        QnId id;
+    };
+    class ApiObjectInfoList: public std::vector<ApiObjectInfo>
+    {
+    public:
+        std::vector<ApiIdData> toIdList() 
+        {
+            std::vector<ApiIdData> result;
+            for (int i = 0; i < size(); ++i) {
+                ApiIdData data;
+                data.id = at(i).id;
+                result.push_back(data);
+            }
+            return result;
+        }
+    };
+
     class QnDbManager: public QnDbHelper
     {
     public:
+
         QnDbManager(
             QnResourceFactory* factory,
             LicenseManagerImpl* const licenseManagerImpl,
@@ -77,7 +113,7 @@ namespace ec2
         }
 
         //getCurrentTime
-        ErrorCode doQuery(const nullptr_t& /*dummy*/, qint64& currentTime);
+        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, qint64& currentTime);
 
         //getStoragePath
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -85,48 +121,51 @@ namespace ec2
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileData& data);
 
         //getResourceTypes
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiResourceTypeDataList& resourceTypeList);
 
         //getCameras
         ErrorCode doQueryNoLock(const QnId& mServerId, ApiCameraDataList& cameraList);
 
         //getServers
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiMediaServerDataList& serverList);
 
         //getCameraServerItems
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
 
         //getCameraBookmarkTags
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags);
 
         //getUserList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList& userList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiUserDataList& userList);
 
         //getVideowallList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
 
         //getBusinessRuleList
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiLayoutDataList& layoutList);
 
         //getResourceParams
         ErrorCode doQueryNoLock(const QnId& resourceId, ApiResourceParamsData& params);
 
         // ApiFullInfo
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiFullInfoData& data);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiFullInfoData& data);
 
         //getLicenses
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data);
 
         //getParams
-        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
 
 		// --------- misc -----------------------------
         bool markLicenseOverflow(bool value, qint64 time);
         qint64 licenseOverflowTime() const;
+        QUuid getID() const;
 
+        ApiOjectType getObjectType(const QnId& objectId);
+        ApiObjectInfoList getNestedObjects(const ApiObjectInfo& parentObject);
     private:
         friend class QnTransactionLog;
         QSqlDatabase& getDB() { return m_sdb; }
@@ -205,7 +244,7 @@ namespace ec2
         ErrorCode insertOrReplaceResource(const ApiResourceData& data, qint32* internalId);
         //ErrorCode insertOrReplaceResource(const ApiResourceData& data);
         ErrorCode deleteRecordFromResourceTable(const qint32 id);
-        ErrorCode removeResource(const QnId& id);
+        ErrorCode removeObject(const ApiObjectInfo& apiObject);
 
         ErrorCode insertAddParams(const std::vector<ApiResourceParamData>& params, qint32 internalId);
         ErrorCode deleteAddParams(qint32 resourceId);
@@ -240,6 +279,8 @@ namespace ec2
         ErrorCode updateVideowallItems(const ApiVideowallData& data);
         ErrorCode updateVideowallScreens(const ApiVideowallData& data);
         ErrorCode removeLayoutFromVideowallItems(const QnId &layout_id);
+        ErrorCode deleteVideowallMatrices(const QnId &videowall_guid);
+        ErrorCode updateVideowallMatrices(const ApiVideowallData &data);
 
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnId& ruleGuid, const QnId& resourceGuid);
@@ -274,6 +315,7 @@ namespace ec2
         ApiResourceTypeDataList m_cachedResTypes;
         bool m_licenseOverflowMarked;
         qint64 m_licenseOverflowTime;
+        QUuid m_dbInstanceId;
 
         void fillServerInfo( ApiServerInfoData* const serverInfo );
     };

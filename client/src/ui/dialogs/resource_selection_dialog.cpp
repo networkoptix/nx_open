@@ -48,55 +48,56 @@ namespace {
 // -------------------------------------------------------------------------- //
 QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_resourceModel(NULL),
+    m_delegate(NULL),
+    m_thumbnailManager(NULL),
+    m_target(target),
+    m_screenshotIndex(0),
+    m_updating(false)
 {
-    init(target);
+    init();
 }
 
 QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_resourceModel(NULL),
+    m_delegate(NULL),
+    m_thumbnailManager(NULL),
+    m_target(CameraResourceTarget),
+    m_screenshotIndex(0),
+    m_updating(false)
 {
-    init(CameraResourceTarget);
+    init();
 }
 
-void QnResourceSelectionDialog::init(SelectionTarget target) {
-    m_delegate = NULL;
-    m_tooltipResourceId = QnId();
-    m_screenshotIndex = 0;
-    m_target = target;
-    m_updating = false;
+void QnResourceSelectionDialog::init() {
 
     ui.reset(new Ui::ResourceSelectionDialog);
     ui->setupUi(this);
 
-    bool flat;
     Qn::NodeType rootNodeType;
 
-
-    switch (target) {
+    switch (m_target) {
     case UserResourceTarget:
-        flat = true;
         rootNodeType = Qn::UsersNode;
         setWindowTitle(tr("Select users..."));
         ui->detailsWidget->hide();
         resize(minimumSize());
         break;
     case CameraResourceTarget:
-        flat = false;
         rootNodeType = Qn::ServersNode;
         setWindowTitle(tr("Select cameras..."));
         break;
     default:
-        qWarning() << "undefined resource selection dialog behaviour";
-        flat = false;
         rootNodeType = Qn::RootNode;
         setWindowTitle(tr("Select resources..."));
         ui->detailsWidget->hide();
         resize(minimumSize());
         break;
     }
-    m_resourceModel = new QnResourcePoolModel(rootNodeType, flat, this);
+    m_resourceModel = new QnResourcePoolModel(rootNodeType, this);
 
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
 
@@ -108,7 +109,7 @@ void QnResourceSelectionDialog::init(SelectionTarget target) {
 
     ui->delegateFrame->setVisible(false);
 
-    if (target == CameraResourceTarget) {
+    if (m_target == CameraResourceTarget) {
         connect(ui->resourcesWidget->treeView(), SIGNAL(entered(QModelIndex)), this, SLOT(updateThumbnail(QModelIndex)));
         m_thumbnailManager = new QnCameraThumbnailManager(this);
         m_thumbnailManager->setThumbnailSize(ui->screenshotLabel->contentSize());
@@ -119,9 +120,7 @@ void QnResourceSelectionDialog::init(SelectionTarget target) {
     at_resourceModel_dataChanged();
 }
 
-QnResourceSelectionDialog::~QnResourceSelectionDialog() {
-    return;
-}
+QnResourceSelectionDialog::~QnResourceSelectionDialog() {}
 
 QnResourceList QnResourceSelectionDialog::selectedResources() const {
     return selectedResourcesInner();
@@ -132,7 +131,6 @@ void QnResourceSelectionDialog::setSelectedResources(const QnResourceList &selec
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
         setSelectedResourcesInner(selected);
     }
-
     at_resourceModel_dataChanged();
 }
 
@@ -189,15 +187,6 @@ void QnResourceSelectionDialog::keyPressEvent(QKeyEvent *event) {
         return;
     }
     base_type::keyPressEvent(event);
-}
-
-bool QnResourceSelectionDialog::event(QEvent *event) {
-    bool result = base_type::event(event);
-
-    if(event->type() == QEvent::Polish) {
-    }
-
-    return result;
 }
 
 void QnResourceSelectionDialog::setDelegate(QnResourceSelectionDialogDelegate *delegate) {

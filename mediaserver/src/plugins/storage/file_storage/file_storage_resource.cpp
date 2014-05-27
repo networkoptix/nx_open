@@ -12,6 +12,8 @@
 #include "windows.h"
 #endif
 #include <media_server/settings.h>
+#include <recorder/storage_manager.h>
+
 
 static const int FFMPEG_BUFFER_SIZE = 1024*1024*4;
 
@@ -186,7 +188,9 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 
 QnStorageResource* QnFileStorageResource::instance()
 {
-    return new QnFileStorageResource();
+    QnStorageResource* storage = new QnFileStorageResource();
+    storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong() );
+    return storage;
 }
 
 float QnFileStorageResource::getAvarageWritingUsage() const

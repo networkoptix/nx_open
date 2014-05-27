@@ -1,6 +1,8 @@
 #ifndef __TRANSACTION_MESSAGE_BUS_H_
 #define __TRANSACTION_MESSAGE_BUS_H_
 
+#include <memory>
+
 #include <QtCore/QElapsedTimer>
 
 #include <nx_ec/ec_api.h>
@@ -37,20 +39,18 @@ namespace ec2
         template <class T>
         void setHandler(T* handler) { 
             QMutexLocker lock(&m_mutex);
-            m_handler = new CustomHandler<T>(handler); 
+            m_handler.reset( new CustomHandler<T>(handler) );
         }
 
         template <class T>
         void removeHandler(T* handler) { 
             QMutexLocker lock(&m_mutex);
             if (m_handler->getHandler() == handler) {
-                delete m_handler;
-                m_handler = 0;
+                m_handler.reset();
             }
         }
 
-        template <class T>
-        void sendTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
+        void sendTransaction(const QnAbstractTransaction& tran, const QByteArray& serializedTran)
         {
             QMutexLocker lock(&m_mutex);
             QByteArray buffer;
@@ -170,7 +170,7 @@ namespace ec2
         };
 
         QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;
-        AbstractHandler* m_handler;
+        std::unique_ptr<AbstractHandler> m_handler;
         QTimer* m_timer;
         mutable QMutex m_mutex;
         QThread *m_thread;

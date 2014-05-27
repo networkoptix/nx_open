@@ -33,7 +33,7 @@
         },
         {
             "keys": [
-                "VIVOTEK|SD8362", "VIVOTEK|SD83X3", "VIVOTEK|SD81X1", "VIVOTEK|SD83X1"
+                "VIVOTEK|*"
             ],
             "onvifPtzStopBroken": true
         },
@@ -54,7 +54,8 @@
             "keys": [
                 "DW|DWC-MPTZ20X", "DW|DWC-MPTZ5X",
                 "ACTI|KCM8111",
-                "*|FW3471-PS-E"
+                "*|FW3471-PS-E",
+                "*|DW-CP04"
             ],
             "octagonalPtz": true
         },
@@ -311,6 +312,71 @@
                         "device":  [    -1,   -0.9,   -0.8,   -0.7,   -0.6,   -0.5,   -0.4,   -0.3,   -0.2,   -0.1,      0,    0.1,    0.2,    0.3,    0.4,    0.5,    0.6,    0.7,    0.8,    0.9,       1],
                         "logical": [1.0000, 1.0748, 1.1636, 1.2617, 1.3738, 1.5000, 1.6449, 1.8178, 2.0187, 2.2477, 2.5234, 2.8458, 3.2383, 3.7150, 4.2850, 4.9766, 5.8411, 6.8645, 7.9626, 9.2925, 10.9050],
                         "logicalMultiplier": 32.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "SONY|SNC-EP580|unknown"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-0.94448, 0.94448],
+                        "logical": [    -170,     170]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1.33,  -1],
+                        "logical": [15,   -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0,      0.0261, 0.0521, 0.0782, 0.1043, 0.1303, 0.1564, 0.1825, 0.2086, 0.2346, 0.2607, 0.2868, 0.3128, 0.3389, 0.365,  0.391,  0.4171, 0.4432, 0.4692,  0.4953,  0.5214],
+                        "logical": [1.0000, 1.0706, 1.1647, 1.2706, 1.3882, 1.5176, 1.6824, 1.8706, 2.0824, 2.3412, 2.6471, 3.0000, 3.4588, 4.0235, 4.7412, 5.6471, 6.7882, 8.2353, 10.1059, 12.5647, 16.5393],
+                        "logicalMultiplier": 36.0,
+                        "space": "35MmEquiv"
+                    }
+                },
+                "toCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1.0, 1.0],
+                        "logical": [-170, 170]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1,     -1],
+                        "logical": [15,   -90]
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "SONY|SNC-EP580", "SONY|SNC-EP580|1.82.01"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-170, 170]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [1, -1],
+                        "logical": [0, -90],
+                        "_TODO": "Actual tilt range is [15, -90], but camera reports everything above 0 as 1."
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0,      0.0261, 0.0521, 0.0782, 0.1043, 0.1303, 0.1564, 0.1825, 0.2086, 0.2346, 0.2607, 0.2868, 0.3128, 0.3389, 0.365,  0.391,  0.4171, 0.4432, 0.4692,  0.4953,  0.5214],
+                        "logical": [1.0000, 1.0706, 1.1647, 1.2706, 1.3882, 1.5176, 1.6824, 1.8706, 2.0824, 2.3412, 2.6471, 3.0000, 3.4588, 4.0235, 4.7412, 5.6471, 6.7882, 8.2353, 10.1059, 12.5647, 16.5393],
+                        "logicalMultiplier": 36.0,
                         "space": "35MmEquiv"
                     }
                 }

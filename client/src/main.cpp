@@ -403,8 +403,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
-    if(authentication.isValid())
+    if(authentication.isValid()) {
+        if (!videoWallGuid.isNull())
+            authentication.setUserName(videoWallGuid.toString());
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
+    }
 
     qnSettings->setVSyncEnabled(!noVSync);
 
@@ -516,6 +519,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QnLocalFileProcessor localFileProcessor;
     QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
+    localFileProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
     QnResourceDiscoveryManager::instance()->setResourceProcessor(&localFileProcessor);
 
     //============================
