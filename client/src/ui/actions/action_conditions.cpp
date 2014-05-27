@@ -859,3 +859,17 @@ Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resource
             return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
+
+
+Qn::ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList &resources) {
+    bool found = false;
+    foreach (const QnResourcePtr &resource, resources) {
+        if (resource->getStatus() != m_status) {
+            if (m_all)
+                return Qn::InvisibleAction;
+        } else {
+            found = true;
+        }
+    }
+    return found ? Qn::EnabledAction : Qn::InvisibleAction;
+}
