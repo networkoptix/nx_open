@@ -10,7 +10,6 @@ public:
 
     QString systemName() const;
     void setSystemName(const QString &systemName);
-    void setRebootPeers(bool rebootPeers);
 
 protected:
     virtual void doStart() override;
@@ -22,7 +21,6 @@ private:
     QString m_systemName;
     QHash<int, QnId> m_pendingPeers;
     QSet<QnId> m_failedPeers;
-    bool m_rebootPeers;
 };
 
 #endif // CHANGE_SYSTEM_NAME_PEER_TASK_H

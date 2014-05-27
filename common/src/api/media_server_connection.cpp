@@ -68,6 +68,7 @@ namespace {
         (BookmarksGetObject,       "cameraBookmarks/get")
         (ChangeSystemNameObject,   "changeSystemName")
         (InstallUpdateObject,      "installUpdate")
+        (Restart,                  "restart")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -404,6 +405,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, handle);
         break;
     case InstallUpdateObject:
+        emitFinished(this, response.status, handle);
+        break;
+    case Restart:
         emitFinished(this, response.status, handle);
         break;
     default:
@@ -848,11 +852,9 @@ int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camer
     return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 
-int QnMediaServerConnection::changeSystemNameAsync(const QString &systemName, bool reboot, QObject *target, const char *slot) {
+int QnMediaServerConnection::changeSystemNameAsync(const QString &systemName, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("systemName", systemName);
-    if (reboot)
-        params << QnRequestParam("reboot", true);
 
     return sendAsyncGetRequest(ChangeSystemNameObject, params, NULL, target, slot);
 }
@@ -864,3 +866,6 @@ int QnMediaServerConnection::installUpdate(const QString &updateId, const QByteA
     return sendAsyncPostRequest(InstallUpdateObject, params, data, NULL, target, slot);
 }
 
+int QnMediaServerConnection::restart(QObject *target, const char *slot) {
+    return sendAsyncGetRequest(Restart, QnRequestParamList(), NULL, target, slot);
+}

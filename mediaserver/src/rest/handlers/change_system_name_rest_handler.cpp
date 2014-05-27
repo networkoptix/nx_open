@@ -3,8 +3,6 @@
 #include <common/common_module.h>
 #include <media_server/settings.h>
 
-void stopServer(int signal);
-
 namespace HttpStatusCode {
     enum Code {
         ok = 200
@@ -20,12 +18,7 @@ int QnChangeSystemNameRestHandler::executeGet(const QString &path, const QnReque
     if (qnCommon->localSystemName() == systemName)
         return HttpStatusCode::ok;
 
-    bool reboot = params.contains("reboot");
-
     MSSettings::roSettings()->setValue("systemName", systemName);
-
-    if (reboot)
-        stopServer(0);
 
     return HttpStatusCode::ok;
 }
@@ -39,6 +32,5 @@ int QnChangeSystemNameRestHandler::executePost(const QString &path, const QnRequ
 QString QnChangeSystemNameRestHandler::description() const {
     return
         "Changes system name of this server<br>"
-        "Request format: GET /api/changeSystemname?systemName=<system name>&amp;reboot&amp;<br>"
-        "'reboot' parameter is optional.<br>";
+        "Request format: GET /api/changeSystemname?systemName=<system name>&amp;reboot&amp;<br>";
 }

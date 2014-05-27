@@ -33,7 +33,6 @@ void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QnId> &targ
     m_running = true;
     m_targets = targets;
     m_changeSystemNameTask->setSystemName(qnCommon->localSystemName());
-    m_changeSystemNameTask->setRebootPeers(false);
     m_changeSystemNameTask->start(targets);
 }
 
