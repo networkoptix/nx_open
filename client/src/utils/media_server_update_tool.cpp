@@ -205,8 +205,10 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
             result.append(resource.staticCast<QnMediaServerResource>());
 
         foreach (const QnResourcePtr &resource, qnResPool->getAllIncompatibleResources()) {
-            if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
-                result.append(server);
+            if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
+                if (server->getSystemName() == qnCommon->localSystemName())
+                    result.append(server);
+            }
         }
 
     } else {
@@ -539,6 +541,7 @@ void QnMediaServerUpdateTool::lockMutex() {
     m_distributedMutex = ec2::QnDistributedMutexManager::instance()->createMutex(mutexName);
     connect(m_distributedMutex, &ec2::QnDistributedMutex::locked,        this,   &QnMediaServerUpdateTool::at_mutexLocked, Qt::QueuedConnection);
     connect(m_distributedMutex, &ec2::QnDistributedMutex::lockTimeout,   this,   &QnMediaServerUpdateTool::at_mutexTimeout, Qt::QueuedConnection);
+    m_distributedMutex->lockAsync();
 }
 
 void QnMediaServerUpdateTool::unlockMutex() {
