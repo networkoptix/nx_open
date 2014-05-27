@@ -1151,6 +1151,7 @@ ErrorCode QnDbManager::deleteRecordFromResourceTable(const qint32 id)
 
 ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
 {
+#if 0
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare("select c.physical_id , (select count(*) from vms_camera where physical_id = c.physical_id) as cnt \
@@ -1166,7 +1167,6 @@ ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
         return ErrorCode::ok; // camera instance on a other media server still present
 
 
-#if 0
     // do not delete because of camera can be found in the future again but camera archive can be still accessible
     QSqlQuery delQuery(m_sdb);
     delQuery.prepare("DELETE FROM vms_cameraserveritem where physical_id = :physical_id");
@@ -1228,6 +1228,10 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
         return err;
 
     err = deleteTableRecord(guid, "vms_businessrule_event_resources", "resource_guid");
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteTableRecord(id, "vms_layoutitem", "resource_id");
     if (err != ErrorCode::ok)
         return err;
 
