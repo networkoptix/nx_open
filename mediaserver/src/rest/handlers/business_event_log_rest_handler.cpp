@@ -50,8 +50,9 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
             }
             else if (params[i].first == "event") {
                 eventType = (QnBusiness::EventType) params[i].second.toInt();
-                if (eventType < 0 || eventType >= QnBusiness::EventCount)
-                    errStr = QString("Invalid event type %1. Valid range is [0..%2]").arg(params[i].second).arg(QnBusiness::EventCount-1);
+                //TODO #ak check enum value for correctness
+                if( eventType == QnBusiness::UndefinedEvent )
+                    errStr = QString("Invalid event type %1").arg(params[i].second);
             }
             else if (params[i].first == "action") {
                 actionType = (QnBusiness::ActionType) params[i].second.toInt();
