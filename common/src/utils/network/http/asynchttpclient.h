@@ -111,10 +111,12 @@ namespace nx_http
         void setUserAgent( const QString& userAgent );
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
+        void setResponseReadTimeoutMs( int _responseReadTimeoutMs );
 
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addRequestHeader(const StringType& key, const StringType& value);
+
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
         //!Emitted when response headers has been read
@@ -157,6 +159,7 @@ namespace nx_http
         mutable QMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
+        int m_responseReadTimeoutMs;
 
         void resetDataBeforeNewRequest();
         bool initiateHttpMessageDelivery( const QUrl& url );

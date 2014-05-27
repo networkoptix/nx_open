@@ -34,7 +34,8 @@ namespace nx_http
         m_authorizationTried( false ),
         m_terminated( false ),
         m_totalBytesRead( 0 ),
-        m_contentEncodingUsed( true )
+        m_contentEncodingUsed( true ),
+        m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT )
     {
         m_responseBuffer.resize(RESPONSE_BUFFER_SIZE);
     }
@@ -154,7 +155,7 @@ namespace nx_http
                         NX_LOG( lit("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2 );
                         m_state = sReceivingResponse;
                         aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
-                        m_socket->setRecvTimeout( DEFAULT_RESPONSE_READ_TIMEOUT );
+                        m_socket->setRecvTimeout( m_responseReadTimeoutMs );
                         aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this );
                     }
                     break;
@@ -429,6 +430,11 @@ namespace nx_http
         m_userPassword = userPassword;
     }
 
+    void AsyncHttpClient::setResponseReadTimeoutMs( int _responseReadTimeoutMs )
+    {
+        m_responseReadTimeoutMs = _responseReadTimeoutMs;
+    }
+
     void AsyncHttpClient::resetDataBeforeNewRequest()
     {
         //stopping client, if it is running
@@ -536,7 +542,7 @@ namespace nx_http
 
     void AsyncHttpClient::composeRequest( const nx_http::StringType& httpMethod )
     {
-        const bool useHttp11 = true;   //TODO/IMPL check. if we need it (e.g. we using keep-alive or requesting live capture)
+        const bool useHttp11 = true;   //TODO #ak check if we need it (e.g. we using keep-alive or requesting live capture)
 
         m_request.requestLine.method = httpMethod;
         m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
@@ -698,11 +704,8 @@ namespace nx_http
         QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
         const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
 
-        if( qop.indexOf("auth-int") != -1 )
+        if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
             return false;   //qop=auth-int is not supported
-
-        BufferType nonceCount = "00000001";     //TODO/IMPL
-        BufferType clientNonce = "0a4f113b";    //TODO/IMPL
 
         QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
 
@@ -732,6 +735,9 @@ namespace nx_http
         md5HashCalc.addData( ":" );
         if( !qop.isEmpty() )
         {
+            const BufferType nonceCount = "00000001";     //TODO/IMPL
+            const BufferType clientNonce = "0a4f113b";    //TODO/IMPL
+
             md5HashCalc.addData( nonceCount );
             md5HashCalc.addData( ":" );
             md5HashCalc.addData( clientNonce );
