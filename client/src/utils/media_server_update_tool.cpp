@@ -550,16 +550,10 @@ void QnMediaServerUpdateTool::unlockMutex() {
 }
 
 void QnMediaServerUpdateTool::at_mutexLocked() {
-    if (name != mutexName)
-        return;
-
     uploadUpdatesToServers();
 }
 
 void QnMediaServerUpdateTool::at_mutexTimeout() {
-    if (name != mutexName)
-        return;
-
     m_distributedMutex->deleteLater();
     m_distributedMutex = 0;
     finishUpdate(LockFailed);
