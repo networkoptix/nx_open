@@ -1149,7 +1149,7 @@ ErrorCode QnDbManager::deleteRecordFromResourceTable(const qint32 id)
     }
 }
 
-ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 id)
+ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 /*id*/)
 {
 #if 0
     QSqlQuery query(m_sdb);
@@ -1371,7 +1371,7 @@ ApiOjectType QnDbManager::getObjectType(const QnId& objectId)
     else if (objectType == "Server")
         return ApiObject_Server;
     else if (objectType == "User")
-        return ApiObject_Server;
+        return ApiObject_User;
     else if (objectType == "Layout")
         return ApiObject_Layout;
     else if (objectType == "Videowall")
