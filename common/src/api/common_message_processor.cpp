@@ -105,18 +105,18 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::at_remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::at_remotePeerLost );
 
-    connection->startReceivingNotifications(true);
+    connection->startReceivingNotifications();
 }
 
-void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiServerAliveData data, bool /*isProxy*/)
+void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool /*isProxy*/)
 {
-    if (!data.isClient)
-        qnLicensePool->addRemoteHardwareIds(data.serverId, data.hardwareIds);
+    if (data.peerType == static_cast<int>(ec2::QnPeerInfo::Server))   //TODO: #Elric #ec2 get rid of the serialization hell
+        qnLicensePool->addRemoteHardwareIds(data.peerId, data.hardwareIds);
 }
 
-void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiServerAliveData data, bool /*isProxy*/)
+void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool /*isProxy*/)
 {
-    qnLicensePool->removeRemoteHardwareIds(data.serverId);
+    qnLicensePool->removeRemoteHardwareIds(data.peerId);
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)

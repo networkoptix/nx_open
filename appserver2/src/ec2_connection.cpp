@@ -52,8 +52,8 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void Ec2DirectConnection::startReceivingNotifications( bool /*isClient*/)
-    {
+    void Ec2DirectConnection::startReceivingNotifications() {
+        QnTransactionMessageBus::instance()->setLocalPeer(QnPeerInfo(qnCommon->moduleGUID(), QnPeerInfo::Server));
         QnTransactionMessageBus::instance()->start();
     }
 }

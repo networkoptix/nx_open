@@ -38,7 +38,7 @@ namespace ec2 {
     struct ApiResourceTypeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
-    struct ApiServerAliveData;
+    struct ApiPeerAliveData;
     struct ApiServerInfoData;
     //struct ApiSetResourceDisabledData;
     struct ApiSetResourceStatusData;
@@ -104,7 +104,7 @@ namespace ec2 {
     (ApiResourceTypeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\
-    (ApiServerAliveData)\
+    (ApiPeerAliveData)\
     (ApiServerInfoData)\
     (ApiSetResourceStatusData)\
     (ApiStorageData)\

@@ -36,8 +36,10 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void RemoteEC2Connection::startReceivingNotifications( bool isClient)
+    void RemoteEC2Connection::startReceivingNotifications()
     {
+        // in remote mode we are always working as a client
+        QnTransactionMessageBus::instance()->setLocalPeer(QnPeerInfo(qnCommon->moduleGUID(), QnPeerInfo::DesktopClient));
         QnTransactionMessageBus::instance()->start();
 
         QUrl url(m_queryProcessor->getUrl());
@@ -46,6 +48,6 @@ namespace ec2
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
         url.setQuery(q);
         m_peerUrl = url;
-        QnTransactionMessageBus::instance()->addConnectionToPeer(url, isClient);
+        QnTransactionMessageBus::instance()->addConnectionToPeer(url);
     }
 }

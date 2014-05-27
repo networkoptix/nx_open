@@ -51,7 +51,16 @@ void QnTransactionTcpProcessor::run()
 
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
     bool isClient = query.hasQueryItem("isClient");
+    bool isMobileClient = query.hasQueryItem("isMobile");
     QUuid remoteGuid  = query.queryItemValue(lit("guid"));
+    if (remoteGuid.isNull())
+        remoteGuid = QUuid::createUuid();
+    QnPeerInfo remotePeer(remoteGuid, isMobileClient 
+        ? QnPeerInfo::AndroidClient
+        : isClient 
+        ? QnPeerInfo::DesktopClient
+        : QnPeerInfo::Server);
+
     qint64 remoteTime  = query.queryItemValue(lit("time")).toLongLong();
     QByteArray remoteHwList = query.queryItemValue(lit("hwList")).toLocal8Bit();
     qint64 localTime = -1;
@@ -60,12 +69,6 @@ void QnTransactionTcpProcessor::run()
         localTime = QnTransactionLog::instance()->getRelativeTime();
         if (remoteTime != -1)
             timeDiff = remoteTime - localTime;
-    }
-
-    if (remoteGuid.isNull()) {
-        qWarning() << "Invalid incoming request. GUID must be filled!";
-        sendResponse("HTTP", CODE_INVALID_PARAMETER, "application/octet-stream");
-        return;
     }
 
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
@@ -102,7 +105,7 @@ void QnTransactionTcpProcessor::run()
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
     }
     else {
-        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, isClient, remoteGuid, timeDiff, QnTransactionTransport::decodeHWList(remoteHwList));
+        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, remotePeer, timeDiff, QnTransactionTransport::decodeHWList(remoteHwList));
         d->socket.clear();
     }
 }
