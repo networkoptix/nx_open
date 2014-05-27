@@ -250,6 +250,8 @@ public:
     int changeSystemNameAsync(const QString &systemName, QObject *target, const char *slot);
     int installUpdate(const QString &updateId, const QByteArray &data, QObject *target, const char *slot);
 
+    int restart(QObject *target, const char *slot);
+
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
 
