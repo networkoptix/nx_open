@@ -1192,7 +1192,10 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Rename")).
         shortcut(tr("F2")).
         autoRepeat(false).
-        condition(new QnRenameActionCondition(this));
+        condition(new QnConjunctionActionCondition(
+                      new QnRenameActionCondition(this),
+                      new QnNegativeActionCondition(new QnResourceStatusActionCondition(QnResource::Incompatible, true, this), this),
+                      this));
 
     factory().
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).

@@ -441,7 +441,7 @@ QnResourceList QnResourceBrowserWidget::selectedIncompatibleServers() const {
     QnResourceList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        if (index.data(Qn::NodeTypeRole).value<Qn::NodeType>() != Qn::IncompatibleServerNode)
+        if (index.data(Qn::ResourceStatusRole).value<QnResource::Status>() != QnResource::Incompatible)
             continue;
 
         result.append(index.data(Qn::ResourceRole).value<QnResourcePtr>());
@@ -469,9 +469,6 @@ QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
 
     if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QUuid>().isNull()) /* If it's a layout item. */
         return QVariant::fromValue(selectedLayoutItems());
-
-    if(nodeType == Qn::IncompatibleServerNode)
-        return QVariant::fromValue(selectedIncompatibleServers());
 
     return QVariant::fromValue(selectedResources());
 }

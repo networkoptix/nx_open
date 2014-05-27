@@ -93,8 +93,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, con
 {
     assert(model != NULL);
     assert(nodeType == Qn::ResourceNode ||
-           nodeType == Qn::EdgeNode ||
-           nodeType == Qn::IncompatibleServerNode);
+           nodeType == Qn::EdgeNode);
 
     setResource(resource);
 
@@ -135,8 +134,7 @@ void QnResourcePoolModelNode::clear() {
     if (m_type == Qn::ItemNode ||
         m_type == Qn::ResourceNode || 
         m_type == Qn::VideoWallItemNode || 
-        m_type == Qn::EdgeNode ||
-        m_type == Qn::IncompatibleServerNode)
+        m_type == Qn::EdgeNode)
     {
         setResource(QnResourcePtr());
     }
@@ -147,8 +145,7 @@ void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
         m_type == Qn::ItemNode ||
         m_type == Qn::ResourceNode || 
         m_type == Qn::VideoWallItemNode || 
-        m_type == Qn::EdgeNode ||
-        m_type == Qn::IncompatibleServerNode);
+        m_type == Qn::EdgeNode);
 
     if(m_resource == resource)
         return;
@@ -166,7 +163,7 @@ void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
 
 void QnResourcePoolModelNode::update() {
     /* Update stored fields. */
-    if(m_type == Qn::ResourceNode || m_type == Qn::ItemNode || m_type == Qn::EdgeNode || m_type == Qn::IncompatibleServerNode) {
+    if(m_type == Qn::ResourceNode || m_type == Qn::ItemNode || m_type == Qn::EdgeNode) {
         if(m_resource.isNull()) {
             m_displayName = m_name = QString();
             m_flags = 0;
@@ -419,9 +416,6 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
     case Qn::VideoWallItemNode: //TODO: #GDM VW drag of empty item on scene should create new layout
     case Qn::RecorderNode:
         result |= Qt::ItemIsDragEnabled; 
-        break;
-    case Qn::IncompatibleServerNode:
-        result |= Qt::ItemIsDragEnabled;
         break;
     default:
         break;
