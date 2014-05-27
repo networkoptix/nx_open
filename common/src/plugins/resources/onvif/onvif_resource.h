@@ -198,6 +198,7 @@ public:
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
     static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl, const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
     CameraDiagnostics::Result readDeviceInformation();
+    CameraDiagnostics::Result getFullUrlInfo();
 
 
     //!Relay input with token \a relayToken has changed its state to \a active
@@ -468,7 +469,6 @@ private:
         bool active,
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
-    CameraDiagnostics::Result getFullUrlInfo();
 };
 
 #endif //ENABLE_ONVIF
