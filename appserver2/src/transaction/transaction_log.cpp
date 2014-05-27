@@ -44,7 +44,7 @@ void QnTransactionLog::init()
     QSqlQuery queryTime(m_dbManager->getDB());
     queryTime.prepare("SELECT max(timestamp) FROM transaction_log");
     if (queryTime.exec() && queryTime.next()) {
-        m_relativeOffset = qMax(1ll, queryTime.value(0).toLongLong());
+        m_relativeOffset = qMax(0ll, queryTime.value(0).toLongLong()) + 1;
     }
 
     QSqlQuery querySequence(m_dbManager->getDB());
@@ -122,6 +122,8 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
         return ErrorCode::failure;
     }
 
+    qDebug() << "add record to transaction log. Transaction=" << toString(tran.command) << "timestamp=" << tran.timestamp << "producedOnCurrentPeer=" << (tran.id.peerID == qnCommon->moduleGUID());
+
     QnTranStateKey key(tran.id.peerID, tran.id.dbID);
     m_state[key] = qMax(m_state[key], tran.id.sequence);
     m_updateHistory[hash] = qMax(m_updateHistory[hash], tran.timestamp);
@@ -167,7 +169,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     foreach(const QnTranStateKey& key, m_state.keys())
     {
         QSqlQuery query(m_dbManager->getDB());
-        query.prepare("SELECT tran_data FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by timestamp, peer_guid, sequence");
+        query.prepare("SELECT tran_data FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by timestamp, peer_guid, db_guid, sequence");
         query.addBindValue(key.peerID.toRfc4122());
         query.addBindValue(key.dbID.toRfc4122());
         query.addBindValue(state.value(key));
