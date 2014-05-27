@@ -136,7 +136,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 
     resource->calcTimeDrift();
     
-    if (resource->readDeviceInformation())
+    if (resource->readDeviceInformation() && resource->getFullUrlInfo())
     {
         // Clarify resource type
         QString fullName = resource->getName();

@@ -1204,7 +1204,7 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
         result = true;
     }
     if (getVendor() != onvifR->getVendor()) {
-        setVendor(onvifR->getModel());
+        setVendor(onvifR->getVendor());
         result = true;
     }
     if (getMAC() != onvifR->getMAC()) {

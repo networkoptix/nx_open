@@ -42,10 +42,10 @@ namespace ec2
             \param handler Functor ( ErrorCode )
         */
         template<class QueryDataType, class HandlerType>
-            void processUpdateAsync(QnTransaction<QueryDataType>& tran, HandlerType handler, void* dummy = 0 )
+            void processUpdateAsync(QnTransaction<QueryDataType>& tran, HandlerType handler, void* /*dummy*/ = 0 )
         {
             Q_UNUSED(dummy)
-            //TODO/IMPL this method must be asynchronous
+            //TODO #ak this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
 
             if (!tran.id.sequence)
@@ -155,7 +155,14 @@ namespace ec2
         {
             ErrorCode errorCode = ErrorCode::ok;
             QList<QPair<QnAbstractTransaction, QByteArray>> processedTran;
-            
+            processedTran.reserve( nestedList.size() + (isParentObjectTran ? 1 : 0) );
+
+            auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
+                QnScopedThreadRollback ensureFreeThread(1);
+                QtConcurrent::run( std::bind( handler, errorCode ) );
+            };
+            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+
             if (multiTran.persistent)
                 dbManager->beginTran();
 
@@ -165,12 +172,6 @@ namespace ec2
                 tran.params = data;
                 tran.fillSequence();
                 tran.localTransaction = multiTran.localTransaction;
-
-                auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
-                    QnScopedThreadRollback ensureFreeThread(1);
-                    QtConcurrent::run( std::bind( handler, errorCode ) );
-                };
-                std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
                 QByteArray serializedTran;
                 QnOutputBinaryStream<QByteArray> stream( &serializedTran );

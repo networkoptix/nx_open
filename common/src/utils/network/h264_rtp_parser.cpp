@@ -100,7 +100,8 @@ void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines)
                                 else if (nal.startsWith(startCodeShort))
                                     nal.remove(0,3);
                             }
-
+                            if( nal.size() > 0 && (nal[0] & 0x1f) == nuSPS )
+                                decodeSpsInfo( nal );
                             
                             m_sdpSpsPps << QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX)).append(nal);
                         }
@@ -142,7 +143,7 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
 {
     try
     {
-        m_sps.decodeBuffer( (const quint8*) data.data() + sizeof(H264_NAL_PREFIX), (const quint8*) data.data() + data.size());
+        m_sps.decodeBuffer( (const quint8*) data.constData(), (const quint8*) data.constData() + data.size());
         m_sps.deserialize();
         m_spsInitialized = true;
 

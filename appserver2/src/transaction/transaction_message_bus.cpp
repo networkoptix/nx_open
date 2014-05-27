@@ -51,6 +51,7 @@ QnTransactionMessageBus::QnTransactionMessageBus():
     m_timer = new QTimer();
     connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
     m_timer->start(500);
+    m_aliveSendTimer.invalidate();
 }
 
 void QnTransactionMessageBus::start()
