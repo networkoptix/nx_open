@@ -117,7 +117,7 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
         case QnMediaServerUpdateTool::UpdateFound:
             m_prevToolState = QnMediaServerUpdateTool::DownloadingUpdate;
             m_updateTool->updateServers();
-            break;
+            return;
         case QnMediaServerUpdateTool::NoNewerVersion:
             m_restartAllPeers = true;
             break;
@@ -141,6 +141,7 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
         m_updateFailed = (m_updateTool->updateResult() != QnMediaServerUpdateTool::UpdateSuccessful);
     }
 
+    m_updateDialog->hide();
     restartPeers();
 }
 
