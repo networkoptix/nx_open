@@ -87,6 +87,11 @@ protected:
         if(leftVideoWall ^ rightVideoWall) /* One of the nodes is a videowall node, but not both. */
             return rightVideoWall;
 
+        bool leftIncompatible = leftResource && (leftResource->getStatus() == QnResource::Incompatible);
+        bool rightIncompatible = rightResource && (rightResource->getStatus() == QnResource::Incompatible);
+        if(leftIncompatible ^ rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
+            return rightIncompatible;
+
         /* Sort by name. */
         QString leftDisplay = left.data(Qt::DisplayRole).toString();
         QString rightDisplay = right.data(Qt::DisplayRole).toString();
