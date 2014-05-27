@@ -10,7 +10,6 @@ class QnServerUpdatesWidget;
 }
 
 class QnServerUpdatesModel;
-class QnSortedServerUpdatesModel;
 class QnMediaServerUpdateTool;
 
 class QnServerUpdatesWidget : public QWidget {
@@ -44,7 +43,6 @@ private:
     bool m_minimalMode;
 
     QnServerUpdatesModel *m_updatesModel;
-    QnSortedServerUpdatesModel *m_sortedUpdatesModel;
     QnMediaServerUpdateTool *m_updateTool;
     int m_previousToolState;
 };

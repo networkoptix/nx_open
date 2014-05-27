@@ -23,11 +23,11 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     m_updateTool = new QnMediaServerUpdateTool(this);
     m_updatesModel = new QnServerUpdatesModel(this);
 
-    m_sortedUpdatesModel = new QnSortedServerUpdatesModel(this);
-    m_sortedUpdatesModel->setSourceModel(m_updatesModel);
-    m_sortedUpdatesModel->sort(0); // the column does not matter because the model uses column-independent sorting
+    QnSortedServerUpdatesModel *sortedUpdatesModel = new QnSortedServerUpdatesModel(this);
+    sortedUpdatesModel->setSourceModel(m_updatesModel);
+    sortedUpdatesModel->sort(0); // the column does not matter because the model uses column-independent sorting
 
-    ui->tableView->setModel(m_sortedUpdatesModel);
+    ui->tableView->setModel(sortedUpdatesModel);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::ResourceNameColumn, QHeaderView::Stretch);
     // TODO: #dklychkov fix progress bar painting and uncomment the line below
@@ -59,7 +59,7 @@ bool QnServerUpdatesWidget::isUpdating() const {
 }
 
 void QnServerUpdatesWidget::setTargets(const QSet<QnId> &targets) {
-    m_sortedUpdatesModel->setFilter(targets);
+    m_updatesModel->setTargets(targets);
     m_updateTool->setTargets(targets);
 }
 

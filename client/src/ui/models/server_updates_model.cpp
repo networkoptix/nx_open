@@ -15,6 +15,11 @@ QnServerUpdatesModel::QnServerUpdatesModel(QObject *parent) :
     resetResourses();
 }
 
+void QnServerUpdatesModel::setTargets(const QSet<QnId> &targets) {
+    m_targets = targets;
+    resetResourses();
+}
+
 int QnServerUpdatesModel::columnCount(const QModelIndex &parent) const {
     if (parent.isValid())
         return 0;
@@ -99,9 +104,19 @@ void QnServerUpdatesModel::resetResourses() {
     qDeleteAll(m_items);
     m_items.clear();
 
-    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
-        QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
-        m_items.append(new Item(server, m_updates[server->getId()]));
+    if (m_targets.isEmpty()) {
+        foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::server)) {
+            QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
+            m_items.append(new Item(server, m_updates[server->getId()]));
+        }
+    } else {
+        foreach (const QnId &id, m_targets) {
+            QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+            if (!server)
+                continue;
+
+            m_items.append(new Item(server, m_updates[server->getId()]));
+        }
     }
 
     endResetModel();
@@ -110,6 +125,9 @@ void QnServerUpdatesModel::resetResourses() {
 void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
+        return;
+
+    if (!m_targets.isEmpty() && !m_targets.contains(resource->getId()))
         return;
 
     beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
@@ -123,6 +141,8 @@ void QnServerUpdatesModel::at_resourceRemoved(const QnResourcePtr &resource) {
         return;
 
     QModelIndex idx = index(server);
+    if (!idx.isValid())
+        return;
 
     beginRemoveRows(QModelIndex(), idx.row(), idx.row());
     m_items.removeAt(idx.row());
@@ -137,6 +157,8 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
         return;
 
     QModelIndex idx = index(server);
+    if (!idx.isValid())
+        return;
 
     emit dataChanged(idx, idx.sibling(idx.row(), LastColumn));
 }

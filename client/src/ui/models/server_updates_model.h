@@ -47,6 +47,8 @@ public:
 
     explicit QnServerUpdatesModel(QObject *parent = 0);
 
+    void setTargets(const QSet<QnId> &targets);
+
     int columnCount(const QModelIndex &parent) const override;
     int rowCount(const QModelIndex &parent) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
@@ -69,6 +71,7 @@ private slots:
 private:
     QList<Item*> m_items;
     QHash<QnId, QnMediaServerUpdateTool::PeerUpdateInformation> m_updates;
+    QSet<QnId> m_targets;
 };
 
 #endif // SERVER_UPDATES_MODEL_H
