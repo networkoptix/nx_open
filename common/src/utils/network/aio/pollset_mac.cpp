@@ -145,7 +145,7 @@ namespace aio
     /*!
         \return bit mask of \a EventType
     */
-    PollSet::EventType PollSet::const_iterator::eventType() const
+    aio::EventType PollSet::const_iterator::eventType() const
     {
         int kFilterType = m_impl->pollSetImpl->receivedEventlist[m_impl->currentIndex].filter;
         aio::EventType revents = aio::etNone;
