@@ -136,6 +136,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
     m_state[key] = qMax(m_state[key], tran.id.sequence);
     m_updateHistory[hash] = qMax(m_updateHistory[hash], tran.timestamp);
 
+    QMutexLocker lock(&m_timeMutex);
     if (tran.timestamp > m_currentTime + m_relativeTimer.elapsed()) {
         m_currentTime = m_lastTimestamp = tran.timestamp;
         m_relativeTimer.restart();
