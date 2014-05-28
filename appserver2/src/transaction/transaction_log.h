@@ -88,7 +88,7 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        qint64 getRelativeTime() const;
+        qint64 getTimeStamp();
         void init();
 
         bool contains(const QnAbstractTransaction& tran, const QUuid& hash) const;
@@ -136,7 +136,8 @@ namespace ec2
         
         mutable QMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
-        qint64 m_relativeOffset;
+        qint64 m_currentTime;
+        qint64 m_lastTimestamp;
     };
 };
 

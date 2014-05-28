@@ -185,7 +185,7 @@ namespace ec2
         id.sequence = 0;
         timestamp = 0;
         if (QnTransactionLog::instance()) {
-            timestamp = QnTransactionLog::instance()->getRelativeTime();
+            timestamp = QnTransactionLog::instance()->getTimeStamp();
             id.dbID = QnDbManager::instance()->getID();
         }
         localTransaction = false;
@@ -200,7 +200,7 @@ namespace ec2
     {
         id.sequence = m_sequence.fetchAndAddAcquire(1);
         if (!timestamp)
-            timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getRelativeTime() : 0;
+            timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getTimeStamp() : 0;
     }
 
     int generateRequestID()

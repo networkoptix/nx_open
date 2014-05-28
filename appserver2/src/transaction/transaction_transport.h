@@ -55,8 +55,6 @@ public:
     void setReadSync(bool value)  {m_readSync = value;}
     bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }
-    void setTimeDiff(qint64 diff) { m_timeDiff = diff; }
-    qint64 timeDiff() const       { return m_timeDiff; }
     QUrl remoteAddr() const       { return m_remoteAddr; }
 
     QnPeerInfo remotePeer() const { return m_remotePeer; }
@@ -90,7 +88,6 @@ private:
     quint32 m_chunkLen;
     int m_sendOffset;
     QQueue<QByteArray> m_dataToSend;
-    qint64 m_timeDiff;
     QUrl m_remoteAddr;
     bool m_connected;
 

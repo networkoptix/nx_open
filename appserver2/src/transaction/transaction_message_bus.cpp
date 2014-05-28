@@ -109,8 +109,6 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, Trans
     }
     //Q_ASSERT(tran.id.peerGUID != qnCommon->moduleGUID());
 
-    tran.timestamp -= sender->timeDiff();
-
     AlivePeersMap:: iterator itr = m_alivePeers.find(tran.id.peerID);
     if (itr != m_alivePeers.end())
         itr.value().lastActivity.restart();
@@ -590,7 +588,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
     }
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QnPeerInfo &remotePeer, qint64 timediff, QList<QByteArray> hwList)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QnPeerInfo &remotePeer, QList<QByteArray> hwList)
 {
     if (!dbManager)
     {
@@ -617,7 +615,6 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
 
     transport->setState(QnTransactionTransport::Connected);
-    transport->setTimeDiff(timediff);
 
     /** Send all data to the client peers on the connect. */
     if (remotePeer.isClient()) 

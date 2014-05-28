@@ -31,7 +31,6 @@ QnTransactionTransport::QnTransactionTransport(const QnPeerInfo &localPeer, cons
     m_chunkHeaderLen(0),
     m_chunkLen(0), 
     m_sendOffset(0), 
-    m_timeDiff(0),
     m_connected(false)
 {
 }
@@ -229,10 +228,6 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     {
         q.removeQueryItem("time");
         q.removeQueryItem("hwList");
-        qint64 localTime = -1;
-        if (QnTransactionLog::instance())
-            localTime = QnTransactionLog::instance()->getRelativeTime();
-        q.addQueryItem("time", QByteArray::number(localTime));
         q.addQueryItem("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds()));
     }
 
@@ -349,12 +344,6 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     if (getState() == ConnectingStage1) {
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);
         if (lockOK) {
-            if (QnTransactionLog::instance()) {
-                qint64 localTime = QUrlQuery(client->url().query()).queryItemValue("time").toLongLong();
-                qint64 remoteTime = itrTime->second.toLongLong();
-                if (remoteTime != -1)
-                    setTimeDiff(remoteTime - localTime);
-            }
             setHwList(decodeHWList(itrHwList->second));
             setState(ConnectingStage2);
         }
