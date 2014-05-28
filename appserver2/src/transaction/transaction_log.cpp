@@ -67,7 +67,7 @@ qint64 QnTransactionLog::getTimeStamp()
     qint64 timestamp = m_currentTime + m_relativeTimer.elapsed();
     if (timestamp <= m_lastTimestamp) {
         m_currentTime = m_lastTimestamp = timestamp + 1;
-        m_relativeTimer.elapsed();
+        m_relativeTimer.restart();
     }
     m_lastTimestamp = timestamp;
     return timestamp;
@@ -136,8 +136,8 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
     m_state[key] = qMax(m_state[key], tran.id.sequence);
     m_updateHistory[hash] = qMax(m_updateHistory[hash], tran.timestamp);
 
-    if (tran.timestamp > m_currentTime) {
-        m_currentTime = tran.timestamp;
+    if (tran.timestamp > m_currentTime + m_relativeTimer.elapsed()) {
+        m_currentTime = m_lastTimestamp = tran.timestamp;
         m_relativeTimer.restart();
     }
 
