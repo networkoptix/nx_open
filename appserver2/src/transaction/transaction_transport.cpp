@@ -226,7 +226,6 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     QUrlQuery q = QUrlQuery(remoteAddr.query());
     if (m_state == ConnectingStage1)
     {
-        q.removeQueryItem("time");
         q.removeQueryItem("hwList");
         q.addQueryItem("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds()));
     }
@@ -329,10 +328,9 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
-    nx_http::HttpHeaders::const_iterator itrTime = client->response()->headers.find("time");
     nx_http::HttpHeaders::const_iterator itrHwList = client->response()->headers.find("hwList");
 
-    if (itrGuid == client->response()->headers.end() || itrTime == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (itrGuid == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
         cancelConnecting();
         return;

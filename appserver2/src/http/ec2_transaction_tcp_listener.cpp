@@ -61,7 +61,6 @@ void QnTransactionTcpProcessor::run()
         ? QnPeerInfo::DesktopClient
         : QnPeerInfo::Server);
 
-    qint64 remoteTime  = query.queryItemValue(lit("time")).toLongLong();
     QByteArray remoteHwList = query.queryItemValue(lit("hwList")).toLocal8Bit();
 
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
