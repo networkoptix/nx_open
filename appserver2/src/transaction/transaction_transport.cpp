@@ -55,7 +55,7 @@ void QnTransactionTransport::addData(const QByteArray& data)
 {
     QMutexLocker lock(&m_mutex);
     if (m_dataToSend.isEmpty() && m_socket)
-        aio::AIOService::instance()->watchSocket( m_socket, PollSet::etWrite, this );
+        aio::AIOService::instance()->watchSocket( m_socket, aio::etWrite, this );
     m_dataToSend.push_back(data);
 }
 
@@ -79,8 +79,8 @@ int QnTransactionTransport::getChunkHeaderEnd(const quint8* data, int dataLen, q
 void QnTransactionTransport::closeSocket()
 {
     if (m_socket) {
-        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead, this );
-        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite, this );
+        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead, this );
+        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite, this );
         m_socket->close();
         m_socket.reset();
     }
@@ -107,7 +107,7 @@ void QnTransactionTransport::setStateNoLock(State state)
         m_socket->setSendTimeout(SOCKET_TIMEOUT);
         m_socket->setNonBlockingMode(true);
         m_chunkHeaderLen = 0;
-        aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this );
+        aio::AIOService::instance()->watchSocket( m_socket, aio::etRead, this );
     }
     if (this->m_state != state) {
         this->m_state = state;
@@ -133,13 +133,13 @@ void QnTransactionTransport::close()
     setState(State::Closed);
 }
 
-void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventType eventType ) throw()
+void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType eventType ) throw()
 {
     //AbstractStreamSocket* streamSock = (AbstractStreamSocket*) sock;
     int readed;
     switch( eventType )
     {
-    case PollSet::etRead:
+    case aio::etRead:
         {
             while (1)
             {
@@ -175,7 +175,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
             }
             break;
         }
-    case PollSet::etWrite: 
+    case aio::etWrite: 
         {
             QMutexLocker lock(&m_mutex);
             while (!m_dataToSend.isEmpty())
@@ -186,7 +186,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                 if (sended < 1) {
                     if(sended == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock) {
                         m_sendOffset = 0;
-                        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite, this );
+                        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite, this );
                         setStateNoLock(State::Error);
                     }
                     return; // can't send any more
@@ -197,11 +197,11 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                     m_dataToSend.dequeue();
                 }
             }
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite, this );
+            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite, this );
             break;
         }
-    case PollSet::etTimedOut:
-    case PollSet::etError:
+    case aio::etTimedOut:
+    case aio::etError:
         setState(State::Error);
         break;
     default:
@@ -216,7 +216,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
 
-    m_httpClient->setUserName("system");
+    m_httpClient->setUserName("system");    
     m_httpClient->setUserPassword(qnCommon->getSystemPassword());
     if (!remoteAddr.userName().isEmpty())
     {

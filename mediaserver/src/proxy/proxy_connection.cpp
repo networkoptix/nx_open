@@ -239,8 +239,8 @@ void QnProxyConnectionProcessor::run()
     if (!openProxyDstConnection())
         return;
 
-    d->pollSet.add( d->socket.data(), PollSet::etRead );
-    d->pollSet.add( d->dstSocket.data(), PollSet::etRead );
+    d->pollSet.add( d->socket.data(), aio::etRead );
+    d->pollSet.add( d->dstSocket.data(), aio::etRead );
 
     bool isWebSocket = nx_http::getHeaderValue( d->request.headers, "Upgrade").toLower() == lit("websocket");
     if (!isWebSocket && (d->protocol.toLower() == "http" || d->protocol.toLower() == "https"))
@@ -269,12 +269,12 @@ void QnProxyConnectionProcessor::doRawProxy()
 
         if (rez < 1)
             return; // error or timeout
-        for( PollSet::const_iterator
+        for( aio::PollSet::const_iterator
             it = d->pollSet.begin();
             it != d->pollSet.end();
             ++it )
         {
-            if( it.eventType() != PollSet::etRead )
+            if( it.eventType() != aio::etRead )
                 return;
             if( it.socket() == d->socket )
                 if (!doProxyData(d->socket.data(), d->dstSocket.data(), buffer, sizeof(buffer)))
@@ -301,12 +301,12 @@ void QnProxyConnectionProcessor::doSmartProxy()
         if (rez < 1)
             return; // error or timeout
 
-        for( PollSet::const_iterator
+        for( aio::PollSet::const_iterator
             it = d->pollSet.begin();
             it != d->pollSet.end();
             ++it )
         {
-            if( it.eventType() != PollSet::etRead )
+            if( it.eventType() != aio::etRead )
                 return;
             if( it.socket() == d->socket )
             {

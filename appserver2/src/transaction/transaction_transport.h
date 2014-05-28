@@ -99,7 +99,7 @@ private:
     static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
     static QMutex m_staticMutex;
 private:
-    void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
+    void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     static void ensureSize(std::vector<quint8>& buffer, std::size_t size);
     int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);

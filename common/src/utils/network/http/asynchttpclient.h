@@ -140,7 +140,7 @@ namespace nx_http
 
     protected:
         //!Implementation of aio::AIOEventHandler::eventTriggered
-        virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw() override;
+        virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override;
 
     private:
         State m_state;
@@ -182,7 +182,7 @@ namespace nx_http
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
         bool resendRequestWithAuthorization( const nx_http::Response& response );
-        void eventTriggeredPrivate( AbstractSocket* sock, PollSet::EventType eventType );
+        void eventTriggeredPrivate( AbstractSocket* sock, aio::EventType eventType );
 
         static const char* toString( State state );
     };

@@ -19,7 +19,7 @@ public:
     QSharedPointer<AbstractStreamSocket> dstSocket;
     QnTcpListener* owner;
     QUrl lastConnectedUrl;
-    PollSet pollSet;
+    aio::PollSet pollSet;
 };
 
 #endif // __PROXY_CONNECTION_PROCESSOR_PRIV_H_
