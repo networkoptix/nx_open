@@ -117,6 +117,10 @@ private:
         bool operator==(const FullAddress &other) const {
             return address == other.address && port == other.port;
         }
+
+        friend uint qHash(const QnModuleFinder::FullAddress &fullAddress) {
+            return qHash(fullAddress.address, fullAddress.port);
+        }
     };
 
     mutable QMutex m_mutex;
