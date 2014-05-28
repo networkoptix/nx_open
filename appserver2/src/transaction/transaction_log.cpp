@@ -66,7 +66,7 @@ qint64 QnTransactionLog::getTimeStamp()
     QMutexLocker lock(&m_timeMutex);
     qint64 timestamp = m_currentTime + m_relativeTimer.elapsed();
     if (timestamp <= m_lastTimestamp) {
-        m_currentTime = m_lastTimestamp = timestamp + 1;
+        m_currentTime = timestamp = m_lastTimestamp + 1;
         m_relativeTimer.restart();
     }
     m_lastTimestamp = timestamp;
