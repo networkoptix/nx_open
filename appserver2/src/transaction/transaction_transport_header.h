@@ -6,10 +6,10 @@ namespace ec2 {
     struct TransactionTransportHeader
     {
         TransactionTransportHeader() {}
-        TransactionTransportHeader(PeerList processedPeers, PeerList dstPeers = PeerList()): processedPeers(processedPeers), dstPeers(dstPeers) {}
+        TransactionTransportHeader(QnPeerSet processedPeers, QnPeerSet dstPeers = QnPeerSet()): processedPeers(processedPeers), dstPeers(dstPeers) {}
 
-        PeerList processedPeers;
-        PeerList dstPeers;
+        QnPeerSet processedPeers;
+        QnPeerSet dstPeers;
     };
 #define TransactionTransportHeader_Fields (processedPeers)(dstPeers)
 

@@ -20,7 +20,7 @@ template<class QueryProcessorType>
 QnUpdatesManager<QueryProcessorType>::~QnUpdatesManager() {}
 
 template<class QueryProcessorType>
-int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const PeerList &peers, impl::SimpleHandlerPtr handler) {
+int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(updateId, data, offset);
 
@@ -43,7 +43,7 @@ int QnUpdatesManager<QueryProcessorType>::sendUpdateUploadResponce(const QString
 }
 
 template<class QueryProcessorType>
-int QnUpdatesManager<QueryProcessorType>::installUpdate(const QString &updateId, const PeerList &peers, impl::SimpleHandlerPtr handler) {
+int QnUpdatesManager<QueryProcessorType>::installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(updateId);
 

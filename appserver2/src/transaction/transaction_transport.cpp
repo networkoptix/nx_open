@@ -19,13 +19,12 @@ QSet<QUuid> QnTransactionTransport::m_existConn;
 QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
 QMutex QnTransactionTransport::m_staticMutex;
 
-QnTransactionTransport::QnTransactionTransport(bool isOriginator, bool isClient, QSharedPointer<AbstractStreamSocket> socket, const QUuid& remoteGuid):
+QnTransactionTransport::QnTransactionTransport(const QnPeerInfo &localPeer, const QnPeerInfo &remotePeer, QSharedPointer<AbstractStreamSocket> socket):
+    m_localPeer(localPeer),
+    m_remotePeer(remotePeer),
     m_lastConnectTime(0), 
     m_readSync(false), 
     m_writeSync(false),
-    m_remoteGuid(remoteGuid),
-    m_originator(isOriginator), 
-    m_isClientPeer(isClient),
     m_socket(socket),
     m_state(NotDefined), 
     m_readBufferLen(0),
@@ -100,7 +99,7 @@ void QnTransactionTransport::setStateNoLock(State state)
     }
     else if (state == Error) {
         if (m_connected)
-            connectDone(m_remoteGuid);
+            connectDone(m_remotePeer.id);
         m_connected = false;
     }
     else if (state == ReadyForStreaming) {
@@ -236,12 +235,15 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
         q.addQueryItem("time", QByteArray::number(localTime));
         q.addQueryItem("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds()));
     }
-    if( m_isClientPeer ) {
+
+    // Client reconnects to the server
+    if( m_localPeer.peerType == QnPeerInfo::DesktopClient ) {
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
         setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
     }
+
     remoteAddr.setQuery(q);
     m_remoteAddr = remoteAddr;
     if (!m_httpClient->doGet(remoteAddr)) {
@@ -317,7 +319,7 @@ void QnTransactionTransport::repeatDoGet()
 void QnTransactionTransport::cancelConnecting()
 {
     if (getState() == ConnectingStage2)
-        QnTransactionTransport::connectingCanceled(m_remoteGuid, true);
+        QnTransactionTransport::connectingCanceled(m_remotePeer.id, true);
     qWarning() << Q_FUNC_INFO << "Connection canceled from state " << toString(getState());
     setState(Error);
 }
@@ -342,10 +344,10 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     }
 
     QByteArray data = m_httpClient->fetchMessageBodyBuffer();
-    m_remoteGuid = itrGuid->second;
+    m_remotePeer.id = itrGuid->second;
 
     if (getState() == ConnectingStage1) {
-        bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remoteGuid, true);
+        bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);
         if (lockOK) {
             if (QnTransactionLog::instance()) {
                 qint64 localTime = QUrlQuery(client->url().query()).queryItemValue("time").toLongLong();
@@ -366,7 +368,7 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     else {
         m_socket = m_httpClient->takeSocket();
         m_httpClient.reset();
-        if (QnTransactionTransport::tryAcquireConnected(m_remoteGuid, true)) {
+        if (QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true)) {
             if (!data.isEmpty())
                 processTransactionData(data);
             setState(QnTransactionTransport::Connected);

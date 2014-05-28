@@ -31,8 +31,8 @@ namespace ec2
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) ),
         m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) )
     {
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(ApiServerAliveData, bool)), this, SIGNAL(remotePeerFound(ApiServerAliveData, bool)), Qt::DirectConnection);
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerLost(ApiServerAliveData, bool)),  this, SIGNAL(remotePeerLost(ApiServerAliveData, bool)), Qt::DirectConnection);
+        connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(ApiPeerAliveData, bool)), this, SIGNAL(remotePeerFound(ApiPeerAliveData, bool)), Qt::DirectConnection);
+        connect (QnTransactionMessageBus::instance(), SIGNAL(peerLost(ApiPeerAliveData, bool)),  this, SIGNAL(remotePeerLost(ApiPeerAliveData, bool)), Qt::DirectConnection);
     }
 
     template<class T>
@@ -192,14 +192,14 @@ namespace ec2
     }
 
     template<class T>
-    void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url, bool isClient, const QUuid& peerGuid)
+    void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url, const QUuid& peerGuid)
     {
         QUrl url(_url);
         url.setPath("/ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
         url.setQuery(q);
-        QnTransactionMessageBus::instance()->addConnectionToPeer(url, isClient, peerGuid);
+        QnTransactionMessageBus::instance()->addConnectionToPeer(url, peerGuid);
     }
 
     template<class T>

@@ -963,7 +963,7 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
         int port = moduleInformation.parameters.value("port").toInt();
         QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
         ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-        ec2Connection->addRemotePeer(url, false, moduleInformation.id);
+        ec2Connection->addRemotePeer(url, moduleInformation.id);
     }
 }
 void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
@@ -1245,7 +1245,7 @@ void QnMain::run()
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(publicAddress.toString()).arg(m_universalTcpListener->getPort()));
 
     Qn::PanicMode pm;
-    while (m_mediaServer.isNull())
+    while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection, &pm);
 
@@ -1305,10 +1305,15 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
 
+    if (needToStop())
+        return;
+
 
     syncStoragesToSettings(m_mediaServer);
 
     do {
+        if (needToStop())
+            return;
     } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), QnResource::Online) != ec2::ErrorCode::ok);
 
 

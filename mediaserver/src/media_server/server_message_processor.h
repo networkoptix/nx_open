@@ -25,8 +25,8 @@ protected:
     virtual void afterRemovingResource(const QnId& id) override;
     void execBusinessActionInternal(QnAbstractBusinessActionPtr action) override;
 private slots:
-    void at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy);
-    void at_remotePeerLost(ec2::ApiServerAliveData data, bool isProxy);
+    void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
+    void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
 
     void at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
     void at_updateInstallationRequested(const QString &updateId);
