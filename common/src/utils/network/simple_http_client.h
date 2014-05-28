@@ -8,7 +8,7 @@
 
 #include "socket.h"
 
-// TODO: #Elric naming! Qn!
+// TODO: #Elric this class is so bad interface-wise that I don't even want to fix it.
 
 enum CLHttpStatus
 {
@@ -83,9 +83,13 @@ public:
     unsigned short localPort() const;
 
     QString mRealm;
-    QString mNonce;
+    QString mNonce; // TODO: #Elric wtf? total incapsulation failure.
     QString mQop;
 
+    const QHostAddress host() const { return m_host; }
+    int port() const { return m_port; }
+    int timeout() const { return m_timeout; }
+    QAuthenticator auth() const { return m_auth; }
 
 private:
     void initSocket();
@@ -97,6 +101,7 @@ private:
 
     int readHeaders();
     void addExtraHeaders(QByteArray& request);
+
 private:
 
     QHostAddress m_host;

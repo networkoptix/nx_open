@@ -14,7 +14,7 @@ namespace {
             return lit("stop");
         } else if(speed < 0) {
             return lit("near");
-        } else if(speed > 0) {
+        } else {
             return lit("far");
         }
     }
@@ -24,7 +24,7 @@ namespace {
             return lit("stop");
         } else if(speed < 0) {
             return lit("wide");
-        } else if(speed > 0) {
+        } else {
             return lit("tele");
         }
     }
@@ -47,8 +47,13 @@ QnVistaMotorPtzController::~QnVistaMotorPtzController() {
 }
 
 void QnVistaMotorPtzController::init() {
+    return;
+
     QnIniSection config;
-    if(!query(lit("config.txt"), &config)) {
+
+    /* Note that there is no point locking a mutex here as this function is called 
+     * only from the constructor. */
+    if(!queryLocked(lit("config.txt"), &config)) {
         qnWarning("Could not initialize VISTA MOTOR PTZ for camera '%1'.", m_resource->getName());        
         return;
     }
@@ -69,30 +74,36 @@ void QnVistaMotorPtzController::init() {
         m_capabilities |= Qn::ContinuousFocusCapability;
 }
 
-CLSimpleHTTPClient *QnVistaMotorPtzController::newHttpClient() const {
-    return new CLSimpleHTTPClient(
-        m_resource->getHostAddress(), 
-        QUrl(m_resource->getUrl()).port(80), 
-        m_resource->getNetworkTimeout(),
-        m_resource->getAuth()
-    );
+void QnVistaMotorPtzController::ensureClientLocked() {
+    /* Vista cameras treat closed channel as a stop command. This is why
+     * we have to keep the http client instance alive between requests. */
+
+    QString host = m_resource->getHostAddress();
+    int timeout = m_resource->getNetworkTimeout();
+    QAuthenticator auth = m_resource->getAuth();
+
+    if(m_client && m_lastHostAddress == host && m_client->timeout() == timeout && m_client->auth() == auth)
+        return;
+
+    m_lastHostAddress = host;
+    m_client.reset(new CLSimpleHTTPClient(host, 80, timeout, auth));
 }
 
-bool QnVistaMotorPtzController::query(const QString &request, QByteArray *body = NULL) const {
-    QScopedPointer<CLSimpleHTTPClient> http(newHttpClient());
+bool QnVistaMotorPtzController::queryLocked(const QString &request, QByteArray *body) {
+    ensureClientLocked();
 
-    CLHttpStatus status = http->doGET(request.toLatin1());
+    CLHttpStatus status = m_client->doGET(request.toLatin1());
     if(status != CL_HTTP_SUCCESS)
         return false;
     
     if(body)
-        http->readAll(*body);
+        m_client->readAll(*body);
     return true;
 }
 
-bool QnVistaMotorPtzController::query(const QString &request, QnIniSection *section, QByteArray *body = NULL) {
+bool QnVistaMotorPtzController::queryLocked(const QString &request, QnIniSection *section, QByteArray *body) {
     QByteArray localBody;
-    if(!query(request, &localBody))
+    if(!queryLocked(request, &localBody))
         return false;
 
     if(section)
@@ -112,12 +123,14 @@ bool QnVistaMotorPtzController::continuousMove(const QVector3D &speed) {
     if(!(m_capabilities & Qn::ContinuousZoomCapability))
         return false;
 
-    return query(lit("mptz/control.php?zoom=%1").arg(vistaZoomDirection(speed.z())));
+    QMutexLocker locker(&m_mutex);
+    return queryLocked(lit("mptz/control.php?zoom=%1").arg(vistaZoomDirection(speed.z())));
 }
 
 bool QnVistaMotorPtzController::continuousFocus(qreal speed) {
     if(!(m_capabilities & Qn::ContinuousFocusCapability))
         return false;
 
-    return query(lit("mptz/control.php?focus=%1").arg(vistaFocusDirection(speed)));
+    QMutexLocker locker(&m_mutex);
+    return queryLocked(lit("mptz/control.php?focus=%1").arg(vistaFocusDirection(speed)));
 }

@@ -25,15 +25,20 @@ public:
     virtual bool continuousFocus(qreal speed) override;
 
 private:
-    CLSimpleHTTPClient *newHttpClient() const;
-    bool query(const QString &request, QByteArray *body = NULL) const;
-    bool query(const QString &request, QnIniSection *section, QByteArray *body = NULL);
-
     void init();
+
+    bool queryLocked(const QString &request, QByteArray *body = NULL);
+    bool queryLocked(const QString &request, QnIniSection *section, QByteArray *body = NULL);
+
+    void ensureClientLocked();
 
 private:
     QnVistaResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
+
+    QMutex m_mutex;
+    QString m_lastHostAddress;
+    QScopedPointer<CLSimpleHTTPClient> m_client;
 };
 
 #endif // QN_VISTA_MOTOR_PTZ_CONTROLLER_H

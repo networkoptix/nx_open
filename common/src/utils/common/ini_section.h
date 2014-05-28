@@ -19,6 +19,8 @@ public:
     QnIniSection() {}
 
     static QnIniSection fromIni(const QByteArray &ini) {
+        QnIniSection result;
+
         QTextStream stream(ini, QIODevice::ReadOnly);
         while(true) {
             QString line = stream.readLine();
@@ -29,8 +31,10 @@ public:
             if(index == -1)
                 continue;
 
-            m_data.insert(line.left(index), line.mid(index + 1));
+            result.insert(line.left(index), line.mid(index + 1));
         }
+
+        return result;
     }
 
     void insert(const QString &key, const QString &value) {
