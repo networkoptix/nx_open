@@ -41,7 +41,7 @@ startquiet() {
 
 stop() {
     echo -n "Stopping $BIN_NAME..... "
-    /usr/bin/killall $BIN_NAME 1>/dev/null
+    /usr/bin/killall $1 $BIN_NAME 1>/dev/null
     while [ `/bin/pidof $BIN_NAME` ]
     do
         /bin/sleep 1
@@ -65,6 +65,9 @@ case "$1" in
         ;;
     stop)
         stop
+        ;;
+    kill)
+        stop -9
         ;;
     status)
         SERVICE_PID="`/bin/pidof $BIN_NAME`"
