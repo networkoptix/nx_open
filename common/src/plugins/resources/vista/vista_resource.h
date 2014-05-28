@@ -5,7 +5,7 @@
 
 #include <plugins/resources/onvif/onvif_resource.h>
 
-class QnVistaResource : public QnPlOnvifResource
+class QnVistaResource : public QnPlOnvifResource 
 {
     Q_OBJECT
     typedef QnPlOnvifResource base_type;

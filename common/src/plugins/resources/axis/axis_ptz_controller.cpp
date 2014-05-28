@@ -11,6 +11,7 @@
 
 static const int DEFAULT_AXIS_API_PORT = 80; // TODO: #Elric copypasta from axis_resource.cpp
 
+// TODO: #Elric #EC2 use QnIniSection
 
 // -------------------------------------------------------------------------- //
 // QnAxisParameterMap
