@@ -197,6 +197,12 @@ public:
         m_zoomOutButton = new PtzImageButtonWidget(this);
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
 
+        m_focusInButton = new PtzImageButtonWidget(this);
+        m_focusInButton->setIcon(qnSkin->icon("item/ptz_focus_in.png"));
+
+        m_focusOutButton = new PtzImageButtonWidget(this);
+        m_focusOutButton->setIcon(qnSkin->icon("item/ptz_focus_out.png"));
+
         m_modeButton = new PtzImageButtonWidget(this);
         m_modeButton->setToolTip(tr("Dewarping panoramic mode"));
 
@@ -213,12 +219,16 @@ public:
         manipulatorWidget()->setCursor(Qt::BlankCursor);
         zoomInButton()->setCursor(Qt::BlankCursor);
         zoomOutButton()->setCursor(Qt::BlankCursor);
+        focusInButton()->setCursor(Qt::BlankCursor);
+        focusOutButton()->setCursor(Qt::BlankCursor);
     }
 
     void showCursor() {
         manipulatorWidget()->setCursor(Qt::SizeAllCursor);
         zoomInButton()->setCursor(Qt::ArrowCursor);
         zoomOutButton()->setCursor(Qt::ArrowCursor);
+        focusInButton()->setCursor(Qt::ArrowCursor);
+        focusOutButton()->setCursor(Qt::ArrowCursor);
     }
 
     PtzManipulatorWidget *manipulatorWidget() const {
@@ -231,6 +241,14 @@ public:
 
     PtzImageButtonWidget *zoomOutButton() const {
         return m_zoomOutButton;
+    }
+
+    PtzImageButtonWidget *focusInButton() const {
+        return m_focusInButton;
+    }
+
+    PtzImageButtonWidget *focusOutButton() const {
+        return m_focusOutButton;
     }
 
     PtzImageButtonWidget *modeButton() const {
@@ -295,13 +313,19 @@ private:
 
         QRectF rect = this->rect();
         QPointF center = rect.center();
+        QPointF left = (rect.topLeft() + rect.bottomLeft()) / 2.0;
+        QPointF right = (rect.topRight() + rect.bottomRight()) / 2.0;
         qreal centralWidth = qMin(rect.width(), rect.height()) / 32;
         QPointF xStep(centralWidth, 0), yStep(0, centralWidth);
+        QSizeF size = QnGeometry::toSize(xStep + yStep);
 
         m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
-        m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * QnGeometry::toSize(xStep + yStep)));
-        m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * QnGeometry::toSize(xStep + yStep)));
-        m_modeButton->setGeometry(QRectF((rect.topRight() + rect.bottomRight()) / 2.0 - xStep * 4.0 - yStep * 1.5, 3.0 * QnGeometry::toSize(xStep + yStep)));
+        m_modeButton->setGeometry(QRectF(right - xStep * 4.0 - yStep * 1.5, 3.0 * size));
+
+        m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
+        m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * size));
+        m_focusInButton->setGeometry(QRectF(left + xStep * 0.5 - yStep * 4.5, 1.5 * size));
+        m_focusOutButton->setGeometry(QRectF(left + xStep * 0.5 - yStep * 2.5, 1.5 * size));
     }
 
 private:
@@ -309,6 +333,8 @@ private:
     PtzManipulatorWidget *m_manipulatorWidget;
     PtzImageButtonWidget *m_zoomInButton;
     PtzImageButtonWidget *m_zoomOutButton;
+    PtzImageButtonWidget *m_focusInButton;
+    PtzImageButtonWidget *m_focusOutButton;
     PtzImageButtonWidget *m_modeButton;
     QPen m_pen;
 };

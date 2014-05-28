@@ -47,8 +47,6 @@ QnVistaMotorPtzController::~QnVistaMotorPtzController() {
 }
 
 void QnVistaMotorPtzController::init() {
-    return;
-
     QnIniSection config;
 
     /* Note that there is no point locking a mutex here as this function is called 

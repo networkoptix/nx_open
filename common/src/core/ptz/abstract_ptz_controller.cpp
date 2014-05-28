@@ -38,6 +38,9 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
     case Qn::ContinuousMovePtzCommand:       
         return (capabilities & Qn::ContinuousPtzCapabilities);
 
+    case Qn::ContinuousFocusPtzCommand:
+        return (capabilities & Qn::ContinuousFocusCapability);
+
     case Qn::GetDevicePositionPtzCommand:
     case Qn::AbsoluteDeviceMovePtzCommand:
         return (capabilities & Qn::AbsolutePtzCapabilities) && (capabilities & Qn::DevicePositioningPtzCapability);

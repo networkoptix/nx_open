@@ -552,6 +552,7 @@ int QnMediaServerConnection::ptzContinuousMoveAsync(const QnNetworkResourcePtr &
 int QnMediaServerConnection::ptzContinuousFocusAsync(const QnNetworkResourcePtr &camera, qreal speed, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("command",         QnLexical::serialized(Qn::ContinuousFocusPtzCommand));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
     params << QnRequestParam("speed",           QnLexical::serialized(speed));
 
     return sendAsyncGetRequest(PtzContinuousFocusObject, params, NULL, target, slot);
