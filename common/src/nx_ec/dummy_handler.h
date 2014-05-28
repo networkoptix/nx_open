@@ -15,9 +15,6 @@ namespace ec2
         Q_OBJECT
 
     public:
-        DummyHandler();
-        ~DummyHandler();
-
         static DummyHandler* instance();
 
     public slots:
