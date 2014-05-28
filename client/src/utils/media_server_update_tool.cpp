@@ -284,7 +284,10 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
         if (m_updateFiles.contains(sysInfo))
             continue;
 
-        m_updateFiles.insert(sysInfo, UpdateFileInformationPtr(new UpdateFileInformation(version, fileName)));
+        UpdateFileInformationPtr updateFileInformation(new UpdateFileInformation(version, fileName));
+        QFile file(fileName);
+        updateFileInformation->fileSize = file.size();
+        m_updateFiles.insert(sysInfo, updateFileInformation);
     }
 
     checkUpdateCoverage();
@@ -469,6 +472,12 @@ void QnMediaServerUpdateTool::downloadUpdates() {
     QHash<QUrl, QString> downloadTargets;
     QMultiHash<QUrl, QnId> peerAssociations;
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
+        if (!it.value()->fileName.isEmpty()) {
+            QFile file(it.value()->fileName);
+            if (file.exists() && file.size() == it.value()->fileSize)
+                continue;
+        }
+
         downloadTargets.insert(it.value()->url, it.value()->baseFileName);
         foreach (const QnId &peerId, m_idBySystemInformation.values(it.key())) {
             peerAssociations.insert(it.value()->url, peerId);
