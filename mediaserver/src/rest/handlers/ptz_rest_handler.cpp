@@ -76,6 +76,7 @@ int QnPtzRestHandler::executePost(const QString &path, const QnRequestParams &pa
 
     switch(command) {
     case Qn::ContinuousMovePtzCommand:      return executeContinuousMove(controller, params, result);
+    case Qn::ContinuousFocusPtzCommand:     return executeContinuousFocus(controller, params, result);
     case Qn::AbsoluteDeviceMovePtzCommand:
     case Qn::AbsoluteLogicalMovePtzCommand: return executeAbsoluteMove(controller, params, result);
     case Qn::ViewportMovePtzCommand:        return executeViewportMove(controller, params, result);
@@ -110,6 +111,17 @@ int QnPtzRestHandler::executeContinuousMove(const QnPtzControllerPtr &controller
 
     QVector3D speed(xSpeed, ySpeed, zSpeed);
     if(!controller->continuousMove(speed))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzRestHandler::executeContinuousFocus(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    qreal speed;
+    if(!requireParameter(params, lit("speed"), result, &speed))
+        return CODE_INVALID_PARAMETER;
+
+    if(!controller->continuousFocus(speed))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;

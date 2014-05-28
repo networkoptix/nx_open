@@ -74,6 +74,10 @@ bool QnRemotePtzController::continuousMove(const QVector3D &speed) {
     RUN_COMMAND(Qn::ContinuousMovePtzCommand, speed, ptzContinuousMoveAsync, speed, m_sequenceId, nextSequenceNumber());
 }
 
+bool QnRemotePtzController::continuousFocus(qreal speed) {
+    RUN_COMMAND(Qn::ContinuousFocusPtzCommand, speed, ptzContinuousFocusAsync, speed);
+}
+
 bool QnRemotePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     RUN_COMMAND(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), position, ptzAbsoluteMoveAsync, space, position, speed, m_sequenceId, nextSequenceNumber());
 }

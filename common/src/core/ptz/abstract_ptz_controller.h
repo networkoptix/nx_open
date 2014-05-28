@@ -69,6 +69,22 @@ public:
     virtual bool continuousMove(const QVector3D &speed) = 0;
 
     /**
+     * Starts or stops continuous focus movement.
+     * 
+     * Speed is specified in device-specific coordinate space and is expected 
+     * to be in range <tt>[-1, 1]</tt>. Positive speed is for far focus. 
+     * 
+     * Passing zero should stop focus movement.
+     * 
+     * This function is expected to be implemented if this controller has
+     * <tt>Qn::ContinuousFocusCapability</tt>.
+     * 
+     * \param speed                     Focus speed.
+     * \returns                         Whether the operation was successful.
+     */
+    virtual bool continuousFocus(qreal speed) = 0;
+
+    /**
      * Sets camera PTZ position in the given coordinate space. 
      * 
      * Note that for the function to succeed, this controller must have a 

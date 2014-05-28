@@ -82,6 +82,7 @@ public:
 
     enum PtzCommand {
         ContinuousMovePtzCommand,
+        ContinuousFocusPtzCommand,
         AbsoluteDeviceMovePtzCommand,
         AbsoluteLogicalMovePtzCommand,
         ViewportMovePtzCommand,
@@ -147,6 +148,7 @@ public:
         ContinuousPanCapability             = 0x00000001,
         ContinuousTiltCapability            = 0x00000002,
         ContinuousZoomCapability            = 0x00000004,
+        ContinuousFocusCapability           = 0x00000008,
 
         AbsolutePanCapability               = 0x00000010,
         AbsoluteTiltCapability              = 0x00000020,

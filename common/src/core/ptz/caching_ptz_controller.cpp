@@ -38,6 +38,10 @@ bool QnCachingPtzController::continuousMove(const QVector3D &speed) {
     return base_type::continuousMove(speed);
 }
 
+bool QnCachingPtzController::continuousFocus(qreal speed) {
+    return base_type::continuousFocus(speed);
+}
+
 bool QnCachingPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     return base_type::absoluteMove(space, position, speed);
 }

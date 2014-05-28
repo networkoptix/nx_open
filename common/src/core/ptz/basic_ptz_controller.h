@@ -13,6 +13,7 @@ public:
     virtual Qn::PtzCapabilities getCapabilities() override                                  { return Qn::NoPtzCapabilities; }
 
     virtual bool continuousMove(const QVector3D &) override                                 { return false; }
+    virtual bool continuousFocus(qreal) override                                            { return false; }
     virtual bool absoluteMove(Qn::PtzCoordinateSpace, const QVector3D &, qreal) override    { return false; }
     virtual bool viewportMove(qreal, const QRectF &, qreal) override                        { return false; }
 

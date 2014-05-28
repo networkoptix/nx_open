@@ -70,6 +70,7 @@ struct StrictResolution {
 
 // strict maximum resolution for this models
 
+// TODO: #Elric #VASILENKO move out to JSON
 StrictResolution strictResolutionList[] =
 {
     { "Brickcom-30xN", QSize(1920, 1080) }
@@ -81,6 +82,7 @@ struct StrictBitrateInfo {
     int maxBitrate;
 };
 
+// TODO: #Elric #VASILENKO move out to JSON
 // Strict bitrate range for specified cameras
 StrictBitrateInfo strictBitrateList[] =
 {
@@ -588,9 +590,9 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
     return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
 }
 
-int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
+int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
 {
-    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(q, resolution, fps));
+    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(quality, resolution, fps));
 }
 
 int QnPlOnvifResource::strictBitrate(int bitrate) const

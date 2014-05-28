@@ -112,6 +112,10 @@ bool QnThreadedPtzController::continuousMove(const QVector3D &speed) {
     RUN_COMMAND(Qn::ContinuousMovePtzCommand, void *, speed, continuousMove, speed);
 }
 
+bool QnThreadedPtzController::continuousFocus(qreal speed) {
+    RUN_COMMAND(Qn::ContinuousFocusPtzCommand, void *, speed, continuousFocus, speed);
+}
+
 bool QnThreadedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     RUN_COMMAND(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), void *, position, absoluteMove, space, position, speed);
 }

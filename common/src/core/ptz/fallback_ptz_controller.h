@@ -17,6 +17,7 @@ public:
     virtual Qn::PtzCapabilities getCapabilities() override                                                      { return baseController()->getCapabilities(); }
 
     virtual bool continuousMove(const QVector3D &speed) override                                                { return baseController()->continuousMove(speed); }
+    virtual bool continuousFocus(qreal speed) override                                                          { return baseController()->continuousFocus(speed); }
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override    { return baseController()->absoluteMove(space, position, speed); }
     virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) override                  { return baseController()->viewportMove(aspectRatio, viewport, speed); }
 

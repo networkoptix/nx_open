@@ -33,6 +33,7 @@ namespace {
         ((TimePeriodsObject,        "RecordedTimePeriods"))
         ((StatisticsObject,         "statistics"))
         ((PtzContinuousMoveObject,  "ptz"))
+        ((PtzContinuousFocusObject, "ptz"))
         ((PtzAbsoluteMoveObject,    "ptz"))
         ((PtzViewportMoveObject,    "ptz"))
         ((PtzGetPositionObject,     "ptz"))
@@ -324,6 +325,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, handle);
         break;
     case PtzContinuousMoveObject:
+    case PtzContinuousFocusObject:
     case PtzAbsoluteMoveObject:
     case PtzViewportMoveObject:
     case PtzCreatePresetObject:
@@ -545,6 +547,14 @@ int QnMediaServerConnection::ptzContinuousMoveAsync(const QnNetworkResourcePtr &
     params << QnRequestParam("sequenceNumber",  QnLexical::serialized(sequenceNumber));
 
     return sendAsyncGetRequest(PtzContinuousMoveObject, params, NULL, target, slot);
+}
+
+int QnMediaServerConnection::ptzContinuousFocusAsync(const QnNetworkResourcePtr &camera, qreal speed, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("command",         QnLexical::serialized(Qn::ContinuousFocusPtzCommand));
+    params << QnRequestParam("speed",           QnLexical::serialized(speed));
+
+    return sendAsyncGetRequest(PtzContinuousFocusObject, params, NULL, target, slot);
 }
 
 int QnMediaServerConnection::ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {

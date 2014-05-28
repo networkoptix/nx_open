@@ -179,6 +179,7 @@ public:
     int addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot);
 
     int ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzContinuousFocusAsync(const QnNetworkResourcePtr &camera, qreal speed, QObject *target, const char *slot);
     int ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzViewportMoveAsync(const QnNetworkResourcePtr &camera, qreal aspectRatio, const QRectF &viewport, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzGetPositionAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot);
