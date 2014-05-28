@@ -47,6 +47,8 @@ namespace ec2
             //TODO #ak this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
 
+            //todo: #roman refactor is need. fillSequence should be under DB manager mutex
+
             if (!tran.id.sequence)
                 tran.fillSequence();
 
