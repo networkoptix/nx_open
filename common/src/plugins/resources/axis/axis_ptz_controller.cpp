@@ -198,7 +198,7 @@ bool QnAxisPtzController::queryInternal(const QString &request, QByteArray *body
             if(body) {
                 QByteArray localBody;
                 http->readAll(localBody);
-                if(body)
+                if(body) // TODO: #Elric why the double check?
                     *body = localBody;
 
                 if(localBody.startsWith("Error:")) {

@@ -18,7 +18,7 @@ class QnIniSection {
 public:
     QnIniSection() {}
 
-    QnIniSection fromIni(const QByteArray &ini) {
+    static QnIniSection fromIni(const QByteArray &ini) {
         QTextStream stream(ini, QIODevice::ReadOnly);
         while(true) {
             QString line = stream.readLine();

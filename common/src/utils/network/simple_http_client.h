@@ -8,6 +8,8 @@
 
 #include "socket.h"
 
+// TODO: #Elric naming! Qn!
+
 enum CLHttpStatus
 {
     CL_HTTP_SUCCESS = 200,
