@@ -471,11 +471,18 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
 void QnMediaServerUpdateTool::downloadUpdates() {
     QHash<QUrl, QString> downloadTargets;
     QMultiHash<QUrl, QnId> peerAssociations;
+
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
-        if (!it.value()->fileName.isEmpty()) {
-            QFile file(it.value()->fileName);
-            if (file.exists() && file.size() == it.value()->fileSize)
+        QString fileName = it.value()->fileName;
+        if (fileName.isEmpty())
+            fileName = updateFilePath(updatesDirName, it.value()->baseFileName);
+
+        if (!fileName.isEmpty()) {
+            QFile file(fileName);
+            if (file.exists() && file.size() == it.value()->fileSize) {
+                it.value()->fileName = fileName;
                 continue;
+            }
         }
 
         downloadTargets.insert(it.value()->url, it.value()->baseFileName);

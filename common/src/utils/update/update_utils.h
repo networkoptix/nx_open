@@ -10,5 +10,6 @@ class QIODevice;
 
 bool verifyUpdatePackage(const QString &fileName, QnSoftwareVersion *version = 0, QnSystemInformation *sysInfo = 0);
 bool verifyUpdatePackage(QIODevice *device, QnSoftwareVersion *version = 0, QnSystemInformation *sysInfo = 0);
+QString updateFilePath(const QString &updatesDirPath, const QString &fileName);
 
 #endif // UPDATE_UTILS_H

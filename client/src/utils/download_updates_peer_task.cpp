@@ -4,6 +4,8 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
+#include <utils/update/update_utils.h>
+
 namespace {
 
     void readAllData(QIODevice *inDevice, QIODevice *outDevice) {
@@ -16,14 +18,6 @@ namespace {
             if (read > 0)
                 outDevice->write(buffer.data(), read);
         }
-    }
-
-    QString updateFilePath(const QString &updatesDirPath, const QString &fileName) {
-        QDir dir = QDir::temp();
-        if (!dir.exists(updatesDirPath))
-            dir.mkdir(updatesDirPath);
-        dir.cd(updatesDirPath);
-        return dir.absoluteFilePath(fileName);
     }
 
 } // anonymous namespace

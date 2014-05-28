@@ -1,6 +1,7 @@
 #include "update_utils.h"
 
 #include <QtCore/QJsonDocument>
+#include <QtCore/QDir>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
@@ -54,4 +55,12 @@ bool verifyUpdatePackage(QIODevice *device, QnSoftwareVersion *version, QnSystem
     zip.setCurrentFile(infoEntryName);
     QuaZipFile infoFile(&zip);
     return verifyUpdatePackageInternal(&infoFile, version, sysInfo);
+}
+
+QString updateFilePath(const QString &updatesDirPath, const QString &fileName) {
+    QDir dir = QDir::temp();
+    if (!dir.exists(updatesDirPath))
+        dir.mkdir(updatesDirPath);
+    dir.cd(updatesDirPath);
+    return dir.absoluteFilePath(fileName);
 }
