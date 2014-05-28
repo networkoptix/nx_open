@@ -50,6 +50,12 @@ void QnDownloadUpdatesPeerTask::setPeerAssociations(const QMultiHash<QUrl, QnId>
     m_peersByUrl = peersByUrl;
 }
 
+void QnDownloadUpdatesPeerTask::cancel() {
+    m_currentPeers.clear();
+    m_pendingDownloads.clear();
+    m_file.reset();
+}
+
 void QnDownloadUpdatesPeerTask::doStart() {
     m_resultingFiles.clear();
     m_pendingDownloads = m_targets.keys();
@@ -89,6 +95,10 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
 
     reply->deleteLater();
 
+    // it means the task was cancelled
+    if (m_file.isNull())
+        return;
+
     if (reply->error() != QNetworkReply::NoError) {
         m_file.reset();
         finish(DownloadError);
@@ -113,6 +123,12 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress(qint64 bytesRe
         return;
     }
 
+    // it means the task was cancelled
+    if (m_file.isNull()) {
+        reply->deleteLater();
+        return;
+    }
+
     foreach (const QnId &peerId, m_currentPeers)
         emit peerProgressChanged(peerId, bytesReceived * 100 / bytesTotal);
 
@@ -124,6 +140,12 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_readyRead() {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply) {
         Q_ASSERT_X(0, "This function must be called only from QNetworkReply", Q_FUNC_INFO);
+        return;
+    }
+
+    // it means the task was cancelled
+    if (m_file.isNull()) {
+        reply->deleteLater();
         return;
     }
 

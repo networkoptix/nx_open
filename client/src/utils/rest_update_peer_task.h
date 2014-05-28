@@ -22,6 +22,8 @@ public:
     void setUpdateId(const QString &updateId);
     void setVersion(const QnSoftwareVersion &version);
 
+    virtual void cancel() override;
+
 protected:
     virtual void doStart() override;
 

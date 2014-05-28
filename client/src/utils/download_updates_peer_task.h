@@ -23,6 +23,8 @@ public:
     QHash<QUrl, QString> resultingFiles() const;
     void setPeerAssociations(const QMultiHash<QUrl, QnId> &peersByUrl);
 
+    virtual void cancel() override;
+
 protected:
     virtual void doStart() override;
 

@@ -38,6 +38,19 @@ void QnRestUpdatePeerTask::setVersion(const QnSoftwareVersion &version) {
     m_version = version;
 }
 
+void QnRestUpdatePeerTask::cancel() {
+    if (!m_currentServers.isEmpty()) {
+        QnMediaServerResourcePtr server = m_currentServers.first();
+        disconnect(server.data(), &QnMediaServerResource::resourceChanged, this, &QnRestUpdatePeerTask::at_resourceChanged);
+    }
+
+    m_serverBySystemInformation.clear();
+    m_currentServers.clear();
+    m_currentData.clear();
+    m_shortTimer->stop();
+    m_longTimer->stop();
+}
+
 void QnRestUpdatePeerTask::doStart() {
     foreach (const QnId &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
@@ -93,6 +106,10 @@ void QnRestUpdatePeerTask::finishPeer() {
 
 void QnRestUpdatePeerTask::at_updateInstalled(int status, int handle) {
     Q_UNUSED(handle)
+
+    // it means the task was cancelled
+    if (m_currentServers.isEmpty())
+        return;
 
     if (status != 0) {
         finish(UploadError);
