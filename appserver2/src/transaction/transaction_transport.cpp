@@ -7,7 +7,6 @@
 #include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
 #include "transaction_log.h"
-#include "transaction_transport_serializer.h"
 #include "common/common_module.h"
 
 namespace ec2
@@ -161,8 +160,8 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                         if (m_readBufferLen == fullChunkLen) 
                         {
                             QByteArray serializedTran;
-                            TransactionTransportHeader transportHeader;
-                            QnTransactionTransportSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+                            QnTransactionTransportHeader transportHeader;
+                            QnBinaryTransactionSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
                             emit gotTransaction(serializedTran, transportHeader);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
@@ -379,8 +378,8 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         if (bufferLen >= fullChunkLen)
         {
             QByteArray serializedTran;
-            TransactionTransportHeader transportHeader;
-            QnTransactionTransportSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+            QnTransactionTransportHeader transportHeader;
+            QnBinaryTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
             emit gotTransaction(serializedTran, transportHeader);
 
             buffer += fullChunkLen;

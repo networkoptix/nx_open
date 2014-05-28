@@ -5,11 +5,17 @@
 #include <QByteArray>
 #include <QQueue>
 #include <QSet>
+
+#include <transaction/transaction.h>
+#include <transaction/binary_transaction_serializer.h>
+#include <transaction/json_transaction_serializer.h>
+#include <transaction/transaction_transport_header.h>
+
+#include <utils/network/abstract_socket.h>
 #include "utils/network/aio/aioeventhandler.h"
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/common/id.h"
-#include "transaction.h"
-#include "transaction_transport_header.h"
+
 
 namespace ec2
 {
@@ -39,11 +45,23 @@ public:
     static QList<QByteArray> decodeHWList(const QByteArray data);
 
 signals:
-    void gotTransaction(QByteArray data, TransactionTransportHeader transportHeader);
+    void gotTransaction(const QByteArray &data, const QnTransactionTransportHeader &transportHeader);
     void stateChanged(State state);
 public:
+
+    template<class T> 
+    void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader &header) {
+        switch (m_remotePeer.peerType) {
+        case QnPeerInfo::AndroidClient:
+            addData(QnJsonTransactionSerializer::instance()->serializeTran(transaction, header));
+            break;
+        default:
+            addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            break;
+        }
+    }
+
     void doOutgoingConnect(QUrl remoteAddr);
-    void addData(const QByteArray& data);
     void close();
 
     // these getters/setters are using from a single thread
@@ -98,6 +116,7 @@ private:
 private:
     void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
+    void addData(const QByteArray &data);
     static void ensureSize(std::vector<quint8>& buffer, std::size_t size);
     int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);
     void processTransactionData( const QByteArray& data);
@@ -109,6 +128,7 @@ private slots:
     void at_httpClientDone(nx_http::AsyncHttpClientPtr);
     void repeatDoGet();
 };
+
 typedef QSharedPointer<QnTransactionTransport> QnTransactionTransportPtr;
 }
 
