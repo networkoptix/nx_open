@@ -11,17 +11,12 @@
 
 namespace ec2
 {
-    template<class QueryProcessorType>
-    class QnUserManager
-        :
+    class QnUserNotificationManager
+    :
         public AbstractUserManager
     {
     public:
-        QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
-
-        virtual int getUsers( impl::GetUsersHandlerPtr handler ) override;
-        virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) override;
-        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+        QnUserNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
 
         void triggerNotification( const QnTransaction<ApiUserData>& tran )
         {
@@ -37,9 +32,25 @@ namespace ec2
             emit removed( QnId(tran.params.id) );
         }
 
+    protected:
+        ResourceContext m_resCtx;
+    };
+
+
+    template<class QueryProcessorType>
+    class QnUserManager
+    :
+        public QnUserNotificationManager
+    {
+    public:
+        QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+
+        virtual int getUsers( impl::GetUsersHandlerPtr handler ) override;
+        virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) override;
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+
     private:
         QueryProcessorType* const m_queryProcessor;
-        ResourceContext m_resCtx;
 
         QnTransaction<ApiUserData> prepareTransaction( ApiCommand::Value command, const QnUserResourcePtr& resource );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& resource );

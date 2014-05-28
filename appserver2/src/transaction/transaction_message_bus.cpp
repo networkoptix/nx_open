@@ -8,10 +8,10 @@
 
 #include <transaction/transaction_transport.h>
 
-#include "utils/common/synctime.h"
-#include "nx_ec/data/api_server_alive_data.h"
-
 #include "api/app_server_connection.h"
+#include "nx_ec/data/api_server_alive_data.h"
+#include "utils/common/synctime.h"
+#include "ec_connection_notification_manager.h"
 
 namespace ec2
 {
@@ -170,20 +170,6 @@ void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran
 // ------------------ QnTransactionMessageBus::CustomHandler -------------------
 
 
-template <class T>
-template <class T2>
-bool QnTransactionMessageBus::CustomHandler<T>::deliveryTransaction(const QnTransaction<T2> &tran)
-{  
-    if (abstractTran.persistent && transactionLog && transactionLog->contains(tran))
-        return true; // transaction already processed
-
-    // trigger notification, update local data e.t.c
-    if (!m_handler->template processIncomingTransaction<T2>(tran, stream.buffer()))
-        return false;
-
-    return true;
-}
-
 void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransaction<ApiLockData>& tran) {
     if(tran.command == ApiCommand::lockRequest)
         emit gotLockRequest(tran.params);
@@ -194,6 +180,139 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransacti
 void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender)
 {
 	sender->setReadSync(true);
+}
+
+template<class T>
+void QnTransactionMessageBus::sendTransactionInternal(const QnTransaction<T>& tran, const QnTransactionTransportHeader &header) {
+    QnPeerSet toSendRest = header.dstPeers;
+    QnPeerSet sentPeers;
+    bool sendToAll = header.dstPeers.isEmpty();
+    for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
+    {
+        QnTransactionTransportPtr transport = *itr;
+        if (!sendToAll && !header.dstPeers.contains(transport->remotePeer().id)) 
+            continue;
+                
+        if (!transport->isReadyToSend(tran.command)) 
+            continue;
+                
+        transport->sendTransaction(tran, header);
+        sentPeers << transport->remotePeer().id;
+        toSendRest.remove(transport->remotePeer().id);
+    }
+
+    // some dst is not accessible directly, send broadcast (to all connected peers except of just sent)
+    if (!toSendRest.isEmpty()) 
+    {
+        for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
+        {
+            QnTransactionTransportPtr transport = *itr;
+            if (!transport->isReadyToSend(tran.command))
+                continue;;
+                    
+            if (sentPeers.contains(transport->remotePeer().id))
+                continue; // already sent
+
+            transport->sendTransaction(tran, header);
+        }
+    }
+}
+
+template <class T>
+void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader) {
+    transport->sendTransaction(tran, transportHeader);
+}
+        
+template <class T>
+void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader) {
+    AlivePeersMap:: iterator itr = m_alivePeers.find(tran.id.peerID);
+    if (itr != m_alivePeers.end())
+        itr.value().lastActivity.restart();
+
+    if (isSystem(tran.command)) {
+        if (m_lastTranSeq[tran.id.peerID] >= tran.id.sequence)
+            return; // already processed
+        m_lastTranSeq[tran.id.peerID] = tran.id.sequence;
+    }
+
+    if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
+        qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "with time=" << tran.timestamp;
+        // process system transactions
+        switch(tran.command) {
+        case ApiCommand::lockRequest:
+        case ApiCommand::lockResponse:
+        case ApiCommand::unlockRequest: 
+            {
+                onGotDistributedMutexTransaction(tran);
+                break;
+            }
+        case ApiCommand::clientInstanceId:
+            //TODO: #GDM VW save clientInstanceId to corresponding connection
+            return;
+        case ApiCommand::tranSyncRequest:
+            onGotTransactionSyncRequest(sender, tran);
+            return;
+        case ApiCommand::tranSyncResponse:
+            onGotTransactionSyncResponse(sender);
+            return;
+        case ApiCommand::serverAliveInfo:
+            onGotServerAliveInfo(tran);
+            break; // do not return. proxy this transaction
+        default:
+            // general transaction
+            if (!sender->isReadSync())
+                return;
+
+            if( tran.persistent && transactionLog && transactionLog->contains(tran) )
+            {
+                // transaction is already processed
+            }
+            else 
+            {
+                if (tran.persistent)
+                {
+                    QByteArray serializedTran;  //TODO #GDM, you know where to get this :)
+                    ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
+                    if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
+                    {
+                        qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
+                        sender->setState(QnTransactionTransport::Error);
+                        return; //TODO #GDM is this correct? Discuss with Roma
+                    }
+                }
+
+                if( m_handler )
+                    m_handler->triggerNotification(tran);
+            }
+
+            // this is required to allow client place transactions directly into transaction message bus
+            if (tran.command == ApiCommand::getAllDataList)
+                sender->setWriteSync(true);
+            break;
+        }
+    }
+    else {
+        qDebug() << "skip transaction " << ApiCommand::toString(tran.command) << "for peers" << transportHeader.dstPeers;
+    }
+
+    QMutexLocker lock(&m_mutex);
+
+    // proxy incoming transaction to other peers.
+    if (!transportHeader.dstPeers.isEmpty() && (transportHeader.dstPeers - transportHeader.processedPeers).isEmpty()) {
+        emit transactionProcessed(tran);
+        return; // all dstPeers already processed
+    }
+
+    for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) {
+        QnTransactionTransportPtr transport = *itr;
+        if (transportHeader.processedPeers.contains(transport->remotePeer().id) || !transport->isReadyToSend(tran.command)) 
+            continue;
+
+        Q_ASSERT(transport->remotePeer().id != tran.id.peerID);
+        transport->sendTransaction(tran, QnTransactionTransportHeader(transportHeader.processedPeers + connectedPeers(tran.command)));
+    }
+
+    emit transactionProcessed(tran);
 }
 
 void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<QnTranState> &tran)
@@ -220,15 +339,6 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     else {
         qWarning() << "Can't execute query for sync with server peer!";
     }
-}
-
-template <class T>
-bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransactionTransport* /*sender*/, QnAbstractTransaction& abstractTran, QnInputBinaryStream<QByteArray>& stream)
-{
-    //TODO/IMPL deliver businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
-    //TODO/IMPL deliver businessRuleReset( const QnBusinessEventRuleList& rules );
-    //TODO/IMPL deliver runtimeInfoChanged( const ec2::QnRuntimeInfo& runtimeInfo );
-    return true;
 }
 
 void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport)
@@ -513,8 +623,5 @@ void QnTransactionMessageBus::setLocalPeer(const QnPeerInfo localPeer) {
 ec2::QnPeerInfo QnTransactionMessageBus::localPeer() const {
     return m_localPeer;
 }
-
-template class QnTransactionMessageBus::CustomHandler<RemoteEC2Connection>;
-template class QnTransactionMessageBus::CustomHandler<Ec2DirectConnection>;
 
 }

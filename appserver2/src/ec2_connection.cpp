@@ -37,13 +37,13 @@ namespace ec2
         fromApiToResourceList(paramList, kvPairs);
 
         m_emailManagerImpl.configure(kvPairs);
-        QnTransactionMessageBus::instance()->setHandler(this);
+        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
         if (QnTransactionMessageBus::instance())
-            QnTransactionMessageBus::instance()->removeHandler(this);
+            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
         ec2::QnDistributedMutexManager::initStaticInstance(0);
     }
 

@@ -229,19 +229,6 @@ namespace ec2
         }
 
 
-        template<class T> 
-        bool processIncomingTransaction( const QnTransaction<T>& tran, const QByteArray& serializedTran ) 
-        {
-            if (tran.persistent)
-            {
-                ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
-                if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
-                    return false;
-            }
-            return true;
-        }
-
-
         /*!
             \param handler Functor ( ErrorCode, OutputData )
             TODO let compiler guess template params
