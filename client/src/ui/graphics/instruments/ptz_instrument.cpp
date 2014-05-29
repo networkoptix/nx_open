@@ -112,6 +112,7 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     overlay->zoomOutButton()->setTarget(widget);
     overlay->focusInButton()->setTarget(widget);
     overlay->focusOutButton()->setTarget(widget);
+    overlay->focusAutoButton()->setTarget(widget);
     overlay->modeButton()->setTarget(widget);
     overlay->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
     overlay->setMarkersVisible(!isFisheye);
@@ -126,6 +127,7 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     connect(overlay->focusInButton(),   &QnImageButtonWidget::released, this, &PtzInstrument::at_focusInButton_released);
     connect(overlay->focusOutButton(),  &QnImageButtonWidget::pressed,  this, &PtzInstrument::at_focusOutButton_pressed);
     connect(overlay->focusOutButton(),  &QnImageButtonWidget::released, this, &PtzInstrument::at_focusOutButton_released);
+    connect(overlay->focusAutoButton(), &QnImageButtonWidget::clicked,  this, &PtzInstrument::at_focusAutoButton_clicked);
     connect(overlay->modeButton(),      &QnImageButtonWidget::clicked,  this, &PtzInstrument::at_modeButton_clicked);
 
     widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, true, false, false);
@@ -190,6 +192,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget *widget) {
         overlayWidget->zoomOutButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
         overlayWidget->focusInButton()->setVisible(data.hasCapabilities(Qn::ContinuousFocusCapability));
         overlayWidget->focusOutButton()->setVisible(data.hasCapabilities(Qn::ContinuousFocusCapability));
+        overlayWidget->focusAutoButton()->setVisible(data.traits.contains(Qn::ManualAutoFocusPtzTrait));
         
         if (isFisheye) {
             int panoAngle = widget->item()
@@ -209,7 +212,22 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
     if(data.capabilities == capabilities)
         return;
 
+    if((data.capabilities ^ capabilities) & Qn::AuxilaryPtzCapability)
+        updateTraits(widget);
+
     data.capabilities = capabilities;
+    updateOverlayWidgetInternal(widget);
+}
+
+void PtzInstrument::updateTraits(QnMediaResourceWidget *widget) {
+    PtzData &data = m_dataByWidget[widget];
+
+    QnPtzAuxilaryTraitList traits;
+    widget->ptzController()->getAuxilaryTraits(&traits);
+    if(data.traits == traits)
+        return;
+
+    data.traits = traits;
     updateOverlayWidgetInternal(widget);
 }
 
@@ -252,6 +270,10 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &spee
 
 void PtzInstrument::focusMove(QnMediaResourceWidget *widget, qreal speed) {
     widget->ptzController()->continuousFocus(speed);
+}
+
+void PtzInstrument::focusAuto(QnMediaResourceWidget *widget) {
+    widget->ptzController()->runAuxilaryCommand(Qn::ManualAutoFocusPtzTrait, QString());
 }
 
 void PtzInstrument::processPtzClick(const QPointF &pos) {
@@ -342,12 +364,15 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             PtzData &data = m_dataByWidget[widget];
             data.capabilitiesConnection = connect(widget->ptzController(), &QnAbstractPtzController::changed, this, 
                 [=](Qn::PtzDataFields fields) { 
-                    if(fields & Qn::CapabilitiesPtzField) 
+                    if(fields & Qn::CapabilitiesPtzField)
                         updateCapabilities(widget); 
+                    if(fields & Qn::AuxilaryTraitsPtzField)
+                        updateTraits(widget);
                 }
             );
 
             updateCapabilities(widget);
+            updateTraits(widget);
             updateOverlayWidgetInternal(widget);
 
             return true;
@@ -594,7 +619,6 @@ void PtzInstrument::dragMove(DragInfo *info) {
 }
 
 void PtzInstrument::finishDrag(DragInfo *info) {
-    
     if(target()) {
         switch (m_movement) {
         case ContinuousMovement:
@@ -724,4 +748,11 @@ void PtzInstrument::at_focusButton_activated(qreal speed) {
 
     if(QnMediaResourceWidget *widget = button->target())
         focusMove(widget, speed);
+}
+
+void PtzInstrument::at_focusAutoButton_clicked() {
+    PtzImageButtonWidget *button = checked_cast<PtzImageButtonWidget *>(sender());
+
+    if(QnMediaResourceWidget *widget = button->target())
+        focusAuto(widget);
 }

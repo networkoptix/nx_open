@@ -79,6 +79,10 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
     case Qn::GetHomeObjectPtzCommand:
         return (capabilities & Qn::HomePtzCapability);
 
+    case Qn::GetAuxilaryTraitsPtzCommand:
+    case Qn::RunAuxilaryCommandPtzCommand:
+        return (capabilities & Qn::AuxilaryPtzCapability);
+
     case Qn::GetDataPtzCommand:
         return true;
 

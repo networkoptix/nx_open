@@ -94,6 +94,8 @@ int QnPtzRestHandler::executePost(const QString &path, const QnRequestParams &pa
     case Qn::GetActiveObjectPtzCommand:     return executeGetActiveObject(controller, params, result);
     case Qn::UpdateHomeObjectPtzCommand:    return executeUpdateHomeObject(controller, params, result);
     case Qn::GetHomeObjectPtzCommand:       return executeGetHomeObject(controller, params, result);
+    case Qn::GetAuxilaryTraitsPtzCommand:   return executeGetAuxilaryTraits(controller, params, result);
+    case Qn::RunAuxilaryCommandPtzCommand:  return executeRunAuxilaryCommand(controller, params, result);
     case Qn::GetDataPtzCommand:             return executeGetData(controller, params, result);
     default:                                return CODE_INVALID_PARAMETER;
     }
@@ -308,6 +310,31 @@ int QnPtzRestHandler::executeGetHomeObject(const QnPtzControllerPtr &controller,
     return CODE_OK;
 }
 
+int QnPtzRestHandler::executeGetAuxilaryTraits(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QnPtzAuxilaryTraitList traits;
+    if(!controller->getAuxilaryTraits(&traits))
+        return CODE_INTERNAL_ERROR;
+
+    result.setReply(traits);
+    return CODE_OK;
+}
+
+int QnPtzRestHandler::executeRunAuxilaryCommand(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QnPtzAuxilaryTrait trait;
+    QString data;
+    if(
+        !requireParameter(params, lit("trait"),     result, &trait) || 
+        !requireParameter(params, lit("data"),      result, &data)
+    ) {
+            return CODE_INVALID_PARAMETER;
+    }
+
+    if(!controller->runAuxilaryCommand(trait, data))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
 int QnPtzRestHandler::executeGetData(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     Qn::PtzDataFields query;
     if(!requireParameter(params, lit("query"), result, &query))
@@ -323,6 +350,7 @@ int QnPtzRestHandler::executeGetData(const QnPtzControllerPtr &controller, const
 
 QString QnPtzRestHandler::description() const
 {
+    // TODO: #Elric not valid anymore
     return "\
         There are several ptz commands: <BR>\
         <b>api/ptz/move</b> - start camera moving.<BR>\

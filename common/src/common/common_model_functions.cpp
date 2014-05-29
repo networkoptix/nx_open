@@ -7,7 +7,7 @@
 QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(Qn::PtzTrait,
     ((Qn::FourWayPtzTrait,          "FourWayPtz"))
     ((Qn::EightWayPtzTrait,         "EightWayPtz"))
-    ((Qn::VistaSmartFocusPtzTrait,  "VistaSmartFocus"))
+    ((Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus"))
 )
 
 QN_DEFINE_METAOBJECT_ENUM_NAME_MAPPING(Qn, PtzCommand)

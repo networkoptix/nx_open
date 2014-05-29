@@ -64,13 +64,14 @@ void QnVistaMotorPtzController::init() {
 
     if(options.contains(lit("SMART_FOCUS"))) {
         m_capabilities |= Qn::AuxilaryPtzCapability;
-        m_traits.push_back(Qn::VistaSmartFocusPtzTrait);
+        m_traits.push_back(Qn::ManualAutoFocusPtzTrait);
     }
 
     QString ptzOptions;
     if(!config.value(lit("m_ptz_option"), &ptzOptions))
         return;
 
+    // TODO: #Elric support pan & tilt here and get rid of the corresponding records in json data file.
     if(ptzOptions.contains(lit("ZOOM")))
         m_capabilities |= Qn::ContinuousZoomCapability;
     if(ptzOptions.contains(lit("FOCUS")))
@@ -150,7 +151,7 @@ bool QnVistaMotorPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait &tra
     if(!(m_capabilities & Qn::AuxilaryPtzCapability))
         return false;
 
-    if(trait.standardTrait() == Qn::VistaSmartFocusPtzTrait) {
+    if(trait.standardTrait() == Qn::ManualAutoFocusPtzTrait) {
         QMutexLocker locker(&m_mutex);
         return queryLocked(lit("live/live_control.php?smart_focus=1"));
     } else {

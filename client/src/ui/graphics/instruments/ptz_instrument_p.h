@@ -203,6 +203,9 @@ public:
         m_focusOutButton = new PtzImageButtonWidget(this);
         m_focusOutButton->setIcon(qnSkin->icon("item/ptz_focus_out.png"));
 
+        m_focusAutoButton = new PtzImageButtonWidget(this);
+        m_focusAutoButton->setIcon(qnSkin->icon("item/ptz_focus_auto.png"));
+
         m_modeButton = new PtzImageButtonWidget(this);
         m_modeButton->setToolTip(tr("Dewarping panoramic mode"));
 
@@ -221,6 +224,7 @@ public:
         zoomOutButton()->setCursor(Qt::BlankCursor);
         focusInButton()->setCursor(Qt::BlankCursor);
         focusOutButton()->setCursor(Qt::BlankCursor);
+        focusAutoButton()->setCursor(Qt::BlankCursor);
     }
 
     void showCursor() {
@@ -229,6 +233,7 @@ public:
         zoomOutButton()->setCursor(Qt::ArrowCursor);
         focusInButton()->setCursor(Qt::ArrowCursor);
         focusOutButton()->setCursor(Qt::ArrowCursor);
+        focusAutoButton()->setCursor(Qt::ArrowCursor);
     }
 
     PtzManipulatorWidget *manipulatorWidget() const {
@@ -249,6 +254,10 @@ public:
 
     PtzImageButtonWidget *focusOutButton() const {
         return m_focusOutButton;
+    }
+
+    PtzImageButtonWidget *focusAutoButton() const {
+        return m_focusAutoButton;
     }
 
     PtzImageButtonWidget *modeButton() const {
@@ -324,7 +333,8 @@ private:
 
         m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
         m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * size));
-        m_focusInButton->setGeometry(QRectF(left + xStep * 0.5 - yStep * 4.5, 1.5 * size));
+        m_focusInButton->setGeometry(QRectF(left + xStep * 0.5 - yStep * 6.5, 1.5 * size));
+        m_focusAutoButton->setGeometry(QRectF(left + xStep * 0.5 - yStep * 4.5, 1.5 * size));
         m_focusOutButton->setGeometry(QRectF(left + xStep * 0.5 - yStep * 2.5, 1.5 * size));
     }
 
@@ -335,6 +345,7 @@ private:
     PtzImageButtonWidget *m_zoomOutButton;
     PtzImageButtonWidget *m_focusInButton;
     PtzImageButtonWidget *m_focusOutButton;
+    PtzImageButtonWidget *m_focusAutoButton;
     PtzImageButtonWidget *m_modeButton;
     QPen m_pen;
 };

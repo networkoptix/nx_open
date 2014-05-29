@@ -39,6 +39,9 @@ private:
     int executeUpdateHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
     int executeGetHomeObject(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
 
+    int executeGetAuxilaryTraits(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
+    int executeRunAuxilaryCommand(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
+
     int executeGetData(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
 
     bool checkSequence(const QString& id, int sequence);

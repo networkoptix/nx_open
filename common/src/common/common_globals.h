@@ -187,10 +187,10 @@ public:
 
 
     enum PtzTrait {
-        NoPtzTraits                 = 0x00,
-        FourWayPtzTrait             = 0x01,
-        EightWayPtzTrait            = 0x02,
-        VistaSmartFocusPtzTrait     = 0x04,
+        NoPtzTraits             = 0x00,
+        FourWayPtzTrait         = 0x01,
+        EightWayPtzTrait        = 0x02,
+        ManualAutoFocusPtzTrait = 0x04,
     };
     Q_DECLARE_FLAGS(PtzTraits, PtzTrait);
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzTraits);

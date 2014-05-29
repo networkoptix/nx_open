@@ -175,12 +175,14 @@ bool QnCachingPtzController::getHomeObject(QnPtzObject *homeObject) {
 }
 
 bool QnCachingPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) {
+    if(!base_type::getAuxilaryTraits(auxilaryTraits))
+        return false;
+
     QMutexLocker locker(&m_mutex);
     if(m_data.fields & Qn::AuxilaryTraitsPtzField) {
         *auxilaryTraits = m_data.auxilaryTraits;
         return true;
     } else {
-        base_type::getAuxilaryTraits(auxilaryTraits);
         return false;
     }
 }

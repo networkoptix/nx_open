@@ -76,9 +76,12 @@ private slots:
     void at_focusOutButton_released();
     void at_focusButton_activated(qreal speed);
 
+    void at_focusAutoButton_clicked();
+
     void updateOverlayWidget();
     void updateOverlayWidgetInternal(QnMediaResourceWidget *widget);
     void updateCapabilities(QnMediaResourceWidget *widget);
+    void updateTraits(QnMediaResourceWidget *widget);
 
 private:
     QnMediaResourceWidget *target() const;
@@ -101,6 +104,7 @@ private:
     void ptzUpdate(QnMediaResourceWidget *widget);
     void ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed, bool instant = false);
     void focusMove(QnMediaResourceWidget *widget, qreal speed);
+    void focusAuto(QnMediaResourceWidget *widget);
 
     void processPtzClick(const QPointF &pos);
     void processPtzDrag(const QRectF &rect);
@@ -113,6 +117,7 @@ private:
         bool hasCapabilities(Qn::PtzCapabilities capabilities) const { return (this->capabilities & capabilities) == capabilities; }
 
         Qn::PtzCapabilities capabilities;
+        QnPtzAuxilaryTraitList traits;
         QVector3D currentSpeed;
         QVector3D requestedSpeed;
         PtzOverlayWidget *overlayWidget;
