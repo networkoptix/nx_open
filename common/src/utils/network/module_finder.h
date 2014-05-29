@@ -8,7 +8,6 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QMutex>
-#include <QtCore/QQueue>
 #include <QtNetwork/QHostAddress>
 
 #include <utils/common/long_runnable.h>
@@ -68,12 +67,6 @@ public:
 
     QnModuleInformation moduleInformation(const QString &moduleId) const;
 
-    void addManualCheckAddress(const QString &address, unsigned short port);
-    void removeManualCheckAddress(const QString &address, unsigned short port);
-
-    void addAutoCheckAddress(const QString &address, unsigned short port);
-    void removeAutoCheckAddress(const QString &address, unsigned short port);
-
 public slots:
     virtual void pleaseStop() override;
 
@@ -93,8 +86,6 @@ private:
     bool processDiscoveryRequest(AbstractDatagramSocket *udpSocket);
     bool processDiscoveryResponse(AbstractDatagramSocket *udpSocket);
 
-    void removeDirectCheckSocket(AbstractDatagramSocket *socket);
-
 private:
     struct ModuleContext {
         QHostAddress address;
@@ -104,19 +95,6 @@ private:
         QnModuleInformation moduleInformation;
 
         ModuleContext(const RevealResponse &response);
-    };
-
-    struct FullAddress {
-        QString address;
-        unsigned short port;
-
-        FullAddress(const QString &address, unsigned short port) :
-            address(address), port(port)
-        {}
-
-        bool operator==(const FullAddress &other) const {
-            return address == other.address && port == other.port;
-        }
     };
 
     mutable QMutex m_mutex;
@@ -129,14 +107,6 @@ private:
     QHash<QString, ModuleContext> m_knownEnterpriseControllers;
     QSet<QString> m_localNetworkAdresses;
     bool m_compatibilityMode;
-
-    QSet<FullAddress> m_knownAddresses;
-    QList<FullAddress> m_manualCheckAddresses;
-    QList<FullAddress> m_autoCheckAddresses;
-    QQueue<FullAddress> m_directCheckQueue;
-    QList<AbstractDatagramSocket*> m_directCheckSockets;
-    QHash<AbstractDatagramSocket*, quint64> m_directCheckSocketCreationTime;
-    quint64 m_lastDirectCheckClock;
 };
 
 Q_DECLARE_METATYPE(QnModuleInformation)

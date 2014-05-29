@@ -8,7 +8,6 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QScopedArrayPointer>
-#include <QtCore/QTimer>
 #include <QtNetwork/QNetworkInterface>
 
 #include <utils/common/log.h>
@@ -25,8 +24,6 @@ namespace {
     const unsigned defaultPingTimeoutMs = 3000;
     const unsigned defaultKeepAliveMultiply = 3;
     const unsigned errorWaitTimeoutMs = 1000;
-    const unsigned directCheckIntervalMs = 10000;
-    const unsigned directCheckSocketTimeoutMs = 3000;
 
 } // anonymous namespace
 
@@ -108,45 +105,6 @@ QnModuleInformation QnModuleFinder::moduleInformation(const QString &moduleId) c
         return QnModuleInformation();
 
     return it->moduleInformation;
-}
-
-void QnModuleFinder::addManualCheckAddress(const QString &address, unsigned short port) {
-    FullAddress fullAddress(address, port);
-
-    QMutexLocker lk(&m_mutex);
-
-    if (!m_manualCheckAddresses.contains(fullAddress))
-        m_manualCheckAddresses.append(fullAddress);
-}
-
-void QnModuleFinder::removeManualCheckAddress(const QString &address, unsigned short port) {
-    FullAddress fullAddress(address, port);
-
-    QMutexLocker lk(&m_mutex);
-
-    m_manualCheckAddresses.removeOne(fullAddress);
-}
-
-void QnModuleFinder::addAutoCheckAddress(const QString &address, unsigned short port) {
-    FullAddress fullAddress(address, port);
-
-    QMutexLocker lk(&m_mutex);
-
-    if (!m_manualCheckAddresses.contains(fullAddress) && !m_autoCheckAddresses.contains(fullAddress))
-        m_manualCheckAddresses.append(fullAddress);
-
-    m_directCheckQueue.enqueue(fullAddress);
-}
-
-void QnModuleFinder::removeAutoCheckAddress(const QString &address, unsigned short port) {
-    FullAddress fullAddress(address, port);
-
-    QMutexLocker lk(&m_mutex);
-
-    m_autoCheckAddresses.removeOne(fullAddress);
-
-    if (!m_manualCheckAddresses.contains(fullAddress))
-        m_directCheckQueue.removeOne(fullAddress);
 }
 
 void QnModuleFinder::pleaseStop() {
@@ -262,22 +220,11 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
         it->moduleInformation.remoteAddresses.insert(remoteAddressStr);
         it->moduleInformation.isLocal |= m_localNetworkAdresses.contains(remoteAddressStr);
 
-        m_knownAddresses.insert(FullAddress(remoteAddressStr, response.typeSpecificParameters[lit("port")].toInt()));
-
         emit moduleFound(it->moduleInformation, remoteAddressStr, localAddress.toString());
     }
     it->prevResponseReceiveClock = QDateTime::currentMSecsSinceEpoch();
 
     return true;
-}
-
-void QnModuleFinder::removeDirectCheckSocket(AbstractDatagramSocket *socket) {
-    if (m_directCheckSockets.contains(udpSocket)) {
-        m_directCheckSocketCreationTime.remove(udpSocket);
-        m_directCheckSockets.removeOne(udpSocket);
-        m_pollSet.remove(udpSocket);
-        delete udpSocket;
-    }
 }
 
 void QnModuleFinder::run() {
@@ -303,36 +250,6 @@ void QnModuleFinder::run() {
 
     while(!needToStop()) {
         quint64 currentClock = QDateTime::currentMSecsSinceEpoch();
-
-        // remove timed out sockets
-        foreach (AbstractDatagramSocket *socket, m_directCheckSockets) {
-            if (currentClock - directCheckSocketTimeoutMs >= m_directCheckSocketCreationTime[socket])
-                removeDirectCheckSocket(socket);
-        }
-
-        // enqueue manual addresses
-        if (currentClock - m_lastDirectCheckClock >= directCheckIntervalMs) {
-            foreach (const FullAddress &address, m_manualCheckAddresses) {
-                if (m_knownAddresses.contains(address))
-                    continue;
-
-                if (m_directCheckQueue.contains(address))
-                    continue;
-
-                m_directCheckQueue.enqueue(address);
-            }
-        }
-
-        // create sockets for the queued addresses
-        while (!m_directCheckQueue.isEmpty()) {
-            FullAddress address = m_directCheckQueue.dequeue();
-            AbstractDatagramSocket *socket = SocketFactory::createDatagramSocket();
-            socket->setDestAddr(address.address, address.port);
-            m_directCheckSockets.append(DirectCheckSocket(socket, currentClock));
-            m_pollSet.add(socket);
-        }
-
-        currentClock = QDateTime::currentMSecsSinceEpoch();
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis) {
             //sending request via each socket
             foreach (AbstractDatagramSocket *socket, m_clientSockets) {
@@ -341,13 +258,6 @@ void QnModuleFinder::run() {
                     SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
                     NX_LOG(lit("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1);
                     //TODO/IMPL if corresponding interface is down, should remove socket from set
-                }
-            }
-            // do the same for direct check sockets
-            foreach (AbstractDatagramSocket *socket, m_directCheckSockets) {
-                if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {
-                    SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    NX_LOG(lit("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1);
                 }
             }
             m_prevPingClock = currentClock;
@@ -377,8 +287,6 @@ void QnModuleFinder::run() {
                 processDiscoveryRequest(udpSocket);
             else
                 processDiscoveryResponse(udpSocket);
-
-            removeDirectCheckSocket(udpSocket);
         }
 
         QMutexLocker lk(&m_mutex);
@@ -388,9 +296,6 @@ void QnModuleFinder::run() {
                 ++it;
                 continue;
             }
-
-            foreach (const QString &address, it->moduleInformation.remoteAddresses)
-                m_knownAddresses.remove(address, it->moduleInformation.parameters[lit("port")].toInt());
 
             emit moduleLost(it->moduleInformation);
             it = m_knownEnterpriseControllers.erase(it);
