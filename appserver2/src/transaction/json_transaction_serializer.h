@@ -22,22 +22,30 @@ namespace ec2
         QnJsonTransactionSerializer() {}
 
         template<class T>
-        QByteArray serializeTran(const QnTransaction<T>& tran, const QnTransactionTransportHeader &header) {
+        QByteArray serializedTransaction(const QnTransaction<T>& tran) {
             QMutexLocker lock(&m_mutex);
             Q_UNUSED(lock);
 
             if (m_cache.contains(tran.id))
                 return *m_cache[tran.id];
 
-            QByteArray* result = new QByteArray();
-            QnOutputBinaryStream<QByteArray> stream(result);
-            QByteArray headerJson = QJson::serialized(header);
-
-            QnBinary::serialize( tran, &stream );
+            QByteArray* result = new QByteArray(QJson::serialized(tran));
 
             m_cache.insert(tran.id, result);
 
             return *result;
+        }
+
+        template<class T>
+        QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
+            QByteArray result;
+            QnOutputBinaryStream<QByteArray> stream(&result);
+            QByteArray headerJson = QJson::serialized(header);
+            stream.write(headerJson, headerJson.size());
+
+            QByteArray serializedTran = serializedTransaction(tran);
+            stream.write(serializedTran.data(), serializedTran.size());
+            return result;
         }
 
     private:

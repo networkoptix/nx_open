@@ -53,7 +53,7 @@ public:
     void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader &header) {
         switch (m_remotePeer.peerType) {
         case QnPeerInfo::AndroidClient:
-            addData(QnJsonTransactionSerializer::instance()->serializeTran(transaction, header));
+            addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
         default:
             addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
