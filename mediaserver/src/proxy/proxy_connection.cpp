@@ -171,6 +171,11 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
 
     if (urlPath.isEmpty())
         urlPath = "/";
+    QString query = url.query();
+    if (!query.isEmpty()) {
+        urlPath += lit("?");
+        urlPath += query;
+    }
     d->request.requestLine.url = urlPath;
 
     for (nx_http::HttpHeaders::iterator itr = d->request.headers.begin(); itr != d->request.headers.end(); ++itr)

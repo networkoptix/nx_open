@@ -11,15 +11,13 @@ function printHelp()
 
 function get_var()
 {
-    VERSION_H_PATH="`find $SRC_DIR/mediaserver/ -name version.h`"
+    VERSION_H_PATH="`find $SRC_DIR/mediaserver/ -name version.h | head -n 1`"
     local h="`grep -R $1 $VERSION_H_PATH | sed 's/.*"\(.*\)".*/\1/'`"
     if [[ "$1" == "QN_CUSTOMIZATION_NAME" && "$h" == "default" ]]; then
         h=networkoptix
     fi
-    echo "$h" | head -n 1
+    echo "$h"
 }
-
-
 
 CUSTOMIZATION=$(get_var "QN_CUSTOMIZATION_NAME")
 PRODUCT_NAME=$(get_var "QN_PRODUCT_NAME_SHORT")
@@ -62,8 +60,6 @@ do
 done
 
 
-
-
 LIBS_TO_COPY=\
 ( libavcodec.so.54.23.100 \
 libavdevice.so.54.0.100 \
@@ -89,7 +85,6 @@ libquazip.so.1.0.0 )
 if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
   LIBS_TO_COPY+=( libvpx.so.1.2.0 )
 fi
-
 
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR/$PREFIX_DIR

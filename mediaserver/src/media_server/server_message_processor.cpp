@@ -10,6 +10,7 @@
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
 #include "business/business_message_bus.h"
+#include "settings.h"
 
 
 QnServerMessageProcessor::QnServerMessageProcessor():
@@ -100,11 +101,20 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     
     if (isCamera) 
     {
-        if (resource->getParentId() != ownMediaServer->getId())
+        bool needProxyToCamera = true;
+        if (resource->getParentId() != ownMediaServer->getId()) {
             resource->addFlags( QnResource::foreigner );
+        }
+        else {
+#ifdef EDGE_SERVER
+            needProxyToCamera = false;
+#endif
+        }
         // update all known IP list
-        QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
-        updateAllIPList(camRes->getId(), camRes->getHostAddress());
+        if (needProxyToCamera) {
+            QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
+            updateAllIPList(camRes->getId(), camRes->getHostAddress());
+        }
     }
 
     if (isServer) 
@@ -194,8 +204,35 @@ bool QnServerMessageProcessor::isProxy(void* opaque, const QUrl& url) {
     return static_cast<QnServerMessageProcessor*> (opaque)->isProxy(url);
 }
 
+bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
+{
+    if (addr == "localhost" || addr == "127.0.0.1")
+        return true;
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (mServer) 
+    {
+        QHostAddress hostAddr(addr);
+        foreach(const QHostAddress& serverAddr, mServer->getNetAddrList())
+        {
+            if (hostAddr == serverAddr)
+                return true;
+        }
+    }
+    return false;
+}
+
 bool QnServerMessageProcessor::isProxy(const QUrl& url) {
-    return isKnownAddr(url.host());
+    if (isKnownAddr(url.host()))
+        return true; // it's camera or other media server address
+    
+    int port = url.port();
+    if (port > 0) {
+        int serverPort = MSSettings::roSettings()->value("rtspPort", MSSettings::DEFAUT_RTSP_PORT).toInt();
+        if (port != serverPort && isLocalAddress(url.host()))
+            return true; // proxy to some local service
+    }
+    
+    return false;
 }
 
 void QnServerMessageProcessor::execBusinessActionInternal(QnAbstractBusinessActionPtr action) {
