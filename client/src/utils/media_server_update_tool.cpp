@@ -287,6 +287,7 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
         UpdateFileInformationPtr updateFileInformation(new UpdateFileInformation(version, fileName));
         QFile file(fileName);
         updateFileInformation->fileSize = file.size();
+        updateFileInformation->md5 = makeMd5(&file);
         m_updateFiles.insert(sysInfo, updateFileInformation);
     }
 
@@ -394,6 +395,7 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
             UpdateFileInformationPtr info(new UpdateFileInformation(m_targetVersion, QUrl(urlPrefix + fileName)));
             info->baseFileName = fileName;
             info->fileSize = package.value(lit("size")).toLongLong();
+            info->md5 = package.value(lit("md5")).toString();
             m_updateFiles.insert(QnSystemInformation(platform.key(), architecture, modification), info);
         }
     }
@@ -471,8 +473,13 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
 void QnMediaServerUpdateTool::downloadUpdates() {
     QHash<QUrl, QString> downloadTargets;
     QMultiHash<QUrl, QnId> peerAssociations;
+    QHash<QUrl, QString> hashByUrl;
 
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
+        QList<QnId> peers = m_idBySystemInformation.values(it.key());
+        if (peers.isEmpty())
+            continue;
+
         QString fileName = it.value()->fileName;
         if (fileName.isEmpty())
             fileName = updateFilePath(updatesDirName, it.value()->baseFileName);
@@ -480,12 +487,15 @@ void QnMediaServerUpdateTool::downloadUpdates() {
         if (!fileName.isEmpty()) {
             QFile file(fileName);
             if (file.exists() && file.size() == it.value()->fileSize) {
-                it.value()->fileName = fileName;
-                continue;
+                if (!it.value()->md5.isEmpty() && makeMd5(&file) == it.value()->md5) {
+                    it.value()->fileName = fileName;
+                    continue;
+                }
             }
         }
 
         downloadTargets.insert(it.value()->url, it.value()->baseFileName);
+        hashByUrl.insert(it.value()->url, it.value()->md5);
         foreach (const QnId &peerId, m_idBySystemInformation.values(it.key())) {
             peerAssociations.insert(it.value()->url, peerId);
             PeerUpdateInformation &updateInformation = m_updateInformationById[peerId];
@@ -499,6 +509,7 @@ void QnMediaServerUpdateTool::downloadUpdates() {
 
     m_downloadUpdatesPeerTask->setTargetDir(updatesDirName);
     m_downloadUpdatesPeerTask->setTargets(downloadTargets);
+    m_downloadUpdatesPeerTask->setHashes(hashByUrl);
     m_downloadUpdatesPeerTask->setPeerAssociations(peerAssociations);
     m_downloadUpdatesPeerTask->start(QSet<QnId>::fromList(m_updateInformationById.keys()));
 }

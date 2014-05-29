@@ -36,6 +36,10 @@ void QnDownloadUpdatesPeerTask::setTargets(const QHash<QUrl, QString> &targets) 
     m_targets = targets;
 }
 
+void QnDownloadUpdatesPeerTask::setHashes(const QHash<QUrl, QString> &hashByUrl) {
+    m_hashByUrl = hashByUrl;
+}
+
 QHash<QUrl, QString> QnDownloadUpdatesPeerTask::resultingFiles() const {
     return m_resultingFiles;
 }
@@ -69,7 +73,7 @@ void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
     m_resultingFiles.insert(url, fileName);
 
     m_file.reset(new QFile(fileName));
-    if (!m_file->open(QFile::WriteOnly)) {
+    if (!m_file->open(QFile::WriteOnly | QFile::Truncate)) {
         finish(FileError);
         return;
     }
@@ -100,8 +104,16 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
     }
 
     readAllData(reply, m_file.data());
+
+    QString md5 = makeMd5(m_file.data());
+
     m_file->close();
     m_file.reset();
+
+    if (md5 != m_hashByUrl[m_pendingDownloads.first()]) {
+        finish(DownloadError);
+        return;
+    }
 
     foreach (const QnId &peerId, m_currentPeers)
         emit peerFinished(peerId);

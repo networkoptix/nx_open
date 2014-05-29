@@ -20,6 +20,7 @@ public:
 
     void setTargetDir(const QString &path);
     void setTargets(const QHash<QUrl, QString> &resultingFiles);
+    void setHashes(const QHash<QUrl, QString> &hashByUrl);
     QHash<QUrl, QString> resultingFiles() const;
     void setPeerAssociations(const QMultiHash<QUrl, QnId> &peersByUrl);
 
@@ -39,6 +40,7 @@ private slots:
 private:
     QString m_targetDirPath;
     QHash<QUrl, QString> m_targets;
+    QHash<QUrl, QString> m_hashByUrl;
     QMultiHash<QUrl, QnId> m_peersByUrl;
     QHash<QUrl, QString> m_resultingFiles;
 

@@ -2,6 +2,7 @@
 
 #include <QtCore/QJsonDocument>
 #include <QtCore/QDir>
+#include <QtCore/QCryptographicHash>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
@@ -63,4 +64,28 @@ QString updateFilePath(const QString &updatesDirPath, const QString &fileName) {
         dir.mkdir(updatesDirPath);
     dir.cd(updatesDirPath);
     return dir.absoluteFilePath(fileName);
+}
+
+
+QString makeMd5(const QString &fileName) {
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly))
+        return QString();
+
+    return makeMd5(&file);
+}
+
+
+QString makeMd5(QIODevice *device) {
+    if (!device->isOpen() && !device->open(QIODevice::ReadOnly))
+        return QString();
+
+    if (!device->isSequential())
+        device->seek(0);
+
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    if (!hash.addData(device))
+        return QString();
+
+    return QString::fromLatin1(hash.result().toHex());
 }

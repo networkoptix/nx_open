@@ -24,6 +24,7 @@ public:
         qint64 fileSize;
         QString baseFileName;
         QUrl url;
+        QString md5;
 
         UpdateFileInformation() {}
 
