@@ -8,6 +8,17 @@
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
 
+#ifdef __arm__
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <unistd.h>
+
+#include <QtCore/QCryptographicHash>
+#endif
+
 #include "util.h"
 #include "hardware_id.h"
 
@@ -111,13 +122,6 @@ void fillHardwareIds(QList<QByteArray>& hardwareIds)
 
 #elif defined(__arm__)
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <arpa/inet.h>
-#include <net/if.h>
-
-
 void mac_eth0(char  MAC_str[13], char** host)
 {
     #define HWADDR_len 6
@@ -142,7 +146,7 @@ void fillHardwareIds(QList<QByteArray> &hardwareIds)
     char MAC_str[13];
     mac_eth0( MAC_str, nullptr );
     QByteArray hardwareId = "03" + QCryptographicHash::hash(
-        QByteArray::fromRaw(MAC_str, sizeof(MAC_str)),
+        QByteArray::fromRawData(MAC_str, sizeof(MAC_str)),
         QCryptographicHash::Md5 ).toHex();
     hardwareIds << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId;
 }
