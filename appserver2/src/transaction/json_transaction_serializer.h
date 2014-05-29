@@ -19,7 +19,7 @@ namespace ec2
     class QnJsonTransactionSerializer: public Singleton<QnJsonTransactionSerializer>
     {
     public:
-        QnJsonTransactionSerializer();
+        QnJsonTransactionSerializer() {}
 
         template<class T>
         QByteArray serializeTran(const QnTransaction<T>& tran, const QnTransactionTransportHeader &header) {

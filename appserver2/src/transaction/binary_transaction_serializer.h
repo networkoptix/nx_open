@@ -17,7 +17,7 @@ namespace ec2
     class QnBinaryTransactionSerializer: public Singleton<QnBinaryTransactionSerializer>
     {
     public:
-        QnBinaryTransactionSerializer();
+        QnBinaryTransactionSerializer() {}
 
         template<class T>
         QByteArray serializedTransaction(const QnTransaction<T>& tran) {
