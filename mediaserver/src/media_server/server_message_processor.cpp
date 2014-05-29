@@ -100,11 +100,20 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     
     if (isCamera) 
     {
-        if (resource->getParentId() != ownMediaServer->getId())
+        bool needProxyToCamera = true;
+        if (resource->getParentId() != ownMediaServer->getId()) {
             resource->addFlags( QnResource::foreigner );
+        }
+        else {
+#ifdef EDGE_SERVER
+            needProxyToCamera = false;
+#endif
+        }
         // update all known IP list
-        QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
-        updateAllIPList(camRes->getId(), camRes->getHostAddress());
+        if (needProxyToCamera) {
+            QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
+            updateAllIPList(camRes->getId(), camRes->getHostAddress());
+        }
     }
 
     if (isServer) 
