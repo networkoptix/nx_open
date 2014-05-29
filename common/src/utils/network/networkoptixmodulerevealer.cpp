@@ -105,7 +105,7 @@ void NetworkOptixModuleRevealer::run()
         it != m_sockets.end();
         ++it )
     {
-        if( !m_pollSet.add( *it, PollSet::etRead ) )
+        if( !m_pollSet.add( *it, aio::etRead ) )
         {
             Q_ASSERT( false );
         }
@@ -118,7 +118,7 @@ void NetworkOptixModuleRevealer::run()
     {
         //TODO/IMPL do join periodically
 
-        int socketCount = m_pollSet.poll( PollSet::INFINITE_TIMEOUT );
+        int socketCount = m_pollSet.poll( aio::PollSet::INFINITE_TIMEOUT );
         if( socketCount == 0 )
             continue;    //timeout
         if( socketCount < 0 )
@@ -130,12 +130,12 @@ void NetworkOptixModuleRevealer::run()
         }
 
         //some socket(s) changed state
-        for( PollSet::const_iterator
+        for( aio::PollSet::const_iterator
             it = m_pollSet.begin();
             it != m_pollSet.end();
             ++it )
         {
-            if( !(it.eventType() & PollSet::etRead) )
+            if( !(it.eventType() & aio::etRead) )
                 continue;
 
             AbstractDatagramSocket* udpSocket = dynamic_cast<AbstractDatagramSocket*>(it.socket());

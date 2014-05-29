@@ -22,13 +22,13 @@ namespace ec2
     {
         ec2::QnDistributedMutexManager::initStaticInstance(new ec2::QnDistributedMutexManager());
 
-        QnTransactionMessageBus::instance()->setHandler(this);
+        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
     }
 
     RemoteEC2Connection::~RemoteEC2Connection()
     {
         QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
-        QnTransactionMessageBus::instance()->removeHandler(this);
+        QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
     }
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const

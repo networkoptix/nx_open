@@ -212,8 +212,8 @@ namespace ec2
         T params;
     };
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary))
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json))
 
     template <class T, class Output>
     void serialize(const QnTransaction<T> &transaction, QnOutputBinaryStream<Output> *stream)
@@ -232,6 +232,8 @@ namespace ec2
 
     int generateRequestID();
 } // namespace ec2
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (numeric))
 
 #ifndef QN_NO_QT
 Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)

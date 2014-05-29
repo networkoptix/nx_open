@@ -45,7 +45,7 @@ protected:
     virtual void run() override;
 
 private:
-    PollSet m_pollSet;
+    aio::PollSet m_pollSet;
     std::vector<AbstractDatagramSocket*> m_sockets;
     RevealResponse m_revealResponse;
 };

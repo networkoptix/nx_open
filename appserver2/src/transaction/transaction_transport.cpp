@@ -7,7 +7,6 @@
 #include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
 #include "transaction_log.h"
-#include "transaction_transport_serializer.h"
 #include "common/common_module.h"
 
 namespace ec2
@@ -31,7 +30,6 @@ QnTransactionTransport::QnTransactionTransport(const QnPeerInfo &localPeer, cons
     m_chunkHeaderLen(0),
     m_chunkLen(0), 
     m_sendOffset(0), 
-    m_timeDiff(0),
     m_connected(false)
 {
 }
@@ -55,7 +53,7 @@ void QnTransactionTransport::addData(const QByteArray& data)
 {
     QMutexLocker lock(&m_mutex);
     if (m_dataToSend.isEmpty() && m_socket)
-        aio::AIOService::instance()->watchSocket( m_socket, PollSet::etWrite, this );
+        aio::AIOService::instance()->watchSocket( m_socket, aio::etWrite, this );
     m_dataToSend.push_back(data);
 }
 
@@ -79,8 +77,8 @@ int QnTransactionTransport::getChunkHeaderEnd(const quint8* data, int dataLen, q
 void QnTransactionTransport::closeSocket()
 {
     if (m_socket) {
-        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead, this );
-        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite, this );
+        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead, this );
+        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite, this );
         m_socket->close();
         m_socket.reset();
     }
@@ -107,7 +105,7 @@ void QnTransactionTransport::setStateNoLock(State state)
         m_socket->setSendTimeout(SOCKET_TIMEOUT);
         m_socket->setNonBlockingMode(true);
         m_chunkHeaderLen = 0;
-        aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this );
+        aio::AIOService::instance()->watchSocket( m_socket, aio::etRead, this );
     }
     if (this->m_state != state) {
         this->m_state = state;
@@ -133,13 +131,13 @@ void QnTransactionTransport::close()
     setState(State::Closed);
 }
 
-void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventType eventType ) throw()
+void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType eventType ) throw()
 {
     //AbstractStreamSocket* streamSock = (AbstractStreamSocket*) sock;
     int readed;
     switch( eventType )
     {
-    case PollSet::etRead:
+    case aio::etRead:
         {
             while (1)
             {
@@ -162,8 +160,8 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                         if (m_readBufferLen == fullChunkLen) 
                         {
                             QByteArray serializedTran;
-                            TransactionTransportHeader transportHeader;
-                            QnTransactionTransportSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+                            QnTransactionTransportHeader transportHeader;
+                            QnBinaryTransactionSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
                             emit gotTransaction(serializedTran, transportHeader);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
@@ -175,7 +173,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
             }
             break;
         }
-    case PollSet::etWrite: 
+    case aio::etWrite: 
         {
             QMutexLocker lock(&m_mutex);
             while (!m_dataToSend.isEmpty())
@@ -186,7 +184,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                 if (sended < 1) {
                     if(sended == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock) {
                         m_sendOffset = 0;
-                        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite, this );
+                        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite, this );
                         setStateNoLock(State::Error);
                     }
                     return; // can't send any more
@@ -197,11 +195,11 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , PollSet::EventTyp
                     m_dataToSend.dequeue();
                 }
             }
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite, this );
+            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite, this );
             break;
         }
-    case PollSet::etTimedOut:
-    case PollSet::etError:
+    case aio::etTimedOut:
+    case aio::etError:
         setState(State::Error);
         break;
     default:
@@ -216,7 +214,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
 
-    m_httpClient->setUserName("system");
+    m_httpClient->setUserName("system");    
     m_httpClient->setUserPassword(qnCommon->getSystemPassword());
     if (!remoteAddr.userName().isEmpty())
     {
@@ -227,12 +225,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     QUrlQuery q = QUrlQuery(remoteAddr.query());
     if (m_state == ConnectingStage1)
     {
-        q.removeQueryItem("time");
         q.removeQueryItem("hwList");
-        qint64 localTime = -1;
-        if (QnTransactionLog::instance())
-            localTime = QnTransactionLog::instance()->getRelativeTime();
-        q.addQueryItem("time", QByteArray::number(localTime));
         q.addQueryItem("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds()));
     }
 
@@ -334,10 +327,9 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
-    nx_http::HttpHeaders::const_iterator itrTime = client->response()->headers.find("time");
     nx_http::HttpHeaders::const_iterator itrHwList = client->response()->headers.find("hwList");
 
-    if (itrGuid == client->response()->headers.end() || itrTime == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    if (itrGuid == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
         cancelConnecting();
         return;
@@ -349,12 +341,6 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     if (getState() == ConnectingStage1) {
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);
         if (lockOK) {
-            if (QnTransactionLog::instance()) {
-                qint64 localTime = QUrlQuery(client->url().query()).queryItemValue("time").toLongLong();
-                qint64 remoteTime = itrTime->second.toLongLong();
-                if (remoteTime != -1)
-                    setTimeDiff(remoteTime - localTime);
-            }
             setHwList(decodeHWList(itrHwList->second));
             setState(ConnectingStage2);
         }
@@ -392,8 +378,8 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         if (bufferLen >= fullChunkLen)
         {
             QByteArray serializedTran;
-            TransactionTransportHeader transportHeader;
-            QnTransactionTransportSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+            QnTransactionTransportHeader transportHeader;
+            QnBinaryTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
             emit gotTransaction(serializedTran, transportHeader);
 
             buffer += fullChunkLen;

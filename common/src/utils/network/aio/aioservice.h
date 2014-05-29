@@ -43,12 +43,12 @@ namespace aio
         //!Monitor socket \a sock for event \a eventToWatch occurrence and trigger \a eventHandler on event
         /*!
             \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
-            \note if no event in corresponding socket timeout (if not 0), then PollSet::etTimedOut event will be reported
+            \note if no event in corresponding socket timeout (if not 0), then aio::etTimedOut event will be reported
             \note If not called from aio thread \a sock can be added to event loop with some delay
         */
         bool watchSocket(
             const QSharedPointer<AbstractSocket>& sock,
-            PollSet::EventType eventToWatch,
+            aio::EventType eventToWatch,
             AIOEventHandler* const eventHandler );
         //!Cancel monitoring \a sock for event \a eventType
         /*!
@@ -62,7 +62,7 @@ namespace aio
         */
         void removeFromWatch(
             const QSharedPointer<AbstractSocket>& sock,
-            PollSet::EventType eventType,
+            aio::EventType eventType,
             bool waitForRunningHandlerCompletion = true );
 
         /*!
@@ -80,7 +80,7 @@ namespace aio
         };
 
         std::list<AIOThread*> m_threadPool;
-        std::map<std::pair<AbstractSocket*, PollSet::EventType>, AIOThread*> m_sockets;
+        std::map<std::pair<AbstractSocket*, aio::EventType>, AIOThread*> m_sockets;
         mutable QMutex m_mutex;
     };
 }

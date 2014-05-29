@@ -185,7 +185,7 @@ namespace ec2
         id.sequence = 0;
         timestamp = 0;
         if (QnTransactionLog::instance()) {
-            timestamp = QnTransactionLog::instance()->getRelativeTime();
+            timestamp = QnTransactionLog::instance()->getTimeStamp();
             id.dbID = QnDbManager::instance()->getID();
         }
         localTransaction = false;
@@ -200,7 +200,7 @@ namespace ec2
     {
         id.sequence = m_sequence.fetchAndAddAcquire(1);
         if (!timestamp)
-            timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getRelativeTime() : 0;
+            timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getTimeStamp() : 0;
     }
 
     int generateRequestID()
@@ -209,8 +209,7 @@ namespace ec2
         return ++requestID;
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary),   (peerID)(dbID)(sequence))
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary),   (command)(id)(persistent)(timestamp))
-
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary)(json),   (peerID)(dbID)(sequence))
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary)(json),   (command)(id)(persistent)(timestamp))
 } // namespace ec2
 

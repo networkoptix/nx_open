@@ -37,13 +37,14 @@ namespace ec2
         fromApiToResourceList(paramList, kvPairs);
 
         m_emailManagerImpl.configure(kvPairs);
-        QnTransactionMessageBus::instance()->setHandler(this);
+        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
+        QnTransactionMessageBus::instance()->setLocalPeer(QnPeerInfo(qnCommon->moduleGUID(), QnPeerInfo::Server));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
         if (QnTransactionMessageBus::instance())
-            QnTransactionMessageBus::instance()->removeHandler(this);
+            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
         ec2::QnDistributedMutexManager::initStaticInstance(0);
     }
 
@@ -53,7 +54,6 @@ namespace ec2
     }
 
     void Ec2DirectConnection::startReceivingNotifications() {
-        QnTransactionMessageBus::instance()->setLocalPeer(QnPeerInfo(qnCommon->moduleGUID(), QnPeerInfo::Server));
         QnTransactionMessageBus::instance()->start();
     }
 }

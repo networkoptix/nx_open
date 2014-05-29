@@ -50,7 +50,6 @@
 
 #include <network/authenticate_helper.h>
 #include <network/default_tcp_connection_processor.h>
-#include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
 
@@ -1107,8 +1106,6 @@ void QnMain::run()
     // Create SessionManager
     QnSessionManager::instance()->start();
 
-    ec2::DummyHandler dummyEcResponseHandler;
-    
 #ifdef ENABLE_ONVIF
     //starting soap server to accept event notifications from onvif servers
     QnSoapServer::initStaticInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?

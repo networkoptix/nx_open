@@ -19,6 +19,8 @@ QnTransactionLog::QnTransactionLog(QnDbManager* db): m_dbManager(db)
 {
     Q_ASSERT(!globalInstance);
     globalInstance = this;
+    m_lastTimestamp = 0;
+    m_currentTime = 0;
 }
 
 void QnTransactionLog::init()
@@ -40,12 +42,13 @@ void QnTransactionLog::init()
             m_updateHistory.insert(QUuid::fromRfc4122(query2.value(0).toByteArray()), query2.value(1).toLongLong());
     }
 
-    m_relativeOffset = 1;
+    m_currentTime = QDateTime::currentMSecsSinceEpoch();
     QSqlQuery queryTime(m_dbManager->getDB());
     queryTime.prepare("SELECT max(timestamp) FROM transaction_log");
     if (queryTime.exec() && queryTime.next()) {
-        m_relativeOffset = qMax(0ll, queryTime.value(0).toLongLong()) + 1;
+        m_currentTime = qMax(m_currentTime, queryTime.value(0).toLongLong());
     }
+    m_relativeTimer.start();
 
     QSqlQuery querySequence(m_dbManager->getDB());
     int startSequence = 1;
@@ -56,13 +59,18 @@ void QnTransactionLog::init()
         startSequence = queryTime.value(0).toInt() + 1;
     QnAbstractTransaction::setStartSequence(startSequence);
 
-    m_relativeTimer.restart();
 }
 
-qint64 QnTransactionLog::getRelativeTime() const
+qint64 QnTransactionLog::getTimeStamp()
 {
     QMutexLocker lock(&m_timeMutex);
-    return m_relativeTimer.elapsed() + m_relativeOffset;
+    qint64 timestamp = m_currentTime + m_relativeTimer.elapsed();
+    if (timestamp <= m_lastTimestamp) {
+        m_currentTime = timestamp = m_lastTimestamp + 1;
+        m_relativeTimer.restart();
+    }
+    m_lastTimestamp = timestamp;
+    return timestamp;
 }
 
 QnTransactionLog* QnTransactionLog::instance()
@@ -105,8 +113,8 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
     Q_ASSERT_X(!tran.id.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     Q_ASSERT_X(!tran.id.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     Q_ASSERT_X(tran.id.sequence, Q_FUNC_INFO, "Transaction sequence MUST be filled!");
-    //Q_ASSERT(tran.id.peerGUID != qnCommon->moduleGUID() || tran.timestamp > 0);
-        //if we clean DB we can receive our old transaction with negative timestamp
+    if (tran.id.peerID == qnCommon->moduleGUID() && tran.id.dbID == m_dbManager->instance()->getID())
+        Q_ASSERT(tran.timestamp > 0);
 
     QSqlQuery query(m_dbManager->getDB());
     //query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, db_guid, sequence, timestamp, tran_guid, tran_data) values (?, ?, ?, ?, ?)");
@@ -127,6 +135,12 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
     QnTranStateKey key(tran.id.peerID, tran.id.dbID);
     m_state[key] = qMax(m_state[key], tran.id.sequence);
     m_updateHistory[hash] = qMax(m_updateHistory[hash], tran.timestamp);
+
+    QMutexLocker lock(&m_timeMutex);
+    if (tran.timestamp > m_currentTime + m_relativeTimer.elapsed()) {
+        m_currentTime = m_lastTimestamp = tran.timestamp;
+        m_relativeTimer.restart();
+    }
 
     return ErrorCode::ok;
 }

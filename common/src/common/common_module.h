@@ -44,7 +44,7 @@ public:
     bool isCloudMode() const { return m_cloudMode; }
 
 protected:
-    static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName);
+    static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
 private:
     QnSessionManager *m_sessionManager;

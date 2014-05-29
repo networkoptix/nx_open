@@ -19,8 +19,8 @@ namespace ec2
     template<class QueryProcessorType>
     QnMediaServerManager<QueryProcessorType>::QnMediaServerManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
     :
-        m_queryProcessor( queryProcessor ),
-        m_resCtx( resCtx )
+        QnMediaServerNotificationManager( resCtx ),
+        m_queryProcessor( queryProcessor )
     {
     }
 
