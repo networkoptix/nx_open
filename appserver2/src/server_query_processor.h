@@ -207,24 +207,25 @@ namespace ec2
                 if (multiTran.persistent)                 
                 {
                     QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(multiTran);
-                    errorCode = dbManager->executeTransactionNoLock( multiTran, serializedTran);
+                    errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
                     if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
                         return;
                 }
-                if( errorCode == ErrorCode::ok )
-                    processedTran << QPair<QnAbstractTransaction, QByteArray>(multiTran, serializedTran);
+                processMultiTran = (errorCode == ErrorCode::ok);
             }
 
 
             if (multiTran.persistent)
                 locker.commit();
 
-            foreach(const auto& tranData, processedTran)
+            foreach(const QnTransaction<SubDataType>& transaction, processedTransactions)
             {
                 // delivering transaction to remote peers
-                if (!tranData.first.localTransaction)
-                    QnTransactionMessageBus::instance()->sendTransaction(tranData.first, tranData.second);
+                if (!transaction.localTransaction)
+                    QnTransactionMessageBus::instance()->sendTransaction(transaction);
             }
+            if (processMultiTran)
+                QnTransactionMessageBus::instance()->sendTransaction(multiTran);
 
             errorCode = ErrorCode::ok;
         }
