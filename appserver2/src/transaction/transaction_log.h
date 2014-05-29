@@ -44,7 +44,7 @@ namespace ec2
             return dbID > other.dbID;
         }
     };
-    QN_FUSION_DECLARE_FUNCTIONS(QnTranStateKey, (binary))
+    QN_FUSION_DECLARE_FUNCTIONS(QnTranStateKey, (binary)(json))
 
 
     typedef QMap<QnTranStateKey, qint32> QnTranState;
