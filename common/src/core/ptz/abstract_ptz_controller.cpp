@@ -27,6 +27,7 @@ bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) 
     if((query & Qn::ToursPtzField)              && getTours(&data->tours))                                              data->fields |= Qn::ToursPtzField;
     if((query & Qn::ActiveObjectPtzField)       && getActiveObject(&data->activeObject))                                data->fields |= Qn::ActiveObjectPtzField;
     if((query & Qn::HomeObjectPtzField)         && getHomeObject(&data->homeObject))                                    data->fields |= Qn::HomeObjectPtzField;
+    if((query & Qn::AuxilaryTraitsPtzField)     && getAuxilaryTraits(&data->auxilaryTraits))                            data->fields |= Qn::AuxilaryTraitsPtzField;
 
     return true;
 }

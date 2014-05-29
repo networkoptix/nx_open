@@ -62,6 +62,11 @@ void QnVistaMotorPtzController::init() {
     if(!options.contains(lit("M_PTZ")))
         return;
 
+    if(options.contains(lit("SMART_FOCUS"))) {
+        m_capabilities |= Qn::AuxilaryPtzCapability;
+        m_traits.push_back(Qn::VistaSmartFocusPtzTrait);
+    }
+
     QString ptzOptions;
     if(!config.value(lit("m_ptz_option"), &ptzOptions))
         return;
@@ -131,4 +136,24 @@ bool QnVistaMotorPtzController::continuousFocus(qreal speed) {
 
     QMutexLocker locker(&m_mutex);
     return queryLocked(lit("mptz/control.php?focus=%1").arg(vistaFocusDirection(speed)));
+}
+
+bool QnVistaMotorPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) {
+    if(!(m_capabilities & Qn::AuxilaryPtzCapability))
+        return false;
+
+    *auxilaryTraits = m_traits;
+    return true;
+}
+
+bool QnVistaMotorPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &) {
+    if(!(m_capabilities & Qn::AuxilaryPtzCapability))
+        return false;
+
+    if(trait.standardTrait() == Qn::VistaSmartFocusPtzTrait) {
+        QMutexLocker locker(&m_mutex);
+        return queryLocked(lit("live/live_control.php?smart_focus=1"));
+    } else {
+        return false;
+    }
 }

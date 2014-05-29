@@ -42,6 +42,9 @@ public:
     virtual bool updateHomeObject(const QnPtzObject &homeObject) override                                       { return m_baseController->updateHomeObject(homeObject); }
     virtual bool getHomeObject(QnPtzObject *homeObject) override                                                { return m_baseController->getHomeObject(homeObject); }
 
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits)                                      { return m_baseController->getAuxilaryTraits(auxilaryTraits); }
+    virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data)                       { return m_baseController->runAuxilaryCommand(trait, data); }
+
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override                                     { return base_type::getData(query, data); /* This is important because of base implementation! */ }
 
 protected:

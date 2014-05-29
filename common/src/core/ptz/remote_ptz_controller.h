@@ -40,6 +40,9 @@ public:
     virtual bool updateHomeObject(const QnPtzObject &homeObject) override;
     virtual bool getHomeObject(QnPtzObject *homeObject) override;
 
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) override;
+    virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data) override;
+
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
 
 private slots:

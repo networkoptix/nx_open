@@ -16,6 +16,7 @@
 #include "ptz_data.h"
 #include "ptz_math.h"
 #include "ptz_object.h"
+#include "ptz_auxilary_trait.h"
 
 /**
  * A thread-safe blocking interface for accessing camera's PTZ functions.
@@ -290,6 +291,10 @@ public:
      * \returns                         Whether the operation was successful.
      */
     virtual bool getHomeObject(QnPtzObject *homeObject) = 0;
+
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) = 0;
+
+    virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data) = 0;
 
     /**
      * Gets all PTZ data associated with this controller in a single operation.

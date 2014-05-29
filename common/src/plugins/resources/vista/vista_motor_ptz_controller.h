@@ -24,6 +24,9 @@ public:
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool continuousFocus(qreal speed) override;
 
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits);
+    virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data);
+
 private:
     void init();
 
@@ -35,6 +38,7 @@ private:
 private:
     QnVistaResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
+    QnPtzAuxilaryTraitList m_traits;
 
     QMutex m_mutex;
     QString m_lastHostAddress;

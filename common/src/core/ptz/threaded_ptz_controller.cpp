@@ -184,6 +184,14 @@ bool QnThreadedPtzController::getHomeObject(QnPtzObject *) {
     RUN_COMMAND(Qn::GetHomeObjectPtzCommand, QnPtzObject, result, getHomeObject, &result);
 }
 
+bool QnThreadedPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *) {
+    RUN_COMMAND(Qn::GetAuxilaryTraitsPtzCommand, QnPtzAuxilaryTraitList, result, getAuxilaryTraits, &result);
+}
+
+bool QnThreadedPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data) {
+    RUN_COMMAND(Qn::RunAuxilaryCommandPtzCommand, void *, trait, runAuxilaryCommand, trait, data);
+}
+
 bool QnThreadedPtzController::getData(Qn::PtzDataFields query, QnPtzData *) {
     RUN_COMMAND(Qn::GetDataPtzCommand, QnPtzData, result, getData, query, &result);
 }

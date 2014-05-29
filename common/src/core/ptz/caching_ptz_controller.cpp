@@ -174,6 +174,21 @@ bool QnCachingPtzController::getHomeObject(QnPtzObject *homeObject) {
     }
 }
 
+bool QnCachingPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) {
+    QMutexLocker locker(&m_mutex);
+    if(m_data.fields & Qn::AuxilaryTraitsPtzField) {
+        *auxilaryTraits = m_data.auxilaryTraits;
+        return true;
+    } else {
+        base_type::getAuxilaryTraits(auxilaryTraits);
+        return false;
+    }
+}
+
+bool QnCachingPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data) {
+    return base_type::runAuxilaryCommand(trait, data); 
+}
+
 bool QnCachingPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) {
     if(!baseController()->getData(query, data)) // TODO: #Elric should be base_type::getData => bad design =(
         return false;
@@ -269,6 +284,9 @@ void QnCachingPtzController::baseFinished(Qn::PtzCommand command, const QVariant
         case Qn::GetHomeObjectPtzCommand:
             changedFields |= updateCacheLocked(Qn::HomeObjectPtzField, &QnPtzData::homeObject, data);
             break;
+        case Qn::GetAuxilaryTraitsPtzCommand:
+            changedFields |= updateCacheLocked(Qn::AuxilaryTraitsPtzField, &QnPtzData::auxilaryTraits, data);
+            break;
         case Qn::GetDataPtzCommand:
             changedFields |= updateCacheLocked(data.value<QnPtzData>());
             break;
@@ -326,6 +344,7 @@ Qn::PtzDataFields QnCachingPtzController::updateCacheLocked(const QnPtzData &dat
     if(fields & Qn::ToursPtzField)          changedFields |= updateCacheLocked(Qn::ToursPtzField,           &QnPtzData::tours,          data.tours);
     if(fields & Qn::ActiveObjectPtzField)   changedFields |= updateCacheLocked(Qn::ActiveObjectPtzField,    &QnPtzData::activeObject,   data.activeObject);
     if(fields & Qn::HomeObjectPtzField)     changedFields |= updateCacheLocked(Qn::HomeObjectPtzField,      &QnPtzData::homeObject,     data.homeObject);
+    if(fields & Qn::AuxilaryTraitsPtzField) changedFields |= updateCacheLocked(Qn::AuxilaryTraitsPtzField,  &QnPtzData::auxilaryTraits, data.auxilaryTraits);
     
     return changedFields;
 }
