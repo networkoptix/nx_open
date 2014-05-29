@@ -268,6 +268,7 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
 
     m_updateFiles.clear();
     m_updateInformationById.clear();
+    m_targetMustBeNewer = false;
 
     QStringList entries = m_localUpdateDir.entryList(QStringList() << lit("*.zip"), QDir::Files);
     foreach (const QString &entry, entries) {
@@ -283,6 +284,14 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
 
         if (m_updateFiles.contains(sysInfo))
             continue;
+
+        if (m_targetVersion.isNull())
+            m_targetVersion = version;
+
+        if (m_targetVersion != version) {
+            setCheckResult(UpdateImpossible);
+            return;
+        }
 
         UpdateFileInformationPtr updateFileInformation(new UpdateFileInformation(version, fileName));
         QFile file(fileName);
