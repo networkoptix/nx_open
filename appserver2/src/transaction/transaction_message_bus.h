@@ -116,7 +116,40 @@ namespace ec2
 
     private:
         template<class T>
-        void sendTransactionInternal(const QnTransaction<T>& tran, const QnTransactionTransportHeader &header);
+        void sendTransactionInternal(const QnTransaction<T>& tran, const QnTransactionTransportHeader &header) {
+            QnPeerSet toSendRest = header.dstPeers;
+            QnPeerSet sentPeers;
+            bool sendToAll = header.dstPeers.isEmpty();
+            for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
+            {
+                QnTransactionTransportPtr transport = *itr;
+                if (!sendToAll && !header.dstPeers.contains(transport->remotePeer().id)) 
+                    continue;
+
+                if (!transport->isReadyToSend(tran.command)) 
+                    continue;
+
+                transport->sendTransaction(tran, header);
+                sentPeers << transport->remotePeer().id;
+                toSendRest.remove(transport->remotePeer().id);
+            }
+
+            // some dst is not accessible directly, send broadcast (to all connected peers except of just sent)
+            if (!toSendRest.isEmpty()) 
+            {
+                for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
+                {
+                    QnTransactionTransportPtr transport = *itr;
+                    if (!transport->isReadyToSend(tran.command))
+                        continue;;
+
+                    if (sentPeers.contains(transport->remotePeer().id))
+                        continue; // already sent
+
+                    transport->sendTransaction(tran, header);
+                }
+            }
+        }
 
         template <class T>
         void sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader);
