@@ -8,6 +8,8 @@
 
 namespace {
 
+    const int maxDownloadTries = 20;
+
     void readAllData(QIODevice *inDevice, QIODevice *outDevice) {
         const int bufferSize = 512 * 1024;
         QByteArray buffer;
@@ -38,6 +40,10 @@ void QnDownloadUpdatesPeerTask::setTargets(const QHash<QUrl, QString> &targets) 
 
 void QnDownloadUpdatesPeerTask::setHashes(const QHash<QUrl, QString> &hashByUrl) {
     m_hashByUrl = hashByUrl;
+}
+
+void QnDownloadUpdatesPeerTask::setFileSizes(const QHash<QUrl, qint64> &fileSizeByUrl) {
+    m_fileSizeByUrl = fileSizeByUrl;
 }
 
 QHash<QUrl, QString> QnDownloadUpdatesPeerTask::resultingFiles() const {
@@ -78,7 +84,25 @@ void QnDownloadUpdatesPeerTask::downloadNextUpdate() {
         return;
     }
 
+    m_triesCount = 0;
     QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(url));
+    connect(reply,  &QNetworkReply::readyRead,          this,   &QnDownloadUpdatesPeerTask::at_downloadReply_readyRead);
+    connect(reply,  &QNetworkReply::finished,           this,   &QnDownloadUpdatesPeerTask::at_downloadReply_finished);
+    connect(reply,  &QNetworkReply::downloadProgress,   this,   &QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress);
+}
+
+void QnDownloadUpdatesPeerTask::continueDownload() {
+    if (m_file.isNull())
+        return;
+
+    QUrl url = m_pendingDownloads.first();
+    qint64 pos = m_file->pos();
+
+    m_triesCount++;
+
+    QNetworkRequest request(url);
+    request.setRawHeader("Range", QString(lit("bytes=%1-")).arg(pos).toLatin1());
+    QNetworkReply *reply = m_networkAccessManager->get(request);
     connect(reply,  &QNetworkReply::readyRead,          this,   &QnDownloadUpdatesPeerTask::at_downloadReply_readyRead);
     connect(reply,  &QNetworkReply::finished,           this,   &QnDownloadUpdatesPeerTask::at_downloadReply_finished);
     connect(reply,  &QNetworkReply::downloadProgress,   this,   &QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress);
@@ -98,16 +122,23 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
         return;
 
     if (reply->error() != QNetworkReply::NoError) {
+        if (m_triesCount < maxDownloadTries) {
+            continueDownload();
+            return;
+        }
+
         m_file.reset();
+        m_file->remove();
         finish(DownloadError);
         return;
     }
 
     readAllData(reply, m_file.data());
 
+    m_file->close();
+
     QString md5 = makeMd5(m_file.data());
 
-    m_file->close();
     m_file.reset();
 
     if (md5 != m_hashByUrl[m_pendingDownloads.first()]) {
@@ -135,6 +166,13 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_downloadProgress(qint64 bytesRe
         return;
     }
 
+    if (m_fileSizeByUrl.contains(m_pendingDownloads.first())) {
+        bytesReceived = m_file->pos() - 1;
+        bytesTotal = m_fileSizeByUrl[m_pendingDownloads.first()];
+    } else {
+        m_fileSizeByUrl.insert(m_pendingDownloads.first(), bytesTotal);
+    }
+
     foreach (const QnId &peerId, m_currentPeers)
         emit peerProgressChanged(peerId, bytesReceived * 100 / bytesTotal);
 
@@ -149,6 +187,8 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_readyRead() {
         return;
     }
 
+    m_triesCount = 0;
+
     // it means the task was cancelled
     if (m_file.isNull()) {
         reply->deleteLater();
@@ -156,4 +196,16 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_readyRead() {
     }
 
     readAllData(reply, m_file.data());
+
+    static int br = 0;
+
+    if (br > m_file->pos())
+        br = 0;
+
+    if (m_file->pos() <= 33200686) {
+        if (reply->isRunning() && m_file->pos() - br > 3000000) {
+            br = m_file->pos();
+            reply->abort();
+        }
+    }
 }

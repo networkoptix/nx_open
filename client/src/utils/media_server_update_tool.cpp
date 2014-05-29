@@ -483,6 +483,7 @@ void QnMediaServerUpdateTool::downloadUpdates() {
     QHash<QUrl, QString> downloadTargets;
     QMultiHash<QUrl, QnId> peerAssociations;
     QHash<QUrl, QString> hashByUrl;
+    QHash<QUrl, qint64> fileSizeByUrl;
 
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
         QList<QnId> peers = m_idBySystemInformation.values(it.key());
@@ -505,7 +506,8 @@ void QnMediaServerUpdateTool::downloadUpdates() {
 
         downloadTargets.insert(it.value()->url, it.value()->baseFileName);
         hashByUrl.insert(it.value()->url, it.value()->md5);
-        foreach (const QnId &peerId, m_idBySystemInformation.values(it.key())) {
+        fileSizeByUrl.insert(it.value()->url, it.value()->fileSize);
+        foreach (const QnId &peerId, peers) {
             peerAssociations.insert(it.value()->url, peerId);
             PeerUpdateInformation &updateInformation = m_updateInformationById[peerId];
             updateInformation.state = PeerUpdateInformation::UpdateDownloading;
@@ -519,6 +521,7 @@ void QnMediaServerUpdateTool::downloadUpdates() {
     m_downloadUpdatesPeerTask->setTargetDir(updatesDirName);
     m_downloadUpdatesPeerTask->setTargets(downloadTargets);
     m_downloadUpdatesPeerTask->setHashes(hashByUrl);
+    m_downloadUpdatesPeerTask->setFileSizes(fileSizeByUrl);
     m_downloadUpdatesPeerTask->setPeerAssociations(peerAssociations);
     m_downloadUpdatesPeerTask->start(QSet<QnId>::fromList(m_updateInformationById.keys()));
 }

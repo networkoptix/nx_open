@@ -21,6 +21,7 @@ public:
     void setTargetDir(const QString &path);
     void setTargets(const QHash<QUrl, QString> &resultingFiles);
     void setHashes(const QHash<QUrl, QString> &hashByUrl);
+    void setFileSizes(const QHash<QUrl, qint64> &fileSizeByUrl);
     QHash<QUrl, QString> resultingFiles() const;
     void setPeerAssociations(const QMultiHash<QUrl, QnId> &peersByUrl);
 
@@ -31,6 +32,7 @@ protected:
 
 private:
     void downloadNextUpdate();
+    void continueDownload();
 
 private slots:
     void at_downloadReply_finished();
@@ -43,9 +45,11 @@ private:
     QHash<QUrl, QString> m_hashByUrl;
     QMultiHash<QUrl, QnId> m_peersByUrl;
     QHash<QUrl, QString> m_resultingFiles;
+    QHash<QUrl, qint64> m_fileSizeByUrl;
 
     QList<QUrl> m_pendingDownloads;
     QSet<QnId> m_currentPeers;
+    int m_triesCount;
 
     QScopedPointer<QFile> m_file;
     QNetworkAccessManager *m_networkAccessManager;
