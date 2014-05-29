@@ -343,6 +343,10 @@ void QnTransactionMessageBus::sendServerAliveMsg(const QnPeerInfo &peer, bool is
     tran.params.hardwareIds = hwList;
     tran.fillSequence();
     sendTransaction(tran);
+
+    if( peer.id == qnCommon->moduleGUID() )
+        return; //sending keep-alive
+
     if (isAlive)
         emit peerFound(tran.params, false);
     else
