@@ -50,7 +50,7 @@ namespace ec2
         std::vector<ApiIdData> toIdList() 
         {
             std::vector<ApiIdData> result;
-            for (int i = 0; i < size(); ++i) {
+            for (size_t i = 0; i < size(); ++i) {
                 ApiIdData data;
                 data.id = at(i).id;
                 result.push_back(data);

@@ -8,6 +8,18 @@
 #include <QtCore/QList>
 #include <QtCore/QByteArray>
 
+#ifdef __arm__
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <net/if.h>
+#include <unistd.h>
+
+#include <QtCore/QCryptographicHash>
+#endif
+
+#include <iostream>
 #include "util.h"
 #include "hardware_id.h"
 
@@ -111,12 +123,34 @@ void fillHardwareIds(QList<QByteArray>& hardwareIds)
 
 #elif defined(__arm__)
 
-void fillHardwareIds(QList<QByteArray> &hardwareIds)
+void mac_eth0(char  MAC_str[13], char** host)
 {
-    QByteArray hardwareId = fromString(read_file("/proc/cpuinfo"));
-    hardwareIds << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId;
+    #define HWADDR_len 6
+    int s,i;
+    struct ifreq ifr;
+    s = socket(AF_INET, SOCK_DGRAM, 0);
+    strcpy(ifr.ifr_name, "eth0");
+    if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
+        for (i=0; i<HWADDR_len; i++)
+            sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+    }
+    if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
+        const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
+        if( host )
+            *host = inet_ntoa(ip->sin_addr);
+    }
+    close(s);
 }
 
+
+void fillHardwareIds(QList<QByteArray> &hardwareIds)
+{
+    char MAC_str[13];
+    mac_eth0( MAC_str, nullptr );
+    QByteArray hardwareId = QByteArray::fromRawData( MAC_str, sizeof(MAC_str) );
+    hardwareIds.clear();
+    hardwareIds << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId;
+}
 
 #endif
 
