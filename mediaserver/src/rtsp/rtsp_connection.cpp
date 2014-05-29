@@ -202,12 +202,14 @@ public:
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
+static const CodecID DEFAULT_VIDEO_CODEC = CODEC_ID_H263P; 
+
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket)
 {
     Q_D(QnRtspConnectionProcessor);
     Q_UNUSED(_owner)
-	d->codecId = CODEC_ID_H263P;
+	d->codecId = CODEC_ID_NONE;
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
@@ -254,6 +256,8 @@ void QnRtspConnectionProcessor::parseRequest()
         AVOutputFormat* format = av_guess_format(codec.toLatin1().data(),NULL,NULL);
         if (format)
             d->codecId = format->video_codec;
+        else
+            d->codecId = CODEC_ID_NONE;
     };
 
     QString pos = urlQuery.queryItemValue("pos").split('/')[0];
@@ -280,6 +284,8 @@ void QnRtspConnectionProcessor::parseRequest()
             }
         }
         d->transcodedVideoSize = videoSize;
+        if (d->codecId == CODEC_ID_NONE)
+            d->codecId = DEFAULT_VIDEO_CODEC;
     }
 
     QString q = nx_http::getHeaderValue(d->request.headers, "x-media-quality");
@@ -517,6 +523,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
     {
         //case CODEC_ID_H264:
         //    return QnRtspEncoderPtr(new QnRtspH264Encoder());
+        case CODEC_ID_NONE:
         case CODEC_ID_H263:
         case CODEC_ID_H263P:
         case CODEC_ID_H264:
