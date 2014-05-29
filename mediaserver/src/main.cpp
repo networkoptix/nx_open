@@ -163,9 +163,6 @@ void stopServer(int signal);
 
 //#define TEST_RTSP_SERVER
 
-static const int DEFAUT_RTSP_PORT = 50000;
-static const int DEFAULT_STREAMING_PORT = 50000;
-
 static const int PROXY_POOL_SIZE = 8;
 #ifdef EDGE_SERVER
 static const int DEFAULT_MAX_CAMERAS = 1;
@@ -976,7 +973,7 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
 
 void QnMain::initTcpListener()
 {
-    int rtspPort = MSSettings::roSettings()->value("rtspPort", DEFAUT_RTSP_PORT).toInt();
+    int rtspPort = MSSettings::roSettings()->value("rtspPort", MSSettings::DEFAUT_RTSP_PORT).toInt();
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageStatus", new QnStorageStatusRestHandler());

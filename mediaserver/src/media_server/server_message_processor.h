@@ -24,6 +24,7 @@ protected:
     virtual void init(ec2::AbstractECConnectionPtr connection);
     virtual void afterRemovingResource(const QnId& id) override;
     void execBusinessActionInternal(QnAbstractBusinessActionPtr action) override;
+    bool isLocalAddress(const QString& addr) const;
 private slots:
     void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
     void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
