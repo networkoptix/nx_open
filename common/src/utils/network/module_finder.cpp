@@ -272,11 +272,11 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
 }
 
 void QnModuleFinder::removeDirectCheckSocket(AbstractDatagramSocket *socket) {
-    if (m_directCheckSockets.contains(socket)) {
-        m_directCheckSocketCreationTime.remove(socket);
-        m_directCheckSockets.removeOne(socket);
-        m_pollSet.remove(socket, PollSet::etRead);
-        delete socket;
+    if (m_directCheckSockets.contains(udpSocket)) {
+        m_directCheckSocketCreationTime.remove(udpSocket);
+        m_directCheckSockets.removeOne(udpSocket);
+        m_pollSet.remove(udpSocket);
+        delete udpSocket;
     }
 }
 
@@ -328,9 +328,8 @@ void QnModuleFinder::run() {
             FullAddress address = m_directCheckQueue.dequeue();
             AbstractDatagramSocket *socket = SocketFactory::createDatagramSocket();
             socket->setDestAddr(address.address, address.port);
-            m_directCheckSockets.append(socket);
-            m_directCheckSocketCreationTime[socket] = currentClock;
-            m_pollSet.add(socket, PollSet::etRead);
+            m_directCheckSockets.append(DirectCheckSocket(socket, currentClock));
+            m_pollSet.add(socket);
         }
 
         currentClock = QDateTime::currentMSecsSinceEpoch();
@@ -391,7 +390,7 @@ void QnModuleFinder::run() {
             }
 
             foreach (const QString &address, it->moduleInformation.remoteAddresses)
-                m_knownAddresses.remove(FullAddress(address, it->moduleInformation.parameters[lit("port")].toInt()));
+                m_knownAddresses.remove(address, it->moduleInformation.parameters[lit("port")].toInt());
 
             emit moduleLost(it->moduleInformation);
             it = m_knownEnterpriseControllers.erase(it);
