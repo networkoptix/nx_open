@@ -19,6 +19,7 @@
 #include <QtCore/QCryptographicHash>
 #endif
 
+#include <iostream>
 #include "util.h"
 #include "hardware_id.h"
 
@@ -141,13 +142,13 @@ void mac_eth0(char  MAC_str[13], char** host)
     close(s);
 }
 
+
 void fillHardwareIds(QList<QByteArray> &hardwareIds)
 {
     char MAC_str[13];
     mac_eth0( MAC_str, nullptr );
-    QByteArray hardwareId = "03" + QCryptographicHash::hash(
-        QByteArray::fromRawData(MAC_str, sizeof(MAC_str)),
-        QCryptographicHash::Md5 ).toHex();
+    QByteArray hardwareId = QByteArray::fromRawData( MAC_str, sizeof(MAC_str) );
+    hardwareIds.clear();
     hardwareIds << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId << hardwareId;
 }
 
