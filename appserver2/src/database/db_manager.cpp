@@ -56,6 +56,37 @@ void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subD
     }
 }
 
+QnDbManager::Locker::Locker(QnDbManager* db): 
+    m_inTran(false), 
+    m_db(db) 
+{
+
+}
+QnDbManager::Locker::~Locker()
+{
+    if (m_inTran)
+        m_db->rollback();
+}
+
+void QnDbManager::Locker::beginTran()
+{
+    if (!m_inTran) {
+        m_db->beginTran();
+        m_inTran = true;
+    }
+}
+
+void QnDbManager::Locker::commit()
+{
+    if (m_inTran) {
+        m_db->commit();
+        m_inTran = false;
+    }
+}
+
+
+// --------------------------------------- QnDbManager -----------------------------------------
+
 QnId QnDbManager::getType(const QString& typeName)
 {
     QSqlQuery query(m_sdb);
@@ -170,7 +201,7 @@ bool QnDbManager::init()
         tran.fillSequence();
         tran.params.id = QnId::fromRfc4122(queryCameras.value(0).toByteArray());
         tran.params.status = QnResource::Offline;
-        executeTransactionNoLock(tran);
+        executeTransactionInternal(tran);
         QByteArray serializedTran;
         QnOutputBinaryStream<QByteArray> stream(&serializedTran);
         QnBinary::serialize(tran, &stream);
@@ -771,7 +802,7 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 in
 	return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiSetResourceStatusData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiSetResourceStatusData>& tran)
 {
     QSqlQuery query(m_sdb);
     query.prepare("UPDATE vms_resource set status = :status where guid = :guid");
@@ -785,7 +816,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiSetResour
 }
 
 /*
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiSetResourceDisabledData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiSetResourceDisabledData>& tran)
 {
     QSqlQuery query(m_sdb);
     query.prepare("UPDATE vms_resource set disabled = :disabled where guid = :guid");
@@ -814,12 +845,12 @@ ErrorCode QnDbManager::saveCamera(const ApiCameraData& params)
     return result;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraData>& tran)
 {
     return saveCamera(tran.params);
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraDataList>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraDataList>& tran)
 {
     foreach(const ApiCameraData& camera, tran.params)
     {
@@ -830,7 +861,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraDat
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceData>& tran)
 {
     qint32 internalId = getResourceInternalId(tran.params.id);
     ErrorCode err = updateResource(tran.params, internalId);
@@ -884,12 +915,12 @@ ErrorCode QnDbManager::updateBusinessRule(const ApiBusinessRuleData& rule)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran)
 {
     return updateBusinessRule(tran.params);
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiMediaServerData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMediaServerData>& tran)
 {
     ErrorCode result;
     qint32 internalId;
@@ -1051,13 +1082,13 @@ ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
     return result;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLayoutData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran)
 {
     ErrorCode result = saveLayout(tran.params);
     return result;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLayoutDataList>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran)
 {
     foreach(const ApiLayoutData& layout, tran.params)
     {
@@ -1068,12 +1099,12 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLayoutDat
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowallData>& tran) {
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran) {
     ErrorCode result = saveVideowall(tran.params);
     return result;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowallDataList>& tran) {
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran) {
     foreach(const ApiVideowallData& videowall, tran.params)
     {
         ErrorCode err = saveVideowall(videowall);
@@ -1083,11 +1114,11 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowall
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiUpdateUploadResponceData>& /*tran*/) {
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& /*tran*/) {
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceParamsData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceParamsData>& tran)
 {
     qint32 internalId = getResourceInternalId(tran.params.id);
     /*
@@ -1098,7 +1129,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceP
     return insertAddParams(tran.params.params, internalId);
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran)
 {
     QSqlQuery lastHistory(m_sdb);
     lastHistory.prepare("SELECT server_guid, max(timestamp) FROM vms_cameraserveritem WHERE physical_id = ? AND timestamp < ?");
@@ -1122,7 +1153,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraSer
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiPanicModeData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiPanicModeData>& tran)
 {
     QSqlQuery query(m_sdb);
     query.prepare("UPDATE vms_server SET panic_mode = :mode");
@@ -1300,7 +1331,7 @@ ErrorCode QnDbManager::removeLayoutInternal(const QnId& id, const qint32 &intern
     return err;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiStoredFileData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran)
 {
     assert( tran.command == ApiCommand::addStoredFile || tran.command == ApiCommand::updateStoredFile );
 
@@ -1316,7 +1347,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiStoredFil
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<QString>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<QString>& tran)
 {
     switch (tran.command) {
     case ApiCommand::removeStoredFile: {
@@ -1339,7 +1370,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<QString>& tr
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiUserData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserData>& tran)
 {
     qint32 internalId;
 
@@ -1420,7 +1451,7 @@ ApiObjectInfoList QnDbManager::getNestedObjects(const ApiObjectInfo& parentObjec
     return result;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiIdData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>& tran)
 {
     switch(tran.command) {
         case ApiCommand::removeCamera:
@@ -1973,7 +2004,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourc
     return rez;
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& tran)
 {
     if (!execSQLQuery("DELETE FROM vms_businessrule_action_resources"))
         return ErrorCode::dbError;
@@ -1993,7 +2024,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusi
 }
 
 // save settings
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResourceParamDataList>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResourceParamDataList>& tran)
 {
     /*
     ErrorCode result = deleteAddParams(m_adminUserInternalID);
@@ -2019,12 +2050,12 @@ ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license) {
 
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicenseData>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran)
 {
     return saveLicense(tran.params);
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicenseDataList>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseDataList>& tran)
 {
     foreach (const ApiLicenseData& license, tran.params) {
         ErrorCode result = saveLicense(license);
@@ -2038,7 +2069,7 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiLicenseDa
 //    return m_licenseManagerImpl->addLicenses( tran.params );
 }
 
-ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiCameraBookmarkTagDataList> &tran) {
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList> &tran) {
 
     std::function<ec2::ErrorCode (const ApiCameraBookmarkTagData &)> processTag;
 
