@@ -196,16 +196,4 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_readyRead() {
     }
 
     readAllData(reply, m_file.data());
-
-    static int br = 0;
-
-    if (br > m_file->pos())
-        br = 0;
-
-    if (m_file->pos() <= 33200686) {
-        if (reply->isRunning() && m_file->pos() - br > 3000000) {
-            br = m_file->pos();
-            reply->abort();
-        }
-    }
 }
