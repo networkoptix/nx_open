@@ -55,7 +55,8 @@ private:
     QSet<QUrl> m_activeRequests;
 
     QHash<QnId, QnModuleInformation> m_foundModules;
-    QHash<QnId, quint64> m_lastPingById;
+    QHash<QnId, qint64> m_lastPingById;
+    QHash<QUrl, QnId> m_moduleByUrl;
 
     QNetworkAccessManager *m_networkAccessManager;
     QTimer *m_manualCheckTimer;

@@ -4,10 +4,13 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
+#include <utils/common/model_functions.h>
+
 namespace {
 
     const int defaultMaxConnections = 30;
     const int manualCheckIntervalMs = 15 * 1000;
+    const int maxPingTimeoutMs = 3 * 60 * 1000;
 
     QUrl makeRequestUrl(const QHostAddress &address, quint16 port) {
         return QUrl(QString(lit("http://%1:%2/api/moduleInformation")).arg(address.toString()).arg(port));
@@ -99,8 +102,7 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
 
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray data = reply->readAll();
-        QnModuleInformation moduleInformation;
-        // TODO: deserialize
+        QnModuleInformation moduleInformation = QJson::deserialized<QnModuleInformation>(data);
         if (!m_ignoredModules.contains(moduleInformation.id, url)) {
             auto it = m_foundModules.find(moduleInformation.id);
             if (it == m_foundModules.end())
@@ -112,7 +114,17 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
             emit moduleFound(moduleInformation, url.host());
         }
     } else {
+        QnId id = m_moduleByUrl[url];
+        if (!id.isNull()) {
+            if (m_lastPingById[id] + maxPingTimeoutMs < QDateTime::currentMSecsSinceEpoch()) {
+                m_lastPingById.remove(id);
+                QnModuleInformation moduleInformation = m_foundModules.take(id);
+                foreach (const QString &address, moduleInformation.remoteAddresses)
+                    m_moduleByUrl.remove(makeRequestUrl(QHostAddress(address), moduleInformation.port));
 
+                emit moduleLost(moduleInformation);
+            }
+        }
     }
 
     activateRequests();
