@@ -244,7 +244,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     else {
         dstSize = QSize(outFrame->width * sar, outFrame->height);
     }
-    dstSize.setWidth(qMin(dstSize.width(), outFrame->width));
+    dstSize.setWidth(qMin(dstSize.width(), outFrame->width * sar));
     dstSize.setHeight(qMin(dstSize.height(), outFrame->height));
 
     if (dstSize.width() < 8 || dstSize.height() < 8)
