@@ -14,7 +14,6 @@ namespace ec2 {
     void QnJsonTransactionSerializer::serializePayload(QByteArray &buffer)
     {
         quint32 payloadSize = buffer.size() - 12;
-        qDebug() <<"payload size" << payloadSize;
         quint32* payloadSizePtr = (quint32*) (buffer.data() + 10);
         *payloadSizePtr = htonl(payloadSize - 4);
         toFormattedHex((quint8*) buffer.data() + 7, payloadSize);

@@ -26,7 +26,8 @@ namespace ec2
             QMutexLocker lock(&m_mutex);
             Q_UNUSED(lock);
 
-            if (m_cache.contains(tran.id))
+            // do not cache read-only transactions (they have sequence == 0)
+            if (tran.id.sequence > 0 && m_cache.contains(tran.id))
                 return *m_cache[tran.id];
 
             

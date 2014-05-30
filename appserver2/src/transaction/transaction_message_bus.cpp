@@ -518,19 +518,6 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         return;
     }
 
-    /** Request all data to be sent to the client peers on the connect. */
-    QnTransaction<ApiFullInfoData> tran;
-    if (remotePeer.isClient()) {
-        tran.command = ApiCommand::getAllDataList;
-        tran.id.peerID = m_localPeer.id;
-        const ErrorCode errorCode = dbManager->doQuery(nullptr, tran.params);
-        if (errorCode != ErrorCode::ok) {
-            qWarning() << "Can't execute query for sync with client peer!";
-            QnTransactionTransport::connectDone(remotePeer.id); // release connection
-            return;
-        }
-    }
-
     QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer, remotePeer, socket));
     transport->setHwList(hwList);
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
@@ -539,10 +526,65 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     transport->setState(QnTransactionTransport::Connected);
 
     /** Send all data to the client peers on the connect. */
-    if (remotePeer.isClient()) 
+    if (remotePeer.peerType == QnPeerInfo::DesktopClient) 
     {
+        /** Request all data to be sent to the client peers on the connect. */
+        QnTransaction<ApiFullInfoData> tran;
+        tran.command = ApiCommand::getAllDataList;
+        tran.id.peerID = m_localPeer.id;
+        if (dbManager->doQuery(nullptr, tran.params) != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            QnTransactionTransport::connectDone(remotePeer.id); // release connection
+            return;
+        }
+
         transport->setWriteSync(true);
         transport->sendTransaction(tran, QnPeerSet() << remotePeer.id << m_localPeer.id);
+        transport->setReadSync(true);
+
+    } else if (remotePeer.peerType == QnPeerInfo::AndroidClient) {
+        /** Request all data to be sent to the client peers on the connect. */
+        QnTransaction<ApiMediaServerDataList> tranServers;
+        tranServers.command = ApiCommand::getMediaServerList;
+        tranServers.id.peerID = m_localPeer.id;
+        if (dbManager->doQuery(nullptr, tranServers.params) != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            QnTransactionTransport::connectDone(remotePeer.id); // release connection
+            return;
+        }
+
+        QnTransaction<ApiCameraDataList> tranCameras;
+        tranCameras.command = ApiCommand::getCameras;
+        tranCameras.id.peerID = m_localPeer.id;
+        if (dbManager->doQuery(QnId(), tranCameras.params) != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            QnTransactionTransport::connectDone(remotePeer.id); // release connection
+            return;
+        }
+
+        QnTransaction<ApiUserDataList> tranUsers;
+        tranUsers.command = ApiCommand::getUserList;
+        tranUsers.id.peerID = m_localPeer.id;
+        if (dbManager->doQuery(nullptr, tranUsers.params) != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            QnTransactionTransport::connectDone(remotePeer.id); // release connection
+            return;
+        }
+
+        QnTransaction<ApiLayoutDataList> tranLayouts;
+        tranLayouts.command = ApiCommand::getLayoutList;
+        tranLayouts.id.peerID = m_localPeer.id;
+        if (dbManager->doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            QnTransactionTransport::connectDone(remotePeer.id); // release connection
+            return;
+        }
+
+        transport->setWriteSync(true);
+        transport->sendTransaction(tranServers, QnPeerSet() << remotePeer.id << m_localPeer.id);
+        transport->sendTransaction(tranCameras, QnPeerSet() << remotePeer.id << m_localPeer.id);
+        transport->sendTransaction(tranUsers,   QnPeerSet() << remotePeer.id << m_localPeer.id);
+        transport->sendTransaction(tranLayouts, QnPeerSet() << remotePeer.id << m_localPeer.id);
         transport->setReadSync(true);
     }
     
