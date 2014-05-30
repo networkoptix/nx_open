@@ -408,6 +408,7 @@ void QnLiveStreamProvider::extractCodedPictureResolution( const QnCompressedVide
     {
         case CODEC_ID_MPEG4:
         case CODEC_ID_H264:
+        case CODEC_ID_MPEG2VIDEO:
             if( videoData->width > 0 && videoData->height > 0 )
                 *newResolution = QSize( videoData->width, videoData->height );
             //TODO #ak it is very possible that videoData->width and videoData->height do not change when stream resolution changes and there is no SPS also
@@ -421,7 +422,6 @@ void QnLiveStreamProvider::extractCodedPictureResolution( const QnCompressedVide
             *newResolution = QSize( imgInfo.width, imgInfo.height );
             break;
         }
-
         default:
             Q_ASSERT( false );
     }
