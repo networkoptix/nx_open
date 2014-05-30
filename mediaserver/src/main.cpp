@@ -107,6 +107,7 @@
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/change_system_name_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
+#include <rest/handlers/module_information_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
 
@@ -1003,6 +1004,7 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/changeSystemName", new QnChangeSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
@@ -1027,6 +1029,7 @@ void QnMain::initTcpListener()
 
     QSet<QString> allowedUnauthorizedPaths;
     allowedUnauthorizedPaths.insert("api/ping");
+    allowedUnauthorizedPaths.insert("api/moduleInformation");
     m_universalTcpListener->setAllowedUnauthorizedPaths(allowedUnauthorizedPaths);
 
     if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
