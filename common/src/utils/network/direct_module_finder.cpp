@@ -50,7 +50,11 @@ void QnDirectModuleFinder::removeAddress(const QHostAddress &address, quint16 po
 }
 
 void QnDirectModuleFinder::addManualAddress(const QHostAddress &address, quint16 port) {
-    m_manualAddresses.insert(makeRequestUrl(address, port));
+    QUrl url = makeRequestUrl(address, port);
+    if (!m_manualAddresses.contains(url)) {
+        m_manualAddresses.insert(makeRequestUrl(address, port));
+        enqueRequest(url);
+    }
 }
 
 void QnDirectModuleFinder::removeManualAddress(const QHostAddress &address, quint16 port) {

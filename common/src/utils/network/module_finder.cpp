@@ -2,10 +2,12 @@
 
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
+#include "direct_module_finder_helper.h"
 
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
     m_multicastModuleFinder(new QnMulticastModuleFinder(clientOnly)),
-    m_directModuleFinder(new QnDirectModuleFinder(this))
+    m_directModuleFinder(new QnDirectModuleFinder(this)),
+    m_directModuleFinderHelper(new QnDirectModuleFinderHelper(this))
 {
     connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleFound,      this,       &QnModuleFinder::at_moduleFound);
     connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleLost,       this,       &QnModuleFinder::at_moduleLost);
@@ -41,11 +43,13 @@ QnDirectModuleFinder *QnModuleFinder::directModuleFinder() const {
 void QnModuleFinder::start() {
     m_multicastModuleFinder->start();
     m_directModuleFinder->start();
+    m_directModuleFinderHelper->setDirectModuleFinder(m_directModuleFinder);
 }
 
 void QnModuleFinder::stop() {
     m_multicastModuleFinder->pleaseStop();
     m_directModuleFinder->stop();
+    m_directModuleFinderHelper->setDirectModuleFinder(NULL);
 }
 
 void QnModuleFinder::at_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {

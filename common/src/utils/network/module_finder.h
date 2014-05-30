@@ -9,6 +9,7 @@
 
 class QnMulticastModuleFinder;
 class QnDirectModuleFinder;
+class QnDirectModuleFinderHelper;
 
 class QnModuleFinder : public QObject, public Singleton<QnModuleFinder> {
     Q_OBJECT
@@ -41,6 +42,7 @@ private slots:
 private:
     QnMulticastModuleFinder *m_multicastModuleFinder;
     QnDirectModuleFinder *m_directModuleFinder;
+    QnDirectModuleFinderHelper *m_directModuleFinderHelper;
 
     QHash<QnId, QnModuleInformation> m_foundModules;
 };
