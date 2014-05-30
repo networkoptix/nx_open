@@ -49,6 +49,14 @@ void QnDirectModuleFinder::removeAddress(const QHostAddress &address, quint16 po
     m_autoAddresses.remove(makeRequestUrl(address, port));
 }
 
+void QnDirectModuleFinder::addManualAddress(const QHostAddress &address, quint16 port) {
+    m_manualAddresses.insert(makeRequestUrl(address, port));
+}
+
+void QnDirectModuleFinder::removeManualAddress(const QHostAddress &address, quint16 port) {
+    m_manualAddresses.remove(makeRequestUrl(address, port));
+}
+
 void QnDirectModuleFinder::addIgnoredAddress(const QHostAddress &address, quint16 port) {
     m_ignoredAddresses.insert(makeRequestUrl(address, port));
 }
@@ -119,7 +127,9 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
 
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray data = reply->readAll();
-        QnJsonRestResult result = QJson::deserialized<QnJsonRestResult>(data);
+
+        QnJsonRestResult result;
+        QJson::deserialize(data, &result);
         QnModuleInformation moduleInformation;
         QJson::deserialize(result.reply(), &moduleInformation);
 

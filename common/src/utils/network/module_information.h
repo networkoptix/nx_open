@@ -20,7 +20,7 @@ struct QnModuleInformation {
     bool isLocal; //!< true if at least one address from \a remoteHostAddress is a local address
     QnId id;
 
-    QnModuleInformation() : isLocal(false) {}
+    QnModuleInformation() : port(0), isLocal(false) {}
 };
 #define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(port)(remoteAddresses)(isLocal)(id)
 

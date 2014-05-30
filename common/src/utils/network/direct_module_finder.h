@@ -22,6 +22,9 @@ public:
     void addAddress(const QHostAddress &address, quint16 port);
     void removeAddress(const QHostAddress &address, quint16 port);
 
+    void addManualAddress(const QHostAddress &address, quint16 port);
+    void removeManualAddress(const QHostAddress &address, quint16 port);
+
     void addIgnoredAddress(const QHostAddress &address, quint16 port);
     void removeIgnoredAddress(const QHostAddress &address, quint16 port);
 
