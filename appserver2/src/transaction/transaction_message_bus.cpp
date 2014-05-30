@@ -14,6 +14,8 @@
 #include "nx_ec/data/api_server_alive_data.h"
 #include "utils/common/synctime.h"
 #include "ec_connection_notification_manager.h"
+
+#include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
 
 namespace ec2
@@ -182,7 +184,7 @@ void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAl
 
 void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader)
 {
-    QnTransactionTransport* sender = (QnTransactionTransport*) this->sender();
+    QnTransactionTransport* sender = checked_cast<QnTransactionTransport*>(this->sender());
     if (!sender || sender->getState() != QnTransactionTransport::ReadyForStreaming)
         return;
 
