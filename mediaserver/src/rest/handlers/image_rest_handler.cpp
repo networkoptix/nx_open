@@ -227,7 +227,8 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     if (!gotFrame)
         return noVideoError(result, time);
 
-    double ar = decoder.getSampleAspectRatio() * outFrame->width / outFrame->height;
+    double sar = decoder.getSampleAspectRatio();
+    double ar = sar * outFrame->width / outFrame->height;
     if (!dstSize.isEmpty()) {
         dstSize.setHeight(qPower2Ceil((unsigned) dstSize.height(), 4));
         dstSize.setWidth(qPower2Ceil((unsigned) dstSize.width(), 4));
@@ -241,9 +242,9 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         dstSize.setHeight(qPower2Ceil((unsigned) (dstSize.width()/ar), 4));
     }
     else {
-        dstSize = QSize(outFrame->width, outFrame->height);
+        dstSize = QSize(outFrame->width * sar, outFrame->height);
     }
-    dstSize.setWidth(qMin(dstSize.width(), outFrame->width));
+    dstSize.setWidth(qMin(dstSize.width(), outFrame->width * sar));
     dstSize.setHeight(qMin(dstSize.height(), outFrame->height));
 
     if (dstSize.width() < 8 || dstSize.height() < 8)

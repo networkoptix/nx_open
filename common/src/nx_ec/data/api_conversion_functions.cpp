@@ -563,6 +563,9 @@ void fromResourceToApi(const QnResourcePtr &src, ApiResourceData &dst) {
     for(const QnParam &srcParam: src->getResourceParamList().list())
         if (srcParam.domain() == QnDomainDatabase)
             dst.addParams.push_back(ApiResourceParamData(srcParam.name(), srcParam.value().toString(), true));
+
+    for(const QnKvPair &srcParam: src->getProperties())
+        dst.addParams.push_back(ApiResourceParamData(srcParam.name(), srcParam.value(), false));
 }
 
 void fromApiToResource(const ApiResourceData &src, QnResourcePtr &dst) {
