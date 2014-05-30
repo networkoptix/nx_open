@@ -257,15 +257,15 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             }
             else 
             {
-                if (tran.persistent)
+                if (m_localPeer.peerType == QnPeerInfo::Server && tran.persistent && dbManager)
                 {
-                    QByteArray serializedTran;  //TODO #GDM, you know where to get this :)
+                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
                     ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
                     if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
                     {
                         qWarning() << "Can't handle transaction" << ApiCommand::toString(tran.command) << "reopen connection";
                         sender->setState(QnTransactionTransport::Error);
-                        return; //TODO #GDM is this correct? Discuss with Roma
+                        return;
                     }
                 }
 
