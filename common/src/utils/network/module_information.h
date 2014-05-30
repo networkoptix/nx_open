@@ -7,6 +7,7 @@
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 #include <utils/common/id.h>
+#include <utils/common/model_functions_fwd.h>
 
 struct QnModuleInformation {
     QString type;
@@ -20,5 +21,8 @@ struct QnModuleInformation {
 
     QnModuleInformation() : isLocal(false) {}
 };
+#define QnModuleInformation_Fields (type)(version)(systemInformation)(systemName)(port)(remoteAddresses)(isLocal)(id)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (json))
 
 #endif // MODULE_INFORMATION_H
