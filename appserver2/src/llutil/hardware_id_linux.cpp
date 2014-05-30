@@ -146,6 +146,7 @@ void mac_eth0(char  MAC_str[13], char** host)
 void fillHardwareIds(QList<QByteArray> &hardwareIds)
 {
     char MAC_str[13];
+    memset(MAC_str, sizeof(MAC_str), 0);
     mac_eth0( MAC_str, nullptr );
     QByteArray hardwareId = QByteArray::fromRawData( MAC_str, sizeof(MAC_str) );
     hardwareIds.clear();
