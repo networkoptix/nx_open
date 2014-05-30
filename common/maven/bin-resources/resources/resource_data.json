@@ -46,9 +46,7 @@
         },
         {
             "keys": [
-                "ACTI|KCM3311",
-                "VISTA|*f",
-                "VISTA|*VZMI"
+                "ACTI|KCM3311"
             ],
             "ptzCapabilities": "ContinuousZoomCapability"
         },

@@ -63,6 +63,7 @@ signals:
     void finished(int status, const QnPtzPresetList &reply, int handle);
     void finished(int status, const QnPtzTourList &reply, int handle);
     void finished(int status, const QnPtzObject &reply, int handle);
+    void finished(int status, const QnPtzAuxilaryTraitList &reply, int handle);
     void finished(int status, const QnPtzData &reply, int handle);
 
 private:
@@ -179,6 +180,7 @@ public:
     int addCameraAsync(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password, QObject *target, const char *slot);
 
     int ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
+    int ptzContinuousFocusAsync(const QnNetworkResourcePtr &camera, qreal speed, QObject *target, const char *slot);
     int ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzViewportMoveAsync(const QnNetworkResourcePtr &camera, qreal aspectRatio, const QRectF &viewport, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzGetPositionAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, QObject *target, const char *slot);
@@ -197,6 +199,9 @@ public:
     int ptzGetActiveObjectAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
     int ptzUpdateHomeObjectAsync(const QnNetworkResourcePtr &camera, const QnPtzObject &homePosition, QObject *target, const char *slot);
     int ptzGetHomeObjectAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+
+    int ptzGetAuxilaryTraitsAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+    int ptzRunAuxilaryCommandAsync(const QnNetworkResourcePtr &camera, const QnPtzAuxilaryTrait &trait, const QString &data, QObject *target, const char *slot);
 
     int ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields query, QObject *target, const char *slot);
 

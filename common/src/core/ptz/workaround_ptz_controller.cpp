@@ -13,7 +13,7 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     base_type(baseController),
     m_overrideContinuousMove(false),
     m_flip(0),
-    m_restriction(Qn::UnrestrictedPtz),
+    m_trait(Qn::NoPtzTraits),
     m_overrideCapabilities(false),
     m_capabilities(Qn::NoPtzCapabilities)
 {
@@ -23,17 +23,17 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
 
     QnResourceData resourceData = qnCommon->dataPool()->data(camera, true);
     
-    QString ptzRestriction = resourceData.value<QString>(lit("ptzRestriction"));
-    if(!ptzRestriction.isEmpty())
-        if(!QnLexical::deserialize(ptzRestriction, &m_restriction))
-            qnWarning("Could not parse PTZ restriction '%1'.", ptzRestriction);
+    QString ptzTraits = resourceData.value<QString>(lit("ptzTraits"));
+    if(!ptzTraits.isEmpty())
+        if(!QnLexical::deserialize(ptzTraits, &m_trait)) // TODO: #Elric support flags in 2.3
+            qnWarning("Could not parse PTZ traits '%1'.", ptzTraits);
 
     if(resourceData.value<bool>(lit("panFlipped"), false))
         m_flip |= Qt::Horizontal;
     if(resourceData.value<bool>(lit("tiltFlipped"), false))
         m_flip |= Qt::Vertical;
 
-    m_overrideContinuousMove = m_flip != 0 || m_restriction != Qn::UnrestrictedPtz;
+    m_overrideContinuousMove = m_flip != 0 || (m_trait & (Qn::FourWayPtzTrait | Qn::EightWayPtzTrait));
 
     QString ptzCapabilities = resourceData.value<QString>(lit("ptzCapabilities"));
     if(!ptzCapabilities.isEmpty()) {
@@ -77,8 +77,8 @@ bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
     if(m_flip & Qt::Vertical)
         localSpeed.setY(localSpeed.y() * -1);
 
-    if(m_restriction == Qn::EightWayPtz || m_restriction == Qn::FourWayPtz) {
-        float rounding = m_restriction == Qn::EightWayPtz ? M_PI / 4.0 : M_PI / 2.0; /* 45 or 90 degrees. */
+    if(m_trait & (Qn::EightWayPtzTrait | Qn::FourWayPtzTrait)) {
+        float rounding = (m_trait & Qn::EightWayPtzTrait) ? M_PI / 4.0 : M_PI / 2.0; /* 45 or 90 degrees. */
 
         QVector2D cartesianSpeed(localSpeed);
         QnPolarPoint<float> polarSpeed = cartesianToPolar(cartesianSpeed);
