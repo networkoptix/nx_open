@@ -23,6 +23,6 @@ struct QnModuleInformation {
 };
 #define QnModuleInformation_Fields (type)(version)(systemInformation)(systemName)(port)(remoteAddresses)(isLocal)(id)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (json))
+QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (json)(metatype))
 
 #endif // MODULE_INFORMATION_H

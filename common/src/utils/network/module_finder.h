@@ -109,6 +109,4 @@ private:
     bool m_compatibilityMode;
 };
 
-Q_DECLARE_METATYPE(QnModuleInformation)
-
 #endif  //NETWORKOPTIXMODULEFINDER_H
