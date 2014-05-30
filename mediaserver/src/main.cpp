@@ -1025,6 +1025,10 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy");
     m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
 
+    QSet<QString> allowedUnauthorizedPaths;
+    allowedUnauthorizedPaths.insert("api/ping");
+    m_universalTcpListener->setAllowedUnauthorizedPaths(allowedUnauthorizedPaths);
+
     if( !MSSettings::roSettings()->value("authenticationEnabled", "true").toBool() )
         m_universalTcpListener->disableAuth();
 

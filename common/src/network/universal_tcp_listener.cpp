@@ -67,7 +67,9 @@ QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(QSharedP
 
 QnTCPConnectionProcessor* QnUniversalTcpListener::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
 {
-    return new QnUniversalRequestProcessor(clientSocket, owner, m_needAuth);
+    QnUniversalRequestProcessor *listener = new QnUniversalRequestProcessor(clientSocket, owner, m_needAuth);
+    listener->setAllowedUnauthorizedPaths(m_allowedUnauthPaths);
+    return listener;
 }
 
 void QnUniversalTcpListener::setProxyParams(const QUrl& proxyServerUrl, const QString& selfId)
@@ -154,4 +156,8 @@ void QnUniversalTcpListener::doPeriodicTasks()
 void QnUniversalTcpListener::disableAuth()
 {
     m_needAuth = false;
+}
+
+void QnUniversalTcpListener::setAllowedUnauthorizedPaths(const QSet<QString> &paths) {
+    m_allowedUnauthPaths = paths;
 }

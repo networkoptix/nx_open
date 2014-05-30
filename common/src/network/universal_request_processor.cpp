@@ -21,6 +21,10 @@ QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
     stop();
 }
 
+void QnUniversalRequestProcessor::setAllowedUnauthorizedPaths(const QSet<QString> &paths) {
+    m_allowedUnauthPaths = paths;
+}
+
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner, bool needAuth):
 QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket)
 {
@@ -54,7 +58,7 @@ bool QnUniversalRequestProcessor::authenticate()
             path = path.left(path.size()-1);
         if (path.startsWith(L'/'))
             path = path.mid(1);
-        bool needAuth = (path != lit("api/ping")) && !path.startsWith(lit("api/camera_event")); //TODO: #AK this class (libcommon's) is not supposed to know about api/ping etc.. (it's mediaserver's)
+        bool needAuth = !m_allowedUnauthPaths.contains(path);
         bool isProxy = dynamic_cast<QnUniversalTcpListener*>(d->owner)->isProxy(url);
         QElapsedTimer t;
         t.restart();
