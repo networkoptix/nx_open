@@ -193,21 +193,26 @@ public:
 
         m_zoomInButton = new PtzImageButtonWidget(this);
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
+        m_zoomInButton->setToolTip(tr("Zoom In"));
 
         m_zoomOutButton = new PtzImageButtonWidget(this);
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
+        m_zoomOutButton->setToolTip(tr("Zoom Out"));
 
         m_focusInButton = new PtzImageButtonWidget(this);
         m_focusInButton->setIcon(qnSkin->icon("item/ptz_focus_in.png"));
+        m_focusInButton->setToolTip(tr("Focus Far"));
 
         m_focusOutButton = new PtzImageButtonWidget(this);
         m_focusOutButton->setIcon(qnSkin->icon("item/ptz_focus_out.png"));
+        m_focusOutButton->setToolTip(tr("Focus Near"));
 
         m_focusAutoButton = new PtzImageButtonWidget(this);
         m_focusAutoButton->setIcon(qnSkin->icon("item/ptz_focus_auto.png"));
+        m_focusAutoButton->setToolTip(tr("Auto Focus"));
 
         m_modeButton = new PtzImageButtonWidget(this);
-        m_modeButton->setToolTip(tr("Dewarping panoramic mode"));
+        m_modeButton->setToolTip(tr("Change Dewarping Mode"));
 
         updateLayout();
         showCursor();

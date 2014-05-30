@@ -97,6 +97,14 @@ bool QnVistaMotorPtzController::queryLocked(const QString &request, QByteArray *
     ensureClientLocked();
 
     CLHttpStatus status = m_client->doGET(request.toLatin1());
+    if(status == CL_TRANSPORT_ERROR) {
+        /* This happens when connection is aborted by the local host. 
+         * Http client doesn't handle this case automatically, so we have to work it around. */
+        m_client.reset();
+        ensureClientLocked();
+
+        status = m_client->doGET(request.toLatin1());
+    }
     if(status != CL_HTTP_SUCCESS)
         return false;
     
