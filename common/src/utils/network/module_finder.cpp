@@ -313,6 +313,6 @@ QnModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)
     moduleInformation.version = QnSoftwareVersion(response.version);
     moduleInformation.systemInformation = QnSystemInformation(response.systemInformation);
     moduleInformation.systemName = response.name;
-    moduleInformation.parameters = response.typeSpecificParameters;
+    moduleInformation.port = response.typeSpecificParameters.value(lit("port")).toUShort();
     moduleInformation.id = QnId(response.seed);
 }

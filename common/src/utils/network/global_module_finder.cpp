@@ -44,7 +44,7 @@ void QnGlobalModuleFinder::fillApiModuleData(const QnModuleInformation &moduleIn
     data->version = moduleInformation.version.toString();
     data->systemInformation = moduleInformation.systemInformation.toString();
     data->addresses = moduleInformation.remoteAddresses.toList();
-    data->port = moduleInformation.parameters.value(lit("port")).toInt();
+    data->port = moduleInformation.port;
     data->isAlive = true;
 }
 
@@ -55,7 +55,7 @@ void QnGlobalModuleFinder::fillFromApiModuleData(const ec2::ApiModuleData &data,
     moduleInformation->version = QnSoftwareVersion(data.version);
     moduleInformation->systemInformation = QnSystemInformation(data.systemInformation);
     moduleInformation->remoteAddresses = QSet<QString>::fromList(data.addresses);
-    moduleInformation->parameters.insert(lit("port"), QString::number(data.port));
+    moduleInformation->port = data.port;
 }
 
 QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {

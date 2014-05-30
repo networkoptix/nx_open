@@ -669,9 +669,7 @@ void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &modul
     QString host = moduleInformation.isLocal ? QLatin1String("127.0.0.1") : remoteAddress;
     QUrl url;
     url.setHost(host);
-
-    QString port = moduleInformation.parameters[lit("port")];
-    url.setPort(port.toInt());
+    url.setPort(moduleInformation.port);
 
     foreach (const QnEcData &data, m_foundEcs.values(moduleInformation.id)) {
         if (data.url.host() == url.host() && data.url.port() == url.port())

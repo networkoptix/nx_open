@@ -960,8 +960,7 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
     if (moduleInformation.version == qnCommon->engineVersion() && moduleInformation.systemName == qnCommon->localSystemName()) {
-        int port = moduleInformation.parameters.value("port").toInt();
-        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
+        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
         ec2Connection->addRemotePeer(url, false, moduleInformation.id.toString());
     } else {
 
@@ -971,9 +970,8 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
     if (moduleInformation.version == qnCommon->engineVersion() && moduleInformation.systemName == qnCommon->localSystemName()) {
-        int port = moduleInformation.parameters.value("port").toInt();
         foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
-            QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
+            QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
             ec2Connection->deleteRemotePeer(url);
         }
     } else {

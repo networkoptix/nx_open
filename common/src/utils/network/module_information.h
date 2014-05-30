@@ -13,7 +13,7 @@ struct QnModuleInformation {
     QnSoftwareVersion version;
     QnSystemInformation systemInformation;
     QString systemName;
-    QMap<QString, QString> parameters;
+    quint16 port;
     QSet<QString> remoteAddresses;
     bool isLocal; //!< true if at least one address from \a remoteHostAddress is a local address
     QnId id;

@@ -55,7 +55,7 @@ protected:
         QString seed;
         QString url;
         QList<QString> ipAddresses;
-        TypeSpecificParamMap params;
+        quint16 port;
 
         bool operator<( const FoundModuleData& right ) const
         {
