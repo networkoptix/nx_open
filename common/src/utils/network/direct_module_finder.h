@@ -17,6 +17,8 @@ class QnDirectModuleFinder : public QObject {
 public:
     explicit QnDirectModuleFinder(QObject *parent = 0);
 
+    void setCompatibilityMode(bool compatibilityMode);
+
     void addAddress(const QHostAddress &address, quint16 port);
     void removeAddress(const QHostAddress &address, quint16 port);
 
@@ -28,6 +30,9 @@ public:
 
     void start();
     void stop();
+
+    QList<QnModuleInformation> foundModules() const;
+    QnModuleInformation moduleInformation(const QnId &id) const;
 
 signals:
     //!Emitted when new enterprise controller has been found
@@ -57,6 +62,8 @@ private:
     QHash<QnId, QnModuleInformation> m_foundModules;
     QHash<QnId, qint64> m_lastPingById;
     QHash<QUrl, QnId> m_moduleByUrl;
+
+    bool m_compatibilityMode;
 
     QNetworkAccessManager *m_networkAccessManager;
     QTimer *m_manualCheckTimer;

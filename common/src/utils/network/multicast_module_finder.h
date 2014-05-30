@@ -8,7 +8,6 @@
 #include <utils/common/long_runnable.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
-#include <utils/common/singleton.h>
 
 #include "module_information.h"
 #include "networkoptixmodulerevealcommon.h"
@@ -25,7 +24,7 @@ class AbstractDatagramSocket;
 
     \note Requests are sent via all available local network interfaces
 */
-class QnMulticastModuleFinder : public QnLongRunnable, public Singleton<QnMulticastModuleFinder> {
+class QnMulticastModuleFinder : public QnLongRunnable {
     Q_OBJECT
 public:
     //!Creates socket and binds it to random unused udp port

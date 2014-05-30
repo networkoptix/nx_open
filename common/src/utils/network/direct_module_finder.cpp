@@ -5,6 +5,9 @@
 #include <QtNetwork/QNetworkReply>
 
 #include <utils/common/model_functions.h>
+#include <rest/server/json_rest_result.h>
+
+#include <version.h>
 
 namespace {
 
@@ -21,12 +24,17 @@ namespace {
 QnDirectModuleFinder::QnDirectModuleFinder(QObject *parent) :
     QObject(parent),
     m_maxConnections(defaultMaxConnections),
+    m_compatibilityMode(false),
     m_networkAccessManager(new QNetworkAccessManager(this)),
     m_manualCheckTimer(new QTimer(this))
 {
     m_manualCheckTimer->setInterval(manualCheckIntervalMs);
     connect(m_manualCheckTimer,     &QTimer::timeout,                   this,   &QnDirectModuleFinder::at_manualCheckTimer_timeout);
     connect(m_networkAccessManager, &QNetworkAccessManager::finished,   this,   &QnDirectModuleFinder::at_reply_finished);
+}
+
+void QnDirectModuleFinder::setCompatibilityMode(bool compatibilityMode) {
+    m_compatibilityMode = compatibilityMode;
 }
 
 void QnDirectModuleFinder::addAddress(const QHostAddress &address, quint16 port) {
@@ -72,6 +80,14 @@ void QnDirectModuleFinder::stop() {
     m_requestQueue.clear();
 }
 
+QList<QnModuleInformation> QnDirectModuleFinder::foundModules() const {
+    return m_foundModules.values();
+}
+
+QnModuleInformation QnDirectModuleFinder::moduleInformation(const QnId &id) const {
+    return m_foundModules[id];
+}
+
 void QnDirectModuleFinder::enqueRequest(const QUrl &url) {
     if (m_activeRequests.contains(url) || m_requestQueue.contains(url))
         return;
@@ -99,35 +115,45 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
     reply->deleteLater();
 
     m_activeRequests.remove(url);
+    activateRequests();
 
     if (reply->error() == QNetworkReply::NoError) {
         QByteArray data = reply->readAll();
-        QnModuleInformation moduleInformation = QJson::deserialized<QnModuleInformation>(data);
-        if (!m_ignoredModules.contains(moduleInformation.id, url)) {
-            auto it = m_foundModules.find(moduleInformation.id);
-            if (it == m_foundModules.end())
-                m_foundModules.insert(moduleInformation.id, moduleInformation);
-            else
-                *it = moduleInformation;
+        QnJsonRestResult result = QJson::deserialized<QnJsonRestResult>(data);
+        QnModuleInformation moduleInformation;
+        QJson::deserialize(result.reply(), &moduleInformation);
 
-            m_lastPingById[moduleInformation.id] = QDateTime::currentMSecsSinceEpoch();
-            emit moduleFound(moduleInformation, url.host());
-        }
+        if (moduleInformation.id.isNull())
+            return;
+
+        if (!m_compatibilityMode && moduleInformation.customization != lit(QN_CUSTOMIZATION_NAME))
+            return;
+
+        if (m_ignoredModules.contains(moduleInformation.id, url))
+            return;
+
+        auto it = m_foundModules.find(moduleInformation.id);
+        if (it == m_foundModules.end())
+            m_foundModules.insert(moduleInformation.id, moduleInformation);
+        else
+            *it = moduleInformation;
+
+        m_lastPingById[moduleInformation.id] = QDateTime::currentMSecsSinceEpoch();
+        emit moduleFound(moduleInformation, url.host());
     } else {
         QnId id = m_moduleByUrl[url];
-        if (!id.isNull()) {
-            if (m_lastPingById[id] + maxPingTimeoutMs < QDateTime::currentMSecsSinceEpoch()) {
-                m_lastPingById.remove(id);
-                QnModuleInformation moduleInformation = m_foundModules.take(id);
-                foreach (const QString &address, moduleInformation.remoteAddresses)
-                    m_moduleByUrl.remove(makeRequestUrl(QHostAddress(address), moduleInformation.port));
+        if (id.isNull())
+            return;
 
-                emit moduleLost(moduleInformation);
-            }
+        if (m_lastPingById[id] + maxPingTimeoutMs < QDateTime::currentMSecsSinceEpoch()) {
+            m_lastPingById.remove(id);
+            QnModuleInformation moduleInformation = m_foundModules.take(id);
+            foreach (const QString &address, moduleInformation.remoteAddresses)
+                m_moduleByUrl.remove(makeRequestUrl(QHostAddress(address), moduleInformation.port));
+
+            emit moduleLost(moduleInformation);
         }
     }
-
-    activateRequests();
 }
 
 void QnDirectModuleFinder::at_manualCheckTimer_timeout() {

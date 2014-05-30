@@ -141,9 +141,7 @@ int	QnFoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) con
     return (int) m_foundModules[parent.row()].ipAddresses.size();
 }
 
-void QnFoundEnterpriseControllersModel::remoteModuleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
-    Q_UNUSED(localInterfaceAddress)
-
+void QnFoundEnterpriseControllersModel::remoteModuleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
     QMutexLocker lk(&m_mutex);
 
     if (moduleInformation.type != nxMediaServerId)

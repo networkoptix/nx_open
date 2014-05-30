@@ -46,7 +46,7 @@ public:
     virtual int	rowCount( const QModelIndex& parent = QModelIndex() ) const;
 
 public slots:
-    void remoteModuleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress);
+    void remoteModuleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress);
     void remoteModuleLost(const QnModuleInformation &moduleInformation);
 
 protected:

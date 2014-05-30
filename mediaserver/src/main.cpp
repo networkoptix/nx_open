@@ -955,9 +955,7 @@ void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
-void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
-    Q_UNUSED(localInterfaceAddress)
-
+void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
     if (moduleInformation.version == qnCommon->engineVersion() && moduleInformation.systemName == qnCommon->localSystemName()) {

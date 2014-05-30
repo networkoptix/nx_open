@@ -11,6 +11,7 @@
 
 struct QnModuleInformation {
     QString type;
+    QString customization;
     QnSoftwareVersion version;
     QnSystemInformation systemInformation;
     QString systemName;
@@ -21,7 +22,7 @@ struct QnModuleInformation {
 
     QnModuleInformation() : isLocal(false) {}
 };
-#define QnModuleInformation_Fields (type)(version)(systemInformation)(systemName)(port)(remoteAddresses)(isLocal)(id)
+#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(port)(remoteAddresses)(isLocal)(id)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (json)(metatype))
 

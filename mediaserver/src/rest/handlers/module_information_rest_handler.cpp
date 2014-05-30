@@ -18,6 +18,7 @@ int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequ
 
     QnModuleInformation moduleInformation;
     moduleInformation.type = lit("Media Server");
+    moduleInformation.customization = lit(QN_CUSTOMIZATION_NAME);
     moduleInformation.version = qnCommon->engineVersion();
     moduleInformation.systemInformation = QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH, QN_ARM_BOX);
     moduleInformation.systemName = qnCommon->localSystemName();

@@ -132,8 +132,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleFound,     this,   &QnLoginDialog::at_moduleFinder_moduleFound);
     connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleLost,      this,   &QnLoginDialog::at_moduleFinder_moduleLost);
 
-    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->revealedModules())
-        at_moduleFinder_moduleFound(moduleInformation, *moduleInformation.remoteAddresses.begin(), QString());
+    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
+        at_moduleFinder_moduleFound(moduleInformation, *moduleInformation.remoteAddresses.begin());
 }
 
 QnLoginDialog::~QnLoginDialog() {}
@@ -660,9 +660,7 @@ void QnLoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
-    Q_UNUSED(localInterfaceAddress)
-
+void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
     //if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
     //    return;
 

@@ -6,7 +6,7 @@
 #include <utils/common/request_param.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/appcast/update_info.h>
-#include <utils/network/module_finder.h>
+#include <utils/network/multicast_module_finder.h>
 #include <utils/math/space_mapper.h>
 
 #include <api/model/storage_space_reply.h>

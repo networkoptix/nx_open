@@ -29,7 +29,7 @@ void QnGlobalModuleFinder::setModuleFinder(QnModuleFinder *moduleFinder) {
     m_moduleFinder = moduleFinder;
 
     if (moduleFinder) {
-        foreach (const QnModuleInformation &moduleInformation, moduleFinder->revealedModules())
+        foreach (const QnModuleInformation &moduleInformation, moduleFinder->foundModules())
             at_moduleFinder_moduleFound(moduleInformation);
 
         connect(moduleFinder,               &QnModuleFinder::moduleFound,   this,   &QnGlobalModuleFinder::at_moduleFinder_moduleFound);
