@@ -1,5 +1,7 @@
 #include "transaction_message_bus.h"
 
+#include <boost/bind.hpp>
+
 #include "remote_ec_connection.h"
 #include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
@@ -12,6 +14,7 @@
 #include "nx_ec/data/api_server_alive_data.h"
 #include "utils/common/synctime.h"
 #include "ec_connection_notification_manager.h"
+#include "utils/common/warnings.h"
 
 namespace ec2
 {
@@ -19,71 +22,91 @@ namespace ec2
 static const int RECONNECT_TIMEOUT = 1000 * 5;
 static const int ALIVE_UPDATE_INTERVAL = 1000 * 60;
 
-#define QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, tranType, method, sender, transportHeader) \
-    { \
-        QnTransaction<tranType> tran(abstractTran); \
-        if (!QnBinary::deserialize(&stream, &tran.params)) return; \
-        method<tranType>(tran, sender, transportHeader); \
-        break; \
-    } 
+struct GotTransactionFuction {
+    typedef void result_type;
 
-#define QN_HANDLE_TRANSACTION(serialized, method, sender, transportHeader) \
-    { \
-        QnAbstractTransaction abstractTran;                                                             \
-        QnInputBinaryStream<QByteArray> stream(serialized);                                             \
-        if (!QnBinary::deserialize(&stream, &abstractTran)) {                                           \
-            qWarning() << Q_FUNC_INFO << "Ignore bad transaction data. size=" << serialized.size();     \
-            sender->setState(QnTransactionTransport::Error);                                            \
-            return;                                                                                     \
-        }                                                                                               \
-        switch (abstractTran.command) {                                                                 \
-        case ApiCommand::getAllDataList:        QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiFullInfoData, method, sender, transportHeader)    \
-        case ApiCommand::setResourceStatus:     QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiSetResourceStatusData, method, sender, transportHeader)    \
-        case ApiCommand::setResourceParams:     QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiResourceParamsData, method, sender, transportHeader)    \
-        case ApiCommand::saveResource:          QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiResourceData, method, sender, transportHeader)    \
-        case ApiCommand::removeResource:        QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiIdData, method, sender, transportHeader)    \
-        case ApiCommand::setPanicMode:          QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiPanicModeData, method, sender, transportHeader)    \
-        case ApiCommand::saveCamera:            QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiCameraData, method, sender, transportHeader)    \
-        case ApiCommand::saveCameras:           QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiCameraDataList, method, sender, transportHeader)    \
-        case ApiCommand::removeCamera:          QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiIdData, method, sender, transportHeader)    \
-        case ApiCommand::addCameraHistoryItem:  QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiCameraServerItemData, method, sender, transportHeader)    \
-        case ApiCommand::saveMediaServer:       QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiMediaServerData, method, sender, transportHeader)    \
-        case ApiCommand::removeMediaServer:     QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiIdData, method, sender, transportHeader)    \
-        case ApiCommand::saveUser:              QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiUserData, method, sender, transportHeader)    \
-        case ApiCommand::removeUser:            QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiIdData, method, sender, transportHeader)    \
-        case ApiCommand::saveBusinessRule:      QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiBusinessRuleData, method, sender, transportHeader)    \
-        case ApiCommand::removeBusinessRule:    QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiIdData, method, sender, transportHeader)    \
-        case ApiCommand::saveLayouts:           QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiLayoutDataList, method, sender, transportHeader)    \
-        case ApiCommand::saveLayout:            QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiLayoutData, method, sender, transportHeader)    \
-        case ApiCommand::removeLayout:          QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiIdData, method, sender, transportHeader)    \
-        case ApiCommand::saveVideowall:         QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiVideowallData, method, sender, transportHeader)    \
-        case ApiCommand::removeVideowall:       QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiIdData, method, sender, transportHeader)    \
-        case ApiCommand::videowallControl:      QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiVideowallControlMessageData, method, sender, transportHeader)    \
-        case ApiCommand::addStoredFile: \
-        case ApiCommand::updateStoredFile:      QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiStoredFileData, method, sender, transportHeader)    \
-        case ApiCommand::removeStoredFile:      QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiStoredFilePath, method, sender, transportHeader)    \
-        case ApiCommand::broadcastBusinessAction: \
-        case ApiCommand::execBusinessAction:    QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiBusinessActionData, method, sender, transportHeader)    \
-        case ApiCommand::saveSettings:          QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiResourceParamDataList, method, sender, transportHeader)    \
-        case ApiCommand::addLicenses:           QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiLicenseDataList, method, sender, transportHeader)    \
-        case ApiCommand::addLicense:            QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiLicenseData, method, sender, transportHeader)    \
-        case ApiCommand::testEmailSettings: { \
-                                                abstractTran.localTransaction = true; \
-                                                QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiEmailSettingsData, method, sender, transportHeader)    \
-                                            } \
-        case ApiCommand::resetBusinessRules:    QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiResetBusinessRuleData, method, sender, transportHeader)    \
-        case ApiCommand::uploadUpdate:          QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiUpdateUploadData, method, sender, transportHeader)    \
-        case ApiCommand::uploadUpdateResponce:  QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiUpdateUploadResponceData, method, sender, transportHeader)    \
-        case ApiCommand::installUpdate:         QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, QString, method, sender, transportHeader)    \
-        case ApiCommand::serverAliveInfo:\
-            break; \
-        case ApiCommand::addCameraBookmarkTags: \
-        case ApiCommand::removeCameraBookmarkTags: QN_HANDLE_TRANSACTION_PARAMS(stream, abstractTran, ApiCameraBookmarkTagDataList, method, sender, transportHeader)    \
-        default: \
-            Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!"); \
-            break;\
-        }\
+    template<class T> 
+    void operator()(QnTransactionMessageBus *bus, const QnTransaction<T> &transaction, QnTransactionTransport *sender, const QnTransactionTransportHeader &transportHeader) const {
+        bus->gotTransaction(transaction, sender, transportHeader);
+    }
+};
+
+struct SendTransactionToTransportFuction {
+    typedef void result_type;
+
+    template<class T> 
+    void operator()(QnTransactionMessageBus *bus, const QnTransaction<T> &transaction, QnTransactionTransport *sender, const QnTransactionTransportHeader &transportHeader) const {
+        bus->sendTransactionToTransport(transaction, sender, transportHeader);
+    }
+};
+
+template<class T, class Function>
+bool handleTransactionParams(QnInputBinaryStream<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction, const Function &function) 
+{
+    QnTransaction<T> transaction(abstractTransaction);
+    if (!QnBinary::deserialize(stream, &transaction.params)) 
+        return false;
+            
+    function(transaction);
+    return true;
 }
+
+template<class Function>
+bool handleTransaction(const QByteArray &serializedTransaction, const Function &function)
+{
+    QnAbstractTransaction transaction;
+    QnInputBinaryStream<QByteArray> stream(serializedTransaction);
+    if (!QnBinary::deserialize(&stream, &transaction)) {
+        qnWarning("Ignore bad transaction data. size=%1.", serializedTransaction.size());
+        return false;
+    }
+
+    switch (transaction.command) {
+    case ApiCommand::getAllDataList:        return handleTransactionParams<ApiFullInfoData>         (&stream, transaction, function);
+    case ApiCommand::setResourceStatus:     return handleTransactionParams<ApiSetResourceStatusData>(&stream, transaction, function);
+    case ApiCommand::setResourceParams:     return handleTransactionParams<ApiResourceParamsData>   (&stream, transaction, function);
+    case ApiCommand::saveResource:          return handleTransactionParams<ApiResourceData>         (&stream, transaction, function);
+    case ApiCommand::removeResource:        return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
+    case ApiCommand::setPanicMode:          return handleTransactionParams<ApiPanicModeData>        (&stream, transaction, function);
+    case ApiCommand::saveCamera:            return handleTransactionParams<ApiCameraData>           (&stream, transaction, function);
+    case ApiCommand::saveCameras:           return handleTransactionParams<ApiCameraDataList>       (&stream, transaction, function);
+    case ApiCommand::removeCamera:          return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
+    case ApiCommand::addCameraHistoryItem:  return handleTransactionParams<ApiCameraServerItemData> (&stream, transaction, function);
+    case ApiCommand::saveMediaServer:       return handleTransactionParams<ApiMediaServerData>      (&stream, transaction, function);
+    case ApiCommand::removeMediaServer:     return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
+    case ApiCommand::saveUser:              return handleTransactionParams<ApiUserData>             (&stream, transaction, function);
+    case ApiCommand::removeUser:            return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
+    case ApiCommand::saveBusinessRule:      return handleTransactionParams<ApiBusinessRuleData>     (&stream, transaction, function);
+    case ApiCommand::removeBusinessRule:    return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
+    case ApiCommand::saveLayouts:           return handleTransactionParams<ApiLayoutDataList>       (&stream, transaction, function);
+    case ApiCommand::saveLayout:            return handleTransactionParams<ApiLayoutData>           (&stream, transaction, function);
+    case ApiCommand::removeLayout:          return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
+    case ApiCommand::saveVideowall:         return handleTransactionParams<ApiVideowallData>        (&stream, transaction, function);
+    case ApiCommand::removeVideowall:       return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
+    case ApiCommand::videowallControl:      return handleTransactionParams<ApiVideowallControlMessageData>(&stream, transaction, function);
+    case ApiCommand::addStoredFile:
+    case ApiCommand::updateStoredFile:      return handleTransactionParams<ApiStoredFileData>       (&stream, transaction, function);
+    case ApiCommand::removeStoredFile:      return handleTransactionParams<ApiStoredFilePath>       (&stream, transaction, function);
+    case ApiCommand::broadcastBusinessAction:
+    case ApiCommand::execBusinessAction:    return handleTransactionParams<ApiBusinessActionData>   (&stream, transaction, function);
+    case ApiCommand::saveSettings:          return handleTransactionParams<ApiResourceParamDataList>(&stream, transaction, function);
+    case ApiCommand::addLicenses:           return handleTransactionParams<ApiLicenseDataList>      (&stream, transaction, function);
+    case ApiCommand::addLicense:            return handleTransactionParams<ApiLicenseData>          (&stream, transaction, function);
+    case ApiCommand::testEmailSettings:     transaction.localTransaction = true;
+                                            return handleTransactionParams<ApiEmailSettingsData>    (&stream, transaction, function);
+    case ApiCommand::resetBusinessRules:    return handleTransactionParams<ApiResetBusinessRuleData>(&stream, transaction, function);
+    case ApiCommand::uploadUpdate:          return handleTransactionParams<ApiUpdateUploadData>     (&stream, transaction, function);
+    case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(&stream, transaction, function);
+    case ApiCommand::installUpdate:         return handleTransactionParams<QString>                 (&stream, transaction, function);
+    case ApiCommand::serverAliveInfo:       return true;
+    case ApiCommand::addCameraBookmarkTags:
+    case ApiCommand::removeCameraBookmarkTags: return handleTransactionParams<ApiCameraBookmarkTagDataList>(&stream, transaction, function);
+    default:
+        Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
+        return false;
+    }
+}
+
 
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
@@ -163,7 +186,8 @@ void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran
     if (!sender || sender->getState() != QnTransactionTransport::ReadyForStreaming)
         return;
 
-    QN_HANDLE_TRANSACTION(serializedTran, gotTransaction, sender, transportHeader);
+    if(!handleTransaction(serializedTran, boost::bind(GotTransactionFuction(), this, _1, sender, transportHeader)))
+        sender->setState(QnTransactionTransport::Error);
 }
 
 
@@ -294,10 +318,9 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         sender->sendTransaction(tran,  QnPeerSet() << sender->remotePeer().id);
 
         QnTransactionTransportHeader transportHeader(QnPeerSet() << sender->remotePeer().id << m_localPeer.id);
-        foreach(const QByteArray& serializedTran, serializedTransactions) {
-
-            QN_HANDLE_TRANSACTION(serializedTran, sendTransactionToTransport, sender, transportHeader);
-        }
+        foreach(const QByteArray& serializedTran, serializedTransactions)
+            if(!handleTransaction(serializedTran, boost::bind(SendTransactionToTransportFuction(), this, _1, sender, transportHeader)))
+                sender->setState(QnTransactionTransport::Error);
         return;
     }
     else {

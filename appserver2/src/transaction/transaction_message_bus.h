@@ -108,6 +108,8 @@ namespace ec2
 
     private:
         friend class QnTransactionTransport;
+        friend struct GotTransactionFuction;
+        friend struct SendTransactionToTransportFuction;
 
         bool isExists(const QnId& removeGuid) const;
         bool isConnecting(const QnId& removeGuid) const;
