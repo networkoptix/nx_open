@@ -257,7 +257,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             }
             else 
             {
-                if (m_localPeer.peerType == QnPeerInfo::Server && tran.persistent && dbManager)
+                if (tran.persistent && dbManager)
                 {
                     QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
                     ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
