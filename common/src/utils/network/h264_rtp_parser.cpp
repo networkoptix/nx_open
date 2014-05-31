@@ -271,7 +271,8 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
 
     m_packetPerNal++;
 
-    int packetType = *curPtr++ & 0x1f;
+    int packetType = *curPtr & 0x1f;
+    int nalRefIDC = *curPtr++ & 0xe0;
 
     switch (packetType)
     {
@@ -310,7 +311,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
                 m_firstSeqNum = sequenceNum;
                 m_packetPerNal = 0;
                 //m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-                nalUnitType += 0x40;
+                nalUnitType |= nalRefIDC;
                 //m_videoBuffer.write( (const char*) &nalUnitType, 1);
             }
             else {
