@@ -406,7 +406,6 @@ void QnLiveStreamProvider::extractCodedPictureResolution( const QnCompressedVide
 {
     switch( videoData->compressionType )
     {
-        case CODEC_ID_MPEG4:
         case CODEC_ID_H264:
             if( videoData->width > 0 && videoData->height > 0 )
                 *newResolution = QSize( videoData->width, videoData->height );
@@ -423,6 +422,8 @@ void QnLiveStreamProvider::extractCodedPictureResolution( const QnCompressedVide
         }
 
         default:
-            Q_ASSERT( false );
+            if( videoData->width > 0 && videoData->height > 0 )
+                *newResolution = QSize( videoData->width, videoData->height );
+            break;
     }
 }
