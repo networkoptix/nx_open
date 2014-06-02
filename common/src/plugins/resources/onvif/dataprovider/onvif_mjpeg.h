@@ -10,14 +10,18 @@
 class MJPEGtreamreader: public CLServerPushStreamReader
 {
 public:
-    MJPEGtreamreader(QnResourcePtr res, const QString& requst);
+    MJPEGtreamreader(QnResourcePtr res, const QString& streamHttpPath);
     virtual ~MJPEGtreamreader();
 
 protected:
-    virtual QnAbstractMediaDataPtr getNextData();
-    virtual CameraDiagnostics::Result openStream();
-    virtual void closeStream() ;
-    virtual bool isStreamOpened() const;
+    //!Implementation of QnAbstractMediaStreamProvider::getNextData
+    virtual QnAbstractMediaDataPtr getNextData() override;
+    //!Implementation of QnAbstractMediaStreamProvider::openStream
+    virtual CameraDiagnostics::Result openStream() override;
+    //!Implementation of QnAbstractMediaStreamProvider::closeStream
+    virtual void closeStream() override;
+    //!Implementation of QnAbstractMediaStreamProvider::isStreamOpened
+    virtual bool isStreamOpened() const override;
 
     void updateStreamParamsBasedOnQuality() override {};
     void updateStreamParamsBasedOnFps() override {};
