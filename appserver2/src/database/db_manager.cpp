@@ -1501,6 +1501,8 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>
             return removeObject(ApiObjectInfo(ApiObject_BusinessRule, tran.params.id));
         case ApiCommand::removeUser:
             return removeObject(ApiObjectInfo(ApiObject_User, tran.params.id));
+        case ApiCommand::removeVideowall:
+            return removeObject(ApiObjectInfo(ApiObject_Videowall, tran.params.id));
         default:
             return removeObject(ApiObjectInfo(ApiObject_Resource, tran.params.id));
     }
@@ -1530,6 +1532,9 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
         break;
     case ApiObject_User:
         result = removeUser(apiObject.id);
+        break;
+    case ApiObject_Videowall:
+        result = removeVideowall(apiObject.id);
         break;
     case ApiObject_Resource:
         result = removeObject(ApiObjectInfo(getObjectType(apiObject.id), apiObject.id));

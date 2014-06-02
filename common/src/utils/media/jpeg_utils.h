@@ -34,6 +34,7 @@ namespace nx_jpg
 
     QString toString( ResultCode resCode );
 
+    //!Event-driven jpg parser. Quite simple due to performance considerations and current use case
     class JpegParser
     {
     public:
