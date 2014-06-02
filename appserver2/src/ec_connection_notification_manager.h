@@ -9,7 +9,7 @@
 #include "nx_ec/ec_api.h"
 
 #include "transaction/transaction.h"
-
+#include <transaction/transaction_log.h>
 
 namespace ec2
 {
@@ -72,6 +72,18 @@ namespace ec2
         void triggerNotification(const QnTransaction<ApiUpdateUploadResponceData>& tran );
         void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran );
 
+        void triggerNotification(const QnTransaction<ApiLockData> &/*tran*/) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+        }
+        void triggerNotification(const QnTransaction<ApiPeerAliveData> &/*tran*/)  {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+        }
+        void triggerNotification(const QnTransaction<QnTranState> &/*tran*/)  {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+        }
+        void triggerNotification(const QnTransaction<int> &/*tran*/) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
+        }
     private:
         ResourceContext m_resCtx;
         AbstractECConnection* m_ecConnection;

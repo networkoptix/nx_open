@@ -100,9 +100,17 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::uploadUpdate:          return handleTransactionParams<ApiUpdateUploadData>     (&stream, transaction, function);
     case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(&stream, transaction, function);
     case ApiCommand::installUpdate:         return handleTransactionParams<QString>                 (&stream, transaction, function);
-    case ApiCommand::serverAliveInfo:       return true;
     case ApiCommand::addCameraBookmarkTags:
     case ApiCommand::removeCameraBookmarkTags: return handleTransactionParams<ApiCameraBookmarkTagDataList>(&stream, transaction, function);
+
+    case ApiCommand::lockRequest:
+    case ApiCommand::lockResponse:
+    case ApiCommand::unlockRequest:         return handleTransactionParams<ApiLockData>             (&stream, transaction, function); 
+    case ApiCommand::clientInstanceId:      return true;    //TODO: #GDM VW save clientInstanceId to corresponding connection
+    case ApiCommand::serverAliveInfo:       return handleTransactionParams<ApiPeerAliveData>        (&stream, transaction, function);
+    case ApiCommand::tranSyncRequest:       return handleTransactionParams<QnTranState>             (&stream, transaction, function);
+    case ApiCommand::tranSyncResponse:      return handleTransactionParams<int>                     (&stream, transaction, function);
+
     default:
         Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
         return false;
@@ -236,9 +244,6 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                 onGotDistributedMutexTransaction(tran);
                 break;
             }
-        case ApiCommand::clientInstanceId:
-            //TODO: #GDM VW save clientInstanceId to corresponding connection
-            return;
         case ApiCommand::tranSyncRequest:
             onGotTransactionSyncRequest(sender, tran);
             return;
