@@ -109,8 +109,6 @@ namespace nx_jpg
         auto parseHandler = [data, size, imgInfo]( int markerType, size_t markerLength, size_t currentOffset ) -> bool
         {
             static const size_t MIN_SOF_SIZE = 5;
-            if( (markerType == 0xD8) || (markerType == 0xD9) )
-                int x = 0;
             if( !(markerType == 0xC0 || markerType == 0xC2) )
                 return true;   //not SOF marker, continue parsing
             if( (markerLength < MARKER_LENGTH_SIZE + MIN_SOF_SIZE) ||       //marker size not enough to read data. marker not recognized?
