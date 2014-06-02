@@ -39,6 +39,7 @@ arm-rpi
 target
 target-isd
 target-isd_s2
+
 build_environment/python/build_packages/*/build
 build_environment/python/packages/llutil/llutil.egg-info
 build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/PKG-INFO
@@ -51,6 +52,8 @@ build_environment/target/buildenv.timestamp
 build_environment/x86
 build_environment/x64
 build_environment/arm
+
+build_environment/maven/filter-resources/current_config
 
 appserver/scripts/ecl/ecproto
 appserver/scripts/ecl/ecl.egg-info
