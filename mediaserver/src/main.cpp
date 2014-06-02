@@ -1423,10 +1423,10 @@ void QnMain::run()
     QnPlIqResourceSearcher iqResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&iqResourceSearcher);
 #endif
-//#ifdef ENABLE_ISD
-//    QnPlISDResourceSearcher isdResourceSearcher;
-//    QnResourceDiscoveryManager::instance()->addDeviceServer(&isdResourceSearcher);
-//#endif
+#ifdef ENABLE_ISD
+    QnPlISDResourceSearcher isdResourceSearcher;
+    QnResourceDiscoveryManager::instance()->addDeviceServer(&isdResourceSearcher);
+#endif
 
 #if defined(Q_OS_WIN) && defined(ENABLE_VMAX)
     QnPlVmax480ResourceSearcher::initStaticInstance( new QnPlVmax480ResourceSearcher() );
