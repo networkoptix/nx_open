@@ -30,9 +30,8 @@ namespace nx_jpg
 
     static bool markerHasBody( int markerType )
     {
-        return !((markerType >= 0xD0 && markerType <= 0xD9)   //RSTn, SOI, EOI
+        return    !((markerType >= 0xD0 && markerType <= 0xD9)   //RSTn, SOI, EOI
                  || (markerType == 0x01)                         //TEM
-                 //|| (markerType == 0xE0)                            //APP0
                  );
     }
 
