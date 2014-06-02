@@ -12,8 +12,6 @@ class QnPtzRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) override;
-    virtual QString description() const;
-
 private:
     int executeContinuousMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);
     int executeAbsoluteMove(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result);

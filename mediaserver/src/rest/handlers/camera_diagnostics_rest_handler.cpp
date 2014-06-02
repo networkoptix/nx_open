@@ -69,23 +69,6 @@ int QnCameraDiagnosticsRestHandler::executeGet(
     return nx_http::StatusCode::ok;
 }
 
-QString QnCameraDiagnosticsRestHandler::description() const
-{
-    QString diagnosticsTypeStrList;
-    for( int i = CameraDiagnostics::Step::none+1; i < CameraDiagnostics::Step::end; ++i )
-    {
-        if( !diagnosticsTypeStrList.isEmpty() )
-            diagnosticsTypeStrList += QLatin1String(", ");
-        diagnosticsTypeStrList += CameraDiagnostics::Step::toString(static_cast<CameraDiagnostics::Step::Value>(i));
-    }
-
-    return lit(
-        "Performs camera diagnostics\
-        <BR>Param <b>%1</b> - Required. ID of camera\
-        <BR>Param <b>%2</b> - Diagnostics to perform (%3)"
-    ).arg(resIDParamName).arg(diagnosticsTypeParamName).arg(diagnosticsTypeStrList);
-}
-
 CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraAvailability( const QnSecurityCamResourcePtr& cameraRes )
 {
     if( !cameraRes->ping() )

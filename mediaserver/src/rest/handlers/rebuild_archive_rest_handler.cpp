@@ -78,11 +78,3 @@ int QnRebuildArchiveRestHandler::executePost(const QString& path, const QnReques
     Q_UNUSED(body)
         return executeGet(path, params, result, contentType);
 }
-
-QString QnRebuildArchiveRestHandler::description() const
-{
-    return 
-        "Start or stop rebuilding of media server archive.\n"
-        "<BR>Param <b>rebuild</b> - 'start' or 'stop' value"
-        "<BR>Return<b>rebuild</b> - return rebuild operation progress if no input param specified";
-}

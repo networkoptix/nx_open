@@ -19,8 +19,3 @@ int QnPingRestHandler::executePost(const QString& path, const QnRequestParamList
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
-
-QString QnPingRestHandler::description() const
-{
-    return "Returns server ping message";
-}

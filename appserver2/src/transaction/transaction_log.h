@@ -19,6 +19,7 @@
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_update_data.h"
+#include "nx_ec/data/api_camera_bookmark_data.h"
 #include "utils/db/db_helper.h"
 
 namespace ec2

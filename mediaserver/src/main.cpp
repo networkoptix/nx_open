@@ -627,7 +627,7 @@ void initAppServerConnection(const QSettings &settings)
     QString host = settings.value("appserverHost").toString();
     if (QUrl(host).scheme() == "file")
         appServerUrl = QUrl(host); // it is a completed URL
-    else if (host.isEmpty())
+    else if (host.isEmpty() || host == "localhost")
         appServerUrl = QUrl(QString("file:///") + closeDirPath(getDataDirectory()));
     else {
         appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));

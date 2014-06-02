@@ -46,7 +46,3 @@ int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParamLi
 
     return CODE_OK;
 }
-
-QString QnUpdateRestHandler::description() const {
-    return "Updates server by the package contained in POST body.";
-}

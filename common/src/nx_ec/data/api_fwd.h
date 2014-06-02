@@ -60,6 +60,12 @@ namespace ec2 {
     struct ApiCameraBookmarkTagData;
     struct ApiLoginData;
 
+    struct ApiHelpValueData;
+    struct ApiHelpParamData;
+    struct ApiHelpFunctionData;
+    struct ApiHelpGroupData;
+    struct ApiHelpGroupDataList;
+
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
     typedef std::vector<ApiCameraServerItemData> ApiCameraServerItemDataList;
@@ -124,6 +130,11 @@ namespace ec2 {
     (ApiUpdateUploadResponceData)\
     (ApiCameraBookmarkTagData)\
     (ApiLoginData)\
+    (ApiHelpValueData)\
+    (ApiHelpParamData)\
+    (ApiHelpFunctionData)\
+    (ApiHelpGroupData)\
+    (ApiHelpGroupDataList)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

@@ -11,6 +11,9 @@
 #include "transaction_log.h"
 #include "api/app_server_connection.h"
 #include <utils/serialization/binary_functions.h>
+#include "nx_ec/data/api_camera_data.h"
+#include "nx_ec/data/api_resource_data.h"
+
 
 namespace ec2
 {

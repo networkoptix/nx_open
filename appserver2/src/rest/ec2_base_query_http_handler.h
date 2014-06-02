@@ -46,16 +46,17 @@ namespace ec2
 
         //!Implementation of QnRestRequestHandler::executeGet
         virtual int executeGet(
-            const QString& /*path*/,
+            const QString& path,
             const QnRequestParamList& params,
             QByteArray& result,
             QByteArray& contentType )
         {
             InputData inputData;
-            parseHttpRequestParams( params, &inputData );
+            QString command = path.split(L'/').last();
+            parseHttpRequestParams( command, params, &inputData);
 
             Qn::SerializationFormat format = Qn::BnsFormat;
-            parseHttpRequestParams( params, &format );
+            parseHttpRequestParams( command, params, &format);
 
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;
@@ -113,13 +114,6 @@ namespace ec2
             return nx_http::StatusCode::badRequest;
         }
 
-        //!Implementation of QnRestRequestHandler::description
-        virtual QString description() const
-        {
-            //TODO/IMPL
-            return QString();
-        }
-
     private:
         ApiCommand::Value m_cmdCode;
         QWaitCondition m_cond;
@@ -153,13 +147,6 @@ namespace ec2
                 m_cmdCode,
                 inputData,
                 handler );
-        }
-
-        //!Implementation of QnRestRequestHandler::description
-        virtual QString description() const
-        {
-            //TODO/IMPL
-            return QString();
         }
 
     private:
