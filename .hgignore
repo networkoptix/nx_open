@@ -33,7 +33,12 @@ Release
 
 x86
 x64
+arm-isd
+arm-isd_s2
+arm-rpi
 target
+target-isd
+target-isd_s2
 build_environment/python/build_packages/*/build
 build_environment/python/packages/llutil/llutil.egg-info
 build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/PKG-INFO
