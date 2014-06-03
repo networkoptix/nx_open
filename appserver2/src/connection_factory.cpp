@@ -183,6 +183,9 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, qint64>( restProcessorPool, ApiCommand::getCurrentTime );
 
 
+        registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getAllDataList );
+        registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>( restProcessorPool, ApiCommand::getLicenses );
+
         //AbstractECConnectionFactory
         registerFunctorHandler<ApiLoginData, QnConnectionInfo>( restProcessorPool, ApiCommand::connect,
             std::bind( &Ec2DirectConnectionFactory::fillConnectionInfo, this, _1, _2 ) );
