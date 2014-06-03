@@ -33,14 +33,13 @@ bool QnJoinSystemTool::isRunning() const {
 
 void QnJoinSystemTool::start(const QUrl &url, const QString &password) {
     m_targetUrl = url;
-    m_targetUrl.setUserName(lit("admin"));
-    m_targetUrl.setPassword(password);
     m_password = password;
 
     m_running = true;
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnJoinSystemTool::at_resource_added);
 
     connection2()->getDiscoveryManager()->discoverPeer(m_targetUrl, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    m_timer->start();
 }
 
 void QnJoinSystemTool::finish(int errorCode) {

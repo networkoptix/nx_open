@@ -56,7 +56,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_joinOtherSystemAction_trigg
     QUrl url = dialog->url();
     QString password = dialog->password();
 
-    if (url.scheme() != lit("http") || url.scheme() != lit("https") || url.host().isEmpty()) {
+    if ((url.scheme() != lit("http") && url.scheme() != lit("https")) || url.host().isEmpty()) {
         QMessageBox::critical(mainWindow(), tr("Error"), tr("You have entered an invalid url."));
         return;
     }

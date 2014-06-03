@@ -1,6 +1,8 @@
 #include "join_other_system_dialog.h"
 #include "ui_join_other_system_dialog.h"
 
+#include <QtCore/QUrl>
+
 QnJoinOtherSystemDialog::QnJoinOtherSystemDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QnJoinOtherSystemDialog)
@@ -11,7 +13,7 @@ QnJoinOtherSystemDialog::QnJoinOtherSystemDialog(QWidget *parent) :
 QnJoinOtherSystemDialog::~QnJoinOtherSystemDialog() {}
 
 QUrl QnJoinOtherSystemDialog::url() const {
-    return QUrl(ui->urlEdit->text());
+    return QUrl::fromUserInput(ui->urlEdit->text());
 }
 
 QString QnJoinOtherSystemDialog::password() const {
