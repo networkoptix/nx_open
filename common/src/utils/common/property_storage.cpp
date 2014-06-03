@@ -371,5 +371,5 @@ QVariant QnPropertyStorage::readValueFromJson(const QJsonObject &json, int id, c
         return defaultValue;
     }
 
-    return jsonValue.toVariant(); 
+    return result; 
 }
