@@ -247,8 +247,8 @@ QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const Q
     }
     */
     
-    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(lit("vista"));
-    //result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(resourceType->getName()); // use name instead of manufacture to instanciate child onvif resource
+    //result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(lit("vista"));
+    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(resourceType->getName()); // use name instead of manufacture to instanciate child onvif resource
     if (!result )
         return result; // not found
 

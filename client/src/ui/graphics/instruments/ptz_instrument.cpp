@@ -190,9 +190,9 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget *widget) {
         overlayWidget->manipulatorWidget()->setVisible(data.hasCapabilities(Qn::ContinuousPanCapability) || data.hasCapabilities(Qn::ContinuousTiltCapability));
         overlayWidget->zoomInButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
         overlayWidget->zoomOutButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
-        //overlayWidget->focusInButton()->setVisible(data.hasCapabilities(Qn::ContinuousFocusCapability));
-        //overlayWidget->focusOutButton()->setVisible(data.hasCapabilities(Qn::ContinuousFocusCapability));
-        //overlayWidget->focusAutoButton()->setVisible(data.traits.contains(Qn::ManualAutoFocusPtzTrait));
+        overlayWidget->focusInButton()->setVisible(data.hasCapabilities(Qn::ContinuousFocusCapability));
+        overlayWidget->focusOutButton()->setVisible(data.hasCapabilities(Qn::ContinuousFocusCapability));
+        overlayWidget->focusAutoButton()->setVisible(data.traits.contains(Qn::ManualAutoFocusPtzTrait));
         
         if (isFisheye) {
             int panoAngle = widget->item()
