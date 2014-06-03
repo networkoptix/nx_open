@@ -22,6 +22,7 @@ namespace StreamingParams
     static const QLatin1String VIDEO_CODEC_PARAM_NAME( "videoCodec" );
     static const QLatin1String AUDIO_CODEC_PARAM_NAME( "audioCodec" );
     static const QLatin1String DURATION_MS_PARAM_NAME( "duration" );
+    static const QLatin1String ALIAS_PARAM_NAME( "alias" );
     static const QLatin1String LIVE_PARAM_NAME( "live" );
     //!Used to differ playlist with reference to other playlists from playlist with chunks
     static const QLatin1String CHUNKED_PARAM_NAME( "chunked" );
