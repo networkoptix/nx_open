@@ -6,8 +6,6 @@
 #include <QtCore/QElapsedTimer>
 
 #include <nx_ec/ec_api.h>
-#include "nx_ec/data/api_camera_data.h"
-#include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/data/api_lock_data.h"
 #include "transaction.h"
 #include "utils/network/http/asynchttpclient.h"

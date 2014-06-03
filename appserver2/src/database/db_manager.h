@@ -4,19 +4,7 @@
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
 #include <nx_ec/data/api_lock_data.h>
-#include "nx_ec/data/api_camera_data.h"
-#include "nx_ec/data/api_resource_type_data.h"
-#include "nx_ec/data/api_stored_file_data.h"
-#include "nx_ec/data/api_user_data.h"
-#include "nx_ec/data/api_layout_data.h"
-#include "nx_ec/data/api_videowall_data.h"
-#include "nx_ec/data/api_license_data.h"
-#include "nx_ec/data/api_business_rule_data.h"
-#include "nx_ec/data/api_full_info_data.h"
-#include "nx_ec/data/api_camera_server_item_data.h"
-#include "nx_ec/data/api_camera_bookmark_data.h"
-#include "nx_ec/data/api_media_server_data.h"
-#include "nx_ec/data/api_update_data.h"
+#include "nx_ec/data/api_fwd.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 
@@ -169,6 +157,9 @@ namespace ec2
 
         //getParams
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
+
+        //getHelp
+        ErrorCode doQueryNoLock(const QString& group, ec2::ApiHelpGroupDataList& data);
 
 		// --------- misc -----------------------------
         bool markLicenseOverflow(bool value, qint64 time);
@@ -334,6 +325,8 @@ namespace ec2
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
         QnId getType(const QString& typeName);
+        bool loadHelpData(const QString& fileName);
+        void fillServerInfo( ApiServerInfoData* const serverInfo );
     private:
         QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;
@@ -346,8 +339,7 @@ namespace ec2
         bool m_licenseOverflowMarked;
         qint64 m_licenseOverflowTime;
         QUuid m_dbInstanceId;
-
-        void fillServerInfo( ApiServerInfoData* const serverInfo );
+        ApiHelpGroupDataList* m_helpData;
     };
 };
 

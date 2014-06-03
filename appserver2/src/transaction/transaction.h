@@ -154,6 +154,9 @@ namespace ec2
             addCameraBookmarkTags = 62,
             getCameraBookmarkTags = 63,
             removeCameraBookmarkTags = 64,
+
+            //ApiHelpGroupDataList
+            getHelp = 65
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

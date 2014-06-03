@@ -11,8 +11,6 @@ public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) override;
 
-    virtual QString description() const override;
-
 private:
     int addCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);
     int updateCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result);

@@ -9,6 +9,7 @@
 #include "transaction.h"
 #include "utils/common/synctime.h"
 #include "utils/common/model_functions.h"
+#include "nx_ec/data/api_camera_bookmark_data.h"
 
 namespace ec2
 {

@@ -14,6 +14,8 @@
 #include "nx_ec/data/api_server_alive_data.h"
 #include "utils/common/synctime.h"
 #include "ec_connection_notification_manager.h"
+#include "nx_ec/data/api_camera_data.h"
+#include "nx_ec/data/api_resource_data.h"
 
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"

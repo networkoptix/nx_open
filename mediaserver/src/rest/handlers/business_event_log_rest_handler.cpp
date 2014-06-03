@@ -91,14 +91,3 @@ int QnBusinessEventLogRestHandler::executePost(const QString& path, const QnRequ
     return executeGet(path, params, result, contentType);
 }
 
-QString QnBusinessEventLogRestHandler::description() const
-{
-    return 
-        "Returns event log"
-        "<BR>Param <b>from</b> - start of time period at ms since 1.1.1970 (UTC format)"
-        "<BR>Param <b>to</b> - end of time period at ms since 1.1.1970 (UTC format). Optional"
-        "<BR>Param <b>format</b> - allowed values: <b>text</b>, <b>protobuf. Optional</b>"
-        "<BR>Param <b>event</b> - event type. Optional</b>"
-        "<BR>Param <b>action</b> - action type. Optional</b>"
-        "<BR>Param <b>brule_id</b> - business rule id. Optional</b>";
-}

@@ -9,7 +9,6 @@
 #include "authenticate_helper.h"
 #include "utils/common/synctime.h"
 
-
 static const int AUTH_TIMEOUT = 60 * 1000;
 static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
 static const int AUTHORIZED_TIMEOUT = 60 * 1000;

@@ -111,6 +111,41 @@ QByteArray compressData(const QByteArray& data)
     return result;
 }
 
+void QnRestConnectionProcessor::createHelpPage()
+{
+    Q_D(QnRestConnectionProcessor);
+
+    d->responseBody.clear();
+    d->responseBody.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
+    d->responseBody.append("<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">\n");
+    d->responseBody.append("<head>\n");
+    d->responseBody.append("<b>Requested method is absent. Allowed methods:</b>\n");
+    d->responseBody.append("</head>\n");
+    d->responseBody.append("<body>\n");
+
+    d->responseBody.append("<TABLE BORDER=\"1\" CELLSPACING=\"0\">\n");
+    for( QnRestProcessorPool::Handlers::const_iterator
+        itr = QnRestProcessorPool::instance()->handlers().begin();
+        itr != QnRestProcessorPool::instance()->handlers().end();
+    ++itr)
+    {
+        QString str = itr.key();
+        //if (str.startsWith(QLatin1String("api/")))
+        {
+            d->responseBody.append("<TR><TD>");
+            d->responseBody.append(str.toLatin1());
+            d->responseBody.append("<TD>");
+            //d->responseBody.append(itr.value()->description());
+            d->responseBody.append("</TD>");
+            d->responseBody.append("</TD></TR>\n");
+        }
+    }
+    d->responseBody.append("</TABLE>\n");
+
+    d->responseBody.append("</body>\n");
+    d->responseBody.append("</html>\n");
+}
+
 void QnRestConnectionProcessor::run()
 {
     Q_D(QnRestConnectionProcessor);
@@ -150,36 +185,8 @@ void QnRestConnectionProcessor::run()
     else {
         qWarning() << "Unknown REST path " << url.path();
         contentType = "text/html";
-        d->responseBody.clear();
-        d->responseBody.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
-        d->responseBody.append("<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">\n");
-        d->responseBody.append("<head>\n");
-        d->responseBody.append("<b>Requested method is absent. Allowed methods:</b>\n");
-        d->responseBody.append("</head>\n");
-        d->responseBody.append("<body>\n");
-
-        d->responseBody.append("<TABLE BORDER=\"1\" CELLSPACING=\"0\">\n");
-        for( QnRestProcessorPool::Handlers::const_iterator
-            itr = QnRestProcessorPool::instance()->handlers().begin();
-            itr != QnRestProcessorPool::instance()->handlers().end();
-            ++itr)
-        {
-            QString str = itr.key();
-            if (str.startsWith(QLatin1String("api/")))
-            {
-                d->responseBody.append("<TR><TD>");
-                d->responseBody.append(str.toLatin1());
-                d->responseBody.append("<TD>");
-                d->responseBody.append(itr.value()->description());
-                d->responseBody.append("</TD>");
-                d->responseBody.append("</TD></TR>\n");
-            }
-        }
-        d->responseBody.append("</TABLE>\n");
-
-        d->responseBody.append("</body>\n");
-        d->responseBody.append("</html>\n");
         rez = CODE_NOT_FOUND;
+        createHelpPage();
     }
     QByteArray contentEncoding;
     if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty()) {
