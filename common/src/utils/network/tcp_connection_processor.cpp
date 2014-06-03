@@ -201,7 +201,7 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     if (displayDebug)
         NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getPeerAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
 
-    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2-------------------\n\n\n").
+    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
         arg(d->socket->getPeerAddress().toString()).
         arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->responseBody.size() : 0)))), cl_logDEBUG1 );
 

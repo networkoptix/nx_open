@@ -325,7 +325,7 @@ namespace nx_hls
         m_writeBuffer.clear();
         response.serialize( &m_writeBuffer );
 
-        NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2-------------------\n\n\n").
+        NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
             arg(remoteHostAddress().toString()).
             arg(QString::fromLatin1(m_writeBuffer)), cl_logDEBUG1 );
 
