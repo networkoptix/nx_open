@@ -42,7 +42,7 @@
                 "ACTI|KCM8111", "*|FW3471-PS-E",
                 "VISTA|VK2-ENCODER"
             ],
-            "ptzRestriction": "EightWayPtz"
+            "ptzTraits": "EightWayPtz"
         },
         {
             "keys": [
@@ -55,7 +55,7 @@
                 "VISTA|*PTW"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
-            "ptzRestriction": "FourWayPtz",
+            "ptzTraits": "FourWayPtz",
             "panFlipped": true
         },
         {
