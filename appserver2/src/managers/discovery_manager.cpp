@@ -24,7 +24,7 @@ void QnDiscoveryManager<QueryProcessorType>::triggerNotification(const QnTransac
 
     // TODO: maybe it's better to move it out and use signal?..
     QnModuleFinder *moduleFinder = QnModuleFinder::instance();
-    if (moduleFinder)
+    if (moduleFinder && moduleFinder->directModuleFinder())
         moduleFinder->directModuleFinder()->checkUrl(QUrl(transaction.params.url));
 
 //    emit peerDiscoveryRequested(QUrl(transaction.params.url));

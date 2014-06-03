@@ -128,7 +128,7 @@ void QnDirectModuleFinder::enqueRequest(const QUrl &url) {
         return;
 
     m_requestQueue.enqueue(url);
-    activateRequests();
+    QTimer::singleShot(0, this, SLOT(activateRequests()));
 }
 
 void QnDirectModuleFinder::activateRequests() {

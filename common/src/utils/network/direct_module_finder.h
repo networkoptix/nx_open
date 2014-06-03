@@ -53,9 +53,10 @@ signals:
 
 private:
     void enqueRequest(const QUrl &url);
-    void activateRequests();
 
 private slots:
+    void activateRequests();
+
     void at_reply_finished(QNetworkReply *reply);
     void at_manualCheckTimer_timeout();
 

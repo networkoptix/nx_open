@@ -6,13 +6,17 @@
 
 QnModuleFinder::QnModuleFinder(bool clientOnly) :
     m_multicastModuleFinder(new QnMulticastModuleFinder(clientOnly)),
-    m_directModuleFinder(new QnDirectModuleFinder(this)),
-    m_directModuleFinderHelper(new QnDirectModuleFinderHelper(this))
+    m_directModuleFinder(0),
+    m_directModuleFinderHelper(0)
 {
     connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleFound,      this,       &QnModuleFinder::at_moduleFound);
     connect(m_multicastModuleFinder,        &QnMulticastModuleFinder::moduleLost,       this,       &QnModuleFinder::at_moduleLost);
-    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleFound,         this,       &QnModuleFinder::at_moduleFound);
-    connect(m_directModuleFinder,           &QnDirectModuleFinder::moduleLost,          this,       &QnModuleFinder::at_moduleLost);
+    if (!clientOnly) {
+        m_directModuleFinder = new QnDirectModuleFinder(this);
+        m_directModuleFinderHelper = new QnDirectModuleFinderHelper(this);
+        connect(m_directModuleFinder,       &QnDirectModuleFinder::moduleFound,         this,       &QnModuleFinder::at_moduleFound);
+        connect(m_directModuleFinder,       &QnDirectModuleFinder::moduleLost,          this,       &QnModuleFinder::at_moduleLost);
+    }
 }
 
 QnModuleFinder::~QnModuleFinder() {
@@ -21,7 +25,8 @@ QnModuleFinder::~QnModuleFinder() {
 
 void QnModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_multicastModuleFinder->setCompatibilityMode(compatibilityMode);
-    m_directModuleFinder->setCompatibilityMode(compatibilityMode);
+    if (m_directModuleFinder)
+        m_directModuleFinder->setCompatibilityMode(compatibilityMode);
 }
 
 QList<QnModuleInformation> QnModuleFinder::foundModules() const {
@@ -42,18 +47,22 @@ QnDirectModuleFinder *QnModuleFinder::directModuleFinder() const {
 
 void QnModuleFinder::start() {
     m_multicastModuleFinder->start();
-    m_directModuleFinder->start();
-    m_directModuleFinderHelper->setDirectModuleFinder(m_directModuleFinder);
+    if (m_directModuleFinder) {
+        m_directModuleFinder->start();
+        m_directModuleFinderHelper->setDirectModuleFinder(m_directModuleFinder);
+    }
 }
 
 void QnModuleFinder::stop() {
     m_multicastModuleFinder->pleaseStop();
-    m_directModuleFinder->stop();
-    m_directModuleFinderHelper->setDirectModuleFinder(NULL);
+    if (m_directModuleFinder) {
+        m_directModuleFinder->stop();
+        m_directModuleFinderHelper->setDirectModuleFinder(NULL);
+    }
 }
 
 void QnModuleFinder::at_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
-    if (sender() == m_multicastModuleFinder)
+    if (sender() == m_multicastModuleFinder && m_directModuleFinder)
         m_directModuleFinder->addIgnoredAddress(QHostAddress(remoteAddress), moduleInformation.port);
 
     auto it = m_foundModules.find(moduleInformation.id);
@@ -73,7 +82,7 @@ void QnModuleFinder::at_moduleFound(const QnModuleInformation &moduleInformation
 void QnModuleFinder::at_moduleLost(const QnModuleInformation &moduleInformation) {
     bool stay = true;
 
-    if (sender() == m_multicastModuleFinder) {
+    if (sender() == m_multicastModuleFinder && m_directModuleFinder) {
         foreach (const QString &address, moduleInformation.remoteAddresses)
             m_directModuleFinder->removeIgnoredAddress(QHostAddress(address), moduleInformation.port);
 
