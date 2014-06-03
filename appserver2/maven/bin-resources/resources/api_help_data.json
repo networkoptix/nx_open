@@ -561,8 +561,385 @@
         },
         {
             "groupName": "ec2",
-            "groupDescription": "This group contains functions related to whole system (all media servers)",
+            "groupDescription": "This group contains functions related to whole system (all media servers).",
             "methods": [
+                {
+                    "name": "getResourceTypes",
+                    "description": "Read all resource types. Resource type contain object type such as 'Server', 'Camera' e.t.c. Also, reosource types contain addition information for cameras such as maximum fps, resolution e.t.c",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getResourceParams",
+                    "description": "Read resource (camera, user or server) addition parameters (camera firmware version e.t.c). List of parameters depends of resource type.",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        },
+                        {
+                            "name": "id",
+                            "description": "Resource guid",
+                            "optional": false,
+                            "values": []
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getMediaServerList",
+                    "description": "Return media server list",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getCameras",
+                    "description": "Read camera list",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        },
+                        {
+                            "name": "id",
+                            "description": "Media server guid",
+                            "optional": true,
+                            "values": []
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getCameraHistoryList",
+                    "description": "Read information about which server hold camera in some time period. This information is used for archive play if camera was moved from one media server to another.",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getCameraBookmarkTags",
+                    "description": "Reserved for future use",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getBusinessRuleList",
+                    "description": "Return business rules",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getUserList",
+                    "description": "Return users registered in the system. User's password contain MD5 hash data with salt",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getVideowallList",
+                    "description": "Return list of video walls",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getLayoutList",
+                    "description": "Return list of user layout",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "listDirectory",
+                    "description": "Return list of folders and files in a virtual FS stored inside database. This function is used to add files (such audio for nitifications) to database.",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        },
+                        {
+                            "name": "folder",
+                            "description": "Folder name in a virtual FS",
+                            "optional": true,
+                            "values": []
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getStoredFile",
+                    "description": "Read file data from a virtual FS",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        },
+                        {
+                            "name": "folder",
+                            "description": "File name",
+                            "optional": true,
+                            "values": []
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getStoredFile",
+                    "description": "Read file data from a virtual FS",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        },
+                        {
+                            "name": "folder",
+                            "description": "File name",
+                            "optional": true,
+                            "values": []
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getSettings",
+                    "description": "Read general system settings such as email address e.t.c",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        },
+                        {
+                            "name": "folder",
+                            "description": "File name",
+                            "optional": true,
+                            "values": []
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getCurrentTime",
+                    "description": "Read current time",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        },
+                        {
+                            "name": "folder",
+                            "description": "File name",
+                            "optional": true,
+                            "values": []
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getAllDataList",
+                    "description": "Read all data such as all media servers, cameras, users e.t.c",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        },
+                        {
+                            "name": "folder",
+                            "description": "File name",
+                            "optional": true,
+                            "values": []
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                },
+                {
+                    "name": "getLicenses",
+                    "description": "Read license list",
+                    "isGetter": true,
+                    "params": [
+                        {
+                            "name": "format",
+                            "description": "Data format. Default value: 'binary'",
+                            "optional": true,
+                            "values": [
+                                { "name": "binary", "description": "binary data format" },
+                                { "name": "json", "description": "json data format" },
+                                { "name": "xml", "description": "xml data format" },
+                                { "name": "csv", "description": "CVS data format. In case of hierarchical data only top level data will be provided" }
+                            ]
+                        },
+                        {
+                            "name": "folder",
+                            "description": "File name",
+                            "optional": true,
+                            "values": []
+                        }
+                    ],
+                    "result": "Return object in requested format"
+                }
             ]
         }
     ]
