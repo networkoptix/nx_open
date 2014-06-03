@@ -19,6 +19,12 @@ public:
      */
     QnResourceData data(const QString &key) const;
 
+
+    // TODO: #VASILENKO #Elric
+    // useWildcard parameter is evil. It implies that we need to know in the code if the corresponding
+    // record in the file contains wildcards. This defies the purpose of
+    // the json file --- that of separating camera data from the code.
+
     /**
      * \param camera                    resource to get data for.
      * \param useWildcard               do general wildcard search. It more slow method but allow to find values with '*' in the middle of a key value
