@@ -8,12 +8,14 @@
 #include "utils/common/synctime.h"
 #include <deque>
 #include "core/dataprovider/live_stream_provider.h"
+#include "utils/media/mediaindex.h"
+
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
 static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
 static const qint64 GET_FRAME_MAX_TIME = 1000000ll * 15;
-static unsigned int MEDIA_CACHE_SIZE_MILLIS = 10000;
+static unsigned int MEDIA_CACHE_SIZE_MILLIS = 10*1000;
 
 // ------------------------------ QnVideoCameraGopKeeper --------------------------------
 

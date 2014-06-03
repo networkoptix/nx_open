@@ -28,4 +28,17 @@ namespace nx_hls
         discontinuity( _discontinuity )
     {
     }
+
+    AbstractPlaylistManager::ChunkData::ChunkData(
+        const QString& _alias,
+        unsigned int _mediaSequence,
+        bool _discontinuity )
+    :
+        alias( _alias ),
+        startTimestamp( 0 ),
+        duration( 0 ),
+        mediaSequence( _mediaSequence ),
+        discontinuity( _discontinuity )
+    {
+    }
 }

@@ -15,10 +15,13 @@
 
 #ifdef _DEBUG
 //#define SAVE_INPUT_STREAM_TO_FILE
+//#define SAVE_OUTPUT_TO_FILE
 #endif
 
 
-static const int RESERVED_TRANSCODED_PACKET_SIZE = 4096;
+static const size_t RESERVED_TRANSCODED_PACKET_SIZE = 4096;
+static const qint64 EMPTY_DATA_SOURCE_REREAD_TIMEOUT_MS = 1000;
+static const size_t USEC_IN_MSEC = 1000;
 
 using namespace std;
 
@@ -26,6 +29,7 @@ StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext()
 :
     chunk( nullptr ),
     dataAvailable( true ),
+    prevReadTryTimestamp( -1 ),
     msTranscoded( 0 ),
     packetsTranscoded( 0 ),
     prevPacketTimestamp( -1 )
@@ -41,6 +45,7 @@ StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext(
     dataSourceCtx( _dataSourceCtx ),
     transcodeParams( _transcodeParams ),
     dataAvailable( true ),
+    prevReadTryTimestamp( -1 ),
     msTranscoded( 0 ),
     packetsTranscoded( 0 ),
     prevPacketTimestamp( -1 )
@@ -50,6 +55,7 @@ StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext(
 StreamingChunkTranscoderThread::StreamingChunkTranscoderThread()
 {
     setObjectName( QLatin1String("StreamingChunkTranscoderThread") );
+    m_monotonicClock.restart();
 }
 
 StreamingChunkTranscoderThread::~StreamingChunkTranscoderThread()
@@ -77,6 +83,11 @@ bool StreamingChunkTranscoderThread::startTranscoding(
         dataSourceCtx,
         transcodeParams );
     m_dataSourceToID.insert( make_pair( dataSourceCtx->mediaDataProvider.get(), transcodingID ) );
+
+#ifdef SAVE_OUTPUT_TO_FILE
+    p.first->second->outputFile.setFileName( lit("c:\\tmp\\%1.ts").arg(transcodingID) );
+    p.first->second->outputFile.open( QIODevice::WriteOnly );
+#endif
 
     connect(
         dataSourceCtx->mediaDataProvider.get(), &AbstractOnDemandDataProvider::dataAvailable,
@@ -111,8 +122,6 @@ void StreamingChunkTranscoderThread::pleaseStop()
     m_cond.wakeAll();
 }
 
-static const int THREAD_STOP_CHECK_TIMEOUT_MS = 1000;
-
 void StreamingChunkTranscoderThread::run()
 {
     NX_LOG( QLatin1String("StreamingChunkTranscoderThread started"), cl_logDEBUG1 );
@@ -126,12 +135,15 @@ void StreamingChunkTranscoderThread::run()
     {
         QMutexLocker lk( &m_mutex );
 
+        const qint64 currentMonotonicTimestamp = m_monotonicClock.elapsed();
         //taking context with data - trying to find context different from previous one
         std::map<int, TranscodeContext*>::iterator transcodeIter = m_transcodeContext.upper_bound( prevReadTranscodingID );
         for( size_t i = 0; i < m_transcodeContext.size(); ++i )
         {
             if( transcodeIter == m_transcodeContext.end() )
                 transcodeIter = m_transcodeContext.begin();
+            if( transcodeIter->second->prevReadTryTimestamp + EMPTY_DATA_SOURCE_REREAD_TIMEOUT_MS < currentMonotonicTimestamp )
+                transcodeIter->second->dataAvailable = true;    //retrying data source
             if( transcodeIter->second->dataAvailable )
                 break;      //TODO/HLS #ak: using dataAvailable looks unreliable, since logic based on AbstractOnDemandDataProvider::dataAvailable is event-triggered
                                 //but AbstractOnDemandDataProvider::tryRead is level-triggered, which is better
@@ -141,7 +153,7 @@ void StreamingChunkTranscoderThread::run()
         if( transcodeIter == m_transcodeContext.end() || !transcodeIter->second->dataAvailable )
         {
             //nothing to do
-            m_cond.wait( lk.mutex(), THREAD_STOP_CHECK_TIMEOUT_MS );
+            m_cond.wait( lk.mutex(), EMPTY_DATA_SOURCE_REREAD_TIMEOUT_MS ); //TODO #ak this timeout is not correct, have to find min timeout to 
             continue;
         }
 
@@ -151,6 +163,7 @@ void StreamingChunkTranscoderThread::run()
         QnAbstractDataPacketPtr srcPacket;
         if( !transcodeIter->second->dataSourceCtx->mediaDataProvider->tryRead( &srcPacket ) )
         {
+            transcodeIter->second->prevReadTryTimestamp = currentMonotonicTimestamp;
             transcodeIter->second->dataAvailable = false;
             continue;
         }
@@ -194,12 +207,23 @@ void StreamingChunkTranscoderThread::run()
 
         //adding data to chunk
         if( resultStream.size() > 0 )
+        {
             transcodeIter->second->chunk->appendData( QByteArray::fromRawData(resultStream.constData(), resultStream.size()) );
+#ifdef SAVE_OUTPUT_TO_FILE
+            transcodeIter->second->outputFile.write( QByteArray::fromRawData(resultStream.constData(), resultStream.size()) );
+#endif
+        }
 
+        //TODO #ak support opened ending (when transcodeParams.endTimestamp() is known only after transcoding is done), 
+            //that required for minimizing hls live delay 
         if( transcodeIter->second->dataSourceCtx->mediaDataProvider->currentPos() >= transcodeIter->second->transcodeParams.endTimestamp() )
+            //|| transcodeIter->second->msTranscoded * USEC_IN_MSEC >= transcodeIter->second->transcodeParams.duration() )
         {
 #ifdef SAVE_INPUT_STREAM_TO_FILE
             m_inputFile.close();
+#endif
+#ifdef SAVE_OUTPUT_TO_FILE
+            transcodeIter->second->outputFile.close();
 #endif
             //neccessary source data has been processed, depleting transcoder buffer
             for( ;; )
