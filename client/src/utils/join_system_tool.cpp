@@ -20,6 +20,7 @@ namespace {
 
 QnJoinSystemTool::QnJoinSystemTool(QObject *parent) :
     QObject(parent),
+    m_running(false),
     m_timer(new QTimer(this))
 {
     m_timer->setInterval(checkTimeout);

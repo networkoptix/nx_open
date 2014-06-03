@@ -2,6 +2,7 @@
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
 #include <utils/network/direct_module_finder.h>
 
 QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QObject *parent) :
@@ -37,7 +38,7 @@ void QnDirectModuleFinderHelper::setDirectModuleFinder(QnDirectModuleFinder *dir
 }
 
 void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(QnResource::server))
+    if (!resource->hasFlags(QnResource::server) || resource->getId() == qnCommon->moduleGUID())
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
@@ -66,7 +67,7 @@ void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource)
 }
 
 void QnDirectModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(QnResource::server))
+    if (!resource->hasFlags(QnResource::server) || resource->getId() == qnCommon->moduleGUID())
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
@@ -112,7 +113,7 @@ void QnDirectModuleFinderHelper::at_resourceChanged(const QnResourcePtr &resourc
 }
 
 void QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(QnResource::server))
+    if (!resource->hasFlags(QnResource::server) || resource->getId() == qnCommon->moduleGUID())
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
@@ -147,7 +148,7 @@ void QnDirectModuleFinderHelper::at_resourceAuxUrlsChanged(const QnResourcePtr &
 }
 
 void QnDirectModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resource) {
-    if (!resource->hasFlags(QnResource::server))
+    if (!resource->hasFlags(QnResource::server) || resource->getId() == qnCommon->moduleGUID())
         return;
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();

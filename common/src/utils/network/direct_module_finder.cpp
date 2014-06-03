@@ -78,7 +78,9 @@ void QnDirectModuleFinder::removeIgnoredModule(const QnId &id, const QHostAddres
 }
 
 void QnDirectModuleFinder::checkUrl(const QUrl &url) {
-    enqueRequest(url);
+    QUrl fixedUrl = url;
+    fixedUrl.setPath(lit("/api/moduleInformation"));
+    enqueRequest(fixedUrl);
 }
 
 void QnDirectModuleFinder::start() {
@@ -135,7 +137,7 @@ void QnDirectModuleFinder::activateRequests() {
     while (m_activeRequests.size() < m_maxConnections && !m_requestQueue.isEmpty()) {
         QUrl url = m_requestQueue.dequeue();
         m_activeRequests.insert(url);
-        m_networkAccessManager->get(QNetworkRequest(url));
+        QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(url));
     }
 }
 
