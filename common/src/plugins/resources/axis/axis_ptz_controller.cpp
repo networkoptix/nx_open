@@ -2,10 +2,15 @@
 
 #include "axis_ptz_controller.h"
 
+#include <common/common_module.h>
+
 #include <utils/math/math.h>
 #include <utils/math/space_mapper.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/common/lexical.h>
+
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource/resource_data.h>
 
 #include "axis_resource.h"
 
@@ -68,6 +73,13 @@ QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource):
     m_capabilities(Qn::NoCapabilities)
 {
     updateState();
+
+    QnResourceData data = qnCommon->dataPool()->data(resource, true);
+    m_maxDeviceSpeed = QVector3D(
+        data.value<qreal>(lit("axisMaxPanSpeed"), 100),
+        data.value<qreal>(lit("axisMaxTiltSpeed"), 100),
+        data.value<qreal>(lit("axisMaxZoomSpeed"), 100)
+    );
 }
 
 QnAxisPtzController::~QnAxisPtzController() {
@@ -291,7 +303,7 @@ Qn::PtzCapabilities QnAxisPtzController::getCapabilities() {
 }
 
 bool QnAxisPtzController::continuousMove(const QVector3D &speed) {
-    return query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * 100).arg(speed.y() * 100).arg(speed.z() * 100));
+    return query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * m_maxDeviceSpeed.x()).arg(speed.y() * m_maxDeviceSpeed.y()).arg(speed.z() * m_maxDeviceSpeed.z()));
 }
 
 bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {

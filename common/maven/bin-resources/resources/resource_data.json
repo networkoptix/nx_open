@@ -74,6 +74,12 @@
         },
         {
             "keys": [
+                "AXISM7016Group2"
+            ],
+            "axisMaxZoomSpeed": 70
+        },
+        {
+            "keys": [
                 "DW|DWC-MPTZ20X"
             ],
             "ptzMapper": {

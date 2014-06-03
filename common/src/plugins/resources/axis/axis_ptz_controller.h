@@ -48,6 +48,7 @@ private:
     Qt::Orientations m_flip;
     QnPtzLimits m_limits;
     QnLinearFunction m_35mmEquivToCameraZoom, m_cameraTo35mmEquivZoom;
+    QVector3D m_maxDeviceSpeed;
 
     mutable QMutex m_mutex;
     QByteArray m_cookie;
