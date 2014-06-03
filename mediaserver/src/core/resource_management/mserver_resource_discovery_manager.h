@@ -8,7 +8,7 @@ class QnMServerResourceDiscoveryManager: public QnResourceDiscoveryManager
 {
     Q_OBJECT
 public:
-    QnMServerResourceDiscoveryManager( const CameraDriverRestrictionList& cameraDriverRestrictionList );
+    QnMServerResourceDiscoveryManager();
     virtual ~QnMServerResourceDiscoveryManager();
 signals:
     void cameraDisconnected(QnResourcePtr camera, qint64 timestamp);

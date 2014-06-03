@@ -988,7 +988,7 @@ void QnMain::run()
 
     CameraDriverRestrictionList cameraDriverRestrictionList;
 
-    QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList));
+    QnResourceDiscoveryManager::init(new QnMServerResourceDiscoveryManager());
     initAppServerConnection(*MSSettings::roSettings());
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
@@ -1175,7 +1175,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->setResourceProcessor(m_processor.get());
 
     //NOTE plugins have higher priority than built-in drivers
-    ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher( &cameraDriverRestrictionList ) );
+    ThirdPartyResourceSearcher::initStaticInstance( new ThirdPartyResourceSearcher() );
     QnResourceDiscoveryManager::instance()->addDeviceServer(ThirdPartyResourceSearcher::instance());
 #ifdef ENABLE_ARECONT
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlArecontResourceSearcher::instance());

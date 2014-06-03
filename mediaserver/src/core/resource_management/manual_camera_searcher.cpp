@@ -4,6 +4,7 @@
 
 #include <QtCore/QFutureWatcher>
 
+#include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_searcher.h>
@@ -14,6 +15,7 @@
 
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/network/ip_range_checker.h>
+
 
 namespace {
     /** Thread limit to scan for online hosts. */
@@ -75,7 +77,16 @@ struct SinglePluginChecker {
     QnManualCameraSearchCameraList mapFunction() const {
         QnManualCameraSearchCameraList results;
         foreach(const QnResourcePtr &resource, plugin->checkHostAddr(url, auth, true))
+        {
+            QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
+            //checking, if found resource is reserved by some other searcher
+            if( camRes &&
+                !CameraDriverRestrictionList::instance()->driverAllowedForCamera( plugin->manufacture(), camRes->getVendor(), camRes->getModel() ) )
+            {
+                continue;   //camera is not allowed to be used with this driver
+            }
             results << fromResource(resource);
+        }
         return results;
     }
 
