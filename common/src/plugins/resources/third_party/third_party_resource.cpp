@@ -378,9 +378,13 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setParam( lit("motionWindowCnt"), 100, QnDomainDatabase );
         setParam( lit("motionMaskWindowCnt"), 100, QnDomainDatabase );
         setParam( lit("motionSensWindowCnt"), 100, QnDomainDatabase );
+        setParam( lit("supportedMotion"), QStringLiteral("softwaregrid,hardwaregrid"), QnDomainDatabase );
     }
     else
+    {
         setMotionType( Qn::MT_SoftwareGrid );
+        setParam( lit("supportedMotion"), QStringLiteral("softwaregrid"), QnDomainDatabase );
+    }
     //if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
     //    setCameraCapability( Qn:: );
     //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
