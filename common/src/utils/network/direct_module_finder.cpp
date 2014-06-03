@@ -77,6 +77,10 @@ void QnDirectModuleFinder::removeIgnoredModule(const QnId &id, const QHostAddres
     m_ignoredModules.remove(id, makeRequestUrl(address, port));
 }
 
+void QnDirectModuleFinder::checkUrl(const QUrl &url) {
+    enqueRequest(url);
+}
+
 void QnDirectModuleFinder::start() {
     foreach (const QUrl &url, m_manualAddresses)
         enqueRequest(url);
@@ -98,6 +102,22 @@ QList<QnModuleInformation> QnDirectModuleFinder::foundModules() const {
 
 QnModuleInformation QnDirectModuleFinder::moduleInformation(const QnId &id) const {
     return m_foundModules[id];
+}
+
+QSet<QUrl> QnDirectModuleFinder::autoAddresses() const {
+    return m_autoAddresses;
+}
+
+QSet<QUrl> QnDirectModuleFinder::ignoredAddresses() const {
+    return m_ignoredAddresses;
+}
+
+QSet<QUrl> QnDirectModuleFinder::manualAddresses() const {
+    return m_manualAddresses;
+}
+
+QMultiHash<QnId, QUrl> QnDirectModuleFinder::ignoredModules() const {
+    return m_ignoredModules;
 }
 
 void QnDirectModuleFinder::enqueRequest(const QUrl &url) {

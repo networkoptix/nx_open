@@ -163,6 +163,13 @@ namespace ec2
                 case moduleInfo:
                     return "moduleInfo";
 
+                case discoverPeer:
+                    return "discoverPeer";
+                case addDiscoveryInformation:
+                    return "addDiscoveryInformation";
+                case removeDiscoveryInformation:
+                    return "removeDiscoveryInformation";
+
                 default:
                     return "unknown " + QString::number((int)val);
             }

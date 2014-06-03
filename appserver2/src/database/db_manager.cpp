@@ -8,6 +8,7 @@
 #include "common/common_module.h"
 #include "managers/impl/license_manager_impl.h"
 #include "nx_ec/data/api_business_rule_data.h"
+#include "nx_ec/data/api_discovery_data.h"
 #include "utils/serialization/binary_stream.h"
 #include "utils/serialization/sql_functions.h"
 #include "business/business_fwd.h"
@@ -421,6 +422,9 @@ bool QnDbManager::createDatabase()
             return false;
 
         if (!execSQLFile(lit(":/07_refactor_firmware.sql")))
+            return false;
+
+        if (!execSQLFile(lit(":/08_discovery.sql")))
             return false;
     }
 
@@ -1081,6 +1085,10 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowall
             return err;
     }
     return ErrorCode::ok;
+}
+
+ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiDiscoveryDataList> &tran) {
+    // TODO: #dklychkov implement it
 }
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiUpdateUploadResponceData>& /*tran*/) {
@@ -1935,6 +1943,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     if ((err = doQueryNoLock(dummy, data.licenses)) != ErrorCode::ok)
         return err;
 
+    if ((err = doQueryNoLock(dummy, data.discoveryData)) != ErrorCode::ok)
+        return err;
+
     std::vector<ApiResourceParamWithRefData> kvPairs;
     QSqlQuery queryParams(m_sdb);
     queryParams.setForwardOnly(true);
@@ -1967,6 +1978,23 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourc
     if (rez == ErrorCode::ok)
         data = params.params;
     return rez;
+}
+
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataList &data) {
+    QSqlQuery query(m_sdb);
+
+    QString q = QString(lit("SELECT server_id as id, url, ignore from vms_mserver_discovery"));
+    query.setForwardOnly(true);
+    query.prepare(q);
+
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return ErrorCode::dbError;
+    }
+
+    QnSql::fetch_many(query, &data);
+
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran)

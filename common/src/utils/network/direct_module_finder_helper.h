@@ -11,6 +11,7 @@
 
 typedef QList<QHostAddress> QnHostAddressList;
 typedef QSet<QHostAddress> QnHostAddressSet;
+typedef QSet<QUrl> QnUrlSet;
 class QnDirectModuleFinder;
 
 class QnDirectModuleFinderHelper : public QObject {
@@ -23,11 +24,13 @@ public:
 private slots:
     void at_resourceAdded(const QnResourcePtr &resource);
     void at_resourceChanged(const QnResourcePtr &resource);
+    void at_resourceAuxUrlsChanged(const QnResourcePtr &resource);
     void at_resourceRemoved(const QnResourcePtr &resource);
 
 private:
     QPointer<QnDirectModuleFinder> m_directModuleFinder;
     QHash<QnId, QnHostAddressSet> m_addressesByServer;
+    QHash<QnId, QnUrlSet> m_manualAddressesByServer;
     QHash<QnId, quint16> m_portByServer;
 };
 

@@ -5,6 +5,7 @@
 #include "api_data.h"
 #include "api_server_info_data.h"
 #include "api_module_data.h"
+#include "api_discovery_data.h"
 
 namespace ec2 
 {
@@ -20,8 +21,9 @@ namespace ec2
         ApiLicenseDataList licenses;
         ApiServerInfoData serverInfo;
         ApiModuleDataList foundModules;
+        ApiDiscoveryDataList discoveryData;
     };
-#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(serverInfo)(foundModules)
+#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(serverInfo)(foundModules)(discoveryData)
 
 } // namespace ec2
 

@@ -157,6 +157,12 @@ namespace ec2
 
             //!ApiModuleData
             moduleInfo = 65,
+            //!ApiDiscoveryDataList
+            discoverPeer = 66,
+            //!ApiDiscoveryDataList
+            addDiscoveryInformation = 67,
+            //!ApiDiscoveryDataList
+            removeDiscoveryInformation = 68,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

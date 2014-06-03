@@ -744,6 +744,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("System Administration")).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
+    factory(Qn::JoinOtherSystem).
+        flags(Qn::Main | Qn::Tree).
+        text(tr("Join the Other System")).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+
     factory(Qn::PreferencesServerTabAction).
         flags(Qn::Tree | Qn::NoTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).

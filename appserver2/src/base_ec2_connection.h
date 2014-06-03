@@ -23,6 +23,7 @@
 #include "managers/videowall_manager.h"
 #include "managers/updates_manager.h"
 #include "managers/misc_manager.h"
+#include "managers/discovery_manager.h"
 
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_videowall_data.h"
@@ -52,6 +53,7 @@ namespace ec2
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
         virtual AbstractMiscManagerPtr getMiscManager() override;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() override;
 
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) override;
@@ -225,6 +227,14 @@ namespace ec2
             m_miscManager->triggerNotification(tran);
         }
 
+        void triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran) {
+            m_discoveryManager->triggerNotification(tran);
+        }
+
+        void triggerNotification(const QnTransaction<ApiDiscoverPeerData> &tran) {
+            m_discoveryManager->triggerNotification(tran);
+        }
+
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
     protected:
         QueryProcessorType* m_queryProcessor;
@@ -240,6 +250,7 @@ namespace ec2
         std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
         std::shared_ptr<QnUpdatesManager<QueryProcessorType>> m_updatesManager;
         std::shared_ptr<QnMiscManager<QueryProcessorType>> m_miscManager;
+        std::shared_ptr<QnDiscoveryManager<QueryProcessorType>> m_discoveryManager;
 
     private:
         QnTransaction<ApiPanicModeData> prepareTransaction( ApiCommand::Value cmd, const Qn::PanicMode& mode);

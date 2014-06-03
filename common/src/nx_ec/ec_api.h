@@ -748,6 +748,34 @@ namespace ec2
     };
     typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
 
+    class AbstractDiscoveryManager : public QObject {
+        Q_OBJECT
+    public:
+        template<class TargetType, class HandlerType> int discoverPeer(const QUrl &url, TargetType *target, HandlerType handler) {
+            return discoverPeer(url, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int addDiscoveryInformation(const QnId &id, const QList<QUrl> &urls, bool ignore, TargetType *target, HandlerType handler) {
+            return addDiscoveryInformation(id, urls, ignore, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int removeDiscoveryInformation(const QnId &id, const QList<QUrl> &urls, bool ignore, TargetType *target, HandlerType handler) {
+            return removeDiscoveryInformation(id, urls, ignore, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+    signals:
+        void peerDiscoveryRequested(const QUrl &url);
+
+    protected:
+        virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
+        virtual int addDiscoveryInformation(const QnId &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) = 0;
+        virtual int removeDiscoveryInformation(const QnId &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) = 0;
+    };
+    typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
+
     class AbstractMiscManager : public QObject {
         Q_OBJECT
     public:
@@ -797,6 +825,7 @@ namespace ec2
         virtual AbstractStoredFileManagerPtr getStoredFileManager() = 0;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() = 0;
         virtual AbstractMiscManagerPtr getMiscManager() = 0;
+        virtual AbstractDiscoveryManagerPtr getDiscoveryManager() = 0;
 
         /*!
             \param handler Functor with params: (ErrorCode)

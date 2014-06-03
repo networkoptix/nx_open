@@ -30,7 +30,8 @@ namespace ec2
         m_videowallManager( new QnVideowallManager<T>(m_queryProcessor, resCtx) ),
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) ),
         m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) ),
-        m_miscManager( new QnMiscManager<T>(m_queryProcessor) )
+        m_miscManager( new QnMiscManager<T>(m_queryProcessor) ),
+        m_discoveryManager( new QnDiscoveryManager<T>(m_queryProcessor) )
     {
         connect(qnTransactionBus,   &QnTransactionMessageBus::peerFound,                this,   &BaseEc2Connection<T>::remotePeerFound,         Qt::DirectConnection);
         connect(qnTransactionBus,   &QnTransactionMessageBus::peerLost,                 this,   &BaseEc2Connection<T>::remotePeerLost,          Qt::DirectConnection);
@@ -100,6 +101,12 @@ namespace ec2
     AbstractMiscManagerPtr BaseEc2Connection<T>::getMiscManager()
     {
         return m_miscManager;
+    }
+
+    template<class T>
+    AbstractDiscoveryManagerPtr BaseEc2Connection<T>::getDiscoveryManager()
+    {
+        return m_discoveryManager;
     }
 
     template<class T>

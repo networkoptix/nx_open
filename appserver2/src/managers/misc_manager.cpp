@@ -1,6 +1,6 @@
 #include "misc_manager.h"
 
-#include <utils/network/global_module_finder.h>
+#include "utils/network/global_module_finder.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 

@@ -31,11 +31,18 @@ public:
     void addIgnoredModule(const QnId &id, const QHostAddress &address, quint16 port);
     void removeIgnoredModule(const QnId &id, const QHostAddress &address, quint16 port);
 
+    void checkUrl(const QUrl &url);
+
     void start();
     void stop();
 
     QList<QnModuleInformation> foundModules() const;
     QnModuleInformation moduleInformation(const QnId &id) const;
+
+    QSet<QUrl> autoAddresses() const;
+    QSet<QUrl> ignoredAddresses() const;
+    QSet<QUrl> manualAddresses() const;
+    QMultiHash<QnId, QUrl> ignoredModules() const;
 
 signals:
     //!Emitted when new enterprise controller has been found

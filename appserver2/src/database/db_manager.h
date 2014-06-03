@@ -159,6 +159,9 @@ namespace ec2
         //getParams
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
 
+        // ApiDiscoveryDataList
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
+
 		// --------- misc -----------------------------
         bool markLicenseOverflow(bool value, qint64 time);
         qint64 licenseOverflowTime() const;
@@ -193,6 +196,7 @@ namespace ec2
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallDataList>& tran);
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiDiscoveryDataList> &tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
@@ -232,6 +236,11 @@ namespace ec2
         }
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiModuleData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiDiscoverPeerData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }

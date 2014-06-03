@@ -669,6 +669,11 @@ namespace Qn {
          */
         ConnectToCurrentSystem,
 
+        /**
+         * Joing the other system to the current system
+         */
+        JoinOtherSystem,
+
         /* PTZ Actions */
 
         /**
