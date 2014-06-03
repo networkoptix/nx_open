@@ -95,7 +95,6 @@ static bool isLocalAddress(const QString& addr)
 QString QnProxyConnectionProcessor::connectToRemoteHost(const QString& guid, const QUrl& url)
 {
     Q_D(QnProxyConnectionProcessor);
-    qWarning() << url.host().toLatin1() << " " << url.port();
     d->dstSocket = (dynamic_cast<QnUniversalTcpListener*> (d->owner))->getProxySocket(guid, CONNECT_TIMEOUT);
     if (!d->dstSocket) {
 
