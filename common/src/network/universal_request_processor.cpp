@@ -57,7 +57,7 @@ bool QnUniversalRequestProcessor::authenticate()
         bool isProxy = dynamic_cast<QnUniversalTcpListener*>(d->owner)->isProxy(url);
         QElapsedTimer t;
         t.restart();
-        while (needAuth && !qnAuthHelper->authenticate(d->request, d->response, isProxy))
+        while (needAuth && !qnAuthHelper->authenticate(d->request, d->response, isProxy) && d->socket->isConnected())
         {
             d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: STATIC_UNAUTHORIZED_HTML;
             sendResponse("HTTP", isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED, "text/html");
@@ -114,7 +114,6 @@ void QnUniversalRequestProcessor::run()
         if (!d->socket)
             break; // processor has token socket ownership
 
-        bool isConnected = d->socket->isConnected();
         if (!isKeepAlive || t.elapsed() >= KEEP_ALIVE_TIMEOUT || !d->socket->isConnected())
             break;
 

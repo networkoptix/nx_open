@@ -23,17 +23,17 @@ struct QnManualCameraSearchStatus {
     };
 
     QnManualCameraSearchStatus(): state(Aborted) {}
-    QnManualCameraSearchStatus(State state, int current, int total):
+    QnManualCameraSearchStatus(State state, quint64 current, quint64 total):
         state(state), current(current), total(total){}
 
     /** Current state of the process. */
     int state;
 
     /** Index of currently processed element. */
-    int current;
+    quint64 current;
 
     /** Number of elements on the current stage. */
-    int total;
+    quint64 total;
 };
 
 #define QnManualCameraSearchStatus_Fields (state)(current)(total)
