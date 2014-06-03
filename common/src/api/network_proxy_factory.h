@@ -18,7 +18,12 @@ public:
 
     void removeFromProxyList(const QUrl& url);
 
-    void addToProxyList(const QUrl& url, const QString& addr, int port);
+    void addToProxyList(
+        const QUrl& targetUrl,
+        const QString& proxyHost,
+        quint16 proxyPort,
+        const QString& userName = QString(),
+        const QString& password = QString() );
 
     void clearProxyList();
 
@@ -28,14 +33,8 @@ protected:
     virtual QList<QNetworkProxy> queryProxy(const QNetworkProxyQuery &query = QNetworkProxyQuery()) override;
 
 private:
-    struct ProxyInfo {
-        ProxyInfo(): port(0) {}
-        ProxyInfo(const QString& _addr, int _port): addr(_addr), port(_port) {}
-        QString addr;
-        int port;
-    };
     QMutex m_mutex;
-    QMap<QString, ProxyInfo> m_proxyInfo;
+    QMap<QString, QNetworkProxy> m_proxyInfo;
 };
 
 #endif
