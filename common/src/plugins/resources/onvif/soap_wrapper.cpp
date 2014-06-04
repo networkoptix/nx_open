@@ -644,6 +644,16 @@ int ImagingSoapWrapper::setImagingSettings(SetImagingSettingsReq& request, SetIm
     return m_soapProxy->SetImagingSettings(m_endpoint, NULL, &request, &response);
 }
 
+int ImagingSoapWrapper::getMoveOptions(ImagingMoveOptionsReq &request, ImagingMoveOptionsResp &response) 
+{
+    return invokeMethod(&ImagingBindingProxy::GetMoveOptions, &request, &response);
+}
+
+int ImagingSoapWrapper::move(ImagingMoveReq &request, ImagingMoveResp &response) 
+{
+    return invokeMethod(&ImagingBindingProxy::Move, &request, &response);
+}
+
 
 // -------------------------------------------------------------------------- //
 // PtzSoapWrapper

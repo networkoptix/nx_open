@@ -165,6 +165,10 @@ class _onvifImg__GetImagingSettings;
 class _onvifImg__GetImagingSettingsResponse;
 class _onvifImg__GetOptions;
 class _onvifImg__GetOptionsResponse;
+class _onvifImg__GetMoveOptions;
+class _onvifImg__GetMoveOptionsResponse;
+class _onvifImg__Move;
+class _onvifImg__MoveResponse;
 class _onvifImg__SetImagingSettings;
 class _onvifImg__SetImagingSettingsResponse;
 
@@ -172,6 +176,10 @@ typedef _onvifImg__GetImagingSettings ImagingSettingsReq;
 typedef _onvifImg__GetImagingSettingsResponse ImagingSettingsResp;
 typedef _onvifImg__GetOptions ImagingOptionsReq;
 typedef _onvifImg__GetOptionsResponse ImagingOptionsResp;
+typedef _onvifImg__GetMoveOptions ImagingMoveOptionsReq;
+typedef _onvifImg__GetMoveOptionsResponse ImagingMoveOptionsResp;
+typedef _onvifImg__Move ImagingMoveReq;
+typedef _onvifImg__MoveResponse ImagingMoveResp;
 typedef _onvifImg__SetImagingSettings SetImagingSettingsReq;
 typedef _onvifImg__SetImagingSettingsResponse SetImagingSettingsResp;
 
@@ -312,9 +320,7 @@ public:
     DeviceIOWrapper(const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive = false );
     virtual ~DeviceIOWrapper();
 
-    int getDigitalInputs(
-        _onvifDeviceIO__GetDigitalInputs& request,
-        _onvifDeviceIO__GetDigitalInputsResponse& response );
+    int getDigitalInputs( _onvifDeviceIO__GetDigitalInputs& request, _onvifDeviceIO__GetDigitalInputsResponse& response );
     int getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response );
     int getRelayOutputOptions( _onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response );
     int setRelayOutputSettings( _onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response );
@@ -325,13 +331,7 @@ public:
 class MediaSoapWrapper: public SoapWrapper<MediaBindingProxy>
 {
 public:
-
-    MediaSoapWrapper(
-        const std::string& endpoint,
-        const QString& login,
-        const QString& passwd,
-        int _timeDrift,
-        bool tcpKeepAlive = false );
+    MediaSoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive = false);
     virtual ~MediaSoapWrapper();
 
     int getAudioEncoderConfigurationOptions(AudioOptionsReq& request, AudioOptionsResp& response);
@@ -405,6 +405,9 @@ public:
     int getOptions(ImagingOptionsReq& request, ImagingOptionsResp& response);
 
     int setImagingSettings(SetImagingSettingsReq& request, SetImagingSettingsResp& response);
+
+    int getMoveOptions(ImagingMoveOptionsReq &request, ImagingMoveOptionsResp &response);
+    int move(ImagingMoveReq &request, ImagingMoveResp &response);
 
 private:
     PasswordHelper& m_passwordsData;
