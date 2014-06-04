@@ -15,8 +15,8 @@ namespace nx_ms_conf
 class MSSettings
 {
 public:
-    static const int DEFAUT_RTSP_PORT = 50000;
-    static const int DEFAULT_STREAMING_PORT = 50000;
+    static const int DEFAUT_RTSP_PORT = 7001;
+    static const int DEFAULT_STREAMING_PORT = 7001;
 
     static QString defaultROSettingsFilePath();
     static void initializeROSettingsFromConfFile( const QString& fileName );
