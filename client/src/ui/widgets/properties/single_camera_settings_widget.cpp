@@ -173,19 +173,18 @@ QnMediaServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() c
     return m_serverConnection;
 }
 
-void QnSingleCameraSettingsWidget::at_sslErrors(QNetworkReply* reply, const QList<QSslError> &)
-{
-    reply->ignoreSslErrors();
-}
-
 void QnSingleCameraSettingsWidget::at_authenticationRequired(QNetworkReply* /*reply*/, QAuthenticator * authenticator)
 {
+    if (!m_camera)
+        return;
     authenticator->setUser(m_camera->getAuth().user());
     authenticator->setPassword(m_camera->getAuth().password());
 }
 
 void QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator)
 {    
+    if (!m_camera)
+        return;
     QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
     authenticator->setUser(lastUsedConnection.url.userName());
     authenticator->setPassword(lastUsedConnection.url.password());
@@ -345,7 +344,7 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
             
 
             connect(advancedWebView->page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
-                    this, &QnSingleCameraSettingsWidget::at_sslErrors );
+                this, [](QNetworkReply* reply, const QList<QSslError> &){reply->ignoreSslErrors();} );
             connect(advancedWebView->page()->networkAccessManager(), &QNetworkAccessManager::authenticationRequired,
                     this, &QnSingleCameraSettingsWidget::at_authenticationRequired, Qt::DirectConnection );
             connect(advancedWebView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
