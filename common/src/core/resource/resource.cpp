@@ -105,9 +105,10 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     m_name = other->m_name;
     m_parentId = other->m_parentId;
 
-    m_status = other->m_status;
-    if (m_status == Offline)
-        m_initialized = false;
+    // TODO: #rvasilenko what does this code here? We have setStatus to do this.
+//    m_status = other->m_status;
+//    if (m_status == Offline)
+//        m_initialized = false;
 }
 
 void QnResource::update(QnResourcePtr other, bool silenceMode)
