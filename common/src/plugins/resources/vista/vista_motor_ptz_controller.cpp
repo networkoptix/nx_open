@@ -19,34 +19,25 @@ namespace {
         }
     }
 
-    QString vistaZoomDirection(qreal speed) {
-        if(qFuzzyIsNull(speed)) {
-            return lit("stop");
-        } else if(speed < 0) {
-            return lit("wide");
-        } else {
-            return lit("tele");
-        }
-    }
-
 } // anonymous namespace
 
 
-QnVistaMotorPtzController::QnVistaMotorPtzController(const QnVistaResourcePtr &resource):
-    base_type(resource),
+QnVistaFocusPtzController::QnVistaFocusPtzController(const QnPtzControllerPtr &baseController):
+    base_type(baseController),
+    m_resource(baseController->resource().dynamicCast<QnVistaResource>()),
     m_capabilities(Qn::NoPtzCapabilities),
-    m_resource(resource)
+    m_isMotor(false)
 {
     assert(m_resource);
 
     init();
 }
 
-QnVistaMotorPtzController::~QnVistaMotorPtzController() {
+QnVistaFocusPtzController::~QnVistaFocusPtzController() {
     return;
 }
 
-void QnVistaMotorPtzController::init() {
+void QnVistaFocusPtzController::init() {
     QnIniSection config;
 
     /* Note that there is no point locking a mutex here as this function is called 
@@ -59,26 +50,27 @@ void QnVistaMotorPtzController::init() {
     QString options;
     if(!config.value(lit("options"), &options))
         return;
-    if(!options.contains(lit("M_PTZ")))
-        return;
 
     if(options.contains(lit("SMART_FOCUS"))) {
         m_capabilities |= Qn::AuxilaryPtzCapability;
         m_traits.push_back(Qn::ManualAutoFocusPtzTrait);
     }
 
-    QString ptzOptions;
-    if(!config.value(lit("m_ptz_option"), &ptzOptions))
-        return;
-
-    // TODO: #Elric support pan & tilt here and get rid of the corresponding records in json data file.
-    if(ptzOptions.contains(lit("ZOOM")))
-        m_capabilities |= Qn::ContinuousZoomCapability;
-    if(ptzOptions.contains(lit("FOCUS")))
+    if(options.contains(lit("BUILTIN_PTZ"))) {
         m_capabilities |= Qn::ContinuousFocusCapability;
+        m_isMotor = false;
+    }
+
+    if(options.contains(lit("M_PTZ"))) {
+        QString ptzOptions = config.value<QString>(lit("m_ptz_option"));
+        if(ptzOptions.contains(lit("FOCUS"))) {
+            m_capabilities |= Qn::ContinuousFocusCapability;
+            m_isMotor = true;
+        }
+    }
 }
 
-void QnVistaMotorPtzController::ensureClientLocked() {
+void QnVistaFocusPtzController::ensureClientLocked() {
     /* Vista cameras treat closed channel as a stop command. This is why
      * we have to keep the http client instance alive between requests. */
 
@@ -93,7 +85,7 @@ void QnVistaMotorPtzController::ensureClientLocked() {
     m_client.reset(new CLSimpleHTTPClient(host, 80, timeout, auth));
 }
 
-bool QnVistaMotorPtzController::queryLocked(const QString &request, QByteArray *body) {
+bool QnVistaFocusPtzController::queryLocked(const QString &request, QByteArray *body) {
     ensureClientLocked();
 
     CLHttpStatus status = m_client->doGET(request.toLatin1());
@@ -113,7 +105,7 @@ bool QnVistaMotorPtzController::queryLocked(const QString &request, QByteArray *
     return true;
 }
 
-bool QnVistaMotorPtzController::queryLocked(const QString &request, QnIniSection *section, QByteArray *body) {
+bool QnVistaFocusPtzController::queryLocked(const QString &request, QnIniSection *section, QByteArray *body) {
     QByteArray localBody;
     if(!queryLocked(request, &localBody))
         return false;
@@ -127,42 +119,40 @@ bool QnVistaMotorPtzController::queryLocked(const QString &request, QnIniSection
     return true;
 }
 
-Qn::PtzCapabilities QnVistaMotorPtzController::getCapabilities() {
-    return m_capabilities;
+Qn::PtzCapabilities QnVistaFocusPtzController::getCapabilities() {
+    return base_type::getCapabilities() | m_capabilities;
 }
 
-bool QnVistaMotorPtzController::continuousMove(const QVector3D &speed) {
-    if(!(m_capabilities & Qn::ContinuousZoomCapability))
-        return false;
-
-    QMutexLocker locker(&m_mutex);
-    return queryLocked(lit("mptz/control.php?zoom=%1").arg(vistaZoomDirection(speed.z())));
-}
-
-bool QnVistaMotorPtzController::continuousFocus(qreal speed) {
+bool QnVistaFocusPtzController::continuousFocus(qreal speed) {
     if(!(m_capabilities & Qn::ContinuousFocusCapability))
-        return false;
+        return base_type::continuousFocus(speed);
 
     QMutexLocker locker(&m_mutex);
-    return queryLocked(lit("mptz/control.php?focus=%1").arg(vistaFocusDirection(speed)));
+    if(m_isMotor) {
+        return queryLocked(lit("mptz/control.php?focus=%1").arg(vistaFocusDirection(speed)));
+    } else {
+        return queryLocked(lit("ptz/control.php?ch=1&focus=%1").arg(vistaFocusDirection(speed)));
+    }
+
 }
 
-bool QnVistaMotorPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) {
+bool QnVistaFocusPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) {
     if(!(m_capabilities & Qn::AuxilaryPtzCapability))
-        return false;
+        return base_type::getAuxilaryTraits(auxilaryTraits);
 
-    *auxilaryTraits = m_traits;
+    base_type::getAuxilaryTraits(auxilaryTraits);
+    auxilaryTraits->append(m_traits);
     return true;
 }
 
-bool QnVistaMotorPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &) {
+bool QnVistaFocusPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data) {
     if(!(m_capabilities & Qn::AuxilaryPtzCapability))
-        return false;
+        return base_type::runAuxilaryCommand(trait, data);
 
     if(trait.standardTrait() == Qn::ManualAutoFocusPtzTrait) {
         QMutexLocker locker(&m_mutex);
         return queryLocked(lit("live/live_control.php?smart_focus=1"));
     } else {
-        return false;
+        return base_type::runAuxilaryCommand(trait, data);
     }
 }
