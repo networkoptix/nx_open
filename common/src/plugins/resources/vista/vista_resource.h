@@ -3,22 +3,22 @@
 
 #ifdef ENABLE_ONVIF
 
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/camera_resource.h"
-#include "../onvif/onvif_resource.h"
+#include <plugins/resources/onvif/onvif_resource.h>
 
-class QnVistaResource : public QnPlOnvifResource
-{
+class QnVistaResource : public QnPlOnvifResource {
     Q_OBJECT
-
     typedef QnPlOnvifResource base_type;
 
 public:
     QnVistaResource();
-    ~QnVistaResource();
+    virtual ~QnVistaResource();
 
-    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
+    virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const override;
+
+protected:
+    virtual QnAbstractPtzController *createPtzControllerInternal() override;
 };
+
 #endif //ENABLE_ONVIF
 
 #endif //vista_resource_h_1854

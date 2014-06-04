@@ -411,7 +411,6 @@ class PtzSoapWrapper: public SoapWrapper<PTZBindingProxy>
     PasswordHelper& passwordsData;
 
 public:
-
     PtzSoapWrapper(const std::string& endpoint,
         const QString &login,
         const QString &passwd,
@@ -427,6 +426,7 @@ public:
     int doContinuousMove(_onvifPtz__ContinuousMove& request, _onvifPtz__ContinuousMoveResponse& response);
     int doGetStatus(_onvifPtz__GetStatus& request, _onvifPtz__GetStatusResponse& response);
     int doStop(_onvifPtz__Stop& request, _onvifPtz__StopResponse& response);
+
 private:
     PtzSoapWrapper();
     PtzSoapWrapper(const PtzSoapWrapper&);

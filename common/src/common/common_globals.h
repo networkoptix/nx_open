@@ -28,7 +28,7 @@ namespace Qn
 #ifdef Q_MOC_RUN
     Q_GADGET
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent ToggleState SystemComponent ItemDataRole PtzRestriction)
-    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes)
+    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes PtzTraits)
 public:
 #else
     Q_NAMESPACE
@@ -82,6 +82,7 @@ public:
 
     enum PtzCommand {
         ContinuousMovePtzCommand,
+        ContinuousFocusPtzCommand,
         AbsoluteDeviceMovePtzCommand,
         AbsoluteLogicalMovePtzCommand,
         ViewportMovePtzCommand,
@@ -107,6 +108,9 @@ public:
         UpdateHomeObjectPtzCommand,
         GetHomeObjectPtzCommand,
 
+        GetAuxilaryTraitsPtzCommand,
+        RunAuxilaryCommandPtzCommand,
+
         GetDataPtzCommand,
 
         InvalidPtzCommand = -1
@@ -123,6 +127,7 @@ public:
         ToursPtzField           = 0x080,
         ActiveObjectPtzField    = 0x100,
         HomeObjectPtzField      = 0x200,
+        AuxilaryTraitsPtzField  = 0x400,
         NoPtzFields             = 0x000,
         AllPtzFields            = 0xFFF
     };
@@ -147,6 +152,7 @@ public:
         ContinuousPanCapability             = 0x00000001,
         ContinuousTiltCapability            = 0x00000002,
         ContinuousZoomCapability            = 0x00000004,
+        ContinuousFocusCapability           = 0x00000008,
 
         AbsolutePanCapability               = 0x00000010,
         AbsoluteTiltCapability              = 0x00000020,
@@ -169,6 +175,8 @@ public:
         SynchronizedPtzCapability           = 0x00200000,
         VirtualPtzCapability                = 0x00400000,
 
+        AuxilaryPtzCapability               = 0x01000000,
+
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
@@ -178,11 +186,14 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
 
 
-    enum PtzRestriction {
-        UnrestrictedPtz = 0,
-        EightWayPtz = 1,
-        FourWayPtz = 2,
+    enum PtzTrait {
+        NoPtzTraits             = 0x00,
+        FourWayPtzTrait         = 0x01,
+        EightWayPtzTrait        = 0x02,
+        ManualAutoFocusPtzTrait = 0x04,
     };
+    Q_DECLARE_FLAGS(PtzTraits, PtzTrait);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzTraits);
 
 
     enum StreamFpsSharingMethod {
@@ -347,7 +358,6 @@ public:
     static const qint64 InvalidUtcOffset = INT64_MAX;
 #define InvalidUtcOffset InvalidUtcOffset
 
-
     /** 
      * Helper function that can be used to 'place' macros into Qn namespace. 
      */
@@ -355,6 +365,8 @@ public:
     const T &_id(const T &value) { return value; }
 
 } // namespace Qn
+
+
 /** 
  * \def lit
  * Helper macro to mark strings that are not to be translated. 
@@ -368,6 +380,6 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #endif
 
 QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
-QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities)(Qn::PtzRestriction), (metatype)(lexical)(json))
+QN_DECLARE_FUNCTIONS_FOR_TYPES((Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities)(Qn::PtzTrait), (metatype)(lexical)(json))
 
 #endif // QN_COMMON_GLOBALS_H

@@ -33,6 +33,7 @@ namespace {
         ((TimePeriodsObject,        "RecordedTimePeriods"))
         ((StatisticsObject,         "statistics"))
         ((PtzContinuousMoveObject,  "ptz"))
+        ((PtzContinuousFocusObject, "ptz"))
         ((PtzAbsoluteMoveObject,    "ptz"))
         ((PtzViewportMoveObject,    "ptz"))
         ((PtzGetPositionObject,     "ptz"))
@@ -48,6 +49,8 @@ namespace {
         ((PtzGetHomeObjectObject,   "ptz"))
         ((PtzGetActiveObjectObject, "ptz"))
         ((PtzUpdateHomeObjectObject, "ptz"))
+        ((PtzGetAuxilaryTraitsObject, "ptz"))
+        ((PtzRunAuxilaryCommandObject, "ptz"))
         ((PtzGetDataObject,         "ptz"))
         ((GetParamsObject,          "getCameraParam"))
         ((SetParamsObject,          "setCameraParam"))
@@ -324,6 +327,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, handle);
         break;
     case PtzContinuousMoveObject:
+    case PtzContinuousFocusObject:
     case PtzAbsoluteMoveObject:
     case PtzViewportMoveObject:
     case PtzCreatePresetObject:
@@ -334,6 +338,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case PtzRemoveTourObject:
     case PtzActivateTourObject:
     case PtzUpdateHomeObjectObject:
+    case PtzRunAuxilaryCommandObject:
         emitFinished(this, response.status, handle);
         break;
     case PtzGetPositionObject:
@@ -349,9 +354,15 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case PtzGetHomeObjectObject:
         processJsonReply<QnPtzObject>(this, response, handle);
         break;
+
+    case PtzGetAuxilaryTraitsObject:
+        processJsonReply<QnPtzAuxilaryTraitList>(this, response, handle);
+        break;
+
     case PtzGetDataObject:
         processJsonReply<QnPtzData>(this, response, handle);
         break;
+
     case CameraSearchStartObject:
     case CameraSearchStatusObject:
     case CameraSearchStopObject:
@@ -547,6 +558,15 @@ int QnMediaServerConnection::ptzContinuousMoveAsync(const QnNetworkResourcePtr &
     return sendAsyncGetRequest(PtzContinuousMoveObject, params, NULL, target, slot);
 }
 
+int QnMediaServerConnection::ptzContinuousFocusAsync(const QnNetworkResourcePtr &camera, qreal speed, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("command",         QnLexical::serialized(Qn::ContinuousFocusPtzCommand));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("speed",           QnLexical::serialized(speed));
+
+    return sendAsyncGetRequest(PtzContinuousFocusObject, params, NULL, target, slot);
+}
+
 int QnMediaServerConnection::ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("command",         QnLexical::serialized(space == Qn::DevicePtzCoordinateSpace ? Qn::AbsoluteDeviceMovePtzCommand : Qn::AbsoluteLogicalMovePtzCommand));
@@ -693,6 +713,24 @@ int QnMediaServerConnection::ptzGetHomeObjectAsync(const QnNetworkResourcePtr &c
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
 
     return sendAsyncGetRequest(PtzGetHomeObjectObject, params, QN_STRINGIZE_TYPE(QnPtzObject), target, slot);
+}
+
+int QnMediaServerConnection::ptzGetAuxilaryTraitsAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("command",         QnLexical::serialized(Qn::GetAuxilaryTraitsPtzCommand));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+
+    return sendAsyncGetRequest(PtzGetAuxilaryTraitsObject, params, QN_STRINGIZE_TYPE(QnPtzAuxilaryTraitList), target, slot);
+}
+
+int QnMediaServerConnection::ptzRunAuxilaryCommandAsync(const QnNetworkResourcePtr &camera, const QnPtzAuxilaryTrait &trait, const QString &data, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("command",         QnLexical::serialized(Qn::RunAuxilaryCommandPtzCommand));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("trait",           QnLexical::serialized(trait));
+    params << QnRequestParam("data",            QnLexical::serialized(data));
+
+    return sendAsyncGetRequest(PtzRunAuxilaryCommandObject, params, NULL, target, slot);
 }
 
 int QnMediaServerConnection::ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields query, QObject *target, const char *slot) {
