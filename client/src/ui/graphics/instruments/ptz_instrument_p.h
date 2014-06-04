@@ -233,6 +233,8 @@ public:
         m_modeButton = new PtzImageButtonWidget(this);
         m_modeButton->setToolTip(tr("Change Dewarping Mode"));
 
+        connect(m_focusAutoButton, &QGraphicsObject::visibleChanged, this, &PtzOverlayWidget::updateLayout);
+
         updateLayout();
         showCursor();
 
@@ -366,9 +368,14 @@ private:
         m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
         m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * size));
         
-        m_focusInButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 2.25, 1.5 * size));
-        m_focusAutoButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 0.75, 1.5 * size));
-        m_focusOutButton->setGeometry(QRectF(right - xStep * 2.5 + yStep * 0.75, 1.5 * size));
+        if(m_focusAutoButton->isVisible()) {
+            m_focusInButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 2.25, 1.5 * size));
+            m_focusAutoButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 0.75, 1.5 * size));
+            m_focusOutButton->setGeometry(QRectF(right - xStep * 2.5 + yStep * 0.75, 1.5 * size));
+        } else {
+            m_focusInButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 1.5, 1.5 * size));
+            m_focusOutButton->setGeometry(QRectF(right - xStep * 2.5 + yStep * 0.0, 1.5 * size));
+        }
     }
 
 private:
