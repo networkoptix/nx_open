@@ -3,6 +3,8 @@
 
 #include <QtCore/QMetaType>
 
+#include <utils/common/model_functions.h>
+
 namespace Qn {
 
     /** 
@@ -250,9 +252,10 @@ namespace Qn {
 
 } // namespace Qn
 
-Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(Qn::ItemRole)
 Q_DECLARE_METATYPE(Qn::TimeMode)
 Q_DECLARE_METATYPE(Qn::ClientSkin)
+
+QN_DECLARE_FUNCTIONS(Qn::ClientSkin, (json))
 
 #endif // QN_CLIENT_GLOBALS_H

@@ -32,7 +32,7 @@
                 "AXIS|AXISP3344", "AXIS|AXISP1344",
                 "*|IPC-HDB3200C", "*|N53F-F",
                 "IPC|LR01", "hs0130|LR01", "H18A2|IPCAM_M1", "H18A3|IPCAM_M1", "H18A4|RL01", "H18A5|IPCAM_M1", "HI9712_51ÊÒÍâ|LR01",
-                "VISTA|*VRD"
+                "VISTA|*VRD", "VISTA|VK2-2MPBX(DN)"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -42,7 +42,7 @@
                 "ACTI|KCM8111", "*|FW3471-PS-E",
                 "VISTA|VK2-ENCODER"
             ],
-            "ptzRestriction": "EightWayPtz"
+            "ptzTraits": "EightWayPtz"
         },
         {
             "keys": [
@@ -55,7 +55,7 @@
                 "VISTA|*PTW"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
-            "ptzRestriction": "FourWayPtz",
+            "ptzTraits": "FourWayPtz",
             "panFlipped": true
         },
         {

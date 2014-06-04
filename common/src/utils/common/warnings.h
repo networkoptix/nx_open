@@ -10,6 +10,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 #include <QtCore/QVariant>
+#include <QtCore/QJsonValue>
 #include <QtCore/QUrl>
 #include <QtCore/QUuid>
 
@@ -115,6 +116,10 @@ namespace detail {
         }
 
         inline QString operator<<(const QString &s, const QVariant &arg) {
+            return debug_operator_lshift(s, arg);
+        }
+
+        inline QString operator<<(const QString &s, const QJsonValue &arg) {
             return debug_operator_lshift(s, arg);
         }
 
