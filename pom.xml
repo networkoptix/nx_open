@@ -195,7 +195,7 @@
             <activation>        
                 <file>
                     <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
-                    <missing>build_environment/target/buildenv1.timestamp</missing>
+                    <missing>build_environment/target/buildenv20130604.timestamp</missing>
                 </file> 
             </activation>
             <modules>	
