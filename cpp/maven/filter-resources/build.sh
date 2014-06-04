@@ -25,4 +25,4 @@ case `uname -s` in
         ;;
 esac
 
-make --no-p QUIET=yes -f Makefile.$CONFIG -j $[NPROCESSORS+1] || exit 1
+make --no-p QUIET=yes -f Makefile.$CONFIG -j $[NPROCESSORS+1] ext_debug || exit 1
