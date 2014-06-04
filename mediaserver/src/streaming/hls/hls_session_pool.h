@@ -45,12 +45,18 @@ namespace nx_hls
         void setPlaylistManager( MediaQuality streamQuality, const QSharedPointer<AbstractPlaylistManager>& value );
         const QSharedPointer<AbstractPlaylistManager>& playlistManager( MediaQuality streamQuality ) const;
 
+        void saveChunkAlias( MediaQuality streamQuality, const QString& alias, quint64 startTimestamp, quint64 duration );
+        bool getChunkByAlias( MediaQuality streamQuality, const QString& alias, quint64* const startTimestamp, quint64* const duration ) const;
+
     private:
         QString m_id;
         bool m_live;
         MediaQuality m_streamQuality;
         QnVideoCamera* const m_videoCamera;
         std::vector<QSharedPointer<AbstractPlaylistManager> > m_playlistManagers;
+        //!map<pair<quality, alias>, pair<start timestamp, duration> >
+        std::map<std::pair<MediaQuality, QString>, std::pair<quint64, quint64> > m_chunksByAlias;
+        mutable QMutex m_mutex;
     };
 
     /*!

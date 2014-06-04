@@ -103,7 +103,6 @@ bool StreamingChunkTranscoder::transcodeAsync(
     //if region is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE: scheduling task
 
     const int newTranscodingID = m_transcodeIDSeq.fetchAndAddAcquire(1);
-    Q_ASSERT( transcodeParams.startTimestamp() <= transcodeParams.endTimestamp() );
 
     chunk->openForModification();
 
@@ -134,15 +133,12 @@ bool StreamingChunkTranscoder::transcodeAsync(
             const quint64 actualStartTimestamp = std::max<>( cacheStartTimestamp, transcodeParams.startTimestamp() );
             mediaDataProvider = AbstractOnDemandDataProviderPtr( new LiveMediaCacheReader( camera->liveCache(transcodeParams.streamQuality()), actualStartTimestamp ) );
 
-            if( transcodeParams.startTimestamp() < cacheEndTimestamp &&
-                transcodeParams.endTimestamp() > cacheStartTimestamp )
+            if( (transcodeParams.startTimestamp() < cacheEndTimestamp &&     //requested data is in live cache (at least, partially)
+                 transcodeParams.endTimestamp() > cacheStartTimestamp) ||
+                (transcodeParams.startTimestamp() > cacheEndTimestamp &&     //chunk is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS
+                 transcodeParams.startTimestamp() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS) ||
+                !transcodeParams.alias().isEmpty() )    //have alias, startTimestamp may be invalid
             {
-                //requested data is in live cache (at least, partially)
-            }
-            else if( transcodeParams.startTimestamp() > cacheEndTimestamp &&
-                     transcodeParams.startTimestamp() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS )
-            {
-                //chunk is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS
             }
             else
             {
@@ -198,10 +194,14 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
     if( transcodeParams.live() )
     {
+        NX_LOG( lit("Starting transcoding startTimestamp %1, duration %2").arg(transcodeParams.startTimestamp()).arg(transcodeParams.duration()), cl_logDEBUG1 );
+
         const quint64 cacheEndTimestamp = camera->liveCache(transcodeParams.streamQuality())->currentTimestamp();
-        if( transcodeParams.startTimestamp() > cacheEndTimestamp &&
+        if( transcodeParams.alias().isEmpty() &&
+            transcodeParams.startTimestamp() > cacheEndTimestamp &&
             transcodeParams.startTimestamp() - cacheEndTimestamp < MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS )
         {
+            //chunk is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS, scheduling transcoding on data availability
             pair<map<int, TranscodeContext>::iterator, bool> p = m_scheduledTranscodings.insert( make_pair( newTranscodingID, TranscodeContext() ) );
             Q_ASSERT( p.second );
 
@@ -210,7 +210,6 @@ bool StreamingChunkTranscoder::transcodeAsync(
             p.first->second.transcodeParams = transcodeParams;
             p.first->second.chunk = chunk;
 
-            //chunk is in future not futher, than MAX_CHUNK_TIMESTAMP_ADVANCE_MICROS
             if( scheduleTranscoding(
                     newTranscodingID,
                     (transcodeParams.startTimestamp() - cacheEndTimestamp) / USEC_IN_MSEC + 1 ) )

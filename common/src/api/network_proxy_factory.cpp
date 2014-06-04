@@ -3,32 +3,38 @@
 // -------------------------------------------------------------------------- //
 // QnNetworkProxyFactory
 // -------------------------------------------------------------------------- //
-/**
- * Note that instance of this class will be used from several threads, and
- * must therefore be thread-safe.
- */
+static QnNetworkProxyFactory* QnNetworkProxyFactory_instance = nullptr;
+
 QnNetworkProxyFactory::QnNetworkProxyFactory()
 {
+    Q_ASSERT( QnNetworkProxyFactory_instance == nullptr );
+    QnNetworkProxyFactory_instance = this;
 }
 
 QnNetworkProxyFactory::~QnNetworkProxyFactory()
 {
+    QnNetworkProxyFactory_instance = nullptr;
 }
 
 void QnNetworkProxyFactory::removeFromProxyList(const QUrl& url)
 {
     QMutexLocker locker(&m_mutex);
-    QString host = url.host();//QString(QLatin1String("%1:%2")).arg(url.host()).arg(url.port());
 
-    m_proxyInfo.remove(host);
+    m_proxyInfo.remove(url.host());
 }
 
-void QnNetworkProxyFactory::addToProxyList(const QUrl& url, const QString& addr, int port)
+void QnNetworkProxyFactory::addToProxyList(
+    const QUrl& targetUrl,
+    const QString& proxyHost,
+    quint16 proxyPort,
+    const QString& userName,
+    const QString& password )
 {
     QMutexLocker locker(&m_mutex);
-    QString host = url.host();//QString(QLatin1String("%1:%2")).arg(url.host()).arg(url.port());
 
-    m_proxyInfo.insert(host, ProxyInfo(addr, port));
+    m_proxyInfo.insert(
+        targetUrl.host(),
+        QNetworkProxy(QNetworkProxy::HttpProxy, proxyHost, proxyPort, userName, password) );
 }
 
 void QnNetworkProxyFactory::clearProxyList()
@@ -40,9 +46,6 @@ void QnNetworkProxyFactory::clearProxyList()
 
 QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery &query)
 {
-    QList<QNetworkProxy> rez;
-    QString host_name = query.url().host();
-
     QString urlPath = query.url().path();    
     
     if (urlPath.startsWith(QLatin1String("/")))
@@ -51,52 +54,18 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
     if (urlPath.endsWith(QLatin1String("/")))
         urlPath.chop(1);
 
-    if (/*urlPath.isEmpty() || */urlPath == QLatin1String("api/ping")) {
-        rez << QNetworkProxy(QNetworkProxy::NoProxy);
-        return rez;
-    }
-    QUrl url = query.url();
-    QString url_host = url.host();
-
-    url.setPath(QString());
-    url.setUserInfo(QString());
-    url.setQuery(QUrlQuery());
+    if ( urlPath == QLatin1String("api/ping") )
+        return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
 
     QMutexLocker locker(&m_mutex);
 
-    QMap<QString, ProxyInfo>::const_iterator itr;
-    itr = m_proxyInfo.find(url_host);
-    if (itr == m_proxyInfo.end())
-    {
-        rez << QNetworkProxy(QNetworkProxy::NoProxy);
-    }
-    else
-    {
-        rez << QNetworkProxy(QNetworkProxy::HttpProxy, itr.value().addr, itr.value().port);
-    }
-    return rez;
+    QMap<QString, QNetworkProxy>::const_iterator itr = m_proxyInfo.find(query.url().host());
+    if( itr == m_proxyInfo.end() )
+        return QList<QNetworkProxy>()<<QNetworkProxy(QNetworkProxy::NoProxy);
+    return QList<QNetworkProxy>() << itr.value();
 }
-
-QPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
-    QnNetworkProxyFactory *result(new QnNetworkProxyFactory());
-
-    /* Qt will take ownership of the supplied instance. */
-    QNetworkProxyFactory::setApplicationProxyFactory(result); // TODO: #Elric we have a race if this code is run several times from different threads.
-
-    return result;
-}
-
-
-Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
-//QPointer<QnNetworkProxyFactory> createGlobalProxyFactory();
-Q_GLOBAL_STATIC_WITH_ARGS(QPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, (createGlobalProxyFactory()));
 
 QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
 {
-    QPointer<QnNetworkProxyFactory> *result = qn_globalProxyFactory();
-    if(*result) {
-        return result->data();
-    } else {
-        return qn_reserveProxyFactory();
-    }
+    return QnNetworkProxyFactory_instance;
 }

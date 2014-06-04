@@ -47,7 +47,7 @@ namespace ec2
                 case setPanicMode:
                     return "setPanicMode";
                 case getAllDataList:
-                    return "getResourceList";
+                    return "getAllDataList";
                 case saveCamera:
                     return "saveCamera";
                 case saveCameras:

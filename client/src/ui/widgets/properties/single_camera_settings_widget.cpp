@@ -177,16 +177,16 @@ void QnSingleCameraSettingsWidget::at_sslErrors(QNetworkReply* reply, const QLis
 {
     reply->ignoreSslErrors();
 }
-void QnSingleCameraSettingsWidget::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
+
+void QnSingleCameraSettingsWidget::at_authenticationRequired(QNetworkReply* /*reply*/, QAuthenticator * authenticator)
 {
-    //qDebug()<<"at_authenticationRequired"<<reply->url().host()<<m_camera->getAuth().user()<<m_camera->getAuth().password();
     authenticator->setUser(m_camera->getAuth().user());
     authenticator->setPassword(m_camera->getAuth().password());
 }
+
 void QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator)
 {    
     QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-    //qDebug()<<"at_proxyAuthenticationRequired"<<lastUsedConnection.url.userName()<<lastUsedConnection.url.password();
     authenticator->setUser(lastUsedConnection.url.userName());
     authenticator->setPassword(lastUsedConnection.url.password());
 }
@@ -205,15 +205,19 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
             QString local_path = resourceData.value<QString>(lit("urlLocalePath"), QString());
 
             QString url_camera_name = QString(QLatin1String("http://%1:%2/%3")).arg(camera_host).arg(camera_port).arg(local_path);
-            QString proxy_url = QnAppServerConnectionFactory::defaultUrl().host();
+            QString proxy_host = QnAppServerConnectionFactory::defaultUrl().host();
             int proxy_port = QnAppServerConnectionFactory::defaultUrl().port();
 
             QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
             QnNetworkProxyFactory::instance()->removeFromProxyList(m_lastSiteUrl);
             
             m_lastSiteUrl = url_camera_name;
-            //qDebug()<<m_lastSiteUrl;
-            QnNetworkProxyFactory::instance()->addToProxyList(m_lastSiteUrl, proxy_url, proxy_port);
+            QnNetworkProxyFactory::instance()->addToProxyList(
+                m_lastSiteUrl,
+                proxy_host,
+                proxy_port,
+                lastUsedConnection.url.userName(),
+                lastUsedConnection.url.password() );
             QNetworkRequest request(m_lastSiteUrl);
             advancedWebView->reload();
             advancedWebView->load(request);

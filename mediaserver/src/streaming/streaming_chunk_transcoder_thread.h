@@ -5,6 +5,7 @@
 #ifndef STREAMING_CHUNK_TRANSCODER_THREAD_H
 #define STREAMING_CHUNK_TRANSCODER_THREAD_H
 
+#include <QElapsedTimer>
 #include <QMutex>
 #include <QSharedPointer>
 #include <QWaitCondition>
@@ -63,10 +64,13 @@ private:
         DataSourceContextPtr dataSourceCtx;
         StreamingChunkCacheKey transcodeParams;
         bool dataAvailable;
+        qint64 prevReadTryTimestamp;
         quint64 msTranscoded; 
         quint64 packetsTranscoded;
         //!-1, if no prev packet
         qint64 prevPacketTimestamp;
+
+        //QFile outputFile;
 
         TranscodeContext();
         TranscodeContext(
@@ -81,6 +85,7 @@ private:
     std::map<AbstractOnDemandDataProvider*, int> m_dataSourceToID;
     mutable QMutex m_mutex;
     QWaitCondition m_cond;
+    QElapsedTimer m_monotonicClock;
 
     void removeTranscodingNonSafe(
         const std::map<int, TranscodeContext*>::iterator& transcodingIter,

@@ -62,6 +62,23 @@ namespace nx_hls
         return m_playlistManagers[streamQuality];
     }
 
+    void HLSSession::saveChunkAlias( MediaQuality streamQuality, const QString& alias, quint64 startTimestamp, quint64 duration )
+    {
+        QMutexLocker lk( &m_mutex );
+        m_chunksByAlias[std::make_pair(streamQuality, alias)] = std::make_pair( startTimestamp, duration );
+    }
+
+    bool HLSSession::getChunkByAlias( MediaQuality streamQuality, const QString& alias, quint64* const startTimestamp, quint64* const duration ) const
+    {
+        QMutexLocker lk( &m_mutex );
+        auto iter = m_chunksByAlias.find( std::make_pair(streamQuality, alias) );
+        if( iter == m_chunksByAlias.end() )
+            return false;
+        *startTimestamp = iter->second.first;
+        *duration = iter->second.second;
+        return true;
+    }
+
 
     ////////////////////////////////////////////////////////////
     // HLSSessionPool class

@@ -40,6 +40,7 @@ public:
         const QString& uniqueResourceID,
         int channel,
         const QString& containerFormat,
+        const QString& alias,
         quint64 startTimestamp,
         quint64 duration,
         MediaQuality streamQuality,
@@ -48,6 +49,7 @@ public:
     //!data source (camera id, stream id)
     const QString& srcResourceUniqueID() const;
     unsigned int channel() const;
+    QString alias() const;
     //!Chunk start timestamp (micros). This is internal timestamp, not calendar time
     quint64 startTimestamp() const;
     //!Duration in micros
@@ -77,6 +79,7 @@ private:
     QString m_uniqueResourceID;
     int m_channel;
     QString m_containerFormat;
+    QString m_alias;
     quint64 m_startTimestamp;
     quint64 m_duration;
     MediaQuality m_streamQuality;

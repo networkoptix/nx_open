@@ -547,7 +547,7 @@ namespace nx_http
 
         m_request.requestLine.method = httpMethod;
         m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
-        m_request.requestLine.version = useHttp11 ? nx_http::Version::http_1_1 : nx_http::Version::http_1_0;
+        m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;
         if( !m_userAgent.isEmpty() )
             m_request.headers.insert( std::make_pair("User-Agent", m_userAgent.toLatin1()) );
         if( useHttp11 )

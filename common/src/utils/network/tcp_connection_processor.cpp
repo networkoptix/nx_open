@@ -92,8 +92,7 @@ void QnTCPConnectionProcessor::parseRequest()
         qWarning() << Q_FUNC_INFO << "Invalid request format.";
         return;
     }
-    QList<QByteArray> versionParts = d->request.requestLine.version.split('/');
-    d->protocol = versionParts[0];
+    d->protocol = d->request.requestLine.version.protocol;
     d->requestBody = d->request.messageBody;
 }
 
@@ -183,17 +182,17 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     d->response.statusLine.statusCode = code;
     d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)code);
     if (d->chunkedMode)
-        d->response.headers.insert( nx_http::HttpHeader( "Transfer-Encoding", "chunked" ) );
+        nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Transfer-Encoding", "chunked" ) );
 
     if (!contentEncoding.isEmpty())
-        d->response.headers.insert( nx_http::HttpHeader( "Content-Encoding", contentEncoding ) );
+        nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Encoding", contentEncoding ) );
     if (!contentType.isEmpty())
-        d->response.headers.insert( nx_http::HttpHeader( "Content-Type", contentType ) );
+        nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Type", contentType ) );
     if (!d->chunkedMode)
-        d->response.headers.insert( nx_http::HttpHeader( "Content-Length", QByteArray::number(d->responseBody.length()) ) );
+        nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Length", QByteArray::number(d->responseBody.length()) ) );
 
+    d->response.statusLine.version.protocol = transport;
     QByteArray response = d->response.toString();
-    response.replace(0,4,transport);    //TODO #ak: looks too bad. Add support for any protocol to nx_http (nx_http has to be renamed in this case)
     if (!d->responseBody.isEmpty())
     {
         response += d->responseBody;
@@ -202,9 +201,9 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     if (displayDebug)
         NX_LOG(lit("Server response to %1:\n%2").arg(d->socket->getPeerAddress().address.toString()).arg(QString::fromLatin1(response)), cl_logDEBUG1);
 
-    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2-------------------\n\n\n").
+    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Sending response to %1:\n%2\n-------------------\n\n\n").
         arg(d->socket->getPeerAddress().toString()).
-        arg(QString::fromLatin1(response)), cl_logDEBUG1 );
+        arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->responseBody.size() : 0)))), cl_logDEBUG1 );
 
     QMutexLocker lock(&d->sockMutex);
     sendData(response.data(), response.size());

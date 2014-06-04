@@ -12,11 +12,11 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "streaming/hls/hls_live_playlist_manager.h"
 #include "utils/media/media_stream_cache.h"
-#include "utils/media/mediaindex.h"
 #include "core/dataprovider/live_stream_provider.h"
 
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
+class MediaIndex;
 namespace nx_hls
 {
     class HLSLivePlaylistManager;

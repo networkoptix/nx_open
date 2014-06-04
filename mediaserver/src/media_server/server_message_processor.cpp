@@ -126,7 +126,6 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
         }
     }
 
-    bool needUpdateServer = false;
     // We are always online
     if (isServer && resource->getId() == serverGuid()) {
         if (resource->getStatus() != QnResource::Online) {
@@ -183,7 +182,7 @@ void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bo
 
 }
 
-void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy)
+void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool /*isProxy*/)
 {
     QnResourcePtr res = qnResPool->getResourceById(data.peerId);
     if (res) {
@@ -225,7 +224,7 @@ bool QnServerMessageProcessor::isProxy(const QUrl& url) {
     if (isKnownAddr(url.host()))
         return true; // it's camera or other media server address
     
-    int port = url.port();
+    int port = url.port( nx_http::DEFAULT_HTTP_PORT );
     if (port > 0) {
         int serverPort = MSSettings::roSettings()->value("rtspPort", MSSettings::DEFAUT_RTSP_PORT).toInt();
         if (port != serverPort && isLocalAddress(url.host()))
