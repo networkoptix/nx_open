@@ -202,7 +202,7 @@ private:
     mutable QnMediaServerConnectionPtr m_serverConnection;
 
     QHash<QnId, QnImageProvider*> m_imageProvidersByResourceId;
-	QUrl m_lastSiteUrl;
+	QUrl m_lastCameraPageUrl;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

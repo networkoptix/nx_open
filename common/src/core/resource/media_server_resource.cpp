@@ -8,6 +8,9 @@
 #include <api/app_server_connection.h>
 #include "utils/common/sleep.h"
 
+
+const QString QnMediaServerResource::USE_PROXY = QLatin1String("proxy");
+
 class QnMediaServerResourceGuard: public QObject {
 public:
     QnMediaServerResourceGuard(const QnMediaServerResourcePtr &resource): m_resource(resource) {}
@@ -155,7 +158,7 @@ void QnMediaServerResource::at_pingResponse(QnHTTPRawResponse response, int resp
     if (response.data.contains("Requested method is absent") || response.data.contains(guid) || response.data.contains("<time><clock>"))
     {
         // server OK
-        if (urlStr == QLatin1String("proxy"))
+        if (urlStr == QnMediaServerResource::USE_PROXY)
             setPrimaryIF(urlStr);
         else
             setPrimaryIF(QUrl(urlStr).host());
@@ -178,7 +181,7 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
     
     QUrl origApiUrl = getApiUrl();
 
-    if (primaryIF != QLatin1String("proxy"))
+    if (primaryIF != USE_PROXY)
     {
         QUrl apiUrl(getApiUrl());
         apiUrl.setHost(primaryIF);
@@ -262,7 +265,7 @@ void QnMediaServerResource::determineOptimalNetIF_testProxy() {
     QMutexLocker lock(&m_mutex);
     m_runningIfRequests.remove(-1);
     int requestNum = QnSessionManager::instance()->sendAsyncGetRequest(QUrl(m_apiUrl), QLatin1String("gettime"), this, "at_pingResponse", Qt::DirectConnection);
-    m_runningIfRequests.insert(requestNum, QLatin1String("proxy"));
+    m_runningIfRequests.insert(requestNum, QnMediaServerResource::USE_PROXY);
 }
 
 void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {

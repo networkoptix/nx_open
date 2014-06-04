@@ -199,31 +199,21 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
         bool showUrl = resourceData.value<bool>(lit("showUrl"), false);
         if ( showUrl && m_camera->getStatus() != QnResource::Offline )
         {
-            QString camera_host = m_camera->getHostAddress();
-            int camera_port = m_camera->httpPort();
-            QString local_path = resourceData.value<QString>(lit("urlLocalePath"), QString());
-
-            QString url_camera_name = QString(QLatin1String("http://%1:%2/%3")).arg(camera_host).arg(camera_port).arg(local_path);
-            QString proxy_host = QnAppServerConnectionFactory::defaultUrl().host();
-            int proxy_port = QnAppServerConnectionFactory::defaultUrl().port();
-
-            QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-            QnNetworkProxyFactory::instance()->removeFromProxyList(m_lastSiteUrl);
+            QnNetworkProxyFactory::instance()->removeFromProxyList(m_lastCameraPageUrl.host());
             
-            m_lastSiteUrl = url_camera_name;
-            QnNetworkProxyFactory::instance()->addToProxyList(
-                m_lastSiteUrl,
-                proxy_host,
-                proxy_port,
-                lastUsedConnection.url.userName(),
-                lastUsedConnection.url.password() );
-            QNetworkRequest request(m_lastSiteUrl);
+            m_lastCameraPageUrl = QString(QLatin1String("http://%1:%2/%3")).
+                arg(m_camera->getHostAddress()).arg(m_camera->httpPort()).
+                arg(resourceData.value<QString>(lit("urlLocalePath"), QString()));
+            m_lastCameraPageUrl.setUserName( m_camera->getAuth().user() );
+            m_lastCameraPageUrl.setPassword( m_camera->getAuth().password() );
+
+            QnNetworkProxyFactory::instance()->bindHostToResource( m_lastCameraPageUrl.host(), m_camera );
             advancedWebView->reload();
-            advancedWebView->load(request);
+            advancedWebView->load( QNetworkRequest(m_lastCameraPageUrl) );
             advancedWebView->show();
             stackedLayout->setCurrentIndex(1);
-            
-        } else
+        }
+        else
         {
             stackedLayout->setCurrentIndex(0);
         }                

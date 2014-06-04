@@ -328,9 +328,9 @@ void QnMediaServerConnection::setProxyAddr(const QUrl &apiUrl, const QString &ad
     m_proxyPort = port;
 
     if (port) {
-        QnNetworkProxyFactory::instance()->addToProxyList(apiUrl, addr, port);
+        QnNetworkProxyFactory::instance()->addToProxyList(apiUrl.host(), addr, port);
     } else {
-        QnNetworkProxyFactory::instance()->removeFromProxyList(apiUrl);
+        QnNetworkProxyFactory::instance()->removeFromProxyList(apiUrl.host());
     }
 }
 
