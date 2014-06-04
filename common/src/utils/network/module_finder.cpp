@@ -77,6 +77,8 @@ void QnModuleFinder::at_moduleFound(const QnModuleInformation &moduleInformation
         *it = moduleInformation;
         it->remoteAddresses += oldAddresses;
     }
+
+    emit moduleFound(moduleInformation, remoteAddress);
 }
 
 void QnModuleFinder::at_moduleLost(const QnModuleInformation &moduleInformation) {
