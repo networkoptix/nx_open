@@ -1088,7 +1088,29 @@ ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiVideowall
 }
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiDiscoveryDataList> &tran) {
-    // TODO: #dklychkov implement it
+    if (tran.command == ApiCommand::addDiscoveryInformation) {
+        foreach (const ApiDiscoveryData &data, tran.params) {
+            QSqlQuery query(m_sdb);
+            query.prepare("INSERT INTO vms_mserver_discovery (server_id, url, ignore) VALUES(:id, :url, :ignore)");
+            QnSql::bind(data, &query);
+            if (!query.exec()) {
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                return ErrorCode::dbError;
+            }
+        }
+    } else if (tran.command == ApiCommand::removeDiscoveryInformation) {
+        foreach (const ApiDiscoveryData &data, tran.params) {
+            QSqlQuery query(m_sdb);
+            query.prepare("DELETE FROM vms_mserver_discovery WHERE server_id = :id AND url = :url");
+            QnSql::bind(data, &query);
+            if (!query.exec()) {
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                return ErrorCode::dbError;
+            }
+        }
+    }
+
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransactionNoLock(const QnTransaction<ApiUpdateUploadResponceData>& /*tran*/) {

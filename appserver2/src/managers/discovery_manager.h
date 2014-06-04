@@ -24,7 +24,7 @@ namespace ec2 {
     private:
         QueryProcessorType* const m_queryProcessor;
 
-        QnTransaction<ApiDiscoveryDataList> prepareTransaction(ApiCommand::Value command, const ApiDiscoveryDataList &discoveryDataList) const;
+        QnTransaction<ApiDiscoveryDataList> prepareTransaction(ApiCommand::Value command, const QnId &id, const QList<QUrl> &urls, bool ignore) const;
         QnTransaction<ApiDiscoverPeerData> prepareTransaction(const QUrl &url) const;
     };
 

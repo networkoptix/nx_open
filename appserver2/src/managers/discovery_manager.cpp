@@ -76,18 +76,36 @@ int QnDiscoveryManager<QueryProcessorType>::discoverPeer(const QUrl &url, impl::
 
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(const QnId &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) {
+    const int reqId = generateRequestID();
+    auto transaction = prepareTransaction(ApiCommand::addDiscoveryInformation, id, urls, ignore);
 
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
+
+    return reqId;
 }
 
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::removeDiscoveryInformation(const QnId &id, const QList<QUrl> &urls, bool ignore, impl::SimpleHandlerPtr handler) {
+    const int reqId = generateRequestID();
+    auto transaction = prepareTransaction(ApiCommand::removeDiscoveryInformation, id, urls, ignore);
 
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
+
+    return reqId;
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiDiscoveryDataList> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const ApiDiscoveryDataList &discoveryDataList) const {
+QnTransaction<ApiDiscoveryDataList> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QnId &id, const QList<QUrl> &urls, bool ignore) const {
     QnTransaction<ApiDiscoveryDataList> transaction(command, true);
-    transaction.params = discoveryDataList;
+    foreach (const QUrl &url, urls) {
+        ApiDiscoveryData data;
+        data.id = id;
+        data.url = url.toString();
+        data.ignore = ignore;
+        transaction.params.push_back(data);
+    }
 
     return transaction;
 }
