@@ -120,7 +120,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         if (!resource->hasFlags(QnResource::foreigner))
         {
             if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
-                resource->init();
+                resource->initAsync(false);
         }
 
         if (resource.dynamicCast<QnLayoutResource>())
