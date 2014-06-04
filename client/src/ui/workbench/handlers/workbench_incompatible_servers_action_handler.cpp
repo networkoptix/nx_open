@@ -102,5 +102,12 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_joinSystemTool_finished(int errorCode) {
-
+    switch (errorCode) {
+    case QnJoinSystemTool::NoError:
+        QMessageBox::information(mainWindow(), tr("Information"), tr("The selected system has been joined to your system successfully."));
+        break;
+    default:
+        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not join the system."));
+        break;
+    }
 }
