@@ -391,7 +391,7 @@ bool DeviceFileCatalog::needRebuildPause()
     return !m_pauseList.isEmpty();
 }
 
-void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList, const ScanFilter& filter)
+void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& filter)
 {
     QString filteredChunkFile;
     if (!filter.isEmpty())
@@ -443,20 +443,20 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourceP
             }
             else {
                 //qnFileDeletor->deleteFile(fi.absoluteFilePath());
-                emptyFileList << fi.absoluteFilePath();
+                emptyFileList << EmptyFileInfo(fi.created().toMSecsSinceEpoch(), fi.absoluteFilePath());
             }
         }
 
     }
 }
 
-void DeviceFileCatalog::readStorageData(QnStorageResourcePtr storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList)
+void DeviceFileCatalog::readStorageData(QnStorageResourcePtr storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList)
 {
     QString rootFolder = closeDirPath(storage->getUrl()) + prefixByCatalog(catalog) + QString('/') + m_macAddress;
     scanMediaFiles(rootFolder, storage, allChunks, emptyFileList);
 }
 
-bool DeviceFileCatalog::doRebuildArchive(QnStorageResourcePtr storage, const QnTimePeriod& /*period*/)
+bool DeviceFileCatalog::doRebuildArchive(QnStorageResourcePtr storage, const QnTimePeriod& period)
 {
     QElapsedTimer t;
     t.restart();
@@ -467,11 +467,13 @@ bool DeviceFileCatalog::doRebuildArchive(QnStorageResourcePtr storage, const QnT
     if (m_rebuildArchive == Rebuild_None || m_rebuildArchive == Rebuild_Canceled) {
         return false;
     }
-    QStringList emptyFileList;
+    QVector<EmptyFileInfo> emptyFileList;
     readStorageData(storage, m_catalog, allChunks, emptyFileList);
 
-    foreach(const QString& fileName, emptyFileList)
-        qnFileDeletor->deleteFile(fileName);
+    foreach(const EmptyFileInfo& emptyFile, emptyFileList) {
+        if (emptyFile.startTimeMs < period.endTimeMs())
+            qnFileDeletor->deleteFile(emptyFile.fileName);
+    }
 
     foreach(const Chunk& chunk, allChunks)
         m_chunks << chunk;

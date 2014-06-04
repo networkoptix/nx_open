@@ -57,6 +57,15 @@ public:
         quint32 fileSizeLo;
     };
 
+    struct EmptyFileInfo
+    {
+        EmptyFileInfo(): startTimeMs(0) {}
+        EmptyFileInfo(qint64 startTimeMs, const QString& fileName): startTimeMs(startTimeMs), fileName(fileName) {}
+
+        qint64 startTimeMs;
+        QString fileName;
+    };
+
     // TODO: #Elric #enum
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
 
@@ -120,19 +129,20 @@ public:
         bool intersects(const QnTimePeriod& period) const;
     };
 
-    void scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList,
+    void scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList,
         const ScanFilter& filter = ScanFilter());
 
     static QVector<Chunk> mergeChunks(const QVector<Chunk>& chunk1, const QVector<Chunk>& chunk2);
     void addChunks(const QVector<Chunk>& chunk);
     bool fromCSVFile(const QString& fileName);
 private:
+
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
     QList<QDate> recordedMonthList();
 
-    void readStorageData(QnStorageResourcePtr storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QStringList& emptyFileList);
+    void readStorageData(QnStorageResourcePtr storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList);
     Chunk chunkFromFile(QnStorageResourcePtr storage, const QString& fileName);
     QnTimePeriod timePeriodFromDir(QnStorageResourcePtr storage, const QString& dirName);
     void replaceChunks(int storageIndex, const QVector<Chunk>& newCatalog);

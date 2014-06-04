@@ -108,7 +108,7 @@ QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(c
 
     /* Check new records, absent in the DB
     */
-    QStringList emptyFileList;
+    QVector<DeviceFileCatalog::EmptyFileInfo> emptyFileList;
     QString rootDir = closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixByCatalog(catalog) + QString('/') + mac;
     DeviceFileCatalog::ScanFilter filter;
     if (!chunks.isEmpty())
@@ -118,8 +118,8 @@ QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(c
     fileCatalog->scanMediaFiles(rootDir, storage, newChunksMap, emptyFileList, filter);
     QVector<DeviceFileCatalog::Chunk> newChunks = newChunksMap.values().toVector();
 
-    foreach(const QString& fileName, emptyFileList)
-        qnFileDeletor->deleteFile(fileName);
+    foreach(const DeviceFileCatalog::EmptyFileInfo& emptyFile, emptyFileList)
+        qnFileDeletor->deleteFile(emptyFile.fileName);
 
     // add to DB
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
