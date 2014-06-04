@@ -1,5 +1,5 @@
-#ifndef QN_VISTA_MOTOR_PTZ_CONTROLLER_H
-#define QN_VISTA_MOTOR_PTZ_CONTROLLER_H
+#ifndef QN_VISTA_FOCUS_PTZ_CONTROLLER_H
+#define QN_VISTA_FOCUS_PTZ_CONTROLLER_H
 
 #include <core/ptz/proxy_ptz_controller.h>
 
@@ -43,4 +43,4 @@ private:
     QScopedPointer<CLSimpleHTTPClient> m_client;
 };
 
-#endif // QN_VISTA_MOTOR_PTZ_CONTROLLER_H
+#endif // QN_VISTA_FOCUS_PTZ_CONTROLLER_H

@@ -1,7 +1,7 @@
 #ifdef ENABLE_ONVIF
 
 #include "vista_resource.h"
-#include "vista_motor_ptz_controller.h"
+#include "vista_focus_ptz_controller.h"
 
 QnVistaResource::QnVistaResource() {
     setVendor(lit("VISTA"));

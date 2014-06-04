@@ -1,4 +1,4 @@
-#include "vista_motor_ptz_controller.h"
+#include "vista_focus_ptz_controller.h"
 
 #include <cassert>
 
