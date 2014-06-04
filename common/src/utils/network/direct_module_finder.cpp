@@ -137,7 +137,7 @@ void QnDirectModuleFinder::activateRequests() {
     while (m_activeRequests.size() < m_maxConnections && !m_requestQueue.isEmpty()) {
         QUrl url = m_requestQueue.dequeue();
         m_activeRequests.insert(url);
-        QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(url));
+        m_networkAccessManager->get(QNetworkRequest(url));
     }
 }
 

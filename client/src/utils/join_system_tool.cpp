@@ -38,7 +38,7 @@ void QnJoinSystemTool::start(const QUrl &url, const QString &password) {
     // we need only scheme, hostname and port from the url
     m_targetUrl.setScheme(url.scheme());
     m_targetUrl.setHost(url.host());
-    m_targetUrl.setPort(url.port());
+    m_targetUrl.setPort(url.port(50000));
 
     m_password = password;
 
@@ -108,11 +108,20 @@ void QnJoinSystemTool::joinResource() {
     }
 
     if (m_targetServer->getSystemName() == qnCommon->localSystemName()) {
-        updateDiscoveryInformation();
+        if (m_targetServer->getStatus() == QnResource::Online)
+            updateDiscoveryInformation();
+        else
+            rediscoverPeer();
+
         return;
     }
 
     m_targetServer->apiConnection()->changeSystemNameAsync(qnCommon->localSystemName(), true, this, SLOT(at_targetServer_systemNameChanged(int,int)));
+}
+
+void QnJoinSystemTool::rediscoverPeer() {
+    connection2()->getDiscoveryManager()->discoverPeer(m_targetUrl, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+
     connect(m_targetServer.data(), &QnResource::statusChanged, this, &QnJoinSystemTool::at_resource_statusChanged);
     m_timer->start();
 }
@@ -194,4 +203,7 @@ void QnJoinSystemTool::at_targetServer_systemNameChanged(int handle, int status)
         finish(JoinError);
         return;
     }
+
+    // System name has been changed. Now discover it again. It must connect the server to us.
+    rediscoverPeer();
 }

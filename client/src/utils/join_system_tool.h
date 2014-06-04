@@ -32,6 +32,7 @@ signals:
 private:
     void findResource();
     void joinResource();
+    void rediscoverPeer();
     void updateDiscoveryInformation();
     void finish(int errorCode);
 
