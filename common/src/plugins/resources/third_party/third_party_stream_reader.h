@@ -17,7 +17,7 @@ class ThirdPartyStreamReader
 :
     public CLServerPushStreamReader
 {
-    typedef CLServerPushStreamReader parent_type;
+    typedef CLServerPushStreamReader base_type;
 
 public:
     ThirdPartyStreamReader(
