@@ -168,11 +168,18 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         if (m_ignoredModules.contains(moduleInformation.id, url))
             return;
 
+        // we don't want use addresses reported by the server
+        moduleInformation.remoteAddresses.clear();
+        // TODO: #dklychkov deal with dns names
+        moduleInformation.remoteAddresses.insert(url.host());
+
         auto it = m_foundModules.find(moduleInformation.id);
-        if (it == m_foundModules.end())
+        if (it == m_foundModules.end()) {
             m_foundModules.insert(moduleInformation.id, moduleInformation);
-        else
+        } else {
+            moduleInformation.remoteAddresses += it->remoteAddresses;
             *it = moduleInformation;
+        }
 
         m_lastPingById[moduleInformation.id] = QDateTime::currentMSecsSinceEpoch();
         emit moduleFound(moduleInformation, url.host());
