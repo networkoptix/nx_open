@@ -133,6 +133,9 @@ class QnPlWatchDogResource;
 typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
 typedef QnSharedResourcePointerList<QnPlWatchDogResource> QnPlWatchDogResourceList;
 
+class QnVistaResource;
+typedef QnSharedResourcePointer<QnVistaResource> QnVistaResourcePtr;
+
 class QnDesktopResource;
 typedef QnSharedResourcePointer<QnDesktopResource> QnDesktopResourcePtr;
 

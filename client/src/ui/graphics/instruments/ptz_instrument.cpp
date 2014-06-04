@@ -15,6 +15,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
+#include <core/ptz/item_dewarping_params.h>
+#include <core/ptz/media_dewarping_params.h>
+
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/animation_event.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -107,6 +110,9 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
     overlay->zoomInButton()->setTarget(widget);
     overlay->zoomOutButton()->setTarget(widget);
+    overlay->focusInButton()->setTarget(widget);
+    overlay->focusOutButton()->setTarget(widget);
+    overlay->focusAutoButton()->setTarget(widget);
     overlay->modeButton()->setTarget(widget);
     overlay->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
     overlay->setMarkersVisible(!isFisheye);
@@ -117,6 +123,11 @@ PtzOverlayWidget *PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widg
     connect(overlay->zoomInButton(),    &QnImageButtonWidget::released, this, &PtzInstrument::at_zoomInButton_released);
     connect(overlay->zoomOutButton(),   &QnImageButtonWidget::pressed,  this, &PtzInstrument::at_zoomOutButton_pressed);
     connect(overlay->zoomOutButton(),   &QnImageButtonWidget::released, this, &PtzInstrument::at_zoomOutButton_released);
+    connect(overlay->focusInButton(),   &QnImageButtonWidget::pressed,  this, &PtzInstrument::at_focusInButton_pressed);
+    connect(overlay->focusInButton(),   &QnImageButtonWidget::released, this, &PtzInstrument::at_focusInButton_released);
+    connect(overlay->focusOutButton(),  &QnImageButtonWidget::pressed,  this, &PtzInstrument::at_focusOutButton_pressed);
+    connect(overlay->focusOutButton(),  &QnImageButtonWidget::released, this, &PtzInstrument::at_focusOutButton_released);
+    connect(overlay->focusAutoButton(), &QnImageButtonWidget::clicked,  this, &PtzInstrument::at_focusAutoButton_clicked);
     connect(overlay->modeButton(),      &QnImageButtonWidget::clicked,  this, &PtzInstrument::at_modeButton_clicked);
 
     widget->addOverlayWidget(overlay, QnResourceWidget::Invisible, true, false, false);
@@ -176,9 +187,12 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget *widget) {
         bool isFisheye = data.hasCapabilities(Qn::VirtualPtzCapability);
         bool isFisheyeEnabled = widget->dewarpingParams().enabled;
 
-        overlayWidget->manipulatorWidget()->setVisible(data.hasCapabilities(Qn::ContinuousPanTiltCapabilities));
+        overlayWidget->manipulatorWidget()->setVisible(data.hasCapabilities(Qn::ContinuousPanCapability) || data.hasCapabilities(Qn::ContinuousTiltCapability));
         overlayWidget->zoomInButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
         overlayWidget->zoomOutButton()->setVisible(data.hasCapabilities(Qn::ContinuousZoomCapability));
+        overlayWidget->focusInButton()->setVisible(data.hasCapabilities(Qn::ContinuousFocusCapability));
+        overlayWidget->focusOutButton()->setVisible(data.hasCapabilities(Qn::ContinuousFocusCapability));
+        overlayWidget->focusAutoButton()->setVisible(data.traits.contains(Qn::ManualAutoFocusPtzTrait));
         
         if (isFisheye) {
             int panoAngle = widget->item()
@@ -198,7 +212,22 @@ void PtzInstrument::updateCapabilities(QnMediaResourceWidget *widget) {
     if(data.capabilities == capabilities)
         return;
 
+    if((data.capabilities ^ capabilities) & Qn::AuxilaryPtzCapability)
+        updateTraits(widget);
+
     data.capabilities = capabilities;
+    updateOverlayWidgetInternal(widget);
+}
+
+void PtzInstrument::updateTraits(QnMediaResourceWidget *widget) {
+    PtzData &data = m_dataByWidget[widget];
+
+    QnPtzAuxilaryTraitList traits;
+    widget->ptzController()->getAuxilaryTraits(&traits);
+    if(data.traits == traits)
+        return;
+
+    data.traits = traits;
     updateOverlayWidgetInternal(widget);
 }
 
@@ -237,6 +266,14 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &spee
         if(!m_movementTimer.isActive())
             m_movementTimer.start(speedUpdateIntervalMSec, this);
     }
+}
+
+void PtzInstrument::focusMove(QnMediaResourceWidget *widget, qreal speed) {
+    widget->ptzController()->continuousFocus(speed);
+}
+
+void PtzInstrument::focusAuto(QnMediaResourceWidget *widget) {
+    widget->ptzController()->runAuxilaryCommand(Qn::ManualAutoFocusPtzTrait, QString());
 }
 
 void PtzInstrument::processPtzClick(const QPointF &pos) {
@@ -327,12 +364,15 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
             PtzData &data = m_dataByWidget[widget];
             data.capabilitiesConnection = connect(widget->ptzController(), &QnAbstractPtzController::changed, this, 
                 [=](Qn::PtzDataFields fields) { 
-                    if(fields & Qn::CapabilitiesPtzField) 
+                    if(fields & Qn::CapabilitiesPtzField)
                         updateCapabilities(widget); 
+                    if(fields & Qn::AuxilaryTraitsPtzField)
+                        updateTraits(widget);
                 }
             );
 
             updateCapabilities(widget);
+            updateTraits(widget);
             updateOverlayWidgetInternal(widget);
 
             return true;
@@ -432,10 +472,16 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
             manipulator = NULL;
     }
 
+    const PtzData &data = m_dataByWidget[target];
     if(manipulator) {
         m_movement = ContinuousMovement;
+
+        m_movementOrientations = 0;
+        if(data.hasCapabilities(Qn::ContinuousPanCapability))
+            m_movementOrientations |= Qt::Horizontal;
+        if(data.hasCapabilities(Qn::ContinuousTiltCapability))
+            m_movementOrientations |= Qt::Vertical;
     } else {
-        const PtzData &data = m_dataByWidget[target];
         if(data.hasCapabilities(Qn::VirtualPtzCapability | Qn::AbsolutePtzCapabilities | Qn::LogicalPositioningPtzCapability)) {
             m_movement = VirtualMovement;
         } else if(data.hasCapabilities(Qn::ViewportPtzCapability)) {
@@ -508,7 +554,15 @@ void PtzInstrument::dragMove(DragInfo *info) {
 
     switch(m_movement) {
     case ContinuousMovement: {
-        QPointF delta = info->mouseItemPos() - target()->rect().center();
+        QPointF mouseItemPos = info->mouseItemPos();
+        QPointF itemCenter = target()->rect().center();
+
+        if(!(m_movementOrientations & Qt::Horizontal))
+            mouseItemPos.setX(itemCenter.x());
+        if(!(m_movementOrientations & Qt::Vertical))
+            mouseItemPos.setY(itemCenter.y());
+
+        QPointF delta = mouseItemPos - itemCenter;
         QSizeF size = target()->size();
         qreal scale = qMax(size.width(), size.height()) / 2.0;
         QPointF speed(qBound(-1.0, delta.x() / scale, 1.0), qBound(-1.0, -delta.y() / scale, 1.0));
@@ -518,7 +572,8 @@ void PtzInstrument::dragMove(DragInfo *info) {
 
         ensureElementsWidget();
         PtzArrowItem *arrowItem = elementsWidget()->arrowItem();
-        arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()), elementsWidget()->mapFromItem(target(), info->mouseItemPos()));
+
+        arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()), elementsWidget()->mapFromItem(target(), mouseItemPos));
         arrowItem->setSize(QSizeF(arrowSize, arrowSize));
 
         ptzMove(target(), QVector3D(speed));
@@ -564,7 +619,6 @@ void PtzInstrument::dragMove(DragInfo *info) {
 }
 
 void PtzInstrument::finishDrag(DragInfo *info) {
-    
     if(target()) {
         switch (m_movement) {
         case ContinuousMovement:
@@ -671,4 +725,34 @@ void PtzInstrument::at_zoomButton_activated(qreal speed) {
     
     if(QnMediaResourceWidget *widget = button->target())
         ptzMove(widget, QVector3D(0.0, 0.0, speed), true);
+}
+
+void PtzInstrument::at_focusInButton_pressed() {
+    at_focusButton_activated(1.0);
+}
+
+void PtzInstrument::at_focusInButton_released() {
+    at_focusButton_activated(0.0);
+}
+
+void PtzInstrument::at_focusOutButton_pressed() {
+    at_focusButton_activated(-1.0);
+}
+
+void PtzInstrument::at_focusOutButton_released() {
+    at_focusButton_activated(0.0);
+}
+
+void PtzInstrument::at_focusButton_activated(qreal speed) {
+    PtzImageButtonWidget *button = checked_cast<PtzImageButtonWidget *>(sender());
+
+    if(QnMediaResourceWidget *widget = button->target())
+        focusMove(widget, speed);
+}
+
+void PtzInstrument::at_focusAutoButton_clicked() {
+    PtzImageButtonWidget *button = checked_cast<PtzImageButtonWidget *>(sender());
+
+    if(QnMediaResourceWidget *widget = button->target())
+        focusAuto(widget);
 }

@@ -24,6 +24,9 @@ typedef QList<QnPtzTourSpot> QnPtzTourSpotList;
 struct QnPtzTour;
 typedef QList<QnPtzTour> QnPtzTourList;
 
+class QnPtzAuxilaryTrait;
+typedef QList<QnPtzAuxilaryTrait> QnPtzAuxilaryTraitList;
+
 struct QnPtzLimits;
 
 struct QnPtzData;
@@ -31,6 +34,7 @@ struct QnPtzData;
 struct QnPtzObject;
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnPtzMapperPtr)(QnPtzPreset)(QnPtzTourSpot)(QnPtzTour)(QnPtzLimits)(QnPtzData)(QnPtzObject), (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnPtzAuxilaryTrait), (lexical))
 
 #endif // QN_PTZ_FWD_H
 

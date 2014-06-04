@@ -31,6 +31,9 @@
 #include "soap/soapserver.h"
 #include "soapStub.h"
 #include "onvif_ptz_controller.h"
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -68,6 +71,7 @@ struct StrictResolution {
 
 // strict maximum resolution for this models
 
+// TODO: #Elric #VASILENKO move out to JSON
 StrictResolution strictResolutionList[] =
 {
     { "Brickcom-30xN", QSize(1920, 1080) }
@@ -79,6 +83,7 @@ struct StrictBitrateInfo {
     int maxBitrate;
 };
 
+// TODO: #Elric #VASILENKO move out to JSON
 // Strict bitrate range for specified cameras
 StrictBitrateInfo strictBitrateList[] =
 {
@@ -148,24 +153,44 @@ public:
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
 {
     int square1Max = 0;
-    int square1Min = INT_MAX;
+    QSize max1Res;
     for (int i = 0; i < s1.resolutions.size(); ++i) {
-        square1Max = qMax(square1Max, s1.resolutions[i].width() * s1.resolutions[i].height());
-        square1Min = qMin(square1Min, s1.resolutions[i].width() * s1.resolutions[i].height());
+        int newMax = s1.resolutions[i].width() * s1.resolutions[i].height();
+        if (newMax > square1Max) {
+            square1Max = newMax;
+            max1Res = s1.resolutions[i];
+        }
     }
     
     int square2Max = 0;
-    int square2Min = INT_MAX;
+    QSize max2Res;
     for (int i = 0; i < s2.resolutions.size(); ++i) {
-        square2Max = qMax(square2Max, s2.resolutions[i].width() * s2.resolutions[i].height());
-        square2Min = qMin(square2Min, s2.resolutions[i].width() * s2.resolutions[i].height());
+        int newMax = s2.resolutions[i].width() * s2.resolutions[i].height();
+        if (newMax > square2Max) {
+            square2Max = newMax;
+            max2Res = s2.resolutions[i];
+        }
     }
 
     if (square1Max != square2Max)
         return square1Max > square2Max;
 
-    if (square1Min != square2Min)
-        return square1Min > square2Min;
+    //if (square1Min != square2Min)
+    //    return square1Min > square2Min;
+    
+    // analyse better resolution for secondary stream
+    double coeff1, coeff2;
+    QSize secondary1 = QnPlOnvifResource::findSecondaryResolution(max1Res, s1.resolutions, &coeff1);
+    QSize secondary2 = QnPlOnvifResource::findSecondaryResolution(max2Res, s2.resolutions, &coeff2);
+    if (qAbs(coeff1 - coeff2) > 1e-4) {
+
+        if (!s1.isH264 && s2.isH264)
+            coeff2 /= 1.3;
+        else if (s1.isH264 && !s2.isH264)
+            coeff1 /= 1.3;
+
+        return coeff1 < coeff2; // less coeff is better
+    }
 
     // if some option doesn't have H264 it "less"
     if (!s1.isH264 && s2.isH264)
@@ -529,6 +554,35 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     saveResolutionList( mediaStreams );
 
     saveParams();
+    
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
+    if (forcedAR) 
+    {
+        qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
+        
+        QnKvPair kvPair;
+        kvPair.setName(QnMediaResource::customAspectRatioKey());
+        kvPair.setValue(QString::number(ar));
+
+        QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+        QnKvPairList existPairs;
+        if (conn->getKvPairs(existPairs, toSharedPointer(this)) == 0) 
+        {
+            bool aspectExists = false;
+            foreach(const QnKvPair& existPair, existPairs)
+            {
+                if (existPair.name() == kvPair.name()) {
+                    aspectExists = true;
+                    break;
+                }
+            }
+            if (!aspectExists) {
+                setProperty(kvPair.name(), kvPair.value());
+                conn->saveSync(getId(), kvPair);
+            }
+        }
+    }
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -545,9 +599,9 @@ QSize QnPlOnvifResource::getNearestResolutionForSecondary(const QSize& resolutio
     return getNearestResolution(resolution, aspectRatio, SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(), m_secondaryResolutionList);
 }
 
-int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
+int QnPlOnvifResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
 {
-    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(q, resolution, fps));
+    return strictBitrate(QnPhysicalCameraResource::suggestBitrateKbps(quality, resolution, fps));
 }
 
 int QnPlOnvifResource::strictBitrate(int bitrate) const
@@ -569,6 +623,16 @@ void QnPlOnvifResource::checkPrimaryResolution(QSize& primaryResolution)
     }
 }
 
+QSize QnPlOnvifResource::findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff)
+{
+    float currentAspect = getResolutionAspectRatio(primaryRes);
+    int maxSquare = SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height();
+    QSize result = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect, maxSquare, secondaryResList, matchCoeff);
+    if (result == EMPTY_RESOLUTION_PAIR)
+        result = getNearestResolution(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0, maxSquare, secondaryResList, matchCoeff); // try to get resolution ignoring aspect ration
+    return result;
+}
+
 void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
 {
     QMutexLocker lock(&m_mutex);
@@ -579,11 +643,10 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
 
     m_primaryResolution = m_resolutionList.front();
     checkPrimaryResolution(m_primaryResolution);
+
+    m_secondaryResolution = findSecondaryResolution(m_primaryResolution, m_secondaryResolutionList);
     float currentAspect = getResolutionAspectRatio(m_primaryResolution);
 
-    m_secondaryResolution = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect);
-    if (m_secondaryResolution == EMPTY_RESOLUTION_PAIR)
-        m_secondaryResolution = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0); // try to get resolution ignoring aspect ration
 
     NX_LOG(QString(lit("ONVIF debug: got secondary resolution %1x%2 encoders for camera %3")).
                         arg(m_secondaryResolution.width()).arg(m_secondaryResolution.height()).arg(getHostAddress()), cl_logDEBUG1);
@@ -1129,6 +1192,16 @@ void QnPlOnvifResource::setImagingUrl(const QString& src)
 {
     QMutexLocker lock(&m_mutex);
     m_imagingUrl = src;
+}
+
+QString QnPlOnvifResource::getVideoSourceToken() const {
+    QMutexLocker lock(&m_mutex);
+    return m_videoSourceToken;
+}
+
+void QnPlOnvifResource::setVideoSourceToken(const QString &src) {
+    QMutexLocker lock(&m_mutex);
+    m_videoSourceToken = src;
 }
 
 QString QnPlOnvifResource::getPtzUrl() const

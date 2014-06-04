@@ -353,19 +353,23 @@ void QnPropertyStorage::updateValuesFromJson(const QJsonObject &json, const QLis
 }
 
 QVariant QnPropertyStorage::readValueFromJson(const QJsonObject &json, int id, const QVariant &defaultValue) {
-    // TODO: #Elric need dynamic JSON deserialization here.
     QJsonValue jsonValue;
     if(!QJson::deserialize(json, name(id), &jsonValue))
         return defaultValue;
 
-    if(type(id) == QMetaType::QColor) {
-        QColor color;
-        if(QJson::deserialize(jsonValue, &color)) {
-            return color;
-        } else {
-            return defaultValue;
-        }
+    int type = this->type(id);
+    QnJsonSerializer *serializer = QnJsonSerializer::forType(type);
+    if(!serializer) {
+        qnWarning("Could not deserialize type '%1' from json, serializer is not registered.", QMetaType::typeName(type));
+        return defaultValue;
     }
 
-    return jsonValue.toVariant(); 
+    QVariant result;
+    QnJsonContext ctx;
+    if(!serializer->deserialize(&ctx, jsonValue, &result)) {
+        qnWarning("Invalid json value '%1' for type '%2'.", jsonValue, QMetaType::typeName(type));
+        return defaultValue;
+    }
+
+    return result; 
 }

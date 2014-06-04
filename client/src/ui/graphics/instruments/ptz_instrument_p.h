@@ -188,17 +188,52 @@ public:
     {
         setAcceptedMouseButtons(0);
 
+        QPainterPath upRoundPath;
+        upRoundPath.moveTo(0, 1);
+        upRoundPath.lineTo(0, 0.5);
+        upRoundPath.arcTo(0, 0, 1, 1, 180, -180);
+        upRoundPath.lineTo(1, 1);
+        upRoundPath.closeSubpath();
+
+        QPainterPath downRoundPath;
+        downRoundPath.moveTo(0, 0);
+        downRoundPath.lineTo(0, 0.5);
+        downRoundPath.arcTo(0, 0, 1, 1, 180, 180);
+        downRoundPath.lineTo(1, 0);
+        downRoundPath.closeSubpath();
+
         /* Note that construction order is important as it defines which items are on top. */
         m_manipulatorWidget = new PtzManipulatorWidget(this);
 
         m_zoomInButton = new PtzImageButtonWidget(this);
         m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
+        m_zoomInButton->setToolTip(tr("Zoom In"));
 
         m_zoomOutButton = new PtzImageButtonWidget(this);
         m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
+        m_zoomOutButton->setToolTip(tr("Zoom Out"));
+
+        m_focusInButton = new PtzImageButtonWidget(this);
+        m_focusInButton->setIcon(qnSkin->icon("item/ptz_focus_in.png"));
+        m_focusInButton->setToolTip(tr("Focus Far"));
+        m_focusInButton->setFrameShape(Qn::CustomFrame);
+        m_focusInButton->setCustomFramePath(upRoundPath);
+
+        m_focusOutButton = new PtzImageButtonWidget(this);
+        m_focusOutButton->setIcon(qnSkin->icon("item/ptz_focus_out.png"));
+        m_focusOutButton->setToolTip(tr("Focus Near"));
+        m_focusOutButton->setFrameShape(Qn::CustomFrame);
+        m_focusOutButton->setCustomFramePath(downRoundPath);
+
+        m_focusAutoButton = new PtzImageButtonWidget(this);
+        m_focusAutoButton->setIcon(qnSkin->icon("item/ptz_focus_auto.png"));
+        m_focusAutoButton->setToolTip(tr("Auto Focus"));
+        m_focusAutoButton->setFrameShape(Qn::RectangularFrame);
 
         m_modeButton = new PtzImageButtonWidget(this);
-        m_modeButton->setToolTip(tr("Dewarping panoramic mode"));
+        m_modeButton->setToolTip(tr("Change Dewarping Mode"));
+
+        connect(m_focusAutoButton, &QGraphicsObject::visibleChanged, this, &PtzOverlayWidget::updateLayout);
 
         updateLayout();
         showCursor();
@@ -213,12 +248,18 @@ public:
         manipulatorWidget()->setCursor(Qt::BlankCursor);
         zoomInButton()->setCursor(Qt::BlankCursor);
         zoomOutButton()->setCursor(Qt::BlankCursor);
+        focusInButton()->setCursor(Qt::BlankCursor);
+        focusOutButton()->setCursor(Qt::BlankCursor);
+        focusAutoButton()->setCursor(Qt::BlankCursor);
     }
 
     void showCursor() {
         manipulatorWidget()->setCursor(Qt::SizeAllCursor);
         zoomInButton()->setCursor(Qt::ArrowCursor);
         zoomOutButton()->setCursor(Qt::ArrowCursor);
+        focusInButton()->setCursor(Qt::ArrowCursor);
+        focusOutButton()->setCursor(Qt::ArrowCursor);
+        focusAutoButton()->setCursor(Qt::ArrowCursor);
     }
 
     PtzManipulatorWidget *manipulatorWidget() const {
@@ -231,6 +272,18 @@ public:
 
     PtzImageButtonWidget *zoomOutButton() const {
         return m_zoomOutButton;
+    }
+
+    PtzImageButtonWidget *focusInButton() const {
+        return m_focusInButton;
+    }
+
+    PtzImageButtonWidget *focusOutButton() const {
+        return m_focusOutButton;
+    }
+
+    PtzImageButtonWidget *focusAutoButton() const {
+        return m_focusAutoButton;
     }
 
     PtzImageButtonWidget *modeButton() const {
@@ -265,23 +318,26 @@ public:
         QVector<QPointF> crosshairLines; // TODO: #Elric cache these?
 
         QPointF center = rect.center();
-        qreal d0 = qMin(rect.width(), rect.height()) / 4.0;
-        qreal d1 = d0 / 8.0;
+        qreal unit = this->unit();
 
-        qreal dx = d1 * 3.0;
-        while(dx < rect.width() / 2.0) {
+        qreal x = unit * 3.0;
+        while(x < rect.width() / 2.0) {
             crosshairLines 
-                << center + QPointF( dx, d1 / 2.0) << center + QPointF( dx, -d1 / 2.0)
-                << center + QPointF(-dx, d1 / 2.0) << center + QPointF(-dx, -d1 / 2.0);
-            dx += d1;
+                << center + QPointF(-x, unit / 2.0) << center + QPointF(-x, -unit / 2.0);
+            
+            if(x < rect.width() / 2.0 - 3.0 * unit || !m_focusInButton->isVisible())
+                crosshairLines 
+                    << center + QPointF( x, unit / 2.0) << center + QPointF( x, -unit / 2.0);
+
+            x += unit;
         }
 
-        qreal dy = d1 * 3.0;
-        while(dy < rect.height() / 2.0) {
+        qreal y = unit * 3.0;
+        while(y < rect.height() / 2.0) {
             crosshairLines 
-                << center + QPointF(d1 / 2.0,  dy) << center + QPointF(-d1 / 2.0,  dy)
-                << center + QPointF(d1 / 2.0, -dy) << center + QPointF(-d1 / 2.0, -dy);
-            dy += d1;
+                << center + QPointF(unit / 2.0,  y) << center + QPointF(-unit / 2.0,  y)
+                << center + QPointF(unit / 2.0, -y) << center + QPointF(-unit / 2.0, -y);
+            y += unit;
         }
 
         QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, m_pen);
@@ -289,19 +345,37 @@ public:
     }
 
 private:
+    qreal unit() const {
+        QRectF rect = this->rect();
+        return qMin(rect.width(), rect.height()) / 32;
+    }
+
     void updateLayout() {
         /* We're doing manual layout of child items as this is an overlay widget and
          * we don't want layouts to mess up widget's size constraints. */
 
+        qreal unit = this->unit();
         QRectF rect = this->rect();
         QPointF center = rect.center();
-        qreal centralWidth = qMin(rect.width(), rect.height()) / 32;
-        QPointF xStep(centralWidth, 0), yStep(0, centralWidth);
+        QPointF left = (rect.topLeft() + rect.bottomLeft()) / 2.0;
+        QPointF right = (rect.topRight() + rect.bottomRight()) / 2.0;
+        QPointF xStep(unit, 0), yStep(0, unit);
+        QSizeF size = QnGeometry::toSize(xStep + yStep);
 
         m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
-        m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * QnGeometry::toSize(xStep + yStep)));
-        m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * QnGeometry::toSize(xStep + yStep)));
-        m_modeButton->setGeometry(QRectF((rect.topRight() + rect.bottomRight()) / 2.0 - xStep * 4.0 - yStep * 1.5, 3.0 * QnGeometry::toSize(xStep + yStep)));
+        m_modeButton->setGeometry(QRectF(right - xStep * 4.0 - yStep * 1.5, 3.0 * size));
+
+        m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
+        m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * size));
+        
+        if(m_focusAutoButton->isVisible()) {
+            m_focusInButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 2.25, 1.5 * size));
+            m_focusAutoButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 0.75, 1.5 * size));
+            m_focusOutButton->setGeometry(QRectF(right - xStep * 2.5 + yStep * 0.75, 1.5 * size));
+        } else {
+            m_focusInButton->setGeometry(QRectF(right - xStep * 2.5 - yStep * 1.5, 1.5 * size));
+            m_focusOutButton->setGeometry(QRectF(right - xStep * 2.5 + yStep * 0.0, 1.5 * size));
+        }
     }
 
 private:
@@ -309,6 +383,9 @@ private:
     PtzManipulatorWidget *m_manipulatorWidget;
     PtzImageButtonWidget *m_zoomInButton;
     PtzImageButtonWidget *m_zoomOutButton;
+    PtzImageButtonWidget *m_focusInButton;
+    PtzImageButtonWidget *m_focusOutButton;
+    PtzImageButtonWidget *m_focusAutoButton;
     PtzImageButtonWidget *m_modeButton;
     QPen m_pen;
 };

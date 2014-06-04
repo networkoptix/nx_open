@@ -26,6 +26,7 @@ public:
     virtual Qn::PtzCapabilities getCapabilities() override;
 
     virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool continuousFocus(qreal speed) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
     virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) override;
 
@@ -47,6 +48,9 @@ public:
     virtual bool getActiveObject(QnPtzObject *activeObject) override;
     virtual bool updateHomeObject(const QnPtzObject &homeObject) override;
     virtual bool getHomeObject(QnPtzObject *homeObject) override;
+
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) override;
+    virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data) override;
 
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override;
 
