@@ -20,7 +20,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     
     ChunkFormat format = ChunkFormat_Unknown;
     QString callback;
-    Qn::TimePeriodContent periodsType;
+    Qn::TimePeriodContent periodsType = Qn::TimePeriodContentCount;
     QString filter;
 
     for (int i = 0; i < params.size(); ++i)
