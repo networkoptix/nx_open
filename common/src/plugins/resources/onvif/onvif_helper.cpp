@@ -190,6 +190,8 @@ PasswordHelper::PasswordHelper()
     setPasswordInfo(FLIR_MANUFACTURER,   ADMIN1, "fliradmin");
     setPasswordInfo(SENTRY_MANUFACTURER, ADMIN1, PASSWD4);
 
+    setPasswordInfo("VISTA", "admin", "admin");
+
     //if (cl_log.logLevel() >= cl_logDEBUG1) {
     //    printPasswords();
     //}
