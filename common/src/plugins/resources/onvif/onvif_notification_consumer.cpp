@@ -39,7 +39,8 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
         if( (!notification.oasisWsnB2__ProducerReference ||
              !notification.oasisWsnB2__ProducerReference->Address) &&
             (!notification.oasisWsnB2__SubscriptionReference ||
-             !notification.oasisWsnB2__SubscriptionReference->Address) )
+             !notification.oasisWsnB2__SubscriptionReference->Address) &&
+            !(notificationRequest->soap && notificationRequest->soap->host) )
         {
             NX_LOG( lit("Received notification with no producer reference and no subscription reference (endpoint %1). Unable to associate with resource. Ignoring...").
                 arg(QString::fromLatin1(notificationRequest->soap ? notificationRequest->soap->endpoint : "")), cl_logWARNING );
@@ -54,19 +55,29 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
             it = m_notificationProducerAddressToResource.find( address );
         }
 
-        if( it == m_notificationProducerAddressToResource.end() )
+        if( it == m_notificationProducerAddressToResource.end()
+            && notification.oasisWsnB2__SubscriptionReference
+            && notification.oasisWsnB2__SubscriptionReference->Address )
         {
             //trying to find by subscription reference
-            if( !(notification.oasisWsnB2__SubscriptionReference &&
-                  notification.oasisWsnB2__SubscriptionReference->Address &&
-                  (it = m_subscriptionReferenceToResource.find( QString::fromStdString(notification.oasisWsnB2__SubscriptionReference->Address->__item) )) != m_subscriptionReferenceToResource.end()) )
-            {
-                //this is possible shortly after resource unregistration
-                //NX_LOG( lit("Received notification for unknown resource. Producer address %1. Ignoring...").
-                //    arg(QString::fromStdString(notification.oasisWsnB2__ProducerReference->Address->__item)), cl_logWARNING );
-                NX_LOG( lit("Received notification for unknown resource. Ignoring..."), cl_logWARNING );
-                continue;
-            }
+            it = m_subscriptionReferenceToResource.find( QString::fromStdString(notification.oasisWsnB2__SubscriptionReference->Address->__item) );
+        }
+
+        if( it == m_notificationProducerAddressToResource.end()
+            && notificationRequest->soap
+            && notificationRequest->soap->host )
+        {
+            //searching by host
+            it = m_notificationProducerAddressToResource.find( QLatin1String(notificationRequest->soap->host) );
+        }
+
+        if( it == m_notificationProducerAddressToResource.end() )
+        {
+            //this is possible shortly after resource unregistration
+            //NX_LOG( lit("Received notification for unknown resource. Producer address %1. Ignoring...").
+            //    arg(QString::fromStdString(notification.oasisWsnB2__ProducerReference->Address->__item)), cl_logWARNING );
+            NX_LOG( lit("Received notification for unknown resource. Ignoring..."), cl_logWARNING );
+            continue;
         }
 
         it->second->notificationReceived( notification );
