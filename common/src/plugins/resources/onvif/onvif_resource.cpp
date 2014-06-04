@@ -1135,6 +1135,16 @@ void QnPlOnvifResource::setImagingUrl(const QString& src)
     m_imagingUrl = src;
 }
 
+QString QnPlOnvifResource::getVideoSourceToken() const {
+    QMutexLocker lock(&m_mutex);
+    return m_videoSourceToken;
+}
+
+void QnPlOnvifResource::setVideoSourceToken(const QString &src) {
+    QMutexLocker lock(&m_mutex);
+    m_videoSourceToken = src;
+}
+
 QString QnPlOnvifResource::getPtzUrl() const
 {
     QMutexLocker lock(&m_mutex);

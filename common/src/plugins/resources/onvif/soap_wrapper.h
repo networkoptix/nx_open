@@ -176,10 +176,6 @@ typedef _onvifImg__GetImagingSettings ImagingSettingsReq;
 typedef _onvifImg__GetImagingSettingsResponse ImagingSettingsResp;
 typedef _onvifImg__GetOptions ImagingOptionsReq;
 typedef _onvifImg__GetOptionsResponse ImagingOptionsResp;
-typedef _onvifImg__GetMoveOptions ImagingMoveOptionsReq;
-typedef _onvifImg__GetMoveOptionsResponse ImagingMoveOptionsResp;
-typedef _onvifImg__Move ImagingMoveReq;
-typedef _onvifImg__MoveResponse ImagingMoveResp;
 typedef _onvifImg__SetImagingSettings SetImagingSettingsReq;
 typedef _onvifImg__SetImagingSettingsResponse SetImagingSettingsResp;
 
@@ -406,8 +402,8 @@ public:
 
     int setImagingSettings(SetImagingSettingsReq& request, SetImagingSettingsResp& response);
 
-    int getMoveOptions(ImagingMoveOptionsReq &request, ImagingMoveOptionsResp &response);
-    int move(ImagingMoveReq &request, ImagingMoveResp &response);
+    int getMoveOptions(_onvifImg__GetMoveOptions &request, _onvifImg__GetMoveOptionsResponse &response);
+    int move(_onvifImg__Move &request, _onvifImg__MoveResponse &response);
 
 private:
     PasswordHelper& m_passwordsData;

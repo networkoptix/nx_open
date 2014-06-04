@@ -21,6 +21,7 @@ public:
     virtual Qn::PtzCapabilities getCapabilities() override;
     
     virtual bool continuousMove(const QVector3D &speed) override;
+    virtual bool continuousFocus(qreal speed) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
     
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
@@ -28,9 +29,19 @@ public:
     virtual bool getFlip(Qt::Orientations *flip) override;
 
 private:
-    double normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff);
+    struct SpeedLimits {
+        SpeedLimits(): min(0.0), max(0.0) {}
+        SpeedLimits(qreal min, qreal max): min(min), max(max) {}
+
+        qreal min;
+        qreal max;
+    };
+
+    static double normalizeSpeed(qreal speed, const SpeedLimits &speedLimits);
     
-    void initCoefficients();
+    Qn::PtzCapabilities initContinuousMove();
+    Qn::PtzCapabilities initContinuousFocus();
+
     bool stopInternal();
     bool moveInternal(const QVector3D &speed);
 
@@ -39,10 +50,7 @@ private:
     Qn::PtzCapabilities m_capabilities;
     bool m_stopBroken;
 
-    QPair<qreal, qreal> m_xNativeVelocityCoeff; // first for positive value, second for negative
-    QPair<qreal, qreal> m_yNativeVelocityCoeff;
-    QPair<qreal, qreal> m_zoomNativeVelocityCoeff;
-
+    SpeedLimits m_panSpeedLimits, m_tiltSpeedLimits, m_zoomSpeedLimits, m_focusSpeedLimits;
     QnPtzLimits m_limits;
 };
 

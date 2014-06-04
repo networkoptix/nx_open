@@ -644,12 +644,12 @@ int ImagingSoapWrapper::setImagingSettings(SetImagingSettingsReq& request, SetIm
     return m_soapProxy->SetImagingSettings(m_endpoint, NULL, &request, &response);
 }
 
-int ImagingSoapWrapper::getMoveOptions(ImagingMoveOptionsReq &request, ImagingMoveOptionsResp &response) 
+int ImagingSoapWrapper::getMoveOptions(_onvifImg__GetMoveOptions &request, _onvifImg__GetMoveOptionsResponse &response) 
 {
     return invokeMethod(&ImagingBindingProxy::GetMoveOptions, &request, &response);
 }
 
-int ImagingSoapWrapper::move(ImagingMoveReq &request, ImagingMoveResp &response) 
+int ImagingSoapWrapper::move(_onvifImg__Move &request, _onvifImg__MoveResponse &response) 
 {
     return invokeMethod(&ImagingBindingProxy::Move, &request, &response);
 }
