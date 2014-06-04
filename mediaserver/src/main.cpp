@@ -108,6 +108,7 @@
 #include <rest/handlers/change_system_name_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
+#include <rest/handlers/change_admin_password_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
 
@@ -1003,6 +1004,7 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/changeSystemName", new QnChangeSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/changeAdminPassword", new QnChangeAdminPasswordRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif

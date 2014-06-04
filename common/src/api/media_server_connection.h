@@ -252,6 +252,8 @@ public:
 
     int restart(QObject *target, const char *slot);
 
+    int changeAdminPasswordAsync(const QString &password, QObject *target, const char *slot);
+
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
 

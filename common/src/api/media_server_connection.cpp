@@ -69,6 +69,7 @@ namespace {
         (ChangeSystemNameObject,   "changeSystemName")
         (InstallUpdateObject,      "installUpdate")
         (Restart,                  "restart")
+        (ChangeAdminPasswordObject,"changeAdminPassword")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -408,6 +409,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, handle);
         break;
     case Restart:
+        emitFinished(this, response.status, handle);
+        break;
+    case ChangeAdminPasswordObject:
         emitFinished(this, response.status, handle);
         break;
     default:
@@ -869,4 +873,11 @@ int QnMediaServerConnection::installUpdate(const QString &updateId, const QByteA
 
 int QnMediaServerConnection::restart(QObject *target, const char *slot) {
     return sendAsyncGetRequest(Restart, QnRequestParamList(), NULL, target, slot);
+}
+
+int QnMediaServerConnection::changeAdminPasswordAsync(const QString &password, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("password", password);
+
+    return sendAsyncGetRequest(ChangeAdminPasswordObject, params, NULL, target, slot);
 }
