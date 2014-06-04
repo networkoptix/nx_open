@@ -1,5 +1,8 @@
 #include "change_system_name_rest_handler.h"
 
+#include <nx_ec/ec_api.h>
+#include <nx_ec/dummy_handler.h>
+#include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <media_server/settings.h>
 
@@ -18,7 +21,12 @@ int QnChangeSystemNameRestHandler::executeGet(const QString &path, const QnReque
     if (qnCommon->localSystemName() == systemName)
         return HttpStatusCode::ok;
 
-    MSSettings::roSettings()->setValue("systemName", systemName);
+    bool wholeSystem = !params.value("wholeSystem").isEmpty();
+
+    if (wholeSystem)
+        QnAppServerConnectionFactory::getConnection2()->getMiscManager()->changeSystemName(systemName, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    else
+        MSSettings::roSettings()->setValue("systemName", systemName);
 
     return HttpStatusCode::ok;
 }

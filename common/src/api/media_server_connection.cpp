@@ -852,9 +852,10 @@ int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camer
     return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 
-int QnMediaServerConnection::changeSystemNameAsync(const QString &systemName, QObject *target, const char *slot) {
+int QnMediaServerConnection::changeSystemNameAsync(const QString &systemName, bool wholeSystem, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("systemName", systemName);
+    params << QnRequestParam("wholeSystem", wholeSystem);
 
     return sendAsyncGetRequest(ChangeSystemNameObject, params, NULL, target, slot);
 }

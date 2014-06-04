@@ -407,6 +407,9 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
         case ApiCommand::removeDiscoveryInformation:
             return deliveryTransaction<ApiDiscoveryDataList>(abstractTran, stream);
 
+        case ApiCommand::changeSystemName:
+            return deliveryTransaction<QString>(abstractTran, stream);
+
         default:
             Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
             break;

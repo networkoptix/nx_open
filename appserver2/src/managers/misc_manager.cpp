@@ -32,9 +32,25 @@ void QnMiscManager<QueryProcessorType>::triggerNotification(const ApiModuleDataL
 }
 
 template<class QueryProcessorType>
+void QnMiscManager<QueryProcessorType>::triggerNotification(const QnTransaction<QString> &transaction) {
+    emit systemNameChangeRequested(transaction.params);
+}
+
+template<class QueryProcessorType>
 int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(moduleInformation, isAlive);
+
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
+
+    return reqId;
+}
+
+template<class QueryProcessorType>
+int QnMiscManager<QueryProcessorType>::changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) {
+    const int reqId = generateRequestID();
+    auto transaction = prepareTransaction(systemName);
 
     using namespace std::placeholders;
     m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
@@ -48,6 +64,14 @@ QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransacti
     QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &transaction.params);
     transaction.params.isAlive = isAlive;
     transaction.params.discoverer = QnId(qnCommon->moduleGUID());
+
+    return transaction;
+}
+
+template<class QueryProcessorType>
+QnTransaction<QString> QnMiscManager<QueryProcessorType>::prepareTransaction(const QString &systemName) const {
+    QnTransaction<QString> transaction(ApiCommand::changeSystemName, false);
+    transaction.params = systemName;
 
     return transaction;
 }

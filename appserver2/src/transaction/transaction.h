@@ -163,6 +163,8 @@ namespace ec2
             addDiscoveryInformation = 67,
             //!ApiDiscoveryDataList
             removeDiscoveryInformation = 68,
+            //!QString
+            changeSystemName = 69,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

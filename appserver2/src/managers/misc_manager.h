@@ -15,14 +15,17 @@ namespace ec2 {
 
         void triggerNotification(const QnTransaction<ApiModuleData> &transaction);
         void triggerNotification(const ApiModuleDataList &moduleDataList);
+        void triggerNotification(const QnTransaction<QString> &transaction);
 
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) override;
+        virtual int changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiModuleData> prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const;
+        QnTransaction<QString> prepareTransaction(const QString &systemName) const;
     };
 
 } // namespace ec2

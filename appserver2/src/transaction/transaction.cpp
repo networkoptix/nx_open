@@ -170,6 +170,9 @@ namespace ec2
                 case removeDiscoveryInformation:
                     return "removeDiscoveryInformation";
 
+                case changeSystemName:
+                    return "changeSystemName";
+
                 default:
                     return "unknown " + QString::number((int)val);
             }

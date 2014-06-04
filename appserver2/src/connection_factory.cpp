@@ -174,8 +174,12 @@ namespace ec2
 
         //AbstractMiscManager::moduleInfo
         registerUpdateFuncHandler<ApiModuleData>(restProcessorPool, ApiCommand::moduleInfo);
+
         //AbstractMiscManager::discoverPeer
         registerUpdateFuncHandler<ApiDiscoverPeerData>(restProcessorPool, ApiCommand::discoverPeer);
+        //AbstractMiscManager::changeSystemName
+        registerUpdateFuncHandler<QString>(restProcessorPool, ApiCommand::changeSystemName);
+
         //AbstractMiscManager::addDiscoveryInformation
         registerUpdateFuncHandler<ApiDiscoveryDataList>(restProcessorPool, ApiCommand::addDiscoveryInformation);
         //AbstractMiscManager::removeDiscoveryInformation

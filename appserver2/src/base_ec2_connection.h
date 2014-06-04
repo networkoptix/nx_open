@@ -188,6 +188,8 @@ namespace ec2
             case ApiCommand::installUpdate:
                 m_updatesManager->triggerNotification(tran);
                 break;
+            case ApiCommand::changeSystemName:
+                m_miscManager->triggerNotification(tran);
             default:
                 assert(false); // we should never get here
             }

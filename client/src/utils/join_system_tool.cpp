@@ -112,7 +112,7 @@ void QnJoinSystemTool::joinResource() {
         return;
     }
 
-    m_targetServer->apiConnection()->changeSystemNameAsync(qnCommon->localSystemName(), this, SLOT(at_targetServer_systemNameChanged(int,int)));
+    m_targetServer->apiConnection()->changeSystemNameAsync(qnCommon->localSystemName(), true, this, SLOT(at_targetServer_systemNameChanged(int,int)));
     connect(m_targetServer.data(), &QnResource::statusChanged, this, &QnJoinSystemTool::at_resource_statusChanged);
     m_timer->start();
 }
