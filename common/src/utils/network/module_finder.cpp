@@ -70,8 +70,10 @@ void QnModuleFinder::at_moduleFound(const QnModuleInformation &moduleInformation
         m_foundModules.insert(moduleInformation.id, moduleInformation);
     } else {
         QSet<QString> oldAddresses = it->remoteAddresses;
-        if (oldAddresses.contains(remoteAddress))
-            return;
+        if (oldAddresses.contains(remoteAddress)) {
+            if (moduleInformation.systemName == it->systemName)
+                return;
+        }
 
         // update module information collecting all known addresses
         *it = moduleInformation;

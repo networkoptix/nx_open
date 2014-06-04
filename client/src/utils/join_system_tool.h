@@ -41,7 +41,7 @@ private slots:
     void at_resource_statusChanged(const QnResourcePtr &resource);
     void at_timer_timeout();
     void at_hostLookedUp(const QHostInfo &hostInfo);
-    void at_targetServer_systemNameChanged(int handle, int status);
+    void at_targetServer_systemNameChanged(int status, int handle);
 
 private:
     bool m_running;

@@ -108,11 +108,7 @@ void QnJoinSystemTool::joinResource() {
     }
 
     if (m_targetServer->getSystemName() == qnCommon->localSystemName()) {
-        if (m_targetServer->getStatus() == QnResource::Online)
-            updateDiscoveryInformation();
-        else
-            rediscoverPeer();
-
+        rediscoverPeer();
         return;
     }
 
@@ -120,9 +116,14 @@ void QnJoinSystemTool::joinResource() {
 }
 
 void QnJoinSystemTool::rediscoverPeer() {
+    if (m_targetServer->getStatus() == QnResource::Online) {
+        updateDiscoveryInformation();
+        return;
+    }
+
     connection2()->getDiscoveryManager()->discoverPeer(m_targetUrl, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 
-    connect(m_targetServer.data(), &QnResource::statusChanged, this, &QnJoinSystemTool::at_resource_statusChanged);
+    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnJoinSystemTool::at_resource_statusChanged);
     m_timer->start();
 }
 
@@ -163,15 +164,19 @@ void QnJoinSystemTool::at_resource_added(const QnResourcePtr &resource) {
         return;
 
     m_targetServer = server;
+    m_timer->stop();
     joinResource();
 }
 
 void QnJoinSystemTool::at_resource_statusChanged(const QnResourcePtr &resource) {
-    if (resource != m_targetServer)
+    if (m_targetServer.isNull() || resource->getId() != m_targetServer->getId())
         return;
 
-    if (resource->getStatus() == QnResource::Online)
+    if (resource->getStatus() == QnResource::Online) {
+        disconnect(qnResPool, &QnResourcePool::statusChanged, this, &QnJoinSystemTool::at_resource_statusChanged);
+        m_timer->stop();
         updateDiscoveryInformation();
+    }
 }
 
 void QnJoinSystemTool::at_timer_timeout() {
@@ -179,11 +184,11 @@ void QnJoinSystemTool::at_timer_timeout() {
         return;
 
     if (m_targetServer) {
+        disconnect(qnResPool, &QnResourcePool::statusChanged, this, &QnJoinSystemTool::at_resource_statusChanged);
         finish(JoinError);
-        disconnect(m_targetServer.data(), &QnResource::statusChanged, this, &QnJoinSystemTool::at_resource_statusChanged);
     } else {
-        finish(Timeout);
         disconnect(qnResPool, &QnResourcePool::resourceAdded, this, &QnJoinSystemTool::at_resource_added);
+        finish(Timeout);
     }
 }
 
@@ -196,7 +201,7 @@ void QnJoinSystemTool::at_hostLookedUp(const QHostInfo &hostInfo) {
     m_possibleAddresses = hostInfo.addresses();
 }
 
-void QnJoinSystemTool::at_targetServer_systemNameChanged(int handle, int status) {
+void QnJoinSystemTool::at_targetServer_systemNameChanged(int status, int handle) {
     Q_UNUSED(handle)
 
     if (status != 0) {
