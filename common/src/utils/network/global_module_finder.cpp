@@ -4,6 +4,7 @@
 #include <common/common_module.h>
 #include <api/app_server_connection.h>
 #include <nx_ec/data/api_module_data.h>
+#include <nx_ec/dummy_handler.h>
 
 QnGlobalModuleFinder::QnGlobalModuleFinder(QObject *parent) :
     QObject(parent)
@@ -79,10 +80,14 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
     addModule(moduleInformation, QnId(qnCommon->moduleGUID()));
+    if (m_connection)
+        m_connection->getMiscManager()->sendModuleInformation(moduleInformation, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
     removeModule(moduleInformation, QnId(qnCommon->moduleGUID()));
+    if (m_connection)
+        m_connection->getMiscManager()->sendModuleInformation(moduleInformation, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformation, const QnId &discoverer) {
