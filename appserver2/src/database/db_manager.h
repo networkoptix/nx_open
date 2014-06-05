@@ -3,20 +3,7 @@
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
-#include "nx_ec/data/api_camera_data.h"
-#include "nx_ec/data/api_resource_type_data.h"
-#include "nx_ec/data/api_stored_file_data.h"
-#include "nx_ec/data/api_user_data.h"
-#include "nx_ec/data/api_layout_data.h"
-#include "nx_ec/data/api_videowall_data.h"
-#include "nx_ec/data/api_license_data.h"
-#include "nx_ec/data/api_business_rule_data.h"
-#include "nx_ec/data/api_full_info_data.h"
-#include "nx_ec/data/api_camera_server_item_data.h"
-#include "nx_ec/data/api_camera_bookmark_data.h"
-#include "nx_ec/data/api_media_server_data.h"
-#include "nx_ec/data/api_update_data.h"
-#include "nx_ec/data/api_module_data.h"
+#include "nx_ec/data/api_fwd.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 
@@ -51,7 +38,7 @@ namespace ec2
         std::vector<ApiIdData> toIdList() 
         {
             std::vector<ApiIdData> result;
-            for (int i = 0; i < size(); ++i) {
+            for (size_t i = 0; i < size(); ++i) {
                 ApiIdData data;
                 data.id = at(i).id;
                 result.push_back(data);
@@ -59,6 +46,8 @@ namespace ec2
             return result;
         }
     };
+
+    class QnDbManager;
 
     class QnDbManager: public QnDbHelper
     {
@@ -70,29 +59,38 @@ namespace ec2
             const QString& dbFileName );
         virtual ~QnDbManager();
 
+
+        class Locker
+        {
+        public:
+            Locker(QnDbManager* db);
+            ~Locker();
+            void beginTran();
+            void commit();
+        private:
+            bool m_inTran;
+            QnDbManager* m_db;
+        };
+
         bool init();
 
         static QnDbManager* instance();
         
         template <class T>
-        ErrorCode executeNestedTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
+        ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
-            ErrorCode result = executeTransactionNoLock(tran);
+            ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
                 return result;
             return transactionLog->saveTransaction( tran, serializedTran);
         }
-
-        void beginTran();
-        void commit();
-        void rollback();
 
 
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
             QnDbTransactionLocker lock(&m_tran);
-            ErrorCode result = executeTransactionNoLock(tran);
+            ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
                 return result;
 
@@ -162,6 +160,9 @@ namespace ec2
         // ApiDiscoveryDataList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
 
+        //getHelp
+        ErrorCode doQueryNoLock(const QString& group, ec2::ApiHelpGroupDataList& data);
+
 		// --------- misc -----------------------------
         bool markLicenseOverflow(bool value, qint64 time);
         qint64 licenseOverflowTime() const;
@@ -176,66 +177,66 @@ namespace ec2
 
         // ------------ transactions --------------------------------------
 
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraDataList>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiMediaServerData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLayoutDataList>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceStatusData>& tran);
-        //ErrorCode executeTransactionNoLock(const QnTransaction<ApiSetResourceDisabledData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceParamsData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraServerItemData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiPanicModeData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiStoredFileData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<QString> &tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessRuleData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiUserData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiResourceParamDataList>& tran); // save settings
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiUpdateUploadResponceData>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallDataList>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiDiscoveryDataList> &tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiSetResourceStatusData>& tran);
+        //ErrorCode executeTransactionInternal(const QnTransaction<ApiSetResourceDisabledData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamsData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiPanicModeData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<QString> &tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& tran); //reset business rules
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamDataList>& tran); // save settings
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryDataList> &tran);
 
         // delete camera, server, layout, any resource, etc.
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiIdData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiIdData>& tran);
 
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicenseDataList>& tran);
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiLicenseData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran);
 
         /* Add or remove camera bookmark tags */
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
 
 
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiEmailSettingsData>&) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiEmailSettingsData>&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiEmailData>&) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiEmailData>&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiFullInfoData>&) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiFullInfoData>&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiBusinessActionData>&) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
-            return ErrorCode::notImplemented;
-        }
-
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiVideowallControlMessageData> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessActionData>&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiUpdateUploadData> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallControlMessageData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiModuleData> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiModuleData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -308,11 +309,17 @@ namespace ec2
         qint32 getResourceInternalId( const QnId& guid );
         QnId getResourceGuid(const qint32 &internalId);
         qint32 getBusinessRuleInternalId( const QnId& guid );
+
+        void beginTran();
+        void commit();
+        void rollback();
     private:
         QMap<int, QnId> getGuidList(const QString& request);
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
         QnId getType(const QString& typeName);
+        bool loadHelpData(const QString& fileName);
+        void fillServerInfo( ApiServerInfoData* const serverInfo );
     private:
         QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;
@@ -325,8 +332,7 @@ namespace ec2
         bool m_licenseOverflowMarked;
         qint64 m_licenseOverflowTime;
         QUuid m_dbInstanceId;
-
-        void fillServerInfo( ApiServerInfoData* const serverInfo );
+        ApiHelpGroupDataList* m_helpData;
     };
 };
 

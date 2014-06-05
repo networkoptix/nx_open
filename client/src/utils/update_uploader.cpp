@@ -56,6 +56,9 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
 }
 
 void QnUpdateUploader::sendNextChunk() {
+    if (m_updateFile.isNull())
+        return;
+
     qint64 offset = m_updateFile->pos();
     QByteArray data = m_updateFile->read(m_chunkSize);
 
@@ -73,6 +76,9 @@ void QnUpdateUploader::sendNextChunk() {
 void QnUpdateUploader::chunkUploaded(int reqId, ec2::ErrorCode errorCode) {
     Q_UNUSED(reqId)
 
+    if (m_updateFile.isNull())
+        return;
+
     if (errorCode != ec2::ErrorCode::ok) {
         cleanUp();
         emit failed();
@@ -85,6 +91,9 @@ void QnUpdateUploader::chunkUploaded(int reqId, ec2::ErrorCode errorCode) {
 
 void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &updateId, const QnId &peerId, int chunks) {
     if (updateId != m_updateId)
+        return;
+
+    if (m_updateFile.isNull())
         return;
 
     auto it = m_progressById.find(peerId);

@@ -250,7 +250,7 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
             storage->closeOpenedFiles();
     }
 
-    bool rez;
+    bool rez = true;
     if (dataInOldFile) {
         QFile::remove(removeProtocolPrefix(newName));
         rez = QFile::rename(removeProtocolPrefix(oldName), removeProtocolPrefix(newName));

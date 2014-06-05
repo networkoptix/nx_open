@@ -30,7 +30,9 @@ public:
     };
     static QString toString( State state );
 
-    QnTransactionTransport(bool isOriginator, bool isClient, QSharedPointer<AbstractStreamSocket> socket = QSharedPointer<AbstractStreamSocket>(), const QUuid& remoteGuid = QUuid());
+    QnTransactionTransport(const QnPeerInfo &localPeer,
+        const QnPeerInfo &remotePeer = QnPeerInfo(QnId(), QnPeerInfo::Server),
+        QSharedPointer<AbstractStreamSocket> socket = QSharedPointer<AbstractStreamSocket>());
     ~QnTransactionTransport();
 
     static QByteArray encodeHWList(const QList<QByteArray> hwList);
@@ -45,20 +47,17 @@ public:
     void close();
 
     // these getters/setters are using from a single thread
-    bool isOriginator() const { return m_originator; }
-    bool isClientPeer() const { return m_isClientPeer; }
     QList<QByteArray> hwList() const { return m_hwList; }
     void setHwList(const QList<QByteArray>& value) { m_hwList = value; }
-    QUuid remoteGuid() const  { return m_remoteGuid; }
     qint64 lastConnectTime() { return m_lastConnectTime; }
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
     bool isReadSync() const       { return m_readSync; }
     void setReadSync(bool value)  {m_readSync = value;}
     bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }
-    void setTimeDiff(qint64 diff) { m_timeDiff = diff; }
-    qint64 timeDiff() const       { return m_timeDiff; }
     QUrl remoteAddr() const       { return m_remoteAddr; }
+
+    QnPeerInfo remotePeer() const { return m_remotePeer; }
 
     // This is multi thread getters/setters
     void setState(State state);
@@ -69,14 +68,14 @@ public:
     static void connectingCanceled(const QnId& id, bool isOriginator);
     static void connectDone(const QnId& id);
 private:
+    QnPeerInfo m_localPeer;
+    QnPeerInfo m_remotePeer;
+
     qint64 m_lastConnectTime;
 
     bool m_readSync;
     bool m_writeSync;
 
-    QUuid m_remoteGuid;
-    bool m_originator;
-    bool m_isClientPeer;
     QList<QByteArray> m_hwList;
 
     mutable QMutex m_mutex;
@@ -89,7 +88,6 @@ private:
     quint32 m_chunkLen;
     int m_sendOffset;
     QQueue<QByteArray> m_dataToSend;
-    qint64 m_timeDiff;
     QUrl m_remoteAddr;
     bool m_connected;
 
@@ -98,7 +96,7 @@ private:
     static ConnectingInfoMap m_connectingConn; // first - true if connecting to remove peer in progress, second - true if getting connection from remove peer in progress
     static QMutex m_staticMutex;
 private:
-    void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw();
+    void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     static void ensureSize(std::vector<quint8>& buffer, std::size_t size);
     int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);

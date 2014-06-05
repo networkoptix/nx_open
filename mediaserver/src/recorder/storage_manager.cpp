@@ -108,7 +108,7 @@ QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(c
 
     /* Check new records, absent in the DB
     */
-    QStringList emptyFileList;
+    QVector<DeviceFileCatalog::EmptyFileInfo> emptyFileList;
     QString rootDir = closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixByCatalog(catalog) + QString('/') + mac;
     DeviceFileCatalog::ScanFilter filter;
     if (!chunks.isEmpty())
@@ -118,11 +118,11 @@ QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(c
     fileCatalog->scanMediaFiles(rootDir, storage, newChunksMap, emptyFileList, filter);
     QVector<DeviceFileCatalog::Chunk> newChunks = newChunksMap.values().toVector();
 
-    foreach(const QString& fileName, emptyFileList)
-        qnFileDeletor->deleteFile(fileName);
+    foreach(const DeviceFileCatalog::EmptyFileInfo& emptyFile, emptyFileList)
+        qnFileDeletor->deleteFile(emptyFile.fileName);
 
     // add to DB
-    QnStorageDbPtr sdb = m_chunksDB[storage];
+    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     foreach(const DeviceFileCatalog::Chunk& chunk, newChunks)
         sdb->addRecord(mac, catalog, chunk);
     sdb->flushRecords();
@@ -158,9 +158,9 @@ QMap<QString, QSet<int>> QnStorageManager::deserializeStorageFile()
 
 bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, bool isRebuild, qreal progressCoeff)
 {
-    QnStorageDbPtr sdb = m_chunksDB[storage];
+    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     if (!sdb)
-        sdb = m_chunksDB[storage] = QnStorageDbPtr(new QnStorageDb(storage->getIndex()));
+        sdb = m_chunksDB[storage->getUrl()] = QnStorageDbPtr(new QnStorageDb(storage->getIndex()));
     QString fileName = closeDirPath(storage->getUrl()) + QString::fromLatin1("media.sqlite");
 
     if (!sdb->open(fileName))
@@ -522,7 +522,7 @@ void QnStorageManager::clearSpace(const QnStorageResourcePtr &storage)
         return;
     qint64 toDelete = storage->getSpaceLimit() - freeSpace;
 
-    QnStorageDbPtr sdb = m_chunksDB[storage];
+    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     sdb->beforeDelete();
 
     while (toDelete > 0)
@@ -861,7 +861,7 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const Qn
     if (recordingTime > 0)
         ownCatalog->setLatRecordingTime(recordingTime);
 
-    QnStorageDbPtr sdb = m_chunksDB[storage];
+    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     sdb->replaceChunks(mac, catalog, newCatalog->m_chunks);
 }
 
@@ -928,7 +928,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     DeviceFileCatalogPtr catalog = getFileCatalog(mac.toUtf8(), quality);
     if (catalog == 0)
         return false;
-    QnStorageDbPtr sdb = m_chunksDB[storage];
+    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     sdb->addRecord(mac.toUtf8(), DeviceFileCatalog::catalogByPrefix(quality), catalog->updateDuration(durationMs, fileSize));
     return true;
 }
@@ -989,7 +989,7 @@ void QnStorageManager::doMigrateCSVCatalog(QnServer::ChunksCatalog catalog)
             {
                 QnStorageResourcePtr storage = findStorageByOldIndex(chunk.storageIndex, storageIndexes);
                 if (storage) {
-                    QnStorageDbPtr sdb = m_chunksDB[storage];
+                    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
                     sdb->addRecord(mac, catalog, chunk);
                 }
             }
@@ -1042,7 +1042,7 @@ bool QnStorageManager::addBookmark(const QByteArray &cameraGuid, QnCameraBookmar
     if (!storage)
         return false;
 
-    QnStorageDbPtr sdb = m_chunksDB[storage];
+    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     if (!sdb)
         return false;
 
@@ -1065,7 +1065,7 @@ bool QnStorageManager::updateBookmark(const QByteArray &cameraGuid, QnCameraBook
     if (!storage)
         return false;
 
-    QnStorageDbPtr sdb = m_chunksDB[storage];
+    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     if (!sdb)
         return false;
 
@@ -1092,7 +1092,7 @@ bool QnStorageManager::deleteBookmark(const QByteArray &cameraGuid, QnCameraBook
     if (!storage)
         return false;
 
-    QnStorageDbPtr sdb = m_chunksDB[storage];
+    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     if (!sdb)
         return false;
 

@@ -76,8 +76,8 @@ private slots:
 
     void on_panicModeChanged(Qn::PanicMode mode);
 
-    void at_remotePeerFound(ec2::ApiServerAliveData data, bool isProxy);
-    void at_remotePeerLost(ec2::ApiServerAliveData data, bool isProxy);
+    void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
+    void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
 
 protected:
     ec2::AbstractECConnectionPtr m_connection;

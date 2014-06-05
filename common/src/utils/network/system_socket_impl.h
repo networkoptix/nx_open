@@ -16,8 +16,8 @@ class SocketImpl
 public:
     SocketImpl();
 
-    void*& getUserData( PollSet::EventType eventType );
-    void* const& getUserData( PollSet::EventType eventType ) const;
+    void*& getUserData( aio::EventType eventType );
+    void* const& getUserData( aio::EventType eventType ) const;
 
 private:
     std::vector<void*> m_eventTypeToUserData;

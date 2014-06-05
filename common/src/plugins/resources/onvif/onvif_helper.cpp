@@ -194,6 +194,11 @@ PasswordHelper::PasswordHelper()
     setPasswordInfo(FLIR_MANUFACTURER,   ADMIN1, "fliradmin");
     setPasswordInfo(SENTRY_MANUFACTURER, ADMIN1, PASSWD4);
 
+    setPasswordInfo("vista", "admin", "admin");
+    setPasswordInfo("norbain", "admin", "admin");
+    setPasswordInfo("vista_", "admin", "admin");
+    setPasswordInfo("norbain_", "admin", "admin");
+
     //if (cl_log.logLevel() >= cl_logDEBUG1) {
     //    printPasswords();
     //}

@@ -48,7 +48,7 @@ public:
     void setEngineVersion(const QnSoftwareVersion &version);
 
 protected:
-    static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName);
+    static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
 private:
     QnSessionManager *m_sessionManager;

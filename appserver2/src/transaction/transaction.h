@@ -157,6 +157,7 @@ namespace ec2
 
             //!ApiModuleData
             moduleInfo = 65,
+
             //!ApiDiscoveryDataList
             discoverPeer = 66,
             //!ApiDiscoveryDataList
@@ -165,6 +166,9 @@ namespace ec2
             removeDiscoveryInformation = 68,
             //!QString
             changeSystemName = 69,
+
+            //!ApiHelpGroupDataList
+            getHelp = 70,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

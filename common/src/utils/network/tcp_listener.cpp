@@ -47,10 +47,7 @@ bool QnTcpListener::authenticate(const nx_http::Request& request, nx_http::Respo
     if (data[0].toLower() == "basic" && data.size() > 1)
         rez = data[1] == d->authDigest;
     if (!rez)
-    {
-        response.headers.erase("WWW-Authenticate");
-        response.headers.insert( std::make_pair("WWW-Authenticate", "Basic realm=\"Secure Area\"") );
-    }
+        nx_http::insertOrReplaceHeader( &response.headers, std::make_pair("WWW-Authenticate", "Basic realm=\"Secure Area\"") );
     return rez;
 }
 

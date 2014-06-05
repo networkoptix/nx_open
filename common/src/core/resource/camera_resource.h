@@ -70,7 +70,7 @@ public:
     virtual int getChannel() const override;
 
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
-    static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList); // find resolution helper function
+    static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList, double* coeff = 0); // find resolution helper function
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;

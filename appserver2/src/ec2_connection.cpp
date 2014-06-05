@@ -38,6 +38,7 @@ namespace ec2
 
         m_emailManagerImpl.configure(kvPairs);
         QnTransactionMessageBus::instance()->setHandler(this);
+        QnTransactionMessageBus::instance()->setLocalPeer(QnPeerInfo(qnCommon->moduleGUID(), QnPeerInfo::Server));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
@@ -52,8 +53,7 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void Ec2DirectConnection::startReceivingNotifications( bool /*isClient*/)
-    {
+    void Ec2DirectConnection::startReceivingNotifications() {
         QnTransactionMessageBus::instance()->start();
     }
 }

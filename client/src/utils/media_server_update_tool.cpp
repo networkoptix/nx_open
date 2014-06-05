@@ -268,6 +268,7 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
 
     m_updateFiles.clear();
     m_updateInformationById.clear();
+    m_targetMustBeNewer = false;
 
     QStringList entries = m_localUpdateDir.entryList(QStringList() << lit("*.zip"), QDir::Files);
     foreach (const QString &entry, entries) {
@@ -284,7 +285,19 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
         if (m_updateFiles.contains(sysInfo))
             continue;
 
-        m_updateFiles.insert(sysInfo, UpdateFileInformationPtr(new UpdateFileInformation(version, fileName)));
+        if (m_targetVersion.isNull())
+            m_targetVersion = version;
+
+        if (m_targetVersion != version) {
+            setCheckResult(UpdateImpossible);
+            return;
+        }
+
+        UpdateFileInformationPtr updateFileInformation(new UpdateFileInformation(version, fileName));
+        QFile file(fileName);
+        updateFileInformation->fileSize = file.size();
+        updateFileInformation->md5 = makeMd5(&file);
+        m_updateFiles.insert(sysInfo, updateFileInformation);
     }
 
     checkUpdateCoverage();
@@ -391,6 +404,7 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
             UpdateFileInformationPtr info(new UpdateFileInformation(m_targetVersion, QUrl(urlPrefix + fileName)));
             info->baseFileName = fileName;
             info->fileSize = package.value(lit("size")).toLongLong();
+            info->md5 = package.value(lit("md5")).toString();
             m_updateFiles.insert(QnSystemInformation(platform.key(), architecture, modification), info);
         }
     }
@@ -468,9 +482,32 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
 void QnMediaServerUpdateTool::downloadUpdates() {
     QHash<QUrl, QString> downloadTargets;
     QMultiHash<QUrl, QnId> peerAssociations;
+    QHash<QUrl, QString> hashByUrl;
+    QHash<QUrl, qint64> fileSizeByUrl;
+
     for (auto it = m_updateFiles.begin(); it != m_updateFiles.end(); ++it) {
+        QList<QnId> peers = m_idBySystemInformation.values(it.key());
+        if (peers.isEmpty())
+            continue;
+
+        QString fileName = it.value()->fileName;
+        if (fileName.isEmpty())
+            fileName = updateFilePath(updatesDirName, it.value()->baseFileName);
+
+        if (!fileName.isEmpty()) {
+            QFile file(fileName);
+            if (file.exists() && file.size() == it.value()->fileSize) {
+                if (!it.value()->md5.isEmpty() && makeMd5(&file) == it.value()->md5) {
+                    it.value()->fileName = fileName;
+                    continue;
+                }
+            }
+        }
+
         downloadTargets.insert(it.value()->url, it.value()->baseFileName);
-        foreach (const QnId &peerId, m_idBySystemInformation.values(it.key())) {
+        hashByUrl.insert(it.value()->url, it.value()->md5);
+        fileSizeByUrl.insert(it.value()->url, it.value()->fileSize);
+        foreach (const QnId &peerId, peers) {
             peerAssociations.insert(it.value()->url, peerId);
             PeerUpdateInformation &updateInformation = m_updateInformationById[peerId];
             updateInformation.state = PeerUpdateInformation::UpdateDownloading;
@@ -483,6 +520,8 @@ void QnMediaServerUpdateTool::downloadUpdates() {
 
     m_downloadUpdatesPeerTask->setTargetDir(updatesDirName);
     m_downloadUpdatesPeerTask->setTargets(downloadTargets);
+    m_downloadUpdatesPeerTask->setHashes(hashByUrl);
+    m_downloadUpdatesPeerTask->setFileSizes(fileSizeByUrl);
     m_downloadUpdatesPeerTask->setPeerAssociations(peerAssociations);
     m_downloadUpdatesPeerTask->start(QSet<QnId>::fromList(m_updateInformationById.keys()));
 }

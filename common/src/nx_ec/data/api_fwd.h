@@ -38,7 +38,7 @@ namespace ec2 {
     struct ApiResourceTypeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
-    struct ApiServerAliveData;
+    struct ApiPeerAliveData;
     struct ApiServerInfoData;
     //struct ApiSetResourceDisabledData;
     struct ApiSetResourceStatusData;
@@ -62,6 +62,12 @@ namespace ec2 {
     struct ApiLoginData;
     struct ApiDiscoveryData;
     struct ApiDiscoverPeerData;
+
+    struct ApiHelpValueData;
+    struct ApiHelpParamData;
+    struct ApiHelpFunctionData;
+    struct ApiHelpGroupData;
+    struct ApiHelpGroupDataList;
 
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
@@ -109,7 +115,7 @@ namespace ec2 {
     (ApiResourceTypeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\
-    (ApiServerAliveData)\
+    (ApiPeerAliveData)\
     (ApiServerInfoData)\
     (ApiSetResourceStatusData)\
     (ApiStorageData)\
@@ -132,6 +138,11 @@ namespace ec2 {
     (ApiLoginData)\
     (ApiDiscoveryData)\
     (ApiDiscoverPeerData)\
+    (ApiHelpValueData)\
+    (ApiHelpParamData)\
+    (ApiHelpFunctionData)\
+    (ApiHelpGroupData)\
+    (ApiHelpGroupDataList)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

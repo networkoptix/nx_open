@@ -88,13 +88,6 @@ namespace ec2
                 : nx_http::StatusCode::internalServerError;
         }
 
-        //!Implementation of QnRestRequestHandler::description
-        virtual QString description() const
-        {
-            //TODO/IMPL
-            return QString();
-        }
-
     private:
         Ec2DirectConnectionPtr m_connection;
         QWaitCondition m_cond;

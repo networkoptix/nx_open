@@ -10,11 +10,13 @@
 #include <QtCore/QTextStream>
 
 #include "plugins/plugin_tools.h"
+#include "plugins/resources/onvif/dataprovider/onvif_mjpeg.h"
+#include "motion_data_picture.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 #include "utils/media/nalUnits.h"
 #include "utils/network/http/httptypes.h"
-#include "motion_data_picture.h"
+#include "utils/network/multicodec_rtp_reader.h"
 
 
 ThirdPartyStreamReader::ThirdPartyStreamReader(
@@ -22,7 +24,6 @@ ThirdPartyStreamReader::ThirdPartyStreamReader(
     nxcip::BaseCameraManager* camManager )
 :
     CLServerPushStreamReader( res ),
-    m_rtpStreamParser( res ),
     m_camManager( camManager ),
     m_liveStreamReader( NULL ),
     m_mediaEncoder2Ref( NULL ),
@@ -51,8 +52,7 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
 
 void ThirdPartyStreamReader::onGotVideoFrame( QnCompressedVideoDataPtr videoData )
 {
-    //TODO/IMPL
-    parent_type::onGotVideoFrame( videoData );
+    base_type::onGotVideoFrame( videoData );
 }
 
 static int sensitivityToMask[10] = 
@@ -72,7 +72,7 @@ static int sensitivityToMask[10] =
 void ThirdPartyStreamReader::updateSoftwareMotion()
 {
     if( m_thirdPartyRes->getMotionType() != Qn::MT_HardwareGrid )
-        return parent_type::updateSoftwareMotion();
+        return base_type::updateSoftwareMotion();
 
     if( m_thirdPartyRes->getVideoLayout()->channelCount() == 0 )
         return;
@@ -111,8 +111,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
     if( isStreamOpened() )
         return CameraDiagnostics::NoErrorResult();
 
-    QnResource::ConnectionRole role = getRole();
-    m_rtpStreamParser.setRole(role);
+    const QnResource::ConnectionRole role = getRole();
 
     const int encoderIndex = role == QnResource::Role_LiveVideo
         ? QnThirdPartyResource::PRIMARY_ENCODER_INDEX
@@ -175,8 +174,24 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
         }
 
         NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(mediaUrlStr).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
-        m_rtpStreamParser.setRequest( mediaUrlStr );
-        return m_rtpStreamParser.openStream();
+
+        //checking url type and creating corresponding data provider
+
+        QUrl mediaUrl( mediaUrlStr );
+        if( mediaUrl.scheme().toLower() == lit("rtsp") )
+        {
+            QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
+            rtspStreamReader->setRequest( mediaUrlStr );
+            rtspStreamReader->setRole(role);
+            m_builtinStreamReader.reset( rtspStreamReader );
+        }
+        else if( mediaUrl.scheme().toLower() == lit("http") )
+        {
+            m_builtinStreamReader.reset( new MJPEGtreamreader(
+                m_resource,
+                mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString()) ) );
+        }
+        return m_builtinStreamReader->openStream();
     }
 }
 
@@ -187,22 +202,22 @@ void ThirdPartyStreamReader::closeStream()
         m_liveStreamReader->releaseRef();
         m_liveStreamReader = NULL;
     }
-    else
+    else if( m_builtinStreamReader.get() )
     {
-        m_rtpStreamParser.closeStream();
+        m_builtinStreamReader->closeStream();
     }
 }
 
 bool ThirdPartyStreamReader::isStreamOpened() const
 {
-    return m_liveStreamReader || m_rtpStreamParser.isStreamOpened();
+    return m_liveStreamReader || (m_builtinStreamReader.get() && m_builtinStreamReader->isStreamOpened());
 }
 
 int ThirdPartyStreamReader::getLastResponseCode() const
 {
     return m_liveStreamReader
         ? nx_http::StatusCode::ok
-        : m_rtpStreamParser.getLastResponseCode();
+        : (m_builtinStreamReader.get() ? m_builtinStreamReader->getLastResponseCode() : nx_http::StatusCode::ok);
 }
 
 //bool ThirdPartyStreamReader::needMetaData() const
@@ -223,9 +238,17 @@ void ThirdPartyStreamReader::pleaseStop()
 {
     CLServerPushStreamReader::pleaseStop();
     if( m_liveStreamReader )
+    {
         m_liveStreamReader->interrupt();
-    else
-        m_rtpStreamParser.pleaseStop();
+    }
+    else if( m_builtinStreamReader )
+    {
+        QnStoppable* stoppable = dynamic_cast<QnStoppable*>(m_builtinStreamReader.get());
+        //TODO #ak preferred way to remove dynamic_cast from here and inherit QnAbstractMediaStreamProvider from QnStoppable. 
+            //But, this will require virtual inheritance since CLServerPushStreamReader (base of MJPEGtreamreader) indirectly inherits QnStoppable.
+        if( stoppable )
+            stoppable->pleaseStop();
+    }
 }
 
 QnResource::ConnectionRole ThirdPartyStreamReader::roleForMotionEstimation()
@@ -296,9 +319,9 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                 }
             }
         }
-        else
+        else if( m_builtinStreamReader.get() )
         {
-            rez = m_rtpStreamParser.getNextData();
+            rez = m_builtinStreamReader->getNextData();
         }
 
         if( rez )
@@ -343,7 +366,7 @@ QnConstResourceAudioLayoutPtr ThirdPartyStreamReader::getDPAudioLayout() const
 {
     return m_liveStreamReader
         ? m_audioLayout.staticCast<const QnResourceAudioLayout>()    //TODO/IMPL
-        : m_rtpStreamParser.getAudioLayout();
+        : (m_builtinStreamReader.get() ? m_builtinStreamReader->getAudioLayout() : QnConstResourceAudioLayoutPtr());
 }
 
 CodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compressionType )

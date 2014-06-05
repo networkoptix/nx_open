@@ -1,6 +1,8 @@
 #include "update_utils.h"
 
 #include <QtCore/QJsonDocument>
+#include <QtCore/QDir>
+#include <QtCore/QCryptographicHash>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
@@ -54,4 +56,36 @@ bool verifyUpdatePackage(QIODevice *device, QnSoftwareVersion *version, QnSystem
     zip.setCurrentFile(infoEntryName);
     QuaZipFile infoFile(&zip);
     return verifyUpdatePackageInternal(&infoFile, version, sysInfo);
+}
+
+QString updateFilePath(const QString &updatesDirPath, const QString &fileName) {
+    QDir dir = QDir::temp();
+    if (!dir.exists(updatesDirPath))
+        dir.mkdir(updatesDirPath);
+    dir.cd(updatesDirPath);
+    return dir.absoluteFilePath(fileName);
+}
+
+
+QString makeMd5(const QString &fileName) {
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly))
+        return QString();
+
+    return makeMd5(&file);
+}
+
+
+QString makeMd5(QIODevice *device) {
+    if (!device->isOpen() && !device->open(QIODevice::ReadOnly))
+        return QString();
+
+    if (!device->isSequential())
+        device->seek(0);
+
+    QCryptographicHash hash(QCryptographicHash::Md5);
+    if (!hash.addData(device))
+        return QString();
+
+    return QString::fromLatin1(hash.result().toHex());
 }

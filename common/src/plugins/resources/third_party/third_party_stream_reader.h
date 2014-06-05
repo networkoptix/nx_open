@@ -6,8 +6,8 @@
 #ifndef THIRD_PARTY_STREAM_READER_H
 #define THIRD_PARTY_STREAM_READER_H
 
+#include "core/dataprovider/abstract_media_stream_provider.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
-#include "utils/network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 #include "third_party_resource.h"
 
@@ -17,7 +17,7 @@ class ThirdPartyStreamReader
 :
     public CLServerPushStreamReader
 {
-    typedef CLServerPushStreamReader parent_type;
+    typedef CLServerPushStreamReader base_type;
 
 public:
     ThirdPartyStreamReader(
@@ -58,7 +58,7 @@ private:
 
 private:
     QnMetaDataV1Ptr m_lastMetadata;
-    QnMulticodecRtpReader m_rtpStreamParser;
+    std::unique_ptr<QnAbstractMediaStreamProvider> m_builtinStreamReader;
     QnThirdPartyResourcePtr m_thirdPartyRes;
     nxcip_qt::BaseCameraManager m_camManager;
     nxcip::StreamReader* m_liveStreamReader;

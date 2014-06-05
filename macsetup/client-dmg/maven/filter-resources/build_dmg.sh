@@ -16,11 +16,6 @@ mv "$SRC/DS_Store" "$SRC/.DS_Store"
 python macdeployqt.py "$SRC/${product.name}.app" "$BINARIES" "$LIBRARIES" "$HELP"
 security unlock-keychain -p 123 $HOME/Library/Keychains/login.keychain
 
-if [ '${skip.sign}' == 'false'  ]
-then
-    codesign -f -v --deep -s "${mac.sign.identity}" "$SRC/${product.name}.app"
-fi
-
 # Boris, move this to a separate script (of even folder), please
 rm -rf "$AS_SRC"
 mkdir "$AS_SRC"
@@ -31,6 +26,11 @@ then
     codesign -f -v --deep --entitlements entitlements.plist -s "${mac.app.sign.identity}" "$AS_SRC/${product.name}.app"
     productbuild --component "$AS_SRC/${product.name}.app" /Applications --sign "${mac.pkg.sign.identity}" --product "$AS_SRC/${product.name}.app/Contents/Info.plist" "$PKG_FILE"
     # End
+fi
+
+if [ '${skip.sign}' == 'false'  ]
+then
+    codesign -f -v --deep -s "${mac.sign.identity}" "$SRC/${product.name}.app"
 fi
 
 SetFile -c icnC $SRC/.VolumeIcon.icns

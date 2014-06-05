@@ -18,7 +18,6 @@ public:
     ~QnManualCameraAdditionRestHandler();
 
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
-    virtual QString description() const;
 
 private:
     int searchStartAction(const QnRequestParams &params, QnJsonRestResult &result);

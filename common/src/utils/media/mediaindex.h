@@ -16,6 +16,7 @@
 /*!
     Used for quick seek in media stream.
     \note Thread-safe
+    TODO #ak this class is not used currently. Throw it away after 2.3 release
 */
 class MediaIndex
 {

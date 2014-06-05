@@ -16,6 +16,7 @@
 #include "ptz_data.h"
 #include "ptz_math.h"
 #include "ptz_object.h"
+#include "ptz_auxilary_trait.h"
 
 /**
  * A thread-safe blocking interface for accessing camera's PTZ functions.
@@ -67,6 +68,22 @@ public:
      * \returns                         Whether the operation was successful.
      */
     virtual bool continuousMove(const QVector3D &speed) = 0;
+
+    /**
+     * Starts or stops continuous focus movement.
+     * 
+     * Speed is specified in device-specific coordinate space and is expected 
+     * to be in range <tt>[-1, 1]</tt>. Positive speed is for far focus. 
+     * 
+     * Passing zero should stop focus movement.
+     * 
+     * This function is expected to be implemented if this controller has
+     * <tt>Qn::ContinuousFocusCapability</tt>.
+     * 
+     * \param speed                     Focus speed.
+     * \returns                         Whether the operation was successful.
+     */
+    virtual bool continuousFocus(qreal speed) = 0;
 
     /**
      * Sets camera PTZ position in the given coordinate space. 
@@ -274,6 +291,10 @@ public:
      * \returns                         Whether the operation was successful.
      */
     virtual bool getHomeObject(QnPtzObject *homeObject) = 0;
+
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) = 0;
+
+    virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data) = 0;
 
     /**
      * Gets all PTZ data associated with this controller in a single operation.

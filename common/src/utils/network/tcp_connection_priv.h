@@ -10,6 +10,7 @@ static const int TCP_READ_BUFFER_SIZE = 65536;
 
 #include "utils/common/byte_array.h"
 #include "utils/network/http/httptypes.h"
+#include "nx_ec/data/api_help_data.h"
 
 
 static const QByteArray STATIC_UNAUTHORIZED_HTML("\
@@ -79,6 +80,8 @@ public:
     int socketTimeout;
     bool chunkedMode;
     int clientRequestOffset;
+
+    ec2::ApiHelpGroupDataList helpData;
 };
 
 #endif // __TCP_CONNECTION_PRIV_H__

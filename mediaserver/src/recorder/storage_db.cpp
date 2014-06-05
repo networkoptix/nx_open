@@ -99,6 +99,9 @@ bool QnStorageDb::replaceChunks(const QByteArray& mac, QnServer::ChunksCatalog c
 
     foreach(const DeviceFileCatalog::Chunk& chunk, chunks)
     {
+        if (chunk.durationMs == -1)
+            continue;
+
         if (!addRecordInternal(mac, catalog, chunk)) {
             rollback();
             return false;

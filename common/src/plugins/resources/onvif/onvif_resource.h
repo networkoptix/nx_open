@@ -173,6 +173,9 @@ public:
     QString getImagingUrl() const;
     void setImagingUrl(const QString& src);
 
+    QString getVideoSourceToken() const;
+    void setVideoSourceToken(const QString &src);
+
     QString getPtzUrl() const;
     void setPtzUrl(const QString& src);
 
@@ -198,6 +201,7 @@ public:
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
     static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl, const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
     CameraDiagnostics::Result readDeviceInformation();
+    CameraDiagnostics::Result getFullUrlInfo();
 
 
     //!Relay input with token \a relayToken has changed its state to \a active
@@ -220,12 +224,13 @@ public:
 
     CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
     bool secondaryResolutionIsLarge() const;
-    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
+    virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const override;
 
     QMutex* getStreamConfMutex();
     void beforeConfigureStream();
     void afterConfigureStream();
 
+    static QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
 protected:
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
@@ -468,7 +473,6 @@ private:
         bool active,
         unsigned int autoResetTimeoutMS );
     CameraDiagnostics::Result fetchAndSetDeviceInformationPriv( bool performSimpleCheck );
-    CameraDiagnostics::Result getFullUrlInfo();
 };
 
 #endif //ENABLE_ONVIF

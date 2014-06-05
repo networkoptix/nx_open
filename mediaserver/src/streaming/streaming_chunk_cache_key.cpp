@@ -29,6 +29,7 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     const QString& uniqueResourceID,
     int channel,
     const QString& containerFormat,
+    const QString& alias,
     quint64 startTimestamp,
     quint64 duration,
     MediaQuality streamQuality,
@@ -37,6 +38,7 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     m_uniqueResourceID( uniqueResourceID ),
     m_channel( channel ),
     m_containerFormat( containerFormat ),
+    m_alias( alias ),
     m_startTimestamp( startTimestamp ),
     m_duration( duration ),
     m_streamQuality( streamQuality ),
@@ -76,6 +78,11 @@ const QString& StreamingChunkCacheKey::srcResourceUniqueID() const
 unsigned int StreamingChunkCacheKey::channel() const
 {
     return m_channel;
+}
+
+QString StreamingChunkCacheKey::alias() const
+{
+    return m_alias;
 }
 
 quint64 StreamingChunkCacheKey::startTimestamp() const
@@ -144,6 +151,11 @@ bool StreamingChunkCacheKey::operator<( const StreamingChunkCacheKey& right ) co
     if( m_containerFormat > right.m_containerFormat )
         return false;
 
+    if( m_alias < right.m_alias )
+        return true;
+    if( m_alias > right.m_alias )
+        return false;
+
     if( m_startTimestamp < right.m_startTimestamp )
         return true;
     if( m_startTimestamp > right.m_startTimestamp )
@@ -197,6 +209,7 @@ bool StreamingChunkCacheKey::operator==( const StreamingChunkCacheKey& right ) c
     return (m_uniqueResourceID == right.m_uniqueResourceID)
         && (m_channel == right.m_channel)
         && (m_containerFormat == right.m_containerFormat)
+        && (m_alias == right.m_alias)
         && (m_startTimestamp == right.m_startTimestamp)
         && (m_duration == right.m_duration)
         && (m_streamQuality == right.m_streamQuality);
@@ -213,6 +226,7 @@ uint qHash( const StreamingChunkCacheKey& key )
     return qHash(key.srcResourceUniqueID())
         + key.channel()
         + key.startTimestamp()
+        + qHash(key.alias())
         + key.duration()
         + key.endTimestamp()
         + key.streamQuality()

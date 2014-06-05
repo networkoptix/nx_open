@@ -25,11 +25,10 @@ private:
     bool m_opened;
     QnIncompatibleServerAdder *m_incompatibleServerAdder;
 private slots:
-    void at_remotePeerFound(ec2::ApiServerAliveData, bool isProxy);
-    void at_remotePeerLost(ec2::ApiServerAliveData, bool isProxy);
+    void at_remotePeerFound(ec2::ApiPeerAliveData, bool isProxy);
+    void at_remotePeerLost(ec2::ApiPeerAliveData, bool isProxy);
 
     void at_systemNameChangeRequested(const QString &systemName);
-
 private:
     void determineOptimalIF(const QnMediaServerResourcePtr &resource);
     void updateServerTmpStatus(const QnId& id, QnResource::Status status);

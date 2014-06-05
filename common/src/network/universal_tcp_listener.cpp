@@ -11,7 +11,9 @@ static const int PROXY_KEEP_ALIVE_INTERVAL = 40 * 1000;
 // -------------------------------- QnUniversalListener ---------------------------------
 
 QnUniversalTcpListener::QnUniversalTcpListener(const QHostAddress& address, int port, int maxConnections):
-    QnTcpListener(address, port, maxConnections)
+    QnTcpListener(address, port, maxConnections),
+    m_proxyPoolSize( 0 ),
+    m_needAuth( true )
 {
 
 }

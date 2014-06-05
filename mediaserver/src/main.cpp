@@ -50,7 +50,6 @@
 
 #include <network/authenticate_helper.h>
 #include <network/default_tcp_connection_processor.h>
-#include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
 #include <transaction/transaction_message_bus.h>
@@ -169,9 +168,6 @@ void stopServer(int signal);
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
 //#define TEST_RTSP_SERVER
-
-static const int DEFAUT_RTSP_PORT = 50000;
-static const int DEFAULT_STREAMING_PORT = 50000;
 
 static const int PROXY_POOL_SIZE = 8;
 #ifdef EDGE_SERVER
@@ -638,7 +634,7 @@ void initAppServerConnection(const QSettings &settings)
     QString host = settings.value("appserverHost").toString();
     if (QUrl(host).scheme() == "file")
         appServerUrl = QUrl(host); // it is a completed URL
-    else if (host.isEmpty())
+    else if (host.isEmpty() || host == "localhost")
         appServerUrl = QUrl(QString("file:///") + closeDirPath(getDataDirectory()));
     else {
         appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
@@ -961,9 +957,7 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
 
     if (moduleInformation.version == qnCommon->engineVersion() && moduleInformation.systemName == qnCommon->localSystemName()) {
         QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
-        ec2Connection->addRemotePeer(url, false, moduleInformation.id.toString());
-    } else {
-
+        ec2Connection->addRemotePeer(url, moduleInformation.id);
     }
 }
 void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
@@ -974,14 +968,12 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
             QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
             ec2Connection->deleteRemotePeer(url);
         }
-    } else {
-
     }
 }
 
 void QnMain::initTcpListener()
 {
-    int rtspPort = MSSettings::roSettings()->value("rtspPort", DEFAUT_RTSP_PORT).toInt();
+    int rtspPort = MSSettings::roSettings()->value("rtspPort", MSSettings::DEFAUT_RTSP_PORT).toInt();
 #ifdef USE_SINGLE_STREAMING_PORT
     QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
@@ -1120,8 +1112,6 @@ void QnMain::run()
     // Create SessionManager
     QnSessionManager::instance()->start();
 
-    ec2::DummyHandler dummyEcResponseHandler;
-    
 #ifdef ENABLE_ONVIF
     //starting soap server to accept event notifications from onvif servers
     QnSoapServer::initStaticInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
@@ -1258,7 +1248,7 @@ void QnMain::run()
     qnCommon->setModuleUlr(QString("http://%1:%2").arg(publicAddress.toString()).arg(m_universalTcpListener->getPort()));
 
     Qn::PanicMode pm;
-    while (m_mediaServer.isNull())
+    while (m_mediaServer.isNull() && !needToStop())
     {
         QnMediaServerResourcePtr server = findServer(ec2Connection, &pm);
 
@@ -1319,10 +1309,15 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
 
+    if (needToStop())
+        return;
+
 
     syncStoragesToSettings(m_mediaServer);
 
     do {
+        if (needToStop())
+            return;
     } while (ec2Connection->getResourceManager()->setResourceStatusSync(m_mediaServer->getId(), QnResource::Online) != ec2::ErrorCode::ok);
 
 

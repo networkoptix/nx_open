@@ -25,6 +25,7 @@
 #include "api_videowall_data.h"
 #include "api_update_data.h"
 #include "api_discovery_data.h"
+#include "api_help_data.h"
 
 /* Some fields are not meant to be bound or fetched. */
 template<class T, class Allocator>

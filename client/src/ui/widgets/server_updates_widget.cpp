@@ -16,7 +16,8 @@
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::QnServerUpdatesWidget)
+    ui(new Ui::QnServerUpdatesWidget),
+    m_minimalMode(false)
 {
     ui->setupUi(this);
 

@@ -18,8 +18,6 @@ class QnCameraDiagnosticsRestHandler: public QnJsonRestHandler {
     Q_OBJECT
 public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) override;
-    virtual QString description() const override;
-
 private:
     CameraDiagnostics::Result checkCameraAvailability( const QnSecurityCamResourcePtr& cameraRes );
     CameraDiagnostics::Result tryAcquireCameraMediaStream( const QnSecurityCamResourcePtr& cameraRes, QnVideoCamera* videoCamera );

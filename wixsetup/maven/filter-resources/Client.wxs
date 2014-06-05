@@ -142,6 +142,12 @@
         </ComponentGroup>                            
         <?endif?>
 
+        <ComponentGroup Id="ClientDirectx" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+            <Component>
+                <File Id="ClientD3dCompilerDll" Name="D3DCompiler_43.dll" Source="$(var.SourceDir)/D3DCompiler_43.dll"/>
+            </Component>
+        </ComponentGroup>        
+        
         <ComponentGroup Id="ClientQTLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="ClientQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" />
@@ -277,6 +283,7 @@
             <?if ${quicksync} = true ?>
             <ComponentGroupRef Id="ClientQuickSync"/>
             <?endif?>
+            <ComponentGroupRef Id="ClientDirectx"/>
             <ComponentGroupRef Id="ClientFFmpegLibraries"/>
             <ComponentGroupRef Id="ClientQTLibraries" />
             <ComponentGroupRef Id="ImageFormats" />

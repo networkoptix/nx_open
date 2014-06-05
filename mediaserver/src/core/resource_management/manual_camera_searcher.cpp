@@ -270,9 +270,9 @@ QnManualCameraSearchProcessStatus QnManualCameraSearcher::status() const {
             result.status = QnManualCameraSearchStatus(m_state, PORT_SCAN_MAX_PROGRESS_PERCENT, MAX_PERCENT);
             NX_LOG( lit(" -----------------3 %1 : %2").arg(result.status.current).arg(result.status.total), cl_logDEBUG1 );
         } else {
-            const int maxProgress = m_scanProgress->progressMaximum() - m_scanProgress->progressMinimum();
-            Q_ASSERT( maxProgress > 0 );
-            const int currentProgress = m_scanProgress->progressValue();
+            const size_t maxProgress = m_scanProgress->progressMaximum() - m_scanProgress->progressMinimum();
+            Q_ASSERT( m_scanProgress->progressMaximum() >= m_scanProgress->progressMinimum() );
+            const size_t currentProgress = m_scanProgress->progressValue();
             //considering it to be second half of entire job
             result.status = QnManualCameraSearchStatus(
                 m_state,

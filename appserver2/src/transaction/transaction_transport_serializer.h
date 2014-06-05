@@ -28,6 +28,9 @@ namespace ec2
                 Q_ASSERT(!peer.isNull());
                 Q_ASSERT(peer != qnCommon->moduleGUID());
             }
+            foreach (const QnId& peer, ttHeader.processedPeers) {
+                Q_ASSERT(!peer.isNull());
+            }
 #endif
             QnOutputBinaryStream<QByteArray> stream(&buffer);
             stream.write("00000000\r\n",10);
@@ -47,6 +50,9 @@ namespace ec2
             foreach (const QnId& peer, ttHeader.dstPeers) {
                 Q_ASSERT(!peer.isNull());
                 Q_ASSERT(peer != qnCommon->moduleGUID());
+            }
+            foreach (const QnId& peer, ttHeader.processedPeers) {
+                Q_ASSERT(!peer.isNull());
             }
 #endif
             QnOutputBinaryStream<QByteArray> stream(&buffer);

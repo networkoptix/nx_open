@@ -47,7 +47,7 @@ namespace ec2
                 case setPanicMode:
                     return "setPanicMode";
                 case getAllDataList:
-                    return "getResourceList";
+                    return "getAllDataList";
                 case saveCamera:
                     return "saveCamera";
                 case saveCameras:
@@ -173,6 +173,9 @@ namespace ec2
                 case changeSystemName:
                     return "changeSystemName";
 
+                case getHelp:
+                    return "getHelp";
+
                 default:
                     return "unknown " + QString::number((int)val);
             }
@@ -198,7 +201,7 @@ namespace ec2
         id.sequence = 0;
         timestamp = 0;
         if (QnTransactionLog::instance()) {
-            timestamp = QnTransactionLog::instance()->getRelativeTime();
+            timestamp = QnTransactionLog::instance()->getTimeStamp();
             id.dbID = QnDbManager::instance()->getID();
         }
         localTransaction = false;
@@ -213,7 +216,7 @@ namespace ec2
     {
         id.sequence = m_sequence.fetchAndAddAcquire(1);
         if (!timestamp)
-            timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getRelativeTime() : 0;
+            timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getTimeStamp() : 0;
     }
 
     int generateRequestID()

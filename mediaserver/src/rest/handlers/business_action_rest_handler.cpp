@@ -52,7 +52,3 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
     return action ? CODE_OK : CODE_INVALID_PARAMETER;
 }
 
-QString QnBusinessActionRestHandler::description() const
-{
-    return "Execute business action. Action specified in POST request body in binary protobuf format. \n";
-}

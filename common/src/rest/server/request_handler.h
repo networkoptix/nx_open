@@ -9,6 +9,7 @@
 #include <QtCore/QSharedPointer>
 
 #include "utils/common/request_param.h"
+#include "nx_ec/data/api_help_data.h"
 
 class TCPSocket;
 
@@ -37,8 +38,6 @@ public:
     */
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType) = 0;
 
-    // incoming connection socket
-    virtual QString description() const { return QString(); }
     
     friend class QnRestProcessorPool;
 

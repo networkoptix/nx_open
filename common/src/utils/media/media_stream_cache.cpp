@@ -13,7 +13,7 @@
 
 using namespace std;
 
-static const int USEC_PER_SEC = 1000*1000;
+static const int USEC_PER_SEC = 10*1000;
 
 MediaStreamCache::SequentialReadContext::SequentialReadContext(
     MediaStreamCache* cache,
@@ -218,6 +218,9 @@ QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(
     quint64* const foundTimestamp ) const
 {
     QMutexLocker lk( &m_mutex );
+
+    if( m_packetsByTimestamp.empty() )
+        return QnAbstractDataPacketPtr();
 
     PacketCotainerType::const_iterator it = m_packetsByTimestamp.lower_bound( desiredTimestamp );
     if( it == m_packetsByTimestamp.end() )

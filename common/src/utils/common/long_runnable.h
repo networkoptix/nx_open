@@ -8,11 +8,15 @@
 
 #include "singleton.h"
 #include "semaphore.h"
+#include "utils/common/stoppable.h"
+
 
 class QnLongRunnablePoolPrivate;
 
-
-class QN_EXPORT QnLongRunnable: public QThread {
+class QN_EXPORT QnLongRunnable:
+    public QThread,
+    public QnStoppable  //QnLongRunnable::pleaseStop moved to separate interface QnStoppable since not only threads need to be stopped
+{
     Q_OBJECT
 public:
     QnLongRunnable();
@@ -31,7 +35,8 @@ public:
 
 public slots:
     virtual void start(Priority priority = InheritPriority);
-    virtual void pleaseStop();
+    //!Implementation of QnStoppable::pleaseStop()
+    virtual void pleaseStop() override;
     virtual void stop();
 
 protected:

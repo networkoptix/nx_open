@@ -42,10 +42,14 @@ namespace ec2
             \param handler Functor ( ErrorCode )
         */
         template<class QueryDataType, class HandlerType>
-            void processUpdateAsync(QnTransaction<QueryDataType>& tran, HandlerType handler, void* dummy = 0 )
+            void processUpdateAsync(QnTransaction<QueryDataType>& tran, HandlerType handler, void* /*dummy*/ = 0 )
         {
-            //TODO/IMPL this method must be asynchronous
+            //TODO #ak this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
+
+            QnDbManager::Locker locker(dbManager);
+            if (tran.persistent)
+                locker.beginTran();
 
             if (!tran.id.sequence)
                 tran.fillSequence();
@@ -61,17 +65,21 @@ namespace ec2
             QnBinary::serialize( tran, &stream );
 
             errorCode = auxManager->executeTransaction(tran);
-            if( errorCode != ErrorCode::ok )
+            if( errorCode != ErrorCode::ok ) {
                 return;
+            }
 
             if (tran.persistent) {
-                errorCode = dbManager->executeTransaction( tran, serializedTran);
+                errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
                 if( errorCode != ErrorCode::ok ) {
                     if (errorCode == ErrorCode::skipped)
                         errorCode = ErrorCode::ok;
                     return;
                 }
             }
+
+            if (tran.persistent)
+                locker.commit();
 
             // delivering transaction to remote peers
             if (!tran.localTransaction)
@@ -154,9 +162,17 @@ namespace ec2
         {
             ErrorCode errorCode = ErrorCode::ok;
             QList<QPair<QnAbstractTransaction, QByteArray>> processedTran;
-            
+            processedTran.reserve(static_cast<int>(nestedList.size() + (isParentObjectTran ? 1 : 0)));
+
+            auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
+                QnScopedThreadRollback ensureFreeThread(1);
+                QtConcurrent::run( std::bind( handler, errorCode ) );
+            };
+            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+
+            QnDbManager::Locker locker(dbManager);
             if (multiTran.persistent)
-                dbManager->beginTran();
+                locker.beginTran();
 
             foreach(const SubDataType& data, nestedList)
             {
@@ -165,32 +181,21 @@ namespace ec2
                 tran.fillSequence();
                 tran.localTransaction = multiTran.localTransaction;
 
-                auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
-                    QnScopedThreadRollback ensureFreeThread(1);
-                    QtConcurrent::run( std::bind( handler, errorCode ) );
-                };
-                std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
-
                 QByteArray serializedTran;
                 QnOutputBinaryStream<QByteArray> stream( &serializedTran );
                 QnBinary::serialize( tran, &stream );
 
                 errorCode = auxManager->executeTransaction(tran);
-                if( errorCode != ErrorCode::ok ) {
-                    if (multiTran.persistent)
-                        dbManager->rollback();
+                if( errorCode != ErrorCode::ok )
                     return;
-                }
 
                 if (tran.persistent) 
                 {
-                    errorCode = dbManager->executeNestedTransaction( tran, serializedTran);
+                    errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
 					if (errorCode == ErrorCode::skipped)
 						continue;
-                    if( errorCode != ErrorCode::ok ) {
-                        dbManager->rollback();
+                    if( errorCode != ErrorCode::ok )
                         return;
-                    }
                 }
                 processedTran << QPair<QnAbstractTransaction, QByteArray>(tran, serializedTran);
             }
@@ -206,11 +211,9 @@ namespace ec2
                 errorCode = ErrorCode::ok;
                 if (multiTran.persistent) 
                 {
-                    errorCode = dbManager->executeNestedTransaction( multiTran, serializedTran);
-                    if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped) {
-                        dbManager->rollback();
+                    errorCode = dbManager->executeTransactionNoLock( multiTran, serializedTran);
+                    if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
                         return;
-                    }
                 }
                 if( errorCode == ErrorCode::ok )
                     processedTran << QPair<QnAbstractTransaction, QByteArray>(multiTran, serializedTran);
@@ -218,7 +221,7 @@ namespace ec2
 
 
             if (multiTran.persistent)
-                dbManager->commit();
+                locker.commit();
 
             foreach(const auto& tranData, processedTran)
             {

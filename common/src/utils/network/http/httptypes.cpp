@@ -37,6 +37,21 @@ namespace nx_http
         return it == headers.end() ? StringType() : it->second;
     }
     
+    HttpHeaders::iterator insertOrReplaceHeader( HttpHeaders* const headers, const HttpHeader& newHeader )
+    {
+        HttpHeaders::iterator existingHeaderIter = headers->lower_bound( newHeader.first );
+        if( (existingHeaderIter != headers->end()) &&
+            (strcasecmp( existingHeaderIter->first, newHeader.first ) == 0) )
+        {
+            existingHeaderIter->second = newHeader.second;  //replacing header
+            return existingHeaderIter;
+        }
+        else
+        {
+            return headers->insert( existingHeaderIter, newHeader );
+        }
+    }
+
     ////////////////////////////////////////////////////////////
     //// parse utils
     ////////////////////////////////////////////////////////////
@@ -225,10 +240,38 @@ namespace nx_http
         const StringType PUT( "PUT" );
     }
 
-    namespace Version
+    //namespace Version
+    //{
+    //    const StringType http_1_0( "HTTP/1.0" );
+    //    const StringType http_1_1( "HTTP/1.1" );
+    //}
+
+
+    ////////////////////////////////////////////////////////////
+    //// class MimeProtoVersion
+    ////////////////////////////////////////////////////////////
+    static size_t estimateSerializedDataSize( const MimeProtoVersion& val )
     {
-        const StringType http_1_0( "HTTP/1.0" );
-        const StringType http_1_1( "HTTP/1.1" );
+        return val.protocol.size() + 1 + val.version.size();
+    }
+
+    bool MimeProtoVersion::parse( const ConstBufferRefType& data )
+    {
+        int sepPos = data.indexOf( '/' );
+        //const ConstBufferRefType& trimmedData = data.trimmed();
+        const ConstBufferRefType& trimmedData = data;
+        if( sepPos == -1 )
+            return false;
+        protocol = trimmedData.mid( 0, sepPos );
+        version = trimmedData.mid( sepPos+1 );
+        return true;
+    }
+
+    void MimeProtoVersion::serialize( BufferType* const dstBuffer ) const
+    {
+        dstBuffer->append( protocol );
+        dstBuffer->append( "/" );
+        dstBuffer->append( version );
     }
 
 
@@ -237,19 +280,20 @@ namespace nx_http
     ////////////////////////////////////////////////////////////
     static size_t estimateSerializedDataSize( const RequestLine& rl )
     {
-        return rl.method.size() + 1 + rl.url.toString().size() + 1 + rl.version.size() + 2;
+        return rl.method.size() + 1 + rl.url.toString().size() + 1 + estimateSerializedDataSize(rl.version) + 2;
     }
 
     bool RequestLine::parse( const ConstBufferRefType& data )
     {
-        const BufferType& str = data;
+        const BufferType& str = data.toByteArrayWithRawData();
         const QList<QByteArray>& elems = str.split( ' ' );
         if( elems.size() != 3 )
             return false;
 
         method = elems[0];
         url = QUrl( QLatin1String(elems[1]) );
-        version = elems[2];
+        if( !version.parse(elems[2]) )
+            return false;
         return true;
     }
 
@@ -259,7 +303,7 @@ namespace nx_http
         *dstBuffer += " ";
         *dstBuffer += url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
         *dstBuffer += " ";
-        *dstBuffer += version;
+        version.serialize( dstBuffer );
         *dstBuffer += "\r\n";
     }
 
@@ -270,7 +314,7 @@ namespace nx_http
     static const int MAX_DIGITS_IN_STATUS_CODE = 5;
     static size_t estimateSerializedDataSize( const StatusLine& sl )
     {
-        return sl.version.size() + 1 + MAX_DIGITS_IN_STATUS_CODE + 1 + sl.reasonPhrase.size() + 2;
+        return estimateSerializedDataSize(sl.version) + 1 + MAX_DIGITS_IN_STATUS_CODE + 1 + sl.reasonPhrase.size() + 2;
     }
 
     StatusLine::StatusLine()
@@ -285,7 +329,8 @@ namespace nx_http
         const size_t versionEnd = find_first_of( data, " ", versionStart );
         if( versionEnd == BufferNpos )
             return false;
-        version = data.mid( versionStart, versionEnd-versionStart );
+        if( !version.parse(data.mid( versionStart, versionEnd-versionStart )) )
+            return false;
 
         const size_t statusCodeStart = find_first_not_of( data, " ", versionEnd );
         if( statusCodeStart == BufferNpos )
@@ -308,7 +353,7 @@ namespace nx_http
 
     void StatusLine::serialize( BufferType* const dstBuffer ) const
     {
-        *dstBuffer += version;
+        version.serialize( dstBuffer );
         *dstBuffer += " ";
         char buf[11];
 #ifdef _WIN32
