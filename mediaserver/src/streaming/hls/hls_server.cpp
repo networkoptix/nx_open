@@ -24,6 +24,7 @@
 #include "hls_live_playlist_manager.h"
 #include "hls_session_pool.h"
 #include "hls_types.h"
+#include "media_server/settings.h"
 #include "streaming/streaming_chunk_cache.h"
 #include "streaming/streaming_params.h"
 #include "utils/network/tcp_connection_priv.h"
@@ -35,14 +36,14 @@ using namespace nx_http;
 namespace nx_hls
 {
     static const size_t READ_BUFFER_SIZE = 64*1024;
-    static const double DEFAULT_TARGET_DURATION = 5;
-    static const int DEFAULT_HLS_SESSION_LIVE_TIMEOUT = (int)DEFAULT_TARGET_DURATION * 7;
     static const int MIN_CHUNK_COUNT_IN_PLAYLIST = 3;
     static const int CHUNK_COUNT_IN_ARCHIVE_PLAYLIST = 3;
     static const QLatin1String HLS_PREFIX( "/hls/" );
     static const quint64 MSEC_IN_SEC = 1000;
     static const quint64 USEC_IN_MSEC = 1000;
     static const quint64 USEC_IN_SEC = MSEC_IN_SEC * USEC_IN_MSEC;
+    static const unsigned int DEFAULT_TARGET_DURATION_MS = 5 * MSEC_IN_SEC;
+    static const unsigned int DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS = DEFAULT_TARGET_DURATION_MS * 7;
     static const int COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO = 5;
     static const int DEFAULT_PRIMARY_STREAM_BITRATE = 4*1024*1024;
     static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
@@ -416,7 +417,7 @@ namespace nx_hls
                 &session );
             if( result != nx_http::StatusCode::ok )
                 return result;
-            if( !HLSSessionPool::instance()->add( session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT ) )
+            if( !HLSSessionPool::instance()->add( session, DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS ) )
             {
                 assert( false );
             }
@@ -535,7 +536,7 @@ namespace nx_hls
             //no chunks generated, waiting for at least one chunk to be generated
             QElapsedTimer monotonicTimer;
             monotonicTimer.restart();
-            while( monotonicTimer.elapsed() < DEFAULT_TARGET_DURATION * MSEC_IN_SEC * 3 )
+            while( monotonicTimer.elapsed() < session->targetDurationMS() * 3 )
             {
                 chunksGenerated = playlistManager->generateChunkList( &chunkList, &isPlaylistClosed );
                 if( chunksGenerated > 0 )
@@ -670,7 +671,7 @@ namespace nx_hls
         }
         quint64 chunkDuration = durationIter != requestParams.end()
             ? durationIter->second.toLongLong()
-            : DEFAULT_TARGET_DURATION * MSEC_IN_SEC * USEC_IN_MSEC;
+            : DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
 
         if( aliasIter != requestParams.end() )
         {
@@ -750,6 +751,7 @@ namespace nx_hls
         std::unique_ptr<HLSSession> newHlsSession(
             new HLSSession(
                 sessionID,
+                MSSettings::roSettings()->value("hlsTargetDurationMS", DEFAULT_TARGET_DURATION_MS).toUInt(),
                 startDatetimeIter == requestParams.end(),   //if no start date specified, providing live stream
                 streamQuality,
                 videoCamera ) );
@@ -759,7 +761,7 @@ namespace nx_hls
             //starting live caching, if it is not started
             for( const MediaQuality quality: requiredQualities )
             {
-                if( !videoCamera->ensureLiveCacheStarted(quality, DEFAULT_TARGET_DURATION * USEC_IN_SEC) )
+                if( !videoCamera->ensureLiveCacheStarted(quality, newHlsSession->targetDurationMS() * USEC_IN_MSEC) )
                 {
                     NX_LOG( QString::fromLatin1("Error. Requested live hls playlist of resource %1 with no live cache").arg(camResource->getUniqueId()), cl_logDEBUG1 );
                     return nx_http::StatusCode::noContent;
@@ -780,7 +782,7 @@ namespace nx_hls
                         camResource,
                         startTimestamp,
                         CHUNK_COUNT_IN_ARCHIVE_PLAYLIST,
-                        DEFAULT_TARGET_DURATION * USEC_IN_SEC,
+                        newHlsSession->targetDurationMS() * USEC_IN_MSEC,
                         quality ) );
                 if( !archivePlaylistManager->initialize() )
                 {
