@@ -5,6 +5,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QVector>
 #include <QtCore/QMap>
+#include <deque>
 
 #include <server/server_globals.h>
 
@@ -18,8 +19,6 @@ class QnTimePeriod;
 class DeviceFileCatalog: public QObject
 {
     Q_OBJECT
-signals:
-    void firstDataRemoved(int n);
 public:
     // TODO: #Elric #enum
     enum RebuildMethod {
@@ -97,7 +96,7 @@ public:
 
     // Detail level determine time duration (in microseconds) visible at 1 screen pixel
     // All information less than detail level is discarded
-    typedef QVector<Chunk> ChunkMap;
+    typedef std::deque<Chunk> ChunkMap;
 
     QnTimePeriodList getTimePeriods(qint64 startTime, qint64 endTime, qint64 detailLevel);
     void close();
@@ -132,8 +131,8 @@ public:
     void scanMediaFiles(const QString& folder, QnStorageResourcePtr storage, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList,
         const ScanFilter& filter = ScanFilter());
 
-    static QVector<Chunk> mergeChunks(const QVector<Chunk>& chunk1, const QVector<Chunk>& chunk2);
-    void addChunks(const QVector<Chunk>& chunk);
+    static std::deque<Chunk> mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2);
+    void addChunks(const std::deque<Chunk>& chunk);
     bool fromCSVFile(const QString& fileName);
 private:
 
@@ -145,14 +144,13 @@ private:
     void readStorageData(QnStorageResourcePtr storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList);
     Chunk chunkFromFile(QnStorageResourcePtr storage, const QString& fileName);
     QnTimePeriod timePeriodFromDir(QnStorageResourcePtr storage, const QString& dirName);
-    void replaceChunks(int storageIndex, const QVector<Chunk>& newCatalog);
+    void replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog);
 private:
     friend class QnStorageManager;
 
     mutable QMutex m_mutex;
     //QFile m_file;
-    QVector<Chunk> m_chunks; 
-    int m_firstDeleteCount;
+    std::deque<Chunk> m_chunks; 
     QString m_macAddress;
 
     typedef QVector<QPair<int, bool> > CachedDirInfo;
