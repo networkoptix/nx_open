@@ -70,7 +70,7 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 :
     m_ready( false ),
-    m_state( InitialSearch ),
+    m_state( InitialSearch )
 {
     connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
