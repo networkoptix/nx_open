@@ -1171,6 +1171,7 @@ void QnMain::run()
         }
 
         NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR );
+        QnSleep::msleep(3000);
     }
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
