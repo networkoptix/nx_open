@@ -3,13 +3,13 @@
 #include <utils/common/model_functions.h>
 
 QnPtzAuxilaryTrait::QnPtzAuxilaryTrait(const QString &name):
-    m_name(name),
-    m_standardTrait(QnLexical::deserialized<Qn::PtzTrait>(name, Qn::NoPtzTraits))
+    m_standardTrait(QnLexical::deserialized<Qn::PtzTrait>(name, Qn::NoPtzTraits)),
+    m_name(name)
 {}
 
 QnPtzAuxilaryTrait::QnPtzAuxilaryTrait(Qn::PtzTrait standardTrait):
-    m_name(QnLexical::serialized(standardTrait)),
-    m_standardTrait(standardTrait)
+    m_standardTrait(standardTrait),
+    m_name(QnLexical::serialized(standardTrait))
 {}
 
 void serialize(const QnPtzAuxilaryTrait &value, QString *target) {
