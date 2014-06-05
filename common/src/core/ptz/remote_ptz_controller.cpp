@@ -74,6 +74,10 @@ bool QnRemotePtzController::continuousMove(const QVector3D &speed) {
     RUN_COMMAND(Qn::ContinuousMovePtzCommand, speed, ptzContinuousMoveAsync, speed, m_sequenceId, nextSequenceNumber());
 }
 
+bool QnRemotePtzController::continuousFocus(qreal speed) {
+    RUN_COMMAND(Qn::ContinuousFocusPtzCommand, speed, ptzContinuousFocusAsync, speed);
+}
+
 bool QnRemotePtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     RUN_COMMAND(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), position, ptzAbsoluteMoveAsync, space, position, speed, m_sequenceId, nextSequenceNumber());
 }
@@ -140,6 +144,14 @@ bool QnRemotePtzController::updateHomeObject(const QnPtzObject &homePosition) {
 
 bool QnRemotePtzController::getHomeObject(QnPtzObject *) {
     RUN_COMMAND(Qn::GetHomeObjectPtzCommand, QVariant(), ptzGetHomeObjectAsync);
+}
+
+bool QnRemotePtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) {
+    RUN_COMMAND(Qn::GetAuxilaryTraitsPtzCommand, QVariant(), ptzGetAuxilaryTraitsAsync);
+}
+
+bool QnRemotePtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data) {
+    RUN_COMMAND(Qn::RunAuxilaryCommandPtzCommand, trait, ptzRunAuxilaryCommandAsync, trait, data);
 }
 
 bool QnRemotePtzController::getData(Qn::PtzDataFields query, QnPtzData *) {

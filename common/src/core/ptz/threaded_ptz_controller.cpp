@@ -112,6 +112,10 @@ bool QnThreadedPtzController::continuousMove(const QVector3D &speed) {
     RUN_COMMAND(Qn::ContinuousMovePtzCommand, void *, speed, continuousMove, speed);
 }
 
+bool QnThreadedPtzController::continuousFocus(qreal speed) {
+    RUN_COMMAND(Qn::ContinuousFocusPtzCommand, void *, speed, continuousFocus, speed);
+}
+
 bool QnThreadedPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     RUN_COMMAND(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), void *, position, absoluteMove, space, position, speed);
 }
@@ -178,6 +182,14 @@ bool QnThreadedPtzController::updateHomeObject(const QnPtzObject &homePosition) 
 
 bool QnThreadedPtzController::getHomeObject(QnPtzObject *) {
     RUN_COMMAND(Qn::GetHomeObjectPtzCommand, QnPtzObject, result, getHomeObject, &result);
+}
+
+bool QnThreadedPtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *) {
+    RUN_COMMAND(Qn::GetAuxilaryTraitsPtzCommand, QnPtzAuxilaryTraitList, result, getAuxilaryTraits, &result);
+}
+
+bool QnThreadedPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data) {
+    RUN_COMMAND(Qn::RunAuxilaryCommandPtzCommand, void *, trait, runAuxilaryCommand, trait, data);
 }
 
 bool QnThreadedPtzController::getData(Qn::PtzDataFields query, QnPtzData *) {

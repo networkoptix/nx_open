@@ -162,7 +162,6 @@ private:
 #ifdef QT_WEBKITWIDGETS_LIB
     void updateWebPage(QStackedLayout* stackedLayout , QWebView* advancedWebView);
 #endif
-    Q_SLOT void at_sslErrors(QNetworkReply* reply, const QList<QSslError> &);
     Q_SLOT void at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator);
     Q_SLOT void at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator);
 
@@ -203,7 +202,7 @@ private:
     mutable QnMediaServerConnectionPtr m_serverConnection;
 
     QHash<QnId, QnImageProvider*> m_imageProvidersByResourceId;
-	QUrl m_lastSiteUrl;
+	QUrl m_lastCameraPageUrl;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

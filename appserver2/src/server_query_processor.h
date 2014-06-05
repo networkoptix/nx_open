@@ -161,7 +161,7 @@ namespace ec2
         {
             ErrorCode errorCode = ErrorCode::ok;
             QList< QnTransaction<SubDataType> > processedTransactions;
-            processedTransactions.reserve((int)nestedList.size());
+            processedTransactions.reserve(static_cast<int>(nestedList.size()));
 
             bool processMultiTran = false;
 
