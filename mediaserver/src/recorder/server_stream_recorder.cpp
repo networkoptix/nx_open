@@ -16,12 +16,16 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "core/datapacket/media_data_packet.h"
 #include <media_server/serverutil.h>
+#include <media_server/settings.h>
 
-static const int MAX_BUFFERED_SIZE = 1024*1024*20;
+
 static const int MOTION_PREBUFFER_SIZE = 8;
 
-QnServerStreamRecorder::QnServerStreamRecorder(const QnResourcePtr &dev, QnServer::ChunksCatalog catalog, QnAbstractMediaStreamDataProvider* mediaProvider):
+QnServerStreamRecorder::QnServerStreamRecorder(const QnResourcePtr &dev, QnServer::ChunksCatalog catalog, QnAbstractMediaStreamDataProvider* mediaProvider)
+:
     QnStreamRecorder(dev),
+    m_maxRecordQueueSizeBytes( MSSettings::roSettings()->value( nx_ms_conf::MAX_RECORD_QUEUE_SIZE_BYTES, nx_ms_conf::DEFAULT_MAX_RECORD_QUEUE_SIZE_BYTES ).toULongLong() ),
+    m_maxRecordQueueSizeElements( MSSettings::roSettings()->value( nx_ms_conf::MAX_RECORD_QUEUE_SIZE_ELEMENTS, nx_ms_conf::DEFAULT_MAX_RECORD_QUEUE_SIZE_ELEMENTS ).toULongLong() ),
     m_scheduleMutex(QMutex::Recursive),
     m_catalog(catalog),
     m_mediaProvider(mediaProvider),
@@ -82,7 +86,7 @@ bool QnServerStreamRecorder::canAcceptData() const
         return true;
 
     //bool rez = QnStreamRecorder::canAcceptData();
-    bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
+    bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && m_dataQueue.size() < m_maxRecordQueueSizeElements;
     
 
     if (!rez) {
@@ -104,7 +108,7 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr nonConstData)
     if (!isRunning()) 
         return;
 
-    bool halfQueueReached = m_queuedSize >= MAX_BUFFERED_SIZE/2 || m_dataQueue.size() >= 500;
+    const bool halfQueueReached = m_queuedSize >= m_maxRecordQueueSizeBytes/2 || m_dataQueue.size() >= m_maxRecordQueueSizeElements/2;
     if (!m_rebuildBlocked && halfQueueReached)
     {
         m_rebuildBlocked = true;
@@ -116,7 +120,7 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr nonConstData)
         DeviceFileCatalog::rebuildResume(this);
     }
 
-    bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
+    bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && m_dataQueue.size() < m_maxRecordQueueSizeElements;
     if (!rez) {
         emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageNotEnoughSpaceReason, m_storage);
 
