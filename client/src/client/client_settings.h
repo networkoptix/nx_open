@@ -134,6 +134,9 @@ public:
 
         RAINBOW_MODE,
 
+        /** Speed of background circles movement. Value is period (in seconds) of the full movement cycle. Default is 120 seconds. */
+        RADIAL_BACKGROUND_CYCLE,
+
         VARIABLE_COUNT
     };
 
@@ -224,6 +227,7 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         lightModeOverride,      setLightModeOverride,       LIGHT_MODE_OVERRIDE,        0)
         QN_DECLARE_RW_PROPERTY(Qn::ClientSkin,              clientSkin,             setClientSkin,              CLIENT_SKIN,                Qn::DarkSkin)
         QN_DECLARE_RW_PROPERTY(bool,                        isRainbowMode,          setRainbowMode,             RAINBOW_MODE,               false)
+        QN_DECLARE_RW_PROPERTY (int,                        radialBackgroundCycle,  setRadialBackgroundCycle,   RADIAL_BACKGROUND_CYCLE,    120)
     QN_END_PROPERTY_STORAGE()
 
 private:
