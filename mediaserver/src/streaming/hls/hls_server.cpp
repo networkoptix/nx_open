@@ -42,8 +42,7 @@ namespace nx_hls
     static const quint64 MSEC_IN_SEC = 1000;
     static const quint64 USEC_IN_MSEC = 1000;
     static const quint64 USEC_IN_SEC = MSEC_IN_SEC * USEC_IN_MSEC;
-    static const unsigned int DEFAULT_TARGET_DURATION_MS = 5 * MSEC_IN_SEC;
-    static const unsigned int DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS = DEFAULT_TARGET_DURATION_MS * 7;
+    static const unsigned int DEFAULT_HLS_SESSION_LIVE_TIMEOUT_MS = nx_ms_conf::DEFAULT_TARGET_DURATION_MS * 7;
     static const int COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO = 5;
     static const int DEFAULT_PRIMARY_STREAM_BITRATE = 4*1024*1024;
     static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
@@ -671,7 +670,7 @@ namespace nx_hls
         }
         quint64 chunkDuration = durationIter != requestParams.end()
             ? durationIter->second.toLongLong()
-            : DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
+            : nx_ms_conf::DEFAULT_TARGET_DURATION_MS * USEC_IN_MSEC;
 
         if( aliasIter != requestParams.end() )
         {
@@ -751,7 +750,7 @@ namespace nx_hls
         std::unique_ptr<HLSSession> newHlsSession(
             new HLSSession(
                 sessionID,
-                MSSettings::roSettings()->value("hlsTargetDurationMS", DEFAULT_TARGET_DURATION_MS).toUInt(),
+                MSSettings::roSettings()->value( nx_ms_conf::HLS_TARGET_DURATION_MS, nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt(),
                 startDatetimeIter == requestParams.end(),   //if no start date specified, providing live stream
                 streamQuality,
                 videoCamera ) );

@@ -17,6 +17,7 @@ public:
 
 protected:
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
+    virtual bool startInputPortMonitoring() override;
 };
 
 #endif //ENABLE_ONVIF
