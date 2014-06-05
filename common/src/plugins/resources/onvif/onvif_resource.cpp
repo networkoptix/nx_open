@@ -555,37 +555,17 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     saveParams();
     
-    // TODO: #VASILENKO #MERGE
-#if 0
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
-    if (forcedAR) 
+    forcedAR = true;
+    if (forcedAR && getProperty(QnMediaResource::customAspectRatioKey()).isNull()) 
     {
         qreal ar = m_primaryResolution.width() / (qreal) m_primaryResolution.height();
-        
-        QnKvPair kvPair;
-        kvPair.setName(QnMediaResource::customAspectRatioKey());
-        kvPair.setValue(QString::number(ar));
-
-        QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection2();
-        QnKvPairList existPairs;
-        if (conn->getKvPairs(existPairs, toSharedPointer(this)) == 0) 
-        {
-            bool aspectExists = false;
-            foreach(const QnKvPair& existPair, existPairs)
-            {
-                if (existPair.name() == kvPair.name()) {
-                    aspectExists = true;
-                    break;
-                }
-            }
-            if (!aspectExists) {
-                setProperty(kvPair.name(), kvPair.value());
-                conn->saveSync(getId(), kvPair);
-            }
-        }
+        setProperty(QnMediaResource::customAspectRatioKey(), QString::number(ar));
+        ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+        QnKvPairListsById  outData;
+        conn->getResourceManager()->saveSync(getId(), getProperties(), false, &outData);
     }
-#endif
 
     return CameraDiagnostics::NoErrorResult();
 }

@@ -619,14 +619,6 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
 
     Q_ASSERT( m_firstDeleteCount <= m_chunks.size() );
 
-    // TODO: #VASILENKO #MERGE
-#if 0
-    if( m_firstDeleteCount > m_chunks.size() )
-    {
-        qCritical()<<"DeviceFileCatalog::addRecord. m_chunks.size() = "<<m_chunks.size()<<", "
-            "m_firstDeleteCount = "<<m_firstDeleteCount<<", ""itr - m_chunks.begin() = "<<(itr - m_chunks.begin());
-    }
-#endif
 
     ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
     if( itr != m_chunks.end() )
