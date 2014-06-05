@@ -252,7 +252,7 @@ public:
 
     int restart(QObject *target, const char *slot);
 
-    int changeAdminPasswordAsync(const QString &password, QObject *target, const char *slot);
+    int changeAdminPasswordAsync(const QByteArray &hash, const QByteArray &digest, QObject *target, const char *slot);
 
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;

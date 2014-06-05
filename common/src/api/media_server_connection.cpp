@@ -875,9 +875,10 @@ int QnMediaServerConnection::restart(QObject *target, const char *slot) {
     return sendAsyncGetRequest(Restart, QnRequestParamList(), NULL, target, slot);
 }
 
-int QnMediaServerConnection::changeAdminPasswordAsync(const QString &password, QObject *target, const char *slot) {
+int QnMediaServerConnection::changeAdminPasswordAsync(const QByteArray &hash, const QByteArray &digest, QObject *target, const char *slot) {
     QnRequestParamList params;
-    params << QnRequestParam("password", password);
+    params << QnRequestParam("hash", QString::fromLatin1(hash));
+    params << QnRequestParam("digest", QString::fromLatin1(digest));
 
     return sendAsyncGetRequest(ChangeAdminPasswordObject, params, NULL, target, slot);
 }

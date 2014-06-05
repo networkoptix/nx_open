@@ -42,6 +42,7 @@ private slots:
     void at_timer_timeout();
     void at_hostLookedUp(const QHostInfo &hostInfo);
     void at_targetServer_systemNameChanged(int status, int handle);
+    void at_targetServer_adminPasswordChanged(int status, int handle);
 
 private:
     bool m_running;

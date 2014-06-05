@@ -5,6 +5,7 @@
 
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
+#include "core/resource/user_resource.h"
 #include "api/app_server_connection.h"
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
@@ -112,7 +113,23 @@ void QnJoinSystemTool::joinResource() {
         return;
     }
 
-    m_targetServer->apiConnection()->changeSystemNameAsync(qnCommon->localSystemName(), true, this, SLOT(at_targetServer_systemNameChanged(int,int)));
+    QByteArray hash;
+    QByteArray digest;
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::user)) {
+        QnUserResourcePtr user = resource.staticCast<QnUserResource>();
+        if (user->getName() == lit("admin")) {
+            hash = user->getHash();
+            digest = user->getDigest();
+            break;
+        }
+    }
+
+    if (hash.isEmpty() || digest.isEmpty()) {
+        finish(JoinError);
+        return;
+    }
+
+    m_targetServer->apiConnection()->changeAdminPasswordAsync(hash, digest, this, SLOT(at_targetServer_adminPasswordChanged(int,int)));
 }
 
 void QnJoinSystemTool::rediscoverPeer() {
@@ -211,4 +228,15 @@ void QnJoinSystemTool::at_targetServer_systemNameChanged(int status, int handle)
 
     // System name has been changed. Now discover it again. It must connect the server to us.
     rediscoverPeer();
+}
+
+void QnJoinSystemTool::at_targetServer_adminPasswordChanged(int status, int handle) {
+    Q_UNUSED(handle)
+
+    if (status != 0) {
+        finish(JoinError);
+        return;
+    }
+
+    m_targetServer->apiConnection()->changeSystemNameAsync(qnCommon->localSystemName(), true, this, SLOT(at_targetServer_systemNameChanged(int,int)));
 }

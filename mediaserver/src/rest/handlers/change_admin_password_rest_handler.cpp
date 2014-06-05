@@ -10,26 +10,27 @@ namespace HttpStatusCode {
         badRequest = 400
     };
 }
-namespace {
-    const int minimalPasswordLength = 3;
-}
 
 int QnChangeAdminPasswordRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) {
     Q_UNUSED(path)
     Q_UNUSED(contentType)
     Q_UNUSED(result)
 
-    QString password = params.value("password");
-    if (password.size() < minimalPasswordLength)
+    QByteArray hash = params.value("hash").toLatin1();
+    QByteArray digest = params.value("digest").toLatin1();
+    if (hash.isEmpty() || hash.count('$') != 2 || digest.isEmpty())
         return HttpStatusCode::badRequest;
 
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::user)) {
         QnUserResourcePtr user = resource.staticCast<QnUserResource>();
         if (user->getName() == lit("admin")) {
-            user->setPassword(password);
+            if (user->getHash() == hash && user->getDigest() == digest)
+                return HttpStatusCode::ok;
 
+            user->setHash(hash);
+            user->setDigest(digest);
             QnAppServerConnectionFactory::getConnection2()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
-            user->setPassword(QString());
+
             return HttpStatusCode::ok;
         }
     }
@@ -46,5 +47,5 @@ int QnChangeAdminPasswordRestHandler::executePost(const QString &path, const QnR
 QString QnChangeAdminPasswordRestHandler::description() const {
     return
         "Changes the admin's password<br>"
-        "Request format: GET /api/changeAdminPassword?password=<new password><br>";
+        "Request format: GET /api/changeAdminPassword?hash=<hash>&digest=<digets><br>";
 }
