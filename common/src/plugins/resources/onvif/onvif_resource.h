@@ -161,6 +161,9 @@ public:
     QString getImagingUrl() const;
     void setImagingUrl(const QString& src);
 
+    QString getVideoSourceToken() const;
+    void setVideoSourceToken(const QString &src);
+
     QString getPtzUrl() const;
     void setPtzUrl(const QString& src);
 
