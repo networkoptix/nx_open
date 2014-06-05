@@ -92,7 +92,7 @@ private:
     };
 
     mutable QMutex m_mutex;
-    PollSet m_pollSet;
+    aio::PollSet m_pollSet;
     QList<AbstractDatagramSocket*> m_clientSockets;
     UDPSocket *m_serverSocket;
     const unsigned int m_pingTimeoutMillis;

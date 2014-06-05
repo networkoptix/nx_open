@@ -236,11 +236,11 @@ void QnMulticastModuleFinder::run() {
         Q_ASSERT(false);
 
     foreach (AbstractDatagramSocket *socket, m_clientSockets) {
-        if (!m_pollSet.add(socket, PollSet::etRead))
+        if (!m_pollSet.add(socket, aio::etRead))
             Q_ASSERT(false);
     }
     if (m_serverSocket) {
-        if (!m_pollSet.add(m_serverSocket, PollSet::etRead))
+        if (!m_pollSet.add(m_serverSocket, aio::etRead))
             Q_ASSERT(false);
     }
 
@@ -273,7 +273,7 @@ void QnMulticastModuleFinder::run() {
 
         //some socket(s) changed state
         for (auto it = m_pollSet.begin(); it != m_pollSet.end(); ++it) {
-            if (!(it.eventType() & PollSet::etRead))
+            if (!(it.eventType() & aio::etRead))
                 continue;
 
             AbstractDatagramSocket *udpSocket = dynamic_cast<AbstractDatagramSocket*>(it.socket());
