@@ -1365,6 +1365,10 @@ ErrorCode QnDbManager::removeServer(const QnId& guid)
     if (err != ErrorCode::ok)
         return err;
 
+    err = deleteTableRecord(id, "vms_mserver_discovery", "server_id");
+    if (err != ErrorCode::ok)
+        return err;
+
     err = deleteRecordFromResourceTable(id);
     if (err != ErrorCode::ok)
         return err;
