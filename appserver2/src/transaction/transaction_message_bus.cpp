@@ -589,11 +589,21 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
             return;
         }
 
+        QnTransaction<ApiCameraServerItemDataList> tranCameraHistory;
+        tranCameraHistory.command = ApiCommand::getCameraHistoryList;
+        tranLayouts.id.peerID = m_localPeer.id;
+        if (dbManager->doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
+            qWarning() << "Can't execute query for sync with client peer!";
+            QnTransactionTransport::connectDone(remotePeer.id); // release connection
+            return;
+        }
+
         transport->setWriteSync(true);
         transport->sendTransaction(tranServers, QnPeerSet() << remotePeer.id << m_localPeer.id);
         transport->sendTransaction(tranCameras, QnPeerSet() << remotePeer.id << m_localPeer.id);
         transport->sendTransaction(tranUsers,   QnPeerSet() << remotePeer.id << m_localPeer.id);
         transport->sendTransaction(tranLayouts, QnPeerSet() << remotePeer.id << m_localPeer.id);
+        transport->sendTransaction(tranCameraHistory, QnPeerSet() << remotePeer.id << m_localPeer.id);
         transport->setReadSync(true);
     }
     
