@@ -15,9 +15,7 @@
 
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
 
-ThirdPartyResourceSearcher::ThirdPartyResourceSearcher( CameraDriverRestrictionList* cameraDriverRestrictionList )
-:
-    m_cameraDriverRestrictionList( cameraDriverRestrictionList )
+ThirdPartyResourceSearcher::ThirdPartyResourceSearcher()
 {
     QList<nxcip::CameraDiscoveryManager*> pluginList = PluginManager::instance()->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
     std::copy(
@@ -33,7 +31,7 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher( CameraDriverRestrictionL
     {
         const QList<QString>& modelList = it->getReservedModelList();
         foreach( QString modelMask, modelList )
-            m_cameraDriverRestrictionList->allow( THIRD_PARTY_MANUFACTURER_NAME, it->getVendorName(), modelMask );
+            CameraDriverRestrictionList::instance()->allow( THIRD_PARTY_MANUFACTURER_NAME, it->getVendorName(), modelMask );
     }
 }
 

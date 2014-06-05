@@ -26,7 +26,7 @@ public:
 
     void beforeDelete();
     void afterDelete();
-    bool replaceChunks(const QByteArray& mac, QnServer::ChunksCatalog catalog, const QVector<DeviceFileCatalog::Chunk>& chunks);
+    bool replaceChunks(const QByteArray& mac, QnServer::ChunksCatalog catalog, const std::deque<DeviceFileCatalog::Chunk>& chunks);
 
     bool removeCameraBookmarks(const QByteArray &mac);
     bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QByteArray &mac);
@@ -54,6 +54,7 @@ private:
     };
 
     QVector<DelayedData> m_delayedData;
+    QMap<QByteArray, int> m_addCount;
 };
 
 typedef QSharedPointer<QnStorageDb> QnStorageDbPtr;
