@@ -1,6 +1,8 @@
 #ifndef QN_VISTA_FOCUS_PTZ_CONTROLLER_H
 #define QN_VISTA_FOCUS_PTZ_CONTROLLER_H
 
+#ifdef ENABLE_ONVIF
+
 #include <core/ptz/proxy_ptz_controller.h>
 
 class CLSimpleHTTPClient;
@@ -42,5 +44,7 @@ private:
     QString m_lastHostAddress;
     QScopedPointer<CLSimpleHTTPClient> m_client;
 };
+
+#endif // ENABLE_ONVIF
 
 #endif // QN_VISTA_FOCUS_PTZ_CONTROLLER_H
