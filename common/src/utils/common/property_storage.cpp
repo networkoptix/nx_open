@@ -358,7 +358,7 @@ QVariant QnPropertyStorage::readValueFromJson(const QJsonObject &json, int id, c
         return defaultValue;
 
     int type = this->type(id);
-    QnJsonSerializer *serializer = QnJsonSerializer::forType(type);
+    QnJsonSerializer *serializer = QnJsonSerializer::serializer(type);
     if(!serializer) {
         qnWarning("Could not deserialize type '%1' from json, serializer is not registered.", QMetaType::typeName(type));
         return defaultValue;

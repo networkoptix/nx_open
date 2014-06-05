@@ -555,6 +555,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     saveParams();
     
+    // TODO: #VASILENKO #MERGE
+#if 0
     QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
     if (forcedAR) 
@@ -565,7 +567,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
         kvPair.setName(QnMediaResource::customAspectRatioKey());
         kvPair.setValue(QString::number(ar));
 
-        QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
+        QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection2();
         QnKvPairList existPairs;
         if (conn->getKvPairs(existPairs, toSharedPointer(this)) == 0) 
         {
@@ -583,6 +585,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
             }
         }
     }
+#endif
 
     return CameraDiagnostics::NoErrorResult();
 }

@@ -1,7 +1,6 @@
 #include "ptz_auxilary_trait.h"
 
-#include <utils/common/lexical.h>
-#include <utils/common/json.h>
+#include <utils/common/model_functions.h>
 
 QnPtzAuxilaryTrait::QnPtzAuxilaryTrait(const QString &name):
     m_name(name),
@@ -22,4 +21,4 @@ bool deserialize(const QString &value, QnPtzAuxilaryTrait *target) {
     return true;
 }
 
-QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnPtzAuxilaryTrait)
+QN_FUSION_DEFINE_FUNCTIONS(QnPtzAuxilaryTrait, (json_lexical))

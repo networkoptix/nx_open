@@ -269,7 +269,7 @@ private:
 
     QString m_login;
     QString m_passwd;
-    bool invoked;
+    bool m_invoked;
 };
 
 

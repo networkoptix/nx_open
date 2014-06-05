@@ -1,5 +1,4 @@
 #include <utils/common/model_functions.h>
-#include <utils/common/enum_name_mapper.h>
 
 #include "client_globals.h"
 #include "client_model_types.h"

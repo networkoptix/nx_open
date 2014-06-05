@@ -10,9 +10,9 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, SecondStreamQuality)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PanicMode)
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTrait,
-    ((Qn::FourWayPtzTrait,          "FourWayPtz"))
-    ((Qn::EightWayPtzTrait,         "EightWayPtz"))
-    ((Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus"))
+    (Qn::FourWayPtzTrait,          "FourWayPtz")
+    (Qn::EightWayPtzTrait,         "EightWayPtz")
+    (Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus")
 )
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RecordingType)

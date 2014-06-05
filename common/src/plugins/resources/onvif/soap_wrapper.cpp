@@ -163,7 +163,7 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const QString& login, c
 template <class T>
 SoapWrapper<T>::~SoapWrapper()
 {
-    if (invoked) 
+    if (m_invoked) 
     {
         soap_destroy(m_soapProxy->soap);
         soap_end(m_soapProxy->soap);
@@ -193,14 +193,14 @@ void correctTimeInternal(char* buffer, const QDateTime& dt)
 template <class T>
 void SoapWrapper<T>::beforeMethodInvocation()
 {
-    if (invoked)
+    if (m_invoked)
     {
         soap_destroy(m_soapProxy->soap);
         soap_end(m_soapProxy->soap);
     }
     else
     {
-        invoked = true;
+        m_invoked = true;
     }
 
     if (!m_login.isEmpty())
