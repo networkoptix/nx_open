@@ -67,11 +67,10 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 
 // ------------------------------------ QnResourceDiscoveryManager -----------------------------
 
-QnResourceDiscoveryManager::QnResourceDiscoveryManager( const CameraDriverRestrictionList* cameraDriverRestrictionList )
+QnResourceDiscoveryManager::QnResourceDiscoveryManager()
 :
     m_ready( false ),
     m_state( InitialSearch ),
-    m_cameraDriverRestrictionList( cameraDriverRestrictionList )
 {
     connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
@@ -301,8 +300,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 QnSecurityCamResourcePtr camRes = it->dynamicCast<QnSecurityCamResource>();
                 //checking, if found resource is reserved by some other searcher
                 if( camRes &&
-                    m_cameraDriverRestrictionList &&
-                    !m_cameraDriverRestrictionList->driverAllowedForCamera( searcher->manufacture(), camRes->getVendor(), camRes->getModel() ) )
+                    !CameraDriverRestrictionList::instance()->driverAllowedForCamera( searcher->manufacture(), camRes->getVendor(), camRes->getModel() ) )
                 {
                     it = lst.erase( it );
                     continue;   //resource with such unique id is already present
