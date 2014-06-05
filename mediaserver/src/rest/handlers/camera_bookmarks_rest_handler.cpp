@@ -24,10 +24,6 @@ int QnCameraBookmarksRestHandler::executePost(const QString &path, const QnReque
     return CODE_NOT_FOUND;
 }
 
-QString QnCameraBookmarksRestHandler::description() const {
-    return QString();
-}
-
 int QnCameraBookmarksRestHandler::addCameraBookmarkAction(const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result) { 
     QString id = params.value("id");
     QnCameraBookmark bookmark;

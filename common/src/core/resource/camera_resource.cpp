@@ -22,7 +22,7 @@ QnPhysicalCameraResource::QnPhysicalCameraResource():
     setFlags(local_live_cam);
 }
 
-int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const
+int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
 {
     // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
     // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
@@ -36,7 +36,7 @@ int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality q, QSize reso
     float frameRateFactor = fps/30.0;
     frameRateFactor = pow(frameRateFactor, (float)0.4);
 
-    int result = lowEnd + (hiEnd - lowEnd) * (q - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
+    int result = lowEnd + (hiEnd - lowEnd) * (quality - Qn::QualityLowest) / (Qn::QualityHighest - Qn::QualityLowest);
     result *= (resolutionFactor * frameRateFactor);
 
     return qMax(192,result);
@@ -70,8 +70,12 @@ float QnPhysicalCameraResource::getResolutionAspectRatio(const QSize& resolution
 }
 
 QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, float aspectRatio,
-                                              double maxResolutionSquare, const QList<QSize>& resolutionList)
+                                              double maxResolutionSquare, const QList<QSize>& resolutionList,
+                                              double* coeff)
 {
+	if (coeff)
+		*coeff = INT_MAX;
+
     double requestSquare = resolution.width() * resolution.height();
     if (requestSquare < MAX_EPS || requestSquare > maxResolutionSquare) return EMPTY_RESOLUTION_PAIR;
 
@@ -101,6 +105,8 @@ QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, fl
         if (matchCoeff <= bestMatchCoeff + MAX_EPS) {
             bestIndex = i;
             bestMatchCoeff = matchCoeff;
+            if (coeff)
+                *coeff = bestMatchCoeff;
         }
     }
 

@@ -8,15 +8,15 @@
 
 SocketImpl::SocketImpl()
 {
-    m_eventTypeToUserData.resize( PollSet::etCount );
+    m_eventTypeToUserData.resize( aio::etMax );
 }
 
-void*& SocketImpl::getUserData( PollSet::EventType eventType )
+void*& SocketImpl::getUserData( aio::EventType eventType )
 {
     return m_eventTypeToUserData[eventType];
 }
 
-void* const& SocketImpl::getUserData( PollSet::EventType eventType ) const
+void* const& SocketImpl::getUserData( aio::EventType eventType ) const
 {
     return m_eventTypeToUserData[eventType];
 }

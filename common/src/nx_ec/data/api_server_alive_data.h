@@ -6,17 +6,17 @@
 
 namespace ec2
 {
-    struct ApiServerAliveData: ApiData
+    struct ApiPeerAliveData: ApiData
     {
-        QnId serverId;
+        QnId peerId;
+        int peerType; //TODO: #Elric what should we do to serialize it properly?
         bool isAlive;
-        bool isClient;
         QList<QByteArray> hardwareIds;
     };
-#define ApiServerAliveData_Fields (serverId)(isAlive)(isClient)(hardwareIds)
+#define ApiPeerAliveData_Fields (peerId)(peerType)(isAlive)(hardwareIds)
 
 } // namespace ec2
 
-Q_DECLARE_METATYPE(ec2::ApiServerAliveData);
+Q_DECLARE_METATYPE(ec2::ApiPeerAliveData);
 
 #endif // __SERVER_ALIVE_DATA_H_

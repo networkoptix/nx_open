@@ -270,7 +270,9 @@ void QnAuthHelper::addAuthHeader(nx_http::Response& response, bool isProxy)
 {
     QString auth(lit("Digest realm=\"%1\",nonce=\"%2\""));
 	QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
-	response.headers.insert( nx_http::HttpHeader(headerName, auth.arg(REALM).arg(QLatin1String(getNonce())).toLatin1() ) );
+    nx_http::insertOrReplaceHeader(
+        &response.headers,
+        nx_http::HttpHeader(headerName, auth.arg(REALM).arg(QLatin1String(getNonce())).toLatin1() ) );
 }
 
 bool QnAuthHelper::isNonceValid(const QByteArray& nonce) const

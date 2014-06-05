@@ -157,6 +157,9 @@ namespace ec2
 
             //!ApiModuleData
             moduleInfo = 65,
+
+            //!ApiHelpGroupDataList
+            getHelp = 66,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

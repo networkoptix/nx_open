@@ -7,6 +7,8 @@
 
 #include <vector>
 
+#include <boost/optional.hpp>
+
 
 namespace nx_hls
 {
@@ -16,6 +18,7 @@ namespace nx_hls
         class ChunkData
         {
         public:
+            boost::optional<QString> alias;
             //!internal timestamp (micros). Not a calendar time
             quint64 startTimestamp;
             //!in micros
@@ -29,6 +32,10 @@ namespace nx_hls
             ChunkData(
                 quint64 _startTimestamp,
                 quint64 _duration,
+                unsigned int _mediaSequence,
+                bool _discontinuity = false );
+            ChunkData(
+                const QString& _alias,
                 unsigned int _mediaSequence,
                 bool _discontinuity = false );
         };

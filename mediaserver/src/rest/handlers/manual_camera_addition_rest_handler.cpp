@@ -190,28 +190,3 @@ bool QnManualCameraAdditionRestHandler::isSearchActive(const QUuid &searchProces
     return m_searchProcesses.contains(searchProcessUuid);
 }
 
-QString QnManualCameraAdditionRestHandler::description() const
-{
-    return 
-            "Search or manual add cameras found in the specified range.<BR>\n"
-            "<BR><b>api/manualCamera/search</b> - start camera searching"
-            "<BR>Param <b>start_ip</b> - first ip address in range."
-            "<BR>Param <b>end_ip</b> - end ip address in range. Can be omitted - only start ip address will be used"
-            "<BR>Param <b>port</b> - Port to scan. Can be omitted"
-            "<BR>Param <b>user</b> - username for the cameras. Can be omitted.</i>"
-            "<BR>Param <b>password</b> - password for the cameras. Can be omitted."
-            "<BR><b>Return</b> XML with camera names, manufacturer and urls"
-            "<BR>"
-            "<BR><b>api/manualCamera/status</b> - get manual addition progress."
-            "<BR>Param <b>uuid</b> - process uuid."
-            "<BR>"
-            "<BR><b>api/manualCamera/stop</b> - stop manual addition progress."
-            "<BR>Param <b>uuid</b> - process uuid."
-            "<BR>"
-            "<BR><b>api/manualCamera/add</b> - manual add camera(s). If several cameras are added, parameters 'url' and 'manufacturer' must be defined several times"
-            "<BR>Param <b>url</b> - camera url returned by scan request."
-            "<BR>Param <b>manufacturer</b> - camera manufacturer.</i>"
-            "<BR>Param <b>user</b> - username for the cameras. Can be omitted.</i>"
-            "<BR>Param <b>password</b> - password for the cameras. Can be omitted."
-            ;
-}

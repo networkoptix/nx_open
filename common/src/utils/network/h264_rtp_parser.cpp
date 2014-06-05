@@ -100,7 +100,8 @@ void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines)
                                 else if (nal.startsWith(startCodeShort))
                                     nal.remove(0,3);
                             }
-
+                            if( nal.size() > 0 && (nal[0] & 0x1f) == nuSPS )
+                                decodeSpsInfo( nal );
                             
                             m_sdpSpsPps << QByteArray(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX)).append(nal);
                         }
@@ -142,7 +143,7 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
 {
     try
     {
-        m_sps.decodeBuffer( (const quint8*) data.data() + sizeof(H264_NAL_PREFIX), (const quint8*) data.data() + data.size());
+        m_sps.decodeBuffer( (const quint8*) data.constData(), (const quint8*) data.constData() + data.size());
         m_sps.deserialize();
         m_spsInitialized = true;
 
@@ -169,12 +170,21 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffe
             serializeSpsPps(result->data);
     }
     //result->data.write(m_videoBuffer);
+    size_t spsNaluStartOffset = (size_t)-1;
     for (uint i = 0; i < m_chunks.size(); ++i)
     {
         if (m_chunks[i].nalStart)
+        {
             result->data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+            if( (m_chunks[i].len > 0) && ((*((const char*)rtpBuffer + m_chunks[i].bufferOffset) & 0x1f) == nuSPS) )
+                spsNaluStartOffset = result->data.size();
+        }
         result->data.uncheckedWrite((const char*) rtpBuffer + m_chunks[i].bufferOffset, m_chunks[i].len);
     }
+
+    if( (spsNaluStartOffset != (size_t)-1) )
+        //decoding sps to detect stream resolution change
+        decodeSpsInfo( QByteArray::fromRawData( result->data.constData() + spsNaluStartOffset, result->data.size() - spsNaluStartOffset ) );
 
     if (m_timeHelper) {
         result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_frequency);
@@ -273,7 +283,8 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
 
     m_packetPerNal++;
 
-    int packetType = *curPtr++ & 0x1f;
+    int packetType = *curPtr & 0x1f;
+    int nalRefIDC = *curPtr++ & 0xe0;
 
     switch (packetType)
     {
@@ -312,7 +323,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
                 m_firstSeqNum = sequenceNum;
                 m_packetPerNal = 0;
                 //m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-                nalUnitType += 0x40;
+                nalUnitType |= nalRefIDC;
                 //m_videoBuffer.write( (const char*) &nalUnitType, 1);
             }
             else {

@@ -103,15 +103,30 @@ void FramedBase::setRoundingRadius(qreal roundingRadius) {
         return;
 
     m_roundingRadius = roundingRadius;
-    m_self->update();
+    if(m_frameShape == Qn::RoundedRectangularFrame)
+        m_self->update();
+}
+
+const QPainterPath &FramedBase::customFramePath() const {
+    return m_customFramePath;
+}
+
+void FramedBase::setCustomFramePath(const QPainterPath &customFramePath) {
+    if(m_customFramePath == customFramePath)
+        return;
+
+    m_customFramePath = customFramePath;
+    m_customFramePathBoundingRect = customFramePath.boundingRect();
+    if(m_frameShape == Qn::CustomFrame)
+        m_self->update();
 }
 
 void FramedBase::paintFrame(QPainter *painter, const QRectF &rect) {
     if(m_frameShape == Qn::NoFrame)
         return;
 
-    QnScopedPainterPenRollback penRollback(painter, QPen(frameBrush(), m_frameWidth, m_frameStyle, Qt::SquareCap, Qt::MiterJoin));
-    QnScopedPainterBrushRollback brushRollback(painter, windowBrush());
+    QN_SCOPED_PAINTER_PEN_ROLLBACK(painter, QPen(frameBrush(), m_frameWidth, m_frameStyle, Qt::SquareCap, Qt::MiterJoin));
+    QN_SCOPED_PAINTER_BRUSH_ROLLBACK(painter, windowBrush());
 
     qreal d = m_frameWidth / 2.0;
     QRectF frameRect = rect.adjusted(d, d, -d, -d);
@@ -132,16 +147,28 @@ void FramedBase::paintFrame(QPainter *painter, const QRectF &rect) {
             painter->fillRect(QRectF(l,             t + fw,     fw,         h - 2 * fw), frameBrush);
             painter->fillRect(QRectF(l + w - fw,    t + fw,     fw,         h - 2 * fw), frameBrush);
         } else {
-            painter->drawRect(rect);
+            painter->drawRect(frameRect);
         }
         break;
     }
     case Qn::RoundedRectangularFrame:
-        painter->drawRoundedRect(rect, m_roundingRadius, m_roundingRadius, Qt::AbsoluteSize);
+        painter->drawRoundedRect(frameRect, m_roundingRadius, m_roundingRadius, Qt::AbsoluteSize);
         break;
     case Qn::EllipticalFrame:
         painter->drawEllipse(frameRect);
         break;
+    case Qn::CustomFrame: {
+        QN_SCOPED_PAINTER_TRANSFORM_ROLLBACK(painter);
+        
+        painter->translate(frameRect.topLeft());
+        qreal sx = frameRect.width() / m_customFramePathBoundingRect.width();
+        qreal sy = frameRect.height() / m_customFramePathBoundingRect.height();
+        painter->scale(sx, sy);
+
+        painter->setPen(QPen(frameBrush(), m_frameWidth / ((sx + sy) / 2.0), m_frameStyle, Qt::SquareCap, Qt::MiterJoin));
+
+        painter->drawPath(m_customFramePath);
+    }
     default:
         break;
     }

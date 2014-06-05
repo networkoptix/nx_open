@@ -120,9 +120,3 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
     result.setReply(reply);
     return CODE_OK;
 }
-
-QString QnStorageSpaceRestHandler::description() const {
-    return 
-        "Returns a list of all server storages.<br>"
-        "No parameters.<br>";
-}

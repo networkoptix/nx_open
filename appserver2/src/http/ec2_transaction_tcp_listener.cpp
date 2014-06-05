@@ -51,25 +51,19 @@ void QnTransactionTcpProcessor::run()
 
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
     bool isClient = query.hasQueryItem("isClient");
+    bool isMobileClient = query.hasQueryItem("isMobile");
     QUuid remoteGuid  = query.queryItemValue(lit("guid"));
-    qint64 remoteTime  = query.queryItemValue(lit("time")).toLongLong();
-    QByteArray remoteHwList = query.queryItemValue(lit("hwList")).toLocal8Bit();
-    qint64 localTime = -1;
-    qint64 timeDiff = 0;
-    if (QnTransactionLog::instance()) {
-        localTime = QnTransactionLog::instance()->getRelativeTime();
-        if (remoteTime != -1)
-            timeDiff = remoteTime - localTime;
-    }
+    if (remoteGuid.isNull())
+        remoteGuid = QUuid::createUuid();
+    QnPeerInfo remotePeer(remoteGuid, isMobileClient 
+        ? QnPeerInfo::AndroidClient
+        : isClient 
+        ? QnPeerInfo::DesktopClient
+        : QnPeerInfo::Server);
 
-    if (remoteGuid.isNull()) {
-        qWarning() << "Invalid incoming request. GUID must be filled!";
-        sendResponse("HTTP", CODE_INVALID_PARAMETER, "application/octet-stream");
-        return;
-    }
+    QByteArray remoteHwList = query.queryItemValue(lit("hwList")).toLocal8Bit();
 
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
     d->response.headers.insert(nx_http::HttpHeader("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds())));
 
     if (!isClient)
@@ -90,7 +84,6 @@ void QnTransactionTcpProcessor::run()
         parseRequest();
 
         d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-        d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
         d->response.headers.insert(nx_http::HttpHeader("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds())));
     }
 
@@ -102,7 +95,7 @@ void QnTransactionTcpProcessor::run()
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
     }
     else {
-        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, isClient, remoteGuid, timeDiff, QnTransactionTransport::decodeHWList(remoteHwList));
+        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, remotePeer, QnTransactionTransport::decodeHWList(remoteHwList));
         d->socket.clear();
     }
 }

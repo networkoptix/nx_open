@@ -79,13 +79,3 @@ int QnExternalBusinessEventRestHandler::executePost(const QString& path, const Q
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
-
-QString QnExternalBusinessEventRestHandler::description() const
-{
-    return QLatin1String(
-        "Process external business event\n"
-        "<BR>Param <b>event_type</b> - eventType. supported values: 'MServerFailure', 'UserEvent'\n"
-        "<BR>Param <b>res_id</b> - resource (media server or camera) uniq id\n"
-        "<BR><b>Return</b> XML with error string or 'OK' message.\n"
-    );
-}

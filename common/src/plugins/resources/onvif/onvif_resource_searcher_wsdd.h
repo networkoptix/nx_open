@@ -103,6 +103,8 @@ private:
         ProbeContext();
         ~ProbeContext();
 
+        void initializeSoap();
+
     private:
         ProbeContext( const ProbeContext& );
         ProbeContext& operator=( const ProbeContext& );

@@ -227,7 +227,8 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
     if (!gotFrame)
         return noVideoError(result, time);
 
-    double ar = decoder.getSampleAspectRatio() * outFrame->width / outFrame->height;
+    double sar = decoder.getSampleAspectRatio();
+    double ar = sar * outFrame->width / outFrame->height;
     if (!dstSize.isEmpty()) {
         dstSize.setHeight(qPower2Ceil((unsigned) dstSize.height(), 4));
         dstSize.setWidth(qPower2Ceil((unsigned) dstSize.width(), 4));
@@ -241,9 +242,9 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         dstSize.setHeight(qPower2Ceil((unsigned) (dstSize.width()/ar), 4));
     }
     else {
-        dstSize = QSize(outFrame->width, outFrame->height);
+        dstSize = QSize(outFrame->width * sar, outFrame->height);
     }
-    dstSize.setWidth(qMin(dstSize.width(), outFrame->width));
+    dstSize.setWidth(qMin(dstSize.width(), outFrame->width * sar));
     dstSize.setHeight(qMin(dstSize.height(), outFrame->height));
 
     if (dstSize.width() < 8 || dstSize.height() < 8)
@@ -348,15 +349,3 @@ int QnImageRestHandler::executePost(const QString& path, const QnRequestParamLis
     return executeGet(path, params, result, contentType);
 }
 
-QString QnImageRestHandler::description() const
-{
-    return 
-        "Return image from camera <BR>"
-        "<BR>Param <b>physicalId</b> - camera physicalId."
-        "<BR>Param <b>time</b> - required image time. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected. Also, special values allowed: 'NOW' - live position (no frame is returned if camera is offline). 'LATEST' - last frame from camera (return live position or last frame from archive if camera is offline)"
-        "<BR>Param <b>format</b> - Optional. image format. Allowed values: 'jpeg', 'png', 'bmp', 'tiff'. Default value 'jpeg"
-        "<BR>Param <b>method</b> - Optional. Allowed values: 'before', 'after', 'exact'. If parameter is 'before' or 'after' server returns nearest I-frame before or after time. Default value 'before'. Parameter not used for Motion jpeg video codec"
-        "<BR>Param <b>height</b> - Optional. Required image height."
-        "<BR>Param <b>width</b> - Optional. Required image width. If only width or height is specified other parameter is auto detected. Video aspect ratio is not changed"
-        "<BR>Returns image";
-}

@@ -86,8 +86,6 @@ class QnSetCameraParamRestHandler
 {
     Q_OBJECT
 public:
-    //!Implementation of QnRestRequestHandler::description
-    virtual QString description() const override;
 };
 
 //!Handles setCameraParam request
@@ -101,7 +99,6 @@ class QnGetCameraParamRestHandler
     Q_OBJECT
 public:
     //!Implementation of QnRestRequestHandler::description
-    virtual QString description() const override;
 };
 
 #endif  //QN_CAMERA_SETTINGS_HANDLER_H

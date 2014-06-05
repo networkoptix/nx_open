@@ -35,7 +35,25 @@ class QnUniversalTcpListener;
 */
 namespace ec2
 {
-    typedef QSet<QnId> PeerList;
+    struct QnPeerInfo {
+        enum Type {
+            Server,
+            DesktopClient,
+            AndroidClient
+
+        };
+
+        bool isClient() const {
+            return peerType == DesktopClient || peerType == AndroidClient;
+        }
+
+        QnId id;
+        Type peerType;
+
+        QnPeerInfo(QnId id, Type peerType): id(id), peerType(peerType) {}
+    };
+
+    typedef QSet<QnId> QnPeerSet;
 
     struct QnFullResourceData
     {
@@ -721,7 +739,7 @@ namespace ec2
 
         virtual ~AbstractUpdatesManager() {}
 
-        template<class TargetType, class HandlerType> int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const PeerList &peers, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, TargetType *target, HandlerType handler) {
             return sendUpdatePackageChunk(updateId, data, offset, peers, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
@@ -731,7 +749,7 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int installUpdate(const QString &updateId, const PeerList &peers, TargetType *target, HandlerType handler) {
+        template<class TargetType, class HandlerType> int installUpdate(const QString &updateId, const QnPeerSet &peers, TargetType *target, HandlerType handler) {
             return installUpdate(updateId, peers, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
@@ -742,9 +760,9 @@ namespace ec2
         void updateInstallationRequested(const QString &updateId);
 
     protected:
-        virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const PeerList &peers, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) = 0;
         virtual int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) = 0;
-        virtual int installUpdate(const QString &updateId, const PeerList &peers, impl::SimpleHandlerPtr handler) = 0;
+        virtual int installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
 
@@ -779,11 +797,10 @@ namespace ec2
         virtual QnConnectionInfo connectionInfo() const = 0;
         //!Calling this method starts notifications delivery by emitting corresponding signals of corresponding manager
         /*!
-            \param fullSyncRequired If \a true, \a AbstractECConnection::initNotification signal is delivered before any other signal
             \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent
         */
-        virtual void startReceivingNotifications( bool fullSyncRequired) = 0;
-        virtual void addRemotePeer(const QUrl& url, bool isClient, const QUuid& peerGuid) = 0;
+        virtual void startReceivingNotifications() = 0;
+        virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager() = 0;
@@ -878,8 +895,8 @@ namespace ec2
         void initNotification(QnFullResourceData fullData);
         void runtimeInfoChanged(const ec2::ApiServerInfoData& runtimeInfo);
 
-        void remotePeerFound(ApiServerAliveData data, bool isProxy);
-        void remotePeerLost(ApiServerAliveData data, bool isProxy);
+        void remotePeerFound(ApiPeerAliveData data, bool isProxy);
+        void remotePeerLost(ApiPeerAliveData data, bool isProxy);
 
         void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);

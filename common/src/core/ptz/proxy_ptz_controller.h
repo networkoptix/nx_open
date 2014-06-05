@@ -19,6 +19,7 @@ public:
     virtual Qn::PtzCapabilities getCapabilities() override                                                      { return m_baseController->getCapabilities(); }
 
     virtual bool continuousMove(const QVector3D &speed) override                                                { return m_baseController->continuousMove(speed); }
+    virtual bool continuousFocus(qreal speed) override                                                          { return m_baseController->continuousFocus(speed); }
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override    { return m_baseController->absoluteMove(space, position, speed); }
     virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) override                  { return m_baseController->viewportMove(aspectRatio, viewport, speed); }
 
@@ -40,6 +41,9 @@ public:
     virtual bool getActiveObject(QnPtzObject *activeObject) override                                            { return m_baseController->getActiveObject(activeObject); }
     virtual bool updateHomeObject(const QnPtzObject &homeObject) override                                       { return m_baseController->updateHomeObject(homeObject); }
     virtual bool getHomeObject(QnPtzObject *homeObject) override                                                { return m_baseController->getHomeObject(homeObject); }
+
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits)                                      { return m_baseController->getAuxilaryTraits(auxilaryTraits); }
+    virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data)                       { return m_baseController->runAuxilaryCommand(trait, data); }
 
     virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override                                     { return base_type::getData(query, data); /* This is important because of base implementation! */ }
 

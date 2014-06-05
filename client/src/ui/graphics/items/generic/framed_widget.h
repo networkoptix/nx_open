@@ -12,6 +12,7 @@ namespace Qn {
         RectangularFrame,
         RoundedRectangularFrame,
         EllipticalFrame,
+        CustomFrame,
     };
 }
 
@@ -44,6 +45,9 @@ public:
     qreal roundingRadius() const;
     void setRoundingRadius(qreal roundingRadius);
 
+    const QPainterPath &customFramePath() const;
+    void setCustomFramePath(const QPainterPath &customFramePath);
+
 protected:
     void paintFrame(QPainter *painter, const QRectF &rect);
 
@@ -55,6 +59,8 @@ private:
     qreal m_roundingRadius;
     Qt::PenStyle m_frameStyle;
     Qn::FrameShape m_frameShape;
+    QPainterPath m_customFramePath;
+    QRectF m_customFramePathBoundingRect;
 };
 
 

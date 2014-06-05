@@ -20,7 +20,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
     
     ChunkFormat format = ChunkFormat_Unknown;
     QString callback;
-    Qn::TimePeriodContent periodsType;
+    Qn::TimePeriodContent periodsType = Qn::TimePeriodContentCount;
     QString filter;
 
     for (int i = 0; i < params.size(); ++i)
@@ -172,15 +172,3 @@ int QnRecordedChunksRestHandler::executePost(const QString& path, const QnReques
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRecordedChunksRestHandler::description() const
-{
-    return 
-        "Return recorded chunk info by specified cameras\n"
-        "<BR>Param <b>physicalId</b> - camera physicalId. Param can be repeated several times for many cameras."
-        "<BR>Param <b>startTime</b> - Time interval start. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected."
-        "<BR>Param <b>endTime</b> - Time interval end (same format, see above)."
-        "<BR>Param <b>motionRegions</b> - Match motion on a video by specified rect. Params can be used several times."
-        "<BR>Param <b>format</b> - Optional. Data format. Allowed values: 'json', 'xml', 'txt', 'bin'. Default value 'json'"
-        "<BR>Param <b>detail</b> - Chunk detail level, in microseconds. Time periods/chunks that are shorter than the detail level are discarded. You can use detail level as amount of microseconds per screen pixel."
-        "<BR><b>Return</b> XML - with chunks merged for all cameras. Returned time and duration in microseconds.";
-}

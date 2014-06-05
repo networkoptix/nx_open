@@ -4,6 +4,7 @@
 #include <QtCore/QMetaType>
 
 #include <common/user_permissions.h>
+#include <utils/common/model_functions.h>
 
 namespace Qn {
 
@@ -258,11 +259,11 @@ namespace Qn {
 
 } // namespace Qn
 
-Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(Qn::ItemRole)
 Q_DECLARE_METATYPE(Qn::TimeMode)
 Q_DECLARE_METATYPE(Qn::ClientSkin)
-Q_DECLARE_TYPEINFO(Qn::NodeType, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(Qn::NodeType)
+
+QN_FUSION_DECLARE_FUNCTIONS(Qn::ClientSkin, (lexical))
 
 #endif // QN_CLIENT_GLOBALS_H

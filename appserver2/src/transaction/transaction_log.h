@@ -20,6 +20,7 @@
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_module_data.h"
+#include "nx_ec/data/api_camera_bookmark_data.h"
 #include "utils/db/db_helper.h"
 
 namespace ec2
@@ -94,7 +95,7 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        qint64 getRelativeTime() const;
+        qint64 getTimeStamp();
         void init();
 
         bool contains(const QnAbstractTransaction& tran, const QUuid& hash) const;
@@ -143,7 +144,8 @@ namespace ec2
         
         mutable QMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
-        qint64 m_relativeOffset;
+        qint64 m_currentTime;
+        qint64 m_lastTimestamp;
     };
 };
 

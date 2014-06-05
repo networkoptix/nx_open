@@ -22,8 +22,3 @@ int QnVersionRestHandler::executePost(const QString& path, const QnRequestParamL
 {
     return executeGet(path, params, result, contentType);
 }
-
-QString QnVersionRestHandler::description() const
-{
-    return "Returns server version";
-}

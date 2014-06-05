@@ -147,6 +147,12 @@ void serialize(qint64 value, QnOutputBinaryStream<Output> *stream) {
 }
 
 template<class Output>
+void serialize(quint64 value, QnOutputBinaryStream<Output> *stream) {
+    quint64 tmp = qToBigEndian(value);
+    stream->write(&tmp, sizeof(value));
+}
+
+template<class Output>
 void serialize(float value, QnOutputBinaryStream<Output> *stream) {
     stream->write(&value, sizeof(value));
 }
@@ -215,6 +221,15 @@ bool deserialize(QnInputBinaryStream<Input> *stream, quint8 *target) {
 template<class Input>
 bool deserialize(QnInputBinaryStream<Input> *stream, qint64 *target) {
     qint64 tmp;
+    if(stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
+        return false;
+    *target = qFromBigEndian(tmp);
+    return true;
+}
+
+template<class Input>
+bool deserialize(QnInputBinaryStream<Input> *stream, quint64 *target) {
+    quint64 tmp;
     if(stream->read(&tmp, sizeof(tmp)) != sizeof(tmp) )
         return false;
     *target = qFromBigEndian(tmp);

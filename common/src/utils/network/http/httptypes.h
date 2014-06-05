@@ -60,6 +60,10 @@ namespace nx_http
         }
     };
 
+    //!Http header container
+    /*!
+        \warning This is multimap(!) to allow same header be present multiple times in single http message. To insert or replace use \a nx_http::insertOrReplace
+    */
     typedef std::multimap<StringType, StringType, ci_less> HttpHeaders;
     typedef HttpHeaders::value_type HttpHeader;
 
@@ -68,6 +72,13 @@ namespace nx_http
         \return Value of header \a headerName (if found), empty string otherwise
     */
     StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName );
+
+    //!convenient function for inserting or replacing header
+    /*!
+        \return iterator of added element
+    */
+    HttpHeaders::iterator insertOrReplaceHeader( HttpHeaders* const headers, const HttpHeader& newHeader );
+
 
     static const size_t BufferNpos = size_t(-1);
 
@@ -212,18 +223,33 @@ namespace nx_http
         extern const StringType PUT;
     }
 
-    namespace Version
+    //!Represents string like HTTP/1.1, RTSP/1.0
+    class MimeProtoVersion
     {
-        extern const StringType http_1_0;
-        extern const StringType http_1_1;
-    }
+    public:
+        StringType protocol;
+        StringType version;
+
+        bool parse( const ConstBufferRefType& data );
+        //!Appends serialized data to \a dstBuffer
+        void serialize( BufferType* const dstBuffer ) const;
+
+        bool operator==( const MimeProtoVersion& right ) const
+        {
+            return protocol == right.protocol && version == right.version;
+        }
+    };
+
+    static const MimeProtoVersion http_1_0 = { "HTTP", "1.0" };
+    static const MimeProtoVersion http_1_1 = { "HTTP", "1.1" };
+    static const MimeProtoVersion rtsp_1_0 = { "RTSP", "1.0" };
 
     class RequestLine
     {
     public:
         StringType method;
         QUrl url;
-        StringType version;
+        MimeProtoVersion version;
 
         bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
@@ -233,7 +259,7 @@ namespace nx_http
     class StatusLine
     {
     public:
-        StringType version;
+        MimeProtoVersion version;
         int statusCode;
         StringType reasonPhrase;
 

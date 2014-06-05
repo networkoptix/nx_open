@@ -1,12 +1,15 @@
 #ifndef live_strem_provider_h_1508
 #define live_strem_provider_h_1508
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
+
 #include "../resource/media_resource.h"
 #include "motion/motion_estimation.h"
 #include "../resource/motion_window.h"
 #include "core/resource/resource_fwd.h"
 #include "media_streamdataprovider.h"
+
 
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
@@ -97,6 +100,10 @@ private:
     bool m_isPhysicalResource;
     Qn::SecondStreamQuality  m_secondaryQuality;
     simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
+    QElapsedTimer m_resolutionCheckTimer;
+
+    void updateStreamResolution( int channelNumber, const QSize& newResolution );
+    void extractCodedPictureResolution( const QnCompressedVideoDataPtr& videoData, QSize* const newResolution );
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;

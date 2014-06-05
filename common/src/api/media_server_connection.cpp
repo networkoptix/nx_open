@@ -35,6 +35,7 @@ namespace {
         (TimePeriodsObject,        "RecordedTimePeriods")
         (StatisticsObject,         "statistics")
         (PtzContinuousMoveObject,  "ptz")
+        (PtzContinuousFocusObject, "ptz")
         (PtzAbsoluteMoveObject,    "ptz")
         (PtzViewportMoveObject,    "ptz")
         (PtzGetPositionObject,     "ptz")
@@ -51,6 +52,8 @@ namespace {
         (PtzGetActiveObjectObject, "ptz")
         (PtzUpdateHomeObjectObject, "ptz")
         (PtzGetDataObject,         "ptz")
+        (PtzGetAuxilaryTraitsObject, "ptz")
+        (PtzRunAuxilaryCommandObject, "ptz")
         (GetParamsObject,          "getCameraParam")
         (SetParamsObject,          "setCameraParam")
         (TimeObject,               "gettime")
@@ -90,115 +93,6 @@ namespace {
 
 } // anonymous namespace
 
-
-// -------------------------------------------------------------------------- //
-// QnNetworkProxyFactory
-// -------------------------------------------------------------------------- //
-/**
- * Note that instance of this class will be used from several threads, and
- * must therefore be thread-safe.
- */
-/*
-class QnNetworkProxyFactory: public QObject, public QNetworkProxyFactory {
-public:
-    QnNetworkProxyFactory()
-    {
-    }
-
-    virtual ~QnNetworkProxyFactory()
-    {
-    }
-
-    void removeFromProxyList(const QUrl& url)
-    {
-        QMutexLocker locker(&m_mutex);
-
-        m_proxyInfo.remove(url);
-    }
-
-    void addToProxyList(const QUrl& url, const QString& addr, int port)
-    {
-        QMutexLocker locker(&m_mutex);
-
-        m_proxyInfo.insert(url, ProxyInfo(addr, port));
-    }
-
-    void clearProxyList()
-    {
-        QMutexLocker locker(&m_mutex);
-
-        m_proxyInfo.clear();
-    }
-
-    static QnNetworkProxyFactory* instance();
-
-protected:
-    virtual QList<QNetworkProxy> queryProxy(const QNetworkProxyQuery &query = QNetworkProxyQuery()) override
-    {
-        QList<QNetworkProxy> rez;
-
-        QString urlPath = query.url().path();
-        if (urlPath.startsWith(QLatin1String("/")))
-            urlPath.remove(0, 1);
-
-        if (urlPath.endsWith(QLatin1String("/")))
-            urlPath.chop(1);
-
-        if (urlPath.isEmpty() || urlPath == QLatin1String("api/ping")) {
-            rez << QNetworkProxy(QNetworkProxy::NoProxy);
-            return rez;
-        }
-        QString host = query.peerHostName();
-        QUrl url = query.url();
-        url.setPath(QString());
-        url.setUserInfo(QString());
-        url.setQuery(QUrlQuery());
-
-        QMutexLocker locker(&m_mutex);
-        QMap<QUrl, ProxyInfo>::const_iterator itr = m_proxyInfo.find(url);
-        if (itr == m_proxyInfo.end())
-            rez << QNetworkProxy(QNetworkProxy::NoProxy);
-        else
-            rez << QNetworkProxy(QNetworkProxy::HttpProxy, itr.value().addr, itr.value().port);
-        return rez;
-    }
-
-private:
-    struct ProxyInfo {
-        ProxyInfo(): port(0) {}
-        ProxyInfo(const QString& _addr, int _port): addr(_addr), port(_port) {}
-        QString addr;
-        int port;
-    };
-    QMutex m_mutex;
-    QMap<QUrl, ProxyInfo> m_proxyInfo;
-};
-
-Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
-
-QPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
-    QnNetworkProxyFactory *result(new QnNetworkProxyFactory());
-
-    // Qt will take ownership of the supplied instance. 
-    QNetworkProxyFactory::setApplicationProxyFactory(result); // TODO: #Elric we have a race if this code is run several times from different threads.
-
-    return result;
-}
-
-Q_GLOBAL_STATIC_WITH_ARGS(QPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, (createGlobalProxyFactory()));
-
-QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
-{
-    QPointer<QnNetworkProxyFactory> *result = qn_globalProxyFactory();
-    if(*result) {
-        return result->data();
-    } else {
-        return qn_reserveProxyFactory();
-    }
-}
-
-
-*/
 
 // -------------------------------------------------------------------------- //
 // QnMediaServerReplyProcessor
@@ -336,6 +230,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, handle);
         break;
     case PtzContinuousMoveObject:
+    case PtzContinuousFocusObject:
     case PtzAbsoluteMoveObject:
     case PtzViewportMoveObject:
     case PtzCreatePresetObject:
@@ -346,6 +241,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case PtzRemoveTourObject:
     case PtzActivateTourObject:
     case PtzUpdateHomeObjectObject:
+    case PtzRunAuxilaryCommandObject:
         emitFinished(this, response.status, handle);
         break;
     case PtzGetPositionObject:
@@ -361,9 +257,15 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case PtzGetHomeObjectObject:
         processJsonReply<QnPtzObject>(this, response, handle);
         break;
+
+    case PtzGetAuxilaryTraitsObject:
+        processJsonReply<QnPtzAuxilaryTraitList>(this, response, handle);
+        break;
+
     case PtzGetDataObject:
         processJsonReply<QnPtzData>(this, response, handle);
         break;
+
     case CameraSearchStartObject:
     case CameraSearchStatusObject:
     case CameraSearchStopObject:
@@ -449,9 +351,9 @@ void QnMediaServerConnection::setProxyAddr(const QUrl &apiUrl, const QString &ad
     m_proxyPort = port;
 
     if (port) {
-        QnNetworkProxyFactory::instance()->addToProxyList(apiUrl, addr, port);
+        QnNetworkProxyFactory::instance()->addToProxyList(apiUrl.host(), addr, port);
     } else {
-        QnNetworkProxyFactory::instance()->removeFromProxyList(apiUrl);
+        QnNetworkProxyFactory::instance()->removeFromProxyList(apiUrl.host());
     }
 }
 
@@ -583,6 +485,15 @@ int QnMediaServerConnection::ptzContinuousMoveAsync(const QnNetworkResourcePtr &
     params << QnRequestParam("sequenceNumber",  QnLexical::serialized(sequenceNumber));
 
     return sendAsyncGetRequest(PtzContinuousMoveObject, params, NULL, target, slot);
+}
+
+int QnMediaServerConnection::ptzContinuousFocusAsync(const QnNetworkResourcePtr &camera, qreal speed, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("command",         QnLexical::serialized(Qn::ContinuousFocusPtzCommand));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("speed",           QnLexical::serialized(speed));
+
+    return sendAsyncGetRequest(PtzContinuousFocusObject, params, NULL, target, slot);
 }
 
 int QnMediaServerConnection::ptzAbsoluteMoveAsync(const QnNetworkResourcePtr &camera, Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed, const QUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot) {
@@ -731,6 +642,24 @@ int QnMediaServerConnection::ptzGetHomeObjectAsync(const QnNetworkResourcePtr &c
     params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
 
     return sendAsyncGetRequest(PtzGetHomeObjectObject, params, QN_STRINGIZE_TYPE(QnPtzObject), target, slot);
+}
+
+int QnMediaServerConnection::ptzGetAuxilaryTraitsAsync(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("command",         QnLexical::serialized(Qn::GetAuxilaryTraitsPtzCommand));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+
+    return sendAsyncGetRequest(PtzGetAuxilaryTraitsObject, params, QN_STRINGIZE_TYPE(QnPtzAuxilaryTraitList), target, slot);
+}
+
+int QnMediaServerConnection::ptzRunAuxilaryCommandAsync(const QnNetworkResourcePtr &camera, const QnPtzAuxilaryTrait &trait, const QString &data, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("command",         QnLexical::serialized(Qn::RunAuxilaryCommandPtzCommand));
+    params << QnRequestParam("resourceId",      QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("trait",           QnLexical::serialized(trait));
+    params << QnRequestParam("data",            QnLexical::serialized(data));
+
+    return sendAsyncGetRequest(PtzRunAuxilaryCommandObject, params, NULL, target, slot);
 }
 
 int QnMediaServerConnection::ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields query, QObject *target, const char *slot) {

@@ -34,7 +34,8 @@ namespace nx_http
         m_authorizationTried( false ),
         m_terminated( false ),
         m_totalBytesRead( 0 ),
-        m_contentEncodingUsed( true )
+        m_contentEncodingUsed( true ),
+        m_responseReadTimeoutMs( DEFAULT_RESPONSE_READ_TIMEOUT )
     {
         m_responseBuffer.resize(RESPONSE_BUFFER_SIZE);
     }
@@ -63,17 +64,17 @@ namespace nx_http
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
         if( m_socket )
         {
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead );
+            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
 
             //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
         }
     }
 
     //!Implementation of aio::AIOEventHandler::eventTriggered
-    void AsyncHttpClient::eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw()
+    void AsyncHttpClient::eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw()
     {
-        //TODO/IMPL #AK need to refactore this method: possibly split to multiple methods
+        //TODO #AK: need to refactore this method: possibly split to multiple methods
 
         std::shared_ptr<AsyncHttpClient> sharedThis( shared_from_this() );
 
@@ -87,11 +88,11 @@ namespace nx_http
                 case sWaitingConnectToHost:
                     switch( eventType )
                     {
-                        case PollSet::etRead:
+                        case aio::etRead:
                             Q_ASSERT( false );
                             break;
 
-                        case PollSet::etWrite:
+                        case aio::etWrite:
                             //connect successful
                             serializeRequest();
                             m_state = sSendingRequest;
@@ -100,13 +101,14 @@ namespace nx_http
                             lk.relock();
                             continue;
 
-                        case PollSet::etTimedOut:
-                        case PollSet::etError:
-                            NX_LOG( lit("Failed to connect to %1:%2. %3").arg(m_url.host()).arg(m_url.port(DEFAULT_HTTP_PORT)).arg(eventType), cl_logDEBUG1 );
+                        case aio::etTimedOut:
+                        case aio::etError:
+                            NX_LOG( lit("AsyncHttpClient. Failed to establish tcp connection to %1. %2").
+                                arg(m_url.toString()).arg(QLatin1String(aio::toString(eventType))), cl_logDEBUG1 );
                             if( reconnectIfAppropriate() )
                                 break;
                             m_state = sFailed;
-                            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+                            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
                             lk.unlock();
                             emit done( sharedThis );
                             lk.relock();
@@ -118,9 +120,9 @@ namespace nx_http
                     break;
 
                 case sSendingRequest:
-                    if( eventType == PollSet::etError || eventType == PollSet::etTimedOut )
+                    if( eventType == aio::etError || eventType == aio::etTimedOut )
                     {
-                        if( eventType == PollSet::etError )
+                        if( eventType == aio::etError )
                         {
                             if( reconnectIfAppropriate() )
                                 break;
@@ -143,7 +145,7 @@ namespace nx_http
                     {
                         NX_LOG( lit("Failed to send request to %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
                         m_state = sFailed;
-                        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+                        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
                         lk.unlock();
                         emit done( sharedThis );
                         lk.relock();
@@ -153,18 +155,18 @@ namespace nx_http
                     {
                         NX_LOG( lit("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2 );
                         m_state = sReceivingResponse;
-                        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
-                        m_socket->setRecvTimeout( DEFAULT_RESPONSE_READ_TIMEOUT );
-                        aio::AIOService::instance()->watchSocket( m_socket, PollSet::etRead, this );
+                        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
+                        m_socket->setRecvTimeout( m_responseReadTimeoutMs );
+                        aio::AIOService::instance()->watchSocket( m_socket, aio::etRead, this );
                     }
                     break;
 
                 case sReceivingResponse:
                 {
-                    Q_ASSERT( eventType != PollSet::etWrite );
-                    if( eventType == PollSet::etError || eventType == PollSet::etTimedOut )
+                    Q_ASSERT( eventType != aio::etWrite );
+                    if( eventType == aio::etError || eventType == aio::etTimedOut )
                     {
-                        if( eventType == PollSet::etError )
+                        if( eventType == aio::etError )
                         {
                             if( reconnectIfAppropriate() )
                                 break;
@@ -272,8 +274,8 @@ namespace nx_http
 
                 case sReadingMessageBody:
                 {
-                    Q_ASSERT( eventType != PollSet::etWrite );
-                    if( eventType == PollSet::etError )
+                    Q_ASSERT( eventType != aio::etWrite );
+                    if( eventType == aio::etError )
                     {
                         if( reconnectIfAppropriate() )
                             break;
@@ -286,9 +288,9 @@ namespace nx_http
                     }
 
                     int bytesRead = readAndParseHttp();
-                    //TODO/IMPL reconnect in case of error
+                    //TODO #ak reconnect in case of error
                     if( m_state != sReadingMessageBody )
-                        aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
+                        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead );
                     if( bytesRead > 0 )
                     {
                         lk.unlock();
@@ -318,8 +320,8 @@ namespace nx_http
 
         if( m_state == sFailed || m_state == sDone )
         {
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead );
+            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
         }
     }
 
@@ -356,7 +358,7 @@ namespace nx_http
         composeRequest( nx_http::Method::POST );
         m_request.headers.insert( make_pair("Content-Type", contentType) );
         m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
-        //TODO/IMPL support chunked encoding & compression
+        //TODO #ak support chunked encoding & compression
         m_request.headers.insert( make_pair("Content-Encoding", "identity") );
         m_request.messageBody = messageBody;
         return initiateHttpMessageDelivery( url );
@@ -406,12 +408,12 @@ namespace nx_http
 
     void AsyncHttpClient::setSubsequentReconnectTries( int /*reconnectTries*/ )
     {
-        //TODO/IMPL
+        //TODO #ak
     }
 
     void AsyncHttpClient::setTotalReconnectTries( int /*reconnectTries*/ )
     {
-        //TODO/IMPL
+        //TODO #ak
     }
 
     void AsyncHttpClient::setUserAgent( const QString& userAgent )
@@ -427,6 +429,11 @@ namespace nx_http
     void AsyncHttpClient::setUserPassword( const QString& userPassword )
     {
         m_userPassword = userPassword;
+    }
+
+    void AsyncHttpClient::setResponseReadTimeoutMs( int _responseReadTimeoutMs )
+    {
+        m_responseReadTimeoutMs = _responseReadTimeoutMs;
     }
 
     void AsyncHttpClient::resetDataBeforeNewRequest()
@@ -447,8 +454,8 @@ namespace nx_http
 
         if( m_socket )
         {
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead );
+            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite );
 
             serializeRequest();
             m_state = sSendingRequest;
@@ -481,7 +488,7 @@ namespace nx_http
         }
 
         //connect is done if socket is available for write
-        if( !aio::AIOService::instance()->watchSocket( m_socket, PollSet::etWrite, this ) )
+        if( !aio::AIOService::instance()->watchSocket( m_socket, aio::etWrite, this ) )
         {
             NX_LOG( lit("Failed to add socket (connecting to %1:%2) to aio service. %3").
                 arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
@@ -509,7 +516,7 @@ namespace nx_http
         {
             //closing connection is a valid HTTP way to signal message end
             //m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
-            //TODO/IMPL check if whole message body is received (if message body size is known)
+            //TODO #ak check if whole message body is received (if message body size is known)
             m_httpStreamReader.flush();
             m_state = (m_httpStreamReader.state() == HttpStreamReader::messageDone) || (m_httpStreamReader.state() == HttpStreamReader::readingMessageBody)
                 ? sDone
@@ -536,11 +543,11 @@ namespace nx_http
 
     void AsyncHttpClient::composeRequest( const nx_http::StringType& httpMethod )
     {
-        const bool useHttp11 = true;   //TODO/IMPL check. if we need it (e.g. we using keep-alive or requesting live capture)
+        const bool useHttp11 = true;   //TODO #ak check if we need it (e.g. we using keep-alive or requesting live capture)
 
         m_request.requestLine.method = httpMethod;
         m_request.requestLine.url = m_url.path() + (m_url.hasQuery() ? (QLatin1String("?") + m_url.query()) : QString());
-        m_request.requestLine.version = useHttp11 ? nx_http::Version::http_1_1 : nx_http::Version::http_1_0;
+        m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;
         if( !m_userAgent.isEmpty() )
             m_request.headers.insert( std::make_pair("User-Agent", m_userAgent.toLatin1()) );
         if( useHttp11 )
@@ -588,7 +595,7 @@ namespace nx_http
 
     bool AsyncHttpClient::reconnectIfAppropriate()
     {
-        //TODO/IMPL we need reconnect and request entity from the point we stopped at
+        //TODO #ak we need reconnect and request entity from the point we stopped at
         return false;
     }
 
@@ -698,11 +705,8 @@ namespace nx_http
         QMap<BufferType, BufferType>::const_iterator qopIter = wwwAuthenticateHeader.params.find("qop");
         const BufferType qop = qopIter != wwwAuthenticateHeader.params.end() ? qopIter.value() : BufferType();
 
-        if( qop.indexOf("auth-int") != -1 )
+        if( qop.indexOf("auth-int") != -1 ) //TODO #ak qop can have value "auth,auth-int". That should be supported
             return false;   //qop=auth-int is not supported
-
-        BufferType nonceCount = "00000001";     //TODO/IMPL
-        BufferType clientNonce = "0a4f113b";    //TODO/IMPL
 
         QCryptographicHash md5HashCalc( QCryptographicHash::Md5 );
 
@@ -732,6 +736,9 @@ namespace nx_http
         md5HashCalc.addData( ":" );
         if( !qop.isEmpty() )
         {
+            const BufferType nonceCount = "00000001";     //TODO/IMPL
+            const BufferType clientNonce = "0a4f113b";    //TODO/IMPL
+
             md5HashCalc.addData( nonceCount );
             md5HashCalc.addData( ":" );
             md5HashCalc.addData( clientNonce );

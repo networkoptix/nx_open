@@ -38,7 +38,7 @@ QnPausedPainter::QnPausedPainter(const QGLContext *context):
         <<  1.0 <<  1.0 //2
         <<  d   <<  1.0 //3
         <<  d   << -1.0;//0
-    m_vertexCount = 8;
+    m_vertexCount = 12;
     
     /* Generate color data. */
     

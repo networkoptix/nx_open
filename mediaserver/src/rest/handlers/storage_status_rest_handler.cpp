@@ -47,11 +47,3 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     result.setReply(reply);
     return CODE_OK;
 }
-
-QString QnStorageStatusRestHandler::description() const
-{
-    return 
-        "Returns 'OK' if specified folder may be used for writing on mediaServer. Otherwise returns 'FAIL' \n"
-        "<BR>Param <b>path</b> - Folder."
-        "<BR><b>Return</b> JSON with path validity.";
-}
