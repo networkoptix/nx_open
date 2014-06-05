@@ -71,7 +71,6 @@ libQt5Sql.so.5.2.1 \
 libQt5Xml.so.5.2.1 \
 libquazip.so.1.0.0 \
 libsigar.so \
-libvpx.so.1.2.0 \
 libswresample.so.0.15.100 \
 libswscale.so.2.1.100 )
 
