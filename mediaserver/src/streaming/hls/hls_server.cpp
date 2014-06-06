@@ -122,7 +122,7 @@ namespace nx_hls
                 }
 
                 case sDone:
-                    NX_LOG( QString::fromLatin1("Done request to %1. Closing connection...").arg(remoteHostAddress().toString()), cl_logDEBUG1 );
+                    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Done message to %1. Closing connection...").arg(remoteHostAddress().toString()), cl_logDEBUG1 );
                     return;
             }
         }
@@ -196,15 +196,16 @@ namespace nx_hls
     {
         nx_http::Response response;
         response.statusLine.version = request.requestLine.version;
+
+        response.statusLine.statusCode = getRequestedFile( request, &response );
+        if( response.statusLine.reasonPhrase.isEmpty() )
+            response.statusLine.reasonPhrase = StatusCode::toString( response.statusLine.statusCode );
+
         response.headers.insert( std::make_pair(
             "Date",
             QLocale(QLocale::English).toString(QDateTime::currentDateTime(), lit("ddd, d MMM yyyy hh:mm:ss t")).toLatin1() ) );
         response.headers.insert( std::make_pair( "Server", QN_APPLICATION_NAME " " QN_APPLICATION_VERSION ) );
         response.headers.insert( std::make_pair( "Cache-Control", "no-cache" ) );   //getRequestedFile can override this
-
-        response.statusLine.statusCode = getRequestedFile( request, &response );
-        if( response.statusLine.reasonPhrase.isEmpty() )
-            response.statusLine.reasonPhrase = StatusCode::toString( response.statusLine.statusCode );
 
         if( request.requestLine.version == nx_http::http_1_1 )
         {
@@ -422,6 +423,8 @@ namespace nx_hls
             }
         }
 
+        ensureChunkCacheFilledEnoughForPlayback( session, session->streamQuality() );
+
         if( chunkedParamIter == requestParams.end() )
             return getVariantPlaylist( session, request, camResource, videoCamera, requestParams, response );
         else
@@ -529,21 +532,8 @@ namespace nx_hls
             return nx_http::StatusCode::notFound;
         }
 
-        size_t chunksGenerated = playlistManager->generateChunkList( &chunkList, &isPlaylistClosed );
-        if( chunksGenerated == 0 && session->isLive() )
-        {
-            //no chunks generated, waiting for at least one chunk to be generated
-            QElapsedTimer monotonicTimer;
-            monotonicTimer.restart();
-            while( monotonicTimer.elapsed() < session->targetDurationMS() * 3 )
-            {
-                chunksGenerated = playlistManager->generateChunkList( &chunkList, &isPlaylistClosed );
-                if( chunksGenerated > 0 )
-                    break;
-                QThread::msleep( 1000 );
-            }
-        }
-        if( chunksGenerated == 0 )   //no chunks generated
+        const size_t chunksGenerated = playlistManager->generateChunkList( &chunkList, &isPlaylistClosed );
+        if( chunkList.empty() )   //no chunks generated
         {
             NX_LOG( QString::fromLatin1("Failed to get chunks of resource %1").arg(camResource->getUniqueId()), cl_logWARNING );
             return nx_http::StatusCode::noContent;
@@ -823,5 +813,37 @@ namespace nx_hls
     {
         QMutexLocker lk( &m_mutex );
         m_cond.wakeAll();
+    }
+
+    void QnHttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback( HLSSession* const session, MediaQuality streamQuality )
+    {
+        static const size_t MIN_PLAYLIST_SIZE_TO_START_STREAMING = 1;
+        static const size_t PLAYLIST_CHECK_TIMEOUT_MS = 1000;
+
+        if( !session->isLive() )
+            return; //TODO #ak investigate archive streaming (likely, there is no such problem there)
+
+        //TODO #ak proper handling of MEDIA_Quality_Auto
+        if( streamQuality == MEDIA_Quality_Auto )
+            streamQuality = MEDIA_Quality_High;
+
+        //if no chunks in cache, waiting for cache to be filled
+        std::vector<nx_hls::AbstractPlaylistManager::ChunkData> chunkList;
+        bool isPlaylistClosed = false;
+        size_t chunksGenerated = session->playlistManager(streamQuality)->generateChunkList( &chunkList, &isPlaylistClosed );
+        if( chunksGenerated == 0 )
+        {
+            //no chunks generated, waiting for at least one chunk to be generated
+            QElapsedTimer monotonicTimer;
+            monotonicTimer.restart();
+            while( monotonicTimer.elapsed() < session->targetDurationMS() * (MIN_PLAYLIST_SIZE_TO_START_STREAMING + 2) )
+            {
+                chunkList.clear();
+                chunksGenerated = session->playlistManager(streamQuality)->generateChunkList( &chunkList, &isPlaylistClosed );
+                if( chunksGenerated >= MIN_PLAYLIST_SIZE_TO_START_STREAMING )
+                    break;
+                QThread::msleep( PLAYLIST_CHECK_TIMEOUT_MS );
+            }
+        }
     }
 }

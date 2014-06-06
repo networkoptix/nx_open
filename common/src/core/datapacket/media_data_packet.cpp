@@ -32,8 +32,20 @@ QnMediaContext::QnMediaContext(CodecID codecId)
     if (codecId != CODEC_ID_NONE)
     {
         AVCodec* codec = avcodec_find_decoder(codecId);
-        m_ctx = avcodec_alloc_context3(codec);
-        avcodec_open2(m_ctx, codec, NULL);
+        if( codec && codec->id == codecId )
+        {
+            m_ctx = avcodec_alloc_context3(codec);
+            avcodec_open2(m_ctx, codec, NULL);
+        }
+        else
+        {
+            AVCodec* codec = (AVCodec*)av_malloc(sizeof(AVCodec));
+            memset( codec, 0, sizeof(*codec) );
+            codec->id = codecId;
+            codec->type = AVMEDIA_TYPE_VIDEO;
+            m_ctx = avcodec_alloc_context3(codec);
+            m_ctx->codec_id = codecId;
+        }
     } else {
         m_ctx = 0;
     }
