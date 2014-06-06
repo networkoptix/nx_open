@@ -327,9 +327,10 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         tran.params = 0;
         tran.fillSequence();
         QByteArray chunkData;
-        sender->sendTransaction(tran,  QnPeerSet() << sender->remotePeer().id);
+        QnPeerSet processedPeers(QnPeerSet() << sender->remotePeer().id << m_localPeer.id);
+        sender->sendTransaction(tran, processedPeers);
 
-        QnTransactionTransportHeader transportHeader(QnPeerSet() << sender->remotePeer().id << m_localPeer.id);
+        QnTransactionTransportHeader transportHeader(processedPeers);
         foreach(const QByteArray& serializedTran, serializedTransactions)
             if(!handleTransaction(serializedTran, boost::bind(SendTransactionToTransportFuction(), this, _1, sender, transportHeader)))
                 sender->setState(QnTransactionTransport::Error);
