@@ -133,6 +133,7 @@ void QnJoinSystemTool::joinResource() {
 
     // temporary add the auth info to the api url
     QUrl apiUrl = m_oldApiUrl;
+    apiUrl.setScheme(lit("https"));
     apiUrl.setUserName(lit("admin"));
     apiUrl.setPassword(m_password);
     m_targetServer->apiConnection()->setUrl(apiUrl);
