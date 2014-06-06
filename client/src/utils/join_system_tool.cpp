@@ -39,7 +39,7 @@ void QnJoinSystemTool::start(const QUrl &url, const QString &password) {
     // we need only scheme, hostname and port from the url
     m_targetUrl.setScheme(url.scheme());
     m_targetUrl.setHost(url.host());
-    m_targetUrl.setPort(url.port(50000));
+    m_targetUrl.setPort(url.port(DEFAULT_APPSERVER_PORT));
 
     m_password = password;
 
@@ -128,6 +128,14 @@ void QnJoinSystemTool::joinResource() {
         finish(JoinError);
         return;
     }
+
+    m_oldApiUrl = m_targetServer->apiConnection()->url();
+
+    // temporary add the auth info to the api url
+    QUrl apiUrl = m_oldApiUrl;
+    apiUrl.setUserName(lit("admin"));
+    apiUrl.setPassword(m_password);
+    m_targetServer->apiConnection()->setUrl(apiUrl);
 
     m_targetServer->apiConnection()->changeAdminPasswordAsync(hash, digest, this, SLOT(at_targetServer_adminPasswordChanged(int,int)));
 }
@@ -237,6 +245,9 @@ void QnJoinSystemTool::at_targetServer_adminPasswordChanged(int status, int hand
         finish(JoinError);
         return;
     }
+
+    // now revert to the default api url because the password has been reset to our own
+    m_targetServer->apiConnection()->setUrl(m_oldApiUrl);
 
     m_targetServer->apiConnection()->changeSystemNameAsync(qnCommon->localSystemName(), true, this, SLOT(at_targetServer_systemNameChanged(int,int)));
 }

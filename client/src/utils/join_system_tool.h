@@ -48,6 +48,7 @@ private:
     bool m_running;
 
     QUrl m_targetUrl;
+    QUrl m_oldApiUrl;
     QString m_password;
     QList<QHostAddress> m_possibleAddresses;
     QnMediaServerResourcePtr m_targetServer;
