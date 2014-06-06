@@ -19,15 +19,23 @@ public:
 
     void setCompatibilityMode(bool compatibilityMode);
 
+    void addUrl(const QUrl &url);
+    void removeUrl(const QUrl &url);
     void addAddress(const QHostAddress &address, quint16 port);
     void removeAddress(const QHostAddress &address, quint16 port);
 
+    void addManualUrl(const QUrl &url);
+    void removeManualUrl(const QUrl &url);
     void addManualAddress(const QHostAddress &address, quint16 port);
     void removeManualAddress(const QHostAddress &address, quint16 port);
 
+    void addIgnoredUrl(const QUrl &url);
+    void removeIgnoredUrl(const QUrl &url);
     void addIgnoredAddress(const QHostAddress &address, quint16 port);
     void removeIgnoredAddress(const QHostAddress &address, quint16 port);
 
+    void addIgnoredModule(const QnId &id, const QUrl &url);
+    void removeIgnoredModule(const QnId &id, const QUrl &url);
     void addIgnoredModule(const QnId &id, const QHostAddress &address, quint16 port);
     void removeIgnoredModule(const QnId &id, const QHostAddress &address, quint16 port);
 
@@ -39,9 +47,9 @@ public:
     QList<QnModuleInformation> foundModules() const;
     QnModuleInformation moduleInformation(const QnId &id) const;
 
-    QSet<QUrl> autoAddresses() const;
-    QSet<QUrl> ignoredAddresses() const;
-    QSet<QUrl> manualAddresses() const;
+    QSet<QUrl> autoUrls() const;
+    QSet<QUrl> ignoredUrls() const;
+    QSet<QUrl> manualUrls() const;
     QMultiHash<QnId, QUrl> ignoredModules() const;
 
 signals:
@@ -54,6 +62,9 @@ signals:
 private:
     void enqueRequest(const QUrl &url);
 
+    void checkAndAddUrl(const QUrl &url, QSet<QUrl> *urlSet);
+    void checkAndAddAddress(const QHostAddress &address, quint16 port, QSet<QUrl> *urlSet);
+
 private slots:
     void activateRequests();
 
@@ -61,9 +72,9 @@ private slots:
     void at_manualCheckTimer_timeout();
 
 private:
-    QSet<QUrl> m_autoAddresses;
-    QSet<QUrl> m_ignoredAddresses;
-    QSet<QUrl> m_manualAddresses;
+    QSet<QUrl> m_autoUrls;
+    QSet<QUrl> m_ignoredUrls;
+    QSet<QUrl> m_manualUrls;
     QMultiHash<QnId, QUrl> m_ignoredModules;
 
     int m_maxConnections;

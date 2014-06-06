@@ -19,6 +19,15 @@ namespace {
         return QUrl(QString(lit("http://%1:%2/api/moduleInformation")).arg(address.toString()).arg(port));
     }
 
+    QUrl makeRequestUrl(const QUrl &url) {
+        QUrl result;
+        result.setScheme(url.scheme());
+        result.setHost(url.host());
+        result.setPort(url.port());
+        result.setPath(lit("/api/moduleInformation"));
+        return result;
+    }
+
 } // anonymous namespace
 
 QnDirectModuleFinder::QnDirectModuleFinder(QObject *parent) :
@@ -37,36 +46,76 @@ void QnDirectModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
-void QnDirectModuleFinder::addAddress(const QHostAddress &address, quint16 port) {
-    QUrl url = makeRequestUrl(address, port);
-    if (!m_autoAddresses.contains(url)) {
-        m_autoAddresses.insert(makeRequestUrl(address, port));
+void QnDirectModuleFinder::checkAndAddUrl(const QUrl &srcUrl, QSet<QUrl> *urlSet) {
+    QUrl url = makeRequestUrl(srcUrl);
+    if (!urlSet->contains(url)) {
+        urlSet->insert(url);
         enqueRequest(url);
     }
+}
+
+void QnDirectModuleFinder::checkAndAddAddress(const QHostAddress &address, quint16 port, QSet<QUrl> *urlSet) {
+    QUrl url = makeRequestUrl(address, port);
+    if (!urlSet->contains(url)) {
+        urlSet->insert(url);
+        enqueRequest(url);
+    }
+}
+
+void QnDirectModuleFinder::addUrl(const QUrl &url) {
+    checkAndAddUrl(url, &m_autoUrls);
+}
+
+void QnDirectModuleFinder::removeUrl(const QUrl &url) {
+    m_autoUrls.remove(makeRequestUrl(url));
+}
+
+void QnDirectModuleFinder::addAddress(const QHostAddress &address, quint16 port) {
+    checkAndAddAddress(address, port, &m_autoUrls);
 }
 
 void QnDirectModuleFinder::removeAddress(const QHostAddress &address, quint16 port) {
-    m_autoAddresses.remove(makeRequestUrl(address, port));
+    m_autoUrls.remove(makeRequestUrl(address, port));
+}
+
+void QnDirectModuleFinder::addManualUrl(const QUrl &url) {
+    checkAndAddUrl(url, &m_manualUrls);
+}
+
+void QnDirectModuleFinder::removeManualUrl(const QUrl &url) {
+    m_manualUrls.remove(makeRequestUrl(url));
 }
 
 void QnDirectModuleFinder::addManualAddress(const QHostAddress &address, quint16 port) {
-    QUrl url = makeRequestUrl(address, port);
-    if (!m_manualAddresses.contains(url)) {
-        m_manualAddresses.insert(makeRequestUrl(address, port));
-        enqueRequest(url);
-    }
+    checkAndAddAddress(address, port, &m_manualUrls);
 }
 
 void QnDirectModuleFinder::removeManualAddress(const QHostAddress &address, quint16 port) {
-    m_manualAddresses.remove(makeRequestUrl(address, port));
+    m_manualUrls.remove(makeRequestUrl(address, port));
+}
+
+void QnDirectModuleFinder::addIgnoredUrl(const QUrl &url) {
+    m_ignoredUrls.insert(makeRequestUrl(url));
+}
+
+void QnDirectModuleFinder::removeIgnoredUrl(const QUrl &url) {
+    m_ignoredUrls.remove(makeRequestUrl(url));
 }
 
 void QnDirectModuleFinder::addIgnoredAddress(const QHostAddress &address, quint16 port) {
-    m_ignoredAddresses.insert(makeRequestUrl(address, port));
+    m_ignoredUrls.insert(makeRequestUrl(address, port));
 }
 
 void QnDirectModuleFinder::removeIgnoredAddress(const QHostAddress &address, quint16 port) {
-    m_ignoredAddresses.remove(makeRequestUrl(address, port));
+    m_ignoredUrls.remove(makeRequestUrl(address, port));
+}
+
+void QnDirectModuleFinder::addIgnoredModule(const QnId &id, const QUrl &url) {
+    m_ignoredModules.insert(id, makeRequestUrl(url));
+}
+
+void QnDirectModuleFinder::removeIgnoredModule(const QnId &id, const QUrl &url) {
+    m_ignoredModules.remove(id, makeRequestUrl(url));
 }
 
 void QnDirectModuleFinder::addIgnoredModule(const QnId &id, const QHostAddress &address, quint16 port) {
@@ -84,10 +133,10 @@ void QnDirectModuleFinder::checkUrl(const QUrl &url) {
 }
 
 void QnDirectModuleFinder::start() {
-    foreach (const QUrl &url, m_manualAddresses)
+    foreach (const QUrl &url, m_manualUrls)
         enqueRequest(url);
 
-    foreach (const QUrl &url, m_autoAddresses)
+    foreach (const QUrl &url, m_autoUrls)
         enqueRequest(url);
 
     m_manualCheckTimer->start();
@@ -106,16 +155,16 @@ QnModuleInformation QnDirectModuleFinder::moduleInformation(const QnId &id) cons
     return m_foundModules[id];
 }
 
-QSet<QUrl> QnDirectModuleFinder::autoAddresses() const {
-    return m_autoAddresses;
+QSet<QUrl> QnDirectModuleFinder::autoUrls() const {
+    return m_autoUrls;
 }
 
-QSet<QUrl> QnDirectModuleFinder::ignoredAddresses() const {
-    return m_ignoredAddresses;
+QSet<QUrl> QnDirectModuleFinder::ignoredUrls() const {
+    return m_ignoredUrls;
 }
 
-QSet<QUrl> QnDirectModuleFinder::manualAddresses() const {
-    return m_manualAddresses;
+QSet<QUrl> QnDirectModuleFinder::manualUrls() const {
+    return m_manualUrls;
 }
 
 QMultiHash<QnId, QUrl> QnDirectModuleFinder::ignoredModules() const {
@@ -126,7 +175,7 @@ void QnDirectModuleFinder::enqueRequest(const QUrl &url) {
     if (m_activeRequests.contains(url) || m_requestQueue.contains(url))
         return;
 
-    if (m_ignoredAddresses.contains(url))
+    if (m_ignoredUrls.contains(url))
         return;
 
     m_requestQueue.enqueue(url);
@@ -200,6 +249,6 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
 }
 
 void QnDirectModuleFinder::at_manualCheckTimer_timeout() {
-    foreach (const QUrl &url, m_manualAddresses)
+    foreach (const QUrl &url, m_manualUrls)
         enqueRequest(url);
 }
