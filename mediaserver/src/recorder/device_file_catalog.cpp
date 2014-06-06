@@ -764,6 +764,7 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
             }
 
             m_chunks.pop_front();
+            --m_lastAddIndex;
         }
     }
 
