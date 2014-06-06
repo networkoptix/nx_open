@@ -118,7 +118,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         dialog->setName(layout->getName());
         setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
 
-        QMessageBox::Button button;
+        QMessageBox::Button button = QMessageBox::Cancel;
         do {
             dialog->exec();
             if(dialog->clickedButton() != QDialogButtonBox::Save)
