@@ -100,7 +100,7 @@ namespace QnBusiness
         switch( eventType )
         {
         case StorageFailureEvent:
-            return false; //TODO: #GDM restore when will work fine
+            return false; //TODO: #GDM #Business restore when will work fine
         default:
             return false;
         }

@@ -5,7 +5,7 @@
 
 #include <nx_ec/ec_api.h>
 
-// TODO: #GDM move out from global namespace.
+// TODO: #GDM #Business move out from global namespace.
 enum QnBusinessRulesActualModelChange {
     RulesLoaded,
     RuleSaved

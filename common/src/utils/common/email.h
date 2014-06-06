@@ -54,7 +54,7 @@ public:
         int port;
         int timeout;
 
-        //TODO: #GDM think where else we can store it
+        //TODO: #GDM #Common think where else we can store it
         /** Flag that we are using simple view */
         bool simple;
     };

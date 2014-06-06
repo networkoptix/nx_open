@@ -87,13 +87,13 @@ void QnShadowItem::ensureShadowParameters() const {
 
 QRectF QnShadowItem::boundingRect() const {
     ensureShadowParameters();
-    //TODO: #GDM what should we return if the rect is not valid?
+    //TODO: #GDM #Common what should we return if the rect is not valid?
     return m_boundingRect;
 }
 
 QPainterPath QnShadowItem::shape() const {
     ensureShadowParameters();
-    //TODO: #GDM what should we return if the rect is not valid?
+    //TODO: #GDM #Common what should we return if the rect is not valid?
     return m_painterPath;
 }
 

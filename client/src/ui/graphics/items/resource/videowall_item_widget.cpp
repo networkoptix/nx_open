@@ -209,12 +209,12 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
         updateStatusOverlay(Qn::NoDataOverlay);
     }
     else {
-        //TODO: #GDM VW paint layout background and calculate its size in bounding geometry
+        //TODO: #GDM #VW paint layout background and calculate its size in bounding geometry
         QRectF bounding;
         foreach (const QnLayoutItemData &data, m_layout->getItems()) {
             QRectF itemRect = data.combinedGeometry;
             if (!itemRect.isValid())
-                continue; //TODO: #GDM VW some items can be not placed yet, wtf
+                continue; //TODO: #GDM #VW some items can be not placed yet, wtf
             bounding = bounding.united(itemRect);
         }
 
@@ -459,7 +459,7 @@ void QnVideowallItemWidget::updateInfo() {
     else
         m_footerLabel->setText(QString());
     m_headerLabel->setText(m_videowall->items()->getItem(m_itemUuid).name);
-    //TODO: #GDM VW update layout in case of transition "long name -> short name"
+    //TODO: #GDM #VW update layout in case of transition "long name -> short name"
 }
 
 void QnVideowallItemWidget::updateStatusOverlay(Qn::ResourceStatusOverlay overlay) {
@@ -484,7 +484,7 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
 
     if (isServer && !m_widget->m_thumbs.contains(resource->getId())) {
         m_widget->m_thumbs[resource->getId()] = qnSkin->pixmap("events/thumb_server.png");
-    } //TODO: #GDM VW local files placeholder
+    } //TODO: #GDM #VW local files placeholder
 
     if (resource && m_widget->m_thumbs.contains(resource->getId())) {
         QPixmap pixmap = m_widget->m_thumbs[resource->getId()];

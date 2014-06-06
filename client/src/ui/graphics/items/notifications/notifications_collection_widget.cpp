@@ -37,7 +37,7 @@
 #include <utils/math/color_transformations.h>
 #include <utils/app_server_notification_cache.h>
 
-//TODO: #GDM remove debug
+//TODO: #GDM #Business remove debug
 #include <business/actions/common_business_action.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
@@ -412,7 +412,7 @@ void QnNotificationsCollectionWidget::hideBusinessAction(const QnAbstractBusines
     if (!resource)
         return;
 
-    // TODO: #GDM please review, there must be a better way to do this. 
+    // TODO: #GDM #Business please review, there must be a better way to do this. 
     // Probably PlaySoundRepeated is not the only action type. See #2812.
     QnNotificationWidget* item = findItem(ruleId, resource, businessAction->actionType() != QnBusiness::PlaySoundAction); /* Ignore resource for repeated sound actions. */
     if (!item)
@@ -564,7 +564,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
     QnResourceList cameras = qnResPool->getResources().filtered<QnVirtualCameraResource>();
     QnResourcePtr sampleCamera = cameras.isEmpty() ? QnResourcePtr() : cameras.first();
 
-    //TODO: #GDM REMOVE DEBUG
+    //TODO: #GDM #Business REMOVE DEBUG
     for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
         QnSystemHealth::MessageType message = QnSystemHealth::MessageType(i);
         QnResourcePtr resource;
@@ -587,7 +587,7 @@ void QnNotificationsCollectionWidget::at_debugButton_clicked() {
         showSystemHealthMessage(message, resource);
     }
 
-    //TODO: #GDM REMOVE DEBUG
+    //TODO: #GDM #Business REMOVE DEBUG
     for (int i = 1; i < QnBusiness::EventCount; i++) {
         QnBusiness::EventType eventType = QnBusiness::EventType(i);
 

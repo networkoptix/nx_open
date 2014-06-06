@@ -309,7 +309,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     qnSettings->setTimestampCorner(parameters.timestampPosition);
 }
 
-//TODO: #GDM may be we should incapsulate in some other object to get parameters and clear connection if user cancelled the process?
+//TODO: #GDM #Business may be we should encapsulate in some other object to get parameters and clear connection if user cancelled the process?
 void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
     QnScreenshotLoader* loader = dynamic_cast<QnScreenshotLoader*>(sender());

@@ -7,7 +7,7 @@
 
 #include <core/resource/motion_window.h>
 
-//TODO: #GDM #Bookmarks rename/move this module to something sane or get rid of it
+//TODO: #GDM #Common rename/move this module to something sane or get rid of it
 
 // TODO: #Elric move somewhere.
 /*

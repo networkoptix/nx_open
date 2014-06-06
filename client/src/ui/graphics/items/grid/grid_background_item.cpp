@@ -75,7 +75,7 @@ public:
     QImage image;
 #endif
     ImageStatus imageStatus;
-    QHash<QString, QImage> imagesMemCache;
+    QHash<QString, QImage> imagesMemCache;  //TODO: #GDM #Common #High replace with QCache
 };
 
 
@@ -249,7 +249,7 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 
     if (!d->imagesMemCache.contains(d->imageFilename)) {
         d->imagesMemCache.insert(d->imageFilename, image);
-    } //TODO: #GDM limit image mem cache size
+    }
 
 #ifdef NATIVE_PAINT_BACKGROUND
     //converting image to ARGB32 since we cannot convert to YUV from monochrome, indexed, etc..
