@@ -378,7 +378,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setCalendarVisible(false);
     updateControlsVisibility(false);
 
-    //TODO: #GDM think about a refactoring
+    //TODO: #GDM #Common think about a refactoring
     bool treeOpened = qnSettings->isTreeOpened(); //quite a hack because m_treePinButton sets tree opened if it is pinned
     bool notificationsOpened = qnSettings->isNotificationsOpened(); //same shit
     m_treePinButton->setChecked(qnSettings->isTreePinned());
@@ -1776,7 +1776,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
         calendarEmpty = c->isEmpty(); /* Small hack. We have a signal that updates visibility if a calendar receive new data */
 
     bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
-    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM does this belong here?
+    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM #Common does this belong here?
 
     bool calendarVisible = calendarEnabled && m_sliderVisible && isSliderOpened();
 

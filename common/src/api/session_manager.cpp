@@ -411,7 +411,7 @@ void QnSessionManager::at_authCookieChanged(const QNetworkCookie &cookie) {
 }
 
 void QnSessionManager::at_authTimer_timeout() {
-    //TODO: #GDM VW reimplement
+    //TODO: #GDM #VW reimplement! camera video may not work!
     //QnAppServerConnectionFactory::createConnection()->testConnectionAsync();
     m_authTimer->start(defaultTimerIterval);
 }

@@ -37,7 +37,7 @@ void QnClockDataProvider::at_timer_timeout() {
 }
 
 void QnClockDataProvider::updateFormatString() {
-    // TODO: #GDM field values are not updated from settings.
+    // TODO: #GDM #Common field values are not updated from settings.
     // We probably don't need this complexity anyway.
 
     m_formatString = QString();

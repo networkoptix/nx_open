@@ -37,7 +37,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
     m_userPasswordHash = user ? user->getHash() : QByteArray();
 
     if (m_user) {
-        connect(m_user, &QnResource::resourceChanged, this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM get rid of resourceChanged
+        connect(m_user, &QnResource::resourceChanged, this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
         connect(m_user, &QnUserResource::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
     }
 

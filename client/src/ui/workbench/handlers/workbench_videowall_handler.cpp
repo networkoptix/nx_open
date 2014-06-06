@@ -38,7 +38,7 @@
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
-#include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM VW refactor
+#include <ui/dialogs/layout_name_dialog.h> //TODO: #GDM #VW refactor
 #include <ui/dialogs/attach_to_videowall_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/videowall_settings_dialog.h>
@@ -221,12 +221,12 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
         connect(action(Qn::DelayedOpenVideoWallItemAction), &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
-        //TODO: #GDM VW may be we should override ::instance() ?
+        //TODO: #GDM #VW may be we should override ::instance() ?
         QnCommonMessageProcessor* clientMessageProcessor = QnClientMessageProcessor::instance();
         connect(clientMessageProcessor,   &QnCommonMessageProcessor::videowallControlMessageReceived,
                 this,                     &QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived);
 
-        //connect(clientMessageProcessor, SIGNAL(connectionClosed()) TODO: #GDM VW reinitialize window state if someone control us?
+        //connect(clientMessageProcessor, SIGNAL(connectionClosed()) TODO: #GDM #VW reinitialize window state if someone control us?
         connect(clientMessageProcessor,   &QnCommonMessageProcessor::connectionOpened,  this,   &QnWorkbenchVideoWallHandler::at_connection_opened);
     } else {
 
@@ -373,8 +373,8 @@ QRect QnWorkbenchVideoWallHandler::calculateSnapGeometry(const QList<QnVideoWall
     } else {
         return source;
     }
-    //TODO: #GDM VW check edges validity
-    //TODO: #GDM VW check that screens are not in use already
+    //TODO: #GDM #VW check edges validity
+    //TODO: #GDM #VW check that screens are not in use already
 
     return QRect(QPoint(left.value, top.value), QPoint(right.value, bottom.value));
 
@@ -459,7 +459,7 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
                 for (int y = 0; y < qRound((qreal)unitedGeometry.height() / h); y++) {
                     QRect geometry = calculateSnapGeometry(localScreens, QRect(xOffset + x*w, yOffset + y*h, w, h));
                     if (geometry == item.geometry)
-                        continue;   //TODO: #GDM VW check overlapping with existing items
+                        continue;   //TODO: #GDM #VW check overlapping with existing items
                     QnVideoWallItem fillItem = newItem();
                     fillItem.geometry = geometry;
                     videoWall->items()->addItem(fillItem);
@@ -622,7 +622,7 @@ bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr
 bool QnWorkbenchVideoWallHandler::canClose() {
     if (!context()->user())
         return true;
-    //TODO: #GDM implement real check. Think about circular dependencies
+    //TODO: #GDM #VW implement real check. Think about circular dependencies
     /*
     if (businessRulesDialog() && businessRulesDialog()->isVisible()) {
         businessRulesDialog()->activateWindow();
@@ -1214,7 +1214,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::findExistingResourceLayout(cons
 
     QnId parentId = context()->user() ? context()->user()->getId() : QnId();
     foreach(const QnLayoutResourcePtr &layout, qnResPool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>()) {
-        //TODO: #GDM VW should we check name of this layout?
+        //TODO: #GDM #VW should we check name of this layout?
         if (layout->getItems().size() != 1)
             continue;
         QnLayoutItemData data = layout->getItems().values().first();
@@ -1327,7 +1327,7 @@ void QnWorkbenchVideoWallHandler::at_connection_opened() {
 }
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
-    //TODO: #GDM VW refactor to corresponding dialog
+    //TODO: #GDM #VW refactor to corresponding dialog
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Video Wall..."));
     dialog->setText(tr("Enter the name of the Video Wall to create:")); //TODO: #VW #TR
@@ -1359,7 +1359,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
             if (errorCode == ec2::ErrorCode::ok)
                 return;
 
-            //TODO: #GDM VW make common place to call this dialog from different handlers
+            //TODO: #GDM #VW make common place to call this dialog from different handlers
             QnResourceListDialog::exec(
                 mainWindow(),
                 QnResourceList() << videoWall,
@@ -1761,7 +1761,7 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
 
 void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
     // Desktop_camera_{e87e9b3d-facf-4870-abef-455861829ed3}_admin
-    //TODO: #GDM VW ask Roma to do some more stable way to find correct desktop camera
+    //TODO: #GDM #VW ask Roma to do some more stable way to find correct desktop camera
     QRegExp desktopCameraNameRegExp(QString(lit("Desktop_camera_\\{.{36,36}\\}_%1")).arg(context()->user()->getName()));
     QnVirtualCameraResourcePtr desktopCamera;
 
@@ -1934,12 +1934,12 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr
         if (resource->getId() != m_videoWallMode.guid)
             return;
 
-        QnVideowallAutoStarter(resource->getId(), this).setAutoStartEnabled(false); //TODO: #GDM VW clean nonexistent videowalls sometimes
+        QnVideowallAutoStarter(resource->getId(), this).setAutoStartEnabled(false); //TODO: #GDM #VW clean nonexistent videowalls sometimes
         closeInstanceDelayed();
     } else {
         if (QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>()) {
             disconnect(videoWall, NULL, this, NULL);
-            QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false); //TODO: #GDM VW clean nonexistent videowalls sometimes
+            QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false); //TODO: #GDM #VW clean nonexistent videowalls sometimes
         }
 
     }
@@ -1958,7 +1958,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcAdded(const QnVideoWallResource
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_pcChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc) {
-    //TODO: #GDM VW implement screen size changes handling
+    //TODO: #GDM #VW implement screen size changes handling
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc) {
@@ -2010,7 +2010,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
-    //TODO: #GDM VW implement screen size changes handling
+    //TODO: #GDM #VW implement screen size changes handling
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
@@ -2087,7 +2087,7 @@ void QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived(const Q
     }
 
     // all messages should go one-by-one
-    //TODO: #GDM VW what if one message is lost forever? timeout?
+    //TODO: #GDM #VW what if one message is lost forever? timeout?
     if (!m_videoWallMode.sequenceByPcUuid.contains(controllerUuid) ||
             (sequence - m_videoWallMode.sequenceByPcUuid[controllerUuid] > 1)) {
 #ifdef RECEIVER_DEBUG

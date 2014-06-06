@@ -90,8 +90,8 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
         QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
         exportHandler->saveLocalLayout(layout, isReadOnly, true); // overwrite layout file
     } else {
-        //TODO: #GDM check existing layouts.
-        //TODO: #GDM all remotes layout checking and saving should be done in one place
+        //TODO: #GDM #Common check existing layouts.
+        //TODO: #GDM #Common all remotes layout checking and saving should be done in one place
         snapshotManager()->save(layout, this, SLOT(at_layouts_saved(int, const QnResourceList &, int)));
     }
 }

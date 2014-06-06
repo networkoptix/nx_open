@@ -15,7 +15,7 @@ public:
      * Get locale code of the current translation language.
      * If no corresponding translation found, empty string is returned.
      */
-    //TODO: #GDM change method loadTranslations() to be translations() const;
+    //TODO: #GDM #Common change method loadTranslations() to be translations() const;
     QString getCurrentLanguage();
 };
 

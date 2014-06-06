@@ -815,6 +815,7 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
     
     m_rtspSession.setAuth(auth, RTPSession::authDigest);
 
+    //TODO: #GDM #VW does not work for now?
     if (QnSessionManager::instance()->authCookieEnabled())
         m_rtspSession.setAdditionAttribute("cookie", QnSessionManager::instance()->authCookie().toRawForm(QNetworkCookie::NameAndValueOnly));
 }

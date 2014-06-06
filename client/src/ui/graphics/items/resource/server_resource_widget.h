@@ -92,7 +92,7 @@ private:
 
     void updateCheckedHealthMonitoringButtons();
 private:
-    //TODO: #GDM move all required fields to inner class
+    //TODO: #GDM #Common move all required fields to inner class
     friend class StatisticsOverlayWidget;
 
     QnStatisticsColors m_colors;
@@ -111,7 +111,7 @@ private:
     /** Id of the last received response. */
     qint64 m_lastHistoryId;
 
-    // TODO: #GDM uncomment when will implement time labels
+    // TODO: #GDM #Common uncomment when will implement time labels
     // /** Timestamp of the last received response in msecs since epoch */
     //qint64 m_lastTimeStamp;
 

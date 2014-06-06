@@ -244,7 +244,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         statusOverlayWidget()->setDiagnosticsVisible(true);
     }
 
-    connect(resource()->toResource(), &QnResource::resourceChanged, this, &QnMediaResourceWidget::updateButtonsVisibility); //TODO: #GDM get rid of resourceChanged
+    connect(resource()->toResource(), &QnResource::resourceChanged, this, &QnMediaResourceWidget::updateButtonsVisibility); //TODO: #GDM #Common get rid of resourceChanged
 
     connect(this, &QnResourceWidget::zoomRectChanged, this, &QnMediaResourceWidget::at_zoomRectChanged);
     connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged, this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);

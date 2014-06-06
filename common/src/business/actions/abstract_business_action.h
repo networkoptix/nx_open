@@ -12,7 +12,7 @@
 
 namespace QnBusiness
 {
-    //TODO: #GDM fix to resourceTypeRequired: None, Camera, Server, User, etc
+    //TODO: #GDM #Business fix to resourceTypeRequired: None, Camera, Server, User, etc
     bool requiresCameraResource(ActionType actionType);
     bool requiresUserResource(ActionType actionType);
 

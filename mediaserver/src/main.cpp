@@ -655,20 +655,20 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
 {
     QUrl appServerEventsUrl;
 
-    //TODO: #GDM move to server_message_processor as in client
+    //TODO: #GDM #Common move to server_message_processor as in client or remove if it is not needed anymore
     // ### remove
-    appServerEventsUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
+   /* appServerEventsUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
     appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
     appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-    appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
-    appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
+    appServerEventsUrl.setUserName(settings.value("appserverLogin").toString());
+    appServerEventsUrl.setPassword(settings.value("appserverPassword").toString());
     appServerEventsUrl.setPath("/events/");
     QUrlQuery appServerEventsUrlQuery;
     appServerEventsUrlQuery.addQueryItem("xid", mediaServer->getId().toString());
     appServerEventsUrlQuery.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
     appServerEventsUrlQuery.addQueryItem("version", QN_ENGINE_VERSION);
     appServerEventsUrlQuery.addQueryItem("format", "pb");
-    appServerEventsUrl.setQuery( appServerEventsUrlQuery );
+    appServerEventsUrl.setQuery( appServerEventsUrlQuery );*/
 
     //QnServerMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
 }
