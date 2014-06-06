@@ -45,7 +45,7 @@ bool QnUniversalRequestProcessor::authenticate()
     Q_D(QnUniversalRequestProcessor);
 
     int retryCount = 0;
-    if (d->needAuth &&  d->protocol.toLower() == "http")
+    if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
         QString path = url.path().trimmed();
