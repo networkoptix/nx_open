@@ -120,6 +120,7 @@ namespace ec2
             QnPeerSet toSendRest = header.dstPeers;
             QnPeerSet sentPeers;
             bool sendToAll = header.dstPeers.isEmpty();
+
             for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
             {
                 QnTransactionTransportPtr transport = *itr;

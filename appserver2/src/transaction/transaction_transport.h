@@ -51,6 +51,8 @@ public:
 
     template<class T> 
     void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader &header) {
+        assert(header.processedPeers.contains(m_localPeer.id));
+
         switch (m_remotePeer.peerType) {
         case QnPeerInfo::AndroidClient:
             addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));

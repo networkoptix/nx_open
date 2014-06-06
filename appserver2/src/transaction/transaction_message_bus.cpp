@@ -300,13 +300,16 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         return; // all dstPeers already processed
     }
 
+    QnPeerSet processedPeers = transportHeader.processedPeers + connectedPeers(tran.command);
+    processedPeers << m_localPeer.id;
+
     for(QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr) {
         QnTransactionTransportPtr transport = *itr;
         if (transportHeader.processedPeers.contains(transport->remotePeer().id) || !transport->isReadyToSend(tran.command)) 
             continue;
 
         Q_ASSERT(transport->remotePeer().id != tran.id.peerID);
-        transport->sendTransaction(tran, QnTransactionTransportHeader(transportHeader.processedPeers + connectedPeers(tran.command)));
+        transport->sendTransaction(tran, QnTransactionTransportHeader(processedPeers));
     }
 
     emit transactionProcessed(tran);
@@ -344,7 +347,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     QnTransaction<QnTranState> requestTran(ApiCommand::tranSyncRequest, false);
     requestTran.params = transactionLog->getTransactionsState();
     requestTran.fillSequence();
-    transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id);
+    transport->sendTransaction(requestTran, QnPeerSet() << transport->remotePeer().id << m_localPeer.id);
 }
 
 void QnTransactionMessageBus::connectToPeerLost(const QnId& id)
@@ -598,12 +601,13 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
             return;
         }
 
+        QnPeerSet processedPeers = QnPeerSet() << remotePeer.id << m_localPeer.id;
         transport->setWriteSync(true);
-        transport->sendTransaction(tranServers, QnPeerSet() << remotePeer.id << m_localPeer.id);
-        transport->sendTransaction(tranCameras, QnPeerSet() << remotePeer.id << m_localPeer.id);
-        transport->sendTransaction(tranUsers,   QnPeerSet() << remotePeer.id << m_localPeer.id);
-        transport->sendTransaction(tranLayouts, QnPeerSet() << remotePeer.id << m_localPeer.id);
-        transport->sendTransaction(tranCameraHistory, QnPeerSet() << remotePeer.id << m_localPeer.id);
+        transport->sendTransaction(tranServers,         processedPeers);
+        transport->sendTransaction(tranCameras,         processedPeers);
+        transport->sendTransaction(tranUsers,           processedPeers);
+        transport->sendTransaction(tranLayouts,         processedPeers);
+        transport->sendTransaction(tranCameraHistory,   processedPeers);
         transport->setReadSync(true);
     }
     
