@@ -1,46 +1,45 @@
 #!/bin/bash
 
-SRC_DIR=../../
+# SRC_DIR=../../
 
 
-function printHelp()
-{
-    echo "--target-dir={dir to copy packet to}"
-    echo
-}
+# function printHelp()
+# {
+#     echo "--target-dir={dir to copy packet to}"
+#     echo
+# }
 
-function get_var()
-{
-    local h="`grep -R $1 $SRC_DIR/mediaserver/arm/version.h | sed 's/.*"\(.*\)".*/\1/'`"
-    if [[ "$1" == "QN_CUSTOMIZATION_NAME" && "$h" == "default" ]]; then
-        h=networkoptix
-    fi
-    echo "$h"
-}
-
-
-
+# function get_var()
+# {
+#     local h="`grep -R $1 $SRC_DIR/mediaserver/arm/version.h | sed 's/.*"\(.*\)".*/\1/'`"
+#     if [[ "$1" == "QN_CUSTOMIZATION_NAME" && "$h" == "default" ]]; then
+#         h=networkoptix
+#     fi
+#     echo "$h"
+# }
 TOOLCHAIN_PREFIX=/usr/local/codesourcery/arm-2013.11/bin/arm-none-linux-gnueabi-
 
-BOX=rpi
-CUSTOMIZATION=$(get_var "QN_CUSTOMIZATION_NAME")
-PRODUCT_NAME=$(get_var "QN_PRODUCT_NAME_SHORT")
+
+CUSTOMIZATION=${deb.customization.company.name}
+PRODUCT_NAME=${product.name.short}
 MODULE_NAME=mediaserver
-VERSION=$(get_var "ENGINE_VERSION")
-MAJOR_VERSION="`echo $VERSION | cut -d . -f 1 --output-delimiter=`"
-MINOR_VERSION="`echo $VERSION | cut -d . -f 2 --output-delimiter=`"
-BUILD_VERSION="`echo $VERSION | cut -d . -f 3 --output-delimiter=`"
+VERSION=${release.version}.${buildNumber}
+MAJOR_VERSION="${parsedVersion.majorVersion}"
+MINOR_VERSION="${parsedVersion.minorVersion}"
+BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
-PACKAGE_NAME=$CUSTOMIZATION-$PRODUCT_NAME-$MODULE_NAME-$VERSION-$BOX.tar.gz
+BOX_NAME=${box}
 
-BUILD_DIR=/tmp/hdw_isd_build.tmp
+PACKAGE_NAME=$CUSTOMIZATION-$PRODUCT_NAME-$MODULE_NAME-$VERSION-$BOX_NAME.tar.gz
+
+BUILD_DIR=/tmp/hdw_$BOX_NAME_build.tmp
 PREFIX_DIR=/opt/$CUSTOMIZATION
 
-BUILD_OUTPUT_DIR=$SRC_DIR/build_environment/target
+BUILD_OUTPUT_DIR=${libdir}
 LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
 
-
 STRIP=1
+
 
 for i in "$@"
 do
@@ -53,9 +52,6 @@ do
         STRIP=
     fi
 done
-
-
-
 
 LIBS_TO_COPY=\
 ( libavcodec.so.54.23.100 \
@@ -74,7 +70,6 @@ libQt5Network.so.5.2.1 \
 libQt5Sql.so.5.2.1 \
 libQt5Xml.so.5.2.1 \
 libsigar.so \
-libvpx.so.1.2.0 \
 libswresample.so.0.15.100 \
 libswscale.so.2.1.100 \
 libquazip.so.1.0.0 )
@@ -82,7 +77,6 @@ libquazip.so.1.0.0 )
 if [ -e "$LIBS_DIR/libvpx.so.1.2.0" ]; then
   LIBS_TO_COPY+=( libvpx.so.1.2.0 )
 fi
-
 
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR/$PREFIX_DIR
@@ -114,11 +108,11 @@ cp $BUILD_OUTPUT_DIR/bin/release/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME
 
 #conf
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
-cp $SRC_DIR/edge_firmware/$BOX/maven/filter-resources/$PREFIX_DIR/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
+cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc
 
 #start script
 mkdir -p $BUILD_DIR/etc/init.d/
-install -m 755 $SRC_DIR/edge_firmware/$BOX/maven/filter-resources/etc/init.d/$CUSTOMIZATION-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
+install -m 755 ./etc/init.d/$CUSTOMIZATION-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
 
 
 #building package
@@ -132,3 +126,4 @@ fi
 popd
 
 cp $BUILD_DIR/$PACKAGE_NAME .
+rm -Rf $BUILD_DIR
