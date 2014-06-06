@@ -76,6 +76,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 {
     ui->setupUi(this);
 
+    setWindowTitle(tr("Connect to Enterprise Controller (%1)").arg(lit(QN_APPLICATION_VERSION)));
     setHelpTopic(this, Qn::Login_Help);
 
     /* Don't allow to save passwords, at least for now. */
