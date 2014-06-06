@@ -265,6 +265,7 @@ void DeviceFileCatalog::replaceChunks(int storageIndex, const std::deque<Chunk>&
         [storageIndex](const Chunk& chunk){ return chunk.storageIndex == storageIndex; } );
     m_chunks.resize( filteredDataEndIter - filteredData.begin() + newCatalog.size() );
     std::merge( filteredData.begin(), filteredDataEndIter, newCatalog.begin(), newCatalog.end(), m_chunks.begin() );
+    m_lastAddIndex = -1;
 }
 
 //QList<QDate> DeviceFileCatalog::recordedMonthList()
@@ -639,6 +640,9 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64
 
     if (itr != m_chunks.end() && itr->startTimeMs == startTimeMs && itr->durationMs == durationMs) {
         Chunk result = *itr;
+        int idx = itr - m_chunks.begin();
+        if (m_lastAddIndex >= idx)
+            --m_lastAddIndex;
         m_chunks.erase(itr);
         return result;
     }
@@ -716,8 +720,11 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
     {
         if (m_chunks[i].storageIndex == storageIndex)
         {
-            if (m_chunks[i].startTimeMs < timeMs)
+            if (m_chunks[i].startTimeMs < timeMs) {
                 m_chunks.erase(m_chunks.begin() + i);
+                if (m_lastAddIndex >= i)
+                    --m_lastAddIndex;
+            }
             else
                 break;
 
