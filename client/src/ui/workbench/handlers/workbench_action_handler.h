@@ -354,6 +354,7 @@ private:
     /** Scope of the last selection change. */
     Qn::ActionScope m_selectionScope;
 
+    bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once
      * the user logs in. */
     QList<QnMimeData> m_delayedDrops;
