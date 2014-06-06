@@ -189,7 +189,7 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 QnStorageResource* QnFileStorageResource::instance()
 {
     QnStorageResource* storage = new QnFileStorageResource();
-    storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong() );
+    storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
     return storage;
 }
 

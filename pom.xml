@@ -421,6 +421,7 @@
                 </property>
             </activation>
             <properties>
+                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <toolchain.version>codesourcery-2013.11</toolchain.version>
                 <compiler>2011.09</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
@@ -445,6 +446,7 @@
                 </property>
             </activation>
             <properties>
+                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f-SNAPSHOT</openssl.version>
