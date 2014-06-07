@@ -65,8 +65,6 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
 
     initContinuousMove();
 
-    m_capabilities |= Qn::nativePresetsPtzCapability;
-
     //initContinuousFocus(); // Disabled for now.
 
     // TODO: #PTZ #Elric actually implement flip!
