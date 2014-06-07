@@ -12,6 +12,31 @@
 
 #include "soap_wrapper.h"
 
+static QByteArray ENCODE_PREFIX("BASE64_");
+
+static std::string toLatinStdString(const QString& value)
+{
+    std::string value1 = value.toStdString();
+    std::string value2 = value.toLatin1();
+    if (value1 == value2)
+        return value1;
+    else
+        return ENCODE_PREFIX.append(value.toUtf8().toBase64());
+}
+
+static QString fromLatinStdString(const std::string& value)
+{
+    QByteArray data(value.c_str());
+    if (data.startsWith(ENCODE_PREFIX)) {
+        data = QByteArray::fromBase64(data.mid(ENCODE_PREFIX.length()));
+        return QString::fromUtf8(data);
+    }
+    else {
+        return QString::fromStdString(value);
+    }
+}
+
+
 
 // -------------------------------------------------------------------------- //
 // QnOnvifPtzController
@@ -125,7 +150,7 @@ bool QnOnvifPtzController::readBuiltinPresets()
     foreach(onvifXsd__PTZPreset* preset, response.Preset) {
         if (preset) {
             QString id = QString::fromStdString(*preset->token);
-            QString name = QString::fromStdString(*preset->Name);
+            QString name = fromLatinStdString(*preset->Name);
             m_builtinPresets.insert(id, name);
         }
     }
@@ -344,11 +369,6 @@ QString QnOnvifPtzController::getPresetName(const QString &presetId)
 
 bool QnOnvifPtzController::removePreset(const QString &presetId)
 {
-    return removePresetInternal(presetId, false);
-}
-
-bool QnOnvifPtzController::removePresetInternal(const QString &presetId, bool tryPresetName)
-{
     QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
         return false;
@@ -359,16 +379,10 @@ bool QnOnvifPtzController::removePresetInternal(const QString &presetId, bool tr
     RemovePresetReq request;
     RemovePresetResp response;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
-    if (tryPresetName)
-        request.PresetToken = getPresetName(presetId).toStdString();
-    else
-        request.PresetToken = getPresetToken(presetId).toStdString();
+    request.PresetToken = getPresetToken(presetId).toStdString();
     if (ptz.removePreset(request, response) != SOAP_OK) {
         qnWarning("Execution of PTZ remove preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
-        if (!tryPresetName)
-            return removePresetInternal(presetId, true);
-        else
-            return false;
+        return false;
     }
 
     return true;
@@ -385,11 +399,6 @@ bool QnOnvifPtzController::getPresets(QnPtzPresetList *presets)
 
 bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed)
 {
-    return activatePresetInternal(presetId, speed, false);
-}
-
-bool QnOnvifPtzController::activatePresetInternal(const QString &presetId, qreal speed, bool tryPresetName)
-{
     QString ptzUrl = m_resource->getPtzUrl();
     if(ptzUrl.isEmpty())
         return false;
@@ -400,17 +409,11 @@ bool QnOnvifPtzController::activatePresetInternal(const QString &presetId, qreal
     GotoPresetReq request;
     GotoPresetResp response;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
-    if (tryPresetName)
-        request.PresetToken = getPresetName(presetId).toStdString();
-    else
-        request.PresetToken = getPresetToken(presetId).toStdString();
+    request.PresetToken = getPresetToken(presetId).toStdString();
 
     if (ptz.gotoPreset(request, response) != SOAP_OK) {
         qnWarning("Execution of PTZ goto preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
-        if (!tryPresetName)
-            return activatePresetInternal(presetId, speed, true);
-        else
-            return false;
+        return false;
     }
 
     return true;
@@ -433,7 +436,7 @@ bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset)
     SetPresetReq request;
     SetPresetResp response;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
-    std::string stdPresetName = preset.name.toStdString();
+    std::string stdPresetName = toLatinStdString(preset.name);
     request.PresetName = &stdPresetName;
 
     if (ptz.setPreset(request, response) != SOAP_OK) {

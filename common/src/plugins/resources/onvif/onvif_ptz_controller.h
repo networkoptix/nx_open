@@ -53,8 +53,6 @@ private:
 
     bool stopInternal();
     bool moveInternal(const QVector3D &speed);
-    bool activatePresetInternal(const QString &presetId, qreal speed, bool tryPresetName);
-    bool removePresetInternal(const QString &presetId, bool tryPresetName);
     QString getPresetToken(const QString &presetId);
     QString getPresetName(const QString &presetId);
 private:
