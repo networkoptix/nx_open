@@ -28,6 +28,14 @@ public:
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
 
+    /*
+    * Built in preset support
+    */
+    virtual bool getPresets(QnPtzPresetList *presets) override;
+    virtual bool activatePreset(const QString &presetId, qreal speed) override;
+    virtual bool createPreset(const QnPtzPreset &preset) override;
+    virtual bool updatePreset(const QnPtzPreset &preset) override;
+    virtual bool removePreset(const QString &presetId) override;
 private:
     struct SpeedLimits {
         SpeedLimits(): min(0.0), max(0.0) {}
@@ -41,10 +49,14 @@ private:
     
     Qn::PtzCapabilities initContinuousMove();
     Qn::PtzCapabilities initContinuousFocus();
+    bool readBuiltinPresets();
 
     bool stopInternal();
     bool moveInternal(const QVector3D &speed);
-
+    bool activatePresetInternal(const QString &presetId, qreal speed, bool tryPresetName);
+    bool removePresetInternal(const QString &presetId, bool tryPresetName);
+    QString getPresetToken(const QString &presetId);
+    QString getPresetName(const QString &presetId);
 private:
     QnPlOnvifResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
@@ -52,6 +64,9 @@ private:
 
     SpeedLimits m_panSpeedLimits, m_tiltSpeedLimits, m_zoomSpeedLimits, m_focusSpeedLimits;
     QnPtzLimits m_limits;
+    QMap<QString, QString> m_extIdToIntId;
+    QMap<QString, QString> m_builtinPresets; // key - token, value - name
+    bool m_ptzPresetsReady;
 };
 
 #endif //ENABLE_ONVIF
