@@ -115,11 +115,11 @@ cp $BUILD_OUTPUT_DIR/bin/release/plugins/libisd_native_plugin.so $BUILD_DIR/$PRE
 
 #conf
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
-cp ./usr/local/apps/$CUSTOMIZATION/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
+cp ./usr/local/apps/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/etc/
 
 #start script
 mkdir -p $BUILD_DIR/etc/init.d/
-install -m 755 ./etc/init.d/S99$CUSTOMIZATION-$MODULE_NAME $BUILD_DIR/etc/init.d/S99$CUSTOMIZATION-$MODULE_NAME
+install -m 755 ./etc/init.d/S99networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/S99$CUSTOMIZATION-$MODULE_NAME
 sed -i "s/\${customization}/$CUSTOMIZATION/" $BUILD_DIR/etc/init.d/S99$CUSTOMIZATION-$MODULE_NAME
 
 
