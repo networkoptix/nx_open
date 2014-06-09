@@ -159,7 +159,8 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
     bool overrideAr = ui->arOverrideCheckBox->checkState() == Qt::Checked;
     bool clearAr = ui->arOverrideCheckBox->checkState() == Qt::Unchecked;
 
-    foreach(QnVirtualCameraResourcePtr camera, m_cameras) {
+    foreach(QnVirtualCameraResourcePtr camera, m_cameras) 
+    {
         QString cameraLogin = camera->getAuth().user();
         if (!login.isEmpty() || !m_loginWasEmpty)
             cameraLogin = login;
@@ -169,6 +170,10 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
             cameraPassword = password;
 
         camera->setAuth(cameraLogin, cameraPassword);
+
+        int maxDays = ui->cameraScheduleWidget->maxRecordedDays();
+        if (maxDays != QnCameraScheduleWidget::RecordedDaysDontChange)
+            camera->setMaxDays(maxDays);
 
         if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && ui->enableAudioCheckBox->isEnabled()) 
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());

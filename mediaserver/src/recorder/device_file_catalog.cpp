@@ -610,6 +610,11 @@ void DeviceFileCatalog::rewriteCatalog(bool isLastRecordRecording)
 }
 */
 
+QnServer::ChunksCatalog DeviceFileCatalog::getRole() const
+{
+    return m_catalog; // it is a const data
+}
+
 void DeviceFileCatalog::addRecord(const Chunk& chunk)
 {
     Q_ASSERT(chunk.durationMs < 1000 * 1000);
@@ -629,6 +634,16 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
     m_lastAddIndex = itr - m_chunks.begin();
 }
 
+void DeviceFileCatalog::removeRecord(int idx)
+{
+    if (idx == 0)
+        m_chunks.pop_front();
+    else
+        m_chunks.erase(m_chunks.begin() + idx);
+    if (m_lastAddIndex >= idx)
+        m_lastAddIndex--;
+}
+
 DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64 durationMs) {
     QMutexLocker lock(&m_mutex);
     
@@ -641,9 +656,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64
     if (itr != m_chunks.end() && itr->startTimeMs == startTimeMs && itr->durationMs == durationMs) {
         Chunk result = *itr;
         int idx = itr - m_chunks.begin();
-        if (m_lastAddIndex >= idx)
-            --m_lastAddIndex;
-        m_chunks.erase(itr);
+        removeRecord(idx);
         return result;
     }
 
@@ -689,14 +702,27 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint6
     }
 }
 
-QVector<qint64> DeviceFileCatalog::deleteRecordsBefore(int idx)
+/*
+QVector<qint64> DeviceFileCatalog::deleteRecordBeforeDays(int days)
+{
+    static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
+    qint64 deleteThreshold = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * days;
+    auto deleteItr = qUpperBound(m_chunks.begin(), m_chunks.end(), deleteThreshold);
+    if (deleteItr != m_chunks.end()) 
+        return deleteRecordsBefore(deleteItr - m_chunks.begin());
+    else
+        return QVector<qint64>();
+}
+*/
+
+QVector<DeviceFileCatalog::Chunk> DeviceFileCatalog::deleteRecordsBefore(int idx)
 {
     int count = idx;
-    QVector<qint64> result;
+    QVector<Chunk> result;
     for (int i = 0; i < count; ++i) {
-        qint64 deletedTime = deleteFirstRecord();
-        if (deletedTime)
-            result << deletedTime;
+        Chunk deletedChunk = deleteFirstRecord();
+        if (deletedChunk.startTimeMs)
+            result << deletedChunk;
     }
     return result;
 }
@@ -721,9 +747,7 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
         if (m_chunks[i].storageIndex == storageIndex)
         {
             if (m_chunks[i].startTimeMs < timeMs) {
-                m_chunks.erase(m_chunks.begin() + i);
-                if (m_lastAddIndex >= i)
-                    --m_lastAddIndex;
+                removeRecord(i);
             }
             else
                 break;
@@ -741,17 +765,17 @@ bool DeviceFileCatalog::isEmpty() const
     return m_chunks.empty();
 }
 
-qint64 DeviceFileCatalog::deleteFirstRecord()
+DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
 {
     QnStorageResourcePtr storage;
     QString delFileName;
     QString motionDirName;
-    qint64 deletedTime = 0;
+    Chunk deletedChunk;
     {
         QMutexLocker lock(&m_mutex);
 
         if (m_chunks.empty())
-            return deletedTime;
+            return deletedChunk;
 
         static const int DELETE_COEFF = 1000;
 
@@ -759,7 +783,7 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
         {
             storage = qnStorageMan->storageRoot(m_chunks[0].storageIndex);
             delFileName = fullFileName(m_chunks[0]);
-            deletedTime = m_chunks[0].startTimeMs;
+            deletedChunk = m_chunks[0];
 
             QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[0].startTimeMs).date();
 
@@ -770,8 +794,7 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
                     motionDirName = QnMotionHelper::instance()->getMotionDir(curDate, m_macAddress);
             }
 
-            m_chunks.pop_front();
-            --m_lastAddIndex;
+            removeRecord(0);
         }
     }
 
@@ -785,7 +808,7 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
             storage->removeDir(motionDirName);
     }
 
-    return deletedTime;
+    return deletedChunk;
 }
 
 int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) const

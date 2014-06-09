@@ -542,6 +542,10 @@ void QnSingleCameraSettingsWidget::submitToResource() {
             m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
         }
 
+        int maxDays = ui->cameraScheduleWidget->maxRecordedDays();
+        if (maxDays != QnCameraScheduleWidget::RecordedDaysDontChange)
+            m_camera->setMaxDays(maxDays);
+
         if (!m_camera->isDtsBased()) {
             if (m_hasScheduleChanges) {
                 QnScheduleTaskList scheduleTasks;

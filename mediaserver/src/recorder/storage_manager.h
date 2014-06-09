@@ -35,6 +35,7 @@ public:
     };
 
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
+    typedef QMap<QByteArray, DeviceFileCatalogPtr> FileCatalogMap;
 
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
@@ -78,7 +79,15 @@ public:
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
     QnStorageResourceList getStorages() const;
+
     void clearSpace();
+    void clearSpace(const QnStorageResourcePtr &storage);
+
+    void clearMaxDaysData();
+    void clearMaxDaysData(FileCatalogMap catalogMap);
+
+    void deleteRecordsToTime(DeviceFileCatalogPtr catalog, qint64 minTime);
+    void clearDbByChunk(DeviceFileCatalogPtr catalog, const DeviceFileCatalog::Chunk& chunk);
 
     bool isWritableStoragesAvailable() const { return m_isWritableStorageAvail; }
 
@@ -110,8 +119,6 @@ public slots:
 private:
     friend class TestStorageThread;
 
-    void clearSpace(const QnStorageResourcePtr &storage);
-
     int detectStorageIndex(const QString& path);
     QSet<int> getDeprecateIndexList(const QString& p);
     //void loadFullFileCatalogInternal(QnServer::ChunksCatalog catalog, bool rebuildMode);
@@ -137,7 +144,6 @@ private:
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex, QMap<QString, QSet<int>> oldIndexes);
 private:
     StorageMap m_storageRoots;
-    typedef QMap<QByteArray, DeviceFileCatalogPtr> FileCatalogMap;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];
 
     mutable QMutex m_mutexStorages;

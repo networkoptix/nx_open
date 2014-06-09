@@ -80,6 +80,8 @@ public:
     void setContext(QnWorkbenchContext *context);
 
     void setExportScheduleButtonEnabled(bool enabled);
+    int maxRecordedDays() const;
+    static const int RecordedDaysDontChange = INT_MAX;
 signals:
     void scheduleTasksChanged();
     void recordingSettingsChanged();
@@ -92,6 +94,7 @@ signals:
 private slots:
     void updateGridParams(bool fromUserInput = false);
     void updateGridEnabledState();
+    void updateMaxDaysEnabledState();
     void updateLicensesLabelText();
     void updateMotionButtons();
     void updatePanicLabelText();
@@ -101,6 +104,7 @@ private slots:
 
     void at_gridWidget_cellActivated(const QPoint &cell);
     void at_enableRecordingCheckBox_clicked();
+    void at_checkBoxMaxArchive_clicked();
     void at_displayQualiteCheckBox_stateChanged(int state);
     void at_displayFpsCheckBox_stateChanged(int state);
     void at_licensesButton_clicked();

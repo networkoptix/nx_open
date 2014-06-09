@@ -35,7 +35,7 @@ namespace ec2
     struct ApiCameraData: ApiResourceData
     {
         ApiCameraData(): scheduleDisabled(false), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryStreamQuality(Qn::SSQualityNotDefined),
-                         controlDisabled(false), statusFlags(0) {}
+                         controlDisabled(false), statusFlags(0), minArchiveDays(0), maxArchiveDays(0) {}
 
         // TODO: #API using xyzDisabled as a field name is a bad practice.
         // It leads to constructs like if(!isDisabled()), which are difficult to parse.
@@ -59,9 +59,11 @@ namespace ec2
         qint32              statusFlags; // TODO: #API use bool here. We have exactly one flag, and I don't see why we would need more. And use bool in security cam resource.
         QnLatin1Array       dewarpingParams;
         QString             vendor;
+        int                 minArchiveDays;
+        int                 maxArchiveDays;
     };
 #define ApiCameraData_Fields ApiResourceData_Fields (scheduleDisabled)(motionType)(motionMask)(mac)(login)(password)(scheduleTasks)(audioEnabled)(physicalId)(manuallyAdded)(model) \
-                            (groupId)(groupName)(secondaryStreamQuality)(controlDisabled)(statusFlags)(dewarpingParams)(vendor)
+                            (groupId)(groupName)(secondaryStreamQuality)(controlDisabled)(statusFlags)(dewarpingParams)(vendor)(minArchiveDays)(maxArchiveDays)
 
 } // namespace ec2
 

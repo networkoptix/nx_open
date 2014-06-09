@@ -13,6 +13,17 @@
 class QnStorageDb: public QnDbHelper
 {
 public:
+
+    struct DeleteRecordInfo
+    {
+        DeleteRecordInfo(): startTimeMs(-1) {}
+        DeleteRecordInfo(const QByteArray& mac, QnServer::ChunksCatalog catalog, qint64 startTimeMs): mac(mac), catalog(catalog), startTimeMs(startTimeMs) {}
+
+        QByteArray mac;
+        QnServer::ChunksCatalog catalog;
+        qint64 startTimeMs;
+    };
+
     QnStorageDb(int storageIndex);
     virtual ~QnStorageDb();
 
@@ -33,6 +44,7 @@ public:
     bool deleteCameraBookmark(const QnCameraBookmark &bookmark, const QByteArray &mac);
     bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
 private:
+    bool deleteRecordsInternal(const DeleteRecordInfo& delRecord);
     bool addRecordInternal(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
 
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
@@ -55,6 +67,8 @@ private:
 
     QVector<DelayedData> m_delayedData;
     QMap<QByteArray, int> m_addCount;
+    QVector<DeleteRecordInfo> m_recordsToDelete;
+    QMutex m_delMutex;
 };
 
 typedef QSharedPointer<QnStorageDb> QnStorageDbPtr;

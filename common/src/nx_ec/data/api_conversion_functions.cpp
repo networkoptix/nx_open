@@ -176,6 +176,8 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
 
     dst->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams));
     dst->setVendor(src.vendor);
+    dst->setMinDays(src.minArchiveDays);
+    dst->setMaxDays(src.maxArchiveDays);
 }
 
 
@@ -208,6 +210,8 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.statusFlags = src->statusFlags();
     dst.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(src->getDewarpingParams());
     dst.vendor = src->getVendor();
+    dst.minArchiveDays = src->minDays();
+    dst.maxArchiveDays = src->maxDays();
 }
 
 template<class List> 

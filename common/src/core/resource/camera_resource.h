@@ -34,7 +34,6 @@ public:
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;
-
 public slots:
     void issueOccured();
     void noCameraIssues();
