@@ -43,8 +43,7 @@ bool QnRouteBuilder::RoutePoint::operator ==(const QnRouteBuilder::RoutePoint &o
 
 /* QnRouteBuilder */
 
-QnRouteBuilder::QnRouteBuilder(const QnId &startId, QObject *parent) :
-    QObject(parent),
+QnRouteBuilder::QnRouteBuilder(const QnId &startId) :
     m_startId(startId)
 {
 }

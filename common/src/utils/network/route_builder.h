@@ -1,12 +1,11 @@
 #ifndef ROUTE_BUILDER_H
 #define ROUTE_BUILDER_H
 
-#include <QtCore/QObject>
+#include <QtCore/QString>
 
 #include <utils/common/id.h>
 
-class QnRouteBuilder : public QObject {
-    Q_OBJECT
+class QnRouteBuilder {
 public:
 
     struct RoutePoint {
@@ -33,7 +32,7 @@ public:
         bool operator <(const Route &other) const;
     };
 
-    explicit QnRouteBuilder(const QnId &startId, QObject *parent = 0);
+    explicit QnRouteBuilder(const QnId &startId);
 
     void addConnection(const QnId &from, const QnId &to, const QString &host, quint16 port, int weight = 5);
     void removeConnection(const QnId &from, const QnId &to, const QString &host, quint16 port);
