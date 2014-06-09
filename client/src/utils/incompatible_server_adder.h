@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 
-class QnModuleInformation;
+struct QnModuleInformation;
 
 class QnIncompatibleServerAdder : public QObject {
     Q_OBJECT
