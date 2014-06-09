@@ -10,6 +10,8 @@
 #include "third_party_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/camera_driver_restriction_list.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 #include "../../plugin_manager.h"
 
 
@@ -300,6 +302,13 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid) );
     resource->setVendor( discoveryManager->getVendorName() );
+
+    //TODO #ak reading MaxFPS here ia a workaround of camera integration API defect: 
+        //it does not not allow plugin to return hard-coded max fps, it can only be read in initInternal
+    const QnResourceData& resourceData = qnCommon->dataPool()->data(resource);
+    const float maxFps = resourceData.value<float>( lit("MaxFPS"), 0.0 );
+    if( maxFps > 0.0 )
+        resource->setParam( lit("MaxFPS"), maxFps, QnDomainMemory );
     
     unsigned int caps;
     if (camManager->getCameraCapabilities(&caps) == 0) 
