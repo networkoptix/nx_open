@@ -163,7 +163,10 @@ namespace ec2
             {
                 case nx_http::StatusCode::ok:
                     break;
-
+                case nx_http::StatusCode::unauthorized:
+                    return handler( ErrorCode::unauthorized, OutputData() );
+                case nx_http::StatusCode::notImplemented:
+                    return handler( ErrorCode::unsupported, OutputData() );
                 default:
                     return handler( ErrorCode::serverError, OutputData() );
             }
@@ -185,13 +188,11 @@ namespace ec2
             switch( httpClient->response()->statusLine.statusCode )
             {
                 case nx_http::StatusCode::ok:
-                    handler( ErrorCode::ok );
-                    break;
-
+                    return handler( ErrorCode::ok );
                 case nx_http::StatusCode::unauthorized:
-                    handler( ErrorCode::unauthorized );
-                    break;
-
+                    return handler( ErrorCode::unauthorized );
+                case nx_http::StatusCode::notImplemented:
+                    return handler( ErrorCode::unsupported );
                 default:
                     return handler( ErrorCode::serverError );
             }

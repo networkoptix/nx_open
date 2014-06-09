@@ -8,6 +8,9 @@
 
 #include <memory>
 
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
+
 #include "client_query_processor.h"
 
 
@@ -30,23 +33,52 @@ namespace ec2
         template<class QueryDataType, class HandlerType>
             void processUpdateAsync( const QnTransaction<QueryDataType>& tran, HandlerType handler )
         {
-            m_clientProcessor->processUpdateAsync( m_ecURL, tran, handler );
+            QUrl ecUrl;
+            {
+                QMutexLocker lk( &m_mutex );
+                ecUrl = m_ecURL;
+            }
+            m_clientProcessor->processUpdateAsync( ecUrl, tran, handler );
         }
 
         template<class T> bool processIncomingTransaction( const QnTransaction<T>&  tran, const QByteArray& serializedTran)
         {
-            return m_clientProcessor->processIncomingTransaction( tran, serializedTran);
+            return m_clientProcessor->processIncomingTransaction( tran, serializedTran );
         }
 
         template<class InputData, class OutputData, class HandlerType>
             void processQueryAsync( ApiCommand::Value cmdCode, InputData input, HandlerType handler )
         {
-            m_clientProcessor->processQueryAsync<InputData, OutputData, HandlerType>( m_ecURL, cmdCode, input, handler );
+            QUrl ecUrl;
+            {
+                QMutexLocker lk( &m_mutex );
+                ecUrl = m_ecURL;
+            }
+            m_clientProcessor->processQueryAsync<InputData, OutputData, HandlerType>( ecUrl, cmdCode, input, handler );
         }
-        QUrl getUrl() const { return m_ecURL; }
+
+        QUrl getUrl() const
+        {
+            QMutexLocker lk( &m_mutex );
+            return m_ecURL;
+        }
+
+        QString userName() const
+        {
+            QMutexLocker lk( &m_mutex );
+            return m_ecURL.userName();
+        }
+
+        void setPassword( const QString& password )
+        {
+            QMutexLocker lk( &m_mutex );
+            m_ecURL.setPassword( password );
+        }
+
     private:
         ClientQueryProcessor* m_clientProcessor;
-        const QUrl m_ecURL;
+        QUrl m_ecURL;
+        mutable QMutex m_mutex;
     };
 
     typedef std::shared_ptr<FixedUrlClientQueryProcessor> FixedUrlClientQueryProcessorPtr;
