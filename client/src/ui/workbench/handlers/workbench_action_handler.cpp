@@ -15,6 +15,7 @@
 #include <QtGui/QImageWriter>
 
 #include <api/session_manager.h>
+#include <api/network_proxy_factory.h>
 
 #include <business/business_action_parameters.h>
 
@@ -2038,24 +2039,24 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if(!server)
         return;
 
-    QUrl serverUrl = server->getApiUrl();
-    
-    // TODO: #Elric total encapsulation failure, there should be no proxy-related logic here.
-    QUrl url;
-    if(!server->getProxyHost().isEmpty()) {
-        url.setScheme(lit("http"));
-        url.setHost(server->getProxyHost());
-        url.setPort(server->getProxyPort());
-        url.setPath(lit("/proxy/%4:%5/api/showLog").arg(serverUrl.host()).arg(serverUrl.port()));
-    } else {
-        url = serverUrl;
-        url.setPath(lit("/api/showLog"));
-    }
+    QUrl url = server->getApiUrl();
+    url.setScheme(lit("http"));
+    url.setPath( lit("/api/showLog") );
     url.setQuery(lit("lines=1000"));
-
-    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+    
+    //setting credentials for access to resource
+    const QnConnectionData& lastUsedConnection = qnSettings->lastUsedConnection();
     url.setUserName(lastUsedConnection.url.userName());
     url.setPassword(lastUsedConnection.url.password());
+
+    if( !QnNetworkProxyFactory::instance()->fillUrlWithRouteToResource(
+            server,
+            &url,
+            QnNetworkProxyFactory::placeCredentialsToUrl ) )
+    {
+        //could not find route to server. Can it really happen?
+        //TODO: #ak some error message
+    }
     
     QDesktopServices::openUrl(url);
 }
