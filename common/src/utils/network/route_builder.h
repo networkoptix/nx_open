@@ -5,19 +5,17 @@
 
 #include <utils/common/id.h>
 
-class QHostAddress;
-
 class QnRouteBuilder : public QObject {
     Q_OBJECT
 public:
 
     struct RoutePoint {
         QnId peerId;
-        QHostAddress address;
+        QString host;
         quint16 port;
 
-        RoutePoint(const QnId &peerId, const QHostAddress &address, quint16 port) :
-            peerId(peerId), address(address), port(port)
+        RoutePoint(const QnId &peerId, const QString &host, quint16 port) :
+            peerId(peerId), host(host), port(port)
         {}
 
         bool operator ==(const RoutePoint &other) const;
@@ -37,8 +35,8 @@ public:
 
     explicit QnRouteBuilder(const QnId &startId, QObject *parent = 0);
 
-    void addConnection(const QnId &from, const QnId &to, const QHostAddress &address, quint16 port, int weight = 5);
-    void removeConnection(const QnId &from, const QnId &to, const QHostAddress &address, quint16 port);
+    void addConnection(const QnId &from, const QnId &to, const QString &host, quint16 port, int weight = 5);
+    void removeConnection(const QnId &from, const QnId &to, const QString &host, quint16 port);
 
     Route routeTo(const QnId &peerId) const;
 

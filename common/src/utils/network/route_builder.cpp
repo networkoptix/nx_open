@@ -38,7 +38,7 @@ bool QnRouteBuilder::Route::operator <(const QnRouteBuilder::Route &other) const
 /* QnRouteBuilder::RoutePoint */
 
 bool QnRouteBuilder::RoutePoint::operator ==(const QnRouteBuilder::RoutePoint &other) const {
-    return peerId == other.peerId && address == other.address && port == other.port;
+    return peerId == other.peerId && host == other.host && port == other.port;
 }
 
 /* QnRouteBuilder */
@@ -49,39 +49,39 @@ QnRouteBuilder::QnRouteBuilder(const QnId &startId, QObject *parent) :
 {
 }
 
-void QnRouteBuilder::addConnection(const QnId &from, const QnId &to, const QHostAddress &address, quint16 port, int weight) {
+void QnRouteBuilder::addConnection(const QnId &from, const QnId &to, const QString &host, quint16 port, int weight) {
     Q_ASSERT(from != to);
 
     if (m_startId == from) {
         // we've got a new direct connection
         Route route;
-        route.addPoint(RoutePoint(to, address, port), weight);
+        route.addPoint(RoutePoint(to, host, port), weight);
         insertRoute(route);
     } else {
         // we've got a new point, so we have to update routes
         foreach (const Route &route, m_routes[from]) {
             Route newRoute = route;
-            newRoute.addPoint(RoutePoint(to, address, port), weight);
+            newRoute.addPoint(RoutePoint(to, host, port), weight);
             insertRoute(newRoute);
         }
     }
 }
 
-void QnRouteBuilder::removeConnection(const QnId &from, const QnId &to, const QHostAddress &address, quint16 port) {
+void QnRouteBuilder::removeConnection(const QnId &from, const QnId &to, const QString &host, quint16 port) {
     Q_ASSERT(from != to);
 
     if (m_startId == from) {
         // remove the direct connection
         RouteList &routeList = m_routes[to];
         for (auto it = routeList.begin(); it != routeList.end(); ++it) {
-            if (it->points.size() == 1 && it->points.first() == RoutePoint(to, address, port)) {
+            if (it->points.size() == 1 && it->points.first() == RoutePoint(to, host, port)) {
                 routeList.erase(it);
                 break;
             }
         }
     } else {
         // remove all routes containing the given connection
-        RoutePoint point(to, address, port);
+        RoutePoint point(to, host, port);
         for (auto rtIt = m_routes.begin(); rtIt != m_routes.end(); ++rtIt) {
             for (auto it = rtIt.value().begin(); it != rtIt.value().end(); ) {
                 if (it->containsConnection(from, point))
