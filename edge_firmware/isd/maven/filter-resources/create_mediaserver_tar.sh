@@ -36,9 +36,9 @@ BUILD_DIR=/tmp/hdw_$BOX_NAME_build.tmp
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
 
 BUILD_OUTPUT_DIR=${libdir}
-LIBS_DIR=$BUILD_OUTPUT_DIR/lib/release
+LIBS_DIR=$BUILD_OUTPUT_DIR/lib/${build.configuration}
 
-STRIP="`find ../../mediaserver/ -name 'Makefile*' | head -n 1 | xargs grep -E 'STRIP\s+=' | cut -d= -f 2 | tr -d ' '`"
+STRIP="`find ${root.dir}/mediaserver/ -name 'Makefile*' | head -n 1 | xargs grep -E 'STRIP\s+=' | cut -d= -f 2 | tr -d ' '`"
 
 
 for i in "$@"
@@ -105,10 +105,10 @@ popd
 
 #copying bin
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
-cp $BUILD_OUTPUT_DIR/bin/release/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
+cp $BUILD_OUTPUT_DIR/bin/${build.configuration}/mediaserver $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/
 
 mkdir -p $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
-cp $BUILD_OUTPUT_DIR/bin/release/plugins/libisd_native_plugin.so $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
+cp $BUILD_OUTPUT_DIR/bin/${build.configuration}/plugins/libisd_native_plugin.so $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/bin/plugins/
 #pushd $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/plugins/
 #ln -s libisd_native_plugin.so libisd_native_plugin.so
 #popd
