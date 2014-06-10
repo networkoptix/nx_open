@@ -110,7 +110,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
 
     result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, camManager, *discoveryManager ) );
     result->setTypeId(resourceTypeId);
-    result->setPhysicalId(QString::fromUtf8(cameraInfo.uid));
+    result->setPhysicalId(QString::fromUtf8(cameraInfo.uid).trimmed());
 
     unsigned int caps = 0;
     if (camManager->getCameraCapabilities(&caps) == 0) 
@@ -297,10 +297,10 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setTypeId(typeId);
     resource->setName( QString::fromUtf8("%1-%2").arg(discoveryManager->getVendorName()).arg(QString::fromUtf8(cameraInfo.modelName)) );
     resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
-    resource->setMAC( QnMacAddress(QString::fromUtf8(cameraInfo.uid)) );
+    resource->setMAC( QnMacAddress(QString::fromUtf8(cameraInfo.uid).trimmed()) );
     resource->setAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
-    resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid) );
+    resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid).trimmed() );
     resource->setVendor( discoveryManager->getVendorName() );
 
     //TODO #ak reading MaxFPS here ia a workaround of camera integration API defect: 

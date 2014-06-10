@@ -63,6 +63,7 @@ namespace nxcip_qt
             urlUtf8.data(),
             login ? loginUtf8.data() : NULL,
             password ? passwordUtf8.data() : NULL );
+        //TODO #ak validating cameraInfo data
         cameras->resize( result > 0 ? result : 0 );
         return result;
     }
@@ -70,6 +71,7 @@ namespace nxcip_qt
     int CameraDiscoveryManager::fromMDNSData( const QByteArray& mdnsResponsePacket, const QHostAddress& discoveredAddress, nxcip::CameraInfo* cameraInfo )
     {
         QByteArray discoveredAddressUtf8 = discoveredAddress.toString().toUtf8();
+        //TODO #ak validating cameraInfo data
         return m_intf->fromMDNSData(
             discoveredAddressUtf8.data(),
             (const unsigned char*)mdnsResponsePacket.data(),
@@ -80,6 +82,7 @@ namespace nxcip_qt
     //!See nxcip::CameraDiscoveryManager::fromUpnpData
     bool CameraDiscoveryManager::fromUpnpData( const QByteArray& upnpXMLData, nxcip::CameraInfo* cameraInfo )
     {
+        //TODO #ak validating cameraInfo data
         return m_intf->fromUpnpData( upnpXMLData.data(), upnpXMLData.size(), cameraInfo ) != 0;
     }
 

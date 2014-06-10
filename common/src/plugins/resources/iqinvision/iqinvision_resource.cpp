@@ -31,7 +31,7 @@ void QnPlIqResource::setIframeDistance(int /*frames*/, int /*timems*/)
 QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
 {
     
-    //return new MJPEGtreamreader(toSharedPointer(), "mjpg/video.mjpg");
+    //return new MJPEGStreamReader(toSharedPointer(), "mjpg/video.mjpg");
     
     QString name = getName();
     if (name == QLatin1String("IQA35") ||
@@ -53,7 +53,7 @@ QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
         return new QnRtpStreamReader(toSharedPointer());
         /**/
 
-    return new MJPEGtreamreader(toSharedPointer(), QLatin1String("now.jpg?snap=spush"));
+    return new MJPEGStreamReader(toSharedPointer(), QLatin1String("now.jpg?snap=spush"));
 }
 
 void QnPlIqResource::setCroppingPhysical(QRect /*cropping*/)
