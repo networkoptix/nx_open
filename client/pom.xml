@@ -31,7 +31,7 @@
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs>-lmp3lame -lssl -lcrypto -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>
-        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap -lsigar-universal64-macosx</mac.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL -ltermcap</mac.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
