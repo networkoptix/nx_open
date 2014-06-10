@@ -660,7 +660,7 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
         toDelete = storage->getSpaceLimit() - freeSpace;
     }
 
-    if (toDelete > 0) {
+    if (toDelete > 0 && !useMinArchiveDays) {
         if (!m_diskFullWarned[storage->getId()]) {
             QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
             emit storageFailure(storage, QnBusiness::StorageNotEnoughSpaceReason);
