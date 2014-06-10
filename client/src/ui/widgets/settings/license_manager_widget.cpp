@@ -356,8 +356,11 @@ void QnLicenseManagerWidget::at_downloadFinished() {
             if (!license )
                 break;
 
-            if (license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT)))
+            QnLicense::ErrorCode errCode = QnLicense::NoError;
+            if (license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT), &errCode))
                 licenses.append(license);
+            else if (errCode == QnLicense::Expired)
+                licenses.append(license); // ignore expired error code
         }
 
         validateLicenses(m_replyKeyMap[reply], licenses);
