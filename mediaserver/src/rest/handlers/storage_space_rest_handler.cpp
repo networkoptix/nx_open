@@ -7,7 +7,7 @@
 
 #include <api/model/storage_space_reply.h>
 
-#include <platform/core_platform_abstraction.h>
+#include <platform/platform_abstraction.h>
 
 #include <recorder/storage_manager.h>
 
