@@ -81,8 +81,10 @@ public:
 
     void setExportScheduleButtonEnabled(bool enabled);
     int maxRecordedDays() const;
+    int minRecordedDays() const;
     static const int RecordedDaysDontChange = INT_MAX;
 signals:
+    void archiveRangeChanged();
     void scheduleTasksChanged();
     void recordingSettingsChanged();
     void scheduleEnabledChanged(int);

@@ -82,7 +82,7 @@ public:
 
     void clearSpace();
     
-    void clearOldestSpace(const QnStorageResourcePtr &storage);
+    void clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
     void clearMaxDaysData();
     void clearMaxDaysData(FileCatalogMap catalogMap);
 
@@ -144,6 +144,7 @@ private:
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex, QMap<QString, QSet<int>> oldIndexes);
     void clearUnusedMotion();
     void updateRecordedMonths(FileCatalogMap catalogMap, QMap<QString, QSet<QDate>>& usedMonths);
+    void findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog);
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];

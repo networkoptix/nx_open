@@ -193,7 +193,11 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
 
     connect(ui->checkBoxMaxArchive,      SIGNAL(clicked()),                 this,   SLOT(at_checkBoxMaxArchive_clicked()));
-    connect(ui->checkBoxMaxArchive,      SIGNAL(stateChanged(int)),          this,   SLOT(updateMaxDaysEnabledState()));
+    connect(ui->checkBoxMaxArchive,      SIGNAL(stateChanged(int)),         this,   SLOT(updateMaxDaysEnabledState()));
+    connect(ui->checkBoxMaxArchive,      SIGNAL(stateChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
+
+    connect(ui->spinBoxMinDays,          SIGNAL(valueChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
+    connect(ui->spinBoxMaxDays,          SIGNAL(valueChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
 
     connect(ui->exportScheduleButton,   SIGNAL(clicked()),                  this,   SLOT(at_exportScheduleButton_clicked()));
     ui->exportWarningLabel->setVisible(false);
@@ -282,8 +286,11 @@ void QnCameraScheduleWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->exportWarningLabel, readOnly);
 
     setReadOnly(ui->checkBoxMaxArchive, readOnly);
-    setReadOnly(ui->spinBoxMaxDays, readOnly && ui->checkBoxMaxArchive->checkState() == Qt::Checked);
-    setReadOnly(ui->maxArchiveLabel, readOnly && ui->checkBoxMaxArchive->checkState() == Qt::Checked);
+    bool rangeUsed = ui->checkBoxMaxArchive->checkState() == Qt::Checked;
+    setReadOnly(ui->spinBoxMaxDays, readOnly && rangeUsed);
+    setReadOnly(ui->maxArchiveLabel, readOnly && rangeUsed);
+    setReadOnly(ui->spinBoxMinDays, readOnly && rangeUsed);
+    setReadOnly(ui->minArchiveLabel, readOnly && rangeUsed);
     m_readOnly = readOnly;
 }
 
@@ -298,29 +305,45 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     m_cameras = cameras;
 
     int enabledCount = 0, disabledCount = 0;
-    int maxDaysEnableCount = 0, maxDaysDisableCount = 0;
+    
+    int minDays = INT_MAX, maxDays = INT_MAX;
+    bool mixedArchiveDays = false;
+
     static const int DEFAULT_MAX_DAYS = 30;
-    int maxDays = -DEFAULT_MAX_DAYS;
-    foreach (QnVirtualCameraResourcePtr camera, m_cameras) {
+    static const int DEFAULT_MIN_DAYS = 1;
+    foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
+    {
         (camera->isScheduleDisabled() ? disabledCount : enabledCount)++;
-        maxDays = camera->maxDays();
-        if (maxDays == 0)
-            maxDays = -DEFAULT_MAX_DAYS; // negative value means disabled
-        (maxDays > 0 ? maxDaysEnableCount : maxDaysDisableCount)++;
+        if (minDays == INT_MAX) {
+            minDays = camera->minDays();
+            maxDays = camera->maxDays();
+        }
+        else if (camera->minDays() != minDays || camera->maxDays() != maxDays) {
+            mixedArchiveDays = true;
+        }
     }
+
+    if (minDays == 0) {
+        // change to default value
+        maxDays = -DEFAULT_MAX_DAYS; // negative value means disabled
+        minDays = -DEFAULT_MIN_DAYS; // negative value means disabled
+    }
+
 
     if(enabledCount > 0 && disabledCount > 0)
         ui->enableRecordingCheckBox->setCheckState(Qt::PartiallyChecked);
     else 
         ui->enableRecordingCheckBox->setCheckState(enabledCount > 0 ? Qt::Checked : Qt::Unchecked);
 
-    if(maxDaysEnableCount > 0 && maxDaysDisableCount > 0) {
+    if(mixedArchiveDays) {
         ui->checkBoxMaxArchive->setCheckState(Qt::PartiallyChecked);
         ui->spinBoxMaxDays->setValue(DEFAULT_MAX_DAYS);
+        ui->spinBoxMinDays->setValue(DEFAULT_MIN_DAYS);
     }
     else {
-        ui->checkBoxMaxArchive->setCheckState(maxDaysEnableCount > 0 ? Qt::Checked : Qt::Unchecked);
+        ui->checkBoxMaxArchive->setCheckState(maxDays > 0 ? Qt::Checked : Qt::Unchecked);
         ui->spinBoxMaxDays->setValue(qAbs(maxDays));
+        ui->spinBoxMinDays->setValue(qAbs(minDays));
     }
 
     updatePanicLabelText();
@@ -616,6 +639,8 @@ void QnCameraScheduleWidget::updateMaxDaysEnabledState()
     bool isEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked && ui->checkBoxMaxArchive->checkState() == Qt::Checked;
     ui->spinBoxMaxDays->setEnabled(isEnabled);
     ui->maxArchiveLabel->setEnabled(isEnabled);
+    ui->spinBoxMinDays->setEnabled(isEnabled);
+    ui->minArchiveLabel->setEnabled(isEnabled);
 }
 
 void QnCameraScheduleWidget::updateGridEnabledState()
@@ -628,8 +653,11 @@ void QnCameraScheduleWidget::updateGridEnabledState()
     ui->gridWidget->setEnabled(enabled && !m_changesDisabled);
 
     ui->checkBoxMaxArchive->setEnabled(enabled);
-    ui->spinBoxMaxDays->setEnabled(enabled && ui->checkBoxMaxArchive->checkState() == Qt::Checked); 
-    ui->maxArchiveLabel->setEnabled(enabled &&  ui->checkBoxMaxArchive->checkState() == Qt::Checked);
+    bool rangeEnabled = ui->checkBoxMaxArchive->checkState() == Qt::Checked;
+    ui->spinBoxMaxDays->setEnabled(enabled && rangeEnabled); 
+    ui->maxArchiveLabel->setEnabled(enabled &&  rangeEnabled);
+    ui->spinBoxMinDays->setEnabled(enabled && rangeEnabled); 
+    ui->minArchiveLabel->setEnabled(enabled && rangeEnabled);
 }
 
 void QnCameraScheduleWidget::updateLicensesLabelText()
@@ -873,8 +901,10 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
     foreach(QnVirtualCameraResourcePtr camera, cameras) 
     {
         int maxDays = maxRecordedDays();
-        if (maxDays != RecordedDaysDontChange)
+        if (maxDays != RecordedDaysDontChange) {
             camera->setMaxDays(maxDays);
+            camera->setMinDays(minRecordedDays());
+        }
 
         camera->setScheduleDisabled(!recordingEnabled);
         if (recordingEnabled){
@@ -938,4 +968,12 @@ int QnCameraScheduleWidget::maxRecordedDays() const
         return RecordedDaysDontChange;
     else
         return ui->spinBoxMaxDays->value() * (ui->checkBoxMaxArchive->isChecked() ? 1 : -1);
+}
+
+int QnCameraScheduleWidget::minRecordedDays() const
+{
+    if (ui->checkBoxMaxArchive->checkState() == Qt::PartiallyChecked)
+        return RecordedDaysDontChange;
+    else
+        return ui->spinBoxMinDays->value() * (ui->checkBoxMaxArchive->isChecked() ? 1 : -1);
 }

@@ -30,6 +30,7 @@
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 static const int DB_UPDATE_PER_RECORDS = 128;
+static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
 
 Q_GLOBAL_STATIC(QnStorageManager, QnStorageManager_inst)
 
@@ -502,7 +503,9 @@ void QnStorageManager::clearSpace()
     // 2. free storage space
     const QSet<QnStorageResourcePtr> storages = getWritableStorages();
     foreach(QnStorageResourcePtr storage, storages)
-        clearOldestSpace(storage);
+        clearOldestSpace(storage, true);
+    foreach(QnStorageResourcePtr storage, storages)
+        clearOldestSpace(storage, false);
 
     foreach(QnStorageDbPtr sdb, m_chunksDB)
         sdb->afterDelete();
@@ -551,8 +554,6 @@ void QnStorageManager::clearMaxDaysData()
 
 void QnStorageManager::clearMaxDaysData(FileCatalogMap catalogMap)
 {
-    static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
-
     QMutexLocker lock(&m_mutexCatalog);
     foreach(const DeviceFileCatalogPtr catalog, catalogMap.values()) {
         QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqId(catalog->getMac()).dynamicCast<QnSecurityCamResource>();
@@ -582,7 +583,29 @@ void QnStorageManager::updateRecordedMonths(FileCatalogMap catalogMap, QMap<QStr
         usedMonths[catalog->getMac()] += catalog->recordedMonthList();
 }
 
-void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage)
+void QnStorageManager::findTotalMinTime(const bool useMinArchiveDays, const FileCatalogMap& catalogMap, qint64& minTime, DeviceFileCatalogPtr& catalog)
+{
+    for (FileCatalogMap::const_iterator itr = catalogMap.constBegin(); itr != catalogMap.constEnd(); ++itr)
+    {
+        DeviceFileCatalogPtr curCatalog = itr.value();
+        qint64 curMinTime = curCatalog->firstTime();
+        if (curMinTime != (qint64)AV_NOPTS_VALUE && curMinTime < minTime)
+        {
+            if (useMinArchiveDays) {
+                QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqId(itr.key()).dynamicCast<QnSecurityCamResource>();
+                if (camera && camera->minDays() > 0) {
+                    qint64 threshold = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->minDays();
+                    if (threshold < curMinTime)
+                        continue; // do not delete archive for this camera
+                }
+            }
+            minTime = curMinTime;
+            catalog = curCatalog;
+        }
+    }
+}
+
+void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays)
 {
     if (storage->getSpaceLimit() == 0)
         return; // unlimited
@@ -601,36 +624,26 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage)
     while (toDelete > 0)
     {
         qint64 minTime = 0x7fffffffffffffffll;
-        QByteArray mac;
         DeviceFileCatalogPtr catalog;
         {
             QMutexLocker lock(&m_mutexCatalog);
-            for (FileCatalogMap::const_iterator itr = m_devFileCatalog[QnServer::HiQualityCatalog].constBegin(); itr != m_devFileCatalog[QnServer::HiQualityCatalog].constEnd(); ++itr)
-            {
-                qint64 firstTime = itr.value()->firstTime();
-                if (firstTime != (qint64)AV_NOPTS_VALUE && firstTime < minTime)
-                {
-                    minTime = itr.value()->firstTime();
-                    mac = itr.key();
-                }
-            }
-            if (!mac.isEmpty())
-                catalog = getFileCatalog(mac, QnServer::HiQualityCatalog);
+            findTotalMinTime(useMinArchiveDays, m_devFileCatalog[QnServer::HiQualityCatalog], minTime, catalog);
+            findTotalMinTime(useMinArchiveDays, m_devFileCatalog[QnServer::LowQualityCatalog], minTime, catalog);
         }
         if (catalog != 0) 
         {
             DeviceFileCatalog::Chunk deletedChunk = catalog->deleteFirstRecord();
             clearDbByChunk(catalog, deletedChunk);
-            
-            DeviceFileCatalogPtr catalogLowRes = getFileCatalog(mac, QnServer::LowQualityCatalog);
-            if (catalogLowRes != 0) 
+            QnServer::ChunksCatalog altQuality = catalog->getRole() == QnServer::HiQualityCatalog ? QnServer::LowQualityCatalog : QnServer::HiQualityCatalog;
+            DeviceFileCatalogPtr altCatalog = getFileCatalog(catalog->getMac(), altQuality);
+            if (altCatalog != 0) 
             {
                 qint64 minTime = catalog->minTime();
                 if (minTime != (qint64)AV_NOPTS_VALUE)
-                    deleteRecordsToTime(catalogLowRes, minTime);
+                    deleteRecordsToTime(altCatalog, minTime);
                 else
-                    deleteRecordsToTime(catalogLowRes, DATETIME_NOW);
-                if (catalog->isEmpty() && catalogLowRes->isEmpty())
+                    deleteRecordsToTime(altCatalog, DATETIME_NOW);
+                if (catalog->isEmpty() && altCatalog->isEmpty())
                     break; // nothing to delete
             }
             else {
