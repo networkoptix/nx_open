@@ -413,7 +413,7 @@ Qt::ItemFlags QnResourcePoolModelNode::flags(int column) const {
         if(m_flags & (QnResource::media | QnResource::layout | QnResource::server | QnResource::user | QnResource::videowall))
             result |= Qt::ItemIsDragEnabled;
         break;
-    case Qn::VideoWallItemNode: //TODO: #GDM VW drag of empty item on scene should create new layout
+    case Qn::VideoWallItemNode: //TODO: #GDM #VW drag of empty item on scene should create new layout
     case Qn::RecorderNode:
         result |= Qt::ItemIsDragEnabled; 
         break;

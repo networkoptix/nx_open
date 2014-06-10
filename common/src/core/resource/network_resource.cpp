@@ -21,7 +21,7 @@ QnNetworkResource::QnNetworkResource():
     m_networkTimeout(5000),
     m_probablyNeedToUpdateStatus(false)
 {
-    //TODO: #GDM motion flag should be set in QnVirtualCameraResource depending on motion support
+    //TODO: #GDM #Common motion flag should be set in QnVirtualCameraResource depending on motion support
     addFlags(network);
 }
 

@@ -130,7 +130,7 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
 //        ui->accessRightsGroupbox->setEnabled(editable);
         setReadOnly(ui->accessRightsComboBox, !editable);
         setReadOnly(ui->accessRightsGroupbox, !editable);
-        // TODO: #GDM if readonly then do not save anyway
+        // TODO: #GDM #Common if readonly then do not save anyway
         break;
     case Email:
         ui->emailEdit->setVisible(visible);
@@ -515,7 +515,7 @@ void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights) {
             pos.value()->setChecked((pos.key() & rights) == pos.key());
     m_inUpdateDependensies = false;
 
-    updateDependantPermissions(); // TODO: #GDM rename to something more sane, connect properly
+    updateDependantPermissions(); // TODO: #GDM #Common rename to something more sane, connect properly
 }
 
 quint64 QnUserSettingsDialog::readAccessRightsAdvanced() {

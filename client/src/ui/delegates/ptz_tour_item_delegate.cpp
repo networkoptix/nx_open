@@ -23,7 +23,7 @@ void QnPtzTourItemDelegate::initStyleOption(QStyleOptionViewItem *option, const 
         QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
         option->palette.setColor(QPalette::Highlight, clr.lighter());
     }
-    //TODO: #GDM PTZ invalid rows highlight
+    //TODO: #GDM #PTZ invalid rows highlight
 }
 
 QWidget* QnPtzTourItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const  {

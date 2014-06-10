@@ -26,6 +26,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <QtCore/QFile>
+
+
 DiscoveryManager::DiscoveryManager()
 :
     m_refManager( IsdNativePlugin::instance()->refManager() )
@@ -57,7 +60,7 @@ unsigned int DiscoveryManager::releaseRef()
     return m_refManager.releaseRef();
 }
 
-static const char* VENDOR_NAME = "ISD_NATIVE";
+static const char* VENDOR_NAME = "ISD_EDGE";
 
 void DiscoveryManager::getVendorName( char* buf ) const
 {
@@ -93,15 +96,58 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*loc
 #ifndef WIN32
     mac_eth0(mac, &host);
 #endif
-    const char* modelName = "ISD-xxx";
-    const char* firmware = "1.0.0"; // todo: implement me!
+
+    if( m_modelName.isEmpty() )
+    {
+        m_modelName = "ISD-xxx";
+        QFile hwconfigFile( "/etc/isd/factory/hwconfig.txt" );
+        if( hwconfigFile.open( QIODevice::ReadOnly ) )
+        {
+            const QByteArray& isdParamsStr = hwconfigFile.readAll();
+            const QList<QByteArray>& isdParams = isdParamsStr.split('\n');
+            for( QByteArray isdParamStr: isdParams )
+            {
+                const QList<QByteArray>& paramTokens = isdParamStr.split( '=' );
+                if( paramTokens.size() < 2 )
+                    continue;
+                if( paramTokens[0] == "model" )
+                {
+                    m_modelName = paramTokens[1];
+                    break;
+                }
+            }
+        }
+    }
+
+    if( m_firmwareVersion.isEmpty() )
+    {
+        m_firmwareVersion = "unknown";
+        QFile versionFile( "/webSvr/web/version.html" );
+        if( versionFile.open( QIODevice::ReadOnly ) )
+        {
+            const QByteArray& isdParamsStr = versionFile.readAll();
+            const QList<QByteArray>& isdParams = isdParamsStr.split('\n');
+            for( QByteArray isdParamStr: isdParams )
+            {
+                if( !isdParamStr.startsWith( "Version:" ) )
+                    continue;
+
+                const QList<QByteArray>& paramTokens = isdParamStr.split( ':' );
+                if( paramTokens.size() < 2 )
+                    continue;
+                m_firmwareVersion = paramTokens[1].trimmed();
+                break;
+            }
+        }
+    }
+
     const char* loginToUse = "root";
     const char* passwordToUse = "admin";
 
     memset( cameras, 0, sizeof(*cameras) );
     strncpy( cameras->uid, mac, sizeof(cameras->uid)-1 );
-    strncpy( cameras->modelName, modelName, sizeof(cameras->modelName)-1 );
-    strncpy( cameras->firmware, firmware, sizeof(cameras->firmware)-1 );
+    strncpy( cameras->modelName, m_modelName.constData(), sizeof(cameras->modelName)-1 );
+    strncpy( cameras->firmware, m_firmwareVersion.constData(), sizeof(cameras->firmware)-1 );
     if (host)
         strncpy( cameras->url, host, sizeof(cameras->url)-1 );
     strcpy( cameras->defaultLogin, loginToUse );
@@ -110,7 +156,7 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*loc
     return 1;
 }
 
-int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* /*login*/, const char* /*password*/ )
+int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* /*cameras*/, const char* /*address*/, const char* /*login*/, const char* /*password*/ )
 {
     return nxcip::NX_NO_ERROR;
 }

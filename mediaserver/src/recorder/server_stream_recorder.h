@@ -74,6 +74,8 @@ private:
 private slots:
     void at_recordingFinished(int status, const QString &filename);
 private:
+    const size_t m_maxRecordQueueSizeBytes;
+    const size_t m_maxRecordQueueSizeElements;
     mutable QMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
     QnTimePeriod m_lastSchedulePeriod;

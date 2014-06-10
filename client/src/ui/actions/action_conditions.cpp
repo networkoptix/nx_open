@@ -260,7 +260,7 @@ Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResource
 
         bool isUnsupported = 
             (widget->resource()->flags() & (QnResource::network | QnResource::still_image | QnResource::server)) ||
-            !(widget->resource()->flags() & QnResource::utc); // TODO: #GDM this is wrong, we need a flag for exported files.
+            !(widget->resource()->flags() & QnResource::utc); // TODO: #GDM #Common this is wrong, we need a flag for exported files.
         if(isUnsupported)
             return Qn::InvisibleAction;
     }
@@ -639,7 +639,7 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
         if (resource->getStatus() == QnResource::Incompatible)
             continue;
 
-        //TODO: #GDM refactor duplicated code
+        //TODO: #GDM #Common refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)

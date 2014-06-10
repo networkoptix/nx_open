@@ -56,7 +56,7 @@ namespace ec2
             QnKvPairList outData;
 
             for( const ApiResourceParamData& param: tran.params.params )
-                outData << QnKvPair(param.name, param.value);
+                outData << QnKvPair(param.name, param.value, param.predefinedParam);
             emit resourceParamsChanged( tran.params.id, outData );
         }
 

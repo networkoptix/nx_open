@@ -119,7 +119,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     case QnBusiness::SourceColumn:
     {
         QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
-        //TODO: #GDM server selection dialog?
+        //TODO: #GDM #Business server selection dialog?
         connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
         QnBusiness::EventType eventType = (QnBusiness::EventType)index.data(Qn::EventTypeRole).toInt();

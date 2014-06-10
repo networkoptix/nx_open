@@ -21,7 +21,7 @@
 
 #include <utils/resource_property_adaptors.h>
 
-//TODO: #GDM handle user changing here
+//TODO: #GDM #Common handle user changing here
 
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) :
     base_type(parent),
@@ -99,8 +99,8 @@ void QnPopupSettingsWidget::submitToSettings() {
 }
 
 void QnPopupSettingsWidget::at_showAllCheckBox_toggled(bool checked) {
-    // TODO: #GDM also update checked state!
-    // TODO: #GDM maybe tristate for 'show all' checkbox would be better.
+    // TODO: #GDM #Common also update checked state!
+    // TODO: #GDM #Common maybe tristate for 'show all' checkbox would be better.
     foreach (QCheckBox* checkbox, m_businessRulesCheckBoxes) {
         checkbox->setEnabled(!checked);
     }

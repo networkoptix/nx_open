@@ -72,7 +72,7 @@ public:
 
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
-    QnResourceDiscoveryManager( const CameraDriverRestrictionList* cameraDriverRestrictionList = NULL );
+    QnResourceDiscoveryManager();
     ~QnResourceDiscoveryManager();
 
     static QnResourceDiscoveryManager* instance();
@@ -149,7 +149,6 @@ private:
     std::auto_ptr<QTimer> m_timer;
     State m_state;
     QSet<QString> m_recentlyDeleted;
-    const CameraDriverRestrictionList* m_cameraDriverRestrictionList;
 
     QHash<QUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
     QHash<QUuid, QnManualCameraSearchCameraList> m_searchProcessResults;

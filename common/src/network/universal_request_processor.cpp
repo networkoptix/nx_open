@@ -45,7 +45,7 @@ bool QnUniversalRequestProcessor::authenticate()
     Q_D(QnUniversalRequestProcessor);
 
     int retryCount = 0;
-    if (d->needAuth &&  d->protocol.toLower() == "http")
+    if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
         QString path = url.path().trimmed();
@@ -53,11 +53,10 @@ bool QnUniversalRequestProcessor::authenticate()
             path = path.left(path.size()-1);
         if (path.startsWith(L'/'))
             path = path.mid(1);
-        bool needAuth = (path != lit("api/ping")) && !path.startsWith(lit("api/camera_event")); //TODO: #AK this class (libcommon's) is not supposed to know about api/ping etc.. (it's mediaserver's)
         bool isProxy = dynamic_cast<QnUniversalTcpListener*>(d->owner)->isProxy(url);
         QElapsedTimer t;
         t.restart();
-        while (needAuth && !qnAuthHelper->authenticate(d->request, d->response, isProxy) && d->socket->isConnected())
+        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy) && d->socket->isConnected())
         {
             d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: STATIC_UNAUTHORIZED_HTML;
             sendResponse("HTTP", isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED, "text/html");

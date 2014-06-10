@@ -61,6 +61,8 @@ case "$1" in
         start
         ;;
     start_console)
+        echo "/media/mmcblk0p1/cores/core.%p" > /proc/sys/kernel/core_pattern
+        ulimit -c unlimited
         $BIN_PATH -e --conf-file=$PREFIX/etc/mediaserver.conf --log-level=$LOG_LEVEL
         ;;
     stop)

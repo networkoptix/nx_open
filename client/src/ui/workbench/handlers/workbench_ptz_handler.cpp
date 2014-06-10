@@ -101,7 +101,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
         return;
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
-    //TODO: #GDM PTZ fix the text
+    //TODO: #GDM #PTZ fix the text
     if(resource->getStatus() == QnResource::Offline || resource->getStatus() == QnResource::Unauthorized) {
         QMessageBox::critical(
             mainWindow(),
@@ -130,7 +130,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
     QnResourcePtr resource = widget->resource()->toResourcePtr();
 
     if (!widget->ptzController()->hasCapabilities(Qn::PresetsPtzCapability)) {
-        //TODO: #GDM PTZ show appropriate error message?
+        //TODO: #GDM #PTZ show appropriate error message?
         return;
     }
 
@@ -153,7 +153,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
             );
             return;
         }
-        //TODO: #GDM PTZ check other cases
+        //TODO: #GDM #PTZ check other cases
     }
 }
 
@@ -187,7 +187,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
             );
             return;
         }
-        //TODO: #GDM PTZ check other cases
+        //TODO: #GDM #PTZ check other cases
     }
 }
 

@@ -147,7 +147,7 @@ public:
     bool synchronized() const;
     Q_SLOT void setSynchronized();
 
-    // TODO: #GDM I've moved this one to public. Implement properly.
+    // TODO: #GDM #PTZ I've moved this one to public. Implement properly.
     bool tourIsValid(const QnPtzTourItemModel &tourModel) const;
 
 signals:

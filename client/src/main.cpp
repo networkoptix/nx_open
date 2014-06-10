@@ -507,10 +507,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
-
     // Create and start SessionManager
-    if (qnSettings->isVideoWallMode())
-        QnSessionManager::instance()->setAuthCookieEnabled();
     QnSessionManager::instance()->start();
 
     ffmpegInit();

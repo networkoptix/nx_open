@@ -16,5 +16,5 @@ void QnPtzTourListItemDelegate::initStyleOption(QStyleOptionViewItem *option, co
         QColor clr = index.data(Qt::BackgroundRole).value<QColor>();
         option->palette.setColor(QPalette::Highlight, clr.lighter());
     }
-    //TODO: #GDM PTZ invalid rows highlight
+    //TODO: #GDM #PTZ invalid rows highlight
 }

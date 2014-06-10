@@ -122,6 +122,7 @@ namespace nx_hls
             QnSecurityCamResourcePtr camResource,
             QnVideoCamera* const videoCamera,
             MediaQuality streamQuality );
+        void ensureChunkCacheFilledEnoughForPlayback( HLSSession* const session, MediaQuality streamQuality );
 
     private slots:
         void chunkDataAvailable( StreamingChunkPtr chunk, quint64 newSizeBytes );

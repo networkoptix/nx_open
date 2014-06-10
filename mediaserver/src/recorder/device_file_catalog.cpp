@@ -76,7 +76,6 @@ void DeviceFileCatalog::Chunk::truncate(qint64 timeMs)
 DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnServer::ChunksCatalog catalog):
     m_rebuildStartTime(0),
     m_mutex(QMutex::Recursive),
-    m_firstDeleteCount(0),
     m_macAddress(macAddress),
     //m_duplicateName(false),
     m_catalog(catalog),
@@ -256,17 +255,17 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     return rez;
 }
 
-void DeviceFileCatalog::replaceChunks(int storageIndex, const QVector<Chunk>& newCatalog)
+void DeviceFileCatalog::replaceChunks(int storageIndex, const std::deque<Chunk>& newCatalog)
 {
     QMutexLocker lock(&m_mutex);
 
-    QVector<Chunk> filteredData;
+    std::deque<Chunk> filteredData;
     filteredData.swap( m_chunks );
     const auto filteredDataEndIter = std::remove_if( filteredData.begin(), filteredData.end(),
         [storageIndex](const Chunk& chunk){ return chunk.storageIndex == storageIndex; } );
     m_chunks.resize( filteredDataEndIter - filteredData.begin() + newCatalog.size() );
     std::merge( filteredData.begin(), filteredDataEndIter, newCatalog.begin(), newCatalog.end(), m_chunks.begin() );
-    m_firstDeleteCount = 0; //TODO #vasilenko is this correct?
+    m_lastAddIndex = -1;
 }
 
 //QList<QDate> DeviceFileCatalog::recordedMonthList()
@@ -291,35 +290,35 @@ bool DeviceFileCatalog::addChunk(const Chunk& chunk)
 {
     QMutexLocker lk( &m_mutex );
 
-    if (!m_chunks.isEmpty() && chunk.startTimeMs > m_chunks.last().startTimeMs) {
-        m_chunks << chunk;
+    if (!m_chunks.empty() && chunk.startTimeMs > m_chunks[m_chunks.size()-1].startTimeMs) {
+        m_chunks.push_back(chunk);
     }
     else {
-        ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
+        ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
         m_chunks.insert(itr, chunk);
     }
-    if (m_chunks.size() > 1 && m_chunks.last().startTimeMs == m_chunks[m_chunks.size()-2].endTimeMs() + 1)
+    if (m_chunks.size() > 1 && m_chunks[m_chunks.size()-1].startTimeMs == m_chunks[m_chunks.size()-2].endTimeMs() + 1)
     {
         // update catalog to fix bug from previous version
-        m_chunks[m_chunks.size()-2].durationMs = m_chunks.last().startTimeMs - m_chunks[m_chunks.size()-2].startTimeMs;
+        m_chunks[m_chunks.size()-2].durationMs = m_chunks[m_chunks.size()-1].startTimeMs - m_chunks[m_chunks.size()-2].startTimeMs;
         return true;
     }
     return false;
 }
 
-void DeviceFileCatalog::addChunks(const QVector<Chunk>& chunks)
+void DeviceFileCatalog::addChunks(const std::deque<Chunk>& chunks)
 {
     QMutexLocker lk( &m_mutex );
 
-    QVector<Chunk> existChunks;
+    std::deque<Chunk> existChunks;
     existChunks.swap( m_chunks );
     m_chunks.resize(existChunks.size() + chunks.size());
     std::merge(existChunks.begin(), existChunks.end(), chunks.begin(), chunks.end(), m_chunks.begin());
 }
 
-QVector<DeviceFileCatalog::Chunk> DeviceFileCatalog::mergeChunks(const QVector<Chunk>& chunk1, const QVector<Chunk>& chunk2)
+std::deque<DeviceFileCatalog::Chunk> DeviceFileCatalog::mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2)
 {
-    QVector<Chunk> result;
+    std::deque<Chunk> result;
     result.resize(chunk1.size() + chunk2.size());
     std::merge(chunk1.begin(), chunk1.end(), chunk2.begin(), chunk2.end(), result.begin());
     return result;
@@ -482,7 +481,7 @@ bool DeviceFileCatalog::doRebuildArchive(QnStorageResourcePtr storage, const QnT
     QMutexLocker lk( &m_mutex );
 
     foreach(const Chunk& chunk, allChunks)
-        m_chunks << chunk;
+        m_chunks.push_back(chunk);
 
     qWarning() << "rebuild archive for camera " << m_macAddress << prefixByCatalog(m_catalog) << "finished. time=" << t.elapsed() << "ms. processd files=" << m_chunks.size();
 
@@ -617,10 +616,7 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
 
     QMutexLocker lock(&m_mutex);
 
-    Q_ASSERT( m_firstDeleteCount <= m_chunks.size() );
-
-
-    ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
+    ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
     if( itr != m_chunks.end() )
     {
         itr = m_chunks.insert(itr, chunk);  //triggers assert if itr == end()
@@ -636,16 +632,17 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
 DeviceFileCatalog::Chunk DeviceFileCatalog::takeChunk(qint64 startTimeMs, qint64 durationMs) {
     QMutexLocker lock(&m_mutex);
     
-    ChunkMap::iterator itr = qUpperBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), startTimeMs);
-    if (itr > m_chunks.begin() + m_firstDeleteCount)
+    ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), startTimeMs);
+    if (itr > m_chunks.begin())
         --itr;
-    while (itr > m_chunks.begin() + m_firstDeleteCount && itr->startTimeMs == startTimeMs && itr->durationMs != durationMs)
+    while (itr > m_chunks.begin() && itr->startTimeMs == startTimeMs && itr->durationMs != durationMs)
         --itr;
 
     if (itr != m_chunks.end() && itr->startTimeMs == startTimeMs && itr->durationMs == durationMs) {
         Chunk result = *itr;
-        if( itr - m_chunks.begin() < m_firstDeleteCount )
-            --m_firstDeleteCount;
+        int idx = itr - m_chunks.begin();
+        if (m_lastAddIndex >= idx)
+            --m_lastAddIndex;
         m_chunks.erase(itr);
         return result;
     }
@@ -694,8 +691,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::updateDuration(int durationMs, qint6
 
 QVector<qint64> DeviceFileCatalog::deleteRecordsBefore(int idx)
 {
-    //TODO #vasilenko m_firstDeleteCount can be changed not only by deleteFirstRecord but by other thread too, will "count" value be still actual in that case?
-    int count = idx - m_firstDeleteCount; // m_firstDeleteCount may be changed during delete
+    int count = idx;
     QVector<qint64> result;
     for (int i = 0; i < count; ++i) {
         qint64 deletedTime = deleteFirstRecord();
@@ -708,7 +704,7 @@ QVector<qint64> DeviceFileCatalog::deleteRecordsBefore(int idx)
 void DeviceFileCatalog::clear()
 {
     QMutexLocker lk( &m_mutex );
-    while(m_firstDeleteCount < m_chunks.size()) //this comparison MUST be atomic
+    while(!m_chunks.empty())
     {
         lk.unlock();
         deleteFirstRecord();
@@ -720,18 +716,15 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 {
     QMutexLocker lock(&m_mutex);
 
-    if (m_firstDeleteCount > 0) {
-        emit firstDataRemoved(m_firstDeleteCount);
-        m_chunks.erase(m_chunks.begin(), m_chunks.begin() + m_firstDeleteCount);
-        m_lastAddIndex -= m_firstDeleteCount;
-        m_firstDeleteCount = 0;
-    }
     for (int i = 0; i < m_chunks.size();)
     {
         if (m_chunks[i].storageIndex == storageIndex)
         {
-            if (m_chunks[i].startTimeMs < timeMs)
-                m_chunks.remove(i);
+            if (m_chunks[i].startTimeMs < timeMs) {
+                m_chunks.erase(m_chunks.begin() + i);
+                if (m_lastAddIndex >= i)
+                    --m_lastAddIndex;
+            }
             else
                 break;
 
@@ -745,7 +738,7 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 bool DeviceFileCatalog::isEmpty() const
 {
     QMutexLocker lock(&m_mutex);
-    return m_chunks.isEmpty();
+    return m_chunks.empty();
 }
 
 qint64 DeviceFileCatalog::deleteFirstRecord()
@@ -757,38 +750,28 @@ qint64 DeviceFileCatalog::deleteFirstRecord()
     {
         QMutexLocker lock(&m_mutex);
 
-        if (m_chunks.isEmpty())
+        if (m_chunks.empty())
             return deletedTime;
 
         static const int DELETE_COEFF = 1000;
 
-        if (m_firstDeleteCount < m_chunks.size()) 
+        if (!m_chunks.empty()) 
         {
-            storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
-            delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
-            deletedTime = m_chunks[m_firstDeleteCount].startTimeMs;
+            storage = qnStorageMan->storageRoot(m_chunks[0].storageIndex);
+            delFileName = fullFileName(m_chunks[0]);
+            deletedTime = m_chunks[0].startTimeMs;
 
-            QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
+            QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[0].startTimeMs).date();
 
-            if (m_firstDeleteCount < m_chunks.size()-1)
+            if (m_chunks.size() > 1)
             {
-                QDate nextDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount+1].startTimeMs).date();
+                QDate nextDate = QDateTime::fromMSecsSinceEpoch(m_chunks[1].startTimeMs).date();
                 if (curDate.year() != nextDate.year() || curDate.month() != nextDate.month())
                     motionDirName = QnMotionHelper::instance()->getMotionDir(curDate, m_macAddress);
             }
-            m_firstDeleteCount++;
-        }
-        else {
-            emit firstDataRemoved(m_chunks.size());
-            m_firstDeleteCount = 0;
-            m_chunks.clear();
-            m_lastAddIndex = -1;
-        }
-        if (m_firstDeleteCount == DELETE_COEFF) {
-            emit firstDataRemoved(DELETE_COEFF);
-            m_chunks.erase(m_chunks.begin(), m_chunks.begin() + DELETE_COEFF);
-            m_lastAddIndex -= DELETE_COEFF;
-            m_firstDeleteCount = 0;
+
+            m_chunks.pop_front();
+            --m_lastAddIndex;
         }
     }
 
@@ -817,11 +800,11 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
 */
     QMutexLocker lock(&m_mutex);
 
-    if (m_chunks.isEmpty())
+    if (m_chunks.empty())
         return -1;
 
-    ChunkMap::const_iterator itr = qUpperBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), startTimeMs);
-    if (itr > m_chunks.begin()+m_firstDeleteCount)
+    ChunkMap::const_iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), startTimeMs);
+    if (itr > m_chunks.begin())
     {
         --itr;
          if (method == OnRecordHole_NextChunk && itr->startTimeMs + itr->durationMs <= startTimeMs && itr < m_chunks.end()-1)
@@ -835,7 +818,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
 void DeviceFileCatalog::updateChunkDuration(Chunk& chunk)
 {
     QMutexLocker lock(&m_mutex);
-    ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
+    ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
     if (itr != m_chunks.end() && itr->startTimeMs == chunk.startTimeMs)
         chunk.durationMs = itr->durationMs;
 }
@@ -856,36 +839,36 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 qint64 DeviceFileCatalog::minTime() const
 {
     QMutexLocker lock(&m_mutex);
-    if (m_chunks.isEmpty() || m_firstDeleteCount >= m_chunks.size())
+    if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks[m_firstDeleteCount].startTimeMs;
+        return m_chunks[0].startTimeMs;
 }
 
 qint64 DeviceFileCatalog::maxTime() const
 {
     QMutexLocker lock(&m_mutex);
-    if (m_chunks.isEmpty())
+    if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else if (m_lastAddIndex >= 0 && m_chunks[m_lastAddIndex].durationMs == -1)
         return DATETIME_NOW;
-    else if (m_chunks.last().durationMs == -1)
+    else if (m_chunks[m_chunks.size()-1].durationMs == -1)
         return DATETIME_NOW;
     else
-        return m_chunks.last().startTimeMs + qMax(0, m_chunks.last().durationMs);
+        return m_chunks[m_chunks.size()-1].startTimeMs + qMax(0, m_chunks[m_chunks.size()-1].durationMs);
 }
 
 bool DeviceFileCatalog::containTime(qint64 timeMs, qint64 eps) const
 {
     QMutexLocker lk( &m_mutex );
 
-    if (m_chunks.isEmpty())
+    if (m_chunks.empty())
         return false;
 
-    ChunkMap::const_iterator itr = qUpperBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), timeMs);
+    ChunkMap::const_iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), timeMs);
     if (itr != m_chunks.end() && itr->startTimeMs - timeMs <= eps)
         return true;
-    if (itr > m_chunks.begin()+m_firstDeleteCount)
+    if (itr > m_chunks.begin())
         --itr;
     return itr->distanceToTime(timeMs) <= eps;
 }
@@ -893,10 +876,10 @@ bool DeviceFileCatalog::containTime(qint64 timeMs, qint64 eps) const
 bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const
 {
     QMutexLocker lock(&m_mutex);
-    if (m_chunks.isEmpty())    
+    if (m_chunks.empty())    
         return true;
     else
-        return m_chunks.last().startTimeMs == startTimeMs;
+        return m_chunks[m_chunks.size()-1].startTimeMs == startTimeMs;
 }
 
 DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
@@ -911,10 +894,10 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
 qint64 DeviceFileCatalog::firstTime() const
 {
     QMutexLocker lock(&m_mutex);
-    if (m_firstDeleteCount >= m_chunks.size())
+    if (m_chunks.empty())
         return AV_NOPTS_VALUE;
     else
-        return m_chunks[m_firstDeleteCount].startTimeMs;
+        return m_chunks[0].startTimeMs;
 }
 
 void DeviceFileCatalog::setRebuildArchive(RebuildMethod value)
@@ -932,7 +915,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
 
     QMutexLocker lock(&m_mutex);
     QnTimePeriodList result;
-    ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin() + m_firstDeleteCount, m_chunks.end(), startTime);
+    ChunkMap::const_iterator itr = qLowerBound(m_chunks.begin(), m_chunks.end(), startTime);
     if (itr == m_chunks.end())
         return result;
 
