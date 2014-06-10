@@ -26,7 +26,7 @@ case `uname -s` in
         ;;
 esac
 
-if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'mediaserver' ]  || [ '${project.artifactId}' == 'appserver2' ]; then
+if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'mediaserver' ]  || [ '${project.artifactId}' == 'appserver2' || [ '${project.artifactId}' == 'isd_native_plugin' ]; then
      DEBUG=ext_debug
 fi
 
