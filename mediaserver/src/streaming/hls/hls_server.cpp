@@ -122,7 +122,7 @@ namespace nx_hls
                 }
 
                 case sDone:
-                    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Done message to %1. Closing connection...").arg(remoteHostAddress().toString()), cl_logDEBUG1 );
+                    NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Done message to %1. Closing connection...\n\n\n").arg(remoteHostAddress().toString()), cl_logDEBUG1 );
                     return;
             }
         }
