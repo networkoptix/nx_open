@@ -25,7 +25,8 @@ namespace nx_http
         m_currentChunkSize( 0 ),
         m_currentChunkBytesRead( 0 ),
         m_prevChar( 0 ),
-        m_lineEndingOffset( 0 )
+        m_lineEndingOffset( 0 ),
+        m_decodeChunked( true )
     {
     }
 
@@ -183,6 +184,15 @@ namespace nx_http
             m_contentDecoder->flush();
     }
 
+    /*!
+        By default \a true.
+        \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
+    */
+    void HttpStreamReader::setDecodeChunkedMessageBody( bool val )
+    {
+        m_decodeChunked = val;
+    }
+
     bool HttpStreamReader::parseLine( const ConstBufferRefType& data )
     {
         switch( m_state )
@@ -307,7 +317,7 @@ namespace nx_http
         const QnByteArrayConstRef& data,
         Func func )
     {
-        return m_isChunkedTransfer
+        return (m_isChunkedTransfer && m_decodeChunked)
             ? readChunkStream( data, func )
             : readIdentityStream( data, func );
     }

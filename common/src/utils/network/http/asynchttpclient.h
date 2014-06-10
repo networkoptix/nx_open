@@ -112,6 +112,11 @@ namespace nx_http
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
         void setResponseReadTimeoutMs( int _responseReadTimeoutMs );
+        /*!
+            By default \a true.
+            \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
+        */
+        void setDecodeChunkedMessageBody( bool val );
 
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
