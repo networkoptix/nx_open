@@ -89,6 +89,7 @@ for var in "${LIBS_TO_COPY[@]}"
 do
   cp $LIBS_DIR/${var}   $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
   if [ ! -z "$STRIP" ]; then
+     echo $STRIP
      $STRIP $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
   fi
 done
