@@ -192,17 +192,13 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
 
-    connect(ui->checkBoxMaxArchive,      SIGNAL(clicked()),                 this,   SLOT(at_checkBoxArchive_clicked()));
-    connect(ui->checkBoxMaxArchive,      SIGNAL(stateChanged(int)),         this,   SLOT(updateMaxDaysEnabledState()));
-    connect(ui->checkBoxMaxArchive,      SIGNAL(stateChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
-
     connect(ui->checkBoxMinArchive,      SIGNAL(clicked()),                 this,   SLOT(at_checkBoxArchive_clicked()));
-    connect(ui->checkBoxMinArchive,      SIGNAL(stateChanged(int)),         this,   SLOT(updateMaxDaysEnabledState()));
+    connect(ui->checkBoxMinArchive,      SIGNAL(stateChanged(int)),         this,   SLOT(updateDaysEnabledState()));
     connect(ui->checkBoxMinArchive,      SIGNAL(stateChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
     connect(ui->checkBoxMinArchive,      SIGNAL(valueChanged(int)),         this,   SLOT(at_archiveRangeChanged()));
 
     connect(ui->checkBoxMaxArchive,      SIGNAL(clicked()),                 this,   SLOT(at_checkBoxArchive_clicked()));
-    connect(ui->checkBoxMaxArchive,      SIGNAL(stateChanged(int)),         this,   SLOT(updateMaxDaysEnabledState()));
+    connect(ui->checkBoxMaxArchive,      SIGNAL(stateChanged(int)),         this,   SLOT(updateDaysEnabledState()));
     connect(ui->checkBoxMaxArchive,      SIGNAL(stateChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
     connect(ui->checkBoxMaxArchive,      SIGNAL(valueChanged(int)),         this,   SLOT(at_archiveRangeChanged()));
 
@@ -655,7 +651,7 @@ bool QnCameraScheduleWidget::isRecordingParamsAvailable() const
 }
 
 
-void QnCameraScheduleWidget::updateMaxDaysEnabledState()
+void QnCameraScheduleWidget::updateDaysEnabledState()
 {
     bool isEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
     ui->spinBoxMaxDays->setEnabled(isEnabled && ui->checkBoxMaxArchive->checkState() == Qt::Checked);

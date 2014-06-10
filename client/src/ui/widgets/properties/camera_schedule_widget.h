@@ -96,7 +96,7 @@ signals:
 private slots:
     void updateGridParams(bool fromUserInput = false);
     void updateGridEnabledState();
-    void updateMaxDaysEnabledState();
+    void updateDaysEnabledState();
     void updateLicensesLabelText();
     void updateMotionButtons();
     void updatePanicLabelText();
