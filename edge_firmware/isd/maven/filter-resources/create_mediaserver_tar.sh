@@ -30,7 +30,7 @@ BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
 BOX_NAME=${box}
 
-PACKAGE_NAME=$CUSTOMIZATION-$PRODUCT_NAME-$MODULE_NAME-$VERSION-$BOX_NAME.tar.gz
+PACKAGE_NAME=$CUSTOMIZATION-$MODULE_NAME-$VERSION-$BOX_NAME.tar.gz
 
 BUILD_DIR=/tmp/hdw_$BOX_NAME_build.tmp
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
@@ -89,6 +89,7 @@ for var in "${LIBS_TO_COPY[@]}"
 do
   cp $LIBS_DIR/${var}   $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
   if [ ! -z "$STRIP" ]; then
+     echo $STRIP
      $STRIP $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
   fi
 done
