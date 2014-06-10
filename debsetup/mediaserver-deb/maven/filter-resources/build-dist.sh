@@ -31,7 +31,7 @@ SERVER_LIB_PLUGIN_PATH=$SERVER_BIN_PATH/plugins
 SCRIPTS_PATH=${basedir}/../scripts
 
 # Prepare stage dir
-rm -rf $STAGEBASE
+rm -rf $STAGE
 mkdir -p $BINSTAGE
 mkdir -p $BINSTAGE/imageformats
 mkdir -p $LIBSTAGE
