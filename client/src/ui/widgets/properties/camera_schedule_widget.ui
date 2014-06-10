@@ -77,7 +77,7 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="5">
+     <item row="0" column="4">
       <widget class="QSpinBox" name="spinBoxMaxDays">
        <property name="minimum">
         <number>1</number>
@@ -87,7 +87,7 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="7">
+     <item row="0" column="5">
       <spacer name="horizontalSpacer_5">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -100,47 +100,21 @@
        </property>
       </spacer>
      </item>
-     <item row="0" column="1">
-      <widget class="QCheckBox" name="checkBoxMaxArchive">
+     <item row="0" column="0">
+      <widget class="QCheckBox" name="checkBoxMinArchive">
        <property name="text">
-        <string>Strict archive range. Min:</string>
+        <string>Min archive days</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
-      <spacer name="horizontalSpacer_6">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Fixed</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="0" column="6">
-      <widget class="QLabel" name="maxArchiveLabel">
-       <property name="text">
-        <string>days</string>
+     <item row="0" column="1">
+      <widget class="QSpinBox" name="spinBoxMinDays">
+       <property name="minimum">
+        <number>1</number>
        </property>
       </widget>
      </item>
      <item row="0" column="2">
-      <widget class="QSpinBox" name="spinBoxMinDays"/>
-     </item>
-     <item row="0" column="4">
-      <widget class="QLabel" name="minArchiveLabel">
-       <property name="text">
-        <string>Max: </string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="3">
       <spacer name="horizontalSpacer_8">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -150,11 +124,18 @@
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>8</width>
+         <width>16</width>
          <height>20</height>
         </size>
        </property>
       </spacer>
+     </item>
+     <item row="0" column="3">
+      <widget class="QCheckBox" name="checkBoxMaxArchive">
+       <property name="text">
+        <string>Max archive days</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

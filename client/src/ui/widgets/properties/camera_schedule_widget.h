@@ -106,7 +106,7 @@ private slots:
 
     void at_gridWidget_cellActivated(const QPoint &cell);
     void at_enableRecordingCheckBox_clicked();
-    void at_checkBoxMaxArchive_clicked();
+    void at_checkBoxArchive_clicked();
     void at_displayQualiteCheckBox_stateChanged(int state);
     void at_displayFpsCheckBox_stateChanged(int state);
     void at_licensesButton_clicked();

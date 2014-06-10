@@ -173,11 +173,12 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
         camera->setAuth(cameraLogin, cameraPassword);
 
         int maxDays = ui->cameraScheduleWidget->maxRecordedDays();
-        if (maxDays != QnCameraScheduleWidget::RecordedDaysDontChange) {
+        if (maxDays != QnCameraScheduleWidget::RecordedDaysDontChange)
             camera->setMaxDays(maxDays);
-            camera->setMinDays(ui->cameraScheduleWidget->minRecordedDays());
-        }
-
+        int minDays = ui->cameraScheduleWidget->minRecordedDays();
+        if (minDays != QnCameraScheduleWidget::RecordedDaysDontChange)
+            camera->setMinDays(minDays);
+        
         if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && ui->enableAudioCheckBox->isEnabled()) 
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
 
