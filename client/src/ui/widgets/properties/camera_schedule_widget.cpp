@@ -196,6 +196,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->checkBoxMaxArchive,      SIGNAL(stateChanged(int)),         this,   SLOT(updateMaxDaysEnabledState()));
     connect(ui->checkBoxMaxArchive,      SIGNAL(stateChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
 
+    connect(ui->spinBoxMinDays,          SIGNAL(valueChanged(int)),         this,   SLOT(at_archiveRangeChanged()));
+    connect(ui->spinBoxMaxDays,          SIGNAL(valueChanged(int)),         this,   SLOT(at_archiveRangeChanged()));
     connect(ui->spinBoxMinDays,          SIGNAL(valueChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
     connect(ui->spinBoxMaxDays,          SIGNAL(valueChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
 
@@ -310,7 +312,7 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     bool mixedArchiveDays = false;
 
     static const int DEFAULT_MAX_DAYS = 30;
-    static const int DEFAULT_MIN_DAYS = 1;
+    static const int DEFAULT_MIN_DAYS = 0;
     foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
     {
         (camera->isScheduleDisabled() ? disabledCount : enabledCount)++;
@@ -976,4 +978,13 @@ int QnCameraScheduleWidget::minRecordedDays() const
         return RecordedDaysDontChange;
     else
         return ui->spinBoxMinDays->value() * (ui->checkBoxMaxArchive->isChecked() ? 1 : -1);
+}
+
+void QnCameraScheduleWidget::at_archiveRangeChanged()
+{
+    if (ui->checkBoxMaxArchive->checkState() == Qt::Checked)
+    {
+        if (ui->spinBoxMaxDays->value() < ui->spinBoxMinDays->value())
+            ui->spinBoxMaxDays->setValue(ui->spinBoxMinDays->value());
+    }
 }

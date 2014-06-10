@@ -112,7 +112,7 @@ private slots:
     void at_licensesButton_clicked();
     void at_releaseSignalizer_activated(QObject *target);
     void at_exportScheduleButton_clicked();
-
+    void at_archiveRangeChanged();
 private:
     int qualityToComboIndex(const Qn::StreamQuality& q);
 
