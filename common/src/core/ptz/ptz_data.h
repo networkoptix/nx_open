@@ -11,6 +11,7 @@
 #include "ptz_preset.h"
 #include "ptz_tour.h"
 #include "ptz_object.h"
+#include "ptz_auxilary_trait.h"
 
 struct QnPtzData {
     QnPtzData() {}
@@ -28,6 +29,7 @@ struct QnPtzData {
     QnPtzTourList tours;
     QnPtzObject activeObject;
     QnPtzObject homeObject;
+    QnPtzAuxilaryTraitList auxilaryTraits;
 };
 #define QnPtzData_Fields (query)(fields)(capabilities)(logicalPosition)(devicePosition)(logicalLimits)(deviceLimits)(flip)(presets)(tours)(activeObject)(homeObject)
 

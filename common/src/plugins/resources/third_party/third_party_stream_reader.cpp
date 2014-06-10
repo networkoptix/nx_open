@@ -52,7 +52,7 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
 
 void ThirdPartyStreamReader::onGotVideoFrame( QnCompressedVideoDataPtr videoData )
 {
-    parent_type::onGotVideoFrame( videoData );
+    base_type::onGotVideoFrame( videoData );
 }
 
 static int sensitivityToMask[10] = 
@@ -72,7 +72,7 @@ static int sensitivityToMask[10] =
 void ThirdPartyStreamReader::updateSoftwareMotion()
 {
     if( m_thirdPartyRes->getMotionType() != Qn::MT_HardwareGrid )
-        return parent_type::updateSoftwareMotion();
+        return base_type::updateSoftwareMotion();
 
     if( m_thirdPartyRes->getVideoLayout()->channelCount() == 0 )
         return;
@@ -238,7 +238,9 @@ void ThirdPartyStreamReader::pleaseStop()
 {
     CLServerPushStreamReader::pleaseStop();
     if( m_liveStreamReader )
+    {
         m_liveStreamReader->interrupt();
+    }
     else if( m_builtinStreamReader )
     {
         QnStoppable* stoppable = dynamic_cast<QnStoppable*>(m_builtinStreamReader.get());

@@ -89,7 +89,7 @@ QnStorageManager::QnStorageManager():
     m_testStorageThread = new TestStorageThread(this);
 }
 
-QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const QVector<DeviceFileCatalog::Chunk>& chunks)
+std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
 {
     const QByteArray& mac = fileCatalog->getMac();
     QnServer::ChunksCatalog catalog = fileCatalog->getCatalog();
@@ -108,18 +108,20 @@ QVector<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(c
 
     /* Check new records, absent in the DB
     */
-    QStringList emptyFileList;
+    QVector<DeviceFileCatalog::EmptyFileInfo> emptyFileList;
     QString rootDir = closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixByCatalog(catalog) + QString('/') + mac;
     DeviceFileCatalog::ScanFilter filter;
-    if (!chunks.isEmpty())
-        filter.scanAfter = chunks.last();
+    if (!chunks.empty())
+        filter.scanAfter = chunks[chunks.size()-1];
 
     QMap<qint64, DeviceFileCatalog::Chunk> newChunksMap;
     fileCatalog->scanMediaFiles(rootDir, storage, newChunksMap, emptyFileList, filter);
-    QVector<DeviceFileCatalog::Chunk> newChunks = newChunksMap.values().toVector();
+    std::deque<DeviceFileCatalog::Chunk> newChunks; // = newChunksMap.values().toVector();
+    for(auto itr = newChunksMap.begin(); itr != newChunksMap.end(); ++itr)
+        newChunks.push_back(itr.value());
 
-    foreach(const QString& fileName, emptyFileList)
-        qnFileDeletor->deleteFile(fileName);
+    foreach(const DeviceFileCatalog::EmptyFileInfo& emptyFile, emptyFileList)
+        qnFileDeletor->deleteFile(emptyFile.fileName);
 
     // add to DB
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
@@ -834,18 +836,18 @@ void QnStorageManager::replaceChunks(const QnTimePeriod& rebuildPeriod, const Qn
     int storageIndex = storage->getIndex();
     
     // add new recorded chunks to scan data
-    qint64 scannedDataLastTime = newCatalog->m_chunks.isEmpty() ? 0 : newCatalog->m_chunks.last().startTimeMs;
+    qint64 scannedDataLastTime = newCatalog->m_chunks.empty() ? 0 : newCatalog->m_chunks[newCatalog->m_chunks.size()-1].startTimeMs;
     qint64 rebuildLastTime = qMax(rebuildPeriod.endTimeMs(), scannedDataLastTime);
     
     DeviceFileCatalogPtr ownCatalog = getFileCatalogInternal(mac, catalog);
-    QVector<DeviceFileCatalog::Chunk>::const_iterator itr = qLowerBound(ownCatalog->m_chunks.begin(), ownCatalog->m_chunks.end(), rebuildLastTime);
+    auto itr = qLowerBound(ownCatalog->m_chunks.begin(), ownCatalog->m_chunks.end(), rebuildLastTime);
     for (; itr != ownCatalog->m_chunks.end(); ++itr)
     {
         if (itr->storageIndex == storageIndex) {
 
             if (!newCatalog->isEmpty()) 
             {
-                DeviceFileCatalog::Chunk& lastChunk = newCatalog->m_chunks.last();
+                DeviceFileCatalog::Chunk& lastChunk = newCatalog->m_chunks[newCatalog->m_chunks.size()-1];
                 if (lastChunk.startTimeMs == itr->startTimeMs) {
                     lastChunk.durationMs = qMax(lastChunk.durationMs, itr->durationMs);
                         continue;

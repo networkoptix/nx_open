@@ -77,7 +77,7 @@ public:
     int getRelayAutoResetTimeout() const;
     void setRelayAutoResetTimeout(int value);
 
-    // TODO: #GDM this one seems not to be used anywhere. Why? Can it be removed? Ask Roma/Andrey.
+    // TODO: #GDM #Business this one seems not to be used anywhere. Why? Can it be removed? Ask Roma/Andrey.
     QString getParamsKey() const;
     void setParamsKey(QString value);
 

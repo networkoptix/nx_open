@@ -78,9 +78,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 
     setHelpTopic(this, Qn::Login_Help);
 
-    /* Don't allow to save passwords, at least for now. */
-    //ui->savePasswordCheckBox->hide();
-
     static const char *introNames[] = { "intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg", NULL };
     QString introPath;
     for(const char **introName = introNames; *introName != NULL; introName++) {

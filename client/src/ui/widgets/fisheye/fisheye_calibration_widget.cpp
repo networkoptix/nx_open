@@ -63,7 +63,7 @@ void QnFisheyeCalibrationWidget::init() {
 }
 
 void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
-    // TODO: #GDM ownership is not clear. Does this object claim ownership of provider?
+    // TODO: #GDM #Common ownership is not clear. Does this object claim ownership of provider?
     // If not, then it should not rely on destruction order => need to store provider in 
     // QPointer and check that it's alive before usage.
 

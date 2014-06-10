@@ -62,7 +62,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         data.isWritable = storage->isStorageAvailableForWriting();
         data.isUsedForWriting = storage->isUsedForWriting();
 
-        if( data.totalSpace < MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong() )
+        if( data.totalSpace < MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() )
             continue;
 
         // TODO: #Elric remove once UnknownSize is dropped.
@@ -86,7 +86,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         if(hasStorage)
             continue;
 
-        const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong();
+        const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
 
         QnStorageSpaceData data;
         data.path = partition.path + lit(QN_MEDIA_FOLDER_NAME) + QDir::separator();

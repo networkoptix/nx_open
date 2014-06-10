@@ -437,7 +437,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapp
         return CameraDiagnostics::RequestFailedResult( QLatin1String("getProfiles"), soapWrapper.getLastError() );
     }
 
-    Profile* profile = fetchExistingProfile(response, isPrimary);
+    Profile* profile = fetchExistingProfile(response, isPrimary, info);
     if (profile) {
         info.profileToken = QString::fromStdString(profile->token);
     }
@@ -482,7 +482,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::createNewProfile(const QString& n
     return CameraDiagnostics::NoErrorResult();
 }
 
-Profile* QnOnvifStreamReader::fetchExistingProfile(const ProfilesResp& response, bool isPrimary) const
+Profile* QnOnvifStreamReader::fetchExistingProfile(const ProfilesResp& response, bool isPrimary, CameraInfoParams& info) const
 {
     QStringList availableProfiles;
     QString noProfileName = isPrimary ? QLatin1String(NETOPTIX_PRIMARY_NAME) : QLatin1String(NETOPTIX_SECONDARY_NAME);
@@ -500,12 +500,26 @@ Profile* QnOnvifStreamReader::fetchExistingProfile(const ProfilesResp& response,
         availableProfiles << QString::fromStdString(profile->token);
     }
 
+    // try to select profile with necessary VideoEncoder to avoid change video encoder inside profile (some cameras doesn't support it. It can be checked via getCompatibleVideoEncoders from profile)
+    iter = response.Profiles.begin();
+    for (; iter != response.Profiles.end(); ++iter) 
+    {
+        Profile* profile = *iter;
+        if (!profile)
+            continue;
+        bool vSourceMatched = profile->VideoSourceConfiguration && profile->VideoSourceConfiguration->token == info.videoSourceId.toStdString();
+        bool vEncoderMatched = profile->VideoEncoderConfiguration && profile->VideoEncoderConfiguration->token == info.videoEncoderId.toStdString();
+        if (vSourceMatched && vEncoderMatched)
+            return profile;
+    }
+
+    // try to select profile by is lexicographical order
     qSort(availableProfiles);
     int profileIndex = isPrimary ? 0 : 1;
     profileIndex += m_onvifRes->getChannel()* (m_onvifRes->hasDualStreaming() ? 2 : 1);
-
     if (availableProfiles.size() <= profileIndex)
         return 0; // no existing profile matched
+
 
     QString reqProfileToken = availableProfiles[profileIndex];
     for (iter = response.Profiles.begin(); iter != response.Profiles.end(); ++iter) {

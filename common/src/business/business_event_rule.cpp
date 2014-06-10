@@ -80,7 +80,7 @@ QnBusiness::ActionType QnBusinessEventRule::actionType() const {
 
 void QnBusinessEventRule::setActionType(QnBusiness::ActionType actionType) {
     m_actionType = actionType;
-    //TODO: #GDM fill action params with default values? filter action resources?
+    //TODO: #GDM #Business fill action params with default values? filter action resources?
 }
 
 QVector<QnId> QnBusinessEventRule::actionResources() const {

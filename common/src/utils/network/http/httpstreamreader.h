@@ -66,6 +66,11 @@ namespace nx_http
         void resetState();
         //!Flush all internal buffers (if any), so that all data is available through public API
         void flush();
+        /*!
+            By default \a true.
+            \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
+        */
+        void setDecodeChunkedMessageBody( bool val );
 
     private:
         // TODO: #Elric #enum
@@ -97,6 +102,7 @@ namespace nx_http
         BufferType m_codedMessageBodyBuffer;
         std::unique_ptr<AbstractByteStreamFilter> m_contentDecoder;
         int m_lineEndingOffset;
+        bool m_decodeChunked;
 
         LineSplitter m_lineSplitter;
         mutable std::mutex m_mutex;

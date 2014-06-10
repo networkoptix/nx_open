@@ -85,8 +85,8 @@
         <qtlib16>Qml</qtlib16>
         <qtlib17>Positioning</qtlib17>
         <qtlib18>Sensors</qtlib18>
-        <qtlib19></qtlib19>
-        <qtlib20></qtlib20>
+        <qtlib19/>
+        <qtlib20/>
 
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
@@ -421,13 +421,14 @@
                 </property>
             </activation>
             <properties>
+                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <toolchain.version>codesourcery-2013.11</toolchain.version>
                 <compiler>2011.09</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
-		<module>edge_firmware</module>
+                <module>edge_firmware/isd</module>
             </modules>            
         </profile>
 
@@ -445,13 +446,14 @@
                 </property>
             </activation>
             <properties>
+                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f-SNAPSHOT</openssl.version>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
-		<module>edge_firmware</module>
+                <module>edge_firmware/isd</module>
             </modules>            
         </profile>
 
@@ -473,6 +475,9 @@
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
             </properties>
+            <modules>
+                <module>edge_firmware/rpi</module>
+            </modules>             
         </profile>
 
         <profile>

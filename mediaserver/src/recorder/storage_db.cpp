@@ -43,11 +43,11 @@ void QnStorageDb::addRecord(const QByteArray& mac, QnServer::ChunksCatalog catal
     if (chunk.durationMs <= 0)
         return;
 
-    if (m_lastTranTime.elapsed() < COMMIT_INTERVAL) 
-    {
-        m_delayedData << DelayedData(mac, catalog, chunk);
+    m_delayedData << DelayedData(mac, catalog, chunk);
+    QByteArray countKey = mac + QByteArray("-") + QByteArray::number((int)catalog);
+    if (m_addCount[countKey]++ > 0 &&  m_lastTranTime.elapsed() < COMMIT_INTERVAL) 
         return;
-    }
+
     flushRecords();
 
 }
@@ -82,7 +82,7 @@ bool QnStorageDb::addRecordInternal(const QByteArray& mac, QnServer::ChunksCatal
     return true;
 }
 
-bool QnStorageDb::replaceChunks(const QByteArray& mac, QnServer::ChunksCatalog catalog, const QVector<DeviceFileCatalog::Chunk>& chunks)
+bool QnStorageDb::replaceChunks(const QByteArray& mac, QnServer::ChunksCatalog catalog, const std::deque<DeviceFileCatalog::Chunk>& chunks)
 {
     beginTran();
 
@@ -99,6 +99,9 @@ bool QnStorageDb::replaceChunks(const QByteArray& mac, QnServer::ChunksCatalog c
 
     foreach(const DeviceFileCatalog::Chunk& chunk, chunks)
     {
+        if (chunk.durationMs == -1)
+            continue;
+
         if (!addRecordInternal(mac, catalog, chunk)) {
             rollback();
             return false;
@@ -344,7 +347,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
     int filesizeFieldIdx = queryInfo.indexOf("filesize");
 
     DeviceFileCatalogPtr fileCatalog;
-    QVector<DeviceFileCatalog::Chunk> chunks;
+    std::deque<DeviceFileCatalog::Chunk> chunks;
     QnServer::ChunksCatalog prevCatalog = QnServer::ChunksCatalogCount; //should differ from all existing catalogs
     QByteArray prevMac;
     while (query.next())
@@ -368,7 +371,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
         int timezone = query.value(timezoneFieldIdx).toInt();
         int fileNum = query.value(fileNumFieldIdx).toInt();
         int durationMs = query.value(durationFieldIdx).toInt();
-        chunks << DeviceFileCatalog::Chunk(startTime, m_storageIndex, fileNum, durationMs, (qint16) timezone, (quint16) (filesize >> 32), (quint32) filesize);
+        chunks.push_back(DeviceFileCatalog::Chunk(startTime, m_storageIndex, fileNum, durationMs, (qint16) timezone, (quint16) (filesize >> 32), (quint32) filesize));
     }
     if (fileCatalog) {
         fileCatalog->addChunks(chunks);
@@ -393,7 +396,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
     int durationFieldIdx = queryInfo.indexOf("duration");
 
     DeviceFileCatalogPtr fileCatalog;
-    QVector<DeviceFileCatalog::Chunk> chunks;
+    std::deque<DeviceFileCatalog::Chunk> chunks;
     QByteArray prevMac;
     while (query.next())
     {
@@ -410,7 +413,7 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadBookmarksFileCatalog() {
         }
         qint64 startTime = query.value(startTimeFieldIdx).toLongLong();
         int durationMs = query.value(durationFieldIdx).toInt();
-        chunks << DeviceFileCatalog::Chunk(startTime, m_storageIndex, 0, durationMs, 0, 0, 0);
+        chunks.push_back(DeviceFileCatalog::Chunk(startTime, m_storageIndex, 0, durationMs, 0, 0, 0));
     }
     if (fileCatalog) {
         fileCatalog->addChunks(chunks);

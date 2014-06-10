@@ -395,15 +395,20 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setParam( lit("motionWindowCnt"), 100, QnDomainDatabase );
         setParam( lit("motionMaskWindowCnt"), 100, QnDomainDatabase );
         setParam( lit("motionSensWindowCnt"), 100, QnDomainDatabase );
+        setParam( lit("supportedMotion"), QStringLiteral("softwaregrid,hardwaregrid"), QnDomainDatabase );
     }
     else
+    {
         setMotionType( Qn::MT_SoftwareGrid );
+        setParam( lit("supportedMotion"), QStringLiteral("softwaregrid"), QnDomainDatabase );
+    }
     if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
 		setStreamFpsSharingMethod(Qn::BasicFpsSharing);
     else if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
 		setStreamFpsSharingMethod(Qn::PixelsFpsSharing);
     else 
         setStreamFpsSharingMethod(Qn::NoFpsSharing);
+        
 
     QVector<EncoderData> encoderDataTemp;
     encoderDataTemp.resize( m_encoderCount );

@@ -22,9 +22,8 @@
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int MSERVER_OFFLINE_TIMEOUT = 1000 * 60 * 5;
 
-QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager( const CameraDriverRestrictionList& cameraDriverRestrictionList )
+QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
 :
-    QnResourceDiscoveryManager( &cameraDriverRestrictionList ),
     m_foundSmth(false)
 {
     netStateTime.restart();

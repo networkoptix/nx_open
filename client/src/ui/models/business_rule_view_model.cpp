@@ -218,7 +218,7 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
         {
             QnBusinessActionParameters params = m_actionParams;
 
-            // TODO: #GDM you're implicitly relying on what enum values are, which is very bad.
+            // TODO: #GDM #Business you're implicitly relying on what enum values are, which is very bad.
             // This code will fail silently if someone changes the header. Please write it properly.
             
             params.setUserGroup((QnBusinessActionParameters::UserGroup)value.toInt()); 
@@ -282,7 +282,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     m_schedule = businessRule->schedule();
     m_system = businessRule->isSystem();
 
-    updateActionTypesModel();//TODO: #GDM connect on dataChanged?
+    updateActionTypesModel();//TODO: #GDM #Business connect on dataChanged?
 
     emit dataChanged(this, QnBusiness::AllFieldsMask);
 }
@@ -306,8 +306,8 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
         rule->setEventResources(toIdList(m_eventResources.filtered<QnMediaServerResource>()));
     else
         rule->setEventResources(QVector<QnId>());
-    rule->setEventState(m_eventState);   //TODO: #GDM check
-    rule->setEventParams(m_eventParams); //TODO: #GDM filtered
+    rule->setEventState(m_eventState);   //TODO: #GDM #Business check
+    rule->setEventParams(m_eventParams); //TODO: #GDM #Business filtered
     rule->setActionType(m_actionType);
     if (QnBusiness::requiresCameraResource(m_actionType))
         rule->setActionResources(toIdList(m_actionResources.filtered<QnVirtualCameraResource>()));
@@ -315,7 +315,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
         rule->setActionResources(toIdList(m_actionResources.filtered<QnUserResource>()));
     else
         rule->setActionResources(QVector<QnId>());
-    rule->setActionParams(m_actionParams); //TODO: #GDM filtered
+    rule->setActionParams(m_actionParams); //TODO: #GDM #Business filtered
     rule->setAggregationPeriod(m_aggregationPeriod);
     rule->setDisabled(m_disabled);
     rule->setComment(m_comments);
@@ -378,7 +378,7 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value) {
     updateActionTypesModel();
 
     emit dataChanged(this, fields);
-    //TODO: #GDM check others, params and resources should be merged
+    //TODO: #GDM #Business check others, params and resources should be merged
 }
 
 
@@ -388,7 +388,7 @@ QnResourceList QnBusinessRuleViewModel::eventResources() const {
 
 void QnBusinessRuleViewModel::setEventResources(const QnResourceList &value) {
     if (m_eventResources == value)
-        return; //TODO: #GDM check equal
+        return; //TODO: #GDM #Business check equal
 
     m_eventResources = value;
     m_modified = true;
@@ -636,8 +636,8 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
     switch (column) {
     case QnBusiness::SourceColumn:
     {
-        //TODO: #GDM check all variants or resource requirements: userResource, serverResource
-        QnResourceList resources = m_eventResources; //TODO: #GDM filtered by type
+        //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
+        QnResourceList resources = m_eventResources; //TODO: #GDM #Business filtered by type
         if (!QnBusiness::isResourceRequired(m_eventType)) {
             return qnResIconCache->icon(QnResourceIconCache::Servers);
         } else if (resources.size() == 1) {
@@ -674,8 +674,8 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
             break;
         }
 
-        //TODO: #GDM check all variants or resource requirements: userResource, serverResource
-        QnResourceList resources = m_actionResources; //TODO: #GDM filtered by type
+        //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
+        QnResourceList resources = m_actionResources; //TODO: #GDM #Business filtered by type
         if (!QnBusiness::requiresCameraResource(m_actionType)) {
             return qnResIconCache->icon(QnResourceIconCache::Servers);
         } else if (resources.size() == 1) {
@@ -686,7 +686,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
         } else {
             return qnResIconCache->icon(QnResourceIconCache::Camera);
         }
-        //TODO: #GDM special icon for sound action
+        //TODO: #GDM #Business special icon for sound action
     }
     default:
         break;
@@ -759,7 +759,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             break;
         }
 
-        //TODO: #GDM check all variants or resource requirements: userResource, serverResource
+        //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
         QnResourceList resources = m_actionResources.filtered<QnVirtualCameraResource>();
         if (QnBusiness::requiresCameraResource(m_actionType) && resources.isEmpty()) {
             return false;
@@ -789,7 +789,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
     else if (m_eventType == QnBusiness::CameraInputEvent)
         return QnCameraInputPolicy::getText(m_eventResources, detailed);
 
-    QnResourceList resources = m_eventResources; //TODO: #GDM filtered by type
+    QnResourceList resources = m_eventResources; //TODO: #GDM #Business filtered by type
     if (!QnBusiness::isResourceRequired(m_eventType)) {
         return tr("<System>");
     } else if (resources.size() == 1) {
@@ -858,7 +858,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         break;
     }
 
-    //TODO: #GDM check all variants or resource requirements: userResource, serverResource
+    //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
     QnResourceList resources = m_actionResources;
     if (!QnBusiness::requiresCameraResource(m_actionType)) {
         return tr("<System>");

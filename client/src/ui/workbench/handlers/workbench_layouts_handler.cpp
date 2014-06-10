@@ -90,8 +90,8 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
         QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
         exportHandler->saveLocalLayout(layout, isReadOnly, true); // overwrite layout file
     } else {
-        //TODO: #GDM check existing layouts.
-        //TODO: #GDM all remotes layout checking and saving should be done in one place
+        //TODO: #GDM #Common check existing layouts.
+        //TODO: #GDM #Common all remotes layout checking and saving should be done in one place
         snapshotManager()->save(layout, this, SLOT(at_layouts_saved(int, const QnResourceList &, int)));
     }
 }
@@ -118,7 +118,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         dialog->setName(layout->getName());
         setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
 
-        QMessageBox::Button button;
+        QMessageBox::Button button = QMessageBox::Cancel;
         do {
             dialog->exec();
             if(dialog->clickedButton() != QDialogButtonBox::Save)

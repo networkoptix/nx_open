@@ -30,7 +30,7 @@ namespace Qn
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat)
-    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes ServerFlags)
+    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities PtzTraits MotionTypes TimePeriodTypes ServerFlags)
 public:
 #else
     Q_NAMESPACE
@@ -84,6 +84,7 @@ public:
 
     enum PtzCommand {
         ContinuousMovePtzCommand,
+        ContinuousFocusPtzCommand,
         AbsoluteDeviceMovePtzCommand,
         AbsoluteLogicalMovePtzCommand,
         ViewportMovePtzCommand,
@@ -109,6 +110,9 @@ public:
         UpdateHomeObjectPtzCommand,
         GetHomeObjectPtzCommand,
 
+        GetAuxilaryTraitsPtzCommand,
+        RunAuxilaryCommandPtzCommand,
+
         GetDataPtzCommand,
 
         InvalidPtzCommand = -1
@@ -125,6 +129,7 @@ public:
         ToursPtzField           = 0x080,
         ActiveObjectPtzField    = 0x100,
         HomeObjectPtzField      = 0x200,
+        AuxilaryTraitsPtzField  = 0x400,
         NoPtzFields             = 0x000,
         AllPtzFields            = 0xFFF
     };
@@ -151,6 +156,7 @@ public:
         ContinuousPanCapability             = 0x00000001,
         ContinuousTiltCapability            = 0x00000002,
         ContinuousZoomCapability            = 0x00000004,
+        ContinuousFocusCapability           = 0x00000008,
 
         AbsolutePanCapability               = 0x00000010,
         AbsoluteTiltCapability              = 0x00000020,
@@ -173,6 +179,8 @@ public:
         SynchronizedPtzCapability           = 0x00200000,
         VirtualPtzCapability                = 0x00400000,
 
+        AuxilaryPtzCapability               = 0x01000000,
+
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
@@ -182,6 +190,17 @@ public:
 
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities)
+
+
+
+    enum PtzTrait {
+        NoPtzTraits             = 0x00,
+        FourWayPtzTrait         = 0x01,
+        EightWayPtzTrait        = 0x02,
+        ManualAutoFocusPtzTrait = 0x04,
+    };
+    Q_DECLARE_FLAGS(PtzTraits, PtzTrait);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzTraits);
 
 
     enum StreamFpsSharingMethod {
@@ -451,7 +470,6 @@ public:
     static const qint64 InvalidUtcOffset = INT64_MAX;
 #define InvalidUtcOffset InvalidUtcOffset
 
-
     /** 
      * Helper function that can be used to 'place' macros into Qn namespace. 
      */
@@ -479,7 +497,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
         (Qn::SerializationFormat)(Qn::PropertyDataType), 
     (metatype)(lexical)

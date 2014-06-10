@@ -162,7 +162,7 @@ namespace ec2
         {
             ErrorCode errorCode = ErrorCode::ok;
             QList<QPair<QnAbstractTransaction, QByteArray>> processedTran;
-            processedTran.reserve( nestedList.size() + (isParentObjectTran ? 1 : 0) );
+            processedTran.reserve(static_cast<int>(nestedList.size() + (isParentObjectTran ? 1 : 0)));
 
             auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
                 QnScopedThreadRollback ensureFreeThread(1);

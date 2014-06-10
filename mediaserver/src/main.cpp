@@ -141,6 +141,7 @@
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
 #include "compatibility.h"
+#include "media_server/file_connection_processor.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -328,7 +329,7 @@ QnStorageResourcePtr createStorage(const QString& path)
     QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
     storage->setUrl(path);
-    storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong() );
+    storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
     storage->setUsedForWriting(storage->isStorageAvailableForWriting());
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     Q_ASSERT(resType);
@@ -654,20 +655,20 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
 {
     QUrl appServerEventsUrl;
 
-    //TODO: #GDM move to server_message_processor as in client
+    //TODO: #GDM #Common move to server_message_processor as in client or remove if it is not needed anymore
     // ### remove
-    appServerEventsUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
+   /* appServerEventsUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
     appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
     appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-    appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
-    appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
+    appServerEventsUrl.setUserName(settings.value("appserverLogin").toString());
+    appServerEventsUrl.setPassword(settings.value("appserverPassword").toString());
     appServerEventsUrl.setPath("/events/");
     QUrlQuery appServerEventsUrlQuery;
     appServerEventsUrlQuery.addQueryItem("xid", mediaServer->getId().toString());
     appServerEventsUrlQuery.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
     appServerEventsUrlQuery.addQueryItem("version", QN_ENGINE_VERSION);
     appServerEventsUrlQuery.addQueryItem("format", "pb");
-    appServerEventsUrl.setQuery( appServerEventsUrlQuery );
+    appServerEventsUrl.setQuery( appServerEventsUrlQuery );*/
 
     //QnServerMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
 }
@@ -1007,6 +1008,7 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
+    m_universalTcpListener->addHandler<QnFileConnectionProcessor>("HTTP", "web/static");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
     //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
@@ -1114,6 +1116,9 @@ void QnMain::run()
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping*"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
     QnEventsDB::init();
@@ -1132,7 +1137,7 @@ void QnMain::run()
 
     QSettings* settings = MSSettings::roSettings();
 
-    std::unique_ptr<QnMServerResourceDiscoveryManager> mserverResourceDiscoveryManager( new QnMServerResourceDiscoveryManager(cameraDriverRestrictionList) );
+    std::unique_ptr<QnMServerResourceDiscoveryManager> mserverResourceDiscoveryManager( new QnMServerResourceDiscoveryManager() );
     QnResourceDiscoveryManager::init( mserverResourceDiscoveryManager.get() );
     initAppServerConnection(*settings);
 
@@ -1171,6 +1176,7 @@ void QnMain::run()
         }
 
         NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR );
+        QnSleep::msleep(3000);
     }
 
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
@@ -1331,7 +1337,7 @@ void QnMain::run()
         QnStorageResourcePtr newStorage = QnStorageResourcePtr(new QnFileStorageResource());
         newStorage->setId(QnId::createUuid());
         newStorage->setUrl(path);
-        newStorage->setSpaceLimit( settings->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong() );
+        newStorage->setSpaceLimit( settings->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
         newStorage->setUsedForWriting(false);
         newStorage->addFlags(QnResource::deprecated);
 
@@ -1376,7 +1382,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
 
     //NOTE plugins have higher priority than built-in drivers
-    ThirdPartyResourceSearcher thirdPartyResourceSearcher( &cameraDriverRestrictionList );
+    ThirdPartyResourceSearcher thirdPartyResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer( &thirdPartyResourceSearcher );
 
 #ifdef ENABLE_DESKTOP_CAMERA

@@ -58,6 +58,7 @@ namespace {
         );
     }
 
+    // TODO: #Elric use QnPtzUtilities
     QString actiZoomDirection(int deviceZoomSpeed) {
         if(deviceZoomSpeed < 0) {
             return lit("WIDE");

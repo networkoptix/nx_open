@@ -33,12 +33,14 @@ namespace nx_hls
         */
         HLSSession(
             const QString& id,
+            unsigned int targetDurationMS,
             bool _isLive,
             MediaQuality streamQuality,
             QnVideoCamera* const videoCamera );
         ~HLSSession();
 
         const QString& id() const;
+        unsigned int targetDurationMS() const;
         bool isLive() const;
         MediaQuality streamQuality() const;
 
@@ -49,9 +51,10 @@ namespace nx_hls
         bool getChunkByAlias( MediaQuality streamQuality, const QString& alias, quint64* const startTimestamp, quint64* const duration ) const;
 
     private:
-        QString m_id;
-        bool m_live;
-        MediaQuality m_streamQuality;
+        const QString m_id;
+        const unsigned int m_targetDurationMS;
+        const bool m_live;
+        const MediaQuality m_streamQuality;
         QnVideoCamera* const m_videoCamera;
         std::vector<QSharedPointer<AbstractPlaylistManager> > m_playlistManagers;
         //!map<pair<quality, alias>, pair<start timestamp, duration> >
@@ -102,7 +105,7 @@ namespace nx_hls
             \param keepAliveTimeoutSec Session will be removed, if noone uses it for \a keepAliveTimeoutSec seconds. 0 is treated as no timeout
             \return false, if session with id \a session->id() already exists. true, otherwise
         */
-        bool add( HLSSession* session, int keepAliveTimeoutSec );
+        bool add( HLSSession* session, unsigned int keepAliveTimeoutMS );
         /*!
             \return NULL, if session not found
             \note Re-launches session deletion timer for \a keepAliveTimeoutSec
@@ -126,13 +129,13 @@ namespace nx_hls
         {
         public:
             HLSSession* session;
-            int keepAliveTimeoutSec;
+            unsigned int keepAliveTimeoutMS;
             quint64 removeTaskID;
 
             HLSSessionContext();
             HLSSessionContext(
                 HLSSession* const _session,
-                int _keepAliveTimeoutSec );
+                unsigned int _keepAliveTimeoutMS );
         };
 
         mutable QMutex m_mutex;

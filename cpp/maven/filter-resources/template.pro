@@ -135,7 +135,7 @@ win* {
 unix: {
   DEFINES += override=
   DEFINES += QN_EXPORT=  
-  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder
+  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=maybe-uninitialized
   arm {
     QMAKE_CXXFLAGS += -std=c++0x 
   } else {

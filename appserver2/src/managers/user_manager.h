@@ -13,7 +13,7 @@ namespace ec2
 {
     template<class QueryProcessorType>
     class QnUserManager
-        :
+    :
         public AbstractUserManager
     {
     public:

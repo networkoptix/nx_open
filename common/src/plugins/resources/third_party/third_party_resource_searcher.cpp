@@ -10,14 +10,14 @@
 #include "third_party_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/camera_driver_restriction_list.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 #include "../../plugin_manager.h"
 
 
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
 
-ThirdPartyResourceSearcher::ThirdPartyResourceSearcher( CameraDriverRestrictionList* cameraDriverRestrictionList )
-:
-    m_cameraDriverRestrictionList( cameraDriverRestrictionList )
+ThirdPartyResourceSearcher::ThirdPartyResourceSearcher()
 {
     QList<nxcip::CameraDiscoveryManager*> pluginList = PluginManager::instance()->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
     std::copy(
@@ -33,7 +33,7 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher( CameraDriverRestrictionL
     {
         const QList<QString>& modelList = it->getReservedModelList();
         foreach( QString modelMask, modelList )
-            m_cameraDriverRestrictionList->allow( THIRD_PARTY_MANUFACTURER_NAME, it->getVendorName(), modelMask );
+            CameraDriverRestrictionList::instance()->allow( THIRD_PARTY_MANUFACTURER_NAME, it->getVendorName(), modelMask );
     }
 }
 
@@ -302,6 +302,13 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid) );
     resource->setVendor( discoveryManager->getVendorName() );
+
+    //TODO #ak reading MaxFPS here ia a workaround of camera integration API defect: 
+        //it does not not allow plugin to return hard-coded max fps, it can only be read in initInternal
+    const QnResourceData& resourceData = qnCommon->dataPool()->data(resource);
+    const float maxFps = resourceData.value<float>( lit("MaxFPS"), 0.0 );
+    if( maxFps > 0.0 )
+        resource->setParam( lit("MaxFPS"), maxFps, QnDomainMemory );
     
     unsigned int caps;
     if (camManager->getCameraCapabilities(&caps) == 0) 

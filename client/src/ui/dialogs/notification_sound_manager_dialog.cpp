@@ -56,7 +56,7 @@ void QnNotificationSoundManagerDialog::at_playButton_clicked() {
 }
 
 void QnNotificationSoundManagerDialog::at_addButton_clicked() {
-    //TODO: #GDM progressbar required
+    //TODO: #GDM #Common progressbar required
 
     QString supportedFormats = tr("Sound files");
     supportedFormats += QLatin1String(" (*.wav *.mp3 *.ogg *.wma)");
@@ -109,7 +109,7 @@ void QnNotificationSoundManagerDialog::at_renameButton_clicked() {
 }
 
 void QnNotificationSoundManagerDialog::at_deleteButton_clicked() {
-    //TODO: #GDM progressbar required
+    //TODO: #GDM #Common progressbar required
     if (!ui->listView->currentIndex().isValid())
         return;
 

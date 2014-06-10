@@ -721,7 +721,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     if(m_currentWidget) {
         if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
             foreach(QnResourceWidget *widget, m_syncedWidgets)
-                updateItemDataFromSlider(widget); //TODO: #GDM ask #elric: should it be done at every selection change?
+                updateItemDataFromSlider(widget); //TODO: #GDM #Common ask #elric: should it be done at every selection change?
         else
             updateItemDataFromSlider(m_currentWidget);
     } else {
@@ -731,8 +731,8 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 
     if (display() && display()->isChangingLayout()) {
         // clear current widget state to avoid incorrect behavior when closing the layout
-        // see: Bug #1341: Selection on timline aren't displayed after thumbnails searching
-        // see: Bug #1344: If make a THMB search from a layout with a result of THMB searc, Timeline are not marked properly
+        // see: Bug #1341: Selection on timeline aren't displayed after thumbnails searching
+        // see: Bug #1344: If make a THMB search from a layout with a result of THMB search, Timeline are not marked properly
         m_currentWidget = NULL;
         m_currentMediaWidget = NULL;
     } else {

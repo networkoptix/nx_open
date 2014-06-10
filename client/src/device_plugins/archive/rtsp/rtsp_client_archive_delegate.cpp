@@ -805,18 +805,17 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
         if (videoLayout)
             numOfVideoChannels = videoLayout->channelCount();
     }
-    m_rtspSession.setUsePredefinedTracks(numOfVideoChannels); // ommit DESCRIBE and SETUP requests
+    m_rtspSession.setUsePredefinedTracks(numOfVideoChannels); // omit DESCRIBE and SETUP requests
     
     QString user = QnAppServerConnectionFactory::defaultUrl().userName();
     QString password = QnAppServerConnectionFactory::defaultUrl().password();
     QAuthenticator auth;
     auth.setUser(user);
     auth.setPassword(password);
-    
     m_rtspSession.setAuth(auth, RTPSession::authDigest);
 
-    if (QnSessionManager::instance()->authCookieEnabled())
-        m_rtspSession.setAdditionAttribute("cookie", QnSessionManager::instance()->authCookie().toRawForm(QNetworkCookie::NameAndValueOnly));
+    if (!QnAppServerConnectionFactory::videoWallKey().isEmpty())
+        m_rtspSession.setAdditionAttribute("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videoWallKey().toUtf8());
 }
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)

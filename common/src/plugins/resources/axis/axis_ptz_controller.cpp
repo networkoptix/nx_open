@@ -2,15 +2,21 @@
 
 #include "axis_ptz_controller.h"
 
+#include <common/common_module.h>
+
 #include <utils/math/math.h>
 #include <utils/math/space_mapper.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/serialization/lexical_functions.h>
 
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource/resource_data.h>
+
 #include "axis_resource.h"
 
 static const int DEFAULT_AXIS_API_PORT = 80; // TODO: #Elric copypasta from axis_resource.cpp
 
+// TODO: #Elric #EC2 use QnIniSection
 
 // -------------------------------------------------------------------------- //
 // QnAxisParameterMap
@@ -68,6 +74,13 @@ QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource):
     m_capabilities(Qn::NoCapabilities)
 {
     updateState();
+
+    QnResourceData data = qnCommon->dataPool()->data(resource, true);
+    m_maxDeviceSpeed = QVector3D(
+        data.value<qreal>(lit("axisMaxPanSpeed"), 100),
+        data.value<qreal>(lit("axisMaxTiltSpeed"), 100),
+        data.value<qreal>(lit("axisMaxZoomSpeed"), 100)
+    );
 }
 
 QnAxisPtzController::~QnAxisPtzController() {
@@ -197,7 +210,7 @@ bool QnAxisPtzController::queryInternal(const QString &request, QByteArray *body
             if(body) {
                 QByteArray localBody;
                 http->readAll(localBody);
-                if(body)
+                if(body) // TODO: #Elric why the double check?
                     *body = localBody;
 
                 if(localBody.startsWith("Error:")) {
@@ -291,7 +304,7 @@ Qn::PtzCapabilities QnAxisPtzController::getCapabilities() {
 }
 
 bool QnAxisPtzController::continuousMove(const QVector3D &speed) {
-    return query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * 100).arg(speed.y() * 100).arg(speed.z() * 100));
+    return query(lit("com/ptz.cgi?continuouspantiltmove=%1,%2&continuouszoommove=%3").arg(speed.x() * m_maxDeviceSpeed.x()).arg(speed.y() * m_maxDeviceSpeed.y()).arg(speed.z() * m_maxDeviceSpeed.z()));
 }
 
 bool QnAxisPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {

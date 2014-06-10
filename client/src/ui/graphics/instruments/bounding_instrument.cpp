@@ -266,7 +266,7 @@ public:
         /* Correct. */
         if(!qFuzzyCompare(m_view->viewportTransform(), m_sceneToViewport)) {
             /* Calculate old scale. */
-            qreal logOldScale;
+            qreal logOldScale = 1.0;
             if(m_isSizeCorrected)
                 calculateRelativeScale(&logOldScale);
 

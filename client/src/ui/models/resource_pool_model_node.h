@@ -9,7 +9,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-//#TODO: #GDM include resource.h
+//#TODO: #GDM #Common include resource.h
 #include <core/resource/resource.h>
 
 class QnResourcePoolModel;
@@ -97,7 +97,7 @@ protected:
     void changeInternal();
 
 private:
-    //TODO: #GDM need complete recorder nodes structure refactor to get rid of this shit
+    //TODO: #GDM #Common need complete recorder nodes structure refactor to get rid of this shit
     friend class QnResourcePoolModel;
 
     /* Node state. */
@@ -153,7 +153,7 @@ private:
     /** Whether this resource is checked. */
     Qt::CheckState m_checked;
 
-    //TODO: #GDM implement cache invalidating in case of permissions change
+    //TODO: #GDM #Common implement cache invalidating in case of permissions change
     /** Whether this resource can be renamed, cached value. */
     mutable struct {
         bool value;
