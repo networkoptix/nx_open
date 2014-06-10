@@ -28,8 +28,12 @@ void QnStorageDb::afterDelete()
     QMutexLocker lock(&m_delMutex);
 
     beginTran();
-    foreach(const DeleteRecordInfo& delRecord, m_recordsToDelete)
-        deleteRecordsInternal(delRecord);
+    foreach(const DeleteRecordInfo& delRecord, m_recordsToDelete) {
+        if (!deleteRecordsInternal(delRecord)) {
+            rollback();
+            return; // keep record list to delete. try to the next time
+        }
+    }
     commit();
 
     m_recordsToDelete.clear();

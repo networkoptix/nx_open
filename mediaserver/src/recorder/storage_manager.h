@@ -81,8 +81,8 @@ public:
     QnStorageResourceList getStorages() const;
 
     void clearSpace();
-    void clearSpace(const QnStorageResourcePtr &storage);
-
+    
+    void clearOldestSpace(const QnStorageResourcePtr &storage);
     void clearMaxDaysData();
     void clearMaxDaysData(FileCatalogMap catalogMap);
 
@@ -142,6 +142,8 @@ private:
     void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog);
     QMap<QString, QSet<int>> deserializeStorageFile();
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex, QMap<QString, QSet<int>> oldIndexes);
+    void clearUnusedMotion();
+    void updateRecordedMonths(FileCatalogMap catalogMap, QMap<QString, QSet<QDate>>& usedMonths);
 private:
     StorageMap m_storageRoots;
     FileCatalogMap m_devFileCatalog[QnServer::ChunksCatalogCount];

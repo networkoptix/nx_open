@@ -142,7 +142,7 @@ private:
     bool fileExists(const Chunk& chunk, bool checkDirOnly);
     bool addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
-    //QList<QDate> recordedMonthList();
+    QSet<QDate> recordedMonthList();
 
     void readStorageData(QnStorageResourcePtr storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList);
     Chunk chunkFromFile(QnStorageResourcePtr storage, const QString& fileName);

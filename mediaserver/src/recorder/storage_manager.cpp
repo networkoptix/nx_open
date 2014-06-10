@@ -25,6 +25,7 @@
 #include <media_server/serverutil.h>
 #include "file_deletor.h"
 #include "utils/common/synctime.h"
+#include "motion/motion_helper.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -501,10 +502,12 @@ void QnStorageManager::clearSpace()
     // 2. free storage space
     const QSet<QnStorageResourcePtr> storages = getWritableStorages();
     foreach(QnStorageResourcePtr storage, storages)
-        clearSpace(storage);
+        clearOldestSpace(storage);
 
     foreach(QnStorageDbPtr sdb, m_chunksDB)
         sdb->afterDelete();
+
+    clearUnusedMotion();
 }
 
 QnStorageManager::StorageMap QnStorageManager::getAllStorages() const 
@@ -542,8 +545,8 @@ void QnStorageManager::clearDbByChunk(DeviceFileCatalogPtr catalog, const Device
 
 void QnStorageManager::clearMaxDaysData()
 {
-    m_devFileCatalog[QnServer::HiQualityCatalog];
-    m_devFileCatalog[QnServer::LowQualityCatalog];
+    clearMaxDaysData(m_devFileCatalog[QnServer::HiQualityCatalog]);
+    clearMaxDaysData(m_devFileCatalog[QnServer::LowQualityCatalog]);
 }
 
 void QnStorageManager::clearMaxDaysData(FileCatalogMap catalogMap)
@@ -560,7 +563,26 @@ void QnStorageManager::clearMaxDaysData(FileCatalogMap catalogMap)
     }
 }
 
-void QnStorageManager::clearSpace(const QnStorageResourcePtr &storage)
+void QnStorageManager::clearUnusedMotion()
+{
+    QMutexLocker lock(&m_mutexCatalog);
+
+    QMap<QString, QSet<QDate>> usedMonths;
+
+    updateRecordedMonths(m_devFileCatalog[QnServer::HiQualityCatalog], usedMonths);
+    updateRecordedMonths(m_devFileCatalog[QnServer::LowQualityCatalog], usedMonths);
+
+    foreach(const DeviceFileCatalogPtr catalog, m_devFileCatalog[QnServer::HiQualityCatalog].values())
+        QnMotionHelper::instance()->deleteUnusedFiles(usedMonths[catalog->getMac()].toList(), catalog->getMac());
+}
+
+void QnStorageManager::updateRecordedMonths(FileCatalogMap catalogMap, QMap<QString, QSet<QDate>>& usedMonths)
+{
+    foreach(const DeviceFileCatalogPtr catalog, catalogMap.values())
+        usedMonths[catalog->getMac()] += catalog->recordedMonthList();
+}
+
+void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage)
 {
     if (storage->getSpaceLimit() == 0)
         return; // unlimited
