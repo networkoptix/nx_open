@@ -736,8 +736,14 @@ void SPSUnit::hrd_parameters()
 	bit_rate_scale = bitReader.getBits(4);
 	cpb_size_scale = bitReader.getBits(4);
 
+    if( bit_rate_value_minus1 )
+        delete[] bit_rate_value_minus1;
 	bit_rate_value_minus1 = new int[cpb_cnt_minus1 + 1];
+    if( cpb_size_value_minus1 )
+        delete[] cpb_size_value_minus1;
 	cpb_size_value_minus1 = new int[cpb_cnt_minus1 + 1];
+    if( cbr_flag )
+        delete[] cbr_flag;
 	cbr_flag = new quint8[cpb_cnt_minus1 + 1];
 
 	for( int SchedSelIdx = 0; SchedSelIdx <= cpb_cnt_minus1; SchedSelIdx++) 
