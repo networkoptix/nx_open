@@ -218,6 +218,7 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
 {
     setState(ConnectingStage1);
     m_httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+    m_httpClient->setDecodeChunkedMessageBody( false ); //chunked decoding is done in this class
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnTransactionTransport::at_responseReceived, Qt::DirectConnection);
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnTransactionTransport::at_httpClientDone, Qt::DirectConnection);
 
