@@ -556,6 +556,25 @@
                     "isGetter": false,
                     "params": [],
                     "result": ""
+                },
+                {
+                    "name": "changeSystemName",
+                    "description": "Change system name.",
+                    "isGetter": false,
+                    "params" : [
+                        {
+                            "name" : "systemName",
+                            "description" : "A new system name",
+                            "optional" : false,
+                            "values" : []
+                        }
+                    ]
+                },
+                {
+                    "name": "restart",
+                    "description": "Restart the server.",
+                    "isGetter": false,
+                    "params": []
                 }
             ]
         },
