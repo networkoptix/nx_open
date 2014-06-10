@@ -89,3 +89,7 @@ install -m 644 debian/templates $STAGE/DEBIAN
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta)
+cp -P $SERVER_LIB_PATH/*.debug ${project.build.directory}
+cp -P $SERVER_BIN_PATH/*.debug ${project.build.directory}
+cp -P $SERVER_LIB_PLUGIN_PATH/*.debug ${project.build.directory}
+tar czf ./${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}-debug-symbols.tar.gz ./*.debug
