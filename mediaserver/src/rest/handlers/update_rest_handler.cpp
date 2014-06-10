@@ -40,7 +40,7 @@ int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParamLi
     if (version == qnCommon->engineVersion())
         return CODE_OK;
 
-    if (sysInfo != QnSystemInformation(lit(QN_APPLICATION_PLATFORM), lit(QN_APPLICATION_ARCH)))
+    if (sysInfo != QnSystemInformation(lit(QN_APPLICATION_PLATFORM), lit(QN_APPLICATION_ARCH), lit(QN_ARM_BOX)))
         return CODE_INVALID_PARAMETER;
 
     if (!QnServerUpdateTool::instance()->addUpdateFile(version.toString(), body))
