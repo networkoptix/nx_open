@@ -26,7 +26,3 @@ int QnRestartRestHandler::executePost(const QString &path, const QnRequestParamL
 
     return executeGet(path, params, result, contentType);
 }
-
-QString QnRestartRestHandler::description() const {
-    return "Restarts the server<br>";
-}

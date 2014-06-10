@@ -28,9 +28,3 @@ int QnChangeSystemNameRestHandler::executePost(const QString &path, const QnRequ
 
     return executeGet(path, params, result, contentType);
 }
-
-QString QnChangeSystemNameRestHandler::description() const {
-    return
-        "Changes system name of this server<br>"
-        "Request format: GET /api/changeSystemname?systemName=<system name>&amp;reboot&amp;<br>";
-}
