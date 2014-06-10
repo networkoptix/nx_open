@@ -134,4 +134,8 @@ fi
 popd
 
 cp $BUILD_DIR/$PACKAGE_NAME .
+cp -P $LIBS_DIR/*.debug ${project.build.directory}
+cp -P $BUILD_OUTPUT_DIR/bin/${build.configuration}/*.debug ${project.build.directory}
+cp -P $BUILD_OUTPUT_DIR/bin/${build.configuration}/plugins/*.debug ${project.build.directory}
+tar czf ./$PACKAGE_NAME-debug-symbols.tar.gz ./*.debug
 rm -Rf $BUILD_DIR
