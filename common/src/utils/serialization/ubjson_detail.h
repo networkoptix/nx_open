@@ -4,8 +4,8 @@
 #include <QtCore/QtGlobal>
 
 #include "binary_stream.h"
-#include "ubj_fwd.h"
-#include "ubj_marker.h"
+#include "ubjson_fwd.h"
+#include "ubjson_marker.h"
 
 namespace QnUbjDetail {
 

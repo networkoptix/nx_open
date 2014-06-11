@@ -1,9 +1,9 @@
 #ifndef QN_UBJ_H
 #define QN_UBJ_H
 
-#include "ubj_fwd.h"
-#include "ubj_reader.h"
-#include "ubj_writer.h"
+#include "ubjson_fwd.h"
+#include "ubjson_reader.h"
+#include "ubjson_writer.h"
 
 namespace QnUbj {
     template<class T, class Output>

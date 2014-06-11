@@ -1,7 +1,7 @@
 #ifndef QN_UBJ_MARKER_H
 #define QN_UBJ_MARKER_H
 
-#include "ubj_fwd.h"
+#include "ubjson_fwd.h"
 
 namespace QnUbj {
     enum Marker {
