@@ -11,8 +11,6 @@
 #include <transcoding/ffmpeg_transcoder.h>
 #include <utils/common/log.h>
 
-#include "streaming_chunk.h"
-
 #ifdef _DEBUG
 //#define SAVE_INPUT_STREAM_TO_FILE
 //#define SAVE_OUTPUT_TO_FILE
@@ -37,7 +35,7 @@ StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext()
 }
 
 StreamingChunkTranscoderThread::TranscodeContext::TranscodeContext(
-    StreamingChunk* const _chunk,
+    StreamingChunkPtr const _chunk,
     DataSourceContextPtr _dataSourceCtx,
     const StreamingChunkCacheKey& _transcodeParams )
 :
@@ -67,7 +65,7 @@ StreamingChunkTranscoderThread::~StreamingChunkTranscoderThread()
 
 bool StreamingChunkTranscoderThread::startTranscoding(
     int transcodingID,
-    StreamingChunk* const chunk,
+    StreamingChunkPtr const chunk,
     DataSourceContextPtr dataSourceCtx,
     const StreamingChunkCacheKey& transcodeParams )
 {
@@ -266,7 +264,7 @@ void StreamingChunkTranscoderThread::removeTranscodingNonSafe(
     bool transcodingFinishedSuccessfully,
     QMutexLocker* const lk )
 {
-    StreamingChunk* chunk = transcodingIter->second->chunk;
+    StreamingChunkPtr chunk = transcodingIter->second->chunk;
 
     m_dataSourceToID.erase( transcodingIter->second->dataSourceCtx->mediaDataProvider.get() );
     TranscodeContext* tc = transcodingIter->second;

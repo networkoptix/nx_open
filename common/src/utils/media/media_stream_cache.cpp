@@ -13,7 +13,7 @@
 
 using namespace std;
 
-static const int USEC_PER_SEC = 10*1000;
+static const int USEC_PER_SEC = 1000*1000;
 
 MediaStreamCache::SequentialReadContext::SequentialReadContext(
     MediaStreamCache* cache,

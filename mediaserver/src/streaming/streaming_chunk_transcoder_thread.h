@@ -14,11 +14,11 @@
 #include <utils/common/long_runnable.h>
 
 #include "data_source_cache.h"
+#include "streaming_chunk.h"
 #include "streaming_chunk_cache_key.h"
 
 
 class QnTranscoder;
-class StreamingChunk;
 class StreamingChunkCacheKey;
 
 class StreamingChunkTranscoderThread
@@ -33,7 +33,7 @@ public:
 
     bool startTranscoding(
         int transcodingID,
-        StreamingChunk* const chunk,
+        StreamingChunkPtr chunk,
         DataSourceContextPtr dataSourceCtx,
         const StreamingChunkCacheKey& transcodeParams );
     //void cancel( int transcodingID );
@@ -60,7 +60,7 @@ private:
     class TranscodeContext
     {
     public:
-        StreamingChunk* const chunk;
+        StreamingChunkPtr chunk;
         DataSourceContextPtr dataSourceCtx;
         StreamingChunkCacheKey transcodeParams;
         bool dataAvailable;
@@ -74,7 +74,7 @@ private:
 
         TranscodeContext();
         TranscodeContext(
-            StreamingChunk* const _chunk,
+            StreamingChunkPtr _chunk,
             DataSourceContextPtr dataSourceCtx,
             const StreamingChunkCacheKey& _transcodeParams );
     };
