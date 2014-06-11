@@ -19,7 +19,6 @@
 #include "live_media_cache_reader.h"
 #include "streaming_chunk_cache_key.h"
 #include "streaming_chunk_transcoder_thread.h"
-#include "streaming_chunk.h"
 #include "../camera/camera_pool.h"
 
 
@@ -75,7 +74,7 @@ StreamingChunkTranscoder::~StreamingChunkTranscoder()
 
 bool StreamingChunkTranscoder::transcodeAsync(
     const StreamingChunkCacheKey& transcodeParams,
-    StreamingChunk* const chunk )
+    StreamingChunkPtr chunk )
 {
     //searching for resource
     QnResourcePtr resource = QnResourcePool::instance()->getResourceByUniqId( transcodeParams.srcResourceUniqueID() );
@@ -289,7 +288,7 @@ bool StreamingChunkTranscoder::startTranscoding(
     int transcodingID,
     DataSourceContextPtr dataSourceCtx,
     const StreamingChunkCacheKey& transcodeParams,
-    StreamingChunk* const chunk )
+    StreamingChunkPtr chunk )
 {
     //selecting least used transcoding thread from pool
     StreamingChunkTranscoderThread* transcoderThread = *std::max_element( m_transcodeThreads.cbegin(), m_transcodeThreads.cend(), 
