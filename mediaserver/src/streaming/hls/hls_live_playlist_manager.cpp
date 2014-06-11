@@ -124,7 +124,7 @@ namespace nx_hls
                     }
                     else
                     {
-                        if( m_removedChunksToKeepCount < m_chunks.size() )
+                        if( (size_t)m_removedChunksToKeepCount < m_chunks.size() )
                             keepChunkDataTillTimestamp = m_chunks[m_removedChunksToKeepCount].startTimestamp;
                         else
                             keepChunkDataTillTimestamp =

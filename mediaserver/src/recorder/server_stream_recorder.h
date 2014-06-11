@@ -94,7 +94,7 @@ private:
     bool m_usedPanicMode;
     bool m_usedSpecialRecordingMode;
     bool m_lastMotionState; // true if motion in progress
-    qint64 m_queuedSize;
+    size_t m_queuedSize;
     QMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
