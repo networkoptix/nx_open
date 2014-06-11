@@ -56,7 +56,8 @@ namespace ec2
         QnDbManager(
             QnResourceFactory* factory,
             LicenseManagerImpl* const licenseManagerImpl,
-            const QString& dbFileName );
+            const QString& dbFilePath,
+            const QString& dbFilePathStatic);
         virtual ~QnDbManager();
 
 
@@ -319,6 +320,14 @@ namespace ec2
         qint64 m_licenseOverflowTime;
         QUuid m_dbInstanceId;
         ApiHelpGroupDataList* m_helpData;
+        
+        /*
+        * Database for static or very rare modified data. Be carefull! It's not supported DB transactions for static DB
+        * So, only atomic SQL updates are allowed. m_mutexStatic is used for createDB only. Common mutex/transaction is sharing for both DB
+        */
+        QSqlDatabase m_sdbStatic;
+        QnDbTransaction m_tranStatic;
+        mutable QReadWriteLock m_mutexStatic;
     };
 };
 

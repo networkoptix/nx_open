@@ -122,14 +122,14 @@ bool QnStorageDb::open(const QString& fileName)
 bool QnStorageDb::createDatabase()
 {
     beginTran();
-    if (!isObjectExists(lit("table"), lit("storage_data")))
+    if (!isObjectExists(lit("table"), lit("storage_data"), m_sdb))
     {
-        if (!execSQLFile(lit(":/01_create_storage_db.sql"))) {
+        if (!execSQLFile(lit(":/01_create_storage_db.sql"), m_sdb)) {
             rollback();
             return false;
         }
 
-        if (!execSQLFile(lit(":/02_storage_bookmarks.sql"))) {
+        if (!execSQLFile(lit(":/02_storage_bookmarks.sql"), m_sdb)) {
             rollback();
             return false;
         }
