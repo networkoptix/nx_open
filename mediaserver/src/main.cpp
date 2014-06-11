@@ -1686,14 +1686,27 @@ int main(int argc, char* argv[])
     bool showHelp = false;
 
     QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, QString());
-    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--msg-log-level", NULL, QString(), "none");
-    commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, QString(), "all");
+    commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, 
+        "Supported values: none (no logging), ALWAYS, ERROR, WARNING, INFO, DEBUG, DEBUG2. Default value is "
+#ifdef _DEBUG
+            "DEBUG"
+#else
+            "INFO"
+#endif
+            );
+    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--msg-log-level", NULL,
+        "Log value for msg_log.log. Supported values same as above. Default is none (no logging)", "none");
+    commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, 
+        lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     //commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
-    commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, QString());
-    commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, QString());
-    commandLineParser.addParameter(&showVersion, "--version", NULL, QString(), true);
-    commandLineParser.addParameter(&showHelp, "--help", NULL, QString(), true);
+    commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, 
+        "Path to config file. By default "+MSSettings::defaultROSettingsFilePath());
+    commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, 
+        "Path to config file which is used to save some. By default "+MSSettings::defaultRunTimeSettingsFilePath() );
+    commandLineParser.addParameter(&showVersion, "--version", NULL,
+        lit("Print version info and exit"), true);
+    commandLineParser.addParameter(&showHelp, "--help", NULL,
+        lit("This help message"), true);
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
 
     if( showVersion )
@@ -1704,7 +1717,8 @@ int main(int argc, char* argv[])
 
     if( showHelp )
     {
-        printHelp();
+        QTextStream stream(stdout);
+        commandLineParser.print(stream);
         return 0;
     }
 
@@ -1720,26 +1734,4 @@ int main(int argc, char* argv[])
 static void printVersion()
 {
     std::cout<<"  "<<QN_APPLICATION_NAME" v."<<QN_APPLICATION_VERSION<<std::endl;
-}
-
-// TODO: #Elric we have QnCommandLineParser::print for that.
-static void printHelp()
-{
-    printVersion();
-
-    std::cout<<"\n"
-        "  --help                   This help message\n"
-        "  --version                Print version info and exit\n"
-        "  -e                       Start as console application\n"
-        "  --log-level              Supported values: none (no logging), ALWAYS, ERROR, WARNING, INFO, DEBUG, DEBUG2. Default value is "
-#ifdef _DEBUG
-            "DEBUG\n"
-#else
-            "INFO\n"
-#endif
-        "  --msg-log-level          Log value for http_log.log. Supported values same as above. Default is none (no logging)\n"
-        "  --rebuild                Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)\n"
-        "  --conf-file              Path to config file. By default "<<MSSettings::defaultROSettingsFilePath().toStdString()<<"\n"
-        "  --runtime-conf-file      Path to config file which is used to save some. By default "<<MSSettings::defaultRunTimeSettingsFilePath().toStdString()<<"\n"
-        ;
 }
