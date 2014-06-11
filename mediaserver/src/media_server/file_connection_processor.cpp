@@ -23,8 +23,8 @@ static QMutex cacheMutex;
 
 struct HttpContentTypes
 {
-    char* fileExt;
-    char* contentType;
+    const char* fileExt;
+    const char* contentType;
 };
 
 static HttpContentTypes contentTypes[] =
