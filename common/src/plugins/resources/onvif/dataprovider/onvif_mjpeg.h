@@ -7,11 +7,11 @@
 #include "utils/network/simple_http_client.h"
 
 
-class MJPEGtreamreader: public CLServerPushStreamReader
+class MJPEGStreamReader: public CLServerPushStreamReader
 {
 public:
-    MJPEGtreamreader(QnResourcePtr res, const QString& streamHttpPath);
-    virtual ~MJPEGtreamreader();
+    MJPEGStreamReader(QnResourcePtr res, const QString& streamHttpPath);
+    virtual ~MJPEGStreamReader();
 
 protected:
     //!Implementation of QnAbstractMediaStreamProvider::getNextData

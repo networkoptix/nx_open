@@ -8,6 +8,8 @@
 
 #include <utils/common/synctime.h>
 
+#include "media_server/settings.h"
+
 
 namespace nx_hls
 {
@@ -22,7 +24,8 @@ namespace nx_hls
         m_targetDurationUSec( targetDurationUSec ),
         m_mediaSequence( 0 ),
         m_totalPlaylistDuration( 0 ),
-        m_blockID( -1 )
+        m_blockID( -1 ),
+        m_removedChunksToKeepCount( MSSettings::roSettings()->value( nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP, nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP ).toInt() )
     {
         m_mediaStreamCache->addEventReceiver( this );
     }
@@ -113,9 +116,25 @@ namespace nx_hls
                     //   period of time equal to the duration of the segment plus the duration
                     //   of the longest Playlist file distributed by the server containing
                     //   that segment.
+                    quint64 keepChunkDataTillTimestamp = 0;
+                    if( m_removedChunksToKeepCount < 0 )
+                    {
+                        //spec-defined behavour.
+                        keepChunkDataTillTimestamp = m_chunks.front().startTimestamp + m_chunks.front().duration*2 + playlistDurationBak;
+                        //adding additional m_chunks.front().duration, since (m_chunks.front().startTimestamp + m_chunks.front().duration) is current playlist start timestamp
+                    }
+                    else
+                    {
+                        if( m_removedChunksToKeepCount < m_chunks.size() )
+                            keepChunkDataTillTimestamp = m_chunks[m_removedChunksToKeepCount].startTimestamp;
+                        else
+                            keepChunkDataTillTimestamp =
+                                m_chunks.back().startTimestamp + m_chunks.back().duration +                 //length of current playlist in usec
+                                m_chunks.front().duration * (m_removedChunksToKeepCount - m_chunks.size()); //estimation of length of next chunks to skip (not yet existing)
+                    }
                     m_timestampToBlock.push( std::make_pair(
                         m_chunks.front().startTimestamp,
-                        m_chunks.front().startTimestamp + m_chunks.front().duration + playlistDurationBak ) );
+                        keepChunkDataTillTimestamp ) );
 
                     m_totalPlaylistDuration -= m_chunks.front().duration;
                     m_chunks.pop_front();
@@ -123,15 +142,15 @@ namespace nx_hls
 
                 Q_ASSERT( !m_chunks.empty() );
 
-                while( !m_timestampToBlock.empty() && (m_timestampToBlock.front().second <= m_chunks.front().startTimestamp) )
+                while( !m_timestampToBlock.empty() && (m_timestampToBlock.front().second < m_chunks.front().startTimestamp) )
                 {
                     m_timestampToBlock.pop();
-                    if( m_timestampToBlock.empty() )
-                        break;
                     //locking chunk data in media data in conformance with draft-pantos-http-live-streaming-10
                     m_mediaStreamCache->moveBlocking(
                         m_blockID,
-                        m_timestampToBlock.front().first );
+                        !m_timestampToBlock.empty()
+                            ? m_timestampToBlock.front().first
+                            : m_chunks.front().startTimestamp );
                 }
             }
         }

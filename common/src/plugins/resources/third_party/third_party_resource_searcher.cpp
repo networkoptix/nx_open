@@ -10,6 +10,8 @@
 #include "third_party_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/camera_driver_restriction_list.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 #include "../../plugin_manager.h"
 
 
@@ -108,7 +110,7 @@ QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, c
 
     result = QnThirdPartyResourcePtr( new QnThirdPartyResource( cameraInfo, camManager, *discoveryManager ) );
     result->setTypeId(resourceTypeId);
-    result->setPhysicalId(QString::fromUtf8(cameraInfo.uid));
+    result->setPhysicalId(QString::fromUtf8(cameraInfo.uid).trimmed());
 
     unsigned int caps = 0;
     if (camManager->getCameraCapabilities(&caps) == 0) 
@@ -295,11 +297,18 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     resource->setTypeId(typeId);
     resource->setName( QString::fromUtf8("%1-%2").arg(discoveryManager->getVendorName()).arg(QString::fromUtf8(cameraInfo.modelName)) );
     resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
-    resource->setMAC( QnMacAddress(QString::fromUtf8(cameraInfo.uid)) );
+    resource->setMAC( QnMacAddress(QString::fromUtf8(cameraInfo.uid).trimmed()) );
     resource->setAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
-    resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid) );
+    resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid).trimmed() );
     resource->setVendor( discoveryManager->getVendorName() );
+
+    //TODO #ak reading MaxFPS here ia a workaround of camera integration API defect: 
+        //it does not not allow plugin to return hard-coded max fps, it can only be read in initInternal
+    const QnResourceData& resourceData = qnCommon->dataPool()->data(resource);
+    const float maxFps = resourceData.value<float>( lit("MaxFPS"), 0.0 );
+    if( maxFps > 0.0 )
+        resource->setParam( lit("MaxFPS"), maxFps, QnDomainDatabase );
     
     unsigned int caps;
     if (camManager->getCameraCapabilities(&caps) == 0) 

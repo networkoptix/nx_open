@@ -58,6 +58,7 @@ namespace nx_hls
         //queue<pair<timestamp to block; playlist start timestamp, blocking lives to> >
         std::queue<std::pair<quint64, quint64> > m_timestampToBlock;
         int m_blockID;
+        int m_removedChunksToKeepCount;
 
         //!Implementation of AbstractMediaCacheEventReceiver::onKeyFrame
         virtual void onKeyFrame( quint64 currentPacketTimestampUSec ) override;

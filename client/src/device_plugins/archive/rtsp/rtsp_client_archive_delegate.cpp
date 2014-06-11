@@ -809,7 +809,6 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
     
     QString user = QnAppServerConnectionFactory::defaultUrl().userName();
     QString password = QnAppServerConnectionFactory::defaultUrl().password();
-    qDebug() << "using rtsp authorization" << user << password;
     QAuthenticator auth;
     auth.setUser(user);
     auth.setPassword(password);

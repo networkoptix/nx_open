@@ -30,7 +30,8 @@ BUILD_VERSION="${parsedVersion.incrementalVersion}"
 
 BOX_NAME=${box}
 
-PACKAGE_NAME=$CUSTOMIZATION-$PRODUCT_NAME-$MODULE_NAME-$VERSION-$BOX_NAME.tar.gz
+PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$VERSION-$BOX_NAME-beta
+PACKAGE_NAME=$PACKAGE.tar.gz
 
 BUILD_DIR=/tmp/hdw_$BOX_NAME_build.tmp
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
@@ -89,6 +90,7 @@ for var in "${LIBS_TO_COPY[@]}"
 do
   cp $LIBS_DIR/${var}   $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/
   if [ ! -z "$STRIP" ]; then
+     echo $STRIP
      $STRIP $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib/${var}
   fi
 done
@@ -134,4 +136,18 @@ fi
 popd
 
 cp $BUILD_DIR/$PACKAGE_NAME .
+cp -P $LIBS_DIR/*.debug ${project.build.directory}
+cp -P $BUILD_OUTPUT_DIR/bin/${build.configuration}/*.debug ${project.build.directory}
+cp -P $BUILD_OUTPUT_DIR/bin/${build.configuration}/plugins/*.debug ${project.build.directory}
+tar czf ./$PACKAGE_NAME-debug-symbols.tar.gz ./*.debug
 rm -Rf $BUILD_DIR
+
+mkdir -p zip
+mv $PACKAGE_NAME ./zip
+mv update ./zip
+mv install.sh ./zip
+cd zip
+zip ./$PACKAGE.zip ./*
+mv ./* ../
+cd ..
+rm -Rf zip
