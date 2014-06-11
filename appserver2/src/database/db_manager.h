@@ -17,6 +17,7 @@
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_module_data.h"
+#include "nx_ec/data/api_routing_data.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 
@@ -232,6 +233,11 @@ namespace ec2
         }
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiModuleData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiConnectionData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }

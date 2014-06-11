@@ -172,6 +172,7 @@ namespace ec2
             fromApiToResourceList(tran.params, fullResData, m_resCtx);
             emit initNotification(fullResData);
             m_miscManager->triggerNotification(tran.params.foundModules);
+            m_miscManager->triggerNotification(tran.params.connections);
         }
 
         void triggerNotification( const QnTransaction<ApiPanicModeData>& tran ) {
@@ -222,6 +223,10 @@ namespace ec2
         }
 
         void triggerNotification(const QnTransaction<ApiModuleData> &tran) {
+            m_miscManager->triggerNotification(tran);
+        }
+
+        void triggerNotification(const QnTransaction<ApiConnectionData> &tran) {
             m_miscManager->triggerNotification(tran);
         }
 

@@ -128,6 +128,7 @@
 #include <utils/network/ssl_socket.h>
 #include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
+#include <utils/network/router.h>
 #include <media_server/server_update_tool.h>
 
 
@@ -1377,6 +1378,9 @@ void QnMain::run()
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
     globalModuleFinder->setConnection(ec2Connection);
     globalModuleFinder->setModuleFinder(moduleFinder.data());
+
+    QScopedPointer<QnRouter> router(new QnRouter());
+    router->setConnection(ec2Connection);
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
 

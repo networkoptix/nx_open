@@ -32,9 +32,47 @@ void QnMiscManager<QueryProcessorType>::triggerNotification(const ApiModuleDataL
 }
 
 template<class QueryProcessorType>
+void QnMiscManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiConnectionData> &transaction) {
+    Q_ASSERT_X(transaction.command == ApiCommand::addConnection || transaction.command == ApiCommand::removeConnection, "transaction isn't supported in this function", Q_FUNC_INFO);
+
+    if (transaction.command == ApiCommand::addConnection)
+        emit connectionAdded(transaction.params.discovererId, transaction.params.peerId, transaction.params.host, transaction.params.port);
+    else
+        emit connectionRemoved(transaction.params.discovererId, transaction.params.peerId, transaction.params.host, transaction.params.port);
+}
+
+template<class QueryProcessorType>
+void QnMiscManager<QueryProcessorType>::triggerNotification(const ApiConnectionDataList &connections) {
+    foreach (const ApiConnectionData &connection, connections)
+        emit connectionAdded(connection.discovererId, connection.peerId, connection.host, connection.port);
+}
+
+template<class QueryProcessorType>
 int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(moduleInformation, isAlive);
+
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
+
+    return reqId;
+}
+
+template<class QueryProcessorType>
+int QnMiscManager<QueryProcessorType>::addConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) {
+    const int reqId = generateRequestID();
+    auto transaction = prepareTransaction(ApiCommand::addConnection, discovererId, peerId, host, port);
+
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
+
+    return reqId;
+}
+
+template<class QueryProcessorType>
+int QnMiscManager<QueryProcessorType>::removeConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) {
+    const int reqId = generateRequestID();
+    auto transaction = prepareTransaction(ApiCommand::removeConnection, discovererId, peerId, host, port);
 
     using namespace std::placeholders;
     m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
@@ -48,6 +86,17 @@ QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransacti
     QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &transaction.params);
     transaction.params.isAlive = isAlive;
     transaction.params.discoverer = QnId(qnCommon->moduleGUID());
+
+    return transaction;
+}
+
+template<class QueryProcessorType>
+QnTransaction<ApiConnectionData> QnMiscManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port) const {
+    QnTransaction<ApiConnectionData> transaction(command, false);
+    transaction.params.discovererId = discovererId;
+    transaction.params.peerId = peerId;
+    transaction.params.host = host;
+    transaction.params.port = port;
 
     return transaction;
 }

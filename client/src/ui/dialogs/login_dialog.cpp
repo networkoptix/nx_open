@@ -40,6 +40,7 @@
 #include "connection_testing_dialog.h"
 
 #include <utils/network/global_module_finder.h>
+#include <utils/network/router.h>
 #include <api/model/connection_info.h>
 #include "compatibility_version_installation_dialog.h"
 #include "version.h"
@@ -557,6 +558,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
     m_connectInfo = connectionInfo;
     qnCommon->setLocalSystemName(connectionInfo->systemName);
     QnGlobalModuleFinder::instance()->setConnection(connection);
+    QnRouter::instance()->setConnection(connection);
     base_type::accept();
 }
 

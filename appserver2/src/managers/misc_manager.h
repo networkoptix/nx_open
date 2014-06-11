@@ -3,6 +3,7 @@
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_module_data.h>
+#include <nx_ec/data/api_connection_data.h>
 #include <transaction/transaction.h>
 
 namespace ec2 {
@@ -15,14 +16,19 @@ namespace ec2 {
 
         void triggerNotification(const QnTransaction<ApiModuleData> &transaction);
         void triggerNotification(const ApiModuleDataList &moduleDataList);
+        void triggerNotification(const QnTransaction<ApiConnectionData> &transaction);
+        void triggerNotification(const ApiConnectionDataList &connections);
 
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) override;
+        virtual int addConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) override;
+        virtual int removeConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiModuleData> prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const;
+        QnTransaction<ApiConnectionData> prepareTransaction(ApiCommand::Value command, const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port) const;
     };
 
 } // namespace ec2

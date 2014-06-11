@@ -157,6 +157,10 @@ namespace ec2
 
             //!ApiModuleData
             moduleInfo = 65,
+
+            //!ApiConnectionData
+            addConnection = 66,
+            removeConnection = 67,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

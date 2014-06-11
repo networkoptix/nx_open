@@ -756,11 +756,25 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
+        template<class TargetType, class HandlerType> int addConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, TargetType *target, HandlerType handler) {
+            return addConnection(discovererId, peerId, host, port, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int removeConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, TargetType *target, HandlerType handler) {
+            return removeConnection(discovererId, peerId, host, port, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
     signals:
         void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer);
+        void connectionAdded(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port);
+        void connectionRemoved(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port);
 
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) = 0;
+        virtual int addConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
+        virtual int removeConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 

@@ -12,6 +12,7 @@
 #include "api/app_server_connection.h"
 #include <utils/serialization/binary_functions.h>
 #include <utils/network/global_module_finder.h>
+#include <utils/network/router.h>
 
 #include "version.h"
 
@@ -401,6 +402,10 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
         case ApiCommand::moduleInfo:
             return deliveryTransaction<ApiModuleData>(abstractTran, stream);
 
+        case ApiCommand::addConnection:
+        case ApiCommand::removeConnection:
+            return deliveryTransaction<ApiConnectionData>(abstractTran, stream);
+
         default:
             Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
             break;
@@ -626,6 +631,17 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
             QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
             data.discoverer = QnId(qnCommon->moduleGUID());
             tran.params.foundModules.push_back(data);
+        }
+
+        /* fill in connections */
+        QMultiHash<QnId, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
+        for (auto it = connections.begin(); it != connections.end(); ++it) {
+            ApiConnectionData connection;
+            connection.discovererId = it.key();
+            connection.peerId = it->id;
+            connection.host = it->host;
+            connection.port = it->port;
+            tran.params.connections.push_back(connection);
         }
     }
 

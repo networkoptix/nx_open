@@ -163,6 +163,11 @@ namespace ec2
                 case moduleInfo:
                     return "moduleInfo";
 
+                case addConnection:
+                    return "addConnection";
+                case removeConnection:
+                    return "removeConnection";
+
                 default:
                     return "unknown " + QString::number((int)val);
             }
