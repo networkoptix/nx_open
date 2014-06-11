@@ -143,6 +143,10 @@ namespace QnUbjsonDetail {
             }
         }
 
+        bool skipBytes(int size) {
+            return m_stream.skip(size) == size;
+        }
+
     private:
         QnInputBinaryStream<Input> m_stream;
     };

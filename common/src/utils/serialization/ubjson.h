@@ -48,9 +48,9 @@ namespace QnUbjsonDetail {
         {}
 
         template<class T, class Access>
-        bool operator()(const T &, const Access &access, const QnFusion::start_tag &) const {
+        bool operator()(const T &, const Access &, const QnFusion::start_tag &) const {
             using namespace QnFusion;
-            m_stream->writeArrayStart(access(member_count));
+            m_stream->writeArrayStart();
             return true;
         }
 
@@ -83,10 +83,8 @@ namespace QnUbjsonDetail {
         bool operator()(const T &, const Access &, const QnFusion::start_tag &) {
             using namespace QnFusion;
 
-            if(!m_stream->readArrayStart(&m_count))
+            if(!m_stream->readArrayStart())
                 return false;
-            if(m_count < 0)
-                return false; /* Invalid format, size is expected to be specified. */
 
             return true;
         }
@@ -95,9 +93,9 @@ namespace QnUbjsonDetail {
         bool operator()(T &target, const Access &access) {
             using namespace QnFusion;
 
-            m_count--;
-            if(m_count < 0)
-                return true; /* A packet from the previous version, OK. */
+            /* Packet from previous version? Just skip the new fields. */
+            if(m_stream->peekMarker() == QnUbjson::ArrayEndMarker)
+                return true; 
 
             return operator()(target, access, access(setter_tag));
         }
@@ -106,8 +104,10 @@ namespace QnUbjsonDetail {
         bool operator()(const T &, const Access &, const QnFusion::end_tag &) {
             using namespace QnFusion;
 
-            if(m_count > 0)
-                return false; // TODO: #Elric #UBJ skip
+            /* Packet from next version? Skip additional values. */
+            while(m_stream->peekMarker() != QnUbjson::ArrayEndMarker)
+                if(!m_stream->skipValue())
+                    return false; 
 
             return m_stream->readArrayEnd();
         }
@@ -133,7 +133,6 @@ namespace QnUbjsonDetail {
 
     private:
         QnUbjsonReader<Input> *m_stream;
-        int m_count;
     };
 
 } // namespace QnBinaryDetail

@@ -148,6 +148,78 @@ public:
         return readContainerEndInternal(QnUbjson::ObjectEndMarker);
     }
 
+    bool skipValue() {
+        QnUbjson::Marker marker = peekMarker();
+        m_peeked = false;
+
+        switch (marker) {
+        case QnUbjson::NullMarker:
+        case QnUbjson::TrueMarker: 
+        case QnUbjson::FalseMarker:
+            return true;
+        case QnUbjson::UInt8Marker:
+            return m_stream.skipBytes(sizeof(quint8));
+        case QnUbjson::Int8Marker:
+            return m_stream.skipBytes(sizeof(qint8));
+        case QnUbjson::Int16Marker:
+            return m_stream.skipBytes(sizeof(qint16));
+        case QnUbjson::Int32Marker:
+            return m_stream.skipBytes(sizeof(qint32));
+        case QnUbjson::Int64Marker:
+            return m_stream.skipBytes(sizeof(qint64));
+        case QnUbjson::FloatMarker:
+            return m_stream.skipBytes(sizeof(float));
+        case QnUbjson::DoubleMarker:
+            return m_stream.skipBytes(sizeof(double));
+        case QnUbjson::Latin1CharMarker:
+            return m_stream.skipBytes(sizeof(char));
+        case QnUbjson::BigNumberMarker:
+        case QnUbjson::Utf8StringMarker: {
+            int size;
+            if(!readSizeFromStream(&size))
+                return false;
+            return m_stream.skipBytes(size);
+        }
+        case QnUbjson::ArrayStartMarker: {
+            if(!readArrayStart())
+                return false;
+
+            while(true) {
+                marker = peekMarker();
+                if(marker == QnUbjson::ArrayEndMarker)
+                    break;
+
+                skipValue();
+            }
+
+            if(!readArrayEnd())
+                return false;
+
+            return true;
+        }
+        case QnUbjson::ObjectStartMarker: {
+            if(!readObjectStart())
+                return false;
+
+            while(true) {
+                marker = peekMarker();
+                if(marker == QnUbjson::ObjectEndMarker)
+                    break;
+
+                skipValue();
+                skipValue();
+            }
+
+            if(!readObjectEnd())
+                return false;
+
+            return true;
+        }
+        default:
+            return false;
+        }
+    }
+
 private:
     template<class T>
     bool readNumberInternal(QnUbjson::Marker expectedMarker, T *target) {

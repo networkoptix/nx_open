@@ -29,6 +29,12 @@ public:
         return toRead;
     }
 
+    int skip(int size) {
+        size = qMin(size, m_data->size() - m_pos);
+        m_pos += size;
+        return size;
+    }
+
     const QByteArray &buffer() const { return *m_data; }
     int pos() const { return m_pos; }
 
