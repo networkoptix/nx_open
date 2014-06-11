@@ -17,7 +17,6 @@ namespace nx_hls
 
     HLSLivePlaylistManager::HLSLivePlaylistManager(
         MediaStreamCache* const mediaStreamCache,
-        MediaIndex* const /*mediaIndex*/,
         quint64 targetDurationUSec )
     :
         m_mediaStreamCache( mediaStreamCache ),

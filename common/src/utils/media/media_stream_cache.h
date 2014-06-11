@@ -14,8 +14,6 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 
 
-class MediaIndex;
-
 /*!
     Event receiver is allowed to call \a MediaStreamCache methods from \a onKeyFrame
 */
@@ -69,9 +67,7 @@ public:
     /*!
         \param cacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis is dropped
     */
-    MediaStreamCache(
-        unsigned int cacheSizeMillis,
-        MediaIndex* const mediaIndex );
+    MediaStreamCache( unsigned int cacheSizeMillis );
 
     //!Implementation of QnAbstractDataReceptor::canAcceptData
     virtual bool canAcceptData() const override;
@@ -122,7 +118,6 @@ private:
     typedef std::map<quint64, std::pair<QnAbstractDataPacketPtr, bool> > PacketCotainerType;
 
     unsigned int m_cacheSizeMillis;
-    MediaIndex* const m_mediaIndex;
     PacketCotainerType m_packetsByTimestamp;
     mutable QMutex m_mutex;
     qint64 m_prevPacketSrcTimestamp;
