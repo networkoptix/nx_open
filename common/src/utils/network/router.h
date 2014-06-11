@@ -38,6 +38,7 @@ private slots:
 
 private:
     void makeConsistent();
+    void printRoutingData();
 
 private:
     ec2::AbstractECConnectionPtr m_connection;

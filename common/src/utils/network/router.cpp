@@ -52,6 +52,7 @@ void QnRouter::at_connectionAdded(const QnId &discovererId, const QnId &peerId, 
 
     m_connections.insert(discovererId, Endpoint(peerId, host, port));
     m_routeBuilder->addConnection(discovererId, peerId, host, port);
+    printRoutingData();
 }
 
 void QnRouter::at_connectionRemoved(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port) {
@@ -61,6 +62,7 @@ void QnRouter::at_connectionRemoved(const QnId &discovererId, const QnId &peerId
     m_routeBuilder->removeConnection(discovererId, peerId, host, port);
     m_connections.remove(discovererId, Endpoint(peerId, host, port));
     makeConsistent();
+    printRoutingData();
 }
 
 void QnRouter::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
@@ -73,6 +75,7 @@ void QnRouter::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInfo
     m_routeBuilder->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port);
     if (m_connection)
         m_connection->getMiscManager()->addConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    printRoutingData();
 }
 
 void QnRouter::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
@@ -81,6 +84,8 @@ void QnRouter::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInfor
     m_connections.remove(qnCommon->moduleGUID(), endpoint);
     if (m_connection)
         m_connection->getMiscManager()->removeConnection(qnCommon->moduleGUID(), endpoint.id, endpoint.host, endpoint.port, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    makeConsistent();
+    printRoutingData();
 }
 
 void QnRouter::makeConsistent() {
@@ -101,4 +106,11 @@ void QnRouter::makeConsistent() {
         m_routeBuilder->removeConnection(it.key(), it->id, it->host, it->port);
         m_connections.remove(it.key(), it.value());
     }
+}
+
+void QnRouter::printRoutingData() {
+    qDebug() << "Routing data has been changed";
+    for (auto it = m_connections.begin(); it != m_connections.end(); ++it)
+        qDebug() << it.key() << " -> " << it->id;
+    qDebug() << "-----------------------------";
 }
