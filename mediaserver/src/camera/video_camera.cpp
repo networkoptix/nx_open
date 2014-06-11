@@ -1,14 +1,16 @@
+
 #include "video_camera.h"
+
+#include <deque>
+
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/datapacket/media_data_packet.h"
-#include "core/resource/camera_resource.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
-#include "utils/media/frame_info.h"
-#include "decoders/video/ffmpeg.h"
-#include "utils/common/synctime.h"
-#include <deque>
 #include "core/dataprovider/live_stream_provider.h"
-#include "utils/media/mediaindex.h"
+#include "core/resource/camera_resource.h"
+#include "decoders/video/ffmpeg.h"
+#include "utils/media/frame_info.h"
+#include "utils/common/synctime.h"
 
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
