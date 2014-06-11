@@ -29,6 +29,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::StreamQuality,
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::SerializationFormat,
     (Qn::JsonFormat,        "json")
+    (Qn::UbJsonFormat,      "ubjson")
     (Qn::BnsFormat,         "bns")
     (Qn::CsvFormat,         "csv")
     (Qn::XmlFormat,         "xml")

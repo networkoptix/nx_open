@@ -18,7 +18,7 @@ namespace ec2
     bool QnTransactionTransportSerializer::deserializeTran(const quint8* chunkPayload, int len,  TransactionTransportHeader& transportHeader, QByteArray& tranData)
     {
         QByteArray srcData = QByteArray::fromRawData((const char*) chunkPayload, len);
-        QnInputBinaryStream<QByteArray> stream(srcData);
+        QnInputBinaryStream<QByteArray> stream(&srcData);
 
         if (!deserialize(&stream, &transportHeader))
             return false;

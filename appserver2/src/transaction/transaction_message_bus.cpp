@@ -104,7 +104,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, Trans
         return;
 
     QnAbstractTransaction tran;
-    QnInputBinaryStream<QByteArray> stream(serializedTran);
+    QnInputBinaryStream<QByteArray> stream(&serializedTran);
     if (!QnBinary::deserialize(&stream, &tran)) {
         qWarning() << Q_FUNC_INFO << "Ignore bad transaction data. size=" << serializedTran.size();
         sender->setState(QnTransactionTransport::Error);

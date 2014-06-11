@@ -54,7 +54,7 @@ namespace ec2
             QByteArray& /*contentType*/ )
         {
             QnTransaction<RequestDataType> tran;
-            QnInputBinaryStream<QByteArray> stream( body );
+            QnInputBinaryStream<QByteArray> stream( &body );
             if (!QnBinary::deserialize(&stream, &tran))
                 return nx_http::StatusCode::badRequest;
             

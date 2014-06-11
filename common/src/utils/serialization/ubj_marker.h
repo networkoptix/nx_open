@@ -1,6 +1,8 @@
 #ifndef QN_UBJ_MARKER_H
 #define QN_UBJ_MARKER_H
 
+#include "ubj_fwd.h"
+
 namespace QnUbj {
     enum Marker {
         NullMarker          = 'Z',
@@ -32,7 +34,7 @@ namespace QnUbj {
         InvalidMarker       = '\0'
     };
 
-    QnUbj::Marker markerFromChar(char c) {
+    inline QnUbj::Marker markerFromChar(char c) {
         switch (c) {
         case 'Z': case 'T': case 'F': case 'U': case 'i': case 'I': case 'l':
         case 'L': case 'd': case 'D': case 'H': case 'C': case 'S':
@@ -44,11 +46,11 @@ namespace QnUbj {
         }
     }
 
-    char charFromMarker(Marker marker) {
+    inline char charFromMarker(Marker marker) {
         return static_cast<char>(marker);
     }
 
-    bool isValidContainerType(Marker marker) {
+    inline bool isValidContainerType(Marker marker) {
         switch (marker) {
         case QnUbj::NullMarker:
         case QnUbj::TrueMarker:

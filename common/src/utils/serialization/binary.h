@@ -30,14 +30,13 @@ namespace QnBinary {
     template<class T>
     T deserialized(const QByteArray &value, const T &defaultValue = T(), bool *success = NULL) {
         T target;
-        QnInputBinaryStream<QByteArray> stream(value);
+        QnInputBinaryStream<QByteArray> stream(&value);
         bool result = QnBinary::deserialize(&stream, &target);
         if (success)
             *success = result;
         return result ? target : defaultValue;
     }
 #endif
-
 
 } // namespace QnBinary
 

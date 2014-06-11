@@ -30,10 +30,10 @@ struct QnManualCameraSearchStatus {
     int state;
 
     /** Index of currently processed element. */
-    quint64 current;
+    qint64 current;
 
     /** Number of elements on the current stage. */
-    quint64 total;
+    qint64 total;
 };
 
 #define QnManualCameraSearchStatus_Fields (state)(current)(total)

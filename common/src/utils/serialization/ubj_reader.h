@@ -2,23 +2,26 @@
 #define QN_UBJ_READER_H
 
 #include <cassert>
-#include <cstdint>
 
 #include <algorithm> /* For std::min. */
 
+#include <QtCore/QtGlobal>
+
 #include "binary_stream.h"
+#include "ubj_fwd.h"
 #include "ubj_marker.h"
+#include "ubj_detail.h"
 
 
-template<class T>
-class QnUbjReader {
+template<class Input>
+class QnUbjReader: private QnUbjDetail::ReaderWriterBase {
 public:
-    QnUbjReader(QnInputBinaryStream<T> *stream): 
-        m_stream(stream),
+    QnUbjReader(Input *data): 
+        m_stream(data),
         m_peeked(false), 
         m_peekedMarker(QnUbj::InvalidMarker) 
     {
-        m_parseStack.push_back(ParserState(AtArrayElement));
+        m_stateStack.push_back(State(AtArrayElement));
     }
 
     QnUbj::Marker peekMarker() {
@@ -57,23 +60,23 @@ public:
         }
     }
 
-    bool readUInt8(std::uint8_t *target) {
+    bool readUInt8(quint8 *target) {
         return readNumberInternal(QnUbj::UInt8Marker, target);
     }
 
-    bool readInt8(std::int8_t *target) {
+    bool readInt8(qint8 *target) {
         return readNumberInternal(QnUbj::Int8Marker, target);
     }
 
-    bool readInt16(std::int16_t *target) {
+    bool readInt16(qint16 *target) {
         return readNumberInternal(QnUbj::Int16Marker, target);
     }
 
-    bool readInt32(std::int32_t *target) {
+    bool readInt32(qint32 *target) {
         return readNumberInternal(QnUbj::Int32Marker, target);
     }
 
-    bool readInt64(std::int64_t *target) {
+    bool readInt64(qint64 *target) {
         return readNumberInternal(QnUbj::Int64Marker, target);
     }
 
@@ -108,31 +111,37 @@ public:
         return true;
     }
 
-    bool readArrayStart(int *size = NULL, QnUbj::Marker *type = NULL) {
-        return readContainerStartInternal(QnUbj::ArrayStartMarker, AtArrayElement, AtSizedArrayElement, AtTypedSizedArrayElement, AtArrayEnd, size, type);
-    }
-
-    bool readUInt8ArrayData(QByteArray *target) {
+    bool readBinaryData(QByteArray *target) {
         assert(target);
 
-        ParserState &parserState = m_parseStack.back();
-
-        if(parserState.state != AtTypedSizedArrayElement || parserState.type != QnUbj::UInt8Marker)
+        if(!readArrayStart())
             return false;
 
-        if(!readBytesInternal(parserState.count, target))
+        State &state = m_stateStack.back();
+        if(state.type != QnUbj::UInt8Marker)
             return false;
 
-        parserState.state = AtArrayEnd;
+        if(!m_stream.readBytes(state.count, target))
+            return false;
+
+        state.status = AtArrayEnd;
+
+        if(!readArrayEnd())
+            return false;
+
         return true;
+    }
+
+    bool readArrayStart(int *size = NULL, QnUbj::Marker *type = NULL) {
+        return readContainerStartInternal(QnUbj::ArrayStartMarker, AtArrayStart, AtArrayElement, AtSizedArrayElement, AtTypedSizedArrayElement, AtArrayEnd, size, type);
     }
 
     bool readArrayEnd() {
         return readContainerEndInternal(QnUbj::ArrayEndMarker);
     }
 
-    bool readObjectStart(int *size, QnUbj::Marker *type) {
-        return readContainerStartInternal(QnUbj::ObjectStartMarker, AtObjectKey, AtSizedObjectKey, AtTypedSizedObjectKey, AtObjectEnd, size, type);
+    bool readObjectStart(int *size = NULL, QnUbj::Marker *type = NULL) {
+        return readContainerStartInternal(QnUbj::ObjectStartMarker, AtObjectStart, AtObjectKey, AtSizedObjectKey, AtTypedSizedObjectKey, AtObjectEnd, size, type);
     }
 
     bool readObjectEnd() {
@@ -140,8 +149,8 @@ public:
     }
 
 private:
-    template<class Number>
-    bool readNumberInternal(QnUbj::Marker expectedMarker, Number *target) {
+    template<class T>
+    bool readNumberInternal(QnUbj::Marker expectedMarker, T *target) {
         assert(target);
 
         peekMarker();
@@ -149,10 +158,9 @@ private:
             return false;
         m_peeked = false;
 
-        if(m_stream->read(target, sizeof(Number)) != sizeof(Number))
+        if(!m_stream.readNumber(target))
             return false;
 
-        *target = fromBigEndian(*target);
         return true;
     }
 
@@ -165,109 +173,54 @@ private:
         m_peeked = false;
 
         int size;
-        if(!readSizeInternal(&size))
+        if(!readSizeFromStream(&size))
             return false;
 
-        return readBytesInternal(size, target);
+        return m_stream.readBytes(size, target);
     }
 
-    bool readBytesInternal(int size, QByteArray *target) {
-        const int chunkSize = 16 * 1024 * 1024;
-        if(size < chunkSize) {
-            /* If it's less than 16Mb then just read it as a whole chunk. */
-            target->resize(size);
-            return m_stream->read(target->data(), size) == size;
-        } else {
-            /* Otherwise there is a high probability that the stream is corrupted, 
-             * but we cannot be 100% sure. Read it chunk-by-chunk, then assemble. */
-            QVector<QByteArray> chunks;
-
-            for(int pos = 0; pos < size; pos += chunkSize) {
-                QByteArray chunk;
-                chunk.resize(std::min(chunkSize, size - pos));
-
-                if(m_stream->read(chunk.data(), chunk.size()) != chunk.size())
-                    return false; /* The stream was indeed corrupted. */
-
-                chunks.push_back(chunk);
-            }
-
-            /* Assemble the chunks. */
-            target->clear();
-            target->reserve(size);
-            for(const QByteArray chunk: chunks)
-                target->append(chunk);
-            return true;
-        }
-    }
-
-    bool readSizeInternal(int *target) {
-        switch (peekMarker()) {
-        case QnUbj::UInt8Marker:    return readSizeInternal<std::uint8_t>(QnUbj::UInt8Marker, target);
-        case QnUbj::Int8Marker:     return readSizeInternal<std::int8_t>(QnUbj::Int8Marker, target);
-        case QnUbj::Int16Marker:    return readSizeInternal<std::int16_t>(QnUbj::Int16Marker, target);
-        case QnUbj::Int32Marker:    return readSizeInternal<std::int32_t>(QnUbj::Int32Marker, target);
-        default:                    return false;
-        }
-    }
-
-    template<class Number>
-    bool readSizeInternal(QnUbj::Marker expectedMarker, int *target) {
-        Number tmp;
-        if(!readNumberInternal(expectedMarker, &tmp))
-            return false;
-
-        *target = static_cast<int>(target);
-        if(*target < 0)
-            return false;
-
-        return true;
-    }
-
-    bool readContainerStartInternal(QnUbj::Marker expectedMarker, State normalState, State sizedState, State typedSizedState, State endState, int *size, QnUbj::Marker *type) {
+    bool readContainerStartInternal(QnUbj::Marker expectedMarker, Status startStatus, Status normalStatus, Status sizedStatus, Status typedSizedStatus, Status endStatus, int *size, QnUbj::Marker *type) {
         peekMarker();
         if(m_peekedMarker != expectedMarker)
             return false;
         m_peeked = false;
 
-        ParserState parserState;
+        m_stateStack.push_back(State(startStatus));
+        State &state = m_stateStack.back();
 
         peekMarker();
         if(m_peekedMarker == QnUbj::ContainerTypeMarker) {
             m_peeked = false;
 
-            parserState.state = typedSizedState;
-
-            parserState.type = readMarkerFromStream();
-            if(!QnUbj::isValidContainerType(parserState.type))
+            state.type = m_stream.readMarker();
+            if(!QnUbj::isValidContainerType(state.type))
                 return false;
 
-            if(readMarkerFromStream() != QnUbj::ContainerSizeMarker)
+            if(m_stream.readMarker() != QnUbj::ContainerSizeMarker)
                 return false;
 
-            if(!readSizeInternal(&parserState.count))
+            if(!readSizeFromStream(&state.count))
                 return false;
-            if(parserState.count == 0)
-                parserState.state = endState;
+
+            state.status = state.count == 0 ? endStatus : typedSizedStatus;
         } else if(m_peekedMarker == QnUbj::ContainerSizeMarker) {
             m_peeked = false;
 
-            parserState.state = sizedState;
+            state.status = sizedStatus;
 
-            if(!readSizeInternal(&state.count))
+            if(!readSizeFromStream(&state.count))
                 return false;
-            if(parserState.count == 0)
-                parserState.state = endState;
+
+            state.status = state.count == 0 ? endStatus : sizedStatus;
         } else {
-            parserState.state = normalState;
+            state.status = normalStatus;
         }
 
         if(size)
-            *size = parserState.count;
+            *size = state.count;
         if(type)
-            *type = parserState.type;
+            *type = state.type;
 
-        m_parseStack.push_back(parserState);
         return true;
     }
 
@@ -277,10 +230,10 @@ private:
             return false;
         m_peeked = false;
 
-        m_parseStack.pop_back();
-        if(m_parseStack.isEmpty()) {
+        m_stateStack.pop_back();
+        if(m_stateStack.isEmpty()) {
             /* Upper level array should not be closed. */
-            m_parseStack.push_back(ParserState(AtArrayElement));
+            m_stateStack.push_back(State(AtArrayElement));
             return false;
         }
 
@@ -290,136 +243,112 @@ private:
     QnUbj::Marker readMarkerInternal() {
         assert(!m_peeked);
 
-        const ParserState &parserState = m_parseStack.back();
-        switch (parserState.state) {
+        State &state = m_stateStack.back();
+        switch (state.status) {
+        case AtArrayStart:
+            return m_stream.readNonNoopMarker();
+
         case AtArrayElement:
-            return readNonNoopMarkerFromStream();
+            return m_stream.readNonNoopMarker();
 
         case AtSizedArrayElement:
-            parserState.count--;
-            if(parserState.count == 0)
-                parserState.state = AtArrayEnd;
-            return readNonNoopMarkerFromStream();
+            state.count--;
+            if(state.count == 0)
+                state.status = AtArrayEnd;
+            return m_stream.readNonNoopMarker();
 
         case AtTypedSizedArrayElement:
-            parserState.count--;
-            if(parserState.count == 0)
-                parserState.state = AtArrayEnd;
-            return parserState.type;
+            state.count--;
+            if(state.count == 0)
+                state.status = AtArrayEnd;
+            return state.type;
 
         case AtArrayEnd:
             return QnUbj::ArrayEndMarker;
 
+        case AtObjectStart:
+            return m_stream.readNonNoopMarker();
+
         case AtObjectKey:
-            parserState.state = AtObjectValue;
+            state.status = AtObjectValue;
             return QnUbj::Utf8StringMarker;
 
         case AtObjectValue:
-            parserState.state = AtObjectKey;
-            return readNonNoopMarkerFromStream();
+            state.status = AtObjectKey;
+            return m_stream.readNonNoopMarker();
 
         case AtSizedObjectKey:
-            parserState.state = AtSizedObjectValue;
+            state.status = AtSizedObjectValue;
             return QnUbj::Utf8StringMarker;
 
         case AtSizedObjectValue:
-            parserState.count--;
-            if(parserState.count == 0) {
-                parserState.state = AtObjectEnd;
+            state.count--;
+            if(state.count == 0) {
+                state.status = AtObjectEnd;
             } else {
-                parserState.state = AtSizedObjectKey;
+                state.status = AtSizedObjectKey;
             }
-            return readNonNoopMarkerFromStream();
+            return m_stream.readNonNoopMarker();
 
         case AtTypedSizedObjectKey:
-            parserState.state = AtTypedSizedObjectValue;
+            state.status = AtTypedSizedObjectValue;
             return QnUbj::Utf8StringMarker;
 
         case AtTypedSizedObjectValue:
-            parserState.count--;
-            if(parserState.count == 0) {
-                parserState.state = AtObjectEnd;
+            state.count--;
+            if(state.count == 0) {
+                state.status = AtObjectEnd;
             } else {
-                parserState.state = AtSizedObjectKey;
+                state.status = AtSizedObjectKey;
             }
-            return parserState.type;
+            return state.type;
 
         case AtObjectEnd:
             return QnUbj::ObjectEndMarker;
 
         default:
-            break;
-        }
-    }
-
-    QnUbj::Marker readNonNoopMarkerFromStream() {
-        while(true) {
-            QnUbj::Marker result = readMarkerFromStream();
-            if(result != QnUbj::NoopMarker)
-                return result;
-        }
-    }
-
-    QnUbj::Marker readMarkerFromStream() {
-        char c;
-        if(m_stream->read(&c, 1) != 1) {
             return QnUbj::InvalidMarker;
-        } else {
-            return QnUbj::markerFromChar(c);
         }
     }
 
-    template<class Number>
-    static Number fromBigEndian(const Number &value) {
-        return qFromBigEndian(value);
+    bool readSizeFromStream(int *target) {
+        switch (m_stream.readMarker()) {
+        case QnUbj::UInt8Marker:    return readTypedSizeFromStream<quint8>(target);
+        case QnUbj::Int8Marker:     return readTypedSizeFromStream<qint8>(target);
+        case QnUbj::Int16Marker:    return readTypedSizeFromStream<qint16>(target);
+        case QnUbj::Int32Marker:    return readTypedSizeFromStream<qint32>(target);
+        default:                    return false;
+        }
     }
 
-    static char fromBigEndian(char value) {
-        return value;
-    }
+    template<class T>
+    bool readTypedSizeFromStream(int *target) {
+        T tmp;
+        if(!m_stream.readNumber(&tmp))
+            return false;
 
-    static float fromBigEndian(float value) {
-        std::uint32_t tmp = reinterpret_cast<std::uint32_t &>(value);
-        tmp = qFromBigEndian(tmp);
-        return reinterpret_cast<float &>(tmp);
-    }
+        *target = static_cast<int>(*target);
+        if(*target < 0)
+            return false;
 
-    static float fromBigEndian(double value) {
-        std::uint64_t tmp = reinterpret_cast<std::uint64_t &>(value);
-        tmp = qFromBigEndian(tmp);
-        return reinterpret_cast<double &>(tmp);
+        return true;
     }
 
 private:
-    enum State {
-        AtArrayElement,
-        AtSizedArrayElement,
-        AtTypedSizedArrayElement,
-        AtArrayEnd,
-        
-        AtObjectKey,
-        AtObjectValue,
-        AtSizedObjectKey,
-        AtSizedObjectValue,
-        AtTypedSizedObjectKey,
-        AtTypedSizedObjectValue,
-        AtObjectEnd
-    };
-
-    struct ParserState {
-        ParserState(): state(QnUbj::AtArrayElement), type(QnUbj::InvalidMarker), count(-1) {}
-        ParserState(State state): state(state), type(QnUbj::InvalidMarker), count(-1) {}
-
-        State state;
-        QnUbj::Marker type;
-        int count;
-    };
-
-    QnInputBinaryStream<T> *m_stream;
+    QnUbjDetail::InputStreamWrapper<Input> m_stream;
+    QVector<State> m_stateStack;
     bool m_peeked;
     QnUbj::Marker m_peekedMarker;
-    QVector<ParserState> m_parseStack;
 };
+
+
+/* Disable conversion wrapping for stream types as they are not convertible to anything
+ * anyway. Also when wrapping is enabled, ADL fails to find template overloads. */
+
+template<class Output>
+QnUbjReader<Output> *disable_user_conversions(QnUbjReader<Output> *value) {
+    return value;
+}
 
 
 #endif // QN_UBJ_READER_H
