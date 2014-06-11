@@ -65,6 +65,7 @@ namespace nx_hls
         if( m_currentChunk )
         {
             //disconnecting and waiting for already-emmitted signals from m_currentChunk to be delivered and processed
+            //TODO #ak cancel on-going transcoding. Currently, it just wastes CPU time
             m_currentChunk->disconnectAndJoin( this );
             StreamingChunkCache::instance()->putBackUsedItem( m_currentChunk->params(), m_currentChunk );
             m_currentChunk.reset();
