@@ -1,17 +1,10 @@
 #!/bin/bash
 
-DISTRIB=${deb.customization.company.name}-mediaserver-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta.deb
-ARCH=${arch}
+DISTRIB=$COMPANY_NAME-mediaserver-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta
 
 function update () {
-    if [ ARCH == "arm" ]; then
-        /etc/init.d/S99networkoptix-mediaserver stop
-        tar xfv networkoptix-hdwitness-mediaserver-2.3.0.0-isd_s2.tar.gza -C /
-        /etc/init.d/S99networkoptix-mediaserver start
-    else
-        export DEBIAN_FRONTEND=noninteractive
-        dpkg -i $DISTRIB
-    fi    
+    export DEBIAN_FRONTEND=noninteractive
+    dpkg -i $DISTRIB
 }
 
 if [ "$1" != "" ]
