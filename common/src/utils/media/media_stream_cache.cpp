@@ -8,8 +8,6 @@
 
 #include <QMutexLocker>
 
-#include "mediaindex.h"
-
 
 using namespace std;
 
@@ -62,12 +60,9 @@ quint64 MediaStreamCache::SequentialReadContext::currentPos() const
 }
 
 
-MediaStreamCache::MediaStreamCache(
-    unsigned int cacheSizeMillis,
-    MediaIndex* const mediaIndex )
+MediaStreamCache::MediaStreamCache( unsigned int cacheSizeMillis )
 :
     m_cacheSizeMillis( cacheSizeMillis ),
-    m_mediaIndex( mediaIndex ),
     m_mutex( QMutex::Recursive ),
     m_prevPacketSrcTimestamp( -1 ),
     m_currentPacketTimestamp( 0 ),
@@ -112,9 +107,6 @@ void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
         m_currentPacketTimestamp += data->timestamp - m_prevPacketSrcTimestamp;
         m_prevPacketSrcTimestamp = data->timestamp;
     }
-
-    if( isKeyFrame )
-        m_mediaIndex->addPoint( m_currentPacketTimestamp, QDateTime::currentDateTimeUtc(), isKeyFrame );
 
     if( m_packetsByTimestamp.insert( make_pair( m_currentPacketTimestamp, make_pair( data, isKeyFrame ) ) ).second )
     {
