@@ -119,10 +119,10 @@ void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
     }
 
     //searching position to insert to. in most cases (or in every case in case of h.264@baseline) insertion is done to the end
-    PacketContainerType::const_iterator posToInsert = m_packetsByTimestamp.cend();
-    for( PacketContainerType::const_reverse_iterator
-        rIt = m_packetsByTimestamp.crbegin();
-        rIt != m_packetsByTimestamp.crend();
+    PacketContainerType::iterator posToInsert = m_packetsByTimestamp.end();
+    for( PacketContainerType::reverse_iterator
+        rIt = m_packetsByTimestamp.rbegin();
+        rIt != m_packetsByTimestamp.rend();
         ++rIt )
     {
         if( rIt->timestamp <= m_currentPacketTimestamp )
@@ -163,15 +163,15 @@ void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
 
         //removing old packets up to key frame, but not futher any position of sequential reading
         //PacketContainerType::iterator lastItToRemove = m_packetsByTimestamp.lower_bound( std::min<>( minReadingTimestamp, maxTimestamp - m_cacheSizeMillis*MICROS_PER_MS ) );
-        PacketContainerType::const_iterator lastItToRemove = std::lower_bound(
-            m_packetsByTimestamp.cbegin(),
-            m_packetsByTimestamp.cend(),
+        PacketContainerType::iterator lastItToRemove = std::lower_bound(
+            m_packetsByTimestamp.begin(),
+            m_packetsByTimestamp.end(),
             std::min<>( minReadingTimestamp, maxTimestamp - m_cacheSizeMillis*MICROS_PER_MS ),
             compare1_lower_bound );
-        if( lastItToRemove != m_packetsByTimestamp.cbegin() )
+        if( lastItToRemove != m_packetsByTimestamp.begin() )
             --lastItToRemove;
         //iterating to first key frame to the left from lastItToRemove
-        for( ; lastItToRemove != m_packetsByTimestamp.cbegin() && !lastItToRemove->isKeyFrame; --lastItToRemove ) {}
+        for( ; lastItToRemove != m_packetsByTimestamp.begin() && !lastItToRemove->isKeyFrame; --lastItToRemove ) {}
         //updating cache size (in bytes)
         for( PacketContainerType::const_iterator
             it = m_packetsByTimestamp.cbegin();
@@ -182,7 +182,7 @@ void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
             if( mediaPacket )
                 m_cacheSizeInBytes -= mediaPacket->data.size();
         }
-        m_packetsByTimestamp.erase( m_packetsByTimestamp.cbegin(), lastItToRemove );
+        m_packetsByTimestamp.erase( m_packetsByTimestamp.begin(), lastItToRemove );
     }
 }
 
