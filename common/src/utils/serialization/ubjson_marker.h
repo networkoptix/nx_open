@@ -1,9 +1,9 @@
-#ifndef QN_UBJ_MARKER_H
-#define QN_UBJ_MARKER_H
+#ifndef QN_UBJSON_MARKER_H
+#define QN_UBJSON_MARKER_H
 
 #include "ubjson_fwd.h"
 
-namespace QnUbj {
+namespace QnUbjson {
     enum Marker {
         NullMarker          = 'Z',
         TrueMarker          = 'T',
@@ -34,15 +34,15 @@ namespace QnUbj {
         InvalidMarker       = '\0'
     };
 
-    inline QnUbj::Marker markerFromChar(char c) {
+    inline QnUbjson::Marker markerFromChar(char c) {
         switch (c) {
         case 'Z': case 'T': case 'F': case 'U': case 'i': case 'I': case 'l':
         case 'L': case 'd': case 'D': case 'H': case 'C': case 'S':
         case '[': case ']': case '{': case '}':
         case 'N': case '$': case '#':
-            return static_cast<QnUbj::Marker>(c);
+            return static_cast<QnUbjson::Marker>(c);
         default:    
-            return QnUbj::InvalidMarker;
+            return QnUbjson::InvalidMarker;
         }
     }
 
@@ -52,19 +52,19 @@ namespace QnUbj {
 
     inline bool isValidContainerType(Marker marker) {
         switch (marker) {
-        case QnUbj::NullMarker:
-        case QnUbj::TrueMarker:
-        case QnUbj::FalseMarker:
-        case QnUbj::UInt8Marker:
-        case QnUbj::Int8Marker:
-        case QnUbj::Int16Marker:
-        case QnUbj::Int32Marker:
-        case QnUbj::Int64Marker:
-        case QnUbj::FloatMarker:
-        case QnUbj::DoubleMarker:
-        case QnUbj::BigNumberMarker:
-        case QnUbj::Latin1CharMarker:
-        case QnUbj::Utf8StringMarker:
+        case QnUbjson::NullMarker:
+        case QnUbjson::TrueMarker:
+        case QnUbjson::FalseMarker:
+        case QnUbjson::UInt8Marker:
+        case QnUbjson::Int8Marker:
+        case QnUbjson::Int16Marker:
+        case QnUbjson::Int32Marker:
+        case QnUbjson::Int64Marker:
+        case QnUbjson::FloatMarker:
+        case QnUbjson::DoubleMarker:
+        case QnUbjson::BigNumberMarker:
+        case QnUbjson::Latin1CharMarker:
+        case QnUbjson::Utf8StringMarker:
             return true;
         default:
             return false;
@@ -73,4 +73,4 @@ namespace QnUbj {
 
 } // namespace QnUbj
 
-#endif // QN_UBJ_MARKER_H
+#endif // QN_UBJSON_MARKER_H

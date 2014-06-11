@@ -70,12 +70,12 @@ bool deserialize(QnInputBinaryStream<QByteArray> *stream, QnSoftwareVersion *tar
     return QnBinary::deserialize(stream, &target->m_data);
 }
 
-void serialize(const QnSoftwareVersion &value, QnUbjWriter<QByteArray> *stream) {
-    QnUbj::serialize(value.m_data, stream);
+void serialize(const QnSoftwareVersion &value, QnUbjsonWriter<QByteArray> *stream) {
+    QnUbjson::serialize(value.m_data, stream);
 }
 
-bool deserialize(QnUbjReader<QByteArray> *stream, QnSoftwareVersion *target) {
-    return QnUbj::deserialize(stream, &target->m_data);
+bool deserialize(QnUbjsonReader<QByteArray> *stream, QnSoftwareVersion *target) {
+    return QnUbjson::deserialize(stream, &target->m_data);
 }
 
 void serialize(const QnSoftwareVersion &value, QnCsvStreamWriter<QByteArray> *target) {

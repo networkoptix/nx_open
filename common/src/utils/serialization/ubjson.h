@@ -1,18 +1,18 @@
-#ifndef QN_UBJ_H
-#define QN_UBJ_H
+#ifndef QN_UBJSON_H
+#define QN_UBJSON_H
 
 #include "ubjson_fwd.h"
 #include "ubjson_reader.h"
 #include "ubjson_writer.h"
 
-namespace QnUbj {
+namespace QnUbjson {
     template<class T, class Output>
-    void serialize(const T &value, QnUbjWriter<Output> *stream) {
+    void serialize(const T &value, QnUbjsonWriter<Output> *stream) {
         QnSerialization::serialize(value, stream);
     }
 
     template<class T, class Input>
-    bool deserialize(QnUbjReader<Input> *stream, T *target) {
+    bool deserialize(QnUbjsonReader<Input> *stream, T *target) {
         return QnSerialization::deserialize(stream, target);
     }
 
@@ -20,30 +20,30 @@ namespace QnUbj {
     template<class T>
     QByteArray serialized(const T &value) {
         QByteArray result;
-        QnUbjWriter<QByteArray> stream(&result);
-        QnUbj::serialize(value, &stream);
+        QnUbjsonWriter<QByteArray> stream(&result);
+        QnUbjson::serialize(value, &stream);
         return result;
     }
 
     template<class T>
     T deserialized(const QByteArray &value, const T &defaultValue = T(), bool *success = NULL) {
         T target;
-        QnUbjReader<QByteArray> stream(&value);
-        bool result = QnUbj::deserialize(&stream, &target);
+        QnUbjsonReader<QByteArray> stream(&value);
+        bool result = QnUbjson::deserialize(&stream, &target);
         if (success)
             *success = result;
         return result ? target : defaultValue;
     }
 #endif
 
-} // namespace QnUbj
+} // namespace QnUbjson
 
 
-namespace QnUbjDetail {
+namespace QnUbjsonDetail {
     template<class Output>
     class SerializationVisitor {
     public:
-        SerializationVisitor(QnUbjWriter<Output> *stream): 
+        SerializationVisitor(QnUbjsonWriter<Output> *stream): 
             m_stream(stream) 
         {}
 
@@ -57,7 +57,7 @@ namespace QnUbjDetail {
         template<class T, class Access>
         bool operator()(const T &value, const Access &access) const {
             using namespace QnFusion;
-            QnUbj::serialize(invoke(access(getter), value), m_stream);
+            QnUbjson::serialize(invoke(access(getter), value), m_stream);
             return true;
         }
 
@@ -69,13 +69,13 @@ namespace QnUbjDetail {
         }
 
     private:
-        QnUbjWriter<Output> *m_stream;
+        QnUbjsonWriter<Output> *m_stream;
     };
 
     template<class Input>
     struct DeserializationVisitor {
     public:
-        DeserializationVisitor(QnUbjReader<Input> *stream):
+        DeserializationVisitor(QnUbjsonReader<Input> *stream):
             m_stream(stream)
         {}
 
@@ -117,7 +117,7 @@ namespace QnUbjDetail {
         bool operator()(T &target, const Access &access, const QnFusion::member_setter_tag &) {
             using namespace QnFusion;
 
-            return QnUbj::deserialize(m_stream, &(target.*access(setter)));
+            return QnUbjson::deserialize(m_stream, &(target.*access(setter)));
         }
 
         template<class T, class Access, class Member>
@@ -125,32 +125,32 @@ namespace QnUbjDetail {
             using namespace QnFusion;
 
             Member member;
-            if(!QnUbj::deserialize(m_stream, &member))
+            if(!QnUbjson::deserialize(m_stream, &member))
                 return false;
             invoke(access(setter), target, std::move(member));
             return true;
         }
 
     private:
-        QnUbjReader<Input> *m_stream;
+        QnUbjsonReader<Input> *m_stream;
         int m_count;
     };
 
 } // namespace QnBinaryDetail
 
 
-QN_FUSION_REGISTER_SERIALIZATION_VISITOR_TPL((class Output), (QnUbjWriter<Output> *), (QnUbjDetail::SerializationVisitor<Output>))
-QN_FUSION_REGISTER_DESERIALIZATION_VISITOR_TPL((class Input), (QnUbjReader<Input> *), (QnUbjDetail::DeserializationVisitor<Input>))
+QN_FUSION_REGISTER_SERIALIZATION_VISITOR_TPL((class Output), (QnUbjsonWriter<Output> *), (QnUbjsonDetail::SerializationVisitor<Output>))
+QN_FUSION_REGISTER_DESERIALIZATION_VISITOR_TPL((class Input), (QnUbjsonReader<Input> *), (QnUbjsonDetail::DeserializationVisitor<Input>))
 
 
 #define QN_FUSION_DEFINE_FUNCTIONS_ubj(TYPE, ... /* PREFIX */)                  \
-__VA_ARGS__ void serialize(const TYPE &value, QnUbjWriter<QByteArray> *stream) { \
+__VA_ARGS__ void serialize(const TYPE &value, QnUbjsonWriter<QByteArray> *stream) { \
     QnFusion::serialize(value, &stream);                                        \
 }                                                                               \
                                                                                 \
-__VA_ARGS__ bool deserialize(QnUbjReader<QByteArray> *stream, TYPE *target) {   \
+__VA_ARGS__ bool deserialize(QnUbjsonReader<QByteArray> *stream, TYPE *target) {   \
     return QnFusion::deserialize(stream, target);                               \
 }
 
 
-#endif // QN_UBJ_H
+#endif // QN_UBJSON_H

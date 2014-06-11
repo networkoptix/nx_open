@@ -1,5 +1,5 @@
-#ifndef QN_UBJ_DETAIL_H
-#define QN_UBJ_DETAIL_H
+#ifndef QN_UBJSON_DETAIL_H
+#define QN_UBJSON_DETAIL_H
 
 #include <QtCore/QtGlobal>
 
@@ -7,7 +7,7 @@
 #include "ubjson_fwd.h"
 #include "ubjson_marker.h"
 
-namespace QnUbjDetail {
+namespace QnUbjsonDetail {
 
     template<class T>
     T fromBigEndian(const T &value) {
@@ -72,11 +72,11 @@ namespace QnUbjDetail {
         };
 
         struct State {
-            State(): status(AtArrayElement), type(QnUbj::InvalidMarker), count(-1) {}
-            State(Status status): status(status), type(QnUbj::InvalidMarker), count(-1) {}
+            State(): status(AtArrayElement), type(QnUbjson::InvalidMarker), count(-1) {}
+            State(Status status): status(status), type(QnUbjson::InvalidMarker), count(-1) {}
 
             Status status;
-            QnUbj::Marker type;
+            QnUbjson::Marker type;
             int count;
         };
     };
@@ -87,19 +87,19 @@ namespace QnUbjDetail {
     public:
         InputStreamWrapper(Input *data): m_stream(data) {}
 
-        QnUbj::Marker readMarker() {
+        QnUbjson::Marker readMarker() {
             char c;
             if(m_stream.read(&c, 1) != 1) {
-                return QnUbj::InvalidMarker;
+                return QnUbjson::InvalidMarker;
             } else {
-                return QnUbj::markerFromChar(c);
+                return QnUbjson::markerFromChar(c);
             }
         }
 
-        QnUbj::Marker readNonNoopMarker() {
+        QnUbjson::Marker readNonNoopMarker() {
             while(true) {
-                QnUbj::Marker result = readMarker();
-                if(result != QnUbj::NoopMarker)
+                QnUbjson::Marker result = readMarker();
+                if(result != QnUbjson::NoopMarker)
                     return result;
             }
         }
@@ -153,8 +153,8 @@ namespace QnUbjDetail {
     public:
         OutputStreamWrapper(Output *data): m_stream(data) {}
 
-        void writeMarker(QnUbj::Marker marker) {
-            char c = QnUbj::charFromMarker(marker);
+        void writeMarker(QnUbjson::Marker marker) {
+            char c = QnUbjson::charFromMarker(marker);
             m_stream.write(&c, 1);
         }
 
@@ -173,6 +173,6 @@ namespace QnUbjDetail {
     };
 
 
-} // namespace QnUbjDetail
+} // namespace QnUbjsonDetail
 
-#endif // QN_UBJ_DETAIL_H
+#endif // QN_UBJSON_DETAIL_H

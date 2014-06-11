@@ -458,7 +458,7 @@ public:
 
     enum SerializationFormat {
         JsonFormat,
-        UbJsonFormat,
+        UbjsonFormat,
         BnsFormat,
         CsvFormat,
         XmlFormat
