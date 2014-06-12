@@ -384,6 +384,8 @@ private:
     }
 
     bool readSizeFromStream(int *target) {
+        // TODO: #Elric #ubjson support Int64 here
+
         switch (m_stream.readMarker()) {
         case QnUbjson::UInt8Marker:    return readTypedSizeFromStream<quint8>(target);
         case QnUbjson::Int8Marker:     return readTypedSizeFromStream<qint8>(target);

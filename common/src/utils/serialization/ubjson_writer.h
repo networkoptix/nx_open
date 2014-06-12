@@ -230,8 +230,14 @@ private:
     }
 
     void writeSizeToStream(int value) {
-        if(value <= 255) {
-            m_stream.writeMarker(QnUbjson::UInt8Marker);
+        /* Note that we're not using UInt8 here as it's not completely clear 
+         * from the spec if it can be used. See this discussion:
+         * 
+         * https://github.com/thebuzzmedia/universal-binary-json/issues/28
+         * 
+         * Look for 'then the marker should be i/I/l/L'. */
+        if(value <= 127) {
+            m_stream.writeMarker(QnUbjson::Int8Marker);
             m_stream.writeNumber(static_cast<quint8>(value));
         } else if (value <= 32767) {
             m_stream.writeMarker(QnUbjson::Int16Marker);
