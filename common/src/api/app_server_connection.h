@@ -4,6 +4,7 @@
 #include <QtCore/QMutex>
 
 #include <utils/common/request_param.h>
+#include <utils/common/software_version.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/misc/schedule_task.h>
@@ -15,7 +16,6 @@
 #include <api/model/connection_info.h>
 
 #include "api_fwd.h"
-#include "abstract_connection.h"
 
 class QnAppServerConnectionFactory;
 class QnApiSerializer;

@@ -5,6 +5,7 @@
 #include <utils/serialization/lexical_enum.h>
 
 #include "session_manager.h"
+#include "abstract_reply_processor.h"
 
 Q_GLOBAL_STATIC(QnEnumLexicalSerializer<int>, qn_abstractConnection_emptySerializer);
 

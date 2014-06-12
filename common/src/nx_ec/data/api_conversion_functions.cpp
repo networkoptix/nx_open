@@ -2,6 +2,8 @@
 
 #include <api/serializer/serializer.h>
 
+#include <utils/serialization/json.h>
+
 #include <business/business_event_parameters.h>
 #include <business/business_action_parameters.h>
 #include <business/actions/abstract_business_action.h>
