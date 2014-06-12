@@ -19,15 +19,27 @@ namespace QnUbjsonDetail {
     }
 
     inline float fromBigEndian(float value) {
-        quint32 tmp = reinterpret_cast<quint32 &>(value);
-        tmp = qFromBigEndian(tmp);
-        return reinterpret_cast<float &>(tmp);
+        /* Avoid breaking strict aliasing rules by using a union. */ 
+        union {
+            quint32 i;
+            float f;
+        } tmp;
+        
+        tmp.f = value;
+        tmp.i = qFromBigEndian(tmp.i);
+        return tmp.f;
     }
 
     inline float fromBigEndian(double value) {
-        quint64 tmp = reinterpret_cast<quint64 &>(value);
-        tmp = qFromBigEndian(tmp);
-        return reinterpret_cast<double &>(tmp);
+        /* Avoid breaking strict aliasing rules by using a union. */ 
+        union {
+            quint64 i;
+            double f;
+        } tmp;
+
+        tmp.f = value;
+        tmp.i = qFromBigEndian(tmp.i);
+        return tmp.f;
     }
 
     template<class T>
@@ -40,15 +52,27 @@ namespace QnUbjsonDetail {
     }
 
     inline float toBigEndian(float value) {
-        quint32 tmp = reinterpret_cast<quint32 &>(value);
-        tmp = qToBigEndian(tmp);
-        return reinterpret_cast<float &>(tmp);
+        /* Avoid breaking strict aliasing rules by using a union. */ 
+        union {
+            quint32 i;
+            float f;
+        } tmp;
+
+        tmp.f = value;
+        tmp.i = qToBigEndian(tmp.i);
+        return tmp.f;
     }
 
     inline double toBigEndian(double value) {
-        quint64 tmp = reinterpret_cast<quint64 &>(value);
-        tmp = qToBigEndian(tmp);
-        return reinterpret_cast<double &>(tmp);
+        /* Avoid breaking strict aliasing rules by using a union. */ 
+        union {
+            quint64 i;
+            double f;
+        } tmp;
+
+        tmp.f = value;
+        tmp.i = qToBigEndian(tmp.i);
+        return tmp.f;
     }
 
 
