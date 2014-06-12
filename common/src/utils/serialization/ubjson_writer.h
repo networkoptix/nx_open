@@ -85,7 +85,7 @@ public:
     }
 
     void writeArrayStart(int size = -1, QnUbjson::Marker type = QnUbjson::InvalidMarker) {
-        writeContainerStartInternal(QnUbjson::ArrayStartMarker, AtArrayStart, AtArrayElement, AtSizedArrayElement, AtTypedSizedArrayElement, AtArrayEnd, size, type);
+        writeContainerStartInternal<AtArrayStart, AtArrayElement, AtSizedArrayElement, AtTypedSizedArrayElement, AtArrayEnd>(QnUbjson::ArrayStartMarker, size, type);
     }
 
     void writeArrayEnd() {
@@ -93,7 +93,7 @@ public:
     }
 
     void writeObjectStart(int size = -1, QnUbjson::Marker type = QnUbjson::InvalidMarker) {
-        writeContainerStartInternal(QnUbjson::ObjectStartMarker, AtObjectStart, AtObjectKey, AtSizedObjectKey, AtTypedSizedObjectKey, AtObjectEnd, size, type);
+        writeContainerStartInternal<AtObjectStart, AtObjectKey, AtSizedObjectKey, AtTypedSizedObjectKey, AtObjectEnd>(QnUbjson::ObjectStartMarker, size, type);
     }
 
     void writeObjectEnd() {
@@ -113,7 +113,8 @@ private:
         m_stream.writeBytes(value);
     }
 
-    void writeContainerStartInternal(QnUbjson::Marker marker, Status startStatus, Status normalStatus, Status sizedStatus, Status typedSizedStatus, Status endStatus, int size, QnUbjson::Marker type) {
+    template<Status startStatus, Status normalStatus, Status sizedStatus, Status typedSizedStatus, Status endStatus>
+    void writeContainerStartInternal(QnUbjson::Marker marker, int size, QnUbjson::Marker type) {
         writeMarkerInternal(marker);
 
         m_stateStack.push_back(State(startStatus));

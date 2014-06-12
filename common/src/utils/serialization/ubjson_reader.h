@@ -134,7 +134,7 @@ public:
     }
 
     bool readArrayStart(int *size = NULL, QnUbjson::Marker *type = NULL) {
-        return readContainerStartInternal(QnUbjson::ArrayStartMarker, AtArrayStart, AtArrayElement, AtSizedArrayElement, AtTypedSizedArrayElement, AtArrayEnd, size, type);
+        return readContainerStartInternal<AtArrayStart, AtArrayElement, AtSizedArrayElement, AtTypedSizedArrayElement, AtArrayEnd>(QnUbjson::ArrayStartMarker, size, type);
     }
 
     bool readArrayEnd() {
@@ -142,7 +142,7 @@ public:
     }
 
     bool readObjectStart(int *size = NULL, QnUbjson::Marker *type = NULL) {
-        return readContainerStartInternal(QnUbjson::ObjectStartMarker, AtObjectStart, AtObjectKey, AtSizedObjectKey, AtTypedSizedObjectKey, AtObjectEnd, size, type);
+        return readContainerStartInternal<AtObjectStart, AtObjectKey, AtSizedObjectKey, AtTypedSizedObjectKey, AtObjectEnd>(QnUbjson::ObjectStartMarker, size, type);
     }
 
     bool readObjectEnd() {
@@ -252,7 +252,8 @@ private:
         return m_stream.readBytes(size, target);
     }
 
-    bool readContainerStartInternal(QnUbjson::Marker expectedMarker, Status startStatus, Status normalStatus, Status sizedStatus, Status typedSizedStatus, Status endStatus, int *size, QnUbjson::Marker *type) {
+    template<Status startStatus, Status normalStatus, Status sizedStatus, Status typedSizedStatus, Status endStatus>
+    bool readContainerStartInternal(QnUbjson::Marker expectedMarker, int *size, QnUbjson::Marker *type) {
         peekMarker();
         if(m_peekedMarker != expectedMarker)
             return false;

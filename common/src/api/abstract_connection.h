@@ -17,7 +17,7 @@
 #include <utils/serialization/json.h>
 
 #include <nx_ec/ec_api.h>
-#include <rest/server/json_rest_handler.h>
+#include <rest/server/json_rest_result.h>
 
 class QnLexicalSerializer;
 

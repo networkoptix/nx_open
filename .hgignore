@@ -291,3 +291,4 @@ edge_firmware/isd/*.tar.gz
 android-client/android-main/AndroidManifest.xml
 android-client/android-main/res/**
 
+html
