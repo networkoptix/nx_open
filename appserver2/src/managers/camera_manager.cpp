@@ -82,7 +82,7 @@ namespace ec2
             handler->done( reqID, errorCode, outData);
         };
         m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
-            ApiCommand::getCameraHistoryList, nullptr, queryDoneHandler );
+            ApiCommand::getCameraHistoryItems, nullptr, queryDoneHandler );
         return reqID;
     }
 

@@ -159,7 +159,7 @@ void QnTransactionMessageBus::at_gotTransaction(QByteArray serializedTran, Trans
             }
 
             // this is required to allow client place transactions directly into transaction message bus
-            if (tran.command == ApiCommand::getAllDataList)
+            if (tran.command == ApiCommand::getFullInfo)
                 sender->setWriteSync(true);
 
             break;
@@ -302,7 +302,7 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
 {
     switch (abstractTran.command)
     {
-        case ApiCommand::getAllDataList:
+        case ApiCommand::getFullInfo:
             return deliveryTransaction<ApiFullInfoData>(abstractTran, stream);
 
         //!ApiSetResourceStatusData
@@ -606,7 +606,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     /** Request all data to be sent to the client peers on the connect. */
     QnTransaction<ApiFullInfoData> tran;
     if (remotePeer.isClient()) {
-        tran.command = ApiCommand::getAllDataList;
+        tran.command = ApiCommand::getFullInfo;
         tran.id.peerID = m_localPeer.id;
         const ErrorCode errorCode = dbManager->doQuery(nullptr, tran.params);
         if (errorCode != ErrorCode::ok) {

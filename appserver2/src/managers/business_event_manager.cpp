@@ -34,7 +34,7 @@ int QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPt
             fromApiToResourceList(rules, outData, m_resCtx.pool);
         handler->done( reqID, errorCode, outData);
     };
-    m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiBusinessRuleDataList, decltype(queryDoneHandler)> ( ApiCommand::getBusinessRuleList, nullptr, queryDoneHandler);
+    m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiBusinessRuleDataList, decltype(queryDoneHandler)> ( ApiCommand::getBusinessRules, nullptr, queryDoneHandler);
     return reqID;
 }
 

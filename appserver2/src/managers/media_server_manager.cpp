@@ -36,7 +36,7 @@ namespace ec2
             handler->done( reqID, errorCode, outData);
         };
         m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiMediaServerDataList, decltype(queryDoneHandler)> (
-            ApiCommand::getMediaServerList, nullptr, queryDoneHandler);
+            ApiCommand::getMediaServers, nullptr, queryDoneHandler);
         return reqID;
     }
 
