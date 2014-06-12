@@ -387,10 +387,10 @@ private:
         // TODO: #Elric #ubjson support Int64 here
 
         switch (m_stream.readMarker()) {
-        case QnUbjson::UInt8Marker:    return readTypedSizeFromStream<quint8>(target);
-        case QnUbjson::Int8Marker:     return readTypedSizeFromStream<qint8>(target);
-        case QnUbjson::Int16Marker:    return readTypedSizeFromStream<qint16>(target);
-        case QnUbjson::Int32Marker:    return readTypedSizeFromStream<qint32>(target);
+        case QnUbjson::UInt8Marker: return readTypedSizeFromStream<quint8>(target);
+        case QnUbjson::Int8Marker:  return readTypedSizeFromStream<qint8>(target);
+        case QnUbjson::Int16Marker: return readTypedSizeFromStream<qint16>(target);
+        case QnUbjson::Int32Marker: return readTypedSizeFromStream<qint32>(target);
         default:                    return false;
         }
     }
@@ -401,7 +401,7 @@ private:
         if(!m_stream.readNumber(&tmp))
             return false;
 
-        *target = static_cast<int>(*target);
+        *target = static_cast<int>(tmp);
         if(*target < 0)
             return false;
 

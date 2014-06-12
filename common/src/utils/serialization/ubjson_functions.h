@@ -171,12 +171,12 @@ namespace QnUbjsonDetail {
 #ifndef Q_MOC_RUN
 #define QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(TYPE, READ_METHOD, WRITE_METHOD) \
 template<class Output>                                                          \
-void serialize(const TYPE &value, QnUbjsonWriter<Output> *stream) {                \
+void serialize(const TYPE &value, QnUbjsonWriter<Output> *stream) {             \
     stream->WRITE_METHOD(value);                                                \
 }                                                                               \
                                                                                 \
 template<class Input>                                                           \
-bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                    \
+bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                 \
     return stream->READ_METHOD(target);                                         \
 }
 
@@ -196,12 +196,12 @@ QN_DEFINE_DIRECT_UBJSON_SERIALIZATION_FUNCTIONS(QByteArray,    readBinaryData, w
 
 #define QN_DEFINE_INTEGER_CONVERSION_UBJSON_SERIALIZATION_FUNCTIONS(TYPE, TARGET_TYPE) \
 template<class Output>                                                          \
-void serialize(const TYPE &value, QnUbjsonWriter<Output> *stream) {                \
-    QnUbjsonDetail::serialize_integer<TYPE, TARGET_TYPE>(value, stream);           \
+void serialize(const TYPE &value, QnUbjsonWriter<Output> *stream) {             \
+    QnUbjsonDetail::serialize_integer<TYPE, TARGET_TYPE>(value, stream);        \
 }                                                                               \
                                                                                 \
 template<class Input>                                                           \
-bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                    \
+bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                 \
     return QnUbjsonDetail::deserialize_integer<TYPE, TARGET_TYPE>(stream, target); \
 }
 
@@ -214,12 +214,12 @@ bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                 
 #define QN_DEFINE_COLLECTION_UBJSON_SERIALIZATION_FUNCTIONS(TYPE, TPL_DEF, TPL_ARG, IMPL) \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Output>                            \
 void serialize(const TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> &value, QnUbjsonWriter<Output> *stream) { \
-    QnUbjsonDetail::BOOST_PP_CAT(serialize_, IMPL)(value, stream);                 \
+    QnUbjsonDetail::BOOST_PP_CAT(serialize_, IMPL)(value, stream);              \
 }                                                                               \
                                                                                 \
 template<BOOST_PP_TUPLE_ENUM(TPL_DEF), class Input>                             \
 bool deserialize(QnUbjsonReader<Input> *stream, TYPE<BOOST_PP_TUPLE_ENUM(TPL_ARG)> *target) { \
-    return QnUbjsonDetail::BOOST_PP_CAT(deserialize_, IMPL)(stream, target);       \
+    return QnUbjsonDetail::BOOST_PP_CAT(deserialize_, IMPL)(stream, target);    \
 }                                                                               \
 
 QN_DEFINE_COLLECTION_UBJSON_SERIALIZATION_FUNCTIONS(QSet, (class T), (T), collection);
