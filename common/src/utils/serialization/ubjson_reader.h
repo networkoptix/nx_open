@@ -82,10 +82,12 @@ public:
     }
 
     bool readFloat(float *target) {
+        // TODO: #Elric support NaN (like in JSON spec)
         return readNumberInternal(QnUbjson::FloatMarker, target);
     }
 
     bool readDouble(double *target) {
+        // TODO: #Elric support NaN (like in JSON spec)
         return readNumberInternal(QnUbjson::DoubleMarker, target);
     }
 

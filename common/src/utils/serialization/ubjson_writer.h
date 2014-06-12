@@ -49,10 +49,12 @@ public:
     }
 
     void writeFloat(float value) {
+        // TODO: #Elric support NaN (like in JSON spec)
         return writeNumberInternal(QnUbjson::FloatMarker, value);
     }
 
     void writeDouble(double value) {
+        // TODO: #Elric support NaN (like in JSON spec)
         return writeNumberInternal(QnUbjson::DoubleMarker, value);
     }
 
