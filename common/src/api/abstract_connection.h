@@ -102,11 +102,14 @@ public:
 
     QUrl url() const;
     void setUrl(const QUrl &url);
+
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) = 0;
 
     QnLexicalSerializer *serializer() const;
     void setSerializer(QnLexicalSerializer *serializer);
+    
+    QString objectName(int object) const;
 
     const QnRequestHeaderList &extraHeaders() const;
     void setExtraHeaders(const QnRequestHeaderList &extraHeaders);
@@ -134,12 +137,8 @@ protected:
             return status;
 
         int replyType = qMetaTypeId<T>();
-        if(replyVariant.userType() != replyType) {
-            QString objectName;
-            m_serializer->serialize(object, &objectName);
-
-            qnWarning("Invalid return type of request '%1': expected '%2', got '%3'.", objectName, QMetaType::typeName(replyType), replyVariant.typeName());
-        }
+        if(replyVariant.userType() != replyType)
+            qnWarning("Invalid return type of request '%1': expected '%2', got '%3'.", objectName(object), QMetaType::typeName(replyType), replyVariant.typeName());
 
         *reply = replyVariant.value<T>();
         return status;
