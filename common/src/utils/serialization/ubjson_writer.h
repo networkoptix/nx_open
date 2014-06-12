@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <QtCore/QtGlobal>
+#include <QtCore/QVarLengthArray>
 
 #include "binary_stream.h"
 #include "ubjson_fwd.h"
@@ -142,9 +143,7 @@ private:
 
     void writeContainerEndInternal(QnUbjson::Marker marker) {
         assert(m_stateStack.size() > 1);
-
-        State &state = m_stateStack.back();
-        assert(state.count <= 0);
+        assert(m_stateStack.back().count <= 0);
 
         writeMarkerInternal(marker);
 
@@ -248,7 +247,7 @@ private:
 
 private:
     QnUbjsonDetail::OutputStreamWrapper<Output> m_stream;
-    QVector<State> m_stateStack;
+    QVarLengthArray<State, 8> m_stateStack;
 };
 
 

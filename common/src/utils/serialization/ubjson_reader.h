@@ -6,6 +6,7 @@
 #include <algorithm> /* For std::min. */
 
 #include <QtCore/QtGlobal>
+#include <QtCore/QVarLengthArray>
 
 #include "binary_stream.h"
 #include "ubjson_fwd.h"
@@ -410,7 +411,7 @@ private:
 
 private:
     QnUbjsonDetail::InputStreamWrapper<Input> m_stream;
-    QVector<State> m_stateStack;
+    QVarLengthArray<State, 8> m_stateStack;
     bool m_peeked;
     QnUbjson::Marker m_peekedMarker;
 };
