@@ -98,8 +98,11 @@ void QnRouter::makeConsistent() {
     while (!pointsToCheck.isEmpty()) {
         QnId point = pointsToCheck.dequeue();
 
-        foreach (const Endpoint &endpoint, m_connections.values(point))
+        foreach (const Endpoint &endpoint, connections.values(point)) {
             connections.remove(point, endpoint);
+            if (!pointsToCheck.contains(endpoint.id))
+                pointsToCheck.enqueue(endpoint.id);
+        }
     }
 
     for (auto it = connections.begin(); it != connections.end(); ++it) {
