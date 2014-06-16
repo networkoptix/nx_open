@@ -234,7 +234,7 @@ module.exports = function (grunt) {
         // concat, minify and revision files. Creates configurations in memory so
         // additional tasks can operate on them
         useminPrepare: {
-            html: '<%= yeoman.app %>/index.html',
+            html: ['<%= yeoman.app %>/index.html', '<%= yeoman.app %>/api.xsl'],
             options: {
                 dest: '<%= yeoman.dist %>'
             }
@@ -242,7 +242,7 @@ module.exports = function (grunt) {
 
         // Performs rewrites based on rev and the useminPrepare configuration
         usemin: {
-            html: ['<%= yeoman.dist %>/{,*/}*.html'],
+            html: ['<%= yeoman.dist %>/{,*/}{*.html,*.xsl}'],
             css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
             options: {
                 assetsDirs: ['<%= yeoman.dist %>']
@@ -328,6 +328,8 @@ module.exports = function (grunt) {
                             '*.{ico,png,txt}',
                             '.htaccess',
                             '*.html',
+                            '*.xml',
+                            '*.xsl',                                                        
                             'views/{,*/}*.html',
                             'bower_components/**/*',
                             'images/{,*/}*.{webp}',

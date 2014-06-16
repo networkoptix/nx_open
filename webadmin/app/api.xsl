@@ -28,16 +28,19 @@
                 <!-- endbuild -->
                 <!-- build:css({.tmp,app}) styles/main.css -->
                 <link rel="stylesheet" href="styles/main.css"/>
-                <link rel="stylesheet" href="styles/doc.css"/>
             </head>
             <body>
-                <div class="container">
-                    <div class="page-header">
-                        <h1>HD Witness
-                            <small>API Reference</small>
-                        </h1>
+              <div class="container">
+                <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+                  <div class="container">
+                    <div class="navbar-header">
+                      <h1>HD Witness
+                      <small>API Reference</small>
+                      </h1>
                     </div>
-
+                  </div>
+                </nav>
+                
                     <div class="row">
                         <nav class="col-xs-4 bs-docs-sidebar">
                             <ul class="nav nav-stacked fixed" id="sidebar">
