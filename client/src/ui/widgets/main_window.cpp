@@ -192,6 +192,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
     m_controller.reset(new QnWorkbenchController(this));
+    if (qnSettings->isVideoWallMode())
+        m_controller->setMenuEnabled(false);
     m_ui.reset(new QnWorkbenchUi(this));
     if (qnSettings->isVideoWallMode())
         m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::HideWhenNormal );

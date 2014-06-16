@@ -827,12 +827,18 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
+    if (qnSettings->isVideoWallMode())
+        return;
+
     m_mainMenu = menu()->newMenu(Qn::MainScope, mainWindow());
 
     action(Qn::MainMenuAction)->setMenu(m_mainMenu.data());
 }
 
 void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
+    if (qnSettings->isVideoWallMode())
+        return;
+
     m_currentUserLayoutsMenu = menu()->newMenu(Qn::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
 
     action(Qn::OpenCurrentUserLayoutMenu)->setMenu(m_currentUserLayoutsMenu.data());

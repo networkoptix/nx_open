@@ -767,7 +767,8 @@ QString QnServerResourceWidget::calculateTitleText() const {
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility();
     result &= (CloseButton | RotateButton | InfoButton);
-    result |= PingButton | ShowLogButton | CheckIssuesButton;
+    if (!qnSettings->isVideoWallMode)
+        result |= PingButton | ShowLogButton | CheckIssuesButton;
     return result;
 }
 
