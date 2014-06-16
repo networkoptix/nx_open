@@ -1275,7 +1275,8 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
         tr("Don't notify again about this update."),
         &ignoreThisVersion,
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Ok
+        QDialogButtonBox::Ok,
+        QDialogButtonBox::Cancel
     );
 
     if(ignoreThisVersion != thisVersionWasIgnored)

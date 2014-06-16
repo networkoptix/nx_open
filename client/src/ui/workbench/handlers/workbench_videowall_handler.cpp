@@ -671,7 +671,8 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
             QString(),
             &doNotAskAgain,
             QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Yes
+            QDialogButtonBox::Yes,
+            QDialogButtonBox::Cancel
             );
     } else {
         button = static_cast<QDialogButtonBox::StandardButton>(startMode);
