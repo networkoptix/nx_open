@@ -331,6 +331,8 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     if (m_canceled)
         return;
 
+    hideProgressDelayed();
+
     QnScreenshotParameters parameters = loader->parameters();
 
     QImage resizedToAr = image;
@@ -388,8 +390,6 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     }
 
     QnFileProcessor::createResourcesForFile(filename);
-
-    hideProgressDelayed();
 }
 
 void QnWorkbenchScreenshotHandler::showProgressDelayed(const QString &message) {
@@ -412,6 +412,7 @@ void QnWorkbenchScreenshotHandler::showProgress() {
     if (m_progressShowTime == 0)
         return;
 
+    m_progressShowTime = QDateTime::currentMSecsSinceEpoch();
     m_screenshotProgressDialog->show();
 }
 
@@ -419,11 +420,16 @@ void QnWorkbenchScreenshotHandler::hideProgressDelayed() {
     if (!m_screenshotProgressDialog)
         return;
 
+    if (!m_screenshotProgressDialog->isVisible()) {
+        hideProgress();
+        return;
+    }
+
     int restTimeMs = minProgressDisplayTime - (QDateTime::currentMSecsSinceEpoch() - m_progressShowTime);
     if (restTimeMs < 0)
         hideProgress();
     else
-        QTimer::singleShot(restTimeMs, m_screenshotProgressDialog, SLOT(hide));
+        QTimer::singleShot(restTimeMs, this, SLOT(hideProgress()));
 }
 
 void QnWorkbenchScreenshotHandler::hideProgress() {
