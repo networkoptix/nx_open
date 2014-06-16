@@ -1292,7 +1292,6 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
 
     QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->setWindowTitle(tr("Layout Settings"));
     dialog->readFromResource(layout);
 
     bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();

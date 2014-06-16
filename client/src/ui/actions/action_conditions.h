@@ -542,6 +542,12 @@ public:
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
 };
 
+class QnAutoStartAllowedActionCodition: public QnActionCondition {
+public:
+    QnAutoStartAllowedActionCodition(QObject *parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 class QnLightModeCondition: public QnActionCondition {
 public:
     QnLightModeCondition(Qn::LightModeFlags flags, QObject *parent = NULL):

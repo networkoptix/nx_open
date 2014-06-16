@@ -1256,7 +1256,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::VideowallSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Video Wall Settings...")).     //TODO: #VW #TR
-        condition(new QnResourceActionCondition(hasFlags(QnResource::videowall), Qn::ExactlyOne, this));
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(QnResource::videowall), Qn::ExactlyOne, this),
+            new QnAutoStartAllowedActionCodition(this),
+            this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).

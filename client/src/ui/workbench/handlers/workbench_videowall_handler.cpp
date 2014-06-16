@@ -286,8 +286,6 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         foreach(QnResourceWidget *widget, display()->widgets())
             at_display_widgetAdded(widget);
     }
-
-
 }
 
 QnWorkbenchVideoWallHandler::~QnWorkbenchVideoWallHandler() {

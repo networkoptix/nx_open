@@ -24,6 +24,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -818,5 +819,11 @@ Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resource
     foreach (const QnResourcePtr &resource, resources)
         if (m_isEdgeServer ^ QnMediaServerResource::isEdgeServer(resource))
             return Qn::InvisibleAction;
+    return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParameters &parameters) {
+    if(!context()->instance<QnWorkbenchAutoStarter>()->isSupported())
+        return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
