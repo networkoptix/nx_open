@@ -1194,13 +1194,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         separator();
 
-    factory(Qn::YouTubeUploadAction).
-        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
-        text(tr("Upload to YouTube...")).
-        //shortcut(tr("Ctrl+Y")).
-        autoRepeat(false).
-        condition(hasFlags(QnResource::ARCHIVE));
-
     factory(Qn::DeleteFromDiskAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
         text(tr("Delete from Disk")).

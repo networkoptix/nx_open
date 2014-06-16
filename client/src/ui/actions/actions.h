@@ -595,11 +595,6 @@ namespace Qn {
         CameraListByServerAction,
 
         /**
-         * Opens a YouTube upload dialog.
-         */
-        YouTubeUploadAction,
-
-        /**
          * Opens a folder that contains the file resource.
          */
         OpenInFolderAction,

@@ -262,7 +262,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PingAction),                             SIGNAL(triggered()),    this,   SLOT(at_pingAction_triggered()));
     connect(action(Qn::ServerLogsAction),                       SIGNAL(triggered()),    this,   SLOT(at_serverLogsAction_triggered()));
     connect(action(Qn::ServerIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_serverIssuesAction_triggered()));
-    connect(action(Qn::YouTubeUploadAction),                    SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
     connect(action(Qn::OpenInFolderAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
     connect(action(Qn::DeleteFromDiskAction),                   SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
     connect(action(Qn::RemoveLayoutItemAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
@@ -2092,16 +2091,6 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     dialog->startPings();
 #endif
 
-}
-
-void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
-    /* QnResourcePtr resource = menu()->currentParameters(sender()).resource();
-    if(resource.isNull())
-        return;
-
-    QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(context(), resource, widget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec(); */
 }
 
 void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
