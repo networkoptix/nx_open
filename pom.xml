@@ -41,7 +41,7 @@
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
         <libdir>${root.dir}/build_environment/target</libdir>        
-        <ClientHelpSourceDir>${environment.dir}/help/${release.version}/${customization}</ClientHelpSourceDir>
+        <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
