@@ -2,7 +2,7 @@
 
 #include "utils/common/util.h"
 #include "utils/network/tcp_connection_priv.h"
-#include "platform/core_platform_abstraction.h"
+#include "platform/platform_abstraction.h"
 
 #include "rest/server/rest_server.h"
 

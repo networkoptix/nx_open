@@ -10,12 +10,12 @@
 	<parent>
 		<artifactId>plugins</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.2.0-SNAPSHOT</version>
+		<version>2.2.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.2.0-SNAPSHOT</version>
+	<version>2.2.1-SNAPSHOT</version>
 	<artifactId>image_library_plugin</artifactId>
 	<packaging>pom</packaging>
 	<name>HD Witness Image Library Plugin</name>	

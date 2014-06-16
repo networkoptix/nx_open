@@ -27,6 +27,7 @@ public:
 private:
     bool doStreamingFile(QList<QnCompressedVideoDataPtr> data, AbstractStreamSocket* socket, int fps);
     void makeOfflineFlood();
+    int sendAll(AbstractStreamSocket* socket, const void* data, int size);
 private:
     quint32 m_num;
     QByteArray m_mac;

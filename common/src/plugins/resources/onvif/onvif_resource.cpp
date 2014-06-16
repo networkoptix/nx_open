@@ -24,6 +24,7 @@
 #include "onvif_helper.h"
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
+#include "utils/network/http/httptypes.h"
 #include "utils/common/timermanager.h"
 #include "utils/common/systemerror.h"
 #include "api/app_server_connection.h"
@@ -856,8 +857,19 @@ void QnPlOnvifResource::notificationReceived(
         return;
     }
 
+    //some cameras (especially, Vista) send here events on output port, filtering them out
+    if( !handler.source.empty() &&
+        std::find_if(
+            m_relayOutputInfo.begin(),
+            m_relayOutputInfo.end(),
+            [&handler](const RelayOutputInfo& outputInfo){ return QString::fromStdString(outputInfo.token) == handler.source.front().value; }
+        ) != m_relayOutputInfo.end() )
+    {
+        return; //this is notification about output port
+    }
+
     //saving port state
-    const bool newPortState = (handler.data.value == QLatin1String("true")) || (handler.data.value == QLatin1String("active"));
+    const bool newPortState = (handler.data.value == lit("true")) || (handler.data.value == lit("active")) || (handler.data.value.toInt() > 0);
     bool& currentPortState = m_relayInputStates[portSourceIter->value];
     if( currentPortState != newPortState )
     {
@@ -866,7 +878,7 @@ void QnPlOnvifResource::notificationReceived(
             toSharedPointer(),
             portSourceIter->value,
             newPortState,
-            QDateTime::currentMSecsSinceEpoch() );  //it is not absolutely correct, but better than de-synchronized timestamp from camera
+            qnSyncTime->currentMSecsSinceEpoch() );   //it is not absolutely correct, but better than de-synchronized timestamp from camera
             //handler.utcTime.toMSecsSinceEpoch() );
     }
 }
@@ -1135,6 +1147,16 @@ void QnPlOnvifResource::setImagingUrl(const QString& src)
     m_imagingUrl = src;
 }
 
+QString QnPlOnvifResource::getVideoSourceToken() const {
+    QMutexLocker lock(&m_mutex);
+    return m_videoSourceToken;
+}
+
+void QnPlOnvifResource::setVideoSourceToken(const QString &src) {
+    QMutexLocker lock(&m_mutex);
+    m_videoSourceToken = src;
+}
+
 QString QnPlOnvifResource::getPtzUrl() const
 {
     QMutexLocker lock(&m_mutex);
@@ -1376,6 +1398,121 @@ int QnPlOnvifResource::getSecondaryIndex(const QList<VideoOptionsLocal>& optList
     }
 
     return bestResIndex;
+}
+
+bool QnPlOnvifResource::registerNotificationConsumer()
+{
+    QMutexLocker lk( &m_subscriptionMutex );
+
+    //determining local address, accessible by onvif device
+    QUrl eventServiceURL( QString::fromStdString(m_eventCapabilities->XAddr) );
+    QString localAddress;
+
+    //TODO: #ak should read local address only once
+    std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
+    if( !sock->connect( eventServiceURL.host(), eventServiceURL.port(nx_http::DEFAULT_HTTP_PORT) ) )
+    {
+        NX_LOG( lit("Failed to connect to %1:%2 to determine local address. %3").
+            arg(eventServiceURL.host()).arg(eventServiceURL.port()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+        return false;
+    }
+    localAddress = sock->getLocalAddress().address.toString();
+
+    const QAuthenticator& auth = getAuth();
+    NotificationProducerSoapWrapper soapWrapper(
+        m_eventCapabilities->XAddr,
+        auth.user(),
+        auth.password(),
+        m_timeDrift );
+    soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
+
+    char buf[512];
+
+    //providing local gsoap server url
+    _oasisWsnB2__Subscribe request;
+    ns1__EndpointReferenceType notificationConsumerEndPoint;
+    ns1__AttributedURIType notificationConsumerEndPointAddress;
+    sprintf( buf, "http://%s:%d%s", localAddress.toLatin1().data(), QnSoapServer::instance()->port(), QnSoapServer::instance()->path().toLatin1().data() );
+    notificationConsumerEndPointAddress.__item = buf;
+    notificationConsumerEndPoint.Address = &notificationConsumerEndPointAddress;
+    request.ConsumerReference = &notificationConsumerEndPoint;
+    //setting InitialTerminationTime (if supported)
+    sprintf( buf, "PT%dS", DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT );
+    std::string initialTerminationTime( buf );
+    request.InitialTerminationTime = &initialTerminationTime;
+
+    //creating filter
+    //oasisWsnB2__FilterType topicFilter;
+    //strcpy( buf, "<wsnt:TopicExpression Dialect=\"xsd:anyURI\">tns1:Device/Trigger/Relay</wsnt:TopicExpression>" );
+    //topicFilter.__any.push_back( buf );
+    //request.Filter = &topicFilter;
+                                                             
+    _oasisWsnB2__SubscribeResponse response;
+    m_prevSoapCallResult = soapWrapper.Subscribe( &request, &response );
+    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )    //TODO/IMPL find out which is error and which is not
+    {
+        NX_LOG( lit("Failed to subscribe in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
+        return false;
+    }
+
+    //TODO: #ak if this variable is unused following code may be deleted as well
+    time_t utcTerminationTime; //= ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
+    if( response.oasisWsnB2__TerminationTime )
+    {
+        if( response.oasisWsnB2__CurrentTime )
+            utcTerminationTime = ::time(NULL) + *response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime;
+        else
+            utcTerminationTime = *response.oasisWsnB2__TerminationTime; //hoping local and cam clocks are synchronized
+    }
+    //else: considering, that onvif device processed initialTerminationTime
+    Q_UNUSED(utcTerminationTime)
+
+    std::string subscriptionID;
+    if( response.SubscriptionReference )
+    {
+        if( response.SubscriptionReference->ns1__ReferenceParameters &&
+            response.SubscriptionReference->ns1__ReferenceParameters->__item )
+        {
+            //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
+            QXmlSimpleReader reader;
+            SubscriptionReferenceParametersParseHandler handler;
+            reader.setContentHandler( &handler );
+            QBuffer srcDataBuffer;
+            srcDataBuffer.setData(
+                response.SubscriptionReference->ns1__ReferenceParameters->__item,
+                (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
+            QXmlInputSource xmlSrc( &srcDataBuffer );
+            if( reader.parse( &xmlSrc ) )
+                m_onvifNotificationSubscriptionID = handler.subscriptionID;
+        }
+
+        if( response.SubscriptionReference->Address )
+            m_onvifNotificationSubscriptionReference = QString::fromStdString(response.SubscriptionReference->Address->__item);
+    }
+
+    //launching renew-subscription timer
+    unsigned int renewSubsciptionTimeoutSec = 0;
+    if( response.oasisWsnB2__CurrentTime && response.oasisWsnB2__TerminationTime )
+        renewSubsciptionTimeoutSec = *response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime;
+    else
+        renewSubsciptionTimeoutSec = DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
+    m_renewSubscriptionTaskID = TimerManager::instance()->addTimer(
+        this,
+        (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
+            ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
+            : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
+
+    /* Note that we don't pass shared pointer here as this would create a 
+     * cyclic reference and onvif resource will never be deleted. */
+    QnSoapServer::instance()->getService()->registerResource(
+        this,
+        QUrl(QString::fromStdString(m_eventCapabilities->XAddr)).host(),
+        m_onvifNotificationSubscriptionReference );
+
+    m_eventMonitorType = emtNotification;
+
+    NX_LOG( lit("Successfully registered in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
+    return true;
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
@@ -2392,12 +2529,13 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::startElement(
     {
         case init:
         {
-            if( localName != QLatin1String("Message") )
+            if( localName != lit("Message") )
                 return false;
-            int utcTimeIndex = atts.index( QLatin1String("UtcTime") );
+            int utcTimeIndex = atts.index( lit("UtcTime") );
             if( utcTimeIndex == -1 )
                 return false;   //missing required attribute
             utcTime = QDateTime::fromString( atts.value(utcTimeIndex), Qt::ISODate );
+            propertyOperation = atts.value( lit("PropertyOperation") );
             m_parseStateStack.push( readingMessage );
             break;
         }
@@ -2409,7 +2547,7 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::startElement(
             else if( localName == QLatin1String("Data") )
                 m_parseStateStack.push( readingData );
             else
-                return false;
+                m_parseStateStack.push( skipping );
             break;
         }
 
@@ -2450,6 +2588,9 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::startElement(
         case readingDataItem:
             return false;   //unexpected
 
+        case skipping:
+            m_parseStateStack.push( skipping );
+
         default:
             return false;
     }
@@ -2471,123 +2612,6 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::endElement(
 //////////////////////////////////////////////////////////
 // QnPlOnvifResource
 //////////////////////////////////////////////////////////
-
-static const int DEFAULT_HTTP_PORT = 80;
-
-bool QnPlOnvifResource::registerNotificationConsumer()
-{
-    QMutexLocker lk( &m_subscriptionMutex );
-
-    //determining local address, accessible by onvif device
-    QUrl eventServiceURL( QString::fromStdString(m_eventCapabilities->XAddr) );
-    QString localAddress;
-
-    //TODO: #ak should read local address only once
-    std::unique_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
-    if( !sock->connect( eventServiceURL.host(), eventServiceURL.port(DEFAULT_HTTP_PORT) ) )
-    {
-        NX_LOG( lit("Failed to connect to %1:%2 to determine local address. %3").
-            arg(eventServiceURL.host()).arg(eventServiceURL.port()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
-        return false;
-    }
-    localAddress = sock->getLocalAddress().address.toString();
-
-    const QAuthenticator& auth = getAuth();
-    NotificationProducerSoapWrapper soapWrapper(
-        m_eventCapabilities->XAddr,
-        auth.user(),
-        auth.password(),
-        m_timeDrift );
-    soapWrapper.getProxy()->soap->imode |= SOAP_XML_IGNORENS;
-
-    char buf[512];
-
-    //providing local gsoap server url
-    _oasisWsnB2__Subscribe request;
-    ns1__EndpointReferenceType notificationConsumerEndPoint;
-    ns1__AttributedURIType notificationConsumerEndPointAddress;
-    sprintf( buf, "http://%s:%d%s", localAddress.toLatin1().data(), QnSoapServer::instance()->port(), QnSoapServer::instance()->path().toLatin1().data() );
-    notificationConsumerEndPointAddress.__item = buf;
-    notificationConsumerEndPoint.Address = &notificationConsumerEndPointAddress;
-    request.ConsumerReference = &notificationConsumerEndPoint;
-    //setting InitialTerminationTime (if supported)
-    sprintf( buf, "PT%dS", DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT );
-    std::string initialTerminationTime( buf );
-    request.InitialTerminationTime = &initialTerminationTime;
-
-    //creating filter
-    //oasisWsnB2__FilterType topicFilter;
-    //strcpy( buf, "<wsnt:TopicExpression Dialect=\"xsd:anyURI\">tns1:Device/Trigger/Relay</wsnt:TopicExpression>" );
-    //topicFilter.__any.push_back( buf );
-    //request.Filter = &topicFilter;
-                                                             
-    _oasisWsnB2__SubscribeResponse response;
-    m_prevSoapCallResult = soapWrapper.Subscribe( &request, &response );
-    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )    //TODO/IMPL find out which is error and which is not
-    {
-        NX_LOG( lit("Failed to subscribe in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
-        return false;
-    }
-
-    //TODO: #ak if this variable is unused following code may be deleted as well
-    time_t utcTerminationTime; //= ::time(NULL) + DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
-    if( response.oasisWsnB2__TerminationTime )
-    {
-        if( response.oasisWsnB2__CurrentTime )
-            utcTerminationTime = ::time(NULL) + *response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime;
-        else
-            utcTerminationTime = *response.oasisWsnB2__TerminationTime; //hoping local and cam clocks are synchronized
-    }
-    //else: considering, that onvif device processed initialTerminationTime
-    Q_UNUSED(utcTerminationTime)
-
-    std::string subscriptionID;
-    if( response.SubscriptionReference )
-    {
-        if( response.SubscriptionReference->ns1__ReferenceParameters &&
-            response.SubscriptionReference->ns1__ReferenceParameters->__item )
-        {
-            //parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
-            QXmlSimpleReader reader;
-            SubscriptionReferenceParametersParseHandler handler;
-            reader.setContentHandler( &handler );
-            QBuffer srcDataBuffer;
-            srcDataBuffer.setData(
-                response.SubscriptionReference->ns1__ReferenceParameters->__item,
-                (int) strlen(response.SubscriptionReference->ns1__ReferenceParameters->__item) );
-            QXmlInputSource xmlSrc( &srcDataBuffer );
-            if( reader.parse( &xmlSrc ) )
-                m_onvifNotificationSubscriptionID = handler.subscriptionID;
-        }
-
-        if( response.SubscriptionReference->Address )
-            m_onvifNotificationSubscriptionReference = QString::fromStdString(response.SubscriptionReference->Address->__item);
-    }
-
-    //launching renew-subscription timer
-    unsigned int renewSubsciptionTimeoutSec = 0;
-    if( response.oasisWsnB2__CurrentTime && response.oasisWsnB2__TerminationTime )
-        renewSubsciptionTimeoutSec = *response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime;
-    else
-        renewSubsciptionTimeoutSec = DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT;
-    m_renewSubscriptionTaskID = TimerManager::instance()->addTimer(
-        this,
-        (renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
-            ? renewSubsciptionTimeoutSec-RENEW_NOTIFICATION_FORWARDING_SECS
-            : renewSubsciptionTimeoutSec)*MS_PER_SECOND );
-
-    /* Note that we don't pass shared pointer here as this would create a 
-     * cyclic reference and onvif resource will never be deleted. */
-    QnSoapServer::instance()->getService()->registerResource(
-        this,
-        QUrl(QString::fromStdString(m_eventCapabilities->XAddr)).host(),
-        m_onvifNotificationSubscriptionReference );
-
-    m_eventMonitorType = emtNotification;
-
-    NX_LOG( lit("Successfully registered in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logDEBUG1 );
-    return true;
-}
 
 bool QnPlOnvifResource::createPullPointSubscription()
 {

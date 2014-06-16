@@ -1,3 +1,16 @@
+----------------------------------------------2.2.1.xxxx-------------------------------------------
+
+Improvements:
+1. Onvif protocol support is improved
+2. Web client works better on Internet Explorer 9+
+3. If screenshots are taken from a remote camera, then it can take a long to download it. Added progress bar to allow users to esimate time.
+
+Bugs Fixed:
+1. Fixed the installation error on Windows 8 and Windows Server 2008
+2. Sometimes thumbnails could not be loaded on Android devices. Fixed
+3. Better motion support for non-onvif cameras that are integrated through SDK.
+
+
 ----------------------------------------------2.2.0.xxxx-------------------------------------------
 
 Features:

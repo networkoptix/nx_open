@@ -161,6 +161,9 @@ public:
     QString getImagingUrl() const;
     void setImagingUrl(const QString& src);
 
+    QString getVideoSourceToken() const;
+    void setVideoSourceToken(const QString &src);
+
     QString getPtzUrl() const;
     void setPtzUrl(const QString& src);
 
@@ -212,6 +215,7 @@ public:
     void afterConfigureStream();
 
     static QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
+
 protected:
     int strictBitrate(int bitrate) const;
     void setCodec(CODECS c, bool isPrimary);
@@ -264,7 +268,9 @@ private:
     QRect getVideoSourceMaxSize(const QString& configToken);
 
     bool isH264Allowed() const; // block H264 if need for compatble with some onvif devices
+
 protected:
+    std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     QList<QSize> m_resolutionList; //Sorted desc
     QList<QSize> m_secondaryResolutionList;
     std::unique_ptr<OnvifCameraSettingsResp> m_onvifAdditionalSettings;
@@ -278,6 +284,9 @@ protected:
 
     qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
     int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
+    //!Registeres local NotificationConsumer in resource's NotificationProducer
+    bool registerNotificationConsumer();
+
 private slots:
     void onRenewSubscriptionTimer();
 
@@ -331,6 +340,7 @@ private:
             }
         };
 
+        QString propertyOperation;
         QDateTime utcTime;
         std::list<SimpleItem> source;
         SimpleItem data;
@@ -348,7 +358,9 @@ private:
             readingSource,
             readingSourceItem,
             readingData,
-            readingDataItem
+            readingDataItem,
+            //skipping unknown element
+            skipping
         };
 
         std::stack<State> m_parseStateStack;
@@ -416,7 +428,6 @@ private:
     QString m_ptzConfigurationToken;
     int m_timeDrift;
     int m_prevSoapCallResult;
-    std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
@@ -438,8 +449,6 @@ private:
 
     bool createPullPointSubscription();
     bool pullMessages();
-    //!Registeres local NotificationConsumer in resource's NotificationProducer
-    bool registerNotificationConsumer();
     //!Reads relay output list from resource
     bool fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs );
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
