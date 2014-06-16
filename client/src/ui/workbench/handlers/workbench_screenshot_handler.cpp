@@ -313,6 +313,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         loader->setParameters(parameters); //update changed fields
 
         showProgressDelayed(tr("Saving %1").arg(QFileInfo(fileName).completeBaseName()));
+        connect(m_screenshotProgressDialog, &QnProgressDialog::canceled, loader, &QnScreenshotLoader::deleteLater);
     }
     m_canceled = false;
     loader->loadAsync();
