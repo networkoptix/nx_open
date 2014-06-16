@@ -82,6 +82,20 @@ QVariant QnServerAddressesModel::data(const QModelIndex &index, int role) const 
     return QVariant();
 }
 
+bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+    Q_UNUSED(role)
+
+    if (index.column() != IgnoredColumn)
+        return false;
+
+    if (isManualAddress(index))
+        return false;
+
+    emit ignoreChangeRequested(index.sibling(index.row(), AddressColumn).data().toString(), value.toInt() == Qt::Checked);
+
+    return false;
+}
+
 QVariant QnServerAddressesModel::headerData(int section, Qt::Orientation orientation, int role) const {
     if (orientation == Qt::Vertical)
         return QVariant();

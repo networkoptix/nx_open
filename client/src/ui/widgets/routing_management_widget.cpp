@@ -26,10 +26,11 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     ui->addressesView->horizontalHeader()->setSectionResizeMode(QnServerAddressesModel::AddressColumn, QHeaderView::Stretch);
     ui->addressesView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    connect(ui->serversView->selectionModel(),  &QItemSelectionModel::currentRowChanged,    this,   &QnRoutingManagementWidget::at_serversView_currentIndexChanged);
-    connect(ui->addressesView->selectionModel(),&QItemSelectionModel::currentRowChanged,    this,   &QnRoutingManagementWidget::at_addressesView_currentIndexChanged);
-    connect(ui->addButton,                      &QPushButton::clicked,                      this,   &QnRoutingManagementWidget::at_addButton_clicked);
-    connect(ui->removeButton,                   &QPushButton::clicked,                      this,   &QnRoutingManagementWidget::at_removeButton_clicked);
+    connect(ui->serversView->selectionModel(),  &QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::at_serversView_currentIndexChanged);
+    connect(ui->addressesView->selectionModel(),&QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::at_addressesView_currentIndexChanged);
+    connect(m_serverAddressesModel,             &QnServerAddressesModel::ignoreChangeRequested, this,   &QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested);
+    connect(ui->addButton,                      &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_addButton_clicked);
+    connect(ui->removeButton,                   &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_removeButton_clicked);
 }
 
 QnRoutingManagementWidget::~QnRoutingManagementWidget() {}
@@ -128,4 +129,27 @@ void QnRoutingManagementWidget::at_addressesView_currentIndexChanged(const QMode
 void QnRoutingManagementWidget::at_currentServer_changed(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
     updateModel(server);
+}
+
+void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(const QString &address, bool ignore) {
+    QnMediaServerResourcePtr server = currentServer();
+    if (!server)
+        return;
+
+    if (!server->getNetAddrList().contains(QHostAddress(address)))
+        return;
+
+    QUrl url = QUrl(QString(lit("http://%1")).arg(address));
+
+    QList<QUrl> ignoredUrls = server->getIgnoredUrls();
+
+    if (ignore) {
+        if (ignoredUrls.contains(url))
+            return;
+        ignoredUrls.append(url);
+    } else {
+        if (!ignoredUrls.removeOne(url))
+            return;
+    }
+    server->setIgnoredUrls(ignoredUrls);
 }
