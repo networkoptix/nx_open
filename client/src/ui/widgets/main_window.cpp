@@ -216,7 +216,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
-    /* Set up actions. */
+    /* Set up actions. Only these actions will be available through hotkeys. */
     addAction(action(Qn::NextLayoutAction));
     addAction(action(Qn::PreviousLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAction));
@@ -242,6 +242,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
     addAction(action(Qn::DeleteVideoWallItemAction));
+    addAction(action(Qn::DeleteVideowallMatrixAction));
     addAction(action(Qn::SelectAllAction));
     addAction(action(Qn::CheckFileSignatureAction));
     addAction(action(Qn::TakeScreenshotAction));
