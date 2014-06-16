@@ -1931,10 +1931,16 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved(const QnResourcePtr
         QnVideowallAutoStarter(resource->getId(), this).setAutoStartEnabled(false); //TODO: #GDM #VW clean nonexistent videowalls sometimes
         closeInstanceDelayed();
     } else {
-        if (QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>()) {
-            disconnect(videoWall, NULL, this, NULL);
-            QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false); //TODO: #GDM #VW clean nonexistent videowalls sometimes
-        }
+        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+        if (!videoWall)
+            return;
+        disconnect(videoWall, NULL, this, NULL);
+        QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false); //TODO: #GDM #VW clean nonexistent videowalls sometimes
+
+        QnWorkbenchLayout* layout = findReviewModeLayout(videoWall);
+        if (layout && layout->resource())
+            qnResPool->removeResource(layout->resource());
+ 
 
     }
 }
