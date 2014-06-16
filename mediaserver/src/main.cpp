@@ -1008,7 +1008,7 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
-    m_universalTcpListener->addHandler<QnFileConnectionProcessor>("HTTP", "web/static");
+    m_universalTcpListener->addHandler<QnFileConnectionProcessor>("HTTP", "static");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
     //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
