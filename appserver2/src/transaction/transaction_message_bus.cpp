@@ -620,13 +620,16 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
             return;
         }
 
+        // TODO: #dklychkov rewrite module info synchronization
         /* fill module information */
+/*
         foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules()) {
             ApiModuleData data;
             QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
             data.discoverer = QnId(qnCommon->moduleGUID());
             tran.params.foundModules.push_back(data);
         }
+        */
     }
 
     QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer, remotePeer, socket));
