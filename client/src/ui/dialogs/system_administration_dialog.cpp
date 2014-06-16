@@ -4,6 +4,7 @@
 #include <QtWidgets/QMessageBox>
 
 #include <ui/widgets/server_updates_widget.h>
+#include <ui/widgets/routing_management_widget.h>
 
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QnWorkbenchContext *context, QWidget *parent) :
     QDialog(parent),
@@ -14,6 +15,9 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QnWorkbenchContext *c
 
     m_updatesWidget = new QnServerUpdatesWidget(this);
     ui->tabWidget->addTab(m_updatesWidget, tr("Updates"));
+
+    m_routingManagementWidget = new QnRoutingManagementWidget(this);
+    ui->tabWidget->addTab(m_routingManagementWidget, tr("Routing Management"));
 }
 
 QnSystemAdministrationDialog::~QnSystemAdministrationDialog() {}

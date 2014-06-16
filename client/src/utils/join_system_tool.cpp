@@ -154,6 +154,11 @@ void QnJoinSystemTool::rediscoverPeer() {
 }
 
 void QnJoinSystemTool::updateDiscoveryInformation() {
+    QHostAddress address(m_targetUrl.host());
+    // there is no need to add manual address if it's already in the database
+    if (!address.isNull() && m_targetServer->getNetAddrList().contains(address))
+        return;
+
     connection2()->getDiscoveryManager()->addDiscoveryInformation(m_targetServer->getId(), QList<QUrl>() << m_targetUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     finish(NoError);
 }
