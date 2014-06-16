@@ -50,14 +50,15 @@ AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
 
 static QAtomicInt QnFfmpegTranscoder_count = 0;
 
-QnFfmpegTranscoder::QnFfmpegTranscoder():
-QnTranscoder(),
-m_videoEncoderCodecCtx(0),
-m_audioEncoderCodecCtx(0),
-m_videoBitrate(0),
-m_formatCtx(0),
-m_ioContext(0),
-m_baseTime(AV_NOPTS_VALUE)
+QnFfmpegTranscoder::QnFfmpegTranscoder()
+:
+    QnTranscoder(),
+    m_videoEncoderCodecCtx(0),
+    m_audioEncoderCodecCtx(0),
+    m_videoBitrate(0),
+    m_formatCtx(0),
+    m_ioContext(0),
+    m_baseTime(AV_NOPTS_VALUE)
 {
     NX_LOG( lit("Created new ffmpeg transcoder. Total transcoder count %1").
         arg(QnFfmpegTranscoder_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
@@ -70,16 +71,26 @@ QnFfmpegTranscoder::~QnFfmpegTranscoder()
     closeFfmpegContext();
 }
 
+void av_free_stream( AVStream* st )
+{
+    av_free( st->info );
+    if( st->codec )
+    {
+        avcodec_close( st->codec );
+        av_free( st->codec );
+    }
+    av_free( st );
+}
+
 void QnFfmpegTranscoder::closeFfmpegContext()
 {
     if (m_formatCtx)
     {
+        av_write_trailer(m_formatCtx);
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
-        {
-            if (m_formatCtx->streams[i]->codec->codec)
-                avcodec_close(m_formatCtx->streams[i]->codec);
-        }
+            av_free_stream( m_formatCtx->streams[i] );
     }
+
     if (m_ioContext)
     {
         //m_ioContext->opaque = 0;
@@ -134,7 +145,8 @@ int QnFfmpegTranscoder::open(QnConstCompressedVideoDataPtr video, QnConstCompres
             return -1;
         }
 
-        videoStream->codec = m_videoEncoderCodecCtx = avcodec_alloc_context3(0);
+        //videoStream->codec = m_videoEncoderCodecCtx = avcodec_alloc_context3(0);
+        m_videoEncoderCodecCtx = videoStream->codec;
         m_videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         m_videoEncoderCodecCtx->codec_id = m_videoCodec;
         m_videoEncoderCodecCtx->pix_fmt = m_videoCodec == CODEC_ID_MJPEG ? PIX_FMT_YUVJ420P : PIX_FMT_YUV420P;
@@ -169,6 +181,7 @@ int QnFfmpegTranscoder::open(QnConstCompressedVideoDataPtr video, QnConstCompres
                 if (videoWidth < 1 || videoHeight < 1)
                 {
                     m_lastErrMessage = tr("Could not perform direct stream copy because frame size is undefined.");
+                    av_free_stream( videoStream );
                     return -3;
                 }
             }
@@ -214,6 +227,7 @@ int QnFfmpegTranscoder::open(QnConstCompressedVideoDataPtr video, QnConstCompres
         if (avCodec == 0)
         {
             m_lastErrMessage = tr("Could not find codec %1.").arg(m_audioCodec);
+            av_free_stream( audioStream );
             return -2;
         }
         audioStream->codec = m_audioEncoderCodecCtx = avcodec_alloc_context3(avCodec);

@@ -292,3 +292,9 @@ android-client/android-main/AndroidManifest.xml
 android-client/android-main/res/**
 
 html
+
+webadmin/node_modules
+webadmin/dist
+webadmin/.tmp
+webadmin/.sass-cache
+app/bower_components

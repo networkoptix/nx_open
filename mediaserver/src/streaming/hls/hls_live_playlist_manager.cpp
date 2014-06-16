@@ -17,7 +17,6 @@ namespace nx_hls
 
     HLSLivePlaylistManager::HLSLivePlaylistManager(
         MediaStreamCache* const mediaStreamCache,
-        MediaIndex* const /*mediaIndex*/,
         quint64 targetDurationUSec )
     :
         m_mediaStreamCache( mediaStreamCache ),
@@ -125,7 +124,7 @@ namespace nx_hls
                     }
                     else
                     {
-                        if( m_removedChunksToKeepCount < m_chunks.size() )
+                        if( (size_t)m_removedChunksToKeepCount < m_chunks.size() )
                             keepChunkDataTillTimestamp = m_chunks[m_removedChunksToKeepCount].startTimestamp;
                         else
                             keepChunkDataTillTimestamp =

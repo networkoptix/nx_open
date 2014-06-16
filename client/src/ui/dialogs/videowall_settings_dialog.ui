@@ -11,13 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Video Wall Settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QCheckBox" name="autoRunCheckBox">
      <property name="text">
-      <string>Start videowall when the Windows starts</string>
+      <string>Start Video Wall when the Windows starts</string>
      </property>
     </widget>
    </item>

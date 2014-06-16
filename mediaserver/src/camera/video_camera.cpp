@@ -1,14 +1,16 @@
+
 #include "video_camera.h"
+
+#include <deque>
+
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/datapacket/media_data_packet.h"
-#include "core/resource/camera_resource.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
-#include "utils/media/frame_info.h"
-#include "decoders/video/ffmpeg.h"
-#include "utils/common/synctime.h"
-#include <deque>
 #include "core/dataprovider/live_stream_provider.h"
-#include "utils/media/mediaindex.h"
+#include "core/resource/camera_resource.h"
+#include "decoders/video/ffmpeg.h"
+#include "utils/media/frame_info.h"
+#include "utils/common/synctime.h"
 
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
@@ -511,10 +513,9 @@ bool QnVideoCamera::ensureLiveCacheStarted(
     //ensuring that vectors will not take much memory
     static_assert(
         ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
-        "MediaQuality enum suddenly contains too large values: consider changing QnVideoCamera::m_liveCache, QnVideoCamera::m_mediaIndexes, QnVideoCamera::m_hlsLivePlaylistManager type" );  
+        "MediaQuality enum suddenly contains too large values: consider changing QnVideoCamera::m_liveCache, QnVideoCamera::m_hlsLivePlaylistManager type" );  
 
     m_liveCache.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
-    m_mediaIndexes.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_hlsLivePlaylistManager.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
 
     primaryReader->startIfNotRunning();
@@ -524,13 +525,9 @@ bool QnVideoCamera::ensureLiveCacheStarted(
     if( !primaryReader )
         return false;
 
-    m_mediaIndexes[streamQuality].reset( new MediaIndex() );
-    m_liveCache[streamQuality].reset( new MediaStreamCache( MEDIA_CACHE_SIZE_MILLIS, m_mediaIndexes[streamQuality].get() ) );
+    m_liveCache[streamQuality].reset( new MediaStreamCache( MEDIA_CACHE_SIZE_MILLIS ) );
     m_hlsLivePlaylistManager[streamQuality] = QSharedPointer<nx_hls::HLSLivePlaylistManager>(
-        new nx_hls::HLSLivePlaylistManager(
-            m_liveCache[streamQuality].get(),
-            m_mediaIndexes[streamQuality].get(),
-            targetDurationUSec ) );
+        new nx_hls::HLSLivePlaylistManager( m_liveCache[streamQuality].get(), targetDurationUSec ) );
     //connecting live cache to reader
     primaryReader->addDataProcessor( m_liveCache[streamQuality].get() );
     m_cameraUsers << this;

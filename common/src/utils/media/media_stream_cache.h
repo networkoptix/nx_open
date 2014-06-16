@@ -5,6 +5,7 @@
 #ifndef MEDIASTREAMCACHE_H
 #define MEDIASTREAMCACHE_H
 
+#include <deque>
 #include <map>
 #include <set>
 #include <vector>
@@ -13,8 +14,6 @@
 
 #include <core/dataconsumer/abstract_data_receptor.h>
 
-
-class MediaIndex;
 
 /*!
     Event receiver is allowed to call \a MediaStreamCache methods from \a onKeyFrame
@@ -69,9 +68,7 @@ public:
     /*!
         \param cacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis is dropped
     */
-    MediaStreamCache(
-        unsigned int cacheSizeMillis,
-        MediaIndex* const mediaIndex );
+    MediaStreamCache( unsigned int cacheSizeMillis );
 
     //!Implementation of QnAbstractDataReceptor::canAcceptData
     virtual bool canAcceptData() const override;
@@ -117,13 +114,37 @@ public:
     //!Removed blocking \a blockingID
     void unblockData( int blockingID );
 
+    struct MediaPacketContext
+    {
+        quint64 timestamp;
+        QnAbstractDataPacketPtr packet;
+        bool isKeyFrame;
+
+        MediaPacketContext() 
+        :
+            timestamp( 0 ),
+            isKeyFrame( false )
+        {
+        }
+
+        MediaPacketContext(
+            quint64 _timestamp,
+            QnAbstractDataPacketPtr _packet,
+            bool _isKeyFrame )
+        :
+            timestamp( _timestamp ),
+            packet( _packet ),
+            isKeyFrame( _isKeyFrame )
+        {
+        }
+    };
+
 private:
     //!map<timestamp, pair<packet, key_flag> >
-    typedef std::map<quint64, std::pair<QnAbstractDataPacketPtr, bool> > PacketCotainerType;
+    typedef std::deque<MediaPacketContext> PacketContainerType;
 
     unsigned int m_cacheSizeMillis;
-    MediaIndex* const m_mediaIndex;
-    PacketCotainerType m_packetsByTimestamp;
+    PacketContainerType m_packetsByTimestamp;
     mutable QMutex m_mutex;
     qint64 m_prevPacketSrcTimestamp;
     //!In micros

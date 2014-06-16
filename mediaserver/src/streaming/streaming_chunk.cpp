@@ -13,7 +13,6 @@ StreamingChunk::SequentialReadingContext::SequentialReadingContext()
 {
 }
 
-
 StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params )
 :
     m_params( params ),
@@ -75,9 +74,13 @@ bool StreamingChunk::openForModification()
 
 void StreamingChunk::appendData( const QByteArray& data )
 {
+    static const size_t BUF_INCREASE_STEP = 128*1024;
+
     {
         QMutexLocker lk( &m_mutex );
         Q_ASSERT( m_isOpenedForModification );
+        if( m_data.capacity() < m_data.size() + data.size() )
+            m_data.reserve( m_data.size() + data.size() + BUF_INCREASE_STEP );
         m_data.append( data );
     }
 

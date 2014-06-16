@@ -15,7 +15,6 @@
 #include "hls_playlist_manager.h"
 
 
-class MediaIndex;
 class MediaStreamCache;
 
 namespace nx_hls
@@ -33,7 +32,6 @@ namespace nx_hls
     public:
         HLSLivePlaylistManager(
             MediaStreamCache* const mediaStreamCache,
-            MediaIndex* const mediaIndex,
             quint64 targetDurationUSec );
         ~HLSLivePlaylistManager();
 

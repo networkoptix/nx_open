@@ -475,10 +475,9 @@ void QnVideowallItemWidget::updateStatusOverlay(Qn::ResourceStatusOverlay overla
 
 
 bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data) {
-    QnResourcePtr resource = resourcePool()->getResourceByUniqId(data.resource.path);
-    /*QnResourcePtr resource = (data.resource.id.isNull())
+    QnResourcePtr resource = (!data.resource.id.isNull())
             ? qnResPool->getResourceById(data.resource.id)
-            : qnResPool->getResourceByUniqId(data.resource.path);*/ //TODO: #EC2
+            : qnResPool->getResourceByUniqId(data.resource.path); //TODO: #EC2
 
     bool isServer = resource && (resource->flags() & QnResource::server);
 

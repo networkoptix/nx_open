@@ -142,15 +142,23 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
 
     if (urlPath.startsWith("proxy") || urlPath.startsWith("/proxy"))
     {
-        int proxyEndPos = urlPath.indexOf('/', 1); // remove proxy prefix
+        int proxyEndPos = urlPath.indexOf('/', 2); // remove proxy prefix
         int protocolEndPos = urlPath.indexOf('/', proxyEndPos+1); // remove proxy prefix
         if (protocolEndPos == -1)
             return false;
+
+        QString protocol = urlPath.mid(proxyEndPos+1, protocolEndPos - proxyEndPos-1);
+        if (!isProtocol(protocol)) {
+            protocol = dstUrl.scheme();
+            if (protocol.isEmpty())
+                protocol = "http";
+            protocolEndPos = proxyEndPos;
+        }
+
         int hostEndPos = urlPath.indexOf('/', protocolEndPos+1); // remove proxy prefix
         if (hostEndPos == -1)
             hostEndPos = urlPath.size();
 
-        QString protocol = urlPath.mid(proxyEndPos+1, protocolEndPos - proxyEndPos-1);
         host = urlPath.mid(protocolEndPos+1, hostEndPos - protocolEndPos-1);
         if (host.startsWith("{"))
             xServerGUID = host;
