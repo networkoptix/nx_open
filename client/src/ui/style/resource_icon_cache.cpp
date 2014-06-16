@@ -5,6 +5,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/videowall_resource.h>
 
 #include <ui/style/skin.h>
 
@@ -101,21 +102,26 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr &resource)
     }
 
     Key status = Unknown;
-    if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
-        status = layout->locked() ? Locked : Unknown;
-    else
-    switch (resource->getStatus()) {
-    case QnResource::Online:
-        status = Online;
-        break;
-    case QnResource::Offline:
-        status = Offline;
-        break;
-    case QnResource::Unauthorized:
-        status = Unauthorized;
-        break;
-    default:
-        break;
+    if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
+        if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
+            key = VideoWall;
+        else
+            status = layout->locked() ? Locked : Unknown;
+    }
+    else {
+        switch (resource->getStatus()) {
+        case QnResource::Online:
+            status = Online;
+            break;
+        case QnResource::Offline:
+            status = Offline;
+            break;
+        case QnResource::Unauthorized:
+            status = Unauthorized;
+            break;
+        default:
+            break;
+        }
     }
 
     return Key(key | status);

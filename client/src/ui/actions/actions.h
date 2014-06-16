@@ -192,9 +192,14 @@ namespace Qn {
         PushMyScreenToVideowallAction,
 
         /**
-         * Saves current videowall review layout.
+         * Saves videowall review layout.
          */
         SaveVideoWallReviewAction,
+
+        /**
+         * Saves current videowall review layout.
+         */
+        SaveCurrentVideoWallReviewAction,
 
         /**
          * Handles resources drop on the selected videowall item.

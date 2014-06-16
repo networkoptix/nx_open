@@ -335,6 +335,7 @@ Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutIte
 
 Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout;
+    QnVideoWallResourcePtr videowall;
 
     if(m_current) {
         layout = workbench()->currentLayout()->resource();
@@ -346,6 +347,9 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
     }
 
     if(!layout)
+        return Qn::InvisibleAction;
+
+    if (layout->data().contains(Qn::VideoWallResourceRole))
         return Qn::InvisibleAction;
 
     if(snapshotManager()->isSaveable(layout)) {

@@ -612,9 +612,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Alt+S")).
-        autoRepeat(false);
+        autoRepeat(false).
+        condition(new QnVideoWallReviewModeCondition(true, this));
 
-    factory(Qn::SaveVideoWallReviewAction).
+    factory(Qn::SaveCurrentVideoWallReviewAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey | Qn::IntentionallyAmbiguous).
         text(tr("Save Video Wall View")). //TODO: #VW #TR
         shortcut(tr("Ctrl+S")).
@@ -903,6 +904,14 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Switch to Video Wall mode...")).  //TODO: #VW #TR
         autoRepeat(false).
         condition(new QnStartVideowallActionCondition(this));
+
+    factory(Qn::SaveVideoWallReviewAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        text(tr("Save Video Wall View")). //TODO: #VW #TR
+        shortcut(tr("Ctrl+S")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        autoRepeat(false).
+        condition(hasFlags(QnResource::videowall));
 
     factory(Qn::SaveVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).

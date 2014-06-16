@@ -221,7 +221,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::PreviousLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAsAction));
-    addAction(action(Qn::SaveVideoWallReviewAction));
+    addAction(action(Qn::SaveCurrentVideoWallReviewAction));
     addAction(action(Qn::ExitAction));
     addAction(action(Qn::EscapeHotkeyAction));
     addAction(action(Qn::FullscreenMaximizeHotkeyAction));

@@ -31,6 +31,8 @@ public:
     explicit QnWorkbenchVideoWallHandler(QObject *parent = 0);
     virtual ~QnWorkbenchVideoWallHandler();
 
+    bool saveReviewLayout(const QnLayoutResourcePtr &layout, std::function<void(int, ec2::ErrorCode)> callback);
+
 private:
     ec2::AbstractECConnectionPtr connection2() const;
 
@@ -86,6 +88,7 @@ private slots:
     void at_identifyVideoWallAction_triggered();
     void at_startVideoWallControlAction_triggered();
     void at_openVideoWallsReviewAction_triggered();
+    void at_saveCurrentVideoWallReviewAction_triggered();
     void at_saveVideoWallReviewAction_triggered();
     void at_dropOnVideoWallItemAction_triggered();
     void at_pushMyScreenToVideowallAction_triggered();
@@ -137,6 +140,8 @@ private slots:
 
     void submitDelayedItemOpen();
 
+    void saveVideowall(const QnVideoWallResourcePtr& videowall);
+    void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls);
 private:
     struct ScreenSnap {
         int index;          /**< Index of the screen. */
