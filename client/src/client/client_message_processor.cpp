@@ -178,8 +178,10 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData, bool isP
 
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
-    if (m_incompatibleServerAdder)
+    if (m_incompatibleServerAdder) {
         delete m_incompatibleServerAdder;
+        m_incompatibleServerAdder = 0;
+    }
 
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     QnResourceDiscoveryManager::instance()->setReady(true);

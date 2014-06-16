@@ -10,7 +10,6 @@
 #include <QWaitCondition>
 
 #include <core/resource/media_resource.h>
-#include <utils/media/mediaindex.h>
 #include <utils/network/http/httpstreamreader.h>
 #include <utils/network/tcp_connection_processor.h>
 

@@ -16,7 +16,6 @@
 
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
-class MediaIndex;
 namespace nx_hls
 {
     class HLSLivePlaylistManager;
@@ -87,8 +86,6 @@ private:
     QnCompressedAudioDataPtr m_lastAudioFrame;
     //!index - is a \a MediaQuality element
     std::vector<std::unique_ptr<MediaStreamCache> > m_liveCache;
-    //!index - is a \a MediaQuality element
-    std::vector<std::unique_ptr<MediaIndex> > m_mediaIndexes;
     //!index - is a \a MediaQuality element
     std::vector<QSharedPointer<nx_hls::HLSLivePlaylistManager> > m_hlsLivePlaylistManager;
 
