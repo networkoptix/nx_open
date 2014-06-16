@@ -109,7 +109,7 @@ namespace QnUbjsonDetail {
     template<class Input>
     class InputStreamWrapper {
     public:
-        InputStreamWrapper(Input *data): m_stream(data) {}
+        InputStreamWrapper(const Input *data): m_stream(data) {}
 
         QnUbjson::Marker readMarker() {
             char c;

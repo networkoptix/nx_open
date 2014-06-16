@@ -17,7 +17,7 @@
 template<class Input>
 class QnUbjsonReader: private QnUbjsonDetail::ReaderWriterBase {
 public:
-    QnUbjsonReader(Input *data): 
+    QnUbjsonReader(const Input *data): 
         m_stream(data),
         m_peeked(false), 
         m_peekedMarker(QnUbjson::InvalidMarker) 
