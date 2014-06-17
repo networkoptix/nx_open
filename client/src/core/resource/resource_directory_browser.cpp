@@ -204,62 +204,64 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QIODevice *itemTimeZonesIO = layoutStorage.open(QLatin1String("item_timezones.txt"), QIODevice::ReadOnly);
     QTextStream itemTimeZones(itemTimeZonesIO);
 
-    // TODO: #Elric here is bad place to add resources to pool. need refactor
-    QnLayoutItemDataList& items = orderedItems[0];
-    for (int i = 0; i < items.size(); ++i)
-    {
-        QnLayoutItemData& item = items[i];
-        QString path = item.resource.path;
-        item.uuid = QUuid::createUuid();
-        if (!path.endsWith(QLatin1String(".mkv")))
-            item.resource.path += QLatin1String(".mkv");
-        item.resource.path = QnLayoutFileStorageResource::updateNovParent(xfile,item.resource.path);
+    if (!orderedItems.isEmpty()) {
+        // TODO: #Elric here is bad place to add resources to pool. need refactor
+        QnLayoutItemDataList& items = orderedItems[0];
+        for (int i = 0; i < items.size(); ++i)
+        {
+            QnLayoutItemData& item = items[i];
+            QString path = item.resource.path;
+            item.uuid = QUuid::createUuid();
+            if (!path.endsWith(QLatin1String(".mkv")))
+                item.resource.path += QLatin1String(".mkv");
+            item.resource.path = QnLayoutFileStorageResource::updateNovParent(xfile,item.resource.path);
 
-        QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
-        storage->setUrl(xfile);
+            QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
+            storage->setUrl(xfile);
 
-        QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
-        if (layoutWithCameras)
-            aviResource->addFlags(QnResource::utc | QnResource::sync | QnResource::periods | QnResource::motion);
-        aviResource->setStorage(storage);
-        aviResource->setParentId(layout->getId());
-        QString itemName(itemNames.readLine());
-        if (!itemName.isEmpty())
-            aviResource->setName(itemName);
-        qint64 timeZoneOffset = itemTimeZones.readLine().toLongLong();
-        if (timeZoneOffset != Qn::InvalidUtcOffset)
-            aviResource->setTimeZoneOffset(timeZoneOffset);
+            QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
+            if (layoutWithCameras)
+                aviResource->addFlags(QnResource::utc | QnResource::sync | QnResource::periods | QnResource::motion);
+            aviResource->setStorage(storage);
+            aviResource->setParentId(layout->getId());
+            QString itemName(itemNames.readLine());
+            if (!itemName.isEmpty())
+                aviResource->setName(itemName);
+            qint64 timeZoneOffset = itemTimeZones.readLine().toLongLong();
+            if (timeZoneOffset != Qn::InvalidUtcOffset)
+                aviResource->setTimeZoneOffset(timeZoneOffset);
 
-        qnResPool->addResource(aviResource);
-        aviResource = qnResPool->getResourceByUniqId(aviResource->getUniqueId()).dynamicCast<QnAviResource>(); // It may have already been in the pool!
-        if(!aviResource) {
-            qnWarning("ACHTUNG! Total mess up in exported layout loading!");
-            continue;
-        }
-        item.resource.id = aviResource->getId();
-
-        for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel) {
-            QString normMotionName = path.mid(path.lastIndexOf(L'?')+1);
-            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly);
-            if (motionIO) {
-                Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
-                QnMetaDataLightVector motionData;
-                int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
-                if (motionDataSize > 0) {
-                    motionData.resize(motionDataSize);
-                    motionIO->read((char*) &motionData[0], motionIO->size());
-                }
-                delete motionIO;
-                for (uint i = 0; i < motionData.size(); ++i)
-                    motionData[i].doMarshalling();
-                if (!motionData.empty())
-                    aviResource->setMotionBuffer(motionData, channel);
+            qnResPool->addResource(aviResource);
+            aviResource = qnResPool->getResourceByUniqId(aviResource->getUniqueId()).dynamicCast<QnAviResource>(); // It may have already been in the pool!
+            if(!aviResource) {
+                qnWarning("ACHTUNG! Total mess up in exported layout loading!");
+                continue;
             }
-            else
-                break;
-        }
+            item.resource.id = aviResource->getId();
 
-        updatedItems.insert(item.uuid, item);
+            for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel) {
+                QString normMotionName = path.mid(path.lastIndexOf(L'?')+1);
+                QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly);
+                if (motionIO) {
+                    Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
+                    QnMetaDataLightVector motionData;
+                    int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
+                    if (motionDataSize > 0) {
+                        motionData.resize(motionDataSize);
+                        motionIO->read((char*) &motionData[0], motionIO->size());
+                    }
+                    delete motionIO;
+                    for (uint i = 0; i < motionData.size(); ++i)
+                        motionData[i].doMarshalling();
+                    if (!motionData.empty())
+                        aviResource->setMotionBuffer(motionData, channel);
+                }
+                else
+                    break;
+            }
+
+            updatedItems.insert(item.uuid, item);
+        }
     }
     delete itemNamesIO;
     delete itemTimeZonesIO;
