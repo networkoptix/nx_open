@@ -6,6 +6,8 @@
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/videowall_resource.h>
+
 #include <core/resource_management/resource_pool.h>
 
 #include <nx_ec/dummy_handler.h>
@@ -25,6 +27,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/handlers/workbench_export_handler.h>
+#include <ui/workbench/handlers/workbench_videowall_handler.h>
 
 #include <utils/common/counter.h>
 #include <utils/common/event_processors.h>
@@ -89,6 +92,16 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
         bool isReadOnly = !(accessController()->permissions(layout) & Qn::WritePermission);
         QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
         exportHandler->saveLocalLayout(layout, isReadOnly, true); // overwrite layout file
+    } else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
+        //TODO: #GDM #VW #LOW refactor common code to common place
+        if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout, [this, layout](int reqId, ec2::ErrorCode errorCode) {
+            snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
+            at_layouts_saved(static_cast<int>(errorCode), QnResourceList() << layout, reqId);           
+            if (errorCode != ec2::ErrorCode::ok)
+                return;
+            snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
+        }))
+            snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) | Qn::ResourceIsBeingSaved);
     } else {
         //TODO: #GDM #Common check existing layouts.
         //TODO: #GDM #Common all remotes layout checking and saving should be done in one place
@@ -105,6 +118,8 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
 
     if(snapshotManager()->isFile(layout)) {
         context()->instance<QnWorkbenchExportHandler>()->doAskNameAndExportLocalLayout(layout->getLocalRange(), layout, Qn::LayoutLocalSaveAs);
+        return;
+    } else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
         return;
     }
 
@@ -288,14 +303,12 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
     QnLayoutResourceList saveableResources, rollbackResources;
     if (!force) {
         foreach(const QnLayoutResourcePtr &resource, resources) {
-            bool changed, saveable;
-
             Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
-            changed = flags & Qn::ResourceIsChanged;
-            saveable = accessController()->permissions(resource) & Qn::SavePermission;
 
-            if(changed && saveable)
-                needToAsk = true;
+            bool changed = flags & Qn::ResourceIsChanged;
+            bool saveable = accessController()->permissions(resource) & Qn::SavePermission;
+
+            needToAsk |= (changed && saveable);
 
             if(changed) {
                 if(saveable) {
@@ -338,7 +351,7 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
         }
 
         if(!waitForReply || saveableResources.empty()) {
-            closeLayouts(resources, rollbackResources, saveableResources, this, SLOT(at_layouts_saved(int, const QnResourceList &, int)));
+            closeLayouts(resources, rollbackResources, saveableResources, NULL, NULL);
             return true;
         } else {
             QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(mainWindow()));
@@ -366,10 +379,12 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
 
 void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *target, const char *slot) {
     if(!saveResources.empty()) {
-        QnLayoutResourceList fileResources, normalResources;
+        QnLayoutResourceList fileResources, normalResources, videowallReviewResources;
         foreach(const QnLayoutResourcePtr &resource, saveResources) {
             if(snapshotManager()->isFile(resource)) {
                 fileResources.push_back(resource);
+            } else if (!resource->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
+                videowallReviewResources.push_back(resource);
             } else {
                 normalResources.push_back(resource);
             }
@@ -391,6 +406,23 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
 
             if(exportHandler->saveLocalLayout(fileResource, isReadOnly, false, counter, SLOT(decrement())))
                 counter->increment();
+        }
+
+        if (!videowallReviewResources.isEmpty()) {
+            foreach(const QnLayoutResourcePtr &layout, videowallReviewResources) {
+                //TODO: #GDM #VW #LOW refactor common code to common place
+                if (!context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout, [this, layout, counter](int reqId, ec2::ErrorCode errorCode) {
+                    Q_UNUSED(reqId);
+                    snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
+                    counter->decrement();
+                    if (errorCode != ec2::ErrorCode::ok)
+                        return;
+                    snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
+                }))
+                    continue;
+                snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) | Qn::ResourceIsBeingSaved);
+                counter->increment();
+            }
         }
 
         // magic that will invoke slot if counter is empty and delete it afterwards

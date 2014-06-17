@@ -132,11 +132,14 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
-void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&)
+void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&modifiedFields)
 {
     QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
     if (other_casted) {
-        m_dewarpingParams = other_casted->m_dewarpingParams;
+        if (m_dewarpingParams != other_casted->m_dewarpingParams) {
+            m_dewarpingParams = other_casted->m_dewarpingParams;
+            modifiedFields << "mediaDewarpingParamsChanged";
+        }
         m_customVideoLayout = other_casted->m_customVideoLayout;
     }
 }

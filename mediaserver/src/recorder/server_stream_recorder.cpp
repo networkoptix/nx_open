@@ -108,7 +108,7 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr nonConstData)
     if (!isRunning()) 
         return;
 
-    const bool halfQueueReached = m_queuedSize >= m_maxRecordQueueSizeBytes/2 || m_dataQueue.size() >= m_maxRecordQueueSizeElements/2;
+    const bool halfQueueReached = m_queuedSize >= m_maxRecordQueueSizeBytes/2 || (size_t)m_dataQueue.size() >= m_maxRecordQueueSizeElements/2;
     if (!m_rebuildBlocked && halfQueueReached)
     {
         m_rebuildBlocked = true;
@@ -120,11 +120,11 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr nonConstData)
         DeviceFileCatalog::rebuildResume(this);
     }
 
-    bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && m_dataQueue.size() < m_maxRecordQueueSizeElements;
+    bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
     if (!rez) {
         emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageNotEnoughSpaceReason, m_storage);
 
-        qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "some frames are dropped!";
+        qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
         markNeedKeyData();
         m_dataQueue.clear();
         QMutexLocker lock(&m_queueSizeMutex);

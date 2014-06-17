@@ -91,7 +91,7 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& /*modifiedFields*/)
 {
     Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
@@ -132,6 +132,11 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         {
             setParam(param.name(), param.value(), QnDomainDatabase);
         }
+    }
+
+    //silently ignoring missing properties because of removeProperty method lack
+    for (const QnKvPair &param: other->getProperties()) {
+        setProperty(param.name(), param.value());   //here "propertyChanged" will be called
     }
 
     foreach (QnResourceConsumer *consumer, m_consumers)
@@ -405,14 +410,15 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         }
     }
 
-    //QnDomainMemory should changed anyway
+    //QnDomainMemory should be changed anyway
     {
         QMutexLocker locker(&m_mutex); // block paramList changing
-        m_resourceParamList[name].setDomain(domain);
-        if (!m_resourceParamList[name].setValue(val))
+        QnParam& param = m_resourceParamList[name];
+        param.setDomain(domain);
+        if (!param.setValue(val))
         {
             locker.unlock();
-            cl_log.log("cannot set such param!", cl_logWARNING);
+            NX_LOG( lit("cannot set such param %1!").arg(name), cl_logWARNING );
             emit asyncParamSetDone(toSharedPointer(this), name, val, false);
             return false;
         }

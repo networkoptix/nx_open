@@ -341,7 +341,8 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
                     this, &QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired, Qt::DirectConnection);
            
             stacked_layout->addWidget(advancedWebView);
-            updateWebPage(stacked_layout,advancedWebView);
+            if( currentTab() == Qn::AdvancedCameraSettingsTab )
+                updateWebPage(stacked_layout, advancedWebView);
 #endif
         } else {
             if (m_camera->getUniqueId() == m_widgetsRecreator->getCameraId()) {
@@ -358,7 +359,7 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
             advancedTreeWidget = m_widgetsRecreator->getRootWidget();
             advancedLayout = m_widgetsRecreator->getRootLayout();
 #ifdef QT_WEBKITWIDGETS_LIB
-            advancedWebView = *m_widgetsRecreator->getWebView();
+            advancedWebView = m_widgetsRecreator->getWebView();
 #endif
             cleanAdvancedSettings();
         }
@@ -374,7 +375,7 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
         advancedTreeWidget = m_widgetsRecreator->getRootWidget();
         advancedLayout = m_widgetsRecreator->getRootLayout();
 #ifdef QT_WEBKITWIDGETS_LIB
-        advancedWebView = *m_widgetsRecreator->getWebView();
+        advancedWebView = m_widgetsRecreator->getWebView();
 #endif
         cleanAdvancedSettings();
 
@@ -457,10 +458,8 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         
 #ifdef QT_WEBKITWIDGETS_LIB
         QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*>(ui->advancedTab->layout());
-        if ( m_widgetsRecreator && m_widgetsRecreator->getWebView() && stacked_layout)
-        {
-            updateWebPage(stacked_layout,*m_widgetsRecreator->getWebView());
-        }        
+        if ( m_widgetsRecreator && m_widgetsRecreator->getWebView() && stacked_layout && (currentTab() == Qn::AdvancedCameraSettingsTab) )
+            updateWebPage( stacked_layout, m_widgetsRecreator->getWebView() );
 #endif
     }
 
@@ -1143,23 +1142,40 @@ void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString) {
 }
 
 void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
-    if(m_motionWidget != NULL)
-        return;
+    switch( currentTab() )
+    {
+        case Qn::MotionSettingsTab:
+        {
+            if(m_motionWidget != NULL)
+                return;
 
-    if(currentTab() != Qn::MotionSettingsTab)
-        return;
+            m_motionWidget = new QnCameraMotionMaskWidget(this);
 
-    m_motionWidget = new QnCameraMotionMaskWidget(this);
+            updateMotionWidgetFromResource();
 
-    updateMotionWidgetFromResource();
+            using ::setReadOnly;
+            setReadOnly(m_motionWidget, m_readOnly);
+            //m_motionWidget->setReadOnly(m_readOnly);
 
-    using ::setReadOnly;
-    setReadOnly(m_motionWidget, m_readOnly);
-    //m_motionWidget->setReadOnly(m_readOnly);
+            m_motionLayout->addWidget(m_motionWidget);
 
-    m_motionLayout->addWidget(m_motionWidget);
+            connectToMotionWidget();
+            break;
+        }
 
-    connectToMotionWidget();
+#ifdef QT_WEBKITWIDGETS_LIB
+        case Qn::AdvancedCameraSettingsTab:
+        {
+            QStackedLayout* stacked_layout = dynamic_cast<QStackedLayout*>(ui->advancedTab->layout());
+            if ( m_widgetsRecreator && m_widgetsRecreator->getWebView() && stacked_layout && (currentTab() == Qn::AdvancedCameraSettingsTab) )
+                updateWebPage( stacked_layout, m_widgetsRecreator->getWebView() );
+            break;
+        }
+#endif
+
+        default:
+            break;
+    }
 }
 
 void QnSingleCameraSettingsWidget::at_dbDataChanged() {

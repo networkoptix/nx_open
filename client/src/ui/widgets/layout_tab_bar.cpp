@@ -7,6 +7,8 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QMenu>
 
+#include <client/client_settings.h>
+
 #include <core/resource/videowall_resource.h>
 
 #include <utils/common/warnings.h>
@@ -169,6 +171,9 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
         qnWarning("Requesting context menu for a layout tab bar while no menu manager instance is available.");
         return;
     }
+
+    if (qnSettings->isVideoWallMode())
+        return;
 
     QnWorkbenchLayoutList target;
     int index = tabAt(event->pos());

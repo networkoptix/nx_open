@@ -15,12 +15,11 @@ namespace ec2
 {
     template<class QueryProcessorType>
     QnUserManager<QueryProcessorType>::QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
-        :
+    :
         QnUserNotificationManager(resCtx),
         m_queryProcessor( queryProcessor )
     {
     }
-
 
     template<class T>
     int QnUserManager<T>::getUsers( impl::GetUsersHandlerPtr handler )
@@ -37,6 +36,36 @@ namespace ec2
         return reqID;
     }
 
+    template<class QueryProcessorType>
+    void callSaveUserAsync(
+        QueryProcessorType* const queryProcessor,
+        QnTransaction<ApiUserData>& tran,
+        impl::AddUserHandlerPtr handler,
+        const int reqID,
+        QnUserResourceList users )
+    {
+        using namespace std::placeholders;
+        queryProcessor->processUpdateAsync( tran, std::bind( &impl::AddUserHandler::done, handler, reqID, _1, users ) );
+    }
+
+    template<>
+    void callSaveUserAsync<FixedUrlClientQueryProcessor>(
+        FixedUrlClientQueryProcessor* const queryProcessor,
+        QnTransaction<ApiUserData>& tran,
+        impl::AddUserHandlerPtr handler,
+        const int reqID,
+        QnUserResourceList users )
+    {
+        //after successfull call completion users.front()->getPassword() is empty, so saving it here
+        QString newPassword = users.front()->getPassword();
+        queryProcessor->processUpdateAsync( tran, 
+            [queryProcessor, handler, reqID, users, newPassword]( ec2::ErrorCode errorCode ){
+                if( errorCode == ec2::ErrorCode::ok && queryProcessor->userName() == users.front()->getName() )
+                    queryProcessor->setPassword( newPassword );
+                handler->done( reqID, errorCode, users );
+            });
+    }
+
     template<class T>
     int QnUserManager<T>::save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler )
     {
@@ -49,8 +78,7 @@ namespace ec2
 
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::saveUser, resource );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::AddUserHandler::done, handler, reqID, _1, users ) );
+        callSaveUserAsync( m_queryProcessor, tran, handler, reqID, users );
         return reqID;
     }
 

@@ -537,7 +537,10 @@ void QnResourcePoolModel::at_context_userChanged() {
 }
 
 void QnResourcePoolModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
-    QnResourcePoolModelNode *node = this->node(resource);
+    QnVideoWallResourcePtr videowall = resource->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
+    QnResourcePoolModelNode *node = videowall 
+        ? this->node(videowall)
+        : this->node(resource);
 
     node->setModified(snapshotManager()->isModified(resource));
     node->update();

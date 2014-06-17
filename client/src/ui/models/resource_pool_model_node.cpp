@@ -169,7 +169,7 @@ void QnResourcePoolModelNode::update() {
     } else if (m_type == Qn::VideoWallItemNode) {
         m_status = QnResource::Online;
         m_searchString = QString();
-        m_flags = QnResource::videowall_item;
+        m_flags = 0;
         m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
 
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
@@ -189,7 +189,7 @@ void QnResourcePoolModelNode::update() {
         m_status = QnResource::Online;
         m_searchString = QString();
         m_flags = 0; 
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
         foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>()) {
             if (!videowall->matrices()->hasItem(m_uuid))
                 continue;
@@ -211,8 +211,13 @@ void QnResourcePoolModelNode::update() {
     case Qn::ResourceNode:
         bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
         if(!bastard)
-            if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) /* Hide local layouts that are not file-based. */
+            if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) {
+                /* Hide local layouts that are not file-based. */ 
                 bastard = m_model->snapshotManager()->isLocal(layout) && !m_model->snapshotManager()->isFile(layout);
+
+                /* Hide "Preview Search" layouts */
+                bastard |= layout->data().contains(Qn::LayoutSearchStateRole);
+            }
         if(!bastard)
             bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
         if(!bastard)

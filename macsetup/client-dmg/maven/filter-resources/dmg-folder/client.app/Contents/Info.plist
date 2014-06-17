@@ -23,7 +23,7 @@
 	<key>CFBundleVersion</key>
 	<string>${release.version}</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.7.0</string>
+	<string>10.7</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.business</string>
 	<key>LSUIElement</key>

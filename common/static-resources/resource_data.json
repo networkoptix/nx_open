@@ -26,10 +26,11 @@
         },
         {
             "keys": [
-                "ISD_NATIVE|*"
+                "ISD_EDGE|*"
             ],
             "showUrl": true,
-            "urlLocalePath": "priv/cam.html"
+            "urlLocalePath": "priv/cam.html",
+            "MaxFPS": 30.0
         },
         {
             "keys": [

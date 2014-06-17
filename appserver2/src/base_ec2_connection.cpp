@@ -31,8 +31,8 @@ namespace ec2
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) ),
         m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) )
     {
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(ApiPeerAliveData, bool)), this, SIGNAL(remotePeerFound(ApiPeerAliveData, bool)), Qt::DirectConnection);
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerLost(ApiPeerAliveData, bool)),  this, SIGNAL(remotePeerLost(ApiPeerAliveData, bool)), Qt::DirectConnection);
+        connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerFound, this, &BaseEc2Connection<T>::remotePeerFound, Qt::DirectConnection);
+        connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,  this, &BaseEc2Connection<T>::remotePeerLost, Qt::DirectConnection);
 
         m_notificationManager.reset(
             new ECConnectionNotificationManager(
