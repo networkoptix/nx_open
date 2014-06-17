@@ -441,13 +441,13 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("transaction_log")))
     {
-#ifdef EDGE_SERVER
-        if (!execSQLFile(lit(":/02_insert_3thparty_vendor.sql")))
-            return false;
-#else
+//#ifdef EDGE_SERVER
+//        if (!execSQLFile(lit(":/02_insert_3thparty_vendor.sql")))
+//            return false;
+//#else
         if (!execSQLFile(lit(":/02_insert_all_vendors.sql")))
             return false;
-#endif
+//#endif
 
         if (!execSQLFile(lit(":/03_update_2.2_stage1.sql")))
             return false;

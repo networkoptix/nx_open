@@ -141,7 +141,7 @@ void QnVideowallScreenWidget::updateLayout() {
 
     ReviewButtons state;
     if (item())
-        state = item()->data<ReviewButtons>(Qn::ItemVideowallReviewButtonsRole);
+        state = item()->data(Qn::ItemVideowallReviewButtonsRole).value<ReviewButtons>();
 
     auto createItem = [this, &state](const QUuid &id) {
         QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, id, this, m_mainOverlayWidget);
@@ -152,7 +152,7 @@ void QnVideowallScreenWidget::updateLayout() {
         connect(itemWidget, &QnVideowallItemWidget::infoVisibleChanged, this, [this, id](bool visible){
             if (!this->item())
                 return;
-            ReviewButtons state = item()->data<ReviewButtons>(Qn::ItemVideowallReviewButtonsRole);
+            ReviewButtons state = item()->data(Qn::ItemVideowallReviewButtonsRole).value<ReviewButtons>();
             state[id] = visible ? 1 : 0;    //TODO: #VW #temporary solution, will be improved if new buttons will be added
             item()->setData(Qn::ItemVideowallReviewButtonsRole, state);
         });
