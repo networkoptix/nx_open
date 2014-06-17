@@ -488,11 +488,16 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
     if (resource && m_widget->m_thumbs.contains(resource->getId())) {
         QPixmap pixmap = m_widget->m_thumbs[resource->getId()];
 
+        QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>();
+        QSize mediaLayout = mediaResource ? mediaResource->getVideoLayout()->size() : QSize(1, 1);
+        // ensure width and height are not zero
+        mediaLayout.setWidth(qMax(mediaLayout.width(), 1));
+        mediaLayout.setHeight(qMax(mediaLayout.height(), 1));
 
         qreal targetAr = paintRect.width() / paintRect.height();
         qreal sourceAr = isServer
                 ? targetAr
-                : (qreal)pixmap.width() / pixmap.height();
+                : ((qreal)pixmap.width()*mediaLayout.width()) / (pixmap.height() * mediaLayout.height());
 
         qreal x, y, w, h;
         if (sourceAr > targetAr) {
@@ -507,14 +512,22 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
             x = (paintRect.width() - w) * 0.5 + paintRect.left();
         }
 
+        auto drawPixmap = [painter, &pixmap, &mediaLayout, x, y, w, h]() {
+            int wh = w / mediaLayout.width();
+            int ht = h / mediaLayout.height(); 
+            for (int i = 0; i < mediaLayout.width(); ++i)
+                for (int j = 0; j < mediaLayout.height(); ++j)
+                    painter->drawPixmap(QRectF(x + wh*i, y + ht*j, wh, ht).toRect(), pixmap);
+        };
+
         if (!qFuzzyIsNull(data.rotation)) {
             QnScopedPainterTransformRollback guard(painter); Q_UNUSED(guard);
             painter->translate(paintRect.center());
             painter->rotate(data.rotation);
             painter->translate(-paintRect.center());
-            painter->drawPixmap(QRectF(x, y, w, h).toRect(), pixmap);
+            drawPixmap();
         } else {
-            painter->drawPixmap(QRectF(x, y, w, h).toRect(), pixmap);
+            drawPixmap();
         }
         return true;
     }
