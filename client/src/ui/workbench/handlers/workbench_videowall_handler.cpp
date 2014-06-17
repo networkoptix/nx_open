@@ -664,7 +664,7 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
     if (startMode < 0) {
         button = QnCheckableMessageBox::question(
             mainWindow(),
-            tr("Client will be closed."),
+            tr("Switch to Video Wall Mode..."),
             tr("Client will be closed and reopened as Video Wall."), //TODO: #VW #TR
             QString(),
             &doNotAskAgain,
