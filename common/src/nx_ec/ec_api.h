@@ -786,6 +786,7 @@ namespace ec2
 
     signals:
         void peerDiscoveryRequested(const QUrl &url);
+        void discoveryInformationChanged(const ApiDiscoveryDataList &data, bool addInformation);
 
     protected:
         virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) = 0;

@@ -15,6 +15,7 @@ namespace ec2 {
 
         void triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction);
         void triggerNotification(const QnTransaction<ApiDiscoveryDataList> &transaction);
+        void triggerNotification(const ApiDiscoveryDataList &discoveryData, bool addInformation = true);
 
     protected:
         virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) override;

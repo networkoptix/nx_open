@@ -1,7 +1,5 @@
 #include "discovery_manager.h"
 
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/media_server_resource.h"
 #include "utils/network/module_finder.h"
 #include "utils/network/direct_module_finder.h"
 #include "fixed_url_client_query_processor.h"
@@ -34,33 +32,12 @@ template<class QueryProcessorType>
 void QnDiscoveryManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiDiscoveryDataList> &transaction) {
     Q_ASSERT_X(transaction.command == ApiCommand::addDiscoveryInformation || transaction.command == ApiCommand::removeDiscoveryInformation, "Invalid command for this function", Q_FUNC_INFO);
 
-    QHash<QnId, QUrl> m_additionalUrls;
-    QHash<QnId, QUrl> m_ignoredUrls;
+    triggerNotification(transaction.params, transaction.command == ApiCommand::addDiscoveryInformation);
+}
 
-    foreach (const ApiDiscoveryData &data, transaction.params) {
-        if (data.ignore)
-            m_ignoredUrls.insert(data.id, data.url);
-        else
-            m_additionalUrls.insert(data.id, data.url);
-    }
-
-    foreach (const QnId &id, m_additionalUrls.uniqueKeys()) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
-        if (transaction.command == ApiCommand::addDiscoveryInformation)
-            server->setAdditionalUrls(m_additionalUrls.values(id));
-    }
-
-    foreach (const QnId &id, m_ignoredUrls.uniqueKeys()) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
-        if (transaction.command == ApiCommand::addDiscoveryInformation)
-            server->setIgnoredUrls(m_additionalUrls.values(id));
-    }
+template<class QueryProcessorType>
+void QnDiscoveryManager<QueryProcessorType>::triggerNotification(const ApiDiscoveryDataList &discoveryData, bool addInformation) {
+    emit discoveryInformationChanged(discoveryData, addInformation);
 }
 
 template<class QueryProcessorType>
