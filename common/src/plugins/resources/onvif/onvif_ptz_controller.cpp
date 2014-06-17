@@ -17,7 +17,8 @@ static QByteArray ENCODE_PREFIX("BASE64_");
 static std::string toLatinStdString(const QString& value)
 {
     std::string value1 = value.toStdString();
-    std::string value2 = value.toLatin1();
+    QByteArray latinString = value.toLatin1();
+    std::string value2(latinString.constData(), latinString.length());
     if (value1 == value2)
         return value1;
     else {
