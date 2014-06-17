@@ -1068,7 +1068,7 @@ void QnMain::run()
 
 #ifdef ENABLE_ONVIF
     //starting soap server to accept event notifications from onvif servers
-    QnSoapServer::initStaticInstance( new QnSoapServer(MSSettings::roSettings()->value(nx_ms_conf::SOAP_PORT, nx_ms_conf::DEFAUT_SOAP_PORT).toInt()) );
+    QnSoapServer::initStaticInstance( new QnSoapServer(MSSettings::roSettings()->value(nx_ms_conf::SOAP_PORT, nx_ms_conf::DEFAULT_SOAP_PORT).toInt()) );
     QnSoapServer::instance()->start();
 #endif //ENABLE_ONVIF
 

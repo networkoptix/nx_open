@@ -721,7 +721,7 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
         {
             if (m_chunks[i].startTimeMs < timeMs) {
                 m_chunks.erase(m_chunks.begin() + i);
-                if (m_lastAddIndex >= (ssize_t)i)
+                if (m_lastAddIndex >= (int)i)
                     --m_lastAddIndex;
             }
             else
