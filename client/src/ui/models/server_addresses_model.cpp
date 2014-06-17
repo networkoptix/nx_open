@@ -1,10 +1,9 @@
 #include "server_addresses_model.h"
 
 #include <QtCore/QSet>
-#include <QtGui/QFont>
 
 QnServerAddressesModel::QnServerAddressesModel(QObject *parent) :
-    QAbstractItemModel(parent)
+    base_type(parent)
 {
 }
 
@@ -70,18 +69,19 @@ QVariant QnServerAddressesModel::data(const QModelIndex &index, int role) const 
     switch (role) {
     case Qt::DisplayRole:
         if (index.column() == AddressColumn)
+            return addressAtIndex(index).toString();
+        break;
+    case Qt::EditRole:
+        if (index.column() == AddressColumn)
             return addressAtIndex(index);
         break;
     case Qt::CheckStateRole:
         if (index.column() == InUseColumn)
             return m_ignoredAddresses.contains(addressAtIndex(index)) ? Qt::Unchecked : Qt::Checked;
         break;
-    case Qt::FontRole:
-        if (isManualAddress(index)) {
-            QFont font;
-            font.setItalic(true);
-            return font;
-        }
+    case Qt::ForegroundRole:
+        if (!isManualAddress(index) && index.column() == AddressColumn)
+            return m_colors.readOnly;
         break;
     default:
         break;
@@ -143,6 +143,16 @@ Qt::ItemFlags QnServerAddressesModel::flags(const QModelIndex &index) const {
         flags |= Qt::ItemIsUserCheckable;
 
     return flags;
+}
+
+const QnRoutingManagementColors QnServerAddressesModel::colors() const {
+    return m_colors;
+}
+
+void QnServerAddressesModel::setColors(const QnRoutingManagementColors &colors) {
+    m_colors = colors;
+    if (!m_addresses.isEmpty() || m_manualAddresses.isEmpty())
+        emit dataChanged(index(0, AddressColumn), index(m_addresses.size() + m_manualAddresses.size(), AddressColumn));
 }
 
 QUrl QnServerAddressesModel::addressAtIndex(const QModelIndex &index) const {

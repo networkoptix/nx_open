@@ -156,10 +156,19 @@ struct QnLicensesListModelColors {
 #define QnLicensesListModelColors_Fields (normal)(warning)(expired)
 
 
+struct QnRoutingManagementColors {
+    QnRoutingManagementColors();
+
+    QColor readOnly;
+};
+#define QnRoutingManagementColors_Fields (readOnly)
+
+
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
-    (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors)
+    (QnHistogramColors)(QnResourceWidgetFrameColors)(QnLicensesListModelColors) \
+    (QnRoutingManagementColors)
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
