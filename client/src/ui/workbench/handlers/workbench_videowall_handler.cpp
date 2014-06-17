@@ -1700,6 +1700,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered() {
     if (!layoutResource)
         layoutResource = layout->resource();
 
+    //TODO: #GDM #VW #LOW refactor common code to common place
     if (saveReviewLayout(layoutResource, [this, layoutResource](int reqId, ec2::ErrorCode errorCode) {
         Q_UNUSED(reqId);
         snapshotManager()->setFlags(layoutResource, snapshotManager()->flags(layoutResource) & ~Qn::ResourceIsBeingSaved);
