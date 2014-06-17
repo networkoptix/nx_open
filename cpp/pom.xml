@@ -198,6 +198,7 @@
  
                                         <!-- Disabling optimization for debug builds -->
                                         <replacement>
+                                            <xpath>//Project/ItemDefinitionGroup[contains(@Condition,'Debug')]</xpath>
                                             <token><![CDATA[<WarningLevel>Level3</WarningLevel>]]></token>
                                             <value><![CDATA[<WarningLevel>Level3</WarningLevel><Optimization>Disabled</Optimization>]]></value>
                                         </replacement>
