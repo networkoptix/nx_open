@@ -167,6 +167,8 @@ namespace ec2
                     return "addConnection";
                 case removeConnection:
                     return "removeConnection";
+                case availableConnections:
+                    return "availableConnections";
 
                 default:
                     return "unknown " + QString::number((int)val);

@@ -766,6 +766,11 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
+        template<class TargetType, class HandlerType> int sendAvailableConnections(TargetType *target, HandlerType handler) {
+            return sendAvailableConnections(std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
     signals:
         void moduleChanged(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer);
         void connectionAdded(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port);
@@ -775,6 +780,7 @@ namespace ec2
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) = 0;
         virtual int addConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
         virtual int removeConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendAvailableConnections(impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 

@@ -21,9 +21,8 @@ namespace ec2
         ApiLicenseDataList licenses;
         ApiServerInfoData serverInfo;
         ApiModuleDataList foundModules;
-        ApiConnectionDataList connections;
     };
-#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(serverInfo)(foundModules)(connections)
+#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(serverInfo)(foundModules)
 
 } // namespace ec2
 

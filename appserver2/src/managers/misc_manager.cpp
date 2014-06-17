@@ -1,6 +1,7 @@
 #include "misc_manager.h"
 
-#include <utils/network/global_module_finder.h>
+#include "utils/network/global_module_finder.h"
+#include "utils/network/router.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 
@@ -81,6 +82,17 @@ int QnMiscManager<QueryProcessorType>::removeConnection(const QnId &discovererId
 }
 
 template<class QueryProcessorType>
+int QnMiscManager<QueryProcessorType>::sendAvailableConnections(impl::SimpleHandlerPtr handler) {
+    const int reqId = generateRequestID();
+    auto transaction = prepareAvailableConnectionsTransaction();
+
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
+
+    return reqId;
+}
+
+template<class QueryProcessorType>
 QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const {
     QnTransaction<ApiModuleData> transaction(ApiCommand::moduleInfo, false);
     QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &transaction.params);
@@ -97,6 +109,23 @@ QnTransaction<ApiConnectionData> QnMiscManager<QueryProcessorType>::prepareTrans
     transaction.params.peerId = peerId;
     transaction.params.host = host;
     transaction.params.port = port;
+
+    return transaction;
+}
+
+template<class QueryProcessorType>
+QnTransaction<ApiConnectionDataList> QnMiscManager<QueryProcessorType>::prepareAvailableConnectionsTransaction() const {
+    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections, false);
+
+    QMultiHash<QnId, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
+    for (auto it = connections.begin(); it != connections.end(); ++it) {
+        ApiConnectionData connection;
+        connection.discovererId = it.key();
+        connection.peerId = it->id;
+        connection.host = it->host;
+        connection.port = it->port;
+        transaction.params.push_back(connection);
+    }
 
     return transaction;
 }

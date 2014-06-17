@@ -179,6 +179,8 @@ namespace ec2
         registerUpdateFuncHandler<ApiConnectionData>(restProcessorPool, ApiCommand::addConnection);
         //AbstractMiscManager::removeConnection
         registerUpdateFuncHandler<ApiConnectionData>(restProcessorPool, ApiCommand::removeConnection);
+        //AbstractMiscManager::availableConnections
+        registerUpdateFuncHandler<ApiConnectionDataList>(restProcessorPool, ApiCommand::availableConnections);
 
         //ApiResourceParamList
         registerGetFuncHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );

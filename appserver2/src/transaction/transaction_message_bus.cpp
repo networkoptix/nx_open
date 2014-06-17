@@ -405,6 +405,8 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
         case ApiCommand::addConnection:
         case ApiCommand::removeConnection:
             return deliveryTransaction<ApiConnectionData>(abstractTran, stream);
+        case ApiCommand::availableConnections:
+            return deliveryTransaction<ApiConnectionDataList>(abstractTran, stream);
 
         default:
             Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
@@ -445,6 +447,7 @@ void QnTransactionMessageBus::connectToPeerEstablished(const QnId& id, bool isCl
     if (!m_alivePeers.contains(id)) {
         m_alivePeers.insert(id, AlivePeerInfo(isClient, false, hwList));
         sendServerAliveMsg(id, true, isClient, hwList);
+        sendConnectionsData();
     }
 }
 
@@ -463,6 +466,27 @@ void QnTransactionMessageBus::sendServerAliveMsg(const QnId& serverId, bool isAl
         emit peerFound(tran.params, false);
     else
         emit peerLost(tran.params, false);
+}
+
+void QnTransactionMessageBus::sendConnectionsData()
+{
+    if (!QnRouter::instance())
+        return;
+
+    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections, false);
+
+    QMultiHash<QnId, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
+    for (auto it = connections.begin(); it != connections.end(); ++it) {
+        ApiConnectionData connection;
+        connection.discovererId = it.key();
+        connection.peerId = it->id;
+        connection.host = it->host;
+        connection.port = it->port;
+        transaction.params.push_back(connection);
+    }
+
+    transaction.fillSequence();
+    sendTransaction(transaction);
 }
 
 QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
@@ -631,17 +655,6 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
             QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
             data.discoverer = QnId(qnCommon->moduleGUID());
             tran.params.foundModules.push_back(data);
-        }
-
-        /* fill in connections */
-        QMultiHash<QnId, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
-        for (auto it = connections.begin(); it != connections.end(); ++it) {
-            ApiConnectionData connection;
-            connection.discovererId = it.key();
-            connection.peerId = it->id;
-            connection.host = it->host;
-            connection.port = it->port;
-            tran.params.connections.push_back(connection);
         }
     }
 
