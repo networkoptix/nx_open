@@ -89,6 +89,7 @@ void QnFfmpegTranscoder::closeFfmpegContext()
         av_write_trailer(m_formatCtx);
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
             av_free_stream( m_formatCtx->streams[i] );
+        m_formatCtx->nb_streams = 0;
     }
 
     if (m_ioContext)

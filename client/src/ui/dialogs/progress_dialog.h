@@ -121,6 +121,7 @@ public Q_SLOTS:
     void setLabelText(const QString &text);
     void setCancelButtonText(const QString &text);
     void setMinimumDuration(int ms);
+    void setInfiniteProgress();
 
 private Q_SLOTS:
     void _q_disconnectOnClose();

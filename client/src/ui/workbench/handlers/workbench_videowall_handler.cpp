@@ -48,6 +48,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/style/globals.h>
+#include <ui/style/resource_icon_cache.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -664,7 +665,7 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
     if (startMode < 0) {
         button = QnCheckableMessageBox::question(
             mainWindow(),
-            tr("Client will be closed."),
+            tr("Switch to Video Wall Mode..."),
             tr("Client will be closed and reopened as Video Wall."), //TODO: #VW #TR
             QString(),
             &doNotAskAgain,
@@ -1487,12 +1488,33 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVideoWallItemIndexList items = parameters.videoWallItems();
 
-    QSet<QnVideoWallResourcePtr> videoWalls;
-    foreach (const QnVideoWallItemIndex &item, items) {
-        if (!item.videowall())
+    QnResourceList resources;
+    foreach(const QnVideoWallItemIndex &index, items) {
+        if (!index.videowall() || !index.videowall()->items()->hasItem(index.uuid()))
             continue;
-        item.videowall()->items()->removeItem(item.uuid());
-        videoWalls << item.videowall();
+        QnResourcePtr proxyResource(new QnResource());
+        proxyResource->setId(index.uuid());
+        proxyResource->setName(index.videowall()->items()->getItem(index.uuid()).name);
+        qnResIconCache->setKey(proxyResource, QnResourceIconCache::VideoWallItem);
+        resources.append(proxyResource);
+    }
+
+    QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+        mainWindow(),
+        resources,
+        tr("Delete Items"),
+        tr("Are you sure you want to permanently delete these %n item(s)?", "", resources.size()),
+        QDialogButtonBox::Yes | QDialogButtonBox::No
+        );
+    if(button != QDialogButtonBox::Yes)
+        return;
+
+    QSet<QnVideoWallResourcePtr> videoWalls;
+    foreach (const QnVideoWallItemIndex &index, items) {
+        if (!index.videowall())
+            continue;
+        index.videowall()->items()->removeItem(index.uuid());
+        videoWalls << index.videowall();
     }
 
     saveVideowalls(videoWalls);
@@ -1700,6 +1722,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered() {
     if (!layoutResource)
         layoutResource = layout->resource();
 
+    //TODO: #GDM #VW #LOW refactor common code to common place
     if (saveReviewLayout(layoutResource, [this, layoutResource](int reqId, ec2::ErrorCode errorCode) {
         Q_UNUSED(reqId);
         snapshotManager()->setFlags(layoutResource, snapshotManager()->flags(layoutResource) & ~Qn::ResourceIsBeingSaved);
@@ -1868,8 +1891,29 @@ void QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered() {
 void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVideoWallMatrixIndexList matrices = parameters.videoWallMatrices();
-    QSet<QnVideoWallResourcePtr> videoWalls;
 
+    QnResourceList resources;
+    foreach(const QnVideoWallMatrixIndex &index, matrices) {
+        if (!index.videowall() || !index.videowall()->matrices()->hasItem(index.uuid()))
+            continue;
+        QnResourcePtr proxyResource(new QnResource());
+        proxyResource->setId(index.uuid());
+        proxyResource->setName(index.videowall()->matrices()->getItem(index.uuid()).name);
+        qnResIconCache->setKey(proxyResource, QnResourceIconCache::VideoWallMatrix);
+        resources.append(proxyResource);
+    }
+
+    QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+        mainWindow(),
+        resources,
+        tr("Delete Matrices"),
+        tr("Are you sure you want to permanently delete these %n matrices?", "", resources.size()),
+        QDialogButtonBox::Yes | QDialogButtonBox::No
+        );
+    if(button != QDialogButtonBox::Yes)
+        return;
+
+    QSet<QnVideoWallResourcePtr> videoWalls;
     foreach (const QnVideoWallMatrixIndex &matrix, matrices) {
         if (!matrix.videowall())
             continue;

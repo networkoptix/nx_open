@@ -53,7 +53,7 @@
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
 
-#include <platform/core_platform_abstraction.h>
+#include <platform/platform_abstraction.h>
 
 #include <plugins/plugin_manager.h>
 #include <plugins/resources/acti/acti_resource_searcher.h>
@@ -143,7 +143,6 @@
 #include "compatibility.h"
 #include "media_server/file_connection_processor.h"
 
-#define USE_SINGLE_STREAMING_PORT
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
 
@@ -651,29 +650,6 @@ void initAppServerConnection(const QSettings &settings)
     QnAppServerConnectionFactory::setBox(lit(QN_ARM_BOX));
 }
 
-void initAppServerEventConnection(const QSettings &settings, const QnMediaServerResourcePtr& mediaServer)
-{
-    QUrl appServerEventsUrl;
-
-    //TODO: #GDM #Common move to server_message_processor as in client or remove if it is not needed anymore
-    // ### remove
-   /* appServerEventsUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
-    appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
-    appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-    appServerEventsUrl.setUserName(settings.value("appserverLogin").toString());
-    appServerEventsUrl.setPassword(settings.value("appserverPassword").toString());
-    appServerEventsUrl.setPath("/events/");
-    QUrlQuery appServerEventsUrlQuery;
-    appServerEventsUrlQuery.addQueryItem("xid", mediaServer->getId().toString());
-    appServerEventsUrlQuery.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
-    appServerEventsUrlQuery.addQueryItem("version", QN_ENGINE_VERSION);
-    appServerEventsUrlQuery.addQueryItem("format", "pb");
-    appServerEventsUrl.setQuery( appServerEventsUrlQuery );*/
-
-    //QnServerMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
-}
-
-
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
@@ -974,8 +950,7 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
 
 void QnMain::initTcpListener()
 {
-    int rtspPort = MSSettings::roSettings()->value("rtspPort", MSSettings::DEFAUT_RTSP_PORT).toInt();
-#ifdef USE_SINGLE_STREAMING_PORT
+    const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT, nx_ms_conf::DEFAULT_RTSP_PORT).toInt();
     QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageSpace", new QnStorageSpaceRestHandler());
@@ -1025,20 +1000,6 @@ void QnMain::initTcpListener()
 #endif   //ENABLE_DESKTOP_CAMERA
 
     m_universalTcpListener->start();
-
-#else
-    int apiPort = MSSettings::roSettings()->value("apiPort", DEFAULT_REST_PORT).toInt();
-    int streamingPort = MSSettings::roSettings()->value("streamingPort", DEFAULT_STREAMING_PORT).toInt();
-
-    m_restServer = new QnRestServer(QHostAddress::Any, apiPort);
-    m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, streamingPort);
-    m_progressiveDownloadingServer->start();
-    m_progressiveDownloadingServer->enableSSLMode();
-    m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
-    m_restServer->start();
-    m_progressiveDownloadingServer->start();
-    m_rtspListener->start();
-#endif
 }
 
 QHostAddress QnMain::getPublicAddress()
@@ -1107,7 +1068,7 @@ void QnMain::run()
 
 #ifdef ENABLE_ONVIF
     //starting soap server to accept event notifications from onvif servers
-    QnSoapServer::initStaticInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
+    QnSoapServer::initStaticInstance( new QnSoapServer(MSSettings::roSettings()->value(nx_ms_conf::SOAP_PORT, nx_ms_conf::DEFAULT_SOAP_PORT).toInt()) );
     QnSoapServer::instance()->start();
 #endif //ENABLE_ONVIF
 
@@ -1348,8 +1309,6 @@ void QnMain::run()
 
     qnStorageMan->doMigrateCSVCatalog();
 
-    initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
-    
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
@@ -1598,7 +1557,7 @@ public:
 
 protected:
     virtual int executeApplication() override { 
-        QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
+        QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
         
@@ -1656,13 +1615,12 @@ void stopServer(int signal)
 }
 
 static void printVersion();
-static void printHelp();
 
 
 int main(int argc, char* argv[])
 {
 
-#if __arm__
+#if 0
 #if defined(__GNUC__)
 # if defined(__i386__)
         /* Enable Alignment Checking on x86 */
@@ -1733,5 +1691,5 @@ int main(int argc, char* argv[])
 
 static void printVersion()
 {
-    std::cout<<"  "<<QN_APPLICATION_NAME" v."<<QN_APPLICATION_VERSION<<std::endl;
+    std::cout<<"  "<<QN_APPLICATION_NAME<<" v."<<QN_APPLICATION_VERSION<<std::endl;
 }

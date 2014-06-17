@@ -273,20 +273,22 @@ bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& in
 
 bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, QFile& indexFile)
 {
+    static const size_t READ_BUF_SIZE = 128*1024;
+
     index.clear();
     indexFile.seek(0);
     indexFile.read((char*) &indexHeader, MOTION_INDEX_HEADER_SIZE);
 
-    quint8 tmpBuffer[1024*128];
+    std::unique_ptr<quint8> tmpBuffer( new quint8[READ_BUF_SIZE] );
     while(1)
     {
-        int readed = indexFile.read((char*) tmpBuffer, sizeof(tmpBuffer));
+        int readed = indexFile.read((char*) tmpBuffer.get(), READ_BUF_SIZE);
         if (readed < 1)
             break;
         int records = readed / MOTION_INDEX_RECORD_SIZE;
         int oldVectorSize = index.size();
         index.resize(oldVectorSize + records);
-        memcpy(&index[oldVectorSize], tmpBuffer, records * MOTION_INDEX_RECORD_SIZE);
+        memcpy(&index[oldVectorSize], tmpBuffer.get(), records * MOTION_INDEX_RECORD_SIZE);
     }
 
     return true;

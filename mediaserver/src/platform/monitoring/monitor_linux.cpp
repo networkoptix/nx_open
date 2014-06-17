@@ -6,6 +6,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QFile>
+#include <QtCore/QDir>
 #include <QtCore/QHash>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>

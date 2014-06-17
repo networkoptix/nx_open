@@ -169,7 +169,7 @@ void QnResourcePoolModelNode::update() {
     } else if (m_type == Qn::VideoWallItemNode) {
         m_status = QnResource::Online;
         m_searchString = QString();
-        m_flags = QnResource::videowall_item;
+        m_flags = 0;
         m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
 
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
@@ -189,7 +189,7 @@ void QnResourcePoolModelNode::update() {
         m_status = QnResource::Online;
         m_searchString = QString();
         m_flags = 0; 
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
         foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>()) {
             if (!videowall->matrices()->hasItem(m_uuid))
                 continue;
