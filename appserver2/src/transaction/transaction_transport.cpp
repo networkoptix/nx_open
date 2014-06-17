@@ -7,6 +7,7 @@
 #include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
 #include "transaction_log.h"
+#include <transaction/chunked_transfer_encoder.h>
 #include "common/common_module.h"
 
 namespace ec2
@@ -54,7 +55,7 @@ void QnTransactionTransport::addData(const QByteArray& data)
     QMutexLocker lock(&m_mutex);
     if (m_dataToSend.isEmpty() && m_socket)
         aio::AIOService::instance()->watchSocket( m_socket, aio::etWrite, this );
-    m_dataToSend.push_back(data);
+    m_dataToSend.push_back(QnChunkedTransferEncoder::serializedTransaction(data));
 }
 
 int QnTransactionTransport::getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size)

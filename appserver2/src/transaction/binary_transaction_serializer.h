@@ -45,8 +45,6 @@ namespace ec2
 
             QByteArray serializedTran = serializedTransaction(tran);
             stream.write(serializedTran.data(), serializedTran.size());
-            stream.write("\r\n",2); // chunk end
-            serializePayload(result);
             return result;
         }
 
@@ -54,8 +52,6 @@ namespace ec2
     private:
 
         static void serializeHeader(QnOutputBinaryStream<QByteArray> &stream, const QnTransactionTransportHeader& ttHeader);
-        static void serializePayload(QByteArray &buffer);
-        static void toFormattedHex(quint8* dst, quint32 payloadSize);
 
     private:
         mutable QMutex m_mutex;

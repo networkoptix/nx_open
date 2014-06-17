@@ -30,7 +30,6 @@ namespace ec2
             if (tran.id.sequence > 0 && m_cache.contains(tran.id))
                 return *m_cache[tran.id];
 
-            
             QJsonValue jsonTran;
             QJson::serialize(tran, &jsonTran);
 
@@ -51,21 +50,8 @@ namespace ec2
 
         template<class T>
         QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
-            QByteArray result;
-            QnOutputBinaryStream<QByteArray> stream(&result);
-            serializeHeader(stream, header);  // does not required for 
-
-            QByteArray serializedTran = serializedTransaction(tran);
-            stream.write(serializedTran.data(), serializedTran.size());
-            stream.write("\r\n",2); // chunk end
-            serializePayload(result);
-            return result;
+            return serializedTransaction(tran);
         }
-
-    private:
-        static void serializeHeader(QnOutputBinaryStream<QByteArray> stream, const QnTransactionTransportHeader & header);
-        static void serializePayload(QByteArray &buffer);
-        static void toFormattedHex(quint8* dst, quint32 payloadSize);
 
     private:
         mutable QMutex m_mutex;

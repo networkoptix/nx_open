@@ -23,13 +23,7 @@ namespace ec2
         return true;
     }
 
-    void QnBinaryTransactionSerializer::toFormattedHex(quint8* dst, quint32 payloadSize)
-    {
-        for (;payloadSize; payloadSize >>= 4) {
-            quint8 digit = payloadSize % 16;
-            *dst-- = digit < 10 ? digit + '0': digit + 'A'-10;
-        }
-    }
+
 
     void QnBinaryTransactionSerializer::serializeHeader(QnOutputBinaryStream<QByteArray> &stream, const QnTransactionTransportHeader& ttHeader)
     {
@@ -39,16 +33,6 @@ namespace ec2
             Q_ASSERT(peer != qnCommon->moduleGUID());
         }
 #endif
-        stream.write("00000000\r\n",10);
-        stream.write("0000", 4);
         QnBinary::serialize(ttHeader, &stream);
     }
-
-    void QnBinaryTransactionSerializer::serializePayload(QByteArray& buffer) {
-        quint32 payloadSize = buffer.size() - 12;
-        quint32* payloadSizePtr = (quint32*) (buffer.data() + 10);
-        *payloadSizePtr = htonl(payloadSize - 4);
-        toFormattedHex((quint8*) buffer.data() + 7, payloadSize);
-    }
-
 }
