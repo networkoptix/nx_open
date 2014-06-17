@@ -5,6 +5,7 @@
 
 #include <nx_ec/ec_api.h>
 #include <utils/common/singleton.h>
+#include <utils/network/route.h>
 
 class QnRouteBuilder;
 class QnModuleFinder;
@@ -29,6 +30,9 @@ public:
     void setModuleFinder(QnModuleFinder *moduleFinder);
 
     QMultiHash<QnId, Endpoint> connections() const;
+
+    QnRoute routeTo(const QnId &id) const;
+    QnRoute routeTo(const QString &host, quint16 port) const;
 
 private slots:
     void at_connectionAdded(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port);

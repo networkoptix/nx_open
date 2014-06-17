@@ -5,6 +5,7 @@
 #include "utils/network/tcp_listener.h"
 #include "proxy_connection.h"
 #include "utils/network/socket.h"
+#include "utils/network/router.h"
 #include "proxy_connection_processor_p.h"
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"
@@ -179,6 +180,23 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
             itr->second = host.toUtf8();
         else if (itr->first == "x-server-guid")
             xServerGUID = itr->second;
+    }
+
+    QnRoute route;
+    if (!xServerGUID.isEmpty())
+        route = QnRouter::instance()->routeTo(xServerGUID);
+    else
+        route = QnRouter::instance()->routeTo(dstUrl.host(), dstUrl.port());
+
+    if (route.isValid() && route.points.size() > 1) {
+        QString path = dstUrl.path();
+        if (!path.startsWith(QLatin1Char('/')))
+            path.prepend(QLatin1Char('/'));
+        path.prepend(QString(lit("/proxy/%1:%2")).arg(dstUrl.host()).arg(dstUrl.port()));
+
+        dstUrl.setPath(path);
+        dstUrl.setHost(route.points.first().host);
+        dstUrl.setPort(route.points.first().port);
     }
 
     d->clientRequest.clear();

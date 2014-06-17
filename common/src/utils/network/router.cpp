@@ -46,6 +46,18 @@ QMultiHash<QnId, QnRouter::Endpoint> QnRouter::connections() const {
     return m_connections;
 }
 
+QnRoute QnRouter::routeTo(const QnId &id) const {
+    return m_routeBuilder->routeTo(id);
+}
+
+QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
+    for (auto it = m_connections.begin(); it != m_connections.end(); ++it) {
+        if (it->host == host && it->port == port)
+            return routeTo(it.key());
+    }
+    return QnRoute();
+}
+
 void QnRouter::at_connectionAdded(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port) {
     if (m_connections.contains(discovererId, Endpoint(peerId, host, port)))
         return;
