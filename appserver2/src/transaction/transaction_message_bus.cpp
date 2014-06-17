@@ -262,6 +262,8 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractT
 void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>&)
 {
 	sender->setReadSync(true);
+
+    sendConnectionsData();
 }
 
 bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>& stream)
@@ -447,7 +449,6 @@ void QnTransactionMessageBus::connectToPeerEstablished(const QnId& id, bool isCl
     if (!m_alivePeers.contains(id)) {
         m_alivePeers.insert(id, AlivePeerInfo(isClient, false, hwList));
         sendServerAliveMsg(id, true, isClient, hwList);
-        sendConnectionsData();
     }
 }
 
