@@ -37,6 +37,7 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
 
     connect(ui->serversView->selectionModel(),  &QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::at_serversView_currentIndexChanged);
     connect(ui->addressesView->selectionModel(),&QItemSelectionModel::currentRowChanged,        this,   &QnRoutingManagementWidget::at_addressesView_currentIndexChanged);
+    connect(ui->addressesView,                  &QAbstractItemView::doubleClicked,              this,   &QnRoutingManagementWidget::at_addressesView_doubleClicked);
     connect(m_serverAddressesModel,             &QnServerAddressesModel::ignoreChangeRequested, this,   &QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested);
     connect(ui->addButton,                      &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_addButton_clicked);
     connect(ui->removeButton,                   &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_removeButton_clicked);
@@ -108,8 +109,10 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         url.setPort(DEFAULT_APPSERVER_PORT);
 
     QList<QUrl> urls = server->getAdditionalUrls();
-    if (urls.contains(url))
+    if ((server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == QUrl(server->getApiUrl()).port()) || urls.contains(url)) {
+        QMessageBox::warning(this, tr("Warning"), tr("This URL is alerady in the address list."));
         return;
+    }
 
     urls.append(url);
 
@@ -126,7 +129,7 @@ void QnRoutingManagementWidget::at_removeButton_clicked() {
     if (!server)
         return;
 
-    QUrl url(index.data().toUrl());
+    QUrl url(index.data(Qt::EditRole).toUrl());
     QList<QUrl> urls = server->getAdditionalUrls();
     if (!urls.removeOne(url))
         return;
@@ -158,6 +161,52 @@ void QnRoutingManagementWidget::at_addressesView_currentIndexChanged(const QMode
     bool manual = m_serverAddressesModel->isManualAddress(sourceIndex);
 
     ui->removeButton->setEnabled(manual);
+}
+
+void QnRoutingManagementWidget::at_addressesView_doubleClicked(const QModelIndex &index) {
+    if (!index.isValid())
+        return;
+
+    if (index.column() != QnServerAddressesModel::AddressColumn)
+        return;
+
+    QnMediaServerResourcePtr server = currentServer();
+    if (!server)
+        return;
+
+    if (!m_serverAddressesModel->isManualAddress(m_sortedServerAddressesModel->mapToSource(index)))
+        return;
+
+    QUrl oldUrl = index.data(Qt::EditRole).toUrl();
+
+    QString urlString = QInputDialog::getText(this, tr("Edit URL"), tr("URL"), QLineEdit::Normal, oldUrl.toString());
+    if (urlString.isEmpty())
+        return;
+
+    QUrl url = QUrl::fromUserInput(urlString);
+    if (!url.isValid()) {
+        QMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
+        return;
+    }
+
+    if (url.port() == -1)
+        url.setPort(DEFAULT_APPSERVER_PORT);
+
+    if (oldUrl == url)
+        return;
+
+    if (server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == QUrl(server->getApiUrl()).port()) {
+        QMessageBox::warning(this, tr("Warning"), tr("This URL is alerady in the address list."));
+        return;
+    }
+
+    QList<QUrl> urls = server->getAdditionalUrls();
+    urls.removeOne(oldUrl);
+    urls.append(url);
+    server->setAdditionalUrls(urls);
+
+    connection2()->getDiscoveryManager()->removeDiscoveryInformation(server->getId(), QList<QUrl>() << oldUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    connection2()->getDiscoveryManager()->addDiscoveryInformation(server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnRoutingManagementWidget::at_currentServer_changed(const QnResourcePtr &resource) {
