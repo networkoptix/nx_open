@@ -134,6 +134,11 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         }
     }
 
+    //silently ignoring missing properties because of removeProperty method lack
+    for (const QnKvPair &param: other->getProperties()) {
+        setProperty(param.name(), param.value());   //here "propertyChanged" will be called
+    }
+
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->afterUpdate();
 }
