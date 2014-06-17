@@ -20,8 +20,10 @@ static std::string toLatinStdString(const QString& value)
     std::string value2 = value.toLatin1();
     if (value1 == value2)
         return value1;
-    else
-        return ENCODE_PREFIX.append(value.toUtf8().toBase64());
+    else {
+        QByteArray result = ENCODE_PREFIX.append(value.toUtf8().toBase64());
+        return std::string(result.constData(), result.length());
+    }
 }
 
 static QString fromLatinStdString(const std::string& value)
