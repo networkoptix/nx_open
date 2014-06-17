@@ -73,8 +73,8 @@ QVariant QnServerAddressesModel::data(const QModelIndex &index, int role) const 
             return addressAtIndex(index);
         break;
     case Qt::CheckStateRole:
-        if (index.column() == IgnoredColumn)
-            return m_ignoredAddresses.contains(addressAtIndex(index)) ? Qt::Checked : Qt::Unchecked;
+        if (index.column() == InUseColumn)
+            return m_ignoredAddresses.contains(addressAtIndex(index)) ? Qt::Unchecked : Qt::Checked;
         break;
     case Qt::FontRole:
         if (isManualAddress(index)) {
@@ -93,10 +93,10 @@ QVariant QnServerAddressesModel::data(const QModelIndex &index, int role) const 
 bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     Q_UNUSED(role)
 
-    if (index.column() != IgnoredColumn)
+    if (index.column() != InUseColumn)
         return false;
 
-    emit ignoreChangeRequested(index.sibling(index.row(), AddressColumn).data().toString(), value.toInt() == Qt::Checked);
+    emit ignoreChangeRequested(index.sibling(index.row(), AddressColumn).data().toString(), value.toInt() == Qt::Unchecked);
 
     return false;
 }
@@ -111,8 +111,8 @@ QVariant QnServerAddressesModel::headerData(int section, Qt::Orientation orienta
     switch (section) {
     case AddressColumn:
         return tr("Address");
-    case IgnoredColumn:
-        return tr("Ignored");
+    case InUseColumn:
+        return tr("In Use");
     default:
         break;
     }
@@ -139,7 +139,7 @@ Qt::ItemFlags QnServerAddressesModel::flags(const QModelIndex &index) const {
 
     Qt::ItemFlags flags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
-    if (index.column() == IgnoredColumn)
+    if (index.column() == InUseColumn)
         flags |= Qt::ItemIsUserCheckable;
 
     return flags;

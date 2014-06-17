@@ -9,7 +9,7 @@ class QnServerAddressesModel : public QAbstractItemModel {
 public:
     enum {
         AddressColumn = 0,
-        IgnoredColumn,
+        InUseColumn,
         ColumnCount
     };
 
