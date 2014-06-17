@@ -269,7 +269,7 @@ bool QnFileStorageResource::readTabFile( const QString& filePath, QStringList* c
 
         const QStringList& fields = line.split( QRegExp(QLatin1String("[\\s\\t]+")), QString::SkipEmptyParts );
         if( fields.size() >= 2 )
-            mountPoints->push_back( fields[1] );
+            mountPoints->push_back( closeDirPath( fields[1] ) );
     }
 
     return true;
