@@ -5,7 +5,6 @@
 
 #include <utils/common/singleton.h>
 
-#include "monitoring/global_monitor.h"
 #include "notification/platform_notifier.h"
 #include "process/platform_process.h"
 
@@ -15,10 +14,6 @@ public:
     QnCorePlatformAbstraction(QObject *parent = NULL);
     virtual ~QnCorePlatformAbstraction();
 
-    QnGlobalMonitor *monitor() const {
-        return m_monitor;
-    }
-
     QnPlatformNotifier *notifier() const {
         return m_notifier;
     }
@@ -26,7 +21,6 @@ public:
     QnPlatformProcess *process(QProcess *source = NULL) const;
 
 private:
-    QnGlobalMonitor *m_monitor;
     QnPlatformNotifier *m_notifier;
     QnPlatformProcess *m_process;
 };

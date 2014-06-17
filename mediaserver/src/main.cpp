@@ -53,7 +53,7 @@
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/ec_api.h>
 
-#include <platform/core_platform_abstraction.h>
+#include <platform/platform_abstraction.h>
 
 #include <plugins/plugin_manager.h>
 #include <plugins/resources/acti/acti_resource_searcher.h>
@@ -1598,7 +1598,7 @@ public:
 
 protected:
     virtual int executeApplication() override { 
-        QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
+        QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
         

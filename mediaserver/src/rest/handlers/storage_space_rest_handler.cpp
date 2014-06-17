@@ -6,7 +6,6 @@
 
 #include <core/resource/storage_resource.h>
 
-#include <platform/core_platform_abstraction.h>
 #include <utils/network/tcp_connection_priv.h> /* For CODE_OK. */
 #include <utils/serialization/json.h>
 
