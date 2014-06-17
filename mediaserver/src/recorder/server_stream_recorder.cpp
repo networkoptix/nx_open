@@ -124,7 +124,7 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr nonConstData)
     if (!rez) {
         emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageNotEnoughSpaceReason, m_storage);
 
-        qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "some frames are dropped!";
+        qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
         markNeedKeyData();
         m_dataQueue.clear();
         QMutexLocker lock(&m_queueSizeMutex);
