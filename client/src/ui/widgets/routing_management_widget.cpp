@@ -4,9 +4,18 @@
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QMessageBox>
 
+#include "api/app_server_connection.h"
+#include "nx_ec/ec_api.h"
+#include "nx_ec/dummy_handler.h"
 #include "core/resource/media_server_resource.h"
 #include "ui/models/resource_pool_model.h"
 #include "ui/models/server_addresses_model.h"
+
+namespace {
+    ec2::AbstractECConnectionPtr connection2() {
+        return QnAppServerConnectionFactory::getConnection2();
+    }
+}
 
 QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     QWidget(parent),
@@ -81,6 +90,8 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         return;
 
     urls.append(url);
+
+    connection2()->getDiscoveryManager()->addDiscoveryInformation(server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     server->setAdditionalUrls(urls);
 }
 
@@ -98,6 +109,7 @@ void QnRoutingManagementWidget::at_removeButton_clicked() {
     if (!urls.removeOne(url))
         return;
 
+    connection2()->getDiscoveryManager()->removeDiscoveryInformation(server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     server->setAdditionalUrls(urls);
 }
 
@@ -147,9 +159,11 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
         if (ignoredUrls.contains(url))
             return;
         ignoredUrls.append(url);
+        connection2()->getDiscoveryManager()->addDiscoveryInformation(server->getId(), QList<QUrl>() << url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     } else {
         if (!ignoredUrls.removeOne(url))
             return;
+        connection2()->getDiscoveryManager()->removeDiscoveryInformation(server->getId(), QList<QUrl>() << url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
     server->setIgnoredUrls(ignoredUrls);
 }
