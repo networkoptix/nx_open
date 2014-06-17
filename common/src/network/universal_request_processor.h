@@ -12,16 +12,12 @@ public:
     QnUniversalRequestProcessor(QnUniversalRequestProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner, bool needAuth);
     virtual ~QnUniversalRequestProcessor();
 
-    void setAllowedUnauthorizedPaths(const QSet<QString> &paths);
-
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;
-    void processRequest();
+    bool processRequest();
     bool authenticate();
 private:
-    QSet<QString> m_allowedUnauthPaths;
-
     Q_DECLARE_PRIVATE(QnUniversalRequestProcessor);
 };
 

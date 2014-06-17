@@ -18,7 +18,7 @@ class QnModuleFinder;
 class QnFoundEnterpriseControllersModel : public QAbstractItemModel {
     Q_OBJECT
 public:
-    // TODO: #Elric #GDM use global roles from Qn
+    // TODO: #Elric #ak use global roles from Qn
     enum Role
     {
         UrlRole = Qt::UserRole + 1,

@@ -14,22 +14,8 @@
 #include <QtWidgets/QCheckBox>
 #include <QtGui/QImageWriter>
 
-#include <utils/license_usage_helper.h>
-#include <utils/app_server_image_cache.h>
-#include <utils/app_server_notification_cache.h>
-#include <utils/applauncher_utils.h>
-#include <utils/local_file_cache.h>
-#include <utils/common/environment.h>
-#include <utils/common/delete_later.h>
-#include <utils/common/mime_data.h>
-#include <utils/common/event_processors.h>
-#include <utils/common/string.h>
-#include <utils/common/time.h>
-#include <utils/common/email.h>
-#include <utils/common/synctime.h>
-#include <utils/math/math.h>
-
 #include <api/session_manager.h>
+#include <api/network_proxy_factory.h>
 
 #include <business/business_action_parameters.h>
 
@@ -122,6 +108,22 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
+#include <utils/app_server_image_cache.h>
+#include <utils/app_server_notification_cache.h>
+#include <utils/applauncher_utils.h>
+#include <utils/license_usage_helper.h>
+#include <utils/local_file_cache.h>
+#include <utils/common/environment.h>
+#include <utils/common/delete_later.h>
+#include <utils/common/mime_data.h>
+#include <utils/common/event_processors.h>
+#include <utils/common/string.h>
+#include <utils/common/time.h>
+#include <utils/common/email.h>
+#include <utils/common/synctime.h>
+#include <utils/common/scoped_value_rollback.h>
+#include <utils/math/math.h>
+
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
 #endif
@@ -191,6 +193,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
+    m_delayedDropGuard(false),
     m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
@@ -261,7 +264,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PingAction),                             SIGNAL(triggered()),    this,   SLOT(at_pingAction_triggered()));
     connect(action(Qn::ServerLogsAction),                       SIGNAL(triggered()),    this,   SLOT(at_serverLogsAction_triggered()));
     connect(action(Qn::ServerIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_serverIssuesAction_triggered()));
-    connect(action(Qn::YouTubeUploadAction),                    SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
     connect(action(Qn::OpenInFolderAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
     connect(action(Qn::DeleteFromDiskAction),                   SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
     connect(action(Qn::RemoveLayoutItemAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
@@ -373,7 +375,7 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
         return;
 
     {
-        //TODO: #GDM refactor duplicated code
+        //TODO: #GDM #Common refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
@@ -668,11 +670,17 @@ void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
 }
 
 void QnWorkbenchActionHandler::submitDelayedDrops() {
+    if (m_delayedDropGuard)
+        return;
+
     if(!context()->user())
         return;
 
     if (!context()->workbench()->currentLayout()->resource())
         return;
+
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_delayedDropGuard, true);
 
     foreach(const QnMimeData &data, m_delayedDrops) {
         QMimeData mimeData;
@@ -815,18 +823,24 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
 
 void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
-    action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM use conditional texts?
+    action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
 
     context()->instance<QnAppServerNotificationCache>()->getFileList();
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
+    if (qnSettings->isVideoWallMode())
+        return;
+
     m_mainMenu = menu()->newMenu(Qn::MainScope, mainWindow());
 
     action(Qn::MainMenuAction)->setMenu(m_mainMenu.data());
 }
 
 void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
+    if (qnSettings->isVideoWallMode())
+        return;
+
     m_currentUserLayoutsMenu = menu()->newMenu(Qn::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
 
     action(Qn::OpenCurrentUserLayoutMenu)->setMenu(m_currentUserLayoutsMenu.data());
@@ -1029,7 +1043,7 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openLayoutsInNewWindowAction_triggered() {
-    // TODO: #GDM this won't work for layouts that are not saved. (de)serialization of layouts is not implemented.
+    // TODO: #GDM #Common this won't work for layouts that are not saved. (de)serialization of layouts is not implemented.
     QnLayoutResourceList layouts = menu()->currentParameters(sender()).resources().filtered<QnLayoutResource>();
     if(layouts.isEmpty())
         return;
@@ -1135,7 +1149,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
             if (layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout)) {
                 bool hasLocal = false;
                 foreach (const QnResourcePtr &resource, resources) {
-                    //TODO: #GDM refactor duplicated code
+                    //TODO: #GDM #Common refactor duplicated code
                     hasLocal |= resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
                             && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
                     if (hasLocal)
@@ -1263,7 +1277,8 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
         tr("Don't notify again about this update."),
         &ignoreThisVersion,
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Ok
+        QDialogButtonBox::Ok,
+        QDialogButtonBox::Cancel
     );
 
     if(ignoreThisVersion != thisVersionWasIgnored)
@@ -1279,7 +1294,6 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
 
     QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->setWindowTitle(tr("Layout Settings"));
     dialog->readFromResource(layout);
 
     bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
@@ -1634,7 +1648,7 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     if( context()->user() && !context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true, force)) 
         return;
 
-    // TODO: #GDM Factor out common code from reconnect/disconnect/login actions.
+    // TODO: #GDM #Common Factor out common code from reconnect/disconnect/login actions.
 
     menu()->trigger(Qn::ClearCameraSettingsAction);
 
@@ -1994,7 +2008,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
                         mainWindow(),
                         tr("Process is in progress"),
                         tr("Camera addition is already in progress."\
-                           "Are you sure you want to cancel current process?"), //TODO: #GDM show current process details
+                           "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
                         QMessageBox::Ok | QMessageBox::Cancel,
                         QMessageBox::Cancel
             );
@@ -2032,24 +2046,24 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if(!server)
         return;
 
-    QUrl serverUrl = server->getApiUrl();
-    
-    // TODO: #Elric total encapsulation failure, there should be no proxy-related logic here.
-    QUrl url;
-    if(!server->getProxyHost().isEmpty()) {
-        url.setScheme(lit("http"));
-        url.setHost(server->getProxyHost());
-        url.setPort(server->getProxyPort());
-        url.setPath(lit("/proxy/%4:%5/api/showLog").arg(serverUrl.host()).arg(serverUrl.port()));
-    } else {
-        url = serverUrl;
-        url.setPath(lit("/api/showLog"));
-    }
+    QUrl url = server->getApiUrl();
+    url.setScheme(lit("http"));
+    url.setPath( lit("/api/showLog") );
     url.setQuery(lit("lines=1000"));
-
-    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
+    
+    //setting credentials for access to resource
+    const QnConnectionData& lastUsedConnection = qnSettings->lastUsedConnection();
     url.setUserName(lastUsedConnection.url.userName());
     url.setPassword(lastUsedConnection.url.password());
+
+    if( !QnNetworkProxyFactory::instance()->fillUrlWithRouteToResource(
+            server,
+            &url,
+            QnNetworkProxyFactory::placeCredentialsToUrl ) )
+    {
+        //could not find route to server. Can it really happen?
+        //TODO: #ak some error message
+    }
     
     QDesktopServices::openUrl(url);
 }
@@ -2085,16 +2099,6 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
     dialog->startPings();
 #endif
 
-}
-
-void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
-    /* QnResourcePtr resource = menu()->currentParameters(sender()).resource();
-    if(resource.isNull())
-        return;
-
-    QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(context(), resource, widget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec(); */
 }
 
 void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
@@ -2906,7 +2910,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     bool isInstalled;
     bool success = applauncher::isVersionInstalled(version, &isInstalled) == applauncher::api::ResultType::ok;
     if (success && isInstalled) {
-        //TODO: #GDM wtf? whats up with order?
+        //TODO: #GDM #Common wtf? whats up with order?
         if(context()->user()) { // TODO: #Elric factor out
             QnWorkbenchState state;
             workbench()->submit(state);
@@ -2916,7 +2920,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
             qnSettings->setUserWorkbenchStates(states);
         }
 
-        //TODO: #GDM factor out
+        //TODO: #GDM #Common factor out
         if(!context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true)) {
             return;
         }

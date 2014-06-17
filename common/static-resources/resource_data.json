@@ -26,10 +26,11 @@
         },
         {
             "keys": [
-                "ISD_NATIVE|*"
+                "ISD_EDGE|*"
             ],
             "showUrl": true,
-            "urlLocalePath": "priv/cam.html"
+            "urlLocalePath": "priv/cam.html",
+            "MaxFPS": 30.0
         },
         {
             "keys": [
@@ -85,6 +86,12 @@
                 "VISTA|VK2-600PTZ"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability"
+        },
+        {
+            "keys": [
+                "AXIS|AXISM7016Group1", "AXIS|AXISM7016Group2", "AXIS|AXISM7016Group3", "AXIS|AXISM7016Group4"
+            ],
+            "axisMaxZoomSpeed": 70
         },
         {
             "keys": [

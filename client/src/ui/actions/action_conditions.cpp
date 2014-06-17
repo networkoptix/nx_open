@@ -24,6 +24,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -260,7 +261,7 @@ Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResource
 
         bool isUnsupported = 
             (widget->resource()->flags() & (QnResource::network | QnResource::still_image | QnResource::server)) ||
-            !(widget->resource()->flags() & QnResource::utc); // TODO: #GDM this is wrong, we need a flag for exported files.
+            !(widget->resource()->flags() & QnResource::utc); // TODO: #GDM #Common this is wrong, we need a flag for exported files.
         if(isUnsupported)
             return Qn::InvisibleAction;
     }
@@ -375,6 +376,7 @@ Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutIte
 
 Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout;
+    QnVideoWallResourcePtr videowall;
 
     if(m_current) {
         layout = workbench()->currentLayout()->resource();
@@ -386,6 +388,9 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
     }
 
     if(!layout)
+        return Qn::InvisibleAction;
+
+    if (layout->data().contains(Qn::VideoWallResourceRole))
         return Qn::InvisibleAction;
 
     if(snapshotManager()->isSaveable(layout)) {
@@ -639,7 +644,7 @@ Qn::ActionVisibility QnOpenInCurrentLayoutActionCondition::check(const QnResourc
         if (resource->getStatus() == QnResource::Incompatible)
             continue;
 
-        //TODO: #GDM refactor duplicated code
+        //TODO: #GDM #Common refactor duplicated code
         bool isServer = resource->hasFlags(QnResource::server);
         bool isMediaResource = resource->hasFlags(QnResource::media);
         bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media)
@@ -860,7 +865,6 @@ Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resource
     return Qn::EnabledAction;
 }
 
-
 Qn::ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList &resources) {
     bool found = false;
     foreach (const QnResourcePtr &resource, resources) {
@@ -872,4 +876,10 @@ Qn::ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList
         }
     }
     return found ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParameters &parameters) {
+    if(!context()->instance<QnWorkbenchAutoStarter>()->isSupported())
+        return Qn::InvisibleAction;
+    return Qn::EnabledAction;
 }

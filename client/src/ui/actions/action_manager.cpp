@@ -447,7 +447,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Control Video Wall")); //TODO: #VW #TR
 
-    //TODO: #GDM VW check desktop camera availability
+    //TODO: #GDM #VW check desktop camera availability
     factory(Qn::PushMyScreenToVideowallAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
@@ -612,9 +612,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Alt+S")).
-        autoRepeat(false);
+        autoRepeat(false).
+        condition(new QnVideoWallReviewModeCondition(true, this));
 
-    factory(Qn::SaveVideoWallReviewAction).
+    factory(Qn::SaveCurrentVideoWallReviewAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey | Qn::IntentionallyAmbiguous).
         text(tr("Save Video Wall View")). //TODO: #VW #TR
         shortcut(tr("Ctrl+S")).
@@ -913,6 +914,14 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnStartVideowallActionCondition(this));
 
+    factory(Qn::SaveVideoWallReviewAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        text(tr("Save Video Wall View")). //TODO: #VW #TR
+        shortcut(tr("Ctrl+S")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        autoRepeat(false).
+        condition(hasFlags(QnResource::videowall));
+
     factory(Qn::SaveVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
@@ -1206,13 +1215,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         separator();
 
-    factory(Qn::YouTubeUploadAction).
-        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
-        text(tr("Upload to YouTube...")).
-        //shortcut(tr("Ctrl+Y")).
-        autoRepeat(false).
-        condition(hasFlags(QnResource::ARCHIVE));
-
     factory(Qn::DeleteFromDiskAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
         text(tr("Delete from Disk")).
@@ -1266,7 +1268,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::VideowallSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Video Wall Settings...")).     //TODO: #VW #TR
-        condition(new QnResourceActionCondition(hasFlags(QnResource::videowall), Qn::ExactlyOne, this));
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(QnResource::videowall), Qn::ExactlyOne, this),
+            new QnAutoStartAllowedActionCodition(this),
+            this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).

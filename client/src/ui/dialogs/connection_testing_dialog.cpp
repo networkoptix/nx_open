@@ -48,6 +48,7 @@ QnConnectionTestingDialog::QnConnectionTestingDialog( QWidget *parent) :
 
 void QnConnectionTestingDialog::testEnterpriseController(const QUrl &url) {
     QUrl urlNoPassword(url);
+    urlNoPassword.setPassword(QString());
     qnDebug("Testing connectivity for URL '%1'.", urlNoPassword.toString());
 
     setHelpTopic(this, Qn::Login_Help);

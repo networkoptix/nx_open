@@ -772,7 +772,7 @@ static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
 }
 
 
-AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int IO_BLOCK_SIZE)
+AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int ioBlockSize)
 {
     int prefix = url.indexOf(QLatin1String("://"));
     QString path = prefix == -1 ? url : url.mid(prefix+3);
@@ -784,10 +784,10 @@ AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QnStorageResourcePtr resource
     if (ioDevice == 0)
         return 0;
 
-    ioBuffer = (quint8*) av_malloc(IO_BLOCK_SIZE);
+    ioBuffer = (quint8*) av_malloc(ioBlockSize);
     ffmpegIOContext = avio_alloc_context(
         ioBuffer,
-        IO_BLOCK_SIZE,
+        ioBlockSize,
         (openMode & QIODevice::WriteOnly) ? 1 : 0,
         ioDevice,
         &ffmpegReadPacket,
@@ -797,15 +797,15 @@ AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QnStorageResourcePtr resource
     return ffmpegIOContext;
 }
 
-AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QIODevice* ioDevice, int IO_BLOCK_SIZE)
+AVIOContext* QnFfmpegHelper::createFfmpegIOContext(QIODevice* ioDevice, int ioBlockSize)
 {
     quint8* ioBuffer;
     AVIOContext* ffmpegIOContext;
 
-    ioBuffer = (quint8*) av_malloc(IO_BLOCK_SIZE);
+    ioBuffer = (quint8*) av_malloc(ioBlockSize);
     ffmpegIOContext = avio_alloc_context(
         ioBuffer,
-        IO_BLOCK_SIZE,
+        ioBlockSize,
         (ioDevice->openMode() & QIODevice::WriteOnly) ? 1 : 0,
         ioDevice,
         &ffmpegReadPacket,

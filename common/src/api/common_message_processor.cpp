@@ -213,7 +213,10 @@ void QnCommonMessageProcessor::on_resourceParamsChanged( const QnId& resourceId,
         return;
 
     foreach (const QnKvPair &pair, kvPairs)
-        resource->setProperty(pair.name(), pair.value());
+        if( pair.isPredefinedParam() )
+            resource->setParam(pair.name(), pair.value(), QnDomainMemory);
+        else
+            resource->setProperty(pair.name(), pair.value());
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnId& resourceId )

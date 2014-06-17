@@ -180,7 +180,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_view->setAutoFillBackground(true);
 
     if (!(qnSettings->lightMode() & Qn::LightModeNoSceneBackground)) {
-        m_backgroundPainter.reset(new QnGradientBackgroundPainter(120.0, this));
+        m_backgroundPainter.reset(new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), this));
         m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
     }
 
@@ -193,6 +193,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
     m_controller.reset(new QnWorkbenchController(this));
+    if (qnSettings->isVideoWallMode())
+        m_controller->setMenuEnabled(false);
     m_ui.reset(new QnWorkbenchUi(this));
     if (qnSettings->isVideoWallMode())
         m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::HideWhenNormal );
@@ -218,12 +220,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
-    /* Set up actions. */
+    /* Set up actions. Only these actions will be available through hotkeys. */
     addAction(action(Qn::NextLayoutAction));
     addAction(action(Qn::PreviousLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAsAction));
-    addAction(action(Qn::SaveVideoWallReviewAction));
+    addAction(action(Qn::SaveCurrentVideoWallReviewAction));
     addAction(action(Qn::ExitAction));
     addAction(action(Qn::EscapeHotkeyAction));
     addAction(action(Qn::FullscreenMaximizeHotkeyAction));
@@ -239,11 +241,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::OpenNewWindowAction));
     addAction(action(Qn::CloseLayoutAction));
     addAction(action(Qn::MainMenuAction));
-    addAction(action(Qn::YouTubeUploadAction));
     addAction(action(Qn::OpenInFolderAction));
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
     addAction(action(Qn::DeleteVideoWallItemAction));
+    addAction(action(Qn::DeleteVideowallMatrixAction));
     addAction(action(Qn::SelectAllAction));
     addAction(action(Qn::CheckFileSignatureAction));
     addAction(action(Qn::TakeScreenshotAction));

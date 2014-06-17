@@ -91,7 +91,7 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& /*modifiedFields*/)
 {
     Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
@@ -104,11 +104,6 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     m_flags = other->m_flags;
     m_name = other->m_name;
     m_parentId = other->m_parentId;
-
-    // TODO: #rvasilenko what does this code here? We have setStatus to do this.
-//    m_status = other->m_status;
-//    if (m_status == Offline)
-//        m_initialized = false;
 }
 
 void QnResource::update(QnResourcePtr other, bool silenceMode)
@@ -409,14 +404,15 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         }
     }
 
-    //QnDomainMemory should changed anyway
+    //QnDomainMemory should be changed anyway
     {
         QMutexLocker locker(&m_mutex); // block paramList changing
-        m_resourceParamList[name].setDomain(domain);
-        if (!m_resourceParamList[name].setValue(val))
+        QnParam& param = m_resourceParamList[name];
+        param.setDomain(domain);
+        if (!param.setValue(val))
         {
             locker.unlock();
-            cl_log.log("cannot set such param!", cl_logWARNING);
+            NX_LOG( lit("cannot set such param %1!").arg(name), cl_logWARNING );
             emit asyncParamSetDone(toSharedPointer(this), name, val, false);
             return false;
         }

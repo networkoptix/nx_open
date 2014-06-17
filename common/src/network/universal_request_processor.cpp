@@ -20,10 +20,6 @@ QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
     stop();
 }
 
-void QnUniversalRequestProcessor::setAllowedUnauthorizedPaths(const QSet<QString> &paths) {
-    m_allowedUnauthPaths = paths;
-}
-
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner, bool needAuth):
 QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket)
 {
@@ -49,7 +45,7 @@ bool QnUniversalRequestProcessor::authenticate()
     Q_D(QnUniversalRequestProcessor);
 
     int retryCount = 0;
-    if (d->needAuth &&  d->protocol.toLower() == "http")
+    if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
         QString path = url.path().trimmed();
@@ -57,11 +53,10 @@ bool QnUniversalRequestProcessor::authenticate()
             path = path.left(path.size()-1);
         if (path.startsWith(L'/'))
             path = path.mid(1);
-        bool needAuth = !m_allowedUnauthPaths.contains(path);
         bool isProxy = dynamic_cast<QnUniversalTcpListener*>(d->owner)->isProxy(url);
         QElapsedTimer t;
         t.restart();
-        while (needAuth && !qnAuthHelper->authenticate(d->request, d->response, isProxy) && d->socket->isConnected())
+        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy) && d->socket->isConnected())
         {
             d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: STATIC_UNAUTHORIZED_HTML;
             sendResponse("HTTP", isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED, "text/html");
@@ -112,7 +107,16 @@ void QnUniversalRequestProcessor::run()
                 d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
                 d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
             }
-            processRequest();
+            if( !processRequest() )
+            {
+                d->response.statusLine.version = d->request.requestLine.version;
+                d->response.statusLine.statusCode = nx_http::StatusCode::notFound;
+                d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString( d->response.statusLine.statusCode );
+                d->response.headers.insert( nx_http::HttpHeader( "Content-Type", "text/plain" ) );
+                d->response.messageBody = "NOT FOUND";
+                d->response.headers.insert( nx_http::HttpHeader( "Content-Length", nx_http::StringType::number(d->response.messageBody.size()) ) );
+                sendBuffer( d->response.toString() );
+            }
         }
 
         if (!d->socket)
@@ -127,7 +131,7 @@ void QnUniversalRequestProcessor::run()
         d->socket->close();
 }
 
-void QnUniversalRequestProcessor::processRequest()
+bool QnUniversalRequestProcessor::processRequest()
 {
     Q_D(QnUniversalRequestProcessor);
     QList<QByteArray> header = d->clientRequest.left(d->clientRequest.indexOf('\n')).split(' ');
@@ -137,6 +141,9 @@ void QnUniversalRequestProcessor::processRequest()
         QByteArray protocol = header[2].split('/')[0].toUpper();
         QMutexLocker lock(&d->mutex);
         d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, protocol, QUrl(QString::fromUtf8(header[1])));
+        if( !d->processor )
+            return false;
+
         if (d->processor && !needToStop()) 
         {
             copyClientRequestTo(*d->processor);
@@ -148,7 +155,10 @@ void QnUniversalRequestProcessor::processRequest()
         }
         delete d->processor;
         d->processor = 0;
+        return true;
     }
+
+    return false;
 }
 
 void QnUniversalRequestProcessor::pleaseStop()

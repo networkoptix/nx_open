@@ -13,11 +13,13 @@ namespace nx_hls
 {
     HLSSession::HLSSession(
         const QString& id,
+        unsigned int targetDurationMS,
         bool _isLive,
         MediaQuality streamQuality,
         QnVideoCamera* const videoCamera )
     :
         m_id( id ),
+        m_targetDurationMS( targetDurationMS ),
         m_live( _isLive ),
         m_streamQuality( streamQuality ),
         m_videoCamera( videoCamera )
@@ -38,6 +40,11 @@ namespace nx_hls
     const QString& HLSSession::id() const
     {
         return m_id;
+    }
+
+    unsigned int HLSSession::targetDurationMS() const
+    {
+        return m_targetDurationMS;
     }
 
     bool HLSSession::isLive() const
@@ -87,17 +94,17 @@ namespace nx_hls
     HLSSessionPool::HLSSessionContext::HLSSessionContext()
     :
         session( NULL ),
-        keepAliveTimeoutSec( 0 ),
+        keepAliveTimeoutMS( 0 ),
         removeTaskID( 0 )
     {
     }
 
     HLSSessionPool::HLSSessionContext::HLSSessionContext(
         HLSSession* const _session,
-        int _keepAliveTimeoutSec )
+        unsigned int _keepAliveTimeoutMS )
     :
         session( _session ),
-        keepAliveTimeoutSec( _keepAliveTimeoutSec ),
+        keepAliveTimeoutMS( _keepAliveTimeoutMS ),
         removeTaskID( 0 )
     {
     }
@@ -121,12 +128,12 @@ namespace nx_hls
         }
     }
 
-    bool HLSSessionPool::add( HLSSession* session, int keepAliveTimeoutSec )
+    bool HLSSessionPool::add( HLSSession* session, unsigned int keepAliveTimeoutMS )
     {
         QMutexLocker lk( &m_mutex );
-        if( !m_sessionByID.insert( std::make_pair(session->id(), HLSSessionContext(session, keepAliveTimeoutSec)) ).second )
+        if( !m_sessionByID.insert( std::make_pair(session->id(), HLSSessionContext(session, keepAliveTimeoutMS)) ).second )
             return false;
-        Q_ASSERT( (keepAliveTimeoutSec == 0) || (m_lockedIDs.find(session->id()) != m_lockedIDs.end()) );   //session with keep-alive timeout can only be accessed under lock
+        Q_ASSERT( (keepAliveTimeoutMS == 0) || (m_lockedIDs.find(session->id()) != m_lockedIDs.end()) );   //session with keep-alive timeout can only be accessed under lock
         return true;
     }
 
@@ -136,7 +143,7 @@ namespace nx_hls
         std::map<QString, HLSSessionContext>::const_iterator it = m_sessionByID.find( id );
         if( it == m_sessionByID.end() )
             return NULL;
-        Q_ASSERT( (it->second.keepAliveTimeoutSec == 0) || (m_lockedIDs.find(id) != m_lockedIDs.end()) );   //session with keep-alive timeout can only be accessed under lock
+        Q_ASSERT( (it->second.keepAliveTimeoutMS == 0) || (m_lockedIDs.find(id) != m_lockedIDs.end()) );   //session with keep-alive timeout can only be accessed under lock
         return it->second.session;
     }
 
@@ -174,8 +181,6 @@ namespace nx_hls
         it->second.removeTaskID = 0;
     }
 
-    static const unsigned int MS_IN_SEC = 1000;
-
     void HLSSessionPool::unlockSessionID( const QString& id )
     {
         QMutexLocker lk( &m_mutex );
@@ -183,9 +188,9 @@ namespace nx_hls
 
         //creating session remove task
         std::map<QString, HLSSessionContext>::iterator it = m_sessionByID.find( id );
-        if( it == m_sessionByID.end() || it->second.keepAliveTimeoutSec == 0 )
+        if( it == m_sessionByID.end() || it->second.keepAliveTimeoutMS == 0 )
             return;
-        it->second.removeTaskID = TimerManager::instance()->addTimer( this, it->second.keepAliveTimeoutSec * MS_IN_SEC );
+        it->second.removeTaskID = TimerManager::instance()->addTimer( this, it->second.keepAliveTimeoutMS );
         m_taskToSessionID.insert( std::make_pair( it->second.removeTaskID, id ) );
     }
 

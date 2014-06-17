@@ -122,7 +122,6 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
     static const char* RTSP_TRANSPORT_NAME = "rtsp";
     static const char* HLS_TRANSPORT_NAME = "hls";
     static const char* MJPEG_TRANSPORT_NAME = "mjpeg";
-    static const char* WEBM_TRANSPORT_NAME = "webm";
 
     static const char* CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = "mediaStreams";
 
@@ -151,6 +150,8 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
 #endif
 
 #ifdef TRANSCODING_AVAILABLE
+    static const char* WEBM_TRANSPORT_NAME = "webm";
+
     CameraMediaStreamInfo transcodedStream;
     //any resolution is supported
     transcodedStream.transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );

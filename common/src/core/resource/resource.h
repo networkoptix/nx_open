@@ -102,7 +102,6 @@ public:
         deprecated = 0x100000,  /**< Resource absent in EC but still used in memory for some reason */
 
         videowall = 0x200000,           /**< Videowall resource */
-        videowall_item = 0x400000,      /**< Videowall item */
 
         local_media = local | media,
         local_layout = local | layout,

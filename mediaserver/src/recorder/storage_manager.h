@@ -36,11 +36,6 @@ public:
 
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
 
-#ifdef __arm__
-    static const qint64 DEFAULT_SPACE_LIMIT =    100*1024*1024; // 100MB
-#else
-    static const qint64 DEFAULT_SPACE_LIMIT = 5*1024*1024*1024ll; // 5gb
-#endif
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
 
@@ -77,7 +72,7 @@ public:
 
     void doMigrateCSVCatalog();
     bool loadFullFileCatalog(const QnStorageResourcePtr &storage, bool isRebuild = false, qreal progressCoeff = 1.0);
-    QVector<DeviceFileCatalog::Chunk> correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const QVector<DeviceFileCatalog::Chunk>& chunks);
+    std::deque<DeviceFileCatalog::Chunk> correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks);
 
 
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);

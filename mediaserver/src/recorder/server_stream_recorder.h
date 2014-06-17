@@ -74,6 +74,8 @@ private:
 private slots:
     void at_recordingFinished(int status, const QString &filename);
 private:
+    const size_t m_maxRecordQueueSizeBytes;
+    const size_t m_maxRecordQueueSizeElements;
     mutable QMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
     QnTimePeriod m_lastSchedulePeriod;
@@ -92,7 +94,7 @@ private:
     bool m_usedPanicMode;
     bool m_usedSpecialRecordingMode;
     bool m_lastMotionState; // true if motion in progress
-    qint64 m_queuedSize;
+    size_t m_queuedSize;
     QMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;

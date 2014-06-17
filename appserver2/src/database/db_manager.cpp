@@ -1889,7 +1889,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     query.prepare(QString("SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
                           l.autorun \
                           FROM vms_videowall l \
-                          JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.id").arg(filter));
+                          JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.guid").arg(filter));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
@@ -1902,7 +1902,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
                        item.guid, item.pc_guid as pcGuid, item.layout_guid as layoutGuid, \
                        item.videowall_guid as videowallGuid, item.name, \
                        item.x as left, item.y as top, item.w as width, item.h as height \
-                       FROM vms_videowall_item item");
+                       FROM vms_videowall_item item ORDER BY videowallGuid");
     if (!queryItems.exec()) {
         qWarning() << Q_FUNC_INFO << queryItems.lastError().text();
         return ErrorCode::dbError;
@@ -1923,7 +1923,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
                          screen.layout_x as layoutLeft, screen.layout_y as layoutTop, \
                          screen.layout_w as layoutWidth, screen.layout_h as layoutHeight \
                          FROM vms_videowall_screen screen \
-                         JOIN vms_videowall_pcs pc on pc.pc_guid = screen.pc_guid");
+                         JOIN vms_videowall_pcs pc on pc.pc_guid = screen.pc_guid ORDER BY videowallGuid");
     if (!queryScreens.exec()) {
         qWarning() << Q_FUNC_INFO << queryScreens.lastError().text();
         return ErrorCode::dbError;
@@ -1937,8 +1937,11 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     queryMatrixItems.prepare("SELECT \
                              item.matrix_guid as matrixGuid, \
                              item.item_guid as itemGuid, \
-                             item.layout_guid as layoutGuid \
-                             FROM vms_videowall_matrix_items item");
+                             item.layout_guid as layoutGuid, \
+                             matrix.videowall_guid \
+                             FROM vms_videowall_matrix_items item \
+                             JOIN vms_videowall_matrix matrix ON matrix.guid = item.matrix_guid \
+                             ORDER BY matrix.videowall_guid");
     if (!queryMatrixItems.exec()) {
         qWarning() << Q_FUNC_INFO << queryMatrixItems.lastError().text();
         return ErrorCode::dbError;
@@ -1952,7 +1955,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
                           matrix.guid as id, \
                           matrix.name, \
                           matrix.videowall_guid as videowallGuid \
-                          FROM vms_videowall_matrix matrix");
+                          FROM vms_videowall_matrix matrix ORDER BY videowallGuid");
     if (!queryMatrices.exec()) {
         qWarning() << Q_FUNC_INFO << queryMatrices.lastError().text();
         return ErrorCode::dbError;

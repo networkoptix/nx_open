@@ -10,7 +10,6 @@
 #include <QWaitCondition>
 
 #include <core/resource/media_resource.h>
-#include <utils/media/mediaindex.h>
 #include <utils/network/http/httpstreamreader.h>
 #include <utils/network/tcp_connection_processor.h>
 
@@ -122,6 +121,7 @@ namespace nx_hls
             QnSecurityCamResourcePtr camResource,
             QnVideoCamera* const videoCamera,
             MediaQuality streamQuality );
+        void ensureChunkCacheFilledEnoughForPlayback( HLSSession* const session, MediaQuality streamQuality );
 
     private slots:
         void chunkDataAvailable( StreamingChunkPtr chunk, quint64 newSizeBytes );

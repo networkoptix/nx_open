@@ -35,7 +35,6 @@ class QnVideowallItemWidget : public Overlayed<Animated<Connective<QnClickableWi
     Q_OBJECT
 
     Q_PROPERTY(QnResourceWidgetFrameColors frameColors READ frameColors WRITE setFrameColors)
-
 public:
     explicit QnVideowallItemWidget(const QnVideoWallResourcePtr &videowall, const QUuid &itemUuid, QnVideowallScreenWidget *parent, QGraphicsWidget* parentWidget, Qt::WindowFlags windowFlags = 0);
 
@@ -44,6 +43,10 @@ public:
 
     bool isInfoVisible() const;
     void setInfoVisible(bool visible, bool animate = true);
+
+signals:
+    void infoVisibleChanged(bool visible);
+
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintFrame(QPainter *painter, const QRectF &paintRect);
@@ -74,6 +77,7 @@ private:
 
     /** \returns false if item image is still loading */
     bool paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data);
+    
 private:
     friend class QnVideowallScreenWidget;
     friend class QnVideowallItemWidgetHoverProgressAccessor;

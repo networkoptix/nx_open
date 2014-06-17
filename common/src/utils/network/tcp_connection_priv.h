@@ -39,6 +39,7 @@ static const QByteArray STATIC_PROXY_UNAUTHORIZED_HTML("\
 // TODO: #vasilenko these are part of a public interface and are used throughout the codebase.
 // Why they are in a private header???
 static const int CODE_OK = 200;
+static const int CODE_NOT_MODIFIED = 304;
 static const int CODE_AUTH_REQUIRED = 401;
 static const int CODE_NOT_FOUND = 404;
 static const int CODE_PROXY_AUTH_REQUIRED = 407;
@@ -80,6 +81,7 @@ public:
     int socketTimeout;
     bool chunkedMode;
     int clientRequestOffset;
+    QDateTime lastModified;
 
     ec2::ApiHelpGroupDataList helpData;
 };

@@ -4,7 +4,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtWidgets/QMessageBox>
 
-//TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+//TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
@@ -241,7 +241,7 @@ void QnCameraScheduleWidget::endUpdate() {
     if (m_inUpdate > 0)
         return;
     connectToGridWidget();
-    updateGridParams(); // TODO: #GDM does not belong here...
+    updateGridParams(); // TODO: #GDM #Common does not belong here...
 }
 
 void QnCameraScheduleWidget::setChangesDisabled(bool val)
@@ -268,7 +268,7 @@ void QnCameraScheduleWidget::setReadOnly(bool readOnly)
 
     using ::setReadOnly;
     setReadOnly(ui->recordAlwaysButton, readOnly);
-    setReadOnly(ui->recordMotionButton, readOnly); // TODO: #GDM this is not valid. Camera may not support HW motion, we need to check for this.
+    setReadOnly(ui->recordMotionButton, readOnly); // TODO: #GDM #Common this is not valid. Camera may not support HW motion, we need to check for this.
     setReadOnly(ui->recordMotionPlusLQButton, readOnly);
     setReadOnly(ui->noRecordButton, readOnly);
     setReadOnly(ui->qualityComboBox, readOnly);
@@ -793,7 +793,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     if(widget->isEnabled() || (widget->parentWidget() && !widget->parentWidget()->isEnabled()))
         return;
 
-    // TODO: #GDM duplicate code.
+    // TODO: #GDM #Common duplicate code.
     bool hasDualStreaming = !m_cameras.isEmpty();
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
@@ -832,7 +832,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
         if (recordingEnabled){
             int maxFps = camera->getMaxFps();
 
-            //TODO: #GDM ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+            //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
             // or just use camera->reservedSecondStreamFps();
 
             int decreaseAlways = 0;

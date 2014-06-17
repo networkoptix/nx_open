@@ -298,6 +298,10 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
         qnWarning("Requesting context menu for a tree widget while no menu manager instance is available.");
         return;
     }
+
+    if (qnSettings->isVideoWallMode())
+        return;
+
     QnActionManager *manager = context()->menu();
 
     QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection ? QnActionParameters() : currentParameters(Qn::TreeScope)));

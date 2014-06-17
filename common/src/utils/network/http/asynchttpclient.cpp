@@ -436,6 +436,11 @@ namespace nx_http
         m_responseReadTimeoutMs = _responseReadTimeoutMs;
     }
 
+    void AsyncHttpClient::setDecodeChunkedMessageBody( bool val )
+    {
+        m_httpStreamReader.setDecodeChunkedMessageBody( val );
+    }
+
     void AsyncHttpClient::resetDataBeforeNewRequest()
     {
         //stopping client, if it is running

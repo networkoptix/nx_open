@@ -70,7 +70,6 @@ public:
     void setProxyPoolSize(int value);
 
     void disableAuth();
-    void setAllowedUnauthorizedPaths(const QSet<QString> &paths);
 
     bool isProxy(const QUrl& url);
 protected:
@@ -99,7 +98,6 @@ private:
     QSet<QString> m_proxyConExists;
     int m_proxyPoolSize;
     bool m_needAuth;
-    QSet<QString> m_allowedUnauthPaths;
 };
 
 #endif // __UNIVERSAL_TCP_LISTENER_H__

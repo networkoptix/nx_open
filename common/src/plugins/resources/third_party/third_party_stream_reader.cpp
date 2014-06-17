@@ -187,7 +187,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStream()
         }
         else if( mediaUrl.scheme().toLower() == lit("http") )
         {
-            m_builtinStreamReader.reset( new MJPEGtreamreader(
+            m_builtinStreamReader.reset( new MJPEGStreamReader(
                 m_resource,
                 mediaUrl.path() + (!mediaUrl.query().isEmpty() ? lit("?") + mediaUrl.query() : QString()) ) );
         }
@@ -245,7 +245,7 @@ void ThirdPartyStreamReader::pleaseStop()
     {
         QnStoppable* stoppable = dynamic_cast<QnStoppable*>(m_builtinStreamReader.get());
         //TODO #ak preferred way to remove dynamic_cast from here and inherit QnAbstractMediaStreamProvider from QnStoppable. 
-            //But, this will require virtual inheritance since CLServerPushStreamReader (base of MJPEGtreamreader) indirectly inherits QnStoppable.
+            //But, this will require virtual inheritance since CLServerPushStreamReader (base of MJPEGStreamReader) indirectly inherits QnStoppable.
         if( stoppable )
             stoppable->pleaseStop();
     }

@@ -19,11 +19,11 @@
 #include <utils/common/timermanager.h>
 
 #include "data_source_cache.h"
+#include "streaming_chunk.h"
 #include "streaming_chunk_cache_key.h"
 
 
 class StreamingChunkCacheKey;
-class StreamingChunk;
 class StreamingChunkTranscoderThread;
 class QnTranscoder;
 
@@ -72,7 +72,7 @@ public:
     */
     bool transcodeAsync(
         const StreamingChunkCacheKey& transcodeParams,
-        StreamingChunk* const chunk );
+        StreamingChunkPtr chunk );
 
     static StreamingChunkTranscoder* instance();
 
@@ -85,7 +85,7 @@ private:
         QnSecurityCamResourcePtr mediaResource;
         DataSourceContextPtr dataSourceCtx;
         StreamingChunkCacheKey transcodeParams;
-        StreamingChunk* chunk;
+        StreamingChunkPtr chunk;
         QnTranscoder* transcoder;
 
         TranscodeContext();
@@ -106,7 +106,7 @@ private:
         int transcodingID,
         DataSourceContextPtr dataSourceCtx,
         const StreamingChunkCacheKey& transcodeParams,
-        StreamingChunk* const chunk );
+        StreamingChunkPtr chunk );
     bool scheduleTranscoding(
         const int transcodeID,
         int delayMSec );

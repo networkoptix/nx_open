@@ -30,6 +30,7 @@ public:
         Users,
         VideoWall,
         VideoWallItem,
+        VideoWallMatrix,
         TypeMask        = 0xFF,
 
         Offline         = 1 << 8,
@@ -57,8 +58,16 @@ public:
 
     static Key key(const QnResourcePtr &resource);
 
+    /**
+     * @brief setKey            Bind custom key to the provided resource instance.
+     * @param resource          Target resource.
+     * @param key               Custom key.
+     */
+    static void setKey(QnResourcePtr &resource, Key key);
+
     static QnResourceIconCache *instance();
 
+    
 private:
     QHash<Key, QIcon> m_cache;
 };

@@ -252,7 +252,6 @@ protected slots:
     void at_serverLogsAction_triggered();
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
-    void at_youtubeUploadAction_triggered();
     void at_thumbnailsSearchAction_triggered();
 
     void at_openInFolderAction_triggered();
@@ -354,6 +353,7 @@ private:
     /** Scope of the last selection change. */
     Qn::ActionScope m_selectionScope;
 
+    bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once
      * the user logs in. */
     QList<QnMimeData> m_delayedDrops;
