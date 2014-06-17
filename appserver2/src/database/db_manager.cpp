@@ -1159,7 +1159,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDiscove
     if (tran.command == ApiCommand::addDiscoveryInformation) {
         foreach (const ApiDiscoveryData &data, tran.params) {
             QSqlQuery query(m_sdb);
-            query.prepare("INSERT INTO vms_mserver_discovery (server_id, url, ignore) VALUES(:id, :url, :ignore)");
+            query.prepare("INSERT OR REPLACE INTO vms_mserver_discovery (server_id, url, ignore) VALUES(:id, :url, :ignore)");
             QnSql::bind(data, &query);
             if (!query.exec()) {
                 qWarning() << Q_FUNC_INFO << query.lastError().text();

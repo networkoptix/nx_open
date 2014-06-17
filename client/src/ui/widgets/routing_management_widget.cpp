@@ -49,17 +49,36 @@ QnMediaServerResourcePtr QnRoutingManagementWidget::currentServer() const {
 }
 
 void QnRoutingManagementWidget::updateModel(const QnMediaServerResourcePtr &server) {
-    QStringList addresses;
-    foreach (const QHostAddress &address, server->getNetAddrList())
-        addresses.append(address.toString());
+    int port = QUrl(server->getApiUrl()).port();
+    if (port == -1)
+        port = DEFAULT_APPSERVER_PORT;
 
-    QStringList manualAddresses;
-    foreach (const QUrl &url, server->getAdditionalUrls())
-        manualAddresses.append(url.toString());
+    QList<QUrl> addresses;
+    foreach (const QHostAddress &address, server->getNetAddrList()) {
+        QUrl url;
+        url.setScheme(lit("http"));
+        url.setHost(address.toString());
+        url.setPort(port);
+        url.setPath(QString());
 
-    QSet<QString> ignoredAddresses;
-    foreach (const QUrl &url, server->getIgnoredUrls())
-        ignoredAddresses.insert(url.host());
+        addresses.append(url);
+    }
+
+    QList<QUrl> manualAddresses;
+    foreach (const QUrl &url, server->getAdditionalUrls()) {
+        QUrl actualUrl = url;
+        if (actualUrl.port() == -1)
+            actualUrl.setPort(port);
+        manualAddresses.append(actualUrl);
+    }
+
+    QSet<QUrl> ignoredAddresses;
+    foreach (const QUrl &url, server->getIgnoredUrls()) {
+        QUrl actualUrl = url;
+        if (actualUrl.port() == -1)
+            actualUrl.setPort(port);
+        ignoredAddresses.insert(actualUrl);
+    }
 
 
     int row = ui->addressesView->currentIndex().row();
@@ -85,6 +104,9 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
         return;
     }
 
+    if (url.port() == -1)
+        url.setPort(DEFAULT_APPSERVER_PORT);
+
     QList<QUrl> urls = server->getAdditionalUrls();
     if (urls.contains(url))
         return;
@@ -104,7 +126,7 @@ void QnRoutingManagementWidget::at_removeButton_clicked() {
     if (!server)
         return;
 
-    QUrl url = QUrl(index.data().toString());
+    QUrl url(index.data().toUrl());
     QList<QUrl> urls = server->getAdditionalUrls();
     if (!urls.removeOne(url))
         return;
@@ -120,7 +142,7 @@ void QnRoutingManagementWidget::at_serversView_currentIndexChanged(const QModelI
 
     QnMediaServerResourcePtr server = current.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnMediaServerResource>();
     if (!server) {
-        m_serverAddressesModel->resetModel(QStringList(), QStringList(), QSet<QString>());
+        m_serverAddressesModel->resetModel(QList<QUrl>(), QList<QUrl>(), QSet<QUrl>());
         return;
     }
 
@@ -148,10 +170,13 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
     if (!server)
         return;
 
-    if (!server->getNetAddrList().contains(QHostAddress(address)))
-        return;
+    int port = QUrl(server->getApiUrl()).port();
+    if (port == -1)
+        port = DEFAULT_APPSERVER_PORT;
 
-    QUrl url = QUrl(QString(lit("http://%1")).arg(address));
+    QUrl url(address);
+    if (server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == port)
+        url.setPort(-1);
 
     QList<QUrl> ignoredUrls = server->getIgnoredUrls();
 
@@ -163,7 +188,11 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
     } else {
         if (!ignoredUrls.removeOne(url))
             return;
-        connection2()->getDiscoveryManager()->removeDiscoveryInformation(server->getId(), QList<QUrl>() << url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+
+        if (url.port() == -1)
+            connection2()->getDiscoveryManager()->removeDiscoveryInformation(server->getId(), QList<QUrl>() << url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        else
+            connection2()->getDiscoveryManager()->addDiscoveryInformation(server->getId(), QList<QUrl>() << url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }
     server->setIgnoredUrls(ignoredUrls);
 }

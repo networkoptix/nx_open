@@ -77,6 +77,7 @@ template<class QueryProcessorType>
 QnTransaction<ApiDiscoveryDataList> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QnId &id, const QList<QUrl> &urls, bool ignore) const {
     QnTransaction<ApiDiscoveryDataList> transaction(command, true);
     foreach (const QUrl &url, urls) {
+        Q_ASSERT_X(ignore || url.port() != -1, "Additional server URLs without a port are not allowed", Q_FUNC_INFO);
         ApiDiscoveryData data;
         data.id = id;
         data.url = url.toString();

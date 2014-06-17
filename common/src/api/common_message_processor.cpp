@@ -147,10 +147,15 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryDataLi
     QMultiHash<QnId, QUrl> m_ignoredUrls;
 
     foreach (const ec2::ApiDiscoveryData &data, discoveryData) {
-        if (data.ignore)
-            m_ignoredUrls.insert(data.id, data.url);
-        else
-            m_additionalUrls.insert(data.id, data.url);
+        QUrl url(data.url);
+        if (data.ignore) {
+            if (url.port() != -1 && !m_additionalUrls.contains(data.id, url))
+                m_additionalUrls.insert(data.id, url);
+            m_ignoredUrls.insert(data.id, url);
+        } else {
+            if (!m_additionalUrls.contains(data.id, url))
+                m_additionalUrls.insert(data.id, url);
+        }
     }
 
     foreach (const QnId &id, m_additionalUrls.uniqueKeys()) {
@@ -158,17 +163,18 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryDataLi
         if (!server)
             continue;
 
+        QList<QUrl> additionalUrls = server->getAdditionalUrls();
+
         if (addInformation) {
-            server->setAdditionalUrls(m_additionalUrls.values(id));
-        } else {
-            QList<QUrl> urlsToRemove = m_additionalUrls.values(id);
-            QList<QUrl> urls;
-            foreach (const QUrl &url, server->getAdditionalUrls()) {
-                if (!urlsToRemove.contains(url))
-                    urls.append(url);
+            foreach (const QUrl &url, m_additionalUrls.values(id)) {
+                if (!additionalUrls.contains(url))
+                    additionalUrls.append(url);
             }
-            server->setAdditionalUrls(urls);
+        } else {
+            foreach (const QUrl &url, m_additionalUrls.values(id))
+                additionalUrls.removeOne(url);
         }
+        server->setAdditionalUrls(additionalUrls);
     }
 
     foreach (const QnId &id, m_ignoredUrls.uniqueKeys()) {
@@ -176,17 +182,20 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryDataLi
         if (!server)
             continue;
 
+        QList<QUrl> ignoredUrls = server->getIgnoredUrls();
+
         if (addInformation) {
-            server->setIgnoredUrls(m_ignoredUrls.values(id));
-        } else {
-            QList<QUrl> urlsToRemove = m_ignoredUrls.values(id);
-            QList<QUrl> urls;
-            foreach (const QUrl &url, server->getIgnoredUrls()) {
-                if (!urlsToRemove.contains(url))
-                    urls.append(url);
+            foreach (const QUrl &url, m_additionalUrls.values(id))
+                ignoredUrls.removeOne(url);
+            foreach (const QUrl &url, m_ignoredUrls.values(id)) {
+                if (!ignoredUrls.contains(url))
+                    ignoredUrls.append(url);
             }
-            server->setIgnoredUrls(urls);
+        } else {
+            foreach (const QUrl &url, m_ignoredUrls.values(id))
+                ignoredUrls.removeOne(url);
         }
+        server->setIgnoredUrls(ignoredUrls);
     }
 }
 

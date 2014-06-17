@@ -15,16 +15,16 @@ public:
 
     explicit QnServerAddressesModel(QObject *parent = 0);
 
-    void setAddressList(const QStringList &addresses);
-    QStringList addressList() const;
+    void setAddressList(const QList<QUrl> &addresses);
+    QList<QUrl> addressList() const;
 
-    void setManualAddressList(const QStringList &addresses);
-    QStringList manualAddressList() const;
+    void setManualAddressList(const QList<QUrl> &addresses);
+    QList<QUrl> manualAddressList() const;
 
-    void setIgnoredAddresses(const QSet<QString> &ignoredAddresses);
-    QSet<QString> ignoredAddresses() const;
+    void setIgnoredAddresses(const QSet<QUrl> &ignoredAddresses);
+    QSet<QUrl> ignoredAddresses() const;
 
-    void resetModel(const QStringList &addresses, const QStringList &manualAddresses, const QSet<QString> &ignoredAddresses);
+    void resetModel(const QList<QUrl> &addresses, const QList<QUrl> &manualAddresses, const QSet<QUrl> &ignoredAddresses);
 
     bool isManualAddress(const QModelIndex &index) const;
 
@@ -39,12 +39,15 @@ public:
     virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 signals:
-    void ignoreChangeRequested(const QString &address, bool ignore);
+    void ignoreChangeRequested(const QString &addressAtIndex, bool ignore);
 
 private:
-    QStringList m_addresses;
-    QStringList m_manualAddresses;
-    QSet<QString> m_ignoredAddresses;
+    QUrl addressAtIndex(const QModelIndex &index) const;
+
+private:
+    QList<QUrl> m_addresses;
+    QList<QUrl> m_manualAddresses;
+    QSet<QUrl> m_ignoredAddresses;
 };
 
 class QnSortedServerAddressesModel : public QSortFilterProxyModel {

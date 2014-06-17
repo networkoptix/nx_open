@@ -1,43 +1,44 @@
 #include "server_addresses_model.h"
 
 #include <QtCore/QSet>
+#include <QtGui/QFont>
 
 QnServerAddressesModel::QnServerAddressesModel(QObject *parent) :
     QAbstractItemModel(parent)
 {
 }
 
-void QnServerAddressesModel::setAddressList(const QStringList &addresses) {
+void QnServerAddressesModel::setAddressList(const QList<QUrl> &addresses) {
     beginResetModel();
     m_addresses = addresses;
     endResetModel();
 }
 
-QStringList QnServerAddressesModel::addressList() const {
+QList<QUrl> QnServerAddressesModel::addressList() const {
     return m_addresses;
 }
 
-void QnServerAddressesModel::setManualAddressList(const QStringList &addresses) {
+void QnServerAddressesModel::setManualAddressList(const QList<QUrl> &addresses) {
     beginResetModel();
     m_manualAddresses = addresses;
     endResetModel();
 }
 
-QStringList QnServerAddressesModel::manualAddressList() const {
+QList<QUrl> QnServerAddressesModel::manualAddressList() const {
     return m_manualAddresses;
 }
 
-void QnServerAddressesModel::setIgnoredAddresses(const QSet<QString> &ignoredAddresses) {
+void QnServerAddressesModel::setIgnoredAddresses(const QSet<QUrl> &ignoredAddresses) {
     beginResetModel();
     m_ignoredAddresses = ignoredAddresses;
     endResetModel();
 }
 
-QSet<QString> QnServerAddressesModel::ignoredAddresses() const {
+QSet<QUrl> QnServerAddressesModel::ignoredAddresses() const {
     return m_ignoredAddresses;
 }
 
-void QnServerAddressesModel::resetModel(const QStringList &addresses, const QStringList &manualAddresses, const QSet<QString> &ignoredAddresses) {
+void QnServerAddressesModel::resetModel(const QList<QUrl> &addresses, const QList<QUrl> &manualAddresses, const QSet<QUrl> &ignoredAddresses) {
     beginResetModel();
     m_addresses = addresses;
     m_manualAddresses = manualAddresses;
@@ -69,11 +70,18 @@ QVariant QnServerAddressesModel::data(const QModelIndex &index, int role) const 
     switch (role) {
     case Qt::DisplayRole:
         if (index.column() == AddressColumn)
-            return isManualAddress(index) ? m_manualAddresses[index.row() - m_addresses.size()] : m_addresses[index.row()];
+            return addressAtIndex(index);
         break;
     case Qt::CheckStateRole:
         if (index.column() == IgnoredColumn)
-            return !isManualAddress(index) && m_ignoredAddresses.contains(m_addresses[index.row()]) ? Qt::Checked : Qt::Unchecked;
+            return m_ignoredAddresses.contains(addressAtIndex(index)) ? Qt::Checked : Qt::Unchecked;
+        break;
+    case Qt::FontRole:
+        if (isManualAddress(index)) {
+            QFont font;
+            font.setItalic(true);
+            return font;
+        }
         break;
     default:
         break;
@@ -86,9 +94,6 @@ bool QnServerAddressesModel::setData(const QModelIndex &index, const QVariant &v
     Q_UNUSED(role)
 
     if (index.column() != IgnoredColumn)
-        return false;
-
-    if (isManualAddress(index))
         return false;
 
     emit ignoreChangeRequested(index.sibling(index.row(), AddressColumn).data().toString(), value.toInt() == Qt::Checked);
@@ -138,6 +143,16 @@ Qt::ItemFlags QnServerAddressesModel::flags(const QModelIndex &index) const {
         flags |= Qt::ItemIsUserCheckable;
 
     return flags;
+}
+
+QUrl QnServerAddressesModel::addressAtIndex(const QModelIndex &index) const {
+    if (!hasIndex(index.row(), index.column(), index.parent()))
+        return QString();
+
+    if (index.row() < m_addresses.size())
+        return m_addresses[index.row()];
+    else
+        return m_manualAddresses[index.row() - m_addresses.size()];
 }
 
 
