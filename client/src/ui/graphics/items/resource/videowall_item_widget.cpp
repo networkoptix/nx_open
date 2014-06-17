@@ -550,6 +550,8 @@ void QnVideowallItemWidget::setInfoVisible(bool visible, bool animate) {
     }
 
     m_infoButton->setChecked(visible);
+
+    emit infoVisibleChanged(visible);
 }
 
 void QnVideowallItemWidget::at_infoButton_toggled(bool toggled) {
