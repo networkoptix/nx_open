@@ -558,7 +558,6 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
     m_connectInfo = connectionInfo;
     qnCommon->setLocalSystemName(connectionInfo->systemName);
     QnGlobalModuleFinder::instance()->setConnection(connection);
-    QnRouter::instance()->setConnection(connection);
     base_type::accept();
 }
 
