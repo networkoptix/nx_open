@@ -360,6 +360,8 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::videowallControl:
             return deliveryTransaction<ApiVideowallControlMessageData>(abstractTran, stream);          
+        case ApiCommand::updateVideowallInstanceStatus:
+            return deliveryTransaction<ApiVideowallInstanceStatusData>(abstractTran, stream);       
 
         case ApiCommand::addStoredFile:
         case ApiCommand::updateStoredFile:

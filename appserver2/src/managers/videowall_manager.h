@@ -40,6 +40,13 @@ namespace ec2
             emit controlMessage(message);
         }
 
+        void triggerNotification(const QnTransaction<ApiVideowallInstanceStatusData>& tran) {
+            assert(tran.command == ApiCommand::updateVideowallInstanceStatus);
+            QnVideowallInstanceStatus status;
+            fromApiToResource(tran.params, status);
+            emit instanceStatusUpdated(status);
+        }
+
     protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) override;
         virtual int save( const QnVideoWallResourcePtr& resource, impl::AddVideowallHandlerPtr handler ) override;
