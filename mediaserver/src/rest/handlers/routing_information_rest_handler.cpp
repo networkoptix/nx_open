@@ -11,6 +11,27 @@ namespace HttpCode {
     };
 }
 
+namespace {
+    QByteArray routeToHtml(const QnId &target, const QnRoute &route) {
+        QByteArray result;
+
+        result.append("<b>Route to ");
+        result.append(target.toByteArray());
+        result.append("</b><br/>\r\n");
+
+        foreach (const QnRoutePoint &point, route.points) {
+            result.append(point.peerId.toByteArray());
+            result.append(" ");
+            result.append(point.host.toUtf8());
+            result.append(":");
+            result.append(QString::number(point.port).toUtf8());
+            result.append("<br/>\r\n");
+        }
+
+        return result;
+    }
+}
+
 
 
 int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) {
@@ -45,18 +66,7 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
         result.append("<html><body>\r\n");
 
         if (route.isValid()) {
-            result.append("<b>Route to ");
-            result.append(target.toByteArray());
-            result.append("</b><br/>\r\n");
-
-            foreach (const QnRoutePoint &point, route.points) {
-                result.append(point.peerId.toByteArray());
-                result.append(" ");
-                result.append(point.host.toUtf8());
-                result.append(":");
-                result.append(QString::number(point.port).toUtf8());
-                result.append("<br/>\r\n");
-            }
+            result.append(routeToHtml(target, route));
         } else {
             result.append("Could not found a route to ");
             result.append(params.value(lit("target")).toUtf8());
@@ -82,6 +92,36 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
 
         if (connections.isEmpty())
             result.append("There are no available connections on this server.\r\n");
+
+        result.append("</body></html>\r\n");
+
+        return HttpCode::Ok;
+    } else if (command == lit("routes")) {
+        QnId target = QnId(params.value(lit("target")));
+        QHash<QnId, QnRouteList> routes = QnRouter::instance()->routes();
+
+        result.append("<html><body>\r\n");
+
+        QList<QnId> targets = target.isNull() ? routes.uniqueKeys() : (QList<QnId>() << target);
+        foreach (const QnId &id, targets) {
+            result.append("<b>Routes to ");
+            result.append(id.toByteArray());
+            result.append("</b><br/>\r\n");
+
+            foreach (const QnRoute &route, routes.value(id)) {
+                result.append("<br/>\r\n");
+                result.append(routeToHtml(target, route));
+            }
+            result.append("<br/>\r\n");
+        }
+
+        if (!target.isNull() && routes.count(target) == 0) {
+            result.append("There are no available routes to ");
+            result.append(params.value(lit("target")));
+            result.append("\r\n");
+        } else if (routes.isEmpty()) {
+            result.append("There are no available routes on this server.\r\n");
+        }
 
         result.append("</body></html>\r\n");
 

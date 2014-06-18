@@ -30,6 +30,7 @@ public:
     void setModuleFinder(QnModuleFinder *moduleFinder);
 
     QMultiHash<QnId, Endpoint> connections() const;
+    QHash<QnId, QnRouteList> routes() const;
 
     QnRoute routeTo(const QnId &id) const;
     QnRoute routeTo(const QString &host, quint16 port) const;

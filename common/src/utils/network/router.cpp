@@ -46,6 +46,10 @@ QMultiHash<QnId, QnRouter::Endpoint> QnRouter::connections() const {
     return m_connections;
 }
 
+QHash<QnId, QnRouteList> QnRouter::routes() const {
+    return m_routeBuilder->routes();
+}
+
 QnRoute QnRouter::routeTo(const QnId &id) const {
     return m_routeBuilder->routeTo(id);
 }

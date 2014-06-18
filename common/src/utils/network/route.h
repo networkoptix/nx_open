@@ -27,4 +27,6 @@ struct QnRoute {
     bool operator <(const QnRoute &other) const;
 };
 
+typedef QList<QnRoute> QnRouteList;
+
 #endif // ROUTE_H

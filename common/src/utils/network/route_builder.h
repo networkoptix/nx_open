@@ -14,8 +14,9 @@ public:
 
     QnRoute routeTo(const QnId &peerId) const;
 
+    QHash<QnId, QnRouteList> routes() const;
+
 private:
-    typedef QList<QnRoute> RouteList;
     typedef QPair<QnRoutePoint, int> WeightedPoint;
 
 private:
@@ -25,7 +26,7 @@ private:
 
 private:
     QnId m_startId;
-    QHash<QnId, RouteList> m_routes;
+    QHash<QnId, QnRouteList> m_routes;
     QMultiHash<QnId, WeightedPoint> m_connections;
 };
 

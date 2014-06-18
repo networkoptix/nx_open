@@ -44,7 +44,7 @@ void QnRouteBuilder::removeConnection(const QnId &from, const QnId &to, const QS
 
     if (m_startId == from) {
         // remove the direct connection
-        RouteList &routeList = m_routes[to];
+        QnRouteList &routeList = m_routes[to];
         for (auto it = routeList.begin(); it != routeList.end(); ++it) {
             if (it->points.size() == 1 && it->points.first() == point) {
                 routeList.erase(it);
@@ -69,17 +69,21 @@ void QnRouteBuilder::clear() {
 }
 
 QnRoute QnRouteBuilder::routeTo(const QnId &peerId) const {
-    const RouteList &routeList = m_routes[peerId];
+    const QnRouteList &routeList = m_routes[peerId];
     if (routeList.isEmpty())
         return QnRoute();
     else
         return routeList.first();
 }
 
+QHash<QnId, QnRouteList> QnRouteBuilder::routes() const {
+    return m_routes;
+}
+
 void QnRouteBuilder::insertRoute(const QnRoute &route) {
     Q_ASSERT(!route.points.isEmpty());
 
-    RouteList &routeList = m_routes[route.points.last().peerId];
+    QnRouteList &routeList = m_routes[route.points.last().peerId];
     routeList.insert(qLowerBound(routeList.begin(), routeList.end(), route), route);
 }
 
