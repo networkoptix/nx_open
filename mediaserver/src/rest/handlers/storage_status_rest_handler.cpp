@@ -20,8 +20,10 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     bool exists = storage;
     if (!storage) {
         storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
-        if(storage)
+        if(storage) {
             storage->setUrl(storageUrl);
+            storage->setSpaceLimit(QnStorageManager::DEFAULT_SPACE_LIMIT);
+        }
     }
     
     QnStorageStatusReply reply;

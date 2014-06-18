@@ -88,7 +88,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         data.storageId = -1;
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
-        data.reservedSpace = -1;
+        data.reservedSpace = QnStorageManager::DEFAULT_SPACE_LIMIT;
         data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.isUsedForWriting = false;
 
