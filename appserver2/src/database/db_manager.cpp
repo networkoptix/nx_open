@@ -13,6 +13,7 @@
 #include "business/business_fwd.h"
 #include "utils/common/synctime.h"
 #include "utils/serialization/json.h"
+#include "core/resource/user_resource.h"
 
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
@@ -28,6 +29,7 @@
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_help_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 using std::nullptr_t;
 
@@ -129,6 +131,7 @@ QnDbManager::QnDbManager(
     m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
     m_sdb.setDatabaseName( closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite"));
+    qDebug() << closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite");
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
 }
@@ -141,7 +144,8 @@ bool QnDbManager::init()
         return false;
     }
 
-	if (!createDatabase())  { 
+    bool dbJustCreated = false;
+	if (!createDatabase(&dbJustCreated))  { 
         // create tables is DB is empty
 		qWarning() << "can't create tables for sqlLite database!";
         return false;
@@ -195,6 +199,33 @@ bool QnDbManager::init()
     if (QnTransactionLog::instance())
         QnTransactionLog::instance()->init();
 
+    
+    if (dbJustCreated) {
+        // Set admin user's password
+        ApiUserDataList users;
+        ErrorCode errCode = doQueryNoLock(nullptr, users);
+        if (errCode != ErrorCode::ok) {
+            return false;
+        }
+
+        if (users.empty()) {
+            return false;
+        }
+
+        QnUserResourcePtr userResource(new QnUserResource());
+        fromApiToResource(users[0], userResource);
+        userResource->setPassword(qnCommon->defaultAdminPassword());
+
+        QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser, true);
+        userTransaction.fillSequence();
+        fromResourceToApi(userResource, userTransaction.params);
+
+        executeTransactionInternal(userTransaction);
+        QByteArray serializedTran;
+        QnOutputBinaryStream<QByteArray> stream(&serializedTran);
+        QnBinary::serialize(userTransaction, &stream);
+        transactionLog->saveTransaction(userTransaction, serializedTran);
+    }
 
     QSqlQuery queryCameras(m_sdb);
     // Update cameras status
@@ -427,12 +458,16 @@ bool QnDbManager::migrateBusinessEvents()
     return true;
 }
 
-bool QnDbManager::createDatabase()
+bool QnDbManager::createDatabase(bool *dbJustCreated)
 {
     QnDbTransactionLocker lock(&m_tran);
 
+    *dbJustCreated = false;
+
     if (!isObjectExists(lit("table"), lit("vms_resource")))
     {
+        *dbJustCreated = true;
+
         if (!execSQLFile(lit(":/01_createdb.sql")))
             return false;
         if (!migrateBusinessEvents())
