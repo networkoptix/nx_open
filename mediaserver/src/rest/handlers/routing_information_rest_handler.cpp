@@ -43,12 +43,8 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
         command = command.mid(1);
 
     if (command == lit("routeTo")) {
-        QnRoute route;
-
         QnId target = QnId(params.value(lit("target")));
-        if (!target.isNull()) {
-            route = QnRouter::instance()->routeTo(target);
-        } else {
+        if (target.isNull()) {
             // suppose it to be host:port
             QStringList targetParams = params.value(lit("target")).split(QLatin1Char(':'));
             if (targetParams.size() != 2)
@@ -60,8 +56,10 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
             if (host.isEmpty() || port == 0)
                 return HttpCode::BadRequest;
 
-            route = QnRouter::instance()->routeTo(host, port);
+            target = QnRouter::instance()->whoIs(host, port);
         }
+
+        QnRoute route = QnRouter::instance()->routeTo(target);
 
         result.append("<html><body>\r\n");
 

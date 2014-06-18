@@ -35,6 +35,8 @@ public:
     QnRoute routeTo(const QnId &id) const;
     QnRoute routeTo(const QString &host, quint16 port) const;
 
+    QnId whoIs(const QString &host, quint16 port) const;
+
 private slots:
     void at_connectionAdded(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port);
     void at_connectionRemoved(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port);

@@ -55,11 +55,16 @@ QnRoute QnRouter::routeTo(const QnId &id) const {
 }
 
 QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
+    QnId id = whoIs(host, port);
+    return id.isNull() ? QnRoute() : routeTo(id);
+}
+
+QnId QnRouter::whoIs(const QString &host, quint16 port) const {
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it) {
         if (it->host == host && it->port == port)
-            return routeTo(it->id);
+            return it->id;
     }
-    return QnRoute();
+    return QnId();
 }
 
 void QnRouter::at_connectionAdded(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port) {
