@@ -280,7 +280,7 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
             tran.params = 0;
             tran.fillSequence();
             QByteArray chunkData;
-            m_serializer.serializeTran(chunkData, tran, QnPeerSet() << sender->remotePeer().id);
+            m_serializer.serializeTran(chunkData, tran, QnPeerSet() << sender->remotePeer().id << m_localPeer.id);
             sender->addData(chunkData);
 
             foreach(const QByteArray& serializedTran, transactions) {
@@ -360,6 +360,8 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
             return deliveryTransaction<ApiIdData>(abstractTran, stream);
         case ApiCommand::videowallControl:
             return deliveryTransaction<ApiVideowallControlMessageData>(abstractTran, stream);          
+        case ApiCommand::updateVideowallInstanceStatus:
+            return deliveryTransaction<ApiVideowallInstanceStatusData>(abstractTran, stream);       
 
         case ApiCommand::addStoredFile:
         case ApiCommand::updateStoredFile:
@@ -419,7 +421,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     requestTran.params = transactionLog->getTransactionsState();
     requestTran.fillSequence();
     QByteArray syncRequest;
-    m_serializer.serializeTran(syncRequest, requestTran, QnPeerSet() << transport->remotePeer().id);
+    m_serializer.serializeTran(syncRequest, requestTran, QnPeerSet() << transport->remotePeer().id << m_localPeer.id);
     transport->addData(syncRequest);
 }
 

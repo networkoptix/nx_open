@@ -268,7 +268,6 @@ int MediaEncoder::getSupportedResolution() const
         return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_NETWORK_ERROR;
 
     const QStringList& vals = getValues( QLatin1String(reslst) );
-    int resIndex = 0;
     m_supportedResolutions.reserve( vals.size() );
     for( QStringList::const_iterator it = vals.begin(); it != vals.end(); ++it )
     {
