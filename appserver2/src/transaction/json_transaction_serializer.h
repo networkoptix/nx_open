@@ -50,6 +50,7 @@ namespace ec2
 
         template<class T>
         QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
+            Q_UNUSED(header);    //header is really unused in json clients
             return serializedTransaction(tran);
         }
 

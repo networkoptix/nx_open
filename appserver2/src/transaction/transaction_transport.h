@@ -16,6 +16,10 @@
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/common/id.h"
 
+#ifdef _DEBUG
+#include <common/common_module.h>
+#endif
+
 
 namespace ec2
 {
@@ -52,6 +56,12 @@ public:
     template<class T> 
     void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader &header) {
         assert(header.processedPeers.contains(m_localPeer.id));
+#ifdef _DEBUG
+        foreach (const QnId& peer, header.dstPeers) {
+            Q_ASSERT(!peer.isNull());
+            Q_ASSERT(peer != qnCommon->moduleGUID());
+        }
+#endif
 
         switch (m_remotePeer.peerType) {
         case QnPeerInfo::AndroidClient:

@@ -59,14 +59,14 @@ template<class Function>
 bool handleTransaction(const QByteArray &serializedTransaction, const Function &function)
 {
     QnAbstractTransaction transaction;
-    QnInputBinaryStream<QByteArray> stream(serializedTransaction);
+    QnInputBinaryStream<QByteArray> stream(&serializedTransaction);
     if (!QnBinary::deserialize(&stream, &transaction)) {
         qnWarning("Ignore bad transaction data. size=%1.", serializedTransaction.size());
         return false;
     }
 
     switch (transaction.command) {
-    case ApiCommand::getAllDataList:        return handleTransactionParams<ApiFullInfoData>         (&stream, transaction, function);
+    case ApiCommand::getFullInfo:           return handleTransactionParams<ApiFullInfoData>         (&stream, transaction, function);
     case ApiCommand::setResourceStatus:     return handleTransactionParams<ApiSetResourceStatusData>(&stream, transaction, function);
     case ApiCommand::setResourceParams:     return handleTransactionParams<ApiResourceParamsData>   (&stream, transaction, function);
     case ApiCommand::saveResource:          return handleTransactionParams<ApiResourceData>         (&stream, transaction, function);
@@ -558,7 +558,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     } else if (remotePeer.peerType == QnPeerInfo::AndroidClient) {
         /** Request all data to be sent to the client peers on the connect. */
         QnTransaction<ApiMediaServerDataList> tranServers;
-        tranServers.command = ApiCommand::getMediaServerList;
+        tranServers.command = ApiCommand::getMediaServers;
         tranServers.id.peerID = m_localPeer.id;
         if (dbManager->doQuery(nullptr, tranServers.params) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
@@ -576,7 +576,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         }
 
         QnTransaction<ApiUserDataList> tranUsers;
-        tranUsers.command = ApiCommand::getUserList;
+        tranUsers.command = ApiCommand::getUsers;
         tranUsers.id.peerID = m_localPeer.id;
         if (dbManager->doQuery(nullptr, tranUsers.params) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
@@ -585,7 +585,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         }
 
         QnTransaction<ApiLayoutDataList> tranLayouts;
-        tranLayouts.command = ApiCommand::getLayoutList;
+        tranLayouts.command = ApiCommand::getLayouts;
         tranLayouts.id.peerID = m_localPeer.id;
         if (dbManager->doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
@@ -594,7 +594,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         }
 
         QnTransaction<ApiCameraServerItemDataList> tranCameraHistory;
-        tranCameraHistory.command = ApiCommand::getCameraHistoryList;
+        tranCameraHistory.command = ApiCommand::getCameraHistoryItems;
         tranLayouts.id.peerID = m_localPeer.id;
         if (dbManager->doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
