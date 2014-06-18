@@ -280,7 +280,7 @@ bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
             tran.params = 0;
             tran.fillSequence();
             QByteArray chunkData;
-            m_serializer.serializeTran(chunkData, tran, QnPeerSet() << sender->remotePeer().id);
+            m_serializer.serializeTran(chunkData, tran, QnPeerSet() << sender->remotePeer().id << m_localPeer.id);
             sender->addData(chunkData);
 
             foreach(const QByteArray& serializedTran, transactions) {
@@ -419,7 +419,7 @@ void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport
     requestTran.params = transactionLog->getTransactionsState();
     requestTran.fillSequence();
     QByteArray syncRequest;
-    m_serializer.serializeTran(syncRequest, requestTran, QnPeerSet() << transport->remotePeer().id);
+    m_serializer.serializeTran(syncRequest, requestTran, QnPeerSet() << transport->remotePeer().id << m_localPeer.id);
     transport->addData(syncRequest);
 }
 
