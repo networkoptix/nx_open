@@ -73,6 +73,10 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
             result.append(it.key().toByteArray());
             result.append(" -> ");
             result.append(it->id.toByteArray());
+            result.append(" ");
+            result.append(it->host);
+            result.append(":");
+            result.append(QString::number(it->port).toUtf8());
             result.append("<br/>\r\n");
         }
 
