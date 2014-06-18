@@ -9,6 +9,7 @@
 #include <memory>
 #include <stdint.h>
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QMutex>
 
 #ifndef NO_ISD_AUDIO
@@ -21,6 +22,8 @@
 #include <utils/media/pts_to_clock_mapper.h>
 
 #include "isd_motion_estimation.h"
+
+//#define DEBUG_OUTPUT
 
 
 class ISDAudioPacket;
@@ -58,10 +61,6 @@ public:
     int getAudioFormat( nxcip::AudioFormat* audioFormat ) const;
 
 private:
-    bool needMetaData();
-    MotionDataPicture* getMotionData();
-
-private:
     nxpt::CommonRefManager m_refManager;
     int m_encoderNum;
     nxcip::CompressionType m_videoCodec;
@@ -85,11 +84,22 @@ private:
     int64_t m_timestampDelta;
     int m_framesSinceTimeResync;
     int m_epollFD;
+    MotionDataPicture* m_motionData;
+    QAtomicInt m_refCounter;
 
     PtsToClockMapper m_ptsMapper;
 
+#ifdef DEBUG_OUTPUT
+    QElapsedTimer m_frameTimer;
+    size_t m_totalFramesRead;
+#endif
+
     int initializeVMux();
+    int initializeVMuxMotion();
     int getVideoPacket( nxcip::MediaDataPacket** packet );
+    bool needMetaData();
+    void readMotion();
+    MotionDataPicture* getMotionData();
     bool registerFD( int fd );
     void unregisterFD( int fd );
 #ifndef NO_ISD_AUDIO
@@ -97,6 +107,7 @@ private:
     int getAudioPacket( nxcip::MediaDataPacket** packet );
     void fillAudioFormat( const ISDAudioPacket& audioPacket );
 #endif
+    void closeAllStreams();
     int64_t calcNextTimestamp( int32_t pts, int64_t absoluteTimeMS );
     void resyncTime( int64_t absoluteSourceTimeUSec );
 };
