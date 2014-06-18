@@ -104,15 +104,10 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
 
         QList<QnId> targets = target.isNull() ? routes.uniqueKeys() : (QList<QnId>() << target);
         foreach (const QnId &id, targets) {
-            result.append("<b>Routes to ");
-            result.append(id.toByteArray());
-            result.append("</b><br/>\r\n");
-
             foreach (const QnRoute &route, routes.value(id)) {
+                result.append(routeToHtml(id, route));
                 result.append("<br/>\r\n");
-                result.append(routeToHtml(target, route));
             }
-            result.append("<br/>\r\n");
         }
 
         if (!target.isNull() && routes.count(target) == 0) {
