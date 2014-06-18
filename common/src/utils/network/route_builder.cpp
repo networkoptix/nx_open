@@ -8,6 +8,9 @@ QnRouteBuilder::QnRouteBuilder(const QnId &startId) :
 void QnRouteBuilder::addConnection(const QnId &from, const QnId &to, const QString &host, quint16 port, int weight) {
     Q_ASSERT(from != to);
 
+    if (to == m_startId)
+        return;
+
     QnRoutePoint point(to, host, port);
 
     if (findConnection(from, point) != m_connections.end())
@@ -94,9 +97,6 @@ void QnRouteBuilder::buildRoutes(const QList<QnRoute> &initialRoutes) {
         QnRoute route = routes.takeFirst();
 
         foreach (const WeightedPoint &point, m_connections.values(route.points.last().peerId)) {
-            if (point.first.peerId == m_startId)
-                continue;
-
             QnRoute newRoute = route;
             if (newRoute.addPoint(point.first, point.second))
                 routes.append(newRoute);

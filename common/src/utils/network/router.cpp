@@ -57,7 +57,7 @@ QnRoute QnRouter::routeTo(const QnId &id) const {
 QnRoute QnRouter::routeTo(const QString &host, quint16 port) const {
     for (auto it = m_connections.begin(); it != m_connections.end(); ++it) {
         if (it->host == host && it->port == port)
-            return routeTo(it.key());
+            return routeTo(it->id);
     }
     return QnRoute();
 }
