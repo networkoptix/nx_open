@@ -298,3 +298,7 @@ webadmin/dist
 webadmin/.tmp
 webadmin/.sass-cache
 app/bower_components
+
+
+mobile_client\build-*
+
