@@ -1,5 +1,7 @@
-
 #include "network_proxy_factory.h"
+
+#include <QtCore/QMutexLocker>
+#include <QtCore/QUrlQuery>
 
 #include <api/app_server_connection.h>
 #include <core/resource/resource.h>

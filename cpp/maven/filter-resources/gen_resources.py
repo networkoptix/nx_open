@@ -103,7 +103,10 @@ def replace(file,searchExp,replaceExp):
 
 def gen_includepath(file, path):      
     for dirs in os.walk(path).next()[1]:
-        print >> file, '\nINCLUDEPATH += %s/%s' % (path, dirs)
+        if(dirs.endswith('win32')):
+            print >> file, '\nwin*:INCLUDEPATH += %s/%s' % (path, dirs)
+        else:
+            print >> file, '\nINCLUDEPATH += %s/%s' % (path, dirs)
                     
 if __name__ == '__main__':
     if not os.path.exists('${project.build.directory}/build'):

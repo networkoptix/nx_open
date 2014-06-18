@@ -131,9 +131,8 @@ win* {
   QMAKE_MOC_OPTIONS += -DQ_OS_WIN
 }
 
-## BOTH LINUX AND MAC
-unix: {
-  DEFINES += override=
+## LINUX, MAC AND ANDROID
+unix {
   DEFINES += QN_EXPORT=  
   QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=maybe-uninitialized
   arm {
@@ -144,7 +143,7 @@ unix: {
 }
 
 ## LINUX
-unix:!mac {
+unix:!android:!mac {
   !arm {
     LIBS += ${linux.oslibs}
     QMAKE_CXXFLAGS += -msse2
@@ -168,3 +167,25 @@ mac {
 
   INCLUDEPATH += ${qt.dir}/lib/QtCore.framework/Headers/$$QT_VERSION/QtCore/
 }
+
+## ANDROID
+android {
+  LIBS -= -lssl
+  LIBS += ${linux.arm.oslibs}
+
+  QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
+  DEFINES += ${linux.defines}
+  QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
+}
+
+
+
+
+
+
+
+
+
+
+
+

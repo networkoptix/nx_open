@@ -2,6 +2,7 @@
 #define QN_GLOBAL_SETTINGS_H
 
 #include <QtCore/QObject>
+#include <QtCore/QMutex>
 
 #include <utils/common/singleton.h>
 #include <utils/common/connective.h>

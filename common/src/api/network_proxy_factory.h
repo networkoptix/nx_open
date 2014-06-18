@@ -1,8 +1,9 @@
 #ifndef QN_NETWORK_PROXY_FACTORY_H
 #define QN_NETWORK_PROXY_FACTORY_H
 
-#include <QtNetwork/qnetworkproxy.h>
 #include <QtCore/QPointer>
+#include <QtCore/QMutex>
+#include <QtNetwork/QNetworkProxyFactory>
 
 #include <core/resource/resource_fwd.h>
 

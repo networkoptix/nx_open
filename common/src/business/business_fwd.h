@@ -8,6 +8,8 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
+#include <common/common_globals.h>
+
 #include <utils/common/model_functions_fwd.h>
 
 class QnAbstractBusinessEvent;

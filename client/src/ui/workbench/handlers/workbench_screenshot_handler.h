@@ -43,8 +43,10 @@ public:
 
     QnScreenshotParameters parameters() const;
     void setParameters(const QnScreenshotParameters &parameters);
+
 protected:
     virtual void doLoadAsync() override;
+
 private slots:
     void at_imageLoaded(const QImage &image);
 
