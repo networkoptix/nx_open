@@ -156,7 +156,10 @@ namespace ec2
             removeCameraBookmarkTags = 64,
 
             //ApiHelpGroupDataList
-            getHelp = 65
+            getHelp = 65,
+
+            //ApiVideowallInstanceStatusData
+            updateVideowallInstanceStatus = 66
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

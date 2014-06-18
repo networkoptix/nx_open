@@ -61,6 +61,10 @@ namespace ec2
 
         virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
+        void triggerNotification(const QnTransaction<ApiVideowallInstanceStatusData> &tran) {
+            return m_videowallManager->triggerNotification(tran);
+        }
+
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
         ECConnectionNotificationManager* notificationManager() { return m_notificationManager.get(); }

@@ -24,8 +24,11 @@
 #include "transaction/transaction_log.h"
 #include "utils/serialization/binary_functions.h"
 
+
 namespace ec2
 {
+    static const size_t RESPONSE_WAIT_TIMEOUT_MS = 10*1000;
+
     class ClientQueryProcessor
     :
         public QObject
@@ -47,6 +50,7 @@ namespace ec2
         {
             QUrl requestUrl( ecBaseUrl );
             nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+            httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
             if (!requestUrl.userName().isEmpty()) {
                 httpClient->setUserName(requestUrl.userName());
                 httpClient->setUserPassword(requestUrl.password());
@@ -69,9 +73,8 @@ namespace ec2
                 QtConcurrent::run( std::bind( handler, ErrorCode::failure ) );
                 return;
             }
-            //auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpPostResponse<HandlerType> ), this, httpClient, handler );
             auto func = [this, httpClient, handler](){ processHttpPostResponse( httpClient, handler ); };
-            m_runningHttpRequests[httpClient] = new CustomHandler<decltype(func)>(func);
+            m_runningHttpRequests[httpClient] = std::function<void()>( func );
         }
 
         /*!
@@ -83,12 +86,15 @@ namespace ec2
         {
             QUrl requestUrl( ecBaseUrl );
             nx_http::AsyncHttpClientPtr httpClient = std::make_shared<nx_http::AsyncHttpClient>();
+            httpClient->setResponseReadTimeoutMs( RESPONSE_WAIT_TIMEOUT_MS );
             if (!requestUrl.userName().isEmpty()) {
                 httpClient->setUserName(requestUrl.userName());
                 httpClient->setUserPassword(requestUrl.password());
                 requestUrl.setUserName(QString());
                 requestUrl.setPassword(QString());
             }
+
+            //TODO #ak videowall looks strange here
             if (!QnAppServerConnectionFactory::videoWallKey().isEmpty())
                 httpClient->addRequestHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videoWallKey().toUtf8());
 
@@ -107,46 +113,28 @@ namespace ec2
                 return;
             }
             auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpGetResponse<OutputData, HandlerType> ), this, httpClient, handler );
-            m_runningHttpRequests[httpClient] = new CustomHandler<decltype(func)>(func);
+            m_runningHttpRequests[httpClient] = std::function<void()>( func );
         }
 
     public slots:
         void onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
         {
-            std::unique_ptr<AbstractHandler> handler;
+            std::function<void()> handler;
             {
                 QMutexLocker lk( &m_mutex );
                 auto it = m_runningHttpRequests.find( httpClient );
                 assert( it != m_runningHttpRequests.end() );
-                handler.reset( it->second );
+                handler = std::move(it->second);
                 httpClient->terminate();
                 m_runningHttpRequests.erase( it );
             }
 
-            handler->doIt();
+            handler();
         }
 
     private:
-        class AbstractHandler
-        {
-        public:
-            virtual ~AbstractHandler() {}
-            virtual void doIt() = 0;
-        };
-
-        template<class Handler>
-        class CustomHandler : public AbstractHandler
-        {
-        public:
-            CustomHandler( const Handler& handler ) : m_handler( handler ) {}
-            virtual void doIt() override { m_handler(); }
-
-        private:
-            Handler m_handler;
-        };
-
         QMutex m_mutex;
-        std::map<nx_http::AsyncHttpClientPtr, AbstractHandler*> m_runningHttpRequests;
+        std::map<nx_http::AsyncHttpClientPtr, std::function<void()> > m_runningHttpRequests;
 
         template<class OutputData, class HandlerType>
             void processHttpGetResponse( nx_http::AsyncHttpClientPtr httpClient, HandlerType handler )

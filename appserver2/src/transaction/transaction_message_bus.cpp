@@ -340,6 +340,8 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         qWarning() << "Can't execute query for sync with server peer!";
     }
 }
+        case ApiCommand::updateVideowallInstanceStatus:
+            return deliveryTransaction<ApiVideowallInstanceStatusData>(abstractTran, stream);       
 
 void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport)
 {
