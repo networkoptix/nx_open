@@ -14,7 +14,7 @@ namespace HttpCode {
 
 
 int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) {
-    Q_UNUSED(contentType)
+    contentType = "text/html";
 
     QString command = path;
     command.remove(lit("api/routingInformation/"));
@@ -59,7 +59,7 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
             }
         } else {
             result.append("Could not found a route to ");
-            result.append(target.toByteArray());
+            result.append(params.value(lit("target")).toUtf8());
             result.append("\r\n");
         }
 
