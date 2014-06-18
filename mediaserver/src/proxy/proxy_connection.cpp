@@ -189,12 +189,12 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
         route = QnRouter::instance()->routeTo(dstUrl.host(), dstUrl.port());
 
     if (route.isValid() && route.points.size() > 1) {
-        QString path = dstUrl.path();
+        QString path = urlPath;
         if (!path.startsWith(QLatin1Char('/')))
             path.prepend(QLatin1Char('/'));
-        path.prepend(QString(lit("/proxy/%1:%2")).arg(dstUrl.host()).arg(dstUrl.port()));
+        path.prepend(QString(lit("/proxy/%1/%2:%3")).arg(dstUrl.scheme()).arg(dstUrl.host()).arg(dstUrl.port()));
+        d->request.requestLine.url = path;
 
-        dstUrl.setPath(path);
         dstUrl.setHost(route.points.first().host);
         dstUrl.setPort(route.points.first().port);
     }
