@@ -132,30 +132,27 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
 
     if (resourceType.isNull())
         return result;
+
     if (resourceType->getName() == QLatin1String("Storage"))
     {
-
         result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(params.url));
-        //if (result)
-        //    result->deserialize(parameters);
     }
-    else {
+    else
+    {
         ResourceSearcherList searchersList;
         {
             QMutexLocker locker(&m_searchersListMutex);
             searchersList = m_searchersList;
         }
 
-        int i = 0;
         foreach (QnAbstractResourceSearcher *searcher, searchersList)
         {
             result = searcher->createResource(resourceTypeId, QnResourceParams(params.url, params.vendor));
             if (!result.isNull())
                 break;
-            i++;
         }
     }
-
+    
     return result;
 }
 
