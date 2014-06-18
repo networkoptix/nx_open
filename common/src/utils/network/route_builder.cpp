@@ -94,6 +94,9 @@ void QnRouteBuilder::buildRoutes(const QList<QnRoute> &initialRoutes) {
         QnRoute route = routes.takeFirst();
 
         foreach (const WeightedPoint &point, m_connections.values(route.points.last().peerId)) {
+            if (point.first.peerId == m_startId)
+                continue;
+
             QnRoute newRoute = route;
             if (newRoute.addPoint(point.first, point.second))
                 routes.append(newRoute);
