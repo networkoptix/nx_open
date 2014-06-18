@@ -292,6 +292,8 @@ android-client/android-main/AndroidManifest.xml
 android-client/android-main/res/**
 
 android-client/android-main/libs/**
+html
+
 webadmin/node_modules
 webadmin/dist
 webadmin/.tmp

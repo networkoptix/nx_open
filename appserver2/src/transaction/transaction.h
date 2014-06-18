@@ -44,7 +44,7 @@ namespace ec2
             //!ApiPanicModeData
             setPanicMode = 12,
             //!ApiFullInfo,
-            getAllDataList = 13,
+            getFullInfo = 13,
             
             //!ApiCameraData
             saveCamera = 14,
@@ -54,11 +54,11 @@ namespace ec2
             removeCamera = 16,
             getCameras = 17,
             //!ApiCameraServerItemList
-            getCameraHistoryList = 18,
+            getCameraHistoryItems = 18,
             //!ApiCameraServerItem
             addCameraHistoryItem = 19,
 
-            getMediaServerList = 20,
+            getMediaServers = 20,
             //!ApiMediaServer
             saveMediaServer = 21,
             //!ApiIdData
@@ -66,12 +66,12 @@ namespace ec2
 
             //!ApiUser
             saveUser = 23,
-            getUserList = 24,
+            getUsers = 24,
             //!ApiIdData
             removeUser = 25,
 
             //!ApiBusinessRuleList
-            getBusinessRuleList = 26,
+            getBusinessRules = 26,
             //!ApiBusinessRule
             saveBusinessRule = 27,
             //!ApiIdData
@@ -89,13 +89,13 @@ namespace ec2
             //!ApiLayoutList
             saveLayout = 33,
             //!ApiLayoutList
-            getLayoutList = 34,
+            getLayouts = 34,
             //!ApiIdData
             removeLayout = 35,
             
             //!ApiVideowall
             saveVideowall = 36,
-            getVideowallList = 37,
+            getVideowalls = 37,
             //!ApiIdData
             removeVideowall = 38,
 

@@ -166,7 +166,7 @@ namespace ec2
             }
 
             const QByteArray& msgBody = httpClient->fetchMessageBodyBuffer();
-            QnInputBinaryStream<QByteArray> inputStream( msgBody );
+            QnInputBinaryStream<QByteArray> inputStream( &msgBody );
             OutputData outputData;
             if( !QnBinary::deserialize( &inputStream, &outputData ) )
                 handler( ErrorCode::badResponse, outputData );

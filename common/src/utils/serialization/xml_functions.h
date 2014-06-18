@@ -15,8 +15,8 @@
 #include <utils/common/latin1_array.h>
 #include <utils/common/collection.h>
 
-#include "collection_fwd.h"
 #include "xml.h"
+#include "collection_fwd.h"
 #include "lexical_functions.h"
 #include "enum.h"
 

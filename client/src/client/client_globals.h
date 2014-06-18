@@ -4,7 +4,7 @@
 #include <QtCore/QMetaType>
 
 #include <common/user_permissions.h>
-#include <utils/common/model_functions.h>
+#include <utils/common/model_functions_fwd.h>
 
 namespace Qn {
 

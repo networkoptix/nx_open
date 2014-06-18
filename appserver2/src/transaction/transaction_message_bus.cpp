@@ -283,7 +283,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             }
 
             // this is required to allow client place transactions directly into transaction message bus
-            if (tran.command == ApiCommand::getAllDataList)
+            if (tran.command == ApiCommand::getFullInfo)
                 sender->setWriteSync(true);
             break;
         }
@@ -543,7 +543,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     {
         /** Request all data to be sent to the client peers on the connect. */
         QnTransaction<ApiFullInfoData> tran;
-        tran.command = ApiCommand::getAllDataList;
+        tran.command = ApiCommand::getFullInfo;
         tran.id.peerID = m_localPeer.id;
         if (dbManager->doQuery(nullptr, tran.params) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";

@@ -29,7 +29,7 @@ namespace ec2
             handler->done( reqID, errorCode, outData);
         };
         m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>
-            ( ApiCommand::getLayoutList, nullptr, queryDoneHandler );
+            ( ApiCommand::getLayouts, nullptr, queryDoneHandler );
         return reqID;
     }
 
