@@ -251,6 +251,19 @@ void ThirdPartyStreamReader::pleaseStop()
     }
 }
 
+void ThirdPartyStreamReader::beforeRun()
+{
+    //we can be sure that getNextData will not be called while we are here
+    CLServerPushStreamReader::beforeRun();
+}
+
+void ThirdPartyStreamReader::afterRun()
+{
+    //we can be sure that getNextData will not be called while we are here
+    CLServerPushStreamReader::afterRun();
+    closeStream();
+}
+
 QnResource::ConnectionRole ThirdPartyStreamReader::roleForMotionEstimation()
 {
     const QnResource::ConnectionRole softMotionRole = CLServerPushStreamReader::roleForMotionEstimation();
