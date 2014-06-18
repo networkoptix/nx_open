@@ -88,6 +88,8 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::saveVideowall:         return handleTransactionParams<ApiVideowallData>        (&stream, transaction, function);
     case ApiCommand::removeVideowall:       return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
     case ApiCommand::videowallControl:      return handleTransactionParams<ApiVideowallControlMessageData>(&stream, transaction, function);
+    case ApiCommand::updateVideowallInstanceStatus:  
+                                            return handleTransactionParams<ApiVideowallInstanceStatusData>(&stream, transaction, function);
     case ApiCommand::addStoredFile:
     case ApiCommand::updateStoredFile:      return handleTransactionParams<ApiStoredFileData>       (&stream, transaction, function);
     case ApiCommand::removeStoredFile:      return handleTransactionParams<ApiStoredFilePath>       (&stream, transaction, function);
@@ -103,7 +105,8 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(&stream, transaction, function);
     case ApiCommand::installUpdate:         return handleTransactionParams<QString>                 (&stream, transaction, function);
     case ApiCommand::addCameraBookmarkTags:
-    case ApiCommand::removeCameraBookmarkTags: return handleTransactionParams<ApiCameraBookmarkTagDataList>(&stream, transaction, function);
+    case ApiCommand::removeCameraBookmarkTags:
+                                            return handleTransactionParams<ApiCameraBookmarkTagDataList>(&stream, transaction, function);
 
     case ApiCommand::lockRequest:
     case ApiCommand::lockResponse:
@@ -339,9 +342,7 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     else {
         qWarning() << "Can't execute query for sync with server peer!";
     }
-}
-        case ApiCommand::updateVideowallInstanceStatus:
-            return deliveryTransaction<ApiVideowallInstanceStatusData>(abstractTran, stream);       
+}      
 
 void QnTransactionMessageBus::queueSyncRequest(QnTransactionTransport* transport)
 {
