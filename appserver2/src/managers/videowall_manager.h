@@ -39,6 +39,13 @@ namespace ec2
             emit controlMessage(message);
         }
 
+        void triggerNotification(const QnTransaction<ApiVideowallInstanceStatusData>& tran) {
+            assert(tran.command == ApiCommand::updateVideowallInstanceStatus);
+            QnVideowallInstanceStatus status;
+            fromApiToResource(tran.params, status);
+            emit instanceStatusUpdated(status);
+        }
+
     protected:
         ResourceContext m_resCtx;
     };

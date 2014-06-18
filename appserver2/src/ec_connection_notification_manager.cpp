@@ -179,6 +179,10 @@ namespace ec2
         return m_videowallManager->triggerNotification(tran);
     }
 
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiVideowallInstanceStatusData> &tran) {
+        return m_videowallManager->triggerNotification(tran);
+    }
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiEmailSettingsData>& /*tran*/ ) {
     }
 
