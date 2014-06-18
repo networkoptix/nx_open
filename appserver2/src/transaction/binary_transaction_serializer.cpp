@@ -18,10 +18,4 @@ namespace ec2
         tranData.append((const char*) chunkPayload + stream.pos(), len - stream.pos());
         return true;
     }
-
-
-
-    void QnBinaryTransactionSerializer::serializeHeader(QnOutputBinaryStream<QByteArray> &stream, const QnTransactionTransportHeader& ttHeader) {
-        QnBinary::serialize(ttHeader, &stream);
-    }
 }

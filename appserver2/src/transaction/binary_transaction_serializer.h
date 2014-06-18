@@ -41,7 +41,7 @@ namespace ec2
         QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
             QByteArray result;
             QnOutputBinaryStream<QByteArray> stream(&result);
-            serializeHeader(stream, header);
+            QnBinary::serialize(header, &stream);
 
             QByteArray serializedTran = serializedTransaction(tran);
             stream.write(serializedTran.data(), serializedTran.size());
@@ -49,10 +49,6 @@ namespace ec2
         }
 
         static bool deserializeTran(const quint8* chunkPayload, int len,  QnTransactionTransportHeader& transportHeader, QByteArray& tranData);
-    private:
-
-        static void serializeHeader(QnOutputBinaryStream<QByteArray> &stream, const QnTransactionTransportHeader& ttHeader);
-
     private:
         mutable QMutex m_mutex;
         QCache<QnAbstractTransaction::ID, QByteArray> m_cache;
