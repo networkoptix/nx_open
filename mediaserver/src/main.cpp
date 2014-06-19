@@ -124,7 +124,6 @@
 #include <utils/network/ssl_socket.h>
 #include <utils/network/modulefinder.h>
 
-
 #include <media_server/server_message_processor.h>
 #include <media_server/settings.h>
 #include <media_server/serverutil.h>
@@ -142,6 +141,7 @@
 #include "proxy/proxy_connection.h"
 #include "compatibility.h"
 #include "media_server/file_connection_processor.h"
+#include "streaming/hls/hls_session_pool.h"
 
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
@@ -1191,6 +1191,8 @@ void QnMain::run()
 
     if( QnAppServerConnectionFactory::defaultUrl().scheme().toLower() == lit("file") )
         ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
+
+    nx_hls::HLSSessionPool hlsSessionPool;
 
     initTcpListener();
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(messageProcessor.data(), QnServerMessageProcessor::isProxy);
