@@ -53,7 +53,7 @@ void QnResourceCommandProcessor::putData(const QnAbstractDataPacketPtr& data)
 }
 
 
-bool QnResourceCommandProcessor::processData(QnAbstractDataPacketPtr data)
+bool QnResourceCommandProcessor::processData(const QnAbstractDataPacketPtr& data)
 {
     if (!data)
         return true;

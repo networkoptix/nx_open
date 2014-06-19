@@ -47,7 +47,7 @@ signals:
 
     void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, QnBusiness::EventReason reasonCode, QnResourcePtr storageRes);
 protected:
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     virtual bool needSaveData(QnConstAbstractMediaDataPtr media) override;
     void beforeProcessData(QnConstAbstractMediaDataPtr media);

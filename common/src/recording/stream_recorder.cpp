@@ -190,7 +190,7 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
     return AV_NOPTS_VALUE;
 }
 
-bool QnStreamRecorder::processData(QnAbstractDataPacketPtr nonConstData)
+bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnConstAbstractDataPacketPtr data = nonConstData;
 

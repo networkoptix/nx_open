@@ -28,10 +28,10 @@ public:
     QnResourceCommandProcessor();
     ~QnResourceCommandProcessor();
 
-    virtual void putData(const QnAbstractDataPacketPtr& data);
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
 protected:
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
 };
 

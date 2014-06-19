@@ -30,7 +30,7 @@ public:
 
 protected:
     void run();
-    virtual bool processData(QnAbstractDataPacketPtr /*data*/)=0;
+    virtual bool processData(const QnAbstractDataPacketPtr& data) = 0;
     virtual void endOfRun();
 
 protected:

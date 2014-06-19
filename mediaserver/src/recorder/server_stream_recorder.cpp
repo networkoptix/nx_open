@@ -427,7 +427,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 }
 
-bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
+bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 {
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)

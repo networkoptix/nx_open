@@ -29,7 +29,7 @@ public:
 protected:
 protected:
 
-    virtual bool processData(QnAbstractDataPacketPtr packet) override
+    virtual bool processData(const QnAbstractDataPacketPtr& packet) override
     {
         if (m_needStop)
             return true;

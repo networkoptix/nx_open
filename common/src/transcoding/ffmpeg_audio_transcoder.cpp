@@ -41,7 +41,7 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 
 }
 
-bool QnFfmpegAudioTranscoder::open(QnConstCompressedAudioDataPtr audio)
+bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
 {
     if (!audio->context)
     {
@@ -54,7 +54,7 @@ bool QnFfmpegAudioTranscoder::open(QnConstCompressedAudioDataPtr audio)
     return open(audio->context);
 }
 
-bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
+bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
 {
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
@@ -134,7 +134,7 @@ bool QnFfmpegAudioTranscoder::existMoreData() const
     return m_decodedBufferSize >= encoderFrameSize;
 }
 
-int QnFfmpegAudioTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result)
+int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
     if( result )
         result->clear();

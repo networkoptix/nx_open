@@ -143,7 +143,7 @@ protected:
     }
 
 
-    virtual bool processData(QnAbstractDataPacketPtr data) override
+    virtual bool processData(const QnAbstractDataPacketPtr& data) override
     {
         if( m_standFrameDuration )
             doRealtimeDelay( data );
