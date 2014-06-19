@@ -2,8 +2,14 @@ TEMPLATE = app
 
 QT += qml quick
 
+COMMON_DIR = ../common
+
 SOURCES += \
     src/main.cpp \
+    $$COMMON_DIR/
+
+HEADERS += \
+
 
 RESOURCES += \
     qml.qrc \

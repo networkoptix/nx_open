@@ -102,6 +102,19 @@ DEPENDPATH *= $${INCLUDEPATH}
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
 PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
+
+android:contains(QMAKE_HOST.os,Windows) {
+  # Support precompiled headers on android-mingw
+  QMAKE_CFLAGS_PRECOMPILE       = -x c-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}.gch
+  QMAKE_CFLAGS_USE_PRECOMPILE   = -include ${QMAKE_PCH_OUTPUT}
+  QMAKE_CXXFLAGS_PRECOMPILE     = -x c++-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}.gch
+  QMAKE_CXXFLAGS_USE_PRECOMPILE = $$QMAKE_CFLAGS_USE_PRECOMPILE
+
+  # Work around CreateProcess limit on arg size ///////// doesn't work yet
+  QMAKE_AR_CMD = dir /B $$OBJECTS_DIR/*.obj >$$OBJECTS_DIR/_objects.lst $$escape_expand(\n\t) $(AR) $(TARGET) @$$OBJECTS_DIR/_objects.lst
+}
+
+
 # Workaround for https://bugreports.qt-project.org/browse/QTBUG-29331
 QMAKE_MOC_OPTIONS += -DBOOST_MPL_IF_HPP_INCLUDED -DBOOST_TT_TYPE_WITH_ALIGNMENT_INCLUDED -DBOOST_MPL_NOT_HPP_INCLUDED -DBOOST_MPL_VOID_HPP_INCLUDED
 
