@@ -11,17 +11,7 @@
 #include <utils/common/id.h>
 
 #include <api/api_fwd.h>
-#include <api/model/camera_diagnostics_reply.h>
-#include <api/model/storage_space_reply.h>
-#include <api/model/storage_status_reply.h>
-#include <api/model/statistics_reply.h>
-#include <api/model/time_reply.h>
-#include <api/model/rebuild_archive_reply.h>
-#include <api/model/manual_camera_seach_reply.h>
-
-#include <core/ptz/ptz_preset.h>
-#include <core/ptz/ptz_tour.h>
-#include <core/ptz/ptz_data.h>
+#include <core/ptz/ptz_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
@@ -31,46 +21,9 @@
 typedef QList<QPair<QString, bool> > QnStringBoolPairList;
 typedef QList<QPair<QString, QVariant> > QnStringVariantPairList;
 
-class QnTimePeriodList;
-
 Q_DECLARE_METATYPE(QnStringBoolPairList);
 Q_DECLARE_METATYPE(QnStringVariantPairList);
 
-
-class QnMediaServerReplyProcessor: public QnAbstractReplyProcessor {
-    Q_OBJECT
-
-public:
-    QnMediaServerReplyProcessor(int object): QnAbstractReplyProcessor(object) {}
-
-    virtual void processReply(const QnHTTPRawResponse &response, int handle) override;
-
-signals:
-    void finished(int status, const QnRebuildArchiveReply &reply, int handle);
-    void finished(int status, const QnStorageStatusReply &reply, int handle);
-    void finished(int status, const QnStorageSpaceReply &reply, int handle);
-    void finished(int status, const QnTimePeriodList &reply, int handle);
-    void finished(int status, const QnStatisticsReply &reply, int handle);
-    void finished(int status, const QVector3D &reply, int handle);
-    void finished(int status, const QnStringVariantPairList &reply, int handle);
-    void finished(int status, const QnStringBoolPairList &reply, int handle);
-    void finished(int status, const QnTimeReply &reply, int handle);
-    void finished(int status, const QnCameraDiagnosticsReply &reply, int handle);
-    void finished(int status, const QnManualCameraSearchReply &reply, int handle);
-    void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);
-    void finished(int status, const QImage &reply, int handle);
-    void finished(int status, const QString &reply, int handle);
-    void finished(int status, const QnPtzPresetList &reply, int handle);
-    void finished(int status, const QnPtzTourList &reply, int handle);
-    void finished(int status, const QnPtzObject &reply, int handle);
-    void finished(int status, const QnPtzAuxilaryTraitList &reply, int handle);
-    void finished(int status, const QnPtzData &reply, int handle);
-    void finished(int status, const QnCameraBookmark &reply, int handle);
-    void finished(int status, const QnCameraBookmarkList &reply, int handle);
-
-private:
-    friend class QnAbstractReplyProcessor;
-};
 
 // TODO: #MSAPI move to api/model or even to common_globals, 
 // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)

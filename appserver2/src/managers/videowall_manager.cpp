@@ -14,9 +14,9 @@ namespace ec2
 {
     template<class QueryProcessorType>
     QnVideowallManager<QueryProcessorType>::QnVideowallManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
-        :
-        m_queryProcessor( queryProcessor ),
-        m_resCtx(resCtx)
+    :
+        QnVideowallNotificationManager( resCtx ),
+        m_queryProcessor( queryProcessor )
     {
     }
 
@@ -32,7 +32,7 @@ namespace ec2
                 fromApiToResourceList(videowalls, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowallList, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowalls, nullptr, queryDoneHandler);
         return reqID;
     }
 

@@ -640,7 +640,7 @@ QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(
 }
 
 bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) {
-    QnSecurityCamResourcePtr camera = source.dynamicCast<QnSecurityCamResource>();
+    QnSecurityCamResource* camera = dynamic_cast<QnSecurityCamResource*>(source.data());
     if (!camera)
         return false;
 

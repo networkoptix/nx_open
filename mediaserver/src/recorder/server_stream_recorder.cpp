@@ -101,7 +101,7 @@ bool QnServerStreamRecorder::canAcceptData() const
     */
 }
 
-void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr nonConstData)
+void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnConstAbstractDataPacketPtr data = nonConstData;
 
@@ -427,7 +427,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 }
 
-bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
+bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 {
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)

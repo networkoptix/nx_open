@@ -294,7 +294,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 it != lst.end();
                  )
             {
-                QnSecurityCamResourcePtr camRes = it->dynamicCast<QnSecurityCamResource>();
+                const QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(it->data());
                 //checking, if found resource is reserved by some other searcher
                 if( camRes &&
                     !CameraDriverRestrictionList::instance()->driverAllowedForCamera( searcher->manufacture(), camRes->getVendor(), camRes->getModel() ) )
@@ -303,7 +303,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                     continue;   //resource with such unique id is already present
                 }
 
-                QnNetworkResourcePtr networkRes = it->dynamicCast<QnNetworkResource>();
+                const QnNetworkResource* networkRes = dynamic_cast<QnNetworkResource*>(it->data());
                 if( networkRes )
                 {
                     //checking that resource do not duplicate already found ones
@@ -357,8 +357,8 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
         if (needToStop())
             return false;
 
-        QnResourcePtr rpResource = qnResPool->getResourceByUniqId((*it)->getUniqueId());
-        QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
+        const QnResourcePtr& rpResource = qnResPool->getResourceByUniqId((*it)->getUniqueId());
+        QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(rpResource.data());
         if (rpNetRes) {
             QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
             if (newNetRes)
@@ -394,7 +394,7 @@ bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoM
 
 void QnResourceDiscoveryManager::onInitAsyncFinished(QnResourcePtr res, bool initialized)
 {
-    QnNetworkResourcePtr rpNetRes = res.dynamicCast<QnNetworkResource>();
+    QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());
     if (initialized && rpNetRes)
     {
         if (rpNetRes->getStatus() == QnResource::Offline || rpNetRes->getStatus() == QnResource::Unauthorized)

@@ -12,7 +12,7 @@ bool QnAbstractDataConsumer::canAcceptData() const
     return (m_dataQueue.size() < m_dataQueue.maxSize());
 }
 
-void QnAbstractDataConsumer::putData(QnAbstractDataPacketPtr data)
+void QnAbstractDataConsumer::putData( const QnAbstractDataPacketPtr& data )
 {
     if (!needToStop())
         m_dataQueue.push(data);

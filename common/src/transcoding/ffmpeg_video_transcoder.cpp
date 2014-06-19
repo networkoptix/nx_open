@@ -111,7 +111,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame(CLVideoDecoderOutput* decodedFrame, co
     return 0;
 }
 
-bool QnFfmpegVideoTranscoder::open(QnConstCompressedVideoDataPtr video)
+bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
     close();
 
@@ -178,7 +178,7 @@ bool QnFfmpegVideoTranscoder::open(QnConstCompressedVideoDataPtr video)
     return true;
 }
 
-int QnFfmpegVideoTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result)
+int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
     if( result )
         result->clear();

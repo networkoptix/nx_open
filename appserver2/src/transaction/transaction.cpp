@@ -46,8 +46,8 @@ namespace ec2
                     return "removeResource";
                 case setPanicMode:
                     return "setPanicMode";
-                case getAllDataList:
-                    return "getAllDataList";
+                case getFullInfo:
+                    return "getFullInfo";
                 case saveCamera:
                     return "saveCamera";
                 case saveCameras:
@@ -56,13 +56,13 @@ namespace ec2
                     return "removeCamera";
                 case getCameras:
                     return "getCameras";
-                case getCameraHistoryList:
-                    return "getCameraHistoryList";
+                case getCameraHistoryItems:
+                    return "getCameraHistoryItems";
                 case addCameraHistoryItem:
                     return "addCameraHistoryItem";
 
-                case getMediaServerList:
-                    return "getMediaServerList";
+                case getMediaServers:
+                    return "getMediaServers";
                 case saveMediaServer:
                     return "saveMediaServer";
                 case removeMediaServer:
@@ -70,8 +70,8 @@ namespace ec2
 
                 case saveUser:
                     return "saveUser";
-                case getUserList:
-                    return "getUserList";
+                case getUsers:
+                    return "getUsers";
                 case removeUser:
                     return "removeUser";
 
@@ -83,8 +83,8 @@ namespace ec2
                     return "broadcastBusinessAction";
                 case execBusinessAction:
                     return "execBusinessAction";
-                case getBusinessRuleList:
-                    return "getBusinessRuleList";
+                case getBusinessRules:
+                    return "getBusinessRules";
                 case resetBusinessRules:
                     return "resetBusinessRules";
 
@@ -92,15 +92,15 @@ namespace ec2
                     return "saveLayout";
                 case saveLayouts:
                     return "addOrUpdateLayouts";
-                case getLayoutList:
-                    return "getLayoutList";
+                case getLayouts:
+                    return "getLayouts";
                 case removeLayout:
                     return "removeLayout";
 
                 case saveVideowall:
                     return "saveVideowall";
-                case getVideowallList:
-                    return "getVideowallList";
+                case getVideowalls:
+                    return "getVideowalls";
                 case removeVideowall:
                     return "removeVideowall";
                 case videowallControl:
@@ -212,8 +212,7 @@ namespace ec2
         return ++requestID;
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary),   (peerID)(dbID)(sequence))
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary),   (command)(id)(persistent)(timestamp))
-
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary)(json),   (peerID)(dbID)(sequence))
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary)(json),   (command)(id)(persistent)(timestamp))
 } // namespace ec2
 

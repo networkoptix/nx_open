@@ -43,7 +43,7 @@ public:
     // I assume this function is called once per video frame 
     bool needMetaData(); 
 
-    virtual void onGotVideoFrame(QnCompressedVideoDataPtr videoData);
+    virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData);
 
     void setUseSoftwareMotion(bool value);
 

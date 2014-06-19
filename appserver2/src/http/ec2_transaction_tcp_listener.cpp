@@ -66,9 +66,9 @@ void QnTransactionTcpProcessor::run()
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
     d->response.headers.insert(nx_http::HttpHeader("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds())));
 
-    if (!isClient)
+    if (remotePeer.peerType == QnPeerInfo::Server)
     {
-        // use two stage connect for server peers only, go to second stage for client immediatly
+        // use two stage connect for server peers only, go to second stage for client immediately
 
         // 1-st stage
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);

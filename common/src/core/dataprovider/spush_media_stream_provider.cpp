@@ -15,7 +15,7 @@ CLServerPushStreamReader::CLServerPushStreamReader(QnResourcePtr dev ):
     m_openStreamCounter(0),
     m_FrameCnt(0)
 {
-    QnPhysicalCameraResourcePtr camera = getResource().dynamicCast<QnPhysicalCameraResource>();
+    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(getResource().data());
     if (camera) 
         m_cameraAudioEnabled = camera->isAudioEnabled();
 }
@@ -178,7 +178,7 @@ void CLServerPushStreamReader::run()
 
         // check queue sizes
         if (dataCanBeAccepted())
-            putData(data);
+            putData(std::move(data));
         else
             setNeedKeyData();
 
@@ -207,7 +207,7 @@ void CLServerPushStreamReader::pleaseReOpen()
 
 void CLServerPushStreamReader::afterUpdate() 
 {
-    QnPhysicalCameraResourcePtr camera = getResource().dynamicCast<QnPhysicalCameraResource>();
+    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(getResource().data());
     if (camera) {
         if (m_cameraAudioEnabled != camera->isAudioEnabled())
             pleaseReOpen();
