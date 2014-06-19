@@ -112,6 +112,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
                                             return handleTransactionParams<ApiCameraBookmarkTagDataList>(&stream, transaction, function);
 
     case ApiCommand::moduleInfo:            return handleTransactionParams<ApiModuleData>           (&stream, transaction, function);
+    case ApiCommand::moduleInfoList:        return handleTransactionParams<ApiModuleDataList>       (&stream, transaction, function);
 
     case ApiCommand::discoverPeer:          return handleTransactionParams<ApiDiscoverPeerData>     (&stream, transaction, function);
     case ApiCommand::addDiscoveryInformation:
@@ -238,6 +239,7 @@ void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTranspor
 	sender->setReadSync(true);
 
     sendConnectionsData();
+    sendModulesData();
 }
 
 template <class T>
@@ -411,6 +413,20 @@ void QnTransactionMessageBus::sendServerAliveMsg(const QnPeerInfo &peer, bool is
         emit peerLost(tran.params, false);
 }
 
+QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const {
+    QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList, false);
+
+    foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules()) {
+        ApiModuleData data;
+        QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
+        data.isAlive = true;
+        data.discoverers = QnGlobalModuleFinder::instance()->discoverers(data.id);
+        transaction.params.push_back(data);
+    }
+
+    return transaction;
+}
+
 void QnTransactionMessageBus::sendConnectionsData()
 {
     if (!QnRouter::instance())
@@ -430,6 +446,14 @@ void QnTransactionMessageBus::sendConnectionsData()
 
     transaction.fillSequence();
     sendTransaction(transaction);
+}
+
+void QnTransactionMessageBus::sendModulesData()
+{
+    if (!QnGlobalModuleFinder::instance())
+        return;
+
+    sendTransaction(prepareModulesDataTransaction());
 }
 
 QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
@@ -594,19 +618,13 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
             return;
         }
 
-        // TODO: #dklychkov rewrite module info synchronization
-        /* fill module information */
-        /*
-        foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules()) {
-            ApiModuleData data;
-            QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
-            data.discoverer = QnId(qnCommon->moduleGUID());
-            tran.params.foundModules.push_back(data);
-        }
-        */
+        QnTransaction<ApiModuleDataList> tranModules = prepareModulesDataTransaction();
+        tranModules.id.peerID = m_localPeer.id;
 
+        QnPeerSet processedPeers = QnPeerSet() << remotePeer.id << m_localPeer.id;
         transport->setWriteSync(true);
-        transport->sendTransaction(tran, QnPeerSet() << remotePeer.id << m_localPeer.id);
+        transport->sendTransaction(tran, processedPeers);
+        sendTransaction(tranModules, processedPeers);
         transport->setReadSync(true);
 
     } else if (remotePeer.peerType == QnPeerInfo::AndroidClient) {

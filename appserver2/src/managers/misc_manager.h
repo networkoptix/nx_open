@@ -11,7 +11,7 @@ namespace ec2 {
     class QnMiscNotificationManager : public AbstractMiscManager {
     public:
         void triggerNotification(const QnTransaction<ApiModuleData> &transaction);
-        void triggerNotification(const ApiModuleDataList &moduleDataList);
+        void triggerNotification(const QnTransaction<ApiModuleDataList> &transaction);
         void triggerNotification(const QnTransaction<QString> &transaction);
         void triggerNotification(const QnTransaction<ApiConnectionData> &transaction);
         void triggerNotification(const ApiConnectionDataList &connections);
@@ -24,7 +24,8 @@ namespace ec2 {
         virtual ~QnMiscManager();
 
     protected:
-        virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) override;
+        virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer, impl::SimpleHandlerPtr handler) override;
+        virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnId, QnId> &discoverersByPeer, impl::SimpleHandlerPtr handler) override;
         virtual int changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) override;
         virtual int addConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) override;
         virtual int removeConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) override;
@@ -33,7 +34,8 @@ namespace ec2 {
     private:
         QueryProcessorType* const m_queryProcessor;
 
-        QnTransaction<ApiModuleData> prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const;
+        QnTransaction<ApiModuleData> prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer) const;
+        QnTransaction<ApiModuleDataList> prepareTransaction(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnId, QnId> &discoverersByPeer) const;
         QnTransaction<QString> prepareTransaction(const QString &systemName) const;
         QnTransaction<ApiConnectionData> prepareTransaction(ApiCommand::Value command, const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port) const;
         QnTransaction<ApiConnectionDataList> prepareAvailableConnectionsTransaction() const;

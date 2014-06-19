@@ -14,10 +14,10 @@ namespace ec2 {
         QStringList addresses;
         int port;
         bool isAlive;
-        QnId discoverer;
+        QList<QnId> discoverers;
     };
 
-#define ApiModuleData_Fields (type)(id)(systemName)(version)(systemInformation)(addresses)(port)(isAlive)(discoverer)
+#define ApiModuleData_Fields (type)(id)(systemName)(version)(systemInformation)(addresses)(port)(isAlive)(discoverers)
 
 } // namespace ec2
 

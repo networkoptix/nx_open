@@ -210,6 +210,10 @@ namespace ec2
         m_miscManager->triggerNotification(tran);
     }
 
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiModuleDataList> &tran) {
+        m_miscManager->triggerNotification(tran);
+    }
+
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran) {
         m_discoveryManager->triggerNotification(tran);
     }

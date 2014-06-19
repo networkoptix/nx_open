@@ -162,6 +162,8 @@ namespace ec2
 
                 case moduleInfo:
                     return "moduleInfo";
+                case moduleInfoList:
+                    return "moduleInfoList";
 
                 case discoverPeer:
                     return "discoverPeer";

@@ -24,6 +24,7 @@ public:
     QList<QnModuleInformation> foundModules() const;
 
     QList<QnId> discoverers(const QnId &moduleId);
+    QMultiHash<QnId, QnId> discoverers() const;
 
     QnModuleInformation moduleInformation(const QnId &id) const;
 
@@ -37,9 +38,13 @@ private slots:
     void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
+    void at_resourcePool_statusChanged(const QnResourcePtr &resource);
+
 private:
     void addModule(const QnModuleInformation &moduleInformation, const QnId &discoverer);
     void removeModule(const QnModuleInformation &moduleInformation, const QnId &discoverer);
+
+    void removeAllModulesDiscoveredBy(const QnId &discoverer);
 
 private:
     ec2::AbstractECConnectionPtr m_connection;  // just to know from where to disconnect

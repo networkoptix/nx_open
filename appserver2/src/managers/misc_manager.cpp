@@ -10,14 +10,16 @@ namespace ec2 {
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModuleData> &transaction) {
     QnModuleInformation moduleInformation;
     QnGlobalModuleFinder::fillFromApiModuleData(transaction.params, &moduleInformation);
-    emit moduleChanged(moduleInformation, transaction.params.isAlive, transaction.params.discoverer);
+    foreach (const QnId &discovererId, transaction.params.discoverers)
+        emit moduleChanged(moduleInformation, transaction.params.isAlive, discovererId);
 }
 
-void QnMiscNotificationManager::triggerNotification(const ApiModuleDataList &moduleDataList) {
-    foreach (const ApiModuleData &data, moduleDataList) {
+void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModuleDataList> &transaction) {
+    foreach (const ApiModuleData &data, transaction.params) {
         QnModuleInformation moduleInformation;
         QnGlobalModuleFinder::fillFromApiModuleData(data, &moduleInformation);
-        emit moduleChanged(moduleInformation, data.isAlive, data.discoverer);
+        foreach (const QnId &discovererId, data.discoverers)
+            emit moduleChanged(moduleInformation, data.isAlive, discovererId);
     }
 }
 
@@ -50,9 +52,20 @@ template<class QueryProcessorType>
 QnMiscManager<QueryProcessorType>::~QnMiscManager() {}
 
 template<class QueryProcessorType>
-int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
-    auto transaction = prepareTransaction(moduleInformation, isAlive);
+    auto transaction = prepareTransaction(moduleInformation, isAlive, discoverer);
+
+    using namespace std::placeholders;
+    m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
+
+    return reqId;
+}
+
+template<class QueryProcessorType>
+int QnMiscManager<QueryProcessorType>::sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnId, QnId> &discoverersByPeer, impl::SimpleHandlerPtr handler) {
+    const int reqId = generateRequestID();
+    auto transaction = prepareTransaction(moduleInformationList, discoverersByPeer);
 
     using namespace std::placeholders;
     m_queryProcessor->processUpdateAsync(transaction, [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
@@ -105,11 +118,26 @@ int QnMiscManager<QueryProcessorType>::sendAvailableConnections(impl::SimpleHand
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const {
+QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer) const {
     QnTransaction<ApiModuleData> transaction(ApiCommand::moduleInfo, false);
     QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &transaction.params);
     transaction.params.isAlive = isAlive;
-    transaction.params.discoverer = QnId(qnCommon->moduleGUID());
+    transaction.params.discoverers.append(discoverer);
+
+    return transaction;
+}
+
+template<class QueryProcessorType>
+QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTransaction(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnId, QnId> &discoverersByPeer) const {
+    QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList, false);
+
+    foreach (const QnModuleInformation &moduleInformation, moduleInformationList) {
+        ApiModuleData data;
+        QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
+        data.isAlive = true;
+        data.discoverers = discoverersByPeer.values(data.id);
+        transaction.params.push_back(data);
+    }
 
     return transaction;
 }

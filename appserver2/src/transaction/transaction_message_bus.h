@@ -166,7 +166,9 @@ namespace ec2
         void connectToPeerEstablished(const QnPeerInfo &peerInfo, const QList<QByteArray>& hwList);
         void connectToPeerLost(const QnId& id);
         void sendServerAliveMsg(const QnPeerInfo& peer, bool isAlive, const QList<QByteArray>& hwList);
+        QnTransaction<ApiModuleDataList> prepareModulesDataTransaction() const;
         void sendConnectionsData();
+        void sendModulesData();
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran);
         QnPeerSet connectedPeers(ApiCommand::Value command) const;

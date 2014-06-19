@@ -801,9 +801,14 @@ namespace ec2
     class AbstractMiscManager : public QObject {
         Q_OBJECT
     public:
-        template<class TargetType, class HandlerType> int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, TargetType *target, HandlerType handler) {
-            return sendModuleInformation(moduleInformation, isAlive, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer, TargetType *target, HandlerType handler) {
+            return sendModuleInformation(moduleInformation, isAlive, discoverer, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnId, QnId> &discoverersByPeer, TargetType *target, HandlerType handler) {
+            return sendModuleInformation(moduleInformationList, discoverersByPeer, std::static_pointer_cast<impl::SimpleHandler>(
+                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
         template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, TargetType *target, HandlerType handler) {
@@ -833,7 +838,8 @@ namespace ec2
         void connectionRemoved(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port);
 
     protected:
-        virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendModuleInformationList(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnId, QnId> &discoverersByPeer, impl::SimpleHandlerPtr handler) = 0;
         virtual int changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) = 0;
         virtual int addConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;
         virtual int removeConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) = 0;

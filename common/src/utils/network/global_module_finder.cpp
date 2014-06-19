@@ -1,5 +1,6 @@
 #include "global_module_finder.h"
 
+#include <core/resource_management/resource_pool.h>
 #include <utils/network/module_finder.h>
 #include <common/common_module.h>
 #include <api/app_server_connection.h>
@@ -9,6 +10,7 @@
 QnGlobalModuleFinder::QnGlobalModuleFinder(QObject *parent) :
     QObject(parent)
 {
+    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnGlobalModuleFinder::at_resourcePool_statusChanged);
 }
 
 void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &connection) {
@@ -67,6 +69,10 @@ QList<QnId> QnGlobalModuleFinder::discoverers(const QnId &moduleId) {
     return m_discovererIdByServerId.values(moduleId);
 }
 
+QMultiHash<QnId, QnId> QnGlobalModuleFinder::discoverers() const {
+    return m_discovererIdByServerId;
+}
+
 QnModuleInformation QnGlobalModuleFinder::moduleInformation(const QnId &id) const {
     return m_moduleInformationById[id];
 }
@@ -81,13 +87,20 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
 void QnGlobalModuleFinder::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
     addModule(moduleInformation, QnId(qnCommon->moduleGUID()));
     if (m_connection)
-        m_connection->getMiscManager()->sendModuleInformation(moduleInformation, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        m_connection->getMiscManager()->sendModuleInformation(moduleInformation, true, QnId(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
     removeModule(moduleInformation, QnId(qnCommon->moduleGUID()));
     if (m_connection)
-        m_connection->getMiscManager()->sendModuleInformation(moduleInformation, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        m_connection->getMiscManager()->sendModuleInformation(moduleInformation, false, QnId(qnCommon->moduleGUID()), ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+}
+
+void QnGlobalModuleFinder::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
+    if (!resource->hasFlags(QnResource::server))
+        return;
+
+    removeAllModulesDiscoveredBy(resource->getId());
 }
 
 void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformation, const QnId &discoverer) {
@@ -117,5 +130,22 @@ void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInforma
         m_moduleInformationById.erase(it);
         m_discovererIdByServerId.remove(moduleInformation.id, discoverer);
         emit peerLost(moduleInformation);
+    }
+}
+
+void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QnId &discoverer) {
+    if (discoverer == qnCommon->moduleGUID()) {
+        qWarning() << "Trying to remove our own modules";
+        return;
+    }
+
+    for (auto it = m_moduleInformationById.begin(); it != m_moduleInformationById.end(); /* no inc */) {
+        if (m_discovererIdByServerId.remove(it.key(), discoverer) > 0) {
+            if (!m_discovererIdByServerId.contains(it.key())) {
+                emit peerLost(it.value());
+                it = m_moduleInformationById.erase(it);
+            }
+        }
+        ++it;
     }
 }
