@@ -7,24 +7,13 @@
 
 namespace ec2 {
 
-template<class QueryProcessorType>
-QnMiscNotificationManager<QueryProcessorType>::QnMiscNotificationManager(QueryProcessorType * const queryProcessor) :
-    m_queryProcessor(queryProcessor)
-{
-}
-
-template<class QueryProcessorType>
-QnMiscNotificationManager<QueryProcessorType>::~QnMiscNotificationManager() {}
-
-template<class QueryProcessorType>
-void QnMiscNotificationManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiModuleData> &transaction) {
+void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModuleData> &transaction) {
     QnModuleInformation moduleInformation;
     QnGlobalModuleFinder::fillFromApiModuleData(transaction.params, &moduleInformation);
     emit moduleChanged(moduleInformation, transaction.params.isAlive, transaction.params.discoverer);
 }
 
-template<class QueryProcessorType>
-void QnMiscNotificationManager<QueryProcessorType>::triggerNotification(const ApiModuleDataList &moduleDataList) {
+void QnMiscNotificationManager::triggerNotification(const ApiModuleDataList &moduleDataList) {
     foreach (const ApiModuleData &data, moduleDataList) {
         QnModuleInformation moduleInformation;
         QnGlobalModuleFinder::fillFromApiModuleData(data, &moduleInformation);
@@ -32,13 +21,11 @@ void QnMiscNotificationManager<QueryProcessorType>::triggerNotification(const Ap
     }
 }
 
-template<class QueryProcessorType>
-void QnMiscNotificationManager<QueryProcessorType>::triggerNotification(const QnTransaction<QString> &transaction) {
+void QnMiscNotificationManager::triggerNotification(const QnTransaction<QString> &transaction) {
     emit systemNameChangeRequested(transaction.params);
 }
 
-template<class QueryProcessorType>
-void QnMiscNotificationManager<QueryProcessorType>::triggerNotification(const QnTransaction<ApiConnectionData> &transaction) {
+void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiConnectionData> &transaction) {
     Q_ASSERT_X(transaction.command == ApiCommand::addConnection || transaction.command == ApiCommand::removeConnection, "transaction isn't supported in this function", Q_FUNC_INFO);
 
     if (transaction.command == ApiCommand::addConnection)
@@ -47,14 +34,23 @@ void QnMiscNotificationManager<QueryProcessorType>::triggerNotification(const Qn
         emit connectionRemoved(transaction.params.discovererId, transaction.params.peerId, transaction.params.host, transaction.params.port);
 }
 
-template<class QueryProcessorType>
-void QnMiscNotificationManager<QueryProcessorType>::triggerNotification(const ApiConnectionDataList &connections) {
+void QnMiscNotificationManager::triggerNotification(const ApiConnectionDataList &connections) {
     foreach (const ApiConnectionData &connection, connections)
         emit connectionAdded(connection.discovererId, connection.peerId, connection.host, connection.port);
 }
 
+
 template<class QueryProcessorType>
-int QnMiscNotificationManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) {
+QnMiscManager<QueryProcessorType>::QnMiscManager(QueryProcessorType * const queryProcessor) :
+    m_queryProcessor(queryProcessor)
+{
+}
+
+template<class QueryProcessorType>
+QnMiscManager<QueryProcessorType>::~QnMiscManager() {}
+
+template<class QueryProcessorType>
+int QnMiscManager<QueryProcessorType>::sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(moduleInformation, isAlive);
 
@@ -65,7 +61,7 @@ int QnMiscNotificationManager<QueryProcessorType>::sendModuleInformation(const Q
 }
 
 template<class QueryProcessorType>
-int QnMiscNotificationManager<QueryProcessorType>::changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::changeSystemName(const QString &systemName, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(systemName);
 
@@ -76,7 +72,7 @@ int QnMiscNotificationManager<QueryProcessorType>::changeSystemName(const QStrin
 }
 
 template<class QueryProcessorType>
-int QnMiscNotificationManager<QueryProcessorType>::addConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::addConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(ApiCommand::addConnection, discovererId, peerId, host, port);
 
@@ -87,7 +83,7 @@ int QnMiscNotificationManager<QueryProcessorType>::addConnection(const QnId &dis
 }
 
 template<class QueryProcessorType>
-int QnMiscNotificationManager<QueryProcessorType>::removeConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::removeConnection(const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port, impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareTransaction(ApiCommand::removeConnection, discovererId, peerId, host, port);
 
@@ -98,7 +94,7 @@ int QnMiscNotificationManager<QueryProcessorType>::removeConnection(const QnId &
 }
 
 template<class QueryProcessorType>
-int QnMiscNotificationManager<QueryProcessorType>::sendAvailableConnections(impl::SimpleHandlerPtr handler) {
+int QnMiscManager<QueryProcessorType>::sendAvailableConnections(impl::SimpleHandlerPtr handler) {
     const int reqId = generateRequestID();
     auto transaction = prepareAvailableConnectionsTransaction();
 
@@ -109,7 +105,7 @@ int QnMiscNotificationManager<QueryProcessorType>::sendAvailableConnections(impl
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiModuleData> QnMiscNotificationManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const {
+QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive) const {
     QnTransaction<ApiModuleData> transaction(ApiCommand::moduleInfo, false);
     QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &transaction.params);
     transaction.params.isAlive = isAlive;
@@ -119,7 +115,7 @@ QnTransaction<ApiModuleData> QnMiscNotificationManager<QueryProcessorType>::prep
 }
 
 template<class QueryProcessorType>
-QnTransaction<QString> QnMiscNotificationManager<QueryProcessorType>::prepareTransaction(const QString &systemName) const {
+QnTransaction<QString> QnMiscManager<QueryProcessorType>::prepareTransaction(const QString &systemName) const {
     QnTransaction<QString> transaction(ApiCommand::changeSystemName, false);
     transaction.params = systemName;
 
@@ -127,7 +123,7 @@ QnTransaction<QString> QnMiscNotificationManager<QueryProcessorType>::prepareTra
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiConnectionData> QnMiscNotificationManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port) const {
+QnTransaction<ApiConnectionData> QnMiscManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port) const {
     QnTransaction<ApiConnectionData> transaction(command, false);
     transaction.params.discovererId = discovererId;
     transaction.params.peerId = peerId;
@@ -138,7 +134,7 @@ QnTransaction<ApiConnectionData> QnMiscNotificationManager<QueryProcessorType>::
 }
 
 template<class QueryProcessorType>
-QnTransaction<ApiConnectionDataList> QnMiscNotificationManager<QueryProcessorType>::prepareAvailableConnectionsTransaction() const {
+QnTransaction<ApiConnectionDataList> QnMiscManager<QueryProcessorType>::prepareAvailableConnectionsTransaction() const {
     QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections, false);
 
     QMultiHash<QnId, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
@@ -154,7 +150,7 @@ QnTransaction<ApiConnectionDataList> QnMiscNotificationManager<QueryProcessorTyp
     return transaction;
 }
 
-template class QnMiscNotificationManager<ServerQueryProcessor>;
-template class QnMiscNotificationManager<FixedUrlClientQueryProcessor>;
+template class QnMiscManager<ServerQueryProcessor>;
+template class QnMiscManager<FixedUrlClientQueryProcessor>;
 
 } // namespace ec2

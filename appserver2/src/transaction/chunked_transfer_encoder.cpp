@@ -1,5 +1,11 @@
 #include "chunked_transfer_encoder.h"
 
+#ifdef Q_OS_WIN
+#   include <winsock2.h>
+#else
+#   include <arpa/inet.h>
+#endif
+
 #include <utils/serialization/binary_stream.h>
 
 namespace ec2 {

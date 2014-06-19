@@ -82,8 +82,8 @@ namespace ec2
         std::shared_ptr<QnVideowallManager<QueryProcessorType>> m_videowallManager;
         std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
         std::shared_ptr<QnUpdatesManager<QueryProcessorType>> m_updatesManager;
-        std::shared_ptr<QnMiscNotificationManager<QueryProcessorType>> m_miscManager;
-        std::shared_ptr<QnDiscoveryNotificationManager<QueryProcessorType>> m_discoveryManager;
+        std::shared_ptr<QnMiscManager<QueryProcessorType>> m_miscManager;
+        std::shared_ptr<QnDiscoveryManager<QueryProcessorType>> m_discoveryManager;
         std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
 
     private:

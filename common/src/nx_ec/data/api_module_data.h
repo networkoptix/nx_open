@@ -12,7 +12,7 @@ namespace ec2 {
         QString version;
         QString systemInformation;
         QStringList addresses;
-        unsigned short port;
+        int port;
         bool isAlive;
         QnId discoverer;
     };

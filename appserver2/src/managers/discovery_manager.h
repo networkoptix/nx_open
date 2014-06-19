@@ -7,15 +7,18 @@
 
 namespace ec2 {
 
-    template<class QueryProcessorType>
     class QnDiscoveryNotificationManager : public AbstractDiscoveryManager {
     public:
-        QnDiscoveryNotificationManager(QueryProcessorType * const queryProcessor);
-        virtual ~QnDiscoveryNotificationManager();
-
         void triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction);
         void triggerNotification(const QnTransaction<ApiDiscoveryDataList> &transaction);
         void triggerNotification(const ApiDiscoveryDataList &discoveryData, bool addInformation = true);
+    };
+
+    template<class QueryProcessorType>
+    class QnDiscoveryManager : public QnDiscoveryNotificationManager {
+    public:
+        QnDiscoveryManager(QueryProcessorType * const queryProcessor);
+        virtual ~QnDiscoveryManager();
 
     protected:
         virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) override;

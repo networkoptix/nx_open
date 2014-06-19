@@ -9,7 +9,7 @@ namespace ec2 {
         QnId discovererId;
         QnId peerId;
         QString host;
-        quint16 port;
+        int port;
     };
 
 #define ApiConnectionData_Fields (discovererId)(peerId)(host)(port)

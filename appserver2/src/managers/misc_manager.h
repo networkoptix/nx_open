@@ -8,17 +8,20 @@
 
 namespace ec2 {
 
-    template<class QueryProcessorType>
     class QnMiscNotificationManager : public AbstractMiscManager {
     public:
-        QnMiscNotificationManager(QueryProcessorType * const queryProcessor);
-        virtual ~QnMiscNotificationManager();
-
         void triggerNotification(const QnTransaction<ApiModuleData> &transaction);
         void triggerNotification(const ApiModuleDataList &moduleDataList);
         void triggerNotification(const QnTransaction<QString> &transaction);
         void triggerNotification(const QnTransaction<ApiConnectionData> &transaction);
         void triggerNotification(const ApiConnectionDataList &connections);
+    };
+
+    template<class QueryProcessorType>
+    class QnMiscManager : public QnMiscNotificationManager {
+    public:
+        QnMiscManager(QueryProcessorType * const queryProcessor);
+        virtual ~QnMiscManager();
 
     protected:
         virtual int sendModuleInformation(const QnModuleInformation &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) override;

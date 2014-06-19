@@ -30,8 +30,8 @@ namespace ec2
         m_videowallManager( new QnVideowallManager<T>(m_queryProcessor, resCtx) ),
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) ),
         m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) ),
-        m_miscManager( new QnMiscNotificationManager<T>(m_queryProcessor) ),
-        m_discoveryManager( new QnDiscoveryNotificationManager<T>(m_queryProcessor) )
+        m_miscManager( new QnMiscManager<T>(m_queryProcessor) ),
+        m_discoveryManager( new QnDiscoveryManager<T>(m_queryProcessor) )
     {
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerFound, this, &BaseEc2Connection<T>::remotePeerFound, Qt::DirectConnection);
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,  this, &BaseEc2Connection<T>::remotePeerLost, Qt::DirectConnection);
@@ -49,7 +49,9 @@ namespace ec2
                 m_layoutManager.get(),
                 m_videowallManager.get(),
                 m_storedFileManager.get(),
-                m_updatesManager.get() ) );
+                m_updatesManager.get(),
+                m_miscManager.get(),
+                m_discoveryManager.get() ) );
     }
 
     template<class T>
