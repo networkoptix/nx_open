@@ -106,6 +106,8 @@
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/change_system_name_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
+#include <rest/handlers/module_information_rest_handler.h>
+#include <rest/handlers/change_admin_password_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
 
@@ -927,24 +929,20 @@ void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
         qnSyncTime->currentUSecsSinceEpoch());
 }
 
-void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
-    Q_UNUSED(localInterfaceAddress)
-
+void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
     if (isCompatible(moduleInformation.version, qnCommon->engineVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
-        int port = moduleInformation.parameters.value("port").toInt();
-        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
+        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
         ec2Connection->addRemotePeer(url, moduleInformation.id);
     }
 }
 void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
-    if (moduleInformation.version == qnCommon->engineVersion() && moduleInformation.systemName == qnCommon->localSystemName()) {
-        int port = moduleInformation.parameters.value("port").toInt();
+    if (isCompatibe(moduleInformation.version, qnCommon->engineVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
         foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
-            QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
+            QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
             ec2Connection->deleteRemotePeer(url);
         }
     }
@@ -973,6 +971,8 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/changeSystemName", new QnChangeSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/changeAdminPassword", new QnChangeAdminPasswordRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
@@ -1084,6 +1084,7 @@ void QnMain::run()
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation*"), AuthMethod::noAuth );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
     QnEventsDB::init();
@@ -1679,7 +1680,7 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, 
         lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     //commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
-    commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, 
+    commandLineParser.addParameter(&configFilePath, "--conf-file", NULL,
         "Path to config file. By default "+MSSettings::defaultROSettingsFilePath());
     commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, 
         "Path to config file which is used to save some. By default "+MSSettings::defaultRunTimeSettingsFilePath() );

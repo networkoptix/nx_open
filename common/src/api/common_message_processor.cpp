@@ -1,5 +1,6 @@
 #include "common_message_processor.h"
 
+#include <nx_ec/data/api_discovery_data.h>
 #include <api/app_server_connection.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -104,6 +105,9 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::controlMessage,
         this, &QnCommonMessageProcessor::videowallControlMessageReceived );
 
+    connect( connection->getDiscoveryManager().get(), &ec2::AbstractDiscoveryManager::discoveryInformationChanged,
+        this, &QnCommonMessageProcessor::on_gotDiscoveryData );
+
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::at_remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::at_remotePeerLost );
 
@@ -135,6 +139,64 @@ void QnCommonMessageProcessor::on_runtimeInfoChanged( const ec2::ApiServerInfoDa
     QnAppServerConnectionFactory::setPublicIp(runtimeInfo.publicIp);
     QnAppServerConnectionFactory::setSessionKey(runtimeInfo.sessionKey);
     QnAppServerConnectionFactory::setPrematureLicenseExperationDate(runtimeInfo.prematureLicenseExperationDate);
+}
+
+void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryDataList &discoveryData, bool addInformation)
+{
+    QMultiHash<QnId, QUrl> m_additionalUrls;
+    QMultiHash<QnId, QUrl> m_ignoredUrls;
+
+    foreach (const ec2::ApiDiscoveryData &data, discoveryData) {
+        QUrl url(data.url);
+        if (data.ignore) {
+            if (url.port() != -1 && !m_additionalUrls.contains(data.id, url))
+                m_additionalUrls.insert(data.id, url);
+            m_ignoredUrls.insert(data.id, url);
+        } else {
+            if (!m_additionalUrls.contains(data.id, url))
+                m_additionalUrls.insert(data.id, url);
+        }
+    }
+
+    foreach (const QnId &id, m_additionalUrls.uniqueKeys()) {
+        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
+        QList<QUrl> additionalUrls = server->getAdditionalUrls();
+
+        if (addInformation) {
+            foreach (const QUrl &url, m_additionalUrls.values(id)) {
+                if (!additionalUrls.contains(url))
+                    additionalUrls.append(url);
+            }
+        } else {
+            foreach (const QUrl &url, m_additionalUrls.values(id))
+                additionalUrls.removeOne(url);
+        }
+        server->setAdditionalUrls(additionalUrls);
+    }
+
+    foreach (const QnId &id, m_ignoredUrls.uniqueKeys()) {
+        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
+        QList<QUrl> ignoredUrls = server->getIgnoredUrls();
+
+        if (addInformation) {
+            foreach (const QUrl &url, m_additionalUrls.values(id))
+                ignoredUrls.removeOne(url);
+            foreach (const QUrl &url, m_ignoredUrls.values(id)) {
+                if (!ignoredUrls.contains(url))
+                    ignoredUrls.append(url);
+            }
+        } else {
+            foreach (const QUrl &url, m_ignoredUrls.values(id))
+                ignoredUrls.removeOne(url);
+        }
+        server->setIgnoredUrls(ignoredUrls);
+    }
 }
 
 void QnCommonMessageProcessor::on_resourceStatusChanged( const QnId& resourceId, QnResource::Status status )

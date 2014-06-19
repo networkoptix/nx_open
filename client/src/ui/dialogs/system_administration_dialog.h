@@ -10,6 +10,7 @@ class QnSystemAdministrationDialog;
 }
 
 class QnServerUpdatesWidget;
+class QnRoutingManagementWidget;
 
 class QnSystemAdministrationDialog : public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -25,6 +26,7 @@ private:
     QScopedPointer<Ui::QnSystemAdministrationDialog> ui;
 
     QnServerUpdatesWidget *m_updatesWidget;
+    QnRoutingManagementWidget *m_routingManagementWidget;
 };
 
 #endif // UPDATE_DIALOG_H

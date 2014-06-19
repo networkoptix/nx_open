@@ -129,8 +129,8 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleFound,     this,   &QnLoginDialog::at_moduleFinder_moduleFound);
     connect(QnModuleFinder::instance(),     &QnModuleFinder::moduleLost,      this,   &QnLoginDialog::at_moduleFinder_moduleLost);
 
-    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->revealedModules())
-        at_moduleFinder_moduleFound(moduleInformation, *moduleInformation.remoteAddresses.begin(), QString());
+    foreach (const QnModuleInformation &moduleInformation, QnModuleFinder::instance()->foundModules())
+        at_moduleFinder_moduleFound(moduleInformation, *moduleInformation.remoteAddresses.begin());
 }
 
 QnLoginDialog::~QnLoginDialog() {}
@@ -657,18 +657,14 @@ void QnLoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
-    Q_UNUSED(localInterfaceAddress)
-
+void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress) {
     //if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
     //    return;
 
     QString host = moduleInformation.isLocal ? QLatin1String("127.0.0.1") : remoteAddress;
     QUrl url;
     url.setHost(host);
-
-    QString port = moduleInformation.parameters[lit("port")];
-    url.setPort(port.toInt());
+    url.setPort(moduleInformation.port);
 
     foreach (const QnEcData &data, m_foundEcs.values(moduleInformation.id)) {
         if (data.url.host() == url.host() && data.url.port() == url.port())

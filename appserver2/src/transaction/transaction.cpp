@@ -163,6 +163,16 @@ namespace ec2
                 case moduleInfo:
                     return "moduleInfo";
 
+                case discoverPeer:
+                    return "discoverPeer";
+                case addDiscoveryInformation:
+                    return "addDiscoveryInformation";
+                case removeDiscoveryInformation:
+                    return "removeDiscoveryInformation";
+
+                case changeSystemName:
+                    return "changeSystemName";
+
                 case getHelp:
                     return "getHelp";
 

@@ -92,6 +92,32 @@ QList<QHostAddress> QnMediaServerResource::getNetAddrList()
     return m_netAddrList;
 }
 
+void QnMediaServerResource::setAdditionalUrls(const QList<QUrl> &urls)
+{
+    QMutexLocker lock(&m_mutex);
+    m_additionalUrls = urls;
+    emit auxUrlsChanged(::toSharedPointer(this));
+}
+
+QList<QUrl> QnMediaServerResource::getAdditionalUrls() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_additionalUrls;
+}
+
+void QnMediaServerResource::setIgnoredUrls(const QList<QUrl> &urls)
+{
+    QMutexLocker lock(&m_mutex);
+    m_ignoredUrls = urls;
+    emit auxUrlsChanged(::toSharedPointer(this));
+}
+
+QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_ignoredUrls;
+}
+
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 {
     QMutexLocker lock(&m_mutex);

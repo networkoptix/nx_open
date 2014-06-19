@@ -72,6 +72,7 @@ namespace {
         (ChangeSystemNameObject,   "changeSystemName")
         (InstallUpdateObject,      "installUpdate")
         (Restart,                  "restart")
+        (ChangeAdminPasswordObject,"changeAdminPassword")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -310,6 +311,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, handle);
         break;
     case Restart:
+        emitFinished(this, response.status, handle);
+        break;
+    case ChangeAdminPasswordObject:
         emitFinished(this, response.status, handle);
         break;
     default:
@@ -781,9 +785,10 @@ int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camer
     return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 
-int QnMediaServerConnection::changeSystemNameAsync(const QString &systemName, QObject *target, const char *slot) {
+int QnMediaServerConnection::changeSystemNameAsync(const QString &systemName, bool wholeSystem, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("systemName", systemName);
+    params << QnRequestParam("wholeSystem", wholeSystem);
 
     return sendAsyncGetRequest(ChangeSystemNameObject, params, NULL, target, slot);
 }
@@ -797,4 +802,12 @@ int QnMediaServerConnection::installUpdate(const QString &updateId, const QByteA
 
 int QnMediaServerConnection::restart(QObject *target, const char *slot) {
     return sendAsyncGetRequest(Restart, QnRequestParamList(), NULL, target, slot);
+}
+
+int QnMediaServerConnection::changeAdminPasswordAsync(const QByteArray &hash, const QByteArray &digest, QObject *target, const char *slot) {
+    QnRequestParamList params;
+    params << QnRequestParam("hash", QString::fromLatin1(hash));
+    params << QnRequestParam("digest", QString::fromLatin1(digest));
+
+    return sendAsyncGetRequest(ChangeAdminPasswordObject, params, NULL, target, slot);
 }

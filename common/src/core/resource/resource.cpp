@@ -104,7 +104,6 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& /*mod
     m_flags = other->m_flags;
     m_name = other->m_name;
     m_parentId = other->m_parentId;
-
 }
 
 void QnResource::update(QnResourcePtr other, bool silenceMode)

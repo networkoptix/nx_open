@@ -4,6 +4,7 @@
 #include <common/common_module.h>
 #include <api/app_server_connection.h>
 #include <nx_ec/data/api_module_data.h>
+#include <nx_ec/dummy_handler.h>
 
 QnGlobalModuleFinder::QnGlobalModuleFinder(QObject *parent) :
     QObject(parent)
@@ -29,7 +30,7 @@ void QnGlobalModuleFinder::setModuleFinder(QnModuleFinder *moduleFinder) {
     m_moduleFinder = moduleFinder;
 
     if (moduleFinder) {
-        foreach (const QnModuleInformation &moduleInformation, moduleFinder->revealedModules())
+        foreach (const QnModuleInformation &moduleInformation, moduleFinder->foundModules())
             at_moduleFinder_moduleFound(moduleInformation);
 
         connect(moduleFinder,               &QnModuleFinder::moduleFound,   this,   &QnGlobalModuleFinder::at_moduleFinder_moduleFound);
@@ -44,7 +45,7 @@ void QnGlobalModuleFinder::fillApiModuleData(const QnModuleInformation &moduleIn
     data->version = moduleInformation.version.toString();
     data->systemInformation = moduleInformation.systemInformation.toString();
     data->addresses = moduleInformation.remoteAddresses.toList();
-    data->port = moduleInformation.parameters.value(lit("port")).toInt();
+    data->port = moduleInformation.port;
     data->isAlive = true;
 }
 
@@ -55,7 +56,7 @@ void QnGlobalModuleFinder::fillFromApiModuleData(const ec2::ApiModuleData &data,
     moduleInformation->version = QnSoftwareVersion(data.version);
     moduleInformation->systemInformation = QnSystemInformation(data.systemInformation);
     moduleInformation->remoteAddresses = QSet<QString>::fromList(data.addresses);
-    moduleInformation->parameters.insert(lit("port"), QString::number(data.port));
+    moduleInformation->port = data.port;
 }
 
 QList<QnModuleInformation> QnGlobalModuleFinder::foundModules() const {
@@ -79,10 +80,14 @@ void QnGlobalModuleFinder::at_moduleChanged(const QnModuleInformation &moduleInf
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
     addModule(moduleInformation, QnId(qnCommon->moduleGUID()));
+    if (m_connection)
+        m_connection->getMiscManager()->sendModuleInformation(moduleInformation, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
     removeModule(moduleInformation, QnId(qnCommon->moduleGUID()));
+    if (m_connection)
+        m_connection->getMiscManager()->sendModuleInformation(moduleInformation, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
 }
 
 void QnGlobalModuleFinder::addModule(const QnModuleInformation &moduleInformation, const QnId &discoverer) {

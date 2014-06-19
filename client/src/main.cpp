@@ -484,7 +484,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     moduleFinder->start();
 
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
-    globalModuleFinder->setModuleFinder(moduleFinder.data());
 
     qnSettings->save();
     if (!QDir(qnSettings->mediaFolder()).exists())

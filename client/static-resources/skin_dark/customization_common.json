@@ -337,6 +337,12 @@
             "expired": "#ff0000"
         }
     },
+
+    "QnServerAddressesModel": {
+        "colors": {
+            "readOnly": "#c0c0c0"
+        }
+    },
     
     "QnShadowItem": {
         "color": "#00000080"

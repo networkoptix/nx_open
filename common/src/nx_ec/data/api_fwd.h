@@ -61,6 +61,8 @@ namespace ec2 {
     struct ApiCameraBookmarkTagData;
     struct ApiModuleData;
     struct ApiLoginData;
+    struct ApiDiscoveryData;
+    struct ApiDiscoverPeerData;
 
     struct ApiHelpValueData;
     struct ApiHelpParamData;
@@ -83,6 +85,7 @@ namespace ec2 {
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
     typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
     typedef std::vector<ApiModuleData> ApiModuleDataList;
+    typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
 
     typedef QString ApiStoredFilePath; // TODO: #Elric struct => extendable?
     typedef QString ApiUpdateInstallData; // TODO: #Elric struct => extendable?
@@ -135,6 +138,8 @@ namespace ec2 {
     (ApiCameraBookmarkTagData)\
     (ApiModuleData)\
     (ApiLoginData)\
+    (ApiDiscoveryData)\
+    (ApiDiscoverPeerData)\
     (ApiHelpValueData)\
     (ApiHelpParamData)\
     (ApiHelpFunctionData)\

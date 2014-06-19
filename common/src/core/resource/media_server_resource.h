@@ -36,6 +36,12 @@ public:
     void setNetAddrList(const QList<QHostAddress>&);
     QList<QHostAddress> getNetAddrList();
 
+    void setAdditionalUrls(const QList<QUrl> &urls);
+    QList<QUrl> getAdditionalUrls() const;
+
+    void setIgnoredUrls(const QList<QUrl> &urls);
+    QList<QUrl> getIgnoredUrls() const;
+
     QnMediaServerConnectionPtr apiConnection();
 
     QnAbstractStorageResourceList getStorages() const;
@@ -86,6 +92,8 @@ private slots:
 signals:
     void serverIfFound(const QnMediaServerResourcePtr &resource, const QString &, const QString& );
     void panicModeChanged(const QnResourcePtr &resource);
+    //! This signal is emmited when the set of additional URLs or ignored URLs has been changed.
+    void auxUrlsChanged(const QnResourcePtr &resource);
 
 private:
     QnMediaServerConnectionPtr m_restConnection;
@@ -94,6 +102,8 @@ private:
     QString m_streamingUrl;
     QList<QHostAddress> m_netAddrList;
     QList<QHostAddress> m_prevNetAddrList;
+    QList<QUrl> m_additionalUrls;
+    QList<QUrl> m_ignoredUrls;
     QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
     Qn::ServerFlags m_serverFlags;

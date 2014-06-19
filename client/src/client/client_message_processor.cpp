@@ -24,6 +24,9 @@ void QnClientMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     QnCommonMessageProcessor::init(connection);
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
+
+    connect( connection->getMiscManager().get(), &ec2::AbstractMiscManager::systemNameChangeRequested,
+             this, &QnClientMessageProcessor::at_systemNameChangeRequested );
 }
 
 void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
@@ -174,6 +177,13 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData, bool isP
         foreach(QnResourcePtr res, qnResPool->getAllCameras(QnResourcePtr()))
             res->setStatus(QnResource::Offline);
     }
+}
+
+void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &systemName) {
+    if (qnCommon->localSystemName() == systemName)
+        return;
+
+    qnCommon->setLocalSystemName(systemName);
 }
 
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)

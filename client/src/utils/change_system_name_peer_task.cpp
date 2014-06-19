@@ -25,7 +25,7 @@ void QnChangeSystemNamePeerTask::doStart() {
             continue;
         }
 
-        int handle = server->apiConnection()->changeSystemNameAsync(m_systemName, this, SLOT(processReply(int,int)));
+        int handle = server->apiConnection()->changeSystemNameAsync(m_systemName, false, this, SLOT(processReply(int,int)));
         m_pendingPeers.insert(handle, id);
     }
 

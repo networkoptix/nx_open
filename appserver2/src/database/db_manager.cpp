@@ -8,6 +8,7 @@
 #include "common/common_module.h"
 #include "managers/impl/license_manager_impl.h"
 #include "nx_ec/data/api_business_rule_data.h"
+#include "nx_ec/data/api_discovery_data.h"
 #include "utils/serialization/binary_stream.h"
 #include "utils/serialization/sql_functions.h"
 #include "business/business_fwd.h"
@@ -503,6 +504,9 @@ bool QnDbManager::createDatabase(bool *dbJustCreated)
             return false;
 
         if (!execSQLFile(lit(":/07_refactor_firmware.sql")))
+            return false;
+
+        if (!execSQLFile(lit(":/08_discovery.sql")))
             return false;
     }
 
@@ -1186,6 +1190,32 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiVideowa
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDiscoveryDataList> &tran) {
+    if (tran.command == ApiCommand::addDiscoveryInformation) {
+        foreach (const ApiDiscoveryData &data, tran.params) {
+            QSqlQuery query(m_sdb);
+            query.prepare("INSERT OR REPLACE INTO vms_mserver_discovery (server_id, url, ignore) VALUES(:id, :url, :ignore)");
+            QnSql::bind(data, &query);
+            if (!query.exec()) {
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                return ErrorCode::dbError;
+            }
+        }
+    } else if (tran.command == ApiCommand::removeDiscoveryInformation) {
+        foreach (const ApiDiscoveryData &data, tran.params) {
+            QSqlQuery query(m_sdb);
+            query.prepare("DELETE FROM vms_mserver_discovery WHERE server_id = :id AND url = :url");
+            QnSql::bind(data, &query);
+            if (!query.exec()) {
+                qWarning() << Q_FUNC_INFO << query.lastError().text();
+                return ErrorCode::dbError;
+            }
+        }
+    }
+
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& /*tran*/) {
     return ErrorCode::ok;
 }
@@ -1367,6 +1397,10 @@ ErrorCode QnDbManager::removeServer(const QnId& guid)
         return err;
 
     err = deleteTableRecord(id, "vms_server", "resource_ptr_id");
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteTableRecord(id, "vms_mserver_discovery", "server_id");
     if (err != ErrorCode::ok)
         return err;
 
@@ -2068,6 +2102,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     if ((err = doQueryNoLock(dummy, data.licenses)) != ErrorCode::ok)
         return err;
 
+    if ((err = doQueryNoLock(dummy, data.discoveryData)) != ErrorCode::ok)
+        return err;
+
     std::vector<ApiResourceParamWithRefData> kvPairs;
     QSqlQuery queryParams(m_sdb);
     queryParams.setForwardOnly(true);
@@ -2100,6 +2137,23 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiResourc
     if (rez == ErrorCode::ok)
         data = params.params;
     return rez;
+}
+
+ErrorCode QnDbManager::doQueryNoLock(const std::nullptr_t &, ApiDiscoveryDataList &data) {
+    QSqlQuery query(m_sdb);
+
+    QString q = QString(lit("SELECT server_id as id, url, ignore from vms_mserver_discovery"));
+    query.setForwardOnly(true);
+    query.prepare(q);
+
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
+        return ErrorCode::dbError;
+    }
+
+    QnSql::fetch_many(query, &data);
+
+    return ErrorCode::ok;
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiResetBusinessRuleData>& tran)

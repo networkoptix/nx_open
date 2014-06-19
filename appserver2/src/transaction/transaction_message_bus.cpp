@@ -406,6 +406,15 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
         case ApiCommand::moduleInfo:
             return deliveryTransaction<ApiModuleData>(abstractTran, stream);
 
+        case ApiCommand::discoverPeer:
+            return deliveryTransaction<ApiDiscoverPeerData>(abstractTran, stream);
+        case ApiCommand::addDiscoveryInformation:
+        case ApiCommand::removeDiscoveryInformation:
+            return deliveryTransaction<ApiDiscoveryDataList>(abstractTran, stream);
+
+        case ApiCommand::changeSystemName:
+            return deliveryTransaction<QString>(abstractTran, stream);
+
         default:
             Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
             break;
@@ -624,7 +633,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
 
         // TODO: #dklychkov rewrite module info synchronization
         /* fill module information */
-/*
+        /*
         foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules()) {
             ApiModuleData data;
             QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &data);
