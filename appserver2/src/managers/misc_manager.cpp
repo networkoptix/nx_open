@@ -122,6 +122,8 @@ template<class QueryProcessorType>
 QnTransaction<QString> QnMiscManager<QueryProcessorType>::prepareTransaction(const QString &systemName) const {
     QnTransaction<QString> transaction(ApiCommand::changeSystemName, false);
     transaction.params = systemName;
+
+    return transaction;
 }
 
 template<class QueryProcessorType>

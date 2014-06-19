@@ -942,7 +942,7 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
 void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
-    if (isCompatibe(moduleInformation.version, qnCommon->engineVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
+    if (isCompatible(moduleInformation.version, qnCommon->engineVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
         foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
             QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
             ec2Connection->deleteRemotePeer(url);

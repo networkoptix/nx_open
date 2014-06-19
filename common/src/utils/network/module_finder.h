@@ -47,6 +47,4 @@ private:
     QHash<QnId, QnModuleInformation> m_foundModules;
 };
 
-Q_DECLARE_METATYPE(QnModuleInformation)
-
 #endif  //NETWORKOPTIXMODULEFINDER_H

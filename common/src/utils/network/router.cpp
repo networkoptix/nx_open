@@ -34,7 +34,7 @@ void QnRouter::setModuleFinder(QnModuleFinder *moduleFinder) {
     m_moduleFinder = moduleFinder;
 
     if (moduleFinder) {
-        foreach (const QnModuleInformation &moduleInformation, moduleFinder->revealedModules())
+        foreach (const QnModuleInformation &moduleInformation, moduleFinder->foundModules())
             at_moduleFinder_moduleFound(moduleInformation);
 
         connect(moduleFinder,               &QnModuleFinder::moduleFound,   this,   &QnRouter::at_moduleFinder_moduleFound);
@@ -86,7 +86,7 @@ void QnRouter::at_connectionRemoved(const QnId &discovererId, const QnId &peerId
 
 void QnRouter::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation) {
     foreach (const QString &address, moduleInformation.remoteAddresses) {
-        Endpoint endpoint(moduleInformation.id, address, moduleInformation.parameters.value(lit("port")).toUShort());
+        Endpoint endpoint(moduleInformation.id, address, moduleInformation.port);
         if (m_connections.contains(qnCommon->moduleGUID(), endpoint))
             return;
 
