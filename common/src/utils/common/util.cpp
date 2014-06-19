@@ -1,6 +1,6 @@
 #include "utils/common/util.h"
 
-#ifndef Q_OS_WIN
+#if !defined(Q_OS_WIN) && !defined(Q_OS_ANDROID)
 #   include <sys/statvfs.h>
 #   include <sys/time.h>
 #endif
@@ -124,7 +124,7 @@ QString closeDirPath(const QString& value)
     else
         return tmp + QLatin1Char('/');
 }
-#ifdef Q_OS_WIN32
+#if defined(Q_OS_WIN32)
 qint64 getDiskFreeSpace(const QString& root)
 {
     quint64 freeBytesAvailableToCaller = -1;
@@ -155,7 +155,17 @@ qint64 getDiskTotalSpace(const QString& root)
     return totalNumberOfBytes;
 };
 
-#else 
+#elif defined(Q_OS_ANDROID)
+
+qint64 getDiskFreeSpace(const QString& root) {
+    return 0; // TODO: #android
+}
+
+qint64 getDiskTotalSpace(const QString& root) {
+    return 0; // TODO: #android
+}
+
+#else
 qint64 getDiskFreeSpace(const QString& root) {
     struct statvfs buf;
     if (statvfs(root.toUtf8().data(), &buf) == 0)

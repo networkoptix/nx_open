@@ -2,7 +2,10 @@
 #define QN_EVENT_LOOP_H
 
 #include <QtCore/QThread>
-#include <QtCore/5.2.1/QtCore/private/qthread_p.h>
+
+#ifndef Q_OS_ANDROID
+#   include <QtCore/5.2.1/QtCore/private/qthread_p.h>
+#endif
 
 /**
  * \param thread                        Thread to check.
@@ -14,8 +17,12 @@
  *                                      error checking only.
  */
 inline bool qnHasEventLoop(QThread *thread) {
+#ifndef Q_OS_ANDROID
     int loopLevel = QThreadData::get2(thread)->loopLevel;
     return loopLevel > 0;
+#else
+    return true;
+#endif
 }
 
 #endif // QN_EVENT_LOOP_H

@@ -17,6 +17,9 @@
 
 #include "../socket.h"
 
+#ifdef Q_OS_ANDROID
+#   define EPOLLRDHUP 0x2000 /* Android doesn't define EPOLLRDHUP, but it still works if defined properly. */
+#endif
 
 using namespace std;
 

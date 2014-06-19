@@ -1,4 +1,3 @@
-
 #include <QtCore/QCoreApplication>
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtNetwork/QHostInfo>
@@ -13,11 +12,13 @@
 #include "../common/log.h"
 
 #ifdef Q_OS_LINUX
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <ifaddrs.h>
-#include <unistd.h>
+#   include <arpa/inet.h>
+#   include <sys/socket.h>
+#   include <netdb.h>
+#   include <unistd.h>
+#   ifndef Q_OS_ANDROID
+#       include <ifaddrs.h>
+#   endif
 #endif
 
 /*

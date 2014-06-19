@@ -9,7 +9,7 @@
 
 #include <common/systemexcept_win32.h>
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
 #   include <sys/types.h>
 #   include <linux/unistd.h>
 static pid_t gettid(void) { return syscall(__NR_gettid); }
