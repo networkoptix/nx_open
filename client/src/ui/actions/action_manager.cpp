@@ -742,7 +742,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SystemAdministrationAction).
         flags(Qn::Main | Qn::Tree).
-        text(tr("System Administration")).
+        text(tr("System Administration...")).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory(Qn::JoinOtherSystem).
