@@ -74,7 +74,7 @@ void QnMediaServerResource::setStreamingUrl(const QString& value)
     m_streamingUrl = value;
 }
 
-QString QnMediaServerResource::getStreamingUrl() const
+const QString& QnMediaServerResource::getStreamingUrl() const
 {
     QMutexLocker lock(&m_mutex);
     return m_streamingUrl;
@@ -86,7 +86,7 @@ void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrLis
     m_netAddrList = netAddrList;
 }
 
-QList<QHostAddress> QnMediaServerResource::getNetAddrList()
+const QList<QHostAddress>& QnMediaServerResource::getNetAddrList() const
 {
     QMutexLocker lock(&m_mutex);
     return m_netAddrList;

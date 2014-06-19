@@ -318,13 +318,14 @@ bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*
 bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) const
 {
     const QnParamList& resourceParamList = getResourceParamList();
-    if (!resourceParamList.contains(name))
+    QnParamList::const_iterator paramIter = resourceParamList.find( name );
+    if ( paramIter == resourceParamList.cend() )
     {
         emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
         return false;
     }
 
-    const QnParam& param = resourceParamList[name];
+    const QnParam& param = paramIter.value();
     val = param.value();
 
     if (domain == QnDomainMemory)

@@ -98,13 +98,8 @@ bool channelCheckFunctor(const QnAbstractDataPacketPtr& data, QVariant channelNu
 
 void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr nonConstData)
 {
-    QnAbstractDataPacketPtr data = nonConstData;
-
-    QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(data);
-    QnConstCompressedAudioDataPtr audio = qSharedPointerDynamicCast<const QnCompressedAudioData>(data);
-
     QMutexLocker lock(&m_queueMtx);
-    if (video)
+    if (QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(nonConstData))
     {
         if (video->flags & AV_PKT_FLAG_KEY)
         {
@@ -115,20 +110,22 @@ void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr nonConstData)
             }
             m_gotIFramesMask |= 1 << video->channelNumber;
             m_lastKeyFrame = video;
+            const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
             if (m_lastKeyFrames.empty() || m_lastKeyFrames.back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
-                m_lastKeyFrames.push_back(video);
-            qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
+                m_lastKeyFrames.push_back(std::move(video));
             while (!m_lastKeyFrames.empty() && m_lastKeyFrames.front()->timestamp < removeThreshold)
                 m_lastKeyFrames.pop_front();
         }
 
         if (m_dataQueue.size() < m_dataQueue.maxSize()) {
-            video.constCast<QnCompressedVideoData>()->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-            QnAbstractDataConsumer::putData(nonConstData);
+            //TODO #ak MUST NOT modify video packet here! It can be used by other threads concurrently and flags value can be undefined in other threads
+            nonConstData.staticCast<QnAbstractMediaData>()->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+            QnAbstractDataConsumer::putData(std::move(nonConstData));
         }
     }
-    else if (audio) {
-        m_lastAudioData = audio;
+    else if (QnConstCompressedAudioDataPtr audio = qSharedPointerDynamicCast<const QnCompressedAudioData>(nonConstData))
+    {
+        m_lastAudioData = std::move(audio);
     }
 }
 
