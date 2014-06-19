@@ -15,6 +15,7 @@ QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget *parent) :
 
     connect(ui->layoutsComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [&](){ui->layoutCustom->setChecked(true);});
     connect(ui->amAllRadioButton, &QRadioButton::toggled, ui->autoFillCheckBox, &QCheckBox::setDisabled);
+    connect(ui->autoFillCheckBox, &QCheckBox::toggled,    this, &QnAttachToVideowallDialog::updatePreview);
 }
 
 QnAttachToVideowallDialog::~QnAttachToVideowallDialog(){}
@@ -74,6 +75,7 @@ void QnAttachToVideowallDialog::loadSettings(const QnVideowallAttachSettings &se
     }
 
     ui->autoFillCheckBox->setChecked(settings.autoFill);
+    updatePreview();
 }
 
 void QnAttachToVideowallDialog::loadLayoutsList(const QnLayoutResourceList &layouts) {
@@ -105,5 +107,17 @@ bool QnAttachToVideowallDialog::isShortcutsSupported() const {
 
 void QnAttachToVideowallDialog::setShortcutsSupported(bool value) {
     ui->shortcutCheckbox->setVisible(value);
+}
+
+void QnAttachToVideowallDialog::updatePreview() {
+    ui->previewWidget->setAutoFill(ui->autoFillCheckBox->isChecked());
+}
+
+QnVideoWallResourcePtr QnAttachToVideowallDialog::videowall() const {
+    return ui->previewWidget->videowall();
+}
+
+void QnAttachToVideowallDialog::setVideowall(const QnVideoWallResourcePtr &videowall) {
+    ui->previewWidget->setVideowall(videowall);
 }
 

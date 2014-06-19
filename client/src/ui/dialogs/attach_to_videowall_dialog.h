@@ -18,6 +18,9 @@ public:
     explicit QnAttachToVideowallDialog(QWidget *parent = 0);
     ~QnAttachToVideowallDialog();
 
+    QnVideoWallResourcePtr videowall() const;
+    void setVideowall(const QnVideoWallResourcePtr &videowall);
+
     QnVideowallAttachSettings settings() const;
     void loadSettings(const QnVideowallAttachSettings &settings);
 
@@ -31,6 +34,9 @@ public:
 
     bool isCreateShortcut() const;
     void setCreateShortcut(bool value);
+private:
+    void updatePreview();
+
 private:
     QScopedPointer<Ui::QnAttachToVideowallDialog> ui;
 };
