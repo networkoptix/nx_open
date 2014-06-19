@@ -27,7 +27,6 @@
 #include <string.h>
 
 #include <QtCore/QFile>
-#include <utils/network/mac_address.h>
 
 
 DiscoveryManager::DiscoveryManager()
@@ -69,7 +68,7 @@ void DiscoveryManager::getVendorName( char* buf ) const
 }
 
 #ifndef WIN32
-void mac_eth0(char  MAC_str[13], char** host)
+void mac_eth0(char  MAC_str[19], char** host)
 {
     #define HWADDR_len 6
     int s,i;
@@ -78,7 +77,8 @@ void mac_eth0(char  MAC_str[13], char** host)
     strcpy(ifr.ifr_name, "eth0");
     if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
         for (i=0; i<HWADDR_len; i++)
-            sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+            sprintf(&MAC_str[i*3],"%02X-",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+	MAC_str[17] = 0;
     }
     if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
         const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
@@ -97,7 +97,6 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*loc
 #ifndef WIN32
     mac_eth0(mac, &host);
 #endif
-    QByteArray macStr = QnMacAddress((unsigned char*) mac).toString().toLatin1();
 
     if( m_modelName.isEmpty() )
     {
@@ -147,7 +146,7 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*loc
     const char* passwordToUse = "admin";
 
     memset( cameras, 0, sizeof(*cameras) );
-    strncpy( cameras->uid, macStr.constData(), macStr.length() );
+    strncpy( cameras->uid, mac, sizeof(cameras->uid)-1 );
     strncpy( cameras->modelName, m_modelName.constData(), sizeof(cameras->modelName)-1 );
     strncpy( cameras->firmware, m_firmwareVersion.constData(), sizeof(cameras->firmware)-1 );
     if (host)
