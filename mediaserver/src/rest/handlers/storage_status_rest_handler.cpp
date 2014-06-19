@@ -12,6 +12,8 @@
 #include "api/serializer/serializer.h"
 #include "recorder/storage_manager.h"
 #include "api/model/storage_status_reply.h"
+#include "media_server/settings.h"
+
 
 int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result)
 {
@@ -23,8 +25,10 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     bool exists = storage;
     if (!storage) {
         storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
-        if(storage)
+        if(storage) {
             storage->setUrl(storageUrl);
+            storage->setSpaceLimit(nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE);
+        }
     }
     
     QnStorageStatusReply reply;

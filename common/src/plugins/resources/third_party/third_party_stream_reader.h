@@ -46,6 +46,8 @@ protected:
     virtual void updateStreamParamsBasedOnFps() override;
 
     virtual void pleaseStop() override;
+    virtual void beforeRun() override;
+    virtual void afterRun() override;
 
     //!Overrides QnLiveStreamProvider::roleForMotionEstimation()
     virtual QnResource::ConnectionRole roleForMotionEstimation() override;
