@@ -91,7 +91,7 @@ void mac_eth0(char  MAC_str[19], char** host)
 int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*localInterfaceIPAddr*/ )
 {
     //const char* mac = "543959ab129a";
-    char  mac[13];
+    char  mac[19];
     memset(mac, 0, sizeof(mac));
     char* host = 0;
 #ifndef WIN32
