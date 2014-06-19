@@ -108,6 +108,7 @@
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/change_admin_password_rest_handler.h>
+#include <rest/handlers/routing_information_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
 
@@ -129,6 +130,7 @@
 #include <utils/network/ssl_socket.h>
 #include <utils/network/module_finder.h>
 #include <utils/network/global_module_finder.h>
+#include <utils/network/router.h>
 #include <media_server/server_update_tool.h>
 
 #include <media_server/server_message_processor.h>
@@ -973,6 +975,7 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/changeAdminPassword", new QnChangeAdminPasswordRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/routingInformation", new QnRoutingInformationRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
@@ -1341,6 +1344,10 @@ void QnMain::run()
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
     globalModuleFinder->setConnection(ec2Connection);
     globalModuleFinder->setModuleFinder(moduleFinder.data());
+
+    QScopedPointer<QnRouter> router(new QnRouter());
+    router->setConnection(ec2Connection);
+    router->setModuleFinder(moduleFinder.data());
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
 

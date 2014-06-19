@@ -7,13 +7,14 @@
 #include "transaction_transport.h"
 #include "transaction_transport_serializer.h"
 #include "utils/common/synctime.h"
+#include "utils/network/global_module_finder.h"
+#include "utils/network/router.h"
 #include "nx_ec/data/api_server_alive_data.h"
+#include "nx_ec/data/api_camera_data.h"
+#include "nx_ec/data/api_resource_data.h"
 #include "transaction_log.h"
 #include "api/app_server_connection.h"
 #include <utils/serialization/binary_functions.h>
-#include <utils/network/global_module_finder.h>
-#include "nx_ec/data/api_camera_data.h"
-#include "nx_ec/data/api_resource_data.h"
 
 #include "version.h"
 
@@ -264,6 +265,8 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnAbstractT
 void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>&)
 {
 	sender->setReadSync(true);
+
+    sendConnectionsData();
 }
 
 bool QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>& stream)
@@ -412,6 +415,12 @@ bool QnTransactionMessageBus::CustomHandler<T>::processTransaction(QnTransaction
         case ApiCommand::removeDiscoveryInformation:
             return deliveryTransaction<ApiDiscoveryDataList>(abstractTran, stream);
 
+        case ApiCommand::addConnection:
+        case ApiCommand::removeConnection:
+            return deliveryTransaction<ApiConnectionData>(abstractTran, stream);
+        case ApiCommand::availableConnections:
+            return deliveryTransaction<ApiConnectionDataList>(abstractTran, stream);
+
         case ApiCommand::changeSystemName:
             return deliveryTransaction<QString>(abstractTran, stream);
 
@@ -475,6 +484,27 @@ void QnTransactionMessageBus::sendServerAliveMsg(const QnPeerInfo &peer, bool is
         emit peerFound(tran.params, false);
     else
         emit peerLost(tran.params, false);
+}
+
+void QnTransactionMessageBus::sendConnectionsData()
+{
+    if (!QnRouter::instance())
+        return;
+
+    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections, false);
+
+    QMultiHash<QnId, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
+    for (auto it = connections.begin(); it != connections.end(); ++it) {
+        ApiConnectionData connection;
+        connection.discovererId = it.key();
+        connection.peerId = it->id;
+        connection.host = it->host;
+        connection.port = it->port;
+        transaction.params.push_back(connection);
+    }
+
+    transaction.fillSequence();
+    sendTransaction(transaction);
 }
 
 QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }

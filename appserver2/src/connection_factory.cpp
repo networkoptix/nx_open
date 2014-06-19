@@ -181,13 +181,19 @@ namespace ec2
 
         //AbstractMiscManager::discoverPeer
         registerUpdateFuncHandler<ApiDiscoverPeerData>(restProcessorPool, ApiCommand::discoverPeer);
-        //AbstractMiscManager::changeSystemName
-        registerUpdateFuncHandler<QString>(restProcessorPool, ApiCommand::changeSystemName);
-
         //AbstractMiscManager::addDiscoveryInformation
         registerUpdateFuncHandler<ApiDiscoveryDataList>(restProcessorPool, ApiCommand::addDiscoveryInformation);
         //AbstractMiscManager::removeDiscoveryInformation
         registerUpdateFuncHandler<ApiDiscoveryDataList>(restProcessorPool, ApiCommand::removeDiscoveryInformation);
+        //AbstractMiscManager::changeSystemName
+        registerUpdateFuncHandler<QString>(restProcessorPool, ApiCommand::changeSystemName);
+
+        //AbstractMiscManager::addConnection
+        registerUpdateFuncHandler<ApiConnectionData>(restProcessorPool, ApiCommand::addConnection);
+        //AbstractMiscManager::removeConnection
+        registerUpdateFuncHandler<ApiConnectionData>(restProcessorPool, ApiCommand::removeConnection);
+        //AbstractMiscManager::availableConnections
+        registerUpdateFuncHandler<ApiConnectionDataList>(restProcessorPool, ApiCommand::availableConnections);
 
         //ApiResourceParamList
         registerGetFuncHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );

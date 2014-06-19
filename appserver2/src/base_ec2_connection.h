@@ -242,6 +242,14 @@ namespace ec2
             m_discoveryManager->triggerNotification(tran);
         }
 
+        void triggerNotification(const QnTransaction<ApiConnectionData> &tran) {
+            m_miscManager->triggerNotification(tran);
+        }
+
+        void triggerNotification(const QnTransaction<ApiConnectionDataList> &tran) {
+            m_miscManager->triggerNotification(tran.params);
+        }
+
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
     protected:
         QueryProcessorType* m_queryProcessor;

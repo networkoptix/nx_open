@@ -170,6 +170,13 @@ namespace ec2
                 case removeDiscoveryInformation:
                     return "removeDiscoveryInformation";
 
+                case addConnection:
+                    return "addConnection";
+                case removeConnection:
+                    return "removeConnection";
+                case availableConnections:
+                    return "availableConnections";
+
                 case changeSystemName:
                     return "changeSystemName";
 

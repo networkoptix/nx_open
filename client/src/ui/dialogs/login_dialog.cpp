@@ -40,6 +40,7 @@
 #include "connection_testing_dialog.h"
 
 #include <utils/network/global_module_finder.h>
+#include <utils/network/router.h>
 #include <api/model/connection_info.h>
 #include "compatibility_version_installation_dialog.h"
 #include "version.h"

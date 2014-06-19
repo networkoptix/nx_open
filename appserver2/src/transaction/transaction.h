@@ -172,6 +172,12 @@ namespace ec2
 
             //!ApiVideowallInstanceStatusData
             updateVideowallInstanceStatus = 71,
+
+            //!ApiConnectionData
+            addConnection = 72,
+            removeConnection = 73,
+            //!ApiConnectionDataList
+            availableConnections = 74,
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

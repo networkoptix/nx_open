@@ -21,6 +21,7 @@
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_module_data.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
+#include "nx_ec/data/api_routing_data.h"
 #include "utils/db/db_helper.h"
 
 namespace ec2
@@ -100,6 +101,16 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode saveTransaction(const QnTransaction<ApiConnectionData>& , const QByteArray&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode saveTransaction(const QnTransaction<ApiConnectionDataList>& , const QByteArray&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
         qint64 getTimeStamp();
         void init();
 
@@ -142,6 +153,8 @@ namespace ec2
         QUuid transactionHash(const ApiUpdateUploadResponceData& ) const       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiModuleData& ) const                     { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiDiscoverPeerData& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiConnectionData& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiConnectionDataList& ) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);
