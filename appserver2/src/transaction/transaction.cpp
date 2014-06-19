@@ -25,9 +25,6 @@ namespace ec2
                 case connect:
                     return "connect";
 
-                case clientInstanceId:
-                    return "clientInstanceId";
-
                 case getResourceTypes:
                     return "getResourceTypes";
                 case getResource:
@@ -105,6 +102,8 @@ namespace ec2
                     return "removeVideowall";
                 case videowallControl:
                     return "videowallControl";
+                case updateVideowallInstanceStatus:
+                    return "updateVideowallInstanceStatus";
 
                 case listDirectory:
                     return "listDirectory";
@@ -131,8 +130,8 @@ namespace ec2
                     return "tranSyncRequest";
                 case tranSyncResponse:
                     return "tranSyncResponse";
-                case serverAliveInfo:
-                    return "serverAliveInfo";
+                case peerAliveInfo:
+                    return "peerAliveInfo";
 
                 case getSettings:
                     return "getSettings";
@@ -175,7 +174,7 @@ namespace ec2
                     val == unlockRequest ||
                     val == tranSyncRequest ||
                     val == tranSyncResponse ||
-                    val == serverAliveInfo;
+                    val == peerAliveInfo;
         }
 
     }

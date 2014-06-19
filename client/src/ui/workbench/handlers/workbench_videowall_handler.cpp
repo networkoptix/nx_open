@@ -240,13 +240,10 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
         connect(action(Qn::DelayedOpenVideoWallItemAction), &QAction::triggered,        this,   &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
-        //TODO: #GDM #VW may be we should override ::instance() ?
         QnCommonMessageProcessor* clientMessageProcessor = QnClientMessageProcessor::instance();
         connect(clientMessageProcessor,   &QnCommonMessageProcessor::videowallControlMessageReceived,
                 this,                     &QnWorkbenchVideoWallHandler::at_eventManager_controlMessageReceived);
 
-        //connect(clientMessageProcessor, SIGNAL(connectionClosed()) TODO: #GDM #VW reinitialize window state if someone control us?
-        connect(clientMessageProcessor,   &QnCommonMessageProcessor::connectionOpened,  this,   &QnWorkbenchVideoWallHandler::at_connection_opened);
     } else {
 
         /* Control videowall actions */
@@ -652,6 +649,7 @@ bool QnWorkbenchVideoWallHandler::canClose() {
 
 void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourcePtr &videoWall) {
 
+    //TODO: #GDM #VW online check
     if (!canStartVideowall(videoWall)) {
         QMessageBox::warning(mainWindow(),
             tr("Error"),
@@ -688,10 +686,20 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
     if (doNotAskAgain)
         qnSettings->setVideoWallStartMode(static_cast<int>(button));
 
-    QStringList arguments;
-    arguments << QLatin1String("--videowall");
-    arguments << videoWall->getId().toString();
-    openNewWindow(arguments);
+
+    QUuid pcUuid = qnSettings->pcUuid();
+    //TODO: #GDM #VW online check
+    foreach (const QnVideoWallItem &item, videoWall->items()->getItems()) {
+        if (item.pcUuid != pcUuid)
+            continue;
+
+        QStringList arguments;
+        arguments << QLatin1String("--videowall");
+        arguments << videoWall->getId().toString();
+        arguments << QLatin1String("--videowall-instance");
+        arguments << item.uuid.toString();
+        openNewWindow(arguments);
+    }
 }
 
 void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args) {
@@ -732,15 +740,10 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
     QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
     if (layout)
         menu()->trigger(Qn::OpenSingleLayoutAction, layout);
-    sendInstanceGuid();
 }
 
 void QnWorkbenchVideoWallHandler::closeInstanceDelayed() {
     QTimer::singleShot(10, action(Qn::ExitAction), SLOT(trigger()));
-}
-
-void QnWorkbenchVideoWallHandler::sendInstanceGuid() {
-    connection2()->getVideowallManager()->sendInstanceId(m_videoWallMode.instanceGuid, this, []{});
 }
 
 void QnWorkbenchVideoWallHandler::sendMessage(QnVideoWallControlMessage message, bool cached) {
@@ -1333,11 +1336,6 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 }
 
 /*------------------------------------ HANDLERS ------------------------------------------*/
-
-void QnWorkbenchVideoWallHandler::at_connection_opened() {
-    if (!m_videoWallMode.instanceGuid.isNull())
-        sendInstanceGuid();
-}
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     //TODO: #GDM #VW refactor to corresponding dialog

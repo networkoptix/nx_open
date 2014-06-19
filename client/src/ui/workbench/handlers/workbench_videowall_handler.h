@@ -53,7 +53,6 @@ private:
     void openNewWindow(const QStringList &args);
     void openVideoWallItem(const QnVideoWallResourcePtr &videoWall);
     void closeInstanceDelayed();
-    void sendInstanceGuid();
 
     void setControlMode(bool active);
     void updateMode();
@@ -74,7 +73,6 @@ private:
     bool shortcutExists(const QnVideoWallResourcePtr &videowall) const;
     bool createShortcut(const QnVideoWallResourcePtr &videowall);
 private slots:
-    void at_connection_opened();
 
     void at_newVideoWallAction_triggered();
     void at_attachToVideoWallAction_triggered();
