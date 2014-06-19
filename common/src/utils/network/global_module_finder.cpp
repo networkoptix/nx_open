@@ -127,9 +127,12 @@ void QnGlobalModuleFinder::removeModule(const QnModuleInformation &moduleInforma
     auto it = m_moduleInformationById.find(moduleInformation.id);
 
     if (it != m_moduleInformationById.end()) {
-        m_moduleInformationById.erase(it);
-        m_discovererIdByServerId.remove(moduleInformation.id, discoverer);
-        emit peerLost(moduleInformation);
+        if (m_discovererIdByServerId.remove(it.key(), discoverer) > 0) {
+            if (!m_discovererIdByServerId.contains(it.key())) {
+                emit peerLost(it.value());
+                it = m_moduleInformationById.erase(it);
+            }
+        }
     }
 }
 
