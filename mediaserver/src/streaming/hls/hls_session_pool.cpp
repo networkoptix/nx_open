@@ -109,6 +109,14 @@ namespace nx_hls
     {
     }
 
+    static HLSSessionPool* HLSSessionPool_instance = nullptr;
+
+    HLSSessionPool::HLSSessionPool()
+    {
+        assert( HLSSessionPool_instance == nullptr );
+        HLSSessionPool_instance = this;
+    }
+
     HLSSessionPool::~HLSSessionPool()
     {
         while( !m_sessionByID.empty() )
@@ -126,6 +134,8 @@ namespace nx_hls
             delete sessionCtx.session;
             TimerManager::instance()->joinAndDeleteTimer( sessionCtx.removeTaskID );
         }
+
+        HLSSessionPool_instance = nullptr;
     }
 
     bool HLSSessionPool::add( HLSSession* session, unsigned int keepAliveTimeoutMS )
@@ -153,11 +163,9 @@ namespace nx_hls
         removeNonSafe( id );
     }
 
-    Q_GLOBAL_STATIC( HLSSessionPool, staticInstance )
-
     HLSSessionPool* HLSSessionPool::instance()
     {
-        return staticInstance();
+        return HLSSessionPool_instance;
     }
 
     static QAtomicInt nextSessionID = 1;

@@ -12,8 +12,8 @@ namespace ec2
     template<class QueryProcessorType>
     QnLayoutManager<QueryProcessorType>::QnLayoutManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
     :
-        m_queryProcessor( queryProcessor ),
-        m_resCtx( resCtx )
+        QnLayoutNotificationManager( resCtx ),
+        m_queryProcessor( queryProcessor )
     {
     }
 

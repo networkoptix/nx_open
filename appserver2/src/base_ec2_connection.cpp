@@ -19,7 +19,7 @@ namespace ec2
         const ResourceContext& resCtx )
     :
         m_queryProcessor( queryProcessor ),
-        m_resCtx(resCtx),
+        m_resCtx( resCtx ),
         m_licenseManager( new QnLicenseManager<T>(m_queryProcessor) ),
         m_resourceManager( new QnResourceManager<T>(m_queryProcessor, resCtx) ),
         m_mediaServerManager( new QnMediaServerManager<T>(m_queryProcessor, resCtx) ),
@@ -33,6 +33,21 @@ namespace ec2
     {
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerFound, this, &BaseEc2Connection<T>::remotePeerFound, Qt::DirectConnection);
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,  this, &BaseEc2Connection<T>::remotePeerLost, Qt::DirectConnection);
+
+        m_notificationManager.reset(
+            new ECConnectionNotificationManager(
+                m_resCtx,
+                this, 
+                m_licenseManager.get(),
+                m_resourceManager.get(),
+                m_mediaServerManager.get(),
+                m_cameraManager.get(),
+                m_userManager.get(),
+                m_businessEventManager.get(),
+                m_layoutManager.get(),
+                m_videowallManager.get(),
+                m_storedFileManager.get(),
+                m_updatesManager.get() ) );
     }
 
     template<class T>

@@ -21,8 +21,8 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
     if( srcMediaPacket->data.data()[3] == 1 )
         return *data;   //already in annexb format. TODO #ak: format validation is too weak
 
-    //TODO #ak: copying packet
-    QnAbstractMediaDataPtr mediaPacket = srcMediaPacket;
+    //TODO #ak: copying packet srcMediaPacket to mediaPacket
+    QnAbstractMediaDataPtr mediaPacket = std::move(srcMediaPacket);
 
     //replacing NALU size with {0 0 0 1}
     for( quint8* dataStart = (quint8*)mediaPacket->data.data();

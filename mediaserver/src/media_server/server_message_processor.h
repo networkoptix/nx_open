@@ -40,6 +40,8 @@ private:
     mutable QMutex m_mutexAddrList;
     QHash<QString, int> m_allIPAddress;
     QHash<QnId, QList<QString> > m_addrById;
+    const int m_serverPort;
+    mutable QnMediaServerResourcePtr m_mServer;
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

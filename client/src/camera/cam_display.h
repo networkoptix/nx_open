@@ -92,7 +92,7 @@ public:
     bool isLongWaiting() const;
     bool isEOFReached() const;
     bool isStillImage() const;
-    virtual void putData(QnAbstractDataPacketPtr data) override;
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
     QSize getMaxScreenSize() const;
     QnArchiveStreamReader* getArchiveReader() const;
     bool isFullScreen() const;

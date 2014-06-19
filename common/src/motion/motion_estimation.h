@@ -27,7 +27,7 @@ public:
     /*!
         \return true if successfully decoded and analyzed \a frame
     */
-    bool analizeFrame(QnCompressedVideoDataPtr frame);
+    bool analizeFrame(const QnCompressedVideoDataPtr& frame);
 #endif
     QnMetaDataV1Ptr getMotion();
     bool existsMetadata() const;

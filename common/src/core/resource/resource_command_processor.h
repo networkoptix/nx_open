@@ -28,7 +28,7 @@ public:
     QnResourceCommandProcessor();
     ~QnResourceCommandProcessor();
 
-    virtual void putData(QnAbstractDataPacketPtr data);
+    virtual void putData(const QnAbstractDataPacketPtr& data);
 
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);

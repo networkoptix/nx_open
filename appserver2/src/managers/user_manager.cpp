@@ -16,8 +16,8 @@ namespace ec2
     template<class QueryProcessorType>
     QnUserManager<QueryProcessorType>::QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
     :
-        m_queryProcessor( queryProcessor ),
-        m_resCtx(resCtx)
+        QnUserNotificationManager(resCtx),
+        m_queryProcessor( queryProcessor )
     {
     }
 

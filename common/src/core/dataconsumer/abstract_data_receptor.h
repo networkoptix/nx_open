@@ -24,7 +24,7 @@ public:
         \note Can ignore data for some reasons (e.g., some internal buffer size is exceeded). 
             Data provider should use \a canAcceptData method to find out whether it is possible
     */
-    virtual void putData( QnAbstractDataPacketPtr data ) = 0;
+    virtual void putData( const QnAbstractDataPacketPtr& data ) = 0;
 };
 
 #endif  //ABSTRACT_DATA_RECEPTOR_H

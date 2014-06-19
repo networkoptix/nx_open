@@ -46,7 +46,7 @@ signals:
     void slowSourceHint();
 
 protected:
-    virtual void putData(QnAbstractDataPacketPtr data);
+    virtual void putData(const QnAbstractDataPacketPtr& data);
     void beforeDisconnectFromResource();
 
 protected:

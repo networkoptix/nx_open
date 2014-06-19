@@ -261,7 +261,7 @@ bool QnLiveStreamProvider::needMetaData()
 
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10*1000;
 
-void QnLiveStreamProvider::onGotVideoFrame(QnCompressedVideoDataPtr videoData)
+void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& videoData)
 {
     m_framesSinceLastMetaData++;
 
@@ -407,6 +407,7 @@ void QnLiveStreamProvider::extractCodedPictureResolution( const QnCompressedVide
     switch( videoData->compressionType )
     {
         case CODEC_ID_H264:
+        case CODEC_ID_MPEG2VIDEO:
             if( videoData->width > 0 && videoData->height > 0 )
                 *newResolution = QSize( videoData->width, videoData->height );
             //TODO #ak it is very possible that videoData->width and videoData->height do not change when stream resolution changes and there is no SPS also
@@ -420,7 +421,6 @@ void QnLiveStreamProvider::extractCodedPictureResolution( const QnCompressedVide
             *newResolution = QSize( imgInfo.width, imgInfo.height );
             break;
         }
-
         default:
             if( videoData->width > 0 && videoData->height > 0 )
                 *newResolution = QSize( videoData->width, videoData->height );

@@ -17,7 +17,7 @@
 
 static const QLatin1String localhost( "127.0.0.1" );
 static const int DEFAULT_ISD_PORT = 80;
-static const int ISD_HTTP_REQUEST_TIMEOUT = 3000;
+static const int ISD_HTTP_REQUEST_TIMEOUT = 6000;
 static const int PRIMARY_ENCODER_NUMBER = 0;
 static const int SECONDARY_ENCODER_NUMBER = 1;
 
@@ -268,7 +268,6 @@ int MediaEncoder::getSupportedResolution() const
         return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_NETWORK_ERROR;
 
     const QStringList& vals = getValues( QLatin1String(reslst) );
-    int resIndex = 0;
     m_supportedResolutions.reserve( vals.size() );
     for( QStringList::const_iterator it = vals.begin(); it != vals.end(); ++it )
     {

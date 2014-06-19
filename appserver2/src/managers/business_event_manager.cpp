@@ -17,8 +17,8 @@ namespace ec2
 template<class QueryProcessorType>
 QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
 :
-    m_queryProcessor( queryProcessor ),
-    m_resCtx( resCtx )
+    QnBusinessEventNotificationManager( resCtx ),
+    m_queryProcessor( queryProcessor )
 {
 }
 
