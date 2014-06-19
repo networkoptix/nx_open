@@ -104,11 +104,15 @@ void QnAboutDialog::retranslateUi()
     }
 
     QStringList serverVersions;
+    QnSoftwareVersion clientVersion(QN_APPLICATION_VERSION);
     foreach (QnMediaServerResourcePtr server, qnResPool->getResources().filtered<QnMediaServerResource>()) {
         if (server->getStatus() != QnResource::Online)
             continue;
-
-        serverVersions.append(tr("<b>Media Server</b> version %2 at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
+        if( server->getVersion() < clientVersion ) {
+            serverVersions.append(tr("<b>Media Server</b> version <font color=\"red\">%2</font> at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
+        } else {
+            serverVersions.append(tr("<b>Media Server</b> version %2 at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
+        }
     }
     
     if (!ecsVersion.isNull() && !serverVersions.isEmpty())
