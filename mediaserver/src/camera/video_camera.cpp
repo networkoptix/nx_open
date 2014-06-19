@@ -33,7 +33,7 @@ public:
 
     // QnAbstractDataConsumer
     virtual bool canAcceptData() const;
-    virtual void putData(QnAbstractDataPacketPtr data);
+    virtual void putData(const QnAbstractDataPacketPtr& data);
     virtual bool processData(QnAbstractDataPacketPtr data);
 
     //QnMediaContextPtr getVideoCodecContext();
@@ -96,7 +96,7 @@ bool channelCheckFunctor(const QnAbstractDataPacketPtr& data, QVariant channelNu
     return media && media->channelNumber == ch;
 }
 
-void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr nonConstData)
+void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QMutexLocker lock(&m_queueMtx);
     if (QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(nonConstData))
@@ -120,7 +120,7 @@ void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr nonConstData)
         if (m_dataQueue.size() < m_dataQueue.maxSize()) {
             //TODO #ak MUST NOT modify video packet here! It can be used by other threads concurrently and flags value can be undefined in other threads
             nonConstData.staticCast<QnAbstractMediaData>()->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-            QnAbstractDataConsumer::putData(std::move(nonConstData));
+            QnAbstractDataConsumer::putData( nonConstData );
         }
     }
     else if (QnConstCompressedAudioDataPtr audio = qSharedPointerDynamicCast<const QnCompressedAudioData>(nonConstData))
@@ -281,7 +281,7 @@ void QnVideoCamera::at_camera_resourceChanged()
 {
 	QMutexLocker lock(&m_getReaderMutex);
 
-	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
+	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	if ( cameraResource )
 	{
 		if ( !cameraResource->hasDualStreaming2() && m_secondaryReader )
@@ -297,7 +297,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     const bool primaryLiveStream = catalog == QnServer::HiQualityCatalog;
     const QnResource::ConnectionRole role = primaryLiveStream ? QnResource::Role_LiveVideo : QnResource::Role_SecondaryLiveVideo;
 
-	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
+	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	
     QnLiveStreamProviderPtr &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
     if (reader == 0)
@@ -490,7 +490,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCata
             createReader(catalog);
         }
     }
-	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
+	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	if ( cameraResource && !cameraResource->hasDualStreaming2() && catalog == QnServer::LowQualityCatalog )
 	{
 		return QnLiveStreamProviderPtr();		

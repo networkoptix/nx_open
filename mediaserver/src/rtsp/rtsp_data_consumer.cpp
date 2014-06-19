@@ -168,7 +168,7 @@ qint64 QnRtspDataConsumer::dataQueueDuration()
     //return m_dataQueue.mediaLength();
 }
 
-void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr nonConstData)
+void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnConstAbstractDataPacketPtr data = nonConstData;
 

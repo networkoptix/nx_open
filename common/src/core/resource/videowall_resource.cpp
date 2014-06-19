@@ -26,7 +26,7 @@ QnResourceItemStorage<QnVideoWallMatrix> * QnVideoWallResource::matrices() const
 void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
     base_type::updateInner(other, modifiedFields);
 
-    QnVideoWallResourcePtr localOther = other.dynamicCast<QnVideoWallResource>();
+    QnVideoWallResource* localOther = dynamic_cast<QnVideoWallResource*>(other.data());
     if(localOther) {
         m_items->setItemsUnderLock(localOther->items());
         m_pcs->setItemsUnderLock(localOther->pcs());

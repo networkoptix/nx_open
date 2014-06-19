@@ -791,7 +791,7 @@ void QnResource::stopCommandProc()
     QnResourceCommandProcessor_instance()->stop();
 }
 
-void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
+void QnResource::addCommandToProc(const QnAbstractDataPacketPtr& data)
 {
     QnResourceCommandProcessor_instance()->putData(data);
 }

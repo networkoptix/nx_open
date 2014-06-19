@@ -261,7 +261,7 @@ bool QnLiveStreamProvider::needMetaData()
 
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10*1000;
 
-void QnLiveStreamProvider::onGotVideoFrame(QnCompressedVideoDataPtr videoData)
+void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& videoData)
 {
     m_framesSinceLastMetaData++;
 
