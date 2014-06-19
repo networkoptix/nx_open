@@ -226,6 +226,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 		qint64 localOffset = 0;
 		if(qnSettings->timeMode() == Qn::ServerTimeMode && parameters.isUtc)
 			localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
+		parameters.time += localOffset*1000;
 
     QnImageProvider* imageProvider = getLocalScreenshotProvider(parameters, display.data());
     if (!imageProvider)
@@ -238,11 +239,6 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         QString previousDir = qnSettings->lastScreenshotDir();
         if (previousDir.isEmpty())
             previousDir = qnSettings->mediaFolder();
-
-				QString timeStr = parameters.timeString();
-				parameters.time += localOffset*1000;
-				timeStr = parameters.timeString();
-
         QString suggestion = replaceNonFileNameCharacters(widget->resource()->toResource()->getName(), QLatin1Char('_'))
                 + QLatin1Char('_') + parameters.timeString();
         suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
