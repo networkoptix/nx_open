@@ -569,10 +569,11 @@ namespace nx_http
         //adding user credentials
         if( !m_userName.isEmpty() || !m_userPassword.isEmpty() )
         {
-            m_request.headers.erase( Header::Authorization::NAME );
-            m_request.headers.insert( std::make_pair(
-                Header::Authorization::NAME,
-                Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
+            nx_http::insertOrReplaceHeader(
+                &m_request.headers,
+                nx_http::HttpHeader(
+                    Header::Authorization::NAME,
+                    Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
         }
     }
 
@@ -760,8 +761,10 @@ namespace nx_http
 
         BufferType authorizationStr;
         digestAuthorizationHeader.serialize( &authorizationStr );
-        m_request.headers.erase( Header::Authorization::NAME );
-        m_request.headers.insert( make_pair(Header::Authorization::NAME, authorizationStr) );
+
+        nx_http::insertOrReplaceHeader(
+            &m_request.headers,
+            nx_http::HttpHeader( Header::Authorization::NAME, authorizationStr ) );
 
         m_authorizationTried = true;
         return initiateHttpMessageDelivery( m_url );

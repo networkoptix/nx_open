@@ -13,8 +13,10 @@
 #include "settings.h"
 
 
-QnServerMessageProcessor::QnServerMessageProcessor():
-        base_type()
+QnServerMessageProcessor::QnServerMessageProcessor()
+:
+    base_type(),
+    m_serverPort( MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT, nx_ms_conf::DEFAULT_RTSP_PORT).toInt() )
 {
 
 }
@@ -207,11 +209,12 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
 {
     if (addr == "localhost" || addr == "127.0.0.1")
         return true;
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
-    if (mServer) 
+    if( !m_mServer )
+        m_mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (m_mServer) 
     {
         QHostAddress hostAddr(addr);
-        foreach(const QHostAddress& serverAddr, mServer->getNetAddrList())
+        foreach(const QHostAddress& serverAddr, m_mServer->getNetAddrList())
         {
             if (hostAddr == serverAddr)
                 return true;
@@ -221,13 +224,13 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
 }
 
 bool QnServerMessageProcessor::isProxy(const QUrl& url) {
-    if (isKnownAddr(url.host()))
+    const QString& urlHost = url.host();
+    if (isKnownAddr(urlHost))
         return true; // it's camera or other media server address
     
     int port = url.port( nx_http::DEFAULT_HTTP_PORT );
     if (port > 0) {
-        const int serverPort = MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT, nx_ms_conf::DEFAULT_RTSP_PORT).toInt();
-        if (port != serverPort && isLocalAddress(url.host()))
+        if (port != m_serverPort && isLocalAddress(urlHost))
             return true; // proxy to some local service
     }
     

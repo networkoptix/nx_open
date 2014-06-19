@@ -239,33 +239,38 @@ bool QnSecurityCamResource::hasDualStreaming2() const {
     return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse;
 }
 
+static const QString HAS_DUAL_STREAMING_PARAM_NAME = lit("hasDualStreaming");
+static const QString DTS_PARAM_NAME = lit("dts");
+static const QString ANALOG_PARAM_NAME = lit("analog");
+static const QString STREAM_FPS_SHARING_PARAM_NAME = lit("streamFpsSharing");
+
 bool QnSecurityCamResource::hasDualStreaming() const {
     QVariant val;
-    if (!getParam(lit("hasDualStreaming"), val, QnDomainMemory))
+    if (!getParam(HAS_DUAL_STREAMING_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
 }
 
 bool QnSecurityCamResource::isDtsBased() const {
     QVariant val;
-    if (!getParam(lit("dts"), val, QnDomainMemory))
+    if (!getParam(DTS_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
 }
 
 bool QnSecurityCamResource::isAnalog() const {
     QVariant val;
-    if (!getParam(lit("analog"), val, QnDomainMemory))
+    if (!getParam(ANALOG_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
     QVariant val;
-    if (!getParam(lit("streamFpsSharing"), val, QnDomainMemory))
+    if (!getParam(STREAM_FPS_SHARING_PARAM_NAME, val, QnDomainMemory))
         return defaultStreamFpsSharingMethod;
 
-    QString sval = val.toString();
+    const QString& sval = val.toString();
     if (sval == lit("shareFps"))
         return Qn::BasicFpsSharing;
     if (sval == lit("noSharing"))
@@ -275,14 +280,18 @@ Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
 
 void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value) 
 {
-    QString strVal;
-    if (value == Qn::BasicFpsSharing)
-        strVal = lit("shareFps");
-    else if (value == Qn::NoFpsSharing)
-        strVal = lit("noSharing");
-    else
-        strVal = lit("sharePixels");
-    setParam(lit("streamFpsSharing"), strVal, QnDomainDatabase);
+    switch( value )
+    {
+        case Qn::BasicFpsSharing:
+            setParam(STREAM_FPS_SHARING_PARAM_NAME, lit("shareFps"), QnDomainDatabase);
+            break;
+        case Qn::NoFpsSharing:
+            setParam(STREAM_FPS_SHARING_PARAM_NAME, lit("noSharing"), QnDomainDatabase);
+            break;
+        default:
+            setParam(STREAM_FPS_SHARING_PARAM_NAME, lit("sharePixels"), QnDomainDatabase);
+            break;
+    }
 }
 
 QStringList QnSecurityCamResource::getRelayOutputList() const {

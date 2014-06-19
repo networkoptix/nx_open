@@ -313,7 +313,7 @@ namespace ec2
         ErrorCode addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
         ErrorCode removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
 
-        bool createDatabase();
+        bool createDatabase(bool *dbJustCreated);
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         

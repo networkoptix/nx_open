@@ -27,6 +27,7 @@
 #include <string.h>
 
 #include <QtCore/QFile>
+#include <utils/network/mac_address.h>
 
 
 DiscoveryManager::DiscoveryManager()
@@ -96,6 +97,7 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*loc
 #ifndef WIN32
     mac_eth0(mac, &host);
 #endif
+    QByteArray macStr = QnMacAddress((unsigned char*) mac).toString().toLatin1();
 
     if( m_modelName.isEmpty() )
     {
@@ -145,7 +147,7 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*loc
     const char* passwordToUse = "admin";
 
     memset( cameras, 0, sizeof(*cameras) );
-    strncpy( cameras->uid, mac, sizeof(cameras->uid)-1 );
+    strncpy( cameras->uid, macStr.constData(), macStr.length() );
     strncpy( cameras->modelName, m_modelName.constData(), sizeof(cameras->modelName)-1 );
     strncpy( cameras->firmware, m_firmwareVersion.constData(), sizeof(cameras->firmware)-1 );
     if (host)

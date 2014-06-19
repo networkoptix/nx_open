@@ -83,10 +83,7 @@ StreamReader::StreamReader(
     m_videoCodec(nxcip::CODEC_ID_NONE),
     m_lastVideoTime(0),
     m_lastMotionTime(0),
-    m_vmux(nullptr),
-    m_vmux_motion(0),
 #ifndef NO_ISD_AUDIO
-    m_amux(nullptr),
     m_audioEnabled(false),
     m_audioCodec(nxcip::CODEC_ID_NONE),
 #endif
@@ -207,7 +204,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
         ;
 
 #ifndef NO_ISD_AUDIO
-    if( !m_amux && (m_encoderNum == HIGH_QUALITY_ENCODER) && m_audioEnabled )
+    if( !m_amux.get() && (m_encoderNum == HIGH_QUALITY_ENCODER) && m_audioEnabled )
     {
         //audio is not required
         int result = initializeAMux();
@@ -219,7 +216,7 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     }
 #endif
 
-    if( !m_vmux )
+    if( !m_vmux.get() )
     {
         int result = initializeVMux();
         if( result != nxcip::NX_NO_ERROR )
@@ -229,13 +226,13 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
                 return nxcip::NX_IO_ERROR;
     }
 
-    //if( !m_vmux_motion && (m_encoderNum == ENCODER_STREAM_TO_ADD_MOTION_TO) )
+    //if( !m_vmuxMotion && (m_encoderNum == ENCODER_STREAM_TO_ADD_MOTION_TO) )
     //{
     //    int result = initializeVMuxMotion();
     //    if( result != nxcip::NX_NO_ERROR )
     //        return result;
-    //    //std::cout<<"Initialized motion. FD "<<m_vmux_motion->GetFD()<<std::endl;
-    //    //if( !registerFD( m_vmux_motion->GetFD() ) )
+    //    //std::cout<<"Initialized motion. FD "<<m_vmuxMotion->GetFD()<<std::endl;
+    //    //if( !registerFD( m_vmuxMotion->GetFD() ) )
     //    //    return nxcip::NX_IO_ERROR;
     //}
 
@@ -273,12 +270,18 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
 
             if( eventsArray[i].data.fd == m_vmux->GetFD() )
             {
-                return getVideoPacket( lpPacket );
+                const int result = getVideoPacket( lpPacket );
+                if( result == nxcip::NX_TRY_AGAIN )
+                    continue;   //trying again
+                return result;
             }
 #ifndef NO_ISD_AUDIO
             else if( eventsArray[i].data.fd == m_amux->GetFD() )
             {
-                return getAudioPacket( lpPacket );
+                const int result = getAudioPacket( lpPacket );
+                if( result == nxcip::NX_TRY_AGAIN )
+                    continue;   //trying again
+                return result;
             }
 #endif
             else
@@ -336,7 +339,7 @@ int StreamReader::initializeVMux()
 #endif
     m_currentTimestamp = 0;
 
-    m_vmux = vmux.release();
+    m_vmux = std::move(vmux);
 
     //std::cout<<"VMUX initialized. fd = "<<m_vmux->GetFD()<<"\n";
     //memset( &processStatus, 0, sizeof(processStatus) );
@@ -354,13 +357,15 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
 #endif
 
     vmux_frame_t frame;
+    memset( &frame, 0, sizeof(frame) );
     int rv = m_vmux->GetFrame (&frame);
     if (rv) {
-        std::cerr << "Can't read video frame" << std::endl;
+        std::cerr << "Can't read video frame. "<<rv<<", errno "<<errno<<std::endl;
+        if( errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN )
+            return nxcip::NX_TRY_AGAIN;
         if( m_epollFD != -1 )
             unregisterFD( m_vmux->GetFD() );
-        delete m_vmux;
-        m_vmux = 0;
+        m_vmux.reset();
         return nxcip::NX_IO_ERROR; // error
     }
 
@@ -389,6 +394,12 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
         0, // cseq
         m_videoCodec ));
     videoPacket->resizeBuffer( frame.frame_size );
+    if( !videoPacket->data() )
+    {
+        std::cerr<<"ISD plugin. Could not allocate "<<frame.frame_size<<" bytes for video frame"<<std::endl;
+        m_vmux.reset();
+        return nxcip::NX_IO_ERROR; // error
+    }
     memcpy(videoPacket->data(), frame.frame_addr, frame.frame_size);
 
 #ifdef DUMP_VIDEO_STREAM
@@ -415,7 +426,7 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
 
 void StreamReader::readMotion()
 {
-    if( !m_vmux_motion )
+    if( !m_vmuxMotion.get() )
     {
         int result = initializeVMuxMotion();
         if( result != nxcip::NX_NO_ERROR )
@@ -423,10 +434,9 @@ void StreamReader::readMotion()
     }
 
     vmux_frame_t frame;
-    int rv = m_vmux_motion->GetFrame (&frame);
+    int rv = m_vmuxMotion->GetFrame (&frame);
     if (rv) {
-        delete m_vmux_motion;
-        m_vmux_motion = nullptr; // close motion stream
+        m_vmuxMotion.reset();
         return;
     }
 
@@ -447,25 +457,23 @@ MotionDataPicture* StreamReader::getMotionData()
 
 int StreamReader::initializeVMuxMotion()
 {
-    m_vmux_motion = new Vmux();
+    std::unique_ptr<Vmux> newVmuxMotion( new Vmux() );
+
     int info_size = sizeof(motion_stream_info);
-    int rv = m_vmux_motion->GetStreamInfo (Y_STREAM_SMALL, &motion_stream_info, &info_size);
+    int rv = newVmuxMotion->GetStreamInfo (Y_STREAM_SMALL, &motion_stream_info, &info_size);
     if (rv) {
         std::cerr << "can't get stream info for motion stream" << std::endl;
-        delete m_vmux_motion;
-        m_vmux_motion = nullptr;
         return nxcip::NX_IO_ERROR; // error
     }
 
     //std::cout << "motion width=" << motion_stream_info.width << " height=" << motion_stream_info.height << " stride=" << motion_stream_info.pitch << std::endl;
 
-    rv = m_vmux_motion->StartVideo (Y_STREAM_SMALL);
+    rv = newVmuxMotion->StartVideo (Y_STREAM_SMALL);
     if (rv) {
-        delete m_vmux_motion;
-        m_vmux_motion = nullptr;
         return nxcip::NX_IO_ERROR; // error
     }
 
+    m_vmuxMotion = std::move( newVmuxMotion );
     return nxcip::NX_NO_ERROR;
 }
 
@@ -505,7 +513,7 @@ int StreamReader::initializeAMux()
 
     //std::cout<<"AMUX initialized. Codec type "<<m_audioCodec<<" fd = "<<amux->GetFD()<<"\n";
 
-    m_amux = amux.release();
+    m_amux = std::move(amux);
     return nxcip::NX_NO_ERROR;
 }
 
@@ -515,6 +523,7 @@ int StreamReader::getAudioPacket( nxcip::MediaDataPacket** lpPacket )
     if( audioBytesAvailable <= 0 )
     {
         std::cerr<<"ISD plugin: no audio bytes available\n";
+        m_amux.reset();
         return nxcip::NX_IO_ERROR;
     }
 
@@ -528,6 +537,7 @@ int StreamReader::getAudioPacket( nxcip::MediaDataPacket** lpPacket )
     if( bytesRead <= 0 )
     {
         std::cerr<<"ISD plugin: failed to read audio packet\n";
+        m_amux.reset();
         return nxcip::NX_IO_ERROR;
     }
 
@@ -542,7 +552,7 @@ int StreamReader::getAudioPacket( nxcip::MediaDataPacket** lpPacket )
     return nxcip::NX_NO_ERROR;
 }
 
-void StreamReader::fillAudioFormat( const ISDAudioPacket& audioPacket )
+void StreamReader::fillAudioFormat( const ISDAudioPacket& /*audioPacket*/ )
 {
     QMutexLocker lk( &m_mutex );
 
@@ -599,25 +609,22 @@ void StreamReader::closeAllStreams()
     }
 #endif
 
-    if( m_vmux )
+    if( m_vmux.get() )
     {
         unregisterFD( m_vmux->GetFD() );
-        delete m_vmux;
-        m_vmux = nullptr;
+        m_vmux.reset();
 #ifdef DEBUG_OUTPUT
         std::cout<<"ISD plugin: stopped video on encoder "<<m_encoderNum<<std::endl;
 #endif
     }
 
-    delete m_vmux_motion;
-    m_vmux_motion = nullptr;
+    m_vmuxMotion.reset();
 
 #ifndef NO_ISD_AUDIO
-    if( m_amux )
+    if( m_amux.get() )
     {
         unregisterFD( m_amux->GetFD() );
-        delete m_amux;
-        m_amux = nullptr;
+        m_amux.reset();
     }
 #endif
 }
