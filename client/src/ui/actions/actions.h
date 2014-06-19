@@ -192,9 +192,14 @@ namespace Qn {
         PushMyScreenToVideowallAction,
 
         /**
-         * Saves current videowall review layout.
+         * Saves videowall review layout.
          */
         SaveVideoWallReviewAction,
+
+        /**
+         * Saves current videowall review layout.
+         */
+        SaveCurrentVideoWallReviewAction,
 
         /**
          * Handles resources drop on the selected videowall item.
@@ -593,11 +598,6 @@ namespace Qn {
          * Opens camera list by media server
          */
         CameraListByServerAction,
-
-        /**
-         * Opens a YouTube upload dialog.
-         */
-        YouTubeUploadAction,
 
         /**
          * Opens a folder that contains the file resource.

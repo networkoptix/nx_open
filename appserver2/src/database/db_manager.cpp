@@ -13,6 +13,7 @@
 #include "business/business_fwd.h"
 #include "utils/common/synctime.h"
 #include "utils/serialization/json.h"
+#include "core/resource/user_resource.h"
 
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
@@ -28,6 +29,7 @@
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_help_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 using std::nullptr_t;
 
@@ -129,6 +131,7 @@ QnDbManager::QnDbManager(
     m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
     m_sdb.setDatabaseName( closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite"));
+    qDebug() << closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite");
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;
 }
@@ -141,7 +144,8 @@ bool QnDbManager::init()
         return false;
     }
 
-	if (!createDatabase())  { 
+    bool dbJustCreated = false;
+	if (!createDatabase(&dbJustCreated))  { 
         // create tables is DB is empty
 		qWarning() << "can't create tables for sqlLite database!";
         return false;
@@ -195,6 +199,33 @@ bool QnDbManager::init()
     if (QnTransactionLog::instance())
         QnTransactionLog::instance()->init();
 
+    
+    if (dbJustCreated) {
+        // Set admin user's password
+        ApiUserDataList users;
+        ErrorCode errCode = doQueryNoLock(nullptr, users);
+        if (errCode != ErrorCode::ok) {
+            return false;
+        }
+
+        if (users.empty()) {
+            return false;
+        }
+
+        QnUserResourcePtr userResource(new QnUserResource());
+        fromApiToResource(users[0], userResource);
+        userResource->setPassword(qnCommon->defaultAdminPassword());
+
+        QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser, true);
+        userTransaction.fillSequence();
+        fromResourceToApi(userResource, userTransaction.params);
+
+        executeTransactionInternal(userTransaction);
+        QByteArray serializedTran;
+        QnOutputBinaryStream<QByteArray> stream(&serializedTran);
+        QnBinary::serialize(userTransaction, &stream);
+        transactionLog->saveTransaction(userTransaction, serializedTran);
+    }
 
     QSqlQuery queryCameras(m_sdb);
     // Update cameras status
@@ -427,12 +458,16 @@ bool QnDbManager::migrateBusinessEvents()
     return true;
 }
 
-bool QnDbManager::createDatabase()
+bool QnDbManager::createDatabase(bool *dbJustCreated)
 {
     QnDbTransactionLocker lock(&m_tran);
 
+    *dbJustCreated = false;
+
     if (!isObjectExists(lit("table"), lit("vms_resource")))
     {
+        *dbJustCreated = true;
+
         if (!execSQLFile(lit(":/01_createdb.sql")))
             return false;
         if (!migrateBusinessEvents())
@@ -441,13 +476,13 @@ bool QnDbManager::createDatabase()
 
     if (!isObjectExists(lit("table"), lit("transaction_log")))
     {
-#ifdef EDGE_SERVER
-        if (!execSQLFile(lit(":/02_insert_3thparty_vendor.sql")))
-            return false;
-#else
+//#ifdef EDGE_SERVER
+//        if (!execSQLFile(lit(":/02_insert_3thparty_vendor.sql")))
+//            return false;
+//#else
         if (!execSQLFile(lit(":/02_insert_all_vendors.sql")))
             return false;
-#endif
+//#endif
 
         if (!execSQLFile(lit(":/03_update_2.2_stage1.sql")))
             return false;
@@ -1855,7 +1890,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     query.prepare(QString("SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
                           l.autorun \
                           FROM vms_videowall l \
-                          JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.id").arg(filter));
+                          JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.guid").arg(filter));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
@@ -1868,7 +1903,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
                        item.guid, item.pc_guid as pcGuid, item.layout_guid as layoutGuid, \
                        item.videowall_guid as videowallGuid, item.name, \
                        item.x as left, item.y as top, item.w as width, item.h as height \
-                       FROM vms_videowall_item item");
+                       FROM vms_videowall_item item ORDER BY videowallGuid");
     if (!queryItems.exec()) {
         qWarning() << Q_FUNC_INFO << queryItems.lastError().text();
         return ErrorCode::dbError;
@@ -1889,7 +1924,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
                          screen.layout_x as layoutLeft, screen.layout_y as layoutTop, \
                          screen.layout_w as layoutWidth, screen.layout_h as layoutHeight \
                          FROM vms_videowall_screen screen \
-                         JOIN vms_videowall_pcs pc on pc.pc_guid = screen.pc_guid");
+                         JOIN vms_videowall_pcs pc on pc.pc_guid = screen.pc_guid ORDER BY videowallGuid");
     if (!queryScreens.exec()) {
         qWarning() << Q_FUNC_INFO << queryScreens.lastError().text();
         return ErrorCode::dbError;
@@ -1903,8 +1938,11 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     queryMatrixItems.prepare("SELECT \
                              item.matrix_guid as matrixGuid, \
                              item.item_guid as itemGuid, \
-                             item.layout_guid as layoutGuid \
-                             FROM vms_videowall_matrix_items item");
+                             item.layout_guid as layoutGuid, \
+                             matrix.videowall_guid \
+                             FROM vms_videowall_matrix_items item \
+                             JOIN vms_videowall_matrix matrix ON matrix.guid = item.matrix_guid \
+                             ORDER BY matrix.videowall_guid");
     if (!queryMatrixItems.exec()) {
         qWarning() << Q_FUNC_INFO << queryMatrixItems.lastError().text();
         return ErrorCode::dbError;
@@ -1918,7 +1956,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
                           matrix.guid as id, \
                           matrix.name, \
                           matrix.videowall_guid as videowallGuid \
-                          FROM vms_videowall_matrix matrix");
+                          FROM vms_videowall_matrix matrix ORDER BY videowallGuid");
     if (!queryMatrices.exec()) {
         qWarning() << Q_FUNC_INFO << queryMatrices.lastError().text();
         return ErrorCode::dbError;

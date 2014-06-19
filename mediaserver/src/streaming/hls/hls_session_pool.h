@@ -97,6 +97,7 @@ namespace nx_hls
             const QString m_id;
         };
 
+        HLSSessionPool();
         virtual ~HLSSessionPool();
 
         //!Add new session

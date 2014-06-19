@@ -171,10 +171,13 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffe
     }
     //result->data.write(m_videoBuffer);
     size_t spsNaluStartOffset = (size_t)-1;
+    size_t spsNaluSize = 0;
     for (uint i = 0; i < m_chunks.size(); ++i)
     {
         if (m_chunks[i].nalStart)
         {
+            if( (spsNaluStartOffset != (size_t)-1) && (spsNaluSize == 0) )
+                spsNaluSize = result->data.size() - spsNaluStartOffset;
             result->data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
             if( (m_chunks[i].len > 0) && ((*((const char*)rtpBuffer + m_chunks[i].bufferOffset) & 0x1f) == nuSPS) )
                 spsNaluStartOffset = result->data.size();
@@ -184,7 +187,7 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffe
 
     if( (spsNaluStartOffset != (size_t)-1) )
         //decoding sps to detect stream resolution change
-        decodeSpsInfo( QByteArray::fromRawData( result->data.constData() + spsNaluStartOffset, result->data.size() - spsNaluStartOffset ) );
+        decodeSpsInfo( QByteArray::fromRawData( result->data.constData() + spsNaluStartOffset, spsNaluSize ) );
 
     if (m_timeHelper) {
         result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_frequency);

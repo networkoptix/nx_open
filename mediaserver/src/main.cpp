@@ -54,7 +54,7 @@
 #include <nx_ec/ec_api.h>
 #include <transaction/transaction_message_bus.h>
 
-#include <platform/core_platform_abstraction.h>
+#include <platform/platform_abstraction.h>
 
 #include <plugins/plugin_manager.h>
 #include <plugins/resources/acti/acti_resource_searcher.h>
@@ -129,7 +129,6 @@
 #include <utils/network/global_module_finder.h>
 #include <media_server/server_update_tool.h>
 
-
 #include <media_server/server_message_processor.h>
 #include <media_server/settings.h>
 #include <media_server/serverutil.h>
@@ -146,8 +145,8 @@
 #include "proxy/proxy_connection.h"
 #include "compatibility.h"
 #include "media_server/file_connection_processor.h"
+#include "streaming/hls/hls_session_pool.h"
 
-#define USE_SINGLE_STREAMING_PORT
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
 
@@ -656,29 +655,6 @@ void initAppServerConnection(const QSettings &settings)
     QnAppServerConnectionFactory::setBox(lit(QN_ARM_BOX));
 }
 
-void initAppServerEventConnection(const QSettings &settings, const QnMediaServerResourcePtr& mediaServer)
-{
-    QUrl appServerEventsUrl;
-
-    //TODO: #GDM #Common move to server_message_processor as in client or remove if it is not needed anymore
-    // ### remove
-   /* appServerEventsUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
-    appServerEventsUrl.setHost(settings.value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString());
-    appServerEventsUrl.setPort(settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt());
-    appServerEventsUrl.setUserName(settings.value("appserverLogin").toString());
-    appServerEventsUrl.setPassword(settings.value("appserverPassword").toString());
-    appServerEventsUrl.setPath("/events/");
-    QUrlQuery appServerEventsUrlQuery;
-    appServerEventsUrlQuery.addQueryItem("xid", mediaServer->getId().toString());
-    appServerEventsUrlQuery.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
-    appServerEventsUrlQuery.addQueryItem("version", qnCommon->engineVersion().toString());
-    appServerEventsUrlQuery.addQueryItem("format", "pb");
-    appServerEventsUrl.setQuery( appServerEventsUrlQuery );*/
-
-    //QnServerMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
-}
-
-
 QnMain::QnMain(int argc, char* argv[])
     : m_argc(argc),
     m_argv(argv),
@@ -956,7 +932,7 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
-    if (moduleInformation.version == qnCommon->engineVersion() && moduleInformation.systemName == qnCommon->localSystemName()) {
+    if (isCompatible(moduleInformation.version, qnCommon->engineVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
         int port = moduleInformation.parameters.value("port").toInt();
         QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(port);
         ec2Connection->addRemotePeer(url, moduleInformation.id);
@@ -976,8 +952,7 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
 
 void QnMain::initTcpListener()
 {
-    int rtspPort = MSSettings::roSettings()->value("rtspPort", MSSettings::DEFAUT_RTSP_PORT).toInt();
-#ifdef USE_SINGLE_STREAMING_PORT
+    const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT, nx_ms_conf::DEFAULT_RTSP_PORT).toInt();
     QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageStatus", new QnStorageStatusRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/storageSpace", new QnStorageSpaceRestHandler());
@@ -1012,7 +987,7 @@ void QnMain::initTcpListener()
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
-    m_universalTcpListener->addHandler<QnFileConnectionProcessor>("HTTP", "web/static");
+    m_universalTcpListener->addHandler<QnFileConnectionProcessor>("HTTP", "static");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
     m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
     //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
@@ -1029,20 +1004,6 @@ void QnMain::initTcpListener()
 #endif   //ENABLE_DESKTOP_CAMERA
 
     m_universalTcpListener->start();
-
-#else
-    int apiPort = MSSettings::roSettings()->value("apiPort", DEFAULT_REST_PORT).toInt();
-    int streamingPort = MSSettings::roSettings()->value("streamingPort", DEFAULT_STREAMING_PORT).toInt();
-
-    m_restServer = new QnRestServer(QHostAddress::Any, apiPort);
-    m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, streamingPort);
-    m_progressiveDownloadingServer->start();
-    m_progressiveDownloadingServer->enableSSLMode();
-    m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
-    m_restServer->start();
-    m_progressiveDownloadingServer->start();
-    m_rtspListener->start();
-#endif
 }
 
 QHostAddress QnMain::getPublicAddress()
@@ -1111,7 +1072,7 @@ void QnMain::run()
 
 #ifdef ENABLE_ONVIF
     //starting soap server to accept event notifications from onvif servers
-    QnSoapServer::initStaticInstance( new QnSoapServer(8083) ); //TODO/IMPL get port from settings or use any unused port?
+    QnSoapServer::initStaticInstance( new QnSoapServer(MSSettings::roSettings()->value(nx_ms_conf::SOAP_PORT, nx_ms_conf::DEFAULT_SOAP_PORT).toInt()) );
     QnSoapServer::instance()->start();
 #endif //ENABLE_ONVIF
 
@@ -1145,6 +1106,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::init( mserverResourceDiscoveryManager.get() );
     initAppServerConnection(*settings);
 
+    qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("123")).toString());
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
     QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool());
@@ -1233,6 +1195,8 @@ void QnMain::run()
 
     if( QnAppServerConnectionFactory::defaultUrl().scheme().toLower() == lit("file") )
         ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
+
+    nx_hls::HLSSessionPool hlsSessionPool;
 
     initTcpListener();
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(messageProcessor.data(), QnServerMessageProcessor::isProxy);
@@ -1353,8 +1317,6 @@ void QnMain::run()
 
     qnStorageMan->doMigrateCSVCatalog();
 
-    initAppServerEventConnection(*MSSettings::roSettings(), m_mediaServer);
-    
     QnRecordingManager::initStaticInstance( new QnRecordingManager() );
     QnRecordingManager::instance()->start();
     qnResPool->addResource(m_mediaServer);
@@ -1612,7 +1574,7 @@ public:
 
 protected:
     virtual int executeApplication() override { 
-        QScopedPointer<QnCorePlatformAbstraction> platform(new QnCorePlatformAbstraction());
+        QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
         QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
         QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule(m_argc, m_argv));
         
@@ -1674,13 +1636,12 @@ void stopServer(int signal)
 }
 
 static void printVersion();
-static void printHelp();
 
 
 int main(int argc, char* argv[])
 {
 
-#if __arm__
+#if 0
 #if defined(__GNUC__)
 # if defined(__i386__)
         /* Enable Alignment Checking on x86 */
@@ -1705,15 +1666,29 @@ int main(int argc, char* argv[])
     QString engineVersion;
 
     QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, QString());
-    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--msg-log-level", NULL, QString(), "none");
-    commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, QString(), "all");
+    commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL, 
+        "Supported values: none (no logging), ALWAYS, ERROR, WARNING, INFO, DEBUG, DEBUG2. Default value is "
+#ifdef _DEBUG
+            "DEBUG"
+#else
+            "INFO"
+#endif
+            );
+    commandLineParser.addParameter(&cmdLineArguments.msgLogLevel, "--msg-log-level", NULL,
+        "Log value for msg_log.log. Supported values same as above. Default is none (no logging)", "none");
+    commandLineParser.addParameter(&cmdLineArguments.rebuildArchive, "--rebuild", NULL, 
+        lit("Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)"), "all");
     //commandLineParser.addParameter(&cmdLineArguments.devModeKey, "--dev-mode-key", NULL, QString());
-    commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, QString());
-    commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, QString());
-    commandLineParser.addParameter(&showVersion, "--version", NULL, QString(), true);
-    commandLineParser.addParameter(&showHelp, "--help", NULL, QString(), true);
-    commandLineParser.addParameter(&engineVersion, "--override-version", NULL, QString());
+    commandLineParser.addParameter(&configFilePath, "--conf-file", NULL, 
+        "Path to config file. By default "+MSSettings::defaultROSettingsFilePath());
+    commandLineParser.addParameter(&rwConfigFilePath, "--runtime-conf-file", NULL, 
+        "Path to config file which is used to save some. By default "+MSSettings::defaultRunTimeSettingsFilePath() );
+    commandLineParser.addParameter(&showVersion, "--version", NULL,
+        lit("Print version info and exit"), true);
+    commandLineParser.addParameter(&showHelp, "--help", NULL,
+        lit("This help message"), true);
+    commandLineParser.addParameter(&engineVersion, "--override-version", NULL,
+        lit("Force the other engine version"), QString());
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::PreserveParsedParameters);
 
     if( showVersion )
@@ -1724,7 +1699,8 @@ int main(int argc, char* argv[])
 
     if( showHelp )
     {
-        printHelp();
+        QTextStream stream(stdout);
+        commandLineParser.print(stream);
         return 0;
     }
 
@@ -1749,26 +1725,4 @@ int main(int argc, char* argv[])
 static void printVersion()
 {
     std::cout << "  " << QN_APPLICATION_NAME << " v." << QCoreApplication::applicationVersion().toUtf8().data() << std::endl;
-}
-
-// TODO: #Elric we have QnCommandLineParser::print for that.
-static void printHelp()
-{
-    printVersion();
-
-    std::cout<<"\n"
-        "  --help                   This help message\n"
-        "  --version                Print version info and exit\n"
-        "  -e                       Start as console application\n"
-        "  --log-level              Supported values: none (no logging), ALWAYS, ERROR, WARNING, INFO, DEBUG, DEBUG2. Default value is "
-#ifdef _DEBUG
-            "DEBUG\n"
-#else
-            "INFO\n"
-#endif
-        "  --msg-log-level          Log value for http_log.log. Supported values same as above. Default is none (no logging)\n"
-        "  --rebuild                Rebuild archive index. Supported values: all (high & low quality), hq (only high), lq (only low)\n"
-        "  --conf-file              Path to config file. By default "<<MSSettings::defaultROSettingsFilePath().toStdString()<<"\n"
-        "  --runtime-conf-file      Path to config file which is used to save some. By default "<<MSSettings::defaultRunTimeSettingsFilePath().toStdString()<<"\n"
-        ;
 }

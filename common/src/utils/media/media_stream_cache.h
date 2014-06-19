@@ -5,6 +5,7 @@
 #ifndef MEDIASTREAMCACHE_H
 #define MEDIASTREAMCACHE_H
 
+#include <deque>
 #include <map>
 #include <set>
 #include <vector>
@@ -113,12 +114,37 @@ public:
     //!Removed blocking \a blockingID
     void unblockData( int blockingID );
 
+    struct MediaPacketContext
+    {
+        quint64 timestamp;
+        QnAbstractDataPacketPtr packet;
+        bool isKeyFrame;
+
+        MediaPacketContext() 
+        :
+            timestamp( 0 ),
+            isKeyFrame( false )
+        {
+        }
+
+        MediaPacketContext(
+            quint64 _timestamp,
+            QnAbstractDataPacketPtr _packet,
+            bool _isKeyFrame )
+        :
+            timestamp( _timestamp ),
+            packet( _packet ),
+            isKeyFrame( _isKeyFrame )
+        {
+        }
+    };
+
 private:
     //!map<timestamp, pair<packet, key_flag> >
-    typedef std::map<quint64, std::pair<QnAbstractDataPacketPtr, bool> > PacketCotainerType;
+    typedef std::deque<MediaPacketContext> PacketContainerType;
 
     unsigned int m_cacheSizeMillis;
-    PacketCotainerType m_packetsByTimestamp;
+    PacketContainerType m_packetsByTimestamp;
     mutable QMutex m_mutex;
     qint64 m_prevPacketSrcTimestamp;
     //!In micros

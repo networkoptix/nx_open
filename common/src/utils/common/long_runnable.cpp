@@ -103,6 +103,12 @@ void QnLongRunnablePool::waitAll() {
 }
 
 
+//!Thread stack size reduced (from default 8MB on linux) to save memory on edge devices. If this is not enough consider using heap
+/*!
+    This value is not platform-dependent to be able to catch stack overflow error on every platform
+*/
+static const size_t DEFAULT_THREAD_STACK_SIZE = 128*1024;
+
 // -------------------------------------------------------------------------- //
 // QnLongRunnable
 // -------------------------------------------------------------------------- //
@@ -122,6 +128,8 @@ QnLongRunnable::QnLongRunnable():
 
     connect(this, SIGNAL(started()),    this, SLOT(at_started()), Qt::DirectConnection);
     connect(this, SIGNAL(finished()),   this, SLOT(at_finished()), Qt::DirectConnection);
+
+    setStackSize( DEFAULT_THREAD_STACK_SIZE );
 }
 
 QnLongRunnable::~QnLongRunnable() {

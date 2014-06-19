@@ -1,7 +1,7 @@
 #!/bin/bash
 
 COMPANY_NAME=${deb.customization.company.name}
-DISTRIB=$COMPANY_NAME-mediaserver-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta
+DISTRIB=$COMPANY_NAME-mediaserver-${release.version}.${buildNumber}-${box}-${build.configuration}-beta
 
 function update () {
     /etc/init.d/S99$COMPANY_NAME-mediaserver stop

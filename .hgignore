@@ -1,4 +1,6 @@
 syntax: glob
+ecs.db-shm
+ecs.db-wal
 *.cache
 *make.cache
 *-build*
@@ -291,3 +293,8 @@ edge_firmware/isd/*.tar.gz
 android-client/android-main/AndroidManifest.xml
 android-client/android-main/res/**
 
+webadmin/node_modules
+webadmin/dist
+webadmin/.tmp
+webadmin/.sass-cache
+app/bower_components

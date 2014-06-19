@@ -135,7 +135,7 @@ rm -Rf $BUILD_DIR
 
 mkdir -p zip
 mv $PACKAGE_NAME ./zip
-mv update ./zip
+mv update.* ./zip
 mv install.sh ./zip
 cd zip
 zip ./$PACKAGE.zip ./*

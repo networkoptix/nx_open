@@ -15,6 +15,7 @@
 
 class QPainter;
 class QnResourceDisplay;
+class QnProgressDialog;
 
 struct QnScreenshotParameters {
     qint64 time;    //in microseconds since epoch
@@ -63,9 +64,21 @@ public:
 
 private:
     QnImageProvider* getLocalScreenshotProvider(QnScreenshotParameters &parameters, QnResourceDisplay* display);
+
 private slots:
     void at_takeScreenshotAction_triggered();
     void at_imageLoaded(const QImage &image);
+
+    void showProgressDelayed(const QString &message);
+    void showProgress();
+    void hideProgressDelayed();
+    void hideProgress();
+    void cancelLoading();
+
+private:
+    QnProgressDialog *m_screenshotProgressDialog;
+    quint64 m_progressShowTime;
+    bool m_canceled;
 };
 
 

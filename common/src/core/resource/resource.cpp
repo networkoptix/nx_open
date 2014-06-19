@@ -91,7 +91,7 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& /*modifiedFields*/)
 {
     Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
@@ -132,6 +132,11 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         {
             setParam(param.name(), param.value(), QnDomainDatabase);
         }
+    }
+
+    //silently ignoring missing properties because of removeProperty method lack
+    for (const QnKvPair &param: other->getProperties()) {
+        setProperty(param.name(), param.value());   //here "propertyChanged" will be called
     }
 
     foreach (QnResourceConsumer *consumer, m_consumers)

@@ -24,6 +24,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -375,6 +376,7 @@ Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutIte
 
 Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &resources) {
     QnLayoutResourcePtr layout;
+    QnVideoWallResourcePtr videowall;
 
     if(m_current) {
         layout = workbench()->currentLayout()->resource();
@@ -386,6 +388,9 @@ Qn::ActionVisibility QnSaveLayoutActionCondition::check(const QnResourceList &re
     }
 
     if(!layout)
+        return Qn::InvisibleAction;
+
+    if (layout->data().contains(Qn::VideoWallResourceRole))
         return Qn::InvisibleAction;
 
     if(snapshotManager()->isSaveable(layout)) {
@@ -860,7 +865,6 @@ Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resource
     return Qn::EnabledAction;
 }
 
-
 Qn::ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList &resources) {
     bool found = false;
     foreach (const QnResourcePtr &resource, resources) {
@@ -872,4 +876,10 @@ Qn::ActionVisibility QnResourceStatusActionCondition::check(const QnResourceList
         }
     }
     return found ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParameters &parameters) {
+    if(!context()->instance<QnWorkbenchAutoStarter>()->isSupported())
+        return Qn::InvisibleAction;
+    return Qn::EnabledAction;
 }

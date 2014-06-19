@@ -23,8 +23,8 @@ static QMutex cacheMutex;
 
 struct HttpContentTypes
 {
-    char* fileExt;
-    char* contentType;
+    const char* fileExt;
+    const char* contentType;
 };
 
 static HttpContentTypes contentTypes[] =
@@ -36,7 +36,9 @@ static HttpContentTypes contentTypes[] =
     { "json", "application/json"},
     { "png",  "image/png"},
     { "jpeg", "image/jpeg"},
-    { "jpg",  "image/jpeg"}
+    { "jpg",  "image/jpeg"},
+    { "xml",  "application/xml" },
+    { "xsl",  "applicaton/xslt+xml" }
 };
 
 
@@ -78,7 +80,7 @@ void QnFileConnectionProcessor::run()
     QByteArray contentType = "application/xml";
     QByteArray contentEncoding;
     
-    QString fileName = getDataDirectory() + path;
+    QString fileName = getDataDirectory() + "/web/" + path;
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly))
     {
@@ -96,7 +98,7 @@ void QnFileConnectionProcessor::run()
             rez = CODE_NOT_MODIFIED;
     }
 
-    if (rez = CODE_OK)
+    if (rez == CODE_OK)
     {
         QMutexLocker lock(&cacheMutex);
 
