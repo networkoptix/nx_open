@@ -144,7 +144,7 @@ void QnAbstractArchiveReader::run()
             m_stat[videoData->channelNumber].onData(videoData->data.size());
 
 
-        putData(data);
+        putData(std::move(data));
     }
 
     afterRun();

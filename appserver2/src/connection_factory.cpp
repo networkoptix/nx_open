@@ -34,7 +34,7 @@ namespace ec2
         qRegisterMetaType<ErrorCode>( "ErrorCode" );
         qRegisterMetaType<AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
         qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" ); // TODO: #Elric #EC2 register in a proper place!
-        qRegisterMetaType<TransactionTransportHeader>( "TransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
+        qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiPeerAliveData>( "ApiPeerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); // TODO: #Elric #EC2 register in a proper place!
 
@@ -93,7 +93,7 @@ namespace ec2
 
 
         //AbstractMediaServerManager::getServers
-        registerGetFuncHandler<std::nullptr_t, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServerList );
+        registerGetFuncHandler<std::nullptr_t, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServers );
         //AbstractMediaServerManager::save
         registerUpdateFuncHandler<ApiMediaServerData>( restProcessorPool, ApiCommand::saveMediaServer );
         //AbstractMediaServerManager::remove
@@ -108,8 +108,8 @@ namespace ec2
         registerGetFuncHandler<QnId, ApiCameraDataList>( restProcessorPool, ApiCommand::getCameras );
         //AbstractCameraManager::addCameraHistoryItem
         registerUpdateFuncHandler<ApiCameraServerItemData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
-        //AbstractCameraManager::getCameraHistoryList
-        registerGetFuncHandler<std::nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryList );
+        //AbstractCameraManager::getCameraHistoryItems
+        registerGetFuncHandler<std::nullptr_t, ApiCameraServerItemDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
         //AbstractCameraManager::getBookmarkTags
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
 
@@ -121,7 +121,7 @@ namespace ec2
 
 
         //AbstractBusinessEventManager::getBusinessRules
-        registerGetFuncHandler<std::nullptr_t, ApiBusinessRuleDataList>( restProcessorPool, ApiCommand::getBusinessRuleList );
+        registerGetFuncHandler<std::nullptr_t, ApiBusinessRuleDataList>( restProcessorPool, ApiCommand::getBusinessRules );
         //AbstractBusinessEventManager::save
         registerUpdateFuncHandler<ApiBusinessRuleData>( restProcessorPool, ApiCommand::saveBusinessRule );
         //AbstractBusinessEventManager::deleteRule
@@ -136,14 +136,14 @@ namespace ec2
 
 
         //AbstractUserManager::getUsers
-        registerGetFuncHandler<std::nullptr_t, ApiUserDataList>( restProcessorPool, ApiCommand::getUserList );
+        registerGetFuncHandler<std::nullptr_t, ApiUserDataList>( restProcessorPool, ApiCommand::getUsers );
         //AbstractUserManager::save
         registerUpdateFuncHandler<ApiUserData>( restProcessorPool, ApiCommand::saveUser );
         //AbstractUserManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeUser );
 
         //AbstractVideowallManager::getVideowalls
-        registerGetFuncHandler<std::nullptr_t, ApiVideowallDataList>( restProcessorPool, ApiCommand::getVideowallList );
+        registerGetFuncHandler<std::nullptr_t, ApiVideowallDataList>( restProcessorPool, ApiCommand::getVideowalls );
         //AbstractVideowallManager::save
         registerUpdateFuncHandler<ApiVideowallData>( restProcessorPool, ApiCommand::saveVideowall );
         //AbstractVideowallManager::remove
@@ -151,7 +151,7 @@ namespace ec2
         registerUpdateFuncHandler<ApiVideowallControlMessageData>( restProcessorPool, ApiCommand::videowallControl );
 
         //AbstractLayoutManager::getLayouts
-        registerGetFuncHandler<std::nullptr_t, ApiLayoutDataList>( restProcessorPool, ApiCommand::getLayoutList );
+        registerGetFuncHandler<std::nullptr_t, ApiLayoutDataList>( restProcessorPool, ApiCommand::getLayouts );
         //AbstractLayoutManager::save
         registerUpdateFuncHandler<ApiLayoutDataList>( restProcessorPool, ApiCommand::saveLayouts );
         //AbstractLayoutManager::remove
@@ -203,7 +203,7 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, qint64>( restProcessorPool, ApiCommand::getCurrentTime );
 
 
-        registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getAllDataList );
+        registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );
         registerGetFuncHandler<std::nullptr_t, ApiLicenseDataList>( restProcessorPool, ApiCommand::getLicenses );
 
         //AbstractECConnectionFactory

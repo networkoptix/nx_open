@@ -28,7 +28,7 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
 
     QnAbstractBusinessActionPtr action;
     ec2::ApiBusinessActionData apiData;
-    QnInputBinaryStream<QByteArray> stream(body);
+    QnInputBinaryStream<QByteArray> stream(&body);
     if (QnBinary::deserialize(&stream, &apiData))
         fromApiToResource(apiData, action, qnResPool);
     

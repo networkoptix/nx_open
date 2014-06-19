@@ -43,8 +43,8 @@ private:
 private:
     void updateResourceStatusAsync(const QnResourcePtr &resource);
     bool isSetStatusInProgress(const QnResourcePtr &resource);
-    void addNewCamera(QnVirtualCameraResourcePtr cameraResource);
-    void addNewCameraInternal(QnVirtualCameraResourcePtr cameraResource);
+    void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
+    void addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource);
 private slots:
     void at_resource_statusChanged(const QnResourcePtr& resource);
     //void requestFinished(const QnHTTPRawResponse& response, int handle);

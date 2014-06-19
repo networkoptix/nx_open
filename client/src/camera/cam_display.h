@@ -48,7 +48,7 @@ public:
     void addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bool canDownscale);
     void removeVideoRenderer(QnAbstractRenderer* vw);
 
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     virtual void pleaseStop() override;
 
@@ -92,7 +92,7 @@ public:
     bool isLongWaiting() const;
     bool isEOFReached() const;
     bool isStillImage() const;
-    virtual void putData(QnAbstractDataPacketPtr data) override;
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
     QSize getMaxScreenSize() const;
     QnArchiveStreamReader* getArchiveReader() const;
     bool isFullScreen() const;

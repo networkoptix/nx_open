@@ -16,8 +16,8 @@ namespace ec2
     template<class T>
     QnResourceManager<T>::QnResourceManager( T* const queryProcessor, const ResourceContext& resCtx)
     :
-        m_queryProcessor( queryProcessor ),
-        m_resCtx( resCtx )
+        QnResourceNotificationManager( resCtx ),
+        m_queryProcessor( queryProcessor )
     {
     }
 

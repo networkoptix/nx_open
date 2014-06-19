@@ -209,6 +209,6 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     return ErrorCode::ok;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTranStateKey,    (binary),   (peerID)(dbID))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTranStateKey,    (binary)(json),   (peerID)(dbID))
 
 } // namespace ec2

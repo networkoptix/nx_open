@@ -17,6 +17,8 @@
 #include <api/model/servers_reply.h>
 #include <api/model/kvpair.h>
 #include <api/model/connection_info.h>
+#include <api/model/time_reply.h>
+#include <api/model/rebuild_archive_reply.h>
 
 #include <recording/time_period_list.h>
 

@@ -31,10 +31,10 @@ public:
     QString getApiUrl() const;
 
     void setStreamingUrl(const QString& value);
-    QString getStreamingUrl() const;
+    const QString& getStreamingUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
-    QList<QHostAddress> getNetAddrList();
+    const QList<QHostAddress>& getNetAddrList() const;
 
     void setAdditionalUrls(const QList<QUrl> &urls);
     QList<QUrl> getAdditionalUrls() const;

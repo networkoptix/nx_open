@@ -5,7 +5,7 @@
 #include <QtCore/QString>
 
 #include <utils/serialization/json.h>
-#include <utils/serialization/enum_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 // TODO: #MSAPI rename to QnRestResult.
 // 

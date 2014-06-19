@@ -291,7 +291,7 @@ public:
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(QnAbstractDataPacketPtr data);
+    static void addCommandToProc(const QnAbstractDataPacketPtr& data);
     static int commandProcQueueSize();
 
     void update(QnResourcePtr other, bool silenceMode = false);

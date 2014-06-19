@@ -116,12 +116,6 @@ namespace ec2
             m_runningHttpRequests[httpClient] = std::function<void()>( func );
         }
 
-        template<class T> bool processIncomingTransaction( const QnTransaction<T>&, const QByteArray&   )
-        {
-            // nothing to do for a while
-            return true;
-        }
-
     public slots:
         void onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
         {
@@ -160,7 +154,7 @@ namespace ec2
             }
 
             const QByteArray& msgBody = httpClient->fetchMessageBodyBuffer();
-            QnInputBinaryStream<QByteArray> inputStream( msgBody );
+            QnInputBinaryStream<QByteArray> inputStream( &msgBody );
             OutputData outputData;
             if( !QnBinary::deserialize( &inputStream, &outputData ) )
                 handler( ErrorCode::badResponse, outputData );

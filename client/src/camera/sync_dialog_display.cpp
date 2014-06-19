@@ -61,7 +61,7 @@ void QnSignDialogDisplay::finilizeSign()
     emit gotSignature(calculatedSign, signFromPicture);
 }
 
-bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
+bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
     QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (data->dataProvider);
     if (reader)

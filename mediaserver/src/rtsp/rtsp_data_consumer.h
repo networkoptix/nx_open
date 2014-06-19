@@ -33,7 +33,7 @@ public:
 
     void setLastSendTime(qint64 time);
     void setWaitCSeq(qint64 newTime, int sceq);
-    virtual void putData(QnAbstractDataPacketPtr data);
+    virtual void putData(const QnAbstractDataPacketPtr& data);
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
     int copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime, quint32 cseq);
@@ -62,7 +62,7 @@ public:
     void setAllowAdaptiveStreaming(bool value);
 protected:
     //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     void createDataPacketTCP(QnByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel);
 

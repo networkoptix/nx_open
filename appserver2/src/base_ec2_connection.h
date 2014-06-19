@@ -8,10 +8,13 @@
 
 #include <memory>
 
-#include "nx_ec/ec_api.h"
 #include "core/resource_management/resource_pool.h"
+#include "ec_connection_notification_manager.h"
 #include "nx_ec/data/api_media_server_data.h"
-#include "transaction/transaction.h"
+#include "nx_ec/data/api_full_info_data.h"
+#include "nx_ec/data/api_videowall_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
+
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"
 #include "managers/layout_manager.h"
@@ -25,13 +28,11 @@
 #include "managers/misc_manager.h"
 #include "managers/discovery_manager.h"
 
-#include "nx_ec/data/api_full_info_data.h"
-#include "nx_ec/data/api_videowall_data.h"
-#include "nx_ec/data/api_conversion_functions.h"
-
 
 namespace ec2
 {
+    class ECConnectionNotificationManager;
+
     template<class QueryProcessorType>
     class BaseEc2Connection
     :
@@ -64,193 +65,10 @@ namespace ec2
 
         virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
-    public:
-
-        template<class T> bool processIncomingTransaction( const QnTransaction<T>& tran, const QByteArray& serializedTran) {
-            if (!m_queryProcessor->processIncomingTransaction(tran, serializedTran))
-                return false;
-            triggerNotification(tran);
-            return true;
-        }
-
-        void triggerNotification( const QnTransaction<ApiLicenseDataList>& tran ) {
-            m_licenseManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiLicenseData>& tran ) {
-            m_licenseManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiResetBusinessRuleData>& tran ) {
-            m_businessEventManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiCameraData>& tran ) {
-            m_cameraManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiCameraDataList>& tran ) {
-            m_cameraManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran ) {
-            m_businessEventManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiVideowallData>& tran ) {
-            m_videowallManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiIdData>& tran ) {
-            switch( tran.command )
-            {
-            case ApiCommand::removeResource:
-                return m_resourceManager->triggerNotification( tran );
-            case ApiCommand::removeCamera:
-                return m_cameraManager->triggerNotification( tran );
-            case ApiCommand::removeMediaServer:
-                return m_mediaServerManager->triggerNotification( tran );
-            case ApiCommand::removeUser:
-                return m_userManager->triggerNotification( tran );
-            case ApiCommand::removeBusinessRule:
-                return m_businessEventManager->triggerNotification( tran );
-            case ApiCommand::removeLayout:
-                return m_layoutManager->triggerNotification( tran );
-            case ApiCommand::removeVideowall:
-                return m_videowallManager->triggerNotification( tran );
-            default:
-                assert( false );
-            }
-        }
-
-        void triggerNotification( const QnTransaction<ApiMediaServerData>& tran ) {
-            m_mediaServerManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiResourceData>& tran ) {
-            m_resourceManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiSetResourceStatusData>& tran ) {
-            m_resourceManager->triggerNotification( tran );
-        }
-
-        /*
-        void triggerNotification( const QnTransaction<ApiSetResourceDisabledData>& tran ) {
-            m_resourceManager->triggerNotification( tran );
-        }
-        */
-
-        void triggerNotification( const QnTransaction<ApiResourceParamsData>& tran ) {
-            m_resourceManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiCameraServerItemData>& tran ) {
-            return m_cameraManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiUserData>& tran ) {
-            return m_userManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiBusinessRuleData>& tran ) {
-            return m_businessEventManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiLayoutData>& tran ) {
-            return m_layoutManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran ) {
-            return m_layoutManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiStoredFileData>& tran ) {
-            return m_storedFileManager->triggerNotification( tran );
-        }
-
-        void triggerNotification( const QnTransaction<ApiFullInfoData>& tran ) {
-            QnFullResourceData fullResData;
-            fromApiToResourceList(tran.params, fullResData, m_resCtx);
-            emit initNotification(fullResData);
-            m_miscManager->triggerNotification(tran.params.foundModules);
-            m_discoveryManager->triggerNotification(tran.params.discoveryData);
-        }
-
-        void triggerNotification( const QnTransaction<ApiPanicModeData>& tran ) {
-            emit panicModeChanged(tran.params.mode);
-        }
-
-        void triggerNotification( const QnTransaction<QString>& tran ) {
-            switch (tran.command) {
-            case ApiCommand::removeStoredFile:
-                m_storedFileManager->triggerNotification(tran);
-                break;
-            case ApiCommand::installUpdate:
-                m_updatesManager->triggerNotification(tran);
-                break;
-            case ApiCommand::changeSystemName:
-                m_miscManager->triggerNotification(tran);
-            default:
-                assert(false); // we should never get here
-            }
-        }
-
-        void triggerNotification( const QnTransaction<ApiResourceParamDataList>& tran ) {
-            if( tran.command == ApiCommand::saveSettings ) {
-                QnKvPairList newSettings;
-                fromApiToResourceList(tran.params, newSettings);
-                emit settingsChanged(newSettings);
-            }
-        }
-
-        void triggerNotification(const QnTransaction<ApiVideowallControlMessageData> &tran) {
-            return m_videowallManager->triggerNotification(tran);
-        }
-
-        void triggerNotification(const QnTransaction<ApiVideowallInstanceStatusData> &tran) {
-            return m_videowallManager->triggerNotification(tran);
-        }
-
-        void triggerNotification( const QnTransaction<ApiEmailSettingsData>&  ) {
-        }
-
-        void triggerNotification( const QnTransaction<ApiEmailData>&  ) {
-        }
-
-        void triggerNotification(const QnTransaction<ApiUpdateUploadData> &tran) {
-            m_updatesManager->triggerNotification(tran);
-        }
-
-        void triggerNotification(const QnTransaction<ApiUpdateUploadResponceData> &tran) {
-            m_updatesManager->triggerNotification(tran);
-        }
-
-        void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList> &tran) {
-            m_cameraManager->triggerNotification(tran);
-        }
-
-        void triggerNotification(const QnTransaction<ApiModuleData> &tran) {
-            m_miscManager->triggerNotification(tran);
-        }
-
-        void triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran) {
-            m_discoveryManager->triggerNotification(tran);
-        }
-
-        void triggerNotification(const QnTransaction<ApiDiscoverPeerData> &tran) {
-            m_discoveryManager->triggerNotification(tran);
-        }
-
-        void triggerNotification(const QnTransaction<ApiConnectionData> &tran) {
-            m_miscManager->triggerNotification(tran);
-        }
-
-        void triggerNotification(const QnTransaction<ApiConnectionDataList> &tran) {
-            m_miscManager->triggerNotification(tran.params);
-        }
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
+        ECConnectionNotificationManager* notificationManager() { return m_notificationManager.get(); }
+
     protected:
         QueryProcessorType* m_queryProcessor;
         ResourceContext m_resCtx;
@@ -264,8 +82,9 @@ namespace ec2
         std::shared_ptr<QnVideowallManager<QueryProcessorType>> m_videowallManager;
         std::shared_ptr<QnStoredFileManager<QueryProcessorType>> m_storedFileManager;
         std::shared_ptr<QnUpdatesManager<QueryProcessorType>> m_updatesManager;
-        std::shared_ptr<QnMiscManager<QueryProcessorType>> m_miscManager;
-        std::shared_ptr<QnDiscoveryManager<QueryProcessorType>> m_discoveryManager;
+        std::shared_ptr<QnMiscNotificationManager<QueryProcessorType>> m_miscManager;
+        std::shared_ptr<QnDiscoveryNotificationManager<QueryProcessorType>> m_discoveryManager;
+        std::unique_ptr<ECConnectionNotificationManager> m_notificationManager;
 
     private:
         QnTransaction<ApiPanicModeData> prepareTransaction( ApiCommand::Value cmd, const Qn::PanicMode& mode);

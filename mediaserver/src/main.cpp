@@ -133,6 +133,7 @@
 #include <utils/network/router.h>
 #include <media_server/server_update_tool.h>
 
+
 #include <media_server/server_message_processor.h>
 #include <media_server/settings.h>
 #include <media_server/serverutil.h>
@@ -676,7 +677,6 @@ QnMain::~QnMain()
 {
     quit();
     stop();
-    stopObjects();
 }
 
 void QnMain::stopSync()
@@ -1117,6 +1117,7 @@ void QnMain::run()
 
     //QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
+    QnStorageManager storageManager;
 
     connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
     connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_storageManager_noStoragesAvailable()));

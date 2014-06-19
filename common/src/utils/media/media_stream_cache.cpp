@@ -90,11 +90,11 @@ static qint64 MAX_ALLOWED_TIMESTAMP_DIFF = 5*1000*1000UL;  //5 seconds
 static const int MICROS_PER_MS = 1000;
 
 //!Implementation of QnAbstractDataReceptor::putData
-void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
+void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 {
     QMutexLocker lk( &m_mutex );
 
-    const QnAbstractMediaDataPtr mediaPacket = data.dynamicCast<QnAbstractMediaData>();
+    const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(data.data());
     const bool isKeyFrame = mediaPacket && (mediaPacket->flags & QnAbstractMediaData::MediaFlags_AVKey);
     if( m_packetsByTimestamp.empty() && !isKeyFrame )
         return; //cache data MUST start with key frame
@@ -178,7 +178,7 @@ void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
             it != lastItToRemove;
             ++it )
         {
-            const QnAbstractMediaDataPtr mediaPacket = it->packet.dynamicCast<QnAbstractMediaData>();
+            const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(it->packet.data());
             if( mediaPacket )
                 m_cacheSizeInBytes -= mediaPacket->data.size();
         }
