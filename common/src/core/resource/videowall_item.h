@@ -6,6 +6,8 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QUuid>
 
+#include <core/misc/screen_snap.h>
+
 #include <utils/common/id.h>
 
 class QMimeData;
@@ -39,11 +41,7 @@ public:
      */
     QString name;
 
-    /**
-     * @brief geometry                      Position and size of the item in the Virtual Desktop
-     *                                      coordinate system.
-     */
-    QRect geometry;
+    QnScreenSnaps screenSnaps;
 
     static QString mimeType();
 
@@ -56,7 +54,7 @@ public:
                 l.uuid == r.uuid &&
                 l.pcUuid == r.pcUuid &&
                 l.name == r.name &&
-                l.geometry == r.geometry);
+                l.screenSnaps == r.screenSnaps);
     }
 };
 

@@ -143,52 +143,7 @@ private slots:
     void saveVideowall(const QnVideoWallResourcePtr& videowall);
     void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls);
 private:
-    struct ScreenSnap {
-        int index;          /**< Index of the screen. */
-        int value;          /**< Value of the snap. */
-        bool intermidiate;  /**< Flag if the snap is in the center of the screen. */
-
-        ScreenSnap(): index(-1), value(-1) {}
-
-        ScreenSnap(int index, int value, bool intermidiate):
-            index(index), value(value), intermidiate(intermidiate){}
-
-        operator int() const {return value;}
-        bool isValid() { return index >= 0 && value >= 0; }
-    };
-
-    struct ScreenSnaps {
-        QList<ScreenSnap> left;
-        QList<ScreenSnap> right;
-        QList<ScreenSnap> top;
-        QList<ScreenSnap> bottom;
-
-        ScreenSnaps filtered(const int index) const {
-            ScreenSnaps result;
-            foreach (const ScreenSnap &i, left)    if (i.index == index) result.left << i;
-            foreach (const ScreenSnap &i, right)   if (i.index == index) result.right << i;
-            foreach (const ScreenSnap &i, top)     if (i.index == index) result.top << i;
-            foreach (const ScreenSnap &i, bottom)  if (i.index == index) result.bottom << i;
-            return result;
-        }
-
-        ScreenSnaps joined() const {
-            ScreenSnaps result;
-
-            auto contains = [](const QList<ScreenSnap> &list, const int value) {
-                foreach (const ScreenSnap &snap, list)
-                    if (snap.value == value)
-                        return true;
-                return false;
-            };
-
-            foreach (const ScreenSnap &i, left)    if (!contains(result.left, i.value)) result.left << i;
-            foreach (const ScreenSnap &i, right)   if (!contains(result.right, i.value)) result.right << i;
-            foreach (const ScreenSnap &i, top)     if (!contains(result.top, i.value)) result.top << i;
-            foreach (const ScreenSnap &i, bottom)  if (!contains(result.bottom, i.value)) result.bottom << i;
-            return result;
-        }
-    };
+    
 
     ScreenSnaps calculateSnaps(const QUuid &pcUuid, const QList<QnVideoWallPcData::PcScreen> &screens);
     QRect calculateSnapGeometry(const QList<QnVideoWallPcData::PcScreen> &screens, const QRect &source);
