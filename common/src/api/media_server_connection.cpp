@@ -15,6 +15,10 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_bookmark.h>
 
+#include <core/ptz/ptz_preset.h>
+#include <core/ptz/ptz_tour.h>
+#include <core/ptz/ptz_data.h>
+
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
@@ -27,6 +31,7 @@
 
 #include "network_proxy_factory.h"
 #include "session_manager.h"
+#include "media_server_reply_processor.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,

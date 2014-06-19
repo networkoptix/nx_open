@@ -9,32 +9,45 @@
 
 namespace ec2 {
 
-template<class QueryProcessorType>
-class QnUpdatesManager : public AbstractUpdatesManager {
-public:
-    QnUpdatesManager(QueryProcessorType * const queryProcessor);
-    virtual ~QnUpdatesManager();
+    class QnUpdatesNotificationManager
+    :
+        public AbstractUpdatesManager
+    {
+    public:
+        QnUpdatesNotificationManager();
 
-    void triggerNotification(const QnTransaction<ApiUpdateUploadData> &transaction);
-    void triggerNotification(const QnTransaction<ApiUpdateUploadResponceData> &transaction);
-    void triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction);
+        void triggerNotification(const QnTransaction<ApiUpdateUploadData> &transaction);
+        void triggerNotification(const QnTransaction<ApiUpdateUploadResponceData> &transaction);
+        void triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction);
 
-protected:
-    virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) override;
-    virtual int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) override;
-    virtual int installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) override;
+    private:
+        QHash<QnAbstractTransaction::ID, QString> m_requestedUpdateIds;
 
-private:
-    QueryProcessorType* const m_queryProcessor;
+        void at_transactionProcessed(const QnAbstractTransaction &transaction);
+    };
 
-    QHash<QnAbstractTransaction::ID, QString> m_requestedUpdateIds;
 
-    QnTransaction<ApiUpdateUploadData> prepareTransaction(const QString &updateId, const QByteArray &data, qint64 offset) const;
-    QnTransaction<ApiUpdateUploadResponceData> prepareTransaction(const QString &updateId, const QnId &peerId, int chunks) const;
-    QnTransaction<ApiUpdateInstallData> prepareTransaction(const QString &updateId) const;
+    template<class QueryProcessorType>
+    class QnUpdatesManager
+    :
+        public QnUpdatesNotificationManager
+    {
+    public:
+        QnUpdatesManager(QueryProcessorType * const queryProcessor);
+        virtual ~QnUpdatesManager();
 
-    void at_transactionProcessed(const QnAbstractTransaction &transaction);
-};
+    protected:
+        virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) override;
+        virtual int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) override;
+        virtual int installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) override;
+
+    private:
+        QueryProcessorType* const m_queryProcessor;
+
+        QnTransaction<ApiUpdateUploadData> prepareTransaction(const QString &updateId, const QByteArray &data, qint64 offset) const;
+        QnTransaction<ApiUpdateUploadResponceData> prepareTransaction(const QString &updateId, const QnId &peerId, int chunks) const;
+        QnTransaction<ApiUpdateInstallData> prepareTransaction(const QString &updateId) const;
+    };
 
 } // namespace ec2
 
