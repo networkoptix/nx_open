@@ -27,13 +27,13 @@ public:
     AVCodecContext* getAudioCodecContext() const;
     AVFormatContext* getFormatContext() const { return m_formatCtx; }
 
-    virtual int open(QnConstCompressedVideoDataPtr video, QnConstCompressedAudioDataPtr audio) override;
+    virtual int open(const QnConstCompressedVideoDataPtr& video, const QnConstCompressedAudioDataPtr& audio) override;
 
     //!Implementation of QnTranscoder::addTag
     virtual bool addTag( const QString& name, const QString& value ) override;
 
 protected:
-    virtual int transcodePacketInternal(QnConstAbstractMediaDataPtr media, QnByteArray* const result) override;
+    virtual int transcodePacketInternal(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result) override;
 
 private:
     //friend qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size);

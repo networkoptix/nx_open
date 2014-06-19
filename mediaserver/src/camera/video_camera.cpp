@@ -34,7 +34,7 @@ public:
     // QnAbstractDataConsumer
     virtual bool canAcceptData() const;
     virtual void putData(const QnAbstractDataPacketPtr& data);
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     //QnMediaContextPtr getVideoCodecContext();
     //QnMediaContextPtr getAudioCodecContext();
@@ -129,7 +129,7 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
     }
 }
 
-bool QnVideoCameraGopKeeper::processData(QnAbstractDataPacketPtr /*data*/)
+bool QnVideoCameraGopKeeper::processData(const QnAbstractDataPacketPtr& /*data*/)
 {
     return true;
 }

@@ -431,7 +431,7 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
     }
 }
 
-bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr nonConstData)
+bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnConstAbstractDataPacketPtr data = nonConstData;
 

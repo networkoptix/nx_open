@@ -62,7 +62,7 @@ public:
     void setAllowAdaptiveStreaming(bool value);
 protected:
     //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     void createDataPacketTCP(QnByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel);
 

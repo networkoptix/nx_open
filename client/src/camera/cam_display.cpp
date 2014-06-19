@@ -954,7 +954,7 @@ bool QnCamDisplay::needBuffering(qint64 vTime) const
     //return m_audioDisplay->isBuffering() && !flushCurrentBuffer;
 }
 
-bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
+bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
 
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
