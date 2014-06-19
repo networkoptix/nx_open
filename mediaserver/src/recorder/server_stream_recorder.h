@@ -57,7 +57,7 @@ protected:
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize) override;
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider* provider) override;
     virtual bool canAcceptData() const;
-    virtual void putData(QnAbstractDataPacketPtr data) override;
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
     virtual void endOfRun() override;
     virtual bool saveData(QnConstAbstractMediaDataPtr md) override;

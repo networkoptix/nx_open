@@ -18,9 +18,9 @@ QnDesktopDataProviderWrapper::~QnDesktopDataProviderWrapper()
     m_owner->beforeDestroyDataProvider(this);
 }
 
-void QnDesktopDataProviderWrapper::putData(QnAbstractDataPacketPtr data)
+void QnDesktopDataProviderWrapper::putData(const QnAbstractDataPacketPtr& data)
 {
-    QnAbstractMediaDataPtr media  = data.dynamicCast<QnAbstractMediaData>();
+    const QnAbstractMediaData* media  = dynamic_cast<QnAbstractMediaData*>(data.data());
     if (!media)
         return;
 

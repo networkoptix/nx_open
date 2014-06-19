@@ -101,7 +101,7 @@ bool QnServerStreamRecorder::canAcceptData() const
     */
 }
 
-void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr nonConstData)
+void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnConstAbstractDataPacketPtr data = nonConstData;
 

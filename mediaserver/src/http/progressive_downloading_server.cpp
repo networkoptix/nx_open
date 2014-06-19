@@ -121,7 +121,7 @@ protected:
             return QnAbstractDataConsumer::canAcceptData();
     }
 
-    void putData(QnAbstractDataPacketPtr data) override
+    void putData(const QnAbstractDataPacketPtr& data) override
     {
         if (m_liveMode)
         {

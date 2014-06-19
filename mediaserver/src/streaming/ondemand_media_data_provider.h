@@ -42,7 +42,7 @@ public:
     /*!
         Stores \a data in internal buffer, which is read out by \a tryRead
     */
-    virtual void putData( QnAbstractDataPacketPtr data ) override;
+    virtual void putData( const QnAbstractDataPacketPtr& data ) override;
 
 private:
     QSharedPointer<QnAbstractStreamDataProvider> m_dataProvider;

@@ -93,7 +93,7 @@ void QnUserResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& m
 {
     base_type::updateInner(other, modifiedFields);
 
-    QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
+    QnUserResource* localOther = dynamic_cast<QnUserResource*>(other.data());
     if(localOther) {
         setPassword(localOther->getPassword());
         setHash(localOther->getHash());

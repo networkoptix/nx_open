@@ -921,7 +921,7 @@ bool QnCamDisplay::useSync(QnCompressedVideoDataPtr vd)
     return m_extTimeSrc && m_extTimeSrc->isEnabled() && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_PlayUnsync));
 }
 
-void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
+void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
 {
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
     if (video && (video->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_dataQueue.size() > 0 && video->timestamp - m_lastVideoPacketTime > LIVE_MEDIA_LEN_THRESHOLD)

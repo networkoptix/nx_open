@@ -33,7 +33,7 @@ public:
 
     void setLastSendTime(qint64 time);
     void setWaitCSeq(qint64 newTime, int sceq);
-    virtual void putData(QnAbstractDataPacketPtr data);
+    virtual void putData(const QnAbstractDataPacketPtr& data);
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
     int copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime, quint32 cseq);

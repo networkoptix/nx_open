@@ -73,7 +73,7 @@ public:
     //!Implementation of QnAbstractDataReceptor::canAcceptData
     virtual bool canAcceptData() const override;
     //!Implementation of QnAbstractDataReceptor::putData
-    virtual void putData( QnAbstractDataPacketPtr data ) override;
+    virtual void putData( const QnAbstractDataPacketPtr& data ) override;
 
     quint64 startTimestamp() const;
     quint64 currentTimestamp() const;
