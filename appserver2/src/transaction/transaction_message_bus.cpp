@@ -453,7 +453,10 @@ void QnTransactionMessageBus::sendModulesData()
     if (!QnGlobalModuleFinder::instance())
         return;
 
-    sendTransaction(prepareModulesDataTransaction());
+    QnTransaction<ApiModuleDataList> transaction = prepareModulesDataTransaction();
+    transaction.fillSequence();
+
+    sendTransaction(transaction);
 }
 
 QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
@@ -624,7 +627,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         QnPeerSet processedPeers = QnPeerSet() << remotePeer.id << m_localPeer.id;
         transport->setWriteSync(true);
         transport->sendTransaction(tran, processedPeers);
-        sendTransaction(tranModules, processedPeers);
+        transport->sendTransaction(tranModules, processedPeers);
         transport->setReadSync(true);
 
     } else if (remotePeer.peerType == QnPeerInfo::AndroidClient) {
