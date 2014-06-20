@@ -21,7 +21,7 @@ public:
 
     //virtual void setSendMotion(bool value) override;
 
-    virtual bool open(QnResourcePtr resource);
+    virtual bool open(const QnResourcePtr &resource);
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();
@@ -35,6 +35,8 @@ public:
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch);
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
+
+    virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
 
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog);
@@ -79,7 +81,9 @@ private:
     bool m_sendMotion;
     bool m_eof;
     MediaQuality m_quality;
-    QnDialQualityHelper m_dialQualityHelper;
+    QnDualQualityHelper m_dialQualityHelper;
+
+    ArchiveChunkInfo m_currentChunkInfo;
 
     mutable QMutex m_mutex;
 };

@@ -33,6 +33,7 @@ namespace nx_http
         {
             waitingMessageStart,
             readingMessageHeaders,
+            //!Moves to this state after reading whole message body (in case content-length is known or chunk encoding is used)
             messageDone,
             parseError,
             readingMessageBody
@@ -43,6 +44,7 @@ namespace nx_http
 
         //!Parses \a count bytes from source buffer \a data as HTTP
         /*!
+            \param count Bytes of \a data to parse
             \param bytesProcessed if not NULL, \a *bytesProcessed is set to number of bytes read from \a data
             \return true on success. false on parse error, call \a errorText() to receive error description
         */
@@ -53,7 +55,7 @@ namespace nx_http
         /*!
             \return Actual only after state changed from \a readingMessageHeaders to \a waitingMessageStart or \a readingMessageBody
         */
-        const HttpMessage& message() const;
+        const Message& message() const;
         ReadState state() const;
         size_t messageBodyBufferSize() const;
         //!Returns internal message body buffer and clears internal buffer
@@ -64,6 +66,11 @@ namespace nx_http
         void resetState();
         //!Flush all internal buffers (if any), so that all data is available through public API
         void flush();
+        /*!
+            By default \a true.
+            \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
+        */
+        void setDecodeChunkedMessageBody( bool val );
 
     private:
         // TODO: #Elric #enum
@@ -80,7 +87,7 @@ namespace nx_http
         };
 
         ReadState m_state;
-        HttpMessage m_httpMessage;
+        Message m_httpMessage;
         quint64 m_contentLength;
         bool m_isChunkedTransfer;
         quint64 m_messageBodyBytesRead;
@@ -95,6 +102,7 @@ namespace nx_http
         BufferType m_codedMessageBodyBuffer;
         std::unique_ptr<AbstractByteStreamFilter> m_contentDecoder;
         int m_lineEndingOffset;
+        bool m_decodeChunked;
 
         LineSplitter m_lineSplitter;
         mutable std::mutex m_mutex;

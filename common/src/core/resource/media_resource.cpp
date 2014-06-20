@@ -82,7 +82,7 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::Stream
     return QImage();
 }
 
-static std::shared_ptr<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
 QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     QVariant val;
@@ -108,7 +108,7 @@ void QnMediaResource::setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLay
     toResource()->setParam(QLatin1String("VideoLayout"), newLayout->toString(), QnDomainMemory);
 }
 
-static std::shared_ptr<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
+static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
 QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
 {
     return audioLayout;
@@ -132,11 +132,16 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
-void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&)
+void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&modifiedFields)
 {
     QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
-    if (other_casted)
-        m_dewarpingParams = other_casted->m_dewarpingParams;
+    if (other_casted) {
+        if (m_dewarpingParams != other_casted->m_dewarpingParams) {
+            m_dewarpingParams = other_casted->m_dewarpingParams;
+            modifiedFields << "mediaDewarpingParamsChanged";
+        }
+        m_customVideoLayout = other_casted->m_customVideoLayout;
+    }
 }
 
 QString QnMediaResource::customAspectRatioKey() {

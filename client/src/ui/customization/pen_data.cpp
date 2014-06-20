@@ -7,9 +7,12 @@
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, PenStyle, static)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, PenCapStyle, static)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qt, PenJoinStyle, static)
-QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenStyle, static)
-QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenCapStyle, static)
-QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(Qt::PenJoinStyle, static)
+
+QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
+    (Qt::PenStyle)(Qt::PenCapStyle)(Qt::PenJoinStyle),
+    (json_lexical)
+)
+
 
 namespace QnPenDataDetail {
     template<QnPenData::Field field>

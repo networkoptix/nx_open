@@ -5,6 +5,7 @@
 #include <QtCore/QString>
 
 #include <utils/serialization/json.h>
+#include <utils/common/model_functions_fwd.h>
 
 // TODO: #MSAPI rename to QnRestResult.
 // 
@@ -51,5 +52,6 @@ private:
     QJsonValue m_reply;
 };
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnJsonRestResult::Error)
 
 #endif // QN_JSON_REST_RESULT_H

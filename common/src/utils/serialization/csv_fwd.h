@@ -27,14 +27,11 @@ namespace QnCsv {
 
 
 #define QN_FUSION_DECLARE_FUNCTIONS_csv_field(TYPE, ... /* PREFIX */)           \
-__VA_ARGS__ void serialize_field(const TYPE &value, QnCsvStreamWriter<QByteArray> *stream); \
+__VA_ARGS__ void serialize(const TYPE &value, QnCsvStreamWriter<QByteArray> *stream); \
 
 #define QN_FUSION_DECLARE_FUNCTIONS_csv_record(TYPE, ... /* PREFIX */)          \
-__VA_ARGS__ void serialize_record(const TYPE &value, QnCsvStreamWriter<QByteArray> *stream); \
-__VA_ARGS__ void serialize_record_header(const TYPE &value, const QString &prefix, QnCsvStreamWriter<QByteArray> *stream); \
-
-#define QN_FUSION_DECLARE_FUNCTIONS_csv_document(TYPE, ... /* PREFIX */)        \
-__VA_ARGS__ void serialize_document(const TYPE &value, QnCsvStreamWriter<QByteArray> *stream); \
+__VA_ARGS__ void serialize(const TYPE &value, QnCsvStreamWriter<QByteArray> *stream); \
+__VA_ARGS__ void serialize_header(const QString &prefix, QnCsvStreamWriter<QByteArray> *stream, const TYPE *value); \
 
 
 #endif // QN_SERIALIZATION_CSV_FWD_H

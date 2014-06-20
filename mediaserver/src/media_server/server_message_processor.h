@@ -5,6 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include "nx_ec/impl/ec_api_impl.h"
+#include "nx_ec/data/api_server_alive_data.h"
 
 class QnServerMessageProcessor : public QnCommonMessageProcessor
 {
@@ -23,9 +24,13 @@ protected:
     virtual void init(ec2::AbstractECConnectionPtr connection);
     virtual void afterRemovingResource(const QnId& id) override;
     void execBusinessActionInternal(QnAbstractBusinessActionPtr action) override;
+    bool isLocalAddress(const QString& addr) const;
 private slots:
-    void at_remotePeerFound(QnId id, bool isClient, bool isProxy);
-    void at_remotePeerLost(QnId id, bool isClient, bool isProxy);
+    void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
+    void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
+
+    void at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset);
+    void at_updateInstallationRequested(const QString &updateId);
 private:
     void updateAllIPList(const QnId& id, const QList<QHostAddress>& addrList);
     void updateAllIPList(const QnId& id, const QList<QString>& addr);
@@ -35,6 +40,8 @@ private:
     mutable QMutex m_mutexAddrList;
     QHash<QString, int> m_allIPAddress;
     QHash<QnId, QList<QString> > m_addrById;
+    const int m_serverPort;
+    mutable QnMediaServerResourcePtr m_mServer;
 };
 
 #endif // QN_SERVER_MESSAGE_PROCESSOR_H

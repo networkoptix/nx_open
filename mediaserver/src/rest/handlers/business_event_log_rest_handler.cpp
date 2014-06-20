@@ -50,8 +50,9 @@ int QnBusinessEventLogRestHandler::executeGet(const QString& path, const QnReque
             }
             else if (params[i].first == "event") {
                 eventType = (QnBusiness::EventType) params[i].second.toInt();
-                if (eventType < 0 || eventType >= QnBusiness::EventCount)
-                    errStr = QString("Invalid event type %1. Valid range is [0..%2]").arg(params[i].second).arg(QnBusiness::EventCount-1);
+                //TODO #ak check enum value for correctness
+                if( eventType == QnBusiness::UndefinedEvent )
+                    errStr = QString("Invalid event type %1").arg(params[i].second);
             }
             else if (params[i].first == "action") {
                 actionType = (QnBusiness::ActionType) params[i].second.toInt();
@@ -90,14 +91,3 @@ int QnBusinessEventLogRestHandler::executePost(const QString& path, const QnRequ
     return executeGet(path, params, result, contentType);
 }
 
-QString QnBusinessEventLogRestHandler::description() const
-{
-    return 
-        "Returns event log"
-        "<BR>Param <b>from</b> - start of time period at ms since 1.1.1970 (UTC format)"
-        "<BR>Param <b>to</b> - end of time period at ms since 1.1.1970 (UTC format). Optional"
-        "<BR>Param <b>format</b> - allowed values: <b>text</b>, <b>protobuf. Optional</b>"
-        "<BR>Param <b>event</b> - event type. Optional</b>"
-        "<BR>Param <b>action</b> - action type. Optional</b>"
-        "<BR>Param <b>brule_id</b> - business rule id. Optional</b>";
-}

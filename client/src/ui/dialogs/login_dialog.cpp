@@ -28,6 +28,7 @@
 #include <ui/workaround/gl_widget_factory.h>
 
 #include <utils/applauncher_utils.h>
+#include <utils/network/modulefinder.h>
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
@@ -77,9 +78,6 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 
     setHelpTopic(this, Qn::Login_Help);
 
-    /* Don't allow to save passwords, at least for now. */
-    //ui->savePasswordCheckBox->hide();
-
     static const char *introNames[] = { "intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg", NULL };
     QString introPath;
     for(const char **introName = introNames; *introName != NULL; introName++) {
@@ -127,23 +125,18 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     resetConnectionsModel();
     updateFocus();
 
-    m_moduleFinder = new NetworkOptixModuleFinder(true);
+    m_moduleFinder = new QnModuleFinder(true);
+    m_moduleFinder->setParent(this);
     if (qnSettings->isDevMode())
         m_moduleFinder->setCompatibilityMode(true);
-    connect(m_moduleFinder,    SIGNAL(moduleFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-            this,               SLOT(at_moduleFinder_moduleFound(const QString&, const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
-    connect(m_moduleFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
-            this,               SLOT(at_moduleFinder_moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)));
+    connect(m_moduleFinder,     &QnModuleFinder::moduleFound,     this,   &QnLoginDialog::at_moduleFinder_moduleFound);
+    connect(m_moduleFinder,     &QnModuleFinder::moduleLost,      this,   &QnLoginDialog::at_moduleFinder_moduleLost);
     m_moduleFinder->start();
 }
 
-QnLoginDialog::~QnLoginDialog() {
-    delete m_moduleFinder;
-    return;
-}
+QnLoginDialog::~QnLoginDialog() {}
 
-void QnLoginDialog::updateFocus() 
-{
+void QnLoginDialog::updateFocus() {
     ui->passwordLineEdit->setFocus();
 }
 
@@ -176,13 +169,7 @@ void QnLoginDialog::accept() {
         return;
     }
 
-#ifdef OLD_EC
-    QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
-    m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, QnConnectionInfoPtr, int)));
-#else
     QnAppServerConnectionFactory::ec2ConnectionFactory()->connect( url, this, &QnLoginDialog::at_ec2ConnectFinished );
-#endif
-
     updateUsability();
 }
 
@@ -347,7 +334,6 @@ void QnLoginDialog::updateUsability() {
 // Handlers
 // -------------------------------------------------------------------------- //
 
-#ifndef OLD_EC
 void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::AbstractECConnectionPtr connection )
 {
     updateUsability();
@@ -361,32 +347,12 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
         success = qnSettings->isDevMode() || _connectionInfo.brand.isEmpty()
                 || _connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
     }
-#else
-void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectionInfo, int requestHandle) {
-    if(m_requestHandle != requestHandle) 
-        return;
-    m_requestHandle = -1;
-
-    updateUsability();
-
-    bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
-            || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
-    bool success = (status == 0) && compatibleProduct;
-#endif
 
     QString detail;
 
-#ifdef OLD_EC
-    if (status == 202) {
-#else
     if (errorCode == ec2::ErrorCode::unauthorized) {
-#endif
         detail = tr("Login or password you have entered are incorrect, please try again.");
-#ifdef OLD_EC
-    } else if (status != 0) {
-#else
     } else if (errorCode != ec2::ErrorCode::ok) {
-#endif
         detail = tr("Connection to the Enterprise Controller could not be established.\n"
                                "Connection details that you have entered are incorrect, please try again.\n\n"
                                "If this error persists, please contact your VMS administrator.");
@@ -435,6 +401,7 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
         }
 
         if (connectionInfo->version > QnSoftwareVersion(QN_ENGINE_VERSION)) {
+#ifndef Q_OS_MACX
             QnMessageBox::warning(
                 this,
                 Qn::VersionMismatch_Help,
@@ -446,15 +413,28 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
                 ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
                 QMessageBox::Ok
             );
+#else
+            QnMessageBox::warning(
+                this,
+                Qn::VersionMismatch_Help,
+                tr("Could not connect to Enterprise Controller"),
+                tr("Selected Enterprise controller has a different version:\n"
+                    " - Client version: %1.\n"
+                    " - EC version: %2.\n"
+                    "The other version of client is needed in order to establish the connection to this server."
+                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                QMessageBox::Ok
+            );
+#endif
             m_restartPending = false;
         }
 
         if(m_restartPending) {
-            for( ;; )
-            {
+            for (;;) {
                 bool isInstalled = false;
-                if( applauncher::isVersionInstalled(connectionInfo->version, &isInstalled) != applauncher::api::ResultType::ok )
+                if (applauncher::isVersionInstalled(connectionInfo->version, &isInstalled) != applauncher::api::ResultType::ok)
                 {
+#ifndef Q_OS_MACX
                     QnMessageBox::warning(
                         this,
                         Qn::VersionMismatch_Help,
@@ -466,6 +446,19 @@ void QnLoginDialog::at_connectFinished(int status, QnConnectionInfoPtr connectio
                         ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
                         QMessageBox::Ok
                     );
+#else
+                    QnMessageBox::warning(
+                        this,
+                        Qn::VersionMismatch_Help,
+                        tr("Could not connect to Enterprise Controller"),
+                        tr("Selected Enterprise controller has a different version:\n"
+                            " - Client version: %1.\n"
+                            " - EC version: %2.\n"
+                            "The other version of client is needed in order to establish the connection to this server."
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                        QMessageBox::Ok
+                    );
+#endif
                     m_restartPending = false;
                 }
                 else if(isInstalled) {
@@ -665,46 +658,37 @@ void QnLoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleFound(const QString& moduleID, const QString& moduleVersion, const QString& systemName,
-                                                const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
+void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
     Q_UNUSED(localInterfaceAddress)
-
-    QString portId = QLatin1String("port");
 
     //if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
     //    return;
 
-    QString host = isLocal ? QLatin1String("127.0.0.1") : remoteHostAddress;
+    QString host = moduleInformation.isLocal ? QLatin1String("127.0.0.1") : remoteAddress;
     QUrl url;
     url.setHost(host);
 
-    QString port = moduleParameters[portId];
+    QString port = moduleInformation.parameters[lit("port")];
     url.setPort(port.toInt());
 
-    QMultiHash<QString, QnEcData>::iterator i = m_foundEcs.find(seed);
-    while (i != m_foundEcs.end() && i.key() == seed) {
-        QUrl found = i.value().url;
-        if (found.host() == url.host() && found.port() == url.port())
+    foreach (const QnEcData &data, m_foundEcs.values(moduleInformation.id)) {
+        if (data.url.host() == url.host() && data.url.port() == url.port())
             return; // found the same host, e.g. two interfaces on local controller
-        ++i;
     }
 
     QnEcData data;
     data.url = url;
-    data.version = moduleVersion;
-    data.systemName = systemName;
-    m_foundEcs.insert(seed, data);
+    data.version = moduleInformation.version.toString();
+    data.systemName = moduleInformation.systemName;
+    m_foundEcs.insert(moduleInformation.id, data);
     resetAutoFoundConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleFinder_moduleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed) {
-    Q_UNUSED(moduleParameters)
-    Q_UNUSED(remoteHostAddress)
-    Q_UNUSED(isLocal)
-
-    if( moduleID != nxMediaServerId )
+void QnLoginDialog::at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation) {
+    if (moduleInformation.type != nxMediaServerId)
         return;
-    m_foundEcs.remove(seed);
+
+    m_foundEcs.remove(moduleInformation.id);
 
     resetAutoFoundConnectionsModel();
 }

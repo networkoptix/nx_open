@@ -9,14 +9,10 @@
 #include "authenticate_helper.h"
 #include "utils/common/synctime.h"
 
-
 static const int AUTH_TIMEOUT = 60 * 1000;
 static const int KEEP_ALIVE_TIMEOUT = 60  * 1000;
 static const int AUTHORIZED_TIMEOUT = 60 * 1000;
 static const int MAX_AUTH_RETRY_COUNT = 3;
-
-static QMap<QString, qint64> authorizedList;
-static QMutex authorizationCacheMutex;
 
 
 QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
@@ -48,16 +44,8 @@ bool QnUniversalRequestProcessor::authenticate()
 {
     Q_D(QnUniversalRequestProcessor);
 
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    QString addr = d->socket->getForeignAddress().address.toString();
-    {
-        QMutexLocker lock(&authorizationCacheMutex);
-        if (currentTime - authorizedList.value(addr) < AUTHORIZED_TIMEOUT)
-            return true;
-    }
-
     int retryCount = 0;
-    if (d->needAuth &&  d->protocol.toLower() == "http")
+    if (d->needAuth)
     {
         QUrl url = getDecodedUrl();
         QString path = url.path().trimmed();
@@ -65,14 +53,13 @@ bool QnUniversalRequestProcessor::authenticate()
             path = path.left(path.size()-1);
         if (path.startsWith(L'/'))
             path = path.mid(1);
-        bool needAuth = (path != lit("api/ping")) && !path.startsWith(lit("api/camera_event")); //TODO: #AK this class (libcommon's) is not supposed to know about api/ping etc.. (it's mediaserver's)
         bool isProxy = dynamic_cast<QnUniversalTcpListener*>(d->owner)->isProxy(url);
         QElapsedTimer t;
         t.restart();
-        while (needAuth && !qnAuthHelper->authenticate(d->request, d->response, isProxy))
+        while (!qnAuthHelper->authenticate(d->request, d->response, isProxy) && d->socket->isConnected())
         {
             d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: STATIC_UNAUTHORIZED_HTML;
-            sendResponse("HTTP", isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED, "text/html");
+            sendResponse(isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED, "text/html");
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT)
                 return false;
@@ -88,8 +75,6 @@ bool QnUniversalRequestProcessor::authenticate()
         }
     }
 
-    QMutexLocker lock(&authorizationCacheMutex);
-    authorizedList.insert(addr, currentTime);
     return true;
 }
 
@@ -122,13 +107,21 @@ void QnUniversalRequestProcessor::run()
                 d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
                 d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
             }
-            processRequest();
+            if( !processRequest() )
+            {
+                d->response.statusLine.version = d->request.requestLine.version;
+                d->response.statusLine.statusCode = nx_http::StatusCode::notFound;
+                d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString( d->response.statusLine.statusCode );
+                d->response.headers.insert( nx_http::HttpHeader( "Content-Type", "text/plain" ) );
+                d->response.messageBody = "NOT FOUND";
+                d->response.headers.insert( nx_http::HttpHeader( "Content-Length", nx_http::StringType::number(d->response.messageBody.size()) ) );
+                sendBuffer( d->response.toString() );
+            }
         }
 
         if (!d->socket)
             break; // processor has token socket ownership
 
-        bool isConnected = d->socket->isConnected();
         if (!isKeepAlive || t.elapsed() >= KEEP_ALIVE_TIMEOUT || !d->socket->isConnected())
             break;
 
@@ -138,7 +131,7 @@ void QnUniversalRequestProcessor::run()
         d->socket->close();
 }
 
-void QnUniversalRequestProcessor::processRequest()
+bool QnUniversalRequestProcessor::processRequest()
 {
     Q_D(QnUniversalRequestProcessor);
     QList<QByteArray> header = d->clientRequest.left(d->clientRequest.indexOf('\n')).split(' ');
@@ -148,6 +141,9 @@ void QnUniversalRequestProcessor::processRequest()
         QByteArray protocol = header[2].split('/')[0].toUpper();
         QMutexLocker lock(&d->mutex);
         d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, protocol, QUrl(QString::fromUtf8(header[1])));
+        if( !d->processor )
+            return false;
+
         if (d->processor && !needToStop()) 
         {
             copyClientRequestTo(*d->processor);
@@ -159,7 +155,10 @@ void QnUniversalRequestProcessor::processRequest()
         }
         delete d->processor;
         d->processor = 0;
+        return true;
     }
+
+    return false;
 }
 
 void QnUniversalRequestProcessor::pleaseStop()

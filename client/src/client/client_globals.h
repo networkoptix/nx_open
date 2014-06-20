@@ -4,6 +4,7 @@
 #include <QtCore/QMetaType>
 
 #include <common/user_permissions.h>
+#include <utils/common/model_functions_fwd.h>
 
 namespace Qn {
 
@@ -23,11 +24,8 @@ namespace Qn {
         RecorderNode,           /**< Node that represents a recorder (VMAX, etc). Has both guid and resource (parent server). */
         EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
 
-        VideoWallItemNode,      /**< Node that represents a video wall item. Has a guid and can have resource. */
-        VideoWallHistoryNode,   /**< Node that represents a video wall history item. Has both guid and resource. */
-
-        UserVideoWallNode,      /**< Node that represents a video wall having items that user is allowed to edit. Has both guid and resource. */
-        UserVideoWallItemNode,  /**< Node that represents a video wall item that user is allowed to edit. Has a guid. */
+        VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */
+        VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */
 
         NodeTypeCount
     };
@@ -214,6 +212,7 @@ namespace Qn {
         CommonNotification,
         ImportantNotification,
         CriticalNotification,
+        SystemNotification,
         LevelCount
     };
 
@@ -258,11 +257,11 @@ namespace Qn {
 
 } // namespace Qn
 
-Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(Qn::ItemRole)
 Q_DECLARE_METATYPE(Qn::TimeMode)
 Q_DECLARE_METATYPE(Qn::ClientSkin)
-Q_DECLARE_TYPEINFO(Qn::NodeType, Q_PRIMITIVE_TYPE);
 Q_DECLARE_METATYPE(Qn::NodeType)
+
+QN_FUSION_DECLARE_FUNCTIONS(Qn::ClientSkin, (lexical))
 
 #endif // QN_CLIENT_GLOBALS_H

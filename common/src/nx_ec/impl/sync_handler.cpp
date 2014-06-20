@@ -32,7 +32,7 @@ namespace ec2
             return m_errorCode;
         }
 
-        void SyncHandler::done( int reqID, ErrorCode _errorCode )
+        void SyncHandler::done( int /*reqID*/, ErrorCode _errorCode )
         {
             QMutexLocker lk( &m_mutex );
             m_done = true;

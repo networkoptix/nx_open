@@ -5,7 +5,8 @@
 #include <QtNetwork/QHostAddress>
 #include "utils/network/mac_address.h"
 #include "resource.h"
-#include "recording/time_period_list.h"
+
+class QnTimePeriodList;
 
 class QN_EXPORT QnNetworkResource : public QnResource
 {
@@ -89,11 +90,7 @@ public:
     /*
     * Return time periods from resource based archive (direct to storage)
     */
-    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {
-        Q_UNUSED(startTimeMs)
-        Q_UNUSED(endTimeMs)
-        Q_UNUSED(detailLevel)
-        return QnTimePeriodList(); }
+    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel);
 
     //!Returns true if camera is accessible
     /*!

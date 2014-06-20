@@ -18,13 +18,16 @@ struct QnDlink_cam_info
     bool inited() const;
 
     // returns resolution with width not less than width
-    QSize resolutionCloseTo(int width);
+    QSize resolutionCloseTo(int width) const;
 
     // returns next up bitrate 
     QString bitrateCloseTo(int val);
 
     // returns next up frame rate 
     int frameRateCloseTo(int fr);
+
+    QSize primaryStreamResolution() const;
+    QSize secondaryStreamResolution() const;
 
     QString hasH264;// some cams have H.264, some H264
     bool hasMPEG4;

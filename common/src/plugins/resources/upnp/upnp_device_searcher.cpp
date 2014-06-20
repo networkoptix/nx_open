@@ -114,7 +114,7 @@ void UPNPDeviceSearcher::pleaseStop()
         it != m_socketList.end();
         ++it )
     {
-        aio::AIOService::instance()->removeFromWatch( it->second.get(), PollSet::etRead );
+        aio::AIOService::instance()->removeFromWatch( it->second.get(), aio::etRead );
     }
     m_socketList.clear();
 
@@ -200,9 +200,9 @@ void UPNPDeviceSearcher::onTimer( const quint64& /*timerID*/ )
         m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
 }
 
-void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw()
+void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw()
 {
-    if( eventType == PollSet::etError )
+    if( eventType == aio::etError )
     {
         std::shared_ptr<AbstractDatagramSocket> udpSock;
         {
@@ -221,11 +221,11 @@ void UPNPDeviceSearcher::eventTriggered( AbstractSocket* sock, PollSet::EventTyp
             }
         }
         if( udpSock )
-            aio::AIOService::instance()->removeFromWatch( udpSock.get(), PollSet::etRead );
+            aio::AIOService::instance()->removeFromWatch( udpSock.get(), aio::etRead );
         return;
     }
 
-    nx_http::HttpRequest foundDeviceReply;
+    nx_http::Request foundDeviceReply;
     QString remoteHost;
 
     AbstractDatagramSocket* udpSock = dynamic_cast<AbstractDatagramSocket*>( sock );
@@ -303,7 +303,7 @@ std::shared_ptr<AbstractDatagramSocket> UPNPDeviceSearcher::getSockByIntf( const
         !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
         !sock->setMulticastIF( localAddress ) ||
         !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
-        !aio::AIOService::instance()->watchSocket( sock.get(), PollSet::etRead, this ) )
+        !aio::AIOService::instance()->watchSocket( sock.get(), aio::etRead, this ) )
     {
         QMutexLocker lk( &m_mutex );
         m_socketList.erase( p.first );

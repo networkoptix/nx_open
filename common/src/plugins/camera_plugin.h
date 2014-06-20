@@ -63,7 +63,7 @@ namespace nxcip
         char firmware[256];
         //!Camera's unique identifier. MAC address can be used
         char uid[256];
-        //!Camera management url
+        //!Camera management url. Can contain just address. MUST NOT be empty
         char url[MAX_TEXT_LEN];
         //!Any data in implementation defined format (for internal plugin usage)
         char auxiliaryData[256];
@@ -134,6 +134,7 @@ namespace nxcip
             \param[in] login Login to access \a address. If NULL, default login should be used
             \param[in] password Password to access \a address. If NULL, default password should be used
             \return > 0 - number of found cameras, < 0 - on error. 0 - nothing found
+            \note This method MUST fill CameraInfo::url with value of \a address
         */
         virtual int checkHostAddress( CameraInfo* cameras, const char* address, const char* login, const char* password ) = 0;
         //!MDNS camera search method
@@ -170,10 +171,13 @@ namespace nxcip
         */
         virtual BaseCameraManager* createCameraManager( const CameraInfo& info ) = 0;
 
-        //!Get model model names, reserved by the plugin
+        //!Get model names, reserved by the plugin
         /*!
-             \param[out] modelList        Array of \a char* buffers of size \a MAX_MODEL_NAME_SIZE where camera model names will be written. May be NULL.
-             \param[in, out] count        A pointer to a variable that specifies the size of array pointed to by the \a modelList parameter. 
+            For example, let camera support ONVIF, and plugin uses native API. In this case, plugin MUST implement this function and reserve model name, 
+            provided by onvif implementation. Also, CameraDiscoveryManager::getVendorName MUST be same as ONVIF vendor anem
+
+            \param[out] modelList        Array of \a char* buffers of size \a MAX_MODEL_NAME_SIZE where camera model names will be written. May be NULL.
+            \param[in, out] count        A pointer to a variable that specifies the size of array pointed to by the \a modelList parameter. 
                                           When the function returns, this variable contains the number of model names copied to \a modelList.
                                           If the buffer specified by \a modelList parameter is not large enough to hold the data, 
                                           the function returns NX_MORE_DATA and stores the required buffer size in the variable pointed to by \a count. 

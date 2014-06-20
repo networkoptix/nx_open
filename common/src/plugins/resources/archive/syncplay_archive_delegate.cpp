@@ -20,7 +20,7 @@ QnSyncPlayArchiveDelegate::~QnSyncPlayArchiveDelegate()
     delete m_ownerDelegate;
 }
 
-bool QnSyncPlayArchiveDelegate::open(QnResourcePtr resource)
+bool QnSyncPlayArchiveDelegate::open(const QnResourcePtr &resource)
 {
     return m_ownerDelegate->open(resource);
 }
@@ -139,4 +139,9 @@ QnAbstractMotionArchiveConnectionPtr QnSyncPlayArchiveDelegate::getMotionConnect
 void QnSyncPlayArchiveDelegate::setSendMotion(bool value)
 {
     m_ownerDelegate->setSendMotion(value);
+}
+
+QnAbstractArchiveDelegate::ArchiveChunkInfo QnSyncPlayArchiveDelegate::getLastUsedChunkInfo() const
+{
+    return m_ownerDelegate->getLastUsedChunkInfo();
 }

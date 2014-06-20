@@ -28,7 +28,7 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
 
     QnAbstractBusinessActionPtr action;
     ec2::ApiBusinessActionData apiData;
-    QnInputBinaryStream<QByteArray> stream(body);
+    QnInputBinaryStream<QByteArray> stream(&body);
     if (QnBinary::deserialize(&stream, &apiData))
         fromApiToResource(apiData, action, qnResPool);
     
@@ -52,7 +52,3 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
     return action ? CODE_OK : CODE_INVALID_PARAMETER;
 }
 
-QString QnBusinessActionRestHandler::description() const
-{
-    return "Execute business action. Action specified in POST request body in binary protobuf format. \n";
-}

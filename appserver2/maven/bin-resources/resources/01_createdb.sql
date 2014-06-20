@@ -101,27 +101,205 @@ CREATE TABLE "south_migrationhistory" (
     "migration" varchar(255) NOT NULL,
     "applied" datetime NOT NULL
 );
-CREATE TABLE "vms_businessrule" ("aggregation_period" integer, "action_params" varchar(16384) NOT NULL, "event_condition" varchar(16384) NOT NULL, "schedule" varchar(16384), "system" bool NOT NULL DEFAULT 0, "comments" varchar(16384), "disabled" bool NOT NULL DEFAULT 0, "action_type" smallint NOT NULL, "event_state" smallint NOT NULL DEFAULT 0, "id" integer PRIMARY KEY autoincrement, "event_type" smallint NOT NULL);
-CREATE TABLE "vms_businessrule_action_resources" ("id" integer NOT NULL PRIMARY KEY, "businessrule_id" integer NOT NULL, "resource_id" integer NOT NULL);
-CREATE TABLE "vms_businessrule_event_resources" ("id" integer NOT NULL PRIMARY KEY, "businessrule_id" integer NOT NULL, "resource_id" integer NOT NULL);
-CREATE TABLE "vms_camera" ("audio_enabled" bool NOT NULL DEFAULT 0, "control_disabled" bool NOT NULL DEFAULT 0, "firmware" varchar(200) NOT NULL DEFAULT '', "vendor" varchar(200) NOT NULL DEFAULT '', "manually_added" bool NOT NULL DEFAULT 0, "resource_ptr_id" integer PRIMARY KEY autoincrement, "region" varchar(1024) NOT NULL, "schedule_disabled" bool NOT NULL DEFAULT 0, "motion_type" smallint NOT NULL DEFAULT 0, "group_name" varchar(200) NOT NULL DEFAULT '', "group_id" varchar(200) NOT NULL DEFAULT '', "mac" varchar(200) NOT NULL, "model" varchar(200) NOT NULL DEFAULT '', "secondary_quality" smallint NOT NULL DEFAULT 1, "status_flags" integer NOT NULL DEFAULT 0, "physical_id" varchar(200) NOT NULL DEFAULT '', "password" varchar(200) NOT NULL, "login" varchar(200) NOT NULL, "dewarping_params" varchar(200));
-CREATE TABLE "vms_cameraserveritem" ("server_guid" varchar(40) NOT NULL, "timestamp" integer NOT NULL, "physical_id" varchar(200) NOT NULL, "id" integer PRIMARY KEY autoincrement);
-CREATE TABLE "vms_kvpair" ("resource_id" integer NOT NULL DEFAULT 1, "id" integer PRIMARY KEY autoincrement, "value" varchar(200) NOT NULL, "name" varchar(200) NOT NULL);
-CREATE TABLE "vms_layout" ("user_can_edit" bool NOT NULL DEFAULT 0, "cell_spacing_height" real NOT NULL DEFAULT -1.0, "locked" bool NOT NULL DEFAULT 0, "cell_aspect_ratio" real NOT NULL DEFAULT -1.0, "user_id" integer NOT NULL, "background_width" integer NOT NULL DEFAULT 1, "background_image_filename" varchar(1024), "background_height" integer NOT NULL DEFAULT 1, "cell_spacing_width" real NOT NULL DEFAULT -1.0, "background_opacity" real NOT NULL, "resource_ptr_id" integer PRIMARY KEY autoincrement);
-CREATE TABLE "vms_layoutitem" ("zoom_bottom" real NOT NULL DEFAULT 0, "right" real NOT NULL, "uuid" varchar(40) NOT NULL, "zoom_left" real NOT NULL DEFAULT 0, "resource_id" integer NOT NULL, "zoom_right" real NOT NULL DEFAULT 0, "top" real NOT NULL, "layout_id" integer NOT NULL, "bottom" real NOT NULL, "zoom_top" real NOT NULL DEFAULT 0, "zoom_target_uuid" varchar(40), "flags" integer NOT NULL, "contrast_params" varchar(200), "rotation" real NOT NULL, "id" integer PRIMARY KEY autoincrement, "dewarping_params" varchar(200) NULL, "left" real NOT NULL);
-CREATE TABLE "vms_license" ("name" varchar(100) NOT NULL, "camera_count" integer NOT NULL, "raw_license" varchar(2048) NOT NULL DEFAULT '', "key" varchar(32) NOT NULL, "signature" varchar(1024) NOT NULL, "id" integer PRIMARY KEY autoincrement);
-CREATE TABLE "vms_localresource" ("resource_ptr_id" integer NOT NULL PRIMARY KEY);
-CREATE TABLE "vms_manufacture" ("id" integer NOT NULL PRIMARY KEY, "name" varchar(200) NOT NULL UNIQUE);
-CREATE TABLE "vms_property" ("id" integer NOT NULL PRIMARY KEY, "resource_id" integer NOT NULL, "property_type_id" integer NOT NULL, "value" varchar(200) NOT NULL);
-CREATE TABLE "vms_propertytype" ("id" integer NOT NULL PRIMARY KEY, "resource_type_id" integer NOT NULL, "name" varchar(200) NOT NULL, "type" smallint NOT NULL, "min" integer NULL, "max" integer NULL, "step" integer NULL, "values" varchar(200)  NULL, "ui_values" varchar(200) NULL, "default_value" varchar(200)  NULL, "netHelper" varchar(200) NULL, "group" varchar(200) NULL, "sub_group" varchar(200) NULL, "description" varchar(200) NULL, "ui" bool NULL, "readonly" bool NULL);
-CREATE TABLE "vms_resource" ("status" smallint NOT NULL, "disabled" bool NOT NULL DEFAULT 0, "name" varchar(200) NOT NULL, "url" varchar(200), "xtype_id" integer NOT NULL, "parent_id" integer, "guid" varchar(40), "id" integer PRIMARY KEY autoincrement);
-CREATE TABLE "vms_resourcetype" ("id" integer NOT NULL PRIMARY KEY, "name" varchar(200) NOT NULL, "description" varchar(200) NULL, "manufacture_id" integer NULL);
-CREATE TABLE "vms_resourcetype_parents" ("id" integer NOT NULL PRIMARY KEY, "from_resourcetype_id" integer NOT NULL, "to_resourcetype_id" integer NOT NULL);
-CREATE TABLE "vms_scheduletask" ("id" integer NOT NULL PRIMARY KEY, "source_id" integer NOT NULL, "start_time" integer NOT NULL, "end_time" integer NOT NULL, "do_record_audio" bool NOT NULL, "record_type" smallint NOT NULL, "day_of_week" smallint NOT NULL, "before_threshold" integer NOT NULL, "after_threshold" integer NOT NULL, "stream_quality" smallint NOT NULL, "fps" integer NOT NULL);
-CREATE TABLE "vms_server" ("api_url" varchar(200) NOT NULL, "auth_key" varchar(1024), "streaming_url" varchar(200), "version" varchar(1024), "net_addr_list" varchar(1024), "reserve" bool NOT NULL DEFAULT 0, "resource_ptr_id" integer PRIMARY KEY autoincrement, "panic_mode" smallint NOT NULL);
-CREATE TABLE "vms_setting" ("id" integer NOT NULL PRIMARY KEY, "name" varchar(200) NOT NULL UNIQUE, "value" varchar(200) NOT NULL);
-CREATE TABLE "vms_storage" ("space_limit" integer NOT NULL, "used_for_writing" bool NOT NULL DEFAULT 1, "resource_ptr_id" integer PRIMARY KEY autoincrement);
-CREATE TABLE "vms_userprofile" ("user_id" integer NOT NULL UNIQUE, "digest" varchar(128) NULL, "resource_ptr_id" integer PRIMARY KEY autoincrement, "rights" integer unsigned NOT NULL DEFAULT 0);
+CREATE TABLE "vms_businessrule" (
+    "aggregation_period" integer, "action_params" varchar(16384) NOT NULL,
+    "event_condition" varchar(16384) NOT NULL,
+    "schedule" varchar(16384),
+    "system" bool NOT NULL DEFAULT 0,
+    "comments" varchar(16384),
+    "disabled" bool NOT NULL DEFAULT 0,
+    "action_type" smallint NOT NULL,
+    "event_state" smallint NOT NULL DEFAULT 0,
+    "id" integer PRIMARY KEY autoincrement,
+    "event_type" smallint NOT NULL);
+
+CREATE TABLE "vms_businessrule_action_resources" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "businessrule_id" integer NOT NULL,
+    "resource_id" integer NOT NULL);
+
+CREATE TABLE "vms_businessrule_event_resources" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "businessrule_id" integer NOT NULL,
+    "resource_id" integer NOT NULL);
+
+CREATE TABLE "vms_camera" (
+    "audio_enabled" bool NOT NULL DEFAULT 0,
+    "control_disabled" bool NOT NULL DEFAULT 0,
+    "firmware" varchar(200) NOT NULL DEFAULT '',
+    "vendor" varchar(200) NOT NULL DEFAULT '',
+    "manually_added" bool NOT NULL DEFAULT 0,
+    "resource_ptr_id" integer PRIMARY KEY autoincrement,
+    "region" varchar(1024) NOT NULL,
+    "schedule_disabled" bool NOT NULL DEFAULT 0,
+    "motion_type" smallint NOT NULL DEFAULT 0,
+    "group_name" varchar(200) NOT NULL DEFAULT '',
+    "group_id" varchar(200) NOT NULL DEFAULT '',
+    "mac" varchar(200) NOT NULL,
+    "model" varchar(200) NOT NULL DEFAULT '',
+    "secondary_quality" smallint NOT NULL DEFAULT 1,
+    "status_flags" integer NOT NULL DEFAULT 0,
+    "physical_id" varchar(200) NOT NULL DEFAULT '',
+    "password" varchar(200) NOT NULL,
+    "login" varchar(200) NOT NULL,
+    "dewarping_params" varchar(200));
+
+CREATE TABLE "vms_cameraserveritem" (
+    "server_guid" varchar(40) NOT NULL,
+    "timestamp" integer NOT NULL,
+    "physical_id" varchar(200) NOT NULL,
+    "id" integer PRIMARY KEY autoincrement);
+
+CREATE TABLE "vms_kvpair" (
+    "resource_id" integer NOT NULL DEFAULT 1,
+    "id" integer PRIMARY KEY autoincrement,
+    "value" varchar(200) NOT NULL,
+    "name" varchar(200) NOT NULL);
+
+
+CREATE TABLE "vms_layout" (
+    "user_can_edit" bool NOT NULL DEFAULT 0,
+    "cell_spacing_height" real NOT NULL DEFAULT -1.0,
+    "locked" bool NOT NULL DEFAULT 0,
+    "cell_aspect_ratio" real NOT NULL DEFAULT -1.0,
+    "user_id" integer NOT NULL,
+    "background_width" integer NOT NULL DEFAULT 1,
+    "background_image_filename" varchar(1024),
+    "background_height" integer NOT NULL DEFAULT 1,
+    "cell_spacing_width" real NOT NULL DEFAULT -1.0, 
+    "background_opacity" real NOT NULL,
+    "resource_ptr_id" integer PRIMARY KEY autoincrement );
+
+
+CREATE TABLE "vms_layoutitem" (
+    "zoom_bottom" real NOT NULL DEFAULT 0,
+    "right" real NOT NULL,
+    "uuid" varchar(40) NOT NULL,
+    "zoom_left" real NOT NULL DEFAULT 0,
+    "resource_id" integer NOT NULL,
+    "zoom_right" real NOT NULL DEFAULT 0,
+    "top" real NOT NULL,
+    "layout_id" integer NOT NULL,
+    "bottom" real NOT NULL,
+    "zoom_top" real NOT NULL DEFAULT 0,
+    "zoom_target_uuid" varchar(40),
+    "flags" integer NOT NULL,
+    "contrast_params" varchar(200),
+    "rotation" real NOT NULL,
+    "id" integer PRIMARY KEY autoincrement,
+    "dewarping_params" varchar(200) NULL,
+    "left" real NOT NULL);
+
+
+CREATE TABLE "vms_license" (
+    "name" varchar(100) NOT NULL,
+    "camera_count" integer NOT NULL,
+    "raw_license" varchar(2048) NOT NULL DEFAULT '',
+    "key" varchar(32) NOT NULL,
+    "signature" varchar(1024) NOT NULL,
+    "id" integer PRIMARY KEY autoincrement);
+
+
+CREATE TABLE "vms_localresource" (
+    "resource_ptr_id" integer NOT NULL PRIMARY KEY);
+
+
+CREATE TABLE "vms_manufacture" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "name" varchar(200) NOT NULL UNIQUE);
+
+
+CREATE TABLE "vms_property" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "resource_id" integer NOT NULL,
+    "property_type_id" integer NOT NULL,
+    "value" varchar(200) NOT NULL);
+
+
+CREATE TABLE "vms_propertytype" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "resource_type_id" integer NOT NULL,
+    "name" varchar(200) NOT NULL,
+    "type" smallint NOT NULL,
+    "min" integer NULL,
+    "max" integer NULL,
+    "step" integer NULL,
+    "values" varchar(200) NULL,
+    "ui_values" varchar(200) NULL,
+    "default_value" varchar(200) NULL,
+    "netHelper" varchar(200) NULL,
+    "group" varchar(200) NULL,
+    "sub_group" varchar(200) NULL,
+    "description" varchar(200) NULL,
+    "ui" bool NULL,
+    "readonly" bool NULL);
+
+
+CREATE TABLE "vms_resource" (
+    "status" smallint NOT NULL,
+    "disabled" bool NOT NULL DEFAULT 0,
+    "name" varchar(200) NOT NULL,
+    "url" varchar(200),
+    "xtype_id" integer NOT NULL,
+    "parent_id" integer,
+    "guid" varchar(40),
+    "id" integer PRIMARY KEY autoincrement);
+
+
+CREATE TABLE "vms_resourcetype" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "name" varchar(200) NOT NULL,
+    "description" varchar(200) NULL,
+    "manufacture_id" integer NULL);
+
+
+CREATE TABLE "vms_resourcetype_parents" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "from_resourcetype_id" integer NOT NULL,
+    "to_resourcetype_id" integer NOT NULL);
+
+
+CREATE TABLE "vms_scheduletask" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "source_id" integer NOT NULL,
+    "start_time" integer NOT NULL,
+    "end_time" integer NOT NULL,
+    "do_record_audio" bool NOT NULL,
+    "record_type" smallint NOT NULL,
+    "day_of_week" smallint NOT NULL,
+    "before_threshold" integer NOT NULL,
+    "after_threshold" integer NOT NULL,
+    "stream_quality" smallint NOT NULL,
+    "fps" integer NOT NULL);
+
+
+CREATE TABLE "vms_server" (
+    "api_url" varchar(200) NOT NULL,
+    "auth_key" varchar(1024),
+    "streaming_url" varchar(200),
+    "version" varchar(1024),
+    "net_addr_list" varchar(1024),
+    "reserve" bool NOT NULL DEFAULT 0,
+    "resource_ptr_id" integer PRIMARY KEY autoincrement,
+    "panic_mode" smallint NOT NULL);
+
+
+CREATE TABLE "vms_setting" (
+    "id" integer NOT NULL PRIMARY KEY,
+    "name" varchar(200) NOT NULL UNIQUE,
+    "value" varchar(200) NOT NULL);
+
+CREATE TABLE "vms_storage" (
+    "space_limit" integer NOT NULL,
+    "used_for_writing" bool NOT NULL DEFAULT 1,
+    "resource_ptr_id" integer PRIMARY KEY autoincrement);
+
+CREATE TABLE "vms_userprofile" (
+    "user_id" integer NOT NULL UNIQUE,
+    "digest" varchar(128) NULL,
+    "resource_ptr_id" integer PRIMARY KEY autoincrement,
+    "rights" integer unsigned NOT NULL DEFAULT 0);
+    
 CREATE INDEX "auth_group_permissions_1e014c8f" ON "auth_group_permissions" ("permission_id");
 CREATE INDEX "auth_group_permissions_425ae3c4" ON "auth_group_permissions" ("group_id");
 CREATE INDEX "auth_permission_1bb8f392" ON "auth_permission" ("content_type_id");
@@ -314,3 +492,5 @@ INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES (
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '4','Storage',NULL,NULL );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '5','Local',NULL,NULL );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '6','Camera',NULL,NULL );
+
+INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '17238','6','mediaStreams','1',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0' );

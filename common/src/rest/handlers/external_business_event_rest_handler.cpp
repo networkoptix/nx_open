@@ -13,9 +13,7 @@
 QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()
 {
     QnBusinessEventConnector* connector = qnBusinessRuleConnector;
-    connect(this, SIGNAL(mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason)),
-            connector,
-            SLOT(at_mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason)));
+    connect(this, &QnExternalBusinessEventRestHandler::mserverFailure, connector, &QnBusinessEventConnector::at_mserverFailure);
 }
 
 int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
@@ -52,10 +50,8 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
         {
             emit mserverFailure(resource,
                  qnSyncTime->currentUSecsSinceEpoch(),
-                 QnBusiness::ServerTerminatedReason);
-            //qnBusinessRuleConnector->at_mserverFailure(resource,
-            //                                           qnSyncTime->currentUSecsSinceEpoch(),
-            //                                           QnBusiness::MServerIssueTerminated);
+                 QnBusiness::ServerTerminatedReason,
+                 QString());
         }
         //else if (eventType == "UserEvent")
         //    bEvent = new QnUserDefinedBusinessEvent(); // todo: not implemented
@@ -82,14 +78,4 @@ int QnExternalBusinessEventRestHandler::executePost(const QString& path, const Q
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
-}
-
-QString QnExternalBusinessEventRestHandler::description() const
-{
-    return QLatin1String(
-        "Process external business event\n"
-        "<BR>Param <b>event_type</b> - eventType. supported values: 'MServerFailure', 'UserEvent'\n"
-        "<BR>Param <b>res_id</b> - resource (media server or camera) uniq id\n"
-        "<BR><b>Return</b> XML with error string or 'OK' message.\n"
-    );
 }

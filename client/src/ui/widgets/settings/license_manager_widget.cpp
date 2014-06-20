@@ -14,13 +14,13 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
-#include <client/client_translation_manager.h>
-
+#include <common/common_module.h>
+#include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <common/common_module.h>
-
 #include <mustache/mustache.h>
+
+#include <client/client_translation_manager.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -29,6 +29,7 @@
 #include <utils/license_usage_helper.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/common/product_features.h>
+
 
 #define QN_LICENSE_URL "http://networkoptix.com/nolicensed_vms/activate.php"
 
@@ -40,7 +41,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->setupUi(this);
 
     QList<QnLicenseListModel::Column> columns;
-    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn << QnLicenseListModel::ExpirationDateColumn;
+    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn << QnLicenseListModel::ExpirationDateColumn << QnLicenseListModel::LicenseStatusColumn;
 
     m_model = new QnLicenseListModel(this);
     m_model->setColumns(columns);
@@ -356,8 +357,11 @@ void QnLicenseManagerWidget::at_downloadFinished() {
             if (!license )
                 break;
 
-            if (license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT)))
+            QnLicense::ErrorCode errCode = QnLicense::NoError;
+            if (license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT), &errCode))
                 licenses.append(license);
+            else if (errCode == QnLicense::Expired)
+                licenses.append(license); // ignore expired error code
         }
 
         validateLicenses(m_replyKeyMap[reply], licenses);

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Attach to videowall...</string>
+   <string>Attach to Video Wall...</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -118,12 +118,12 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="closeClientCheckBox">
+    <widget class="QCheckBox" name="shortcutCheckbox">
      <property name="text">
-      <string>Start the videowall and exit</string>
+      <string>Create shortcut on the desktop</string>
      </property>
      <property name="checked">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
     </widget>
    </item>

@@ -20,7 +20,7 @@ signals:
     void gotImageSize(int width, int height);
 protected:
     virtual bool canAcceptData() const override;
-    virtual bool processData(QnAbstractDataPacketPtr data) override;
+    virtual bool processData(const QnAbstractDataPacketPtr& data) override;
     void finilizeSign();
 private:
     QnCryptographicHash m_mdctx;

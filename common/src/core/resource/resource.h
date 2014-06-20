@@ -67,17 +67,7 @@ public:
         Unauthorized,
         Online,
         Recording,
-        NotDefined,
-
-        /** Locked status used in layouts only */
-        Locked = Recording 
-        
-        // TODO: #EC2 #API #MSAPI Locked status was a bad idea in the first place. 
-        // Just add locked bool field to layout, and a proper migration script.
-        // 
-        // Think of how this is supposed to look in json API. 
-        // "layout": { "status": "Recording" }
-        // => Layout is locked. ZOMG!
+        NotDefined
     };
 
     enum Flag {
@@ -111,7 +101,6 @@ public:
         deprecated = 0x100000,  /**< Resource absent in EC but still used in memory for some reason */
 
         videowall = 0x200000,           /**< Videowall resource */
-        videowall_item = 0x400000,      /**< Videowall item */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -301,7 +290,7 @@ public:
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(QnAbstractDataPacketPtr data);
+    static void addCommandToProc(const QnAbstractDataPacketPtr& data);
     static int commandProcQueueSize();
 
     void update(QnResourcePtr other, bool silenceMode = false);
@@ -454,12 +443,13 @@ public:
     virtual ~QnResourceProcessor() {}
 
     virtual void processResources(const QnResourceList &resources) = 0;
+    virtual bool isBusy() const { return false; }
 };
 
 
 Q_DECLARE_METATYPE(QnResourcePtr);
 Q_DECLARE_METATYPE(QnResourceList);
 
-QN_FUSION_DECLARE_FUNCTIONS(QnResource::Status, (metatype)(json))
+QN_FUSION_DECLARE_FUNCTIONS(QnResource::Status, (metatype)(lexical))
 
 #endif // QN_RESOURCE_H

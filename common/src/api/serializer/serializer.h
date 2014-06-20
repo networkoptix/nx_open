@@ -2,24 +2,14 @@
 #define QN_API_SERIALIZER_H
 
 #include <QtCore/QByteArray>
+#include <QtCore/QList>
+#include <QtGui/QRegion>
 
-#include <api/model/kvpair.h>
-#include <api/model/email_attachment.h>
-#include <api/model/connection_info.h>
-
-#include <business/business_fwd.h>
-
-#include <core/resource/resource_fwd.h>
-#include <core/resource/camera_history.h>
-#include <core/resource/layout_item_data.h>
 #include <core/resource/motion_window.h>
 
-#include <licensing/license.h>
-
-#include <utils/common/exception.h>
+//TODO: #GDM #Common rename/move this module to something sane or get rid of it
 
 // TODO: #Elric move somewhere.
-
 /*
  * Helper serialization functions. Not related to any specific serialization format.
  */

@@ -36,22 +36,36 @@ namespace ec2 {
     struct ApiResourceParamWithRefData;
     struct ApiResourceParamsData;
     struct ApiResourceTypeData;
-    struct ApiRuntimeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
-    struct ApiServerAliveData;
+    struct ApiPeerAliveData;
     struct ApiServerInfoData;
-    struct ApiSetResourceDisabledData;
+    //struct ApiSetResourceDisabledData;
     struct ApiSetResourceStatusData;
     struct ApiStorageData;
     struct ApiStoredFileData;
     struct ApiUserData;
     struct ApiVideowallControlMessageData;
+    struct ApiVideowallInstanceStatusData;
     struct ApiVideowallData;
     struct ApiVideowallItemData;
     struct ApiVideowallItemWithRefData;
     struct ApiVideowallScreenData;
     struct ApiVideowallScreenWithRefData;
+    struct ApiVideowallMatrixData;
+    struct ApiVideowallMatrixWithRefData;
+    struct ApiVideowallMatrixItemData;
+    struct ApiVideowallMatrixItemWithRefData;
+    struct ApiUpdateUploadData;
+    struct ApiUpdateUploadResponceData;
+    struct ApiCameraBookmarkTagData;
+    struct ApiLoginData;
+
+    struct ApiHelpValueData;
+    struct ApiHelpParamData;
+    struct ApiHelpFunctionData;
+    struct ApiHelpGroupData;
+    struct ApiHelpGroupDataList;
 
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
@@ -66,12 +80,13 @@ namespace ec2 {
     typedef std::vector<ApiStorageData> ApiStorageDataList;
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
+    typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
 
     typedef QString ApiStoredFilePath; // TODO: #Elric struct => extendable?
+    typedef QString ApiUpdateInstallData; // TODO: #Elric struct => extendable?
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
-    struct LoginInfo;
 
-#define QN_EC2_API_DATA_CLASSES \
+#define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
     (ApiBusinessRuleData)\
     (ApiCameraData)\
@@ -94,27 +109,39 @@ namespace ec2 {
     (ApiResourceParamWithRefData)\
     (ApiResourceParamsData)\
     (ApiResourceTypeData)\
-    (ApiRuntimeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\
-    (ApiServerAliveData)\
+    (ApiPeerAliveData)\
     (ApiServerInfoData)\
-    (ApiSetResourceDisabledData)\
     (ApiSetResourceStatusData)\
     (ApiStorageData)\
     (ApiStoredFileData)\
     (ApiUserData)\
     (ApiVideowallControlMessageData)\
+    (ApiVideowallInstanceStatusData)\
     (ApiVideowallData)\
     (ApiVideowallItemData)\
     (ApiVideowallItemWithRefData)\
     (ApiVideowallScreenData)\
     (ApiVideowallScreenWithRefData)\
+    (ApiVideowallMatrixData)\
+    (ApiVideowallMatrixWithRefData)\
+    (ApiVideowallMatrixItemData)\
+    (ApiVideowallMatrixItemWithRefData)\
+    (ApiUpdateUploadData)\
+    (ApiUpdateUploadResponceData)\
+    (ApiCameraBookmarkTagData)\
+    (ApiLoginData)\
+    (ApiHelpValueData)\
+    (ApiHelpParamData)\
+    (ApiHelpFunctionData)\
+    (ApiHelpGroupData)\
+    (ApiHelpGroupDataList)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-        QN_EC2_API_DATA_CLASSES,
-        (binary)(json)(sql_record)(csv_record)
+        QN_EC2_API_DATA_TYPES,
+        (ubj)(xml)(binary)(json)(sql_record)(csv_record)
     );
 #endif
     

@@ -5,14 +5,18 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <media_server/server_update_tool.h>
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
 #include "business/business_message_bus.h"
+#include "settings.h"
 
 
-QnServerMessageProcessor::QnServerMessageProcessor():
-        base_type()
+QnServerMessageProcessor::QnServerMessageProcessor()
+:
+    base_type(),
+    m_serverPort( MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT, nx_ms_conf::DEFAULT_RTSP_PORT).toInt() )
 {
 
 }
@@ -99,11 +103,20 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     
     if (isCamera) 
     {
-        if (resource->getParentId() != ownMediaServer->getId())
+        bool needProxyToCamera = true;
+        if (resource->getParentId() != ownMediaServer->getId()) {
             resource->addFlags( QnResource::foreigner );
+        }
+        else {
+#ifdef EDGE_SERVER
+            needProxyToCamera = false;
+#endif
+        }
         // update all known IP list
-        QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
-        updateAllIPList(camRes->getId(), camRes->getHostAddress());
+        if (needProxyToCamera) {
+            QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
+            updateAllIPList(camRes->getId(), camRes->getHostAddress());
+        }
     }
 
     if (isServer) 
@@ -115,7 +128,6 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
         }
     }
 
-    bool needUpdateServer = false;
     // We are always online
     if (isServer && resource->getId() == serverGuid()) {
         if (resource->getStatus() != QnResource::Online) {
@@ -144,6 +156,12 @@ void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 {
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnServerMessageProcessor::at_remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnServerMessageProcessor::at_remotePeerLost );
+
+    connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateChunkReceived,
+        this, &QnServerMessageProcessor::at_updateChunkReceived );
+    connect( connection->getUpdatesManager().get(), &ec2::AbstractUpdatesManager::updateInstallationRequested,
+        this, &QnServerMessageProcessor::at_updateInstallationRequested );
+
     QnCommonMessageProcessor::init(connection);
 }
 
@@ -158,20 +176,20 @@ bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
 * EC2 related processing. Need move to other class
 */
 
-void QnServerMessageProcessor::at_remotePeerFound(QnId id, bool isClient, bool isProxy)
+void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool /*isProxy*/)
 {
-    QnResourcePtr res = qnResPool->getResourceById(id);
+    QnResourcePtr res = qnResPool->getResourceById(data.peerId);
     if (res)
         res->setStatus(QnResource::Online);
 
 }
 
-void QnServerMessageProcessor::at_remotePeerLost(QnId id, bool isClient, bool isProxy)
+void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool /*isProxy*/)
 {
-    QnResourcePtr res = qnResPool->getResourceById(id);
+    QnResourcePtr res = qnResPool->getResourceById(data.peerId);
     if (res) {
         res->setStatus(QnResource::Offline);
-        if (isClient) {
+        if (data.peerType != ec2::QnPeerInfo::Server) {
             // This media server hasn't own DB
             foreach(QnResourcePtr camera, qnResPool->getAllCameras(res))
                 camera->setStatus(QnResource::Offline);
@@ -183,17 +201,50 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     resource->setStatus(status, true);
 }
 
-bool QnServerMessageProcessor::isProxy(void* opaque, const QUrl& url)
-{
+bool QnServerMessageProcessor::isProxy(void* opaque, const QUrl& url) {
     return static_cast<QnServerMessageProcessor*> (opaque)->isProxy(url);
 }
 
-bool QnServerMessageProcessor::isProxy(const QUrl& url)
+bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
 {
-    return isKnownAddr(url.host());
+    if (addr == "localhost" || addr == "127.0.0.1")
+        return true;
+    if( !m_mServer )
+        m_mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (m_mServer) 
+    {
+        QHostAddress hostAddr(addr);
+        foreach(const QHostAddress& serverAddr, m_mServer->getNetAddrList())
+        {
+            if (hostAddr == serverAddr)
+                return true;
+        }
+    }
+    return false;
 }
 
-void QnServerMessageProcessor::execBusinessActionInternal(QnAbstractBusinessActionPtr action)
-{
+bool QnServerMessageProcessor::isProxy(const QUrl& url) {
+    const QString& urlHost = url.host();
+    if (isKnownAddr(urlHost))
+        return true; // it's camera or other media server address
+    
+    int port = url.port( nx_http::DEFAULT_HTTP_PORT );
+    if (port > 0) {
+        if (port != m_serverPort && isLocalAddress(urlHost))
+            return true; // proxy to some local service
+    }
+    
+    return false;
+}
+
+void QnServerMessageProcessor::execBusinessActionInternal(QnAbstractBusinessActionPtr action) {
     qnBusinessMessageBus->at_actionReceived(action);
+}
+
+void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset) {
+    QnServerUpdateTool::instance()->addUpdateFileChunk(updateId, data, offset);
+}
+
+void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
+    QnServerUpdateTool::instance()->installUpdate(updateId);
 }

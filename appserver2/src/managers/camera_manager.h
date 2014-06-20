@@ -12,26 +12,12 @@
 
 namespace ec2
 {
-    template<class QueryProcessorType>
-    class QnCameraManager
+    class QnCameraNotificationManager
     :
         public AbstractCameraManager
     {
     public:
-        QnCameraManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
-
-        //!Implementation of AbstractCameraManager::addCamera
-        virtual int addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) override;
-        //!Implementation of AbstractCameraManager::addCameraHistoryItem
-        virtual int addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler ) override;
-        //!Implementation of AbstractCameraManager::getCameras
-        virtual int getCameras( const QnId& mediaServerId, impl::GetCamerasHandlerPtr handler ) override;
-        //!Implementation of AbstractCameraManager::getCameraHistoryList
-        virtual int getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler ) override;
-        //!Implementation of AbstractCameraManager::save
-        virtual int save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler ) override;
-        //!Implementation of AbstractCameraManager::remove
-        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+        QnCameraNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
 
         void triggerNotification( const QnTransaction<ApiCameraData>& tran )
         {
@@ -70,18 +56,73 @@ namespace ec2
             QnCameraHistoryItemPtr cameraHistoryItem( new QnCameraHistoryItem(
                 tran.params.physicalId,
                 tran.params.timestamp,
-                tran.params.serverGuid ) );
+                tran.params.serverId ) );
             emit cameraHistoryChanged( cameraHistoryItem );
         }
 
+        void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran )
+        {
+            QnCameraBookmarkTags tags;
+            fromApiToResource(tran.params, tags);
+            if (tags.isEmpty())
+                return;
+
+            switch (tran.command) {
+            case ApiCommand::addCameraBookmarkTags:
+                emit cameraBookmarkTagsAdded(tags);
+                break;
+            case ApiCommand::removeCameraBookmarkTags:
+                emit cameraBookmarkTagsRemoved(tags);
+                break;
+            default:
+                assert(false);  //should never get here
+                break;
+            }
+        }
+
+    protected:
+		ResourceContext m_resCtx;
+    };
+
+
+
+
+    template<class QueryProcessorType>
+    class QnCameraManager
+    :
+        public QnCameraNotificationManager
+    {
+    public:
+        QnCameraManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+
+        //!Implementation of AbstractCameraManager::addCamera
+        virtual int addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) override;
+        //!Implementation of AbstractCameraManager::addCameraHistoryItem
+        virtual int addCameraHistoryItem( const QnCameraHistoryItem& cameraHistoryItem, impl::SimpleHandlerPtr handler ) override;
+        //!Implementation of AbstractCameraManager::getCameras
+        virtual int getCameras( const QnId& mediaServerId, impl::GetCamerasHandlerPtr handler ) override;
+        //!Implementation of AbstractCameraManager::getCameraHistoryList
+        virtual int getCameraHistoryList( impl::GetCamerasHistoryHandlerPtr handler ) override;
+        //!Implementation of AbstractCameraManager::save
+        virtual int save( const QnVirtualCameraResourceList& cameras, impl::AddCameraHandlerPtr handler ) override;
+        //!Implementation of AbstractCameraManager::remove
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+
+        //!Implementation of AbstractCameraManager::addBookmarkTags
+        virtual int addBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) override;
+        //!Implementation of AbstractCameraManager::getBookmarkTags
+        virtual int getBookmarkTags(impl::GetCameraBookmarkTagsHandlerPtr handler) override;
+        //!Implementation of AbstractCameraManager::removeBookmarkTags
+        virtual int removeBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) override;
+
     private:
         QueryProcessorType* const m_queryProcessor;
-		ResourceContext m_resCtx;
 
         QnTransaction<ApiCameraData> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourcePtr& resource );
         QnTransaction<ApiCameraDataList> prepareTransaction( ApiCommand::Value cmd, const QnVirtualCameraResourceList& cameras );
         QnTransaction<ApiCameraServerItemData> prepareTransaction( ApiCommand::Value cmd, const QnCameraHistoryItem& historyItem );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
+        QnTransaction<ApiCameraBookmarkTagDataList> prepareTransaction( ApiCommand::Value command, const QnCameraBookmarkTags& tags );
     };
 }
 

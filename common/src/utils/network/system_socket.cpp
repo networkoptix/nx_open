@@ -935,7 +935,13 @@ int CommunicatingSocket::send( const void* buffer, unsigned int bufferLen )
         return -1;
 
     int sended = doInterruptableSystemCallWithTimeout<>(
-        std::bind(&::send, sockDesc, (const void*)buffer, (size_t)bufferLen, MSG_NOSIGNAL),
+        std::bind(&::send, sockDesc, (const void*)buffer, (size_t)bufferLen,
+#ifdef __linux
+            MSG_NOSIGNAL
+#else
+            0
+#endif
+	),
         sendTimeout );
 #endif
     if (sended < 0)
@@ -1377,7 +1383,13 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
         return -1;
 
     return doInterruptableSystemCallWithTimeout<>(
-        std::bind(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, MSG_NOSIGNAL, (const sockaddr *) &m_destAddr, (socklen_t)sizeof(m_destAddr)),
+        std::bind(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen,
+#ifdef __linux__
+            MSG_NOSIGNAL,
+#else
+            0,
+#endif
+            (const sockaddr *) &m_destAddr, (socklen_t)sizeof(m_destAddr)),
         sendTimeout ) == bufferLen;
 #endif
 }

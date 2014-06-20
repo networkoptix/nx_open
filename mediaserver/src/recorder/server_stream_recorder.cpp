@@ -1,4 +1,5 @@
 #include "server_stream_recorder.h"
+
 #include "motion/motion_helper.h"
 #include "storage_manager.h"
 #include "core/dataprovider/media_streamdataprovider.h"
@@ -15,14 +16,18 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "core/datapacket/media_data_packet.h"
 #include <media_server/serverutil.h>
+#include <media_server/settings.h>
 
-static const int MAX_BUFFERED_SIZE = 1024*1024*20;
+
 static const int MOTION_PREBUFFER_SIZE = 8;
 
-QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
+QnServerStreamRecorder::QnServerStreamRecorder(const QnResourcePtr &dev, QnServer::ChunksCatalog catalog, QnAbstractMediaStreamDataProvider* mediaProvider)
+:
     QnStreamRecorder(dev),
+    m_maxRecordQueueSizeBytes( MSSettings::roSettings()->value( nx_ms_conf::MAX_RECORD_QUEUE_SIZE_BYTES, nx_ms_conf::DEFAULT_MAX_RECORD_QUEUE_SIZE_BYTES ).toULongLong() ),
+    m_maxRecordQueueSizeElements( MSSettings::roSettings()->value( nx_ms_conf::MAX_RECORD_QUEUE_SIZE_ELEMENTS, nx_ms_conf::DEFAULT_MAX_RECORD_QUEUE_SIZE_ELEMENTS ).toULongLong() ),
     m_scheduleMutex(QMutex::Recursive),
-    m_role(role),
+    m_catalog(catalog),
     m_mediaProvider(mediaProvider),
     m_dualStreamingHelper(0),
     m_usedPanicMode(false),
@@ -81,7 +86,7 @@ bool QnServerStreamRecorder::canAcceptData() const
         return true;
 
     //bool rez = QnStreamRecorder::canAcceptData();
-    bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
+    bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && m_dataQueue.size() < m_maxRecordQueueSizeElements;
     
 
     if (!rez) {
@@ -96,14 +101,14 @@ bool QnServerStreamRecorder::canAcceptData() const
     */
 }
 
-void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr nonConstData)
+void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnConstAbstractDataPacketPtr data = nonConstData;
 
     if (!isRunning()) 
         return;
 
-    bool halfQueueReached = m_queuedSize >= MAX_BUFFERED_SIZE/2 || m_dataQueue.size() >= 500;
+    const bool halfQueueReached = m_queuedSize >= m_maxRecordQueueSizeBytes/2 || (size_t)m_dataQueue.size() >= m_maxRecordQueueSizeElements/2;
     if (!m_rebuildBlocked && halfQueueReached)
     {
         m_rebuildBlocked = true;
@@ -115,11 +120,11 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr nonConstData)
         DeviceFileCatalog::rebuildResume(this);
     }
 
-    bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
+    bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
     if (!rez) {
         emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageNotEnoughSpaceReason, m_storage);
 
-        qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "some frames are dropped!";
+        qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
         markNeedKeyData();
         m_dataQueue.clear();
         QMutexLocker lock(&m_queueSizeMutex);
@@ -155,7 +160,7 @@ void QnServerStreamRecorder::updateStreamParams()
     if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
-        if (m_role == QnResource::Role_LiveVideo) {
+        if (m_catalog == QnServer::HiQualityCatalog) {
             if (m_currentScheduleTask.getRecordingType() != Qn::RT_Never) {
                 liveProvider->setFps(m_currentScheduleTask.getFps());
                 liveProvider->setQuality(m_currentScheduleTask.getStreamQuality());
@@ -175,7 +180,7 @@ bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
 {
     QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
     return recType == Qn::RT_MotionOnly || 
-           (m_role == QnResource::Role_LiveVideo && recType == Qn::RT_MotionAndLowQuality && camera->hasDualStreaming2());
+           (m_catalog == QnServer::HiQualityCatalog && recType == Qn::RT_MotionAndLowQuality && camera->hasDualStreaming2());
 }
 
 void QnServerStreamRecorder::beforeProcessData(QnConstAbstractMediaDataPtr media)
@@ -248,7 +253,7 @@ bool QnServerStreamRecorder::needSaveData(QnConstAbstractMediaDataPtr media)
 
     if (task.getRecordingType() == Qn::RT_Always)
         return true;
-    else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_role == QnResource::Role_SecondaryLiveVideo || !camera->hasDualStreaming2()))
+    else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_catalog == QnServer::LowQualityCatalog || !camera->hasDualStreaming2()))
         return true;
     else if (task.getRecordingType() == Qn::RT_Never)
     {
@@ -282,14 +287,14 @@ int QnServerStreamRecorder::getFpsForValue(int fps)
     QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
     if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
     {
-        if (m_role == QnResource::Role_LiveVideo)
+        if (m_catalog == QnServer::HiQualityCatalog)
             return fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2;
         else
             return fps ? qMax(2, qMin(camera->desiredSecondStreamFps(), camera->getMaxFps()-fps)) : 2;
     }
     else
     {
-        if (m_role == QnResource::Role_LiveVideo)
+        if (m_catalog == QnServer::HiQualityCatalog)
             return fps ? fps : camera->getMaxFps();
         else
             return camera->desiredSecondStreamFps();
@@ -422,7 +427,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     }
 }
 
-bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
+bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 {
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
     if (!media)
@@ -463,7 +468,7 @@ QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* 
         m_storage = qnStorageMan->getOptimalStorageRoot(provider);
         if (m_storage)
             setTruncateInterval(m_storage->getChunkLen());
-        return qnStorageMan->getFileName(m_startDateTime/1000, m_currentTimeZone, netResource, DeviceFileCatalog::prefixForRole(m_role), m_storage);
+        return qnStorageMan->getFileName(m_startDateTime/1000, m_currentTimeZone, netResource, DeviceFileCatalog::prefixByCatalog(m_catalog), m_storage);
     }
     else {
         return m_fixedFileName;

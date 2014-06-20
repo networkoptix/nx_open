@@ -51,7 +51,7 @@ extern "C"
 
 //#define UPLOAD_SYSMEM_FRAMES_ASYNC
 #define UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
-//#define USE_MIN_GL_TEXTURES
+#define USE_MIN_GL_TEXTURES
 
 #if defined(UPLOAD_SYSMEM_FRAMES_ASYNC) && defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD)
 #error "UPLOAD_SYSMEM_FRAMES_ASYNC and UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD cannot be defined simultaneously"
@@ -1291,7 +1291,10 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     m_uploadThread = pool[random(0, pool.size())];    //TODO/IMPL should take 
 #endif
 
-    for( size_t i = 0; i < asyncDepth+MIN_GL_PIC_BUF_COUNT; ++i )
+    //const int textureQueueSize = asyncDepth+MIN_GL_PIC_BUF_COUNT;
+    const int textureQueueSize = 1;
+
+    for( size_t i = 0; i < textureQueueSize; ++i )
         m_emptyBuffers.push_back( new UploadedPicture( this ) );
 
 #ifdef SINGLE_STREAM_UPLOAD
@@ -1913,7 +1916,7 @@ static int glRGBFormat( PixelFormat format )
             case PIX_FMT_RGB24:
                 return GL_RGB;
             case PIX_FMT_BGR24:
-                return GL_BGR_EXT;
+                return GL_BGRA_EXT; //TODO: #asinaisky 
             default:
                 break;
         }

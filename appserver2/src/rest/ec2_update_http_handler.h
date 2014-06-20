@@ -54,12 +54,14 @@ namespace ec2
             QByteArray& /*contentType*/ )
         {
             QnTransaction<RequestDataType> tran;
-            QnInputBinaryStream<QByteArray> stream( body );
+            QnInputBinaryStream<QByteArray> stream( &body );
             if (!QnBinary::deserialize(&stream, &tran))
                 return nx_http::StatusCode::badRequest;
             
             // replace client GUID to own GUID (take transaction ownership).
-            tran.id.peerGUID = qnCommon->moduleGUID();
+            tran.id.peerID = qnCommon->moduleGUID();
+            if (QnDbManager::instance())
+                tran.id.dbID = QnDbManager::instance()->getID();
 
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;
@@ -79,18 +81,11 @@ namespace ec2
 
              // update local data
             if (errorCode == ErrorCode::ok)
-                m_connection->triggerNotification(tran);
+                m_connection->notificationManager()->triggerNotification(tran);
 
             return (errorCode == ErrorCode::ok)
                 ? nx_http::StatusCode::ok
                 : nx_http::StatusCode::internalServerError;
-        }
-
-        //!Implementation of QnRestRequestHandler::description
-        virtual QString description() const
-        {
-            //TODO/IMPL
-            return QString();
         }
 
     private:

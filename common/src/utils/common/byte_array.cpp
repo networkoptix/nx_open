@@ -1,10 +1,24 @@
 #include "byte_array.h"
 #include "warnings.h"
+#include "plugins/plugin_tools.h"
 
 /**
  * Same as FF_INPUT_BUFFER_PADDING_SIZE.
  */
 #define QN_BYTE_ARRAY_PADDING 16
+
+//#define CALC_QnByteArray_ALLOCATION
+#ifdef CALC_QnByteArray_ALLOCATION
+QAtomicInt QnByteArray_bytesAllocated;
+#endif
+
+#if 1
+#define _qMallocAligned qMallocAligned
+#define _qFreeAligned qFreeAligned
+#else
+#define _qMallocAligned nxpt::mallocAligned
+#define _qFreeAligned nxpt::freeAligned
+#endif
 
 QnByteArray::QnByteArray(unsigned int alignment, unsigned int capacity):
     m_alignment(alignment),
@@ -32,7 +46,12 @@ QnByteArray::QnByteArray( char* buf, unsigned int dataSize )
 QnByteArray::~QnByteArray()
 {
     if( m_ownBuffer )
-        qFreeAligned(m_data);
+    {
+        _qFreeAligned(m_data);
+#ifdef CALC_QnByteArray_ALLOCATION
+        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
+#endif
+    }
 }
 
 void QnByteArray::clear()
@@ -145,6 +164,63 @@ void QnByteArray::removeTrailingZeros()
         --m_size;
 }
 
+QnByteArray& QnByteArray::operator=( const QnByteArray& right )
+{
+    if( &right == this )
+        return *this;
+
+    if( m_ownBuffer )
+    {
+#ifdef CALC_QnByteArray_ALLOCATION
+        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
+#endif
+        _qFreeAligned(m_data);
+    }
+
+    m_alignment = right.m_alignment;
+    m_capacity = right.m_size;
+    m_size = right.m_size;
+    m_data = (char*)_qMallocAligned( m_capacity + QN_BYTE_ARRAY_PADDING, m_alignment ); 
+#ifdef CALC_QnByteArray_ALLOCATION
+    QnByteArray_bytesAllocated.fetchAndAddOrdered( m_capacity + QN_BYTE_ARRAY_PADDING );
+#endif
+    memcpy( m_data, right.constData(), right.size() );
+    m_ignore = 0;
+    m_ownBuffer = true;
+
+    return *this;
+}
+
+QnByteArray& QnByteArray::operator=( QnByteArray&& right )
+{
+    if( &right == this )
+        return *this;
+
+    if( m_ownBuffer )
+    {
+        _qFreeAligned(m_data);
+#ifdef CALC_QnByteArray_ALLOCATION
+        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
+#endif
+    }
+
+    m_alignment = right.m_alignment;
+    m_capacity = right.m_capacity;
+    m_size = right.m_size;
+    m_data = right.m_data;
+    m_ignore = right.m_ignore;
+    m_ownBuffer = right.m_ownBuffer;
+
+    right.m_alignment = 1;
+    right.m_capacity = 0;
+    right.m_size = 0;
+    right.m_data = nullptr;
+    right.m_ignore = 0;
+    right.m_ownBuffer = true;
+
+    return *this;
+}
+
 bool QnByteArray::reallocate(unsigned int capacity)
 {
     Q_ASSERT(capacity > 0);
@@ -159,13 +235,21 @@ bool QnByteArray::reallocate(unsigned int capacity)
     if (capacity < m_capacity)
         return true;
 
-    char *data = (char *) qMallocAligned(capacity + QN_BYTE_ARRAY_PADDING, m_alignment);
+    char *data = (char *) _qMallocAligned(capacity + QN_BYTE_ARRAY_PADDING, m_alignment);
     if(!data)
         return false;
+#ifdef CALC_QnByteArray_ALLOCATION
+    QnByteArray_bytesAllocated.fetchAndAddOrdered( capacity + QN_BYTE_ARRAY_PADDING );
+#endif
 
     memcpy(data, m_data, m_size);
     if( m_ownBuffer )
-        qFreeAligned(m_data);
+    {
+        _qFreeAligned(m_data);
+#ifdef CALC_QnByteArray_ALLOCATION
+        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
+#endif
+    }
     m_capacity = capacity;
     m_data = data;
     m_ownBuffer = true;

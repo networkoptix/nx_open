@@ -5,9 +5,26 @@
 
 #include "camera_driver_restriction_list.h"
 
+#include <QtCore/QMutexLocker>
+
+
+static CameraDriverRestrictionList* CameraDriverRestrictionList_instance = nullptr;
+
+CameraDriverRestrictionList::CameraDriverRestrictionList()
+{
+    assert( CameraDriverRestrictionList_instance == nullptr );
+    CameraDriverRestrictionList_instance = this;
+}
+
+CameraDriverRestrictionList::~CameraDriverRestrictionList()
+{
+    CameraDriverRestrictionList_instance = nullptr;
+}
 
 void CameraDriverRestrictionList::allow( const QString& driverName, const QString& cameraVendor, const QString& cameraModelMask )
 {
+    QMutexLocker lk( &m_mutex );
+
     std::vector<AllowRuleData>& rules = m_allowRulesByVendor[cameraVendor.toLower()];
     AllowRuleData ruleData;
     ruleData.modelNamePattern = QRegExp( cameraModelMask, Qt::CaseInsensitive, QRegExp::Wildcard );
@@ -17,6 +34,8 @@ void CameraDriverRestrictionList::allow( const QString& driverName, const QStrin
 
 bool CameraDriverRestrictionList::driverAllowedForCamera( const QString& driverName, const QString& cameraVendor, const QString& cameraModel ) const
 {
+    QMutexLocker lk( &m_mutex );
+
     std::map<QString, std::vector<AllowRuleData> >::const_iterator it = m_allowRulesByVendor.find(cameraVendor.toLower());
     if( it == m_allowRulesByVendor.end() )
         return true;
@@ -28,4 +47,9 @@ bool CameraDriverRestrictionList::driverAllowedForCamera( const QString& driverN
             return rules[i].driverName == driverName;
     }
     return true;    //by default, everything is allowed
+}
+
+CameraDriverRestrictionList* CameraDriverRestrictionList::instance()
+{
+    return CameraDriverRestrictionList_instance;
 }

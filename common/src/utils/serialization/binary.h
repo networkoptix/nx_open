@@ -30,14 +30,13 @@ namespace QnBinary {
     template<class T>
     T deserialized(const QByteArray &value, const T &defaultValue = T(), bool *success = NULL) {
         T target;
-        QnInputBinaryStream<QByteArray> stream(value);
+        QnInputBinaryStream<QByteArray> stream(&value);
         bool result = QnBinary::deserialize(&stream, &target);
         if (success)
             *success = result;
         return result ? target : defaultValue;
     }
 #endif
-
 
 } // namespace QnBinary
 
@@ -88,9 +87,10 @@ namespace QnBinaryDetail {
         bool operator()(const T &, const Access &access, const QnFusion::start_tag &) {
             using namespace QnFusion;
 
-            unsigned char header;
-            QnBinary::deserialize(m_stream, &header);
-            if(header & 0xE0)
+            unsigned char header = 0;
+            if(!QnBinary::deserialize(m_stream, &header))
+                return false;
+            if(header & 0xE0)   //TODO: #Elric what does 0xE0 mean?
                 return false; /* Reserved fields are expected to be zero. A packet from next version? */
 
             m_count = header;
@@ -139,8 +139,8 @@ namespace QnBinaryDetail {
 } // namespace QnBinaryDetail
 
 
-QN_FUSION_REGISTER_SERIALIZATION_VISITOR(QnOutputBinaryStream<QByteArray> *, QnBinaryDetail::SerializationVisitor<QByteArray>)
-QN_FUSION_REGISTER_DESERIALIZATION_VISITOR(QnInputBinaryStream<QByteArray> *, QnBinaryDetail::DeserializationVisitor<QByteArray>)
+QN_FUSION_REGISTER_SERIALIZATION_VISITOR_TPL((class Output), (QnOutputBinaryStream<Output> *), (QnBinaryDetail::SerializationVisitor<Output>))
+QN_FUSION_REGISTER_DESERIALIZATION_VISITOR_TPL((class Input), (QnInputBinaryStream<Input> *), (QnBinaryDetail::DeserializationVisitor<Input>))
 
 
 #define QN_FUSION_DEFINE_FUNCTIONS_binary(TYPE, ... /* PREFIX */)               \

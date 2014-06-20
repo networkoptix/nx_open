@@ -54,7 +54,7 @@ public:
         int port;
         int timeout;
 
-        //TODO: #GDM think where else we can store it
+        //TODO: #GDM #Common think where else we can store it
         /** Flag that we are using simple view */
         bool simple;
     };
@@ -88,7 +88,7 @@ private:
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnEmail::ConnectionType)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (json))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (lexical))
 
 #endif // QN_EMAIL_H
 

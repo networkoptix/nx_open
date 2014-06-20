@@ -39,7 +39,7 @@ QnGraphicsMessageBoxItem::QnGraphicsMessageBoxItem(QGraphicsItem *parent):
 
 QnGraphicsMessageBoxItem::~QnGraphicsMessageBoxItem() {
     // instance = NULL;
-    // TODO: #GDM why is it commented out?
+    // TODO: #GDM #Common why is it commented out?
 }
 
 void QnGraphicsMessageBoxItem::addItem(QGraphicsLayoutItem *item) {
@@ -127,6 +127,31 @@ QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text, int
 
     QnGraphicsMessageBox* box = new QnGraphicsMessageBox(instance, text, timeoutMsec, fontSize);
     instance->addItem(box);
+    return box;
+}
+
+QnGraphicsMessageBox* QnGraphicsMessageBox::informationTicking(const QString &text, int timeoutMsec, int fontSize) {
+    if (!instance)
+        return NULL;
+
+    QPointer<QnGraphicsMessageBox> box = new QnGraphicsMessageBox(instance, QString(), timeoutMsec, fontSize);
+    instance->addItem(box);
+
+    const auto tickHandler = [box, text](int tick) {
+        if (!box)
+            return;
+
+        int left = box->timeout() - tick;
+        int n = (left + 500) / 1000;
+
+        if (n > 0)
+            box->setText(text.arg(n));
+        else
+            box->hideImmideately();
+    };
+    connect(box.data(), &QnGraphicsMessageBox::tick, instance, tickHandler);
+    tickHandler(0);
+
     return box;
 }
 

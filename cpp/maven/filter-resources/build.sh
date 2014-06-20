@@ -4,6 +4,7 @@ CONFIG=${build.configuration}
 ARTIFACT=${project.artifactId}
 PLATFORM=`uname -s`
 QTCHECK=`ldd ${libdir}/lib/${build.configuration}/libQt5Core.so.5 | grep libglib-2.0.so.0`
+DEBUG=
 
 if [ $PLATFORM == 'Linux' ] && [ "${arch}" != "arm"  ] && [ -z "$QTCHECK" ]; then
      echo 'invalid QT - does not support libglib. Compilation terminated'
@@ -25,4 +26,8 @@ case `uname -s` in
         ;;
 esac
 
-make --no-p QUIET=yes -f Makefile.$CONFIG -j $[NPROCESSORS+1] || exit 1
+if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'mediaserver' ]  || [ '${project.artifactId}' == 'appserver2' || [ '${project.artifactId}' == 'isd_native_plugin' ]; then
+     DEBUG=ext_debug
+fi
+
+make --no-p QUIET=yes -f Makefile.$CONFIG -j $[NPROCESSORS+1] $DEBUG || exit 1

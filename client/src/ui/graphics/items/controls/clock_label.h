@@ -15,7 +15,6 @@ signals:
     void timeChanged(const QString &timeString);
 
 private slots:
-    void at_timer_timeout();
     void updateFormatString();
 
 private:

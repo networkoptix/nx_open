@@ -8,6 +8,8 @@
 
 #include <memory>
 
+#include <QtCore/QUrl>
+
 #include <utils/common/stoppable.h>
 
 
@@ -41,12 +43,9 @@ namespace detail
         virtual void operationDone( const std::shared_ptr<RDirSynchronizationOperation>& operation ) = 0;
     };
 
-    class RDirSynchronizationOperation
-    :
-        public QnStoppable
+    namespace ResultCode
     {
-    public:
-        enum class ResultCode
+        enum Value
         {
             success,
             downloadFailure,
@@ -55,6 +54,14 @@ namespace detail
             unknownError
         };
 
+        QString toString( Value val );
+    }
+
+    class RDirSynchronizationOperation
+    :
+        public QnStoppable
+    {
+    public:
         const RSyncOperationType type;
         const int id;
         const QUrl baseUrl;
@@ -81,16 +88,17 @@ namespace detail
         //!Returns true, if failed to get data from remote side
         bool remoteSideFailure() const { return m_result == ResultCode::downloadFailure; }
         QString errorText() const { return m_errorText; }
+        ResultCode::Value result() const { return m_result; };
 
     protected:
         AbstractRDirSynchronizationEventHandler* const m_handler;
 
         void setErrorText( const QString& _errorText ) { m_errorText = _errorText; }
-        void setResult( ResultCode _result ) { m_result = _result; }
+        void setResult( ResultCode::Value _result ) { m_result = _result; }
 
     private:
         QString m_errorText;
-        ResultCode m_result;
+        ResultCode::Value m_result;
     };
 }
 

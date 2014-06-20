@@ -123,7 +123,9 @@ CameraDiagnostics::Result QnPlSonyResource::initInternal()
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
 
-    //TODO/IMPL if no input, exiting
+    //if no input, exiting
+    if( !hasCameraCapabilities(Qn::RelayInputCapability) )
+        return result;
 
     CLSimpleHTTPClient http(
         getHostAddress(),
@@ -138,7 +140,7 @@ CameraDiagnostics::Result QnPlSonyResource::initInternal()
             arg(getHostAddress()).arg(status), cl_logDEBUG1 );
     }
 
-    startInputPortMonitoring();
+    //startInputPortMonitoring();
 
     return CameraDiagnostics::NoErrorResult();
 }

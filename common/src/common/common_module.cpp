@@ -1,5 +1,7 @@
 #include "common_module.h"
 
+#include <cassert>
+
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFile>
 
@@ -13,14 +15,14 @@ QnCommonModule::QnCommonModule(int &, char **, QObject *parent): QObject(parent)
     Q_INIT_RESOURCE(common);
     m_cloudMode = false;
 
-    QnCommonMetaTypes::initilize();
+    QnCommonMetaTypes::initialize();
     
     /* Init statics. */
     qnProductFeatures();
 
     m_dataPool = instance<QnResourceDataPool>();
-    loadResourceData(m_dataPool, lit(":/resource_data.json"));
-    loadResourceData(m_dataPool, QCoreApplication::applicationDirPath() + lit("/resource_data.json"));
+    loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
+    loadResourceData(m_dataPool, QCoreApplication::applicationDirPath() + lit("/resource_data.json"), false);
 
     /* Init members. */
     m_sessionManager = new QnSessionManager(); //instance<QnSessionManager>();
@@ -31,7 +33,8 @@ QnCommonModule::~QnCommonModule() {
     return;
 }
 
-void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName) {
-    if(QFile::exists(fileName))
-        dataPool->load(fileName);
+void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
+    bool loaded = QFile::exists(fileName) && dataPool->load(fileName);
+    
+    assert(!required || loaded); /* Getting an assert here? Something is wrong with resource data json file. */
 }

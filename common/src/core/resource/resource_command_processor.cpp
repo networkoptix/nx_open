@@ -4,7 +4,7 @@
 bool sameResourceFunctor(const QnAbstractDataPacketPtr& data, QVariant resource)
 {
     QnResourcePtr res = resource.value<QnResourcePtr>();
-    QnResourceCommandPtr command = data.dynamicCast<QnResourceCommand>();
+    QnResourceCommand* command = dynamic_cast<QnResourceCommand*>(data.data());
     if (!command)
         return false;
 
@@ -46,14 +46,14 @@ QnResourceCommandProcessor::~QnResourceCommandProcessor()
     stop();
 }
 
-void QnResourceCommandProcessor::putData(QnAbstractDataPacketPtr data)
+void QnResourceCommandProcessor::putData(const QnAbstractDataPacketPtr& data)
 {
     QnResourceCommandPtr command = data.staticCast<QnResourceCommand>();
     QnAbstractDataConsumer::putData(data);
 }
 
 
-bool QnResourceCommandProcessor::processData(QnAbstractDataPacketPtr data)
+bool QnResourceCommandProcessor::processData(const QnAbstractDataPacketPtr& data)
 {
     if (!data)
         return true;

@@ -3,7 +3,11 @@
 #include <QtCore/QDir>
 
 #include <api/model/storage_space_reply.h>
-#include <platform/core_platform_abstraction.h>
+
+#include <core/resource/storage_resource.h>
+
+#include <platform/platform_abstraction.h>
+
 #include <utils/network/tcp_connection_priv.h> /* For CODE_OK. */
 #include <utils/serialization/json.h>
 
@@ -59,7 +63,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         data.isWritable = storage->isStorageAvailableForWriting();
         data.isUsedForWriting = storage->isUsedForWriting();
 
-        if( data.totalSpace < MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong() )
+        if( data.totalSpace < MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() )
             continue;
 
         // TODO: #Elric remove once UnknownSize is dropped.
@@ -83,21 +87,24 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         if(hasStorage)
             continue;
 
+        const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
+
         QnStorageSpaceData data;
         data.path = partition.path + lit(QN_MEDIA_FOLDER_NAME) + QDir::separator();
         data.storageId = QnId();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
-        data.reservedSpace = -1;
+        data.reservedSpace = defaultStorageSpaceLimit;
         data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.isUsedForWriting = false;
 
-        if( data.totalSpace < MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, QnStorageManager::DEFAULT_SPACE_LIMIT).toLongLong() )
+        if( data.totalSpace < defaultStorageSpaceLimit )
             continue;
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.path, false));
         if (storage) {
             storage->setUrl(data.path); /* createStorage does not fill url. */
+            storage->setSpaceLimit( defaultStorageSpaceLimit );
             data.isWritable = storage->isStorageAvailableForWriting();
         } else {
             data.isWritable = false;
@@ -113,10 +120,4 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
 
     result.setReply(reply);
     return CODE_OK;
-}
-
-QString QnStorageSpaceRestHandler::description() const {
-    return 
-        "Returns a list of all server storages.<br>"
-        "No parameters.<br>";
 }

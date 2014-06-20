@@ -6,7 +6,6 @@
 #include <QtConcurrent>
 
 #include "fixed_url_client_query_processor.h"
-#include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "transaction/transaction_log.h"
 #include "server_query_processor.h"
@@ -20,8 +19,8 @@ namespace ec2
     template<class QueryProcessorType>
     QnMediaServerManager<QueryProcessorType>::QnMediaServerManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
     :
-        m_queryProcessor( queryProcessor ),
-        m_resCtx( resCtx )
+        QnMediaServerNotificationManager( resCtx ),
+        m_queryProcessor( queryProcessor )
     {
     }
 
@@ -36,8 +35,8 @@ namespace ec2
                 fromApiToResourceList(servers, outData, m_resCtx);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiMediaServerDataList, decltype(queryDoneHandler)> (
-            ApiCommand::getMediaServerList, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiMediaServerDataList, decltype(queryDoneHandler)> (
+            ApiCommand::getMediaServers, nullptr, queryDoneHandler);
         return reqID;
     }
 

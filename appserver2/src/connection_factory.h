@@ -62,7 +62,7 @@ namespace ec2
             impl::TestConnectionHandlerPtr handler );
         //!Called on server side to handle connection request from remote host
         ErrorCode fillConnectionInfo(
-            const LoginInfo& loginInfo,
+            const ApiLoginData& loginInfo,
             QnConnectionInfo* const connectionInfo );
         int testDirectConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );
         int testRemoteConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler );

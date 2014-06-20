@@ -40,16 +40,21 @@ public:
     void setLocalSystemName(const QString& value) { m_localSystemName = value; }
     QString localSystemName() { return m_localSystemName; }
     QByteArray getSystemPassword() { return "{61D85D22-E7AA-44EC-B5EC-1BEAC9FE19C5}"; }
+
+    void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
+    QString defaultAdminPassword() const { return m_defaultAdminPassword; }
+
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
 
 protected:
-    static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName);
+    static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
 private:
     QnSessionManager *m_sessionManager;
     QnResourceDataPool *m_dataPool;
     QString m_localSystemName;
+    QString m_defaultAdminPassword;
     QUuid m_uuid;
     QUrl m_url;
     bool m_cloudMode;

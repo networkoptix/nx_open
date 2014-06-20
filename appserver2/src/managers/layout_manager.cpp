@@ -12,8 +12,8 @@ namespace ec2
     template<class QueryProcessorType>
     QnLayoutManager<QueryProcessorType>::QnLayoutManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
     :
-        m_queryProcessor( queryProcessor ),
-        m_resCtx( resCtx )
+        QnLayoutNotificationManager( resCtx ),
+        m_queryProcessor( queryProcessor )
     {
     }
 
@@ -28,8 +28,8 @@ namespace ec2
                 fromApiToResourceList(layouts, outData);
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>
-            ( ApiCommand::getLayoutList, nullptr, queryDoneHandler );
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiLayoutDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getLayouts, nullptr, queryDoneHandler );
         return reqID;
     }
 

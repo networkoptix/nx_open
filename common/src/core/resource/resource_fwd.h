@@ -31,6 +31,7 @@ struct QnParamType;
 typedef QSharedPointer<QnParamType> QnParamTypePtr;
 
 class QnVideoWallControlMessage;
+struct QnVideowallInstanceStatus;
 
 class QnLayoutItemData;
 
@@ -133,6 +134,9 @@ class QnPlWatchDogResource;
 typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
 typedef QnSharedResourcePointerList<QnPlWatchDogResource> QnPlWatchDogResourceList;
 
+class QnVistaResource;
+typedef QnSharedResourcePointer<QnVistaResource> QnVistaResourcePtr;
+
 class QnDesktopResource;
 typedef QnSharedResourcePointer<QnDesktopResource> QnDesktopResourcePtr;
 
@@ -145,5 +149,8 @@ typedef QnSharedResourcePointerList<QnVideoWallResource> QnVideoWallResourceList
 
 class QnVideoWallItemIndex;
 typedef QList<QnVideoWallItemIndex> QnVideoWallItemIndexList;
+
+class QnVideoWallMatrixIndex;
+typedef QList<QnVideoWallMatrixIndex> QnVideoWallMatrixIndexList;
 
 #endif // QN_RESOURCE_FWD_H

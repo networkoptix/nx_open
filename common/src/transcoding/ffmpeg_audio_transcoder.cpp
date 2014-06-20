@@ -5,14 +5,15 @@ static const int MAX_AUDIO_JITTER = 1000 * 200;
 
 QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(CodecID codecId):
     QnAudioTranscoder(codecId),
+    m_audioEncodingBuffer(0),
+    m_resampleBuffer(0),
     m_encoderCtx(0),
     m_decoderContext(0),
     m_firstEncodedPts(AV_NOPTS_VALUE),
     m_lastTimestamp(AV_NOPTS_VALUE),
     m_downmixAudio(false),
     m_frameNum(0),
-    m_resampleCtx(0),
-    m_resampleBuffer(0)
+    m_resampleCtx(0)
 {
     m_bitrate = 128*1000;
     m_audioEncodingBuffer = (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE*2, 32);
@@ -40,7 +41,7 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 
 }
 
-bool QnFfmpegAudioTranscoder::open(QnConstCompressedAudioDataPtr audio)
+bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
 {
     if (!audio->context)
     {
@@ -53,7 +54,7 @@ bool QnFfmpegAudioTranscoder::open(QnConstCompressedAudioDataPtr audio)
     return open(audio->context);
 }
 
-bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
+bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
 {
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
@@ -133,7 +134,7 @@ bool QnFfmpegAudioTranscoder::existMoreData() const
     return m_decodedBufferSize >= encoderFrameSize;
 }
 
-int QnFfmpegAudioTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result)
+int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result)
 {
     if( result )
         result->clear();
@@ -177,7 +178,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, 
                         m_decoderContext->sample_rate,
                         m_encoderCtx->sample_fmt,
                         m_decoderContext->sample_fmt,
-                        16, 10, 1, 2.0);
+                        16, 10, 0, 1.0);
                     m_resampleBuffer = (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE*2, 32);
                 }
                 int inSamples = out_size / sampleSize(m_decoderContext->sample_fmt);

@@ -82,7 +82,9 @@ PasswordHelper& PasswordHelper::instance()
 
 bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
 {
+#ifdef ONVIF_DEBUG
     qDebug() << "PasswordHelper::isNotAuthenticated: all fault info: " << SoapErrorHelper::fetchDescription(faultInfo);
+#endif
 
     if (!faultInfo) {
         return false;
@@ -97,7 +99,9 @@ bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
     }
 
     info = info.toLower();
+#ifdef ONVIF_DEBUG
     qDebug() << "PasswordHelper::isNotAuthenticated: gathered string: " << info;
+#endif
 
     return info.indexOf(QLatin1String("notauthorized")) != -1 ||
         info.indexOf(QLatin1String("not permitted")) != -1 ||
@@ -190,6 +194,11 @@ PasswordHelper::PasswordHelper()
     setPasswordInfo(FLIR_MANUFACTURER,   ADMIN1, "fliradmin");
     setPasswordInfo(SENTRY_MANUFACTURER, ADMIN1, PASSWD4);
 
+    setPasswordInfo("vista", "admin", "admin");
+    setPasswordInfo("norbain", "admin", "admin");
+    setPasswordInfo("vista_", "admin", "admin");
+    setPasswordInfo("norbain_", "admin", "admin");
+
     //if (cl_log.logLevel() >= cl_logDEBUG1) {
     //    printPasswords();
     //}
@@ -218,8 +227,10 @@ void PasswordHelper::setPasswordInfo(const char* manufacturer)
 
 const PasswordList& PasswordHelper::getPasswordsByManufacturer(const QString& manufacturer) const
 {
+#ifdef ONVIF_DEBUG
     qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer: " << manufacturer
         << ", normalized: " << manufacturer.toLower().replace(UNNEEDED_CHARACTERS, QString());
+#endif
     ManufacturerPasswords::ConstIterator it = manufacturer.isEmpty()? manufacturerPasswords.end():
         manufacturerPasswords.find(manufacturer.toLower().replace(UNNEEDED_CHARACTERS, QString()));
 
@@ -232,28 +243,26 @@ const PasswordList& PasswordHelper::getPasswordsByManufacturer(const QString& ma
 
 void PasswordHelper::printPasswords() const
 {
+#ifdef ONVIF_DEBUG
     qDebug() << "PasswordHelper::printPasswords:";
-
     ManufacturerPasswords::const_iterator iter = manufacturerPasswords.begin();
     while (iter != manufacturerPasswords.end()) {
         qDebug() << "  Manufacturer: " << iter.key() << ": ";
-
         PasswordList::ConstIterator listIter = iter.value().begin();
         while (listIter != iter.value().end()) {
             qDebug() << "    " << listIter->first << " / " << listIter->second;
             ++listIter;
         }
-
         ++iter;
     }
 
     qDebug() << "  All passwords: ";
-
     PasswordList::ConstIterator listIter = allPasswords.begin();
     while (listIter != allPasswords.end()) {
         qDebug() << "    " << listIter->first << " / " << listIter->second;
         ++listIter;
     }
+#endif
 }
 
 //
@@ -263,7 +272,9 @@ void PasswordHelper::printPasswords() const
 const QString SoapErrorHelper::fetchDescription(const SOAP_ENV__Fault* faultInfo)
 {
     if (!faultInfo) {
+#ifdef ONVIF_DEBUG
         qDebug() << "SoapErrorHelper::fetchDescription: fault info is null";
+#endif
         return lit("unknown_error"); // TODO: #Elric #TR
     }
 

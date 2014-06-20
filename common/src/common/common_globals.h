@@ -27,10 +27,10 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace 
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
-            StreamQuality SecondStreamQuality PanicMode RecordingType SerializationFormat)
-    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities MotionTypes TimePeriodTypes ServerFlags)
+            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat)
+    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities PtzTraits MotionTypes TimePeriodTypes ServerFlags)
 public:
 #else
     Q_NAMESPACE
@@ -79,11 +79,12 @@ public:
         RelayOutputCapability               = 0x010,
         ShareIpCapability                   = 0x020 
     };
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities);
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraCapabilities)
 
     enum PtzCommand {
         ContinuousMovePtzCommand,
+        ContinuousFocusPtzCommand,
         AbsoluteDeviceMovePtzCommand,
         AbsoluteLogicalMovePtzCommand,
         ViewportMovePtzCommand,
@@ -109,6 +110,9 @@ public:
         UpdateHomeObjectPtzCommand,
         GetHomeObjectPtzCommand,
 
+        GetAuxilaryTraitsPtzCommand,
+        RunAuxilaryCommandPtzCommand,
+
         GetDataPtzCommand,
 
         InvalidPtzCommand = -1
@@ -125,9 +129,12 @@ public:
         ToursPtzField           = 0x080,
         ActiveObjectPtzField    = 0x100,
         HomeObjectPtzField      = 0x200,
+        AuxilaryTraitsPtzField  = 0x400,
         NoPtzFields             = 0x000,
         AllPtzFields            = 0xFFF
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzDataField)
+
     Q_DECLARE_FLAGS(PtzDataFields, PtzDataField)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
 
@@ -149,6 +156,7 @@ public:
         ContinuousPanCapability             = 0x00000001,
         ContinuousTiltCapability            = 0x00000002,
         ContinuousZoomCapability            = 0x00000004,
+        ContinuousFocusCapability           = 0x00000008,
 
         AbsolutePanCapability               = 0x00000010,
         AbsoluteTiltCapability              = 0x00000020,
@@ -171,14 +179,28 @@ public:
         SynchronizedPtzCapability           = 0x00200000,
         VirtualPtzCapability                = 0x00400000,
 
+        AuxilaryPtzCapability               = 0x01000000,
+
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzCapability)
 
-    Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities);
+    Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities)
+
+
+
+    enum PtzTrait {
+        NoPtzTraits             = 0x00,
+        FourWayPtzTrait         = 0x01,
+        EightWayPtzTrait        = 0x02,
+        ManualAutoFocusPtzTrait = 0x04,
+    };
+    Q_DECLARE_FLAGS(PtzTraits, PtzTrait);
+    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzTraits);
 
 
     enum StreamFpsSharingMethod {
@@ -194,16 +216,16 @@ public:
 
 
     enum MotionType {
-        MT_Default = 0, 
-        MT_HardwareGrid = 1, 
-        MT_SoftwareGrid = 2, 
-        MT_MotionWindow = 4, 
-        MT_NoMotion = 8
+        MT_Default      = 0x0, 
+        MT_HardwareGrid = 0x1, 
+        MT_SoftwareGrid = 0x2, 
+        MT_MotionWindow = 0x4, 
+        MT_NoMotion     = 0x8
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionType)
 
-    Q_DECLARE_FLAGS(MotionTypes, MotionType);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes);
+    Q_DECLARE_FLAGS(MotionTypes, MotionType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(MotionTypes)
 
 
     enum PanicMode {
@@ -216,10 +238,10 @@ public:
 
     // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag { 
-        SF_None     = 0, 
-        SF_Edge     = 1,
-        SF_RemoteEC = 2,
-        SF_HasPublicIP = 4
+        SF_None         = 0x0, 
+        SF_Edge         = 0x1,
+        SF_RemoteEC     = 0x2,
+        SF_HasPublicIP  = 0x4
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
@@ -233,16 +255,25 @@ public:
         NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
     };
 
-    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes);
+    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes)
 
 
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
+        BookmarksContent,
         TimePeriodContentCount
     };
 
+    enum CameraDataType {
+        RecordedTimePeriod,
+        MotionTimePeriod,
+        BookmarkTimePeriod,
+        BookmarkData,
+
+        CameraDataTypeCount
+    };
 
     enum SystemComponent {
         EnterpriseControllerComponent,
@@ -314,6 +345,7 @@ public:
         ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
+        ItemVideowallReviewButtonsRole,             /**< Role for buttons that are checked on each sub-item of the videowall screen widget. Value of type QnVideowallScreenWidget::ReviewButtons. */
 
         /* Ptz-based. */
         PtzPresetRole,                              /**< Role for PTZ preset. Value of type QnPtzPreset. */
@@ -342,6 +374,9 @@ public:
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
+        CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
+        UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
+        KeyboardModifiersRole,                      /**< Role for keyboard modifiers. Used in some Drop actions. */
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
@@ -410,11 +445,24 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
 
+    enum PropertyDataType { 
+        PDT_None        = 0, 
+        PDT_Value       = 1, 
+        PDT_OnOff       = 2, 
+        PDT_Boolen      = 3, 
+        PDT_MinMaxStep  = 4, 
+        PDT_Enumeration = 5, 
+        PDT_Button      = 6 
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PropertyDataType)
+
 
     enum SerializationFormat {
         JsonFormat,
+        UbjsonFormat,
         BnsFormat,
-        CsvFormat
+        CsvFormat,
+        XmlFormat
     };
 
 
@@ -423,7 +471,6 @@ public:
      */
     static const qint64 InvalidUtcOffset = INT64_MAX;
 #define InvalidUtcOffset InvalidUtcOffset
-
 
     /** 
      * Helper function that can be used to 'place' macros into Qn namespace. 
@@ -446,14 +493,21 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #   define lit(s) QLatin1String(s)
 #endif
 
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((Qn::TimePeriodContent)(Qn::Corner), (metatype))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::TimePeriodContent)(Qn::Corner)(Qn::CameraDataType), 
+    (metatype)
+)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::PtzDataFields)(Qn::PtzCapabilities)
-        (Qn::MotionType)(Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlags)(Qn::PanicMode)(Qn::RecordingType)
-        (Qn::SerializationFormat), 
-    (metatype)(lexical)(json)
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzCoordinateSpace)(Qn::MotionType)
+        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::SerializationFormat)(Qn::PropertyDataType), 
+    (metatype)(lexical)
+)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::PtzCapabilities),
+    (metatype)(numeric)
 )
 
 #endif // QN_COMMON_GLOBALS_H

@@ -18,6 +18,7 @@ public:
     static void initialize();
 };
 
+Q_DECLARE_METATYPE(Qt::KeyboardModifiers);
 Q_DECLARE_METATYPE(QVector<QUuid>);
 Q_DECLARE_METATYPE(QVector<QColor>);
 

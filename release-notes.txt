@@ -1,3 +1,16 @@
+----------------------------------------------2.2.1.xxxx-------------------------------------------
+
+Improvements:
+1. Onvif protocol support is improved
+2. Web client works better on Internet Explorer 9+
+3. If screenshots are taken from a remote camera, then it can take a long to download it. Added progress bar to allow users to esimate time.
+
+Bugs Fixed:
+1. Fixed the installation error on Windows 8 and Windows Server 2008
+2. Sometimes thumbnails could not be loaded on Android devices. Fixed
+3. Better motion support for non-onvif cameras that are integrated through SDK.
+
+
 ----------------------------------------------2.2.0.xxxx-------------------------------------------
 
 Features:
@@ -74,6 +87,7 @@ Improvements:
     If click on it, the selection has been zoomed. If there are no selection on timeline, "Zoom to selection" is not available.
 25. Ability to view client logs and clear cache.
 26. Added dewarping for pictures.
+27. Added Fast Forward for VMAX.
     
 Bugs Fixed:
 1. Tray tool. Incorrect EC port in the list if it has been changed.Fixed.
@@ -105,12 +119,14 @@ Bugs Fixed:
 27. "IP address" in Media Server Settings is disabled for changing.
 28. Multiple select hours in calendar doesn't work. Fixed.
 29. Axis encoder PTZ issues are resolved.
+30. Fixed issue with time for grouped events. 
 
 Removed features:
 1. Hardware acceleration has been removed. 
 2. Panic recording buuton from front pannel has been removed.
 3. Analog license message has been removed (old analog licenses still can be activated).
 4. Capture Mode is removed from the Screen Recording settings. Right now only application window can be recorded.
+5. Removed thumbnails for panoramic cameras.
 
 New cameras supported
 Arecont cameras: MegaBalls2 & MegaDomes2.

@@ -33,8 +33,3 @@ int QnFavIconRestHandler::executePost(const QString& path, const QnRequestParamL
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
-
-QString QnFavIconRestHandler::description() const
-{
-    return "Returns favico";
-}

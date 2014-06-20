@@ -51,32 +51,39 @@ void QnTransactionTcpProcessor::run()
 
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
     bool isClient = query.hasQueryItem("isClient");
-    QUuid remoteGuid  = query.queryItemValue(lit("guid"));
-    qint64 removeTime  = query.queryItemValue(lit("time")).toLongLong();
-    qint64 localTime = -1;
-    qint64 timeDiff = 0;
-    if (QnTransactionLog::instance()) {
-        localTime = QnTransactionLog::instance()->getRelativeTime();
-        if (removeTime != -1)
-            timeDiff = removeTime - localTime;
+    bool isMobileClient = query.hasQueryItem("isMobile");
+    QUuid remoteGuid  = query.queryItemValue("guid");
+    if (remoteGuid.isNull())
+        remoteGuid = QUuid::createUuid();
+    QnId videowallGuid = query.queryItemValue("videowallGuid");
+    bool isVideowall = (!videowallGuid.isNull());
+    QnId instanceGuid = isVideowall
+        ? query.queryItemValue("instanceGuid")
+        : QnId();
+
+    QnPeerInfo remotePeer(remoteGuid, 
+        isMobileClient  ? QnPeerInfo::AndroidClient
+        : isVideowall   ? QnPeerInfo::VideowallClient
+        : isClient      ? QnPeerInfo::DesktopClient
+        : QnPeerInfo::Server);
+
+    if (isVideowall) {
+        remotePeer.params["videowallGuid"] = videowallGuid.toString();
+        remotePeer.params["instanceGuid"] = instanceGuid.toString();
     }
 
-    if (remoteGuid.isNull()) {
-        qWarning() << "Invalid incoming request. GUID must be filled!";
-        sendResponse("HTTP", CODE_INVALID_PARAMETER, "application/octet-stream");
-        return;
-    }
+    QByteArray remoteHwList = query.queryItemValue(lit("hwList")).toLocal8Bit();
 
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
+    d->response.headers.insert(nx_http::HttpHeader("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds())));
 
-    if (!isClient)
+    if (remotePeer.peerType == QnPeerInfo::Server)
     {
-        // use two stage connect for server peers only, go to second stage for client immediatly
+        // use two stage connect for server peers only, go to second stage for client immediately
 
         // 1-st stage
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
-        sendResponse("HTTP", lockOK ? CODE_OK : CODE_INVALID_PARAMETER , "application/octet-stream");
+        sendResponse(lockOK ? CODE_OK : CODE_INVALID_PARAMETER , "application/octet-stream");
         if (!lockOK)
             return;
 
@@ -86,19 +93,20 @@ void QnTransactionTcpProcessor::run()
             return;
         }
         parseRequest();
+
+        d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds())));
     }
 
     query = QUrlQuery(d->request.requestLine.url.query());
     bool fail = query.hasQueryItem("canceled") || !QnTransactionTransport::tryAcquireConnected(remoteGuid, false);
     d->chunkedMode = true;
-    d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader("time", QByteArray::number(localTime)));
-    sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
+    sendResponse(fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
     if (fail) {
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
     }
     else {
-        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, isClient, remoteGuid, timeDiff);
+        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, remotePeer, QnTransactionTransport::decodeHWList(remoteHwList));
         d->socket.clear();
     }
 }

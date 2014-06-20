@@ -9,37 +9,25 @@
 
 #include <QtCore/QMutexLocker>
 
+#include <utils/network/modulefinder.h>
 
-using namespace std;
-
-FoundEnterpriseControllersModel::FoundEnterpriseControllersModel( NetworkOptixModuleFinder* const finder )
-{
-    QObject::connect(
-        finder,
-        SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-        this,
-        SLOT(remoteModuleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
-        Qt::DirectConnection );
-    QObject::connect(
-        finder,
-        SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
-        this,
-        SLOT(remoteModuleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
-        Qt::DirectConnection );
+QnFoundEnterpriseControllersModel::QnFoundEnterpriseControllersModel(QnModuleFinder* const finder) {
+    connect(finder,     &QnModuleFinder::moduleFound,   this,   &QnFoundEnterpriseControllersModel::remoteModuleFound,  Qt::DirectConnection);
+    connect(finder,     &QnModuleFinder::moduleLost,    this,   &QnFoundEnterpriseControllersModel::remoteModuleLost,   Qt::DirectConnection);
 }
 
 //!Implementation of QAbstractItemModel::data
-QVariant FoundEnterpriseControllersModel::data( const QModelIndex& index, int role ) const
+QVariant QnFoundEnterpriseControllersModel::data( const QModelIndex& index, int role ) const
 {
     QMutexLocker lk( &m_mutex );
 
     if( index.column() != 0 )
         return QVariant();
-    size_t foundModuleIndex = 0;
-    size_t moduleAddressIndex = 0;
+    int foundModuleIndex = 0;
+    int moduleAddressIndex = 0;
     if( index.internalId() == 0 )
     {
-        if( index.row() >= static_cast<int>(m_foundModules.size()) )
+        if( index.row() >= m_foundModules.size() )
             return QVariant();
         foundModuleIndex = index.row();
         moduleAddressIndex = 0;
@@ -49,8 +37,8 @@ QVariant FoundEnterpriseControllersModel::data( const QModelIndex& index, int ro
     else
     {
         foundModuleIndex = index.internalId() & 0x00ffffff;
-        if( foundModuleIndex >= static_cast<int>(m_foundModules.size()) ||
-            index.row() >= static_cast<int>(m_foundModules[foundModuleIndex].ipAddresses.size()) )   //invalid address index
+        if( foundModuleIndex >= m_foundModules.size() ||
+            index.row() >= m_foundModules[foundModuleIndex].ipAddresses.size() )   //invalid address index
         {
             return QVariant();
         }
@@ -79,7 +67,7 @@ QVariant FoundEnterpriseControllersModel::data( const QModelIndex& index, int ro
     }
 }
 
-bool FoundEnterpriseControllersModel::hasChildren( const QModelIndex& parent ) const
+bool QnFoundEnterpriseControllersModel::hasChildren( const QModelIndex& parent ) const
 {
     QMutexLocker lk( &m_mutex );
 
@@ -89,7 +77,7 @@ bool FoundEnterpriseControllersModel::hasChildren( const QModelIndex& parent ) c
     if( parent.internalId() != 0 ||
         parent.column() > 0 ||
         parent.row() < 0 ||
-        parent.row() >= static_cast<int>(m_foundModules.size()) )
+        parent.row() >= m_foundModules.size() )
     {
         return false;
     }
@@ -97,7 +85,7 @@ bool FoundEnterpriseControllersModel::hasChildren( const QModelIndex& parent ) c
     return m_foundModules[parent.row()].ipAddresses.size() > 1;
 }
 
-QVariant FoundEnterpriseControllersModel::headerData( int section, Qt::Orientation orientation, int role ) const
+QVariant QnFoundEnterpriseControllersModel::headerData( int section, Qt::Orientation orientation, int role ) const
 {
     if( role != Qt::DisplayRole ||
         orientation != Qt::Horizontal ||
@@ -110,33 +98,33 @@ QVariant FoundEnterpriseControllersModel::headerData( int section, Qt::Orientati
 }
 
 //!Implementation of QAbstractItemModel::index
-QModelIndex	FoundEnterpriseControllersModel::index( int row, int column, const QModelIndex& parent ) const
+QModelIndex	QnFoundEnterpriseControllersModel::index( int row, int column, const QModelIndex& parent ) const
 {
     QMutexLocker lk( &m_mutex );
 
     return indexNonSafe( row, column, parent );
 }
 
-QModelIndex	FoundEnterpriseControllersModel::parent( const QModelIndex& index ) const
+QModelIndex	QnFoundEnterpriseControllersModel::parent( const QModelIndex& index ) const
 {
     if( index.column() != 0 || index.internalId() == 0 )
         return QModelIndex();
 
     const int foundModuleIndex = index.internalId() & 0x00ffffff;
-    if( foundModuleIndex >= static_cast<int>(m_foundModules.size()) )
+    if( foundModuleIndex >= m_foundModules.size() )
         return QModelIndex();
 
     return createIndex( foundModuleIndex, 0, (void*)0 );
 }
 
-int FoundEnterpriseControllersModel::columnCount( const QModelIndex& index ) const
+int QnFoundEnterpriseControllersModel::columnCount( const QModelIndex& index ) const
 {
     Q_UNUSED(index)
     return 1;
 }
 
 //!Implementation of QAbstractItemModel::rowCount
-int	FoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) const
+int	QnFoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) const
 {
     if( !parent.isValid() )
         return (int) m_foundModules.size();
@@ -144,7 +132,7 @@ int	FoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) const
     if( parent.internalId() != 0 || //element with ip address
         parent.column() != 0 ||
         parent.row() < 0 ||
-        parent.row() >= static_cast<int>(m_foundModules.size()) )
+        parent.row() >= m_foundModules.size() )
     {
         return 0;
     }
@@ -153,76 +141,65 @@ int	FoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) const
     return (int) m_foundModules[parent.row()].ipAddresses.size();
 }
 
-void FoundEnterpriseControllersModel::remoteModuleFound(
-    const QString& moduleID,
-    const QString& /*moduleVersion*/,
-    const QString& /*systemName*/,
-    const TypeSpecificParamMap& moduleParameters,
-    const QString& /*localInterfaceAddress*/,
-    const QString& remoteHostAddressVal,
-    bool isLocal,
-    const QString& seed )
-{
-    QMutexLocker lk( &m_mutex );
+void QnFoundEnterpriseControllersModel::remoteModuleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress) {
+    Q_UNUSED(localInterfaceAddress)
 
-    if( moduleID != nxMediaServerId )
-        return;
-    if( !moduleParameters.contains(QString::fromLatin1("port")) )
+    QMutexLocker lk(&m_mutex);
+
+    if (moduleInformation.type != nxMediaServerId)
         return;
 
-    const QString& remoteHostAddress = isLocal ? QString::fromLatin1("127.0.0.1") : remoteHostAddressVal;
+    if (!moduleInformation.parameters.contains(lit("port")))
+        return;
 
-    const QString& url = QString::fromLatin1("https://%1:%2").arg(remoteHostAddress).arg(moduleParameters[QString::fromLatin1("port")]);
+    const QString &remoteHostAddress = moduleInformation.isLocal ? QString::fromLatin1("127.0.0.1") : remoteAddress;
+    const QString &url = QString(lit("https://%1:%2")).arg(remoteHostAddress).arg(moduleInformation.parameters[lit("port")]);
     bool isNewElement = false;
-    vector<FoundModuleData>::iterator it = std::find_if( m_foundModules.begin(), m_foundModules.end(), IsSeedEqualPred(seed) );
-    if( it == m_foundModules.end() )
-    {
+
+    auto it = std::find_if(m_foundModules.begin(), m_foundModules.end(),
+                           [&moduleInformation](const FoundModuleData &data) { return data.seed == moduleInformation.id; });
+    if (it == m_foundModules.end()) {
         FoundModuleData newModuleData;
         newModuleData.url = url;
-        newModuleData.seed = seed;
+        newModuleData.seed = moduleInformation.id;
+
         //searching place to insert new element in order of increase of url
-        it = std::lower_bound( m_foundModules.begin(), m_foundModules.end(), newModuleData );
-        if( it == m_foundModules.end() || it->url != newModuleData.url )
-            it = m_foundModules.insert( it, newModuleData );
+        it = std::lower_bound(m_foundModules.begin(), m_foundModules.end(), newModuleData);
+        if (it == m_foundModules.end() || it->url != newModuleData.url)
+            it = m_foundModules.insert(it, newModuleData);
+
         isNewElement = true;
     }
 
     //if such already exists, updating it's data
-    if( std::find( it->ipAddresses.begin(), it->ipAddresses.end(), remoteHostAddress ) == it->ipAddresses.end() )
-        it->ipAddresses.push_back( remoteHostAddress );
-    it->params = moduleParameters;
-    const QModelIndex& updatedElemIndex = indexNonSafe( it - m_foundModules.begin(), 0 );
+    if (!it->ipAddresses.contains(remoteAddress))
+        it->ipAddresses.append(remoteAddress);
+    it->params = moduleInformation.parameters;
+
+    const QModelIndex &updatedElemIndex = indexNonSafe(it - m_foundModules.begin(), 0);
 
     lk.unlock();
 
-    if( isNewElement )
-    {
+    if (isNewElement) {
         beginResetModel();
         endResetModel();
-    }
-    else
-    {
-        emit dataChanged( updatedElemIndex, updatedElemIndex );
+    } else {
+        emit dataChanged(updatedElemIndex, updatedElemIndex);
     }
 }
 
-void FoundEnterpriseControllersModel::remoteModuleLost(
-    const QString& moduleID,
-    const TypeSpecificParamMap& /*moduleParameters*/,
-    const QString& /*remoteHostAddress*/,
-    bool isLocal,
-    const QString& seed )
-{
-    Q_UNUSED(isLocal)
-    QMutexLocker lk( &m_mutex );
+void QnFoundEnterpriseControllersModel::remoteModuleLost(const QnModuleInformation &moduleInformation) {
+    QMutexLocker lk(&m_mutex);
 
-    if( moduleID != nxMediaServerId )
+    if (moduleInformation.type != nxMediaServerId)
         return;
 
-    vector<FoundModuleData>::iterator it = std::find_if( m_foundModules.begin(), m_foundModules.end(), IsSeedEqualPred(seed) );
-    if( it == m_foundModules.end() )
+    auto it = std::find_if(m_foundModules.begin(), m_foundModules.end(),
+                           [&moduleInformation](const FoundModuleData &data) { return data.seed == moduleInformation.id; });
+    if (it == m_foundModules.end())
         return;
-    m_foundModules.erase( it );
+
+    m_foundModules.erase(it);
 
     lk.unlock();
 
@@ -230,7 +207,7 @@ void FoundEnterpriseControllersModel::remoteModuleLost(
     endResetModel();
 }
 
-QString FoundEnterpriseControllersModel::getDisplayStringForEnterpriseControllerRootNode( const FoundModuleData& moduleData ) const
+QString QnFoundEnterpriseControllersModel::getDisplayStringForEnterpriseControllerRootNode( const FoundModuleData& moduleData ) const
 {
     QString port = moduleData.params[lit("port")];
 
@@ -243,25 +220,25 @@ QString FoundEnterpriseControllersModel::getDisplayStringForEnterpriseController
     return result;
 }
 
-QString FoundEnterpriseControllersModel::getDisplayStringForEnterpriseControllerAddressNode( const FoundModuleData& /*moduleData*/, const QString& address ) const
+QString QnFoundEnterpriseControllersModel::getDisplayStringForEnterpriseControllerAddressNode( const FoundModuleData& /*moduleData*/, const QString& address ) const
 {
     return address;
 }
 
-QModelIndex	FoundEnterpriseControllersModel::indexNonSafe( int row, int column, const QModelIndex& parent ) const
+QModelIndex	QnFoundEnterpriseControllersModel::indexNonSafe( int row, int column, const QModelIndex& parent ) const
 {
     if( column != 0 )
         return QModelIndex();
     if( !parent.isValid() )
     {
-        if( row >= static_cast<int>(m_foundModules.size()) )
+        if( row >= m_foundModules.size() )
             return QModelIndex();
         return createIndex( row, column, (void*)0 );
     }
     else
     {
         if( parent.internalId() != 0 ||
-            parent.row() >= static_cast<int>(m_foundModules.size()) ||
+            parent.row() >= m_foundModules.size() ||
             parent.column() > 0 )
         {
             return QModelIndex();

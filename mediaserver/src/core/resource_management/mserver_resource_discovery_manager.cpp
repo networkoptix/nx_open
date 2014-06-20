@@ -18,13 +18,13 @@
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include "common/common_module.h"
+#include "data_only_camera_resource.h"
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int MSERVER_OFFLINE_TIMEOUT = 1000 * 60 * 5;
 
-QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager( const CameraDriverRestrictionList& cameraDriverRestrictionList )
+QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
 :
-    QnResourceDiscoveryManager( &cameraDriverRestrictionList ),
     m_foundSmth(false)
 {
     netStateTime.restart();
@@ -36,7 +36,19 @@ QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
     stop();
 }
 
-void printInLogNetResources(const QnResourceList& resources)
+QnResourcePtr QnMServerResourceDiscoveryManager::createResource(QnId resourceTypeId, const QnResourceParams& params)
+{
+    QnResourcePtr res = QnResourceDiscoveryManager::createResource( resourceTypeId, params );
+    if( res )
+        return res;
+
+    const QnResourceTypePtr& resourceType = qnResTypePool->getResourceType(resourceTypeId);
+    if( !resourceType )
+        return res;
+    return QnResourcePtr(new DataOnlyCameraResource( resourceTypeId ));   //found resource type, but could not find factory. Disabled discovery?
+}
+
+static void printInLogNetResources(const QnResourceList& resources)
 {
     foreach(QnResourcePtr res, resources)
     {
@@ -54,7 +66,8 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(QnResourcePtr camer
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     if (!mServer || mServer->getStatus() == QnResource::Online)
         return false;
-    if (!mServer->isRedundancy())
+    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (!ownServer || !ownServer->isRedundancy())
         return false; // redundancy is disabled
     
     return mServer->currentStatusTime() > MSERVER_OFFLINE_TIMEOUT;

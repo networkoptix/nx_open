@@ -34,6 +34,7 @@ namespace QnBusiness
         case ServerFailureEvent:
         case ServerConflictEvent:
         case ServerStartEvent:
+        case LicenseIssueEvent:
             return AnyServerEvent;
 
         case AnyBusinessEvent:
@@ -54,7 +55,7 @@ namespace QnBusiness
             result << CameraDisconnectEvent << NetworkIssueEvent << CameraIpConflictEvent;
             break;
         case AnyServerEvent:
-            result << StorageFailureEvent << ServerFailureEvent << ServerConflictEvent << ServerStartEvent;
+            result << StorageFailureEvent << ServerFailureEvent << ServerConflictEvent << ServerStartEvent << LicenseIssueEvent;
             break;
         case AnyBusinessEvent:
             result << CameraMotionEvent << CameraInputEvent <<
@@ -99,7 +100,7 @@ namespace QnBusiness
         switch( eventType )
         {
         case StorageFailureEvent:
-            return false; //TODO: #GDM restore when will work fine
+            return false; //TODO: #GDM #Business restore when will work fine
         default:
             return false;
         }

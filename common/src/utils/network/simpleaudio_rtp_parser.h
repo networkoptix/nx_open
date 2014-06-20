@@ -19,7 +19,7 @@ public:
     void setSampleFormat(AVSampleFormat sampleFormat);
 private:
     QnMediaContextPtr m_context;
-    std::shared_ptr<QnRtspAudioLayout> m_audioLayout;
+    QSharedPointer<QnRtspAudioLayout> m_audioLayout;
     int m_frequency;
     int m_channels;
     int m_bits_per_coded_sample;

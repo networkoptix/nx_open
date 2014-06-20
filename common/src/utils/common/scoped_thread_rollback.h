@@ -3,23 +3,29 @@
 
 #include <QtCore/QThreadPool>
 
+
+/*!
+    Intended for use in thread of thread pool
+*/
 class QnScopedThreadRollback {
 public:
-    QnScopedThreadRollback(int increaseThreadCount):
-        m_increaseThreadCount(increaseThreadCount)
+    QnScopedThreadRollback(int increaseThreadCount, QThreadPool* threadPool = nullptr):
+        m_increaseThreadCount(increaseThreadCount),
+        m_threadPool(threadPool)
     {
         //  Calling this function without previously reserving a thread temporarily increases maxThreadCount().
         for (int i = 0; i < m_increaseThreadCount; i++)
-            QThreadPool::globalInstance()->releaseThread();
+            (m_threadPool ? m_threadPool : QThreadPool::globalInstance())->releaseThread();
     }
 
     ~QnScopedThreadRollback() {
         for (int i = 0; i < m_increaseThreadCount; i++)
-            QThreadPool::globalInstance()->reserveThread();
+            (m_threadPool ? m_threadPool : QThreadPool::globalInstance())->reserveThread();
     }
 
 private:
     int m_increaseThreadCount;
+    QThreadPool* m_threadPool;
 
 };
 

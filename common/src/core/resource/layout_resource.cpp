@@ -111,11 +111,6 @@ QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
     return m_itemByUuid.value(itemUuid);
 }
 
-QString QnLayoutResource::getUniqueId() const
-{
-    return getId().toString();
-}
-
 void QnLayoutResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
     base_type::updateInner(other, modifiedFields);
 
@@ -367,11 +362,6 @@ void QnLayoutResource::setLocked(bool value) {
         if (m_locked == value)
             return;
         m_locked = value;
-
-        if (value)
-            setStatus(QnResource::Locked, true);
-        else
-            setStatus(QnResource::Online, true);
     }
     emit lockedChanged(::toSharedPointer(this));
 }

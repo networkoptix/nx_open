@@ -3,9 +3,11 @@
 
 #include <QtCore/QObject>
 
+#include <nx_ec/ec_api.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_resource.h>
-#include <api/app_server_connection.h>
+#include <api/abstract_reply_processor.h>
 
 #include <client/client_globals.h>
 
@@ -55,6 +57,7 @@ public:
 
     int save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot);
     int save(const QnLayoutResourceList &resources, QObject *object, const char *slot);
+    int save(const QnLayoutResourceList &resources, QnWorkbenchLayoutReplyProcessor *replyProcessor);
 
     void store(const QnLayoutResourcePtr &resource);
     void restore(const QnLayoutResourcePtr &resource);

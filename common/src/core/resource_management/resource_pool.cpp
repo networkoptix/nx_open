@@ -12,6 +12,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
+#include <core/resource/videowall_matrix_index.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
@@ -129,7 +130,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         if (!resource->hasFlags(QnResource::foreigner))
         {
             if (resource->getStatus() != QnResource::Offline)
-                resource->init();
+                resource->initAsync(false);
         }
 
         if (resource.dynamicCast<QnLayoutResource>())
@@ -214,11 +215,11 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
 
         if (resource.dynamicCast<QnLayoutResource>()) {
             foreach (const QnVideoWallResourcePtr &videowall, getResources().filtered<QnVideoWallResource>()) { // TODO: #Elric this is way beyond what one may call 'suboptimal'.
-                foreach (QnVideoWallItem item, videowall->getItems()) {
+                foreach (QnVideoWallItem item, videowall->items()->getItems()) {
                     if (item.layout != resource->getId())
                         continue;
                     item.layout = QUuid();
-                    videowall->updateItem(item.uuid, item);
+                    videowall->items()->updateItem(item.uuid, item);
                 }
             }
         }
@@ -462,9 +463,11 @@ int QnResourcePool::activeCamerasByClass(bool analog) const
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera || camera->hasFlags(QnResource::foreigner) || camera->isScheduleDisabled() || camera->isAnalog() != analog)
-            continue;
-        count++;
+        if (camera && !camera->hasFlags(QnResource::foreigner) && !camera->isScheduleDisabled() && camera->isAnalog() == analog) {
+            QnResourcePtr mServer = getResourceById(camera->getId());
+            if (mServer && mServer->getStatus() != QnResource::Offline)
+                count++;
+        }
     }
     return count;
 }
@@ -497,7 +500,7 @@ bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHas
 QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QUuid &uuid) const {
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
-        if (!videoWall || !videoWall->hasItem(uuid))
+        if (!videoWall || !videoWall->items()->hasItem(uuid))
             continue;
         return QnVideoWallItemIndex(videoWall, uuid);
     }
@@ -508,6 +511,26 @@ QnVideoWallItemIndexList QnResourcePool::getVideoWallItemsByUuid(const QList<QUu
     QnVideoWallItemIndexList result;
     foreach (const QUuid &uuid, uuids) {
         QnVideoWallItemIndex index = getVideoWallItemByUuid(uuid);
+        if (!index.isNull())
+            result << index;
+    }
+    return result;
+}
+
+QnVideoWallMatrixIndex QnResourcePool::getVideoWallMatrixByUuid(const QUuid &uuid) const {
+    foreach (const QnResourcePtr &resource, m_resources) {
+        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+        if (!videoWall || !videoWall->matrices()->hasItem(uuid))
+            continue;
+        return QnVideoWallMatrixIndex(videoWall, uuid);
+    }
+    return QnVideoWallMatrixIndex();
+}
+
+QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(const QList<QUuid> &uuids) const {
+    QnVideoWallMatrixIndexList result;
+    foreach (const QUuid &uuid, uuids) {
+        QnVideoWallMatrixIndex index = getVideoWallMatrixByUuid(uuid);
         if (!index.isNull())
             result << index;
     }

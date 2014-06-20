@@ -1,22 +1,28 @@
 #ifndef QN_TRANSACTION_TRANSPORT_HEADER_H
 #define QN_TRANSACTION_TRANSPORT_HEADER_H
 
+#include <nx_ec/ec_api.h>
+
+#include <utils/common/model_functions_fwd.h>
+
 namespace ec2 {
 
-    struct TransactionTransportHeader
+    struct QnTransactionTransportHeader
     {
-        TransactionTransportHeader() {}
-        TransactionTransportHeader(PeerList processedPeers, PeerList dstPeers = PeerList()): processedPeers(processedPeers), dstPeers(dstPeers) {}
+        QnTransactionTransportHeader() {}
+        QnTransactionTransportHeader(QnPeerSet processedPeers, QnPeerSet dstPeers = QnPeerSet()): processedPeers(processedPeers), dstPeers(dstPeers) {}
 
-        PeerList processedPeers;
-        PeerList dstPeers;
+        QnPeerSet processedPeers;
+        QnPeerSet dstPeers;
     };
-#define TransactionTransportHeader_Fields (processedPeers)(dstPeers)
+#define QnTransactionTransportHeader_Fields (processedPeers)(dstPeers)
+
+    QN_FUSION_DECLARE_FUNCTIONS(QnTransactionTransportHeader, (binary)(json))
 
 } // namespace ec2
 
 #ifndef QN_NO_QT
-Q_DECLARE_METATYPE(ec2::TransactionTransportHeader);
+Q_DECLARE_METATYPE(ec2::QnTransactionTransportHeader);
 #endif
 
 #endif // QN_TRANSACTION_TRANSPORT_HEADER_H

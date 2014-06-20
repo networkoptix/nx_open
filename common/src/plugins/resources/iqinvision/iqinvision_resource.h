@@ -34,6 +34,7 @@ protected:
     CLHttpStatus setOID(const QString& oid, const QString& val);
 
     QSize getMaxResolution() const;
+    bool isRtp() const;
 };
 
 #endif // #ifdef ENABLE_IQE

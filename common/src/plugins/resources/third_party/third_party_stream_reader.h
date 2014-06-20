@@ -6,8 +6,8 @@
 #ifndef THIRD_PARTY_STREAM_READER_H
 #define THIRD_PARTY_STREAM_READER_H
 
+#include "core/dataprovider/abstract_media_stream_provider.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
-#include "utils/network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 #include "third_party_resource.h"
 
@@ -17,7 +17,7 @@ class ThirdPartyStreamReader
 :
     public CLServerPushStreamReader
 {
-    typedef CLServerPushStreamReader parent_type;
+    typedef CLServerPushStreamReader base_type;
 
 public:
     ThirdPartyStreamReader(
@@ -31,7 +31,7 @@ public:
     static QnAbstractMediaDataPtr readStreamReader( nxcip::StreamReader* streamReader );
 
     //!Overrides QnLiveStreamProvider::onGotVideoFrame()
-    virtual void onGotVideoFrame(QnCompressedVideoDataPtr videoData) override;
+    virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData) override;
     //!Overrides QnLiveStreamProvider::updateSoftwareMotion()
     virtual void updateSoftwareMotion() override;
 
@@ -46,6 +46,8 @@ protected:
     virtual void updateStreamParamsBasedOnFps() override;
 
     virtual void pleaseStop() override;
+    virtual void beforeRun() override;
+    virtual void afterRun() override;
 
     //!Overrides QnLiveStreamProvider::roleForMotionEstimation()
     virtual QnResource::ConnectionRole roleForMotionEstimation() override;
@@ -58,7 +60,7 @@ private:
 
 private:
     QnMetaDataV1Ptr m_lastMetadata;
-    QnMulticodecRtpReader m_rtpStreamParser;
+    std::unique_ptr<QnAbstractMediaStreamProvider> m_builtinStreamReader;
     QnThirdPartyResourcePtr m_thirdPartyRes;
     nxcip_qt::BaseCameraManager m_camManager;
     nxcip::StreamReader* m_liveStreamReader;
@@ -69,11 +71,7 @@ private:
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     unsigned int m_cameraCapabilities;
 
-    nxcip::Resolution getMaxResolution( int encoderNumber ) const;
-    //!Returns resolution with pixel count equal or less than \a desiredResolution
-    nxcip::Resolution getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const;
     QnAbstractMediaDataPtr readLiveStreamReader();
-    nxcip::Resolution getSecondStreamResolution( const nxcip_qt::CameraMediaEncoder& cameraEncoder );
     void initializeAudioContext( const nxcip::AudioFormat& audioFormat );
 };
 

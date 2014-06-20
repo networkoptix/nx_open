@@ -10,7 +10,7 @@ public:
     QnThumbnailsArchiveDelegate(QnAbstractArchiveDelegatePtr baseDelegate);
 
     virtual QnAbstractMediaDataPtr getNextData() override;
-    virtual bool open(QnResourcePtr resource) override;
+    virtual bool open(const QnResourcePtr &resource) override;
     virtual void close() override;
     virtual qint64 startTime() override;
     virtual qint64 endTime() override;
@@ -20,6 +20,9 @@ public:
 
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep);
     virtual void setGroupId(const QByteArray& groupId) override;
+
+    virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
+
 private:
     qint64 m_currentPos;
     qint64 m_rangeStart;

@@ -1,22 +1,26 @@
 #ifndef __TRANSACTION_MESSAGE_BUS_H_
 #define __TRANSACTION_MESSAGE_BUS_H_
 
+#include <memory>
+
 #include <QtCore/QElapsedTimer>
 
 #include <nx_ec/ec_api.h>
-#include "nx_ec/data/api_camera_data.h"
-#include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/data/api_lock_data.h"
 #include "transaction.h"
 #include "utils/network/http/asynchttpclient.h"
-#include "transaction_transport_serializer.h"
 #include "transaction_transport.h"
+#include <transaction/transaction_log.h>
 #include "common/common_module.h"
+
+#include <transaction/binary_transaction_serializer.h>
+#include <transaction/json_transaction_serializer.h>
 
 class QTimer;
 
 namespace ec2
 {
+    class ECConnectionNotificationManager;
 
     class QnTransactionMessageBus: public QObject
     {
@@ -28,62 +32,55 @@ namespace ec2
         static QnTransactionMessageBus* instance();
         static void initStaticInstance(QnTransactionMessageBus* instance);
 
-        void addConnectionToPeer(const QUrl& url, bool isClient, const QUuid& peer = QUuid());
+        void addConnectionToPeer(const QUrl& url, const QUuid& peer = QUuid());
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, bool isClient, const QnId& removeGuid, qint64 timediff);
+        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QnPeerInfo &remotePeer, QList<QByteArray> hwList);
         
+        void setLocalPeer(const QnPeerInfo localPeer);
+        QnPeerInfo localPeer() const;
+
         void start();
 
-        template <class T>
-        void setHandler(T* handler) { 
+        /*!
+            \param handler Control of life-time of this object is out of scope of this class
+        */
+        void setHandler(ECConnectionNotificationManager* handler) { 
             QMutexLocker lock(&m_mutex);
-            m_handler = new CustomHandler<T>(handler); 
+            m_handler = handler;
         }
 
-        template <class T>
-        void removeHandler(T* handler) { 
+        void removeHandler(ECConnectionNotificationManager* handler) { 
             QMutexLocker lock(&m_mutex);
-            if (m_handler->getHandler() == handler) {
-                delete m_handler;
-                m_handler = 0;
-            }
+            if( m_handler == handler )
+                m_handler = nullptr;
         }
 
-        template <class T>
-        void sendTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
-        {
-            QMutexLocker lock(&m_mutex);
-            QByteArray buffer;
-            m_serializer.serializeTran(buffer, serializedTran, TransactionTransportHeader(peersToSend(tran.command) << qnCommon->moduleGUID()));
-            sendTransactionInternal(tran, buffer);
-        }
-
-        template <class T>
-        void sendTransaction(const QnTransaction<T>& tran, const PeerList& dstPeers = PeerList())
+        template<class T>
+        void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
         {
             Q_ASSERT(tran.command != ApiCommand::NotDefined);
             QMutexLocker lock(&m_mutex);
-            QByteArray buffer;
-            m_serializer.serializeTran(buffer, tran, TransactionTransportHeader(peersToSend(tran.command) << qnCommon->moduleGUID(), dstPeers));
-            sendTransactionInternal(tran, buffer, dstPeers);
+            sendTransactionInternal(tran, QnTransactionTransportHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers));
         }
 
         template <class T>
-        void sendTransaction(const QnTransaction<T>& tran, const QnId& dstPeer)
+        void sendTransaction(const QnTransaction<T>& tran, const QnId& dstPeerId)
         {
             Q_ASSERT(tran.command != ApiCommand::NotDefined);
-            PeerList pList;
-            if (!dstPeer.isNull())
-                pList << dstPeer;
-            sendTransaction(tran, pList);
+            QnPeerSet pSet;
+            if (!dstPeerId.isNull())
+                pSet << dstPeerId;
+            sendTransaction(tran, pSet);
         }
 
         struct AlivePeerInfo
         {
-            AlivePeerInfo(bool isClient = false, bool isProxy = false): isClient(isClient), isProxy(isProxy) { lastActivity.restart(); }
-            bool isClient;
+            AlivePeerInfo(): peer(QnId(), QnPeerInfo::Server), isProxy(false) { lastActivity.restart(); }
+            AlivePeerInfo(const QnPeerInfo &peer, bool isProxy, QList<QByteArray> hwList): peer(peer), isProxy(isProxy), hwList(hwList) { lastActivity.restart(); }
+            QnPeerInfo peer;
             bool isProxy;
             QElapsedTimer lastActivity;
+            QList<QByteArray> hwList;
         };
         typedef QMap<QnId, AlivePeerInfo> AlivePeersMap;
 
@@ -97,76 +94,104 @@ namespace ec2
         */
         AlivePeersMap aliveServerPeers() const;
 
-signals:
-        void peerLost(QnId, bool isClient, bool isProxy);
-        void peerFound(QnId, bool isClient, bool isProxy);
+    signals:
+        void peerLost(ApiPeerAliveData data, bool isProxy);
+        void peerFound(ApiPeerAliveData data, bool isProxy);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);
         void gotLockResponse(ApiLockData);
+
+        void transactionProcessed(const QnAbstractTransaction &transaction);
+
     private:
         friend class QnTransactionTransport;
+        friend struct GotTransactionFuction;
+        friend struct SendTransactionToTransportFuction;
 
         bool isExists(const QnId& removeGuid) const;
         bool isConnecting(const QnId& removeGuid) const;
 
-        class AbstractHandler
-        {
-        public:
-            virtual bool processTransaction(QnTransactionTransport* sender, QnAbstractTransaction& tran, QnInputBinaryStream<QByteArray>& stream) = 0;
-            virtual void* getHandler() const = 0;
-            virtual ~AbstractHandler() {}
-        };
-
-        template <class T>
-        class CustomHandler: public AbstractHandler
-        {
-        public:
-            CustomHandler(T* handler): m_handler(handler) {}
-
-            virtual bool processTransaction(QnTransactionTransport* sender, QnAbstractTransaction& tran, QnInputBinaryStream<QByteArray>& stream) override;
-            virtual void* getHandler() const override { return m_handler; }
-        private:
-            template <class T2> bool deliveryTransaction(const QnAbstractTransaction&  abstractTran, QnInputBinaryStream<QByteArray>& stream);
-        private:
-            T* m_handler;
-        };
-
         typedef QMap<QUuid, QSharedPointer<QnTransactionTransport>> QnConnectionMap;
 
     private:
-        //void gotTransaction(const QnId& remoteGuid, bool isConnectionOriginator, const QByteArray& data);
-        void sendTransactionInternal(const QnAbstractTransaction& tran, const QByteArray& chunkData, const PeerList& dstPeers = PeerList());
-        bool onGotTransactionSyncRequest(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>& stream);
-        void onGotTransactionSyncResponse(QnTransactionTransport* sender, QnInputBinaryStream<QByteArray>& stream);
-        void onGotDistributedMutexTransaction(const QnAbstractTransaction& tran, QnInputBinaryStream<QByteArray>&);
+        template<class T>
+        void sendTransactionInternal(const QnTransaction<T>& tran, const QnTransactionTransportHeader &header) {
+            QnPeerSet toSendRest = header.dstPeers;
+            QnPeerSet sentPeers;
+            bool sendToAll = header.dstPeers.isEmpty();
+
+            for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
+            {
+                QnTransactionTransportPtr transport = *itr;
+                if (!sendToAll && !header.dstPeers.contains(transport->remotePeer().id)) 
+                    continue;
+
+                if (!transport->isReadyToSend(tran.command)) 
+                    continue;
+
+                transport->sendTransaction(tran, header);
+                sentPeers << transport->remotePeer().id;
+                toSendRest.remove(transport->remotePeer().id);
+            }
+
+            // some dst is not accessible directly, send broadcast (to all connected peers except of just sent)
+            if (!toSendRest.isEmpty()) 
+            {
+                for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
+                {
+                    QnTransactionTransportPtr transport = *itr;
+                    if (!transport->isReadyToSend(tran.command))
+                        continue;;
+
+                    if (sentPeers.contains(transport->remotePeer().id))
+                        continue; // already sent
+
+                    transport->sendTransaction(tran, header);
+                }
+            }
+        }
+
+        template <class T>
+        void sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader);
+        
+        template <class T>
+        void gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader);
+
+        void onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<QnTranState> &tran);
+        void onGotTransactionSyncResponse(QnTransactionTransport* sender);
+        void onGotDistributedMutexTransaction(const QnTransaction<ApiLockData>& tran);
         void queueSyncRequest(QnTransactionTransport* transport);
 
-        void connectToPeerEstablished(const QnId& id, bool isClient);
+        void connectToPeerEstablished(const QnPeerInfo &peerInfo, const QList<QByteArray>& hwList);
         void connectToPeerLost(const QnId& id);
-        void sendServerAliveMsg(const QnId& id, bool isAlive, bool isClient);
+        void handlePeerAliveChanged(const QnPeerInfo& peer, bool isAlive, const QList<QByteArray>& hwList);
+        void sendVideowallInstanceStatus(const QnPeerInfo &peer, bool isAlive);
         bool isPeerUsing(const QUrl& url);
-        void onGotServerAliveInfo(const QnAbstractTransaction& abstractTran, QnInputBinaryStream<QByteArray>& stream);
-        QSet<QUuid> peersToSend(ApiCommand::Value command) const;
+        void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran);
+        QnPeerSet connectedPeers(ApiCommand::Value command) const;
+
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
-        void at_gotTransaction(QByteArray serializedTran, TransactionTransportHeader transportHeader);
+        void at_gotTransaction(const QByteArray &serializedTran, const QnTransactionTransportHeader &transportHeader);
         void doPeriodicTasks();
-    private:
-        QnTransactionTransportSerializer m_serializer;
-        //typedef QMap<QUrl, QSharedPointer<QnTransactionTransport>> RemoveUrlMap;
 
-        //RemoveUrlMap m_remoteUrls;
-        struct RemoveUrlConnectInfo {
-            RemoveUrlConnectInfo(bool isClient = false, const QUuid& peer = QUuid()): isClient(isClient), peer(peer), lastConnectedTime(0) {}
-            bool isClient;
+    private:
+        /** Info about us. Should be set before start(). */
+        QnPeerInfo m_localPeer;
+
+        QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
+        QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
+
+        struct RemoteUrlConnectInfo {
+            RemoteUrlConnectInfo(const QUuid& peer = QUuid()): peer(peer), lastConnectedTime(0) {}
             QUuid peer;
             qint64 lastConnectedTime;
         };
 
-        QMap<QUrl, RemoveUrlConnectInfo> m_removeUrls;
-        AbstractHandler* m_handler;
+        QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;
+        ECConnectionNotificationManager* m_handler;
         QTimer* m_timer;
         mutable QMutex m_mutex;
         QThread *m_thread;

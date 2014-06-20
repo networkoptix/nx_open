@@ -20,13 +20,11 @@ enum QnDomain
 
 struct QN_EXPORT QnParamType
 {
-    // TODO: #Elric #enum
-    enum DataType { None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };
 
     QnParamType();
     //QnParamType(const QString& name, const QVariant &val);
 
-    DataType type;
+    Qn::PropertyDataType type;
 
     //QnId id;
     QString name;
@@ -72,7 +70,7 @@ struct QN_EXPORT QnParam
     const QString &subGroup() const { return m_paramType->subgroup; }
     double minValue() const { return m_paramType->min_val; }
     double maxValue() const { return m_paramType->max_val; }
-    QnParamType::DataType type() const { return m_paramType->type;}
+    Qn::PropertyDataType type() const { return m_paramType->type;}
     const QList<QVariant> &uiPossibleValues() const { return m_paramType->ui_possible_values; }
     const QList<QVariant> &possibleValues() const { return m_paramType->possible_values; }
     const QString &description() const { return m_paramType->description; }
@@ -92,7 +90,14 @@ Q_DECLARE_METATYPE(QnParam)
 
 class QN_EXPORT QnParamList
 {
+    typedef QHash<QString, QnParam> QnParamMap;
+
 public:
+    typedef QnParamMap::key_type key_type;
+    typedef QnParamMap::mapped_type mapped_type;
+    typedef QnParamMap::iterator iterator;
+    typedef QnParamMap::const_iterator const_iterator;
+
     void unite(const QnParamList &other);
     bool contains(const QString &name) const;
     QnParam &operator[](const QString &name);
@@ -108,8 +113,47 @@ public:
 
     QnParamList paramList(const QString &group, const QString &subGroup = QString()) const;
 
+    iterator begin()
+    {
+        return m_params.begin();
+    }
+
+    const_iterator begin() const
+    {
+        return m_params.begin();
+    }
+
+    const_iterator cbegin() const
+    {
+        return m_params.cbegin();
+    }
+
+    const_iterator cend() const
+    {
+        return m_params.cend();
+    }
+
+    iterator end()
+    {
+        return m_params.end();
+    }
+
+    const_iterator end() const
+    {
+        return m_params.end();
+    }
+
+    iterator find( const key_type& key )
+    {
+        return m_params.find( key );
+    }
+
+    const_iterator find( const key_type& key ) const
+    {
+        return m_params.find( key );
+    }
+
 private:
-    typedef QHash<QString, QnParam> QnParamMap;
     QnParamMap m_params;
 };
 

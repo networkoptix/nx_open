@@ -1,16 +1,20 @@
 #include "workaround_ptz_controller.h"
 
+#include <common/common_module.h>
+
 #include <utils/math/math.h>
 #include <utils/math/coordinate_transformations.h>
+#include <utils/serialization/lexical_functions.h>
 
-#include <common/common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_data_pool.h>
 
 QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
-    m_octagonal(false),
+    m_overrideContinuousMove(false),
+    m_flip(0),
+    m_trait(Qn::NoPtzTraits),
     m_overrideCapabilities(false),
     m_capabilities(Qn::NoPtzCapabilities)
 {
@@ -18,21 +22,24 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     if(!camera)
         return;
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(camera);
-
-    m_octagonal = resourceData.value<bool>(lit("octagonalPtz"), false);
+    QnResourceData resourceData = qnCommon->dataPool()->data(camera, true);
     
+    QString ptzTraits = resourceData.value<QString>(lit("ptzTraits"));
+    if(!ptzTraits.isEmpty())
+        if(!QnLexical::deserialize(ptzTraits, &m_trait)) // TODO: #Elric support flags in 2.3
+            qnWarning("Could not parse PTZ traits '%1'.", ptzTraits);
+
+    if(resourceData.value<bool>(lit("panFlipped"), false))
+        m_flip |= Qt::Horizontal;
+    if(resourceData.value<bool>(lit("tiltFlipped"), false))
+        m_flip |= Qt::Vertical;
+
+    m_overrideContinuousMove = m_flip != 0 || (m_trait & (Qn::FourWayPtzTrait | Qn::EightWayPtzTrait));
+
     QString ptzCapabilities = resourceData.value<QString>(lit("ptzCapabilities")); 
-    
     if(!ptzCapabilities.isEmpty()) {
-        // TODO: #Elric #enum evil. implement via enum name mapper flags.
-
-        if(ptzCapabilities == lit("NoPtzCapabilities")) {
+        if(QnLexical::deserialize(ptzCapabilities, &m_capabilities)) {
             m_overrideCapabilities = true;
-            m_capabilities = Qn::NoPtzCapabilities;
-        } else if(ptzCapabilities == lit("ContinuousZoomCapability")) {
-            m_overrideCapabilities = true;
-            m_capabilities = Qn::ContinuousZoomCapability;
         } else {
             qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
         }
@@ -44,21 +51,32 @@ Qn::PtzCapabilities QnWorkaroundPtzController::getCapabilities() {
 }
 
 bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
-    if(!m_octagonal) {
+    if(!m_overrideContinuousMove)
         return base_type::continuousMove(speed);
-    } else {
-        QVector2D cartesianSpeed(speed);
+
+    QVector3D localSpeed = speed;
+    if(m_flip & Qt::Horizontal)
+        localSpeed.setX(localSpeed.x() * -1);
+    if(m_flip & Qt::Vertical)
+        localSpeed.setY(localSpeed.y() * -1);
+
+    if(m_trait & (Qn::EightWayPtzTrait | Qn::FourWayPtzTrait)) {
+        float rounding = (m_trait & Qn::EightWayPtzTrait) ? M_PI / 4.0 : M_PI / 2.0; /* 45 or 90 degrees. */
+
+        QVector2D cartesianSpeed(localSpeed);
         QnPolarPoint<float> polarSpeed = cartesianToPolar(cartesianSpeed);
-        polarSpeed.alpha = qRound(polarSpeed.alpha, M_PI / 4.0); /* Rounded to 45 degrees. */
+        polarSpeed.alpha = qRound(polarSpeed.alpha, rounding);
         cartesianSpeed = polarToCartesian<QVector2D>(polarSpeed.r, polarSpeed.alpha);
 
         if(qFuzzyIsNull(cartesianSpeed.x())) // TODO: #Elric use lower null threshold
             cartesianSpeed.setX(0.0);
         if(qFuzzyIsNull(cartesianSpeed.y()))
             cartesianSpeed.setY(0.0);
-        
-        return base_type::continuousMove(QVector3D(cartesianSpeed, speed.z()));
+
+        localSpeed = QVector3D(cartesianSpeed, localSpeed.z());
     }
+
+    return base_type::continuousMove(localSpeed);
 }
 
 bool QnWorkaroundPtzController::extends(Qn::PtzCapabilities) {

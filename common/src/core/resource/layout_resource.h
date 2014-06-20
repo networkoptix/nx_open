@@ -8,7 +8,6 @@
 
 #include "resource.h"
 #include "layout_item_data.h"
-#include "recording/time_period.h"
 
 class QnLayoutResource: public QnResource {
     Q_OBJECT
@@ -19,8 +18,6 @@ public:
     QnLayoutResource();
 
     QnLayoutResourcePtr clone() const;
-
-    virtual QString getUniqueId() const override;
 
     void setItems(const QnLayoutItemDataList &items);
 

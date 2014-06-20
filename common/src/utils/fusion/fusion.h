@@ -2,29 +2,24 @@
 #define QN_FUSION_H
 
 #include <utility> /* For std::forward and std::declval. */
-#include <type_traits> /* For std::remove_*, std::enable_if, std::is_same, std::integral_constant. */
+#include <type_traits> /* For std::enable_if, std::is_same, std::integral_constant. */
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/tuple/enum.hpp>
+#include <boost/preprocessor/tuple/elem.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/mpl/if.hpp>
 #endif // Q_MOC_RUN
 
 #include <utils/preprocessor/variadic_seq_for_each.h>
+#include <utils/common/type_traits.h>
 
 #include "fusion_fwd.h"
 #include "fusion_detail.h"
 #include "fusion_keys.h"
 
 namespace QnFusion {
-    template<class T>
-    struct remove_cvr:
-        std::remove_cv<
-            typename std::remove_reference<T>::type
-        >
-    {};
-
 
     /**
      * Main API entry point. Iterates through the members of a previously 
@@ -65,7 +60,7 @@ namespace QnFusion {
      */
 
     template<class Base, class Derived, class T>
-    T invoke(T Base::*getter, const Derived &object) {
+    const T &invoke(T Base::*getter, const Derived &object) {
         return object.*getter;
     }
 
@@ -127,7 +122,9 @@ namespace QnFusion {
             typed_member_setter_tag<T>,
             typed_function_setter_tag<T>
         >
-    {};
+    {
+        //static_assert(std::is_member_object_pointer<Setter>::value, "111");
+    };
 
     /**
      * This metafuction returns the type of the field specified by the given
@@ -137,7 +134,7 @@ namespace QnFusion {
      */
     template<class Access>
     struct access_member_type:
-        remove_cvr<decltype(invoke(
+        QnTypeTraits::remove_cvr<decltype(invoke(
             std::declval<typename Access::template at<getter_type, void>::type::result_type>(), 
             std::declval<typename Access::template at<object_declval_type, void>::type::result_type>()
         ))>
@@ -153,7 +150,7 @@ namespace QnFusion {
     template<class Access>
     struct access_setter_category:
         setter_category<
-            typename Access::template at<setter_type, void>::type,
+            typename Access::template at<setter_type, void>::type::result_type,
             typename access_member_type<Access>::type
         >
     {};
@@ -257,7 +254,15 @@ namespace QnFusionDetail {
     BOOST_PP_VARIADIC_SEQ_FOR_EACH(QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_I, (FUNCTION_SEQ, ##__VA_ARGS__), CLASS_SEQ)
 
 #define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_I(R, PARAMS, CLASS)           \
-    QN_FUSION_DEFINE_FUNCTIONS(BOOST_PP_TUPLE_ENUM(CLASS), BOOST_PP_TUPLE_ENUM(PARAMS))
+    QN_FUSION_DEFINE_FUNCTIONS(                                                 \
+        BOOST_PP_TUPLE_ENUM(CLASS),                                             \
+        QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_E_0 PARAMS,                   \
+        QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_E_1 PARAMS                    \
+    )
 
+/* These ones serve as a workaround for the fact that we cannot use BOOST_PP_TUPLE_ELEM here
+ * because it is already used up the stack. */
+#define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_E_0(FUNCTION_SEQ, ... /* PREFIX */) FUNCTION_SEQ
+#define QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES_STEP_E_1(FUNCTION_SEQ, ... /* PREFIX */) __VA_ARGS__
 
 #endif // QN_FUSION_H

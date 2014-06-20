@@ -8,6 +8,7 @@
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 #include "common/common_module.h"
+#include "transaction/transaction_message_bus.h"
 
 
 namespace ec2
@@ -18,7 +19,7 @@ namespace ec2
         const ResourceContext& resCtx )
     :
         m_queryProcessor( queryProcessor ),
-        m_resCtx(resCtx),
+        m_resCtx( resCtx ),
         m_licenseManager( new QnLicenseManager<T>(m_queryProcessor) ),
         m_resourceManager( new QnResourceManager<T>(m_queryProcessor, resCtx) ),
         m_mediaServerManager( new QnMediaServerManager<T>(m_queryProcessor, resCtx) ),
@@ -27,10 +28,26 @@ namespace ec2
         m_businessEventManager( new QnBusinessEventManager<T>(m_queryProcessor, resCtx) ),
         m_layoutManager( new QnLayoutManager<T>(m_queryProcessor, resCtx) ),
         m_videowallManager( new QnVideowallManager<T>(m_queryProcessor, resCtx) ),
-        m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) )
+        m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) ),
+        m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) )
     {
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerFound(QnId, bool, bool)), this, SIGNAL(remotePeerFound(QnId, bool, bool)), Qt::DirectConnection);
-        connect (QnTransactionMessageBus::instance(), SIGNAL(peerLost(QnId, bool, bool)),  this, SIGNAL(remotePeerLost(QnId, bool, bool)), Qt::DirectConnection);
+        connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerFound, this, &BaseEc2Connection<T>::remotePeerFound, Qt::DirectConnection);
+        connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,  this, &BaseEc2Connection<T>::remotePeerLost, Qt::DirectConnection);
+
+        m_notificationManager.reset(
+            new ECConnectionNotificationManager(
+                m_resCtx,
+                this, 
+                m_licenseManager.get(),
+                m_resourceManager.get(),
+                m_mediaServerManager.get(),
+                m_cameraManager.get(),
+                m_userManager.get(),
+                m_businessEventManager.get(),
+                m_layoutManager.get(),
+                m_videowallManager.get(),
+                m_storedFileManager.get(),
+                m_updatesManager.get() ) );
     }
 
     template<class T>
@@ -88,6 +105,12 @@ namespace ec2
     }
 
     template<class T>
+    AbstractUpdatesManagerPtr BaseEc2Connection<T>::getUpdatesManager()
+    {
+        return m_updatesManager;
+    }
+
+    template<class T>
     int BaseEc2Connection<T>::setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler )
     {
         const int reqID = generateRequestID();
@@ -124,7 +147,7 @@ namespace ec2
                 outData = currentTime;
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, qint64, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, qint64, decltype(queryDoneHandler)> (
             ApiCommand::getCurrentTime, nullptr, queryDoneHandler );
 
         return reqID;
@@ -157,7 +180,7 @@ namespace ec2
                 fromApiToResourceList(settings, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<nullptr_t, ApiResourceParamDataList, decltype(queryDoneHandler)> ( ApiCommand::getSettings, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiResourceParamDataList, decltype(queryDoneHandler)> ( ApiCommand::getSettings, nullptr, queryDoneHandler);
         return reqID;
     }
 
@@ -184,14 +207,14 @@ namespace ec2
     }
 
     template<class T>
-    void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url, bool isClient, const QUuid& peerGuid)
+    void BaseEc2Connection<T>::addRemotePeer(const QUrl& _url, const QUuid& peerGuid)
     {
         QUrl url(_url);
         url.setPath("/ec2/events");
         QUrlQuery q;
         q.addQueryItem("guid", qnCommon->moduleGUID().toString());
         url.setQuery(q);
-        QnTransactionMessageBus::instance()->addConnectionToPeer(url, isClient, peerGuid);
+        QnTransactionMessageBus::instance()->addConnectionToPeer(url, peerGuid);
     }
 
     template<class T>

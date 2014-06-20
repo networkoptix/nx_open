@@ -7,9 +7,11 @@
 #include <api/media_server_connection.h>
 
 #include <utils/common/software_version.h>
+#include <utils/common/system_information.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/abstract_storage_resource.h>
+
 
 class QnMediaServerResource : public QnResource
 {
@@ -18,6 +20,7 @@ class QnMediaServerResource : public QnResource
     Q_PROPERTY(QString streamingUrl READ getStreamingUrl WRITE setStreamingUrl)
 
 public:
+    static const QString USE_PROXY;
 
     QnMediaServerResource(const QnResourceTypePool* resTypePool);
     virtual ~QnMediaServerResource();
@@ -28,10 +31,10 @@ public:
     QString getApiUrl() const;
 
     void setStreamingUrl(const QString& value);
-    QString getStreamingUrl() const;
+    const QString& getStreamingUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
-    QList<QHostAddress> getNetAddrList();
+    const QList<QHostAddress>& getNetAddrList() const;
 
     QnMediaServerConnectionPtr apiConnection();
 
@@ -42,6 +45,9 @@ public:
 
     void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
+    /*!
+        \return If there is route to mediaserver, ip address of mediaserver. If there is no route, string \a USE_PROXY
+    */
     QString getPrimaryIF() const;
 
     Qn::PanicMode getPanicMode() const;
@@ -63,6 +69,10 @@ public:
 
     QnSoftwareVersion getVersion() const;
     void setVersion(const QnSoftwareVersion& version);
+
+    QnSystemInformation getSystemInfo() const;
+    void setSystemInfo(const QnSystemInformation &systemInfo);
+
     static bool isEdgeServer(const QnResourcePtr &resource);
     virtual void setStatus(Status newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
@@ -86,6 +96,7 @@ private:
     Qn::ServerFlags m_serverFlags;
     Qn::PanicMode m_panicMode;
     QnSoftwareVersion m_version;
+    QnSystemInformation m_systemInfo;
     QMap<int, QString> m_runningIfRequests;
     QObject *m_guard; // TODO: #Elric evil hack. Remove once roma's direct connection hell is refactored out.
     int m_maxCameras;

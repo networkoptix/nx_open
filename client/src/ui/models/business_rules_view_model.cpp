@@ -191,7 +191,7 @@ void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
     m_rules.removeAt(row);
     endRemoveRows();
 
-    //TODO: #GDM check if dataChanged is required, check row
+    //TODO: #GDM #Business check if dataChanged is required, check row
     //emit dataChanged(index(row, 0), index(row, QnBusiness::ColumnCount - 1));
 }
 

@@ -12,6 +12,7 @@
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
 
+#include <recording/time_period_list.h>
 
 QnNetworkResource::QnNetworkResource(): 
     QnResource(),
@@ -20,7 +21,7 @@ QnNetworkResource::QnNetworkResource():
     m_networkTimeout(5000),
     m_probablyNeedToUpdateStatus(false)
 {
-    //TODO: #GDM motion flag should be set in QnVirtualCameraResource depending on motion support
+    //TODO: #GDM #Common motion flag should be set in QnVirtualCameraResource depending on motion support
     addFlags(network);
 }
 
@@ -210,6 +211,13 @@ bool QnNetworkResource::ping()
 {
     std::auto_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
     return sock->connect( getHostAddress(), httpPort() );
+}
+
+QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {
+    Q_UNUSED(startTimeMs)
+    Q_UNUSED(endTimeMs)
+    Q_UNUSED(detailLevel)
+    return QnTimePeriodList();
 }
 
 /*

@@ -42,6 +42,7 @@ class QnLoginDialog;
 class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
+class QnSystemAdministrationDialog;
 
 // TODO: #Elric get rid of these processors here
 namespace detail {
@@ -168,6 +169,8 @@ protected:
 
     QnLoginDialog *loginDialog() const;
 
+    QnSystemAdministrationDialog *systemAdministrationDialog() const;
+
     QnWorkbenchNotificationsHandler* notificationsHandler() const;
 
 protected slots:
@@ -221,6 +224,7 @@ protected slots:
     void at_openBusinessLogAction_triggered();
     void at_cameraListAction_triggered();
     void at_webClientAction_triggered();
+    void at_systemAdministrationAction_triggered();
     void at_preferencesGeneralTabAction_triggered();
     void at_preferencesLicensesTabAction_triggered();
     void at_preferencesServerTabAction_triggered();
@@ -248,7 +252,6 @@ protected slots:
     void at_serverLogsAction_triggered();
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
-    void at_youtubeUploadAction_triggered();
     void at_thumbnailsSearchAction_triggered();
 
     void at_openInFolderAction_triggered();
@@ -340,6 +343,7 @@ private:
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QPointer<QnLoginDialog> m_loginDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
+    QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
 
 
     /** Whether the set of selected resources was changed and settings
@@ -349,6 +353,7 @@ private:
     /** Scope of the last selection change. */
     Qn::ActionScope m_selectionScope;
 
+    bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once
      * the user logs in. */
     QList<QnMimeData> m_delayedDrops;

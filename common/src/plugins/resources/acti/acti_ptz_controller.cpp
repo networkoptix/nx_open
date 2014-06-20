@@ -58,6 +58,7 @@ namespace {
         );
     }
 
+    // TODO: #Elric use QnPtzUtilities
     QString actiZoomDirection(int deviceZoomSpeed) {
         if(deviceZoomSpeed < 0) {
             return lit("WIDE");
@@ -111,8 +112,8 @@ public:
     QnActiPtzControllerPrivate(const QnActiResourcePtr &resource): 
         resource(resource), 
         pendingCommand(Qn::InvalidPtzCommand),
-        currentPosition(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue),
-        currentSpeed(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue)
+        currentSpeed(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue),
+        currentPosition(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue)
     {}
 
     virtual ~QnActiPtzControllerPrivate() {}

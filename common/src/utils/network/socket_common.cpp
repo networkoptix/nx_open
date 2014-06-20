@@ -44,15 +44,6 @@ QString HostAddress::toString() const
         m_addrStr = QLatin1String(inet_ntoa(m_sinAddr));
     return m_addrStr.get();
 }
-
-
-SocketAddress::SocketAddress( const HostAddress& _address, unsigned short _port )
-:
-    address( _address ),
-    port( _port )
-{
-}
-
 SocketAddress::SocketAddress( const QString& addrStr )
 :
     port( 0 )

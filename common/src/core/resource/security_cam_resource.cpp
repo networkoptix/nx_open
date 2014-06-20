@@ -13,6 +13,8 @@
 #include "user_resource.h"
 #include "common/common_module.h"
 
+#include <recording/time_period_list.h>
+
 #define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
 
 namespace {
@@ -113,7 +115,6 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_audioEnabled = other_casted->m_audioEnabled;
         m_manuallyAdded = other_casted->m_manuallyAdded;
         m_model = other_casted->m_model;
-        m_firmware = other_casted->m_firmware;
         m_vendor = other_casted->m_vendor;
     }
 }
@@ -238,33 +239,38 @@ bool QnSecurityCamResource::hasDualStreaming2() const {
     return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse;
 }
 
+static const QString HAS_DUAL_STREAMING_PARAM_NAME = lit("hasDualStreaming");
+static const QString DTS_PARAM_NAME = lit("dts");
+static const QString ANALOG_PARAM_NAME = lit("analog");
+static const QString STREAM_FPS_SHARING_PARAM_NAME = lit("streamFpsSharing");
+
 bool QnSecurityCamResource::hasDualStreaming() const {
     QVariant val;
-    if (!getParam(lit("hasDualStreaming"), val, QnDomainMemory))
+    if (!getParam(HAS_DUAL_STREAMING_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
 }
 
 bool QnSecurityCamResource::isDtsBased() const {
     QVariant val;
-    if (!getParam(lit("dts"), val, QnDomainMemory))
+    if (!getParam(DTS_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
 }
 
 bool QnSecurityCamResource::isAnalog() const {
     QVariant val;
-    if (!getParam(lit("analog"), val, QnDomainMemory))
+    if (!getParam(ANALOG_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
     QVariant val;
-    if (!getParam(lit("streamFpsSharing"), val, QnDomainMemory))
+    if (!getParam(STREAM_FPS_SHARING_PARAM_NAME, val, QnDomainMemory))
         return defaultStreamFpsSharingMethod;
 
-    QString sval = val.toString();
+    const QString& sval = val.toString();
     if (sval == lit("shareFps"))
         return Qn::BasicFpsSharing;
     if (sval == lit("noSharing"))
@@ -274,14 +280,18 @@ Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
 
 void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value) 
 {
-    QString strVal;
-    if (value == Qn::BasicFpsSharing)
-        strVal = lit("shareFps");
-    else if (value == Qn::NoFpsSharing)
-        strVal = lit("noSharing");
-    else
-        strVal = lit("sharePixels");
-    setParam(lit("streamFpsSharing"), strVal, QnDomainDatabase);
+    switch( value )
+    {
+        case Qn::BasicFpsSharing:
+            setParam(STREAM_FPS_SHARING_PARAM_NAME, lit("shareFps"), QnDomainDatabase);
+            break;
+        case Qn::NoFpsSharing:
+            setParam(STREAM_FPS_SHARING_PARAM_NAME, lit("noSharing"), QnDomainDatabase);
+            break;
+        default:
+            setParam(STREAM_FPS_SHARING_PARAM_NAME, lit("sharePixels"), QnDomainDatabase);
+            break;
+    }
 }
 
 QStringList QnSecurityCamResource::getRelayOutputList() const {
@@ -353,7 +363,13 @@ bool QnSecurityCamResource::isAudioSupported() const {
     QVariant val;
     if (!getParam(lit("isAudioSupported"), val, QnDomainMemory))
         return false;
-    return val.toBool();
+    if (val.toBool())
+        return true;
+
+    if (!getParam(lit("forcedIsAudioSupported"), val, QnDomainMemory))
+        return false;
+
+    return val.toInt() > 0;
 }
 
 Qn::MotionType QnSecurityCamResource::getCameraBasedMotionType() const {
@@ -484,11 +500,14 @@ void QnSecurityCamResource::setModel(const QString &model) {
 }
 
 QString QnSecurityCamResource::getFirmware() const {
-    SAFE(return m_firmware)
+    QVariant val;
+    if (!getParam(lit("firmware"), val, QnDomainMemory))
+        return QString();
+    return val.toString();
 }
 
 void QnSecurityCamResource::setFirmware(const QString &firmware) {
-    SAFE(m_firmware = firmware)
+    setParam(lit("firmware"), firmware, QnDomainDatabase);
 }
 
 QString QnSecurityCamResource::getVendor() const {
@@ -621,7 +640,7 @@ QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(
 }
 
 bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) {
-    QnSecurityCamResourcePtr camera = source.dynamicCast<QnSecurityCamResource>();
+    QnSecurityCamResource* camera = dynamic_cast<QnSecurityCamResource*>(source.data());
     if (!camera)
         return false;
 

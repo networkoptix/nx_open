@@ -262,7 +262,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
     return time;
 }
 
-bool QnAviArchiveDelegate::open(QnResourcePtr resource)
+bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
 {
     QMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
 
@@ -281,14 +281,14 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
         m_formatContext->pb = m_ioContext = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
         if (!m_ioContext) {
             close();
-            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccesible
+            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccessible
             return false;
         }
         m_initialized = avformat_open_input(&m_formatContext, "", 0, 0) >= 0;
 
         if (!m_initialized ) {
             close();
-            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccesible
+            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccessible
             return false;
         }
         
@@ -348,7 +348,7 @@ const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
     return entry ? entry->value : 0;
 }
 
-static std::shared_ptr<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
 QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
 {
     if (!m_initialized)
@@ -381,7 +381,7 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
         {
             AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,getTagName(Tag_LayoutInfo, format), 0, 0);
             if (layoutInfo)
-                deserializeLayout(m_videoLayout.get(), QLatin1String(layoutInfo->value));
+                deserializeLayout(m_videoLayout.data(), QLatin1String(layoutInfo->value));
 
             if (m_useAbsolutePos)
             {

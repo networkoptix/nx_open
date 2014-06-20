@@ -1,6 +1,8 @@
 #ifndef __SERVER_STREAM_RECORDER_H__
 #define __SERVER_STREAM_RECORDER_H__
 
+#include <server/server_globals.h>
+
 #include "recording/stream_recorder.h"
 #include "core/misc/schedule_task.h"
 #include "recorder/device_file_catalog.h"
@@ -15,7 +17,7 @@ class QnServerStreamRecorder: public QnStreamRecorder
 {
     Q_OBJECT
 public:
-    QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider);
+    QnServerStreamRecorder(const QnResourcePtr &dev, QnServer::ChunksCatalog catalog, QnAbstractMediaStreamDataProvider* mediaProvider);
     ~QnServerStreamRecorder();
 
     void updateCamera(QnSecurityCamResourcePtr cameraRes);
@@ -45,7 +47,7 @@ signals:
 
     void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, QnBusiness::EventReason reasonCode, QnResourcePtr storageRes);
 protected:
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     virtual bool needSaveData(QnConstAbstractMediaDataPtr media) override;
     void beforeProcessData(QnConstAbstractMediaDataPtr media);
@@ -55,7 +57,7 @@ protected:
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize) override;
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider* provider) override;
     virtual bool canAcceptData() const;
-    virtual void putData(QnAbstractDataPacketPtr data) override;
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
     virtual void endOfRun() override;
     virtual bool saveData(QnConstAbstractMediaDataPtr md) override;
@@ -72,6 +74,8 @@ private:
 private slots:
     void at_recordingFinished(int status, const QString &filename);
 private:
+    const size_t m_maxRecordQueueSizeBytes;
+    const size_t m_maxRecordQueueSizeElements;
     mutable QMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
     QnTimePeriod m_lastSchedulePeriod;
@@ -81,7 +85,7 @@ private:
     //bool m_lastMotionContainData;
     //bool m_needUpdateStreamParams;
     mutable qint64 m_lastWarningTime;
-    QnResource::ConnectionRole m_role;
+    QnServer::ChunksCatalog m_catalog;
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     QnDualStreamingHelperPtr m_dualStreamingHelper;
     QnMediaServerResourcePtr m_mediaServer;
@@ -90,7 +94,7 @@ private:
     bool m_usedPanicMode;
     bool m_usedSpecialRecordingMode;
     bool m_lastMotionState; // true if motion in progress
-    qint64 m_queuedSize;
+    size_t m_queuedSize;
     QMutex m_queueSizeMutex;
     qint64 m_lastMediaTime;
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;

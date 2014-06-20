@@ -6,6 +6,7 @@
 #include "ec2_connection.h"
 #include "mutex/distributed_mutex.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "transaction/transaction_message_bus.h"
 
 
 namespace ec2
@@ -36,13 +37,14 @@ namespace ec2
         fromApiToResourceList(paramList, kvPairs);
 
         m_emailManagerImpl.configure(kvPairs);
-        QnTransactionMessageBus::instance()->setHandler(this);
+        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
+        QnTransactionMessageBus::instance()->setLocalPeer(QnPeerInfo(qnCommon->moduleGUID(), QnPeerInfo::Server));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
         if (QnTransactionMessageBus::instance())
-            QnTransactionMessageBus::instance()->removeHandler(this);
+            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
         ec2::QnDistributedMutexManager::initStaticInstance(0);
     }
 
@@ -51,8 +53,7 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void Ec2DirectConnection::startReceivingNotifications( bool /*isClient*/)
-    {
+    void Ec2DirectConnection::startReceivingNotifications() {
         QnTransactionMessageBus::instance()->start();
     }
 }

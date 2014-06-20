@@ -77,30 +77,30 @@ namespace aio
     */
     bool AIOService::watchSocket(
         AbstractSocket* const sock,
-        PollSet::EventType eventToWatch,
+        aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler )
     {
         QMutexLocker lk( &m_mutex );
 
         unsigned int sockTimeoutMS = 0;
-        if( eventToWatch == PollSet::etRead )
+        if( eventToWatch == aio::etRead )
         {
             if( !sock->getRecvTimeout( &sockTimeoutMS ) )
                 return false;
         }
-        else if( eventToWatch == PollSet::etWrite )
+        else if( eventToWatch == aio::etWrite )
         {
             if( !sock->getSendTimeout( &sockTimeoutMS ) )
                 return false;
         }
 
-        //const int sockTimeoutMS = eventToWatch == PollSet::etRead
+        //const int sockTimeoutMS = eventToWatch == aio::etRead
         //    ? sock->getReadTimeOut()
-        //    : (eventToWatch == PollSet::etWrite ? sock->getWriteTimeOut() : 0);
+        //    : (eventToWatch == aio::etWrite ? sock->getWriteTimeOut() : 0);
 
         //checking, if that socket is already monitored
-        const pair<AbstractSocket*, PollSet::EventType>& sockCtx = make_pair( sock, eventToWatch );
-        map<pair<AbstractSocket*, PollSet::EventType>, AIOThread*>::iterator it = m_sockets.lower_bound( sockCtx );
+        const pair<AbstractSocket*, aio::EventType>& sockCtx = make_pair( sock, eventToWatch );
+        map<pair<AbstractSocket*, aio::EventType>, AIOThread*>::iterator it = m_sockets.lower_bound( sockCtx );
         if( it != m_sockets.end() && it->first == sockCtx )
             return true;    //socket already monitored for eventToWatch
 
@@ -154,13 +154,13 @@ namespace aio
     */
     void AIOService::removeFromWatch(
         AbstractSocket* const sock,
-        PollSet::EventType eventType,
+        aio::EventType eventType,
         bool waitForRunningHandlerCompletion )
     {
         QMutexLocker lk( &m_mutex );
 
-        const pair<AbstractSocket*, PollSet::EventType>& sockCtx = make_pair( sock, eventType );
-        map<pair<AbstractSocket*, PollSet::EventType>, AIOThread*>::iterator it = m_sockets.find( sockCtx );
+        const pair<AbstractSocket*, aio::EventType>& sockCtx = make_pair( sock, eventType );
+        map<pair<AbstractSocket*, aio::EventType>, AIOThread*>::iterator it = m_sockets.find( sockCtx );
         if( it != m_sockets.end() )
         {
             if( it->second->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion ) )

@@ -57,7 +57,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
 //    if (businessAction->actionType() != QnBusiness::ShowPopup)
 //        return;
 
-    //TODO: #GDM check if camera is visible to us
+    //TODO: #GDM #Business check if camera is visible to us
     QnBusinessActionParameters::UserGroup userGroup = businessAction->getParams().getUserGroup();
     if (userGroup == QnBusinessActionParameters::AdminOnly
             && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
@@ -81,7 +81,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     if (!context()->user())
         return;
 
-    const bool soundAction = businessAction->actionType() == QnBusiness::PlaySoundAction; // TODO: #GDM also PlaySoundOnceAction?
+    const bool soundAction = businessAction->actionType() == QnBusiness::PlaySoundAction; // TODO: #GDM #Business also PlaySoundOnceAction?
     if (!soundAction && !m_adaptor->isAllowed(eventType))
         return;
 

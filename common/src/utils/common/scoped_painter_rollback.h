@@ -87,12 +87,15 @@ typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAcc
 typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::NonCosmeticDefaultPen> >    QnScopedPainterNonCosmeticDefaultPenRollback;
 typedef QnGenericScopedPainterRollback<bool,        detail::PainterRenderHintAccessor<QPainter::SmoothPixmapTransform> >    QnScopedPainterSmoothPixmapTransformRollback;
 
-#define QN_SCOPED_PAINTER_PEN_ROLLBACK(PAINTER, PEN)                            \
-    QN_GENERIC_SCOPED_ROLLBACK((QnGenericScopedPainterRollback<QPen, detail::PainterPenAccessor>), PAINTER, PEN)
+#define QN_SCOPED_PAINTER_PEN_ROLLBACK(PAINTER, ... /* PEN */)                  \
+    QN_GENERIC_SCOPED_ROLLBACK((QnGenericScopedPainterRollback<QPen, detail::PainterPenAccessor>), PAINTER, ##__VA_ARGS__)
 
-#define QN_SCOPED_PAINTER_BRUSH_ROLLBACK(PAINTER, BRUSH)                        \
-    QN_GENERIC_SCOPED_ROLLBACK((QnGenericScopedPainterRollback<QBrush, detail::PainterBrushAccessor>), PAINTER, BRUSH)
+#define QN_SCOPED_PAINTER_BRUSH_ROLLBACK(PAINTER, ... /* BRUSH */)              \
+    QN_GENERIC_SCOPED_ROLLBACK((QnGenericScopedPainterRollback<QBrush, detail::PainterBrushAccessor>), PAINTER, ##__VA_ARGS__)
 
-// TODO: #Elric complete the list and remove defines
+#define QN_SCOPED_PAINTER_TRANSFORM_ROLLBACK(PAINTER, ... /* TRANSFORM */)      \
+    QN_GENERIC_SCOPED_ROLLBACK((QnGenericScopedPainterRollback<QTransform, detail::PainterTransformAccessor>), PAINTER, ##__VA_ARGS__)
+
+// TODO: #Elric complete the list and remove typedefs
 
 #endif // QN_SCOPED_PAINTER_ROLLBACK_H

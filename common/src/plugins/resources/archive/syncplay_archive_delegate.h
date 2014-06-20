@@ -16,7 +16,7 @@ public:
     QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, QnAbstractArchiveDelegate* ownerDelegate);
     virtual ~QnSyncPlayArchiveDelegate();
 
-    virtual bool open(QnResourcePtr resource);
+    virtual bool open(const QnResourcePtr &resource);
     virtual void close();
     virtual void beforeClose();
     virtual qint64 startTime();
@@ -38,6 +38,9 @@ public:
     virtual bool setQuality(MediaQuality quality, bool fastSwitch) override;
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
     virtual void setSendMotion(bool value) override;
+
+    virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
+
 protected:
     friend class QnArchiveSyncPlayWrapper;
     //void setPrebuffering(bool value);

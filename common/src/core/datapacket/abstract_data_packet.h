@@ -1,11 +1,13 @@
 #ifndef abstract_data_h_1112
 #define abstract_data_h_1112
 
-#include <QSharedPointer>
-#include <QSharedPointer>
 #include <libavutil/avutil.h>
+
+#include <QSharedPointer>
+
 #include "utils/common/threadqueue.h"
 
+#include <libavutil/avutil.h>
 
 class QnAbstractStreamDataProvider;
 

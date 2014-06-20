@@ -8,7 +8,7 @@
 #include <QtSql/QSqlRecord>
 #include <QtSql/QSqlQuery>
 
-#include <utils/common/adl_wrapper.h>
+#include <utils/common/conversion_wrapper.h>
 #include <utils/fusion/fusion.h>
 
 #include "sql_fwd.h"
@@ -22,12 +22,12 @@ namespace QnSqlDetail {
 
     template<class T>
     QnSqlIndexMapping mapping_internal(const QSqlQuery &query, const T *dummy) {
-        return mapping(adl_wrap(query), dummy);
+        return mapping(disable_user_conversions(query), dummy);
     }
 
     template<class T>
     void fetch_internal(const QnSqlIndexMapping &mapping, const QSqlRecord &value, T *target) {
-        fetch(mapping, adl_wrap(value), target);
+        fetch(mapping, disable_user_conversions(value), target);
     }
 
     template<class T>
@@ -37,7 +37,7 @@ namespace QnSqlDetail {
 
     template<class T>
     void deserialize_field_internal(const QVariant &value, T *target) {
-        deserialize_field(adl_wrap(value), target);
+        deserialize_field(disable_user_conversions(value), target);
     }
 
     struct TrueChecker {
@@ -205,7 +205,7 @@ namespace QnSqlDetail {
             return true;
         }
 
-        template<class T, class Access, class Member>
+        template<class T, class Access>
         bool operator()(T &target, const Access &access, int index, const QnFusion::member_setter_tag &) const {
             using namespace QnFusion;
 
@@ -241,5 +241,6 @@ __VA_ARGS__ void fetch(const QnSqlIndexMapping &mapping, const QSqlRecord &value
     QnFusion::visit_members(*target, QnSqlDetail::FetchVisitor(mapping, value)); \
 }
 
+// TODO: #Elric we have undefined behaviour here (mapping^): dereferencing NULL.
 
 #endif // QN_SERIALIZATION_SQL_H

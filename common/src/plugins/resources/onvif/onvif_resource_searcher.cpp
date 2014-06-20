@@ -114,7 +114,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         
         if (channel == 0 && !hasRunningLiveProvider(rpResource)) {
             resource->calcTimeDrift();
-            if (!resource->fetchAndSetDeviceInformation(true))
+            if (!resource->readDeviceInformation())
                 return resList; // no answer from camera
         }
         else if (rpResource->getStatus() == QnResource::Offline)
@@ -135,7 +135,8 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
     }
 
     resource->calcTimeDrift();
-    if (resource->fetchAndSetDeviceInformation(false))
+    
+    if (resource->readDeviceInformation() && resource->getFullUrlInfo())
     {
         // Clarify resource type
         QString fullName = resource->getName();
@@ -220,7 +221,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     return result;
 }
 
-QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
+QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnResourcePtr result;
 
@@ -241,7 +242,8 @@ QnResourcePtr OnvifResourceSearcher::createResource(QnId resourceTypeId, const Q
     }
     */
     
-    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(resourceType->getName()); // use name instead of manufacture to instanciate child onvif resource
+    result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(lit("vista"));
+    //result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(resourceType->getName()); // use name instead of manufacture to instanciate child onvif resource
     if (!result )
         return result; // not found
 

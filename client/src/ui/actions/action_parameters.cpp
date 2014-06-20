@@ -2,6 +2,7 @@
 
 #include <core/resource/layout_item_index.h>
 #include <core/resource/videowall_item_index.h>
+#include <core/resource/videowall_matrix_index.h>
 
 #include <utils/common/warnings.h>
 
@@ -64,6 +65,12 @@ QnActionParameters::QnActionParameters(const QnVideoWallItemIndexList &videoWall
     setItems(QVariant::fromValue<QnVideoWallItemIndexList>(videoWallItems));
 }
 
+QnActionParameters::QnActionParameters(const QnVideoWallMatrixIndexList &videoWallMatrices, const ArgumentHash &arguments) {
+    setArguments(arguments);
+    setItems(QVariant::fromValue<QnVideoWallMatrixIndexList>(videoWallMatrices));
+}
+
+
 void QnActionParameters::setArguments(const ArgumentHash &arguments) {
     for(ArgumentHash::const_iterator pos = arguments.begin(); pos != arguments.end(); pos++)
         setArgument(pos.key(), pos.value());
@@ -111,6 +118,10 @@ QnLayoutItemIndexList QnActionParameters::layoutItems(int key) const {
 
 QnVideoWallItemIndexList QnActionParameters::videoWallItems(int key) const {
     return QnActionParameterTypes::videoWallItems(argument(key));
+}
+
+QnVideoWallMatrixIndexList QnActionParameters::videoWallMatrices(int key) const {
+    return QnActionParameterTypes::videoWallMatrices(argument(key));
 }
 
 QnWorkbenchLayoutList QnActionParameters::layouts(int key) const {

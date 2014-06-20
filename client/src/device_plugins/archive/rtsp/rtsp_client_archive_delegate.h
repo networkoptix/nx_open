@@ -24,7 +24,7 @@ public:
 
     void setResource(QnResourcePtr resource);
     void setServer(QnResourcePtr mServer);
-    virtual bool open(QnResourcePtr resource);
+    virtual bool open(const QnResourcePtr &resource);
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();
@@ -81,7 +81,7 @@ private:
     bool m_tcpMode;
     QMap<quint32, quint16> m_prevTimestamp;
     qint64 m_position;
-    std::shared_ptr<QnDefaultResourceVideoLayout> m_defaultVideoLayout;
+    QSharedPointer<QnDefaultResourceVideoLayout> m_defaultVideoLayout;
     bool m_opened;
     QnResourcePtr m_resource;
     QnResourcePtr m_server;

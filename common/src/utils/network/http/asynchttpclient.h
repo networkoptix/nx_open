@@ -93,7 +93,7 @@ namespace nx_http
             Response is valid only after signal \a responseReceived() has been emitted
             \return Can be NULL if no response has been received yet
         */
-        const HttpResponse* response() const;
+        const Response* response() const;
         StringType contentType() const;
         //!Returns current message body buffer, clearing it
         /*!
@@ -111,10 +111,17 @@ namespace nx_http
         void setUserAgent( const QString& userAgent );
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
+        void setResponseReadTimeoutMs( int _responseReadTimeoutMs );
+        /*!
+            By default \a true.
+            \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
+        */
+        void setDecodeChunkedMessageBody( bool val );
 
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addRequestHeader(const StringType& key, const StringType& value);
+
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
         //!Emitted when response headers has been read
@@ -138,11 +145,11 @@ namespace nx_http
 
     protected:
         //!Implementation of aio::AIOEventHandler::eventTriggered
-        virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw() override;
+        virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override;
 
     private:
         State m_state;
-        HttpRequest m_request;
+        Request m_request;
         std::shared_ptr<AbstractStreamSocket> m_socket;
         BufferType m_requestBuffer;
         size_t m_requestBytesSent;
@@ -157,6 +164,7 @@ namespace nx_http
         mutable QMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
+        int m_responseReadTimeoutMs;
 
         void resetDataBeforeNewRequest();
         bool initiateHttpMessageDelivery( const QUrl& url );
@@ -178,8 +186,8 @@ namespace nx_http
         */
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
-        bool resendRequestWithAuthorization( const nx_http::HttpResponse& response );
-        void eventTriggeredPrivate( AbstractSocket* sock, PollSet::EventType eventType );
+        bool resendRequestWithAuthorization( const nx_http::Response& response );
+        void eventTriggeredPrivate( AbstractSocket* sock, aio::EventType eventType );
 
         static const char* toString( State state );
     };

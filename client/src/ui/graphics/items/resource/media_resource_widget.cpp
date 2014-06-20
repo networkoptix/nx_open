@@ -10,7 +10,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
@@ -58,7 +58,7 @@
 
 
 //TODO: #Elric remove
-#include "camera/caching_time_period_loader.h"
+#include <camera/loaders/caching_camera_data_loader.h>
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 
@@ -244,7 +244,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         statusOverlayWidget()->setDiagnosticsVisible(true);
     }
 
-    connect(resource()->toResource(), &QnResource::resourceChanged, this, &QnMediaResourceWidget::updateButtonsVisibility); //TODO: #GDM get rid of resourceChanged
+    connect(resource()->toResource(), &QnResource::resourceChanged, this, &QnMediaResourceWidget::updateButtonsVisibility); //TODO: #GDM #Common get rid of resourceChanged
 
     connect(this, &QnResourceWidget::zoomRectChanged, this, &QnMediaResourceWidget::at_zoomRectChanged);
     connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged, this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
@@ -985,7 +985,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
-        QnCachingTimePeriodLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
+        QnCachingCameraDataLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(QnResource::Online);
         else

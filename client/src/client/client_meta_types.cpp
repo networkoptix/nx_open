@@ -7,6 +7,7 @@
 #include <utils/ping_utility.h>
 
 #include <camera/thumbnail.h>
+#include <camera/data/abstract_camera_data.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_parameters.h>
@@ -33,8 +34,9 @@ void QnClientMetaTypes::initialize() {
     if(qn_clientMetaTypes_initialized)
         return;
 
-    QnCommonMetaTypes::initilize();
+    QnCommonMetaTypes::initialize();
 
+    qRegisterMetaType<Qt::KeyboardModifiers>();
     qRegisterMetaType<QVector<QUuid> >();
     qRegisterMetaType<QVector<QColor> >();
 
@@ -79,6 +81,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnPtzManageModelColors>();
     qRegisterMetaType<QnLicensesListModelColors>();
 
+    qRegisterMetaType<QnAbstractCameraDataPtr>();
+
     QnJsonSerializer::registerSerializer<QnTimeSliderColors>();
     QnJsonSerializer::registerSerializer<QnTimeScrollBarColors>();
     QnJsonSerializer::registerSerializer<QnBackgroundColors>();
@@ -91,6 +95,7 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnPtzManageModelColors>();
     QnJsonSerializer::registerSerializer<QnLicensesListModelColors>();
 
+    QnJsonSerializer::registerSerializer<Qn::ClientSkin>();
     QnJsonSerializer::registerSerializer<QnPaletteData>();
     QnJsonSerializer::registerSerializer<QnPenData>();
     QnJsonSerializer::registerSerializer<QVector<QColor> >(); // TODO: #Elric integrate with QVariant iteration?

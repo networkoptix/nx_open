@@ -7,7 +7,9 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <nx_ec/data/api_connection_data.h>
 #include <utils/serialization/lexical_functions.h>
+
 
 namespace ec2
 {
@@ -27,8 +29,11 @@ namespace ec2
     }
 
 
-    bool parseHttpRequestParams(const QnRequestParamList &params, ApiStoredFilePath *path) {
-        return deserialize(params, lit("folder"), path);
+    bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, QString *value) {
+        if (command == "getHelp")
+            return deserialize(params, lit("group"), value);
+        else
+            return deserialize(params, lit("folder"), value); // ApiStoredFilePath
     }
 
     void toUrlParams(const ApiStoredFilePath &name, QUrlQuery *query) {
@@ -36,7 +41,8 @@ namespace ec2
     }
 
 
-    bool parseHttpRequestParams(const QnRequestParamList &params, QnId *id) {
+    bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, QnId *id) {
+        Q_UNUSED(command);
         return deserialize(params, lit("id"), id);
     }
 
@@ -45,7 +51,8 @@ namespace ec2
     }
 
 
-    bool parseHttpRequestParams(const QnRequestParamList &params, Qn::SerializationFormat *format) {
+    bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, Qn::SerializationFormat *format) {
+        Q_UNUSED(command);
         return deserialize(params, lit("format"), format);
     }
 
@@ -54,10 +61,21 @@ namespace ec2
     }
 
 
-    bool parseHttpRequestParams(const QnRequestParamList &, LoginInfo *) { return true; }
-    void toUrlParams(const LoginInfo &, QUrlQuery *) {}
+    bool parseHttpRequestParams(const QString& command, const QnRequestParamList& params, ApiLoginData* data)
+    {
+        Q_UNUSED(command);
+        return 
+            deserialize(params, lit("login"), &data->login) &&
+            deserialize(params, lit("digest"), &data->passwordHash);
+    }
 
-    bool parseHttpRequestParams(const QnRequestParamList &, nullptr_t *) { return true; }
+    void toUrlParams(const ApiLoginData& data, QUrlQuery* query) 
+    {
+        serialize( data.login, lit("login"), query );
+        serialize( data.passwordHash, lit("digest"), query );
+    }
+
+    bool parseHttpRequestParams(const QString&, const QnRequestParamList &, std::nullptr_t *) { return true; }
     void toUrlParams(const std::nullptr_t &, QUrlQuery *) {}
 
 }

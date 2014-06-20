@@ -23,7 +23,14 @@ public:
 
     void loadLayoutsList(const QnLayoutResourceList &layouts);
 
-    void setCanClone(bool canClone);
+    bool canClone() const;
+    void setCanClone(bool value);
+
+    bool isShortcutsSupported() const;
+    void setShortcutsSupported(bool value);
+
+    bool isCreateShortcut() const;
+    void setCreateShortcut(bool value);
 private:
     QScopedPointer<Ui::QnAttachToVideowallDialog> ui;
 };

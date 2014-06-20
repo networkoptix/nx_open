@@ -192,7 +192,7 @@ void QnAbstractResourcePropertyAdaptor::processSaveRequestsNoLock(const QnResour
     resource->setProperty(m_key, serializedValue);
 
     ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
-    connection->getResourceManager()->save(resource->getId(), QnKvPairList() << QnKvPair(m_key, serializedValue), this, &QnAbstractResourcePropertyAdaptor::at_connection_propertiesSaved);
+    connection->getResourceManager()->save(resource->getId(), QnKvPairList() << QnKvPair(m_key, serializedValue), false, this, &QnAbstractResourcePropertyAdaptor::at_connection_propertiesSaved);
 }
 
 void QnAbstractResourcePropertyAdaptor::enqueueSaveRequest() {

@@ -1,48 +1,64 @@
+
 #include "network_proxy_factory.h"
+
+#include <api/app_server_connection.h>
+#include <core/resource/resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/security_cam_resource.h>
+#include <network/authenticate_helper.h>
+
 
 // -------------------------------------------------------------------------- //
 // QnNetworkProxyFactory
 // -------------------------------------------------------------------------- //
-/**
- * Note that instance of this class will be used from several threads, and
- * must therefore be thread-safe.
- */
+static QnNetworkProxyFactory* QnNetworkProxyFactory_instance = nullptr;
+
 QnNetworkProxyFactory::QnNetworkProxyFactory()
 {
+    Q_ASSERT( QnNetworkProxyFactory_instance == nullptr );
+    QnNetworkProxyFactory_instance = this;
 }
 
 QnNetworkProxyFactory::~QnNetworkProxyFactory()
 {
+    QnNetworkProxyFactory_instance = nullptr;
 }
 
-void QnNetworkProxyFactory::removeFromProxyList(const QUrl& url)
+void QnNetworkProxyFactory::removeFromProxyList(const QString& targetHost)
 {
     QMutexLocker locker(&m_mutex);
-    QString host = url.host();//QString(QLatin1String("%1:%2")).arg(url.host()).arg(url.port());
 
-    m_proxyInfo.remove(host);
+    m_proxyInfo.remove(targetHost);
 }
 
-void QnNetworkProxyFactory::addToProxyList(const QUrl& url, const QString& addr, int port)
+void QnNetworkProxyFactory::addToProxyList(
+    const QString& targetHost,
+    const QString& proxyHost,
+    quint16 proxyPort,
+    const QString& userName,
+    const QString& password )
 {
-    QMutexLocker locker(&m_mutex);
-    QString host = url.host();//QString(QLatin1String("%1:%2")).arg(url.host()).arg(url.port());
+    QMutexLocker lk( &m_mutex );
+    m_proxyInfo[targetHost] = QNetworkProxy(QNetworkProxy::HttpProxy, proxyHost, proxyPort, userName, password);
+}
 
-    m_proxyInfo.insert(host, ProxyInfo(addr, port));
+void QnNetworkProxyFactory::bindHostToResource(
+    const QString& targetHost,
+    QnResourcePtr resource )
+{
+    QMutexLocker lk( &m_mutex );
+    m_proxyInfo[targetHost] = getProxyToResource( resource );
 }
 
 void QnNetworkProxyFactory::clearProxyList()
 {
-    QMutexLocker locker(&m_mutex);
+    QMutexLocker lk( &m_mutex );
 
     m_proxyInfo.clear();
 }
 
 QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery &query)
 {
-    QList<QNetworkProxy> rez;
-    QString host_name = query.url().host();
-
     QString urlPath = query.url().path();    
     
     if (urlPath.startsWith(QLatin1String("/")))
@@ -51,47 +67,116 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
     if (urlPath.endsWith(QLatin1String("/")))
         urlPath.chop(1);
 
-    if (/*urlPath.isEmpty() || */urlPath == QLatin1String("api/ping")) {
-        rez << QNetworkProxy(QNetworkProxy::NoProxy);
-        return rez;
-    }
-    QUrl url = query.url();
-    QString url_host = url.host();
-
-    url.setPath(QString());
-    url.setUserInfo(QString());
-    url.setQuery(QUrlQuery());
+    if ( urlPath == QLatin1String("api/ping") )
+        return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
 
     QMutexLocker locker(&m_mutex);
 
-    QMap<QString, ProxyInfo>::const_iterator itr;
-    itr = m_proxyInfo.find(url_host);
-    if (itr == m_proxyInfo.end())
+    const QString& targetHost = query.url().host();
+    QMap<QString, QNetworkProxy>::const_iterator itr = m_proxyInfo.find(targetHost);
+    if( itr == m_proxyInfo.end() )
+        return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
+    return QList<QNetworkProxy>() << itr.value();
+}
+
+bool QnNetworkProxyFactory::fillUrlWithRouteToResource(
+    QnResourcePtr targetResource,
+    QUrl* const requestUrl,
+    WhereToPlaceProxyCredentials credentialsBehavour )
+{
+    QUrlQuery urlQuery( requestUrl->query() );
+    const QNetworkProxy& proxy = getProxyToResource( targetResource );
+    switch( proxy.type() )
     {
-        rez << QNetworkProxy(QNetworkProxy::NoProxy);
+        case QNetworkProxy::NoProxy:
+            break;
+
+        case QNetworkProxy::HttpProxy:
+            requestUrl->setPath( lit("/proxy/{%1}%2").arg(targetResource->getId().toString()).arg(requestUrl->path()) );
+            requestUrl->setHost( proxy.hostName() );
+            requestUrl->setPort( proxy.port() );
+            urlQuery.addQueryItem( lit("proxy_auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam( requestUrl->userName(), requestUrl->password() )) );
+            break;
+
+        default:
+            assert( false );
+            return false;
+    }
+
+    if( !requestUrl->userName().isEmpty() )
+    {
+        //adding credentials
+        switch( credentialsBehavour )
+        {
+            case QnNetworkProxyFactory::placeCredentialsToUrl:
+                urlQuery.addQueryItem( lit("auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam( requestUrl->userName(), requestUrl->password() )) );
+                break;
+
+            default:
+                //TODO #ak
+                break;
+        }
+    }
+
+    requestUrl->setQuery( urlQuery );
+    return true;
+}
+
+QnNetworkProxyFactory* QnNetworkProxyFactory::instance()
+{
+    return QnNetworkProxyFactory_instance;
+}
+
+QNetworkProxy QnNetworkProxyFactory::getProxyToResource( QnResourcePtr resource )
+{
+    QNetworkProxy proxy( QNetworkProxy::HttpProxy );
+    if( dynamic_cast<QnSecurityCamResource*>(resource.data()) )
+    {
+        QnResourcePtr parent = resource->getParentResource();
+        if( !parent )
+            return QNetworkProxy( QNetworkProxy::NoProxy );
+        const QnMediaServerResource* mediaServerResource = dynamic_cast<QnMediaServerResource*>(parent.data());
+        if( !mediaServerResource )
+            return QNetworkProxy( QNetworkProxy::NoProxy );
+        const QString& proxyHost = mediaServerResource->getPrimaryIF();
+        if( proxyHost == QnMediaServerResource::USE_PROXY )
+        {
+            //proxying via EC
+            proxy.setHostName( QnAppServerConnectionFactory::defaultUrl().host() );
+            proxy.setPort( QnAppServerConnectionFactory::defaultUrl().port() );
+        }
+        else
+        {
+            //going directly through mediaserver
+            const QUrl mServerApiUrl( mediaServerResource->getApiUrl() );
+            proxy.setHostName( mServerApiUrl.host() );
+            proxy.setPort( mServerApiUrl.port() );
+        }
+        proxy.setUser( QnAppServerConnectionFactory::defaultUrl().userName() );
+        proxy.setPassword( QnAppServerConnectionFactory::defaultUrl().password() );
+        return proxy;
+    }
+    else if( const QnMediaServerResource* mediaServerResource = dynamic_cast<QnMediaServerResource*>(resource.data()) )
+    {
+        //TODO #ak looks like copy-paste from upper block
+        const QString& proxyHost = mediaServerResource->getPrimaryIF();
+        if( proxyHost == QnMediaServerResource::USE_PROXY )
+        {
+            //proxying via EC
+            proxy.setHostName( QnAppServerConnectionFactory::defaultUrl().host() );
+            proxy.setPort( QnAppServerConnectionFactory::defaultUrl().port() );
+            proxy.setUser( QnAppServerConnectionFactory::defaultUrl().userName() );
+            proxy.setPassword( QnAppServerConnectionFactory::defaultUrl().password() );
+            return proxy;
+        }
+        else
+        {
+            //going directly through mediaserver
+            return QNetworkProxy( QNetworkProxy::NoProxy );
+        }
     }
     else
     {
-        rez << QNetworkProxy(QNetworkProxy::HttpProxy, itr.value().addr, itr.value().port);
-    }
-    return rez;
-}
-
-QPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
-    QnNetworkProxyFactory *result(new QnNetworkProxyFactory());
-
-    /* Qt will take ownership of the supplied instance. */
-    QNetworkProxyFactory::setApplicationProxyFactory(result); // TODO: #Elric we have a race if this code is run several times from different threads.
-
-    return result;
-}
-
-QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
-{
-    QPointer<QnNetworkProxyFactory> *result = qn_globalProxyFactory();
-    if(*result) {
-        return result->data();
-    } else {
-        return qn_reserveProxyFactory();
+        return QNetworkProxy( QNetworkProxy::NoProxy );
     }
 }

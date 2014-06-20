@@ -65,7 +65,7 @@ private:
     CameraDiagnostics::Result fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
     
     CameraDiagnostics::Result fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
-    Profile* fetchExistingProfile(const ProfilesResp& response, bool isPrimary) const;
+    Profile* fetchExistingProfile(const ProfilesResp& response, bool isPrimary, CameraInfoParams& info) const;
     CameraDiagnostics::Result sendProfileToCamera(CameraInfoParams& info, Profile* profile) const;
     CameraDiagnostics::Result createNewProfile(const QString& name, const QString& token) const;
 

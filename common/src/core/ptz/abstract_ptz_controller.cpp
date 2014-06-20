@@ -27,6 +27,7 @@ bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData *data) 
     if((query & Qn::ToursPtzField)              && getTours(&data->tours))                                              data->fields |= Qn::ToursPtzField;
     if((query & Qn::ActiveObjectPtzField)       && getActiveObject(&data->activeObject))                                data->fields |= Qn::ActiveObjectPtzField;
     if((query & Qn::HomeObjectPtzField)         && getHomeObject(&data->homeObject))                                    data->fields |= Qn::HomeObjectPtzField;
+    if((query & Qn::AuxilaryTraitsPtzField)     && getAuxilaryTraits(&data->auxilaryTraits))                            data->fields |= Qn::AuxilaryTraitsPtzField;
 
     return true;
 }
@@ -37,6 +38,9 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
     switch (command) {
     case Qn::ContinuousMovePtzCommand:       
         return (capabilities & Qn::ContinuousPtzCapabilities);
+
+    case Qn::ContinuousFocusPtzCommand:
+        return (capabilities & Qn::ContinuousFocusCapability);
 
     case Qn::GetDevicePositionPtzCommand:
     case Qn::AbsoluteDeviceMovePtzCommand:
@@ -74,6 +78,10 @@ bool QnAbstractPtzController::supports(Qn::PtzCommand command) {
     case Qn::UpdateHomeObjectPtzCommand:
     case Qn::GetHomeObjectPtzCommand:
         return (capabilities & Qn::HomePtzCapability);
+
+    case Qn::GetAuxilaryTraitsPtzCommand:
+    case Qn::RunAuxilaryCommandPtzCommand:
+        return (capabilities & Qn::AuxilaryPtzCapability);
 
     case Qn::GetDataPtzCommand:
         return true;

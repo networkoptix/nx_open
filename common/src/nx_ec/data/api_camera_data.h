@@ -43,7 +43,7 @@ namespace ec2
 
         bool                scheduleDisabled; // TODO: #API rename 'scheduleEnabled'
         Qn::MotionType      motionType;
-        QByteArray          region; // TODO: #API rename. What kind of region is this? Or maybe there are many regions inside?
+        QnLatin1Array       motionMask;
         QnLatin1Array       mac;
         QString             login;
         QString             password;
@@ -52,17 +52,16 @@ namespace ec2
         QString             physicalId;
         bool                manuallyAdded;
         QString             model;
-        QString             firmware;
         QString             groupId;
         QString             groupName;
         Qn::SecondStreamQuality    secondaryStreamQuality;
         bool                controlDisabled; // TODO: #API rename 'controlEnabled'
         qint32              statusFlags; // TODO: #API use bool here. We have exactly one flag, and I don't see why we would need more. And use bool in security cam resource.
-        QByteArray          dewarpingParams;
+        QnLatin1Array       dewarpingParams;
         QString             vendor;
     };
-#define ApiCameraData_Fields ApiResourceData_Fields (scheduleDisabled)(motionType)(region)(mac)(login)(password)(scheduleTasks)(audioEnabled)(physicalId)(manuallyAdded)(model) \
-                            (firmware)(groupId)(groupName)(secondaryStreamQuality)(controlDisabled)(statusFlags)(dewarpingParams)(vendor)
+#define ApiCameraData_Fields ApiResourceData_Fields (scheduleDisabled)(motionType)(motionMask)(mac)(login)(password)(scheduleTasks)(audioEnabled)(physicalId)(manuallyAdded)(model) \
+                            (groupId)(groupName)(secondaryStreamQuality)(controlDisabled)(statusFlags)(dewarpingParams)(vendor)
 
 } // namespace ec2
 

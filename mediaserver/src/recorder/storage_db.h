@@ -2,8 +2,12 @@
 #define __STORAGE_DB_H_
 
 #include <QElapsedTimer>
+
+#include <core/resource/camera_bookmark_fwd.h>
+#include <server/server_globals.h>
+
 #include "utils/db/db_helper.h"
-#include "core/resource/resource.h"
+
 #include "device_file_catalog.h"
 
 class QnStorageDb: public QnDbHelper
@@ -14,17 +18,25 @@ public:
 
     bool open(const QString& fileName);
 
-    bool deleteRecords(const QByteArray& mac, QnResource::ConnectionRole role, qint64 startTimeMs = -1);
-    void addRecord(const QByteArray& mac, QnResource::ConnectionRole role, const DeviceFileCatalog::Chunk& chunk);
+    bool deleteRecords(const QByteArray& mac, QnServer::ChunksCatalog catalog, qint64 startTimeMs = -1);
+    void addRecord(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
     void flushRecords();
     bool createDatabase();
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
     void beforeDelete();
     void afterDelete();
-    bool replaceChunks(const QByteArray& mac, QnResource::ConnectionRole role, const QVector<DeviceFileCatalog::Chunk>& chunks);
+    bool replaceChunks(const QByteArray& mac, QnServer::ChunksCatalog catalog, const std::deque<DeviceFileCatalog::Chunk>& chunks);
+
+    bool removeCameraBookmarks(const QByteArray &mac);
+    bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QByteArray &mac);
+    bool deleteCameraBookmark(const QnCameraBookmark &bookmark, const QByteArray &mac);
+    bool getBookmarks(const QByteArray &cameraGuid, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
 private:
-    bool addRecordInternal(const QByteArray& mac, QnResource::ConnectionRole role, const DeviceFileCatalog::Chunk& chunk);
+    bool addRecordInternal(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
+
+    QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
+    QVector<DeviceFileCatalogPtr> loadBookmarksFileCatalog();
 private:
     int m_storageIndex;
     QElapsedTimer m_lastTranTime;
@@ -32,16 +44,17 @@ private:
     struct DelayedData 
     {
         DelayedData (const QByteArray& mac = QByteArray(), 
-                     QnResource::ConnectionRole role = QnResource::Role_Default, 
+                     QnServer::ChunksCatalog catalog = QnServer::ChunksCatalogCount, 
                      const DeviceFileCatalog::Chunk& chunk = DeviceFileCatalog::Chunk()): 
-        mac(mac), role(role), chunk(chunk) {}
+        mac(mac), catalog(catalog), chunk(chunk) {}
 
         QByteArray mac;
-        QnResource::ConnectionRole role;
+        QnServer::ChunksCatalog catalog;
         DeviceFileCatalog::Chunk chunk;
     };
 
     QVector<DelayedData> m_delayedData;
+    QMap<QByteArray, int> m_addCount;
 };
 
 typedef QSharedPointer<QnStorageDb> QnStorageDbPtr;

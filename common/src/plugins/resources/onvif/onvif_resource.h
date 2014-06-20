@@ -43,6 +43,19 @@ class VideoOptionsLocal;
 
 class QDomElement;
 
+/*
+* This structure is used during discovery process. These data are read by getDeviceInformation request and may override data from multicast packet
+*/
+struct OnvifResExtInfo
+{
+    QString name;
+    QString model;
+    QString firmware;
+    QString vendor;
+    QString hardwareId;
+    QString mac;
+};
+
 class QnPlOnvifResource
 :
     public QnPhysicalCameraResource,
@@ -89,6 +102,7 @@ public:
     static QString ONVIF_URL_PARAM_NAME;
     static QString MAX_FPS_PARAM_NAME;
     static QString AUDIO_SUPPORTED_PARAM_NAME;
+    static QString FORCED_AUDIO_SUPPORTED_PARAM_NAME;
     static QString DUAL_STREAMING_PARAM_NAME;
     static const float QUALITY_COEF;
     static const char* PROFILE_NAME_PRIMARY;
@@ -159,6 +173,9 @@ public:
     QString getImagingUrl() const;
     void setImagingUrl(const QString& src);
 
+    QString getVideoSourceToken() const;
+    void setVideoSourceToken(const QString &src);
+
     QString getPtzUrl() const;
     void setPtzUrl(const QString& src);
 
@@ -181,7 +198,11 @@ public:
 
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
-    bool fetchAndSetDeviceInformation(bool performSimpleCheck);
+    //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
+    static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl, const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
+    CameraDiagnostics::Result readDeviceInformation();
+    CameraDiagnostics::Result getFullUrlInfo();
+
 
     //!Relay input with token \a relayToken has changed its state to \a active
     //void notificationReceived( const std::string& relayToken, bool active );
@@ -203,11 +224,13 @@ public:
 
     CameraDiagnostics::Result sendVideoEncoderToCamera(VideoEncoder& encoder);
     bool secondaryResolutionIsLarge() const;
-    virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const override;
+    virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const override;
 
     QMutex* getStreamConfMutex();
     void beforeConfigureStream();
     void afterConfigureStream();
+
+    static QSize findSecondaryResolution(const QSize& primaryRes, const QList<QSize>& secondaryResList, double* matchCoeff = 0);
 
 protected:
     int strictBitrate(int bitrate) const;
@@ -261,7 +284,9 @@ private:
     QRect getVideoSourceMaxSize(const QString& configToken);
 
     bool isH264Allowed() const; // block H264 if need for compatble with some onvif devices
+
 protected:
+    std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     QList<QSize> m_resolutionList; //Sorted desc
     QList<QSize> m_secondaryResolutionList;
     std::unique_ptr<OnvifCameraSettingsResp> m_onvifAdditionalSettings;
@@ -275,6 +300,9 @@ protected:
 
     qreal getBestSecondaryCoeff(const QList<QSize> resList, qreal aspectRatio) const;
     int getSecondaryIndex(const QList<VideoOptionsLocal>& optList) const;
+    //!Registeres local NotificationConsumer in resource's NotificationProducer
+    bool registerNotificationConsumer();
+
 private slots:
     void onRenewSubscriptionTimer();
 
@@ -329,6 +357,7 @@ private:
             }
         };
 
+        QString propertyOperation;
         QDateTime utcTime;
         std::list<SimpleItem> source;
         SimpleItem data;
@@ -347,7 +376,9 @@ private:
             readingSource,
             readingSourceItem,
             readingData,
-            readingDataItem
+            readingDataItem,
+            //skipping unknown element
+            skipping
         };
 
         std::stack<State> m_parseStateStack;
@@ -415,7 +446,6 @@ private:
     QString m_ptzConfigurationToken;
     int m_timeDrift;
     int m_prevSoapCallResult;
-    std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
@@ -437,8 +467,6 @@ private:
 
     bool createPullPointSubscription();
     bool pullMessages();
-    //!Registeres local NotificationConsumer in resource's NotificationProducer
-    bool registerNotificationConsumer();
     //!Reads relay output list from resource
     bool fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs );
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );

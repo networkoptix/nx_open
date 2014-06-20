@@ -10,6 +10,7 @@
 #include "business/business_action_factory.h"
 #include "core/resource_management/resource_pool.h"
 #include "recorder/storage_manager.h"
+#include <recording/time_period.h>
 #include <media_server/settings.h>
 
 
@@ -40,6 +41,21 @@ void QnEventsDB::setEventLogPeriod(qint64 periodUsec)
 
 bool QnEventsDB::createDatabase()
 {
+    QSqlQuery versionQuery;
+    versionQuery.prepare("SELECT sql from sqlite_master where name = 'runtime_actions'");
+    if (versionQuery.exec() && versionQuery.next())
+    {
+        QByteArray sql = versionQuery.value("sql").toByteArray();
+        versionQuery.clear();
+        if (!sql.contains("business_rule_guid")) {
+            if (!execSQLQuery("drop index 'timeAndCamIdx'")) {
+                return false;
+            }
+            if (!execSQLQuery("drop table 'runtime_actions'"))
+                return false;
+        }
+    }
+
     if (!isObjectExists(lit("table"), lit("runtime_actions")))
     {
         QSqlQuery ddlQuery(m_sdb);

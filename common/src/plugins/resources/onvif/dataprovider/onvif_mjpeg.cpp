@@ -60,15 +60,15 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 }
 */
 
-MJPEGtreamreader::MJPEGtreamreader(QnResourcePtr res, const QString& requst)
+MJPEGStreamReader::MJPEGStreamReader(QnResourcePtr res, const QString& streamHttpPath)
 :
     CLServerPushStreamReader(res),
-    m_request(requst)
+    m_request(streamHttpPath)
 {
 
 }
 
-MJPEGtreamreader::~MJPEGtreamreader()
+MJPEGStreamReader::~MJPEGStreamReader()
 {
     stop();
 }
@@ -81,7 +81,7 @@ int getIntParam(const char* pos)
     return rez;
 }
 
-QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
+QnAbstractMediaDataPtr MJPEGStreamReader::getNextData()
 {
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
@@ -139,7 +139,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
     return videoData;
 }
 
-CameraDiagnostics::Result MJPEGtreamreader::openStream()
+CameraDiagnostics::Result MJPEGStreamReader::openStream()
 {
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -167,12 +167,12 @@ CameraDiagnostics::Result MJPEGtreamreader::openStream()
     }
 }
 
-void MJPEGtreamreader::closeStream()
+void MJPEGStreamReader::closeStream()
 {
     mHttpClient.reset();
 }
 
-bool MJPEGtreamreader::isStreamOpened() const
+bool MJPEGStreamReader::isStreamOpened() const
 {
     return ( mHttpClient.get() && mHttpClient->isOpened() );
 }

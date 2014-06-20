@@ -16,6 +16,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_type.h>
+#include <core/resource/camera_bookmark_fwd.h>
 #include <licensing/license.h>
 
 
@@ -99,6 +100,8 @@ namespace ec2
         //!Response parse error
         badResponse,
         skipped,
+        //!Error executing DB request
+        dbError,
         //!Method is not implemented yet
         notImplemented
     };
@@ -154,7 +157,7 @@ namespace ec2
             void emitGetResourceTypesDone( int reqID, const ErrorCode p1, const QnResourceTypeList& p2 ) { emit onGetResourceTypesDone( reqID, p1, p2 ); }
             void emitSetResourceStatusDone( int reqID, const ErrorCode p1, const QnId& p2 ) { emit onSetResourceStatusDone( reqID, p1, p2 ); }
             void emitSaveResourceDone( int reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onSaveResourceDone( reqID, p1, p2 ); }
-            void emitSetResourceDisabledDone( int reqID, const ErrorCode p1, const QnId& p2 ) { emit onSetResourceDisabledDone( reqID, p1, p2 ); }
+            //void emitSetResourceDisabledDone( int reqID, const ErrorCode p1, const QnId& p2 ) { emit onSetResourceDisabledDone( reqID, p1, p2 ); }
             void emitGetResourcesDone( int reqID, const ErrorCode p1, const QnResourceList& p2 ) { emit onGetResourcesDone( reqID, p1, p2 ); }
             void emitGetResourceDone( int reqID, const ErrorCode p1, const QnResourcePtr& p2 ) { emit onGetResourceDone( reqID, p1, p2 ); }
             void emitGetKvPairsDone( int reqID, const ErrorCode p1, const QnKvPairListsById& p2 ) { emit onGetKvPairsDone( reqID, p1, p2 ); }
@@ -166,6 +169,7 @@ namespace ec2
             void emitAddUserDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onAddUserDone( reqID, p1, p2 ); }
             void emitGetCamerasDone( int reqID, const ErrorCode p1, const QnVirtualCameraResourceList& p2 ) { emit onGetCamerasDone( reqID, p1, p2 ); }
             void emitGetCamerasHistoryDone( int reqID, const ErrorCode p1, const QnCameraHistoryList& p2 ) { emit onGetCamerasHistoryDone( reqID, p1, p2 ); }
+            void emitGetCameraBookmarkTagsDone( int reqID, const ErrorCode p1, const QnCameraBookmarkTags& p2 ) { emit onGetCameraBookmarkTagsDone( reqID, p1, p2 ); }
             void emitGetUsersDone( int reqID, const ErrorCode p1, const QnUserResourceList& p2 ) { emit onGetUsersDone( reqID, p1, p2 ); }
             void emitGetBusinessRulesDone( int reqID, const ErrorCode p1, const QnBusinessEventRuleList& p2 ) { emit onGetBusinessRulesDone( reqID, p1, p2 ); }
             void emitGetLicensesDone( int reqID, const ErrorCode p1, const QnLicenseList& p2 ) { emit onGetLicensesDone( reqID, p1, p2 ); }
@@ -185,7 +189,7 @@ namespace ec2
             void onGetResourceTypesDone( int reqID, const ErrorCode, const QnResourceTypeList& );
             void onSetResourceStatusDone( int reqID, const ErrorCode, const QnId& );
             void onSaveResourceDone( int reqID, const ErrorCode, const QnResourcePtr& );
-            void onSetResourceDisabledDone( int reqID, const ErrorCode, const QnId& );
+            //void onSetResourceDisabledDone( int reqID, const ErrorCode, const QnId& );
             void onGetResourcesDone( int reqID, const ErrorCode, const QnResourceList& );
             void onGetResourceDone( int reqID, const ErrorCode, const QnResourcePtr& );
             void onGetKvPairsDone( int reqID, const ErrorCode, const QnKvPairListsById& );
@@ -197,6 +201,7 @@ namespace ec2
             void onAddUserDone( int reqID, const ErrorCode, const QnUserResourceList& );
             void onGetCamerasDone( int reqID, const ErrorCode, const QnVirtualCameraResourceList& );
             void onGetCamerasHistoryDone( int reqID, const ErrorCode, const QnCameraHistoryList& );
+            void onGetCameraBookmarkTagsDone(int reqID, const ErrorCode, const QnCameraBookmarkTags& );
             void onGetUsersDone( int reqID, const ErrorCode, const QnUserResourceList& );
             void onGetBusinessRulesDone( int reqID, const ErrorCode, const QnBusinessEventRuleList& );
             void onGetLicensesDone( int reqID, const ErrorCode, const QnLicenseList& );
@@ -225,7 +230,7 @@ namespace ec2
         ///////// Handlers for AbstractResourceManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( SetResourceStatus, ErrorCode, QnId )
-        DEFINE_TWO_ARG_HANDLER( SetResourceDisabled, ErrorCode, QnId )
+        //DEFINE_TWO_ARG_HANDLER( SetResourceDisabled, ErrorCode, QnId )
         DEFINE_TWO_ARG_HANDLER( GetResourceTypes, ErrorCode, QnResourceTypeList )
         DEFINE_TWO_ARG_HANDLER( GetResources, ErrorCode, QnResourceList )
         DEFINE_TWO_ARG_HANDLER( GetResource, ErrorCode, QnResourcePtr )
@@ -246,7 +251,7 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER( AddCamera, ErrorCode, QnVirtualCameraResourceList )
         DEFINE_TWO_ARG_HANDLER( GetCameras, ErrorCode, QnVirtualCameraResourceList )
         DEFINE_TWO_ARG_HANDLER( GetCamerasHistory, ErrorCode, QnCameraHistoryList )
-        
+        DEFINE_TWO_ARG_HANDLER( GetCameraBookmarkTags, ErrorCode, QnCameraBookmarkTags )
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractUserManager

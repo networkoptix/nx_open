@@ -286,13 +286,13 @@ QString PlDlinkStreamReader::composeVideoProfile()
     if (role == QnResource::Role_SecondaryLiveVideo)
     {
         profileNum = 2;
-        resolution = info.resolutionCloseTo(480);
+        resolution = info.secondaryStreamResolution();
     }
     else
     {
         profileNum = 1;
         //resolution = info.resolutionCloseTo(320);
-        resolution = info.resolutions.at(0);
+        resolution = info.primaryStreamResolution();
     }
 
 

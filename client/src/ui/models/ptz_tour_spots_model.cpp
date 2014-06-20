@@ -6,7 +6,7 @@
 
 #include <ui/style/globals.h>
 
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 #include <utils/common/string.h>
 
 namespace {
@@ -191,7 +191,7 @@ Qt::ItemFlags QnPtzTourSpotsModel::flags(const QModelIndex &index) const {
     case NumberColumn:
         return base_type::flags(index);
     default:
-        return base_type::flags(index) | Qt::ItemIsEditable; //TODO: #GDM PTZ drag'n'drop?
+        return base_type::flags(index) | Qt::ItemIsEditable; //TODO: #GDM #PTZ drag'n'drop?
     }
 }
 

@@ -9,7 +9,6 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_criterion.h>
 
-#include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "action_fwd.h"
@@ -323,11 +322,10 @@ public:
  */
 class QnTimePeriodActionCondition: public QnActionCondition {
 public:
-    QnTimePeriodActionCondition(Qn::TimePeriodTypes periodTypes, Qn::ActionVisibility nonMatchingVisibility, bool centralItemRequired, QObject *parent):
+    QnTimePeriodActionCondition(Qn::TimePeriodTypes periodTypes, Qn::ActionVisibility nonMatchingVisibility, QObject *parent):
         QnActionCondition(parent),
         m_periodTypes(periodTypes),
-        m_nonMatchingVisibility(nonMatchingVisibility),
-        m_centralItemRequired(centralItemRequired)
+        m_nonMatchingVisibility(nonMatchingVisibility)
     {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
@@ -335,7 +333,6 @@ public:
 private:
     Qn::TimePeriodTypes m_periodTypes;
     Qn::ActionVisibility m_nonMatchingVisibility;
-    bool m_centralItemRequired;
 };
 
 class QnExportActionCondition: public QnActionCondition {
@@ -349,6 +346,20 @@ public:
 
 private:
     bool m_centralItemRequired;
+};
+
+class QnAddBookmarkActionCondition: public QnActionCondition {
+public:
+    QnAddBookmarkActionCondition(QObject *parent):
+        QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnModifyBookmarkActionCondition: public QnActionCondition {
+public:
+    QnModifyBookmarkActionCondition(QObject *parent):
+        QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 class QnPreviewActionCondition: public QnExportActionCondition {
@@ -495,11 +506,34 @@ private:
     bool m_disableIfPtzDialogVisible;
 };
 
-class QnIdentifyVideoWallActionCondition: public QnActionCondition {
+class QnNonEmptyVideowallActionCondition: public QnActionCondition {
 public:
-    QnIdentifyVideoWallActionCondition(QObject* parent): QnActionCondition(parent) {}
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+    QnNonEmptyVideowallActionCondition(QObject* parent): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+class QnRunningVideowallActionCondition: public QnActionCondition {
+public:
+    QnRunningVideowallActionCondition(QObject* parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+class QnSaveVideowallReviewActionCondition: public QnActionCondition {
+public:
+    QnSaveVideowallReviewActionCondition(QObject* parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+class QnStartVideowallActionCondition: public QnActionCondition {
+public:
+    QnStartVideowallActionCondition(QObject* parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+class QnIdentifyVideoWallActionCondition: public QnRunningVideowallActionCondition {
+public:
+    QnIdentifyVideoWallActionCondition(QObject* parent): QnRunningVideowallActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 class QnResetVideoWallLayoutActionCondition: public QnActionCondition {
@@ -518,6 +552,18 @@ class QnRotateItemCondition: public QnActionCondition {
 public:
     QnRotateItemCondition(QObject* parent): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+};
+
+class QnAutoStartAllowedActionCodition: public QnActionCondition {
+public:
+    QnAutoStartAllowedActionCodition(QObject *parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnDesktopCameraActionCondition: public QnActionCondition {
+public:
+    QnDesktopCameraActionCondition(QObject *parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
 class QnLightModeCondition: public QnActionCondition {

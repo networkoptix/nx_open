@@ -11,20 +11,12 @@
 
 namespace ec2
 {
-    template<class QueryProcessorType>
-    class QnMediaServerManager
+    class QnMediaServerNotificationManager
     :
         public AbstractMediaServerManager
     {
     public:
-        QnMediaServerManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
-
-        //!Implementation of QnMediaServerManager::getServers
-        virtual int getServers( impl::GetServersHandlerPtr handler ) override;
-        //!Implementation of QnMediaServerManager::saveServer
-        virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) override;
-        //!Implementation of QnMediaServerManager::remove
-        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+        QnMediaServerNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
 
         void triggerNotification( const QnTransaction<ApiMediaServerData>& tran ) {
             assert( tran.command == ApiCommand::saveMediaServer);
@@ -39,9 +31,29 @@ namespace ec2
             emit removed( QnId(tran.params.id) );
         }
 
+    protected:
+        ResourceContext m_resCtx;
+    };
+
+
+
+    template<class QueryProcessorType>
+    class QnMediaServerManager
+    :
+        public QnMediaServerNotificationManager
+    {
+    public:
+        QnMediaServerManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+
+        //!Implementation of QnMediaServerManager::getServers
+        virtual int getServers( impl::GetServersHandlerPtr handler ) override;
+        //!Implementation of QnMediaServerManager::saveServer
+        virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) override;
+        //!Implementation of QnMediaServerManager::remove
+        virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
+
     private:
         QueryProcessorType* const m_queryProcessor;
-        ResourceContext m_resCtx;
 
         QnTransaction<ApiMediaServerData> prepareTransaction( ApiCommand::Value command, const QnMediaServerResourcePtr& resource );
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );

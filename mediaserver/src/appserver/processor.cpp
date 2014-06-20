@@ -13,8 +13,6 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
 {
     connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
 
-    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::locked, this, &QnAppserverResourceProcessor::at_mutexLocked);
-    connect(ec2::QnDistributedMutexManager::instance(), &ec2::QnDistributedMutexManager::lockTimeout, this, &QnAppserverResourceProcessor::at_mutexTimeout);
 
     m_cameraDataHandler = new ec2::QnMutexCameraDataHandler();
     ec2::QnDistributedMutexManager::instance()->setUserDataHandler(m_cameraDataHandler);
@@ -37,6 +35,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if (cameraResource.isNull())
             continue;
 
+        //Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(cameraResource->getPhysicalId()).isEmpty());
 
         cameraResource->setParentId(m_serverId);
     }
@@ -79,7 +78,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
     }
 }
 
-void QnAppserverResourceProcessor::addNewCamera(QnVirtualCameraResourcePtr cameraResource)
+void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)
 {
     if (!ec2::QnDistributedMutexManager::instance())
     {
@@ -92,33 +91,37 @@ void QnAppserverResourceProcessor::addNewCamera(QnVirtualCameraResourcePtr camer
     if (m_lockInProgress.contains(name))
         return; // camera already adding (in progress)
 
-    Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(name).isEmpty());
-    ec2::QnDistributedMutexPtr mutex = ec2::QnDistributedMutexManager::instance()->getLock(name);
+    if (!qnResPool->getAllNetResourceByPhysicalId(name).isEmpty())
+        return; // already added. Camera has been found twice
+
+    ec2::QnDistributedMutex* mutex = ec2::QnDistributedMutexManager::instance()->createMutex(name);
+    connect(mutex, &ec2::QnDistributedMutex::locked, this, &QnAppserverResourceProcessor::at_mutexLocked, Qt::QueuedConnection);
+    connect(mutex, &ec2::QnDistributedMutex::lockTimeout, this, &QnAppserverResourceProcessor::at_mutexTimeout, Qt::QueuedConnection);
     m_lockInProgress.insert(name, LockData(mutex, cameraResource));
+    mutex->lockAsync();
 }
 
-void QnAppserverResourceProcessor::at_mutexLocked(QByteArray name)
+void QnAppserverResourceProcessor::at_mutexLocked()
 {
     QMutexLocker lock(&m_mutex);
-
-    LockData data = m_lockInProgress.value(name);
-    if (!data.mutex) {
-        Q_ASSERT_X(0, "It should not be!!!", Q_FUNC_INFO);
+    ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
+    LockData data = m_lockInProgress.value(mutex->name());
+    if (!data.mutex)
         return;
-    }
 
-    if (data.mutex->checkUserData())
+    if (mutex->checkUserData())
     {
         // add camera if and only if it absent on the other server
-        Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(name).isEmpty());
+        Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(mutex->name()).isEmpty());
         addNewCameraInternal(data.cameraResource);
     }
 
-    data.mutex->unlock();
-    m_lockInProgress.remove(name);
+    mutex->unlock();
+    m_lockInProgress.remove(mutex->name());
+    mutex->deleteLater();
 }
 
-void QnAppserverResourceProcessor::addNewCameraInternal(QnVirtualCameraResourcePtr cameraResource)
+void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
 {
     QnVirtualCameraResourceList cameras;
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
@@ -129,11 +132,12 @@ void QnAppserverResourceProcessor::addNewCameraInternal(QnVirtualCameraResourceP
         NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
 }
 
-void QnAppserverResourceProcessor::at_mutexTimeout(QByteArray name)
+void QnAppserverResourceProcessor::at_mutexTimeout()
 {
     QMutexLocker lock(&m_mutex);
-
-    m_lockInProgress.remove(name);
+    ec2::QnDistributedMutex* mutex = (ec2::QnDistributedMutex*) sender();
+    m_lockInProgress.remove(mutex->name());
+    mutex->deleteLater();
 }
 
 
@@ -171,4 +175,10 @@ void QnAppserverResourceProcessor::at_resource_statusChanged(const QnResourcePtr
         updateResourceStatusAsync(resource);
     else
         m_awaitingSetStatus << resource->getId();
+}
+
+bool QnAppserverResourceProcessor::isBusy() const
+{
+    bool rez = !m_lockInProgress.isEmpty();
+    return rez;
 }

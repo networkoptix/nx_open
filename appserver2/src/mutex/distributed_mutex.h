@@ -16,7 +16,7 @@ namespace ec2
 
     struct LockRuntimeInfo: public ApiLockData
     {
-        LockRuntimeInfo(const QUuid& _peer = QUuid(), qint64 _timestamp = 0, const QByteArray& _name = QByteArray()) {
+        LockRuntimeInfo(const QUuid& _peer = QUuid(), qint64 _timestamp = 0, const QString& _name = QString()) {
             peer = _peer;
             timestamp = _timestamp;
             name = _name;
@@ -30,55 +30,57 @@ namespace ec2
     };
 
     /*
-    * Ricart–Agrawala algorithm
+    * Ricart-Agrawala algorithm
     */
 
     class QnDistributedMutex: public QObject
     {
         Q_OBJECT
     public:
+        static const int DEFAULT_LOCK_TIMEOUT = 1000 * 30;
+        void lockAsync(int timeoutMs = DEFAULT_LOCK_TIMEOUT);
         void unlock();
         bool checkUserData() const;
         virtual ~QnDistributedMutex();
+
+        QString name() const { return m_name; }
     private:
         friend class QnDistributedMutexManager;
 
-        static const int DEFAULT_LOCK_TIMEOUT = 1000 * 30;
-
-        QnDistributedMutex(QnDistributedMutexManager* owner);
+        QnDistributedMutex(QnDistributedMutexManager* owner, const QString& name);
         
         /* Try to lock within timeout */
-        void lockAsync(const QByteArray& name, int timeoutMs = DEFAULT_LOCK_TIMEOUT);
         bool isLocking() const;
         bool isLocked() const;
     signals:
-        void locked(QByteArray name);
-        void lockTimeout(QByteArray name);
+        void locked();
+        void lockTimeout();
     private slots:
         void at_gotLockRequest(ApiLockData lockInfo);
         void at_gotLockResponse(ApiLockData lockInfo);
         //void at_gotUnlockRequest(ApiLockData lockInfo);
-        void at_newPeerFound(QnId peer, bool isClient);
-        void at_peerLost(QnId peer, bool isClient);
+        void at_newPeerFound(ec2::ApiPeerAliveData data);
+        void at_peerLost(ec2::ApiPeerAliveData data);
         void at_timeout();
     private:
         bool isAllPeersReady() const;
         void checkForLocked();
         void sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnId& dstPeer);
+        void unlockInternal();
     private:
-        QByteArray m_name;
+        QString m_name;
         LockRuntimeInfo m_selfLock;
         typedef QMap<LockRuntimeInfo, int> LockedMap;
         LockedMap m_peerLockInfo;
         QSet<QnId> m_proccesedPeers;
-        QTimer timer;
+        QTimer* m_timer;
         mutable QMutex m_mutex;
         bool m_locked;
         QQueue<ApiLockData> m_delayedResponse;
         QnDistributedMutexManager* m_owner;
         QByteArray m_userData;
     };
-    typedef QSharedPointer<QnDistributedMutex> QnDistributedMutexPtr;
+    //typedef QSharedPointer<QnDistributedMutex> QnDistributedMutexPtr;
     
     /*
     * This class is using for provide extra information
@@ -102,15 +104,12 @@ namespace ec2
         static const int DEFAULT_TIMEOUT = 1000 * 30;
 
         QnDistributedMutexManager();
-        QnDistributedMutexPtr getLock(const QByteArray& name, int timeoutMs = DEFAULT_TIMEOUT);
+        QnDistributedMutex* createMutex(const QString& name);
 
         static void initStaticInstance(QnDistributedMutexManager*);
         static QnDistributedMutexManager* instance();
 
         void setUserDataHandler(QnMutexUserDataHandler* userDataHandler);
-    signals:
-        void locked(QByteArray name);
-        void lockTimeout(QByteArray name);
     private:
         qint64 newTimestamp();
     private:
@@ -121,9 +120,9 @@ namespace ec2
         //void at_gotUnlockRequest(ApiLockData lockInfo);
         void at_newPeerFound(QnId peer);
         void at_peerLost(QnId peer);
-        void releaseMutex(const QByteArray& name);
+        void releaseMutex(const QString& name);
     private:
-        QMap<QByteArray, QnDistributedMutexPtr> m_mutexList;
+        QMap<QString, QnDistributedMutex*> m_mutexList;
         mutable QMutex m_mutex;
         qint64 m_timestamp;
         QnMutexUserDataHandler* m_userDataHandler;

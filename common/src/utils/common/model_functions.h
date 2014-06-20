@@ -9,6 +9,8 @@
 #include <utils/serialization/json_functions.h>
 #include <utils/serialization/lexical_functions.h>
 #include <utils/serialization/sql_functions.h>
+#include <utils/serialization/ubjson_functions.h>
+#include <utils/serialization/xml_functions.h>
 #include <utils/math/fuzzy.h>
 
 namespace QnHashAutomation {

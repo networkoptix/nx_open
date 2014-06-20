@@ -20,9 +20,21 @@
 #include <business/business_rule_processor.h>
 #include <business/business_event_connector.h>
 #include <media_server/serverutil.h>
+#include "licensing/license.h"
+#include "mutex/camera_data_handler.h"
+#include "common/common_module.h"
+#include "transaction/transaction_log.h"
+#include "database/db_manager.h"
+
+
+static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24;
+static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
 {
+    m_tooManyRecordingCnt = 0;
+    m_licenseMutex = 0;
+    connect(this, &QnRecordingManager::recordingDisabled, qnBusinessRuleConnector, &QnBusinessEventConnector::at_licenseIssueEvent);
 }
 
 QnRecordingManager::~QnRecordingManager()
@@ -35,8 +47,12 @@ void QnRecordingManager::start()
     connect(qnResPool, SIGNAL(resourceAdded(QnResourcePtr)), this, SLOT(onNewResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
     connect(&m_scheduleWatchingTimer, SIGNAL(timeout()), this, SLOT(onTimer()));
-
     m_scheduleWatchingTimer.start(1000);
+    
+#ifndef EDGE_SERVER
+    connect(&m_licenseTimer, &QTimer::timeout, this, &QnRecordingManager::at_checkLicenses);
+    m_licenseTimer.start(1000 * 60);
+#endif
 
     QThread::start();
 }
@@ -49,23 +65,23 @@ void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
         recorders.recorderLowRes->pleaseStop();
 }
 
-void QnRecordingManager::deleteRecorder(const Recorders& recorders)
+void QnRecordingManager::deleteRecorder(const Recorders& recorders, const QnResourcePtr& resource)
 {
     if (recorders.recorderHiRes)
         recorders.recorderHiRes->stop();
     if (recorders.recorderLowRes)
         recorders.recorderLowRes->stop();
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
+    QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
     if (camera)
     {
         if (recorders.recorderHiRes) {
-            QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(QnResource::Role_LiveVideo);
+            QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(QnServer::HiQualityCatalog);
             if (reader)
                 reader->removeDataProcessor(recorders.recorderHiRes);
         }
 
         if (recorders.recorderLowRes) {
-            QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+            QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(QnServer::LowQualityCatalog);
             if (reader)
                 reader->removeDataProcessor(recorders.recorderLowRes);
         }
@@ -85,9 +101,12 @@ void QnRecordingManager::stop()
     {
         beforeDeleteRecorder(recorders);
     }
-    foreach(const Recorders& recorders, m_recordMap.values()) 
+    for( QMap<QnResourcePtr, Recorders>::const_iterator
+        it = m_recordMap.cbegin();
+        it != m_recordMap.cend();
+        ++it )
     {
-        deleteRecorder(recorders);
+        deleteRecorder(it.value(), it.key());
     }
     m_recordMap.clear();
     m_onlineCameras.clear();
@@ -103,12 +122,12 @@ Recorders QnRecordingManager::findRecorders(QnResourcePtr res) const
     return m_recordMap.value(res);
 }
 
-QnServerStreamRecorder* QnRecordingManager::createRecorder(QnResourcePtr res, QnVideoCamera* camera, QnResource::ConnectionRole role)
+QnServerStreamRecorder* QnRecordingManager::createRecorder(const QnResourcePtr &res, QnVideoCamera* camera, QnServer::ChunksCatalog catalog)
 {
-    QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(role);
+    QnAbstractMediaStreamDataProviderPtr reader = camera->getLiveReader(catalog);
     if (reader == 0)
         return 0;
-    QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res, role, reader.data());
+    QnServerStreamRecorder* recorder = new QnServerStreamRecorder(res, catalog, reader.data());
     recorder->setTruncateInterval(RECORDING_CHUNK_LEN);
     reader->addDataProcessor(recorder);
     reader->setNeedKeyData();
@@ -133,7 +152,7 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     if (QnCameraHistoryPool::instance()->getMinTime(netRes) == (qint64)AV_NOPTS_VALUE)
     {
         // it is first record for camera
-        DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(physicalId.toUtf8(), QnResource::Role_LiveVideo);
+        DeviceFileCatalogPtr catalogHi = qnStorageMan->getFileCatalog(physicalId.toUtf8(), QnServer::HiQualityCatalog);
         if (!catalogHi)
             return false;
         qint64 archiveMinTime = catalogHi->minTime();
@@ -142,7 +161,7 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     }
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(res->getParentId()));
-    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getId().toString());
+    QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getId().toByteArray());
 
     ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
     ec2::ErrorCode errCode = appServerConnection->getCameraManager()->addCameraHistoryItemSync(cameraHistoryItem);
@@ -217,8 +236,8 @@ bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes, bo
 
 bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
-    QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-    QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+    QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
+    QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
     QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
 
     if (!cameraRes->isInitialized() && !cameraRes->hasFlags(QnResource::foreigner) && !cameraRes->isScheduleDisabled())
@@ -311,8 +330,8 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
 void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
 {
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
-    QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
-    QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
+    QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
+    QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
 
     //if (cameraRes->getMotionType() == MT_SoftwareGrid)
 
@@ -332,7 +351,7 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
 
             if (recorders.recorderHiRes && providerLow && !recorders.recorderLowRes)
             {
-                QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
+                QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnServer::LowQualityCatalog);
                 if (recorderLowRes) 
                     recorderLowRes->setDualStreamingHelper(recorders.recorderHiRes->getDualStreamingHelper());
             }
@@ -343,8 +362,8 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
         }
         else if (!res->hasFlags(QnResource::foreigner))
         {
-            QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnResource::Role_LiveVideo);
-            QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
+            QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnServer::HiQualityCatalog);
+            QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnServer::LowQualityCatalog);
 
             if (!recorderHiRes && !recorderLowRes)
                 return;
@@ -479,7 +498,7 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
     qnCameraPool->removeVideoCamera(resource);
 
     beforeDeleteRecorder(recorders);
-    deleteRecorder(recorders);
+    deleteRecorder(recorders, resource);
 
     m_onlineCameras.remove(resource);
 }
@@ -532,6 +551,122 @@ void QnRecordingManager::onTimer()
     }
 }
 
+QnResourceList QnRecordingManager::getLocalControlledCameras()
+{
+    // return own cameras + cameras from media servers without DB (remote connected servers)
+    QnResourceList cameras = qnResPool->getAllCameras(QnResourcePtr());
+    QnResourceList result;
+    foreach(QnResourcePtr camRes, cameras)
+    {
+        QnMediaServerResourcePtr mServer = camRes->getParentResource().dynamicCast<QnMediaServerResource>();
+        if (!mServer)
+            continue;
+        if (mServer->getId() == qnCommon->moduleGUID() || (mServer->getServerFlags() | Qn::SF_RemoteEC))
+            result << camRes;
+    }
+    return result;
+}
+
+void QnRecordingManager::at_checkLicenses()
+{
+    if (!ec2::QnTransactionLog::instance() || m_licenseMutex)
+        return;
+
+    QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
+    int maxDigital = licenseListHelper.totalDigital();
+    int maxAnalog = licenseListHelper.totalAnalog();
+
+    int recordingDigital = qnResPool->activeCamerasByClass(false);
+    int recordingAnalog = qnResPool->activeCamerasByClass(true);
+
+    bool isOverflowTotal = recordingDigital + recordingAnalog > maxDigital + maxAnalog;
+    if (recordingDigital > maxDigital  || isOverflowTotal)
+    {
+        if (++m_tooManyRecordingCnt < 5)
+            return; // do not report license problem immediatly. Server should wait several minutes, probably other media servers will be available soon
+
+
+        ec2::QnDbManager::instance()->markLicenseOverflow(true, qnSyncTime->currentMSecsSinceEpoch());
+        if (qnSyncTime->currentMSecsSinceEpoch() - ec2::QnDbManager::instance()->licenseOverflowTime() < LICENSE_RECORDING_STOP_TIME)
+            return; // not enough license, but timeout not reached yet
+
+        // Too many licenses. check if server has own recording cameras and force to disable recording
+        QnResourceList ownCameras = getLocalControlledCameras();
+        foreach(QnResourcePtr camRes, ownCameras)
+        {
+            QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
+            if (!camera->isScheduleDisabled())
+            {
+                if ((recordingDigital > maxDigital && !camera->isAnalog()) || isOverflowTotal) {
+                    // found. remove recording from some of them
+
+                    m_licenseMutex = ec2::QnDistributedMutexManager::instance()->createMutex(LICENSE_OVERFLOW_LOCK_NAME);
+                    connect(m_licenseMutex, &ec2::QnDistributedMutex::locked, this, &QnRecordingManager::at_licenseMutexLocked, Qt::QueuedConnection);
+                    connect(m_licenseMutex, &ec2::QnDistributedMutex::lockTimeout, this, &QnRecordingManager::at_licenseMutexTimeout, Qt::QueuedConnection);
+                    m_licenseMutex->lockAsync();
+                    break;
+                }
+            }
+        }
+    }
+    else {
+        ec2::QnDbManager::instance()->markLicenseOverflow(false, 0);
+        m_tooManyRecordingCnt = 0;
+    }
+}
+
+void QnRecordingManager::at_licenseMutexLocked()
+{
+
+    QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
+    int maxDigital = licenseListHelper.totalDigital();
+    int maxAnalog = licenseListHelper.totalAnalog();
+
+    int recordingDigital = qnResPool->activeCamerasByClass(false);
+    int recordingAnalog = qnResPool->activeCamerasByClass(true);
+    int disabledCameras = 0;
+    
+    // Too many licenses. check if server has own recording cameras and force to disable recording
+    QnResourceList ownCameras = getLocalControlledCameras();
+    foreach(QnResourcePtr camRes, ownCameras)
+    {
+        bool licenseOverflow = recordingDigital > maxDigital  || recordingDigital + recordingAnalog > maxDigital + maxAnalog;
+        if (!licenseOverflow)
+            break;
+
+        QnVirtualCameraResourcePtr camera = camRes.dynamicCast<QnVirtualCameraResource>();
+        if (!camera->isScheduleDisabled())
+        {
+            camera->setScheduleDisabled(true);
+            ec2::ErrorCode errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager()->addCameraSync(camera);
+            if (errCode != ec2::ErrorCode::ok)
+            {
+                qWarning() << "Can't turn off recording for camera:" << camera->getUniqueId() << "error:" << ec2::toString(errCode);
+                camera->setScheduleDisabled(false); // rollback
+                continue;
+            }
+            disabledCameras++;
+            if (camera->isAnalog())
+                recordingAnalog--;
+            else
+                recordingDigital--;
+        }
+    }
+    m_licenseMutex->unlock();
+    m_licenseMutex->deleteLater();
+    m_licenseMutex = 0;
+
+    if (disabledCameras > 0) {
+        QnResourcePtr resource = qnResPool->getResourceById(qnCommon->moduleGUID());
+        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, QString::number(disabledCameras));
+    }
+}
+
+void QnRecordingManager::at_licenseMutexTimeout()
+{
+    m_licenseMutex->deleteLater();
+    m_licenseMutex = 0;
+}
 
 //Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)
 static QnRecordingManager* staticInstance = NULL;

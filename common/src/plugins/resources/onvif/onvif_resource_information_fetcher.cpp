@@ -9,6 +9,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "plugins/resources/flex_watch/flexwatch_resource.h"
 #include "plugins/resources/axis/axis_onvif_resource.h"
+#include "../vista/vista_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 const char* ONVIF_ANALOG_RT = "ONVIF_ANALOG";
@@ -158,39 +159,38 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     {
         if (model.isEmpty())
             model = existResource->getModel();
-        QnResourceTypePtr resType = qnResTypePool->getResourceType(existResource->getTypeId());
         if (manufacturer.isEmpty())
-            manufacturer = resType->getName();
+            manufacturer = existResource->getVendor();
+        if (mac.isEmpty())
+            mac = existResource->getMAC().toString();
     }
-    else // if (model.isEmpty() || manufacturer.isEmpty())
+
+    if (model.isEmpty() || manufacturer.isEmpty())
     {
-        // always call getDeviceInformation to filter non-onvif devices
-        DeviceInfoReq request;
-        DeviceInfoResp response;
-        int soapRes = soapWrapper.getDeviceInformation(request, response);
-        if (soapRes != SOAP_OK) {
-            qDebug() << "OnvifResourceInformationFetcher::findResources: SOAP to endpoint '" << endpoint
-                     << "' failed. Camera name will be set to 'Unknown'. GSoap error code: " << soapRes
-                     << ". " << soapWrapper.getLastError();
-            if (!soapWrapper.isNotAuthenticated())
-                return; // non onvif device
-        } 
-        else {
-            if (!response.Manufacturer.empty())
-                manufacturer = QString::fromStdString(response.Manufacturer);
+        OnvifResExtInfo extInfo;
+        QAuthenticator auth;
+        auth.setUser(soapWrapper.getLogin());
+        auth.setPassword(soapWrapper.getPassword());
+        CameraDiagnostics::Result result = QnPlOnvifResource::readDeviceInformation(endpoint, auth, INT_MAX, &extInfo);
+        
+        if (!result && result.errorCode != CameraDiagnostics::ErrorCode::notAuthorised)
+            return; // non onvif device
 
-            if (model.isEmpty())
-                model = QString::fromStdString(response.Model);
+        if (!extInfo.vendor.isEmpty())
+            manufacturer = extInfo.vendor;
 
-            if (!response.FirmwareVersion.empty())
-                firmware = QString::fromStdString(response.FirmwareVersion);
-
-            if( (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString()))) ||
-                ignoreCamera(manufacturer, model) )
-            {
-                qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << model;
-                return;
-            }
+        if (!extInfo.model.isEmpty())
+            model = extInfo.model;
+        if (!extInfo.firmware.isEmpty())
+            firmware = extInfo.firmware;
+        if (!extInfo.mac.isEmpty())
+            mac = extInfo.mac;
+            
+        if( (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString()))) ||
+            ignoreCamera(manufacturer, model) )
+        {
+            qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << model;
+            return;
         }
     }
 
@@ -335,6 +335,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnPlSonyResource());
     else if (manufacture.toLower().contains(QLatin1String("seyeon tech")))
         resource = QnPlOnvifResourcePtr(new QnFlexWatchResource());
+    else if (manufacture.toLower().contains(QLatin1String("vista")))
+        resource = QnPlOnvifResourcePtr(new QnVistaResource());
 #ifdef ENABLE_AXIS
     else if (manufacture.toLower().contains(QLatin1String("axis")))
         resource = QnPlOnvifResourcePtr(new QnAxisOnvifResource());

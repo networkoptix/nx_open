@@ -24,7 +24,6 @@
 #include "utils/common/util.h"
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnResource, Status)
-QN_DEFINE_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnResource::Status)
 
 bool QnResource::m_appStopping = false;
 QnInitResPool QnResource::m_initAsyncPool;
@@ -92,7 +91,7 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
+void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& /*modifiedFields*/)
 {
     Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
@@ -106,9 +105,6 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modif
     m_name = other->m_name;
     m_parentId = other->m_parentId;
 
-    m_status = other->m_status;
-    if (m_status == Offline)
-        m_initialized = false;
 }
 
 void QnResource::update(QnResourcePtr other, bool silenceMode)
@@ -136,6 +132,11 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         {
             setParam(param.name(), param.value(), QnDomainDatabase);
         }
+    }
+
+    //silently ignoring missing properties because of removeProperty method lack
+    for (const QnKvPair &param: other->getProperties()) {
+        setProperty(param.name(), param.value());   //here "propertyChanged" will be called
     }
 
     foreach (QnResourceConsumer *consumer, m_consumers)
@@ -316,21 +317,16 @@ bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*
 
 bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) const
 {
-    getResourceParamList();
-    if (!m_resourceParamList.contains(name))
+    const QnParamList& resourceParamList = getResourceParamList();
+    QnParamList::const_iterator paramIter = resourceParamList.find( name );
+    if ( paramIter == resourceParamList.cend() )
     {
         emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
         return false;
     }
 
-    //m_mutex.lock();
-    //QnParam &param = m_resourceParamList[name];
-    //val = param.value();
-    //m_mutex.unlock();
-    m_mutex.lock();
-    QnParam param = m_resourceParamList[name];
+    const QnParam& param = paramIter.value();
     val = param.value();
-    m_mutex.unlock();
 
     if (domain == QnDomainMemory)
     {
@@ -383,9 +379,8 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         return true;
     }
 
-
-    getResourceParamList(); // paramList loaded once. No more changes, instead of param value. So, use mutex for value only
-    if (!m_resourceParamList.contains(name))
+    const QnParamList& resourceParamList = getResourceParamList(); // paramList loaded once. No more changes, instead of param value. So, use mutex for value only
+    if (!resourceParamList.contains(name))
     {
         qWarning() << "Can't set parameter. Parameter" << name << "does not exists for resource" << getName();
         emit asyncParamSetDone(toSharedPointer(this), name, val, false);
@@ -416,14 +411,15 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         }
     }
 
-    //QnDomainMemory should changed anyway
+    //QnDomainMemory should be changed anyway
     {
         QMutexLocker locker(&m_mutex); // block paramList changing
-        m_resourceParamList[name].setDomain(domain);
-        if (!m_resourceParamList[name].setValue(val))
+        QnParam& param = m_resourceParamList[name];
+        param.setDomain(domain);
+        if (!param.setValue(val))
         {
             locker.unlock();
-            cl_log.log("cannot set such param!", cl_logWARNING);
+            NX_LOG( lit("cannot set such param %1!").arg(name), cl_logWARNING );
             emit asyncParamSetDone(toSharedPointer(this), name, val, false);
             return false;
         }
@@ -795,7 +791,7 @@ void QnResource::stopCommandProc()
     QnResourceCommandProcessor_instance()->stop();
 }
 
-void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
+void QnResource::addCommandToProc(const QnAbstractDataPacketPtr& data)
 {
     QnResourceCommandProcessor_instance()->putData(data);
 }

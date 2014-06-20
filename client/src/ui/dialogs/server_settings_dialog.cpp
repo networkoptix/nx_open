@@ -14,6 +14,8 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
+#include <api/model/storage_space_reply.h>
+
 #include <utils/common/counter.h>
 #include <utils/common/string.h>
 #include <utils/common/variant.h>
@@ -43,7 +45,6 @@
 namespace {
     //setting free space to zero, since now client does not change this value, so it must keep current value
     const qint64 defaultReservedSpace = 0;  //5ll * 1024ll * 1024ll * 1024ll;
-    const qint64 minimalReservedSpace = 0;  //5ll * 1024ll * 1024ll * 1024ll;
 
     const qint64 bytesInMiB = 1024 * 1024;
 
@@ -301,7 +302,7 @@ void QnServerSettingsDialog::submitToResources() {
             storage->setName(QUuid::createUuid().toString());
             storage->setParentId(m_server->getId());
             storage->setUrl(item.path);
-            storage->setSpaceLimit(qMax(minimalReservedSpace, item.reservedSpace)); // TODO: #Elric is this a proper place for this qMax?
+            storage->setSpaceLimit(item.reservedSpace); //client does not change space limit anymore
             storage->setUsedForWriting(item.isUsedForWriting);
 
             storages.push_back(storage);
@@ -520,10 +521,6 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
 
         if(item.reservedSpace == -1)
             item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getId(), item.path) , -1);
-
-        /* Note that if freeSpace is -1, then we'll also get -1 in reservedSpace, which is the desired behavior. */
-        if(item.reservedSpace == -1)
-            item.reservedSpace = qMin(defaultReservedSpace, item.freeSpace);
     }
 
     struct StorageSpaceDataLess {

@@ -6,10 +6,9 @@
 #include <QtCore/QList>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/videowall_resource.h>
 
 /**
- * This class contains all the necessary information to look up a layout item.
+ * This class contains all the necessary information to look up a videowall item.
  */
 class QnVideoWallItemIndex {
 public:
@@ -23,16 +22,8 @@ public:
         return m_videowall;
     }
 
-    void setVideoWall(const QnVideoWallResourcePtr &videowall) {
-        m_videowall = videowall;
-    }
-
     const QUuid &uuid() const {
         return m_uuid;
-    }
-
-    void setUuid(const QUuid &uuid) {
-        m_uuid = uuid;
     }
 
     bool isNull() const {

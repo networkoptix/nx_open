@@ -17,7 +17,7 @@ void QnEnumLexicalSerializerData::load(const QMetaObject *metaObject, const char
     clear();
 
     int index = metaObject->indexOfEnumerator(enumName);
-    assert(index >= 0); /* Getting an assert here? Do your class actually contain the provided enumeration? */
+    assert(index >= 0); /* Getting an assert here? Do your class actually contain the provided enumeration? Maybe you've forgotten to use Q_ENUMS? */
 
     QMetaEnum enumerator = metaObject->enumerator(index);
     m_flagged = enumerator.isFlag();

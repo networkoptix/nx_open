@@ -20,7 +20,7 @@ public:
         CameraCountColumn,
         LicenseKeyColumn,
         ExpirationDateColumn,
-        ExpiresInColumn,
+        LicenseStatusColumn,
         ColumnCount
     };
 

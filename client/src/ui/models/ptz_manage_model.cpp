@@ -5,7 +5,7 @@
 #include <ui/style/globals.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 #include <utils/common/string.h>
 
 QnPtzManageModel::QnPtzManageModel(QObject *parent) :

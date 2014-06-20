@@ -3,11 +3,6 @@
 
 #include "axis_onvif_resource.h"
 
-#include <QtCore/QMutexLocker>
-
-#include "onvif/soapMediaBindingProxy.h"
-#include <utils/network/http/asynchttpclient.h>
-
 QnAxisOnvifResource::QnAxisOnvifResource()
 {
 }

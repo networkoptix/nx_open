@@ -76,6 +76,7 @@ int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params
 
     switch(command) {
     case Qn::ContinuousMovePtzCommand:      return executeContinuousMove(controller, params, result);
+    case Qn::ContinuousFocusPtzCommand:     return executeContinuousFocus(controller, params, result);
     case Qn::AbsoluteDeviceMovePtzCommand:
     case Qn::AbsoluteLogicalMovePtzCommand: return executeAbsoluteMove(controller, params, result);
     case Qn::ViewportMovePtzCommand:        return executeViewportMove(controller, params, result);
@@ -93,6 +94,8 @@ int QnPtzRestHandler::executePost(const QString &, const QnRequestParams &params
     case Qn::GetActiveObjectPtzCommand:     return executeGetActiveObject(controller, params, result);
     case Qn::UpdateHomeObjectPtzCommand:    return executeUpdateHomeObject(controller, params, result);
     case Qn::GetHomeObjectPtzCommand:       return executeGetHomeObject(controller, params, result);
+    case Qn::GetAuxilaryTraitsPtzCommand:   return executeGetAuxilaryTraits(controller, params, result);
+    case Qn::RunAuxilaryCommandPtzCommand:  return executeRunAuxilaryCommand(controller, params, result);
     case Qn::GetDataPtzCommand:             return executeGetData(controller, params, result);
     default:                                return CODE_INVALID_PARAMETER;
     }
@@ -110,6 +113,17 @@ int QnPtzRestHandler::executeContinuousMove(const QnPtzControllerPtr &controller
 
     QVector3D speed(xSpeed, ySpeed, zSpeed);
     if(!controller->continuousMove(speed))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
+int QnPtzRestHandler::executeContinuousFocus(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    qreal speed;
+    if(!requireParameter(params, lit("speed"), result, &speed))
+        return CODE_INVALID_PARAMETER;
+
+    if(!controller->continuousFocus(speed))
         return CODE_INTERNAL_ERROR;
 
     return CODE_OK;
@@ -224,7 +238,7 @@ int QnPtzRestHandler::executeGetPresets(const QnPtzControllerPtr &controller, co
     return CODE_OK;
 }
 
-int QnPtzRestHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &, const QByteArray &body, QnJsonRestResult &result) {
+int QnPtzRestHandler::executeCreateTour(const QnPtzControllerPtr &controller, const QnRequestParams &, const QByteArray &body, QnJsonRestResult& /*result*/) {
     QnPtzTour tour;
     if(!QJson::deserialize(body, &tour))
         return CODE_INVALID_PARAMETER;
@@ -298,6 +312,31 @@ int QnPtzRestHandler::executeGetHomeObject(const QnPtzControllerPtr &controller,
     return CODE_OK;
 }
 
+int QnPtzRestHandler::executeGetAuxilaryTraits(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QnPtzAuxilaryTraitList traits;
+    if(!controller->getAuxilaryTraits(&traits))
+        return CODE_INTERNAL_ERROR;
+
+    result.setReply(traits);
+    return CODE_OK;
+}
+
+int QnPtzRestHandler::executeRunAuxilaryCommand(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
+    QnPtzAuxilaryTrait trait;
+    QString data;
+    if(
+        !requireParameter(params, lit("trait"),     result, &trait) || 
+        !requireParameter(params, lit("data"),      result, &data)
+    ) {
+            return CODE_INVALID_PARAMETER;
+    }
+
+    if(!controller->runAuxilaryCommand(trait, data))
+        return CODE_INTERNAL_ERROR;
+
+    return CODE_OK;
+}
+
 int QnPtzRestHandler::executeGetData(const QnPtzControllerPtr &controller, const QnRequestParams &params, QnJsonRestResult &result) {
     Qn::PtzDataFields query;
     if(!requireParameter(params, lit("query"), result, &query))
@@ -311,31 +350,4 @@ int QnPtzRestHandler::executeGetData(const QnPtzControllerPtr &controller, const
     return CODE_OK;
 }
 
-QString QnPtzRestHandler::description() const
-{
-    return "\
-        There are several ptz commands: <BR>\
-        <b>api/ptz/move</b> - start camera moving.<BR>\
-        <b>api/ptz/moveTo</b> - go to absolute position.<BR>\
-        <b>api/ptz/stop</b> - stop camera moving.<BR>\
-        <b>api/ptz/getPosition</b> - return current camera position.<BR>\
-        <b>api/ptz/getSpaceMapper</b> - return JSON-serialized PTZ space mapper for the given camera, if any.<BR>\
-        <b>api/ptz/calibrate</b> - calibrate moving speed (addition speed coeff).<BR>\
-        <b>api/ptz/getCalibrate</b> - read current calibration settings.<BR>\
-        <BR>\
-        Param <b>res_id</b> - camera physicalID.<BR>\
-        <BR>\
-        Arguments for 'move' and 'calibrate' commands:<BR>\
-        Param <b>xSpeed</b> - rotation X velocity in range [-1..+1].<BR>\
-        Param <b>ySpeed</b> - rotation Y velocity in range [-1..+1].<BR>\
-        Param <b>zoomSpeed</b> - zoom velocity in range [-1..+1].<BR>\
-        <BR>\
-        Arguments for 'moveTo' commands:<BR>\
-        Param <b>xPos</b> - go to absolute X position in range [-1..+1].<BR>\
-        Param <b>yPos</b> - go to absolute Y position in range [-1..+1].<BR>\
-        Param <b>zoomPos</b> - Optional. Go to absolute zoom position in range [0..+1].<BR>\
-        <BR>\
-        If PTZ command do not return data, function return simple 'OK' message on success or error message if command fail. \
-        For 'getCalibrate' command returns XML with coeffecients. For 'getPosition' command returns XML with current position.\
-    ";
-}
+    // TODO: #Elric not valid anymore

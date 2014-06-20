@@ -13,10 +13,9 @@ public:
 
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
-    virtual QString description() const override;
 
 signals:
-    void mserverFailure(QnResourcePtr resource, qint64 time, QnBusiness::EventReason reason);
+    void mserverFailure(QnResourcePtr resource, qint64 time, QnBusiness::EventReason reason, const QString& reasonText);
 };
 
 #endif // QN_FILE_SYSTEM_HANDLER_H

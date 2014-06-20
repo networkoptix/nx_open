@@ -20,7 +20,7 @@ void QnThumbnailsArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qin
     m_baseDelegate->setRange(startTime, endTime, frameStep);
 }
 
-bool QnThumbnailsArchiveDelegate::open(QnResourcePtr resource)
+bool QnThumbnailsArchiveDelegate::open(const QnResourcePtr &resource)
 
 {
     m_lastMediaTime = 0;
@@ -106,4 +106,9 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
 void QnThumbnailsArchiveDelegate::setGroupId(const QByteArray& groupId)
 {
     m_baseDelegate->setGroupId(groupId);
+}
+
+QnAbstractArchiveDelegate::ArchiveChunkInfo QnThumbnailsArchiveDelegate::getLastUsedChunkInfo() const
+{
+    return m_baseDelegate->getLastUsedChunkInfo();
 }

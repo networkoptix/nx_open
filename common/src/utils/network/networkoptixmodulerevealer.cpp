@@ -84,7 +84,7 @@ void NetworkOptixModuleRevealer::pleaseStop()
     QnLongRunnable::pleaseStop();
 }
 
-static const unsigned int ERROR_WAIT_TIMEOUT_MS = 1000;
+static const unsigned int errorWaitTimeoutMs = 1000;
 static const unsigned int MULTICAST_GROUP_JOIN_TIMEOUT_MS = 60000;
 
 void NetworkOptixModuleRevealer::run()
@@ -106,7 +106,7 @@ void NetworkOptixModuleRevealer::run()
         it != m_sockets.end();
         ++it )
     {
-        if( !m_pollSet.add( *it, PollSet::etRead ) )
+        if( !m_pollSet.add( *it, aio::etRead ) )
         {
             Q_ASSERT( false );
         }
@@ -119,24 +119,24 @@ void NetworkOptixModuleRevealer::run()
     {
         //TODO/IMPL do join periodically
 
-        int socketCount = m_pollSet.poll( PollSet::INFINITE_TIMEOUT );
+        int socketCount = m_pollSet.poll( aio::PollSet::INFINITE_TIMEOUT );
         if( socketCount == 0 )
             continue;    //timeout
         if( socketCount < 0 )
         {
             const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
             cl_log.log( lit("NetworkOptixModuleRevealer. poll failed. ").arg(SystemError::toString(prevErrorCode)), cl_logERROR );
-            msleep( ERROR_WAIT_TIMEOUT_MS );
+            msleep( errorWaitTimeoutMs );
             continue;
         }
 
         //some socket(s) changed state
-        for( PollSet::const_iterator
+        for( aio::PollSet::const_iterator
             it = m_pollSet.begin();
             it != m_pollSet.end();
             ++it )
         {
-            if( !(it.eventType() & PollSet::etRead) )
+            if( !(it.eventType() & aio::etRead) )
                 continue;
 
             AbstractDatagramSocket* udpSocket = dynamic_cast<AbstractDatagramSocket*>(it.socket());

@@ -151,18 +151,6 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
         return Qn::FullLayoutPermissions;
     } else {
         QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
-
-        if (m_user) {
-            foreach (QUuid uuid, m_user->videoWallItems()) {
-                QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(uuid);
-                if (index.isNull())
-                    continue;
-                QnVideoWallItem item = index.videowall()->getItem(uuid);
-                if (item.layout == layout->getId())
-                    return user == m_user ? Qn::FullLayoutPermissions : Qn::ReadWriteSavePermission | Qn::EditLayoutSettingsPermission;
-            }
-        }
-
         if(user != m_user)
             return 0; /* Viewer can't view other's layouts. */
 
@@ -201,24 +189,17 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstra
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnMediaServerResourcePtr &server) {
     assert(server);
 
-    if(m_userPermissions & Qn::GlobalEditServersPermissions) {
+    if(m_userPermissions & Qn::GlobalEditServersPermissions) 
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
-    } else {
-        return 0;
-    }
+    return 0;
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoWallResourcePtr &videoWall) {
     assert(videoWall);
 
-    if(m_userPermissions & Qn::GlobalEditVideoWallPermission) {
+    if(m_userPermissions & Qn::GlobalEditVideoWallPermission) 
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
-    } else {
-        foreach(const QnVideoWallItem &item, videoWall->getItems())
-            if (m_user && m_user->videoWallItems().contains(item.uuid))
-                return Qn::ReadPermission;
-        return 0;
-    }
+    return 0;
 }
 
 

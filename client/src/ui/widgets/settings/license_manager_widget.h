@@ -2,13 +2,16 @@
 #define QN_LICENSE_MANAGER_WIDGET_H
 
 #include <QtWidgets/QWidget>
-#include <QtCore/QModelIndex>
 
-#include "licensing/license.h"
-#include "api/app_server_connection.h"
+#include <nx_ec/ec_api.h>
+
+#include <licensing/license.h>
+
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 
+class QModelIndex;
 class QNetworkAccessManager;
+class QNetworkReply;
 
 class QnLicenseListModel;
 

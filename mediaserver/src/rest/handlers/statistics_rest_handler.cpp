@@ -2,7 +2,7 @@
 
 #include "utils/common/util.h"
 #include "utils/network/tcp_connection_priv.h"
-#include "platform/core_platform_abstraction.h"
+#include "platform/platform_abstraction.h"
 
 #include "rest/server/rest_server.h"
 
@@ -73,9 +73,4 @@ int QnStatisticsRestHandler::executePost(const QString& path, const QnRequestPar
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
-}
-
-QString QnStatisticsRestHandler::description() const
-{
-    return "Returns server info: CPU usage, HDD usage e.t.c \n";
 }

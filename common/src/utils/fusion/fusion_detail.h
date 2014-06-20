@@ -8,6 +8,8 @@
 #include <boost/mpl/has_xxx.hpp>
 #endif 
 
+#include <utils/common/type_traits.h>
+
 #include "fusion_fwd.h"
 #include "fusion_keys.h"
 
@@ -17,9 +19,7 @@ namespace QnFusion {
 } // namespace QnFusion
 
 namespace QnFusionDetail {
-    struct na {};
-    struct yes_type { char dummy; };
-    struct no_type { char dummy[64]; };
+    using namespace QnTypeTraits;
 
     template<class T, class Visitor>
     bool visit_members_internal(T &&value, Visitor &&visitor) {
@@ -147,12 +147,6 @@ namespace QnFusionDetail {
     }
 
 
-
-    template<class Visitor, class T, class Access>
-    bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access) {
-        return dispatch_visit(std::forward<Visitor>(visitor), std::forward<T>(value), access, typename Access::template at<QnFusion::base_type, na>::type());
-    }
-
     template<class Visitor, class T, class Access>
     bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access, const na &) {
         return visitor(std::forward<T>(value), access);
@@ -163,6 +157,11 @@ namespace QnFusionDetail {
         typedef typename replace_referent<T, typename std::remove_reference<typename Base::result_type>::type>::type base_type;
 
         return QnFusion::visit_members(std::forward<base_type>(value), no_start_stop_wrap(visitor));
+    }
+
+    template<class Visitor, class T, class Access>
+    bool dispatch_visit(Visitor &&visitor, T &&value, const Access &access) {
+        return dispatch_visit(std::forward<Visitor>(visitor), std::forward<T>(value), access, typename Access::template at<QnFusion::base_type, na>::type());
     }
 
 } // namespace QnFusionDetail

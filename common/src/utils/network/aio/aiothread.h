@@ -45,7 +45,7 @@ namespace aio
         */
         bool watchSocket(
             AbstractSocket* const sock,
-            PollSet::EventType eventToWatch,
+            aio::EventType eventToWatch,
             AIOEventHandler* const eventHandler,
             int timeoutMS = 0 );
         //!Do not monitor \a sock for event \a eventType
@@ -59,12 +59,12 @@ namespace aio
         */
         bool removeFromWatch(
             AbstractSocket* const sock,
-            PollSet::EventType eventType,
+            aio::EventType eventType,
             bool waitForRunningHandlerCompletion );
         //!Returns number of sockets monitored for \a eventToWatch event
-        size_t size( PollSet::EventType eventToWatch ) const;
+        size_t size( aio::EventType eventToWatch ) const;
         //!Returns true, if can monitor one more socket for \a eventToWatch
-        bool canAcceptSocket( PollSet::EventType eventToWatch ) const;
+        bool canAcceptSocket( aio::EventType eventToWatch ) const;
 
     protected:
         //!Implementation of QThread::run

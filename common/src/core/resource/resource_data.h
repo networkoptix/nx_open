@@ -6,6 +6,7 @@
 
 #include <core/ptz/ptz_fwd.h>
 
+// TODO: #Elric use json for storage. Like in customizations.
 class QnResourceData {
 public:
     QnResourceData() {}

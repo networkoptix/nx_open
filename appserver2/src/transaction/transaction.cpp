@@ -25,17 +25,14 @@ namespace ec2
                 case connect:
                     return "connect";
 
-                case clientInstanceId:
-                    return "clientInstanceId";
-
                 case getResourceTypes:
                     return "getResourceTypes";
                 case getResource:
                     return "getResource";
                 case setResourceStatus:
                     return "setResourceStatus";
-                case setResourceDisabled:
-                    return "setResourceDisabled";
+                //case setResourceDisabled:
+                //    return "setResourceDisabled";
                 case setResourceParams:
                     return "setResourceParams";
                 case getResourceParams:
@@ -46,8 +43,8 @@ namespace ec2
                     return "removeResource";
                 case setPanicMode:
                     return "setPanicMode";
-                case getAllDataList:
-                    return "getResourceList";
+                case getFullInfo:
+                    return "getFullInfo";
                 case saveCamera:
                     return "saveCamera";
                 case saveCameras:
@@ -56,13 +53,13 @@ namespace ec2
                     return "removeCamera";
                 case getCameras:
                     return "getCameras";
-                case getCameraHistoryList:
-                    return "getCameraHistoryList";
+                case getCameraHistoryItems:
+                    return "getCameraHistoryItems";
                 case addCameraHistoryItem:
                     return "addCameraHistoryItem";
 
-                case getMediaServerList:
-                    return "getMediaServerList";
+                case getMediaServers:
+                    return "getMediaServers";
                 case saveMediaServer:
                     return "saveMediaServer";
                 case removeMediaServer:
@@ -70,8 +67,8 @@ namespace ec2
 
                 case saveUser:
                     return "saveUser";
-                case getUserList:
-                    return "getUserList";
+                case getUsers:
+                    return "getUsers";
                 case removeUser:
                     return "removeUser";
 
@@ -83,26 +80,30 @@ namespace ec2
                     return "broadcastBusinessAction";
                 case execBusinessAction:
                     return "execBusinessAction";
-                case getBusinessRuleList:
-                    return "getBusinessRuleList";
+                case getBusinessRules:
+                    return "getBusinessRules";
                 case resetBusinessRules:
                     return "resetBusinessRules";
 
+                case saveLayout:
+                    return "saveLayout";
                 case saveLayouts:
                     return "addOrUpdateLayouts";
-                case getLayoutList:
-                    return "getLayoutList";
+                case getLayouts:
+                    return "getLayouts";
                 case removeLayout:
                     return "removeLayout";
 
                 case saveVideowall:
                     return "saveVideowall";
-                case getVideowallList:
-                    return "getVideowallList";
+                case getVideowalls:
+                    return "getVideowalls";
                 case removeVideowall:
                     return "removeVideowall";
                 case videowallControl:
                     return "videowallControl";
+                case updateVideowallInstanceStatus:
+                    return "updateVideowallInstanceStatus";
 
                 case listDirectory:
                     return "listDirectory";
@@ -129,8 +130,8 @@ namespace ec2
                     return "tranSyncRequest";
                 case tranSyncResponse:
                     return "tranSyncResponse";
-                case serverAliveInfo:
-                    return "serverAliveInfo";
+                case peerAliveInfo:
+                    return "peerAliveInfo";
 
                 case getSettings:
                     return "getSettings";
@@ -144,6 +145,23 @@ namespace ec2
                 case unlockRequest:
                     return "unlockRequest";
 
+                case uploadUpdate:
+                    return "uploadUpdate";
+                case uploadUpdateResponce:
+                    return "uploadUpdateResponce";
+                case installUpdate:
+                    return "installUpdate";
+
+                case addCameraBookmarkTags:
+                    return "addCameraBookmarkTags";
+                case getCameraBookmarkTags:
+                    return "getCameraBookmarkTags";
+                case removeCameraBookmarkTags:
+                    return "removeCameraBookmarkTags";
+
+                case getHelp:
+                    return "getHelp";
+
                 default:
                     return "unknown " + QString::number((int)val);
             }
@@ -156,7 +174,7 @@ namespace ec2
                     val == unlockRequest ||
                     val == tranSyncRequest ||
                     val == tranSyncResponse ||
-                    val == serverAliveInfo;
+                    val == peerAliveInfo;
         }
 
     }
@@ -165,9 +183,13 @@ namespace ec2
     {
         command = _command;
         persistent = _persistent;
-        id.peerGUID = qnCommon->moduleGUID();
+        id.peerID = qnCommon->moduleGUID();
         id.sequence = 0;
-        timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getRelativeTime() : 0;
+        timestamp = 0;
+        if (QnTransactionLog::instance()) {
+            timestamp = QnTransactionLog::instance()->getTimeStamp();
+            id.dbID = QnDbManager::instance()->getID();
+        }
         localTransaction = false;
     }
 
@@ -180,7 +202,7 @@ namespace ec2
     {
         id.sequence = m_sequence.fetchAndAddAcquire(1);
         if (!timestamp)
-            timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getRelativeTime() : 0;
+            timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getTimeStamp() : 0;
     }
 
     int generateRequestID()
@@ -189,8 +211,7 @@ namespace ec2
         return ++requestID;
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary),   (peerGUID)(sequence))
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary),   (command)(id)(persistent)(timestamp))
-
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary)(json),   (peerID)(dbID)(sequence))
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary)(json),   (command)(id)(persistent)(timestamp))
 } // namespace ec2
 

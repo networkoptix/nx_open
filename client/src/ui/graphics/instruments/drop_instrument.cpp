@@ -12,6 +12,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <core/resource/file_processor.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>

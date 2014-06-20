@@ -148,7 +148,7 @@ private:
     //!Implementation of \a TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID ) override;
     //!Implementation of \a aio::AIOEventHandler::eventTriggered
-    virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw() override;
+    virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override;
 
     void dispatchDiscoverPackets();
     std::shared_ptr<AbstractDatagramSocket> getSockByIntf( const QnInterfaceAndAddr& iface );

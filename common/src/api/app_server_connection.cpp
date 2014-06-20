@@ -26,6 +26,7 @@
 Q_GLOBAL_STATIC(QnAppServerConnectionFactory, qn_appServerConnectionFactory_instance)
 
 QnAppServerConnectionFactory::QnAppServerConnectionFactory(): 
+    m_prematureLicenseExperationDate(0),
     m_defaultMediaProxyPort(0)
 {}
 
@@ -72,6 +73,22 @@ void QnAppServerConnectionFactory::setSessionKey(const QByteArray& sessionKey)
     }
 }
 
+qint64 QnAppServerConnectionFactory::prematureLicenseExperationDate()
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
+        return factory->m_prematureLicenseExperationDate;
+    return 0;
+}
+
+void QnAppServerConnectionFactory::setPrematureLicenseExperationDate(qint64 value)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        if (value != factory->m_prematureLicenseExperationDate) {
+            factory->m_prematureLicenseExperationDate = value;
+        }
+    }
+}
+
 void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -114,14 +131,6 @@ QString QnAppServerConnectionFactory::authKey()
 
     return QString();
 }
-
-
-QString QnAppServerConnectionFactory::videoWallKey() {
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
-        return factory->m_videoWallKey;
-    return QString();
-}
-
 
 QString QnAppServerConnectionFactory::box()
 {
@@ -173,13 +182,6 @@ void QnAppServerConnectionFactory::setAuthKey(const QString &authKey)
     }
 }
 
-void QnAppServerConnectionFactory::setVideoWallKey(const QString &key)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_videoWallKey = key;
-    }
-}
-
 void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -202,6 +204,32 @@ void QnAppServerConnectionFactory::setDefaultFactory(QnResourceFactory* resource
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_resourceFactory = resourceFactory;
+    }
+}
+
+QUuid QnAppServerConnectionFactory::videowallGuid() {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
+        return factory->m_videowallGuid;
+    return QUuid();
+}
+
+void QnAppServerConnectionFactory::setVideowallGuid(const QUuid &uuid)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_videowallGuid = uuid;
+    }
+}
+
+QUuid QnAppServerConnectionFactory::instanceGuid() {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
+        return factory->m_instanceGuid;
+    return QUuid();
+}
+
+void QnAppServerConnectionFactory::setInstanceGuid(const QUuid &uuid)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_instanceGuid = uuid;
     }
 }
 

@@ -33,7 +33,6 @@ public:
 
     void setTmpStatus(Status value);
 protected:
-    virtual QString getUniqueId() const override;
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
 private:
     Status m_tmpStatus;

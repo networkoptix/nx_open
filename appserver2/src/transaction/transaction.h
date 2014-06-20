@@ -3,13 +3,15 @@
 
 #include <vector>
 
+#ifndef QN_NO_QT
 #include <QtCore/QString>
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_email_data.h"
-#include "utils/serialization/binary.h"
+#endif
 
+#include "utils/serialization/binary.h"
 
 namespace ec2
 {
@@ -23,8 +25,6 @@ namespace ec2
             testConnection = 1,
             connect = 2,
 
-            clientInstanceId = 3,
-
             //!ApiResourceTypeList
             getResourceTypes = 4,
             //!ApiResource
@@ -32,7 +32,7 @@ namespace ec2
             //!ApiSetResourceStatusData
             setResourceStatus = 6,
             //!ApiSetResourceDisabledData
-            setResourceDisabled = 7,
+            //setResourceDisabled = 7,
             //!ApiResourceParams
             setResourceParams = 8,
             getResourceParams = 9,
@@ -42,9 +42,9 @@ namespace ec2
             //!ApiPanicModeData
             setPanicMode = 12,
             //!ApiFullInfo,
-            getAllDataList = 13,
+            getFullInfo = 13,
             
-            //!ApiCamera
+            //!ApiCameraData
             saveCamera = 14,
             //!ApiCameraList
             saveCameras = 15,
@@ -52,11 +52,11 @@ namespace ec2
             removeCamera = 16,
             getCameras = 17,
             //!ApiCameraServerItemList
-            getCameraHistoryList = 18,
+            getCameraHistoryItems = 18,
             //!ApiCameraServerItem
             addCameraHistoryItem = 19,
 
-            getMediaServerList = 20,
+            getMediaServers = 20,
             //!ApiMediaServer
             saveMediaServer = 21,
             //!ApiIdData
@@ -64,12 +64,12 @@ namespace ec2
 
             //!ApiUser
             saveUser = 23,
-            getUserList = 24,
+            getUsers = 24,
             //!ApiIdData
             removeUser = 25,
 
             //!ApiBusinessRuleList
-            getBusinessRuleList = 26,
+            getBusinessRules = 26,
             //!ApiBusinessRule
             saveBusinessRule = 27,
             //!ApiIdData
@@ -87,13 +87,13 @@ namespace ec2
             //!ApiLayoutList
             saveLayout = 33,
             //!ApiLayoutList
-            getLayoutList = 34,
+            getLayouts = 34,
             //!ApiIdData
             removeLayout = 35,
             
             //!ApiVideowall
             saveVideowall = 36,
-            getVideowallList = 37,
+            getVideowalls = 37,
             //!ApiIdData
             removeVideowall = 38,
 
@@ -134,12 +134,30 @@ namespace ec2
             tranSyncRequest = 53,
             tranSyncResponse = 54,
             
-            serverAliveInfo = 55,
+            peerAliveInfo = 55,
             
             //!ApiLockInfo
             lockRequest = 56,
             lockResponse = 57,
             unlockRequest = 58,
+
+            //!ApiUpdateUploadData
+            uploadUpdate = 59,
+            //!ApiUpdateUploadResponceData
+            uploadUpdateResponce = 60,
+            //!ApiUpdateInstallData
+            installUpdate = 61,
+
+            //!ApiCameraBookmarkTagDataList
+            addCameraBookmarkTags = 62,
+            getCameraBookmarkTags = 63,
+            removeCameraBookmarkTags = 64,
+
+            //ApiHelpGroupDataList
+            getHelp = 65,
+
+            //ApiVideowallInstanceStatusData
+            updateVideowallInstanceStatus = 66
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
@@ -159,8 +177,19 @@ namespace ec2
         struct ID
         {
             ID(): sequence(0) {}
-            QUuid peerGUID; // TODO: #Elric #EC2 rename into sane case
+            QUuid peerID;
+            QUuid dbID;
             qint32 sequence;
+
+#ifndef QN_NO_QT
+            friend uint qHash(const ec2::QnAbstractTransaction::ID &id) {
+                return ::qHash(id.peerID.toRfc4122().append(id.dbID.toRfc4122()), id.sequence);
+            }
+#endif
+
+            bool operator==(const ID &other) const {
+                return peerID == other.peerID && dbID == other.dbID && sequence == other.sequence;
+            }
         };
 
         ApiCommand::Value command;
@@ -172,7 +201,9 @@ namespace ec2
         bool localTransaction; // do not propagate transactions to other server peers
     };
 
-    typedef QSet<QnId> PeerList;
+    typedef QnAbstractTransaction::ID QnAbstractTransaction_ID;
+#define QnAbstractTransaction_ID_Fields (peerID)(dbID)(sequence)
+#define QnAbstractTransaction_Fields (command)(id)(persistent)(timestamp)        
 
     template <class T>
     class QnTransaction: public QnAbstractTransaction
@@ -185,8 +216,8 @@ namespace ec2
         T params;
     };
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary))
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json))
 
     template <class T, class Output>
     void serialize(const QnTransaction<T> &transaction, QnOutputBinaryStream<Output> *stream)
@@ -205,5 +236,11 @@ namespace ec2
 
     int generateRequestID();
 } // namespace ec2
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (numeric))
+
+#ifndef QN_NO_QT
+Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)
+#endif
 
 #endif  //EC2_TRANSACTION_H

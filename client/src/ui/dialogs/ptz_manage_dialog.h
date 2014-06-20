@@ -16,7 +16,7 @@ class QnPtzManageModel;
 class QnPtzHotkeysResourcePropertyAdaptor;
 class QnLocalFileCache;
 
-// TODO: #GDM remove singleton
+// TODO: #GDM #PTZ remove singleton
 class QnPtzManageDialog : public QnAbstractPtzDialog, public Singleton<QnPtzManageDialog> {
     Q_OBJECT
     typedef QnAbstractPtzDialog base_type;

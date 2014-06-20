@@ -10,23 +10,22 @@
 #include <QtConcurrent>
 
 #include <utils/common/scoped_thread_rollback.h>
+#include <utils/common/model_functions.h>
 
-#include <utils/serialization/json_functions.h>
-#include <utils/serialization/binary_functions.h>
-#include <utils/serialization/csv_functions.h>
-
-#include "cluster/cluster_manager.h"
 #include "database/db_manager.h"
 #include "managers/aux_manager.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
+#include "transaction/transaction_message_bus.h"
+#include <transaction/binary_transaction_serializer.h>
+
 
 namespace ec2
 {
     class CommonRequestsProcessor
     {
     public:
-        static ErrorCode getCurrentTime( nullptr_t, qint64* curTime )
+        static ErrorCode getCurrentTime( std::nullptr_t, qint64* curTime )
         {
             *curTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
             return ErrorCode::ok;
@@ -44,10 +43,14 @@ namespace ec2
             \param handler Functor ( ErrorCode )
         */
         template<class QueryDataType, class HandlerType>
-            void processUpdateAsync(QnTransaction<QueryDataType>& tran, HandlerType handler )
+            void processUpdateAsync(QnTransaction<QueryDataType>& tran, HandlerType handler, void* /*dummy*/ = 0 )
         {
-            //TODO/IMPL this method must be asynchronous
+            //TODO #ak this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
+
+            QnDbManager::Locker locker(dbManager);
+            if (tran.persistent)
+                locker.beginTran();
 
             if (!tran.id.sequence)
                 tran.fillSequence();
@@ -58,16 +61,15 @@ namespace ec2
             };
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
-            QByteArray serializedTran;
-            QnOutputBinaryStream<QByteArray> stream( &serializedTran );
-            QnBinary::serialize( tran, &stream );
+            QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
 
             errorCode = auxManager->executeTransaction(tran);
-            if( errorCode != ErrorCode::ok )
+            if( errorCode != ErrorCode::ok ) {
                 return;
+            }
 
             if (tran.persistent) {
-                errorCode = dbManager->executeTransaction( tran, serializedTran);
+                errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
                 if( errorCode != ErrorCode::ok ) {
                     if (errorCode == ErrorCode::skipped)
                         errorCode = ErrorCode::ok;
@@ -75,9 +77,55 @@ namespace ec2
                 }
             }
 
+            if (tran.persistent)
+                locker.commit();
+
             // delivering transaction to remote peers
             if (!tran.localTransaction)
-                QnTransactionMessageBus::instance()->sendTransaction(tran, serializedTran);
+                QnTransactionMessageBus::instance()->sendTransaction(tran);
+        }
+
+        template<class HandlerType>
+        void processUpdateAsync(QnTransaction<ApiIdData>& tran, HandlerType handler )
+        {
+            Q_ASSERT(tran.persistent);
+            switch (tran.command)
+            {
+            case ApiCommand::removeMediaServer:
+                return processMultiUpdateAsync<ApiIdData, ApiIdData>(tran, handler, ApiCommand::removeCamera, dbManager->getNestedObjects(ApiObjectInfo(ApiObject_Server, tran.params.id)).toIdList(), true);
+            case ApiCommand::removeUser:
+                return processMultiUpdateAsync<ApiIdData, ApiIdData>(tran, handler, ApiCommand::removeLayout, dbManager->getNestedObjects(ApiObjectInfo(ApiObject_User, tran.params.id)).toIdList(), true);
+            case ApiCommand::removeResource:
+            {
+                QnTransaction<ApiIdData> updatedTran = tran;
+                switch(dbManager->getObjectType(tran.params.id))
+                {
+                case ApiObject_Server:
+                    updatedTran.command = ApiCommand::removeMediaServer;
+                    break;
+                case ApiObject_Camera:
+                    updatedTran.command = ApiCommand::removeCamera;
+                    break;
+                case ApiObject_User:
+                    updatedTran.command = ApiCommand::removeUser;
+                    break;
+                case ApiObject_Layout:
+                    updatedTran.command = ApiCommand::removeLayout;
+                    break;
+                case ApiObject_Videowall:
+                    updatedTran.command = ApiCommand::removeVideowall;
+                    break;
+                case ApiObject_BusinessRule:
+                    updatedTran.command = ApiCommand::removeBusinessRule;
+                    break;
+                default:
+                    return processUpdateAsync(tran, handler, 0); // call default handler
+                }
+                return processUpdateAsync(updatedTran, handler);
+            }
+            default:
+                return processUpdateAsync(tran, handler, 0); // call default handler
+            }
         }
 
         template<class HandlerType>
@@ -104,71 +152,82 @@ namespace ec2
         template<class QueryDataType, class SubDataType, class HandlerType>
         void processMultiUpdateAsync(QnTransaction<QueryDataType>& multiTran, HandlerType handler, ApiCommand::Value command)
         {
-            ErrorCode errorCode = ErrorCode::ok;
-            QList<QPair<QnTransaction<SubDataType>, QByteArray>> processedTran;
-            
-            if (multiTran.persistent)
-                dbManager->beginTran();
+            return processMultiUpdateAsync(multiTran, handler, command, multiTran.params, false);
+        }
 
-            foreach(const SubDataType& data, multiTran.params)
+
+        template<class QueryDataType, class SubDataType, class HandlerType>
+        void processMultiUpdateAsync(QnTransaction<QueryDataType>& multiTran, HandlerType handler, ApiCommand::Value command, const std::vector<SubDataType>& nestedList, bool isParentObjectTran)
+        {
+            ErrorCode errorCode = ErrorCode::ok;
+            QList< QnTransaction<SubDataType> > processedTransactions;
+            processedTransactions.reserve(static_cast<int>(nestedList.size()));
+
+            bool processMultiTran = false;
+
+            auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
+                QnScopedThreadRollback ensureFreeThread(1);
+                QtConcurrent::run( std::bind( handler, errorCode ) );
+            };
+            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+
+            QnDbManager::Locker locker(dbManager);
+            if (multiTran.persistent)
+                locker.beginTran();
+
+            foreach(const SubDataType& data, nestedList)
             {
                 QnTransaction<SubDataType> tran(command, multiTran.persistent);
                 tran.params = data;
                 tran.fillSequence();
                 tran.localTransaction = multiTran.localTransaction;
 
-                auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
-                    QnScopedThreadRollback ensureFreeThread(1);
-                    QtConcurrent::run( std::bind( handler, errorCode ) );
-                };
-                std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
-
-                QByteArray serializedTran;
-                QnOutputBinaryStream<QByteArray> stream( &serializedTran );
-                QnBinary::serialize( tran, &stream );
-
                 errorCode = auxManager->executeTransaction(tran);
-                if( errorCode != ErrorCode::ok ) {
-                    if (multiTran.persistent)
-                        dbManager->rollback();
+                if( errorCode != ErrorCode::ok )
                     return;
-                }
 
-                if (tran.persistent) {
-                    errorCode = dbManager->executeNestedTransaction( tran, serializedTran);
+                if (tran.persistent) 
+                {
+                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
+                    errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
 					if (errorCode == ErrorCode::skipped)
 						continue;
-                    if( errorCode != ErrorCode::ok ) {
-                        dbManager->rollback();
+                    if( errorCode != ErrorCode::ok )
                         return;
-                    }
                 }
-                processedTran << QPair<QnTransaction<SubDataType>, QByteArray>(tran, serializedTran);
+                processedTransactions << tran;
             }
+            
+            // delete master object if need (server->cameras required to delete master object, layoutList->layout doesn't)
+            if (isParentObjectTran) 
+            {
+                multiTran.fillSequence();
+
+                errorCode = ErrorCode::ok;
+                if (multiTran.persistent)                 
+                {
+                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(multiTran);
+                    errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
+                    if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
+                        return;
+                }
+                processMultiTran = (errorCode == ErrorCode::ok);
+            }
+
 
             if (multiTran.persistent)
-                dbManager->commit();
+                locker.commit();
 
-            foreach(const auto& tranData, processedTran)
+            foreach(const QnTransaction<SubDataType>& transaction, processedTransactions)
             {
                 // delivering transaction to remote peers
-                if (!tranData.first.localTransaction)
-                    QnTransactionMessageBus::instance()->sendTransaction(tranData.first, tranData.second);
+                if (!transaction.localTransaction)
+                    QnTransactionMessageBus::instance()->sendTransaction(transaction);
             }
+            if (processMultiTran)
+                QnTransactionMessageBus::instance()->sendTransaction(multiTran);
+
             errorCode = ErrorCode::ok;
-        }
-
-
-        template<class T> 
-        bool processIncomingTransaction( const QnTransaction<T>& tran, const QByteArray& serializedTran ) 
-        {
-            if (tran.persistent)
-            {
-                ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
-                if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
-                    return false;
-            }
-            return true;
         }
 
 
