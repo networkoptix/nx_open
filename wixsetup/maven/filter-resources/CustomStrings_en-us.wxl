@@ -65,8 +65,9 @@
     <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Warning</String>     
 
     <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">Quick Full (Installing ALL Components)</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Client Only (I want to view video recorded elsewhere)</String>
+    <String Id="InstallTypeDlg_Full"                                Overridable="yes">Full</String>
+    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">Server Only</String>
+    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Client Only</String>
     <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Advanced</String>
     <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Please select installation type</String>
     <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Installation Type</String>       
@@ -90,6 +91,7 @@
     <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Connection Settings</String>
     <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Server Configuration</String>
     <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Server</String>  
+    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">System Name</String>  
 
     <!-- MyExitDialog -->
 
