@@ -1360,21 +1360,11 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         foreach (const QnVideoWallPcData &pc, videoWall->pcs()->getItems()) {
             QSet<int> usedScreens;
 
-            auto itemScreens = [](const QnScreenSnaps &snaps) {
-                QSet<int> screens;
-                screens 
-                    << snaps.left.screenIndex 
-                    << snaps.top.screenIndex 
-                    << snaps.right.screenIndex 
-                    << snaps.bottom.screenIndex;
-                return screens;
-            };
-
             foreach (const QnVideoWallItem &item, videoWall->items()->getItems()) {
                 if (item.pcUuid != pc.uuid)
                     continue;
 
-                QSet<int> screens = itemScreens(item.screenSnaps);
+                QSet<int> screens = item.screenSnaps.screens();
                 if (screens.isEmpty())
                     continue;
 
@@ -1746,17 +1736,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
 
     QnVideoWallPcData pc = videoWall->pcs()->getItem(item.pcUuid);
 
-    auto itemScreens = [](const QnScreenSnaps &snaps) {
-        QSet<int> screens;
-        screens 
-            << snaps.left.screenIndex 
-            << snaps.top.screenIndex 
-            << snaps.right.screenIndex 
-            << snaps.bottom.screenIndex;
-        return screens;
-    };
-
-    QList<int> indices = itemScreens(item.screenSnaps).toList();
+    QList<int> indices = item.screenSnaps.screens().toList();
     if (indices.isEmpty())
         return;
 

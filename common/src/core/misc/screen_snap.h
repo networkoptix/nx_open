@@ -29,6 +29,8 @@ struct QnScreenSnaps {
 
     bool isValid() const;
 
+    QSet<int> screens() const;
+
     friend bool operator==(const QnScreenSnaps &l, const QnScreenSnaps &r) {
         return (l.left == r.left &&
             l.right == r.right &&

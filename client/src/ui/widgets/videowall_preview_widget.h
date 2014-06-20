@@ -12,6 +12,8 @@
 class DragProcessor;
 class QAbstractAnimation;
 
+class QnVideowallModel;
+
 class QnVideowallPreviewWidget : public QWidget, public DragProcessHandler {
     Q_OBJECT
     typedef QWidget base_type;
@@ -27,6 +29,8 @@ protected:
 
 private:
     void updateModel();
+
+    QScopedPointer<QnVideowallModel> m_model;
 };
 
 #endif // VIDEOWALL_PREVIEW_WIDGET_H

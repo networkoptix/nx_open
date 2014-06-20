@@ -35,3 +35,13 @@ int QnScreenSnap::snapsPerScreen() {
 bool QnScreenSnaps::isValid() const {
     return left.isValid() && right.isValid() && top.isValid() && bottom.isValid();
 }
+
+QSet<int> QnScreenSnaps::screens() const {
+    QSet<int> screens;
+    screens 
+        << left.screenIndex 
+        << top.screenIndex 
+        << right.screenIndex 
+        << bottom.screenIndex;
+    return screens;
+}
