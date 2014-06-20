@@ -25,8 +25,6 @@ namespace ec2
             testConnection = 1,
             connect = 2,
 
-            clientInstanceId = 3,
-
             //!ApiResourceTypeList
             getResourceTypes = 4,
             //!ApiResource
@@ -44,7 +42,7 @@ namespace ec2
             //!ApiPanicModeData
             setPanicMode = 12,
             //!ApiFullInfo,
-            getAllDataList = 13,
+            getFullInfo = 13,
             
             //!ApiCameraData
             saveCamera = 14,
@@ -54,11 +52,11 @@ namespace ec2
             removeCamera = 16,
             getCameras = 17,
             //!ApiCameraServerItemList
-            getCameraHistoryList = 18,
+            getCameraHistoryItems = 18,
             //!ApiCameraServerItem
             addCameraHistoryItem = 19,
 
-            getMediaServerList = 20,
+            getMediaServers = 20,
             //!ApiMediaServer
             saveMediaServer = 21,
             //!ApiIdData
@@ -66,12 +64,12 @@ namespace ec2
 
             //!ApiUser
             saveUser = 23,
-            getUserList = 24,
+            getUsers = 24,
             //!ApiIdData
             removeUser = 25,
 
             //!ApiBusinessRuleList
-            getBusinessRuleList = 26,
+            getBusinessRules = 26,
             //!ApiBusinessRule
             saveBusinessRule = 27,
             //!ApiIdData
@@ -89,13 +87,13 @@ namespace ec2
             //!ApiLayoutList
             saveLayout = 33,
             //!ApiLayoutList
-            getLayoutList = 34,
+            getLayouts = 34,
             //!ApiIdData
             removeLayout = 35,
             
             //!ApiVideowall
             saveVideowall = 36,
-            getVideowallList = 37,
+            getVideowalls = 37,
             //!ApiIdData
             removeVideowall = 38,
 
@@ -136,7 +134,7 @@ namespace ec2
             tranSyncRequest = 53,
             tranSyncResponse = 54,
             
-            serverAliveInfo = 55,
+            peerAliveInfo = 55,
             
             //!ApiLockInfo
             lockRequest = 56,
@@ -218,8 +216,8 @@ namespace ec2
         T params;
     };
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary))
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json))
 
     template <class T, class Output>
     void serialize(const QnTransaction<T> &transaction, QnOutputBinaryStream<Output> *stream)
@@ -238,6 +236,8 @@ namespace ec2
 
     int generateRequestID();
 } // namespace ec2
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (numeric))
 
 #ifndef QN_NO_QT
 Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)

@@ -23,9 +23,9 @@ public:
     QString lastErrorStr() const;
     virtual bool hasThread() const override { return false; }
 protected:
-    virtual bool processData(QnAbstractDataPacketPtr /*data*/) { return true; }
+    virtual bool processData(const QnAbstractDataPacketPtr& /*data*/) { return true; }
 protected:
-    virtual void putData(QnAbstractDataPacketPtr data) override;
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
 private:
     QSet<void*> m_needKeyData;
     QnDesktopDataProvider* m_owner;

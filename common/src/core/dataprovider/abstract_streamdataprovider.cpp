@@ -51,7 +51,7 @@ void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractDataReceptor* d
     m_dataprocessors.removeOne(dp);
 }
 
-void QnAbstractStreamDataProvider::putData(QnAbstractDataPacketPtr data)
+void QnAbstractStreamDataProvider::putData(const QnAbstractDataPacketPtr& data)
 {
     if (!data)
         return;

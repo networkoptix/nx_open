@@ -167,20 +167,26 @@ void QnResourcePoolModelNode::update() {
             m_displayName = getResourceName(m_resource);
         }
     } else if (m_type == Qn::VideoWallItemNode) {
-        m_status = QnResource::Online;
         m_searchString = QString();
         m_flags = 0;
-        m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+        m_status = QnResource::Offline;
+        m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
 
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
         if (!index.isNull()) {
             QnVideoWallItem item = index.videowall()->items()->getItem(m_uuid);
+
+            if (item.online) {
+                m_status = QnResource::Online;
+                m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);              
+            }
 
             if(m_resource.isNull()) {
                 m_displayName = m_name = item.name;
             } else {
                 m_name = item.name;
                 m_displayName = QString(QLatin1String("%1 <%2>")).arg(item.name).arg(m_resource->getName());
+
             }
         } else {
             m_displayName = m_name = QString();

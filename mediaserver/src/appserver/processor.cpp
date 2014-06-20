@@ -78,7 +78,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
     }
 }
 
-void QnAppserverResourceProcessor::addNewCamera(QnVirtualCameraResourcePtr cameraResource)
+void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)
 {
     if (!ec2::QnDistributedMutexManager::instance())
     {
@@ -121,7 +121,7 @@ void QnAppserverResourceProcessor::at_mutexLocked()
     mutex->deleteLater();
 }
 
-void QnAppserverResourceProcessor::addNewCameraInternal(QnVirtualCameraResourcePtr cameraResource)
+void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
 {
     QnVirtualCameraResourceList cameras;
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();

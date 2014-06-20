@@ -121,7 +121,7 @@ protected:
             return QnAbstractDataConsumer::canAcceptData();
     }
 
-    void putData(QnAbstractDataPacketPtr data) override
+    void putData(const QnAbstractDataPacketPtr& data) override
     {
         if (m_liveMode)
         {
@@ -143,7 +143,7 @@ protected:
     }
 
 
-    virtual bool processData(QnAbstractDataPacketPtr data) override
+    virtual bool processData(const QnAbstractDataPacketPtr& data) override
     {
         if( m_standFrameDuration )
             doRealtimeDelay( data );

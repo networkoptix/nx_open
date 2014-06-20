@@ -17,8 +17,8 @@ namespace ec2
     template<class QueryProcessorType>
     QnCameraManager<QueryProcessorType>::QnCameraManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
     :
-        m_queryProcessor( queryProcessor ),
-		m_resCtx( resCtx )
+		QnCameraNotificationManager( resCtx ),
+        m_queryProcessor( queryProcessor )
     {
     }
 
@@ -82,7 +82,7 @@ namespace ec2
             handler->done( reqID, errorCode, outData);
         };
         m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiCameraServerItemDataList, decltype(queryDoneHandler)> (
-            ApiCommand::getCameraHistoryList, nullptr, queryDoneHandler );
+            ApiCommand::getCameraHistoryItems, nullptr, queryDoneHandler );
         return reqID;
     }
 

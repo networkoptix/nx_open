@@ -132,14 +132,6 @@ QString QnAppServerConnectionFactory::authKey()
     return QString();
 }
 
-
-QString QnAppServerConnectionFactory::videoWallKey() {
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
-        return factory->m_videoWallKey;
-    return QString();
-}
-
-
 QString QnAppServerConnectionFactory::box()
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -190,13 +182,6 @@ void QnAppServerConnectionFactory::setAuthKey(const QString &authKey)
     }
 }
 
-void QnAppServerConnectionFactory::setVideoWallKey(const QString &key)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_videoWallKey = key;
-    }
-}
-
 void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
@@ -219,6 +204,32 @@ void QnAppServerConnectionFactory::setDefaultFactory(QnResourceFactory* resource
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_resourceFactory = resourceFactory;
+    }
+}
+
+QUuid QnAppServerConnectionFactory::videowallGuid() {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
+        return factory->m_videowallGuid;
+    return QUuid();
+}
+
+void QnAppServerConnectionFactory::setVideowallGuid(const QUuid &uuid)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_videowallGuid = uuid;
+    }
+}
+
+QUuid QnAppServerConnectionFactory::instanceGuid() {
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
+        return factory->m_instanceGuid;
+    return QUuid();
+}
+
+void QnAppServerConnectionFactory::setInstanceGuid(const QUuid &uuid)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        factory->m_instanceGuid = uuid;
     }
 }
 

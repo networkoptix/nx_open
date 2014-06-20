@@ -190,7 +190,7 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
     return AV_NOPTS_VALUE;
 }
 
-bool QnStreamRecorder::processData(QnAbstractDataPacketPtr nonConstData)
+bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QnConstAbstractDataPacketPtr data = nonConstData;
 
@@ -410,7 +410,7 @@ void QnStreamRecorder::writeData(QnConstAbstractMediaDataPtr md, int streamIndex
         avPkt.dts = qMax((qint64)stream->cur_dts+1, dts);
     else
         avPkt.dts = dts;
-    QnConstCompressedVideoDataPtr video = md.dynamicCast<const QnCompressedVideoData>();
+    const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(md.data());
     if (video && (quint64)video->pts != AV_NOPTS_VALUE)
         avPkt.pts = av_rescale_q(video->pts-m_startDateTime, srcRate, stream->time_base) + (avPkt.dts-dts);
     else

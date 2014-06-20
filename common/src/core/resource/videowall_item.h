@@ -19,7 +19,7 @@ class QMimeData;
  */
 class QnVideoWallItem {
 public:
-    QnVideoWallItem() {}
+    QnVideoWallItem(): online(false) {}
 
     /**
      * @brief layout                        Id of this item's layout resource (if any).
@@ -42,6 +42,9 @@ public:
     QString name;
 
     QnScreenSnaps screenSnaps;
+    /** Status of the running videowall instance bound to this item. Runtime status, should not be serialized or saved. */
+    bool online;
+
 
     static QString mimeType();
 
@@ -54,6 +57,7 @@ public:
                 l.uuid == r.uuid &&
                 l.pcUuid == r.pcUuid &&
                 l.name == r.name &&
+                l.online == r.online &&
                 l.screenSnaps == r.screenSnaps);
     }
 };

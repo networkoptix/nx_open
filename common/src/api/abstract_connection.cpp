@@ -5,6 +5,7 @@
 #include <utils/serialization/lexical_enum.h>
 
 #include "session_manager.h"
+#include "abstract_reply_processor.h"
 
 Q_GLOBAL_STATIC(QnEnumLexicalSerializer<int>, qn_abstractConnection_emptySerializer);
 
@@ -55,6 +56,12 @@ void QnAbstractConnection::setSerializer(QnLexicalSerializer *serializer) {
     m_serializer.reset(serializer);
 }
 
+QString QnAbstractConnection::objectName(int object) const {
+    QString result;    
+    serializer()->serialize(object, &result);
+    return result;
+}
+
 int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRequestHeaderList &headers, const QnRequestParamList &params, const QByteArray& data, const char *replyTypeName, QObject *target, const char *slot) {
     QnAbstractReplyProcessor *processor = newReplyProcessor(object);
 
@@ -72,13 +79,10 @@ int QnAbstractConnection::sendAsyncRequest(int operation, int object, const QnRe
     if(!m_extraHeaders.isEmpty())
         actualHeaders.append(m_extraHeaders);
 
-    QString objectName;    
-    serializer()->serialize(processor->object(), &objectName);
-
     return QnSessionManager::instance()->sendAsyncRequest(
         operation,
         m_url, 
-        objectName, 
+        objectName(processor->object()), 
         actualHeaders, 
         params, 
         data,
@@ -108,14 +112,11 @@ int QnAbstractConnection::sendSyncRequest(int operation, int object, const QnReq
     if(!m_extraHeaders.isEmpty())
         actualHeaders.append(m_extraHeaders);
 
-    QString objectName;
-    serializer()->serialize(object, &objectName);
-
     QnHTTPRawResponse response;
     int status = QnSessionManager::instance()->sendSyncRequest(
         operation,
         m_url,
-        objectName,
+        objectName(object),
         actualHeaders,
         params,
         data,

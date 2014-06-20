@@ -57,7 +57,7 @@ void QnSingleShotFileStreamreader::run()
         qWarning() << "Application out of memory";
     }
     if (data)
-        putData(data);
+        putData(std::move(data));
 }
 
 void QnSingleShotFileStreamreader::setStorage(QnStorageResourcePtr storage)

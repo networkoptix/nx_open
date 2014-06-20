@@ -11,13 +11,12 @@
 
 namespace ec2
 {
-    template<class QueryProcessorType>
-    class QnVideowallManager
-        :
+    class QnVideowallNotificationManager
+    :
         public AbstractVideowallManager
     {
     public:
-        QnVideowallManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+        QnVideowallNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
 
         void triggerNotification( const QnTransaction<ApiVideowallData>& tran )
         {
@@ -44,8 +43,20 @@ namespace ec2
             assert(tran.command == ApiCommand::updateVideowallInstanceStatus);
             QnVideowallInstanceStatus status;
             fromApiToResource(tran.params, status);
-            emit instanceStatusUpdated(status);
+            emit instanceStatusChanged(status);
         }
+
+    protected:
+        ResourceContext m_resCtx;
+    };
+
+    template<class QueryProcessorType>
+    class QnVideowallManager
+    :
+        public QnVideowallNotificationManager
+    {
+    public:
+        QnVideowallManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
 
     protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) override;
@@ -53,10 +64,9 @@ namespace ec2
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) override;
 
         virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) override;
-        virtual int sendInstanceId(const QUuid& guid, impl::SimpleHandlerPtr handler) override;
+
     private:
         QueryProcessorType* const m_queryProcessor;
-        ResourceContext m_resCtx;
 
         QnTransaction<ApiVideowallData> prepareTransaction(ApiCommand::Value command, const QnVideoWallResourcePtr &resource);
         QnTransaction<ApiIdData> prepareTransaction(ApiCommand::Value command, const QnId& id);
