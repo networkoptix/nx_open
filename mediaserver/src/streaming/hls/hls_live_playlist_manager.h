@@ -10,8 +10,6 @@
 
 #include <QMutex>
 
-#include <utils/media/media_stream_cache.h>
-
 #include "hls_playlist_manager.h"
 
 
@@ -26,14 +24,13 @@ namespace nx_hls
     */
     class HLSLivePlaylistManager
     :
-        public AbstractMediaCacheEventReceiver,
         public AbstractPlaylistManager
     {
     public:
         HLSLivePlaylistManager(
             MediaStreamCache* const mediaStreamCache,
             quint64 targetDurationUSec );
-        ~HLSLivePlaylistManager();
+        virtual ~HLSLivePlaylistManager();
 
         //!Returns playlist for live data
         /*!
@@ -57,9 +54,9 @@ namespace nx_hls
         std::queue<std::pair<quint64, quint64> > m_timestampToBlock;
         int m_blockID;
         int m_removedChunksToKeepCount;
+        int m_eventRegistrationID;
 
-        //!Implementation of AbstractMediaCacheEventReceiver::onKeyFrame
-        virtual void onKeyFrame( quint64 currentPacketTimestampUSec ) override;
+        void onKeyFrame( quint64 currentPacketTimestampUSec );
     };
 }
 

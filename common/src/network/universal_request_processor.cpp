@@ -59,7 +59,7 @@ bool QnUniversalRequestProcessor::authenticate()
         while (!qnAuthHelper->authenticate(d->request, d->response, isProxy) && d->socket->isConnected())
         {
             d->responseBody = isProxy ? STATIC_PROXY_UNAUTHORIZED_HTML: STATIC_UNAUTHORIZED_HTML;
-            sendResponse("HTTP", isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED, "text/html");
+            sendResponse(isProxy ? CODE_PROXY_AUTH_REQUIRED : CODE_AUTH_REQUIRED, "text/html");
 
             if (++retryCount > MAX_AUTH_RETRY_COUNT)
                 return false;
