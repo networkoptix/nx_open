@@ -1,11 +1,13 @@
 #include "videowall_preview_widget.h"
 
+#include <client/client_settings.h>
+
 #include <core/resource/videowall_resource.h>
 
+#include <utils/common/string.h>
+
 QnVideowallPreviewWidget::QnVideowallPreviewWidget(QWidget *parent /*= 0*/):
-    QWidget(parent),
-    m_autoFill(false)
-{
+    QWidget(parent) {
     updateModel();
 }
 
@@ -19,33 +21,43 @@ void QnVideowallPreviewWidget::paintEvent(QPaintEvent *event) {
 
 
 }
-
-QnVideoWallResourcePtr QnVideowallPreviewWidget::videowall() const {
-    return m_videowall;
-}
-
-void QnVideowallPreviewWidget::setVideowall(const QnVideoWallResourcePtr &videowall) {
-    if (m_videowall == videowall)
-        return;
-    m_videowall = videowall;
-    updateModel();
-}
-
-bool QnVideowallPreviewWidget::autoFill() const {
-    return m_autoFill;
-}
-
-void QnVideowallPreviewWidget::setAutoFill(bool value) {
-    if (m_autoFill == value)
-        return;
-    m_autoFill = value;
-    updateModel();
-}
-
 void QnVideowallPreviewWidget::updateModel() {
-
-    if (!m_videowall)
-        return;
     update();
+}
+
+void QnVideowallPreviewWidget::loadFromResource(const QnVideoWallResourcePtr &videowall) {
+    updateModel();
+}
+
+void QnVideowallPreviewWidget::submitToResource(const QnVideoWallResourcePtr &videowall) {
+    QDesktopWidget* desktop = qApp->desktop();
+    QList<QnVideoWallPcData::PcScreen> localScreens;
+    QRect unitedGeometry;
+    for (int i = 0; i < desktop->screenCount(); i++) {
+        QnVideoWallPcData::PcScreen screen;
+        screen.index = i;
+        screen.desktopGeometry = desktop->screenGeometry(i);
+        unitedGeometry = unitedGeometry.united(screen.desktopGeometry);
+        localScreens << screen;
+    }
+    
+    QUuid pcUuid = qnSettings->pcUuid();
+
+    auto newItem = [&]() {
+        QnVideoWallItem result;
+
+        result.name = generateUniqueString([&videowall] () {
+            QStringList used;
+            foreach (const QnVideoWallItem &item, videowall->items()->getItems())
+                used << item.name;
+            return used;
+        }(), tr("Screen"), tr("Screen %1") );
+        result.pcUuid = pcUuid;
+        result.uuid = QUuid::createUuid();
+        return result;
+    };
+
+    QnVideoWallItem item = newItem();
+    videowall->items()->addItem(item);
 }
 

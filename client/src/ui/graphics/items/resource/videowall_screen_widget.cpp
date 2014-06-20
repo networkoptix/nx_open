@@ -165,22 +165,22 @@ void QnVideowallScreenWidget::updateLayout() {
         foreach (const QnVideoWallItem &item, m_items) {
             QnVideowallItemWidget *itemWidget = createItem(item.uuid);
 
-            if (item.geometry.left() == m_desktopGeometry.left())
+            if (item.screenSnaps.left.snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorLeft);
             else
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorHorizontalCenter);
 
-            if (item.geometry.top() == m_desktopGeometry.top())
+            if (item.screenSnaps.top.snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorTop, m_mainLayout, Qt::AnchorTop);
             else
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorTop, m_mainLayout, Qt::AnchorVerticalCenter);
 
-            if (item.geometry.right() == m_desktopGeometry.right())
+            if (item.screenSnaps.right.snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorRight, m_mainLayout, Qt::AnchorRight);
             else
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorRight, m_mainLayout, Qt::AnchorHorizontalCenter);
 
-            if (item.geometry.bottom() == m_desktopGeometry.bottom())
+            if (item.screenSnaps.bottom.snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorBottom, m_mainLayout, Qt::AnchorBottom);
             else
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorBottom, m_mainLayout, Qt::AnchorVerticalCenter);
@@ -205,7 +205,10 @@ void QnVideowallScreenWidget::at_videoWall_itemAdded(const QnVideoWallResourcePt
     if (item.pcUuid != m_pcUuid)
         return;
 
-    if (!m_desktopGeometry.contains(item.geometry))
+    // check that left edge of the item belongs to the current screen
+    if (qnIndexOf(m_screens, [item](const QnVideoWallPcData::PcScreen &screen) {
+        return item.screenSnaps.left.screenIndex == screen.index;
+    }) < 0)
         return;
 
     m_items << item;
@@ -224,7 +227,7 @@ void QnVideowallScreenWidget::at_videoWall_itemChanged(const QnVideoWallResource
 
     QnVideoWallItem oldItem = m_items[idx];
     m_items[idx] = item;
-    if (item.geometry == oldItem.geometry)
+    if (item.screenSnaps == oldItem.screenSnaps)
        return;
 
     m_layoutUpdateRequired = true;

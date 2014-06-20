@@ -294,238 +294,6 @@ ec2::AbstractECConnectionPtr QnWorkbenchVideoWallHandler::connection2() const {
     return QnAppServerConnectionFactory::getConnection2();
 }
 
-QnWorkbenchVideoWallHandler::ScreenSnap QnWorkbenchVideoWallHandler::findNearest(const QList<ScreenSnap> &list, int value) {
-
-    QList<ScreenSnap>::ConstIterator i = qLowerBound(list.constBegin(), list.constEnd(), value);
-    if (i == list.constEnd())
-        return list.last();
-
-    if (i->value == value)
-        return *i;
-
-    int idx = (i - list.constBegin());
-    if (idx <= 0)
-        return list.first();
-
-    if (idx >= list.size())
-        return list.last();
-
-    ScreenSnap prev = list[idx - 1];
-    ScreenSnap next = list[idx];
-    if (qAbs(value - prev.value) <= qAbs(value - next.value))
-        return prev;
-    return next;
-}
-
-QnWorkbenchVideoWallHandler::ScreenSnap QnWorkbenchVideoWallHandler::findEdge(const QList<QnWorkbenchVideoWallHandler::ScreenSnap> &snaps, QList<int> screens, bool backward) {
-
-    if (backward) {
-        foreach(const ScreenSnap &snap, snaps | boost::adaptors::reversed) {
-            if (snap.intermidiate || !screens.contains(snap.index))
-                continue;
-            return snap;
-        }
-    } else {
-        foreach(const ScreenSnap &snap, snaps) {
-            if (snap.intermidiate || !screens.contains(snap.index))
-                continue;
-            return snap;
-        }
-    }
-
-    return ScreenSnap();
-}
-
-QList<int> QnWorkbenchVideoWallHandler::getScreensByItem(const ScreenSnaps &snaps, const QRect &source) {
-
-    ScreenSnaps joined = snaps.joined();
-
-    ScreenSnap left     = findNearest(joined.left, source.left());
-    ScreenSnap top      = findNearest(joined.top, source.top());
-    ScreenSnap right    = findNearest(joined.right, source.right());
-    ScreenSnap bottom   = findNearest(joined.bottom, source.bottom());
-    QSet<int> screenIndices;
-    screenIndices << left.index << top.index << right.index << bottom.index;
-
-    QList<int> result = screenIndices.values();
-    foreach (int index, result) {   //check if it is really one screen
-        ScreenSnaps filtered = snaps.filtered(index);
-        if (findNearest(filtered.left, source.left()).value != left.value)
-            continue;
-        if (findNearest(filtered.top, source.top()).value != top.value)
-            continue;
-        if (findNearest(filtered.right, source.right()).value != right.value)
-            continue;
-        if (findNearest(filtered.bottom, source.bottom()).value != bottom.value)
-            continue;
-
-        return QList<int>() << index;
-    }
-    return result;
-}
-
-QRect QnWorkbenchVideoWallHandler::calculateSnapGeometry(const QList<QnVideoWallPcData::PcScreen> &screens, const QRect &source) {
-    if (screens.isEmpty())
-        return source;
-
-    ScreenSnaps localSnaps = calculateSnaps(qnSettings->pcUuid(), screens);
-
-    ScreenSnap left, top, right, bottom;
-
-    // multiple calculations are not important because function is used very rare and datasets are small
-    QList<int> screenIndices = getScreensByItem(localSnaps, source);
-    if (screenIndices.size() > 1) { // if client uses some screens it should fill them completely
-        left    = findEdge(localSnaps.left,     screenIndices);
-        top     = findEdge(localSnaps.top,      screenIndices);
-        right   = findEdge(localSnaps.right,    screenIndices, true);
-        bottom  = findEdge(localSnaps.bottom,   screenIndices, true);
-    } else if (!screenIndices.isEmpty()) {  //safety check
-        ScreenSnaps joined = localSnaps.joined();
-        left    = findNearest(joined.left,      source.left());
-        top     = findNearest(joined.top,       source.top());
-        right   = findNearest(joined.right,     source.right());
-        bottom  = findNearest(joined.bottom,    source.bottom());
-    } else {
-        return source;
-    }
-    //TODO: #GDM #VW check edges validity
-    //TODO: #GDM #VW check that screens are not in use already
-
-    return QRect(QPoint(left.value, top.value), QPoint(right.value, bottom.value));
-
-}
-
-void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &videoWall, const QnLayoutResourcePtr &layout, const QnVideowallAttachSettings &settings) {
-    QDesktopWidget* desktop = qApp->desktop();
-    QList<QnVideoWallPcData::PcScreen> localScreens;
-    QRect unitedGeometry;
-    for (int i = 0; i < desktop->screenCount(); i++) {
-        QnVideoWallPcData::PcScreen screen;
-        screen.index = i;
-        screen.desktopGeometry = desktop->screenGeometry(i);
-        unitedGeometry = unitedGeometry.united(screen.desktopGeometry);
-        localScreens << screen;
-    }
-    int currentScreen = desktop->screenNumber(mainWindow());
-    QUuid pcUuid = qnSettings->pcUuid();
-    
-    auto newItem = [&]() {
-        QnVideoWallItem result;
-
-        // if layout can be attached right now, do it
-        if (layout && !snapshotManager()->isLocal(layout))
-            result.layout = layout->getId();
-
-        result.name = generateUniqueString([&videoWall] () {
-            QStringList used;
-            foreach (const QnVideoWallItem &item, videoWall->items()->getItems())
-                used << item.name;
-            return used;
-        }(), tr("Screen"), tr("Screen %1") );
-        result.pcUuid = pcUuid;
-        result.uuid = QUuid::createUuid();
-        return result;
-    };
-
-    QnVideoWallItem item = newItem();
-
-    switch (settings.attachMode) {
-    case QnVideowallAttachSettings::AttachAll:
-        item.geometry = unitedGeometry;
-        break;
-    case QnVideowallAttachSettings::AttachScreen:
-        item.geometry = desktop->screenGeometry(currentScreen);
-        break;
-    case QnVideowallAttachSettings::AttachWindow:
-        item.geometry = calculateSnapGeometry(localScreens, mainWindow()->geometry());
-        break;
-    default:
-        break;
-    }
-
-  //  action(Qn::EffectiveMaximizeAction)->setChecked(false);
-  //  mainWindow()->setGeometry(item.geometry);   // WYSIWYG
-
-    videoWall->items()->addItem(item);
-    QnVideoWallItemIndexList items;
-    items << QnVideoWallItemIndex(videoWall, item.uuid);
-
-    if (settings.autoFill) {
-        switch (settings.attachMode) {
-        case QnVideowallAttachSettings::AttachScreen: 
-        {
-            for (int i = 0; i < desktop->screenCount(); i++) {
-                if (i == currentScreen)
-                    continue;
-                QnVideoWallItem fillItem = newItem();
-                fillItem.geometry = desktop->screenGeometry(i);
-                videoWall->items()->addItem(fillItem);
-                items << QnVideoWallItemIndex(videoWall, fillItem.uuid);
-            }
-            break;
-        }
-        case QnVideowallAttachSettings::AttachWindow:
-        {
-            int w = item.geometry.width();
-            int h = item.geometry.height();
-            int xOffset = unitedGeometry.left();
-            int yOffset = unitedGeometry.top();
-            for (int x = 0; x < qRound((qreal)unitedGeometry.width() / w); x++) {
-                for (int y = 0; y < qRound((qreal)unitedGeometry.height() / h); y++) {
-                    QRect geometry = calculateSnapGeometry(localScreens, QRect(xOffset + x*w, yOffset + y*h, w, h));
-                    if (geometry == item.geometry)
-                        continue;   //TODO: #GDM #VW check overlapping with existing items
-                    QnVideoWallItem fillItem = newItem();
-                    fillItem.geometry = geometry;
-                    videoWall->items()->addItem(fillItem);
-                    items << QnVideoWallItemIndex(videoWall, fillItem.uuid);
-                }
-            }
-            break;
-        }
-        default:
-            break;
-        }
-    }
-
-    QnVideoWallPcData pcData;
-    pcData.uuid = pcUuid;
-    pcData.screens = localScreens;
-
-    if (!videoWall->pcs()->hasItem(pcUuid))
-        videoWall->pcs()->addItem(pcData);
-    else
-        videoWall->pcs()->updateItem(pcUuid, pcData);
-
-    // If layout should be saved, attach it after videowall saving.
-    connection2()->getVideowallManager()->save(videoWall,  this, 
-        [this, items, layout, videoWall]( int reqID, ec2::ErrorCode errorCode ) {
-            Q_UNUSED(reqID);
-            if (errorCode != ec2::ErrorCode::ok)
-                return;
-
-            if (items.isEmpty())
-                return;
-
-            bool updateLayout = !layout.isNull();
-            foreach(const QnVideoWallItemIndex &index, items) {
-                if (index.isNull())
-                    continue;
-                QnVideoWallResourcePtr videowall = index.videowall();
-                if (!videowall->items()->hasItem(index.uuid()))
-                    continue;
-                if (!videowall->items()->getItem(index.uuid()).layout.isNull()) {
-                    updateLayout = false;
-                    break;
-                }
-            }
-            if (updateLayout)
-                resetLayout(items, layout);
-    } );
-
-    menu()->trigger(Qn::OpenVideoWallsReviewAction, QnActionParameters(videoWall));
-}
-
 void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout) {
     if (items.isEmpty())
         return;
@@ -725,12 +493,38 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
     workbench()->clear();
 
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
-    mainWindow()->setGeometry(item.geometry);
+
+    auto geometryFromSnaps = [this](const QnScreenSnaps &snaps) {
+        if (!snaps.isValid())
+            return QRect();
+
+        QRect geometry;
+        QDesktopWidget* desktop = qApp->desktop();
+        int maxIndex = desktop->screenCount() - 1;
+
+        auto xCoord = [desktop, maxIndex](const QnScreenSnap &snap) {
+            QRect screenRect = desktop->screenGeometry(qMin(snap.screenIndex, maxIndex));
+            return screenRect.x() + (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+        };
+
+        auto yCoord = [desktop, maxIndex](const QnScreenSnap &snap) {
+            QRect screenRect = desktop->screenGeometry(qMin(snap.screenIndex, maxIndex));
+            return screenRect.y() + (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+        };
+
+        return QRect(
+            QPoint(xCoord(snaps.left), yCoord(snaps.top)),
+            QPoint(xCoord(snaps.right), yCoord(snaps.bottom))
+            );
+    };
+
+    QRect targetGeometry = geometryFromSnaps(item.screenSnaps);
+    mainWindow()->setGeometry(targetGeometry);
 
     QDesktopWidget* desktop = qApp->desktop();
     for (int i = 0; i < desktop->screenCount(); i++) {
         QRect screen = desktop->screenGeometry(i);
-        if (item.geometry == screen)
+        if (targetGeometry == screen)
             menu()->action(Qn::EffectiveMaximizeAction)->trigger();
     }
 
@@ -1157,40 +951,6 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen() {
     }
 }
 
-QnWorkbenchVideoWallHandler::ScreenSnaps QnWorkbenchVideoWallHandler::calculateSnaps(const QUuid &pcUuid, const QList<QnVideoWallPcData::PcScreen> &screens) {
-    if (m_screenSnapsByUuid.contains(pcUuid))
-        return m_screenSnapsByUuid[pcUuid];
-
-    ScreenSnaps result;
-    QList<ScreenSnap> left, right, top, bottom;
-
-    foreach (const QnVideoWallPcData::PcScreen &screen, screens) {
-        QRect geom = screen.desktopGeometry;
-        int w = geom.width() / 2;
-        int h = geom.height() / 2;
-
-        left     << ScreenSnap(screen.index, geom.left(), false)      << ScreenSnap(screen.index, geom.left() + w + 1, true);
-        right    << ScreenSnap(screen.index, geom.left() + w, true)   << ScreenSnap(screen.index, geom.right(), false);
-        top      << ScreenSnap(screen.index, geom.top(), false)       << ScreenSnap(screen.index, geom.top() + h + 1, true);
-        bottom   << ScreenSnap(screen.index, geom.top() + h, true)    << ScreenSnap(screen.index, geom.bottom(), false);
-    }
-
-    qSort(left);
-    result.left = left;
-
-    qSort(right);
-    result.right = right;
-
-    qSort(top);
-    result.top = top;
-
-    qSort(bottom);
-    result.bottom = bottom;
-
-    m_screenSnapsByUuid[pcUuid] = result;
-    return result;
-}
-
 QnVideoWallItemIndexList QnWorkbenchVideoWallHandler::targetList() const {
     if (!workbench()->currentLayout()->resource())
         return QnVideoWallItemIndexList();
@@ -1379,68 +1139,13 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     if(videoWall.isNull())
         return;
 
-    // Suggest any of the current user's layouts
-    QnLayoutResourceList layouts;
-    foreach (const QnLayoutResourcePtr &layout, qnResPool->getResourcesWithParentId(context()->user()->getId()).filtered<QnLayoutResource>())
-        if (!snapshotManager()->isFile(layout) && !layout->data().contains(Qn::VideoWallResourceRole))
-            layouts << layout;
-
-    qSort(layouts.begin(), layouts.end(),  [](const QnLayoutResourcePtr &l, const QnLayoutResourcePtr &r) {
-        return naturalStringCaseInsensitiveLessThan(l->getName(), r->getName());
-    });
-
-     QnLayoutResourcePtr currentLayout = workbench()->currentLayout()->resource();
-     bool canClone = layouts.contains(currentLayout);
-
-    // If selected layout is invalid, suggest current workbench layout as a default value
-    if (m_attachSettings.layoutId.isNull() || qnIndexOf(layouts, [&](const QnLayoutResourcePtr &layout) {return layout->getId() == m_attachSettings.layoutId;}) < 0)
-        m_attachSettings.layoutId = currentLayout->getId();
-
-    bool shortcutsSupported = qnPlatform->shortcuts()->supported();
-
     QScopedPointer<QnAttachToVideowallDialog> dialog(new QnAttachToVideowallDialog(mainWindow()));
-    dialog->loadLayoutsList(layouts);
-    dialog->setCanClone(canClone);
-    dialog->loadSettings(m_attachSettings);
-    dialog->setShortcutsSupported(shortcutsSupported);
-    if (shortcutsSupported)
-        dialog->setCreateShortcut(!shortcutExists(videoWall));
+    dialog->loadFromResource(videoWall);
     if (!dialog->exec())
         return;
-    m_attachSettings = dialog->settings();
-
-    QnLayoutResourcePtr targetLayout;
-
-    switch (m_attachSettings.layoutMode) {
-    case QnVideowallAttachSettings::LayoutCustom:
-    {
-        int idx = qnIndexOf(layouts, [&](const QnLayoutResourcePtr &l){ return l->getId() == m_attachSettings.layoutId; });
-        if (idx >= 0)
-            targetLayout = layouts[idx];
-        break;
-    }
-    case QnVideowallAttachSettings::LayoutClone:
-    {
-        if (!canClone)
-            break;
-
-        targetLayout = currentLayout->clone();
-        targetLayout->setName(generateUniqueLayoutName(context()->user(), tr("Video Wall Layout"),  tr("Video Wall Layout %1")));
-        targetLayout->setParentId(context()->user()->getId());
-        targetLayout->addFlags(QnResource::local);
-        targetLayout->setCellSpacing(QSizeF(0.0, 0.0));
-        targetLayout->setUserCanEdit(true);
-        resourcePool()->addResource(targetLayout);
-        break;
-    }
-    default:
-        break;
-    }
-
-    attachLayout(videoWall, targetLayout, m_attachSettings);
-
-    if (shortcutsSupported && dialog->isCreateShortcut())
-        createShortcut(videoWall);
+    dialog->submitToResource(videoWall);
+    
+    menu()->trigger(Qn::OpenVideoWallsReviewAction, QnActionParameters(videoWall));
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered() {
@@ -1655,25 +1360,35 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         foreach (const QnVideoWallPcData &pc, videoWall->pcs()->getItems()) {
             QSet<int> usedScreens;
 
+            auto itemScreens = [](const QnScreenSnaps &snaps) {
+                QSet<int> screens;
+                screens 
+                    << snaps.left.screenIndex 
+                    << snaps.top.screenIndex 
+                    << snaps.right.screenIndex 
+                    << snaps.bottom.screenIndex;
+                return screens;
+            };
+
             foreach (const QnVideoWallItem &item, videoWall->items()->getItems()) {
                 if (item.pcUuid != pc.uuid)
                     continue;
 
-                QList<int> screens = getScreensByItem(calculateSnaps(pc.uuid, pc.screens), item.geometry);
-                if (screens.size() == 0)
+                QSet<int> screens = itemScreens(item.screenSnaps);
+                if (screens.isEmpty())
                     continue;
-                qSort(screens);
 
-                bool skip = false;
-                foreach (int index, screens) {
-                    skip |= usedScreens.contains(index);
-                    usedScreens << index;
-                }
+                QSet<int> intersected = usedScreens.intersect(screens);
+                bool skip = !intersected.isEmpty();
+                usedScreens = intersected;
 
                 if (skip)
                     continue;
 
-                addItemToLayout(layout, videoWall, pc, screens);
+                //TODO: #GDM #VW refactor
+                QList<int> listScreens = screens.toList();
+                qSort(listScreens);
+                addItemToLayout(layout, videoWall, pc, listScreens);
             }
         }
 
@@ -1800,12 +1515,20 @@ void QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered() {
     if (!videowall)
         return;
 
+    bool shortcutsSupported = qnPlatform->shortcuts()->supported();
+
     QScopedPointer<QnVideowallSettingsDialog> dialog(new QnVideowallSettingsDialog(mainWindow()));
     dialog->loadFromResource(videowall);
+    dialog->setShortcutsSupported(shortcutsSupported);
+    if (shortcutsSupported)
+        dialog->setCreateShortcut(!shortcutExists(videowall));
     if (!dialog->exec())
         return;
 
     dialog->submitToResource(videowall);
+    if (shortcutsSupported && dialog->isCreateShortcut())
+        createShortcut(videowall);
+
     saveVideowall(videowall);
 }
 
@@ -2022,7 +1745,18 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
         return;
 
     QnVideoWallPcData pc = videoWall->pcs()->getItem(item.pcUuid);
-    QList<int> indices = getScreensByItem(calculateSnaps(pc.uuid, pc.screens), item.geometry);
+
+    auto itemScreens = [](const QnScreenSnaps &snaps) {
+        QSet<int> screens;
+        screens 
+            << snaps.left.screenIndex 
+            << snaps.top.screenIndex 
+            << snaps.right.screenIndex 
+            << snaps.bottom.screenIndex;
+        return screens;
+    };
+
+    QList<int> indices = itemScreens(item.screenSnaps).toList();
     if (indices.isEmpty())
         return;
 
@@ -2070,16 +1804,18 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved(const QnVideoWallReso
             combinedGeometry = combinedGeometry.united(screen.desktopGeometry);
         }
 
-        if (!combinedGeometry.contains(item.geometry))
-            continue;
+        //TODO: #GDM #VW implement!
+        //if (!combinedGeometry.contains(item.geometry))
+        //    continue;
 
         // we found the widget containing removed item
         foreach (const QnVideoWallItem &existingItem, videoWall->items()->getItems()) {
             if (existingItem.pcUuid != item.pcUuid)
                 continue;
 
-            if (combinedGeometry.contains(existingItem.geometry))
-                return; //that wasn't last item
+            //TODO: #GDM #VW implement!
+            //if (combinedGeometry.contains(existingItem.geometry))
+            //    return; //that wasn't last item
         }
 
         layout->removeItem(workbenchItem);

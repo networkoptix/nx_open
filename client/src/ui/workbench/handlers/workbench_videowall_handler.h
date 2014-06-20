@@ -36,7 +36,6 @@ public:
 private:
     ec2::AbstractECConnectionPtr connection2() const;
 
-    void attachLayout(const QnVideoWallResourcePtr &videoWall, const QnLayoutResourcePtr &layout, const QnVideowallAttachSettings &settings);
     void resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout);
     void swapLayouts(const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout);
 
@@ -140,15 +139,6 @@ private slots:
     void saveVideowall(const QnVideoWallResourcePtr& videowall);
     void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls);
 private:
-    
-
-    ScreenSnaps calculateSnaps(const QUuid &pcUuid, const QList<QnVideoWallPcData::PcScreen> &screens);
-    QRect calculateSnapGeometry(const QList<QnVideoWallPcData::PcScreen> &screens, const QRect &source);
-
-    static ScreenSnap findNearest(const QList<ScreenSnap> &snaps, int value);
-    static ScreenSnap findEdge(const QList<ScreenSnap> &snaps, QList<int> screens, bool backward = false);
-    static QList<int> getScreensByItem(const ScreenSnaps &snaps, const QRect &source);
-private:
     typedef QHash<qint64, QnVideoWallControlMessage> StoredMessagesHash;
 
     struct {
@@ -169,9 +159,6 @@ private:
         QList<QnVideoWallControlMessage> cachedMessages;
         QTimer* cacheTimer;
     } m_controlMode;
-
-    QHash<QUuid, ScreenSnaps> m_screenSnapsByUuid;
-    QnVideowallAttachSettings m_attachSettings;
 };
 
 #endif // WORKBENCH_VIDEOWALL_HANDLER_H

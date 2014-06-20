@@ -19,21 +19,14 @@ public:
     explicit QnVideowallPreviewWidget(QWidget *parent = 0);
     virtual ~QnVideowallPreviewWidget();
 
-    QnVideoWallResourcePtr videowall() const;
-    void setVideowall(const QnVideoWallResourcePtr &videowall);
-
-    bool autoFill() const;
-    void setAutoFill(bool value);
+    void loadFromResource(const QnVideoWallResourcePtr &videowall);
+    void submitToResource(const QnVideoWallResourcePtr &videowall); 
 
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
 
 private:
     void updateModel();
-
-private:
-    QnVideoWallResourcePtr m_videowall;
-    bool m_autoFill;
 };
 
 #endif // VIDEOWALL_PREVIEW_WIDGET_H

@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>659</width>
-    <height>450</height>
+    <height>271</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Attach to Video Wall...</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
    <item>
     <widget class="QGroupBox" name="previewGroupBox">
      <property name="title">
@@ -24,70 +24,6 @@
        <widget class="QnVideowallPreviewWidget" name="previewWidget" native="true"/>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="layoutGroupBox">
-     <property name="title">
-      <string>Layout</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <item>
-       <widget class="QRadioButton" name="layoutNone">
-        <property name="text">
-         <string>None</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QRadioButton" name="layoutClone">
-        <property name="text">
-         <string>Clone current</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QRadioButton" name="layoutCustom">
-          <property name="text">
-           <string>Custom...</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="layoutsComboBox">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>1</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="autoFillCheckBox">
-     <property name="text">
-      <string>Fill the free space the same way</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="shortcutCheckbox">
-     <property name="text">
-      <string>Create shortcut on the desktop</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
    <item>
