@@ -30,7 +30,7 @@ public:
     QnMotionRegion();
 
     static const int MIN_SENSITIVITY = 0; // equal motion mask
-    static const int DEFAULT_SENSITIVITY = 6;
+    static const int DEFAULT_SENSITIVITY = 5;
     static const int MAX_SENSITIVITY = 9; // max motion sensitivity
 
     /** 
