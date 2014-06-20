@@ -911,7 +911,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+S")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         autoRepeat(false).
-        condition(hasFlags(QnResource::videowall));
+        condition(new QnSaveVideowallReviewActionCondition(this));
 
     factory(Qn::SaveVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -947,7 +947,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Stop Video Wall")).
         autoRepeat(false).
-        condition(new QnNonEmptyVideowallActionCondition(this));
+        condition(new QnRunningVideowallActionCondition(this));
 
     factory(Qn::DetachFromVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).

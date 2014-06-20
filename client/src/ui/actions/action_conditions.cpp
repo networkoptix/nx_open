@@ -714,7 +714,6 @@ bool QnPtzActionCondition::check(const QnPtzControllerPtr &controller) {
     return controller && controller->hasCapabilities(m_capabilities);
 }
 
-
 Qn::ActionVisibility QnNonEmptyVideowallActionCondition::check(const QnResourceList &resources) {
     foreach(const QnResourcePtr &resource, resources) {
         if(!resource->hasFlags(QnResource::videowall)) 
@@ -729,8 +728,53 @@ Qn::ActionVisibility QnNonEmptyVideowallActionCondition::check(const QnResourceL
 
         return Qn::EnabledAction;
     }
-
     return Qn::InvisibleAction;
+}
+
+
+Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourceList &resources) {
+    foreach(const QnResourcePtr &resource, resources) {
+        if(!resource->hasFlags(QnResource::videowall)) 
+            continue;
+
+        QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
+        if (!videowall)
+            continue;
+
+        if (videowall->items()->getItems().isEmpty())
+            continue;
+
+        if (!QnWorkbenchLayout::instance(videowall))
+            continue;
+
+        return Qn::EnabledAction;
+    }
+    return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnRunningVideowallActionCondition::check(const QnResourceList &resources) {
+    bool hasNonEmptyVideowall = false;
+    foreach(const QnResourcePtr &resource, resources) {
+        if(!resource->hasFlags(QnResource::videowall)) 
+            continue;
+
+        QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
+        if (!videowall)
+            continue;
+
+        if (videowall->items()->getItems().isEmpty())
+            continue;
+
+        hasNonEmptyVideowall = true;
+        if (videowall->onlineItems().isEmpty())
+            continue;
+
+        return Qn::EnabledAction;
+    }
+
+    return hasNonEmptyVideowall 
+        ? Qn::DisabledAction
+        : Qn::InvisibleAction;
 }
 
 
@@ -739,6 +783,7 @@ Qn::ActionVisibility QnStartVideowallActionCondition::check(const QnResourceList
     if (pcUuid.isNull()) 
         return Qn::InvisibleAction;
 
+    bool hasAttachedItems = false;
     foreach(const QnResourcePtr &resource, resources) {
         if(!resource->hasFlags(QnResource::videowall)) 
             continue;
@@ -750,17 +795,34 @@ Qn::ActionVisibility QnStartVideowallActionCondition::check(const QnResourceList
         if (!videowall->pcs()->hasItem(pcUuid))
             continue;
 
-        foreach (const QnVideoWallItem &item, videowall->items()->getItems())
-            if (item.pcUuid == pcUuid)
+        foreach (const QnVideoWallItem &item, videowall->items()->getItems()) {
+            if (item.pcUuid != pcUuid)
+                continue;
+
+            if (!item.online)
                return Qn::EnabledAction;
+
+            hasAttachedItems = true;
+        }
     }
-    return Qn::InvisibleAction;
+
+    return hasAttachedItems 
+        ? Qn::DisabledAction
+        : Qn::InvisibleAction;
 }
 
 
 Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionParameters &parameters) {
-    if (parameters.videoWallItems().size() > 0)
-        return Qn::EnabledAction;
+    if (parameters.videoWallItems().size() > 0) {
+        // allow action if there is at least one online item
+        foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
+            if (index.isNull() || !index.videowall()->items()->hasItem(index.uuid()))
+                continue;
+            if (index.videowall()->items()->getItem(index.uuid()).online)
+                return Qn::EnabledAction;
+        }
+        return Qn::DisabledAction;
+    }
     return QnActionCondition::check(parameters);
 }
 

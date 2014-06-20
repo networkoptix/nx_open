@@ -29,6 +29,8 @@ public:
     bool isAutorun() const;
     void setAutorun(bool value);
 
+    /** Utility method to get IDs of all online items.  */
+    QList<QUuid> onlineItems() const;
 signals:
     void itemAdded(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);
     void itemRemoved(const QnVideoWallResourcePtr &resource, const QnVideoWallItem &item);

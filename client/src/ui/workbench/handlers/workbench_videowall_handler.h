@@ -65,7 +65,6 @@ private:
     /** Returns list of target videowall items for current layout. */
     QnVideoWallItemIndexList targetList() const;
 
-    QnWorkbenchLayout* findReviewModeLayout(const QnVideoWallResourcePtr &videoWall) const;
     QnLayoutResourcePtr findExistingResourceLayout(const QnResourcePtr &resource) const;
     QnLayoutResourcePtr constructLayout(const QnResourceList &resources) const;
 
