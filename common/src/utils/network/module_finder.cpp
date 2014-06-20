@@ -86,17 +86,23 @@ void QnModuleFinder::at_moduleFound(const QnModuleInformation &moduleInformation
 void QnModuleFinder::at_moduleLost(const QnModuleInformation &moduleInformation) {
     bool stay = true;
 
-    if (sender() == m_multicastModuleFinder && m_directModuleFinder) {
-        foreach (const QString &address, moduleInformation.remoteAddresses)
-            m_directModuleFinder->removeIgnoredAddress(QHostAddress(address), moduleInformation.port);
+    if (sender() == m_multicastModuleFinder) {
+        if (m_directModuleFinder) {
+            foreach (const QString &address, moduleInformation.remoteAddresses)
+                m_directModuleFinder->removeIgnoredAddress(QHostAddress(address), moduleInformation.port);
 
-        if (m_directModuleFinder->moduleInformation(moduleInformation.id).id.isNull())
+            if (m_directModuleFinder->moduleInformation(moduleInformation.id).id.isNull())
+                stay = false;
+        } else {
             stay = false;
+        }
     } else {
         if (m_multicastModuleFinder->moduleInformation(moduleInformation.id.toString()).id.isNull())
             stay = false;
     }
 
-    if (!stay)
+    if (!stay) {
+        m_foundModules.remove(moduleInformation.id);
         emit moduleLost(moduleInformation);
+    }
 }
