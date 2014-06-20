@@ -42,6 +42,7 @@ public:
     QString name;
 
     QnScreenSnaps screenSnaps;
+
     /** Status of the running videowall instance bound to this item. Runtime status, should not be serialized or saved. */
     bool online;
 

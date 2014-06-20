@@ -1902,7 +1902,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     queryItems.prepare("SELECT \
                        item.guid, item.pc_guid as pcGuid, item.layout_guid as layoutGuid, \
                        item.videowall_guid as videowallGuid, item.name, \
-                       item.x as left, item.y as top, item.w as width, item.h as height \
+                       item.snap_left as snapLeft, item.snap_top as snapTop, item.snap_rigth as snapRight, item.snap_bottom as snapBottom \
                        FROM vms_videowall_item item ORDER BY videowallGuid");
     if (!queryItems.exec()) {
         qWarning() << Q_FUNC_INFO << queryItems.lastError().text();
@@ -2315,9 +2315,9 @@ ErrorCode QnDbManager::updateVideowallItems(const ApiVideowallData& data) {
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT INTO vms_videowall_item \
-                     (guid, pc_guid, layout_guid, videowall_guid, name, x, y, w, h) \
+                     (guid, pc_guid, layout_guid, videowall_guid, name, snap_left, snap_top, snap_right, snap_bottom) \
                      VALUES \
-                     (:guid, :pcGuid, :layoutGuid, :videowall_guid, :name, :left, :top, :width, :height)");
+                     (:guid, :pcGuid, :layoutGuid, :videowall_guid, :name, :snapLeft, :snapTop, :snapRight, :snapBottom)");
     foreach(const ApiVideowallItemData& item, data.items)
     {
         QnSql::bind(item, &insQuery);
