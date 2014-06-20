@@ -44,17 +44,3 @@ QString HostAddress::toString() const
         m_addrStr = QLatin1String(inet_ntoa(m_sinAddr));
     return m_addrStr.get();
 }
-SocketAddress::SocketAddress( const QString& addrStr )
-:
-    port( 0 )
-{
-    const QStringList& tokens = addrStr.split( QLatin1Char(':') );
-    if( tokens.size() > 1 )
-        port = tokens[1].toUInt();
-    //TODO/IMPL
-}
-
-QString SocketAddress::toString() const
-{
-    return lit("%1:%2").arg(address.toString()).arg(port);
-}
