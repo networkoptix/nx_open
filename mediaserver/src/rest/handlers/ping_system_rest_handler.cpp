@@ -1,7 +1,10 @@
 #include "ping_system_rest_handler.h"
 
+#include "common/common_module.h"
+#include "utils/network/module_information.h"
 #include "utils/network/simple_http_client.h"
 #include "utils/network/tcp_connection_priv.h"
+#include "version.h"
 
 int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
     Q_UNUSED(path)
@@ -28,6 +31,25 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
 
     if (status != CL_HTTP_SUCCESS) {
         result.setReply(QJsonValue(lit("FAIL")));
+        return CODE_OK;
+    }
+
+    QByteArray data;
+    client.readAll(data);
+
+    QnJsonRestResult json;
+    QJson::deserialize(data, &json);
+    QnModuleInformation moduleInformation;
+    QJson::deserialize(json.reply(), &moduleInformation);
+
+    if (moduleInformation.systemName.isEmpty()) {
+        /* Hmm there's no system name. It would be wrong system. Reject it. */
+        result.setReply(QJsonValue(lit("FAIL")));
+        return CODE_OK;
+    }
+
+    if (moduleInformation.version != qnCommon->engineVersion() || moduleInformation.customization != lit(QN_CUSTOMIZATION_NAME)) {
+        result.setReply(QJsonValue(lit("INCOMPATIBLE")));
         return CODE_OK;
     }
 
