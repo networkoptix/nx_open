@@ -3,9 +3,10 @@
 #include <QtWidgets/QMessageBox>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
 #include <common/common_module.h>
 #include <utils/network/global_module_finder.h>
-#include <utils/change_system_name_peer_task.h>
+#include <utils/configure_peer_task.h>
 #include <utils/restart_peer_task.h>
 #include <utils/media_server_update_tool.h>
 #include <utils/common/software_version.h>
@@ -16,13 +17,13 @@
 QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject *parent) :
     QObject(parent),
     m_running(false),
-    m_changeSystemNameTask(new QnChangeSystemNamePeerTask(this)),
+    m_configureTask(new QnConfigurePeerTask(this)),
     m_restartPeerTask(new QnRestartPeerTask(this)),
     m_updateDialog(new QnUpdateDialog())
 {
     m_updateTool = m_updateDialog->updateTool();
 
-    connect(m_changeSystemNameTask,     &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_changeSystemNameTask_finished);
+    connect(m_configureTask,            &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_configureTask_finished);
     connect(m_restartPeerTask,          &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_restartPeerTask_finished);
     // queued connection is used to be sure that we'll get this signal AFTER it will be handled by update dialog
     connect(m_updateTool,               &QnMediaServerUpdateTool::stateChanged,     this,       &QnConnectToCurrentSystemTool::at_updateTool_stateChanged, Qt::QueuedConnection);
@@ -57,8 +58,16 @@ void QnConnectToCurrentSystemTool::changeSystemName() {
         return;
     }
 
-    m_changeSystemNameTask->setSystemName(qnCommon->localSystemName());
-    m_changeSystemNameTask->start(m_targets);
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::user)) {
+        QnUserResourcePtr user = resource.staticCast<QnUserResource>();
+        if (user->getName() == lit("admin")) {
+            m_configureTask->setPasswordHash(user->getHash(), user->getDigest());
+            break;
+        }
+    }
+
+    m_configureTask->setSystemName(qnCommon->localSystemName());
+    m_configureTask->start(m_targets);
 }
 
 void QnConnectToCurrentSystemTool::updatePeers() {
@@ -87,7 +96,7 @@ void QnConnectToCurrentSystemTool::restartPeers() {
     m_restartPeerTask->start(m_restartTargets);
 }
 
-void QnConnectToCurrentSystemTool::at_changeSystemNameTask_finished(int errorCode, const QSet<QnId> &failedPeers) {
+void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QnId> &failedPeers) {
     if (errorCode != 0) {
         finish(SystemNameChangeFailed);
         return;

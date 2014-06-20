@@ -104,10 +104,8 @@
 #include <rest/handlers/storage_status_rest_handler.h>
 #include <rest/handlers/time_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
-#include <rest/handlers/change_system_name_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
-#include <rest/handlers/change_admin_password_rest_handler.h>
 #include <rest/handlers/routing_information_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
@@ -970,10 +968,8 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/changeSystemName", new QnChangeSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/restart", new QnRestartRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/changeAdminPassword", new QnChangeAdminPasswordRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/routingInformation", new QnRoutingInformationRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS

@@ -5,7 +5,7 @@
 
 #include <utils/common/id.h>
 
-class QnChangeSystemNamePeerTask;
+class QnConfigurePeerTask;
 class QnRestartPeerTask;
 class QnUpdateDialog;
 class QnMediaServerUpdateTool;
@@ -37,7 +37,7 @@ private:
     void restartPeers();
 
 private slots:
-    void at_changeSystemNameTask_finished(int errorCode, const QSet<QnId> &failedPeers);
+    void at_configureTask_finished(int errorCode, const QSet<QnId> &failedPeers);
     void at_restartPeerTask_finished(int errorCode);
     void at_updateTool_stateChanged(int state);
 
@@ -47,7 +47,7 @@ private:
 
     QSet<QnId> m_restartTargets;
     QSet<QnId> m_updateTargets;
-    QnChangeSystemNamePeerTask *m_changeSystemNameTask;
+    QnConfigurePeerTask *m_configureTask;
     QnRestartPeerTask *m_restartPeerTask;
     QScopedPointer<QnUpdateDialog> m_updateDialog;
     QnMediaServerUpdateTool *m_updateTool;

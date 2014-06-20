@@ -138,7 +138,7 @@ void QnJoinSystemTool::joinResource() {
     apiUrl.setPassword(m_password);
     m_targetServer->apiConnection()->setUrl(apiUrl);
 
-    m_targetServer->apiConnection()->changeAdminPasswordAsync(hash, digest, this, SLOT(at_targetServer_adminPasswordChanged(int,int)));
+    m_targetServer->apiConnection()->configureAsync(true, qnCommon->localSystemName(), QString(), hash, digest, 0, this, SLOT(at_targetServer_configured(int,int)));
 }
 
 void QnJoinSystemTool::rediscoverPeer() {
@@ -232,19 +232,7 @@ void QnJoinSystemTool::at_hostLookedUp(const QHostInfo &hostInfo) {
     m_possibleAddresses = hostInfo.addresses();
 }
 
-void QnJoinSystemTool::at_targetServer_systemNameChanged(int status, int handle) {
-    Q_UNUSED(handle)
-
-    if (status != 0) {
-        finish(JoinError);
-        return;
-    }
-
-    // System name has been changed. Now discover it again. It must connect the server to us.
-    rediscoverPeer();
-}
-
-void QnJoinSystemTool::at_targetServer_adminPasswordChanged(int status, int handle) {
+void QnJoinSystemTool::at_targetServer_configured(int status, int handle) {
     Q_UNUSED(handle)
 
     if (status != 0) {
@@ -255,5 +243,5 @@ void QnJoinSystemTool::at_targetServer_adminPasswordChanged(int status, int hand
     // now revert to the default api url because the password has been reset to our own
     m_targetServer->apiConnection()->setUrl(m_oldApiUrl);
 
-    m_targetServer->apiConnection()->changeSystemNameAsync(qnCommon->localSystemName(), true, this, SLOT(at_targetServer_systemNameChanged(int,int)));
+    rediscoverPeer();
 }

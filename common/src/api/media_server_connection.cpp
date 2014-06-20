@@ -74,10 +74,9 @@ namespace {
         (BookmarkUpdateObject,     "cameraBookmarks/update")
         (BookmarkDeleteObject,     "cameraBookmarks/delete")
         (BookmarksGetObject,       "cameraBookmarks/get")
-        (ChangeSystemNameObject,   "changeSystemName")
         (InstallUpdateObject,      "installUpdate")
         (Restart,                  "restart")
-        (ChangeAdminPasswordObject,"changeAdminPassword")
+        (ConfigureObject,          "configure")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -309,16 +308,13 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case BookmarksGetObject:
         processJsonReply<QnCameraBookmarkList>(this, response, handle);
         break;
-    case ChangeSystemNameObject:
-        emitFinished(this, response.status, handle);
-        break;
     case InstallUpdateObject:
         emitFinished(this, response.status, handle);
         break;
     case Restart:
         emitFinished(this, response.status, handle);
         break;
-    case ChangeAdminPasswordObject:
+    case ConfigureObject:
         emitFinished(this, response.status, handle);
         break;
     default:
@@ -790,14 +786,6 @@ int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camer
     return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 
-int QnMediaServerConnection::changeSystemNameAsync(const QString &systemName, bool wholeSystem, QObject *target, const char *slot) {
-    QnRequestParamList params;
-    params << QnRequestParam("systemName", systemName);
-    params << QnRequestParam("wholeSystem", wholeSystem);
-
-    return sendAsyncGetRequest(ChangeSystemNameObject, params, NULL, target, slot);
-}
-
 int QnMediaServerConnection::installUpdate(const QString &updateId, const QByteArray &data, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("updateId", updateId);
@@ -809,10 +797,14 @@ int QnMediaServerConnection::restart(QObject *target, const char *slot) {
     return sendAsyncGetRequest(Restart, QnRequestParamList(), NULL, target, slot);
 }
 
-int QnMediaServerConnection::changeAdminPasswordAsync(const QByteArray &hash, const QByteArray &digest, QObject *target, const char *slot) {
+int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot) {
     QnRequestParamList params;
-    params << QnRequestParam("hash", QString::fromLatin1(hash));
-    params << QnRequestParam("digest", QString::fromLatin1(digest));
+    params << QnRequestParam("wholeSystem", wholeSystem);
+    params << QnRequestParam("systemName", systemName);
+    params << QnRequestParam("password", password);
+    params << QnRequestParam("passwordHash", QString::fromLatin1(passwordHash));
+    params << QnRequestParam("passwordDigest", QString::fromLatin1(passwordDigest));
+    params << QnRequestParam("port", port);
 
-    return sendAsyncGetRequest(ChangeAdminPasswordObject, params, NULL, target, slot);
+    return sendAsyncGetRequest(ConfigureObject, params, NULL, target, slot);
 }
