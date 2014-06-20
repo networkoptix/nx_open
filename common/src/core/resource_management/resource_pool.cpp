@@ -205,6 +205,17 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
             m_resources.erase( resIter );
             removedResources.append(resource);
         }
+        else
+        {
+            resIter = std::find_if(m_incompatibleResources.begin(), m_incompatibleResources.end(), MatchResourceByID(resource->getId()));
+            if (resIter != m_incompatibleResources.end())
+            {
+                m_incompatibleResources.erase(resIter);
+                removedResources.append(resource);
+            }
+        }
+
+
 
         resource->setResourcePool(NULL);
     }
