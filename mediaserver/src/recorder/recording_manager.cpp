@@ -51,11 +51,16 @@ void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
 
 void QnRecordingManager::deleteRecorder(const Recorders& recorders)
 {
-    if (recorders.recorderHiRes)
+    QnVideoCamera* camera = 0;
+    if (recorders.recorderHiRes) {
         recorders.recorderHiRes->stop();
-    if (recorders.recorderLowRes)
+        camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
+    }
+    if (recorders.recorderLowRes) {
         recorders.recorderLowRes->stop();
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
+        if (!camera)
+            camera = qnCameraPool->getVideoCamera(recorders.recorderLowRes->getResource());
+    }
     if (camera)
     {
         if (recorders.recorderHiRes) {
