@@ -7,6 +7,8 @@
 #endif
 
 #include <utils/serialization/binary_stream.h>
+#include <utils/network/socket.h>
+
 
 namespace ec2 {
 
