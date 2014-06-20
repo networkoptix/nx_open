@@ -27,6 +27,11 @@ public:
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;
 
+    /*! Hacky thing. This function emits moduleLost for every found module and then moduleFound for them.
+     * It's used to force a server to drop all its connections and find new.
+     */
+    void makeModulesReappear();
+
 public slots:
     void start();
     void stop();

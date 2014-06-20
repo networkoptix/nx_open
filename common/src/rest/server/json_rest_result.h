@@ -25,6 +25,7 @@ public:
         NoError = 0,
         MissingParameter = 1,
         InvalidParameter = 2,
+        InternalError = 3,
     };
 
     QnJsonRestResult();
@@ -40,6 +41,10 @@ public:
     template<class T>
     void setReply(const T &reply) {
         QJson::serialize(reply, &m_reply);
+    }
+
+    void setReply(const QJsonValue &reply) {
+        m_reply = reply;
     }
 
     QN_FUSION_DECLARE_FUNCTIONS(QnJsonRestResult, (json), friend)

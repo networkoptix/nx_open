@@ -109,6 +109,7 @@
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/handlers/change_admin_password_rest_handler.h>
 #include <rest/handlers/routing_information_rest_handler.h>
+#include <rest/handlers/configure_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
 
@@ -942,11 +943,9 @@ void QnMain::at_peerFound(const QnModuleInformation &moduleInformation, const QS
 void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
 
-    if (isCompatible(moduleInformation.version, qnCommon->engineVersion()) && moduleInformation.systemName == qnCommon->localSystemName()) {
-        foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
-            QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
-            ec2Connection->deleteRemotePeer(url);
-        }
+    foreach (const QString &remoteAddress, moduleInformation.remoteAddresses) {
+        QString url = QString(lit("http://%1:%2")).arg(remoteAddress).arg(moduleInformation.port);
+        ec2Connection->deleteRemotePeer(url);
     }
 }
 
@@ -976,6 +975,7 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/changeAdminPassword", new QnChangeAdminPasswordRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/routingInformation", new QnRoutingInformationRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif

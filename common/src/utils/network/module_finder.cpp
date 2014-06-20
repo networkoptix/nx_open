@@ -45,6 +45,14 @@ QnDirectModuleFinder *QnModuleFinder::directModuleFinder() const {
     return m_directModuleFinder;
 }
 
+void QnModuleFinder::makeModulesReappear() {
+    foreach (const QnModuleInformation &moduleInformation, m_foundModules) {
+        emit moduleLost(moduleInformation);
+        foreach (const QString &address, moduleInformation.remoteAddresses)
+            emit moduleFound(moduleInformation, address);
+    }
+}
+
 void QnModuleFinder::start() {
     m_multicastModuleFinder->start();
     if (m_directModuleFinder) {

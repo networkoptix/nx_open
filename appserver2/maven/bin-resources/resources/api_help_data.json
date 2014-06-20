@@ -958,6 +958,49 @@
                         }
                     ],
                     "result": "Return object in requested format"
+                },
+                {
+                    "name": "configure",
+                    "description": "Configure media server",
+                    "isGetter": false,
+                    "params": [
+                        {
+                            "name": "systemName",
+                            "description": "New system name.",
+                            "optional": true,
+                            "values": []
+                        },
+                        {
+                            "name": "wholeSystem",
+                            "description": "If true then change system name for the whole system. Default: false",
+                            "optional": true,
+                            "values": []
+                        },
+                        {
+                            "name": "port",
+                            "description": "New port. After changing port you must restart server.",
+                            "optional": true,
+                            "values": []
+                        },
+                        {
+                            "name": "password",
+                            "description": "New admin password. You can also set passwordHash and passwordDigest instead of password.",
+                            "optional": true,
+                            "values": []
+                        },
+                        {
+                            "name": "passwordHash",
+                            "description": "Hash of the new admin password. If you set it you should also specify passwordDigest.",
+                            "optional": true,
+                            "values": []
+                        },
+                        {
+                            "name": "passwordDigest",
+                            "description": "Digest hash of the new admin password. If you set it you should also specify passwordHash.",
+                            "optional": true,
+                            "values": []
+                        }
+                    ]
                 }
             ]
         }
