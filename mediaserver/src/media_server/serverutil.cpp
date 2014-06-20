@@ -2,9 +2,11 @@
 #include <QtCore/QUuid>
 #include <QtGui/QDesktopServices>
 #include <QtCore/QDir>
+#include <QtCore/QEventLoop>
+#include <QtCore/QFile>
 
 #include <core/resource/media_server_resource.h>
-
+#include <api/app_server_connection.h>
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
 #include "version.h"
@@ -115,4 +117,44 @@ QString getDataDirectory()
     const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
     return dataDirList.isEmpty() ? QString() : dataDirList[0];
 #endif
+}
+
+
+bool backupDatabase() {
+    QString dir = getDataDirectory() + lit("/");
+    QString fileName;
+    for (int i = -1; ; i++) {
+        QString suffix = (i < 0) ? QString() : lit("_") + QString::number(i);
+        fileName = dir + lit("ecs") + suffix + lit(".backup");
+        if (!QFile::exists(fileName))
+            break;
+    }
+
+    QFile file(fileName);
+    if (!file.open(QFile::WriteOnly))
+        return false;
+
+    QByteArray data;
+    ec2::ErrorCode errorCode;
+
+    QEventLoop loop;
+    auto dumpDatabaseHandler =
+        [&loop, &errorCode, &data] (int /*reqID*/, ec2::ErrorCode _errorCode, const QByteArray &dbData) {
+            errorCode = _errorCode;
+            data = dbData;
+            loop.quit();
+    };
+
+    QnAppServerConnectionFactory::getConnection2()->dumpDatabaseAsync(&loop, dumpDatabaseHandler);
+    loop.exec();
+
+    if (errorCode != ec2::ErrorCode::ok) {
+        NX_LOG(lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
+        return false;
+    }
+
+    file.write(data);
+    file.close();
+
+    return true;
 }
