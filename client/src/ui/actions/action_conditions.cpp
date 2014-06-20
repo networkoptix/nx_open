@@ -6,6 +6,7 @@
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item_index.h>
@@ -883,6 +884,34 @@ Qn::ActionVisibility QnEdgeServerCondition::check(const QnResourceList &resource
             return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
+
+Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParameters &parameters) {
+#ifdef Q_OS_WIN
+    if (!context()->user())
+        return Qn::InvisibleAction;
+
+    //TODO: #GDM #VW ask Roma to do some more stable way to find correct desktop camera
+    QRegExp desktopCameraNameRegExp(QString(lit("Desktop_camera_\\{.{36,36}\\}_%1")).arg(context()->user()->getName()));
+    QnVirtualCameraResourcePtr desktopCamera;
+
+    foreach (const QnResourcePtr &resource, qnResPool->getAllCameras(QnResourcePtr())) {
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera)
+            continue;
+        if (!desktopCameraNameRegExp.exactMatch(camera->getPhysicalId()))
+            continue;
+        desktopCamera = camera;
+        break;
+    }
+    if (!desktopCamera)
+        return Qn::InvisibleAction;
+
+    return Qn::EnabledAction;
+#else
+    return Qn::InvisibleAction;
+#endif
+}
+
 
 Qn::ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParameters &parameters) {
     if(!context()->instance<QnWorkbenchAutoStarter>()->isSupported())

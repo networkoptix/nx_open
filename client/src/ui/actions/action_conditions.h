@@ -560,6 +560,12 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
+class QnDesktopCameraActionCondition: public QnActionCondition {
+public:
+    QnDesktopCameraActionCondition(QObject *parent): QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 class QnLightModeCondition: public QnActionCondition {
 public:
     QnLightModeCondition(Qn::LightModeFlags flags, QObject *parent = NULL):
