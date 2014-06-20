@@ -72,7 +72,15 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
 
     changeSystemName(moduleInformation.systemName);
     changeAdminPassword(password);
-    discoverSystem(url);
+
+    if (qnResPool->getResourceById(moduleInformation.id).isNull()) {
+        if (!moduleInformation.remoteAddresses.contains(url.host())) {
+            QUrl simpleUrl = url;
+            url.setPath(QString());
+            ec2Connection()->getDiscoveryManager()->addDiscoveryInformation(moduleInformation.id, QList<QUrl>() << simpleUrl, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+        }
+        QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
+    }
 
     result.setReply(QJsonValue(lit("OK")));
     return CODE_OK;
@@ -104,8 +112,4 @@ void QnJoinSystemRestHandler::changeAdminPassword(const QString &password) {
             return;
         }
     }
-}
-
-void QnJoinSystemRestHandler::discoverSystem(const QUrl &url) {
-    QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
 }

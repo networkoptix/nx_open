@@ -10,7 +10,6 @@ public:
 private:
     void changeSystemName(const QString &systemName);
     void changeAdminPassword(const QString &password);
-    void discoverSystem(const QUrl &url);
 };
 
 #endif // JOIN_SYSTEM_REST_HANDLER_H
