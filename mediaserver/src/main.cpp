@@ -110,6 +110,7 @@
 #include <rest/handlers/routing_information_rest_handler.h>
 #include <rest/handlers/configure_rest_handler.h>
 #include <rest/handlers/join_system_rest_handler.h>
+#include <rest/handlers/backup_db_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
 
@@ -977,6 +978,7 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/routingInformation", new QnRoutingInformationRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/configure", new QnConfigureRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/joinSystem", new QnJoinSystemRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/backupDatabase", new QnBackupDbRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
