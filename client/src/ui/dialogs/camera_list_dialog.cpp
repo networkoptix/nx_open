@@ -72,6 +72,12 @@ QnCameraListDialog::~QnCameraListDialog() { }
 
 void QnCameraListDialog::setServer(const QnMediaServerResourcePtr &server) {
     m_model->setServer(server);
+    // This fix is for the first time, the user open the camera list that doesn't see
+    // the title of that dialog to indicate the camera numbers. I've noticed that the
+    // message/signal that invoke this updateWindowTitle slot will not be triggered 
+    // just by opening the dialog in the menu. This quick but not dirty fix just flush
+    // window title whenever a serverResource is changed .
+    updateWindowTitle();
 }
 
 QnMediaServerResourcePtr QnCameraListDialog::server() const {
