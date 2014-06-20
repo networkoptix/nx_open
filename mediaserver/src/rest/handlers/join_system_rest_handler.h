@@ -8,8 +8,8 @@ class QnJoinSystemRestHandler : public QnJsonRestHandler {
 public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result);
 private:
-    void changeSystemName(const QString &systemName);
-    void changeAdminPassword(const QString &password);
+    bool changeSystemName(const QString &systemName);
+    bool changeAdminPassword(const QString &password);
 };
 
 #endif // JOIN_SYSTEM_REST_HANDLER_H

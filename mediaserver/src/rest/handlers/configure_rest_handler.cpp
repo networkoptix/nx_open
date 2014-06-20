@@ -5,6 +5,7 @@
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
+#include "media_server/serverutil.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/media_server_resource.h"
@@ -61,6 +62,9 @@ int QnConfigureRestHandler::changeSystemName(const QString &systemName, bool who
         return ResultSkip;
     QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
     if (!server)
+        return ResultFail;
+
+    if (!backupDatabase())
         return ResultFail;
 
     MSSettings::roSettings()->setValue("systemName", systemName);

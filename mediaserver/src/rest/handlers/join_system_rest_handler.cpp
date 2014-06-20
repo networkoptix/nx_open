@@ -10,6 +10,7 @@
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
+#include "media_server/serverutil.h"
 #include "utils/network/simple_http_client.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/module_finder.h"
@@ -46,7 +47,7 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
     CLHttpStatus status = client.doGET(lit("api/moduleInformationAuthenticated"));
 
     if (status != CL_HTTP_SUCCESS) {
-        result.setReply(QJsonValue(lit("FAIL")));
+        result.setErrorString(lit("FAIL"));
         return CODE_OK;
     }
 
@@ -61,16 +62,19 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
 
     if (moduleInformation.systemName.isEmpty()) {
         /* Hmm there's no system name. It would be wrong system. Reject it. */
-        result.setReply(QJsonValue(lit("FAIL")));
+        result.setErrorString(lit("FAIL"));
         return CODE_OK;
     }
 
     if (moduleInformation.version != qnCommon->engineVersion() || moduleInformation.customization != lit(QN_CUSTOMIZATION_NAME)) {
-        result.setReply(QJsonValue(lit("INCOMPATIBLE")));
+        result.setErrorString(lit("INCOMPATIBLE"));
         return CODE_OK;
     }
 
-    changeSystemName(moduleInformation.systemName);
+    if (!changeSystemName(moduleInformation.systemName)) {
+        result.setErrorString(lit("BACKUP_ERROR"));
+        return CODE_OK;
+    }
     changeAdminPassword(password);
 
     if (qnResPool->getResourceById(moduleInformation.id).isNull()) {
@@ -82,12 +86,14 @@ int QnJoinSystemRestHandler::executeGet(const QString &path, const QnRequestPara
         QnModuleFinder::instance()->directModuleFinder()->checkUrl(url);
     }
 
-    result.setReply(QJsonValue(lit("OK")));
     return CODE_OK;
 }
 
-void QnJoinSystemRestHandler::changeSystemName(const QString &systemName) {
+bool QnJoinSystemRestHandler::changeSystemName(const QString &systemName) {
     QnMediaServerResourcePtr server = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+
+    if (!backupDatabase())
+        return false;
 
     if (systemName != qnCommon->localSystemName()) {
         MSSettings::roSettings()->setValue("systemName", systemName);
@@ -100,16 +106,19 @@ void QnJoinSystemRestHandler::changeSystemName(const QString &systemName) {
     /* disconnect from the original system */
     if (QnModuleFinder::instance())
         QnModuleFinder::instance()->makeModulesReappear();
+
+    return true;
 }
 
-void QnJoinSystemRestHandler::changeAdminPassword(const QString &password) {
+bool QnJoinSystemRestHandler::changeAdminPassword(const QString &password) {
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::user)) {
         QnUserResourcePtr user = resource.staticCast<QnUserResource>();
         if (user->getName() == lit("admin")) {
             user->setPassword(password);
             ec2Connection()->getUserManager()->save(user, this, [](int, ec2::ErrorCode) { return; });
             user->setPassword(QString());
-            return;
+            return true;
         }
     }
+    return false;
 }

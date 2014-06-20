@@ -30,7 +30,7 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
     CLHttpStatus status = client.doGET(lit("api/moduleInformationAuthenticated"));
 
     if (status != CL_HTTP_SUCCESS) {
-        result.setReply(QJsonValue(lit("FAIL")));
+        result.setErrorString(lit("FAIL"));
         return CODE_OK;
     }
 
@@ -44,16 +44,14 @@ int QnPingSystemRestHandler::executeGet(const QString &path, const QnRequestPara
 
     if (moduleInformation.systemName.isEmpty()) {
         /* Hmm there's no system name. It would be wrong system. Reject it. */
-        result.setReply(QJsonValue(lit("FAIL")));
+        result.setErrorString(lit("FAIL"));
         return CODE_OK;
     }
 
     if (moduleInformation.version != qnCommon->engineVersion() || moduleInformation.customization != lit(QN_CUSTOMIZATION_NAME)) {
-        result.setReply(QJsonValue(lit("INCOMPATIBLE")));
+        result.setErrorString(lit("INCOMPATIBLE"));
         return CODE_OK;
     }
-
-    result.setReply(QJsonValue(lit("OK")));
 
     return CODE_OK;
 }

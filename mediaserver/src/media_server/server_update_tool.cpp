@@ -15,6 +15,7 @@
 #include <utils/common/log.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
+#include <media_server/serverutil.h>
 
 #include <version.h>
 
@@ -240,13 +241,16 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
         cl_log.log("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
         return false;
     }
-    //TODO: #dklychkov ask about QN_ARM_BOX and uncomment
-    /*
+
     if (map.value(lit("modification")) != lit(QN_ARM_BOX)) {
         cl_log.log("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
         return false;
     }
-    */
+
+    if (!backupDatabase()) {
+        cl_log.log("Could not create database backup.", cl_logERROR);
+        return false;
+    }
 
     QString version = map.value(lit("version")).toString();
 
