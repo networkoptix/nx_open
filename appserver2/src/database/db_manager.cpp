@@ -1902,7 +1902,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     queryItems.prepare("SELECT \
                        item.guid, item.pc_guid as pcGuid, item.layout_guid as layoutGuid, \
                        item.videowall_guid as videowallGuid, item.name, \
-                       item.snap_left as snapLeft, item.snap_top as snapTop, item.snap_rigth as snapRight, item.snap_bottom as snapBottom \
+                       item.snap_left as snapLeft, item.snap_top as snapTop, item.snap_right as snapRight, item.snap_bottom as snapBottom \
                        FROM vms_videowall_item item ORDER BY videowallGuid");
     if (!queryItems.exec()) {
         qWarning() << Q_FUNC_INFO << queryItems.lastError().text();
