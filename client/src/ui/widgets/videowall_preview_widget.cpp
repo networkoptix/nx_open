@@ -65,6 +65,8 @@ void QnVideowallPreviewWidget::paintEvent(QPaintEvent *event) {
     if (targetRect.isNull())
         return;
 
+    targetRect = expanded(aspectRatio(unitedGeometry), targetRect, Qt::KeepAspectRatio).toRect();
+
     painter->fillRect(targetRect, palette().window());
 
     if (unitedGeometry.isNull())    //TODO: #GDM #VW replace by model.Valid

@@ -7,6 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <ui/common/geometry.h>
 #include <ui/processors/drag_process_handler.h>
 
 class DragProcessor;
@@ -14,7 +15,7 @@ class QAbstractAnimation;
 
 class QnVideowallModel;
 
-class QnVideowallPreviewWidget : public QWidget, public DragProcessHandler {
+class QnVideowallPreviewWidget : public QWidget, public DragProcessHandler, private QnGeometry {
     Q_OBJECT
     typedef QWidget base_type;
 public:
