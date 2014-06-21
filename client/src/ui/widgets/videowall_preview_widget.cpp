@@ -1,28 +1,69 @@
 #include "videowall_preview_widget.h"
 
+#include <QtGui/QIcon>
+
 #include <client/client_settings.h>
 
 #include <core/resource/videowall_resource.h>
 
+#include <ui/style/skin.h>
+
 #include <utils/common/string.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-class ModelScreenPart {
-public:
-    ModelScreenPart(const QRect &rect):
-        geometry(rect),
-        free(true){}
+namespace {
+    class ModelScreenPart {
+    public:
+        ModelScreenPart(const QRect &rect):
+            geometry(rect),
+            free(true){}
 
-    QRect geometry;
-    bool free;
-};
+        QRect geometry;
+        bool free;
+    };
 
+    class ModelScreen {
+    public:
+        ModelScreen(const QRect &rect):
+            geometry(rect)
+        {
+            int width = rect.width() / QnScreenSnap::snapsPerScreen();
+            int height = rect.height() / QnScreenSnap::snapsPerScreen();
+
+            for (int j = 0; j < QnScreenSnap::snapsPerScreen(); ++j) {
+                for (int k = 0; k < QnScreenSnap::snapsPerScreen(); ++k) {
+                    QRect partRect(rect.x() + width * j, rect.y() + height * k, width, height);
+                    parts << partRect;
+                } 
+            }
+        }
+
+
+        bool free() const {
+            return std::all_of(parts.cbegin(), parts.cend(), [](const ModelScreenPart &part) {return part.free;});
+        }
+
+        void setFree(bool value) {
+            std::transform(parts.begin(), parts.end(), parts.begin(), [value](ModelScreenPart part) {
+                part.free = value;
+                return part;
+            });
+        }
+
+
+        QRect geometry;
+        QList<ModelScreenPart> parts;
+    };
+
+    const qreal frameMargin = 0.04;
+    const qreal innerMargin = frameMargin * 2;
+}
 
 class QnVideowallModel {
 public:
     QnVideoWallResourcePtr videowall;
 
-    QList<ModelScreenPart> screenParts;
+    QList<ModelScreen> screens;
 };
 
 QnVideowallPreviewWidget::QnVideowallPreviewWidget(QWidget *parent /*= 0*/):
@@ -31,17 +72,7 @@ QnVideowallPreviewWidget::QnVideowallPreviewWidget(QWidget *parent /*= 0*/):
 {
      QDesktopWidget* desktop = qApp->desktop();
      for (int i = 0; i < desktop->screenCount(); ++i) {
-         QRect screen = desktop->screenGeometry(i);
-         int width = screen.width() / QnScreenSnap::snapsPerScreen();
-         int height = screen.height() / QnScreenSnap::snapsPerScreen();
-
-         for (int j = 0; j < QnScreenSnap::snapsPerScreen(); ++j) {
-             for (int k = 0; k < QnScreenSnap::snapsPerScreen(); ++k) {
-                 QRect partRect(screen.x() + width * j, screen.y() + height * k, width, height);
-                 m_model->screenParts << partRect;
-             } 
-         }
-
+         m_model->screens << desktop->screenGeometry(i);
      }
 
 }
@@ -65,15 +96,16 @@ void QnVideowallPreviewWidget::paintEvent(QPaintEvent *event) {
     if (targetRect.isNull())
         return;
 
-    targetRect = expanded(aspectRatio(unitedGeometry), targetRect, Qt::KeepAspectRatio).toRect();
-
     painter->fillRect(targetRect, palette().window());
+
+    targetRect = expanded(aspectRatio(unitedGeometry), targetRect, Qt::KeepAspectRatio).toRect();
 
     if (unitedGeometry.isNull())    //TODO: #GDM #VW replace by model.Valid
         return;
 
     // transform to paint in the desktop coordinate system
     QTransform scaleTransform(painter->transform());
+    scaleTransform.translate(targetRect.left(), targetRect.top());
     scaleTransform.scale(
         static_cast<qreal> (targetRect.width()) /  unitedGeometry.width(),
         static_cast<qreal> (targetRect.height()) /  unitedGeometry.height());
@@ -106,12 +138,16 @@ void QnVideowallPreviewWidget::paintEvent(QPaintEvent *event) {
     debugColors << Qt::red << Qt::blue << Qt::green << Qt::yellow;
 
     int idx = 0;
-    foreach (const ModelScreenPart &part, m_model->screenParts) {
-        if (!part.free)
-            continue;
-
-        painter->fillRect(part.geometry, debugColors[idx]);
-        idx = (idx + 1) % debugColors.size();
+    foreach (const ModelScreen &screen, m_model->screens) {
+        paintScreenFrame(painter.data(), screen.geometry);
+        if (screen.free()) {
+            paintPlaceholder(painter.data(), screen.geometry);
+        } else {
+            foreach (const ModelScreenPart &part, screen.parts) {
+                if (part.free)
+                    paintPlaceholder(painter.data(), part.geometry);
+            }
+        }
     }
 
     //TODO: draw placeholders with '+' sign
@@ -148,5 +184,47 @@ void QnVideowallPreviewWidget::submitToResource(const QnVideoWallResourcePtr &vi
 
     QnVideoWallItem item = newItem();
     videowall->items()->addItem(item);
+}
+
+
+void QnVideowallPreviewWidget::paintScreenFrame(QPainter *painter, const QRect &geometry)
+{
+    qreal margin = frameMargin * qMin(geometry.width(), geometry.height());
+    QRectF targetRect = eroded(geometry, margin);
+
+    QPainterPath path;
+    path.addRect(targetRect);
+
+    QPen borderPen(QColor(130, 130, 130, 200));
+    borderPen.setWidth(10);
+
+    QnScopedPainterPenRollback penRollback(painter, borderPen);
+    QnScopedPainterBrushRollback brushRollback(painter, QColor(130, 130, 130, 128));
+
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+
+    painter->drawPath(path);
+}
+
+
+void QnVideowallPreviewWidget::paintPlaceholder(QPainter* painter, const QRect &geometry) {
+    qreal margin = innerMargin * qMin(geometry.width(), geometry.height());
+
+    QRectF targetRect = eroded(geometry, margin);
+
+    QPainterPath path;
+    path.addRoundRect(targetRect, 25);
+
+    QPen borderPen(QColor(64, 130, 180, 200));
+    borderPen.setWidth(25);
+    
+    QnScopedPainterPenRollback penRollback(painter, borderPen);
+    QnScopedPainterBrushRollback brushRollback(painter, QColor(64, 130, 180, 128));
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+
+    painter->drawPath(path);
+
+    QRect iconRect(targetRect.center().toPoint(), QSize(200, 200));
+    painter->drawPixmap(iconRect, qnSkin->pixmap("item/ptz_zoom_in.png"));
 }
 

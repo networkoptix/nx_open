@@ -31,6 +31,11 @@ protected:
 private:
     void updateModel();
 
+
+    void paintScreenFrame(QPainter *painter, const QRect &geometry);
+    void paintPlaceholder(QPainter* painter, const QRect &geometry);
+    
+private:
     QScopedPointer<QnVideowallModel> m_model;
 };
 
