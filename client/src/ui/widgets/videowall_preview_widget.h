@@ -8,6 +8,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/common/geometry.h>
+
 #include <ui/processors/drag_process_handler.h>
 
 class DragProcessor;
@@ -28,13 +29,17 @@ public:
 protected:
     virtual void paintEvent(QPaintEvent *event) override;
 
+    virtual bool eventFilter(QObject *target, QEvent *event) override;
+
+    virtual void mouseReleaseEvent(QMouseEvent *event);
+    virtual void mouseMoveEvent(QMouseEvent *event);
+    
 private:
     void updateModel();
 
+    void paintScreenFrame(QPainter *painter, BaseModelItem &item);
+    void paintPlaceholder(QPainter* painter, BaseModelItem &item);
 
-    void paintScreenFrame(QPainter *painter, const QRect &geometry);
-    void paintPlaceholder(QPainter* painter, const QRect &geometry);
-    
 private:
     QScopedPointer<QnVideowallModel> m_model;
 };

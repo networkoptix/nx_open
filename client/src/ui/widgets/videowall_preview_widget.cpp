@@ -12,20 +12,30 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
-    class ModelScreenPart {
-    public:
-        ModelScreenPart(const QRect &rect):
-            geometry(rect),
-            free(true){}
+
+    struct BaseModelItem {
+        BaseModelItem(const QRect &rect):
+            geometry(rect) {}
 
         QRect geometry;
+        QPainterPath path;
+    };
+
+
+    struct ModelItem: BaseModelItem {
+    };
+
+    struct ModelScreenPart: BaseModelItem {
+        ModelScreenPart(const QRect &rect):
+            BaseModelItem(rect),
+            free(true){}
+
         bool free;
     };
 
-    class ModelScreen {
-    public:
+    struct ModelScreen: BaseModelItem {
         ModelScreen(const QRect &rect):
-            geometry(rect)
+            BaseModelItem(rect)
         {
             int width = rect.width() / QnScreenSnap::snapsPerScreen();
             int height = rect.height() / QnScreenSnap::snapsPerScreen();
@@ -50,8 +60,6 @@ namespace {
             });
         }
 
-
-        QRect geometry;
         QList<ModelScreenPart> parts;
     };
 
@@ -59,61 +67,86 @@ namespace {
     const qreal innerMargin = frameMargin * 2;
 }
 
-class QnVideowallModel {
+// TODO: refactor to Q_D
+class QnVideowallModel: private QnGeometry {
 public:
     QnVideoWallResourcePtr videowall;
+    QRect unitedGeometry;
 
+    QList<ModelItem> items;
     QList<ModelScreen> screens;
+
+    QTransform getTransform(const QRect &rect) {
+        if (m_widgetRect == rect)
+            return m_transform;
+
+        m_transform.reset();
+        m_transform.translate(rect.left(), rect.top());
+        m_transform.scale(
+            static_cast<qreal> (rect.width()) /  unitedGeometry.width(),
+            static_cast<qreal> (rect.height()) /  unitedGeometry.height());
+        m_transform.translate(-unitedGeometry.left(), -unitedGeometry.top());
+        m_invertedTransform = m_transform.inverted();
+
+        m_widgetRect = rect;
+        return m_transform;
+    }
+
+    QTransform getInvertedTransform(const QRect &rect) {
+        if (m_widgetRect != rect)
+            getTransform(rect);
+        return m_invertedTransform;
+    }
+
+    QRect targetRect(const QRect &rect) const {
+        if (unitedGeometry.isNull())    //TODO: #GDM #VW replace by model.Valid
+            return QRect();
+
+        return expanded(aspectRatio(unitedGeometry), rect, Qt::KeepAspectRatio).toRect();
+    }
+
+private:
+    QTransform m_transform;
+    QTransform m_invertedTransform;
+    QRect m_widgetRect;
 };
 
 QnVideowallPreviewWidget::QnVideowallPreviewWidget(QWidget *parent /*= 0*/):
-    QWidget(parent),
+    base_type(parent),
     m_model(new QnVideowallModel())
 {
-     QDesktopWidget* desktop = qApp->desktop();
-     for (int i = 0; i < desktop->screenCount(); ++i) {
-         m_model->screens << desktop->screenGeometry(i);
-     }
+    QRect unitedGeometry;
+    QDesktopWidget* desktop = qApp->desktop();
+    for (int i = 0; i < desktop->screenCount(); ++i) {
+        QRect screen = desktop->screenGeometry(i);
+        m_model->screens << screen;
+        unitedGeometry = unitedGeometry.united(screen);
+    }
+    m_model->unitedGeometry = unitedGeometry;
 
+    installEventFilter(this);
 }
 
 QnVideowallPreviewWidget::~QnVideowallPreviewWidget() { }
 
 void QnVideowallPreviewWidget::paintEvent(QPaintEvent *event) {
-    QDesktopWidget* desktop = qApp->desktop();
-    
-    QList<QRect> screens;
-    QRect unitedGeometry;
-    screens.reserve( desktop->screenCount());
-    for (int i = 0; i < desktop->screenCount(); i++) {
-        screens << desktop->screenGeometry(i);
-        unitedGeometry = unitedGeometry.united(desktop->screenGeometry(i));
-    }
-
     QScopedPointer<QPainter> painter(new QPainter(this));
 
-    QRect targetRect = event->rect();
-    if (targetRect.isNull())
+    QRect eventRect = event->rect();
+    if (eventRect.isNull())
         return;
 
-    painter->fillRect(targetRect, palette().window());
+    painter->fillRect(eventRect, palette().window());
 
-    targetRect = expanded(aspectRatio(unitedGeometry), targetRect, Qt::KeepAspectRatio).toRect();
-
-    if (unitedGeometry.isNull())    //TODO: #GDM #VW replace by model.Valid
+    if (m_model->unitedGeometry.isNull())    //TODO: #GDM #VW replace by model.Valid
         return;
+
+    QRect targetRect = m_model->targetRect(eventRect);
 
     // transform to paint in the desktop coordinate system
-    QTransform scaleTransform(painter->transform());
-    scaleTransform.translate(targetRect.left(), targetRect.top());
-    scaleTransform.scale(
-        static_cast<qreal> (targetRect.width()) /  unitedGeometry.width(),
-        static_cast<qreal> (targetRect.height()) /  unitedGeometry.height());
-    scaleTransform.translate(-unitedGeometry.left(), -unitedGeometry.top());
+    QTransform transform(m_model->getTransform(targetRect));
 
-    QnScopedPainterTransformRollback scaleRollback(painter.data(), scaleTransform);
-
-    //TODO: draw screen frames
+    QnScopedPainterTransformRollback transformRollback(painter.data(), transform);
 
     if (!m_model->videowall)
         return;
@@ -134,24 +167,18 @@ void QnVideowallPreviewWidget::paintEvent(QPaintEvent *event) {
         //TODO: draw small items
     }
 
-    QList<QColor> debugColors;
-    debugColors << Qt::red << Qt::blue << Qt::green << Qt::yellow;
-
     int idx = 0;
     foreach (const ModelScreen &screen, m_model->screens) {
-        paintScreenFrame(painter.data(), screen.geometry);
+        paintScreenFrame(painter.data(), screen);
         if (screen.free()) {
-            paintPlaceholder(painter.data(), screen.geometry);
+            paintPlaceholder(painter.data(), screen);
         } else {
             foreach (const ModelScreenPart &part, screen.parts) {
                 if (part.free)
-                    paintPlaceholder(painter.data(), part.geometry);
+                    paintPlaceholder(painter.data(), part);
             }
         }
     }
-
-    //TODO: draw placeholders with '+' sign
-
 }
 
 
@@ -187,13 +214,16 @@ void QnVideowallPreviewWidget::submitToResource(const QnVideoWallResourcePtr &vi
 }
 
 
-void QnVideowallPreviewWidget::paintScreenFrame(QPainter *painter, const QRect &geometry)
+void QnVideowallPreviewWidget::paintScreenFrame(QPainter *painter, BaseModelItem &item)
 {
+    QRect geometry = item.geometry;
+
     qreal margin = frameMargin * qMin(geometry.width(), geometry.height());
     QRectF targetRect = eroded(geometry, margin);
 
     QPainterPath path;
     path.addRect(targetRect);
+    item.path = path;
 
     QPen borderPen(QColor(130, 130, 130, 200));
     borderPen.setWidth(10);
@@ -207,13 +237,16 @@ void QnVideowallPreviewWidget::paintScreenFrame(QPainter *painter, const QRect &
 }
 
 
-void QnVideowallPreviewWidget::paintPlaceholder(QPainter* painter, const QRect &geometry) {
+void QnVideowallPreviewWidget::paintPlaceholder(QPainter* painter, BaseModelItem &item) {
+    QRect geometry = item.geometry;
+
     qreal margin = innerMargin * qMin(geometry.width(), geometry.height());
 
     QRectF targetRect = eroded(geometry, margin);
 
     QPainterPath path;
     path.addRoundRect(targetRect, 25);
+    item.path = path;
 
     QPen borderPen(QColor(64, 130, 180, 200));
     borderPen.setWidth(25);
@@ -224,7 +257,33 @@ void QnVideowallPreviewWidget::paintPlaceholder(QPainter* painter, const QRect &
 
     painter->drawPath(path);
 
-    QRect iconRect(targetRect.center().toPoint(), QSize(200, 200));
+    QRect iconRect(0, 0, 200, 200);
+    iconRect.moveCenter(targetRect.center().toPoint());
     painter->drawPixmap(iconRect, qnSkin->pixmap("item/ptz_zoom_in.png"));
+}
+
+bool QnVideowallPreviewWidget::eventFilter(QObject *target, QEvent *event) {
+//     if (event->type() == QEvent::LeaveWhatsThisMode)
+//         d->skipNextReleaseEvent = true;
+    return base_type::eventFilter(target, event);
+}
+
+void QnVideowallPreviewWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    /* if (&& !d->skipNextReleaseEvent) */
+    {
+
+        QTransform transform(m_model->getInvertedTransform(m_model->targetRect(this->rect())));
+        qDebug() << event->pos() << transform.map(event->pos());
+        //addItem
+    }
+    //d->skipNextReleaseEvent = false;
+}
+
+void QnVideowallPreviewWidget::mouseMoveEvent(QMouseEvent *event) {
+    QTransform transform(m_model->getInvertedTransform(m_model->targetRect(this->rect())));
+    qDebug() << transform.map(event->pos());
+
+
 }
 

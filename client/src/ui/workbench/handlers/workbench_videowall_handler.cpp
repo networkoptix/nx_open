@@ -502,20 +502,30 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
         QDesktopWidget* desktop = qApp->desktop();
         int maxIndex = desktop->screenCount() - 1;
 
-        auto xCoord = [desktop, maxIndex](const QnScreenSnap &snap) {
+        auto leftCoord = [desktop, maxIndex](const QnScreenSnap &snap) {
             QRect screenRect = desktop->screenGeometry(qMin(snap.screenIndex, maxIndex));
-            return screenRect.x() + (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+            return screenRect.left() + (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
         };
 
-        auto yCoord = [desktop, maxIndex](const QnScreenSnap &snap) {
+        auto topCoord = [desktop, maxIndex](const QnScreenSnap &snap) {
             QRect screenRect = desktop->screenGeometry(qMin(snap.screenIndex, maxIndex));
-            return screenRect.y() + (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+            return screenRect.top() + (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+        };
+
+        auto rightCoord = [desktop, maxIndex](const QnScreenSnap &snap) {
+            QRect screenRect = desktop->screenGeometry(qMin(snap.screenIndex, maxIndex));
+            return screenRect.right() - (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+        };
+
+        auto bottomCoord = [desktop, maxIndex](const QnScreenSnap &snap) {
+            QRect screenRect = desktop->screenGeometry(qMin(snap.screenIndex, maxIndex));
+            return screenRect.bottom() - (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
         };
 
         return QRect(
-            QPoint(xCoord(snaps.left), yCoord(snaps.top)),
-            QPoint(xCoord(snaps.right), yCoord(snaps.bottom))
-            );
+            QPoint(leftCoord(snaps.left), topCoord(snaps.top)),
+            QPoint(rightCoord(snaps.right), bottomCoord(snaps.bottom))
+            ).normalized(); //swap coords if screens were moved
     };
 
     QRect targetGeometry = geometryFromSnaps(item.screenSnaps);
