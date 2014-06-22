@@ -92,7 +92,7 @@ void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr
     QString url = QnAppServerConnectionFactory::defaultUrl().host();
     if (url.isEmpty())
         url = QLatin1String("127.0.0.1");
-    int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
+    int port = QUrl(resource->getApiUrl()).port(80);
     resource->apiConnection()->setProxyAddr(resource->getApiUrl(), url, port);
     disconnect(resource.data(), NULL, this, NULL);
     //connect(resource.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), 
@@ -114,7 +114,7 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource:
 
 void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy)
 {
-    if (data.peerId == qnCommon->moduleGUID())
+    if (data.peer.id == qnCommon->moduleGUID())
         return;
 
     if (isProxy) {

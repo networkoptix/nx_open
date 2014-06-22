@@ -28,7 +28,6 @@ public:
 
     static QString clientGuid();
     static QUrl defaultUrl();
-    static QByteArray prevSessionKey();
     static QUrl publicUrl();
     static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();

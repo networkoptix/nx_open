@@ -28,7 +28,7 @@ namespace ec2
         Qn::PeerType peerType;
 
         /** Additional info. */
-        QHash<QString, QString> params; // todo: #GDM #VW. remove it
+        QMap<QString, QString> params; // todo: #GDM #VW. remove it
     };
     typedef QSet<QnId> QnPeerSet;
 
