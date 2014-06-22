@@ -36,7 +36,8 @@
 #include "api_resource_type_data.h"
 #include "api_user_data.h"
 #include "api_videowall_data.h"
-
+#include "api_peer_data.h"
+#include "api_runtime_data.h"
 
 namespace ec2 {
 
@@ -321,7 +322,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
     fromApiToResourceList(src.cameraHistory, dst.cameraHistory);
 
-    dst.serverInfo = src.serverInfo;
+    //dst.serverInfo = src.serverInfo;
 }
 
 

@@ -2086,9 +2086,6 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     mergeObjectListData<ApiLayoutData>(data.layouts,        kvPairs, &ApiLayoutData::addParams,      &ApiResourceParamWithRefData::resourceId);
     mergeObjectListData<ApiVideowallData>(data.videowalls,  kvPairs, &ApiVideowallData::addParams,   &ApiResourceParamWithRefData::resourceId);
 
-    //filling serverinfo
-    fillServerInfo( &data.serverInfo );
-
     return err;
 }
 
@@ -2278,11 +2275,11 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFil
     return ErrorCode::ok;
 }
 
-void QnDbManager::fillServerInfo( ApiServerInfoData* const serverInfo )
+void QnDbManager::fillRuntimeInfo( ApiRuntimeData* const runtimeInfo )
 {
-    serverInfo->platform = QLatin1String(QN_ARM_BOX);
-    m_licenseManagerImpl->getHardwareId( serverInfo );
-    serverInfo->prematureLicenseExperationDate = licenseOverflowTime();
+    runtimeInfo->platform = QLatin1String(QN_ARM_BOX);
+    //m_licenseManagerImpl->getHardwareId( runtimeInfo );
+    runtimeInfo->prematureLicenseExperationDate = licenseOverflowTime();
 }
 
 ErrorCode QnDbManager::saveVideowall(const ApiVideowallData& params) {

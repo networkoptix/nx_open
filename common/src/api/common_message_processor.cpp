@@ -113,13 +113,19 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
 
 void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool /*isProxy*/)
 {
-    if (data.peerType == static_cast<int>(ec2::QnPeerInfo::Server))   //TODO: #Elric #ec2 get rid of the serialization hell
-        qnLicensePool->addRemoteHardwareIds(data.peerId, data.hardwareIds);
 }
 
-void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool /*isProxy*/)
+void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData runtimeInfo, bool /*isProxy*/)
 {
-    qnLicensePool->removeRemoteHardwareIds(data.peerId);
+    qnLicensePool->removeRemoteValidLicenses(runtimeInfo.peer.id);   //TODO: #Elric #ec2 get rid of the serialization hell
+    QnAppServerConnectionFactory::removeRuntimeInfo(runtimeInfo.peer.id);
+}
+
+void QnCommonMessageProcessor::on_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo)
+{
+    if (runtimeInfo.peer.peerType == Qn::PT_Server)   //TODO: #Elric #ec2 get rid of the serialization hell
+        qnLicensePool->addRemoteValidLicenses(runtimeInfo.peer.id, runtimeInfo.validLicenses);
+    QnAppServerConnectionFactory::addRuntimeInfo(runtimeInfo);
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
@@ -131,12 +137,6 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResour
     onGotInitialNotification(fullData);
 }
 
-void QnCommonMessageProcessor::on_runtimeInfoChanged( const ec2::ApiServerInfoData& runtimeInfo )
-{
-    QnAppServerConnectionFactory::setPublicIp(runtimeInfo.publicIp);
-    QnAppServerConnectionFactory::setSessionKey(runtimeInfo.sessionKey);
-    QnAppServerConnectionFactory::setPrematureLicenseExperationDate(runtimeInfo.prematureLicenseExperationDate);
-}
 
 void QnCommonMessageProcessor::on_resourceStatusChanged( const QnId& resourceId, QnResource::Status status )
 {
@@ -248,12 +248,13 @@ void QnCommonMessageProcessor::afterRemovingResource(const QnId& id) {
     }
 }
 
+/*
 void QnCommonMessageProcessor::updateHardwareIds(const ec2::QnFullResourceData& fullData)
 {
     qnLicensePool->setMainHardwareIds(fullData.serverInfo.mainHardwareIds);
     qnLicensePool->setCompatibleHardwareIds(fullData.serverInfo.compatibleHardwareIds);
-    qnLicensePool->setRemoteHardwareIds( fullData.serverInfo.remoteHardwareIds);
 }
+*/
 
 void QnCommonMessageProcessor::processResources(const QnResourceList& resources)
 {
@@ -277,12 +278,12 @@ void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryLis
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
-    QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
+    //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
 
-    updateHardwareIds(fullData);
+    //updateHardwareIds(fullData);
     processResources(fullData.resources);
     processLicenses(fullData.licenses);
     processCameraServerItems(fullData.cameraHistory);
-    on_runtimeInfoChanged(fullData.serverInfo);
+    //on_runtimeInfoChanged(fullData.serverInfo);
     qnSyncTime->reset();
 }

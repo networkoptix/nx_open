@@ -644,11 +644,10 @@ void initAppServerConnection(const QSettings &settings)
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
     cl_log.log("Connect to enterprise controller server ", urlNoPassword.toString(), cl_logINFO);
-    QnAppServerConnectionFactory::setAuthKey(authKey());
+    //QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
-    QnAppServerConnectionFactory::setBox(lit(QN_ARM_BOX));
 }
 
 QnMain::QnMain(int argc, char* argv[])
@@ -1146,8 +1145,10 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
 
-    QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
-    QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
+    ec2::ApiRuntimeData runtimeInfo = qnCommon->localRuntimeInfo();
+    runtimeInfo.publicIP = connectInfo->publicIp;
+    runtimeInfo.box = lit(QN_ARM_BOX);
+    qnCommon->setLocalRuntimeInfo(runtimeInfo);
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());

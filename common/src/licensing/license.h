@@ -13,6 +13,7 @@
 #include <QtCore/QTextStream>
 
 #include "core/resource/resource_fwd.h"
+#include "utils/common/latin1_array.h"
 #include "utils/common/id.h"
 
 #ifdef __APPLE__
@@ -184,11 +185,11 @@ public:
     QList<QByteArray> allHardwareIds() const;
     QList<QByteArray> allLocalHardwareIds() const;
 
-    QMap<QnId, QList<QByteArray>> remoteHardwareIds() const;
-    QList<QByteArray> allRemoteHardwareIds() const;
-    void setRemoteHardwareIds(const QMap<QnId, QList<QByteArray>>& hardwareIds);
-    void addRemoteHardwareIds(const QnId& peer, const QList<QByteArray>& hardwareIds);
-    void removeRemoteHardwareIds(const QnId& peer);
+    QMap<QnId, QList<QnLatin1Array>> remoteValidLicenses() const;
+    QList<QnLatin1Array> allRemoteValidLicenses() const;
+    void setRemoteValidLicenses(const QMap<QnId, QList<QnLatin1Array>>& licenses);
+    void addRemoteValidLicenses(const QnId& peer, const QList<QnLatin1Array>& licenses);
+    void removeRemoteValidLicenses(const QnId& peer);
 
     QByteArray currentHardwareId() const;
     bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
@@ -209,8 +210,8 @@ private:
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
 
-    QList<QByteArray> m_remoteHardwareIds;
-    QMap<QnId, QList<QByteArray>> m_remoteHardwareIdsMap;
+    QList<QnLatin1Array> m_remoteValidLicenses;
+    QMap<QnId, QList<QnLatin1Array>> m_remoteValidLicenseMap;
 };
 
 #define qnLicensePool QnLicensePool::instance()

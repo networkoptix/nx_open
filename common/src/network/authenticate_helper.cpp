@@ -98,9 +98,9 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
         if (customAuthInfoPos >= 0) {
             QString digest = cookie.mid(customAuthInfoPos + QByteArray("authinfo=").length(), 32);
-            if (doCustomAuthorization(digest.toLatin1(), response, QnAppServerConnectionFactory::sessionKey()))
+            if (doCustomAuthorization(digest.toLatin1(), response, qnCommon->localRuntimeInfo().sessionKey))
                 return true;
-            if (doCustomAuthorization(digest.toLatin1(), response, QnAppServerConnectionFactory::prevSessionKey()))
+            if (doCustomAuthorization(digest.toLatin1(), response, qnCommon->localRuntimeInfo().prevSessionKey))
                 return true;
         }
     }

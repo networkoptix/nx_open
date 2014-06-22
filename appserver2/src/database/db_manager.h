@@ -7,7 +7,7 @@
 #include "nx_ec/data/api_fwd.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
-
+#include "nx_ec/data/api_runtime_data.h"
 
 namespace ec2
 {
@@ -330,7 +330,7 @@ namespace ec2
         bool updateGuids();
         QnId getType(const QString& typeName);
         bool loadHelpData(const QString& fileName);
-        void fillServerInfo( ApiServerInfoData* const serverInfo );
+        void fillRuntimeInfo( ApiRuntimeData* const runtimeInfo );
     private:
         QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;

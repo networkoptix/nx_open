@@ -6,6 +6,7 @@
 
 #include <utils/common/singleton.h>
 #include <utils/common/instance_storage.h>
+#include "nx_ec/data/api_runtime_data.h"
 
 class QnSessionManager;
 class QnResourceDataPool;
@@ -47,6 +48,9 @@ public:
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
 
+    ec2::ApiRuntimeData localRuntimeInfo();
+    void setLocalRuntimeInfo(const ec2::ApiRuntimeData& data);
+
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
@@ -58,6 +62,7 @@ private:
     QUuid m_uuid;
     QUrl m_url;
     bool m_cloudMode;
+    ec2::ApiRuntimeData m_localRuntimeInfo;
 };
 
 #define qnCommon (QnCommonModule::instance())

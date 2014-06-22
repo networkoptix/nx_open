@@ -38,3 +38,13 @@ void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QStrin
     
     assert(!required || loaded); /* Getting an assert here? Something is wrong with resource data json file. */
 }
+
+ec2::ApiRuntimeData QnCommonModule::localRuntimeInfo()
+{
+    return m_localRuntimeInfo;
+}
+
+void QnCommonModule::setLocalRuntimeInfo(const ec2::ApiRuntimeData& data)
+{
+    m_localRuntimeInfo = data;
+}

@@ -25,20 +25,11 @@
 // -------------------------------------------------------------------------- //
 Q_GLOBAL_STATIC(QnAppServerConnectionFactory, qn_appServerConnectionFactory_instance)
 
-QnAppServerConnectionFactory::QnAppServerConnectionFactory(): 
-    m_prematureLicenseExperationDate(0),
-    m_defaultMediaProxyPort(0)
+QnAppServerConnectionFactory::QnAppServerConnectionFactory()
 {}
 
 QnAppServerConnectionFactory::~QnAppServerConnectionFactory() {
     return;
-}
-
-void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_defaultMediaProxyPort = port;
-    }
 }
 
 void QnAppServerConnectionFactory::setCurrentVersion(const QnSoftwareVersion &version)
@@ -48,61 +39,18 @@ void QnAppServerConnectionFactory::setCurrentVersion(const QnSoftwareVersion &ve
     }
 }
 
-QByteArray QnAppServerConnectionFactory::prevSessionKey()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
-        return factory->m_prevSessionKey;
-    return QByteArray();
-}
-
-
-QByteArray QnAppServerConnectionFactory::sessionKey()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
-            return factory->m_sessionKey;
-    return QByteArray();
-}
-
-void QnAppServerConnectionFactory::setSessionKey(const QByteArray& sessionKey)
+void QnAppServerConnectionFactory::addRuntimeInfo(const ec2::ApiRuntimeData& value)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        if (sessionKey != factory->m_sessionKey) {
-            factory->m_prevSessionKey = factory->m_sessionKey;
-            factory->m_sessionKey = sessionKey.trimmed();
-        }
+        factory->m_runtimeInfo.insert(value.peer.id, value);
     }
 }
 
-qint64 QnAppServerConnectionFactory::prematureLicenseExperationDate()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
-        return factory->m_prematureLicenseExperationDate;
-    return 0;
-}
-
-void QnAppServerConnectionFactory::setPrematureLicenseExperationDate(qint64 value)
+void QnAppServerConnectionFactory::removeRuntimeInfo(const QnId& peerId)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        if (value != factory->m_prematureLicenseExperationDate) {
-            factory->m_prematureLicenseExperationDate = value;
-        }
+        factory->m_runtimeInfo.remove(peerId);
     }
-}
-
-void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_publicUrl.setHost(publicIp);
-    }
-}
-
-int QnAppServerConnectionFactory::defaultMediaProxyPort()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        return factory->m_defaultMediaProxyPort;
-    }
-
-    return 0;
 }
 
 QnSoftwareVersion QnAppServerConnectionFactory::currentVersion()
@@ -121,24 +69,6 @@ QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
     }
 
     return 0;
-}
-
-QString QnAppServerConnectionFactory::authKey()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        return factory->m_authKey;
-    }
-
-    return QString();
-}
-
-QString QnAppServerConnectionFactory::box()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        return factory->m_box;
-    }
-
-    return QString();
 }
 
 QString QnAppServerConnectionFactory::clientGuid()
@@ -166,20 +96,6 @@ QUrl QnAppServerConnectionFactory::publicUrl()
     }
 
     return QUrl();
-}
-
-void QnAppServerConnectionFactory::setBox(const QString &box)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_box = box;
-    }
-}
-
-void QnAppServerConnectionFactory::setAuthKey(const QString &authKey)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_authKey = authKey;
-    }
 }
 
 void QnAppServerConnectionFactory::setClientGuid(const QString &guid)

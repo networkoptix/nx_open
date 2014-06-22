@@ -42,13 +42,13 @@ namespace ec2
     void RemoteEC2Connection::startReceivingNotifications() {
 
         // in remote mode we are always working as a client
-        QnPeerInfo localPeer(qnCommon->moduleGUID(), QnPeerInfo::DesktopClient);
+        ApiPeerData localPeer(qnCommon->moduleGUID(), Qn::PT_DesktopClient);
 
         QUuid videowallGuid = QnAppServerConnectionFactory::videowallGuid();
         if (!videowallGuid.isNull()) {
-            localPeer.peerType = QnPeerInfo::VideowallClient;
-            localPeer.params["videowallGuid"] = videowallGuid.toString();
-            localPeer.params["instanceGuid"] = QnAppServerConnectionFactory::instanceGuid().toString();
+            localPeer.peerType = Qn::PT_VideowallClient;
+            //localPeer.params["videowallGuid"] = videowallGuid.toString();
+            //localPeer.params["instanceGuid"] = QnAppServerConnectionFactory::instanceGuid().toString();
         }
         
         QnTransactionMessageBus::instance()->setLocalPeer(localPeer);

@@ -12,6 +12,7 @@
 #include <utils/common/singleton.h>
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_server_alive_data.h"
+#include "nx_ec/data/api_runtime_data.h"
 
 class QnCommonMessageProcessor: public QObject, public Singleton<QnCommonMessageProcessor>
 {
@@ -50,7 +51,7 @@ protected:
     
     virtual void afterRemovingResource(const QnId &id);
 
-    void updateHardwareIds(const ec2::QnFullResourceData &fullData);
+    //void updateHardwareIds(const ec2::QnFullResourceData &fullData);
     virtual void processResources(const QnResourceList &resources);
     void processLicenses(const QnLicenseList &licenses);
     void processCameraServerItems(const QnCameraHistoryList &cameraHistoryList);
@@ -59,7 +60,7 @@ public slots:
     void on_licenseChanged(const QnLicensePtr &license);
 private slots:
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
-    void on_runtimeInfoChanged(const ec2::ApiServerInfoData &runtimeInfo);
+    void on_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
 
     void on_resourceStatusChanged(const QnId &resourceId, QnResource::Status status );
     void on_resourceParamsChanged(const QnId& resourceId, const QnKvPairList& kvPairs );
@@ -78,7 +79,7 @@ private slots:
 
     void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
     void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
-
+    
 protected:
     ec2::AbstractECConnectionPtr m_connection;
     QMap<QnId, QnBusinessEventRulePtr> m_rules;

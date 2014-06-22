@@ -34,10 +34,10 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url, const QUuid& peer = QUuid());
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QnPeerInfo &remotePeer, QList<QByteArray> hwList);
+        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const ApiPeerData &remotePeer);
         
-        void setLocalPeer(const QnPeerInfo localPeer);
-        QnPeerInfo localPeer() const;
+        void setLocalPeer(const ApiPeerData localPeer);
+        ApiPeerData localPeer() const;
 
         void start();
 
@@ -75,12 +75,11 @@ namespace ec2
 
         struct AlivePeerInfo
         {
-            AlivePeerInfo(): peer(QnId(), QnPeerInfo::Server), isProxy(false) { lastActivity.restart(); }
-            AlivePeerInfo(const QnPeerInfo &peer, bool isProxy, QList<QByteArray> hwList): peer(peer), isProxy(isProxy), hwList(hwList) { lastActivity.restart(); }
-            QnPeerInfo peer;
+            AlivePeerInfo(): peer(QnId(), Qn::PT_Server), isProxy(false) { lastActivity.restart(); }
+            AlivePeerInfo(const ApiPeerData &peer, bool isProxy): peer(peer), isProxy(isProxy) { lastActivity.restart(); }
+            ApiPeerData peer;
             bool isProxy;
             QElapsedTimer lastActivity;
-            QList<QByteArray> hwList;
         };
         typedef QMap<QnId, AlivePeerInfo> AlivePeersMap;
 
@@ -163,10 +162,10 @@ namespace ec2
         void onGotDistributedMutexTransaction(const QnTransaction<ApiLockData>& tran);
         void queueSyncRequest(QnTransactionTransport* transport);
 
-        void connectToPeerEstablished(const QnPeerInfo &peerInfo, const QList<QByteArray>& hwList);
+        void connectToPeerEstablished(const ApiPeerData &peerInfo);
         void connectToPeerLost(const QnId& id);
-        void handlePeerAliveChanged(const QnPeerInfo& peer, bool isAlive, const QList<QByteArray>& hwList);
-        void sendVideowallInstanceStatus(const QnPeerInfo &peer, bool isAlive);
+        void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive);
+        void sendVideowallInstanceStatus(const ApiPeerData &peer, bool isAlive);
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran);
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
@@ -179,7 +178,7 @@ namespace ec2
 
     private:
         /** Info about us. Should be set before start(). */
-        QnPeerInfo m_localPeer;
+        ApiPeerData m_localPeer;
 
         QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;

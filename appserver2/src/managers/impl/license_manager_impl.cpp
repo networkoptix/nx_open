@@ -73,13 +73,14 @@ namespace ec2
         return ErrorCode::notImplemented;
     }
 
-    void LicenseManagerImpl::getHardwareId( ApiServerInfoData* const serverInfo )
+    /*
+    void LicenseManagerImpl::getHardwareId( ApiRuntimeData* const serverInfo )
     {
         int guidCompatibility = 0;
 
         // TODO: #Ivan, add guidCompatibility to settings
         serverInfo->mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
         serverInfo->compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
-        serverInfo->remoteHardwareIds = qnLicensePool->remoteHardwareIds();
     }
+    */
 }

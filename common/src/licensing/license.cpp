@@ -17,6 +17,7 @@
 #include <utils/common/synctime.h>
 #include <utils/common/product_features.h>
 #include <api/app_server_connection.h>
+#include "common/common_module.h"
 
 namespace {
     const char *networkOptixRSAPublicKey = "-----BEGIN PUBLIC KEY-----\n"
@@ -157,7 +158,7 @@ bool QnLicense::isValid(const QList<QByteArray>& hardwareIds, const QString& bra
     // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
     // We just allow empty brand for all, because we believe license is correct.
 
-    QString box = QnAppServerConnectionFactory::box();
+    QString box = qnCommon->localRuntimeInfo().box;
     // 1. edge licenses can be activated only if box is "isd"
     // 2. if box is "isd" only edge licenses AND any trial can be activated
 
@@ -498,7 +499,7 @@ QList<QByteArray> QnLicensePool::compatibleHardwareIds() const
 
 QList<QByteArray> QnLicensePool::allHardwareIds() const
 {
-    return m_mainHardwareIds + m_compatibleHardwareIds + m_remoteHardwareIds;
+    return m_mainHardwareIds + m_compatibleHardwareIds;
 }
 
 QList<QByteArray> QnLicensePool::allLocalHardwareIds() const
@@ -506,40 +507,40 @@ QList<QByteArray> QnLicensePool::allLocalHardwareIds() const
     return m_mainHardwareIds + m_compatibleHardwareIds;
 }
 
-QList<QByteArray> QnLicensePool::allRemoteHardwareIds() const
+QList<QnLatin1Array> QnLicensePool::allRemoteValidLicenses() const
 {
-    return m_remoteHardwareIds;
+    return m_remoteValidLicenses;
 }
 
-QMap<QnId, QList<QByteArray>> QnLicensePool::remoteHardwareIds() const
+QMap<QnId, QList<QnLatin1Array>> QnLicensePool::remoteValidLicenses() const
 {
-    return m_remoteHardwareIdsMap;
+    return m_remoteValidLicenseMap;
 }
 
-void QnLicensePool::addRemoteHardwareIds(const QnId& peer, const QList<QByteArray>& hardwareIds)
+void QnLicensePool::addRemoteValidLicenses(const QnId& peer, const QList<QnLatin1Array>& licenses)
 {
-    m_remoteHardwareIdsMap.insert(peer, hardwareIds);
+    m_remoteValidLicenseMap.insert(peer, licenses);
     updateRemoteIdList();
 }
 
-void QnLicensePool::setRemoteHardwareIds(const QMap<QnId, QList<QByteArray>>& hardwareIds)
+void QnLicensePool::setRemoteValidLicenses(const QMap<QnId, QList<QnLatin1Array>>& licenseMap)
 {
-    m_remoteHardwareIdsMap = hardwareIds;
+    m_remoteValidLicenseMap = licenseMap;
     updateRemoteIdList();
 }
 
-void QnLicensePool::removeRemoteHardwareIds(const QnId& peer)
+void QnLicensePool::removeRemoteValidLicenses(const QnId& peer)
 {
-    m_remoteHardwareIdsMap.remove(peer);
+    m_remoteValidLicenseMap.remove(peer);
     updateRemoteIdList();
 }
 
 void QnLicensePool::updateRemoteIdList()
 {
-    QList<QByteArray> allHwId;
-    foreach(const QList<QByteArray>& hwIDs, m_remoteHardwareIdsMap.values())
-        allHwId << hwIDs;
-    m_remoteHardwareIds = allHwId;
+    QList<QnLatin1Array> mergedData;
+    foreach(const QList<QnLatin1Array>& value, m_remoteValidLicenseMap.values())
+        mergedData << value;
+    m_remoteValidLicenses = mergedData;
 }
 
 QByteArray QnLicensePool::currentHardwareId() const
