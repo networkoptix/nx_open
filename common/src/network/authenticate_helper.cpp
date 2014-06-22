@@ -98,9 +98,10 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
         if (customAuthInfoPos >= 0) {
             QString digest = cookie.mid(customAuthInfoPos + QByteArray("authinfo=").length(), 32);
-            if (doCustomAuthorization(digest.toLatin1(), response, qnCommon->localRuntimeInfo().sessionKey))
+            QMutexLocker lock(&m_sessionKeyMutex);
+            if (doCustomAuthorization(digest.toLatin1(), response, m_sessionKey))
                 return true;
-            if (doCustomAuthorization(digest.toLatin1(), response, qnCommon->localRuntimeInfo().prevSessionKey))
+            if (doCustomAuthorization(digest.toLatin1(), response, m_prevSessionKey))
                 return true;
         }
     }
@@ -395,4 +396,11 @@ void QnAuthHelper::at_resourcePool_resourceRemoved(const QnResourcePtr &res)
     QMutexLocker lock(&m_mutex);
 
     m_users.remove(res->getId());
+}
+
+void QnAuthHelper::setSessionKey(const QByteArray& value)
+{
+    QMutexLocker lock(&m_sessionKeyMutex);
+    m_prevSessionKey = m_sessionKey;
+    m_sessionKey = value;
 }

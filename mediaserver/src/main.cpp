@@ -143,6 +143,7 @@
 #include "compatibility.h"
 #include "media_server/file_connection_processor.h"
 #include "streaming/hls/hls_session_pool.h"
+#include "managers/runtime_info_manager.h"
 
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
@@ -1061,6 +1062,7 @@ void QnMain::run()
     }
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
+    QScopedPointer<ec2::QnRuntimeInfoManager> runtimeInfoManager(new ec2::QnRuntimeInfoManager());
 
     // Create SessionManager
     QnSessionManager::instance()->start();
@@ -1115,6 +1117,8 @@ void QnMain::run()
     connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageManager_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
     connect(QnStorageManager::instance(), SIGNAL(rebuildFinished()), this, SLOT(at_storageManager_rebuildFinished()));
 
+    connect(QnLicensePool::instance(), &QnLicensePool::licensesChanged, this, &QnMain::at_licenseListChanged);
+
     qnCommon->setModuleGUID(serverGuid());
     qnCommon->setLocalSystemName(settings->value("systemName").toString());
 
@@ -1145,10 +1149,13 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
 
-    ec2::ApiRuntimeData runtimeInfo = qnCommon->localRuntimeInfo();
+
+    ec2::ApiRuntimeData runtimeInfo;
     runtimeInfo.publicIP = connectInfo->publicIp;
     runtimeInfo.box = lit(QN_ARM_BOX);
-    qnCommon->setLocalRuntimeInfo(runtimeInfo);
+    runtimeInfo.peer.id = qnCommon->moduleGUID();
+    runtimeInfo.peer.peerType = Qn::PT_Server;
+    ec2::QnRuntimeInfoManager::instance()->update(runtimeInfo);
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
@@ -1548,6 +1555,14 @@ void QnMain::at_appStarted()
 {
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
 };
+
+void QnMain::at_licenseListChanged()
+{
+    QList<QnLatin1Array> licenseList = QnLicensePool::instance()->allLocalValidLicenses();
+    ec2::ApiRuntimeData data = ec2::QnRuntimeInfoManager::instance()->data().value(qnCommon->moduleGUID());
+    data.validLicenses = licenseList;
+    ec2::QnRuntimeInfoManager::instance()->update(data);
+}
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {

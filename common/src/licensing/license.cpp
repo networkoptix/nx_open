@@ -152,13 +152,16 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-bool QnLicense::isValid(const QList<QByteArray>& hardwareIds, const QString& brand, ErrorCode* errCode) const
+bool QnLicense::isValid(const QString& brand, ErrorCode* errCode, bool checkForeignLicenses) const
 {
+    if (checkForeignLicenses && QnLicensePool::instance()->allRemoteValidLicenses().contains(m_key))
+        return true; // it is valid license from a remote peer
+
     // >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
     // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
     // We just allow empty brand for all, because we believe license is correct.
 
-    QString box = qnCommon->localRuntimeInfo().box;
+    QString box = lit(QN_ARM_BOX);
     // 1. edge licenses can be activated only if box is "isd"
     // 2. if box is "isd" only edge licenses AND any trial can be activated
 
@@ -168,7 +171,8 @@ bool QnLicense::isValid(const QList<QByteArray>& hardwareIds, const QString& bra
         return false;
     }
 
-    if (!hardwareIds.contains(m_hardwareId)) {
+    if (!QnLicensePool::instance()->allHardwareIds().contains(m_hardwareId))
+    {
         if (errCode)
             *errCode = InvalidHardwareID;
         return false;
@@ -374,7 +378,7 @@ int QnLicenseListHelper::totalCamerasByClass(bool analog) const
 
     foreach (QnLicensePtr license, m_licenseDict.values()) 
     {
-        if (license->isAnalog() == analog && license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT)))
+        if (license->isAnalog() == analog && license->isValid(QLatin1String(QN_PRODUCT_NAME_SHORT)))
             result += license->cameraCount();
     }
     return result;
@@ -405,12 +409,12 @@ QnLicenseList QnLicensePool::getLicenses() const
 bool QnLicensePool::isLicenseMatchesCurrentSystem(const QnLicensePtr &license) {
     const QString brand(QLatin1String(QN_PRODUCT_NAME_SHORT));
 
-    return license->isValid(m_mainHardwareIds + m_compatibleHardwareIds, brand);
+    return license->isValid(brand, 0, false);
 }
 
 bool QnLicensePool::isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode) const
 {
-    return license->isValid(allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT), errCode);
+    return license->isValid(QLatin1String(QN_PRODUCT_NAME_SHORT), errCode);
 }
 
 bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
@@ -502,14 +506,22 @@ QList<QByteArray> QnLicensePool::allHardwareIds() const
     return m_mainHardwareIds + m_compatibleHardwareIds;
 }
 
-QList<QByteArray> QnLicensePool::allLocalHardwareIds() const
-{
-    return m_mainHardwareIds + m_compatibleHardwareIds;
-}
-
 QList<QnLatin1Array> QnLicensePool::allRemoteValidLicenses() const
 {
     return m_remoteValidLicenses;
+}
+
+QList<QnLatin1Array> QnLicensePool::allLocalValidLicenses() const
+{
+    QList<QnLatin1Array> result;
+    QList<QByteArray>  hwList = allHardwareIds();
+    foreach (QnLicensePtr license, m_licenseDict.values()) 
+    {
+        if (hwList.contains(license->hardwareId()) && license->isValid(QLatin1String(QN_PRODUCT_NAME_SHORT), 0, false))
+            result << license->key();
+    }
+
+    return result;
 }
 
 QMap<QnId, QList<QnLatin1Array>> QnLicensePool::remoteValidLicenses() const

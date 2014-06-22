@@ -30,6 +30,7 @@
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_help_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "managers/runtime_info_manager.h"
 
 using std::nullptr_t;
 
@@ -180,6 +181,10 @@ bool QnDbManager::init()
         m_licenseOverflowTime = query.value(0).toByteArray().toLongLong();
         m_licenseOverflowMarked = m_licenseOverflowTime > 0;
     }
+    ApiRuntimeData data = QnRuntimeInfoManager::instance()->data().value(qnCommon->moduleGUID());
+    data.prematureLicenseExperationDate = m_licenseOverflowTime;
+    ec2::QnRuntimeInfoManager::instance()->update(data);
+
     query.addBindValue(DB_INSTANCE_KEY);
     if (query.exec() && query.next()) {
         m_dbInstanceId = QUuid::fromRfc4122(query.value(0).toByteArray());
@@ -2275,13 +2280,6 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFil
     return ErrorCode::ok;
 }
 
-void QnDbManager::fillRuntimeInfo( ApiRuntimeData* const runtimeInfo )
-{
-    runtimeInfo->platform = QLatin1String(QN_ARM_BOX);
-    //m_licenseManagerImpl->getHardwareId( runtimeInfo );
-    runtimeInfo->prematureLicenseExperationDate = licenseOverflowTime();
-}
-
 ErrorCode QnDbManager::saveVideowall(const ApiVideowallData& params) {
     qint32 internalId;
 
@@ -2533,11 +2531,10 @@ bool QnDbManager::markLicenseOverflow(bool value, qint64 time)
     query.addBindValue(LICENSE_EXPIRED_TIME_KEY);
     query.addBindValue(QByteArray::number(m_licenseOverflowTime));
     return query.exec();
-}
 
-qint64 QnDbManager::licenseOverflowTime() const
-{
-    return m_licenseOverflowTime;
+    ApiRuntimeData data = QnRuntimeInfoManager::instance()->data().value(qnCommon->moduleGUID());
+    data.prematureLicenseExperationDate = m_licenseOverflowTime;
+    ec2::QnRuntimeInfoManager::instance()->update(data);
 }
 
 QUuid QnDbManager::getID() const

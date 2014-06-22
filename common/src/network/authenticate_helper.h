@@ -80,6 +80,8 @@ public:
     static QByteArray createUserPasswordDigest( const QString& userName, const QString& password );
     static QByteArray createHttpQueryAuthParam( const QString& userName, const QString& password );
 
+    void setSessionKey(const QByteArray& value);
+
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &);
@@ -97,6 +99,10 @@ private:
     //QMap<QByteArray, QElapsedTimer> m_nonces;
     QMap<QnId, QnUserResourcePtr> m_users;
     QnAuthMethodRestrictionList m_authMethodRestrictionList;
+
+    QByteArray m_sessionKey;
+    QByteArray m_prevSessionKey;
+    QMutex m_sessionKeyMutex;
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

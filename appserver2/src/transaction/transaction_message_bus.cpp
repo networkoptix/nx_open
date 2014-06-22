@@ -19,6 +19,7 @@
 
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
+#include "managers/runtime_info_manager.h"
 
 namespace ec2
 {
@@ -395,8 +396,8 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
 void QnTransactionMessageBus::sendVideowallInstanceStatus(const ApiPeerData &peer, bool isAlive) {
     QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::updateVideowallInstanceStatus, false);
     tran.params.online = isAlive;
-    //tran.params.instanceGuid = peer.params["instanceGuid"];
-    //tran.params.videowallGuid = peer.params["videowallGuid"];
+    tran.params.instanceGuid = peer.params["instanceGuid"];
+    tran.params.videowallGuid = peer.params["videowallGuid"];
     tran.fillSequence();
     sendTransaction(tran);
 }
@@ -536,6 +537,16 @@ void QnTransactionMessageBus::doPeriodicTasks()
     }
 }
 
+void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransportPtr transport, const QnPeerSet& processedPeers)
+{
+    foreach (ApiRuntimeData info, QnRuntimeInfoManager::instance()->data().values())
+    {
+        QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, false);
+        tran.params = info;
+        transport->sendTransaction(tran, processedPeers);
+    }
+}
+
 void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const ApiPeerData &remotePeer)
 {
     if (!dbManager)
@@ -550,7 +561,9 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
 
     transport->setState(QnTransactionTransport::Connected);
 
+
     /** Send all data to the client peers on the connect. */
+    QnPeerSet processedPeers = QnPeerSet() << remotePeer.id << m_localPeer.id;
     if (remotePeer.peerType == Qn::PT_DesktopClient || 
         remotePeer.peerType == Qn::PT_VideowallClient)     //TODO: #GDM #VW do not send fullInfo, just required part of it
     {
@@ -565,7 +578,8 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         }
 
         transport->setWriteSync(true);
-        transport->sendTransaction(tran, QnPeerSet() << remotePeer.id << m_localPeer.id);
+        sendRuntimeInfo(transport, processedPeers);
+        transport->sendTransaction(tran, processedPeers);
         transport->setReadSync(true);
     } else if (remotePeer.peerType == Qn::PT_AndroidClient) {
         /** Request all data to be sent to the client peers on the connect. */
@@ -614,8 +628,8 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
             return;
         }
 
-        QnPeerSet processedPeers = QnPeerSet() << remotePeer.id << m_localPeer.id;
         transport->setWriteSync(true);
+        sendRuntimeInfo(transport, processedPeers);
         transport->sendTransaction(tranServers,         processedPeers);
         transport->sendTransaction(tranCameras,         processedPeers);
         transport->sendTransaction(tranUsers,           processedPeers);

@@ -55,7 +55,7 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(const QList<QByteArray> &hardwareIds, const QString &brand, ErrorCode* errCode = 0) const;
+    bool isValid(const QString &brand, ErrorCode* errCode = 0, bool checkForeignLicenses = true) const;
 
     static QString errorMessage(ErrorCode errCode);
 
@@ -183,10 +183,10 @@ public:
     QList<QByteArray> compatibleHardwareIds() const;
 
     QList<QByteArray> allHardwareIds() const;
-    QList<QByteArray> allLocalHardwareIds() const;
 
     QMap<QnId, QList<QnLatin1Array>> remoteValidLicenses() const;
     QList<QnLatin1Array> allRemoteValidLicenses() const;
+    QList<QnLatin1Array> allLocalValidLicenses() const;
     void setRemoteValidLicenses(const QMap<QnId, QList<QnLatin1Array>>& licenses);
     void addRemoteValidLicenses(const QnId& peer, const QList<QnLatin1Array>& licenses);
     void removeRemoteValidLicenses(const QnId& peer);

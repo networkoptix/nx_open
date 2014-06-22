@@ -47,8 +47,8 @@ namespace ec2
         QUuid videowallGuid = QnAppServerConnectionFactory::videowallGuid();
         if (!videowallGuid.isNull()) {
             localPeer.peerType = Qn::PT_VideowallClient;
-            //localPeer.params["videowallGuid"] = videowallGuid.toString();
-            //localPeer.params["instanceGuid"] = QnAppServerConnectionFactory::instanceGuid().toString();
+            localPeer.params["videowallGuid"] = videowallGuid.toString();
+            localPeer.params["instanceGuid"] = QnAppServerConnectionFactory::instanceGuid().toString();
         }
         
         QnTransactionMessageBus::instance()->setLocalPeer(localPeer);

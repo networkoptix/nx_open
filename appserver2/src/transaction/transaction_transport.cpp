@@ -231,11 +231,6 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
 
     QUrlQuery q = QUrlQuery(remoteAddr.query());
-    if (m_state == ConnectingStage1)
-    {
-        q.removeQueryItem("hwList");
-        q.addQueryItem("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds()));
-    }
 
     // Client reconnects to the server
     if( m_localPeer.peerType == Qn::PT_DesktopClient ) {
@@ -247,11 +242,11 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
         q.removeQueryItem("isClient");  //videowall client is still client
         q.addQueryItem("isClient", QString());
 
-        //q.removeQueryItem("videowallGuid");
-        //q.addQueryItem("videowallGuid", m_localPeer.params["videowallGuid"]);
+        q.removeQueryItem("videowallGuid");
+        q.addQueryItem("videowallGuid", m_localPeer.params["videowallGuid"]);
 
-        //q.removeQueryItem("instanceGuid");
-        //q.addQueryItem("instanceGuid", m_localPeer.params["instanceGuid"]);
+        q.removeQueryItem("instanceGuid");
+        q.addQueryItem("instanceGuid", m_localPeer.params["instanceGuid"]);
 
         setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
@@ -347,7 +342,6 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
-    nx_http::HttpHeaders::const_iterator itrHwList = client->response()->headers.find("hwList");
 
     if (itrGuid == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
@@ -421,22 +415,6 @@ bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
 {
      // allow to send system command immediately, without tranSyncRequest
     return ApiCommand::isSystem(command) ? true : m_writeSync;
-}
-
-QByteArray QnTransactionTransport::encodeHWList(const QList<QByteArray> hwList)
-{
-    QByteArray result;
-    foreach(const QByteArray& hw, hwList) {
-        if (!result.isEmpty())
-            result.append("-");
-        result.append(hw);
-    }
-    return result;
-}
-
-QList<QByteArray> QnTransactionTransport::decodeHWList(const QByteArray data)
-{
-    return data.split('-');
 }
 
 QString QnTransactionTransport::toString( State state )

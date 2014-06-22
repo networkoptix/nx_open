@@ -467,6 +467,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
+    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
+
     //clientMessageProcessor->init(QnAppServerConnectionFactory::getConnection2());
 
     qnSettings->save();

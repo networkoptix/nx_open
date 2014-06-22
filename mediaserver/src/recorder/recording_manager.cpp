@@ -25,6 +25,7 @@
 #include "common/common_module.h"
 #include "transaction/transaction_log.h"
 #include "database/db_manager.h"
+#include "managers/runtime_info_manager.h"
 
 
 static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24;
@@ -587,7 +588,8 @@ void QnRecordingManager::at_checkLicenses()
 
 
         ec2::QnDbManager::instance()->markLicenseOverflow(true, qnSyncTime->currentMSecsSinceEpoch());
-        if (qnSyncTime->currentMSecsSinceEpoch() - ec2::QnDbManager::instance()->licenseOverflowTime() < LICENSE_RECORDING_STOP_TIME)
+        qint64 licenseOverflowTime = ec2::QnRuntimeInfoManager::instance()->data().value(qnCommon->moduleGUID()).prematureLicenseExperationDate;
+        if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < LICENSE_RECORDING_STOP_TIME)
             return; // not enough license, but timeout not reached yet
 
         // Too many licenses. check if server has own recording cameras and force to disable recording

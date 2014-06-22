@@ -32,7 +32,7 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection.get(), &ec2::AbstractECConnection::initNotification,
         this, &QnCommonMessageProcessor::on_gotInitialNotification );
     connect( connection.get(), &ec2::AbstractECConnection::runtimeInfoChanged,
-        this, &QnCommonMessageProcessor::on_runtimeInfoChanged );
+        this, &QnCommonMessageProcessor::runtimeInfoChanged );
 
     connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::statusChanged,
         this, &QnCommonMessageProcessor::on_resourceStatusChanged );
@@ -108,6 +108,9 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::at_remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::at_remotePeerLost );
 
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::remotePeerFound );
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::remotePeerLost );
+
     connection->startReceivingNotifications();
 }
 
@@ -117,16 +120,18 @@ void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bo
 
 void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData runtimeInfo, bool /*isProxy*/)
 {
-    qnLicensePool->removeRemoteValidLicenses(runtimeInfo.peer.id);   //TODO: #Elric #ec2 get rid of the serialization hell
-    QnAppServerConnectionFactory::removeRuntimeInfo(runtimeInfo.peer.id);
+    //qnLicensePool->removeRemoteValidLicenses(runtimeInfo.peer.id);   //TODO: #Elric #ec2 get rid of the serialization hell
+    //QnAppServerConnectionFactory::removeRuntimeInfo(runtimeInfo.peer.id);
 }
 
+/*
 void QnCommonMessageProcessor::on_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo)
 {
     if (runtimeInfo.peer.peerType == Qn::PT_Server)   //TODO: #Elric #ec2 get rid of the serialization hell
         qnLicensePool->addRemoteValidLicenses(runtimeInfo.peer.id, runtimeInfo.validLicenses);
     QnAppServerConnectionFactory::addRuntimeInfo(runtimeInfo);
 }
+*/
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
 {

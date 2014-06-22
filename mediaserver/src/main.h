@@ -51,6 +51,7 @@ private slots:
     void at_peerLost(const QnModuleInformation &moduleInformation);
 
     void at_appStarted();
+    void at_licenseListChanged();
 private:
     void updateDisabledVendorsIfNeeded();
     void initTcpListener();

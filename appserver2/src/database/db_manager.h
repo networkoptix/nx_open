@@ -163,7 +163,6 @@ namespace ec2
 
 		// --------- misc -----------------------------
         bool markLicenseOverflow(bool value, qint64 time);
-        qint64 licenseOverflowTime() const;
         QUuid getID() const;
 
         ApiOjectType getObjectType(const QnId& objectId);
@@ -330,7 +329,6 @@ namespace ec2
         bool updateGuids();
         QnId getType(const QString& typeName);
         bool loadHelpData(const QString& fileName);
-        void fillRuntimeInfo( ApiRuntimeData* const runtimeInfo );
     private:
         QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;

@@ -45,9 +45,6 @@ public:
         QSharedPointer<AbstractStreamSocket> socket = QSharedPointer<AbstractStreamSocket>());
     ~QnTransactionTransport();
 
-    static QByteArray encodeHWList(const QList<QByteArray> hwList);
-    static QList<QByteArray> decodeHWList(const QByteArray data);
-
 signals:
     void gotTransaction(const QByteArray &data, const QnTransactionTransportHeader &transportHeader);
     void stateChanged(State state);

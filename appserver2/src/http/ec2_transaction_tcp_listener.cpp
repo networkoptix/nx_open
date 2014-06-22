@@ -68,14 +68,11 @@ void QnTransactionTcpProcessor::run()
         : Qn::PT_Server);
 
     if (isVideowall) {
-        //remotePeer.params["videowallGuid"] = videowallGuid.toString();
-        //remotePeer.params["instanceGuid"] = instanceGuid.toString();
+        remotePeer.params["videowallGuid"] = videowallGuid.toString();
+        remotePeer.params["instanceGuid"] = instanceGuid.toString();
     }
 
-    QByteArray remoteHwList = query.queryItemValue(lit("hwList")).toLocal8Bit();
-
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds())));
 
     if (remotePeer.peerType == Qn::PT_Server)
     {
@@ -95,7 +92,6 @@ void QnTransactionTcpProcessor::run()
         parseRequest();
 
         d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-        d->response.headers.insert(nx_http::HttpHeader("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds())));
     }
 
     query = QUrlQuery(d->request.requestLine.url.query());

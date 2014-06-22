@@ -49,7 +49,7 @@ namespace ec2
         QnLicensePtr qlicense(new QnLicense);
         fromApiToResource(license, qlicense);
 
-        return qlicense->isValid(m_hardwareIds, m_brand);
+        return qlicense->isValid(m_brand);
     }
 
     ErrorCode LicenseManagerImpl::getLicenses( ApiLicenseDataList* const licList )

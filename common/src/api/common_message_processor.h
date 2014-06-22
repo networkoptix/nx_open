@@ -44,6 +44,10 @@ signals:
 
     void cameraBookmarkTagsAdded(const QnCameraBookmarkTags &tags);
     void cameraBookmarkTagsRemoved(const QnCameraBookmarkTags &tags);
+
+    void runtimeInfoChanged (const ec2::ApiRuntimeData &runtimeInfo);
+    void remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
+    void remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) = 0;
@@ -60,7 +64,8 @@ public slots:
     void on_licenseChanged(const QnLicensePtr &license);
 private slots:
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
-    void on_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
+    //void on_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
+
 
     void on_resourceStatusChanged(const QnId &resourceId, QnResource::Status status );
     void on_resourceParamsChanged(const QnId& resourceId, const QnKvPairList& kvPairs );

@@ -39,20 +39,6 @@ void QnAppServerConnectionFactory::setCurrentVersion(const QnSoftwareVersion &ve
     }
 }
 
-void QnAppServerConnectionFactory::addRuntimeInfo(const ec2::ApiRuntimeData& value)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_runtimeInfo.insert(value.peer.id, value);
-    }
-}
-
-void QnAppServerConnectionFactory::removeRuntimeInfo(const QnId& peerId)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_runtimeInfo.remove(peerId);
-    }
-}
-
 QnSoftwareVersion QnAppServerConnectionFactory::currentVersion()
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {

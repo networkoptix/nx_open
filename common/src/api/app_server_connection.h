@@ -39,11 +39,6 @@ public:
     static void setDefaultFactory(QnResourceFactory *);
     static void setCurrentVersion(const QnSoftwareVersion &version);
     
-    static void addRuntimeInfo(const ec2::ApiRuntimeData& runtimeInfo);
-    static void removeRuntimeInfo(const QnId& peerId);
-    static QMap<QnId, ec2::ApiRuntimeData> getRunTimeInfo();
-
-
     /** If the client is started in videowall mode, videowall's guid is stored here. */ 
     static QUuid videowallGuid();
     static void setVideowallGuid(const QUuid &uuid);
@@ -65,8 +60,6 @@ private:
     QString m_clientGuid;
     QUrl m_defaultUrl;
     QUrl m_publicUrl;
-
-    QMap<QnId, ec2::ApiRuntimeData> m_runtimeInfo;
 
     /** Videowall-related fields */
     QUuid m_videowallGuid;

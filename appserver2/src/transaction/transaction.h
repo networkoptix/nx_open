@@ -157,7 +157,10 @@ namespace ec2
             getHelp = 65,
 
             //ApiVideowallInstanceStatusData
-            updateVideowallInstanceStatus = 66
+            updateVideowallInstanceStatus = 66,
+            
+            //ApiRuntimeData
+            runtimeInfoChanged = 67
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
