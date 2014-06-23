@@ -357,7 +357,7 @@ QString QnRtspConnectionProcessor::getRangeHeaderIfChanged()
 
 void QnRtspConnectionProcessor::sendResponse(int code)
 {
-    QnTCPConnectionProcessor::sendResponse("RTSP", code, "application/sdp", "", true);
+    QnTCPConnectionProcessor::sendResponse(code, "application/sdp", "", true);
 }
 
 int QnRtspConnectionProcessor::getMetadataChannelNum() const
@@ -483,8 +483,9 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
     QString range = getRangeStr();
     if (!range.isEmpty())
     {
-        d->response.headers.erase("Range");
-        d->response.headers.insert(nx_http::HttpHeader("Range", range.toLatin1()));
+        nx_http::insertOrReplaceHeader(
+            &d->response.headers,
+            nx_http::HttpHeader( "Range", range.toLatin1() ) );
     }
 };
 

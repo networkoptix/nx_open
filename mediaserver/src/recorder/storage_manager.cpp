@@ -30,8 +30,6 @@ static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 static const int DB_UPDATE_PER_RECORDS = 128;
 
-Q_GLOBAL_STATIC(QnStorageManager, QnStorageManager_inst)
-
 
 class RebuildAsyncTask: public QnLongRunnable
 {
@@ -73,6 +71,8 @@ TestStorageThread* QnStorageManager::m_testStorageThread;
 // -------------------- QnStorageManager --------------------
 
 
+static QnStorageManager* QnStorageManager_instance = nullptr;
+
 QnStorageManager::QnStorageManager():
     m_mutexStorages(QMutex::Recursive),
     m_mutexCatalog(QMutex::Recursive),
@@ -87,6 +87,9 @@ QnStorageManager::QnStorageManager():
     m_lastTestTime.restart();
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(this);
+
+    assert( QnStorageManager_instance == nullptr );
+    QnStorageManager_instance = this;
 }
 
 std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -405,12 +408,14 @@ void QnStorageManager::removeAbsentStorages(const QnAbstractStorageResourceList 
 
 QnStorageManager::~QnStorageManager()
 {
+    QnStorageManager_instance = nullptr;
+
     stopAsyncTasks();
 }
 
 QnStorageManager* QnStorageManager::instance()
 {
-    return QnStorageManager_inst();
+    return QnStorageManager_instance;
 }
 
 QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone)

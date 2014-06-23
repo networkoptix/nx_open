@@ -7,6 +7,7 @@
 #include <QtCore/QMutexLocker>
 
 #include <utils/common/synctime.h>
+#include <utils/media/media_stream_cache.h>
 
 #include "media_server/settings.h"
 
@@ -24,16 +25,18 @@ namespace nx_hls
         m_mediaSequence( 0 ),
         m_totalPlaylistDuration( 0 ),
         m_blockID( -1 ),
-        m_removedChunksToKeepCount( MSSettings::roSettings()->value( nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP, nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP ).toInt() )
+        m_removedChunksToKeepCount( MSSettings::roSettings()->value( nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP, nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP ).toInt() ),
+        m_eventRegistrationID( 0 )
     {
-        m_mediaStreamCache->addEventReceiver( this );
+        using namespace std::placeholders;
+        m_eventRegistrationID = m_mediaStreamCache->addKeyFrameEventReceiver( std::bind( &HLSLivePlaylistManager::onKeyFrame, this, _1 ) );
     }
 
     HLSLivePlaylistManager::~HLSLivePlaylistManager()
     {
         m_mediaStreamCache->unblockData( m_blockID );
         m_blockID = -1;
-        m_mediaStreamCache->removeEventReceiver( this );
+        m_mediaStreamCache->removeKeyFrameEventReceiver( m_eventRegistrationID );
     }
 
     //!Same as \a generateChunkList, but returns \a chunksToGenerate last chunks of available data
@@ -75,7 +78,6 @@ namespace nx_hls
         return m_mediaStreamCache->getMaxBitrate();
     }
 
-    //!Implementation of AbstractMediaCacheEventReceiver::onKeyFrame
     void HLSLivePlaylistManager::onKeyFrame( quint64 currentPacketTimestampUSec )
     {
         QMutexLocker lk( &m_mutex );

@@ -22,7 +22,8 @@ void QnClientPullMediaStreamProvider::run()
 
     int numberOfChnnels = 1;
 
-    if (QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>())
+    const QnResourcePtr& resource = getResource();
+    if (QnMediaResource* mr = dynamic_cast<QnMediaResource*>(resource.data()))
     {
         numberOfChnnels = mr->getVideoLayout()->channelCount();
     }
@@ -91,7 +92,8 @@ void QnClientPullMediaStreamProvider::run()
         }
         checkTime(data);
 
-        if (getResource().dynamicCast<QnPhysicalCameraResource>())
+        const QnResourcePtr& resource = getResource();
+        if (dynamic_cast<QnPhysicalCameraResource*>(resource.data()))
         {
             if (getResource()->getStatus() == QnResource::Unauthorized || getResource()->getStatus() == QnResource::Offline)
                 getResource()->setStatus(QnResource::Online);
@@ -144,7 +146,7 @@ void QnClientPullMediaStreamProvider::run()
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
 
-        putData(data);
+        putData(std::move(data));
 
         if (videoData && !isMaxFps())
             m_fpsSleep.sleep(1000*1000/getFps()/numberOfChnnels);

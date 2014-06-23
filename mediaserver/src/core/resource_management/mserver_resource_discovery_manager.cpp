@@ -18,6 +18,7 @@
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include "common/common_module.h"
+#include "data_only_camera_resource.h"
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int MSERVER_OFFLINE_TIMEOUT = 1000 * 60 * 5;
@@ -35,7 +36,19 @@ QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
     stop();
 }
 
-void printInLogNetResources(const QnResourceList& resources)
+QnResourcePtr QnMServerResourceDiscoveryManager::createResource(QnId resourceTypeId, const QnResourceParams& params)
+{
+    QnResourcePtr res = QnResourceDiscoveryManager::createResource( resourceTypeId, params );
+    if( res )
+        return res;
+
+    const QnResourceTypePtr& resourceType = qnResTypePool->getResourceType(resourceTypeId);
+    if( !resourceType )
+        return res;
+    return QnResourcePtr(new DataOnlyCameraResource( resourceTypeId ));   //found resource type, but could not find factory. Disabled discovery?
+}
+
+static void printInLogNetResources(const QnResourceList& resources)
 {
     foreach(QnResourcePtr res, resources)
     {

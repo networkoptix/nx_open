@@ -26,7 +26,7 @@ QnResourceItemStorage<QnVideoWallMatrix> * QnVideoWallResource::matrices() const
 void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
     base_type::updateInner(other, modifiedFields);
 
-    QnVideoWallResourcePtr localOther = other.dynamicCast<QnVideoWallResource>();
+    QnVideoWallResource* localOther = dynamic_cast<QnVideoWallResource*>(other.data());
     if(localOther) {
         m_items->setItemsUnderLock(localOther->items());
         m_pcs->setItemsUnderLock(localOther->pcs());
@@ -107,4 +107,14 @@ void QnVideoWallResource::storedItemRemoved(const QnVideoWallMatrix &item) {
 
 void QnVideoWallResource::storedItemChanged(const QnVideoWallMatrix &item) {
     emit matrixChanged(::toSharedPointer(this), item);
+}
+
+QList<QUuid> QnVideoWallResource::onlineItems() const {
+    QList<QUuid> result;
+    foreach (const QnVideoWallItem &item, m_items->getItems()) {
+        if (!item.online)
+            continue;
+        result << item.uuid;
+    }
+    return result;
 }

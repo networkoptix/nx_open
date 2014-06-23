@@ -7,6 +7,32 @@
 
 namespace ec2
 {
+
+    ////////////////////////////////////////////////////////////
+    //// class QnLicenseNotificationManager
+    ////////////////////////////////////////////////////////////
+    void QnLicenseNotificationManager::triggerNotification( const QnTransaction<ApiLicenseDataList>& tran )
+    {
+        QnLicenseList licenseList;
+        fromApiToResourceList(tran.params, licenseList);
+
+        foreach (const QnLicensePtr& license, licenseList) {
+            emit licenseChanged(license);
+        }
+    }
+
+    void QnLicenseNotificationManager::triggerNotification( const QnTransaction<ApiLicenseData>& tran )
+    {
+        QnLicensePtr license(new QnLicense());
+        fromApiToResource(tran.params, license);
+        emit licenseChanged(license);
+    }
+
+
+
+    ////////////////////////////////////////////////////////////
+    //// class QnLicenseManager
+    ////////////////////////////////////////////////////////////
     template<class T>
     QnLicenseManager<T>::QnLicenseManager( T* const queryProcessor )
     :
@@ -51,25 +77,6 @@ namespace ec2
         QnTransaction<ApiLicenseDataList> tran( cmd, true );
         fromResourceListToApi(licenses, tran.params);
         return tran;
-    }
-
-    template<class T>
-    void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicenseDataList>& tran )
-    {
-        QnLicenseList licenseList;
-        fromApiToResourceList(tran.params, licenseList);
-
-        foreach (const QnLicensePtr& license, licenseList) {
-            emit licenseChanged(license);
-        }
-    }
-
-    template<class T>
-    void QnLicenseManager<T>::triggerNotification( const QnTransaction<ApiLicenseData>& tran )
-    {
-        QnLicensePtr license(new QnLicense());
-        fromApiToResource(tran.params, license);
-        emit licenseChanged(license);
     }
 
     template class QnLicenseManager<ServerQueryProcessor>;

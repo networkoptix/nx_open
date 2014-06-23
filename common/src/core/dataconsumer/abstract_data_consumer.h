@@ -19,7 +19,7 @@ public:
       * @return true is there is any space in the queue, false otherwise
       */
     virtual bool canAcceptData() const override;
-    virtual void putData(QnAbstractDataPacketPtr data) override;
+    virtual void putData( const QnAbstractDataPacketPtr& data ) override;
     virtual void clearUnprocessedData();
     int queueSize() const;
     virtual void setSingleShotMode(bool /*single*/) {}
@@ -30,7 +30,7 @@ public:
 
 protected:
     void run();
-    virtual bool processData(QnAbstractDataPacketPtr /*data*/)=0;
+    virtual bool processData(const QnAbstractDataPacketPtr& data) = 0;
     virtual void endOfRun();
 
 protected:

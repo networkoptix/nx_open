@@ -15,8 +15,6 @@ QnOpenGLRenderer::QnOpenGLRenderer(const QGLContext* a_context , QObject *parent
     m_texturePerVertexColoredProgram.reset(new QnPerVertexColoredGLShaderProgramm(a_context,parent));
     m_texturePerVertexColoredProgram->compile();
 
-    
-
     m_indices_for_render_quads[0] = 0;
     m_indices_for_render_quads[1] = 1;
     m_indices_for_render_quads[2] = 2;
@@ -29,10 +27,12 @@ QnOpenGLRenderer::QnOpenGLRenderer(const QGLContext* a_context , QObject *parent
     m_modelViewMatrix.setToIdentity();
     m_projectionMatrix.setToIdentity();
 }
+
 void  QnOpenGLRenderer::setColor(const QVector4D& c)
 { 
     m_color = c; 
 };
+
 void  QnOpenGLRenderer::setColor(const QColor& c)
 { 
     m_color.setX(c.redF()); 
@@ -40,6 +40,7 @@ void  QnOpenGLRenderer::setColor(const QColor& c)
     m_color.setZ(c.blueF()); 
     m_color.setW(c.alphaF()); 
 };
+
 void QnOpenGLRenderer::drawBindedTextureOnQuad( const QRectF &rect , QnTextureColorGLShaderProgramm* shader)
 {
     GLfloat vertices[] = {
@@ -57,6 +58,7 @@ void QnOpenGLRenderer::drawBindedTextureOnQuad( const QRectF &rect , QnTextureCo
     };
     drawBindedTextureOnQuad(vertices,texCoords,shader);
 };
+
 void QnOpenGLRenderer::drawBindedTextureOnQuad( const QRectF &rect , const QSizeF& size, QnTextureColorGLShaderProgramm* shader)
 {
     GLfloat vertices[] = {
@@ -85,6 +87,7 @@ void QnOpenGLRenderer::drawColoredQuad( const QRectF &rect , QnColorGLShaderProg
     };
     drawColoredQuad(vertices,shader);
 };
+
 void QnOpenGLRenderer::drawPerVertexColoredPolygon( unsigned int a_buffer , unsigned int a_vertices_size , unsigned int a_polygon_state)
 {
     QnPerVertexColoredGLShaderProgramm* shader = m_texturePerVertexColoredProgram.data();
@@ -158,6 +161,7 @@ void QnOpenGLRenderer::drawColoredQuad(const float* v_array, QnColorGLShaderProg
         //glDisableVertexAttribArray(VERTEX_POS_INDX);
     }
 };
+
 void QnOpenGLRenderer::drawBindedTextureOnQuad( const float* v_array, const float* tx_array , QnAbstractBaseGLShaderProgramm* shader)
 {
     bool empty_shader = false;
@@ -209,6 +213,7 @@ void QnOpenGLRenderer::drawBindedTextureOnQuad( const float* v_array, const floa
     }
     
 }
+
 void    QnOpenGLRenderer:: drawColoredPolygon( const QPolygonF & a_polygon, QnColorGLShaderProgramm* shader)
 {
     static std::vector<float> vertices;
@@ -220,6 +225,7 @@ void    QnOpenGLRenderer:: drawColoredPolygon( const QPolygonF & a_polygon, QnCo
     }
     drawColoredPolygon(&vertices[0],a_polygon.size(),shader);
 };
+
 void    QnOpenGLRenderer:: drawColoredPolygon( const QVector<QVector2D>& a_polygon, QnColorGLShaderProgramm* shader)
 {
     static std::vector<float> vertices;
@@ -231,6 +237,7 @@ void    QnOpenGLRenderer:: drawColoredPolygon( const QVector<QVector2D>& a_polyg
     }
     drawColoredPolygon(&vertices[0],a_polygon.size(),shader);
 };
+
 void    QnOpenGLRenderer:: drawColoredPolygon( const float* v_array, unsigned int size , QnColorGLShaderProgramm* shader)
 {
     if ( !shader )
@@ -264,19 +271,19 @@ void    QnOpenGLRenderer:: drawColoredPolygon( const float* v_array, unsigned in
 
 //=================================================================================================
 
-Q_GLOBAL_STATIC(QnOpenGLRendererManager, qn_OpenGlRenderManager_instance)
+Q_GLOBAL_STATIC(QnOpenGLRendererManager, qn_openGlRenderManager_instance)
 
 
 QnOpenGLRenderer& QnOpenGLRendererManager::instance(const QGLContext* a_context)
 {
-    QnOpenGLRendererManager* manager = qn_OpenGlRenderManager_instance();
+    QnOpenGLRendererManager* manager = qn_openGlRenderManager_instance();
 
-    QHash<const QGLContext*,QnOpenGLRenderer>::iterator it = manager->getContainer().find(a_context);
-    if ( it != manager->getContainer().end() )
+    auto it = manager->m_container.find(a_context);
+    if ( it != manager->m_container.end() )
         return (*it);
 
-    manager->getContainer().insert(a_context,QnOpenGLRenderer(a_context));
-    return *(manager->getContainer().find(a_context));
+    manager->m_container.insert(a_context,QnOpenGLRenderer(a_context));
+    return *(manager->m_container.find(a_context));
 }
 
 void loadImageData( int texture_wigth , int texture_height , int image_width , int image_heigth , int gl_bytes_per_pixel , int gl_format , const uchar* pixels )

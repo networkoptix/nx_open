@@ -7,7 +7,7 @@
 #include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
 #include "transaction_log.h"
-#include "transaction_transport_serializer.h"
+#include <transaction/chunked_transfer_encoder.h>
 #include "common/common_module.h"
 
 namespace ec2
@@ -55,7 +55,7 @@ void QnTransactionTransport::addData(const QByteArray& data)
     QMutexLocker lock(&m_mutex);
     if (m_dataToSend.isEmpty() && m_socket)
         aio::AIOService::instance()->watchSocket( m_socket, aio::etWrite, this );
-    m_dataToSend.push_back(data);
+    m_dataToSend.push_back(QnChunkedTransferEncoder::serializedTransaction(data));
 }
 
 int QnTransactionTransport::getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size)
@@ -167,8 +167,8 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                         if (m_readBufferLen == fullChunkLen) 
                         {
                             QByteArray serializedTran;
-                            TransactionTransportHeader transportHeader;
-                            QnTransactionTransportSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+                            QnTransactionTransportHeader transportHeader;
+                            QnBinaryTransactionSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
                             emit gotTransaction(serializedTran, transportHeader);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
@@ -241,6 +241,18 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     if( m_localPeer.peerType == QnPeerInfo::DesktopClient ) {
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
+        setState(ConnectingStage2); // one GET method for client peer is enough
+        setReadSync(true);
+    } else if (m_localPeer.peerType == QnPeerInfo::VideowallClient) {
+        q.removeQueryItem("isClient");  //videowall client is still client
+        q.addQueryItem("isClient", QString());
+
+        q.removeQueryItem("videowallGuid");
+        q.addQueryItem("videowallGuid", m_localPeer.params["videowallGuid"]);
+
+        q.removeQueryItem("instanceGuid");
+        q.addQueryItem("instanceGuid", m_localPeer.params["instanceGuid"]);
+
         setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
     }
@@ -386,8 +398,8 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         if (bufferLen >= fullChunkLen)
         {
             QByteArray serializedTran;
-            TransactionTransportHeader transportHeader;
-            QnTransactionTransportSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+            QnTransactionTransportHeader transportHeader;
+            QnBinaryTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
             emit gotTransaction(serializedTran, transportHeader);
 
             buffer += fullChunkLen;

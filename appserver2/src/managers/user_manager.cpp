@@ -16,8 +16,8 @@ namespace ec2
     template<class QueryProcessorType>
     QnUserManager<QueryProcessorType>::QnUserManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
     :
-        m_queryProcessor( queryProcessor ),
-        m_resCtx(resCtx)
+        QnUserNotificationManager(resCtx),
+        m_queryProcessor( queryProcessor )
     {
     }
 
@@ -32,7 +32,7 @@ namespace ec2
                 fromApiToResourceList(users, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUserList, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiUserDataList, decltype(queryDoneHandler)> ( ApiCommand::getUsers, nullptr, queryDoneHandler);
         return reqID;
     }
 

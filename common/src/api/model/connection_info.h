@@ -34,7 +34,7 @@ struct QnConnectionInfo {
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (QnCompatibilityItem)(QnConnectionInfo), 
-    (metatype)(xml)(json)(binary)(csv_record)
+    (ubj)(metatype)(xml)(json)(binary)(csv_record)
 )
 
 // TODO: #Elric remove shared pointer?

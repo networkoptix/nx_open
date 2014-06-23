@@ -4,6 +4,7 @@
 #include <QtCore/QMutex>
 
 #include <utils/common/request_param.h>
+#include <utils/common/software_version.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/misc/schedule_task.h>
@@ -15,7 +16,6 @@
 #include <api/model/connection_info.h>
 
 #include "api_fwd.h"
-#include "abstract_connection.h"
 
 class QnAppServerConnectionFactory;
 class QnApiSerializer;
@@ -28,7 +28,6 @@ public:
 
     static QString box();
     static QString authKey();
-    static QString videoWallKey();
     static QString clientGuid();
     static QUrl defaultUrl();
     static QUrl publicUrl();
@@ -42,7 +41,6 @@ public:
 
     static void setBox(const QString &box);
     static void setAuthKey(const QString &key);
-    static void setVideoWallKey(const QString &key);
     static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
@@ -51,6 +49,14 @@ public:
     static void setPublicIp(const QString &publicIp);
 
     static void setSessionKey(const QByteArray& sessionKey);
+
+    /** If the client is started in videowall mode, videowall's guid is stored here. */ 
+    static QUuid videowallGuid();
+    static void setVideowallGuid(const QUuid &uuid);
+
+    /** If the client is started in videowall mode, instance's guid is stored here. */ 
+    static QUuid instanceGuid();
+    static void setInstanceGuid(const QUuid &uuid);
 
     //static QnAppServerConnectionPtr createConnection();
     //static QnAppServerConnectionPtr createConnection(const QUrl &url);
@@ -64,13 +70,16 @@ private:
     QMutex m_mutex;
     QString m_clientGuid;
     QString m_authKey;
-    QString m_videoWallKey;
     QUrl m_defaultUrl;
     QUrl m_publicUrl;
     QByteArray m_sessionKey;
     QByteArray m_prevSessionKey;
     QString m_box;
     qint64 m_prematureLicenseExperationDate;
+
+    /** Videowall-related fields */
+    QUuid m_videowallGuid;
+    QUuid m_instanceGuid;
 
     int m_defaultMediaProxyPort;
     QnSoftwareVersion m_currentVersion;

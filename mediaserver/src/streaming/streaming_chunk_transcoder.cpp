@@ -161,7 +161,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
                 return false;
             }
 
-            QSharedPointer<QnAbstractArchiveReader> archiveReader = dp.dynamicCast<QnAbstractArchiveReader>();
+            QnAbstractArchiveReader* archiveReader = dynamic_cast<QnAbstractArchiveReader*>(dp.data());
             if( !archiveReader || !archiveReader->open() )
             {
                 NX_LOG( lit("StreamingChunkTranscoder::transcodeAsync. Failed (2) to create archive data provider (resource %1)").

@@ -74,7 +74,7 @@ void QnMediaServerResource::setStreamingUrl(const QString& value)
     m_streamingUrl = value;
 }
 
-QString QnMediaServerResource::getStreamingUrl() const
+const QString& QnMediaServerResource::getStreamingUrl() const
 {
     QMutexLocker lock(&m_mutex);
     return m_streamingUrl;
@@ -86,7 +86,7 @@ void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrLis
     m_netAddrList = netAddrList;
 }
 
-QList<QHostAddress> QnMediaServerResource::getNetAddrList()
+const QList<QHostAddress>& QnMediaServerResource::getNetAddrList() const
 {
     QMutexLocker lock(&m_mutex);
     return m_netAddrList;
@@ -99,7 +99,7 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     /* We want the video server connection to be deleted in its associated thread, 
      * no matter where the reference count reached zero. Hence the custom deleter. */
     if (!m_restConnection && !m_apiUrl.isEmpty())
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this, QnAppServerConnectionFactory::videoWallKey()), &qnDeleteLater);
+        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this, QnAppServerConnectionFactory::videowallGuid()), &qnDeleteLater);
 
     return m_restConnection;
 }
@@ -273,7 +273,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     QnResource::updateInner(other, modifiedFields);
     bool netAddrListChanged = false;
 
-    QnMediaServerResourcePtr localOther = other.dynamicCast<QnMediaServerResource>();
+    QnMediaServerResource* localOther = dynamic_cast<QnMediaServerResource*>(other.data());
     if(localOther) {
         if (m_panicMode != localOther->m_panicMode)
             modifiedFields << "panicModeChanged";
@@ -376,7 +376,7 @@ void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo)
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
-    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) 
+    if (QnMediaServerResource* server = dynamic_cast<QnMediaServerResource*>(resource.data())) 
         return (server->getServerFlags() & Qn::SF_Edge);
     return false;
 }

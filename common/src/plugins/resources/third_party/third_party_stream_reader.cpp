@@ -50,7 +50,7 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
         m_mediaEncoder2Ref->releaseRef();
 }
 
-void ThirdPartyStreamReader::onGotVideoFrame( QnCompressedVideoDataPtr videoData )
+void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData )
 {
     base_type::onGotVideoFrame( videoData );
 }
@@ -249,6 +249,19 @@ void ThirdPartyStreamReader::pleaseStop()
         if( stoppable )
             stoppable->pleaseStop();
     }
+}
+
+void ThirdPartyStreamReader::beforeRun()
+{
+    //we can be sure that getNextData will not be called while we are here
+    CLServerPushStreamReader::beforeRun();
+}
+
+void ThirdPartyStreamReader::afterRun()
+{
+    //we can be sure that getNextData will not be called while we are here
+    CLServerPushStreamReader::afterRun();
+    closeStream();
 }
 
 QnResource::ConnectionRole ThirdPartyStreamReader::roleForMotionEstimation()

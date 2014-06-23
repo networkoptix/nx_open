@@ -2,6 +2,8 @@
 
 #include <api/serializer/serializer.h>
 
+#include <utils/serialization/json.h>
+
 #include <business/business_event_parameters.h>
 #include <business/business_action_parameters.h>
 #include <business/actions/abstract_business_action.h>
@@ -15,6 +17,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_instance_status.h>
 #include <core/resource/camera_bookmark.h>
 
 #include <nx_ec/ec_api.h>
@@ -880,6 +883,18 @@ void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallCon
     }
 }
 
+void fromApiToResource(const ApiVideowallInstanceStatusData &data, QnVideowallInstanceStatus &status) {
+    status.videowallGuid = data.videowallGuid;
+    status.instanceGuid = data.instanceGuid;
+    status.online = data.online;
+}
+
+void fromResourceToApi(const QnVideowallInstanceStatus &status, ApiVideowallInstanceStatusData &data) {
+    data.videowallGuid = status.videowallGuid;
+    data.instanceGuid = status.instanceGuid;
+    data.online = status.online;
+}
+
 void fromApiToResource(const ApiCameraBookmarkTagDataList &data, QnCameraBookmarkTags &tags) {
     for (const ApiCameraBookmarkTagData &tag: data)
         tags << tag.name;
@@ -890,5 +905,7 @@ void fromResourceToApi(const QnCameraBookmarkTags &tags, ApiCameraBookmarkTagDat
     for (const QString &tag: tags)
         data.push_back(ApiCameraBookmarkTagData(tag));
 }
+
+
 
 } // namespace ec2

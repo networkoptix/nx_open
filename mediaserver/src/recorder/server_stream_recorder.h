@@ -47,7 +47,7 @@ signals:
 
     void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, QnBusiness::EventReason reasonCode, QnResourcePtr storageRes);
 protected:
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     virtual bool needSaveData(QnConstAbstractMediaDataPtr media) override;
     void beforeProcessData(QnConstAbstractMediaDataPtr media);
@@ -57,7 +57,7 @@ protected:
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize) override;
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider* provider) override;
     virtual bool canAcceptData() const;
-    virtual void putData(QnAbstractDataPacketPtr data) override;
+    virtual void putData(const QnAbstractDataPacketPtr& data) override;
 
     virtual void endOfRun() override;
     virtual bool saveData(QnConstAbstractMediaDataPtr md) override;

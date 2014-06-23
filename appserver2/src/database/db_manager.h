@@ -3,6 +3,7 @@
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
+#include <nx_ec/data/api_lock_data.h>
 #include "nx_ec/data/api_fwd.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
@@ -204,7 +205,6 @@ namespace ec2
         /* Add or remove camera bookmark tags */
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
 
-
         ErrorCode executeTransactionInternal(const QnTransaction<ApiEmailSettingsData>&) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
@@ -227,7 +227,32 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallInstanceStatusData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiLockData> &) {
+           Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerAliveData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<QnTranState> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<int> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }

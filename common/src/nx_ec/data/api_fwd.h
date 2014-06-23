@@ -46,6 +46,7 @@ namespace ec2 {
     struct ApiStoredFileData;
     struct ApiUserData;
     struct ApiVideowallControlMessageData;
+    struct ApiVideowallInstanceStatusData;
     struct ApiVideowallData;
     struct ApiVideowallItemData;
     struct ApiVideowallItemWithRefData;
@@ -117,6 +118,7 @@ namespace ec2 {
     (ApiStoredFileData)\
     (ApiUserData)\
     (ApiVideowallControlMessageData)\
+    (ApiVideowallInstanceStatusData)\
     (ApiVideowallData)\
     (ApiVideowallItemData)\
     (ApiVideowallItemWithRefData)\
@@ -139,7 +141,7 @@ namespace ec2 {
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         QN_EC2_API_DATA_TYPES,
-        (xml)(binary)(json)(sql_record)(csv_record)
+        (ubj)(xml)(binary)(json)(sql_record)(csv_record)
     );
 #endif
     
