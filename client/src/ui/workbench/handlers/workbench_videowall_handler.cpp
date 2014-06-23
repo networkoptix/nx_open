@@ -655,23 +655,15 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
         return;
     }
 
-    bool doNotAskAgain = false;
-    int startMode = qnSettings->videoWallStartMode();
-    QDialogButtonBox::StandardButton button = QDialogButtonBox::Yes; 
-    if (startMode < 0) {
-        button = QnCheckableMessageBox::question(
+    QMessageBox::StandardButton button = 
+        QMessageBox::question(
             mainWindow(),
             tr("Switch to Video Wall Mode..."),
-            tr("Client will be closed and reopened as Video Wall."), //TODO: #VW #TR
-            QString(),
-            &doNotAskAgain,
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-            QDialogButtonBox::Yes,
-            QDialogButtonBox::Cancel
+            tr("Video Wall will be started now. Do you want to close this %1 Client instance?")
+                .arg(lit(QN_PRODUCT_NAME_LONG)), //TODO: #VW #TR
+            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+            QMessageBox::Yes
             );
-    } else {
-        button = static_cast<QDialogButtonBox::StandardButton>(startMode);
-    }
 
     if (button == QDialogButtonBox::Cancel)
         return;
@@ -681,10 +673,6 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
             closeInstanceDelayed();
     }
     
-    if (doNotAskAgain)
-        qnSettings->setVideoWallStartMode(static_cast<int>(button));
-
-
     QUuid pcUuid = qnSettings->pcUuid();
     foreach (const QnVideoWallItem &item, videoWall->items()->getItems()) {
         if (item.pcUuid != pcUuid || item.online)
@@ -1132,18 +1120,9 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen() {
 
     bool master = m_videoWallMode.instanceGuid.isNull();
     if (master) {
-        bool first = true;
-
         foreach (const QnVideoWallItem &item, videoWall->items()->getItems()) {
-            if (item.pcUuid != pcUuid)
+            if (item.pcUuid != pcUuid || item.online)
                 continue;
-
-            if (first) {
-                first = false;
-                m_videoWallMode.instanceGuid = item.uuid;
-                openVideoWallItem(videoWall);
-                continue;
-            }
 
             QStringList arguments;
             arguments << QLatin1String("--videowall");
@@ -1152,6 +1131,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen() {
             arguments << item.uuid.toString();
             openNewWindow(arguments);
         }
+        closeInstanceDelayed();
     } else {
         openVideoWallItem(videoWall);
     }
