@@ -76,7 +76,8 @@ MediaStreamCache::MediaStreamCache( unsigned int cacheSizeMillis )
     m_mutex( QMutex::Recursive ),
     m_prevPacketSrcTimestamp( -1 ),
     m_currentPacketTimestamp( 0 ),
-    m_cacheSizeInBytes( 0 )
+    m_cacheSizeInBytes( 0 ),
+    m_prevGivenEventReceiverID( 0 )
 {
 }
 
@@ -139,14 +140,8 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
     if( !isKeyFrame )
         return; //no sense to perform this operation more than once per GOP
 
-    for( std::set<AbstractMediaCacheEventReceiver*>::const_iterator
-        it = m_eventReceivers.cbegin();
-        it != m_eventReceivers.cend();
-        ++it )
-    {
-        (*it)->onKeyFrame( m_currentPacketTimestamp );
-    }
-
+    for( auto eventReceiver: m_eventReceivers )
+        eventReceiver.second( m_currentPacketTimestamp );
     const quint64 maxTimestamp = m_packetsByTimestamp.back().timestamp;
     if( maxTimestamp - m_packetsByTimestamp.front().timestamp > m_cacheSizeMillis*MICROS_PER_MS )
     {
@@ -272,16 +267,17 @@ QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quin
     return it->packet;
 }
 
-void MediaStreamCache::addEventReceiver( AbstractMediaCacheEventReceiver* const receiver )
+int MediaStreamCache::addKeyFrameEventReceiver( const std::function<void (quint64)>& keyFrameEventReceiver )
 {
     QMutexLocker lk( &m_mutex );
-    m_eventReceivers.insert( receiver );
+    m_eventReceivers.insert( std::make_pair( ++m_prevGivenEventReceiverID, keyFrameEventReceiver ) );
+    return m_prevGivenEventReceiverID;
 }
 
-void MediaStreamCache::removeEventReceiver( AbstractMediaCacheEventReceiver* const receiver )
+void MediaStreamCache::removeKeyFrameEventReceiver( int receiverID )
 {
     QMutexLocker lk( &m_mutex );
-    m_eventReceivers.erase( receiver );
+    m_eventReceivers.erase( receiverID );
 }
 
 int MediaStreamCache::blockData( quint64 timestamp )

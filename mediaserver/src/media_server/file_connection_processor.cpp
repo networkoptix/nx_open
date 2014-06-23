@@ -134,5 +134,5 @@ void QnFileConnectionProcessor::run()
 #endif
     }
     d->response.headers.insert(nx_http::HttpHeader("Last-Modified", lastModified.toString(Qt::RFC2822Date).toUtf8()));
-    sendResponse("HTTP", rez, contentType, contentEncoding, false);
+    sendResponse(rez, contentType, contentEncoding, false);
 }

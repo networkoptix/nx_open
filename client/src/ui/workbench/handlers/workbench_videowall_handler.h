@@ -65,7 +65,6 @@ private:
     /** Returns list of target videowall items for current layout. */
     QnVideoWallItemIndexList targetList() const;
 
-    QnWorkbenchLayout* findReviewModeLayout(const QnVideoWallResourcePtr &videoWall) const;
     QnLayoutResourcePtr findExistingResourceLayout(const QnResourcePtr &resource) const;
     QnLayoutResourcePtr constructLayout(const QnResourceList &resources) const;
 
@@ -138,8 +137,8 @@ private slots:
 
     void submitDelayedItemOpen();
 
-    void saveVideowall(const QnVideoWallResourcePtr& videowall);
-    void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls);
+    void saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout = false);
+    void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls, bool saveLayout = false);
 private:
     struct ScreenSnap {
         int index;          /**< Index of the screen. */

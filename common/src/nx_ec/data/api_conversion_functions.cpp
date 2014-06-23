@@ -147,6 +147,12 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     QnResourcePtr tmp = dst;
     fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 
+    { // test if the camera is desktop camera
+        auto resType = qnResTypePool->getResourceType(src.typeId);
+        if (resType->getName() == lit("SERVER_DESKTOP_CAMERA"))
+            dst->addFlags(QnResource::desktop_camera);
+    }
+
     dst->setScheduleDisabled(src.scheduleDisabled);
     dst->setMotionType(src.motionType);
 

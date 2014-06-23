@@ -63,6 +63,9 @@ namespace ec2
             sendTransactionInternal(tran, QnTransactionTransportHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers));
         }
 
+        /** Template specialization to fill dstPeers from the transaction params. */
+        void sendTransaction(const QnTransaction<ec2::ApiVideowallControlMessageData>& tran, const QnPeerSet& dstPeers = QnPeerSet());
+
         template <class T>
         void sendTransaction(const QnTransaction<T>& tran, const QnId& dstPeerId)
         {

@@ -11,6 +11,7 @@
 #include "decoders/video/ffmpeg.h"
 #include "utils/media/frame_info.h"
 #include "utils/common/synctime.h"
+#include "utils/media/media_stream_cache.h"
 
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;

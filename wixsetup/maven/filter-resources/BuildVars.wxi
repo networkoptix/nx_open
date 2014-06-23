@@ -31,4 +31,8 @@
     <?else?>
     <?define archSuffix = "x86_x64" ?>
     <?endif?>
+
+    <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>                
+    <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>                        
+
 </Include>

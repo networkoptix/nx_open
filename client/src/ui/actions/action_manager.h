@@ -85,6 +85,16 @@ public:
      */
     void trigger(Qn::ActionId id, const QnActionParameters &parameters = QnActionParameters());
 
+
+    /**
+     * Triggers the action with the given id if possible
+     * 
+     * \param id                        Id of the action to trigger.
+     * \param parameters                Parameters to pass to action handler.
+     * \returns                         Was action triggered or not.
+     */
+    bool triggerIfPossible(Qn::ActionId id, const QnActionParameters &parameters = QnActionParameters());
+
     /**
      * \param scope                     Scope of the menu to create.
      * \param parameters                Action parameters for menu creation.
