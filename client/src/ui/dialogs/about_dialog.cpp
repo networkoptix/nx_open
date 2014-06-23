@@ -22,6 +22,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/style/globals.h>
 
 #include "openal/qtvaudiodevice.h"
 #include "version.h"
@@ -109,7 +110,9 @@ void QnAboutDialog::retranslateUi()
         if (server->getStatus() != QnResource::Online)
             continue;
         if( server->getVersion() < clientVersion ) {
-            serverVersions.append(tr("<b>Media Server</b> version <font color=\"red\">%2</font> at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
+            
+            serverVersions.append(tr("<b>Media Server</b> version \
+                                     <font color=\"%2\">%3</font> at %4.").arg(qnGlobals->errorTextColor().name()).arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
         } else {
             serverVersions.append(tr("<b>Media Server</b> version %2 at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
         }
