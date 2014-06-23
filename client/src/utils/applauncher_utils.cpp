@@ -91,10 +91,8 @@ namespace applauncher
 
         //return sendCommandToLauncher(version, arguments);
         const api::ResultType::Value result = sendCommandToLauncher(
-            applauncher::api::StartApplicationTask(
-                version.toString(QnSoftwareVersion::MinorFormat),
-                arguments ),
-            &response );
+            applauncher::api::StartApplicationTask(version, arguments),
+            &response);
         return result != api::ResultType::ok ? result : response.result;
     }
 
@@ -103,7 +101,7 @@ namespace applauncher
         unsigned int* installationID )
     {
         api::StartInstallationTask request;
-        request.version = version.toString(QnSoftwareVersion::MinorFormat);
+        request.version = version;
         api::StartInstallationResponse response;
         api::ResultType::Value result = sendCommandToLauncher( request, &response );
         if( result != api::ResultType::ok )
@@ -137,14 +135,14 @@ namespace applauncher
         const QString &zipFileName )
     {
         api::InstallZipTask request;
-        request.version = version.toString();
-        api::InstallZipResponse response;
+        request.version = version;
+        request.zipFileName = zipFileName;
+        api::Response response;
         api::ResultType::Value result = sendCommandToLauncher( request, &response );
         if( result != api::ResultType::ok )
             return result;
         if( response.result != api::ResultType::ok )
             return response.result;
-        *dir = response.installationDir;
         return response.result;
     }
 

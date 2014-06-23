@@ -30,15 +30,6 @@ const QString buildInformationSuffix(lit("update"));
 const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
 const QString mutexName = lit("auto_update");
 
-QnMediaServerUpdateTool::UpdateFileInformationPtr mapToUpdateFileInformation(const QVariantMap &package, const QnSoftwareVersion &targetVersion) {
-    QString fileName = package.value(lit("file")).toString();
-    QnMediaServerUpdateTool::UpdateFileInformationPtr info(new QnMediaServerUpdateTool::UpdateFileInformation(targetVersion, QUrl(urlPrefix + fileName)));
-    info->baseFileName = fileName;
-    info->fileSize = package.value(lit("size")).toLongLong();
-    info->md5 = package.value(lit("md5")).toString();
-    return info;
-}
-
 } // anonymous namespace
 
 QnMediaServerUpdateTool::PeerUpdateInformation::PeerUpdateInformation(const QnMediaServerResourcePtr &server) :
@@ -530,7 +521,7 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
 
     if (!package.isEmpty()) {
         QString fileName = package.value(lit("file")).toString();
-        m_clientUpdateFile = new UpdateFileInformation(m_targetVersion, QUrl(urlPrefix + fileName));
+        m_clientUpdateFile.reset(new UpdateFileInformation(m_targetVersion, QUrl(urlPrefix + fileName)));
         m_clientUpdateFile->baseFileName = fileName;
         m_clientUpdateFile->fileSize = package.value(lit("size")).toLongLong();
         m_clientUpdateFile->md5 = package.value(lit("md5")).toString();
@@ -679,8 +670,7 @@ void QnMediaServerUpdateTool::uploadUpdatesToServers() {
 void QnMediaServerUpdateTool::installClientUpdate() {
     setState(InstallingClientUpdate);
 
-    QString installationDir;
-    if (applauncher::installZip(m_targetVersion, &installationDir) != applauncher::api::ResultType::ok) {
+    if (applauncher::installZip(m_targetVersion, m_clientUpdateFile->fileName) != applauncher::api::ResultType::ok) {
         finishUpdate(InstallationFailed);
         return;
     }
