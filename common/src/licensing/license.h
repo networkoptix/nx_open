@@ -15,6 +15,7 @@
 #include "core/resource/resource_fwd.h"
 #include "utils/common/latin1_array.h"
 #include "utils/common/id.h"
+#include "nx_ec/data/api_fwd.h"
 
 #ifdef __APPLE__
 #undef verify
@@ -118,6 +119,8 @@ private:
         QByteArray* const v1LicenseBlock,
         QByteArray* const v2LicenseBlock );
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
+
+    ec2::ApiRuntimeData findRuntimeDataByLicense(const QByteArray& key) const;
 };
 
 Q_DECLARE_METATYPE(QnLicensePtr)

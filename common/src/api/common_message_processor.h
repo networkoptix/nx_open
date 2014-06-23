@@ -55,7 +55,6 @@ protected:
     
     virtual void afterRemovingResource(const QnId &id);
 
-    void updateHardwareIds(const ec2::QnFullResourceData &fullData);
     virtual void processResources(const QnResourceList &resources);
     void processLicenses(const QnLicenseList &licenses);
     void processCameraServerItems(const QnCameraHistoryList &cameraHistoryList);

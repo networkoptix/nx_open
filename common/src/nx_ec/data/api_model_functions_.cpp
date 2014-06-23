@@ -40,7 +40,6 @@ inline void serialize_field(const QList<T> &, QVariant *) { return; }
 
 inline void serialize_field(const ec2::ApiPeerData &, QVariant *) { return; }
 inline void serialize_field(const ec2::ApiRuntimeData &, QVariant *) { return; }
-inline void serialize_field(const ec2::ApiServerInfoData &, QVariant *) { return; }
 
 template<class T, class Allocator>
 inline void deserialize_field(const QVariant &, std::vector<T, Allocator> *) { return; }
@@ -53,7 +52,6 @@ inline void deserialize_field(const QVariant &, QList<T> *) { return; }
 
 inline void deserialize_field(const QVariant &, ec2::ApiPeerData *) { return; }
 inline void deserialize_field(const QVariant &, ec2::ApiRuntimeData *) { return; }
-inline void deserialize_field(const QVariant &, ec2::ApiServerInfoData *) { return; }
 
 namespace ec2 {
 

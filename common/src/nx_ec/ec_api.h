@@ -37,7 +37,6 @@ namespace ec2
 {
     struct QnFullResourceData
     {
-        ApiServerInfoData serverInfo;
         QnResourceTypeList resTypes;
         QnResourceList resources;
         QnBusinessEventRuleList bRules; // TODO: #Elric #EC2 rename

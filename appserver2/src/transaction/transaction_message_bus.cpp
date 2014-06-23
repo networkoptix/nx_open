@@ -19,7 +19,7 @@
 
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
-#include "managers/runtime_info_manager.h"
+#include "api/runtime_info_manager.h"
 
 namespace ec2
 {
@@ -540,7 +540,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
 
 void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransportPtr transport, const QnPeerSet& processedPeers)
 {
-    foreach (ApiRuntimeData info, QnRuntimeInfoManager::instance()->data().values())
+    foreach (ApiRuntimeData info, QnRuntimeInfoManager::instance()->allData().values())
     {
         QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, false);
         tran.params = info;

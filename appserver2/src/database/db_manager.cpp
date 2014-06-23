@@ -30,7 +30,7 @@
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_help_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include "managers/runtime_info_manager.h"
+#include "api/runtime_info_manager.h"
 
 using std::nullptr_t;
 
@@ -181,9 +181,9 @@ bool QnDbManager::init()
         m_licenseOverflowTime = query.value(0).toByteArray().toLongLong();
         m_licenseOverflowMarked = m_licenseOverflowTime > 0;
     }
-    ApiRuntimeData data = QnRuntimeInfoManager::instance()->data().value(qnCommon->moduleGUID());
+    ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
     data.prematureLicenseExperationDate = m_licenseOverflowTime;
-    ec2::QnRuntimeInfoManager::instance()->update(data);
+    QnRuntimeInfoManager::instance()->update(data);
 
     query.addBindValue(DB_INSTANCE_KEY);
     if (query.exec() && query.next()) {
@@ -2091,9 +2091,6 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     mergeObjectListData<ApiLayoutData>(data.layouts,        kvPairs, &ApiLayoutData::addParams,      &ApiResourceParamWithRefData::resourceId);
     mergeObjectListData<ApiVideowallData>(data.videowalls,  kvPairs, &ApiVideowallData::addParams,   &ApiResourceParamWithRefData::resourceId);
 
-    //filling serverinfo
-    fillServerInfo( &data.serverInfo );
-
     return err;
 }
 
@@ -2281,12 +2278,6 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFil
     if (query.next())
         data.data = query.value(0).toByteArray();
     return ErrorCode::ok;
-}
-
-void QnDbManager::fillServerInfo( ApiServerInfoData* const serverInfo )
-{
-    //serverInfo->platform = QLatin1String(QN_ARM_BOX);
-    m_licenseManagerImpl->getHardwareId( serverInfo );
 }
 
 ErrorCode QnDbManager::saveVideowall(const ApiVideowallData& params) {
@@ -2541,9 +2532,9 @@ bool QnDbManager::markLicenseOverflow(bool value, qint64 time)
     query.addBindValue(QByteArray::number(m_licenseOverflowTime));
     return query.exec();
 
-    ApiRuntimeData data = QnRuntimeInfoManager::instance()->data().value(qnCommon->moduleGUID());
+    ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
     data.prematureLicenseExperationDate = m_licenseOverflowTime;
-    ec2::QnRuntimeInfoManager::instance()->update(data);
+    QnRuntimeInfoManager::instance()->update(data);
 }
 
 QUuid QnDbManager::getID() const

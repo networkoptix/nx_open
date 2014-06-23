@@ -1,10 +1,7 @@
 #include "runtime_info_manager.h"
-#include "transaction/transaction.h"
 #include "api/common_message_processor.h"
-#include "transaction/transaction_message_bus.h"
-
-namespace ec2
-{
+#include "api/app_server_connection.h"
+#include "common/common_module.h"
 
 static QnRuntimeInfoManager* m_inst;
 
@@ -42,31 +39,54 @@ void QnRuntimeInfoManager::at_remotePeerLost(ec2::ApiPeerAliveData data, bool is
 
 void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo)
 {
+    QMutexLocker lock(&m_mutex);
+
     m_runtimeInfo.insert(runtimeInfo.peer.id, runtimeInfo);
-    qnLicensePool->addRemoteValidLicenses(runtimeInfo.peer.id, runtimeInfo.validLicenses);
+
+    QnId remoteID = qnCommon->remoteGUID();
+    if (runtimeInfo.peer.id == remoteID) {
+        qnLicensePool->setMainHardwareIds(runtimeInfo.mainHardwareIds);
+        qnLicensePool->setCompatibleHardwareIds(runtimeInfo.compatibleHardwareIds);
+    }
+    else {
+        qnLicensePool->addRemoteValidLicenses(runtimeInfo.peer.id, runtimeInfo.validLicenses);
+    }
+    emit runtimeInfoChanged(runtimeInfo);
 }
 
 void QnRuntimeInfoManager::update(const ec2::ApiRuntimeData& value)
 {
+    Q_ASSERT(!value.peer.id.isNull());
+
+    QMutexLocker lock(&m_mutex);
+
     if (m_runtimeInfo.value(value.peer.id) == value)
         return;
 
     m_runtimeInfo.insert(value.peer.id, value);
-
-    QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, false);
-    tran.params = value;
-    tran.fillSequence();
-    qnTransactionBus->sendTransaction(tran);
+    emit runtimeInfoChanged(value);
 }
 
-QMap<QnId, ec2::ApiRuntimeData> QnRuntimeInfoManager::data()
+QMap<QnId, ec2::ApiRuntimeData> QnRuntimeInfoManager::allData() const
 {
+    QMutexLocker lock(&m_mutex);
     return m_runtimeInfo;
+}
+
+ec2::ApiRuntimeData QnRuntimeInfoManager::data(const QnId& id) const
+{
+    QMutexLocker lock(&m_mutex);
+    if (m_runtimeInfo.contains(id)) {
+        return m_runtimeInfo.value(id);
+    }
+    else {
+        ec2::ApiRuntimeData result;
+        result.peer.id = id;
+        return result;
+    }
 }
 
 QnRuntimeInfoManager* QnRuntimeInfoManager::instance()
 {
     return m_inst;
-}
-
 }

@@ -109,11 +109,11 @@ extern "C"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
 #include <api/network_proxy_factory.h>
-#include "managers/runtime_info_manager.h"
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
 #endif
+#include "api/runtime_info_manager.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -468,7 +468,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
-    QScopedPointer<ec2::QnRuntimeInfoManager> runtimeInfoManager(new ec2::QnRuntimeInfoManager());
+    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
     //clientMessageProcessor->init(QnAppServerConnectionFactory::getConnection2());
 

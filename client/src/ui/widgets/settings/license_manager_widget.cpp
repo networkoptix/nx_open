@@ -29,8 +29,7 @@
 #include <utils/license_usage_helper.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/common/product_features.h>
-#include "managers/runtime_info_manager.h"
-
+#include "api/runtime_info_manager.h"
 
 #define QN_LICENSE_URL "http://networkoptix.com/nolicensed_vms/activate.php"
 
@@ -71,7 +70,7 @@ void QnLicenseManagerWidget::updateLicenses() {
     if (!m_handleKeyMap.isEmpty())
         return;
 
-    setEnabled(!ec2::QnRuntimeInfoManager::instance()->data().isEmpty());
+    setEnabled(!QnRuntimeInfoManager::instance()->allData().isEmpty());
 
     m_licenses = qnLicensePool->getLicenses();
 

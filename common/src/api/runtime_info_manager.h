@@ -3,13 +3,13 @@
 
 #include <QMap>
 #include "nx_ec/data/api_fwd.h"
+#include "nx_ec/data/api_runtime_data.h"
+#include "nx_ec/data/api_server_alive_data.h"
 #include "utils/common/id.h"
-
-namespace ec2
-{
 
 class QnRuntimeInfoManager: public QObject
 {
+    Q_OBJECT
 public:
     QnRuntimeInfoManager();
     virtual ~QnRuntimeInfoManager();
@@ -17,10 +17,9 @@ public:
     static QnRuntimeInfoManager* instance();
 
     void update(const ec2::ApiRuntimeData& runtimeInfo);
-    QMap<QnId, ec2::ApiRuntimeData> data();
+    QMap<QnId, ec2::ApiRuntimeData> allData() const;
+    ec2::ApiRuntimeData data(const QnId& id) const;
 
-public slots:
-    void on_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
 signals:
     void runtimeInfoChanged(ec2::ApiRuntimeData data);
 private slots:
@@ -28,9 +27,8 @@ private slots:
     void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
     void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
 private:
-    QMap<QnId, ApiRuntimeData> m_runtimeInfo;
+    QMap<QnId, ec2::ApiRuntimeData> m_runtimeInfo;
+    mutable QMutex m_mutex;
 };
-
-}
 
 #endif

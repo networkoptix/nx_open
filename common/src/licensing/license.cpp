@@ -16,8 +16,8 @@
 #include <common/common_globals.h>
 #include <utils/common/synctime.h>
 #include <utils/common/product_features.h>
-#include <api/app_server_connection.h>
 #include "common/common_module.h"
+#include "api/runtime_info_manager.h"
 
 namespace {
     const char *networkOptixRSAPublicKey = "-----BEGIN PUBLIC KEY-----\n"
@@ -152,6 +152,16 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
+ec2::ApiRuntimeData QnLicense::findRuntimeDataByLicense(const QByteArray& key) const
+{
+    foreach(const ec2::ApiRuntimeData& data, QnRuntimeInfoManager::instance()->allData().values())
+    {
+        if (data.mainHardwareIds.contains(key) || data.compatibleHardwareIds.contains(key))
+            return data;
+    }
+    return ec2::ApiRuntimeData();
+}
+
 bool QnLicense::isValid(const QString& brand, ErrorCode* errCode, bool checkForeignLicenses) const
 {
     if (checkForeignLicenses && QnLicensePool::instance()->allRemoteValidLicenses().contains(m_key))
@@ -161,8 +171,8 @@ bool QnLicense::isValid(const QString& brand, ErrorCode* errCode, bool checkFore
     // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
     // We just allow empty brand for all, because we believe license is correct.
 
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
-    QString box = ec2Connection->connectionInfo().box;
+    ec2::ApiRuntimeData runtimeData = findRuntimeDataByLicense(m_key);
+    QString box = runtimeData.box;
 
     // 1. edge licenses can be activated only if box is "isd"
     // 2. if box is "isd" only edge licenses AND any trial can be activated

@@ -243,12 +243,6 @@ void QnCommonMessageProcessor::afterRemovingResource(const QnId& id) {
 }
 
 
-void QnCommonMessageProcessor::updateHardwareIds(const ec2::QnFullResourceData& fullData)
-{
-    qnLicensePool->setMainHardwareIds(fullData.serverInfo.mainHardwareIds);
-    qnLicensePool->setCompatibleHardwareIds(fullData.serverInfo.compatibleHardwareIds);
-}
-
 void QnCommonMessageProcessor::processResources(const QnResourceList& resources)
 {
     qnResPool->beginTran();
@@ -273,7 +267,6 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
 {
     //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
 
-    updateHardwareIds(fullData);
     processResources(fullData.resources);
     processLicenses(fullData.licenses);
     processCameraServerItems(fullData.cameraHistory);
