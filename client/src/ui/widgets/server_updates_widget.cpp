@@ -4,6 +4,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
+#include <QtCore/QTimer>
 
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
@@ -17,10 +18,15 @@
 
 #include <version.h>
 
+namespace {
+    const int longInstallWarningTimeout = 2 * 60 * 1000; // 2 minutes
+}
+
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QnServerUpdatesWidget),
-    m_minimalMode(false)
+    m_minimalMode(false),
+    m_extraMessageTimer(new QTimer(this))
 {
     ui->setupUi(this);
 
@@ -45,6 +51,9 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     connect(m_updateTool,       &QnMediaServerUpdateTool::stateChanged,         this,           &QnServerUpdatesWidget::updateUi);
     connect(m_updateTool,       &QnMediaServerUpdateTool::progressChanged,      ui->updateProgessBar,   &QProgressBar::setValue);
     connect(m_updateTool,       &QnMediaServerUpdateTool::peerChanged,          this,           &QnServerUpdatesWidget::at_updateTool_peerChanged);
+
+    m_extraMessageTimer->setInterval(longInstallWarningTimeout);
+    connect(m_extraMessageTimer, &QTimer::timeout, this, &QnServerUpdatesWidget::at_extraMessageTimer_timeout);
 
     m_previousToolState = m_updateTool->state();
     updateUi();
@@ -81,6 +90,9 @@ void QnServerUpdatesWidget::setMinimalMode(bool minimalMode) {
 }
 
 void QnServerUpdatesWidget::reset() {
+    if (m_updateTool->state() != QnMediaServerUpdateTool::Idle)
+        return;
+
     m_updateTool->reset();
     updateUi();
 }
@@ -131,12 +143,18 @@ void QnServerUpdatesWidget::at_updateTool_peerChanged(const QnId &peerId) {
     m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(peerId));
 }
 
+void QnServerUpdatesWidget::at_extraMessageTimer_timeout() {
+    if (m_updateTool->state() == QnMediaServerUpdateTool::InstallingUpdate)
+        ui->extraMessageLabel->show();
+}
+
 void QnServerUpdatesWidget::updateUi() {
     bool checkingForUpdates = false;
     bool applying = false;
     bool cancellable = false;
     bool startUpdate = false;
     bool infiniteProgress = false;
+    bool installing = false;
 
     foreach (const QnMediaServerResourcePtr &server, m_updateTool->actualTargets())
         m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(server->getId()));
@@ -176,7 +194,7 @@ void QnServerUpdatesWidget::updateUi() {
                     QMessageBox::critical(this, tr("Update check failed"), m_updateTool->resultString());
                 break;
             }
-        } else {
+        } else if (m_previousToolState > QnMediaServerUpdateTool::CheckingForUpdates) {
             switch (m_updateTool->updateResult()) {
             case QnMediaServerUpdateTool::UpdateSuccessful:
                 if (!m_minimalMode) {
@@ -222,6 +240,7 @@ void QnServerUpdatesWidget::updateUi() {
     case QnMediaServerUpdateTool::InstallingUpdate:
         applying = true;
         infiniteProgress = true;
+        installing = true;
         ui->updateStateLabel->setText(tr("Installing updates"));
         break;
     default:
@@ -240,6 +259,13 @@ void QnServerUpdatesWidget::updateUi() {
     ui->updateProgessBar->setVisible(!infiniteProgress);
 
     m_previousToolState = m_updateTool->state();
+
+    if (installing) {
+        m_extraMessageTimer->start();
+    } else {
+        ui->extraMessageLabel->hide();
+        m_extraMessageTimer->stop();
+    }
 
     if (startUpdate)
         m_updateTool->updateServers();

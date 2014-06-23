@@ -36,6 +36,7 @@ private slots:
     void at_updateFromLocalSourceButton_clicked();
     void at_updateButton_clicked();
     void at_updateTool_peerChanged(const QnId &peerId);
+    void at_extraMessageTimer_timeout();
 
     void updateUi();
 
@@ -46,6 +47,8 @@ private:
     QnServerUpdatesModel *m_updatesModel;
     QnMediaServerUpdateTool *m_updateTool;
     int m_previousToolState;
+
+    QTimer *m_extraMessageTimer;
 };
 
 #endif // SERVER_UPDATES_WIDGET_H
