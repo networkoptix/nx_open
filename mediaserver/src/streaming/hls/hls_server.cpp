@@ -803,7 +803,7 @@ namespace nx_hls
             //estimating bitrate as we can
             QnConstCompressedVideoDataPtr videoFrame = videoCamera->getLastVideoFrame( streamQuality == MEDIA_Quality_High );
             if( videoFrame )
-                bandwidth = videoFrame->data.size() * CHAR_BIT / COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO * camResource->getMaxFps();
+                bandwidth = videoFrame->dataSize() * CHAR_BIT / COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO * camResource->getMaxFps();
         }
         if( bandwidth == -1 )
             bandwidth = DEFAULT_PRIMARY_STREAM_BITRATE;
