@@ -131,6 +131,7 @@ void QnServerUpdatesWidget::updateUi() {
     bool applying = false;
     bool cancellable = false;
     bool startUpdate = false;
+    bool infiniteProgress = false;
 
     switch (m_updateTool->state()) {
     case QnMediaServerUpdateTool::Idle:
@@ -212,6 +213,7 @@ void QnServerUpdatesWidget::updateUi() {
         break;
     case QnMediaServerUpdateTool::InstallingUpdate:
         applying = true;
+        infiniteProgress = true;
         ui->updateStateLabel->setText(tr("Installing updates"));
         break;
     default:
@@ -229,6 +231,8 @@ void QnServerUpdatesWidget::updateUi() {
     ui->cancelButton->setVisible(applying);
     ui->cancelButton->setEnabled(cancellable);
     ui->updateStateWidget->setVisible(applying);
+    ui->progressIndicator->setVisible(infiniteProgress);
+    ui->updateProgessBar->setVisible(!infiniteProgress);
 
     m_previousToolState = m_updateTool->state();
 
