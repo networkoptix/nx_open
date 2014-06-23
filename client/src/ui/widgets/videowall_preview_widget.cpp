@@ -11,7 +11,6 @@
 #include <utils/common/string.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-namespace {
 
     struct BaseModelItem {
         BaseModelItem(const QRect &rect):
@@ -63,6 +62,7 @@ namespace {
         QList<ModelScreenPart> parts;
     };
 
+namespace {
     const qreal frameMargin = 0.04;
     const qreal innerMargin = frameMargin * 2;
 }
@@ -214,7 +214,7 @@ void QnVideowallPreviewWidget::submitToResource(const QnVideoWallResourcePtr &vi
 }
 
 
-void QnVideowallPreviewWidget::paintScreenFrame(QPainter *painter, BaseModelItem &item)
+void QnVideowallPreviewWidget::paintScreenFrame(QPainter *painter, const BaseModelItem &item)
 {
     QRect geometry = item.geometry;
 
@@ -223,7 +223,7 @@ void QnVideowallPreviewWidget::paintScreenFrame(QPainter *painter, BaseModelItem
 
     QPainterPath path;
     path.addRect(targetRect);
-    item.path = path;
+    //item.path = path;
 
     QPen borderPen(QColor(130, 130, 130, 200));
     borderPen.setWidth(10);
@@ -237,7 +237,7 @@ void QnVideowallPreviewWidget::paintScreenFrame(QPainter *painter, BaseModelItem
 }
 
 
-void QnVideowallPreviewWidget::paintPlaceholder(QPainter* painter, BaseModelItem &item) {
+void QnVideowallPreviewWidget::paintPlaceholder(QPainter* painter, const BaseModelItem &item) {
     QRect geometry = item.geometry;
 
     qreal margin = innerMargin * qMin(geometry.width(), geometry.height());
@@ -246,7 +246,7 @@ void QnVideowallPreviewWidget::paintPlaceholder(QPainter* painter, BaseModelItem
 
     QPainterPath path;
     path.addRoundRect(targetRect, 25);
-    item.path = path;
+    //item.path = path;
 
     QPen borderPen(QColor(64, 130, 180, 200));
     borderPen.setWidth(25);
@@ -283,6 +283,7 @@ void QnVideowallPreviewWidget::mouseReleaseEvent(QMouseEvent *event)
 void QnVideowallPreviewWidget::mouseMoveEvent(QMouseEvent *event) {
     QTransform transform(m_model->getInvertedTransform(m_model->targetRect(this->rect())));
     qDebug() << transform.map(event->pos());
+
 
 
 }

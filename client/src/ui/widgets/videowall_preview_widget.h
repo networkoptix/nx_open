@@ -15,6 +15,7 @@ class DragProcessor;
 class QAbstractAnimation;
 
 class QnVideowallModel;
+struct BaseModelItem;
 
 class QnVideowallPreviewWidget : public QWidget, public DragProcessHandler, private QnGeometry {
     Q_OBJECT
@@ -37,8 +38,8 @@ protected:
 private:
     void updateModel();
 
-    void paintScreenFrame(QPainter *painter, BaseModelItem &item);
-    void paintPlaceholder(QPainter* painter, BaseModelItem &item);
+    void paintScreenFrame(QPainter *painter, const BaseModelItem &item);
+    void paintPlaceholder(QPainter* painter, const BaseModelItem &item);
 
 private:
     QScopedPointer<QnVideowallModel> m_model;
