@@ -36,6 +36,7 @@ namespace ec2
         qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiPeerAliveData>( "ApiPeerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
+        qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
 
         ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
     }

@@ -43,6 +43,7 @@ void QnRuntimeInfoManager::at_remotePeerLost(ec2::ApiPeerAliveData data, bool is
 void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo)
 {
     m_runtimeInfo.insert(runtimeInfo.peer.id, runtimeInfo);
+    qnLicensePool->addRemoteValidLicenses(runtimeInfo.peer.id, runtimeInfo.validLicenses);
 }
 
 void QnRuntimeInfoManager::update(const ec2::ApiRuntimeData& value)
