@@ -582,12 +582,12 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         sendRuntimeInfo(transport, processedPeers);
         transport->sendTransaction(tran, processedPeers);
 
-        if (remotePeer.peerType == QnPeerInfo::DesktopClient) {
+        if (remotePeer.peerType == Qn::PT_DesktopClient) {
             foreach(QnTransactionTransportPtr connected, m_connections.values()) {
                 if (!connected)
                     continue;
-                QnPeerInfo peer = connected->remotePeer();
-                if (peer.peerType != QnPeerInfo::VideowallClient)
+                ApiPeerData peer = connected->remotePeer();
+                if (peer.peerType != Qn::PT_VideowallClient)
                     continue;
                 
                 QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::updateVideowallInstanceStatus, false);

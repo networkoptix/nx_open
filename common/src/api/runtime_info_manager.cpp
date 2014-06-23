@@ -56,7 +56,7 @@ void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData& runt
 
 void QnRuntimeInfoManager::update(const ec2::ApiRuntimeData& value)
 {
-    Q_ASSERT(!value.peer.id.isNull());
+    Q_ASSERT(!value.peer.id.isNull() && value.peer.peerType == Qn::PT_Server);
 
     QMutexLocker lock(&m_mutex);
 
