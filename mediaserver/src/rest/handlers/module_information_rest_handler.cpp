@@ -33,7 +33,3 @@ int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequ
     result.setReply(moduleInformation);
     return CODE_OK;
 }
-
-QString QnModuleInformationRestHandler::description() const {
-    return lit("Returns module information.");
-}

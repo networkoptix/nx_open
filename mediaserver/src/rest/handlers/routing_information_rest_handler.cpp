@@ -129,8 +129,3 @@ int QnRoutingInformationRestHandler::executePost(const QString &path, const QnRe
 
     return executeGet(path, params, result, contentType);
 }
-
-QString QnRoutingInformationRestHandler::description() const {
-    // this is for our support
-    return QString();
-}
