@@ -36,7 +36,7 @@
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\${mediaserver.name}">
                                     <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
-                                    <RegistryValue Type="string" Name="appserverPort" Value="[SERVER_PORT]"/>
+                                    <RegistryValue Type="string" Name="rtspPort" Value="[SERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="appserverLogin" Value="[SERVER_LOGIN]"/>
                                     <RegistryValue Type="string" Name="appserverPassword" Value="[SERVER_PASSWORD]"/>
                                 </RegistryKey>

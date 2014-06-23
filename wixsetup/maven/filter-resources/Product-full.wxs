@@ -86,7 +86,7 @@
             <RegistrySearch Id="ServerEcsPortReg"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
-                            Name="appserverPort"
+                            Name="rtspPort"
                             Type="raw"
                             Win64="yes"/>
         </Property>
