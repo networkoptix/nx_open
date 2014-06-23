@@ -570,6 +570,23 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
 
         transport->setWriteSync(true);
         transport->sendTransaction(tran, QnPeerSet() << remotePeer.id << m_localPeer.id);
+
+        if (remotePeer.peerType == QnPeerInfo::DesktopClient) {
+            foreach(QnTransactionTransportPtr connected, m_connections.values()) {
+                if (!connected)
+                    continue;
+                QnPeerInfo peer = connected->remotePeer();
+                if (peer.peerType != QnPeerInfo::VideowallClient)
+                    continue;
+                
+                QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::updateVideowallInstanceStatus, false);
+                tran.params.online = true;
+                tran.params.instanceGuid = peer.params["instanceGuid"];
+                tran.params.videowallGuid = peer.params["videowallGuid"];
+                transport->sendTransaction(tran, QnPeerSet() << remotePeer.id << m_localPeer.id);        
+            }
+        }
+
         transport->setReadSync(true);
     } else if (remotePeer.peerType == QnPeerInfo::AndroidClient) {
         /** Request all data to be sent to the client peers on the connect. */
