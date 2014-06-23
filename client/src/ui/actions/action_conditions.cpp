@@ -908,23 +908,13 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
     if (!context()->user())
         return Qn::InvisibleAction;
 
-    //TODO: #GDM #VW ask Roma to do some more stable way to find correct desktop camera
-    QRegExp desktopCameraNameRegExp(QString(lit("Desktop_camera_\\{.{36,36}\\}_%1")).arg(context()->user()->getName()));
-    QnVirtualCameraResourcePtr desktopCamera;
-
-    foreach (const QnResourcePtr &resource, qnResPool->getAllCameras(QnResourcePtr())) {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera)
-            continue;
-        if (!desktopCameraNameRegExp.exactMatch(camera->getPhysicalId()))
-            continue;
-        desktopCamera = camera;
-        break;
-    }
-    if (!desktopCamera)
-        return Qn::InvisibleAction;
-
-    return Qn::EnabledAction;
+    QString userName = context()->user()->getName();
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::desktop_camera)) 
+        if (resource->getName() == userName)
+            return Qn::EnabledAction;
+    
+    return Qn::InvisibleAction;
+   
 #else
     return Qn::InvisibleAction;
 #endif
