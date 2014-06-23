@@ -233,6 +233,14 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
 QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl() const {
     QUrlQuery query;
 
+    QString versionSuffix;
+    if (m_targetVersion.isNull()) {
+        versionSuffix = lit("/latest");
+        query.addQueryItem(lit("current"), qnCommon->engineVersion().toString());
+    } else {
+        versionSuffix = QString(lit("/%1-%2")).arg(m_targetVersion.toString(), passwordForBuild((unsigned)m_targetVersion.build()));
+    }
+
     QSet<QnSystemInformation> systemInformationList;
 
     if (m_idBySystemInformation.isEmpty()) {
@@ -245,12 +253,6 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl() const {
     query.addQueryItem(lit("client"), QnSystemInformation(lit(QN_APPLICATION_PLATFORM), lit(QN_APPLICATION_ARCH), lit(QN_ARM_BOX)).toString().replace(QLatin1Char(' '), QLatin1Char('_')));
     foreach (const QnSystemInformation &systemInformation, systemInformationList)
         query.addQueryItem(lit("server"), systemInformation.toString().replace(QLatin1Char(' '), QLatin1Char('_')));
-
-    QString versionSuffix;
-    if (m_targetVersion.isNull())
-        versionSuffix = lit("/latest");
-    else
-        versionSuffix = QString(lit("/%1-%2")).arg(m_targetVersion.toString(), passwordForBuild((unsigned)m_targetVersion.build()));
 
     QUrl url(QN_UPDATE_PACKAGE_URL + versionSuffix);
     url.setQuery(query);
