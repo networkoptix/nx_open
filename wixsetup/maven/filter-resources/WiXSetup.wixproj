@@ -44,6 +44,7 @@
     <Compile Include="Product-client-only.wxs" />
     <Compile Include="Product-full.wxs" />
     <Compile Include="SelectionWarning.wxs" />
+    <Compile Include="server.wxs" />
     <Compile Include="UninstallOptionsDlg.wxs" />
     <Compile Include="UpgradeDlg.wxs" />
   </ItemGroup>
