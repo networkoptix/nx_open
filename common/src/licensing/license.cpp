@@ -173,13 +173,6 @@ bool QnLicense::isValid(ErrorCode* errCode, bool checkForeignLicenses) const
     // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
     // We just allow empty brand for all, because we believe license is correct.
 
-    ec2::ApiRuntimeData runtimeData = findRuntimeDataByLicense();
-    if (runtimeData.peer.id.isNull()) {
-        // new license
-        runtimeData = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
-    }
-    const QString box = runtimeData.box;
-    const QString brand = runtimeData.brand;
 
     // 1. edge licenses can be activated only if box is "isd"
     // 2. if box is "isd" only edge licenses AND any trial can be activated
@@ -196,6 +189,14 @@ bool QnLicense::isValid(ErrorCode* errCode, bool checkForeignLicenses) const
             *errCode = InvalidHardwareID;
         return false;
     }
+
+    ec2::ApiRuntimeData runtimeData = findRuntimeDataByLicense();
+    if (runtimeData.peer.id.isNull()) {
+        // new license
+        runtimeData = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
+    }
+    const QString box = runtimeData.box;
+    const QString brand = runtimeData.brand;
 
     if (!m_brand.isEmpty() && m_brand != brand) {
         if (errCode)
