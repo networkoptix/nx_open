@@ -110,6 +110,9 @@ android:contains(QMAKE_HOST.os,Windows) {
   QMAKE_CXXFLAGS_PRECOMPILE     = -x c++-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}.gch
   QMAKE_CXXFLAGS_USE_PRECOMPILE = $$QMAKE_CFLAGS_USE_PRECOMPILE
 
+  # Make sure moc files compile
+  QMAKE_CXXFLAGS += -fpermissive
+
   # Replace slashes in paths with backslashes
   OBJECTS_DIR ~= s,/,\\,g
 
