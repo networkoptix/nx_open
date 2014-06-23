@@ -2091,6 +2091,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     mergeObjectListData<ApiLayoutData>(data.layouts,        kvPairs, &ApiLayoutData::addParams,      &ApiResourceParamWithRefData::resourceId);
     mergeObjectListData<ApiVideowallData>(data.videowalls,  kvPairs, &ApiVideowallData::addParams,   &ApiResourceParamWithRefData::resourceId);
 
+    //filling serverinfo
+    fillServerInfo( &data.serverInfo );
+
     return err;
 }
 
@@ -2278,6 +2281,12 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFil
     if (query.next())
         data.data = query.value(0).toByteArray();
     return ErrorCode::ok;
+}
+
+void QnDbManager::fillServerInfo( ApiServerInfoData* const serverInfo )
+{
+    //serverInfo->platform = QLatin1String(QN_ARM_BOX);
+    m_licenseManagerImpl->getHardwareId( serverInfo );
 }
 
 ErrorCode QnDbManager::saveVideowall(const ApiVideowallData& params) {

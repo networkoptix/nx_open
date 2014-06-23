@@ -322,7 +322,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
     fromApiToResourceList(src.cameraHistory, dst.cameraHistory);
 
-    //dst.serverInfo = src.serverInfo;
+    dst.serverInfo = src.serverInfo;
 }
 
 

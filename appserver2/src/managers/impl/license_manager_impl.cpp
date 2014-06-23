@@ -7,6 +7,7 @@
 #include "llutil/hardware_id.h"
 #include "version.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "nx_ec/data/api_runtime_data.h"
 
 
 static const char TEST_LICENSE_NX[] = 
@@ -73,8 +74,7 @@ namespace ec2
         return ErrorCode::notImplemented;
     }
 
-    /*
-    void LicenseManagerImpl::getHardwareId( ApiRuntimeData* const serverInfo )
+    void LicenseManagerImpl::getHardwareId( ec2::ApiServerInfoData* const serverInfo )
     {
         int guidCompatibility = 0;
 
@@ -82,5 +82,4 @@ namespace ec2
         serverInfo->mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
         serverInfo->compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
     }
-    */
 }

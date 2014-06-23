@@ -297,6 +297,7 @@ namespace ec2
         ErrorCode removeUser( const QnId& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
 
+        void fillServerInfo( ApiServerInfoData* const serverInfo );
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnId& id);
         ErrorCode insertOrReplaceVideowall(const ApiVideowallData& data, qint32 internalId);
