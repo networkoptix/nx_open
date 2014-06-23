@@ -11,8 +11,8 @@ static QnRuntimeInfoManager* m_inst;
 QnRuntimeInfoManager::QnRuntimeInfoManager():
     QObject()
 {
-    m_inst = this;
     Q_ASSERT(m_inst == 0);
+    m_inst = this;
 
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, &QnRuntimeInfoManager::at_runtimeInfoChanged );
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerFound,    this, &QnRuntimeInfoManager::at_remotePeerFound );
