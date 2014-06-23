@@ -861,6 +861,24 @@ Qn::ActionVisibility QnDetachFromVideoWallActionCondition::check(const QnActionP
     return Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnStartVideoWallControlActionCondition::check(const QnActionParameters &parameters) {
+    if (!context()->user() || parameters.videoWallItems().isEmpty())
+        return Qn::InvisibleAction;
+
+    foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
+        if (index.isNull() || !index.videowall()->items()->hasItem(index.uuid()))
+            continue;
+
+        auto item = index.videowall()->items()->getItem(index.uuid());
+        if (item.layout.isNull())
+            continue;
+
+        return Qn::EnabledAction;
+    }
+    return Qn::InvisibleAction;
+}
+
+
 Qn::ActionVisibility QnRotateItemCondition::check(const QnResourceWidgetList &widgets) {
     foreach (QnResourceWidget *widget, widgets) {
         if (widget->options() & QnResourceWidget::WindowRotationForbidden)

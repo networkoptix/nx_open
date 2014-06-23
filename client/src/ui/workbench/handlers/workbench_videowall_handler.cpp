@@ -1660,10 +1660,10 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
 
         resourcePool()->addResource(layout);
 
+        menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+
         // new layout should not be marked as changed
         menu()->trigger(Qn::SaveVideoWallReviewAction, QnActionParameters(videoWall).withArgument(Qn::LayoutResourceRole, layout));
-
-        menu()->trigger(Qn::OpenSingleLayoutAction, layout);
     }
 }
 
@@ -2030,6 +2030,50 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     //TODO: #GDM #VW implement screen size changes handling
+
+    // index to place updated layout
+    int layoutIndex = -1;
+    bool wasCurrent = false;
+
+    // check if layout was changed or detached
+    for (int i = 0; i < workbench()->layouts().size(); ++i) {
+         QnWorkbenchLayout *layout = workbench()->layout(i);
+
+        if (layout->data(Qn::VideoWallItemGuidRole).value<QUuid>() != item.uuid)
+            continue;
+
+        if (layout->resource() && item.layout == layout->resource()->getId())
+            return; //everything is correct, no changes required
+
+        wasCurrent = workbench()->currentLayout() == layout;
+        layoutIndex = i;
+        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QUuid()));
+        workbench()->removeLayout(layout);
+    }
+
+    if (item.layout.isNull() || layoutIndex < 0)
+        return;
+
+    // add new layout if needed
+    {
+        QnLayoutResourcePtr layoutResource = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
+        if (!layoutResource)
+            return;
+
+        QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(layoutResource);
+        if(!layout) 
+            layout = new QnWorkbenchLayout(layoutResource, workbench());
+
+        if (workbench()->layoutIndex(layout) < 0)
+            workbench()->insertLayout(layout, layoutIndex);
+        else 
+            workbench()->moveLayout(layout, layoutIndex);
+
+        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(item.uuid));
+        if (wasCurrent)
+            workbench()->setCurrentLayoutIndex(layoutIndex);
+    }
+
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
@@ -2511,6 +2555,7 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(const QnLayoutResourcePtr &la
         videowall->pcs()->updateItem(pcUuid, pc);
     }
 
+    //TODO: #GDM #VW sometimes saving is not required
     connection2()->getVideowallManager()->save(videowall, this, 
         [this, callback]( int reqID, ec2::ErrorCode errorCode ) {
             callback(reqID, errorCode);

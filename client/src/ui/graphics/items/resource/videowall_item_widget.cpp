@@ -419,7 +419,7 @@ void QnVideowallItemWidget::at_doubleClicked(Qt::MouseButton button) {
     if (button != Qt::LeftButton)
         return;
 
-    menu()->trigger(
+    menu()->triggerIfPossible(
         Qn::StartVideoWallControlAction,
         QnActionParameters(m_indices)
     );
