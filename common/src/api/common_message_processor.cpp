@@ -120,18 +120,7 @@ void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bo
 
 void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData runtimeInfo, bool /*isProxy*/)
 {
-    //qnLicensePool->removeRemoteValidLicenses(runtimeInfo.peer.id);   //TODO: #Elric #ec2 get rid of the serialization hell
-    //QnAppServerConnectionFactory::removeRuntimeInfo(runtimeInfo.peer.id);
 }
-
-/*
-void QnCommonMessageProcessor::on_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo)
-{
-    if (runtimeInfo.peer.peerType == Qn::PT_Server)   //TODO: #Elric #ec2 get rid of the serialization hell
-        qnLicensePool->addRemoteValidLicenses(runtimeInfo.peer.id, runtimeInfo.validLicenses);
-    QnAppServerConnectionFactory::addRuntimeInfo(runtimeInfo);
-}
-*/
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
 {

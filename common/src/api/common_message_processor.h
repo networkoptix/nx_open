@@ -64,7 +64,6 @@ public slots:
     void on_licenseChanged(const QnLicensePtr &license);
 private slots:
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
-    //void on_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
 
 
     void on_resourceStatusChanged(const QnId &resourceId, QnResource::Status status );

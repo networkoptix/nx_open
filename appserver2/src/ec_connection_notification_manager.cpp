@@ -98,6 +98,12 @@ namespace ec2
         }
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiRuntimeData>& tran )
+    {
+        Q_ASSERT(tran.command == ApiCommand::runtimeInfoChanged);
+        emit m_ecConnection->runtimeInfoChanged(tran.params);
+    }
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiMediaServerData>& tran ) {
         m_mediaServerManager->triggerNotification( tran );
     }
