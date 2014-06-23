@@ -523,6 +523,7 @@ void QnWorkbenchVideoWallHandler::attachLayout(const QnVideoWallResourcePtr &vid
                 resetLayout(items, layout);
     } );
 
+    menu()->trigger(Qn::SaveVideoWallReviewAction, QnActionParameters(videoWall));
     menu()->trigger(Qn::OpenVideoWallsReviewAction, QnActionParameters(videoWall));
 }
 
@@ -1484,7 +1485,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered() {
         videoWalls << index.videowall();
     }
 
-    saveVideowalls(videoWalls);
+    saveVideowalls(videoWalls, true);
 }
 
 void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered() {
@@ -1658,6 +1659,10 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         }
 
         resourcePool()->addResource(layout);
+
+        // new layout should not be marked as changed
+        menu()->trigger(Qn::SaveVideoWallReviewAction, QnActionParameters(videoWall).withArgument(Qn::LayoutResourceRole, layout));
+
         menu()->trigger(Qn::OpenSingleLayoutAction, layout);
     }
 }
@@ -1682,7 +1687,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered() {
         layout = QnWorkbenchLayout::instance(layoutResource);
     else
         layout = QnWorkbenchLayout::instance(videowall);
-    
+
     if (!layout) 
         return;
 
@@ -1698,6 +1703,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered() {
         snapshotManager()->setFlags(layoutResource, snapshotManager()->flags(layoutResource) & ~Qn::ResourceIsChanged);
     }))
         snapshotManager()->setFlags(layoutResource, snapshotManager()->flags(layoutResource) | Qn::ResourceIsBeingSaved);
+    
 }
 
 void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
@@ -2471,19 +2477,16 @@ bool QnWorkbenchVideoWallHandler::createShortcut(const QnVideoWallResourcePtr &v
     return qnPlatform->shortcuts()->createShortcut(qApp->applicationFilePath(), destinationPath, videowall->getName(), arguments);
 }
 
-void QnWorkbenchVideoWallHandler::saveVideowall(const QnVideoWallResourcePtr& videowall) {
-    connection2()->getVideowallManager()->save(videowall, this, [this, videowall] {
-        if (!videowall->items()->getItems().isEmpty())
-            return;
-        QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(videowall);
-        if (layout && layout->resource())
-            snapshotManager()->setFlags(layout->resource(), snapshotManager()->flags(layout->resource()) & ~Qn::ResourceIsChanged);
-    });
+void QnWorkbenchVideoWallHandler::saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout) {
+    if (saveLayout)
+        menu()->trigger(Qn::SaveVideoWallReviewAction, QnActionParameters(videowall));
+    else
+        connection2()->getVideowallManager()->save(videowall, this, [] {});
 }
 
-void QnWorkbenchVideoWallHandler::saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls) {
+void QnWorkbenchVideoWallHandler::saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls, bool saveLayout) {
     foreach (const QnVideoWallResourcePtr &videowall, videowalls)
-        saveVideowall(videowall);
+        saveVideowall(videowall, saveLayout);
 }
 
 bool QnWorkbenchVideoWallHandler::saveReviewLayout(const QnLayoutResourcePtr &layoutResource, std::function<void(int, ec2::ErrorCode)> callback) {

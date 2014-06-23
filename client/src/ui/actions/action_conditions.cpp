@@ -742,8 +742,8 @@ Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourc
         if (!videowall)
             continue;
 
-        if (videowall->items()->getItems().isEmpty())
-            continue;
+       // if (videowall->items()->getItems().isEmpty())
+       //     continue; //disable check to avoid unsaved empty layout
 
         if (!QnWorkbenchLayout::instance(videowall))
             continue;
