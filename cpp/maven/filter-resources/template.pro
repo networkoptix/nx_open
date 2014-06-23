@@ -110,8 +110,23 @@ android:contains(QMAKE_HOST.os,Windows) {
   QMAKE_CXXFLAGS_PRECOMPILE     = -x c++-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}.gch
   QMAKE_CXXFLAGS_USE_PRECOMPILE = $$QMAKE_CFLAGS_USE_PRECOMPILE
 
-  # Work around CreateProcess limit on arg size ///////// doesn't work yet
-  QMAKE_AR_CMD = dir /B $$OBJECTS_DIR/*.obj >$$OBJECTS_DIR/_objects.lst $$escape_expand(\n\t) $(AR) $(TARGET) @$$OBJECTS_DIR/_objects.lst
+  # Replace slashes in paths with backslashes
+  OBJECTS_DIR ~= s,/,\\,g
+
+  # Work around CreateProcess limit on arg size
+  QMAKE_AR_CMD = \
+    del /F $$OBJECTS_DIR\\_list.bat                                                 $$escape_expand(\n\t)\
+                                                                                    $$escape_expand(\n\t)\
+    echo @echo off                          >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+    echo setlocal EnableDelayedExpansion    >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+    echo for %%%%i in (%%1) do (            >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+    echo   set OBJECT=%%%%~fi               >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+    echo   set OBJECT=!OBJECT:\\=/!         >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+    echo   echo !OBJECT!                    >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+    echo )                                  >>$$OBJECTS_DIR\\_list.bat              $$escape_expand(\n\t)\
+                                                                                    $$escape_expand(\n\t)\
+    $$OBJECTS_DIR\\_list.bat $$OBJECTS_DIR\\*.obj >$$OBJECTS_DIR\\_objects.lst      $$escape_expand(\n\t)\
+    $(AR) $(TARGET) @$$OBJECTS_DIR\\_objects.lst
 }
 
 
