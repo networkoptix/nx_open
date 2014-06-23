@@ -4,9 +4,6 @@
     <Fragment Id='FragmentClient'>
         <?include BuildVars.wxi ?>
 
-        <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>                
-        <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>                        
-
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="${customization}ClientDir" Name="Client">
                 <Directory Id="${customization}HelpDir" Name="help"/>                         
