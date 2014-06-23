@@ -1058,7 +1058,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
 
         m_controlMode.active = active;
         m_controlMode.cacheTimer->start();
-        sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStarted));
+        sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStarted));  //TODO: #GDM #VW start control when item goes online
 
 
     } else {
