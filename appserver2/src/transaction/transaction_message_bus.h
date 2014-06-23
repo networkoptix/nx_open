@@ -173,7 +173,7 @@ namespace ec2
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran);
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
 
-        void sendRuntimeInfo(QnTransactionTransportPtr transport, const QnPeerSet& processedPeers);
+        void sendRuntimeInfo(QnTransactionTransport* transport, const QnPeerSet& processedPeers);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();

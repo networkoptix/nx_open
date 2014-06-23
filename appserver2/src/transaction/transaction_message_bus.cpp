@@ -334,6 +334,8 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         QnPeerSet processedPeers(QnPeerSet() << sender->remotePeer().id << m_localPeer.id);
         sender->sendTransaction(tran, processedPeers);
 
+        sendRuntimeInfo(sender, processedPeers);
+
         QnTransactionTransportHeader transportHeader(processedPeers);
         foreach(const QByteArray& serializedTran, serializedTransactions)
             if(!handleTransaction(serializedTran, boost::bind(SendTransactionToTransportFuction(), this, _1, sender, transportHeader)))
@@ -538,7 +540,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
     }
 }
 
-void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransportPtr transport, const QnPeerSet& processedPeers)
+void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport, const QnPeerSet& processedPeers)
 {
     foreach (ApiRuntimeData info, QnRuntimeInfoManager::instance()->allData().values())
     {
@@ -579,7 +581,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         }
 
         transport->setWriteSync(true);
-        sendRuntimeInfo(transport, processedPeers);
+        sendRuntimeInfo(transport.data(), processedPeers);
         transport->sendTransaction(tran, processedPeers);
 
         if (remotePeer.peerType == Qn::PT_DesktopClient) {
@@ -647,7 +649,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         }
 
         transport->setWriteSync(true);
-        sendRuntimeInfo(transport, processedPeers);
+        sendRuntimeInfo(transport.data(), processedPeers);
         transport->sendTransaction(tranServers,         processedPeers);
         transport->sendTransaction(tranCameras,         processedPeers);
         transport->sendTransaction(tranUsers,           processedPeers);
