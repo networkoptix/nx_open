@@ -1185,7 +1185,7 @@ QnVideoWallItemIndexList QnWorkbenchVideoWallHandler::targetList() const {
             continue;
 
         foreach(const QnVideoWallItem &item, videoWall->items()->getItems()) {
-            if (item.layout == currentId)
+            if (item.layout == currentId && item.online)
                 indexes << QnVideoWallItemIndex(videoWall, item.uuid);
         }
     }
