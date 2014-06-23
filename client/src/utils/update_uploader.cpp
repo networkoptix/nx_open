@@ -18,7 +18,6 @@ QnUpdateUploader::QnUpdateUploader(QObject *parent) :
     QObject(parent),
     m_chunkSize(chunkSize)
 {
-    connect(connection2()->getUpdatesManager().get(),   &ec2::AbstractUpdatesManager::updateUploadProgress,   this,   &QnUpdateUploader::at_updateManager_updateUploadProgress);
 }
 
 QString QnUpdateUploader::updateId() const {
@@ -51,6 +50,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
     foreach (const QnId &peerId, peers)
         m_progressById[peerId] = 0;
 
+    connect(connection2()->getUpdatesManager().get(),   &ec2::AbstractUpdatesManager::updateUploadProgress,   this,   &QnUpdateUploader::at_updateManager_updateUploadProgress);
     sendNextChunk();
     return true;
 }
@@ -131,4 +131,5 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
 void QnUpdateUploader::cleanUp() {
     m_updateFile.reset();
     m_updateId.clear();
+    connection2()->getUpdatesManager()->disconnect(this);
 }
