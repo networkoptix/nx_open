@@ -161,7 +161,9 @@ bool QnLicense::isValid(const QString& brand, ErrorCode* errCode, bool checkFore
     // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
     // We just allow empty brand for all, because we believe license is correct.
 
-    QString box = lit(QN_ARM_BOX);
+    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    QString box = ec2Connection->connectionInfo().box;
+
     // 1. edge licenses can be activated only if box is "isd"
     // 2. if box is "isd" only edge licenses AND any trial can be activated
 

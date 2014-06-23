@@ -1209,7 +1209,7 @@ void QnMain::run()
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
     QUrl proxyServerUrl = ec2Connection->connectionInfo().ecUrl;
-    proxyServerUrl.setPort(connectInfo->proxyPort);
+    //proxyServerUrl.setPort(connectInfo->proxyPort);
     m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid().toString());
     m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
