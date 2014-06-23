@@ -4,6 +4,7 @@
 #include <QtCore/QRegExp>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QMessageBox>
 
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/range/adaptor/reversed.hpp>
@@ -666,10 +667,10 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
             QMessageBox::Yes
             );
 
-    if (button == QDialogButtonBox::Cancel)
+    if (button == QMessageBox::Cancel)
         return;
 
-    if (button == QDialogButtonBox::Yes) {
+    if (button == QMessageBox::Yes) {
         if (canClose())
             closeInstanceDelayed();
     }
