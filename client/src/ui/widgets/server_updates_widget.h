@@ -28,6 +28,8 @@ public:
     bool isMinimalMode() const;
     void setMinimalMode(bool minimalMode);
 
+    void reset();
+
 private slots:
     void at_checkForUpdatesButton_clicked();
     void at_installSpecificBuildButton_clicked();

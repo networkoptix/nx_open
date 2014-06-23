@@ -183,6 +183,8 @@ QVariant QnServerUpdatesModel::Item::data(int column, int role) const {
             return m_server->getVersion().toString(QnSoftwareVersion::FullFormat);
         case UpdateColumn: {
             switch (m_updateInfo.state) {
+            case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateUnknown:
+                return QString();
             case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateNotFound:
                 return tr("Not found");
             case QnMediaServerUpdateTool::PeerUpdateInformation::UpdateFound:

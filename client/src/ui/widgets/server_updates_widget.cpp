@@ -80,6 +80,11 @@ void QnServerUpdatesWidget::setMinimalMode(bool minimalMode) {
     ui->topButtonBar->setVisible(!m_minimalMode);
 }
 
+void QnServerUpdatesWidget::reset() {
+    m_updateTool->reset();
+    updateUi();
+}
+
 void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {
     m_updateTool->setDenyMajorUpdates(false);
     m_updateTool->checkForUpdates();
@@ -133,9 +138,12 @@ void QnServerUpdatesWidget::updateUi() {
     bool startUpdate = false;
     bool infiniteProgress = false;
 
+    foreach (const QnMediaServerResourcePtr &server, m_updateTool->actualTargets())
+        m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(server->getId()));
+
     switch (m_updateTool->state()) {
     case QnMediaServerUpdateTool::Idle:
-        if (m_previousToolState <= QnMediaServerUpdateTool::CheckingForUpdates) {
+        if (m_previousToolState == QnMediaServerUpdateTool::CheckingForUpdates) {
             switch (m_updateTool->updateCheckResult()) {
             case QnMediaServerUpdateTool::UpdateFound:
                 if (!m_updateTool->targetVersion().isNull() && !m_minimalMode) { // null version means we've got here first time after the dialog has been showed
@@ -219,9 +227,6 @@ void QnServerUpdatesWidget::updateUi() {
     default:
         break;
     }
-
-    foreach (const QnMediaServerResourcePtr &server, m_updateTool->actualTargets())
-        m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(server->getId()));
 
     if (checkingForUpdates)
         ui->buttonBox->showProgress(tr("Checking for updates..."));

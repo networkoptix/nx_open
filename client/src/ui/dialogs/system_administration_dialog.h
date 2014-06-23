@@ -22,6 +22,8 @@ public:
     virtual void reject() override;
     virtual void accept() override;
 
+    void reset();
+
 private:
     QScopedPointer<Ui::QnSystemAdministrationDialog> ui;
 

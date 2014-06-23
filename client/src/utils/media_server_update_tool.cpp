@@ -33,7 +33,7 @@ const QString mutexName = lit("auto_update");
 
 QnMediaServerUpdateTool::PeerUpdateInformation::PeerUpdateInformation(const QnMediaServerResourcePtr &server) :
     server(server),
-    state(UpdateNotFound),
+    state(UpdateUnknown),
     updateInformation(0),
     progress(0)
 {
@@ -186,7 +186,10 @@ QnMediaServerUpdateTool::PeerUpdateInformation QnMediaServerUpdateTool::updateIn
     PeerUpdateInformation info(qnResPool->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>());
     if (info.server && m_state == Idle) {
         info.updateInformation = m_updateFiles[info.server->getSystemInfo()];
-        info.state = info.updateInformation ? PeerUpdateInformation::UpdateFound : PeerUpdateInformation::UpdateNotFound;
+        if (m_targetVersion.isNull())
+            info.state = PeerUpdateInformation::UpdateUnknown;
+        else
+            info.state = info.updateInformation ? PeerUpdateInformation::UpdateFound : PeerUpdateInformation::UpdateNotFound;
     }
     return info;
 }
@@ -255,6 +258,15 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl() const {
     return url;
 }
 
+void QnMediaServerUpdateTool::reset() {
+    if (m_state != Idle)
+        return;
+
+    m_updateInformationById.clear();
+    m_updateFiles.clear();
+    m_targetVersion = QnSoftwareVersion();
+}
+
 void QnMediaServerUpdateTool::checkForUpdates() {
     if (m_state >= CheckingForUpdates)
         return;
@@ -274,7 +286,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QString &fileName) {
         return;
 
     m_localUpdateFileName = fileName;
-    m_localTemporaryDir.clear();
+
     checkLocalUpdates();
 }
 
@@ -300,6 +312,12 @@ void QnMediaServerUpdateTool::checkOnlineUpdates(const QnSoftwareVersion &versio
 }
 
 void QnMediaServerUpdateTool::checkLocalUpdates() {
+    m_updateFiles.clear();
+    m_updateInformationById.clear();
+    m_targetMustBeNewer = false;
+    m_targetVersion = QnSoftwareVersion();
+    m_localTemporaryDir.clear();
+
     setState(CheckingForUpdates);
 
     if (!QFile::exists(m_localUpdateFileName)) {
@@ -329,10 +347,6 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
     }
 
     QRegExp updateFileRegExp(lit("update_.+_.+_\\d+\\.\\d+\\.\\d+\\.\\d+\\.zip"));
-
-    m_updateFiles.clear();
-    m_updateInformationById.clear();
-    m_targetMustBeNewer = false;
 
     QStringList entries = dir.entryList(QStringList() << lit("*.zip"), QDir::Files);
     foreach (const QString &entry, entries) {

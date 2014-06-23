@@ -37,3 +37,7 @@ void QnSystemAdministrationDialog::accept() {
     }
     base_type::accept();
 }
+
+void QnSystemAdministrationDialog::reset() {
+    m_updatesWidget->reset();
+}

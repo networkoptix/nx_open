@@ -40,6 +40,7 @@ public:
 
     struct PeerUpdateInformation {
         enum State {
+            UpdateUnknown,
             UpdateNotFound,
             UpdateFound,
             PendingDownloading,
@@ -115,6 +116,8 @@ public:
     QnMediaServerResourceList actualTargets() const;
 
     QUrl generateUpdatePackageUrl() const;
+
+    void reset();
 
 signals:
     void stateChanged(int state);

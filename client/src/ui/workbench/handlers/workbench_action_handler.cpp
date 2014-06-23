@@ -1400,6 +1400,7 @@ void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
     }
 
     QRect oldGeometry = systemAdministrationDialog()->geometry();
+    systemAdministrationDialog()->reset();
     systemAdministrationDialog()->show();
     if (!newlyCreated)
         systemAdministrationDialog()->setGeometry(oldGeometry);
