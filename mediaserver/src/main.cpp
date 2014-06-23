@@ -1125,6 +1125,7 @@ void QnMain::run()
     ec2::ApiRuntimeData runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
     runtimeInfo.peer.peerType = Qn::PT_Server;
     runtimeInfo.box = lit(QN_ARM_BOX);
+    runtimeInfo.brand = lit(QN_PRODUCT_NAME_SHORT);
     int guidCompatibility = 0;
     runtimeInfo.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
     runtimeInfo.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);

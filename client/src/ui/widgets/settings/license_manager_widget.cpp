@@ -189,7 +189,10 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
         hw++;
     }
 
-    params.addQueryItem(QLatin1String("brand"), QLatin1String(QN_PRODUCT_NAME_SHORT));
+    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
+
+    params.addQueryItem(QLatin1String("box"), runtimeData.box);
+    params.addQueryItem(QLatin1String("brand"), runtimeData.brand);
     params.addQueryItem(QLatin1String("version"), QLatin1String(QN_ENGINE_VERSION));
     params.addQueryItem(QLatin1String("lang"), qnCommon->instance<QnClientTranslationManager>()->getCurrentLanguage());
 
