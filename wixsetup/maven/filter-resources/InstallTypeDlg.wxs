@@ -5,17 +5,14 @@
             <Dialog Id="InstallTypeDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
                 <Control Id="radioButtonGroupBox1" Type="RadioButtonGroup" Height="96" Width="272" X="15" Y="49" Property="INSTALLTYPE">
                     <RadioButtonGroup Property="INSTALLTYPE">
-                        <RadioButton X="19" Y="14" Height="18" Width="201" Text="!(loc.InstallTypeDlg_QuickFull)" Value="0"/>
-                        <RadioButton X="19" Y="38" Height="18" Width="251" Text="!(loc.InstallTypeDlg_ClientOnly)" Value="2" />
-                        <RadioButton X="19" Y="60" Height="18" Width="78" Text="!(loc.InstallTypeDlg_Advanced)" Value="1" />
+                        <RadioButton X="19" Y="14" Height="18" Width="201" Text="!(loc.InstallTypeDlg_Full)" Value="0"/>
+                        <RadioButton X="19" Y="38" Height="18" Width="251" Text="!(loc.InstallTypeDlg_ServerOnly)" Value="1" />
+                        <RadioButton X="19" Y="58" Height="18" Width="78" Text="!(loc.InstallTypeDlg_ClientOnly)" Value="2" />
                     </RadioButtonGroup>
                 </Control>
                 <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
                     <Condition Action="disable">NOT INSTALLTYPE</Condition>
                     <Condition Action="enable">INSTALLTYPE</Condition>
-                    <!--
-                                                                    <Publish Event="NewDialog" Value="ViewLicenseAgreement">1</Publish>
-                                                                    -->
                 </Control>
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Disabled="no" Text="!(loc.WixUIBack)" />
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
