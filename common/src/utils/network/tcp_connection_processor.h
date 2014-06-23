@@ -51,7 +51,7 @@ protected:
     //inline void bufferData(const QByteArray& data) { bufferData(data.constData(), data.size()); }
     //void clearBuffer();
 
-    void sendResponse(const QByteArray& transport, int code, const QByteArray& contentType, const QByteArray& contentEncoding = QByteArray(), bool displayDebug = false);
+    void sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding = QByteArray(), bool displayDebug = false);
     QString codeToMessage(int code);
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);

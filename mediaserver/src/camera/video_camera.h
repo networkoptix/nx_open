@@ -11,15 +11,10 @@
 #include <core/resource/resource_consumer.h>
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "streaming/hls/hls_live_playlist_manager.h"
-#include "utils/media/media_stream_cache.h"
 #include "core/dataprovider/live_stream_provider.h"
 
 class QnVideoCameraGopKeeper;
 class MediaStreamCache;
-namespace nx_hls
-{
-    class HLSLivePlaylistManager;
-}
 
 class QnVideoCamera: public QObject
 {

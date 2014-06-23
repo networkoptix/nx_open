@@ -63,6 +63,9 @@ namespace ec2
             sendTransactionInternal(tran, QnTransactionTransportHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers));
         }
 
+        /** Template specialization to fill dstPeers from the transaction params. */
+        void sendTransaction(const QnTransaction<ec2::ApiVideowallControlMessageData>& tran, const QnPeerSet& dstPeers = QnPeerSet());
+
         template <class T>
         void sendTransaction(const QnTransaction<T>& tran, const QnId& dstPeerId)
         {
@@ -165,7 +168,8 @@ namespace ec2
 
         void connectToPeerEstablished(const QnPeerInfo &peerInfo, const QList<QByteArray>& hwList);
         void connectToPeerLost(const QnId& id);
-        void sendServerAliveMsg(const QnPeerInfo& peer, bool isAlive, const QList<QByteArray>& hwList);
+        void handlePeerAliveChanged(const QnPeerInfo& peer, bool isAlive, const QList<QByteArray>& hwList);
+        void sendVideowallInstanceStatus(const QnPeerInfo &peer, bool isAlive);
         QnTransaction<ApiModuleDataList> prepareModulesDataTransaction() const;
         void sendConnectionsData();
         void sendModulesData();

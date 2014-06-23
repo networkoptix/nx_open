@@ -243,6 +243,18 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
         q.addQueryItem("isClient", QString());
         setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
+    } else if (m_localPeer.peerType == QnPeerInfo::VideowallClient) {
+        q.removeQueryItem("isClient");  //videowall client is still client
+        q.addQueryItem("isClient", QString());
+
+        q.removeQueryItem("videowallGuid");
+        q.addQueryItem("videowallGuid", m_localPeer.params["videowallGuid"]);
+
+        q.removeQueryItem("instanceGuid");
+        q.addQueryItem("instanceGuid", m_localPeer.params["instanceGuid"]);
+
+        setState(ConnectingStage2); // one GET method for client peer is enough
+        setReadSync(true);
     }
 
     remoteAddr.setQuery(q);

@@ -53,7 +53,6 @@ private:
     void openNewWindow(const QStringList &args);
     void openVideoWallItem(const QnVideoWallResourcePtr &videoWall);
     void closeInstanceDelayed();
-    void sendInstanceGuid();
 
     void setControlMode(bool active);
     void updateMode();
@@ -66,7 +65,6 @@ private:
     /** Returns list of target videowall items for current layout. */
     QnVideoWallItemIndexList targetList() const;
 
-    QnWorkbenchLayout* findReviewModeLayout(const QnVideoWallResourcePtr &videoWall) const;
     QnLayoutResourcePtr findExistingResourceLayout(const QnResourcePtr &resource) const;
     QnLayoutResourcePtr constructLayout(const QnResourceList &resources) const;
 
@@ -74,7 +72,6 @@ private:
     bool shortcutExists(const QnVideoWallResourcePtr &videowall) const;
     bool createShortcut(const QnVideoWallResourcePtr &videowall);
 private slots:
-    void at_connection_opened();
 
     void at_newVideoWallAction_triggered();
     void at_attachToVideoWallAction_triggered();
@@ -140,8 +137,8 @@ private slots:
 
     void submitDelayedItemOpen();
 
-    void saveVideowall(const QnVideoWallResourcePtr& videowall);
-    void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls);
+    void saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout = false);
+    void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls, bool saveLayout = false);
 private:
     struct ScreenSnap {
         int index;          /**< Index of the screen. */

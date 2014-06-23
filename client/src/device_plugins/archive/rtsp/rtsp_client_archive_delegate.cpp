@@ -814,8 +814,8 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
     auth.setPassword(password);
     m_rtspSession.setAuth(auth, RTPSession::authDigest);
 
-    if (!QnAppServerConnectionFactory::videoWallKey().isEmpty())
-        m_rtspSession.setAdditionAttribute("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videoWallKey().toUtf8());
+    if (!QnAppServerConnectionFactory::videowallGuid().isNull())
+        m_rtspSession.setAdditionAttribute("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
 }
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)

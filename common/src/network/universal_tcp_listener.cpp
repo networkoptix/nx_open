@@ -22,16 +22,19 @@ QnUniversalTcpListener::~QnUniversalTcpListener()
 {
     stop();
 }
-bool QnUniversalTcpListener::isProxy(const QUrl& url)
+bool QnUniversalTcpListener::isProxy(const nx_http::Request& request)
 {
-    return (m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(m_proxyInfo.proxyOpaque, url));
+    return (m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(request));
 };
-QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const QUrl& url)
+QnTCPConnectionProcessor* QnUniversalTcpListener::createNativeProcessor(
+    QSharedPointer<AbstractStreamSocket> clientSocket,
+    const QByteArray& protocol,
+    const nx_http::Request& request)
 {
-    if (isProxy(url))
+    if (isProxy(request))
         return m_proxyInfo.proxyHandler(clientSocket, this);
 
-    QString path = url.path();
+    QString path = request.requestLine.url.path();
     QString normPath = path.startsWith(L'/') ? path.mid(1) : path;
     int bestPathLen = -1;
     int bestIdx = -1;

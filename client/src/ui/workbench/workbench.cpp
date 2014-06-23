@@ -132,7 +132,7 @@ void QnWorkbench::moveLayout(QnWorkbenchLayout *layout, int index) {
     }
 
     /* Silently fix index. */
-    index = qBound(0, index, m_layouts.size());
+    index = qBound(0, index, m_layouts.size() - 1);
 
     int currentIndex = m_layouts.indexOf(layout);
     if(currentIndex == index)

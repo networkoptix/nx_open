@@ -129,6 +129,13 @@ namespace ec2
         QUuid makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) const;
         QUuid makeHash(const QString &extraData, const ApiDiscoveryDataList &data) const;
 
+         /**
+         *  Semantics of the transactionHash() function is following:
+         *  if transaction A follows transaction B and overrides it,
+         *  their transactionHash() result MUST be the same. Otherwise, transactionHash() result must differ.
+         *  Obviously, transactionHash() is not needed for the non-persistent transaction.
+         */
+
         QUuid transactionHash(const ApiCameraData& params) const                 { return params.id; }
         QUuid transactionHash(const ApiMediaServerData& params) const            { return params.id; }
         QUuid transactionHash(const ApiUserData& params) const                   { return params.id; }

@@ -158,5 +158,5 @@ void QnRestConnectionProcessor::run()
             contentEncoding = "gzip";
         }
     }
-    sendResponse("HTTP", rez, contentType, contentEncoding, false);
+    sendResponse(rez, contentType, contentEncoding, false);
 }

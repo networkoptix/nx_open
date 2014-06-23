@@ -65,8 +65,8 @@ QIcon QnResourceIconCache::icon(Key key, bool unchecked) {
         {
             QPainter painter(&pixmap);
             QRect r = pixmap.rect();
-            r.setTopLeft(r.center());
-            overlay.paint(&painter, r, Qt::AlignRight | Qt::AlignBottom);
+            r.setTopRight(r.center());
+            overlay.paint(&painter, r, Qt::AlignLeft | Qt::AlignBottom);
         }
         icon = QIcon(pixmap);
     }

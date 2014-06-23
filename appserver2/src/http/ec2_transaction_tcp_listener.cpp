@@ -52,14 +52,25 @@ void QnTransactionTcpProcessor::run()
     QUrlQuery query = QUrlQuery(d->request.requestLine.url.query());
     bool isClient = query.hasQueryItem("isClient");
     bool isMobileClient = query.hasQueryItem("isMobile");
-    QUuid remoteGuid  = query.queryItemValue(lit("guid"));
+    QUuid remoteGuid  = query.queryItemValue("guid");
     if (remoteGuid.isNull())
         remoteGuid = QUuid::createUuid();
-    QnPeerInfo remotePeer(remoteGuid, isMobileClient 
-        ? QnPeerInfo::AndroidClient
-        : isClient 
-        ? QnPeerInfo::DesktopClient
+    QnId videowallGuid = query.queryItemValue("videowallGuid");
+    bool isVideowall = (!videowallGuid.isNull());
+    QnId instanceGuid = isVideowall
+        ? query.queryItemValue("instanceGuid")
+        : QnId();
+
+    QnPeerInfo remotePeer(remoteGuid, 
+        isMobileClient  ? QnPeerInfo::AndroidClient
+        : isVideowall   ? QnPeerInfo::VideowallClient
+        : isClient      ? QnPeerInfo::DesktopClient
         : QnPeerInfo::Server);
+
+    if (isVideowall) {
+        remotePeer.params["videowallGuid"] = videowallGuid.toString();
+        remotePeer.params["instanceGuid"] = instanceGuid.toString();
+    }
 
     QByteArray remoteHwList = query.queryItemValue(lit("hwList")).toLocal8Bit();
 
@@ -72,7 +83,7 @@ void QnTransactionTcpProcessor::run()
 
         // 1-st stage
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(remoteGuid, false);
-        sendResponse("HTTP", lockOK ? CODE_OK : CODE_INVALID_PARAMETER , "application/octet-stream");
+        sendResponse(lockOK ? CODE_OK : CODE_INVALID_PARAMETER , "application/octet-stream");
         if (!lockOK)
             return;
 
@@ -90,7 +101,7 @@ void QnTransactionTcpProcessor::run()
     query = QUrlQuery(d->request.requestLine.url.query());
     bool fail = query.hasQueryItem("canceled") || !QnTransactionTransport::tryAcquireConnected(remoteGuid, false);
     d->chunkedMode = true;
-    sendResponse("HTTP", fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
+    sendResponse(fail ? CODE_INVALID_PARAMETER : CODE_OK, "application/octet-stream");
     if (fail) {
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
     }

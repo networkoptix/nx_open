@@ -242,7 +242,7 @@ void addTestData()
 }
 #endif
 
-void initAppServerConnection(const QUuid &videoWallGuid)
+void initAppServerConnection(const QUuid &videowallGuid, const QUuid &instanceGuid)
 {
     QUrl appServerUrl = qnSettings->lastUsedConnection().url;
 
@@ -252,8 +252,10 @@ void initAppServerConnection(const QUuid &videoWallGuid)
     QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
-    if (!videoWallGuid.isNull())
-        QnAppServerConnectionFactory::setVideoWallKey(videoWallGuid.toString());
+    if (!videowallGuid.isNull()) {
+        QnAppServerConnectionFactory::setVideowallGuid(videowallGuid);
+        QnAppServerConnectionFactory::setInstanceGuid(instanceGuid);
+    }
 }
 
 /** Initialize log. */
@@ -366,20 +368,20 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         }
     }
 
-    QUuid videoWallGuid(sVideoWallGuid);
-    QUuid videoWallItemGuid(sVideoWallItemGuid);
+    QUuid videowallGuid(sVideoWallGuid);
+    QUuid instanceGuid(sVideoWallItemGuid);
 
     QString logFileNameSuffix;
-    if (!videoWallGuid.isNull()) {
+    if (!videowallGuid.isNull()) {
         qnSettings->setVideoWallMode(true);
         noSingleApplication = true;
         noFullScreen = true;
         noVersionMismatchCheck = true;
         qnSettings->setLightModeOverride(Qn::LightModeVideoWall);
 
-        logFileNameSuffix = videoWallItemGuid.isNull() 
-            ? videoWallGuid.toString() 
-            : videoWallItemGuid.toString();
+        logFileNameSuffix = instanceGuid.isNull() 
+            ? videowallGuid.toString() 
+            : instanceGuid.toString();
         logFileNameSuffix.replace(QRegExp(lit("[{}]")), lit("_"));
     }
 
@@ -405,8 +407,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
     if(authentication.isValid()) {
-        if (!videoWallGuid.isNull())
-            authentication.setUserName(videoWallGuid.toString());
+        if (!videowallGuid.isNull())
+            authentication.setUserName(videowallGuid.toString());
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
     }
 
@@ -466,7 +468,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QNetworkProxyFactory::setApplicationProxyFactory( new QnNetworkProxyFactory() );
 
     /* Initialize connections. */
-    initAppServerConnection(videoWallGuid);
+    initAppServerConnection(videowallGuid, instanceGuid);
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
     ec2::ResourceContext resCtx(
@@ -664,10 +666,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         context->menu()->trigger(Qn::ReconnectAction);
     }
 
-    if (!videoWallGuid.isNull()) {
+    if (!videowallGuid.isNull()) {
         context->menu()->trigger(Qn::DelayedOpenVideoWallItemAction, QnActionParameters()
-                             .withArgument(Qn::VideoWallGuidRole, videoWallGuid)
-                             .withArgument(Qn::VideoWallItemGuidRole, videoWallItemGuid));
+                             .withArgument(Qn::VideoWallGuidRole, videowallGuid)
+                             .withArgument(Qn::VideoWallItemGuidRole, instanceGuid));
     } else {
         /* Drop resources if needed. */
         if(!delayedDrop.isEmpty()) {

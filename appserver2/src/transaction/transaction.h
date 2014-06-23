@@ -25,8 +25,6 @@ namespace ec2
             testConnection = 1,
             connect = 2,
 
-            clientInstanceId = 3,
-
             //!ApiResourceTypeList
             getResourceTypes = 4,
             //!ApiResource
@@ -136,7 +134,7 @@ namespace ec2
             tranSyncRequest = 53,
             tranSyncResponse = 54,
             
-            serverAliveInfo = 55,
+            peerAliveInfo = 55,
             
             //!ApiLockInfo
             lockRequest = 56,

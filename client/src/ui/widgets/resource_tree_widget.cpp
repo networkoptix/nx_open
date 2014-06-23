@@ -92,6 +92,11 @@ protected:
         if(leftIncompatible ^ rightIncompatible) /* One of the nodes is incompatible server node, but not both. */
             return rightIncompatible;
 
+        // checking pairs of VideoWallItemNode + VideoWallMatrixNode
+        if ((leftNode == Qn::VideoWallItemNode || rightNode == Qn::VideoWallItemNode)
+            && leftNode != rightNode)
+            return rightNode == Qn::VideoWallItemNode;   
+
         /* Sort by name. */
         QString leftDisplay = left.data(Qt::DisplayRole).toString();
         QString rightDisplay = right.data(Qt::DisplayRole).toString();
