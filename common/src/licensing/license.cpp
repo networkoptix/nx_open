@@ -152,11 +152,13 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-ec2::ApiRuntimeData QnLicense::findRuntimeDataByLicense(const QByteArray& key) const
+ec2::ApiRuntimeData QnLicense::findRuntimeDataByLicense() const
 {
     foreach(const ec2::ApiRuntimeData& data, QnRuntimeInfoManager::instance()->allData().values())
     {
-        if (data.mainHardwareIds.contains(key) || data.compatibleHardwareIds.contains(key))
+        bool hwKeyOK = data.mainHardwareIds.contains(m_hardwareId) || data.compatibleHardwareIds.contains(m_hardwareId);
+        bool brandOK = (m_brand == data.brand);
+        if (hwKeyOK && brandOK)
             return data;
     }
     return ec2::ApiRuntimeData();
@@ -171,7 +173,7 @@ bool QnLicense::isValid(ErrorCode* errCode, bool checkForeignLicenses) const
     // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
     // We just allow empty brand for all, because we believe license is correct.
 
-    ec2::ApiRuntimeData runtimeData = findRuntimeDataByLicense(m_key);
+    ec2::ApiRuntimeData runtimeData = findRuntimeDataByLicense();
     if (runtimeData.peer.id.isNull()) {
         // new license
         runtimeData = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
