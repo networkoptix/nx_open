@@ -2,6 +2,8 @@
 #include "ui_server_updates_widget.h"
 
 #include <QtWidgets/QMessageBox>
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
@@ -9,6 +11,7 @@
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/build_number_dialog.h>
+#include <ui/dialogs/update_url_dialog.h>
 #include <ui/delegates/update_status_item_delegate.h>
 #include <utils/media_server_update_tool.h>
 
@@ -142,14 +145,9 @@ void QnServerUpdatesWidget::updateUi() {
                 }
                 break;
             case QnMediaServerUpdateTool::InternetProblem: {
-                int result = QMessageBox::warning(this,
-                                                  tr("Check for updates failed"),
-                                                  tr("Cannot check for updates via the Internet.\n"
-                                                     "Do you want to create a download helper to download updates on the computer which is connected to the internet?"),
-                                                  QMessageBox::Yes, QMessageBox::No);
-                if (result == QMessageBox::Yes)
-                    createUpdatesDownloader();
-
+                QnUpdateUrlDialog dialog;
+                dialog.setUpdatesUrl(m_updateTool->generateUpdatePackageUrl().toString());
+                dialog.exec();
                 break;
             }
             case QnMediaServerUpdateTool::NoNewerVersion:
@@ -232,8 +230,4 @@ void QnServerUpdatesWidget::updateUi() {
 
     if (startUpdate)
         m_updateTool->updateServers();
-}
-
-void QnServerUpdatesWidget::createUpdatesDownloader() {
-
 }

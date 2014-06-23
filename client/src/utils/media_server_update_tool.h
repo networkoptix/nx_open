@@ -113,6 +113,8 @@ public:
 
     QnMediaServerResourceList actualTargets() const;
 
+    QUrl generateUpdatePackageUrl() const;
+
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);

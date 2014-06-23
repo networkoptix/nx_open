@@ -10,7 +10,8 @@
 namespace {
 
 const QString infoEntryName = lit("update.json");
-
+const char passwordChars[] = "abcdefghijklmnopqrstuvwxyz0123456789";
+const int passwordLength = 6;
 
 bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *version = 0, QnSystemInformation *sysInfo = 0) {
     if (!infoFile->open(QuaZipFile::ReadOnly))
@@ -88,4 +89,20 @@ QString makeMd5(QIODevice *device) {
         return QString();
 
     return QString::fromLatin1(hash.result().toHex());
+}
+
+QString passwordForBuild(unsigned buildNumber) {
+    unsigned seed1 = buildNumber;
+    unsigned seed2 = (buildNumber + 13) * 179;
+    unsigned seed3 = buildNumber << 16;
+    unsigned seed4 = ((buildNumber + 179) * 13) << 16;
+    unsigned seed = seed1 ^ seed2 ^ seed3 ^ seed4;
+
+    QString password;
+    const int charsCount = sizeof(passwordChars) - 1;
+    for (int i = 0; i < passwordLength; i++) {
+        password += QChar::fromLatin1(passwordChars[seed % charsCount]);
+        seed /= charsCount;
+    }
+    return password;
 }

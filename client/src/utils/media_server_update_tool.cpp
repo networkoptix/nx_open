@@ -2,6 +2,7 @@
 
 #include <QtCore/QFileInfo>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QUrlQuery>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
@@ -20,6 +21,7 @@
 namespace {
 
 const QString QN_UPDATES_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/updates");
+const QString QN_UPDATE_PACKAGE_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/get_update");
 const QString buildInformationSuffix(lit("update"));
 const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
 const QString mutexName = lit("auto_update");
@@ -216,6 +218,34 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
     }
 
     return result;
+}
+
+QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl() const {
+    QUrlQuery query;
+
+    QSet<QnSystemInformation> systemInformationList;
+
+    if (m_idBySystemInformation.isEmpty()) {
+        foreach (const QnMediaServerResourcePtr &server, actualTargets())
+            systemInformationList.insert(server->getSystemInfo());
+    } else {
+        systemInformationList = QSet<QnSystemInformation>::fromList(m_idBySystemInformation.keys());
+    }
+
+    query.addQueryItem(lit("client"), QnSystemInformation(lit(QN_APPLICATION_PLATFORM), lit(QN_APPLICATION_ARCH), lit(QN_ARM_BOX)).toString().replace(QLatin1Char(' '), QLatin1Char('_')));
+    foreach (const QnSystemInformation &systemInformation, systemInformationList)
+        query.addQueryItem(lit("server"), systemInformation.toString().replace(QLatin1Char(' '), QLatin1Char('_')));
+
+    QString versionSuffix;
+    if (m_targetVersion.isNull())
+        versionSuffix = lit("/latest");
+    else
+        versionSuffix = QString(lit("/%1-%2")).arg(m_targetVersion.toString(), passwordForBuild((unsigned)m_targetVersion.build()));
+
+    QUrl url(QN_UPDATE_PACKAGE_URL + versionSuffix);
+    url.setQuery(query);
+
+    return url;
 }
 
 void QnMediaServerUpdateTool::checkForUpdates() {

@@ -36,7 +36,6 @@ private slots:
     void at_updateTool_peerChanged(const QnId &peerId);
 
     void updateUi();
-    void createUpdatesDownloader();
 
 private:
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;
