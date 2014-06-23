@@ -130,7 +130,7 @@
             <Component>
                 <File Id="ServerQt5Sql$(var.suffix).dll" Name="Qt5Sql$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sql$(var.suffix).dll" />
             </Component>
-			<?if ${webkit} = true ?>
+<!--            <?if ${webkit} = true ?> -->
             <Component>
                 <File Id="Servericudt53.dll" Name="icudt53.dll" Source="$(var.SourceDir)\icudt53.dll"  />                
             </Component>                 
@@ -143,7 +143,7 @@
             <Component>
                 <File Id="ServerlibGLESv2$(var.suffix).dll" Name="libGLESv2$(var.suffix).dll" Source="$(var.SourceDir)\libGLESv2$(var.suffix).dll"  />                
             </Component>                         
-			<?endif?>            
+<!--            <?endif?>           -->
                 <Component>
                 <File Id="Serverquazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll"  />                
             </Component>
