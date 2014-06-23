@@ -40,8 +40,7 @@ namespace ec2
     LicenseManagerImpl::LicenseManagerImpl()
     {
         // TODO: #Ivan, support compatibility mode
-        m_hardwareIds = LLUtil::getMainHardwareIds(0);
-        qnLicensePool->setMainHardwareIds(m_hardwareIds);
+        qnLicensePool->setMainHardwareIds(LLUtil::getMainHardwareIds(0));
         qnLicensePool->setCompatibleHardwareIds(LLUtil::getCompatibleHardwareIds(0));
     }
 
@@ -53,8 +52,6 @@ namespace ec2
 
     ErrorCode LicenseManagerImpl::getLicenses( ApiLicenseDataList* const licList )
     {
-        //TODO/IMPL
-
         ApiLicenseData license;
 
         license.licenseBlock = TEST_LICENSE_NX;

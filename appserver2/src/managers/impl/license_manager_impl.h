@@ -32,9 +32,6 @@ namespace ec2
 
         void getHardwareId( ec2::ApiRuntimeData* const serverInfo );
         bool validateLicense(const ApiLicenseData& license) const;
-
-    private:
-        QList<QByteArray> m_hardwareIds;
     };
 }
 
