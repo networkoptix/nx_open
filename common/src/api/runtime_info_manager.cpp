@@ -35,6 +35,11 @@ void QnRuntimeInfoManager::at_remotePeerLost(ec2::ApiPeerAliveData data, bool is
 {
     qnLicensePool->removeRemoteValidLicenses(data.peer.id);   //TODO: #Elric #ec2 get rid of the serialization hell
     m_runtimeInfo.remove(data.peer.id);
+
+    if (data.peer.id == qnCommon->remoteGUID()) {
+        qnLicensePool->setMainHardwareIds(QList<QByteArray>());
+        qnLicensePool->setCompatibleHardwareIds(QList<QByteArray>());
+    }
 }
 
 void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo)

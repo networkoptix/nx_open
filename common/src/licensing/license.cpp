@@ -162,7 +162,7 @@ ec2::ApiRuntimeData QnLicense::findRuntimeDataByLicense(const QByteArray& key) c
     return ec2::ApiRuntimeData();
 }
 
-bool QnLicense::isValid(const QString& brand, ErrorCode* errCode, bool checkForeignLicenses) const
+bool QnLicense::isValid(ErrorCode* errCode, bool checkForeignLicenses) const
 {
     if (checkForeignLicenses && QnLicensePool::instance()->allRemoteValidLicenses().contains(m_key))
         return true; // it is valid license from a remote peer
@@ -172,7 +172,12 @@ bool QnLicense::isValid(const QString& brand, ErrorCode* errCode, bool checkFore
     // We just allow empty brand for all, because we believe license is correct.
 
     ec2::ApiRuntimeData runtimeData = findRuntimeDataByLicense(m_key);
-    QString box = runtimeData.box;
+    if (runtimeData.peer.id.isNull()) {
+        // new license
+        runtimeData = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
+    }
+    const QString box = runtimeData.box;
+    const QString brand = runtimeData.brand;
 
     // 1. edge licenses can be activated only if box is "isd"
     // 2. if box is "isd" only edge licenses AND any trial can be activated
@@ -390,7 +395,7 @@ int QnLicenseListHelper::totalCamerasByClass(bool analog) const
 
     foreach (QnLicensePtr license, m_licenseDict.values()) 
     {
-        if (license->isAnalog() == analog && license->isValid(QLatin1String(QN_PRODUCT_NAME_SHORT)))
+        if (license->isAnalog() == analog && license->isValid())
             result += license->cameraCount();
     }
     return result;
@@ -419,14 +424,12 @@ QnLicenseList QnLicensePool::getLicenses() const
 }
 
 bool QnLicensePool::isLicenseMatchesCurrentSystem(const QnLicensePtr &license) {
-    const QString brand(QLatin1String(QN_PRODUCT_NAME_SHORT));
-
-    return license->isValid(brand, 0, false);
+    return license->isValid(0, false);
 }
 
 bool QnLicensePool::isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode) const
 {
-    return license->isValid(QLatin1String(QN_PRODUCT_NAME_SHORT), errCode);
+    return license->isValid(errCode);
 }
 
 bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
@@ -529,7 +532,7 @@ QList<QnLatin1Array> QnLicensePool::allLocalValidLicenses() const
     QList<QByteArray>  hwList = allHardwareIds();
     foreach (QnLicensePtr license, m_licenseDict.values()) 
     {
-        if (hwList.contains(license->hardwareId()) && license->isValid(QLatin1String(QN_PRODUCT_NAME_SHORT), 0, false))
+        if (hwList.contains(license->hardwareId()) && license->isValid(0, false))
             result << license->key();
     }
 

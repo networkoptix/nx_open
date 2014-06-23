@@ -56,7 +56,7 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(const QString &brand, ErrorCode* errCode = 0, bool checkForeignLicenses = true) const;
+    bool isValid(ErrorCode* errCode = 0, bool checkForeignLicenses = true) const;
 
     static QString errorMessage(ErrorCode errCode);
 

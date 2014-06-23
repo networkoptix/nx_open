@@ -41,7 +41,6 @@ namespace ec2
     {
         // TODO: #Ivan, support compatibility mode
         m_hardwareIds = LLUtil::getMainHardwareIds(0);
-        m_brand = lit(QN_PRODUCT_NAME_SHORT);
         qnLicensePool->setMainHardwareIds(m_hardwareIds);
         qnLicensePool->setCompatibleHardwareIds(LLUtil::getCompatibleHardwareIds(0));
     }
@@ -49,8 +48,7 @@ namespace ec2
     bool LicenseManagerImpl::validateLicense(const ApiLicenseData& license) const {
         QnLicensePtr qlicense(new QnLicense);
         fromApiToResource(license, qlicense);
-
-        return qlicense->isValid(m_brand);
+        return qlicense->isValid();
     }
 
     ErrorCode LicenseManagerImpl::getLicenses( ApiLicenseDataList* const licList )

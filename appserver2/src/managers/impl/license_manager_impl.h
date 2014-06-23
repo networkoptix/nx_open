@@ -35,7 +35,6 @@ namespace ec2
 
     private:
         QList<QByteArray> m_hardwareIds;
-        QString m_brand;
     };
 }
 
