@@ -28,6 +28,7 @@ namespace ec2
 
         QString platform;
         QString box;
+        QString brand;
         QString publicIP;
         QList<QnLatin1Array> validLicenses; // list of valid licenses (license key) for peer.
         qint64 prematureLicenseExperationDate;
@@ -38,7 +39,7 @@ namespace ec2
         // todo: #GDM. add VideoWall related fields. #VW
     };
 
-#define ApiRuntimeData_Fields (peer)(platform)(box)(publicIP)(validLicenses)(mainHardwareIds)(compatibleHardwareIds)
+#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(validLicenses)(mainHardwareIds)(compatibleHardwareIds)
 
 
 } // namespace ec2
