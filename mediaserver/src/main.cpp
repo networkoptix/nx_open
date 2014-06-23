@@ -1196,7 +1196,8 @@ void QnMain::run()
     nx_hls::HLSSessionPool hlsSessionPool;
 
     initTcpListener();
-    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(messageProcessor.data(), QnServerMessageProcessor::isProxy);
+    using namespace std::placeholders;
+    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>( std::bind( &QnServerMessageProcessor::isProxy, messageProcessor.data(), _1 ) );
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 

@@ -142,6 +142,9 @@ void QnProxySenderConnection::run()
     if (!m_needStop) {
         addNewProxyConnect();
         if (gotRequest)
+        {
+            parseRequest();
             processRequest();
+        }
     }
 }
