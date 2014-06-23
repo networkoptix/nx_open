@@ -94,12 +94,14 @@ void QnServerUpdatesWidget::reset() {
         return;
 
     m_updateTool->reset();
+    m_updatesModel->setTargets(QSet<QnId>());
     updateUi();
 }
 
 void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {
     m_updateTool->setDenyMajorUpdates(false);
     m_updateTool->checkForUpdates();
+    m_updatesModel->setTargets(m_updateTool->actualTargets());
 }
 
 void QnServerUpdatesWidget::at_installSpecificBuildButton_clicked() {
@@ -110,6 +112,7 @@ void QnServerUpdatesWidget::at_installSpecificBuildButton_clicked() {
     m_updateTool->setDenyMajorUpdates(true);
     QnSoftwareVersion version = qnCommon->engineVersion();
     m_updateTool->checkForUpdates(QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber()));
+    m_updatesModel->setTargets(m_updateTool->actualTargets());
 }
 
 void QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked() {
@@ -119,6 +122,7 @@ void QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked() {
 
     m_updateTool->setDenyMajorUpdates(false);
     m_updateTool->checkForUpdates(fileName);
+    m_updatesModel->setTargets(m_updateTool->actualTargets());
 }
 
 void QnServerUpdatesWidget::at_updateButton_clicked() {

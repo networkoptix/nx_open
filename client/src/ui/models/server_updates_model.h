@@ -48,6 +48,7 @@ public:
     explicit QnServerUpdatesModel(QObject *parent = 0);
 
     void setTargets(const QSet<QnId> &targets);
+    void setTargets(const QnMediaServerResourceList &targets);
 
     int columnCount(const QModelIndex &parent) const override;
     int rowCount(const QModelIndex &parent) const override;

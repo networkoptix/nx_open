@@ -1,5 +1,6 @@
 #include "server_updates_model.h"
 
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <ui/common/ui_resource_name.h>
 #include <ui/style/resource_icon_cache.h>
@@ -17,6 +18,13 @@ QnServerUpdatesModel::QnServerUpdatesModel(QObject *parent) :
 
 void QnServerUpdatesModel::setTargets(const QSet<QnId> &targets) {
     m_targets = targets;
+    resetResourses();
+}
+
+void QnServerUpdatesModel::setTargets(const QnMediaServerResourceList &targets) {
+    m_targets.clear();
+    foreach (const QnMediaServerResourcePtr &server, targets)
+        m_targets.insert(server->getId());
     resetResourses();
 }
 
@@ -127,8 +135,13 @@ void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource) {
     if (!server)
         return;
 
-    if (!m_targets.isEmpty() && !m_targets.contains(resource->getId()))
-        return;
+    if (m_targets.isEmpty()) {
+        if (server->getSystemName() != qnCommon->localSystemName())
+            return;
+    } else {
+        if (!m_targets.contains(resource->getId()))
+            return;
+    }
 
     beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
     m_items.append(new Item(server, m_updates[server->getId()]));
