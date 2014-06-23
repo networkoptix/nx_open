@@ -971,7 +971,7 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
-    QnRestProcessorPool::instance()->registerHandler("api/changeSystemName", new QnChangeSystemNameRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/configure", new QnChangeSystemNameRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
