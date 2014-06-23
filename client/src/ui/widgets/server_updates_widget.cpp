@@ -96,12 +96,12 @@ void QnServerUpdatesWidget::at_installSpecificBuildButton_clicked() {
 }
 
 void QnServerUpdatesWidget::at_updateFromLocalSourceButton_clicked() {
-    QString sourceDir = QnFileDialog::getExistingDirectory(this, tr("Select updates folder..."), QString(), QnCustomFileDialog::directoryDialogOptions());
-    if (sourceDir.isEmpty())
+    QString fileName = QnFileDialog::getOpenFileName(this, tr("Select Update File..."), QString(), tr("Update Files (*.zip)"), 0, QnCustomFileDialog::fileDialogOptions());
+    if (fileName.isEmpty())
         return;
 
     m_updateTool->setDenyMajorUpdates(false);
-    m_updateTool->checkForUpdates(sourceDir);
+    m_updateTool->checkForUpdates(fileName);
 }
 
 void QnServerUpdatesWidget::at_updateButton_clicked() {
@@ -161,6 +161,10 @@ void QnServerUpdatesWidget::updateUi() {
             case QnMediaServerUpdateTool::UpdateImpossible:
                 if (!m_minimalMode)
                     QMessageBox::critical(this, tr("Update is impossible"), m_updateTool->resultString());
+                break;
+            case QnMediaServerUpdateTool::BadUpdateFile:
+                if (!m_minimalMode)
+                    QMessageBox::critical(this, tr("Update check failed"), m_updateTool->resultString());
                 break;
             }
         } else {

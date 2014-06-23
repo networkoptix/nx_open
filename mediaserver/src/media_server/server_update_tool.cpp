@@ -13,6 +13,7 @@
 #include <media_server/settings.h>
 #include <media_server/serverutil.h>
 #include <utils/common/log.h>
+#include <utils/update/update_utils.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <media_server/serverutil.h>
@@ -24,7 +25,6 @@ namespace {
     const QString updatesDirSuffix = lit("mediaserver/updates");
     const QString updateInfoFileName = lit("update.json");
     const QString updateLogFileName = lit("update.log");
-    const int readBufferSize = 1024 * 16;
     const int replyDelay = 200;
 
     QDir getUpdatesDir() {
@@ -47,44 +47,6 @@ namespace {
     QString getUpdateFilePath(const QString &updateId) {
         QString id = updateId.mid(1, updateId.length() - 2);
         return getUpdatesDir().absoluteFilePath(id + lit(".zip"));
-    }
-
-    bool extractZipArchive(QuaZip *zip, const QDir &dir) {
-        if (!dir.exists())
-            return false;
-
-        QuaZipFile file(zip);
-        for (bool more = zip->goToFirstFile(); more; more = zip->goToNextFile()) {
-            QuaZipFileInfo info;
-            zip->getCurrentFileInfo(&info);
-
-            QFileInfo fileInfo(info.name);
-            QString path = fileInfo.path();
-
-            if (!path.isEmpty() && !dir.exists(path) && !dir.mkpath(path))
-                return false;
-
-            QFile destFile(dir.absoluteFilePath(info.name));
-            if (!destFile.open(QFile::WriteOnly))
-                return false;
-
-            if (!file.open(QuaZipFile::ReadOnly))
-                return false;
-
-            QByteArray buf(readBufferSize, 0);
-            while (file.bytesAvailable()) {
-                qint64 read = file.read(buf.data(), readBufferSize);
-                if (read != destFile.write(buf.data(), read)) {
-                    file.close();
-                    return false;
-                }
-            }
-            destFile.close();
-            file.close();
-
-            destFile.setPermissions(info.getPermissions());
-        }
-        return zip->getZipError() == UNZ_OK;
     }
 
     bool initializeUpdateLog(const QString &targetVersion, QString *logFileName) {

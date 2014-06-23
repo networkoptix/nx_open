@@ -7,6 +7,9 @@
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
 
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
@@ -87,20 +90,23 @@ void QnMediaServerUpdateTool::setCheckResult(QnMediaServerUpdateTool::CheckResul
     m_checkResult = result;
 
     switch (result) {
-    case QnMediaServerUpdateTool::UpdateFound:
+    case UpdateFound:
         m_resultString = tr("Update has been successfully finished.");
         break;
-    case QnMediaServerUpdateTool::InternetProblem:
+    case InternetProblem:
         m_resultString = tr("Check for updates failed.");
         break;
-    case QnMediaServerUpdateTool::NoNewerVersion:
+    case NoNewerVersion:
         m_resultString = tr("All component in your system are already up to date.");
         break;
-    case QnMediaServerUpdateTool::NoSuchBuild:
+    case NoSuchBuild:
         m_resultString = tr("There is no such build on the update server");
         break;
-    case QnMediaServerUpdateTool::UpdateImpossible:
+    case UpdateImpossible:
         m_resultString = tr("Cannot start update.\nUpdate for one or more servers were not found.");
+        break;
+    case BadUpdateFile:
+        m_resultString = tr("Cannot update from this file:\n%1").arg(QFileInfo(m_localUpdateFileName).fileName());
         break;
     }
 
@@ -111,23 +117,23 @@ void QnMediaServerUpdateTool::setUpdateResult(QnMediaServerUpdateTool::UpdateRes
     m_updateResult = result;
 
     switch (result) {
-    case QnMediaServerUpdateTool::UpdateSuccessful:
+    case UpdateSuccessful:
         m_resultString = tr("Update has been successfully finished.");
         break;
-    case QnMediaServerUpdateTool::Cancelled:
+    case Cancelled:
         m_resultString = tr("Update has been cancelled.");
         break;
-    case QnMediaServerUpdateTool::LockFailed:
+    case LockFailed:
         m_resultString = tr("Someone has already started an update.");
         break;
-    case QnMediaServerUpdateTool::DownloadingFailed:
+    case DownloadingFailed:
         m_resultString = tr("Could not download updates.");
         break;
-    case QnMediaServerUpdateTool::UploadingFailed:
+    case UploadingFailed:
         m_resultString = tr("Could not upload updates to servers.");
         break;
-    case QnMediaServerUpdateTool::InstallationFailed:
-    case QnMediaServerUpdateTool::RestInstallationFailed:
+    case InstallationFailed:
+    case RestInstallationFailed:
         m_resultString = tr("Could not install updates on one or more servers.");
         break;
     }
@@ -137,6 +143,7 @@ void QnMediaServerUpdateTool::setUpdateResult(QnMediaServerUpdateTool::UpdateRes
 
 void QnMediaServerUpdateTool::finishUpdate(QnMediaServerUpdateTool::UpdateResult result) {
     unlockMutex();
+    removeTemporaryDir();
     setUpdateResult(result);
 }
 
@@ -262,11 +269,12 @@ void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version) 
     checkOnlineUpdates(version);
 }
 
-void QnMediaServerUpdateTool::checkForUpdates(const QString &path) {
+void QnMediaServerUpdateTool::checkForUpdates(const QString &fileName) {
     if (m_state >= CheckingForUpdates)
         return;
 
-    m_localUpdateDir = QDir(path);
+    m_localUpdateFileName = fileName;
+    m_localTemporaryDir.clear();
     checkLocalUpdates();
 }
 
@@ -292,20 +300,46 @@ void QnMediaServerUpdateTool::checkOnlineUpdates(const QnSoftwareVersion &versio
 }
 
 void QnMediaServerUpdateTool::checkLocalUpdates() {
-    QRegExp updateFileRegExp(lit("update_.+_.+_\\d+\\.\\d+\\.\\d+\\.\\d+\\.zip"));
-
     setState(CheckingForUpdates);
+
+    if (!QFile::exists(m_localUpdateFileName)) {
+        setCheckResult(BadUpdateFile);
+        return;
+    }
+
+    QDir dir = QDir::temp();
+    forever {
+        QString dirName = QUuid::createUuid().toString();
+        if (dir.exists(dirName))
+            continue;
+
+        if (!dir.mkdir(dirName)) {
+            setCheckResult(BadUpdateFile);
+            return;
+        }
+
+        dir.cd(dirName);
+        break;
+    }
+
+    if (!extractZipArchive(m_localUpdateFileName, dir)) {
+        removeTemporaryDir();
+        setCheckResult(BadUpdateFile);
+        return;
+    }
+
+    QRegExp updateFileRegExp(lit("update_.+_.+_\\d+\\.\\d+\\.\\d+\\.\\d+\\.zip"));
 
     m_updateFiles.clear();
     m_updateInformationById.clear();
     m_targetMustBeNewer = false;
 
-    QStringList entries = m_localUpdateDir.entryList(QStringList() << lit("*.zip"), QDir::Files);
+    QStringList entries = dir.entryList(QStringList() << lit("*.zip"), QDir::Files);
     foreach (const QString &entry, entries) {
         if (!updateFileRegExp.exactMatch(entry))
             continue;
 
-        QString fileName = m_localUpdateDir.absoluteFilePath(entry);
+        QString fileName = dir.absoluteFilePath(entry);
         QnSoftwareVersion version;
         QnSystemInformation sysInfo;
 
@@ -319,7 +353,7 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
             m_targetVersion = version;
 
         if (m_targetVersion != version) {
-            setCheckResult(UpdateImpossible);
+            setCheckResult(BadUpdateFile);
             return;
         }
 
@@ -342,11 +376,20 @@ void QnMediaServerUpdateTool::checkBuildOnline() {
     connect(reply, &QNetworkReply::finished, this, &QnMediaServerUpdateTool::at_buildReply_finished);
 }
 
+void QnMediaServerUpdateTool::removeTemporaryDir() {
+    if (m_localTemporaryDir.isEmpty())
+        return;
+
+    QDir(m_localTemporaryDir).removeRecursively();
+    m_localTemporaryDir.clear();
+}
+
 void QnMediaServerUpdateTool::checkUpdateCoverage() {
     bool needUpdate = false;
     foreach (const QnMediaServerResourcePtr &server, actualTargets()) {
         UpdateFileInformationPtr updateFileInformation = m_updateFiles[server->getSystemInfo()];
         if (!updateFileInformation) {
+            removeTemporaryDir();
             setCheckResult(UpdateImpossible);
             return;
         }

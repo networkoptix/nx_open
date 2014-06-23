@@ -77,7 +77,8 @@ public:
         InternetProblem,
         NoNewerVersion,
         NoSuchBuild,
-        UpdateImpossible
+        UpdateImpossible,
+        BadUpdateFile
     };
 
     enum UpdateResult {
@@ -123,7 +124,7 @@ signals:
 public slots:
     void checkForUpdates();
     void checkForUpdates(const QnSoftwareVersion &version);
-    void checkForUpdates(const QString &path);
+    void checkForUpdates(const QString &fileName);
     bool cancelUpdate();
 
 protected:
@@ -156,6 +157,7 @@ private:
     void finishUpdate(UpdateResult result);
     void setPeerState(const QnId &peerId, PeerUpdateInformation::State state);
     void checkBuildOnline();
+    void removeTemporaryDir();
 
     void downloadUpdates();
     void uploadUpdatesToServers();
@@ -171,7 +173,8 @@ private:
     UpdateResult m_updateResult;
     QString m_resultString;
 
-    QDir m_localUpdateDir;
+    QString m_localUpdateFileName;
+    QString m_localTemporaryDir;
     QUrl m_onlineUpdateUrl;
     QString m_updateLocationPrefix;
 
