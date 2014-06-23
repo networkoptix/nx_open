@@ -286,8 +286,6 @@
             <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
             <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
 
-            <!--            <Property Id="ARPNOMODIFY" Value="1" />-->
-
             <DialogRef Id="SelectionWarningDlg" />
             <DialogRef Id="DowngradeWarningDlg" />
             <DialogRef Id="BrowseDlg" />
@@ -300,7 +298,6 @@
             <DialogRef Id="ProgressDlg" />
             <DialogRef Id="ResumeDlg" />
             <DialogRef Id="UserExit" />
-            <!--Width="260" Height="85"-->
 
             <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
 
@@ -321,25 +318,14 @@
 
             <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
 
-            <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_SERVER" Value="1">INSTALLTYPE=0</Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_CLIENT" Value="1">INSTALLTYPE=0</Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_SERVER" Value="1">INSTALLTYPE=1</Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_CLIENT" Value="{}">INSTALLTYPE=1</Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_SERVER" Value="{}">INSTALLTYPE=2</Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_CLIENT" Value="1">INSTALLTYPE=2</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_SERVER" Value="1" Order="1">INSTALLTYPE=0</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_CLIENT" Value="1" Order="1">INSTALLTYPE=0</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_SERVER" Value="1" Order="1">INSTALLTYPE=1</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_CLIENT" Value="{}" Order="1">INSTALLTYPE=1</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_SERVER" Value="{}" Order="1">INSTALLTYPE=2</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_CLIENT" Value="1" Order="1">INSTALLTYPE=2</Publish>
             
- <!--            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">INSTALLTYPE=0 OR INSTALLTYPE=1</Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">INSTALLTYPE=2</Publish> -->
-
- 
-<!--            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">
-                <![CDATA[ NOT $(var.VmsChanging) ]]>
-            </Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">
-                <![CDATA[ $(var.VmsChanging) ]]>
-            </Publish> -->
-
-            <Publish Dialog="InstallTypeDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)">INSTALL_CLIENT</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)" Order="1">INSTALL_CLIENT</Publish>
 
             <?define SomeFeaturesSelected="(INSTALL_SERVER OR INSTALL_CLIENT)"?>         
 
@@ -357,48 +343,15 @@
             <?define Changing_S0C1="NOT $(var.VmsInstalling) AND $(var.Inst_S0C1)"?>
             <?define ChangingNothing="NOT $(var.VmsInstalling) AND $(var.Inst_S0C0)"?>
 
-            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg">
+            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="2">
                 <![CDATA[ $(var.Inst_S1) ]]>
             </Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="ClientDlg">
+            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2">
                 <![CDATA[ $(var.Inst_S0C1) ]]>
             </Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">
+            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">
                 <![CDATA[ $(var.ChangingNothing) ]]>
             </Publish>
-
-            <!--
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SYSTEM_NAME" Value="{}" Order="4">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_PORT" Value="{}" Order="4">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_LOGIN" Value="{}" Order="4">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_PASSWORD" Value="{}" Order="4" >1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_PASSWORD_CONFIRM" Value="{}" Order="4" >1</Publish>
-
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_HOST" Value="{}" Order="4">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_PORT" Value="{}" Order="4">1</Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_LOGIN" Value="{}" Order="4">1</Publish>
-
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="{}">
-                <![CDATA[ $(var.Inst_C0) ]]>
-            </Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)">
-                <![CDATA[ $(var.Inst_C1) ]]>
-            </Publish> 
-
-            <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">
-                <![CDATA[ INSTALLTYPE <> 2 ]]></Publish>
-            <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">
-                <![CDATA[ INSTALLTYPE = 2 ]]>
-            </Publish>
-
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="3">INSTALL_SERVER</Publish>
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="4">NOT INSTALL_SERVER AND INSTALL_CLIENT</Publish>
-            <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
-            <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
-
-            <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
-            <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish> -->
 
             <?define PasswordsEqual="(SERVER_PASSWORD = SERVER_PASSWORD_CONFIRM)" ?>
 
@@ -440,27 +393,28 @@
                 <![CDATA[ 1 ]]>
             </Publish>
 
-            <?define EditingSettings="(($(var.VmsInstalling) AND INSTALLTYPE=1) OR $(var.VmsChanging))"?>
-
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg" >
+            <!-- Normal installation -->
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg" Order="2">
                 <![CDATA[ $(var.Inst_S0C0) ]]>
             </Publish>
 
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">
-                <![CDATA[ $(var.EditingSettings) AND $(var.Inst_S1C0) ]]>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="2">
+                <![CDATA[ ($(var.VmsInstalling) OR $(var.VmsChanging)) AND $(var.Inst_S1C0) ]]>
             </Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg" >
-                <![CDATA[ $(var.EditingSettings) AND $(var.Inst_C1) ]]>
+            
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg" Order="2">
+                <![CDATA[ ($(var.VmsInstalling) OR $(var.VmsChanging)) AND $(var.Inst_C1) ]]>
             </Publish>
 
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg" Order="2">
                 <![CDATA[$(var.VmsUpgrading)]]>
             </Publish>
+            
+            <!-- Maintanance -->
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">
-                <![CDATA[ ($(var.VmsRemoving) AND !AppServerFeature <> 3) OR WixUI_InstallMode = "Repair" ]]>
+                <![CDATA[ $(var.VmsRemoving) OR WixUI_InstallMode = "Repair" ]]>
             </Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">
-                <![CDATA[ $(var.VmsRemoving) AND !AppServerFeature <> 3 ]]></Publish>
+            
             <Publish Dialog="VerifyReadyDlg" Control="Back" Property="REMOVE" Value="{}" Order="3">
                 <![CDATA[ Installed ]]>
             </Publish>
