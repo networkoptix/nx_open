@@ -57,7 +57,7 @@ namespace applauncher
             version = QnSoftwareVersion(QN_ENGINE_VERSION);
 
         api::IsVersionInstalledRequest request;
-        request.version = version.toString(QnSoftwareVersion::MinorFormat);
+        request.version = version;
         api::IsVersionInstalledResponse response;
         api::ResultType::Value result = sendCommandToLauncher( request, &response );
         if( result != api::ResultType::ok )
@@ -129,6 +129,22 @@ namespace applauncher
             return response.result;
         *status = response.status;
         *progress = response.progress;
+        return response.result;
+    }
+
+    api::ResultType::Value installZip(
+        const QnSoftwareVersion &version,
+        const QString &zipFileName )
+    {
+        api::InstallZipTask request;
+        request.version = version.toString();
+        api::InstallZipResponse response;
+        api::ResultType::Value result = sendCommandToLauncher( request, &response );
+        if( result != api::ResultType::ok )
+            return result;
+        if( response.result != api::ResultType::ok )
+            return response.result;
+        *dir = response.installationDir;
         return response.result;
     }
 

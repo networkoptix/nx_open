@@ -12,6 +12,7 @@
 #include <QtCore/QRegExp>
 
 #include <utils/common/log.h>
+#include <utils/update/update_utils.h>
 
 #include "version.h"
 
@@ -27,8 +28,29 @@ namespace {
 
     const QString INSTALLATION_DATA_FILE( "install.dat" );
 
-    QnSoftwareVersion toMinorVersion(const QnSoftwareVersion &version) {
-        return QnSoftwareVersion(version.major(), version.minor(), 0, 0);
+    bool fillFileSizes(const QDir &root, const QString &base, QMap<QString, qint64> &fileSizeByEntry) {
+        QDir currentDir = root;
+        currentDir.cd(base);
+        foreach (const QFileInfo &info, currentDir.entryInfoList(QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot)) {
+            if (info.isDir()) {
+                if (!fillFileSizes(root, root.relativeFilePath(info.absoluteFilePath()), fileSizeByEntry))
+                    return false;
+            } else {
+                QFile file(info.absoluteFilePath());
+                if (!file.open(QFile::ReadOnly))
+                    return false;
+                fileSizeByEntry.insert(root.relativeFilePath(info.absoluteFilePath()), file.size());
+                file.close();
+            }
+        }
+        return true;
+    }
+
+    QString versionToString(const QnSoftwareVersion &version) {
+        if (version < QnSoftwareVersion(2, 2))
+            return version.toString(QnSoftwareVersion::MinorFormat);
+        else
+            return version.toString();
     }
 
 } // anonymous namespace
@@ -141,7 +163,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     NX_LOG(QString::fromLatin1("Checking current version (%1)").arg(QN_APPLICATION_VERSION), cl_logDEBUG1);
     AppData current = getAppData(QCoreApplication::applicationDirPath());
     if (current.exists()) {
-        current.m_version = toMinorVersion(QnSoftwareVersion(QN_APPLICATION_VERSION));
+        current.m_version = QnSoftwareVersion(QN_APPLICATION_VERSION);
         tempInstalledProductsByVersion.insert(current.version(), current);
     } else {
         NX_LOG(QString::fromLatin1("Can't find client binary in %1").arg(current.rootPath()), cl_logWARNING);
@@ -160,7 +182,7 @@ void InstallationManager::updateInstalledVersionsInformation()
             if (!appData.exists())
                 continue;
 
-            appData.m_version = toMinorVersion(QnSoftwareVersion(entry));
+            appData.m_version = QnSoftwareVersion(entry);
 
             tempInstalledProductsByVersion.insert(appData.version(), appData);
             NX_LOG(QString::fromLatin1("Compatibility version %1 found").arg(entry), cl_logDEBUG1);
@@ -177,10 +199,10 @@ void InstallationManager::updateInstalledVersionsInformation()
 
 void InstallationManager::createGhosts()
 {
-    QString latestVersion = getMostRecentVersion();
+    QnSoftwareVersion latestVersion = getMostRecentVersion();
 
     foreach (const QnSoftwareVersion &version, m_installedProductsByVersion.keys()) {
-        if (version.toString(QnSoftwareVersion::MinorFormat) == latestVersion)
+        if (version == latestVersion)
             continue;
 
         createGhostsForVersion(version);
@@ -189,11 +211,11 @@ void InstallationManager::createGhosts()
 
 void InstallationManager::createGhostsForVersion(const QnSoftwareVersion &version)
 {
-    // Make version check. Applauncher doesn't need to affect versions >= 2.2 because they are able to communicate with applauncher
-    if (QnSoftwareVersion(2, 1, 0, 0) < version)
+    // Applauncher doesn't need to affect versions >= 2.2 because they can communicate to applauncher.
+    if (version >= QnSoftwareVersion(2, 2))
         return;
 
-    auto it = m_installedProductsByVersion.find(version);
+    auto it = m_installedProductsByVersion.find(nearestInstalledVersion(version));
     if (it == m_installedProductsByVersion.end())
         return;
 
@@ -234,36 +256,74 @@ int InstallationManager::count() const
     return m_installedProductsByVersion.size();
 }
 
-QString InstallationManager::getMostRecentVersion() const
+QnSoftwareVersion InstallationManager::getMostRecentVersion() const
 {
     std::unique_lock<std::mutex> lk( m_mutex );
-    return m_installedProductsByVersion.empty() ? QString() : m_installedProductsByVersion.lastKey().toString(QnSoftwareVersion::MinorFormat);
+    return m_installedProductsByVersion.empty() ? QnSoftwareVersion() : m_installedProductsByVersion.lastKey();
 }
 
-bool InstallationManager::isVersionInstalled( const QString& version ) const
+bool InstallationManager::isVersionInstalled(const QnSoftwareVersion &version ) const
 {
-    std::unique_lock<std::mutex> lk( m_mutex );
+    QnSoftwareVersion ver = nearestInstalledVersion(version);
 
-    auto iter = m_installedProductsByVersion.find(QnSoftwareVersion(version));
-    if (iter == m_installedProductsByVersion.end())
+    if (ver.isNull())
         return false;
 
-    lk.unlock();
+    AppData appData;
+    if (!getInstalledVersionData(ver, &appData))
+        return false;
 
     //checking that directory exists
-    if (!iter.value().exists()) {
-        m_installedProductsByVersion.erase(iter);
+    if (!appData.exists()) {
+        m_installedProductsByVersion.remove(ver);
         return false;
     }
 
     return true;
 }
 
-bool InstallationManager::getInstalledVersionData(const QString &version, InstallationManager::AppData *const appData) const
+QnSoftwareVersion InstallationManager::nearestInstalledVersion(const QnSoftwareVersion &version) const
+{
+    if (m_installedProductsByVersion.isEmpty())
+        return QnSoftwareVersion();
+
+    std::unique_lock<std::mutex> lk( m_mutex );
+
+    auto iter = m_installedProductsByVersion.find(version);
+    if (iter == m_installedProductsByVersion.end() && version.build() == 0) {
+        do {
+            --iter;
+
+            QnSoftwareVersion v = iter->version();
+            // too early
+            if (v.major() > version.major())
+                continue;
+
+            // to last (
+            if (v.major() < version.major())
+                break;
+
+            // too early
+            if (v.minor() > version.minor())
+                continue;
+
+            // to last (
+            if (v.minor() < version.minor())
+                break;
+
+            // got it!
+            return v;
+        } while (iter != m_installedProductsByVersion.begin());
+    }
+
+    return QnSoftwareVersion();
+}
+
+bool InstallationManager::getInstalledVersionData(const QnSoftwareVersion &version, InstallationManager::AppData *const appData) const
 {
     std::unique_lock<std::mutex> lk( m_mutex );
 
-    auto it = m_installedProductsByVersion.find(QnSoftwareVersion(version));
+    auto it = m_installedProductsByVersion.find(version);
     if (it == m_installedProductsByVersion.end())
         return false;
 
@@ -276,14 +336,12 @@ QString InstallationManager::getRootInstallDirectory() const
     return m_defaultDirectoryForNewInstallations;
 }
 
-QString InstallationManager::getInstallDirForVersion( const QString& version ) const
+QString InstallationManager::getInstallDirForVersion(const QnSoftwareVersion &version) const
 {
-    if( !isValidVersionName(version) ||
-        m_defaultDirectoryForNewInstallations.isEmpty() )   //no writable installation path
-    {
+    if (m_defaultDirectoryForNewInstallations.isEmpty())   //no writable installation path
         return QString();
-    }
-    return m_defaultDirectoryForNewInstallations + "/" + version;
+
+    return m_defaultDirectoryForNewInstallations + "/" + versionToString(version);
 }
 
 //!Returns previous error description
@@ -292,7 +350,45 @@ QString InstallationManager::errorString() const
     return m_errorString;
 }
 
-bool InstallationManager::isValidVersionName( const QString& version )
+bool InstallationManager::installZip(const QnSoftwareVersion &version, const QString &fileName)
+{
+    AppData appData;
+    if (getInstalledVersionData(version, &appData)) {
+        if (appData.verifyInstallation())
+            return true;
+    }
+
+    if (!extractZipArchive(fileName, getInstallDirForVersion(version)))
+        return false;
+
+    appData = getAppData(getInstallDirForVersion(version));
+    if (!appData.exists()) {
+        QDir(getInstallDirForVersion(version)).removeRecursively();
+        return false;
+    }
+
+    QMap<QString, qint64> fileSizeByEntry;
+    if (!fillFileSizes(QDir(appData.rootPath()), QString(), fileSizeByEntry)) {
+        QDir(appData.rootPath()).removeRecursively();
+        return false;
+    }
+
+    QFile file(appData.rootPath() + "/" + INSTALLATION_DATA_FILE);
+    if (!file.open(QFile::WriteOnly)) {
+        QDir(appData.rootPath()).removeRecursively();
+        return false;
+    }
+
+    QDataStream stream(&file);
+    stream << fileSizeByEntry;
+    file.close();
+
+    m_installedProductsByVersion.insert(appData.version(), appData);
+
+    return true;
+}
+
+bool InstallationManager::isValidVersionName(const QString &version)
 {
     return versionDirMatch.exactMatch(version);
 }

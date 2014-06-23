@@ -18,6 +18,7 @@
 #include <utils/upload_updates_peer_task.h>
 #include <utils/install_updates_peer_task.h>
 #include <utils/rest_update_peer_task.h>
+#include <utils/applauncher_utils.h>
 
 #include <version.h>
 
@@ -28,6 +29,15 @@ const QString QN_UPDATE_PACKAGE_URL = lit("http://enk.me/bg/dklychkov/exmaple_up
 const QString buildInformationSuffix(lit("update"));
 const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
 const QString mutexName = lit("auto_update");
+
+QnMediaServerUpdateTool::UpdateFileInformationPtr mapToUpdateFileInformation(const QVariantMap &package, const QnSoftwareVersion &targetVersion) {
+    QString fileName = package.value(lit("file")).toString();
+    QnMediaServerUpdateTool::UpdateFileInformationPtr info(new QnMediaServerUpdateTool::UpdateFileInformation(targetVersion, QUrl(urlPrefix + fileName)));
+    info->baseFileName = fileName;
+    info->fileSize = package.value(lit("size")).toLongLong();
+    info->md5 = package.value(lit("md5")).toString();
+    return info;
+}
 
 } // anonymous namespace
 
@@ -266,6 +276,7 @@ void QnMediaServerUpdateTool::reset() {
 
     m_updateInformationById.clear();
     m_updateFiles.clear();
+    m_clientUpdateFile.clear();
     m_targetVersion = QnSoftwareVersion();
 }
 
@@ -304,6 +315,7 @@ void QnMediaServerUpdateTool::checkOnlineUpdates(const QnSoftwareVersion &versio
     }
 
     m_updateFiles.clear();
+    m_clientUpdateFile.clear();
     m_updateInformationById.clear();
 
     m_targetMustBeNewer = version.isNull();
@@ -315,6 +327,7 @@ void QnMediaServerUpdateTool::checkOnlineUpdates(const QnSoftwareVersion &versio
 
 void QnMediaServerUpdateTool::checkLocalUpdates() {
     m_updateFiles.clear();
+    m_clientUpdateFile.clear();
     m_updateInformationById.clear();
     m_targetMustBeNewer = false;
     m_targetVersion = QnSoftwareVersion();
@@ -348,7 +361,7 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
         return;
     }
 
-    QRegExp updateFileRegExp(lit("update_.+_.+_\\d+\\.\\d+\\.\\d+\\.\\d+\\.zip"));
+    QRegExp updateFileRegExp(lit("(?:client_){0,1}update_.+_.+_\\d+\\.\\d+\\.\\d+\\.\\d+\\.zip"));
 
     QStringList entries = dir.entryList(QStringList() << lit("*.zip"), QDir::Files);
     foreach (const QString &entry, entries) {
@@ -358,8 +371,9 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
         QString fileName = dir.absoluteFilePath(entry);
         QnSoftwareVersion version;
         QnSystemInformation sysInfo;
+        bool isClient;
 
-        if (!verifyUpdatePackage(fileName, &version, &sysInfo))
+        if (!verifyUpdatePackage(fileName, &version, &sysInfo, &isClient))
             continue;
 
         if (m_updateFiles.contains(sysInfo))
@@ -377,7 +391,10 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
         QFile file(fileName);
         updateFileInformation->fileSize = file.size();
         updateFileInformation->md5 = makeMd5(&file);
-        m_updateFiles.insert(sysInfo, updateFileInformation);
+        if (isClient)
+            m_clientUpdateFile = updateFileInformation;
+        else
+            m_updateFiles.insert(sysInfo, updateFileInformation);
     }
 
     checkUpdateCoverage();
@@ -412,6 +429,12 @@ void QnMediaServerUpdateTool::checkUpdateCoverage() {
         QnSoftwareVersion version = updateFileInformation->version;
         if ((m_targetMustBeNewer && version > server->getVersion()) || (!m_targetMustBeNewer && version != server->getVersion()))
             needUpdate = true;
+    }
+
+    if (!m_clientUpdateFile) {
+        removeTemporaryDir();
+        setCheckResult(UpdateImpossible);
+        return;
     }
 
     setCheckResult(needUpdate ? UpdateFound : NoNewerVersion);
@@ -496,6 +519,21 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
             info->md5 = package.value(lit("md5")).toString();
             m_updateFiles.insert(QnSystemInformation(platform.key(), architecture, modification), info);
         }
+    }
+
+    packages = map.value(lit("client_packages")).toMap();
+    QString arch = lit(QN_APPLICATION_ARCH);
+    QString modification = lit(QN_ARM_BOX);
+    if (!modification.isEmpty())
+        arch += lit("_") + modification;
+    QVariantMap package = packages.value(lit(QN_APPLICATION_PLATFORM)).toMap().value(arch).toMap();
+
+    if (!package.isEmpty()) {
+        QString fileName = package.value(lit("file")).toString();
+        m_clientUpdateFile = new UpdateFileInformation(m_targetVersion, QUrl(urlPrefix + fileName));
+        m_clientUpdateFile->baseFileName = fileName;
+        m_clientUpdateFile->fileSize = package.value(lit("size")).toLongLong();
+        m_clientUpdateFile->md5 = package.value(lit("md5")).toString();
     }
 
     checkUpdateCoverage();
@@ -604,6 +642,11 @@ void QnMediaServerUpdateTool::downloadUpdates() {
         }
     }
 
+    downloadTargets.insert(m_clientUpdateFile->url, m_clientUpdateFile->baseFileName);
+    hashByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->md5);
+    fileSizeByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->fileSize);
+    peerAssociations.insert(m_clientUpdateFile->url, qnCommon->moduleGUID());
+
     emit progressChanged(0);
     setState(DownloadingUpdate);
 
@@ -631,6 +674,18 @@ void QnMediaServerUpdateTool::uploadUpdatesToServers() {
     m_uploadUpdatesPeerTask->setUpdateId(m_updateId);
     m_uploadUpdatesPeerTask->setUploads(fileBySystemInformation);
     m_uploadUpdatesPeerTask->start(m_targetPeerIds - m_incompatiblePeerIds);
+}
+
+void QnMediaServerUpdateTool::installClientUpdate() {
+    setState(InstallingClientUpdate);
+
+    QString installationDir;
+    if (applauncher::installZip(m_targetVersion, &installationDir) != applauncher::api::ResultType::ok) {
+        finishUpdate(InstallationFailed);
+        return;
+    }
+
+    installUpdatesToServers();
 }
 
 void QnMediaServerUpdateTool::installUpdatesToServers() {
@@ -722,7 +777,7 @@ void QnMediaServerUpdateTool::at_uploadTask_finished(int errorCode) {
         return;
     }
 
-    installUpdatesToServers();
+    installClientUpdate();
 }
 
 void QnMediaServerUpdateTool::at_installTask_finished(int errorCode) {

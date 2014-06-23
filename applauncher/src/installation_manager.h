@@ -58,18 +58,21 @@ public:
     void createGhostsForVersion(const QnSoftwareVersion &version);
     //!Returns number of installed versions
     int count() const;
-    QString getMostRecentVersion() const;
-    bool isVersionInstalled( const QString& version ) const;
+    QnSoftwareVersion getMostRecentVersion() const;
+    bool isVersionInstalled( const QnSoftwareVersion& version ) const;
+    QnSoftwareVersion nearestInstalledVersion(const QnSoftwareVersion &version) const;
     /*!
         \return false, if \a version not found. Otherwise, true and \a *appData filled
     */
-    bool getInstalledVersionData( const QString& version, AppData* const appData ) const;
+    bool getInstalledVersionData(const QnSoftwareVersion &version, AppData* const appData ) const;
     //!Returns path to "{program files dir}/Network Optix" on windows and "/opt/Network Optix" on unix
     QString getRootInstallDirectory() const;
     //!Returns path to install \a version to or empty string writable paths for installations is not known
-    QString getInstallDirForVersion( const QString& version ) const;
+    QString getInstallDirForVersion( const QnSoftwareVersion& version ) const;
     //!Returns previous error description
     QString errorString() const;
+
+    bool installZip(const QnSoftwareVersion &version, const QString &fileName);
 
     static bool isValidVersionName( const QString& version );
 

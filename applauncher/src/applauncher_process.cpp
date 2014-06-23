@@ -72,6 +72,13 @@ void ApplauncherProcess::processRequest(
                 static_cast<applauncher::api::StartInstallationResponse*>(*response) );
             break;
 
+        case applauncher::api::TaskType::installZip:
+            *response = new applauncher::api::Response();
+            installZip(
+                std::static_pointer_cast<applauncher::api::InstallZipTask>( request ),
+                static_cast<applauncher::api::Response*>(*response) );
+            break;
+
         case applauncher::api::TaskType::getInstallationStatus:
             *response = new applauncher::api::InstallationStatusResponse();
             getInstallationStatus(
@@ -119,7 +126,7 @@ int ApplauncherProcess::run()
         return 0;
 
     //launching most recent version
-    QString versionToLaunch;
+    QnSoftwareVersion versionToLaunch;
     QString appArgs;
     if( getVersionToLaunch( &versionToLaunch, &appArgs ) )
     {
@@ -173,7 +180,7 @@ bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
     QByteArray serializedTask;
     if( !m_quitMode )
     {
-        QString versionToLaunch;
+        QnSoftwareVersion versionToLaunch;
         QString appArgs;
         if( !getVersionToLaunch( &versionToLaunch, &appArgs ) )
         {
@@ -195,11 +202,11 @@ bool ApplauncherProcess::sendTaskToRunningLauncherInstance()
 
 static const QLatin1String PREVIOUS_LAUNCHED_VERSION_PARAM_NAME( "previousLaunchedVersion" );
 
-bool ApplauncherProcess::getVersionToLaunch( QString* const versionToLaunch, QString* const appArgs )
+bool ApplauncherProcess::getVersionToLaunch( QnSoftwareVersion* const versionToLaunch, QString* const appArgs )
 {
     if( m_settings->contains( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ) )
     {
-        *versionToLaunch = m_settings->value( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ).toString();
+        *versionToLaunch = QnSoftwareVersion(m_settings->value( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME ).toString());
         *appArgs = m_settings->value( "previousUsedCmdParams" ).toString();
     }
     else if( m_installationManager->count() > 0 )
@@ -294,14 +301,14 @@ bool ApplauncherProcess::startApplication(
 
         if( m_installationManager->count() > 0 )
         {
-            const QString& theMostRecentVersion = m_installationManager->getMostRecentVersion();
+            const QnSoftwareVersion& theMostRecentVersion = m_installationManager->getMostRecentVersion();
             if( task->version != theMostRecentVersion )
             {
                 task->version = theMostRecentVersion;
                 continue;
             }
         }
-        NX_LOG( QString::fromLatin1("Failed to find installed version %1 path").arg(task->version), cl_logDEBUG1 );
+        NX_LOG( QString::fromLatin1("Failed to find installed version %1 path").arg(task->version.toString()), cl_logDEBUG1 );
         response->result = applauncher::api::ResultType::versionNotInstalled;
         return false;
     }
@@ -353,15 +360,15 @@ bool ApplauncherProcess::startApplication(
     if (!m_devModeKey.isEmpty())
         arguments.append(QString::fromLatin1("--dev-mode-key=%1").arg(devModeKey()));
 
-    NX_LOG( QString::fromLatin1("Launching version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG2 );
+    NX_LOG( QString::fromLatin1("Launching version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG2 );
     if( ProcessUtils::startProcessDetached(
             binPath,
             arguments,
             QString(),
             environment) )
     {
-        NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG1 );
-        m_settings->setValue( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME, task->version );
+        NX_LOG( QString::fromLatin1("Successfully launched version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG1 );
+        m_settings->setValue( PREVIOUS_LAUNCHED_VERSION_PARAM_NAME, task->version.toString() );
         m_settings->sync();
         response->result = applauncher::api::ResultType::ok;
         return true;
@@ -369,7 +376,7 @@ bool ApplauncherProcess::startApplication(
     else
     {
         //TODO/IMPL should mark version as not installed or corrupted?
-        NX_LOG( QString::fromLatin1("Failed to launch version %1 (path %2)").arg(task->version).arg(binPath), cl_logDEBUG1 );
+        NX_LOG( QString::fromLatin1("Failed to launch version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG1 );
         response->result = applauncher::api::ResultType::ioError;
 
         if( task->autoRestore )
@@ -388,12 +395,6 @@ bool ApplauncherProcess::startInstallation(
     const std::shared_ptr<applauncher::api::StartInstallationTask>& task,
     applauncher::api::StartInstallationResponse* const response )
 {
-    if( !InstallationManager::isValidVersionName(task->version) )
-    {
-        response->result = applauncher::api::ResultType::invalidVersionFormat;
-        return true;
-    }
-
     //TODO/IMPL if installation of this version is already running, returning id of running installation
 
     //if already installed, running restore
@@ -468,6 +469,13 @@ bool ApplauncherProcess::getInstallationStatus(
     }
 
     return true;
+}
+
+bool ApplauncherProcess::installZip(
+    const std::shared_ptr<applauncher::api::InstallZipTask>& request,
+    applauncher::api::Response* const response )
+{
+    return m_installationManager->installZip(request->version, request->zipFileName);
 }
 
 bool ApplauncherProcess::isVersionInstalled(
@@ -551,7 +559,7 @@ void ApplauncherProcess::onInstallationDone( InstallationProcess* installationPr
 
 static const int INSTALLATION_CHECK_TIMEOUT_MS = 1000;
 
-bool ApplauncherProcess::blockingRestoreVersion( const QString& versionToLaunch )
+bool ApplauncherProcess::blockingRestoreVersion( const QnSoftwareVersion& versionToLaunch )
 {
     //trying to restore installed version
     applauncher::api::StartInstallationResponse startInstallationResponse;

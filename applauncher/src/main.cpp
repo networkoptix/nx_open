@@ -66,7 +66,7 @@ int doInstallation(
     const QString& mirrorListUrl,
     const QString& productName,
     const QString& customization,
-    const QString& version,
+    const QnSoftwareVersion &version,
     const QString& module,
     const QString& installationPath );
 
@@ -88,7 +88,7 @@ int main( int argc, char* argv[] )
     QString localDir;
     QString remoteUrl;
     bool installMode = false;
-    QString versionToInstall;
+    QnSoftwareVersion versionToInstall;
     QString productNameToInstall( QString::fromUtf8(QN_PRODUCT_NAME_SHORT) );
     QString customizationToInstall( QString::fromUtf8(QN_CUSTOMIZATION_NAME) );
     QString moduleToInstall( QString::fromLatin1("client") );
@@ -239,21 +239,16 @@ int doInstallation(
     const QString& mirrorListUrl,
     const QString& productName,
     const QString& customization,
-    const QString& version,
+    const QnSoftwareVersion& version,
     const QString& module,
     const QString& installationPath )
 {
-    if( version.isEmpty() )
+    if( version.isNull() )
     {
         std::cerr<<"FAILURE. Missing required parameter \"version\""<<std::endl;
         return 1;
     }
 
-    if( !installationManager.isValidVersionName(version) )
-    {
-        std::cerr<<"FAILURE. "<<version.toStdString()<<" is not a valid version to install"<<std::endl;
-        return 1;
-    }
     QString effectiveInstallationPath = installationPath;
     if( effectiveInstallationPath.isEmpty() )
         effectiveInstallationPath = installationManager.getInstallDirForVersion(version);

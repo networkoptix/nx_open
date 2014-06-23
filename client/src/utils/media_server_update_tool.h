@@ -70,6 +70,7 @@ public:
         DownloadingUpdate,
         InstallingToIncompatiblePeers,
         UploadingUpdate,
+        InstallingClientUpdate,
         InstallingUpdate,
     };
 
@@ -164,6 +165,7 @@ private:
 
     void downloadUpdates();
     void uploadUpdatesToServers();
+    void installClientUpdate();
     void installUpdatesToServers();
     void installIncompatiblePeers();
 
@@ -188,6 +190,7 @@ private:
     QString m_updateId;
 
     QHash<QnSystemInformation, UpdateFileInformationPtr> m_updateFiles;
+    UpdateFileInformationPtr m_clientUpdateFile;
 
     QNetworkAccessManager *m_networkAccessManager;
     ec2::QnDistributedMutex *m_distributedMutex;
