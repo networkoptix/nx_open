@@ -30,6 +30,18 @@ const QString buildInformationSuffix(lit("update"));
 const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
 const QString mutexName = lit("auto_update");
 
+bool verifyFile(const QString &fileName, qint64 size, const QString &md5) {
+    QFile file(fileName);
+
+    if (!file.exists() || file.size() != size)
+        return false;
+
+    if (!md5.isEmpty() && makeMd5(&file) != md5)
+        return false;
+
+    return true;
+}
+
 } // anonymous namespace
 
 QnMediaServerUpdateTool::PeerUpdateInformation::PeerUpdateInformation(const QnMediaServerResourcePtr &server) :
@@ -104,7 +116,10 @@ void QnMediaServerUpdateTool::setCheckResult(QnMediaServerUpdateTool::CheckResul
         m_resultString = tr("There is no such build on the update server");
         break;
     case UpdateImpossible:
-        m_resultString = tr("Cannot start update.\nUpdate for one or more servers were not found.");
+        if (m_clientUpdateFile.isNull())
+            m_resultString = tr("Cannot start update.\nAn update for the client was not found.");
+        else
+            m_resultString = tr("Cannot start update.\nAn update for one or more servers was not found.");
         break;
     case BadUpdateFile:
         m_resultString = tr("Cannot update from this file:\n%1").arg(QFileInfo(m_localUpdateFileName).fileName());
@@ -132,6 +147,9 @@ void QnMediaServerUpdateTool::setUpdateResult(QnMediaServerUpdateTool::UpdateRes
         break;
     case UploadingFailed:
         m_resultString = tr("Could not upload updates to servers.");
+        break;
+    case ClientInstallationFailed:
+        m_resultString = tr("Could not install an pdate to the client.");
         break;
     case InstallationFailed:
     case RestInstallationFailed:
@@ -612,14 +630,9 @@ void QnMediaServerUpdateTool::downloadUpdates() {
         if (fileName.isEmpty())
             fileName = updateFilePath(updatesDirName, it.value()->baseFileName);
 
-        if (!fileName.isEmpty()) {
-            QFile file(fileName);
-            if (file.exists() && file.size() == it.value()->fileSize) {
-                if (!it.value()->md5.isEmpty() && makeMd5(&file) == it.value()->md5) {
-                    it.value()->fileName = fileName;
-                    continue;
-                }
-            }
+        if (!fileName.isEmpty() && verifyFile(fileName, it.value()->fileSize, it.value()->md5)) {
+            it.value()->fileName = fileName;
+            continue;
         }
 
         downloadTargets.insert(it.value()->url, it.value()->baseFileName);
@@ -633,10 +646,18 @@ void QnMediaServerUpdateTool::downloadUpdates() {
         }
     }
 
-    downloadTargets.insert(m_clientUpdateFile->url, m_clientUpdateFile->baseFileName);
-    hashByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->md5);
-    fileSizeByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->fileSize);
-    peerAssociations.insert(m_clientUpdateFile->url, qnCommon->moduleGUID());
+    QString fileName = m_clientUpdateFile->fileName;
+    if (fileName.isEmpty())
+        fileName = updateFilePath(updatesDirName, m_clientUpdateFile->baseFileName);
+
+    if (!fileName.isEmpty() && verifyFile(fileName, m_clientUpdateFile->fileSize, m_clientUpdateFile->md5)) {
+        m_clientUpdateFile->fileName = fileName;
+    } else {
+        downloadTargets.insert(m_clientUpdateFile->url, m_clientUpdateFile->baseFileName);
+        hashByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->md5);
+        fileSizeByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->fileSize);
+        peerAssociations.insert(m_clientUpdateFile->url, qnCommon->moduleGUID());
+    }
 
     emit progressChanged(0);
     setState(DownloadingUpdate);
@@ -675,7 +696,7 @@ void QnMediaServerUpdateTool::installClientUpdate() {
         return;
     }
 
-    installUpdatesToServers();
+    installIncompatiblePeers();
 }
 
 void QnMediaServerUpdateTool::installUpdatesToServers() {
@@ -752,8 +773,10 @@ void QnMediaServerUpdateTool::at_downloadTask_finished(int errorCode) {
         if (resultingFiles.contains(it.value()->url))
             it.value()->fileName = resultingFiles[it.value()->url];
     }
+    if (resultingFiles.contains(m_clientUpdateFile->url))
+        m_clientUpdateFile->fileName = resultingFiles[m_clientUpdateFile->url];
 
-    installIncompatiblePeers();
+    installClientUpdate();
 }
 
 void QnMediaServerUpdateTool::at_uploadTask_finished(int errorCode) {

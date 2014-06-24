@@ -89,6 +89,7 @@ public:
         LockFailed,
         DownloadingFailed,
         UploadingFailed,
+        ClientInstallationFailed,
         InstallationFailed,
         RestInstallationFailed
     };
