@@ -40,32 +40,69 @@ static QnDbManager* globalInstance = 0; // TODO: #Elric #EC2 use QnSingleton
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
+template <class T>
+void assertSorted(std::vector<T> &data) {
+#ifdef _DEBUG
+    assertSorted(data, &T::id);
+#endif // DEBUG
+}
+
+template <class T, class Field>
+void assertSorted(std::vector<T> &data, QnId Field::*idField) {
+#ifdef _DEBUG
+    if (data.empty())
+        return;
+
+    QByteArray prev = (data[0].*idField).toRfc4122();
+    for (int i = 1; i < data.size(); ++i) {
+        QByteArray next = (data[i].*idField).toRfc4122();
+        assert(next >= prev);
+        prev = next;
+    }
+#endif // DEBUG
+}
+
 /**
  * Function merges sorted query into the sorted Data list. Data list contains placeholder 
  * field for the data, that is contained in the query. 
  * Data elements should have 'id' field and should be sorted by it.
- * Query should have 'id' and 'parentId' fields and should be sorted by 'parentId'.
+ * Query should have 'id' and 'parentId' fields and should be sorted by 'id'.
  */
 template <class MainData>
 void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<QnId> MainData::*subList)
 {
+    assertSorted(data);
+
     QSqlRecord rec = query.record();
     int idIdx = rec.indexOf("id");
     int parentIdIdx = rec.indexOf("parentId");
     assert(idIdx >=0 && parentIdIdx >= 0);
+  
+    bool eof = true;
+    QnId id, parentId;
+    QByteArray idRfc;
 
-    size_t idx = 0;
-    size_t dataIdx = 0;
-    while (query.next())
-    {
-        QnId id = QnId::fromRfc4122(query.value(idIdx).toByteArray());
-        QnId parentId = QnId::fromRfc4122(query.value(parentIdIdx).toByteArray());
+    auto step = [&eof, &id, &idRfc, &parentId, &query, idIdx, parentIdIdx]{
+        eof = !query.next();
+        if (eof)
+            return;
+        idRfc = query.value(idIdx).toByteArray();
+        assert(idRfc == id.toRfc4122() || idRfc > id.toRfc4122());
+        id = QnId::fromRfc4122(idRfc);
+        parentId = QnId::fromRfc4122(query.value(parentIdIdx).toByteArray());
+    };
 
-        for (idx = dataIdx; idx < data.size() && data[idx].id != id; idx++);
-        if (idx == data.size())
-            continue;
-        (data[idx].*subList).push_back(parentId);
-        dataIdx = idx + 1;
+    step();
+    size_t i = 0;
+    while (i < data.size() && !eof) {
+        if (id == data[i].id) {
+            (data[i].*subList).push_back(parentId);
+            step();
+        } else if (idRfc > data[i].id.toRfc4122()) {
+            ++i;
+        } else {
+            step();
+        }
     }
 }
 
@@ -78,14 +115,20 @@ void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<
 template <class MainData, class SubData, class MainSubData, class MainOrParentType, class IdType, class SubOrParentType>
 void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<MainSubData> MainOrParentType::*subDataListField, IdType SubOrParentType::*parentIdField)
 {
-    size_t idx = 0;
-    size_t dataIdx = 0;
-    foreach(const SubData& subData, subDataList) {
-        for (idx = dataIdx; idx < data.size() && subData.*parentIdField != data[idx].id; idx++);
-        if (idx == data.size())
-            continue;
-        (data[idx].*subDataListField).push_back(subData);
-        dataIdx = idx + 1;
+    assertSorted(data);
+    assertSorted(subDataList, parentIdField);
+
+    size_t i = 0;
+    size_t j = 0;
+    while (i < data.size() && j < subDataList.size()) {
+        if (subDataList[j].*parentIdField == data[i].id) {
+            (data[i].*subDataListField).push_back(subDataList[j]);
+            ++j;
+        } else if ((subDataList[j].*parentIdField).toRfc4122() > data[i].id.toRfc4122()) {
+            ++i;
+        } else {
+            ++j;
+        }
     }
 }
 
@@ -1641,11 +1684,12 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
 	queryTypes.prepare("select rt.guid as id, rt.name, m.name as vendor \
 				  from vms_resourcetype rt \
 				  left join vms_manufacture m on m.id = rt.manufacture_id \
-				  order by rt.id");
+				  order by rt.guid");
 	if (!queryTypes.exec()) {
         qWarning() << Q_FUNC_INFO << queryTypes.lastError().text();
 		return ErrorCode::dbError;
     }
+    QnSql::fetch_many(queryTypes, &data);
 
 	QSqlQuery queryParents(m_sdb);
     queryParents.setForwardOnly(true);
@@ -1653,25 +1697,23 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceType
                          from vms_resourcetype_parents p \
                          JOIN vms_resourcetype t1 on t1.id = p.from_resourcetype_id \
                          JOIN vms_resourcetype t2 on t2.id = p.to_resourcetype_id \
-                         order by p.from_resourcetype_id, p.to_resourcetype_id desc");
+                         order by t1.guid, p.to_resourcetype_id desc");
 	if (!queryParents.exec()) {
         qWarning() << Q_FUNC_INFO << queryParents.lastError().text();
 		return ErrorCode::dbError;
     }
+    mergeIdListData<ApiResourceTypeData>(queryParents, data, &ApiResourceTypeData::parentId);
 
     QSqlQuery queryProperty(m_sdb);
     queryProperty.setForwardOnly(true);
     queryProperty.prepare("SELECT rt.guid as resourceTypeId, pt.name, pt.type, pt.min, pt.max, pt.step, pt.[values], pt.ui_values as uiValues, pt.default_value as defaultValue, \
                           pt.netHelper as internalData, pt.[group], pt.sub_group as subGroup, pt.description, pt.ui, pt.readonly as readOnly \
                           FROM vms_propertytype pt \
-                          JOIN vms_resourcetype rt on rt.id = pt.resource_type_id ORDER BY pt.resource_type_id");
+                          JOIN vms_resourcetype rt on rt.id = pt.resource_type_id ORDER BY rt.guid");
     if (!queryProperty.exec()) {
         qWarning() << Q_FUNC_INFO << queryProperty.lastError().text();
         return ErrorCode::dbError;
     }
-
-    QnSql::fetch_many(queryTypes, &data);
-    mergeIdListData<ApiResourceTypeData>(queryParents, data, &ApiResourceTypeData::parentId);
 
     std::vector<ApiPropertyTypeData> allProperties;
     QnSql::fetch_many(queryProperty, &allProperties);
@@ -1695,7 +1737,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataLi
                   l.background_image_filename as backgroundImageFilename, l.background_height as backgroundHeight, \
                   l.cell_spacing_width as horizontalSpacing, l.background_opacity as backgroundOpacity, l.resource_ptr_id as id \
                   FROM vms_layout l \
-                  JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.id").arg(filter));
+                  JOIN vms_resource r on r.id = l.resource_ptr_id %1 ORDER BY r.guid").arg(filter));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
@@ -1707,7 +1749,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataLi
                        li.zoom_right as zoomRight, li.top, li.bottom, li.zoom_top as zoomTop, \
                        li.zoom_target_uuid as zoomTargetId, li.flags, li.contrast_params as contrastParams, li.rotation, li.id, \
                        li.dewarping_params as dewarpingParams, li.left FROM vms_layoutitem li \
-                       JOIN vms_resource r on r.id = li.layout_id order by li.layout_id");
+                       JOIN vms_resource r on r.id = li.layout_id order by r.guid");
 
     if (!queryItems.exec()) {
         qWarning() << Q_FUNC_INFO << queryItems.lastError().text();
@@ -1738,7 +1780,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& c
 		c.group_name as groupName, c.group_id as groupId, c.mac, c. model, c.secondary_quality as secondaryStreamQuality, \
 		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login, c.dewarping_params as dewarpingParams \
 		FROM vms_resource r \
-		JOIN vms_camera c on c.resource_ptr_id = r.id %1 ORDER BY r.id").arg(filterStr));
+		JOIN vms_camera c on c.resource_ptr_id = r.id %1 ORDER BY r.guid").arg(filterStr));
 
 
     QSqlQuery queryScheduleTask(m_sdb);
@@ -1748,7 +1790,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& c
                                        st.record_type as recordingType, st.day_of_week as dayOfWeek, st.before_threshold as beforeThreshold, st.after_threshold as afterThreshold, \
                                        st.stream_quality as streamQuality, st.fps \
                                        FROM vms_scheduletask st \
-                                       JOIN vms_resource r on r.id = st.source_id %1 ORDER BY r.id").arg(filterStr));
+                                       JOIN vms_resource r on r.id = st.source_id %1 ORDER BY r.guid").arg(filterStr));
 
     QSqlQuery queryParams(m_sdb);
     queryParams.setForwardOnly(true);
@@ -1760,7 +1802,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& c
                                  JOIN vms_camera c on c.resource_ptr_id = kv.resource_id \
                                  JOIN vms_resource r on r.id = kv.resource_id \
                                  %1 \
-                                 ORDER BY kv.resource_id").arg(filterStr2));
+                                 ORDER BY r.guid").arg(filterStr2));
 
 	if (!queryCameras.exec()) {
         qWarning() << Q_FUNC_INFO << queryCameras.lastError().text();
@@ -1869,7 +1911,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
                           from vms_resource r \
                           join auth_user u  on u.id = r.id\
                           join vms_userprofile p on p.user_id = u.id\
-                          order by r.id"));
+                          order by r.guid"));
     if (!query.exec()) {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
@@ -1882,7 +1924,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiUserDataList
                                 JOIN auth_user u on u.id = kv.resource_id \
                                 JOIN vms_resource r on r.id = kv.resource_id \
                                 WHERE kv.isResTypeParam = 0 \
-                                ORDER BY kv.resource_id"));
+                                ORDER BY r.guid"));
 
     if (!queryParams.exec()) {
         qWarning() << Q_FUNC_INFO << queryParams.lastError().text();
@@ -2090,7 +2132,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     queryParams.prepare(QString("SELECT r.guid as resourceId, kv.value, kv.name, kv.isResTypeParam as predefinedParam\
                                 FROM vms_kvpair kv \
                                 JOIN vms_resource r on r.id = kv.resource_id \
-                                ORDER BY kv.resource_id"));
+                                ORDER BY r.guid"));
     if (!queryParams.exec())
         return ErrorCode::dbError;
 
