@@ -94,7 +94,7 @@ public:
     void setRole(Role role);
     void setTimestampCorner(Qn::Corner pos);
 
-    void setStorage(QnStorageResourcePtr storage);
+    void setStorage(const QnStorageResourcePtr& storage);
 
     void setContainer(const QString& container);
     void setNeedReopen();
@@ -126,14 +126,14 @@ signals:
     void recordingFinished(int status, const QString &fileName);
 protected:
     virtual void endOfRun();
-    bool initFfmpegContainer(QnConstCompressedVideoDataPtr mediaData);
+    bool initFfmpegContainer(const QnConstCompressedVideoDataPtr& mediaData);
 
     void setPrebufferingUsec(int value);
     void flushPrebuffer();
     int getPrebufferingUsec() const;
-    virtual bool needSaveData(QnConstAbstractMediaDataPtr media);
+    virtual bool needSaveData(const QnConstAbstractMediaDataPtr& media);
 
-    virtual bool saveMotion(QnConstMetaDataV1Ptr media);
+    virtual bool saveMotion(const QnConstMetaDataV1Ptr& media);
 
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider, qint64 fileSize) {
         Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
@@ -145,8 +145,8 @@ protected:
 
     bool addSignatureFrame();
     void markNeedKeyData();
-    virtual bool saveData(QnConstAbstractMediaDataPtr md);
-    virtual void writeData(QnConstAbstractMediaDataPtr md, int streamIndex);
+    virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
+    virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex);
 private:
     void updateSignatureAttr();
     qint64 findNextIFrame(qint64 baseTime);

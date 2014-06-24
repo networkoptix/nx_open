@@ -141,7 +141,7 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     QnStreamRecorder::putData(nonConstData);
 }
 
-bool QnServerStreamRecorder::saveMotion(QnConstMetaDataV1Ptr motion)
+bool QnServerStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 {
     if (motion)
         QnMotionHelper::instance()->saveToArchive(motion);
@@ -156,7 +156,7 @@ QnScheduleTask QnServerStreamRecorder::currentScheduleTask() const
 
 void QnServerStreamRecorder::updateStreamParams()
 {
-    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
+    const QnPhysicalCameraResource* camera = dynamic_cast<const QnPhysicalCameraResource*>(m_device.data());
     if (m_mediaProvider)
     {
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
@@ -183,7 +183,7 @@ bool QnServerStreamRecorder::isMotionRec(Qn::RecordingType recType) const
            (m_catalog == QnServer::HiQualityCatalog && recType == Qn::RT_MotionAndLowQuality && camera->hasDualStreaming2());
 }
 
-void QnServerStreamRecorder::beforeProcessData(QnConstAbstractMediaDataPtr media)
+void QnServerStreamRecorder::beforeProcessData(const QnConstAbstractMediaDataPtr& media)
 {
     m_lastMediaTime = media->timestamp;
 
@@ -227,7 +227,7 @@ void QnServerStreamRecorder::beforeProcessData(QnConstAbstractMediaDataPtr media
     }
 }
 
-void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timestamp, QnConstMetaDataV1Ptr metaData)
+void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timestamp, const QnConstMetaDataV1Ptr& metaData)
 {
     if (m_lastMotionState == value && !value)
         return;
@@ -235,7 +235,7 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
     emit motionDetected(getResource(), m_lastMotionState, timestamp, metaData);
 }
 
-bool QnServerStreamRecorder::needSaveData(QnConstAbstractMediaDataPtr media)
+bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)
 {
     qint64 afterThreshold = 5 * 1000000ll;
     if (m_currentScheduleTask.getRecordingType() == Qn::RT_MotionOnly)
@@ -263,8 +263,7 @@ bool QnServerStreamRecorder::needSaveData(QnConstAbstractMediaDataPtr media)
         return false;
     }
     
-    QnConstMetaDataV1Ptr metaData = qSharedPointerDynamicCast<const QnMetaDataV1>(media);
-    if (metaData)
+    if( dynamic_cast<const QnMetaDataV1*>(media.data()) )
         return true;
 
     // write motion only
@@ -444,7 +443,7 @@ bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
     return rez;
 }
 
-void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
+void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& cameraRes)
 {
     QMutexLocker lock(&m_scheduleMutex);
     m_schedule = cameraRes->getScheduleTasks();
@@ -506,7 +505,7 @@ void QnServerStreamRecorder::endOfRun()
     m_queuedSize = 0;
 }
 
-void QnServerStreamRecorder::setDualStreamingHelper(QnDualStreamingHelperPtr helper)
+void QnServerStreamRecorder::setDualStreamingHelper(const QnDualStreamingHelperPtr& helper)
 {
     m_dualStreamingHelper = helper;
 }
@@ -532,20 +531,20 @@ void QnServerStreamRecorder::writeRecentlyMotion(qint64 writeAfterTime)
     m_recentlyMotion.clear();
 }
 
-void QnServerStreamRecorder::keepRecentlyMotion(QnConstAbstractMediaDataPtr md)
+void QnServerStreamRecorder::keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md)
 {
     if (m_recentlyMotion.size() == MOTION_PREBUFFER_SIZE)
         m_recentlyMotion.dequeue();
     m_recentlyMotion.enqueue(md);
 }
 
-bool QnServerStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
+bool QnServerStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 {
     writeRecentlyMotion(md->timestamp);
     return QnStreamRecorder::saveData(md);
 }
 
-void QnServerStreamRecorder::writeData(QnConstAbstractMediaDataPtr md, int streamIndex)
+void QnServerStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex)
 {
     QnStreamRecorder::writeData(md, streamIndex);
     m_diskErrorWarned = false;
