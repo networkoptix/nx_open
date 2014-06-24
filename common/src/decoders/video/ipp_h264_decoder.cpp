@@ -41,7 +41,7 @@ IPPH264Decoder::~IPPH264Decoder()
         ptr_destroyDecoder(m_decoder);
 }
 
-bool IPPH264Decoder::decode(const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame)
+bool IPPH264Decoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame)
 {
     return m_decoder && ptr_decode(m_decoder, data.data(), outFrame->data());
 }
@@ -52,7 +52,7 @@ QSize IPPH264Decoder::getOriginalPictureSize() const
     return QSize();
 }
 
-void IPPH264Decoder::resetDecoder( QnConstCompressedVideoDataPtr /*data*/ )
+void IPPH264Decoder::resetDecoder( const QnConstCompressedVideoDataPtr& /*data*/ )
 {
     //TODO/IMPL
 }

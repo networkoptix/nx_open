@@ -27,9 +27,9 @@ public:
     /*!
         \param swDecoderCount Atomically incremented in constructor and atommically decremented in destructor
     */
-    CLFFmpegVideoDecoder(CodecID codec, const QnConstCompressedVideoDataPtr data, bool mtDecoding, QAtomicInt* const swDecoderCount = NULL);
+    CLFFmpegVideoDecoder(CodecID codec, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount = NULL);
     ~CLFFmpegVideoDecoder();
-    bool decode( const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
+    bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
     void showMotion(bool show);
 
@@ -52,9 +52,9 @@ public:
     virtual PixelFormat getFormat() const { return m_context->pix_fmt; }
     virtual void flush();
     virtual const AVFrame* lastFrame() const { return m_frame; }
-    void determineOptimalThreadType(const QnConstCompressedVideoDataPtr data);
+    void determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data);
     virtual void setMTDecoding(bool value);
-    virtual void resetDecoder(QnConstCompressedVideoDataPtr data);
+    virtual void resetDecoder(const QnConstCompressedVideoDataPtr& data);
     virtual void setOutPictureSize( const QSize& outSize );
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
     /*!
@@ -66,11 +66,11 @@ public:
 private:
     static AVCodec* findCodec(CodecID codecId);
 
-    void openDecoder(const QnConstCompressedVideoDataPtr data);
+    void openDecoder(const QnConstCompressedVideoDataPtr& data);
     void closeDecoder();
     int findMotionInfo(qint64 pkt_dts);
     void reallocateDeinterlacedFrame();
-    void processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr data, int width, int height);
+    void processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr& data, int width, int height);
 private:
     AVCodecContext *m_passedContext;
 

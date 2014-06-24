@@ -90,13 +90,6 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
     return true;
 }
 
-bool channelCheckFunctor(const QnAbstractDataPacketPtr& data, QVariant channelNumber)
-{
-    quint32 ch = channelNumber.toUInt();
-    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-    return media && media->channelNumber == ch;
-}
-
 void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QMutexLocker lock(&m_queueMtx);
@@ -142,7 +135,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, 
     for (int i = 0; i < m_dataQueue.size(); ++i)
     {
         QnConstAbstractDataPacketPtr data = m_dataQueue.at(i);
-        QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(data);
+        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.data());
         if (video)
         {
             QnCompressedVideoData* newData = video->clone();
