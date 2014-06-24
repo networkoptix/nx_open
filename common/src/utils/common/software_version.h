@@ -38,23 +38,13 @@ public:
      * 
      * \param versionString             Version string.
      */
-    explicit QnSoftwareVersion(const QString &versionString) {
-        deserialize(versionString, this);
-    }
-
-    explicit QnSoftwareVersion(const char *versionString) {
-        deserialize(QString(QLatin1String(versionString)), this);
-    }
-
-    explicit QnSoftwareVersion(const QByteArray &versionString) {
-        deserialize(QString(QLatin1String(versionString.constData())), this);
-    }
+    explicit QnSoftwareVersion(const QString &versionString);
+    explicit QnSoftwareVersion(const char *versionString);
+    explicit QnSoftwareVersion(const QByteArray &versionString);
 
     QString toString(Format format = FullFormat) const;
 
-    bool isNull() const {
-        return m_data[0] == 0 && m_data[1] == 0 && m_data[2] == 0 && m_data[3] == 0;
-    }
+    bool isNull() const;
 
     int major() const {
         return m_data[0];
