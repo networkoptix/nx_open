@@ -692,6 +692,8 @@ void QnMediaServerUpdateTool::installClientUpdate() {
     setState(InstallingClientUpdate);
 
     if (applauncher::installZip(m_targetVersion, m_clientUpdateFile->fileName) != applauncher::api::ResultType::ok) {
+        for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
+            setPeerState(it.key(), PeerUpdateInformation::UpdateFailed);
         finishUpdate(InstallationFailed);
         return;
     }
