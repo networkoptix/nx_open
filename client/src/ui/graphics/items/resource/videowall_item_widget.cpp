@@ -226,20 +226,25 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
         qreal xspace = m_layout->cellSpacing().width() * 0.5;
         qreal yspace = m_layout->cellSpacing().height() * 0.5;
+       
+        qreal cellAspectRatio = m_layout->hasCellAspectRatio() 
+            ? m_layout->cellAspectRatio()
+            : qnGlobals->defaultLayoutCellAspectRatio();
 
         qreal xscale, yscale, xoffset, yoffset;
-        qreal sourceAr = m_layout->cellAspectRatio() * bounding.width() / bounding.height();
+        qreal sourceAr = cellAspectRatio * bounding.width() / bounding.height();
+
         qreal targetAr = paintRect.width() / paintRect.height();
         if (sourceAr > targetAr) {
             xscale = paintRect.width() / bounding.width();
-            yscale = xscale / m_layout->cellAspectRatio();
+            yscale = xscale / cellAspectRatio;
             xoffset = paintRect.left();
 
             qreal h = bounding.height() * yscale;
             yoffset = (paintRect.height() - h) * 0.5 + paintRect.top();
         } else {
             yscale = paintRect.height() / bounding.height();
-            xscale = yscale * m_layout->cellAspectRatio();
+            xscale = yscale * cellAspectRatio;
             yoffset = paintRect.top();
 
             qreal w = bounding.width() * xscale;
