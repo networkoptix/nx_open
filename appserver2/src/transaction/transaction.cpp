@@ -102,8 +102,8 @@ namespace ec2
                     return "removeVideowall";
                 case videowallControl:
                     return "videowallControl";
-                case updateVideowallInstanceStatus:
-                    return "updateVideowallInstanceStatus";
+                case videowallInstanceStatus:
+                    return "videowallInstanceStatus";
 
                 case listDirectory:
                     return "listDirectory";

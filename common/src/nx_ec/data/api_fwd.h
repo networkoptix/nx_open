@@ -40,7 +40,6 @@ namespace ec2 {
     struct ApiScheduleTaskWithRefData;
     struct ApiPeerAliveData;
     struct ApiServerInfoData;
-    //struct ApiSetResourceDisabledData;
     struct ApiSetResourceStatusData;
     struct ApiStorageData;
     struct ApiStoredFileData;
