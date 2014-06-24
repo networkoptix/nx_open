@@ -1,5 +1,7 @@
 #include "desktop_camera_deleter.h"
 
+#ifdef ENABLE_DESKTOP_CAMERA
+
 #include <QtCore/QTimer>
 
 #include <api/app_server_connection.h>
@@ -33,3 +35,4 @@ QnDesktopCameraDeleter::QnDesktopCameraDeleter(QObject *parent): QObject(parent)
     timer->start(timeout);   
 }
 
+#endif
