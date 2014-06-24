@@ -15,11 +15,14 @@
 #include <ui/dialogs/update_url_dialog.h>
 #include <ui/delegates/update_status_item_delegate.h>
 #include <utils/media_server_update_tool.h>
+#include <utils/applauncher_utils.h>
 
 #include <version.h>
 
 namespace {
     const int longInstallWarningTimeout = 2 * 60 * 1000; // 2 minutes
+    // Time that is given to process to exit. After that, appauncher (if present) will try to terminate it.
+    static const quint32 processTerminateTimeout = 15000;
 }
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
@@ -205,7 +208,16 @@ void QnServerUpdatesWidget::updateUi() {
                     QMessageBox::information(this,
                                              tr("Update is successfull"),
                                              tr("Update has been successfully finished.\n"
-                                                "Client will be restarted and updated."));
+                                                "Client will be restarted to the updated version."));
+                    if (!applauncher::restartClient(m_updateTool->targetVersion()) == applauncher::api::ResultType::ok) {
+                        QMessageBox::critical(this,
+                                              tr("Launcher process is not found"),
+                                              tr("Cannot restart the client.\n"
+                                                 "Please close the application and start it again using the shortcut in the start menu."));
+                    } else {
+                        qApp->exit(0);
+                        applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
+                    }
                 }
                 break;
             case QnMediaServerUpdateTool::Cancelled:
@@ -230,6 +242,12 @@ void QnServerUpdatesWidget::updateUi() {
         applying = true;
         cancellable = true;
         ui->updateStateLabel->setText(tr("Downloading updates"));
+        break;
+    case QnMediaServerUpdateTool::InstallingClientUpdate:
+        applying = true;
+        cancellable = true;
+        ui->updateStateLabel->setText(tr("Installing client update"));
+        infiniteProgress = true;
         break;
     case QnMediaServerUpdateTool::InstallingToIncompatiblePeers:
         applying = true;
