@@ -513,12 +513,6 @@ QList<QByteArray> QnLicensePool::compatibleHardwareIds() const
     return m_compatibleHardwareIds;
 }
 
-QList<QByteArray> QnLicensePool::allHardwareIds() const
-{
-    return m_mainHardwareIds + m_compatibleHardwareIds;
-}
-
-
 QByteArray QnLicensePool::currentHardwareId() const
 {
     return m_mainHardwareIds.isEmpty() ? QByteArray() : m_mainHardwareIds.last();

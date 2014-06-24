@@ -185,8 +185,6 @@ public:
     void setCompatibleHardwareIds(const QList<QByteArray>& hardwareIds);
     QList<QByteArray> compatibleHardwareIds() const;
 
-    QList<QByteArray> allHardwareIds() const;
-
     QByteArray currentHardwareId() const;
     bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
 signals:
