@@ -40,23 +40,32 @@ static QnDbManager* globalInstance = 0; // TODO: #Elric #EC2 use QnSingleton
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
-
+/**
+ * Function merges sorted query into the sorted Data list. Data list contains placeholder 
+ * field for the data, that is contained in the query. 
+ * Data elements should have 'id' field and should be sorted by it.
+ * Query should have 'id' and 'parentId' fields and should be sorted by 'parentId'.
+ */
 template <class MainData>
 void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<QnId> MainData::*subList)
 {
-    size_t idx = 0;
     QSqlRecord rec = query.record();
     int idIdx = rec.indexOf("id");
     int parentIdIdx = rec.indexOf("parentId");
+    assert(idIdx >=0 && parentIdIdx >= 0);
+
+    size_t idx = 0;
+    size_t dataIdx = 0;
     while (query.next())
     {
         QnId id = QnId::fromRfc4122(query.value(idIdx).toByteArray());
         QnId parentId = QnId::fromRfc4122(query.value(parentIdIdx).toByteArray());
 
-        for (; idx < data.size() && data[idx].id != id; idx++);
+        for (idx = dataIdx; idx < data.size() && data[idx].id != id; idx++);
         if (idx == data.size())
-            break;
+            continue;
         (data[idx].*subList).push_back(parentId);
+        dataIdx = idx + 1;
     }
 }
 
