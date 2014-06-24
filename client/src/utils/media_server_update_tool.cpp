@@ -792,7 +792,7 @@ void QnMediaServerUpdateTool::at_uploadTask_finished(int errorCode) {
         return;
     }
 
-    installClientUpdate();
+    installUpdatesToServers();
 }
 
 void QnMediaServerUpdateTool::at_installTask_finished(int errorCode) {
