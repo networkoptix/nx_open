@@ -123,25 +123,27 @@ bool extractZipArchive(QuaZip *zip, const QDir &dir) {
         if (!path.isEmpty() && !dir.exists(path) && !dir.mkpath(path))
             return false;
 
-        QFile destFile(dir.absoluteFilePath(info.name));
-        if (!destFile.open(QFile::WriteOnly))
-            return false;
-
-        if (!file.open(QuaZipFile::ReadOnly))
-            return false;
-
-        QByteArray buf(readBufferSize, 0);
-        while (file.bytesAvailable()) {
-            qint64 read = file.read(buf.data(), readBufferSize);
-            if (read != destFile.write(buf.data(), read)) {
-                file.close();
+        if (!info.name.endsWith(lit("/"))) {
+            QFile destFile(dir.absoluteFilePath(info.name));
+            if (!destFile.open(QFile::WriteOnly))
                 return false;
-            }
-        }
-        destFile.close();
-        file.close();
 
-        destFile.setPermissions(info.getPermissions());
+            if (!file.open(QuaZipFile::ReadOnly))
+                return false;
+
+            QByteArray buf(readBufferSize, 0);
+            while (file.bytesAvailable()) {
+                qint64 read = file.read(buf.data(), readBufferSize);
+                if (read != destFile.write(buf.data(), read)) {
+                    file.close();
+                    return false;
+                }
+            }
+            destFile.close();
+            file.close();
+
+            destFile.setPermissions(info.getPermissions());
+        }
     }
     return zip->getZipError() == UNZ_OK;
 }
