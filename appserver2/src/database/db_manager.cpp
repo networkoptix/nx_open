@@ -41,36 +41,52 @@ static QnDbManager* globalInstance = 0; // TODO: #Elric #EC2 use QnSingleton
 static const char LICENSE_EXPIRED_TIME_KEY[] = "{4208502A-BD7F-47C2-B290-83017D83CDB7}";
 static const char DB_INSTANCE_KEY[] = "DB_INSTANCE_ID";
 
-
+/**
+ * Function merges sorted query into the sorted Data list. Data list contains placeholder 
+ * field for the data, that is contained in the query. 
+ * Data elements should have 'id' field and should be sorted by it.
+ * Query should have 'id' and 'parentId' fields and should be sorted by 'parentId'.
+ */
 template <class MainData>
 void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<QnId> MainData::*subList)
 {
-    size_t idx = 0;
     QSqlRecord rec = query.record();
     int idIdx = rec.indexOf("id");
     int parentIdIdx = rec.indexOf("parentId");
+    assert(idIdx >=0 && parentIdIdx >= 0);
+
+    size_t idx = 0;
+    size_t dataIdx = 0;
     while (query.next())
     {
         QnId id = QnId::fromRfc4122(query.value(idIdx).toByteArray());
         QnId parentId = QnId::fromRfc4122(query.value(parentIdIdx).toByteArray());
 
-        for (; idx < data.size() && data[idx].id != id; idx++);
+        for (idx = dataIdx; idx < data.size() && data[idx].id != id; idx++);
         if (idx == data.size())
-            break;
+            continue;
         (data[idx].*subList).push_back(parentId);
+        dataIdx = idx + 1;
     }
 }
 
+/**
+ * Function merges two sorted lists. First of them (data) contains placeholder 
+ * field for the data, that is contained in the second (subData). 
+ * Data elements should have 'id' field and should be sorted by it.
+ * SubData elements should be sorted by parentIdField.
+ */
 template <class MainData, class SubData, class MainSubData, class MainOrParentType, class IdType, class SubOrParentType>
 void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<MainSubData> MainOrParentType::*subDataListField, IdType SubOrParentType::*parentIdField)
 {
     size_t idx = 0;
-    foreach(const SubData& subData, subDataList)
-    {
-        for (; idx < data.size() && subData.*parentIdField != data[idx].id; idx++);
+    size_t dataIdx = 0;
+    foreach(const SubData& subData, subDataList) {
+        for (idx = dataIdx; idx < data.size() && subData.*parentIdField != data[idx].id; idx++);
         if (idx == data.size())
-            break;
+            continue;
         (data[idx].*subDataListField).push_back(subData);
+        dataIdx = idx + 1;
     }
 }
 
@@ -2467,6 +2483,10 @@ ErrorCode QnDbManager::updateVideowallMatrices(const ApiVideowallData &data) {
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::deleteVideowallPcs(const QnId &videowall_guid) {
+    return deleteTableRecord(videowall_guid, "vms_videowall_pcs", "videowall_guid");
+}
+
 ErrorCode QnDbManager::deleteVideowallItems(const QnId &videowall_guid) {
     ErrorCode err = deleteTableRecord(videowall_guid, "vms_videowall_item", "videowall_guid");
     if (err != ErrorCode::ok)
@@ -2518,6 +2538,10 @@ ErrorCode QnDbManager::removeVideowall(const QnId& guid) {
         return err;
 
     err = deleteVideowallMatrices(guid);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteVideowallPcs(guid);
     if (err != ErrorCode::ok)
         return err;
 

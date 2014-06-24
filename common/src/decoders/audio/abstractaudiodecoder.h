@@ -3,6 +3,7 @@
 
 #include "audio_struct.h"
 #include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/audio_data_packet.h"
 
 class CLAbstractAudioDecoder;
 

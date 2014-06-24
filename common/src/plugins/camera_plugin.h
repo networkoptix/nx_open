@@ -785,8 +785,14 @@ namespace nxcip
     static const nxpl::NX_GUID IID_MediaDataPacket = { { 0x76, 0x3c, 0x93, 0xdc, 0xa7, 0x7d, 0x41, 0xff, 0x80, 0x71, 0xb6, 0x4c, 0x4d, 0x3a, 0xfc, 0xff } };
     //!Required alignment of \a MediaDataPacket::data() buffer
     static const unsigned int MEDIA_DATA_BUFFER_ALIGNMENT = 32;
+    //!Required padding after media data (see \a MediaDataPacket::data() description)
+    static const unsigned int MEDIA_PACKET_BUFFER_PADDING_SIZE = 32;
 
     //!Portion of media data
+    /*!
+        \warning Buffer returned by \a MediaDataPacket::data() MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than \a MediaDataPacket::dataSize() returns 
+            and this padding MUST be filled with zeros. This is required by decoder, since this buffer may (and will!) be used as decoder input
+    */
     class MediaDataPacket
     :
         public nxpl::PluginInterface
@@ -822,9 +828,15 @@ namespace nxcip
                 - aac (\a nxcip::CODEC_ID_AAC): ADTS stream
             \return Media data. Returned buffer MUST be aligned on \a MEDIA_DATA_BUFFER_ALIGNMENT - byte boundary (this restriction helps for some optimization).
                 \a nxpt::mallocAligned and \a nxpt::freeAligned routines can be used for that purpose
+            \warning Actual buffer size MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than \a MediaDataPacket::dataSize() returns 
+                and this padding MUST be filled with zeros. This is required by decoder, since this buffer may (and will!) be used as decoder input
         */
         virtual const void* data() const = 0;
         //!Returns size (in bytes) of packet's data
+        /*!
+            \warning Actual buffer size MUST be \a MEDIA_PACKET_BUFFER_PADDING_SIZE larger than this method returns 
+                and this padding MUST be filled with zeros. This is required by decoder, since this buffer may (and will!) be used as decoder input
+        */
         virtual unsigned int dataSize() const = 0;
         /*!
             For video packet data contains number of camera sensor starting with 0 (e.g., panoramic camera has multiple sensors).\n

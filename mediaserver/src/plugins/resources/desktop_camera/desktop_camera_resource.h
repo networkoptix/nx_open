@@ -16,12 +16,15 @@ class QnDesktopCameraResource
 {
     Q_OBJECT
 
+    typedef QnPhysicalCameraResource base_type;
+
 public:
     static const QString MANUFACTURE;
 
     static const int MAX_STREAMS = 2;
 
     QnDesktopCameraResource();
+    QnDesktopCameraResource(const QString &userName);
     ~QnDesktopCameraResource();
 
     virtual QString getDriverName() const override;
@@ -34,9 +37,9 @@ public:
 
     virtual bool isResourceAccessible() override;
 
-    QString gePhysicalIdPrefix() const;
-    QString getUserName() const;
     QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider);
+
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 };
 
 #endif //ENABLE_DESKTOP_CAMERA

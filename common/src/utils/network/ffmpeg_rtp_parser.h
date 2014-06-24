@@ -23,6 +23,7 @@ public:
 private:
     QnMediaContextPtr m_context;
     QnAbstractMediaDataPtr m_nextDataPacket;
+    QnByteArray* m_nextDataPacketBuffer;
     qint64 m_position;
 };
 typedef QSharedPointer<QnFfmpegRtpParser> QnFfmpegRtpParserPtr;

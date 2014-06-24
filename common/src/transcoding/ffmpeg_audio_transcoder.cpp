@@ -1,5 +1,9 @@
+
 #include "ffmpeg_audio_transcoder.h"
+
+#include "core/datapacket/audio_data_packet.h"
 #include "utils/media/audio_processor.h"
+
 
 static const int MAX_AUDIO_JITTER = 1000 * 200;
 
@@ -153,8 +157,8 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         QnConstCompressedAudioDataPtr audio = qSharedPointerDynamicCast<const QnCompressedAudioData>(media);
         AVPacket avpkt;
         av_init_packet(&avpkt);
-        avpkt.data = (quint8*)media->data.data();
-        avpkt.size = media->data.size();
+        avpkt.data = const_cast<quint8*>((const quint8*)media->data());
+        avpkt.size = media->dataSize();
 
         int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
         // TODO: #vasilenko avoid using deprecated methods
@@ -210,13 +214,14 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         return 0;
 
 
-    *result = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, encoded, m_context));
-    (*result)->compressionType = m_codecId;
+    QnWritableCompressedAudioData* resultAudioPacket = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, encoded, m_context);
+    resultAudioPacket->compressionType = m_codecId;
     static AVRational r = {1, 1000000};
     //result->timestamp  = m_lastTimestamp;
     qint64 audioPts = m_frameNum++ * m_encoderCtx->frame_size;
-    (*result)->timestamp  = av_rescale_q(audioPts, m_encoderCtx->time_base, r) + m_firstEncodedPts;
-    (*result)->data.write((const char*) m_audioEncodingBuffer, encoded);
+    resultAudioPacket->timestamp  = av_rescale_q(audioPts, m_encoderCtx->time_base, r) + m_firstEncodedPts;
+    resultAudioPacket->m_data.write((const char*) m_audioEncodingBuffer, encoded);
+    *result = QnCompressedAudioDataPtr(resultAudioPacket);
 
     return 0;
 }

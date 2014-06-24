@@ -2,6 +2,7 @@
 
 #include "cpul_http_dataprovider.h"
 #include "../resource/av_resource.h"
+#include "core/datapacket/video_data_packet.h"
 #include "utils/common/synctime.h"
 
 
@@ -123,8 +124,8 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
     if (!http_client.isOpened())
         return QnAbstractMediaDataPtr(0);
 
-    QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
-    QnByteArray& img = videoData->data;
+    QnWritableCompressedVideoDataPtr videoData ( new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
+    QnByteArray& img = videoData->m_data;
 
     while(http_client.isOpened())
     {
