@@ -300,6 +300,7 @@ namespace ec2
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnId& id);
         ErrorCode insertOrReplaceVideowall(const ApiVideowallData& data, qint32 internalId);
+        ErrorCode deleteVideowallPcs(const QnId &videowall_guid);
         ErrorCode deleteVideowallItems(const QnId &videowall_guid);
         ErrorCode updateVideowallItems(const ApiVideowallData& data);
         ErrorCode updateVideowallScreens(const ApiVideowallData& data);

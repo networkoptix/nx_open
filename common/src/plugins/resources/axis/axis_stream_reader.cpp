@@ -261,8 +261,8 @@ void QnAxisStreamReader::processTriggerData(const quint8* payload, int len)
 
 void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
 {
-    const quint8* curNal = (const quint8*) videoData->data.data();
-    const quint8* end = curNal + videoData->data.size();
+    const quint8* curNal = (const quint8*) videoData->data();
+    const quint8* end = curNal + videoData->dataSize();
     curNal = NALUnit::findNextNAL(curNal, end);
     //int prefixSize = 3;
     //if (end - curNal >= 4 && curNal[2] == 0)
@@ -316,8 +316,8 @@ void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
 
 bool QnAxisStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
 {
-    const quint8* curNal = (const quint8*) videoData->data.data();
-    const quint8* end = curNal + videoData->data.size();
+    const quint8* curNal = (const quint8*) videoData->data();
+    const quint8* end = curNal + videoData->dataSize();
     curNal = NALUnit::findNextNAL(curNal, end);
 
     const quint8* nextNal = curNal;

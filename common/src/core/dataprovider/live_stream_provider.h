@@ -7,6 +7,7 @@
 #include "../resource/media_resource.h"
 #include "motion/motion_estimation.h"
 #include "../resource/motion_window.h"
+#include "core/datapacket/video_data_packet.h"
 #include "core/resource/resource_fwd.h"
 #include "media_streamdataprovider.h"
 

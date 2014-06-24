@@ -4,6 +4,7 @@
 //#include <QtOpenGL/QGLContext>
 
 #include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/video_data_packet.h"
 #include "utils/media/frame_info.h"
 
 

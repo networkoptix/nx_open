@@ -8,6 +8,7 @@ extern "C"
 
 #include <QtCore/QWaitCondition>
 #include "abstract_archive_stream_reader.h"
+#include "core/datapacket/audio_data_packet.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "playbackmask_helper.h"

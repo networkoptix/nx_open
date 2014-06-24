@@ -94,9 +94,9 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
 
 
     m_lastResult = QnMetaDataV1Ptr(new QnMetaDataV1());
-    m_lastResult->data.clear();
+    m_lastResult->m_data.clear();
     int motionIndex = indexOffset - m_motionLoadedStart;
-    m_lastResult->data.write((const char*) m_motionBuffer + motionIndex*MOTION_DATA_RECORD_SIZE, MOTION_DATA_RECORD_SIZE);
+    m_lastResult->m_data.write((const char*) m_motionBuffer + motionIndex*MOTION_DATA_RECORD_SIZE, MOTION_DATA_RECORD_SIZE);
     m_lastResult->timestamp = foundStartTime*1000;
     m_lastResult->m_duration = m_indexItr->duration*1000;
     m_lastResult->channelNumber = m_owner->getChannel();
@@ -395,7 +395,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnConstMetaDataV1Ptr data)
         qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();
     }
 
-    if (m_detailedMotionFile.write(data->data.constData(), data->data.capacity()) != data->data.capacity())
+    if (m_detailedMotionFile.write(data->data(), data->dataSize()) != data->dataSize())
     {
         qWarning() << "Failed to write index file for camera" << m_resource->getUniqueId();
     }
