@@ -144,7 +144,8 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
         ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
     bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
-            && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium;
+            && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium
+            && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked;
 
     ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
     ui->assureCheckBox->setChecked(!defaultValues);

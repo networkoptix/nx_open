@@ -71,6 +71,7 @@ private:
     void keepRecentlyMotion(QnConstAbstractMediaDataPtr md);
 private slots:
     void at_recordingFinished(int status, const QString &filename);
+    void at_camera_propertyChanged();
 private:
     mutable QMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
@@ -96,6 +97,7 @@ private:
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
     bool m_diskErrorWarned;
     bool m_rebuildBlocked;
+    bool m_useSecondaryRecorder;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

@@ -254,19 +254,13 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
             bool runSecondStream = (cameraRes->streamFpsSharingMethod() != Qn::shareFps || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS) && cameraRes->hasDualStreaming2();
-            bool useSecondaryRecorder = (cameraRes->getProperty(QnMediaResource::dontRecordSecondaryStreamKey()).toInt() == 0);
             if (runSecondStream)
             {
                 if (recorderLowRes) {
-                    if (useSecondaryRecorder) {
-                        if (!recorderLowRes->isRunning()) {
-                            NX_LOG(QString(lit("Recording started (secondary stream) for camera  %1")).arg(res->getUniqueId()), cl_logINFO);
-                        }
-                        recorderLowRes->start();
+                    if (!recorderLowRes->isRunning()) {
+                        NX_LOG(QString(lit("Recording started (secondary stream) for camera  %1")).arg(res->getUniqueId()), cl_logINFO);
                     }
-                    else {
-                        recorderLowRes->pleaseStop();
-                    }
+                    recorderLowRes->start();
                 }
                 providerLow->startIfNotRunning();
             }
