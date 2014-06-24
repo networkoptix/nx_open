@@ -13,7 +13,7 @@ extern "C"
 
 
 class QnAbstractVideoDecoder;
-struct QnCompressedVideoData;
+class QnCompressedVideoData;
 class QnAbstractRenderer;
 class QnBufferedFrameDisplayer;
 

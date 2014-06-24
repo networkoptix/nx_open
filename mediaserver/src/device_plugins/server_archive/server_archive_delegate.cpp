@@ -1,9 +1,11 @@
 
+#include "server_archive_delegate.h"
+
 #include <QtCore/QMutexLocker>
 
 #include <server/server_globals.h>
 
-#include "server_archive_delegate.h"
+#include "core/datapacket/video_data_packet.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
 #include "motion/motion_archive.h"
@@ -257,7 +259,7 @@ begin_label:
             if (!getNextChunk(chunk, chunkCatalog))
             {
                 if (m_reverseMode) {
-                    data = QnAbstractMediaDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
+                    data = QnAbstractMediaDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
                     data->timestamp = INT64_MAX; // EOF reached
                 }
                 else if (data)

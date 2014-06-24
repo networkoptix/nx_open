@@ -122,7 +122,7 @@ void QnThumbnailsStreamReader::run()
         }
 
         if (videoData)
-            m_stat[videoData->channelNumber].onData(videoData->data.size());
+            m_stat[videoData->channelNumber].onData(videoData->dataSize());
 
 
         putData(data);

@@ -1,6 +1,9 @@
+
 #include "coldstore_dts_archive_reader.h"
-#include "../../coldstore/coldstore_api/sfs-client.h"
+
+#include "core/datapacket/video_data_packet.h"
 #include "core/resource/resource_media_layout.h"
+#include "../../coldstore/coldstore_api/sfs-client.h"
 
 #include <QtXml/QDomDocument>
 
@@ -212,8 +215,8 @@ QnAbstractMediaDataPtr QnColdStoreDelegate::getNextData()
 
     CSFrameInfo fi = m_frameInfo.at(m_curr_frame);
 
-    QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,fi.lenght) );
-    QnByteArray& img = videoData->data;
+    QnWritableCompressedVideoDataPtr videoData ( new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT,fi.lenght) );
+    QnByteArray& img = videoData->m_data;
 
     char* to = img.startWriting(fi.lenght);
     memcpy(to, m_fileContent.data() + fi.shift, fi.lenght);

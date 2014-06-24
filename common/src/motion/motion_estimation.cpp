@@ -1172,7 +1172,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     int lineStep = (m_scaledWidth*65536) / MD_WIDTH;
     int scaledLineNum = 0;
     int prevILineNum = -1;
-    quint32* dst = (quint32*) rez->data.data();
+    quint32* dst = (quint32*) rez->data();
 
     //postFiltering();
 

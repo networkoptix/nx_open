@@ -2,7 +2,9 @@
 #define cl_ffmpeg_h2026
 
 #include <QtGui/QImage>
+
 #include "abstractdecoder.h"
+#include "core/datapacket/video_data_packet.h"
 
 #ifdef _USE_DXVA
 #include "dxva/dxva.h"

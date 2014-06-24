@@ -135,7 +135,7 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 
     m_packetsByTimestamp.insert( posToInsert, MediaPacketContext( m_currentPacketTimestamp, data, isKeyFrame ) );
     if( mediaPacket )
-        m_cacheSizeInBytes += mediaPacket->data.size();
+        m_cacheSizeInBytes += mediaPacket->dataSize();
 
     if( !isKeyFrame )
         return; //no sense to perform this operation more than once per GOP
@@ -175,7 +175,7 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
         {
             const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(it->packet.data());
             if( mediaPacket )
-                m_cacheSizeInBytes -= mediaPacket->data.size();
+                m_cacheSizeInBytes -= mediaPacket->dataSize();
         }
         m_packetsByTimestamp.erase( m_packetsByTimestamp.begin(), lastItToRemove );
     }

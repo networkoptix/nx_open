@@ -5,6 +5,7 @@
 #include "../resource/av_resource.h"
 #include "../tools/simple_tftp_client.h"
 #include "../tools/AVJpegHeader.h"
+#include "core/datapacket/video_data_packet.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/common/synctime.h"
 #include "../resource/av_panoramic.h"
@@ -346,8 +347,8 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality, m_model.toLatin1().data());
     }
 
-    QnCompressedVideoDataPtr videoData( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,m_videoFrameBuff.size()) );
-    videoData->data.write(m_videoFrameBuff);
+    QnWritableCompressedVideoDataPtr videoData( new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT,m_videoFrameBuff.size()) );
+    videoData->m_data.write(m_videoFrameBuff);
     
 
     if (iFrame)
