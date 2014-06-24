@@ -60,16 +60,23 @@ void mergeIdListData(QSqlQuery& query, std::vector<MainData>& data, std::vector<
     }
 }
 
+/**
+ * Function merges two sorted lists. First of them (data) contains placeholder 
+ * field for the data, that is contained in the second (subData). 
+ * Data elements should have 'id' field and should be sorted by it.
+ * SubData elements should be sorted by parentIdField.
+ */
 template <class MainData, class SubData, class MainSubData, class MainOrParentType, class IdType, class SubOrParentType>
 void mergeObjectListData(std::vector<MainData>& data, std::vector<SubData>& subDataList, std::vector<MainSubData> MainOrParentType::*subDataListField, IdType SubOrParentType::*parentIdField)
 {
     size_t idx = 0;
-    foreach(const SubData& subData, subDataList)
-    {
-        for (; idx < data.size() && subData.*parentIdField != data[idx].id; idx++);
+    size_t dataIdx = 0;
+    foreach(const SubData& subData, subDataList) {
+        for (idx = dataIdx; idx < data.size() && subData.*parentIdField != data[idx].id; idx++);
         if (idx == data.size())
-            break;
+            continue;
         (data[idx].*subDataListField).push_back(subData);
+        dataIdx = idx + 1;
     }
 }
 
