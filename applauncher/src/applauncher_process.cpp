@@ -93,6 +93,13 @@ void ApplauncherProcess::processRequest(
                 static_cast<applauncher::api::IsVersionInstalledResponse*>(*response) );
             break;
 
+        case applauncher::api::TaskType::getInstalledVersions:
+            *response = new applauncher::api::GetInstalledVersionsResponse();
+            getInstalledVersions(
+                std::static_pointer_cast<applauncher::api::GetInstalledVersionsRequest>( request ),
+                static_cast<applauncher::api::GetInstalledVersionsResponse*>(*response) );
+            break;
+
         case applauncher::api::TaskType::cancelInstallation:
             *response = new applauncher::api::CancelInstallationResponse();
             cancelInstallation(
@@ -477,6 +484,14 @@ bool ApplauncherProcess::isVersionInstalled(
     applauncher::api::IsVersionInstalledResponse* const response )
 {
     response->installed = m_installationManager->isVersionInstalled(request->version);
+    return true;
+}
+
+bool ApplauncherProcess::getInstalledVersions(
+    const std::shared_ptr<applauncher::api::GetInstalledVersionsRequest>& request,
+    applauncher::api::GetInstalledVersionsResponse* const response )
+{
+    response->versions = m_installationManager->installedVersions();
     return true;
 }
 

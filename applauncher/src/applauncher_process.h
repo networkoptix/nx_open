@@ -97,6 +97,9 @@ private:
     bool isVersionInstalled(
         const std::shared_ptr<applauncher::api::IsVersionInstalledRequest>& request,
         applauncher::api::IsVersionInstalledResponse* const response );
+    bool getInstalledVersions(
+        const std::shared_ptr<applauncher::api::GetInstalledVersionsRequest>& request,
+        applauncher::api::GetInstalledVersionsResponse* const response );
     bool cancelInstallation(
         const std::shared_ptr<applauncher::api::CancelInstallationRequest>& request,
         applauncher::api::CancelInstallationResponse* const response );

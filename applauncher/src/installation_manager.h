@@ -40,6 +40,7 @@ public:
     int count() const;
     QnSoftwareVersion latestVersion() const;
     bool isVersionInstalled(const QnSoftwareVersion &version, bool strict = false) const;
+    QList<QnSoftwareVersion> installedVersions() const;
     QnSoftwareVersion nearestInstalledVersion(const QnSoftwareVersion &version) const;
     /*!
         \return false, if \a version not found. Otherwise, true and \a *appData filled

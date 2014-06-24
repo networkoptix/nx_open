@@ -185,6 +185,12 @@ bool InstallationManager::isVersionInstalled(const QnSoftwareVersion &version, b
     return true;
 }
 
+QList<QnSoftwareVersion> InstallationManager::installedVersions() const
+{
+    std::unique_lock<std::mutex> lk( m_mutex );
+    return m_installationByVersion.keys();
+}
+
 QnSoftwareVersion InstallationManager::nearestInstalledVersion(const QnSoftwareVersion &version) const
 {
     std::unique_lock<std::mutex> lk( m_mutex );

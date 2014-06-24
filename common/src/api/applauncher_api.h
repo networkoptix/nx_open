@@ -26,6 +26,7 @@ namespace applauncher
                 installZip,
                 getInstallationStatus,
                 isVersionInstalled,
+                getInstalledVersions,
                 cancelInstallation,
                 addProcessKillTimer,
                 invalidTaskType
@@ -132,6 +133,16 @@ namespace applauncher
             virtual bool deserialize( const QnByteArrayConstRef& data ) override;
         };
 
+        class GetInstalledVersionsRequest
+        :
+            public BaseTask {
+        public:
+            GetInstalledVersionsRequest();
+
+            virtual QByteArray serialize() const override;
+            virtual bool deserialize(const QnByteArrayConstRef &data) override;
+        };
+
         namespace ResultType
         {
             enum Value
@@ -234,6 +245,19 @@ namespace applauncher
 
             virtual QByteArray serialize() const override;
             virtual bool deserialize( const QnByteArrayConstRef& data ) override;
+        };
+
+        class GetInstalledVersionsResponse
+        :
+            public Response
+        {
+        public:
+            QList<QnSoftwareVersion> versions;
+
+            GetInstalledVersionsResponse();
+
+            virtual QByteArray serialize() const override;
+            virtual bool deserialize(const QnByteArrayConstRef &data) override;
         };
 
         class CancelInstallationRequest

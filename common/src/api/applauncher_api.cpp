@@ -27,6 +27,8 @@ namespace applauncher
                     return getInstallationStatus;
                 else if( str == "isVersionInstalled" )
                     return isVersionInstalled;
+                else if( str == "getInstalledVersions" )
+                    return getInstalledVersions;
                 else if( str == "cancelInstallation" )
                     return cancelInstallation;
                 else if( str == "addProcessKillTimer" )
@@ -51,6 +53,8 @@ namespace applauncher
                         return "getInstallationStatus";
                     case isVersionInstalled:
                         return "isVersionInstalled";
+                    case getInstalledVersions:
+                        return "getInstalledVersions";
                     case cancelInstallation:
                         return "cancelInstallation";
                     case addProcessKillTimer:
@@ -105,6 +109,10 @@ namespace applauncher
                     *ptr = new IsVersionInstalledRequest();
                     break;
                     
+                case TaskType::getInstalledVersions:
+                    *ptr = new GetInstalledVersionsRequest();
+                    break;
+
                 case TaskType::cancelInstallation:
                     *ptr = new CancelInstallationRequest();
                     break;
@@ -596,6 +604,59 @@ namespace applauncher
                 return false;
             processID = lines[1].toByteArrayWithRawData().toUInt();
             timeoutMillis = lines[2].toByteArrayWithRawData().toUInt();
+            return true;
+        }
+
+        ////////////////////////////////////////////////////////////
+        //// class GetInstalledVersionsRequest
+        ////////////////////////////////////////////////////////////
+        GetInstalledVersionsRequest::GetInstalledVersionsRequest()
+        :
+             BaseTask( TaskType::getInstalledVersions )
+        {
+        }
+
+        QByteArray GetInstalledVersionsRequest::serialize() const
+        {
+            return TaskType::toString(type) + "\n";
+        }
+
+        bool GetInstalledVersionsRequest::deserialize(const QnByteArrayConstRef &data)
+        {
+            return data == serialize();
+        }
+
+        ////////////////////////////////////////////////////////////
+        //// class GetInstalledVersionsResponse
+        ////////////////////////////////////////////////////////////
+        GetInstalledVersionsResponse::GetInstalledVersionsResponse()
+        {
+        }
+
+        QByteArray GetInstalledVersionsResponse::serialize() const
+        {
+            QByteArray result = Response::serialize();
+            foreach (const QnSoftwareVersion &version, versions) {
+                result.append(version.toString().toLatin1());
+                result.append(',');
+            }
+            result[result.size() - 1] = '\n';
+            return result;
+        }
+
+        bool GetInstalledVersionsResponse::deserialize(const QnByteArrayConstRef &data)
+        {
+            if (!Response::deserialize(data))
+                return false;
+
+            const QList<QnByteArrayConstRef> &lines = data.split('\n');
+            if (lines.size() < 2)
+                return false;
+
+            const QList<QnByteArrayConstRef> &versions = lines[1].split(',');
+            foreach (const QnByteArrayConstRef &version, versions)
+                this->versions.append(QnSoftwareVersion(version.toByteArrayWithRawData()));
+
             return true;
         }
     }
