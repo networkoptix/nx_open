@@ -147,6 +147,7 @@ void QnGlobalModuleFinder::removeAllModulesDiscoveredBy(const QnId &discoverer) 
             if (!m_discovererIdByServerId.contains(it.key())) {
                 emit peerLost(it.value());
                 it = m_moduleInformationById.erase(it);
+                continue;
             }
         }
         ++it;
