@@ -251,7 +251,7 @@ int doInstallation(
 
     QString effectiveInstallationPath = installationPath;
     if( effectiveInstallationPath.isEmpty() )
-        effectiveInstallationPath = installationManager.getInstallDirForVersion(version);
+        effectiveInstallationPath = installationManager.installationDirForVersion(version);
 
     InstallationProcess installationProcess(
         productName,

@@ -56,7 +56,7 @@ void InstallationProcess::join()
 }
 
 static const QString MIRROR_LIST_URL_PARAM_NAME( "mirrorListUrl" );
-static const QString INSTALLATION_DATA_FILE( "install.dat" );
+static const QString installationDataFile( "install.dat" );
 
 bool InstallationProcess::start( const QString& mirrorListUrl )
 {
@@ -198,7 +198,7 @@ void InstallationProcess::failed(
 
 bool InstallationProcess::writeInstallationSummary()
 {
-    QFile file(m_installationDirectory + "/" + INSTALLATION_DATA_FILE);
+    QFile file(m_installationDirectory + "/" + installationDataFile);
     if (!file.open(QFile::WriteOnly))
         return false;
 

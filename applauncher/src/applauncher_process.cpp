@@ -140,7 +140,7 @@ int ApplauncherProcess::run()
 
             //failed to start, trying to restore version
             if( !blockingRestoreVersion( versionToLaunch ) )
-                versionToLaunch = m_installationManager->getMostRecentVersion();
+                versionToLaunch = m_installationManager->latestVersion();
         }
 
         //if( response.result != applauncher::api::ResultType::ok )
@@ -211,7 +211,7 @@ bool ApplauncherProcess::getVersionToLaunch( QnSoftwareVersion* const versionToL
     }
     else if( m_installationManager->count() > 0 )
     {
-        *versionToLaunch = m_installationManager->getMostRecentVersion();
+        *versionToLaunch = m_installationManager->latestVersion();
         //leaving default cmd params
     }
     else
@@ -293,34 +293,26 @@ bool ApplauncherProcess::startApplication(
     std::const_pointer_cast<applauncher::api::StartApplicationTask>(task)->version = "debug";
 #endif
 
-    InstallationManager::AppData appData;
-    for( ;; )
-    {
-        if( m_installationManager->getInstalledVersionData( task->version, &appData ) )
-            break;
+    QnClientInstallationPtr installation = m_installationManager->installationForVersion(task->version);
+    if (installation.isNull())
+        installation = m_installationManager->installationForVersion(m_installationManager->latestVersion());
 
-        if( m_installationManager->count() > 0 )
-        {
-            const QnSoftwareVersion& theMostRecentVersion = m_installationManager->getMostRecentVersion();
-            if( task->version != theMostRecentVersion )
-            {
-                task->version = theMostRecentVersion;
-                continue;
-            }
-        }
-        NX_LOG( QString::fromLatin1("Failed to find installed version %1 path").arg(task->version.toString()), cl_logDEBUG1 );
+    if (installation.isNull()) {
+        NX_LOG(QString::fromLatin1("Failed to find installed version %1 path").arg(task->version.toString()), cl_logDEBUG1);
         response->result = applauncher::api::ResultType::versionNotInstalled;
         return false;
     }
 
-    if( task->version != m_installationManager->getMostRecentVersion() ) {
+    task->version = installation->version();
+
+    if( task->version != m_installationManager->latestVersion() ) {
         task->appArgs += QString::fromLatin1(" ") + m_settings->value( NON_RECENT_VERSION_ARGS_PARAM_NAME, NON_RECENT_VERSION_ARGS_DEFAULT_VALUE ).toString();
 
-        if (!appData.verifyInstallation()) {
-            NX_LOG( QString::fromLatin1("Verification failed for version %1 (path %2)").arg(appData.version().toString(QnSoftwareVersion::MinorFormat)).arg(appData.rootPath()), cl_logDEBUG1 );
+        if (!installation->verify()) {
+            NX_LOG(QString::fromLatin1("Verification failed for version %1 (path %2)").arg(installation->version().toString()).arg(installation->rootPath()), cl_logDEBUG1);
             response->result = applauncher::api::ResultType::ioError;
 
-            if( task->autoRestore )
+            if (task->autoRestore)
             {
                 applauncher::api::StartInstallationResponse startInstallationResponse;
                 startInstallation(
@@ -334,11 +326,11 @@ bool ApplauncherProcess::startApplication(
 
     //TODO/IMPL start process asynchronously ?
 
-    const QString binPath = appData.executableFilePath();
+    const QString binPath = installation->executableFilePath();
 
     QStringList environment = QProcess::systemEnvironment();
 #ifdef Q_OS_LINUX
-    QString variableValue = appData.libraryPath();
+    QString variableValue = installation->libraryPath();
     if (!variableValue.isEmpty() && QFile::exists(variableValue)) {
         const QString variableName = "LD_LIBRARY_PATH";
 
@@ -405,7 +397,7 @@ bool ApplauncherProcess::startInstallation(
     //}
 
     //detecting directory to download to 
-    const QString& targetDir = m_installationManager->getInstallDirForVersion(task->version);
+    const QString& targetDir = m_installationManager->installationDirForVersion(task->version);
     if( !QDir().mkpath(targetDir) )
     {
         response->result = applauncher::api::ResultType::ioError;
@@ -475,7 +467,9 @@ bool ApplauncherProcess::installZip(
     const std::shared_ptr<applauncher::api::InstallZipTask>& request,
     applauncher::api::Response* const response )
 {
-    return m_installationManager->installZip(request->version, request->zipFileName);
+    bool ok = m_installationManager->installZip(request->version, request->zipFileName);
+    response->result = ok ? applauncher::api::ResultType::ok : applauncher::api::ResultType::otherError;
+    return ok;
 }
 
 bool ApplauncherProcess::isVersionInstalled(
