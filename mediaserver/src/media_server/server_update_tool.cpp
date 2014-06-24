@@ -191,21 +191,21 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
 
     QString executable = map.value(lit("executable")).toString();
     if (executable.isEmpty()) {
-        cl_log.log("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
+        cl_log.log("There is no executable specified in update information file: ", updateInfoFile.fileName(), cl_logERROR);
         return false;
     }
 
     if (map.value(lit("platform")) != lit(QN_APPLICATION_PLATFORM)) {
-        cl_log.log("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
+        cl_log.log("Incompatible update: ", lit(QN_APPLICATION_PLATFORM), " != ", map.value(lit("platform")), cl_logERROR);
         return false;
     }
     if (map.value(lit("arch")) != lit(QN_APPLICATION_ARCH)) {
-        cl_log.log("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
+        cl_log.log("Incompatible update: ", lit(QN_APPLICATION_ARCH), " != ", map.value(lit("arch")), cl_logERROR);
         return false;
     }
 
     if (map.value(lit("modification")) != lit(QN_ARM_BOX)) {
-        cl_log.log("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
+        cl_log.log("Incompatible update: ", lit(QN_ARM_BOX), " != ", map.value(lit("modification")), cl_logERROR);
         return false;
     }
 
