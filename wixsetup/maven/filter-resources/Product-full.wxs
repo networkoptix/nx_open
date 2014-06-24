@@ -289,7 +289,7 @@
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_SERVER" Value="{}" Order="1">INSTALLTYPE=2</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_CLIENT" Value="1" Order="1">INSTALLTYPE=2</Publish>
             
-            <Publish Dialog="InstallTypeDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)" Order="1">INSTALL_CLIENT</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)" Order="2">INSTALL_CLIENT</Publish>
 
             <?define SomeFeaturesSelected="(INSTALL_SERVER OR INSTALL_CLIENT)"?>         
 
