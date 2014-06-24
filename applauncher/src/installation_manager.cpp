@@ -89,10 +89,9 @@ void InstallationManager::updateInstalledVersionsInformation()
         NX_LOG(QString::fromLatin1("Compatibility version %1 found").arg(entry), cl_logDEBUG1);
     }
 
-    {
-        std::unique_lock<std::mutex> lk(m_mutex);
-        m_installationByVersion = installations;
-    }
+    std::unique_lock<std::mutex> lk(m_mutex);
+    m_installationByVersion = installations;
+    lk.unlock();
 
     createGhosts();
 }
@@ -101,7 +100,11 @@ void InstallationManager::createGhosts()
 {
     QnSoftwareVersion latest = latestVersion();
 
-    foreach (const QnSoftwareVersion &version, m_installationByVersion.keys()) {
+    std::unique_lock<std::mutex> lk(m_mutex);
+    QList<QnSoftwareVersion> versions = m_installationByVersion.keys();
+    lk.unlock();
+
+    foreach (const QnSoftwareVersion &version, versions) {
         if (version == latest)
             continue;
 
@@ -125,7 +128,11 @@ void InstallationManager::createGhostsForVersion(const QnSoftwareVersion &versio
     QSet<QString> entries = QSet<QString>::fromList(targetDir.entryList(QDir::Files));
     entries.remove(version.toString(QnSoftwareVersion::MinorFormat));
 
-    foreach (const QnSoftwareVersion &ghostVersion, m_installationByVersion.keys()) {
+    std::unique_lock<std::mutex> lk(m_mutex);
+    QList<QnSoftwareVersion> versions = m_installationByVersion.keys();
+    lk.unlock();
+
+    foreach (const QnSoftwareVersion &ghostVersion, versions) {
         if (ghostVersion == version)
             continue;
 
@@ -283,6 +290,8 @@ bool InstallationManager::installZip(const QnSoftwareVersion &version, const QSt
 
     std::unique_lock<std::mutex> lk( m_mutex );
     m_installationByVersion.insert(installation->version(), installation);
+    lk.unlock();
+
     createGhosts();
 
     return true;
