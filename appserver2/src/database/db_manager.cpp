@@ -1393,7 +1393,7 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteTableRecord(id, "vms_layoutitem", "resource_id");
+    err = deleteTableRecord(guid, "vms_layoutitem", "resource_id");
     if (err != ErrorCode::ok)
         return err;
 
