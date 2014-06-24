@@ -219,7 +219,7 @@ QnSoftwareVersion InstallationManager::nearestInstalledVersion(const QnSoftwareV
 QnClientInstallationPtr InstallationManager::installationForVersion(const QnSoftwareVersion &version, bool strict) const
 {
     std::unique_lock<std::mutex> lk( m_mutex );
-    QnClientInstallationPtr installation = m_installationByVersion[version];
+    QnClientInstallationPtr installation = m_installationByVersion.value(version);
     lk.unlock();
 
     if (installation)
@@ -233,7 +233,7 @@ QnClientInstallationPtr InstallationManager::installationForVersion(const QnSoft
         return QnClientInstallationPtr();
 
     lk.lock();
-    return m_installationByVersion[ver];
+    return m_installationByVersion.value(ver);
 }
 
 QString InstallationManager::rootInstallationDirectory() const
@@ -273,6 +273,7 @@ bool InstallationManager::installZip(const QnSoftwareVersion &version, const QSt
         return false;
     }
 
+    installation->setVersion(version);
     targetDir.remove(lit("update.json"));
 
     if (!installation->createInstallationDat()) {
@@ -282,6 +283,7 @@ bool InstallationManager::installZip(const QnSoftwareVersion &version, const QSt
 
     std::unique_lock<std::mutex> lk( m_mutex );
     m_installationByVersion.insert(installation->version(), installation);
+    createGhosts();
 
     return true;
 }
