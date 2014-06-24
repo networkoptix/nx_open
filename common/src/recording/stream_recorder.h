@@ -14,7 +14,8 @@ extern "C"
 #include <core/ptz/item_dewarping_params.h>
 
 #include <core/dataconsumer/abstract_data_consumer.h>
-#include <core/datapacket/media_data_packet.h>
+#include <core/datapacket/audio_data_packet.h>
+#include <core/datapacket/video_data_packet.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>

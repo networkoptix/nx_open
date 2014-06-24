@@ -52,11 +52,8 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     
     for(; itr != m_connections.end(); ++itr)
     {
-        QnDesktopCameraResourcePtr cam = QnDesktopCameraResourcePtr(new QnDesktopCameraResource);
-        QString userName = itr->userName;
-        cam->setName(lit("desktop-") + userName);
+        QnSecurityCamResourcePtr cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(itr->userName));
         cam->setModel(lit("virtual desktop camera"));
-        cam->setPhysicalId(cam->gePhysicalIdPrefix() + userName);
         cam->setTypeId(rt);
         result << cam;
     }

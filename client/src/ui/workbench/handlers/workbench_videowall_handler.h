@@ -137,8 +137,8 @@ private slots:
 
     void submitDelayedItemOpen();
 
-    void saveVideowall(const QnVideoWallResourcePtr& videowall);
-    void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls);
+    void saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout = false);
+    void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls, bool saveLayout = false);
 private:
     struct ScreenSnap {
         int index;          /**< Index of the screen. */

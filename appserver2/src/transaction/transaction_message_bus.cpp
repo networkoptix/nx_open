@@ -570,6 +570,23 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
 
         transport->setWriteSync(true);
         transport->sendTransaction(tran, QnPeerSet() << remotePeer.id << m_localPeer.id);
+
+        if (remotePeer.peerType == QnPeerInfo::DesktopClient) {
+            foreach(QnTransactionTransportPtr connected, m_connections.values()) {
+                if (!connected)
+                    continue;
+                QnPeerInfo peer = connected->remotePeer();
+                if (peer.peerType != QnPeerInfo::VideowallClient)
+                    continue;
+                
+                QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::updateVideowallInstanceStatus, false);
+                tran.params.online = true;
+                tran.params.instanceGuid = peer.params["instanceGuid"];
+                tran.params.videowallGuid = peer.params["videowallGuid"];
+                transport->sendTransaction(tran, QnPeerSet() << remotePeer.id << m_localPeer.id);        
+            }
+        }
+
         transport->setReadSync(true);
     } else if (remotePeer.peerType == QnPeerInfo::AndroidClient) {
         /** Request all data to be sent to the client peers on the connect. */
@@ -697,6 +714,14 @@ void QnTransactionMessageBus::setLocalPeer(const QnPeerInfo localPeer) {
 
 ec2::QnPeerInfo QnTransactionMessageBus::localPeer() const {
     return m_localPeer;
+}
+
+void QnTransactionMessageBus::sendTransaction(const QnTransaction<ec2::ApiVideowallControlMessageData>& tran, const QnPeerSet& dstPeers /*= QnPeerSet()*/)
+{
+    //TODO: #GDM #VW fill dstPeers based on m_alivePeers info
+    Q_ASSERT(tran.command == ApiCommand::videowallControl);
+    QMutexLocker lock(&m_mutex);
+    sendTransactionInternal(tran, QnTransactionTransportHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers));
 }
 
 }

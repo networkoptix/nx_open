@@ -1,6 +1,7 @@
 #include "media_streamdataprovider.h"
 #include "core/resource/resource_media_layout.h"
 #include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/video_data_packet.h"
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include "../resource/camera_resource.h"
@@ -133,7 +134,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
         data->dataProvider = this;
 
     if (videoData)
-        m_stat[videoData->channelNumber].onData(data->data.size());
+        m_stat[videoData->channelNumber].onData(data->dataSize());
 
     return true;
 

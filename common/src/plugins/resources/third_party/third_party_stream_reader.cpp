@@ -9,6 +9,8 @@
 
 #include <QtCore/QTextStream>
 
+#include "core/datapacket/third_party_audio_data_packet.h"
+#include "core/datapacket/third_party_video_data_packet.h"
 #include "plugins/plugin_tools.h"
 #include "plugins/resources/onvif/dataprovider/onvif_mjpeg.h"
 #include "motion_data_picture.h"
@@ -440,9 +442,9 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
             if( !srcVideoPacket )
                 return QnAbstractMediaDataPtr();  //looks like bug in plugin implementation
 
-            mediaPacket = QnAbstractMediaDataPtr(new QnCompressedVideoData());
-            static_cast<QnCompressedVideoData*>(mediaPacket.data())->pts = packet->timestamp();
-            mediaPacket->dataType = QnAbstractMediaData::VIDEO;
+            QnThirdPartyCompressedVideoData* videoPacket = new QnThirdPartyCompressedVideoData( srcVideoPacket );
+            packetAp.release();
+            videoPacket->pts = packet->timestamp();
 
             nxcip::Picture* srcMotionData = srcVideoPacket->getMotionData();
             if( srcMotionData )
@@ -457,22 +459,22 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
                     motion->timestamp = srcVideoPacket->timestamp();
                     motion->channelNumber = packet->channelNumber();
                     motion->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-                    static_cast<QnCompressedVideoData*>(mediaPacket.data())->motion = motion;
+                    videoPacket->motion = motion;
                 }
                 srcMotionData->releaseRef();
             }
 
+            mediaPacket = QnAbstractMediaDataPtr(videoPacket);
             srcVideoPacket->releaseRef();
             break;
         }
 
         case nxcip::dptAudio:
-            mediaPacket = QnAbstractMediaDataPtr(new QnCompressedAudioData());
-            mediaPacket->dataType = QnAbstractMediaData::AUDIO;
+            mediaPacket = QnAbstractMediaDataPtr( new QnThirdPartyCompressedAudioData( packetAp.release() ) );
             break;
 
         case nxcip::dptEmpty:
-            mediaPacket = QnAbstractMediaDataPtr(new QnEmptyMediaData());
+            mediaPacket = QnAbstractMediaDataPtr( new QnEmptyMediaData() );
             break;    //end of data
 
         default:
@@ -514,12 +516,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     if( packet->flags() & nxcip::MediaDataPacket::fStreamReset )
         mediaPacket->flags |= QnAbstractMediaData::MediaFlags_BOF;
 
-    //QnMediaContextPtr context;
-    //int opaque;
-
-    //TODO/IMPL get rid of following copy by modifying QnAbstractMediaData class
-    if( packet->data() )
-        mediaPacket->data.write( (const char*)packet->data(), packet->dataSize() );
     return mediaPacket;
 }
 

@@ -445,7 +445,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-        text(tr("Control Video Wall")); //TODO: #VW #TR
+        text(tr("Control Video Wall")). //TODO: #VW #TR
+        condition(new QnStartVideoWallControlActionCondition(this));
 
     factory(Qn::PushMyScreenToVideowallAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
@@ -1687,6 +1688,23 @@ void QnActionManager::trigger(Qn::ActionId id, const QnActionParameters &paramet
     QN_SCOPED_VALUE_ROLLBACK(&m_parametersByMenu[NULL], parameters);
     QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
     action->trigger();
+}
+
+bool QnActionManager::triggerIfPossible(Qn::ActionId id, const QnActionParameters &parameters) {
+    QnAction *action = m_actionById.value(id);
+    if(action == NULL) {
+        qnWarning("Invalid action id '%1'.", static_cast<int>(id));
+        return false;
+    }
+
+    if(action->checkCondition(action->scope(), parameters) != Qn::EnabledAction) {
+        return false;
+    }
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_parametersByMenu[NULL], parameters);
+    QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
+    action->trigger();
+    return true;
 }
 
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
