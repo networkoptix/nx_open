@@ -7,7 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 
 namespace {
-    const int timeout = 15*1000;    //check once a minute
+    const int timeout = 60*1000;    //check once a minute
 }
 
 QnDesktopCameraDeleter::QnDesktopCameraDeleter(QObject *parent): QObject(parent) {
@@ -29,12 +29,6 @@ QnDesktopCameraDeleter::QnDesktopCameraDeleter(QObject *parent): QObject(parent)
             if (resource->getStatus() == QnResource::Offline)
                 m_queuedToDelete << resource;
         }
-
-        qDebug() << "----resources----";
-        foreach (const QnResourcePtr &resource, qnResPool->getResources()) {
-            qDebug() << "resource name" << resource->getName() << "flags" << resource->flags();
-        }
-
     });
     timer->start(timeout);   
 }
