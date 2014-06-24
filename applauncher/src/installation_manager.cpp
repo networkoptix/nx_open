@@ -256,19 +256,27 @@ bool InstallationManager::installZip(const QnSoftwareVersion &version, const QSt
     if (installation && installation->verify())
         return true;
 
-    QString targetDir = installationDirForVersion(version);
+    QDir targetDir = QDir(installationDirForVersion(version));
+
+    if (targetDir.exists())
+        targetDir.removeRecursively();
+
+    if (!QDir().mkdir(targetDir.absolutePath()))
+        return false;
 
     if (!extractZipArchive(fileName, targetDir))
         return false;
 
-    installation = QnClientInstallation::installationForPath(targetDir);
-    if (!installation->exists()) {
-        QDir(targetDir).removeRecursively();
+    installation = QnClientInstallation::installationForPath(targetDir.absolutePath());
+    if (installation.isNull() || !installation->exists()) {
+        targetDir.removeRecursively();
         return false;
     }
 
+    targetDir.remove(lit("update.json"));
+
     if (!installation->createInstallationDat()) {
-        QDir(installation->rootPath()).removeRecursively();
+        targetDir.removeRecursively();
         return false;
     }
 
