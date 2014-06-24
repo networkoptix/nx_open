@@ -44,6 +44,8 @@ template <class T>
 void assertSorted(std::vector<T> &data) {
 #ifdef _DEBUG
     assertSorted(data, &T::id);
+#else
+    Q_UNUSED(data);
 #endif // DEBUG
 }
 
@@ -59,6 +61,9 @@ void assertSorted(std::vector<T> &data, QnId Field::*idField) {
         assert(next >= prev);
         prev = next;
     }
+#else
+    Q_UNUSED(data);
+    Q_UNUSED(idField);
 #endif // DEBUG
 }
 
