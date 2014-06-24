@@ -10,7 +10,7 @@
 #include <Dbghelp.h>
 
 #include <QtCore/QCoreApplication>
-
+#include <QtCore/QStandardPaths>
 
 using std::string;
 
@@ -62,9 +62,15 @@ static void writeCrashInfo(
     const char* title,
     const char* information )
 {
-    const QFileInfo exeFileInfo( QCoreApplication::applicationFilePath() );
-    const QString exceptFileName = lit("%1/%2_%3.except").arg(exeFileInfo.absoluteDir().absolutePath()).arg(exeFileInfo.baseName()).arg(GetCurrentProcessId());
 
+    // As bug 3355 indicates, the exception file should be saved to AppData folder on windows instead of
+    // the client executable path for the permission problem. 
+    const QFileInfo exeFileInfo( QCoreApplication::applicationFilePath() );
+    const QString exceptFileName = lit("%1/%2/%3_%4.except").
+        arg( QStandardPaths::writableLocation( QStandardPaths::DataLocation ) ).
+        arg( QCoreApplication::applicationName() ).
+        arg( exeFileInfo.baseName() ).
+        arg( QCoreApplication::applicationPid() );
     std::ofstream of( exceptFileName.toLatin1().constData() );
     of<<title<<"\n";
     of.write( information, strlen(information) );
