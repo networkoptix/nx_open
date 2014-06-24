@@ -349,6 +349,7 @@
             <properties>		
                 <platform>macosx</platform>
                 <additional.compiler>clang</additional.compiler>
+                <client.mediafolder.name>${product.name}</client.mediafolder.name>
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>
                 <qtlib11>PrintSupport</qtlib11>
