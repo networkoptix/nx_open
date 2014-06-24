@@ -62,6 +62,7 @@
 #include <plugins/resources/axis/axis_resource_searcher.h>
 #include <plugins/resources/desktop_camera/desktop_camera_registrator.h>
 #include <plugins/resources/desktop_camera/desktop_camera_resource_searcher.h>
+#include <plugins/resources/desktop_camera/desktop_camera_deleter.h>
 #include <plugins/resources/d-link/dlink_resource_searcher.h>
 #include <plugins/resources/droid/droid_resource_searcher.h>
 #include <plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h>
@@ -1352,6 +1353,7 @@ void QnMain::run()
 #ifdef ENABLE_DESKTOP_CAMERA
     QnDesktopCameraResourceSearcher desktopCameraResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&desktopCameraResourceSearcher);
+    QnDesktopCameraDeleter autoDeleter;
 #endif  //ENABLE_DESKTOP_CAMERA
 
 #ifndef EDGE_SERVER
