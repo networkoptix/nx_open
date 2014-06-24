@@ -36,7 +36,7 @@ void QnFileDeletor::run()
             m_postponeTimer.restart();
         }
         
-        if (m_storagesTimer.elapsed() > SPACE_CLEARANCE_INTERVAL)
+        if (qnStorageMan && m_storagesTimer.elapsed() > SPACE_CLEARANCE_INTERVAL)
         {
             qnStorageMan->clearSpace();
             m_storagesTimer.restart();

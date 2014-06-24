@@ -181,7 +181,7 @@ QnBusinessEventRule::QnBusinessEventRule(int internalId, int aggregationPeriod, 
     m_disabled = false;
     m_eventState = QnBusiness::UndefinedState;
     
-    m_id = intToGuid(internalId);
+    m_id = intToGuid(internalId, "vms_businessrule");
     m_aggregationPeriod = aggregationPeriod;
     m_system = isSystem;
     m_actionType = bActionType;
