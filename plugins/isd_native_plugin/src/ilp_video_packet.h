@@ -11,17 +11,20 @@
 #include <plugins/plugin_tools.h>
 
 
+class NxBufferCache;
+
 class ILPVideoPacket
 :
     public nxcip::VideoDataPacket
 {
 public:
     ILPVideoPacket(
+        NxBufferCache* const mediaBufferCache,
         int channelNumber,
         nxcip::UsecUTCTimestamp _timestamp,
         unsigned int flags,
         unsigned int cSeq,
-        nxcip::CompressionType codec);
+        nxcip::CompressionType codec );
     virtual ~ILPVideoPacket();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -62,6 +65,7 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
+    NxBufferCache* const m_mediaBufferCache;
     const int m_channelNumber;
     nxcip::UsecUTCTimestamp m_timestamp;
     void* m_buffer;
