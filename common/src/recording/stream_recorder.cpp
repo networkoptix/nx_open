@@ -183,7 +183,7 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
 {
     for (int i = 0; i < m_prebuffer.size(); ++i)
     {
-        QnConstAbstractMediaDataPtr media = m_prebuffer.at(i);
+        const QnConstAbstractMediaDataPtr& media = m_prebuffer.at(i);
         if (media->dataType == QnAbstractMediaData::VIDEO && media->timestamp > baseTime && (media->flags & AV_PKT_FLAG_KEY))
             return media->timestamp;
     }
@@ -489,7 +489,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
         m_contrastParams.enabled ||
         m_itemDewarpingParams.enabled;
 
-    QnConstResourceVideoLayoutPtr layout = mediaDev->getVideoLayout(m_mediaProvider);
+    const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.data());
     {
         if (!isTranscode)

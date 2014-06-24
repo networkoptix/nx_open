@@ -304,8 +304,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
         {
             if( m_savedMediaPacket )
             {
-                rez = m_savedMediaPacket;
-                m_savedMediaPacket = QnAbstractMediaDataPtr();
+                rez = std::move(m_savedMediaPacket);
+                m_savedMediaPacket.clear(); //calling clear since QSharePointer move operator implementation leaves some questions...
             }
             else
             {
@@ -313,12 +313,12 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                 if( rez )
                 {
                     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-                    QnCompressedVideoDataPtr videoData = rez.dynamicCast<QnCompressedVideoData>();
+                    QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.data());
                     if( videoData && videoData->motion )
                     {
-                        rez = videoData->motion;
-                        videoData->motion = QnMetaDataV1Ptr();
-                        m_savedMediaPacket = videoData;
+                        rez = std::move(videoData->motion);
+                        videoData->motion.clear();
+                        m_savedMediaPacket = rez;
                     }
 
                     if( rez->dataType == QnAbstractMediaData::AUDIO )
@@ -329,7 +329,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                             if( m_mediaEncoder2Ref->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
                                 initializeAudioContext( audioFormat );
                         }
-                        rez.staticCast<QnCompressedAudioData>()->context = m_audioContext;
+                        static_cast<QnCompressedAudioData*>(rez.data())->context = m_audioContext;
                     }
                 }
             }
@@ -343,7 +343,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
         {
             if( rez->dataType == QnAbstractMediaData::VIDEO )
             {
-                QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
+                //QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
                 //parseMotionInfo(videoData);
                 break;
             }

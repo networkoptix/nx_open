@@ -131,7 +131,7 @@ protected:
                 return;
             }
         }
-        QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+        const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>(data.data());
         if (m_needKeyData && media)
         {
             if (!(media->flags & AV_PKT_FLAG_KEY))
@@ -149,7 +149,7 @@ protected:
             doRealtimeDelay( data );
 
 
-        QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
+        const QnAbstractMediaDataPtr& media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
 
         if (media->dataType == QnAbstractMediaData::EMPTY_DATA) {
             if (media->timestamp == DATETIME_NOW)
@@ -583,7 +583,7 @@ void QnProgressiveDownloadingConsumer::run()
                     int counter = 0;
                     while (counter < 20)
                     {
-                        QnAbstractMediaDataPtr data = archive->getNextData();
+                        const QnAbstractMediaDataPtr& data = archive->getNextData();
                         if (data)
                         {
                             if (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO) 

@@ -113,7 +113,7 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
 
         if (m_dataQueue.size() < m_dataQueue.maxSize()) {
             //TODO #ak MUST NOT modify video packet here! It can be used by other threads concurrently and flags value can be undefined in other threads
-            nonConstData.staticCast<QnAbstractMediaData>()->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+            static_cast<QnAbstractMediaData*>(nonConstData.data())->flags |= QnAbstractMediaData::MediaFlags_LIVE;
             QnAbstractDataConsumer::putData( nonConstData );
         }
     }
