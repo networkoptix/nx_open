@@ -56,6 +56,7 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, QObject *par
     base_type(parent), 
     QnWorkbenchContextAware(parent),
     m_urlsShown(true),
+    m_layoutIsShown(true),
     m_rootNodeType(rootNodeType)
 {
     m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::RootNode << Qn::BastardNode;
@@ -257,7 +258,6 @@ Qn::NodeType QnResourcePoolModel::rootNodeType() const {
 QModelIndex QnResourcePoolModel::index(int row, int column, const QModelIndex &parent) const {
     if(!hasIndex(row, column, parent)) /* hasIndex calls rowCount and columnCount. */
         return QModelIndex();
-
     return node(parent)->child(row)->index(row, column);
 }
 
@@ -278,8 +278,14 @@ bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
 int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
     if (parent.column() > Qn::NameColumn)
         return 0;
-
-    return node(parent)->children().size();
+    QnResourcePoolModelNode* n = node(parent);
+    if( !m_layoutIsShown ) {
+        // If we don't allow to show the layout of root node so
+        // we will return count as zero when the node is not m_rootNodeType
+        if( n->type() != m_rootNodeType ) 
+            return 0;
+    }
+    return n->children().size();
 }
 
 int QnResourcePoolModel::columnCount(const QModelIndex &/*parent*/) const {
