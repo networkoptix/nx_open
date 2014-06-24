@@ -491,6 +491,7 @@ bool ApplauncherProcess::getInstalledVersions(
     const std::shared_ptr<applauncher::api::GetInstalledVersionsRequest>& request,
     applauncher::api::GetInstalledVersionsResponse* const response )
 {
+    Q_UNUSED(request)
     response->versions = m_installationManager->installedVersions();
     return true;
 }

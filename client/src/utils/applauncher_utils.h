@@ -16,6 +16,8 @@ namespace applauncher
     */
     api::ResultType::Value isVersionInstalled( QnSoftwareVersion version, bool* const installed );
 
+    //!Retrieves a list of the installed versions
+    api::ResultType::Value getInstalledVersions(QList<QnSoftwareVersion> *versions);
     /*!
         Send the required version to the applauncher, close the current instance of the client.
         \return \a ResultType::ok if request has been performed successfully, otherwise - error code

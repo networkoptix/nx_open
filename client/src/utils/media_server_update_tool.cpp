@@ -29,6 +29,7 @@ const QString QN_UPDATE_PACKAGE_URL = lit("http://enk.me/bg/dklychkov/exmaple_up
 const QString buildInformationSuffix(lit("update"));
 const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
 const QString mutexName = lit("auto_update");
+const QString updateInformationFileName = (lit("update.json"));
 
 bool verifyFile(const QString &fileName, qint64 size, const QString &md5) {
     QFile file(fileName);
@@ -40,6 +41,29 @@ bool verifyFile(const QString &fileName, qint64 size, const QString &md5) {
         return false;
 
     return true;
+}
+
+QnSoftwareVersion minimalVersionForUpdatePackage(const QString &fileName) {
+    QuaZipFile infoFile(fileName, updateInformationFileName);
+    if (!infoFile.open(QuaZipFile::ReadOnly))
+        return QnSoftwareVersion();
+
+    QString data = QString::fromUtf8(infoFile.readAll());
+    infoFile.close();
+
+    QRegExp minimalVersionRegExp(lit("\"minimalVersion\"\\s*:\\s*\"([\\d\\.]+)\""));
+    if (minimalVersionRegExp.indexIn(data) != -1)
+        return QnSoftwareVersion(minimalVersionRegExp.cap(1));
+
+    return QnSoftwareVersion();
+}
+
+QnSoftwareVersion maximumAvailableVersion() {
+    QList<QnSoftwareVersion> versions;
+    if (applauncher::getInstalledVersions(&versions) != applauncher::api::ResultType::ok)
+        versions.append(QnSoftwareVersion(qApp->applicationVersion()));
+
+    return *std::max_element(versions.begin(), versions.end());
 }
 
 } // anonymous namespace
@@ -287,6 +311,11 @@ void QnMediaServerUpdateTool::reset() {
     m_updateFiles.clear();
     m_clientUpdateFile.clear();
     m_targetVersion = QnSoftwareVersion();
+    m_clientRequiresInstaller = false;
+}
+
+bool QnMediaServerUpdateTool::isClientRequiresInstaller() const {
+    return m_clientRequiresInstaller;
 }
 
 void QnMediaServerUpdateTool::checkForUpdates() {
@@ -329,6 +358,7 @@ void QnMediaServerUpdateTool::checkOnlineUpdates(const QnSoftwareVersion &versio
 
     m_targetMustBeNewer = version.isNull();
     m_targetVersion = version;
+    m_clientRequiresInstaller = false;
 
     QNetworkReply *reply = m_networkAccessManager->get(QNetworkRequest(QUrl(m_onlineUpdateUrl)));
     connect(reply, &QNetworkReply::finished, this, &QnMediaServerUpdateTool::at_updateReply_finished);
@@ -341,6 +371,7 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
     m_targetMustBeNewer = false;
     m_targetVersion = QnSoftwareVersion();
     m_localTemporaryDir.clear();
+    m_clientRequiresInstaller = false;
 
     setState(CheckingForUpdates);
 
@@ -400,10 +431,13 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
         QFile file(fileName);
         updateFileInformation->fileSize = file.size();
         updateFileInformation->md5 = makeMd5(&file);
-        if (isClient)
+        if (isClient) {
             m_clientUpdateFile = updateFileInformation;
-        else
+            QnSoftwareVersion minimalVersion = minimalVersionForUpdatePackage(updateFileInformation->fileName);
+            m_clientRequiresInstaller = !minimalVersion.isNull() && minimalVersion > maximumAvailableVersion();
+        } else {
             m_updateFiles.insert(sysInfo, updateFileInformation);
+        }
     }
 
     checkUpdateCoverage();
@@ -530,7 +564,7 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
         }
     }
 
-    packages = map.value(lit("client_packages")).toMap();
+    packages = map.value(lit("clientPackages")).toMap();
     QString arch = lit(QN_APPLICATION_ARCH);
     QString modification = lit(QN_ARM_BOX);
     if (!modification.isEmpty())
@@ -544,6 +578,9 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
         m_clientUpdateFile->fileSize = package.value(lit("size")).toLongLong();
         m_clientUpdateFile->md5 = package.value(lit("md5")).toString();
     }
+
+    QnSoftwareVersion minimalVersionToUpdate(map.value(lit("minimalClientVersion")).toString());
+    m_clientRequiresInstaller = !minimalVersionToUpdate.isNull() && minimalVersionToUpdate > maximumAvailableVersion();
 
     checkUpdateCoverage();
 }

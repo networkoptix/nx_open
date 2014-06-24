@@ -168,4 +168,16 @@ namespace applauncher
             return result;
         return response.result;
     }
+
+    api::ResultType::Value getInstalledVersions(QList<QnSoftwareVersion> *versions)
+    {
+        api::GetInstalledVersionsRequest request;
+        api::GetInstalledVersionsResponse response;
+        api::ResultType::Value result = sendCommandToLauncher( request, &response );
+        if( result != api::ResultType::ok )
+            return result;
+        *versions = response.versions;
+        return response.result;
+    }
+
 }

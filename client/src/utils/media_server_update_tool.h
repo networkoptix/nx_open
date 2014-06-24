@@ -121,6 +121,8 @@ public:
 
     void reset();
 
+    bool isClientRequiresInstaller() const;
+
 signals:
     void stateChanged(int state);
     void progressChanged(int progress);
@@ -208,6 +210,8 @@ private:
 
     QSet<QnId> m_incompatiblePeerIds;
     QSet<QnId> m_targetPeerIds;
+
+    bool m_clientRequiresInstaller;
 };
 
 #endif // QN_MEDIA_SERVER_UPDATE_TOOL_H
