@@ -283,7 +283,7 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
     return true;
 }
 
-bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
+bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
 {
     if (md->dataType == QnAbstractMediaData::META_V1)
         return saveMotion(md.dynamicCast<const QnMetaDataV1>());
@@ -307,7 +307,7 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
 
     if (md->dataType == QnAbstractMediaData::AUDIO && m_truncateInterval > 0)
     {
-        QnConstCompressedAudioDataPtr ad = qSharedPointerDynamicCast<const QnCompressedAudioData>(md);
+        const QnCompressedAudioData* ad = dynamic_cast<const QnCompressedAudioData*>(md.data());
         assert( ad->context );
         QnCodecAudioFormat audioFormat(ad->context);
         if (!m_firstTime && audioFormat != m_prevAudioFormat) {
@@ -373,11 +373,12 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
     if (md->dataType == QnAbstractMediaData::AUDIO && m_audioTranscoder)
     {
         QnAbstractMediaDataPtr result;
+        bool inputDataDepleted = false;
         do {
-            m_audioTranscoder->transcodePacket(md, &result);
+            m_audioTranscoder->transcodePacket(inputDataDepleted ? QnConstAbstractMediaDataPtr() : md, &result);
             if (result && result->dataSize() > 0)
                 writeData(result, streamIndex);
-            md.clear();
+            inputDataDepleted = true;
         } while (result);
     }
     else if (md->dataType == QnAbstractMediaData::VIDEO && m_videoTranscoder)
@@ -394,7 +395,7 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
     return true;
 }
 
-void QnStreamRecorder::writeData(QnConstAbstractMediaDataPtr md, int streamIndex)
+void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex)
 {
     AVRational srcRate = {1, 1000000};
     AVStream* stream = m_formatCtx->streams[streamIndex];
@@ -442,7 +443,7 @@ void QnStreamRecorder::endOfRun()
     close();
 }
 
-bool QnStreamRecorder::initFfmpegContainer(QnConstCompressedVideoDataPtr mediaData)
+bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& mediaData)
 {
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
     Q_ASSERT(m_mediaProvider);
@@ -723,13 +724,13 @@ int QnStreamRecorder::getPrebufferingUsec() const
 }
 
 
-bool QnStreamRecorder::needSaveData(QnConstAbstractMediaDataPtr media)
+bool QnStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)
 {
     Q_UNUSED(media)
     return true;
 }
 
-bool QnStreamRecorder::saveMotion(QnConstMetaDataV1Ptr motion)
+bool QnStreamRecorder::saveMotion(const QnConstMetaDataV1Ptr& motion)
 {
     if (motion && !motion->isEmpty() && m_motionFileList[motion->channelNumber])
         motion->serialize(m_motionFileList[motion->channelNumber].data());
@@ -825,7 +826,7 @@ void QnStreamRecorder::setSignLogo(const QImage& logo)
 }
 #endif
 
-void QnStreamRecorder::setStorage(QnStorageResourcePtr storage)
+void QnStreamRecorder::setStorage(const QnStorageResourcePtr& storage)
 {
     m_storage = storage;
 }
