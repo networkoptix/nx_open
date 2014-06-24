@@ -497,12 +497,21 @@ namespace applauncher
 
         QByteArray InstallZipTask::serialize() const
         {
-            return version.toString().toLatin1();
+            return lit("%1\n%2\n%3\n\n")
+                    .arg(QString::fromLatin1(TaskType::toString(type)))
+                    .arg(version.toString())
+                    .arg(zipFileName).toUtf8();
         }
 
         bool InstallZipTask::deserialize(const QnByteArrayConstRef &data)
         {
-            version = QnSoftwareVersion(data);
+            QStringList list = QString::fromUtf8(data).split(lit("\n"), QString::SkipEmptyParts);
+            if (list.size() < 3)
+                return false;
+            if (TaskType::toString(type) != list[0].toLatin1())
+                return false;
+            version = QnSoftwareVersion(list[1]);
+            zipFileName = list[2];
             return true;
         }
 
