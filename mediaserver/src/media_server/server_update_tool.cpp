@@ -195,17 +195,21 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
         return false;
     }
 
-    if (map.value(lit("platform")) != lit(QN_APPLICATION_PLATFORM)) {
-        cl_log.log("Incompatible update: ", lit(QN_APPLICATION_PLATFORM), " != ", map.value(lit("platform")), cl_logERROR);
-        return false;
-    }
-    if (map.value(lit("arch")) != lit(QN_APPLICATION_ARCH)) {
-        cl_log.log("Incompatible update: ", lit(QN_APPLICATION_ARCH), " != ", map.value(lit("arch")), cl_logERROR);
+    QString platform = map.value(lit("platform")).toString();
+    if (platform != lit(QN_APPLICATION_PLATFORM)) {
+        cl_log.log("Incompatible update: ", QN_APPLICATION_PLATFORM, " != ", platform, cl_logERROR);
         return false;
     }
 
-    if (map.value(lit("modification")) != lit(QN_ARM_BOX)) {
-        cl_log.log("Incompatible update: ", lit(QN_ARM_BOX), " != ", map.value(lit("modification")), cl_logERROR);
+    QString arch = map.value(lit("arch")).toString();
+    if (arch != lit(QN_APPLICATION_ARCH)) {
+        cl_log.log("Incompatible update: ", QN_APPLICATION_ARCH, " != ", arch, cl_logERROR);
+        return false;
+    }
+
+    QString modification = map.value(lit("modification")).toString();
+    if (modification != lit(QN_ARM_BOX)) {
+        cl_log.log("Incompatible update: ", QN_ARM_BOX, " != ", modification, cl_logERROR);
         return false;
     }
 
