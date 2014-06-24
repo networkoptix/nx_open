@@ -192,15 +192,13 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
 
 bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
-    QnConstAbstractDataPacketPtr data = nonConstData;
-
     if (m_needReopen)
     {
         m_needReopen = false;
         close();
     }
 
-    QnConstAbstractMediaDataPtr md = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
+    QnConstAbstractMediaDataPtr md = qSharedPointerDynamicCast<const QnAbstractMediaData>(nonConstData);
     if (!md)
         return true; // skip unknown data
 
@@ -481,7 +479,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
         return false;
     }
 
-    QnMediaResourcePtr mediaDev = qSharedPointerDynamicCast<QnMediaResource>(m_device);
+    const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_device.data());
 
     // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
     // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose

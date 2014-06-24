@@ -42,14 +42,14 @@ void QnServerCamera::setIframeDistance(int frames, int timems)
     Q_UNUSED(timems)
 }
 
-QnConstResourceVideoLayoutPtr QnServerCamera::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceVideoLayoutPtr QnServerCamera::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     Q_UNUSED(dataProvider)
     // todo: layout must be loaded in resourceParams
     return QnMediaResource::getVideoLayout();
 }
 
-QnConstResourceAudioLayoutPtr QnServerCamera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnServerCamera::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archive)
