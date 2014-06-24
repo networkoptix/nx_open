@@ -99,7 +99,7 @@ void QnResourceSelectionDialog::init() {
     }
     m_resourceModel = new QnResourcePoolModel(rootNodeType, this);
 
-    connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
+    connect(m_resourceModel, &QnResourcePoolModel::dataChanged, this, &QnResourceSelectionDialog::at_resourceModel_dataChanged);
 
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
@@ -110,10 +110,10 @@ void QnResourceSelectionDialog::init() {
     ui->delegateFrame->setVisible(false);
 
     if (m_target == CameraResourceTarget) {
-        connect(ui->resourcesWidget->treeView(), SIGNAL(entered(QModelIndex)), this, SLOT(updateThumbnail(QModelIndex)));
+        connect(ui->resourcesWidget->treeView(), &QAbstractItemView::entered, this, &QnResourceSelectionDialog::updateThumbnail);
         m_thumbnailManager = new QnCameraThumbnailManager(this);
         m_thumbnailManager->setThumbnailSize(ui->screenshotLabel->contentSize());
-        connect(m_thumbnailManager, SIGNAL(thumbnailReady(QnId,QPixmap)), this, SLOT(at_thumbnailReady(int, QPixmap)));
+        connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, &QnResourceSelectionDialog::at_thumbnailReady);
         updateThumbnail(QModelIndex());
     }
 
