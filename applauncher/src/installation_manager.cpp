@@ -37,7 +37,7 @@ QString InstallationManager::defaultDirectoryForInstallations()
 {
     QString defaultDirectoryForNewInstallations = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
     if (!defaultDirectoryForNewInstallations.isEmpty())
-        defaultDirectoryForNewInstallations += QString::fromLatin1("/%1/%2/compatibility/%3/").arg(installationPathPrefix, QN_ORGANIZATION_NAME, QN_CUSTOMIZATION_NAME);
+        defaultDirectoryForNewInstallations += QString::fromLatin1("/%1/%2/client/%3/").arg(installationPathPrefix, QN_ORGANIZATION_NAME, QN_CUSTOMIZATION_NAME);
 
     return defaultDirectoryForNewInstallations;
 }
@@ -52,7 +52,7 @@ InstallationManager::InstallationManager(QObject *parent): QObject(parent)
 //    appDir.cdUp();
 //    m_rootInstallDirectoryList.push_back( appDir.absolutePath() );
 
-    m_installationsDir = defaultDirectoryForInstallations();
+    m_installationsDir = QDir(defaultDirectoryForInstallations());
     updateInstalledVersionsInformation();
 }
 
@@ -219,8 +219,9 @@ QnSoftwareVersion InstallationManager::nearestInstalledVersion(const QnSoftwareV
 QnClientInstallationPtr InstallationManager::installationForVersion(const QnSoftwareVersion &version, bool strict) const
 {
     std::unique_lock<std::mutex> lk( m_mutex );
-
     QnClientInstallationPtr installation = m_installationByVersion[version];
+    lk.unlock();
+
     if (installation)
         return installation;
 
@@ -231,6 +232,7 @@ QnClientInstallationPtr InstallationManager::installationForVersion(const QnSoft
     if (ver.isNull())
         return QnClientInstallationPtr();
 
+    lk.lock();
     return m_installationByVersion[ver];
 }
 
@@ -241,6 +243,7 @@ QString InstallationManager::rootInstallationDirectory() const
 
 QString InstallationManager::installationDirForVersion(const QnSoftwareVersion &version) const
 {
+    std::unique_lock<std::mutex> lk( m_mutex );
     if (!m_installationsDir.exists())
         return QString();
 
@@ -269,6 +272,7 @@ bool InstallationManager::installZip(const QnSoftwareVersion &version, const QSt
         return false;
     }
 
+    std::unique_lock<std::mutex> lk( m_mutex );
     m_installationByVersion.insert(installation->version(), installation);
 
     return true;

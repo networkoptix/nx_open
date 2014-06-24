@@ -79,7 +79,10 @@ int main( int argc, char* argv[] )
     QnLongRunnablePool runnablePool;
 
     QString logLevel = "WARN";
-    QString logFilePath = InstallationManager::defaultDirectoryForInstallations() + "/applauncher";
+    QString installationsDir = InstallationManager::defaultDirectoryForInstallations();
+    if (!QDir(installationsDir).exists())
+        QDir().mkpath(installationsDir);
+    QString logFilePath = installationsDir + "/applauncher";
     QString mirrorListUrl;
     bool quitMode = false;
     bool displayHelp = false;
@@ -88,7 +91,7 @@ int main( int argc, char* argv[] )
     QString localDir;
     QString remoteUrl;
     bool installMode = false;
-    QnSoftwareVersion versionToInstall;
+    QString versionToInstall;
     QString productNameToInstall( QString::fromUtf8(QN_PRODUCT_NAME_SHORT) );
     QString customizationToInstall( QString::fromUtf8(QN_CUSTOMIZATION_NAME) );
     QString moduleToInstall( QString::fromLatin1("client") );
@@ -152,7 +155,7 @@ int main( int argc, char* argv[] )
             mirrorListUrl,
             productNameToInstall,
             customizationToInstall,
-            versionToInstall,
+            QnSoftwareVersion(versionToInstall),
             moduleToInstall,
             installationPath );
 
