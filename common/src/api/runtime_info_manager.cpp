@@ -33,7 +33,6 @@ void QnRuntimeInfoManager::at_remotePeerFound(ec2::ApiPeerAliveData data, bool i
 
 void QnRuntimeInfoManager::at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy)
 {
-    qnLicensePool->removeRemoteValidLicenses(data.peer.id);   //TODO: #Elric #ec2 get rid of the serialization hell
     m_runtimeInfo.remove(data.peer.id);
 
     if (data.peer.id == qnCommon->remoteGUID()) {
@@ -52,9 +51,6 @@ void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData& runt
     if (runtimeInfo.peer.id == remoteID) {
         qnLicensePool->setMainHardwareIds(runtimeInfo.mainHardwareIds);
         qnLicensePool->setCompatibleHardwareIds(runtimeInfo.compatibleHardwareIds);
-    }
-    else {
-        qnLicensePool->addRemoteValidLicenses(runtimeInfo.peer.id, runtimeInfo.validLicenses);
     }
     emit runtimeInfoChanged(runtimeInfo);
 }

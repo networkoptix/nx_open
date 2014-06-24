@@ -51,7 +51,6 @@ private slots:
     void at_peerLost(const QnModuleInformation &moduleInformation);
 
     void at_appStarted();
-    void at_licenseListChanged();
     void at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
 private:
     void updateDisabledVendorsIfNeeded();

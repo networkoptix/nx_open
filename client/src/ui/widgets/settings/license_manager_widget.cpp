@@ -358,7 +358,7 @@ void QnLicenseManagerWidget::at_downloadFinished() {
 
 
             QnLicense::ErrorCode errCode = QnLicense::NoError;
-            if (license->isValid(&errCode))
+            if (license->isValid(&errCode, true))
                 licenses.append(license);
             else if (errCode == QnLicense::Expired)
                 licenses.append(license); // ignore expired error code

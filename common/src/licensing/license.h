@@ -56,7 +56,7 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(ErrorCode* errCode = 0, bool checkForeignLicenses = true) const;
+    bool isValid(ErrorCode* errCode = 0, bool isNewLicense = false) const;
 
     static QString errorMessage(ErrorCode errCode);
 
@@ -187,13 +187,6 @@ public:
 
     QList<QByteArray> allHardwareIds() const;
 
-    QMap<QnId, QList<QnLatin1Array>> remoteValidLicenses() const;
-    QList<QnLatin1Array> allRemoteValidLicenses() const;
-    QList<QnLatin1Array> allLocalValidLicenses() const;
-    void setRemoteValidLicenses(const QMap<QnId, QList<QnLatin1Array>>& licenses);
-    void addRemoteValidLicenses(const QnId& peer, const QList<QnLatin1Array>& licenses);
-    void removeRemoteValidLicenses(const QnId& peer);
-
     QByteArray currentHardwareId() const;
     bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
 signals:
@@ -206,15 +199,11 @@ private:
     bool isLicenseMatchesCurrentSystem(const QnLicensePtr &license);
     bool addLicense_i(const QnLicensePtr &license);
     bool addLicenses_i(const QnLicenseList &licenses);
-    void updateRemoteIdList();
 private:
     QList<QByteArray> m_mainHardwareIds;
     QList<QByteArray> m_compatibleHardwareIds;
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
-
-    QList<QnLatin1Array> m_remoteValidLicenses;
-    QMap<QnId, QList<QnLatin1Array>> m_remoteValidLicenseMap;
 };
 
 #define qnLicensePool QnLicensePool::instance()

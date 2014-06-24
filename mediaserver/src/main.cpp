@@ -1564,14 +1564,6 @@ void QnMain::at_appStarted()
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
 };
 
-void QnMain::at_licenseListChanged()
-{
-    QList<QnLatin1Array> licenseList = QnLicensePool::instance()->allLocalValidLicenses();
-    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
-    data.validLicenses = licenseList;
-    QnRuntimeInfoManager::instance()->update(data);
-}
-
 void QnMain::at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo)
 {
     if (runtimeInfo.peer.id == qnCommon->moduleGUID())

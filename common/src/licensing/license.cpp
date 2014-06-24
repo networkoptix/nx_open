@@ -164,11 +164,8 @@ ec2::ApiRuntimeData QnLicense::findRuntimeDataByLicense() const
     return ec2::ApiRuntimeData();
 }
 
-bool QnLicense::isValid(ErrorCode* errCode, bool checkForeignLicenses) const
+bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
 {
-    if (checkForeignLicenses && QnLicensePool::instance()->allRemoteValidLicenses().contains(m_key))
-        return true; // it is valid license from a remote peer
-
     // >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
     // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
     // We just allow empty brand for all, because we believe license is correct.
@@ -183,18 +180,15 @@ bool QnLicense::isValid(ErrorCode* errCode, bool checkForeignLicenses) const
         return false;
     }
 
-    if (!QnLicensePool::instance()->allHardwareIds().contains(m_hardwareId))
+    ec2::ApiRuntimeData runtimeData = isNewLicense ? QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID()) : findRuntimeDataByLicense();
+
+    if (runtimeData.peer.id.isNull())
     {
         if (errCode)
             *errCode = InvalidHardwareID;
         return false;
     }
 
-    ec2::ApiRuntimeData runtimeData = findRuntimeDataByLicense();
-    if (runtimeData.peer.id.isNull()) {
-        // new license
-        runtimeData = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
-    }
     const QString box = runtimeData.box;
     const QString brand = runtimeData.brand;
 
@@ -427,7 +421,7 @@ QnLicenseList QnLicensePool::getLicenses() const
 }
 
 bool QnLicensePool::isLicenseMatchesCurrentSystem(const QnLicensePtr &license) {
-    return license->isValid(0, false);
+    return license->isValid(0);
 }
 
 bool QnLicensePool::isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode) const
@@ -524,54 +518,6 @@ QList<QByteArray> QnLicensePool::allHardwareIds() const
     return m_mainHardwareIds + m_compatibleHardwareIds;
 }
 
-QList<QnLatin1Array> QnLicensePool::allRemoteValidLicenses() const
-{
-    return m_remoteValidLicenses;
-}
-
-QList<QnLatin1Array> QnLicensePool::allLocalValidLicenses() const
-{
-    QList<QnLatin1Array> result;
-    QList<QByteArray>  hwList = allHardwareIds();
-    foreach (QnLicensePtr license, m_licenseDict.values()) 
-    {
-        if (hwList.contains(license->hardwareId()) && license->isValid(0, false))
-            result << license->key();
-    }
-
-    return result;
-}
-
-QMap<QnId, QList<QnLatin1Array>> QnLicensePool::remoteValidLicenses() const
-{
-    return m_remoteValidLicenseMap;
-}
-
-void QnLicensePool::addRemoteValidLicenses(const QnId& peer, const QList<QnLatin1Array>& licenses)
-{
-    m_remoteValidLicenseMap.insert(peer, licenses);
-    updateRemoteIdList();
-}
-
-void QnLicensePool::setRemoteValidLicenses(const QMap<QnId, QList<QnLatin1Array>>& licenseMap)
-{
-    m_remoteValidLicenseMap = licenseMap;
-    updateRemoteIdList();
-}
-
-void QnLicensePool::removeRemoteValidLicenses(const QnId& peer)
-{
-    m_remoteValidLicenseMap.remove(peer);
-    updateRemoteIdList();
-}
-
-void QnLicensePool::updateRemoteIdList()
-{
-    QList<QnLatin1Array> mergedData;
-    foreach(const QList<QnLatin1Array>& value, m_remoteValidLicenseMap.values())
-        mergedData << value;
-    m_remoteValidLicenses = mergedData;
-}
 
 QByteArray QnLicensePool::currentHardwareId() const
 {
