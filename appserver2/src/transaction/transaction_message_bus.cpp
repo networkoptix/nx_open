@@ -1,7 +1,5 @@
 #include "transaction_message_bus.h"
 
-#include <boost/bind.hpp>
-
 #include "remote_ec_connection.h"
 #include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
@@ -46,7 +44,7 @@ struct SendTransactionToTransportFuction {
 };
 
 template<class T, class Function>
-bool handleTransactionParams(QnInputBinaryStream<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction, const Function &function) 
+bool handleTransactionParams(QnInputBinaryStream<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction, Function function) 
 {
     QnTransaction<T> transaction(abstractTransaction);
     if (!QnBinary::deserialize(stream, &transaction.params)) 
@@ -202,7 +200,8 @@ void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran
     if (!sender || sender->getState() != QnTransactionTransport::ReadyForStreaming)
         return;
 
-    if(!handleTransaction(serializedTran, boost::bind(GotTransactionFuction(), this, _1, sender, transportHeader)))
+    using namespace std::placeholders;
+    if(!handleTransaction(serializedTran, std::bind(GotTransactionFuction(), this, _1, sender, transportHeader)))
         sender->setState(QnTransactionTransport::Error);
 }
 
@@ -337,8 +336,9 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         sendRuntimeInfo(sender, processedPeers);
 
         QnTransactionTransportHeader transportHeader(processedPeers);
+        using namespace std::placeholders;
         foreach(const QByteArray& serializedTran, serializedTransactions)
-            if(!handleTransaction(serializedTran, boost::bind(SendTransactionToTransportFuction(), this, _1, sender, transportHeader)))
+            if(!handleTransaction(serializedTran, std::bind(SendTransactionToTransportFuction(), this, _1, sender, transportHeader)))
                 sender->setState(QnTransactionTransport::Error);
         return;
     }

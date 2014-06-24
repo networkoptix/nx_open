@@ -7,6 +7,8 @@
 
 #include <algorithm>
 
+//#define DEBUG_OUTPUT
+
 
 static const size_t MAX_PERCENT = 100;
 
@@ -42,6 +44,10 @@ void* NxBufferCache::getBuffer( size_t size )
         assert( it->first >= size );
         void* ptr = it->second;
         m_totalCacheSize -= it->first;
+#ifdef DEBUG_OUTPUT
+        std::cout<<"NxBufferCache. Cache hit! Returning "<<it->first<<" buffer ("<<size<<" bytes requested). "
+            "totalCacheSize "<<m_totalCacheSize<<" ("<<m_freeBuffers.size()<<")"<<std::endl;
+#endif
         m_freeBuffers.erase( it );  //TODO #ak const erase complexity desired
         return ptr;
     }
@@ -49,6 +55,10 @@ void* NxBufferCache::getBuffer( size_t size )
     //allocating new buffer
     const size_t bufferToAllocateSize = size + (size / MAX_PERCENT * m_bufferAllocationExcessPercent);
     void* newBuf = ::malloc( bufferToAllocateSize + sizeof(bufferToAllocateSize) );
+#ifdef DEBUG_OUTPUT
+    std::cout<<"NxBufferCache. Allocating new buffer "<<size<<"("<<bufferToAllocateSize<<") bytes size. "
+        "totalCacheSize "<<m_totalCacheSize<<" ("<<m_freeBuffers.size()<<")"<<std::endl;
+#endif
     if( !newBuf )
         return nullptr;
 
@@ -73,6 +83,15 @@ void NxBufferCache::release( void* ptr )
     auto it = std::upper_bound( m_freeBuffers.begin(), m_freeBuffers.end(), newElem );
     m_freeBuffers.emplace( it, newElem );
     m_totalCacheSize += size;
+}
+
+void NxBufferCache::setCacheSize( size_t maxUnusedMemoryToCache )
+{
+    std::unique_lock<std::mutex> lk( m_mutex );
+    m_maxUnusedMemoryToCache = maxUnusedMemoryToCache;
+#ifdef DEBUG_OUTPUT
+    std::cout<<"NxBufferCache::setCacheSize. m_maxUnusedMemoryToCache "<<m_maxUnusedMemoryToCache<<std::endl;
+#endif
 }
 
 void NxBufferCache::cleanCacheIfNeeded()

@@ -45,6 +45,8 @@ template <class T>
 void assertSorted(std::vector<T> &data) {
 #ifdef _DEBUG
     assertSorted(data, &T::id);
+#else
+    Q_UNUSED(data);
 #endif // DEBUG
 }
 
@@ -60,6 +62,9 @@ void assertSorted(std::vector<T> &data, QnId Field::*idField) {
         assert(next >= prev);
         prev = next;
     }
+#else
+    Q_UNUSED(data);
+    Q_UNUSED(idField);
 #endif // DEBUG
 }
 
@@ -1398,7 +1403,7 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteTableRecord(id, "vms_layoutitem", "resource_id");
+    err = deleteTableRecord(guid, "vms_layoutitem", "resource_id");
     if (err != ErrorCode::ok)
         return err;
 

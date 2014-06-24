@@ -1511,7 +1511,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 
 quint8* RTPSession::prepareDemuxedData(std::vector<QnByteArray*>& demuxedData, int channel, int reserve)
 {
-    if (demuxedData.size() <= channel)
+    if (channel >= 0 && demuxedData.size() <= (size_t)channel)
         demuxedData.resize(channel+1);
     if (demuxedData[channel] == 0)
         demuxedData[channel] = new QnByteArray(16, 32);
