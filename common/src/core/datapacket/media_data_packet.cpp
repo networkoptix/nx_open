@@ -100,6 +100,21 @@ bool QnMediaContext::equalTo(QnMediaContext *other) const
 }
 
 
+QnAbstractMediaData::QnAbstractMediaData( DataType _dataType )
+: 
+    dataType(_dataType),
+    compressionType(CODEC_ID_NONE),
+    flags(MediaFlags_None),
+    channelNumber(0),
+    context(0),
+    opaque(0)
+{
+}
+
+QnAbstractMediaData::~QnAbstractMediaData()
+{
+}
+
 void QnAbstractMediaData::assign(const QnAbstractMediaData* other)
 {
     dataProvider = other->dataProvider;

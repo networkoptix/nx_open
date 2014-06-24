@@ -316,12 +316,11 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                     QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.data());
                     if( videoData && videoData->motion )
                     {
+                        m_savedMediaPacket = rez;
                         rez = std::move(videoData->motion);
                         videoData->motion.clear();
-                        m_savedMediaPacket = rez;
                     }
-
-                    if( rez->dataType == QnAbstractMediaData::AUDIO )
+                    else if( rez->dataType == QnAbstractMediaData::AUDIO )
                     {
                         if( !m_audioContext )
                         {
