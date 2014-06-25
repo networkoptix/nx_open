@@ -119,7 +119,6 @@ void QnAbstractMediaData::assign(const QnAbstractMediaData* other)
 {
     dataProvider = other->dataProvider;
     timestamp = other->timestamp;
-    data.clear();
     dataType = other->dataType;
     compressionType = other->compressionType;
     flags = other->flags;
