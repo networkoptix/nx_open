@@ -330,12 +330,29 @@ void QnVideowallPreviewWidget::loadFromResource(const QnVideoWallResourcePtr &vi
 
 void QnVideowallPreviewWidget::submitToResource(const QnVideoWallResourcePtr &videowall) {
 
+    QUuid pcUuid = qnSettings->pcUuid();
+
+    QList<QnVideoWallPcData::PcScreen> localScreens;
+    for (int i = 0; i < m_model->screens.size(); i++) {
+        QnVideoWallPcData::PcScreen screen;
+        screen.index = i;
+        screen.desktopGeometry = m_model->screens[i].geometry;
+        localScreens << screen;
+    }
+
+    QnVideoWallPcData pcData;
+    pcData.uuid = pcUuid;
+    pcData.screens = localScreens;
+    if (!videowall->pcs()->hasItem(pcUuid))
+        videowall->pcs()->addItem(pcData);
+    else
+        videowall->pcs()->updateItem(pcUuid, pcData);
+
     if (m_model->addedItem.id.isNull())
         return;
 
-    QUuid pcUuid = qnSettings->pcUuid();
-
-    auto newItem = [&]() {
+    // encapsulating into lambda because there is a future possibility of adding several items at once
+    auto newItem = [&videowall, &pcUuid, this]() {
         QnVideoWallItem result;
 
         result.name = generateUniqueString([&videowall] () {
@@ -352,6 +369,9 @@ void QnVideowallPreviewWidget::submitToResource(const QnVideoWallResourcePtr &vi
 
     QnVideoWallItem item = newItem();
     videowall->items()->addItem(item);
+
+
+
 }
 
 
