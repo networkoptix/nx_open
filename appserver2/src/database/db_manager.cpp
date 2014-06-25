@@ -264,6 +264,24 @@ bool QnDbManager::init()
         return false;
     }
 
+    // updateDBVersion();
+    QSqlQuery insVersionQuery(m_sdb);
+    insVersionQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
+    insVersionQuery.addBindValue("VERSION");
+    insVersionQuery.addBindValue(QN_APPLICATION_VERSION);
+    if (!insVersionQuery.exec()) {
+        qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
+        return false;
+    }
+    insVersionQuery.addBindValue("BUILD");
+    insVersionQuery.addBindValue(QN_APPLICATION_REVISION);
+    if (!insVersionQuery.exec()) {
+        qWarning() << "can't initialize sqlLite database!" << insVersionQuery.lastError().text();
+        return false;
+    }
+
+
+
     m_storageTypeId = getType("Storage");
     m_serverTypeId = getType("Server");
     m_cameraTypeId = getType("Camera");
