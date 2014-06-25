@@ -161,6 +161,8 @@ static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 class QnMain;
 static QnMain* serviceMainInstance = 0;
 void stopServer(int signal);
+bool restartFlag = false;
+void restartServer();
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -1618,8 +1620,18 @@ private:
 
 void stopServer(int signal)
 {
+    restartFlag = false;
     if (serviceMainInstance) {
         qWarning() << "got signal" << signal << "stop server!";
+        serviceMainInstance->stopAsync();
+    }
+}
+
+void restartServer()
+{
+    restartFlag = true;
+    if (serviceMainInstance) {
+        qWarning() << "restart requested!";
         serviceMainInstance->stopAsync();
     }
 }
@@ -1696,7 +1708,10 @@ int main(int argc, char* argv[])
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
 
     QnVideoService service( argc, argv );
-    return service.exec();
+    int res = service.exec();
+    if (restartFlag && res == 0)
+        return 1;
+    return res;
 }
 
 static void printVersion()

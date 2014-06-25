@@ -4,7 +4,7 @@
 #include "media_server/settings.h"
 #include "common/common_module.h"
 
-void stopServer(int signal);
+void restartServer();
 
 int QnChangeSystemNameRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result) {
     Q_UNUSED(path)
@@ -17,7 +17,7 @@ int QnChangeSystemNameRestHandler::executeGet(const QString &path, const QnReque
 
     if (qnCommon->localSystemName() != systemName) {
         MSSettings::roSettings()->setValue("systemName", systemName);
-        stopServer(0);
+        restartServer();
     }
 
     result.setError(QnJsonRestResult::NoError);
