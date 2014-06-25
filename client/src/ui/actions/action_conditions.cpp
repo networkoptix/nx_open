@@ -910,7 +910,7 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
 
     QString userName = context()->user()->getName();
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::desktop_camera)) 
-        if (resource->getName() == userName)
+        if (resource->getStatus() == QnResource::Online && resource->getName() == userName)
             return Qn::EnabledAction;
     
     return Qn::InvisibleAction;

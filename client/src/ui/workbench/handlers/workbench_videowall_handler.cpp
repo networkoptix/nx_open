@@ -1472,7 +1472,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
     QnVirtualCameraResourcePtr desktopCamera;
 
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::desktop_camera)) {
-        if (resource->getName() == context()->user()->getName())
+        if (resource->getName() == context()->user()->getName() && resource->getStatus() == QnResource::Online)
             desktopCamera = resource.dynamicCast<QnVirtualCameraResource>();    
     }
     if (!desktopCamera)
