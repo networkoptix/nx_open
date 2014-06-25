@@ -13,6 +13,7 @@ EC2_DIR = $$PWD/../appserver2
 BUILDENV_DIR = $$PWD/../build_environment
 
 INCLUDEPATH += \
+    $$PWD/src \
     $$COMMON_DIR/src \
     $$EC2_DIR/src \
 
@@ -23,8 +24,14 @@ LIBS += \
 
 SOURCES += \
     src/main.cpp \
+    src/context/context_aware.cpp \
+    src/components/ec_connection.cpp \
+    src/context/context.cpp
 
 HEADERS += \
+    src/context/context.h \
+    src/context/context_aware.h \
+    src/components/ec_connection.h
 
 RESOURCES += \
     qml.qrc \
