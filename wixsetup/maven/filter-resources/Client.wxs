@@ -138,13 +138,13 @@
             </Component>
         </ComponentGroup>                            
         <?endif?>
-
+		<?if ${angle} = true ?>
         <ComponentGroup Id="ClientDirectx" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="ClientD3dCompilerDll" Name="D3DCompiler_43.dll" Source="$(var.SourceDir)/D3DCompiler_43.dll"/>
             </Component>
         </ComponentGroup>        
-        
+        <?endif?>
         <ComponentGroup Id="ClientQTLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="ClientQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" />
@@ -194,12 +194,6 @@
             <Component>
                 <File Id="ClientQt5Quick$(var.suffix).dll" Name="Qt5Quick$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Quick$(var.suffix).dll"  />                
             </Component>             
-            <Component>
-                <File Id="ClientQt5Positioning$(var.suffix).dll" Name="Qt5Positioning$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Positioning$(var.suffix).dll"  />                
-            </Component>             
-            <Component>
-                <File Id="ClientQt5Sensors$(var.suffix).dll" Name="Qt5Sensors$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sensors$(var.suffix).dll"  />                
-            </Component>             
             <?if ${webkit} = true ?>
 			<Component>
                 <File Id="Clienticudt53.dll" Name="icudt53.dll" Source="$(var.SourceDir)\icudt53.dll"  />                
@@ -209,14 +203,16 @@
             </Component>                 
             <Component>
                 <File Id="Clienticuuc5.dll" Name="icuuc53.dll" Source="$(var.SourceDir)\icuuc53.dll"  />                
-            </Component>                 
+            </Component>
+			<?endif?>            
+            <?if ${angle} = true ?>			
             <Component>
                 <File Id="ClientlibGLESv2$(var.suffix).dll" Name="libGLESv2$(var.suffix).dll" Source="$(var.SourceDir)\libGLESv2$(var.suffix).dll"  />                
             </Component>                         
             <Component>
                 <File Id="ClientlibEGL$(var.suffix).dll" Name="libEGL$(var.suffix).dll" Source="$(var.SourceDir)\libEGL$(var.suffix).dll"  />                
             </Component>
-			<?endif?>            
+            <?endif?>					
             <Component>
                 <File Id="Clientquazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll"  />                
             </Component>
@@ -284,7 +280,9 @@
             <?if ${quicksync} = true ?>
             <ComponentGroupRef Id="ClientQuickSync"/>
             <?endif?>
-            <ComponentGroupRef Id="ClientDirectx"/>
+            <?if ${angle} = true ?>
+			<ComponentGroupRef Id="ClientDirectx"/>
+			<?endif?>
             <ComponentGroupRef Id="ClientFFmpegLibraries"/>
             <ComponentGroupRef Id="ClientQTLibraries" />
             <ComponentGroupRef Id="ImageFormats" />

@@ -38,10 +38,12 @@
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
         <beta>true</beta>
+		<angle>false</angle>
         <box/>
 
         <root.dir>${basedir}</root.dir>
 		<compile.options>webkit</compile.options>
+		<webkit>true</webkit>
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
@@ -567,9 +569,6 @@
         <profile>
             <id>no-webkit</id>
             <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
                 <property>
                     <name>webkit</name>
                     <value>false</value>
@@ -578,6 +577,21 @@
             <properties>
                 <compile.options></compile.options>
             </properties>
-        </profile>         
+        </profile>      
+        <profile>
+            <id>angle</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>angle</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <properties>
+                <compile.options></compile.options>
+            </properties>
+        </profile>  		
     </profiles> 
 </project>
