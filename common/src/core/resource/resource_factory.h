@@ -8,7 +8,7 @@
 struct QnResourceParams
 {
     QnResourceParams() {}
-    QnResourceParams(const QString& url, const QString& vendor): url(url), vendor(vendor) {}
+    QnResourceParams(const QString &url, const QString &vendor): url(url), vendor(vendor) {}
 
     QString url;
     QString vendor;
@@ -20,7 +20,7 @@ class QnResourceFactory
 public:
     virtual ~QnResourceFactory() {}
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams &params) = 0;
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams &params) = 0;
 };
 
 #endif // QN_RESOURCE_FACTORY_H
