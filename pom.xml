@@ -42,7 +42,7 @@
         <box/>
 
         <root.dir>${basedir}</root.dir>
-		<compile.options>webkit</compile.options>
+		<compile.options>-webkit</compile.options>
 		<webkit>true</webkit>
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>

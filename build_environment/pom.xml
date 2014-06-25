@@ -208,14 +208,14 @@
 					<version>5.2.1-SNAPSHOT</version>
 					<artifactId>qt</artifactId>
 					<type>tar.gz</type>
-					<classifier>${profile.classifier}-x86-${compile.options}</classifier>
+					<classifier>${profile.classifier}-x86${compile.options}</classifier>
 				</dependency>	
 				<dependency>
 					<groupId>com.digia</groupId>
 					<version>5.2.1-SNAPSHOT</version>
 					<artifactId>qt</artifactId>
 					<type>tar.gz</type>
-					<classifier>${profile.classifier}-x64-${compile.options}</classifier>
+					<classifier>${profile.classifier}-x64${compile.options}</classifier>
 				</dependency>			
 				<dependency>
 					<groupId>org.openssl</groupId>
@@ -282,7 +282,7 @@
 					<version>5.2.1-SNAPSHOT</version>
 					<artifactId>qt</artifactId>
 					<type>tar.gz</type>
-					<classifier>${qt.classifier}-${compile.options}</classifier>
+					<classifier>${qt.classifier}${compile.options}</classifier>
 				</dependency>
 			</dependencies>
 		</profile>  		
