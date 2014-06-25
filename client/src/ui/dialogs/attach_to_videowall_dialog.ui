@@ -21,7 +21,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QnVideowallPreviewWidget" name="previewWidget" native="true"/>
+       <widget class="QnVideowallManageWidget" name="manageWidget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -40,9 +40,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnVideowallPreviewWidget</class>
+   <class>QnVideowallManageWidget</class>
    <extends>QWidget</extends>
-   <header location="global">ui/widgets/videowall_preview_widget.h</header>
+   <header location="global">ui/widgets/videowall_manage_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
