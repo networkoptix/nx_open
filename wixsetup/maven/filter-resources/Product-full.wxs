@@ -306,15 +306,16 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_LOGIN" Value="[SERVER_LOGIN]">1</Publish>
 
             <!-- ClientDlg -->
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg"><![CDATA[ NOT $(var.VmsChanging) AND $(var.Inst_S0) ]]> </Publish>
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ NOT $(var.VmsChanging) AND $(var.Inst_S1) ]]> </Publish>
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ $(var.VmsChanging) ]]> </Publish>            
-            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ 1 ]]> </Publish>
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">NOT $(var.VmsChanging) AND $(var.Inst_S0)</Publish>
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">NOT $(var.VmsChanging) AND $(var.Inst_S1)</Publish>
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">$(var.VmsChanging)</Publish>
+            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
 
             <!-- VerifyReadyDlg -->
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">NOT $(var.VmsUpgrading) AND $(var.Inst_S1C0)</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg">NOT $(var.VmsUpgrading) AND $(var.Inst_C1)</Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">NOT $(var.VmsUpgrading) AND $(var.Inst_S0C0)</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading) AND $(var.Inst_S1C0)</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading) AND $(var.Inst_C1)</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">NOT $(var.VmsRemoving) AND NOT $(var.VmsUpgrading) AND $(var.Inst_S0C0)</Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">$(var.VmsRemoving)</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">$(var.VmsUpgrading)</Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Property="REMOVE" Value="{}" Order="3"><![CDATA[ Installed ]]></Publish>

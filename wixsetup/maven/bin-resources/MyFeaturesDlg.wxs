@@ -27,9 +27,9 @@ You must not remove this notice, or any other, from this software.
 		<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
 		<Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.FeaturesDlgDescription)" />
 		<Control Id="Title" Type="Text" X="15" Y="6" Width="210" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.FeaturesDlgTitle)" />
-		<Control Id="groupBox1" Type="GroupBox" Height="82" Width="350" X="10" Y="50" Text="!(loc.MyFeaturesDlg_Components)" />
-		<Control Id="checkBox2" Type="CheckBox" Height="30" Width="331" X="25" Y="65" Text="!(loc.MyFeaturesDlg_Client)" Property="INSTALL_CLIENT" CheckBoxValue="1" />
-		<Control Id="checkBox1" Type="CheckBox" Height="30" Width="331" X="25" Y="103" Text="!(loc.MyFeaturesDlg_Mediaserver)" Property="INSTALL_SERVER" CheckBoxValue="1" />
+		<Control Id="groupBox1" Type="GroupBox" Height="90" Width="350" X="10" Y="50" Text="!(loc.MyFeaturesDlg_Components)" />
+		<Control Id="checkBox2" Type="CheckBox" Height="30" Width="331" X="25" Y="65" Text="!(loc.MyFeaturesDlg_Mediaserver)" Property="INSTALL_SERVER" CheckBoxValue="1" />
+		<Control Id="checkBox1" Type="CheckBox" Height="30" Width="331" X="25" Y="103" Text="!(loc.MyFeaturesDlg_Client)" Property="INSTALL_CLIENT" CheckBoxValue="1" />
 	  </Dialog>
 	</UI>
   </Fragment>
