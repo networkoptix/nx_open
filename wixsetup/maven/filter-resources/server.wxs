@@ -32,9 +32,8 @@
                                 <ServiceControl Id="Stop${customization}ServerService" Name="${customization}MediaServer" Stop="both" Wait="yes" Remove="uninstall" />
                             </Component>
 
-                            <Component Id="ServerConfiguration" Permanent="yes">
-                                <RegistryKey Root="HKLM"
-                                             Key="Software\[Manufacturer]\${mediaserver.name}">
+                            <Component Id="ServerConfiguration">
+                                <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
                                     <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
                                     <RegistryValue Type="string" Name="port" Value="[SERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="appserverLogin" Value="[SERVER_LOGIN]"/>
