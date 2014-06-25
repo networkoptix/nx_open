@@ -294,7 +294,6 @@ ec2::AbstractECConnectionPtr QnWorkbenchVideoWallHandler::connection2() const {
     return QnAppServerConnectionFactory::getConnection2();
 }
 
-    menu()->trigger(Qn::SaveVideoWallReviewAction, QnActionParameters(videoWall));
 void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout) {
     if (items.isEmpty())
         return;
@@ -1137,6 +1136,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     dialog->submitToResource(videoWall);
     
     menu()->trigger(Qn::OpenVideoWallsReviewAction, QnActionParameters(videoWall));
+    menu()->trigger(Qn::SaveVideoWallReviewAction, QnActionParameters(videoWall));
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered() {
