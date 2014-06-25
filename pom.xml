@@ -431,6 +431,7 @@
                 <toolchain.version>codesourcery-2013.11</toolchain.version>
                 <compiler>2011.09</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+		<compile.options></compile.options>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
