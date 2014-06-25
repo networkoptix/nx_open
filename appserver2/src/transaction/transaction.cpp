@@ -12,7 +12,7 @@
 namespace ec2
 {
 
-    QAtomicInt QnAbstractTransaction::m_sequence(1);
+    QAtomicInt qn_abstractTransaction_sequence(1);
 
     namespace ApiCommand
     {
@@ -188,17 +188,17 @@ namespace ec2
             timestamp = QnTransactionLog::instance()->getTimeStamp();
             id.dbID = QnDbManager::instance()->getID();
         }
-        localTransaction = false;
+        isLocal = false;
     }
 
     void QnAbstractTransaction::setStartSequence(int value)
     {
-        m_sequence = value;
+        qn_abstractTransaction_sequence = value;
     }
 
     void QnAbstractTransaction::fillSequence()
     {
-        id.sequence = m_sequence.fetchAndAddAcquire(1);
+        id.sequence = qn_abstractTransaction_sequence.fetchAndAddAcquire(1);
         if (!timestamp)
             timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getTimeStamp() : 0;
     }

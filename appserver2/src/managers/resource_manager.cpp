@@ -160,9 +160,9 @@ namespace ec2
         {
             QnResourcePtr res = m_resCtx.pool->getResourceById(id);
             if (id == qnCommon->moduleGUID())
-                tran.localTransaction = true;
+                tran.isLocal = true;
             else if (res && res->hasFlags(QnResource::foreigner))
-                tran.localTransaction = true;
+                tran.isLocal = true;
         }
 
         return tran;

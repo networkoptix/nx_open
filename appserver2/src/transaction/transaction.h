@@ -126,7 +126,7 @@ namespace ec2
     class QnAbstractTransaction
     {
     public:
-		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false), timestamp(0), localTransaction(false) {}
+		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false), timestamp(0), isLocal(false) {}
         QnAbstractTransaction(ApiCommand::Value command, bool persistent);
         
         static void setStartSequence(int value);
@@ -155,8 +155,7 @@ namespace ec2
         bool persistent;
         qint64 timestamp;
         
-        static QAtomicInt m_sequence;
-        bool localTransaction; // do not propagate transactions to other server peers
+        bool isLocal; // do not propagate transactions to other server peers
     };
 
     typedef QnAbstractTransaction::ID QnAbstractTransaction_ID;
