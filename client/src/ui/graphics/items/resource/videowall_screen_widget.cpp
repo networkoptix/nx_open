@@ -164,23 +164,24 @@ void QnVideowallScreenWidget::updateLayout() {
     if (m_screens.size() == 1) {
         foreach (const QnVideoWallItem &item, m_items) {
             QnVideowallItemWidget *itemWidget = createItem(item.uuid);
+            assert(QnScreenSnap::snapsPerScreen() == 2);    //in other case layout should be reimplemented
 
-            if (item.screenSnaps.left.snapIndex == 0)
+            if (item.screenSnaps.left().snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorLeft);
             else
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorHorizontalCenter);
 
-            if (item.screenSnaps.top.snapIndex == 0)
+            if (item.screenSnaps.top().snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorTop, m_mainLayout, Qt::AnchorTop);
             else
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorTop, m_mainLayout, Qt::AnchorVerticalCenter);
 
-            if (item.screenSnaps.right.snapIndex == 0)
+            if (item.screenSnaps.right().snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorRight, m_mainLayout, Qt::AnchorRight);
             else
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorRight, m_mainLayout, Qt::AnchorHorizontalCenter);
 
-            if (item.screenSnaps.bottom.snapIndex == 0)
+            if (item.screenSnaps.bottom().snapIndex == 0)
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorBottom, m_mainLayout, Qt::AnchorBottom);
             else
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorBottom, m_mainLayout, Qt::AnchorVerticalCenter);
@@ -207,7 +208,7 @@ void QnVideowallScreenWidget::at_videoWall_itemAdded(const QnVideoWallResourcePt
 
     // check that left edge of the item belongs to the current screen
     if (qnIndexOf(m_screens, [item](const QnVideoWallPcData::PcScreen &screen) {
-        return item.screenSnaps.left.screenIndex == screen.index;
+        return item.screenSnaps.left().screenIndex == screen.index;
     }) < 0)
         return;
 

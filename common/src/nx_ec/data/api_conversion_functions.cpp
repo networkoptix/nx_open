@@ -730,10 +730,10 @@ void fromApiToResource(const ApiVideowallItemData &src, QnVideoWallItem &dst) {
     dst.layout     = src.layoutGuid;
     dst.pcUuid     = src.pcGuid;
     dst.name       = src.name;
-    dst.screenSnaps.left = QnScreenSnap::decode(src.snapLeft);
-    dst.screenSnaps.top = QnScreenSnap::decode(src.snapTop);
-    dst.screenSnaps.right = QnScreenSnap::decode(src.snapRight);
-    dst.screenSnaps.bottom = QnScreenSnap::decode(src.snapBottom);
+    dst.screenSnaps.left() = QnScreenSnap::decode(src.snapLeft);
+    dst.screenSnaps.top() = QnScreenSnap::decode(src.snapTop);
+    dst.screenSnaps.right() = QnScreenSnap::decode(src.snapRight);
+    dst.screenSnaps.bottom() = QnScreenSnap::decode(src.snapBottom);
 }
 
 void fromResourceToApi(const QnVideoWallItem &src, ApiVideowallItemData &dst) {
@@ -741,10 +741,10 @@ void fromResourceToApi(const QnVideoWallItem &src, ApiVideowallItemData &dst) {
     dst.layoutGuid  = src.layout;
     dst.pcGuid      = src.pcUuid;
     dst.name        = src.name;
-    dst.snapLeft    = src.screenSnaps.left.encode();
-    dst.snapTop     = src.screenSnaps.top.encode();
-    dst.snapRight   = src.screenSnaps.right.encode();
-    dst.snapBottom  = src.screenSnaps.bottom.encode();
+    dst.snapLeft    = src.screenSnaps.left().encode();
+    dst.snapTop     = src.screenSnaps.top().encode();
+    dst.snapRight   = src.screenSnaps.right().encode();
+    dst.snapBottom  = src.screenSnaps.bottom().encode();
 }
 
 void fromApiToResource(const ApiVideowallMatrixData &src, QnVideoWallMatrix &dst) {

@@ -482,46 +482,14 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
 
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
 
-    auto geometryFromSnaps = [this](const QnScreenSnaps &snaps) {
-        if (!snaps.isValid())
-            return QRect();
-
-        QRect geometry;
-        QDesktopWidget* desktop = qApp->desktop();
-        int maxIndex = desktop->screenCount() - 1;
-
-        auto leftCoord = [desktop, maxIndex](const QnScreenSnap &snap) {
-            QRect screenRect = desktop->screenGeometry(qMin(snap.screenIndex, maxIndex));
-            return screenRect.left() + (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
-        };
-
-        auto topCoord = [desktop, maxIndex](const QnScreenSnap &snap) {
-            QRect screenRect = desktop->screenGeometry(qMin(snap.screenIndex, maxIndex));
-            return screenRect.top() + (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
-        };
-
-        auto rightCoord = [desktop, maxIndex](const QnScreenSnap &snap) {
-            QRect screenRect = desktop->screenGeometry(qMin(snap.screenIndex, maxIndex));
-            return screenRect.right() - (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
-        };
-
-        auto bottomCoord = [desktop, maxIndex](const QnScreenSnap &snap) {
-            QRect screenRect = desktop->screenGeometry(qMin(snap.screenIndex, maxIndex));
-            return screenRect.bottom() - (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
-        };
-
-        return QRect(
-            QPoint(leftCoord(snaps.left), topCoord(snaps.top)),
-            QPoint(rightCoord(snaps.right), bottomCoord(snaps.bottom))
-            ).normalized(); //swap coords if screens were moved
-    };
-
-    QRect targetGeometry = geometryFromSnaps(item.screenSnaps);
+    QList<QRect> screens;
+    QDesktopWidget* desktop = qApp->desktop();
+    for (int i = 0; i < desktop->screenCount(); ++i)
+        screens << desktop->screenGeometry(i);
+    QRect targetGeometry = item.screenSnaps.geometry(screens);
     mainWindow()->setGeometry(targetGeometry);
 
-    QDesktopWidget* desktop = qApp->desktop();
-    for (int i = 0; i < desktop->screenCount(); i++) {
-        QRect screen = desktop->screenGeometry(i);
+    for (const QRect &screen: screens) {
         if (targetGeometry == screen)
             menu()->action(Qn::EffectiveMaximizeAction)->trigger();
     }

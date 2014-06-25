@@ -33,15 +33,47 @@ int QnScreenSnap::snapsPerScreen() {
 }
 
 bool QnScreenSnaps::isValid() const {
-    return left.isValid() && right.isValid() && top.isValid() && bottom.isValid();
+    return std::all_of(values.cbegin(), values.cend(), [](const QnScreenSnap &snap) {return snap.isValid();});
 }
 
 QSet<int> QnScreenSnaps::screens() const {
     QSet<int> screens;
-    screens 
-        << left.screenIndex 
-        << top.screenIndex 
-        << right.screenIndex 
-        << bottom.screenIndex;
+    for(const QnScreenSnap &snap: values)
+        screens << snap.screenIndex;
     return screens;
 }
+
+QRect QnScreenSnaps::geometry(const QList<QRect> &screens) const {
+    if (!isValid())
+        return QRect();
+
+    QRect geometry;
+    int maxIndex = screens.size() - 1;
+
+    auto leftCoord = [&screens, maxIndex](const QnScreenSnap &snap) {
+        QRect screenRect = screens.at(qMin(snap.screenIndex, maxIndex));
+        return screenRect.left() + (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+    };
+
+    auto topCoord = [&screens, maxIndex](const QnScreenSnap &snap) {
+        QRect screenRect = screens.at(qMin(snap.screenIndex, maxIndex));
+        return screenRect.top() + (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+    };
+
+    auto rightCoord = [&screens, maxIndex](const QnScreenSnap &snap) {
+        QRect screenRect = screens.at(qMin(snap.screenIndex, maxIndex));
+        return screenRect.right() - (screenRect.width() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+    };
+
+    auto bottomCoord = [&screens, maxIndex](const QnScreenSnap &snap) {
+        QRect screenRect = screens.at(qMin(snap.screenIndex, maxIndex));
+        return screenRect.bottom() - (screenRect.height() / QnScreenSnap::snapsPerScreen()) * snap.snapIndex;
+    };
+
+    return QRect(
+        QPoint(leftCoord(left()), topCoord(top())),
+        QPoint(rightCoord(right()), bottomCoord(bottom()))
+        ).normalized(); //swap coordinates if screens were moved
+
+}
+

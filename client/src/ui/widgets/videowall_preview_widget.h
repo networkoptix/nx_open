@@ -40,6 +40,8 @@ private:
 
     void paintScreenFrame(QPainter *painter, const BaseModelItem &item);
     void paintPlaceholder(QPainter* painter, const BaseModelItem &item);
+    void paintExistingItem(QPainter* painter, const BaseModelItem &item);
+    void paintAddedItem(QPainter* painter);
 
 private:
     QScopedPointer<QnVideowallModel> m_model;
