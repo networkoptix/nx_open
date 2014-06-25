@@ -667,20 +667,19 @@ void QnLoginDialog::at_moduleFinder_moduleFound(const QnModuleInformation &modul
     QString host = moduleInformation.isLocal ? QLatin1String("127.0.0.1") : remoteAddress;
     QUrl url;
     url.setHost(host);
-
     QString port = moduleInformation.parameters[lit("port")];
     url.setPort(port.toInt());
 
-    foreach (const QnEcData &data, m_foundEcs.values(moduleInformation.id)) {
-        if (data.url.host() == url.host() && data.url.port() == url.port())
-            return; // found the same host, e.g. two interfaces on local controller
-    }
-
     QnEcData data;
+    data.id = moduleInformation.id;
     data.url = url;
     data.version = moduleInformation.version.toString();
     data.systemName = moduleInformation.systemName;
-    m_foundEcs.insert(moduleInformation.id, data);
+    QString key = data.systemName + url.toString();
+    if (m_foundEcs.value(key) == data)
+        return;
+
+    m_foundEcs.insert(key, data);
     resetAutoFoundConnectionsModel();
 }
 
@@ -688,7 +687,12 @@ void QnLoginDialog::at_moduleFinder_moduleLost(const QnModuleInformation &module
     if (moduleInformation.type != nxMediaServerId)
         return;
 
-    m_foundEcs.remove(moduleInformation.id);
-
+    for(auto itr = m_foundEcs.begin(); itr != m_foundEcs.end(); ++itr)
+    {
+        if (itr.value().id == moduleInformation.id) {
+            m_foundEcs.erase(itr);
+            break;
+        }
+    }
     resetAutoFoundConnectionsModel();
 }
