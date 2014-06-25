@@ -1,5 +1,6 @@
 #include "download_updates_peer_task.h"
 
+#include <QtCore/QTimer>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
@@ -122,9 +123,19 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
         return;
 
     if (reply->error() != QNetworkReply::NoError) {
-        if (m_triesCount < maxDownloadTries) {
-            continueDownload();
-            return;
+        switch (reply->error()) {
+        case QNetworkReply::RemoteHostClosedError:
+        case QNetworkReply::HostNotFoundError:
+        case QNetworkReply::TimeoutError:
+        case QNetworkReply::TemporaryNetworkFailureError:
+        case QNetworkReply::NetworkSessionFailedError:
+            if (m_triesCount < maxDownloadTries) {
+                QTimer::singleShot(m_triesCount * 50, this, SLOT(continueDownload()));
+                return;
+            }
+            break;
+        default:
+            break;
         }
 
         m_file.reset();

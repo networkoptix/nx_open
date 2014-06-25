@@ -32,9 +32,9 @@ protected:
 
 private:
     void downloadNextUpdate();
-    void continueDownload();
 
 private slots:
+    void continueDownload();
     void at_downloadReply_finished();
     void at_downloadReply_downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
     void at_downloadReply_readyRead();
