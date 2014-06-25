@@ -31,10 +31,16 @@ protected:
 
     virtual bool eventFilter(QObject *target, QEvent *event) override;
 
-    virtual void mouseReleaseEvent(QMouseEvent *event);
-    virtual void mouseMoveEvent(QMouseEvent *event);
+    virtual void startDragProcess(DragInfo *info) override;
+    virtual void dragMove(DragInfo *info) override;
+    virtual void finishDragProcess(DragInfo *info) override;
+
+    virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
+    virtual void mouseMoveEvent(QMouseEvent *event) override;
 private:
     QScopedPointer<QnVideowallManageWidgetPrivate> d_ptr;
+    DragProcessor *m_dragProcessor;
 };
 
 #endif // VIDEOWALL_MANAGE_WIDGET_H
