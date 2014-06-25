@@ -8,7 +8,7 @@
 #include <utils/common/cryptographic_hash.h>
 #include <utils/media/nalUnits.h>
 
-#include <core/datapacket/media_data_packet.h>
+#include <core/datapacket/video_data_packet.h>
 
 static const char EXPORT_SIGN_MAGIC[] = "RhjrjLbkMxTujHI!";
 static const QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = QnCryptographicHash::Md5;

@@ -1,7 +1,11 @@
+
 #include "single_shot_file_reader.h"
+
 #include "filetypesupport.h"
 #include "utils/common/synctime.h"
+#include "core/datapacket/video_data_packet.h"
 #include "core/resource/storage_resource.h"
+
 
 QnSingleShotFileStreamreader::QnSingleShotFileStreamreader(QnResourcePtr resource):
     QnAbstractMediaStreamDataProvider(resource)
@@ -34,8 +38,8 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
         return QnAbstractMediaDataPtr();
 
     QByteArray srcData = file->readAll();
-    QnCompressedVideoDataPtr outData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, srcData.size()));
-    outData->data.write(srcData);
+    QnWritableCompressedVideoDataPtr outData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, srcData.size()));
+    outData->m_data.write(srcData);
 
     outData->compressionType = compressionType;
     outData->flags |= QnAbstractMediaData::MediaFlags_AVKey | QnAbstractMediaData::MediaFlags_StillImage;
@@ -57,7 +61,7 @@ void QnSingleShotFileStreamreader::run()
         qWarning() << "Application out of memory";
     }
     if (data)
-        putData(data);
+        putData(std::move(data));
 }
 
 void QnSingleShotFileStreamreader::setStorage(QnStorageResourcePtr storage)

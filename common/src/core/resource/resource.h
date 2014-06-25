@@ -101,6 +101,7 @@ public:
         deprecated = 0x100000,  /**< Resource absent in EC but still used in memory for some reason */
 
         videowall = 0x200000,           /**< Videowall resource */
+        desktop_camera = 0x400000,      /**< Desktop Camera resource */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -290,7 +291,7 @@ public:
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(QnAbstractDataPacketPtr data);
+    static void addCommandToProc(const QnAbstractDataPacketPtr& data);
     static int commandProcQueueSize();
 
     void update(QnResourcePtr other, bool silenceMode = false);

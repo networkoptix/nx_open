@@ -235,7 +235,6 @@ android-client/.metadata/*
 android-client/**/bin/**
 android-client/**/*.prefs
 android-client/**/gen/*
-android-client/android-main/libs/*.jar
 
 ios-client/build
 ios-client/dist
@@ -259,7 +258,6 @@ launcher/x64
 launcher/arm
 android-client/android-main/target/**
 android-client/protobuf-classes/target/**
-android-client/android-dw/**
 
 
 axiscamplugin/x86
@@ -293,6 +291,9 @@ edge_firmware/isd/*.tar.gz
 android-client/android-main/AndroidManifest.xml
 android-client/android-main/res/**
 
+android-client/android-main/libs/**
+html
+
 webadmin/node_modules
 webadmin/dist
 webadmin/.tmp
@@ -301,4 +302,3 @@ app/bower_components
 
 
 mobile_client\build-*
-

@@ -2,6 +2,8 @@
 
 #include <api/serializer/serializer.h>
 
+#include <utils/serialization/json.h>
+
 #include <business/business_event_parameters.h>
 #include <business/business_action_parameters.h>
 #include <business/actions/abstract_business_action.h>
@@ -143,6 +145,12 @@ void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, cons
 void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst) {
     QnResourcePtr tmp = dst;
     fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
+
+    { // test if the camera is desktop camera
+        auto resType = qnResTypePool->getResourceType(src.typeId);
+        if (resType->getName() == lit("SERVER_DESKTOP_CAMERA"))
+            dst->addFlags(QnResource::desktop_camera);
+    }
 
     dst->setScheduleDisabled(src.scheduleDisabled);
     dst->setMotionType(src.motionType);

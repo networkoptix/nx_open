@@ -20,6 +20,7 @@
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 #include <utils/media/pts_to_clock_mapper.h>
+#include <utils/memory/nx_allocation_cache.h>
 
 #include "isd_motion_estimation.h"
 
@@ -66,11 +67,11 @@ private:
     nxcip::CompressionType m_videoCodec;
     nxcip::UsecUTCTimestamp m_lastVideoTime;
     nxcip::UsecUTCTimestamp m_lastMotionTime;
-    Vmux* m_vmux;
-    Vmux* m_vmux_motion;
+    std::unique_ptr<Vmux> m_vmux;
+    std::unique_ptr<Vmux> m_vmuxMotion;
 #ifndef NO_ISD_AUDIO
     amux_info_t m_audioInfo;
-    Amux* m_amux;
+    std::unique_ptr<Amux> m_amux;
     bool m_audioEnabled;
     nxcip::CompressionType m_audioCodec;
     std::unique_ptr<nxcip::AudioFormat> m_audioFormat;
@@ -88,6 +89,8 @@ private:
     QAtomicInt m_refCounter;
 
     PtsToClockMapper m_ptsMapper;
+    NxBufferCache m_mediaBufferCache;
+    size_t m_currentGopSizeBytes;
 
 #ifdef DEBUG_OUTPUT
     QElapsedTimer m_frameTimer;

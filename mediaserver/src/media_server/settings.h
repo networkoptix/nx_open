@@ -8,7 +8,7 @@
 namespace nx_ms_conf
 {
     //!Port, server listenes on. All requests (ec2 API, mediaserver API, rtsp) are accepted on this port, so name \a rtspPort does not reflects its purpose
-    static const QLatin1String RTSP_PORT( "rtspPort" );
+    static const QLatin1String RTSP_PORT( "port" );
     static const int DEFAULT_RTSP_PORT = 7001;
 
     static const QLatin1String MIN_STORAGE_SPACE( "minStorageSpace" );

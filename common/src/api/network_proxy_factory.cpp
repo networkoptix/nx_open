@@ -132,12 +132,12 @@ QnNetworkProxyFactory* QnNetworkProxyFactory::instance()
 QNetworkProxy QnNetworkProxyFactory::getProxyToResource( QnResourcePtr resource )
 {
     QNetworkProxy proxy( QNetworkProxy::HttpProxy );
-    if( QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>() )
+    if( dynamic_cast<QnSecurityCamResource*>(resource.data()) )
     {
         QnResourcePtr parent = resource->getParentResource();
         if( !parent )
             return QNetworkProxy( QNetworkProxy::NoProxy );
-        QnMediaServerResourcePtr mediaServerResource = parent.dynamicCast<QnMediaServerResource>();
+        const QnMediaServerResource* mediaServerResource = dynamic_cast<QnMediaServerResource*>(parent.data());
         if( !mediaServerResource )
             return QNetworkProxy( QNetworkProxy::NoProxy );
         const QString& proxyHost = mediaServerResource->getPrimaryIF();
@@ -158,7 +158,7 @@ QNetworkProxy QnNetworkProxyFactory::getProxyToResource( QnResourcePtr resource 
         proxy.setPassword( QnAppServerConnectionFactory::defaultUrl().password() );
         return proxy;
     }
-    else if( QnMediaServerResourcePtr mediaServerResource = resource.dynamicCast<QnMediaServerResource>() )
+    else if( const QnMediaServerResource* mediaServerResource = dynamic_cast<QnMediaServerResource*>(resource.data()) )
     {
         //TODO #ak looks like copy-paste from upper block
         const QString& proxyHost = mediaServerResource->getPrimaryIF();

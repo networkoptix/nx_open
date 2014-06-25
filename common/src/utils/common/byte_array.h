@@ -155,6 +155,7 @@ public:
     int getAlignment() const;
 
     QnByteArray& operator=( const QnByteArray& );
+    QnByteArray& operator=( QnByteArray&& );
 
 protected:
     bool reallocate(unsigned int capacity);

@@ -38,7 +38,7 @@ struct FffmpegLog
 };
 
 
-CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr data, bool mtDecoding, QAtomicInt* const swDecoderCount):
+CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
     m_context(0),
     m_width(0),
@@ -142,7 +142,7 @@ void CLFFmpegVideoDecoder::closeDecoder()
     m_motionMap.clear();
 }
 
-void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr data)
+void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
 {
     if (m_context->thread_count == 1) {
         m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
@@ -152,14 +152,14 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     if (!m_mtDecoding && !m_forcedMtDecoding)
         m_context->thread_count = 1;
 
-    if (m_forceSliceDecoding == -1 && data && data->data.data() && m_context->codec_id == CODEC_ID_H264) 
+    if (m_forceSliceDecoding == -1 && data && data->data() && m_context->codec_id == CODEC_ID_H264) 
     {
         m_forceSliceDecoding = 0;
         int nextSliceCnt = 0;
-        const quint8* curNal = (const quint8*) data->data.data();
+        const quint8* curNal = (const quint8*) data->data();
         if (curNal[0] == 0) 
         {
-            const quint8* end = curNal + data->data.size();
+            const quint8* end = curNal + data->dataSize();
             for(curNal = NALUnit::findNextNAL(curNal, end); curNal < end; curNal = NALUnit::findNextNAL(curNal, end))
             {
                 quint8 nalType = *curNal & 0x1f;
@@ -191,7 +191,7 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     //m_context->flags |= CODEC_FLAG_GRAY;
 }
 
-void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr data)
+void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data)
 {
     m_codec = findCodec(m_codecId);
 
@@ -240,7 +240,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr data)
 //    avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
 }
 
-void CLFFmpegVideoDecoder::resetDecoder(QnConstCompressedVideoDataPtr data)
+void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& data)
 {
     if (!(data->flags & AV_PKT_FLAG_KEY))
     {
@@ -330,7 +330,7 @@ void CLFFmpegVideoDecoder::reallocateDeinterlacedFrame()
     }
 }
 
-void CLFFmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr data, int width, int height)
+void CLFFmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr& data, int width, int height)
 {
     if (m_currentWidth == -1) {
         m_currentWidth = width;
@@ -358,7 +358,7 @@ void CLFFmpegVideoDecoder::forceMtDecoding(bool value)
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
-bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
+bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
     CLVideoDecoderOutput* const outFrame = outFramePtr->data();
     AVFrame* copyFromFrame = m_frame;
@@ -382,7 +382,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSha
             m_lightModeFrameCounter = 0;
         }
 
-        if ((m_decodeMode > DecodeMode_Full || (data->flags & QnAbstractMediaData::MediaFlags_Ignore)) && data->data.data())
+        if ((m_decodeMode > DecodeMode_Full || (data->flags & QnAbstractMediaData::MediaFlags_Ignore)) && data->data())
         {
 
             if (data->compressionType == CODEC_ID_MJPEG)
@@ -401,7 +401,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSha
             {
                 if (m_decodeMode == DecodeMode_Fastest)
                     return false;
-                else if (m_frameTypeExtractor->getFrameType((quint8*) data->data.data(), data->data.size()) == FrameTypeExtractor::B_Frame)
+                else if (m_frameTypeExtractor->getFrameType((quint8*) data->data(), data->dataSize()) == FrameTypeExtractor::B_Frame)
                     return false;
             }
         }
@@ -424,8 +424,8 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSha
 
         AVPacket avpkt;
         av_init_packet(&avpkt);
-        avpkt.data = (unsigned char*)data->data.data();
-        avpkt.size = data->data.size();
+        avpkt.data = (unsigned char*)data->data();
+        avpkt.size = data->dataSize();
         avpkt.dts = avpkt.pts = data->timestamp;
         // HACK for CorePNG to decode as normal PNG by default
         avpkt.flags = AV_PKT_FLAG_KEY;

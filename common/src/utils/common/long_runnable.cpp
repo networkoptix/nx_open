@@ -54,7 +54,7 @@ public:
     void finishedNotify(QnLongRunnable *runnable) {
         QMutexLocker locker(&m_mutex);
 
-        assert(runnable && m_running.contains(runnable));
+        assert(runnable); //  && m_running.contains(runnable)
 
         m_running.remove(runnable);
         if(m_running.isEmpty())

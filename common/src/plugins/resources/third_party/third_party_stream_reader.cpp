@@ -9,6 +9,8 @@
 
 #include <QtCore/QTextStream>
 
+#include "core/datapacket/third_party_audio_data_packet.h"
+#include "core/datapacket/third_party_video_data_packet.h"
 #include "plugins/plugin_tools.h"
 #include "plugins/resources/onvif/dataprovider/onvif_mjpeg.h"
 #include "motion_data_picture.h"
@@ -50,7 +52,7 @@ ThirdPartyStreamReader::~ThirdPartyStreamReader()
         m_mediaEncoder2Ref->releaseRef();
 }
 
-void ThirdPartyStreamReader::onGotVideoFrame( QnCompressedVideoDataPtr videoData )
+void ThirdPartyStreamReader::onGotVideoFrame( const QnCompressedVideoDataPtr& videoData )
 {
     base_type::onGotVideoFrame( videoData );
 }
@@ -302,8 +304,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
         {
             if( m_savedMediaPacket )
             {
-                rez = m_savedMediaPacket;
-                m_savedMediaPacket = QnAbstractMediaDataPtr();
+                rez = std::move(m_savedMediaPacket);
+                m_savedMediaPacket.clear(); //calling clear since QSharePointer move operator implementation leaves some questions...
             }
             else
             {
@@ -311,15 +313,14 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                 if( rez )
                 {
                     rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-                    QnCompressedVideoDataPtr videoData = rez.dynamicCast<QnCompressedVideoData>();
+                    QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.data());
                     if( videoData && videoData->motion )
                     {
-                        rez = videoData->motion;
-                        videoData->motion = QnMetaDataV1Ptr();
-                        m_savedMediaPacket = videoData;
+                        m_savedMediaPacket = rez;
+                        rez = std::move(videoData->motion);
+                        videoData->motion.clear();
                     }
-
-                    if( rez->dataType == QnAbstractMediaData::AUDIO )
+                    else if( rez->dataType == QnAbstractMediaData::AUDIO )
                     {
                         if( !m_audioContext )
                         {
@@ -327,7 +328,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                             if( m_mediaEncoder2Ref->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
                                 initializeAudioContext( audioFormat );
                         }
-                        rez.staticCast<QnCompressedAudioData>()->context = m_audioContext;
+                        static_cast<QnCompressedAudioData*>(rez.data())->context = m_audioContext;
                     }
                 }
             }
@@ -341,7 +342,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
         {
             if( rez->dataType == QnAbstractMediaData::VIDEO )
             {
-                QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
+                //QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
                 //parseMotionInfo(videoData);
                 break;
             }
@@ -440,9 +441,9 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
             if( !srcVideoPacket )
                 return QnAbstractMediaDataPtr();  //looks like bug in plugin implementation
 
-            mediaPacket = QnAbstractMediaDataPtr(new QnCompressedVideoData());
-            static_cast<QnCompressedVideoData*>(mediaPacket.data())->pts = packet->timestamp();
-            mediaPacket->dataType = QnAbstractMediaData::VIDEO;
+            QnThirdPartyCompressedVideoData* videoPacket = new QnThirdPartyCompressedVideoData( srcVideoPacket );
+            packetAp.release();
+            videoPacket->pts = packet->timestamp();
 
             nxcip::Picture* srcMotionData = srcVideoPacket->getMotionData();
             if( srcMotionData )
@@ -457,22 +458,22 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
                     motion->timestamp = srcVideoPacket->timestamp();
                     motion->channelNumber = packet->channelNumber();
                     motion->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-                    static_cast<QnCompressedVideoData*>(mediaPacket.data())->motion = motion;
+                    videoPacket->motion = motion;
                 }
                 srcMotionData->releaseRef();
             }
 
+            mediaPacket = QnAbstractMediaDataPtr(videoPacket);
             srcVideoPacket->releaseRef();
             break;
         }
 
         case nxcip::dptAudio:
-            mediaPacket = QnAbstractMediaDataPtr(new QnCompressedAudioData());
-            mediaPacket->dataType = QnAbstractMediaData::AUDIO;
+            mediaPacket = QnAbstractMediaDataPtr( new QnThirdPartyCompressedAudioData( packetAp.release() ) );
             break;
 
         case nxcip::dptEmpty:
-            mediaPacket = QnAbstractMediaDataPtr(new QnEmptyMediaData());
+            mediaPacket = QnAbstractMediaDataPtr( new QnEmptyMediaData() );
             break;    //end of data
 
         default:
@@ -514,12 +515,6 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     if( packet->flags() & nxcip::MediaDataPacket::fStreamReset )
         mediaPacket->flags |= QnAbstractMediaData::MediaFlags_BOF;
 
-    //QnMediaContextPtr context;
-    //int opaque;
-
-    //TODO/IMPL get rid of following copy by modifying QnAbstractMediaData class
-    if( packet->data() )
-        mediaPacket->data.write( (const char*)packet->data(), packet->dataSize() );
     return mediaPacket;
 }
 

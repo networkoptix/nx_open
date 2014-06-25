@@ -11,6 +11,7 @@
 #include "decoders/video/ffmpeg.h"
 #include "utils/media/frame_info.h"
 #include "utils/common/synctime.h"
+#include "utils/media/media_stream_cache.h"
 
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
@@ -33,8 +34,8 @@ public:
 
     // QnAbstractDataConsumer
     virtual bool canAcceptData() const;
-    virtual void putData(QnAbstractDataPacketPtr data);
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual void putData(const QnAbstractDataPacketPtr& data);
+    virtual bool processData(const QnAbstractDataPacketPtr& data);
 
     //QnMediaContextPtr getVideoCodecContext();
     //QnMediaContextPtr getAudioCodecContext();
@@ -89,22 +90,10 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
     return true;
 }
 
-bool channelCheckFunctor(const QnAbstractDataPacketPtr& data, QVariant channelNumber)
+void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
-    quint32 ch = channelNumber.toUInt();
-    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-    return media && media->channelNumber == ch;
-}
-
-void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr nonConstData)
-{
-    QnAbstractDataPacketPtr data = nonConstData;
-
-    QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(data);
-    QnConstCompressedAudioDataPtr audio = qSharedPointerDynamicCast<const QnCompressedAudioData>(data);
-
     QMutexLocker lock(&m_queueMtx);
-    if (video)
+    if (QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(nonConstData))
     {
         if (video->flags & AV_PKT_FLAG_KEY)
         {
@@ -115,24 +104,26 @@ void QnVideoCameraGopKeeper::putData(QnAbstractDataPacketPtr nonConstData)
             }
             m_gotIFramesMask |= 1 << video->channelNumber;
             m_lastKeyFrame = video;
+            const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
             if (m_lastKeyFrames.empty() || m_lastKeyFrames.back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
-                m_lastKeyFrames.push_back(video);
-            qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
+                m_lastKeyFrames.push_back(std::move(video));
             while (!m_lastKeyFrames.empty() && m_lastKeyFrames.front()->timestamp < removeThreshold)
                 m_lastKeyFrames.pop_front();
         }
 
         if (m_dataQueue.size() < m_dataQueue.maxSize()) {
-            video.constCast<QnCompressedVideoData>()->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-            QnAbstractDataConsumer::putData(nonConstData);
+            //TODO #ak MUST NOT modify video packet here! It can be used by other threads concurrently and flags value can be undefined in other threads
+            static_cast<QnAbstractMediaData*>(nonConstData.data())->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+            QnAbstractDataConsumer::putData( nonConstData );
         }
     }
-    else if (audio) {
-        m_lastAudioData = audio;
+    else if (QnConstCompressedAudioDataPtr audio = qSharedPointerDynamicCast<const QnCompressedAudioData>(nonConstData))
+    {
+        m_lastAudioData = std::move(audio);
     }
 }
 
-bool QnVideoCameraGopKeeper::processData(QnAbstractDataPacketPtr /*data*/)
+bool QnVideoCameraGopKeeper::processData(const QnAbstractDataPacketPtr& /*data*/)
 {
     return true;
 }
@@ -144,7 +135,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, 
     for (int i = 0; i < m_dataQueue.size(); ++i)
     {
         QnConstAbstractDataPacketPtr data = m_dataQueue.at(i);
-        QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(data);
+        const QnCompressedVideoData* video = dynamic_cast<const QnCompressedVideoData*>(data.data());
         if (video)
         {
             QnCompressedVideoData* newData = video->clone();
@@ -284,7 +275,7 @@ void QnVideoCamera::at_camera_resourceChanged()
 {
 	QMutexLocker lock(&m_getReaderMutex);
 
-	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
+	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	if ( cameraResource )
 	{
 		if ( !cameraResource->hasDualStreaming2() && m_secondaryReader )
@@ -300,7 +291,7 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
     const bool primaryLiveStream = catalog == QnServer::HiQualityCatalog;
     const QnResource::ConnectionRole role = primaryLiveStream ? QnResource::Role_LiveVideo : QnResource::Role_SecondaryLiveVideo;
 
-	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
+	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	
     QnLiveStreamProviderPtr &reader = primaryLiveStream ? m_primaryReader : m_secondaryReader;
     if (reader == 0)
@@ -493,7 +484,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCata
             createReader(catalog);
         }
     }
-	QnSecurityCamResourcePtr cameraResource = m_resource.dynamicCast<QnSecurityCamResource>();
+	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	if ( cameraResource && !cameraResource->hasDualStreaming2() && catalog == QnServer::LowQualityCatalog )
 	{
 		return QnLiveStreamProviderPtr();		

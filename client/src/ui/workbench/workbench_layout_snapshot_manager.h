@@ -3,9 +3,11 @@
 
 #include <QtCore/QObject>
 
+#include <nx_ec/ec_api.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_resource.h>
-#include <api/app_server_connection.h>
+#include <api/abstract_reply_processor.h>
 
 #include <client/client_globals.h>
 

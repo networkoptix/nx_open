@@ -95,8 +95,8 @@ namespace ec2
             }
 
             //TODO #ak videowall looks strange here
-            if (!QnAppServerConnectionFactory::videoWallKey().isEmpty())
-                httpClient->addRequestHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videoWallKey().toUtf8());
+            if (!QnAppServerConnectionFactory::videowallGuid().isNull())
+                httpClient->addRequestHeader("X-NetworkOptix-VideoWall", QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
 
             requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(cmdCode)) );
             QUrlQuery query;
@@ -114,12 +114,6 @@ namespace ec2
             }
             auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpGetResponse<OutputData, HandlerType> ), this, httpClient, handler );
             m_runningHttpRequests[httpClient] = std::function<void()>( func );
-        }
-
-        template<class T> bool processIncomingTransaction( const QnTransaction<T>&, const QByteArray&   )
-        {
-            // nothing to do for a while
-            return true;
         }
 
     public slots:
@@ -160,7 +154,7 @@ namespace ec2
             }
 
             const QByteArray& msgBody = httpClient->fetchMessageBodyBuffer();
-            QnInputBinaryStream<QByteArray> inputStream( msgBody );
+            QnInputBinaryStream<QByteArray> inputStream( &msgBody );
             OutputData outputData;
             if( !QnBinary::deserialize( &inputStream, &outputData ) )
                 handler( ErrorCode::badResponse, outputData );

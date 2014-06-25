@@ -23,8 +23,8 @@ ISDAudioPacket::ISDAudioPacket(
 
 ISDAudioPacket::~ISDAudioPacket()
 {
-    delete m_data;
-    m_data = 0;
+    nxpt::freeAligned( m_data );
+    m_data = nullptr;
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -110,10 +110,11 @@ void* ISDAudioPacket::data()
 
 void ISDAudioPacket::reserve( unsigned int _capacity )
 {
-    delete m_data;
+    if( m_data )
+        nxpt::freeAligned( m_data );
 
     m_capacity = _capacity;
-    m_data = new uint8_t[_capacity];
+    m_data = (uint8_t*)nxpt::mallocAligned( _capacity + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE, nxcip::MEDIA_DATA_BUFFER_ALIGNMENT );
 }
 
 unsigned int ISDAudioPacket::capacity() const

@@ -14,13 +14,13 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
-#include <client/client_translation_manager.h>
-
+#include <common/common_module.h>
+#include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <common/common_module.h>
-
 #include <mustache/mustache.h>
+
+#include <client/client_translation_manager.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -29,6 +29,7 @@
 #include <utils/license_usage_helper.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/common/product_features.h>
+
 
 #define QN_LICENSE_URL "http://networkoptix.com/nolicensed_vms/activate.php"
 

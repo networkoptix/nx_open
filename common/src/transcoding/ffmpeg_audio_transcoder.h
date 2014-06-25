@@ -13,9 +13,9 @@ public:
     QnFfmpegAudioTranscoder(CodecID codecId);
     ~QnFfmpegAudioTranscoder();
 
-    virtual int transcodePacket(QnConstAbstractMediaDataPtr media, QnAbstractMediaDataPtr* const result) override;
-    virtual bool open(QnConstCompressedAudioDataPtr audio) override;
-    bool open(QnMediaContextPtr codecCtx);
+    virtual int transcodePacket(const QnConstAbstractMediaDataPtr& media, QnAbstractMediaDataPtr* const result) override;
+    virtual bool open(const QnConstCompressedAudioDataPtr& audio) override;
+    bool open(const QnMediaContextPtr& codecCtx);
     AVCodecContext* getCodecContext();
     virtual bool existMoreData() const override;
 private:

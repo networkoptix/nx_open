@@ -1018,7 +1018,7 @@ void QnMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, 
 }
 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-bool QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
+bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -1172,7 +1172,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     int lineStep = (m_scaledWidth*65536) / MD_WIDTH;
     int scaledLineNum = 0;
     int prevILineNum = -1;
-    quint32* dst = (quint32*) rez->data.data();
+    quint32* dst = (quint32*) rez->data();
 
     //postFiltering();
 

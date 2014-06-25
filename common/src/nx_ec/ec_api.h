@@ -39,16 +39,23 @@ namespace ec2
         enum Type {
             Server,
             DesktopClient,
+            VideowallClient,
             AndroidClient
 
         };
 
         bool isClient() const {
-            return peerType == DesktopClient || peerType == AndroidClient;
+            return peerType != Server;
         }
 
+        /** Unique ID of the peer. */ 
         QnId id;
+
+        /** Type of the peer. */
         Type peerType;
+
+        /** Additional info. */
+        QHash<QString, QString> params;
 
         QnPeerInfo(QnId id, Type peerType): id(id), peerType(peerType) {}
     };
@@ -649,19 +656,11 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int sendInstanceId(const QUuid& guid, TargetType* target, HandlerType handler ) {
-            return sendInstanceId(guid, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
     signals:
         void addedOrUpdated(const QnVideoWallResourcePtr &videowall);
         void removed(const QUuid &id);
         void controlMessage(const QnVideoWallControlMessage &message);
-        void instanceStatusUpdated(const QnVideowallInstanceStatus &status);
+        void instanceStatusChanged(const QnVideowallInstanceStatus &status);
 
     protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) = 0;
@@ -669,7 +668,6 @@ namespace ec2
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
 
         virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendInstanceId(const QUuid& guid, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractVideowallManager> AbstractVideowallManagerPtr;
 

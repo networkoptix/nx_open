@@ -64,7 +64,7 @@ namespace nx_hls
         m_delegate = new QnThumbnailsArchiveDelegate(archiveDelegate);
         m_delegate->setRange( m_startTimestamp, std::numeric_limits<qint64>::max(), m_targetDurationUsec );
 
-        QnAbstractMediaDataPtr nextData = m_delegate->getNextData();
+        const QnAbstractMediaDataPtr& nextData = m_delegate->getNextData();
         if( !nextData )
         {
             m_prevChunkEndTimestamp = -1;
@@ -126,7 +126,7 @@ namespace nx_hls
         if( m_eof )
             return false;
 
-        QnAbstractMediaDataPtr nextData = m_delegate->getNextData();
+        const QnAbstractMediaDataPtr& nextData = m_delegate->getNextData();
         if( !nextData )
         {
             //end of archive reached
