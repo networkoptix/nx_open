@@ -604,8 +604,11 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
 
     if (!isObjectExists(lit("table"), lit("transaction_log")))
     {
-        if (!(*dbJustCreated))
+        if (!(*dbJustCreated)) {
             *isMigrationFrom2_2 = true;
+            if (!execSQLFile(lit(":/02_migration_from_2_2.sql")))
+                return false; // update admin user GUID e.t.c
+        }
 
         if (!execSQLFile(lit(":/03_update_2.2_stage1.sql")))
             return false;
