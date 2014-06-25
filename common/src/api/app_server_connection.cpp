@@ -26,19 +26,11 @@
 Q_GLOBAL_STATIC(QnAppServerConnectionFactory, qn_appServerConnectionFactory_instance)
 
 QnAppServerConnectionFactory::QnAppServerConnectionFactory(): 
-    m_prematureLicenseExperationDate(0),
-    m_defaultMediaProxyPort(0)
+    m_prematureLicenseExperationDate(0)
 {}
 
 QnAppServerConnectionFactory::~QnAppServerConnectionFactory() {
     return;
-}
-
-void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_defaultMediaProxyPort = port;
-    }
 }
 
 void QnAppServerConnectionFactory::setCurrentVersion(const QnSoftwareVersion &version)
@@ -94,15 +86,6 @@ void QnAppServerConnectionFactory::setPublicIp(const QString &publicIp)
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_publicUrl.setHost(publicIp);
     }
-}
-
-int QnAppServerConnectionFactory::defaultMediaProxyPort()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        return factory->m_defaultMediaProxyPort;
-    }
-
-    return 0;
 }
 
 QnSoftwareVersion QnAppServerConnectionFactory::currentVersion()
