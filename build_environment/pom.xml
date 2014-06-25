@@ -269,6 +269,24 @@
 			</dependencies>           
 		</profile>
 		<profile>
+			<!-- Common Profile for Linux, Mac, Arm -->
+			<id>unix</id>
+			<activation>
+				<os>
+					<family>unix</family>
+				</os> 
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.digia</groupId>
+					<version>5.2.1-SNAPSHOT</version>
+					<artifactId>qt</artifactId>
+					<type>tar.gz</type>
+					<classifier>${profile.classifier}-${compile.options}</classifier>
+				</dependency>
+			</dependencies>
+		</profile>  		
+		<profile>
 			<id>desktop</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
@@ -325,13 +343,6 @@
 
 			<dependencies>              
 				<dependency>
-					<groupId>com.digia</groupId>
-					<version>5.2.1-SNAPSHOT</version>
-					<artifactId>qt</artifactId>
-					<type>tar.gz</type>
-					<classifier>${profile.classifier}-${compile.options}</classifier>
-				</dependency>	
-				<dependency>
 					<groupId>org.openssl</groupId>
 					<artifactId>openssl</artifactId>
 					<version>${openssl.version}</version>
@@ -369,7 +380,7 @@
 				</property>
 			</activation>
 
-			<dependencies>              
+			<dependencies> 			
 				<dependency>
 					<groupId>org.openssl</groupId>
 					<artifactId>openssl</artifactId>
