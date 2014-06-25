@@ -258,7 +258,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     QnScheduleTask task = currentScheduleTask();
 
     const QnSecurityCamResource* camera = static_cast<const QnSecurityCamResource*>(m_device.data());
-    const QnConstMetaDataV1Ptr metaData = qSharedPointerDynamicCast<const QnMetaDataV1>(media);
+    const QnMetaDataV1* metaData = dynamic_cast<const QnMetaDataV1*>(media.data());
 
     if (m_catalog == QnServer::LowQualityCatalog && !metaData && !m_useSecondaryRecorder)
     {
