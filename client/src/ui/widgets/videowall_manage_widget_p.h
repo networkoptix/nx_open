@@ -12,53 +12,6 @@
 
 #include <ui/common/geometry.h>
 
-#include <ui/processors/drag_process_handler.h>
-
-
-enum class ItemType {
-    Existing,
-    ScreenPart,
-    Screen,
-    Added
-};
-
-enum class StateFlag {
-    Default = 0,        /**< Default button state. */
-    Pressed = 0x2,      /**< Button is pressed. This is the state that the button enters when a mouse button is pressed over it, and leaves when the mouse button is released. */
-    Hovered = 0x4,      /**< Button is hovered over. */
-    Disabled = 0x8     /**< Button is disabled. */
-};
-Q_DECLARE_FLAGS(StateFlags, StateFlag)
-
-struct BaseModelItem {
-    BaseModelItem(const QRect &rect);
-
-    QUuid id;
-    QRect geometry;
-    ItemType itemType;
-    QnScreenSnaps snaps;
-};
-
-
-struct ModelItem: BaseModelItem {
-    ModelItem();
-};
-
-struct ModelScreenPart: BaseModelItem {
-    ModelScreenPart(int screenIdx, int xIndex, int yIndex, const QRect &rect);
-
-    bool free;
-};
-
-struct ModelScreen: BaseModelItem {
-    ModelScreen(int idx, const QRect &rect);
-
-    bool free() const;
-    void setFree(bool value);
-
-    QList<ModelScreenPart> parts;
-};
-
 class QnVideowallManageWidgetPrivate : private QnGeometry {
     Q_DECLARE_TR_FUNCTIONS(QnVideowallManageWidgetPrivate);
 public:
@@ -76,10 +29,49 @@ public:
 
     void paint(QPainter* painter, const QRect &rect);
 private:
-    QRect unitedGeometry;
-    QList<ModelItem> items;
-    QList<ModelScreen> screens;
-    QList<ModelItem> added;
+    enum class ItemType {
+        Existing,
+        ScreenPart,
+        Screen,
+        Added
+    };
+
+    enum class StateFlag {
+        Default = 0,        
+        Pressed = 0x2,      
+        Hovered = 0x4,      
+        Disabled = 0x8      
+    };
+    Q_DECLARE_FLAGS(StateFlags, StateFlag)
+
+    struct BaseModelItem {
+        BaseModelItem(const QRect &rect);
+
+        QUuid id;
+        QRect geometry;
+        ItemType itemType;
+        QnScreenSnaps snaps;
+    };
+
+
+    struct ModelItem: BaseModelItem {
+        ModelItem();
+    };
+
+    struct ModelScreenPart: BaseModelItem {
+        ModelScreenPart(int screenIdx, int xIndex, int yIndex, const QRect &rect);
+
+        bool free;
+    };
+
+    struct ModelScreen: BaseModelItem {
+        ModelScreen(int idx, const QRect &rect);
+
+        bool free() const;
+        void setFree(bool value);
+
+        QList<ModelScreenPart> parts;
+    };
 
 private:
     void paintScreenFrame(QPainter *painter, const BaseModelItem &item);
@@ -91,6 +83,10 @@ private:
     QTransform m_transform;
     QTransform m_invertedTransform;
     QRect m_widgetRect;
+    QRect m_unitedGeometry;
+    QList<ModelItem> m_items;
+    QList<ModelScreen> m_screens;
+    QList<ModelItem> m_added;
 };
 
 #endif // VIDEOWALL_MANAGE_WIDGET_PRIVATE_H
