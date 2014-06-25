@@ -161,7 +161,6 @@ protected:
     bool m_stopOnWriteError;
     QnStorageResourcePtr m_storage;
     int m_currentTimeZone;
-    Role m_role;
 private:
     bool m_waitEOF;
 
@@ -210,6 +209,7 @@ private:
 
     /** If true method close() will emit signal recordingFinished() at the end. */
     bool m_recordingFinished;
+    Role m_role;
 };
 
 #endif // _STREAM_RECORDER_H__
