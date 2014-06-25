@@ -1,8 +1,7 @@
 #ifndef QN_RESOURCE_SEARCHER_H
 #define QN_RESOURCE_SEARCHER_H
 
-#include <QtNetwork/QHostAddress>
-#include "core/resource/resource.h"
+#include <core/resource/resource_factory.h>
 
 
 /**

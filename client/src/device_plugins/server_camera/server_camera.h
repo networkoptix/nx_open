@@ -1,7 +1,9 @@
 #ifndef QN_SERVER_CAMERA_H
 #define QN_SERVER_CAMERA_H
 
-#include "core/resource/camera_resource.h"
+#include <core/resource/camera_resource.h>
+#include <core/resource/resource_factory.h>
+#include <core/resource/resource_processor.h>
 
 class QnServerCamera;
 typedef QnSharedResourcePointer<QnServerCamera> QnServerCameraPtr;
