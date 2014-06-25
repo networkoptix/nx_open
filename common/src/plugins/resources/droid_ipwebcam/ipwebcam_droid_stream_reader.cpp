@@ -2,6 +2,7 @@
 
 #include "ipwebcam_droid_stream_reader.h"
 
+#include "core/datapacket/video_data_packet.h"
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
 #include "utils/network/http/httptypes.h"
@@ -73,8 +74,8 @@ QnAbstractMediaDataPtr QnPlDroidIpWebCamReader::getNextData()
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 3*1024*1024+FF_INPUT_BUFFER_PADDING_SIZE));
-    QnByteArray& img = videoData->data;
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, 3*1024*1024+FF_INPUT_BUFFER_PADDING_SIZE));
+    QnByteArray& img = videoData->m_data;
 
 
     bool getting_image = false;

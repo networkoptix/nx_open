@@ -47,11 +47,11 @@ def gen_strings():
 # Generate CustomStrings.wxl
 gen_strings()
 
-WXS_FILES = "MediaDirDlg.wxs MediaServerDlg.wxs MyFeaturesDlg.wxs SelectionWarning.wxs DowngradeWarningDlg.wxs  ClientDlg.wxs  Product_mvn.wxs AppServerFiles.wxs AppServerDlg.wxs FileAssociations.wxs"
-os.system(r'heat dir ..\appserver\setup\build\' + ecs_builddir_name + ' -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr VmsAppServerDir -var var.AppServerSourceDir -wixvar')
-fixasfiles()
+WXS_FILES = "MediaDirDlg.wxs MediaServerDlg.wxs MyFeaturesDlg.wxs SelectionWarning.wxs DowngradeWarningDlg.wxs  ClientDlg.wxs  Product_mvn.wxs FileAssociations.wxs"
+# os.system(r'heat dir ..\appserver\setup\build\' + ecs_builddir_name + ' -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr VmsAppServerDir -var var.AppServerSourceDir -wixvar')
+# fixasfiles()
 
-os.system(r'candle -dAppServerSourceDir="../appserver/setup/build/' + ecs_builddir_name + '" -out obj\%s\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (CONFIG, WXS_FILES))
+os.system(r'candle -out obj\%s\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (CONFIG, WXS_FILES))
 
 if CONFIG == 'Debug':
     output_file = '${arch}/VMS-%s.%s-Debug.msi' % (APPLICATION_VERSION, BUILD_NUMBER)

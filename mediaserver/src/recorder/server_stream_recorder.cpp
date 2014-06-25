@@ -136,7 +136,7 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     QnConstAbstractMediaDataPtr media = data.dynamicCast<const QnAbstractMediaData>();
     if (media) {
         QMutexLocker lock(&m_queueSizeMutex);
-        m_queuedSize += media->data.size();
+        m_queuedSize += media->dataSize();
     }
     QnStreamRecorder::putData(nonConstData);
 }
@@ -435,7 +435,7 @@ bool QnServerStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
 
     {
         QMutexLocker lock(&m_queueSizeMutex);
-        m_queuedSize -= media->data.size();
+        m_queuedSize -= media->dataSize();
     }
 
     // for empty schedule we record all time

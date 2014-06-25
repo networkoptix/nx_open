@@ -742,8 +742,8 @@ Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourc
         if (!videowall)
             continue;
 
-        if (videowall->items()->getItems().isEmpty())
-            continue;
+       // if (videowall->items()->getItems().isEmpty())
+       //     continue; //disable check to avoid unsaved empty layout
 
         if (!QnWorkbenchLayout::instance(videowall))
             continue;
@@ -861,6 +861,24 @@ Qn::ActionVisibility QnDetachFromVideoWallActionCondition::check(const QnActionP
     return Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnStartVideoWallControlActionCondition::check(const QnActionParameters &parameters) {
+    if (!context()->user() || parameters.videoWallItems().isEmpty())
+        return Qn::InvisibleAction;
+
+    foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
+        if (index.isNull() || !index.videowall()->items()->hasItem(index.uuid()))
+            continue;
+
+        auto item = index.videowall()->items()->getItem(index.uuid());
+        if (item.layout.isNull())
+            continue;
+
+        return Qn::EnabledAction;
+    }
+    return Qn::InvisibleAction;
+}
+
+
 Qn::ActionVisibility QnRotateItemCondition::check(const QnResourceWidgetList &widgets) {
     foreach (QnResourceWidget *widget, widgets) {
         if (widget->options() & QnResourceWidget::WindowRotationForbidden)
@@ -890,23 +908,13 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
     if (!context()->user())
         return Qn::InvisibleAction;
 
-    //TODO: #GDM #VW ask Roma to do some more stable way to find correct desktop camera
-    QRegExp desktopCameraNameRegExp(QString(lit("Desktop_camera_\\{.{36,36}\\}_%1")).arg(context()->user()->getName()));
-    QnVirtualCameraResourcePtr desktopCamera;
-
-    foreach (const QnResourcePtr &resource, qnResPool->getAllCameras(QnResourcePtr())) {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera)
-            continue;
-        if (!desktopCameraNameRegExp.exactMatch(camera->getPhysicalId()))
-            continue;
-        desktopCamera = camera;
-        break;
-    }
-    if (!desktopCamera)
-        return Qn::InvisibleAction;
-
-    return Qn::EnabledAction;
+    QString userName = context()->user()->getName();
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::desktop_camera)) 
+        if (resource->getName() == userName)
+            return Qn::EnabledAction;
+    
+    return Qn::InvisibleAction;
+   
 #else
     return Qn::InvisibleAction;
 #endif

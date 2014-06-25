@@ -9,7 +9,8 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
-#include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/audio_data_packet.h"
+#include "core/datapacket/video_data_packet.h"
 #include "core/resource/media_resource.h"
 #include "filters/abstract_filter.h"
 

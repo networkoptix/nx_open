@@ -6,6 +6,7 @@
 #include "decoders/video/abstractdecoder.h"
 #include "video_stream_display.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
+#include "core/datapacket/audio_data_packet.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/common/adaptive_sleep.h"
 #include "utils/media/externaltimesource.h"
@@ -14,7 +15,7 @@
 class QnAbstractRenderer;
 class QnVideoStreamDisplay;
 class QnAudioStreamDisplay;
-struct QnCompressedVideoData;
+class QnCompressedVideoData;
 class QnArchiveStreamReader;
 
 /* 

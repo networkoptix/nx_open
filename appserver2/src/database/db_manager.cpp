@@ -2413,6 +2413,10 @@ ErrorCode QnDbManager::updateVideowallMatrices(const ApiVideowallData &data) {
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::deleteVideowallPcs(const QnId &videowall_guid) {
+    return deleteTableRecord(videowall_guid, "vms_videowall_pcs", "videowall_guid");
+}
+
 ErrorCode QnDbManager::deleteVideowallItems(const QnId &videowall_guid) {
     ErrorCode err = deleteTableRecord(videowall_guid, "vms_videowall_item", "videowall_guid");
     if (err != ErrorCode::ok)
@@ -2464,6 +2468,10 @@ ErrorCode QnDbManager::removeVideowall(const QnId& guid) {
         return err;
 
     err = deleteVideowallMatrices(guid);
+    if (err != ErrorCode::ok)
+        return err;
+
+    err = deleteVideowallPcs(guid);
     if (err != ErrorCode::ok)
         return err;
 

@@ -28,7 +28,19 @@ void QnVideoWallResource::updateInner(const QnResourcePtr &other, QSet<QByteArra
 
     QnVideoWallResource* localOther = dynamic_cast<QnVideoWallResource*>(other.data());
     if(localOther) {
-        m_items->setItemsUnderLock(localOther->items());
+
+        // copy online status to the updated items
+        auto newItems = localOther->items();
+        foreach(const auto &item, m_items->getItems()) {
+            if(newItems->hasItem(item.uuid)) {
+                QnVideoWallItem newItem = newItems->getItem(item.uuid);
+                newItem.online = item.online;
+                newItems->updateItem(item.uuid, newItem);
+            }
+        }
+        m_items->setItemsUnderLock(newItems);
+
+
         m_pcs->setItemsUnderLock(localOther->pcs());
         m_matrices->setItemsUnderLock(localOther->matrices());
         if (m_autorun != localOther->m_autorun) {

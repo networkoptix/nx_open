@@ -10,7 +10,7 @@
 
 #include <utils/common/long_runnable.h>
 
-#include <core/datapacket/media_data_packet.h>
+#include <core/datapacket/audio_data_packet.h>
 #include <core/dataprovider/live_stream_provider.h>
 
 #include <ui/screen_recording/qnaudio_device_info.h>
@@ -76,8 +76,8 @@ private:
         QnAudioDeviceInfo m_audioDevice;
         //QString m_audioDeviceName;
         QnAudioFormat m_audioFormat;
-        CLThreadQueue<QnAbstractMediaDataPtr>  m_audioQueue;
-        QnAbstractMediaData m_tmpAudioBuffer;
+        CLThreadQueue<QnWritableCompressedAudioDataPtr>  m_audioQueue;
+        QnWritableCompressedAudioData m_tmpAudioBuffer;
         SpeexPreprocessState* m_speexPreprocess;
 
         int audioPacketSize();
