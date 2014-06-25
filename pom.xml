@@ -342,6 +342,7 @@
             <properties>            
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
+				<qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -399,6 +400,7 @@
             </activation>
             <properties>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
+				<qt.classifier>${platform}-${arch}-${box}</qt.classifier>
 				<compile.options></compile.options>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
                 <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->

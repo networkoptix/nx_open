@@ -282,7 +282,7 @@
 					<version>5.2.1-SNAPSHOT</version>
 					<artifactId>qt</artifactId>
 					<type>tar.gz</type>
-					<classifier>${profile.classifier}-${compile.options}</classifier>
+					<classifier>${qt.classifier}-${compile.options}</classifier>
 				</dependency>
 			</dependencies>
 		</profile>  		
