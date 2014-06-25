@@ -326,7 +326,7 @@ namespace ec2
         void commit();
         void rollback();
     private:
-        QMap<int, QnId> getGuidList(const QString& request, const QByteArray& tableName);
+        QMap<int, QnId> getGuidList(const QString& request, const QByteArray& tableName, bool isBinaryGUID = false);
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
         QnId getType(const QString& typeName);

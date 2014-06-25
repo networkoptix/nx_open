@@ -371,7 +371,7 @@ bool QnDbManager::init()
     return true;
 }
 
-QMap<int, QnId> QnDbManager::getGuidList(const QString& request, const QByteArray& tableName)
+QMap<int, QnId> QnDbManager::getGuidList(const QString& request, const QByteArray& tableName, bool isBinaryGUID)
 {
     QMap<int, QnId>  result;
     QSqlQuery query(m_sdb);
@@ -384,7 +384,9 @@ QMap<int, QnId> QnDbManager::getGuidList(const QString& request, const QByteArra
     {
         qint32 id = query.value(0).toInt();
         QVariant data = query.value(1);
-        if (data.isNull())
+        if (isBinaryGUID)
+            result.insert(id, QnId::fromRfc4122(data.toByteArray()));
+        else if (data.isNull())
             result.insert(id, intToGuid(id, tableName));
         else if (data.toString().length() <= 10 && data.toInt())
             result.insert(id, intToGuid(data.toInt(), tableName));
@@ -433,7 +435,7 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_resource", "guid", guids))
         return false;
 
-    guids = getGuidList("SELECT rt.id, rt.name || coalesce(m.name,'-') as guid from vms_resourcetype rt LEFT JOIN vms_manufacture m on m.id = rt.manufacture_id", "vms_resourcetype");
+    guids = getGuidList("SELECT rt.id, rt.name || coalesce(m.name,'-') as guid from vms_resourcetype rt LEFT JOIN vms_manufacture m on m.id = rt.manufacture_id", "vms_resource");
     if (!updateTableGuids("vms_resourcetype", "guid", guids))
         return false;
 
@@ -441,7 +443,7 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_resource", "parent_guid", guids))
         return false;
 
-    guids = getGuidList("SELECT r.id, rt.guid from vms_resource_tmp r JOIN vms_resourcetype rt on rt.id = r.xtype_id", "vms_resource");
+    guids = getGuidList("SELECT r.id, rt.guid from vms_resource_tmp r JOIN vms_resourcetype rt on rt.id = r.xtype_id", "vms_resource", true);
     if (!updateTableGuids("vms_resource", "xtype_guid", guids))
         return false;
 
