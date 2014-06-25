@@ -17,7 +17,6 @@ class QnMediaServerResource : public QnResource
 {
     Q_OBJECT
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
-    Q_PROPERTY(QString streamingUrl READ getStreamingUrl WRITE setStreamingUrl)
 
 public:
     static const QString USE_PROXY;
@@ -29,9 +28,6 @@ public:
 
     void setApiUrl(const QString& restUrl);
     QString getApiUrl() const;
-
-    void setStreamingUrl(const QString& value);
-    const QString& getStreamingUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
     const QList<QHostAddress>& getNetAddrList() const;
@@ -88,7 +84,6 @@ private:
     QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;
     QString m_primaryIf;
-    QString m_streamingUrl;
     QList<QHostAddress> m_netAddrList;
     QList<QHostAddress> m_prevNetAddrList;
     QnAbstractStorageResourceList m_storages;

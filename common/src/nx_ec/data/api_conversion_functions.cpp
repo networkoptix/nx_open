@@ -492,7 +492,6 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
     dst.apiUrl = src->getApiUrl();
     dst.flags = src->getServerFlags();
     dst.panicMode = src->getPanicMode();
-    dst.streamingUrl = src->getStreamingUrl();
     dst.version = src->getVersion().toString();
     dst.systemInfo = src->getSystemInfo().toString();
     dst.maxCameras = src->getMaxCameras();
@@ -516,7 +515,6 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
     dst->setPanicMode(static_cast<Qn::PanicMode>(src.panicMode));
-    dst->setStreamingUrl(src.streamingUrl);
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setSystemInfo(QnSystemInformation(src.systemInfo));
     dst->setMaxCameras(src.maxCameras);
