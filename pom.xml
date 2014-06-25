@@ -38,6 +38,7 @@
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
         <beta>true</beta>
+	<webkit>true</webkit>
         <box/>
 
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>

@@ -137,31 +137,6 @@ LExit:
 }
 #endif
 
-UINT __stdcall SetMoviesFolder(MSIHANDLE hInstall)
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-
-    hr = WcaInitialize(hInstall, "SetMoviesFolder");
-    ExitOnFailure(hr, "Failed to initialize");
-
-    WcaLog(LOGMSG_STANDARD, "Initialized.");
-
-    WCHAR moviesFolderPath[MAX_PATH];
-
-    if (!SHGetSpecialFolderPath(0, moviesFolderPath, CSIDL_MYVIDEO, TRUE))
-    {
-        SHGetSpecialFolderPath(0, moviesFolderPath, CSIDL_MYDOCUMENTS, FALSE);
-    }
-
-    MsiSetProperty(hInstall, L"MOVIESFOLDER", moviesFolderPath);
-
-LExit:
-    
-    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    return WcaFinalize(er);
-}
-
 UINT __stdcall CheckPorts(MSIHANDLE hInstall)
 {
     CAtlString portsString;
@@ -247,50 +222,6 @@ UINT __stdcall FindFreePorts(MSIHANDLE hInstall)
 LExit:
 
     FinishWinsock();
-    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    return WcaFinalize(er);
-}
-
-UINT __stdcall FixClientFolder(MSIHANDLE hInstall)
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-
-    hr = WcaInitialize(hInstall, "FixClientFolder");
-    ExitOnFailure(hr, "Failed to initialize");
-
-    WcaLog(LOGMSG_STANDARD, "Initialized.");
-
-    {
-        CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
-        fixPath(clientFolder);
-        MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", clientFolder);
-    }
-
-LExit:
-    
-    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    return WcaFinalize(er);
-}
-
-UINT __stdcall IsClientFolderExists(MSIHANDLE hInstall)
-{
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-
-    hr = WcaInitialize(hInstall, "IsClientFolderExists");
-    ExitOnFailure(hr, "Failed to initialize");
-
-    WcaLog(LOGMSG_STANDARD, "Initialized.");
-
-    {
-        CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
-        if (GetFileAttributes(clientFolder) == INVALID_FILE_ATTRIBUTES)
-            MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", L"");
-    }
-
-LExit:
-    
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
