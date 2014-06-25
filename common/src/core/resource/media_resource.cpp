@@ -147,3 +147,7 @@ void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&m
 QString QnMediaResource::customAspectRatioKey() {
     return lit("overrideAr");
 }
+
+QString QnMediaResource::dontRecordSecondaryStreamKey() {
+    return lit("dontRecordSecondaryStream");
+}

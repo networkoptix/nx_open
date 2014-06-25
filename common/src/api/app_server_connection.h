@@ -35,7 +35,6 @@ public:
     static QByteArray sessionKey();
     static qint64 prematureLicenseExperationDate();
     static void setPrematureLicenseExperationDate(qint64 value);
-    static int defaultMediaProxyPort();
     static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
 
@@ -44,7 +43,6 @@ public:
     static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
-    static void setDefaultMediaProxyPort(int port);
     static void setCurrentVersion(const QnSoftwareVersion &version);
     static void setPublicIp(const QString &publicIp);
 
@@ -81,7 +79,6 @@ private:
     QUuid m_videowallGuid;
     QUuid m_instanceGuid;
 
-    int m_defaultMediaProxyPort;
     QnSoftwareVersion m_currentVersion;
     QnResourceFactory *m_resourceFactory;
 };

@@ -161,6 +161,7 @@ protected:
     bool m_stopOnWriteError;
     QnStorageResourcePtr m_storage;
     int m_currentTimeZone;
+    Role m_role;
 private:
     bool m_waitEOF;
 
@@ -198,7 +199,6 @@ private:
     CodecID m_dstAudioCodec;
     CodecID m_dstVideoCodec;
     qint64 m_onscreenDateOffset;
-    Role m_role;
     Qn::Corner m_timestampCorner;
     qint64 m_serverTimeZoneMs;
 
