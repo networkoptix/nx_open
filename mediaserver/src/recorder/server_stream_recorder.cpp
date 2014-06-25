@@ -58,11 +58,20 @@ QnServerStreamRecorder::QnServerStreamRecorder(const QnResourcePtr &dev, QnServe
 
     connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64, QnConstAbstractDataPacketPtr)), qnBusinessRuleConnector, SLOT(at_motionDetected(const QnResourcePtr&, bool, qint64, QnConstAbstractDataPacketPtr)));
     connect(this, SIGNAL(storageFailure(QnResourcePtr, qint64, QnBusiness::EventReason, QnResourcePtr)), qnBusinessRuleConnector, SLOT(at_storageFailure(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QnResourcePtr&)));
+    connect(dev.data(), SIGNAL(propertyChanged(const QnResourcePtr &, const QString &)),          this, SLOT(at_camera_propertyChanged()));
+    at_camera_propertyChanged();
 }
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
 {
     stop();
+}
+
+
+void QnServerStreamRecorder::at_camera_propertyChanged()
+{
+    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
+    m_useSecondaryRecorder = (camera->getProperty(QnMediaResource::dontRecordSecondaryStreamKey()).toInt() == 0);
 }
 
 void QnServerStreamRecorder::at_recordingFinished(int status, const QString &filename) {
@@ -249,6 +258,13 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     QnScheduleTask task = currentScheduleTask();
 
     const QnSecurityCamResource* camera = static_cast<const QnSecurityCamResource*>(m_device.data());
+    QnConstMetaDataV1Ptr metaData = qSharedPointerDynamicCast<const QnMetaDataV1>(media);
+
+    if (m_role == QnResource::Role_SecondaryLiveVideo && !metaData && !m_useSecondaryRecorder)
+    {
+        close();
+        return false;
+    }
     if (task.getRecordingType() == Qn::RT_Always)
         return true;
     else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_catalog == QnServer::LowQualityCatalog || !camera->hasDualStreaming2()))
@@ -261,7 +277,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
         return false;
     }
     
-    if( dynamic_cast<const QnMetaDataV1*>(media.data()) )
+    if (metaData)
         return true;
 
     // write motion only

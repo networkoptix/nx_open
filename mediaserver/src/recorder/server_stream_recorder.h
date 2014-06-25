@@ -73,6 +73,7 @@ private:
     void keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md);
 private slots:
     void at_recordingFinished(int status, const QString &filename);
+    void at_camera_propertyChanged();
 private:
     const size_t m_maxRecordQueueSizeBytes;
     const size_t m_maxRecordQueueSizeElements;
@@ -100,6 +101,7 @@ private:
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
     bool m_diskErrorWarned;
     bool m_rebuildBlocked;
+    bool m_useSecondaryRecorder;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__
