@@ -144,6 +144,7 @@
 #include "compatibility.h"
 #include "media_server/file_connection_processor.h"
 #include "streaming/hls/hls_session_pool.h"
+#include "rest/handlers/old_client_connect_rest_handler.h"
 
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
@@ -970,6 +971,7 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/showLog", new QnLogRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
@@ -1147,7 +1149,6 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
 
-    QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectInfo->proxyPort);
     QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );

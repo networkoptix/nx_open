@@ -68,7 +68,7 @@ QnAbstractStreamDataProvider* QnServerCamera::createLiveDataProvider()
 
 // --------------------------- QnServerCameraFactory -----------------------------
 
-QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const QnResourceParams&)
+QnResourcePtr QnServerCameraFactory::createResource(const QnId &resourceTypeId, const QnResourceParams&)
 {
     QnResourcePtr resource;
 

@@ -36,7 +36,7 @@ QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
     stop();
 }
 
-QnResourcePtr QnMServerResourceDiscoveryManager::createResource(QnId resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnId &resourceTypeId, const QnResourceParams &params)
 {
     QnResourcePtr res = QnResourceDiscoveryManager::createResource( resourceTypeId, params );
     if( res )

@@ -119,7 +119,6 @@ void QnAbstractMediaData::assign(const QnAbstractMediaData* other)
 {
     dataProvider = other->dataProvider;
     timestamp = other->timestamp;
-
     dataType = other->dataType;
     compressionType = other->compressionType;
     flags = other->flags;
@@ -235,8 +234,7 @@ bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int mas
 void QnMetaDataV1::assign(const QnMetaDataV1* other)
 {
     QnAbstractMediaData::assign(other);
-    m_data.clear();
-    m_data.write(other->m_data.data(), other->m_data.size());
+    m_data = other->m_data;
     m_input = other->m_input;
     m_duration = other->m_duration;
     m_firstTimestamp = other->m_firstTimestamp;

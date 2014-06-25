@@ -666,10 +666,10 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
             QMessageBox::Yes
             );
 
-    if (button == QDialogButtonBox::Cancel)
+    if (button == QMessageBox::Cancel)
         return;
 
-    if (button == QDialogButtonBox::Yes) {
+    if (button == QMessageBox::Yes) {
         if (canClose())
             closeInstanceDelayed();
     }

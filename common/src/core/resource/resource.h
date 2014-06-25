@@ -417,37 +417,6 @@ QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource
     return toSharedPointer(resource);
 }
 
-
-struct QnResourceParams
-{
-    QnResourceParams() {}
-    QnResourceParams(const QString& url, const QString& vendor): url(url), vendor(vendor) {}
-
-    QString url;
-    QString vendor;
-};
-
-class QnResourceFactory
-{
-public:
-    virtual ~QnResourceFactory() {}
-
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams &params) = 0;
-};
-
-typedef QSharedPointer<QnResourceFactory> QnResourceFactoryPtr;
-
-
-class QnResourceProcessor
-{
-public:
-    virtual ~QnResourceProcessor() {}
-
-    virtual void processResources(const QnResourceList &resources) = 0;
-    virtual bool isBusy() const { return false; }
-};
-
-
 Q_DECLARE_METATYPE(QnResourcePtr);
 Q_DECLARE_METATYPE(QnResourceList);
 

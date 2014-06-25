@@ -54,6 +54,8 @@ public:
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
     static QString customAspectRatioKey();
+    /** Name of the resource property to disable secondary recorder */
+    static QString dontRecordSecondaryStreamKey();
 protected:
     void initMediaResource();
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);

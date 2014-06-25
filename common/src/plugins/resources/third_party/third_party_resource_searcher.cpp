@@ -42,7 +42,7 @@ ThirdPartyResourceSearcher::~ThirdPartyResourceSearcher()
 {
 }
 
-QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, const QnResourceParams& params )
+QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnId &resourceTypeId, const QnResourceParams& params )
 {
     QnThirdPartyResourcePtr result;
 

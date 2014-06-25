@@ -117,7 +117,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
     return rez;
 }
 
-QnResourcePtr QnTestCameraResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnTestCameraResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 

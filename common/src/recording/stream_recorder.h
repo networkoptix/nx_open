@@ -198,7 +198,6 @@ private:
     CodecID m_dstAudioCodec;
     CodecID m_dstVideoCodec;
     qint64 m_onscreenDateOffset;
-    Role m_role;
     Qn::Corner m_timestampCorner;
     qint64 m_serverTimeZoneMs;
 
@@ -210,6 +209,7 @@ private:
 
     /** If true method close() will emit signal recordingFinished() at the end. */
     bool m_recordingFinished;
+    Role m_role;
 };
 
 #endif // _STREAM_RECORDER_H__

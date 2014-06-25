@@ -172,7 +172,7 @@ static const int MAX_DATA_QUEUE_SIZE = 120;
 
 void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
-    QnConstAbstractDataPacketPtr data = nonConstData;
+    //QnConstAbstractDataPacketPtr data = nonConstData;
 
 //    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
 //    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
@@ -446,8 +446,8 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if (!media)
         return true;
 
-    QnConstMetaDataV1Ptr metadata = qSharedPointerDynamicCast<const QnMetaDataV1>(data);
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+    const QnMetaDataV1* metadata = dynamic_cast<const QnMetaDataV1*>(data.data());
     if (metadata == 0)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
@@ -520,7 +520,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
     }
 
-    QnRtspFfmpegEncoderPtr ffmpegEncoder = qSharedPointerDynamicCast<QnRtspFfmpegEncoder>(codecEncoder);
+    QnRtspFfmpegEncoder* ffmpegEncoder = dynamic_cast<QnRtspFfmpegEncoder*>(codecEncoder.data());
     if (ffmpegEncoder)
     {
         ffmpegEncoder->setAdditionFlags(0);

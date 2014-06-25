@@ -1,7 +1,9 @@
 #ifndef QN_SERVER_CAMERA_H
 #define QN_SERVER_CAMERA_H
 
-#include "core/resource/camera_resource.h"
+#include <core/resource/camera_resource.h>
+#include <core/resource/resource_factory.h>
+#include <core/resource/resource_processor.h>
 
 class QnServerCamera;
 typedef QnSharedResourcePointer<QnServerCamera> QnServerCameraPtr;
@@ -44,7 +46,7 @@ private:
 class QnServerCameraFactory : public QnResourceFactory
 {
 public:
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
 
     static QnServerCameraFactory& instance();
 };
