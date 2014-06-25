@@ -172,10 +172,12 @@ void QnServerUpdatesWidget::updateUi() {
             switch (m_updateTool->updateCheckResult()) {
             case QnMediaServerUpdateTool::UpdateFound:
                 if (!m_updateTool->targetVersion().isNull() && !m_minimalMode) { // null version means we've got here first time after the dialog has been showed
-                    int result = QMessageBox::question(this, tr("Update is found"),
-                                                       tr("Do you want to update your system to version %1?").arg(m_updateTool->targetVersion().toString()),
-                                                       QMessageBox::Yes | QMessageBox::No);
-                    startUpdate = (result == QMessageBox::Yes);
+                    QString message = tr("Do you want to update your system to version %1?").arg(m_updateTool->targetVersion().toString());
+                    if (m_updateTool->isClientRequiresInstaller()) {
+                        message += lit("\n");
+                        message += tr("You will have to update the client manually using an installer.");
+                    }
+                    startUpdate = QMessageBox::question(this, tr("Update is found"), message, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes;
                 }
                 break;
             case QnMediaServerUpdateTool::InternetProblem: {
@@ -205,18 +207,25 @@ void QnServerUpdatesWidget::updateUi() {
             switch (m_updateTool->updateResult()) {
             case QnMediaServerUpdateTool::UpdateSuccessful:
                 if (!m_minimalMode) {
-                    QMessageBox::information(this,
-                                             tr("Update is successfull"),
-                                             tr("Update has been successfully finished.\n"
-                                                "Client will be restarted to the updated version."));
-                    if (!applauncher::restartClient(m_updateTool->targetVersion()) == applauncher::api::ResultType::ok) {
-                        QMessageBox::critical(this,
-                                              tr("Launcher process is not found"),
-                                              tr("Cannot restart the client.\n"
-                                                 "Please close the application and start it again using the shortcut in the start menu."));
-                    } else {
-                        qApp->exit(0);
-                        applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
+                    QString message = tr("Update has been successfully finished.");
+                    message += lit("\n");
+                    if (m_updateTool->isClientRequiresInstaller())
+                        message += tr("Now you have to update the client to the newer version using an installer.");
+                    else
+                        message += tr("The client will be restarted to the updated version.");
+
+                    QMessageBox::information(this, tr("Update is successfull"), message);
+
+                    if (!m_updateTool->isClientRequiresInstaller()) {
+                        if (!applauncher::restartClient(m_updateTool->targetVersion()) == applauncher::api::ResultType::ok) {
+                            QMessageBox::critical(this,
+                                                  tr("Launcher process is not found"),
+                                                  tr("Cannot restart the client.\n"
+                                                     "Please close the application and start it again using the shortcut in the start menu."));
+                        } else {
+                            qApp->exit(0);
+                            applauncher::scheduleProcessKill(QCoreApplication::applicationPid(), processTerminateTimeout);
+                        }
                     }
                 }
                 break;

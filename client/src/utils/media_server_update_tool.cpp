@@ -683,17 +683,19 @@ void QnMediaServerUpdateTool::downloadUpdates() {
         }
     }
 
-    QString fileName = m_clientUpdateFile->fileName;
-    if (fileName.isEmpty())
-        fileName = updateFilePath(updatesDirName, m_clientUpdateFile->baseFileName);
+    if (!m_clientRequiresInstaller) {
+        QString fileName = m_clientUpdateFile->fileName;
+        if (fileName.isEmpty())
+            fileName = updateFilePath(updatesDirName, m_clientUpdateFile->baseFileName);
 
-    if (!fileName.isEmpty() && verifyFile(fileName, m_clientUpdateFile->fileSize, m_clientUpdateFile->md5)) {
-        m_clientUpdateFile->fileName = fileName;
-    } else {
-        downloadTargets.insert(m_clientUpdateFile->url, m_clientUpdateFile->baseFileName);
-        hashByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->md5);
-        fileSizeByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->fileSize);
-        peerAssociations.insert(m_clientUpdateFile->url, qnCommon->moduleGUID());
+        if (!fileName.isEmpty() && verifyFile(fileName, m_clientUpdateFile->fileSize, m_clientUpdateFile->md5)) {
+            m_clientUpdateFile->fileName = fileName;
+        } else {
+            downloadTargets.insert(m_clientUpdateFile->url, m_clientUpdateFile->baseFileName);
+            hashByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->md5);
+            fileSizeByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->fileSize);
+            peerAssociations.insert(m_clientUpdateFile->url, qnCommon->moduleGUID());
+        }
     }
 
     emit progressChanged(0);
@@ -726,6 +728,11 @@ void QnMediaServerUpdateTool::uploadUpdatesToServers() {
 }
 
 void QnMediaServerUpdateTool::installClientUpdate() {
+    if (m_clientRequiresInstaller) {
+        installIncompatiblePeers();
+        return;
+    }
+
     setState(InstallingClientUpdate);
 
     qApp->processEvents();
