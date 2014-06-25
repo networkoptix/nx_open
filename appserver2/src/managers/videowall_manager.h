@@ -40,7 +40,7 @@ namespace ec2
         }
 
         void triggerNotification(const QnTransaction<ApiVideowallInstanceStatusData>& tran) {
-            assert(tran.command == ApiCommand::updateVideowallInstanceStatus);
+            assert(tran.command == ApiCommand::videowallInstanceStatus);
             QnVideowallInstanceStatus status;
             fromApiToResource(tran.params, status);
             emit instanceStatusChanged(status);

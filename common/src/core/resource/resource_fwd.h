@@ -38,6 +38,8 @@ class QnLayoutItemData;
 // -->
 
 
+class QnResourceFactory;
+
 class QnResource;
 typedef QnSharedResourcePointer<QnResource> QnResourcePtr;
 typedef QnSharedResourcePointerList<QnResource> QnResourceList;

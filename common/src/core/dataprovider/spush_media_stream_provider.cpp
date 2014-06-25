@@ -93,7 +93,7 @@ void CLServerPushStreamReader::run()
             closeStream();
         }
 
-        QnAbstractMediaDataPtr data = getNextData();
+        const QnAbstractMediaDataPtr& data = getNextData();
 
 
         if (data==0)
@@ -167,7 +167,7 @@ void CLServerPushStreamReader::run()
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
         if (videoData)
         {
-            m_stat[videoData->channelNumber].onData(data->data.size());
+            m_stat[videoData->channelNumber].onData(data->dataSize());
             if (lp)
                 lp->onGotVideoFrame(videoData);
         }

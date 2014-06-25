@@ -65,8 +65,9 @@
     <String Id="EmptyPasswordDlg_Warning"                           Overridable="yes">Warning</String>     
 
     <!-- InstallTypeDlg -->
-    <String Id="InstallTypeDlg_QuickFull"                           Overridable="yes">Quick Full (Installing ALL Components)</String>
-    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Client Only (I want to view video recorded elsewhere)</String>
+    <String Id="InstallTypeDlg_Full"                                Overridable="yes">Full</String>
+    <String Id="InstallTypeDlg_ServerOnly"                          Overridable="yes">Server Only</String>
+    <String Id="InstallTypeDlg_ClientOnly"                          Overridable="yes">Client Only</String>
     <String Id="InstallTypeDlg_Advanced"                            Overridable="yes">Advanced</String>
     <String Id="InstallTypeDlg_SelectInstallType"                   Overridable="yes">Please select installation type</String>
     <String Id="InstallTypeDlg_InstallType"                         Overridable="yes">Installation Type</String>       
@@ -84,11 +85,13 @@
     <String Id="MediaServerDlg_Host"                                Overridable="yes">Host</String>
     <String Id="MediaServerDlg_AppserverPort"                       Overridable="yes">Port</String>
     <String Id="MediaServerDlg_Login"                               Overridable="yes">Login</String>
-    <String Id="MediaServerDlg_Password"                            Overridable="yes">Password</String>  
-    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Media Server Port</String>
-    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Enterprise Controller</String>
-    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Media Server Configuration</String>
-    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Media Server</String>  
+    <String Id="MediaServerDlg_Password"                            Overridable="yes">New Password</String>  
+    <String Id="MediaServerDlg_PasswordConfirm"                     Overridable="yes">Confirm Password</String>  
+    <String Id="MediaServerDlg_MediaserverPort"                     Overridable="yes">Server Port</String>
+    <String Id="MediaServerDlg_EnterpriseController"                Overridable="yes">Connection Settings</String>
+    <String Id="MediaServerDlg_MediaServerConfig"                   Overridable="yes">Server Configuration</String>
+    <String Id="MediaServerDlg_MediaServer"                         Overridable="yes">Server</String>  
+    <String Id="MediaServerDlg_SystemName"                          Overridable="yes">System Name</String>  
 
     <!-- MyExitDialog -->
 
@@ -105,6 +108,7 @@
     <String Id="PasswordDlg_LoginLabel"                             Overridable="yes">Login</String>
     <String Id="PasswordDlg_PasswordLabel"                          Overridable="yes">Create Password</String>
     <String Id="PasswordDlg_ConfirmPasswordLabel"                   Overridable="yes">Confirm Password</String>    
+    <String Id="PasswordDlg_SystemNameLabel"                        Overridable="yes">System Name</String>    
 
     <!-- PasswordShouldMatchDlg -->
     <String Id="PasswordShouldMatchDlg_ConfigError"                 Overridable="yes">Configuration error</String>    

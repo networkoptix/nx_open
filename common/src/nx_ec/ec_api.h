@@ -1,4 +1,3 @@
-
 #ifndef EC_API_H
 #define EC_API_H
 
@@ -24,6 +23,7 @@
 #include <nx_ec/data/api_email_data.h>
 #include <nx_ec/data/api_server_alive_data.h>
 
+#include "ec_api_fwd.h"
 
 class QnRestProcessorPool;
 class QnUniversalTcpListener;
@@ -182,7 +182,6 @@ namespace ec2
         virtual int save( const QnId& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractResourceManager> AbstractResourceManagerPtr;
 
 
     class AbstractMediaServerManager
@@ -241,7 +240,6 @@ namespace ec2
         virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) = 0;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractMediaServerManager> AbstractMediaServerManagerPtr;
 
 
     /*!
@@ -359,7 +357,7 @@ namespace ec2
         virtual int getBookmarkTags(impl::GetCameraBookmarkTagsHandlerPtr handler) = 0;
         virtual int removeBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) = 0;
     };
-    typedef std::shared_ptr<AbstractCameraManager> AbstractCameraManagerPtr;
+
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -403,7 +401,7 @@ namespace ec2
         virtual int getLicenses( impl::GetLicensesHandlerPtr handler ) = 0;
         virtual int addLicenses( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractLicenseManager> AbstractLicenseManagerPtr;
+
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -506,7 +504,7 @@ namespace ec2
         virtual int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractBusinessEventManager> AbstractBusinessEventManagerPtr;
+
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -559,7 +557,7 @@ namespace ec2
         virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) = 0;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractUserManager> AbstractUserManagerPtr;
+
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -604,7 +602,7 @@ namespace ec2
         virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) = 0;
         virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractLayoutManager> AbstractLayoutManagerPtr;
+    
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -669,7 +667,6 @@ namespace ec2
 
         virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) = 0;
     };
-    typedef std::shared_ptr<AbstractVideowallManager> AbstractVideowallManagerPtr;
 
 
     /*!
@@ -726,7 +723,7 @@ namespace ec2
         virtual int deleteStoredFile( const QString& filename, impl::SimpleHandlerPtr handler ) = 0;
         virtual int listDirectory( const QString& folderName, impl::ListDirectoryHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractStoredFileManager> AbstractStoredFileManagerPtr;
+    
 
     class AbstractUpdatesManager : public QObject {
         Q_OBJECT
@@ -763,7 +760,7 @@ namespace ec2
         virtual int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) = 0;
         virtual int installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) = 0;
     };
-    typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
+
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -892,7 +889,6 @@ namespace ec2
         virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
     };  
 
-    typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
 
     struct ResourceContext
     {

@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/audio_data_packet.h"
 #include "audio_struct.h"
 
 struct AVCodecContext;
@@ -103,8 +103,8 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
     if (!codec)
         return false;
 
-    const unsigned char* inbuf_ptr = (const unsigned char*) data->data.data();
-    int size = data->data.size();
+    const unsigned char* inbuf_ptr = (const unsigned char*) data->data();
+    int size = data->dataSize();
     unsigned char* outbuf = (unsigned char*)result.data();
 
     int outbuf_len = 0;

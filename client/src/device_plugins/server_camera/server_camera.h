@@ -1,7 +1,9 @@
 #ifndef QN_SERVER_CAMERA_H
 #define QN_SERVER_CAMERA_H
 
-#include "core/resource/camera_resource.h"
+#include <core/resource/camera_resource.h>
+#include <core/resource/resource_factory.h>
+#include <core/resource/resource_processor.h>
 
 class QnServerCamera;
 typedef QnSharedResourcePointer<QnServerCamera> QnServerCameraPtr;
@@ -24,8 +26,8 @@ public:
     virtual QString getDriverName() const override;
     virtual void setIframeDistance(int frames, int timems) override;
 
-    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
 
     //QString getUniqueIdForServer(const QnResourcePtr mServer) const;
 

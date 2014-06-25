@@ -176,7 +176,7 @@ bool QnStardotResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-QnConstResourceAudioLayoutPtr QnStardotResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnStardotResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     if (isAudioEnabled()) {
         const QnStardotStreamReader* stardotReader = dynamic_cast<const QnStardotStreamReader*>(dataProvider);

@@ -1,21 +1,23 @@
 #include "media_streamdataprovider.h"
 #include "core/resource/resource_media_layout.h"
 #include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/video_data_packet.h"
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include "../resource/camera_resource.h"
 
 static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;
 
-QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
-QnAbstractStreamDataProvider(res),
-m_numberOfchannels(0)
+QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnResourcePtr& res)
+:
+    QnAbstractStreamDataProvider(res),
+    m_numberOfchannels(0)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
     m_mediaResource = res;
     Q_ASSERT(dynamic_cast<QnMediaResource*>(m_mediaResource.data()));
     resetTimeCheck();
-    m_isCamera = qSharedPointerDynamicCast<QnPhysicalCameraResource> (res) != 0;
+    m_isCamera = dynamic_cast<const QnPhysicalCameraResource*>(res.data()) != nullptr;
     //QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
     //m_NumaberOfVideoChannels = mr->getMediaLayout()->numberOfVideoChannels();
 }
@@ -77,10 +79,10 @@ void QnAbstractMediaStreamDataProvider::afterRun()
 }
 
 
-bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
+bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketPtr& d)
 {
 
-    QnAbstractMediaDataPtr data = qSharedPointerDynamicCast<QnAbstractMediaData>(d);
+    QnAbstractMediaData* data = dynamic_cast<QnAbstractMediaData*>(d.data());
 
     if (data==0)
     {
@@ -97,7 +99,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
         return false;
     }
 
-    QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+    const QnCompressedVideoData* videoData = dynamic_cast<const QnCompressedVideoData*>(data);
 
     if (mFramesLost > 0) // we are alive again
     {
@@ -133,7 +135,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(QnAbstractDataPacketPtr d)
         data->dataProvider = this;
 
     if (videoData)
-        m_stat[videoData->channelNumber].onData(data->data.size());
+        m_stat[videoData->channelNumber].onData(data->dataSize());
 
     return true;
 
@@ -159,7 +161,7 @@ void QnAbstractMediaStreamDataProvider::resetTimeCheck()
         m_lastMediaTime[i] = AV_NOPTS_VALUE;
 }
 
-void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr media)
+void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& media)
 {
     if (m_isCamera && media && (media->dataType == QnAbstractMediaData::VIDEO || media->dataType == QnAbstractMediaData::AUDIO))
     {

@@ -4,9 +4,12 @@
 
 #include "media_stream_cache.h"
 
+#include <malloc.h>
 #include <algorithm>
 
 #include <QMutexLocker>
+
+//#define DEBUG_OUTPUT
 
 
 using namespace std;
@@ -135,10 +138,27 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 
     m_packetsByTimestamp.insert( posToInsert, MediaPacketContext( m_currentPacketTimestamp, data, isKeyFrame ) );
     if( mediaPacket )
-        m_cacheSizeInBytes += mediaPacket->data.size();
+        m_cacheSizeInBytes += mediaPacket->dataSize();
 
     if( !isKeyFrame )
         return; //no sense to perform this operation more than once per GOP
+
+#ifdef DEBUG_OUTPUT
+    std::cout<<"Media cache size "<<(m_packetsByTimestamp.empty() ? 0 : (m_packetsByTimestamp.back().timestamp - m_packetsByTimestamp.front().timestamp)) / 1000000<<" sec"
+        ", "<<m_cacheSizeInBytes<<" bytes"<<
+        ", m_packetsByTimestamp.size() = "<<m_packetsByTimestamp.size()<<
+        //", QnAbstractMediaData count "<<QnAbstractMediaData_instanceCount.load()<<
+        //", QnByteArray_bytesAllocated "<<QnByteArray_bytesAllocated.load()<<
+        std::endl;
+
+    static int malloc_statsCounter = 0;
+    ++malloc_statsCounter;
+    if( malloc_statsCounter == 10 )
+    {
+        malloc_stats();
+        malloc_statsCounter = 0;
+    }
+#endif
 
     for( auto eventReceiver: m_eventReceivers )
         eventReceiver.second( m_currentPacketTimestamp );
@@ -175,7 +195,7 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
         {
             const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(it->packet.data());
             if( mediaPacket )
-                m_cacheSizeInBytes -= mediaPacket->data.size();
+                m_cacheSizeInBytes -= mediaPacket->dataSize();
         }
         m_packetsByTimestamp.erase( m_packetsByTimestamp.begin(), lastItToRemove );
     }

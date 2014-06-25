@@ -416,7 +416,7 @@ void QnLiveStreamProvider::extractCodedPictureResolution( const QnCompressedVide
         case CODEC_ID_MJPEG:
         {
             nx_jpg::ImageInfo imgInfo;
-            if( !nx_jpg::readJpegImageInfo( (const quint8*)videoData->data.constData(), videoData->data.size(), &imgInfo ) )
+            if( !nx_jpg::readJpegImageInfo( (const quint8*)videoData->data(), videoData->dataSize(), &imgInfo ) )
                 return;
             *newResolution = QSize( imgInfo.width, imgInfo.height );
             break;

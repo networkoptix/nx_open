@@ -1,7 +1,5 @@
 #include "transaction_message_bus.h"
 
-#include <boost/bind.hpp>
-
 #include "remote_ec_connection.h"
 #include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
@@ -45,7 +43,7 @@ struct SendTransactionToTransportFuction {
 };
 
 template<class T, class Function>
-bool handleTransactionParams(QnInputBinaryStream<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction, const Function &function) 
+bool handleTransactionParams(QnInputBinaryStream<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction, Function function) 
 {
     QnTransaction<T> transaction(abstractTransaction);
     if (!QnBinary::deserialize(stream, &transaction.params)) 
@@ -88,7 +86,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::saveVideowall:         return handleTransactionParams<ApiVideowallData>        (&stream, transaction, function);
     case ApiCommand::removeVideowall:       return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
     case ApiCommand::videowallControl:      return handleTransactionParams<ApiVideowallControlMessageData>(&stream, transaction, function);
-    case ApiCommand::updateVideowallInstanceStatus:  
+    case ApiCommand::videowallInstanceStatus:  
                                             return handleTransactionParams<ApiVideowallInstanceStatusData>(&stream, transaction, function);
     case ApiCommand::addStoredFile:
     case ApiCommand::updateStoredFile:      return handleTransactionParams<ApiStoredFileData>       (&stream, transaction, function);
@@ -200,7 +198,8 @@ void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran
     if (!sender || sender->getState() != QnTransactionTransport::ReadyForStreaming)
         return;
 
-    if(!handleTransaction(serializedTran, boost::bind(GotTransactionFuction(), this, _1, sender, transportHeader)))
+    using namespace std::placeholders;
+    if(!handleTransaction(serializedTran, std::bind(GotTransactionFuction(), this, _1, sender, transportHeader)))
         sender->setState(QnTransactionTransport::Error);
 }
 
@@ -333,8 +332,9 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
         sender->sendTransaction(tran, processedPeers);
 
         QnTransactionTransportHeader transportHeader(processedPeers);
+        using namespace std::placeholders;
         foreach(const QByteArray& serializedTran, serializedTransactions)
-            if(!handleTransaction(serializedTran, boost::bind(SendTransactionToTransportFuction(), this, _1, sender, transportHeader)))
+            if(!handleTransaction(serializedTran, std::bind(SendTransactionToTransportFuction(), this, _1, sender, transportHeader)))
                 sender->setState(QnTransactionTransport::Error);
         return;
     }
@@ -395,7 +395,7 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const QnPeerInfo &peer, boo
 }
 
 void QnTransactionMessageBus::sendVideowallInstanceStatus(const QnPeerInfo &peer, bool isAlive) {
-    QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::updateVideowallInstanceStatus, false);
+    QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::videowallInstanceStatus, false);
     tran.params.online = isAlive;
     tran.params.instanceGuid = peer.params["instanceGuid"];
     tran.params.videowallGuid = peer.params["videowallGuid"];
@@ -570,6 +570,23 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
 
         transport->setWriteSync(true);
         transport->sendTransaction(tran, QnPeerSet() << remotePeer.id << m_localPeer.id);
+
+        if (remotePeer.peerType == QnPeerInfo::DesktopClient) {
+            foreach(QnTransactionTransportPtr connected, m_connections.values()) {
+                if (!connected)
+                    continue;
+                QnPeerInfo peer = connected->remotePeer();
+                if (peer.peerType != QnPeerInfo::VideowallClient)
+                    continue;
+                
+                QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::videowallInstanceStatus, false);
+                tran.params.online = true;
+                tran.params.instanceGuid = peer.params["instanceGuid"];
+                tran.params.videowallGuid = peer.params["videowallGuid"];
+                transport->sendTransaction(tran, QnPeerSet() << remotePeer.id << m_localPeer.id);        
+            }
+        }
+
         transport->setReadSync(true);
     } else if (remotePeer.peerType == QnPeerInfo::AndroidClient) {
         /** Request all data to be sent to the client peers on the connect. */
@@ -697,6 +714,14 @@ void QnTransactionMessageBus::setLocalPeer(const QnPeerInfo localPeer) {
 
 ec2::QnPeerInfo QnTransactionMessageBus::localPeer() const {
     return m_localPeer;
+}
+
+void QnTransactionMessageBus::sendTransaction(const QnTransaction<ec2::ApiVideowallControlMessageData>& tran, const QnPeerSet& dstPeers /*= QnPeerSet()*/)
+{
+    //TODO: #GDM #VW fill dstPeers based on m_alivePeers info
+    Q_ASSERT(tran.command == ApiCommand::videowallControl);
+    QMutexLocker lock(&m_mutex);
+    sendTransactionInternal(tran, QnTransactionTransportHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers));
 }
 
 }

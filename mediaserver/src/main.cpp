@@ -62,6 +62,7 @@
 #include <plugins/resources/axis/axis_resource_searcher.h>
 #include <plugins/resources/desktop_camera/desktop_camera_registrator.h>
 #include <plugins/resources/desktop_camera/desktop_camera_resource_searcher.h>
+#include <plugins/resources/desktop_camera/desktop_camera_deleter.h>
 #include <plugins/resources/d-link/dlink_resource_searcher.h>
 #include <plugins/resources/droid/droid_resource_searcher.h>
 #include <plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h>
@@ -1102,7 +1103,6 @@ void QnMain::run()
     QnResourceDiscoveryManager::init( mserverResourceDiscoveryManager.get() );
     initAppServerConnection(*settings);
 
-    qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("123")).toString());
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
     QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool());
@@ -1116,6 +1116,7 @@ void QnMain::run()
     connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageManager_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
     connect(QnStorageManager::instance(), SIGNAL(rebuildFinished()), this, SLOT(at_storageManager_rebuildFinished()));
 
+    qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("123")).toString());
     qnCommon->setModuleGUID(serverGuid());
     qnCommon->setLocalSystemName(settings->value("systemName").toString());
 
@@ -1196,7 +1197,8 @@ void QnMain::run()
     nx_hls::HLSSessionPool hlsSessionPool;
 
     initTcpListener();
-    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(messageProcessor.data(), QnServerMessageProcessor::isProxy);
+    using namespace std::placeholders;
+    m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>( std::bind( &QnServerMessageProcessor::isProxy, messageProcessor.data(), _1 ) );
 
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
@@ -1351,6 +1353,7 @@ void QnMain::run()
 #ifdef ENABLE_DESKTOP_CAMERA
     QnDesktopCameraResourceSearcher desktopCameraResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&desktopCameraResourceSearcher);
+    QnDesktopCameraDeleter autoDeleter;
 #endif  //ENABLE_DESKTOP_CAMERA
 
 #ifndef EDGE_SERVER

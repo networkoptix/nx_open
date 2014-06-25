@@ -20,6 +20,19 @@ namespace ec2
         {
             switch( val )
             {
+                case tranSyncRequest:
+                    return "tranSyncRequest";
+                case tranSyncResponse:
+                    return "tranSyncResponse";
+                case lockRequest:
+                    return "lockRequest";
+                case lockResponse:
+                    return "lockResponse";
+                case unlockRequest:
+                    return "unlockRequest";
+                case peerAliveInfo:
+                    return "peerAliveInfo";
+
                 case testConnection:
                     return "testConnection";
                 case connect:
@@ -27,8 +40,6 @@ namespace ec2
 
                 case getResourceTypes:
                     return "getResourceTypes";
-                case getResource:
-                    return "getResource";
                 case setResourceStatus:
                     return "setResourceStatus";
                 //case setResourceDisabled:
@@ -45,6 +56,7 @@ namespace ec2
                     return "setPanicMode";
                 case getFullInfo:
                     return "getFullInfo";
+
                 case saveCamera:
                     return "saveCamera";
                 case saveCameras:
@@ -102,8 +114,8 @@ namespace ec2
                     return "removeVideowall";
                 case videowallControl:
                     return "videowallControl";
-                case updateVideowallInstanceStatus:
-                    return "updateVideowallInstanceStatus";
+                case videowallInstanceStatus:
+                    return "videowallInstanceStatus";
 
                 case listDirectory:
                     return "listDirectory";
@@ -126,24 +138,10 @@ namespace ec2
                 case getCurrentTime:
                     return "getCurrentTime";
 
-                case tranSyncRequest:
-                    return "tranSyncRequest";
-                case tranSyncResponse:
-                    return "tranSyncResponse";
-                case peerAliveInfo:
-                    return "peerAliveInfo";
-
                 case getSettings:
                     return "getSettings";
                 case saveSettings:
                     return "saveSettings";
-
-                case lockRequest:
-                    return "lockRequest";
-                case lockResponse:
-                    return "lockResponse";
-                case unlockRequest:
-                    return "unlockRequest";
 
                 case uploadUpdate:
                     return "uploadUpdate";

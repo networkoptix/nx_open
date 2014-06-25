@@ -1,14 +1,18 @@
 #ifdef ENABLE_ARECONT
 
-#include "av_client_pull.h"
 #include "cpul_tftp_dataprovider.h"
+
+#include <QtCore/QMutex>
+
+#include "av_client_pull.h"
 #include "../resource/av_resource.h"
 #include "../tools/simple_tftp_client.h"
 #include "../tools/AVJpegHeader.h"
-#include <QtCore/QMutex>
+#include "core/datapacket/video_data_packet.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
+
 
 //======================================================
 
@@ -68,7 +72,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 {
     if (needMetaData())
     {
-        QnAbstractMediaDataPtr metadata = getMetaData();
+        const QnAbstractMediaDataPtr& metadata = getMetaData();
         if (metadata)
             return metadata;
     }
@@ -385,9 +389,9 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     }
 
 
-    QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,m_videoFrameBuff.size()));
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT,m_videoFrameBuff.size()));
 
-    QnByteArray& imgToSend = videoData->data;
+    QnByteArray& imgToSend = videoData->m_data;
     imgToSend.write(m_videoFrameBuff);
     
 

@@ -1,4 +1,7 @@
+
 #include "ffmpeg_video_transcoder.h"
+
+#include "core/datapacket/video_data_packet.h"
 #include "decoders/video/ffmpeg.h"
 
 extern "C" {
@@ -274,11 +277,12 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         {
             return -3;
         }
-        *result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded));
-        (*result)->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
+        QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, encoded);
+        resultVideoData->timestamp = av_rescale_q(m_encoderCtx->coded_frame->pts, m_encoderCtx->time_base, r);
         if(m_encoderCtx->coded_frame->key_frame)
-            (*result)->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-        (*result)->data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
+            resultVideoData->flags |= QnAbstractMediaData::MediaFlags_AVKey;
+        resultVideoData->m_data.write((const char*) m_videoEncodingBuffer, encoded); // todo: remove data copy here!
+        *result = QnCompressedVideoDataPtr(resultVideoData);
         return 0;
     }
     else {

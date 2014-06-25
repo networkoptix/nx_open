@@ -210,7 +210,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
         return m_rootNodes[Qn::ServersNode];
 
     if (node->resourceFlags() & QnResource::videowall)
-        return m_rootNodes[m_rootNodeType];
+        return m_rootNodes[Qn::RootNode];
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
     if(!parentResource || (parentResource->flags() & QnResource::local_server) == QnResource::local_server) {

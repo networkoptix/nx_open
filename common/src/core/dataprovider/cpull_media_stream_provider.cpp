@@ -1,6 +1,9 @@
+
 #include "utils/common/sleep.h"
 #include "cpull_media_stream_provider.h"
+#include "core/datapacket/video_data_packet.h"
 #include "../resource/camera_resource.h"
+
 
 QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(QnResourcePtr dev ):
     QnLiveStreamProvider(dev),
@@ -51,7 +54,7 @@ void QnClientPullMediaStreamProvider::run()
             continue;
         }
 
-        QnAbstractMediaDataPtr data = getNextData();
+        const QnAbstractMediaDataPtr& data = getNextData();
 
         if (data==0)
         {
@@ -138,7 +141,7 @@ void QnClientPullMediaStreamProvider::run()
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
         if (videoData)
         {
-            m_stat[videoData->channelNumber].onData(videoData->data.size());
+            m_stat[videoData->channelNumber].onData(videoData->dataSize());
             if (lp)
                 lp->onGotVideoFrame(videoData);
         }

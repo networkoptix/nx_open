@@ -4,6 +4,7 @@
 #include <QtCore/QString>
 #include <QtCore/QSet>
 #include <QtCore/QByteArray>
+#include <QtCore/QTime>
 
 #include "core/resource_management/resource_searcher.h"
 #include "utils/common/long_runnable.h"

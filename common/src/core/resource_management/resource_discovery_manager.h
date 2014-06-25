@@ -14,6 +14,8 @@
 #include <api/model/manual_camera_seach_reply.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_factory.h>
+#include <core/resource/resource_processor.h>
 
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
