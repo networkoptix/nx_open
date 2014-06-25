@@ -91,7 +91,9 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     m_downloadUpdatesPeerTask(new QnDownloadUpdatesPeerTask(this)),
     m_uploadUpdatesPeerTask(new QnUploadUpdatesPeerTask(this)),
     m_installUpdatesPeerTask(new QnInstallUpdatesPeerTask(this)),
-    m_restUpdatePeerTask(new QnRestUpdatePeerTask(this))
+    m_restUpdatePeerTask(new QnRestUpdatePeerTask(this)),
+    m_clientRequiresInstaller(false),
+    m_disableClientUpdates(false)
 {
     connect(m_downloadUpdatesPeerTask,                  &QnNetworkPeerTask::finished,                   this,   &QnMediaServerUpdateTool::at_downloadTask_finished);
     connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::finished,                   this,   &QnMediaServerUpdateTool::at_uploadTask_finished);
@@ -105,6 +107,10 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::progressChanged,            this,   &QnMediaServerUpdateTool::progressChanged);
     connect(m_downloadUpdatesPeerTask,                  &QnNetworkPeerTask::peerProgressChanged,        this,   &QnMediaServerUpdateTool::at_networkTask_peerProgressChanged);
     connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::peerProgressChanged,        this,   &QnMediaServerUpdateTool::at_networkTask_peerProgressChanged);
+
+#ifdef Q_OS_MACX
+    m_disableClientUpdates = true;
+#endif
 }
 
 QnMediaServerUpdateTool::State QnMediaServerUpdateTool::state() const {
@@ -427,6 +433,14 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
             return;
         }
 
+        if (isClient) {
+            if (m_disableClientUpdates)
+                continue;
+
+            if (sysInfo != QnSystemInformation(lit(QN_APPLICATION_PLATFORM), lit(QN_APPLICATION_ARCH), lit(QN_ARM_BOX)))
+                continue;
+        }
+
         UpdateFileInformationPtr updateFileInformation(new UpdateFileInformation(version, fileName));
         QFile file(fileName);
         updateFileInformation->fileSize = file.size();
@@ -474,7 +488,7 @@ void QnMediaServerUpdateTool::checkUpdateCoverage() {
             needUpdate = true;
     }
 
-    if (!m_clientUpdateFile) {
+    if (!m_disableClientUpdates && !m_clientRequiresInstaller && !m_clientUpdateFile) {
         removeTemporaryDir();
         setCheckResult(UpdateImpossible);
         return;
@@ -564,23 +578,27 @@ void QnMediaServerUpdateTool::at_buildReply_finished() {
         }
     }
 
-    packages = map.value(lit("clientPackages")).toMap();
-    QString arch = lit(QN_APPLICATION_ARCH);
-    QString modification = lit(QN_ARM_BOX);
-    if (!modification.isEmpty())
-        arch += lit("_") + modification;
-    QVariantMap package = packages.value(lit(QN_APPLICATION_PLATFORM)).toMap().value(arch).toMap();
+    if (!m_disableClientUpdates) {
+        packages = map.value(lit("clientPackages")).toMap();
+        QString arch = lit(QN_APPLICATION_ARCH);
+        QString modification = lit(QN_ARM_BOX);
+        if (!modification.isEmpty())
+            arch += lit("_") + modification;
+        QVariantMap package = packages.value(lit(QN_APPLICATION_PLATFORM)).toMap().value(arch).toMap();
 
-    if (!package.isEmpty()) {
-        QString fileName = package.value(lit("file")).toString();
-        m_clientUpdateFile.reset(new UpdateFileInformation(m_targetVersion, QUrl(urlPrefix + fileName)));
-        m_clientUpdateFile->baseFileName = fileName;
-        m_clientUpdateFile->fileSize = package.value(lit("size")).toLongLong();
-        m_clientUpdateFile->md5 = package.value(lit("md5")).toString();
+        if (!package.isEmpty()) {
+            QString fileName = package.value(lit("file")).toString();
+            m_clientUpdateFile.reset(new UpdateFileInformation(m_targetVersion, QUrl(urlPrefix + fileName)));
+            m_clientUpdateFile->baseFileName = fileName;
+            m_clientUpdateFile->fileSize = package.value(lit("size")).toLongLong();
+            m_clientUpdateFile->md5 = package.value(lit("md5")).toString();
+        }
+
+        QnSoftwareVersion minimalVersionToUpdate(map.value(lit("minimalClientVersion")).toString());
+        m_clientRequiresInstaller = !minimalVersionToUpdate.isNull() && minimalVersionToUpdate > maximumAvailableVersion();
+    } else {
+        m_clientRequiresInstaller = true;
     }
-
-    QnSoftwareVersion minimalVersionToUpdate(map.value(lit("minimalClientVersion")).toString());
-    m_clientRequiresInstaller = !minimalVersionToUpdate.isNull() && minimalVersionToUpdate > maximumAvailableVersion();
 
     checkUpdateCoverage();
 }
@@ -728,7 +746,7 @@ void QnMediaServerUpdateTool::uploadUpdatesToServers() {
 }
 
 void QnMediaServerUpdateTool::installClientUpdate() {
-    if (m_clientRequiresInstaller) {
+    if (m_clientRequiresInstaller || m_disableClientUpdates || m_clientUpdateFile->version == qnCommon->engineVersion()) {
         installIncompatiblePeers();
         return;
     }

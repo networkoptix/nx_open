@@ -212,6 +212,7 @@ private:
     QSet<QnId> m_targetPeerIds;
 
     bool m_clientRequiresInstaller;
+    bool m_disableClientUpdates;
 };
 
 #endif // QN_MEDIA_SERVER_UPDATE_TOOL_H
