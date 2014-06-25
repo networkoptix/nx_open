@@ -5,14 +5,12 @@ class Context;
 
 class ContextAware {
 public:
-    ContextAware(QObject *parent);
+    ContextAware(QObject *parent = NULL);
 
-    Context *context() const {
-        return m_context;
-    }
+    Context *context() const;
 
 private:
-    Context *m_context;
+    mutable Context *m_context;
 };
 
 #endif // CONTEXT_AWARE_H
