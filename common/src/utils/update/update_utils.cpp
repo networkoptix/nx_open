@@ -30,7 +30,8 @@ bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *versio
     if (locVersion.isNull())
         return false;
 
-    if (!info.contains(lit("executable")))
+    bool client = info.value(lit("client")).toBool();
+    if (!client && !info.contains(lit("executable")))
         return false;
 
     if (version)
@@ -38,7 +39,7 @@ bool verifyUpdatePackageInternal(QuaZipFile *infoFile, QnSoftwareVersion *versio
     if (sysInfo)
         *sysInfo = locSysInfo;
     if (isClient)
-        *isClient = info.value(lit("client")).toBool();
+        *isClient = client;
 
     return true;
 }
