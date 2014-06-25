@@ -113,7 +113,7 @@ public:
     PeerUpdateInformation updateInformation(const QnId &peerId) const;
 
     QnMediaServerResourceList targets() const;
-    void setTargets(const QSet<QnId> &targets);
+    void setTargets(const QSet<QnId> &targets, bool client = false);
 
     QnMediaServerResourceList actualTargets() const;
 

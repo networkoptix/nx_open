@@ -31,6 +31,12 @@ const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
 const QString mutexName = lit("auto_update");
 const QString updateInformationFileName = (lit("update.json"));
 
+#ifdef Q_OS_MACX
+const bool defaultDisableClientUpdates = true;
+#else
+const bool defaultDisableClientUpdates = false;
+#endif
+
 bool verifyFile(const QString &fileName, qint64 size, const QString &md5) {
     QFile file(fileName);
 
@@ -93,7 +99,7 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     m_installUpdatesPeerTask(new QnInstallUpdatesPeerTask(this)),
     m_restUpdatePeerTask(new QnRestUpdatePeerTask(this)),
     m_clientRequiresInstaller(false),
-    m_disableClientUpdates(false)
+    m_disableClientUpdates(defaultDisableClientUpdates)
 {
     connect(m_downloadUpdatesPeerTask,                  &QnNetworkPeerTask::finished,                   this,   &QnMediaServerUpdateTool::at_downloadTask_finished);
     connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::finished,                   this,   &QnMediaServerUpdateTool::at_uploadTask_finished);
@@ -107,10 +113,6 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::progressChanged,            this,   &QnMediaServerUpdateTool::progressChanged);
     connect(m_downloadUpdatesPeerTask,                  &QnNetworkPeerTask::peerProgressChanged,        this,   &QnMediaServerUpdateTool::at_networkTask_peerProgressChanged);
     connect(m_uploadUpdatesPeerTask,                    &QnNetworkPeerTask::peerProgressChanged,        this,   &QnMediaServerUpdateTool::at_networkTask_peerProgressChanged);
-
-#ifdef Q_OS_MACX
-    m_disableClientUpdates = true;
-#endif
 }
 
 QnMediaServerUpdateTool::State QnMediaServerUpdateTool::state() const {
@@ -247,7 +249,7 @@ QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {
     return m_targets;
 }
 
-void QnMediaServerUpdateTool::setTargets(const QSet<QnId> &targets) {
+void QnMediaServerUpdateTool::setTargets(const QSet<QnId> &targets, bool client) {
     m_targets.clear();
 
     foreach (const QnId &id, targets) {
@@ -256,6 +258,8 @@ void QnMediaServerUpdateTool::setTargets(const QSet<QnId> &targets) {
             continue;
         m_targets.append(server);
     }
+
+    m_disableClientUpdates = !client;
 }
 
 QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
@@ -318,6 +322,7 @@ void QnMediaServerUpdateTool::reset() {
     m_clientUpdateFile.clear();
     m_targetVersion = QnSoftwareVersion();
     m_clientRequiresInstaller = false;
+    m_disableClientUpdates = defaultDisableClientUpdates;
 }
 
 bool QnMediaServerUpdateTool::isClientRequiresInstaller() const {
@@ -488,10 +493,15 @@ void QnMediaServerUpdateTool::checkUpdateCoverage() {
             needUpdate = true;
     }
 
-    if (!m_disableClientUpdates && !m_clientRequiresInstaller && !m_clientUpdateFile) {
-        removeTemporaryDir();
-        setCheckResult(UpdateImpossible);
-        return;
+    if (!m_disableClientUpdates && !m_clientRequiresInstaller) {
+        if (!m_clientUpdateFile) {
+            removeTemporaryDir();
+            setCheckResult(UpdateImpossible);
+            return;
+        }
+
+        if ((m_targetMustBeNewer && m_clientUpdateFile->version > qnCommon->engineVersion()) || (!m_targetMustBeNewer && m_clientUpdateFile->version != qnCommon->engineVersion()))
+            needUpdate = true;
     }
 
     setCheckResult(needUpdate ? UpdateFound : NoNewerVersion);
