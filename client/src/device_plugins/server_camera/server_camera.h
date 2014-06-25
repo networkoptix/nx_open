@@ -2,22 +2,15 @@
 #define QN_SERVER_CAMERA_H
 
 #include <core/resource/camera_resource.h>
-#include <core/resource/resource_factory.h>
-#include <core/resource/resource_processor.h>
 
 class QnServerCamera;
 typedef QnSharedResourcePointer<QnServerCamera> QnServerCameraPtr;
+typedef QList<QnServerCameraPtr> QnServerCameraList;
 
-class QnLocalFileProcessor : public QObject, public QnResourceProcessor
-{
-    Q_OBJECT
-public:
-    virtual void processResources(const QnResourceList &resources) override;
-};
 
-class QnServerCamera: public QnVirtualCameraResource
-{
+class QnServerCamera: public QnVirtualCameraResource {
     Q_OBJECT
+
 public:
     QnServerCamera(const QnId& resourceTypeId);
 
@@ -29,29 +22,16 @@ public:
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
 
-    //QString getUniqueIdForServer(const QnResourcePtr mServer) const;
-
     virtual Status getStatus() const override;
 
     void setTmpStatus(Status value);
+
 protected:
     virtual QnAbstractStreamDataProvider *createLiveDataProvider() override;
+
 private:
     Status m_tmpStatus;
-
-private:
     QnServerCameraPtr m_activeCamera;
 };
-
-class QnServerCameraFactory : public QnResourceFactory
-{
-public:
-    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
-
-    static QnServerCameraFactory& instance();
-};
-
-typedef QnSharedResourcePointer<QnServerCamera> QnServerCameraPtr;
-typedef QList<QnServerCameraPtr> QnServerCameraList;
 
 #endif // QN_SERVER_CAMERA_H
