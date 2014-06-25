@@ -35,15 +35,30 @@ public:
 
     void setCacheSize( size_t maxUnusedMemoryToCache );
 
+    struct BufferContext
+    {
+        size_t size;
+        void* ptr;
+        size_t timestamp;
+
+        BufferContext( size_t _size = 0, void* _ptr = nullptr, size_t _timestamp = 0 )
+        :
+            size( _size ),
+            ptr( _ptr ),
+            timestamp( _timestamp )
+        {
+        }
+    };
+
 private:
     size_t m_maxUnusedMemoryToCache;
     const size_t m_maxBufferSizeExcessPercent;
     const size_t m_bufferAllocationExcessPercent;
     std::mutex m_mutex;
     //!map<size, ptr>. storing only unused buffers here
-    std::deque<std::pair<size_t, void*> > m_freeBuffers;
-    //std::deque<BlockContext> m_allocatedBlocks;
+    std::deque<BufferContext> m_freeBuffers;
     size_t m_totalCacheSize;
+    size_t m_prevTimestamp;
 
     void cleanCacheIfNeeded();
 };

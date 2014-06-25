@@ -9,8 +9,22 @@
 
 //#define DEBUG_OUTPUT
 
+//TODO #ak overall optimization of this class is required: 
+    // - const complexity of erase
+    // - binary complexity of search/add
+    // - elements should be iteratable by timestamp growth
 
 static const size_t MAX_PERCENT = 100;
+
+static bool cmp_lb( const NxBufferCache::BufferContext& buf, size_t size )
+{
+    return buf.size < size;
+}
+
+static bool cmp_ub( size_t size, const NxBufferCache::BufferContext& buf )
+{
+    return size < buf.size;
+}
 
 NxBufferCache::NxBufferCache(
     size_t maxUnusedMemoryToCache,
@@ -20,14 +34,15 @@ NxBufferCache::NxBufferCache(
     m_maxUnusedMemoryToCache( maxUnusedMemoryToCache ),
     m_maxBufferSizeExcessPercent( maxBufferSizeExcessPercent ),
     m_bufferAllocationExcessPercent( bufferAllocationExcessPercent ),
-    m_totalCacheSize( 0 )
+    m_totalCacheSize( 0 ),
+    m_prevTimestamp( 0 )
 {
 }
 
 NxBufferCache::~NxBufferCache()
 {
     for( auto val: m_freeBuffers )
-        ::free( static_cast<char*>(val.second) - sizeof(size_t) );
+        ::free( static_cast<char*>(val.ptr) - sizeof(size_t) );
     m_freeBuffers.clear();
 }
 
@@ -36,16 +51,16 @@ void* NxBufferCache::getBuffer( size_t size )
     std::unique_lock<std::mutex> lk( m_mutex );
 
     //looking for an already allocated buffer suitable for request
-    auto it = std::lower_bound( m_freeBuffers.begin(), m_freeBuffers.end(), std::pair<size_t, void*>(size, nullptr) );
+    auto it = std::lower_bound( m_freeBuffers.begin(), m_freeBuffers.end(), size, cmp_lb );
     if( (it != m_freeBuffers.end()) &&
-        (it->first < (size + (size / MAX_PERCENT) * m_maxBufferSizeExcessPercent)) )
+        (it->size < (size + (size / MAX_PERCENT) * m_maxBufferSizeExcessPercent)) )
     {
         //found it
-        assert( it->first >= size );
-        void* ptr = it->second;
-        m_totalCacheSize -= it->first;
+        assert( it->size >= size );
+        void* ptr = it->ptr;
+        m_totalCacheSize -= it->size;
 #ifdef DEBUG_OUTPUT
-        std::cout<<"NxBufferCache. Cache hit! Returning "<<it->first<<" buffer ("<<size<<" bytes requested). "
+        std::cout<<"NxBufferCache. Cache hit! Returning "<<it->size<<" buffer ("<<size<<" bytes requested). "
             "totalCacheSize "<<m_totalCacheSize<<" ("<<m_freeBuffers.size()<<")"<<std::endl;
 #endif
         m_freeBuffers.erase( it );  //TODO #ak const erase complexity desired
@@ -79,8 +94,8 @@ void NxBufferCache::release( void* ptr )
     memcpy( &size, static_cast<char*>(ptr) - sizeof(size), sizeof(size) );
     std::unique_lock<std::mutex> lk( m_mutex );
     cleanCacheIfNeeded();
-    std::pair<size_t, void*> newElem(size, ptr);
-    auto it = std::upper_bound( m_freeBuffers.begin(), m_freeBuffers.end(), newElem );
+    BufferContext newElem( size, ptr, ++m_prevTimestamp );
+    auto it = std::upper_bound( m_freeBuffers.begin(), m_freeBuffers.end(), size, cmp_ub );
     m_freeBuffers.emplace( it, newElem );
     m_totalCacheSize += size;
 }
@@ -98,12 +113,16 @@ void NxBufferCache::cleanCacheIfNeeded()
 {
     while( m_totalCacheSize > m_maxUnusedMemoryToCache )
     {
-        //erasing largest buffer first
-        //TODO #ak should erases oldest buffer first, not largest!
         assert( !m_freeBuffers.empty() );
-        const auto& it = m_freeBuffers.rbegin();
-        m_totalCacheSize -= it->first;
-        ::free( static_cast<char*>(it->second) - sizeof(size_t) );
-        m_freeBuffers.erase( std::prev(it.base()) );
+
+        //erasing oldest buffer first
+        auto oldestElemIter = std::min_element(
+            m_freeBuffers.begin(),
+            m_freeBuffers.end(),
+            []( const BufferContext& one, const BufferContext& two ){ return one.timestamp < two.timestamp; } );
+
+        m_totalCacheSize -= oldestElemIter->size;
+        ::free( static_cast<char*>(oldestElemIter->ptr) - sizeof(size_t) );
+        m_freeBuffers.erase( oldestElemIter );
     }
 }
