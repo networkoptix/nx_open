@@ -213,7 +213,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         ui->analogGroupBox->setVisible(false);
     } else {
         /* Aggregate camera parameters first. */
-
+        ui->cameraScheduleWidget->beginUpdate();
         ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
 
         QSet<QString> logins, passwords;
@@ -337,7 +337,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
     }
 
     ui->cameraScheduleWidget->setCameras(m_cameras);
-
+    ui->cameraScheduleWidget->endUpdate();
     updateLicenseText();
 
     setHasDbChanges(false);
