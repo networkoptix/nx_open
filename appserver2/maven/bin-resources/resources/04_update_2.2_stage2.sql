@@ -43,3 +43,5 @@ DROP TABLE vms_license;
 ALTER TABLE "vms_license_tmp" RENAME TO "vms_license";
 
 CREATE TABLE misc_data (key VARCHAR(64), data BLOB(128));
+
+drop table vms_setting;
