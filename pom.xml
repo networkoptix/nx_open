@@ -360,6 +360,7 @@
                 <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
             </properties>
             <modules>
                 <module>macsetup/client-dmg</module>
