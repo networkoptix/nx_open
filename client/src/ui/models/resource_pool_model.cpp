@@ -56,7 +56,6 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, QObject *par
     base_type(parent), 
     QnWorkbenchContextAware(parent),
     m_urlsShown(true),
-    m_layoutIsShown(true),
     m_rootNodeType(rootNodeType)
 {
     m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::RootNode << Qn::BastardNode;
@@ -84,6 +83,7 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, QObject *par
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
     foreach(const QnResourcePtr &resource, resources)
         at_resPool_resourceAdded(resource);
+
 }
 
 QnResourcePoolModel::~QnResourcePoolModel() {
@@ -283,12 +283,6 @@ int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
     if (parent.column() > Qn::NameColumn)
         return 0;
     QnResourcePoolModelNode* n = node(parent);
-    if( !m_layoutIsShown ) {
-        // If we don't allow to show the layout of root node so
-        // we will return count as zero when the node is not m_rootNodeType
-        if( n->type() != m_rootNodeType ) 
-            return 0;
-    }
     return n->children().size();
 }
 
@@ -634,5 +628,22 @@ void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResource
         recorder->m_name = camera->getGroupName();
         recorder->m_displayName = camera->getGroupName();
         recorder->changeInternal();
+    }
+}
+
+void QnResourcePoolModel::setToFlatMode( bool flat ) {
+    QnResourcePoolModelNode* root_node = m_rootNodes[m_rootNodeType];
+    Q_ASSERT(root_node);
+
+    // The root_node here is root of the tree, what we really need to hide
+    // is the root of the tree's grand children.If we hide the children of
+    // that tree root, we gonna end up with nothing to show here. 
+
+    foreach(QnResourcePoolModelNode* child,root_node->children()) {
+        if( child != NULL ) {
+            foreach(QnResourcePoolModelNode* grand_child,child->children() ) {
+                grand_child->setBastard(flat);
+            }
+        }
     }
 }

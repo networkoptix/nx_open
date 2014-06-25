@@ -197,7 +197,6 @@ void QnResourcePoolModelNode::update() {
             break;
         }
     }
-
     /* Update bastard state. */
     bool bastard = false;
     switch(m_type) {
@@ -243,6 +242,7 @@ void QnResourcePoolModelNode::update() {
     default:
         break;
     }
+
     setBastard(bastard);
 
     /* Notify views. */

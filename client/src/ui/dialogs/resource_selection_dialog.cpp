@@ -101,12 +101,10 @@ void QnResourceSelectionDialog::init() {
 
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
 
-    if( rootNodeType == Qn::UsersNode ) {
-        // As the bug # 3347 indicates, when the user wants to choose the users within the system,
-        // the opened the dialog shouldn't display all the layouts for each users. Therefore we 
-        // set the resource model not to show any layout here .
-        m_resourceModel->setLayoutShown(false);
+    if(rootNodeType == Qn::UsersNode) {
+        m_resourceModel->setToFlatMode(true);
     }
+
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);
     ui->resourcesWidget->setEditingEnabled(false);

@@ -52,12 +52,8 @@ public:
     bool isUrlsShown();
     void setUrlsShown(bool urlsShown);
 
-    bool isLayoutsShown() const {
-        return m_layoutIsShown;
-    }
-    void setLayoutShown( bool layoutIsShown ) {
-        m_layoutIsShown = layoutIsShown;
-    }
+
+    void setToFlatMode( bool );
 
     Qn::NodeType rootNodeType() const;
 private:
@@ -124,9 +120,6 @@ private:
 
     /** Whether item urls should be shown. */
     bool m_urlsShown;
-
-    /** Weather the layout is shown */
-    bool m_layoutIsShown;
 
     /** Type of root node - for the models with narrowed scopes */
     Qn::NodeType m_rootNodeType;
