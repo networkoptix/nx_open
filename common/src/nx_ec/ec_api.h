@@ -28,7 +28,7 @@
 
 class QnRestProcessorPool;
 class QnUniversalTcpListener;
-class QnModuleInformation;
+struct QnModuleInformation;
 
 //!Contains API classes for the new enterprise controller
 /*!
