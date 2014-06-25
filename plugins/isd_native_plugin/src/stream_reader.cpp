@@ -240,7 +240,13 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     if( cameraStreamsToRead == 1 )
     {
         //not using epoll to maximize performance
-        return getVideoPacket( lpPacket );
+        for( ;; )
+        {
+            const int result = getVideoPacket( lpPacket );
+            if( result == nxcip::NX_TRY_AGAIN )
+                continue;
+            return result;
+        }
     }
 
     assert( m_epollFD != -1 );
@@ -361,8 +367,9 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
     memset( &frame, 0, sizeof(frame) );
     int rv = m_vmux->GetFrame (&frame);
     if (rv) {
-        std::cerr << "Can't read video frame. "<<rv<<", errno "<<errno<<std::endl;
-        if( errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN )
+        const int errnoBak = errno;
+        std::cerr << "Can't read video frame. "<<rv<<", errno "<<errnoBak<<std::endl;
+        if( errnoBak == EINTR || errnoBak == EWOULDBLOCK || errnoBak == EAGAIN )
             return nxcip::NX_TRY_AGAIN;
         if( m_epollFD != -1 )
             unregisterFD( m_vmux->GetFD() );
