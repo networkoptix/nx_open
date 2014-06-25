@@ -40,8 +40,8 @@
         <beta>true</beta>
         <box/>
 
-        <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
+		<compile.options>webkit</compile.options>
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
@@ -293,7 +293,7 @@
                 <!-- <module>wixsetup/wixsetup-client-only</module> -->
             </modules>
             <properties>
-                <qt.dir>${environment.dir}/qt5webkit/qtbase-${arch}</qt.dir>
+                <qt.dir>${libdir}/${arch}</qt.dir>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>                
@@ -321,6 +321,7 @@
                 <init.python.dir>${environment.dir}/python/bin</init.python.dir>                
                 <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
+				<qt.dir>${libdir}</qt.dir>
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
@@ -396,7 +397,7 @@
             </activation>
             <properties>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <qt.dir>${environment.dir}/qt5/qtbase-${arch}-${toolchain.version}</qt.dir>
+				<compile.options></compile.options>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
                 <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
@@ -575,8 +576,8 @@
                 </property>                
             </activation>
             <properties>
-                <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
+                <compile.options></compile.options>
             </properties>
-        </profile>          
+        </profile>         
     </profiles> 
 </project>
