@@ -397,7 +397,7 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
 }
 
 void QnTransactionMessageBus::sendVideowallInstanceStatus(const ApiPeerData &peer, bool isAlive) {
-    QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::updateVideowallInstanceStatus, false);
+    QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::videowallInstanceStatus, false);
     tran.params.online = isAlive;
     tran.params.instanceGuid = peer.params["instanceGuid"];
     tran.params.videowallGuid = peer.params["videowallGuid"];

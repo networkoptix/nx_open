@@ -146,6 +146,7 @@
 #include "streaming/hls/hls_session_pool.h"
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
+#include "rest/handlers/old_client_connect_rest_handler.h"
 
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"

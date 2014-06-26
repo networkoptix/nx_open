@@ -115,13 +115,7 @@ namespace ec2
             getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
 
-
-            updateVideowallInstanceStatus = 66,
-			
 			maxTransactionValue         = 65535
-            
-            //ApiRuntimeData
-            runtimeInfoChanged = 67
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
