@@ -231,6 +231,16 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     else
         cl_log.log("Could not create or open update log file.", cl_logWARNING);
 
+    QFile executableFile(updateDir.absoluteFilePath(executable));
+    if (!executableFile.exists()) {
+        cl_log.log("The specified executable doesn't exists: ", executable, cl_logERROR);
+        return false;
+    }
+    if (!executableFile.permissions().testFlag(QFile::ExeOwner)) {
+        cl_log.log("The specified executable doesn't have an execute permission: ", executable, cl_logWARNING);
+        executableFile.setPermissions(executableFile.permissions() | QFile::ExeOwner);
+    }
+
     if (QProcess::startDetached(updateDir.absoluteFilePath(executable), arguments)) {
         cl_log.log("Update has been started.", cl_logINFO);
     } else {
