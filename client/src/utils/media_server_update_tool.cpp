@@ -250,7 +250,7 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl() const {
         systemInformationList = QSet<QnSystemInformation>::fromList(m_idBySystemInformation.keys());
     }
 
-    query.addQueryItem(lit("client"), QnSystemInformation(lit(QN_APPLICATION_PLATFORM), lit(QN_APPLICATION_ARCH), lit(QN_ARM_BOX)).toString().replace(QLatin1Char(' '), QLatin1Char('_')));
+    query.addQueryItem(lit("client"), QnSystemInformation::currentSystemInformation().toString().replace(QLatin1Char(' '), QLatin1Char('_')));
     foreach (const QnSystemInformation &systemInformation, systemInformationList)
         query.addQueryItem(lit("server"), systemInformation.toString().replace(QLatin1Char(' '), QLatin1Char('_')));
 

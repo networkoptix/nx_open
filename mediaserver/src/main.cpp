@@ -1233,7 +1233,7 @@ void QnMain::run()
             server->setMaxCameras(DEFAULT_MAX_CAMERAS);
         }
         server->setVersion(qnCommon->engineVersion());
-        server->setSystemInfo(QnSystemInformation(QN_APPLICATION_PLATFORM, QN_APPLICATION_ARCH, QN_ARM_BOX));
+        server->setSystemInfo(QnSystemInformation::currentSystemInformation());
         server->setSystemName(qnCommon->localSystemName());
 
         QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
