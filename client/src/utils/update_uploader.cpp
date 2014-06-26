@@ -108,6 +108,7 @@ void QnUpdateUploader::at_updateManager_updateUploadProgress(const QString &upda
         if (chunks == ec2::AbstractUpdatesManager::Failed) {
             emit failed();
             cleanUp();
+            return;
         } else {
             progress = 100;
         }

@@ -138,8 +138,8 @@ void QnDownloadUpdatesPeerTask::at_downloadReply_finished() {
             break;
         }
 
-        m_file.reset();
         m_file->remove();
+        m_file.reset();
         finish(DownloadError);
         return;
     }
