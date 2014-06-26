@@ -68,12 +68,12 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_dstAudioCodec(CODEC_ID_NONE),
     m_dstVideoCodec(CODEC_ID_NONE),
     m_onscreenDateOffset(0),
-    m_role(Role_ServerRecording),
     m_timestampCorner(Qn::NoCorner),
     m_serverTimeZoneMs(Qn::InvalidUtcOffset),
     m_nextIFrameTime(AV_NOPTS_VALUE),
     m_truncateIntervalEps(0),
-    m_recordingFinished(false)
+    m_recordingFinished(false),
+    m_role(Role_ServerRecording)
 {
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false

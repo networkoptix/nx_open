@@ -182,6 +182,7 @@ namespace nx_http
         ConstBufferRefType* const headerName,
         ConstBufferRefType* const headerValue,
         const ConstBufferRefType& data );
+    HttpHeader parseHeader( const ConstBufferRefType& data );
 
     namespace StatusCode
     {
@@ -276,8 +277,8 @@ namespace nx_http
         HttpHeaders headers;
         BufferType messageBody;
 
-        //!Appends serialized data to \a dstBuffer
         bool parse( const ConstBufferRefType& data );
+        //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
     };
 
@@ -288,6 +289,7 @@ namespace nx_http
         HttpHeaders headers;
         BufferType messageBody;
 
+        bool parse( const ConstBufferRefType& data );
         //!Appends serialized data to \a dstBuffer
         void serialize( BufferType* const dstBuffer ) const;
         BufferType toString() const;

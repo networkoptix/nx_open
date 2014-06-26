@@ -18,7 +18,7 @@
                         </File>
                     </Component>
 
-                    <Component Id="AppLauncherConfiguration" Permanent="yes">
+                    <Component Id="AppLauncherConfiguration">
                         <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\${applauncher.name}">
                             <RegistryValue Type="string" Name="previousLaunchedVersion" Value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"/>
@@ -29,7 +29,7 @@
                         </RegistryKey>                        
                     </Component>                                
 
-                    <Component Id="DefaultLanguage" Permanent="yes">
+                    <Component Id="DefaultLanguage">
                         <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\${client.name}">
                             <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_${translation1}.qm"/>
@@ -69,7 +69,7 @@
                         </File>
                     </Component>                                
 
-                    <Component Id="ClientConfiguration" Permanent="yes">
+                    <Component Id="ClientConfiguration">
                         <Condition>
                         NOT PREVIOUSVERSIONSINSTALLED
                         </Condition>
@@ -80,7 +80,6 @@
                             <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
                             <RegistryValue Type="string" Name="appserverPort" Value="[CLIENT_APPSERVER_PORT]"/>
                             <RegistryValue Type="string" Name="appserverLogin" Value="[CLIENT_APPSERVER_LOGIN]"/>
-                            <RegistryValue Type="string" Name="mediaRoot" Value="[CLIENT_DIRECTORY]"/>
                         </RegistryKey>
                     </Component>
 

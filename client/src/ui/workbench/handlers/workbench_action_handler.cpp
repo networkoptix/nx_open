@@ -1593,8 +1593,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
 
 
-    QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectionInfo->proxyPort);
-
     QnSessionManager::instance()->stop();
 
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo->version);

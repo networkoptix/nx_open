@@ -71,8 +71,18 @@ public:
 
     static void initStaticInstance(QnAuthHelper* instance);
     static QnAuthHelper* instance();
-    
+
+    //!Authenticates request on server side
     bool authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false);
+    //!Authenticates request on client side
+    /*!
+        Usage:\n
+        - client sends request with no authentication information
+        - client receives response with 401 or 407 status code
+        - client calls this method supplying received response. This method adds necessary headers to request
+        - client sends request to server
+    */
+    bool authenticate(const QAuthenticator& auth, const nx_http::Response& response, nx_http::Request* request);
     bool authenticate(const QString& login, const QByteArray& digest) const;
 
     QnAuthMethodRestrictionList* restrictionList();

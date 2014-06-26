@@ -3,7 +3,9 @@
 
 #include <nx_ec/ec_api.h>
 
-#include "core/resource/resource.h"
+#include <core/resource/resource.h>
+#include <core/resource/resource_processor.h>
+
 #include "api/app_server_connection.h"
 #include "mutex/distributed_mutex.h"
 
@@ -20,7 +22,7 @@ public:
     virtual ~QnAppserverResourceProcessor();
 
     virtual bool isBusy() const override;
-    void processResources(const QnResourceList &resources);
+    virtual void processResources(const QnResourceList &resources) override;
 
 private:
     ec2::AbstractECConnectionPtr m_ec2Connection;
