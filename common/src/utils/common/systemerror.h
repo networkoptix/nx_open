@@ -30,7 +30,7 @@ namespace SystemError
     static const ErrorCode timedOut = WSAETIMEDOUT;
     static const ErrorCode fileNotFound = ERROR_FILE_NOT_FOUND;
     static const ErrorCode interrupted = WSAEINTR;
-    static const ErrorCode again = WSAEAGAIN;
+    static const ErrorCode again = WSAEWOULDBLOCK; /* Windows does not define WSAEAGAIN. */
 #else
     static const ErrorCode wouldBlock = EWOULDBLOCK;
     static const ErrorCode inProgress = EINPROGRESS;
