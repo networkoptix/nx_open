@@ -15,13 +15,20 @@
 
 QnVideowallManageWidget::QnVideowallManageWidget(QWidget *parent /*= 0*/):
     base_type(parent),
-    d_ptr(new QnVideowallManageWidgetPrivate())
+    d_ptr(new QnVideowallManageWidgetPrivate()),
+    m_dragProcessor(new DragProcessor(this)),
+    m_skipReleaseEvent(false),
+    m_pressedButtons(Qt::NoButton)
 {
     installEventFilter(this);
     setMouseTracking(true);
 
-    m_dragProcessor = new DragProcessor(this);
     m_dragProcessor->setHandler(this);
+
+    QAnimationTimer *animationTimer = new QAnimationTimer(this);
+    setTimer(animationTimer);
+    startListening();
+    
 }
 
 QnVideowallManageWidget::~QnVideowallManageWidget() { }
@@ -51,30 +58,20 @@ void QnVideowallManageWidget::submitToResource(const QnVideoWallResourcePtr &vid
 }
 
 bool QnVideowallManageWidget::eventFilter(QObject *target, QEvent *event) {
-//     if (event->type() == QEvent::LeaveWhatsThisMode)
-//         d->skipNextReleaseEvent = true;
+     if (event->type() == QEvent::LeaveWhatsThisMode)
+         m_skipReleaseEvent = true;
     m_dragProcessor->widgetEvent(this, event);
     return base_type::eventFilter(target, event);
 }
 
-void QnVideowallManageWidget::mouseReleaseEvent(QMouseEvent *event) {
-    base_type::mouseReleaseEvent(event);
 
-    Q_D(QnVideowallManageWidget);
-    /* if (&& !d->skipNextReleaseEvent) */
-    {
-        QTransform transform(d->getInvertedTransform(d->targetRect(this->rect())));
-        QPoint p = transform.map(event->pos());
-        //d->mouseReleaseAt(p);
-        QUuid id = d->itemIdByPos(p);
-        if (id.isNull())
-            return;
 
-        d->addItemTo(id);
-        update();
-    }
-    //d->skipNextReleaseEvent = false;
+void QnVideowallManageWidget::mousePressEvent(QMouseEvent *event) {
+    base_type::mousePressEvent(event);
+    m_pressedButtons = event->buttons();
+
 }
+
 
 void QnVideowallManageWidget::mouseMoveEvent(QMouseEvent *event) {
     base_type::mouseMoveEvent(event);
@@ -82,26 +79,50 @@ void QnVideowallManageWidget::mouseMoveEvent(QMouseEvent *event) {
     Q_D(QnVideowallManageWidget);
 
     QTransform transform(d->getInvertedTransform(d->targetRect(this->rect())));
-    qDebug() << transform.map(event->pos()) << event->buttons();
-
-    
+    d->mouseMoveAt(transform.map(event->pos()), event->buttons());  
 }
 
-void QnVideowallManageWidget::mousePressEvent(QMouseEvent *event) {
-    base_type::mousePressEvent(event);
+void QnVideowallManageWidget::mouseReleaseEvent(QMouseEvent *event) {
+    base_type::mouseReleaseEvent(event);
 
+    bool skip = m_skipReleaseEvent;
+    m_skipReleaseEvent = false;
+    if (skip)
+        return;
 
+    Q_D(QnVideowallManageWidget);
+    QTransform transform(d->getInvertedTransform(d->targetRect(this->rect())));
+    QPoint p = transform.map(event->pos());
+    d->mouseClickAt(p, m_pressedButtons);
 }
 
-void QnVideowallManageWidget::startDragProcess(DragInfo *info) {
-    qDebug() << "start drag process";
+
+void QnVideowallManageWidget::startDrag(DragInfo *info) {
+    m_skipReleaseEvent = true;
+
+    Q_D(QnVideowallManageWidget);
+    QTransform transform(d->getInvertedTransform(d->targetRect(this->rect())));
+    QPoint p = transform.map(info->mouseItemPos().toPoint());
+    d->dragStartAt(p);
 }
 
 void QnVideowallManageWidget::dragMove(DragInfo *info) {
-    qDebug() << "drag move";
+    Q_D(QnVideowallManageWidget);
+    QTransform transform(d->getInvertedTransform(d->targetRect(this->rect())));
+    QPoint p = transform.map(info->mouseItemPos().toPoint());
+    d->dragMoveAt(p);
 }
 
-void QnVideowallManageWidget::finishDragProcess(DragInfo *info) {
-    qDebug() << "finish drag process";
+void QnVideowallManageWidget::finishDrag(DragInfo *info) {
+    Q_D(QnVideowallManageWidget);
+    QTransform transform(d->getInvertedTransform(d->targetRect(this->rect())));
+    QPoint p = transform.map(info->mouseItemPos().toPoint());
+    d->dragEndAt(p);
+}
+
+void QnVideowallManageWidget::tick(int deltaTime) {
+    Q_D(QnVideowallManageWidget);
+    d->tick(deltaTime);
+    update();
 }
 

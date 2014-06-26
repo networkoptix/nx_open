@@ -20,14 +20,19 @@ public:
     QTransform getTransform(const QRect &rect);
     QTransform getInvertedTransform(const QRect &rect);
     QRect targetRect(const QRect &rect) const;
-    QUuid itemIdByPos(const QPoint &pos);
-    void addItemTo(const QUuid &id);
-    void use(const QnScreenSnaps &snaps);
 
     void loadFromResource(const QnVideoWallResourcePtr &videowall);
     void submitToResource(const QnVideoWallResourcePtr &videowall);
 
     void paint(QPainter* painter, const QRect &rect);
+
+    void mouseMoveAt(const QPoint &pos, Qt::MouseButtons buttons);
+    void mouseClickAt(const QPoint &pos, Qt::MouseButtons buttons);
+    void dragStartAt(const QPoint &pos);
+    void dragMoveAt(const QPoint &pos);
+    void dragEndAt(const QPoint &pos);
+
+    void tick(int deltaMSecs);
 private:
     enum class ItemType {
         Existing,
@@ -47,33 +52,53 @@ private:
     struct BaseModelItem {
         BaseModelItem(const QRect &rect);
 
+        virtual bool free() const = 0;
+        virtual void setFree(bool value) = 0;
+
         QUuid id;
         QRect geometry;
         ItemType itemType;
         QnScreenSnaps snaps;
+        StateFlags flags;
+        qreal opacity;
     };
 
 
     struct ModelItem: BaseModelItem {
         ModelItem();
+
+        virtual bool free() const override;
+        virtual void setFree(bool value) override;
     };
 
     struct ModelScreenPart: BaseModelItem {
         ModelScreenPart(int screenIdx, int xIndex, int yIndex, const QRect &rect);
 
-        bool free;
+        virtual bool free() const override;
+        virtual void setFree(bool value) override;
+    private:
+        bool m_free;
     };
 
     struct ModelScreen: BaseModelItem {
         ModelScreen(int idx, const QRect &rect);
 
-        bool free() const;
-        void setFree(bool value);
+        virtual bool free() const override;
+        virtual void setFree(bool value) override;
 
         QList<ModelScreenPart> parts;
     };
 
 private:
+    /** 
+     * Utility function that iterates over all items and calls handler to each of them. 
+     * If the handler sets 'abort' variable to true, iterator will stop.
+     */
+    void foreachItem(std::function<void(BaseModelItem& /*item*/, bool& /*abort*/)> handler);
+    void foreachItemConst(std::function<void(const BaseModelItem& /*item*/, bool& /*abort*/)> handler);
+
+    void use(const QnScreenSnaps &snaps);
+
     void paintScreenFrame(QPainter *painter, const BaseModelItem &item);
     void paintPlaceholder(QPainter* painter, const BaseModelItem &item);
     void paintExistingItem(QPainter* painter, const BaseModelItem &item);

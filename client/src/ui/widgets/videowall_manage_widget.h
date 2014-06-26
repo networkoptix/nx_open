@@ -7,6 +7,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <ui/animation/animation_timer.h>
+#include <ui/animation/animation_timer_listener.h>
 #include <ui/processors/drag_process_handler.h>
 
 class DragProcessor;
@@ -14,7 +16,7 @@ class QAbstractAnimation;
 
 class QnVideowallManageWidgetPrivate;
 
-class QnVideowallManageWidget : public QWidget, public DragProcessHandler {
+class QnVideowallManageWidget : public QWidget, protected  DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT
     typedef QWidget base_type;
 public:
@@ -31,16 +33,21 @@ protected:
 
     virtual bool eventFilter(QObject *target, QEvent *event) override;
 
-    virtual void startDragProcess(DragInfo *info) override;
+    virtual void startDrag(DragInfo *info) override;
     virtual void dragMove(DragInfo *info) override;
-    virtual void finishDragProcess(DragInfo *info) override;
+    virtual void finishDrag(DragInfo *info) override;
 
     virtual void mousePressEvent(QMouseEvent *event) override;
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
+
+    virtual void tick(int deltaTime) override;
+
 private:
     QScopedPointer<QnVideowallManageWidgetPrivate> d_ptr;
     DragProcessor *m_dragProcessor;
+    bool m_skipReleaseEvent;
+    Qt::MouseButtons m_pressedButtons;
 };
 
 #endif // VIDEOWALL_MANAGE_WIDGET_H
