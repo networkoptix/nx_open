@@ -38,12 +38,18 @@
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
         <beta>true</beta>
-		<angle>false</angle>
+        <!-- compile.option1. See profile no-webkit -->
+        <webkit>true</webkit>
+		<!-- compile.option2. See profile angle  -->
+        <angle>false</angle>
         <box/>
 
         <root.dir>${basedir}</root.dir>
-		<compile.options>-webkit</compile.options>
-		<webkit>true</webkit>
+		<compile.option1>-webkit</compile.option1>
+		<compile.option2></compile.option2>
+		<compile.option3></compile.option3>
+        <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
+
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
@@ -343,7 +349,7 @@
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
 				<qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
-				<compile.options></compile.options>
+				<compile.option1></compile.option1>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -403,7 +409,7 @@
             <properties>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
 				<qt.classifier>${platform}-${arch}-${box}</qt.classifier>
-				<compile.options></compile.options>
+				<compile.option1></compile.option1>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
                 <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
@@ -579,7 +585,7 @@
                 </property>                
             </activation>
             <properties>
-                <compile.options></compile.options>
+                <compile.option1></compile.option1>
             </properties>
         </profile>      
         <profile>
@@ -594,7 +600,7 @@
                 </property>                
             </activation>
             <properties>
-                <compile.options></compile.options>
+                <compile.option2>-angle</compile.option2>
             </properties>
         </profile>  		
     </profiles> 
