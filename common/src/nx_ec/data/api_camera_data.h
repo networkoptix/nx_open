@@ -37,10 +37,6 @@ namespace ec2
         ApiCameraData(): scheduleEnabled(true), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryStreamQuality(Qn::SSQualityNotDefined),
                          controlEnabled(true), statusFlags(0) {}
 
-        // TODO: #API using xyzDisabled as a field name is a bad practice.
-        // It leads to constructs like if(!isDisabled()), which are difficult to parse.
-        // As a rule of thumb, name fields in a way that would not lead to double negation in code as in case of !isDisabled.
-
         bool                scheduleEnabled;
         Qn::MotionType      motionType;
         QnLatin1Array       motionMask;
