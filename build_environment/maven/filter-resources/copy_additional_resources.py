@@ -65,9 +65,9 @@ if __name__ == '__main__':
             
     if get_platform() == 'windows':        
         for arch in ('x86', 'x64'):
-            plugin_source_dir = '%s/qtbase-%s/plugins' % (qtbasedir, arch)
-            lib_source_dir = '%s/qtbase-%s/bin' % (qtbasedir, arch)
-            pdb_source_dir = '%s/qtbase-%s/lib' % (qtbasedir, arch)
+            plugin_source_dir = '%s/%s/plugins' % (qtbasedir, arch)
+            lib_source_dir = '%s/%s/bin' % (qtbasedir, arch)
+            pdb_source_dir = '%s/%s/lib' % (qtbasedir, arch)
             target_dir = join('${project.build.directory}', arch, 'bin')
             lib_target_dir = join('${project.build.directory}', arch, 'lib')
             help_dir = join('${project.build.directory}', arch, 'bin/help')
