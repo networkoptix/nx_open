@@ -350,7 +350,6 @@
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
 				<qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
-				<compile.option1></compile.option1>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
