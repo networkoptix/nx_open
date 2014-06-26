@@ -78,11 +78,11 @@ def gentext(file, path, extensions, text):
                     continue
                 
                 cond = ''
-                if n.endswith('_win'):
+                if n.endswith('_win') or parent.endswith('_win'):
                     cond = 'win*:'
-                elif n.endswith('_mac'):
+                elif n.endswith('_mac') or parent.endswith('_mac'):
                     cond = 'mac:'
-                elif n.endswith('_linux'):
+                elif n.endswith('_linux') or parent.endswith('_linux'):
                     cond = 'linux*:'
                 elif n.endswith('_unix'):
                     cond = 'unix:'
