@@ -919,7 +919,11 @@ namespace ec2
         \note All methods are asynchronous if other not specified
     */
     class AbstractECConnectionFactory
+    :
+        public QObject
     {
+        Q_OBJECT
+
     public:
         virtual ~AbstractECConnectionFactory() {}
 
