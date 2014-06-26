@@ -30,7 +30,7 @@ namespace Qn
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat)
-    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities PtzTraits MotionTypes TimePeriodTypes ServerFlags)
+    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities PtzTraits MotionTypes TimePeriodTypes ServerFlags CameraStatusFlags)
 public:
 #else
     Q_NAMESPACE
@@ -426,6 +426,13 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SecondStreamQuality)
 
+    enum CameraStatusFlag {
+        CSF_NoFlags = 0x0,
+        CSF_HasIssuesFlag = 0x1
+    };
+    Q_DECLARE_FLAGS(CameraStatusFlags, CameraStatusFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraStatusFlags)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraStatusFlag)
 
     // TODO: #Elric #EC2 rename
     enum RecordingType {
@@ -506,7 +513,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::PtzCapabilities),
+    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::PtzCapabilities)(Qn::CameraStatusFlags),
     (metatype)(numeric)
 )
 

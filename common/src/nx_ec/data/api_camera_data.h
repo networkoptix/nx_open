@@ -56,7 +56,7 @@ namespace ec2
         QString             groupName;
         Qn::SecondStreamQuality    secondaryStreamQuality;
         bool                controlDisabled; // TODO: #API rename 'controlEnabled'
-        qint32              statusFlags; // TODO: #API use bool here. We have exactly one flag, and I don't see why we would need more. And use bool in security cam resource.
+        Qn::CameraStatusFlags   statusFlags;
         QnLatin1Array       dewarpingParams;
         QString             vendor;
     };

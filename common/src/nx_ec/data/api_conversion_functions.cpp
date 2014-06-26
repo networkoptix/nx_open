@@ -181,7 +181,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setGroupName(src.groupName);
     dst->setSecondaryStreamQuality(src.secondaryStreamQuality);
     dst->setCameraControlDisabled(src.controlDisabled);
-    dst->setStatusFlags(static_cast<QnSecurityCamResource::StatusFlags>(src.statusFlags));
+    dst->setStatusFlags(src.statusFlags);
 
     dst->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams));
     dst->setVendor(src.vendor);
@@ -515,7 +515,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setApiUrl(src.apiUrl);
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
-    dst->setPanicMode(static_cast<Qn::PanicMode>(src.panicMode));
+    dst->setPanicMode(src.panicMode);
     dst->setStreamingUrl(src.streamingUrl);
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setSystemInfo(QnSystemInformation(src.systemInfo));
