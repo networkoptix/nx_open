@@ -2601,11 +2601,15 @@ bool QnDbManager::markLicenseOverflow(bool value, qint64 time)
     query.prepare("INSERT OR REPLACE into misc_data (key, data) values(?, ?) ");
     query.addBindValue(LICENSE_EXPIRED_TIME_KEY);
     query.addBindValue(QByteArray::number(m_licenseOverflowTime));
-    return query.exec();
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return false;
+    }
 
     ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
     data.prematureLicenseExperationDate = m_licenseOverflowTime;
     QnRuntimeInfoManager::instance()->update(data);
+    return true;
 }
 
 QUuid QnDbManager::getID() const
