@@ -333,11 +333,10 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
         }
         m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
-
+        ui->cameraScheduleWidget->endUpdate();
     }
 
     ui->cameraScheduleWidget->setCameras(m_cameras);
-    ui->cameraScheduleWidget->endUpdate();
     updateLicenseText();
 
     setHasDbChanges(false);
