@@ -161,6 +161,8 @@ public:
         m_lastTickTime = 0;
         m_stickyLogScaleHi = 1.0;
         m_stickyLogScaleLo = -1.0;
+        m_stickyLogScaleResettingThreshold = 0.91;
+        m_logScaleResettingSpeedMultiplier = 0.2;
     }
 
     void update() {
@@ -317,8 +319,15 @@ public:
                 qreal logScale, powFactor;
                 calculateRelativeScale(&logScale, &powFactor);
                 qreal logDirection = calculateDistance(logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
+                qreal scaleSpeed = m_logScaleSpeed;
+                if (qFuzzyIsNull(logDirection)) {
+                    if (logScale > m_stickyLogScaleHi * m_stickyLogScaleResettingThreshold) {
+                        logDirection = m_stickyLogScaleHi - logScale;
+                        scaleSpeed *= m_logScaleResettingSpeedMultiplier;
+                    }
+                }
                 if(!qFuzzyIsNull(logDirection)) {
-                    qreal logDelta = dt * (m_logScaleSpeed / powFactor) * speedMultiplier(logDirection, std::log(2.0) / powFactor);
+                    qreal logDelta = dt * (scaleSpeed / powFactor) * speedMultiplier(logDirection, std::log(2.0) / powFactor);
                     if(std::abs(logDelta) > std::abs(logDirection))
                         logDelta = logDirection;
 
@@ -518,6 +527,12 @@ public:
 
     /** Sticky log scale lower bound. */
     qreal m_stickyLogScaleLo;
+
+    /** A threshold multiplier to specify the scale when the bounds should be reset to default value (m_stickyLogScaleHi). */
+    qreal m_stickyLogScaleResettingThreshold;
+
+    /** Scale speed multiplier when scale is resetting to default value (m_stickyLogScaleHi). */
+    qreal m_logScaleResettingSpeedMultiplier;
 };
 
 
