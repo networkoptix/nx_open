@@ -301,10 +301,6 @@ QPointF DragProcessor::itemPos(QGraphicsItem *, QGraphicsSceneMouseEvent *event)
     return event->pos();
 }
 
-QPointF DragProcessor::itemPos(QWidget*, QMouseEvent* event) {
-    return event->pos();
-}
-
 template<class T, class Event>
 void DragProcessor::mousePressEventInternal(T *object, Event *event, bool instantDrag) {
     checkThread(object);
