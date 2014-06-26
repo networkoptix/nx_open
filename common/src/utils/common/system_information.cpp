@@ -4,7 +4,7 @@
 
 #include <utils/common/model_functions.h>
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSystemInformation, (json)(binary)(datastream)(eq)(hash), QnSystemInformation_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnSystemInformation, (json)(binary)(datastream)(eq)(hash), QnSystemInformation_Fields, (optional, true))
 
 QnSystemInformation::QnSystemInformation(const QString &platform, const QString &arch, const QString &modification) :
     arch(arch),
