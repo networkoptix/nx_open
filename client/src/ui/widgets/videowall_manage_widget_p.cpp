@@ -96,7 +96,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter) con
 
             QnScopedPainterPenRollback penRollback(painter, editBorderPen);
             QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
-            painter->drawPath(path);
+            painter->drawRect(targetRect);
         }
 
         {
@@ -286,7 +286,9 @@ QnVideowallManageWidgetPrivate::AddedItem::AddedItem() :
 /* QnVideowallManageWidgetPrivate                                       */
 /************************************************************************/
 
-QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate() {
+QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate():
+    m_dragging(false)
+{
     QDesktopWidget* desktop = qApp->desktop();
     for (int i = 0; i < desktop->screenCount(); ++i) {
         ModelScreen screen(i, desktop->screenGeometry(i));
@@ -373,7 +375,7 @@ void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourceP
         modelItem.snaps = item.screenSnaps;
         modelItem.geometry = item.screenSnaps.geometry(screens);
         m_items << modelItem;
-        use(modelItem.snaps);
+        setFree(modelItem.snaps, false);
     }
 }
 
@@ -444,7 +446,7 @@ QRect QnVideowallManageWidgetPrivate::targetRect(const QRect &rect) const
     return expanded(aspectRatio(m_unitedGeometry), rect, Qt::KeepAspectRatio).toRect();
 }
 
-void QnVideowallManageWidgetPrivate::use(const QnScreenSnaps &snaps)
+void QnVideowallManageWidgetPrivate::setFree(const QnScreenSnaps &snaps, bool value)
 {
     QSet<int> screenIdxs = snaps.screens();
     // if the item takes some screens, it should take them fully
@@ -452,8 +454,8 @@ void QnVideowallManageWidgetPrivate::use(const QnScreenSnaps &snaps)
         for (int idx: screenIdxs) {
             if (idx >= m_screens.size())
                 continue;   // we can lose one screen after snaps have been set
-            assert(m_screens[idx].free());
-            m_screens[idx].setFree(false);
+            assert(m_screens[idx].free() != value);
+            m_screens[idx].setFree(value);
         }
     } else if (!screenIdxs.isEmpty()) { //otherwise looking at the screen parts
         int screenIdx = screenIdxs.toList().first();
@@ -465,8 +467,8 @@ void QnVideowallManageWidgetPrivate::use(const QnScreenSnaps &snaps)
             for (int j = snaps.top().snapIndex; j < QnScreenSnap::snapsPerScreen() - snaps.bottom().snapIndex; ++j) {
                 int idx = i* QnScreenSnap::snapsPerScreen() + j;
                 assert(idx < screen.parts.size());
-                assert(screen.parts[idx].free());
-                screen.parts[idx].setFree(false);
+                assert(screen.parts[idx].free() != value);
+                screen.parts[idx].setFree(value);
             }
         }
     }
@@ -523,8 +525,9 @@ void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint &pos, const QPoint
             return;
 
         item.flags |= StateFlag::Pressed;
-        
-        
+        setFree(item.snaps, true);
+
+        m_dragging = true;
         abort = true;
     });
 }
@@ -533,31 +536,47 @@ void QnVideowallManageWidgetPrivate::dragMoveAt(const QPoint &pos, const QPoint 
     foreachItem([this, &pos, &oldPos](BaseModelItem &item, bool &abort) {
         if (!item.hasFlag(StateFlag::Pressed))
             return;
-
-        qDebug() << "drag move" << item.geometry;
-        qDebug() << "oldCenter" << item.geometry.center();
-        qDebug() << "pos" << pos << "oldPos" << oldPos;
-
         QPoint newCenter = item.geometry.center() + pos - oldPos;
-        qDebug() << "newCenter" << newCenter;
-
         item.geometry.moveCenter(newCenter);
-        qDebug() << "new geometry" << item.geometry;
-
         abort = true;
     });
 }
 
 void QnVideowallManageWidgetPrivate::dragEndAt(const QPoint &pos, const QPoint &oldPos) {
     foreachItem([this, pos](BaseModelItem &item, bool &abort) {
+        item.flags &= ~StateFlags(StateFlag::Hovered);
         if (!item.hasFlag(StateFlag::Pressed))
             return;
-
         item.flags &= ~StateFlags(StateFlag::Pressed);
 
+        if (item.snaps.screens().size() > 1) {
+            assert("Not implemented");
+        } else {
+            int bestIndex = -1;
+            qint64 bestCoeff = 0;
+            for (int i = 0; i < m_screens.size(); ++i) {
+                ModelScreen screen = m_screens[i]; 
+                if (!screen.free())
+                    continue;
+                QSize intersectionSize = m_screens[i].geometry.intersected(item.geometry).size();
+                qint64 coeff = intersectionSize.width() * intersectionSize.height();
+                if (bestIndex < 0 || coeff > bestCoeff) {
+                    bestIndex = i;
+                    bestCoeff = coeff;
+                }
+            }
+            assert(bestIndex >= 0);
 
-        abort = true;
+            ModelScreen screen = m_screens[bestIndex]; 
+            item.geometry = screen.geometry;
+            item.snaps = screen.snaps;
+        }
+
+        //for bes user experience do not hide controls until user moves a mouse
+        item.flags |= StateFlags(StateFlag::Hovered);
+        setFree(item.snaps, false);
     });
+    m_dragging = false;
 }
 
 void QnVideowallManageWidgetPrivate::tick(int deltaMSecs) {
@@ -567,7 +586,7 @@ void QnVideowallManageWidgetPrivate::tick(int deltaMSecs) {
         if (item.hasFlag(StateFlag::Pressed))
             item.opacity = qMax(item.opacity - opacityDelta, draggedOpacity);
         else
-        if (item.hasFlag(StateFlag::Hovered))
+        if (item.hasFlag(StateFlag::Hovered) && !m_dragging)
             item.opacity = qMin(item.opacity + opacityDelta, 1.0);
         else
             item.opacity = qMax(item.opacity - opacityDelta, minOpacity);

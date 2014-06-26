@@ -76,6 +76,9 @@ void QnVideowallManageWidget::mousePressEvent(QMouseEvent *event) {
 void QnVideowallManageWidget::mouseMoveEvent(QMouseEvent *event) {
     base_type::mouseMoveEvent(event);
 
+    if (m_dragProcessor->isRunning())
+        return;
+
     Q_D(QnVideowallManageWidget);
 
     QTransform transform(d->getInvertedTransform(d->targetRect(this->rect())));

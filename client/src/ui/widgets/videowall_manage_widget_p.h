@@ -129,7 +129,7 @@ private:
     void foreachItem(std::function<void(BaseModelItem& /*item*/, bool& /*abort*/)> handler);
     void foreachItemConst(std::function<void(const BaseModelItem& /*item*/, bool& /*abort*/)> handler);
 
-    void use(const QnScreenSnaps &snaps);
+    void setFree(const QnScreenSnaps &snaps, bool value);
 private:
     QTransform m_transform;
     QTransform m_invertedTransform;
@@ -138,6 +138,7 @@ private:
     QList<ModelItem> m_items;
     QList<ModelScreen> m_screens;
     QList<ModelItem> m_added;
+    bool m_dragging;
 };
 
 #endif // VIDEOWALL_MANAGE_WIDGET_PRIVATE_H
