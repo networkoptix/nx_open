@@ -1,6 +1,8 @@
 #ifndef QN_RESOURCE_SEARCHER_H
 #define QN_RESOURCE_SEARCHER_H
 
+#include <QtCore/QMutex>
+
 #include <core/resource/resource_factory.h>
 
 

@@ -26,7 +26,7 @@ QnPlIqResourceSearcher::QnPlIqResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlIqResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlIqResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 

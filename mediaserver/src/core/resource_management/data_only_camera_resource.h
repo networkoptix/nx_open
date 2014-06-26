@@ -7,6 +7,8 @@
 
 #include <core/resource/camera_resource.h>
 
+// TODO: #AK does not belong in /resource_management, move to /resource
+// Use Qn prefix?
 
 //!Camera resource of type, not supported on this server
 /*!

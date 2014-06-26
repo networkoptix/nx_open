@@ -26,7 +26,7 @@ QnResourceDirectoryBrowser::QnResourceDirectoryBrowser() {
     m_resourceReady = false;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createResource(QnId resourceTypeId, const QnResourceParams& params) {
+QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnId &resourceTypeId, const QnResourceParams& params) {
     QnResourcePtr result;
 
     if (!isResourceTypeSupported(resourceTypeId)) {

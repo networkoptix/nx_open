@@ -14,7 +14,7 @@ public:
     /*!
         Calls \a QnResourceDiscoveryManager::createResource first. If resource was not created and resource type is present in system, returns data-only resource
     */
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams &params) override;
 
 signals:
     void cameraDisconnected(QnResourcePtr camera, qint64 timestamp);

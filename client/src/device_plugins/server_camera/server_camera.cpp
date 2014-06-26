@@ -6,12 +6,6 @@
 #include "api/app_server_connection.h"
 
 
-void QnLocalFileProcessor::processResources(const QnResourceList &resources)
-{
-    QnResourcePool::instance()->addResources(resources);
-}
-
-
 QnServerCamera::QnServerCamera(const QnId& resourceTypeId): QnVirtualCameraResource()
 {
     setTypeId(resourceTypeId);
@@ -65,41 +59,6 @@ QnAbstractStreamDataProvider* QnServerCamera::createLiveDataProvider()
     result->setArchiveDelegate(new QnRtspClientArchiveDelegate(result));
     return result;
 }
-
-// --------------------------- QnServerCameraFactory -----------------------------
-
-QnResourcePtr QnServerCameraFactory::createResource(QnId resourceTypeId, const QnResourceParams&)
-{
-    QnResourcePtr resource;
-
-    QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
-
-    if (resourceType.isNull())
-        return resource;
-
-    if (resourceType->getName() == QLatin1String("Storage"))
-    {
-        //  storage = QnAbstractStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(pb_storage.url().c_str()));
-        resource =  QnAbstractStorageResourcePtr(new QnAbstractStorageResource());
-    }
-    else {
-        // Currently we support only cameras.
-        if (!resourceType->isCamera())
-            return resource;
-
-        resource = QnResourcePtr(new QnServerCamera(resourceTypeId));
-    }
-    //resource->deserialize(parameters);
-    return resource;
-}
-
-QnServerCameraFactory& QnServerCameraFactory::instance()
-{
-    static QnServerCameraFactory _instance;
-
-    return _instance;
-}
-
 
 QnResource::Status QnServerCamera::getStatus() const
 {

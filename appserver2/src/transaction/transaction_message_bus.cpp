@@ -96,7 +96,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::saveSettings:          return handleTransactionParams<ApiResourceParamDataList>(&stream, transaction, function);
     case ApiCommand::addLicenses:           return handleTransactionParams<ApiLicenseDataList>      (&stream, transaction, function);
     case ApiCommand::addLicense:            return handleTransactionParams<ApiLicenseData>          (&stream, transaction, function);
-    case ApiCommand::testEmailSettings:     transaction.localTransaction = true;
+    case ApiCommand::testEmailSettings:     transaction.isLocal = true;
                                             return handleTransactionParams<ApiEmailSettingsData>    (&stream, transaction, function);
     case ApiCommand::resetBusinessRules:    return handleTransactionParams<ApiResetBusinessRuleData>(&stream, transaction, function);
     case ApiCommand::uploadUpdate:          return handleTransactionParams<ApiUpdateUploadData>     (&stream, transaction, function);
