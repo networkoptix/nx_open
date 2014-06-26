@@ -38,7 +38,7 @@ struct FffmpegLog
 };
 
 
-CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr data, bool mtDecoding, QAtomicInt* const swDecoderCount):
+CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
     m_context(0),
     m_width(0),
@@ -142,7 +142,7 @@ void CLFFmpegVideoDecoder::closeDecoder()
     m_motionMap.clear();
 }
 
-void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr data)
+void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
 {
     if (m_context->thread_count == 1) {
         m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
@@ -191,7 +191,7 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     //m_context->flags |= CODEC_FLAG_GRAY;
 }
 
-void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr data)
+void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data)
 {
     m_codec = findCodec(m_codecId);
 
@@ -240,7 +240,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr data)
 //    avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
 }
 
-void CLFFmpegVideoDecoder::resetDecoder(QnConstCompressedVideoDataPtr data)
+void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& data)
 {
     if (!(data->flags & AV_PKT_FLAG_KEY))
     {
@@ -330,7 +330,7 @@ void CLFFmpegVideoDecoder::reallocateDeinterlacedFrame()
     }
 }
 
-void CLFFmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr data, int width, int height)
+void CLFFmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr& data, int width, int height)
 {
     if (m_currentWidth == -1) {
         m_currentWidth = width;
@@ -358,7 +358,7 @@ void CLFFmpegVideoDecoder::forceMtDecoding(bool value)
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
-bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
+bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
     CLVideoDecoderOutput* const outFrame = outFramePtr->data();
     AVFrame* copyFromFrame = m_frame;

@@ -68,12 +68,12 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_dstAudioCodec(CODEC_ID_NONE),
     m_dstVideoCodec(CODEC_ID_NONE),
     m_onscreenDateOffset(0),
-    m_role(Role_ServerRecording),
     m_timestampCorner(Qn::NoCorner),
     m_serverTimeZoneMs(Qn::InvalidUtcOffset),
     m_nextIFrameTime(AV_NOPTS_VALUE),
     m_truncateIntervalEps(0),
-    m_recordingFinished(false)
+    m_recordingFinished(false),
+    m_role(Role_ServerRecording)
 {
     srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
@@ -183,7 +183,7 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
 {
     for (int i = 0; i < m_prebuffer.size(); ++i)
     {
-        QnConstAbstractMediaDataPtr media = m_prebuffer.at(i);
+        const QnConstAbstractMediaDataPtr& media = m_prebuffer.at(i);
         if (media->dataType == QnAbstractMediaData::VIDEO && media->timestamp > baseTime && (media->flags & AV_PKT_FLAG_KEY))
             return media->timestamp;
     }
@@ -192,15 +192,13 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
 
 bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
 {
-    QnConstAbstractDataPacketPtr data = nonConstData;
-
     if (m_needReopen)
     {
         m_needReopen = false;
         close();
     }
 
-    QnConstAbstractMediaDataPtr md = qSharedPointerDynamicCast<const QnAbstractMediaData>(data);
+    QnConstAbstractMediaDataPtr md = qSharedPointerDynamicCast<const QnAbstractMediaData>(nonConstData);
     if (!md)
         return true; // skip unknown data
 
@@ -481,7 +479,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
         return false;
     }
 
-    QnMediaResourcePtr mediaDev = qSharedPointerDynamicCast<QnMediaResource>(m_device);
+    const QnMediaResource* mediaDev = dynamic_cast<const QnMediaResource*>(m_device.data());
 
     // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
     // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
@@ -491,7 +489,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
         m_contrastParams.enabled ||
         m_itemDewarpingParams.enabled;
 
-    QnConstResourceVideoLayoutPtr layout = mediaDev->getVideoLayout(m_mediaProvider);
+    const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.data());
     {
         if (!isTranscode)

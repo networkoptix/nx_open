@@ -26,12 +26,11 @@
 Q_GLOBAL_STATIC(QnAppServerConnectionFactory, qn_appServerConnectionFactory_instance)
 
 QnAppServerConnectionFactory::QnAppServerConnectionFactory()
+    m_prematureLicenseExperationDate(0)
 {}
 
 QnAppServerConnectionFactory::~QnAppServerConnectionFactory() {
     return;
-}
-
 void QnAppServerConnectionFactory::setCurrentVersion(const QnSoftwareVersion &version)
 {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {

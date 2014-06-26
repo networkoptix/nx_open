@@ -18,7 +18,7 @@ extern "C"
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = AUTO;
 
 QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(
-    const QnCompressedVideoDataPtr data,
+    const QnCompressedVideoDataPtr& data,
     bool mtDecoding,
     const QGLContext* glContext,
     bool allowHardwareDecoding )

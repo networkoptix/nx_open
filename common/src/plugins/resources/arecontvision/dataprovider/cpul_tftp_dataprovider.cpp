@@ -72,7 +72,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 {
     if (needMetaData())
     {
-        QnAbstractMediaDataPtr metadata = getMetaData();
+        const QnAbstractMediaDataPtr& metadata = getMetaData();
         if (metadata)
             return metadata;
     }

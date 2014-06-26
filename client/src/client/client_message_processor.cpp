@@ -89,14 +89,12 @@ void QnClientMessageProcessor::checkForTmpStatus(QnResourcePtr resource)
 void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
 {
     // set proxy. If some media server IF will be found, proxy address will be cleared
-    QString url = QnAppServerConnectionFactory::defaultUrl().host();
-    if (url.isEmpty())
-        url = QLatin1String("127.0.0.1");
-    int port = QUrl(resource->getApiUrl()).port(80);
-    resource->apiConnection()->setProxyAddr(resource->getApiUrl(), url, port);
+    const QString& proxyAddr = QnAppServerConnectionFactory::defaultUrl().host();
+    resource->apiConnection()->setProxyAddr(
+        resource->getApiUrl(),
+        proxyAddr,
+        QnAppServerConnectionFactory::defaultUrl().port() );    //starting with 2.3 proxy embedded to EC
     disconnect(resource.data(), NULL, this, NULL);
-    //connect(resource.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), 
-    //         this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)));
     resource->determineOptimalNetIF();
 }
 

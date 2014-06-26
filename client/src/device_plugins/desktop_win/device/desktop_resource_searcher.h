@@ -24,8 +24,9 @@ public:
     static void initStaticInstance(QnDesktopResourceSearcher* instance);
 
     virtual bool isVirtualResource() const override { return true; }
+
 protected:
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
 
 private:
     IDirect3D9 *m_pD3D;

@@ -93,18 +93,8 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     };
 
     //QnAbstractMediaData(unsigned int alignment, unsigned int capacity): 
-    QnAbstractMediaData( DataType _dataType = EMPTY_DATA )
-    : 
-        dataType(_dataType),
-        compressionType(CODEC_ID_NONE),
-        flags(MediaFlags_None),
-        channelNumber(0),
-        context(0),
-        opaque(0)
-    {
-    }
-
-    virtual ~QnAbstractMediaData() {}
+    QnAbstractMediaData( DataType _dataType = EMPTY_DATA );
+    virtual ~QnAbstractMediaData();
 
     bool isLQ() const { return flags & MediaFlags_LowQuality; }
     bool isLive() const { return flags & MediaFlags_LIVE; }

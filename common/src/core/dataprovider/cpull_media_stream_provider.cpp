@@ -54,7 +54,7 @@ void QnClientPullMediaStreamProvider::run()
             continue;
         }
 
-        QnAbstractMediaDataPtr data = getNextData();
+        const QnAbstractMediaDataPtr& data = getNextData();
 
         if (data==0)
         {

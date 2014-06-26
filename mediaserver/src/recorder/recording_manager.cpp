@@ -68,11 +68,16 @@ void QnRecordingManager::beforeDeleteRecorder(const Recorders& recorders)
 
 void QnRecordingManager::deleteRecorder(const Recorders& recorders, const QnResourcePtr& resource)
 {
-    if (recorders.recorderHiRes)
+	QnVideoCamera* camera = 0;
+    if (recorders.recorderHiRes) {
         recorders.recorderHiRes->stop();
-    if (recorders.recorderLowRes)
+		camera = qnCameraPool->getVideoCamera(recorders.recorderHiRes->getResource());
+	}
+    if (recorders.recorderLowRes) {
         recorders.recorderLowRes->stop();
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
+        if (!camera)
+            camera = qnCameraPool->getVideoCamera(recorders.recorderLowRes->getResource());
+	}
     if (camera)
     {
         if (recorders.recorderHiRes) {
@@ -269,7 +274,6 @@ bool QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
             bool runSecondStream = (cameraRes->streamFpsSharingMethod() != Qn::BasicFpsSharing || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS) && cameraRes->hasDualStreaming2(); 
-
             if (runSecondStream)
             {
                 if (recorderLowRes) {

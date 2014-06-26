@@ -295,13 +295,11 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
     AVStream* stream = m_formatCtx->streams[streamIndex];
     AVPacket packet;
     av_init_packet(&packet);
-
-    QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(media);
+    
     QnAbstractMediaDataPtr transcodedData;
     
-
     QnCodecTranscoderPtr transcoder;
-    if (video)
+    if (dynamic_cast<const QnCompressedVideoData*>(media.data()))
         transcoder = m_vTranscoder;
     else
         transcoder = m_aTranscoder;

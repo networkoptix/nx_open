@@ -87,7 +87,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::saveVideowall:         return handleTransactionParams<ApiVideowallData>        (&stream, transaction, function);
     case ApiCommand::removeVideowall:       return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
     case ApiCommand::videowallControl:      return handleTransactionParams<ApiVideowallControlMessageData>(&stream, transaction, function);
-    case ApiCommand::updateVideowallInstanceStatus:  
+    case ApiCommand::videowallInstanceStatus:  
                                             return handleTransactionParams<ApiVideowallInstanceStatusData>(&stream, transaction, function);
     case ApiCommand::addStoredFile:
     case ApiCommand::updateStoredFile:      return handleTransactionParams<ApiStoredFileData>       (&stream, transaction, function);
@@ -97,7 +97,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::saveSettings:          return handleTransactionParams<ApiResourceParamDataList>(&stream, transaction, function);
     case ApiCommand::addLicenses:           return handleTransactionParams<ApiLicenseDataList>      (&stream, transaction, function);
     case ApiCommand::addLicense:            return handleTransactionParams<ApiLicenseData>          (&stream, transaction, function);
-    case ApiCommand::testEmailSettings:     transaction.localTransaction = true;
+    case ApiCommand::testEmailSettings:     transaction.isLocal = true;
                                             return handleTransactionParams<ApiEmailSettingsData>    (&stream, transaction, function);
     case ApiCommand::resetBusinessRules:    return handleTransactionParams<ApiResetBusinessRuleData>(&stream, transaction, function);
     case ApiCommand::uploadUpdate:          return handleTransactionParams<ApiUpdateUploadData>     (&stream, transaction, function);
@@ -592,7 +592,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
                 if (peer.peerType != Qn::PT_VideowallClient)
                     continue;
                 
-                QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::updateVideowallInstanceStatus, false);
+                QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::videowallInstanceStatus, false);
                 tran.params.online = true;
                 tran.params.instanceGuid = peer.params["instanceGuid"];
                 tran.params.videowallGuid = peer.params["videowallGuid"];

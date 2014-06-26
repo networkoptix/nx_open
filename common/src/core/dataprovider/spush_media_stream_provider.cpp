@@ -93,7 +93,7 @@ void CLServerPushStreamReader::run()
             closeStream();
         }
 
-        QnAbstractMediaDataPtr data = getNextData();
+        const QnAbstractMediaDataPtr& data = getNextData();
 
 
         if (data==0)

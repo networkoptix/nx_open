@@ -146,7 +146,7 @@ QnTransaction<ApiEmailSettingsData> QnBusinessEventManager<T>::prepareTransactio
     QnTransaction<ApiEmailSettingsData> tran(command, true);
     fromResourceToApi(resource, tran.params);
     tran.persistent = false;
-    tran.localTransaction = true;
+    tran.isLocal = true;
     return tran;
 }
 
@@ -156,7 +156,7 @@ QnTransaction<ApiEmailData> QnBusinessEventManager<T>::prepareTransaction( ApiCo
     QnTransaction<ApiEmailData> tran(command, true);
     tran.params = data;
     tran.persistent = false;
-    tran.localTransaction = true;
+    tran.isLocal = true;
     return tran;
 }
 

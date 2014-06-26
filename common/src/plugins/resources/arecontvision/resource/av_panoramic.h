@@ -25,7 +25,7 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
-    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 private:
     bool setResolution(bool full);
     bool setCamQuality(int q);
@@ -33,7 +33,7 @@ private:
 protected:
     QnResourceVideoLayoutPtr m_vrl;
     bool m_isRotated;    
-    QnCustomResourceVideoLayoutPtr m_rotatedLayout;
+    mutable QnCustomResourceVideoLayoutPtr m_rotatedLayout;
     QElapsedTimer m_flipTimer;
 };
 
