@@ -348,13 +348,8 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
         return;
     }
 
-    QRegExp updateFileRegExp(lit("update_.+_.+_\\d+\\.\\d+\\.\\d+\\.\\d+\\.zip"));
-
     QStringList entries = dir.entryList(QStringList() << lit("*.zip"), QDir::Files);
     foreach (const QString &entry, entries) {
-        if (!updateFileRegExp.exactMatch(entry))
-            continue;
-
         QString fileName = dir.absoluteFilePath(entry);
         QnSoftwareVersion version;
         QnSystemInformation sysInfo;
