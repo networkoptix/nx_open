@@ -68,7 +68,7 @@
             "keys": [
                 "VISTA|VK2-600PTZ"
             ],
-            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability"
+            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability"
         },
         {
             "keys": [
