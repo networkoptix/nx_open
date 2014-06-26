@@ -179,8 +179,8 @@ bool ipV4AddressLessThan( const QString& left , const QString& right ) {
 }// namespace
 
 bool QnResourceSearchProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const {
-    QVariant leftData = data(left,Qt::DisplayRole);
-    QVariant rightData = data(right,Qt::DisplayRole);
+    QVariant leftData = sourceModel()->data(left);
+    QVariant rightData = sourceModel()->data(right);
     if( leftData.type() == QVariant::String && rightData.type() == QVariant::String ) {
         QString ls = leftData.toString();
         QString rs = rightData.toString();
