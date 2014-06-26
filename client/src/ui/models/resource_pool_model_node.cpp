@@ -1,6 +1,7 @@
 #include "resource_pool_model_node.h"
 
 #include <common/common_meta_types.h>
+#include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -216,6 +217,8 @@ void QnResourcePoolModelNode::update() {
             m_displayName = m_name = videowall->matrices()->getItem(m_uuid).name;
             break;
         }
+    } else if (m_type == Qn::ServersNode) {
+        m_displayName = m_name + lit(" (%1)").arg(qnCommon->localSystemName());
     }
 
     /* Update bastard state. */
