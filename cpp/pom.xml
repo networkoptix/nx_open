@@ -299,6 +299,10 @@
                                             <token><![CDATA[@echo linking \$@ && link]]></token>
                                             <value>link</value>
                                         </replacement>
+                                        <replacement>
+                                            <token>${artifactId}${parsedVersion.majorVersion}</token>
+                                            <value>${artifactId}</value>
+                                        </replacement>										
                                     </replacements>
                                     <skip>${replace.skip}</skip>
                                 </configuration>								
