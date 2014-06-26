@@ -3,12 +3,12 @@
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec2_lib.h>
 
-//#include <
+#include <device_plugins/server_camera/server_camera_factory.h>
 
 Context::Context(QObject *parent):
     base_type(parent)
 {
-    m_connectionFactory.reset(getConnectionFactory());
+    store<ec2::AbstractECConnectionFactory>(getConnectionFactory());
 
     ec2::ResourceContext resCtx(&QnServerCameraFactory::instance(), qnResPool, qnResTypePool);
 
