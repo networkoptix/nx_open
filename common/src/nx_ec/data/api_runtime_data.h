@@ -37,7 +37,7 @@ namespace ec2
         // todo: #GDM. add VideoWall related fields. #VW
     };
 
-#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(mainHardwareIds)(compatibleHardwareIds)
+#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)(mainHardwareIds)(compatibleHardwareIds)
 
 
 } // namespace ec2
