@@ -11,42 +11,89 @@
 #include <utils/common/string.h>
 #include <utils/common/scoped_painter_rollback.h>
 
+#include <utils/math/color_transformations.h>
+
 
 namespace {
     const qreal frameMargin = 0.04;
     const qreal innerMargin = frameMargin * 2;
 
     const qreal minOpacity = 0.5;
+
+    const int fillColorAlpha = 180;
+    const int roundness = 25;
+    const int borderWidth = 25;
+
+
+    const QColor desktopColor(130, 130, 130);
+    const QColor freeSpaceColor(64, 130, 180);
+    const QColor existingItemColor(100, 100, 100);
+    const QColor addedItemColor(64, 180, 130);
 }
 
+/************************************************************************/
+/* BaseModelItem                                                        */
+/************************************************************************/
 
-QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(const QRect &rect):
+QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(const QRect &rect, ItemType itemType, const QUuid &id):
+    id(id),
+    itemType(itemType),
     geometry(rect),
     flags(StateFlag::Default),
     opacity(minOpacity)
 {}
 
+void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter) const {
+    qreal margin = innerMargin * qMin(geometry.width(), geometry.height());
 
-QnVideowallManageWidgetPrivate::ModelItem::ModelItem():
-    BaseModelItem(QRect())
-{}
+    QRectF targetRect = eroded(geometry, margin);
 
-bool QnVideowallManageWidgetPrivate::ModelItem::free() const {
-    return false;
+    QPainterPath path;
+    path.addRoundRect(targetRect, roundness);
+
+    QPen borderPen(baseColor);
+    borderPen.setWidth(borderWidth);
+
+    QnScopedPainterPenRollback penRollback(painter, borderPen);
+    QnScopedPainterBrushRollback brushRollback(painter, withAlpha(baseColor, fillColorAlpha));
+    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
+
+    painter->drawPath(path);
 }
 
-void QnVideowallManageWidgetPrivate::ModelItem::setFree(bool value) {
-    Q_UNUSED(value);
-    assert("Should never get here");
+/************************************************************************/
+/* FreeSpaceItem                                                        */
+/************************************************************************/
+
+QnVideowallManageWidgetPrivate::FreeSpaceItem::FreeSpaceItem(const QRect &rect, ItemType itemType):
+    base_type(rect, itemType, QUuid::createUuid())
+{
+    baseColor = freeSpaceColor;
 }
 
+void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(QPainter* painter) const {
+    if (!free())
+        return;
+
+    base_type::paint(painter);
+
+    // for now allow adding of only one item to simplify the logic
+    //if (!m_added.isEmpty())
+    //    return;
+
+    QRect iconRect(0, 0, 200, 200);
+    iconRect.moveCenter(geometry.center());
+    painter->drawPixmap(iconRect, qnSkin->pixmap("item/ptz_zoom_in.png"));
+}
+
+/************************************************************************/
+/* ModelScreenPart                                                      */
+/************************************************************************/
 
 QnVideowallManageWidgetPrivate::ModelScreenPart::ModelScreenPart(int screenIdx, int xIndex, int yIndex, const QRect &rect) :
-    BaseModelItem(rect),
+    base_type(rect, ItemType::ScreenPart),
     m_free(true)
 {
-    id = QUuid::createUuid();
-    itemType = ItemType::ScreenPart;
     for (auto snap = snaps.values.begin(); snap != snaps.values.end(); ++snap) {
         snap->screenIndex = screenIdx;
     }
@@ -64,11 +111,13 @@ void QnVideowallManageWidgetPrivate::ModelScreenPart::setFree(bool value) {
     m_free = value;
 }
 
+/************************************************************************/
+/* ModelScreen                                                          */
+/************************************************************************/
+
 QnVideowallManageWidgetPrivate::ModelScreen::ModelScreen(int idx, const QRect &rect) :
-    BaseModelItem(rect)
+    base_type(rect, ItemType::Screen)
 {
-    id = QUuid::createUuid();
-    itemType = ItemType::Screen;
     for (auto snap = snaps.values.begin(); snap != snaps.values.end(); ++snap) {
         snap->screenIndex = idx;
         snap->snapIndex = 0;
@@ -91,10 +140,66 @@ bool QnVideowallManageWidgetPrivate::ModelScreen::free() const {
 }
 
 void QnVideowallManageWidgetPrivate::ModelScreen::setFree(bool value) {
-    std::transform(parts.begin(), parts.end(), parts.begin(), [value](ModelScreenPart part) {
-        part.setFree(value);
-        return part;
-    });
+    for (auto part = parts.begin(); part != parts.end(); ++part)
+        part->setFree(value);
+}
+
+void QnVideowallManageWidgetPrivate::ModelScreen::paint(QPainter* painter) const {
+    {
+        qreal margin = frameMargin * qMin(geometry.width(), geometry.height());
+        QRectF targetRect = eroded(geometry, margin);
+
+        QPainterPath path;
+        path.addRect(targetRect);
+
+        QPen borderPen(desktopColor);
+        borderPen.setWidth(10);
+
+        QnScopedPainterPenRollback penRollback(painter, borderPen);
+        QnScopedPainterBrushRollback brushRollback(painter, withAlpha(desktopColor, 127));
+
+        QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
+
+        painter->drawPath(path);
+    }
+    base_type::paint(painter);   
+}
+
+/************************************************************************/
+/* ModelItem                                                            */
+/************************************************************************/
+
+QnVideowallManageWidgetPrivate::ModelItem::ModelItem(ItemType itemType, const QUuid &id):
+    BaseModelItem(QRect(), itemType, id)
+{}
+
+bool QnVideowallManageWidgetPrivate::ModelItem::free() const {
+    return false;
+}
+
+void QnVideowallManageWidgetPrivate::ModelItem::setFree(bool value) {
+    Q_UNUSED(value);
+    assert("Should never get here");
+}
+
+/************************************************************************/
+/* ExistingItem                                                         */
+/************************************************************************/
+
+QnVideowallManageWidgetPrivate::ExistingItem::ExistingItem(const QUuid &id) :
+    ModelItem(ItemType::Existing, id)
+{
+    baseColor = existingItemColor;
+}
+
+/************************************************************************/
+/* AddedItem                                                            */
+/************************************************************************/
+
+QnVideowallManageWidgetPrivate::AddedItem::AddedItem() :
+    ModelItem(ItemType::Added, QUuid::createUuid())
+{
+    baseColor = addedItemColor;
 }
 
 /************************************************************************/
@@ -183,9 +288,7 @@ void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourceP
         screens << desktop->screenGeometry(i);
 
     foreach (const QnVideoWallItem &item, videowall->items()->getItems()) {
-        ModelItem modelItem;
-        modelItem.id = item.uuid;
-        modelItem.itemType = ItemType::Existing;
+        ExistingItem modelItem(item.uuid);
         modelItem.snaps = item.screenSnaps;
         modelItem.geometry = item.screenSnaps.geometry(screens);
         m_items << modelItem;
@@ -226,99 +329,6 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
         item.screenSnaps = addedItem.snaps;
         videowall->items()->addItem(item);
     }
-}
-
-
-void QnVideowallManageWidgetPrivate::paintScreenFrame(QPainter *painter, const BaseModelItem &item)
-{
-    QRect geometry = item.geometry;
-
-    qreal margin = frameMargin * qMin(geometry.width(), geometry.height());
-    QRectF targetRect = eroded(geometry, margin);
-
-    QPainterPath path;
-    path.addRect(targetRect);
-
-    QPen borderPen(QColor(130, 130, 130));
-    borderPen.setWidth(10);
-
-    QnScopedPainterPenRollback penRollback(painter, borderPen);
-    QnScopedPainterBrushRollback brushRollback(painter, QColor(130, 130, 130, 127));
-
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
-
-    painter->drawPath(path);
-}
-
-
-void QnVideowallManageWidgetPrivate::paintPlaceholder(QPainter* painter, const BaseModelItem &item) {
-    QRect geometry = item.geometry;
-
-    qreal margin = innerMargin * qMin(geometry.width(), geometry.height());
-
-    QRectF targetRect = eroded(geometry, margin);
-
-    QPainterPath path;
-    path.addRoundRect(targetRect, 25);
-
-    QPen borderPen(QColor(64, 130, 180));
-    borderPen.setWidth(25);
-    
-    QnScopedPainterPenRollback penRollback(painter, borderPen);
-    QnScopedPainterBrushRollback brushRollback(painter, QColor(64, 130, 180, 180));
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-
-    painter->drawPath(path);
-
-    // for now allow adding of only one item to simplify the logic
-    if (!m_added.isEmpty())
-        return;
-
-    QRect iconRect(0, 0, 200, 200);
-    iconRect.moveCenter(targetRect.center().toPoint());
-    painter->drawPixmap(iconRect, qnSkin->pixmap("item/ptz_zoom_in.png"));
-}
-
-
-void QnVideowallManageWidgetPrivate::paintExistingItem(QPainter* painter, const BaseModelItem &item) {
-    QRect geometry = item.geometry;
-
-    qreal margin = innerMargin * qMin(geometry.width(), geometry.height());
-
-    QRectF targetRect = eroded(geometry, margin);
-
-    QPainterPath path;
-    path.addRoundRect(targetRect, 25);
-
-    QPen borderPen(QColor(100, 100, 100));
-    borderPen.setWidth(25);
-
-    QnScopedPainterPenRollback penRollback(painter, borderPen);
-    QnScopedPainterBrushRollback brushRollback(painter, QColor(100, 100, 100, 180));
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-
-    painter->drawPath(path);
-
-}
-
-void QnVideowallManageWidgetPrivate::paintAddedItem(QPainter* painter, const BaseModelItem &item) {
-    QRect geometry = item.geometry;
-
-    qreal margin = innerMargin * qMin(geometry.width(), geometry.height());
-
-    QRectF targetRect = eroded(geometry, margin);
-
-    QPainterPath path;
-    path.addRoundRect(targetRect, 25);
-
-    QPen borderPen(QColor(64, 180, 130));
-    borderPen.setWidth(25);
-
-    QnScopedPainterPenRollback penRollback(painter, borderPen);
-    QnScopedPainterBrushRollback brushRollback(painter, QColor(64, 180, 130, 180));
-    QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
-
-    painter->drawPath(path);
 }
 
 QTransform QnVideowallManageWidgetPrivate::getTransform(const QRect &rect)
@@ -393,23 +403,7 @@ void QnVideowallManageWidgetPrivate::paint(QPainter* painter, const QRect &rect)
 
     foreachItemConst([this, painter](const BaseModelItem &item, bool &) {
         QnScopedPainterOpacityRollback opacityRollback(painter, item.opacity);
-        switch (item.itemType) {
-        case ItemType::Screen:
-             paintScreenFrame(painter, item);
-             if (item.free())
-                 paintPlaceholder(painter, item);
-             break;
-        case ItemType::ScreenPart:
-            if (item.free())
-                paintPlaceholder(painter, item);
-            break;
-        case ItemType::Existing:
-            paintExistingItem(painter, item);
-            break;
-        case ItemType::Added:
-            paintAddedItem(painter, item);
-            break;
-        }
+        item.paint(painter);
     });
 }
 
@@ -430,9 +424,7 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
         if (!item.free())
             return;
 
-        ModelItem added;
-        added.id = QUuid::createUuid();
-        added.itemType = ItemType::Added;
+        AddedItem added;
         added.geometry = item.geometry;
         added.snaps = item.snaps;
         added.flags |= StateFlag::Hovered;   //mouse cursor is over it
@@ -464,4 +456,3 @@ void QnVideowallManageWidgetPrivate::tick(int deltaMSecs) {
             item.opacity = qMax(item.opacity - opacityDelta, minOpacity);
     });
 }
-

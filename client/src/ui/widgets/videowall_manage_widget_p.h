@@ -50,28 +50,51 @@ private:
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
     struct BaseModelItem {
-        BaseModelItem(const QRect &rect);
+        BaseModelItem(const QRect &rect, ItemType itemType, const QUuid &id);
 
         virtual bool free() const = 0;
         virtual void setFree(bool value) = 0;
 
-        QUuid id;
+        virtual void paint(QPainter* painter) const;
+
+        const QUuid id;
+        const ItemType itemType;
+
         QRect geometry;
-        ItemType itemType;
         QnScreenSnaps snaps;
         StateFlags flags;
+
         qreal opacity;
+        QColor baseColor;
     };
 
 
     struct ModelItem: BaseModelItem {
-        ModelItem();
+        ModelItem(ItemType itemType, const QUuid &id);
 
         virtual bool free() const override;
         virtual void setFree(bool value) override;
     };
 
-    struct ModelScreenPart: BaseModelItem {
+    struct ExistingItem: ModelItem {
+        ExistingItem(const QUuid &id);
+    };
+
+    struct AddedItem: ModelItem {
+        AddedItem();
+    };
+
+    struct FreeSpaceItem: BaseModelItem {
+        typedef BaseModelItem base_type;
+
+        FreeSpaceItem(const QRect &rect, ItemType itemType);
+
+        virtual void paint(QPainter* painter) const override;
+    };
+
+    struct ModelScreenPart: FreeSpaceItem {
+        typedef FreeSpaceItem base_type;
+
         ModelScreenPart(int screenIdx, int xIndex, int yIndex, const QRect &rect);
 
         virtual bool free() const override;
@@ -80,11 +103,15 @@ private:
         bool m_free;
     };
 
-    struct ModelScreen: BaseModelItem {
+    struct ModelScreen: FreeSpaceItem {
+        typedef FreeSpaceItem base_type;
+
         ModelScreen(int idx, const QRect &rect);
 
         virtual bool free() const override;
         virtual void setFree(bool value) override;
+
+        virtual void paint(QPainter* painter) const override;
 
         QList<ModelScreenPart> parts;
     };
@@ -98,12 +125,6 @@ private:
     void foreachItemConst(std::function<void(const BaseModelItem& /*item*/, bool& /*abort*/)> handler);
 
     void use(const QnScreenSnaps &snaps);
-
-    void paintScreenFrame(QPainter *painter, const BaseModelItem &item);
-    void paintPlaceholder(QPainter* painter, const BaseModelItem &item);
-    void paintExistingItem(QPainter* painter, const BaseModelItem &item);
-    void paintAddedItem(QPainter* painter, const BaseModelItem &item);
-
 private:
     QTransform m_transform;
     QTransform m_invertedTransform;
