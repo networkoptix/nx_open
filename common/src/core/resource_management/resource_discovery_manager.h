@@ -85,7 +85,7 @@ public:
     void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
 
     virtual void pleaseStop();
 

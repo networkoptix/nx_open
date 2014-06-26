@@ -124,7 +124,7 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
     m_resourceProcessor = processor;
 }
 
-QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnResourceDiscoveryManager::createResource(const QnId &resourceTypeId, const QnResourceParams& params)
 {
     QnResourcePtr result;
 

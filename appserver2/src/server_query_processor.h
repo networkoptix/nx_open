@@ -81,7 +81,7 @@ namespace ec2
                 locker.commit();
 
             // delivering transaction to remote peers
-            if (!tran.localTransaction)
+            if (!tran.isLocal)
                 QnTransactionMessageBus::instance()->sendTransaction(tran);
         }
 
@@ -180,7 +180,7 @@ namespace ec2
                 QnTransaction<SubDataType> tran(command, multiTran.persistent);
                 tran.params = data;
                 tran.fillSequence();
-                tran.localTransaction = multiTran.localTransaction;
+                tran.isLocal = multiTran.isLocal;
 
                 errorCode = auxManager->executeTransaction(tran);
                 if( errorCode != ErrorCode::ok )
@@ -221,7 +221,7 @@ namespace ec2
             foreach(const QnTransaction<SubDataType>& transaction, processedTransactions)
             {
                 // delivering transaction to remote peers
-                if (!transaction.localTransaction)
+                if (!transaction.isLocal)
                     QnTransactionMessageBus::instance()->sendTransaction(transaction);
             }
             if (processMultiTran)
