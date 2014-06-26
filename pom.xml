@@ -21,6 +21,7 @@
 
     <properties>
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
+        <timestamp>${angle}-${webkit}-20140625.timestamp</timestamp>
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
@@ -38,7 +39,7 @@
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
         <beta>true</beta>
-	<webkit>true</webkit>
+        <webkit>true</webkit>
         <box/>
 
         <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
@@ -150,7 +151,7 @@
                 </executions>
                 <configuration>
                     <doCheck>false</doCheck>
-                    <doUpdate>update</doUpdate>
+                    <doUpdate>true</doUpdate>
                 </configuration>
             </plugin>       
             <plugin>
@@ -208,7 +209,7 @@
             <activation>        
                 <file>
                     <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
-                    <missing>build_environment/target/buildenv20140603.timestamp</missing>
+                    <missing>build_environment/target/${timestamp}</missing>
                 </file> 
             </activation>
             <modules>   
