@@ -5,8 +5,7 @@
 
 #include <utils/common/id.h>
 
-struct QnResourceParams
-{
+struct QnResourceParams {
     QnResourceParams() {}
     QnResourceParams(const QString &url, const QString &vendor): url(url), vendor(vendor) {}
 
@@ -15,8 +14,7 @@ struct QnResourceParams
 };
 
 
-class QnResourceFactory
-{
+class QnResourceFactory {
 public:
     virtual ~QnResourceFactory() {}
 
