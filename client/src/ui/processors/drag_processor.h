@@ -196,6 +196,8 @@ private:
 
     QPointF itemPos(QGraphicsItem *item, QGraphicsSceneMouseEvent *event);
 
+    QPointF itemPos(QWidget *widget, QMouseEvent *event);
+
     template<class T, class Event>
     void mousePressEventInternal(T *object, Event *event, bool instantDrag);
 
