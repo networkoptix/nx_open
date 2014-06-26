@@ -8,6 +8,7 @@ CONFIG(debug, debug|release) {
   CONFIGURATION=release
 }
 
+CLIENT_DIR = $$PWD/../client
 COMMON_DIR = $$PWD/../common
 EC2_DIR = $$PWD/../appserver2
 BUILDENV_DIR = $$PWD/../build_environment
@@ -16,6 +17,7 @@ INCLUDEPATH += \
     $$PWD/src \
     $$COMMON_DIR/src \
     $$EC2_DIR/src \
+    $$CLIENT_DIR/src \
 
 LIBS += \
     -L$$BUILDENV_DIR/target/lib/$$CONFIGURATION \
