@@ -18,6 +18,8 @@ namespace {
     const qreal frameMargin = 0.04;
     const qreal innerMargin = frameMargin * 2;
 
+    const qreal opacityChangeSpeed = 0.002;
+    const qreal draggedOpacity = 0.2;
     const qreal minOpacity = 0.5;
 
     const int fillColorAlpha = 180;
@@ -25,10 +27,11 @@ namespace {
     const int borderWidth = 25;
 
 
-    const QColor desktopColor(130, 130, 130);
+    const QColor desktopColor(Qt::darkGray);
     const QColor freeSpaceColor(64, 130, 180);
-    const QColor existingItemColor(100, 100, 100);
+    const QColor existingItemColor(Qt::lightGray);
     const QColor addedItemColor(64, 180, 130);
+    const QColor textColor(Qt::white);
 }
 
 /************************************************************************/
@@ -40,7 +43,8 @@ QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(const QRect &rect, 
     itemType(itemType),
     geometry(rect),
     flags(StateFlag::Default),
-    opacity(minOpacity)
+    opacity(minOpacity),
+    editable(false)
 {}
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter) const {
@@ -59,6 +63,82 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter) con
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
 
     painter->drawPath(path);
+
+    if (!name.isEmpty()) {
+        QPen textPen(textColor);
+        QnScopedPainterPenRollback penRollback(painter, textPen);
+
+        QFont font(painter->font());
+        font.setPixelSize(120);
+        QnScopedPainterFontRollback fontRollback(painter, font);
+
+        QRect textRect(0, 0,
+            painter->fontMetrics().width(name),
+            painter->fontMetrics().height());
+        textRect.moveCenter(targetRect.center().toPoint());
+        textRect.moveTop(targetRect.top() + targetRect.height() * 0.7);
+
+        painter->drawText(textRect, name);
+    }
+
+    if (editable && hasFlag(StateFlag::Hovered)) {
+        QRect iconRect(0, 0, 200, 200);
+        iconRect.moveCenter(geometry.center());
+        painter->drawPixmap(iconRect, qnSkin->pixmap("item/move.png"));
+
+        {
+            QPen editBorderPen(textColor);
+            editBorderPen.setWidth(borderWidth);
+
+            QVector<qreal> dashes;
+            dashes << 2 << 3;
+            editBorderPen.setDashPattern(dashes);
+
+            QnScopedPainterPenRollback penRollback(painter, editBorderPen);
+            QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
+            painter->drawPath(path);
+        }
+
+        {
+            QPen resizeBorderPen(textColor);
+            resizeBorderPen.setWidth(borderWidth / 2);
+
+            QnScopedPainterPenRollback penRollback(painter, resizeBorderPen);
+            QnScopedPainterBrushRollback brushRollback(painter, baseColor);
+
+            QRect resizeRect(0, 0, borderWidth*3, borderWidth*3);
+
+            resizeRect.moveCenter(QPoint(targetRect.left(), targetRect.top()));
+            painter->drawRect(resizeRect);
+
+            resizeRect.moveCenter(QPoint(targetRect.right(), targetRect.top()));
+            painter->drawRect(resizeRect);
+
+            resizeRect.moveCenter(QPoint(targetRect.left(), targetRect.bottom()));
+            painter->drawRect(resizeRect);
+
+            resizeRect.moveCenter(QPoint(targetRect.right(), targetRect.bottom()));
+            painter->drawRect(resizeRect);
+
+            resizeRect.moveCenter(QPoint(targetRect.left(), targetRect.center().y()));
+            painter->drawRect(resizeRect);
+
+            resizeRect.moveCenter(QPoint(targetRect.right(), targetRect.center().y()));
+            painter->drawRect(resizeRect);
+
+            resizeRect.moveCenter(QPoint(targetRect.center().x(), targetRect.top()));
+            painter->drawRect(resizeRect);
+
+            resizeRect.moveCenter(QPoint(targetRect.center().x(), targetRect.bottom()));
+            painter->drawRect(resizeRect);
+        }
+
+ 
+    }
+}
+
+bool QnVideowallManageWidgetPrivate::BaseModelItem::hasFlag(StateFlags flag) const {
+    return (flags & flag) == flag;
 }
 
 /************************************************************************/
@@ -76,10 +156,6 @@ void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(QPainter* painter) con
         return;
 
     base_type::paint(painter);
-
-    // for now allow adding of only one item to simplify the logic
-    //if (!m_added.isEmpty())
-    //    return;
 
     QRect iconRect(0, 0, 200, 200);
     iconRect.moveCenter(geometry.center());
@@ -118,6 +194,8 @@ void QnVideowallManageWidgetPrivate::ModelScreenPart::setFree(bool value) {
 QnVideowallManageWidgetPrivate::ModelScreen::ModelScreen(int idx, const QRect &rect) :
     base_type(rect, ItemType::Screen)
 {
+    name = tr("Desktop %1").arg(idx + 1);
+
     for (auto snap = snaps.values.begin(); snap != snaps.values.end(); ++snap) {
         snap->screenIndex = idx;
         snap->snapIndex = 0;
@@ -171,7 +249,8 @@ void QnVideowallManageWidgetPrivate::ModelScreen::paint(QPainter* painter) const
 
 QnVideowallManageWidgetPrivate::ModelItem::ModelItem(ItemType itemType, const QUuid &id):
     BaseModelItem(QRect(), itemType, id)
-{}
+{
+}
 
 bool QnVideowallManageWidgetPrivate::ModelItem::free() const {
     return false;
@@ -199,6 +278,7 @@ QnVideowallManageWidgetPrivate::ExistingItem::ExistingItem(const QUuid &id) :
 QnVideowallManageWidgetPrivate::AddedItem::AddedItem() :
     ModelItem(ItemType::Added, QUuid::createUuid())
 {
+    editable = true;
     baseColor = addedItemColor;
 }
 
@@ -289,6 +369,7 @@ void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourceP
 
     foreach (const QnVideoWallItem &item, videowall->items()->getItems()) {
         ExistingItem modelItem(item.uuid);
+        modelItem.name = item.name;
         modelItem.snaps = item.screenSnaps;
         modelItem.geometry = item.screenSnaps.geometry(screens);
         m_items << modelItem;
@@ -421,36 +502,72 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
         return;
 
     foreachItem([this, pos](BaseModelItem &item, bool &abort) {
-        if (!item.free())
+        if (!item.free() || !item.geometry.contains(pos))
             return;
 
         AddedItem added;
+        added.name = tr("New Item");
         added.geometry = item.geometry;
         added.snaps = item.snaps;
         added.flags |= StateFlag::Hovered;   //mouse cursor is over it
+        added.opacity = 1.0;
         m_added << added;
         item.setFree(false);
         abort = true;
     });
 }
 
-void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint &pos) {
+void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint &pos, const QPoint &oldPos) {
+    foreachItem([this, pos](BaseModelItem &item, bool &abort) {
+        if (!item.editable || !item.geometry.contains(pos))
+            return;
 
+        item.flags |= StateFlag::Pressed;
+        
+        
+        abort = true;
+    });
 }
 
-void QnVideowallManageWidgetPrivate::dragMoveAt(const QPoint &pos) {
+void QnVideowallManageWidgetPrivate::dragMoveAt(const QPoint &pos, const QPoint &oldPos) {
+    foreachItem([this, &pos, &oldPos](BaseModelItem &item, bool &abort) {
+        if (!item.hasFlag(StateFlag::Pressed))
+            return;
 
+        qDebug() << "drag move" << item.geometry;
+        qDebug() << "oldCenter" << item.geometry.center();
+        qDebug() << "pos" << pos << "oldPos" << oldPos;
+
+        QPoint newCenter = item.geometry.center() + pos - oldPos;
+        qDebug() << "newCenter" << newCenter;
+
+        item.geometry.moveCenter(newCenter);
+        qDebug() << "new geometry" << item.geometry;
+
+        abort = true;
+    });
 }
 
-void QnVideowallManageWidgetPrivate::dragEndAt(const QPoint &pos) {
+void QnVideowallManageWidgetPrivate::dragEndAt(const QPoint &pos, const QPoint &oldPos) {
+    foreachItem([this, pos](BaseModelItem &item, bool &abort) {
+        if (!item.hasFlag(StateFlag::Pressed))
+            return;
 
+        item.flags &= ~StateFlags(StateFlag::Pressed);
+
+
+        abort = true;
+    });
 }
 
 void QnVideowallManageWidgetPrivate::tick(int deltaMSecs) {
-    qreal opacityDelta = 0.001 * deltaMSecs;
+    qreal opacityDelta = opacityChangeSpeed * deltaMSecs;
 
     foreachItem([this, opacityDelta](BaseModelItem &item, bool &) {
-        if (item.flags & StateFlag::Hovered)
+        if (item.hasFlag(StateFlag::Pressed))
+            item.opacity = qMax(item.opacity - opacityDelta, draggedOpacity);
+        else
+        if (item.hasFlag(StateFlag::Hovered))
             item.opacity = qMin(item.opacity + opacityDelta, 1.0);
         else
             item.opacity = qMax(item.opacity - opacityDelta, minOpacity);

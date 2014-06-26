@@ -28,9 +28,9 @@ public:
 
     void mouseMoveAt(const QPoint &pos, Qt::MouseButtons buttons);
     void mouseClickAt(const QPoint &pos, Qt::MouseButtons buttons);
-    void dragStartAt(const QPoint &pos);
-    void dragMoveAt(const QPoint &pos);
-    void dragEndAt(const QPoint &pos);
+    void dragStartAt(const QPoint &pos, const QPoint &oldPos);
+    void dragMoveAt(const QPoint &pos, const QPoint &oldPos);
+    void dragEndAt(const QPoint &pos, const QPoint &oldPos);
 
     void tick(int deltaMSecs);
 private:
@@ -57,6 +57,8 @@ private:
 
         virtual void paint(QPainter* painter) const;
 
+        bool hasFlag(StateFlags flag) const;
+
         const QUuid id;
         const ItemType itemType;
 
@@ -66,6 +68,9 @@ private:
 
         qreal opacity;
         QColor baseColor;
+        bool editable;
+
+        QString name;
     };
 
 

@@ -102,22 +102,26 @@ void QnVideowallManageWidget::startDrag(DragInfo *info) {
 
     Q_D(QnVideowallManageWidget);
     QTransform transform(d->getInvertedTransform(d->targetRect(this->rect())));
-    QPoint p = transform.map(info->mouseItemPos().toPoint());
-    d->dragStartAt(p);
+
+    QPoint p = transform.map(mapFromGlobal(info->mouseScreenPos()));
+    QPoint prev = transform.map(mapFromGlobal(info->lastMouseScreenPos()));
+    d->dragStartAt(p, prev);
 }
 
 void QnVideowallManageWidget::dragMove(DragInfo *info) {
     Q_D(QnVideowallManageWidget);
     QTransform transform(d->getInvertedTransform(d->targetRect(this->rect())));
-    QPoint p = transform.map(info->mouseItemPos().toPoint());
-    d->dragMoveAt(p);
+    QPoint p = transform.map(mapFromGlobal(info->mouseScreenPos()));
+    QPoint prev = transform.map(mapFromGlobal(info->lastMouseScreenPos()));
+    d->dragMoveAt(p, prev);
 }
 
 void QnVideowallManageWidget::finishDrag(DragInfo *info) {
     Q_D(QnVideowallManageWidget);
     QTransform transform(d->getInvertedTransform(d->targetRect(this->rect())));
-    QPoint p = transform.map(info->mouseItemPos().toPoint());
-    d->dragEndAt(p);
+    QPoint p = transform.map(mapFromGlobal(info->mouseScreenPos()));
+    QPoint prev = transform.map(mapFromGlobal(info->lastMouseScreenPos()));
+    d->dragEndAt(p, prev);
 }
 
 void QnVideowallManageWidget::tick(int deltaTime) {
