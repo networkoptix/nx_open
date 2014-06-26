@@ -16,7 +16,6 @@
 #include <ui/models/resource_pool_model.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/models/resource_pool_model_node.h>
 
 #include <utils/common/scoped_value_rollback.h>
 
@@ -79,6 +78,7 @@ void QnResourceSelectionDialog::init() {
     ui->setupUi(this);
 
     Qn::NodeType rootNodeType;
+
     switch (m_target) {
     case UserResourceTarget:
         rootNodeType = Qn::UsersNode;
@@ -97,13 +97,10 @@ void QnResourceSelectionDialog::init() {
         resize(minimumSize());
         break;
     }
-    m_resourceModel = new QnResourcePoolModel(rootNodeType,this);
+    m_resourceModel = new QnResourcePoolModel(rootNodeType, this);
 
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
 
-    if(rootNodeType == Qn::UsersNode) {
-        m_resourceModel->setToFlatMode(true);
-    }
 
     ui->resourcesWidget->setModel(m_resourceModel);
     ui->resourcesWidget->setFilterVisible(true);

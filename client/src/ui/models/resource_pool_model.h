@@ -52,9 +52,6 @@ public:
     bool isUrlsShown();
     void setUrlsShown(bool urlsShown);
 
-
-    void setToFlatMode( bool );
-
     Qn::NodeType rootNodeType() const;
 private:
     QnResourcePoolModelNode *node(const QnResourcePtr &resource);

@@ -262,6 +262,7 @@ Qn::NodeType QnResourcePoolModel::rootNodeType() const {
 QModelIndex QnResourcePoolModel::index(int row, int column, const QModelIndex &parent) const {
     if(!hasIndex(row, column, parent)) /* hasIndex calls rowCount and columnCount. */
         return QModelIndex();
+
     return node(parent)->child(row)->index(row, column);
 }
 
@@ -282,8 +283,8 @@ bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
 int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
     if (parent.column() > Qn::NameColumn)
         return 0;
-    QnResourcePoolModelNode* n = node(parent);
-    return n->children().size();
+
+    return node(parent)->children().size();
 }
 
 int QnResourcePoolModel::columnCount(const QModelIndex &/*parent*/) const {
@@ -628,22 +629,5 @@ void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResource
         recorder->m_name = camera->getGroupName();
         recorder->m_displayName = camera->getGroupName();
         recorder->changeInternal();
-    }
-}
-
-void QnResourcePoolModel::setToFlatMode( bool flat ) {
-    QnResourcePoolModelNode* root_node = m_rootNodes[m_rootNodeType];
-    Q_ASSERT(root_node);
-
-    // The root_node here is root of the tree, what we really need to hide
-    // is the root of the tree's grand children.If we hide the children of
-    // that tree root, we gonna end up with nothing to show here. 
-
-    foreach(QnResourcePoolModelNode* child,root_node->children()) {
-        if( child != NULL ) {
-            foreach(QnResourcePoolModelNode* grand_child,child->children() ) {
-                grand_child->setBastard(flat);
-            }
-        }
     }
 }
