@@ -38,6 +38,7 @@ void QnRuntimeInfoManager::at_remotePeerLost(ec2::ApiPeerAliveData data, bool is
     if (data.peer.id == qnCommon->remoteGUID()) {
         qnLicensePool->setMainHardwareIds(QList<QByteArray>());
         qnLicensePool->setCompatibleHardwareIds(QList<QByteArray>());
+        m_runtimeInfo.clear();
     }
 }
 
