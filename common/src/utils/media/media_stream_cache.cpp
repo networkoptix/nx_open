@@ -4,7 +4,7 @@
 
 #include "media_stream_cache.h"
 
-#include <malloc.h>
+#include <cstdlib>
 #include <algorithm>
 
 #include <QMutexLocker>
