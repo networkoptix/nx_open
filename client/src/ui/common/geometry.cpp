@@ -510,4 +510,10 @@ QPointF QnGeometry::closestPoint(const QPointF &a, const QPointF &b, const QPoin
     return a + k * b;
 }
 
+qint64 QnGeometry::area(const QRect &rect) {
+    if (!rect.isValid())
+        return 0;
+    return rect.width() * rect.height();
+}
+
 

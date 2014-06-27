@@ -341,6 +341,14 @@ public:
      */
     static bool contains(const QSize &size, const QSize &otherSize);
 
+    /**
+     * Calculates the area of the given rectangle.
+     * 
+     * \param rect                      Target rectangle.
+     * \returns                         Area of the provided rectangle or 0 if it is not valid.
+     */
+    static qint64 area(const QRect &rect);
+
     static QRectF movedInto(const QRectF &rect, const QRectF &target);
 
     static QRectF subRect(const QRectF &rect, const QRectF &relativeSubRect);

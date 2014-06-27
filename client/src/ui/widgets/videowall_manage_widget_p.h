@@ -28,9 +28,9 @@ public:
 
     void mouseMoveAt(const QPoint &pos);
     void mouseClickAt(const QPoint &pos, Qt::MouseButtons buttons);
-    void dragStartAt(const QPoint &pos, const QPoint &oldPos);
+    void dragStartAt(const QPoint &pos);
     void dragMoveAt(const QPoint &pos, const QPoint &oldPos);
-    void dragEndAt(const QPoint &pos, const QPoint &oldPos);
+    void dragEndAt(const QPoint &pos);
 
     void tick(int deltaMSecs);
 private:
@@ -59,13 +59,37 @@ private:
     };
     Q_DECLARE_FLAGS(ItemTransformations, ItemTransformation)
 
+    struct TransformationProcess {
+        TransformationProcess();
+
+        ItemTransformations value;
+        QRect geometry;
+
+        bool isRunning() const {
+            return value != ItemTransformation::None;
+        }
+
+        friend bool operator==(const TransformationProcess &process, const ItemTransformations &transformations) {
+            return process.value == transformations;
+        }
+
+        friend bool operator==(const ItemTransformations &transformations, const TransformationProcess &process) {
+            return process.value == transformations;
+        }
+    };
+
     struct BaseModelItem {
         BaseModelItem(const QRect &rect, ItemType itemType, const QUuid &id);
 
         virtual bool free() const = 0;
         virtual void setFree(bool value) = 0;
 
-        virtual void paint(QPainter* painter) const;
+        virtual void paint(QPainter* painter, const TransformationProcess &process) const;
+        virtual QRect bodyRect() const;
+        virtual QPainterPath bodyPath() const;
+        void paintDashBorder(QPainter *painter, const QPainterPath &path) const;
+        void paintResizeAnchors(QPainter *painter, const QRect &rect) const;
+        void paintPixmap(QPainter *painter, const QRect &rect, const QPixmap &pixmap) const;
 
         bool hasFlag(StateFlags flag) const;
 
@@ -104,13 +128,15 @@ private:
 
         FreeSpaceItem(const QRect &rect, ItemType itemType);
 
-        virtual void paint(QPainter* painter) const override;
+        virtual void paint(QPainter* painter, const TransformationProcess &process) const override;
     };
 
     struct ModelScreenPart: FreeSpaceItem {
         typedef FreeSpaceItem base_type;
 
         ModelScreenPart(int screenIdx, int xIndex, int yIndex, const QRect &rect);
+
+        virtual QPainterPath bodyPath() const override;
 
         virtual bool free() const override;
         virtual void setFree(bool value) override;
@@ -126,7 +152,7 @@ private:
         virtual bool free() const override;
         virtual void setFree(bool value) override;
 
-        virtual void paint(QPainter* painter) const override;
+        virtual void paint(QPainter* painter, const TransformationProcess &process) const override;
 
         QList<ModelScreenPart> parts;
     };
@@ -154,6 +180,7 @@ private:
     ItemTransformations transformationsAnchor(const QRect &geometry, const QPoint &pos) const;
     Qt::CursorShape transformationsCursor(ItemTransformations value) const;
 
+    QRect calculateProposedGeometry(const QRect &geometry, bool *valid = NULL) const;
 private:
     QWidget *q_ptr;
     QTransform m_transform;
@@ -164,7 +191,7 @@ private:
     QList<ModelScreen> m_screens;
     QList<ModelItem> m_added;
 
-    ItemTransformations m_process;
+    TransformationProcess m_process;   
 };
 
 #endif // VIDEOWALL_MANAGE_WIDGET_PRIVATE_H
