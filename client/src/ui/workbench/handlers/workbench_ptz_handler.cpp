@@ -123,7 +123,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
 void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnMediaResourceWidget *widget = parameters.widget<QnMediaResourceWidget>();
-    QString id = parameters.argument<QString>(Qn::PtzObjectIdRole).trimmed();
+    QString id = parameters.argument<QString>(Qn::PtzObjectIdRole);
 
     if(!widget || !widget->ptzController() || id.isEmpty())
         return;

@@ -38,30 +38,54 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     QString ptzCapabilities = resourceData.value<QString>(lit("ptzCapabilities"));
     if(!ptzCapabilities.isEmpty()) {
         // TODO: #Elric evil. implement via enum name mapper flags.
-
-        if(ptzCapabilities == lit("NoPtzCapabilities")) {
-            m_overrideCapabilities = true;
-            m_capabilities = Qn::NoPtzCapabilities;
-        } else if(ptzCapabilities == lit("ContinuousPanCapability")) {
-            m_overrideCapabilities = true;
-            m_capabilities = Qn::ContinuousPanCapability;
-        } else if(ptzCapabilities == lit("ContinuousZoomCapability")) {
-            m_overrideCapabilities = true;
-            m_capabilities = Qn::ContinuousZoomCapability;
-        } else if(ptzCapabilities == lit("ContinuousPanCapability|ContinuousTiltCapability")) {
-            m_overrideCapabilities = true;
-            m_capabilities = Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability;
-        } else if(ptzCapabilities == lit("ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability")) {
-            m_overrideCapabilities = true;
-            m_capabilities = Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability | Qn::ContinuousZoomCapability;
-        } else if(ptzCapabilities == lit("ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability")) {
-            m_overrideCapabilities = true;
-            m_capabilities = Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability | Qn::ContinuousZoomCapability | Qn::ContinuousFocusCapability;
-        } else if(ptzCapabilities == lit("ContinuousPanCapability|ContinuousTiltCapability|AbsolutePanCapability|AbsoluteTiltCapability|DevicePositioningPtzCapability")) {
-            m_overrideCapabilities = true;
-            m_capabilities = Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability | Qn::AbsolutePanCapability | Qn::AbsoluteTiltCapability | Qn::DevicePositioningPtzCapability;
-        } else {
-            qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
+        m_overrideCapabilities = true;
+        m_capabilities = Qn::NoPtzCapabilities;
+        foreach(const QString& capability, ptzCapabilities.split(L'|'))
+        {
+            if(capability == lit("NoPtzCapabilities"))
+                m_capabilities |= Qn::NoPtzCapabilities;
+            else if(capability == lit("ContinuousPanCapability"))
+                m_capabilities |= Qn::ContinuousPanCapability;
+            else if(capability == lit("ContinuousTiltCapability"))
+                m_capabilities |= Qn::ContinuousTiltCapability;
+            else if(capability == lit("ContinuousPanTiltCapabilities"))
+                m_capabilities |= Qn::ContinuousPanTiltCapabilities;
+            else if(capability == lit("ContinuousPtzCapabilities"))
+                m_capabilities |= Qn::ContinuousPtzCapabilities;
+            else if(capability == lit("ContinuousZoomCapability"))
+                m_capabilities |= Qn::ContinuousZoomCapability;
+            else if(capability == lit("AbsolutePanCapability"))
+                m_capabilities |= Qn::AbsolutePanCapability;
+            else if(capability == lit("AbsoluteTiltCapability"))
+                m_capabilities |= Qn::AbsoluteTiltCapability;
+            else if(capability == lit("AbsoluteZoomCapability"))
+                m_capabilities |= Qn::AbsoluteZoomCapability;
+            else if(capability == lit("AbsolutePtzCapabilities"))
+                m_capabilities |= Qn::AbsolutePtzCapabilities;
+            else if(capability == lit("ViewportPtzCapability"))
+                m_capabilities |= Qn::ViewportPtzCapability;
+            else if(capability == lit("FlipPtzCapability"))
+                m_capabilities |= Qn::FlipPtzCapability;
+            else if(capability == lit("LimitsPtzCapability"))
+                m_capabilities |= Qn::LimitsPtzCapability;
+            else if(capability == lit("LimitsPtzCapability"))
+                m_capabilities |= Qn::LimitsPtzCapability;
+            else if(capability == lit("DevicePositioningPtzCapability"))
+                m_capabilities |= Qn::DevicePositioningPtzCapability;
+            else if(capability == lit("LogicalPositioningPtzCapability"))
+                m_capabilities |= Qn::LogicalPositioningPtzCapability;
+            else if(capability == lit("PresetsPtzCapability"))
+                m_capabilities |= Qn::PresetsPtzCapability;
+            else if(capability == lit("ToursPtzCapability"))
+                m_capabilities |= Qn::ToursPtzCapability;
+            else if(capability == lit("ActivityPtzCapability"))
+                m_capabilities |= Qn::ActivityPtzCapability;
+            else if(capability == lit("HomePtzCapability"))
+                m_capabilities |= Qn::HomePtzCapability;
+            else if(capability == lit("nativePresetsPtzCapability"))
+                m_capabilities |= Qn::nativePresetsPtzCapability;
+            else
+                qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
         }
     }
 }
