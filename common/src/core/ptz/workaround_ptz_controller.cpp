@@ -82,6 +82,12 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
                 m_capabilities |= Qn::ActivityPtzCapability;
             else if(capability == lit("HomePtzCapability"))
                 m_capabilities |= Qn::HomePtzCapability;
+            else if(capability == lit("AsynchronousPtzCapability"))
+                m_capabilities |= Qn::AsynchronousPtzCapability;
+            else if(capability == lit("SynchronizedPtzCapability"))
+                m_capabilities |= Qn::SynchronizedPtzCapability;
+            else if(capability == lit("VirtualPtzCapability"))
+                m_capabilities |= Qn::VirtualPtzCapability;
             else if(capability == lit("nativePresetsPtzCapability"))
                 m_capabilities |= Qn::nativePresetsPtzCapability;
             else
