@@ -88,11 +88,15 @@ private:
         virtual void paint(QPainter* painter, const TransformationProcess &process) const;
         virtual QRect bodyRect() const;
         virtual QPainterPath bodyPath() const;
+        virtual int fontSize() const;
+        virtual int iconSize() const;
+        virtual void paintProposed(QPainter* painter, const TransformationProcess &process) const;
         void paintDashBorder(QPainter *painter, const QPainterPath &path) const;
         void paintResizeAnchors(QPainter *painter, const QRect &rect) const;
         void paintPixmap(QPainter *painter, const QRect &rect, const QPixmap &pixmap) const;
 
         bool hasFlag(StateFlags flag) const;
+        bool isPartOfScreen() const;
 
         const QUuid id;
         const ItemType itemType;
@@ -110,6 +114,8 @@ private:
 
 
     struct ModelItem: BaseModelItem {
+        typedef BaseModelItem base_type;
+
         ModelItem(ItemType itemType, const QUuid &id);
 
         virtual bool free() const override;
@@ -137,8 +143,6 @@ private:
 
         ModelScreenPart(int screenIdx, int xIndex, int yIndex, const QRect &rect);
 
-        virtual QPainterPath bodyPath() const override;
-
         virtual bool free() const override;
         virtual void setFree(bool value) override;
     private:
@@ -154,6 +158,7 @@ private:
         virtual void setFree(bool value) override;
 
         virtual void paint(QPainter* painter, const TransformationProcess &process) const override;
+        virtual void paintProposed(QPainter* painter, const TransformationProcess &process) const override;
 
         QList<ModelScreenPart> parts;
     };
@@ -181,7 +186,7 @@ private:
     ItemTransformations transformationsAnchor(const QRect &geometry, const QPoint &pos) const;
     Qt::CursorShape transformationsCursor(ItemTransformations value) const;
 
-    QRect calculateProposedGeometry(const QRect &geometry, bool *valid = NULL) const;
+    QRect calculateProposedGeometry(const QRect &geometry, bool *valid = NULL, bool *multiScreen = NULL) const;
 private:
     QWidget *q_ptr;
     QTransform m_transform;

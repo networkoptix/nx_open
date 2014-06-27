@@ -23,12 +23,15 @@ namespace {
     const qreal minOpacity = 0.5;
     
     const qreal minAreaOverlapping = 0.25;
+    const qreal textOffset = 0.7;
+    const qreal partScreenCoeff = 0.65;
 
     const int fillColorAlpha = 180;
     const int roundness = 25;
     const int borderWidth = 25;
     const int transformationOffset = 50;
-    const int iconSize = 200;
+    const int baseIconSize = 200;
+    const int baseFontSize = 120;
 
     const QColor desktopColor(Qt::darkGray);
     const QColor freeSpaceColor(64, 130, 180);
@@ -56,13 +59,39 @@ bool QnVideowallManageWidgetPrivate::BaseModelItem::hasFlag(StateFlags flag) con
 }
 
 QRect QnVideowallManageWidgetPrivate::BaseModelItem::bodyRect() const {
-    return eroded(geometry, bodyMargin);
+    QRect body = eroded(geometry, bodyMargin);
+    if (!isPartOfScreen())
+        return body;
+
+    if (snaps.left().snapIndex == 0)
+        body.translate(bodyMargin * partScreenCoeff, 0);
+    else if (snaps.right().snapIndex == 0)
+        body.translate(-bodyMargin * partScreenCoeff, 0);
+
+    if (snaps.top().snapIndex == 0)
+        body.translate(0, bodyMargin * partScreenCoeff);
+    else if (snaps.bottom().snapIndex == 0)
+        body.translate(0, -bodyMargin * partScreenCoeff);
+
+    return body;
 }
 
 QPainterPath QnVideowallManageWidgetPrivate::BaseModelItem::bodyPath() const {
     QPainterPath path;
     path.addRoundRect(bodyRect(), roundness);
     return path;
+}
+
+int QnVideowallManageWidgetPrivate::BaseModelItem::fontSize() const {
+    if (isPartOfScreen())
+        return baseFontSize * partScreenCoeff;
+    return baseFontSize;
+}
+
+int QnVideowallManageWidgetPrivate::BaseModelItem::iconSize() const {
+    if (isPartOfScreen())
+        return baseIconSize * partScreenCoeff;
+    return baseIconSize;
 }
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, const TransformationProcess &process) const {
@@ -82,14 +111,14 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
         QnScopedPainterPenRollback penRollback(painter, textPen);
 
         QFont font(painter->font());
-        font.setPixelSize(120);
+        font.setPixelSize(fontSize());
         QnScopedPainterFontRollback fontRollback(painter, font);
 
         QRect textRect(0, 0,
             painter->fontMetrics().width(name),
             painter->fontMetrics().height());
         textRect.moveCenter(body.center());
-        textRect.moveTop(body.top() + body.height() * 0.7);
+        textRect.moveTop(body.top() + body.height() * textOffset);
 
         painter->drawText(textRect, name);
     }
@@ -104,7 +133,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
         
     }
     else if (process.isRunning() && geometry.intersects(process.geometry) && !hasFlag(StateFlag::Pressed))
-        paintDashBorder(painter, bodyPath());
+        paintProposed(painter, process);
 }
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paintDashBorder(QPainter *painter, const QPainterPath &path) const {
@@ -122,7 +151,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintDashBorder(QPainter *pa
 
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paintPixmap(QPainter *painter, const QRect &rect, const QPixmap &pixmap) const {
-    QRect iconRect(0, 0, iconSize, iconSize);
+    QRect iconRect(0, 0, iconSize(), iconSize());
     iconRect.moveCenter(rect.center());
     painter->drawPixmap(iconRect, pixmap);
 }
@@ -161,7 +190,13 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintResizeAnchors(QPainter 
     painter->drawRect(resizeRect);
 }
 
+bool QnVideowallManageWidgetPrivate::BaseModelItem::isPartOfScreen() const {
+    return std::any_of(snaps.values.cbegin(), snaps.values.cend(), [](const QnScreenSnap &snap) {return snap.snapIndex > 0;});
+}
 
+void QnVideowallManageWidgetPrivate::BaseModelItem::paintProposed(QPainter* painter, const TransformationProcess &process) const {
+    paintDashBorder(painter, bodyPath());
+}
 
 /************************************************************************/
 /* FreeSpaceItem                                                        */
@@ -178,7 +213,7 @@ void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(QPainter* painter, con
         return;
     base_type::paint(painter, process);
     if (!process.isRunning())
-        paintPixmap(painter, geometry, qnSkin->pixmap("item/ptz_zoom_in.png"));
+        paintPixmap(painter, bodyRect(), qnSkin->pixmap("item/ptz_zoom_in.png"));
 }
 
 /************************************************************************/
@@ -204,23 +239,6 @@ bool QnVideowallManageWidgetPrivate::ModelScreenPart::free() const {
 
 void QnVideowallManageWidgetPrivate::ModelScreenPart::setFree(bool value) {
     m_free = value;
-}
-
-QPainterPath QnVideowallManageWidgetPrivate::ModelScreenPart::bodyPath() const {
-    QRect body = bodyRect();
-    if (snaps.left().snapIndex == 0)
-        body.translate(bodyMargin / 2, 0);
-    else if (snaps.right().snapIndex == 0)
-        body.translate(-bodyMargin / 2, 0);
-
-    if (snaps.top().snapIndex == 0)
-        body.translate(0, bodyMargin / 2);
-    else if (snaps.bottom().snapIndex == 0)
-        body.translate(0, -bodyMargin / 2);
-
-    QPainterPath path;
-    path.addRoundRect(body, roundness);
-    return path;
 }
 
 /************************************************************************/
@@ -276,9 +294,23 @@ void QnVideowallManageWidgetPrivate::ModelScreen::paint(QPainter* painter, const
         painter->drawPath(path);
     }
     base_type::paint(painter, process);
-    if (process.isRunning() && geometry.intersects(process.geometry) && free()) {
+    
+}
+
+void QnVideowallManageWidgetPrivate::ModelScreen::paintProposed(QPainter* painter, const TransformationProcess &process) const {
+    if (process.isRunning() && free()) {
+        QRect intersection = geometry.intersected(process.geometry);
+        if (!intersection.isValid())
+            return;
+
+        if (intersection == geometry) {
+            base_type::paintProposed(painter, process);
+            return;
+        }
+
         foreach (const ModelScreenPart &part, parts)
-            paintDashBorder(painter, part.bodyPath());
+            if (part.geometry.intersects(intersection))
+                paintDashBorder(painter, part.bodyPath());
     }
 }
 
@@ -718,14 +750,68 @@ void QnVideowallManageWidgetPrivate::resizeItemEnd(BaseModelItem &item) {
     item.flags &= ~StateFlags(StateFlag::Pressed);
 
     bool valid = true;
-    QRect proposedGeometry = calculateProposedGeometry(item.geometry, &valid);
+    bool multiscreen = false;
+    QRect proposedGeometry = calculateProposedGeometry(item.geometry, &valid, &multiscreen);
 
     if (!valid) {
         item.geometry = m_process.oldGeometry;
     } else {
         item.geometry = proposedGeometry;
-    }
 
+        if (multiscreen) {
+            QRect united;
+            foreach(const ModelScreen &screen, m_screens) {
+                if (!screen.geometry.intersects(proposedGeometry))
+                    continue;
+
+                if (!united.isValid()) {
+                    united = screen.geometry;
+                    item.snaps = screen.snaps;
+                    continue;
+                }
+
+                if (screen.geometry.left() < united.left())
+                    item.snaps.left() = screen.snaps.left();
+                if (screen.geometry.right() > united.right())
+                    item.snaps.right() = screen.snaps.right();
+                if (screen.geometry.top() < united.top())
+                    item.snaps.top() = screen.snaps.top();
+                if (screen.geometry.bottom() > united.bottom())
+                    item.snaps.bottom() = screen.snaps.bottom();
+            }
+        } else {
+            
+            foreach(const ModelScreen &screen, m_screens) {
+                if (!screen.geometry.intersects(proposedGeometry))
+                    continue;
+
+                QRect united;
+                foreach (const ModelScreenPart &part, screen.parts) {
+                    if (!part.geometry.intersects(proposedGeometry))
+                        continue;
+
+                    if (!united.isValid()) {
+                        united = part.geometry;
+                        item.snaps = part.snaps;
+                        continue;
+                    }
+
+                    if (part.geometry.left() < united.left())
+                        item.snaps.left() = part.snaps.left();
+                    if (part.geometry.right() > united.right())
+                        item.snaps.right() = part.snaps.right();
+                    if (part.geometry.top() < united.top())
+                        item.snaps.top() = part.snaps.top();
+                    if (part.geometry.bottom() > united.bottom())
+                        item.snaps.bottom() = part.snaps.bottom();
+                }
+
+                break;
+            }
+
+
+        }
+    }
     setFree(item.snaps, false);
 }
 
@@ -793,7 +879,7 @@ Qt::CursorShape QnVideowallManageWidgetPrivate::transformationsCursor(ItemTransf
     }
 }
 
-QRect QnVideowallManageWidgetPrivate::calculateProposedGeometry(const QRect &geometry, bool *valid) const {
+QRect QnVideowallManageWidgetPrivate::calculateProposedGeometry(const QRect &geometry, bool *valid, bool *multiScreen) const {
     QRect result;
 
     int screenCount = 0;
@@ -824,5 +910,8 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedGeometry(const QRect &geo
 
     if (valid)
         *valid &= result.isValid();
+
+    if (multiScreen)
+        *multiScreen = screenCount > 1;
     return result;
 }
