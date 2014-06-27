@@ -201,6 +201,8 @@ void QnTransactionMessageBus::at_gotTransaction(const QByteArray &serializedTran
     if (!sender || sender->getState() != QnTransactionTransport::ReadyForStreaming)
         return;
 
+    Q_ASSERT(transportHeader.processedPeers.contains(sender->remotePeer().id));
+
     using namespace std::placeholders;
     if(!handleTransaction(serializedTran, std::bind(GotTransactionFuction(), this, _1, sender, transportHeader)))
         sender->setState(QnTransactionTransport::Error);
