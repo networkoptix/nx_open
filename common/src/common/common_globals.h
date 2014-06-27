@@ -181,10 +181,13 @@ public:
 
         AuxilaryPtzCapability               = 0x01000000,
 
+        builtinPresetControl                = 0x02000000,
+
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
+        nativePresetsPtzCapability          = PresetsPtzCapability | builtinPresetControl,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzCapability)
 
