@@ -143,6 +143,7 @@ private:
     //!In micros
     quint64 m_currentPacketTimestamp;
     size_t m_cacheSizeInBytes;
+    //!map<event receiver id, function>
     std::map<int, std::function<void (quint64)> > m_eventReceivers;
     int m_prevGivenEventReceiverID;
     std::map<int, quint64> m_dataBlockings;
