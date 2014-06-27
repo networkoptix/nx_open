@@ -676,6 +676,30 @@ int PtzSoapWrapper::doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& r
     return m_soapProxy->AbsoluteMove(m_endpoint, NULL, &request, &response);
 }
 
+int PtzSoapWrapper::gotoPreset(GotoPresetReq& request, GotoPresetResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GotoPreset(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::setPreset(SetPresetReq& request, SetPresetResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->SetPreset(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::getPresets(GetPresetsReq& request, GetPresetsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetPresets(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::removePreset(RemovePresetReq& request, RemovePresetResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->RemovePreset(m_endpoint, NULL, &request, &response);
+}
+
 int PtzSoapWrapper::doGetNode(_onvifPtz__GetNode& request, _onvifPtz__GetNodeResponse& response)
 {
     beforeMethodInvocation();
