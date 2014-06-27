@@ -23,7 +23,7 @@ extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 
 //=========================================================
 
-AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader(QnResourcePtr res):
+AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader(const QnResourcePtr& res):
 QnPlAVClinetPullStreamReader(res)
 {
 
@@ -31,7 +31,7 @@ QnPlAVClinetPullStreamReader(res)
     m_last_width = 1600;
     m_last_height = 1200;
 
-    QnPlAreconVisionResourcePtr avRes = res.dynamicCast<QnPlAreconVisionResource>();
+    const QnPlAreconVisionResource* avRes = dynamic_cast<const QnPlAreconVisionResource*>(res.data());
 
     m_panoramic = avRes->isPanoramic();
     m_dualsensor = avRes->isDualSensor();

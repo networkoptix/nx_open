@@ -16,7 +16,7 @@ class QnDataProviderFactory {
 public:
     virtual ~QnDataProviderFactory() {}
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role) = 0;
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, QnResource::ConnectionRole role) = 0;
 };
 
 
@@ -195,7 +195,7 @@ signals:
         \param timestamp MSecs since epoch, UTC
     */
     void cameraInput(
-        QnResourcePtr resource,
+        const QnResourcePtr& resource,
         const QString& inputPortID,
         bool value,
         qint64 timestamp );

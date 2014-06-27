@@ -10,7 +10,7 @@
 class MJPEGStreamReader: public CLServerPushStreamReader
 {
 public:
-    MJPEGStreamReader(QnResourcePtr res, const QString& streamHttpPath);
+    MJPEGStreamReader(const QnResourcePtr& res, const QString& streamHttpPath);
     virtual ~MJPEGStreamReader();
 
 protected:

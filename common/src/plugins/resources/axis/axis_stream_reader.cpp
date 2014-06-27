@@ -14,7 +14,7 @@ static const int AXIS_SEI_TIMESTAMP = 0x0a01;
 static const int AXIS_SEI_TRIGGER_DATA = 0x0a03;
 
 
-QnAxisStreamReader::QnAxisStreamReader(QnResourcePtr res):
+QnAxisStreamReader::QnAxisStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
     m_rtpStreamParser(res),
     m_oldFirmwareWarned(false)

@@ -15,7 +15,7 @@ static const int STARDOT_SEI_TRIGGER_DATA = 0x0a03;
 static const QByteArray STARDOT_MOTION_UUID = QByteArray::fromHex("bed9b7e0f06032a1bb7e7d4c6d82d249");
 
 
-QnStardotStreamReader::QnStardotStreamReader(QnResourcePtr res):
+QnStardotStreamReader::QnStardotStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
     m_multiCodec(res)
 {
@@ -129,7 +129,7 @@ QnConstResourceAudioLayoutPtr QnStardotStreamReader::getDPAudioLayout() const
 
 // motion estimation
 
-void QnStardotStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
+void QnStardotStreamReader::parseMotionInfo(const QnCompressedVideoDataPtr& videoData)
 {
     const quint8* curNal = (const quint8*) videoData->data();
     const quint8* end = curNal + videoData->dataSize();

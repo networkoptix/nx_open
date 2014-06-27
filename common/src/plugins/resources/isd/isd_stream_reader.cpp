@@ -10,7 +10,7 @@
 
 extern QString getValueFromString(const QString& line);
 
-QnISDStreamReader::QnISDStreamReader(QnResourcePtr res):
+QnISDStreamReader::QnISDStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
     m_rtpStreamParser(res)
 {

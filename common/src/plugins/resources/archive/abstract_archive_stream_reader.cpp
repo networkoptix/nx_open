@@ -5,7 +5,7 @@
 
 #include "utils/common/util.h"
 
-QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
+QnAbstractArchiveReader::QnAbstractArchiveReader(const QnResourcePtr& dev ) :
     QnAbstractMediaStreamDataProvider(dev),
     m_cycleMode(true),
     m_needToSleep(0),

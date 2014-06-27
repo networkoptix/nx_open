@@ -11,7 +11,7 @@
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)
 {
-    connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
+    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnAppserverResourceProcessor::at_resource_statusChanged);
 
 
     m_cameraDataHandler = new ec2::QnMutexCameraDataHandler();
@@ -26,13 +26,10 @@ QnAppserverResourceProcessor::~QnAppserverResourceProcessor()
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
 {
-    
-
     foreach (QnResourcePtr resource, resources)
     {
-        QnVirtualCameraResourcePtr cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
-
-        if (cameraResource.isNull())
+        QnVirtualCameraResource* cameraResource = dynamic_cast<QnVirtualCameraResource*>(resource.data());
+        if (cameraResource == nullptr)
             continue;
 
         //Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(cameraResource->getPhysicalId()).isEmpty());

@@ -36,7 +36,7 @@ QString QnStreamRecorder::errorString(int errCode) {
     }
 }
 
-QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
+QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
     m_device(dev),
     m_firstTime(true),

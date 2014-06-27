@@ -14,7 +14,7 @@ static const int MAX_KEY_FIND_INTERVAL = 10 * 1000 * 1000;
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
 
-QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
+QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
     QnAbstractArchiveReader(dev),
 //protected
     m_currentTime(0),

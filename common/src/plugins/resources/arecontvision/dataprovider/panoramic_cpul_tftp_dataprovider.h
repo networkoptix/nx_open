@@ -13,7 +13,7 @@ class CLSimpleTFTPClient;
 class AVPanoramicClientPullSSTFTPStreamreader : public QnPlAVClinetPullStreamReader
 {
 public:
-    explicit AVPanoramicClientPullSSTFTPStreamreader(QnResourcePtr res);
+    explicit AVPanoramicClientPullSSTFTPStreamreader(const QnResourcePtr& res);
 
     ~AVPanoramicClientPullSSTFTPStreamreader();
 

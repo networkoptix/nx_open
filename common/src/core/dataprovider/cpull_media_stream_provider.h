@@ -13,7 +13,7 @@ class QnClientPullMediaStreamProvider : public QnLiveStreamProvider
     Q_OBJECT;
 
 public:
-    QnClientPullMediaStreamProvider(QnResourcePtr dev);
+    QnClientPullMediaStreamProvider(const QnResourcePtr& dev);
     virtual ~QnClientPullMediaStreamProvider() {stop();}
 
 protected:

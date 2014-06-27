@@ -92,7 +92,7 @@ CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::tryAcquireCameraMediaS
     return streamReader->diagnoseMediaStreamConnection();
 }
 
-CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraMediaStreamForErrors( QnResourcePtr res )
+CameraDiagnostics::Result QnCameraDiagnosticsRestHandler::checkCameraMediaStreamForErrors( const QnResourcePtr& res )
 {
     return res->getLastMediaIssue();
 }

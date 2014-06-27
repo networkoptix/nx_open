@@ -89,7 +89,7 @@ int QnLayoutFileCameraDataLoader::loadMotion(const QnTimePeriod &period, const Q
 
             for (QnMetaDataLightVector::const_iterator itr = itrStart; itr != itrEnd; ++itr)
             {
-                if (itr->channel <= motionRegions.size() && QnMetaDataV1::mathImage((__m128i*) itr->data, (__m128i*) masks[itr->channel]))
+                if (itr->channel <= motionRegions.size() && QnMetaDataV1::matchImage((__m128i*) itr->data, (__m128i*) masks[itr->channel]))
                     periods.last() << QnTimePeriod(itr->startTimeMs, itr->durationMs);
             }
         }

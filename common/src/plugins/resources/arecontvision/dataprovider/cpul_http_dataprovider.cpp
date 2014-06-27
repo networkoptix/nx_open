@@ -6,14 +6,14 @@
 #include "utils/common/synctime.h"
 
 
-AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(QnResourcePtr res):
+AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(const QnResourcePtr& res):
 QnPlAVClinetPullStreamReader(res)
 {
 
     m_port = 69;
     m_timeout = 500;
 
-    QnPlAreconVisionResourcePtr avRes = res.dynamicCast<QnPlAreconVisionResource>();
+    const QnPlAreconVisionResource* avRes = dynamic_cast<const QnPlAreconVisionResource*>(res.data());
 
     m_panoramic = avRes->isPanoramic();
     m_dualsensor = avRes->isDualSensor();

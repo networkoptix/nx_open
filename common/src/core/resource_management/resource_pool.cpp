@@ -396,7 +396,7 @@ QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
     return itr != m_resources.end() ? itr.value() : QnResourcePtr(0);
 }
 
-void QnResourcePool::updateUniqId(QnResourcePtr res, const QString &newUniqId)
+void QnResourcePool::updateUniqId(const QnResourcePtr& res, const QString &newUniqId)
 {
     QMutexLocker locker(&m_resourcesMtx);
     QHash<QString, QnResourcePtr>::iterator itr = m_resources.find(res->getUniqueId());

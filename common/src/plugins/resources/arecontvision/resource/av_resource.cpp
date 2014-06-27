@@ -84,7 +84,7 @@ CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
 class QnPlArecontResourceSetRegCommand : public QnResourceCommand
 {
 public:
-    QnPlArecontResourceSetRegCommand(QnResourcePtr res, int page, int reg, int val):
+    QnPlArecontResourceSetRegCommand(const QnResourcePtr& res, int page, int reg, int val):
       QnResourceCommand(res),
           m_page(page),
           m_reg(reg),

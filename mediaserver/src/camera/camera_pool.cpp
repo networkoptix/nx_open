@@ -45,10 +45,9 @@ QnVideoCameraPool* QnVideoCameraPool::instance()
     //return &inst;
 }
 
-QnVideoCamera* QnVideoCameraPool::getVideoCamera(QnResourcePtr res)
+QnVideoCamera* QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res)
 {
-    QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
-    if (!cameraRes)
+    if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
         return 0;
 
     QMutexLocker lock(&m_staticMtx);
@@ -64,7 +63,7 @@ QnVideoCamera* QnVideoCameraPool::getVideoCamera(QnResourcePtr res)
     }
 }
 
-void QnVideoCameraPool::removeVideoCamera(QnResourcePtr res)
+void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
 {
     QMutexLocker lock(&m_staticMtx);
     CameraMap::iterator itr = m_cameras.find(res);

@@ -17,7 +17,7 @@ public:
     virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams &params) override;
 
 signals:
-    void cameraDisconnected(QnResourcePtr camera, qint64 timestamp);
+    void cameraDisconnected(const QnResourcePtr& camera, qint64 timestamp);
 
 protected:
     virtual bool processDiscoveredResources(QnResourceList& resources) override;
@@ -25,12 +25,12 @@ protected:
 private:
     void markOfflineIfNeeded(QSet<QString>& discoveredResources);
 
-    void updateResourceStatus(QnResourcePtr res, QSet<QString>& discoveredResources);
+    void updateResourceStatus(const QnResourcePtr& res, QSet<QString>& discoveredResources);
 
     // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
-    void pingResources(QnResourcePtr res);
-    void addNewCamera(QnVirtualCameraResourcePtr cameraResource);
-    bool canTakeForeignCamera(QnResourcePtr camera);
+    void pingResources(const QnResourcePtr& res);
+    void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
+    bool canTakeForeignCamera(const QnResourcePtr& camera);
 
 private:
     bool m_foundSmth; // minor just to minimize lof output

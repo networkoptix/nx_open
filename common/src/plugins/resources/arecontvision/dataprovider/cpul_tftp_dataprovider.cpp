@@ -35,7 +35,7 @@ AVLastPacketSize ExtractSize(const unsigned char* arr)
 
 //=========================================================
 
-AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader(QnResourcePtr res):
+AVClientPullSSTFTPStreamreader::AVClientPullSSTFTPStreamreader(const QnResourcePtr& res):
 QnPlAVClinetPullStreamReader(res),
 m_black_white(false),
 m_prevDataReadResult(CameraDiagnostics::ErrorCode::noError)
@@ -420,7 +420,7 @@ QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
         return motion; // no motion detected
 
 
-    QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
+    const QnPlAreconVisionResource* avRes = dynamic_cast<QnPlAreconVisionResource*>(getResource().data());
     int zones = avRes->totalMdZones() == 1024 ? 32 : 8;
 
     QStringList md = mdresult.toString().split(QLatin1Char(' '), QString::SkipEmptyParts);

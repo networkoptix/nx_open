@@ -107,7 +107,7 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& /*mod
 
 }
 
-void QnResource::update(QnResourcePtr other, bool silenceMode)
+void QnResource::update(const QnResourcePtr& other, bool silenceMode)
 {
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->beforeUpdate();

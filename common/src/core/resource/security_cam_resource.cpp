@@ -53,11 +53,11 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     // TODO: #AK this is a wrong place for this connect call.
     // You should listen to changes in resource pool instead.
-    if(QnBusinessEventConnector::instance()) {
+    //TODO: #Elric didn't get it. How resource pool connected to relay input event on camera?
+    if(QnBusinessEventConnector::instance())
         connect(
-            this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
-            QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
-    }
+            this, &QnSecurityCamResource::cameraInput, 
+            QnBusinessEventConnector::instance(), &QnBusinessEventConnector::at_cameraInput );
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {

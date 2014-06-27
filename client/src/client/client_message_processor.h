@@ -13,7 +13,7 @@ class QnClientMessageProcessor : public QnCommonMessageProcessor
     typedef QnCommonMessageProcessor base_type;
 public:
     QnClientMessageProcessor();
-    virtual void init(ec2::AbstractECConnectionPtr connection) override;
+    virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
 protected:
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) override;
     virtual void updateResource(const QnResourcePtr &resource) override;
@@ -27,7 +27,7 @@ private slots:
 private:
     void determineOptimalIF(const QnMediaServerResourcePtr &resource);
     void updateServerTmpStatus(const QnId& id, QnResource::Status status);
-    void checkForTmpStatus(QnResourcePtr resource);
+    void checkForTmpStatus(const QnResourcePtr& resource);
 };
 
 #endif // _client_event_manager_h

@@ -215,7 +215,7 @@ inline bool mathImage_cpu(const simd128i* data, const simd128i* mask, int maskSt
     return false;
 }
 
-bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
+bool QnMetaDataV1::matchImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
 {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     if (useSSE41())
