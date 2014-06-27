@@ -54,6 +54,8 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
                 m_capabilities |= Qn::ContinuousPtzCapabilities;
             else if(capability == lit("ContinuousZoomCapability"))
                 m_capabilities |= Qn::ContinuousZoomCapability;
+            else if(capability == lit("ContinuousFocusCapability"))
+                m_capabilities |= Qn::ContinuousFocusCapability;
             else if(capability == lit("AbsolutePanCapability"))
                 m_capabilities |= Qn::AbsolutePanCapability;
             else if(capability == lit("AbsoluteTiltCapability"))
