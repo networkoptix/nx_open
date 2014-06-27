@@ -147,26 +147,26 @@ void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCom
 
 void QnDistributedMutex::at_newPeerFound(ec2::ApiPeerAliveData data)
 {
-    if (data.peerType != QnPeerInfo::Server)
+    if (data.peer.peerType != Qn::PT_Server)
         return;
 
     QMutexLocker lock(&m_mutex);
-    Q_ASSERT(data.peerId != qnCommon->moduleGUID());
+    Q_ASSERT(data.peer.id != qnCommon->moduleGUID());
     if (!m_selfLock.isEmpty())
-        sendTransaction(m_selfLock, ApiCommand::lockRequest, data.peerId);
+        sendTransaction(m_selfLock, ApiCommand::lockRequest, data.peer.id);
 }
 
 void QnDistributedMutex::at_peerLost(ec2::ApiPeerAliveData data)
 {
-    if (data.peerType != QnPeerInfo::Server)
+    if (data.peer.peerType != Qn::PT_Server)
         return;
 
     QMutexLocker lock(&m_mutex);
 
-    m_proccesedPeers.remove(data.peerId);
+    m_proccesedPeers.remove(data.peer.id);
     for (LockedMap::iterator itr = m_peerLockInfo.begin(); itr != m_peerLockInfo.end();)
     {
-        if (itr.key().peer == data.peerId)
+        if (itr.key().peer == data.peer.id)
             itr = m_peerLockInfo.erase(itr);
         else
             ++itr;

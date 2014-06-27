@@ -7,6 +7,7 @@
 #include "llutil/hardware_id.h"
 #include "version.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "nx_ec/data/api_runtime_data.h"
 
 
 static const char TEST_LICENSE_NX[] = 
@@ -39,23 +40,18 @@ namespace ec2
     LicenseManagerImpl::LicenseManagerImpl()
     {
         // TODO: #Ivan, support compatibility mode
-        m_hardwareIds = LLUtil::getMainHardwareIds(0);
-        m_brand = lit(QN_PRODUCT_NAME_SHORT);
-        qnLicensePool->setMainHardwareIds(m_hardwareIds);
+        qnLicensePool->setMainHardwareIds(LLUtil::getMainHardwareIds(0));
         qnLicensePool->setCompatibleHardwareIds(LLUtil::getCompatibleHardwareIds(0));
     }
 
     bool LicenseManagerImpl::validateLicense(const ApiLicenseData& license) const {
         QnLicensePtr qlicense(new QnLicense);
         fromApiToResource(license, qlicense);
-
-        return qlicense->isValid(m_hardwareIds, m_brand);
+        return qlicense->isValid();
     }
 
     ErrorCode LicenseManagerImpl::getLicenses( ApiLicenseDataList* const licList )
     {
-        //TODO/IMPL
-
         ApiLicenseData license;
 
         license.licenseBlock = TEST_LICENSE_NX;
@@ -73,13 +69,12 @@ namespace ec2
         return ErrorCode::notImplemented;
     }
 
-    void LicenseManagerImpl::getHardwareId( ApiServerInfoData* const serverInfo )
+    void LicenseManagerImpl::getHardwareId( ec2::ApiRuntimeData* const serverInfo )
     {
         int guidCompatibility = 0;
 
         // TODO: #Ivan, add guidCompatibility to settings
         serverInfo->mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
         serverInfo->compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
-        serverInfo->remoteHardwareIds = qnLicensePool->remoteHardwareIds();
     }
 }

@@ -178,7 +178,7 @@ bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
 
 void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool /*isProxy*/)
 {
-    QnResourcePtr res = qnResPool->getResourceById(data.peerId);
+    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
     if (res)
         res->setStatus(QnResource::Online);
 
@@ -186,10 +186,10 @@ void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bo
 
 void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool /*isProxy*/)
 {
-    QnResourcePtr res = qnResPool->getResourceById(data.peerId);
+    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
     if (res) {
         res->setStatus(QnResource::Offline);
-        if (data.peerType != ec2::QnPeerInfo::Server) {
+        if (data.peer.peerType != Qn::PT_Server) {
             // This media server hasn't own DB
             foreach(QnResourcePtr camera, qnResPool->getAllCameras(res))
                 camera->setStatus(QnResource::Offline);

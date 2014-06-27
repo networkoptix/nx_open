@@ -43,6 +43,7 @@
 #include "version.h"
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 #include "compatibility.h"
+#include "common/common_module.h"
 
 
 namespace {
@@ -555,6 +556,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
 
     QnAppServerConnectionFactory::setEc2Connection( connection );
     m_connectInfo = connectionInfo;
+    qnCommon->setRemoteGUID(m_connectInfo->ecsGuid);
     base_type::accept();
 }
 

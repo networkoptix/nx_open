@@ -20,6 +20,7 @@
 #include "nx_ec/data/api_license_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
+#include "nx_ec/data/api_runtime_data.h"
 #include "utils/db/db_helper.h"
 
 namespace ec2
@@ -94,6 +95,11 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode saveTransaction(const QnTransaction<ApiRuntimeData>& , const QByteArray&) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
         qint64 getTimeStamp();
         void init();
 
@@ -144,6 +150,7 @@ namespace ec2
         QUuid transactionHash(const ApiPeerAliveData& ) const                  { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTranState& ) const                       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const int& ) const                               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiRuntimeData& ) const                    { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);

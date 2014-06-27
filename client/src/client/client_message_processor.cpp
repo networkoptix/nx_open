@@ -112,7 +112,7 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource:
 
 void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy)
 {
-    if (data.peerId == qnCommon->moduleGUID())
+    if (data.peer.id == qnCommon->moduleGUID())
         return;
 
     if (isProxy) {

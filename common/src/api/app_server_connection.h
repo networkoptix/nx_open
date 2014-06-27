@@ -26,28 +26,18 @@ public:
     QnAppServerConnectionFactory();
     virtual ~QnAppServerConnectionFactory();
 
-    static QString box();
-    static QString authKey();
     static QString clientGuid();
     static QUrl defaultUrl();
     static QUrl publicUrl();
-    static QByteArray prevSessionKey();
-    static QByteArray sessionKey();
-    static qint64 prematureLicenseExperationDate();
-    static void setPrematureLicenseExperationDate(qint64 value);
     static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
 
-    static void setBox(const QString &box);
-    static void setAuthKey(const QString &key);
+    //static void setAuthKey(const QString &key);
     static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
     static void setCurrentVersion(const QnSoftwareVersion &version);
-    static void setPublicIp(const QString &publicIp);
-
-    static void setSessionKey(const QByteArray& sessionKey);
-
+    
     /** If the client is started in videowall mode, videowall's guid is stored here. */ 
     static QUuid videowallGuid();
     static void setVideowallGuid(const QUuid &uuid);
@@ -67,13 +57,8 @@ public:
 private:
     QMutex m_mutex;
     QString m_clientGuid;
-    QString m_authKey;
     QUrl m_defaultUrl;
     QUrl m_publicUrl;
-    QByteArray m_sessionKey;
-    QByteArray m_prevSessionKey;
-    QString m_box;
-    qint64 m_prematureLicenseExperationDate;
 
     /** Videowall-related fields */
     QUuid m_videowallGuid;

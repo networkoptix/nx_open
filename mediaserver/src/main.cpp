@@ -144,6 +144,8 @@
 #include "compatibility.h"
 #include "media_server/file_connection_processor.h"
 #include "streaming/hls/hls_session_pool.h"
+#include "llutil/hardware_id.h"
+#include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
 
 
@@ -646,11 +648,10 @@ void initAppServerConnection(const QSettings &settings)
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
     NX_LOG(lit("Connect to enterprise controller server %1").arg(urlNoPassword.toString()), cl_logINFO);
-    QnAppServerConnectionFactory::setAuthKey(authKey());
+    //QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
-    QnAppServerConnectionFactory::setBox(lit(QN_ARM_BOX));
 }
 
 QnMain::QnMain(int argc, char* argv[])
@@ -1065,6 +1066,7 @@ void QnMain::run()
     }
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
+    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
     // Create SessionManager
     QnSessionManager::instance()->start();
@@ -1119,10 +1121,22 @@ void QnMain::run()
     connect(QnStorageManager::instance(), &QnStorageManager::rebuildFinished, this, &QnMain::at_storageManager_rebuildFinished);
 
     qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("123")).toString());
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
+
     qnCommon->setModuleGUID(serverGuid());
     qnCommon->setLocalSystemName(settings->value("systemName").toString());
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+
+    ec2::ApiRuntimeData runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
+    runtimeInfo.peer.peerType = Qn::PT_Server;
+    runtimeInfo.box = lit(QN_ARM_BOX);
+    runtimeInfo.brand = lit(QN_PRODUCT_NAME_SHORT);
+    int guidCompatibility = 0;
+    runtimeInfo.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
+    runtimeInfo.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
+    QnRuntimeInfoManager::instance()->update(runtimeInfo);
+
 
     ec2::ResourceContext resCtx(
         QnResourceDiscoveryManager::instance(),
@@ -1149,7 +1163,11 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
 
-    QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
+
+    runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
+    runtimeInfo.publicIP = connectInfo->publicIp;
+    qnCommon->setRemoteGUID(connectInfo->ecsGuid);
+    QnRuntimeInfoManager::instance()->update(runtimeInfo);
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
@@ -1204,7 +1222,7 @@ void QnMain::run()
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
     QUrl proxyServerUrl = ec2Connection->connectionInfo().ecUrl;
-    proxyServerUrl.setPort(connectInfo->proxyPort);
+    //proxyServerUrl.setPort(connectInfo->proxyPort);
     m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid().toString());
     m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
@@ -1551,6 +1569,17 @@ void QnMain::at_appStarted()
 {
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
 };
+
+void QnMain::at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo)
+{
+    if (runtimeInfo.peer.id == qnCommon->moduleGUID())
+    {
+        ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged, false);
+        tran.params = runtimeInfo;
+        tran.fillSequence();
+        ec2::qnTransactionBus->sendTransaction(tran);
+    }
+}
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {

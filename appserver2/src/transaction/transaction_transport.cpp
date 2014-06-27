@@ -19,7 +19,7 @@ QSet<QUuid> QnTransactionTransport::m_existConn;
 QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
 QMutex QnTransactionTransport::m_staticMutex;
 
-QnTransactionTransport::QnTransactionTransport(const QnPeerInfo &localPeer, const QnPeerInfo &remotePeer, QSharedPointer<AbstractStreamSocket> socket):
+QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, const ApiPeerData &remotePeer, QSharedPointer<AbstractStreamSocket> socket):
     m_localPeer(localPeer),
     m_remotePeer(remotePeer),
     m_lastConnectTime(0), 
@@ -231,19 +231,14 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
 
     QUrlQuery q = QUrlQuery(remoteAddr.query());
-    if (m_state == ConnectingStage1)
-    {
-        q.removeQueryItem("hwList");
-        q.addQueryItem("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds()));
-    }
 
     // Client reconnects to the server
-    if( m_localPeer.peerType == QnPeerInfo::DesktopClient ) {
+    if( m_localPeer.peerType == Qn::PT_DesktopClient ) {
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
         setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
-    } else if (m_localPeer.peerType == QnPeerInfo::VideowallClient) {
+    } else if (m_localPeer.peerType == Qn::PT_VideowallClient) {
         q.removeQueryItem("isClient");  //videowall client is still client
         q.addQueryItem("isClient", QString());
 
@@ -347,7 +342,6 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
-    nx_http::HttpHeaders::const_iterator itrHwList = client->response()->headers.find("hwList");
 
     if (itrGuid == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
@@ -361,7 +355,6 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     if (getState() == ConnectingStage1) {
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);
         if (lockOK) {
-            setHwList(decodeHWList(itrHwList->second));
             setState(ConnectingStage2);
         }
         else {
@@ -422,22 +415,6 @@ bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
 {
      // allow to send system command immediately, without tranSyncRequest
     return ApiCommand::isSystem(command) ? true : m_writeSync;
-}
-
-QByteArray QnTransactionTransport::encodeHWList(const QList<QByteArray> hwList)
-{
-    QByteArray result;
-    foreach(const QByteArray& hw, hwList) {
-        if (!result.isEmpty())
-            result.append("-");
-        result.append(hw);
-    }
-    return result;
-}
-
-QList<QByteArray> QnTransactionTransport::decodeHWList(const QByteArray data)
-{
-    return data.split('-');
 }
 
 QString QnTransactionTransport::toString( State state )
