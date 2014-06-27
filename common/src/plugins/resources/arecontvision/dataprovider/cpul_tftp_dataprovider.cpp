@@ -105,7 +105,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
                 !m_streamParam.contains("image_right") || !m_streamParam.contains("image_bottom") ||
                 (h264 && !m_streamParam.contains("streamID")))
             {
-                cl_log.log("Error!!! parameter is missing in stream params.", cl_logERROR);
+                NX_LOG("Error!!! parameter is missing in stream params.", cl_logERROR);
                 //return QnAbstractMediaDataPtr(0);
             }
 
@@ -283,7 +283,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     {
         if (lp_size<21)
         {
-            cl_log.log("last packet is too short!", cl_logERROR);
+            NX_LOG("last packet is too short!", cl_logERROR);
             return QnAbstractMediaDataPtr(0);
         }
 
@@ -292,7 +292,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
     if (h264 && (lp_size < iframe_index))
     {
-        cl_log.log("last packet is too short!", cl_logERROR);
+        NX_LOG("last packet is too short!", cl_logERROR);
         //delete videoData;
         return QnAbstractMediaDataPtr(0);
     }
@@ -357,7 +357,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
                 if (diff>0)
                     img.startWriting(diff);
 
-                cl_log.log("Perfomance hint: AVClientPullSSTFTP streamreader moved received data", cl_logINFO);
+                NX_LOG("Perfomance hint: AVClientPullSSTFTP streamreader moved received data", cl_logINFO);
 
                 memmove(img.data() + 5 + header_size, img.data() + 5 + expectable_header_size, img.size() - (5 + expectable_header_size));
                 img.finishWriting(diff);

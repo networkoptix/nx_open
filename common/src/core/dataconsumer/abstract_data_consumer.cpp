@@ -54,7 +54,7 @@ void QnAbstractDataConsumer::run()
             else
                 QnSleep::msleep(1);
         }
-        //cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
+        //NX_LOG("queue size = ", m_dataQueue.size(),cl_logALWAYS);
     }
 
     endOfRun();

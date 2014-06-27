@@ -56,7 +56,7 @@ static void printInLogNetResources(const QnResourceList& resources)
         if (!netRes)
             continue;
 
-        cl_log.log(netRes->getHostAddress() + QLatin1String(" "), netRes->getName(), cl_logINFO);
+        NX_LOG( lit("%1 %2").arg(netRes->getHostAddress()).arg(netRes->getName()), cl_logINFO);
     }
 
 }
@@ -177,7 +177,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
     m_foundSmth = !resources.isEmpty();
     if (m_foundSmth)
-        cl_log.log("Discovery----: after excluding existing resources we've got ", resources.size(), " new resources:", cl_logINFO);
+        NX_LOG( lit("Discovery----: after excluding existing resources we've got %1 new resources:").arg(resources.size()), cl_logINFO);
 
     printInLogNetResources(resources);
 
@@ -204,7 +204,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
     if (resources.size())
     {
-        cl_log.log("Discovery---- Final result: ", cl_logINFO);
+        NX_LOG("Discovery---- Final result: ", cl_logINFO);
         printInLogNetResources(resources);
     }
     return true;

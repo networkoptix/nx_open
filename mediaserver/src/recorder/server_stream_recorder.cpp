@@ -350,7 +350,7 @@ void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleT
     QTextStream str(&msg);
     str << "Update recording params for camera " << m_device->getUniqueId() << "  " << scheduleTask;
     str.flush();
-    cl_log.log(msg, cl_logINFO);
+    NX_LOG(msg, cl_logINFO);
     */
 
     if (!isMotionRec(scheduleTask.getRecordingType()))

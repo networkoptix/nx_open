@@ -200,7 +200,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     }
     else
     {
-        cl_log.log("Found unknown resource! ", model.toString(), cl_logWARNING);
+        NX_LOG( lit("Found unknown resource! %1").arg(model.toString()), cl_logWARNING);
     }
 
     return result;
@@ -409,7 +409,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
             rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, new_name);
             if (!rt.isNull())
             {
-                cl_log.log("Unsupported resource found(!!!): ", name, cl_logERROR);
+                NX_LOG( lit("Unsupported resource found(!!!): %1").arg(name), cl_logERROR);
                 return 0;
             }
         }
@@ -425,7 +425,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId 
 
     if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
     {
-        cl_log.log("Can't create AV Resource. Resource type is invalid.", rt.toString(), cl_logERROR);
+        NX_LOG( lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()), cl_logERROR);
         return 0;
     }
 

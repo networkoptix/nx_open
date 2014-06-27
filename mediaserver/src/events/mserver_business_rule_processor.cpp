@@ -118,7 +118,7 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
     QString relayOutputId = action->getRelayOutputId();
     //if( relayOutputId.isEmpty() )
     //{
-    //    cl_log.log( lit("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
+    //    NX_LOG( lit("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
     //    return false;
     //}
 

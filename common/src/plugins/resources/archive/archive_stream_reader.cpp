@@ -446,7 +446,7 @@ begin_label:
             str << "setMarker=" << m_newDataMarker
                 << " for Time=" << QDateTime::fromMSecsSinceEpoch(m_requiredJumpTime/1000).toString("hh:mm:ss.zzz");
             str.flush();
-            cl_log.log(s, cl_logALWAYS);
+            NX_LOG(s, cl_logALWAYS);
         }
         */
         setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);

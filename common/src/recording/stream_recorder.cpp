@@ -422,7 +422,9 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
     avPkt.stream_index= streamIndex;
 
     if (av_write_frame(m_formatCtx, &avPkt) < 0) 
-        cl_log.log(QLatin1String("AV packet write error"), cl_logWARNING);
+    {
+        NX_LOG(QLatin1String("AV packet write error"), cl_logWARNING);
+    }
     else {
         m_packetWrited = true;
         if (m_needCalcSignature) 
@@ -455,7 +457,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
     if (outputCtx == 0)
     {
         m_lastError = ContainerNotFoundError;
-        cl_log.log(lit("No %1 container in FFMPEG library.").arg(m_container), cl_logERROR);
+        NX_LOG(lit("No %1 container in FFMPEG library.").arg(m_container), cl_logERROR);
         return false;
     }
 
@@ -474,7 +476,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
 
     if (err < 0) {
         m_lastError = FileCreateError;
-        cl_log.log(lit("Can't create output file '%1' for video recording.").arg(m_fileName), cl_logERROR);
+        NX_LOG(lit("Can't create output file '%1' for video recording.").arg(m_fileName), cl_logERROR);
         msleep(500); // avoid createFile flood
         return false;
     }
@@ -535,7 +537,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
             AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
             if (videoStream == 0) {
                 m_lastError = VideoStreamAllocationError;
-                cl_log.log(lit("Can't allocate output stream for recording."), cl_logERROR);
+                NX_LOG(lit("Can't allocate output stream for recording."), cl_logERROR);
                 return false;
             }
 
@@ -624,7 +626,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
             AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
             if (!audioStream) {
                 m_lastError = AudioStreamAllocationError;
-                cl_log.log(lit("Can't allocate output audio stream."), cl_logERROR);
+                NX_LOG(lit("Can't allocate output audio stream."), cl_logERROR);
                 return false;
             }
 
@@ -632,7 +634,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
             QnMediaContextPtr mediaContext = audioLayout->getAudioTrackInfo(i).codecContext.dynamicCast<QnMediaContext>();
             if (!mediaContext) {
                 m_lastError = InvalidAudioCodecError;
-                cl_log.log(lit("Invalid audio codec information."), cl_logERROR);
+                NX_LOG(lit("Invalid audio codec information."), cl_logERROR);
                 return false;
             }
 
@@ -661,7 +663,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
         {
             avformat_close_input(&m_formatCtx);
             m_lastError = FileCreateError;
-            cl_log.log(lit("Can't create output file '%1'.").arg(url), cl_logERROR);
+            NX_LOG(lit("Can't create output file '%1'.").arg(url), cl_logERROR);
             msleep(500); // avoid createFile flood
             return false;
         }
@@ -674,7 +676,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
             m_formatCtx->pb = 0;
             avformat_close_input(&m_formatCtx);
             m_lastError = IncompatibleCodecError;
-            cl_log.log(lit("Video or audio codec is incompatible with %1 format. Try another format.").arg(m_container), cl_logERROR);
+            NX_LOG(lit("Video or audio codec is incompatible with %1 format. Try another format.").arg(m_container), cl_logERROR);
             return false;
         }
     }

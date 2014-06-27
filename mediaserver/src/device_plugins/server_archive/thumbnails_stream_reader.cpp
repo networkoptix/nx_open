@@ -66,7 +66,7 @@ QnAbstractMediaDataPtr QnThumbnailsStreamReader::getNextData()
 
 void QnThumbnailsStreamReader::run()
 {
-    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("QnThumbnailsStreamReader started."), cl_logINFO);
+    CL_LOG(cl_logINFO) NX_LOG(QLatin1String("QnThumbnailsStreamReader started."), cl_logINFO);
 
     beforeRun();
 
@@ -131,7 +131,7 @@ void QnThumbnailsStreamReader::run()
 
     afterRun();
 
-    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("QnThumbnailsStreamReader reader stopped."), cl_logINFO);
+    CL_LOG(cl_logINFO) NX_LOG(QLatin1String("QnThumbnailsStreamReader reader stopped."), cl_logINFO);
 }
 
 void QnThumbnailsStreamReader::afterRun()

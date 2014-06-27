@@ -53,7 +53,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
                 !m_streamParam.contains("image_right") || !m_streamParam.contains("image_bottom") ||
                 (h264 && !m_streamParam.contains("streamID")) )
             {
-                cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
+                NX_LOG("Erorr!!! parameter is missing in stream params.", cl_logERROR);
                 return QnAbstractMediaDataPtr(0);
             }
 
@@ -140,7 +140,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
 
         if (img.size()>CL_MAX_DATASIZE)
         {
-            cl_log.log("Image is too big!!", cl_logERROR);
+            NX_LOG("Image is too big!!", cl_logERROR);
             return QnAbstractMediaDataPtr(0);
         }
     }

@@ -467,12 +467,12 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
     if( recipients.isEmpty() )
     {
-        cl_log.log( lit("Action SendMail (rule %1) missing valid recipients. Ignoring...").arg(action->getBusinessRuleId().toString()), cl_logWARNING );
-        cl_log.log( lit("All recipients: ") + log.join(QLatin1String("; ")), cl_logWARNING );
+        NX_LOG( lit("Action SendMail (rule %1) missing valid recipients. Ignoring...").arg(action->getBusinessRuleId().toString()), cl_logWARNING );
+        NX_LOG( lit("All recipients: ") + log.join(QLatin1String("; ")), cl_logWARNING );
         return false;
     }
 
-    cl_log.log( lit("Processing action SendMail. Sending mail to %1").
+    NX_LOG( lit("Processing action SendMail. Sending mail to %1").
         arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
 
@@ -534,7 +534,7 @@ void QnBusinessRuleProcessor::at_sendEmailFinished(int handle, ec2::ErrorCode er
 
     broadcastBusinessAction(action);
 
-    cl_log.log(lit("Error processing action SendMail. %1").arg(ec2::toString(errorCode)), cl_logWARNING);
+    NX_LOG(lit("Error processing action SendMail. %1").arg(ec2::toString(errorCode)), cl_logWARNING);
 }
 
 void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished( int handle, ec2::ErrorCode errorCode )

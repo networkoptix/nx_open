@@ -221,7 +221,7 @@ void QnAppServerConnectionFactory::setInstanceGuid(const QUuid &uuid)
 //    QUrl urlNoPassword (url);
 //    urlNoPassword.setPassword(QString());
 //
-//    cl_log.log(QLatin1String("Creating connection to the Enterprise Controller ") + urlNoPassword.toString(), cl_logDEBUG2);
+//    NX_LOG(QLatin1String("Creating connection to the Enterprise Controller ") + urlNoPassword.toString(), cl_logDEBUG2);
 //
 //    return QnAppServerConnectionPtr(new QnAppServerConnection(
 //        url,
