@@ -15,7 +15,7 @@
 class QnVideowallManageWidgetPrivate : private QnGeometry {
     Q_DECLARE_TR_FUNCTIONS(QnVideowallManageWidgetPrivate);
 public:
-    QnVideowallManageWidgetPrivate();
+    QnVideowallManageWidgetPrivate(QWidget* q);
 
     QTransform getTransform(const QRect &rect);
     QTransform getInvertedTransform(const QRect &rect);
@@ -26,7 +26,7 @@ public:
 
     void paint(QPainter* painter, const QRect &rect);
 
-    void mouseMoveAt(const QPoint &pos, Qt::MouseButtons buttons);
+    void mouseMoveAt(const QPoint &pos);
     void mouseClickAt(const QPoint &pos, Qt::MouseButtons buttons);
     void dragStartAt(const QPoint &pos, const QPoint &oldPos);
     void dragMoveAt(const QPoint &pos, const QPoint &oldPos);
@@ -48,6 +48,16 @@ private:
         Disabled = 0x8      
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
+
+    enum ItemTransformation {
+        None            = 0x00,
+        Move            = 0x01,
+        ResizeLeft      = 0x02,
+        ResizeRight     = 0x04,
+        ResizeTop       = 0x08,
+        ResizeBottom    = 0x10
+    };
+    Q_DECLARE_FLAGS(ItemTransformations, ItemTransformation)
 
     struct BaseModelItem {
         BaseModelItem(const QRect &rect, ItemType itemType, const QUuid &id);
@@ -122,6 +132,8 @@ private:
     };
 
 private:
+    Q_DECLARE_PUBLIC(QWidget);
+
     /** 
      * Utility function that iterates over all items and calls handler to each of them. 
      * If the handler sets 'abort' variable to true, iterator will stop.
@@ -129,8 +141,21 @@ private:
     void foreachItem(std::function<void(BaseModelItem& /*item*/, bool& /*abort*/)> handler);
     void foreachItemConst(std::function<void(const BaseModelItem& /*item*/, bool& /*abort*/)> handler);
 
+    void moveItemStart(BaseModelItem &item);
+    void moveItemMove(BaseModelItem &item, const QPoint &offset);
+    void moveItemEnd(BaseModelItem &item);
+
+    void resizeItemStart(BaseModelItem &item);
+    void resizeItemMove(BaseModelItem &item, const QPoint &offset);
+    void resizeItemEnd(BaseModelItem &item);
+
     void setFree(const QnScreenSnaps &snaps, bool value);
+
+    ItemTransformations transformationsAnchor(const QRect &geometry, const QPoint &pos) const;
+    Qt::CursorShape transformationsCursor(ItemTransformations value) const;
+
 private:
+    QWidget *q_ptr;
     QTransform m_transform;
     QTransform m_invertedTransform;
     QRect m_widgetRect;
@@ -138,7 +163,8 @@ private:
     QList<ModelItem> m_items;
     QList<ModelScreen> m_screens;
     QList<ModelItem> m_added;
-    bool m_dragging;
+
+    ItemTransformations m_process;
 };
 
 #endif // VIDEOWALL_MANAGE_WIDGET_PRIVATE_H

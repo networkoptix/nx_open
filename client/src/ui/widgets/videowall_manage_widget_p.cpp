@@ -25,7 +25,7 @@ namespace {
     const int fillColorAlpha = 180;
     const int roundness = 25;
     const int borderWidth = 25;
-
+    const int transformationOffset = 50;
 
     const QColor desktopColor(Qt::darkGray);
     const QColor freeSpaceColor(64, 130, 180);
@@ -50,7 +50,7 @@ QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(const QRect &rect, 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter) const {
     qreal margin = innerMargin * qMin(geometry.width(), geometry.height());
 
-    QRectF targetRect = eroded(geometry, margin);
+    QRectF targetRect = eroded(QRectF(geometry), margin);
 
     QPainterPath path;
     path.addRoundRect(targetRect, roundness);
@@ -98,6 +98,23 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter) con
             QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
             painter->drawRect(targetRect);
         }
+
+        /*  // Debug painting of the transformation anchors
+        {
+            QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
+            QnScopedPainterBrushRollback brushRollback(painter, Qt::red);
+            {
+                QRect innerRect(eroded(geometry, transformationOffset * 2));
+                painter->drawRect(dilated(QRect(innerRect.left(), innerRect.top(), 0, innerRect.height()), transformationOffset));
+                painter->drawRect(dilated(QRect(innerRect.center().x(), innerRect.top(), 0, innerRect.height()), transformationOffset));
+                painter->drawRect(dilated(QRect(innerRect.right(), innerRect.top(), 0, innerRect.height()), transformationOffset));
+
+                painter->drawRect(dilated(QRect(innerRect.left(), innerRect.top(), innerRect.width(), 0), transformationOffset));
+                painter->drawRect(dilated(QRect(innerRect.left(), innerRect.center().y(), innerRect.width(), 0), transformationOffset));
+                painter->drawRect(dilated(QRect(innerRect.left(), innerRect.bottom(), innerRect.width(), 0), transformationOffset));
+            }
+        }
+        */
 
         {
             QPen resizeBorderPen(textColor);
@@ -225,7 +242,7 @@ void QnVideowallManageWidgetPrivate::ModelScreen::setFree(bool value) {
 void QnVideowallManageWidgetPrivate::ModelScreen::paint(QPainter* painter) const {
     {
         qreal margin = frameMargin * qMin(geometry.width(), geometry.height());
-        QRectF targetRect = eroded(geometry, margin);
+        QRectF targetRect = eroded(QRectF(geometry), margin);
 
         QPainterPath path;
         path.addRect(targetRect);
@@ -286,8 +303,9 @@ QnVideowallManageWidgetPrivate::AddedItem::AddedItem() :
 /* QnVideowallManageWidgetPrivate                                       */
 /************************************************************************/
 
-QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate():
-    m_dragging(false)
+QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(QWidget *q):
+    q_ptr(q),
+    m_process(ItemTransformation::None)
 {
     QDesktopWidget* desktop = qApp->desktop();
     for (int i = 0; i < desktop->screenCount(); ++i) {
@@ -490,17 +508,32 @@ void QnVideowallManageWidgetPrivate::paint(QPainter* painter, const QRect &rect)
     });
 }
 
-void QnVideowallManageWidgetPrivate::mouseMoveAt(const QPoint &pos, Qt::MouseButtons buttons) {
-    foreachItem([pos](BaseModelItem &item, bool &) {
-        if (item.geometry.contains(pos))
+void QnVideowallManageWidgetPrivate::mouseMoveAt(const QPoint &pos) {
+    if (m_process != ItemTransformation::None)
+        return;
+
+    ItemTransformations proposed = ItemTransformation::None;
+    foreachItem([this, pos, &proposed](BaseModelItem &item, bool &) {
+        if (item.geometry.contains(pos)) {
             item.flags |= StateFlag::Hovered;
+            if (item.editable && m_process == ItemTransformation::None) {
+                proposed = transformationsAnchor(item.geometry, pos);
+            }
+        }
         else
             item.flags &= ~StateFlags(StateFlag::Hovered);
     });
+
+    QCursor cursor(transformationsCursor(proposed));
+
+    Q_Q(QWidget);
+    q->setCursor(cursor);
 }
 
 void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseButtons buttons) {
     if ((buttons & Qt::LeftButton) != Qt::LeftButton)
+        return;
+    if (m_process != ItemTransformation::None)
         return;
 
     foreachItem([this, pos](BaseModelItem &item, bool &abort) {
@@ -520,63 +553,53 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
 }
 
 void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint &pos, const QPoint &oldPos) {
+    assert(m_process == ItemTransformation::None);
     foreachItem([this, pos](BaseModelItem &item, bool &abort) {
         if (!item.editable || !item.geometry.contains(pos))
             return;
+        abort = true;   //no more than one such item must exist
 
-        item.flags |= StateFlag::Pressed;
-        setFree(item.snaps, true);
+        m_process = transformationsAnchor(item.geometry, pos);
+        if (m_process == ItemTransformation::None) 
+            return;
 
-        m_dragging = true;
-        abort = true;
+        if (m_process == ItemTransformation::Move) 
+            moveItemStart(item);
+        else
+            resizeItemStart(item);       
     });
 }
 
 void QnVideowallManageWidgetPrivate::dragMoveAt(const QPoint &pos, const QPoint &oldPos) {
+    if (m_process == ItemTransformation::None)
+        return;
+
     foreachItem([this, &pos, &oldPos](BaseModelItem &item, bool &abort) {
         if (!item.hasFlag(StateFlag::Pressed))
             return;
-        QPoint newCenter = item.geometry.center() + pos - oldPos;
-        item.geometry.moveCenter(newCenter);
+        QPoint offset = pos - oldPos;
+        if (m_process == ItemTransformation::Move)
+            moveItemMove(item, offset);
+        else
+            resizeItemMove(item, offset);
         abort = true;
     });
 }
 
 void QnVideowallManageWidgetPrivate::dragEndAt(const QPoint &pos, const QPoint &oldPos) {
+    if (m_process == ItemTransformation::None)
+        return;
+
     foreachItem([this, pos](BaseModelItem &item, bool &abort) {
         item.flags &= ~StateFlags(StateFlag::Hovered);
         if (!item.hasFlag(StateFlag::Pressed))
             return;
-        item.flags &= ~StateFlags(StateFlag::Pressed);
-
-        if (item.snaps.screens().size() > 1) {
-            assert("Not implemented");
-        } else {
-            int bestIndex = -1;
-            qint64 bestCoeff = 0;
-            for (int i = 0; i < m_screens.size(); ++i) {
-                ModelScreen screen = m_screens[i]; 
-                if (!screen.free())
-                    continue;
-                QSize intersectionSize = m_screens[i].geometry.intersected(item.geometry).size();
-                qint64 coeff = intersectionSize.width() * intersectionSize.height();
-                if (bestIndex < 0 || coeff > bestCoeff) {
-                    bestIndex = i;
-                    bestCoeff = coeff;
-                }
-            }
-            assert(bestIndex >= 0);
-
-            ModelScreen screen = m_screens[bestIndex]; 
-            item.geometry = screen.geometry;
-            item.snaps = screen.snaps;
-        }
-
-        //for bes user experience do not hide controls until user moves a mouse
-        item.flags |= StateFlags(StateFlag::Hovered);
-        setFree(item.snaps, false);
+        if (m_process == ItemTransformation::Move)
+            moveItemEnd(item);
+        else
+            resizeItemEnd(item);
     });
-    m_dragging = false;
+    m_process = ItemTransformation::None;
 }
 
 void QnVideowallManageWidgetPrivate::tick(int deltaMSecs) {
@@ -586,9 +609,136 @@ void QnVideowallManageWidgetPrivate::tick(int deltaMSecs) {
         if (item.hasFlag(StateFlag::Pressed))
             item.opacity = qMax(item.opacity - opacityDelta, draggedOpacity);
         else
-        if (item.hasFlag(StateFlag::Hovered) && !m_dragging)
+        if (item.hasFlag(StateFlag::Hovered) && (m_process == ItemTransformation::None))
             item.opacity = qMin(item.opacity + opacityDelta, 1.0);
         else
             item.opacity = qMax(item.opacity - opacityDelta, minOpacity);
     });
+}
+
+void QnVideowallManageWidgetPrivate::moveItemStart(BaseModelItem &item) {
+    item.flags |= StateFlag::Pressed;
+    setFree(item.snaps, true);
+
+}
+
+void QnVideowallManageWidgetPrivate::moveItemMove(BaseModelItem &item, const QPoint &offset) {
+    item.geometry.translate(offset);
+}
+
+void QnVideowallManageWidgetPrivate::moveItemEnd(BaseModelItem &item) {
+    item.flags &= ~StateFlags(StateFlag::Pressed);
+
+    if (item.snaps.screens().size() > 1) {
+        assert("Not implemented");
+    } else {
+        int bestIndex = -1;
+        qint64 bestCoeff = 0;
+        for (int i = 0; i < m_screens.size(); ++i) {
+            ModelScreen screen = m_screens[i]; 
+            if (!screen.free())
+                continue;
+            QSize intersectionSize = m_screens[i].geometry.intersected(item.geometry).size();
+            qint64 coeff = intersectionSize.width() * intersectionSize.height();
+            if (bestIndex < 0 || coeff > bestCoeff) {
+                bestIndex = i;
+                bestCoeff = coeff;
+            }
+        }
+        assert(bestIndex >= 0);
+
+        ModelScreen screen = m_screens[bestIndex]; 
+        item.geometry = screen.geometry;
+        item.snaps = screen.snaps;
+    }
+
+    //for bes user experience do not hide controls until user moves a mouse
+    item.flags |= StateFlags(StateFlag::Hovered);
+    setFree(item.snaps, false);
+}
+
+void QnVideowallManageWidgetPrivate::resizeItemStart(BaseModelItem &item) {
+    setFree(item.snaps, true);
+    item.flags |= StateFlag::Pressed;
+}
+
+void QnVideowallManageWidgetPrivate::resizeItemMove(BaseModelItem &item, const QPoint &offset) {
+    if (m_process & ItemTransformation::ResizeLeft)
+        item.geometry.adjust(offset.x(), 0, 0, 0);
+    else if (m_process & ItemTransformation::ResizeRight)
+        item.geometry.adjust(0, 0, offset.x(), 0);
+
+    if (m_process & ItemTransformation::ResizeTop)
+        item.geometry.adjust(0, offset.y(), 0, 0);
+    else if (m_process & ItemTransformation::ResizeBottom)
+        item.geometry.adjust(0, 0, 0, offset.y());
+}
+
+void QnVideowallManageWidgetPrivate::resizeItemEnd(BaseModelItem &item) {
+    item.flags &= ~StateFlags(StateFlag::Pressed);
+    setFree(item.snaps, false);
+}
+
+QnVideowallManageWidgetPrivate::ItemTransformations QnVideowallManageWidgetPrivate::transformationsAnchor(const QRect &geometry, const QPoint &pos) const {
+    if (!geometry.contains(pos))
+        return ItemTransformation::None;
+
+    QRect innerRect(eroded(geometry, transformationOffset * 2));
+
+    QRect leftAnchor(dilated(QRect(innerRect.left(), innerRect.top(), 0, innerRect.height()), transformationOffset));
+    QRect centerXAnchor(dilated(QRect(innerRect.center().x(), innerRect.top(), 0, innerRect.height()), transformationOffset));
+    QRect rightAnchor(dilated(QRect(innerRect.left() + innerRect.width(), innerRect.top(), 0, innerRect.height()), transformationOffset));
+
+    QRect topAnchor(dilated(QRect(innerRect.left(), innerRect.top(), innerRect.width(), 0), transformationOffset));
+    QRect centerYAnchor(dilated(QRect(innerRect.left(), innerRect.center().y(), innerRect.width(), 0), transformationOffset));
+    QRect bottomAnchor(dilated(QRect(innerRect.left(), innerRect.top() + innerRect.height(), innerRect.width(), 0), transformationOffset));
+
+    auto in = [pos](const QRect &first, const QRect &second) {
+        return first.contains(pos) && second.contains(pos);
+    };
+
+    if (in(centerXAnchor, centerYAnchor))
+        return ItemTransformation::Move;
+    if (in(leftAnchor, centerYAnchor))
+        return ItemTransformation::ResizeLeft;
+    if (in(rightAnchor, centerYAnchor))
+        return ItemTransformation::ResizeRight;
+    if (in(topAnchor, centerXAnchor))
+        return ItemTransformation::ResizeTop;
+    if (in(bottomAnchor, centerXAnchor))
+        return ItemTransformation::ResizeBottom;
+    if (in(leftAnchor, topAnchor))
+        return ItemTransformation::ResizeLeft | ItemTransformation::ResizeTop;
+    if (in(leftAnchor, bottomAnchor))
+        return ItemTransformation::ResizeLeft | ItemTransformation::ResizeBottom;
+    if (in(rightAnchor, topAnchor))
+        return ItemTransformation::ResizeRight | ItemTransformation::ResizeTop;
+    if (in(rightAnchor, bottomAnchor))
+        return ItemTransformation::ResizeRight | ItemTransformation::ResizeBottom;
+
+    return ItemTransformation::None;
+}
+
+Qt::CursorShape QnVideowallManageWidgetPrivate::transformationsCursor(ItemTransformations value) const {
+    switch (value) {
+    case ItemTransformation::ResizeLeft | ItemTransformation::ResizeTop:
+    case ItemTransformation::ResizeRight | ItemTransformation::ResizeBottom:
+        return Qt::SizeFDiagCursor;
+    case ItemTransformation::ResizeRight | ItemTransformation::ResizeTop:
+    case ItemTransformation::ResizeLeft | ItemTransformation::ResizeBottom:
+        return Qt::SizeBDiagCursor;
+    case ItemTransformation::ResizeLeft:
+    case ItemTransformation::ResizeRight:
+        return Qt::SizeHorCursor;
+    case ItemTransformation::ResizeTop:
+    case ItemTransformation::ResizeBottom:
+        return Qt::SizeVerCursor;
+    case ItemTransformation::Move:
+        return Qt::SizeAllCursor;
+    case ItemTransformation::None:
+        return Qt::ArrowCursor;
+    default:
+        qWarning() << "Invalid transformation" << value;
+        return Qt::ArrowCursor;
+    }
 }

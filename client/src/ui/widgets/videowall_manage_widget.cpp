@@ -15,7 +15,7 @@
 
 QnVideowallManageWidget::QnVideowallManageWidget(QWidget *parent /*= 0*/):
     base_type(parent),
-    d_ptr(new QnVideowallManageWidgetPrivate()),
+    d_ptr(new QnVideowallManageWidgetPrivate(this)),
     m_dragProcessor(new DragProcessor(this)),
     m_skipReleaseEvent(false),
     m_pressedButtons(Qt::NoButton)
@@ -82,7 +82,7 @@ void QnVideowallManageWidget::mouseMoveEvent(QMouseEvent *event) {
     Q_D(QnVideowallManageWidget);
 
     QTransform transform(d->getInvertedTransform(d->targetRect(this->rect())));
-    d->mouseMoveAt(transform.map(event->pos()), event->buttons());  
+    d->mouseMoveAt(transform.map(event->pos()));  
 }
 
 void QnVideowallManageWidget::mouseReleaseEvent(QMouseEvent *event) {
