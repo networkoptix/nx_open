@@ -10,6 +10,9 @@
 #include <QMutexLocker>
 
 //#define DEBUG_OUTPUT
+#ifdef DEBUG_OUTPUT
+#include <malloc.h>
+#endif
 
 
 using namespace std;
@@ -76,7 +79,7 @@ quint64 MediaStreamCache::SequentialReadContext::currentPos() const
 MediaStreamCache::MediaStreamCache( unsigned int cacheSizeMillis )
 :
     m_cacheSizeMillis( cacheSizeMillis ),
-    m_mutex( QMutex::Recursive ),
+    m_mutex( QMutex::Recursive ),   //TODO #ak get rid of Recursive mutex
     m_prevPacketSrcTimestamp( -1 ),
     m_currentPacketTimestamp( 0 ),
     m_cacheSizeInBytes( 0 ),

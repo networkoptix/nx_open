@@ -274,6 +274,20 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString &p
     return QnNetworkResourcePtr(0);
 }
 
+QnResourcePtr QnResourcePool::getResourceByParam(const QString &key, const QString &value) const
+{
+    QMutexLocker locker(&m_resourcesMtx);
+    foreach (const QnResourcePtr &resource, m_resources) 
+    {
+        QVariant result;
+        resource->getParam(key, result, QnDomainMemory);
+        if (result.toString() == value)
+            return resource;
+    }
+
+    return QnResourcePtr(0);
+}
+
 QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac) const
 {
     QnMacAddress macAddress(mac);
