@@ -1125,6 +1125,8 @@ void QnMain::run()
     qnCommon->setModuleGUID(serverGuid());
     qnCommon->setLocalSystemName(settings->value("systemName").toString());
 
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+
     ec2::ApiRuntimeData runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
     runtimeInfo.peer.peerType = Qn::PT_Server;
     runtimeInfo.box = lit(QN_ARM_BOX);
@@ -1134,7 +1136,6 @@ void QnMain::run()
     runtimeInfo.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
     QnRuntimeInfoManager::instance()->update(runtimeInfo);
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
 
     ec2::ResourceContext resCtx(
         QnResourceDiscoveryManager::instance(),
