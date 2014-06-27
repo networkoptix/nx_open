@@ -46,6 +46,10 @@ void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData& runt
 {
     QMutexLocker lock(&m_mutex);
 
+    ec2::ApiRuntimeData existingData = m_runtimeInfo.value(runtimeInfo.peer.id);
+    if (existingData.version >= runtimeInfo.version)
+        return;
+
     m_runtimeInfo.insert(runtimeInfo.peer.id, runtimeInfo);
 
     QnId remoteID = qnCommon->remoteGUID();
@@ -62,11 +66,14 @@ void QnRuntimeInfoManager::update(const ec2::ApiRuntimeData& value)
 
     QMutexLocker lock(&m_mutex);
 
-    if (m_runtimeInfo.value(value.peer.id) == value)
+    ec2::ApiRuntimeData existingData = m_runtimeInfo.value(value.peer.id);
+    if (existingData == value)
         return;
 
-    m_runtimeInfo.insert(value.peer.id, value);
-    emit runtimeInfoChanged(value);
+    ec2::ApiRuntimeData newData = value;
+    newData.version = existingData.version + 1;
+    m_runtimeInfo.insert(value.peer.id, newData);
+    emit runtimeInfoChanged(newData);
 }
 
 QMap<QnId, ec2::ApiRuntimeData> QnRuntimeInfoManager::allData() const
