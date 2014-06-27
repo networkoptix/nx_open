@@ -211,6 +211,14 @@ void CyclicAllocator::skipFreedBlocks()
 {
     while( m_leftMostAllocatedBlock != m_freeMemStart )
     {
+        if( m_leftMostAllocatedBlock.arena->size - m_leftMostAllocatedBlock.pos < AllocationHeader::ALLOCATION_HEADER_SIZE )
+        {
+            //moving to the next arena
+            m_leftMostAllocatedBlock.arena = m_leftMostAllocatedBlock.arena->next;
+            m_leftMostAllocatedBlock.pos = 0;
+            continue;
+        }
+
         AllocationHeader header;
         header.read( m_leftMostAllocatedBlock.arena->mem + m_leftMostAllocatedBlock.pos );
 
