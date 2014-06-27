@@ -103,19 +103,19 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
         paintResizeAnchors(painter, body);
         
     }
-    else if (geometry.intersects(process.geometry) && !hasFlag(StateFlag::Pressed))
+    else if (process.isRunning() && geometry.intersects(process.geometry) && !hasFlag(StateFlag::Pressed))
         paintDashBorder(painter, bodyPath());
 }
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paintDashBorder(QPainter *painter, const QPainterPath &path) const {
-    QPen editBorderPen(textColor);
-    editBorderPen.setWidth(borderWidth);
+    QPen pen(textColor);
+    pen.setWidth(borderWidth);
 
     QVector<qreal> dashes;
     dashes << 2 << 3;
-    editBorderPen.setDashPattern(dashes);
+    pen.setDashPattern(dashes);
 
-    QnScopedPainterPenRollback penRollback(painter, editBorderPen);
+    QnScopedPainterPenRollback penRollback(painter, pen);
     QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
     painter->drawPath(path);
 }
@@ -599,6 +599,7 @@ void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint &pos) {
         else
             resizeItemStart(item);       
         m_process.geometry = item.geometry;
+        m_process.oldGeometry = item.geometry;
     });
 }
 
@@ -665,23 +666,27 @@ void QnVideowallManageWidgetPrivate::moveItemEnd(BaseModelItem &item) {
         assert("Not implemented");
     } else {
         int bestIndex = -1;
-        qint64 bestCoeff = 0;
+        qint64 bestArea = 0;
         for (int i = 0; i < m_screens.size(); ++i) {
             ModelScreen screen = m_screens[i]; 
             if (!screen.free())
                 continue;
-            QSize intersectionSize = m_screens[i].geometry.intersected(item.geometry).size();
-            qint64 coeff = intersectionSize.width() * intersectionSize.height();
-            if (bestIndex < 0 || coeff > bestCoeff) {
+            QRect intersection = m_screens[i].geometry.intersected(item.geometry);
+            qint64 nextArea = area(intersection);
+            if (bestIndex < 0 || nextArea > bestArea) {
                 bestIndex = i;
-                bestCoeff = coeff;
+                bestArea = nextArea;
             }
         }
         assert(bestIndex >= 0);
 
-        ModelScreen screen = m_screens[bestIndex]; 
-        item.geometry = screen.geometry;
-        item.snaps = screen.snaps;
+        if (1.0 * bestArea / area(item.geometry) > minAreaOverlapping) {
+            ModelScreen screen = m_screens[bestIndex]; 
+            item.geometry = screen.geometry;
+            item.snaps = screen.snaps;
+        } else {
+            item.geometry = m_process.oldGeometry;
+        }
     }
 
     //for bes user experience do not hide controls until user moves a mouse
@@ -715,19 +720,13 @@ void QnVideowallManageWidgetPrivate::resizeItemEnd(BaseModelItem &item) {
     bool valid = true;
     QRect proposedGeometry = calculateProposedGeometry(item.geometry, &valid);
 
-    QList<QRect> screens;
-    QDesktopWidget* desktop = qApp->desktop();
-    for (int i = 0; i < desktop->screenCount(); ++i)
-        screens << desktop->screenGeometry(i);
-
     if (!valid) {
-        item.geometry = item.snaps.geometry(screens);
+        item.geometry = m_process.oldGeometry;
     } else {
         item.geometry = proposedGeometry;
     }
 
     setFree(item.snaps, false);
-    m_process.geometry = QRect();
 }
 
 QnVideowallManageWidgetPrivate::ItemTransformations QnVideowallManageWidgetPrivate::transformationsAnchor(const QRect &geometry, const QPoint &pos) const {

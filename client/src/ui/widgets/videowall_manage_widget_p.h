@@ -64,6 +64,7 @@ private:
 
         ItemTransformations value;
         QRect geometry;
+        QRect oldGeometry;
 
         bool isRunning() const {
             return value != ItemTransformation::None;
