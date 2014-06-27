@@ -54,7 +54,7 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(
                     if( decoder.get() && decoder->isHardwareAccelerationEnabled() )
                         return decoder.release();
                 }
-                cl_log.log( lit("Hardware acceleration is not supported. Switching to software decoding..."), cl_logWARNING );
+                NX_LOG( lit("Hardware acceleration is not supported. Switching to software decoding..."), cl_logWARNING );
             }
         }
 

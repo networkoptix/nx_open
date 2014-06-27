@@ -90,8 +90,10 @@ namespace nx_hls
                 const quint64 playlistDurationBak = m_totalPlaylistDuration;
 
                 //if there is already chunk with same media sequence, replacing it...
-                auto chunkIter = std::find_if( m_chunks.begin(), m_chunks.end(), 
-                    [this]( const ChunkData& chunk ){ return chunk.mediaSequence == m_currentChunk.mediaSequence; } );
+                std::deque<AbstractPlaylistManager::ChunkData>::iterator chunkIter = m_chunks.begin();
+                for( ; chunkIter != m_chunks.end(); ++chunkIter )
+                    if( chunkIter->mediaSequence == m_currentChunk.mediaSequence )
+                        break;
                 if( chunkIter == m_chunks.end() )
                 {
                     m_chunks.push_back( m_currentChunk );
@@ -101,6 +103,7 @@ namespace nx_hls
                     m_currentChunk.alias = chunkIter->alias;
                     *chunkIter = m_currentChunk;
                 }
+
                 m_totalPlaylistDuration += m_currentChunk.duration;
                 m_currentChunk.mediaSequence = 0;   //using media sequence 0 for NULL chunk
                 m_currentChunk.alias.reset();

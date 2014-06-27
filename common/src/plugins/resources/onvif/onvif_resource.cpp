@@ -48,6 +48,7 @@ const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
 const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
 QString QnPlOnvifResource::MEDIA_URL_PARAM_NAME = QLatin1String("MediaUrl");
 QString QnPlOnvifResource::ONVIF_URL_PARAM_NAME = QLatin1String("DeviceUrl");
+QString QnPlOnvifResource::ONVIF_ID_PARAM_NAME = QLatin1String("DeviceID");
 QString QnPlOnvifResource::MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 QString QnPlOnvifResource::FORCED_AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("forcedIsAudioSupported");
 QString QnPlOnvifResource::AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("isAudioSupported");
@@ -753,6 +754,19 @@ QString QnPlOnvifResource::getDeviceOnvifUrl() const
 void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src) 
 { 
     setParam(ONVIF_URL_PARAM_NAME, src, QnDomainDatabase);
+}
+
+QString QnPlOnvifResource::getDeviceOnvifID() const 
+{ 
+    QVariant mediaVariant;
+    QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
+    this_casted->getParam(ONVIF_ID_PARAM_NAME, mediaVariant, QnDomainMemory);
+    return mediaVariant.toString();
+}
+
+void QnPlOnvifResource::setDeviceOnvifID(const QString& src) 
+{ 
+    setParam(ONVIF_ID_PARAM_NAME, src, QnDomainDatabase);
 }
 
 QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort)

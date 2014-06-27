@@ -566,7 +566,7 @@ bool QnAviArchiveDelegate::deserializeLayout(QnCustomResourceVideoLayout* layout
     {
         QStringList params = info[i].split(QLatin1Char(','));
         if (params.size() != 2) {
-            cl_log.log("Invalid layout string stored at file metadata. Ignored.", cl_logWARNING);
+            NX_LOG("Invalid layout string stored at file metadata. Ignored.", cl_logWARNING);
             return false;
         }
         if (i == 0) {

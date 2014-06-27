@@ -34,7 +34,7 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_recActionCnt(0),
     m_secondaryQuality(Qn::SSQualityMedium),
     m_cameraControlDisabled(false),
-    m_statusFlags(0),
+    m_statusFlags(Qn::CSF_NoFlags),
     m_scheduleDisabled(true),
     m_audioEnabled(false),
     m_advancedWorking(false),
@@ -53,11 +53,11 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     // TODO: #AK this is a wrong place for this connect call.
     // You should listen to changes in resource pool instead.
-    if(QnBusinessEventConnector::instance()) {
+    //TODO: #Elric didn't get it. How resource pool connected to relay input event on camera?
+    if(QnBusinessEventConnector::instance())
         connect(
-            this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
-            QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
-    }
+            this, &QnSecurityCamResource::cameraInput, 
+            QnBusinessEventConnector::instance(), &QnBusinessEventConnector::at_cameraInput );
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
@@ -600,23 +600,24 @@ Qn::StreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const {
         return Qn::QualityNormal;
 }
 
-QnSecurityCamResource::StatusFlags QnSecurityCamResource::statusFlags() const {
+Qn::CameraStatusFlags QnSecurityCamResource::statusFlags() const {
     return m_statusFlags;
 }
 
-bool QnSecurityCamResource::hasStatusFlags(StatusFlags value) const {
+bool QnSecurityCamResource::hasStatusFlags(Qn::CameraStatusFlag value) const
+{
     return m_statusFlags & value;
 }
 
-void QnSecurityCamResource::setStatusFlags(StatusFlags value) {
+void QnSecurityCamResource::setStatusFlags(Qn::CameraStatusFlags value) {
     m_statusFlags = value;
 }
 
-void QnSecurityCamResource::addStatusFlags(StatusFlags value) {
+void QnSecurityCamResource::addStatusFlags(Qn::CameraStatusFlag value) {
     m_statusFlags |= value;
 }
 
-void QnSecurityCamResource::removeStatusFlags(StatusFlags value) {
+void QnSecurityCamResource::removeStatusFlags(Qn::CameraStatusFlag value) {
     m_statusFlags &= ~value;
 }
 

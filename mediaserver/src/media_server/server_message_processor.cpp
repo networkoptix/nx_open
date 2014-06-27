@@ -90,10 +90,10 @@ void QnServerMessageProcessor::removeIPList(const QnId& id)
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>();
 
-    bool isServer = resource.dynamicCast<QnMediaServerResource>();
-    bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
-    bool isUser = resource.dynamicCast<QnUserResource>();
-    bool isVideowall = resource.dynamicCast<QnVideoWallResource>();
+    const bool isServer = dynamic_cast<const QnMediaServerResource*>(resource.data()) != nullptr;
+    const bool isCamera = dynamic_cast<const QnVirtualCameraResource*>(resource.data()) != nullptr;
+    const bool isUser = dynamic_cast<const QnUserResource*>(resource.data()) != nullptr;
+    const bool isVideowall = dynamic_cast<const QnVideoWallResource*>(resource.data()) != nullptr;
 
     if (!isServer && !isCamera && !isUser && !isVideowall)
         return;
@@ -114,7 +114,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
         }
         // update all known IP list
         if (needProxyToCamera) {
-            QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
+            const QnVirtualCameraResource* camRes = dynamic_cast<const QnVirtualCameraResource*>(resource.data());
             updateAllIPList(camRes->getId(), camRes->getHostAddress());
         }
     }
@@ -124,7 +124,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
         if (resource->getId() != ownMediaServer->getId()) {
             resource->addFlags( QnResource::foreigner );
             // update all known IP list
-            updateAllIPList(resource->getId(), resource.dynamicCast<QnMediaServerResource>()->getNetAddrList());
+            updateAllIPList(resource->getId(), dynamic_cast<const QnMediaServerResource*>(resource.data())->getNetAddrList());
         }
     }
 
@@ -152,7 +152,7 @@ void QnServerMessageProcessor::afterRemovingResource(const QnId& id)
     removeIPList(id);
 }
 
-void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
+void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnServerMessageProcessor::at_remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnServerMessageProcessor::at_remotePeerLost );
@@ -238,7 +238,7 @@ bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
     return isKnownAddr(urlHost); // is it camera or other media server address?
 }
 
-void QnServerMessageProcessor::execBusinessActionInternal(QnAbstractBusinessActionPtr action) {
+void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) {
     qnBusinessMessageBus->at_actionReceived(action);
 }
 

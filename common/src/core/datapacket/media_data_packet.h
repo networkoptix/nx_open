@@ -238,7 +238,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     //void deserialize(QIODevice* ioDevice);
     void serialize(QIODevice* ioDevice) const;
 
-    static bool mathImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
+    static bool matchImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
 
 
     quint8 m_input;

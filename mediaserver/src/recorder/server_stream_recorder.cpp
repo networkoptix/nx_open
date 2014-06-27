@@ -70,7 +70,7 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 
 void QnServerStreamRecorder::at_camera_propertyChanged()
 {
-    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
+    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(m_device.data());
     m_useSecondaryRecorder = (camera->getProperty(QnMediaResource::dontRecordSecondaryStreamKey()).toInt() == 0);
 }
 
@@ -297,7 +297,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
 
 int QnServerStreamRecorder::getFpsForValue(int fps)
 {
-    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
+    const QnPhysicalCameraResource* camera = dynamic_cast<const QnPhysicalCameraResource*>(m_device.data());
     if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
     {
         if (m_catalog == QnServer::HiQualityCatalog)
@@ -350,13 +350,14 @@ void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleT
     QTextStream str(&msg);
     str << "Update recording params for camera " << m_device->getUniqueId() << "  " << scheduleTask;
     str.flush();
-    cl_log.log(msg, cl_logINFO);
+    NX_LOG(msg, cl_logINFO);
     */
 
     if (!isMotionRec(scheduleTask.getRecordingType()))
     {
         // switch from motion to non-motion recording
-        QnSecurityCamResourcePtr camRes = getResource().dynamicCast<QnSecurityCamResource>();
+        const QnResourcePtr& res = getResource();
+        const QnSecurityCamResource* camRes = dynamic_cast<const QnSecurityCamResource*>(res.data());
         bool isNoRec = scheduleTask.getRecordingType() == Qn::RT_Never;
         bool usedInRecordAction = camRes && camRes->isRecordingEventAttached();
         int prebuffer = usedInRecordAction && isNoRec ? 1 : 0; // prebuffer 1 usec if camera used in recording action (for keeping last GOP)
@@ -372,8 +373,6 @@ void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleT
 void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task)
 {
     // zero fps value means 'autodetect as maximum possible fps'
-    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
-
 
     // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
     //CLServerPushStreamReader* sPushProvider = dynamic_cast<CLServerPushStreamReader*> (m_mediaProvider);

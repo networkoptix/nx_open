@@ -107,7 +107,7 @@ void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& /*mod
 
 }
 
-void QnResource::update(QnResourcePtr other, bool silenceMode)
+void QnResource::update(const QnResourcePtr& other, bool silenceMode)
 {
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->beforeUpdate();
@@ -392,7 +392,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     QnParam param = m_resourceParamList[name];
     if (param.isReadOnly())
     {
-        cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
+        NX_LOG("setParam: cannot set readonly param!", cl_logWARNING);
         m_mutex.unlock();
         emit asyncParamSetDone(toSharedPointer(this), name, val, false);
         return false;

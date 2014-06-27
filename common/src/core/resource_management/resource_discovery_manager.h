@@ -118,8 +118,8 @@ signals:
     void localInterfacesChanged();
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
 
-private slots:
-    void onInitAsyncFinished(QnResourcePtr res, bool initialized);
+protected slots:
+    void onInitAsyncFinished(const QnResourcePtr& res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
 
 private:

@@ -24,7 +24,7 @@ class QnVideoCamera: public QObject
     Q_OBJECT
 
 public:
-    QnVideoCamera(QnResourcePtr resource);
+    QnVideoCamera(const QnResourcePtr& resource);
     virtual ~QnVideoCamera();
     QnLiveStreamProviderPtr getLiveReader(QnServer::ChunksCatalog catalog);
     int copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue, int cseq);
@@ -90,7 +90,7 @@ private:
     QnLiveStreamProviderPtr getLiveReaderNonSafe(QnServer::ChunksCatalog catalog);
     bool ensureLiveCacheStarted(
         MediaQuality streamQuality,
-        QnLiveStreamProviderPtr primaryReader,
+        const QnLiveStreamProviderPtr& primaryReader,
         qint64 targetDurationUSec );
 };
 

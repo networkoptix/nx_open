@@ -201,6 +201,23 @@ typedef _onvifPtz__RelativeMoveResponse RelativeMoveResp;
 typedef _onvifPtz__GetServiceCapabilities PtzGetServiceCapabilitiesReq;
 typedef _onvifPtz__GetServiceCapabilitiesResponse PtzPtzGetServiceCapabilitiesResp;
 
+class _onvifPtz__GotoPreset;
+class _onvifPtz__GotoPresetResponse;
+class _onvifPtz__SetPreset;
+class _onvifPtz__SetPresetResponse;
+class _onvifPtz__GetPresets;
+class _onvifPtz__GetPresetsResponse;
+class _onvifPtz__RemovePreset;
+class _onvifPtz__RemovePresetResponse;
+typedef _onvifPtz__GotoPreset GotoPresetReq;
+typedef _onvifPtz__GotoPresetResponse GotoPresetResp;
+typedef _onvifPtz__SetPreset SetPresetReq;
+typedef _onvifPtz__SetPresetResponse SetPresetResp;
+typedef _onvifPtz__GetPresets GetPresetsReq;
+typedef _onvifPtz__GetPresetsResponse GetPresetsResp;
+typedef _onvifPtz__RemovePreset RemovePresetReq;
+typedef _onvifPtz__RemovePresetResponse RemovePresetResp;
+
 class _onvifPtz__ContinuousMove;
 class _onvifPtz__ContinuousMoveResponse;
 class _onvifPtz__Stop;
@@ -379,6 +396,10 @@ public:
     int doGetNode(_onvifPtz__GetNode& request, _onvifPtz__GetNodeResponse& response);
     int doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response);
     int doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& response);
+    int gotoPreset(GotoPresetReq& request, GotoPresetResp& response);
+    int setPreset(SetPresetReq& request, SetPresetResp& response);
+    int getPresets(GetPresetsReq& request, GetPresetsResp& response);
+    int removePreset(RemovePresetReq& request, RemovePresetResp& response);
     int doContinuousMove(_onvifPtz__ContinuousMove& request, _onvifPtz__ContinuousMoveResponse& response);
     int doGetStatus(_onvifPtz__GetStatus& request, _onvifPtz__GetStatusResponse& response);
     int doStop(_onvifPtz__Stop& request, _onvifPtz__StopResponse& response);

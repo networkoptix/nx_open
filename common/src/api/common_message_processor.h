@@ -21,7 +21,7 @@ public:
     explicit QnCommonMessageProcessor(QObject *parent = 0);
     virtual ~QnCommonMessageProcessor() {}
 
-    virtual void init(ec2::AbstractECConnectionPtr connection);
+    virtual void init(const ec2::AbstractECConnectionPtr& connection);
 
     virtual void updateResource(const QnResourcePtr &resource) = 0;
 
@@ -51,7 +51,7 @@ signals:
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) = 0;
-    virtual void execBusinessActionInternal(QnAbstractBusinessActionPtr /*action*/) {}
+    virtual void execBusinessActionInternal(const QnAbstractBusinessActionPtr& /*action*/) {}
     
     virtual void afterRemovingResource(const QnId &id);
 

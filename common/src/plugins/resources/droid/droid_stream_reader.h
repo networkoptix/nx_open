@@ -15,7 +15,7 @@ class PlDroidStreamReader: public CLServerPushStreamReader
 public:
     static void setSDPInfo(quint32 ipv4, QByteArray sdpInfo);
 
-    PlDroidStreamReader(QnResourcePtr res);
+    PlDroidStreamReader(const QnResourcePtr& res);
     virtual ~PlDroidStreamReader();
 
 protected:

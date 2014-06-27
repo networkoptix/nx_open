@@ -197,7 +197,7 @@ void QnTcpListener::run()
             "Reason: " << SystemError::toString(prevErrorCode) << "("<<prevErrorCode<<")";
     }
     else {
-        cl_log.log("Server started at ", d->serverAddress.toString() + QLatin1String(":") + QString::number(d->localPort), cl_logINFO);
+        NX_LOG(lit("Server started at %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logINFO);
     }
 
 

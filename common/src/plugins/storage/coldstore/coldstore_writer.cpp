@@ -3,7 +3,7 @@
 #include "utils/common/sleep.h"
 
 
-QnColdStoreWriter::QnColdStoreWriter(QnResourcePtr res):
+QnColdStoreWriter::QnColdStoreWriter(const QnResourcePtr& res):
 QnResourceConsumer(res)
 {
     

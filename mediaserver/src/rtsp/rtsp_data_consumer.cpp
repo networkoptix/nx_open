@@ -174,9 +174,9 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     //QnConstAbstractDataPacketPtr data = nonConstData;
 
-//    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
+//    NX_LOG("queueSize=", m_dataQueue.size(), cl_logALWAYS);
 //    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-//    cl_log.log(QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
+//    NX_LOG(QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
 
     QMutexLocker lock(&m_dataQueueMtx);
     m_dataQueue.push(nonConstData);

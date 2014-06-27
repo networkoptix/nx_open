@@ -16,7 +16,7 @@ bool sameResourceFunctor(const QnAbstractDataPacketPtr& data, QVariant resource)
 
 
 
-QnResourceCommand::QnResourceCommand(QnResourcePtr res):
+QnResourceCommand::QnResourceCommand(const QnResourcePtr& res):
 QnResourceConsumer(res)
 {
     

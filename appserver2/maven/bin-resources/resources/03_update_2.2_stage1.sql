@@ -72,3 +72,6 @@ CREATE INDEX idx_transaction_time  ON transaction_log(timestamp);
 CREATE TABLE "vms_storedFiles" (path VARCHAR PRIMARY KEY, data BLOB);
 CREATE UNIQUE INDEX idx_kvpair_name ON vms_kvpair (resource_id, name);
 ALTER TABLE vms_kvpair ADD isResTypeParam BOOL;
+
+
+INSERT INTO "vms_propertytype" ("resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ('624','DeviceID','1',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,'0','0' );

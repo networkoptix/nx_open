@@ -291,7 +291,7 @@ void QnRtspTimeHelper::printTime(double jitter)
         if (m_jitPackets > 0) {
             QString message(QLatin1String("camera %1. minJit=%2 ms. maxJit=%3 ms. avgJit=%4 ms"));
             message = message.arg(m_resId).arg(int(m_minJitter*1000+0.5)).arg(int(m_maxJitter*1000+0.5)).arg(int(m_jitterSum/m_jitPackets*1000+0.5));
-            cl_log.log(message, cl_logINFO);
+            NX_LOG(message, cl_logINFO);
         }
         m_statsTimer.restart();
         m_minJitter = INT_MAX;

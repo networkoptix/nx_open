@@ -225,7 +225,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
 
 // --------------- QnVideoCamera ----------------------------
 
-QnVideoCamera::QnVideoCamera(QnResourcePtr resource): m_resource(resource)
+QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource): m_resource(resource)
 {
     m_primaryGopKeeper = 0;
     m_secondaryGopKeeper = 0;
@@ -486,9 +486,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCata
     }
 	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	if ( cameraResource && !cameraResource->hasDualStreaming2() && catalog == QnServer::LowQualityCatalog )
-	{
 		return QnLiveStreamProviderPtr();		
-	}
     return catalog == QnServer::HiQualityCatalog ? m_primaryReader : m_secondaryReader;
 }
 
@@ -498,7 +496,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCata
 */
 bool QnVideoCamera::ensureLiveCacheStarted(
     MediaQuality streamQuality,
-    QnLiveStreamProviderPtr primaryReader,
+    const QnLiveStreamProviderPtr& primaryReader,
     qint64 targetDurationUSec )
 {
     //ensuring that vectors will not take much memory
