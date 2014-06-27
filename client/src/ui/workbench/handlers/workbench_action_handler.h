@@ -320,6 +320,8 @@ protected slots:
 
     void at_queueAppRestartAction_triggered();
 
+    void at_disableBackgroundAnimationAction_triggered();
+
 private:
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
 

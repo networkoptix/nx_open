@@ -254,7 +254,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::DebugDecrementCounterAction));
     addAction(action(Qn::DebugShowResourcePoolAction));
     addAction(action(Qn::DebugControlPanelAction));
-
+    addAction(action(Qn::DisableBackgroundAnimationAction));
     connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
@@ -742,3 +742,11 @@ void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 
+void QnMainWindow::stopBackgroundAnimation() {
+    if( m_backgroundPainter.isNull() )
+        return;
+    else {
+        m_view->uninstallLayerPainter(m_backgroundPainter.data());
+        m_backgroundPainter.reset(NULL);
+    }
+}

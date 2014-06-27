@@ -960,6 +960,10 @@ namespace Qn {
         JumpToLiveAction,
         ToggleSyncAction,
 
+        /**
+         * Disable the background animation
+         */
+        DisableBackgroundAnimationAction,
 
         /* Debug actions. */
 

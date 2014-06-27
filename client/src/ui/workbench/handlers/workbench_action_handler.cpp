@@ -106,6 +106,8 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
+#include <ui/widgets/main_window.h>
+
 #include <utils/app_server_image_cache.h>
 #include <utils/app_server_notification_cache.h>
 #include <utils/applauncher_utils.h>
@@ -121,6 +123,8 @@
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/math.h>
+#include <utils/common/checked_cast.h>
+
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -299,6 +303,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
+    connect(action(Qn::DisableBackgroundAnimationAction),       SIGNAL(triggered()),    this,   SLOT(at_disableBackgroundAnimationAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -2940,3 +2945,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
 
+void QnWorkbenchActionHandler::at_disableBackgroundAnimationAction_triggered() {
+    QnMainWindow* mainWindow = checked_cast<QnMainWindow*>( context()->mainWindow() );
+    mainWindow->stopBackgroundAnimation();
+}

@@ -51,6 +51,8 @@ public:
     Options options() const;
     void setOptions(Options options);
 
+    void stopBackgroundAnimation();
+
     void setAnimationsEnabled(bool enabled = true);
 
     QWidget *viewport() const;
