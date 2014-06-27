@@ -34,6 +34,14 @@ QnCommonModule::~QnCommonModule() {
     return;
 }
 
+void QnCommonModule::setLocalSystemName(const QString &value) {
+    if (m_localSystemName == value)
+        return;
+
+    m_localSystemName = value;
+    emit systemNameChanged(m_localSystemName);
+}
+
 QnSoftwareVersion QnCommonModule::engineVersion() const {
     return m_engineVersion;
 }

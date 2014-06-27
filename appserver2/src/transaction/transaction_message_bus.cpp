@@ -746,6 +746,16 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
     }
 }
 
+void QnTransactionMessageBus::dropConnections()
+{
+    QMutexLocker lock(&m_mutex);
+    m_remoteUrls.clear();
+    foreach(const QnTransactionTransportPtr &transport, m_connections) {
+        qWarning() << "Disconnected from peer" << transport->remoteAddr();
+        transport->setState(QnTransactionTransport::Error);
+    }
+}
+
 QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() const
 {
     QMutexLocker lock(&m_mutex);
