@@ -116,6 +116,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::runtimeInfoChanged:    return handleTransactionParams<ApiRuntimeData>          (&stream, transaction, function);
 
     default:
+        qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
         Q_ASSERT_X(0, Q_FUNC_INFO, "Transaction type is not implemented for delivery! Implement me!");
         return false;
     }
