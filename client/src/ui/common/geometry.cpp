@@ -375,6 +375,10 @@ QRectF QnGeometry::dilated(const QRectF &rect, qreal amount) {
     return rect.adjusted(-amount, -amount, amount, amount);
 }
 
+QRect QnGeometry::dilated(const QRect rect, int amount) {
+    return rect.adjusted(-amount, -amount, amount, amount);
+}
+
 QSizeF QnGeometry::dilated(const QSizeF &size, const MarginsF &amount) {
     return size + sizeDelta(amount);
 }
@@ -384,6 +388,10 @@ QRectF QnGeometry::eroded(const QRectF &rect, const MarginsF &amount) {
 }
 
 QRectF QnGeometry::eroded(const QRectF &rect, qreal amount) {
+    return rect.adjusted(amount, amount, -amount, -amount);
+}
+
+QRect QnGeometry::eroded(const QRect &rect, int amount) {
     return rect.adjusted(amount, amount, -amount, -amount);
 }
 
