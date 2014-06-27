@@ -28,7 +28,7 @@ public:
     virtual ~QnThirdPartyCompressedVideoData();
 
     //!Implementation of QnAbstractMediaData::clone
-    virtual QnWritableCompressedVideoData* clone() const override;
+    virtual QnWritableCompressedVideoData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
     //!Implementation of QnAbstractMediaData::data
     virtual const char* data() const override;
     //!Implementation of QnAbstractMediaData::dataSize
