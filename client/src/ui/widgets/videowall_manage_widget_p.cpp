@@ -531,7 +531,13 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
     else
         videowall->pcs()->updateItem(pcUuid, pcData);
 
+    QSet<QUuid> existingIds;
+    foreach (const QnVideoWallItem &item, videowall->items()->getItems())
+        existingIds << item.uuid;
+
     foreach (const ModelItem &modelItem, m_items) {
+        existingIds.remove(modelItem.id);
+
         QnVideoWallItem item;
         if (modelItem.itemType == ItemType::Added || !videowall->items()->hasItem(modelItem.id)) {
             item.name = generateUniqueString([&videowall] () {
@@ -552,6 +558,9 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
         else
             videowall->items()->addItem(item);
     }
+
+    foreach (const QUuid &toDelete, existingIds)
+        videowall->items()->removeItem(toDelete);
 
 }
 
