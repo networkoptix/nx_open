@@ -123,13 +123,28 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
     }
 
     if (editable && hasFlag(StateFlag::Hovered)) {
+#ifdef DEBUG_RESIZE_ANCHORS
+        {
+            QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
+            QnScopedPainterBrushRollback brushRollback(painter, Qt::red);
+
+            QRect innerRect(bodyRect());
+
+            painter->drawRect(dilated(QRect(innerRect.left(), innerRect.top(), 0, innerRect.height()), transformationOffset));
+            painter->drawRect(dilated(QRect(innerRect.center().x(), innerRect.top(), 0, innerRect.height()), transformationOffset));
+            painter->drawRect(dilated(QRect(innerRect.left() + innerRect.width(), innerRect.top(), 0, innerRect.height()), transformationOffset));
+
+            painter->drawRect(dilated(QRect(innerRect.left(), innerRect.top(), innerRect.width(), 0), transformationOffset));
+            painter->drawRect(dilated(QRect(innerRect.left(), innerRect.center().y(), innerRect.width(), 0), transformationOffset));
+            painter->drawRect(dilated(QRect(innerRect.left(), innerRect.top() + innerRect.height(), innerRect.width(), 0), transformationOffset));
+        }
+#endif
         paintPixmap(painter, body, qnSkin->pixmap("item/move.png"));
 
         QPainterPath anchorPath;
         anchorPath.addRect(body);
         paintDashBorder(painter, anchorPath);
         paintResizeAnchors(painter, body);
-
     }
     else if (process.isRunning() && geometry.intersects(process.geometry) && !hasFlag(StateFlag::Pressed))
         paintProposed(painter, process);
@@ -580,7 +595,7 @@ void QnVideowallManageWidgetPrivate::mouseMoveAt(const QPoint &pos) {
         if (item.geometry.contains(pos)) {
             item.flags |= StateFlag::Hovered;
             if (item.editable && m_process == ItemTransformation::None) {
-                proposed = transformationsAnchor(item.geometry, pos);
+                proposed = transformationsAnchor(item.bodyRect(), pos);
             }
         }
         else
@@ -622,7 +637,7 @@ void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint &pos) {
             return;
         abort = true;   //no more than one such item must exist
 
-        m_process.value = transformationsAnchor(item.geometry, pos);
+        m_process.value = transformationsAnchor(item.bodyRect(), pos);
         if (m_process == ItemTransformation::None) 
             return;
 
@@ -708,18 +723,13 @@ void QnVideowallManageWidgetPrivate::resizeItem(BaseModelItem &item, const QPoin
 }
 
 QnVideowallManageWidgetPrivate::ItemTransformations QnVideowallManageWidgetPrivate::transformationsAnchor(const QRect &geometry, const QPoint &pos) const {
-    if (!geometry.contains(pos))
-        return ItemTransformation::None;
+    QRect leftAnchor    (dilated(QRect(geometry.left(), geometry.top(), 0, geometry.height()), transformationOffset));
+    QRect centerXAnchor (dilated(QRect(geometry.center().x(), geometry.top(), 0, geometry.height()), transformationOffset));
+    QRect rightAnchor   (dilated(QRect(geometry.left() + geometry.width(), geometry.top(), 0, geometry.height()), transformationOffset));
 
-    QRect innerRect(eroded(geometry, transformationOffset * 2));
-
-    QRect leftAnchor(dilated(QRect(innerRect.left(), innerRect.top(), 0, innerRect.height()), transformationOffset));
-    QRect centerXAnchor(dilated(QRect(innerRect.center().x(), innerRect.top(), 0, innerRect.height()), transformationOffset));
-    QRect rightAnchor(dilated(QRect(innerRect.left() + innerRect.width(), innerRect.top(), 0, innerRect.height()), transformationOffset));
-
-    QRect topAnchor(dilated(QRect(innerRect.left(), innerRect.top(), innerRect.width(), 0), transformationOffset));
-    QRect centerYAnchor(dilated(QRect(innerRect.left(), innerRect.center().y(), innerRect.width(), 0), transformationOffset));
-    QRect bottomAnchor(dilated(QRect(innerRect.left(), innerRect.top() + innerRect.height(), innerRect.width(), 0), transformationOffset));
+    QRect topAnchor     (dilated(QRect(geometry.left(), geometry.top(), geometry.width(), 0), transformationOffset));
+    QRect centerYAnchor (dilated(QRect(geometry.left(), geometry.center().y(), geometry.width(), 0), transformationOffset));
+    QRect bottomAnchor  (dilated(QRect(geometry.left(), geometry.top() + geometry.height(), geometry.width(), 0), transformationOffset));
 
     auto in = [pos](const QRect &first, const QRect &second) {
         return first.contains(pos) && second.contains(pos);
