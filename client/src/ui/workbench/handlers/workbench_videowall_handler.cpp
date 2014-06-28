@@ -1327,9 +1327,10 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
                 if (screens.isEmpty())
                     continue;
 
-                QSet<int> intersected = usedScreens.intersect(screens);
+                QSet<int> intersected = screens;
+                intersected.intersect(usedScreens);
                 bool skip = !intersected.isEmpty();
-                usedScreens = intersected;
+                usedScreens |= screens;
 
                 if (skip)
                     continue;

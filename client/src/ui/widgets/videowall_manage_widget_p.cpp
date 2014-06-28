@@ -218,7 +218,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintDeleteButton(QPainter *
         path.translate(rect.topLeft());
         painter->drawPath(path);
     }
-  
+    // setFillMode does not work o_O, using minor hack --gdm
     {
         QPainterPath path;
         path.moveTo(0, offset);
