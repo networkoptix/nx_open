@@ -179,21 +179,20 @@ private:
     void foreachItem(std::function<void(BaseModelItem& /*item*/, bool& /*abort*/)> handler);
     void foreachItemConst(std::function<void(const BaseModelItem& /*item*/, bool& /*abort*/)> handler);
 
-    void moveItemStart(BaseModelItem &item);
-    void moveItemMove(BaseModelItem &item, const QPoint &offset);
-    void moveItemEnd(BaseModelItem &item);
-
-    void resizeItemStart(BaseModelItem &item);
-    void resizeItemMove(BaseModelItem &item, const QPoint &offset);
-    void resizeItemEnd(BaseModelItem &item);
+    void moveItem(BaseModelItem &item, const QPoint &offset);
+    void resizeItem(BaseModelItem &item, const QPoint &offset);
 
     void setFree(const QnScreenSnaps &snaps, bool value);
 
     ItemTransformations transformationsAnchor(const QRect &geometry, const QPoint &pos) const;
     Qt::CursorShape transformationsCursor(ItemTransformations value) const;
 
+	typedef std::function<QRect(const BaseModelItem &, bool *, bool *)> calculateProposedGeometryFunction;
     QRect calculateProposedResizeGeometry(const BaseModelItem &item, bool *valid = NULL, bool *multiScreen = NULL) const;
 	QRect calculateProposedMoveGeometry(const BaseModelItem &item, bool *valid = NULL, bool *multiScreen = NULL) const;
+
+	void processItemStart(BaseModelItem &item, calculateProposedGeometryFunction proposedGeometry);
+	void processItemEnd(BaseModelItem &item, calculateProposedGeometryFunction proposedGeometry);
 private:
     QWidget *q_ptr;
     QTransform m_transform;
