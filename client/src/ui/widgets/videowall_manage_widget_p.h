@@ -41,11 +41,11 @@ private:
         Added
     };
 
-    enum class StateFlag {
+    enum StateFlag {
         Default = 0,        
         Pressed = 0x2,      
-        Hovered = 0x4,      
-        Disabled = 0x8      
+        Hovered = 0x4,
+        DeleteHovered = 0x8      
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
@@ -93,6 +93,7 @@ private:
 
         virtual void paint(QPainter* painter, const TransformationProcess &process) const;
         virtual QRect bodyRect() const;
+        virtual QRect deleteButtonRect() const;
         virtual QPainterPath bodyPath() const;
         virtual int fontSize() const;
         virtual int iconSize() const;
@@ -100,6 +101,7 @@ private:
         void paintDashBorder(QPainter *painter, const QPainterPath &path) const;
         void paintResizeAnchors(QPainter *painter, const QRect &rect) const;
         void paintPixmap(QPainter *painter, const QRect &rect, const QPixmap &pixmap) const;
+        void paintDeleteButton(QPainter *painter) const;
 
         bool hasFlag(StateFlags flag) const;
         bool isPartOfScreen() const;
@@ -112,6 +114,7 @@ private:
         StateFlags flags;
 
         qreal opacity;
+        qreal deleteButtonOpacity;
         QColor baseColor;
         bool editable;
 

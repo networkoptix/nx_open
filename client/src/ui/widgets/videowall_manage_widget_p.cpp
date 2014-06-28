@@ -50,6 +50,7 @@ QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(const QRect &geomet
     geometry(geometry),
     flags(StateFlag::Default),
     opacity(minOpacity),
+    deleteButtonOpacity(0.0),
     editable(false)
 {}
 
@@ -88,6 +89,18 @@ QRect QnVideowallManageWidgetPrivate::BaseModelItem::bodyRect() const {
         body.translate(0, -offset);
 
     return body;
+}
+
+QRect QnVideowallManageWidgetPrivate::BaseModelItem::deleteButtonRect() const {
+    QRect iconRect(0, 0, iconSize(), iconSize());
+
+    QPoint p = bodyRect().topRight();
+    p.setX(p.x() - transformationOffset* partScreenCoeff);
+    p.setY(p.y() + transformationOffset* partScreenCoeff);
+
+    iconRect.moveTopRight(p);
+
+    return iconRect;
 }
 
 QPainterPath QnVideowallManageWidgetPrivate::BaseModelItem::bodyPath() const {
@@ -155,6 +168,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
         }
 #endif
         paintPixmap(painter, body, qnSkin->pixmap("item/move.png"));
+        paintDeleteButton(painter);
 
         QPainterPath anchorPath;
         anchorPath.addRect(body);
@@ -183,6 +197,15 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintPixmap(QPainter *painte
     QRect iconRect(0, 0, iconSize(), iconSize());
     iconRect.moveCenter(rect.center());
     painter->drawPixmap(iconRect, pixmap);
+}
+
+void QnVideowallManageWidgetPrivate::BaseModelItem::paintDeleteButton(QPainter *painter) const {
+    QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
+
+    QColor color = toTransparent(QColor(Qt::red), deleteButtonOpacity);
+
+    QnScopedPainterBrushRollback brushRollback(painter, color);
+    painter->drawRect(deleteButtonRect());
 }
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paintResizeAnchors(QPainter *painter, const QRect &rect) const {
@@ -593,11 +616,16 @@ void QnVideowallManageWidgetPrivate::mouseMoveAt(const QPoint &pos) {
         if (item.geometry.contains(pos)) {
             item.flags |= StateFlag::Hovered;
             if (item.editable && m_process == ItemTransformation::None) {
+                if (item.deleteButtonRect().contains(pos))
+                    item.flags |= StateFlag::DeleteHovered;
+                else
+                    item.flags &= ~StateFlag::DeleteHovered;
+
                 proposed = transformationsAnchor(item.bodyRect(), pos);
             }
         }
         else
-            item.flags &= ~StateFlags(StateFlag::Hovered);
+            item.flags &= ~(StateFlag::Hovered | StateFlag::DeleteHovered);
     });
 
     QCursor cursor(transformationsCursor(proposed));
@@ -612,20 +640,34 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
     if (m_process.isRunning())
         return;
 
-    foreachItem([this, pos](BaseModelItem &item, bool &abort) {
-        if (!item.free() || !item.geometry.contains(pos))
+    QUuid toDelete;
+    foreachItem([this, pos, &toDelete](BaseModelItem &item, bool &abort) {
+        if (!item.geometry.contains(pos))
             return;
 
-        ModelItem added(ItemType::Added, QUuid::createUuid());
-        added.name = tr("New Item");
-        added.geometry = item.geometry;
-        added.snaps = item.snaps;
-        added.flags |= StateFlag::Hovered;   //mouse cursor is over it
-        added.opacity = 1.0;
-        m_items << added;
-        item.setFree(false);
-        abort = true;
+        if (item.free()) {
+            ModelItem added(ItemType::Added, QUuid::createUuid());
+            added.name = tr("New Item");
+            added.geometry = item.geometry;
+            added.snaps = item.snaps;
+            added.flags |= StateFlag::Hovered;   //mouse cursor is over it
+            added.opacity = 1.0;
+            m_items << added;
+            item.setFree(false);
+
+            abort = true;
+        } else if (item.editable && item.deleteButtonRect().contains(pos)) {
+            toDelete = item.id;
+            setFree(item.snaps, true);
+            abort = true;
+        }     
     });
+
+    if (!toDelete.isNull()) {
+        m_items.erase(std::remove_if(m_items.begin(), m_items.end(), [&toDelete](const ModelItem &v) {
+            return v.id == toDelete;
+        }), m_items.end());
+    }
 }
 
 void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint &pos) {
@@ -691,13 +733,19 @@ void QnVideowallManageWidgetPrivate::tick(int deltaMSecs) {
     qreal opacityDelta = opacityChangeSpeed * deltaMSecs;
 
     foreachItem([this, opacityDelta](BaseModelItem &item, bool &) {
-        if (item.hasFlag(StateFlag::Pressed))
+        if (item.hasFlag(StateFlag::Pressed)) {
             item.opacity = qMax(item.opacity - opacityDelta, draggedOpacity);
-        else
+        } else {
             if (item.hasFlag(StateFlag::Hovered) && (m_process == ItemTransformation::None))
                 item.opacity = qMin(item.opacity + opacityDelta, 1.0);
             else
                 item.opacity = qMax(item.opacity - opacityDelta, minOpacity);
+        }
+        if (item.hasFlag(StateFlag::DeleteHovered)) {
+            item.deleteButtonOpacity = qMin(item.deleteButtonOpacity + opacityDelta, 1.0);
+        } else {
+            item.deleteButtonOpacity = qMax(item.deleteButtonOpacity - opacityDelta, 0.0);
+        }
     });
 }
 
