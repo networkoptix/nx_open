@@ -12,7 +12,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <utils/math/color_transformations.h>
-
+#include <utils/math/linear_combination.h>
 
 namespace {
     const int frameMargin = 40;
@@ -37,7 +37,7 @@ namespace {
     const QColor freeSpaceColor(Qt::lightGray);
     const QColor itemColor(64, 130, 180);
     const QColor textColor(Qt::white);
-    const QColor overrideColor(Qt::red);
+    const QColor errorColor(Qt::red);
 }
 
 /************************************************************************/
@@ -92,7 +92,7 @@ QRect QnVideowallManageWidgetPrivate::BaseModelItem::bodyRect() const {
 }
 
 QRect QnVideowallManageWidgetPrivate::BaseModelItem::deleteButtonRect() const {
-    QRect iconRect(0, 0, iconSize(), iconSize());
+    QRect iconRect(0, 0, iconSize()*0.7, iconSize()*0.7);
 
     QPoint p = bodyRect().topRight();
     p.setX(p.x() - transformationOffset* partScreenCoeff);
@@ -202,10 +202,34 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paintPixmap(QPainter *painte
 void QnVideowallManageWidgetPrivate::BaseModelItem::paintDeleteButton(QPainter *painter) const {
     QnScopedPainterPenRollback penRollback(painter, Qt::NoPen);
 
-    QColor color = toTransparent(QColor(Qt::red), deleteButtonOpacity);
-
+    QColor color = linearCombine(deleteButtonOpacity, errorColor, 1.0 - deleteButtonOpacity, textColor);
     QnScopedPainterBrushRollback brushRollback(painter, color);
-    painter->drawRect(deleteButtonRect());
+
+    QRect rect = deleteButtonRect();
+    int offset = rect.width() * 10 / 64;
+
+    {
+        QPainterPath path;
+        path.moveTo(rect.width(), offset);
+        path.lineTo(rect.width() - offset, 0);
+        path.lineTo(0, rect.height() - offset);
+        path.lineTo(offset, rect.height());
+        path.closeSubpath();
+        path.translate(rect.topLeft());
+        painter->drawPath(path);
+    }
+  
+    {
+        QPainterPath path;
+        path.moveTo(0, offset);
+        path.lineTo(offset, 0);
+        path.lineTo(rect.width(), rect.height() - offset);
+        path.lineTo(rect.width() - offset, rect.height());
+        path.closeSubpath();
+        path.translate(rect.topLeft());
+        painter->drawPath(path);
+    }
+
 }
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paintResizeAnchors(QPainter *painter, const QRect &rect) const {
@@ -391,7 +415,7 @@ void QnVideowallManageWidgetPrivate::ModelItem::paintProposed(QPainter* painter,
     base_type::paintProposed(painter, proposedGeometry);
     
     QnScopedPainterPenRollback pen(painter, Qt::NoPen);
-    QnScopedPainterBrushRollback brush(painter, overrideColor);
+    QnScopedPainterBrushRollback brush(painter, errorColor);
     painter->drawPath(bodyPath());
 }
 
