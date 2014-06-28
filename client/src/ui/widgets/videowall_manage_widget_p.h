@@ -70,6 +70,12 @@ private:
             return value != ItemTransformation::None;
         }
 
+		void clear() {
+			value = ItemTransformation::None;
+			geometry = QRect();
+			oldGeometry = QRect();
+		}
+
         friend bool operator==(const TransformationProcess &process, const ItemTransformations &transformations) {
             return process.value == transformations;
         }
@@ -80,7 +86,7 @@ private:
     };
 
     struct BaseModelItem {
-        BaseModelItem(const QRect &rect, ItemType itemType, const QUuid &id);
+        BaseModelItem(const QRect &geometry, ItemType itemType, const QUuid &id);
 
         virtual bool free() const = 0;
         virtual void setFree(bool value) = 0;
@@ -98,8 +104,8 @@ private:
         bool hasFlag(StateFlags flag) const;
         bool isPartOfScreen() const;
 
-        const QUuid id;
-        const ItemType itemType;
+        QUuid id;
+        ItemType itemType;
 
         QRect geometry;
         QnScreenSnaps snaps;
@@ -186,7 +192,8 @@ private:
     ItemTransformations transformationsAnchor(const QRect &geometry, const QPoint &pos) const;
     Qt::CursorShape transformationsCursor(ItemTransformations value) const;
 
-    QRect calculateProposedGeometry(const QRect &geometry, bool *valid = NULL, bool *multiScreen = NULL) const;
+    QRect calculateProposedResizeGeometry(const BaseModelItem &item, bool *valid = NULL, bool *multiScreen = NULL) const;
+	QRect calculateProposedMoveGeometry(const BaseModelItem &item, bool *valid = NULL, bool *multiScreen = NULL) const;
 private:
     QWidget *q_ptr;
     QTransform m_transform;

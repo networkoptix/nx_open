@@ -44,15 +44,14 @@ namespace {
 /* BaseModelItem                                                        */
 /************************************************************************/
 
-QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(const QRect &rect, ItemType itemType, const QUuid &id):
+QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(const QRect &geometry, ItemType itemType, const QUuid &id):
     id(id),
     itemType(itemType),
-    geometry(rect),
+    geometry(geometry),
     flags(StateFlag::Default),
     opacity(minOpacity),
     editable(false)
 {}
-
 
 bool QnVideowallManageWidgetPrivate::BaseModelItem::hasFlag(StateFlags flag) const {
     return (flags & flag) == flag;
@@ -195,7 +194,8 @@ bool QnVideowallManageWidgetPrivate::BaseModelItem::isPartOfScreen() const {
 }
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paintProposed(QPainter* painter, const TransformationProcess &process) const {
-    paintDashBorder(painter, bodyPath());
+	if (process.isRunning())
+		paintDashBorder(painter, bodyPath());
 }
 
 /************************************************************************/
@@ -616,7 +616,7 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
 }
 
 void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint &pos) {
-    assert(m_process == ItemTransformation::None);
+    assert(!m_process.isRunning());
     foreachItem([this, pos](BaseModelItem &item, bool &abort) {
         if (!item.editable || !item.geometry.contains(pos))
             return;
@@ -636,7 +636,7 @@ void QnVideowallManageWidgetPrivate::dragStartAt(const QPoint &pos) {
 }
 
 void QnVideowallManageWidgetPrivate::dragMoveAt(const QPoint &pos, const QPoint &oldPos) {
-    if (m_process == ItemTransformation::None)
+    if (!m_process.isRunning())
         return;
 
     foreachItem([this, &pos, &oldPos](BaseModelItem &item, bool &abort) {
@@ -652,10 +652,11 @@ void QnVideowallManageWidgetPrivate::dragMoveAt(const QPoint &pos, const QPoint 
 }
 
 void QnVideowallManageWidgetPrivate::dragEndAt(const QPoint &pos) {
-    if (m_process == ItemTransformation::None)
+    if (!m_process.isRunning())
         return;
 
     foreachItem([this, pos](BaseModelItem &item, bool &abort) {
+		Q_UNUSED(abort)	//we should remove Hovered flag from all items
         item.flags &= ~StateFlags(StateFlag::Hovered);
         if (!item.hasFlag(StateFlag::Pressed))
             return;
@@ -664,7 +665,8 @@ void QnVideowallManageWidgetPrivate::dragEndAt(const QPoint &pos) {
         else
             resizeItemEnd(item);
     });
-    m_process.value = ItemTransformation::None;
+
+    m_process.clear();
 }
 
 void QnVideowallManageWidgetPrivate::tick(int deltaMSecs) {
@@ -684,42 +686,82 @@ void QnVideowallManageWidgetPrivate::tick(int deltaMSecs) {
 void QnVideowallManageWidgetPrivate::moveItemStart(BaseModelItem &item) {
     item.flags |= StateFlag::Pressed;
     setFree(item.snaps, true);
-
+	m_process.geometry = calculateProposedMoveGeometry(item);
 }
 
 void QnVideowallManageWidgetPrivate::moveItemMove(BaseModelItem &item, const QPoint &offset) {
     item.geometry.translate(offset);
+	m_process.geometry = calculateProposedMoveGeometry(item);
 }
 
 void QnVideowallManageWidgetPrivate::moveItemEnd(BaseModelItem &item) {
     item.flags &= ~StateFlags(StateFlag::Pressed);
 
-    if (item.snaps.screens().size() > 1) {
-        assert("Not implemented");
-    } else {
-        int bestIndex = -1;
-        qint64 bestArea = 0;
-        for (int i = 0; i < m_screens.size(); ++i) {
-            ModelScreen screen = m_screens[i]; 
-            if (!screen.free())
-                continue;
-            QRect intersection = m_screens[i].geometry.intersected(item.geometry);
-            qint64 nextArea = area(intersection);
-            if (bestIndex < 0 || nextArea > bestArea) {
-                bestIndex = i;
-                bestArea = nextArea;
-            }
-        }
-        assert(bestIndex >= 0);
+	bool valid = true;
+	bool multiscreen = false;
+	QRect proposedGeometry = calculateProposedMoveGeometry(item, &valid, &multiscreen);
 
-        if (1.0 * bestArea / area(item.geometry) > minAreaOverlapping) {
-            ModelScreen screen = m_screens[bestIndex]; 
-            item.geometry = screen.geometry;
-            item.snaps = screen.snaps;
-        } else {
-            item.geometry = m_process.oldGeometry;
-        }
-    }
+	if (!valid) {
+		item.geometry = m_process.oldGeometry;
+	} else {
+		item.geometry = proposedGeometry;
+
+		if (multiscreen) {
+			QRect united;
+			foreach(const ModelScreen &screen, m_screens) {
+				if (!screen.geometry.intersects(proposedGeometry))
+					continue;
+
+				if (!united.isValid()) {
+					united = screen.geometry;
+					item.snaps = screen.snaps;
+					continue;
+				}
+
+				if (screen.geometry.left() < united.left())
+					item.snaps.left() = screen.snaps.left();
+				if (screen.geometry.right() > united.right())
+					item.snaps.right() = screen.snaps.right();
+				if (screen.geometry.top() < united.top())
+					item.snaps.top() = screen.snaps.top();
+				if (screen.geometry.bottom() > united.bottom())
+					item.snaps.bottom() = screen.snaps.bottom();
+				united = united.united(screen.geometry);
+			}
+		} else {
+
+			foreach(const ModelScreen &screen, m_screens) {
+				if (!screen.geometry.intersects(proposedGeometry))
+					continue;
+
+				QRect united;
+				foreach (const ModelScreenPart &part, screen.parts) {
+					if (!part.geometry.intersects(proposedGeometry))
+						continue;
+
+					if (!united.isValid()) {
+						united = part.geometry;
+						item.snaps = part.snaps;
+						continue;
+					}
+
+					if (part.geometry.left() < united.left())
+						item.snaps.left() = part.snaps.left();
+					if (part.geometry.right() > united.right())
+						item.snaps.right() = part.snaps.right();
+					if (part.geometry.top() < united.top())
+						item.snaps.top() = part.snaps.top();
+					if (part.geometry.bottom() > united.bottom())
+						item.snaps.bottom() = part.snaps.bottom();
+					united = united.united(part.geometry);
+				}
+
+				break;
+			}
+
+
+		}
+	}
 
     //for bes user experience do not hide controls until user moves a mouse
     item.flags |= StateFlags(StateFlag::Hovered);
@@ -729,7 +771,7 @@ void QnVideowallManageWidgetPrivate::moveItemEnd(BaseModelItem &item) {
 void QnVideowallManageWidgetPrivate::resizeItemStart(BaseModelItem &item) {
     setFree(item.snaps, true);
     item.flags |= StateFlag::Pressed;
-    m_process.geometry = calculateProposedGeometry(item.geometry);
+    m_process.geometry = calculateProposedResizeGeometry(item);
 }
 
 void QnVideowallManageWidgetPrivate::resizeItemMove(BaseModelItem &item, const QPoint &offset) {
@@ -743,7 +785,7 @@ void QnVideowallManageWidgetPrivate::resizeItemMove(BaseModelItem &item, const Q
     else if (m_process.value & ItemTransformation::ResizeBottom)
         item.geometry.adjust(0, 0, 0, offset.y());
 
-    m_process.geometry = calculateProposedGeometry(item.geometry);
+    m_process.geometry = calculateProposedResizeGeometry(item);
 }
 
 void QnVideowallManageWidgetPrivate::resizeItemEnd(BaseModelItem &item) {
@@ -751,7 +793,7 @@ void QnVideowallManageWidgetPrivate::resizeItemEnd(BaseModelItem &item) {
 
     bool valid = true;
     bool multiscreen = false;
-    QRect proposedGeometry = calculateProposedGeometry(item.geometry, &valid, &multiscreen);
+    QRect proposedGeometry = calculateProposedResizeGeometry(item, &valid, &multiscreen);
 
     if (!valid) {
         item.geometry = m_process.oldGeometry;
@@ -778,6 +820,7 @@ void QnVideowallManageWidgetPrivate::resizeItemEnd(BaseModelItem &item) {
                     item.snaps.top() = screen.snaps.top();
                 if (screen.geometry.bottom() > united.bottom())
                     item.snaps.bottom() = screen.snaps.bottom();
+				united = united.united(screen.geometry);
             }
         } else {
             
@@ -804,6 +847,7 @@ void QnVideowallManageWidgetPrivate::resizeItemEnd(BaseModelItem &item) {
                         item.snaps.top() = part.snaps.top();
                     if (part.geometry.bottom() > united.bottom())
                         item.snaps.bottom() = part.snaps.bottom();
+					united = united.united(part.geometry);
                 }
 
                 break;
@@ -812,7 +856,10 @@ void QnVideowallManageWidgetPrivate::resizeItemEnd(BaseModelItem &item) {
 
         }
     }
+
+	//for bes user experience do not hide controls until user moves a mouse
     setFree(item.snaps, false);
+	item.flags |= StateFlags(StateFlag::Hovered);
 }
 
 QnVideowallManageWidgetPrivate::ItemTransformations QnVideowallManageWidgetPrivate::transformationsAnchor(const QRect &geometry, const QPoint &pos) const {
@@ -879,7 +926,8 @@ Qt::CursorShape QnVideowallManageWidgetPrivate::transformationsCursor(ItemTransf
     }
 }
 
-QRect QnVideowallManageWidgetPrivate::calculateProposedGeometry(const QRect &geometry, bool *valid, bool *multiScreen) const {
+QRect QnVideowallManageWidgetPrivate::calculateProposedResizeGeometry(const BaseModelItem &item, bool *valid, bool *multiScreen) const {
+	QRect geometry = item.geometry;
     QRect result;
 
     int screenCount = 0;
@@ -914,4 +962,52 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedGeometry(const QRect &geo
     if (multiScreen)
         *multiScreen = screenCount > 1;
     return result;
+}
+
+template<typename T>
+QList<T> bestMatchingGeometry(const QList<T> &source, const QRect &geometry, int count) {
+	QList<T> result;
+	result.reserve(count);
+	for(int i = 0; i < count; ++i)
+		result << source[0];
+
+	std::partial_sort_copy(source.cbegin(), source.cend(), result.begin(), result.end(), [&geometry](const T& left, const T& right) {
+		return QnGeometry::area(left.geometry.intersected(geometry)) > QnGeometry::area(right.geometry.intersected(geometry));
+	});
+	return result;
+}
+
+template<typename T>
+QRect unitedGeometry(const QList<T> source, bool *valid) {
+	QRect result;
+	for(const T &item: source) {
+		result = result.united(item.geometry);
+		if (valid)
+			*valid &= item.free();
+	}
+	return result;
+}
+
+
+QRect QnVideowallManageWidgetPrivate::calculateProposedMoveGeometry(const BaseModelItem &item, bool *valid, bool *multiScreen) const {
+	QRect geometry = item.geometry;
+	
+	const int screenCount = item.snaps.screens().size();
+	if (multiScreen)
+		*multiScreen = screenCount > 1;
+
+	QList<ModelScreen> bestScreens = bestMatchingGeometry(m_screens, geometry, screenCount);
+	if (screenCount > 1 || !item.isPartOfScreen())
+		return unitedGeometry(bestScreens, valid);
+
+	int screenIdx = bestScreens[0].snaps.left().screenIndex;
+	int partCount = [](const QnScreenSnaps &snaps) {
+		int x = QnScreenSnap::snapsPerScreen() - snaps.right().snapIndex - snaps.left().snapIndex;
+		int y = QnScreenSnap::snapsPerScreen() - snaps.bottom().snapIndex - snaps.top().snapIndex;
+		return x * y;
+	}(item.snaps);
+
+	QList<ModelScreenPart> bestParts = bestMatchingGeometry(m_screens[screenIdx].parts, geometry, partCount);
+	return unitedGeometry(bestParts, valid);
+	
 }
