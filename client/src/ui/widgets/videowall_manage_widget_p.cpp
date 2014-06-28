@@ -629,9 +629,7 @@ void QnVideowallManageWidgetPrivate::mouseMoveAt(const QPoint &pos) {
     });
 
     QCursor cursor(transformationsCursor(proposed));
-
-    Q_Q(QWidget);
-    q->setCursor(cursor);
+    q_ptr->setCursor(cursor);
 }
 
 void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseButtons buttons) {
@@ -640,33 +638,37 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
     if (m_process.isRunning())
         return;
 
-    QUuid toDelete;
-    foreachItem([this, pos, &toDelete](BaseModelItem &item, bool &abort) {
-        if (!item.geometry.contains(pos))
+    foreachItem([this, pos](BaseModelItem &item, bool &abort) {
+        if (!item.geometry.contains(pos) || !item.free())
             return;
 
-        if (item.free()) {
-            ModelItem added(ItemType::Added, QUuid::createUuid());
-            added.name = tr("New Item");
-            added.geometry = item.geometry;
-            added.snaps = item.snaps;
-            added.flags |= StateFlag::Hovered;   //mouse cursor is over it
-            added.opacity = 1.0;
-            m_items << added;
-            item.setFree(false);
+        ModelItem added(ItemType::Added, QUuid::createUuid());
+        added.name = tr("New Item");
+        added.geometry = item.geometry;
+        added.snaps = item.snaps;
+        added.flags |= StateFlag::Hovered;   //mouse cursor is over it
+        added.opacity = 1.0;
+        m_items << added;
+        item.setFree(false);
 
-            abort = true;
-        } else if (item.editable && item.deleteButtonRect().contains(pos)) {
-            toDelete = item.id;
-            setFree(item.snaps, true);
-            abort = true;
-        }     
+        abort = true;
     });
 
-    if (!toDelete.isNull()) {
-        m_items.erase(std::remove_if(m_items.begin(), m_items.end(), [&toDelete](const ModelItem &v) {
-            return v.id == toDelete;
-        }), m_items.end());
+    for (auto item = m_items.begin(); item != m_items.end(); ++item) {
+        if (!item->editable || !item->deleteButtonRect().contains(pos)) 
+            continue;;
+        
+        if (item->itemType == ItemType::Existing) {
+            if (QMessageBox::question(q_ptr, 
+                tr("Delete Screen"),
+                tr("Are you sure you want to delete %1").arg(item->name),
+                QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
+                return;
+        }
+        
+        setFree(item->snaps, true);
+        m_items.removeAt(std::distance(m_items.begin(), item));
+        break;
     }
 }
 
