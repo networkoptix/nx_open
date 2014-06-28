@@ -34,10 +34,10 @@ namespace {
     const int baseFontSize = 120;
 
     const QColor desktopColor(Qt::darkGray);
-    const QColor freeSpaceColor(64, 130, 180);
-    const QColor existingItemColor(Qt::lightGray);
-    const QColor addedItemColor(64, 180, 130);
+    const QColor freeSpaceColor(Qt::lightGray);
+    const QColor itemColor(64, 130, 180);
     const QColor textColor(Qt::white);
+    const QColor overrideColor(Qt::red);
 }
 
 /************************************************************************/
@@ -61,16 +61,31 @@ QRect QnVideowallManageWidgetPrivate::BaseModelItem::bodyRect() const {
     QRect body = eroded(geometry, bodyMargin);
     if (!isPartOfScreen())
         return body;
+    int offset = bodyMargin * partScreenCoeff;
 
-    if (snaps.left().snapIndex == 0)
-        body.translate(bodyMargin * partScreenCoeff, 0);
+    if (snaps.left().snapIndex == 0) {
+        if (snaps.right().snapIndex != 0) {
+            body.translate(offset, 0);
+        }
+        else {
+            body.setLeft(body.left() + offset);
+            body.setRight(body.right() - offset);
+        }
+    }
     else if (snaps.right().snapIndex == 0)
-        body.translate(-bodyMargin * partScreenCoeff, 0);
+        body.translate(-offset, 0);
 
-    if (snaps.top().snapIndex == 0)
-        body.translate(0, bodyMargin * partScreenCoeff);
+    if (snaps.top().snapIndex == 0) {
+        if (snaps.bottom().snapIndex != 0) {
+            body.translate(0, offset);
+        }
+        else {
+            body.setTop(body.top() + offset);
+            body.setBottom(body.bottom() - offset);
+        }
+    }
     else if (snaps.bottom().snapIndex == 0)
-        body.translate(0, -bodyMargin * partScreenCoeff);
+        body.translate(0, -offset);
 
     return body;
 }
@@ -147,7 +162,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
         paintResizeAnchors(painter, body);
     }
     else if (process.isRunning() && geometry.intersects(process.geometry) && !hasFlag(StateFlag::Pressed))
-        paintProposed(painter, process);
+        paintProposed(painter, process.geometry);
 }
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paintDashBorder(QPainter *painter, const QPainterPath &path) const {
@@ -208,9 +223,9 @@ bool QnVideowallManageWidgetPrivate::BaseModelItem::isPartOfScreen() const {
     return std::any_of(snaps.values.cbegin(), snaps.values.cend(), [](const QnScreenSnap &snap) {return snap.snapIndex > 0;});
 }
 
-void QnVideowallManageWidgetPrivate::BaseModelItem::paintProposed(QPainter* painter, const TransformationProcess &process) const {
-    if (process.isRunning())
-        paintDashBorder(painter, bodyPath());
+void QnVideowallManageWidgetPrivate::BaseModelItem::paintProposed(QPainter* painter, const QRect &proposedGeometry) const {
+    Q_UNUSED(proposedGeometry)
+    paintDashBorder(painter, bodyPath());
 }
 
 /************************************************************************/
@@ -312,14 +327,14 @@ void QnVideowallManageWidgetPrivate::ModelScreen::paint(QPainter* painter, const
 
 }
 
-void QnVideowallManageWidgetPrivate::ModelScreen::paintProposed(QPainter* painter, const TransformationProcess &process) const {
-    if (process.isRunning() && free()) {
-        QRect intersection = geometry.intersected(process.geometry);
+void QnVideowallManageWidgetPrivate::ModelScreen::paintProposed(QPainter* painter, const QRect &proposedGeometry) const {
+    if (free()) {
+        QRect intersection = geometry.intersected(proposedGeometry);
         if (!intersection.isValid())
             return;
 
         if (intersection == geometry) {
-            base_type::paintProposed(painter, process);
+            base_type::paintProposed(painter, proposedGeometry);
             return;
         }
 
@@ -336,6 +351,8 @@ void QnVideowallManageWidgetPrivate::ModelScreen::paintProposed(QPainter* painte
 QnVideowallManageWidgetPrivate::ModelItem::ModelItem(ItemType itemType, const QUuid &id):
     BaseModelItem(QRect(), itemType, id)
 {
+    editable = true;
+    baseColor = itemColor;
 }
 
 bool QnVideowallManageWidgetPrivate::ModelItem::free() const {
@@ -347,27 +364,13 @@ void QnVideowallManageWidgetPrivate::ModelItem::setFree(bool value) {
     assert("Should never get here");
 }
 
-/************************************************************************/
-/* ExistingItem                                                         */
-/************************************************************************/
-
-QnVideowallManageWidgetPrivate::ExistingItem::ExistingItem(const QUuid &id) :
-    ModelItem(ItemType::Existing, id)
-{
-    baseColor = existingItemColor;
+void QnVideowallManageWidgetPrivate::ModelItem::paintProposed(QPainter* painter, const QRect &proposedGeometry) const {
+    base_type::paintProposed(painter, proposedGeometry);
+    
+    QnScopedPainterPenRollback pen(painter, Qt::NoPen);
+    QnScopedPainterBrushRollback brush(painter, overrideColor);
+    painter->drawPath(bodyPath());
 }
-
-/************************************************************************/
-/* AddedItem                                                            */
-/************************************************************************/
-
-QnVideowallManageWidgetPrivate::AddedItem::AddedItem() :
-    ModelItem(ItemType::Added, QUuid::createUuid())
-{
-    editable = true;
-    baseColor = addedItemColor;
-}
-
 
 /************************************************************************/
 /* TransformationProcess                                                */
@@ -418,13 +421,6 @@ void QnVideowallManageWidgetPrivate::foreachItem(std::function<void(BaseModelIte
         if (abort)
             return;
     }
-
-    for (auto added = m_added.begin(); added != m_added.end(); ++added) {
-        handler(*added, abort);
-        if (abort)
-            return;
-    }
-
 }
 
 void QnVideowallManageWidgetPrivate::foreachItemConst(std::function<void(const BaseModelItem& /*item*/, bool& /*abort*/)> handler) {
@@ -450,23 +446,16 @@ void QnVideowallManageWidgetPrivate::foreachItemConst(std::function<void(const B
         if (abort)
             return;
     }
-
-    for (auto added = m_added.cbegin(); added != m_added.cend(); ++added) {
-        handler(*added, abort);
-        if (abort)
-            return;
-    }
 }
 
 void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourcePtr &videowall) {
-
     QList<QRect> screens;
     QDesktopWidget* desktop = qApp->desktop();
     for (int i = 0; i < desktop->screenCount(); ++i)
         screens << desktop->screenGeometry(i);
 
     foreach (const QnVideoWallItem &item, videowall->items()->getItems()) {
-        ExistingItem modelItem(item.uuid);
+        ModelItem modelItem(ItemType::Existing, item.uuid);
         modelItem.name = item.name;
         modelItem.snaps = item.screenSnaps;
         modelItem.geometry = item.screenSnaps.geometry(screens);
@@ -495,19 +484,28 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
     else
         videowall->pcs()->updateItem(pcUuid, pcData);
 
-    foreach (const ModelItem &addedItem, m_added) {
+    foreach (const ModelItem &modelItem, m_items) {
         QnVideoWallItem item;
-        item.name = generateUniqueString([&videowall] () {
-            QStringList used;
-            foreach (const QnVideoWallItem &item, videowall->items()->getItems())
-                used << item.name;
-            return used;
-        }(), tr("Screen"), tr("Screen %1") );
-        item.pcUuid = pcUuid;
-        item.uuid = addedItem.id;
-        item.screenSnaps = addedItem.snaps;
-        videowall->items()->addItem(item);
+        if (modelItem.itemType == ItemType::Added || !videowall->items()->hasItem(modelItem.id)) {
+            item.name = generateUniqueString([&videowall] () {
+                QStringList used;
+                foreach (const QnVideoWallItem &item, videowall->items()->getItems())
+                    used << item.name;
+                return used;
+            }(), tr("Screen"), tr("Screen %1") );
+            item.pcUuid = pcUuid;
+            item.uuid = modelItem.id;
+        } else {
+            item = videowall->items()->getItem(modelItem.id);
+        }
+        item.screenSnaps = modelItem.snaps;
+
+        if (videowall->items()->hasItem(modelItem.id))
+            videowall->items()->updateItem(modelItem.id, item);
+        else
+            videowall->items()->addItem(item);
     }
+
 }
 
 QTransform QnVideowallManageWidgetPrivate::getTransform(const QRect &rect)
@@ -618,13 +616,13 @@ void QnVideowallManageWidgetPrivate::mouseClickAt(const QPoint &pos, Qt::MouseBu
         if (!item.free() || !item.geometry.contains(pos))
             return;
 
-        AddedItem added;
+        ModelItem added(ItemType::Added, QUuid::createUuid());
         added.name = tr("New Item");
         added.geometry = item.geometry;
         added.snaps = item.snaps;
         added.flags |= StateFlag::Hovered;   //mouse cursor is over it
         added.opacity = 1.0;
-        m_added << added;
+        m_items << added;
         item.setFree(false);
         abort = true;
     });
@@ -851,9 +849,18 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedMoveGeometry(const BaseMo
     if (multiScreen)
         *multiScreen = screenCount > 1;
 
+    auto checkedAR = [&item, valid](const QRect &proposed) -> QRect {
+        bool isSameAr = (item.geometry.width() * proposed.height() == item.geometry.height() * proposed.width());
+        if (valid)
+            *valid &= isSameAr;
+        if (isSameAr)
+            return proposed;
+        return QRect();
+    };
+
     QList<ModelScreen> bestScreens = bestMatchingGeometry(m_screens, geometry, screenCount);
     if (screenCount > 1 || !item.isPartOfScreen())
-        return unitedGeometry(bestScreens, valid);
+        return checkedAR(unitedGeometry(bestScreens, valid));
 
     int screenIdx = bestScreens[0].snaps.left().screenIndex;
     int partCount = [](const QnScreenSnaps &snaps) {
@@ -863,7 +870,7 @@ QRect QnVideowallManageWidgetPrivate::calculateProposedMoveGeometry(const BaseMo
     }(item.snaps);
 
     QList<ModelScreenPart> bestParts = bestMatchingGeometry(m_screens[screenIdx].parts, geometry, partCount);
-    return unitedGeometry(bestParts, valid);
+    return checkedAR(unitedGeometry(bestParts, valid));
 
 }
 

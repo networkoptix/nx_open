@@ -96,7 +96,7 @@ private:
         virtual QPainterPath bodyPath() const;
         virtual int fontSize() const;
         virtual int iconSize() const;
-        virtual void paintProposed(QPainter* painter, const TransformationProcess &process) const;
+        virtual void paintProposed(QPainter* painter, const QRect &proposedGeometry) const;
         void paintDashBorder(QPainter *painter, const QPainterPath &path) const;
         void paintResizeAnchors(QPainter *painter, const QRect &rect) const;
         void paintPixmap(QPainter *painter, const QRect &rect, const QPixmap &pixmap) const;
@@ -126,14 +126,8 @@ private:
 
         virtual bool free() const override;
         virtual void setFree(bool value) override;
-    };
 
-    struct ExistingItem: ModelItem {
-        ExistingItem(const QUuid &id);
-    };
-
-    struct AddedItem: ModelItem {
-        AddedItem();
+        virtual void paintProposed(QPainter* painter, const QRect &proposedGeometry) const override;
     };
 
     struct FreeSpaceItem: BaseModelItem {
@@ -164,7 +158,7 @@ private:
         virtual void setFree(bool value) override;
 
         virtual void paint(QPainter* painter, const TransformationProcess &process) const override;
-        virtual void paintProposed(QPainter* painter, const TransformationProcess &process) const override;
+        virtual void paintProposed(QPainter* painter, const QRect &proposedGeometry) const override;
 
         QList<ModelScreenPart> parts;
     };
@@ -201,7 +195,6 @@ private:
     QRect m_unitedGeometry;
     QList<ModelItem> m_items;
     QList<ModelScreen> m_screens;
-    QList<ModelItem> m_added;
 
     TransformationProcess m_process;   
 };
