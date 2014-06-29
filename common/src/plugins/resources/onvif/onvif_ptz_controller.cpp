@@ -65,10 +65,15 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
         m_capabilities = Qn::NoPtzCapabilities;
 
     m_stopBroken = qnCommon->dataPool()->data(resource, true).value<bool>(lit("onvifPtzStopBroken"), false);
+    m_absoluteMoveBroken = qnCommon->dataPool()->data(resource, true).value<bool>(lit("onvifPtzAbsoluteMoveBroken"), false);
+    m_presetsEnabled = qnCommon->dataPool()->data(resource, true).value<bool>(lit("onvifPtzPresetsEnabled"), false);
+    m_focusEnabled = qnCommon->dataPool()->data(resource, true).value<bool>(lit("onvifPtzFocusEnabled"), false);
+
+    if()
 
     initContinuousMove();
 
-    //initContinuousFocus(); // Disabled for now.
+    // initContinuousFocus(); // Disabled for now.
 
     // TODO: #PTZ #Elric actually implement flip!
 }
@@ -129,7 +134,7 @@ Qn::PtzCapabilities QnOnvifPtzController::initContinuousMove() {
     return result;
 }
 
-bool QnOnvifPtzController::readBuiltinPresets()
+bool QnOnvifPtzController::initPresets()
 {
     if (m_ptzPresetsReady)
         return true;
@@ -147,12 +152,12 @@ bool QnOnvifPtzController::readBuiltinPresets()
     if (ptz.getPresets(request, response) != SOAP_OK)
         return false;
 
-    m_builtinPresets.clear();
+    m_presetNameByToken.clear();
     foreach(onvifXsd__PTZPreset* preset, response.Preset) {
         if (preset) {
             QString id = QString::fromStdString(*preset->token);
             QString name = fromLatinStdString(*preset->Name);
-            m_builtinPresets.insert(id, name);
+            m_presetNameByToken.insert(id, name);
         }
     }
     
@@ -353,7 +358,7 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
 
 QString QnOnvifPtzController::getPresetToken(const QString &presetId)
 {
-    QString internalId = m_extIdToIntId.value(presetId);
+    QString internalId = m_presetTokenById.value(presetId);
     if (!internalId.isEmpty())
         return internalId;
     else
@@ -362,10 +367,10 @@ QString QnOnvifPtzController::getPresetToken(const QString &presetId)
 
 QString QnOnvifPtzController::getPresetName(const QString &presetId)
 {
-    QString internalId = m_extIdToIntId.value(presetId);
+    QString internalId = m_presetTokenById.value(presetId);
     if (internalId.isEmpty())
         internalId = presetId;
-    return m_builtinPresets.value(internalId);
+    return m_presetNameByToken.value(internalId);
 }
 
 bool QnOnvifPtzController::removePreset(const QString &presetId)
@@ -391,9 +396,9 @@ bool QnOnvifPtzController::removePreset(const QString &presetId)
 
 bool QnOnvifPtzController::getPresets(QnPtzPresetList *presets)
 {
-    if (!readBuiltinPresets())
+    if (!initPresets())
         return false;
-    for (auto itr = m_builtinPresets.begin(); itr != m_builtinPresets.end(); ++itr)
+    for (auto itr = m_presetNameByToken.begin(); itr != m_presetNameByToken.end(); ++itr)
         presets->push_back(QnPtzPreset(itr.key(), itr.value()));
     return true;
 }
@@ -446,8 +451,8 @@ bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset)
     }
 
     QString token = QString::fromStdString(response.PresetToken);
-    m_extIdToIntId.insert(preset.id, token);
-    m_builtinPresets.insert(token, preset.name);
+    m_presetTokenById.insert(preset.id, token);
+    m_presetNameByToken.insert(token, preset.name);
     return true;
 }
 
@@ -499,4 +504,4 @@ bool QnOnvifPtzController::getFlip(Qt::Orientations *flip) {
     return true;
 }
 
-#endif //ENABLE_ONVIF
+#endif // ENABLE_ONVIF

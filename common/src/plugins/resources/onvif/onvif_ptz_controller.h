@@ -49,21 +49,25 @@ private:
     
     Qn::PtzCapabilities initContinuousMove();
     Qn::PtzCapabilities initContinuousFocus();
-    bool readBuiltinPresets();
+    bool initPresets();
 
     bool stopInternal();
     bool moveInternal(const QVector3D &speed);
     QString getPresetToken(const QString &presetId);
     QString getPresetName(const QString &presetId);
+
 private:
     QnPlOnvifResourcePtr m_resource;
     Qn::PtzCapabilities m_capabilities;
     bool m_stopBroken;
+    bool m_absoluteMoveBroken;
+    bool m_presetsEnabled;
+    bool m_focusEnabled;
 
     SpeedLimits m_panSpeedLimits, m_tiltSpeedLimits, m_zoomSpeedLimits, m_focusSpeedLimits;
     QnPtzLimits m_limits;
-    QMap<QString, QString> m_extIdToIntId;
-    QMap<QString, QString> m_builtinPresets; // key - token, value - name
+    QMap<QString, QString> m_presetTokenById;
+    QMap<QString, QString> m_presetNameByToken; // key - token, value - name
     bool m_ptzPresetsReady;
 };
 
