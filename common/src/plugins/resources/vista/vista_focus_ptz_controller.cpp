@@ -43,7 +43,7 @@ void QnVistaFocusPtzController::init() {
     /* Note that there is no point locking a mutex here as this function is called 
      * only from the constructor. */
     if(!queryLocked(lit("config.txt"), &config)) {
-        qnWarning("Could not initialize VISTA MOTOR PTZ for camera '%1'.", m_resource->getName());        
+        qnWarning("Could not initialize VISTA PTZ for camera '%1'.", m_resource->getName());        
         return;
     }
 
@@ -57,6 +57,11 @@ void QnVistaFocusPtzController::init() {
     }
 
     if(options.contains(lit("BUILTIN_PTZ"))) {
+        m_capabilities |= Qn::ContinuousFocusCapability;
+        m_isMotor = false;
+    }
+
+    if(options.contains(lit("PTZ")) && config.value<QString>(lit("device_name")).compare(lit("EncoderVistaPTZ"), Qt::CaseInsensitive) == 0) { // TODO: #Elric the device_name part should go to json settings.
         m_capabilities |= Qn::ContinuousFocusCapability;
         m_isMotor = false;
     }

@@ -60,10 +60,15 @@
         },
         {
             "keys": [
-                "VISTA|VK2-ENCODER",
-		"VISTA|VK2-1080PTZ"
+                "VISTA|VK2-1080PTZ"
             ],
             "ptzCapabilities": "ContinuousPtzCapabilities|nativePresetsPtzCapability"
+        },
+        {
+            "keys": [
+                "VISTA|VK2-ENCODER"
+            ],
+            "ptzCapabilities": "ContinuousPtzCapabilities|nativePresetsPtzCapability|ContinuousFocusCapability"
         },
         {
             "keys": [
