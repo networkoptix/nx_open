@@ -10,7 +10,6 @@
 #include "common/common_module.h"
 #include "transaction/transaction_message_bus.h"
 
-
 namespace ec2
 {
     template<class T>
@@ -126,28 +125,18 @@ namespace ec2
         return reqID;
     }
 
-    /*
-    ReqID BaseEc2Connection<ServerQueryProcessor>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
-    {
-        const ReqID reqID = generateRequestID();
-        qint64 curTime = 0;
-        CommonRequestsProcessor::getCurrentTime( nullptr, &curTime );
-        QtConcurrent::run( std::bind( std::mem_fn( &impl::CurrentTimeHandler::done ), handler, reqID, ec2::ErrorCode::ok, curTime ) );
-        return reqID;
-    }
-    */
     template <class T>
     int BaseEc2Connection<T>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
     {
         const int reqID = generateRequestID();
 
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const qint64& currentTime) {
+        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiTimeData& currentTime) {
             qint64 outData = 0;
             if( errorCode == ErrorCode::ok )
-                outData = currentTime;
+                outData = currentTime.value;
             handler->done( reqID, errorCode, outData);
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, qint64, decltype(queryDoneHandler)> (
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiTimeData, decltype(queryDoneHandler)> (
             ApiCommand::getCurrentTime, nullptr, queryDoneHandler );
 
         return reqID;

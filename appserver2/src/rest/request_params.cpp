@@ -8,6 +8,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <nx_ec/data/api_connection_data.h>
+#include <nx_ec/data/api_stored_file_data.h>
 #include <utils/serialization/lexical_functions.h>
 
 
@@ -30,14 +31,17 @@ namespace ec2
 
 
     bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, QString *value) {
-        if (command == "getHelp")
-            return deserialize(params, lit("group"), value);
-        else
-            return deserialize(params, lit("folder"), value); // ApiStoredFilePath
+        assert(command == "getHelp");
+        return deserialize(params, lit("group"), value);
+    }
+
+    bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, ApiStoredFilePath *value) {
+        assert(command != "getHelp");
+        return deserialize(params, lit("folder"), &(value->path)); // ApiStoredFilePath
     }
 
     void toUrlParams(const ApiStoredFilePath &name, QUrlQuery *query) {
-        serialize(name, lit("folder"), query);
+        serialize(name.path, lit("folder"), query);
     }
 
 
@@ -79,4 +83,3 @@ namespace ec2
     void toUrlParams(const std::nullptr_t &, QUrlQuery *) {}
 
 }
-

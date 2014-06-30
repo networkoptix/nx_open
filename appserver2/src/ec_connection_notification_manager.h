@@ -61,16 +61,17 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiLayoutData>& tran );
         void triggerNotification( const QnTransaction<ApiLayoutDataList>& tran );
         void triggerNotification( const QnTransaction<ApiStoredFileData>& tran );
+        void triggerNotification( const QnTransaction<ApiStoredFilePath>& tran );
         void triggerNotification( const QnTransaction<ApiFullInfoData>& tran );
         void triggerNotification( const QnTransaction<ApiPanicModeData>& tran );
-        void triggerNotification( const QnTransaction<QString>& tran );
         void triggerNotification( const QnTransaction<ApiResourceParamDataList>& tran );
-        void triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran );
-        void triggerNotification(const QnTransaction<ApiVideowallInstanceStatusData>& tran );
+        void triggerNotification( const QnTransaction<ApiVideowallControlMessageData>& tran );
+        void triggerNotification( const QnTransaction<ApiVideowallInstanceStatusData>& tran );
         void triggerNotification( const QnTransaction<ApiEmailSettingsData>& /*tran*/ );
         void triggerNotification( const QnTransaction<ApiEmailData>& /*tran*/ );
-        void triggerNotification(const QnTransaction<ApiUpdateUploadData>& tran );
-        void triggerNotification(const QnTransaction<ApiUpdateUploadResponceData>& tran );
+        void triggerNotification( const QnTransaction<ApiUpdateInstallData>& tran );
+        void triggerNotification( const QnTransaction<ApiUpdateUploadData>& tran );
+        void triggerNotification( const QnTransaction<ApiUpdateUploadResponceData>& tran );
         void triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran );
         void triggerNotification( const QnTransaction<ApiRuntimeData>& tran );
 
@@ -83,7 +84,7 @@ namespace ec2
         void triggerNotification(const QnTransaction<QnTranState> &/*tran*/)  {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
-        void triggerNotification(const QnTransaction<int> &/*tran*/) {
+        void triggerNotification(const QnTransaction<QnTranStateResponse> &/*tran*/) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a system transaction!"); // we MUSTN'T be here
         }
     private:

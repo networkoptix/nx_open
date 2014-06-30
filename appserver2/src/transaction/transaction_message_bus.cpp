@@ -102,7 +102,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::resetBusinessRules:    return handleTransactionParams<ApiResetBusinessRuleData>(&stream, transaction, function);
     case ApiCommand::uploadUpdate:          return handleTransactionParams<ApiUpdateUploadData>     (&stream, transaction, function);
     case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(&stream, transaction, function);
-    case ApiCommand::installUpdate:         return handleTransactionParams<QString>                 (&stream, transaction, function);
+    case ApiCommand::installUpdate:         return handleTransactionParams<ApiUpdateInstallData>    (&stream, transaction, function);
     case ApiCommand::addCameraBookmarkTags:
     case ApiCommand::removeCameraBookmarkTags:
                                             return handleTransactionParams<ApiCameraBookmarkTagDataList>(&stream, transaction, function);
@@ -112,7 +112,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::unlockRequest:         return handleTransactionParams<ApiLockData>             (&stream, transaction, function); 
     case ApiCommand::peerAliveInfo:         return handleTransactionParams<ApiPeerAliveData>        (&stream, transaction, function);
     case ApiCommand::tranSyncRequest:       return handleTransactionParams<QnTranState>             (&stream, transaction, function);
-    case ApiCommand::tranSyncResponse:      return handleTransactionParams<int>                     (&stream, transaction, function);
+    case ApiCommand::tranSyncResponse:      return handleTransactionParams<QnTranStateResponse>     (&stream, transaction, function);
     case ApiCommand::runtimeInfoChanged:    return handleTransactionParams<ApiRuntimeData>          (&stream, transaction, function);
 
     default:
@@ -219,8 +219,8 @@ void QnTransactionMessageBus::onGotDistributedMutexTransaction(const QnTransacti
         emit gotLockResponse(tran.params);
 }
 
-void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender)
-{
+void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse> &tran) {
+    Q_UNUSED(tran)
 	sender->setReadSync(true);
 }
 
@@ -256,7 +256,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             onGotTransactionSyncRequest(sender, tran);
             return;
         case ApiCommand::tranSyncResponse:
-            onGotTransactionSyncResponse(sender);
+            onGotTransactionSyncResponse(sender, tran);
             return;
         case ApiCommand::peerAliveInfo:
             onGotServerAliveInfo(tran);
@@ -329,8 +329,8 @@ void QnTransactionMessageBus::onGotTransactionSyncRequest(QnTransactionTransport
     const ErrorCode errorCode = transactionLog->getTransactionsAfter(tran.params, serializedTransactions);
     if (errorCode == ErrorCode::ok) 
     {
-        QnTransaction<int> tran(ApiCommand::tranSyncResponse, false);
-        tran.params = 0;
+        QnTransaction<QnTranStateResponse> tran(ApiCommand::tranSyncResponse, false);
+        tran.params.result = 0;
         tran.fillSequence();
         QByteArray chunkData;
         QnPeerSet processedPeers(QnPeerSet() << sender->remotePeer().id << m_localPeer.id);

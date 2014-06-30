@@ -24,11 +24,11 @@ namespace ec2
 
             /* System */
             tranSyncRequest             = 1,    /*< QnTranState */
-            tranSyncResponse            = 2,    /*< int */       
+            tranSyncResponse            = 2,    /*< QnTranStateResponse */       
             lockRequest                 = 3,    /*< ApiLockData */
             lockResponse                = 4,    /*< ApiLockData */
             unlockRequest               = 5,    /*< ApiLockData */
-            peerAliveInfo               = 6,    //TODO: #rvasilenko replace
+            peerAliveInfo               = 6,    /*< ApiPeerAliveData */
 
             /* Connection */
             testConnection              = 100,  /*< ApiLoginData */
@@ -111,7 +111,7 @@ namespace ec2
             /* Misc */
             getSettings                 = 9000,  /*< ApiResourceParamDataList */
             saveSettings                = 9001,  /*< ApiResourceParamDataList */
-            getCurrentTime              = 9002,  /*< qint64 */         
+            getCurrentTime              = 9002,  /*< ApiTimeData */         
             getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
 
