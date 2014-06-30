@@ -44,11 +44,11 @@ for branch in result:
             print '--------------------------------------------------------------------------------'
         prevUser = branch['user']
         print prevUser
+    output = str(branch['name']).ljust(40)
     if branch['inactive']:
-        print str(branch['name']).ljust(40), branch['date'], 'INACTIVE'
+        output += ' (INACTIVE)'
     else:
         delta = curDate - branch['date']
         if delta > timedelta(days = 30):
-            print str(branch['name']).ljust(40), branch['date'], 'TOO OLD', delta.days, 'days'
-        else:
-            print str(branch['name']).ljust(40), branch['date']
+            output += ' (TOO OLD: ' + str(delta.days) + 'days)'
+    print output
