@@ -49,7 +49,7 @@
                                             <xsl:value-of select="groupName"/>
                                         </a>
                                         <ul class="nav nav-stacked">
-                                            <xsl:for-each select="methods/method">
+                                            <xsl:for-each select="functions/function">
                                                 <xsl:variable name="quotedName" select="translate(name, '/', '_')"/>
                                                 <li>
                                                     <a href="#execAction">
@@ -76,12 +76,12 @@
                                         </h3>
                                     </div>
 
-                                    <xsl:for-each select="methods/method">
+                                    <xsl:for-each select="functions/function">
                                         <xsl:variable name="quotedName" select="translate(name, '/', '_')"/>
                                         <div class="subgroup">
                                             <xsl:attribute name="id">group_<xsl:value-of select="$groupName"/>_method_<xsl:value-of select="$quotedName"/></xsl:attribute>
                                             <h4>
-                                                <span class="label label-info">GET</span>
+                                                <span class="label label-info"><xsl:value-of select="method"/></span>
                                                 <span class="label label-default">
                                                     /<xsl:value-of select="$groupName"/>/<xsl:value-of select="name"/>
                                                 </span>
