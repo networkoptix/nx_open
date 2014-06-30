@@ -271,6 +271,9 @@ void QnServerUpdatesWidget::updateUi() {
     ui->updateStateWidget->setVisible(applying);
     ui->progressIndicator->setVisible(infiniteProgress);
     ui->updateProgessBar->setVisible(!infiniteProgress);
+    ui->checkForUpdatesButton->setEnabled(!applying && !checkingForUpdates);
+    ui->installSpecificBuildButton->setEnabled(!applying && !checkingForUpdates);
+    ui->updateFromLocalSourceButton->setEnabled(!applying && !checkingForUpdates);
 
     m_previousToolState = m_updateTool->state();
 
