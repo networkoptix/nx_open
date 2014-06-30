@@ -396,7 +396,7 @@ QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
     return itr != m_resources.end() ? itr.value() : QnResourcePtr(0);
 }
 
-void QnResourcePool::updateUniqId(QnResourcePtr res, const QString &newUniqId)
+void QnResourcePool::updateUniqId(const QnResourcePtr& res, const QString &newUniqId)
 {
     QMutexLocker locker(&m_resourcesMtx);
     QHash<QString, QnResourcePtr>::iterator itr = m_resources.find(res->getUniqueId());
@@ -477,7 +477,7 @@ int QnResourcePool::activeCamerasByClass(bool analog) const
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (camera && !camera->hasFlags(QnResource::foreigner) && !camera->isScheduleDisabled() && camera->isAnalog() == analog) {
+        if (camera && !camera->isScheduleDisabled() && camera->isAnalog() == analog) {
             QnResourcePtr mServer = getResourceById(camera->getId());
             if (mServer && mServer->getStatus() != QnResource::Offline)
                 count++;

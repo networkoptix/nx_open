@@ -11,7 +11,7 @@
 class AVClientPullSSHTTPStreamreader : public QnPlAVClinetPullStreamReader
 {
 public:
-    explicit AVClientPullSSHTTPStreamreader(QnResourcePtr res);
+    explicit AVClientPullSSHTTPStreamreader(const QnResourcePtr& res);
 
     ~AVClientPullSSHTTPStreamreader()
     {

@@ -55,7 +55,7 @@ int contain_subst(char *data, int datalen, int start_index ,  char *subdata, int
 
 #ifdef ENABLE_DROID
 
-QnPlDroidIpWebCamReader::QnPlDroidIpWebCamReader(QnResourcePtr res)
+QnPlDroidIpWebCamReader::QnPlDroidIpWebCamReader(const QnResourcePtr& res)
 :CLServerPushStreamReader(res),
 mHttpClient(0)
 

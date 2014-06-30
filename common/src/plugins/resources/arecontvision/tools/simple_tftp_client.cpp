@@ -76,12 +76,12 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                     // some times ( do not know why) cam responds with wrong blk size - very very rarely
                     if (m_wish_blk_size==double_blk_size && buff_recv[10]=='1')
                     {
-                        //cl_log.log("unexpected packet size", cl_logWARNING);
+                        //NX_LOG("unexpected packet size", cl_logWARNING);
                         m_curr_blk_size = blk_size;
                     }
                     else if (m_wish_blk_size==blk_size && buff_recv[10]=='2')
                     {
-                        //cl_log.log("unexpected packet size", cl_logWARNING);
+                        //NX_LOG("unexpected packet size", cl_logWARNING);
                         m_curr_blk_size = double_blk_size;
                     }
 
@@ -114,7 +114,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
             for (i = 0; i < m_retry; ++i)
             {
 
-                //cl_log.log("sending... ", blk_cam_sending, cl_logWARNING);
+                //NX_LOG("sending... ", blk_cam_sending, cl_logWARNING);
 
                 m_prevResult = CameraDiagnostics::NoErrorResult();
                 if (!m_sock->send(buff_send,len_send))
@@ -123,7 +123,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                     return 0;
                 }
 
-                //cl_log.log("send ", blk_cam_sending, cl_logWARNING);
+                //NX_LOG("send ", blk_cam_sending, cl_logWARNING);
 
                 while(1)
                 {
@@ -142,7 +142,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
 
                         blk_cam_sending = buff_recv[2]*256 + buff_recv[3];
 
-                        //cl_log.log("got ", blk_cam_sending, cl_logWARNING);
+                        //NX_LOG("got ", blk_cam_sending, cl_logWARNING);
 
                         int data_len = len_recv-4;
 
@@ -159,7 +159,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                         len+=data_len;
                         if (len>CL_MAX_DATASIZE)
                         {
-                            cl_log.log("Image is too big!!", cl_logERROR);
+                            NX_LOG("Image is too big!!", cl_logERROR);
                             m_status = time_out;
                             break;
                         }
@@ -173,7 +173,7 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                         else
                         {
                             // this is 3 times we got option ack; need to resend ack0?
-                            cl_log.log("this is 3 times we got option ack; need to resend ack0?", cl_logDEBUG1);
+                            NX_LOG("this is 3 times we got option ack; need to resend ack0?", cl_logDEBUG1);
 
                             if (len_recv<13) // unexpected answer
                                 continue;
@@ -181,12 +181,12 @@ int CLSimpleTFTPClient::read( const QString& fn, QnByteArray& data)
                             // some times ( do not know why) cam responds with wrong blk size - very very rarely
                             if (m_wish_blk_size==double_blk_size && buff_recv[10]=='1')
                             {
-                                //cl_log.log("unexpected packet size", cl_logWARNING);
+                                //NX_LOG("unexpected packet size", cl_logWARNING);
                                 m_curr_blk_size = blk_size;
                             }
                             else if (m_wish_blk_size==blk_size && buff_recv[10]=='2')
                             {
-                                //cl_log.log("unexpected packet size", cl_logWARNING);
+                                //NX_LOG("unexpected packet size", cl_logWARNING);
                                 m_curr_blk_size = double_blk_size;
                             }
 

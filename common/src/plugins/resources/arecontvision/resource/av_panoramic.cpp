@@ -28,7 +28,7 @@ bool QnArecontPanoramicResource::getDescription()
 
 QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider()
 {
-    cl_log.log("Create live provider for camera ", getHostAddress(), cl_logDEBUG1);
+    NX_LOG( lit("Create live provider for camera %1").arg(getHostAddress()), cl_logDEBUG1);
     return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
 }
 

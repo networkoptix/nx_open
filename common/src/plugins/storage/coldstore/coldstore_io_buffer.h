@@ -8,7 +8,7 @@
 class QnColdStoreIOBuffer : public QBuffer, public QnResourceConsumer
 {
 public:
-    QnColdStoreIOBuffer(QnResourcePtr res, const QString& fn, int capacity = 0);
+    QnColdStoreIOBuffer(const QnResourcePtr& res, const QString& fn, int capacity = 0);
     virtual ~QnColdStoreIOBuffer();
 
     virtual void beforeDisconnectFromResource() override;

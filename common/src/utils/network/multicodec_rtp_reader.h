@@ -42,7 +42,7 @@ private:
     enum {BLOCK_SIZE = 1460};
 
 public:
-    QnMulticodecRtpReader( QnResourcePtr res );
+    QnMulticodecRtpReader( const QnResourcePtr& res );
     virtual ~QnMulticodecRtpReader();
 
     //!Implementation of QnAbstractMediaStreamProvider::getNextData

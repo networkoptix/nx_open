@@ -14,7 +14,7 @@ struct AVLastPacketSize
 class QnPlAVClinetPullStreamReader : public QnClientPullMediaStreamProvider
 {
 public:
-    QnPlAVClinetPullStreamReader(QnResourcePtr res);
+    QnPlAVClinetPullStreamReader(const QnResourcePtr& res);
     virtual ~QnPlAVClinetPullStreamReader();
 
 

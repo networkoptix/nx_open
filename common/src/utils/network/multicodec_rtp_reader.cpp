@@ -25,7 +25,7 @@ static const int RTCP_REPORT_TIMEOUT = 30 * 1000;
 
 static RtpTransport::Value defaultTransportToUse( RtpTransport::_auto );
 
-QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
+QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
     QnResourceConsumer(res),
     m_videoIO(0),
     m_audioIO(0),

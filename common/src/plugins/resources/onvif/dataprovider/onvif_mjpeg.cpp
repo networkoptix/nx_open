@@ -62,7 +62,7 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 }
 */
 
-MJPEGStreamReader::MJPEGStreamReader(QnResourcePtr res, const QString& streamHttpPath)
+MJPEGStreamReader::MJPEGStreamReader(const QnResourcePtr& res, const QString& streamHttpPath)
 :
     CLServerPushStreamReader(res),
     m_request(streamHttpPath)

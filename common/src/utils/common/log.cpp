@@ -290,7 +290,7 @@ void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& /*ctx*/, const QS
         break;
     }
 
-    cl_log.log(msg, logLevel);
+    NX_LOG(msg, logLevel);
 }
 
 QString QnLog::logFileName( int logID )
@@ -315,8 +315,8 @@ void QnLog::initLog(const QString& logLevelStr, int logID) {
     QnLog::instance(logID)->setLogLevel(logLevel);
 
     if (needWarnLogLevel) {
-        cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
-        cl_log.log("Unknown log level specified. Using level ", QnLog::logLevelToString(logLevel), cl_logALWAYS);
+        NX_LOG(QLatin1String("================================================================================="), cl_logALWAYS);
+        NX_LOG(lit("Unknown log level specified. Using level %1").arg(QnLog::logLevelToString(logLevel)), cl_logALWAYS);
     }
 
 }

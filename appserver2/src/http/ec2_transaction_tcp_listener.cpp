@@ -61,23 +61,20 @@ void QnTransactionTcpProcessor::run()
         ? query.queryItemValue("instanceGuid")
         : QnId();
 
-    QnPeerInfo remotePeer(remoteGuid, 
-        isMobileClient  ? QnPeerInfo::AndroidClient
-        : isVideowall   ? QnPeerInfo::VideowallClient
-        : isClient      ? QnPeerInfo::DesktopClient
-        : QnPeerInfo::Server);
+    ApiPeerData remotePeer(remoteGuid, 
+        isMobileClient  ? Qn::PT_AndroidClient
+        : isVideowall   ? Qn::PT_VideowallClient
+        : isClient      ? Qn::PT_DesktopClient
+        : Qn::PT_Server);
 
     if (isVideowall) {
         remotePeer.params["videowallGuid"] = videowallGuid.toString();
         remotePeer.params["instanceGuid"] = instanceGuid.toString();
     }
 
-    QByteArray remoteHwList = query.queryItemValue(lit("hwList")).toLocal8Bit();
-
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds())));
 
-    if (remotePeer.peerType == QnPeerInfo::Server)
+    if (remotePeer.peerType == Qn::PT_Server)
     {
         // use two stage connect for server peers only, go to second stage for client immediately
 
@@ -95,7 +92,6 @@ void QnTransactionTcpProcessor::run()
         parseRequest();
 
         d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
-        d->response.headers.insert(nx_http::HttpHeader("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds())));
     }
 
     query = QUrlQuery(d->request.requestLine.url.query());
@@ -106,7 +102,7 @@ void QnTransactionTcpProcessor::run()
         QnTransactionTransport::connectingCanceled(remoteGuid, false);
     }
     else {
-        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, remotePeer, QnTransactionTransport::decodeHWList(remoteHwList));
+        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(d->socket, remotePeer);
         d->socket.clear();
     }
 }

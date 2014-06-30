@@ -2,7 +2,7 @@
 
 #include "../resource/resource.h"
 
-QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr resource):
+QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(const QnResourcePtr& resource):
     QnResourceConsumer(resource),
     m_mutex(QMutex::Recursive),
     m_role(QnResource::Role_Default)

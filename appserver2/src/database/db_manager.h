@@ -7,7 +7,7 @@
 #include "nx_ec/data/api_fwd.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
-
+#include "nx_ec/data/api_runtime_data.h"
 
 namespace ec2
 {
@@ -163,7 +163,6 @@ namespace ec2
 
 		// --------- misc -----------------------------
         bool markLicenseOverflow(bool value, qint64 time);
-        qint64 licenseOverflowTime() const;
         QUuid getID() const;
 
         ApiOjectType getObjectType(const QnId& objectId);
@@ -239,6 +238,11 @@ namespace ec2
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLockData> &) {
            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiRuntimeData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
 
@@ -331,7 +335,6 @@ namespace ec2
         bool updateGuids();
         QnId getType(const QString& typeName);
         bool loadHelpData(const QString& fileName);
-        void fillServerInfo( ApiServerInfoData* const serverInfo );
     private:
         QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;

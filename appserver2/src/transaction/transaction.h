@@ -113,9 +113,9 @@ namespace ec2
             saveSettings                = 9001,  /*< ApiResourceParamDataList */
             getCurrentTime              = 9002,  /*< qint64 */         
             getHelp                     = 9003,  /*< ApiHelpGroupDataList */
+			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
 
-
-            maxTransactionValue         = 65535
+			maxTransactionValue         = 65535
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 

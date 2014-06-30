@@ -40,13 +40,10 @@ public:
     };
     static QString toString( State state );
 
-    QnTransactionTransport(const QnPeerInfo &localPeer,
-        const QnPeerInfo &remotePeer = QnPeerInfo(QnId(), QnPeerInfo::Server),
+    QnTransactionTransport(const ApiPeerData &localPeer,
+        const ApiPeerData &remotePeer = ApiPeerData(QnId(), Qn::PT_Server),
         QSharedPointer<AbstractStreamSocket> socket = QSharedPointer<AbstractStreamSocket>());
     ~QnTransactionTransport();
-
-    static QByteArray encodeHWList(const QList<QByteArray> hwList);
-    static QList<QByteArray> decodeHWList(const QByteArray data);
 
 signals:
     void gotTransaction(const QByteArray &data, const QnTransactionTransportHeader &transportHeader);
@@ -64,7 +61,7 @@ public:
 #endif
 
         switch (m_remotePeer.peerType) {
-        case QnPeerInfo::AndroidClient:
+        case Qn::PT_AndroidClient:
             addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
         default:
@@ -77,8 +74,6 @@ public:
     void close();
 
     // these getters/setters are using from a single thread
-    QList<QByteArray> hwList() const { return m_hwList; }
-    void setHwList(const QList<QByteArray>& value) { m_hwList = value; }
     qint64 lastConnectTime() { return m_lastConnectTime; }
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
     bool isReadSync() const       { return m_readSync; }
@@ -87,7 +82,7 @@ public:
     void setWriteSync(bool value) { m_writeSync = value; }
     QUrl remoteAddr() const       { return m_remoteAddr; }
 
-    QnPeerInfo remotePeer() const { return m_remotePeer; }
+    ApiPeerData remotePeer() const { return m_remotePeer; }
 
     // This is multi thread getters/setters
     void setState(State state);
@@ -98,15 +93,13 @@ public:
     static void connectingCanceled(const QnId& id, bool isOriginator);
     static void connectDone(const QnId& id);
 private:
-    QnPeerInfo m_localPeer;
-    QnPeerInfo m_remotePeer;
+    ApiPeerData m_localPeer;
+    ApiPeerData m_remotePeer;
 
     qint64 m_lastConnectTime;
 
     bool m_readSync;
     bool m_writeSync;
-
-    QList<QByteArray> m_hwList;
 
     mutable QMutex m_mutex;
     QSharedPointer<AbstractStreamSocket> m_socket;

@@ -5,7 +5,7 @@
 #include "utils/media/jpeg_utils.h"
 
 
-QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
+QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     QnAbstractMediaStreamDataProvider(res),
     m_livemutex(QMutex::Recursive),
     m_quality(Qn::QualityNormal),
@@ -337,7 +337,7 @@ QnMetaDataV1Ptr QnLiveStreamProvider::getCameraMetadata()
     return result;
 }
 
-bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResourcePtr netRes)
+bool QnLiveStreamProvider::hasRunningLiveProvider(QnNetworkResource* netRes)
 {
     bool rez = false;
     netRes->lockConsumers();
@@ -369,11 +369,11 @@ void QnLiveStreamProvider::startIfNotRunning()
 
 bool QnLiveStreamProvider::isCameraControlDisabled() const
 {
-    QnVirtualCameraResourcePtr camRes = m_resource.dynamicCast<QnVirtualCameraResource>();
+    const QnVirtualCameraResource* camRes = dynamic_cast<const QnVirtualCameraResource*>(m_resource.data());
     return camRes && camRes->isCameraControlDisabled();
 }
 
-void QnLiveStreamProvider::filterMotionByMask(QnMetaDataV1Ptr motion)
+void QnLiveStreamProvider::filterMotionByMask(const QnMetaDataV1Ptr& motion)
 {
     motion->removeMotion(m_motionMaskBinData[motion->channelNumber]);
 }

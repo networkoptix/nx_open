@@ -1591,8 +1591,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         }
     }
 
-
-
     QnSessionManager::instance()->stop();
 
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo->version);

@@ -160,6 +160,9 @@ namespace ec2
                 case getHelp:
                     return "getHelp";
 
+                case runtimeInfoChanged:
+                    return "runtimeInfoChanged";
+
                 default:
                     return "unknown " + QString::number((int)val);
             }

@@ -29,7 +29,7 @@
 #include <utils/license_usage_helper.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/common/product_features.h>
-
+#include "api/runtime_info_manager.h"
 
 #define QN_LICENSE_URL "http://networkoptix.com/nolicensed_vms/activate.php"
 
@@ -70,11 +70,7 @@ void QnLicenseManagerWidget::updateLicenses() {
     if (!m_handleKeyMap.isEmpty())
         return;
 
-    if (qnLicensePool->currentHardwareId().isEmpty()) {
-        setEnabled(false);
-    } else {
-        setEnabled(true);
-    }
+    setEnabled(!QnRuntimeInfoManager::instance()->allData().isEmpty());
 
     m_licenses = qnLicensePool->getLicenses();
 
@@ -193,7 +189,10 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
         hw++;
     }
 
-    params.addQueryItem(QLatin1String("brand"), QLatin1String(QN_PRODUCT_NAME_SHORT));
+    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
+
+    params.addQueryItem(QLatin1String("box"), runtimeData.box);
+    params.addQueryItem(QLatin1String("brand"), runtimeData.brand);
     params.addQueryItem(QLatin1String("version"), QLatin1String(QN_ENGINE_VERSION));
     params.addQueryItem(QLatin1String("lang"), qnCommon->instance<QnClientTranslationManager>()->getCurrentLanguage());
 
@@ -357,8 +356,9 @@ void QnLicenseManagerWidget::at_downloadFinished() {
             if (!license )
                 break;
 
+
             QnLicense::ErrorCode errCode = QnLicense::NoError;
-            if (license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT), &errCode))
+            if (license->isValid(&errCode, true))
                 licenses.append(license);
             else if (errCode == QnLicense::Expired)
                 licenses.append(license); // ignore expired error code
@@ -392,7 +392,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
     } else {
         QList<QnLicensePtr> licenseList;
         QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
-        if (license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT)))
+        if (license->isValid())
             licenseList.append(license);
 
         validateLicenses(license ? license->key() : "", licenseList);

@@ -14,7 +14,7 @@ QnClientMessageProcessor::QnClientMessageProcessor():
 {
 }
 
-void QnClientMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
+void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
     QnCommonMessageProcessor::init(connection);
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
@@ -64,7 +64,7 @@ void QnClientMessageProcessor::processResources(const QnResourceList& resources)
         checkForTmpStatus(resource);
 }
 
-void QnClientMessageProcessor::checkForTmpStatus(QnResourcePtr resource)
+void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
 {
     // process tmp status
     if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) 
@@ -112,7 +112,7 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource:
 
 void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy)
 {
-    if (data.peerId == qnCommon->moduleGUID())
+    if (data.peer.id == qnCommon->moduleGUID())
         return;
 
     if (isProxy) {

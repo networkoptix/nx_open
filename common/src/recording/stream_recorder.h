@@ -48,7 +48,7 @@ public:
 
     static QString errorString(int errCode);
 
-    QnStreamRecorder(QnResourcePtr dev);
+    QnStreamRecorder(const QnResourcePtr& dev);
     virtual ~QnStreamRecorder();
 
     /*

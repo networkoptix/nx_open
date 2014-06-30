@@ -300,8 +300,8 @@
                                             <value>link</value>
                                         </replacement>
                                         <replacement>
-                                            <token>${artifactId}${parsedVersion.majorVersion}</token>
-                                            <value>${artifactId}</value>
+                                            <token>${project.artifactId}${parsedVersion.majorVersion}</token>
+                                            <value>${project.artifactId}</value>
                                         </replacement>										
                                     </replacements>
                                     <skip>${replace.skip}</skip>

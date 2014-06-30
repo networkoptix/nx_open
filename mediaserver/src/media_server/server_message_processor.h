@@ -22,9 +22,9 @@ public:
     bool isProxy(const nx_http::Request& request) const;
 protected:
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status ) override;
-    virtual void init(ec2::AbstractECConnectionPtr connection);
+    virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
     virtual void afterRemovingResource(const QnId& id) override;
-    void execBusinessActionInternal(QnAbstractBusinessActionPtr action) override;
+    void execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) override;
     bool isLocalAddress(const QString& addr) const;
 private slots:
     void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);

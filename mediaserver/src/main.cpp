@@ -144,6 +144,8 @@
 #include "compatibility.h"
 #include "media_server/file_connection_processor.h"
 #include "streaming/hls/hls_session_pool.h"
+#include "llutil/hardware_id.h"
+#include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
 
 
@@ -211,7 +213,7 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
         szMsg[strlen(szMsg)-1] = 0;
     }
 
-    cl_log.log(QLatin1String("FFMPEG "), QString::fromLocal8Bit(szMsg), cl_logERROR);
+    NX_LOG( lit("FFMPEG %1").arg(QString::fromLocal8Bit(szMsg)), cl_logERROR);
 }
 
 QHostAddress resolveHost(const QString& hostString)
@@ -225,7 +227,7 @@ QHostAddress resolveHost(const QString& hostString)
     // Can't resolve
     if (info.error() != QHostInfo::NoError)
     {
-        cl_log.log("Couldn't resolve host ", hostString, cl_logERROR);
+        NX_LOG(lit("Couldn't resolve host %1").arg(hostString), cl_logERROR);
         return QHostAddress();
     }
 
@@ -241,7 +243,7 @@ QHostAddress resolveHost(const QString& hostString)
     }
 
     if (host.toIPv4Address() == 0)
-        cl_log.log("No ipv4 address associated with host ", hostString, cl_logERROR);
+        NX_LOG( lit("No ipv4 address associated with host %1").arg(hostString), cl_logERROR);
 
     return host;
 }
@@ -381,14 +383,14 @@ static QStringList listRecordFolders()
         }
 
         if (freeSpace >= 100) {
-            cl_log.log(QString("Drive %1 has more than 100GB free space. Using it for storage.").arg(path), cl_logINFO);
+            NX_LOG(QString("Drive %1 has more than 100GB free space. Using it for storage.").arg(path), cl_logINFO);
             folderPaths.append(path + QN_MEDIA_FOLDER_NAME);
         }
         */
     }
     /*
     if (folderPaths.isEmpty()) {
-        cl_log.log(QString("There are no drives with more than 100GB free space. Using drive %1 as it has the most free space: %2 GB").arg(maxFreeSpaceDrive).arg(maxFreeSpace), cl_logINFO);
+        NX_LOG(QString("There are no drives with more than 100GB free space. Using drive %1 as it has the most free space: %2 GB").arg(maxFreeSpaceDrive).arg(maxFreeSpace), cl_logINFO);
         folderPaths.append(maxFreeSpaceDrive + QN_MEDIA_FOLDER_NAME);
     }
     */
@@ -411,7 +413,7 @@ QnAbstractStorageResourceList createStorages()
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
         bigStorageThreshold = qMax(bigStorageThreshold, available);
         storages.append(storage);
-        cl_log.log(QString("Creating new storage: %1").arg(folderPath), cl_logINFO);
+        NX_LOG(QString("Creating new storage: %1").arg(folderPath), cl_logINFO);
     }
     bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
 
@@ -536,16 +538,16 @@ void initLog(const QString &logLevel) {
     const QString& dataLocation = getDataDirectory();
     const QString& logFileLocation = MSSettings::roSettings()->value( "logDir", dataLocation + QLatin1String("/log/") ).toString();
     if (!QDir().mkpath(logFileLocation))
-        cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
+        NX_LOG(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
     const QString& logFileName = logFileLocation + QLatin1String("/log_file");
     if (!cl_log.create(
             logFileName,
             MSSettings::roSettings()->value( "maxLogFileSize", DEFAULT_MAX_LOG_FILE_SIZE ).toULongLong(),
             MSSettings::roSettings()->value( "logArchiveSize", DEFAULT_LOG_ARCHIVE_SIZE ).toULongLong(),
             cl_logDEBUG1))
-        cl_log.log(lit("Could not create log file") + logFileName, cl_logALWAYS);
+        NX_LOG(lit("Could not create log file") + logFileName, cl_logALWAYS);
     MSSettings::roSettings()->setValue("logFile", logFileName);
-    cl_log.log(QLatin1String("================================================================================="), cl_logALWAYS);
+    NX_LOG(QLatin1String("================================================================================="), cl_logALWAYS);
 }
 
 int serverMain(int argc, char *argv[])
@@ -598,10 +600,10 @@ int serverMain(int argc, char *argv[])
     else if (cmdLineArguments.rebuildArchive == "lq")
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_LQ);
     
-    cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
-    cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
-    cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
-    cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
+    NX_LOG(lit("%1 started").arg(QN_APPLICATION_NAME), cl_logALWAYS);
+    NX_LOG(lit("Software version: %1").arg(QN_APPLICATION_VERSION), cl_logALWAYS);
+    NX_LOG(lit("Software revision: %1").arg(QN_APPLICATION_REVISION), cl_logALWAYS);
+    NX_LOG(lit("binary path: %1").arg(QFile::decodeName(argv[0])), cl_logALWAYS);
 
     if( cmdLineArguments.logLevel != lit("none") )
         defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
@@ -645,12 +647,11 @@ void initAppServerConnection(const QSettings &settings)
 
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
-    cl_log.log("Connect to enterprise controller server ", urlNoPassword.toString(), cl_logINFO);
-    QnAppServerConnectionFactory::setAuthKey(authKey());
+    NX_LOG(lit("Connect to enterprise controller server %1").arg(urlNoPassword.toString()), cl_logINFO);
+    //QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
-    QnAppServerConnectionFactory::setBox(lit(QN_ARM_BOX));
 }
 
 QnMain::QnMain(int argc, char* argv[])
@@ -914,7 +915,7 @@ void QnMain::at_storageManager_noStoragesAvailable() {
     qnBusinessRuleConnector->at_NoStorages(m_mediaServer);
 }
 
-void QnMain::at_storageManager_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason) {
+void QnMain::at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason) {
     qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
 }
 
@@ -922,7 +923,7 @@ void QnMain::at_storageManager_rebuildFinished() {
     qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer);
 }
 
-void QnMain::at_cameraIPConflict(QHostAddress host, QStringList macAddrList)
+void QnMain::at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList)
 {
     qnBusinessRuleConnector->at_cameraIPConflict(
         m_mediaServer,
@@ -1065,6 +1066,7 @@ void QnMain::run()
     }
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
+    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
     // Create SessionManager
     QnSessionManager::instance()->start();
@@ -1113,16 +1115,28 @@ void QnMain::run()
 
     QnStorageManager storageManager;
 
-    connect(QnResourceDiscoveryManager::instance(), SIGNAL(CameraIPConflict(QHostAddress, QStringList)), this, SLOT(at_cameraIPConflict(QHostAddress, QStringList)));
-    connect(QnStorageManager::instance(), SIGNAL(noStoragesAvailable()), this, SLOT(at_storageManager_noStoragesAvailable()));
-    connect(QnStorageManager::instance(), SIGNAL(storageFailure(QnResourcePtr, QnBusiness::EventReason)), this, SLOT(at_storageManager_storageFailure(QnResourcePtr, QnBusiness::EventReason)));
-    connect(QnStorageManager::instance(), SIGNAL(rebuildFinished()), this, SLOT(at_storageManager_rebuildFinished()));
+    connect(QnResourceDiscoveryManager::instance(), &QnResourceDiscoveryManager::CameraIPConflict, this, &QnMain::at_cameraIPConflict);
+    connect(QnStorageManager::instance(), &QnStorageManager::noStoragesAvailable, this, &QnMain::at_storageManager_noStoragesAvailable);
+    connect(QnStorageManager::instance(), &QnStorageManager::storageFailure, this, &QnMain::at_storageManager_storageFailure);
+    connect(QnStorageManager::instance(), &QnStorageManager::rebuildFinished, this, &QnMain::at_storageManager_rebuildFinished);
 
     qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("123")).toString());
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
+
     qnCommon->setModuleGUID(serverGuid());
     qnCommon->setLocalSystemName(settings->value("systemName").toString());
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+
+    ec2::ApiRuntimeData runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
+    runtimeInfo.peer.peerType = Qn::PT_Server;
+    runtimeInfo.box = lit(QN_ARM_BOX);
+    runtimeInfo.brand = lit(QN_PRODUCT_NAME_SHORT);
+    int guidCompatibility = 0;
+    runtimeInfo.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
+    runtimeInfo.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
+    QnRuntimeInfoManager::instance()->update(runtimeInfo);
+
 
     ec2::ResourceContext resCtx(
         QnResourceDiscoveryManager::instance(),
@@ -1149,7 +1163,11 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
 
-    QnAppServerConnectionFactory::setPublicIp(connectInfo->publicIp);
+
+    runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
+    runtimeInfo.publicIP = connectInfo->publicIp;
+    qnCommon->setRemoteGUID(connectInfo->ecsGuid);
+    QnRuntimeInfoManager::instance()->update(runtimeInfo);
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
@@ -1172,7 +1190,7 @@ void QnMain::run()
 
     if (!compatibilityChecker->isCompatible(COMPONENT_NAME, QnSoftwareVersion(QN_ENGINE_VERSION), "ECS", connectInfo->version))
     {
-        cl_log.log(cl_logERROR, "Incompatible Enterprise Controller version detected! Giving up.");
+        NX_LOG(lit("Incompatible Enterprise Controller version detected! Giving up."), cl_logERROR);
         return;
     }
 
@@ -1204,7 +1222,7 @@ void QnMain::run()
     ec2ConnectionFactory->registerTransactionListener( m_universalTcpListener );
 
     QUrl proxyServerUrl = ec2Connection->connectionInfo().ecUrl;
-    proxyServerUrl.setPort(connectInfo->proxyPort);
+    //proxyServerUrl.setPort(connectInfo->proxyPort);
     m_universalTcpListener->setProxyParams(proxyServerUrl, serverGuid().toString());
     m_universalTcpListener->addProxySenderConnections(PROXY_POOL_SIZE);
 
@@ -1452,7 +1470,7 @@ void QnMain::run()
                << scheduleTask.getEndTime()
                << scheduleTask.getRecordingType()
                << scheduleTask.getResourceId().toString();
-        cl_log.log(str, cl_logALWAYS);
+        NX_LOG(str, cl_logALWAYS);
     }
     */
 
@@ -1552,6 +1570,17 @@ void QnMain::at_appStarted()
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
 };
 
+void QnMain::at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo)
+{
+    if (runtimeInfo.peer.id == qnCommon->moduleGUID())
+    {
+        ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged, false);
+        tran.params = runtimeInfo;
+        tran.fillSequence();
+        ec2::qnTransactionBus->sendTransaction(tran);
+    }
+}
+
 class QnVideoService : public QtService<QtSingleCoreApplication>
 {
 public:
@@ -1586,14 +1615,14 @@ protected:
         QUuid guid = serverGuid();
         if (guid.isNull())
         {
-            cl_log.log("Can't save guid. Run once as administrator.", cl_logERROR);
+            NX_LOG("Can't save guid. Run once as administrator.", cl_logERROR);
             qApp->quit();
             return;
         }
 
         if (application->isRunning())
         {
-            cl_log.log("Server already started", cl_logERROR);
+            NX_LOG("Server already started", cl_logERROR);
             qApp->quit();
             return;
         }

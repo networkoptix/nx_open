@@ -14,7 +14,7 @@ static const int MAX_KEY_FIND_INTERVAL = 10 * 1000 * 1000;
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
 
-QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
+QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
     QnAbstractArchiveReader(dev),
 //protected
     m_currentTime(0),
@@ -446,7 +446,7 @@ begin_label:
             str << "setMarker=" << m_newDataMarker
                 << " for Time=" << QDateTime::fromMSecsSinceEpoch(m_requiredJumpTime/1000).toString("hh:mm:ss.zzz");
             str.flush();
-            cl_log.log(s, cl_logALWAYS);
+            NX_LOG(s, cl_logALWAYS);
         }
         */
         setSkipFramesToTime(tmpSkipFramesToTime, !exactJumpToSpecifiedFrame);

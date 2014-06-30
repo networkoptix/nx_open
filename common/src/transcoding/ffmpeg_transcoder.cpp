@@ -142,7 +142,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         if (videoStream == 0)
         {
             m_lastErrMessage = tr("Could not allocate output stream for recording.");
-            cl_log.log(m_lastErrMessage, cl_logERROR);
+            NX_LOG(m_lastErrMessage, cl_logERROR);
             return -1;
         }
 
@@ -220,7 +220,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         if (audioStream == 0)
         {
             m_lastErrMessage = tr("Could not allocate output stream for recording.");
-            cl_log.log(m_lastErrMessage, cl_logERROR);
+            NX_LOG(m_lastErrMessage, cl_logERROR);
             return -1;
         }
 
@@ -264,7 +264,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
     {
         closeFfmpegContext();
         m_lastErrMessage = tr("Video or audio codec is incompatible with container %1.").arg(m_container);
-        cl_log.log(m_lastErrMessage, cl_logERROR);
+        NX_LOG(m_lastErrMessage, cl_logERROR);
         return -3;
     }
     m_initialized = true;

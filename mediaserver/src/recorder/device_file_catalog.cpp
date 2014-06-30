@@ -98,7 +98,7 @@ bool DeviceFileCatalog::readCatalog()
 {
     if (!m_file.open(QFile::ReadWrite))
     {
-        cl_log.log("Can't create title file ", m_file.fileName(), cl_logERROR);
+        NX_LOG("Can't create title file ", m_file.fileName(), cl_logERROR);
         return false;
     }
 
@@ -220,7 +220,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk, bool checkDirOnly)
 
 qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage)
 {
-    cl_log.log("recreate broken file ", fileName, cl_logWARNING);
+    NX_LOG(lit("recreate broken file %1").arg(fileName), cl_logWARNING);
     QnAviResourcePtr res(new QnAviResource(fileName));
     QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
     avi->setStorage(storage);
@@ -792,7 +792,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
     QTextStream str(&msg);
     str << " find chunk for time=" << QDateTime::fromMSecsSinceEpoch(startTime/1000).toString();
     str.flush();
-    cl_log.log(msg, cl_logWARNING);
+    NX_LOG(msg, cl_logWARNING);
     str.flush();
 */
     QMutexLocker lock(&m_mutex);
@@ -943,7 +943,7 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
 
     if (!file.open(QFile::ReadOnly))
     {
-        cl_log.log("Can't open title file ", file.fileName(), cl_logERROR);
+        NX_LOG(lit("Can't open title file %1").arg(file.fileName()), cl_logERROR);
         return false;
     }
 
