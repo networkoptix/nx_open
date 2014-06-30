@@ -169,9 +169,19 @@ void QnServerUpdatesWidget::updateUi() {
             switch (m_updateTool->updateCheckResult()) {
             case QnMediaServerUpdateTool::UpdateFound:
                 if (!m_updateTool->targetVersion().isNull() && !m_minimalMode) { // null version means we've got here first time after the dialog has been showed
-                    int result = QMessageBox::question(this, tr("Update is found"),
-                                                       tr("Do you want to update your system to version %1?").arg(m_updateTool->targetVersion().toString()),
-                                                       QMessageBox::Yes | QMessageBox::No);
+                    QString message = tr("Do you want to update your system to version %1?").arg(m_updateTool->targetVersion().toString());
+                    switch (QDateTime::currentDateTime().date().dayOfWeek()) {
+                    case Qt::Thursday:
+                    case Qt::Friday:
+                    case Qt::Saturday:
+                    case Qt::Sunday:
+                        message += lit("\n") + tr("As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.");
+                        break;
+                    default:
+                        break;
+                    }
+
+                    int result = QMessageBox::question(this, tr("Update is found"), message, QMessageBox::Yes | QMessageBox::No);
                     startUpdate = (result == QMessageBox::Yes);
                 }
                 break;
