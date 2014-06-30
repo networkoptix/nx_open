@@ -39,6 +39,7 @@ private slots:
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
     void at_resourcePool_statusChanged(const QnResourcePtr &resource);
+    void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
 private:
     void addModule(const QnModuleInformation &moduleInformation, const QnId &discoverer);
