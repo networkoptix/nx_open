@@ -104,6 +104,8 @@
 #include <rest/handlers/storage_status_rest_handler.h>
 #include <rest/handlers/time_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
+#include <rest/handlers/change_system_name_rest_handler.h>
+#include <rest/handlers/module_information_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/server/rest_server.h>
 
@@ -163,6 +165,8 @@ static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
 class QnMain;
 static QnMain* serviceMainInstance = 0;
 void stopServer(int signal);
+bool restartFlag = false;
+void restartServer();
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
@@ -973,6 +977,8 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/installUpdate", new QnUpdateRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/connect", new QnOldClientConnectRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/configure", new QnChangeSystemNameRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/moduleInformation", new QnModuleInformationRestHandler());
 #ifdef QN_ENABLE_BOOKMARKS
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 #endif
@@ -1084,6 +1090,7 @@ void QnMain::run()
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
+    QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/showLog*"), AuthMethod::urlQueryParam );
 
     QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
@@ -1646,8 +1653,18 @@ private:
 
 void stopServer(int signal)
 {
+    restartFlag = false;
     if (serviceMainInstance) {
         qWarning() << "got signal" << signal << "stop server!";
+        serviceMainInstance->stopAsync();
+    }
+}
+
+void restartServer()
+{
+    restartFlag = true;
+    if (serviceMainInstance) {
+        qWarning() << "restart requested!";
         serviceMainInstance->stopAsync();
     }
 }
@@ -1724,7 +1741,10 @@ int main(int argc, char* argv[])
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
 
     QnVideoService service( argc, argv );
-    return service.exec();
+    int res = service.exec();
+    if (restartFlag && res == 0)
+        return 1;
+    return res;
 }
 
 static void printVersion()

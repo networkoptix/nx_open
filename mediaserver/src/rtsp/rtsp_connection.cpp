@@ -182,6 +182,7 @@ public:
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
     QByteArray clientGuid;
+    enum CodecID codecId;
     qint64 startTime; // time from last range header
     qint64 endTime;   // time from last range header
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
@@ -201,10 +202,14 @@ public:
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
+static const CodecID DEFAULT_VIDEO_CODEC = CODEC_ID_H263P; 
+
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket)
 {
+    Q_D(QnRtspConnectionProcessor);
     Q_UNUSED(_owner)
+	d->codecId = CODEC_ID_NONE;
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
@@ -245,6 +250,16 @@ void QnRtspConnectionProcessor::parseRequest()
 
     const QUrlQuery urlQuery( url.query() );
 
+    QString codec = urlQuery.queryItemValue("codec");
+    if (!codec.isEmpty())
+    {
+        AVOutputFormat* format = av_guess_format(codec.toLatin1().data(),NULL,NULL);
+        if (format)
+            d->codecId = format->video_codec;
+        else
+            d->codecId = CODEC_ID_NONE;
+    };
+
     QString pos = urlQuery.queryItemValue("pos").split('/')[0];
     if (pos.isEmpty())
         processRangeHeader();
@@ -269,6 +284,8 @@ void QnRtspConnectionProcessor::parseRequest()
             }
         }
         d->transcodedVideoSize = videoSize;
+        if (d->codecId == CODEC_ID_NONE)
+            d->codecId = DEFAULT_VIDEO_CODEC;
     }
 
     QString q = nx_http::getHeaderValue(d->request.headers, "x-media-quality");
@@ -491,9 +508,10 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
 
 QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QnConstResourceVideoLayoutPtr vLayout)
 {
+    Q_D(QnRtspConnectionProcessor);
     CodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
-        dstCodec = CODEC_ID_H263P;
+        dstCodec = d->codecId;
     else
         dstCodec = media && media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
         //dstCodec = media && media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_VORBIS; // keep aac without transcoding for audio
@@ -505,6 +523,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
     {
         //case CODEC_ID_H264:
         //    return QnRtspEncoderPtr(new QnRtspH264Encoder());
+        case CODEC_ID_NONE:
         case CODEC_ID_H263:
         case CODEC_ID_H263P:
         case CODEC_ID_H264:

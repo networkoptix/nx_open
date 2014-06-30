@@ -29,6 +29,7 @@
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_help_data.h"
+#include <nx_ec/data/api_time_data.h>
 #include "nx_ec/data/api_conversion_functions.h"
 #include "api/runtime_info_manager.h"
 
@@ -1488,26 +1489,17 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredF
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<QString>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFilePath>& tran)
 {
-    switch (tran.command) {
-    case ApiCommand::removeStoredFile: {
-        QSqlQuery query(m_sdb);
-        query.prepare("DELETE FROM vms_storedFiles WHERE path = :path");
-        query.bindValue(":path", tran.params);
-        if (!query.exec()) {
-            qWarning() << Q_FUNC_INFO << query.lastError().text();
-            return ErrorCode::dbError;
-        }
-        break;
+    assert(tran.command == ApiCommand::removeStoredFile);
+  
+    QSqlQuery query(m_sdb);
+    query.prepare("DELETE FROM vms_storedFiles WHERE path = :path");
+    query.bindValue(":path", tran.params.path);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
     }
-    case ApiCommand::installUpdate:
-        break;
-    default:
-        Q_ASSERT_X(0, "Unsupported transaction", Q_FUNC_INFO);
-        return ErrorCode::notImplemented;
-    }
-
     return ErrorCode::ok;
 }
 
@@ -2098,9 +2090,9 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& resourceId, ApiResourceParamsDa
 }
 
 // getCurrentTime
-ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, qint64& currentTime)
+ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime)
 {
-    currentTime = QDateTime::currentMSecsSinceEpoch();
+    currentTime.value = QDateTime::currentMSecsSinceEpoch();
     return ErrorCode::ok;
 }
 
@@ -2303,8 +2295,8 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& _path, ApiStoredDi
 {
     QSqlQuery query(m_sdb);
     QString path;
-    if (!_path.isEmpty())
-        path = closeDirPath(_path);
+    if (!_path.path.isEmpty())
+        path = closeDirPath(_path.path);
     
     QString pathFilter(lit("path"));
     if (!path.isEmpty())
@@ -2331,13 +2323,13 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFil
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare("SELECT data FROM vms_storedFiles WHERE path = :path");
-    query.bindValue(":path", path);
+    query.bindValue(":path", path.path);
     if (!query.exec())
     {
         qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
         return ErrorCode::dbError;
     }
-    data.path = path;
+    data.path = path.path;
     if (query.next())
         data.data = query.value(0).toByteArray();
     return ErrorCode::ok;

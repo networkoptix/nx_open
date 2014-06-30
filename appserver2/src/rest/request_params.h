@@ -16,6 +16,8 @@ class QUrlQuery;
 namespace ec2
 {
     bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, QString *value);
+
+    bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, ApiStoredFilePath *value);
     void toUrlParams(const ApiStoredFilePath &id, QUrlQuery *query);
 
     bool parseHttpRequestParams(const QString& command, const QnRequestParamList &params, QnId *id);

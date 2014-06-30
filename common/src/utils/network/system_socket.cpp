@@ -603,7 +603,7 @@ namespace
         {
             int result = func();
             //const int errCode = errno;
-            if( result == -1 && (errno == EINTR || errno == EAGAIN) )
+            if( result == -1 && errno == EINTR )
             {
                 if( timeout == 0 ||  //no timeout
                     !waitStartTimeActual )  //cannot check timeout expiration
@@ -770,7 +770,7 @@ int CommunicatingSocket::recv( void* buffer, unsigned int bufferLen, int flags )
     if (bytesRead < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
-        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock)
+        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock && errCode != SystemError::again)
             mConnected = false;
     }
     else if (bytesRead == 0)
@@ -801,7 +801,7 @@ int CommunicatingSocket::send( const void* buffer, unsigned int bufferLen )
     if (sended < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
-        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock)
+        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock && errCode != SystemError::again)
             mConnected = false;
     }
     else if (sended == 0)

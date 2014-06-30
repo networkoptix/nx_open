@@ -22,6 +22,7 @@
 #include <nx_ec/data/api_server_info_data.h>
 #include <nx_ec/data/api_email_data.h>
 #include <nx_ec/data/api_server_alive_data.h>
+#include <nx_ec/data/api_time_data.h>
 
 #include "ec_api_fwd.h"
 
