@@ -388,7 +388,7 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
 #endif
 
     std::unique_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
-        &m_mediaBufferCache,
+        &m_allocator,
         0, // channel
         calcNextTimestamp(
             frame.vmux_info.PTS
@@ -413,11 +413,7 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
 
     //TODO #ak calculating GOP size in bytes
     if( frame.vmux_info.pic_type == VMUX_IDR_FRAME && m_currentGopSizeBytes > 0 )
-    {
-        //keeping cache 20% larger than GOP size so that we can often find suitable buffer in cache
-        //m_mediaBufferCache.setCacheSize( m_currentGopSizeBytes / 4 * 5 );
         m_currentGopSizeBytes = 0;
-    }
     m_currentGopSizeBytes += frame.frame_size;
 
 #ifdef DUMP_VIDEO_STREAM

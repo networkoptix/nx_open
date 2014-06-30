@@ -11,7 +11,7 @@
 #include <plugins/plugin_tools.h>
 
 
-class NxBufferCache;
+class CyclicAllocator;
 
 class ILPVideoPacket
 :
@@ -19,7 +19,7 @@ class ILPVideoPacket
 {
 public:
     ILPVideoPacket(
-        NxBufferCache* const mediaBufferCache,
+        CyclicAllocator* const allocator,
         int channelNumber,
         nxcip::UsecUTCTimestamp _timestamp,
         unsigned int flags,
@@ -65,7 +65,7 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
-    NxBufferCache* const m_mediaBufferCache;
+    CyclicAllocator* const m_allocator;
     const int m_channelNumber;
     nxcip::UsecUTCTimestamp m_timestamp;
     void* m_buffer;
