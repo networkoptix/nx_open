@@ -182,6 +182,7 @@ public:
     ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
     QByteArray clientGuid;
+    enum CodecID codecId;
     qint64 startTime; // time from last range header
     qint64 endTime;   // time from last range header
     double rtspScale; // RTSP playing speed (1 - normal speed, 0 - pause, >1 fast forward, <-1 fast back e. t.c.)
@@ -204,7 +205,9 @@ public:
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket)
 {
+    Q_D(QnRtspConnectionProcessor);
     Q_UNUSED(_owner)
+	d->codecId = CODEC_ID_H263P;
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
@@ -244,6 +247,14 @@ void QnRtspConnectionProcessor::parseRequest()
     }
 
     const QUrlQuery urlQuery( url.query() );
+
+    QString codec = urlQuery.queryItemValue("codec");
+    if (!codec.isEmpty())
+    {
+        AVOutputFormat* format = av_guess_format(codec.toLatin1().data(),NULL,NULL);
+        if (format)
+            d->codecId = format->video_codec;
+    };
 
     QString pos = urlQuery.queryItemValue("pos").split('/')[0];
     if (pos.isEmpty())
@@ -491,9 +502,10 @@ void QnRtspConnectionProcessor::addResponseRangeHeader()
 
 QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbstractMediaDataPtr media, QSize resolution, QnConstResourceVideoLayoutPtr vLayout)
 {
+    Q_D(QnRtspConnectionProcessor);
     CodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
-        dstCodec = CODEC_ID_H263P;
+        dstCodec = d->codecId;
     else
         dstCodec = media && media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
         //dstCodec = media && media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_VORBIS; // keep aac without transcoding for audio
