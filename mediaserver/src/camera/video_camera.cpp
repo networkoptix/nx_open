@@ -91,12 +91,11 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
     return true;
 }
 
-static const size_t gopKeeperKeyFramesAllocatorArenaSize = 2*1024*1024;
 /*!
     using different allocator for stored ket frames, since these key frames can be kept in QnVideoCameraGopKeeper::m_lastKeyFrames 
-    for 80 seconds and that can cause huge memory consumption in CyclicAllocator used to alloc original frames
+    for 80 seconds and that can cause huge memory consumption if CyclicAllocator has been used to alloc original frames
 */
-static CyclicAllocator gopKeeperKeyFramesAllocator( gopKeeperKeyFramesAllocatorArenaSize );
+static CyclicAllocator gopKeeperKeyFramesAllocator;
 
 void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
@@ -112,6 +111,7 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
             }
             m_gotIFramesMask |= 1 << video->channelNumber;
             m_lastKeyFrame = video;
+
             const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
             if (m_lastKeyFrames.empty() || m_lastKeyFrames.back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
                 m_lastKeyFrames.push_back(QnCompressedVideoDataPtr(video->clone(&gopKeeperKeyFramesAllocator)));

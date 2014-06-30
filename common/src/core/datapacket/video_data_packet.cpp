@@ -5,6 +5,8 @@
 
 #include "video_data_packet.h"
 
+#include <utils/memory/cyclic_allocator.h>
+
 
 QnCompressedVideoData::QnCompressedVideoData( QnMediaContextPtr ctx )
 :
@@ -31,13 +33,15 @@ void QnCompressedVideoData::assign(const QnCompressedVideoData* other)
 
 static const unsigned int MAX_VIDEO_PACKET_SIZE = 10*1024*1024;
 
+//static CyclicAllocator videoPacketCyclicAllocator;
+
 QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     unsigned int alignment,
     unsigned int capacity,
     QnMediaContextPtr ctx )
 :   //TODO #ak delegate constructor (requires msvc2013)
     QnCompressedVideoData( ctx ),
-    m_data(alignment, qMin(capacity, MAX_VIDEO_PACKET_SIZE))
+    m_data(/*&videoPacketCyclicAllocator,*/ alignment, qMin(capacity, MAX_VIDEO_PACKET_SIZE))
 {
 }
 

@@ -7,9 +7,12 @@
 #define CYCLIC_ALLOCATOR_H
 
 #include <stdint.h>
+#include <map>
 #include <mutex>
 
 #include "abstract_allocator.h"
+
+//#define CA_DEBUG
 
 
 //!Allocates memory from cyclic buffer. Suitable for media frames allocation, since media frames generally freed in the same order they were allocated
@@ -22,7 +25,7 @@ class CyclicAllocator
     public QnAbstractAllocator
 {
 public:
-    static const size_t DEFAULT_ARENA_SIZE = 8*1024*1024;
+    static const size_t DEFAULT_ARENA_SIZE = 4*1024*1024;
 
     CyclicAllocator( size_t arenaSize = DEFAULT_ARENA_SIZE );
     ~CyclicAllocator();
@@ -60,8 +63,14 @@ private:
     Position m_freeMemStart;
     size_t m_arenaSize;
 
+    size_t m_allocatedBlockCount;
+
+#ifdef CA_DEBUG
     Arena* m_head;
-    size_t m_allocatedBlocks;
+    size_t m_arenaCount;
+    //map<ptr, size>
+    std::map<void*, size_t> m_allocatedBlocks;
+#endif
 
     //!Returns free space in arena pointed to by \a m_freeMemStart.arena
     size_t calcCurrentArenaBytesAvailable() const;
