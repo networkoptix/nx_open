@@ -1347,7 +1347,7 @@ void QnMain::run()
     qnResPool->addResource(m_mediaServer);
 
     m_moduleFinder = new QnModuleFinder(false);
-    if (cmdLineArguments.devModeKey == lit("raz-raz-raz"))
+    if (cmdLineArguments.devModeKey == lit("razrazraz"))
         m_moduleFinder->setCompatibilityMode(true);
     QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleFound,     this,   &QnMain::at_peerFound,  Qt::DirectConnection);
     QObject::connect(m_moduleFinder,    &QnModuleFinder::moduleLost,      this,   &QnMain::at_peerLost,   Qt::DirectConnection);
