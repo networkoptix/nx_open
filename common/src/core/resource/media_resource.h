@@ -56,6 +56,7 @@ public:
     static QString customAspectRatioKey();
     /** Name of the resource property to disable secondary recorder */
     static QString dontRecordSecondaryStreamKey();
+    static QString rtpTransportKey();
 protected:
     void initMediaResource();
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
