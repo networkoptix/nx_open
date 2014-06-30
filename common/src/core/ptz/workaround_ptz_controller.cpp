@@ -90,8 +90,6 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
                 m_capabilities |= Qn::SynchronizedPtzCapability;
             else if(capability == lit("VirtualPtzCapability"))
                 m_capabilities |= Qn::VirtualPtzCapability;
-            else if(capability == lit("nativePresetsPtzCapability"))
-                m_capabilities |= Qn::nativePresetsPtzCapability;
             else
                 qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
         }

@@ -7,6 +7,15 @@ QnPtzMapperPtr QnResourceData::ptzMapper() {
     return m_valueByKey.value(lit("ptzMapper")).value<QnPtzMapperPtr>();
 }
 
+void QnResourceData::add(const QnResourceData &other) {
+    if(m_valueByKey.isEmpty()) {
+        m_valueByKey = other.m_valueByKey;
+    } else {
+        for(auto pos = other.m_valueByKey.begin(); pos != other.m_valueByKey.end(); pos++)
+            m_valueByKey.insert(pos.key(), pos.value());
+    }
+}
+
 bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceData *target) {
     if(value.type() == QJsonValue::Null) {
         /* That's null data. */

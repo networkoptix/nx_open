@@ -37,14 +37,7 @@ public:
         m_valueByKey.insert(key, QVariant::fromValue<T>(value));
     }
 
-    void add(const QnResourceData &other) {
-        if(m_valueByKey.isEmpty()) {
-            m_valueByKey = other.m_valueByKey;
-        } else {
-            for(auto pos = other.m_valueByKey.begin(); pos != other.m_valueByKey.end(); pos++)
-                m_valueByKey.insert(pos.key(), pos.value());
-        }
-    }
+    void add(const QnResourceData &other);
 
     /* Built-in data follows. */
 
