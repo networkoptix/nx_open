@@ -109,13 +109,9 @@ void QnUniversalRequestProcessor::run()
             }
             if( !processRequest() )
             {
-                d->response.statusLine.version = d->request.requestLine.version;
-                d->response.statusLine.statusCode = nx_http::StatusCode::notFound;
-                d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString( d->response.statusLine.statusCode );
-                d->response.headers.insert( nx_http::HttpHeader( "Content-Type", "text/plain" ) );
-                d->response.messageBody = "NOT FOUND";
-                d->response.headers.insert( nx_http::HttpHeader( "Content-Length", nx_http::StringType::number(d->response.messageBody.size()) ) );
-                sendBuffer( d->response.toString() );
+                QByteArray contentType;
+                int rez = redirectTo(QnTcpListener::defaultPage(), contentType);
+                sendResponse(rez, contentType);
             }
         }
 
