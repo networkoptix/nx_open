@@ -61,7 +61,7 @@ void QnVistaFocusPtzController::init() {
         m_isMotor = false;
     }
 
-    if(options.contains(lit("PTZ")) && config.value<QString>(lit("device_name")).compare(lit("ENCODERPelcoPTZ"), Qt::CaseInsensitive) == 0) { // TODO: #Elric the device_name part should go to json settings.
+    if(options.contains(lit("PTZ")) && config.value<QString>(lit("device_name")).compare(lit("EncoderVistaPTZ"), Qt::CaseInsensitive) == 0) { // TODO: #Elric the device_name part should go to json settings.
         m_capabilities |= Qn::ContinuousFocusCapability;
         m_isMotor = false;
     }
