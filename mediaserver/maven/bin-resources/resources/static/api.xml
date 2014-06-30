@@ -1269,5 +1269,67 @@
                 </method>
             </methods>
         </group>
+        <group>
+            <groupName>rtsp</groupName>
+            <groupDescription>
+							This group contains information about media server RTSP api.
+							RTSP api is accessible on a same port as HTTP requests. To request video for camera use:
+						</groupDescription>
+						<methods>
+                <method>
+                    <name>&lt;camera_unique_id&gt;</name>
+                    <description>
+										Open RTSP video from a camera. It is not a exact method name. It mean that RTSP url may contain any camera unique ID. For instance:
+										rtsp://&lt;server_ip&gt;:&lt;port&gt;/&lt;12AB42FD5912&gt;
+										</description>
+                    <params>
+                        <param>
+                            <name>pos</name>
+                            <description>By default media server open camera from live position. This parameter define position in a archive in microseconds in a UTC format.
+														Position can be passed via standard RTSP attribute as well as via URL parameter</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>resolution</name>
+                            <description>Turn on video transcoding to specified resolution. Resolution string either may contain width and height (for instance 320x240) or 
+														height only (for instance 240p)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>codec</name>
+                            <description>Define video codec used for transcoding. Default value H263.</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>H263</name>
+                                    <description></description>
+                                </value>
+                                <value>
+                                    <name>H263p</name>
+                                    <description>H263 plus format</description>
+                                </value>
+                                <value>
+                                    <name>mpeg2video</name>
+                                    <description></description>
+                                </value>
+                                <value>
+                                    <name>mpjeg</name>
+                                    <description></description>
+                                </value>
+                                <value>
+                                    <name>mpeg4</name>
+                                    <description>MPEG-4 part 2</description>
+                                </value>
+                                <value>
+                                    <name>libvpx</name>
+                                    <description>VP8 video codec</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result>Return RTSP video stream</result>
+                </method>
+						</methods>
+        </group>
     </groups>
 </apidoc>
