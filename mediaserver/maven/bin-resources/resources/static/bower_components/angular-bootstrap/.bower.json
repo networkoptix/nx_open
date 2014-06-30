@@ -19,5 +19,6 @@
   },
   "_source": "git://github.com/angular-ui/bootstrap-bower.git",
   "_target": "~0.11.0",
-  "_originalSource": "angular-bootstrap"
+  "_originalSource": "angular-bootstrap",
+  "_direct": true
 }
