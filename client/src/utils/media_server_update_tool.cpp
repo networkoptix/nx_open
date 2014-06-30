@@ -404,13 +404,15 @@ void QnMediaServerUpdateTool::checkUpdateCoverage() {
             setCheckResult(UpdateImpossible);
             return;
         }
-        QnSoftwareVersion version = updateFileInformation->version;
-        if ((m_targetMustBeNewer && version > server->getVersion()) || (!m_targetMustBeNewer && version != server->getVersion()))
-            needUpdate = true;
+        needUpdate |= this->needUpdate(server->getVersion(), updateFileInformation->version);
     }
 
     setCheckResult(needUpdate ? UpdateFound : NoNewerVersion);
     return;
+}
+
+bool QnMediaServerUpdateTool::needUpdate(const QnSoftwareVersion &version, const QnSoftwareVersion &updateVersion) const {
+    return (m_targetMustBeNewer && updateVersion > version) || (!m_targetMustBeNewer && updateVersion != version);
 }
 
 void QnMediaServerUpdateTool::at_updateReply_finished() {
@@ -509,6 +511,9 @@ void QnMediaServerUpdateTool::updateServers() {
             continue;
 
         if (!server->getSystemInfo().isValid())
+            continue;
+
+        if (!needUpdate(server->getVersion(), m_targetVersion))
             continue;
 
         QnId peerId = server->getId();

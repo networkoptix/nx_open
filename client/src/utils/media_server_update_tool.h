@@ -134,6 +134,7 @@ protected:
     void checkOnlineUpdates(const QnSoftwareVersion &version = QnSoftwareVersion());
     void checkLocalUpdates();
     void checkUpdateCoverage();
+    bool needUpdate(const QnSoftwareVersion &version, const QnSoftwareVersion &updateVersion) const;
 
 private slots:
     void at_updateReply_finished();
