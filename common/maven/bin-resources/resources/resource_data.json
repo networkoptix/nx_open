@@ -32,13 +32,14 @@
                 "AXIS|AXISP3344", "AXIS|AXISP1344",
                 "*|IPC-HDB3200C", "*|N53F-F",
                 "IPC|LR01", "hs0130|LR01", "H18A2|IPCAM_M1", "H18A3|IPCAM_M1", "H18A4|RL01", "H18A5|IPCAM_M1", "HI9712_51ÊÒÍâ|LR01",
-                "VISTA|*VRD", "VISTA|VK2-2MPBX(DN)"
+                "VISTA|*VRD", "VISTA|VK2-2MPBX(DN)",
+                "DW|DWC-MV950TIR"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
         {
             "keys": [
-                "DW|DWC-MPTZ20X", "DW|DWC-MPTZ5X",
+                "DW|DWC-MPTZ20X", "DW|DWC-MPTZ5X", "DW|DWC-MPZ20XFM",
                 "ACTI|KCM8111", "*|FW3471-PS-E",
                 "VISTA|VK2-ENCODER"
             ],
@@ -46,7 +47,8 @@
         },
         {
             "keys": [
-                "ACTI|KCM3311"
+                "ACTI|KCM3311",
+                "DW|DWC-MB421TIR"
             ],
             "ptzCapabilities": "ContinuousZoomCapability"
         },
@@ -81,7 +83,7 @@
             "keys": [
                 "VISTA|VK2-600PTZ",
 				"VISTA|VK2-720VZMI",
-				"VISTA|VK2-720VZMX"
+                "VISTA|VK2-720VZMX"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability"
         },

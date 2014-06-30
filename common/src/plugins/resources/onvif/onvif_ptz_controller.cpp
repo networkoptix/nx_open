@@ -92,6 +92,8 @@ Qn::PtzCapabilities QnOnvifPtzController::initContinuousMove() {
     if(response.PTZConfiguration.empty())
         return Qn::NoPtzCapabilities;
 
+	// TODO: #PTZ #Elric we can init caps by examining spaces in response!
+
     _onvifPtz__GetNode nodeRequest;
     _onvifPtz__GetNodeResponse nodeResponse;
     nodeRequest.NodeToken = response.PTZConfiguration[0]->NodeToken;
