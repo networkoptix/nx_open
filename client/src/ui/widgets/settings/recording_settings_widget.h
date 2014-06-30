@@ -13,6 +13,8 @@ namespace Ui {
     class RecordingSettings;
 }
 
+class QnDwm;
+
 class QnRecordingSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -22,11 +24,17 @@ public:
     explicit QnRecordingSettingsWidget(QWidget *parent = NULL);
     virtual ~QnRecordingSettingsWidget();
 
+    Qn::CaptureMode captureMode() const;
+    void setCaptureMode(Qn::CaptureMode c);
+
     Qn::DecoderQuality decoderQuality() const;
     void setDecoderQuality(Qn::DecoderQuality q);
 
     Qn::Resolution resolution() const;
     void setResolution(Qn::Resolution r);
+
+    int screen() const;
+    void setScreen(int screen);
 
     QString primaryAudioDeviceName() const;
     void setPrimaryAudioDeviceName(const QString &name);
@@ -45,12 +53,15 @@ private slots:
     void onComboboxChanged(int index);
     
     void updateRecordingWarning();
+    void updateDisableAeroCheckbox();
 
     void at_browseRecordingFolderButton_clicked();
+    void at_dwm_compositionChanged();
 
 private:
     QScopedPointer<Ui::RecordingSettings> ui;
     QnVideoRecorderSettings *m_settings;
+    QnDwm* m_dwm;
 };
 
 #endif // VIDEORECORDINGDIALOG_H
