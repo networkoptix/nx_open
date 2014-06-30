@@ -2947,5 +2947,9 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
 
 void QnWorkbenchActionHandler::at_disableBackgroundAnimationAction_triggered() {
     QnMainWindow* mainWindow = checked_cast<QnMainWindow*>( context()->mainWindow() );
+    // Ivanov advice me that mainWindow may be NULL pointer for context()->mainWindow() may
+    // return NULL pointer. It is possible , so I add a NULL pointer check branch here
+    if( mainWindow == NULL ) 
+        return;
     mainWindow->stopBackgroundAnimation();
 }
