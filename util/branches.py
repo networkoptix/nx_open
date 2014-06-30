@@ -47,8 +47,8 @@ for branch in result:
     output = str(branch['name']).ljust(40)
     if branch['inactive']:
         output += ' (INACTIVE)'
-    else:
-        delta = curDate - branch['date']
-        if delta > timedelta(days = 30):
-            output += ' (TOO OLD: ' + str(delta.days) + 'days)'
+
+    delta = curDate - branch['date']
+    if delta > timedelta(days = 30):
+        output += ' (TOO OLD: ' + str(delta.days) + ' days)'
     print output
