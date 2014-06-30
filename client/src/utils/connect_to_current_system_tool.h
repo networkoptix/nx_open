@@ -23,7 +23,7 @@ public:
     explicit QnConnectToCurrentSystemTool(QObject *parent = 0);
     ~QnConnectToCurrentSystemTool();
 
-    void connectToCurrentSystem(const QSet<QnId> &targets);
+    void connectToCurrentSystem(const QSet<QnId> &targets, const QString &password);
 
     bool isRunning() const;
 
@@ -44,6 +44,7 @@ private slots:
 private:
     bool m_running;
     QSet<QnId> m_targets;
+    QString m_password;
 
     QSet<QnId> m_restartTargets;
     QSet<QnId> m_updateTargets;

@@ -1,6 +1,7 @@
 #include "workbench_incompatible_servers_action_handler.h"
 
 #include <QtWidgets/QMessageBox>
+#include <QtWidgets/QInputDialog>
 #include <QtCore/QUrl>
 
 #include <ui/actions/action_manager.h>
@@ -38,7 +39,11 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
     if (targets.isEmpty())
         return;
 
-    tool->connectToCurrentSystem(targets);
+    QString password = QInputDialog::getText(mainWindow(), tr("Enter password..."), tr("Password"), QLineEdit::Password);
+    if (password.isEmpty())
+        return;
+
+    tool->connectToCurrentSystem(targets, password);
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_joinOtherSystemAction_triggered() {

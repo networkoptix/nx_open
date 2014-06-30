@@ -31,12 +31,13 @@ QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject *parent) :
 
 QnConnectToCurrentSystemTool::~QnConnectToCurrentSystemTool() {}
 
-void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QnId> &targets) {
+void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QnId> &targets, const QString &password) {
     if (m_running)
         return;
 
     m_running = true;
     m_targets = targets;
+    m_password = password;
     m_restartTargets.clear();
     m_updateTargets.clear();
     changeSystemName();
@@ -67,6 +68,7 @@ void QnConnectToCurrentSystemTool::changeSystemName() {
     }
 
     m_configureTask->setSystemName(qnCommon->localSystemName());
+    m_configureTask->setPassword(m_password);
     m_configureTask->start(m_targets);
 }
 
