@@ -1076,44 +1076,6 @@
                     <result>Return object in requested format</result>
                 </method>
                 <method>
-                    <name>getStoredFile</name>
-                    <description>Read file data from a virtual FS</description>
-                    <isGetter>true</isGetter>
-                    <params>
-                        <param>
-                            <name>format</name>
-                            <description>Data format. Default value: 'binary'</description>
-                            <optional>true</optional>
-                            <values>
-                                <value>
-                                    <name>binary</name>
-                                    <description>binary data format</description>
-                                </value>
-                                <value>
-                                    <name>json</name>
-                                    <description>json data format</description>
-                                </value>
-                                <value>
-                                    <name>xml</name>
-                                    <description>xml data format</description>
-                                </value>
-                                <value>
-                                    <name>csv</name>
-                                    <description>CVS data format. In case of hierarchical data only
-                                        top level data will be provided</description>
-                                </value>
-                            </values>
-                        </param>
-                        <param>
-                            <name>folder</name>
-                            <description>File name</description>
-                            <optional>true</optional>
-                            <values/>
-                        </param>
-                    </params>
-                    <result>Return object in requested format</result>
-                </method>
-                <method>
                     <name>getSettings</name>
                     <description>Read general system settings such as email address
                         e.t.c</description>
