@@ -19,7 +19,8 @@ public:
     {}
 
     bool isAllowed(QnBusiness::EventType eventType) const {
-        return value() & (1ull << eventType);
+        int offset = static_cast<int>(eventType) - 1;
+        return value() & (1ull << offset);
     }
 };
 
