@@ -1280,7 +1280,7 @@
                     <name>&lt;camera_unique_id&gt;</name>
                     <description>
 										Open RTSP video from a camera. It is not a exact method name. It mean that RTSP url may contain any camera unique ID. For instance:
-										rtsp://&lt;server_ip&gt;:&lt;port&gt;/&lt;12AB42FD5912&gt;?pos=1235631&resolution=240p
+										rtsp://&lt;server_ip&gt;:&lt;port&gt;/&lt;12AB42FD5912&gt;?pos=1235631&amp;resolution=240p
 										</description>
 										<method>PLAY</method>
                     <params>
