@@ -548,8 +548,15 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     if (!m_resourceNodeByResource.contains(resource))
         return;
 
-    delete m_resourceNodeByResource.take(resource);
+    QnResourcePoolModelNode *node = m_resourceNodeByResource.take(resource);
+    QnResourcePoolModelNode *parent = node->parent();
+
+    delete node;
+
+    if (parent)
+        parent->update();
 }
+
 
 void QnResourcePoolModel::at_context_userChanged() {
     m_rootNodes[Qn::LocalNode]->update();
