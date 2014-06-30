@@ -100,11 +100,25 @@ bool QnMediaContext::equalTo(QnMediaContext *other) const
 }
 
 
+QnAbstractMediaData::QnAbstractMediaData( DataType _dataType )
+: 
+    dataType(_dataType),
+    compressionType(CODEC_ID_NONE),
+    flags(MediaFlags_None),
+    channelNumber(0),
+    context(0),
+    opaque(0)
+{
+}
+
+QnAbstractMediaData::~QnAbstractMediaData()
+{
+}
+
 void QnAbstractMediaData::assign(const QnAbstractMediaData* other)
 {
     dataProvider = other->dataProvider;
     timestamp = other->timestamp;
-
     dataType = other->dataType;
     compressionType = other->compressionType;
     flags = other->flags;
@@ -201,7 +215,7 @@ inline bool mathImage_cpu(const simd128i* data, const simd128i* mask, int maskSt
     return false;
 }
 
-bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
+bool QnMetaDataV1::matchImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
 {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     if (useSSE41())
@@ -220,8 +234,7 @@ bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int mas
 void QnMetaDataV1::assign(const QnMetaDataV1* other)
 {
     QnAbstractMediaData::assign(other);
-    m_data.clear();
-    m_data.write(other->m_data.data(), other->m_data.size());
+    m_data = other->m_data;
     m_input = other->m_input;
     m_duration = other->m_duration;
     m_firstTimestamp = other->m_firstTimestamp;

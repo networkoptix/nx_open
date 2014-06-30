@@ -12,7 +12,7 @@
 namespace ec2
 {
 
-    QAtomicInt QnAbstractTransaction::m_sequence(1);
+    QAtomicInt qn_abstractTransaction_sequence(1);
 
     namespace ApiCommand
     {
@@ -20,6 +20,19 @@ namespace ec2
         {
             switch( val )
             {
+                case tranSyncRequest:
+                    return "tranSyncRequest";
+                case tranSyncResponse:
+                    return "tranSyncResponse";
+                case lockRequest:
+                    return "lockRequest";
+                case lockResponse:
+                    return "lockResponse";
+                case unlockRequest:
+                    return "unlockRequest";
+                case peerAliveInfo:
+                    return "peerAliveInfo";
+
                 case testConnection:
                     return "testConnection";
                 case connect:
@@ -27,8 +40,6 @@ namespace ec2
 
                 case getResourceTypes:
                     return "getResourceTypes";
-                case getResource:
-                    return "getResource";
                 case setResourceStatus:
                     return "setResourceStatus";
                 //case setResourceDisabled:
@@ -45,6 +56,7 @@ namespace ec2
                     return "setPanicMode";
                 case getFullInfo:
                     return "getFullInfo";
+
                 case saveCamera:
                     return "saveCamera";
                 case saveCameras:
@@ -102,8 +114,8 @@ namespace ec2
                     return "removeVideowall";
                 case videowallControl:
                     return "videowallControl";
-                case updateVideowallInstanceStatus:
-                    return "updateVideowallInstanceStatus";
+                case videowallInstanceStatus:
+                    return "videowallInstanceStatus";
 
                 case listDirectory:
                     return "listDirectory";
@@ -126,24 +138,10 @@ namespace ec2
                 case getCurrentTime:
                     return "getCurrentTime";
 
-                case tranSyncRequest:
-                    return "tranSyncRequest";
-                case tranSyncResponse:
-                    return "tranSyncResponse";
-                case peerAliveInfo:
-                    return "peerAliveInfo";
-
                 case getSettings:
                     return "getSettings";
                 case saveSettings:
                     return "saveSettings";
-
-                case lockRequest:
-                    return "lockRequest";
-                case lockResponse:
-                    return "lockResponse";
-                case unlockRequest:
-                    return "unlockRequest";
 
                 case uploadUpdate:
                     return "uploadUpdate";
@@ -161,6 +159,9 @@ namespace ec2
 
                 case getHelp:
                     return "getHelp";
+
+                case runtimeInfoChanged:
+                    return "runtimeInfoChanged";
 
                 default:
                     return "unknown " + QString::number((int)val);
@@ -190,17 +191,17 @@ namespace ec2
             timestamp = QnTransactionLog::instance()->getTimeStamp();
             id.dbID = QnDbManager::instance()->getID();
         }
-        localTransaction = false;
+        isLocal = false;
     }
 
     void QnAbstractTransaction::setStartSequence(int value)
     {
-        m_sequence = value;
+        qn_abstractTransaction_sequence = value;
     }
 
     void QnAbstractTransaction::fillSequence()
     {
-        id.sequence = m_sequence.fetchAndAddAcquire(1);
+        id.sequence = qn_abstractTransaction_sequence.fetchAndAddAcquire(1);
         if (!timestamp)
             timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getTimeStamp() : 0;
     }

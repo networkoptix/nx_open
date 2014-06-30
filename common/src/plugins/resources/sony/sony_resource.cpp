@@ -207,7 +207,7 @@ void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient 
 
     if( (m_inputMonitorHttpClient->response()->statusLine.statusCode / 100) * 100 != StatusCode::ok )
     {
-        cl_log.log( lit("Sony camera %1. Failed to subscribe to input monitoring. %3").
+        NX_LOG( lit("Sony camera %1. Failed to subscribe to input monitoring. %3").
             arg(getUrl()).arg(QLatin1String(m_inputMonitorHttpClient->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
         m_inputMonitorHttpClient.reset();
         return;

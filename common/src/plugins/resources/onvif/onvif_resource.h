@@ -100,6 +100,7 @@ public:
     static const QString MANUFACTURE;
     static QString MEDIA_URL_PARAM_NAME;
     static QString ONVIF_URL_PARAM_NAME;
+    static QString ONVIF_ID_PARAM_NAME;
     static QString MAX_FPS_PARAM_NAME;
     static QString AUDIO_SUPPORTED_PARAM_NAME;
     static QString FORCED_AUDIO_SUPPORTED_PARAM_NAME;
@@ -188,10 +189,13 @@ public:
     QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
 
+    QString getDeviceOnvifID() const;
+    void setDeviceOnvifID(const QString& src);
+
     CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl);

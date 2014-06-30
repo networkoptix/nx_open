@@ -28,7 +28,7 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
     m_foundSmth(false)
 {
     netStateTime.restart();
-    connect(this, SIGNAL(cameraDisconnected(QnResourcePtr, qint64)), qnBusinessRuleConnector, SLOT(at_cameraDisconnected(const QnResourcePtr&, qint64)));
+    connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected, qnBusinessRuleConnector, &QnBusinessEventConnector::at_cameraDisconnected);
 }
 
 QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
@@ -36,7 +36,7 @@ QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
     stop();
 }
 
-QnResourcePtr QnMServerResourceDiscoveryManager::createResource(QnId resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnMServerResourceDiscoveryManager::createResource(const QnId &resourceTypeId, const QnResourceParams &params)
 {
     QnResourcePtr res = QnResourceDiscoveryManager::createResource( resourceTypeId, params );
     if( res )
@@ -52,16 +52,16 @@ static void printInLogNetResources(const QnResourceList& resources)
 {
     foreach(QnResourcePtr res, resources)
     {
-        QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
+        const QnNetworkResource* netRes = dynamic_cast<const QnNetworkResource*>(res.data());
         if (!netRes)
             continue;
 
-        cl_log.log(netRes->getHostAddress() + QLatin1String(" "), netRes->getName(), cl_logINFO);
+        NX_LOG( lit("%1 %2").arg(netRes->getHostAddress()).arg(netRes->getName()), cl_logINFO);
     }
 
 }
 
-bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(QnResourcePtr camera)
+bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnResourcePtr& camera)
 {
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     if (!mServer || mServer->getStatus() == QnResource::Online)
@@ -163,7 +163,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             foreach(QnNetworkResourcePtr camRes, itr.value()) 
             {
                 conflicts << camRes->getPhysicalId();
-                QnVirtualCameraResourcePtr cam = camRes.dynamicCast<QnVirtualCameraResource>();
+                QnVirtualCameraResource* cam = dynamic_cast<QnVirtualCameraResource*>(camRes.data());
                 if (cam)
                     cam->issueOccured();
             }
@@ -177,7 +177,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
     m_foundSmth = !resources.isEmpty();
     if (m_foundSmth)
-        cl_log.log("Discovery----: after excluding existing resources we've got ", resources.size(), " new resources:", cl_logINFO);
+        NX_LOG( lit("Discovery----: after excluding existing resources we've got %1 new resources:").arg(resources.size()), cl_logINFO);
 
     printInLogNetResources(resources);
 
@@ -204,7 +204,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
     if (resources.size())
     {
-        cl_log.log("Discovery---- Final result: ", cl_logINFO);
+        NX_LOG("Discovery---- Final result: ", cl_logINFO);
         printInLogNetResources(resources);
     }
     return true;
@@ -212,11 +212,11 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
 void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& discoveredResources)
 {
-    QnResourceList resources = qnResPool->getResources();
+    const QnResourceList& resources = qnResPool->getResources();
 
     foreach(QnResourcePtr res, resources)
     {
-        QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
+        QnNetworkResource* netRes = dynamic_cast<QnNetworkResource*>(res.data());
         if (!netRes)
             continue;
 
@@ -241,7 +241,7 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
 
             if (m_resourceDiscoveryCounter[uniqId] >= 5)
             {
-                QnVirtualCameraResourcePtr camRes = netRes.dynamicCast<QnVirtualCameraResource>();
+                QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
                 if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)  || (camRes && !camRes->isScheduleDisabled())) {
                     if (res->getStatus() == QnResource::Offline && !m_disconnectSended[uniqId]) {
                         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
@@ -263,15 +263,15 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
     }
 }
 
-void QnMServerResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res, QSet<QString>& discoveredResources)
+void QnMServerResourceDiscoveryManager::updateResourceStatus(const QnResourcePtr& res, QSet<QString>& discoveredResources)
 {
     // seems like resource is in the pool and has OK ip
-    QnNetworkResourcePtr rpNetRes = res.dynamicCast<QnNetworkResource>();
+    QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());
 
     if (rpNetRes)
     {
-        disconnect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
-        connect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
+        disconnect(rpNetRes, &QnResource::initAsyncFinished, this, &QnMServerResourceDiscoveryManager::onInitAsyncFinished);
+        connect(rpNetRes, &QnResource::initAsyncFinished, this, &QnMServerResourceDiscoveryManager::onInitAsyncFinished);
 
         if (!rpNetRes->hasFlags(QnResource::foreigner))
         {
@@ -290,13 +290,12 @@ void QnMServerResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res, 
 
 }
 
-void QnMServerResourceDiscoveryManager::pingResources(QnResourcePtr res)
+void QnMServerResourceDiscoveryManager::pingResources(const QnResourcePtr& res)
 {
     if (m_runNumber%50 != 0)
         return;
 
-    QnNetworkResourcePtr rpNetRes = res.dynamicCast<QnNetworkResource>();
-
+    QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());
     if (rpNetRes)
     {
         if (!QnLiveStreamProvider::hasRunningLiveProvider(rpNetRes))

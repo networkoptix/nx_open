@@ -24,9 +24,9 @@ public:
 
     virtual QnResourceList findResources();
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
 
-    virtual QString manufacture() const;
+    virtual QString manufacture() const override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 private:

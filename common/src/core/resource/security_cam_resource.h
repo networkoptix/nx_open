@@ -8,6 +8,7 @@
 #include "motion_window.h"
 #include "core/misc/schedule_task.h"
 #include "network_resource.h"
+#include "common/common_globals.h"
 
 class QnAbstractArchiveDelegate;
 
@@ -15,7 +16,7 @@ class QnDataProviderFactory {
 public:
     virtual ~QnDataProviderFactory() {}
 
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role) = 0;
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, QnResource::ConnectionRole role) = 0;
 };
 
 
@@ -24,13 +25,6 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
     Q_OBJECT
 
 public:
-    // TODO: #API This one probably does not deserve to be a flag.
-    // Do we intend to add more status flags?
-    enum StatusFlag {
-        HasIssuesFlag = 0x1
-    };
-    Q_DECLARE_FLAGS(StatusFlags, StatusFlag)
-
     Qn::MotionTypes supportedMotionType() const;
     bool isAudioSupported() const;
     Qn::MotionType getCameraBasedMotionType() const;
@@ -155,11 +149,11 @@ public:
     int desiredSecondStreamFps() const;
     Qn::StreamQuality getSecondaryStreamQuality() const;
 
-    StatusFlags statusFlags() const;
-    bool hasStatusFlags(StatusFlags value) const;
-    void setStatusFlags(StatusFlags value);
-    void addStatusFlags(StatusFlags value);
-    void removeStatusFlags(StatusFlags value);
+    Qn::CameraStatusFlags statusFlags() const;
+    bool hasStatusFlags(Qn::CameraStatusFlag value) const;
+    void setStatusFlags(Qn::CameraStatusFlags value);
+    void addStatusFlags(Qn::CameraStatusFlag value);
+    void removeStatusFlags(Qn::CameraStatusFlag value);
 
     bool needCheckIpConflicts() const;
 
@@ -201,7 +195,7 @@ signals:
         \param timestamp MSecs since epoch, UTC
     */
     void cameraInput(
-        QnResourcePtr resource,
+        const QnResourcePtr& resource,
         const QString& inputPortID,
         bool value,
         qint64 timestamp );
@@ -246,7 +240,7 @@ private:
     QString m_groupId;
     Qn::SecondStreamQuality  m_secondaryQuality;
     bool m_cameraControlDisabled;
-    StatusFlags m_statusFlags;
+    Qn::CameraStatusFlags m_statusFlags;
     bool m_scheduleDisabled;
     bool m_audioEnabled;
     bool m_advancedWorking;

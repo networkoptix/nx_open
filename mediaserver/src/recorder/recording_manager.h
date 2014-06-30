@@ -40,13 +40,13 @@ public:
 
     void start();
     void stop();
-    bool isCameraRecoring(QnResourcePtr camera);
+    bool isCameraRecoring(const QnResourcePtr& camera);
 
-    Recorders findRecorders(QnResourcePtr res) const;
+    Recorders findRecorders(const QnResourcePtr& res) const;
 
-    bool startForcedRecording(QnSecurityCamResourcePtr camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
+    bool startForcedRecording(const QnSecurityCamResourcePtr& camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
 
-    bool stopForcedRecording(QnSecurityCamResourcePtr camRes, bool afterThresholdCheck = true);
+    bool stopForcedRecording(const QnSecurityCamResourcePtr& camRes, bool afterThresholdCheck = true);
 signals:
     void recordingDisabled(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 private slots:
@@ -59,16 +59,16 @@ private slots:
     void at_camera_initAsyncFinished(const QnResourcePtr &resource, bool state);
     void at_checkLicenses();
 private:
-    void updateCamera(QnSecurityCamResourcePtr camera);
+    void updateCamera(const QnSecurityCamResourcePtr& camera);
 
     QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, QnVideoCamera* camera, QnServer::ChunksCatalog catalog);
-    bool startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
-    bool isResourceDisabled(QnResourcePtr res) const;
+    bool startOrStopRecording(const QnResourcePtr& res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
+    bool isResourceDisabled(const QnResourcePtr& res) const;
     QnResourceList getLocalControlledCameras();
 
     void beforeDeleteRecorder(const Recorders& recorders);
     void deleteRecorder(const Recorders& recorders, const QnResourcePtr& resource);
-    bool updateCameraHistory(QnResourcePtr res);
+    bool updateCameraHistory(const QnResourcePtr& res);
 
     void at_licenseMutexLocked();
     void at_licenseMutexTimeout();
@@ -87,7 +87,7 @@ class QnServerDataProviderFactory: public QnDataProviderFactory
 {
 public:
     static QnServerDataProviderFactory* instance();
-    QnAbstractStreamDataProvider* createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role);
+    virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, QnResource::ConnectionRole role) override;
 };
 
 #define qnRecordingManager QnRecordingManager::instance()

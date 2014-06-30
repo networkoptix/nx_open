@@ -34,7 +34,7 @@ struct ACS_VideoHeader
 
 #pragma pack(pop)
 
-PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
+PlDlinkStreamReader::PlDlinkStreamReader(const QnResourcePtr& res):
 CLServerPushStreamReader(res),
 m_rtpReader(res),
 mHttpClient(0),

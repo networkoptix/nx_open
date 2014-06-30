@@ -7,7 +7,7 @@
 #include "../resource/camera_resource.h"
 
 
-CLServerPushStreamReader::CLServerPushStreamReader(QnResourcePtr dev ):
+CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
     QnLiveStreamProvider(dev),
     m_needReopen(false),
     m_cameraAudioEnabled(false),
@@ -15,7 +15,7 @@ CLServerPushStreamReader::CLServerPushStreamReader(QnResourcePtr dev ):
     m_openStreamCounter(0),
     m_FrameCnt(0)
 {
-    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(getResource().data());
+    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(dev.data());
     if (camera) 
         m_cameraAudioEnabled = camera->isAudioEnabled();
 }
@@ -93,7 +93,7 @@ void CLServerPushStreamReader::run()
             closeStream();
         }
 
-        QnAbstractMediaDataPtr data = getNextData();
+        const QnAbstractMediaDataPtr& data = getNextData();
 
 
         if (data==0)

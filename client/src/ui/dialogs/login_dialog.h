@@ -99,13 +99,18 @@ private:
     QnModuleFinder *m_moduleFinder;
 
     struct QnEcData {
+        QnId id;
         QUrl url;
         QString version;
         QString systemName;
+
+        bool operator==(const QnEcData& other) const  {
+            return id == other.id && url == other.url && version == other.version && systemName == other.systemName;
+        }
     };
 
     /** Hash list of automatically found Enterprise Controllers based on seed as key. */
-    QMultiHash<QString, QnEcData> m_foundEcs;
+    QMap<QString, QnEcData> m_foundEcs;
     std::unique_ptr<CompatibilityVersionInstallationDialog> m_installationDialog;
 
     bool m_restartPending;

@@ -44,7 +44,7 @@ void QnNetworkProxyFactory::addToProxyList(
 
 void QnNetworkProxyFactory::bindHostToResource(
     const QString& targetHost,
-    QnResourcePtr resource )
+    const QnResourcePtr& resource )
 {
     QMutexLocker lk( &m_mutex );
     m_proxyInfo[targetHost] = getProxyToResource( resource );
@@ -80,7 +80,7 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
 }
 
 bool QnNetworkProxyFactory::fillUrlWithRouteToResource(
-    QnResourcePtr targetResource,
+    const QnResourcePtr& targetResource,
     QUrl* const requestUrl,
     WhereToPlaceProxyCredentials credentialsBehavour )
 {
@@ -127,7 +127,7 @@ QnNetworkProxyFactory* QnNetworkProxyFactory::instance()
     return QnNetworkProxyFactory_instance;
 }
 
-QNetworkProxy QnNetworkProxyFactory::getProxyToResource( QnResourcePtr resource )
+QNetworkProxy QnNetworkProxyFactory::getProxyToResource( const QnResourcePtr& resource )
 {
     QNetworkProxy proxy( QNetworkProxy::HttpProxy );
     if( dynamic_cast<QnSecurityCamResource*>(resource.data()) )

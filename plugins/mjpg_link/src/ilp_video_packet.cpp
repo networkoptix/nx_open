@@ -35,7 +35,6 @@ ILPVideoPacket::~ILPVideoPacket()
 {
     if( m_buffer )
     {
-        //nxpt::freeAligned( m_buffer );
         using namespace std::placeholders;
         nxpt::freeAligned( m_buffer, std::bind( &NxBufferCache::release, m_mediaBufferCache, _1 ) );
         m_buffer = NULL;
@@ -146,7 +145,6 @@ void ILPVideoPacket::resizeBuffer( size_t bufSize )
     {
         if( newBuffer )
             memcpy( newBuffer, m_buffer, std::min<>(m_bufSize, bufSize) );
-        //nxpt::freeAligned( m_buffer );
         nxpt::freeAligned( m_buffer, std::bind( &NxBufferCache::release, m_mediaBufferCache, _1 ) );
         m_buffer = NULL;
         m_bufSize = 0;

@@ -115,7 +115,7 @@ bool QnEventsDB::removeLogForRes(QnId resId)
     return delQuery.exec();
 }
 
-bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePtr actionRes)
+bool QnEventsDB::saveActionToDB(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& actionRes)
 {
     QWriteLocker lock(&m_mutex);
 

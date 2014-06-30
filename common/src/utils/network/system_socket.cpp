@@ -603,7 +603,7 @@ namespace
         {
             int result = func();
             //const int errCode = errno;
-            if( result == -1 && errno == EINTR )
+            if( result == -1 && (errno == EINTR || errno == EAGAIN) )
             {
                 if( timeout == 0 ||  //no timeout
                     !waitStartTimeActual )  //cannot check timeout expiration

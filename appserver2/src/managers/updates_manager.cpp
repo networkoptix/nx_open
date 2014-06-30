@@ -30,7 +30,7 @@ namespace ec2 {
 
     void QnUpdatesNotificationManager::triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction) {
         assert(transaction.command == ApiCommand::installUpdate);
-        m_requestedUpdateIds.insert(transaction.id, transaction.params);
+        m_requestedUpdateIds.insert(transaction.id, transaction.params.updateId);
     }
 
     void QnUpdatesNotificationManager::at_transactionProcessed(const QnAbstractTransaction &transaction) {

@@ -29,7 +29,9 @@
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_help_data.h"
+#include <nx_ec/data/api_time_data.h>
 #include "nx_ec/data/api_conversion_functions.h"
+#include "api/runtime_info_manager.h"
 
 using std::nullptr_t;
 
@@ -44,6 +46,8 @@ template <class T>
 void assertSorted(std::vector<T> &data) {
 #ifdef _DEBUG
     assertSorted(data, &T::id);
+#else
+    Q_UNUSED(data);
 #endif // DEBUG
 }
 
@@ -59,6 +63,9 @@ void assertSorted(std::vector<T> &data, QnId Field::*idField) {
         assert(next >= prev);
         prev = next;
     }
+#else
+    Q_UNUSED(data);
+    Q_UNUSED(idField);
 #endif // DEBUG
 }
 
@@ -311,6 +318,10 @@ bool QnDbManager::init()
         m_licenseOverflowTime = query.value(0).toByteArray().toLongLong();
         m_licenseOverflowMarked = m_licenseOverflowTime > 0;
     }
+    ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
+    data.prematureLicenseExperationDate = m_licenseOverflowTime;
+    QnRuntimeInfoManager::instance()->update(data);
+
     query.addBindValue(DB_INSTANCE_KEY);
     if (query.exec() && query.next()) {
         m_dbInstanceId = QUuid::fromRfc4122(query.value(0).toByteArray());
@@ -870,9 +881,9 @@ ErrorCode QnDbManager::insertOrReplaceUser(const ApiUserData& data, qint32 inter
 ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_camera (audio_enabled, control_disabled, vendor, manually_added, resource_ptr_id, region, schedule_disabled, motion_type, group_name, group_id,\
+    insQuery.prepare("INSERT OR REPLACE INTO vms_camera (audio_enabled, control_enabled, vendor, manually_added, resource_ptr_id, region, schedule_enabled, motion_type, group_name, group_id,\
                      mac, model, secondary_quality, status_flags, physical_id, password, login, dewarping_params, resource_ptr_id) VALUES\
-                     (:audioEnabled, :controlDisabled, :vendor, :manuallyAdded, :id, :motionMask, :scheduleDisabled, :motionType, :groupName, :groupId,\
+                     (:audioEnabled, :controlEnabled, :vendor, :manuallyAdded, :id, :motionMask, :scheduleEnabled, :motionType, :groupName, :groupId,\
                      :mac, :model, :secondaryStreamQuality, :statusFlags, :physicalId, :password, :login, :dewarpingParams, :internalId)");
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
@@ -1479,7 +1490,7 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteTableRecord(id, "vms_layoutitem", "resource_id");
+    err = deleteTableRecord(guid, "vms_layoutitem", "resource_id");
     if (err != ErrorCode::ok)
         return err;
 
@@ -1564,26 +1575,17 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredF
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<QString>& tran)
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFilePath>& tran)
 {
-    switch (tran.command) {
-    case ApiCommand::removeStoredFile: {
-        QSqlQuery query(m_sdb);
-        query.prepare("DELETE FROM vms_storedFiles WHERE path = :path");
-        query.bindValue(":path", tran.params);
-        if (!query.exec()) {
-            qWarning() << Q_FUNC_INFO << query.lastError().text();
-            return ErrorCode::dbError;
-        }
-        break;
+    assert(tran.command == ApiCommand::removeStoredFile);
+  
+    QSqlQuery query(m_sdb);
+    query.prepare("DELETE FROM vms_storedFiles WHERE path = :path");
+    query.bindValue(":path", tran.params.path);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
     }
-    case ApiCommand::installUpdate:
-        break;
-    default:
-        Q_ASSERT_X(0, "Unsupported transaction", Q_FUNC_INFO);
-        return ErrorCode::notImplemented;
-    }
-
     return ErrorCode::ok;
 }
 
@@ -1861,8 +1863,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& mServerId, ApiCameraDataList& c
 	}
     queryCameras.setForwardOnly(true);
 	queryCameras.prepare(QString("SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, r.status, \
-		c.audio_enabled as audioEnabled, c.control_disabled as controlDisabled, c.vendor, c.manually_added as manuallyAdded, \
-		c.region as motionMask, c.schedule_disabled as scheduleDisabled, c.motion_type as motionType, \
+		c.audio_enabled as audioEnabled, c.control_enabled as controlEnabled, c.vendor, c.manually_added as manuallyAdded, \
+		c.region as motionMask, c.schedule_enabled as scheduleEnabled, c.motion_type as motionType, \
 		c.group_name as groupName, c.group_id as groupId, c.mac, c. model, c.secondary_quality as secondaryStreamQuality, \
 		c.status_flags as statusFlags, c.physical_id as physicalId, c.password, login, c.dewarping_params as dewarpingParams \
 		FROM vms_resource r \
@@ -2174,9 +2176,9 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& resourceId, ApiResourceParamsDa
 }
 
 // getCurrentTime
-ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, qint64& currentTime)
+ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime)
 {
-    currentTime = QDateTime::currentMSecsSinceEpoch();
+    currentTime.value = QDateTime::currentMSecsSinceEpoch();
     return ErrorCode::ok;
 }
 
@@ -2229,9 +2231,6 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     mergeObjectListData<ApiUserData>(data.users,            kvPairs, &ApiUserData::addParams,        &ApiResourceParamWithRefData::resourceId);
     mergeObjectListData<ApiLayoutData>(data.layouts,        kvPairs, &ApiLayoutData::addParams,      &ApiResourceParamWithRefData::resourceId);
     mergeObjectListData<ApiVideowallData>(data.videowalls,  kvPairs, &ApiVideowallData::addParams,   &ApiResourceParamWithRefData::resourceId);
-
-    //filling serverinfo
-    fillServerInfo( &data.serverInfo );
 
     return err;
 }
@@ -2382,8 +2381,8 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& _path, ApiStoredDi
 {
     QSqlQuery query(m_sdb);
     QString path;
-    if (!_path.isEmpty())
-        path = closeDirPath(_path);
+    if (!_path.path.isEmpty())
+        path = closeDirPath(_path.path);
     
     QString pathFilter(lit("path"));
     if (!path.isEmpty())
@@ -2410,23 +2409,16 @@ ErrorCode QnDbManager::doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFil
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare("SELECT data FROM vms_storedFiles WHERE path = :path");
-    query.bindValue(":path", path);
+    query.bindValue(":path", path.path);
     if (!query.exec())
     {
         qWarning() << Q_FUNC_INFO << __LINE__ << query.lastError();
         return ErrorCode::dbError;
     }
-    data.path = path;
+    data.path = path.path;
     if (query.next())
         data.data = query.value(0).toByteArray();
     return ErrorCode::ok;
-}
-
-void QnDbManager::fillServerInfo( ApiServerInfoData* const serverInfo )
-{
-    serverInfo->platform = QLatin1String(QN_ARM_BOX);
-    m_licenseManagerImpl->getHardwareId( serverInfo );
-    serverInfo->prematureLicenseExperationDate = licenseOverflowTime();
 }
 
 ErrorCode QnDbManager::saveVideowall(const ApiVideowallData& params) {
@@ -2687,12 +2679,15 @@ bool QnDbManager::markLicenseOverflow(bool value, qint64 time)
     query.prepare("INSERT OR REPLACE into misc_data (key, data) values(?, ?) ");
     query.addBindValue(LICENSE_EXPIRED_TIME_KEY);
     query.addBindValue(QByteArray::number(m_licenseOverflowTime));
-    return query.exec();
-}
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return false;
+    }
 
-qint64 QnDbManager::licenseOverflowTime() const
-{
-    return m_licenseOverflowTime;
+    ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
+    data.prematureLicenseExperationDate = m_licenseOverflowTime;
+    QnRuntimeInfoManager::instance()->update(data);
+    return true;
 }
 
 QUuid QnDbManager::getID() const

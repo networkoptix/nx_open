@@ -8,7 +8,7 @@
 class QnRtpStreamReader: public CLServerPushStreamReader
 {
 public:
-    QnRtpStreamReader(QnResourcePtr res, const QString& request = QString());
+    QnRtpStreamReader(const QnResourcePtr& res, const QString& request = QString());
     virtual ~QnRtpStreamReader();
 
     void setRequest(const QString& request);

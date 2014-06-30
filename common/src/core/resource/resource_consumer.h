@@ -6,7 +6,7 @@
 class QN_EXPORT QnResourceConsumer
 {
 public:
-    explicit QnResourceConsumer(QnResourcePtr resource);
+    explicit QnResourceConsumer(const QnResourcePtr& resource);
     virtual ~QnResourceConsumer();
 
     const QnResourcePtr &getResource() const;

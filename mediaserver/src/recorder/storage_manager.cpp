@@ -25,6 +25,7 @@
 #include <media_server/serverutil.h>
 #include "file_deletor.h"
 #include "utils/common/synctime.h"
+#include "common/common_module.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -166,7 +167,13 @@ bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, 
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     if (!sdb)
         sdb = m_chunksDB[storage->getUrl()] = QnStorageDbPtr(new QnStorageDb(storage->getIndex()));
-    QString fileName = closeDirPath(storage->getUrl()) + QString::fromLatin1("media.sqlite");
+    QString simplifiedGUID = qnCommon->moduleGUID().toString();
+    simplifiedGUID = simplifiedGUID.replace("{", "");
+    simplifiedGUID = simplifiedGUID.replace("}", "");
+    QString fileName = closeDirPath(storage->getUrl()) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
+    QString oldFileName = closeDirPath(storage->getUrl()) + QString::fromLatin1("media.sqlite");
+    if (QFile::exists(oldFileName) && !QFile::exists(fileName))
+        QFile::rename(oldFileName, fileName);
 
     if (!sdb->open(fileName))
     {
@@ -242,7 +249,7 @@ void QnStorageManager::cancelRebuildCatalogAsync()
 {
     if (m_rebuildState != RebuildState_None) 
     {
-        cl_log.log("Catalog rebuild operation is canceled", cl_logINFO);
+        NX_LOG("Catalog rebuild operation is canceled", cl_logINFO);
         m_rebuildCancelled = true;
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_None);
         setRebuildState(RebuildState_None);
@@ -342,7 +349,7 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
     QMutexLocker lock(&m_mutexStorages);
     m_storagesStatisticsReady = false;
     
-    cl_log.log(QString("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently available: %3MiB").arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+    NX_LOG(QString("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently available: %3MiB").arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
 
     removeStorage(storage); // remove existing storage record if exists
     //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists

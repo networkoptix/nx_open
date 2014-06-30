@@ -18,7 +18,7 @@ QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent) :
 {
 }
 
-void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
+void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
     if (m_connection) {
         m_connection->disconnect(this);
@@ -32,7 +32,7 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection.get(), &ec2::AbstractECConnection::initNotification,
         this, &QnCommonMessageProcessor::on_gotInitialNotification );
     connect( connection.get(), &ec2::AbstractECConnection::runtimeInfoChanged,
-        this, &QnCommonMessageProcessor::on_runtimeInfoChanged );
+        this, &QnCommonMessageProcessor::runtimeInfoChanged );
 
     connect( connection->getResourceManager().get(), &ec2::AbstractResourceManager::statusChanged,
         this, &QnCommonMessageProcessor::on_resourceStatusChanged );
@@ -108,18 +108,18 @@ void QnCommonMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::at_remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::at_remotePeerLost );
 
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::remotePeerFound );
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::remotePeerLost );
+
     connection->startReceivingNotifications();
 }
 
 void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool /*isProxy*/)
 {
-    if (data.peerType == static_cast<int>(ec2::QnPeerInfo::Server))   //TODO: #Elric #ec2 get rid of the serialization hell
-        qnLicensePool->addRemoteHardwareIds(data.peerId, data.hardwareIds);
 }
 
-void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool /*isProxy*/)
+void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData runtimeInfo, bool /*isProxy*/)
 {
-    qnLicensePool->removeRemoteHardwareIds(data.peerId);
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
@@ -131,12 +131,6 @@ void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResour
     onGotInitialNotification(fullData);
 }
 
-void QnCommonMessageProcessor::on_runtimeInfoChanged( const ec2::ApiServerInfoData& runtimeInfo )
-{
-    QnAppServerConnectionFactory::setPublicIp(runtimeInfo.publicIp);
-    QnAppServerConnectionFactory::setSessionKey(runtimeInfo.sessionKey);
-    QnAppServerConnectionFactory::setPrematureLicenseExperationDate(runtimeInfo.prematureLicenseExperationDate);
-}
 
 void QnCommonMessageProcessor::on_resourceStatusChanged( const QnId& resourceId, QnResource::Status status )
 {
@@ -248,12 +242,6 @@ void QnCommonMessageProcessor::afterRemovingResource(const QnId& id) {
     }
 }
 
-void QnCommonMessageProcessor::updateHardwareIds(const ec2::QnFullResourceData& fullData)
-{
-    qnLicensePool->setMainHardwareIds(fullData.serverInfo.mainHardwareIds);
-    qnLicensePool->setCompatibleHardwareIds(fullData.serverInfo.compatibleHardwareIds);
-    qnLicensePool->setRemoteHardwareIds( fullData.serverInfo.remoteHardwareIds);
-}
 
 void QnCommonMessageProcessor::processResources(const QnResourceList& resources)
 {
@@ -277,12 +265,11 @@ void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryLis
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
-    QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
+    //QnAppServerConnectionFactory::setBox(fullData.serverInfo.platform);
 
-    updateHardwareIds(fullData);
     processResources(fullData.resources);
     processLicenses(fullData.licenses);
     processCameraServerItems(fullData.cameraHistory);
-    on_runtimeInfoChanged(fullData.serverInfo);
+    //on_runtimeInfoChanged(fullData.serverInfo);
     qnSyncTime->reset();
 }

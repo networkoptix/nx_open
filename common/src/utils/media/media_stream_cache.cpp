@@ -4,9 +4,15 @@
 
 #include "media_stream_cache.h"
 
+#include <cstdlib>
 #include <algorithm>
 
 #include <QMutexLocker>
+
+//#define DEBUG_OUTPUT
+#ifdef DEBUG_OUTPUT
+#include <malloc.h>
+#endif
 
 
 using namespace std;
@@ -73,7 +79,7 @@ quint64 MediaStreamCache::SequentialReadContext::currentPos() const
 MediaStreamCache::MediaStreamCache( unsigned int cacheSizeMillis )
 :
     m_cacheSizeMillis( cacheSizeMillis ),
-    m_mutex( QMutex::Recursive ),
+    m_mutex( QMutex::Recursive ),   //TODO #ak get rid of Recursive mutex
     m_prevPacketSrcTimestamp( -1 ),
     m_currentPacketTimestamp( 0 ),
     m_cacheSizeInBytes( 0 ),
@@ -139,6 +145,23 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 
     if( !isKeyFrame )
         return; //no sense to perform this operation more than once per GOP
+
+#ifdef DEBUG_OUTPUT
+    std::cout<<"Media cache size "<<(m_packetsByTimestamp.empty() ? 0 : (m_packetsByTimestamp.back().timestamp - m_packetsByTimestamp.front().timestamp)) / 1000000<<" sec"
+        ", "<<m_cacheSizeInBytes<<" bytes"<<
+        ", m_packetsByTimestamp.size() = "<<m_packetsByTimestamp.size()<<
+        //", QnAbstractMediaData count "<<QnAbstractMediaData_instanceCount.load()<<
+        //", QnByteArray_bytesAllocated "<<QnByteArray_bytesAllocated.load()<<
+        std::endl;
+
+    static int malloc_statsCounter = 0;
+    ++malloc_statsCounter;
+    if( malloc_statsCounter == 10 )
+    {
+        malloc_stats();
+        malloc_statsCounter = 0;
+    }
+#endif
 
     for( auto eventReceiver: m_eventReceivers )
         eventReceiver.second( m_currentPacketTimestamp );

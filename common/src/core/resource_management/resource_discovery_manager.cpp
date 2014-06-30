@@ -124,7 +124,7 @@ void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* proce
     m_resourceProcessor = processor;
 }
 
-QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnResourceDiscoveryManager::createResource(const QnId &resourceTypeId, const QnResourceParams& params)
 {
     QnResourcePtr result;
 
@@ -392,7 +392,7 @@ bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoM
 }
 
 
-void QnResourceDiscoveryManager::onInitAsyncFinished(QnResourcePtr res, bool initialized)
+void QnResourceDiscoveryManager::onInitAsyncFinished(const QnResourcePtr& res, bool initialized)
 {
     QnNetworkResource* rpNetRes = dynamic_cast<QnNetworkResource*>(res.data());
     if (initialized && rpNetRes)

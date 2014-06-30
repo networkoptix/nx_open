@@ -36,7 +36,8 @@
 #include "api_resource_type_data.h"
 #include "api_user_data.h"
 #include "api_videowall_data.h"
-
+#include "api_peer_data.h"
+#include "api_runtime_data.h"
 
 namespace ec2 {
 
@@ -152,7 +153,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
             dst->addFlags(QnResource::desktop_camera);
     }
 
-    dst->setScheduleDisabled(src.scheduleDisabled);
+    dst->setScheduleDisabled(!src.scheduleEnabled);
     dst->setMotionType(src.motionType);
 
     QList<QnMotionRegion> regions;
@@ -180,8 +181,8 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setGroupId(src.groupId);
     dst->setGroupName(src.groupName);
     dst->setSecondaryStreamQuality(src.secondaryStreamQuality);
-    dst->setCameraControlDisabled(src.controlDisabled);
-    dst->setStatusFlags(static_cast<QnSecurityCamResource::StatusFlags>(src.statusFlags));
+    dst->setCameraControlDisabled(!src.controlEnabled);
+    dst->setStatusFlags(src.statusFlags);
 
     dst->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams));
     dst->setVendor(src.vendor);
@@ -191,7 +192,7 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
 void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst) {
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
-    dst.scheduleDisabled = src->isScheduleDisabled();
+    dst.scheduleEnabled = !src->isScheduleDisabled();
     dst.motionType = src->getMotionType();
 
     QList<QnMotionRegion> regions;
@@ -213,7 +214,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.groupId = src->getGroupId();
     dst.groupName = src->getGroupName();
     dst.secondaryStreamQuality = src->secondaryStreamQuality();
-    dst.controlDisabled = src->isCameraControlDisabled();
+    dst.controlEnabled = !src->isCameraControlDisabled();
     dst.statusFlags = src->statusFlags();
     dst.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(src->getDewarpingParams());
     dst.vendor = src->getVendor();
@@ -326,8 +327,6 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.licenses, dst.licenses);
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
     fromApiToResourceList(src.cameraHistory, dst.cameraHistory);
-
-    dst.serverInfo = src.serverInfo;
 }
 
 
@@ -514,7 +513,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setApiUrl(src.apiUrl);
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
-    dst->setPanicMode(static_cast<Qn::PanicMode>(src.panicMode));
+    dst->setPanicMode(src.panicMode);
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setSystemInfo(QnSystemInformation(src.systemInfo));
     dst->setMaxCameras(src.maxCameras);

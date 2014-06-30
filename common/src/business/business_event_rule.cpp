@@ -175,8 +175,9 @@ bool QnBusinessEventRule::isScheduleMatchTime(const QDateTime& datetime) const
     return rez;
 }
 
-QnBusinessEventRule::QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType,
-                                         QnResourcePtr actionRes)
+QnBusinessEventRule::QnBusinessEventRule(
+    int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, 
+    QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, const QnResourcePtr& actionRes)
 {
     m_disabled = false;
     m_eventState = QnBusiness::UndefinedState;

@@ -50,6 +50,8 @@ extern "C"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
+#include "device_plugins/server_camera/server_camera_factory.h"
+
 
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
@@ -95,8 +97,9 @@ extern "C"
 #endif
 
 #include "ui/help/help_handler.h"
-#include "client/client_module.h"
+#include <client/client_module.h>
 #include <client/client_connection_data.h>
+#include <client/client_resource_processor.h>
 #include "platform/platform_abstraction.h"
 #include "utils/common/long_runnable.h"
 
@@ -113,6 +116,7 @@ extern "C"
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
 #endif
+#include "api/runtime_info_manager.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -467,6 +471,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
+    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
+
     //clientMessageProcessor->init(QnAppServerConnectionFactory::getConnection2());
 
     qnSettings->save();
@@ -501,10 +507,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
 
-    QnLocalFileProcessor localFileProcessor;
+    QnClientResourceProcessor resourceProcessor;
     QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
-    localFileProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(&localFileProcessor);
+    resourceProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(&resourceProcessor);
 
     //============================
     //QnResourceDirectoryBrowser

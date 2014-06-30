@@ -17,7 +17,7 @@ class QnThumbnailsStreamReader : public QnAbstractMediaStreamDataProvider
     Q_OBJECT;
 
 public:
-    QnThumbnailsStreamReader(QnResourcePtr dev);
+    QnThumbnailsStreamReader(const QnResourcePtr& dev);
     virtual ~QnThumbnailsStreamReader();
 
     /*

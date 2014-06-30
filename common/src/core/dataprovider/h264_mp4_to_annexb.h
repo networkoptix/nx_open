@@ -32,9 +32,9 @@ private:
     QnMediaContextPtr m_newContext;
 
     void readH264SeqHeaderFromExtraData(
-        const QnAbstractMediaDataPtr data,
+        const QnAbstractMediaDataPtr& data,
         std::basic_string<quint8>* const seqHeader );
-    bool isH264SeqHeaderInExtraData( const QnAbstractMediaDataPtr data ) const;
+    bool isH264SeqHeaderInExtraData( const QnAbstractMediaDataPtr& data ) const;
 };
 
 #endif  //H264_MP4_TO_ANNEXB_H

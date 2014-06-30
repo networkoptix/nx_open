@@ -9,7 +9,7 @@
 #include <utils/network/socket.h>
 #include <common/common_globals.h>
 
-typedef QUuid QnId;
+typedef QUuid QnId; // TODO: #Elric remove this typedef. It's useless and it prevents forward declarations.
 
 
 inline QnId intToGuid(qint32 value, const QByteArray& postfix)

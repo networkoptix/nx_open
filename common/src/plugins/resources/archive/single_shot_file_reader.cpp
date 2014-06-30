@@ -7,7 +7,7 @@
 #include "core/resource/storage_resource.h"
 
 
-QnSingleShotFileStreamreader::QnSingleShotFileStreamreader(QnResourcePtr resource):
+QnSingleShotFileStreamreader::QnSingleShotFileStreamreader(const QnResourcePtr& resource):
     QnAbstractMediaStreamDataProvider(resource)
 {
 }
@@ -64,7 +64,7 @@ void QnSingleShotFileStreamreader::run()
         putData(std::move(data));
 }
 
-void QnSingleShotFileStreamreader::setStorage(QnStorageResourcePtr storage)
+void QnSingleShotFileStreamreader::setStorage(const QnStorageResourcePtr& storage)
 {
     m_storage = storage;
 }

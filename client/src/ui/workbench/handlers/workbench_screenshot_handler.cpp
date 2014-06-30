@@ -362,6 +362,11 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         painter->setCompositionMode(QPainter::CompositionMode_Source);
         painter->drawImage(QPointF(0, 0), resizedToAr, QnGeometry::cwiseMul(parameters.zoomRect, resizedToAr.size()));
     }
+    
+    int panoFactor = (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) ? parameters.itemDewarpingParams.panoFactor : 1;
+    if (panoFactor > 1)
+        resized = resized.scaled(resized.width() * panoFactor, resized.height());
+    
 
     QScopedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(resized));
     if (parameters.imageCorrectionParams.enabled) {

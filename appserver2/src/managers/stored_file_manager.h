@@ -26,10 +26,10 @@ namespace ec2
                 assert( false );
         }
 
-        void triggerNotification( const QnTransaction<QString>& tran )
+        void triggerNotification( const QnTransaction<ApiStoredFilePath>& tran )
         {
             assert( tran.command == ApiCommand::removeStoredFile );
-            emit removed( tran.params );
+            emit removed( tran.params.path );
         }
 
     private:

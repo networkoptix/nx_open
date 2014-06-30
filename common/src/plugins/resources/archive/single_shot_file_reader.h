@@ -10,9 +10,9 @@
 class QnSingleShotFileStreamreader : public QnAbstractMediaStreamDataProvider
 {
 public:
-    QnSingleShotFileStreamreader(QnResourcePtr resource);
+    QnSingleShotFileStreamreader(const QnResourcePtr& resource);
     ~QnSingleShotFileStreamreader(){stop();}
-    void setStorage(QnStorageResourcePtr storage);
+    void setStorage(const QnStorageResourcePtr& storage);
 
     //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection() override;

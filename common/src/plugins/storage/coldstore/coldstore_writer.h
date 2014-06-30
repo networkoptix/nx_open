@@ -9,7 +9,7 @@ struct QnCSFile;
 class QnColdStoreWriter : public QnResourceConsumer, public QnLongRunnable
 {
 public:
-    QnColdStoreWriter(QnResourcePtr res);
+    QnColdStoreWriter(const QnResourcePtr& res);
     virtual ~QnColdStoreWriter();
 
     virtual void beforeDisconnectFromResource() override;

@@ -10,6 +10,7 @@
 #include <utils/common/system_information.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_factory.h>
 #include <core/resource/abstract_storage_resource.h>
 
 
