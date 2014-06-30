@@ -3,7 +3,8 @@
 <apidoc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="api.xsd">
     <groups>
         <group>
-            <groupName>api</groupName>
+            <groupName>Media server API</groupName>
+            <urlPrefix>/api</urlPrefix>
             <groupDescription>This group contains functions related to single media
                 server</groupDescription>
             <functions>
@@ -654,7 +655,8 @@
             </functions>
         </group>
         <group>
-            <groupName>ec2</groupName>
+            <groupName>General API</groupName>
+            <urlPrefix>/ec2</urlPrefix>
             <groupDescription>This group contains functions related to whole system (all media
                 servers).</groupDescription>
             <functions>
@@ -1270,7 +1272,8 @@
             </functions>
         </group>
         <group>
-            <groupName>rtsp</groupName>
+            <groupName>RTSP API</groupName>
+            <urlPrefix></urlPrefix>
             <groupDescription>
 							This group contains information about media server RTSP api.
 							RTSP api is accessible on a same port as HTTP requests. To request video for camera use:
