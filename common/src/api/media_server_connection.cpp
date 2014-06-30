@@ -13,56 +13,67 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
+#include <core/resource/camera_bookmark.h>
+
+#include <core/ptz/ptz_preset.h>
+#include <core/ptz/ptz_tour.h>
+#include <core/ptz/ptz_data.h>
 
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
-#include <utils/common/json.h>
-#include <utils/common/enum_name_mapper.h>
+#include <utils/common/model_functions.h>
 
 #include <api/serializer/serializer.h>
-#include <api/serializer/pb_serializer.h>
 #include <event_log/events_serializer.h>
 
+#include <recording/time_period_list.h>
+
+#include "network_proxy_factory.h"
 #include "session_manager.h"
+#include "media_server_reply_processor.h"
 
 namespace {
-    QN_DEFINE_NAME_MAPPED_ENUM(RequestObject,
-        ((StorageStatusObject,      "storageStatus"))
-        ((StorageSpaceObject,       "storageSpace"))
-        ((TimePeriodsObject,        "RecordedTimePeriods"))
-        ((StatisticsObject,         "statistics"))
-        ((PtzContinuousMoveObject,  "ptz"))
-        ((PtzContinuousFocusObject, "ptz"))
-        ((PtzAbsoluteMoveObject,    "ptz"))
-        ((PtzViewportMoveObject,    "ptz"))
-        ((PtzGetPositionObject,     "ptz"))
-        ((PtzCreatePresetObject,    "ptz"))
-        ((PtzUpdatePresetObject,    "ptz"))
-        ((PtzRemovePresetObject,    "ptz"))
-        ((PtzActivatePresetObject,  "ptz"))
-        ((PtzGetPresetsObject,      "ptz"))
-        ((PtzCreateTourObject,      "ptz"))
-        ((PtzRemoveTourObject,      "ptz"))
-        ((PtzActivateTourObject,    "ptz"))
-        ((PtzGetToursObject,        "ptz"))
-        ((PtzGetHomeObjectObject,   "ptz"))
-        ((PtzGetActiveObjectObject, "ptz"))
-        ((PtzUpdateHomeObjectObject, "ptz"))
-        ((PtzGetAuxilaryTraitsObject, "ptz"))
-        ((PtzRunAuxilaryCommandObject, "ptz"))
-        ((PtzGetDataObject,         "ptz"))
-        ((GetParamsObject,          "getCameraParam"))
-        ((SetParamsObject,          "setCameraParam"))
-        ((TimeObject,               "gettime"))
-        ((CameraSearchStartObject,  "manualCamera/search"))
-        ((CameraSearchStatusObject, "manualCamera/status"))
-        ((CameraSearchStopObject,   "manualCamera/stop"))
-        ((CameraAddObject,          "manualCamera/add"))
-        ((EventLogObject,           "events"))
-        ((ImageObject,              "image"))
-        ((CameraDiagnosticsObject,  "doCameraDiagnosticsStep"))
-        ((RebuildArchiveObject,     "rebuildArchive"))
+    QN_DEFINE_LEXICAL_ENUM(RequestObject,
+        (StorageStatusObject,      "storageStatus")
+        (StorageSpaceObject,       "storageSpace")
+        (TimePeriodsObject,        "RecordedTimePeriods")
+        (StatisticsObject,         "statistics")
+        (PtzContinuousMoveObject,  "ptz")
+        (PtzContinuousFocusObject, "ptz")
+        (PtzAbsoluteMoveObject,    "ptz")
+        (PtzViewportMoveObject,    "ptz")
+        (PtzGetPositionObject,     "ptz")
+        (PtzCreatePresetObject,    "ptz")
+        (PtzUpdatePresetObject,    "ptz")
+        (PtzRemovePresetObject,    "ptz")
+        (PtzActivatePresetObject,  "ptz")
+        (PtzGetPresetsObject,      "ptz")
+        (PtzCreateTourObject,      "ptz")
+        (PtzRemoveTourObject,      "ptz")
+        (PtzActivateTourObject,    "ptz")
+        (PtzGetToursObject,        "ptz")
+        (PtzGetHomeObjectObject,   "ptz")
+        (PtzGetActiveObjectObject, "ptz")
+        (PtzUpdateHomeObjectObject, "ptz")
+        (PtzGetDataObject,         "ptz")
+        (PtzGetAuxilaryTraitsObject, "ptz")
+        (PtzRunAuxilaryCommandObject, "ptz")
+        (GetParamsObject,          "getCameraParam")
+        (SetParamsObject,          "setCameraParam")
+        (TimeObject,               "gettime")
+        (CameraSearchStartObject,  "manualCamera/search")
+        (CameraSearchStatusObject, "manualCamera/status")
+        (CameraSearchStopObject,   "manualCamera/stop")
+        (CameraAddObject,          "manualCamera/add")
+        (EventLogObject,           "events")
+        (ImageObject,              "image")
+        (CameraDiagnosticsObject,  "doCameraDiagnosticsStep")
+        (RebuildArchiveObject,     "rebuildArchive")
+        (BookmarkAddObject,        "cameraBookmarks/add")
+        (BookmarkUpdateObject,     "cameraBookmarks/update")
+        (BookmarkDeleteObject,     "cameraBookmarks/delete")
+        (BookmarksGetObject,       "cameraBookmarks/get")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -86,114 +97,6 @@ namespace {
 
 
 // -------------------------------------------------------------------------- //
-// QnNetworkProxyFactory
-// -------------------------------------------------------------------------- //
-/**
- * Note that instance of this class will be used from several threads, and
- * must therefore be thread-safe.
- */
-class QnNetworkProxyFactory: public QObject, public QNetworkProxyFactory {
-public:
-    QnNetworkProxyFactory()
-    {
-    }
-
-    virtual ~QnNetworkProxyFactory()
-    {
-    }
-
-    void removeFromProxyList(const QUrl& url)
-    {
-        QMutexLocker locker(&m_mutex);
-
-        m_proxyInfo.remove(url);
-    }
-
-    void addToProxyList(const QUrl& url, const QString& addr, int port)
-    {
-        QMutexLocker locker(&m_mutex);
-
-        m_proxyInfo.insert(url, ProxyInfo(addr, port));
-    }
-
-    void clearProxyList()
-    {
-        QMutexLocker locker(&m_mutex);
-
-        m_proxyInfo.clear();
-    }
-
-    static QnNetworkProxyFactory* instance();
-
-protected:
-    virtual QList<QNetworkProxy> queryProxy(const QNetworkProxyQuery &query = QNetworkProxyQuery()) override
-    {
-        QList<QNetworkProxy> rez;
-
-        QString urlPath = query.url().path();
-        if (urlPath.startsWith(QLatin1String("/")))
-            urlPath.remove(0, 1);
-
-        if (urlPath.endsWith(QLatin1String("/")))
-            urlPath.chop(1);
-
-        if (urlPath.isEmpty() || urlPath == QLatin1String("api/ping")) {
-            rez << QNetworkProxy(QNetworkProxy::NoProxy);
-            return rez;
-        }
-        QString host = query.peerHostName();
-        QUrl url = query.url();
-        url.setPath(QString());
-        url.setUserInfo(QString());
-        url.setQuery(QUrlQuery());
-
-        QMutexLocker locker(&m_mutex);
-        QMap<QUrl, ProxyInfo>::const_iterator itr = m_proxyInfo.find(url);
-        if (itr == m_proxyInfo.end())
-            rez << QNetworkProxy(QNetworkProxy::NoProxy);
-        else
-            rez << QNetworkProxy(QNetworkProxy::HttpProxy, itr.value().addr, itr.value().port);
-        return rez;
-    }
-
-private:
-    struct ProxyInfo {
-        ProxyInfo(): port(0) {}
-        ProxyInfo(const QString& _addr, int _port): addr(_addr), port(_port) {}
-        QString addr;
-        int port;
-    };
-    QMutex m_mutex;
-    QMap<QUrl, ProxyInfo> m_proxyInfo;
-};
-
-Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
-
-QPointer<QnNetworkProxyFactory> createGlobalProxyFactory() {
-    QnNetworkProxyFactory *result(new QnNetworkProxyFactory());
-
-    /* Qt will take ownership of the supplied instance. */
-    QNetworkProxyFactory::setApplicationProxyFactory(result); // TODO: #Elric we have a race if this code is run several times from different threads.
-
-    return result;
-}
-
-Q_GLOBAL_STATIC_WITH_ARGS(QPointer<QnNetworkProxyFactory>, qn_globalProxyFactory, (createGlobalProxyFactory()));
-
-QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
-{
-    QPointer<QnNetworkProxyFactory> *result = qn_globalProxyFactory();
-    if(*result) {
-        return result->data();
-    } else {
-        return qn_reserveProxyFactory();
-    }
-}
-
-
-
-
-// -------------------------------------------------------------------------- //
 // QnMediaServerReplyProcessor
 // -------------------------------------------------------------------------- //
 void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle) {
@@ -210,7 +113,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         QnTimePeriodList reply;
         if(status == 0) {
             if (response.data.startsWith("BIN")) {
-                reply.decode((const quint8*) response.data.constData() + 3, response.data.size() - 3);
+                reply.decode((const quint8*) response.data.constData() + 3, response.data.size() - 3, false);
+            } else if (response.data.startsWith("BII")) {
+                reply.decode((const quint8*) response.data.constData() + 3, response.data.size() - 3, true);
             } else {
                 qWarning() << "QnMediaServerConnection: unexpected message received.";
                 status = -1;
@@ -392,6 +297,14 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
         emitFinished(this, response.status, info, handle);
         break;
     }
+    case BookmarkAddObject: 
+    case BookmarkUpdateObject: 
+    case BookmarkDeleteObject:
+        processJsonReply<QnCameraBookmark>(this, response, handle);
+        break;
+    case BookmarksGetObject:
+        processJsonReply<QnCameraBookmarkList>(this, response, handle);
+        break;
     default:
         assert(false); /* We should never get here. */
         break;
@@ -404,15 +317,17 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // -------------------------------------------------------------------------- //
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
-QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QUuid &videowallGuid, QObject *parent):
     base_type(parent),
     m_proxyPort(0)
 {
     setUrl(mserver->getApiUrl());
-    setNameMapper(new QnEnumNameMapper(QnEnumNameMapper::create<RequestObject>())); // TODO: #Elric no new
+    setSerializer(QnLexical::newEnumSerializer<RequestObject, int>());
 
     QnRequestHeaderList extraHeaders;
-    extraHeaders << QnRequestHeader(lit("x-server-guid"), mserver->getGuid());
+    extraHeaders.insert(lit("x-server-guid"), mserver->getId().toString());
+    if (!videowallGuid.isNull())
+        extraHeaders.insert(lit("X-NetworkOptix-VideoWall"), videowallGuid.toString());
     setExtraHeaders(extraHeaders);
 }
 
@@ -429,27 +344,10 @@ void QnMediaServerConnection::setProxyAddr(const QUrl &apiUrl, const QString &ad
     m_proxyPort = port;
 
     if (port) {
-        QnNetworkProxyFactory::instance()->addToProxyList(apiUrl, addr, port);
+        QnNetworkProxyFactory::instance()->addToProxyList(apiUrl.host(), addr, port);
     } else {
-        QnNetworkProxyFactory::instance()->removeFromProxyList(apiUrl);
+        QnNetworkProxyFactory::instance()->removeFromProxyList(apiUrl.host());
     }
-}
-
-QnRequestParamList QnMediaServerConnection::createTimePeriodsRequest(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion>& motionRegions) {
-    QnRequestParamList result;
-
-    foreach(QnNetworkResourcePtr netResource, list)
-        result << QnRequestParam("physicalId", netResource->getPhysicalId());
-    result << QnRequestParam("startTime", QString::number(startTimeUSec));
-    result << QnRequestParam("endTime", QString::number(endTimeUSec));
-    result << QnRequestParam("detail", QString::number(detail));
-    result << QnRequestParam("format", "bin");
-
-    QString regionStr = serializeRegionList(motionRegions);
-    if (!regionStr.isEmpty())
-        result << QnRequestParam("motionRegions", regionStr);
-
-    return result;
 }
 
 int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camera, qint64 timeUsec, const
@@ -473,8 +371,32 @@ int QnMediaServerConnection::getThumbnailAsync(const QnNetworkResourcePtr &camer
     return sendAsyncGetRequest(ImageObject, params, QN_STRINGIZE_TYPE(QImage), target, slot);
 }
 
-int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot) {
-    return sendAsyncGetRequest(TimePeriodsObject, createTimePeriodsRequest(list, startTimeMs, endTimeMs, detail, motionRegions), QN_STRINGIZE_TYPE(QnTimePeriodList), target, slot);
+int QnMediaServerConnection::getTimePeriodsAsync(const QnNetworkResourceList &list, 
+                                                 qint64 startTimeMs,
+                                                 qint64 endTimeMs, 
+                                                 qint64 detail,
+                                                 Qn::TimePeriodContent periodsType,
+                                                 const QString &filter,
+                                                 QObject *target,
+                                                 const char *slot) 
+{
+    QnRequestParamList params;
+
+    foreach(QnNetworkResourcePtr netResource, list)
+        params << QnRequestParam("physicalId", netResource->getPhysicalId());
+    params << QnRequestParam("startTime", QString::number(startTimeMs));
+    params << QnRequestParam("endTime", QString::number(endTimeMs));
+    params << QnRequestParam("detail", QString::number(detail));
+#ifdef QN_ENABLE_BOOKMARKS
+    if (periodsType == Qn::BookmarksContent)
+        params << QnRequestParam("format", "bii");
+    else
+#endif
+        params << QnRequestParam("format", "bin");
+    params << QnRequestParam("periodsType", QString::number(static_cast<int>(periodsType)));
+    params << QnRequestParam("filter", filter);
+
+    return sendAsyncGetRequest(TimePeriodsObject, params, QN_STRINGIZE_TYPE(QnTimePeriodList), target, slot);
 }
 
 QnRequestParamList QnMediaServerConnection::createGetParamsRequest(const QnNetworkResourcePtr &camera, const QStringList &params) {
@@ -784,8 +706,8 @@ int QnMediaServerConnection::getStatisticsAsync(QObject *target, const char *slo
 int QnMediaServerConnection::getEventLogAsync(
                   qint64 dateFrom, qint64 dateTo,
                   QnResourceList camList,
-                  BusinessEventType::Value eventType,
-                  BusinessActionType::Value actionType,
+                  QnBusiness::EventType eventType,
+                  QnBusiness::ActionType actionType,
                   QnId businessRuleId,
                   QObject *target, const char *slot)
 {
@@ -798,13 +720,57 @@ int QnMediaServerConnection::getEventLogAsync(
         if (camera)
             params << QnRequestParam( "res_id", camera->getPhysicalId() );
     }
-    if (businessRuleId.isValid())
-        params << QnRequestParam( "brule_id", businessRuleId.toInt() );
-    if (eventType != BusinessEventType::NotDefined)
+    if (!businessRuleId.isNull())
+        params << QnRequestParam( "brule_id", businessRuleId );
+    if (eventType != QnBusiness::UndefinedEvent)
         params << QnRequestParam( "event", (int) eventType);
-    if (actionType != BusinessActionType::NotDefined)
+    if (actionType != QnBusiness::UndefinedAction)
         params << QnRequestParam( "action", (int) actionType);
 
     return sendAsyncGetRequest(EventLogObject, params, QN_STRINGIZE_TYPE(QnBusinessActionDataListPtr), target, slot);
+}
+
+int QnMediaServerConnection::addBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot) {
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
+
+    QnRequestParamList params;
+    params << QnRequestParam("id",      QnLexical::serialized(camera->getPhysicalId()));
+
+    return sendAsyncPostRequest(BookmarkAddObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
+}
+
+int QnMediaServerConnection::updateBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot) {
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
+
+    QnRequestParamList params;
+    params << QnRequestParam("id",      QnLexical::serialized(camera->getPhysicalId()));
+
+    return sendAsyncPostRequest(BookmarkUpdateObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
+}
+
+int QnMediaServerConnection::deleteBookmarkAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmark &bookmark, QObject *target, const char *slot) {
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
+
+    QnRequestParamList params;
+    params << QnRequestParam("id",      QnLexical::serialized(camera->getPhysicalId()));
+
+    return sendAsyncPostRequest(BookmarkDeleteObject, headers, params, QJson::serialized(bookmark), QN_STRINGIZE_TYPE(QnCameraBookmark), target, slot);
+}
+
+int QnMediaServerConnection::getBookmarksAsync(const QnNetworkResourcePtr &camera, const QnCameraBookmarkSearchFilter &filter, QObject *target, const char *slot) {
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
+
+    QnRequestParamList params;
+    params << QnRequestParam("id",               QnLexical::serialized(camera->getPhysicalId()));
+    params << QnRequestParam("minStartTimeMs",   QnLexical::serialized(filter.minStartTimeMs));
+    params << QnRequestParam("maxStartTimeMs",   QnLexical::serialized(filter.maxStartTimeMs));
+    params << QnRequestParam("minDurationMs",    QnLexical::serialized(filter.minDurationMs));
+    params << QnRequestParam("text",             QnLexical::serialized(filter.text));
+    
+    return sendAsyncGetRequest(BookmarksGetObject, headers, params, QN_STRINGIZE_TYPE(QnCameraBookmarkList), target, slot);
 }
 

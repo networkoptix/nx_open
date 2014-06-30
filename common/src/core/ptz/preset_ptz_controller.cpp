@@ -20,7 +20,7 @@ struct QnPtzPresetData {
     QVector3D position;
     Qn::PtzCoordinateSpace space;
 };
-QN_DEFINE_STRUCT_FUNCTIONS(QnPtzPresetData, (json)(eq), (position)(space))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzPresetData, (json)(eq), (position)(space))
 
 struct QnPtzPresetRecord {
     QnPtzPresetRecord() {}
@@ -29,7 +29,7 @@ struct QnPtzPresetRecord {
     QnPtzPreset preset;
     QnPtzPresetData data;
 };
-QN_DEFINE_STRUCT_FUNCTIONS(QnPtzPresetRecord, (json)(eq), (preset)(data))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnPtzPresetRecord, (json)(eq), (preset)(data))
 
 Q_DECLARE_METATYPE(QnPtzPresetRecordHash)
 

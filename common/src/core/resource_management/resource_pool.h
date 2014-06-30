@@ -5,10 +5,12 @@
 #include <QtCore/QHash>
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
+#include <QtCore/QUuid>
+#include <QtNetwork/QHostAddress>
 
-#include "core/resource/resource.h"
-#include "core/resource_management/resource_criterion.h"
-#include "core/resource/network_resource.h"
+#include <core/resource/resource_fwd.h>
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_criterion.h>
 
 class QnResource;
 class QnNetworkResource;
@@ -48,8 +50,10 @@ public:
     // keeps database ID ( if possible )
     void addResources(const QnResourceList &resources);
 
-    inline void addResource(const QnResourcePtr &resource)
-    { addResources(QnResourceList() << resource); }
+    void addResource(const QnResourcePtr &resource);
+
+    void beginTran();
+    void commit();
 
     void removeResources(const QnResourceList &resources);
     inline void removeResource(const QnResourcePtr &resource)
@@ -57,11 +61,10 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(QnId id, Filter searchFilter = OnlyFriends) const;
-    QnResourcePtr getResourceByGuid(QString guid) const;
+    QnResourcePtr getResourceById(const QnId &id) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
-    void updateUniqId(QnResourcePtr res, const QString &newUniqId);
+    void updateUniqId(const QnResourcePtr& res, const QString &newUniqId);
 
     bool hasSuchResource(const QString &uniqid) const;
 
@@ -69,15 +72,16 @@ public:
 
     QnNetworkResourcePtr getNetResourceByPhysicalId(const QString &physicalId) const;
     QnNetworkResourcePtr getResourceByMacAddress(const QString &mac) const;
+    QnResourcePtr getResourceByParam(const QString &key, const QString &value) const;
 
     QnResourceList getAllResourceByTypeName(const QString &typeName) const;
 
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
-    QnNetworkResourcePtr getEnabledResourceByPhysicalId(const QString &mac) const;
-    QnResourceList getAllEnabledCameras(QnResourcePtr mServer = QnResourcePtr()) const;
-    QnResourcePtr getEnabledResourceByUniqueId(const QString &uniqueId) const;
+    QnResourceList getAllCameras(const QnResourcePtr &mServer) const;
+    QnMediaServerResourceList getAllServers() const;
+    QnResourceList getResourcesByParentId(const QnId& parentId) const;
 
     // returns list of resources with such flag
     QnResourceList getResourcesWithFlag(QnResource::Flag flag) const;
@@ -86,6 +90,37 @@ public:
     QnResourceList getResourcesWithTypeId(QnId id) const;
 
     QnUserResourcePtr getAdministrator() const;
+
+    /**
+     * @brief getVideoWallItemByUuid            Find videowall item by uuid.
+     * @param uuid                              Unique id of the item.
+     * @return                                  Index containing the videowall and item's uuid.
+     */
+    QnVideoWallItemIndex getVideoWallItemByUuid(const QUuid &uuid) const;
+
+    /**
+     * @brief getVideoWallItemsByUuid           Find list of videowall items by their uuids.
+     * @param uuids                             Unique ids of the items.
+     * @return                                  List of indices containing the videowall and items' uuid.
+     */
+    QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QUuid> &uuids) const;
+
+    
+    /**
+     * @brief getVideoWallMatrixByUuid          Find videowall matrix by uuid.
+     * @param uuid                              Unique id of the matrix.
+     * @return                                  Index containing the videowall and matrix's uuid.
+     */
+    QnVideoWallMatrixIndex getVideoWallMatrixByUuid(const QUuid &uuid) const;
+
+    /**
+     * @brief getVideoWallMatricesByUuid        Find list of videowall matrices by their uuids.
+     * @param uuids                             Unique ids of the matrices.
+     * @return                                  List of indices containing the videowall and matrices' uuid.
+     */
+    QnVideoWallMatrixIndexList getVideoWallMatricesByUuid(const QList<QUuid> &uuids) const;
+
+
 
     QStringList allTags() const;
 
@@ -98,10 +133,6 @@ public:
     int activeAnalog() const {
         return activeCamerasByClass(true);
     }
-
-    // TODO #GDM: this is a hack. Fix.
-    bool isLayoutsUpdated() const;
-    void setLayoutsUpdated(bool updateLayouts);
 
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();
@@ -116,13 +147,9 @@ signals:
 
 private:
     mutable QMutex m_resourcesMtx;
-    bool m_updateLayouts;
+    bool m_tranInProgress;
+    QnResourceList m_tmpResources;
     QHash<QString, QnResourcePtr> m_resources;
-    //!Resources with flag \a QnResource::foreign set
-    /*!
-        Using separate dictionary to minimize existing code modification
-    */
-    QHash<QString, QnResourcePtr> m_foreignResources;
 
     /*!
         \return true, if \a resource has been inserted. false - if updated existing resource

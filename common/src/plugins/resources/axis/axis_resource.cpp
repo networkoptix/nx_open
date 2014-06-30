@@ -16,7 +16,7 @@
 
 using namespace std;
 
-const char* QnPlAxisResource::MANUFACTURE = "Axis";
+const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
 static const float MAX_AR_EPS = 0.04f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 static const quint16 DEFAULT_AXIS_API_PORT = 80;
@@ -40,7 +40,7 @@ bool QnPlAxisResource::isResourceAccessible()
 
 QString QnPlAxisResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnPlAxisResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -53,11 +53,6 @@ QnAbstractStreamDataProvider* QnPlAxisResource::createLiveDataProvider()
     return new QnAxisStreamReader(toSharedPointer());
 }
 
-bool QnPlAxisResource::shoudResolveConflicts() const 
-{
-    return false;
-}
-
 void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 {
 
@@ -65,8 +60,7 @@ void QnPlAxisResource::setCroppingPhysical(QRect /*cropping*/)
 
 bool QnPlAxisResource::startInputPortMonitoring()
 {
-    if( isDisabled()
-        || hasFlags(QnResource::foreigner)      //we do not own camera
+    if( hasFlags(QnResource::foreigner)      //we do not own camera
         || m_inputPortNameToIndex.empty() )
     {
         return false;
@@ -262,7 +256,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
 
-    //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
+    //TODO #ak check firmware version. it must be >= 5.0.0 to support I/O ports
     {
         CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
         CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version"));
@@ -357,6 +351,21 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
     
     qSort(m_resolutionList.begin(), m_resolutionList.end(), resolutionGreatThan);
 
+    //detecting primary & secondary resolution
+    m_resolutions[PRIMARY_ENCODER_INDEX] = getMaxResolution();
+    m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(
+        QSize(480,316),
+        getResolutionAspectRatio(getMaxResolution()) );
+    if (m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty())
+        m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
+
+    //detecting and saving selected resolutions
+    CameraMediaStreams mediaStreams;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolutions[PRIMARY_ENCODER_INDEX].size, CODEC_ID_H264 ) );
+    if( !m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty() )
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolutions[SECONDARY_ENCODER_INDEX].size, CODEC_ID_H264 ) );
+    saveResolutionList( mediaStreams );
+
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
@@ -368,12 +377,7 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     // determin camera max resolution
 
-    // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
-    {
-        QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-        if (conn->saveSync(::toSharedPointer(this).staticCast<QnVirtualCameraResource>()) != 0)
-            qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
-    }
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -535,7 +539,7 @@ void QnPlAxisResource::setMotionMaskPhysical(int /*channel*/)
     }
 }
 
-QnConstResourceAudioLayoutPtr QnPlAxisResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnPlAxisResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     if (isAudioEnabled()) {
         const QnAxisStreamReader* axisReader = dynamic_cast<const QnAxisStreamReader*>(dataProvider);
@@ -631,7 +635,7 @@ bool QnPlAxisResource::setRelayOutputState(
     CLHttpStatus status = httpClient.doGET( cmd );
     if( status / 100 != 2 )
     {
-        cl_log.log( lit("Failed to set camera %1 port %2 output state to %3. Result: %4").
+        NX_LOG( lit("Failed to set camera %1 port %2 output state to %3. Result: %4").
             arg(getHostAddress()).arg(it->first).arg(activate).arg(::toString(status)), cl_logWARNING );
         return false;
     }
@@ -657,14 +661,14 @@ CLHttpStatus QnPlAxisResource::readAxisParameter(
         }
         else
         {
-            cl_log.log( lit("Failed to read param %1 of camera %2. Unexpected response: %3").
+            NX_LOG( lit("Failed to read param %1 of camera %2. Unexpected response: %3").
                 arg(paramName).arg(getHostAddress()).arg(QLatin1String(body)), cl_logWARNING );
             return CL_HTTP_BAD_REQUEST;
         }
     }
     else
     {
-        cl_log.log( lit("Failed to param %1 of camera %2. Result: %3").
+        NX_LOG( lit("Failed to param %1 of camera %2. Result: %3").
             arg(paramName).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
         return status;
     }
@@ -698,7 +702,7 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr ht
 
     if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
     {
-        cl_log.log( lit("Axis camera %1. Failed to subscribe to input %2 monitoring. %3").
+        NX_LOG( lit("Axis camera %1. Failed to subscribe to input %2 monitoring. %3").
             arg(getUrl()).arg(QLatin1String("")).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
         forgetHttpClient( httpClient );
         return;
@@ -777,18 +781,26 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
     unsigned int inputPortCount = 0;
     CLHttpStatus status = readAxisParameter( http, QLatin1String("Input.NbrOfInputs"), &inputPortCount );
     if( status != CL_HTTP_SUCCESS )
-        cl_log.log( lit("Failed to read number of input ports of camera %1. Result: %2").
+    {
+        NX_LOG( lit("Failed to read number of input ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+    }
     else if( inputPortCount > 0 )
+    {
         setCameraCapability(Qn::RelayInputCapability, true);
+    }
 
     unsigned int outputPortCount = 0;
     status = readAxisParameter( http, QLatin1String("Output.NbrOfOutputs"), &outputPortCount );
     if( status != CL_HTTP_SUCCESS )
-        cl_log.log( lit("Failed to read number of output ports of camera %1. Result: %2").
+    {
+        NX_LOG( lit("Failed to read number of output ports of camera %1. Result: %2").
             arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+    }
     else if( outputPortCount > 0 )
+    {
         setCameraCapability(Qn::RelayOutputCapability, true);
+    }
 
     //reading port direction and names
     for( unsigned int i = 0; i < inputPortCount+outputPortCount; ++i )
@@ -797,7 +809,7 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
         status = readAxisParameter( http, lit("IOPort.I%1.Direction").arg(i), &portDirection );
         if( status != CL_HTTP_SUCCESS )
         {
-            cl_log.log( lit("Failed to read name of port %1 of camera %2. Result: %3").
+            NX_LOG( lit("Failed to read name of port %1 of camera %2. Result: %3").
                 arg(i).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
             continue;
         }
@@ -806,7 +818,7 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
         status = readAxisParameter( http, lit("IOPort.I%1.%2.Name").arg(i).arg(portDirection), &portName );
         if( status != CL_HTTP_SUCCESS )
         {
-            cl_log.log( lit("Failed to read name of input port %1 of camera %2. Result: %3").
+            NX_LOG( lit("Failed to read name of input port %1 of camera %2. Result: %3").
                 arg(i).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
             continue;
         }
@@ -826,25 +838,25 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
     //1I:H, 1I:L, 1I:/, "1I:\"
     if( notification.isEmpty() )
         return;
-    cl_log.log( lit("Received notification %1 from %2").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logDEBUG1 );
+    NX_LOG( lit("Received notification %1 from %2").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logDEBUG1 );
 
     //notification
     size_t sepPos = nx_http::find_first_of( notification, ":" );
     if( sepPos == nx_http::BufferNpos || sepPos+1 >= notification.size() )
     {
-        cl_log.log( lit("Error parsing notification %1 from %2. Event type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
+        NX_LOG( lit("Error parsing notification %1 from %2. Event type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
         return;
     }
     const char eventType = notification[sepPos+1];
     size_t portTypePos = nx_http::find_first_not_of( notification, "0123456789" );
     if( portTypePos == nx_http::BufferNpos )
     {
-        cl_log.log( lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
+        NX_LOG( lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
         return;
     }
     const unsigned int portNumber = notification.mid( 0, portTypePos ).toUInt();
     const char portType = notification[portTypePos];
-    cl_log.log( lit("%1 port %2 changed its state to %3. Camera %4").
+    NX_LOG( lit("%1 port %2 changed its state to %3. Camera %4").
         arg(QLatin1String(portType == 'I' ? "Input" : "Output")).arg(portNumber).arg(QLatin1String(eventType == '/' ? "active" : "inactive")).arg(getUrl()), cl_logDEBUG1 );
 
     if( portType != 'I' )
@@ -884,6 +896,13 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClientPtr httpClient 
 
 QnAbstractPtzController *QnPlAxisResource::createPtzControllerInternal() {
     return new QnAxisPtzController(toSharedPointer(this));
+}
+
+QnPlAxisResource::AxisResolution QnPlAxisResource::getResolution( int encoderIndex ) const
+{
+    return (unsigned int)encoderIndex < sizeof(m_resolutions)/sizeof(*m_resolutions)
+        ? m_resolutions[encoderIndex]
+        : QnPlAxisResource::AxisResolution();
 }
 
 int QnPlAxisResource::getChannel() const

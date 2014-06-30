@@ -20,13 +20,7 @@ QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher()
 {
 }
 
-QnPlDlinkResourceSearcher& QnPlDlinkResourceSearcher::instance()
-{
-    static QnPlDlinkResourceSearcher inst;
-    return inst;
-}
-
-QnResourcePtr QnPlDlinkResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlDlinkResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -48,9 +42,9 @@ QnResourcePtr QnPlDlinkResourceSearcher::createResource(QnId resourceTypeId, con
     result = QnVirtualCameraResourcePtr( new QnPlDlinkResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create DLink camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
+    qDebug() << "Create DLink camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
 
-    result->deserialize(parameters);
+    //result->deserialize(parameters);
 
     return result;
 }
@@ -146,13 +140,13 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             QnPlDlinkResourcePtr resource ( new QnPlDlinkResource() );
 
             QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-            if (!rt.isValid())
+            if (rt.isNull())
                 continue;
 
             resource->setTypeId(rt);
             resource->setName(name);
             resource->setModel(name);
-            resource->setMAC(smac);
+            resource->setMAC(QnMacAddress(smac));
             resource->setHostAddress(sender, QnDomainMemory);
 
             resource->setDiscoveryAddr(iface.address);
@@ -168,7 +162,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
 QString QnPlDlinkResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlDlinkResource::MANUFACTURE);
+    return QnPlDlinkResource::MANUFACTURE;
 }
 
 
@@ -219,14 +213,14 @@ QList<QnResourcePtr> QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, c
 
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
         return QList<QnResourcePtr>();
 
     QnNetworkResourcePtr resource ( new QnPlDlinkResource() );
 
     resource->setTypeId(rt);
     resource->setName(name);
-    resource->setMAC(mac);
+    resource->setMAC(QnMacAddress(mac));
     (resource.dynamicCast<QnPlDlinkResource>())->setModel(name);
     resource->setHostAddress(host, QnDomainMemory);
     resource->setAuth(auth);

@@ -43,7 +43,7 @@ public:
     /**
      * \returns                         Resource associated with this widget.
      */
-    QnMediaResourcePtr resource() const;
+    const QnMediaResourcePtr &resource() const;
 
     /**
      * \returns                         Display associated with this widget.
@@ -83,6 +83,8 @@ public:
     void clearMotionSelection();
 
     bool isMotionSelectionEmpty() const;
+
+    void setMotionSelection(const QList<QRegion> &regions);
 
     /**
      * \returns                         Current motion selection regions.
@@ -141,7 +143,7 @@ protected:
     void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
 
     void ensureMotionSensitivity() const;
-    void invalidateMotionSensitivity();
+    Q_SLOT void invalidateMotionSensitivity();
 
     void ensureBinaryMotionMask() const;
     void invalidateBinaryMotionMask();
@@ -171,6 +173,8 @@ private slots:
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
+
+    void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
 private:
     void setDisplay(const QnResourceDisplayPtr &display);

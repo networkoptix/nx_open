@@ -470,8 +470,16 @@ QStringList CameraSettingsTreeLister::proceed()
 // class CameraSettingsWidgetsTreeCreator
 //
 
-CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString& cameraId,
-        const QString& id, QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler):
+CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(
+    const QString& cameraId,
+    const QString& id,
+    QTreeWidget& rootWidget,
+    QStackedLayout& rootLayout,
+#ifdef QT_WEBKITWIDGETS_LIB
+    QWebView* webView,
+#endif
+    QObject* handler)
+:
     CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>(id),
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
@@ -482,6 +490,9 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString
     m_settings(0),
     m_id(id),
     m_cameraId(cameraId)
+#ifdef QT_WEBKITWIDGETS_LIB
+    , m_webView(webView)
+#endif
 {
     
 }
@@ -491,6 +502,9 @@ CameraSettingsWidgetsTreeCreator::~CameraSettingsWidgetsTreeCreator()
     removeEmptyWidgetGroups();
     m_treeWidgetsById.clear();
     m_rootWidget.clear();
+#ifdef QT_WEBKITWIDGETS_LIB
+    m_webView = NULL;
+#endif
 }
 
 CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(const QString& id)
@@ -508,8 +522,8 @@ CameraSettings& CameraSettingsWidgetsTreeCreator::getAdditionalInfo()
 void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings* settings)
 {
     m_settings = settings;
-
-    CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
+    if ( !m_id.isNull() )
+        CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
 }
 
 QString CameraSettingsWidgetsTreeCreator::getId() const
@@ -531,6 +545,13 @@ QStackedLayout* CameraSettingsWidgetsTreeCreator::getRootLayout()
 {
     return &m_rootLayout;
 }
+
+#ifdef QT_WEBKITWIDGETS_LIB
+QWebView* CameraSettingsWidgetsTreeCreator::getWebView()
+{
+    return m_webView;
+}
+#endif
 
 void CameraSettingsWidgetsTreeCreator::removeEmptyWidgetGroups()
 {

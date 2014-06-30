@@ -17,9 +17,10 @@ V16 = Version(1, 6)
 V20 = Version(2, 0)
 V21 = Version(2, 1)
 V22 = Version(2, 2)
+V23 = Version(2, 3)
            
 COMPATIBILITY_INFO = (
-    (Range(V15, V22), (IOSCL,), Range(V15, V22)), # iOS 1.5-2.2 can connect to 1.5-2.2
+    (Range(V15, V23), (IOSCL,), Range(V15, V22)), # iOS 1.5-2.3 can connect to 1.5-2.2
 
     (V16, (ANDROID,), Range(V14, V20)), # android V1.6 can connect to 1.4, 1.5 and 2.0
     

@@ -50,7 +50,8 @@ extern "C"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
-#include "device_plugins/server_camera/appserver.h"
+#include "device_plugins/server_camera/server_camera_factory.h"
+
 
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
@@ -96,8 +97,9 @@ extern "C"
 #endif
 
 #include "ui/help/help_handler.h"
-#include "client/client_module.h"
+#include <client/client_module.h>
 #include <client/client_connection_data.h>
+#include <client/client_resource_processor.h>
 #include "platform/platform_abstraction.h"
 #include "utils/common/long_runnable.h"
 
@@ -107,10 +109,14 @@ extern "C"
 #include "ui/customization/customizer.h"
 #include "core/ptz/client_ptz_controller_pool.h"
 #include "ui/dialogs/message_box.h"
+#include <nx_ec/ec2_lib.h>
+#include <nx_ec/dummy_handler.h>
+#include <api/network_proxy_factory.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
 #endif
+#include "api/runtime_info_manager.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -238,25 +244,28 @@ void addTestData()
 }
 #endif
 
-void initAppServerConnection()
+void initAppServerConnection(const QUuid &videowallGuid, const QUuid &instanceGuid)
 {
     QUrl appServerUrl = qnSettings->lastUsedConnection().url;
 
     if(!appServerUrl.isValid())
         appServerUrl = qnSettings->defaultConnection().url;
 
-    // TODO: #Ivan. Enable it when removing all places on receiving messages.
-    // QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
+    QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
+    if (!videowallGuid.isNull()) {
+        QnAppServerConnectionFactory::setVideowallGuid(videowallGuid);
+        QnAppServerConnectionFactory::setInstanceGuid(instanceGuid);
+    }
 }
 
 /** Initialize log. */
-void initLog(const QString &logLevel) {
+void initLog(const QString &logLevel, const QString fileNameSuffix) {
     QnLog::initLog(logLevel);
     const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QString logFileLocation = dataLocation + QLatin1String("/log");
-    QString logFileName = logFileLocation + QLatin1String("/log_file");
+    QString logFileName = logFileLocation + QLatin1String("/log_file") + fileNameSuffix;
     if (!QDir().mkpath(logFileLocation))
         cl_log.log(lit("Could not create log folder: ") + logFileLocation, cl_logALWAYS);
     if (!cl_log.create(logFileName, 1024*1024*10, 5, cl_logDEBUG1))
@@ -317,6 +326,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     bool noVersionMismatchCheck = false;
     QString lightMode;
     bool noVSync = false;
+    QString sVideoWallGuid;
+    QString sVideoWallItemGuid;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -337,17 +348,38 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif
     commandLineParser.addParameter(&lightMode,              "--light-mode",                 NULL,   QString(), lit("full"));
     commandLineParser.addParameter(&noVSync,                "--no-vsync",                   NULL,   QString());
+    commandLineParser.addParameter(&sVideoWallGuid,         "--videowall",                  NULL,   QString());
+    commandLineParser.addParameter(&sVideoWallItemGuid,     "--videowall-instance",         NULL,   QString());
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 
-    initLog(logLevel);
+    ec2::DummyHandler dummyEc2RequestHandler;
 
     /* Dev mode. */
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
         qnSettings->setDevMode(true);
     }
 
-    // TODO: #Elric why QString???
+    QUuid videowallGuid(sVideoWallGuid);
+    QUuid instanceGuid(sVideoWallItemGuid);
+
+    QString logFileNameSuffix;
+    if (!videowallGuid.isNull()) {
+        qnSettings->setVideoWallMode(true);
+        noSingleApplication = true;
+        noFullScreen = true;
+        noVersionMismatchCheck = true;
+        qnSettings->setLightModeOverride(Qn::LightModeVideoWall);
+
+        logFileNameSuffix = instanceGuid.isNull() 
+            ? videowallGuid.toString() 
+            : instanceGuid.toString();
+        logFileNameSuffix.replace(QRegExp(lit("[{}]")), lit("_"));
+    }
+
+    initLog(logLevel, logFileNameSuffix);
+
+	// TODO: #Elric why QString???
     if (!lightMode.isEmpty()) {
         bool ok;
         int lightModeOverride = lightMode.toInt(&ok);
@@ -366,8 +398,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
-    if(authentication.isValid())
+    if(authentication.isValid()) {
+        if (!videowallGuid.isNull())
+            authentication.setUserName(videowallGuid.toString());
         qnSettings->setLastUsedConnection(QnConnectionData(QString(), authentication));
+    }
 
     qnSettings->setVSyncEnabled(!noVSync);
 
@@ -392,7 +427,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
     QScopedPointer<QnLongRunnablePool> runnablePool(new QnLongRunnablePool());
-    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     QScopedPointer<QnClientPtzControllerPool> clientPtzPool(new QnClientPtzControllerPool());
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
@@ -422,8 +456,25 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         }
     }
 
+    //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
+    QNetworkProxyFactory::setApplicationProxyFactory( new QnNetworkProxyFactory() );
+
     /* Initialize connections. */
-    initAppServerConnection();
+    initAppServerConnection(videowallGuid, instanceGuid);
+
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+    ec2::ResourceContext resCtx(
+        &QnServerCameraFactory::instance(),
+        qnResPool,
+        qnResTypePool );
+	ec2ConnectionFactory->setContext( resCtx );
+    QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
+
+    QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
+    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
+
+    //clientMessageProcessor->init(QnAppServerConnectionFactory::getConnection2());
+
     qnSettings->save();
     if (!QDir(qnSettings->mediaFolder()).exists())
         QDir().mkpath(qnSettings->mediaFolder());
@@ -445,19 +496,21 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 
-
     // Create and start SessionManager
     QnSessionManager::instance()->start();
 
     ffmpegInit();
 
+    qnCommon->setModuleGUID(QUuid::createUuid());
+
     //===========================================================================
 
     CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
 
-    QnLocalFileProcessor localFileProcessor;
+    QnClientResourceProcessor resourceProcessor;
     QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(&localFileProcessor);
+    resourceProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(&resourceProcessor);
 
     //============================
     //QnResourceDirectoryBrowser
@@ -499,11 +552,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->addDeviceServer(&QnPlPulseSearcher::instance());
 #endif
 
-#ifdef Q_OS_WIN
-    //    QnResourceDiscoveryManager::instance()->addDeviceServer(&DesktopDeviceServer::instance());
-#endif // Q_OS_WIN
-
-
     /* Load translation. */
     QnClientTranslationManager *translationManager = qnCommon->instance<QnClientTranslationManager>();
     QnTranslation translation;
@@ -535,7 +583,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     context->menu()->registerAlias(Qn::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
     /* Create main window. */
-    QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
+    Qt::WindowFlags flags = qnSettings->isVideoWallMode()
+            ? Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint
+            : static_cast<Qt::WindowFlags>(0);
+    QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data(), NULL, flags));
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
@@ -552,11 +603,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     mainWindow->show();
     if (!noFullScreen)
         context->action(Qn::EffectiveMaximizeAction)->trigger();
+    else
+        mainWindow->updateDecorationsState();
 
     if(noVersionMismatchCheck)
         context->action(Qn::VersionMismatchMessageAction)->setVisible(false); // TODO: #Elric need a better mechanism for this
 
-    /* Initialize desctop camera searcher. */
+    /* Initialize desktop camera searcher. */
 #ifdef Q_OS_WIN
     QnDesktopResourceSearcher desktopSearcher(dynamic_cast<QGLWidget *>(mainWindow->viewport()));
     QnDesktopResourceSearcher::initStaticInstance(&desktopSearcher);
@@ -587,35 +640,35 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Process pending events before executing actions. */
     qApp->processEvents();
 
-        // show beta version warning message for the main instance only
-        if (!noSingleApplication &&
-                !qnSettings->isDevMode() &&
-                QLatin1String(QN_BETA) == QLatin1String("true"))
-            context->action(Qn::BetaVersionMessageAction)->trigger();
+    // show beta version warning message for the main instance only
+    if (!noSingleApplication &&
+        !qnSettings->isDevMode() &&
+        QLatin1String(QN_BETA) == lit("true"))
+        context->action(Qn::BetaVersionMessageAction)->trigger();
 
-    if (argc <= 1) {
-        /* If no input files were supplied --- open connection settings dialog. */
-        if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
-            context->menu()->trigger(Qn::ConnectToServerAction,
-                                     QnActionParameters().withArgument(Qn::AutoConnectRole, true));
-        } else if (instantDrop.isEmpty()) {
-            context->menu()->trigger(Qn::ReconnectAction);
+    /* If no input files were supplied --- open connection settings dialog. */
+    if(!authentication.isValid() && delayedDrop.isEmpty() && instantDrop.isEmpty()) {
+        context->menu()->trigger(Qn::ConnectToServerAction,
+            QnActionParameters().withArgument(Qn::AutoConnectRole, true));
+    } else if (instantDrop.isEmpty()) {
+        context->menu()->trigger(Qn::ReconnectAction);
+    }
+
+    if (!videowallGuid.isNull()) {
+        context->menu()->trigger(Qn::DelayedOpenVideoWallItemAction, QnActionParameters()
+                             .withArgument(Qn::VideoWallGuidRole, videowallGuid)
+                             .withArgument(Qn::VideoWallItemGuidRole, instanceGuid));
+    } else {
+        /* Drop resources if needed. */
+        if(!delayedDrop.isEmpty()) {
+            QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
+            context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
         }
-    }
 
-    /* Drop resources if needed. */
-    if(!delayedDrop.isEmpty()) {
-        qnSettings->setLayoutsOpenedOnLogin(false);
-
-        QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
-        context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
-    }
-
-    if (!instantDrop.isEmpty()){
-        qnSettings->setLayoutsOpenedOnLogin(false);
-
-        QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
-        context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+        if (!instantDrop.isEmpty()){
+            QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
+            context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedDataRole, data));
+        }
     }
 
 #ifdef _DEBUG
@@ -632,11 +685,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         cl_log.log(autoTester.message(), cl_logALWAYS);
     }
 
-    QnCommonMessageProcessor::instance()->stop();
     QnSessionManager::instance()->stop();
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
+
+    QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
 
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());

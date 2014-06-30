@@ -2,8 +2,10 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <utils/common/model_functions.h>
 #include <utils/math/math.h>
 #include <api/app_server_connection.h>
+
 
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a 1 min.
@@ -115,6 +117,54 @@ CameraDiagnostics::Result QnPhysicalCameraResource::initInternal() {
     return CameraDiagnostics::NoErrorResult();
 }
 
+void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& supportedNativeStreams )
+{
+    static const char* RTSP_TRANSPORT_NAME = "rtsp";
+    static const char* HLS_TRANSPORT_NAME = "hls";
+    static const char* MJPEG_TRANSPORT_NAME = "mjpeg";
+
+    static const char* CAMERA_MEDIA_STREAM_LIST_PARAM_NAME = "mediaStreams";
+
+    CameraMediaStreams fullStreamList( supportedNativeStreams );
+    for( CameraMediaStreamInfo& streamInfo: fullStreamList.streams )
+    {
+        switch( streamInfo.codec )
+        {
+            case CODEC_ID_H264:
+                streamInfo.transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
+                streamInfo.transports.push_back( QLatin1String(HLS_TRANSPORT_NAME) );
+                break;
+            case CODEC_ID_MPEG4:
+                streamInfo.transports.push_back( QLatin1String(RTSP_TRANSPORT_NAME) );
+                break;
+            case CODEC_ID_MJPEG:
+                streamInfo.transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
+                break;
+            default:
+                break;
+        }
+    }
+
+#if !defined(EDGE_SERVER) && !defined(__arm__)
+#define TRANSCODING_AVAILABLE
+#endif
+
+#ifdef TRANSCODING_AVAILABLE
+    static const char* WEBM_TRANSPORT_NAME = "webm";
+
+    CameraMediaStreamInfo transcodedStream;
+    //any resolution is supported
+    transcodedStream.transports.push_back( QLatin1String(MJPEG_TRANSPORT_NAME) );
+    transcodedStream.transports.push_back( QLatin1String(WEBM_TRANSPORT_NAME) );
+    transcodedStream.transcodingRequired = true;
+    fullStreamList.streams.push_back( transcodedStream );
+#endif
+
+    //saving fullStreamList;
+    const QByteArray& serializedStreams = QJson::serialized( fullStreamList );
+    setParam( QLatin1String(CAMERA_MEDIA_STREAM_LIST_PARAM_NAME), QLatin1String(serializedStreams), QnDomainDatabase );
+}
+
 // --------------- QnVirtualCameraResource ----------------------
 
 QnAbstractDTSFactory* QnVirtualCameraResource::getDTSFactory()
@@ -140,18 +190,7 @@ void QnVirtualCameraResource::unLockDTSFactory()
 
 QString QnVirtualCameraResource::getUniqueId() const
 {
-    if (hasFlags(foreigner))
-        return getPhysicalId() + getParentId().toString();
-    else 
-        return getPhysicalId();
-
-}
-
-void QnVirtualCameraResource::deserialize(const QnResourceParameters &parameters) {
-    QnNetworkResource::deserialize(parameters);
-
-    if (!isDtsBased() && supportedMotionType() != Qn::MT_NoMotion)
-        addFlags(motion);
+    return getPhysicalId();
 }
 
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
@@ -166,29 +205,35 @@ void QnVirtualCameraResource::forceEnableAudio()
 	if (isForcedAudioSupported())
         return;
     setParam(lit("forcedIsAudioSupported"), 1, QnDomainDatabase); 
-    save(); 
-};
+    saveParams(); 
+}
+
 void QnVirtualCameraResource::forceDisableAudio()
 { 
     if (!isForcedAudioSupported())
         return;
     setParam(lit("forcedIsAudioSupported"), 0, QnDomainDatabase); 
-    save(); 
-};
-
-void QnVirtualCameraResource::save()
-{
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(::toSharedPointer(this)) != 0) {
-        qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
-            << getPhysicalId() << ". Description: " << conn->getLastError();
-    }
+    saveParams(); 
 }
 
-int QnVirtualCameraResource::saveAsync(QObject *target, const char *slot)
+void QnVirtualCameraResource::saveParams()
 {
-    QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    return conn->saveAsync(::toSharedPointer(this), target, slot);
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    QnKvPairList params;
+
+    foreach(const QnParam& param, getResourceParamList().list())
+    {
+        if (param.domain() == QnDomainDatabase)
+            params << QnKvPair(param.name(), param.value().toString());
+    }
+
+    QnKvPairListsById  outData;
+    ec2::ErrorCode rez = conn->getResourceManager()->saveSync(getId(), params, true, &outData);
+
+    if (rez != ec2::ErrorCode::ok) {
+        qCritical() << Q_FUNC_INFO << ": can't save resource params to Enterprise Controller. Resource physicalId: "
+            << getPhysicalId() << ". Description: " << ec2::toString(rez);
+    }
 }
 
 QString QnVirtualCameraResource::toSearchString() const
@@ -204,15 +249,21 @@ void QnVirtualCameraResource::issueOccured()
     QMutexLocker lock(&m_mutex);
     m_issueTimes.push_back(getUsecTimer());
     if (m_issueTimes.size() >= MAX_ISSUE_CNT) {
-        if (!hasStatusFlags(HasIssuesFlag)) {
-            addStatusFlags(HasIssuesFlag);
+        if (!hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
+            addStatusFlags(Qn::CSF_HasIssuesFlag);
             lock.unlock();
-            saveAsync(this, SLOT(at_saveAsyncFinished(int, const QnResourceList &, int)));
+            saveAsync();
         }
     }
 }
 
-void QnVirtualCameraResource::at_saveAsyncFinished(int, const QnResourceList &, int)
+int QnVirtualCameraResource::saveAsync()
+{
+    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    return conn->getCameraManager()->addCamera(::toSharedPointer(this), this, &QnVirtualCameraResource::at_saveAsyncFinished);
+}
+
+void QnVirtualCameraResource::at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &)
 {
     // not used
 }
@@ -224,9 +275,28 @@ void QnVirtualCameraResource::noCameraIssues()
     while(!m_issueTimes.empty() && m_issueTimes.front() < threshold)
         m_issueTimes.pop_front();
 
-    if (m_issueTimes.empty() && hasStatusFlags(HasIssuesFlag)) {
-        removeStatusFlags(HasIssuesFlag);
+    if (m_issueTimes.empty() && hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
+        removeStatusFlags(Qn::CSF_HasIssuesFlag);
         lock.unlock();
-        saveAsync(this, SLOT(at_saveAsyncFinished(int, const QnResourceList &, int)));
+        saveAsync();
     }
 }
+
+
+CameraMediaStreamInfo::CameraMediaStreamInfo()
+:
+    resolution( lit("*") ),
+    transcodingRequired( false ),
+    codec( CODEC_ID_NONE )
+{
+}
+
+CameraMediaStreamInfo::CameraMediaStreamInfo( const QSize& _resolution, CodecID _codec )
+:
+    resolution( _resolution.isValid() ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height()) : lit("*") ),
+    transcodingRequired( false ),
+    codec( _codec )
+{
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json), _Fields )

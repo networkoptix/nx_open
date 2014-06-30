@@ -40,6 +40,104 @@ const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
 
 
 
+namespace
+{
+    //To avoid recreating of gsoap socket, these 2 functions must be assigned
+    int nullGsoapFconnect(struct soap*, const char*, const char*, int)
+    {
+        return SOAP_OK;
+    }
+
+    int nullGsoapFdisconnect(struct soap*)
+    {
+        return SOAP_OK;
+    }
+
+    //Socket send through UdpSocket
+    int gsoapFsend(struct soap *soap, const char *s, size_t n)
+    {
+        AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
+        qSocket->sendTo(s, n, QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
+        return SOAP_OK;
+    }
+
+    static const char STATIC_DISCOVERY_MESSAGE[] = "\
+    <s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\
+    <s:Header>\
+    <a:Action s:mustUnderstand=\"1\">\
+    http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe\
+    </a:Action>\
+    <a:MessageID>%1</a:MessageID>\
+    <a:ReplyTo>\
+    <a:Address>\
+    http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
+    </a:Address>\
+    </a:ReplyTo>\
+    <a:To s:mustUnderstand=\"1\">urn:schemas-xmlsoap-org:ws:2005:04:discovery</a:To>\
+    </s:Header>\
+    <s:Body>\
+    <Probe xmlns=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
+    <d:Types xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\" xmlns:dp0=\"http://www.onvif.org/ver10/network/wsdl\">dp0:NetworkVideoTransmitter</d:Types>\
+    </Probe>\
+    </s:Body>\
+    </s:Envelope>";
+
+
+    // avoid SOAP select call
+    size_t gsoapFrecv(struct soap* soap, char* data, size_t maxSize)
+    {
+        AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
+        int readed = qSocket->recv(data, maxSize, 0);
+        return (size_t) qMax(0, readed);
+    }
+
+
+    //Socket send through UDPSocket
+    int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
+    {
+        //avoiding sending numerous data
+        if (!QByteArray::fromRawData(s, n).startsWith("<?xml")) {
+            return SOAP_OK;
+        }
+
+        Q_UNUSED(s)
+        Q_UNUSED(n)
+        QString msgId;
+        AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
+
+        QString guid = QUuid::createUuid().toString();
+        guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
+        QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLatin1();
+
+        qSocket->sendTo(data.data(), data.size(), QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
+        return SOAP_OK;
+    }
+
+    int gsoapFsendSmallUnicast(struct soap *soap, const char *s, size_t n)
+    {
+        //avoiding sending numerous data
+        if (!QByteArray::fromRawData(s, n).startsWith("<?xml")) {
+            return SOAP_OK;
+        }
+
+        Q_UNUSED(s)
+        Q_UNUSED(n)
+        QString msgId;
+        AbstractDatagramSocket* socket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
+
+        QString guid = QUuid::createUuid().toString();
+        guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
+        QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLatin1();
+
+        //socket.connectToHost(QHostAddress(QString::fromLatin1(soap->host)), WSDD_MULTICAST_PORT);
+        //socket.write(data);
+        socket->sendTo(data.data(), data.size(), QString::fromLatin1(soap->host), WSDD_MULTICAST_PORT);
+        return SOAP_OK;
+    }
+}
+
+
+
 OnvifResourceSearcherWsdd::ProbeContext::ProbeContext()
 :
     soapWsddProxy( SOAP_IO_UDP )
@@ -48,6 +146,20 @@ OnvifResourceSearcherWsdd::ProbeContext::ProbeContext()
 
 OnvifResourceSearcherWsdd::ProbeContext::~ProbeContext()
 {
+}
+
+void OnvifResourceSearcherWsdd::ProbeContext::initializeSoap()
+{
+    soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
+    soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
+    soapWsddProxy.soap->user = sock.get();
+    soapWsddProxy.soap->fconnect = nullGsoapFconnect;
+    soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
+    soapWsddProxy.soap->fsend = gsoapFsendSmall;
+    soapWsddProxy.soap->frecv = gsoapFrecv;
+    soapWsddProxy.soap->fopen = NULL;
+    soapWsddProxy.soap->socket = -1;
+    soapWsddProxy.soap->master = -1;
 }
 
 
@@ -86,103 +198,6 @@ void OnvifResourceSearcherWsdd::pleaseStop()
     m_shouldStop = true;
     m_onvifFetcher.pleaseStop();
 }
-
-//To avoid recreating of gsoap socket, these 2 functions must be assigned
-int nullGsoapFconnect(struct soap*, const char*, const char*, int)
-{
-    return SOAP_OK;
-}
-
-int nullGsoapFdisconnect(struct soap*)
-{
-    return SOAP_OK;
-}
-
-//Socket send through UdpSocket
-int gsoapFsend(struct soap *soap, const char *s, size_t n)
-{
-    AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
-    qSocket->sendTo(s, n, QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
-    return SOAP_OK;
-}
-
-static const char STATIC_DISCOVERY_MESSAGE[] = "\
-<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:a=\"http://schemas.xmlsoap.org/ws/2004/08/addressing\">\
-<s:Header>\
-<a:Action s:mustUnderstand=\"1\">\
-http://schemas.xmlsoap.org/ws/2005/04/discovery/Probe\
-</a:Action>\
-<a:MessageID>%1</a:MessageID>\
-<a:ReplyTo>\
-<a:Address>\
-http://schemas.xmlsoap.org/ws/2004/08/addressing/role/anonymous\
-</a:Address>\
-</a:ReplyTo>\
-<a:To s:mustUnderstand=\"1\">urn:schemas-xmlsoap-org:ws:2005:04:discovery</a:To>\
-</s:Header>\
-<s:Body>\
-<Probe xmlns=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\">\
-<d:Types xmlns:d=\"http://schemas.xmlsoap.org/ws/2005/04/discovery\" xmlns:dp0=\"http://www.onvif.org/ver10/network/wsdl\">dp0:NetworkVideoTransmitter</d:Types>\
-</Probe>\
-</s:Body>\
-</s:Envelope>";
-
-
-// avoid SOAP select call
-size_t gsoapFrecv(struct soap* soap, char* data, size_t maxSize)
-{
-    AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
-    int readed = qSocket->recv(data, maxSize, 0);
-    return (size_t) qMax(0, readed);
-}
-
-
-//Socket send through UDPSocket
-int gsoapFsendSmall(struct soap *soap, const char *s, size_t n)
-{
-    QString recvData = QString::fromLatin1(QByteArray(s, (int) n).data());
-    //avoiding sending numerous data
-    if (!recvData.startsWith(lit("<?xml"))) {
-        return SOAP_OK;
-    }
-
-    Q_UNUSED(s)
-    Q_UNUSED(n)
-    QString msgId;
-    AbstractDatagramSocket* qSocket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
-
-    QString guid = QUuid::createUuid().toString();
-    guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
-    QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLocal8Bit();
-
-    qSocket->sendTo(data.data(), data.size(), QLatin1String(WSDD_MULTICAST_ADDRESS), WSDD_MULTICAST_PORT);
-    return SOAP_OK;
-}
-
-int gsoapFsendSmallUnicast(struct soap *soap, const char *s, size_t n)
-{
-    // TODO: #Elric WTF????????????????????????? Why construct a temporary QByteArray????
-    QString recvData = QString::fromLatin1(QByteArray(s, (int) n).data()); 
-    //avoiding sending numerous data
-    if (!recvData.startsWith(lit("<?xml"))) {
-        return SOAP_OK;
-    }
-
-    Q_UNUSED(s)
-    Q_UNUSED(n)
-    QString msgId;
-    AbstractDatagramSocket* socket = reinterpret_cast<AbstractDatagramSocket*>(soap->user);
-
-    QString guid = QUuid::createUuid().toString();
-    guid = QLatin1String("uuid:") + guid.mid(1, guid.length()-2);
-    QByteArray data = QString(QLatin1String(STATIC_DISCOVERY_MESSAGE)).arg(guid).toLocal8Bit();
-
-    //socket.connectToHost(QHostAddress(QString::fromLatin1(soap->host)), WSDD_MULTICAST_PORT);
-    //socket.write(data);
-    socket->sendTo(data.data(), data.size(), QString::fromLatin1(soap->host), WSDD_MULTICAST_PORT);
-    return SOAP_OK;
-}
-
 
 /*void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
 {
@@ -318,7 +333,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result)
         }
     }
 
-    bool intfListChanged = intfList.size() != m_ifaceToSock.size();
+    bool intfListChanged = (unsigned int)intfList.size() != m_ifaceToSock.size();
     if( !intfListChanged )
         for( const QnInterfaceAndAddr& intf: intfList )
         {
@@ -766,20 +781,9 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
             return false;
         }
         ctx->sock->setMulticastIF(iface.address.toString());
-
-        ctx->soapWsddProxy.soap->send_timeout = SOAP_DISCOVERY_TIMEOUT;
-        ctx->soapWsddProxy.soap->recv_timeout = SOAP_DISCOVERY_TIMEOUT;
-        ctx->soapWsddProxy.soap->user = ctx->sock.get();
-        ctx->soapWsddProxy.soap->fconnect = nullGsoapFconnect;
-        ctx->soapWsddProxy.soap->fdisconnect = nullGsoapFdisconnect;
-        ctx->soapWsddProxy.soap->fsend = gsoapFsendSmall;
-        ctx->soapWsddProxy.soap->frecv = gsoapFrecv;
-        ctx->soapWsddProxy.soap->fopen = NULL;
-        //ctx->soapWsddProxy.soap->socket = ctx->sock->handle();
-        //ctx->soapWsddProxy.soap->master = ctx->sock->handle();
-        ctx->soapWsddProxy.soap->socket = -1;
-        ctx->soapWsddProxy.soap->master = -1;
     }
+
+    ctx->initializeSoap();
 
     fillWsddStructs( ctx->wsddProbe, ctx->replyTo );
 
@@ -793,8 +797,6 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
 
     QString targetAddr = QString::fromLatin1(WSDD_GSOAP_MULTICAST_ADDRESS);
     int soapRes = ctx->soapWsddProxy.send_Probe(targetAddr.toLatin1().data(), NULL, &ctx->wsddProbe);
-    soapRes = ctx->soapWsddProxy.send_Probe(targetAddr.toLatin1().data(), NULL, &ctx->wsddProbe);
-
     if( soapRes != SOAP_OK ) 
     {
         qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: (Send) SOAP failed. GSoap error code: "
@@ -802,6 +804,7 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
             << ". Interface: " << (iface.address.toString());
     }
 
+    //ctx->soapWsddProxy.reset();
     soap_destroy(ctx->soapWsddProxy.soap);
     soap_end(ctx->soapWsddProxy.soap);
 
@@ -827,10 +830,15 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
     for( ;; )
     {
         if (m_shouldStop)
+        {
+            ctx.soapWsddProxy.reset();
             return false;
+        }
+
+        ctx.initializeSoap();
 
         __wsdd__ProbeMatches wsddProbeMatches;
-        wsddProbeMatches.wsdd__ProbeMatches = NULL;
+        memset( &wsddProbeMatches, 0, sizeof(wsddProbeMatches) );
 
         int soapRes = ctx.soapWsddProxy.recv_ProbeMatches(wsddProbeMatches);
         if (soapRes != SOAP_OK) 
@@ -845,8 +853,8 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
                     << soapRes << SoapErrorHelper::fetchDescription(ctx.soapWsddProxy.soap_fault())
                     << ". Interface: " << (iface.address.toString());
             }
-            soap_destroy(ctx.soapWsddProxy.soap);
-            soap_end(ctx.soapWsddProxy.soap);
+            ctx.soapWsddProxy.reset();
+            //ctx.soapWsddProxy.destroy();
             //ctx.sock.reset();
             //delete it->second;
             //m_ifaceToSock.erase( it );
@@ -868,8 +876,7 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
             }
         }
 
-        soap_destroy(ctx.soapWsddProxy.soap);
-        //soap_end(ctx.soapWsddProxy.soap);
+        ctx.soapWsddProxy.reset();
     }
 }
 

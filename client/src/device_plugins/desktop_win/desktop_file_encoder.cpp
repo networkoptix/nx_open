@@ -245,8 +245,8 @@ void QnDesktopFileEncoder::EncodedAudioInfo::gotData()
     {
         // write data
         int packetSize = data->dwBytesRecorded;
-        QnAbstractMediaDataPtr outData(new QnAbstractMediaData(CL_MEDIA_ALIGNMENT, packetSize));
-        outData->data.write(data->lpData, data->dwBytesRecorded);
+        QnWritableCompressedAudioDataPtr outData(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packetSize));
+        outData->m_data.write(data->lpData, data->dwBytesRecorded);
         outData->timestamp = m_owner->currentTime(); // - m_startDelay;
         //cl_log.log("got audio data. time=", outData->timestamp, cl_logALWAYS);
         m_audioQueue.push(outData);
@@ -714,7 +714,7 @@ int QnDesktopFileEncoder::processData(bool flush)
     EncodedAudioInfo* ai2 = m_audioInfo.size() > 1 ? m_audioInfo[1] : 0;
     while (ai && ai->m_audioQueue.size() > 0 && (ai2 == 0 || ai2->m_audioQueue.size() > 0))
     {
-        QnAbstractMediaDataPtr audioData = ai->m_audioQueue.front();
+        QnWritableCompressedAudioDataPtr audioData = ai->m_audioQueue.front();
 
         qint64 audioPts = audioData->timestamp - m_audioFrameDuration;
         qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration;
@@ -735,19 +735,20 @@ int QnDesktopFileEncoder::processData(bool flush)
         m_audioFramesCount++;
 
         AVPacket audioPacket;
-        ai->m_audioQueue.pop(audioData);
+        QnWritableCompressedAudioDataPtr mediaData;
+        ai->m_audioQueue.pop(mediaData);
 
         // todo: add audio resample here
 
-        short* buffer1 = (short*) audioData->data.data();
+        short* buffer1 = (short*) audioData->m_data.data();
         if (ai->m_speexPreprocess)
             speex_preprocess(ai->m_speexPreprocess, buffer1, NULL);
 
         if (ai2)
         {
-            QnAbstractMediaDataPtr audioData2;
+            QnWritableCompressedAudioDataPtr audioData2;
             ai2->m_audioQueue.pop(audioData2);
-            short* buffer2 = (short*) audioData2->data.data();
+            short* buffer2 = (short*) audioData2->m_data.data();
             if (ai2->m_speexPreprocess)
                 speex_preprocess(ai2->m_speexPreprocess, buffer2, NULL);
 
@@ -764,13 +765,13 @@ int QnDesktopFileEncoder::processData(bool flush)
             */
             if (ai->m_audioFormat.channelCount() == 1)
             {
-                monoToStereo((qint16*) ai->m_tmpAudioBuffer.data.data(), buffer1, stereoPacketSize/4);
-                buffer1 = (qint16*) ai->m_tmpAudioBuffer.data.data();
+                monoToStereo((qint16*) ai->m_tmpAudioBuffer.m_data.data(), buffer1, stereoPacketSize/4);
+                buffer1 = (qint16*) ai->m_tmpAudioBuffer.m_data.data();
             }
             if (ai2->m_audioFormat.channelCount() == 1)
             {
-                monoToStereo((qint16*) ai2->m_tmpAudioBuffer.data.data(), buffer2, stereoPacketSize/4);
-                buffer2 = (qint16*) ai2->m_tmpAudioBuffer.data.data();
+                monoToStereo((qint16*) ai2->m_tmpAudioBuffer.m_data.data(), buffer2, stereoPacketSize/4);
+                buffer2 = (qint16*) ai2->m_tmpAudioBuffer.m_data.data();
             }
             if (buffer2)
                 stereoAudioMux(buffer1, buffer2, stereoPacketSize / 2);

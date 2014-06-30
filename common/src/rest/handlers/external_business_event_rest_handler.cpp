@@ -13,9 +13,7 @@
 QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()
 {
     QnBusinessEventConnector* connector = qnBusinessRuleConnector;
-    connect(this, SIGNAL(mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason)),
-            connector,
-            SLOT(at_mserverFailure(QnResourcePtr, qint64, QnBusiness::EventReason)));
+    connect(this, &QnExternalBusinessEventRestHandler::mserverFailure, connector, &QnBusinessEventConnector::at_mserverFailure);
 }
 
 int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
@@ -29,9 +27,9 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
 
     for (int i = 0; i < params.size(); ++i)
     {
-        if (params[i].first.toLocal8Bit() == "res_id" || params[i].first.toLocal8Bit() == "guid")
+        if (params[i].first == QLatin1String("res_id") || params[i].first == QLatin1String("guid"))
             resourceId = params[i].second;
-        else if (params[i].first.toLocal8Bit() == "event_type")
+        else if (params[i].first == QLatin1String("event_type"))
             eventType = params[i].second;
     }
     if (resourceId.isEmpty())
@@ -41,7 +39,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
     else {
         resource= qnResPool->getResourceByUniqId(resourceId);
         if (!resource) {
-            resource= qnResPool->getResourceByGuid(resourceId);
+            resource= qnResPool->getResourceById(resourceId);
             if (!resource)
                 errStr = tr("Resource with id '%1' not found \n").arg(resourceId);
         }
@@ -52,10 +50,8 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
         {
             emit mserverFailure(resource,
                  qnSyncTime->currentUSecsSinceEpoch(),
-                 QnBusiness::MServerIssueTerminated);
-            //qnBusinessRuleConnector->at_mserverFailure(resource,
-            //                                           qnSyncTime->currentUSecsSinceEpoch(),
-            //                                           QnBusiness::MServerIssueTerminated);
+                 QnBusiness::ServerTerminatedReason,
+                 QString());
         }
         //else if (eventType == "UserEvent")
         //    bEvent = new QnUserDefinedBusinessEvent(); // todo: not implemented
@@ -82,14 +78,4 @@ int QnExternalBusinessEventRestHandler::executePost(const QString& path, const Q
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
-}
-
-QString QnExternalBusinessEventRestHandler::description() const
-{
-    return QLatin1String(
-        "Process external business event\n"
-        "<BR>Param <b>event_type</b> - eventType. supported values: 'MServerFailure', 'UserEvent'\n"
-        "<BR>Param <b>res_id</b> - resource (media server or camera) uniq id\n"
-        "<BR><b>Return</b> XML with error string or 'OK' message.\n"
-    );
 }

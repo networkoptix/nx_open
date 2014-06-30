@@ -38,7 +38,7 @@ private:
 
     AACCodec m_aacHelper;
     QnMediaContextPtr m_context;
-    std::shared_ptr<QnRtspAudioLayout> m_audioLayout;
+    QSharedPointer<QnRtspAudioLayout> m_audioLayout;
 };
 
 #endif // __AAC_RTP_PARSER_H

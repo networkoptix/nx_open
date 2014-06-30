@@ -7,7 +7,7 @@
 #include <utils/math/math.h>
 #include <utils/math/space_mapper.h>
 #include <utils/network/simple_http_client.h>
-#include <utils/common/lexical.h>
+#include <utils/serialization/lexical_functions.h>
 
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/resource_data.h>

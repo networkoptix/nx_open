@@ -1,4 +1,3 @@
-
 #include "business_event_parameters.h"
 
 #include <QtCore/QVariant>
@@ -27,18 +26,18 @@ static const char DELIMITER('$');
 static const char STRING_LIST_DELIM('\n');
 
 QnBusinessEventParameters::QnBusinessEventParameters():
-    m_eventType(BusinessEventType::NotDefined),
+    m_eventType(QnBusiness::UndefinedEvent),
     m_timestamp(0),
     m_reasonCode(QnBusiness::NoReason)
 {
 
 }
 
-BusinessEventType::Value QnBusinessEventParameters::getEventType()  const {
+QnBusiness::EventType QnBusinessEventParameters::getEventType()  const {
     return  m_eventType;
 }
 
-void QnBusinessEventParameters::setEventType(BusinessEventType::Value value) {
+void QnBusinessEventParameters::setEventType(QnBusiness::EventType value) {
     m_eventType = value;
 }
 
@@ -50,19 +49,19 @@ void QnBusinessEventParameters::setEventTimestamp(qint64 value) {
     m_timestamp = value;
 }
 
-int QnBusinessEventParameters::getEventResourceId() const {
+QnId QnBusinessEventParameters::getEventResourceId() const {
     return m_resourceId;
 }
 
-void QnBusinessEventParameters::setEventResourceId(int value) {
+void QnBusinessEventParameters::setEventResourceId(const QnId& value) {
     m_resourceId = value;
 }
 
-int QnBusinessEventParameters::getActionResourceId() const {
+QnId QnBusinessEventParameters::getActionResourceId() const {
     return m_actionResourceId;
 }
 
-void QnBusinessEventParameters::setActionResourceId(int value) {
+void QnBusinessEventParameters::setActionResourceId(const QnId& value) {
     m_actionResourceId = value;
 }
 
@@ -157,16 +156,16 @@ QnBusinessEventParameters QnBusinessEventParameters::deserialize(const QByteArra
             switch ((Params) i)
             {
                 case eventTypeParam:
-                    result.m_eventType = (BusinessEventType::Value) toInt(field);
+                    result.m_eventType = (QnBusiness::EventType) toInt(field);
                     break;
                 case eventTimestampParam:
                     result.m_timestamp = toInt64(field);
                     break;
                 case eventResourceParam:
-                    result.m_resourceId = toInt(field);
+                    result.m_resourceId = QnId(field);
                     break;
                 case actionResourceParam:
-                    result.m_actionResourceId = toInt(field);
+                    result.m_actionResourceId = QnId(field);
                     break;
 
                 // event specific params.
@@ -214,6 +213,15 @@ static void serializeStringParam(QByteArray& result, const QString& value, const
     result += DELIMITER;
 }
 
+static void serializeQnIdParam(QByteArray& result, const QnId& value)
+{
+    if (value != QnId()) {
+        QByteArray data = value.toByteArray();
+        result += data;
+    }
+    result += DELIMITER;
+}
+
 void serializeStringListParam(QByteArray& result, const QStringList& value)
 {
     if (!value.isEmpty()) {
@@ -234,8 +242,8 @@ QByteArray QnBusinessEventParameters::serialize() const
 
     serializeIntParam(result, m_eventType, m_defaultParams.m_eventType);
     serializeIntParam(result, m_timestamp, m_defaultParams.m_timestamp);
-    serializeIntParam(result, m_resourceId, m_defaultParams.m_resourceId);
-    serializeIntParam(result, m_actionResourceId, m_defaultParams.m_actionResourceId);
+    serializeQnIdParam(result, m_resourceId);
+    serializeQnIdParam(result, m_actionResourceId);
     serializeStringParam(result, m_inputPort, m_defaultParams.m_inputPort);
     serializeIntParam(result, m_reasonCode, m_defaultParams.m_reasonCode);
     serializeStringParam(result, m_reasonParamsEncoded, m_defaultParams.m_reasonParamsEncoded);
@@ -269,10 +277,10 @@ QnBusinessParams QnBusinessEventParameters::toBusinessParams() const
         result.insert(PARAM_NAMES[eventTimestampParam], m_timestamp);
 
     if (m_resourceId != m_defaultParams.m_resourceId)
-        result.insert(PARAM_NAMES[eventResourceParam], m_resourceId.toInt());
+        result.insert(PARAM_NAMES[eventResourceParam], m_resourceId.toString());
 
     if (m_actionResourceId != m_defaultParams.m_actionResourceId)
-        result.insert(PARAM_NAMES[actionResourceParam], m_actionResourceId.toInt());
+        result.insert(PARAM_NAMES[actionResourceParam], m_actionResourceId.toString());
 
     if (m_inputPort != m_defaultParams.m_inputPort)
         result.insert(PARAM_NAMES[inputPortIdParam], m_inputPort);
@@ -323,16 +331,16 @@ QnBusinessEventParameters QnBusinessEventParameters::fromBusinessParams(const Qn
             switch (Params( paramIndex))
             {
             case eventTypeParam:
-                result.m_eventType = (BusinessEventType::Value) itr.value().toInt();
+                result.m_eventType = (QnBusiness::EventType) itr.value().toInt();
                 break;
             case eventTimestampParam:
                 result.m_timestamp = itr.value().toLongLong();
                 break;
             case eventResourceParam:
-                result.m_resourceId = itr.value().toInt();
+                result.m_resourceId = itr.value().toString();
                 break;
             case actionResourceParam:
-                result.m_actionResourceId = itr.value().toInt();
+                result.m_actionResourceId = itr.value().toString();
                 break;
 
                 // event specific params.
@@ -406,14 +414,14 @@ QString QnBusinessEventParameters::getParamsKey() const
 
     switch (getEventType())
     {
-        case BusinessEventType::MediaServer_Failure:
-        case BusinessEventType::Network_Issue:
-        case BusinessEventType::Storage_Failure:
+        case QnBusiness::ServerFailureEvent:
+        case QnBusiness::NetworkIssueEvent:
+        case QnBusiness::StorageFailureEvent:
             paramKey += QLatin1String("_") + QString::number(getReasonCode());
-            if (getReasonCode() == QnBusiness::StorageIssueIoError || getReasonCode() == QnBusiness::StorageIssueNotEnoughSpeed || getReasonCode() == QnBusiness::StorageIssueNotEnoughSpace)
+            if (getReasonCode() == QnBusiness::StorageIoErrorReason || getReasonCode() == QnBusiness::StorageTooSlowReason || getReasonCode() == QnBusiness::StorageNotEnoughSpaceReason || getReasonCode() == QnBusiness::LicenseRemoved)
                 paramKey += QLatin1String("_") + getReasonParamsEncoded();
             break;
-        case BusinessEventType::Camera_Input:
+        case QnBusiness::CameraInputEvent:
             paramKey += QLatin1String("_") + getInputPortId();
             break;
     default:

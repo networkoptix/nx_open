@@ -5,7 +5,8 @@
 #include <QtNetwork/QHostAddress>
 #include "utils/network/mac_address.h"
 #include "resource.h"
-#include "recording/time_period_list.h"
+
+class QnTimePeriodList;
 
 class QN_EXPORT QnNetworkResource : public QnResource
 {
@@ -15,6 +16,7 @@ class QN_EXPORT QnNetworkResource : public QnResource
     //Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
 
 public:
+    // TODO: #Elric #enum Qn prefix?
     enum QnNetworkStatus
     {
         BadHostAddr = 0x01,
@@ -23,8 +25,6 @@ public:
 
     QnNetworkResource();
     virtual ~QnNetworkResource();
-
-    virtual void deserialize(const QnResourceParameters& parameters) override;
 
     virtual QString getUniqueId() const;
 
@@ -63,11 +63,6 @@ public:
     void setNetworkStatus(QnNetworkStatus status);
 
 
-    // return true if device conflicting with something else ( IP conflict )
-    // this function makes sense to call only for resources in the same lan
-    // it does some physical job
-    virtual bool conflicting();
-
     // all data readers and any sockets will use this number as timeout value in ms
     void setNetworkTimeout(unsigned int timeout);
     virtual unsigned int getNetworkTimeout() const;
@@ -85,9 +80,7 @@ public:
     // we need to get mac anyway to differentiate one device from another
     virtual bool updateMACAddress() { return true; }
 
-    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields) override;
-
-    virtual bool shoudResolveConflicts() const;
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     // in some cases I just want to update couple of field from just discovered resource
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source);
@@ -97,11 +90,7 @@ public:
     /*
     * Return time periods from resource based archive (direct to storage)
     */
-    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {
-        Q_UNUSED(startTimeMs)
-        Q_UNUSED(endTimeMs)
-        Q_UNUSED(detailLevel)
-        return QnTimePeriodList(); }
+    virtual QnTimePeriodList getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel);
 
     //!Returns true if camera is accessible
     /*!
@@ -119,7 +108,7 @@ private:
 
     QHostAddress m_localAddress; // address used to discover this resource ( in case if machine has more than one NIC/address
 
-    unsigned long m_networkStatus;
+    unsigned long m_networkStatus; // TODO: #Elric #enum type safety has just walked out of the window.
 
     unsigned int m_networkTimeout;
 

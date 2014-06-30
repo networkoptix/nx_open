@@ -322,7 +322,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     qnSettings->setTimestampCorner(parameters.timestampPosition);
 }
 
-//TODO: #GDM may be we should incapsulate in some other object to get parameters and clear connection if user cancelled the process?
+//TODO: #GDM #Business may be we should encapsulate in some other object to get parameters and clear connection if user cancelled the process?
 void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     QnScreenshotLoader* loader = dynamic_cast<QnScreenshotLoader*>(sender());
     if (!loader)
@@ -362,6 +362,11 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         painter->setCompositionMode(QPainter::CompositionMode_Source);
         painter->drawImage(QPointF(0, 0), resizedToAr, QnGeometry::cwiseMul(parameters.zoomRect, resizedToAr.size()));
     }
+    
+    int panoFactor = (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) ? parameters.itemDewarpingParams.panoFactor : 1;
+    if (panoFactor > 1)
+        resized = resized.scaled(resized.width() * panoFactor, resized.height());
+    
 
     QScopedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(resized));
     if (parameters.imageCorrectionParams.enabled) {

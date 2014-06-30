@@ -1,10 +1,12 @@
 #ifndef QN_COMMON_MODULE_H
 #define QN_COMMON_MODULE_H
 
+#include <QUuid>
 #include <QtCore/QObject>
 
 #include <utils/common/singleton.h>
 #include <utils/common/instance_storage.h>
+#include "nx_ec/data/api_runtime_data.h"
 
 class QnSessionManager;
 class QnResourceDataPool;
@@ -31,12 +33,44 @@ public:
         return m_sessionManager;
     }
 
+    void setModuleGUID(const QUuid& guid) { m_uuid = guid; }
+    QUuid moduleGUID() const{ return m_uuid; }
+
+    void setRemoteGUID(const QUuid& guid) {
+        QMutexLocker lock(&m_mutex);
+        m_remoteUuid = guid; 
+    }
+    QUuid remoteGUID() const{ 
+        QMutexLocker lock(&m_mutex);
+        return m_remoteUuid; 
+    }
+
+    QUrl moduleUrl() const { return m_url; }
+    void setModuleUlr(const QUrl& url) { m_url = url; }
+
+    void setLocalSystemName(const QString& value) { m_localSystemName = value; }
+    QString localSystemName() { return m_localSystemName; }
+    QByteArray getSystemPassword() { return "{61D85D22-E7AA-44EC-B5EC-1BEAC9FE19C5}"; }
+
+    void setDefaultAdminPassword(const QString& password) { m_defaultAdminPassword = password; }
+    QString defaultAdminPassword() const { return m_defaultAdminPassword; }
+
+    void setCloudMode(bool value) { m_cloudMode = value; }
+    bool isCloudMode() const { return m_cloudMode; }
+
 protected:
-    static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName);
+    static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
 private:
     QnSessionManager *m_sessionManager;
     QnResourceDataPool *m_dataPool;
+    QString m_localSystemName;
+    QString m_defaultAdminPassword;
+    QUuid m_uuid;
+    QUuid m_remoteUuid;
+    QUrl m_url;
+    bool m_cloudMode;
+    mutable QMutex m_mutex;
 };
 
 #define qnCommon (QnCommonModule::instance())

@@ -5,6 +5,7 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/common/geometry.h>
 #include <ui/workaround/gl_native_painting.h>
+#include "opengl_renderer.h"
 
 QnShadowItem::QnShadowItem(QGraphicsItem *parent):
     base_type(parent),
@@ -67,7 +68,7 @@ void QnShadowItem::ensureShadowShape() const {
     } else {
         m_shadowShape = QPolygonF();
     }
-    m_shapeValid = true;
+    m_shapeValid = m_shadowShape.size() > 0;
 }
 
 void QnShadowItem::ensureShadowParameters() const {
@@ -75,6 +76,8 @@ void QnShadowItem::ensureShadowParameters() const {
         return;
 
     ensureShadowShape();
+    if (!m_shapeValid)
+        return;
 
     m_painterPath = QPainterPath();
     m_painterPath.addPolygon(m_shadowShape);
@@ -84,18 +87,21 @@ void QnShadowItem::ensureShadowParameters() const {
 
 QRectF QnShadowItem::boundingRect() const {
     ensureShadowParameters();
-
+    //TODO: #GDM #Common what should we return if the rect is not valid?
     return m_boundingRect;
 }
 
 QPainterPath QnShadowItem::shape() const {
     ensureShadowParameters();
-
+    //TODO: #GDM #Common what should we return if the rect is not valid?
     return m_painterPath;
 }
 
 void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     ensureShadowShape();
+
+    if (!m_shapeValid)
+        return;
 
 #if 0
     QN_SCOPED_PAINTER_BRUSH_ROLLBACK(painter, m_color);
@@ -109,16 +115,18 @@ void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     QColor color = m_color;
     color.setAlpha(color.alpha() * effectiveOpacity());
 
-    QnGlNativePainting::begin(painter);
+    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
     //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-
-    /* Draw shadowed rect. */
-    glBegin(GL_TRIANGLE_FAN);
+   
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(color);
+    QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawColoredPolygon(m_shadowShape);
+   /* Draw shadowed rect. */
+   /* glBegin(GL_TRIANGLE_FAN);
     glColor(color);
     glVertices(m_shadowShape);
-    glEnd();
+    glEnd();*/
 
     glDisable(GL_BLEND); 
     //glPopAttrib();

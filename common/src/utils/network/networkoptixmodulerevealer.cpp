@@ -51,7 +51,7 @@ NetworkOptixModuleRevealer::NetworkOptixModuleRevealer(
                 !sock->joinGroup( multicastGroupAddress.toString(), localAddressToUse.toString() ) )
             {
                 SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                cl_log.log( lit("NetworkOptixModuleRevealer. Failed to bind to local address %1:%2 and join multicast group %3. %4").
+                NX_LOG( lit("NetworkOptixModuleRevealer. Failed to bind to local address %1:%2 and join multicast group %3. %4").
                     arg(localAddressToUse.toString()).arg(multicastGroupPort).arg(multicastGroupAddress.toString()).arg(SystemError::toString(prevErrorCode)), cl_logERROR );
                 continue;
             }
@@ -59,7 +59,7 @@ NetworkOptixModuleRevealer::NetworkOptixModuleRevealer(
         }
         catch( const std::exception& e )
         {
-            cl_log.log( lit("NetworkOptixModuleRevealer. Failed to create socket on local address %1. %2").arg(localAddressToUse.toString()).arg(QString::fromLatin1(e.what())), cl_logERROR );
+            NX_LOG( lit("NetworkOptixModuleRevealer. Failed to create socket on local address %1. %2").arg(localAddressToUse.toString()).arg(QString::fromLatin1(e.what())), cl_logERROR );
         }
     }
 }
@@ -83,13 +83,13 @@ void NetworkOptixModuleRevealer::pleaseStop()
     QnLongRunnable::pleaseStop();
 }
 
-static const unsigned int ERROR_WAIT_TIMEOUT_MS = 1000;
+static const unsigned int errorWaitTimeoutMs = 1000;
 static const unsigned int MULTICAST_GROUP_JOIN_TIMEOUT_MS = 60000;
 
 void NetworkOptixModuleRevealer::run()
 {
     initSystemThreadId();
-    cl_log.log( lit("NetworkOptixModuleRevealer started"), cl_logDEBUG1 );
+    NX_LOG( lit("NetworkOptixModuleRevealer started"), cl_logDEBUG1 );
 
     static const unsigned int REVEAL_PACKET_RESPONSE_LENGTH = 256;
     quint8 revealPacketResponse[REVEAL_PACKET_RESPONSE_LENGTH];
@@ -105,7 +105,7 @@ void NetworkOptixModuleRevealer::run()
         it != m_sockets.end();
         ++it )
     {
-        if( !m_pollSet.add( *it, PollSet::etRead ) )
+        if( !m_pollSet.add( *it, aio::etRead ) )
         {
             Q_ASSERT( false );
         }
@@ -118,24 +118,24 @@ void NetworkOptixModuleRevealer::run()
     {
         //TODO/IMPL do join periodically
 
-        int socketCount = m_pollSet.poll( PollSet::INFINITE_TIMEOUT );
+        int socketCount = m_pollSet.poll( aio::PollSet::INFINITE_TIMEOUT );
         if( socketCount == 0 )
             continue;    //timeout
         if( socketCount < 0 )
         {
             const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-            cl_log.log( lit("NetworkOptixModuleRevealer. poll failed. ").arg(SystemError::toString(prevErrorCode)), cl_logERROR );
-            msleep( ERROR_WAIT_TIMEOUT_MS );
+            NX_LOG( lit("NetworkOptixModuleRevealer. poll failed. ").arg(SystemError::toString(prevErrorCode)), cl_logERROR );
+            msleep( errorWaitTimeoutMs );
             continue;
         }
 
         //some socket(s) changed state
-        for( PollSet::const_iterator
+        for( aio::PollSet::const_iterator
             it = m_pollSet.begin();
             it != m_pollSet.end();
             ++it )
         {
-            if( !(it.eventType() & PollSet::etRead) )
+            if( !(it.eventType() & aio::etRead) )
                 continue;
 
             AbstractDatagramSocket* udpSocket = dynamic_cast<AbstractDatagramSocket*>(it.socket());
@@ -178,5 +178,5 @@ void NetworkOptixModuleRevealer::run()
         }
     }
 
-    cl_log.log( lit("NetworkOptixModuleRevealer stopped"), cl_logDEBUG1 );
+    NX_LOG( lit("NetworkOptixModuleRevealer stopped"), cl_logDEBUG1 );
 }

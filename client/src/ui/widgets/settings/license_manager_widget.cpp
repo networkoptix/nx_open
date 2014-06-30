@@ -14,21 +14,22 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
-#include <client/client_translation_manager.h>
-
+#include <common/common_module.h>
+#include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <common/common_module.h>
-
 #include <mustache/mustache.h>
+
+#include <client/client_translation_manager.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/style/warning_style.h>
 #include <ui/models/license_list_model.h>
 #include <utils/license_usage_helper.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json_functions.h>
 #include <utils/common/product_features.h>
+#include "api/runtime_info_manager.h"
 
 #define QN_LICENSE_URL "http://networkoptix.com/nolicensed_vms/activate.php"
 
@@ -40,7 +41,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->setupUi(this);
 
     QList<QnLicenseListModel::Column> columns;
-    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn << QnLicenseListModel::ExpirationDateColumn;
+    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn << QnLicenseListModel::ExpirationDateColumn << QnLicenseListModel::LicenseStatusColumn;
 
     m_model = new QnLicenseListModel(this);
     m_model->setColumns(columns);
@@ -69,11 +70,7 @@ void QnLicenseManagerWidget::updateLicenses() {
     if (!m_handleKeyMap.isEmpty())
         return;
 
-    if (qnLicensePool->currentHardwareId().isEmpty()) {
-        setEnabled(false);
-    } else {
-        setEnabled(true);
-    }
+    setEnabled(!QnRuntimeInfoManager::instance()->allData().isEmpty());
 
     m_licenses = qnLicensePool->getLicenses();
 
@@ -159,7 +156,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
 
     QUrl url(QLatin1String(QN_LICENSE_URL));
     QNetworkRequest request;
-    request.setUrl(url);
+    request.setUrl(url.toString());
 
     QUrlQuery params;
     params.addQueryItem(QLatin1String("license_key"), QLatin1String(licenseKey));
@@ -192,7 +189,10 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
         hw++;
     }
 
-    params.addQueryItem(QLatin1String("brand"), QLatin1String(QN_PRODUCT_NAME_SHORT));
+    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
+
+    params.addQueryItem(QLatin1String("box"), runtimeData.box);
+    params.addQueryItem(QLatin1String("brand"), runtimeData.brand);
     params.addQueryItem(QLatin1String("version"), QLatin1String(QN_ENGINE_VERSION));
     params.addQueryItem(QLatin1String("lang"), qnCommon->instance<QnClientTranslationManager>()->getCurrentLanguage());
 
@@ -221,8 +221,11 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     }
 
     if (!licensesToUpdate.isEmpty()) {
-        QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection();
-        int handle = connection->addLicensesAsync(licensesToUpdate, this, SLOT(at_licensesReceived(int,QnLicenseList,int)));
+        auto addLisencesHandler = [this, licensesToUpdate]( int reqID, ec2::ErrorCode errorCode ){
+            at_licensesReceived( reqID, errorCode, licensesToUpdate );
+        };
+        int handle = QnAppServerConnectionFactory::getConnection2()->getLicenseManager()->addLicenses(
+            licensesToUpdate, this, addLisencesHandler );
         m_handleKeyMap[handle] = licenseKey;
     }
 
@@ -261,7 +264,7 @@ void QnLicenseManagerWidget::updateDetailsButtonEnabled() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licenses, int handle)
+void QnLicenseManagerWidget::at_licensesReceived(int handle, ec2::ErrorCode errorCode, QnLicenseList licenses)
 {
     if (!m_handleKeyMap.contains(handle))
         return;
@@ -273,7 +276,7 @@ void QnLicenseManagerWidget::at_licensesReceived(int status, QnLicenseList licen
     QnLicensePtr license = licenseListHelper.getLicenseByKey(licenseKey);
         
     QString message;
-    if (!license || status)
+    if (!license || (errorCode != ec2::ErrorCode::ok))
         message = tr("There was a problem activating your license.");
     else if (license)
         message = tr("License was successfully activated.");
@@ -298,7 +301,7 @@ void QnLicenseManagerWidget::at_downloadError() {
         reply->deleteLater();
 
         /* QNetworkReply slots should not start eventLoop */
-        emit showMessageLater(tr("License Activation"),
+        emit showMessageLater(tr("License Activation ") + reply->errorString(),
                               tr("Network error has occurred during automatic license activation.\nTry to activate your license manually."),
                               true);
 
@@ -353,8 +356,12 @@ void QnLicenseManagerWidget::at_downloadFinished() {
             if (!license )
                 break;
 
-            if (license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT)))
+
+            QnLicense::ErrorCode errCode = QnLicense::NoError;
+            if (license->isValid(&errCode, true))
                 licenses.append(license);
+            else if (errCode == QnLicense::Expired)
+                licenses.append(license); // ignore expired error code
         }
 
         validateLicenses(m_replyKeyMap[reply], licenses);
@@ -385,7 +392,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
     } else {
         QList<QnLicensePtr> licenseList;
         QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
-        if (license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT)))
+        if (license->isValid())
             licenseList.append(license);
 
         validateLicenses(license ? license->key() : "", licenseList);

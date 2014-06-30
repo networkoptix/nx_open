@@ -140,6 +140,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), QString(), QString(), 0);
 
     QnVirtualCameraResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
+    if (!existResource)
+        existResource = qnResPool->getResourceByParam(QnPlOnvifResource::ONVIF_ID_PARAM_NAME, info.uniqId).dynamicCast<QnVirtualCameraResource>();
+
     if (existResource) {
         soapWrapper.setLogin(existResource->getAuth().user());
         soapWrapper.setPassword(existResource->getAuth().password());
@@ -150,48 +153,44 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     }
     else
         soapWrapper.fetchLoginPassword(info.manufacturer);
-    //qDebug() << "OnvifResourceInformationFetcher::findResources: Initial login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();
-
-    //some cameras returns by default not specific names; for example vivoteck returns "networkcamera" -> just in case we request params one more time.
 
     //Trying to get name and manufacturer
     if (existResource)
     {
         if (model.isEmpty())
             model = existResource->getModel();
-        QnResourceTypePtr resType = qnResTypePool->getResourceType(existResource->getTypeId());
         if (manufacturer.isEmpty())
-            manufacturer = resType->getName();
+            manufacturer = existResource->getVendor();
+        if (mac.isEmpty())
+            mac = existResource->getMAC().toString();
     }
-    else // if (model.isEmpty() || manufacturer.isEmpty())
+
+    if (model.isEmpty() || manufacturer.isEmpty() || mac.isEmpty())
     {
-        // always call getDeviceInformation to filter non-onvif devices
-        DeviceInfoReq request;
-        DeviceInfoResp response;
-        int soapRes = soapWrapper.getDeviceInformation(request, response);
-        if (soapRes != SOAP_OK) {
-            qDebug() << "OnvifResourceInformationFetcher::findResources: SOAP to endpoint '" << endpoint
-                     << "' failed. Camera name will be set to 'Unknown'. GSoap error code: " << soapRes
-                     << ". " << soapWrapper.getLastError();
-            if (!soapWrapper.isNotAuthenticated())
-                return; // non onvif device
-        } 
-        else {
-            if (!response.Manufacturer.empty())
-                manufacturer = QString::fromStdString(response.Manufacturer);
+        OnvifResExtInfo extInfo;
+        QAuthenticator auth;
+        auth.setUser(soapWrapper.getLogin());
+        auth.setPassword(soapWrapper.getPassword());
+        CameraDiagnostics::Result result = QnPlOnvifResource::readDeviceInformation(endpoint, auth, INT_MAX, &extInfo);
+        
+        if (!result && result.errorCode != CameraDiagnostics::ErrorCode::notAuthorised)
+            return; // non onvif device
 
-            if (model.isEmpty())
-                model = QString::fromStdString(response.Model);
+        if (!extInfo.vendor.isEmpty())
+            manufacturer = extInfo.vendor;
 
-            if (!response.FirmwareVersion.empty())
-                firmware = QString::fromStdString(response.FirmwareVersion);
-
-            if( (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString()))) ||
-                ignoreCamera(manufacturer, model) )
-            {
-                qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << model;
-                return;
-            }
+        if (!extInfo.model.isEmpty())
+            model = extInfo.model;
+        if (!extInfo.firmware.isEmpty())
+            firmware = extInfo.firmware;
+        if (!extInfo.mac.isEmpty())
+            mac = extInfo.mac;
+            
+        if( (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(model).replace(manufacturer, QString()))) ||
+            ignoreCamera(manufacturer, model) )
+        {
+            qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << model;
+            return;
         }
     }
 
@@ -248,9 +247,9 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 QnId OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manufacturer, const QString&  model) const
 {
     QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
-    if (rt.isValid())
+    if (!rt.isNull())
         return rt;
-    else if (isAnalogOnvifResource(manufacturer, model) && onvifAnalogTypeId.isValid())
+    else if (isAnalogOnvifResource(manufacturer, model) && !onvifAnalogTypeId.isNull())
         return onvifAnalogTypeId;
     else 
         return onvifTypeId; // no child resourceType found. Use root ONVIF resource type
@@ -268,31 +267,21 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
 
     resource->setTypeId(getOnvifResourceType(manufacturer, model));
 
-    /*
-    QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
-    if (rt.isValid())
-        resource->setTypeId(rt);
-    else if (isAnalogOnvifResource(manufacturer, model) && onvifAnalogTypeId.isValid())
-        resource->setTypeId(onvifAnalogTypeId);
-    else 
-        resource->setTypeId(onvifTypeId); // no child resourceType found. Use root ONVIF resource type
-    */
-
     resource->setHostAddress(QHostAddress(sender).toString(), QnDomainMemory);
     resource->setDiscoveryAddr(discoveryIp);
-    //resource->setName(manufacturer + QLatin1String(" - ") + name);
     resource->setModel(model);
     if (isModelContainVendor(manufacturer, model))
         resource->setName(model); 
     else
         resource->setName(manufacturer + model); 
-    resource->setMAC(mac);
+    resource->setMAC(QnMacAddress(mac));
     resource->setFirmware(firmware);
 
-    if (!mac.size())
+    if (mac.isEmpty())
         resource->setPhysicalId(uniqId);
 
     resource->setDeviceOnvifUrl(deviceUrl);
+    resource->setDeviceOnvifID(uniqId);
 
     if (!login.isEmpty())
         resource->setAuth(login, passwd);

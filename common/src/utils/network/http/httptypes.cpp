@@ -37,6 +37,21 @@ namespace nx_http
         return it == headers.end() ? StringType() : it->second;
     }
     
+    HttpHeaders::iterator insertOrReplaceHeader( HttpHeaders* const headers, const HttpHeader& newHeader )
+    {
+        HttpHeaders::iterator existingHeaderIter = headers->lower_bound( newHeader.first );
+        if( (existingHeaderIter != headers->end()) &&
+            (strcasecmp( existingHeaderIter->first, newHeader.first ) == 0) )
+        {
+            existingHeaderIter->second = newHeader.second;  //replacing header
+            return existingHeaderIter;
+        }
+        else
+        {
+            return headers->insert( existingHeaderIter, newHeader );
+        }
+    }
+
     ////////////////////////////////////////////////////////////
     //// parse utils
     ////////////////////////////////////////////////////////////
@@ -170,6 +185,14 @@ namespace nx_http
         return true;
     }
 
+    HttpHeader parseHeader( const ConstBufferRefType& data )
+    {
+        ConstBufferRefType headerNameRef;
+        ConstBufferRefType headerValueRef;
+        parseHeader( &headerNameRef, &headerValueRef, data );
+        return HttpHeader( headerNameRef, headerValueRef );
+    }
+
     namespace StatusCode
     {
         StringType toString( int val )
@@ -187,20 +210,32 @@ namespace nx_http
                     return StringType("OK");
                 case noContent:
                     return StringType("No Content");
+                case partialContent:
+                    return StringType("Partial Content");
                 case multipleChoices:
                     return StringType("Multiple Choices");
                 case moved:
                     return StringType("Moved");
+                case moved_permanently:
+                    return StringType("Moved Permanently");
                 case badRequest:
                     return StringType("Bad Request");
                 case unauthorized:
                     return StringType("Unauthorized");
+                case forbidden:
+                    return StringType("Forbidden");
                 case notFound:
                     return StringType("Not Found");
+                case notAllowed:
+                    return StringType("Not Allowed");
+                case proxyAuthenticationRequired:
+                    return StringType("Proxy Authentication Required");
                 case internalServerError:
                     return StringType("Internal Server Error");
                 case notImplemented:
                     return StringType("Not Implemented");
+                case serviceUnavailable:
+                    return StringType("Service Unavailable");
                 default:
                     return StringType("Unknown_") + StringType::number(val);
             }
@@ -211,13 +246,42 @@ namespace nx_http
     namespace Method
     {
         const StringType GET( "GET" );
+        const StringType POST( "POST" );
         const StringType PUT( "PUT" );
     }
 
-    namespace Version
+    //namespace Version
+    //{
+    //    const StringType http_1_0( "HTTP/1.0" );
+    //    const StringType http_1_1( "HTTP/1.1" );
+    //}
+
+
+    ////////////////////////////////////////////////////////////
+    //// class MimeProtoVersion
+    ////////////////////////////////////////////////////////////
+    static size_t estimateSerializedDataSize( const MimeProtoVersion& val )
     {
-        const StringType http_1_0( "HTTP/1.0" );
-        const StringType http_1_1( "HTTP/1.1" );
+        return val.protocol.size() + 1 + val.version.size();
+    }
+
+    bool MimeProtoVersion::parse( const ConstBufferRefType& data )
+    {
+        int sepPos = data.indexOf( '/' );
+        //const ConstBufferRefType& trimmedData = data.trimmed();
+        const ConstBufferRefType& trimmedData = data;
+        if( sepPos == -1 )
+            return false;
+        protocol = trimmedData.mid( 0, sepPos );
+        version = trimmedData.mid( sepPos+1 );
+        return true;
+    }
+
+    void MimeProtoVersion::serialize( BufferType* const dstBuffer ) const
+    {
+        dstBuffer->append( protocol );
+        dstBuffer->append( "/" );
+        dstBuffer->append( version );
     }
 
 
@@ -226,19 +290,20 @@ namespace nx_http
     ////////////////////////////////////////////////////////////
     static size_t estimateSerializedDataSize( const RequestLine& rl )
     {
-        return rl.method.size() + 1 + rl.url.toString().size() + 1 + rl.version.size() + 2;
+        return rl.method.size() + 1 + rl.url.toString().size() + 1 + estimateSerializedDataSize(rl.version) + 2;
     }
 
     bool RequestLine::parse( const ConstBufferRefType& data )
     {
-        const BufferType& str = data;
+        const BufferType& str = data.toByteArrayWithRawData();
         const QList<QByteArray>& elems = str.split( ' ' );
         if( elems.size() != 3 )
             return false;
 
         method = elems[0];
         url = QUrl( QLatin1String(elems[1]) );
-        version = elems[2];
+        if( !version.parse(elems[2]) )
+            return false;
         return true;
     }
 
@@ -248,7 +313,7 @@ namespace nx_http
         *dstBuffer += " ";
         *dstBuffer += url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
         *dstBuffer += " ";
-        *dstBuffer += version;
+        version.serialize( dstBuffer );
         *dstBuffer += "\r\n";
     }
 
@@ -259,7 +324,7 @@ namespace nx_http
     static const int MAX_DIGITS_IN_STATUS_CODE = 5;
     static size_t estimateSerializedDataSize( const StatusLine& sl )
     {
-        return sl.version.size() + 1 + MAX_DIGITS_IN_STATUS_CODE + 1 + sl.reasonPhrase.size() + 2;
+        return estimateSerializedDataSize(sl.version) + 1 + MAX_DIGITS_IN_STATUS_CODE + 1 + sl.reasonPhrase.size() + 2;
     }
 
     StatusLine::StatusLine()
@@ -274,7 +339,8 @@ namespace nx_http
         const size_t versionEnd = find_first_of( data, " ", versionStart );
         if( versionEnd == BufferNpos )
             return false;
-        version = data.mid( versionStart, versionEnd-versionStart );
+        if( !version.parse(data.mid( versionStart, versionEnd-versionStart )) )
+            return false;
 
         const size_t statusCodeStart = find_first_not_of( data, " ", versionEnd );
         if( statusCodeStart == BufferNpos )
@@ -297,7 +363,7 @@ namespace nx_http
 
     void StatusLine::serialize( BufferType* const dstBuffer ) const
     {
-        *dstBuffer += version;
+        version.serialize( dstBuffer );
         *dstBuffer += " ";
         char buf[11];
 #ifdef _WIN32
@@ -313,24 +379,28 @@ namespace nx_http
 
 
     ////////////////////////////////////////////////////////////
-    //// class HttpRequest
+    //// class Request
     ////////////////////////////////////////////////////////////
-    bool HttpRequest::parse( const ConstBufferRefType& data )
+    template<class MessageType, class MessageLineType>
+    bool parseRequestOrResponse(
+        const ConstBufferRefType& data,
+        MessageType* message,
+        MessageLineType MessageType::*messageLine )
     {
         enum ParseState
         {
-            readingRequestLine,
+            readingMessageLine, //request line or status line
             readingHeaders,
             readingMessageBody
         }
-        state = readingRequestLine;
+        state = readingMessageLine;
 
         int lineNumber = 0;
         for( size_t curPos = 0; curPos < data.size(); ++lineNumber )
         {
             if( state == readingMessageBody )
             {
-                messageBody = data.mid( curPos );
+                message->messageBody = data.mid( curPos );
                 break;
             }
 
@@ -339,8 +409,8 @@ namespace nx_http
             const ConstBufferRefType currentLine = data.mid( curPos, lineSepPos == BufferNpos ? lineSepPos : lineSepPos-curPos );
             switch( state )
             {
-                case readingRequestLine:
-                    if( !requestLine.parse( currentLine ) )
+                case readingMessageLine:
+                    if( !(message->*messageLine).parse( currentLine ) )
                         return false;
                     state = readingHeaders;
                     break;
@@ -353,7 +423,7 @@ namespace nx_http
                         StringType headerValue;
                         if( !parseHeader( &headerName, &headerValue, currentLine ) )
                             return false;
-                        headers.insert( std::make_pair( headerName, headerValue ) );
+                        message->headers.insert( std::make_pair( headerName, headerValue ) );
                         break;
                     }
                     else
@@ -377,11 +447,15 @@ namespace nx_http
         return true;
     }
 
-    void HttpRequest::serialize( BufferType* const dstBuffer ) const
+    bool Request::parse( const ConstBufferRefType& data )
+    {
+        return parseRequestOrResponse( data, this, &Request::requestLine );
+    }
+
+    void Request::serialize( BufferType* const dstBuffer ) const
     {
         //estimating required buffer size
-        dstBuffer->clear();
-        dstBuffer->reserve( estimateSerializedDataSize(requestLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );
+        dstBuffer->reserve( dstBuffer->size() + estimateSerializedDataSize(requestLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );
 
         //serializing
         requestLine.serialize( dstBuffer );
@@ -392,13 +466,17 @@ namespace nx_http
 
 
     ////////////////////////////////////////////////////////////
-    //// class HttpResponse
+    //// class Response
     ////////////////////////////////////////////////////////////
-    void HttpResponse::serialize( BufferType* const dstBuffer ) const
+    bool Response::parse( const ConstBufferRefType& data )
+    {
+        return parseRequestOrResponse( data, this, &Response::statusLine );
+    }
+
+    void Response::serialize( BufferType* const dstBuffer ) const
     {
         //estimating required buffer size
-        dstBuffer->clear();
-        dstBuffer->reserve( estimateSerializedDataSize(statusLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );
+        dstBuffer->reserve( dstBuffer->size() + estimateSerializedDataSize(statusLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );
 
         //serializing
         statusLine.serialize( dstBuffer );
@@ -407,57 +485,83 @@ namespace nx_http
         dstBuffer->append( messageBody );
     }
 
-    BufferType HttpResponse::toString() const
+    BufferType Response::toString() const
     {
-        BufferType str;
-        serialize( &str );
-        return str;
+        BufferType buf;
+        serialize( &buf );
+        return buf;
+    }
+
+
+    namespace MessageType
+    {
+        QLatin1String toString( Value val )
+        {
+            switch( val )
+            {
+                case request:
+                {
+                    static QLatin1String requestStr("request");
+                    return requestStr;
+                }
+                case response:
+                {
+                    static QLatin1String responseStr("response");
+                    return responseStr;
+                }
+                default:
+                {
+                    static QLatin1String unknownStr("unknown");
+                    return unknownStr;
+                }
+            }
+        }
     }
 
 
 
     ////////////////////////////////////////////////////////////
-    //// class HttpMessage
+    //// class Message
     ////////////////////////////////////////////////////////////
-    HttpMessage::HttpMessage( MessageType::Value _type )
+    Message::Message( MessageType::Value _type )
     :
         type( _type )
     {
         if( type == MessageType::request )
-            request = new HttpRequest();
+            request = new Request();
         else if( type == MessageType::response )
-            response = new HttpResponse();
+            response = new Response();
     }
 
-    HttpMessage::HttpMessage( const HttpMessage& right )
+    Message::Message( const Message& right )
     :
         type( right.type )
     {
         if( type == MessageType::request )
-            request = new HttpRequest( *right.request );
+            request = new Request( *right.request );
         else if( type == MessageType::response )
-            response = new HttpResponse( *right.response );
+            response = new Response( *right.response );
         else
             request = NULL;
     }
 
-    HttpMessage::~HttpMessage()
+    Message::~Message()
     {
         clear();
     }
 
-    HttpMessage& HttpMessage::operator=( const HttpMessage& right )
+    Message& Message::operator=( const Message& right )
     {
         clear();
         type = right.type;
         if( type == MessageType::request )
-            request = new HttpRequest( *right.request );
+            request = new Request( *right.request );
         else if( type == MessageType::response )
-            response = new HttpResponse( *right.response );
+            response = new Response( *right.response );
         return *this;
     }
 
-    void HttpMessage::clear()
+    void Message::clear()
     {
         if( type == MessageType::request )
             delete request;
@@ -465,6 +569,23 @@ namespace nx_http
             delete response;
         request = NULL;
         type = MessageType::none;
+    }
+
+    BufferType Message::toString() const
+    {
+        BufferType str;
+        switch( type )
+        {
+            case MessageType::request:
+                request->serialize( &str );
+                break;
+            case MessageType::response:
+                response->serialize( &str );
+                break;
+            default:
+                break;
+        }
+        return str;
     }
 
 

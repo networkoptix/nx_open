@@ -8,7 +8,7 @@ QnNovArchiveDelegate::QnNovArchiveDelegate():
 
 }
 
-bool QnNovArchiveDelegate::open(QnResourcePtr resource)
+bool QnNovArchiveDelegate::open(const QnResourcePtr &resource)
 {
     m_skipFramesBeforeTime = AV_NOPTS_VALUE;
 

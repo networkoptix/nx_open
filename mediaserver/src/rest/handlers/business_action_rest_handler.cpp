@@ -2,8 +2,10 @@
 #include "utils/network/tcp_connection_priv.h"
 #include <business/actions/abstract_business_action.h>
 #include <business/business_message_bus.h>
-#include <api/serializer/pb_serializer.h>
 #include "core/resource_management/resource_pool.h"
+#include "nx_ec/data/api_business_rule_data.h"
+#include "nx_ec/data/api_conversion_functions.h"
+#include "utils/serialization/binary_functions.h"
 
 int QnBusinessActionRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
@@ -25,9 +27,11 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
     Q_UNUSED(contentType)
 
     QnAbstractBusinessActionPtr action;
-
-    QnApiPbSerializer serializer;
-    serializer.deserializeBusinessAction(action, body);
+    ec2::ApiBusinessActionData apiData;
+    QnInputBinaryStream<QByteArray> stream(&body);
+    if (QnBinary::deserialize(&stream, &apiData))
+        fromApiToResource(apiData, action, qnResPool);
+    
     if (action) {
         action->setReceivedFromRemoteHost(true);
 
@@ -38,8 +42,8 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
                 resId = params[i].second;
         }
 
-        QnResourcePtr res = qnResPool->getResourceById(resId);
-        qnBusinessMessageBus->at_actionReceived(action, res);
+        //QnResourcePtr res = qnResPool->getResourceById(resId);
+        qnBusinessMessageBus->at_actionReceived(action);
     }
 
     result.append("<root>");
@@ -48,7 +52,3 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
     return action ? CODE_OK : CODE_INVALID_PARAMETER;
 }
 
-QString QnBusinessActionRestHandler::description() const
-{
-    return "Execute business action. Action specified in POST request body in binary protobuf format. \n";
-}

@@ -21,6 +21,9 @@ public:
     }
 
     void start(const QWidget *widget, qreal speed, qreal value) {
+        if (!widget)
+            return;
+
         if(!m_connectedWidgets.contains(widget)) {
             m_connectedWidgets.insert(widget);
             connect(widget, SIGNAL(destroyed(QObject *)), this, SLOT(at_widget_destroyed(QObject *)));

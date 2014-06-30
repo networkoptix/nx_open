@@ -4,19 +4,25 @@
 #include "desktop_camera_reader.h"
 #include <media_server/serverutil.h>
 
-const char* QnDesktopCameraResource::MANUFACTURE = "VIRTUAL_CAMERA";
+const QString QnDesktopCameraResource::MANUFACTURE("VIRTUAL_CAMERA");
 
 static QByteArray ID_PREFIX("Desktop_camera_");
 
 QString QnDesktopCameraResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
-QnDesktopCameraResource::QnDesktopCameraResource(): QnPhysicalCameraResource()
+QnDesktopCameraResource::QnDesktopCameraResource(): QnPhysicalCameraResource() {
+    setFlags(flags() | no_last_gop | desktop_camera);
+}
+
+
+QnDesktopCameraResource::QnDesktopCameraResource(const QString &userName): QnPhysicalCameraResource()
 {
-    setFlags(flags() | no_last_gop);
-    setDisabled(true);  // #3087
+    setFlags(flags() | no_last_gop | desktop_camera);
+    setPhysicalId(QLatin1String(ID_PREFIX) + serverGuid().toString() + lit("_") + userName);
+    setName(userName);
 }
 
 QnDesktopCameraResource::~QnDesktopCameraResource()
@@ -42,16 +48,6 @@ QnAbstractStreamDataProvider* QnDesktopCameraResource::createLiveDataProvider()
     return new QnDesktopCameraStreamReader(toSharedPointer());
 }
 
-QString QnDesktopCameraResource::gePhysicalIdPrefix() const
-{
-    return QLatin1String(ID_PREFIX) + serverGuid() + lit("_");
-}
-
-QString QnDesktopCameraResource::getUserName() const 
-{ 
-    return getPhysicalId().mid(gePhysicalIdPrefix().size());
-}
-
 QnConstResourceAudioLayoutPtr QnDesktopCameraResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     const QnDesktopCameraStreamReader* deskopReader = dynamic_cast<const QnDesktopCameraStreamReader*>(dataProvider);
@@ -59,6 +55,17 @@ QnConstResourceAudioLayoutPtr QnDesktopCameraResource::getAudioLayout(const QnAb
         return deskopReader->getDPAudioLayout();
     else
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
+}
+
+bool QnDesktopCameraResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) {
+    bool result = base_type::mergeResourcesIfNeeded(source);
+
+    if (getName() != source->getName()) {
+        setName(source->getName());
+        result = true;
+    }
+
+    return result;
 }
 
 #endif //ENABLE_DESKTOP_CAMERA

@@ -218,7 +218,7 @@ bool QnAction::event(QEvent *event) {
             }
         } 
 
-        Qn::ActionScope scope;
+        Qn::ActionScope scope = Qn::InvalidScope;
         QnActionParameters parameters;
         QnActionTargetProvider *targetProvider = QnWorkbenchContextAware::menu()->targetProvider();
         if(targetProvider != NULL) {

@@ -121,6 +121,7 @@ protected:
     virtual void run() override;
 
 private:
+    // TODO: #Elric #enum
     enum State
     {
         sInit,
@@ -130,7 +131,7 @@ private:
 
     mutable QMutex m_mutex;
     QWaitCondition m_cond;
-    std::auto_ptr<QnAviArchiveDelegate> m_mediaFileReader;
+    std::unique_ptr<QnAviArchiveDelegate> m_mediaFileReader;
     QnFfmpegTranscoder m_transcoder;
     int m_resultCode;
     State m_state;

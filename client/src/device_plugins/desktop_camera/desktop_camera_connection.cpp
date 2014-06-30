@@ -29,7 +29,7 @@ public:
 protected:
 protected:
 
-    virtual bool processData(QnAbstractDataPacketPtr packet) override
+    virtual bool processData(const QnAbstractDataPacketPtr& packet) override
     {
         if (m_needStop)
             return true;
@@ -122,7 +122,7 @@ void QnDesktopCameraConnectionProcessor::processRequest()
     {
         // nothing to do. we restarting timer on any request
     }
-    d->response.headers.insert(std::make_pair("cSeq", d->request.headers["cSeq"]));
+    d->response.headers.insert(std::make_pair("cSeq", nx_http::getHeaderValue(d->request.headers, "cSeq")));
     //QMutexLocker lock(&d->sendMutex);
     //sendResponse("RTSP", CODE_OK, QByteArray(), QByteArray());
 }

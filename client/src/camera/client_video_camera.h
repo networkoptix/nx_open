@@ -4,7 +4,7 @@
 #include "cam_display.h"
 #include <recording/stream_recorder.h>
 #include "decoders/video/abstractdecoder.h"
-#include "core/resource/media_resource.h"
+#include <core/resource/resource_fwd.h>
 #include "core/dataprovider/statistics.h"
 #include "utils/media/externaltimesource.h"
 
@@ -29,7 +29,7 @@ public:
 
     static QString errorString(int errCode);
 
-    QnClientVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader = 0);
+    QnClientVideoCamera(const QnMediaResourcePtr &resource, QnAbstractMediaStreamDataProvider* reader = 0);
     virtual ~QnClientVideoCamera();
 
     QnMediaResourcePtr resource();

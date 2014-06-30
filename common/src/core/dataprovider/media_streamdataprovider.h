@@ -20,7 +20,7 @@ class QnAbstractMediaStreamDataProvider : public QnAbstractStreamDataProvider
     Q_OBJECT;
 
 public:
-    explicit QnAbstractMediaStreamDataProvider(QnResourcePtr res);
+    explicit QnAbstractMediaStreamDataProvider( const QnResourcePtr& res );
     virtual ~QnAbstractMediaStreamDataProvider();
 
 
@@ -50,9 +50,9 @@ protected:
 
     virtual bool beforeGetData() { return true; }
     // if function returns false we do not put result into the queues
-    virtual bool afterGetData(QnAbstractDataPacketPtr data);
+    virtual bool afterGetData(const QnAbstractDataPacketPtr& data);
     
-    void checkTime(QnAbstractMediaDataPtr data);
+    void checkTime( const QnAbstractMediaDataPtr& data );
     void resetTimeCheck();
 protected:
     QnStatistics m_stat[CL_MAX_CHANNEL_NUMBER];

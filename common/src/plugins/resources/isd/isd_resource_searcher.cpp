@@ -3,6 +3,8 @@
 #include "core/resource/camera_resource.h"
 #include "isd_resource_searcher.h"
 #include "isd_resource.h"
+#include <utils/network/http/httptypes.h>
+
 
 extern QString getValueFromString(const QString& line);
 
@@ -10,13 +12,7 @@ QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
 }
 
-QnPlISDResourceSearcher& QnPlISDResourceSearcher::instance()
-{
-    static QnPlISDResourceSearcher inst;
-    return inst;
-}
-
-QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlISDResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -38,8 +34,8 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const
     result = QnVirtualCameraResourcePtr( new QnPlIsdResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create ISD camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create ISD camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 
@@ -47,7 +43,7 @@ QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const
 
 QString QnPlISDResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlIsdResource::MANUFACTURE);
+    return QnPlIsdResource::MANUFACTURE;
 }
 
 static const QLatin1String DEFAULT_ISD_USERNAME( "root" );
@@ -67,15 +63,11 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 
 
     QString host = url.host();
-    int port = url.port();
+    int port = url.port( nx_http::DEFAULT_HTTP_PORT );
     if (host.isEmpty())
         host = url.toString(); // in case if url just host address without protocol and port
 
     int timeout = 2000;
-
-
-    if (port < 0)
-        port = 80;
 
     CLHttpStatus status;
     QString name = QString(QLatin1String(downloadFile(status, QLatin1String("api/param.cgi?req=General.Brand.ModelName"), host, port, timeout, auth)));
@@ -123,7 +115,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
         return QList<QnResourcePtr>();
 
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
@@ -131,7 +123,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(mac);
+    resource->setMAC(QnMacAddress(mac));
     resource->setHostAddress(host, QnDomainMemory);
     resource->setAuth(auth);
 
@@ -216,7 +208,7 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceLis
     QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (rt.isNull())
     {
         return local_result;
     }
@@ -224,7 +216,7 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceLis
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    resource->setMAC(smac);
+    resource->setMAC(QnMacAddress(smac));
 
     local_result.push_back(resource);
 

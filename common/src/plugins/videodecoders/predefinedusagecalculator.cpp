@@ -15,8 +15,7 @@ PredefinedUsageCalculator::PredefinedUsageCalculator(
 :
     m_rns( rns ),
     m_predefinedDataFilePath( predefinedDataFilePath ),
-    m_usageWatcher( usageWatcher ),
-    m_currentTree( NULL )
+    m_usageWatcher( usageWatcher )
 {
     updateTree();
 }
@@ -79,10 +78,10 @@ void PredefinedUsageCalculator::updateTree()
     if( !newTree )
         return;
 
-    std::auto_ptr<stree::AbstractNode> oldTree; //TODO: #ak auto_ptr is deprecated
+    std::unique_ptr<stree::AbstractNode> oldTree;
     {
         QMutexLocker lk( &m_treeMutex );
-        oldTree = m_currentTree;
+        oldTree = std::move(m_currentTree);
         m_currentTree.reset( newTree );
     }
 }
@@ -98,14 +97,14 @@ void PredefinedUsageCalculator::loadXml( const QString& filePath, stree::Abstrac
     QFile xmlFile( filePath );
     if( !xmlFile.open( QIODevice::ReadOnly ) )
     {
-        cl_log.log( lit( "Failed to open stree xml file (%1). %2" ).arg(filePath).arg(xmlFile.errorString()), cl_logERROR );
+        NX_LOG( lit( "Failed to open stree xml file (%1). %2" ).arg(filePath).arg(xmlFile.errorString()), cl_logERROR );
         return;
     }
     QXmlInputSource input( &xmlFile );
-    cl_log.log( lit( "Parsing stree xml file (%1)" ).arg(filePath), cl_logDEBUG1 );
+    NX_LOG( lit( "Parsing stree xml file (%1)" ).arg(filePath), cl_logDEBUG1 );
     if( !reader.parse( &input ) )
     {
-        cl_log.log( lit( "Failed to parse stree xml (%1). %2" ).arg(filePath).arg(xmlHandler.errorString()), cl_logERROR );
+        NX_LOG( lit( "Failed to parse stree xml (%1). %2" ).arg(filePath).arg(xmlHandler.errorString()), cl_logERROR );
         return;
     }
 

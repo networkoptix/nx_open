@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <UI>
+            <Dialog Id="AllFieldsAreMandatoryDlg" Width="280" Height="70" Title="!(loc.PasswordShouldMatchDlg_ConfigError)">
+                <Control Id="Ok" Type="PushButton" X="220" Y="44" Width="56" Height="17" Text="!(loc.StdString_Ok)">
+                    <Publish Event="EndDialog" Value="Return">1</Publish>
+                </Control>
+                <Control Id="BannerBitmap" Type="Bitmap" Height="24" Width="24" X="10" Y="7" Text="!(loc.StdString_Warning)" />
+                <Control Id="Text" Type="Text" X="38" Y="7" Width="238" Height="30" NoPrefix="yes" Text="!(loc.AllFieldsAreMandatoryDlg_AllFieldsAreMandatory)" />
+            </Dialog>
+        </UI>
+    </Fragment>
+</Wix>

@@ -39,9 +39,9 @@ QnBusinessEventConnector* QnBusinessEventConnector::instance()
     return _instance;
 }
 
-void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, QnConstAbstractDataPacketPtr metadata)
+void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, const QnConstAbstractDataPacketPtr& metadata)
 {
-    QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent(resource, value ? Qn::OnState : Qn::OffState, timeStamp, metadata)); 
+    QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent(resource, value ? QnBusiness::ActiveState : QnBusiness::InactiveState, timeStamp, metadata)); 
     qnBusinessRuleProcessor->processBusinessEvent(motionEvent);
 }
 
@@ -57,10 +57,16 @@ void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes
     qnBusinessRuleProcessor->processBusinessEvent(storageEvent);
 }
 
-void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode)
+void QnBusinessEventConnector::at_mserverFailure(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText)
 {
-    QnMServerFailureBusinessEventPtr mserverEvent(new QnMServerFailureBusinessEvent(resource, timeStamp, reasonCode));
+    QnMServerFailureBusinessEventPtr mserverEvent(new QnMServerFailureBusinessEvent(resource, timeStamp, reasonCode, reasonText));
     qnBusinessRuleProcessor->processBusinessEvent(mserverEvent);
+}
+
+void QnBusinessEventConnector::at_licenseIssueEvent(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText)
+{
+    QnLicenseIssueBusinessEventPtr bEvent(new QnLicenseIssueBusinessEvent(resource, timeStamp, reasonCode, reasonText));
+    qnBusinessRuleProcessor->processBusinessEvent(bEvent);
 }
 
 void QnBusinessEventConnector::at_mserverStarted(const QnResourcePtr &resource, qint64 timeStamp)
@@ -92,7 +98,7 @@ void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, con
         return;
 
     qnBusinessRuleProcessor->processBusinessEvent(
-        QnCameraInputEventPtr(new QnCameraInputEvent(resource->toSharedPointer(), value ? Qn::OnState : Qn::OffState, timeStamp * 1000, inputPortID))
+        QnCameraInputEventPtr(new QnCameraInputEvent(resource->toSharedPointer(), value ? QnBusiness::ActiveState : QnBusiness::InactiveState, timeStamp * 1000, inputPortID))
     );
 }
 

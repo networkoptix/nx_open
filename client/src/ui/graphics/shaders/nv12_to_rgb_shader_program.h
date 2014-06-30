@@ -1,9 +1,12 @@
 #ifndef QN_NV12_TO_RGB_SHADER_PROGRAM_H
 #define QN_NV12_TO_RGB_SHADER_PROGRAM_H
 
-#include <QtOpenGL/QGLShaderProgram>
 
-class QnNv12ToRgbShaderProgram: public QGLShaderProgram {
+
+#include <QtOpenGL/QGLShaderProgram>
+#include "base_shader_program.h"
+
+class QnNv12ToRgbShaderProgram: public QnAbstractBaseGLShaderProgramm {
     Q_OBJECT
 public:
     enum Colorspace {
@@ -44,12 +47,13 @@ public:
     }
 
     static QMatrix4x4 colorTransform(Colorspace colorspace, bool fullRange = true);
-
+    bool wasLinked(){ return m_wasLinked; };
 private:
     int m_yTextureLocation;
     int m_uvTextureLocation;
     int m_colorTransformLocation;
     int m_opacityLocation;
+    bool m_wasLinked;
 };
 
 

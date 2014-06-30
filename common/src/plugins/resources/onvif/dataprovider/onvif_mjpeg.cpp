@@ -1,5 +1,7 @@
 
 #include "onvif_mjpeg.h"
+
+#include "core/datapacket/video_data_packet.h"
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
 #include "utils/network/http/httptypes.h"
@@ -60,15 +62,15 @@ int contain_subst(char *data, int datalen, char *subdata, int subdatalen)
 }
 */
 
-MJPEGtreamreader::MJPEGtreamreader(QnResourcePtr res, const QString& requst)
+MJPEGStreamReader::MJPEGStreamReader(const QnResourcePtr& res, const QString& streamHttpPath)
 :
     CLServerPushStreamReader(res),
-    m_request(requst)
+    m_request(streamHttpPath)
 {
 
 }
 
-MJPEGtreamreader::~MJPEGtreamreader()
+MJPEGStreamReader::~MJPEGStreamReader()
 {
     stop();
 }
@@ -81,7 +83,7 @@ int getIntParam(const char* pos)
     return rez;
 }
 
-QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
+QnAbstractMediaDataPtr MJPEGStreamReader::getNextData()
 {
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
@@ -110,12 +112,12 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
         return QnAbstractMediaDataPtr(0);
     int contentLen = getIntParam(contentLenPtr + 16);
 
-    QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, contentLen+FF_INPUT_BUFFER_PADDING_SIZE));
-    videoData->data.write(realHeaderEnd+4, headerBufferEnd - (realHeaderEnd+4));
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, contentLen+FF_INPUT_BUFFER_PADDING_SIZE));
+    videoData->m_data.write(realHeaderEnd+4, headerBufferEnd - (realHeaderEnd+4));
 
-    int dataLeft = contentLen - videoData->data.size();
-    char* curPtr = videoData->data.data() + videoData->data.size();
-    videoData->data.finishWriting(dataLeft);
+    int dataLeft = contentLen - videoData->m_data.size();
+    char* curPtr = videoData->m_data.data() + videoData->m_data.size();
+    videoData->m_data.finishWriting(dataLeft);
 
     while (dataLeft > 0)
     {
@@ -127,7 +129,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
     }
     // sometime 1 more bytes in the buffer end. Looks like it is a DLink bug caused by 16-bit word alignment
     if (contentLen > 2 && !(curPtr[-2] == (char)0xff && curPtr[-1] == (char)0xd9))
-        videoData->data.finishWriting(-1);
+        videoData->m_data.finishWriting(-1);
 
     videoData->compressionType = CODEC_ID_MJPEG;
     videoData->width = 1920;
@@ -139,7 +141,7 @@ QnAbstractMediaDataPtr MJPEGtreamreader::getNextData()
     return videoData;
 }
 
-CameraDiagnostics::Result MJPEGtreamreader::openStream()
+CameraDiagnostics::Result MJPEGStreamReader::openStream()
 {
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -167,12 +169,12 @@ CameraDiagnostics::Result MJPEGtreamreader::openStream()
     }
 }
 
-void MJPEGtreamreader::closeStream()
+void MJPEGStreamReader::closeStream()
 {
     mHttpClient.reset();
 }
 
-bool MJPEGtreamreader::isStreamOpened() const
+bool MJPEGStreamReader::isStreamOpened() const
 {
     return ( mHttpClient.get() && mHttpClient->isOpened() );
 }

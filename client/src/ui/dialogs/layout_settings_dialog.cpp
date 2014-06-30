@@ -186,7 +186,7 @@ bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
     Q_D(QnLayoutSettingsDialog);
 
-    m_cache = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout) //TODO: #GDM refactor duplicated code
+    m_cache = layout->hasFlags(QnResource::url | QnResource::local | QnResource::layout) //TODO: #GDM #Common refactor duplicated code
             ? new QnLocalFileCache(this)
             : new QnAppServerImageCache(this);
     connect(m_cache, SIGNAL(fileDownloaded(QString, bool)), this, SLOT(at_imageLoaded(QString, bool)));
@@ -228,7 +228,7 @@ bool QnLayoutSettingsDialog::submitToResource(const QnLayoutResourcePtr &layout)
     layout->setBackgroundImageFilename(d->imageFilename);
     layout->setBackgroundSize(QSize(ui->widthSpinBox->value(), ui->heightSpinBox->value()));
     layout->setBackgroundOpacity((qreal)ui->opacitySpinBox->value() * 0.01);
-    // TODO: #GDM remove unused image if any
+    // TODO: #GDM #Common remove unused image if any
     return true;
 }
 
@@ -319,7 +319,7 @@ void QnLayoutSettingsDialog::updateControls() {
     }
 
     qreal targetAspectRatio = bestAspectRatioForCells();
-    // TODO: #GDM do not change if values were changed manually?
+    // TODO: #GDM #Common do not change if values were changed manually?
     if (ui->keepAspectRatioCheckBox->isChecked() && targetAspectRatio > 0 && !cellsAreBestAspected()) {
         QSize minSize = QnGeometry::expanded(targetAspectRatio, qnGlobals->layoutBackgroundMinSize(), Qt::KeepAspectRatioByExpanding).toSize();
         QSize maxSize = QnGeometry::expanded(targetAspectRatio, qnGlobals->layoutBackgroundMaxSize(), Qt::KeepAspectRatio).toSize();

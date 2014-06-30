@@ -1,10 +1,11 @@
 #include "workaround_ptz_controller.h"
 
+#include <common/common_module.h>
+
 #include <utils/math/math.h>
 #include <utils/math/coordinate_transformations.h>
-#include <utils/common/lexical.h>
+#include <utils/serialization/lexical_functions.h>
 
-#include <common/common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -35,63 +36,14 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
 
     m_overrideContinuousMove = m_flip != 0 || (m_trait & (Qn::FourWayPtzTrait | Qn::EightWayPtzTrait));
 
-    QString ptzCapabilities = resourceData.value<QString>(lit("ptzCapabilities"));
+    QString ptzCapabilities = resourceData.value<QString>(lit("ptzCapabilities")); 
     if(!ptzCapabilities.isEmpty()) {
-        // TODO: #Elric evil. implement via enum name mapper flags.
-        m_overrideCapabilities = true;
-        m_capabilities = Qn::NoPtzCapabilities;
-        foreach(const QString& capability, ptzCapabilities.split(L'|'))
-        {
-            if(capability == lit("NoPtzCapabilities"))
-                m_capabilities |= Qn::NoPtzCapabilities;
-            else if(capability == lit("ContinuousPanCapability"))
-                m_capabilities |= Qn::ContinuousPanCapability;
-            else if(capability == lit("ContinuousTiltCapability"))
-                m_capabilities |= Qn::ContinuousTiltCapability;
-            else if(capability == lit("ContinuousPanTiltCapabilities"))
-                m_capabilities |= Qn::ContinuousPanTiltCapabilities;
-            else if(capability == lit("ContinuousPtzCapabilities"))
-                m_capabilities |= Qn::ContinuousPtzCapabilities;
-            else if(capability == lit("ContinuousZoomCapability"))
-                m_capabilities |= Qn::ContinuousZoomCapability;
+        if(QnLexical::deserialize(ptzCapabilities, &m_capabilities)) {
+            m_overrideCapabilities = true;
+        } else {
             else if(capability == lit("ContinuousFocusCapability"))
                 m_capabilities |= Qn::ContinuousFocusCapability;
-            else if(capability == lit("AbsolutePanCapability"))
-                m_capabilities |= Qn::AbsolutePanCapability;
-            else if(capability == lit("AbsoluteTiltCapability"))
-                m_capabilities |= Qn::AbsoluteTiltCapability;
-            else if(capability == lit("AbsoluteZoomCapability"))
-                m_capabilities |= Qn::AbsoluteZoomCapability;
-            else if(capability == lit("AbsolutePtzCapabilities"))
-                m_capabilities |= Qn::AbsolutePtzCapabilities;
-            else if(capability == lit("ViewportPtzCapability"))
-                m_capabilities |= Qn::ViewportPtzCapability;
-            else if(capability == lit("FlipPtzCapability"))
-                m_capabilities |= Qn::FlipPtzCapability;
-            else if(capability == lit("LimitsPtzCapability"))
-                m_capabilities |= Qn::LimitsPtzCapability;
-            else if(capability == lit("LimitsPtzCapability"))
-                m_capabilities |= Qn::LimitsPtzCapability;
-            else if(capability == lit("DevicePositioningPtzCapability"))
-                m_capabilities |= Qn::DevicePositioningPtzCapability;
-            else if(capability == lit("LogicalPositioningPtzCapability"))
-                m_capabilities |= Qn::LogicalPositioningPtzCapability;
-            else if(capability == lit("PresetsPtzCapability"))
-                m_capabilities |= Qn::PresetsPtzCapability;
-            else if(capability == lit("ToursPtzCapability"))
-                m_capabilities |= Qn::ToursPtzCapability;
-            else if(capability == lit("ActivityPtzCapability"))
-                m_capabilities |= Qn::ActivityPtzCapability;
-            else if(capability == lit("HomePtzCapability"))
-                m_capabilities |= Qn::HomePtzCapability;
-            else if(capability == lit("AsynchronousPtzCapability"))
-                m_capabilities |= Qn::AsynchronousPtzCapability;
-            else if(capability == lit("SynchronizedPtzCapability"))
-                m_capabilities |= Qn::SynchronizedPtzCapability;
-            else if(capability == lit("VirtualPtzCapability"))
-                m_capabilities |= Qn::VirtualPtzCapability;
-            else
-                qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
+            qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
         }
     }
 }

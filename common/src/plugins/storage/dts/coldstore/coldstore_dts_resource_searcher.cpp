@@ -21,7 +21,7 @@ QString macFromString(QString str)
     str = str.toUpper();
 
     
-    QByteArray ba = str.toLocal8Bit();
+    QByteArray ba = str.toLatin1();
     const char* cstr = ba.data();
 
     int count = 0;
@@ -163,7 +163,7 @@ QList<QnDtsUnit> QnColdStoreDTSSearcher::findDtsUnits()
 
         foreach(const QHostAddress& srv, server_list)
         {
-//			cl_log.log(QLatin1String("Found CS = "), srv.name, cl_logALWAYS);
+//			NX_LOG(QLatin1String("Found CS = "), srv.name, cl_logALWAYS);
 
             if (!m_factoryList.contains(srv.toString()))
                 m_factoryList[srv.toString()] =  new QnColdstoreDTSreaderFactory(srv.toString());
@@ -185,10 +185,10 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
 {
     Veracity::ISFS* sfs_client = new Veracity::SFSClient();
 
-    QByteArray ipba = addr.toString().toLocal8Bit();
+    QByteArray ipba = addr.toString().toLatin1();
     const char* ip = ipba.data();
     
-//	cl_log.log(QLatin1String("CS checking for files"), cl_logALWAYS);
+//	NX_LOG(QLatin1String("CS checking for files"), cl_logALWAYS);
 
     if (sfs_client->Connect(ip) != Veracity::ISFS::STATUS_SUCCESS)
     {
@@ -220,7 +220,7 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
     &return_results_sizeI, &return_results_countI);
     Q_UNUSED(status)
 
-//	cl_log.log(QLatin1String("CS checking for files, returned: "), (int)return_results_countI, cl_logALWAYS);
+//	NX_LOG(QLatin1String("CS checking for files, returned: "), (int)return_results_countI, cl_logALWAYS);
 
     char *data = resultBA.data();
     const char* endpoint = data + return_results_sizeI;

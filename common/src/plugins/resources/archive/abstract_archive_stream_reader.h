@@ -4,7 +4,9 @@
 #include "abstract_archive_delegate.h"
 #include "utils/common/adaptive_sleep.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
-#include "recording/time_period.h"
+
+class QnTimePeriod;
+class QnTimePeriodList;
 
 class QnAbstractNavigator
 {
@@ -34,7 +36,7 @@ class QnAbstractArchiveReader : public QnAbstractMediaStreamDataProvider, public
 {
     Q_OBJECT
 public:
-    QnAbstractArchiveReader(QnResourcePtr dev);
+    QnAbstractArchiveReader(const QnResourcePtr& dev);
     virtual ~QnAbstractArchiveReader();
 
     QnAbstractNavigator *navDelegate() const;
@@ -48,11 +50,6 @@ public:
     // Manual open. Open will be called automatically on first data access
     bool open();
 
-    /**
-     * \returns                         Current position of this reader, in
-     *                                  microseconds.
-     */
-    virtual qint64 currentTime() const = 0;
     virtual bool isSkippingFrames() const = 0;
 
     /**
@@ -110,6 +107,13 @@ public:
     virtual void startPaused() = 0;
     virtual void setGroupId(const QByteArray& groupId)  = 0;
 protected:
+
+    /**
+     * \returns                         Current position of this reader, in
+     *                                  microseconds.
+     */
+    virtual qint64 currentTime() const = 0;
+
     virtual QnAbstractMediaDataPtr getNextData() = 0;
 signals:
     void beforeJump(qint64 mksec);

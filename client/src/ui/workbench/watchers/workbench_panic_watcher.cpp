@@ -46,7 +46,7 @@ void QnWorkbenchPanicWatcher::at_resourcePool_resourceAdded(const QnResourcePtr 
     connect(server, &QnMediaServerResource::panicModeChanged, this, &QnWorkbenchPanicWatcher::at_resource_panicModeChanged);
 
     m_servers.insert(server);
-    if(server->getPanicMode() != QnMediaServerResource::PM_None)
+    if(server->getPanicMode() != Qn::PM_None)
         m_panicServers.insert(server);
 
     updatePanicMode();
@@ -67,10 +67,10 @@ void QnWorkbenchPanicWatcher::at_resourcePool_resourceRemoved(const QnResourcePt
 
 void QnWorkbenchPanicWatcher::at_resource_panicModeChanged(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if(!server)
+    if (!server)
         return;
 
-    if(server->getPanicMode() != QnMediaServerResource::PM_None) {
+    if(server->getPanicMode() != Qn::PM_None) {
         m_panicServers.insert(server);
     } else {
         m_panicServers.remove(server);

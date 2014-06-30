@@ -8,12 +8,11 @@
 
 class QnStardotResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
-    QnStardotResourceSearcher();
 
 public:
-    static QnStardotResourceSearcher& instance();
+    QnStardotResourceSearcher();
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
 
     // returns all available devices
     virtual QnResourceList findResources();

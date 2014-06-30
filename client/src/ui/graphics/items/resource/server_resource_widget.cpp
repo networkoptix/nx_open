@@ -279,7 +279,7 @@ protected:
         int textOffset = legendImageSize + itemSpacing;
         QRectF textRect = rect.adjusted(textOffset, 0, 0, 0);
         {
-            //TODO: #GDM Text drawing is very slow. #Elric says it is fast in Qt5
+            //TODO: #GDM #Common Text drawing is very slow. Replace with cached textures where possible
             QnScopedPainterPenRollback penRollback(painter, QPen(Qt::black, 2));
             QnScopedPainterBrushRollback brushRollback(painter);
 
@@ -767,7 +767,8 @@ QString QnServerResourceWidget::calculateTitleText() const {
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility();
     result &= (CloseButton | RotateButton | InfoButton);
-    result |= PingButton | ShowLogButton | CheckIssuesButton;
+    if (!qnSettings->isVideoWallMode())
+        result |= PingButton | ShowLogButton | CheckIssuesButton;
     return result;
 }
 

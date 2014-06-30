@@ -39,7 +39,7 @@ QnGraphicsMessageBoxItem::QnGraphicsMessageBoxItem(QGraphicsItem *parent):
 
 QnGraphicsMessageBoxItem::~QnGraphicsMessageBoxItem() {
     // instance = NULL;
-    // TODO: #GDM why is it commented out?
+    // TODO: #GDM #Common why is it commented out?
 }
 
 void QnGraphicsMessageBoxItem::addItem(QGraphicsLayoutItem *item) {
@@ -61,7 +61,7 @@ void QnGraphicsMessageBoxItem::paint(QPainter *painter, const QStyleOptionGraphi
 // -------------------------------------------------------------------------- //
 // QnGraphicsMessageBox
 // -------------------------------------------------------------------------- //
-QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString &text, int timeoutMsec):
+QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString &text, int timeoutMsec, int fontSize):
     base_type(parent, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint | Qt::Tool)
 {
     m_label = new GraphicsLabel(this);
@@ -78,7 +78,7 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
     setRoundingRadius(defaultRoundingRadius);
 
     QFont font = this->font();
-    font.setPixelSize(defaultFontSize);
+    font.setPixelSize(fontSize == 0 ? defaultFontSize : fontSize);
     setFont(font);
 
     setTextColor(QColor(166, 166, 166));
@@ -121,12 +121,37 @@ int QnGraphicsMessageBox::timeout() const {
     return m_timeout;
 }
 
-QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text) {
+QnGraphicsMessageBox* QnGraphicsMessageBox::information(const QString &text, int timeoutMsec, int fontSize) {
     if (!instance)
         return NULL;
 
-    QnGraphicsMessageBox* box = new QnGraphicsMessageBox(instance, text);
+    QnGraphicsMessageBox* box = new QnGraphicsMessageBox(instance, text, timeoutMsec, fontSize);
     instance->addItem(box);
+    return box;
+}
+
+QnGraphicsMessageBox* QnGraphicsMessageBox::informationTicking(const QString &text, int timeoutMsec, int fontSize) {
+    if (!instance)
+        return NULL;
+
+    QPointer<QnGraphicsMessageBox> box = new QnGraphicsMessageBox(instance, QString(), timeoutMsec, fontSize);
+    instance->addItem(box);
+
+    const auto tickHandler = [box, text](int tick) {
+        if (!box)
+            return;
+
+        int left = box->timeout() - tick;
+        int n = (left + 500) / 1000;
+
+        if (n > 0)
+            box->setText(text.arg(n));
+        else
+            box->hideImmideately();
+    };
+    connect(box.data(), &QnGraphicsMessageBox::tick, instance, tickHandler);
+    tickHandler(0);
+
     return box;
 }
 
@@ -150,9 +175,8 @@ void QnGraphicsMessageBox::at_animationIn_finished() {
     animator->setEasingCurve(QEasingCurve::InCubic);
     animator->animateTo(0.6);
     disconnect(animator, 0, this, 0);
-    connect(animator, SIGNAL(animationTick(int)), this, SIGNAL(tick(int)));
-    connect(animator, SIGNAL(finished()), this, SIGNAL(finished()));
-    connect(animator, SIGNAL(finished()), this, SLOT(deleteLater()));
+    connect(animator, &VariantAnimator::animationTick, this, &QnGraphicsMessageBox::tick);
+    connect(animator, &VariantAnimator::finished, this, &QnGraphicsMessageBox::hideImmideately);
 }
 
 /*QSizeF QnGraphicsMessageBox::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const {

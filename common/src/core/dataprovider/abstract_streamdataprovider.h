@@ -9,7 +9,7 @@
 
 class QnAbstractStreamDataProvider;
 class QnResource;
-class QnAbstractDataConsumer;
+class QnAbstractDataReceptor;
 
 #define CL_MAX_DATASIZE (10*1024*1024) // assume we can never get compressed data with  size greater than this
 #define CL_MAX_CHANNEL_NUMBER (10)
@@ -20,35 +20,18 @@ class QN_EXPORT QnAbstractStreamDataProvider : public QnLongRunnable, public QnR
 {
     Q_OBJECT
 public:
-
-    //enum QnStreamQuality {CLSLowest, CLSLow, CLSNormal, CLSHigh, CLSHighest};
-
-    explicit QnAbstractStreamDataProvider(QnResourcePtr resource);
+    explicit QnAbstractStreamDataProvider(const QnResourcePtr& resource);
     virtual ~QnAbstractStreamDataProvider();
 
     virtual bool dataCanBeAccepted() const;
 
-    void addDataProcessor(QnAbstractDataConsumer* dp);
-    void removeDataProcessor(QnAbstractDataConsumer* dp);
     int processorsCount() const;
+    void addDataProcessor(QnAbstractDataReceptor* dp);
+    void removeDataProcessor(QnAbstractDataReceptor* dp);
 
     virtual bool isReverseMode() const { return false;}
 
     bool isConnectedToTheResource() const;
-
-    void pauseDataProcessors()
-    {
-        foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors) {
-            dataProcessor->pause();
-        }
-    }
-
-    void resumeDataProcessors()
-    {
-        foreach(QnAbstractDataConsumer* dataProcessor, m_dataprocessors) {
-            dataProcessor->resume();
-        }
-    }
 
     void setNeedSleep(bool sleep);
 
@@ -63,12 +46,12 @@ signals:
     void slowSourceHint();
 
 protected:
-    virtual void putData(QnAbstractDataPacketPtr data);
+    virtual void putData(const QnAbstractDataPacketPtr& data);
     void beforeDisconnectFromResource();
 
 protected:
+    QList<QnAbstractDataReceptor*> m_dataprocessors;
     mutable QMutex m_mutex;
-    QList<QnAbstractDataConsumer*> m_dataprocessors;
     QHash<QByteArray, QVariant> m_streamParam;
     QnResource::ConnectionRole m_role;
 };

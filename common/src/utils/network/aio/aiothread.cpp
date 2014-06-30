@@ -15,8 +15,6 @@
 #include "../../common/systemerror.h"
 
 
-//TODO/IMPL implement periodic tasks not bound to socket
-
 //!used as clock for periodic events. Function introduced since implementation can be changed
 static qint64 getSystemTimerVal()
 {
@@ -28,6 +26,7 @@ namespace aio
     class SocketAddRemoveTask
     {
     public:
+        // TODO: #Elric #enum
         enum TaskType
         {
             tAdding,
@@ -36,14 +35,14 @@ namespace aio
         };
 
         QSharedPointer<AbstractSocket> socket;
-        PollSet::EventType eventType;
+        aio::EventType eventType;
         AIOEventHandler* eventHandler;
         TaskType type;
         int timeout;
 
         SocketAddRemoveTask(
             const QSharedPointer<AbstractSocket>& _socket,
-            PollSet::EventType _eventType,
+            aio::EventType _eventType,
             AIOEventHandler* const _eventHandler,
             TaskType _type,
             int _timeout )
@@ -154,9 +153,9 @@ namespace aio
                 if( task.type == SocketAddRemoveTask::tAdding )
                 { 
                     addSockToPollset( task.socket, task.eventType, task.timeout, task.eventHandler );
-                    if( task.eventType == PollSet::etRead )
+                    if( task.eventType == aio::etRead )
                         --newReadMonitorTaskCount;
-                    else if( task.eventType == PollSet::etWrite )
+                    else if( task.eventType == aio::etWrite )
                         --newWriteMonitorTaskCount;
                     else
                         Q_ASSERT( false );
@@ -173,7 +172,7 @@ namespace aio
 
         bool addSockToPollset(
             QSharedPointer<AbstractSocket> socket,
-            PollSet::EventType eventType,
+            aio::EventType eventType,
             int timeout,
             AIOEventHandler* eventHandler )
         {
@@ -202,7 +201,7 @@ namespace aio
 
         bool removeReverseTask(
             const QSharedPointer<AbstractSocket>& sock,
-            PollSet::EventType eventType,
+            aio::EventType eventType,
             SocketAddRemoveTask::TaskType taskType,
             AIOEventHandler* const eventHandler,
             int /*newTimeoutMS*/ )
@@ -216,9 +215,11 @@ namespace aio
             {
                 if( it->socket == sock && it->eventType == eventType && it->type != taskType )
                 {
-                    //TODO/IMPL if we changing socket handler or socket timeout MUST not remove task
-                    if( it->type == SocketAddRemoveTask::tRemoving )
+                    //TODO/IMPL if we changing socket timeout MUST NOT remove task
+                    if( it->type == SocketAddRemoveTask::tRemoving )     
                     {
+                        if( eventHandler != it->eventHandler )
+                            continue;   //event handler changed, cannot ignore task
                         //cancelling remove task
                         void* userData = pollSet.getUserData( sock.data(), eventType );
                         Q_ASSERT( userData );
@@ -299,7 +300,7 @@ namespace aio
 
                 if( periodicTaskData.socket )    //periodic event, associated with socket (e.g., socket operation timeout)
                 {
-                    handlingData->eventHandler->eventTriggered( periodicTaskData.socket, PollSet::etTimedOut );
+                    handlingData->eventHandler->eventTriggered( periodicTaskData.socket, aio::etTimedOut );
                     //adding periodic task with same timeout
                     addPeriodicTask( curClock + handlingData->timeout, handlingData, periodicTaskData.socket );
                 }
@@ -352,7 +353,7 @@ namespace aio
     */
     bool AIOThread::watchSocket(
         const QSharedPointer<AbstractSocket>& sock,
-        PollSet::EventType eventToWatch,
+        aio::EventType eventToWatch,
         AIOEventHandler* const eventHandler,
         int timeoutMs )
     {
@@ -365,27 +366,28 @@ namespace aio
         if( !canAcceptSocket( eventToWatch ) )
             return false;
 
-        if( QThread::currentThread() == this )
-        {
-            //adding socket to pollset right away
-            return m_impl->addSockToPollset( sock, eventToWatch, timeoutMs, eventHandler );
-        }
+        //if( QThread::currentThread() == this )
+        //{
+        //    //adding socket to pollset right away
+        //    return m_impl->addSockToPollset( sock, eventToWatch, timeoutMs, eventHandler );
+        //}
 
         m_impl->pollSetModificationQueue.push_back( SocketAddRemoveTask(sock, eventToWatch, eventHandler, SocketAddRemoveTask::tAdding, timeoutMs) );
-        if( eventToWatch == PollSet::etRead )
+        if( eventToWatch == aio::etRead )
             ++m_impl->newReadMonitorTaskCount;
-        else if( eventToWatch == PollSet::etWrite )
+        else if( eventToWatch == aio::etWrite )
             ++m_impl->newWriteMonitorTaskCount;
         else
             Q_ASSERT( false );
-        m_impl->pollSet.interrupt();
+        if( QThread::currentThread() != this )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
+            m_impl->pollSet.interrupt();
 
         return true;
     }
 
     bool AIOThread::removeFromWatch(
         const QSharedPointer<AbstractSocket>& sock,
-        PollSet::EventType eventType,
+        aio::EventType eventType,
         bool waitForRunningHandlerCompletion )
     {
         //NOTE m_impl->mutex is locked up the stack
@@ -424,14 +426,14 @@ namespace aio
     }
 
     //!Returns number of sockets monitored for \a eventToWatch event
-    size_t AIOThread::size( PollSet::EventType eventToWatch ) const
+    size_t AIOThread::size( aio::EventType eventToWatch ) const
     {
         return m_impl->pollSet.size( eventToWatch ) + 
-            (eventToWatch == PollSet::etRead ? m_impl->newReadMonitorTaskCount : m_impl->newWriteMonitorTaskCount);
+            (eventToWatch == aio::etRead ? m_impl->newReadMonitorTaskCount : m_impl->newWriteMonitorTaskCount);
     }
 
     //!Returns true, if can monitor one more socket for \a eventToWatch
-    bool AIOThread::canAcceptSocket( PollSet::EventType eventToWatch ) const
+    bool AIOThread::canAcceptSocket( aio::EventType eventToWatch ) const
     {
         return size( eventToWatch ) < m_impl->pollSet.maxPollSetSize();
     }
@@ -465,6 +467,10 @@ namespace aio
                 break;
             if( triggeredSocketCount < 0 )
             {
+                NX_LOG( QString::fromLatin1( "Poll failed. %1" ).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
+                const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+                if( errorCode == SystemError::interrupted )
+                    continue;
                 NX_LOG( lit( "Poll failed. %1" ).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
                 msleep( ERROR_RESET_TIMEOUT );
                 continue;
@@ -481,7 +487,7 @@ namespace aio
 
             m_impl->removeSocketsFromPollSet();
 
-            //TODO/IMPL #ak recheck that PollSet::remove does not brake PollSet traversal
+            //TODO #ak recheck that PollSet::remove does not brake PollSet traversal
 
             m_impl->processPeriodicTasks( curClock );
             m_impl->processSocketEvents( curClock );

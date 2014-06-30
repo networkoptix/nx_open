@@ -8,16 +8,16 @@
 #include "plugins/resources/upnp/upnp_resource_searcher.h"
 #include "utils/network/simple_http_client.h"
 
+#include <utils/common/singleton.h>
 
-class QnDesktopCameraResourceSearcher : public QnAbstractNetworkResourceSearcher
-{
-    QnDesktopCameraResourceSearcher();
+
+class QnDesktopCameraResourceSearcher : public QnAbstractNetworkResourceSearcher, public Singleton<QnDesktopCameraResourceSearcher> {
+    typedef QnAbstractNetworkResourceSearcher base_type;
 public:
-    static QnDesktopCameraResourceSearcher& instance();
-    
+    QnDesktopCameraResourceSearcher();
     virtual ~QnDesktopCameraResourceSearcher();
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
 
     // return the manufacture of the server
     virtual QString manufacture() const;

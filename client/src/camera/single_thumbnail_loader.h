@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 
 #include <api/media_server_connection.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/resource_fwd.h>
 #include <utils/image_provider.h>
 
 class QnSingleThumbnailLoader : public QnImageProvider {

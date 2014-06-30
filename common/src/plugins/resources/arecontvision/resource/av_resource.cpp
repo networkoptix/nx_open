@@ -16,7 +16,7 @@
 #include "utils/network/nettools.h"
 #include "utils/network/ping.h"
 
-const char* QnPlAreconVisionResource::MANUFACTURE = "ArecontVision";
+const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 #define MAX_RESPONSE_LEN (4*1024)
 
 
@@ -84,7 +84,7 @@ CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
 class QnPlArecontResourceSetRegCommand : public QnResourceCommand
 {
 public:
-    QnPlArecontResourceSetRegCommand(QnResourcePtr res, int page, int reg, int val):
+    QnPlArecontResourceSetRegCommand(const QnResourcePtr& res, int page, int reg, int val):
       QnResourceCommand(res),
           m_page(page),
           m_reg(reg),
@@ -200,7 +200,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     }
     else
     {
-        cl_log.log("Found unknown resource! ", model.toString(), cl_logWARNING);
+        NX_LOG( lit("Found unknown resource! %1").arg(model.toString()), cl_logWARNING);
     }
 
     return result;
@@ -210,17 +210,17 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
     
+    QVariant maxSensorWidth;
+    QVariant maxSensorHeight;
     {
         // TODO: #Elric is this needed? This was a call to setCroppingPhysical
-        QVariant maxSensorWidth;
-        QVariant maxSensorHight;
         getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
-        getParam(QLatin1String("MaxSensorHeight"), maxSensorHight, QnDomainMemory);
+        getParam(QLatin1String("MaxSensorHeight"), maxSensorHeight, QnDomainMemory);
 
         setParamAsync(QLatin1String("sensorleft"), 0, QnDomainPhysical);
         setParamAsync(QLatin1String("sensortop"), 0, QnDomainPhysical);
         setParamAsync(QLatin1String("sensorwidth"), maxSensorWidth, QnDomainPhysical);
-        setParamAsync(QLatin1String("sensorheight"), maxSensorHight, QnDomainPhysical);
+        setParamAsync(QLatin1String("sensorheight"), maxSensorHeight, QnDomainPhysical);
     }
 
     QVariant val;
@@ -251,9 +251,6 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
         m_totalMdZones = 1024;
 
     // lets set zone size
-    QVariant maxSensorWidth;
-    getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
-
     //one zone - 32x32 pixels; zone sizes are 1-15
 
     int optimal_zone_size_pixels = maxSensorWidth.toInt() / (m_totalMdZones == 64 ? 8 : 32);
@@ -266,9 +263,19 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     if (zone_size<1)
         zone_size = 1;
 
+    //detecting and saving selected resolutions
+    CameraMediaStreams mediaStreams;
+    const CodecID streamCodec = isH264() ? CODEC_ID_H264 : CODEC_ID_MJPEG;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt(), maxSensorHeight.toInt()), streamCodec ) );
+    QVariant hasDualStreaming;
+    getParam(QLatin1String("hasDualStreaming"), hasDualStreaming, QnDomainMemory);
+    if( hasDualStreaming.toInt() > 0 )
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt()/2, maxSensorHeight.toInt()/2), streamCodec ) );
+    saveResolutionList( mediaStreams );
+
     const QString firmware = getResourceParamList().value(QLatin1String("Firmware version")).value().toString();
     setFirmware(firmware);
-    save();
+    saveParams();
 
     setParam(QLatin1String("Zone size"), zone_size, QnDomainPhysical);
     setMotionMaskPhysical(0);
@@ -278,7 +285,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
 
 QString QnPlAreconVisionResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 bool QnPlAreconVisionResource::isResourceAccessible()
@@ -297,12 +304,12 @@ bool QnPlAreconVisionResource::updateMACAddress()
     return true;
 }
 
-Qn::StreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(QSize /*size*/) const
+Qn::StreamQuality QnPlAreconVisionResource::getBestQualityForSuchOnScreenSize(const QSize& /*size*/) const
 {
     return Qn::QualityNormal;
 }
 
-QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/)
+QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, Qn::StreamQuality /*quality*/) const
 {
     return QImage();
 }
@@ -314,6 +321,16 @@ void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 int QnPlAreconVisionResource::totalMdZones() const
 {
     return m_totalMdZones;
+}
+
+bool QnPlAreconVisionResource::isH264() const
+{
+    if (!hasParam(QLatin1String("Codec")))
+        return false;
+
+    QVariant val;
+    getParam(QLatin1String("Codec"), val, QnDomainMemory);
+    return val==QLatin1String("H.264");
 }
 
 //===============================================================================================================================
@@ -362,7 +379,7 @@ bool QnPlAreconVisionResource::setParamPhysical(const QnParam &param, const QVar
     CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 
     QString request = QLatin1String("set?") + param.netHelper();
-    if (param.type() != QnParamType::None && param.type() != QnParamType::Button)
+    if (param.type() != Qn::PDT_None && param.type() != Qn::PDT_Button)
         request += QLatin1Char('=') + val.toString();
 
     CLHttpStatus status = connection.doGET(request);
@@ -383,32 +400,32 @@ bool QnPlAreconVisionResource::setParamPhysical(const QnParam &param, const QVar
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const QString &name)
 {
-    QnId rt = qnResTypePool->getLikeResourceTypeId(QLatin1String(MANUFACTURE), name);
-
-    if (!rt.isValid())
+    QnId rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
+    if (rt.isNull())
     {
         if ( name.left(2).toLower() == QLatin1String("av") )
         {
             QString new_name = name.mid(2);
-            rt = qnResTypePool->getLikeResourceTypeId(QLatin1String(MANUFACTURE), new_name);
-            if (!rt.isValid())
+            rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, new_name);
+            if (!rt.isNull())
             {
-                cl_log.log("Unsupported resource found(!!!): ", name, cl_logERROR);
+                NX_LOG( lit("Unsupported resource found(!!!): %1").arg(name), cl_logERROR);
                 return 0;
             }
         }
     }
 
     return createResourceByTypeId(rt);
+
 }
 
 QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId rt)
 {
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(rt);
 
-    if (resourceType.isNull() || (resourceType->getManufacture() != QLatin1String(MANUFACTURE)))
+    if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
     {
-        cl_log.log("Can't create AV Resource. Resource type is invalid.", rt.toString(), cl_logERROR);
+        NX_LOG( lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()), cl_logERROR);
         return 0;
     }
 

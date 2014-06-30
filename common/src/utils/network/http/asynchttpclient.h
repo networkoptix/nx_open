@@ -47,6 +47,7 @@ namespace nx_http
         Q_OBJECT
 
     public:
+        // TODO: #Elric #enum
         enum State
         {
             sInit,
@@ -73,17 +74,26 @@ namespace nx_http
         State state() const;
         //!Returns true, if \a AsyncHttpClient::state() == \a AsyncHttpClient::sFailed
         bool failed() const;
-        //!Start request to \a url
+        //!Start GET request to \a url
         /*!
             \return true, if socket is created and async connect is started. false otherwise
             To get error description use SystemError::getLastOSErrorCode()
         */
         bool doGet( const QUrl& url );
+        //!Start POST request to \a url
+        /*!
+            \todo Infinite POST message body support
+            \return true, if socket is created and async connect is started. false otherwise
+        */
+        bool doPost(
+            const QUrl& url,
+            const nx_http::StringType& contentType,
+            const nx_http::StringType& messageBody );
         /*!
             Response is valid only after signal \a responseReceived() has been emitted
             \return Can be NULL if no response has been received yet
         */
-        const HttpResponse* response() const;
+        const Response* response() const;
         StringType contentType() const;
         //!Returns current message body buffer, clearing it
         /*!
@@ -101,6 +111,16 @@ namespace nx_http
         void setUserAgent( const QString& userAgent );
         void setUserName( const QString& userAgent );
         void setUserPassword( const QString& userAgent );
+        void setResponseReadTimeoutMs( int _responseReadTimeoutMs );
+        /*!
+            By default \a true.
+            \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
+        */
+        void setDecodeChunkedMessageBody( bool val );
+
+        QSharedPointer<AbstractStreamSocket> takeSocket();
+
+        void addRequestHeader(const StringType& key, const StringType& value);
 
     signals:
         void tcpConnectionEstablished( nx_http::AsyncHttpClientPtr );
@@ -125,11 +145,11 @@ namespace nx_http
 
     protected:
         //!Implementation of aio::AIOEventHandler::eventTriggered
-        virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) throw() override;
+        virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw() override;
 
     private:
         State m_state;
-        HttpRequest m_request;
+        Request m_request;
         QSharedPointer<AbstractStreamSocket> m_socket;
         BufferType m_requestBuffer;
         size_t m_requestBytesSent;
@@ -140,18 +160,19 @@ namespace nx_http
         QString m_userName;
         QString m_userPassword;
         bool m_authorizationTried;
-        std::map<BufferType, BufferType> m_customHeaders;
         bool m_terminated;
         mutable QMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
+        int m_responseReadTimeoutMs;
 
-        bool doGetPrivate( const QUrl& url );
+        void resetDataBeforeNewRequest();
+        bool initiateHttpMessageDelivery( const QUrl& url );
         /*!
             \return Number of bytes, read from socket. -1 in case of read error
         */
         int readAndParseHttp();
-        void composeRequest();
+        void composeRequest( const nx_http::StringType& httpMethod );
         void serializeRequest();
         //!Sends request through \a m_socket
         /*!
@@ -165,8 +186,8 @@ namespace nx_http
         */
         bool reconnectIfAppropriate();
         //!Composes request with authorization header based on \a response
-        bool resendRequestWithAuthorization( const nx_http::HttpResponse& response );
-        void eventTriggeredPrivate( AbstractSocket* sock, PollSet::EventType eventType );
+        bool resendRequestWithAuthorization( const nx_http::Response& response );
+        void eventTriggeredPrivate( AbstractSocket* sock, aio::EventType eventType );
 
         static const char* toString( State state );
     };

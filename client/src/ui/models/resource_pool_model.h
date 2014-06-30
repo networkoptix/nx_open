@@ -11,18 +11,23 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <client/client_globals.h>
 
+#include <utils/common/connective.h>
+
 class QnResourceModelPrivate;
 class QnResourcePool;
 class QnLayoutItemData;
+class QnVideoWallItem;
+class QnVideoWallMatrix;
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
+class QnResourcePoolModelNode;
 
-class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContextAware {
+class QnResourcePoolModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware {
     Q_OBJECT
 
-    typedef QAbstractItemModel base_type;
+    typedef Connective<QAbstractItemModel> base_type;
 public:
-    explicit QnResourcePoolModel(Qn::NodeType rootNodeType = Qn::RootNode, bool isFlat = false, QObject *parent = NULL);
+    explicit QnResourcePoolModel(Qn::NodeType rootNodeType = Qn::RootNode, QObject *parent = NULL);
     virtual ~QnResourcePoolModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
@@ -49,15 +54,17 @@ public:
 
     Qn::NodeType rootNodeType() const;
 private:
-    class Node;
-
-    Node *node(const QnResourcePtr &resource);
-    Node *node(const QUuid &uuid);
-    Node *node(const QModelIndex &index) const;
-    Node *expectedParent(Node *node);
+    QnResourcePoolModelNode *node(const QnResourcePtr &resource);
+    QnResourcePoolModelNode *node(const QUuid &uuid);
+    QnResourcePoolModelNode *node(const QModelIndex &index) const;
+    QnResourcePoolModelNode *node(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
+    QnResourcePoolModelNode *node(const QnResourcePtr &resource, const QString &groupId, const QString &groupName);
+    QnResourcePoolModelNode *expectedParent(QnResourcePoolModelNode *node);
     bool isIgnored(const QnResourcePtr &resource) const;
 
-    void deleteNode(Node *node);
+    void deleteNode(QnResourcePoolModelNode *node);
+
+    void deleteNode(Qn::NodeType nodeType, const QUuid &uuid, const QnResourcePtr &resource);
 
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
@@ -69,34 +76,50 @@ private slots:
 
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
     void at_resource_resourceChanged(const QnResourcePtr &resource);
-    void at_resource_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
-    void at_resource_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
+
+    void at_layout_itemAdded(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
+    void at_layout_itemRemoved(const QnLayoutResourcePtr &layout, const QnLayoutItemData &item);
+
+    void at_videoWall_itemAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+    void at_videoWall_itemRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item);
+
+    void at_videoWall_matrixAddedOrChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
+    void at_videoWall_matrixRemoved(const QnVideoWallResourcePtr &videoWall, const QnVideoWallMatrix &matrix);
 
     void at_camera_groupNameChanged(const QnSecurityCamResourcePtr &camera);
 private:
+    friend class QnResourcePoolModelNode;
+
+    typedef QPair<QnResourcePtr, QUuid> NodeKey;
+
+    typedef QHash<QString, QnResourcePoolModelNode *> RecorderHash;
+
     /** Root nodes array */
-    Node *m_rootNodes[Qn::NodeTypeCount];
+    QnResourcePoolModelNode *m_rootNodes[Qn::NodeTypeCount];
+
+    /** Generic node list */
+    QHash<NodeKey, QnResourcePoolModelNode*> m_nodes[Qn::NodeTypeCount];
 
     /** Set of top-level node types */
     QList<Qn::NodeType> m_rootNodeTypes;
 
     /** Mapping for resource nodes, by resource. */
-    QHash<QnResource *, Node *> m_resourceNodeByResource;
+    QHash<QnResourcePtr, QnResourcePoolModelNode *> m_resourceNodeByResource;
+
+    /** Mapping for recorder nodes, by resource. */
+    QHash<QnResourcePtr, RecorderHash> m_recorderHashByResource;
 
     /** Mapping for item nodes, by item id. */
-    QHash<QUuid, Node *> m_itemNodeByUuid;
+    QHash<QUuid, QnResourcePoolModelNode *> m_itemNodeByUuid;
 
     /** Mapping for item nodes, by resource id. Is managed by nodes. */
-    QHash<QnResource *, QList<Node *> > m_itemNodesByResource;
+    QHash<QnResourcePtr, QList<QnResourcePoolModelNode *> > m_itemNodesByResource;
 
     /** Whether item urls should be shown. */
     bool m_urlsShown;
 
     /** Type of root node - for the models with narrowed scopes */
     Qn::NodeType m_rootNodeType;
-
-    /** If set to true only top-level resources should be displayed */
-    bool m_flat;
 };
 
 #endif // QN_RESOURCE_POOL_MODEL_H

@@ -18,7 +18,7 @@ class QnPlAreconVisionResource : public QnPhysicalCameraResource
     Q_OBJECT
 
 public:
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     QnPlAreconVisionResource();
 
@@ -42,10 +42,10 @@ public:
     virtual bool isResourceAccessible();
     virtual bool updateMACAddress();
 
-    virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(QSize size) const;
+    virtual Qn::StreamQuality getBestQualityForSuchOnScreenSize(const QSize& size) const override;
 
 
-    virtual QImage getImage(int channnel, QDateTime time, Qn::StreamQuality quality);
+    virtual QImage getImage(int channnel, QDateTime time, Qn::StreamQuality quality) const override;
 
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
@@ -53,6 +53,7 @@ public:
     //virtual QnMediaInfo getMediaInfo() const;
 
     int totalMdZones() const;
+    bool isH264() const;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;

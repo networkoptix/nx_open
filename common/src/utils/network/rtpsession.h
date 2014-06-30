@@ -49,6 +49,9 @@ public:
     QnRtspTimeHelper(const QString& resId);
     ~QnRtspTimeHelper();
 
+    /*!
+        \note Overflow of \a rtpTime is not handled here, so be sure to update \a statistics often enough (twice per \a rtpTime full cycle)
+    */
     qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
     QString getResID() const { return m_resId; }
 private:
@@ -123,6 +126,7 @@ class RTPSession: public QObject
 {
     Q_OBJECT;
 public:
+    // TODO: #Elric #enum
     enum DefaultAuthScheme {
         authNone,
         authBasic,
@@ -288,6 +292,7 @@ private:
     QString getTrackFormat(int trackNum) const;
     TrackType getTrackType(int trackNum) const;
     //int readRAWData();
+    QByteArray createDescribeRequest();
     bool sendDescribe();
     bool sendOptions();
     bool sendSetup();
@@ -312,6 +317,7 @@ private:
     static QByteArray getGuid();
     void registerRTPChannel(int rtpNum, QSharedPointer<SDPTrackInfo> trackInfo);
     QByteArray calcDefaultNonce() const;
+    QByteArray createPlayRequest( qint64 startPos, qint64 endPos );
     bool sendPlayInternal(qint64 startPos, qint64 endPos);
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
@@ -338,7 +344,7 @@ private:
     int m_responseBufferLen;
     QByteArray m_sdp;
 
-    std::auto_ptr<AbstractStreamSocket> m_tcpSock;
+    std::unique_ptr<AbstractStreamSocket> m_tcpSock;
     //RtpIoTracks m_rtpIoTracks; // key: tracknum, value: track IO device
 
     QUrl mUrl;
@@ -375,6 +381,13 @@ private:
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read
     */
     int readSocketWithBuffering( quint8* buf, size_t bufSize, bool readSome );
+
+    //!Sends request and waits for response. If request requires authentication, re-tries request with credentials
+    /*!
+        Updates \a m_responseCode member.
+        \return error description
+    */
+    bool sendRequestAndReceiveResponse( const QByteArray& request, QByteArray& responce );
 };
 
 #endif //rtp_session_h_1935_h

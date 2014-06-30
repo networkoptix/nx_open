@@ -7,16 +7,16 @@
 
 class QnPlIpWebCamResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
-    QnPlIpWebCamResourceSearcher();
 
 public:
-    static QnPlIpWebCamResourceSearcher& instance();
+    QnPlIpWebCamResourceSearcher();
 
     QnResourceList findResources();
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+
 protected:
     // return the manufacture of the server
     virtual QString manufacture() const;

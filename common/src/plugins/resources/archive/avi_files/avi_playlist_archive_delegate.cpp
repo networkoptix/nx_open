@@ -84,7 +84,7 @@ QnAVIPlaylistArchiveDelegate::~QnAVIPlaylistArchiveDelegate()
         av_free(m_ioBuffer);
 }
 
-bool QnAVIPlaylistArchiveDelegate::open(QnResourcePtr resource)
+bool QnAVIPlaylistArchiveDelegate::open(const QnResourcePtr& resource)
 {
     m_resource = resource;
     return true;
@@ -199,7 +199,7 @@ qint64 QnAVIPlaylistArchiveDelegate::findFileIndexByTime(quint64 mksec)
     }
 }
 
-qint64 QnAVIPlaylistArchiveDelegate::seek(qint64 mksec)
+qint64 QnAVIPlaylistArchiveDelegate::seek(qint64 mksec, bool /*findIFrame*/)
 {
     int oldFileNum = m_currentFileIndex;
     Q_UNUSED(oldFileNum);

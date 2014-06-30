@@ -27,15 +27,25 @@ class QnAbstractArchiveDelegate: public QObject
 signals:
     // delete itself change quality
     void qualityChanged(MediaQuality quality);
+
 public:
+    struct ArchiveChunkInfo
+    {
+        qint64 startTimeUsec;
+        qint64 durationUsec;
+
+        ArchiveChunkInfo() : startTimeUsec( -1 ), durationUsec( -1 ) {}
+    };
+
+    // TODO: #Elric #enum
     enum Flag 
     { 
         Flag_SlowSource = 1, 
-        Flag_CanProcessNegativeSpeed = 2,  // flag inform that delegate is going to process negative speed. If flag is not setted, ArchiveReader is going to process negative speed
-        Flag_CanProcessMediaStep = 4,      // flag inform that delegate is going to process media step itself.
-        Flag_CanSendMotion       = 8,      // motion supported
-        Flag_CanOfflineRange     = 16,     // delegate can return range immediatly withouht opening archive
-        Flag_CanSeekImmediatly   = 32,     // delegate can perform seek operation immediatly, without 'open' function call
+        Flag_CanProcessNegativeSpeed = 2,   // flag inform that delegate is going to process negative speed. If flag is not setted, ArchiveReader is going to process negative speed
+        Flag_CanProcessMediaStep = 4,       // flag inform that delegate is going to process media step itself.
+        Flag_CanSendMotion       = 8,       // motion supported
+        Flag_CanOfflineRange     = 16,      // delegate can return range immediately withouht opening archive
+        Flag_CanSeekImmediatly   = 32,      // delegate can perform seek operation immediatly, without 'open' function call
         Flag_CanOfflineLayout    = 64,      // delegate can return audio/video layout immediatly withouht opening archive
         Flag_UnsyncTime          = 128      // delegate may provide media data with unsync time (non equal to EC time)
     
@@ -45,14 +55,15 @@ public:
     QnAbstractArchiveDelegate(): m_flags(0) {}
     virtual ~QnAbstractArchiveDelegate() {}
 
-    virtual bool open(QnResourcePtr resource) = 0;
+    virtual bool open(const QnResourcePtr &resource) = 0;
     virtual void close() = 0;
     virtual qint64 startTime() = 0;
     virtual qint64 endTime() = 0;
     virtual QnAbstractMediaDataPtr getNextData() = 0;
     // If findIFrame=true, jump to position before time to a nearest IFrame.
     /*!
-        \param time UTC, usec
+       \ mpagaram time UTC, usec
+        \param chunkInfo If not NULL, implementation fills this structure with info of chunk, containing found position
     */
     virtual qint64 seek (qint64 time, bool findIFrame) = 0;
     virtual QnResourceVideoLayoutPtr getVideoLayout() = 0;
@@ -91,6 +102,10 @@ public:
 
     /** This function used for multi-view delegate to help connect different streams together (VMAX) */
     virtual void setGroupId(const QByteArray& groupId) { Q_UNUSED(groupId); }
+
+    //!Returns information of chunk, used by previous \a QnAbstractArchiveDelegate::seek or \a QnAbstractArchiveDelegate::getNextData call
+    virtual ArchiveChunkInfo getLastUsedChunkInfo() const { return ArchiveChunkInfo(); };
+
 protected:
     Flags m_flags;
 };

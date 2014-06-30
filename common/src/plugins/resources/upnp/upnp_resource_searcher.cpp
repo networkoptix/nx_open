@@ -211,7 +211,7 @@ void QnUpnpResourceSearcher::processSocket(AbstractDatagramSocket* socket, QSet<
             buffer[readed] = 0;
         QByteArray reply = QByteArray::fromRawData(buffer, readed);
 
-        nx_http::HttpRequest foundDeviceReply;
+        nx_http::Request foundDeviceReply;
         if( !foundDeviceReply.parse( reply ) )
             continue;
         nx_http::HttpHeaders::const_iterator locationHeader = foundDeviceReply.headers.find( "LOCATION" );
@@ -287,7 +287,8 @@ QnUpnpResourceSearcherAsync::QnUpnpResourceSearcherAsync()
 
 QnUpnpResourceSearcherAsync::~QnUpnpResourceSearcherAsync()
 {
-    UPNPDeviceSearcher::instance()->cancelHandlerRegistration( this );
+    if (UPNPDeviceSearcher::instance())
+        UPNPDeviceSearcher::instance()->cancelHandlerRegistration( this );
 }
 
 QnResourceList QnUpnpResourceSearcherAsync::findResources()

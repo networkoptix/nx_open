@@ -5,6 +5,7 @@
 #include <QtCore/QMetaType>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QAuthenticator>
+#include "nx_ec/ec_api.h"
 
 // TODO: #Elric move to model functions?
 /**
@@ -27,7 +28,7 @@ inline QDataStream &operator>>(QDataStream &stream, ENUM &value) {              
  */
 class QnCommonMetaTypes {
 public:
-    static void initilize();
+    static void initialize();
 };
 
 Q_DECLARE_METATYPE(QUuid);

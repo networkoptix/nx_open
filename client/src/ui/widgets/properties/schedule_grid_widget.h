@@ -6,7 +6,6 @@
 #include <QtWidgets/QWidget>
 
 #include <client/client_color_types.h>
-#include <core/misc/schedule_recording_type.h>
 
 
 //TODO: #Elric omg look at these global constants =)
@@ -27,7 +26,7 @@ public:
         QualityParam,
         RecordTypeParam,
         DiffersFlagParam,
-        ParamType_Count 
+        ParamType_Count // TODO: #Elric #enum
     };
 
     void setDefaultParam(ParamType number, const QVariant& value);
@@ -106,8 +105,8 @@ private:
     QFont m_labelsFont;
     QFont m_gridFont;
 
-    QColor m_cellColors[Qn::RecordingType_Count];
-    QColor m_insideColors[Qn::RecordingType_Count];
+    QColor m_cellColors[Qn::RT_Count];
+    QColor m_insideColors[Qn::RT_Count];
     QnScheduleGridColors m_colors;
 
     bool m_enabled;

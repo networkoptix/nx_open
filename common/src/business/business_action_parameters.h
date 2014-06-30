@@ -10,6 +10,7 @@
 class QnBusinessActionParameters 
 {
 public:
+    // TODO: #Elric #enum
     enum Params 
     {
         soundUrlParam,
@@ -29,6 +30,11 @@ public:
         CountParam
     };
 
+    enum UserGroup {
+        EveryOne,
+        AdminOnly
+    };
+
     QnBusinessActionParameters();
 
     // Play Sound
@@ -42,11 +48,6 @@ public:
     void setEmailAddress(const QString &value);
 
     // Popups and System Health
-
-    enum UserGroup {
-        EveryOne,
-        AdminOnly
-    };
 
     UserGroup getUserGroup() const;
     void setUserGroup(const UserGroup value);
@@ -76,6 +77,7 @@ public:
     int getRelayAutoResetTimeout() const;
     void setRelayAutoResetTimeout(int value);
 
+    // TODO: #GDM #Business this one seems not to be used anywhere. Why? Can it be removed? Ask Roma/Andrey.
     QString getParamsKey() const;
     void setParamsKey(QString value);
 

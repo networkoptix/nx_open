@@ -138,7 +138,7 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const {
         }
     case Qt::DecorationRole:
         if (index.column() == 0)
-            return qnResIconCache->icon(resource->flags(), resource->getStatus());
+            return qnResIconCache->icon(resource);
         break;
     case Qn::ResourceRole:
         return QVariant::fromValue<QnResourcePtr>(resource);

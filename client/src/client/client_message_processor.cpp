@@ -1,169 +1,42 @@
 #include "client_message_processor.h"
-
-#include <QtCore/QTimer>
-#include <QtCore/QDebug>
-#include <QtCore/QtGlobal>
-#include <QtCore/QThread>
-#include <QtCore/QUrl>
-#include <QtCore/QUrlQuery>
-
-#include <api/message_source.h>
-#include <api/app_server_connection.h>
-
-#include <core/resource_management/resource_discovery_manager.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/layout_resource.h>
-
+#include "core/resource_management/resource_pool.h"
+#include "api/app_server_connection.h"
+#include "core/resource/media_server_resource.h"
+#include "core/resource/layout_resource.h"
+#include "core/resource_management/resource_discovery_manager.h"
+#include "utils/common/synctime.h"
+#include "common/common_module.h"
 #include "device_plugins/server_camera/server_camera.h"
 
-#include <utils/common/synctime.h>
-
-void QnClientMessageProcessor::init()
-{
-    QUrl appServerEventsUrl = QnAppServerConnectionFactory::defaultUrl();
-    appServerEventsUrl.setPath(QLatin1String("/events/"));
-
-    QUrlQuery query;
-    query.addQueryItem(QLatin1String("format"), QLatin1String("pb"));
-    query.addQueryItem(QLatin1String("guid"), QnAppServerConnectionFactory::clientGuid());
-
-    appServerEventsUrl.setQuery(query);
-
-    base_type::init(appServerEventsUrl, QString());
-}
-
 QnClientMessageProcessor::QnClientMessageProcessor():
-    base_type()
+    base_type(),
+    m_opened(false)
 {
-    QThread *thread = new QThread(); // TODO: #Elric leaking thread here.
-    thread->start();
-
-    moveToThread(thread);
 }
 
-void QnClientMessageProcessor::run() {
-    init();
-    base_type::run();
-}
-
-void QnClientMessageProcessor::loadRuntimeInfo(const QnMessage &message) {
-    //do not call base method - we do not need session key
-    if (!message.systemName.isEmpty())
-        QnAppServerConnectionFactory::setSystemName(message.systemName);
-    if (!message.publicIp.isEmpty())
-        QnAppServerConnectionFactory::setPublicIp(message.publicIp);
-}
-
-
-void QnClientMessageProcessor::handleConnectionOpened(const QnMessage &message) {
-    updateHardwareIds(message);
-    processResources(message.resources);
-    processLicenses(message.licenses);
-    processCameraServerItems(message.cameraServerItems);
-
-    QnResourceDiscoveryManager::instance()->setReady(true);
-    qDebug() << "Connection opened";
-
-    qnSyncTime->reset();
-    base_type::handleConnectionOpened(message);
-}
-
-void QnClientMessageProcessor::handleMessage(const QnMessage &message) {
-    base_type::handleMessage(message);
-
-    switch(message.messageType) {
-    case Qn::Message_Type_RuntimeInfoChange: {
-        if (!message.mainHardwareIds.isEmpty())
-            qnLicensePool->setMainHardwareIds(message.mainHardwareIds);
-
-        if (!message.compatibleHardwareIds.isEmpty())
-            qnLicensePool->setCompatibleHardwareIds(message.compatibleHardwareIds);
-    }
-
-    case Qn::Message_Type_License: {
-        qnLicensePool->addLicense(message.license);
-        break;
-    }
-    case Qn::Message_Type_ResourceDisabledChange: {
-        QnResourcePtr resource;
-        if (!message.resourceGuid.isEmpty())
-            resource = qnResPool->getResourceByGuid(message.resourceGuid);
-        else
-            resource = qnResPool->getResourceById(message.resourceId);
-
-        if (resource)
-            resource->setDisabled(message.resourceDisabled);
-        break;
-    }
-    case Qn::Message_Type_ResourceStatusChange: {
-        QnResourcePtr resource;
-        if (!message.resourceGuid.isEmpty())
-            resource = qnResPool->getResourceByGuid(message.resourceGuid);
-        else
-            resource = qnResPool->getResourceById(message.resourceId);
-
-        if (resource)
-            resource->setStatus(message.resourceStatus);
-        break;
-    }
-    case Qn::Message_Type_CameraServerItem: {
-        QnCameraHistoryPool::instance()->addCameraHistoryItem(*message.cameraServerItem);
-        break;
-    }
-    case Qn::Message_Type_ResourceChange: {
-        if (!message.resource) {
-            qWarning() << "Got Message_Type_ResourceChange with empty resource in it";
-            return;
-        }
-        updateResource(message.resource, true, true);
-        break;
-    }
-    case Qn::Message_Type_ResourceDelete: {
-        if (QnResourcePtr ownResource = qnResPool->getResourceById(message.resourceId))
-            qnResPool->removeResource(ownResource);
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-void QnClientMessageProcessor::processResources(const QnResourceList& resources)
+void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
-    QnResourceList newResources;
-
-    foreach (const QnResourcePtr& resource, resources)
-        if(!updateResource(resource, false, false))
-            newResources.push_back(resource);
-
-    qnResPool->addResources(newResources);
+    QnCommonMessageProcessor::init(connection);
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
+    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
 }
 
-void QnClientMessageProcessor::processLicenses(const QnLicenseList& licenses)
-{
-    qnLicensePool->replaceLicenses(licenses);
+void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
+    resource->setStatus(status);
+    checkForTmpStatus(resource);
 }
 
-bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool insert, bool updateLayouts)
-{
-    bool result = false;
+void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) {
     QnResourcePtr ownResource;
 
-    QString guid = resource->getGuid();
-    if (!guid.isEmpty())
-        ownResource = qnResPool->getResourceByGuid(guid);
-    else
-        ownResource = qnResPool->getResourceById(resource->getId());
+    ownResource = qnResPool->getResourceById(resource->getId());
 
     if (ownResource.isNull()) {
-        if(insert) {
-            qnResPool->addResource(resource);
-            result = true;
-        }
+        qnResPool->addResource(resource);
         if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>())
             determineOptimalIF(mediaServer);
-    } else if(updateLayouts || !ownResource.dynamicCast<QnLayoutResource>()) {
+    }
+    else {
         bool mserverStatusChanged = false;
         QnMediaServerResourcePtr mediaServer = ownResource.dynamicCast<QnMediaServerResource>();
         if (mediaServer)
@@ -173,43 +46,107 @@ bool QnClientMessageProcessor::updateResource(QnResourcePtr resource, bool inser
 
         if (mserverStatusChanged && mediaServer)
             determineOptimalIF(mediaServer);
-
-        result = true;
     }
+
+    // TODO: #Elric #2.3 don't update layout if we're re-reading resources, 
+    // this leads to unsaved layouts spontaneously rolling back to last saved state.
 
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
         layout->requestStore();
 
-    return result;
+    checkForTmpStatus(resource);
+}
+
+void QnClientMessageProcessor::processResources(const QnResourceList& resources)
+{
+    QnCommonMessageProcessor::processResources(resources);
+    foreach(const QnResourcePtr& resource, resources)
+        checkForTmpStatus(resource);
+}
+
+void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
+{
+    // process tmp status
+    if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) 
+    {
+        if (mediaServer->getStatus() == QnResource::Offline)
+            updateServerTmpStatus(mediaServer->getId(), QnResource::Offline);
+        else
+            updateServerTmpStatus(mediaServer->getId(), QnResource::NotDefined);
+    }
+    else if (QnServerCameraPtr serverCamera = resource.dynamicCast<QnServerCamera>()) 
+    {
+        QnMediaServerResourcePtr mediaServer = qnResPool->getResourceById(serverCamera->getParentId()).dynamicCast<QnMediaServerResource>();
+        if (mediaServer) {
+            if (mediaServer->getStatus() ==QnResource::Offline)
+                serverCamera->setTmpStatus(QnResource::Offline);
+            else
+                serverCamera->setTmpStatus(QnResource::NotDefined);
+        }
+    }
 }
 
 void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
 {
     // set proxy. If some media server IF will be found, proxy address will be cleared
-    QString url = QnAppServerConnectionFactory::defaultUrl().host();
-    if (url.isEmpty())
-        url = QLatin1String("127.0.0.1");
-    int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
-    resource->apiConnection()->setProxyAddr(resource->getApiUrl(), url, port);
+    const QString& proxyAddr = QnAppServerConnectionFactory::defaultUrl().host();
+    resource->apiConnection()->setProxyAddr(
+        resource->getApiUrl(),
+        proxyAddr,
+        QnAppServerConnectionFactory::defaultUrl().port() );    //starting with 2.3 proxy embedded to EC
     disconnect(resource.data(), NULL, this, NULL);
-    connect(resource.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)));
     resource->determineOptimalNetIF();
 }
 
-void QnClientMessageProcessor::at_serverIfFound(const QnMediaServerResourcePtr &resource, const QString & url, const QString& origApiUrl)
+void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource::Status status)
 {
-    if (url != QLatin1String("proxy"))
-        resource->apiConnection()->setProxyAddr(origApiUrl, QString(), 0);
+    QnResourcePtr server = qnResPool->getResourceById(id);
+    if (!server)
+        return;
+    foreach(QnResourcePtr res, qnResPool->getAllCameras(server)) {
+        QnServerCameraPtr serverCamera = res.dynamicCast<QnServerCamera>();
+        if (serverCamera)
+            serverCamera->setTmpStatus(status);
+    }
 }
 
-void QnClientMessageProcessor::processCameraServerItems(const QnCameraHistoryList& cameraHistoryList)
+void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy)
 {
-    foreach(QnCameraHistoryPtr history, cameraHistoryList)
-        QnCameraHistoryPool::instance()->addCameraHistory(history);
+    if (data.peer.id == qnCommon->moduleGUID())
+        return;
+
+    if (isProxy) {
+        //updateTmpStatus(id, QnResource::NotDefined);
+        return;
+    }
+
+    if (!m_opened) {
+        m_opened = true;
+        emit connectionOpened();
+    }
 }
 
-void QnClientMessageProcessor::updateHardwareIds(const QnMessage& message)
+void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData, bool isProxy)
 {
-    qnLicensePool->setMainHardwareIds(message.mainHardwareIds);
-    qnLicensePool->setCompatibleHardwareIds(message.compatibleHardwareIds);
+    if (isProxy) {
+        //updateTmpStatus(id, QnResource::Offline);
+        return;
+    }
+
+    if (m_opened) {
+        m_opened = false;
+        emit connectionClosed();
+        QString serverTypeName = lit("Server");
+        foreach(QnResourcePtr res, qnResPool->getAllResourceByTypeName(serverTypeName))
+            res->setStatus(QnResource::Offline);
+        foreach(QnResourcePtr res, qnResPool->getAllCameras(QnResourcePtr()))
+            res->setStatus(QnResource::Offline);
+    }
+}
+
+void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
+{
+    QnCommonMessageProcessor::onGotInitialNotification(fullData);
+    QnResourceDiscoveryManager::instance()->setReady(true);
+    //emit connectionOpened();
 }

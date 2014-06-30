@@ -154,11 +154,11 @@ public:
 
     int getAlignment() const;
 
+    QnByteArray& operator=( const QnByteArray& );
+    QnByteArray& operator=( QnByteArray&& );
+
 protected:
     bool reallocate(unsigned int capacity);
-
-private:
-    Q_DISABLE_COPY(QnByteArray)
 
 private:
     unsigned int m_alignment;
@@ -168,7 +168,8 @@ private:
     int m_ignore;
     //!true, if we own memory pointed to by \a m_data
     bool m_ownBuffer;
-};
 
+    QnByteArray( const QnByteArray& );
+};
 
 #endif // QN_BYTE_ARRAY_H

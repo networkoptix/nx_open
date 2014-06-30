@@ -8,7 +8,7 @@
 #include <utils/math/math.h>
 #include <utils/common/invocation_event.h>
 #include <utils/common/connective.h>
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 
 #include "threaded_ptz_controller.h"
 
@@ -113,9 +113,16 @@ public:
 };
 
 QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate(): 
-    state(Stopped),
+    q(nullptr),
     usingThreadController(false),
-    usingBlockingController(false)
+    usingBlockingController(false),
+    index(-1),
+    state(Stopped),
+    usingDefaultMoveTimer(false),
+    needPositionUpdate(false),
+    waitingForNewPosition(false),
+    lastPositionRequestTime(0),
+    newPositionRequestTime(0)
 {}
 
 QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {

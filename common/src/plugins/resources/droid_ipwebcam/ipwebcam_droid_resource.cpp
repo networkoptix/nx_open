@@ -4,7 +4,7 @@
 #include "ipwebcam_droid_resource.h"
 #include "ipwebcam_droid_stream_reader.h"
 
-const char* QnPlDriodIpWebCamResource::MANUFACTURE = "NetworkOptixDroid";
+const QString QnPlDriodIpWebCamResource::MANUFACTURE(lit("NetworkOptixDroid"));
 
 
 QnPlDriodIpWebCamResource::QnPlDriodIpWebCamResource()
@@ -19,7 +19,7 @@ bool QnPlDriodIpWebCamResource::isResourceAccessible()
 
 QString QnPlDriodIpWebCamResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnPlDriodIpWebCamResource::setIframeDistance(int /*frames*/, int /*timems*/)

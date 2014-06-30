@@ -11,8 +11,9 @@
 
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>
+#include "nx_ec/impl/ec_api_impl.h"
 
-#include <api/serializer/pb_serializer.h>
+class QnApiSerializer;
 
 /*
 * High level business message transport.
@@ -32,7 +33,8 @@ public:
     //int deliveryBusinessEvent(QnAbstractBusinessEventPtr bEvent, const QUrl& url);
 
     /** Delivery action to other module */
-    int deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QnResourcePtr &res, const QUrl& url);
+    int deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QnId& dstPeer);
+
 signals:
     /** Action successfully delivered to other module*/
     void actionDelivered(const QnAbstractBusinessActionPtr &action);
@@ -41,18 +43,21 @@ signals:
     void actionDeliveryFail(const QnAbstractBusinessActionPtr &action);
 
     /** Action received from other module */
-    void actionReceived(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &res);
+    void actionReceived(const QnAbstractBusinessActionPtr &action);
+
 public slots:
     /** Action received from other module */
-    void at_actionReceived(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &res);
+    void at_actionReceived(const QnAbstractBusinessActionPtr &action);
+
 private slots:
-    void at_replyFinished(QNetworkReply* reply);
+    void at_DeliveryBusinessActionFinished( int handle, ec2::ErrorCode errorCode );
+
 private:
     QNetworkAccessManager m_transport;
     typedef QMap<QNetworkReply*, QnAbstractBusinessActionPtr> ActionMap;
     ActionMap m_actionsInProgress;
     mutable QMutex m_mutex;
-    QnApiPbSerializer m_serializer;
+    QMap<int, QnAbstractBusinessActionPtr> m_sendingActions;
 };
 
 #define qnBusinessMessageBus QnBusinessMessageBus::instance()

@@ -8,7 +8,10 @@
 
 #include <utils/common/id.h>
 
-enum QN_EXPORT QnDomain
+#include "resource_fwd.h"
+
+// TODO: #Elric #enum
+enum QnDomain
 {
     QnDomainMemory = 1,
     QnDomainDatabase = 2,
@@ -17,14 +20,13 @@ enum QN_EXPORT QnDomain
 
 struct QN_EXPORT QnParamType
 {
-    enum DataType { None, Value, OnOff, Boolen, MinMaxStep, Enumeration, Button };
 
     QnParamType();
     //QnParamType(const QString& name, const QVariant &val);
 
-    DataType type;
+    Qn::PropertyDataType type;
 
-    QnId id;
+    //QnId id;
     QString name;
     QVariant default_value;
 
@@ -47,8 +49,6 @@ struct QN_EXPORT QnParamType
     bool setDefVal(const QVariant &val); // safe way to set value
 };
 
-typedef QSharedPointer<QnParamType> QnParamTypePtr;
-
 
 struct QN_EXPORT QnParam
 {
@@ -70,7 +70,7 @@ struct QN_EXPORT QnParam
     const QString &subGroup() const { return m_paramType->subgroup; }
     double minValue() const { return m_paramType->min_val; }
     double maxValue() const { return m_paramType->max_val; }
-    QnParamType::DataType type() const { return m_paramType->type;}
+    Qn::PropertyDataType type() const { return m_paramType->type;}
     const QList<QVariant> &uiPossibleValues() const { return m_paramType->ui_possible_values; }
     const QList<QVariant> &possibleValues() const { return m_paramType->possible_values; }
     const QString &description() const { return m_paramType->description; }
@@ -78,7 +78,7 @@ struct QN_EXPORT QnParam
     bool isPhysical() const { return m_paramType->isPhysical; }
     bool isReadOnly() const { return m_paramType->isReadOnly; }
     const QString &netHelper() const { return m_paramType->paramNetHelper; }
-    const QnId &paramTypeId() const { return m_paramType->id; }
+    //const QnId &paramTypeId() const { return m_paramType->id; }
 
 private:
     QnParamTypePtr m_paramType;
@@ -90,7 +90,14 @@ Q_DECLARE_METATYPE(QnParam)
 
 class QN_EXPORT QnParamList
 {
+    typedef QHash<QString, QnParam> QnParamMap;
+
 public:
+    typedef QnParamMap::key_type key_type;
+    typedef QnParamMap::mapped_type mapped_type;
+    typedef QnParamMap::iterator iterator;
+    typedef QnParamMap::const_iterator const_iterator;
+
     void unite(const QnParamList &other);
     bool contains(const QString &name) const;
     QnParam &operator[](const QString &name);
@@ -106,8 +113,47 @@ public:
 
     QnParamList paramList(const QString &group, const QString &subGroup = QString()) const;
 
+    iterator begin()
+    {
+        return m_params.begin();
+    }
+
+    const_iterator begin() const
+    {
+        return m_params.begin();
+    }
+
+    const_iterator cbegin() const
+    {
+        return m_params.cbegin();
+    }
+
+    const_iterator cend() const
+    {
+        return m_params.cend();
+    }
+
+    iterator end()
+    {
+        return m_params.end();
+    }
+
+    const_iterator end() const
+    {
+        return m_params.end();
+    }
+
+    iterator find( const key_type& key )
+    {
+        return m_params.find( key );
+    }
+
+    const_iterator find( const key_type& key ) const
+    {
+        return m_params.find( key );
+    }
+
 private:
-    typedef QHash<QString, QnParam> QnParamMap;
     QnParamMap m_params;
 };
 

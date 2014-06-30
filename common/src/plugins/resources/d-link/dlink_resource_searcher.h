@@ -8,14 +8,13 @@
 
 class QnPlDlinkResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
-    QnPlDlinkResourceSearcher();
 
 public:
-    static QnPlDlinkResourceSearcher& instance();
+    QnPlDlinkResourceSearcher();
 
     QnResourceList findResources(void);
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 protected:

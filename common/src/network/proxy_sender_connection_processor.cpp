@@ -38,7 +38,7 @@ QByteArray QnProxySenderConnection::readProxyResponse()
     Q_D(QnProxySenderConnection);
 
     quint8 buffer[1024];
-    int bufLen = 0;
+    size_t bufLen = 0;
     while (d->socket->isConnected() && !m_needStop && bufLen < sizeof(buffer))
     {
         int readed = d->socket->recv(buffer + bufLen, sizeof(buffer) - bufLen);
@@ -119,7 +119,6 @@ void QnProxySenderConnection::run()
     bool gotRequest = false;
     QElapsedTimer timer;
     timer.restart();
-    int cseq = 0;
     while (!m_needStop && d->socket->isConnected())
     {
         gotRequest = readRequest();
@@ -143,6 +142,9 @@ void QnProxySenderConnection::run()
     if (!m_needStop) {
         addNewProxyConnect();
         if (gotRequest)
+        {
+            parseRequest();
             processRequest();
+        }
     }
 }

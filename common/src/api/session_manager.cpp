@@ -96,6 +96,7 @@ void QnSessionManager::at_replyReceived(QNetworkReply * reply)
         int n = errorString.lastIndexOf(QLatin1String(":"));
         errorString = errorString.mid(n + 1).trimmed();
     }
+
     AsyncRequestInfo reqInfo = m_handleInProgress.value(reply);
     m_handleInProgress.remove(reply);
     //emit requestFinished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), errorString.toLatin1()), handle);
@@ -284,12 +285,13 @@ void QnSessionManager::at_aboutToBeStopped() {
     m_accessManager = 0;
 }
 
-void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * )
+void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & reply, QAuthenticator* authenticator)
 {
-    // not used
+    QString user = QnAppServerConnectionFactory::defaultUrl().userName();
+    QString password = QnAppServerConnectionFactory::defaultUrl().password();
+    authenticator->setUser(user);
+    authenticator->setPassword(password);
 }
-
-
 
 void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenticator * authenticator)
 {
@@ -366,4 +368,3 @@ void QnSessionManager::at_sslErrors(QNetworkReply* reply, const QList<QSslError>
 {
     reply->ignoreSslErrors();
 }
-

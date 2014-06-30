@@ -12,7 +12,7 @@ bool QnAbstractDataConsumer::canAcceptData() const
     return (m_dataQueue.size() < m_dataQueue.maxSize());
 }
 
-void QnAbstractDataConsumer::putData(QnAbstractDataPacketPtr data)
+void QnAbstractDataConsumer::putData( const QnAbstractDataPacketPtr& data )
 {
     if (!needToStop())
         m_dataQueue.push(data);
@@ -43,7 +43,7 @@ void QnAbstractDataConsumer::run()
 
         if (!get)
         {
-            CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("queue is empty "), (int)(long)(&m_dataQueue),cl_logDEBUG2);
+            NX_LOG( lit("QnAbstractDataConsumer::run. queue is empty %1").arg((int)(long)(&m_dataQueue)), cl_logDEBUG2 );
             QnSleep::msleep(10);
             continue;
         }
@@ -54,7 +54,7 @@ void QnAbstractDataConsumer::run()
             else
                 QnSleep::msleep(1);
         }
-        //cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
+        //NX_LOG("queue size = ", m_dataQueue.size(),cl_logALWAYS);
     }
 
     endOfRun();

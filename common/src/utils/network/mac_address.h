@@ -9,9 +9,10 @@
 class QnMacAddress: public boost::equality_comparable<QnMacAddress, boost::less_than_comparable<QnMacAddress> > {
 public:
     QnMacAddress();
-    QnMacAddress(const unsigned char *mac);
-    QnMacAddress(const QString &mac);
-    QnMacAddress(const QLatin1String &mac);
+    explicit QnMacAddress(const unsigned char *mac);
+    explicit QnMacAddress(const QString &mac);
+    explicit QnMacAddress(const QLatin1String &mac);
+    explicit QnMacAddress(const QByteArray &mac);
     ~QnMacAddress();
 
     bool isNull() const;
@@ -32,7 +33,14 @@ private:
     void init(const QString &mac);
 
 private:
-    unsigned char m_data[6];
+    union
+    {
+        unsigned char bytes[6];
+        struct {
+            quint32 u32;
+            quint16 u16;
+        } uints;
+    } m_data;
 };
 
 Q_DECLARE_TYPEINFO(QnMacAddress, Q_MOVABLE_TYPE);

@@ -16,19 +16,20 @@ class QnDesktopCameraResource
 {
     Q_OBJECT
 
+    typedef QnPhysicalCameraResource base_type;
+
 public:
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     static const int MAX_STREAMS = 2;
 
     QnDesktopCameraResource();
+    QnDesktopCameraResource(const QString &userName);
     ~QnDesktopCameraResource();
 
     virtual QString getDriverName() const override;
 
     virtual void setIframeDistance(int frames, int timems) { Q_UNUSED(frames) Q_UNUSED(timems) }
-
-    virtual bool shoudResolveConflicts() const override { return false; }
 
     virtual bool setRelayOutputState(const QString& outputID, bool activate, unsigned int autoResetTimeoutMS = 0) override;
 
@@ -36,11 +37,10 @@ public:
 
     virtual bool isResourceAccessible() override;
 
-    QString gePhysicalIdPrefix() const;
-    QString getUserName() const;
     QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider);
+
+    virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 };
-typedef QSharedPointer<QnDesktopCameraResource> QnDesktopCameraResourcePtr;
 
 #endif //ENABLE_DESKTOP_CAMERA
 

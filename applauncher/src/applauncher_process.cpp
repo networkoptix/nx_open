@@ -151,7 +151,7 @@ int ApplauncherProcess::run()
         installationIter.second->pleaseStop();
 
     for( auto installationIter: m_activeInstallations )
-        installationIter.second->wait();
+        installationIter.second->join();
 
     m_activeInstallations.clear();
 
@@ -460,6 +460,8 @@ bool ApplauncherProcess::getInstallationStatus(
                 break;
             case applauncher::api::InstallationStatus::cancelled:
                 NX_LOG( QString::fromLatin1("Installation has been cancelled"), cl_logDEBUG2 );
+                break;
+            default:
                 break;
         }
         m_activeInstallations.erase( installationIter );

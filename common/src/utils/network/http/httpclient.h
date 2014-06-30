@@ -11,6 +11,8 @@
 #include <QtCore/QWaitCondition>
 #include <QtCore/QMutex>
 
+#include <utils/common/stoppable.h>
+
 
 /*!
     \note This class is not thread-safe
@@ -23,7 +25,8 @@ namespace nx_http
     */
     class HttpClient
     :
-        public QObject
+        public QObject,
+        public QnStoppable
     {
         Q_OBJECT
 
@@ -31,11 +34,17 @@ namespace nx_http
         HttpClient();
         ~HttpClient();
 
+        virtual void pleaseStop() override;
+
         /*!
             Returns on receiving response
         */
         bool doGet( const QUrl& url );
-        const HttpResponse* response() const;
+        bool doPost(
+            const QUrl& url,
+            const nx_http::StringType& contentType,
+            const nx_http::StringType& messageBody );
+        const Response* response() const;
         //!
         bool eof() const;
         //!

@@ -3,7 +3,8 @@
 #include <ui/style/globals.h>
 
 #include <utils/math/color_transformations.h>
-#include <utils/common/json.h>
+#include <utils/serialization/json_functions.h>
+#include <utils/fusion/fusion_adaptor.h>
 #include <utils/math/math.h>
 
 QnTimeSliderColors::QnTimeSliderColors() {
@@ -22,6 +23,9 @@ QnTimeSliderColors::QnTimeSliderColors() {
 
     pastMotion = QColor(255, 0, 0, 128);
     futureMotion = QColor(255, 0, 0, 64);
+
+    pastBookmark = QColor(0, 0, 255, 128);
+    futureBookmark = QColor(0, 0, 255, 64);
 
     separator = QColor(255, 255, 255, 64);
 
@@ -116,70 +120,9 @@ QnLicensesListModelColors::QnLicensesListModelColors() {
     expired = QColor(Qt::red);
 }
 
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnTimeSliderColors, 
-    (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)
-        (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)
-        (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute), 
-    QJson::Optional
-)
-
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnTimeScrollBarColors, 
-    (indicator)(border)(handle), 
-    QJson::Optional
-)
-
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnBackgroundColors, 
-    (normal)(panic), 
-    QJson::Optional
-)
-
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnCalendarColors, 
-    (selection)(primaryRecording)(secondaryRecording)(primaryMotion)(secondaryMotion)(separator), 
-    QJson::Optional
-)
-
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnStatisticsColors, 
-    (grid)(frame)(cpu)(ram)(hdds)(network), 
-    QJson::Optional
-)
-
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnScheduleGridColors, 
-    (normalLabel)(weekendLabel)(selectedLabel)(disabledLabel), 
-    QJson::Optional
-)
-
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnGridColors, 
-    (grid)(allowed)(disallowed), 
-    QJson::Optional
-)
-
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnPtzManageModelColors, 
-    (title)(invalid)(warning), 
-    QJson::Optional
-)
-
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnHistogramColors, 
-    (background)(border)(histogram)(selection)(grid)(text), 
-    QJson::Optional
-)
-
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnResourceWidgetFrameColors, 
-    (normal)(active)(selected), 
-    QJson::Optional
-)
-
-QN_DEFINE_STRUCT_JSON_SERIALIZATION_FUNCTIONS_EX(
-    QnLicensesListModelColors, 
-    (normal)(warning)(expired), 
-    QJson::Optional
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    QN_CLIENT_COLOR_TYPES,
+    (json),
+    _Fields,
+    (optional, true)
 )

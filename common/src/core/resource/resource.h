@@ -13,6 +13,7 @@
 
 #include <utils/camera/camera_diagnostics.h>
 #include <utils/common/from_this_to_shared.h>
+#include <utils/common/model_functions_fwd.h>
 #include <utils/common/id.h>
 
 #include <core/datapacket/abstract_data_packet.h>
@@ -38,17 +39,6 @@ public:
     }
 };
 
-class QnResourceParameters: public QMap<QString, QString> {
-    typedef QMap<QString, QString> base_type;
-
-public:
-    using base_type::operator[];
-
-    QString &operator[](const char *key) {
-        return base_type::operator[](QLatin1String(key));
-    }
-};
-
 class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
@@ -61,7 +51,6 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(QString searchString READ toSearchString)
     Q_PROPERTY(QnId parentId READ getParentId WRITE setParentId)
     Q_PROPERTY(Status status READ getStatus WRITE setStatus)
-    Q_PROPERTY(bool disabled READ isDisabled WRITE setDisabled)
     Q_PROPERTY(Flags flags READ flags WRITE setFlags)
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
@@ -70,6 +59,7 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
 
 
 public:
+    // TODO: #Elric #enum
     enum ConnectionRole { Role_Default, Role_LiveVideo, Role_SecondaryLiveVideo, Role_Archive };
 
     enum Status {
@@ -77,9 +67,7 @@ public:
         Unauthorized,
         Online,
         Recording,
-
-        /** Locked status used in layouts only */
-        Locked = Recording
+        NotDefined
     };
 
     enum Flag {
@@ -110,7 +98,10 @@ public:
 
         foreigner = 0x40000,    /**< Resource belongs to other entity. E.g., camera on another server */
         no_last_gop = 0x80000,  /**< Do not use last GOP for this when stream is opened */
-        deprecated = 0x100000,   /**< Resource absent in EC but still used in memory for some reason */
+        deprecated = 0x100000,  /**< Resource absent in EC but still used in memory for some reason */
+
+        videowall = 0x200000,           /**< Videowall resource */
+        desktop_camera = 0x400000,      /**< Desktop Camera resource */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -127,22 +118,16 @@ public:
     Q_DECLARE_FLAGS(Flags, Flag)
 
     QnResource();
-    QnResource(const QnResourceParameters &params);
     virtual ~QnResource();
 
-    virtual void deserialize(const QnResourceParameters& parameters);
-
     QnId getId() const;
-    void setId(QnId id);
+    void setId(const QnId& id);
 
     QnId getParentId() const;
     void setParentId(QnId parent);
 
-    void setGuid(const QString& guid); // TODO: #Elric UUID!
-    QString getGuid() const;
-
     // device unique identifier
-    virtual QString getUniqueId() const = 0;
+    virtual QString getUniqueId() const { return getId().toString(); };
     virtual void setUniqId(const QString& value);
 
 
@@ -150,11 +135,9 @@ public:
     // in other words TypeId can be used instantiate the right resource
     QnId getTypeId() const;
     void setTypeId(QnId id);
+    void setTypeByName(const QString& resTypeName);
 
-    bool isDisabled() const;
-    void setDisabled(bool disabled = true);
-
-    Status getStatus() const;
+    virtual Status getStatus() const;
     virtual void setStatus(Status newStatus, bool silenceMode = false);
     QDateTime getLastStatusUpdateTime() const;
 
@@ -276,7 +259,6 @@ public:
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;
     void statusChanged(const QnResourcePtr &resource);
-    void disabledChanged(const QnResourcePtr &resource);
     void nameChanged(const QnResourcePtr &resource);
     void parentIdChanged(const QnResourcePtr &resource);
     void flagsChanged(const QnResourcePtr &resource);
@@ -309,10 +291,10 @@ public:
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(QnAbstractDataPacketPtr data);
+    static void addCommandToProc(const QnAbstractDataPacketPtr& data);
     static int commandProcQueueSize();
 
-    void update(QnResourcePtr other, bool silenceMode = false);
+    void update(const QnResourcePtr& other, bool silenceMode = false);
 
     // Need use lock/unlock consumers before this call!
     QSet<QnResourceConsumer *> getAllConsumers() const { return m_consumers; }
@@ -322,7 +304,7 @@ public:
     QnResourcePtr toSharedPointer() const;
 
 protected:
-    virtual void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields);
+    virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
 
     // should just do physical job ( network or so ) do not care about memory domain
     virtual bool getParamPhysical(const QnParam &param, QVariant &val);
@@ -373,6 +355,12 @@ protected:
 
     static bool m_appStopping;
 
+    /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
+    QnId m_parentId;
+
+    /** Name of this resource. */
+    QString m_name;
+
     /** Url of this resource, if any. */
     QString m_url; 
 private:
@@ -382,23 +370,12 @@ private:
     /** Identifier of this resource. */
     QnId m_id;
 
-    /** Globally unique identifier ot this resource. */
-    QString m_guid;
-
-    /** Identifier of the parent resource. Use resource pool to retrieve the actual parent resource. */
-    QnId m_parentId;
-
     /** Identifier of the type of this resource. */
     QnId m_typeId;
 
     /** Flags of this resource that determine its type. */
     Flags m_flags;
     
-    /** Name of this resource. */
-    QString m_name;
-
-    /** Disable flag of the resource. */
-    bool m_disabled;
 
     /** Status of this resource. */
     Status m_status;
@@ -423,6 +400,8 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResource::Flags);
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnResource::Status) // TODO: #Elric #EC2 move status out, clean up
+
 template<class Resource>
 QnSharedResourcePointer<Resource> toSharedPointer(Resource *resource) {
     if(resource == NULL) {
@@ -438,33 +417,9 @@ QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource
     return toSharedPointer(resource);
 }
 
-
-class QnResourceFactory
-{
-public:
-    virtual ~QnResourceFactory() {}
-
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters) = 0;
-};
-
-
-class QnResourceProcessor
-{
-public:
-    virtual ~QnResourceProcessor() {}
-
-    virtual void processResources(const QnResourceList &resources) = 0;
-};
-
-
-// for future use
-class QnRecorder : public QnResource
-{
-};
-
-
-Q_DECLARE_METATYPE(QnResource::Status);
 Q_DECLARE_METATYPE(QnResourcePtr);
 Q_DECLARE_METATYPE(QnResourceList);
+
+QN_FUSION_DECLARE_FUNCTIONS(QnResource::Status, (metatype)(lexical))
 
 #endif // QN_RESOURCE_H

@@ -17,8 +17,8 @@ QByteArray QnRtspH264Encoder::getAdditionSDP()
     if (!m_sdpMediaPacket) 
         return QByteArray();
     
-    const quint8* end = (const quint8*) m_sdpMediaPacket->data.data() + m_sdpMediaPacket->data.size();
-    const quint8* curPtr = NALUnit::findNextNAL((const quint8*) m_sdpMediaPacket->data.data(), end);
+    const quint8* end = (const quint8*) m_sdpMediaPacket->data() + m_sdpMediaPacket->dataSize();
+    const quint8* curPtr = NALUnit::findNextNAL((const quint8*) m_sdpMediaPacket->data(), end);
     const quint8* nalEnd = NALUnit::findNALWithStartCode(curPtr, end, true);
     bool firstStep = true;
     QString propParam;
@@ -43,12 +43,12 @@ QByteArray QnRtspH264Encoder::getAdditionSDP()
     }
 
     QString result("a=fmtp:%1 packetization-mode=1; profile-level-id=%2; sprop-parameter-sets=%3\r\n");
-    return result.arg(getPayloadtype()).arg(profileParam).arg(propParam).toLocal8Bit();
+    return result.arg(getPayloadtype()).arg(profileParam).arg(propParam).toLatin1();
 }
 
 void QnRtspH264Encoder::goNextNal()
 {
-    const quint8* dataEnd = (const quint8*) m_media->data.data() + m_media->data.size();
+    const quint8* dataEnd = (const quint8*) m_media->data() + m_media->dataSize();
     m_currentData = NALUnit::findNextNAL(m_nalEnd, dataEnd);
     m_nalEnd = NALUnit::findNALWithStartCode(m_currentData, dataEnd, true);
     m_isFragmented = m_nalEnd - m_currentData > RTSP_H264_MAX_LEN;
@@ -75,7 +75,7 @@ void QnRtspH264Encoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 
     m_media = media;
 
-    m_nalEnd = (const quint8*) m_media->data.data();
+    m_nalEnd = (const quint8*) m_media->data();
     goNextNal();    
 }
 
@@ -84,7 +84,7 @@ bool QnRtspH264Encoder::getNextPacket(QnByteArray& sendBuffer)
     if (!m_media)
         return false;
 
-    const quint8* dataEnd = (const quint8*) m_media->data.data() + m_media->data.size();
+    const quint8* dataEnd = (const quint8*) m_media->data() + m_media->dataSize();
     if (m_currentData == dataEnd)
         return false;
 
@@ -150,7 +150,7 @@ bool QnRtspH264Encoder::getRtpMarker()
         return false;
 
     // return true if last packet
-    const quint8* dataEnd = (const quint8*) m_media->data.data() + m_media->data.size();
+    const quint8* dataEnd = (const quint8*) m_media->data() + m_media->dataSize();
     return m_nalEnd == dataEnd && isLastPacket();
 }
 

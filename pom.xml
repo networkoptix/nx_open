@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.2.1-SNAPSHOT</version>
+    <version>2.3.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -10,18 +10,20 @@
     <scm>
         <connection>scm:hg:file:///${basedir}</connection>
         <developerConnection>scm:hg:file:///${basedir}</developerConnection>
-    </scm>	
+    </scm>  
 
     <distributionManagement>
         <repository>
             <id>nexus-snapshots</id>
             <url>https://noptix.enk.me/nexus/content/repositories/snapshots/</url>
         </repository>
-    </distributionManagement>	
+    </distributionManagement>   
 
     <properties>
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
+        <timestamp>${angle}-${webkit}-20140625.timestamp</timestamp>
         <appserver.name>Enterprise Controller</appserver.name>
+        <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <applauncher.name>${company.name} Launcher</applauncher.name>
@@ -37,9 +39,18 @@
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
         <beta>true</beta>
+        <!-- compile.option1. See profile no-webkit -->
+        <webkit>true</webkit>
+		<!-- compile.option2. See profile angle  -->
+        <angle>false</angle>
+        <box/>
 
-        <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
+		<compile.option1>-webkit</compile.option1>
+		<compile.option2></compile.option2>
+		<compile.option3></compile.option3>
+        <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
+
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
@@ -54,11 +65,13 @@
         <festival.version>2.1-SNAPSHOT</festival.version>
         <boost.version>1.54-SNAPSHOT</boost.version>
         <bespin.version>1.2-SNAPSHOT</bespin.version>
+        <quazip.version>0.6.2-SNAPSHOT</quazip.version>
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->         
         <customization>default</customization>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>        
+        <toolchain.version>none</toolchain.version>            
 
         <additional.defines/>
 
@@ -73,13 +86,21 @@
         <qtlib8>Widgets</qtlib8>
         <qtlib9>Gui</qtlib9>
         <qtlib10>X11Extras</qtlib10>                    
-        <!-- qtlib11 is used in macos profile only -->
-        <qtlib12/>
+        <qtlib11>PrintSupport</qtlib11>
+        <qtlib12>WebKit</qtlib12> 
+        <qtlib13>WebKitWidgets</qtlib13>
+        <qtlib14>MultimediaWidgets</qtlib14>
+        <qtlib15>Quick</qtlib15>
+        <qtlib16>Qml</qtlib16>
+        <qtlib17>Positioning</qtlib17>
+        <qtlib18>Sensors</qtlib18>
+        <qtlib19/>
+        <qtlib20/>
 
         <!--QT plugins used-->      
         <qtplugin1>imageformats</qtplugin1>
         <qtplugin2>platforms</qtplugin2>
-        <qtplugin3/>	
+        <qtplugin3/>    
     </properties>
 
     <build>
@@ -101,7 +122,7 @@
                             <files>
                                 <file>${root.dir}/customization/default-values.properties</file>
                                 <file>${customization.dir}/build.properties</file>
-                                <file>${root.dir}/appserver/appserver-${arch}.properties</file>
+                                <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
                             </files>
                         </configuration>
                     </execution>                   
@@ -137,9 +158,9 @@
                 </executions>
                 <configuration>
                     <doCheck>false</doCheck>
-                    <doUpdate>update</doUpdate>
+                    <doUpdate>true</doUpdate>
                 </configuration>
-            </plugin>		
+            </plugin>       
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -160,7 +181,7 @@
                                 <resource>
                                     <directory>${basedir}/maven/filter-resources</directory>
                                     <filtering>true</filtering>
-                                </resource>	
+                                </resource> 
                                 <resource>
                                     <directory>${basedir}/maven/bin-resources</directory>
                                     <filtering>false</filtering>
@@ -172,20 +193,20 @@
                                         <exclude>**/_unused/**</exclude>
                                         <exclude>**/intro.*</exclude>
                                     </excludes>
-                                </resource>	   
+                                </resource>    
                                 <resource>
                                     <directory>${customization.dir}/${project.artifactId}</directory>
                                     <filtering>false</filtering>
                                     <excludes>
                                         <exclude>**/_unused/**</exclude>
                                     </excludes>
-                                </resource>	        	                                                             
+                                </resource>                                                                          
                             </resources>              
                         </configuration>            
                     </execution>
                 </executions>
-            </plugin>			
-        </plugins>			
+            </plugin>           
+        </plugins>          
     </build>
 
     <profiles>
@@ -195,14 +216,14 @@
             <activation>        
                 <file>
                     <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
-                    <missing>build_environment/target/buildenv20130604.timestamp</missing>
+                    <missing>build_environment/target/${timestamp}</missing>
                 </file> 
             </activation>
-            <modules>	
+            <modules>   
                 <module>build_environment</module>
-            </modules>	
+            </modules>  
         </profile>     
-        
+
         <profile>
             <id>quicksync</id>
             <activation>
@@ -211,9 +232,9 @@
                     <value>true</value>
                 </property>
             </activation>
-            <modules>	
+            <modules>   
                 <module>plugins/quicksyncdecoder</module>       
-            </modules>	
+            </modules>  
         </profile>   
 
         <profile>
@@ -225,8 +246,8 @@
             </activation>
             <modules>
                 <module>build_variables</module>
-                <module>appserver</module>
                 <module>common</module>
+                <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
         </profile> 
@@ -244,7 +265,7 @@
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>mediaserver</module>
-                <module>mediaproxy</module>
+                <!--<module>mediaproxy</module> -->
                 <!-- <module>testcamera</module> -->
             </modules>            
             <properties>
@@ -252,7 +273,7 @@
             </properties>
         </profile>  
         <profile>        
-            <id>noarm</id>
+            <id>desktop</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <property>
@@ -260,13 +281,10 @@
                     <value>!arm</value>
                 </property>
             </activation>
-            <modules>		                
+            <modules>                       
                 <module>applauncher</module> 
-                <module>client</module>		
-            </modules>	
-            <properties>
-                <toolchain.version>none</toolchain.version>            
-            </properties>
+                <module>client</module>     
+            </modules>  
         </profile>         
         <profile>
             <id>windows</id>
@@ -275,16 +293,16 @@
                     <family>Windows</family>
                 </os>
             </activation>
-            <modules>
-                <module>plugins/image_library_plugin</module>                
-                <module>traytool</module>
-                <!-- Vmaxproxy	module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
-                <!--<module>vmaxproxy</module>	-->
-                <module>client</module>		                
+            <modules>     
+                <!-- <module>traytool</module> -->
+                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
+                <!--<module>vmaxproxy</module>  -->
+                <module>client</module>                     
                 <module>wixsetup/wixsetup-full</module>
-                <module>wixsetup/wixsetup-client-only</module>
+                <!-- <module>wixsetup/wixsetup-client-only</module> -->
             </modules>
             <properties>
+                <qt.dir>${libdir}/${arch}</qt.dir>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>                
@@ -309,9 +327,10 @@
             </activation>
             <properties>
                 <environment.dir>${env.environment}</environment.dir>
-                <init.python.dir>${environment.dir}/python/bin</init.python.dir>				
+                <init.python.dir>${environment.dir}/python/bin</init.python.dir>                
                 <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
+				<qt.dir>${libdir}</qt.dir>
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
@@ -327,18 +346,15 @@
                     <name>linux</name>
                 </os> 
             </activation>
-            <properties>			
+            <properties>            
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
+				<qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
-                <module>plugins/image_library_plugin</module>
-                <module>debsetup/client-deb</module>
-                <module>debsetup/mediaserver-deb</module>
-                <module>debsetup/appserver-deb</module>
             </modules>            
-        </profile>	
+        </profile>  
         <profile>
             <id>macosx</id>
             <activation>
@@ -346,18 +362,36 @@
                     <family>mac</family>
                 </os> 
             </activation>
-            <properties>		
+            <properties>        
                 <platform>macosx</platform>
                 <additional.compiler>clang</additional.compiler>
-                <client.mediafolder.name>${product.name}</client.mediafolder.name>
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>
-                <qtlib11>PrintSupport</qtlib11>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
             </properties>
             <modules>
                 <module>macsetup/client-dmg</module>
             </modules>            
         </profile>        
+
+        <profile>        
+            <id>linux-noarm</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
+                <property>
+                    <name>arch</name>
+                    <value>!arm</value>
+                </property>
+            </activation>
+            <modules>                       
+                <module>debsetup/client-deb</module>
+                <module>debsetup/mediaserver-deb</module>
+            </modules>  
+        </profile>         
 
         <profile>
             <id>linux-arm</id>
@@ -374,16 +408,91 @@
             </activation>
             <properties>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <toolchain.version>2011.09</toolchain.version>
-                <compiler>${toolchain.version}</compiler>
-                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+				<qt.classifier>${platform}-${arch}-${box}</qt.classifier>
+				<compile.option1></compile.option1>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA</additional.defines>
+                <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
+                <libdir>${root.dir}/build_environment/target-${box}</libdir>
+            </properties>
+            <build>
+                <directory>target-${box}</directory>
+            </build>
+        </profile> 
+
+        <profile>
+            <id>linux-isd-jaguar</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
+                <property>
+                    <name>box</name>
+                    <value>isd</value>
+                </property>
+            </activation>
+            <properties>
+                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <toolchain.version>codesourcery-2013.11</toolchain.version>
+                <compiler>2011.09</compiler>
+                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
-            </modules>
-        </profile>	
+                <module>edge_firmware/isd</module>
+            </modules>            
+        </profile>
+
+        <profile>
+            <id>linux-isd-s2</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os> 
+                <property>
+                    <name>box</name>
+                    <value>isd_s2</value>
+                </property>
+            </activation>
+            <properties>
+                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <toolchain.version>linaro-multilib-2013.09</toolchain.version>
+                <compiler>${toolchain.version}</compiler>
+                <openssl.version>1.0.1f-SNAPSHOT</openssl.version>
+            </properties>
+            <modules>
+                <module>plugins/isd_native_plugin</module>
+                <module>edge_firmware/isd</module>
+            </modules>            
+        </profile>
+
+        <profile>
+            <id>linux-arm-rpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>rpi</value>
+                </property>
+            </activation>
+            <properties>
+                <toolchain.version>rpi</toolchain.version>
+                <compiler>${toolchain.version}</compiler>
+                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+            </properties>
+            <modules>
+                <module>edge_firmware/rpi</module>
+            </modules>             
+        </profile>
+
         <profile>
             <id>linux-x64</id>
             <activation>
@@ -417,7 +526,7 @@
             <properties>
                 <arch>x86</arch>
             </properties>
-        </profile>	
+        </profile>  
         <profile>
             <id>linux-x86-on-x64</id>
             <activation>
@@ -434,7 +543,7 @@
             <properties>
                 <qt.spec>linux-g++-32</qt.spec>
             </properties>
-        </profile>	        
+        </profile>          
         <profile>
             <id>android</id>
             <activation>
@@ -444,7 +553,7 @@
                 <module>android-client/protobuf-classes</module>
                 <module>android-client/android-main</module>
             </modules>
-        </profile>	
+        </profile>  
         <profile>
             <id>ios</id>
             <activation>
@@ -466,6 +575,33 @@
                 <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}</finalName>
                 <skip.sign>false</skip.sign>
             </properties>
-        </profile>	      
-    </profiles>	
+        </profile>     
+        <profile>
+            <id>no-webkit</id>
+            <activation>
+                <property>
+                    <name>webkit</name>
+                    <value>false</value>
+                </property>                
+            </activation>
+            <properties>
+                <compile.option1></compile.option1>
+            </properties>
+        </profile>      
+        <profile>
+            <id>angle</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>angle</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <properties>
+                <compile.option2>-angle</compile.option2>
+            </properties>
+        </profile>  		
+    </profiles> 
 </project>

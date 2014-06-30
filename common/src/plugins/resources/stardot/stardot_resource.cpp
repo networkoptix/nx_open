@@ -14,7 +14,7 @@
 
 
 static QString MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
-const char* QnStardotResource::MANUFACTURE = "Stardot";
+const QString QnStardotResource::MANUFACTURE(lit("Stardot"));
 static const int TCP_TIMEOUT = 3000;
 static const int DEFAULT_RTSP_PORT = 554;
 
@@ -49,7 +49,7 @@ QnStardotResource::~QnStardotResource()
 
 QString QnStardotResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnStardotResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -59,11 +59,6 @@ void QnStardotResource::setIframeDistance(int /*frames*/, int /*timems*/)
 QnAbstractStreamDataProvider* QnStardotResource::createLiveDataProvider()
 {
     return new QnStardotStreamReader(toSharedPointer());
-}
-
-bool QnStardotResource::shoudResolveConflicts() const 
-{
-    return false;
 }
 
 QSize QnStardotResource::extractResolution(const QByteArray& resolutionStr) const
@@ -164,7 +159,13 @@ CameraDiagnostics::Result QnStardotResource::initInternal()
     //setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
     setParam(MAX_FPS_PARAM_NAME, m_maxFps, QnDomainDatabase);
     //setParam(DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
-    save();
+
+    //detecting and saving selected resolutions
+    CameraMediaStreams mediaStreams;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution, CODEC_ID_H264 ) ); //QnStardotStreamReader always requests h.264
+    saveResolutionList( mediaStreams );
+
+    saveParams();
 
     setMotionMaskPhysical(0);
     return CameraDiagnostics::NoErrorResult();
@@ -175,7 +176,7 @@ bool QnStardotResource::isResourceAccessible()
     return updateMACAddress();
 }
 
-QnConstResourceAudioLayoutPtr QnStardotResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnStardotResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     if (isAudioEnabled()) {
         const QnStardotStreamReader* stardotReader = dynamic_cast<const QnStardotStreamReader*>(dataProvider);

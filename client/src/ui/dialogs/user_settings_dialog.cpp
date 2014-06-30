@@ -130,7 +130,7 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
 //        ui->accessRightsGroupbox->setEnabled(editable);
         setReadOnly(ui->accessRightsComboBox, !editable);
         setReadOnly(ui->accessRightsGroupbox, !editable);
-        // TODO: #GDM if readonly then do not save anyway
+        // TODO: #GDM #Common if readonly then do not save anyway
         break;
     case Email:
         ui->emailEdit->setVisible(visible);
@@ -404,11 +404,15 @@ void QnUserSettingsDialog::updateDependantPermissions() {
 
         setCheckboxEnabled(Qn::GlobalExportPermission, false);
         setCheckboxChecked(Qn::GlobalExportPermission);
+
+        setCheckboxEnabled(Qn::GlobalEditVideoWallPermission, false);
+        setCheckboxChecked(Qn::GlobalEditVideoWallPermission);
     } else {
         setCheckboxEnabled(Qn::GlobalEditCamerasPermission);
         setCheckboxEnabled(Qn::GlobalPtzControlPermission);
         setCheckboxEnabled(Qn::GlobalViewArchivePermission);
         setCheckboxEnabled(Qn::GlobalExportPermission);
+        setCheckboxEnabled(Qn::GlobalEditVideoWallPermission);
 
         bool canViewArchive = isCheckboxChecked(Qn::GlobalViewArchivePermission);
         setCheckboxEnabled(Qn::GlobalExportPermission, canViewArchive);
@@ -466,6 +470,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
     previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
     previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
     previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportPermission, previous);
+    previous = createAccessRightCheckBox(tr("Can edit Video Walls"), Qn::GlobalEditVideoWallPermission, previous);  //TODO: #VW #TR
 
     updateDependantPermissions();
 }
@@ -507,10 +512,10 @@ void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights) {
 
     for(QHash<quint64, QCheckBox *>::const_iterator pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
         if(pos.value())
-            pos.value()->setChecked(pos.key() & rights);
+            pos.value()->setChecked((pos.key() & rights) == pos.key());
     m_inUpdateDependensies = false;
 
-    updateDependantPermissions(); // TODO: #GDM rename to something more sane, connect properly
+    updateDependantPermissions(); // TODO: #GDM #Common rename to something more sane, connect properly
 }
 
 quint64 QnUserSettingsDialog::readAccessRightsAdvanced() {

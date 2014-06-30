@@ -17,7 +17,7 @@
 
 static const QLatin1String localhost( "127.0.0.1" );
 static const int DEFAULT_ISD_PORT = 80;
-static const int ISD_HTTP_REQUEST_TIMEOUT = 3000;
+static const int ISD_HTTP_REQUEST_TIMEOUT = 6000;
 static const int PRIMARY_ENCODER_NUMBER = 0;
 static const int SECONDARY_ENCODER_NUMBER = 1;
 
@@ -48,9 +48,9 @@ MediaEncoder::MediaEncoder(
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
     m_encoderNum( encoderNum ),
+    m_motionMask( nullptr ),
     m_fpsListRead( false ),
     m_resolutionListRead( false ),
-    m_motionMask( 0 ),
     m_audioEnabled( false )
 {
 }
@@ -124,9 +124,9 @@ int MediaEncoder::getResolutionList( nxcip::ResolutionInfo* infoList, int* infoL
 int MediaEncoder::getMaxBitrate( int* maxBitrate ) const
 {
     if( m_encoderNum == PRIMARY_ENCODER_NUMBER )
-        *maxBitrate = 6*1024;
+        *maxBitrate = 15*1024;
     else if( m_encoderNum == SECONDARY_ENCODER_NUMBER )
-        *maxBitrate = 1*1024;
+        *maxBitrate = 2*1024;
     else
         *maxBitrate = 0;
     return nxcip::NX_NO_ERROR;
@@ -157,8 +157,9 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 {
     if( !m_streamReader.get() ) {
         m_streamReader.reset( new StreamReader(
-        &m_refManager,
-        m_encoderNum) );
+            &m_refManager,
+            m_encoderNum,
+            m_cameraManager->info().uid ) );
         if (m_motionMask)
             m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
         m_streamReader->setAudioEnabled( m_audioEnabled );
@@ -172,7 +173,8 @@ int MediaEncoder::getAudioFormat( nxcip::AudioFormat* audioFormat ) const
     if( !m_streamReader.get() ) {
         m_streamReader.reset( new StreamReader(
             &m_refManager,
-            m_encoderNum) );
+            m_encoderNum,
+            m_cameraManager->info().uid ) );
         if (m_motionMask)
             m_streamReader->setMotionMask((const uint8_t*) m_motionMask->data());
         m_streamReader->setAudioEnabled( m_audioEnabled );
@@ -266,7 +268,6 @@ int MediaEncoder::getSupportedResolution() const
         return status == CL_HTTP_AUTH_REQUIRED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_NETWORK_ERROR;
 
     const QStringList& vals = getValues( QLatin1String(reslst) );
-    int resIndex = 0;
     m_supportedResolutions.reserve( vals.size() );
     for( QStringList::const_iterator it = vals.begin(); it != vals.end(); ++it )
     {

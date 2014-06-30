@@ -17,7 +17,7 @@
 #include "business/business_event_connector.h"
 
 
-const char* QnActiResource::MANUFACTURE = "ACTI";
+const QString QnActiResource::MANUFACTURE(lit("ACTI"));
 static const int TCP_TIMEOUT = 3000;
 static const int DEFAULT_RTSP_PORT = 7070;
 
@@ -41,10 +41,6 @@ QnActiResource::QnActiResource()
     setAuth(QLatin1String("admin"), QLatin1String("123456"));
     for (uint i = 0; i < sizeof(DEFAULT_AVAIL_BITRATE_KBPS)/sizeof(int); ++i)
         m_availBitrate << DEFAULT_AVAIL_BITRATE_KBPS[i];
-
-    connect(
-        this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
-        QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
 }
 
 QnActiResource::~QnActiResource()
@@ -73,7 +69,7 @@ int QnActiResource::eventPort() {
 
 QString QnActiResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnActiResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -84,11 +80,6 @@ void QnActiResource::setIframeDistance(int /*frames*/, int /*timems*/)
 QnAbstractStreamDataProvider* QnActiResource::createLiveDataProvider()
 {
     return new QnActiStreamReader(toSharedPointer());
-}
-
-bool QnActiResource::shoudResolveConflicts() const 
-{
-    return false;
 }
 
 QSize QnActiResource::extractResolution(const QByteArray& resolutionStr) const
@@ -266,7 +257,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
     QMap<QByteArray, QByteArray> report = parseSystemInfo(serverReport);
     setFirmware(QString::fromUtf8(report.value("firmware version")));
-    setMAC(QString::fromUtf8(report.value("mac address")));
+    setMAC(QnMacAddress(QString::fromUtf8(report.value("mac address"))));
     m_platform = report.value("platform").trimmed().toUpper();
 
     bool dualStreaming = report.value("channels").toInt() > 1 || !report.value("video2_resolution_cap").isEmpty();
@@ -329,7 +320,15 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     setParam(AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0, QnDomainDatabase);
     setParam(MAX_FPS_PARAM_NAME, getMaxFps(), QnDomainDatabase);
     setParam(DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0, QnDomainDatabase);
-    save();
+
+    //detecting and saving selected resolutions
+    CameraMediaStreams mediaStreams;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution[0], CODEC_ID_H264 ) );
+    if( !m_resolution[1].isEmpty() )
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution[1], CODEC_ID_H264 ) );
+    saveResolutionList( mediaStreams );
+
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -393,7 +392,7 @@ bool QnActiResource::startInputPortMonitoring()
     //registering URL commands (one command per input port)
         //GET /cgi-bin/cmd/encoder?EVENT_RSPCMD1=1,[api/camera_event/98/di/activated],[api/camera_event/98/di/deactivated]&EVENT_RSPCMD2=1,[],[]&EVENT_RSPCMD3=1,[],[]
 
-    const QString cgiPath = lit("api/camera_event/%1/di").arg(this->getId());
+    const QString cgiPath = lit("api/camera_event/%1/di").arg(this->getId().toString());
     QString setupURLCommandRequestStr;
     for( int i = 1; i <= m_inputCount; ++i )
     {
@@ -465,7 +464,7 @@ bool QnActiResource::isInputPortMonitored() const
     return m_inputMonitored;
 }
 
-QnConstResourceAudioLayoutPtr QnActiResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnActiResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     if (isAudioEnabled()) {
         const QnActiStreamReader* actiReader = dynamic_cast<const QnActiStreamReader*>(dataProvider);
@@ -543,7 +542,7 @@ bool QnActiResource::hasDualStreaming() const
     QVariant mediaVariant;
     QnActiResource* this_casted = const_cast<QnActiResource*>(this);
     this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
-    return mediaVariant.toInt();
+    return mediaVariant.toBool();
 }
 
 QnAbstractPtzController *QnActiResource::createPtzControllerInternal()

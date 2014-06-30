@@ -1,9 +1,13 @@
+
+#ifdef ENABLE_ONVIF
+
 #include "vista_focus_ptz_controller.h"
 
 #include <cassert>
 
 #include <utils/network/simple_http_client.h>
 #include <utils/common/ini_section.h>
+#include <utils/common/warnings.h>
 
 #include "vista_resource.h"
 
@@ -161,3 +165,6 @@ bool QnVistaFocusPtzController::runAuxilaryCommand(const QnPtzAuxilaryTrait &tra
         return base_type::runAuxilaryCommand(trait, data);
     }
 }
+
+#endif
+

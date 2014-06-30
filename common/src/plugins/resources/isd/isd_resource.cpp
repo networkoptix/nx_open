@@ -6,7 +6,7 @@
 #include "isd_resource.h"
 
 
-const char* QnPlIsdResource::MANUFACTURE = "ISD";
+const QString QnPlIsdResource::MANUFACTURE(lit("ISD"));
 QString QnPlIsdResource::MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
 
 static QStringList getValues(const QString& line)
@@ -44,7 +44,7 @@ bool QnPlIsdResource::isResourceAccessible()
 
 QString QnPlIsdResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnPlIsdResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -181,17 +181,21 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     setMaxFps(fpsList.at(0));
 
-    save();
+    CameraMediaStreams mediaStreams;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution1, CODEC_ID_H264 ) );
+    if( m_resolution2.width() > 0 )
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_resolution2, CODEC_ID_H264 ) );
+    saveResolutionList( mediaStreams );
+
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
-
 }
 
 QSize QnPlIsdResource::getPrimaryResolution() const
 {
     QMutexLocker lock(&m_mutex);
     return m_resolution1;
-
 }
 
 QSize QnPlIsdResource::getSecondaryResolution() const
@@ -203,7 +207,6 @@ QSize QnPlIsdResource::getSecondaryResolution() const
 
 QnAbstractStreamDataProvider* QnPlIsdResource::createLiveDataProvider()
 {
-
     return new QnISDStreamReader(toSharedPointer());
 }
 
@@ -211,7 +214,7 @@ void QnPlIsdResource::setCroppingPhysical(QRect /*cropping*/)
 {
 }
 
-QnConstResourceAudioLayoutPtr QnPlIsdResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnPlIsdResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     if (isAudioEnabled()) {
         const QnISDStreamReader* rtspReader = dynamic_cast<const QnISDStreamReader*>(dataProvider);

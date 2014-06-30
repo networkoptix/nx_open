@@ -16,11 +16,10 @@
 #include <plugins/plugin_tools.h>
 #include <utils/network/http/httpclient.h>
 #include <utils/network/http/multipart_content_parser.h>
+#include <utils/memory/nx_allocation_cache.h>
 
 #include "ilp_video_packet.h"
 
-
-class DirContentsManager;
 
 //!Reads picture files from specified directory as video-stream
 class StreamReader
@@ -52,6 +51,7 @@ public:
 private:
     enum StreamType
     {
+        none,
         mjpg,
         jpg
     };
@@ -61,7 +61,7 @@ private:
     float m_fps;
     int m_encoderNumber;
     nxcip::UsecUTCTimestamp m_curTimestamp;
-    std::unique_ptr<nx_http::HttpClient> m_httpClient;
+    QSharedPointer<nx_http::HttpClient> m_httpClient;
     nx_http::MultipartContentParser m_multipartContentParser;
     std::unique_ptr<ILPVideoPacket> m_videoPacket;
     StreamType m_streamType;
@@ -70,6 +70,7 @@ private:
     bool m_terminated;
     QWaitCondition m_cond;
     QMutex m_mutex;
+    NxBufferCache m_mediaBufferCache;
  
     void gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame );
     /*!

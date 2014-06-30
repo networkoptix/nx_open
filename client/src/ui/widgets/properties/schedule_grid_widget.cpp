@@ -35,14 +35,14 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     m_readOnly = false;
     m_defaultParams[FpsParam] = 10;
     m_defaultParams[QualityParam] = Qn::QualityNormal;
-    m_defaultParams[RecordTypeParam] = Qn::RecordingType_Run;
+    m_defaultParams[RecordTypeParam] = Qn::RT_Always;
 
-    m_insideColors[Qn::RecordingType_Never] = m_cellColors[Qn::RecordingType_Never] = qnGlobals->noRecordColor();
-    m_insideColors[Qn::RecordingType_MotionOnly] = m_cellColors[Qn::RecordingType_MotionOnly] = qnGlobals->recordMotionColor();
-    m_insideColors[Qn::RecordingType_Run] = m_cellColors[Qn::RecordingType_Run] = qnGlobals->recordAlwaysColor();
+    m_insideColors[Qn::RT_Never] = m_cellColors[Qn::RT_Never] = qnGlobals->noRecordColor();
+    m_insideColors[Qn::RT_MotionOnly] = m_cellColors[Qn::RT_MotionOnly] = qnGlobals->recordMotionColor();
+    m_insideColors[Qn::RT_Always] = m_cellColors[Qn::RT_Always] = qnGlobals->recordAlwaysColor();
 
-    m_cellColors[Qn::RecordingType_MotionPlusLQ] = qnGlobals->recordMotionColor(); 
-    m_insideColors[Qn::RecordingType_MotionPlusLQ] = qnGlobals->recordAlwaysColor();
+    m_cellColors[Qn::RT_MotionAndLowQuality] = qnGlobals->recordMotionColor(); 
+    m_insideColors[Qn::RT_MotionAndLowQuality] = qnGlobals->recordAlwaysColor();
 
     resetCellValues();
 
@@ -499,7 +499,7 @@ Qn::RecordingType QnScheduleGridWidget::cellRecordingType(const QPoint &cell) co
     QVariant value = cellValue(cell, RecordTypeParam);
     if (value.isValid())
         return Qn::RecordingType(value.toUInt());
-    return Qn::RecordingType_Run;
+    return Qn::RT_Always;
 }
 
 void QnScheduleGridWidget::setCellRecordingType(const QPoint &cell, const Qn::RecordingType &value) {
@@ -546,7 +546,7 @@ void QnScheduleGridWidget::resetCellValues() {
     CellParams emptyParams;
     emptyParams[FpsParam] = QLatin1String("-");
     emptyParams[QualityParam] = Qn::QualityNotDefined;
-    emptyParams[RecordTypeParam] = Qn::RecordingType_Never;
+    emptyParams[RecordTypeParam] = Qn::RT_Never;
 
     for (int col = 0; col < columnCount(); ++col)
         for (int row = 0; row < rowCount(); ++row)
@@ -596,7 +596,7 @@ void QnScheduleGridWidget::setMaxFps(int maxFps, int maxDualStreamFps)
         {
             int fps = m_gridParams[x][y][FpsParam].toInt();
             int value = maxFps;
-            if (m_gridParams[x][y][RecordTypeParam] == Qn::RecordingType_MotionPlusLQ)
+            if (m_gridParams[x][y][RecordTypeParam] == Qn::RT_MotionAndLowQuality)
                 value = maxDualStreamFps;
             if(fps > value)
                 setCellValueInternal(QPoint(x, y), FpsParam, value);
@@ -610,9 +610,9 @@ int QnScheduleGridWidget::getMaxFps(bool motionPlusLqOnly)
     for (int x = 0; x < columnCount(); ++x) {
         for (int y = 0; y < rowCount(); ++y) {
             Qn::RecordingType rt = static_cast<Qn::RecordingType>(m_gridParams[x][y][RecordTypeParam].toUInt());
-            if (motionPlusLqOnly && rt != Qn::RecordingType_MotionPlusLQ)
+            if (motionPlusLqOnly && rt != Qn::RT_MotionAndLowQuality)
                 continue;
-            if (rt == Qn::RecordingType_Never)
+            if (rt == Qn::RT_Never)
                 continue;
             fps = qMax(fps, m_gridParams[x][y][FpsParam].toInt());
         }

@@ -3,11 +3,11 @@
 
 #include "dw_dvr_resource.h"
 
-const char* QnDwDvrResource::MANUFACTURE = "Digital watchdog";
+const QString QnDwDvrResource::MANUFACTURE(lit("Digital watchdog"));
 
 QString QnDwDvrResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnDwDvrResource::setMotionMaskPhysical(int channel)

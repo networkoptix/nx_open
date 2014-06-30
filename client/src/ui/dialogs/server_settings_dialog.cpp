@@ -14,6 +14,8 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
+#include <api/model/storage_space_reply.h>
+
 #include <utils/common/counter.h>
 #include <utils/common/string.h>
 #include <utils/common/variant.h>
@@ -21,6 +23,7 @@
 #include <utils/math/interpolator.h>
 #include <utils/math/color_transformations.h>
 
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -42,7 +45,6 @@
 namespace {
     //setting free space to zero, since now client does not change this value, so it must keep current value
     const qint64 defaultReservedSpace = 0;  //5ll * 1024ll * 1024ll * 1024ll;
-    const qint64 minimalReservedSpace = 0;  //5ll * 1024ll * 1024ll * 1024ll;
 
     const qint64 bytesInMiB = 1024 * 1024;
 
@@ -132,6 +134,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
 
     /* Set up context help. */
     setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->nameLabel,           ui->maxCamerasSpinBox,              Qn::ServerSettings_General_Help);
     setHelpTopic(ui->ipAddressLabel,      ui->ipAddressLineEdit,              Qn::ServerSettings_General_Help);
     setHelpTopic(ui->portLabel,           ui->portLineEdit,                   Qn::ServerSettings_General_Help);
     setHelpTopic(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
@@ -235,7 +238,7 @@ QnStorageSpaceData QnServerSettingsDialog::tableItem(int row) const {
 
     result.isWritable = checkBoxItem->flags() & Qt::ItemIsEnabled;
     result.isUsedForWriting = checkBoxItem->checkState() == Qt::Checked;
-    result.storageId = qvariant_cast<int>(checkBoxItem->data(StorageIdRole), -1);
+    result.storageId = qvariant_cast<QString>(checkBoxItem->data(StorageIdRole), QString());
     result.isExternal = qvariant_cast<bool>(checkBoxItem->data(ExternalRole), true);
 
     result.path = pathItem->text();
@@ -265,7 +268,14 @@ void QnServerSettingsDialog::updateFromResources()
     setTableItems(QList<QnStorageSpaceData>());
     setBottomLabelText(tr("Loading..."));
 
+    bool edge = QnMediaServerResource::isEdgeServer(m_server);
     ui->nameLineEdit->setText(m_server->getName());
+    ui->nameLineEdit->setEnabled(!edge);
+    ui->maxCamerasSpinBox->setValue(m_server->getMaxCameras());
+    ui->maxCamerasSpinBox->setEnabled(!edge);
+    ui->checkBoxRedundancy->setChecked(m_server->isRedundancy());
+    ui->checkBoxRedundancy->setEnabled(!edge);
+
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
@@ -278,18 +288,21 @@ void QnServerSettingsDialog::submitToResources() {
 
         QnAbstractStorageResourceList storages;
         foreach(const QnStorageSpaceData &item, tableItems()) {
-            if(!item.isUsedForWriting && item.storageId == -1) {
-                serverStorageStates.insert(QnServerStorageKey(m_server->getGuid(), item.path), item.reservedSpace);
+            if(!item.isUsedForWriting && item.storageId.isNull()) {
+                serverStorageStates.insert(QnServerStorageKey(m_server->getId(), item.path), item.reservedSpace);
                 continue;
             }
 
             QnAbstractStorageResourcePtr storage(new QnAbstractStorageResource());
-            if (item.storageId != -1)
+            if (!item.storageId.isNull())
                 storage->setId(item.storageId);
+            QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
+            if (resType)
+                storage->setTypeId(resType->getId());
             storage->setName(QUuid::createUuid().toString());
             storage->setParentId(m_server->getId());
             storage->setUrl(item.path);
-            storage->setSpaceLimit(qMax(minimalReservedSpace, item.reservedSpace)); // TODO: #Elric is this a proper place for this qMax?
+            storage->setSpaceLimit(item.reservedSpace); //client does not change space limit anymore
             storage->setUsedForWriting(item.isUsedForWriting);
 
             storages.push_back(storage);
@@ -299,7 +312,12 @@ void QnServerSettingsDialog::submitToResources() {
         qnSettings->setServerStorageStates(serverStorageStates);
     }
 
-    m_server->setName(ui->nameLineEdit->text());
+    bool edge = QnMediaServerResource::isEdgeServer(m_server);
+    if (!edge) {
+        m_server->setName(ui->nameLineEdit->text());
+        m_server->setMaxCameras(ui->maxCamerasSpinBox->value());
+        m_server->setRedundancy(ui->checkBoxRedundancy->isChecked());
+    }
 }
 
 void QnServerSettingsDialog::setBottomLabelText(const QString &text) {
@@ -366,7 +384,7 @@ void QnServerSettingsDialog::at_tableBottomLabel_linkActivated() {
         return;
 
     QnStorageSpaceData item = dialog->storage();
-    if(item.storageId != -1)
+    if(!item.storageId.isNull())
         return;
     item.isUsedForWriting = true;
     item.isExternal = true;
@@ -502,11 +520,7 @@ void QnServerSettingsDialog::at_replyReceived(int status, const QnStorageSpaceRe
         QnStorageSpaceData &item = items[i];
 
         if(item.reservedSpace == -1)
-            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getGuid(), item.path) , -1);
-
-        /* Note that if freeSpace is -1, then we'll also get -1 in reservedSpace, which is the desired behavior. */
-        if(item.reservedSpace == -1)
-            item.reservedSpace = qMin(defaultReservedSpace, item.freeSpace);
+            item.reservedSpace = serverStorageStates.value(QnServerStorageKey(m_server->getId(), item.path) , -1);
     }
 
     struct StorageSpaceDataLess {

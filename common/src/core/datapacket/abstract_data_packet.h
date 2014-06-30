@@ -1,10 +1,13 @@
 #ifndef abstract_data_h_1112
 #define abstract_data_h_1112
 
+#include <libavutil/avutil.h>
+
 #include <QSharedPointer>
-#include <QSharedPointer>
+
 #include "utils/common/threadqueue.h"
 
+#include <libavutil/avutil.h>
 
 class QnAbstractStreamDataProvider;
 
@@ -19,7 +22,7 @@ typedef QSharedPointer<QnAbstractMediaContext> QnAbstractMediaContextPtr;
 
 struct QnAbstractDataPacket
 {
-    QnAbstractDataPacket(): dataProvider(0), timestamp(0x8000000000000000ll) {}
+    QnAbstractDataPacket(): dataProvider(0), timestamp(AV_NOPTS_VALUE) {} 
     virtual ~QnAbstractDataPacket() {}
     QnAbstractStreamDataProvider* dataProvider;
     qint64 timestamp; // mksec // 10^-6

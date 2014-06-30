@@ -2,13 +2,16 @@
 #define QN_LICENSE_MANAGER_WIDGET_H
 
 #include <QtWidgets/QWidget>
-#include <QtCore/QModelIndex>
 
-#include "licensing/license.h"
-#include "api/app_server_connection.h"
+#include <nx_ec/ec_api.h>
+
+#include <licensing/license.h>
+
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 
+class QModelIndex;
 class QNetworkAccessManager;
+class QNetworkReply;
 
 class QnLicenseListModel;
 
@@ -30,7 +33,7 @@ private slots:
 
     void at_downloadError();
     void at_downloadFinished();
-    void at_licensesReceived(int status, QnLicenseList licenses, int handle);
+    void at_licensesReceived(int handle, ec2::ErrorCode errorCode, QnLicenseList licenses);
     void at_licenseDetailsButton_clicked();
     void at_gridLicenses_doubleClicked(const QModelIndex &index);
     void at_licenseWidget_stateChanged();

@@ -10,11 +10,11 @@
 class QnVMax480ArchiveDelegate: public QnAbstractArchiveDelegate, public QnVmax480DataConsumer
 {
 public:
-    QnVMax480ArchiveDelegate(QnResourcePtr res);
+    QnVMax480ArchiveDelegate(const QnResourcePtr& res);
     virtual ~QnVMax480ArchiveDelegate();
 
 
-    virtual bool open(QnResourcePtr resource)override;
+    virtual bool open(const QnResourcePtr &resource)override;
     virtual void close()override;
     virtual qint64 startTime()override;
     virtual qint64 endTime()override;

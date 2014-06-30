@@ -28,11 +28,13 @@ extern "C"
 
 struct AVCodecContext;
 
-enum MediaQuality { MEDIA_Quality_High,  // high quality
-                    MEDIA_Quality_Low,   // low quality
+// TODO: #Elric #enum
+enum MediaQuality { MEDIA_Quality_High = 1,  // high quality
+                    MEDIA_Quality_Low = 2,   // low quality
                     // At current version MEDIA_Quality_ForceHigh is very similar to MEDIA_Quality_High. It used for export to 'avi' or 'mkv'. 
                     // This mode do not tries first short LQ chunk if LQ chunk has slightly better position
                     MEDIA_Quality_ForceHigh,
+                    MEDIA_Quality_Auto,
                     MEDIA_Quality_None};
 
 class QnMediaContext: public QnAbstractMediaContext {
@@ -81,6 +83,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     };
     Q_DECLARE_FLAGS(MediaFlags, MediaFlag)
 
+    // TODO: #Elric #enum
     enum DataType {
         VIDEO, 
         AUDIO, 
@@ -89,49 +92,27 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         EMPTY_DATA
     };
 
-    QnAbstractMediaData(unsigned int alignment, unsigned int capacity): 
-        data(alignment, capacity),
-        dataType(EMPTY_DATA),
-        compressionType(CODEC_ID_NONE),
-        flags(MediaFlags_None),
-        channelNumber(0),
-        context(0),
-        opaque(0)
-    {
-    }
-
-    virtual QnAbstractMediaData* clone() const;
-
-    //!Create media packet using existing data \a data of size \a dataSize. This buffer will not be deleted!
-    QnAbstractMediaData(char* data, unsigned int dataSize): 
-        data(data, dataSize),
-        dataType(EMPTY_DATA),
-        compressionType(CODEC_ID_NONE),
-        flags(MediaFlags_None),
-        channelNumber(0),
-        context(0),
-        opaque(0)
-    {
-    }
-
-    virtual ~QnAbstractMediaData()
-    {
-    }
+    //QnAbstractMediaData(unsigned int alignment, unsigned int capacity): 
+    QnAbstractMediaData( DataType _dataType = EMPTY_DATA );
+    virtual ~QnAbstractMediaData();
 
     bool isLQ() const { return flags & MediaFlags_LowQuality; }
     bool isLive() const { return flags & MediaFlags_LIVE; }
 
-    QnByteArray data;
+    virtual QnAbstractMediaData* clone() const = 0;
+    virtual const char* data() const = 0;
+    virtual size_t dataSize() const = 0;
+
     DataType dataType;
     CodecID compressionType;
     MediaFlags flags;
-    quint32 channelNumber;     // video or audio channel number; some devices might have more that one sensor.
+    quint32 channelNumber;     // video or audio channel number; some devices might have more than one sensor
     QnMediaContextPtr context;
     int opaque;
 protected:
     void assign(const QnAbstractMediaData* other);
 private:
-    QnAbstractMediaData(): data(0U, 1) {};
+    //QnAbstractMediaData(): data(0U, 1) {};
 };
 typedef QSharedPointer<QnAbstractMediaData> QnAbstractMediaDataPtr;
 typedef QSharedPointer<const QnAbstractMediaData> QnConstAbstractMediaDataPtr;
@@ -141,10 +122,16 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QnAbstractMediaData::MediaFlags)
 
 struct QnEmptyMediaData : public QnAbstractMediaData
 {
-    QnEmptyMediaData(): QnAbstractMediaData(16,0)
+    QnEmptyMediaData(): m_data(16,0)
     {
         dataType = EMPTY_DATA;
     }
+
+    virtual QnEmptyMediaData* clone() const override;
+    virtual const char* data() const override { return m_data.data(); }
+    virtual size_t dataSize() const override { return m_data.size(); }
+
+    QnByteArray m_data;
 };
 typedef QSharedPointer<QnEmptyMediaData> QnEmptyMediaDataPtr;
 
@@ -154,41 +141,8 @@ Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
 typedef QSharedPointer<const QnMetaDataV1> QnConstMetaDataV1Ptr;
 Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
 
-struct QnCompressedVideoData : public QnAbstractMediaData
-{
-    QnCompressedVideoData(
-        unsigned int alignment = CL_MEDIA_ALIGNMENT,
-        unsigned int capacity = 0,
-        QnMediaContextPtr ctx = QnMediaContextPtr(0))
-    :
-        QnAbstractMediaData(alignment, qMin(capacity, (unsigned int)10 * 1024 * 1024))
-    {
-        dataType = VIDEO;
-        //useTwice = false;
-        context = ctx;
-        //ignore = false;
-        flags = 0;
-        width = height = -1;
-        pts = AV_NOPTS_VALUE;
-    }
 
-    virtual QnCompressedVideoData* clone() const override;
-
-
-    int width;
-    int height;
-    //bool keyFrame;
-    //int flags;
-    //bool ignore;
-    QnMetaDataV1Ptr motion;
-    qint64 pts;
-protected:
-    void assign(const QnCompressedVideoData* other);
-};
-
-typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
-typedef QSharedPointer<const QnCompressedVideoData> QnConstCompressedVideoDataPtr;
-
+// TODO: #Elric #enum
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 
@@ -277,80 +231,25 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     static void createMask(const QRegion& region,  char* mask, int* maskStart = 0, int* maskEnd = 0);
 
     virtual QnMetaDataV1* clone() const override;
+    virtual const char* data() const override { return m_data.data(); }
+    char* data() { return m_data.data(); }
+    virtual size_t dataSize() const override { return m_data.size(); }
 
     //void deserialize(QIODevice* ioDevice);
     void serialize(QIODevice* ioDevice) const;
 
-    static bool mathImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
+    static bool matchImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
 
 
     quint8 m_input;
     qint64 m_duration;
+    QnByteArray m_data;
+
 protected:
     void assign(const QnMetaDataV1* other);
+
 private:
     qint64 m_firstTimestamp;
 };
-
-
-class QnCodecAudioFormat: public QnAudioFormat
-{
-public:
-    QnCodecAudioFormat():
-        QnAudioFormat(),
-        bitrate(0),
-        channel_layout(0),
-        block_align(0),
-        m_bitsPerSample(0),
-        m_frequency(0)
-    {}
-
-    QnCodecAudioFormat(QnMediaContextPtr ctx)
-    {
-        fromAvStream(ctx);
-    }
-
-    QnCodecAudioFormat& fromAvStream(QnMediaContextPtr ctx)
-    {
-        fromAvStream(ctx->ctx());
-        return *this;
-    }
-
-    void fromAvStream(AVCodecContext* c);
-
-    QVector<quint8> extraData; // codec extra data
-    int bitrate;
-    int channel_layout;
-    int block_align;
-    int m_bitsPerSample;
-
-private:
-    int m_frequency;
-};
-
-
-struct QnCompressedAudioData : public QnAbstractMediaData
-{
-    QnCompressedAudioData (
-        unsigned int alignment = CL_MEDIA_ALIGNMENT,
-        unsigned int capacity = 0,
-        QnMediaContextPtr ctx = QnMediaContextPtr(0))
-    :
-        QnAbstractMediaData(alignment, capacity)
-    {
-        dataType = AUDIO;
-        duration = 0;
-        context = ctx;
-    }
-
-    virtual QnCompressedAudioData* clone() const override;
-
-    //QnCodecAudioFormat format;
-    quint64 duration;
-private:
-    void assign(const QnCompressedAudioData* other);
-};
-typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;
-typedef QSharedPointer<const QnCompressedAudioData> QnConstCompressedAudioDataPtr;
 
 #endif //abstract_media_data_h_112

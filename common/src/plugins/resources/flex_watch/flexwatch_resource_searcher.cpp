@@ -27,12 +27,6 @@ void QnFlexWatchResourceSearcher::clearSocketList()
     m_sockList.clear();
 }
 
-QnFlexWatchResourceSearcher& QnFlexWatchResourceSearcher::instance()
-{
-    static QnFlexWatchResourceSearcher inst;
-    return inst;
-}
-
 bool QnFlexWatchResourceSearcher::updateSocketList()
 {
     qint64 curretTime = getUsecTimer();
@@ -73,7 +67,7 @@ void QnFlexWatchResourceSearcher::sendBroadcast()
     }
 }
 
-QList<QnResourcePtr> QnFlexWatchResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
+QList<QnResourcePtr> QnFlexWatchResourceSearcher::checkHostAddr(const QUrl& /*url*/, const QAuthenticator& /*auth*/, bool /*doMultichannelCheck*/)
 {
     return QList<QnResourcePtr>(); // do not duplicate resource with ONVIF discovery!
 }
@@ -113,7 +107,7 @@ QnResourceList QnFlexWatchResourceSearcher::findResources()
             info.manufacturer = QLatin1String(datagram.data() + 36 + 16);
             if (info.manufacturer != QLatin1String("flex encoder") && !info.manufacturer.toLower().contains(QLatin1String("system")))
                 continue;
-            //info.mac = QString::fromLocal8Bit(datagram.mid(30,6).toHex());
+            //info.mac = QString::fromLatin1(datagram.mid(30,6).toHex());
             info.mac = QnMacAddress((const unsigned char*) datagram.data() + 30).toString();
 
             if (processedMac.contains(info.mac))

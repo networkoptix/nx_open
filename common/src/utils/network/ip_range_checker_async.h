@@ -13,6 +13,8 @@
 #include <QtCore/QWaitCondition>
 #include <QtNetwork/QHostAddress>
 
+#include <utils/common/joinable.h>
+
 #include "http/asynchttpclient.h"
 #include "../common/stoppable.h"
 
@@ -21,7 +23,8 @@
 class QnIpRangeCheckerAsync
 :
     public QObject,
-    public QnStoppable
+    public QnStoppable,
+    public QnJoinable
 {
     Q_OBJECT
 
@@ -31,25 +34,30 @@ public:
 
     //!Implmmentation of \a QnStoppable::pleaseStop
     virtual void pleaseStop() override;
+    //!Implmmentation of \a QnJoinable::join
+    virtual void join() override;
 
     //!Asynchronously scans specified ip address range for \a portToScan to be opened and listening
     /*!
         \return List of ip address from [\a startAddr; \a endAddr] range which have \a portToScan opened and listening
     */
     QStringList onlineHosts( const QHostAddress& startAddr, const QHostAddress& endAddr, int portToScan );
+    size_t hostsChecked() const;
+
+    static int maxHostsCheckedSimultaneously();
 
 private:
+    bool m_terminated;
     QStringList m_openedIPs;
     //!It is only because of aio::AsyncHttpClient API bug we have to create this terrible dictionary. it will be fixed soon
-    std::set<std::shared_ptr<nx_http::AsyncHttpClient> > m_socketsBeingScanned;
-    QMutex m_mutex;
+    std::set<nx_http::AsyncHttpClientPtr> m_socketsBeingScanned;
+    mutable QMutex m_mutex;
     QWaitCondition m_cond;
     int m_portToScan;
+    quint32 m_startIpv4;
     quint32 m_endIpv4;
     quint32 m_nextIPToCheck;
 
-    //!Returns immediately if no scan is running
-    void waitForScanToFinish();
     bool launchHostCheck();
 
 private slots:

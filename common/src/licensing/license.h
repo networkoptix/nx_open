@@ -4,7 +4,7 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QMetaType>
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMap>
@@ -12,9 +12,18 @@
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
 
-class QnLicense;
-typedef QSharedPointer<QnLicense> QnLicensePtr;
+#include "core/resource/resource_fwd.h"
+#include "utils/common/latin1_array.h"
+#include "utils/common/id.h"
+#include "nx_ec/data/api_fwd.h"
 
+#ifdef __APPLE__
+#undef verify
+#endif
+
+const QString LICENSE_TYPE_PROFESSIONAL = lit("digital");
+const QString LICENSE_TYPE_ANALOG = lit("analog"); // TODO: #Elric #EC2 TOTALLY EVIL!!!!!!!!!
+const QString LICENSE_TYPE_EDGE = lit("edge");
 
 class QnLicense {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
@@ -24,15 +33,32 @@ public:
         TrialLicense,
         AnalogLicense,
         ProfessionalLicense,
-        TypeCount
+        EdgeLicense,
+        TypeCount,
+        Invalid
     };
 
+    enum ErrorCode {
+        NoError,
+        InvalidSignature,
+        InvalidHardwareID,
+        InvalidBrand,
+        Expired,
+        InvalidType
+
+    };
+
+    QnLicense();
     QnLicense(const QByteArray& licenseBlock);
+
+    void loadLicenseBlock( const QByteArray& licenseBlock );
 
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(const QList<QByteArray>& hardwareIds, const QString& brand) const;
+    bool isValid(ErrorCode* errCode = 0, bool isNewLicense = false) const;
+
+    static QString errorMessage(ErrorCode errCode);
 
     /**
      * @returns                         Whether this license is for analog cameras.
@@ -84,9 +110,21 @@ private:
 
     // Is full license valid (signature2 is used)
     bool m_isValid2;
+
+    void parseLicenseBlock(
+        const QByteArray& licenseBlock,
+        QByteArray* const v1LicenseBlock,
+        QByteArray* const v2LicenseBlock );
+    void licenseBlockFromData(
+        QByteArray* const v1LicenseBlock,
+        QByteArray* const v2LicenseBlock );
+    void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
+
+    ec2::ApiRuntimeData findRuntimeDataByLicense() const;
 };
 
-typedef QList<QnLicensePtr> QnLicenseList;
+Q_DECLARE_METATYPE(QnLicensePtr)
+
 typedef QMap<QByteArray, QnLicensePtr> QnLicenseDict;
 
 class QnLicenseListHelper
@@ -147,8 +185,8 @@ public:
     void setCompatibleHardwareIds(const QList<QByteArray>& hardwareIds);
     QList<QByteArray> compatibleHardwareIds() const;
 
-    QList<QByteArray> allHardwareIds() const;
     QByteArray currentHardwareId() const;
+    bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
 signals:
     void licensesChanged();
 
@@ -159,7 +197,6 @@ private:
     bool isLicenseMatchesCurrentSystem(const QnLicensePtr &license);
     bool addLicense_i(const QnLicensePtr &license);
     bool addLicenses_i(const QnLicenseList &licenses);
-
 private:
     QList<QByteArray> m_mainHardwareIds;
     QList<QByteArray> m_compatibleHardwareIds;

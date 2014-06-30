@@ -23,6 +23,9 @@ class QnThirdPartyResource
     Q_OBJECT
 
 public:
+    static const int PRIMARY_ENCODER_INDEX = 0;
+    static const int SECONDARY_ENCODER_INDEX = 1;
+
     QnThirdPartyResource(
         const nxcip::CameraInfo& camInfo,
         nxcip::BaseCameraManager* camManager,
@@ -47,7 +50,7 @@ public:
     //!Implementation of QnSecurityCamResource::getRelayOutputList
     virtual QStringList getRelayOutputList() const override;
 
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     //!Implementation of QnSecurityCamResource::getInputPortList
     virtual QStringList getInputPortList() const override;
@@ -83,6 +86,9 @@ public:
 
     const QList<nxcip::Resolution>& getEncoderResolutionList( int encoderNumber ) const;
     virtual bool hasDualStreaming() const override;
+
+    nxcip::Resolution getSelectedResolutionForEncoder( int encoderIndex ) const;
+
 protected:
     //!Implementation of QnResource::initInternal
     virtual CameraDiagnostics::Result initInternal() override;
@@ -109,8 +115,13 @@ private:
     QAtomicInt m_refCounter;
     QString m_defaultOutputID;
     int m_encoderCount;
+    std::vector<nxcip::Resolution> m_selectedEncoderResolutions;
 
     bool initializeIOPorts();
+    nxcip::Resolution getMaxResolution( int encoderNumber ) const;
+    //!Returns resolution with pixel count equal or less than \a desiredResolution
+    nxcip::Resolution getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const;
+    nxcip::Resolution getSecondStreamResolution() const;
 };
 
 #endif  //THIRD_PARTY_RESOURCE_H

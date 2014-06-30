@@ -8,6 +8,9 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/dialogs/license_notification_dialog.h>
+#include "api/app_server_connection.h"
+#include "common/common_module.h"
+#include "api/runtime_info_manager.h"
 
 namespace {
     const qint64 day = 1000ll * 60ll * 60ll * 24ll;
@@ -49,7 +52,22 @@ void QnWorkbenchLicenseNotifier::checkLicenses() {
     QList<QnLicensePtr> licenses;
     bool warn = false;
 
-    foreach(const QnLicensePtr &license, qnLicensePool->getLicenses()) {
+    bool someLicenseWillBeBlocked = false;
+    foreach (const ec2::ApiRuntimeData& runtimeData, QnRuntimeInfoManager::instance()->allData().values())
+    {
+        if (runtimeData.prematureLicenseExperationDate)
+            someLicenseWillBeBlocked = true;
+    }
+
+    foreach(const QnLicensePtr &license, qnLicensePool->getLicenses()) 
+    {
+        if (someLicenseWillBeBlocked && !qnLicensePool->isLicenseValid(license))
+        {
+            licenses.push_back(license);
+            warn = true;
+            continue;
+        }
+
         qint64 expirationTime = license->expirationTime();
         // skip infinite lcense
         if(expirationTime < 0)

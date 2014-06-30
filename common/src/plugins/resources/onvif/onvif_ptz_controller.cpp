@@ -258,8 +258,6 @@ bool QnOnvifPtzController::moveInternal(const QVector3D &speed) {
     QAuthenticator auth(m_resource->getAuth());
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
 
-    QVector3D localSpeed = speed;
-
     onvifXsd__Vector2D onvifPanTiltSpeed;
     onvifPanTiltSpeed.x = normalizeSpeed(speed.x(), m_panSpeedLimits);
     onvifPanTiltSpeed.y = normalizeSpeed(speed.y(), m_tiltSpeedLimits);

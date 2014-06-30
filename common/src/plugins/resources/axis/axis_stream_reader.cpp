@@ -14,7 +14,7 @@ static const int AXIS_SEI_TIMESTAMP = 0x0a01;
 static const int AXIS_SEI_TRIGGER_DATA = 0x0a03;
 
 
-QnAxisStreamReader::QnAxisStreamReader(QnResourcePtr res):
+QnAxisStreamReader::QnAxisStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
     m_rtpStreamParser(res),
     m_oldFirmwareWarned(false)
@@ -110,7 +110,7 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
             }
             else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned) 
             {
-                cl_log.log("Axis camera must be have old firmware!!!!  ip = ",  res->getHostAddress() , cl_logERROR);
+                NX_LOG( lit("Axis camera must be have old firmware!!!!  ip = %1").arg(res->getHostAddress()) , cl_logERROR);
                 m_oldFirmwareWarned = true;
                 return CameraDiagnostics::RequestFailedResult( requestPath, QLatin1String("old firmware") );
             }
@@ -139,16 +139,11 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
     }
     // ------------------- determine stream parameters ----------------------------
     float fps = getFps();
-    float ar = res->getResolutionAspectRatio(res->getMaxResolution());
-    QnPlAxisResource::AxisResolution resolution;
-    if (role == QnResource::Role_LiveVideo) {
-        resolution =  res->getMaxResolution();
-    }
-    else {
-        resolution =  res->getNearestResolution(QSize(480,316), ar);
-        if (resolution.size.isEmpty())
-            resolution =  res->getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
-    }
+    const QnPlAxisResource::AxisResolution& resolution = res->getResolution(
+        role == QnResource::Role_LiveVideo
+            ? QnPlAxisResource::PRIMARY_ENCODER_INDEX
+            : QnPlAxisResource::SECONDARY_ENCODER_INDEX );
+
     if (resolution.size.isEmpty()) 
         qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
     Qn::StreamQuality quality = getQuality();
@@ -266,8 +261,8 @@ void QnAxisStreamReader::processTriggerData(const quint8* payload, int len)
 
 void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
 {
-    const quint8* curNal = (const quint8*) videoData->data.data();
-    const quint8* end = curNal + videoData->data.size();
+    const quint8* curNal = (const quint8*) videoData->data();
+    const quint8* end = curNal + videoData->dataSize();
     curNal = NALUnit::findNextNAL(curNal, end);
     //int prefixSize = 3;
     //if (end - curNal >= 4 && curNal[2] == 0)
@@ -321,8 +316,8 @@ void QnAxisStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
 
 bool QnAxisStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
 {
-    const quint8* curNal = (const quint8*) videoData->data.data();
-    const quint8* end = curNal + videoData->data.size();
+    const quint8* curNal = (const quint8*) videoData->data();
+    const quint8* end = curNal + videoData->dataSize();
     curNal = NALUnit::findNextNAL(curNal, end);
 
     const quint8* nextNal = curNal;

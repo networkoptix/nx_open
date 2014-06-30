@@ -334,7 +334,7 @@ QList<QnPlatformMonitor::NetworkLoad> QnSigarMonitor::totalNetworkLoad() {
                 continue; /* Skip entries with duplicate macs. */
 
             /* Detect virtual interfaces. */ 
-            for(int i = 0; i < arraysize(virtualMacs); i++) {
+            for(size_t i = 0; i < arraysize(virtualMacs); i++) {
                 if(memcmp(load.macAddress.bytes(), virtualMacs[i], 3) == 0) {
                     load.type = VirtualInterface;
                     break;

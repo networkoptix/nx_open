@@ -12,10 +12,11 @@ static const int MAX_KEY_FIND_INTERVAL = 10 * 1000 * 1000;
 static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
 
-QnThumbnailsStreamReader::QnThumbnailsStreamReader(QnResourcePtr dev ) :
+QnThumbnailsStreamReader::QnThumbnailsStreamReader(const QnResourcePtr& dev )
+:
     QnAbstractMediaStreamDataProvider(dev)
 {
-    QnSecurityCamResourcePtr camRes = dev.dynamicCast<QnSecurityCamResource>();
+    QnSecurityCamResource* camRes = dynamic_cast<QnSecurityCamResource*>(dev.data());
     if (camRes)
         m_archiveDelegate = camRes->createArchiveDelegate();
     if (!m_archiveDelegate)
@@ -65,7 +66,7 @@ QnAbstractMediaDataPtr QnThumbnailsStreamReader::getNextData()
 
 void QnThumbnailsStreamReader::run()
 {
-    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("QnThumbnailsStreamReader started."), cl_logINFO);
+    CL_LOG(cl_logINFO) NX_LOG(QLatin1String("QnThumbnailsStreamReader started."), cl_logINFO);
 
     beforeRun();
 
@@ -122,7 +123,7 @@ void QnThumbnailsStreamReader::run()
         }
 
         if (videoData)
-            m_stat[videoData->channelNumber].onData(videoData->data.size());
+            m_stat[videoData->channelNumber].onData(videoData->dataSize());
 
 
         putData(data);
@@ -130,7 +131,7 @@ void QnThumbnailsStreamReader::run()
 
     afterRun();
 
-    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("QnThumbnailsStreamReader reader stopped."), cl_logINFO);
+    CL_LOG(cl_logINFO) NX_LOG(QLatin1String("QnThumbnailsStreamReader reader stopped."), cl_logINFO);
 }
 
 void QnThumbnailsStreamReader::afterRun()

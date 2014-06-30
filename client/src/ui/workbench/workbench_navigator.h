@@ -4,16 +4,16 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
-#include <utils/common/long_runnable.h>
 #include <core/resource/resource_fwd.h>
-#include <recording/time_period.h>
-#include <camera/resource_display.h>
-
-#include <ui/actions/action_target_provider.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <client/client_globals.h>
 
-#include "workbench_context_aware.h"
+#include <ui/actions/action_target_provider.h>
+#include <ui/workbench/workbench_context_aware.h>
+
+#include <utils/common/connective.h>
+#include <utils/common/long_runnable.h>
 
 class QAction;
 
@@ -23,16 +23,18 @@ class QnTimeScrollBar;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnAbstractArchiveReader;
-class QnCachingTimePeriodLoader;
+class QnCachingCameraDataLoader;
 class QnThumbnailsLoader;
 class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
+class QnResourceDisplay;
+class QnSearchLineEdit;
 
-class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider {
+class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
 
-    typedef QObject base_type;
+    typedef Connective<QObject> base_type;
 
 public:
     enum WidgetFlag {
@@ -59,6 +61,12 @@ public:
     QnDayTimeWidget *dayTimeWidget() const;
     void setDayTimeWidget(QnDayTimeWidget *dayTimeWidget);
 
+    QnSearchLineEdit *bookmarksSearchWidget() const;
+    void setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget);
+
+    QnCameraBookmarkTags bookmarkTags() const;
+    void setBookmarkTags(const QnCameraBookmarkTags &tags);
+
     bool isLive() const;
     Q_SLOT bool setLive(bool live);
     bool isLiveSupported() const;
@@ -71,6 +79,9 @@ public:
     Q_SLOT void setSpeed(qreal speed);
     qreal minimalSpeed() const;
     qreal maximalSpeed() const;
+
+    qint64 position() const;
+    void setPosition(qint64 position);
 
     QnResourceWidget *currentWidget() const;
     WidgetFlags currentWidgetFlags() const;
@@ -85,7 +96,7 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
-    QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
+    QnCachingCameraDataLoader *loader(const QnResourcePtr &resource);
 
 signals:
     void currentWidgetAboutToBeChanged();
@@ -96,6 +107,7 @@ signals:
     void playingSupportedChanged();
     void speedChanged();
     void speedRangeChanged();
+    void positionChanged();
 
 protected:
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
@@ -118,11 +130,10 @@ protected:
 
     void setPlayingTemporary(bool playing);
 
-    QnCachingTimePeriodLoader *loader(QnResourceWidget *widget);
+    QnCachingCameraDataLoader *loader(QnResourceWidget *widget);
 
     QnThumbnailsLoader *thumbnailLoader(const QnResourcePtr &resource);
     QnThumbnailsLoader *thumbnailLoader(QnResourceWidget *widget);
-
 protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
@@ -136,6 +147,7 @@ protected slots:
     void updateCurrentPeriods(Qn::TimePeriodContent type);
     void updateSyncedPeriods();
     void updateSyncedPeriods(Qn::TimePeriodContent type);
+    void updateCurrentBookmarks();
     void updateTargetPeriod();
     void updateLines();
     void updateCalendar();
@@ -167,8 +179,8 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void at_loader_periodsChanged(QnCachingTimePeriodLoader *loader, Qn::TimePeriodContent type);
-    void at_loader_periodsChanged(Qn::TimePeriodContent type);
+    void updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type);
+    void updateLoaderBookmarks(QnCachingCameraDataLoader *loader);
 
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
@@ -177,17 +189,13 @@ protected slots:
     void at_timeSlider_selectionReleased();
     void at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
     void updateTimeSliderWindowSizePolicy();
-    void at_timeSlider_destroyed();
     void at_timeSlider_thumbnailClicked();
 
     void at_timeScrollBar_sliderPressed();
     void at_timeScrollBar_sliderReleased();
-    void at_timeScrollBar_destroyed();
     
-    void at_calendar_destroyed();
     void at_calendar_dateClicked(const QDate &date);
 
-    void at_dayTimeWidget_destroyed();
     void at_dayTimeWidget_timeClicked(const QTime &time);
 
 private:
@@ -197,6 +205,7 @@ private:
     QnTimeScrollBar *m_timeScrollBar;
     QnCalendarWidget *m_calendar;
     QnDayTimeWidget *m_dayTimeWidget;
+    QnSearchLineEdit *m_bookmarksSearchWidget;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
@@ -226,7 +235,7 @@ private:
      *  It's used to make it possible to unpause video only in the user inactivity state handler.
      */
     bool m_autoPaused;
-    QHash<QnResourceDisplayPtr, bool> m_autoPausedResourceDisplays;
+    QHash<QSharedPointer<QnResourceDisplay>, bool> m_autoPausedResourceDisplays;
 
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;
@@ -237,9 +246,12 @@ private:
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
-    QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
+    QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;
     
     QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
+
+    QnCameraBookmarkTags m_bookmarkTags;
+    QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

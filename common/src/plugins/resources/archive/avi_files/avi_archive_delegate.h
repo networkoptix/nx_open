@@ -2,7 +2,10 @@
 #define __AVI_ARCHIVE_DELEGATE_H
 
 #include <QSharedPointer>
+
 #include "../abstract_archive_delegate.h"
+#include "core/datapacket/audio_data_packet.h"
+#include "core/datapacket/video_data_packet.h"
 
 extern "C"
 {
@@ -18,6 +21,7 @@ class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
     Q_OBJECT;
 
 public:
+    // TODO: #Elric #enum
     enum Tag { 
         Tag_startTime, 
         Tag_endTime, 
@@ -37,7 +41,7 @@ public:
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();
 
-    virtual bool open(QnResourcePtr resource);
+    virtual bool open(const QnResourcePtr &resource);
     virtual void close();
     virtual qint64 startTime();
     virtual qint64 endTime();

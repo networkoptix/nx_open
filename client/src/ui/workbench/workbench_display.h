@@ -10,7 +10,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <business/business_fwd.h>
-#include <recording/time_period.h>
 
 #include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
@@ -396,8 +395,6 @@ protected slots:
     void at_mapper_originChanged();
     void at_mapper_cellSizeChanged();
     void at_mapper_spacingChanged();
-
-    void at_resource_disabledChanged(const QnResourcePtr &resource);
 
     void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);
 

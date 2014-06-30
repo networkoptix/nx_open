@@ -12,8 +12,8 @@
 #include "windows.h"
 #endif
 #include <media_server/settings.h>
+#include <recorder/storage_manager.h>
 
-static const int FFMPEG_BUFFER_SIZE = 1024*1024*4;
 
 QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
@@ -23,8 +23,8 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
 
     int systemFlags = 0;
     if (openMode & QIODevice::WriteOnly) {
-        ioBlockSize = IO_BLOCK_SIZE;
-        ffmpegBufferSize = FFMPEG_BUFFER_SIZE;
+        ioBlockSize = MSSettings::roSettings()->value( nx_ms_conf::IO_BLOCK_SIZE, nx_ms_conf::DEFAULT_IO_BLOCK_SIZE ).toInt();
+        ffmpegBufferSize = MSSettings::roSettings()->value( nx_ms_conf::FFMPEG_BUFFER_SIZE, nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE ).toInt();;
 #ifdef Q_OS_WIN
         if (MSSettings::roSettings()->value("disableDirectIO").toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
@@ -186,7 +186,9 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 
 QnStorageResource* QnFileStorageResource::instance()
 {
-    return new QnFileStorageResource();
+    QnStorageResource* storage = new QnFileStorageResource();
+    storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
+    return storage;
 }
 
 float QnFileStorageResource::getAvarageWritingUsage() const

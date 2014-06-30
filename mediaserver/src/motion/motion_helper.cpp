@@ -7,6 +7,8 @@
 #include "recorder/file_deletor.h"
 #include <media_server/serverutil.h>
 
+#include <recording/time_period_list.h>
+
 
 QnMotionHelper::QnMotionHelper()
 {
@@ -20,7 +22,7 @@ QnMotionHelper::~QnMotionHelper()
     m_writers.clear();
 }
 
-QnMotionArchive* QnMotionHelper::getArchive(QnResourcePtr res, int channel)
+QnMotionArchive* QnMotionHelper::getArchive(const QnResourcePtr& res, int channel)
 {
     QMutexLocker lock(&m_mutex);
     QnNetworkResourcePtr netres = qSharedPointerDynamicCast<QnNetworkResource>(res);
@@ -34,7 +36,7 @@ QnMotionArchive* QnMotionHelper::getArchive(QnResourcePtr res, int channel)
     return writer;
 }
 
-void QnMotionHelper::saveToArchive(QnConstMetaDataV1Ptr data)
+void QnMotionHelper::saveToArchive(const QnConstMetaDataV1Ptr& data)
 {
     QnMotionArchive* archive = getArchive(data->dataProvider->getResource(), data->channelNumber);
     if (archive)
@@ -42,7 +44,7 @@ void QnMotionHelper::saveToArchive(QnConstMetaDataV1Ptr data)
 
 }
 
-QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(QnResourcePtr res, int channel)
+QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(const QnResourcePtr& res, int channel)
 {
     QnMotionArchive* archive = getArchive(res, channel);
     if (archive) 
@@ -51,25 +53,25 @@ QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(QnResourcePtr res,
         return QnMotionArchiveConnectionPtr();
 }
 
-QnTimePeriodList QnMotionHelper::mathImage(const QList<QRegion>& regions, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel)
+QnTimePeriodList QnMotionHelper::matchImage(const QList<QRegion>& regions, const QnResourcePtr& res, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
     QVector<QnTimePeriodList> data;
-    mathImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
-    return QnTimePeriod::mergeTimePeriods(data);
+    matchImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
+    return QnTimePeriodList::mergeTimePeriods(data);
 }
 
-QnTimePeriodList QnMotionHelper::mathImage(const QList<QRegion>& regions, QnResourceList resList, qint64 msStartTime, qint64 msEndTime, int detailLevel)
+QnTimePeriodList QnMotionHelper::matchImage(const QList<QRegion>& regions, const QnResourceList& resList, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
     QVector<QnTimePeriodList> data;
     foreach(QnResourcePtr res, resList)
-        mathImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
-    //NOTE could just call prev method instead of private one, but that will result in multiple QnTimePeriod::mergeTimePeriods calls, which could worsen performance
-    return QnTimePeriod::mergeTimePeriods(data);
+        matchImage( regions, res, msStartTime, msEndTime, detailLevel, &data );
+    //NOTE could just call prev method instead of private one, but that will result in multiple QnTimePeriodList::mergeTimePeriods calls, which could worsen performance
+    return QnTimePeriodList::mergeTimePeriods(data);
 }
 
-void QnMotionHelper::mathImage(
+void QnMotionHelper::matchImage(
     const QList<QRegion>& regions,
-    QnResourcePtr res,
+    const QnResourcePtr& res,
     qint64 msStartTime,
     qint64 msEndTime,
     int detailLevel,
@@ -77,7 +79,7 @@ void QnMotionHelper::mathImage(
 {
     for (int i = 0; i < regions.size(); ++i)
     {
-        QnSecurityCamResourcePtr securityCamRes = res.dynamicCast<QnSecurityCamResource>();
+        QnSecurityCamResource* securityCamRes = dynamic_cast<QnSecurityCamResource*>(res.data());
         if( securityCamRes && securityCamRes->isDtsBased() )
         {
             *timePeriods << securityCamRes->getDtsTimePeriodsByMotionRegion( regions, msStartTime, msEndTime, detailLevel );
@@ -86,7 +88,7 @@ void QnMotionHelper::mathImage(
         {
             QnMotionArchive* archive = getArchive(res, i);
             if (archive) 
-                *timePeriods << archive->mathPeriod(regions[i], msStartTime, msEndTime, detailLevel);
+                *timePeriods << archive->matchPeriod(regions[i], msStartTime, msEndTime, detailLevel);
         }
     }
 }

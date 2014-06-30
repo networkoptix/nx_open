@@ -194,7 +194,6 @@ protected slots:
     void at_screenRecorder_recordingStarted();
     void at_screenRecorder_recordingFinished(const QString &recordedFileName);
 
-    void at_recordingAnimation_tick(int tick);
     void at_recordingAnimation_finished();
 
     void at_zoomedToggle_activated();

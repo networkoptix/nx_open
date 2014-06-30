@@ -5,8 +5,7 @@
 #include <ui/style/globals.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <ui/dialogs/message_box.h>
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 #include <utils/common/string.h>
 
 QnPtzManageModel::QnPtzManageModel(QObject *parent) :
@@ -257,88 +256,42 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
         if (!ok || ((hotkey > 9 || hotkey < 0) && hotkey != QnPtzHotkey::NoHotkey))
             return false;
 
-        int oldHotkey = m_hotkeys.key(data.id(), QnPtzHotkey::NoHotkey);
-        if (oldHotkey == hotkey)
+        // can't use hotkey which is already in use
+        if (hotkey != QnPtzHotkey::NoHotkey && !m_hotkeys.value(hotkey).isEmpty())
             return false;
-
-        // preset that is assigned to this hotkey
-        QnPtzManageModel::RowData existing;
-        int existingIndex = -1;
-        if (hotkey != QnPtzHotkey::NoHotkey) {
-            QString id = m_hotkeys[hotkey];
-            if (id == data.id())
-                return false;
-
-            if (!id.isEmpty())
-                existing = rowData(id, &existingIndex);
-        }
-
-        if (existing.rowType != InvalidRow) {
-            // TODO: #dklychkov move it out of here (to item delegate maybe)
-
-            QString message = (existing.rowType == PresetRow)
-                              ? tr("This hotkey is used by preset \"%1\"").arg(existing.presetModel.preset.name)
-                              : tr("This hotkey is used by tour \"%1\"").arg(existing.tourModel.tour.name);
-
-            QnMessageBox messageBox(QnMessageBox::Question, 0, tr("Change hotkey"), message, QnMessageBox::Cancel);
-            messageBox.addButton(tr("Reassign"), QnMessageBox::AcceptRole);
-
-            if (messageBox.exec() == QnMessageBox::Cancel)
-                return false;
-        }
-
-        // we are removing hotkey from the old location. Mark it modified
-        switch (existing.rowType) {
-        case PresetRow:
-            if (existingIndex >= 0)
-                m_presets[existingIndex].modified = true;
-            break;
-        case TourRow:
-            if (existingIndex >= 0)
-                m_tours[existingIndex].modified = true;
-            break;
-        default:
-            break;
-        }
 
         // mark the new location as modified
         QString id;
         switch (data.rowType) {
         case PresetRow: {
-            int currentIndex = presetIndex(data.presetModel.preset.id);
+            id = data.presetModel.preset.id;
+            int currentIndex = presetIndex(id);
             if (currentIndex >= 0)
                 m_presets[currentIndex].modified = true;
-            id = data.presetModel.preset.id;
             break;
         }
         case TourRow: {
-            int currentIndex = tourIndex(data.tourModel.tour.id);
+            id = data.tourModel.tour.id;
+            int currentIndex = tourIndex(id);
             if (currentIndex >= 0)
                 m_tours[currentIndex].modified = true;
-            id = data.tourModel.tour.id;
             break;
         }
         default:
             break;
         }
 
-        // set updated hotkey
-        if(oldHotkey != QnPtzHotkey::NoHotkey) {
-            if(existingIndex != -1) {
-                m_hotkeys.insert(oldHotkey, existing.id());
-            } else {
-                m_hotkeys.remove(oldHotkey);
-            }
-        }
-        if(hotkey != QnPtzHotkey::NoHotkey)
+        // set or remove hotkey
+        if (hotkey != QnPtzHotkey::NoHotkey) {
             m_hotkeys.insert(hotkey, id);
+        } else {
+            int oldHotkey = m_hotkeys.key(id, QnPtzHotkey::NoHotkey);
+            if (oldHotkey != QnPtzHotkey::NoHotkey)
+                m_hotkeys.remove(oldHotkey);
+        }
 
         emit dataChanged(index, index);
         emit dataChanged(index.sibling(index.row(), ModifiedColumn), index.sibling(index.row(), ModifiedColumn));
-
-        int existingRow = rowNumber(existing);
-        emit dataChanged(index.sibling(existingRow, HotkeyColumn), index.sibling(existingRow, HotkeyColumn));
-        emit dataChanged(index.sibling(existingRow, ModifiedColumn), index.sibling(existingRow, ModifiedColumn));
 
         return true;
     } else if (role == Qt::EditRole && index.column() == NameColumn) {

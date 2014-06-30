@@ -33,8 +33,7 @@ public:
 
 // ------------------------ QnRtspListener ---------------------------
 
-#ifdef USE_NX_HTTP
-bool QnTcpListener::authenticate(const nx_http::HttpRequest& request, nx_http::HttpResponse& response) const
+bool QnTcpListener::authenticate(const nx_http::Request& request, nx_http::Response& response) const
 {
     Q_D(const QnTcpListener);
     if (d->authDigest.isEmpty())
@@ -48,25 +47,9 @@ bool QnTcpListener::authenticate(const nx_http::HttpRequest& request, nx_http::H
     if (data[0].toLower() == "basic" && data.size() > 1)
         rez = data[1] == d->authDigest;
     if (!rez)
-        response.headers["WWW-Authenticate"] = "Basic realm=\"Secure Area\"";
+        nx_http::insertOrReplaceHeader( &response.headers, std::make_pair("WWW-Authenticate", "Basic realm=\"Secure Area\"") );
     return rez;
 }
-#else
-bool QnTcpListener::authenticate(const QHttpRequestHeader& headers, QHttpResponseHeader& responseHeaders) const
-{
-    Q_D(const QnTcpListener);
-    if (d->authDigest.isEmpty())
-        return true;
-    QList<QByteArray> data = headers.value(QLatin1String("Authorization")).toUtf8().split(' ');
-    bool rez = false;
-    if (data[0].toLower() == "basic" && data.size() > 1)
-        rez = data[1] == d->authDigest;
-    if (!rez) {
-        responseHeaders.addValue(QLatin1String("WWW-Authenticate"), QLatin1String("Basic realm=\"Secure Area\""));
-    }
-    return rez;
-}
-#endif
 
 void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& password)
 {
@@ -214,7 +197,7 @@ void QnTcpListener::run()
             "Reason: " << SystemError::toString(prevErrorCode) << "("<<prevErrorCode<<")";
     }
     else {
-        cl_log.log("Server started at ", d->serverAddress.toString() + QLatin1String(":") + QString::number(d->localPort), cl_logINFO);
+        NX_LOG(lit("Server started at %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logINFO);
     }
 
 
@@ -277,7 +260,10 @@ void QnTcpListener::run()
             else
             {
                 const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                if( prevErrorCode != SystemError::timedOut ) {
+                if( prevErrorCode != SystemError::timedOut &&
+                    prevErrorCode != SystemError::again &&
+                    prevErrorCode != SystemError::interrupted )
+                {
                     NX_LOG( lit("TCPListener (%1:%2). Accept failed: %3 (%4)").arg(d->serverAddress.toString()).arg(d->localPort).
                         arg(prevErrorCode).arg(SystemError::toString(prevErrorCode)), cl_logWARNING );
                     QThread::msleep(1000);
@@ -304,4 +290,16 @@ int QnTcpListener::getPort() const
     if (!d->serverSocket)
         return -1;
     return d->serverSocket->getLocalAddress().port;
+}
+
+static QByteArray m_defaultPage;
+
+void QnTcpListener::setDefaultPage(const QByteArray& path)
+{
+    m_defaultPage = path;
+}
+
+QByteArray QnTcpListener::defaultPage()
+{
+    return m_defaultPage;
 }

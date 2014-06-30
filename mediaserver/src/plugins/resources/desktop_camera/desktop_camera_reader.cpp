@@ -10,7 +10,7 @@
 
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
-QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(QnResourcePtr res)
+QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(const QnResourcePtr& res)
 :
     CLServerPushStreamReader(res)
 {
@@ -25,14 +25,17 @@ CameraDiagnostics::Result QnDesktopCameraStreamReader::openStream()
 {
     closeStream();
 
-   if (!m_socket) {
-        QString userName = m_resource.dynamicCast<QnDesktopCameraResource>()->getUserName();
-        m_socket = QnDesktopCameraResourceSearcher::instance().getConnection(userName);
+    if (!m_socket) {
+        if (!QnDesktopCameraResourceSearcher::instance())
+            return CameraDiagnostics::CannotEstablishConnectionResult(0);
+
+        QString userName = m_resource->getName();
+        m_socket = QnDesktopCameraResourceSearcher::instance()->getConnection(userName);
         if (!m_socket)
             return CameraDiagnostics::CannotEstablishConnectionResult(0);
-        quint32 cseq = QnDesktopCameraResourceSearcher::instance().incCSeq(m_socket);
+        quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
         QString request = QString(lit("PLAY %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(cseq);
-        m_socket->send(request.toLocal8Bit());
+        m_socket->send(request.toLatin1());
         m_keepaliveTimer.restart();
     }
 
@@ -41,12 +44,11 @@ CameraDiagnostics::Result QnDesktopCameraStreamReader::openStream()
 
 void QnDesktopCameraStreamReader::closeStream()
 {
-    if (m_socket) {
-        QString userName = m_resource.dynamicCast<QnDesktopCameraResource>()->getUserName();
-        quint32 cseq = QnDesktopCameraResourceSearcher::instance().incCSeq(m_socket);
+    if (m_socket && QnDesktopCameraResourceSearcher::instance()) {
+        quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
         QString request = QString(lit("TEARDOWN %1 RTSP/1.0\r\nSeq: %2\r\n\r\n")).arg("*").arg(cseq);
-        m_socket->send(request.toLocal8Bit());
-        QnDesktopCameraResourceSearcher::instance().releaseConnection(m_socket);
+        m_socket->send(request.toLatin1());
+        QnDesktopCameraResourceSearcher::instance()->releaseConnection(m_socket);
     }
     m_socket.clear();
 }
@@ -139,12 +141,14 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         }
         bufferSize = 0;
 
-        if (!m_needStop && m_socket->isConnected() && m_keepaliveTimer.elapsed() >= KEEP_ALIVE_INTERVAL) 
+        if (!m_needStop 
+            && m_socket->isConnected() 
+            && m_keepaliveTimer.elapsed() >= KEEP_ALIVE_INTERVAL
+            && QnDesktopCameraResourceSearcher::instance()) 
         {
-            QString userName = m_resource.dynamicCast<QnDesktopCameraResource>()->getUserName();
-            quint32 cseq = QnDesktopCameraResourceSearcher::instance().incCSeq(m_socket);
+            quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
             QString request = QString(lit("KEEP-ALIVE %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(cseq);
-            if (m_socket->send(request.toLocal8Bit()) < request.size())
+            if (m_socket->send(request.toLatin1()) < request.size())
             {
                 m_socket->close();
                 return result;

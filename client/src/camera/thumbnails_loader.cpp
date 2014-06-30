@@ -32,6 +32,8 @@ extern "C"
 #include "thumbnails_loader_helper.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
+#include <recording/time_period.h>
+
 namespace {
     const qint64 defaultUpdateInterval = 10 * 1000; /* 10 seconds. */
 
@@ -375,8 +377,8 @@ void QnThumbnailsLoader::process() {
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     if (camera) {
-        QnNetworkResourceList cameras = QnCameraHistoryPool::instance()->getOnlineCamerasWithSamePhysicalId(camera, period);
-        for (int i = 0; i < cameras.size(); ++i) 
+        QnResourceList servers = QnCameraHistoryPool::instance()->getOnlineCameraServers(camera, period);
+        for (int i = 0; i < servers.size(); ++i) 
         {
             QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(0));
             rtspDelegate->setMultiserverAllowed(false);
@@ -385,7 +387,8 @@ void QnThumbnailsLoader::process() {
             else
                 rtspDelegate->setQuality(MEDIA_Quality_High, true);
             QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(rtspDelegate));
-            rtspDelegate->setResource(cameras[i]);
+            rtspDelegate->setResource(camera);
+            rtspDelegate->setServer(servers[i]);
             delegates << thumbnailDelegate;
         }
     }
@@ -459,7 +462,7 @@ void QnThumbnailsLoader::process() {
 
             if(!invalidated && m_decode) { // TODO: #Elric m_decode check may be wrong here.
                 /* Make sure decoder's buffer is empty. */
-                QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1, 0));
+                QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1, 0));
                 while (decoder.decode(emptyData, &outFrame)) 
                 {
                     if(timingsQueue.isEmpty()) {

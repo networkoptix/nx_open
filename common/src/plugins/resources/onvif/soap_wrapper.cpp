@@ -135,10 +135,12 @@ static const int DIGEST_TIMEOUT_SEC = 60;
 // -------------------------------------------------------------------------- //
 template <class T>
 SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const QString& login, const QString& passwd, int timeDrift, bool tcpKeepAlive):
+    m_soapProxy(nullptr),
+    m_endpoint(nullptr),
+    m_timeDrift(timeDrift),
     m_login(login),
     m_passwd(passwd),
-    invoked(false),
-    m_timeDrift(timeDrift)
+    m_invoked(false)
 {
     //Q_ASSERT(!endpoint.empty());
     Q_ASSERT_X(!endpoint.empty(), Q_FUNC_INFO, "Onvif URL is empty!!! It is debug only check.");
@@ -161,7 +163,7 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const QString& login, c
 template <class T>
 SoapWrapper<T>::~SoapWrapper()
 {
-    if (invoked) 
+    if (m_invoked) 
     {
         soap_destroy(m_soapProxy->soap);
         soap_end(m_soapProxy->soap);
@@ -183,7 +185,7 @@ void SoapWrapper<T>::setPassword(const QString &password) {
 void correctTimeInternal(char* buffer, const QDateTime& dt)
 {
     if (strlen(buffer) > 19) {
-        QByteArray datetime = dt.toString(Qt::ISODate).toLocal8Bit();
+        QByteArray datetime = dt.toString(Qt::ISODate).toLatin1();
         memcpy(buffer, datetime.data(), 19);
     }
 }
@@ -191,14 +193,14 @@ void correctTimeInternal(char* buffer, const QDateTime& dt)
 template <class T>
 void SoapWrapper<T>::beforeMethodInvocation()
 {
-    if (invoked)
+    if (m_invoked)
     {
         soap_destroy(m_soapProxy->soap);
         soap_end(m_soapProxy->soap);
     }
     else
     {
-        invoked = true;
+        m_invoked = true;
     }
 
     if (!m_login.isEmpty())

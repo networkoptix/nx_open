@@ -15,7 +15,7 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-
+#include <utils/common/warnings.h>
 
 #ifdef _WIN32
 //if defined, background is drawn with native API (as gl texture), else - QPainter::drawImage is used
@@ -75,7 +75,7 @@ public:
     QImage image;
 #endif
     ImageStatus imageStatus;
-    QHash<QString, QImage> imagesMemCache;
+    QHash<QString, QImage> imagesMemCache;  //TODO: #GDM #Common #High replace with QCache
 };
 
 
@@ -249,7 +249,7 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 
     if (!d->imagesMemCache.contains(d->imageFilename)) {
         d->imagesMemCache.insert(d->imageFilename, image);
-    } //TODO: #GDM limit image mem cache size
+    }
 
 #ifdef NATIVE_PAINT_BACKGROUND
     //converting image to ARGB32 since we cannot convert to YUV from monochrome, indexed, etc..
@@ -319,7 +319,7 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 #endif
 }
 
-void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget * )
 {
     Q_D(QnGridBackgroundItem);
 #ifdef NATIVE_PAINT_BACKGROUND
@@ -341,7 +341,7 @@ void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
         d->imgUploaded = true;
     }
 
-    QnGlNativePainting::begin(painter);
+    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
 
     if( m_imgAsFrame->format == PIX_FMT_YUVA420P || m_imgAsFrame->format == PIX_FMT_RGBA )
     {

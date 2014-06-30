@@ -1,6 +1,8 @@
 #ifndef QN_YV12_TO_RGB_SHADER_PROGRAM_H
 #define QN_YV12_TO_RGB_SHADER_PROGRAM_H
 
+
+
 #include "utils/color_space/image_correction.h"
 #include <QtOpenGL/QGLShaderProgram>
 #include <QtOpenGL/QtOpenGL>
@@ -9,7 +11,9 @@
 #include <core/ptz/item_dewarping_params.h>
 #include <core/ptz/media_dewarping_params.h>
 
-class QnAbstractYv12ToRgbShaderProgram : public QGLShaderProgram {
+#include "base_shader_program.h"
+
+class QnAbstractYv12ToRgbShaderProgram : public QnAbstractBaseGLShaderProgramm {
     Q_OBJECT
 public:
     QnAbstractYv12ToRgbShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL);
@@ -29,7 +33,9 @@ public:
     }
 
     virtual bool link() override; 
+    bool wasLinked(){ return m_wasLinked; };
 private:
+    bool m_wasLinked;
     int m_yTextureLocation;
     int m_uTextureLocation;
     int m_vTextureLocation;
@@ -37,7 +43,7 @@ private:
 };
 
 
-class QnAbstractRGBAShaderProgram : public QGLShaderProgram {
+class QnAbstractRGBAShaderProgram : public QnAbstractBaseGLShaderProgramm {
     Q_OBJECT
 public:
     QnAbstractRGBAShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL, bool final = true);
@@ -90,7 +96,11 @@ template <class Base>
 class QnFisheyeShaderProgram : public Base {
     typedef Base base_type;
 public:
-    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL): Base(context, parent, false) {}
+    QnFisheyeShaderProgram(const QGLContext *context = NULL, QObject *parent = NULL)
+        : Base(context, parent, false),
+          m_add_shader(false)
+    {
+    }
 
     using base_type::uniformLocation;
     using base_type::setUniformValue;
@@ -142,7 +152,11 @@ public:
     }
 
     virtual bool link() override {
-        addShaderFromSourceCode(QGLShader::Fragment, getShaderText());
+        if ( !m_add_shader )
+        {
+            addShaderFromSourceCode(QGLShader::Fragment, getShaderText());
+            m_add_shader = true;
+        }        
         bool rez = base_type::link();
         if (rez) {
             m_xShiftLocation = uniformLocation("xShift");
@@ -180,6 +194,7 @@ protected:
     
     int m_maxXLocation;
     int m_maxYLocation;
+    bool m_add_shader;
 };
 
 // --------- fisheye YUV (with optional gamma) ---------------
@@ -256,5 +271,6 @@ public:
 private:
     int m_aTextureLocation;
 };
+
 
 #endif // QN_YV12_TO_RGB_SHADER_PROGRAM_H

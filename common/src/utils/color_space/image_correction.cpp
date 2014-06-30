@@ -3,6 +3,9 @@
 #include <memory>
 
 #include <utils/math/math.h>
+#include <utils/common/model_functions.h>
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ImageCorrectionParams, (json), (blackLevel)(whiteLevel)(gamma)(enabled))
 
 static const int MIN_GAMMA_RANGE = 6;
 static const float NORM_RANGE_START = 0.0; //16.0

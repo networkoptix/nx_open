@@ -10,6 +10,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <utils/common/model_functions_fwd.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnCounter;
@@ -22,13 +24,13 @@ class QnWorkbenchRenderWatcher;
 
 struct QnStreamSynchronizationState {
     QnStreamSynchronizationState(): started(false), time(AV_NOPTS_VALUE), speed(0.0) {}
-    QnStreamSynchronizationState(bool started, qint64 time, float speed): started(started), time(time), speed(speed) {}
+    QnStreamSynchronizationState(bool started, qint64 time, qreal speed): started(started), time(time), speed(speed) {}
 
     bool started;
     qint64 time;
-    float speed;
+    qreal speed;
 };
-Q_DECLARE_METATYPE(QnStreamSynchronizationState);
+QN_FUSION_DECLARE_FUNCTIONS(QnStreamSynchronizationState, (json)(metatype))
 
 /**
  * This class manages the necessary machinery for synchronized playback of

@@ -81,7 +81,7 @@ void QnThirdPartyResource::setMotionMaskPhysical(int /*channel*/)
     //TODO/IMPL
 }
 
-QnConstResourceAudioLayoutPtr QnThirdPartyResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnThirdPartyResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     if (isAudioEnabled()) {
         const ThirdPartyStreamReader* reader = dynamic_cast<const ThirdPartyStreamReader*>(dataProvider);
@@ -281,6 +281,20 @@ const QList<nxcip::Resolution>& QnThirdPartyResource::getEncoderResolutionList( 
     return m_encoderData[encoderNumber].resolutionList;
 }
 
+
+bool QnThirdPartyResource::hasDualStreaming() const
+{
+    return m_encoderCount > 1;
+}
+
+nxcip::Resolution QnThirdPartyResource::getSelectedResolutionForEncoder( int encoderIndex ) const
+{
+    QMutexLocker lk( &m_mutex );
+    if( (size_t)encoderIndex < m_selectedEncoderResolutions.size() )
+        return m_selectedEncoderResolutions[encoderIndex];
+    return nxcip::Resolution();
+}
+
 CameraDiagnostics::Result QnThirdPartyResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
@@ -316,6 +330,9 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
             arg(QString::fromUtf8(m_camInfo.modelName)).arg(QString::fromUtf8(m_camInfo.url)), cl_logDEBUG1 );
         return CameraDiagnostics::UnknownErrorResult();
     }
+
+    //we support only two streams from camera
+    m_encoderCount = m_encoderCount > 2 ? 2 : m_encoderCount;
 
     setParam( lit("hasDualStreaming"), m_encoderCount > 1, QnDomainDatabase );
 
@@ -384,10 +401,13 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         setMotionType( Qn::MT_SoftwareGrid );
         setParam( lit("supportedMotion"), QStringLiteral("softwaregrid"), QnDomainDatabase );
     }
-    //if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
-    //    setCameraCapability( Qn:: );
-    //if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
-    //    setCameraCapability( Qn:: );
+    if( cameraCapabilities & nxcip::BaseCameraManager::shareFpsCapability )
+		setStreamFpsSharingMethod(Qn::BasicFpsSharing);
+    else if( cameraCapabilities & nxcip::BaseCameraManager::sharePixelsCapability )
+		setStreamFpsSharingMethod(Qn::PixelsFpsSharing);
+    else 
+        setStreamFpsSharingMethod(Qn::NoFpsSharing);
+        
 
     QVector<EncoderData> encoderDataTemp;
     encoderDataTemp.resize( m_encoderCount );
@@ -444,14 +464,29 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         initializeIOPorts();
     }
 
-    //TODO/IMPL initializing PTZ
-
-    // TODO: #Elric this is totally evil, copypasta from ONVIF resource.
+    //TODO #ak: current API does not allow to get stream codec, so using CODEC_ID_H264 as true in most cases
+    CameraMediaStreams mediaStreams;
+    std::vector<nxcip::Resolution> selectedEncoderResolutions( m_encoderCount );
+    selectedEncoderResolutions[PRIMARY_ENCODER_INDEX] = getMaxResolution( PRIMARY_ENCODER_INDEX );
+    mediaStreams.streams.push_back( CameraMediaStreamInfo(
+        QSize(selectedEncoderResolutions[PRIMARY_ENCODER_INDEX].width, selectedEncoderResolutions[PRIMARY_ENCODER_INDEX].height),
+        CODEC_ID_H264 ) );
+    if( SECONDARY_ENCODER_INDEX < m_encoderCount )
     {
-        QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-        if (conn->saveSync(::toSharedPointer(this).staticCast<QnVirtualCameraResource>()) != 0)
-            qnCritical("Can't save resource %1 to Enterprise Controller. Error: %2.", getName(), conn->getLastError());
+        selectedEncoderResolutions[SECONDARY_ENCODER_INDEX] = getSecondStreamResolution();
+        mediaStreams.streams.push_back( CameraMediaStreamInfo(
+            QSize(selectedEncoderResolutions[SECONDARY_ENCODER_INDEX].width, selectedEncoderResolutions[SECONDARY_ENCODER_INDEX].height),
+            CODEC_ID_H264 ) );
     }
+
+    {
+        QMutexLocker lk( &m_mutex );
+        m_selectedEncoderResolutions = std::move( selectedEncoderResolutions );
+    }
+
+    saveResolutionList( mediaStreams );
+
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -504,7 +539,61 @@ bool QnThirdPartyResource::initializeIOPorts()
     return true;
 }
 
-bool QnThirdPartyResource::hasDualStreaming() const
+nxcip::Resolution QnThirdPartyResource::getMaxResolution( int encoderNumber ) const
 {
-    return m_encoderCount > 1;
+    const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList( encoderNumber );
+    QList<nxcip::Resolution>::const_iterator maxResIter = std::max_element(
+        resolutionList.constBegin(),
+        resolutionList.constEnd(),
+        [](const nxcip::Resolution& left, const nxcip::Resolution& right){
+            return left.width*left.height < right.width*right.height;
+    } );
+    return maxResIter != resolutionList.constEnd() ? *maxResIter : nxcip::Resolution();
+}
+
+nxcip::Resolution QnThirdPartyResource::getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const
+{
+    const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList( encoderNumber );
+    nxcip::Resolution foundResolution;
+    foreach( nxcip::Resolution resolution, resolutionList )
+    {
+        if( resolution.width*resolution.height <= desiredResolution.width*desiredResolution.height &&
+            resolution.width*resolution.height > foundResolution.width*foundResolution.height )
+        {
+            foundResolution = resolution;
+        }
+    }
+    return foundResolution;
+}
+
+static const nxcip::Resolution DEFAULT_SECOND_STREAM_RESOLUTION = nxcip::Resolution(480, 316);
+
+nxcip::Resolution QnThirdPartyResource::getSecondStreamResolution() const
+{
+    const nxcip::Resolution& primaryStreamResolution = getMaxResolution( PRIMARY_ENCODER_INDEX );
+    const float currentAspect = QnPhysicalCameraResource::getResolutionAspectRatio( QSize(primaryStreamResolution.width, primaryStreamResolution.height) );
+
+    const QList<nxcip::Resolution>& resolutionList = getEncoderResolutionList( SECONDARY_ENCODER_INDEX );
+    if( resolutionList.isEmpty() )
+        return DEFAULT_SECOND_STREAM_RESOLUTION;
+
+    //preparing data in format suitable for getNearestResolution
+    QList<QSize> resList;
+    std::transform(
+        resolutionList.begin(), resolutionList.end(), std::back_inserter(resList),
+        []( const nxcip::Resolution& resolution ){ return QSize(resolution.width, resolution.height); } );
+
+    QSize secondaryResolution = QnPhysicalCameraResource::getNearestResolution(
+        QSize(DEFAULT_SECOND_STREAM_RESOLUTION.width, DEFAULT_SECOND_STREAM_RESOLUTION.height),
+        currentAspect,
+        SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(),
+        resList );
+    if( secondaryResolution == EMPTY_RESOLUTION_PAIR )
+        secondaryResolution = QnPhysicalCameraResource::getNearestResolution(
+            QSize(DEFAULT_SECOND_STREAM_RESOLUTION.width, DEFAULT_SECOND_STREAM_RESOLUTION.height),
+            0.0,        //ignoring aspect ratio
+            SECONDARY_STREAM_MAX_RESOLUTION.width()*SECONDARY_STREAM_MAX_RESOLUTION.height(),
+            resList );
+
+    return nxcip::Resolution( secondaryResolution.width(), secondaryResolution.height() );
 }

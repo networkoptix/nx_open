@@ -43,6 +43,19 @@ class VideoOptionsLocal;
 
 class QDomElement;
 
+/*
+* This structure is used during discovery process. These data are read by getDeviceInformation request and may override data from multicast packet
+*/
+struct OnvifResExtInfo
+{
+    QString name;
+    QString model;
+    QString firmware;
+    QString vendor;
+    QString hardwareId;
+    QString mac;
+};
+
 class QnPlOnvifResource
 :
     public QnPhysicalCameraResource,
@@ -81,12 +94,13 @@ public:
         G711,
         AAC,
         AMR,
-        SIZE_OF_AUDIO_CODECS
+        SIZE_OF_AUDIO_CODECS // TODO: #Elric #enum
     };
 
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
     static QString MEDIA_URL_PARAM_NAME;
     static QString ONVIF_URL_PARAM_NAME;
+    static QString ONVIF_ID_PARAM_NAME;
     static QString MAX_FPS_PARAM_NAME;
     static QString AUDIO_SUPPORTED_PARAM_NAME;
     static QString FORCED_AUDIO_SUPPORTED_PARAM_NAME;
@@ -114,7 +128,6 @@ public:
     virtual int getMaxFps() const override;
     virtual void setIframeDistance(int /*frames*/, int /*timems*/) override {}
     virtual bool hasDualStreaming() const override;
-    virtual bool shoudResolveConflicts() const override;
 
     virtual bool mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) override;
 
@@ -176,17 +189,24 @@ public:
     QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
 
+    QString getDeviceOnvifID() const;
+    void setDeviceOnvifID(const QString& src);
+
     CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl);
 
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
-    bool fetchAndSetDeviceInformation(bool performSimpleCheck);
+    //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
+    static CameraDiagnostics::Result readDeviceInformation(const QString& onvifUrl, const QAuthenticator& auth, int timeDrift, OnvifResExtInfo* extInfo);
+    CameraDiagnostics::Result readDeviceInformation();
+    CameraDiagnostics::Result getFullUrlInfo();
+
 
     //!Relay input with token \a relayToken has changed its state to \a active
     //void notificationReceived( const std::string& relayToken, bool active );
@@ -291,6 +311,7 @@ private slots:
     void onRenewSubscriptionTimer();
 
 private:
+    // TODO: #Elric #enum
     enum EventMonitorType
     {
         emtNone,
@@ -351,6 +372,7 @@ private:
         virtual bool endElement( const QString& namespaceURI, const QString& localName, const QString& qName ) override;
 
     private:
+        // TODO: #Elric #enum
         enum State
         {
             init,

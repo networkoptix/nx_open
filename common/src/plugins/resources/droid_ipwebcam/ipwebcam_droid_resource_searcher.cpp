@@ -13,13 +13,7 @@ QnPlIpWebCamResourceSearcher::QnPlIpWebCamResourceSearcher()
 {
 }
 
-QnPlIpWebCamResourceSearcher& QnPlIpWebCamResourceSearcher::instance()
-{
-    static QnPlIpWebCamResourceSearcher inst;
-    return inst;
-}
-
-QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 
@@ -38,7 +32,7 @@ QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, 
         return result;
     }
 
-    if (parameters.value(QLatin1String("url")).contains(QLatin1String("raw://")))
+    if (params.url.contains(lit("raw://")))
     {
         return result; // it is new droid resource
     }
@@ -46,8 +40,8 @@ QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, 
     result = QnVirtualCameraResourcePtr( new QnPlDriodIpWebCamResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create ipWEB camera resource. typeID:" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create ipWEB camera resource. typeID:" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 
@@ -55,7 +49,7 @@ QnResourcePtr QnPlIpWebCamResourceSearcher::createResource(QnId resourceTypeId, 
 
 QString QnPlIpWebCamResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnPlDriodIpWebCamResource::MANUFACTURE);
+    return QnPlDriodIpWebCamResource::MANUFACTURE;
 }
 
 
@@ -168,7 +162,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
                 QnNetworkResourcePtr resource ( new QnPlDriodIpWebCamResource() );
 
                 QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-                if (!rt.isValid())
+                if (rt.isNull())
                     continue;
 
                 static int n = 0;
@@ -183,7 +177,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
                 resource->setTypeId(rt);
                 resource->setName(name);
-                resource->setMAC(smac);
+                resource->setMAC(QnMacAddress(smac));
                 resource->setHostAddress(QHostAddress(ad.ip).toString(), QnDomainMemory);
                 
                 resource->setDiscoveryAddr(QHostAddress(ad.localAddr));

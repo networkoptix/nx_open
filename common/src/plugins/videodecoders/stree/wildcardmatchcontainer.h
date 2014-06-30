@@ -7,6 +7,8 @@
 
 #include <map>
 
+#include <utils/match/wildcard.h>
+
 
 namespace stree
 {
@@ -86,65 +88,6 @@ namespace stree
 
     private:
         InternalContainerType m_container;
-
-        bool wildcardMatch( const QString& mask, const QString& str ) const
-        {
-            return wildcardMatch( mask.toLatin1().data(), str.toLatin1().data() );
-        }
-
-        //!Validates \a str for appliance to wild-card expression \a mask
-        /*!
-            \param mask Wildcard expression. Allowed to contain special symbols ? (any character except .), * (any number of any characters)
-            \param str String being validated for appliance to \a mask
-            \return true, if \a str has been validated with \a mask. false, otherwise
-        */
-        bool wildcardMatch( const char* mask, const char* str ) const
-        {
-            while( *str && *mask )
-            {
-                switch( *mask )
-                {
-                    case '*':
-                    {
-                        if( !*(mask+1) )
-                            return true;    //we have * at the end
-                        for( const char*
-                            str1 = str;
-                            *str1;
-                            ++str1 )
-                        {
-                            if( wildcardMatch( mask+1, str1 ) )
-                                return true;
-                        }
-                        return false;   //not validated
-                    }
-                    case '?':
-                        if( *str == '.' )
-                            return false;
-                        break;
-
-                    default:
-                        if( *str != *mask )
-                            return false;
-                        break;
-                }
-
-                ++str;
-                ++mask;
-            }
-
-            while( *mask )
-            {
-                if( *mask != '*' )
-                    return false;
-                ++mask;
-            }
-
-            if( *str )
-                return false;
-
-            return true;
-        }
     };
 }
 

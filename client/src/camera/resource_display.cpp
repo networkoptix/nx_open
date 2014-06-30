@@ -73,6 +73,14 @@ void QnResourceDisplay::beforeDestroy()
 {
 }
 
+const QnResourcePtr &QnResourceDisplay::resource() const {
+    return getResource();
+}
+
+const QnMediaResourcePtr &QnResourceDisplay::mediaResource() const {
+    return m_mediaResource;
+}
+
 void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
     if(runnable == NULL)
         return;
@@ -123,10 +131,10 @@ void QnResourceDisplay::disconnectFromResource() {
 
 QnConstResourceVideoLayoutPtr QnResourceDisplay::videoLayout() const {
     if(m_mediaProvider == NULL)
-        return NULL;
+        return QnConstResourceVideoLayoutPtr();
 
     if(m_mediaResource == NULL)
-        return NULL;
+        return QnConstResourceVideoLayoutPtr();
 
     return m_mediaResource->getVideoLayout(m_mediaProvider);
 }

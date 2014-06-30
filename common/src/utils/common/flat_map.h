@@ -3,19 +3,18 @@
 
 #include <cassert>
 
+#include <vector>
+#include <type_traits> /* For std::is_empty and std::is_unsigned. */
+
 #ifndef Q_MOC_RUN
-#include <boost/type_traits/is_empty.hpp>
-#include <boost/type_traits/is_unsigned.hpp>
 #include <boost/functional/value_factory.hpp>
 #endif
-
-#include <QtCore/QVector>
 
 namespace QnFlatMapDetail {
 
     /* FactoryData implements empty base optimization. */
 
-    template<class Factory, bool isEmpty = boost::is_empty<Factory>::value> 
+    template<class Factory, bool isEmpty = std::is_empty<Factory>::value> 
     class FactoryData {
     public:
         FactoryData(const Factory &factory): m_factory(factory) {}
@@ -54,7 +53,7 @@ namespace QnFlatMapDetail {
         return list[key];
     }
 
-    template<class Key, class T, class Factory, class Container, bool isUnsigned = boost::is_unsigned<Key>::value>
+    template<class Key, class T, class Factory, class Container, bool isUnsigned = std::is_unsigned<Key>::value>
     class Data: public FactoryData<Factory> {
         typedef FactoryData<Factory> base_type;
     public:
@@ -125,7 +124,7 @@ namespace QnFlatMapDetail {
 /**
  * Map with an integer key that uses arrays internally.
  */
-template<class Key, class T, class DefaultValueFactory = boost::value_factory<T>, class Container = QVector<T> >
+template<class Key, class T, class DefaultValueFactory = boost::value_factory<T>, class Container = std::vector<T> >
 class QnFlatMap {
 public:
     QnFlatMap(const DefaultValueFactory &factory = DefaultValueFactory()): d(factory) {}
@@ -146,6 +145,10 @@ public:
 
     void insert(const Key &key, const T &value) {
         d.reference(key) = value;
+    }
+
+    void remove(const Key &key) {
+        d.reference(key) = d.factory()();
     }
 
     T operator[](const Key &key) const {

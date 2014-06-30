@@ -14,7 +14,7 @@ public:
 
     static QString MAX_FPS_PARAM_NAME;
 
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     QnPlIsdResource();
 
@@ -31,7 +31,7 @@ public:
 
     //bool hasDualStreaming() const {return false;}
 
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
 protected:
     virtual CameraDiagnostics::Result initInternal() override;

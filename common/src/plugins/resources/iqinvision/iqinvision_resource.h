@@ -11,7 +11,7 @@
 class QnPlIqResource : public QnPhysicalCameraResource
 {
 public:
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     QnPlIqResource();
 
@@ -34,6 +34,7 @@ protected:
     CLHttpStatus setOID(const QString& oid, const QString& val);
 
     QSize getMaxResolution() const;
+    bool isRtp() const;
 };
 
 #endif // #ifdef ENABLE_IQE

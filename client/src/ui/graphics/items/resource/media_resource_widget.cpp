@@ -10,7 +10,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
-#include <utils/common/container.h>
+#include <utils/common/collection.h>
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
@@ -35,6 +35,7 @@
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
+#include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/help/help_topics.h>
 #include <utils/math/color_transformations.h>
 #include <ui/style/globals.h>
@@ -52,13 +53,12 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 
-#include "resource_status_overlay_widget.h"
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
 
 
 //TODO: #Elric remove
-#include "camera/caching_time_period_loader.h"
+#include <camera/loaders/caching_camera_data_loader.h>
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 
@@ -124,14 +124,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     const QGLWidget *viewport = qobject_cast<const QGLWidget *>(view ? view->viewport() : NULL);
     m_renderer = new QnResourceWidgetRenderer(NULL, viewport ? viewport->context() : NULL);
     connect(m_renderer,                 &QnResourceWidgetRenderer::sourceSizeChanged,   this, &QnMediaResourceWidget::updateAspectRatio);
-    connect(m_resource->toResource(),   &QnResource::resourceChanged,                   this, &QnMediaResourceWidget::at_resource_resourceChanged);
-    connect(m_resource->toResource(),   &QnResource::propertyChanged,                   this, &QnMediaResourceWidget::at_resource_propertyChanged);
-    connect(m_resource->toResource(),   &QnResource::mediaDewarpingParamsChanged,       this, &QnMediaResourceWidget::updateDewarpingParams);
+    connect(base_type::resource(),      &QnResource::propertyChanged,                   this, &QnMediaResourceWidget::at_resource_propertyChanged);
+    connect(base_type::resource(),      &QnResource::mediaDewarpingParamsChanged,       this, &QnMediaResourceWidget::updateDewarpingParams);
     connect(this,                       &QnResourceWidget::zoomTargetWidgetChanged,     this, &QnMediaResourceWidget::updateDisplay);
     connect(item,                       &QnWorkbenchItem::dewarpingParamsChanged,       this, &QnMediaResourceWidget::updateFisheye);
+    connect(item,                       &QnWorkbenchItem::imageEnhancementChanged,      this, &QnMediaResourceWidget::at_item_imageEnhancementChanged);
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnResourceWidget::zoomRectChanged,             this, &QnMediaResourceWidget::updateFisheye);
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
+    if (m_camera)
+        connect(m_camera,               &QnVirtualCameraResource::motionRegionChanged,  this, &QnMediaResourceWidget::invalidateMotionSensitivity);
+
     updateDewarpingParams();
     updateDisplay();
 
@@ -241,7 +244,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         statusOverlayWidget()->setDiagnosticsVisible(true);
     }
 
-    connect(resource()->toResource(), &QnResource::resourceChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
+    connect(resource()->toResource(), &QnResource::resourceChanged, this, &QnMediaResourceWidget::updateButtonsVisibility); //TODO: #GDM #Common get rid of resourceChanged
 
     connect(this, &QnResourceWidget::zoomRectChanged, this, &QnMediaResourceWidget::at_zoomRectChanged);
     connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged, this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
@@ -272,7 +275,7 @@ QnMediaResourceWidget::~QnMediaResourceWidget() {
 
 }
 
-QnMediaResourcePtr QnMediaResourceWidget::resource() const {
+const QnMediaResourcePtr &QnMediaResourceWidget::resource() const {
     return m_resource;
 }
 
@@ -355,6 +358,17 @@ void QnMediaResourceWidget::clearMotionSelection() {
     for (int i = 0; i < m_motionSelection.size(); ++i)
         m_motionSelection[i] = QRegion();
 
+    invalidateMotionSelectionCache();
+    emit motionSelectionChanged();
+}
+
+void QnMediaResourceWidget::setMotionSelection(const QList<QRegion> &regions) {
+    if (regions.size() != m_motionSelection.size()) {
+        qWarning() << "invalid motion selection list";
+        return;
+    }
+
+    m_motionSelection = regions;
     invalidateMotionSelectionCache();
     emit motionSelectionChanged();
 }
@@ -571,7 +585,9 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
-    QnGlNativePainting::begin(painter);
+//	return Qn::NewFrameRendered;
+
+    QnGlNativePainting::begin(m_renderer->glContext(),painter);
 
     qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);
@@ -954,6 +970,8 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
         return Qn::EmptyOverlay;
     } else if (resource->hasFlags(QnResource::ARCHIVE) && resource->getStatus() == QnResource::Offline) {
         return Qn::NoDataOverlay;
+
+        
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Offline) {
         return Qn::OfflineOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && resource->getStatus() == QnResource::Unauthorized) {
@@ -961,11 +979,13 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     } else if (m_camera && m_camera->isDtsBased() && m_camera->isScheduleDisabled()) {
         return Qn::AnalogWithoutLicenseOverlay;
     } else if (m_display->isPaused() && (options() & DisplayActivity)) {
-        return Qn::PausedOverlay;
+        if (!qnSettings->isVideoWallMode())
+            return Qn::PausedOverlay;
+        return Qn::EmptyOverlay;
     } else if (m_display->camDisplay()->isLongWaiting()) {
         if (m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
-        QnCachingTimePeriodLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
+        QnCachingCameraDataLoader *loader = context()->navigator()->loader(m_resource->toResourcePtr());
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(QnResource::Online);
         else
@@ -1163,4 +1183,8 @@ void QnMediaResourceWidget::updateCustomAspectRatio() {
 
 void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
     menu()->trigger(Qn::CameraDiagnosticsAction, m_camera);
+}
+
+void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
+    setImageEnhancement(item()->imageEnhancement());
 }

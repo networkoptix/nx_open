@@ -4,11 +4,16 @@
 
 #include "utils/network/tcp_connection_priv.h"
 #include "rest/server/rest_server.h"
+
 #include "core/resource_management/resource_pool.h"
+#include <core/resource/storage_resource.h>
+
 #include "utils/common/util.h"
 #include "api/serializer/serializer.h"
 #include "recorder/storage_manager.h"
 #include "api/model/storage_status_reply.h"
+#include "media_server/settings.h"
+
 
 int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result)
 {
@@ -22,13 +27,13 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
         storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
         if(storage) {
             storage->setUrl(storageUrl);
-            storage->setSpaceLimit(QnStorageManager::DEFAULT_SPACE_LIMIT);
+            storage->setSpaceLimit(nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE);
         }
     }
     
     QnStorageStatusReply reply;
     reply.pluginExists = storage;
-    reply.storage.storageId = exists ? storage->getId().toInt() : -1;
+    reply.storage.storageId = exists ? storage->getId() : QnId();
     reply.storage.path = storageUrl;
     reply.storage.freeSpace = storage ? storage->getFreeSpace() : -1;
     reply.storage.reservedSpace = storage ? storage->getSpaceLimit() : -1;
@@ -45,12 +50,4 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
 
     result.setReply(reply);
     return CODE_OK;
-}
-
-QString QnStorageStatusRestHandler::description() const
-{
-    return 
-        "Returns 'OK' if specified folder may be used for writing on mediaServer. Otherwise returns 'FAIL' \n"
-        "<BR>Param <b>path</b> - Folder."
-        "<BR><b>Return</b> JSON with path validity.";
 }

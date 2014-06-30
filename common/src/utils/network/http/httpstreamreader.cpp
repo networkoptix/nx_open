@@ -17,15 +17,16 @@ namespace nx_http
     HttpStreamReader::HttpStreamReader()
     :
         m_state( waitingMessageStart ),
-        m_nextState( undefined ),
         m_contentLength( 0 ),
         m_isChunkedTransfer( false ),
         m_messageBodyBytesRead( 0 ),
         m_chunkStreamParseState( waitingChunkStart ),
+        m_nextState( undefined ),
         m_currentChunkSize( 0 ),
         m_currentChunkBytesRead( 0 ),
         m_prevChar( 0 ),
-        m_lineEndingOffset( 0 )
+        m_lineEndingOffset( 0 ),
+        m_decodeChunked( true )
     {
     }
 
@@ -124,7 +125,7 @@ namespace nx_http
     /*!
         \return Actual only after state changed from \a readingMessageHeaders to \a waitingMessageStart or \a readingMessageBody
     */
-    const HttpMessage& HttpStreamReader::message() const
+    const Message& HttpStreamReader::message() const
     {
         return m_httpMessage;
     }
@@ -183,6 +184,15 @@ namespace nx_http
             m_contentDecoder->flush();
     }
 
+    /*!
+        By default \a true.
+        \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
+    */
+    void HttpStreamReader::setDecodeChunkedMessageBody( bool val )
+    {
+        m_decodeChunked = val;
+    }
+
     bool HttpStreamReader::parseLine( const ConstBufferRefType& data )
     {
         switch( m_state )
@@ -213,12 +223,12 @@ namespace nx_http
                     return false;
                 if( *pos == ' ' )  //considering message to be request (first token does not contain /, so it looks like METHOD)
                 {
-                    m_httpMessage = HttpMessage( MessageType::request );
+                    m_httpMessage = Message( MessageType::request );
                     m_httpMessage.request->requestLine.parse( data );
                 }
                 else    //response
                 {
-                    m_httpMessage = HttpMessage( MessageType::response );
+                    m_httpMessage = Message( MessageType::response );
                     m_httpMessage.response->statusLine.parse( data );
                 }
                 m_state = readingMessageHeaders;
@@ -307,7 +317,7 @@ namespace nx_http
         const QnByteArrayConstRef& data,
         Func func )
     {
-        return m_isChunkedTransfer
+        return (m_isChunkedTransfer && m_decodeChunked)
             ? readChunkStream( data, func )
             : readIdentityStream( data, func );
     }

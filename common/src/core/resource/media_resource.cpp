@@ -4,19 +4,9 @@
 #include <QtCore/QCoreApplication>
 
 #include <utils/common/warnings.h>
-#include <utils/common/enum_name_mapper.h>
+#include <utils/serialization/lexical.h>
 
 #include "resource_media_layout.h"
-
-QN_DEFINE_EXPLICIT_ENUM_NAME_MAPPING(Qn::StreamQuality, 
-    ((Qn::QualityLowest,  "lowest"))
-    ((Qn::QualityLow,     "low"))
-    ((Qn::QualityNormal,  "normal"))
-    ((Qn::QualityHigh,    "high"))
-    ((Qn::QualityHighest, "highest"))
-    ((Qn::QualityPreSet,  "preset"))
-)
-Q_GLOBAL_STATIC_WITH_ARGS(QnTypedEnumNameMapper<Qn::StreamQuality>, qn_streamQualityNameMapper_instance, (QnEnumNameMapper::create<Qn::StreamQuality>()))
 
 class QnStreamQualityStrings {
     Q_DECLARE_TR_FUNCTIONS(QnStreamQualityStrings);
@@ -75,16 +65,6 @@ QString Qn::toShortDisplayString(Qn::StreamQuality value) {
     return QnStreamQualityStrings::shortDisplayString(value);
 }
 
-template<>
-Qn::StreamQuality Qn::fromString<Qn::StreamQuality>(const QString &string) {
-    return qn_streamQualityNameMapper_instance()->value(string, Qn::QualityNotDefined);
-}
-
-template<>
-QString Qn::toString<Qn::StreamQuality>(Qn::StreamQuality value) {
-    return qn_streamQualityNameMapper_instance()->name(value, QString());
-}
-
 
 // -------------------------------------------------------------------------- //
 // QnMediaResource
@@ -102,8 +82,8 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::Stream
     return QImage();
 }
 
-static std::shared_ptr<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
-QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
+static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     QVariant val;
     toResource()->getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
@@ -128,8 +108,8 @@ void QnMediaResource::setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLay
     toResource()->setParam(QLatin1String("VideoLayout"), newLayout->toString(), QnDomainMemory);
 }
 
-static std::shared_ptr<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
-QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
+static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
+QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
     return audioLayout;
 }
@@ -152,11 +132,16 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
-void QnMediaResource::updateInner(QnResourcePtr other, QSet<QByteArray>&)
+void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&modifiedFields)
 {
     QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
-    if (other_casted)
-        m_dewarpingParams = other_casted->m_dewarpingParams;
+    if (other_casted) {
+        if (m_dewarpingParams != other_casted->m_dewarpingParams) {
+            m_dewarpingParams = other_casted->m_dewarpingParams;
+            modifiedFields << "mediaDewarpingParamsChanged";
+        }
+        m_customVideoLayout = other_casted->m_customVideoLayout;
+    }
 }
 
 QString QnMediaResource::customAspectRatioKey() {
@@ -165,4 +150,8 @@ QString QnMediaResource::customAspectRatioKey() {
 
 QString QnMediaResource::dontRecordSecondaryStreamKey() {
     return lit("dontRecordSecondaryStream");
+}
+
+QString QnMediaResource::rtpTransportKey() {
+    return lit("rtpTransport");
 }

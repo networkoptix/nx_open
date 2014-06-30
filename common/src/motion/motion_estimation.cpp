@@ -12,6 +12,14 @@
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 
+// TODO: #Elric move to config? 
+// see https://code.google.com/p/arxlib/source/browse/include/arx/Utility.h
+#ifndef _MSC_VER
+#   define __forceinline inline
+#endif
+
+
+//#define DEBUG_CPU_MODE
 static const unsigned char BitReverseTable256[] = 
 {
     0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0, 
@@ -161,7 +169,7 @@ void fillFrameRect(CLVideoDecoderOutput* frame, const QRect& rect, quint8 value)
 * returns matrix with avarage Y value
 */
 
-void saveFrame(quint8* data, int width, int height, int linesize, const QString& fileName)
+void saveFrame(const quint8* data, int width, int height, int linesize, const QString& fileName)
 {
     QImage src(width, height, QImage::Format_Indexed8);
     QVector<QRgb> colors;
@@ -199,10 +207,6 @@ inline __m128i advanced_sad(const __m128i src1, const __m128i src2)
     // return sum
     return _mm_sad_epu8(pixelsAbs, zerroConst);
 }
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
-#else
-    //TODO: C fallback routine
 #endif
 
 void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDecoderOutput* prevFrame, quint8* dst)
@@ -253,10 +257,6 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels; // SSE2
             dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT*2;
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
-#else
-    //TODO
 #endif
         }  
         curLineNum = nextLineNum;
@@ -308,10 +308,6 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
             *dstCurLine = _mm_cvtsi128_si32(blockSum) / pixels; // SSE2
             dstCurLine[MD_HEIGHT] = _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT*2;
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
-#else
-    //TODO
 #endif
         }  
         curLineNum = nextLineNum;
@@ -377,10 +373,6 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
             int pixels = rowCnt * 16;
             *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT;
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
-#else
-    //TODO
 #endif
         }
         curLineNum = nextLineNum;
@@ -427,10 +419,6 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
             int pixels = rowCnt * 16;
             *dstCurLine = (_mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)) + _mm_cvtsi128_si32(blockSum)) / pixels; // SSE2
             dstCurLine += MD_HEIGHT;
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
-#else
-    //TODO
 #endif
         }  
         curLineNum = nextLineNum;
@@ -525,10 +513,6 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
             if (squareStep == sqWidthSteps)
                 flushData(rowCnt * sqWidth);
             squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)); // SSE2
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
-#else
-    //TODO
 #endif
 
             squareStep++;
@@ -598,10 +582,6 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
             squareSum += _mm_cvtsi128_si32(_mm_srli_si128(blockSum, 8)); // SSE2
             if (squareStep == sqWidth)
                 flushData();
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
-#else
-    //TODO
 #endif
         }
         if (squareStep)
@@ -626,6 +606,7 @@ QnMotionEstimation::QnMotionEstimation()
 
     m_scaledMask = 0; // mask scaled to x * MD_HEIGHT. for internal use
     m_motionSensScaledMask = 0;
+	m_frameDeltaBuffer = 0;
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
         m_frameBuffer[i] = 0;
     m_filteredFrame = 0;
@@ -641,6 +622,9 @@ QnMotionEstimation::QnMotionEstimation()
     m_lastFrameTime = AV_NOPTS_VALUE;
     m_isNewMask = false;
     m_linkedNums = 0;
+
+	/*m_numFrame = 0;
+	m_sumLogTime = 0;*/
     
 #ifdef DEBUG_TRANSFORM
     static int gg = 0;
@@ -658,6 +642,7 @@ QnMotionEstimation::~QnMotionEstimation()
     delete m_decoder;
     qFreeAligned(m_scaledMask);
     qFreeAligned(m_motionSensScaledMask);
+	qFreeAligned(m_frameDeltaBuffer);
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
         qFreeAligned(m_frameBuffer[i]);
     qFreeAligned(m_filteredFrame);
@@ -670,33 +655,84 @@ QnMotionEstimation::~QnMotionEstimation()
 // rescale motion mask width (mask rotated, so actually remove or duplicate some lines)
 void QnMotionEstimation::scaleMask(quint8* mask, quint8* scaledMask)
 {
-    float lineStep = (m_scaledWidth-1) / float(MD_WIDTH-1);
-    float scaledLineNum = 0;
-    int prevILineNum = -1;
+
+    float lineStep;
+    float scaledLineNum;
+    int prevILineNum;
+
+	//std::vector<quint8> test0,test1;
+	//test0.resize(m_scaledWidth*MD_HEIGHT);
+	//test1.resize(m_scaledWidth*MD_HEIGHT);
+
+#if !defined(DEBUG_CPU_MODE) && (defined(__i386) || defined(__amd64) || defined(_WIN32))
+	lineStep = (m_scaledWidth-1) / float(MD_WIDTH-1);
+    scaledLineNum = 0;
+    prevILineNum = -1;
+
     for (int y = 0; y < MD_WIDTH; ++y)
     {
         int iLineNum = (int) (scaledLineNum+0.5);
         Q_ASSERT(iLineNum < m_scaledWidth);
-        simd128i* dst = (simd128i*) (scaledMask + MD_HEIGHT*iLineNum);
+
+        simd128i* dst = (simd128i*) (scaledMask/*&test0[0]*/ + MD_HEIGHT*iLineNum);
         simd128i* src = (simd128i*) (mask + MD_HEIGHT*y);
         if (iLineNum > prevILineNum) 
         {
             for (int i = 0; i < iLineNum - prevILineNum; ++i) 
                 memcpy(dst - i*MD_HEIGHT/sizeof(simd128i) , src, MD_HEIGHT);
         }
-        else {
-#if defined(__i386) || defined(__amd64) || defined(_WIN32)
-            dst[0] = _mm_min_epu8(dst[0], src[0]); // SSE2
+        else 
+		{
+			dst[0] = _mm_min_epu8(dst[0], src[0]); // SSE2
             dst[1] = _mm_min_epu8(dst[1], src[1]); // SSE2
-#elif __arm__ && __ARM_NEON__
-    //TODO/ARM
-#else
-    //TODO
-#endif
-        }
-        prevILineNum = iLineNum;
+		}
+
+		prevILineNum = iLineNum;
         scaledLineNum += lineStep;
     }
+#else
+	lineStep = (m_scaledWidth-1) / float(MD_WIDTH-1);
+    scaledLineNum = 0;
+    prevILineNum = -1;
+
+    for (int y = 0; y < MD_WIDTH; ++y)
+    {
+        int iLineNum = (int) (scaledLineNum+0.5);
+        Q_ASSERT(iLineNum < m_scaledWidth);
+
+        quint8* dst = scaledMask/*&test1[0]*/ + MD_HEIGHT*iLineNum;
+        quint8* src = mask + MD_HEIGHT*y;
+        if (iLineNum > prevILineNum) 
+		{
+            for (int i = 0; i < iLineNum - prevILineNum; ++i) 
+                memcpy(dst - i*MD_HEIGHT , src , MD_HEIGHT);
+        }
+        else 
+		{
+			for (int i = 0; i < MD_HEIGHT; ++i) 
+				dst[i] = qMin(dst[i], src[i]);
+		}
+
+		prevILineNum = iLineNum;
+        scaledLineNum += lineStep;
+    }
+#endif
+	/*
+	Test to equality algoritms 
+	int it = 0;
+	for (int x = 0; x < m_scaledWidth; ++x)
+    {
+		for (int y = 0; y < MD_HEIGHT; ++y)
+		{
+			if ( test0[it] != test1[it] )
+			{
+				test0[it] = test1[it];
+			};
+			it++;
+		};
+	};*/
+        
+        
     
     //__m128i* curPtr = (__m128i*) mask;
      //for (int i = 0; i < m_scaledWidth*2; ++i)
@@ -707,6 +743,7 @@ void QnMotionEstimation::reallocateMask(int width, int height)
 {
     qFreeAligned(m_scaledMask);
     qFreeAligned(m_motionSensScaledMask);
+	qFreeAligned(m_frameDeltaBuffer);
     for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
         qFreeAligned(m_frameBuffer[i]);
     qFreeAligned(m_filteredFrame);
@@ -727,9 +764,19 @@ void QnMotionEstimation::reallocateMask(int width, int height)
     m_scaledMask = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
     m_linkedNums = (int*) qMallocAligned(MD_HEIGHT * swUp * sizeof(int), 32);
     m_motionSensScaledMask = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
-    m_frameBuffer[0] = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
-    m_frameBuffer[1] = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
-    m_filteredFrame = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
+	m_frameDeltaBuffer = (uint8_t*) qMallocAligned(MD_HEIGHT * MD_WIDTH, 32);
+
+	#if !defined(DEBUG_CPU_MODE) && (defined(__i386) || defined(__amd64) || defined(_WIN32))
+		m_frameBuffer[0] = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
+		m_frameBuffer[1] = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
+	#else
+		m_frameBuffer[0] = (quint8*) qMallocAligned(MD_HEIGHT * MD_WIDTH, 32);
+		m_frameBuffer[1] = (quint8*) qMallocAligned(MD_HEIGHT * MD_WIDTH, 32);
+		memset(m_frameBuffer[0], 0, MD_HEIGHT * MD_WIDTH);
+		memset(m_frameBuffer[1], 0, MD_HEIGHT * MD_WIDTH);
+	#endif
+
+	m_filteredFrame = (quint8*) qMallocAligned(MD_HEIGHT * swUp, 32);
     m_resultMotion = new quint32[MD_HEIGHT/4 * swUp];
     memset(m_resultMotion, 0, MD_HEIGHT * swUp);
 
@@ -912,13 +959,73 @@ void QnMotionEstimation::analizeMotionAmount(quint8* frame)
     }
 }
 
+__forceinline int8_t fastAbs( int8_t value )
+{
+	uint8_t temp = value >> 7;     // make a mask of the sign bit
+	value ^= temp;                   // toggle the bits if value is negative
+	value += temp & 1;               // add one if value was negative
+	return value;
+};
+
+void QnMotionEstimation::scaleFrame(const uint8_t* data, int width, int height, int stride, uint8_t* frameBuffer,
+                                     uint8_t* prevFrameBuffer, uint8_t* deltaBuffer)
+{
+	//saveFrame(data, width, height, stride, QString::fromUtf8("c:/src_orig.bmp"));
+
+    // scale frame to m_scaledWidth* MD_HEIGHT and rotate it to 90 degree
+    uint8_t* dst = frameBuffer;
+    const uint8_t* src = data;
+    int offset = 0;
+    int curLine = 32768;
+    while ((curLine >> 16) < height)
+    {
+        int nextLine = curLine + m_scaleYStep;
+        int lines = (nextLine >> 16) - (curLine >> 16);
+        uint8_t* curDst = dst;
+        int curX = 32768;
+        //for (int x = 0; x < xMax; ++x)
+        while ((curX >> 16) < width)
+        {
+            int nextX = curX + m_scaleXStep;
+            int xPixels = (nextX >> 16) - (curX >> 16);
+            // aggregate pixel
+            uint16_t pixel = 0;
+            const uint8_t* srcPtr = src;
+            for (int y = 0; y < lines; ++y) 
+            {
+                for (int rep = 0; rep < xPixels; ++rep)
+                    pixel += *srcPtr++;
+                srcPtr += stride - xPixels; // go to next src line
+            }
+            pixel /= (lines*xPixels); // get avg value
+            *curDst = pixel;
+			int8_t value = (int8_t)pixel - (int8_t)prevFrameBuffer[offset];
+            uint8_t pixelDelta = abs(value);
+			//qDebug()<<(int16_t)value<<" "<< pixelDelta<<" "<<abs(value);
+
+            deltaBuffer[offset] = pixelDelta;
+
+            src += xPixels;
+            curDst += MD_HEIGHT;
+            offset += MD_HEIGHT;
+            curX = nextX;
+        }
+        src += lines * stride - width;
+        dst++;
+        offset = offset - (MD_HEIGHT*MD_WIDTH) + 1;
+        curLine = nextLine;
+    }
+}
+
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
-bool QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
+bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
 {
     QMutexLocker lock(&m_mutex);
 
     if (m_decoder == 0 && !(videoData->flags & AV_PKT_FLAG_KEY))
         return false;
+    if( !m_motionMask )
+        return false;   //no motion mask set
     if (m_decoder == 0 || m_decoder->getContext()->codec_id != videoData->compressionType)
     {
         delete m_decoder;
@@ -953,12 +1060,27 @@ bool QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 #endif
 
     if (m_decoder->getWidth() != m_lastImgWidth || m_decoder->getHeight() != m_lastImgHeight || m_isNewMask)
+	{
         reallocateMask(m_decoder->getWidth(), m_decoder->getHeight());
-
-#define ANALIZE_PER_PIXEL_DIF
-#ifdef ANALIZE_PER_PIXEL_DIF
+		m_scaleXStep = m_lastImgWidth * 65536 / MD_WIDTH;
+		m_scaleYStep = m_lastImgHeight * 65536 / MD_HEIGHT;
+	};
+	/*
+	LARGE_INTEGER timer;
+	double PCFreq = 0.0;
+	if( QueryPerformanceFrequency(&timer) )
+	{
+		PCFreq = double(timer.QuadPart)/1000.0;
+		//qDebug()<<"start"<< m_numFrame;
+	};
+	QueryPerformanceCounter(&timer);
+	*/
+#if !defined(DEBUG_CPU_MODE) && (defined(__i386) || defined(__amd64) || defined(_WIN32))
     // do not calc motion if resolution just changed
-    if (m_frames[0]->width == m_frames[1]->width && m_frames[0]->height == m_frames[1]->height  && m_frames[0]->format == m_frames[1]->format) 
+    if (m_frames[0]->width == m_frames[1]->width
+        && m_frames[0]->height == m_frames[1]->height
+        && m_frames[0]->format == m_frames[1]->format
+        && (m_frames[idx]->width >= MD_WIDTH && m_frames[idx]->height >= MD_HEIGHT)) 
     {
         // calculate difference between frames
         if (m_xStep == 8)
@@ -968,60 +1090,36 @@ bool QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
         else
             getFrame_avgY_array_x_x (m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx], m_xStep);
 
-
         analizeMotionAmount(m_frameBuffer[idx]);
         
 
-        /*
-        __m128i* cur = (__m128i*) m_frameBuffer[idx];
-        __m128i* mask = (__m128i*) m_scaledMask;
-        for (int i = 0; i < m_scaledWidth; ++i)
-        {
-            __m128i rez1 = _mm_cmpgt_epi8(_mm_sub_epi8(*cur, sse_0x80_const), mask[0]); // SSE2
-            __m128i rez2 = _mm_cmpgt_epi8(_mm_sub_epi8(cur[1], sse_0x80_const), mask[1]); // SSE2
-
-            m_resultMotion[i] |= reverseBits( (_mm_movemask_epi8(rez2) << 16) + _mm_movemask_epi8(rez1)); // SSE2
-            cur += 2;
-            mask += 2;
-        }
-        */
-        
-        
     }
 #else
-    // analize per macroblock diff
-    if (m_totalFrames > 0)
-    {
-        if (m_xStep == 8)
-            getFrame_avgY_array_8_x_mc(m_frames[idx], m_frameBuffer[idx]);
-        else if (m_xStep == 16)
-            getFrame_avgY_array_16_x_mc(m_frames[idx], m_frameBuffer[idx]);
-        else
-            getFrame_avgY_array_x_x_mc(m_frames[idx], m_frameBuffer[idx], m_xStep);
-
-        //saveFrame(m_frameBuffer[idx], MD_HEIGHT, m_scaledWidth, MD_HEIGHT, "c:/src_scaled.bmp");
-
-        // calculate difference between frames
-        __m128i* cur = (__m128i*) m_frameBuffer[idx];
-        __m128i* prev = (__m128i*) m_frameBuffer[prevIdx];
-        __m128i* mask = (__m128i*) m_scaledMask;
-        for (int i = 0; i < m_scaledWidth; ++i)
-        {
-            __m128i rez1 = _mm_sub_epi8(_mm_sub_epi8(_mm_max_epu8(*cur,*prev), _mm_min_epu8(*cur,*prev)), sse_0x80_const);
-            rez1 = _mm_cmpgt_epi8(rez1, mask[0]);
-
-            __m128i rez2 = _mm_sub_epi8(_mm_sub_epi8(_mm_max_epu8(cur[1],prev[1]), _mm_min_epu8(cur[1],prev[1])), sse_0x80_const);
-            rez2 = _mm_cmpgt_epi8(rez2, mask[1]);
-            
-            m_resultMotion[i] |= reverseBits( (_mm_movemask_epi8(rez2) << 16) + _mm_movemask_epi8(rez1));
-            cur += 2;
-            prev += 2;
-            mask += 2;
-        }
-    }
+	scaleFrame(m_frames[idx].data()->data[0], m_frames[idx]->width, m_frames[idx]->height, m_frames[idx]->linesize[0], m_frameBuffer[idx], m_frameBuffer[prevIdx], m_frameDeltaBuffer);
+	analizeMotionAmount(m_frameDeltaBuffer);
 #endif
+
+	
+	/*
+	LARGE_INTEGER end_time;
+	if ( QueryPerformanceCounter(&end_time) )
+	{
+		m_sumLogTime += double(end_time.QuadPart-timer.QuadPart)/(PCFreq);
+		//qDebug()<<"finish"<< m_numFrame;
+	};
+
+	if ( m_numFrame % 100 == 0 )
+	{
+		qDebug() << "analize motion estimations speed:" << (m_sumLogTime / 100.0);
+		m_sumLogTime = 0.0;
+	};
+	//qDebug() << m_numFrame;
+	m_numFrame++;
+	*/
     if (m_totalFrames == 0)
         m_totalFrames++;
+
+	
 
     return true;
 }
@@ -1101,7 +1199,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     int lineStep = (m_scaledWidth*65536) / MD_WIDTH;
     int scaledLineNum = 0;
     int prevILineNum = -1;
-    quint32* dst = (quint32*) rez->data.data();
+    quint32* dst = (quint32*) rez->data();
 
     //postFiltering();
 

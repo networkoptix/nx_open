@@ -4,7 +4,7 @@
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "dlink_stream_reader.h"
 
-const char* QnPlDlinkResource::MANUFACTURE = "Dlink";
+const QString QnPlDlinkResource::MANUFACTURE(lit("Dlink"));
 
 
 QnDlink_cam_info::QnDlink_cam_info():
@@ -36,7 +36,7 @@ bool QnDlink_cam_info::inited() const
 }
 
 // returns resolution with width not less than width
-QSize QnDlink_cam_info::resolutionCloseTo(int width)
+QSize QnDlink_cam_info::resolutionCloseTo(int width) const
 {
     if (resolutions.size()==0)
     {
@@ -102,6 +102,16 @@ int QnDlink_cam_info::frameRateCloseTo(int fr)
     return result;
 }
 
+QSize QnDlink_cam_info::primaryStreamResolution() const
+{
+    return resolutions.at(0);
+}
+
+QSize QnDlink_cam_info::secondaryStreamResolution() const
+{
+    return resolutionCloseTo(480);
+}
+
 
 //=======================================================================================
 
@@ -119,7 +129,7 @@ bool QnPlDlinkResource::isResourceAccessible()
 
 QString QnPlDlinkResource::getDriverName() const
 {
-    return QLatin1String(MANUFACTURE);
+    return MANUFACTURE;
 }
 
 void QnPlDlinkResource::setIframeDistance(int /*frames*/, int /*timems*/)
@@ -129,9 +139,9 @@ void QnPlDlinkResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 QnAbstractStreamDataProvider* QnPlDlinkResource::createLiveDataProvider()
 {
-    //return new MJPEGtreamreader(toSharedPointer(), "ipcam/stream.cgi?nowprofileid=2&audiostream=0");
-    //return new MJPEGtreamreader(toSharedPointer(), "video/mjpg.cgi");
-    //return new MJPEGtreamreader(toSharedPointer(), "video/mjpg.cgi?profileid=2");
+    //return new MJPEGStreamReader(toSharedPointer(), "ipcam/stream.cgi?nowprofileid=2&audiostream=0");
+    //return new MJPEGStreamReader(toSharedPointer(), "video/mjpg.cgi");
+    //return new MJPEGStreamReader(toSharedPointer(), "video/mjpg.cgi?profileid=2");
     return new PlDlinkStreamReader(toSharedPointer());
 }
 
@@ -314,6 +324,18 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         else
             ++it;
     }
+
+    //detecting and saving selected resolutions
+    const CodecID supportedCodec = !m_camInfo.hasH264.isEmpty()
+        ? CODEC_ID_H264
+        : (m_camInfo.hasMPEG4 ? CODEC_ID_MPEG4 : CODEC_ID_MJPEG);
+    CameraMediaStreams mediaStreams;
+    mediaStreams.streams.push_back( CameraMediaStreamInfo( m_camInfo.primaryStreamResolution(), supportedCodec) );
+    if( m_camInfo.secondaryStreamResolution().width() > 0 )
+        mediaStreams.streams.push_back( CameraMediaStreamInfo( m_camInfo.secondaryStreamResolution(), supportedCodec ) );
+    saveResolutionList( mediaStreams );
+
+    saveParams();
 
     return CameraDiagnostics::NoErrorResult();
 

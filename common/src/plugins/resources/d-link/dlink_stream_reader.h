@@ -10,7 +10,7 @@
 class PlDlinkStreamReader: public CLServerPushStreamReader
 {
 public:
-    PlDlinkStreamReader(QnResourcePtr res);
+    PlDlinkStreamReader(const QnResourcePtr& res);
     virtual ~PlDlinkStreamReader();
 
 protected:

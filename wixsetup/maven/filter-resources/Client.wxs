@@ -4,9 +4,6 @@
     <Fragment Id='FragmentClient'>
         <?include BuildVars.wxi ?>
 
-        <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>                
-        <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>                        
-
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="${customization}ClientDir" Name="Client">
                 <Directory Id="${customization}HelpDir" Name="help"/>                         
@@ -21,7 +18,7 @@
                         </File>
                     </Component>
 
-                    <Component Id="AppLauncherConfiguration" Permanent="yes">
+                    <Component Id="AppLauncherConfiguration">
                         <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\${applauncher.name}">
                             <RegistryValue Type="string" Name="previousLaunchedVersion" Value="${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"/>
@@ -32,7 +29,7 @@
                         </RegistryKey>                        
                     </Component>                                
 
-                    <Component Id="DefaultLanguage" Permanent="yes">
+                    <Component Id="DefaultLanguage">
                         <RegistryKey Root="HKCU"
                                  Key="Software\[Manufacturer]\${client.name}">
                             <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_${translation1}.qm"/>
@@ -72,7 +69,7 @@
                         </File>
                     </Component>                                
 
-                    <Component Id="ClientConfiguration" Permanent="yes">
+                    <Component Id="ClientConfiguration">
                         <Condition>
                         NOT PREVIOUSVERSIONSINSTALLED
                         </Condition>
@@ -83,7 +80,6 @@
                             <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
                             <RegistryValue Type="string" Name="appserverPort" Value="[CLIENT_APPSERVER_PORT]"/>
                             <RegistryValue Type="string" Name="appserverLogin" Value="[CLIENT_APPSERVER_LOGIN]"/>
-                            <RegistryValue Type="string" Name="mediaRoot" Value="[CLIENT_DIRECTORY]"/>
                         </RegistryKey>
                     </Component>
 
@@ -141,7 +137,13 @@
             </Component>
         </ComponentGroup>                            
         <?endif?>
-
+		<?if ${angle} = true ?>
+        <ComponentGroup Id="ClientDirectx" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
+            <Component>
+                <File Id="ClientD3dCompilerDll" Name="D3DCompiler_43.dll" Source="$(var.SourceDir)/D3DCompiler_43.dll"/>
+            </Component>
+        </ComponentGroup>        
+        <?endif?>
         <ComponentGroup Id="ClientQTLibraries" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
             <Component>
                 <File Id="ClientQt5Core$(var.suffix).dll" Name="Qt5Core$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Core$(var.suffix).dll" />
@@ -167,6 +169,55 @@
             <Component>
                 <File Id="ClientQt5Concurrent$(var.suffix).dll" Name="Qt5Concurrent$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Concurrent$(var.suffix).dll"  />                
             </Component>             
+            <Component>
+                <File Id="ClientQt5Sql$(var.suffix).dll" Name="Qt5Sql$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Sql$(var.suffix).dll"  />                
+            </Component>            
+
+            <Component>
+                <File Id="ClientQt5PrintSupport$(var.suffix).dll" Name="Qt5PrintSupport$(var.suffix).dll" Source="$(var.SourceDir)\Qt5PrintSupport$(var.suffix).dll"  />                
+            </Component>             
+            <?if ${webkit} = true ?>
+			<Component>
+                <File Id="ClientQt5WebKit$(var.suffix).dll" Name="Qt5WebKit$(var.suffix).dll" Source="$(var.SourceDir)\Qt5WebKit$(var.suffix).dll"  />                
+            </Component>             
+            <Component>
+                <File Id="ClientQt5WebKitWidgets$(var.suffix).dll" Name="Qt5WebKitWidgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5WebKitWidgets$(var.suffix).dll"  />                
+            </Component>
+			<?endif?>			
+            <Component>
+                <File Id="ClientQt5MultimediaWidgets$(var.suffix).dll" Name="Qt5MultimediaWidgets$(var.suffix).dll" Source="$(var.SourceDir)\Qt5MultimediaWidgets$(var.suffix).dll"  />                
+            </Component>             
+            <Component>
+                <File Id="ClientQt5Qml$(var.suffix).dll" Name="Qt5Qml$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Qml$(var.suffix).dll"  />                
+            </Component>       
+            <Component>
+                <File Id="ClientQt5Quick$(var.suffix).dll" Name="Qt5Quick$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Quick$(var.suffix).dll"  />                
+            </Component>             
+            <?if ${webkit} = true ?>
+			<Component>
+                <File Id="Clienticudt53.dll" Name="icudt53.dll" Source="$(var.SourceDir)\icudt53.dll"  />                
+            </Component>                 
+            <Component>
+                <File Id="Clienticuin53.dll" Name="icuin53.dll" Source="$(var.SourceDir)\icuin53.dll"  />                
+            </Component>                 
+            <Component>
+                <File Id="Clienticuuc5.dll" Name="icuuc53.dll" Source="$(var.SourceDir)\icuuc53.dll"  />                
+            </Component>
+			<?endif?>            
+            <?if ${angle} = true ?>			
+            <Component>
+                <File Id="ClientlibGLESv2$(var.suffix).dll" Name="libGLESv2$(var.suffix).dll" Source="$(var.SourceDir)\libGLESv2$(var.suffix).dll"  />                
+            </Component>                         
+            <Component>
+                <File Id="ClientlibEGL$(var.suffix).dll" Name="libEGL$(var.suffix).dll" Source="$(var.SourceDir)\libEGL$(var.suffix).dll"  />                
+            </Component>
+            <?endif?>					
+            <Component>
+                <File Id="Clientquazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll"  />                
+            </Component>
+            <Component>
+                <File Id="Clientzlibwapi.dll" Name="zlibwapi.dll" Source="$(var.SourceDir)\zlibwapi.dll"  />                
+            </Component>                                           
         </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenAL" Directory="${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir">
@@ -228,6 +279,9 @@
             <?if ${quicksync} = true ?>
             <ComponentGroupRef Id="ClientQuickSync"/>
             <?endif?>
+            <?if ${angle} = true ?>
+			<ComponentGroupRef Id="ClientDirectx"/>
+			<?endif?>
             <ComponentGroupRef Id="ClientFFmpegLibraries"/>
             <ComponentGroupRef Id="ClientQTLibraries" />
             <ComponentGroupRef Id="ImageFormats" />

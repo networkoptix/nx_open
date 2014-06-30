@@ -134,10 +134,7 @@ bool PluginManager::loadQtPlugin( const QString& fullFilePath )
 {
     QSharedPointer<QPluginLoader> plugin( new QPluginLoader( fullFilePath ) );
     if( !plugin->load() )
-    {
-        cl_log.log( lit("Library %1 is not plugin").arg(fullFilePath), cl_logDEBUG1 );
         return false;
-    }
 
     QObject* obj = plugin->instance();
     QnAbstractClientPlugin* clientPlugin = dynamic_cast<QnAbstractClientPlugin*>(obj);
@@ -146,11 +143,11 @@ bool PluginManager::loadQtPlugin( const QString& fullFilePath )
     clientPlugin->initializeLog( QnLog::instance() );
     if( !clientPlugin->initialized() )
     {
-        cl_log.log( lit("Failed to initialize plugin %1").arg(fullFilePath), cl_logERROR );
+        NX_LOG( lit("Failed to initialize Qt plugin %1").arg(fullFilePath), cl_logERROR );
         return false;
     }
 
-    cl_log.log( lit("Successfully loaded plugin %1").arg(fullFilePath), cl_logWARNING );
+    NX_LOG( lit("Successfully loaded Qt plugin %1").arg(fullFilePath), cl_logWARNING );
     m_qtPlugins.push_back( plugin );
 
     emit pluginLoaded();
@@ -177,7 +174,7 @@ bool PluginManager::loadNxPlugin( const QString& fullFilePath )
         return false;
     }
 
-    cl_log.log( lit("Successfully loaded NX plugin %1").arg(fullFilePath), cl_logWARNING );
+    NX_LOG( lit("Successfully loaded NX plugin %1").arg(fullFilePath), cl_logWARNING );
     m_nxPlugins.push_back( obj );
 
     emit pluginLoaded();

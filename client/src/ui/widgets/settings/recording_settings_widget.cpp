@@ -40,11 +40,6 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-#ifdef CL_TRIAL_MODE
-    for (int i = 0; i < (int) QnVideoRecorderSettings::Res640x480; ++i)
-        ui->resolutionComboBox->removeItem(0);
-#endif
-
     QDesktopWidget *desktop = qApp->desktop();
     for (int i = 0; i < desktop->screenCount(); i++) {
         bool isPrimaryScreen = (i == desktop->primaryScreen());
@@ -193,7 +188,9 @@ void QnRecordingSettingsWidget::setCaptureMode(Qn::CaptureMode c)
 
 Qn::DecoderQuality QnRecordingSettingsWidget::decoderQuality() const
 {
-    return (Qn::DecoderQuality)ui->qualityComboBox->currentIndex();
+    // TODO: #Elric. Very bad. Text is set in Designer, enum values in C++ code. 
+    // Text should be filled in code, and no assumptions should be made about enum values.
+    return (Qn::DecoderQuality)ui->qualityComboBox->currentIndex(); 
 }
 
 void QnRecordingSettingsWidget::setDecoderQuality(Qn::DecoderQuality q)
@@ -201,22 +198,14 @@ void QnRecordingSettingsWidget::setDecoderQuality(Qn::DecoderQuality q)
     ui->qualityComboBox->setCurrentIndex(q);
 }
 
-Qn::Resolution QnRecordingSettingsWidget::resolution() const
-{
+Qn::Resolution QnRecordingSettingsWidget::resolution() const {
+    // TODO: #Elric same thing here. ^
     int index = ui->resolutionComboBox->currentIndex();
-#ifdef CL_TRIAL_MODE
-    index += (int) QnVideoRecorderSettings::Res640x480; // prev elements are skipped
-#endif
     return (Qn::Resolution) index;
 }
 
-void QnRecordingSettingsWidget::setResolution(Qn::Resolution r)
-{
-#ifdef CL_TRIAL_MODE
-    ui->resolutionComboBox->setCurrentIndex(r - (int) Qn::Exact640x480Resolution);
-#else
+void QnRecordingSettingsWidget::setResolution(Qn::Resolution r) {
     ui->resolutionComboBox->setCurrentIndex(r);
-#endif
 }
 
 int QnRecordingSettingsWidget::screen() const

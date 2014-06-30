@@ -123,7 +123,9 @@ CameraDiagnostics::Result QnPlSonyResource::initInternal()
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
         return result;
 
-    //TODO/IMPL if no input, exiting
+    //if no input, exiting
+    if( !hasCameraCapabilities(Qn::RelayInputCapability) )
+        return result;
 
     CLSimpleHTTPClient http(
         getHostAddress(),
@@ -138,7 +140,7 @@ CameraDiagnostics::Result QnPlSonyResource::initInternal()
             arg(getHostAddress()).arg(status), cl_logDEBUG1 );
     }
 
-    startInputPortMonitoring();
+    //startInputPortMonitoring();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -147,8 +149,7 @@ bool QnPlSonyResource::startInputPortMonitoring()
 {
     QMutexLocker lk( &m_inputPortMutex );
 
-    if( isDisabled()
-        || hasFlags(QnResource::foreigner) )     //we do not own camera
+    if( hasFlags(QnResource::foreigner) )     //we do not own camera
     {
         return false;
     }
@@ -206,7 +207,7 @@ void QnPlSonyResource::onMonitorResponseReceived( AsyncHttpClientPtr httpClient 
 
     if( (m_inputMonitorHttpClient->response()->statusLine.statusCode / 100) * 100 != StatusCode::ok )
     {
-        cl_log.log( lit("Sony camera %1. Failed to subscribe to input monitoring. %3").
+        NX_LOG( lit("Sony camera %1. Failed to subscribe to input monitoring. %3").
             arg(getUrl()).arg(QLatin1String(m_inputMonitorHttpClient->response()->statusLine.reasonPhrase)), cl_logDEBUG1 );
         m_inputMonitorHttpClient.reset();
         return;

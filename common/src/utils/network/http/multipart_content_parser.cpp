@@ -21,7 +21,7 @@ namespace nx_http
 
     void MultipartContentParser::processData( const QnByteArrayConstRef& data )
     {
-        for( int offset = 0; offset < data.size(); )
+        for( size_t offset = 0; offset < data.size(); )
         {
             switch( m_state )
             {
@@ -71,6 +71,9 @@ namespace nx_http
                                 m_contentLength = headerValue.toUInt();
                             break;
                         }
+
+                        default:
+                            break;
                     }
                     break;
                 }
@@ -81,7 +84,7 @@ namespace nx_http
                     const size_t bytesToRead = std::min<size_t>( m_contentLength - m_currentFrame.size(), data.size()-offset );
                     m_currentFrame += data.mid( offset, bytesToRead );
                     offset += bytesToRead;
-                    if( m_currentFrame.size() == m_contentLength )
+                    if( (size_t)m_currentFrame.size() == m_contentLength )
                     {
                         m_state = waitingBoundary;
                         m_nextFilter->processData( m_currentFrame );

@@ -7,7 +7,7 @@
 
 #include <common/common_globals.h>
 
-#include <camera/caching_time_period_loader.h>
+#include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/client_video_camera.h>
 #include <camera/client_video_camera_export_tool.h>
 
@@ -18,6 +18,8 @@
 #include <plugins/resources/archive/archive_stream_reader.h>
 #include <plugins/resources/archive/avi_files/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
+
+#include <recording/time_period.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_manager.h>
@@ -143,7 +145,6 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
     exportProgressDialog->setModal(false);
-    exportProgressDialog->setAutoSize(false);
     exportProgressDialog->show();
 
     QnLayoutExportTool* tool = new QnLayoutExportTool(layout, exportPeriod, layoutFileName, mode, readOnly, this);
@@ -291,7 +292,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         dewarpingParams.enabled &= doTranscode;
 
         if (dialog->selectedNameFilter().contains(aviFileFilter)) {
-            QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource()->toResourcePtr());
+            QnCachingCameraDataLoader* loader = navigator()->loader(widget->resource()->toResourcePtr());
             const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
             if (loader && archive) {
                 QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
@@ -357,6 +358,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             removeLayoutFromPool(existingLayout);
 
         QnLayoutResourcePtr newLayout(new QnLayoutResource());
+        newLayout->setTypeByName(lit("Layout"));
 
         itemData.uuid = QUuid::createUuid();
         newLayout->addItem(itemData);
@@ -424,7 +426,6 @@ void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QStr
 bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layout) {
     bool hasImage = false;
     bool hasLocal = false;
-    bool hasRemote = false;
 
     foreach (const QnLayoutItemData &item, layout->getItems()) {
         QnResourcePtr resource = qnResPool->getResourceByUniqId(item.resource.path);
@@ -433,8 +434,7 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         hasImage |= resource->hasFlags(QnResource::still_image);
         hasLocal |= resource->hasFlags(QnResource::local)
                     || resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix()); // layout item remove 'local' flag.
-        hasRemote |= resource->hasFlags(QnResource::remote);
-        if (hasImage || (hasLocal && hasRemote))
+        if (hasImage || hasLocal)
             break;
     }
 
@@ -447,11 +447,11 @@ bool QnWorkbenchExportHandler::validateItemTypes(const QnLayoutResourcePtr &layo
         );
         return false;
     }
-    else if (hasLocal && hasRemote) {
+    else if (hasLocal) {
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save a layout"),
-            tr("Current layout contains several cameras and local files. You have to keep only cameras or only local files."),
+            tr("Current layout contains local files. Local files are not allowed for Multi-Video export."),
             QMessageBox::Ok
         );
         return false;

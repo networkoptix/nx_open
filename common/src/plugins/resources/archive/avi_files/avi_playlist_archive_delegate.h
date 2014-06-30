@@ -15,10 +15,10 @@ public:
     QnAVIPlaylistArchiveDelegate();
     virtual ~QnAVIPlaylistArchiveDelegate();
 
-    virtual bool open(QnResourcePtr resource);
-    virtual void close();
-    virtual qint64 seek(qint64 time);
-    virtual qint64 endTime();
+    virtual bool open(const QnResourcePtr& resource) override;
+    virtual void close() override;
+    virtual qint64 seek(qint64 time, bool findIFrame) override;
+    virtual qint64 endTime() override;
     virtual QnResourceVideoLayoutPtr getVideoLayout() override;
 
     static QString addDirPath(const QString sourceDir, const QString& postfix);
@@ -60,7 +60,7 @@ private:
 private:
     QFile m_currentFile;
     qint64 m_totalContentLength;
-    std::shared_ptr<QnDefaultResourceVideoLayout> m_defaultVideoLayout;
+    QSharedPointer<QnDefaultResourceVideoLayout> m_defaultVideoLayout;
 };
 
 #endif // QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H

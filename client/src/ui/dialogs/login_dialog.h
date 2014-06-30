@@ -6,13 +6,14 @@
 #include <QtWidgets/QDialog>
 
 #include <api/model/connection_info.h>
-#include <utils/network/networkoptixmodulefinder.h>
+#include <nx_ec/ec_api.h>
 #include <utils/network/foundenterprisecontrollersmodel.h>
 
 #include <client/client_settings.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include "compatibility_version_installation_dialog.h"
+
 
 class QStandardItemModel;
 class QStandardItem;
@@ -22,6 +23,7 @@ class QnWorkbenchContext;
 class QnAbstractArchiveReader;
 class QnResourceWidgetRenderer;
 class QnRenderingWidget;
+class ModuleInformation;
 
 namespace Ui {
     class LoginDialog;
@@ -78,10 +80,10 @@ private slots:
     void at_saveButton_clicked();
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
-    void at_connectFinished(int status, QnConnectionInfoPtr connectionInfo, int requestHandle);
+    void at_ec2ConnectFinished( int, ec2::ErrorCode, ec2::AbstractECConnectionPtr );
 
-    void at_moduleFinder_moduleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress, const QString& remoteHostAddress, bool isLocal, const QString& seed);
-    void at_moduleFinder_moduleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed );
+    void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress);
+    void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
 private:
     QScopedPointer<Ui::LoginDialog> ui;
@@ -94,15 +96,21 @@ private:
     QnConnectionInfoPtr m_connectInfo;
 
     QnRenderingWidget *m_renderingWidget;
-    NetworkOptixModuleFinder *m_moduleFinder;
+    QnModuleFinder *m_moduleFinder;
 
     struct QnEcData {
+        QnId id;
         QUrl url;
         QString version;
+        QString systemName;
+
+        bool operator==(const QnEcData& other) const  {
+            return id == other.id && url == other.url && version == other.version && systemName == other.systemName;
+        }
     };
 
     /** Hash list of automatically found Enterprise Controllers based on seed as key. */
-    QMultiHash<QString, QnEcData> m_foundEcs;
+    QMap<QString, QnEcData> m_foundEcs;
     std::unique_ptr<CompatibilityVersionInstallationDialog> m_installationDialog;
 
     bool m_restartPending;

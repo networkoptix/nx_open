@@ -3,13 +3,13 @@
 
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
+#include <core/resource/network_resource.h>
 
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
-QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher()
-{
-
-}
+QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher():
+    base_type()
+{ }
 
 QnDesktopCameraResourceSearcher::~QnDesktopCameraResourceSearcher()
 {
@@ -43,7 +43,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
 
     QnResourceList result;
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("SERVER_DESKTOP_CAMERA"));
-    if (!rt.isValid())
+    if (rt.isNull())
         return result;
 
     QMutexLocker lock(&m_mutex);
@@ -52,19 +52,17 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     
     for(; itr != m_connections.end(); ++itr)
     {
-        QnDesktopCameraResourcePtr cam = QnDesktopCameraResourcePtr(new QnDesktopCameraResource);
-        QString userName = itr->userName;
-        cam->setName(lit("desktop-") + userName);
+        QnSecurityCamResourcePtr cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(itr->userName));
         cam->setModel(lit("virtual desktop camera"));
-        cam->setPhysicalId(cam->gePhysicalIdPrefix() + userName);
         cam->setTypeId(rt);
         result << cam;
     }
     return result;
 }
 
-QnResourcePtr QnDesktopCameraResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnDesktopCameraResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& params)
 {
+    Q_UNUSED(params);
     QnNetworkResourcePtr result;
 
     QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resourceTypeId);
@@ -84,8 +82,8 @@ QnResourcePtr QnDesktopCameraResourceSearcher::createResource(QnId resourceTypeI
     result = QnVirtualCameraResourcePtr( new QnDesktopCameraResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create Desktop camera resource. TypeID" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create Desktop camera resource. TypeID" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
     return result;
 }
 
@@ -105,7 +103,7 @@ void QnDesktopCameraResourceSearcher::cleanupConnections()
             {
                 conn.timer.restart();                
                 QString request = QString(lit("KEEP-ALIVE %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(++conn.cSeq);
-                if (conn.socket->send(request.toLocal8Bit()) < 1) {
+                if (conn.socket->send(request.toLatin1()) < 1) {
                     conn.socket->close();
                     itr = m_connections.erase(itr);
                     continue;
@@ -114,12 +112,6 @@ void QnDesktopCameraResourceSearcher::cleanupConnections()
             ++itr;
         }
     }
-}
-
-QnDesktopCameraResourceSearcher& QnDesktopCameraResourceSearcher::instance()
-{
-    static QnDesktopCameraResourceSearcher inst;
-    return inst;
 }
 
 TCPSocketPtr QnDesktopCameraResourceSearcher::getConnection(const QString& userName)

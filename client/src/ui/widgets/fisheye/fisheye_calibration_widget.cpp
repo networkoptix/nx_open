@@ -22,7 +22,8 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
     m_calibrator(new QnFisheyeCalibrator()),
     m_imageProvider(NULL),
     m_updating(false),
-    m_lastError(QnFisheyeCalibrator::NoError)
+    m_lastError(QnFisheyeCalibrator::NoError),
+    m_inLoading(false)
 {
     ui->setupUi(this);
     
@@ -62,11 +63,17 @@ void QnFisheyeCalibrationWidget::init() {
     at_imageProvider_imageChanged();
 }
 
+QnImageProvider* QnFisheyeCalibrationWidget::imageProvider() const 
+{
+    return m_imageProvider;
+}
+
+
 void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
-    // TODO: #GDM ownership is not clear. Does this object claim ownership of provider?
+    // TODO: #GDM #Common ownership is not clear. Does this object claim ownership of provider?
     // If not, then it should not rely on destruction order => need to store provider in 
     // QPointer and check that it's alive before usage.
-
+    m_inLoading = false;
     if (m_imageProvider) {
         disconnect(m_updateTimer, NULL, m_imageProvider, NULL);
         disconnect(m_imageProvider, NULL, ui->imageWidget, NULL);
@@ -88,6 +95,7 @@ void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
         ui->imageWidget->setImage(provider->image());
         at_imageProvider_imageChanged();
     }
+    m_inLoading = true;
     m_imageProvider->loadAsync();
 }
 
@@ -110,6 +118,7 @@ void QnFisheyeCalibrationWidget::setRadius(qreal radius) {
 }
 
 void QnFisheyeCalibrationWidget::at_imageProvider_imageChanged() {
+    m_inLoading = false;
     bool imageLoaded = m_imageProvider && !m_imageProvider->image().isNull();
     ui->autoButton->setVisible(imageLoaded);
     ui->xCenterSlider->setVisible(imageLoaded);
@@ -184,6 +193,8 @@ void QnFisheyeCalibrationWidget::at_calibrator_radiusChanged(qreal radius) {
 }
 
 void QnFisheyeCalibrationWidget::at_updateTimer_timeout() {
-    if(m_imageProvider && isVisible())
+    if(m_imageProvider && isVisible() && !m_inLoading) {
+        m_inLoading = true;
         m_imageProvider->loadAsync();
+    }
 }

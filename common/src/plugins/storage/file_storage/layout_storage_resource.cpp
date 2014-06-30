@@ -5,6 +5,8 @@
 
 #include "utils/common/util.h"
 #include <utils/fs/file.h>
+
+#include <recording/time_period_list.h>
 #include "plugins/resources/archive/filetypesupport.h"
 
 
@@ -248,7 +250,7 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
             storage->closeOpenedFiles();
     }
 
-    bool rez;
+    bool rez = true;
     if (dataInOldFile) {
         QFile::remove(removeProtocolPrefix(newName));
         rez = QFile::rename(removeProtocolPrefix(oldName), removeProtocolPrefix(newName));
@@ -492,9 +494,9 @@ void QnLayoutFileStorageResource::addBinaryPostfix(QFile& file)
     file.write((char*) &magic, sizeof(qint64));
 }
 
-QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(QnResourcePtr res)
+QnTimePeriodList QnLayoutFileStorageResource::getTimePeriods(const QnResourcePtr &resource)
 {
-    QString url = res->getUrl();
+    QString url = resource->getUrl();
     url = url.mid(url.lastIndexOf(L'?')+1);
     QIODevice* chunkData = open(QString(QLatin1String("chunk_%1.bin")).arg(QnFile::baseName(url)), QIODevice::ReadOnly);
     if (!chunkData)

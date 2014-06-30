@@ -10,6 +10,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QMap>
+#include <QtCore/QStringList>
 
 #include <utils/common/software_version.h>
 

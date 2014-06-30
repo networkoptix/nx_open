@@ -49,14 +49,15 @@ void QnWorkbenchNotificationsHandler::clear() {
 
 void QnWorkbenchNotificationsHandler::requestSmtpSettings() {
     if (accessController()->globalPermissions() & Qn::GlobalProtectedPermission)
-        QnAppServerConnectionFactory::createConnection()->getSettingsAsync(this, SLOT(updateSmtpSettings(int,QnKvPairList,int)));
+        QnAppServerConnectionFactory::getConnection2()->getSettingsAsync(
+            this, &QnWorkbenchNotificationsHandler::updateSmtpSettings );
 }
 
 void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-//    if (businessAction->actionType() != BusinessActionType::ShowPopup)
+//    if (businessAction->actionType() != QnBusiness::ShowPopup)
 //        return;
 
-    //TODO: #GDM check if camera is visible to us
+    //TODO: #GDM #Business check if camera is visible to us
     QnBusinessActionParameters::UserGroup userGroup = businessAction->getParams().getUserGroup();
     if (userGroup == QnBusinessActionParameters::AdminOnly
             && !(accessController()->globalPermissions() & Qn::GlobalProtectedPermission)) {
@@ -64,15 +65,15 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     }
 
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
-    BusinessEventType::Value eventType = params.getEventType();
+    QnBusiness::EventType eventType = params.getEventType();
 
-    if (eventType >= BusinessEventType::UserDefined)
+    if (eventType >= QnBusiness::UserEvent)
         return;
 
-    int healthMessage = eventType - BusinessEventType::SystemHealthMessage;
+    int healthMessage = eventType - QnBusiness::SystemHealthEvent;
     if (healthMessage >= 0) {
-        int resourceId = params.getEventResourceId();
-        QnResourcePtr resource = qnResPool->getResourceById(resourceId, QnResourcePool::AllResources);
+        QnId resourceId = params.getEventResourceId();
+        QnResourcePtr resource = qnResPool->getResourceById(resourceId);
         addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), resource);
         return;
     }
@@ -80,7 +81,7 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     if (!context()->user())
         return;
 
-    const bool soundAction = businessAction->actionType() == BusinessActionType::PlaySoundRepeated;
+    const bool soundAction = businessAction->actionType() == QnBusiness::PlaySoundAction; // TODO: #GDM #Business also PlaySoundOnceAction?
     if (!soundAction && !m_adaptor->isAllowed(eventType))
         return;
 
@@ -125,13 +126,12 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     return false;
 }
 
-void QnWorkbenchNotificationsHandler::updateSmtpSettings(int status, const QnKvPairList &settings, int handle) {
+void QnWorkbenchNotificationsHandler::updateSmtpSettings( int handle, ec2::ErrorCode errorCode, const QnEmail::Settings &settings ) {
     Q_UNUSED(handle)
-    if (status != 0)
+    if (errorCode != ec2::ErrorCode::ok)
         return;
 
-    QnEmail::Settings email(settings);
-    bool isInvalid = email.server.isEmpty() || email.user.isEmpty() || email.password.isEmpty();
+    bool isInvalid = settings.server.isEmpty() || settings.user.isEmpty() || settings.password.isEmpty();
     setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, isInvalid);
 }
 
@@ -226,12 +226,12 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
 
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
     switch (businessAction->actionType()) {
-    case BusinessActionType::ShowPopup:
+    case QnBusiness::ShowPopupAction:
     {
         addBusinessAction(businessAction);
         break;
     }
-    case BusinessActionType::PlaySound:
+    case QnBusiness::PlaySoundOnceAction:
     {
         QString filename = businessAction->getParams().getSoundUrl();
         QString filePath = context()->instance<QnAppServerNotificationCache>()->getFullPath(filename);
@@ -240,13 +240,13 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
         AudioPlayer::playFileAsync(filePath);
         break;
     }
-    case BusinessActionType::PlaySoundRepeated:
+    case QnBusiness::PlaySoundAction:
     {
         switch (businessAction->getToggleState()) {
-        case Qn::OnState:
+        case QnBusiness::ActiveState:
             addBusinessAction(businessAction);
             break;
-        case Qn::OffState:
+        case QnBusiness::InactiveState:
             emit businessActionRemoved(businessAction);
             break;
         default:
@@ -254,7 +254,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
         }
         break;
     }
-    case BusinessActionType::SayText:
+    case QnBusiness::SayTextAction:
     {
         AudioPlayer::sayTextAsync(businessAction->getParams().getSayText());
         break;

@@ -9,12 +9,6 @@
 #include "param.h"
 #include "utils/common/id.h"
 
-class QnResourceType;
-typedef QSharedPointer<QnResourceType> QnResourceTypePtr;
-typedef QList<QnResourceTypePtr> QnResourceTypeList;
-
-Q_DECLARE_METATYPE(QnResourceTypeList)
-
 class QN_EXPORT QnResourceType
 {
 public:
@@ -22,10 +16,10 @@ public:
     //QnResourceType(const QString& name);
     virtual ~QnResourceType();
 
-    void setId(QnId value) { m_id = value; }
+    void setId(const QnId& value) { m_id = value; }
     QnId getId() const { return m_id;}
 
-    void setParentId(QnId value) { m_parentId = value; }
+    void setParentId(const QnId &value);
     QnId getParentId() const { return m_parentId;}
 
     void setName(const QString& value) { m_name = value; }
@@ -60,6 +54,7 @@ private:
     mutable bool m_isCameraSet;
 };
 
+Q_DECLARE_METATYPE(QnResourceTypeList)
 
 class QN_EXPORT QnResourceTypePool
 {

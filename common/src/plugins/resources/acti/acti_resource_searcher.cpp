@@ -90,7 +90,7 @@ void QnActiResourceSearcher::at_httpConnectionDone(nx_http::AsyncHttpClientPtr r
     m_httpInProgress.remove(host);
 }
 
-QnResourcePtr QnActiResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnActiResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -112,8 +112,8 @@ QnResourcePtr QnActiResourceSearcher::createResource(QnId resourceTypeId, const 
     result = QnVirtualCameraResourcePtr( new QnActiResource() );
     result->setTypeId(resourceTypeId);
 
-    qDebug() << "Create ACTI camera resource. TypeID" << resourceTypeId.toString() << ", Parameters: " << parameters;
-    result->deserialize(parameters);
+    qDebug() << "Create ACTI camera resource. TypeID" << resourceTypeId.toString(); // << ", Parameters: " << parameters;
+    //result->deserialize(parameters);
 
     return result;
 
@@ -121,7 +121,7 @@ QnResourcePtr QnActiResourceSearcher::createResource(QnId resourceTypeId, const 
 
 QString QnActiResourceSearcher::manufacture() const
 {
-    return QLatin1String(QnActiResource::MANUFACTURE);
+    return QnActiResource::MANUFACTURE;
 }
 
 
@@ -182,7 +182,7 @@ void QnActiResourceSearcher::processPacket(
         return;
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
-    if (!rt.isValid())
+    if (rt.isNull())
         return;
 
     QnActiResourcePtr resource ( new QnActiResource() );

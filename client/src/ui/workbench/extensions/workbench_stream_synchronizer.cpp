@@ -23,6 +23,10 @@
 
 #include <ui/workbench/watchers/workbench_render_watcher.h>
 
+#include <utils/common/model_functions.h>
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnStreamSynchronizationState, (json), (started)(time)(speed))
+
 QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
@@ -84,7 +88,7 @@ QnStreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const {
     
     result.started = m_syncPlay->isEnabled();
     if(result.started) {
-        result.speed = 1.0; // TODO: #Elric need getSpeed() here.
+        result.speed = m_syncPlay->getSpeed();
         result.time = m_syncPlay->getCurrentTime();
     }
     

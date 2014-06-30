@@ -12,6 +12,7 @@
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
 
+#include <recording/time_period_list.h>
 
 QnNetworkResource::QnNetworkResource(): 
     QnResource(),
@@ -20,31 +21,12 @@ QnNetworkResource::QnNetworkResource():
     m_networkTimeout(5000),
     m_probablyNeedToUpdateStatus(false)
 {
-    //TODO: #GDM motion flag should be set in QnVirtualCameraResource depending on motion support
+    //TODO: #GDM #Common motion flag should be set in QnVirtualCameraResource depending on motion support
     addFlags(network);
 }
 
 QnNetworkResource::~QnNetworkResource()
 {
-}
-
-void QnNetworkResource::deserialize(const QnResourceParameters& parameters)
-{
-    QnResource::deserialize(parameters);
-
-    const char* MAC = "mac";
-    const char* PHYSICALID = "physicalId";
-    const char* LOGIN = "login";
-    const char* PASSWORD = "password";
-
-    if (parameters.contains(QLatin1String(MAC)))
-        setMAC(parameters[QLatin1String(MAC)]);
-
-    if (parameters.contains(QLatin1String(PHYSICALID)))
-        setPhysicalId(parameters[QLatin1String(PHYSICALID)]);
-
-    if (parameters.contains(QLatin1String(LOGIN)) && parameters.contains(QLatin1String(PASSWORD)))
-        setAuth(parameters[QLatin1String(LOGIN)], parameters[QLatin1String(PASSWORD)]);
 }
 
 QString QnNetworkResource::getUniqueId() const
@@ -196,7 +178,7 @@ unsigned int QnNetworkResource::getNetworkTimeout() const
     return m_networkTimeout;
 }
 
-void QnNetworkResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields)
+void QnNetworkResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
 {
     QMutexLocker mutexLocker(&m_mutex);
     QnResource::updateInner(other, modifiedFields);
@@ -206,11 +188,6 @@ void QnNetworkResource::updateInner(QnResourcePtr other, QSet<QByteArray>& modif
         m_auth = other_casted->m_auth;
         m_macAddress = other_casted->m_macAddress;
     }
-}
-
-bool QnNetworkResource::shoudResolveConflicts() const
-{
-    return false;
 }
 
 bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source )
@@ -225,60 +202,6 @@ bool QnNetworkResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
 }
 
 
-
-bool QnNetworkResource::conflicting()
-{
-    if (checkNetworkStatus(QnNetworkResource::BadHostAddr))
-        return false;
-
-    QElapsedTimer time;
-    time.restart();
-    CL_LOG(cl_logDEBUG2) cl_log.log("begining of QnNetworkResource::conflicting() ",  cl_logDEBUG2);
-
-    QString mac = getMacByIP(getHostAddress());
-
-//#ifndef _WIN32
-    // If mac is empty or resolution is not implemented
-    if (mac.isEmpty())
-        return false;
-//#endif
-
-    if (mac!=m_macAddress.toString())// someone else has this IP
-    {
-        addNetworkStatus(QnNetworkResource::BadHostAddr);
-        return true;
-    }
-
-    QnSleep::msleep(10);
-
-    CLPing ping;
-    if (!ping.ping(getHostAddress(), 2, ping_timeout)) // I do not know how else to solve this problem. but getMacByIP do not creates any ARP record
-    {
-        //addNetworkStatus(QnNetworkResource::BadHostAddr);
-        //return true;
-
-        // some times ping does not work but cam is still is not conflicting
-    }
-
-    mac = getMacByIP(getHostAddress(), false); // just in case if ARP response from some else have delayed
-
-
-
-    if (mac!=m_macAddress.toString() && mac!=QLatin1String("00-00-00-00-00-00"))// someone else has this IP
-    {
-        addNetworkStatus(QnNetworkResource::BadHostAddr);
-        return true;
-    }
-
-    if (mac==QLatin1String("00-00-00-00-00-00"))
-    {
-        CL_LOG(cl_logERROR) cl_log.log("00-00-00-00-00-00 mac record in OS arp( got it once on WIN7) table?!", cl_logERROR);
-    }
-
-    CL_LOG(cl_logDEBUG2) cl_log.log("end of  QnNetworkResource::conflicting(),  time elapsed: ", time.elapsed(), cl_logDEBUG2);
-    return false;
-}
-
 int QnNetworkResource::getChannel() const
 {
     return 0;
@@ -290,12 +213,19 @@ bool QnNetworkResource::ping()
     return sock->connect( getHostAddress(), httpPort() );
 }
 
+QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {
+    Q_UNUSED(startTimeMs)
+    Q_UNUSED(endTimeMs)
+    Q_UNUSED(detailLevel)
+    return QnTimePeriodList();
+}
+
 /*
 void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 {
     // cannot make concurrent work with pointer CLDevice* ; => so extra steps needed
 
-    cl_log.log(QLatin1String("Geting device info..."), cl_logDEBUG1);
+    NX_LOG(QLatin1String("Geting device info..."), cl_logDEBUG1);
     QTime time;
     time.start();
 
@@ -316,10 +246,10 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 
     CL_LOG(cl_logDEBUG1)
     {
-        cl_log.log(QLatin1String("Done. Time elapsed: "), time.elapsed(), cl_logDEBUG1);
+        NX_LOG(QLatin1String("Done. Time elapsed: "), time.elapsed(), cl_logDEBUG1);
 
         foreach(QnResourcePtr res, lst)
-            cl_log.log(res->toString(), cl_logDEBUG1);
+            NX_LOG(res->toString(), cl_logDEBUG1);
 
     }
 

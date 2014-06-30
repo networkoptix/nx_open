@@ -35,7 +35,13 @@ Release
 
 x86
 x64
+arm-isd
+arm-isd_s2
+arm-rpi
 target
+target-isd
+target-isd_s2
+
 build_environment/python/build_packages/*/build
 build_environment/python/packages/llutil/llutil.egg-info
 build_environment/python/build_packages/ecapi_pb2/ecapi_pb2.egg-info/PKG-INFO
@@ -48,6 +54,8 @@ build_environment/target/buildenv.timestamp
 build_environment/x86
 build_environment/x64
 build_environment/arm
+
+build_environment/maven/filter-resources/current_config
 
 appserver/scripts/ecl/ecproto
 appserver/scripts/ecl/ecl.egg-info
@@ -68,6 +76,8 @@ appserver/entcontroller.conf
 appserver/setup/build
 appserver/version_maven.py
 appserver/version.py
+
+appserver2/arm
 
 applauncher/bin
 applauncher/build
@@ -225,7 +235,6 @@ android-client/.metadata/*
 android-client/**/bin/**
 android-client/**/*.prefs
 android-client/**/gen/*
-android-client/android-main/libs/*.jar
 
 ios-client/build
 ios-client/dist
@@ -249,7 +258,6 @@ launcher/x64
 launcher/arm
 android-client/android-main/target/**
 android-client/protobuf-classes/target/**
-android-client/android-dw/**
 
 
 axiscamplugin/x86
@@ -273,7 +281,21 @@ nx_sdk/nx_sdk
 
 libonvif/.build/
 
+plugins/*/arm
+debsetup/*/arm
+edge_firmware/isd/*.tar.gz
+
 .vagrant
 **/Makefile
+
 android-client/android-main/AndroidManifest.xml
 android-client/android-main/res/**
+
+android-client/android-main/libs/**
+html
+
+webadmin/node_modules
+webadmin/dist
+webadmin/.tmp
+webadmin/.sass-cache
+app/bower_components

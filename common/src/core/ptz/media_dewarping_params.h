@@ -3,12 +3,13 @@
 
 #include <QtCore/QMetaType>
 
-#include <boost/operators.hpp>
-
-#include <utils/common/json_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 // TODO: #Elric doesn't really belong in this folder
-struct QnMediaDewarpingParams: public boost::equality_comparable1<QnMediaDewarpingParams> {
+struct QnMediaDewarpingParams {
+    Q_GADGET
+    Q_ENUMS(ViewMode)
+
 public:
     enum ViewMode {
         Horizontal,
@@ -28,6 +29,7 @@ public:
     }
 
     friend bool operator==(const QnMediaDewarpingParams &l, const QnMediaDewarpingParams &r);
+    friend bool operator!=(const QnMediaDewarpingParams &l, const QnMediaDewarpingParams &r);
     friend QDebug &operator<<(QDebug &stream, const QnMediaDewarpingParams &params);
 
     /**
@@ -40,6 +42,7 @@ public:
 
     /** List of all possible panoFactor values for the selected view mode. */
     static const QList<int>& allowedPanoFactorValues(ViewMode mode);
+
 public:
     /** Whether dewarping is currently enabled. */
     bool enabled;
@@ -58,7 +61,6 @@ public:
     qreal radius;
 };
 
-Q_DECLARE_METATYPE(QnMediaDewarpingParams)
-QN_DECLARE_JSON_SERIALIZATION_FUNCTIONS(QnMediaDewarpingParams)
+QN_FUSION_DECLARE_FUNCTIONS(QnMediaDewarpingParams, (json)(metatype))
 
 #endif // MEDIA_DEWARPING_PARAMS_H

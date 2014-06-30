@@ -1,5 +1,5 @@
-#ifndef EMAIL_H
-#define EMAIL_H
+#ifndef QN_EMAIL_H
+#define QN_EMAIL_H
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
@@ -7,17 +7,18 @@
 
 #include <api/model/kvpair.h>
 
-#include <utils/common/json.h>
+#include <utils/common/model_functions_fwd.h>
 
 class QnEmail {
     Q_GADGET
     Q_ENUMS(ConnectionType)
 
 public:
+    // TODO: #Elric #EC2 move out, rename?
     enum ConnectionType {
-        Unsecure,
-        Ssl,
-        Tls,
+        Unsecure = 0,
+        Ssl = 1,
+        Tls = 2,
         ConnectionTypeCount
     };
 
@@ -53,7 +54,7 @@ public:
         int port;
         int timeout;
 
-        //TODO: #GDM think where else we can store it
+        //TODO: #GDM #Common think where else we can store it
         /** Flag that we are using simple view */
         bool simple;
     };
@@ -86,19 +87,8 @@ private:
     QString m_email;
 };
 
-inline void serialize(const QnEmail::ConnectionType &value, QJsonValue *target) {
-    QJson::serialize(static_cast<int>(value), target);
-}
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnEmail::ConnectionType)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (lexical))
 
-inline bool deserialize(const QJsonValue &value, QnEmail::ConnectionType *target) {
-    int tmp;
-    if(!QJson::deserialize(value, &tmp))
-        return false;
-    
-    *target = static_cast<QnEmail::ConnectionType>(tmp);
-    return true;
-}
+#endif // QN_EMAIL_H
 
-QN_DECLARE_FUNCTIONS(QnEmail::SmtpServerPreset, (json))
-
-#endif // EMAIL_H

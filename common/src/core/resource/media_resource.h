@@ -12,38 +12,14 @@
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
+class MediaStreamCache;
 
 namespace Qn {
 
-    enum StreamQuality {
-        QualityLowest,
-        QualityLow,
-        QualityNormal,
-        QualityHigh,
-        QualityHighest,
-        QualityPreSet,
-        QualityNotDefined,
-
-        StreamQualityCount
-    };
-
-    enum SecondStreamQuality { 
-        SSQualityLow, 
-        SSQualityMedium, 
-        SSQualityHigh, 
-        SSQualityNotDefined,
-        SSQualityDontUse
-    };
+    // TODO: #Elric move out!
 
     QString toDisplayString(Qn::StreamQuality value);
     QString toShortDisplayString(Qn::StreamQuality value);
-
-    // TODO: #Elric move out as generic interface
-    template<class Enum> Enum fromString(const QString &string);
-    template<class Enum> QString toString(Enum value);
-
-    template<> Qn::StreamQuality fromString<Qn::StreamQuality>(const QString &string);
-    template<> QString toString<Qn::StreamQuality>(Qn::StreamQuality value);
 }
 
 /*!
@@ -63,8 +39,8 @@ public:
     virtual QImage getImage(int channel, QDateTime time, Qn::StreamQuality quality) const;
 
     // resource can use DataProvider for addition info (optional)
-    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0);
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0);
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
 
     void setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLayout);
 
@@ -80,12 +56,13 @@ public:
     static QString customAspectRatioKey();
     /** Name of the resource property to disable secondary recorder */
     static QString dontRecordSecondaryStreamKey();
+    static QString rtpTransportKey();
 protected:
     void initMediaResource();
-    void updateInner(QnResourcePtr other, QSet<QByteArray>& modifiedFields);
+    void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
 
 protected:
-    QnCustomResourceVideoLayoutPtr m_customVideoLayout;
+    mutable QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     QnMediaDewarpingParams m_dewarpingParams;
 };
 

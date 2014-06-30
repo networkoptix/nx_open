@@ -9,12 +9,11 @@
 
 class QnPlIqResourceSearcher : public QnMdnsResourceSearcher
 {
-    QnPlIqResourceSearcher();
 
 public:
-    static QnPlIqResourceSearcher& instance();
+    QnPlIqResourceSearcher();
 
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
 
     // return the manufacture of the server
     virtual QString manufacture() const;

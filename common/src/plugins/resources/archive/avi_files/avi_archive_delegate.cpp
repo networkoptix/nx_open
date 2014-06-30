@@ -10,6 +10,7 @@ extern "C"
     #include <libavformat/avformat.h>
 }
 
+#include "core/datapacket/video_data_packet.h"
 #include <core/ptz/media_dewarping_params.h>
 #include "core/resource/resource_media_layout.h"
 #include "core/resource/storage_resource.h"
@@ -24,7 +25,7 @@ extern "C"
 
 #include "utils/media/ffmpeg_helper.h"
 #include "utils/media/nalUnits.h"
-#include <utils/common/json.h>
+#include <utils/serialization/json.h>
 
 class QnAviAudioLayout: public QnResourceAudioLayout
 {
@@ -168,8 +169,6 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
     AVPacket packet;
     QnAbstractMediaDataPtr data;
-    QnCompressedVideoData* videoData;
-    QnCompressedAudioData* audioData;
     AVStream *stream;
     while (1)
     {
@@ -191,39 +190,46 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
         switch(stream->codec->codec_type)
         {
             case AVMEDIA_TYPE_VIDEO:
+            {
                 if (m_indexToChannel[packet.stream_index] == -1) {
                     av_free_packet(&packet);
                     continue;
                 }
-                videoData = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
+                QnWritableCompressedVideoData* videoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 videoData->channelNumber = m_indexToChannel[stream->index]; // [packet.stream_index]; // defalut value
                 data = QnAbstractMediaDataPtr(videoData);
                 packetTimestamp(videoData, packet);
+                videoData->m_data.write((const char*) packet.data, packet.size);
                 break;
+            }
 
             case AVMEDIA_TYPE_AUDIO:
+            {
                 if (packet.stream_index != m_audioStreamIndex || stream->codec->channels < 1 /*|| m_indexToChannel[packet.stream_index] == -1*/) {
                     av_free_packet(&packet);
                     continue;
                 }
 
-                audioData = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
+                QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
                 //audioData->format.fromAvStream(stream->codec);
                 time_base = av_q2d(stream->time_base)*1e+6;
                 audioData->duration = qint64(time_base * packet.duration);
                 data = QnAbstractMediaDataPtr(audioData);
                 audioData->channelNumber = m_indexToChannel[packet.stream_index];
                 packetTimestamp(audioData, packet);
+                audioData->m_data.write((const char*) packet.data, packet.size);
                 break;
+            }
 
             default:
+            {
                 av_free_packet(&packet);
                 continue;
+            }
         }
         break;
     }
 
-    data->data.write((const char*) packet.data, packet.size);
     data->compressionType = stream->codec->codec_id;
     data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);
 
@@ -262,7 +268,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
     return time;
 }
 
-bool QnAviArchiveDelegate::open(QnResourcePtr resource)
+bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
 {
     QMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
 
@@ -281,14 +287,14 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
         m_formatContext->pb = m_ioContext = QnFfmpegHelper::createFfmpegIOContext(m_storage, url, QIODevice::ReadOnly);
         if (!m_ioContext) {
             close();
-            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccesible
+            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccessible
             return false;
         }
         m_initialized = avformat_open_input(&m_formatContext, "", 0, 0) >= 0;
 
         if (!m_initialized ) {
             close();
-            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccesible
+            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccessible
             return false;
         }
         
@@ -348,7 +354,7 @@ const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
     return entry ? entry->value : 0;
 }
 
-static std::shared_ptr<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
 QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
 {
     if (!m_initialized)
@@ -381,7 +387,7 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
         {
             AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,getTagName(Tag_LayoutInfo, format), 0, 0);
             if (layoutInfo)
-                deserializeLayout(m_videoLayout.get(), QLatin1String(layoutInfo->value));
+                deserializeLayout(m_videoLayout.data(), QLatin1String(layoutInfo->value));
 
             if (m_useAbsolutePos)
             {
@@ -560,7 +566,7 @@ bool QnAviArchiveDelegate::deserializeLayout(QnCustomResourceVideoLayout* layout
     {
         QStringList params = info[i].split(QLatin1Char(','));
         if (params.size() != 2) {
-            cl_log.log("Invalid layout string stored at file metadata. Ignored.", cl_logWARNING);
+            NX_LOG("Invalid layout string stored at file metadata. Ignored.", cl_logWARNING);
             return false;
         }
         if (i == 0) {

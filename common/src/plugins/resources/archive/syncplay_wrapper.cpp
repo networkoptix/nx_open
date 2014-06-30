@@ -332,8 +332,6 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/
 
     qint64 displayedTime = getDisplayedTimeInternal();
 
-    qDebug() << "Speed changed. CurrentTime" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString();
-    
     foreach(const ReaderInfo& info, d->readers)
     {
         if (info.enabled) {
@@ -703,7 +701,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
     QTextStream str(&s);
     str << "expectTime=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz");
     str.flush();
-    cl_log.log(s, cl_logALWAYS);
+    NX_LOG(s, cl_logALWAYS);
     */
 
 
@@ -830,6 +828,11 @@ bool QnArchiveSyncPlayWrapper::isEnabled() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     return d->enabled;
+}
+
+qreal QnArchiveSyncPlayWrapper::getSpeed() const {
+    Q_D(const QnArchiveSyncPlayWrapper);
+    return d->speed;
 }
 
 void QnArchiveSyncPlayWrapper::setLiveModeEnabled(bool value)

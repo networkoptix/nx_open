@@ -13,7 +13,7 @@ static const int DROID_WEB_CAM_PORT = 8089;
 class QnPlDriodIpWebCamResource : public QnPhysicalCameraResource
 {
 public:
-    static const char* MANUFACTURE;
+    static const QString MANUFACTURE;
 
     QnPlDriodIpWebCamResource();
 
@@ -24,11 +24,6 @@ public:
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
     int httpPort() const override;
-
-    bool shoudResolveConflicts() const override
-    {
-        return false;
-    }
 
 
 protected:

@@ -39,8 +39,6 @@ public:
     void setIndex(quint16 value);
     quint16 getIndex() const;
 
-    virtual void deserialize(const QnResourceParameters& parameters) override;
-
     /*
      * Returns storage usage in range [0..1]
      */

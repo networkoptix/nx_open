@@ -27,7 +27,7 @@ struct CameraInfoParams
 // QnOnvifStreamReader
 //
 
-QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
+QnOnvifStreamReader::QnOnvifStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
     m_multiCodec(res),
     m_cachedFps(-1),
@@ -192,8 +192,8 @@ QnMetaDataV1Ptr QnOnvifStreamReader::getCameraMetadata()
 
 bool QnOnvifStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
 {
-    const quint8* curNal = (const quint8*) videoData->data.data();
-    const quint8* end = curNal + videoData->data.size();
+    const quint8* curNal = (const quint8*) videoData->data();
+    const quint8* end = curNal + videoData->dataSize();
     curNal = NALUnit::findNextNAL(curNal, end);
 
     const quint8* nextNal = curNal;

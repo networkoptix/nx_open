@@ -12,6 +12,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/videowall_resource.h>
 
 #include <ui/delegates/resource_tree_item_delegate.h>
 #include <ui/models/resource_search_proxy_model.h>
@@ -64,11 +65,26 @@ public:
 
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
+        Qn::NodeType leftNode = left.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+        Qn::NodeType rightNode = right.data(Qn::NodeTypeRole).value<Qn::NodeType>();
+
         /* Local node must be the last one in a list. */
-        bool leftLocal = left.data(Qn::NodeTypeRole).toInt() == Qn::LocalNode;
-        bool rightLocal = right.data(Qn::NodeTypeRole).toInt() == Qn::LocalNode;
+        bool leftLocal = leftNode == Qn::LocalNode;
+        bool rightLocal = rightNode == Qn::LocalNode;
         if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
             return rightLocal;
+
+        QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
+        bool leftVideoWall = leftResource.dynamicCast<QnVideoWallResource>();
+        bool rightVideoWall = rightResource.dynamicCast<QnVideoWallResource>();
+        if(leftVideoWall ^ rightVideoWall) /* One of the nodes is a videowall node, but not both. */
+            return rightVideoWall;
+
+        // checking pairs of VideoWallItemNode + VideoWallMatrixNode
+        if ((leftNode == Qn::VideoWallItemNode || rightNode == Qn::VideoWallItemNode)
+            && leftNode != rightNode)
+            return rightNode == Qn::VideoWallItemNode;   
 
         /* Sort by name. */
         QString leftDisplay = left.data(Qt::DisplayRole).toString();
@@ -78,8 +94,6 @@ protected:
             return result < 0;
 
         /* We want the order to be defined even for items with the same name. */
-        QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
-        QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
         if(leftResource && rightResource) {
             return leftResource->getUniqueId() < rightResource->getUniqueId();
         } else {
@@ -440,7 +454,7 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
 
 void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    int nodeType = index.data(Qn::NodeTypeRole).toInt();
+    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
     if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode)
         ui->resourcesTreeView->expand(index);
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);

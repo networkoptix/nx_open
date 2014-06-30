@@ -17,6 +17,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 
+#include <nx_ec/dummy_handler.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/delegates/business_rule_item_delegate.h>
@@ -80,15 +81,15 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(resizeSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_tableViewport_resizeEvent()), Qt::QueuedConnection);
 
 
-    //TODO: #GDM show description label if no rules are loaded
+    //TODO: #GDM #Business show description label if no rules are loaded
 
     connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(at_saveAllButton_clicked()));
     connect(ui->addRuleButton,                              SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
     connect(ui->deleteRuleButton,                           SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
     connect(ui->advancedButton,                             SIGNAL(clicked()), this, SLOT(toggleAdvancedMode()));
 
-    connect(m_rulesViewModel,                               SIGNAL(businessRuleDeleted(int)),
-            this, SLOT(at_message_ruleDeleted(int)));
+    connect(m_rulesViewModel,                               SIGNAL(businessRuleDeleted(QnId)),
+            this, SLOT(at_message_ruleDeleted(QnId)));
 
     connect(ui->eventLogButton,   SIGNAL(clicked(bool)),              
             context()->action(Qn::BusinessEventsLogAction), SIGNAL(triggered()));
@@ -119,7 +120,7 @@ bool QnBusinessRulesDialog::canClose() {
     bool hasChanges = hasRights && loaded && (
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
-                ); //TODO: #GDM calculate once and use anywhere
+                ); //TODO: #GDM #Business calculate once and use anywhere
     if (!hasChanges)
         return true;
 
@@ -194,8 +195,8 @@ void QnBusinessRulesDialog::at_beforeModelChanged() {
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_message_ruleDeleted(int id) {
-    m_pendingDeleteRules.removeOne(id); //TODO: #GDM ask user
+void QnBusinessRulesDialog::at_message_ruleDeleted(QnId id) {
+    m_pendingDeleteRules.removeOne(id); //TODO: #GDM #Business ask user
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
@@ -236,7 +237,8 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked() {
                              QMessageBox::Cancel) == QMessageBox::Cancel)
         return;
 
-    QnAppServerConnectionFactory::createConnection()->resetBusinessRulesAsync(/*m_rulesViewModel, SLOT(reloadData())*/ NULL, NULL);
+    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->resetBusinessRules(
+        ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
 //  m_rulesViewModel->clear();
 //  updateControlButtons();
 }
@@ -267,12 +269,12 @@ void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChang
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& response, int handle) {
+void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode errorCode ) {
     if (!m_deleting.contains(handle))
         return;
 
-    if(response.status != 0) {
-        QMessageBox::critical(this, tr("Error while deleting rule"), QLatin1String(response.errorString));
+    if( errorCode != ec2::ErrorCode::ok ) {
+        QMessageBox::critical(this, tr("Error while deleting rule"), ec2::toString(errorCode));
         m_pendingDeleteRules.append(m_deleting[handle]);
         return;
     }
@@ -363,10 +365,10 @@ bool QnBusinessRulesDialog::saveAll() {
         m_rulesViewModel->saveRule(idx.row());
     }
 
-    //TODO: #GDM replace with QnAppServerReplyProcessor
-    foreach (int id, m_pendingDeleteRules) {
-        int handle = QnAppServerConnectionFactory::createConnection()->deleteRuleAsync(
-                    id, this, "at_resources_deleted");
+    //TODO: #GDM #Business replace with QnAppServerReplyProcessor
+    foreach (const QnId& id, m_pendingDeleteRules) {
+        int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->deleteRule(
+            id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;
     }
     m_pendingDeleteRules.clear();
@@ -416,7 +418,7 @@ bool isRuleVisible(QnBusinessRuleViewModel *ruleModel,
     if (filter.isEmpty())
         return true;
 
-    if (BusinessEventType::requiresCameraResource(ruleModel->eventType())) {
+    if (QnBusiness::requiresCameraResource(ruleModel->eventType())) {
         // rule supports any camera (assuming there is any camera that passing filter)
         if (ruleModel->eventResources().isEmpty() && anyCameraPassFilter)
             return true;
@@ -428,7 +430,7 @@ bool isRuleVisible(QnBusinessRuleViewModel *ruleModel,
         }
     }
 
-    if (BusinessActionType::requiresCameraResource(ruleModel->actionType())) {
+    if (QnBusiness::requiresCameraResource(ruleModel->actionType())) {
         foreach (const QnResourcePtr &resource, ruleModel->actionResources()) {
             if (resource->toSearchString().contains(filter, Qt::CaseInsensitive))
                 return true;
@@ -454,7 +456,7 @@ void QnBusinessRulesDialog::updateFilter() {
 
     filter = filter.trimmed();
     bool anyCameraPassFilter = false;
-    foreach (const QnResourcePtr camera, qnResPool->getAllEnabledCameras())  {
+    foreach (const QnResourcePtr camera, qnResPool->getAllCameras(QnResourcePtr()))  {
         anyCameraPassFilter = camera->toSearchString().contains(filter, Qt::CaseInsensitive);
         if (anyCameraPassFilter)
             break;

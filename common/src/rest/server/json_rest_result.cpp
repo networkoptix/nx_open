@@ -1,5 +1,7 @@
 #include "json_rest_result.h"
 
+#include <utils/common/model_functions.h>
+
 QnJsonRestResult::QnJsonRestResult(): 
     m_error(NoError) 
 {}
@@ -29,9 +31,10 @@ const QJsonValue &QnJsonRestResult::reply() const {
     return m_reply;
 }
 
-QN_DEFINE_ENUM_CAST_LEXICAL_JSON_SERIALIZATION_FUNCTIONS(QnJsonRestResult::Error)
+QN_FUSION_DEFINE_FUNCTIONS(QnJsonRestResult::Error, (numeric))
 
-QN_DEFINE_CLASS_JSON_SERIALIZATION_FUNCTIONS(QnJsonRestResult, 
+QN_FUSION_ADAPT_CLASS_GSN_FUNCTIONS(QnJsonRestResult, 
+    (json),
     ((&QnJsonRestResult::m_error,       &QnJsonRestResult::m_error,         "error"))
     ((&QnJsonRestResult::m_errorString, &QnJsonRestResult::m_errorString,   "errorString"))
     ((&QnJsonRestResult::m_reply,       &QnJsonRestResult::m_reply,         "reply"))

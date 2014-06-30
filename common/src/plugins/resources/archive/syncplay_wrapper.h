@@ -4,11 +4,9 @@
 #include "utils/media/externaltimesource.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "abstract_archive_stream_reader.h"
-#include "recording/time_period.h"
 
 class QnAbstractArchiveReader;
 class QnAbstractArchiveDelegate;
-class QnlTimeSource;
 class QnArchiveSyncPlayWrapperPrivate;
 
 class QnArchiveSyncPlayWrapper: public QObject, public QnlTimeSource, public QnAbstractNavigator
@@ -44,6 +42,7 @@ public:
     void enableSync(qint64 currentTime, float currentSpeed);
 
     virtual bool isEnabled() const;
+    virtual qreal getSpeed() const;
 
     //virtual bool setMotionRegion(const QRegion& region);
     //virtual bool setSendMotion(bool value);

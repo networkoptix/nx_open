@@ -60,7 +60,7 @@ public:
         GLint maxTextureSize = -1;
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
 #ifdef Q_OS_LINUX
-        maxTextureSize = qMin((int)maxTextureSize, (int)LinuxMaxTextureSize);
+        maxTextureSize = qMin((GLint)maxTextureSize, (GLint)LinuxMaxTextureSize);
 #endif
         m_maxTextureSize = maxTextureSize;
     }
