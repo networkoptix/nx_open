@@ -46,8 +46,7 @@
         },
         {
             "keys": [
-                "ACTI|KCM3311",
-                "*|DW-CP04"
+                "ACTI|KCM3311"
             ],
             "ptzCapabilities": "ContinuousZoomCapability"
         },
@@ -62,7 +61,7 @@
         {
             "keys": [
                 "VISTA|VK2-1080PTZ",
-				"*|DW-CP04"
+                "*|DW-CP04"
             ],
             "ptzCapabilities": "ContinuousPtzCapabilities|nativePresetsPtzCapability"
         },
