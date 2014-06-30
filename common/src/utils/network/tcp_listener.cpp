@@ -291,3 +291,15 @@ int QnTcpListener::getPort() const
         return -1;
     return d->serverSocket->getLocalAddress().port;
 }
+
+static QByteArray m_defaultPage;
+
+void QnTcpListener::setDefaultPage(const QByteArray& path)
+{
+    m_defaultPage = path;
+}
+
+QByteArray QnTcpListener::defaultPage()
+{
+    return m_defaultPage;
+}

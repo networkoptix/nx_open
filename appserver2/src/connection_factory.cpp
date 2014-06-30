@@ -112,7 +112,6 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
 
         //AbstractCameraManager::getBookmarkTags
-        registerGetFuncHandler<QString, ApiHelpGroupDataList>( restProcessorPool, ApiCommand::getHelp );
 
         //TODO AbstractLicenseManager
         registerUpdateFuncHandler<ApiLicenseDataList>( restProcessorPool, ApiCommand::addLicenses );

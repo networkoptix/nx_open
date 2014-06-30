@@ -201,6 +201,7 @@ namespace nx_http
             noContent = 204,
             partialContent = 206,
             multipleChoices = 300,
+            moved_permanently = 301,
             moved = 302,
             badRequest = 400,
             unauthorized = 401,

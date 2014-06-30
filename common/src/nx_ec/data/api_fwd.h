@@ -61,11 +61,6 @@ namespace ec2 {
     struct ApiCameraBookmarkTagData;
     struct ApiLoginData;
 
-    struct ApiHelpValueData;
-    struct ApiHelpParamData;
-    struct ApiHelpFunctionData;
-    struct ApiHelpGroupData;
-    struct ApiHelpGroupDataList;
     struct ApiTimeData;
 
     struct ApiPeerData;
@@ -134,11 +129,6 @@ namespace ec2 {
     (ApiUpdateUploadResponceData)\
     (ApiCameraBookmarkTagData)\
     (ApiLoginData)\
-    (ApiHelpValueData)\
-    (ApiHelpParamData)\
-    (ApiHelpFunctionData)\
-    (ApiHelpGroupData)\
-    (ApiHelpGroupDataList)\
     (ApiTimeData)\
     (ApiPeerData)\
     (ApiRuntimeData)\

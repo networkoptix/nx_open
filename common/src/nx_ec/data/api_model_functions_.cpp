@@ -24,7 +24,6 @@
 #include "api_user_data.h"
 #include "api_videowall_data.h"
 #include "api_update_data.h"
-#include "api_help_data.h"
 #include "api_peer_data.h"
 #include "api_runtime_data.h"
 #include "api_time_data.h"

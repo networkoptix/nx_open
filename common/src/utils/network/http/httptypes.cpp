@@ -216,6 +216,8 @@ namespace nx_http
                     return StringType("Multiple Choices");
                 case moved:
                     return StringType("Moved");
+                case moved_permanently:
+                    return StringType("Moved Permanently");
                 case badRequest:
                     return StringType("Bad Request");
                 case unauthorized:
