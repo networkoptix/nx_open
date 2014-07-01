@@ -503,8 +503,6 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
         return QnMediaServerResourcePtr();
     }
     
-    QnAppServerConnectionFactory::setAuthKey(MSSettings::roSettings()->value( "authKey").toString());
-
     return savedServer;
 }
 
@@ -669,7 +667,6 @@ void initAppServerConnection(QSettings &settings)
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
     NX_LOG(lit("Connect to enterprise controller server %1").arg(urlNoPassword.toString()), cl_logINFO);
-    //QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
