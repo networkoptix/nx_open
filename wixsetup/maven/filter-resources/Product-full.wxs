@@ -57,7 +57,6 @@
 
         <SetProperty Action="SetServerPort1" Id="SERVER_PORT" Value="[SERVER_PORT_EC]" Before="SetServerPort2">NOT SERVER_PORT</SetProperty>
         <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="7001" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
-        <SetProperty Action="SetSystemName"  Id="SYSTEM_NAME" Value="System" Before="CostInitialize">NOT SYSTEM_NAME</SetProperty>
 
         <Property Id="INSTALL_SERVER" Secure="yes"/>
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
@@ -91,6 +90,7 @@
         <Property Id="BUSYPORT" Secure="yes"/>
 
         <Property Id="MEDIASERVER_REGISTRY_PATH" Value="$(var.ServerRegPath)"/>
+        <Property Id="OLDEC_REGISTRY_PATH" Value="$(var.ECRegPath)"/>
         <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
         <!-- MediaServer properties-->
@@ -118,7 +118,7 @@
             <RegistrySearch Id="ClientDirectoryReg" Root="HKCU" Key="$(var.ClientRegPath)" Name="mediaRoot" Type="raw" Win64="yes"/>
         </Property>
 
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Debug\CustomActions.dll" />
 
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
@@ -131,6 +131,7 @@
         <CustomAction Id="CheckPorts" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
         <CustomAction Id="CheckPorts2" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
         <CustomAction Id="FixServerFolder" BinaryKey="CustomActions.dll" DllEntry="FixServerFolder"/>
+        <CustomAction Id="GenerateSystemName" BinaryKey="CustomActions.dll" DllEntry="GenerateSystemName"/>        
         
         <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate" Impersonate="yes"
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
@@ -170,6 +171,9 @@
         <InstallExecuteSequence>
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
+
+            
+            <Custom Action="GenerateSystemName" Before="CostInitialize">NOT SYSTEM_NAME</Custom>
 
             <Custom Action="CopyDatabaseFile_Cmd" After="InstallFiles">
                 <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>

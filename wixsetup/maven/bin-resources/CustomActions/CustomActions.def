@@ -16,3 +16,4 @@ CopyDatabaseFile
 PopulateRestoreVersions
 CAQuitExecAndWarn
 DeleteOldMediaserverSettings
+GenerateSystemName

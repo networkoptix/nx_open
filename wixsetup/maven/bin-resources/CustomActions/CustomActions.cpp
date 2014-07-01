@@ -71,10 +71,55 @@ LExit:
     return WcaFinalize(er);
 }
 
+UINT __stdcall GenerateSystemName(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    CRegKey RegKey;
+
+    CAtlString registryPath;
+    CAtlString systemName;
+
+
+    hr = WcaInitialize(hInstall, "GenerateSystemName");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    // Enterprise Controller Path
+    registryPath = GetProperty(hInstall, L"OLDEC_REGISTRY_PATH");
+
+    if(RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS) {
+        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
+        goto LExit;
+    }
+
+    TCHAR ecsGuid[1024];
+    ULONG pnChars = 1024;
+    RegKey.QueryStringValue(_T("ecsGuid"), ecsGuid, &pnChars);
+
+    if (pnChars > 10) {
+        ecsGuid[9] = 0;
+    }
+
+    systemName.Format(_T("System_%s"), ecsGuid + 1);
+    MsiSetProperty(hInstall, _T("SYSTEM_NAME"), systemName);
+
+    RegKey.Close();
+
+LExit:
+
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
 UINT __stdcall DeleteOldMediaserverSettings(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
+
+    InitWinsock();
 
     CRegKey RegKey;
 
@@ -94,15 +139,26 @@ UINT __stdcall DeleteOldMediaserverSettings(MSIHANDLE hInstall)
 
     RegKey.DeleteValue(L"apiPort");
     RegKey.DeleteValue(L"rtspPort");
-    RegKey.DeleteValue(L"appserverHost");
-    RegKey.DeleteValue(L"appserverPort");
-    RegKey.DeleteValue(L"appserverLogin");
-    RegKey.DeleteValue(L"appserverPassword");
+
+    TCHAR appserverHost[1024];
+    ULONG pnChars = 1024;
+    RegKey.QueryStringValue(_T("appserverHost"), appserverHost, &pnChars);
+
+    char lappserverHost[1024];
+    wcstombs(lappserverHost, appserverHost, pnChars);
+
+    if (isStandaloneSystem(lappserverHost)) {
+        RegKey.DeleteValue(L"appserverHost");
+        RegKey.DeleteValue(L"appserverPort");
+        RegKey.DeleteValue(L"appserverLogin");
+        RegKey.DeleteValue(L"appserverPassword");
+    }
 
     RegKey.Close();
 
 LExit:
 
+    FinishWinsock();
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
@@ -135,6 +191,7 @@ LExit:
   * have space less than 10GB.
   * Set SERVERDIR_LOWDISKSPACE property if so. Otherwize set SERVERDIR_LOWDISKSPACE property to empty string.
   */
+
 #if 0
 UINT __stdcall CheckServerDriveLowSpace(MSIHANDLE hInstall)
 {

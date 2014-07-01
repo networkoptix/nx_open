@@ -1181,13 +1181,20 @@ void QnMain::run()
         QnSleep::msleep(3000);
     }
 
+    if (!MSSettings::roSettings()->value("pendingSwitchToClusterMode").toString().isEmpty()) {
+        MSSettings::roSettings()->setValue("systemName", connectInfo->systemName);
+        MSSettings::roSettings()->remove("pendingClusterUpgrade");
+        MSSettings::roSettings()->sync();
+        return;
+    }
+      
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
 
 
     runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
-    runtimeInfo.publicIP = connectInfo->publicIp;
+    runtimeInfo.publicIP = getPublicAddress().toString();
     qnCommon->setRemoteGUID(connectInfo->ecsGuid);
     QnRuntimeInfoManager::instance()->update(runtimeInfo);
 
