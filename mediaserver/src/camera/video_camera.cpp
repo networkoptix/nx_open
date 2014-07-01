@@ -11,6 +11,7 @@
 #include "decoders/video/ffmpeg.h"
 #include "utils/media/frame_info.h"
 #include "utils/common/synctime.h"
+#include <utils/memory/cyclic_allocator.h>
 #include "utils/media/media_stream_cache.h"
 
 
@@ -90,6 +91,12 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
     return true;
 }
 
+/*!
+    using different allocator for stored ket frames, since these key frames can be kept in QnVideoCameraGopKeeper::m_lastKeyFrames 
+    for 80 seconds and that can cause huge memory consumption if CyclicAllocator has been used to alloc original frames
+*/
+static CyclicAllocator gopKeeperKeyFramesAllocator;
+
 void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QMutexLocker lock(&m_queueMtx);
@@ -104,9 +111,10 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
             }
             m_gotIFramesMask |= 1 << video->channelNumber;
             m_lastKeyFrame = video;
+
             const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
             if (m_lastKeyFrames.empty() || m_lastKeyFrames.back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
-                m_lastKeyFrames.push_back(std::move(video));
+                m_lastKeyFrames.push_back(QnCompressedVideoDataPtr(video->clone(&gopKeeperKeyFramesAllocator)));
             while (!m_lastKeyFrames.empty() && m_lastKeyFrames.front()->timestamp < removeThreshold)
                 m_lastKeyFrames.pop_front();
         }
@@ -165,6 +173,7 @@ QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 tim
         return result;
     }
 
+    //TODO #ak looks like std::lower_bound will do fine here
     for (int i = 0; i < (int)m_lastKeyFrames.size(); ++i)
     {
         if (m_lastKeyFrames[i]->timestamp >= time) {

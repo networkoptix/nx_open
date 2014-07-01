@@ -1128,6 +1128,7 @@ void QnMain::run()
     connect(QnStorageManager::instance(), &QnStorageManager::storageFailure, this, &QnMain::at_storageManager_storageFailure);
     connect(QnStorageManager::instance(), &QnStorageManager::rebuildFinished, this, &QnMain::at_storageManager_rebuildFinished);
 
+    //TODO #ak remove this 123 from here
     qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("123")).toString());
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
