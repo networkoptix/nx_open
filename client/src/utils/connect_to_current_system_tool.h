@@ -32,7 +32,7 @@ signals:
 
 private:
     void finish(ErrorCode errorCode);
-    void changeSystemName();
+    void configureServer();
     void updatePeers();
     void restartPeers();
 

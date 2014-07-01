@@ -7,6 +7,7 @@
 
 class QnConnectToCurrentSystemTool;
 class QnJoinSystemTool;
+class QnProgressDialog;
 
 class QnWorkbenchIncompatibleServersActionHandler : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -20,6 +21,7 @@ protected slots:
 private:
     QnConnectToCurrentSystemTool *connectToCurrentSystemTool();
     QnJoinSystemTool *joinSystemTool();
+    QnProgressDialog *progressDialog();
 
 private slots:
     void at_connectToCurrentSystemTool_finished(int errorCode);
@@ -28,6 +30,7 @@ private slots:
 private:
     QnConnectToCurrentSystemTool *m_connectToCurrentSystemTool;
     QnJoinSystemTool *m_joinSystemTool;
+    QnProgressDialog *m_progressDialog;
 };
 
 #endif // WORKBENCH_INCOMPATIBLE_SERVERS_ACTION_HANDLER_H

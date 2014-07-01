@@ -8,6 +8,7 @@
 #include <ui/actions/action.h>
 #include <ui/actions/action_parameter_types.h>
 #include <ui/dialogs/join_other_system_dialog.h>
+#include <ui/dialogs/progress_dialog.h>
 
 #include <utils/connect_to_current_system_tool.h>
 #include <utils/join_system_tool.h>
@@ -16,7 +17,8 @@ QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActio
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_connectToCurrentSystemTool(NULL),
-    m_joinSystemTool(NULL)
+    m_joinSystemTool(NULL),
+    m_progressDialog(NULL)
 {
     connect(action(Qn::ConnectToCurrentSystem),         SIGNAL(triggered()),    this,   SLOT(at_connectToCurrentSystemAction_triggered()));
     connect(action(Qn::JoinOtherSystem),                SIGNAL(triggered()),    this,   SLOT(at_joinOtherSystemAction_triggered()));
@@ -39,9 +41,12 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
     if (targets.isEmpty())
         return;
 
-    QString password = QInputDialog::getText(mainWindow(), tr("Enter password..."), tr("Password"), QLineEdit::Password);
+    QString password = QInputDialog::getText(mainWindow(), tr("Enter Password..."), tr("Administrator Password"), QLineEdit::Password);
     if (password.isEmpty())
         return;
+
+    progressDialog()->setLabelText(tr("Connecting to the current system..."));
+    progressDialog()->show();
 
     tool->connectToCurrentSystem(targets, password);
 }
@@ -71,6 +76,9 @@ void QnWorkbenchIncompatibleServersActionHandler::at_joinOtherSystemAction_trigg
         return;
     }
 
+    progressDialog()->setLabelText(tr("Joining system..."));
+    progressDialog()->show();
+
     tool->start(url, password);
 }
 
@@ -90,29 +98,41 @@ QnJoinSystemTool *QnWorkbenchIncompatibleServersActionHandler::joinSystemTool() 
     return m_joinSystemTool;
 }
 
+QnProgressDialog *QnWorkbenchIncompatibleServersActionHandler::progressDialog() {
+    if (!m_progressDialog) {
+        m_progressDialog = new QnProgressDialog(mainWindow());
+        m_progressDialog->setCancelButton(NULL);
+        m_progressDialog->setInfiniteProgress();
+        m_progressDialog->setModal(true);
+    }
+    return m_progressDialog;
+}
+
 void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_finished(int errorCode) {
     switch (errorCode) {
     case QnConnectToCurrentSystemTool::NoError:
-        QMessageBox::information(mainWindow(), tr("Information"), tr("The selected servers has been successfully connected to your system!"));
+        QMessageBox::information(progressDialog(), tr("Information"), tr("The selected servers has been successfully connected to your system!"));
         break;
     case QnConnectToCurrentSystemTool::SystemNameChangeFailed:
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not change system name for the selected servers."));
+        QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not change system name for the selected servers."));
         break;
     case QnConnectToCurrentSystemTool::UpdateFailed:
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not update the selected servers.\nYou can try to update the servers again in the System Administration."));
+        QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not update the selected servers.\nYou can try to update the servers again in the System Administration."));
         break;
     default:
         break;
     }
+    progressDialog()->hide();
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_joinSystemTool_finished(int errorCode) {
     switch (errorCode) {
     case QnJoinSystemTool::NoError:
-        QMessageBox::information(mainWindow(), tr("Information"), tr("The selected system has been joined to your system successfully."));
+        QMessageBox::information(progressDialog(), tr("Information"), tr("The selected system has been joined to your system successfully."));
         break;
     default:
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not join the system."));
+        QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not join the system."));
         break;
     }
+    progressDialog()->hide();
 }

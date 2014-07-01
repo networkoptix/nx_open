@@ -40,7 +40,7 @@ void QnConnectToCurrentSystemTool::connectToCurrentSystem(const QSet<QnId> &targ
     m_password = password;
     m_restartTargets.clear();
     m_updateTargets.clear();
-    changeSystemName();
+    configureServer();
 }
 
 bool QnConnectToCurrentSystemTool::isRunning() const {
@@ -53,7 +53,7 @@ void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {
     emit finished(errorCode);
 }
 
-void QnConnectToCurrentSystemTool::changeSystemName() {
+void QnConnectToCurrentSystemTool::configureServer() {
     if (m_targets.isEmpty()) {
         finish(NoError);
         return;
@@ -68,7 +68,6 @@ void QnConnectToCurrentSystemTool::changeSystemName() {
     }
 
     m_configureTask->setSystemName(qnCommon->localSystemName());
-    m_configureTask->setPassword(m_password);
     m_configureTask->start(m_targets);
 }
 
