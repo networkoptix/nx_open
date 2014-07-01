@@ -12,7 +12,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
 
-#include <core/resource/resource_fwd.h>
+#include <core/resource/resource.h>
 
 #include "rest/server/request_handler.h"
 
