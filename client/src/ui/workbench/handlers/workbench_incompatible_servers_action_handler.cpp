@@ -136,6 +136,18 @@ void QnWorkbenchIncompatibleServersActionHandler::at_joinSystemTool_finished(int
     case QnJoinSystemTool::NoError:
         QMessageBox::information(progressDialog(), tr("Information"), tr("The selected system has been joined to your system successfully."));
         break;
+    case QnJoinSystemTool::Timeout:
+        QMessageBox::critical(progressDialog(), tr("Error"), tr("Connection timed out."));
+        break;
+    case QnJoinSystemTool::HostLookupError:
+        QMessageBox::critical(progressDialog(), tr("Error"), tr("The specified host has not been found."));
+        break;
+    case QnJoinSystemTool::VersionError:
+        QMessageBox::critical(progressDialog(), tr("Error"), tr("The target system has the different version.\nYou must update that system before joining."));
+        break;
+    case QnJoinSystemTool::AuthentificationError:
+        QMessageBox::critical(progressDialog(), tr("Error"), tr("Authentification failed.\nPlease, check the password you have entered."));
+        break;
     default:
         QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not join the system."));
         break;
