@@ -5,7 +5,9 @@
 #include "desktop_camera_resource.h"
 #include <core/resource/network_resource.h>
 
-static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
+namespace {
+    const int keepAliveInterval = 30 * 1000;
+}
 
 QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher():
     base_type()
@@ -22,11 +24,11 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 }
 
 
-void QnDesktopCameraResourceSearcher::registerCamera(QSharedPointer<AbstractStreamSocket> connection, const QString& userName)
+void QnDesktopCameraResourceSearcher::registerCamera(QSharedPointer<AbstractStreamSocket> connection, const QString& userName, const QString &userId)
 {
     connection->setSendTimeout(1);
     QMutexLocker lock(&m_mutex);
-    m_connections << ClientConnectionInfo(connection, userName);
+    m_connections << ClientConnectionInfo(connection, userName, userId);
 }
 
 QList<QnResourcePtr> QnDesktopCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
@@ -55,6 +57,7 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
         QnSecurityCamResourcePtr cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(itr->userName));
         cam->setModel(lit("virtual desktop camera"));
         cam->setTypeId(rt);
+        cam->setPhysicalId(itr->userId);
         result << cam;
     }
     return result;
@@ -99,7 +102,7 @@ void QnDesktopCameraResourceSearcher::cleanupConnections()
         } 
         else {
             ClientConnectionInfo& conn = *itr;
-            if (conn.useCount == 0 && conn.timer.elapsed() >= KEEP_ALIVE_INTERVAL)
+            if (conn.useCount == 0 && conn.timer.elapsed() >= keepAliveInterval)
             {
                 conn.timer.restart();                
                 QString request = QString(lit("KEEP-ALIVE %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(++conn.cSeq);
