@@ -50,6 +50,7 @@ bool QnConnectToCurrentSystemTool::isRunning() const {
 void QnConnectToCurrentSystemTool::finish(ErrorCode errorCode) {
     m_running = false;
     m_updateDialog->hide();
+    revertApiUrls();
     emit finished(errorCode);
 }
 
@@ -65,6 +66,19 @@ void QnConnectToCurrentSystemTool::configureServer() {
             m_configureTask->setPasswordHash(user->getHash(), user->getDigest());
             break;
         }
+    }
+
+    foreach (const QnId &id, m_targets) {
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
+        QUrl url = server->apiConnection()->url();
+        m_oldUrls.insert(id, url);
+        url.setScheme(lit("https"));
+        url.setUserName(lit("admin"));
+        url.setPassword(m_password);
+        server->apiConnection()->setUrl(url);
     }
 
     m_configureTask->setSystemName(qnCommon->localSystemName());
@@ -97,9 +111,25 @@ void QnConnectToCurrentSystemTool::restartPeers() {
     m_restartPeerTask->start(m_restartTargets);
 }
 
+void QnConnectToCurrentSystemTool::revertApiUrls() {
+    for (auto it = m_oldUrls.begin(); it != m_oldUrls.end(); ++it) {
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(it.key()).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
+        server->apiConnection()->setUrl(it.value());
+    }
+    m_oldUrls.clear();
+}
+
 void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, const QSet<QnId> &failedPeers) {
+    revertApiUrls();
+
     if (errorCode != 0) {
-        finish(SystemNameChangeFailed);
+        if (errorCode == QnConfigurePeerTask::AuthentificationFailed)
+            finish(AuthentificationFailed);
+        else
+            finish(ConfigurationFailed);
         return;
     }
 

@@ -15,7 +15,8 @@ class QnConnectToCurrentSystemTool : public QObject {
 public:
     enum ErrorCode {
         NoError,
-        SystemNameChangeFailed,
+        AuthentificationFailed,
+        ConfigurationFailed,
         UpdateFailed,
         RestartFailed
     };
@@ -35,6 +36,7 @@ private:
     void configureServer();
     void updatePeers();
     void restartPeers();
+    void revertApiUrls();
 
 private slots:
     void at_configureTask_finished(int errorCode, const QSet<QnId> &failedPeers);
@@ -48,6 +50,7 @@ private:
 
     QSet<QnId> m_restartTargets;
     QSet<QnId> m_updateTargets;
+    QHash<QnId, QUrl> m_oldUrls;
     QnConfigurePeerTask *m_configureTask;
     QnRestartPeerTask *m_restartPeerTask;
     QScopedPointer<QnUpdateDialog> m_updateDialog;

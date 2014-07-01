@@ -113,11 +113,17 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_
     case QnConnectToCurrentSystemTool::NoError:
         QMessageBox::information(progressDialog(), tr("Information"), tr("The selected servers has been successfully connected to your system!"));
         break;
-    case QnConnectToCurrentSystemTool::SystemNameChangeFailed:
-        QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not change system name for the selected servers."));
+    case QnConnectToCurrentSystemTool::AuthentificationFailed:
+        QMessageBox::critical(progressDialog(), tr("Error"), tr("Authentification failed.\nPlease, check the password you have entered."));
+        break;
+    case QnConnectToCurrentSystemTool::ConfigurationFailed:
+        QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not configure the selected servers."));
         break;
     case QnConnectToCurrentSystemTool::UpdateFailed:
         QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not update the selected servers.\nYou can try to update the servers again in the System Administration."));
+        break;
+    case QnConnectToCurrentSystemTool::RestartFailed:
+        QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not restart the selected servers after configuration."));
         break;
     default:
         break;

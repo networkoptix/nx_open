@@ -1,5 +1,7 @@
 #include "configure_peer_task.h"
 
+#include <QtNetwork/QNetworkReply>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <utils/network/global_module_finder.h>
@@ -57,6 +59,7 @@ void QnConfigurePeerTask::setWholeSystem(bool wholeSystem) {
 }
 
 void QnConfigurePeerTask::doStart() {
+    m_error = NoError;
     foreach (const QnId &id, peers()) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
         if (!server) {
@@ -77,9 +80,15 @@ void QnConfigurePeerTask::processReply(int status, int handle) {
     if (id.isNull())
         return;
 
-    if (status != 0)
+    if (status != 0) {
         m_failedPeers.insert(id);
 
+        if (status == QNetworkReply::AuthenticationRequiredError && m_error == NoError)
+            m_error = AuthentificationFailed;
+        else
+            m_error = UnknownError;
+    }
+
     if (m_pendingPeers.isEmpty())
-        finish(0);
+        finish(m_error, m_failedPeers);
 }
