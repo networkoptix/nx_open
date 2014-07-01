@@ -186,6 +186,8 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
 
     dst->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams));
     dst->setVendor(src.vendor);
+
+    Q_ASSERT(dst->getId() == QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()));
 }
 
 

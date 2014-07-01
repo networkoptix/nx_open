@@ -398,7 +398,7 @@ bool QnDbManager::init()
     return true;
 }
 
-QMap<int, QnId> QnDbManager::getGuidList(const QString& request, const QByteArray& tableName, bool isBinaryGUID)
+QMap<int, QnId> QnDbManager::getGuidList(const QString& request, const QByteArray& tableName, GuidConversionMethod method)
 {
     QMap<int, QnId>  result;
     QSqlQuery query(m_sdb);
@@ -411,21 +411,36 @@ QMap<int, QnId> QnDbManager::getGuidList(const QString& request, const QByteArra
     {
         qint32 id = query.value(0).toInt();
         QVariant data = query.value(1);
-        if (isBinaryGUID)
-            result.insert(id, QnId::fromRfc4122(data.toByteArray()));
-        else if (data.isNull())
-            result.insert(id, intToGuid(id, tableName));
-        else if (data.toString().length() <= 10 && data.toInt())
-            result.insert(id, intToGuid(data.toInt(), tableName));
-        else {
-            QnId guid(data.toString());
-            if (guid.isNull()) {
-                QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-                md5Hash.addData(data.toString().toUtf8());
-                QByteArray ha2 = md5Hash.result();
-                guid = QnId::fromRfc4122(ha2);
-            }
-            result.insert(id, guid);
+        switch (method)
+        {
+            case CM_Binary:
+                result.insert(id, QnId::fromRfc4122(data.toByteArray()));
+                break;
+            case CM_MakeHash:
+                {
+                    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+                    md5Hash.addData(data.toString().toUtf8());
+                    QByteArray ha2 = md5Hash.result();
+                    result.insert(id, QnId::fromRfc4122(ha2));
+                    break;
+                }
+            default:
+                {
+                    if (data.isNull())
+                        result.insert(id, intToGuid(id, tableName));
+                    else if (data.toString().length() <= 10 && data.toInt())
+                        result.insert(id, intToGuid(data.toInt(), tableName));
+                    else {
+                        QnId guid(data.toString());
+                        if (guid.isNull()) {
+                            QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+                            md5Hash.addData(data.toString().toUtf8());
+                            QByteArray ha2 = md5Hash.result();
+                            guid = QnId::fromRfc4122(ha2);
+                        }
+                        result.insert(id, guid);
+                    }
+                }
         }
     }
 
@@ -462,6 +477,10 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_resource", "guid", guids))
         return false;
 
+    guids = getGuidList("SELECT resource_ptr_id, physical_id from vms_camera order by resource_ptr_id", "vms_resource", CM_MakeHash);
+    if (!updateTableGuids("vms_resource", "guid", guids))
+        return false;
+
     guids = getGuidList("SELECT rt.id, rt.name || coalesce(m.name,'-') as guid from vms_resourcetype rt LEFT JOIN vms_manufacture m on m.id = rt.manufacture_id", "vms_resource");
     if (!updateTableGuids("vms_resourcetype", "guid", guids))
         return false;
@@ -470,7 +489,7 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_resource", "parent_guid", guids))
         return false;
 
-    guids = getGuidList("SELECT r.id, rt.guid from vms_resource_tmp r JOIN vms_resourcetype rt on rt.id = r.xtype_id", "vms_resource", true);
+    guids = getGuidList("SELECT r.id, rt.guid from vms_resource_tmp r JOIN vms_resourcetype rt on rt.id = r.xtype_id", "vms_resource", CM_Binary);
     if (!updateTableGuids("vms_resource", "xtype_guid", guids))
         return false;
 
