@@ -463,6 +463,7 @@ INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_con
 INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '30','{  }','{  }',NULL,'1',NULL,'0','6','2','16','6' );
 INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '30','{  }','{  }',NULL,'1',NULL,'0','6','2','17','7' );
 INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '30','{  }','{  }',NULL,'1',NULL,'0','6','2','18','8' );
+INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '0','{  }','{  }',NULL,'1',NULL,'0','6','2','19','9' );
 INSERT INTO "vms_businessrule_action_resources" ( id,"businessrule_id","resource_id" ) VALUES ( '1','7','1' );
 INSERT INTO "vms_businessrule_action_resources" ( id,"businessrule_id","resource_id" ) VALUES ( '2','8','1' );
 INSERT INTO "vms_businessrule_action_resources" ( id,"businessrule_id","resource_id" ) VALUES ( '3','9','1' );
