@@ -54,6 +54,7 @@ public:
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
     static QString customAspectRatioKey();
+    static QString rotationKey();
 protected:
     void initMediaResource();
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);

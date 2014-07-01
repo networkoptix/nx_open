@@ -144,3 +144,7 @@ void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&)
 QString QnMediaResource::customAspectRatioKey() {
     return lit("overrideAr");
 }
+
+QString QnMediaResource::rotationKey() {
+    return lit("rotation");
+}

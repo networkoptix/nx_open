@@ -150,6 +150,13 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     ui->arComboBox->setCurrentIndex(0);
     connect(ui->arComboBox,         SIGNAL(currentIndexChanged(int)),    this,          SLOT(at_dbDataChanged()));
 
+    connect(ui->rotCheckBox,&QCheckBox::stateChanged,this,[this](int state){ ui->rotComboBox->setEnabled(state == Qt::Checked);} );
+    connect(ui->rotCheckBox,SIGNAL(stateChanged(int)),this,SLOT(at_dbDataChanged()));
+    ui->rotComboBox->addItem(tr("0 degree"),0);
+    ui->rotComboBox->addItem(tr("90 degrees"),90);
+    ui->rotComboBox->addItem(tr("180 degrees"),180);
+    ui->rotComboBox->addItem(tr("270 degress"),270);
+    connect(ui->rotComboBox,SIGNAL(currentIndexChanged(int)),this,SLOT(at_dbDataChanged()));
 
     updateFromResource();
     updateLicensesButtonVisible();
@@ -562,6 +569,11 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         else
             m_camera->setProperty(QnMediaResource::customAspectRatioKey(), QString());
 
+        if(ui->rotCheckBox->isChecked()) 
+            m_camera->setProperty(QnMediaResource::rotationKey(), QString::number(ui->rotComboBox->itemData(ui->rotComboBox->currentIndex()).toInt()));
+        else
+            m_camera->setProperty(QnMediaResource::rotationKey(), QString());
+
         ui->expertSettingsWidget->submitToResources(QnVirtualCameraResourceList() << m_camera);
 
         QnMediaDewarpingParams dewarpingParams = m_camera->getDewarpingParams();
@@ -666,6 +678,15 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
                 }
             }
             ui->arComboBox->setCurrentIndex(idx < 0 ? 0 : idx);
+        }
+        QString rotation = m_camera->getProperty(QnMediaResource::rotationKey());
+        if(!rotation.isEmpty()) {
+            ui->rotCheckBox->setChecked(true);
+            bool ok;
+            int degree = rotation.toInt(&ok);
+            Q_ASSERT(ok);
+            Q_ASSERT(degree>=0 && degree<=270);
+            ui->rotComboBox->setCurrentIndex(degree/90);
         }
 
         if (!dtsBased) {
