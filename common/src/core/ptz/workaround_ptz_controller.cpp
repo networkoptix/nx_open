@@ -41,8 +41,6 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
         if(QnLexical::deserialize(ptzCapabilities, &m_capabilities)) {
             m_overrideCapabilities = true;
         } else {
-            else if(capability == lit("ContinuousFocusCapability"))
-                m_capabilities |= Qn::ContinuousFocusCapability;
             qnWarning("Could not parse PTZ capabilities '%1'.", ptzCapabilities);
         }
     }

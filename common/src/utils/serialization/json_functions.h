@@ -4,6 +4,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <limits>
 
 #include <boost/preprocessor/tuple/enum.hpp>
 
@@ -16,6 +17,7 @@
 #include <QtCore/QUuid>
 #include <QtCore/QUrl>
 #include <QtCore/QtNumeric>
+#include <QtCore/QJsonArray>
 #include <QtGui/QColor>
 #include <QtGui/QRegion>
 #include <QtGui/QVector2D>
@@ -28,6 +30,7 @@
 
 #include "collection_fwd.h"
 #include "json.h"
+#include "json_macros.h"
 #include "lexical_functions.h"
 
 QN_FUSION_DECLARE_FUNCTIONS(qint32, (json)) /* Needed for (de)serialize_numeric_enum below. */ 
