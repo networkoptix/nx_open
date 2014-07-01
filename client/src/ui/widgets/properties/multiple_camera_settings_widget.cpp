@@ -25,6 +25,23 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 
+namespace {
+
+class QnScopedUpdateRollback {
+public:
+    QnScopedUpdateRollback( QnCameraScheduleWidget* widget ) :
+        m_widget(widget) {
+            widget->beginUpdate();
+    }
+    ~QnScopedUpdateRollback() {
+        m_widget->endUpdate();
+    }
+private:
+    QnCameraScheduleWidget* m_widget;
+};
+
+}// namespace
+
 
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent): 
     QWidget(parent),
@@ -200,6 +217,7 @@ bool QnMultipleCameraSettingsWidget::licensedParametersModified() const
 }
 
 void QnMultipleCameraSettingsWidget::updateFromResources() {
+    QnScopedUpdateRollback rollback(ui->cameraScheduleWidget);
     if(m_cameras.empty()) {
         ui->loginEdit->setText(QString());
         ui->enableAudioCheckBox->setCheckState(Qt::Unchecked);
@@ -213,7 +231,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
         ui->analogGroupBox->setVisible(false);
     } else {
         /* Aggregate camera parameters first. */
-        ui->cameraScheduleWidget->beginUpdate();
         ui->cameraScheduleWidget->setCameras(QnVirtualCameraResourceList());
 
         QSet<QString> logins, passwords;
@@ -333,7 +350,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
             ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
         }
         m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
-        ui->cameraScheduleWidget->endUpdate();
     }
 
     ui->cameraScheduleWidget->setCameras(m_cameras);
