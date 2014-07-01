@@ -158,9 +158,6 @@ namespace ec2
         //getParams
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiResourceParamDataList& data);
 
-        //getHelp
-        ErrorCode doQueryNoLock(const QString& group, ec2::ApiHelpGroupDataList& data);
-
 		// --------- misc -----------------------------
         bool markLicenseOverflow(bool value, qint64 time);
         QUuid getID() const;
@@ -338,7 +335,6 @@ namespace ec2
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
         QnId getType(const QString& typeName);
-        bool loadHelpData(const QString& fileName);
         bool resyncTransactionLog();
         
         template <class ObjectType, class ObjectListType> 
@@ -357,7 +353,6 @@ namespace ec2
         bool m_licenseOverflowMarked;
         qint64 m_licenseOverflowTime;
         QUuid m_dbInstanceId;
-        ApiHelpGroupDataList* m_helpData;
     };
 };
 

@@ -112,7 +112,7 @@ namespace ec2
             getSettings                 = 9000,  /*< ApiResourceParamDataList */
             saveSettings                = 9001,  /*< ApiResourceParamDataList */
             getCurrentTime              = 9002,  /*< ApiTimeData */         
-            getHelp                     = 9003,  /*< ApiHelpGroupDataList */
+            //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
 
 			maxTransactionValue         = 65535

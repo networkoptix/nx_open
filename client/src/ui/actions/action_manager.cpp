@@ -1560,17 +1560,17 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::ToggleThumbnailsAction).
-        flags(Qn::Slider | Qn::SingleTarget).
+        flags(Qn::NoTarget).
         text(tr("Show Thumbnails")).
         toggledText(tr("Hide Thumbnails"));
 
     factory(Qn::ToggleCalendarAction).
-        flags(Qn::Slider | Qn::SingleTarget).
+        flags(Qn::NoTarget).
         text(tr("Show Calendar")).
         toggledText(tr("Hide Calendar"));
 
     factory(Qn::ToggleTitleBarAction).
-        flags(Qn::TitleBar | Qn::NoTarget | Qn::SingleTarget).
+        flags(Qn::NoTarget).
         text(tr("Show Title Bar")).
         toggledText(tr("Hide Title Bar")).
         condition(new QnToggleTitleBarActionCondition(this));
@@ -1582,13 +1582,13 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
     factory(Qn::ToggleTreeAction).
-        flags(Qn::Tree | Qn::NoTarget).
+        flags(Qn::NoTarget).
         text(tr("Show Tree")).
         toggledText(tr("Hide Tree")).
         condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
     factory(Qn::ToggleSliderAction).
-        flags(Qn::Slider | Qn::NoTarget | Qn::SingleTarget).
+        flags(Qn::NoTarget).
         text(tr("Show Timeline")).
         toggledText(tr("Hide Timeline"));
 

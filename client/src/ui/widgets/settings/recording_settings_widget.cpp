@@ -12,6 +12,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/skin.h>
 #include <ui/style/warning_style.h>
+#include <ui/widgets/dwm.h>
 #include <ui/workbench/workbench_context.h>
 
 #ifdef Q_OS_WIN
@@ -34,9 +35,26 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::RecordingSettings),
-    m_settings(new QnVideoRecorderSettings(this))
+    m_settings(new QnVideoRecorderSettings(this)),
+    m_dwm(new QnDwm(this))
 {
     ui->setupUi(this);
+
+    QDesktopWidget *desktop = qApp->desktop();
+    for (int i = 0; i < desktop->screenCount(); i++) {
+        bool isPrimaryScreen = (i == desktop->primaryScreen());
+        if (!m_dwm->isSupported() && !isPrimaryScreen)
+            continue; //TODO: #GDM can we record from secondary screen without DWM?
+
+        QRect geometry = desktop->screenGeometry(i);
+        QString item = tr("Screen %1 - %2x%3")
+                .arg(i + 1)
+                .arg(geometry.width())
+                .arg(geometry.height());
+        if (isPrimaryScreen)
+            item = tr("%1 (Primary)").arg(item);
+        ui->screenComboBox->addItem(item, i);
+    }
 
     foreach (const QString& deviceName, QnVideoRecorderSettings::availableDeviceNames(QAudio::AudioInput)) {
         ui->primaryAudioDeviceComboBox->addItem(deviceName);
@@ -45,11 +63,16 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
 
     setHelpTopic(this, Qn::SystemSettings_ScreenRecording_Help);
 
+    connect(ui->fullscreenButton,               SIGNAL(toggled(bool)),              ui->screenComboBox,         SLOT(setEnabled(bool)));
+    connect(ui->fullscreenButton,               SIGNAL(toggled(bool)),              ui->disableAeroCheckBox,    SLOT(setEnabled(bool)));
+
     connect(ui->qualityComboBox,                SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateRecordingWarning()));
     connect(ui->resolutionComboBox,             SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateRecordingWarning()));
     connect(ui->primaryAudioDeviceComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(onComboboxChanged(int)));
     connect(ui->secondaryAudioDeviceComboBox,   SIGNAL(currentIndexChanged(int)),   this,   SLOT(onComboboxChanged(int)));
+    connect(ui->screenComboBox,                 SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateDisableAeroCheckbox()));
     connect(ui->browseRecordingFolderButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseRecordingFolderButton_clicked()));
+    connect(m_dwm,                              SIGNAL(compositionChanged()),       this,   SLOT(at_dwm_compositionChanged()));
 
 #ifdef Q_OS_WIN
     connect(this, SIGNAL(recordingSettingsChanged()), this->context()->instance<QnWorkbenchDesktopCameraWatcher>(), SLOT(at_recordingSettingsChanged()));
@@ -59,6 +82,8 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     setDefaultSoundIcon(ui->primaryDeviceIconLabel);
     setDefaultSoundIcon(ui->secondaryDeviceIconLabel);
 
+    at_dwm_compositionChanged();
+    updateDisableAeroCheckbox();
     updateRecordingWarning();
 }
 
@@ -66,8 +91,10 @@ QnRecordingSettingsWidget::~QnRecordingSettingsWidget() {
 }
 
 void QnRecordingSettingsWidget::updateFromSettings() {
+    setCaptureMode(m_settings->captureMode());
     setDecoderQuality(m_settings->decoderQuality());
     setResolution(m_settings->resolution());
+    setScreen(m_settings->screen());
     setPrimaryAudioDeviceName(m_settings->primaryAudioDevice().fullName());
     setSecondaryAudioDeviceName(m_settings->secondaryAudioDevice().fullName());
     
@@ -79,6 +106,11 @@ void QnRecordingSettingsWidget::submitToSettings()
 {
     bool isChanged = false;
     
+    if (m_settings->captureMode() != captureMode()) {
+        m_settings->setCaptureMode(captureMode());
+        isChanged = true;
+    }
+
     if (m_settings->decoderQuality() != decoderQuality()) {
         m_settings->setDecoderQuality(decoderQuality());
         isChanged = true;
@@ -86,6 +118,11 @@ void QnRecordingSettingsWidget::submitToSettings()
 
     if (m_settings->resolution() != resolution()) {
         m_settings->setResolution(resolution());
+        isChanged = true;
+    }
+
+    if (m_settings->screen() != screen()) {
+        m_settings->setScreen(screen());
         isChanged = true;
     }
 
@@ -113,6 +150,42 @@ void QnRecordingSettingsWidget::submitToSettings()
         emit recordingSettingsChanged();
 }
 
+Qn::CaptureMode QnRecordingSettingsWidget::captureMode() const
+{
+    if (ui->fullscreenButton->isChecked()) {
+        if (!m_dwm->isSupported() || !m_dwm->isCompositionEnabled())
+            return Qn::FullScreenMode; // no need to disable aero if dwm is disabled
+
+        bool isPrimary = ui->screenComboBox->itemData(ui->screenComboBox->currentIndex()) == qApp->desktop()->primaryScreen();
+        if (!isPrimary)
+            return Qn::FullScreenMode; // recording from secondary screen without aero is not supported
+
+        return (ui->disableAeroCheckBox->isChecked())
+                ? Qn::FullScreenNoAeroMode
+                : Qn::FullScreenMode;
+    }
+    return Qn::WindowMode;
+}
+
+void QnRecordingSettingsWidget::setCaptureMode(Qn::CaptureMode c)
+{
+    switch (c) {
+    case Qn::FullScreenMode:
+        ui->fullscreenButton->setChecked(true);
+        ui->disableAeroCheckBox->setChecked(false);
+        break;
+    case Qn::FullScreenNoAeroMode:
+        ui->fullscreenButton->setChecked(true);
+        ui->disableAeroCheckBox->setChecked(true);
+        break;
+    case Qn::WindowMode:
+        ui->windowButton->setChecked(true);
+        break;
+    default:
+        break;
+    }
+}
+
 Qn::DecoderQuality QnRecordingSettingsWidget::decoderQuality() const
 {
     // TODO: #Elric. Very bad. Text is set in Designer, enum values in C++ code. 
@@ -133,6 +206,16 @@ Qn::Resolution QnRecordingSettingsWidget::resolution() const {
 
 void QnRecordingSettingsWidget::setResolution(Qn::Resolution r) {
     ui->resolutionComboBox->setCurrentIndex(r);
+}
+
+int QnRecordingSettingsWidget::screen() const
+{
+    return ui->screenComboBox->itemData(ui->screenComboBox->currentIndex()).toInt();
+}
+
+void QnRecordingSettingsWidget::setScreen(int screen)
+{
+    ui->screenComboBox->setCurrentIndex(screen);
 }
 
 QString QnRecordingSettingsWidget::primaryAudioDeviceName() const
@@ -195,6 +278,13 @@ void QnRecordingSettingsWidget::updateRecordingWarning() {
                                           (resolution() == Qn::Exact1920x1080Resolution || resolution() == Qn::NativeResolution ));
 }
 
+void QnRecordingSettingsWidget::updateDisableAeroCheckbox() {
+    // without Aero only recording from primary screen is supported
+    bool isPrimary = ui->screenComboBox->itemData(ui->screenComboBox->currentIndex()) == qApp->desktop()->primaryScreen();
+    ui->disableAeroCheckBox->setEnabled(isPrimary);
+}
+
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -223,4 +313,9 @@ void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked(){
     if (dirName.isEmpty())
         return;
     ui->recordingFolderLabel->setText(dirName);
+}
+
+void QnRecordingSettingsWidget::at_dwm_compositionChanged() {
+    /* Aero is already disabled if dwm is not enabled or not supported. */
+    ui->disableAeroCheckBox->setVisible(m_dwm->isSupported() && m_dwm->isCompositionEnabled());
 }

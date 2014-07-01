@@ -157,9 +157,6 @@ namespace ec2
                 case removeCameraBookmarkTags:
                     return "removeCameraBookmarkTags";
 
-                case getHelp:
-                    return "getHelp";
-
                 case runtimeInfoChanged:
                     return "runtimeInfoChanged";
 

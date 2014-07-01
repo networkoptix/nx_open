@@ -28,7 +28,6 @@
 #include "nx_ec/data/api_camera_bookmark_data.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
-#include "nx_ec/data/api_help_data.h"
 #include <nx_ec/data/api_time_data.h>
 #include "nx_ec/data/api_conversion_functions.h"
 #include "api/runtime_info_manager.h"
@@ -191,8 +190,7 @@ QnDbManager::QnDbManager(
     QnDbHelper(),
     m_licenseManagerImpl( licenseManagerImpl ),
     m_licenseOverflowMarked(false),
-    m_licenseOverflowTime(0),
-    m_helpData(0)
+    m_licenseOverflowTime(0)
 {
     m_resourceFactory = factory;
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
@@ -667,32 +665,12 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
     qDebug() << "database created successfully";
 #endif // DB_DEBUG
 
-    if (!loadHelpData(":/api_help_data.json"))
-        qWarning() << "No API help file provided";
-    // load help data
-
     return true;
 }
 
 QnDbManager::~QnDbManager()
 {
-    delete m_helpData;
 	globalInstance = 0;
-}
-
-
-bool QnDbManager::loadHelpData(const QString& fileName)
-{
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly))
-        return false;
-
-    QByteArray data = file.readAll();
-    if(data.isEmpty())
-        return false; /* Read error or empty file*/
-    delete m_helpData;
-    m_helpData = new ApiHelpGroupDataList();
-    return QJson::deserialize(data, m_helpData);
 }
 
 QnDbManager* QnDbManager::instance()
@@ -1738,26 +1716,6 @@ ErrorCode QnDbManager::removeObject(const ApiObjectInfo& apiObject)
 -------------------------- getters --------------------------
  ------------------------------------------------------------
 */
-
-// ----------- getResourceTypes --------------------
-
-ErrorCode QnDbManager::doQueryNoLock(const QString& groupName, ec2::ApiHelpGroupDataList& data)
-{
-    if (groupName.isNull()) {
-        data = *m_helpData;
-    }
-    else {
-        foreach(const ApiHelpGroupData& groupData, m_helpData->groups)
-        {
-            if (groupData.groupName == groupName) {
-                data.groups.push_back(groupData);
-                break;
-            }
-        }
-    }
-    return ErrorCode::ok;
-}
-
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiResourceTypeDataList& data)
 {
