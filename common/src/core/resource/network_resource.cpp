@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <QtCore/QElapsedTimer>
+#include <QCryptographicHash>
 
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
@@ -255,3 +256,12 @@ void QnNetworkResource::getDevicesBasicInfo(QnResourceMap& lst, int threads)
 
 }
 */
+
+QnId QnNetworkResource::uniqueIdToId(const QString& uniqId)
+{
+    Q_ASSERT(!uniqId.isEmpty());
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(uniqId.toUtf8());
+    QnId id = QnId::fromRfc4122(md5.result());
+    return id;
+}

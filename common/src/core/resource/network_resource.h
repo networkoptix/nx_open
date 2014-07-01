@@ -98,6 +98,8 @@ public:
     */
     virtual bool ping();
 
+    static QnId uniqueIdToId(const QString& uniqId);
+
 private:
     QAuthenticator m_auth;
     bool m_authenticated;
