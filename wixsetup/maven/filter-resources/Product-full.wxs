@@ -118,7 +118,7 @@
             <RegistrySearch Id="ClientDirectoryReg" Root="HKCU" Key="$(var.ClientRegPath)" Name="mediaRoot" Type="raw" Win64="yes"/>
         </Property>
 
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Debug\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
 
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
