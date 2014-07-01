@@ -180,6 +180,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnPtzMapperPtr>();
     qRegisterMetaType<Qn::PtzDataFields>();
     qRegisterMetaType<Qn::PtzCommand>();
+    qRegisterMetaType<Qn::PtzTraits>();
+    qRegisterMetaType<Qn::PtzCapabilities>();
 
     qRegisterMetaType<QnMediaDewarpingParams>();
     qRegisterMetaType<QnItemDewarpingParams>();
@@ -195,8 +197,9 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::CameraDataType>();
 
 
-    QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
+    QnJsonSerializer::registerSerializer<Qn::PtzTraits>();
+    QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
 
     qn_commonMetaTypes_initialized = true;
 }

@@ -13,6 +13,7 @@ public:
     {
         registerKey<QnPtzMapperPtr>(lit("ptzMapper"));
         registerKey<Qn::PtzCapabilities>(lit("ptzCapabilities"));
+        registerKey<Qn::PtzTraits>(lit("ptzTraits"));
     }
 
 protected:
