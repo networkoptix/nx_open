@@ -46,6 +46,7 @@
 #include <recording/time_period.h>
 
 #include <core/misc/schedule_task.h>
+#include <core/ptz/ptz_mapper.h>
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
@@ -171,12 +172,12 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnManualCameraSearchSingleCamera>();
 
     qRegisterMetaType<QnPtzPreset>();
-
     qRegisterMetaType<QnPtzPresetList>();
     qRegisterMetaType<QnPtzTour>();
     qRegisterMetaType<QnPtzTourList>();
     qRegisterMetaType<QnPtzData>();
     qRegisterMetaType<QnPtzLimits>();
+    qRegisterMetaType<QnPtzMapperPtr>();
     qRegisterMetaType<Qn::PtzDataFields>();
     qRegisterMetaType<Qn::PtzCommand>();
 
@@ -192,6 +193,10 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnModuleInformation>();
 
     qRegisterMetaType<Qn::CameraDataType>();
+
+
+    QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
+    QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
 
     qn_commonMetaTypes_initialized = true;
 }

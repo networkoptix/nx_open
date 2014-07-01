@@ -329,15 +329,12 @@ namespace QJsonDetail {
     bool deserialize_enum(QnJsonContext *ctx, const QJsonValue &value, T *target, typename std::enable_if<QnLexical::is_numerically_serializable<T>::value>::type * = NULL) {
         QnSerialization::check_enum_binary<T>();
 
+        /* Older version did it with lexical functions, so we have to support it. 
+         * Plus there are types that are numeric, but can also be deserialized from a string. */
+        if(value.type() == QJsonValue::String)
+            return QnLexical::deserialize(value.toString(), target);
+
         qint32 tmp;
-
-        /* Older version did it with lexical functions, so we have to support it. */
-        if(value.type() == QJsonValue::String) {
-            if(!QnLexical::deserialize(value.toString(), &tmp))
-                return false;
-            *target = static_cast<T>(tmp);
-        }
-
         if(!::deserialize(ctx, value, &tmp)) /* Note the direct call instead of invocation through QJson. */
             return false;
         *target = static_cast<T>(tmp);
