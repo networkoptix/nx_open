@@ -91,6 +91,7 @@ void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
     }
 }
 
+
 void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
 {
     Q_ASSERT_X(url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was passed");

@@ -115,7 +115,7 @@ bool QnDbHelper::execSQLFile(const QString& fileName)
         QSqlQuery ddlQuery(m_sdb);
         ddlQuery.prepare(QString::fromUtf8(singleCommand));
         if (!ddlQuery.exec()) {
-            qWarning() << "can't create tables for sqlLite database:" << ddlQuery.lastError().text();
+            qWarning() << "can't create tables for sqlLite database:" << ddlQuery.lastError().text() << ". Query was: " << singleCommand;
             return false;
         }
     }
