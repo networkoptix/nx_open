@@ -394,6 +394,17 @@ bool QnAuthHelper::doBasicAuth(const QByteArray& authData, nx_http::Response& /*
             }
         }
     }
+
+    // authenticate by media server auth_key
+    foreach(QnMediaServerResourcePtr server, m_servers)
+    {
+        if (server->getId().toString().toUtf8().toLower() == userName)
+        {
+            if (server->getAuthKey().toUtf8() == password)
+                return true;
+        }
+    }
+
     return false;
 }
 
