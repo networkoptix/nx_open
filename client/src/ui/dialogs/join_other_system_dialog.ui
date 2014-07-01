@@ -6,12 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>310</width>
-    <height>89</height>
+    <width>308</width>
+    <height>92</height>
    </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Join the Other System</string>
   </property>
   <layout class="QFormLayout" name="formLayout">
    <property name="sizeConstraint">

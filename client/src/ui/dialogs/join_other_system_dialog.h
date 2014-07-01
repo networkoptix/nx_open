@@ -16,7 +16,7 @@ public:
 
     QUrl url() const;
     QString password() const;
-    void updateUrls();
+    void updateUi();
 
 private slots:
     void at_urlComboBox_currentIndexChanged(int index);

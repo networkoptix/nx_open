@@ -3,6 +3,7 @@
 
 #include <QtCore/QUrl>
 
+#include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "ui/common/ui_resource_name.h"
@@ -16,7 +17,7 @@ QnJoinOtherSystemDialog::QnJoinOtherSystemDialog(QWidget *parent) :
 
     connect(ui->urlComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_urlComboBox_currentIndexChanged(int)));
 
-    updateUrls();
+    updateUi();
 }
 
 QnJoinOtherSystemDialog::~QnJoinOtherSystemDialog() {}
@@ -29,7 +30,7 @@ QString QnJoinOtherSystemDialog::password() const {
     return ui->passwordEdit->text();
 }
 
-void QnJoinOtherSystemDialog::updateUrls() {
+void QnJoinOtherSystemDialog::updateUi() {
     ui->urlComboBox->clear();
     foreach (const QnResourcePtr &resource, qnResPool->getAllIncompatibleResources()) {
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
@@ -53,4 +54,9 @@ void QnJoinOtherSystemDialog::at_urlComboBox_currentIndexChanged(int index) {
         return;
 
     ui->urlComboBox->setCurrentText(ui->urlComboBox->itemData(index).toString());
+
+    QString title = tr("Join the Other System");
+    if (!qnCommon->localSystemName().isEmpty())
+        title += lit(" (current is %1)").arg(qnCommon->localSystemName());
+    setWindowTitle(title);
 }
