@@ -12,7 +12,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
 
-#include <core/resource/resource.h>
+#include <core/resource/resource_fwd.h>
 
 #include "rest/server/request_handler.h"
 
@@ -42,6 +42,9 @@
     \a res_id - unique id of camera
     If failed to set just one param, response status code is set to 500 (Internal Server Error), in other case - 200 (OK)
 */
+
+struct AwaitedParameters;
+
 class QnCameraSettingsRestHandler
 :
     public QnRestRequestHandler
@@ -57,16 +60,6 @@ public:
     //virtual QString description(TCPSocket* tcpSocket) const;
 
 private:
-    struct AwaitedParameters
-    {
-        QnResourcePtr resource;
-
-        //!Parameters which values we are waiting for
-        std::set<QString> paramsToWaitFor;
-        //!New parameter values are stored here
-        std::map<QString, std::pair<QVariant, bool> > paramValues;
-    };
-
     QMutex m_mutex;
     QWaitCondition m_cond;
     std::set<AwaitedParameters*> m_awaitedParamsSets;
