@@ -382,3 +382,13 @@ qint64 QnMediaServerResource::currentStatusTime() const
     QMutexLocker lock(&m_mutex);
     return m_statusTimer.elapsed();
 }
+
+QString QnMediaServerResource::getAuthKey() const
+{
+    return m_authKey;
+}
+
+void QnMediaServerResource::setAuthKey(const QString& authKey)
+{
+    m_authKey = authKey;
+}

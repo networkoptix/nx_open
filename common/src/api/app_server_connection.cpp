@@ -91,6 +91,22 @@ void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
     }
 }
 
+void QnAppServerConnectionFactory::setAuthKey(const QString &key)
+{
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
+        factory->m_authKey = key;
+}
+
+QString QnAppServerConnectionFactory::authKey()
+{
+    // todo: add some salt here
+    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
+        return factory->m_authKey;
+    else
+        return QString();
+}
+
+
 void QnAppServerConnectionFactory::setDefaultUrl(const QUrl &url)
 {
     Q_ASSERT_X(url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was passed");

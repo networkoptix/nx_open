@@ -70,6 +70,9 @@ public:
     QnSystemInformation getSystemInfo() const;
     void setSystemInfo(const QnSystemInformation &systemInfo);
 
+    QString getAuthKey() const;
+    void setAuthKey(const QString& value);
+
     static bool isEdgeServer(const QnResourcePtr &resource);
     virtual void setStatus(Status newStatus, bool silenceMode = false) override;
     qint64 currentStatusTime() const;
@@ -98,6 +101,7 @@ private:
     int m_maxCameras;
     bool m_redundancy;
     QElapsedTimer m_statusTimer;
+    QString m_authKey;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

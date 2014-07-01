@@ -32,7 +32,9 @@ public:
     static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
 
-    //static void setAuthKey(const QString &key);
+    static void setAuthKey(const QString &key);
+    static QString authKey();
+
     static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
@@ -59,6 +61,7 @@ private:
     QString m_clientGuid;
     QUrl m_defaultUrl;
     QUrl m_publicUrl;
+    QString m_authKey;
 
     /** Videowall-related fields */
     QUuid m_videowallGuid;
