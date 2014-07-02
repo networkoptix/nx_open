@@ -28,7 +28,7 @@ public:
     virtual ~QnThirdPartyCompressedAudioData();
 
     //!Implementation of QnAbstractMediaData::clone
-    virtual QnWritableCompressedAudioData* clone() const override;
+    virtual QnWritableCompressedAudioData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
     //!Implementation of QnAbstractMediaData::data
     virtual const char* data() const override;
     //!Implementation of QnAbstractMediaData::dataSize

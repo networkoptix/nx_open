@@ -5,6 +5,8 @@
 
 #include "video_data_packet.h"
 
+#include <utils/memory/cyclic_allocator.h>
+
 
 QnCompressedVideoData::QnCompressedVideoData( QnMediaContextPtr ctx )
 :
@@ -19,13 +21,6 @@ QnCompressedVideoData::QnCompressedVideoData( QnMediaContextPtr ctx )
     flags = 0;
 }
 
-//!Implementation of QnAbstractMediaData::clone
-QnCompressedVideoData* QnCompressedVideoData::clone() const 
-{
-    assert( false );
-    return nullptr;
-}
-
 void QnCompressedVideoData::assign(const QnCompressedVideoData* other)
 {
     QnAbstractMediaData::assign(other);
@@ -36,22 +31,38 @@ void QnCompressedVideoData::assign(const QnCompressedVideoData* other)
 }
 
 
-static const unsigned int MAX_VIDEO_PACKET_SIZE = 10 * 1024 * 1024;
+static const unsigned int MAX_VIDEO_PACKET_SIZE = 10*1024*1024;
+
+//static CyclicAllocator videoPacketCyclicAllocator;
 
 QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     unsigned int alignment,
     unsigned int capacity,
     QnMediaContextPtr ctx )
+:   //TODO #ak delegate constructor (requires msvc2013)
+    QnCompressedVideoData( ctx ),
+    m_data(/*&videoPacketCyclicAllocator,*/ alignment, qMin(capacity, MAX_VIDEO_PACKET_SIZE))
+{
+}
+
+QnWritableCompressedVideoData::QnWritableCompressedVideoData(
+    QnAbstractAllocator* allocator,
+    unsigned int alignment,
+    unsigned int capacity,
+    QnMediaContextPtr ctx )
 :
     QnCompressedVideoData( ctx ),
-    m_data(alignment, qMin(capacity, MAX_VIDEO_PACKET_SIZE))
+    m_data(allocator, alignment, qMin(capacity, MAX_VIDEO_PACKET_SIZE))
 {
 }
 
 //!Implementation of QnAbstractMediaData::clone
-QnWritableCompressedVideoData* QnWritableCompressedVideoData::clone() const
+QnWritableCompressedVideoData* QnWritableCompressedVideoData::clone( QnAbstractAllocator* allocator ) const
 {
-    QnWritableCompressedVideoData* rez = new QnWritableCompressedVideoData(m_data.getAlignment(), m_data.size());
+    QnWritableCompressedVideoData* rez = new QnWritableCompressedVideoData(
+        allocator,
+        m_data.getAlignment(),
+        m_data.size() );
     rez->assign(this);
     return rez;
 }

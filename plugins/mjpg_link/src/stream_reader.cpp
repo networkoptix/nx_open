@@ -54,8 +54,7 @@ StreamReader::StreamReader(
     m_streamType( none ),
     m_prevFrameClock( -1 ),
     m_frameDurationMSec( 0 ),
-    m_terminated( false ),
-    m_mediaBufferCache( MAX_FRAME_SIZE )
+    m_terminated( false )
 {
     setFps( fps );
 
@@ -208,7 +207,7 @@ void StreamReader::gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame )
     //creating video packet
 
     m_videoPacket.reset( new ILPVideoPacket(
-        &m_mediaBufferCache,
+        &m_allocator,
         0,
         QDateTime::currentMSecsSinceEpoch() * USEC_IN_MS,
         nxcip::MediaDataPacket::fKeyPacket,

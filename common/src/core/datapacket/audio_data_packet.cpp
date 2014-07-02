@@ -109,15 +109,29 @@ QnWritableCompressedAudioData::QnWritableCompressedAudioData(
     unsigned int alignment,
     unsigned int capacity,
     QnMediaContextPtr ctx )
-:
+:   //TODO #ak delegate constructor
     QnCompressedAudioData( ctx ),
     m_data( alignment, capacity )
 {
 }
 
-QnWritableCompressedAudioData* QnWritableCompressedAudioData::clone() const
+QnWritableCompressedAudioData::QnWritableCompressedAudioData(
+    QnAbstractAllocator* allocator,
+    unsigned int alignment,
+    unsigned int capacity,
+    QnMediaContextPtr ctx )
+:
+    QnCompressedAudioData( ctx ),
+    m_data( allocator, alignment, capacity )
 {
-    QnWritableCompressedAudioData* rez = new QnWritableCompressedAudioData(m_data.getAlignment(), m_data.size());
+}
+
+QnWritableCompressedAudioData* QnWritableCompressedAudioData::clone( QnAbstractAllocator* allocator ) const
+{
+    QnWritableCompressedAudioData* rez = new QnWritableCompressedAudioData(
+        allocator,
+        m_data.getAlignment(),
+        m_data.size() );
     rez->assign(this);
     return rez;
 }

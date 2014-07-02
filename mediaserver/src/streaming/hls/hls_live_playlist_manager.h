@@ -6,9 +6,11 @@
 #define HLS_LIVE_PLAYLIST_MANAGER_H
 
 #include <deque>
+#include <memory>
 #include <queue>
 
-#include <QMutex>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QMutex>
 
 #include "hls_playlist_manager.h"
 
@@ -42,10 +44,14 @@ namespace nx_hls
         //!Implementation of AbstractPlaylistManager::getMaxBitrate
         virtual int getMaxBitrate() const override;
 
+        void clear();
+        //!Time (millis) from last usage of this object
+        size_t inactivityPeriod() const;
+
     private:
         MediaStreamCache* const m_mediaStreamCache;
         mutable std::deque<AbstractPlaylistManager::ChunkData> m_chunks;
-        quint64 m_targetDurationUSec;
+        const quint64 m_targetDurationUSec;
         mutable unsigned int m_mediaSequence;
         AbstractPlaylistManager::ChunkData m_currentChunk;
         mutable QMutex m_mutex;
@@ -53,11 +59,15 @@ namespace nx_hls
         //queue<pair<timestamp to block; playlist start timestamp, blocking lives to> >
         std::queue<std::pair<quint64, quint64> > m_timestampToBlock;
         int m_blockID;
-        int m_removedChunksToKeepCount;
+        const int m_removedChunksToKeepCount;
         int m_eventRegistrationID;
+        mutable QElapsedTimer m_inactivityTimer;
 
         void onKeyFrame( quint64 currentPacketTimestampUSec );
     };
+
+    //!Using std::shared_ptr for \a std::shared_ptr::unique()
+    typedef std::shared_ptr<nx_hls::HLSLivePlaylistManager> HLSLivePlaylistManagerPtr;
 }
 
 #endif  //HLS_LIVE_PLAYLIST_MANAGER_H

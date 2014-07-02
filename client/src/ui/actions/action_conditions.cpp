@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QAction>
 
+#include <api/app_server_connection.h>
+
 #include <utils/common/warnings.h>
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
@@ -910,7 +912,7 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
 
     QString userName = context()->user()->getName();
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::desktop_camera)) 
-        if (resource->getName() == userName)
+        if (resource->getUniqueId() == QnAppServerConnectionFactory::clientGuid())
             return Qn::EnabledAction;
     
     return Qn::InvisibleAction;

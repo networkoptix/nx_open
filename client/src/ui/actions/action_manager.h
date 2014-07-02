@@ -146,6 +146,7 @@ public:
      */
     void redirectAction(QMenu *menu, Qn::ActionId sourceId, QAction *targetAction);
 
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
 protected:
     friend class QnAction;
 
@@ -154,10 +155,8 @@ protected:
     QMenu *newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options);
 
     bool redirectActionRecursive(QMenu *menu, Qn::ActionId targetId, QAction *targetAction);
-
 private slots:
     void at_menu_destroyed(QObject *menu);
-    void at_menu_aboutToShow();
 
 private:
     /** Root action. Also contained in the maps. */
@@ -182,8 +181,8 @@ private:
     /** Currently active action that was activated via a shortcut. */
     QnAction *m_shortcutAction;
 
-    /** Last menu that was shown to the user. */
-    QObject *m_lastShownMenu;
+    /** Last menu that was clicked by the user. */
+    QObject *m_lastClickedMenu;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnActionManager::CreationOptions)

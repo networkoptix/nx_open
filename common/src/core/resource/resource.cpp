@@ -91,20 +91,33 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& /*modifiedFields*/)
-{
+void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
     Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
-    m_id = other->m_id; //TODO: #Elric this is WRONG!!!!!!!!!11111111
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
-    
-    m_tags = other->m_tags;
-    m_url = other->m_url;
-    m_flags = other->m_flags;
-    m_name = other->m_name;
-    m_parentId = other->m_parentId;
 
+    m_tags = other->m_tags;
+
+    if (m_url != other->m_url) {
+        m_url = other->m_url;
+        modifiedFields << "urlChanged";
+    }
+
+    if (m_flags != other->m_flags) {
+        m_flags = other->m_flags;    
+        modifiedFields << "flagsChanged";
+    }
+
+    if (m_name != other->m_name) {
+        m_name = other->m_name;
+        modifiedFields << "nameChanged";
+    }
+
+    if (m_parentId != other->m_parentId) {
+        m_parentId = other->m_parentId;
+        modifiedFields << "parentIdChanged";
+    }
 }
 
 void QnResource::update(const QnResourcePtr& other, bool silenceMode)

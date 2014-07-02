@@ -1,6 +1,12 @@
+
 #include "byte_array.h"
+
+#include <functional>
+
+#include <plugins/plugin_tools.h>
+#include <utils/memory/system_allocator.h>
+
 #include "warnings.h"
-#include "plugins/plugin_tools.h"
 
 /**
  * Same as FF_INPUT_BUFFER_PADDING_SIZE.
@@ -12,15 +18,29 @@
 QAtomicInt QnByteArray_bytesAllocated;
 #endif
 
-#if 1
-#define _qMallocAligned qMallocAligned
-#define _qFreeAligned qFreeAligned
-#else
-#define _qMallocAligned nxpt::mallocAligned
-#define _qFreeAligned nxpt::freeAligned
-#endif
 
-QnByteArray::QnByteArray(unsigned int alignment, unsigned int capacity):
+using namespace std::placeholders;
+
+QnByteArray::QnByteArray(unsigned int alignment, unsigned int capacity)
+:    //TODO #ak delegate constructor
+    m_allocator(QnSystemAllocator::instance()),
+    m_alignment(alignment),
+    m_capacity(0),
+    m_size(0),
+    m_data(NULL),
+    m_ignore(0),
+    m_ownBuffer( true )
+{
+    if (capacity > 0)
+        reallocate(capacity);
+}
+
+QnByteArray::QnByteArray(
+    QnAbstractAllocator* const allocator,
+    unsigned int alignment,
+    unsigned int capacity)
+:
+    m_allocator(allocator),
     m_alignment(alignment),
     m_capacity(0),
     m_size(0),
@@ -34,6 +54,7 @@ QnByteArray::QnByteArray(unsigned int alignment, unsigned int capacity):
 
 QnByteArray::QnByteArray( char* buf, unsigned int dataSize )
 :
+    m_allocator( QnSystemAllocator::instance() ),
     m_alignment( 1 ),
     m_capacity( dataSize ),
     m_size( dataSize ),
@@ -47,7 +68,7 @@ QnByteArray::~QnByteArray()
 {
     if( m_ownBuffer )
     {
-        _qFreeAligned(m_data);
+        nxpt::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
 #ifdef CALC_QnByteArray_ALLOCATION
         QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
 #endif
@@ -174,13 +195,18 @@ QnByteArray& QnByteArray::operator=( const QnByteArray& right )
 #ifdef CALC_QnByteArray_ALLOCATION
         QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
 #endif
-        _qFreeAligned(m_data);
+        nxpt::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
     }
 
+    m_allocator = right.m_allocator;
     m_alignment = right.m_alignment;
     m_capacity = right.m_size;
     m_size = right.m_size;
-    m_data = (char*)_qMallocAligned( m_capacity + QN_BYTE_ARRAY_PADDING, m_alignment ); 
+    m_data = (char*)nxpt::mallocAligned(
+        m_capacity + QN_BYTE_ARRAY_PADDING,
+        m_alignment,
+        std::bind( &QnAbstractAllocator::alloc, m_allocator, _1 ) );
+
 #ifdef CALC_QnByteArray_ALLOCATION
     QnByteArray_bytesAllocated.fetchAndAddOrdered( m_capacity + QN_BYTE_ARRAY_PADDING );
 #endif
@@ -198,12 +224,13 @@ QnByteArray& QnByteArray::operator=( QnByteArray&& right )
 
     if( m_ownBuffer )
     {
-        _qFreeAligned(m_data);
+        nxpt::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
 #ifdef CALC_QnByteArray_ALLOCATION
         QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
 #endif
     }
 
+    m_allocator = right.m_allocator;
     m_alignment = right.m_alignment;
     m_capacity = right.m_capacity;
     m_size = right.m_size;
@@ -235,7 +262,10 @@ bool QnByteArray::reallocate(unsigned int capacity)
     if (capacity < m_capacity)
         return true;
 
-    char *data = (char *) _qMallocAligned(capacity + QN_BYTE_ARRAY_PADDING, m_alignment);
+    char* data = (char*)nxpt::mallocAligned(
+        capacity + QN_BYTE_ARRAY_PADDING,
+        m_alignment,
+        std::bind( &QnAbstractAllocator::alloc, m_allocator, _1 ) );
     if(!data)
         return false;
 #ifdef CALC_QnByteArray_ALLOCATION
@@ -245,7 +275,7 @@ bool QnByteArray::reallocate(unsigned int capacity)
     memcpy(data, m_data, m_size);
     if( m_ownBuffer )
     {
-        _qFreeAligned(m_data);
+        nxpt::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
 #ifdef CALC_QnByteArray_ALLOCATION
         QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + QN_BYTE_ARRAY_PADDING) );
 #endif

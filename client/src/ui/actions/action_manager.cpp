@@ -323,7 +323,7 @@ QnActionManager::QnActionManager(QObject *parent):
     m_root(NULL),
     m_targetProvider(NULL),
     m_shortcutAction(NULL),
-    m_lastShownMenu(NULL)
+    m_lastClickedMenu(NULL)
 {
     m_root = new QnAction(Qn::NoAction, this);
     m_actionById[Qn::NoAction] = m_root;
@@ -1725,8 +1725,10 @@ QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWid
 
     if(result) {
         m_parametersByMenu[result] = parameters;
+
+        result->installEventFilter(this);
+
         connect(result, &QObject::destroyed, this, &QnActionManager::at_menu_destroyed);
-        connect(result, &QMenu::aboutToShow, this, &QnActionManager::at_menu_aboutToShow);
     }
 
     return result;
@@ -1838,11 +1840,14 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
 QnActionParameters QnActionManager::currentParameters(QnAction *action) const {
     if(m_shortcutAction == action)
         return m_parametersByMenu.value(NULL);
-
-    if(m_lastShownMenu == NULL || !m_parametersByMenu.contains(m_lastShownMenu))
+    
+    if(m_lastClickedMenu == NULL || !m_parametersByMenu.contains(m_lastClickedMenu)) 
+    {
         qnWarning("No active menu, no target exists.");
-
-    return m_parametersByMenu.value(m_lastShownMenu);
+        return QnActionParameters();
+    }
+    
+    return m_parametersByMenu.value(m_lastClickedMenu);
 }
 
 QnActionParameters QnActionManager::currentParameters(QObject *sender) const {
@@ -1891,8 +1896,17 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId sourceId
 
 void QnActionManager::at_menu_destroyed(QObject *menu) {
     m_parametersByMenu.remove(menu);
+    if (m_lastClickedMenu == menu)
+        m_lastClickedMenu = NULL;
 }
 
-void QnActionManager::at_menu_aboutToShow() {
-    m_lastShownMenu = sender();
+bool QnActionManager::eventFilter(QObject *watched, QEvent *event) {
+    if (event->type() != QEvent::MouseButtonRelease)
+        return false;
+
+    if (!dynamic_cast<QMenu*>(watched))
+        return false;
+
+    m_lastClickedMenu = watched;
+    return false;
 }
