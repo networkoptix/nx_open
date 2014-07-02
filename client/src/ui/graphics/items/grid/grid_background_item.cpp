@@ -75,7 +75,7 @@ public:
     QImage image;
 #endif
     ImageStatus imageStatus;
-    QCache<QString, QImage> imagesMemCache;
+    QHash<QString, QImage> imagesMemCache;  //TODO: #GDM #Common #High replace with QCache
 };
 
 
