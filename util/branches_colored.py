@@ -12,7 +12,7 @@ def main():
     init(autoreset=True)
   
     parser = argparse.ArgumentParser()
-    parser.add_argument('-a', '--all', action='store_true', help="show all branches (including valid)"))
+    parser.add_argument('-a', '--all', action='store_true', help="show all branches (including valid)")
     args = parser.parse_args()
     all_branches = args.all
            
