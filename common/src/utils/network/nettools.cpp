@@ -18,6 +18,10 @@
 #include <netdb.h>
 #include <ifaddrs.h>
 #include <unistd.h>
+#include <net/if.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/ioctl.h>
 #endif
 
 /*
