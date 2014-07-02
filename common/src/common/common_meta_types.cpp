@@ -83,7 +83,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnMacAddress>();
 
     qRegisterMetaType<QnParam>();
-    qRegisterMetaType<QnId>();
     
     qRegisterMetaType<QnKvPair>();
     qRegisterMetaType<QnKvPairList>();

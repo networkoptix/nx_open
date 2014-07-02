@@ -31,7 +31,6 @@ public:
     static void initialize();
 };
 
-Q_DECLARE_METATYPE(QUuid);
 Q_DECLARE_METATYPE(QHostAddress);
 Q_DECLARE_METATYPE(QAuthenticator);
 Q_DECLARE_METATYPE(Qt::ConnectionType);

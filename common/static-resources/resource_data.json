@@ -105,7 +105,7 @@
             "keys": [
                 "VISTA|VK2-ENCODER"
             ],
-            "vistaFocusDevices": ["TODO"]
+            "vistaFocusDevices": ["EncoderVistaPTZ"]
         },
         {
             "keys": [
