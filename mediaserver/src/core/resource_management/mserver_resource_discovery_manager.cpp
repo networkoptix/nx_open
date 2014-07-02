@@ -132,7 +132,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             }
         }
 
-        QnSecurityCamResourcePtr newCamRes = newNetRes.dynamicCast<QnSecurityCamResource>();
+        QnVirtualCameraResourcePtr newCamRes = newNetRes.dynamicCast<QnVirtualCameraResource>();
         if (newCamRes && newCamRes->needCheckIpConflicts())
         {
             // do not count 2--N channels of multichannel cameras as conflict
