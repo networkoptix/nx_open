@@ -211,7 +211,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
-    connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     /* These actions may be activated via context menu. In this case the topmost event loop will be finishing and this somehow affects runModal method of NSSavePanel in MacOS.
@@ -235,6 +234,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CameraListByServerAction),               SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
     connect(action(Qn::WebClientAction),                        SIGNAL(triggered()),    this,   SLOT(at_webClientAction_triggered()));
     connect(action(Qn::SystemAdministrationAction),             SIGNAL(triggered()),    this,   SLOT(at_systemAdministrationAction_triggered()));
+    connect(action(Qn::SystemUpdateAction),                     SIGNAL(triggered()),    this,   SLOT(at_systemUpdateAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
@@ -1255,34 +1255,30 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
         menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dirName));
 }
 
-void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
-    QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
-    if(update.isNull()) {
-        if(alwaysNotify)
-            QMessageBox::information(mainWindow(), tr("Information"), tr("No updates available."));
-        return;
-    }
-
-    QnSoftwareVersion ignoredUpdateVersion = qnSettings->ignoredUpdateVersion();
-    bool ignoreThisVersion = update.engineVersion <= ignoredUpdateVersion;
-    bool thisVersionWasIgnored = ignoreThisVersion;
-    if(ignoreThisVersion && !alwaysNotify)
+void QnWorkbenchActionHandler::notifyAboutUpdate() {
+    QnSoftwareVersion version = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
+    if(version.isNull())
         return;
 
-    QnCheckableMessageBox::question(
+    if (version < qnSettings->ignoredUpdateVersion())
+        return;
+
+    bool ignoreThisVersion;
+    int res = QnCheckableMessageBox::question(
         mainWindow(),
         Qn::Upgrade_Help,
         tr("Software update is available"),
-        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString()),
+        tr("An update for your system is available.\nDo you want to update your system now?"),
         tr("Don't notify again about this update."),
-        &ignoreThisVersion,
-        QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Ok,
-        QDialogButtonBox::Cancel
+        &ignoreThisVersion
     );
 
-    if(ignoreThisVersion != thisVersionWasIgnored)
-        qnSettings->setIgnoredUpdateVersion(ignoreThisVersion ? update.engineVersion : QnSoftwareVersion());
+    if (res == QMessageBox::Yes) {
+        showSystemAdministrationDialog(QnSystemAdministrationDialog::UpdatesTab);
+        systemAdministrationDialog()->checkForUpdates();
+    } else {
+        qnSettings->setIgnoredUpdateVersion(ignoreThisVersion ? version : QnSoftwareVersion());
+    }
 }
 
 void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePtr &layout) {
@@ -1310,11 +1306,7 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
     if (qnSettings->isAutoCheckForUpdates() && qnSettings->isUpdatesEnabled())
-        notifyAboutUpdate(false);
-}
-
-void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
-    notifyAboutUpdate(true);
+        notifyAboutUpdate();
 }
 
 void QnWorkbenchActionHandler::at_showcaseAction_triggered() {
@@ -1392,7 +1384,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     QDesktopServices::openUrl(url);
 }
 
-void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
+void QnWorkbenchActionHandler::showSystemAdministrationDialog(int tab) {
     bool newlyCreated = false;
     if (!m_systemAdministrationDialog) {
         m_systemAdministrationDialog = new QnSystemAdministrationDialog(context(), mainWindow());
@@ -1404,6 +1396,16 @@ void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
     systemAdministrationDialog()->show();
     if (!newlyCreated)
         systemAdministrationDialog()->setGeometry(oldGeometry);
+
+    systemAdministrationDialog()->activateTab(tab);
+}
+
+void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
+    showSystemAdministrationDialog();
+}
+
+void QnWorkbenchActionHandler::at_systemUpdateAction_triggered() {
+    showSystemAdministrationDialog(QnSystemAdministrationDialog::UpdatesTab);
 }
 
 void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {

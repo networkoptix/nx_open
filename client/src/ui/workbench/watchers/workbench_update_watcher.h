@@ -3,30 +3,28 @@
 
 #include <QtCore/QObject>
 
-#include <utils/appcast/update_info.h>
+#include <utils/common/software_version.h>
 
 class QnUpdateChecker;
 
 class QnWorkbenchUpdateWatcher: public QObject {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnWorkbenchUpdateWatcher(QObject *parent = NULL);
     virtual ~QnWorkbenchUpdateWatcher();
 
-    QnUpdateInfoItem availableUpdate() const {
-        return m_availableUpdate;
-    }
+    QnSoftwareVersion availableUpdate() const { return m_availableUpdate; }
 
 signals:
     void availableUpdateChanged();
 
 private slots:
-    void at_checker_updatesAvailable(QnUpdateInfoItemList updates);
+    void at_checker_updateAvailable(const QnSoftwareVersion &version);
     void at_timer_timeout();
 
 private:
     QnUpdateChecker *m_checker;
-    QnUpdateInfoItem m_availableUpdate;
+    QnSoftwareVersion m_availableUpdate;
 };
 
 #endif // QN_WORKBENCH_UPDATE_WATCHER_H

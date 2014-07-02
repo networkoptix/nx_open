@@ -310,11 +310,6 @@ namespace Qn {
         AboutAction,
 
         /**
-         * Checks for updates.
-         */
-        CheckForUpdatesAction,
-
-        /**
          * Open Showcase page in default browser
          */
         ShowcaseAction,
@@ -351,6 +346,11 @@ namespace Qn {
          * System administration dialog.
          */
         SystemAdministrationAction,
+
+        /**
+         * System update dialog.
+         */
+        SystemUpdateAction,
 
         //ShowMediaServerLogs,
 

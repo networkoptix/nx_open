@@ -30,6 +30,8 @@ public:
 
     void reset();
 
+    void checkForUpdates();
+
 private slots:
     void at_checkForUpdatesButton_clicked();
     void at_installSpecificBuildButton_clicked();

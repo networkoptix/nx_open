@@ -41,3 +41,12 @@ void QnSystemAdministrationDialog::accept() {
 void QnSystemAdministrationDialog::reset() {
     m_updatesWidget->reset();
 }
+
+void QnSystemAdministrationDialog::activateTab(int tab) {
+    if (tab >= 0 && tab < ui->tabWidget->count())
+        ui->tabWidget->setCurrentIndex(tab);
+}
+
+void QnSystemAdministrationDialog::checkForUpdates() {
+    m_updatesWidget->checkForUpdates();
+}

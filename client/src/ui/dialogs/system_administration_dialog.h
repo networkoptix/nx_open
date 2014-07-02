@@ -16,6 +16,11 @@ class QnSystemAdministrationDialog : public QDialog, public QnWorkbenchContextAw
     Q_OBJECT
     typedef QDialog base_type;
 public:
+    enum Tabs {
+        UpdatesTab = 0,
+        RoutingTab
+    };
+
     QnSystemAdministrationDialog(QnWorkbenchContext *context, QWidget *parent = 0);
     ~QnSystemAdministrationDialog();
 
@@ -23,6 +28,9 @@ public:
     virtual void accept() override;
 
     void reset();
+
+    void activateTab(int tab);
+    void checkForUpdates();
 
 private:
     QScopedPointer<Ui::QnSystemAdministrationDialog> ui;

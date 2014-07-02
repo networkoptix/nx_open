@@ -101,10 +101,14 @@ void QnServerUpdatesWidget::reset() {
     updateUi();
 }
 
-void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {
+void QnServerUpdatesWidget::checkForUpdates() {
     m_updateTool->setDenyMajorUpdates(false);
     m_updateTool->checkForUpdates();
     m_updatesModel->setTargets(m_updateTool->actualTargets());
+}
+
+void QnServerUpdatesWidget::at_checkForUpdatesButton_clicked() {
+    checkForUpdates();
 }
 
 void QnServerUpdatesWidget::at_installSpecificBuildButton_clicked() {

@@ -747,6 +747,12 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
+    factory(Qn::SystemUpdateAction).
+        flags(Qn::Main | Qn::Tree).
+        text(tr("System Update...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
+
     factory(Qn::JoinOtherSystem).
         flags(Qn::Main | Qn::Tree).
         text(tr("Join the Other System...")).
@@ -768,11 +774,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         text(tr("How-to Videos and FAQ...")).
         condition(new QnShowcaseActionCondition(this));
-
-    factory(Qn::CheckForUpdatesAction).
-        flags(Qn::Main).
-        text(tr("Check for Updates...")).
-        condition(new QnCheckForUpdatesActionCondition(this));
 
     factory(Qn::AboutAction).
         flags(Qn::Main | Qn::GlobalHotkey).
