@@ -856,14 +856,13 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext()) {
         codecString = codecContext->codecName();
         if(!codecString.isEmpty())
-            codecString = tr(" (%1)").arg(codecString);
+            codecString = lit(" (%1)").arg(codecString);
     }
 
-    // TODO: #Elric no pre-spaces in translatable strings, translators mess it up.
     QString hqLqString;
 #ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
     if (!(m_resource->toResource()->flags() & QnResource::local))
-        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" Lo-Res") : tr(" Hi-Res");
+        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
 #endif
 
     QString timeString;
@@ -879,14 +878,14 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         if(qnSettings->timeMode() == Qn::ServerTimeMode)
             utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
 
-        timeString = tr("\t%1").arg(
-            m_display->camDisplay()->isRealTimeSource() ?
-            tr("LIVE") :
-            QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"))
-        );
+        timeString = m_display->camDisplay()->isRealTimeSource() 
+            ? tr("LIVE") 
+            : QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"));
+        
     }
 
-    return tr("%1x%2 %3fps @ %4Mbps%5%6%7")
+    //TODO: #Elric #TR are you sure this string must be translatable???
+    return tr("%1x%2 %3fps @ %4Mbps%5 %6\t%7")
         .arg(size.width())
         .arg(size.height())
         .arg(fps, 0, 'f', 2)
