@@ -51,7 +51,7 @@ void QnRecordingManager::start()
     m_scheduleWatchingTimer.start(1000);
     
     connect(&m_licenseTimer, &QTimer::timeout, this, &QnRecordingManager::at_checkLicenses);
-    //m_licenseTimer.start(1000 * 60);
+    m_licenseTimer.start(1000 * 60);
 
     QThread::start();
 }
