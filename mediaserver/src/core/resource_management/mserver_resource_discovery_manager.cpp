@@ -150,6 +150,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 if (existCamRes->getTypeId() != newNetRes->getTypeId()) {
                     QnId newTypeId = newNetRes->getTypeId();
                     newNetRes->update(existCamRes);
+                    newNetRes->setId(existCamRes->getId());
                     newNetRes->setTypeId(newTypeId);
                     qnResPool->removeResource(existCamRes);
                     qnResPool->addResource(newCamRes);
