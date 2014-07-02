@@ -17,7 +17,7 @@ QnNetworkResource::QnNetworkResource():
     QnResource(),
     m_authenticated(true),
     m_networkStatus(0),
-    m_networkTimeout(5000),
+    m_networkTimeout(1000 * 10),
     m_probablyNeedToUpdateStatus(false)
 {
     //TODO: #GDM motion flag should be set in QnVirtualCameraResource depending on motion support

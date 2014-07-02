@@ -42,7 +42,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     if (netRes)
         m_RtpSession.setTCPTimeout(netRes->getNetworkTimeout());
     else
-        m_RtpSession.setTCPTimeout(1000 * 5);
+        m_RtpSession.setTCPTimeout(1000 * 10);
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
     m_numberOfVideoChannels = mr->getVideoLayout()->channelCount();
     m_gotKeyData.resize(m_numberOfVideoChannels);
