@@ -17,6 +17,7 @@ public:
         Timeout,
         HostLookupError,
         VersionError,
+        AuthentificationError,
         JoinError
     };
 

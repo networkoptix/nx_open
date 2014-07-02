@@ -2,6 +2,7 @@
 
 #include <QtCore/QTimer>
 #include <QtNetwork/QHostInfo>
+#include <QtNetwork/QNetworkReply>
 
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
@@ -236,7 +237,10 @@ void QnJoinSystemTool::at_targetServer_configured(int status, int handle) {
     Q_UNUSED(handle)
 
     if (status != 0) {
-        finish(JoinError);
+        if (status == QNetworkReply::AuthenticationRequiredError)
+            finish(AuthentificationError);
+        else
+            finish(JoinError);
         return;
     }
 

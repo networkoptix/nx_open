@@ -462,7 +462,7 @@ void QnThumbnailsLoader::process() {
 
             if(!invalidated && m_decode) { // TODO: #Elric m_decode check may be wrong here.
                 /* Make sure decoder's buffer is empty. */
-                QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1, 0));
+                QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1, 0));
                 while (decoder.decode(emptyData, &outFrame)) 
                 {
                     if(timingsQueue.isEmpty()) {

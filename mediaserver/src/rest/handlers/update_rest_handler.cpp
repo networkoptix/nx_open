@@ -9,8 +9,6 @@
 #include <utils/common/log.h>
 #include <common/common_module.h>
 
-#include <version.h>
-
 int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType) {
     Q_UNUSED(path)
     Q_UNUSED(params)
@@ -40,7 +38,7 @@ int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParamLi
     if (version == qnCommon->engineVersion())
         return CODE_OK;
 
-    if (sysInfo != QnSystemInformation(lit(QN_APPLICATION_PLATFORM), lit(QN_APPLICATION_ARCH), lit(QN_ARM_BOX)))
+    if (sysInfo != QnSystemInformation::currentSystemInformation())
         return CODE_INVALID_PARAMETER;
 
     if (!QnServerUpdateTool::instance()->addUpdateFile(version.toString(), body))

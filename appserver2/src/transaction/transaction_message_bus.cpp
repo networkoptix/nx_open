@@ -642,6 +642,23 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         transport->setWriteSync(true);
         transport->sendTransaction(tran, processedPeers);
         transport->sendTransaction(tranModules, processedPeers);
+
+        if (remotePeer.peerType == QnPeerInfo::DesktopClient) {
+            foreach(QnTransactionTransportPtr connected, m_connections.values()) {
+                if (!connected)
+                    continue;
+                QnPeerInfo peer = connected->remotePeer();
+                if (peer.peerType != QnPeerInfo::VideowallClient)
+                    continue;
+                
+                QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::updateVideowallInstanceStatus, false);
+                tran.params.online = true;
+                tran.params.instanceGuid = peer.params["instanceGuid"];
+                tran.params.videowallGuid = peer.params["videowallGuid"];
+                transport->sendTransaction(tran, processedPeers);
+            }
+        }
+
         transport->setReadSync(true);
     } else if (remotePeer.peerType == QnPeerInfo::AndroidClient) {
         /** Request all data to be sent to the client peers on the connect. */
@@ -726,6 +743,16 @@ void QnTransactionMessageBus::removeConnectionFromPeer(const QUrl& url)
             qWarning() << "Disconnected from peer" << url;
             transport->setState(QnTransactionTransport::Error);
         }
+    }
+}
+
+void QnTransactionMessageBus::dropConnections()
+{
+    QMutexLocker lock(&m_mutex);
+    m_remoteUrls.clear();
+    foreach(const QnTransactionTransportPtr &transport, m_connections) {
+        qWarning() << "Disconnected from peer" << transport->remoteAddr();
+        transport->setState(QnTransactionTransport::Error);
     }
 }
 

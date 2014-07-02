@@ -76,6 +76,7 @@ QnResourcePoolModel::QnResourcePoolModel(Qn::NodeType rootNodeType, QObject *par
     connect(snapshotManager(),  &QnWorkbenchLayoutSnapshotManager::flagsChanged,    this,   &QnResourcePoolModel::at_snapshotManager_flagsChanged);
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged,   this,   &QnResourcePoolModel::at_accessController_permissionsChanged);
     connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourcePoolModel::at_context_userChanged, Qt::QueuedConnection);
+    connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourcePoolModel::at_commonModule_systemNameChanged);
 
     QnResourceList resources = resourcePool()->getResources(); 
 
@@ -233,7 +234,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
     }
 
     if (node->resourceFlags() & QnResource::videowall)
-        return m_rootNodes[m_rootNodeType];
+        return m_rootNodes[Qn::RootNode];
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
     if(!parentResource || (parentResource->flags() & QnResource::local_server) == QnResource::local_server) {
@@ -547,8 +548,15 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     if (!m_resourceNodeByResource.contains(resource))
         return;
 
-    delete m_resourceNodeByResource.take(resource);
+    QnResourcePoolModelNode *node = m_resourceNodeByResource.take(resource);
+    QnResourcePoolModelNode *parent = node->parent();
+
+    delete node;
+
+    if (parent)
+        parent->update();
 }
+
 
 void QnResourcePoolModel::at_context_userChanged() {
     m_rootNodes[Qn::LocalNode]->update();
@@ -648,4 +656,8 @@ void QnResourcePoolModel::at_camera_groupNameChanged(const QnSecurityCamResource
         recorder->m_displayName = camera->getGroupName();
         recorder->changeInternal();
     }
+}
+
+void QnResourcePoolModel::at_commonModule_systemNameChanged() {
+    m_rootNodes[Qn::ServersNode]->update();
 }

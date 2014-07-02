@@ -2,6 +2,7 @@
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/dummy_handler.h"
+#include "transaction/transaction_message_bus.h"
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
@@ -117,6 +118,11 @@ int QnConfigureRestHandler::changePort(int port) {
 }
 
 void QnConfigureRestHandler::resetConnections() {
+    if (qnTransactionBus) {
+        qDebug() << "Dropping connections";
+        qnTransactionBus->dropConnections();
+    }
+
     if (QnModuleFinder::instance())
         QnModuleFinder::instance()->makeModulesReappear();
 }

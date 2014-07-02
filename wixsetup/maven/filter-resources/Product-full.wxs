@@ -9,11 +9,15 @@
         <?include ControlPanel.wxi ?>
         <?include BuildVars.wxi ?>
 
+        <?define ProductName="${product.name}"?>
+        <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
+        <?define ClientRegPath="Software\${company.name}\$(var.ProductName)"?>
+
+        <!-- Add property to access from custom actions -->
+        <Property Id="ARCHITECTURE" Value="$(var.arch)" />
+        
         <Property Id="REINSTALLMODE" Value="amus"/>
         <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
-
-        <?define SourceDir="${libdir}/${arch}/bin/${build.configuration}"?>
-        <?define PluginsDir="${libdir}/${arch}/bin/${build.configuration}/plugins"?>
 
         <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
         <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
@@ -34,10 +38,10 @@
         <Property Id="INSTALL_SERVER" Secure="yes"/>
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
 
-
         <SetProperty Id="INSTALL_SERVER" Value="1" After="ResetPreselected" Sequence="ui">
             <![CDATA[ $(var.VmsInstalling) OR &ServerFeature = 3 OR !ServerFeature = 3 ]]>
         </SetProperty>
+        
         <SetProperty Id="INSTALL_CLIENT" Value="1" After="ResetPreselected" Sequence="ui">
             <![CDATA[ $(var.VmsInstalling) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
         </SetProperty>
@@ -50,45 +54,29 @@
         <Icon Id="icon_menu.exe" SourceFile="Binary\eve\eve_logo.ico"/>
         <Icon Id="icon_desktop.exe" SourceFile="Binary\eve\eve_logo.ico"/>
 
-        <!-- Add property to access from custom actions -->
-        <Property Id="ARCHITECTURE" Value="$(var.arch)" />
+        <!-- Disable restart manager as it causes installer to ask to stop services instead of doing this automatically -->
         <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
 
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Secure="yes" />
 
         <!-- Properties -->
-        <Property Id="WelcomeDlg_Title" Value="${product.name} Installer Setup" />
+        <Property Id="WelcomeDlg_Title" Value="$(var.ProductName) Installer Setup" />
 
         <Property Id="INSTALLTYPE" Secure="yes"/>
-
         <Property Id="BUSYPORT" Secure="yes"/>
 
-        <Property Id="MEDIASERVER_REGISTRY_PATH" Value="Software\${company.name}\${mediaserver.name}"/>
-
-        <Property Id="REMOVE_DATABASE" Secure="yes" Value="0"/>
-        <Property Id="VERSION_TO_RESTORE" Secure="yes" Value="Current"/>
-
+        <Property Id="MEDIASERVER_REGISTRY_PATH" Value="$(var.ServerRegPath)"/>
         <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
         <!-- MediaServer properties-->
 
         <Property Id="SYSTEM_NAME" Secure="yes">
-                        <RegistrySearch Id="SystemNameReg"
-                            Root="HKLM"
-                            Key="Software\${company.name}\${mediaserver.name}"
-                            Name="systemName"
-                            Type="raw"
-                            Win64="yes"/>
+            <RegistrySearch Id="SystemNameReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="systemName" Type="raw" Win64="yes"/>
         </Property>
         
         <Property Id="SERVER_PORT" Secure="yes">
-            <RegistrySearch Id="ServerEcsPortReg"
-                            Root="HKLM"
-                            Key="Software\${company.name}\${mediaserver.name}"
-                            Name="port"
-                            Type="raw"
-                            Win64="yes"/>
+            <RegistrySearch Id="ServerEcsPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
         </Property>
 
         <Property Id="SERVER_LOGIN" Value="admin"/>
@@ -97,14 +85,8 @@
 
 
         <!-- Client properties-->
-        <Property Id="CLIENT_VMS_MODE" Value="1"/>
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
-            <RegistrySearch Id="ClientDirectoryReg"
-                            Root="HKCU"
-                            Key="Software\[Manufacturer]\${product.name}"
-                            Name="mediaRoot"
-                            Type="raw"
-                            Win64="yes"/>
+            <RegistrySearch Id="ClientDirectoryReg" Root="HKCU" Key="$(var.ClientRegPath)" Name="mediaRoot" Type="raw" Win64="yes"/>
         </Property>
 
         <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
@@ -113,7 +95,6 @@
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="SetMoviesFolder" BinaryKey="CustomActions.dll" DllEntry="SetMoviesFolder" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
-        <CustomAction Id="CopyMediaServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyMediaServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
 
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
@@ -130,14 +111,11 @@
         <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="7001"/>
         <CustomAction Id="AssignClientPort" Property="CLIENT_PORT" Value="[SERVER_PORT]"/>
 
-        <CustomAction Id="SetClientFolderToDefault" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\${product.name} Client Media" />
+        <CustomAction Id="SetClientFolderToDefault" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\$(var.ProductName) Client Media" />
         <CustomAction Id="SetClientFolderToRegistry" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
 
-        <CustomAction Id="CopyMediaServerProfile_Cmd" Property="CopyMediaServerProfile" Execute="immediate" Impersonate="yes"
-            Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server;[System64Folder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server"/>
-
         <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
-                      Value="&quot;[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]${product.name} Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]$(var.ProductName) Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
@@ -150,10 +128,6 @@
             Schedule="afterInstallInitialize"
             DowngradeErrorMessage="!(loc.DowngradeWarningDlg_DowngradeWarning)"
             MigrateFeatures="yes" />
-
-        <!--        <Upgrade Id="${customization.clientUpgradeCode}">
-            <UpgradeVersion OnlyDetect='yes' Property='NEWERCLIENTINSTALLED' Minimum='${release.version}.${buildNumber}' IncludeMinimum='no' />
-        </Upgrade> -->
 
         <InstallUISequence>
             <Custom Action="ResetPreselected" After="MigrateFeatureStates">Installed AND Preselected</Custom>
@@ -177,27 +151,17 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <!--            <RemoveExistingProducts After="InstallFinalize"/>-->
-
-            <!--            <RemoveExistingProducts After="InstallInitialize" />-->
             <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">
                 <![CDATA[ NOT $(var.VmsInstalling) ]]>
             </Custom>
             <Custom Action="CloseAppLauncherAction" Before="StopServices">
                 <![CDATA[ NOT $(var.VmsInstalling) ]]>
             </Custom>
-
-            <Custom Action="CopyMediaServerProfile_Cmd" After="InstallFiles">
-                <![CDATA[ (INSTALL_SERVER OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="CopyMediaServerProfile" After="CopyMediaServerProfile_Cmd">
-                <![CDATA[ (INSTALL_SERVER OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
-
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
-
             <Directory Id="$(var.SystemFolderActual)">
                 <Directory Id="sysfoconfig" Name="config">
                     <Directory Id="sysfoprofile" Name="systemprofile">
@@ -223,12 +187,12 @@
             </Directory>
 
             <Directory Id="MyPicturesFolder">
-                <Directory Id="${customization}BgDir" Name="${product.name} Backgrounds"/>
+                <Directory Id="${customization}BgDir" Name="$(var.ProductName) Backgrounds"/>
             </Directory>
 
             <Directory Id="$(var.ProgramFilesFolder)">
                 <Directory Id="NetworkOptix" Name="${company.name}">
-                    <Directory Id="INSTALLDIR" Name="${product.name}"/>
+                    <Directory Id="INSTALLDIR" Name="$(var.ProductName)"/>
                 </Directory>
             </Directory>
 
@@ -325,7 +289,7 @@
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_SERVER" Value="{}" Order="1">INSTALLTYPE=2</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_CLIENT" Value="1" Order="1">INSTALLTYPE=2</Publish>
             
-            <Publish Dialog="InstallTypeDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)" Order="1">INSTALL_CLIENT</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)" Order="2">INSTALL_CLIENT</Publish>
 
             <?define SomeFeaturesSelected="(INSTALL_SERVER OR INSTALL_CLIENT)"?>         
 

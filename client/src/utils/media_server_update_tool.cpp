@@ -303,7 +303,7 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl() const {
         systemInformationList = QSet<QnSystemInformation>::fromList(m_idBySystemInformation.keys());
     }
 
-    query.addQueryItem(lit("client"), QnSystemInformation(lit(QN_APPLICATION_PLATFORM), lit(QN_APPLICATION_ARCH), lit(QN_ARM_BOX)).toString().replace(QLatin1Char(' '), QLatin1Char('_')));
+    query.addQueryItem(lit("client"), QnSystemInformation::currentSystemInformation().toString().replace(QLatin1Char(' '), QLatin1Char('_')));
     foreach (const QnSystemInformation &systemInformation, systemInformationList)
         query.addQueryItem(lit("server"), systemInformation.toString().replace(QLatin1Char(' '), QLatin1Char('_')));
 
@@ -412,13 +412,8 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
         return;
     }
 
-    QRegExp updateFileRegExp(lit("(?:client_){0,1}update_.+_.+_\\d+\\.\\d+\\.\\d+\\.\\d+\\.zip"));
-
     QStringList entries = dir.entryList(QStringList() << lit("*.zip"), QDir::Files);
     foreach (const QString &entry, entries) {
-        if (!updateFileRegExp.exactMatch(entry))
-            continue;
-
         QString fileName = dir.absoluteFilePath(entry);
         QnSoftwareVersion version;
         QnSystemInformation sysInfo;
@@ -488,9 +483,7 @@ void QnMediaServerUpdateTool::checkUpdateCoverage() {
             setCheckResult(UpdateImpossible);
             return;
         }
-        QnSoftwareVersion version = updateFileInformation->version;
-        if ((m_targetMustBeNewer && version > server->getVersion()) || (!m_targetMustBeNewer && version != server->getVersion()))
-            needUpdate = true;
+        needUpdate |= this->needUpdate(server->getVersion(), updateFileInformation->version);
     }
 
     if (!m_disableClientUpdates && !m_clientRequiresInstaller) {
@@ -506,6 +499,10 @@ void QnMediaServerUpdateTool::checkUpdateCoverage() {
 
     setCheckResult(needUpdate ? UpdateFound : NoNewerVersion);
     return;
+}
+
+bool QnMediaServerUpdateTool::needUpdate(const QnSoftwareVersion &version, const QnSoftwareVersion &updateVersion) const {
+    return (m_targetMustBeNewer && updateVersion > version) || (!m_targetMustBeNewer && updateVersion != version);
 }
 
 void QnMediaServerUpdateTool::at_updateReply_finished() {
@@ -626,6 +623,9 @@ void QnMediaServerUpdateTool::updateServers() {
             continue;
 
         if (!server->getSystemInfo().isValid())
+            continue;
+
+        if (!needUpdate(server->getVersion(), m_targetVersion))
             continue;
 
         QnId peerId = server->getId();

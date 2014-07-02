@@ -6,6 +6,12 @@
 class QnConfigurePeerTask : public QnNetworkPeerTask {
     Q_OBJECT
 public:
+    enum ErrorCode {
+        NoError = 0,
+        AuthentificationFailed,
+        UnknownError
+    };
+
     explicit QnConfigurePeerTask(QObject *parent = 0);
 
     QString systemName() const;
@@ -37,6 +43,7 @@ private:
     QString m_password;
     QByteArray m_passwordHash;
     QByteArray m_passwordDigest;
+    int m_error;
 
     QHash<int, QnId> m_pendingPeers;
     QSet<QnId> m_failedPeers;

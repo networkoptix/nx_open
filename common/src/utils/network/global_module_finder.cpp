@@ -10,7 +10,8 @@
 QnGlobalModuleFinder::QnGlobalModuleFinder(QObject *parent) :
     QObject(parent)
 {
-    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnGlobalModuleFinder::at_resourcePool_statusChanged);
+    connect(qnResPool,      &QnResourcePool::statusChanged,         this,       &QnGlobalModuleFinder::at_resourcePool_statusChanged);
+    connect(qnResPool,      &QnResourcePool::resourceRemoved,       this,       &QnGlobalModuleFinder::at_resourcePool_resourceRemoved);
 }
 
 void QnGlobalModuleFinder::setConnection(const ec2::AbstractECConnectionPtr &connection) {
@@ -97,6 +98,14 @@ void QnGlobalModuleFinder::at_moduleFinder_moduleLost(const QnModuleInformation 
 }
 
 void QnGlobalModuleFinder::at_resourcePool_statusChanged(const QnResourcePtr &resource) {
+    if (!resource->hasFlags(QnResource::server))
+        return;
+
+    if (resource->getStatus() != QnResource::Online)
+        removeAllModulesDiscoveredBy(resource->getId());
+}
+
+void QnGlobalModuleFinder::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
     if (!resource->hasFlags(QnResource::server))
         return;
 

@@ -1755,19 +1755,11 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
     if (!context()->user())
         return;
 
-    // Desktop_camera_{e87e9b3d-facf-4870-abef-455861829ed3}_admin
-    //TODO: #GDM #VW ask Roma to do some more stable way to find correct desktop camera
-    QRegExp desktopCameraNameRegExp(QString(lit("Desktop_camera_\\{.{36,36}\\}_%1")).arg(context()->user()->getName()));
     QnVirtualCameraResourcePtr desktopCamera;
 
-    foreach (const QnResourcePtr &resource, qnResPool->getAllCameras(QnResourcePtr())) {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera)
-            continue;
-        if (!desktopCameraNameRegExp.exactMatch(camera->getPhysicalId()))
-            continue;
-        desktopCamera = camera;
-        break;
+    foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::desktop_camera)) {
+        if (resource->getName() == context()->user()->getName())
+            desktopCamera = resource.dynamicCast<QnVirtualCameraResource>();    
     }
     if (!desktopCamera)
         return;

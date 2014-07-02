@@ -18,8 +18,6 @@
 #include <common/common_module.h>
 #include <media_server/serverutil.h>
 
-#include <version.h>
-
 namespace {
 
     const QString updatesDirSuffix = lit("mediaserver/updates");
@@ -195,21 +193,23 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
         return false;
     }
 
+    QnSystemInformation systemInformation = QnSystemInformation::currentSystemInformation();
+
     QString platform = map.value(lit("platform")).toString();
-    if (platform != lit(QN_APPLICATION_PLATFORM)) {
-        cl_log.log("Incompatible update: ", QN_APPLICATION_PLATFORM, " != ", platform, cl_logERROR);
+    if (platform != systemInformation.platform) {
+        cl_log.log("Incompatible update: ", systemInformation.platform, " != ", platform, cl_logERROR);
         return false;
     }
 
     QString arch = map.value(lit("arch")).toString();
-    if (arch != lit(QN_APPLICATION_ARCH)) {
-        cl_log.log("Incompatible update: ", QN_APPLICATION_ARCH, " != ", arch, cl_logERROR);
+    if (arch != systemInformation.arch) {
+        cl_log.log("Incompatible update: ", systemInformation.arch, " != ", arch, cl_logERROR);
         return false;
     }
 
     QString modification = map.value(lit("modification")).toString();
-    if (modification != lit(QN_ARM_BOX)) {
-        cl_log.log("Incompatible update: ", QN_ARM_BOX, " != ", modification, cl_logERROR);
+    if (modification != systemInformation.modification) {
+        cl_log.log("Incompatible update: ", systemInformation.modification, " != ", modification, cl_logERROR);
         return false;
     }
 
@@ -230,6 +230,16 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
         arguments.append(logFileName);
     else
         cl_log.log("Could not create or open update log file.", cl_logWARNING);
+
+    QFile executableFile(updateDir.absoluteFilePath(executable));
+    if (!executableFile.exists()) {
+        cl_log.log("The specified executable doesn't exists: ", executable, cl_logERROR);
+        return false;
+    }
+    if (!executableFile.permissions().testFlag(QFile::ExeOwner)) {
+        cl_log.log("The specified executable doesn't have an execute permission: ", executable, cl_logWARNING);
+        executableFile.setPermissions(executableFile.permissions() | QFile::ExeOwner);
+    }
 
     if (QProcess::startDetached(updateDir.absoluteFilePath(executable), arguments)) {
         cl_log.log("Update has been started.", cl_logINFO);

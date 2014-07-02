@@ -375,7 +375,7 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
         QnAbstractMediaDataPtr result;
         do {
             m_audioTranscoder->transcodePacket(md, &result);
-            if (result && result->data.size() > 0)
+            if (result && result->dataSize() > 0)
                 writeData(result, streamIndex);
             md.clear();
         } while (result);
@@ -384,7 +384,7 @@ bool QnStreamRecorder::saveData(QnConstAbstractMediaDataPtr md)
     {
         QnAbstractMediaDataPtr result;
         m_videoTranscoder->transcodePacket(md, &result);
-        if (result && result->data.size() > 0)
+        if (result && result->dataSize() > 0)
             writeData(result, streamIndex);
     }
     else {
@@ -418,8 +418,8 @@ void QnStreamRecorder::writeData(QnConstAbstractMediaDataPtr md, int streamIndex
 
     if(md->flags & AV_PKT_FLAG_KEY)
         avPkt.flags |= AV_PKT_FLAG_KEY;
-    avPkt.data = (quint8*) md->data.data();
-    avPkt.size = md->data.size();
+    avPkt.data = const_cast<quint8*>((const quint8*)md->data());    //const_cast is here because av_write_frame accepts non-const pointer, but does not modify object
+    avPkt.size = md->dataSize();
     avPkt.stream_index= streamIndex;
 
     if (av_write_frame(m_formatCtx, &avPkt) < 0) 

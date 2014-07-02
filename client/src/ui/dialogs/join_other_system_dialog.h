@@ -16,6 +16,10 @@ public:
 
     QUrl url() const;
     QString password() const;
+    void updateUi();
+
+private slots:
+    void at_urlComboBox_currentIndexChanged(int index);
 
 private:
     QScopedPointer<Ui::QnJoinOtherSystemDialog> ui;

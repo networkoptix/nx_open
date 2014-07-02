@@ -152,14 +152,14 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     if (!m_mtDecoding && !m_forcedMtDecoding)
         m_context->thread_count = 1;
 
-    if (m_forceSliceDecoding == -1 && data && data->data.data() && m_context->codec_id == CODEC_ID_H264) 
+    if (m_forceSliceDecoding == -1 && data && data->data() && m_context->codec_id == CODEC_ID_H264) 
     {
         m_forceSliceDecoding = 0;
         int nextSliceCnt = 0;
-        const quint8* curNal = (const quint8*) data->data.data();
+        const quint8* curNal = (const quint8*) data->data();
         if (curNal[0] == 0) 
         {
-            const quint8* end = curNal + data->data.size();
+            const quint8* end = curNal + data->dataSize();
             for(curNal = NALUnit::findNextNAL(curNal, end); curNal < end; curNal = NALUnit::findNextNAL(curNal, end))
             {
                 quint8 nalType = *curNal & 0x1f;
@@ -382,7 +382,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSha
             m_lightModeFrameCounter = 0;
         }
 
-        if ((m_decodeMode > DecodeMode_Full || (data->flags & QnAbstractMediaData::MediaFlags_Ignore)) && data->data.data())
+        if ((m_decodeMode > DecodeMode_Full || (data->flags & QnAbstractMediaData::MediaFlags_Ignore)) && data->data())
         {
 
             if (data->compressionType == CODEC_ID_MJPEG)
@@ -401,7 +401,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSha
             {
                 if (m_decodeMode == DecodeMode_Fastest)
                     return false;
-                else if (m_frameTypeExtractor->getFrameType((quint8*) data->data.data(), data->data.size()) == FrameTypeExtractor::B_Frame)
+                else if (m_frameTypeExtractor->getFrameType((quint8*) data->data(), data->dataSize()) == FrameTypeExtractor::B_Frame)
                     return false;
             }
         }
@@ -424,8 +424,8 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSha
 
         AVPacket avpkt;
         av_init_packet(&avpkt);
-        avpkt.data = (unsigned char*)data->data.data();
-        avpkt.size = data->data.size();
+        avpkt.data = (unsigned char*)data->data();
+        avpkt.size = data->dataSize();
         avpkt.dts = avpkt.pts = data->timestamp;
         // HACK for CorePNG to decode as normal PNG by default
         avpkt.flags = AV_PKT_FLAG_KEY;

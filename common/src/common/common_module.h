@@ -38,7 +38,7 @@ public:
     QUrl moduleUrl() const { return m_url; }
     void setModuleUlr(const QUrl& url) { m_url = url; }
 
-    void setLocalSystemName(const QString& value) { m_localSystemName = value; }
+    void setLocalSystemName(const QString& value);
     QString localSystemName() { return m_localSystemName; }
     QByteArray getSystemPassword() { return "{61D85D22-E7AA-44EC-B5EC-1BEAC9FE19C5}"; }
 
@@ -50,6 +50,9 @@ public:
 
     QnSoftwareVersion engineVersion() const;
     void setEngineVersion(const QnSoftwareVersion &version);
+
+signals:
+    void systemNameChanged(const QString &systemName);
 
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);

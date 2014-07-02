@@ -171,11 +171,23 @@ void QnServerUpdatesWidget::updateUi() {
         if (m_previousToolState == QnMediaServerUpdateTool::CheckingForUpdates) {
             switch (m_updateTool->updateCheckResult()) {
             case QnMediaServerUpdateTool::UpdateFound:
-                if (!m_updateTool->targetVersion().isNull() && !m_minimalMode) { // null version means we've got here first time after the dialog has been showed
+                if (!m_updateTool->targetVersion().isNull() && !m_minimalMode) {
+                    // null version means we've got here for the first time after the dialog has been showed
                     QString message = tr("Do you want to update your system to version %1?").arg(m_updateTool->targetVersion().toString());
                     if (m_updateTool->isClientRequiresInstaller()) {
-                        message += lit("\n");
+                        message += lit("\n\n");
                         message += tr("You will have to update the client manually using an installer.");
+                    }
+                    switch (QDateTime::currentDateTime().date().dayOfWeek()) {
+                    case Qt::Thursday:
+                    case Qt::Friday:
+                    case Qt::Saturday:
+                    case Qt::Sunday:
+                        message += lit("\n\n");
+                        message += tr("As a general rule for the sake of better support, we do not recommend to make system updates at the end of the week.");
+                        break;
+                    default:
+                        break;
                     }
                     startUpdate = QMessageBox::question(this, tr("Update is found"), message, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes;
                 }
@@ -288,6 +300,9 @@ void QnServerUpdatesWidget::updateUi() {
     ui->updateStateWidget->setVisible(applying);
     ui->progressIndicator->setVisible(infiniteProgress);
     ui->updateProgessBar->setVisible(!infiniteProgress);
+    ui->checkForUpdatesButton->setEnabled(!applying && !checkingForUpdates);
+    ui->installSpecificBuildButton->setEnabled(!applying && !checkingForUpdates);
+    ui->updateFromLocalSourceButton->setEnabled(!applying && !checkingForUpdates);
 
     m_previousToolState = m_updateTool->state();
 
