@@ -65,7 +65,7 @@ QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
 bool QnLayoutExportTool::start() {
     if (m_realFilename == QnLayoutFileStorageResource::removeProtocolPrefix(m_layout->getUrl())) {
         // can not override opened layout. save to tmp file, then rename
-        m_realFilename += QLatin1String(".tmp");
+        m_realFilename += lit(".tmp");
     }
 
 #ifdef Q_OS_WIN
@@ -89,7 +89,7 @@ bool QnLayoutExportTool::start() {
     m_storage = QnStorageResourcePtr(new QnLayoutFileStorageResource());
     m_storage->setUrl(fullName);
 
-    QIODevice* itemNamesIO = m_storage->open(QLatin1String("item_names.txt"), QIODevice::WriteOnly);
+    QIODevice* itemNamesIO = m_storage->open(lit("item_names.txt"), QIODevice::WriteOnly);
     QTextStream itemNames(itemNamesIO);
 
     QList<qint64> itemTimeZones;
@@ -105,7 +105,7 @@ bool QnLayoutExportTool::start() {
             continue;
 
         QnLayoutItemData localItem = item;
-        itemNames << resource->getName() << QLatin1String("\n");
+        itemNames << resource->getName() << lit("\n");
         QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
         if (mediaRes) {
             QString uniqueId = mediaRes->toResource()->getUniqueId();
@@ -127,10 +127,10 @@ bool QnLayoutExportTool::start() {
     itemNames.flush();
     delete itemNamesIO;
 
-    QIODevice* itemTimezonesIO = m_storage->open(QLatin1String("item_timezones.txt"), QIODevice::WriteOnly);
+    QIODevice* itemTimezonesIO = m_storage->open(lit("item_timezones.txt"), QIODevice::WriteOnly);
     QTextStream itemTimeZonesStream(itemTimezonesIO);
     foreach(qint64 timeZone, itemTimeZones)
-        itemTimeZonesStream << timeZone << QLatin1String("\n");
+        itemTimeZonesStream << timeZone << lit("\n");
     itemTimeZonesStream.flush();
     delete itemTimezonesIO;
 
@@ -141,15 +141,15 @@ bool QnLayoutExportTool::start() {
     QnBinary::serialize(layoutObject, &stream);
 
 
-    QIODevice* device = m_storage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
+    QIODevice* device = m_storage->open(lit("layout.pb"), QIODevice::WriteOnly);
     device->write(layoutData);
     delete device;
 
-    device = m_storage->open(QLatin1String("range.bin"), QIODevice::WriteOnly);
+    device = m_storage->open(lit("range.bin"), QIODevice::WriteOnly);
     device->write(m_period.serialize());
     delete device;
 
-    device = m_storage->open(QLatin1String("misc.bin"), QIODevice::WriteOnly);
+    device = m_storage->open(lit("misc.bin"), QIODevice::WriteOnly);
     quint32 flags = m_readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
 
     foreach (const QnMediaResourcePtr resource, m_resources) {
@@ -161,7 +161,7 @@ bool QnLayoutExportTool::start() {
     device->write((const char*) &flags, sizeof(flags));
     delete device;
 
-    device = m_storage->open(QLatin1String("uuid.bin"), QIODevice::WriteOnly);
+    device = m_storage->open(lit("uuid.bin"), QIODevice::WriteOnly);
     device->write(m_layout->getId().toByteArray());
     delete device;
 
@@ -170,7 +170,7 @@ bool QnLayoutExportTool::start() {
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
         QnCachingCameraDataLoader* loader = navigator()->loader(resource->toResourcePtr());
         if (loader) {
-            QIODevice* device = m_storage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).completeBaseName()), QIODevice::WriteOnly);
+            QIODevice* device = m_storage->open(lit("chunk_%1.bin").arg(QFileInfo(uniqId).completeBaseName()), QIODevice::WriteOnly);
             QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_period);
             QByteArray data;
             periods.encode(data);
@@ -314,7 +314,7 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     m_currentCamera->exportMediaPeriodToFile(m_period.startTimeMs * 1000ll,
                                     (m_period.startTimeMs + m_period.durationMs) * 1000ll,
                                     uniqId,
-                                    QLatin1String("mkv"),
+                                    lit("mkv"),
                                     m_storage,
                                     role,
                                     Qn::NoCorner,
@@ -350,7 +350,7 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
 
             QString uniqId = camera->resource()->toResource()->getUniqueId();
             uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?')+1)).completeBaseName(); // simplify name if export from existing layout
-            QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(uniqId);
+            QString motionFileName = lit("motion%1_%2.bin").arg(i).arg(uniqId);
             QIODevice* device = m_storage->open(motionFileName , QIODevice::WriteOnly);
 
             int retryCount = 0;
@@ -378,8 +378,7 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
     if (error) {
         m_errorMessage = tr("Could not export camera %1").arg(camera->resource()->toResource()->getName());
         finishExport(false);
-    }
-    else {
+    } else {
         exportNextCamera();
     }
 }

@@ -40,7 +40,7 @@ QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnId &resourceTyp
 }
 
 QString QnResourceDirectoryBrowser::manufacture() const {
-    return QLatin1String("DirectoryBrowser");
+    return lit("DirectoryBrowser");
 }
 
 QnResourceDirectoryBrowser &QnResourceDirectoryBrowser::instance() {
@@ -124,7 +124,7 @@ void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResou
 QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xfile) {
     QnLayoutFileStorageResource layoutStorage;
     layoutStorage.setUrl(xfile);
-    QIODevice* layoutFile = layoutStorage.open(QLatin1String("layout.pb"), QIODevice::ReadOnly);
+    QIODevice* layoutFile = layoutStorage.open(lit("layout.pb"), QIODevice::ReadOnly);
     if (layoutFile == 0)
         return QnLayoutResourcePtr();
     QByteArray layoutData = layoutFile->readAll();
@@ -143,7 +143,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         fromApiToResource(item, orderedItems.last());
     }
 
-    QIODevice *uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
+    QIODevice *uuidFile = layoutStorage.open(lit("uuid.bin"), QIODevice::ReadOnly);
     if (uuidFile) {
         QByteArray data = uuidFile->readAll();
         delete uuidFile;
@@ -155,14 +155,14 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         layout->setId(QUuid::createUuid());
     }
 
-    QIODevice* rangeFile = layoutStorage.open(QLatin1String("range.bin"), QIODevice::ReadOnly);
+    QIODevice* rangeFile = layoutStorage.open(lit("range.bin"), QIODevice::ReadOnly);
     if (rangeFile) {
         QByteArray data = rangeFile->readAll();
         delete rangeFile;
         layout->setLocalRange(QnTimePeriod().deserialize(data));
     }
 
-    QIODevice* miscFile = layoutStorage.open(QLatin1String("misc.bin"), QIODevice::ReadOnly);
+    QIODevice* miscFile = layoutStorage.open(lit("misc.bin"), QIODevice::ReadOnly);
     bool layoutWithCameras = false;
     if (miscFile) {
         QByteArray data = miscFile->readAll();
@@ -202,9 +202,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     //QnLayoutItemDataMap items = layout->getItems();
     QnLayoutItemDataMap updatedItems;
 
-    QIODevice *itemNamesIO = layoutStorage.open(QLatin1String("item_names.txt"), QIODevice::ReadOnly);
+    QIODevice *itemNamesIO = layoutStorage.open(lit("item_names.txt"), QIODevice::ReadOnly);
     QTextStream itemNames(itemNamesIO);
-    QIODevice *itemTimeZonesIO = layoutStorage.open(QLatin1String("item_timezones.txt"), QIODevice::ReadOnly);
+    QIODevice *itemTimeZonesIO = layoutStorage.open(lit("item_timezones.txt"), QIODevice::ReadOnly);
     QTextStream itemTimeZones(itemTimeZonesIO);
 
     // TODO: #Elric here is bad place to add resources to pool. need refactor
@@ -214,8 +214,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         QnLayoutItemData& item = items[i];
         QString path = item.resource.path;
         item.uuid = QUuid::createUuid();
-        if (!path.endsWith(QLatin1String(".mkv")))
-            item.resource.path += QLatin1String(".mkv");
+        if (!path.endsWith(lit(".mkv")))
+            item.resource.path += lit(".mkv");
         item.resource.path = QnLayoutFileStorageResource::updateNovParent(xfile,item.resource.path);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
@@ -243,7 +243,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
         for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel) {
             QString normMotionName = path.mid(path.lastIndexOf(L'?')+1);
-            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly);
+            QIODevice* motionIO = layoutStorage.open(lit("motion%1_%2.bin").arg(channel).arg(QFileInfo(normMotionName).completeBaseName()), QIODevice::ReadOnly);
             if (motionIO) {
                 Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;
