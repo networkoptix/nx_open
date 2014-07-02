@@ -5,8 +5,12 @@ import sys
 import argparse
 from datetime import datetime
 from datetime import timedelta
+from colorama import Fore, Back, Style, init
 
 def main():
+    # use Colorama to make Termcolor work on Windows too
+    init(autoreset=True)
+  
     parser = argparse.ArgumentParser()
     parser.add_argument('-a', '--all', action='store_true', help="show all branches (including valid)")
     args = parser.parse_args()
@@ -57,15 +61,15 @@ def main():
             
         if prevUser != branch['user']:
             if prevUser != '':
-                print '-------------------------------------------------------------------------------'
+                print '' #empty line
             prevUser = branch['user']
-            print prevUser
+            print Style.BRIGHT + prevUser
         output = str(branch['name']).ljust(40)
         if branch['inactive']:
-            output += '(INACTIVE)'
+            output = Style.BRIGHT + Fore.RED + output + '(INACTIVE)'
 
         if branch['age'] > tooOld:
-            output += '(TOO OLD: ' + str(branch['age'].days) + ' days)'
+            output = Style.BRIGHT + Fore.YELLOW + output + '(TOO OLD: ' + str(branch['age'].days) + ' days)'
         print output
 
 if __name__ == "__main__":

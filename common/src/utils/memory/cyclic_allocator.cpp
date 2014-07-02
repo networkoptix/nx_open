@@ -226,7 +226,7 @@ size_t CyclicAllocator::calcCurrentArenaBytesAvailable() const
     if( m_freeMemStart == m_leftMostAllocatedBlock )    //head == tail
         return m_allocatedBlockCount > 0
             ? 0                            //arena is full
-            : m_freeMemStart.arena->size;  //arena is empty
+            : (m_freeMemStart.arena->size - m_freeMemStart.pos);  //arena is empty
 
     return (m_freeMemStart.pos > m_leftMostAllocatedBlock.pos
                 ? m_freeMemStart.arena->size

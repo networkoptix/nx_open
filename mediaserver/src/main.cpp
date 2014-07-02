@@ -1623,7 +1623,13 @@ protected:
         
         m_main.reset(new QnMain(m_argc, m_argv));
 
-        return application()->exec();
+        int res = application()->exec();
+#ifdef Q_OS_WIN
+        // stop the service unexpectedly to let windows service management system restart it
+        HANDLE hProcess = GetCurrentProcess();
+        TerminateProcess(hProcess, ERROR_SERVICE_SPECIFIC_ERROR);
+#endif
+        return res;
     }
 
     virtual void start() override

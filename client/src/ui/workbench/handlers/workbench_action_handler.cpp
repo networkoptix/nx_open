@@ -2250,6 +2250,45 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         }
     }
 
+    /* Check that we are deleting online auto-found cameras */ 
+    QnResourceList onlineAutoFoundCameras;
+    foreach(const QnResourcePtr &resource, resources) {
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera ||
+            camera->getStatus() == QnResource::Offline || 
+            camera->isManuallyAdded())
+            continue;
+        okToDelete = false;
+        onlineAutoFoundCameras << camera;
+    }
+
+    if (!onlineAutoFoundCameras.isEmpty()) {
+        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+            mainWindow(),
+            onlineAutoFoundCameras,
+            tr("Delete Resources"),
+            tr("These %n cameras are auto-discovered.\n"\
+               "They may be auto-discovered again after removing.\n"\
+               "Are you sure you want to delete them",
+               "", onlineAutoFoundCameras.size()),   //TODO: #Elric #TR
+            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
+            );
+
+        switch (button) {
+        case QDialogButtonBox::No:
+            foreach(const QnResourcePtr &camera, onlineAutoFoundCameras)
+                resources.removeOne(camera);
+            break;
+        case QDialogButtonBox::Cancel:
+            return;
+        default:
+            break;
+        }           
+    }
+
+    if(resources.isEmpty())
+        return; /* Nothing to delete. */
+
     /* Ask if needed. */
     if(!okToDelete) {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
@@ -2273,7 +2312,15 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             }
         }
 
+        // if we are deleting an edge camera, also delete its server
+        QUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
+                                QnMediaServerResource::isEdgeServer(resource->getParentResource())
+            ? resource->getParentId()
+            : QUuid();
+
         connection2()->getResourceManager()->remove( resource->getId(), this, &QnWorkbenchActionHandler::at_resource_deleted );
+        if (!parentToDelete.isNull())
+            connection2()->getResourceManager()->remove(parentToDelete, this, &QnWorkbenchActionHandler::at_resource_deleted );
     }
 }
 

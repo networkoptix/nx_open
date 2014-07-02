@@ -1,9 +1,17 @@
 #include "log.h"
+#include <iomanip>
 #include <sstream>
 #include <QtCore/QTextStream>
 #include <QtCore/QThread>
 #include <QtCore/QDateTime>
 #include <QtCore/QLocale>
+
+#ifdef Q_OS_LINUX
+#   include <sys/types.h>
+#   include <linux/unistd.h>
+static pid_t gettid(void) { return syscall(__NR_gettid); }
+#endif
+
 
 const char *qn_logLevelNames[] = {"UNKNOWN", "ALWAYS", "ERROR", "WARNING", "INFO", "DEBUG", "DEBUG2"};
 const char UTF8_BOM[] = "\xEF\xBB\xBF";
@@ -66,6 +74,9 @@ public:
         std::ostringstream ostr;
         ostr << QLocale::c().toString(QDateTime::currentDateTime(), QLatin1String("ddd MMM d yy  hh:mm:ss.zzz")).toUtf8().data()
             << " Thread " << QByteArray::number((qint64)QThread::currentThread()->currentThreadId(), 16).data()
+#ifdef Q_OS_LINUX
+            << " ("<<std::setw(5)<<gettid()<<")"
+#endif
             << " (" << qn_logLevelNames[logLevel] << "): " << msg.toUtf8().data() << "\r\n";
         ostr.flush();
 

@@ -299,7 +299,10 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(resource->hasFlags(QnResource::user) || resource->hasFlags(QnResource::videowall))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(QnResource::remote_server) || resource->hasFlags(QnResource::live_cam)) // TODO: #Elric move this to permissions.
+        if(resource->hasFlags(QnResource::live_cam))
+            continue; /* OK to remove. */
+
+        if(resource->hasFlags(QnResource::remote_server)) // TODO: #Elric move this to permissions.
             if(resource->getStatus() == QnResource::Offline)
                 continue; /* Can remove only if offline. */
 
