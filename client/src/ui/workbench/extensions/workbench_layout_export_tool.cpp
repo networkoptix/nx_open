@@ -89,8 +89,8 @@ bool QnLayoutExportTool::start() {
     m_storage = QnStorageResourcePtr(new QnLayoutFileStorageResource());
     m_storage->setUrl(fullName);
 
-    QIODevice* itemNamesIO = m_storage->open(lit("item_names.txt"), QIODevice::WriteOnly);
-    QTextStream itemNames(itemNamesIO);
+    QScopedPointer<QIODevice> itemNamesIO(m_storage->open(lit("item_names.txt"), QIODevice::WriteOnly));
+    QTextStream itemNames(itemNamesIO.data());
 
     QList<qint64> itemTimeZones;
 
@@ -125,14 +125,14 @@ bool QnLayoutExportTool::start() {
     m_layout->setItems(items);
 
     itemNames.flush();
-    delete itemNamesIO;
+    itemNamesIO.reset();
 
-    QIODevice* itemTimezonesIO = m_storage->open(lit("item_timezones.txt"), QIODevice::WriteOnly);
-    QTextStream itemTimeZonesStream(itemTimezonesIO);
+    QScopedPointer<QIODevice> itemTimezonesIO(m_storage->open(lit("item_timezones.txt"), QIODevice::WriteOnly));
+    QTextStream itemTimeZonesStream(itemTimezonesIO.data());
     foreach(qint64 timeZone, itemTimeZones)
         itemTimeZonesStream << timeZone << lit("\n");
     itemTimeZonesStream.flush();
-    delete itemTimezonesIO;
+    itemTimezonesIO.reset();
 
     QByteArray layoutData;
     ec2::ApiLayoutData layoutObject;
@@ -141,41 +141,39 @@ bool QnLayoutExportTool::start() {
     QnBinary::serialize(layoutObject, &stream);
 
 
-    QIODevice* device = m_storage->open(lit("layout.pb"), QIODevice::WriteOnly);
-    device->write(layoutData);
-    delete device;
+    QScopedPointer<QIODevice> layoutsFile(m_storage->open(lit("layout.pb"), QIODevice::WriteOnly));
+    layoutsFile->write(layoutData);
+    layoutsFile.reset();
 
-    device = m_storage->open(lit("range.bin"), QIODevice::WriteOnly);
-    device->write(m_period.serialize());
-    delete device;
+    QScopedPointer<QIODevice> rangeFile(m_storage->open(lit("range.bin"), QIODevice::WriteOnly));
+    rangeFile->write(m_period.serialize());
+    rangeFile.reset();
 
-    device = m_storage->open(lit("misc.bin"), QIODevice::WriteOnly);
+    QScopedPointer<QIODevice> miscFile(m_storage->open(lit("misc.bin"), QIODevice::WriteOnly));
     quint32 flags = m_readOnly ? QnLayoutFileStorageResource::ReadOnly : 0;
-
     foreach (const QnMediaResourcePtr resource, m_resources) {
         if (resource->toResource()->hasFlags(QnResource::utc)) {
             flags |= QnLayoutFileStorageResource::ContainsCameras;
             break;
         }
     }
-    device->write((const char*) &flags, sizeof(flags));
-    delete device;
+    miscFile->write((const char*) &flags, sizeof(flags));
+    miscFile.reset();
 
-    device = m_storage->open(lit("uuid.bin"), QIODevice::WriteOnly);
-    device->write(m_layout->getId().toByteArray());
-    delete device;
+    QScopedPointer<QIODevice> uuidFile(m_storage->open(lit("uuid.bin"), QIODevice::WriteOnly));
+    uuidFile->write(m_layout->getId().toByteArray());
+    uuidFile.reset();
 
     foreach (const QnMediaResourcePtr resource, m_resources) {
         QString uniqId = resource->toResource()->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
         QnCachingCameraDataLoader* loader = navigator()->loader(resource->toResourcePtr());
         if (loader) {
-            QIODevice* device = m_storage->open(lit("chunk_%1.bin").arg(QFileInfo(uniqId).completeBaseName()), QIODevice::WriteOnly);
+            QScopedPointer<QIODevice> chunkFile(m_storage->open(lit("chunk_%1.bin").arg(QFileInfo(uniqId).completeBaseName()), QIODevice::WriteOnly));
             QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(m_period);
             QByteArray data;
             periods.encode(data);
-            device->write(data);
-            delete device;
+            chunkFile->write(data);
         }
     }
 
@@ -190,9 +188,8 @@ bool QnLayoutExportTool::start() {
 
         QImage background(cache->getFullPath(m_layout->backgroundImageFilename()));
         if (!background.isNull()) {
-            device = m_storage->open(m_layout->backgroundImageFilename(), QIODevice::WriteOnly);
-            background.save(device, "png");
-            delete device;
+            QScopedPointer<QIODevice> imageFile(m_storage->open(m_layout->backgroundImageFilename(), QIODevice::WriteOnly));
+            background.save(imageFile.data(), "png");
 
             QnLocalFileCache localCache;
             localCache.storeImage(m_layout->backgroundImageFilename(), background);
