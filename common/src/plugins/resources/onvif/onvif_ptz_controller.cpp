@@ -142,7 +142,7 @@ Qn::PtzCapabilities QnOnvifPtzController::initMove() {
             m_limits.maxPan = spaces->AbsolutePanTiltPositionSpace[0]->XRange->Max;
             nodeCapabilities |= Qn::AbsolutePanCapability;
         }
-        if(spaces->AbsolutePanTiltPositionSpace[1]->YRange) {
+        if(spaces->AbsolutePanTiltPositionSpace[0]->YRange) {
             m_limits.minTilt = spaces->AbsolutePanTiltPositionSpace[0]->YRange->Min;
             m_limits.maxTilt = spaces->AbsolutePanTiltPositionSpace[0]->YRange->Max;
             nodeCapabilities |= Qn::AbsoluteTiltCapability;
