@@ -53,8 +53,16 @@ namespace {
 
         }
 
+        bool doCopyArchiveLength() const {
+            return m_archiveCheckbox->isChecked();
+        }
+
         virtual void init(QWidget* parent) override {
             m_parentPalette = parent->palette();
+
+            m_archiveCheckbox = new QCheckBox(parent);
+            m_archiveCheckbox->setText(tr("Copy archive length settings"));
+            parent->layout()->addWidget(m_archiveCheckbox);
 
             m_licensesLabel = new QLabel(parent);
             parent->layout()->addWidget(m_licensesLabel);
@@ -124,6 +132,7 @@ namespace {
         QLabel* m_licensesLabel;
         QLabel* m_motionLabel;
         QLabel* m_dtsLabel;
+        QCheckBox *m_archiveCheckbox;
         QPalette m_parentPalette;
 
         bool m_recordingEnabled;
@@ -896,21 +905,25 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
     bool dualStreamingUsed = motionUsed && hasDualStreamingMotionOnGrid();
 
     QScopedPointer<QnResourceSelectionDialog> dialog(new QnResourceSelectionDialog(this));
-    dialog->setDelegate(new QnExportScheduleResourceSelectionDialogDelegate(this, recordingEnabled, motionUsed, dualStreamingUsed));
+    auto dialogDelegate = new QnExportScheduleResourceSelectionDialogDelegate(this, recordingEnabled, motionUsed, dualStreamingUsed);
+    dialog->setDelegate(dialogDelegate);
     dialog->setSelectedResources(m_cameras);
     setHelpTopic(dialog.data(), Qn::CameraSettings_Recording_Export_Help);
     if (dialog->exec() != QDialog::Accepted)
         return;
 
+    const bool copyArchiveLength = dialogDelegate->doCopyArchiveLength();
     QnVirtualCameraResourceList cameras = dialog->selectedResources().filtered<QnVirtualCameraResource>();
     foreach(QnVirtualCameraResourcePtr camera, cameras) 
     {
-        int maxDays = maxRecordedDays();
-        if (maxDays != RecordedDaysDontChange)
-            camera->setMaxDays(maxDays);
-        int minDays = minRecordedDays();
-        if (minDays != RecordedDaysDontChange)
-            camera->setMinDays(minDays);
+        if (copyArchiveLength) {
+            int maxDays = maxRecordedDays();
+            if (maxDays != RecordedDaysDontChange)
+                camera->setMaxDays(maxDays);
+            int minDays = minRecordedDays();
+            if (minDays != RecordedDaysDontChange)
+                camera->setMinDays(minDays);
+        }
 
         camera->setScheduleDisabled(!recordingEnabled);
         if (recordingEnabled){
