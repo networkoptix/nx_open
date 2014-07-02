@@ -63,6 +63,7 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnResourcePtr& camera)
 {
+#if 0
 #ifdef EDGE_SERVER
     // return own camera back for edge server
     char  mac[MAC_ADDR_LEN];
@@ -70,6 +71,7 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnResourcePtr
     getMacFromPrimaryIF(mac, &host);
     if (camera->getUniqueId().toLocal8Bit() == QByteArray(mac))
         return true;
+#endif
 #endif
 
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
