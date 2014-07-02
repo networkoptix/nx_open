@@ -132,8 +132,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             }
         }
 
-        QnSecurityCamResourcePtr camRes = newNetRes.dynamicCast<QnSecurityCamResource>();
-        if (camRes && camRes->needCheckIpConflicts())
+        QnSecurityCamResourcePtr newCamRes = newNetRes.dynamicCast<QnSecurityCamResource>();
+        if (newCamRes && newCamRes->needCheckIpConflicts())
         {
             // do not count 2--N channels of multichannel cameras as conflict
             quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
@@ -143,16 +143,28 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || rpResource->hasFlags(QnResource::foreigner))
         {
-            QnVirtualCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnVirtualCameraResource>();
-            if (cameraResource)
+            QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
+            if (existCamRes)
             {
-                cameraResource->setParentId(qnCommon->moduleGUID());
+                existCamRes->setParentId(qnCommon->moduleGUID());
+                existCamRes->setFlags(existCamRes->flags() & ~QnResource::foreigner);
+
+                if (existCamRes->getTypeId() != newNetRes->getTypeId()) {
+                    QnId newTypeId = newNetRes->getTypeId();
+                    newNetRes->update(existCamRes);
+                    newNetRes->setTypeId(newTypeId);
+                    qnResPool->removeResource(existCamRes);
+                    qnResPool->addResource(newCamRes);
+                    existCamRes = newCamRes;
+                }
+                
                 QByteArray errorString;
                 QnVirtualCameraResourceList cameras;
                 ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
-                const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+                const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( existCamRes, &cameras );
                 if( errorCode != ec2::ErrorCode::ok )
                     NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+                    
             }
 
         }
