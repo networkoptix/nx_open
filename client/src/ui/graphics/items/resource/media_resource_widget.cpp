@@ -868,7 +868,14 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 
     QString timeString;
     if (m_resource->toResource()->flags() & QnResource::utc) { /* Do not show time for regular media files. */
-        qint64 utcTime = m_renderer->getTimestampOfNextFrameToRender(0) / 1000;
+
+        // get timestamp from the first channel that was painted
+        int channel = std::distance(m_paintedChannels.cbegin(),
+            std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
+        if (channel >= channelCount())
+            channel = 0;
+
+        qint64 utcTime = m_renderer->getTimestampOfNextFrameToRender(channel) / 1000;
         if(qnSettings->timeMode() == Qn::ServerTimeMode)
             utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
 
