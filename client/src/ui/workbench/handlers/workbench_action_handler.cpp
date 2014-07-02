@@ -2273,7 +2273,15 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             }
         }
 
+        // if we are deleting an edge camera, also delete its server
+        QUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
+                                QnMediaServerResource::isEdgeServer(resource->getParentResource())
+            ? resource->getParentId()
+            : QUuid();
+
         connection2()->getResourceManager()->remove( resource->getId(), this, &QnWorkbenchActionHandler::at_resource_deleted );
+        if (!parentToDelete.isNull())
+            connection2()->getResourceManager()->remove(parentToDelete, this, &QnWorkbenchActionHandler::at_resource_deleted );
     }
 }
 
