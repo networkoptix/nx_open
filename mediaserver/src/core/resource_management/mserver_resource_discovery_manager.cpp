@@ -155,7 +155,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     newNetRes->setTypeId(newTypeId);
                     qnResPool->removeResource(existCamRes);
                     qnResPool->addResource(newCamRes);
-                    existCamRes = newCamRes;
+                    rpNetRes = existCamRes = newCamRes;
                 }
                 
                 QByteArray errorString;
