@@ -2,7 +2,10 @@
 #define __AVI_ARCHIVE_DELEGATE_H
 
 #include <QSharedPointer>
+
 #include "../abstract_archive_delegate.h"
+#include "core/datapacket/audio_data_packet.h"
+#include "core/datapacket/video_data_packet.h"
 
 extern "C"
 {

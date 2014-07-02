@@ -143,7 +143,7 @@ void TimerManager::run()
 {
     QMutexLocker lk( &m_impl->mtx );
 
-    cl_log.log( lit("TimerManager started"), cl_logDEBUG1 );
+    NX_LOG( lit("TimerManager started"), cl_logDEBUG1 );
 
     while( !m_impl->terminated )
     {
@@ -175,11 +175,11 @@ void TimerManager::run()
                 }
                 catch( const std::exception& e )
                 {
-                    cl_log.log( lit("TimerManager. Error. Exception in %1:%2. %3").arg(QLatin1String(__FILE__)).arg(__LINE__).arg(QLatin1String(e.what())), cl_logERROR );
+                    NX_LOG( lit("TimerManager. Error. Exception in %1:%2. %3").arg(QLatin1String(__FILE__)).arg(__LINE__).arg(QLatin1String(e.what())), cl_logERROR );
                 }
                 catch( ... )
                 {
-                    cl_log.log( lit("TimerManager. Unknown exception in %1:%2").arg(QLatin1String(__FILE__)).arg(__LINE__), cl_logERROR );
+                    NX_LOG( lit("TimerManager. Unknown exception in %1:%2").arg(QLatin1String(__FILE__)).arg(__LINE__), cl_logERROR );
                 }
 
                 lk.relock();
@@ -201,11 +201,11 @@ void TimerManager::run()
         }
         catch( exception& e )
         {
-            cl_log.log( lit("TimerManager. Error. Exception in %1:%2. %3").arg(QLatin1String(__FILE__)).arg(__LINE__).arg(QLatin1String(e.what())), cl_logERROR );
+            NX_LOG( lit("TimerManager. Error. Exception in %1:%2. %3").arg(QLatin1String(__FILE__)).arg(__LINE__).arg(QLatin1String(e.what())), cl_logERROR );
         }
 
         m_impl->cond.wait( lk.mutex(), ERROR_SKIP_TIMEOUT_MS );
     }
 
-    cl_log.log( lit("TimerManager stopped"), cl_logDEBUG1 );
+    NX_LOG( lit("TimerManager stopped"), cl_logDEBUG1 );
 }

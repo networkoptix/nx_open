@@ -19,8 +19,8 @@ namespace ec2
     template<class QueryProcessorType>
     QnMediaServerManager<QueryProcessorType>::QnMediaServerManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
     :
-        m_queryProcessor( queryProcessor ),
-        m_resCtx( resCtx )
+        QnMediaServerNotificationManager( resCtx ),
+        m_queryProcessor( queryProcessor )
     {
     }
 
@@ -36,7 +36,7 @@ namespace ec2
             handler->done( reqID, errorCode, outData);
         };
         m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiMediaServerDataList, decltype(queryDoneHandler)> (
-            ApiCommand::getMediaServerList, nullptr, queryDoneHandler);
+            ApiCommand::getMediaServers, nullptr, queryDoneHandler);
         return reqID;
     }
 

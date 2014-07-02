@@ -207,6 +207,7 @@ void StreamReader::gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame )
     //creating video packet
 
     m_videoPacket.reset( new ILPVideoPacket(
+        &m_allocator,
         0,
         QDateTime::currentMSecsSinceEpoch() * USEC_IN_MS,
         nxcip::MediaDataPacket::fKeyPacket,

@@ -210,7 +210,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
         return m_rootNodes[Qn::ServersNode];
 
     if (node->resourceFlags() & QnResource::videowall)
-        return m_rootNodes[m_rootNodeType];
+        return m_rootNodes[Qn::RootNode];
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
     if(!parentResource || (parentResource->flags() & QnResource::local_server) == QnResource::local_server) {
@@ -537,7 +537,10 @@ void QnResourcePoolModel::at_context_userChanged() {
 }
 
 void QnResourcePoolModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
-    QnResourcePoolModelNode *node = this->node(resource);
+    QnVideoWallResourcePtr videowall = resource->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
+    QnResourcePoolModelNode *node = videowall 
+        ? this->node(videowall)
+        : this->node(resource);
 
     node->setModified(snapshotManager()->isModified(resource));
     node->update();

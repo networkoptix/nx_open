@@ -34,7 +34,7 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_recActionCnt(0),
     m_secondaryQuality(Qn::SSQualityMedium),
     m_cameraControlDisabled(false),
-    m_statusFlags(0),
+    m_statusFlags(Qn::CSF_NoFlags),
     m_scheduleDisabled(true),
     m_audioEnabled(false),
     m_advancedWorking(false),
@@ -55,11 +55,11 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     // TODO: #AK this is a wrong place for this connect call.
     // You should listen to changes in resource pool instead.
-    if(QnBusinessEventConnector::instance()) {
+    //TODO: #Elric didn't get it. How resource pool connected to relay input event on camera?
+    if(QnBusinessEventConnector::instance())
         connect(
-            this, SIGNAL(cameraInput(QnResourcePtr, const QString&, bool, qint64)), 
-            QnBusinessEventConnector::instance(), SLOT(at_cameraInput(QnResourcePtr, const QString&, bool, qint64)) );
-    }
+            this, &QnSecurityCamResource::cameraInput, 
+            QnBusinessEventConnector::instance(), &QnBusinessEventConnector::at_cameraInput );
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
@@ -244,33 +244,38 @@ bool QnSecurityCamResource::hasDualStreaming2() const {
     return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse;
 }
 
+static const QString HAS_DUAL_STREAMING_PARAM_NAME = lit("hasDualStreaming");
+static const QString DTS_PARAM_NAME = lit("dts");
+static const QString ANALOG_PARAM_NAME = lit("analog");
+static const QString STREAM_FPS_SHARING_PARAM_NAME = lit("streamFpsSharing");
+
 bool QnSecurityCamResource::hasDualStreaming() const {
     QVariant val;
-    if (!getParam(lit("hasDualStreaming"), val, QnDomainMemory))
+    if (!getParam(HAS_DUAL_STREAMING_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
 }
 
 bool QnSecurityCamResource::isDtsBased() const {
     QVariant val;
-    if (!getParam(lit("dts"), val, QnDomainMemory))
+    if (!getParam(DTS_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
 }
 
 bool QnSecurityCamResource::isAnalog() const {
     QVariant val;
-    if (!getParam(lit("analog"), val, QnDomainMemory))
+    if (!getParam(ANALOG_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
     QVariant val;
-    if (!getParam(lit("streamFpsSharing"), val, QnDomainMemory))
+    if (!getParam(STREAM_FPS_SHARING_PARAM_NAME, val, QnDomainMemory))
         return defaultStreamFpsSharingMethod;
 
-    QString sval = val.toString();
+    const QString& sval = val.toString();
     if (sval == lit("shareFps"))
         return Qn::BasicFpsSharing;
     if (sval == lit("noSharing"))
@@ -280,14 +285,18 @@ Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
 
 void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value) 
 {
-    QString strVal;
-    if (value == Qn::BasicFpsSharing)
-        strVal = lit("shareFps");
-    else if (value == Qn::NoFpsSharing)
-        strVal = lit("noSharing");
-    else
-        strVal = lit("sharePixels");
-    setParam(lit("streamFpsSharing"), strVal, QnDomainDatabase);
+    switch( value )
+    {
+        case Qn::BasicFpsSharing:
+            setParam(STREAM_FPS_SHARING_PARAM_NAME, lit("shareFps"), QnDomainDatabase);
+            break;
+        case Qn::NoFpsSharing:
+            setParam(STREAM_FPS_SHARING_PARAM_NAME, lit("noSharing"), QnDomainDatabase);
+            break;
+        default:
+            setParam(STREAM_FPS_SHARING_PARAM_NAME, lit("sharePixels"), QnDomainDatabase);
+            break;
+    }
 }
 
 QStringList QnSecurityCamResource::getRelayOutputList() const {
@@ -616,23 +625,24 @@ Qn::StreamQuality QnSecurityCamResource::getSecondaryStreamQuality() const {
         return Qn::QualityNormal;
 }
 
-QnSecurityCamResource::StatusFlags QnSecurityCamResource::statusFlags() const {
+Qn::CameraStatusFlags QnSecurityCamResource::statusFlags() const {
     return m_statusFlags;
 }
 
-bool QnSecurityCamResource::hasStatusFlags(StatusFlags value) const {
+bool QnSecurityCamResource::hasStatusFlags(Qn::CameraStatusFlag value) const
+{
     return m_statusFlags & value;
 }
 
-void QnSecurityCamResource::setStatusFlags(StatusFlags value) {
+void QnSecurityCamResource::setStatusFlags(Qn::CameraStatusFlags value) {
     m_statusFlags = value;
 }
 
-void QnSecurityCamResource::addStatusFlags(StatusFlags value) {
+void QnSecurityCamResource::addStatusFlags(Qn::CameraStatusFlag value) {
     m_statusFlags |= value;
 }
 
-void QnSecurityCamResource::removeStatusFlags(StatusFlags value) {
+void QnSecurityCamResource::removeStatusFlags(Qn::CameraStatusFlag value) {
     m_statusFlags &= ~value;
 }
 
@@ -656,7 +666,7 @@ QnTimePeriodList QnSecurityCamResource::getDtsTimePeriodsByMotionRegion(
 }
 
 bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &source) {
-    QnSecurityCamResourcePtr camera = source.dynamicCast<QnSecurityCamResource>();
+    QnSecurityCamResource* camera = dynamic_cast<QnSecurityCamResource*>(source.data());
     if (!camera)
         return false;
 

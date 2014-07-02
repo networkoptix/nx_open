@@ -8,6 +8,7 @@ extern "C"
 
 #include <QtCore/QWaitCondition>
 #include "abstract_archive_stream_reader.h"
+#include "core/datapacket/audio_data_packet.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "playbackmask_helper.h"
@@ -19,7 +20,7 @@ class QnArchiveStreamReader : public QnAbstractArchiveReader
     Q_OBJECT;
 
 public:
-    QnArchiveStreamReader(QnResourcePtr dev);
+    QnArchiveStreamReader(const QnResourcePtr& dev);
     virtual ~QnArchiveStreamReader();
 
     virtual bool isSkippingFrames() const;
@@ -184,7 +185,7 @@ private:
     qint64 determineDisplayTime(bool reverseMode);
     void internalJumpTo(qint64 mksec);
     bool getNextVideoPacket();
-    void addAudioChannel(QnCompressedAudioDataPtr audio);
+    void addAudioChannel(const QnCompressedAudioDataPtr& audio);
     QnAbstractMediaDataPtr getNextPacket();
     void channeljumpToUnsync(qint64 mksec, int channel, qint64 skipTime);
     void setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast);

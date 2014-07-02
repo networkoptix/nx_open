@@ -494,7 +494,7 @@ QByteArray CLSimpleHTTPClient::basicAuth() const
     return basicAuth(m_auth);
 }
 
-QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url)
+QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url, bool isProxy)
 {
     QString HA1= auth.user() + QLatin1Char(':') + realm + QLatin1Char(':') + auth.password();
     HA1 = QString::fromLatin1(QCryptographicHash::hash(HA1.toLatin1(), QCryptographicHash::Md5).toHex().constData());
@@ -510,8 +510,9 @@ QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QStri
     QString result;
     QTextStream str(&result);
 
-    str << "Authorization: Digest username=\"" << auth.user() << "\", realm=\"" << realm << 
-                             "\", nonce=\"" << nonce << "\", uri=\"" << url << "\", response=\"" << response << "\"\r\n";
+    str << (isProxy ? "Proxy-Authorization" : "Authorization") <<
+        ": Digest username=\"" << auth.user() << "\", realm=\"" << realm << 
+        "\", nonce=\"" << nonce << "\", uri=\"" << url << "\", response=\"" << response << "\"\r\n";
 
     return result;
 

@@ -21,6 +21,7 @@
 
     <properties>
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
+        <timestamp>${angle}-${webkit}-20140625.timestamp</timestamp>
         <appserver.name>Enterprise Controller</appserver.name>
         <appserver2.name>${company.name} New Enterprise Controller</appserver2.name>
         <client.name>${company.name} ${product.name} Client</client.name>
@@ -38,10 +39,18 @@
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
         <beta>true</beta>
+        <!-- compile.option1. See profile no-webkit -->
+        <webkit>true</webkit>
+		<!-- compile.option2. See profile angle  -->
+        <angle>false</angle>
         <box/>
 
-        <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
         <root.dir>${basedir}</root.dir>
+		<compile.option1>-webkit</compile.option1>
+		<compile.option2></compile.option2>
+		<compile.option3></compile.option3>
+        <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
+
         <libdir>${root.dir}/build_environment/target</libdir>        
         <ClientHelpSourceDir>${environment.dir}/help/2.2.0/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
@@ -149,7 +158,7 @@
                 </executions>
                 <configuration>
                     <doCheck>false</doCheck>
-                    <doUpdate>update</doUpdate>
+                    <doUpdate>true</doUpdate>
                 </configuration>
             </plugin>       
             <plugin>
@@ -207,7 +216,7 @@
             <activation>        
                 <file>
                     <!-- the dumb activator does not recognize variables so I cannot put libdir here -->
-                    <missing>build_environment/target/buildenv20140603.timestamp</missing>
+                    <missing>build_environment/target/${timestamp}</missing>
                 </file> 
             </activation>
             <modules>   
@@ -289,11 +298,11 @@
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
                 <module>client</module>                     
-                <!-- <module>wixsetup/wixsetup-full</module> -->
-                <module>wixsetup/wixsetup-client-only</module>
+                <module>wixsetup/wixsetup-full</module>
+                <!-- <module>wixsetup/wixsetup-client-only</module> -->
             </modules>
             <properties>
-                <qt.dir>${environment.dir}/qt5webkit/qtbase-${arch}</qt.dir>
+                <qt.dir>${libdir}/${arch}</qt.dir>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>                
@@ -321,6 +330,7 @@
                 <init.python.dir>${environment.dir}/python/bin</init.python.dir>                
                 <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
+				<qt.dir>${libdir}</qt.dir>
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
@@ -339,6 +349,7 @@
             <properties>            
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
+				<qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -356,6 +367,7 @@
                 <additional.compiler>clang</additional.compiler>
                 <arch>x64</arch>
                 <qt.spec>macx-clang-libc++</qt.spec>
+                <qt.classifier>${platform}-${arch}</qt.classifier>
             </properties>
             <modules>
                 <module>macsetup/client-dmg</module>
@@ -396,7 +408,8 @@
             </activation>
             <properties>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-                <qt.dir>${environment.dir}/qt5/qtbase-${arch}-${toolchain.version}</qt.dir>
+				<qt.classifier>${platform}-${arch}-${box}</qt.classifier>
+				<compile.option1></compile.option1>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
                 <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
@@ -566,17 +579,29 @@
         <profile>
             <id>no-webkit</id>
             <activation>
-                <os>
-                    <family>Windows</family>
-                </os>
                 <property>
                     <name>webkit</name>
                     <value>false</value>
                 </property>                
             </activation>
             <properties>
-                <qt.dir>${environment.dir}/qt5/qtbase-${arch}</qt.dir>
+                <compile.option1></compile.option1>
             </properties>
-        </profile>          
+        </profile>      
+        <profile>
+            <id>angle</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>angle</name>
+                    <value>true</value>
+                </property>                
+            </activation>
+            <properties>
+                <compile.option2>-angle</compile.option2>
+            </properties>
+        </profile>  		
     </profiles> 
 </project>

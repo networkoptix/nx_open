@@ -31,11 +31,14 @@ struct QnParamType;
 typedef QSharedPointer<QnParamType> QnParamTypePtr;
 
 class QnVideoWallControlMessage;
+struct QnVideowallInstanceStatus;
 
 class QnLayoutItemData;
 
 // -->
 
+
+class QnResourceFactory;
 
 class QnResource;
 typedef QnSharedResourcePointer<QnResource> QnResourcePtr;

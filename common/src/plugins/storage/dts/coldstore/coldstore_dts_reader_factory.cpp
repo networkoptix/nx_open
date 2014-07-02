@@ -12,7 +12,7 @@ QnColdstoreDTSreaderFactory::~QnColdstoreDTSreaderFactory()
 
 }
 
-QnAbstractArchiveDelegate* QnColdstoreDTSreaderFactory::createDeligate(QnResourcePtr res)
+QnAbstractArchiveDelegate* QnColdstoreDTSreaderFactory::createDeligate(const QnResourcePtr& res)
 {
     Q_UNUSED(res)
     return new QnColdStoreDelegate(QHostAddress(getDtsID()));

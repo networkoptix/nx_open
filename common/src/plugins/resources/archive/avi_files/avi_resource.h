@@ -19,10 +19,10 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
     virtual QString toString() const;
 
-    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) override;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const override;
 
-    void setStorage(QnStorageResourcePtr);
+    void setStorage(const QnStorageResourcePtr&);
     QnStorageResourcePtr getStorage() const;
 
     void setMotionBuffer(const QnMetaDataLightVector& data, int channel);

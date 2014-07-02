@@ -18,9 +18,9 @@ QnDesktopDataProviderWrapper::~QnDesktopDataProviderWrapper()
     m_owner->beforeDestroyDataProvider(this);
 }
 
-void QnDesktopDataProviderWrapper::putData(QnAbstractDataPacketPtr data)
+void QnDesktopDataProviderWrapper::putData(const QnAbstractDataPacketPtr& data)
 {
-    QnAbstractMediaDataPtr media  = data.dynamicCast<QnAbstractMediaData>();
+    const QnAbstractMediaData* media  = dynamic_cast<QnAbstractMediaData*>(data.data());
     if (!media)
         return;
 
@@ -69,7 +69,7 @@ QnDesktopDataProviderWrapper::QnDesktopDataProviderWrapper(QnResourcePtr res, Qn
     QnAbstractMediaStreamDataProvider(res),
     QnAbstractDataConsumer(100) { Q_UNUSED(owner) }
 QnDesktopDataProviderWrapper::~QnDesktopDataProviderWrapper(){}
-void QnDesktopDataProviderWrapper::putData(QnAbstractDataPacketPtr data) {Q_UNUSED(data)}
+void QnDesktopDataProviderWrapper::putData(const QnAbstractDataPacketPtr &data) {Q_UNUSED(data)}
 void QnDesktopDataProviderWrapper::start(Priority priority) {Q_UNUSED(priority)}
 bool QnDesktopDataProviderWrapper::isInitialized() const { return false; }
 QString QnDesktopDataProviderWrapper::lastErrorStr() const { return QString(); }

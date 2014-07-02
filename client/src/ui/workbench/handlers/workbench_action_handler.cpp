@@ -262,7 +262,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::PingAction),                             SIGNAL(triggered()),    this,   SLOT(at_pingAction_triggered()));
     connect(action(Qn::ServerLogsAction),                       SIGNAL(triggered()),    this,   SLOT(at_serverLogsAction_triggered()));
     connect(action(Qn::ServerIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_serverIssuesAction_triggered()));
-    connect(action(Qn::YouTubeUploadAction),                    SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
     connect(action(Qn::OpenInFolderAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInFolderAction_triggered()));
     connect(action(Qn::DeleteFromDiskAction),                   SIGNAL(triggered()),    this,   SLOT(at_deleteFromDiskAction_triggered()));
     connect(action(Qn::RemoveLayoutItemAction),                 SIGNAL(triggered()),    this,   SLOT(at_removeLayoutItemAction_triggered()));
@@ -828,12 +827,18 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
+    if (qnSettings->isVideoWallMode())
+        return;
+
     m_mainMenu = menu()->newMenu(Qn::MainScope, mainWindow());
 
     action(Qn::MainMenuAction)->setMenu(m_mainMenu.data());
 }
 
 void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
+    if (qnSettings->isVideoWallMode())
+        return;
+
     m_currentUserLayoutsMenu = menu()->newMenu(Qn::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
 
     action(Qn::OpenCurrentUserLayoutMenu)->setMenu(m_currentUserLayoutsMenu.data());
@@ -1270,7 +1275,8 @@ void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
         tr("Don't notify again about this update."),
         &ignoreThisVersion,
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Ok
+        QDialogButtonBox::Ok,
+        QDialogButtonBox::Cancel
     );
 
     if(ignoreThisVersion != thisVersionWasIgnored)
@@ -1286,7 +1292,6 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
 
     QScopedPointer<QnLayoutSettingsDialog> dialog(new QnLayoutSettingsDialog(mainWindow()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->setWindowTitle(tr("Layout Settings"));
     dialog->readFromResource(layout);
 
     bool backgroundWasEmpty = layout->backgroundImageFilename().isEmpty();
@@ -1585,10 +1590,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
             return;
         }
     }
-
-
-
-    QnAppServerConnectionFactory::setDefaultMediaProxyPort(connectionInfo->proxyPort);
 
     QnSessionManager::instance()->stop();
 
@@ -2094,16 +2095,6 @@ void QnWorkbenchActionHandler::at_pingAction_triggered() {
 
 }
 
-void QnWorkbenchActionHandler::at_youtubeUploadAction_triggered() {
-    /* QnResourcePtr resource = menu()->currentParameters(sender()).resource();
-    if(resource.isNull())
-        return;
-
-    QScopedPointer<YouTubeUploadDialog> dialog(new YouTubeUploadDialog(context(), resource, widget()));
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec(); */
-}
-
 void QnWorkbenchActionHandler::at_openInFolderAction_triggered() {
     QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(resource.isNull())
@@ -2259,6 +2250,45 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         }
     }
 
+    /* Check that we are deleting online auto-found cameras */ 
+    QnResourceList onlineAutoFoundCameras;
+    foreach(const QnResourcePtr &resource, resources) {
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera ||
+            camera->getStatus() == QnResource::Offline || 
+            camera->isManuallyAdded())
+            continue;
+        okToDelete = false;
+        onlineAutoFoundCameras << camera;
+    }
+
+    if (!onlineAutoFoundCameras.isEmpty()) {
+        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+            mainWindow(),
+            onlineAutoFoundCameras,
+            tr("Delete Resources"),
+            tr("These %n cameras are auto-discovered.\n"\
+               "They may be auto-discovered again after removing.\n"\
+               "Are you sure you want to delete them",
+               "", onlineAutoFoundCameras.size()),   //TODO: #Elric #TR
+            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
+            );
+
+        switch (button) {
+        case QDialogButtonBox::No:
+            foreach(const QnResourcePtr &camera, onlineAutoFoundCameras)
+                resources.removeOne(camera);
+            break;
+        case QDialogButtonBox::Cancel:
+            return;
+        default:
+            break;
+        }           
+    }
+
+    if(resources.isEmpty())
+        return; /* Nothing to delete. */
+
     /* Ask if needed. */
     if(!okToDelete) {
         QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
@@ -2282,7 +2312,15 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             }
         }
 
+        // if we are deleting an edge camera, also delete its server
+        QUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
+                                QnMediaServerResource::isEdgeServer(resource->getParentResource())
+            ? resource->getParentId()
+            : QUuid();
+
         connection2()->getResourceManager()->remove( resource->getId(), this, &QnWorkbenchActionHandler::at_resource_deleted );
+        if (!parentToDelete.isNull())
+            connection2()->getResourceManager()->remove(parentToDelete, this, &QnWorkbenchActionHandler::at_resource_deleted );
     }
 }
 

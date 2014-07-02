@@ -31,7 +31,7 @@ public:
     static QnAbstractMediaDataPtr readStreamReader( nxcip::StreamReader* streamReader );
 
     //!Overrides QnLiveStreamProvider::onGotVideoFrame()
-    virtual void onGotVideoFrame(QnCompressedVideoDataPtr videoData) override;
+    virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData) override;
     //!Overrides QnLiveStreamProvider::updateSoftwareMotion()
     virtual void updateSoftwareMotion() override;
 
@@ -46,6 +46,8 @@ protected:
     virtual void updateStreamParamsBasedOnFps() override;
 
     virtual void pleaseStop() override;
+    virtual void beforeRun() override;
+    virtual void afterRun() override;
 
     //!Overrides QnLiveStreamProvider::roleForMotionEstimation()
     virtual QnResource::ConnectionRole roleForMotionEstimation() override;

@@ -15,7 +15,7 @@ static const int STARDOT_SEI_TRIGGER_DATA = 0x0a03;
 static const QByteArray STARDOT_MOTION_UUID = QByteArray::fromHex("bed9b7e0f06032a1bb7e7d4c6d82d249");
 
 
-QnStardotStreamReader::QnStardotStreamReader(QnResourcePtr res):
+QnStardotStreamReader::QnStardotStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
     m_multiCodec(res)
 {
@@ -129,10 +129,10 @@ QnConstResourceAudioLayoutPtr QnStardotStreamReader::getDPAudioLayout() const
 
 // motion estimation
 
-void QnStardotStreamReader::parseMotionInfo(QnCompressedVideoDataPtr videoData)
+void QnStardotStreamReader::parseMotionInfo(const QnCompressedVideoDataPtr& videoData)
 {
-    const quint8* curNal = (const quint8*) videoData->data.data();
-    const quint8* end = curNal + videoData->data.size();
+    const quint8* curNal = (const quint8*) videoData->data();
+    const quint8* end = curNal + videoData->dataSize();
     curNal = NALUnit::findNextNAL(curNal, end);
     //int prefixSize = 3;
     //if (end - curNal >= 4 && curNal[2] == 0)
@@ -172,7 +172,7 @@ void QnStardotStreamReader::processMotionBinData(const quint8* data, qint64 time
     }
 
     // rotate source data to 90 degree and scale it from 16x16 to 44x32. Destination data stored in native byte order instead of network order
-    quint32* dst = (quint32*) m_lastMetadata->data.data();
+    quint32* dst = (quint32*) m_lastMetadata->m_data.data();
     quint32 dstMask = 0xc0000000;
     for (int y = 0; y < 16; ++y)
     {
@@ -196,7 +196,7 @@ QnMetaDataV1Ptr QnStardotStreamReader::getCameraMetadata()
 {
     QnMetaDataV1Ptr rez;
     if (m_lastMetadata) {
-        quint32* dst = (quint32*) m_lastMetadata->data.data();
+        quint32* dst = (quint32*) m_lastMetadata->m_data.data();
         for (int i = 0; i < MD_WIDTH; ++i)
             dst[i] = htonl(dst[i]);
         const simd128i* mask = m_stardotRes->getMotionMaskBinData();

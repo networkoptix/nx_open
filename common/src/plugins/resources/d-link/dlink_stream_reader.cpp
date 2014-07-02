@@ -1,7 +1,10 @@
 #ifdef ENABLE_DLINK
 
 #include "dlink_stream_reader.h"
+
 #include <QtCore/QTextStream>
+
+#include "core/datapacket/video_data_packet.h"
 #include "dlink_resource.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
@@ -31,7 +34,7 @@ struct ACS_VideoHeader
 
 #pragma pack(pop)
 
-PlDlinkStreamReader::PlDlinkStreamReader(QnResourcePtr res):
+PlDlinkStreamReader::PlDlinkStreamReader(const QnResourcePtr& res):
 CLServerPushStreamReader(res),
 m_rtpReader(res),
 mHttpClient(0),
@@ -401,10 +404,10 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(CodecID ci)
     int dataLeft = vh->ulDataLength;//qMin(vh->ulDataLength, (quint32)1024*1024*10); // to avoid crash
 
 
-    QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, dataLeft+FF_INPUT_BUFFER_PADDING_SIZE));
-    char* curPtr = videoData->data.data();
-    videoData->data.startWriting(dataLeft); // this call does nothing 
-    videoData->data.finishWriting(dataLeft);
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, dataLeft+FF_INPUT_BUFFER_PADDING_SIZE));
+    char* curPtr = videoData->m_data.data();
+    videoData->m_data.startWriting(dataLeft); // this call does nothing 
+    videoData->m_data.finishWriting(dataLeft);
 
     while (dataLeft > 0)
     {
@@ -459,12 +462,12 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
     int contentLen = getIntParam(contentLenPtr + 16);
     contentLen = qMin(contentLen, 10*1024*1024); // to avoid crash if camera is crazy
 
-    QnCompressedVideoDataPtr videoData(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, contentLen+FF_INPUT_BUFFER_PADDING_SIZE));
-    videoData->data.write(realHeaderEnd+4, headerBufferEnd - (realHeaderEnd+4));
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, contentLen+FF_INPUT_BUFFER_PADDING_SIZE));
+    videoData->m_data.write(realHeaderEnd+4, headerBufferEnd - (realHeaderEnd+4));
 
-    int dataLeft = contentLen - videoData->data.size();
-    char* curPtr = videoData->data.data() + videoData->data.size();
-    videoData->data.finishWriting(dataLeft);
+    int dataLeft = contentLen - videoData->dataSize();
+    char* curPtr = videoData->m_data.data() + videoData->m_data.size();
+    videoData->m_data.finishWriting(dataLeft);
 
     while (dataLeft > 0)
     {
@@ -476,7 +479,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
     }
     // sometime 1 more bytes in the buffer end. Looks like it is a DLink bug caused by 16-bit word alignment
     if (contentLen > 2 && !(curPtr[-2] == (char)0xff && curPtr[-1] == (char)0xd9))
-        videoData->data.finishWriting(-1);
+        videoData->m_data.finishWriting(-1);
 
     videoData->compressionType = CODEC_ID_MJPEG;
     videoData->width = 1920;

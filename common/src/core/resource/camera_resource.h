@@ -7,8 +7,6 @@
 
 #include "nx_ec/impl/ec_api_impl.h"
 #include "security_cam_resource.h"
-#include "utils/fusion/fusion_fwd.h"
-#include "utils/serialization/json.h"
 #include <utils/common/model_functions_fwd.h>
 
 

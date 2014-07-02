@@ -176,6 +176,7 @@ QnMediaServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() c
 
 void QnSingleCameraSettingsWidget::at_authenticationRequired(QNetworkReply* /*reply*/, QAuthenticator * authenticator)
 {
+    QMutexLocker locker(&m_cameraMutex);
     if (!m_camera)
         return;
     authenticator->setUser(m_camera->getAuth().user());
@@ -184,6 +185,7 @@ void QnSingleCameraSettingsWidget::at_authenticationRequired(QNetworkReply* /*re
 
 void QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired ( const QNetworkProxy & , QAuthenticator * authenticator)
 {    
+    QMutexLocker locker(&m_cameraMutex);
     if (!m_camera)
         return;
     QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
@@ -448,6 +450,7 @@ void QnSingleCameraSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &c
         disconnect(m_camera, NULL, this, NULL);
     }
 
+    QMutexLocker locker(&m_cameraMutex);
     m_camera = camera;
     d->setCameras(QnVirtualCameraResourceList() << camera);
 

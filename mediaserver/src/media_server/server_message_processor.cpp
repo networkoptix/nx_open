@@ -13,8 +13,10 @@
 #include "settings.h"
 
 
-QnServerMessageProcessor::QnServerMessageProcessor():
-        base_type()
+QnServerMessageProcessor::QnServerMessageProcessor()
+:
+    base_type(),
+    m_serverPort( MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT, nx_ms_conf::DEFAULT_RTSP_PORT).toInt() )
 {
 
 }
@@ -88,10 +90,10 @@ void QnServerMessageProcessor::removeIPList(const QnId& id)
 void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceById(serverGuid()).dynamicCast<QnMediaServerResource>();
 
-    bool isServer = resource.dynamicCast<QnMediaServerResource>();
-    bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
-    bool isUser = resource.dynamicCast<QnUserResource>();
-    bool isVideowall = resource.dynamicCast<QnVideoWallResource>();
+    const bool isServer = dynamic_cast<const QnMediaServerResource*>(resource.data()) != nullptr;
+    const bool isCamera = dynamic_cast<const QnVirtualCameraResource*>(resource.data()) != nullptr;
+    const bool isUser = dynamic_cast<const QnUserResource*>(resource.data()) != nullptr;
+    const bool isVideowall = dynamic_cast<const QnVideoWallResource*>(resource.data()) != nullptr;
 
     if (!isServer && !isCamera && !isUser && !isVideowall)
         return;
@@ -112,7 +114,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
         }
         // update all known IP list
         if (needProxyToCamera) {
-            QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
+            const QnVirtualCameraResource* camRes = dynamic_cast<const QnVirtualCameraResource*>(resource.data());
             updateAllIPList(camRes->getId(), camRes->getHostAddress());
         }
     }
@@ -122,7 +124,7 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
         if (resource->getId() != ownMediaServer->getId()) {
             resource->addFlags( QnResource::foreigner );
             // update all known IP list
-            updateAllIPList(resource->getId(), resource.dynamicCast<QnMediaServerResource>()->getNetAddrList());
+            updateAllIPList(resource->getId(), dynamic_cast<const QnMediaServerResource*>(resource.data())->getNetAddrList());
         }
     }
 
@@ -150,7 +152,7 @@ void QnServerMessageProcessor::afterRemovingResource(const QnId& id)
     removeIPList(id);
 }
 
-void QnServerMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
+void QnServerMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnServerMessageProcessor::at_remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnServerMessageProcessor::at_remotePeerLost );
@@ -176,7 +178,7 @@ bool QnServerMessageProcessor::isKnownAddr(const QString& addr) const
 
 void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool /*isProxy*/)
 {
-    QnResourcePtr res = qnResPool->getResourceById(data.peerId);
+    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
     if (res)
         res->setStatus(QnResource::Online);
 
@@ -184,10 +186,10 @@ void QnServerMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bo
 
 void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool /*isProxy*/)
 {
-    QnResourcePtr res = qnResPool->getResourceById(data.peerId);
+    QnResourcePtr res = qnResPool->getResourceById(data.peer.id);
     if (res) {
         res->setStatus(QnResource::Offline);
-        if (data.peerType != ec2::QnPeerInfo::Server) {
+        if (data.peer.peerType != Qn::PT_Server) {
             // This media server hasn't own DB
             foreach(QnResourcePtr camera, qnResPool->getAllCameras(res))
                 camera->setStatus(QnResource::Offline);
@@ -199,19 +201,16 @@ void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     resource->setStatus(status, true);
 }
 
-bool QnServerMessageProcessor::isProxy(void* opaque, const QUrl& url) {
-    return static_cast<QnServerMessageProcessor*> (opaque)->isProxy(url);
-}
-
 bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
 {
     if (addr == "localhost" || addr == "127.0.0.1")
         return true;
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
-    if (mServer) 
+    if( !m_mServer )
+        m_mServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
+    if (m_mServer) 
     {
         QHostAddress hostAddr(addr);
-        foreach(const QHostAddress& serverAddr, mServer->getNetAddrList())
+        foreach(const QHostAddress& serverAddr, m_mServer->getNetAddrList())
         {
             if (hostAddr == serverAddr)
                 return true;
@@ -220,21 +219,26 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     return false;
 }
 
-bool QnServerMessageProcessor::isProxy(const QUrl& url) {
-    if (isKnownAddr(url.host()))
-        return true; // it's camera or other media server address
-    
-    int port = url.port( nx_http::DEFAULT_HTTP_PORT );
-    if (port > 0) {
-        int serverPort = MSSettings::roSettings()->value("rtspPort", MSSettings::DEFAUT_RTSP_PORT).toInt();
-        if (port != serverPort && isLocalAddress(url.host()))
-            return true; // proxy to some local service
+bool QnServerMessageProcessor::isProxy(const nx_http::Request& request) const
+{
+    const nx_http::BufferType& desiredServerGuid = nx_http::getHeaderValue( request.headers, "x-server-guid" );
+    nx_http::HttpHeaders::const_iterator xServerGuidIter = request.headers.find( "x-server-guid" );
+    if( xServerGuidIter != request.headers.end() )
+    {
+        const QByteArray& localServerGUID = qnCommon->moduleGUID().toByteArray();
+        return desiredServerGuid != localServerGUID;
     }
-    
-    return false;
+
+    const QString& urlHost = request.requestLine.url.host();
+    const int port = request.requestLine.url.port( nx_http::DEFAULT_HTTP_PORT );
+    const bool _isLocalAddress = isLocalAddress(urlHost);
+    if (_isLocalAddress)
+        return port != m_serverPort; //if false, request addressed to us. If true, proxing to some local service
+
+    return isKnownAddr(urlHost); // is it camera or other media server address?
 }
 
-void QnServerMessageProcessor::execBusinessActionInternal(QnAbstractBusinessActionPtr action) {
+void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) {
     qnBusinessMessageBus->at_actionReceived(action);
 }
 

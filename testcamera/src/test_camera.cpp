@@ -97,6 +97,23 @@ void QnTestCamera::setOfflineFreq(double offlineFreq)
     m_offlineFreq = offlineFreq;
 }
 
+int QnTestCamera::sendAll(AbstractStreamSocket* socket, const void* data, int size) {
+    qWarning() << "sendAll: " << size;
+    int sent = 0, sentTotal = 0;
+    while (sentTotal < size) {
+        sent = socket->send(data + sentTotal, size - sentTotal);
+        if (sent < 1) {
+            qWarning() << "TCP socket write error for camera " << m_mac << "send" << sent << "of" << size;
+            break;
+        }
+
+        sentTotal += sent;
+        qWarning() << "SENT: " << sent << ", TOTAL: " << sentTotal;
+    }
+
+    return sentTotal == size;
+}
+
 bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, AbstractStreamSocket* socket, int fps)
 {
     double streamingTime = 0;
@@ -124,10 +141,17 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, Abstrac
             codec |= 0xc000;
             codec = htons(codec);
 
-            socket->send(&codec, 2);
-            socket->send(&packetLen, 4);
+            if (!sendAll(socket, &codec, 2)) {
+                return false;
+            }
 
-            int sended = socket->send(byteArray.data(), byteArray.size());
+            if (!sendAll(socket, &packetLen, 4)) {
+                return false;
+            }
+
+            if (!sendAll(socket, byteArray.data(), byteArray.size())) {
+                return false;
+            }
         }
 
         quint32 packetLen = htonl(video->data.size());
@@ -136,13 +160,15 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, Abstrac
             codec |= 0x8000;
         codec = htons(codec);
 
-        socket->send(&codec, 2);
-        socket->send(&packetLen, 4);
+        if (!sendAll(socket, &codec, 2)) {
+            return false;
+        }
 
-        int sended = socket->send(video->data.data(), video->data.size());
-        if (sended != video->data.size())
-        {
-            qWarning() << "TCP socket write error for camera " << m_mac << "send" << sended << "of" << video->data.size();
+        if (sendAll(socket, &packetLen, 4)) {
+            return false;
+        }
+
+        if (sendAll(socket, video->data.data(), video->data.size())) {
             return false;
         }
 

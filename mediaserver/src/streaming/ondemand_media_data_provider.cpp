@@ -53,7 +53,7 @@ bool OnDemandMediaDataProvider::canAcceptData() const
     return m_dataQueue.size() < MAX_DATA_QUEUE_SIZE;
 }
 
-void OnDemandMediaDataProvider::putData( QnAbstractDataPacketPtr data )
+void OnDemandMediaDataProvider::putData( const QnAbstractDataPacketPtr& data )
 {
     bool dataBecameAvailable = false;
     {

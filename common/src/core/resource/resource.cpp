@@ -91,23 +91,36 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
-{
+void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
     Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
-    m_id = other->m_id; //TODO: #Elric this is WRONG!!!!!!!!!11111111
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
-    
-    m_tags = other->m_tags;
-    m_url = other->m_url;
-    m_flags = other->m_flags;
-    m_name = other->m_name;
-    m_parentId = other->m_parentId;
 
+    m_tags = other->m_tags;
+
+    if (m_url != other->m_url) {
+        m_url = other->m_url;
+        modifiedFields << "urlChanged";
+    }
+
+    if (m_flags != other->m_flags) {
+        m_flags = other->m_flags;    
+        modifiedFields << "flagsChanged";
+    }
+
+    if (m_name != other->m_name) {
+        m_name = other->m_name;
+        modifiedFields << "nameChanged";
+    }
+
+    if (m_parentId != other->m_parentId) {
+        m_parentId = other->m_parentId;
+        modifiedFields << "parentIdChanged";
+    }
 }
 
-void QnResource::update(QnResourcePtr other, bool silenceMode)
+void QnResource::update(const QnResourcePtr& other, bool silenceMode)
 {
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->beforeUpdate();
@@ -132,6 +145,11 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         {
             setParam(param.name(), param.value(), QnDomainDatabase);
         }
+    }
+
+    //silently ignoring missing properties because of removeProperty method lack
+    for (const QnKvPair &param: other->getProperties()) {
+        setProperty(param.name(), param.value());   //here "propertyChanged" will be called
     }
 
     foreach (QnResourceConsumer *consumer, m_consumers)
@@ -313,13 +331,14 @@ bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*
 bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) const
 {
     const QnParamList& resourceParamList = getResourceParamList();
-    if (!resourceParamList.contains(name))
+    QnParamList::const_iterator paramIter = resourceParamList.find( name );
+    if ( paramIter == resourceParamList.cend() )
     {
         emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
         return false;
     }
 
-    const QnParam& param = resourceParamList[name];
+    const QnParam& param = paramIter.value();
     val = param.value();
 
     if (domain == QnDomainMemory)
@@ -386,7 +405,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     QnParam param = m_resourceParamList[name];
     if (param.isReadOnly())
     {
-        cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
+        NX_LOG("setParam: cannot set readonly param!", cl_logWARNING);
         m_mutex.unlock();
         emit asyncParamSetDone(toSharedPointer(this), name, val, false);
         return false;
@@ -785,7 +804,7 @@ void QnResource::stopCommandProc()
     QnResourceCommandProcessor_instance()->stop();
 }
 
-void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
+void QnResource::addCommandToProc(const QnAbstractDataPacketPtr& data)
 {
     QnResourceCommandProcessor_instance()->putData(data);
 }

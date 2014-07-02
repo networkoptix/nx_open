@@ -10,6 +10,8 @@
 
 #include "named_pipe_socket_win32.h"
 
+#pragma comment(lib, "advapi32.lib")
+
 
 ////////////////////////////////////////////////////////////
 //// class NamedPipeServerImpl

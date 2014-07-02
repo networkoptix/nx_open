@@ -42,6 +42,9 @@ public:
 
     virtual bool isTakeSockOwnership() const { return false; }
     void releaseSocket();
+
+    int redirectTo(const QByteArray& page, QByteArray& contentType);
+
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
@@ -51,7 +54,7 @@ protected:
     //inline void bufferData(const QByteArray& data) { bufferData(data.constData(), data.size()); }
     //void clearBuffer();
 
-    void sendResponse(const QByteArray& transport, int code, const QByteArray& contentType, const QByteArray& contentEncoding = QByteArray(), bool displayDebug = false);
+    void sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding = QByteArray(), bool displayDebug = false);
     QString codeToMessage(int code);
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);

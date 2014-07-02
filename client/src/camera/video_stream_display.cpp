@@ -324,7 +324,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
 
     m_mtx.lock();
 
-    QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1,0));
+    QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1,0));
     while (dec->decode(emptyData, &tmpFrame)) 
     {
         calcSampleAR(outFrame, dec);
@@ -519,7 +519,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if ((data->flags & AV_REVERSE_BLOCK_START) && m_decodeMode != QnAbstractVideoDecoder::DecodeMode_Fastest)
     {
-        QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1,0));
+        QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1,0));
         QSharedPointer<CLVideoDecoderOutput> tmpOutFrame( new CLVideoDecoderOutput() );
         while (dec->decode(emptyData, &tmpOutFrame)) 
         {

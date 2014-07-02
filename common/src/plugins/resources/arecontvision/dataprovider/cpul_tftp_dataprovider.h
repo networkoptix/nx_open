@@ -14,7 +14,7 @@ class QnAbstractMediaDataPacket;
 class AVClientPullSSTFTPStreamreader : public QnPlAVClinetPullStreamReader
 {
 public:
-    explicit AVClientPullSSTFTPStreamreader(QnResourcePtr res);
+    explicit AVClientPullSSTFTPStreamreader(const QnResourcePtr& res);
 
     ~AVClientPullSSTFTPStreamreader();
 

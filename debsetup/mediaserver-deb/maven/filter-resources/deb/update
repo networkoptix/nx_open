@@ -1,6 +1,0 @@
-{
-    "version" : "${release.version}.${buildNumber}",
-    "platform" : "${platform}",
-    "arch" : "${arch}",
-    "executable" : "install.sh"
-}

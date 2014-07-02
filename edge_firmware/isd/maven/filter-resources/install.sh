@@ -1,11 +1,12 @@
 #!/bin/bash
 
-DISTRIB=${deb.customization.company.name}-mediaserver-${release.version}.${buildNumber}-${arch}-${build.configuration}-beta.deb
+COMPANY_NAME=${deb.customization.company.name}
+DISTRIB=$COMPANY_NAME-mediaserver-${release.version}.${buildNumber}-${box}-${build.configuration}-beta
 
 function update () {
-    /etc/init.d/S99networkoptix-mediaserver stop
-    tar xfv networkoptix-hdwitness-mediaserver-2.3.0.0-isd_s2.tar.gza -C /
-    /etc/init.d/S99networkoptix-mediaserver start
+    /etc/init.d/S99$COMPANY_NAME-mediaserver stop
+    tar xfv $DISTRIB.tar.gz -C /
+    /etc/init.d/S99$COMPANY_NAME-mediaserver start
 }
 
 if [ "$1" != "" ]

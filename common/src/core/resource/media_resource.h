@@ -13,7 +13,6 @@ class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 class MediaStreamCache;
-class MediaIndex;
 
 namespace Qn {
 
@@ -40,8 +39,8 @@ public:
     virtual QImage getImage(int channel, QDateTime time, Qn::StreamQuality quality) const;
 
     // resource can use DataProvider for addition info (optional)
-    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0);
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0);
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider = 0) const;
 
     void setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLayout);
 
@@ -55,12 +54,15 @@ public:
 
     /** Name of the resource property key intended for the CustomAspectRatio value storage. */
     static QString customAspectRatioKey();
+    /** Name of the resource property to disable secondary recorder */
+    static QString dontRecordSecondaryStreamKey();
+    static QString rtpTransportKey();
 protected:
     void initMediaResource();
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);
 
 protected:
-    QnCustomResourceVideoLayoutPtr m_customVideoLayout;
+    mutable QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     QnMediaDewarpingParams m_dewarpingParams;
 };
 

@@ -1044,6 +1044,7 @@ INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES (
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '619','ISDcam',NULL,'10' );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '620','JMS-CS-1080P',NULL,'10' );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '10001','XMS-CS-4K',NULL,'10' );
+INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '10002','JBS-AF-1080P',NULL,'10' );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '621','NetworkOptix Camera',NULL,'11' );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '622','TestCameraLive',NULL,'11' );
 INSERT INTO "vms_resourcetype" ( id,name,description,"manufacture_id" ) VALUES ( '623','Network Video System',NULL,'12' );

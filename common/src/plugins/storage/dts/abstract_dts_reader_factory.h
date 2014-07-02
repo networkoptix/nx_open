@@ -13,7 +13,7 @@ public:
 
     };
 
-    virtual QnAbstractArchiveDelegate* createDeligate(QnResourcePtr res) = 0;
+    virtual QnAbstractArchiveDelegate* createDeligate(const QnResourcePtr& res) = 0;
     QString getDtsID() const // normaly dts IP address or so 
     {
         return m_dtsID;

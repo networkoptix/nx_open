@@ -30,7 +30,7 @@ public:
     static const char* NETOPTIX_SECONDARY_TOKEN;
     */
 
-    QnOnvifStreamReader(QnResourcePtr res);
+    QnOnvifStreamReader(const QnResourcePtr& res);
     virtual ~QnOnvifStreamReader();
     QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
     virtual void pleaseStop() override;

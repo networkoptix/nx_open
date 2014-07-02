@@ -63,7 +63,13 @@ public:
     /**
      * \returns                         Layout associated with the given resource, if any.
      */
-    static QnWorkbenchLayout *instance(const QnLayoutResourcePtr &resource);
+    static QnWorkbenchLayout *instance(const QnLayoutResourcePtr &layout);
+
+
+    /**
+     * \returns                         Layout associated with the given resource, if any.
+     */
+    static QnWorkbenchLayout *instance(const QnVideoWallResourcePtr &videowall);
 
     /**
      * Virtual destructor.

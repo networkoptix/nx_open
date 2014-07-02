@@ -2,7 +2,7 @@
 
 #include "../resource/resource.h"
 
-QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr resource):
+QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(const QnResourcePtr& resource):
     QnResourceConsumer(resource),
     m_mutex(QMutex::Recursive),
     m_role(QnResource::Role_Default)
@@ -51,7 +51,7 @@ void QnAbstractStreamDataProvider::removeDataProcessor(QnAbstractDataReceptor* d
     m_dataprocessors.removeOne(dp);
 }
 
-void QnAbstractStreamDataProvider::putData(QnAbstractDataPacketPtr data)
+void QnAbstractStreamDataProvider::putData(const QnAbstractDataPacketPtr& data)
 {
     if (!data)
         return;

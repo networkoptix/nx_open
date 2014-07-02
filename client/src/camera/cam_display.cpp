@@ -114,6 +114,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_eofSignalSended(false),
     m_videoQueueDuration(0),
     m_useMTRealTimeDecode(false),
+    m_forceMtDecoding(false),
     m_timeMutex(QMutex::Recursive),
     m_resource(resource),
     m_firstAfterJumpTime(AV_NOPTS_VALUE),
@@ -151,6 +152,12 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     setAudioBufferSize(expectedBufferSize, expectedPrebuferSize);
 
     qnRedAssController->registerConsumer(this);
+
+#ifdef Q_OS_WIN
+    QnDesktopResourcePtr desktopResource = resource.dynamicCast<QnDesktopResource>();
+    if (desktopResource && desktopResource->isRendererSlow())
+        m_forceMtDecoding = true; // not enough speed for desktop camera with aero in single thread mode because of slow rendering
+#endif
 }
 
 QnCamDisplay::~QnCamDisplay()
@@ -921,7 +928,7 @@ bool QnCamDisplay::useSync(QnCompressedVideoDataPtr vd)
     return m_extTimeSrc && m_extTimeSrc->isEnabled() && !(vd->flags & (QnAbstractMediaData::MediaFlags_LIVE | QnAbstractMediaData::MediaFlags_PlayUnsync));
 }
 
-void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
+void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
 {
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
     if (video && (video->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_dataQueue.size() > 0 && video->timestamp - m_lastVideoPacketTime > LIVE_MEDIA_LEN_THRESHOLD)
@@ -954,7 +961,7 @@ bool QnCamDisplay::needBuffering(qint64 vTime) const
     //return m_audioDisplay->isBuffering() && !flushCurrentBuffer;
 }
 
-bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
+bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
 
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
@@ -1283,7 +1290,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
             vd = nextInOutVideodata(incoming, channel);
 
             if (vd) {
-                if (!m_useMtDecoding && (!m_isRealTimeSource))
+                if (!m_useMtDecoding && (!m_isRealTimeSource || m_forceMtDecoding))
                     setMTDecoding(true);
 
                 bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
@@ -1354,7 +1361,7 @@ void QnCamDisplay::playAudio(bool play)
             m_audioDisplay->resume();
     }
     if (m_isRealTimeSource)
-        setMTDecoding(play && m_useMTRealTimeDecode);
+        setMTDecoding(play && (m_useMTRealTimeDecode || m_forceMtDecoding));
     else
         setMTDecoding(play);
 }

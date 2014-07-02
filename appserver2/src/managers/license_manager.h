@@ -12,19 +12,27 @@
 
 namespace ec2
 {
+    class QnLicenseNotificationManager
+    :
+        public AbstractLicenseManager
+    {
+    public:
+        void triggerNotification( const QnTransaction<ApiLicenseDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiLicenseData>& tran );
+    };
+
+
+
     template<class QueryProcessorType>
     class QnLicenseManager
     :
-        public AbstractLicenseManager
+        public QnLicenseNotificationManager
     {
     public:
         QnLicenseManager( QueryProcessorType* const queryProcessor );
 
         virtual int getLicenses( impl::GetLicensesHandlerPtr handler ) override;
         virtual int addLicenses( const QnLicenseList& licenses, impl::SimpleHandlerPtr handler ) override;
-
-        void triggerNotification( const QnTransaction<ApiLicenseDataList>& tran );
-        void triggerNotification( const QnTransaction<ApiLicenseData>& tran );
 
     private:
         QueryProcessorType* const m_queryProcessor;

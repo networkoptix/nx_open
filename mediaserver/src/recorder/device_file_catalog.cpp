@@ -97,7 +97,7 @@ bool DeviceFileCatalog::readCatalog()
 {
     if (!m_file.open(QFile::ReadWrite))
     {
-        cl_log.log("Can't create title file ", m_file.fileName(), cl_logERROR);
+        NX_LOG("Can't create title file ", m_file.fileName(), cl_logERROR);
         return false;
     }
 
@@ -219,7 +219,7 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk, bool checkDirOnly)
 
 qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage)
 {
-    cl_log.log("recreate broken file ", fileName, cl_logWARNING);
+    NX_LOG(lit("recreate broken file %1").arg(fileName), cl_logWARNING);
     QnAviResourcePtr res(new QnAviResource(fileName));
     QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
     avi->setStorage(storage);
@@ -556,7 +556,7 @@ void DeviceFileCatalog::setLatRecordingTime(qint64 value)
     QMutexLocker lock(&m_mutex);
     m_lastAddIndex = -1;
     m_lastRecordRecording = false;
-    for (int i = 0; i < m_chunks.size(); ++i)
+    for (size_t i = 0; i < m_chunks.size(); ++i)
     {
         if (m_chunks[i].startTimeMs == value) {
             m_lastAddIndex = i;
@@ -622,7 +622,7 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 {
     QMutexLocker lock(&m_mutex);
 
-    for (int i = 0; i < m_chunks.size();)
+    for (size_t i = 0; i < m_chunks.size();)
     {
         if (m_chunks[i].storageIndex == storageIndex)
         {
@@ -656,8 +656,6 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
         if (m_chunks.empty())
             return deletedChunk;
 
-        static const int DELETE_COEFF = 1000;
-
         if (!m_chunks.empty()) 
         {
             storage = qnStorageMan->storageRoot(m_chunks[0].storageIndex);
@@ -686,7 +684,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
     QTextStream str(&msg);
     str << " find chunk for time=" << QDateTime::fromMSecsSinceEpoch(startTime/1000).toString();
     str.flush();
-    cl_log.log(msg, cl_logWARNING);
+    NX_LOG(msg, cl_logWARNING);
     str.flush();
 */
     QMutexLocker lock(&m_mutex);
@@ -776,7 +774,7 @@ bool DeviceFileCatalog::isLastChunk(qint64 startTimeMs) const
 DeviceFileCatalog::Chunk DeviceFileCatalog::chunkAt(int index) const
 {
     QMutexLocker lock(&m_mutex);
-    if (index < m_chunks.size() && index >= 0)
+    if (index >= 0 && (size_t)index < m_chunks.size() )
         return m_chunks.at(index);
     else
         return DeviceFileCatalog::Chunk();
@@ -810,10 +808,10 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(qint64 startTime, qint64 endT
     if (itr == m_chunks.end())
         return result;
 
-    int firstIndex = itr - m_chunks.begin();
+    size_t firstIndex = itr - m_chunks.begin();
     result << QnTimePeriod(m_chunks[firstIndex].startTimeMs, m_chunks[firstIndex].durationMs);
 
-    for (int i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTimeMs < endTime; ++i)
+    for (size_t i = firstIndex+1; i < m_chunks.size() && m_chunks[i].startTimeMs < endTime; ++i)
     {
         QnTimePeriod& last = result.last();
         
@@ -837,7 +835,7 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
 
     if (!file.open(QFile::ReadOnly))
     {
-        cl_log.log("Can't open title file ", file.fileName(), cl_logERROR);
+        NX_LOG(lit("Can't open title file %1").arg(file.fileName()), cl_logERROR);
         return false;
     }
 

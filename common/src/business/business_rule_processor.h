@@ -94,7 +94,7 @@ public:
     QnBusinessRuleProcessor();
     virtual ~QnBusinessRuleProcessor();
 
-    void addBusinessRule(QnBusinessEventRulePtr value);
+    void addBusinessRule(const QnBusinessEventRulePtr& value);
     
     
     /*
@@ -103,19 +103,19 @@ public:
 
     virtual QString getGuid() const { return QString(); }
 
-    bool broadcastBusinessAction(QnAbstractBusinessActionPtr action);
+    bool broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
 public slots:
     /*
     * This function matches all business actions for specified business event and execute it
     * So, call this function if business event occured
     */
-    void processBusinessEvent(QnAbstractBusinessEventPtr bEvent);
+    void processBusinessEvent(const QnAbstractBusinessEventPtr& bEvent);
 
     /*
     * Execute business action.
     * This function is called if business event already matched to action(s).
     */
-    void executeAction(QnAbstractBusinessActionPtr action);
+    void executeAction(const QnAbstractBusinessActionPtr& action);
 
     static QnBusinessRuleProcessor* instance();
     static void init(QnBusinessRuleProcessor* instance);
@@ -125,16 +125,16 @@ protected slots:
     /*
     * Execute action physically. Return true if action success executed
     */
-    virtual bool executeActionInternal(QnAbstractBusinessActionPtr action, QnResourcePtr res);
+    virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
 private slots:
     void at_broadcastBusinessActionFinished(int handle, ec2::ErrorCode errorCode);
     void at_sendEmailFinished(int handle, ec2::ErrorCode errorCode);
-    void at_actionDelivered(QnAbstractBusinessActionPtr action);
-    void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);
+    void at_actionDelivered(const QnAbstractBusinessActionPtr& action);
+    void at_actionDeliveryFailed(const QnAbstractBusinessActionPtr& action);
 
-    void at_businessRuleChanged(QnBusinessEventRulePtr bRule);
+    void at_businessRuleChanged(const QnBusinessEventRulePtr& bRule);
     void at_businessRuleDeleted(QnId id);
-    void at_businessRuleReset(QnBusinessEventRuleList rules);
+    void at_businessRuleReset(const QnBusinessEventRuleList& rules);
 
     void at_timer();
 
@@ -142,29 +142,29 @@ private slots:
 protected:
     virtual QImage getEventScreenshot(const QnBusinessEventParameters& params, QSize dstSize) const;
     
-    bool containResource(QnResourceList resList, const QnId& resId) const;
-    QnAbstractBusinessActionList matchActions(QnAbstractBusinessEventPtr bEvent);
+    bool containResource(const QnResourceList& resList, const QnId& resId) const;
+    QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);
     //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
     /*
     * Some actions can be executed on media server only. In this case, function returns media server there action must be executed
     */
-    QnMediaServerResourcePtr getDestMServer(QnAbstractBusinessActionPtr action, QnResourcePtr res);
+    QnMediaServerResourcePtr getDestMServer(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
 
-    void terminateRunningRule(QnBusinessEventRulePtr rule);
+    void terminateRunningRule(const QnBusinessEventRulePtr& rule);
 
 private:
-    void at_businessRuleChanged_i(QnBusinessEventRulePtr bRule);
+    void at_businessRuleChanged_i(const QnBusinessEventRulePtr& bRule);
 
     bool sendMail(const QnSendMailBusinessActionPtr& action );
 
-    QnAbstractBusinessActionPtr processToggleAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
-    QnAbstractBusinessActionPtr processInstantAction(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
-    bool checkRuleCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule) const;
+    QnAbstractBusinessActionPtr processToggleAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
+    QnAbstractBusinessActionPtr processInstantAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
+    bool checkRuleCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule) const;
     QString formatEmailList(const QStringList& value);
-    bool needProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res);
-    void doProxyAction(QnAbstractBusinessActionPtr action, QnResourcePtr res);
-    void executeAction(QnAbstractBusinessActionPtr action, QnResourcePtr res);
+    bool needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
+    void doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
+    void executeAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
 private:
     QList<QnBusinessEventRulePtr> m_rules;
     //QnBusinessMessageBus m_messageBus;
@@ -187,7 +187,7 @@ private:
     /**
      * @brief match resources between event and rule
      */
-    bool checkEventCondition(QnAbstractBusinessEventPtr bEvent, QnBusinessEventRulePtr rule);
+    bool checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
 
     QMap<QString, QnProcessorAggregationInfo> m_aggregateActions; // aggregation counter for instant actions
     QMap<QString, int> m_actionInProgress;              // remove duplicates for long actions
@@ -197,7 +197,7 @@ private:
     /*!
         \param isRuleAdded \a true - rule added, \a false - removed
     */
-    void notifyResourcesAboutEventIfNeccessary( QnBusinessEventRulePtr businessRule, bool isRuleAdded );
+    void notifyResourcesAboutEventIfNeccessary( const QnBusinessEventRulePtr& businessRule, bool isRuleAdded );
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()

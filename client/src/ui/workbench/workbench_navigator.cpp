@@ -1274,6 +1274,10 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         qnWarning("Requesting context menu for a time slider while no menu manager instance is available.");
         return;
     }
+
+    if (qnSettings->isVideoWallMode())
+        return;
+
     QnActionManager *manager = context()->menu();
 
     QnTimePeriod selection;

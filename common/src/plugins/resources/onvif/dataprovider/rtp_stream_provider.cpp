@@ -1,6 +1,6 @@
 #include "rtp_stream_provider.h"
 
-QnRtpStreamReader::QnRtpStreamReader(QnResourcePtr res, const QString& request):
+QnRtpStreamReader::QnRtpStreamReader(const QnResourcePtr& res, const QString& request):
     CLServerPushStreamReader(res),
     m_rtpReader(res),
     m_request(request)

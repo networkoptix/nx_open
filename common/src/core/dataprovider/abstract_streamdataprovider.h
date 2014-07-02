@@ -20,7 +20,7 @@ class QN_EXPORT QnAbstractStreamDataProvider : public QnLongRunnable, public QnR
 {
     Q_OBJECT
 public:
-    explicit QnAbstractStreamDataProvider(QnResourcePtr resource);
+    explicit QnAbstractStreamDataProvider(const QnResourcePtr& resource);
     virtual ~QnAbstractStreamDataProvider();
 
     virtual bool dataCanBeAccepted() const;
@@ -46,7 +46,7 @@ signals:
     void slowSourceHint();
 
 protected:
-    virtual void putData(QnAbstractDataPacketPtr data);
+    virtual void putData(const QnAbstractDataPacketPtr& data);
     void beforeDisconnectFromResource();
 
 protected:

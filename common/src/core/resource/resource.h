@@ -101,7 +101,7 @@ public:
         deprecated = 0x100000,  /**< Resource absent in EC but still used in memory for some reason */
 
         videowall = 0x200000,           /**< Videowall resource */
-        videowall_item = 0x400000,      /**< Videowall item */
+        desktop_camera = 0x400000,      /**< Desktop Camera resource */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -291,10 +291,10 @@ public:
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(QnAbstractDataPacketPtr data);
+    static void addCommandToProc(const QnAbstractDataPacketPtr& data);
     static int commandProcQueueSize();
 
-    void update(QnResourcePtr other, bool silenceMode = false);
+    void update(const QnResourcePtr& other, bool silenceMode = false);
 
     // Need use lock/unlock consumers before this call!
     QSet<QnResourceConsumer *> getAllConsumers() const { return m_consumers; }
@@ -416,37 +416,6 @@ QnSharedResourcePointer<Resource> QnResource::toSharedPointer(Resource *resource
     using ::toSharedPointer; /* Let ADL kick in. */
     return toSharedPointer(resource);
 }
-
-
-struct QnResourceParams
-{
-    QnResourceParams() {}
-    QnResourceParams(const QString& url, const QString& vendor): url(url), vendor(vendor) {}
-
-    QString url;
-    QString vendor;
-};
-
-class QnResourceFactory
-{
-public:
-    virtual ~QnResourceFactory() {}
-
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams &params) = 0;
-};
-
-typedef QSharedPointer<QnResourceFactory> QnResourceFactoryPtr;
-
-
-class QnResourceProcessor
-{
-public:
-    virtual ~QnResourceProcessor() {}
-
-    virtual void processResources(const QnResourceList &resources) = 0;
-    virtual bool isBusy() const { return false; }
-};
-
 
 Q_DECLARE_METATYPE(QnResourcePtr);
 Q_DECLARE_METATYPE(QnResourceList);
