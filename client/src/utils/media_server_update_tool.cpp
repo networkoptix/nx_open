@@ -437,7 +437,7 @@ void QnMediaServerUpdateTool::checkLocalUpdates() {
             if (m_disableClientUpdates)
                 continue;
 
-            if (sysInfo != QnSystemInformation(lit(QN_APPLICATION_PLATFORM), lit(QN_APPLICATION_ARCH), lit(QN_ARM_BOX)))
+            if (sysInfo != QnSystemInformation::currentSystemInformation())
                 continue;
         }
 
