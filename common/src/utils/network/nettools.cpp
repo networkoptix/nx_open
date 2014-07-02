@@ -597,3 +597,45 @@ bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress,
     int eq2 = strEqualAmount(host.toLatin1().constData(), oldAddress.toLatin1().constData());
     return eq1 > eq2;
 }
+
+#ifdef WIN32
+void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
+{
+    // for test purpose only. This function used for EDGE so far
+    memset(MAC_str, 0, sizeof(MAC_str));
+    *host = 0;
+    QList<QNetworkInterface> ifList = QNetworkInterface::allInterfaces();
+    if (ifList.size() > 0) {
+        QByteArray addr = ifList[0].hardwareAddress().toLocal8Bit();
+        memcpy(MAC_str, addr.constData(), qMin(addr.length(), MAC_ADDR_LEN));
+        for (int i = 0; i < MAC_ADDR_LEN; ++i)
+        {
+            if (MAC_str[i] == ':')
+                MAC_str[i] = '-';
+        }
+        MAC_str[MAC_ADDR_LEN-1] = 0;
+    }
+
+    return;
+}
+#else
+void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
+{
+    memset(MAC_str, 0, sizeof(MAC_str));
+#define HWADDR_len 6
+    int s,i;
+    struct ifreq ifr;
+    s = socket(AF_INET, SOCK_DGRAM, 0);
+    strcpy(ifr.ifr_name, "eth0");
+    if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
+        for (i=0; i<HWADDR_len; i++)
+            sprintf(&MAC_str[i*3],"%02X-",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+        MAC_str[17] = 0;
+    }
+    if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
+        const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
+        *host = inet_ntoa(ip->sin_addr);
+    }
+    close(s);
+}
+#endif
