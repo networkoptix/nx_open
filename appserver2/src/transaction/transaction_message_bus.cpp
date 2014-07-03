@@ -408,7 +408,8 @@ void QnTransactionMessageBus::sendVideowallInstanceStatus(const ApiPeerData &pee
     sendTransaction(tran);
 }
 
-QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
+//TODO #ak use SocketAddress instead of this function. It will reduce QString instanciation count
+static QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
 bool QnTransactionMessageBus::isPeerUsing(const QUrl& url)
 {
     QString addr1 = getUrlAddr(url);

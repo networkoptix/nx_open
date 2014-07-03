@@ -147,7 +147,7 @@ void* CyclicAllocator::alloc( size_t size )
 
         //checking, if new arena has enough space
         const size_t nextArenaBytesAvailable = calcCurrentArenaBytesAvailable();
-        //switching to empty arena only so that we do not have to deal with linking from middle of buffer to another buffer
+        //switching to empty arena only so that we do not have to deal with linking from middle of arena to another arena
         if( !m_freeMemStart.arena || nextArenaBytesAvailable < std::max<size_t>(spaceRequired, m_freeMemStart.arena->size) )
         {
             if( !allocateNewArenaBeforeCurrent( spaceRequired, prevArena ) )
@@ -226,7 +226,9 @@ size_t CyclicAllocator::calcCurrentArenaBytesAvailable() const
     if( m_freeMemStart == m_leftMostAllocatedBlock )    //head == tail
         return m_allocatedBlockCount > 0
             ? 0                            //arena is full
-            : (m_freeMemStart.arena->size - m_freeMemStart.pos);  //arena is empty
+            : (m_freeMemStart.arena->size - m_freeMemStart.pos);    //arena is empty, but we do not switch from end of arena two beginning of same arena.
+                                                                    //Reason for that is to have garanteed maximum memory fragmentation size of one arena 
+                                                                    //and make things simplier (at least, for now)
 
     return (m_freeMemStart.pos > m_leftMostAllocatedBlock.pos
                 ? m_freeMemStart.arena->size

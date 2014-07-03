@@ -134,7 +134,7 @@ namespace nx_http
         */
         void someMessageBodyAvailable( nx_http::AsyncHttpClientPtr );
         /*!
-            Emmitted when http request is done with any result (successfully executed request and received message body, 
+            Emitted when http request is done with any result (successfully executed request and received message body, 
             received response with error code, connection terminated unexpectedly).
             To get result code use method \a response()
             \note Some message body can still be stored in internal buffer. To read it, call \a AsyncHttpClient::fetchMessageBodyBuffer
