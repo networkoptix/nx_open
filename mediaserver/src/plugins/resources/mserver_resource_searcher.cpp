@@ -4,6 +4,7 @@
 #include <media_server/settings.h>
 
 #include <business/business_event_connector.h>
+#include <business/events/mserver_conflict_business_event.h>
 
 #include "core/dataprovider/live_stream_provider.h"
 
@@ -91,16 +92,16 @@ public:
         }
     }
 
-    static QList<QByteArray> getLocalUsingCameras()
+    static QStringList getLocalUsingCameras()
     {
-        QList<QByteArray> result;
+        QStringList result;
         QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
         if (mediaServer) {
             QnResourceList resList = qnResPool->getResourcesWithParentId(mediaServer->getId());
             for (int i = 0; i < resList.size(); ++i) {
                 QnNetworkResourcePtr netRes = resList[i].dynamicCast<QnNetworkResource>();
                 if (netRes && hasRunningLiveProvider(netRes))
-                    result << netRes->getPhysicalId().toUtf8();
+                    result << netRes->getPhysicalId();
             }
         }
         return result;
@@ -124,19 +125,24 @@ public:
         result << guidStr;
         result << appServerGuid;
         result << localAppServerHost();
-        QList<QByteArray> cameras = getLocalUsingCameras();
-        result.append(cameras);
-
+        QStringList cameras = getLocalUsingCameras();
+        foreach (const QString &camera, cameras)
+            result.append(camera.toUtf8());
         return listToByteArray(result);
     }
 
-    bool isCameraConflict() const {
-        QList<QByteArray> localCameras = getLocalUsingCameras();
-        for (int i = 0; i < m_cameras.size(); ++i) {
-            if (localCameras.contains(m_cameras[i]))
-                return true;
+    QStringList cameraConflictList() const {
+        QStringList localCameras = getLocalUsingCameras();
+        QStringList result;
+        if (localCameras.isEmpty())
+            return result;
+
+        foreach (const QByteArray &camera, m_cameras) {
+            QString cam = QString::fromUtf8(camera);
+            if (localCameras.contains(cam))
+                result << cam;
         }
-        return false;
+        return result;
     }
 };
 
@@ -239,18 +245,17 @@ void QnMServerResourceSearcher::readDataFromSocket()
     for (int i = 0; i < 600 && !m_needStop; ++i)
         QnSleep::msleep(100);
 
-    QSet<QByteArray> conflictList;
-    readSocketInternal(m_receiveSocket, conflictList);
-    if (!conflictList.isEmpty()) {
-        QList<QByteArray> cList = conflictList.toList();
-        cList.insert(0, localAppServerHost());
+    QnCameraConflictList conflicts;
+    readSocketInternal(m_receiveSocket, conflicts);
+    if (!conflicts.camerasByServer.isEmpty()) {
+        conflicts.sourceServer = localAppServerHost();
         QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
         if (mediaServer)
-            qnBusinessRuleConnector->at_mediaServerConflict(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), cList);
+            qnBusinessRuleConnector->at_mediaServerConflict(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), conflicts);
     }
 }
 
-void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socket, QSet<QByteArray>& conflictList)
+void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socket, QnCameraConflictList& conflictList)
 {
     quint8 tmpBuffer[1024*16];
     while (socket->hasData())
@@ -261,8 +266,12 @@ void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socke
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
             DiscoveryPacket packet(responseData);
-            if (packet.isValidPacket() && packet.appServerGuid() != m_appServerGuid && packet.isCameraConflict())
-                conflictList.insert(packet.appServerHost());
+            if (packet.isValidPacket() && packet.appServerGuid() != m_appServerGuid) {
+                QStringList conflicts = packet.cameraConflictList();
+                if (conflicts.isEmpty())
+                    continue;
+                conflictList.camerasByServer[packet.appServerHost()].append(conflicts);
+            }
         }
     }
 }

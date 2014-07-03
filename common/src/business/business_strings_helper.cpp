@@ -8,6 +8,7 @@
 #include <business/events/network_issue_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/conflict_business_event.h>
+#include <business/events/mserver_conflict_business_event.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
@@ -200,11 +201,19 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case ServerConflictEvent: {
-        QVariantList conflicts;
+        QnCameraConflictList conflicts;
+        conflicts.sourceServer = params.getSource();
+        conflicts.decode(params.getConflicts());
         int n = 0;
-        foreach (QString ip, params.getConflicts()) {
+        foreach (const QString &server, conflicts.camerasByServer.keys()) {
             result += delimiter;
-            result += tr("Conflicting EC #%1: %2").arg(n).arg(ip);
+            result += tr("Conflicting EC #%1: %2").arg(++n).arg(server);
+            int m = 0;
+            foreach (const QString &camera, conflicts.camerasByServer[server]) {
+                result += delimiter;
+                result += tr("Camera #%1 MAC: %2").arg(++m).arg(camera);
+            }
+
         }
         break;
     }
@@ -249,15 +258,22 @@ QVariantHash QnBusinessStringsHelper::eventDetailsMap(const QnBusinessEventParam
         break;
     }
     case ServerConflictEvent: {
-        QVariantList conflicts;
+        QnCameraConflictList conflicts;
+        conflicts.sourceServer = params.getSource();
+        conflicts.decode(params.getConflicts());
+
+        QVariantList conflictsList;
         int n = 0;
-        foreach (QString ip, params.getConflicts()) {
-            QVariantHash conflict;
-            conflict[lit("number")] = ++n;
-            conflict[lit("ip")] = ip;
-            conflicts << conflict;
+        foreach (const QString &server, conflicts.camerasByServer.keys()) {
+            foreach (const QString &camera, conflicts.camerasByServer[server]) {
+                QVariantHash conflict;
+                conflict[lit("number")] = ++n;
+                conflict[lit("ip")] = server;
+                conflict[lit("mac")] = camera;
+                conflictsList << conflict;
+            }
         }
-        detailsMap[lit("msConflicts")] = conflicts;
+        detailsMap[lit("msConflicts")] = conflictsList;
         break;
     }
     default:

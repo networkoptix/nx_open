@@ -32,6 +32,8 @@ class QnBusinessEventRule;
 typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
 typedef QList<QnBusinessEventRulePtr> QnBusinessEventRuleList;
 
+struct QnCameraConflictList;
+
 #ifdef Q_MOC_RUN
 class QnBusiness
 #else
