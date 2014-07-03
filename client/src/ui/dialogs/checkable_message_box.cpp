@@ -106,7 +106,13 @@ QString QnCheckableMessageBox::text() const {
 }
 
 void QnCheckableMessageBox::setText(const QString &t) {
+    d->messageLabel->setTextFormat(Qt::AutoText);
     d->messageLabel->setText(t);
+}
+
+void QnCheckableMessageBox::setRichText(const QString &text) {
+    d->messageLabel->setTextFormat(Qt::RichText);
+    d->messageLabel->setText(text);
 }
 
 QPixmap QnCheckableMessageBox::iconPixmap() const {

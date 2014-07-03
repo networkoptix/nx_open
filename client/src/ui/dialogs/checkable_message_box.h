@@ -71,6 +71,7 @@ public:
 
     QString text() const;
     void setText(const QString &);
+    void setRichText(const QString &);
 
     bool isChecked() const;
     void setChecked(bool s);

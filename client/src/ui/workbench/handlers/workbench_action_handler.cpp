@@ -144,6 +144,8 @@ namespace {
 
     const int videowallReconnectTimeoutMSec = 5000;
     const int videowallCloseTimeoutMSec = 10000;
+
+    QColor redTextColor = Qt::red;
 }
 
 //!time that is given to process to exit. After that, appauncher (if present) will try to terminate it
@@ -1278,27 +1280,33 @@ void QnWorkbenchActionHandler::notifyAboutUpdate() {
     QString message;
     if (majorVersionChange) {
         title = tr("Newer version is available");
-        message = tr("New version is available.\nWould you like to upgrade?");
+        message = tr("New version is available.");
+        message += lit("<br/>");
+        message += tr("Would you like to upgrade?");
     } else {
         title = tr("Upgrade is recommended");
-        message = tr("New version is available.\nMajor issues have been fixed.\nUpdate is strongly recommended.\nWould you like to upgrade?");
+        message = tr("New version is available.");
+        message += lit("<br/>");
+        message += tr("Major issues have been fixed.");
+        message += lit("<br/><span style=\"color:%1;\">").arg(redTextColor.name());
+        message += tr("Update is strongly recommended.");
+        message += lit("</span><br/>");
+        message += tr("Would you like to upgrade?");
     }
 
-    bool ignoreThisVersion;
-    int res = QnCheckableMessageBox::question(
-        mainWindow(),
-        Qn::Upgrade_Help,
-        title,
-        message,
-        tr("Don't notify again about this update."),
-        &ignoreThisVersion
-    );
+    QnCheckableMessageBox messageBox(mainWindow());
+    messageBox.setWindowTitle(title);
+    messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
+    messageBox.setRichText(message);
+    messageBox.setCheckBoxText(tr("Don't notify again about this update."));
+    setHelpTopic(&messageBox, Qn::Upgrade_Help);
+    int res = messageBox.exec();
 
     if (res == QMessageBox::Yes) {
         showSystemAdministrationDialog(QnSystemAdministrationDialog::UpdatesTab);
         systemAdministrationDialog()->checkForUpdates();
     } else {
-        qnSettings->setIgnoredUpdateVersion(ignoreThisVersion ? version : QnSoftwareVersion());
+        qnSettings->setIgnoredUpdateVersion(messageBox.isChecked() ? version : QnSoftwareVersion());
     }
 }
 
