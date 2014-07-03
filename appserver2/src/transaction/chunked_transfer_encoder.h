@@ -8,7 +8,10 @@ namespace ec2
      */
     class QnChunkedTransferEncoder {
     public:
-        static QByteArray serializedTransaction(const QByteArray &data);
+        static QByteArray serializedTransaction(
+            const QByteArray& data,
+            const QByteArray& chunkExtensionName = QByteArray(),
+            const QByteArray& chunkExtensionValue = QByteArray() );
     };
 
 }

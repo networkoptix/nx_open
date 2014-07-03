@@ -22,15 +22,21 @@ namespace ec2
         m_timePriorityKey( 0 )
     {
 #ifndef EDGE_SERVER
-        m_timePriorityKey |= peerTimeNonEdgeServer;
+        m_timePriorityKey |= peerIsNotEdgeServer;
 #endif
         m_timePriorityKey |= (rand() | (rand() * RAND_MAX)) + 1;
+        //TODO #ak handle priority key duplicates or use guid?
+        if( QElapsedTimer::isMonotonic() )
+            m_timePriorityKey |= peerHasMonotonicClock;
 
         m_monotonicClock.restart();
         //initializing synchronized time with local system time
         m_timeDelta = QDateTime::currentMSecsSinceEpoch();
 
-        //TODO #ak handle priority key duplicates or use guid?
+        m_usedTimeSyncInfo = TimeSyncInfo(
+            0,
+            m_timeDelta,
+            m_timePriorityKey ); 
     }
 
     TimeManager::~TimeManager()
@@ -73,17 +79,29 @@ namespace ec2
 
         if( tran.params.serverGuid == qnCommon->moduleGUID() )
         {
+            const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_timePriorityKey;
             //local peer is selected by user as primary time server
             //TODO #ak does it mean that local system time is to be used as synchronized time?
             m_timePriorityKey |= peerTimeSetByUser;
-            //TODO #ak broadcasting current sync time
-            //emit timeChanged( m_monotonicClock.elapsed() + m_timeDelta );
+            if( m_timePriorityKey > m_usedTimeSyncInfo.timePriorityKey )
+            {
+                //using current server time info
+                const qint64 elapsed = m_monotonicClock.elapsed();
+                m_usedTimeSyncInfo = TimeSyncInfo(
+                    elapsed,
+                    elapsed + m_timeDelta,
+                    m_timePriorityKey ); 
+
+                if( !synchronizingByCurrentServer )
+                {
+                    //TODO #ak broadcasting current sync time
+                    emit timeChanged( m_monotonicClock.elapsed() + m_timeDelta );
+                }
+            }
         }
         else
         {
             m_timePriorityKey &= ~peerTimeSetByUser;
-            //TODO asynchronously synchronizing time with server identified by serverGuid and emitting timeChanged
-                //we can have no direct connection to that server
         }
     }
 
@@ -91,55 +109,66 @@ namespace ec2
     {
         QMutexLocker lk( &m_mutex );
 
+        const qint64 elapsed = m_monotonicClock.elapsed();
         return TimeSyncInfo(
-            m_monotonicClock.elapsed(),
-            m_monotonicClock.elapsed() + m_timeDelta,
-            m_timePriorityKey ); 
+            elapsed,
+            elapsed + m_timeDelta,
+            m_usedTimeSyncInfo.timePriorityKey );
     }
 
     void TimeManager::remotePeerTimeSyncUpdate(
-        const QnId& peerID,
+        const QnId& /*peerID*/,
         qint64 localMonotonicClock,
         qint64 remotePeerSyncTime,
         quint64 remotePeerTimePriorityKey )
-    { 
+    {
         assert( remotePeerTimePriorityKey > 0 );
 
         QMutexLocker lk( &m_mutex );
 
-        const quint64 currentMaxRemotePeerTimePriorityKey = m_timeInfoByPeer.empty()
-            ? 0     //priority key is garanteed to be non-zero
-            : m_timeInfoByPeer.begin()->first;
+        //const quint64 currentMaxRemotePeerTimePriorityKey = m_timeInfoByPeer.empty()
+        //    ? 0     //priority key is garanteed to be non-zero
+        //    : m_timeInfoByPeer.begin()->first;
 
-        //saving info for later use
-        m_timeInfoByPeer[remotePeerTimePriorityKey] = RemotePeerTimeInfo(
-            peerID,
-            localMonotonicClock,
-            remotePeerSyncTime );
+        ////saving info for later use
+        //m_timeInfoByPeer[remotePeerTimePriorityKey] = RemotePeerTimeInfo(
+        //    peerID,
+        //    localMonotonicClock,
+        //    remotePeerSyncTime );
 
-        //TODO if there is new maximum remotePeerTimePriorityKey than updating delta and emitting timeChanged
-        if( remotePeerTimePriorityKey > currentMaxRemotePeerTimePriorityKey )
+        //if there is new maximum remotePeerTimePriorityKey than updating delta and emitting timeChanged
+        if( remotePeerTimePriorityKey > m_usedTimeSyncInfo.timePriorityKey )
         {
-            m_timeDelta = ;
+            //taking new synchronization data
+            m_timeDelta = remotePeerSyncTime - localMonotonicClock;
+            m_usedTimeSyncInfo = TimeSyncInfo(
+                localMonotonicClock,
+                remotePeerSyncTime,
+                remotePeerTimePriorityKey ); 
         }
     }
 
-    void TimeManager::remotePeerLost( const QnId& peerID )
-    {
-        QMutexLocker lk( &m_mutex );
+    //void TimeManager::remotePeerLost( const QnId& peerID )
+    //{
+    //    QMutexLocker lk( &m_mutex );
 
-        auto it = std::find_if(
-            m_timeInfoByPeer.begin(),
-            m_timeInfoByPeer.end(),
-            [peerID]( const std::pair<quint64, RemotePeerTimeInfo>& val ) {
-                return val.second.peerID == peerID;
-            } );
-        if( it != m_timeInfoByPeer.end() )
-            m_timeInfoByPeer.erase( it );
-    }
+    //    auto it = std::find_if(
+    //        m_timeInfoByPeer.begin(),
+    //        m_timeInfoByPeer.end(),
+    //        [peerID]( const std::pair<quint64, RemotePeerTimeInfo>& val ) {
+    //            return val.second.peerID == peerID;
+    //        } );
+    //    if( it == m_timeInfoByPeer.begin() )
+    //    {
+    //        //TODO #ak using another peer for synchronization
+    //    }
+    //    
+    //    if( it != m_timeInfoByPeer.end() )
+    //        m_timeInfoByPeer.erase( it );
+    //}
 
     void TimeManager::syncTimeWithExternalSource()
     {
-        //TODO #ak
+        //TODO #ak synchroniing with some internet server if possible
     }
 }

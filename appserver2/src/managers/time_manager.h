@@ -78,6 +78,10 @@ namespace ec2
         qint64 monotonicClockValue;
         //!synchorionized millis from epoch, corresponding to \a monotonicClockValue
         qint64 syncTime;
+        //!priority key, corresponding to \a syncTime value. This is not necessarily priority key of current server
+        /*!
+            When local host accepts another peer's time it uses priority key of that peer
+        */
         quint64 timePriorityKey;
 
         TimeSyncInfo(
@@ -98,9 +102,10 @@ namespace ec2
         public TimeNotificationManager
     {
     public:
-        static const quint64 peerTimeSetByUser                       = 0x0100000000LL;
-        static const quint64 peerTimeSynchronizedWithInternetServer  = 0x0200000000LL;
-        static const quint64 peerTimeNonEdgeServer                   = 0x0400000000LL;
+        static const quint64 peerTimeSetByUser                       = 0x0800000000LL;
+        static const quint64 peerTimeSynchronizedWithInternetServer  = 0x0400000000LL;
+        static const quint64 peerHasMonotonicClock                   = 0x0200000000LL;
+        static const quint64 peerIsNotEdgeServer                     = 0x0100000000LL;
 
         TimeManager();
         virtual ~TimeManager();
@@ -130,7 +135,7 @@ namespace ec2
             qint64 localMonotonicClock,
             qint64 remotePeerSyncTime,
             quint64 remotePeerTimePriorityKey );
-        void remotePeerLost( const QnId& peerID );
+        //void remotePeerLost( const QnId& peerID );
 
     private:
         struct RemotePeerTimeInfo
@@ -164,6 +169,7 @@ namespace ec2
         //!map<priority key, time info>
         std::map<quint64, RemotePeerTimeInfo, std::greater<quint64> > m_timeInfoByPeer;
         mutable QMutex m_mutex;
+        TimeSyncInfo m_usedTimeSyncInfo;
 
         //!Periodically synchronizing time with internet (if possible)
         void syncTimeWithExternalSource();

@@ -50,12 +50,12 @@ void QnTransactionTransport::ensureSize(std::vector<quint8>& buffer, std::size_t
         buffer.resize(size);
 }
 
-void QnTransactionTransport::addData(const QByteArray& data)
+void QnTransactionTransport::addData(QByteArray&& data)
 {
     QMutexLocker lock(&m_mutex);
-    if (m_dataToSend.isEmpty() && m_socket)
+    if (m_dataToSend.empty() && m_socket)
         aio::AIOService::instance()->watchSocket( m_socket, aio::etWrite, this );
-    m_dataToSend.push_back(QnChunkedTransferEncoder::serializedTransaction(data));
+    m_dataToSend.push_back(std::move(data));
 }
 
 int QnTransactionTransport::getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size)
@@ -183,11 +183,14 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
     case aio::etWrite: 
         {
             QMutexLocker lock(&m_mutex);
-            while (!m_dataToSend.isEmpty())
+            while (!m_dataToSend.empty())
             {
-                QByteArray& data = m_dataToSend.front();
-                const char* dataStart = data.data();
-                int sended = m_socket->send(dataStart + m_sendOffset, data.size() - m_sendOffset);
+                DataToSend& dataCtx = m_dataToSend.front();
+                if( dataCtx.encodedSourceData.isEmpty() )
+                    dataCtx.encodedSourceData = QnChunkedTransferEncoder::serializedTransaction(dataCtx.sourceData);
+
+                const QByteArray& data = dataCtx.encodedSourceData;
+                int sended = m_socket->send(data.constData() + m_sendOffset, data.size() - m_sendOffset);
                 if (sended < 1) {
                     if(sended == 0 || (SystemError::getLastOSErrorCode() != SystemError::wouldBlock && SystemError::getLastOSErrorCode() != SystemError::again)) {
                         m_sendOffset = 0;
@@ -199,7 +202,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                 m_sendOffset += sended;
                 if (m_sendOffset == data.size()) {
                     m_sendOffset = 0;
-                    m_dataToSend.dequeue();
+                    m_dataToSend.pop_front();
                 }
             }
             aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite, this );
@@ -332,14 +335,14 @@ void QnTransactionTransport::cancelConnecting()
     setState(Error);
 }
 
-void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr client)
+void QnTransactionTransport::at_httpClientDone(const nx_http::AsyncHttpClientPtr& client)
 {
     nx_http::AsyncHttpClient::State state = client->state();
     if (state == nx_http::AsyncHttpClient::sFailed)
         cancelConnecting();
 }
 
-void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
+void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientPtr& client)
 {
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
 
@@ -366,6 +369,7 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     }
     else {
         m_socket = m_httpClient->takeSocket();
+        //m_socket->setNoDelay( true );
         m_httpClient.reset();
         if (QnTransactionTransport::tryAcquireConnected(m_remotePeer.id, true)) {
             if (!data.isEmpty())

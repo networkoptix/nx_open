@@ -1,9 +1,10 @@
 #ifndef __TRANSACTION_TRANSPORT_H__
 #define __TRANSACTION_TRANSPORT_H__
 
+#include <deque>
+
 #include <QUuid>
 #include <QByteArray>
-#include <QQueue>
 #include <QSet>
 
 #include <transaction/transaction.h>
@@ -92,7 +93,17 @@ public:
     static bool tryAcquireConnected(const QnId& remoteGuid, bool isOriginator);
     static void connectingCanceled(const QnId& id, bool isOriginator);
     static void connectDone(const QnId& id);
+
 private:
+    struct DataToSend
+    {
+        QByteArray sourceData;
+        QByteArray encodedSourceData;
+
+        DataToSend() {}
+        DataToSend( QByteArray&& _sourceData ) : sourceData( std::move(_sourceData) ) {}
+    };
+
     ApiPeerData m_localPeer;
     ApiPeerData m_remotePeer;
 
@@ -110,7 +121,8 @@ private:
     int m_chunkHeaderLen;
     quint32 m_chunkLen;
     int m_sendOffset;
-    QQueue<QByteArray> m_dataToSend;
+    //!Holds raw data. It is serialized to http chunk just before sending to socket
+    std::deque<DataToSend> m_dataToSend;
     QUrl m_remoteAddr;
     bool m_connected;
 
@@ -121,7 +133,7 @@ private:
 private:
     void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
-    void addData(const QByteArray &data);
+    void addData(QByteArray &&data);
     static void ensureSize(std::vector<quint8>& buffer, std::size_t size);
     int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);
     void processTransactionData( const QByteArray& data);
@@ -129,8 +141,8 @@ private:
     void cancelConnecting();
     static void connectingCanceledNoLock(const QnId& remoteGuid, bool isOriginator);
 private slots:
-    void at_responseReceived( nx_http::AsyncHttpClientPtr );
-    void at_httpClientDone(nx_http::AsyncHttpClientPtr);
+    void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
+    void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );
     void repeatDoGet();
 };
 
