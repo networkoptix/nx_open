@@ -166,6 +166,7 @@ bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
 
     const QnResourcePtr& serverRes = qnResPool->getResourceById(res->getParentId());
     const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(serverRes.data());
+    assert( server != nullptr );
     QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getId().toByteArray());
 
     const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();

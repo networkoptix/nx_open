@@ -11,6 +11,7 @@
 #include "transaction/transaction_message_bus.h"
 #include "business/business_message_bus.h"
 #include "settings.h"
+#include "api/app_server_connection.h"
 
 
 QnServerMessageProcessor::QnServerMessageProcessor()
@@ -248,4 +249,21 @@ void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, c
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
     QnServerUpdateTool::instance()->installUpdate(updateId);
+}
+
+bool QnServerMessageProcessor::canRemoveResource(const QnId& resourceId) 
+{ 
+    QnResourcePtr res = qnResPool->getResourceById(resourceId);
+    bool isOwnServer = (res && res->getId() == qnCommon->moduleGUID());
+    return !isOwnServer;
+}
+
+void QnServerMessageProcessor::removeResourceIgnored(const QnId& resourceId) 
+{
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(resourceId).dynamicCast<QnMediaServerResource>();
+    bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
+    if (isOwnServer) {
+        QnMediaServerResourcePtr savedServer;
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(mServer, &savedServer);
+    }
 }
