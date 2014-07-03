@@ -21,17 +21,22 @@ public:
 
     void setDirectModuleFinder(QnDirectModuleFinder *directModuleFinder);
 
+    QnUrlSet urlsForPeriodicalCheck() const;
+    void setUrlsForPeriodicalCheck(const QnUrlSet &urls);
+
 private slots:
     void at_resourceAdded(const QnResourcePtr &resource);
     void at_resourceChanged(const QnResourcePtr &resource);
     void at_resourceAuxUrlsChanged(const QnResourcePtr &resource);
     void at_resourceRemoved(const QnResourcePtr &resource);
+    void at_timer_timeout();
 
 private:
     QPointer<QnDirectModuleFinder> m_directModuleFinder;
     QHash<QnId, QnHostAddressSet> m_addressesByServer;
     QHash<QnId, QnUrlSet> m_manualAddressesByServer;
     QHash<QnId, quint16> m_portByServer;
+    QnUrlSet m_urlsForPeriodicalCheck;
 };
 
 #endif // DIRECT_MODULE_FINDER_HELPER_H

@@ -249,7 +249,8 @@ void QnDirectModuleFinder::at_reply_finished(QNetworkReply *reply) {
         }
 
         m_lastPingById[moduleInformation.id] = QDateTime::currentMSecsSinceEpoch();
-        emit moduleFound(moduleInformation, url.host());
+        url.setPath(QString());
+        emit moduleFound(moduleInformation, url.host(), url);
     } else {
         QnId id = m_moduleByUrl[url];
         if (id.isNull())

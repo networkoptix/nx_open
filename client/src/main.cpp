@@ -481,12 +481,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     //clientMessageProcessor->init(QnAppServerConnectionFactory::getConnection2());
 
-    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true));
-    moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
-    moduleFinder->start();
-
-    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
-
     qnSettings->save();
     if (!QDir(qnSettings->mediaFolder()).exists())
         QDir().mkpath(qnSettings->mediaFolder());
@@ -514,6 +508,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     ffmpegInit();
 
     qnCommon->setModuleGUID(QUuid::createUuid());
+
+    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true));
+    moduleFinder->setCompatibilityMode(qnSettings->isDevMode());
+    moduleFinder->start();
+
+    QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
 
     //===========================================================================
 

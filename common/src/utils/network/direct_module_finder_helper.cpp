@@ -1,17 +1,30 @@
 #include "direct_module_finder_helper.h"
 
+#include <QtCore/QTimer>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
 #include <utils/network/direct_module_finder.h>
 
+namespace {
+    const int checkInterval = 30 * 1000;
+}
+
 QnDirectModuleFinderHelper::QnDirectModuleFinderHelper(QObject *parent) :
     QObject(parent),
     m_directModuleFinder(0)
 {
+    QTimer *timer = new QTimer(this);
+    timer->setInterval(checkInterval);
+
     connect(qnResPool,      &QnResourcePool::resourceAdded,         this,       &QnDirectModuleFinderHelper::at_resourceAdded);
     connect(qnResPool,      &QnResourcePool::resourceChanged,       this,       &QnDirectModuleFinderHelper::at_resourceChanged);
     connect(qnResPool,      &QnResourcePool::resourceRemoved,       this,       &QnDirectModuleFinderHelper::at_resourceRemoved);
+
+    connect(timer,          &QTimer::timeout,                       this,       &QnDirectModuleFinderHelper::at_timer_timeout);
+
+    timer->start();
 }
 
 void QnDirectModuleFinderHelper::setDirectModuleFinder(QnDirectModuleFinder *directModuleFinder) {
@@ -35,6 +48,14 @@ void QnDirectModuleFinderHelper::setDirectModuleFinder(QnDirectModuleFinder *dir
                 m_directModuleFinder->addAddress(address, port, it.key());
         }
     }
+}
+
+QnUrlSet QnDirectModuleFinderHelper::urlsForPeriodicalCheck() const {
+    return m_urlsForPeriodicalCheck;
+}
+
+void QnDirectModuleFinderHelper::setUrlsForPeriodicalCheck(const QnUrlSet &urls) {
+    m_urlsForPeriodicalCheck = urls;
 }
 
 void QnDirectModuleFinderHelper::at_resourceAdded(const QnResourcePtr &resource) {
@@ -175,4 +196,12 @@ void QnDirectModuleFinderHelper::at_resourceRemoved(const QnResourcePtr &resourc
         foreach (const QUrl &url, server->getIgnoredUrls())
             m_directModuleFinder->removeIgnoredModule(url, serverId);
     }
+}
+
+void QnDirectModuleFinderHelper::at_timer_timeout() {
+    if (!m_directModuleFinder)
+        return;
+
+    foreach (const QUrl &url, m_urlsForPeriodicalCheck)
+        m_directModuleFinder->checkUrl(url);
 }
