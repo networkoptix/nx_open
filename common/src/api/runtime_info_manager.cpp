@@ -26,12 +26,12 @@ QnRuntimeInfoManager* instance()
     return m_inst;
 }
 
-void QnRuntimeInfoManager::at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy)
+void QnRuntimeInfoManager::at_remotePeerFound(ec2::ApiPeerAliveData /*data*/, bool /*isProxy*/)
 {
 
 }
 
-void QnRuntimeInfoManager::at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy)
+void QnRuntimeInfoManager::at_remotePeerLost(ec2::ApiPeerAliveData data, bool /*isProxy*/)
 {
     m_runtimeInfo.remove(data.peer.id);
 
