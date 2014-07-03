@@ -80,7 +80,7 @@ private slots:
     void at_saveButton_clicked();
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
-    void at_ec2ConnectFinished( int, ec2::ErrorCode, ec2::AbstractECConnectionPtr );
+    void at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode, const ec2::AbstractECConnectionPtr &connection);
 
     void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);

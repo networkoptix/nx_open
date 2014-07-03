@@ -29,6 +29,8 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
         data.peer.id = qnCommon->remoteGUID();
         at_remotePeerLost(data, false);
         qnCommon->setRemoteGUID(QUuid());
+    } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
+        qnCommon->setRemoteGUID(QUuid());
     }
 }
 
@@ -123,7 +125,11 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource:
 
 void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy)
 {
-    assert(!qnCommon->remoteGUID().isNull());
+    if (qnCommon->remoteGUID().isNull()) {
+        qWarning() << "at_remotePeerFound received while disconnected";
+        return;
+    }
+
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
@@ -136,7 +142,11 @@ void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bo
 
 void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy)
 {
-    assert(!qnCommon->remoteGUID().isNull());
+    if (qnCommon->remoteGUID().isNull()) {
+        qWarning() << "at_remotePeerLost received while disconnected";
+        return;
+    }
+
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 

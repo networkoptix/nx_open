@@ -25,6 +25,8 @@
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
 
+#include <common/common_module.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
@@ -142,6 +144,8 @@ namespace {
 
     const int videowallReconnectTimeoutMSec = 5000;
     const int videowallCloseTimeoutMSec = 10000;
+
+    const int maxReconnectTimeout = 10000;
 }
 
 //!time that is given to process to exit. After that, appauncher (if present) will try to terminate it
@@ -192,6 +196,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
     m_delayedDropGuard(false),
+    m_connectingMessageBox(NULL),
     m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
@@ -824,6 +829,17 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
     resourcePool()->removeResources(remoteResources);
 
     qnLicensePool->reset();
+
+    if (!qnCommon->remoteGUID().isNull()) {
+        m_connectingMessageBox = QnGraphicsMessageBox::informationTicking(
+            tr("Connection failed. Trying to restore connection... %1"),
+            maxReconnectTimeout);
+        connect(m_connectingMessageBox, &QnGraphicsMessageBox::finished, this, [this]{
+            menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
+            menu()->trigger(Qn::ConnectToServerAction);
+            m_connectingMessageBox = NULL;
+        });
+    }
 }
 
 void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
@@ -831,6 +847,12 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
 
     context()->instance<QnAppServerNotificationCache>()->getFileList();
+
+    if (m_connectingMessageBox != NULL) {
+        m_connectingMessageBox->disconnect(this);
+        m_connectingMessageBox->hideImmideately();
+        m_connectingMessageBox = NULL;
+    }
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -1567,6 +1589,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         QnAppServerConnectionFactory::setEc2Connection( result.connection());
         connectionInfo = result.reply<QnConnectionInfo>();
     }
+    QnCommonMessageProcessor::instance()->init(NULL);
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
 
     auto incompatibilityHandler = [this]() {
@@ -1679,6 +1702,12 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     notificationsHandler()->clear();
 
     qnSettings->setStoredPassword(QString());
+
+    if (m_connectingMessageBox != NULL) {
+        m_connectingMessageBox->disconnect(this);
+        m_connectingMessageBox->hideImmideately();
+        m_connectingMessageBox = NULL;
+    }
 }
 
 void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {

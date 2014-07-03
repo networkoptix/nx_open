@@ -335,8 +335,7 @@ void QnLoginDialog::updateUsability() {
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::AbstractECConnectionPtr connection )
-{
+void QnLoginDialog::at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode, const ec2::AbstractECConnectionPtr &connection ) {
     updateUsability();
 
     QnConnectionInfo connectionInfo;
