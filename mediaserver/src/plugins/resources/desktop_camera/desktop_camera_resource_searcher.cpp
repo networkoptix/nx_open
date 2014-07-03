@@ -24,7 +24,7 @@ QString QnDesktopCameraResourceSearcher::manufacture() const
 }
 
 
-void QnDesktopCameraResourceSearcher::registerCamera(QSharedPointer<AbstractStreamSocket> connection, const QString& userName, const QString &userId)
+void QnDesktopCameraResourceSearcher::registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, const QString& userName, const QString &userId)
 {
     connection->setSendTimeout(1);
     QMutexLocker lock(&m_mutex);
@@ -131,7 +131,7 @@ TCPSocketPtr QnDesktopCameraResourceSearcher::getConnection(const QString& userN
     return TCPSocketPtr();
 }
 
-quint32 QnDesktopCameraResourceSearcher::incCSeq(TCPSocketPtr socket)
+quint32 QnDesktopCameraResourceSearcher::incCSeq(const TCPSocketPtr& socket)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -145,7 +145,7 @@ quint32 QnDesktopCameraResourceSearcher::incCSeq(TCPSocketPtr socket)
     return 0;
 }
 
-void QnDesktopCameraResourceSearcher::releaseConnection(TCPSocketPtr socket)
+void QnDesktopCameraResourceSearcher::releaseConnection(const TCPSocketPtr& socket)
 {
     QMutexLocker lock(&m_mutex);
 
