@@ -1270,12 +1270,26 @@ void QnWorkbenchActionHandler::notifyAboutUpdate() {
     if (version <= qnSettings->ignoredUpdateVersion())
         return;
 
+    QnSoftwareVersion current = qnCommon->engineVersion();
+
+    bool majorVersionChange = version.major() > current.major() || version.minor() > current.minor();
+
+    QString title;
+    QString message;
+    if (majorVersionChange) {
+        title = tr("Newer version is available");
+        message = tr("New version is available.\nWould you like to upgrade?");
+    } else {
+        title = tr("Upgrade is recommended");
+        message = tr("New version is available.\nMajor issues have been fixed.\nUpdate is strongly recommended.\nWould you like to upgrade?");
+    }
+
     bool ignoreThisVersion;
     int res = QnCheckableMessageBox::question(
         mainWindow(),
         Qn::Upgrade_Help,
-        tr("Software update is available"),
-        tr("An update for your system is available.\nDo you want to update your system now?"),
+        title,
+        message,
         tr("Don't notify again about this update."),
         &ignoreThisVersion
     );
