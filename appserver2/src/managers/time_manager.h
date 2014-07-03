@@ -1,0 +1,173 @@
+/**********************************************************
+* 02 jul 2014
+* a.kolesnikov
+***********************************************************/
+
+#ifndef NX_EC2_TIME_MANAGER_H
+#define NX_EC2_TIME_MANAGER_H
+
+#include <map>
+
+#include <QtCore/QMutex>
+#include <QtCore/QObject>
+#include <QtGlobal>
+#include <QtCore/QElapsedTimer>
+
+#include <nx_ec/ec_api.h>
+#include <utils/common/id.h>
+
+#include "transaction/transaction.h"
+
+
+namespace ec2
+{
+    /*! \page time_sync Time synchronization in cluster
+        Server system time is never changed. To adjust server times means, adjust server "delta" which server adds to it's time. 
+        To change/adjust server time - means to adjust it's delta.
+
+        PTS(primary time server) (if any) pushes it's time to other servers( adjusts other servers' time):\n
+        - every hour (to all servers in the system)
+        - upon PTS changed event (to all servers in the system)
+        - if new server is connected to the system( only to this new server).
+
+        If possible PTS server adjusts it's time once per hour from internet.
+
+        PTS is selected in prioritized order: \n
+        - selected by user
+        - availability of internet access
+        - non edge server
+
+        In case if there is ambiguity in choosing PTS automatically, random server is chosen as PTS and notification sent to client.
+
+        Once PTS pushed it's time to the server, server marks it's time as actual time. Time remains actual till server is restarted. 
+        If there is no PTS in the system, new server( just connected) takes time from any server with actual time.
+
+        Client should offer user to select PTS if there is no PTS in the system and there are at least 2 servers in the system with actual time more than 500 ms different.
+
+        \todo if system without internet access (with PTS selected) joined by a server with internet access, should new server become PTS?
+    */
+
+    class ApiPrimaryTimeServerData
+    {
+    public:
+        QnId serverGuid;
+    };
+
+    class TimeNotificationManager
+    :
+        public QObject
+    {
+        Q_OBJECT
+
+    public:
+        //void triggerNotification( const QnTransaction<ApiPrimaryTimeServerData>& tran );
+
+    signals:
+        //!Emitted when there is ambiguity while choosing primary time server automatically
+        /*!
+            User SHOULD call \a TimeManager::forcePrimaryTimeServer to set primary time server manually.
+            This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
+        */
+        void primaryTimeServerSelectionRequired();
+        //!Emitted when synchronized time has been changed
+        void timeChanged( qint64 syncTime );
+    };
+
+    struct TimeSyncInfo
+    {
+        qint64 monotonicClockValue;
+        //!synchorionized millis from epoch, corresponding to \a monotonicClockValue
+        qint64 syncTime;
+        quint64 timePriorityKey;
+
+        TimeSyncInfo(
+            qint64 _monotonicClockValue = 0,
+            qint64 _syncTime = 0,
+            quint64 _timePriorityKey = 0 )
+        :
+            monotonicClockValue( _monotonicClockValue ),
+            syncTime( _syncTime ),
+            timePriorityKey( _timePriorityKey )
+        {
+        }
+    };
+
+    //!Cares about synchronizing system time across all servers in cluster
+    class TimeManager
+    :
+        public TimeNotificationManager
+    {
+    public:
+        static const quint64 peerTimeSetByUser                       = 0x0100000000LL;
+        static const quint64 peerTimeSynchronizedWithInternetServer  = 0x0200000000LL;
+        static const quint64 peerTimeNonEdgeServer                   = 0x0400000000LL;
+
+        TimeManager();
+        virtual ~TimeManager();
+
+        //!Get synchronized time
+        /*!
+            \param syncTime Synchronized time (UTC, millis from epoch) is saved here
+            TODO there is method \a AbstractECConnection::getCurrentTime already
+        */
+        virtual int getSyncTime( qint64* const syncTime ) const;
+        //!Set peer identified by \a serverGuid to be primary time server
+        virtual int forcePrimaryTimeServer( const QnId& serverGuid, impl::SimpleHandlerPtr handler );
+
+        //!Called when primary time server has been changed by user
+        void primaryTimeServerChanged( const QnTransaction<ApiPrimaryTimeServerData>& tran );
+        TimeSyncInfo getTimeSyncInfo() const;
+        /*!
+            \param peerID
+            \param localMonotonicClock value of local monotonic clock (received with \a TimeManager::monotonicClockValue)
+            \param remotePeerSyncTime remote peer time (millis, UTC from epoch) corresponding to local clock (\a localClock)
+            \param remotePeerTimePriorityKey This value is used to select peer to synchronize time with.\n
+                - upper DWORD is bitset of flags \a peerTimeSetByUser, \a peerTimeSynchronizedWithInternetServer and \a peerTimeNonEdgeServer
+                - low DWORD - some random number
+        */
+        void remotePeerTimeSyncUpdate(
+            const QnId& peerID,
+            qint64 localMonotonicClock,
+            qint64 remotePeerSyncTime,
+            quint64 remotePeerTimePriorityKey );
+        void remotePeerLost( const QnId& peerID );
+
+    private:
+        struct RemotePeerTimeInfo
+        {
+            QnId peerID;
+            qint64 localMonotonicClock;
+            //!synchorionized millis from epoch, corresponding to \a monotonicClockValue
+            qint64 remotePeerSyncTime;
+
+            RemotePeerTimeInfo(
+                const QnId& _peerID = QnId(),
+                qint64 _localMonotonicClock = 0,
+                qint64 _remotePeerSyncTime = 0 )
+            :
+                peerID( _peerID ),
+                localMonotonicClock( _localMonotonicClock ),
+                remotePeerSyncTime( _remotePeerSyncTime )
+            {
+            }
+        };
+
+        //!Delta (millis) from \a m_monotonicClock to synchronized time. That is, sync_time = m_monotonicClock.elapsed + delta
+        qint64 m_timeDelta;
+        //!Using monotonic clock to be proof to local system time change
+        QElapsedTimer m_monotonicClock;
+        /*!
+            - upper DWORD is bitset of flags \a peerTimeSetByUser, \a peerTimeSynchronizedWithInternetServer and \a peerTimeNonEdgeServer
+            - low DWORD - some random number
+        */
+        quint64 m_timePriorityKey;
+        //!map<priority key, time info>
+        std::map<quint64, RemotePeerTimeInfo, std::greater<quint64> > m_timeInfoByPeer;
+        mutable QMutex m_mutex;
+
+        //!Periodically synchronizing time with internet (if possible)
+        void syncTimeWithExternalSource();
+    };
+}
+
+#endif  //NX_EC2_TIME_MANAGER_H
