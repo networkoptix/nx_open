@@ -60,6 +60,9 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
 
+    if (!m_pendingPeers.contains(server->getId()))
+        return;
+
     if (server->getVersion() == m_version) {
         m_pendingPeers.remove(peerId);
         emit peerFinished(peerId);
@@ -72,17 +75,16 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
     }
 
     if (m_restartingPeers.isEmpty()) {
-        bool pending = false;
         foreach (const QnId &id, m_pendingPeers) {
-            QnResourcePtr resource = qnResPool->getIncompatibleResourceById(id, true);
-            if (resource->getStatus() == QnResource::Offline) {
-                pending = true;
-                break;
+            QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).staticCast<QnMediaServerResource>();
+            if (server->getStatus() == QnResource::Offline) {
+                return;
+            } else if (server->getVersion() != m_version) {
+                finish(InstallationFailed);
+                return;
             }
         }
-
-        if (!pending)
-            finish(InstallationFailed);
+        finish(NoError);
     }
 }
 
