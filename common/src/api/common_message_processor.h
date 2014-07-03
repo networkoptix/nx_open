@@ -58,6 +58,9 @@ protected:
     virtual void processResources(const QnResourceList &resources);
     void processLicenses(const QnLicenseList &licenses);
     void processCameraServerItems(const QnCameraHistoryList &cameraHistoryList);
+    
+    virtual bool canRemoveResource(const QnId& resourceId) { return true; }
+    virtual void removeResourceIgnored(const QnId& resourceId) {}
 public slots:
     void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
     void on_licenseChanged(const QnLicensePtr &license);
