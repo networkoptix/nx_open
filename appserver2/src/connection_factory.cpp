@@ -254,13 +254,15 @@ namespace ec2
             return handler->done( reqID, errorCode, AbstractECConnectionPtr() );
         QnConnectionInfo connectionInfoCopy( connectionInfo );
         connectionInfoCopy.ecUrl = ecURL;
+
+        AbstractECConnectionPtr connection(new RemoteEC2Connection(
+            std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
+            m_resCtx,
+            connectionInfoCopy ));
         return handler->done(
             reqID,
             errorCode,
-            std::make_shared<RemoteEC2Connection>(
-                std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
-                m_resCtx,
-                connectionInfoCopy ) );
+            connection );
     }
 
     void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
