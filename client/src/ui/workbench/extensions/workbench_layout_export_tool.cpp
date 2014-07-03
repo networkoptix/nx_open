@@ -2,6 +2,9 @@
 
 #include <QtCore/QBuffer>
 
+#include <utils/common/model_functions.h>
+#include <utils/app_server_image_cache.h>
+#include <utils/local_file_cache.h>
 
 #include <client/client_settings.h>
 
@@ -14,6 +17,9 @@
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx_ec/data/api_layout_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+
 #include <plugins/resources/archive/avi_files/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
@@ -24,16 +30,10 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
-#include <utils/app_server_image_cache.h>
-#include <utils/local_file_cache.h>
-
 #ifdef Q_OS_WIN
-#include <launcher/nov_launcher_win.h>
+#   include <launcher/nov_launcher_win.h>
 #endif
 
-#include "nx_ec/data/api_layout_data.h"
-#include "utils/serialization/binary_functions.h"
-#include "nx_ec/data/api_conversion_functions.h"
 
 QnLayoutExportTool::QnLayoutExportTool(const QnLayoutResourcePtr &layout,
                                        const QnTimePeriod &period,
@@ -137,8 +137,7 @@ bool QnLayoutExportTool::start() {
     QByteArray layoutData;
     ec2::ApiLayoutData layoutObject;
     fromResourceToApi(m_layout, layoutObject);
-    QnOutputBinaryStream<QByteArray> stream(&layoutData);
-    QnBinary::serialize(layoutObject, &stream);
+    QJson::serialize(layoutObject, &layoutData);
 
 
     QScopedPointer<QIODevice> layoutsFile(m_storage->open(lit("layout.pb"), QIODevice::WriteOnly));

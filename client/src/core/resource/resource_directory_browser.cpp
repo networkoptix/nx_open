@@ -4,22 +4,30 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
-#include "core/resource_management/resource_pool.h"
-#include "plugins/resources/archive/avi_files/avi_dvd_resource.h"
-#include "plugins/resources/archive/avi_files/avi_bluray_resource.h"
-#include "plugins/resources/archive/filetypesupport.h"
-#include "core/resource/layout_resource.h"
-#include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "client/client_globals.h"
-
+#include <utils/common/model_functions.h>
+#include <utils/serialization/proto_message.h>
 #include <utils/common/warnings.h>
 #include <utils/local_file_cache.h>
-#include "nx_ec/data/api_layout_data.h"
-#include "nx_ec/data/api_conversion_functions.h"
-#include "utils/serialization/binary_functions.h"
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/layout_resource.h>
+
+#include <nx_ec/data/api_layout_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+
+#include <client/client_globals.h>
+
+#include <plugins/resources/archive/avi_files/avi_dvd_resource.h>
+#include <plugins/resources/archive/avi_files/avi_bluray_resource.h>
+#include <plugins/resources/archive/filetypesupport.h>
+#include <plugins/storage/file_storage/layout_storage_resource.h>
+
+#include <ui/workaround/layout_proto.h>
+
 
 namespace {
     const int maxResourceCount = 1024;
+
 }
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser() {
@@ -132,12 +140,17 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     
     QnLayoutResourcePtr layout(new QnLayoutResource());
     ec2::ApiLayoutData apiLayout;
-    QnInputBinaryStream<QByteArray> stream(&layoutData);
-    if (QnBinary::deserialize(&stream, &apiLayout)) {//TODO: #Elric 2.2 compatibility is highly required here
-        fromApiToResource(apiLayout, layout);
-    } else {
-        return QnLayoutResourcePtr();
+    if (!QJson::deserialize(layoutData, &apiLayout)) {
+        QnProto::Message<ec2::ApiLayoutData> apiLayoutMessage;
+        if(!QnProto::deserialize(layoutData, &apiLayoutMessage)) {
+            return QnLayoutResourcePtr();
+        } else {
+            apiLayout = apiLayoutMessage.data;
+        }
     }
+        
+    fromApiToResource(apiLayout, layout);
+
     QnLayoutItemDataList orderedItems;
     foreach(const ec2::ApiLayoutItemData& item, apiLayout.items) {
         orderedItems << QnLayoutItemData();
