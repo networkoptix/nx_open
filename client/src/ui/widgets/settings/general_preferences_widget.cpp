@@ -113,6 +113,7 @@ void QnGeneralPreferencesWidget::submitToSettings() {
     qnSettings->setAutoStart(ui->autoStartCheckBox->isChecked());
     qnSettings->setUserIdleTimeoutMSecs(ui->pauseOnInactivityCheckBox->isChecked() ? ui->idleTimeoutSpinBox->value() * 60 * 1000 : 0);
     qnSettings->setClientSkin(static_cast<Qn::ClientSkin>(ui->skinComboBox->itemData(ui->skinComboBox->currentIndex()).toInt()));
+    qnSettings->setGLDoubleBuffer(ui->doubleBufferCheckbox->isChecked());
 
     QStringList extraMediaFolders;
     for(int i = 0; i < ui->extraMediaFoldersList->count(); i++)
