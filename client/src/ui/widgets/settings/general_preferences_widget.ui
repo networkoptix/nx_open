@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>616</width>
-    <height>704</height>
+    <height>698</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -315,26 +315,13 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_8">
+       <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="1,0">
         <item>
          <widget class="QCheckBox" name="downmixAudioCheckBox">
           <property name="text">
            <string/>
           </property>
          </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
         <item>
          <widget class="QLabel" name="downmixWarningLabel">
@@ -347,6 +334,12 @@
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="pauseOnInactivityLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>210</width>
@@ -489,6 +482,50 @@
          <string/>
         </property>
        </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="doubleBufferLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>210</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Double Buffering:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="1,0,0">
+        <item>
+         <widget class="QCheckBox" name="doubleBufferCheckbox">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="doubleBufferWarningLabel">
+          <property name="text">
+           <string>Disable only if the client takes too much CPU.</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="doubleBufferRestartLabel">
+          <property name="text">
+           <string>Restart required.</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

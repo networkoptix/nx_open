@@ -7,13 +7,15 @@
 
 #include <core/resource/layout_resource.h>
 
+#include <ui/workaround/qt5_combobox_workaround.h>
+
 QnAttachToVideowallDialog::QnAttachToVideowallDialog(QWidget *parent) :
     QnButtonBoxDialog(parent),
     ui(new Ui::QnAttachToVideowallDialog)
 {
     ui->setupUi(this);
 
-    connect(ui->layoutsComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, [&](){ui->layoutCustom->setChecked(true);});
+    connect(ui->layoutsComboBox, QnComboboxCurrentIndexChanged, this, [&](){ui->layoutCustom->setChecked(true);});
     connect(ui->amAllRadioButton, &QRadioButton::toggled, ui->autoFillCheckBox, &QCheckBox::setDisabled);
 }
 
