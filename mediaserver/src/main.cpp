@@ -1183,7 +1183,11 @@ void QnMain::run()
 
     if (!MSSettings::roSettings()->value("pendingSwitchToClusterMode").toString().isEmpty()) {
         MSSettings::roSettings()->setValue("systemName", connectInfo->systemName);
-        MSSettings::roSettings()->remove("pendingClusterUpgrade");
+        MSSettings::roSettings()->remove("appserverHost");
+        MSSettings::roSettings()->remove("appserverPort");
+        MSSettings::roSettings()->remove("appserverLogin");
+        MSSettings::roSettings()->remove("appserverPassword");
+        MSSettings::roSettings()->remove("pendingSwitchToClusterMode");
         MSSettings::roSettings()->sync();
         return;
     }
