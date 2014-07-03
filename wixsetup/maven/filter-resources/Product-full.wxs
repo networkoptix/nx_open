@@ -131,7 +131,8 @@
         <CustomAction Id="CheckPorts" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
         <CustomAction Id="CheckPorts2" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
         <CustomAction Id="FixServerFolder" BinaryKey="CustomActions.dll" DllEntry="FixServerFolder"/>
-        <CustomAction Id="GenerateSystemName" BinaryKey="CustomActions.dll" DllEntry="GenerateSystemName"/>        
+        <CustomAction Id="GenerateSystemName" BinaryKey="CustomActions.dll" DllEntry="GenerateSystemName"/>
+        <CustomAction Id="DetectIfSystemIsStandalone" BinaryKey="CustomActions.dll" DllEntry="DetectIfSystemIsStandalone"/>
         
         <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate" Impersonate="yes"
             Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
@@ -172,17 +173,16 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            
-            <Custom Action="GenerateSystemName" Before="CostInitialize">NOT SYSTEM_NAME</Custom>
+            <Custom Action="DetectIfSystemIsStandalone" Before="CostInitialize">$(var.VmsUpgrading)</Custom>
+            <Custom Action="GenerateSystemName" After="DetectIfSystemIsStandalone">$(var.VmsUpgrading) AND NOT SYSTEM_NAME AND STANDALONE_SYSTEM="yes"</Custom>
 
             <Custom Action="CopyDatabaseFile_Cmd" After="InstallFiles">
                 <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyDatabaseFile" After="CopyDatabaseFile_Cmd">
             <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
 
-            
-            <Custom Action="DeleteOldMediaserverSettings_Cmd" After="CopyDatabaseFile">1</Custom>
-            <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">1</Custom>            
+            <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">1</Custom>
+            <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">1</Custom>
 
             <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">
                 <![CDATA[ NOT $(var.VmsInstalling) ]]>

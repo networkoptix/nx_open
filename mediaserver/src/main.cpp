@@ -1181,7 +1181,9 @@ void QnMain::run()
         QnSleep::msleep(3000);
     }
 
-    if (!MSSettings::roSettings()->value("pendingSwitchToClusterMode").toString().isEmpty()) {
+    MSSettings::roSettings()->sync();
+    if (MSSettings::roSettings()->value("pendingSwitchToClusterMode").toString() == "yes") {
+        NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
         MSSettings::roSettings()->setValue("systemName", connectInfo->systemName);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverPort");
@@ -1189,6 +1191,9 @@ void QnMain::run()
         MSSettings::roSettings()->remove("appserverPassword");
         MSSettings::roSettings()->remove("pendingSwitchToClusterMode");
         MSSettings::roSettings()->sync();
+
+        QFile::remove(closeDirPath(getDataDirectory()) + "/ecs.sqlite");
+        qApp->quit();
         return;
     }
       
