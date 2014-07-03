@@ -1674,6 +1674,7 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     QnCommonMessageProcessor::instance()->init(NULL);
 
     // TODO: #Elric save workbench state on logout.
+    // TODO: #GDM save workbench state on connectionClosed() =)
 
     notificationsHandler()->clear();
 
