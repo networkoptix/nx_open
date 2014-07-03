@@ -730,8 +730,15 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-    if(!user)
+    if (!user) {
+        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
         return;
+    }
+
+    if (user->isAdmin())
+        context()->instance<QnWorkbenchUpdateWatcher>()->start();
+    else
+        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 
     /* Open all user's layouts. */
     //if(qnSettings->isLayoutsOpenedOnLogin()) {
@@ -1260,7 +1267,7 @@ void QnWorkbenchActionHandler::notifyAboutUpdate() {
     if(version.isNull())
         return;
 
-    if (version < qnSettings->ignoredUpdateVersion())
+    if (version <= qnSettings->ignoredUpdateVersion())
         return;
 
     bool ignoreThisVersion;

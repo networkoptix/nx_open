@@ -25,17 +25,27 @@ QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject *parent):
     m_checker = new QnUpdateChecker(updateFeedUrl, this);
     connect(m_checker, &QnUpdateChecker::updateAvailable, this, &QnWorkbenchUpdateWatcher::at_checker_updateAvailable);
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
-    timer->start(updatePeriodMSec);
-
-    at_timer_timeout();
+    m_timer = new QTimer(this);
+    m_timer->setInterval(updatePeriodMSec);
+    connect(m_timer, &QTimer::timeout, m_checker, &QnUpdateChecker::checkForUpdates);
 }
 
 QnWorkbenchUpdateWatcher::~QnWorkbenchUpdateWatcher() {}
 
+void QnWorkbenchUpdateWatcher::start() {
+    m_checker->checkForUpdates();
+    m_timer->start();
+}
+
+void QnWorkbenchUpdateWatcher::stop() {
+    m_timer->stop();
+}
+
 void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersion &version) {
     if (version.isNull())
+        return;
+
+    if (!m_timer->isActive())
         return;
 
     if (m_availableUpdate == version)
@@ -43,8 +53,4 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
 
     m_availableUpdate = version;
     emit availableUpdateChanged();
-}
-
-void QnWorkbenchUpdateWatcher::at_timer_timeout() {
-    m_checker->checkForUpdates();
 }

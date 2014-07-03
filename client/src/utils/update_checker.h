@@ -16,6 +16,7 @@ public:
      */
     QnUpdateChecker(const QUrl &url, QObject *parent = NULL);
 
+public slots:
     void checkForUpdates();
 
 signals:

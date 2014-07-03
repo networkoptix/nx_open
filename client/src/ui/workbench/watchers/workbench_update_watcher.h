@@ -6,6 +6,7 @@
 #include <utils/common/software_version.h>
 
 class QnUpdateChecker;
+class QTimer;
 
 class QnWorkbenchUpdateWatcher: public QObject {
     Q_OBJECT
@@ -15,15 +16,19 @@ public:
 
     QnSoftwareVersion availableUpdate() const { return m_availableUpdate; }
 
+public slots:
+    void start();
+    void stop();
+
 signals:
     void availableUpdateChanged();
 
 private slots:
     void at_checker_updateAvailable(const QnSoftwareVersion &version);
-    void at_timer_timeout();
 
 private:
     QnUpdateChecker *m_checker;
+    QTimer *m_timer;
     QnSoftwareVersion m_availableUpdate;
 };
 
