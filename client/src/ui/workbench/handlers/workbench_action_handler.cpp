@@ -817,6 +817,13 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
     if (cameraAdditionDialog())
         cameraAdditionDialog()->hide();
     context()->instance<QnAppServerNotificationCache>()->clear();
+
+    menu()->trigger(Qn::ClearCameraSettingsAction);
+
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    resourcePool()->removeResources(remoteResources);
+
+    qnLicensePool->reset();
 }
 
 void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
@@ -1531,13 +1538,14 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     const QnConnectionData connectionData = qnSettings->lastUsedConnection();
     if (!connectionData.isValid())
         return;
-
-    QnConnectionInfoPtr connectionInfo = parameters.argument<QnConnectionInfoPtr>(Qn::ConnectionInfoRole);
-    if(connectionInfo.isNull()) {
-
-        QnConnectionRequestResult result;
+    
+    QnConnectionInfo connectionInfo;
+    if (parameters.hasArgument(Qn::ConnectionInfoRole)) {   // we have received info from Login Dialog
+        connectionInfo = parameters.argument<QnConnectionInfo>(Qn::ConnectionInfoRole);
+    } else {  // auto-login by previous credentials
+        QnEc2ConnectionRequestResult result;
         QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
-            connectionData.url, &result, &QnConnectionRequestResult::processEc2Reply );
+            connectionData.url, &result, &QnEc2ConnectionRequestResult::processEc2Reply );
 
         QnGraphicsMessageBox* connectingMessageBox = qnSettings->isVideoWallMode()
             ? QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX)
@@ -1557,7 +1565,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         }
 
         QnAppServerConnectionFactory::setEc2Connection( result.connection());
-        connectionInfo = result.reply<QnConnectionInfoPtr>();
+        connectionInfo = result.reply<QnConnectionInfo>();
     }
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
 
@@ -1569,14 +1577,14 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     };
 
     { // I think we should move this common code to common place --gdm
-        bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
-                || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+        bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
+                || connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
         if (!compatibleProduct) {
             incompatibilityHandler();
             return;
         }
 
-        QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
+        QnCompatibilityChecker remoteChecker(connectionInfo.compatibilityItems);
         QnCompatibilityChecker localChecker(localCompatibilityItems());
         QnCompatibilityChecker* compatibilityChecker;
         if (remoteChecker.size() > localChecker.size()) {
@@ -1585,7 +1593,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
             compatibilityChecker = &localChecker;
         }
 
-        if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version)) {
+        if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo.version)) {
             incompatibilityHandler();
             return;
         }
@@ -1593,7 +1601,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     QnSessionManager::instance()->stop();
 
-    QnAppServerConnectionFactory::setCurrentVersion(connectionInfo->version);
+    QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
     QnAppServerConnectionFactory::setDefaultUrl(connectionData.url);
 
     // repopulate the resource pool
@@ -1646,9 +1654,9 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     menu()->trigger(Qn::ClearCameraSettingsAction);
 
-//    QnSessionManager::instance()->stop(); // omfg... logic sucks
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
+    QnSessionManager::instance()->stop();
 
     // Also remove layouts that were just added and have no 'remote' flag set.
     foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
@@ -1662,6 +1670,9 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     qnLicensePool->reset();
 
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
+    QnAppServerConnectionFactory::setEc2Connection( NULL);
+    QnCommonMessageProcessor::instance()->init(NULL);
+
     // TODO: #Elric save workbench state on logout.
 
     notificationsHandler()->clear();

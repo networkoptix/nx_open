@@ -1153,13 +1153,13 @@ void QnMain::run()
         qnResTypePool );
     ec2ConnectionFactory->setContext(resCtx);
     ec2::AbstractECConnectionPtr ec2Connection;
-    QnConnectionInfoPtr connectInfo(new QnConnectionInfo());
+    QnConnectionInfo connectInfo;
     while (!needToStop())
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QnAppServerConnectionFactory::defaultUrl(), &ec2Connection );
         if( errorCode == ec2::ErrorCode::ok )
         {
-            *connectInfo = ec2Connection->connectionInfo();
+            connectInfo = ec2Connection->connectionInfo();
             NX_LOG( QString::fromLatin1("Connected to local EC2"), cl_logWARNING );
             break;
         }
@@ -1174,12 +1174,12 @@ void QnMain::run()
 
 
     runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
-    runtimeInfo.publicIP = connectInfo->publicIp;
-    qnCommon->setRemoteGUID(connectInfo->ecsGuid);
+    runtimeInfo.publicIP = connectInfo.publicIp;
+    qnCommon->setRemoteGUID(connectInfo.ecsGuid);
     QnRuntimeInfoManager::instance()->update(runtimeInfo);
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
-    QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo->ecsGuid.toUtf8());
+    QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo.ecsGuid.toUtf8());
     QnMServerResourceSearcher::instance()->start();
 
     //Initializing plugin manager
@@ -1188,7 +1188,7 @@ void QnMain::run()
     if (needToStop())
         return;
 
-    QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
+    QnCompatibilityChecker remoteChecker(connectInfo.compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
 
     QnCompatibilityChecker* compatibilityChecker;
@@ -1197,7 +1197,7 @@ void QnMain::run()
     else
         compatibilityChecker = &localChecker;
 
-    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, QnSoftwareVersion(QN_ENGINE_VERSION), "ECS", connectInfo->version))
+    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, QnSoftwareVersion(QN_ENGINE_VERSION), "ECS", connectInfo.version))
     {
         NX_LOG(lit("Incompatible Enterprise Controller version detected! Giving up."), cl_logERROR);
         return;

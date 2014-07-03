@@ -22,7 +22,6 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 {
     if (m_connection) {
         m_connection->disconnect(this);
-        //emit connectionClosed();
     }
     m_connection = connection;
 

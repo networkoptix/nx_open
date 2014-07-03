@@ -39,7 +39,7 @@ public:
 
     QUrl currentUrl() const;
     QString currentName() const;
-    QnConnectionInfoPtr currentInfo() const;
+    QnConnectionInfo currentInfo() const;
 
     bool restartPending() const;
 
@@ -93,7 +93,7 @@ private:
     QStandardItem* m_autoFoundItem;
 
     int m_requestHandle;
-    QnConnectionInfoPtr m_connectInfo;
+    QnConnectionInfo m_connectInfo;
 
     QnRenderingWidget *m_renderingWidget;
     QnModuleFinder *m_moduleFinder;
