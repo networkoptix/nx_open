@@ -633,7 +633,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     addTestData();
 #endif
 
-    if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
+    if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::Initial) {
         QObject::connect(&autoTester, SIGNAL(finished()), application, SLOT(quit()));
         autoTester.start();
     }
@@ -679,7 +679,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     result = application->exec();
 
-    if(autoTester.state() == QnAutoTester::FINISHED) {
+    if(autoTester.state() == QnAutoTester::Finished) {
         if(!autoTester.succeeded())
             result = 1;
 

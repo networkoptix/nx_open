@@ -600,7 +600,7 @@ void QnStorageManager::clearSpace(const QnStorageResourcePtr &storage)
     if (toDelete > 0) {
         if (!m_diskFullWarned[storage->getId()]) {
             QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
-            emit storageFailure(storage, QnBusiness::StorageNotEnoughSpaceReason);
+            emit storageFailure(storage, QnBusiness::StorageFullReason);
             m_diskFullWarned[storage->getId()] = true;
         }
     }

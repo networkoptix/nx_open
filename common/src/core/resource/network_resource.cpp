@@ -142,25 +142,25 @@ QString QnNetworkResource::toSearchString() const
     return result;
 }
 
-void QnNetworkResource::addNetworkStatus(QnNetworkStatus status)
+void QnNetworkResource::addNetworkStatus(NetworkStatus status)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_networkStatus |=  status;
+    m_networkStatus |= status;
 }
 
-void QnNetworkResource::removeNetworkStatus(QnNetworkStatus status)
+void QnNetworkResource::removeNetworkStatus(NetworkStatus status)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_networkStatus &=  (~status);
+    m_networkStatus &= (~status);
 }
 
-bool QnNetworkResource::checkNetworkStatus(QnNetworkStatus status) const
+bool QnNetworkResource::checkNetworkStatus(NetworkStatus status) const
 {
     QMutexLocker mutexLocker(&m_mutex);
-    return m_networkStatus & status;
+    return (m_networkStatus & status) == status;
 }
 
-void QnNetworkResource::setNetworkStatus(QnNetworkStatus status)
+void QnNetworkResource::setNetworkStatus(NetworkStatus status)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_networkStatus = status;

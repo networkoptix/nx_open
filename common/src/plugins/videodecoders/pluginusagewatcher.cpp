@@ -7,6 +7,8 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QMutexLocker>
 
+#include <utils/common/log.h>
+
 
 static const size_t SHARED_MEMORY_SIZE = 16*1024;
 

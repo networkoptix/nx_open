@@ -5,6 +5,8 @@
 
 #include "video_data_packet.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <utils/memory/cyclic_allocator.h>
 
 
@@ -84,3 +86,5 @@ void QnWritableCompressedVideoData::assign( const QnWritableCompressedVideoData*
     QnCompressedVideoData::assign( other );
     m_data = other->m_data;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

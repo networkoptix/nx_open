@@ -113,11 +113,11 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     connection->startReceivingNotifications();
 }
 
-void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool /*isProxy*/)
+void QnCommonMessageProcessor::at_remotePeerFound(const ec2::ApiPeerAliveData &, bool)
 {
 }
 
-void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData runtimeInfo, bool /*isProxy*/)
+void QnCommonMessageProcessor::at_remotePeerLost(const ec2::ApiPeerAliveData &, bool)
 {
 }
 
@@ -266,6 +266,14 @@ void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryLis
         QnCameraHistoryPool::instance()->addCameraHistory(history);
 }
 
+bool QnCommonMessageProcessor::canRemoveResource(const QnId &) 
+{ 
+    return true; 
+}
+
+void QnCommonMessageProcessor::removeResourceIgnored(const QnId &) 
+{
+}
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {

@@ -61,11 +61,15 @@ public:
         }
 #endif
 
-        switch (m_remotePeer.peerType) {
-        case Qn::PT_AndroidClient:
+        switch (m_remotePeer.dataFormat) {
+        case Qn::JsonFormat:
             addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
+        case Qn::BnsFormat:
+            addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            break;
         default:
+            qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
             addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
         }

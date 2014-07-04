@@ -61,11 +61,16 @@ void QnTransactionTcpProcessor::run()
         ? query.queryItemValue("instanceGuid")
         : QnId();
 
-    ApiPeerData remotePeer(remoteGuid, 
-        isMobileClient  ? Qn::PT_AndroidClient
+    Qn::PeerType peerType = isMobileClient  ? Qn::PT_MobileClient
         : isVideowall   ? Qn::PT_VideowallClient
         : isClient      ? Qn::PT_DesktopClient
-        : Qn::PT_Server);
+        : Qn::PT_Server;
+
+    Qn::SerializationFormat dataFormat = Qn::BnsFormat;
+    if (query.hasQueryItem("format"))
+         QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
+
+    ApiPeerData remotePeer(remoteGuid, peerType, dataFormat);
 
     if (isVideowall) {
         remotePeer.params["videowallGuid"] = videowallGuid.toString();

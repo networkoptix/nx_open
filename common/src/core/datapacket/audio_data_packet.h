@@ -6,6 +6,8 @@
 #ifndef AUDIO_DATA_PACKET_H
 #define AUDIO_DATA_PACKET_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "media_data_packet.h"
 
 
@@ -79,5 +81,7 @@ private:
 
 typedef QSharedPointer<QnWritableCompressedAudioData> QnWritableCompressedAudioDataPtr;
 typedef QSharedPointer<const QnWritableCompressedAudioData> QnConstWritableCompressedAudioDataPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //AUDIO_DATA_PACKET_H

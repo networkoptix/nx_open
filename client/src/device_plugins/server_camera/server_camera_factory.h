@@ -1,10 +1,15 @@
 #ifndef QN_SERVER_CAMERA_FACTORY_H
 #define QN_SERVER_CAMERA_FACTORY_H
 
+#include <QtCore/QObject>
+
 #include <core/resource/resource_factory.h>
 
-class QnServerCameraFactory: public QnResourceFactory {
+class QnServerCameraFactory: public QObject, public QnResourceFactory {
+    Q_OBJECT
 public:
+    QnServerCameraFactory(QObject *parent = NULL): QObject(parent) {}
+
     virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams &params) override;
 
     static QnServerCameraFactory &instance();

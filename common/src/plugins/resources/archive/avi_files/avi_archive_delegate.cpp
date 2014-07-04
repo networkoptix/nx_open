@@ -369,7 +369,7 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
         QString format = QString(QLatin1String(m_formatContext->iformat->name)).split(QLatin1Char(','))[0];
 
         // check time zone in the 4-th column
-        AVDictionaryEntry* sign = av_dict_get(m_formatContext->metadata, getTagName(Tag_Signature, format), 0, 0);
+        AVDictionaryEntry* sign = av_dict_get(m_formatContext->metadata, getTagName(SignatureTag, format), 0, 0);
         if (sign && sign->value) {
             QList<QByteArray> tmp = QByteArray(sign->value).split(QnSignHelper::getSignPatternDelim());
             if (tmp.size() > 4) {
@@ -380,18 +380,18 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
             }
         }
 
-        AVDictionaryEntry* software = av_dict_get(m_formatContext->metadata, getTagName(Tag_Software, format), 0, 0);
+        AVDictionaryEntry* software = av_dict_get(m_formatContext->metadata, getTagName(SoftwareTag, format), 0, 0);
         bool allowTags = format != QLatin1String("avi") || (software && QString(QLatin1String(software->value)) == QLatin1String("Network Optix"));
 
         if (allowTags)
         {
-            AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,getTagName(Tag_LayoutInfo, format), 0, 0);
+            AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,getTagName(LayoutInfoTag, format), 0, 0);
             if (layoutInfo)
                 deserializeLayout(m_videoLayout.data(), QLatin1String(layoutInfo->value));
 
             if (m_useAbsolutePos)
             {
-                AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,getTagName(Tag_startTime, format), 0, 0);
+                AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,getTagName(StartTimeTag, format), 0, 0);
                 if (start_time) {
                     m_startTime = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
                     if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
@@ -403,14 +403,14 @@ QnResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
                 }
             }
 
-            AVDictionaryEntry* dewarpInfo = av_dict_get(m_formatContext->metadata,getTagName(Tag_Dewarping, format), 0, 0);
+            AVDictionaryEntry* dewarpInfo = av_dict_get(m_formatContext->metadata,getTagName(DewarpingTag, format), 0, 0);
             if (dewarpInfo) {
                 QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>();
                 if (mediaRes)
                     mediaRes->setDewarpingParams(QnMediaDewarpingParams::deserialized(dewarpInfo->value));
             }
 
-            AVDictionaryEntry* customInfo = av_dict_get(m_formatContext->metadata,getTagName(Tag_Custom, format), 0, 0);
+            AVDictionaryEntry* customInfo = av_dict_get(m_formatContext->metadata,getTagName(CustomTag, format), 0, 0);
             if (customInfo) {
                 QnAviArchiveCustomData data = QJson::deserialized<QnAviArchiveCustomData>(customInfo->value);
                 m_resource->setProperty(QnMediaResource::customAspectRatioKey(), QString::number(data.overridenAr));
@@ -639,39 +639,25 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
         // list of all RIFF tag names and information about their usability can be found at http://ru.wikipedia.org/wiki/RIFF
         switch(tag)
         {
-        case Tag_startTime:
-            return "date"; // "ICRD";
-        case Tag_endTime:
-            return "ISRC"; // not used
-        case Tag_LayoutInfo:
-            return "comment"; // "ICMT";
-        case Tag_Software:
-            return "encoded_by"; // "ITCH";
-        case Tag_Signature:
-            return "copyright"; // "ICOP";
-        case Tag_Dewarping:
-            return "title";
-        case Tag_Custom:
-            return "IENG"; //IENG 
+        case StartTimeTag:  return "date"; // "ICRD";
+        case EndTimeTag:    return "ISRC"; // not used
+        case LayoutInfoTag: return "comment"; // "ICMT";
+        case SoftwareTag:   return "encoded_by"; // "ITCH";
+        case SignatureTag:  return "copyright"; // "ICOP";
+        case DewarpingTag:  return "title";
+        case CustomTag:     return "IENG"; //IENG 
         }
-    }
+    } 
     else {
         switch(tag)
         {
-        case Tag_startTime:
-            return "start_time"; // StartTimecode
-        case Tag_endTime:
-            return "end_time"; // EndTimecode
-        case Tag_LayoutInfo:
-            return "video_layout"; // TrackNumber
-        case Tag_Software:
-            return "software";
-        case Tag_Signature:
-            return "signature";
-        case Tag_Dewarping:
-            return "dewarp";
-        case Tag_Custom:
-            return "custom_data";
+        case StartTimeTag:  return "start_time"; // StartTimecode
+        case EndTimeTag:    return "end_time"; // EndTimecode
+        case LayoutInfoTag: return "video_layout"; // TrackNumber
+        case SoftwareTag:   return "software";
+        case SignatureTag:  return "signature";
+        case DewarpingTag:  return "dewarp";
+        case CustomTag:     return "custom_data";
         }
     }
     return "";

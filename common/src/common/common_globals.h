@@ -459,7 +459,7 @@ public:
         PT_Server = 0,
         PT_DesktopClient = 1,
         PT_VideowallClient = 2,
-        PT_AndroidClient = 3,
+        PT_MobileClient = 3,
 
         PT_Count
     };
@@ -484,6 +484,7 @@ public:
         CsvFormat,
         XmlFormat
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SerializationFormat)
 
 
     /**
