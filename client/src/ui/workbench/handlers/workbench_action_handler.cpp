@@ -1709,11 +1709,40 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     if(!resource)
         return;
 
+    bool isSearchLayout = workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+    
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-    if(period.isEmpty())
-        return;
-
     QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
+
+    if (period.isEmpty()) {
+        if (!isSearchLayout)
+            return;
+
+        QnResourceWidget *widget = parameters.widget();
+        if (!widget)
+            return;
+        
+        period = widget->item()->data(Qn::ItemSliderSelectionRole).value<QnTimePeriod>();
+        if (period.isEmpty())
+            return;
+
+        periods = widget->item()->data(Qn::TimePeriodsRole).value<QnTimePeriodList>();
+    }
+
+    /* Adjust for chunks. If they are provided, they MUST intersect with period */
+    if(!periods.isEmpty()) {
+        qint64 startDelta = periods.first().startTimeMs - period.startTimeMs;
+        if (startDelta > 0) { //user selected period before the first chunk
+            period.startTimeMs += startDelta;
+            period.durationMs -= startDelta;
+        }
+
+        qint64 endDelta = period.endTimeMs() - periods.last().endTimeMs();
+        if (endDelta > 0) { // user selected period after the last chunk
+            period.durationMs -= endDelta;
+        }       
+    }
+
 
     /* List of possible time steps, in milliseconds. */
     const qint64 steps[] = {
@@ -1803,7 +1832,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         itemCount = qMin(period.durationMs / step, maxItems);
     }
 
-    /* Adjust for chunks. */
+    /* Adjust resulting period for chunks. */
     if(!periods.isEmpty()) {
         qint64 startTime = periods[0].startTimeMs;
 
@@ -1812,12 +1841,6 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             period.durationMs -= step;
             itemCount--;
         }
-
-        /*qint64 endTime = qnSyncTime->currentMSecsSinceEpoch();
-        while(endTime < period.startTimeMs + period.durationMs) {
-            period.durationMs -= step;
-            itemCount--
-        }*/
     }
 
     /* Calculate size of the resulting matrix. */
@@ -1851,6 +1874,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
         item.dataByRole[Qn::ItemTimeRole] = time;
         item.dataByRole[Qn::ItemAspectRatioRole] = desiredAspectRatio;  // set aspect ratio to make thumbnails load in all cases, see #2619
+        item.dataByRole[Qn::TimePeriodsRole] = QVariant::fromValue<QnTimePeriodList>(periods.intersected(period));
 
         layout->addItem(item);
 
