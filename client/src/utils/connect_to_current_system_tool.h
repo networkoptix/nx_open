@@ -6,7 +6,6 @@
 #include <utils/common/id.h>
 
 class QnConfigurePeerTask;
-class QnRestartPeerTask;
 class QnUpdateDialog;
 class QnMediaServerUpdateTool;
 
@@ -17,8 +16,7 @@ public:
         NoError,
         AuthentificationFailed,
         ConfigurationFailed,
-        UpdateFailed,
-        RestartFailed
+        UpdateFailed
     };
 
     explicit QnConnectToCurrentSystemTool(QObject *parent = 0);
@@ -35,12 +33,10 @@ private:
     void finish(ErrorCode errorCode);
     void configureServer();
     void updatePeers();
-    void restartPeers();
     void revertApiUrls();
 
 private slots:
     void at_configureTask_finished(int errorCode, const QSet<QnId> &failedPeers);
-    void at_restartPeerTask_finished(int errorCode);
     void at_updateTool_stateChanged(int state);
 
 private:
@@ -52,7 +48,6 @@ private:
     QSet<QnId> m_updateTargets;
     QHash<QnId, QUrl> m_oldUrls;
     QnConfigurePeerTask *m_configureTask;
-    QnRestartPeerTask *m_restartPeerTask;
     QScopedPointer<QnUpdateDialog> m_updateDialog;
     QnMediaServerUpdateTool *m_updateTool;
     int m_prevToolState;
