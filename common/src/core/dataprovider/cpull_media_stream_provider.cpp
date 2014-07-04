@@ -1,6 +1,8 @@
+#include "cpull_media_stream_provider.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 #include "utils/common/sleep.h"
-#include "cpull_media_stream_provider.h"
 #include "core/datapacket/video_data_packet.h"
 #include "../resource/camera_resource.h"
 
@@ -166,3 +168,5 @@ void QnClientPullMediaStreamProvider::beforeRun()
     QnAbstractMediaStreamDataProvider::beforeRun();
     getResource()->init();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

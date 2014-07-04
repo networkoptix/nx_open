@@ -1,4 +1,7 @@
 #include "abstract_data_consumer.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "utils/common/sleep.h"
 
 
@@ -64,3 +67,5 @@ int QnAbstractDataConsumer::queueSize() const
 {
     return m_dataQueue.size();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

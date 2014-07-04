@@ -722,6 +722,7 @@ void QnResource::disconnectAllConsumers()
     m_consumers.clear();
 }
 
+#ifdef ENABLE_DATA_PROVIDERS
 QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role)
 {
     QnAbstractStreamDataProvider* dataProvider = createDataProviderInternal(role);
@@ -732,11 +733,11 @@ QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role
     return dataProvider;
 }
 
-QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(ConnectionRole role)
+QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(ConnectionRole)
 {
-    Q_UNUSED(role)
     return NULL;
 }
+#endif
 
 QnAbstractPtzController *QnResource::createPtzController() {
     QnAbstractPtzController *result = createPtzControllerInternal();

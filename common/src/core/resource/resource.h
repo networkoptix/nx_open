@@ -221,7 +221,9 @@ public:
     virtual QnResourcePtr updateResource() { return QnResourcePtr(0); }
     //=============
 
+#ifdef ENABLE_DATA_PROVIDERS
     QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
+#endif
 
     QString getUrl() const;
     virtual void setUrl(const QString &url);
@@ -312,7 +314,10 @@ protected:
 
     virtual bool setSpecialParam(const QString& name, const QVariant& val, QnDomain domain);
 
+#ifdef ENABLE_DATA_PROVIDERS
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+#endif
+
     virtual QnAbstractPtzController *createPtzControllerInternal(); // TODO: #Elric does not belong here
 
     virtual CameraDiagnostics::Result initInternal() {return CameraDiagnostics::NoErrorResult();};

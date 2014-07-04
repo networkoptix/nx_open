@@ -1,6 +1,8 @@
 #ifndef abstract_media_data_h_112
 #define abstract_media_data_h_112
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QVector>
 #include <QtCore/QRect>
 
@@ -263,5 +265,7 @@ protected:
 private:
     qint64 m_firstTimestamp;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //abstract_media_data_h_112

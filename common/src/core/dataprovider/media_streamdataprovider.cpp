@@ -1,4 +1,7 @@
 #include "media_streamdataprovider.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "core/resource/resource_media_layout.h"
 #include "core/datapacket/media_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
@@ -191,3 +194,5 @@ CameraDiagnostics::Result QnAbstractMediaStreamDataProvider::diagnoseMediaStream
 {
     return CameraDiagnostics::NotImplementedResult();
 }
+
+#endif // ENABLE_DATA_PROVIDERS
