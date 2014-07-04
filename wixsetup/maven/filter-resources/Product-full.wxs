@@ -187,8 +187,8 @@
             <Custom Action="CopyDatabaseFile" After="CopyDatabaseFile_Cmd">
             <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">1</Custom>
-            <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">1</Custom>
+            <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">$(var.VmsUpgrading)</Custom>
+            <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">$(var.VmsUpgrading)</Custom>
 
             <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">
                 <![CDATA[ NOT $(var.VmsInstalling) ]]>

@@ -33,6 +33,7 @@
                     <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
                         <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
                         <RegistryValue Type="string" Name="port" Value="[SERVER_PORT]"/>
+                        <RegistryValue Type="string" Name="adminPassword" Value="[SERVER_PASSWORD]"/>
                     </RegistryKey>
                 </Component>
 

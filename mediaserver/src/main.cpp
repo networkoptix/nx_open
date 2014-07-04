@@ -638,6 +638,7 @@ void initAppServerConnection(QSettings &settings)
         appServerUrl.setPort(port);
     }
 
+    // TODO: Actually appserverPassword is always empty. Remove?
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
     QString password = settings.value("appserverPassword", QLatin1String("")).toString();
     QByteArray authKey = settings.value("authKey").toByteArray();
@@ -1142,7 +1143,9 @@ void QnMain::run()
     connect(QnStorageManager::instance(), &QnStorageManager::storageFailure, this, &QnMain::at_storageManager_storageFailure);
     connect(QnStorageManager::instance(), &QnStorageManager::rebuildFinished, this, &QnMain::at_storageManager_rebuildFinished);
 
-    qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("")).toString());
+    // If adminPassword is set by installer save it and create admin user with it if not exists yet
+    // TODO: #vig add ecncryption for adminPassword
+    qnCommon->setDefaultAdminPassword(settings->value("adminPassword", QLatin1String("")).toString());
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
     qnCommon->setModuleGUID(serverGuid());
