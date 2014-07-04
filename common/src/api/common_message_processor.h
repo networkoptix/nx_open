@@ -45,9 +45,10 @@ signals:
     void cameraBookmarkTagsAdded(const QnCameraBookmarkTags &tags);
     void cameraBookmarkTagsRemoved(const QnCameraBookmarkTags &tags);
 
-    void runtimeInfoChanged (const ec2::ApiRuntimeData &runtimeInfo);
-    void remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
-    void remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
+    void runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
+    void remotePeerFound(const ec2::ApiPeerAliveData &data, bool isProxy);
+    void remotePeerLost(const ec2::ApiPeerAliveData &data, bool isProxy);
+
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) = 0;
@@ -59,11 +60,13 @@ protected:
     void processLicenses(const QnLicenseList &licenses);
     void processCameraServerItems(const QnCameraHistoryList &cameraHistoryList);
     
-    virtual bool canRemoveResource(const QnId& resourceId) { return true; }
-    virtual void removeResourceIgnored(const QnId& resourceId) {}
+    virtual bool canRemoveResource(const QnId& resourceId);
+    virtual void removeResourceIgnored(const QnId& resourceId);
+
 public slots:
     void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
     void on_licenseChanged(const QnLicensePtr &license);
+
 private slots:
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
 
@@ -83,8 +86,8 @@ private slots:
 
     void on_panicModeChanged(Qn::PanicMode mode);
 
-    void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
-    void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
+    void at_remotePeerFound(const ec2::ApiPeerAliveData &data, bool isProxy);
+    void at_remotePeerLost(const ec2::ApiPeerAliveData &data, bool isProxy);
     
 protected:
     ec2::AbstractECConnectionPtr m_connection;
