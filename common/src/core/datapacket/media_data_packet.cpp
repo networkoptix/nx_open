@@ -1,5 +1,7 @@
 #include "media_data_packet.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 extern "C"
 {
     #include <libavformat/avformat.h>
@@ -100,11 +102,25 @@ bool QnMediaContext::equalTo(QnMediaContext *other) const
 }
 
 
+QnAbstractMediaData::QnAbstractMediaData( DataType _dataType )
+: 
+    dataType(_dataType),
+    compressionType(CODEC_ID_NONE),
+    flags(MediaFlags_None),
+    channelNumber(0),
+    context(0),
+    opaque(0)
+{
+}
+
+QnAbstractMediaData::~QnAbstractMediaData()
+{
+}
+
 void QnAbstractMediaData::assign(const QnAbstractMediaData* other)
 {
     dataProvider = other->dataProvider;
     timestamp = other->timestamp;
-
     dataType = other->dataType;
     compressionType = other->compressionType;
     flags = other->flags;
@@ -122,9 +138,9 @@ void QnAbstractMediaData::assign(const QnAbstractMediaData* other)
 //    return rez;
 //}
 
-QnEmptyMediaData* QnEmptyMediaData::clone() const
+QnEmptyMediaData* QnEmptyMediaData::clone( QnAbstractAllocator* allocator ) const
 {
-    QnEmptyMediaData* rez = new QnEmptyMediaData();
+    QnEmptyMediaData* rez = new QnEmptyMediaData( allocator );
     rez->assign(this);
     rez->m_data.write(m_data.constData(), m_data.size());
     return rez;
@@ -133,8 +149,29 @@ QnEmptyMediaData* QnEmptyMediaData::clone() const
 
 // ----------------------------------- QnMetaDataV1 -----------------------------------------
 
-QnMetaDataV1::QnMetaDataV1(int initialValue):
+QnMetaDataV1::QnMetaDataV1(int initialValue)
+:   //TODO #ak delegate constructor
     m_data(CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HEIGHT/8)
+{
+    dataType = META_V1;
+    //useTwice = false;
+
+    flags = 0;
+    m_input = 0;
+    m_duration = 0;
+    m_firstTimestamp = AV_NOPTS_VALUE;
+    timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
+    if (initialValue)
+        m_data.writeFiller(0xff, m_data.capacity());
+    else
+        m_data.writeFiller(0, m_data.capacity());
+}
+
+QnMetaDataV1::QnMetaDataV1(
+    QnAbstractAllocator* allocator,
+    int initialValue)
+:
+    m_data(allocator, CL_MEDIA_ALIGNMENT, MD_WIDTH*MD_HEIGHT/8)
 {
     dataType = META_V1;
     //useTwice = false;
@@ -201,7 +238,7 @@ inline bool mathImage_cpu(const simd128i* data, const simd128i* mask, int maskSt
     return false;
 }
 
-bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
+bool QnMetaDataV1::matchImage(const simd128i* data, const simd128i* mask, int maskStart, int maskEnd)
 {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     if (useSSE41())
@@ -220,16 +257,15 @@ bool QnMetaDataV1::mathImage(const simd128i* data, const simd128i* mask, int mas
 void QnMetaDataV1::assign(const QnMetaDataV1* other)
 {
     QnAbstractMediaData::assign(other);
-    m_data.clear();
-    m_data.write(other->m_data.data(), other->m_data.size());
+    m_data = other->m_data;
     m_input = other->m_input;
     m_duration = other->m_duration;
     m_firstTimestamp = other->m_firstTimestamp;
 }
 
-QnMetaDataV1* QnMetaDataV1::clone() const
+QnMetaDataV1* QnMetaDataV1::clone( QnAbstractAllocator* allocator ) const
 {
-    QnMetaDataV1* rez = new QnMetaDataV1();
+    QnMetaDataV1* rez = new QnMetaDataV1( allocator );
     rez->assign(this);
     return rez;
 }
@@ -509,3 +545,6 @@ bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
 {
     return timeMs < data.startTimeMs;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
+

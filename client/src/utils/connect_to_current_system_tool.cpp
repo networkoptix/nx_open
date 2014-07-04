@@ -7,24 +7,28 @@
 #include <common/common_module.h>
 #include <utils/network/global_module_finder.h>
 #include <utils/configure_peer_task.h>
-#include <utils/restart_peer_task.h>
 #include <utils/media_server_update_tool.h>
 #include <utils/common/software_version.h>
 #include <ui/dialogs/update_dialog.h>
 
 #include "version.h"
 
+namespace {
+    enum UpdateToolState {
+        CheckingForUpdates,
+        Updating
+    };
+}
+
 QnConnectToCurrentSystemTool::QnConnectToCurrentSystemTool(QObject *parent) :
     QObject(parent),
     m_running(false),
     m_configureTask(new QnConfigurePeerTask(this)),
-    m_restartPeerTask(new QnRestartPeerTask(this)),
     m_updateDialog(new QnUpdateDialog())
 {
     m_updateTool = m_updateDialog->updateTool();
 
     connect(m_configureTask,            &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_configureTask_finished);
-    connect(m_restartPeerTask,          &QnNetworkPeerTask::finished,               this,       &QnConnectToCurrentSystemTool::at_restartPeerTask_finished);
     // queued connection is used to be sure that we'll get this signal AFTER it will be handled by update dialog
     connect(m_updateTool,               &QnMediaServerUpdateTool::stateChanged,     this,       &QnConnectToCurrentSystemTool::at_updateTool_stateChanged, Qt::QueuedConnection);
 }
@@ -87,28 +91,15 @@ void QnConnectToCurrentSystemTool::configureServer() {
 
 void QnConnectToCurrentSystemTool::updatePeers() {
     if (m_updateTargets.isEmpty()) {
-        restartPeers();
-        return;
-    }
-
-    m_updateFailed = false;
-    m_restartAllPeers = false;
-    m_updateDialog->setTargets(m_updateTargets);
-    m_updateDialog->show();
-    m_prevToolState = QnMediaServerUpdateTool::CheckingForUpdates;
-    m_updateTool->checkForUpdates(qnCommon->engineVersion());
-}
-
-void QnConnectToCurrentSystemTool::restartPeers() {
-    if (m_restartAllPeers)
-        m_restartTargets = m_targets;
-
-    if (m_restartTargets.isEmpty()) {
         finish(NoError);
         return;
     }
 
-    m_restartPeerTask->start(m_restartTargets);
+    m_updateFailed = false;
+    m_updateDialog->setTargets(m_updateTargets);
+    m_updateDialog->show();
+    m_prevToolState = CheckingForUpdates;
+    m_updateTool->checkForUpdates(qnCommon->engineVersion());
 }
 
 void QnConnectToCurrentSystemTool::revertApiUrls() {
@@ -140,8 +131,6 @@ void QnConnectToCurrentSystemTool::at_configureTask_finished(int errorCode, cons
 
         if (server->getVersion() != qnCommon->engineVersion())
             m_updateTargets.insert(id);
-        else
-            m_restartTargets.insert(id);
     }
 
     updatePeers();
@@ -151,46 +140,22 @@ void QnConnectToCurrentSystemTool::at_updateTool_stateChanged(int state) {
     if (state != QnMediaServerUpdateTool::Idle)
         return;
 
-    // decide what to do next.
-    // Previous state is not actual tool previous state! It's set manually in code.
-    if (m_prevToolState == QnMediaServerUpdateTool::CheckingForUpdates) {
+    if (m_prevToolState == CheckingForUpdates) {
         switch (m_updateTool->updateCheckResult()) {
         case QnMediaServerUpdateTool::UpdateFound:
-            m_prevToolState = QnMediaServerUpdateTool::DownloadingUpdate;
+            m_prevToolState = Updating;
             m_updateTool->updateServers();
             return;
         case QnMediaServerUpdateTool::NoNewerVersion:
-            m_restartAllPeers = true;
             break;
         default:
-            m_restartAllPeers = true;
             m_updateFailed = true;
             break;
         }
-    } else if (m_prevToolState == QnMediaServerUpdateTool::DownloadingUpdate) {
-        switch (m_updateTool->updateResult()) {
-        case QnMediaServerUpdateTool::Cancelled:
-        case QnMediaServerUpdateTool::LockFailed:
-        case QnMediaServerUpdateTool::DownloadingFailed:
-        case QnMediaServerUpdateTool::UploadingFailed:
-            m_restartAllPeers = true;
-            break;
-        default:
-            break;
-        }
-
+    } else if (m_prevToolState == Updating) {
         m_updateFailed = (m_updateTool->updateResult() != QnMediaServerUpdateTool::UpdateSuccessful);
     }
 
     m_updateDialog->hide();
-    restartPeers();
-}
-
-void QnConnectToCurrentSystemTool::at_restartPeerTask_finished(int errorCode) {
-    if (errorCode != 0) {
-        finish(RestartFailed);
-        return;
-    }
-
     finish(m_updateFailed ? UpdateFailed : NoError);
 }

@@ -7,7 +7,7 @@
 #include "nx_ec/data/api_fwd.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
-
+#include "nx_ec/data/api_runtime_data.h"
 
 namespace ec2
 {
@@ -112,9 +112,9 @@ namespace ec2
         }
 
         //getCurrentTime
-        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, qint64& currentTime);
+        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime);
 
-        //getStoragePath
+        //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
         //getStorageData
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredFileData& data);
@@ -161,12 +161,8 @@ namespace ec2
         // ApiDiscoveryDataList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ec2::ApiDiscoveryDataList& data);
 
-        //getHelp
-        ErrorCode doQueryNoLock(const QString& group, ec2::ApiHelpGroupDataList& data);
-
 		// --------- misc -----------------------------
         bool markLicenseOverflow(bool value, qint64 time);
-        qint64 licenseOverflowTime() const;
         QUuid getID() const;
 
         ApiOjectType getObjectType(const QnId& objectId);
@@ -184,12 +180,11 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiSetResourceStatusData>& tran);
-        //ErrorCode executeTransactionInternal(const QnTransaction<ApiSetResourceDisabledData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamsData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiPanicModeData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<QString> &tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiBusinessRuleData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUserData>& tran);
@@ -266,12 +261,27 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiSystemNameData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLockData> &) {
            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
 
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiRuntimeData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
         ErrorCode executeTransactionInternal(const QnTransaction<ApiPeerAliveData> &) {
+            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
+            return ErrorCode::notImplemented;
+        }
+
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateInstallData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -281,7 +291,7 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<int> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<QnTranStateResponse> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
@@ -359,8 +369,6 @@ namespace ec2
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
         QnId getType(const QString& typeName);
-        bool loadHelpData(const QString& fileName);
-        void fillServerInfo( ApiServerInfoData* const serverInfo );
     private:
         QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;
@@ -373,7 +381,6 @@ namespace ec2
         bool m_licenseOverflowMarked;
         qint64 m_licenseOverflowTime;
         QUuid m_dbInstanceId;
-        ApiHelpGroupDataList* m_helpData;
     };
 };
 

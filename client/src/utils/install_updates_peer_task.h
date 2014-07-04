@@ -28,6 +28,9 @@ private slots:
     void at_checkTimeout();
 
 private:
+    void finish(int errorCode);
+
+private:
     QString m_updateId;
     QnSoftwareVersion m_version;
     QSet<QnId> m_restartingPeers;

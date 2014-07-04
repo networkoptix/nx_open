@@ -14,6 +14,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/environment.h>
+#include <utils/network/module_finder.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/file_processor.h>
@@ -48,6 +49,7 @@
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
 #include <ui/workbench/watchers/workbench_system_name_watcher.h>
+#include <ui/workbench/watchers/workbench_server_address_watcher.h>
 #include <ui/workbench/workbench_controller.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
@@ -62,7 +64,7 @@
 #include <ui/style/noptix_style.h>
 #include <ui/style/proxy_style.h>
 #include <ui/workaround/qtbug_workaround.h>
-#include <ui/workaround/mac_event_loop_workaround.h>
+#include <ui/workaround/vsync_workaround.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include <client/client_settings.h>
@@ -219,6 +221,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchPtzDialogWatcher>();
     context->instance<QnWorkbenchSystemNameWatcher>();
 
+    QnWorkbenchServerAddressWatcher *serverAddressWatcher = context->instance<QnWorkbenchServerAddressWatcher>();
+    serverAddressWatcher->setDirectModuleFinder(QnModuleFinder::instance()->directModuleFinder());
+    serverAddressWatcher->setDirectModuleFinderHelper(QnModuleFinder::instance()->directModuleFinderHelper());
+
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
@@ -341,11 +347,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     menu()->newMenu(Qn::MainScope);
 #endif
 
-//#ifdef Q_OS_MACX
-    /* Side-effect of this workaround is fps lowering. So enable it for other systems too. */
-    QnMacEventLoopWorkaround *macEventLoopWorkaround = new QnMacEventLoopWorkaround(m_view->viewport(), this);
-    Q_UNUSED(macEventLoopWorkaround);
-//#endif
+    if (!qnSettings->isVSyncEnabled()) {
+        QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
+        Q_UNUSED(vsyncWorkaround);
+    }
 
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
     Q_UNUSED(manageDialog)

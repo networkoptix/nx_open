@@ -114,6 +114,8 @@ int QnConfigureRestHandler::changePort(int port) {
 
     MSSettings::roSettings()->setValue(nx_ms_conf::RTSP_PORT, port);
 
+    //TODO: update port in TCP listener
+
     return ResultOk;
 }
 

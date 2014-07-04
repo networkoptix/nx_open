@@ -10,18 +10,18 @@
 #include <cstdlib>
 
 #include <plugins/plugin_tools.h>
-#include <utils/memory/nx_allocation_cache.h>
+#include <utils/memory/cyclic_allocator.h>
 
 
 ILPVideoPacket::ILPVideoPacket(
-    NxBufferCache* const mediaBufferCache,
+    CyclicAllocator* const allocator,
     int channelNumber,
     nxcip::UsecUTCTimestamp _timestamp,
     unsigned int flags,
     unsigned int cSeq )
 :
     m_refManager( this ),
-    m_mediaBufferCache( mediaBufferCache ),
+    m_allocator( allocator ),
     m_channelNumber( channelNumber ),
     m_timestamp( _timestamp ),
     m_buffer( NULL ),
@@ -35,9 +35,8 @@ ILPVideoPacket::~ILPVideoPacket()
 {
     if( m_buffer )
     {
-        //nxpt::freeAligned( m_buffer );
         using namespace std::placeholders;
-        nxpt::freeAligned( m_buffer, std::bind( &NxBufferCache::release, m_mediaBufferCache, _1 ) );
+        nxpt::freeAligned( m_buffer, std::bind( &CyclicAllocator::release, m_allocator, _1 ) );
         m_buffer = NULL;
         m_bufSize = 0;
     }
@@ -140,14 +139,13 @@ void ILPVideoPacket::resizeBuffer( size_t bufSize )
     void* newBuffer = nxpt::mallocAligned(
         bufSize + nxcip::MEDIA_PACKET_BUFFER_PADDING_SIZE,
         nxcip::MEDIA_DATA_BUFFER_ALIGNMENT,
-        std::bind( &NxBufferCache::getBuffer, m_mediaBufferCache, _1 ) );
+        std::bind( &CyclicAllocator::alloc, m_allocator, _1 ) );
 
     if( m_bufSize > 0 )
     {
         if( newBuffer )
             memcpy( newBuffer, m_buffer, std::min<>(m_bufSize, bufSize) );
-        //nxpt::freeAligned( m_buffer );
-        nxpt::freeAligned( m_buffer, std::bind( &NxBufferCache::release, m_mediaBufferCache, _1 ) );
+        nxpt::freeAligned( m_buffer, std::bind( &CyclicAllocator::release, m_allocator, _1 ) );
         m_buffer = NULL;
         m_bufSize = 0;
     }

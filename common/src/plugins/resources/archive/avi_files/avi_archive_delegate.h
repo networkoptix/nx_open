@@ -21,15 +21,14 @@ class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
     Q_OBJECT;
 
 public:
-    // TODO: #Elric #enum
     enum Tag { 
-        Tag_startTime, 
-        Tag_endTime, 
-        Tag_LayoutInfo, 
-        Tag_Software, 
-        Tag_Signature, 
-        Tag_Dewarping, 
-        Tag_Custom              /**< Tag for all other future values encoded in JSON object. */
+        StartTimeTag, 
+        EndTimeTag, 
+        LayoutInfoTag, 
+        SoftwareTag, 
+        SignatureTag, 
+        DewarpingTag, 
+        CustomTag /**< Tag for all other future values encoded in JSON object. */
     };
 
     /*

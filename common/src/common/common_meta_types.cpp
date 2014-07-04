@@ -70,8 +70,6 @@ void QnCommonMetaTypes::initialize() {
     if(qn_commonMetaTypes_initialized)
         return;
 
-    qRegisterMetaType<QnConnectionInfoPtr>();
-
     qRegisterMetaType<QUuid>();
     qRegisterMetaType<QnId>("QnId");
     qRegisterMetaType<QHostAddress>();

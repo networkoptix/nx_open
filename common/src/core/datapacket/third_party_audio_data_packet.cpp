@@ -5,6 +5,7 @@
 
 #include "third_party_audio_data_packet.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
 
 QnThirdPartyCompressedAudioData::QnThirdPartyCompressedAudioData(
     nxcip::MediaDataPacket* audioPacket,
@@ -21,9 +22,9 @@ QnThirdPartyCompressedAudioData::~QnThirdPartyCompressedAudioData()
     m_audioPacket = nullptr;
 }
 
-QnWritableCompressedAudioData* QnThirdPartyCompressedAudioData::clone() const
+QnWritableCompressedAudioData* QnThirdPartyCompressedAudioData::clone( QnAbstractAllocator* allocator ) const
 {
-    QnWritableCompressedAudioData* cloned = new QnWritableCompressedAudioData();
+    QnWritableCompressedAudioData* cloned = new QnWritableCompressedAudioData(allocator);
     cloned->QnCompressedAudioData::assign( this );
     cloned->m_data.write( static_cast<const char*>(m_audioPacket->data()), m_audioPacket->dataSize() );
     return cloned;
@@ -38,3 +39,5 @@ size_t QnThirdPartyCompressedAudioData::dataSize() const
 {
     return m_audioPacket->dataSize();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

@@ -54,7 +54,7 @@ public:
 
 signals:
     //!Emitted when new enterprise controller has been found
-    void moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress);
+    void moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QUrl &url);
 
     //!Emmited when previously found module did not respond to request in predefined timeout
     void moduleLost(const QnModuleInformation &moduleInformation);

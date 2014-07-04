@@ -7,6 +7,7 @@
 #include <utils/common/singleton.h>
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
+#include "nx_ec/data/api_runtime_data.h"
 
 class QnSessionManager;
 class QnResourceDataPool;
@@ -35,6 +36,16 @@ public:
 
     void setModuleGUID(const QUuid& guid) { m_uuid = guid; }
     QUuid moduleGUID() const{ return m_uuid; }
+
+    void setRemoteGUID(const QUuid& guid) {
+        QMutexLocker lock(&m_mutex);
+        m_remoteUuid = guid; 
+    }
+    QUuid remoteGUID() const{ 
+        QMutexLocker lock(&m_mutex);
+        return m_remoteUuid; 
+    }
+
     QUrl moduleUrl() const { return m_url; }
     void setModuleUlr(const QUrl& url) { m_url = url; }
 
@@ -63,9 +74,11 @@ private:
     QString m_localSystemName;
     QString m_defaultAdminPassword;
     QUuid m_uuid;
+    QUuid m_remoteUuid;
     QUrl m_url;
     bool m_cloudMode;
     QnSoftwareVersion m_engineVersion;
+    mutable QMutex m_mutex;
 };
 
 #define qnCommon (QnCommonModule::instance())

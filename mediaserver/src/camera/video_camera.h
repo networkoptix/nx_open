@@ -24,7 +24,7 @@ class QnVideoCamera: public QObject
     Q_OBJECT
 
 public:
-    QnVideoCamera(QnResourcePtr resource);
+    QnVideoCamera(const QnResourcePtr& resource);
     virtual ~QnVideoCamera();
     QnLiveStreamProviderPtr getLiveReader(QnServer::ChunksCatalog catalog);
     int copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue, int cseq);
@@ -60,7 +60,7 @@ public:
     /*!
         \todo Should remove it from here
     */
-    QSharedPointer<nx_hls::HLSLivePlaylistManager> hlsLivePlaylistManager( MediaQuality streamQuality ) const;
+    nx_hls::HLSLivePlaylistManagerPtr hlsLivePlaylistManager( MediaQuality streamQuality ) const;
 
     //!Starts caching live stream, if not started
     /*!
@@ -85,12 +85,14 @@ private:
     //!index - is a \a MediaQuality element
     std::vector<std::unique_ptr<MediaStreamCache> > m_liveCache;
     //!index - is a \a MediaQuality element
-    std::vector<QSharedPointer<nx_hls::HLSLivePlaylistManager> > m_hlsLivePlaylistManager;
+    std::vector<nx_hls::HLSLivePlaylistManagerPtr> m_hlsLivePlaylistManager;
+    
+    const size_t m_hlsInactivityPeriodMS;
 
     QnLiveStreamProviderPtr getLiveReaderNonSafe(QnServer::ChunksCatalog catalog);
     bool ensureLiveCacheStarted(
         MediaQuality streamQuality,
-        QnLiveStreamProviderPtr primaryReader,
+        const QnLiveStreamProviderPtr& primaryReader,
         qint64 targetDurationUSec );
 };
 

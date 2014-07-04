@@ -12,6 +12,7 @@
 #include <utils/common/singleton.h>
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_server_alive_data.h"
+#include "nx_ec/data/api_runtime_data.h"
 
 class QnCommonMessageProcessor: public QObject, public Singleton<QnCommonMessageProcessor>
 {
@@ -20,7 +21,7 @@ public:
     explicit QnCommonMessageProcessor(QObject *parent = 0);
     virtual ~QnCommonMessageProcessor() {}
 
-    virtual void init(ec2::AbstractECConnectionPtr connection);
+    virtual void init(const ec2::AbstractECConnectionPtr& connection);
 
     virtual void updateResource(const QnResourcePtr &resource) = 0;
 
@@ -43,23 +44,31 @@ signals:
 
     void cameraBookmarkTagsAdded(const QnCameraBookmarkTags &tags);
     void cameraBookmarkTagsRemoved(const QnCameraBookmarkTags &tags);
+
+    void runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
+    void remotePeerFound(const ec2::ApiPeerAliveData &data, bool isProxy);
+    void remotePeerLost(const ec2::ApiPeerAliveData &data, bool isProxy);
+
 protected:
     virtual void onGotInitialNotification(const ec2::QnFullResourceData& fullData);
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) = 0;
-    virtual void execBusinessActionInternal(QnAbstractBusinessActionPtr /*action*/) {}
+    virtual void execBusinessActionInternal(const QnAbstractBusinessActionPtr& /*action*/) {}
     
     virtual void afterRemovingResource(const QnId &id);
 
-    void updateHardwareIds(const ec2::QnFullResourceData &fullData);
     virtual void processResources(const QnResourceList &resources);
     void processLicenses(const QnLicenseList &licenses);
     void processCameraServerItems(const QnCameraHistoryList &cameraHistoryList);
+    
+    virtual bool canRemoveResource(const QnId& resourceId);
+    virtual void removeResourceIgnored(const QnId& resourceId);
+
 public slots:
     void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
     void on_licenseChanged(const QnLicensePtr &license);
+
 private slots:
     void on_gotInitialNotification(const ec2::QnFullResourceData &fullData);
-    void on_runtimeInfoChanged(const ec2::ApiServerInfoData &runtimeInfo);
     void on_gotDiscoveryData(const ec2::ApiDiscoveryDataList &discoveryData, bool addInformation);
 
     void on_resourceStatusChanged(const QnId &resourceId, QnResource::Status status );
@@ -77,9 +86,9 @@ private slots:
 
     void on_panicModeChanged(Qn::PanicMode mode);
 
-    void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
-    void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
-
+    void at_remotePeerFound(const ec2::ApiPeerAliveData &data, bool isProxy);
+    void at_remotePeerLost(const ec2::ApiPeerAliveData &data, bool isProxy);
+    
 protected:
     ec2::AbstractECConnectionPtr m_connection;
     QMap<QnId, QnBusinessEventRulePtr> m_rules;

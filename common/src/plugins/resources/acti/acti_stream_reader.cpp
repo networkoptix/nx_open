@@ -8,7 +8,7 @@
 #include "utils/media/nalUnits.h"
 #include "utils/network/tcp_connection_priv.h"
 
-QnActiStreamReader::QnActiStreamReader(QnResourcePtr res):
+QnActiStreamReader::QnActiStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
     m_multiCodec(res)
 {

@@ -90,7 +90,7 @@ public:
     QnResourceList getAllCameraServers(const QnNetworkResourcePtr &camera);
     QnResourceList getAllCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
     QnResourceList getOnlineCameraServers(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod);
-    qint64 getMinTime(QnNetworkResourcePtr camera);
+    qint64 getMinTime(const QnNetworkResource* camera);
 
 signals:
     void currentCameraChanged(const QnNetworkResourcePtr &camera);

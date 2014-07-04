@@ -6,6 +6,8 @@
 #ifndef VIDEO_DATA_PACKET_H
 #define VIDEO_DATA_PACKET_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "media_data_packet.h"
 
 
@@ -29,7 +31,7 @@ public:
     /*!
         Does nothing. Overridden method MUST return \a QnWritableCompressedVideoData
     */
-    virtual QnCompressedVideoData* clone() const override = 0;
+    virtual QnCompressedVideoData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override = 0;
 
     void assign(const QnCompressedVideoData* other);
 };
@@ -50,9 +52,14 @@ public:
         unsigned int alignment = CL_MEDIA_ALIGNMENT,
         unsigned int capacity = 0,
         QnMediaContextPtr ctx = QnMediaContextPtr(0) );
+    QnWritableCompressedVideoData(
+        QnAbstractAllocator* allocator,
+        unsigned int alignment = CL_MEDIA_ALIGNMENT,
+        unsigned int capacity = 0,
+        QnMediaContextPtr ctx = QnMediaContextPtr(0) );
 
     //!Implementation of QnAbstractMediaData::clone
-    virtual QnWritableCompressedVideoData* clone() const override;
+    virtual QnWritableCompressedVideoData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
     //!Implementation of QnAbstractMediaData::data
     virtual const char* data() const override;
     //!Implementation of QnAbstractMediaData::dataSize
@@ -64,5 +71,7 @@ private:
 
 typedef QSharedPointer<QnWritableCompressedVideoData> QnWritableCompressedVideoDataPtr;
 typedef QSharedPointer<const QnWritableCompressedVideoData> QnConstWritableCompressedVideoDataPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //VIDEO_DATA_PACKET_H

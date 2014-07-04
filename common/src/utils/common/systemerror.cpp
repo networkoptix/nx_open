@@ -17,7 +17,8 @@ namespace SystemError
 #ifdef _WIN32
         return GetLastError();
 #else
-        return errno;
+        //EAGAIN and EWOULDBLOCK are usually same, but not always
+        return errno == EAGAIN ? EWOULDBLOCK : errno;
 #endif
     }
 

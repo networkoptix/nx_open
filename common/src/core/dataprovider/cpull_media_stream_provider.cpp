@@ -1,11 +1,13 @@
+#include "cpull_media_stream_provider.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 #include "utils/common/sleep.h"
-#include "cpull_media_stream_provider.h"
 #include "core/datapacket/video_data_packet.h"
 #include "../resource/camera_resource.h"
 
 
-QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(QnResourcePtr dev ):
+QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(const QnResourcePtr& dev ):
     QnLiveStreamProvider(dev),
     m_fpsSleep(100*1000)
 {
@@ -54,7 +56,7 @@ void QnClientPullMediaStreamProvider::run()
             continue;
         }
 
-        QnAbstractMediaDataPtr data = getNextData();
+        const QnAbstractMediaDataPtr& data = getNextData();
 
         if (data==0)
         {
@@ -166,3 +168,5 @@ void QnClientPullMediaStreamProvider::beforeRun()
     QnAbstractMediaStreamDataProvider::beforeRun();
     getResource()->init();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

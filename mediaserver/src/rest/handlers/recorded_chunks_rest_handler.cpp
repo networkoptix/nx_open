@@ -95,7 +95,7 @@ int QnRecordedChunksRestHandler::executeGet(const QString& path, const QnRequest
         {
             QList<QRegion> motionRegions;
             parseRegionList(motionRegions, filter);
-            periods = QnMotionHelper::instance()->mathImage(motionRegions, resList, startTime, endTime, detailLevel);
+            periods = QnMotionHelper::instance()->matchImage(motionRegions, resList, startTime, endTime, detailLevel);
         }
         break;
 #ifdef QN_ENABLE_BOOKMARKS

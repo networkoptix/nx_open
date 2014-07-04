@@ -6,6 +6,8 @@
 #ifndef THIRD_PARTY_AUDIO_DATA_PACKET_H
 #define THIRD_PARTY_AUDIO_DATA_PACKET_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "audio_data_packet.h"
 
 #include <plugins/camera_plugin.h>
@@ -28,7 +30,7 @@ public:
     virtual ~QnThirdPartyCompressedAudioData();
 
     //!Implementation of QnAbstractMediaData::clone
-    virtual QnWritableCompressedAudioData* clone() const override;
+    virtual QnWritableCompressedAudioData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
     //!Implementation of QnAbstractMediaData::data
     virtual const char* data() const override;
     //!Implementation of QnAbstractMediaData::dataSize
@@ -38,4 +40,8 @@ private:
     nxcip::MediaDataPacket* m_audioPacket;
 };
 
+
+#endif // ENABLE_DATA_PROVIDERS
+
 #endif  //THIRD_PARTY_AUDIO_DATA_PACKET_H
+

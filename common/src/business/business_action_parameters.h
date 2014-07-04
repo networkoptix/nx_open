@@ -3,36 +3,32 @@
 
 #include <business/business_fwd.h>
 
-//TODO: #rvasilenko move Qn::StreamQuality OUT OF THERE! --Elric
 //TODO: #rvasilenko adding new parameter is TOO complex. Structure can be simplified --gdm
-#include <core/resource/media_resource.h>
 
 class QnBusinessActionParameters 
 {
 public:
-    // TODO: #Elric #enum
-    enum Params 
-    {
-        soundUrlParam,
-        emailAddressParam,
-        userGroupParam,
-        fpsParam,
-        qualityParam,
-        durationParam,
-        beforeParam,
-        afterParam,
-        relayOutputIDParam,
-        relayAutoResetTimeoutParam,
-        inputPortIdParam,
-        keyParam,
-        sayTextParam,
+    enum Param {
+        SoundUrlParam,
+        EmailAddressParam,
+        UserGroupParam,
+        FpsParam,
+        QualityParam,
+        DurationParam,
+        BeforeParam,
+        AfterParam,
+        RelayOutputIdParam,
+        EelayAutoResetTimeoutParam,
+        InputPortIdParam,
+        KeyParam,
+        SayTextParam,
 
-        CountParam
+        ParamCount
     };
 
     enum UserGroup {
-        EveryOne,
-        AdminOnly
+        EveryOne  = 0,
+        AdminOnly = 1
     };
 
     QnBusinessActionParameters();
@@ -96,13 +92,15 @@ public:
     QnBusinessParams toBusinessParams() const;
     static QnBusinessActionParameters fromBusinessParams(const QnBusinessParams& bParams);
 
-    /*
-    * Returns true if all parameters have default values
-    */
+    /** 
+     * \returns                        Whether all parameters have default values. 
+     */
     bool isDefault() const;
     bool equalTo(const QnBusinessActionParameters& other) const;
+
 private:
     static int getParamIndex(const QString& key);
+
 private:
     QString m_soundUrl;
     QString m_emailAddress;

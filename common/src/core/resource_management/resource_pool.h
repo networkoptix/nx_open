@@ -64,7 +64,7 @@ public:
     QnResourcePtr getResourceById(const QnId &id) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
-    void updateUniqId(QnResourcePtr res, const QString &newUniqId);
+    void updateUniqId(const QnResourcePtr& res, const QString &newUniqId);
 
     bool hasSuchResource(const QString &uniqid) const;
 
@@ -72,6 +72,7 @@ public:
 
     QnNetworkResourcePtr getNetResourceByPhysicalId(const QString &physicalId) const;
     QnNetworkResourcePtr getResourceByMacAddress(const QString &mac) const;
+    QnResourcePtr getResourceByParam(const QString &key, const QString &value) const;
 
     QnResourceList getAllResourceByTypeName(const QString &typeName) const;
 

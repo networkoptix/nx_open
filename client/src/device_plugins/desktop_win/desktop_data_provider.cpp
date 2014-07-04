@@ -295,8 +295,10 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupPostProcess()
 
 QnDesktopDataProvider::QnDesktopDataProvider (
                    QnResourcePtr res,
+                   int desktopNum,
                    const QnAudioDeviceInfo* audioDevice,
                    const QnAudioDeviceInfo* audioDevice2,
+                   Qn::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
                    float encodeQualuty, // in range 0.0 .. 1.0
@@ -309,12 +311,14 @@ QnDesktopDataProvider::QnDesktopDataProvider (
     m_videoCodecCtx(0),
     m_audioCodecCtx(0),
     m_grabber(0),
+    m_desktopNum(desktopNum),
 
     m_audioFramesCount(0),
     m_audioFrameDuration(0),
     m_storedAudioPts(0),
     m_maxAudioJitter(0),
 
+    m_captureMode(captureMode),
     m_captureCursor(captureCursor),
     m_captureResolution(captureResolution),
     m_encodeQualuty(encodeQualuty),
@@ -362,8 +366,10 @@ bool QnDesktopDataProvider::init()
 {
     m_initTime = AV_NOPTS_VALUE;
     m_grabber = new QnBufferedScreenGrabber(
+            m_desktopNum,
             QnBufferedScreenGrabber::DEFAULT_QUEUE_SIZE,
             QnBufferedScreenGrabber::DEFAULT_FRAME_RATE,
+            m_captureMode,
             m_captureCursor,
             m_captureResolution,
             m_widget);

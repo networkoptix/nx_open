@@ -5,7 +5,7 @@
 
 #include "utils/common/util.h"
 
-QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
+QnAbstractArchiveReader::QnAbstractArchiveReader(const QnResourcePtr& dev ) :
     QnAbstractMediaStreamDataProvider(dev),
     m_cycleMode(true),
     m_needToSleep(0),
@@ -88,7 +88,7 @@ void QnAbstractArchiveReader::run()
 {
     initSystemThreadId();
 
-    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("QnArchiveStreamReader started."), cl_logINFO);
+    CL_LOG(cl_logINFO) NX_LOG(QLatin1String("QnArchiveStreamReader started."), cl_logINFO);
 
     beforeRun();
 
@@ -149,5 +149,5 @@ void QnAbstractArchiveReader::run()
 
     afterRun();
 
-    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("QnArchiveStreamReader reader stopped."), cl_logINFO);
+    CL_LOG(cl_logINFO) NX_LOG(QLatin1String("QnArchiveStreamReader reader stopped."), cl_logINFO);
 }

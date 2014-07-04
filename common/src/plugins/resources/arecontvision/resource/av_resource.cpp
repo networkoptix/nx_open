@@ -4,15 +4,16 @@
 #  include <winsock2.h>
 #endif
 
+#if defined(QT_LINUXBASE)
+#  include <arpa/inet.h>
+#endif
 
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
 #include "core/resource/resource_command_processor.h"
+#include "core/resource/resource_command.h"
 
-#if defined(QT_LINUXBASE)
-#  include <arpa/inet.h>
-#endif
 #include "utils/network/nettools.h"
 #include "utils/network/ping.h"
 
@@ -34,7 +35,7 @@ bool QnPlAreconVisionResource::isPanoramic() const
 bool QnPlAreconVisionResource::isDualSensor() const
 {
     const QString model = getModel();
-    return model.contains(QLatin1String("3130")) || model.contains(QLatin1String("3135"));
+    return model.contains(lit("3130")) || model.contains(lit("3135")); // TODO: #Elric #vasilenko move to json?
 }
 
 CLHttpStatus QnPlAreconVisionResource::getRegister(int page, int num, int& val)
@@ -84,7 +85,7 @@ CLHttpStatus QnPlAreconVisionResource::setRegister(int page, int num, int val)
 class QnPlArecontResourceSetRegCommand : public QnResourceCommand
 {
 public:
-    QnPlArecontResourceSetRegCommand(QnResourcePtr res, int page, int reg, int val):
+    QnPlArecontResourceSetRegCommand(const QnResourcePtr& res, int page, int reg, int val):
       QnResourceCommand(res),
           m_page(page),
           m_reg(reg),
@@ -162,7 +163,7 @@ bool QnPlAreconVisionResource::setHostAddress(const QString& hostAddr, QnDomain 
 
 bool QnPlAreconVisionResource::unknownResource() const
 {
-    return (getName() == QLatin1String("ArecontVision_Abstract"));
+    return (getName() == lit("ArecontVision_Abstract"));
 }
 
 QnResourcePtr QnPlAreconVisionResource::updateResource()
@@ -170,10 +171,10 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     QVariant model;
     QVariant model_relase;
 
-    if (!getParam(QLatin1String("Model"), model, QnDomainPhysical))
+    if (!getParam(lit("Model"), model, QnDomainPhysical))
         return QnNetworkResourcePtr(0);
 
-    if (!getParam(QLatin1String("ModelRelease"), model_relase, QnDomainPhysical))
+    if (!getParam(lit("ModelRelease"), model_relase, QnDomainPhysical))
         return QnNetworkResourcePtr(0);
 
     if (model_relase!=model)
@@ -184,7 +185,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     else
     {
         //old camera; does not support relase name; but must support fullname
-        if (getParam(QLatin1String("ModelFull"), model_relase, QnDomainPhysical))
+        if (getParam(lit("ModelFull"), model_relase, QnDomainPhysical))
             model = model_relase;
     }
 
@@ -200,7 +201,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     }
     else
     {
-        cl_log.log("Found unknown resource! ", model.toString(), cl_logWARNING);
+        NX_LOG( lit("Found unknown resource! %1").arg(model.toString()), cl_logWARNING);
     }
 
     return result;
@@ -214,24 +215,24 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     QVariant maxSensorHeight;
     {
         // TODO: #Elric is this needed? This was a call to setCroppingPhysical
-        getParam(QLatin1String("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
-        getParam(QLatin1String("MaxSensorHeight"), maxSensorHeight, QnDomainMemory);
+        getParam(lit("MaxSensorWidth"), maxSensorWidth, QnDomainMemory);
+        getParam(lit("MaxSensorHeight"), maxSensorHeight, QnDomainMemory);
 
-        setParamAsync(QLatin1String("sensorleft"), 0, QnDomainPhysical);
-        setParamAsync(QLatin1String("sensortop"), 0, QnDomainPhysical);
-        setParamAsync(QLatin1String("sensorwidth"), maxSensorWidth, QnDomainPhysical);
-        setParamAsync(QLatin1String("sensorheight"), maxSensorHeight, QnDomainPhysical);
+        setParamAsync(lit("sensorleft"), 0, QnDomainPhysical);
+        setParamAsync(lit("sensortop"), 0, QnDomainPhysical);
+        setParamAsync(lit("sensorwidth"), maxSensorWidth, QnDomainPhysical);
+        setParamAsync(lit("sensorheight"), maxSensorHeight, QnDomainPhysical);
     }
 
     QVariant val;
-    if (!getParam(QLatin1String("Firmware version"), val, QnDomainPhysical))
-        return CameraDiagnostics::RequestFailedResult(QLatin1String("Firmware version"), QLatin1String("unknown"));
+    if (!getParam(lit("Firmware version"), val, QnDomainPhysical))
+        return CameraDiagnostics::RequestFailedResult(lit("Firmware version"), lit("unknown"));
 
-    if (!getParam(QLatin1String("Image engine"), val, QnDomainPhysical ))
-        return CameraDiagnostics::RequestFailedResult(QLatin1String("Image engine"), QLatin1String("unknown"));
+    if (!getParam(lit("Image engine"), val, QnDomainPhysical ))
+        return CameraDiagnostics::RequestFailedResult(lit("Image engine"), lit("unknown"));
 
-    if (!getParam(QLatin1String("Net version"), val, QnDomainPhysical))
-        return CameraDiagnostics::RequestFailedResult(QLatin1String("Net version"), QLatin1String("unknown"));
+    if (!getParam(lit("Net version"), val, QnDomainPhysical))
+        return CameraDiagnostics::RequestFailedResult(lit("Net version"), lit("unknown"));
 
     //if (!getDescription())
     //    return;
@@ -239,13 +240,13 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     setRegister(3, 21, 20); // sets I frame frequency to 1/20
 
 
-    if (!setParam(QLatin1String("Enable motion detection"), QLatin1String("on"), QnDomainPhysical)) // enables motion detection;
-        return CameraDiagnostics::RequestFailedResult(QLatin1String("Enable motion detection"), QLatin1String("unknown"));
+    if (!setParam(lit("Enable motion detection"), lit("on"), QnDomainPhysical)) // enables motion detection;
+        return CameraDiagnostics::RequestFailedResult(lit("Enable motion detection"), lit("unknown"));
 
     // check if we've got 1024 zones
-    setParam(QLatin1String("TotalZones"), 1024, QnDomainPhysical); // try to set total zones to 64; new cams support it
-    if (!getParam(QLatin1String("TotalZones"), val, QnDomainPhysical))
-        return CameraDiagnostics::RequestFailedResult(QLatin1String("TotalZones"), QLatin1String("unknown"));
+    setParam(lit("TotalZones"), 1024, QnDomainPhysical); // try to set total zones to 64; new cams support it
+    if (!getParam(lit("TotalZones"), val, QnDomainPhysical))
+        return CameraDiagnostics::RequestFailedResult(lit("TotalZones"), lit("unknown"));
 
     if (val.toInt() == 1024)
         m_totalMdZones = 1024;
@@ -268,16 +269,16 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     const CodecID streamCodec = isH264() ? CODEC_ID_H264 : CODEC_ID_MJPEG;
     mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt(), maxSensorHeight.toInt()), streamCodec ) );
     QVariant hasDualStreaming;
-    getParam(QLatin1String("hasDualStreaming"), hasDualStreaming, QnDomainMemory);
+    getParam(lit("hasDualStreaming"), hasDualStreaming, QnDomainMemory);
     if( hasDualStreaming.toInt() > 0 )
         mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt()/2, maxSensorHeight.toInt()/2), streamCodec ) );
     saveResolutionList( mediaStreams );
 
-    const QString firmware = getResourceParamList().value(QLatin1String("Firmware version")).value().toString();
+    const QString firmware = getResourceParamList().value(lit("Firmware version")).value().toString();
     setFirmware(firmware);
     saveParams();
 
-    setParam(QLatin1String("Zone size"), zone_size, QnDomainPhysical);
+    setParam(lit("Zone size"), zone_size, QnDomainPhysical);
     setMotionMaskPhysical(0);
 
     return CameraDiagnostics::NoErrorResult();
@@ -296,7 +297,7 @@ bool QnPlAreconVisionResource::isResourceAccessible()
 bool QnPlAreconVisionResource::updateMACAddress()
 {
     QVariant val;
-    if (!getParam(QLatin1String("MACAddress"), val, QnDomainPhysical))
+    if (!getParam(lit("MACAddress"), val, QnDomainPhysical))
         return false;
 
     setMAC(QnMacAddress(val.toString()));
@@ -325,12 +326,12 @@ int QnPlAreconVisionResource::totalMdZones() const
 
 bool QnPlAreconVisionResource::isH264() const
 {
-    if (!hasParam(QLatin1String("Codec")))
+    if (!hasParam(lit("Codec")))
         return false;
 
     QVariant val;
-    getParam(QLatin1String("Codec"), val, QnDomainMemory);
-    return val==QLatin1String("H.264");
+    getParam(lit("Codec"), val, QnDomainMemory);
+    return val == lit("H.264");
 }
 
 //===============================================================================================================================
@@ -341,7 +342,7 @@ bool QnPlAreconVisionResource::getParamPhysical(const QnParam &param, QVariant &
 
     CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 
-    QString request = QLatin1String("get?") + param.netHelper();
+    QString request = lit("get?") + param.netHelper();
 
     CLHttpStatus status = connection.doGET(request);
     if (status == CL_HTTP_AUTH_REQUIRED)
@@ -378,7 +379,7 @@ bool QnPlAreconVisionResource::setParamPhysical(const QnParam &param, const QVar
 
     CLSimpleHTTPClient connection(getHostAddress(), 80, getNetworkTimeout(), getAuth());
 
-    QString request = QLatin1String("set?") + param.netHelper();
+    QString request = lit("set?") + param.netHelper();
     if (param.type() != Qn::PDT_None && param.type() != Qn::PDT_Button)
         request += QLatin1Char('=') + val.toString();
 
@@ -403,13 +404,13 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByName(const Q
     QnId rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, name);
     if (rt.isNull())
     {
-        if ( name.left(2).toLower() == QLatin1String("av") )
+        if ( name.left(2).toLower() == lit("av") )
         {
             QString new_name = name.mid(2);
             rt = qnResTypePool->getLikeResourceTypeId(MANUFACTURE, new_name);
             if (!rt.isNull())
             {
-                cl_log.log("Unsupported resource found(!!!): ", name, cl_logERROR);
+                NX_LOG( lit("Unsupported resource found(!!!): %1").arg(name), cl_logERROR);
                 return 0;
             }
         }
@@ -425,7 +426,7 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId 
 
     if (resourceType.isNull() || (resourceType->getManufacture() != MANUFACTURE))
     {
-        cl_log.log("Can't create AV Resource. Resource type is invalid.", rt.toString(), cl_logERROR);
+        NX_LOG( lit("Can't create AV Resource. Resource type is invalid. %1").arg(rt.toString()), cl_logERROR);
         return 0;
     }
 
@@ -443,8 +444,8 @@ QnPlAreconVisionResource* QnPlAreconVisionResource::createResourceByTypeId(QnId 
 
 bool QnPlAreconVisionResource::isPanoramic(const QString &name)
 {
-    return name.contains(QLatin1String("8180")) || name.contains(QLatin1String("8185")) || name.contains(QLatin1String("20185")) || name.contains(QLatin1String("20365")) ||
-           name.contains(QLatin1String("8360")) || name.contains(QLatin1String("8365")) || name.contains(QLatin1String("12186")) || name.contains(QLatin1String("40185"));
+    return name.contains(lit("8180")) || name.contains(lit("8185")) || name.contains(lit("20185")) || name.contains(lit("20365")) ||
+           name.contains(lit("8360")) || name.contains(lit("8365")) || name.contains(lit("12186")) || name.contains(lit("40185")); // TODO: #Elric #vasilenko move to json?
 }
 
 QnAbstractStreamDataProvider* QnPlAreconVisionResource::createLiveDataProvider()
@@ -478,7 +479,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
         
         if (!region.getRegionBySens(sens).isEmpty())
         {
-            setParamAsync(QLatin1String("Threshold"), sensToLevelThreshold[sens], QnDomainPhysical);
+            setParamAsync(lit("Threshold"), sensToLevelThreshold[sens], QnDomainPhysical);
             break; // only 1 sensitivity for all frame is supported
         }
     }

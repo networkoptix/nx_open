@@ -122,9 +122,6 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemTool_
     case QnConnectToCurrentSystemTool::UpdateFailed:
         QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not update the selected servers.\nYou can try to update the servers again in the System Administration."));
         break;
-    case QnConnectToCurrentSystemTool::RestartFailed:
-        QMessageBox::critical(progressDialog(), tr("Error"), tr("Could not restart the selected servers after configuration."));
-        break;
     default:
         break;
     }

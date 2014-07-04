@@ -170,7 +170,7 @@ void QnMotionArchive::fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile*
     dir.mkpath(fileName);
 }
 
-QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msStartTime, qint64 msEndTime, int detailLevel)
+QnTimePeriodList QnMotionArchive::matchPeriod(const QRegion& region, qint64 msStartTime, qint64 msEndTime, int detailLevel)
 {
     if (minTime() != (qint64)AV_NOPTS_VALUE)
         msStartTime = qMax(minTime(), msStartTime);
@@ -226,7 +226,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
             quint8* curData = buffer;
             while (i < endItr && curData < dataEnd)
             {
-                if (QnMetaDataV1::mathImage((simd128i*) curData, mask, maskStart, maskEnd))
+                if (QnMetaDataV1::matchImage((simd128i*) curData, mask, maskStart, maskEnd))
                 {
                     qint64 fullStartTime = i->start + indexHeader.startTime;
                     if (fullStartTime > msEndTime) {

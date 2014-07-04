@@ -10,7 +10,7 @@ public:
     QnColdstoreDTSreaderFactory(const QString& dtsId);
     virtual ~QnColdstoreDTSreaderFactory();
 
-    QnAbstractArchiveDelegate* createDeligate(QnResourcePtr res);
+    QnAbstractArchiveDelegate* createDeligate(const QnResourcePtr& res);
 private:
     
 

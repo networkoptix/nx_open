@@ -6,6 +6,7 @@
 #include <nx_ec/ec_api.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <client/client_message_processor.h>
 
 namespace {
     const int checkTimeout = 10 * 60 * 1000;
@@ -44,6 +45,8 @@ void QnInstallUpdatesPeerTask::doStart() {
 
     m_restartingPeers = m_pendingPeers = peers();
 
+    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(true);
+
     connection2()->getUpdatesManager()->installUpdate(m_updateId, m_pendingPeers,
                                                       this, [this](int, ec2::ErrorCode){});
     m_checkTimer->start();
@@ -60,6 +63,9 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
 
     QnMediaServerResourcePtr server = resource.staticCast<QnMediaServerResource>();
 
+    if (!m_pendingPeers.contains(server->getId()))
+        return;
+
     if (server->getVersion() == m_version) {
         m_pendingPeers.remove(peerId);
         emit peerFinished(peerId);
@@ -72,17 +78,16 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
     }
 
     if (m_restartingPeers.isEmpty()) {
-        bool pending = false;
         foreach (const QnId &id, m_pendingPeers) {
-            QnResourcePtr resource = qnResPool->getIncompatibleResourceById(id, true);
-            if (resource->getStatus() == QnResource::Offline) {
-                pending = true;
-                break;
+            QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).staticCast<QnMediaServerResource>();
+            if (server->getStatus() == QnResource::Offline) {
+                return;
+            } else if (server->getVersion() != m_version) {
+                finish(InstallationFailed);
+                return;
             }
         }
-
-        if (!pending)
-            finish(InstallationFailed);
+        finish(NoError);
     }
 }
 
@@ -99,4 +104,9 @@ void QnInstallUpdatesPeerTask::at_checkTimeout() {
     }
 
     finish(m_pendingPeers.isEmpty() ? NoError : InstallationFailed);
+}
+
+void QnInstallUpdatesPeerTask::finish(int errorCode) {
+    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
+    QnNetworkPeerTask::finish(errorCode);
 }

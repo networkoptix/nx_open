@@ -1,6 +1,7 @@
 #ifndef __TCP_CONNECTION_PRIV_H__
 #define __TCP_CONNECTION_PRIV_H__
 
+#include <QDateTime>
 #include <QtCore/QByteArray>
 
 
@@ -10,7 +11,6 @@ static const int TCP_READ_BUFFER_SIZE = 65536;
 
 #include "utils/common/byte_array.h"
 #include "utils/network/http/httptypes.h"
-#include "nx_ec/data/api_help_data.h"
 
 
 static const QByteArray STATIC_UNAUTHORIZED_HTML("\
@@ -39,6 +39,7 @@ static const QByteArray STATIC_PROXY_UNAUTHORIZED_HTML("\
 // TODO: #vasilenko these are part of a public interface and are used throughout the codebase.
 // Why they are in a private header???
 static const int CODE_OK = 200;
+static const int CODE_MOVED_PERMANENTLY = 301;
 static const int CODE_NOT_MODIFIED = 304;
 static const int CODE_AUTH_REQUIRED = 401;
 static const int CODE_NOT_FOUND = 404;
@@ -82,8 +83,6 @@ public:
     bool chunkedMode;
     int clientRequestOffset;
     QDateTime lastModified;
-
-    ec2::ApiHelpGroupDataList helpData;
 };
 
 #endif // __TCP_CONNECTION_PRIV_H__

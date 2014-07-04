@@ -9,7 +9,6 @@
 #include <QtCore/QSharedPointer>
 
 #include "utils/common/request_param.h"
-#include "nx_ec/data/api_help_data.h"
 
 class TCPSocket;
 

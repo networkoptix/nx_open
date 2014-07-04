@@ -349,7 +349,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         result = tr("Not enough HDD/SSD speed for recording to %1.").arg(storageUrl);
         break;
     }
-    case StorageNotEnoughSpaceReason: {
+    case StorageFullReason: {
         QString storageUrl = reasonParamsEncoded;
         result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
         break;

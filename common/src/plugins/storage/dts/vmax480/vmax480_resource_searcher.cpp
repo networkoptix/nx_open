@@ -131,7 +131,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
     }
 }
 
-QnResourcePtr QnPlVmax480ResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnPlVmax480ResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 

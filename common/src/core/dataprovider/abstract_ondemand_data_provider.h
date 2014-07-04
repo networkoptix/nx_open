@@ -5,6 +5,8 @@
 #ifndef ABSTRACTONDEMANDDATAPROVIDER_H
 #define ABSTRACTONDEMANDDATAPROVIDER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <memory>
 
 #include <QObject>
@@ -40,5 +42,7 @@ signals:
 };
 
 typedef std::shared_ptr<AbstractOnDemandDataProvider> AbstractOnDemandDataProviderPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //ABSTRACTONDEMANDDATAPROVIDER_H
