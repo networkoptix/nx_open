@@ -311,7 +311,7 @@ QStringList QnAVIDvdArchiveDelegate::getPlaylist(const QString& url)
     if (titleNum < 1 || titleNum > m_mainIfo->tt_srpt->nr_of_srpts)
     {
         titleNum = -1;
-        cl_log.log(QLatin1String("Invalid titleNum value ignored. Open all titles."), cl_logINFO);
+        NX_LOG(QLatin1String("Invalid titleNum value ignored. Open all titles."), cl_logINFO);
     }
 
     if (titleNum == -1)

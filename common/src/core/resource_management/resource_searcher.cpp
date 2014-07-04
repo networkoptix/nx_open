@@ -1,5 +1,7 @@
 #include "resource_searcher.h"
 
+#include <core/resource/resource_type.h>
+
 QnAbstractResourceSearcher::QnAbstractResourceSearcher():
     m_shouldbeUsed(true),
     m_localResources(false),

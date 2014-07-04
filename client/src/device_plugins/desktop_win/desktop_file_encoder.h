@@ -9,7 +9,7 @@
 #include <QtMultimedia/QAudioInput>
 
 #include <dsp_effects/speex/speex_preprocess.h>
-#include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/audio_data_packet.h"
 #include "utils/common/long_runnable.h"
 #include "screen_grabber.h"
 #include "buffered_screen_grabber.h"
@@ -26,6 +26,7 @@ public:
                         int desktopNum,           // = 0,
                         const QnAudioDeviceInfo* audioDevice,
                         const QnAudioDeviceInfo* audioDevice2,
+                        Qn::CaptureMode mode,
                         bool captureCursor,
                         const QSize& captureResolution,
                         float encodeQualuty, // in range 0.0 .. 1.0
@@ -68,8 +69,8 @@ private:
         QnAudioDeviceInfo m_audioDevice;
         //QString m_audioDeviceName;
         QnAudioFormat m_audioFormat;
-        CLThreadQueue<QnAbstractMediaDataPtr>  m_audioQueue;
-        QnAbstractMediaData m_tmpAudioBuffer;
+        CLThreadQueue<QnWritableCompressedAudioDataPtr>  m_audioQueue;
+        QnWritableCompressedAudioData m_tmpAudioBuffer;
         SpeexPreprocessState* m_speexPreprocess;
 
         int audioPacketSize();
@@ -122,6 +123,7 @@ private:
     int m_maxAudioJitter;
     QVector <EncodedAudioInfo*> m_audioInfo;
 
+    Qn::CaptureMode m_captureMode;
     bool m_captureCursor;
     QSize m_captureResolution;
     float m_encodeQualuty;

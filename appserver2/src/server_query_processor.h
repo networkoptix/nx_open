@@ -17,6 +17,7 @@
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
 #include "transaction/transaction_message_bus.h"
+#include <transaction/binary_transaction_serializer.h>
 
 
 namespace ec2
@@ -60,9 +61,7 @@ namespace ec2
             };
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
-            QByteArray serializedTran;
-            QnOutputBinaryStream<QByteArray> stream( &serializedTran );
-            QnBinary::serialize( tran, &stream );
+            QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
 
             errorCode = auxManager->executeTransaction(tran);
             if( errorCode != ErrorCode::ok ) {
@@ -82,8 +81,8 @@ namespace ec2
                 locker.commit();
 
             // delivering transaction to remote peers
-            if (!tran.localTransaction)
-                QnTransactionMessageBus::instance()->sendTransaction( (const QnAbstractTransaction&) tran, serializedTran);
+            if (!tran.isLocal)
+                QnTransactionMessageBus::instance()->sendTransaction(tran);
         }
 
         template<class HandlerType>
@@ -161,8 +160,10 @@ namespace ec2
         void processMultiUpdateAsync(QnTransaction<QueryDataType>& multiTran, HandlerType handler, ApiCommand::Value command, const std::vector<SubDataType>& nestedList, bool isParentObjectTran)
         {
             ErrorCode errorCode = ErrorCode::ok;
-            QList<QPair<QnAbstractTransaction, QByteArray>> processedTran;
-            processedTran.reserve(static_cast<int>(nestedList.size() + (isParentObjectTran ? 1 : 0)));
+            QList< QnTransaction<SubDataType> > processedTransactions;
+            processedTransactions.reserve(static_cast<int>(nestedList.size()));
+
+            bool processMultiTran = false;
 
             auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
                 QnScopedThreadRollback ensureFreeThread(1);
@@ -179,11 +180,7 @@ namespace ec2
                 QnTransaction<SubDataType> tran(command, multiTran.persistent);
                 tran.params = data;
                 tran.fillSequence();
-                tran.localTransaction = multiTran.localTransaction;
-
-                QByteArray serializedTran;
-                QnOutputBinaryStream<QByteArray> stream( &serializedTran );
-                QnBinary::serialize( tran, &stream );
+                tran.isLocal = multiTran.isLocal;
 
                 errorCode = auxManager->executeTransaction(tran);
                 if( errorCode != ErrorCode::ok )
@@ -191,13 +188,14 @@ namespace ec2
 
                 if (tran.persistent) 
                 {
+                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
                     errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
 					if (errorCode == ErrorCode::skipped)
 						continue;
                     if( errorCode != ErrorCode::ok )
                         return;
                 }
-                processedTran << QPair<QnAbstractTransaction, QByteArray>(tran, serializedTran);
+                processedTransactions << tran;
             }
             
             // delete master object if need (server->cameras required to delete master object, layoutList->layout doesn't)
@@ -205,44 +203,31 @@ namespace ec2
             {
                 multiTran.fillSequence();
 
-                QByteArray serializedTran;
-                QnOutputBinaryStream<QByteArray> stream( &serializedTran );
-                QnBinary::serialize( multiTran, &stream );
                 errorCode = ErrorCode::ok;
-                if (multiTran.persistent) 
+                if (multiTran.persistent)                 
                 {
-                    errorCode = dbManager->executeTransactionNoLock( multiTran, serializedTran);
+                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(multiTran);
+                    errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
                     if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
                         return;
                 }
-                if( errorCode == ErrorCode::ok )
-                    processedTran << QPair<QnAbstractTransaction, QByteArray>(multiTran, serializedTran);
+                processMultiTran = (errorCode == ErrorCode::ok);
             }
 
 
             if (multiTran.persistent)
                 locker.commit();
 
-            foreach(const auto& tranData, processedTran)
+            foreach(const QnTransaction<SubDataType>& transaction, processedTransactions)
             {
                 // delivering transaction to remote peers
-                if (!tranData.first.localTransaction)
-                    QnTransactionMessageBus::instance()->sendTransaction(tranData.first, tranData.second);
+                if (!transaction.isLocal)
+                    QnTransactionMessageBus::instance()->sendTransaction(transaction);
             }
+            if (processMultiTran)
+                QnTransactionMessageBus::instance()->sendTransaction(multiTran);
+
             errorCode = ErrorCode::ok;
-        }
-
-
-        template<class T> 
-        bool processIncomingTransaction( const QnTransaction<T>& tran, const QByteArray& serializedTran ) 
-        {
-            if (tran.persistent)
-            {
-                ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
-                if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
-                    return false;
-            }
-            return true;
         }
 
 

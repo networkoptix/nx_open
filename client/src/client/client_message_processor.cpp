@@ -10,15 +10,28 @@
 
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),
-    m_opened(false)
+    m_connected(false)
 {
 }
 
-void QnClientMessageProcessor::init(ec2::AbstractECConnectionPtr connection)
+void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connection)
 {
     QnCommonMessageProcessor::init(connection);
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
+    if (connection) {
+        assert(!m_connected);
+        assert(qnCommon->remoteGUID().isNull());
+        qnCommon->setRemoteGUID(connection->connectionInfo().ecsGuid);
+        connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnClientMessageProcessor::at_remotePeerFound);
+        connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnClientMessageProcessor::at_remotePeerLost);
+    } else if (m_connected) { // double init by null is allowed
+        assert(!qnCommon->remoteGUID().isNull());
+        ec2::ApiPeerAliveData data;
+        data.peer.id = qnCommon->remoteGUID();
+        at_remotePeerLost(data, false);
+        qnCommon->setRemoteGUID(QUuid());
+    } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
+        qnCommon->setRemoteGUID(QUuid());
+    }
 }
 
 void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
@@ -64,7 +77,7 @@ void QnClientMessageProcessor::processResources(const QnResourceList& resources)
         checkForTmpStatus(resource);
 }
 
-void QnClientMessageProcessor::checkForTmpStatus(QnResourcePtr resource)
+void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
 {
     // process tmp status
     if (QnMediaServerResourcePtr mediaServer = resource.dynamicCast<QnMediaServerResource>()) 
@@ -89,14 +102,12 @@ void QnClientMessageProcessor::checkForTmpStatus(QnResourcePtr resource)
 void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
 {
     // set proxy. If some media server IF will be found, proxy address will be cleared
-    QString url = QnAppServerConnectionFactory::defaultUrl().host();
-    if (url.isEmpty())
-        url = QLatin1String("127.0.0.1");
-    int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
-    resource->apiConnection()->setProxyAddr(resource->getApiUrl(), url, port);
+    const QString& proxyAddr = QnAppServerConnectionFactory::defaultUrl().host();
+    resource->apiConnection()->setProxyAddr(
+        resource->getApiUrl(),
+        proxyAddr,
+        QnAppServerConnectionFactory::defaultUrl().port() );    //starting with 2.3 proxy embedded to EC
     disconnect(resource.data(), NULL, this, NULL);
-    //connect(resource.data(), SIGNAL(serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)), 
-    //         this, SLOT(at_serverIfFound(const QnMediaServerResourcePtr &, const QString &, const QString &)));
     resource->determineOptimalNetIF();
 }
 
@@ -114,41 +125,40 @@ void QnClientMessageProcessor::updateServerTmpStatus(const QnId& id, QnResource:
 
 void QnClientMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy)
 {
-    if (data.peerId == qnCommon->moduleGUID())
-        return;
-
-    if (isProxy) {
-        //updateTmpStatus(id, QnResource::NotDefined);
+    if (qnCommon->remoteGUID().isNull()) {
+        qWarning() << "at_remotePeerFound received while disconnected";
         return;
     }
 
-    if (!m_opened) {
-        m_opened = true;
-        emit connectionOpened();
-    }
+    if (data.peer.id != qnCommon->remoteGUID())
+        return;
+
+    assert(!isProxy);
+    assert(!m_connected);
+    
+    m_connected = true;
+    emit connectionOpened();
 }
 
-void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData, bool isProxy)
+void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy)
 {
-    if (isProxy) {
-        //updateTmpStatus(id, QnResource::Offline);
+    if (qnCommon->remoteGUID().isNull()) {
+        qWarning() << "at_remotePeerLost received while disconnected";
         return;
     }
 
-    if (m_opened) {
-        m_opened = false;
-        emit connectionClosed();
-        QString serverTypeName = lit("Server");
-        foreach(QnResourcePtr res, qnResPool->getAllResourceByTypeName(serverTypeName))
-            res->setStatus(QnResource::Offline);
-        foreach(QnResourcePtr res, qnResPool->getAllCameras(QnResourcePtr()))
-            res->setStatus(QnResource::Offline);
-    }
+    if (data.peer.id != qnCommon->remoteGUID())
+        return;
+
+    assert(!isProxy);
+    assert(m_connected);
+
+    m_connected = false;
+    emit connectionClosed();
 }
 
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     QnResourceDiscoveryManager::instance()->setReady(true);
-    //emit connectionOpened();
 }

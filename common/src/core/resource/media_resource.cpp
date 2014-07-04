@@ -83,7 +83,7 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, Qn::Stream
 }
 
 static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
-QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     QVariant val;
     toResource()->getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
@@ -109,7 +109,7 @@ void QnMediaResource::setCustomVideoLayout(QnCustomResourceVideoLayoutPtr newLay
 }
 
 static QSharedPointer<QnEmptyResourceAudioLayout> audioLayout( new QnEmptyResourceAudioLayout() );
-QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
+QnConstResourceAudioLayoutPtr QnMediaResource::getAudioLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const
 {
     return audioLayout;
 }
@@ -132,15 +132,26 @@ void QnMediaResource::setDewarpingParams(const QnMediaDewarpingParams& params) {
     emit toResource()->mediaDewarpingParamsChanged(this->toResourcePtr());
 }
 
-void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&)
+void QnMediaResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>&modifiedFields)
 {
     QnMediaResourcePtr other_casted = qSharedPointerDynamicCast<QnMediaResource>(other);
     if (other_casted) {
-        m_dewarpingParams = other_casted->m_dewarpingParams;
+        if (m_dewarpingParams != other_casted->m_dewarpingParams) {
+            m_dewarpingParams = other_casted->m_dewarpingParams;
+            modifiedFields << "mediaDewarpingParamsChanged";
+        }
         m_customVideoLayout = other_casted->m_customVideoLayout;
     }
 }
 
 QString QnMediaResource::customAspectRatioKey() {
     return lit("overrideAr");
+}
+
+QString QnMediaResource::dontRecordSecondaryStreamKey() {
+    return lit("dontRecordSecondaryStream");
+}
+
+QString QnMediaResource::rtpTransportKey() {
+    return lit("rtpTransport");
 }

@@ -22,7 +22,7 @@ QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject *parent):
     QObject(parent),
     m_checker(NULL)
 {
-    QUrl updateFeedUrl = qnSettings->updateFeedUrl();
+    QUrl updateFeedUrl(qnSettings->updateFeedUrl());
     if(updateFeedUrl.isEmpty())
         return; 
 

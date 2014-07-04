@@ -7,6 +7,7 @@ static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
 
 #include <QtCore/QByteArray>
 #include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/video_data_packet.h"
 #include "decoders/video/ffmpeg.h"
 #include "core/resource/motion_window.h"
 
@@ -27,7 +28,7 @@ public:
     /*!
         \return true if successfully decoded and analyzed \a frame
     */
-    bool analizeFrame(QnCompressedVideoDataPtr frame);
+    bool analizeFrame(const QnCompressedVideoDataPtr& frame);
 #endif
     QnMetaDataV1Ptr getMotion();
     bool existsMetadata() const;

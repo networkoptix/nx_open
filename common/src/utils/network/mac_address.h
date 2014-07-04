@@ -33,7 +33,14 @@ private:
     void init(const QString &mac);
 
 private:
-    unsigned char m_data[6];
+    union
+    {
+        unsigned char bytes[6];
+        struct {
+            quint32 u32;
+            quint16 u16;
+        } uints;
+    } m_data;
 };
 
 Q_DECLARE_TYPEINFO(QnMacAddress, Q_MOVABLE_TYPE);

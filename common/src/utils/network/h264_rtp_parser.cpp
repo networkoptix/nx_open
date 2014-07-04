@@ -160,31 +160,34 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffe
     if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
         addheaderSize = getSpsPpsSize();
 
-    QnCompressedVideoDataPtr result = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoFrameSize + addheaderSize));
+    QnWritableCompressedVideoDataPtr result = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoFrameSize + addheaderSize));
     result->compressionType = CODEC_ID_H264;
     result->width = m_spsInitialized ? m_sps.getWidth() : -1;
     result->height = m_spsInitialized ? m_sps.getHeight() : -1;
     if (m_keyDataExists) {
         result->flags = QnAbstractMediaData::MediaFlags_AVKey;
         if (!m_builtinSpsFound || !m_builtinPpsFound)
-            serializeSpsPps(result->data);
+            serializeSpsPps(result->m_data);
     }
     //result->data.write(m_videoBuffer);
     size_t spsNaluStartOffset = (size_t)-1;
+    size_t spsNaluSize = 0;
     for (uint i = 0; i < m_chunks.size(); ++i)
     {
         if (m_chunks[i].nalStart)
         {
-            result->data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+            if( (spsNaluStartOffset != (size_t)-1) && (spsNaluSize == 0) )
+                spsNaluSize = result->m_data.size() - spsNaluStartOffset;
+            result->m_data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
             if( (m_chunks[i].len > 0) && ((*((const char*)rtpBuffer + m_chunks[i].bufferOffset) & 0x1f) == nuSPS) )
-                spsNaluStartOffset = result->data.size();
+                spsNaluStartOffset = result->m_data.size();
         }
-        result->data.uncheckedWrite((const char*) rtpBuffer + m_chunks[i].bufferOffset, m_chunks[i].len);
+        result->m_data.uncheckedWrite((const char*) rtpBuffer + m_chunks[i].bufferOffset, m_chunks[i].len);
     }
 
     if( (spsNaluStartOffset != (size_t)-1) )
         //decoding sps to detect stream resolution change
-        decodeSpsInfo( QByteArray::fromRawData( result->data.constData() + spsNaluStartOffset, result->data.size() - spsNaluStartOffset ) );
+        decodeSpsInfo( QByteArray::fromRawData( result->m_data.constData() + spsNaluStartOffset, spsNaluSize ) );
 
     if (m_timeHelper) {
         result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_frequency);

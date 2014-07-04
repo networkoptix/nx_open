@@ -16,8 +16,8 @@ namespace ec2
     template<class T>
     QnResourceManager<T>::QnResourceManager( T* const queryProcessor, const ResourceContext& resCtx)
     :
-        m_queryProcessor( queryProcessor ),
-        m_resCtx( resCtx )
+        QnResourceNotificationManager( resCtx ),
+        m_queryProcessor( queryProcessor )
     {
     }
 
@@ -160,9 +160,9 @@ namespace ec2
         {
             QnResourcePtr res = m_resCtx.pool->getResourceById(id);
             if (id == qnCommon->moduleGUID())
-                tran.localTransaction = true;
+                tran.isLocal = true;
             else if (res && res->hasFlags(QnResource::foreigner))
-                tran.localTransaction = true;
+                tran.isLocal = true;
         }
 
         return tran;

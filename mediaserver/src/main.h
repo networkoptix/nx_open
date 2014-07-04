@@ -40,9 +40,9 @@ private slots:
     void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
     void at_localInterfacesChanged();
     void at_serverSaved(int, ec2::ErrorCode err);
-    void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);
+    void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
-    void at_storageManager_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason);
+    void at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason);
     void at_storageManager_rebuildFinished();
     void at_timer();
     void at_connectionOpened();
@@ -51,6 +51,7 @@ private slots:
     void at_peerLost(const QnModuleInformation &moduleInformation);
 
     void at_appStarted();
+    void at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
 private:
     void updateDisabledVendorsIfNeeded();
     void initTcpListener();

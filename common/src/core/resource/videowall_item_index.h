@@ -22,16 +22,8 @@ public:
         return m_videowall;
     }
 
-    void setVideoWall(const QnVideoWallResourcePtr &videowall) {
-        m_videowall = videowall;
-    }
-
     const QUuid &uuid() const {
         return m_uuid;
-    }
-
-    void setUuid(const QUuid &uuid) {
-        m_uuid = uuid;
     }
 
     bool isNull() const {

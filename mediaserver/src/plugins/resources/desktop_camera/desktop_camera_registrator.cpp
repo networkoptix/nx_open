@@ -22,10 +22,11 @@ void QnDesktopCameraRegistrator::run()
     Q_D(QnDesktopCameraRegistrator);
 
     parseRequest();
-    sendResponse("HTTP", 200, QByteArray());
+    sendResponse(nx_http::StatusCode::ok, QByteArray());
     const QByteArray& userName = nx_http::getHeaderValue(d->request.headers, "user-name");
+    const QByteArray userId = nx_http::getHeaderValue(d->request.headers, "user-id");
     if (QnDesktopCameraResourceSearcher::instance())
-        QnDesktopCameraResourceSearcher::instance()->registerCamera(d->socket, userName);
+        QnDesktopCameraResourceSearcher::instance()->registerCamera(d->socket, userName, userId);
     d->socket.clear();
 }
 

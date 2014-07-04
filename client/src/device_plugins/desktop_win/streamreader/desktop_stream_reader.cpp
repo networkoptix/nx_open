@@ -105,8 +105,8 @@ QnAbstractMediaDataPtr QnDesktopStreamreader::getNextData()
         if (out_size < 1)
             continue;
 
-        QnCompressedVideoData* videoData = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, out_size);
-        videoData->data.write((const char*) m_videoBuf, out_size);
+        QnWritableCompressedVideoData* videoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, out_size);
+        videoData->m_data.write((const char*) m_videoBuf, out_size);
 
         videoData->width = m_grabber->width();
         videoData->height = m_grabber->height();

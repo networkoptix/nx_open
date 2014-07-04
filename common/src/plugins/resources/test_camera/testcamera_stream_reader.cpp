@@ -1,12 +1,14 @@
 #ifdef ENABLE_TEST_CAMERA
 
 #include "testcamera_stream_reader.h"
+
+#include "core/datapacket/video_data_packet.h"
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
 
 static const int TESTCAM_TIMEOUT = 5 * 1000;
 
-QnTestCameraStreamReader::QnTestCameraStreamReader(QnResourcePtr res):
+QnTestCameraStreamReader::QnTestCameraStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res)
 {
     m_tcpSock.reset( SocketFactory::createStreamSocket() );
@@ -75,15 +77,15 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
         return getNextData();
     }
 
-    QnAbstractMediaDataPtr rez(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, size, m_context));
+    QnWritableCompressedVideoDataPtr rez(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, size, m_context));
     rez->compressionType = (CodecID) codec;
 
-    rez->data.finishWriting(size);
+    rez->m_data.finishWriting(size);
     rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     if (isKeyData)
         rez->flags |= QnAbstractMediaData::MediaFlags_AVKey;
 
-    readed = receiveData((quint8*) rez->data.data(), size);
+    readed = receiveData((quint8*) rez->m_data.data(), size);
     if (readed != size) {
         closeStream();
         return QnAbstractMediaDataPtr();

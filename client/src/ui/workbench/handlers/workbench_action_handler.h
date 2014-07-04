@@ -43,6 +43,7 @@ class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
 class QnSystemAdministrationDialog;
+class QnGraphicsMessageBox;
 
 // TODO: #Elric get rid of these processors here
 namespace detail {
@@ -252,7 +253,6 @@ protected slots:
     void at_serverLogsAction_triggered();
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
-    void at_youtubeUploadAction_triggered();
     void at_thumbnailsSearchAction_triggered();
 
     void at_openInFolderAction_triggered();
@@ -366,7 +366,7 @@ private:
     QnLayoutResourcePtr m_exportLayout;
     QnStorageResourcePtr m_exportStorage;
 
-
+    QnGraphicsMessageBox* m_connectingMessageBox;
 
     QTimer *m_tourTimer;
 };

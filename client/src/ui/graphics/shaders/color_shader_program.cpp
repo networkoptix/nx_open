@@ -40,25 +40,28 @@ QnColorGLShaderProgramm::QnColorGLShaderProgramm(const QGLContext *context, QObj
     : QnAbstractBaseGLShaderProgramm(context,parent)
 {
 }
+
 bool QnColorGLShaderProgramm::compile()
 {
     addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
         uniform mat4 uModelViewProjectionMatrix;
-    attribute vec4 aPosition;
-    void main() {
-        gl_Position = uModelViewProjectionMatrix * aPosition;
-    }
+        attribute vec4 aPosition;
+        void main() {
+            gl_Position = uModelViewProjectionMatrix * aPosition;
+        }
     ));
 
     QByteArray shader(QN_SHADER_SOURCE(
         uniform vec4 uColor;
-    void main() {
-        gl_FragColor = uColor;
-    }
+        void main() {
+            gl_FragColor = uColor;
+        }
     ));
-    #ifdef QT_OPENGL_ES_2
-       shader =  QN_SHADER_SOURCE(precision mediump float;) + shader;
-    #endif
+
+#ifdef QT_OPENGL_ES_2
+    shader = QN_SHADER_SOURCE(precision mediump float;) + shader;
+#endif
+
     addShaderFromSourceCode(QGLShader::Fragment, shader);
 
     return link();

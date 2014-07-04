@@ -9,6 +9,7 @@
 #include <memory>
 #include <stdint.h>
 
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QMutex>
 
 #ifndef NO_ISD_AUDIO
@@ -19,8 +20,11 @@
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 #include <utils/media/pts_to_clock_mapper.h>
+#include <utils/memory/cyclic_allocator.h>
 
 #include "isd_motion_estimation.h"
+
+//#define DEBUG_OUTPUT
 
 
 class ISDAudioPacket;
@@ -58,20 +62,16 @@ public:
     int getAudioFormat( nxcip::AudioFormat* audioFormat ) const;
 
 private:
-    bool needMetaData();
-    MotionDataPicture* getMotionData();
-
-private:
     nxpt::CommonRefManager m_refManager;
     int m_encoderNum;
     nxcip::CompressionType m_videoCodec;
     nxcip::UsecUTCTimestamp m_lastVideoTime;
     nxcip::UsecUTCTimestamp m_lastMotionTime;
-    Vmux* m_vmux;
-    Vmux* m_vmux_motion;
+    std::unique_ptr<Vmux> m_vmux;
+    std::unique_ptr<Vmux> m_vmuxMotion;
 #ifndef NO_ISD_AUDIO
     amux_info_t m_audioInfo;
-    Amux* m_amux;
+    std::unique_ptr<Amux> m_amux;
     bool m_audioEnabled;
     nxcip::CompressionType m_audioCodec;
     std::unique_ptr<nxcip::AudioFormat> m_audioFormat;
@@ -85,11 +85,24 @@ private:
     int64_t m_timestampDelta;
     int m_framesSinceTimeResync;
     int m_epollFD;
+    MotionDataPicture* m_motionData;
+    QAtomicInt m_refCounter;
 
     PtsToClockMapper m_ptsMapper;
+    CyclicAllocator m_allocator;
+    size_t m_currentGopSizeBytes;
+
+#ifdef DEBUG_OUTPUT
+    QElapsedTimer m_frameTimer;
+    size_t m_totalFramesRead;
+#endif
 
     int initializeVMux();
+    int initializeVMuxMotion();
     int getVideoPacket( nxcip::MediaDataPacket** packet );
+    bool needMetaData();
+    void readMotion();
+    MotionDataPicture* getMotionData();
     bool registerFD( int fd );
     void unregisterFD( int fd );
 #ifndef NO_ISD_AUDIO
@@ -97,6 +110,7 @@ private:
     int getAudioPacket( nxcip::MediaDataPacket** packet );
     void fillAudioFormat( const ISDAudioPacket& audioPacket );
 #endif
+    void closeAllStreams();
     int64_t calcNextTimestamp( int32_t pts, int64_t absoluteTimeMS );
     void resyncTime( int64_t absoluteSourceTimeUSec );
 };

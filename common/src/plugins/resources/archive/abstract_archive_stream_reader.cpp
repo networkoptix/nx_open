@@ -5,7 +5,7 @@
 
 #include "utils/common/util.h"
 
-QnAbstractArchiveReader::QnAbstractArchiveReader(QnResourcePtr dev ) :
+QnAbstractArchiveReader::QnAbstractArchiveReader(const QnResourcePtr& dev ) :
     QnAbstractMediaStreamDataProvider(dev),
     m_cycleMode(true),
     m_needToSleep(0),
@@ -88,7 +88,7 @@ void QnAbstractArchiveReader::run()
 {
     initSystemThreadId();
 
-    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("QnArchiveStreamReader started."), cl_logINFO);
+    CL_LOG(cl_logINFO) NX_LOG(QLatin1String("QnArchiveStreamReader started."), cl_logINFO);
 
     beforeRun();
 
@@ -141,13 +141,13 @@ void QnAbstractArchiveReader::run()
             data->dataProvider = this;
 
         if (videoData)
-            m_stat[videoData->channelNumber].onData(videoData->data.size());
+            m_stat[videoData->channelNumber].onData(videoData->dataSize());
 
 
-        putData(data);
+        putData(std::move(data));
     }
 
     afterRun();
 
-    CL_LOG(cl_logINFO) cl_log.log(QLatin1String("QnArchiveStreamReader reader stopped."), cl_logINFO);
+    CL_LOG(cl_logINFO) NX_LOG(QLatin1String("QnArchiveStreamReader reader stopped."), cl_logINFO);
 }

@@ -29,7 +29,7 @@ public:
 protected:
 protected:
 
-    virtual bool processData(QnAbstractDataPacketPtr packet) override
+    virtual bool processData(const QnAbstractDataPacketPtr& packet) override
     {
         if (m_needStop)
             return true;
@@ -232,6 +232,7 @@ void QnDesktopCameraConnection::run()
             auth.setPassword(QnAppServerConnectionFactory::defaultUrl().password());
             connection = new CLSimpleHTTPClient(m_mServer->getApiUrl(), CONNECT_TIMEOUT, auth);
             connection->addHeader("user-name", auth.user().toUtf8());
+            connection->addHeader("user-id", QnAppServerConnectionFactory::clientGuid().toUtf8());
         }
 
         CLHttpStatus status = connection->doGET(QByteArray("desktop_camera"));

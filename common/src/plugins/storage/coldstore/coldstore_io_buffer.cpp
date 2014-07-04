@@ -2,7 +2,7 @@
 #include "coldstore_storage.h"
 
 
-QnColdStoreIOBuffer::QnColdStoreIOBuffer(QnResourcePtr res, const QString& fn, int capacity):
+QnColdStoreIOBuffer::QnColdStoreIOBuffer(const QnResourcePtr& res, const QString& fn, int capacity):
 QnResourceConsumer(res),
 m_fileName(fn)
 {

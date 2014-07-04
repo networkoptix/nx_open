@@ -351,7 +351,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 #endif
 
     /* Debug overlay */
-    createDebugWidget();
+    //createDebugWidget();
 
     initGraphicsMessageBox();
 
@@ -2435,6 +2435,7 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
         return;
 
     m_fpsItem->setVisible(fpsVisible);
+    m_fpsCountingInstrument->setEnabled(fpsVisible);
 
     if(fpsVisible)
         m_fpsCountingInstrument->recursiveEnable();

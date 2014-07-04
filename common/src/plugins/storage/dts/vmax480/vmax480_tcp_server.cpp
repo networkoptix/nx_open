@@ -6,6 +6,8 @@
 #include <QtCore/QUuid>
 #include <QtCore/QString>
 
+#include "core/datapacket/audio_data_packet.h"
+#include "core/datapacket/video_data_packet.h"
 #include "vmax480_stream_fetcher.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "../../../../vmaxproxy/src/vmax480_helper.h"
@@ -233,8 +235,6 @@ void QnVMax480ConnectionProcessor::run()
         quint64 timestamp = *(quint64*)(vMaxHeader+8);
         CodecID codecID = CODEC_ID_NONE;
 
-        QnAbstractMediaData* media = 0;
-
         if (dataType == VMAXDT_GotArchiveRange)
         {
             quint32 startDateTime = *(quint32*)(vMaxHeader+8);
@@ -265,10 +265,13 @@ void QnVMax480ConnectionProcessor::run()
 
         // media data
 
+        QnAbstractMediaData* media = nullptr;
+        QnByteArray* mediaBuffer = nullptr;
         if (dataType == VMAXDT_GotVideoPacket)
         {
-            QnCompressedVideoData* video = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, dataSize);
+            QnWritableCompressedVideoData* video = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, dataSize);
             media = video;
+            mediaBuffer = &video->m_data;
             switch (internalCodecID) {
                 case CODEC_VSTREAM_H264:
                     codecID = CODEC_ID_H264;
@@ -327,15 +330,16 @@ void QnVMax480ConnectionProcessor::run()
                 d->context->ctx()->time_base.den = d->context->ctx()->sample_rate;
             }
 
-            QnCompressedAudioData* audio = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize, d->context);
+            QnWritableCompressedAudioData* audio = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize, d->context);
             media = audio;
+            mediaBuffer = &audio->m_data;
         }
 
         if (!media)
             break;
 
-        media->data.resize(media->data.capacity());
-        if (!readBuffer((quint8*) media->data.data(), media->data.size()))
+        mediaBuffer->resize(mediaBuffer->capacity());
+        if (!readBuffer((quint8*) mediaBuffer->data(), mediaBuffer->size()))
             break;
 
         if (vMaxHeader[3] & 1)

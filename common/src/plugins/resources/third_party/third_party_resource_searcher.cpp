@@ -11,6 +11,7 @@
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/camera_driver_restriction_list.h"
 #include "core/resource_management/resource_data_pool.h"
+#include "core/resource_management/resource_pool.h"
 #include "common/common_module.h"
 #include "../../plugin_manager.h"
 
@@ -41,7 +42,7 @@ ThirdPartyResourceSearcher::~ThirdPartyResourceSearcher()
 {
 }
 
-QnResourcePtr ThirdPartyResourceSearcher::createResource( QnId resourceTypeId, const QnResourceParams& params )
+QnResourcePtr ThirdPartyResourceSearcher::createResource( const QnId &resourceTypeId, const QnResourceParams& params )
 {
     QnThirdPartyResourcePtr result;
 
@@ -293,22 +294,33 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
         return QnThirdPartyResourcePtr();
 
     discoveryManager->getRef()->addRef();   //this ref will be released by QnThirdPartyResource
+
+    QString vendor = discoveryManager->getVendorName();
+    bool vendorIsRtsp = vendor == lit("GENERIC_RTSP");
+
     QnThirdPartyResourcePtr resource(new QnThirdPartyResource(cameraInfo, camManager, discoveryManager->getRef()));
     resource->setTypeId(typeId);
-    resource->setName( QString::fromUtf8("%1-%2").arg(discoveryManager->getVendorName()).arg(QString::fromUtf8(cameraInfo.modelName)) );
+    if (vendorIsRtsp)
+        resource->setName( QString::fromUtf8(cameraInfo.modelName) );
+    else
+        resource->setName( QString::fromUtf8("%1-%2").arg(vendor).arg(QString::fromUtf8(cameraInfo.modelName)) );
     resource->setModel( QString::fromUtf8(cameraInfo.modelName) );
     resource->setMAC( QnMacAddress(QString::fromUtf8(cameraInfo.uid).trimmed()) );
     resource->setAuth( QString::fromUtf8(cameraInfo.defaultLogin), QString::fromUtf8(cameraInfo.defaultPassword) );
     resource->setUrl( QString::fromUtf8(cameraInfo.url) );
     resource->setPhysicalId( QString::fromUtf8(cameraInfo.uid).trimmed() );
-    resource->setVendor( discoveryManager->getVendorName() );
+    resource->setVendor( vendor );
 
-    //TODO #ak reading MaxFPS here ia a workaround of camera integration API defect: 
-        //it does not not allow plugin to return hard-coded max fps, it can only be read in initInternal
-    const QnResourceData& resourceData = qnCommon->dataPool()->data(resource);
-    const float maxFps = resourceData.value<float>( lit("MaxFPS"), 0.0 );
-    if( maxFps > 0.0 )
-        resource->setParam( lit("MaxFPS"), maxFps, QnDomainDatabase );
+    if( !qnResPool->getNetResourceByPhysicalId( resource->getPhysicalId() ) )
+    {
+        //new resource
+        //TODO #ak reading MaxFPS here is a workaround of camera integration API defect: 
+            //it does not not allow plugin to return hard-coded max fps, it can only be read in initInternal
+        const QnResourceData& resourceData = qnCommon->dataPool()->data(resource);
+        const float maxFps = resourceData.value<float>( lit("MaxFPS"), 0.0 );
+        if( maxFps > 0.0 )
+            resource->setParam( lit("MaxFPS"), maxFps, QnDomainDatabase );
+    }
     
     unsigned int caps;
     if (camManager->getCameraCapabilities(&caps) == 0) 
@@ -317,8 +329,10 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
             resource->setCameraCapability( Qn::ShareIpCapability, true );
     }
 
-    QString groupName = QString(lit("%1-%2")).arg(discoveryManager->getVendorName()).arg(resource->getHostAddress());
-    resource->setGroupName(groupName);
-    resource->setGroupId(groupName.toLower().trimmed());
+    if (!vendorIsRtsp) { //Bug #3276: Remove group element for generic rtsp/http links
+        QString groupName = QString(lit("%1-%2")).arg(vendor).arg(resource->getHostAddress());
+        resource->setGroupName(groupName);
+        resource->setGroupId(groupName.toLower().trimmed());
+    }
     return resource;
 }

@@ -268,7 +268,7 @@ protected:
     }
 
     qreal stateOpacity(StateFlags stateFlags) {
-        return (stateFlags & HOVERED) ? 1.0 : 0.5;
+        return (stateFlags & Hovered) ? 1.0 : 0.5;
     }
 
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
@@ -767,7 +767,8 @@ QString QnServerResourceWidget::calculateTitleText() const {
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility();
     result &= (CloseButton | RotateButton | InfoButton);
-    result |= PingButton | ShowLogButton | CheckIssuesButton;
+    if (!qnSettings->isVideoWallMode())
+        result |= PingButton | ShowLogButton | CheckIssuesButton;
     return result;
 }
 

@@ -1,5 +1,22 @@
 ----------------------------------------------2.2.0.xxxx-------------------------------------------
 
+Improvements:
+1. Onvif protocol support is improved
+2. Web client works better in Internet Explorer 9+
+3. If screenshots are taken from a remote camera, then it can take a long to download it. Added progress bar to allow users to estimate time.
+4. Default motion sensitivity changed from 6 to 5.
+
+Bugs Fixed:
+1. Fixed the installation error on Windows 8 and Windows Server 2008
+2. Incorrect motion detection. Fixed.
+3. Sometimes thumbnails could not be loaded on Android devices. Fixed
+4. Better motion support for non-onvif cameras that are integrated through SDK.
+5. If new drive is mounted after mediaserver started it will stop recording after being filled. Fixed.
+6. Client crash during media folder check under some rare conditions. Fixed.
+7. Update Feed url was broken. Fixed.
+
+----------------------------------------------2.2.0.xxxx-------------------------------------------
+
 Features:
 1. More easy network configuration: no more 3 ports to port forward( used to be EC port, Media Proxy port and Media Server port ). From now it's simply going to be one port only(normally 7001).
 Also EC machine no longer needs to be able to connect to each MS. In order for client to be able to access video, MS should be able to connect to EC only, not vice versa any more. 

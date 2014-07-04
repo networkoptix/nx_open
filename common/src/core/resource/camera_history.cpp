@@ -226,7 +226,7 @@ QnResourceList QnCameraHistoryPool::getOnlineCameraServers(const QnNetworkResour
     return history ? history->getOnlineCameraServers(timePeriod) : getCurrentServer(camera);
 }
 
-qint64 QnCameraHistoryPool::getMinTime(QnNetworkResourcePtr camera)
+qint64 QnCameraHistoryPool::getMinTime(const QnNetworkResource* camera)
 {
     if (!camera)
         return AV_NOPTS_VALUE;

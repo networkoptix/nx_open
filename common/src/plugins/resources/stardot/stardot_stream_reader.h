@@ -10,7 +10,7 @@
 class QnStardotStreamReader: public CLServerPushStreamReader
 {
 public:
-    QnStardotStreamReader(QnResourcePtr res);
+    QnStardotStreamReader(const QnResourcePtr& res);
     virtual ~QnStardotStreamReader();
 
     QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
@@ -28,7 +28,7 @@ protected:
     virtual void pleaseStop() override;
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 private:
-    void parseMotionInfo(QnCompressedVideoDataPtr videoData);
+    void parseMotionInfo(const QnCompressedVideoDataPtr& videoData);
     void processMotionBinData(const quint8* data, qint64 timestamp);
 private:
     QnMulticodecRtpReader m_multiCodec;

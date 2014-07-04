@@ -4,11 +4,11 @@
 
 #include "../resource/av_resource.h"
 
-QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(QnResourcePtr res):
+QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnResourcePtr& res):
     QnClientPullMediaStreamProvider(res),
     m_videoFrameBuff(CL_MEDIA_ALIGNMENT, 1024*1024)
 {
-    QnSecurityCamResourcePtr ceqResource = getResource().dynamicCast<QnSecurityCamResource>();
+    const QnSecurityCamResource* ceqResource = dynamic_cast<const QnSecurityCamResource*>(res.data());
 
     QSize maxResolution = ceqResource->getMaxSensorSize();
 

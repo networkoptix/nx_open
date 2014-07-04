@@ -10,7 +10,7 @@
 class QnVMax480ArchiveDelegate: public QnAbstractArchiveDelegate, public QnVmax480DataConsumer
 {
 public:
-    QnVMax480ArchiveDelegate(QnResourcePtr res);
+    QnVMax480ArchiveDelegate(const QnResourcePtr& res);
     virtual ~QnVMax480ArchiveDelegate();
 
 

@@ -10,6 +10,7 @@
 #include <utils/common/system_information.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_factory.h>
 #include <core/resource/abstract_storage_resource.h>
 
 
@@ -31,10 +32,10 @@ public:
     QString getApiUrl() const;
 
     void setStreamingUrl(const QString& value);
-    QString getStreamingUrl() const;
+    const QString& getStreamingUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
-    QList<QHostAddress> getNetAddrList();
+    const QList<QHostAddress>& getNetAddrList() const;
 
     QnMediaServerConnectionPtr apiConnection();
 

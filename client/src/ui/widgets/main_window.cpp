@@ -60,7 +60,7 @@
 #include <ui/style/noptix_style.h>
 #include <ui/style/proxy_style.h>
 #include <ui/workaround/qtbug_workaround.h>
-#include <ui/workaround/mac_event_loop_workaround.h>
+#include <ui/workaround/vsync_workaround.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include <client/client_settings.h>
@@ -192,6 +192,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
 
     m_controller.reset(new QnWorkbenchController(this));
+    if (qnSettings->isVideoWallMode())
+        m_controller->setMenuEnabled(false);
     m_ui.reset(new QnWorkbenchUi(this));
     if (qnSettings->isVideoWallMode())
         m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::HideWhenNormal );
@@ -216,12 +218,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
-    /* Set up actions. */
+    /* Set up actions. Only these actions will be available through hotkeys. */
     addAction(action(Qn::NextLayoutAction));
     addAction(action(Qn::PreviousLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAsAction));
-    addAction(action(Qn::SaveVideoWallReviewAction));
+    addAction(action(Qn::SaveCurrentVideoWallReviewAction));
     addAction(action(Qn::ExitAction));
     addAction(action(Qn::EscapeHotkeyAction));
     addAction(action(Qn::FullscreenMaximizeHotkeyAction));
@@ -237,11 +239,11 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::OpenNewWindowAction));
     addAction(action(Qn::CloseLayoutAction));
     addAction(action(Qn::MainMenuAction));
-    addAction(action(Qn::YouTubeUploadAction));
     addAction(action(Qn::OpenInFolderAction));
     addAction(action(Qn::RemoveLayoutItemAction));
     addAction(action(Qn::RemoveFromServerAction));
     addAction(action(Qn::DeleteVideoWallItemAction));
+    addAction(action(Qn::DeleteVideowallMatrixAction));
     addAction(action(Qn::SelectAllAction));
     addAction(action(Qn::CheckFileSignatureAction));
     addAction(action(Qn::TakeScreenshotAction));
@@ -335,11 +337,10 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     menu()->newMenu(Qn::MainScope);
 #endif
 
-//#ifdef Q_OS_MACX
-    /* Side-effect of this workaround is fps lowering. So enable it for other systems too. */
-    QnMacEventLoopWorkaround *macEventLoopWorkaround = new QnMacEventLoopWorkaround(m_view->viewport(), this);
-    Q_UNUSED(macEventLoopWorkaround);
-//#endif
+    if (!qnSettings->isVSyncEnabled()) {
+        QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
+        Q_UNUSED(vsyncWorkaround);
+    }
 
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
     Q_UNUSED(manageDialog)

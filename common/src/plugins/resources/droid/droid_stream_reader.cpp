@@ -19,7 +19,7 @@ void PlDroidStreamReader::setSDPInfo(quint32 ipv4, QByteArray sdpInfo)
         reader->setSDPInfo(sdpInfo);
 }
 
-PlDroidStreamReader::PlDroidStreamReader(QnResourcePtr res):
+PlDroidStreamReader::PlDroidStreamReader(const QnResourcePtr& res):
     CLServerPushStreamReader(res),
     m_rtpSession(),
     m_videoIoDevice(0),

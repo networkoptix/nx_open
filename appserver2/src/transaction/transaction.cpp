@@ -12,7 +12,7 @@
 namespace ec2
 {
 
-    QAtomicInt QnAbstractTransaction::m_sequence(1);
+    QAtomicInt qn_abstractTransaction_sequence(1);
 
     namespace ApiCommand
     {
@@ -20,18 +20,26 @@ namespace ec2
         {
             switch( val )
             {
+                case tranSyncRequest:
+                    return "tranSyncRequest";
+                case tranSyncResponse:
+                    return "tranSyncResponse";
+                case lockRequest:
+                    return "lockRequest";
+                case lockResponse:
+                    return "lockResponse";
+                case unlockRequest:
+                    return "unlockRequest";
+                case peerAliveInfo:
+                    return "peerAliveInfo";
+
                 case testConnection:
                     return "testConnection";
                 case connect:
                     return "connect";
 
-                case clientInstanceId:
-                    return "clientInstanceId";
-
                 case getResourceTypes:
                     return "getResourceTypes";
-                case getResource:
-                    return "getResource";
                 case setResourceStatus:
                     return "setResourceStatus";
                 //case setResourceDisabled:
@@ -46,8 +54,9 @@ namespace ec2
                     return "removeResource";
                 case setPanicMode:
                     return "setPanicMode";
-                case getAllDataList:
-                    return "getAllDataList";
+                case getFullInfo:
+                    return "getFullInfo";
+
                 case saveCamera:
                     return "saveCamera";
                 case saveCameras:
@@ -56,13 +65,13 @@ namespace ec2
                     return "removeCamera";
                 case getCameras:
                     return "getCameras";
-                case getCameraHistoryList:
-                    return "getCameraHistoryList";
+                case getCameraHistoryItems:
+                    return "getCameraHistoryItems";
                 case addCameraHistoryItem:
                     return "addCameraHistoryItem";
 
-                case getMediaServerList:
-                    return "getMediaServerList";
+                case getMediaServers:
+                    return "getMediaServers";
                 case saveMediaServer:
                     return "saveMediaServer";
                 case removeMediaServer:
@@ -70,8 +79,8 @@ namespace ec2
 
                 case saveUser:
                     return "saveUser";
-                case getUserList:
-                    return "getUserList";
+                case getUsers:
+                    return "getUsers";
                 case removeUser:
                     return "removeUser";
 
@@ -83,8 +92,8 @@ namespace ec2
                     return "broadcastBusinessAction";
                 case execBusinessAction:
                     return "execBusinessAction";
-                case getBusinessRuleList:
-                    return "getBusinessRuleList";
+                case getBusinessRules:
+                    return "getBusinessRules";
                 case resetBusinessRules:
                     return "resetBusinessRules";
 
@@ -92,19 +101,21 @@ namespace ec2
                     return "saveLayout";
                 case saveLayouts:
                     return "addOrUpdateLayouts";
-                case getLayoutList:
-                    return "getLayoutList";
+                case getLayouts:
+                    return "getLayouts";
                 case removeLayout:
                     return "removeLayout";
 
                 case saveVideowall:
                     return "saveVideowall";
-                case getVideowallList:
-                    return "getVideowallList";
+                case getVideowalls:
+                    return "getVideowalls";
                 case removeVideowall:
                     return "removeVideowall";
                 case videowallControl:
                     return "videowallControl";
+                case videowallInstanceStatus:
+                    return "videowallInstanceStatus";
 
                 case listDirectory:
                     return "listDirectory";
@@ -127,24 +138,10 @@ namespace ec2
                 case getCurrentTime:
                     return "getCurrentTime";
 
-                case tranSyncRequest:
-                    return "tranSyncRequest";
-                case tranSyncResponse:
-                    return "tranSyncResponse";
-                case serverAliveInfo:
-                    return "serverAliveInfo";
-
                 case getSettings:
                     return "getSettings";
                 case saveSettings:
                     return "saveSettings";
-
-                case lockRequest:
-                    return "lockRequest";
-                case lockResponse:
-                    return "lockResponse";
-                case unlockRequest:
-                    return "unlockRequest";
 
                 case uploadUpdate:
                     return "uploadUpdate";
@@ -160,8 +157,8 @@ namespace ec2
                 case removeCameraBookmarkTags:
                     return "removeCameraBookmarkTags";
 
-                case getHelp:
-                    return "getHelp";
+                case runtimeInfoChanged:
+                    return "runtimeInfoChanged";
 
                 default:
                     return "unknown " + QString::number((int)val);
@@ -175,7 +172,7 @@ namespace ec2
                     val == unlockRequest ||
                     val == tranSyncRequest ||
                     val == tranSyncResponse ||
-                    val == serverAliveInfo;
+                    val == peerAliveInfo;
         }
 
     }
@@ -191,17 +188,17 @@ namespace ec2
             timestamp = QnTransactionLog::instance()->getTimeStamp();
             id.dbID = QnDbManager::instance()->getID();
         }
-        localTransaction = false;
+        isLocal = false;
     }
 
     void QnAbstractTransaction::setStartSequence(int value)
     {
-        m_sequence = value;
+        qn_abstractTransaction_sequence = value;
     }
 
     void QnAbstractTransaction::fillSequence()
     {
-        id.sequence = m_sequence.fetchAndAddAcquire(1);
+        id.sequence = qn_abstractTransaction_sequence.fetchAndAddAcquire(1);
         if (!timestamp)
             timestamp = QnTransactionLog::instance() ? QnTransactionLog::instance()->getTimeStamp() : 0;
     }
@@ -212,8 +209,7 @@ namespace ec2
         return ++requestID;
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary),   (peerID)(dbID)(sequence))
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary),   (command)(id)(persistent)(timestamp))
-
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary)(json),   (peerID)(dbID)(sequence))
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary)(json),   (command)(id)(persistent)(timestamp))
 } // namespace ec2
 

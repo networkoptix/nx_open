@@ -185,7 +185,7 @@ QnId QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QSt
     QMutexLocker lock(&m_mutex);
     foreach(QnResourceTypePtr rt, m_resourceTypeMap)
     {
-        //cl_log.log(rt->getName(), cl_logALWAYS); //debug
+        //NX_LOG(rt->getName(), cl_logALWAYS); //debug
 
         if (rt->getName() == name && rt->getManufacture()==manufacture)
             return rt->getId();

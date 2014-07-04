@@ -20,7 +20,7 @@ QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlDlinkResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlDlinkResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 

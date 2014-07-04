@@ -3,6 +3,8 @@
 #include "core/resource/camera_resource.h"
 #include "isd_resource_searcher.h"
 #include "isd_resource.h"
+#include <utils/network/http/httptypes.h>
+
 
 extern QString getValueFromString(const QString& line);
 
@@ -10,7 +12,7 @@ QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlISDResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -61,15 +63,11 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 
 
     QString host = url.host();
-    int port = url.port();
+    int port = url.port( nx_http::DEFAULT_HTTP_PORT );
     if (host.isEmpty())
         host = url.toString(); // in case if url just host address without protocol and port
 
     int timeout = 2000;
-
-
-    if (port < 0)
-        port = 80;
 
     CLHttpStatus status;
     QString name = QString(QLatin1String(downloadFile(status, QLatin1String("api/param.cgi?req=General.Brand.ModelName"), host, port, timeout, auth)));
@@ -138,6 +136,8 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress)
 {
     QList<QnNetworkResourcePtr> local_result;
+
+    return local_result; // block ISD driver auto discovery
 
 
     QString smac;

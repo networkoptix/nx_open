@@ -10,7 +10,7 @@
 
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 
-QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(QnResourcePtr res)
+QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(const QnResourcePtr& res)
 :
     CLServerPushStreamReader(res)
 {
@@ -29,7 +29,7 @@ CameraDiagnostics::Result QnDesktopCameraStreamReader::openStream()
         if (!QnDesktopCameraResourceSearcher::instance())
             return CameraDiagnostics::CannotEstablishConnectionResult(0);
 
-        QString userName = m_resource.dynamicCast<QnDesktopCameraResource>()->getUserName();
+        QString userName = m_resource->getName();
         m_socket = QnDesktopCameraResourceSearcher::instance()->getConnection(userName);
         if (!m_socket)
             return CameraDiagnostics::CannotEstablishConnectionResult(0);
@@ -45,7 +45,6 @@ CameraDiagnostics::Result QnDesktopCameraStreamReader::openStream()
 void QnDesktopCameraStreamReader::closeStream()
 {
     if (m_socket && QnDesktopCameraResourceSearcher::instance()) {
-        QString userName = m_resource.dynamicCast<QnDesktopCameraResource>()->getUserName();
         quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
         QString request = QString(lit("TEARDOWN %1 RTSP/1.0\r\nSeq: %2\r\n\r\n")).arg("*").arg(cseq);
         m_socket->send(request.toLatin1());
@@ -147,7 +146,6 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
             && m_keepaliveTimer.elapsed() >= KEEP_ALIVE_INTERVAL
             && QnDesktopCameraResourceSearcher::instance()) 
         {
-            QString userName = m_resource.dynamicCast<QnDesktopCameraResource>()->getUserName();
             quint32 cseq = QnDesktopCameraResourceSearcher::instance()->incCSeq(m_socket);
             QString request = QString(lit("KEEP-ALIVE %1 RTSP/1.0\r\ncSeq: %2\r\n\r\n")).arg("*").arg(cseq);
             if (m_socket->send(request.toLatin1()) < request.size())

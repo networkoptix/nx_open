@@ -25,7 +25,7 @@ static const int RTCP_REPORT_TIMEOUT = 30 * 1000;
 
 static RtpTransport::Value defaultTransportToUse( RtpTransport::_auto );
 
-QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
+QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
     QnResourceConsumer(res),
     m_videoIO(0),
     m_audioIO(0),
@@ -47,6 +47,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
 
     connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)),
             qnBusinessRuleConnector, SLOT(at_networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)));
+    connect(res.data(), SIGNAL(propertyChanged(const QnResourcePtr &, const QString &)),          this, SLOT(at_propertyChanged(const QnResourcePtr &, const QString &)));
 }
 
 QnMulticodecRtpReader::~QnMulticodecRtpReader()
@@ -239,7 +240,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
                           qnSyncTime->currentUSecsSinceEpoch(),
                           reason,
                           reasonParamsEncoded);
-        QnVirtualCameraResourcePtr cam = getResource().dynamicCast<QnVirtualCameraResource>();
+        QnVirtualCameraResource* cam = dynamic_cast<QnVirtualCameraResource*>(getResource().data());
         if (cam)
             cam->issueOccured();
 
@@ -392,13 +393,20 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     return result;
 }
 
+void QnMulticodecRtpReader::at_propertyChanged(const QnResourcePtr & res, const QString & key)
+{
+    if (key == QnMediaResource::rtpTransportKey())
+        closeStream();
+}
+
 void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 {
-    QnVirtualCameraResourcePtr cam = getResource().dynamicCast<QnVirtualCameraResource>();
+    const QnResourcePtr& resource = getResource();
+    QnVirtualCameraResource* cam = dynamic_cast<QnVirtualCameraResource*>(resource.data());
     if (cam)
         cam->issueOccured();
 
-    emit networkIssue(getResource(),
+    emit networkIssue(resource,
                       qnSyncTime->currentUSecsSinceEpoch(),
                       QnBusiness::NetworkRtpPacketLossReason,
                       QnNetworkIssueBusinessEvent::encodePacketLossSequence(prev, next));
@@ -431,8 +439,10 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_gotSomeFrame = false;
     QString transport;
     QVariant val;
-    m_resource->getParam(lit("rtpTransport"), val, QnDomainMemory);
+    m_resource->getParam(QnMediaResource::rtpTransportKey(), val, QnDomainMemory);
     transport = val.toString();
+    if (transport.isEmpty())
+        transport = m_resource->getProperty(QnMediaResource::rtpTransportKey());
 
     if (transport.isEmpty()) {
         // if not defined, try transport from registry
@@ -447,7 +457,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         m_RtpSession.setTCPReadBufferSize(TCP_READ_BUFFER_SIZE);
 
 
-    QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
+    const QnNetworkResource* nres = dynamic_cast<QnNetworkResource*>(getResource().data());
 
     QString url;
     if (m_request.length() > 0)

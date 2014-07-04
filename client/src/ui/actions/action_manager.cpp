@@ -323,7 +323,7 @@ QnActionManager::QnActionManager(QObject *parent):
     m_root(NULL),
     m_targetProvider(NULL),
     m_shortcutAction(NULL),
-    m_lastShownMenu(NULL)
+    m_lastClickedMenu(NULL)
 {
     m_root = new QnAction(Qn::NoAction, this);
     m_actionById[Qn::NoAction] = m_root;
@@ -445,13 +445,14 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::StartVideoWallControlAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-        text(tr("Control Video Wall")); //TODO: #VW #TR
+        text(tr("Control Video Wall")). //TODO: #VW #TR
+        condition(new QnStartVideoWallControlActionCondition(this));
 
-    //TODO: #GDM #VW check desktop camera availability
     factory(Qn::PushMyScreenToVideowallAction).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
-        text(tr("Push my screen"));
+        text(tr("Push my screen")).
+        condition(new QnDesktopCameraActionCondition(this));
 
     factory(Qn::QueueAppRestartAction).
         flags(Qn::NoTarget).
@@ -612,9 +613,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Alt+S")).
-        autoRepeat(false);
+        autoRepeat(false).
+        condition(new QnVideoWallReviewModeCondition(true, this));
 
-    factory(Qn::SaveVideoWallReviewAction).
+    factory(Qn::SaveCurrentVideoWallReviewAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey | Qn::IntentionallyAmbiguous).
         text(tr("Save Video Wall View")). //TODO: #VW #TR
         shortcut(tr("Ctrl+S")).
@@ -904,6 +906,14 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnStartVideowallActionCondition(this));
 
+    factory(Qn::SaveVideoWallReviewAction).
+        flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        text(tr("Save Video Wall View")). //TODO: #VW #TR
+        shortcut(tr("Ctrl+S")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
+        autoRepeat(false).
+        condition(new QnSaveVideowallReviewActionCondition(this));
+
     factory(Qn::SaveVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
@@ -938,7 +948,7 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         text(tr("Stop Video Wall")).
         autoRepeat(false).
-        condition(new QnNonEmptyVideowallActionCondition(this));
+        condition(new QnRunningVideowallActionCondition(this));
 
     factory(Qn::DetachFromVideoWallAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
@@ -1194,13 +1204,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         separator();
 
-    factory(Qn::YouTubeUploadAction).
-        //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
-        text(tr("Upload to YouTube...")).
-        //shortcut(tr("Ctrl+Y")).
-        autoRepeat(false).
-        condition(hasFlags(QnResource::ARCHIVE));
-
     factory(Qn::DeleteFromDiskAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
         text(tr("Delete from Disk")).
@@ -1254,7 +1257,10 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::VideowallSettingsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Video Wall Settings...")).     //TODO: #VW #TR
-        condition(new QnResourceActionCondition(hasFlags(QnResource::videowall), Qn::ExactlyOne, this));
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(QnResource::videowall), Qn::ExactlyOne, this),
+            new QnAutoStartAllowedActionCodition(this),
+            this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
@@ -1554,17 +1560,17 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::ToggleThumbnailsAction).
-        flags(Qn::Slider | Qn::SingleTarget).
+        flags(Qn::NoTarget).
         text(tr("Show Thumbnails")).
         toggledText(tr("Hide Thumbnails"));
 
     factory(Qn::ToggleCalendarAction).
-        flags(Qn::Slider | Qn::SingleTarget).
+        flags(Qn::NoTarget).
         text(tr("Show Calendar")).
         toggledText(tr("Hide Calendar"));
 
     factory(Qn::ToggleTitleBarAction).
-        flags(Qn::TitleBar | Qn::NoTarget | Qn::SingleTarget).
+        flags(Qn::NoTarget).
         text(tr("Show Title Bar")).
         toggledText(tr("Hide Title Bar")).
         condition(new QnToggleTitleBarActionCondition(this));
@@ -1576,13 +1582,13 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
     factory(Qn::ToggleTreeAction).
-        flags(Qn::Tree | Qn::NoTarget).
+        flags(Qn::NoTarget).
         text(tr("Show Tree")).
         toggledText(tr("Hide Tree")).
         condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
 
     factory(Qn::ToggleSliderAction).
-        flags(Qn::Slider | Qn::NoTarget | Qn::SingleTarget).
+        flags(Qn::NoTarget).
         text(tr("Show Timeline")).
         toggledText(tr("Hide Timeline"));
 
@@ -1684,6 +1690,23 @@ void QnActionManager::trigger(Qn::ActionId id, const QnActionParameters &paramet
     action->trigger();
 }
 
+bool QnActionManager::triggerIfPossible(Qn::ActionId id, const QnActionParameters &parameters) {
+    QnAction *action = m_actionById.value(id);
+    if(action == NULL) {
+        qnWarning("Invalid action id '%1'.", static_cast<int>(id));
+        return false;
+    }
+
+    if(action->checkCondition(action->scope(), parameters) != Qn::EnabledAction) {
+        return false;
+    }
+
+    QN_SCOPED_VALUE_ROLLBACK(&m_parametersByMenu[NULL], parameters);
+    QN_SCOPED_VALUE_ROLLBACK(&m_shortcutAction, action);
+    action->trigger();
+    return true;
+}
+
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
     return newMenu(Qn::NoAction, scope, parent, parameters, options);
 }
@@ -1702,8 +1725,10 @@ QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWid
 
     if(result) {
         m_parametersByMenu[result] = parameters;
+
+        result->installEventFilter(this);
+
         connect(result, &QObject::destroyed, this, &QnActionManager::at_menu_destroyed);
-        connect(result, &QMenu::aboutToShow, this, &QnActionManager::at_menu_aboutToShow);
     }
 
     return result;
@@ -1815,11 +1840,14 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
 QnActionParameters QnActionManager::currentParameters(QnAction *action) const {
     if(m_shortcutAction == action)
         return m_parametersByMenu.value(NULL);
-
-    if(m_lastShownMenu == NULL || !m_parametersByMenu.contains(m_lastShownMenu))
+    
+    if(m_lastClickedMenu == NULL || !m_parametersByMenu.contains(m_lastClickedMenu)) 
+    {
         qnWarning("No active menu, no target exists.");
-
-    return m_parametersByMenu.value(m_lastShownMenu);
+        return QnActionParameters();
+    }
+    
+    return m_parametersByMenu.value(m_lastClickedMenu);
 }
 
 QnActionParameters QnActionManager::currentParameters(QObject *sender) const {
@@ -1868,8 +1896,17 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId sourceId
 
 void QnActionManager::at_menu_destroyed(QObject *menu) {
     m_parametersByMenu.remove(menu);
+    if (m_lastClickedMenu == menu)
+        m_lastClickedMenu = NULL;
 }
 
-void QnActionManager::at_menu_aboutToShow() {
-    m_lastShownMenu = sender();
+bool QnActionManager::eventFilter(QObject *watched, QEvent *event) {
+    if (event->type() != QEvent::MouseButtonRelease)
+        return false;
+
+    if (!dynamic_cast<QMenu*>(watched))
+        return false;
+
+    m_lastClickedMenu = watched;
+    return false;
 }

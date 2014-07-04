@@ -1,4 +1,7 @@
 #include "abstract_data_consumer.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "utils/common/sleep.h"
 
 
@@ -12,7 +15,7 @@ bool QnAbstractDataConsumer::canAcceptData() const
     return (m_dataQueue.size() < m_dataQueue.maxSize());
 }
 
-void QnAbstractDataConsumer::putData(QnAbstractDataPacketPtr data)
+void QnAbstractDataConsumer::putData( const QnAbstractDataPacketPtr& data )
 {
     if (!needToStop())
         m_dataQueue.push(data);
@@ -54,7 +57,7 @@ void QnAbstractDataConsumer::run()
             else
                 QnSleep::msleep(1);
         }
-        //cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
+        //NX_LOG("queue size = ", m_dataQueue.size(),cl_logALWAYS);
     }
 
     endOfRun();
@@ -64,3 +67,5 @@ int QnAbstractDataConsumer::queueSize() const
 {
     return m_dataQueue.size();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

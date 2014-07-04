@@ -2,17 +2,18 @@
 
 #include "cpul_http_dataprovider.h"
 #include "../resource/av_resource.h"
+#include "core/datapacket/video_data_packet.h"
 #include "utils/common/synctime.h"
 
 
-AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(QnResourcePtr res):
+AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(const QnResourcePtr& res):
 QnPlAVClinetPullStreamReader(res)
 {
 
     m_port = 69;
     m_timeout = 500;
 
-    QnPlAreconVisionResourcePtr avRes = res.dynamicCast<QnPlAreconVisionResource>();
+    const QnPlAreconVisionResource* avRes = dynamic_cast<const QnPlAreconVisionResource*>(res.data());
 
     m_panoramic = avRes->isPanoramic();
     m_dualsensor = avRes->isDualSensor();
@@ -52,7 +53,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
                 !m_streamParam.contains("image_right") || !m_streamParam.contains("image_bottom") ||
                 (h264 && !m_streamParam.contains("streamID")) )
             {
-                cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
+                NX_LOG("Erorr!!! parameter is missing in stream params.", cl_logERROR);
                 return QnAbstractMediaDataPtr(0);
             }
 
@@ -123,8 +124,8 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
     if (!http_client.isOpened())
         return QnAbstractMediaDataPtr(0);
 
-    QnCompressedVideoDataPtr videoData ( new QnCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
-    QnByteArray& img = videoData->data;
+    QnWritableCompressedVideoDataPtr videoData ( new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT,forecast_size) );
+    QnByteArray& img = videoData->m_data;
 
     while(http_client.isOpened())
     {
@@ -139,7 +140,7 @@ QnAbstractMediaDataPtr  AVClientPullSSHTTPStreamreader::getNextData()
 
         if (img.size()>CL_MAX_DATASIZE)
         {
-            cl_log.log("Image is too big!!", cl_logERROR);
+            NX_LOG("Image is too big!!", cl_logERROR);
             return QnAbstractMediaDataPtr(0);
         }
     }

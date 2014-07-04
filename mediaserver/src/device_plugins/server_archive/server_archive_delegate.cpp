@@ -1,9 +1,11 @@
 
+#include "server_archive_delegate.h"
+
 #include <QtCore/QMutexLocker>
 
 #include <server/server_globals.h>
 
-#include "server_archive_delegate.h"
+#include "core/datapacket/video_data_packet.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
 #include "motion/motion_archive.h"
@@ -177,13 +179,13 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     if (seekRez == -1)
         return seekRez;
     qint64 rez = m_currentChunk.startTimeMs*1000 + seekRez;
-    //cl_log.log("jump time ", t.elapsed(), cl_logALWAYS);
+    //NX_LOG("jump time ", t.elapsed(), cl_logALWAYS);
     /*
     QString s;
     QTextStream str(&s);
     str << "server seek:" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz") << " time=" << t.elapsed();
     str.flush();
-    cl_log.log(s, cl_logALWAYS);
+    NX_LOG(s, cl_logALWAYS);
     */
     m_lastSeekTime = rez;
     m_afterSeek = true;
@@ -257,7 +259,7 @@ begin_label:
             if (!getNextChunk(chunk, chunkCatalog))
             {
                 if (m_reverseMode) {
-                    data = QnAbstractMediaDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
+                    data = QnAbstractMediaDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
                     data->timestamp = INT64_MAX; // EOF reached
                 }
                 else if (data)
@@ -381,7 +383,7 @@ AVCodecContext* QnServerArchiveDelegate::setAudioChannel(int num)
     return m_aviDelegate->setAudioChannel(num);
 }
 
-bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog)
+bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newChunk, const DeviceFileCatalogPtr& newCatalog)
 {
     if (newChunk.startTimeMs == -1)
         return false;

@@ -38,14 +38,14 @@ namespace ec2
         fromApiToResourceList(paramList, kvPairs);
 
         m_emailManagerImpl.configure(kvPairs);
-        QnTransactionMessageBus::instance()->setHandler(this);
-        QnTransactionMessageBus::instance()->setLocalPeer(QnPeerInfo(qnCommon->moduleGUID(), QnPeerInfo::Server));
+        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
+        QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), Qn::PT_Server));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
         if (QnTransactionMessageBus::instance())
-            QnTransactionMessageBus::instance()->removeHandler(this);
+            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
         ec2::QnDistributedMutexManager::initStaticInstance(0);
     }
 

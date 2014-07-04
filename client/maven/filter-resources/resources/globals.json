@@ -1,6 +1,6 @@
 {
     "settings": {
-        "updateFeedUrl":            "${updatefeed.url}/${customization}.xml",
+        "updateFeedUrl":            "http://networkoptix.com/files/update/${customization}/update.xml",
         "translationPath":          ":/translations/common_${translation1}.qm",
         "isAutoCheckForUpdates":    ${updatefeed.auto},
         "clientSkin":               "${default.skin}",

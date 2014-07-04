@@ -1,5 +1,7 @@
 #include "workbench_screenshot_handler.h"
 
+#include <QtCore/QTimer>
+
 #include <QtGui/QImageWriter>
 #include <QtGui/QPainter>
 
@@ -20,6 +22,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/dialogs/custom_file_dialog.h>
+#include <ui/dialogs/progress_dialog.h>
 #include <ui/workbench/workbench_item.h>
 
 #include <utils/common/string.h>
@@ -34,6 +37,9 @@
 #endif
 
 namespace {
+    const int showProgressDelay = 1500; // 1.5 sec
+    const int minProgressDisplayTime = 1000; // 1 sec
+
     void drawTimeStamp(QImage &image, Qn::Corner position, const QString &timestamp) {
         if (position == Qn::NoCorner)
             return;
@@ -151,7 +157,10 @@ void QnScreenshotLoader::at_imageLoaded(const QImage &image) {
 // -------------------------------------------------------------------------- //
 QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent): 
     QObject(parent), 
-    QnWorkbenchContextAware(parent) 
+    QnWorkbenchContextAware(parent),
+    m_screenshotProgressDialog(0),
+    m_progressShowTime(0),
+    m_canceled(false)
 {
     connect(action(Qn::TakeScreenshotAction), &QAction::triggered, this, &QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered);
 }
@@ -302,7 +311,11 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
         parameters.filename = fileName;
         parameters.timestampPosition = static_cast<Qn::Corner>(comboBox->itemData(comboBox->currentIndex()).value<int>());
         loader->setParameters(parameters); //update changed fields
+
+        showProgressDelayed(tr("Saving %1").arg(QFileInfo(fileName).completeBaseName()));
+        connect(m_screenshotProgressDialog, &QnProgressDialog::canceled, loader, &QnScreenshotLoader::deleteLater);
     }
+    m_canceled = false;
     loader->loadAsync();
 
     qnSettings->setLastScreenshotDir(QFileInfo(parameters.filename).absolutePath());
@@ -311,11 +324,15 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
 
 //TODO: #GDM #Business may be we should encapsulate in some other object to get parameters and clear connection if user cancelled the process?
 void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
-
     QnScreenshotLoader* loader = dynamic_cast<QnScreenshotLoader*>(sender());
     if (!loader)
         return;
     loader->deleteLater();
+
+    if (m_canceled)
+        return;
+
+    hideProgressDelayed();
 
     QnScreenshotParameters parameters = loader->parameters();
 
@@ -345,6 +362,11 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         painter->setCompositionMode(QPainter::CompositionMode_Source);
         painter->drawImage(QPointF(0, 0), resizedToAr, QnGeometry::cwiseMul(parameters.zoomRect, resizedToAr.size()));
     }
+    
+    int panoFactor = (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) ? parameters.itemDewarpingParams.panoFactor : 1;
+    if (panoFactor > 1)
+        resized = resized.scaled(resized.width() * panoFactor, resized.height());
+    
 
     QScopedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(resized));
     if (parameters.imageCorrectionParams.enabled) {
@@ -363,6 +385,8 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     QString filename = loader->parameters().filename;
 
     if (!timestamped.save(filename)) {
+        hideProgress();
+
         QMessageBox::critical(
             mainWindow(),
             tr("Could not save screenshot"),
@@ -372,4 +396,56 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     }
 
     QnFileProcessor::createResourcesForFile(filename);
+}
+
+void QnWorkbenchScreenshotHandler::showProgressDelayed(const QString &message) {
+    if (!m_screenshotProgressDialog) {
+        m_screenshotProgressDialog = new QnProgressDialog(mainWindow());
+        m_screenshotProgressDialog->setWindowTitle(tr("Saving...")); // TODO: #string_freeze replace with "Saving Screenshot"
+        m_screenshotProgressDialog->setInfiniteProgress();
+        // TODO: #dklychkov ensure concurrent screenshot saving is ok and disable modality
+        m_screenshotProgressDialog->setModal(true);
+        connect(m_screenshotProgressDialog, &QnProgressDialog::canceled, this, &QnWorkbenchScreenshotHandler::cancelLoading);
+    }
+
+    m_screenshotProgressDialog->setLabelText(message);
+
+    m_progressShowTime = QDateTime::currentMSecsSinceEpoch() + showProgressDelay;
+    QTimer::singleShot(showProgressDelay, this, SLOT(showProgress()));
+}
+
+void QnWorkbenchScreenshotHandler::showProgress() {
+    if (m_progressShowTime == 0)
+        return;
+
+    m_progressShowTime = QDateTime::currentMSecsSinceEpoch();
+    m_screenshotProgressDialog->show();
+}
+
+void QnWorkbenchScreenshotHandler::hideProgressDelayed() {
+    if (!m_screenshotProgressDialog)
+        return;
+
+    if (!m_screenshotProgressDialog->isVisible()) {
+        hideProgress();
+        return;
+    }
+
+    int restTimeMs = minProgressDisplayTime - (QDateTime::currentMSecsSinceEpoch() - m_progressShowTime);
+    if (restTimeMs < 0)
+        hideProgress();
+    else
+        QTimer::singleShot(restTimeMs, this, SLOT(hideProgress()));
+}
+
+void QnWorkbenchScreenshotHandler::hideProgress() {
+    if (!m_screenshotProgressDialog)
+        return;
+
+    m_progressShowTime = 0;
+    m_screenshotProgressDialog->hide();
+}
+
+void QnWorkbenchScreenshotHandler::cancelLoading() {
+    m_canceled = true;
 }
