@@ -199,17 +199,21 @@ public:
     // return true if no error
     bool getParam(const QString &name, QVariant &val, QnDomain domain) const;
 
+#ifdef ENABLE_DATA_PROVIDERS
     // same as getParam is invoked in separate thread.
     // as soon as param changed parameterValueChanged() signal is emitted
     void getParamAsync(const QString &name, QnDomain domain);
+#endif ENABLE_DATA_PROVIDERS
 
 
     // return true if no error
     virtual bool setParam(const QString &name, const QVariant &val, QnDomain domain);
 
+#ifdef ENABLE_DATA_PROVIDERS
     // same as setParam but but returns immediately;
     // this function leads setParam invoke in separate thread. so no need to make it virtual
     void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
+#endif
 
     // ==============================================================================
 
