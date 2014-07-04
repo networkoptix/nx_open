@@ -1,5 +1,6 @@
-
 #include "spush_media_stream_provider.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
@@ -214,3 +215,5 @@ void CLServerPushStreamReader::afterUpdate()
         m_cameraAudioEnabled = camera->isAudioEnabled();
     }
 }
+
+#endif // ENABLE_DATA_PROVIDERS

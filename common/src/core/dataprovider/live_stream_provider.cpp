@@ -1,5 +1,6 @@
-
 #include "live_stream_provider.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 #include "core/resource/camera_resource.h"
 #include "utils/media/jpeg_utils.h"
@@ -427,3 +428,5 @@ void QnLiveStreamProvider::extractCodedPictureResolution( const QnCompressedVide
             break;
     }
 }
+
+#endif // ENABLE_DATA_PROVIDERS

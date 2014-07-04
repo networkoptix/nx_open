@@ -5,6 +5,7 @@
 
 #include "third_party_audio_data_packet.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
 
 QnThirdPartyCompressedAudioData::QnThirdPartyCompressedAudioData(
     nxcip::MediaDataPacket* audioPacket,
@@ -38,3 +39,5 @@ size_t QnThirdPartyCompressedAudioData::dataSize() const
 {
     return m_audioPacket->dataSize();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

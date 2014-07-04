@@ -1,6 +1,8 @@
 #ifndef abstract_data_h_1112
 #define abstract_data_h_1112
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <libavutil/avutil.h>
 
 #include <QSharedPointer>
@@ -44,5 +46,7 @@ class CLConstDataQueue: public CLThreadQueue<QnConstAbstractDataPacketPtr>
 public:
     CLConstDataQueue(int size): CLThreadQueue<QnConstAbstractDataPacketPtr> (size) {}
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //abstract_data_h_1112

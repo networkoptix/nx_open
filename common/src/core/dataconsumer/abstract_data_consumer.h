@@ -1,6 +1,8 @@
 #ifndef abstract_data_consumer_h_2111
 #define abstract_data_consumer_h_2111
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "abstract_data_receptor.h"
 #include "utils/common/long_runnable.h"
 
@@ -36,5 +38,7 @@ protected:
 protected:
     CLDataQueue m_dataQueue;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // abstract_data_consumer_h_2111

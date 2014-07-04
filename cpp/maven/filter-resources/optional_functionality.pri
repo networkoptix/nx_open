@@ -48,6 +48,10 @@
   DEFINES += ENABLE_DESKTOP_CAMERA
 }
 
+!contains( DEFINES, DISABLE_DATA_PROVIDERS) {
+  DEFINES += ENABLE_DATA_PROVIDERS
+}
+
 contains(NAME, mediaserver) || contains(NAME, common) {
   IS_VMAX_ENABLED=${vmax}
   contains( IS_VMAX_ENABLED, true ) {
