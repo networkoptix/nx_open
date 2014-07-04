@@ -1470,7 +1470,7 @@ void QnCamDisplay::enqueueVideo(QnCompressedVideoDataPtr vd)
     m_videoQueue[vd->channelNumber].enqueue(vd);
     if (m_videoQueue[vd->channelNumber].size() > 60 * 6) // I assume we are not gonna buffer
     {
-        cl_log.log(QLatin1String("Video buffer overflow!"), cl_logWARNING);
+        cl_log.log(lit("Video buffer overflow!"), cl_logWARNING);
         dequeueVideo(vd->channelNumber);
         // some protection for very large difference between video and audio tracks. Need to improve sync logic for this case (now a lot of glithces)
         m_videoBufferOverflow = true;

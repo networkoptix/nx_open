@@ -3,23 +3,19 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <libavutil/avutil.h>
+#include <libavutil/avutil.h> /* For AV_NOPTS_VALUE. */
 
-#include <QSharedPointer>
-
-#include "utils/common/threadqueue.h"
-
-#include <libavutil/avutil.h>
+#include <QtCore/QSharedPointer>
 
 #include "abstract_media_context.h"
 
 class QnAbstractStreamDataProvider;
 
-struct QnAbstractDataPacket
-{
+struct QnAbstractDataPacket {
     QnAbstractDataPacket(): dataProvider(0), timestamp(AV_NOPTS_VALUE) {} 
     virtual ~QnAbstractDataPacket() {}
-    QnAbstractStreamDataProvider* dataProvider;
+
+    QnAbstractStreamDataProvider *dataProvider;
     qint64 timestamp; // mksec // 10^-6
 };
 
@@ -27,18 +23,6 @@ typedef QSharedPointer<QnAbstractDataPacket> QnAbstractDataPacketPtr;
 Q_DECLARE_METATYPE(QnAbstractDataPacketPtr);
 typedef QSharedPointer<const QnAbstractDataPacket> QnConstAbstractDataPacketPtr;
 Q_DECLARE_METATYPE(QnConstAbstractDataPacketPtr);
-
-class CLDataQueue: public CLThreadQueue<QnAbstractDataPacketPtr> 
-{
-public:
-    CLDataQueue(int size): CLThreadQueue<QnAbstractDataPacketPtr> (size) {}
-};
-
-class CLConstDataQueue: public CLThreadQueue<QnConstAbstractDataPacketPtr> 
-{
-public:
-    CLConstDataQueue(int size): CLThreadQueue<QnConstAbstractDataPacketPtr> (size) {}
-};
 
 #endif // ENABLE_DATA_PROVIDERS
 

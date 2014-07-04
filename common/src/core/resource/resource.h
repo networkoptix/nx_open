@@ -25,6 +25,7 @@
 #include "resource_fwd.h"
 #include "resource_type.h"
 #include "param.h"
+#include "resource_command_processor.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
@@ -293,7 +294,7 @@ public:
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
-    static void addCommandToProc(const QnAbstractDataPacketPtr& data);
+    static void addCommandToProc(const QnResourceCommandPtr &command);
     static int commandProcQueueSize();
 
     void update(const QnResourcePtr& other, bool silenceMode = false);

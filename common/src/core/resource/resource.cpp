@@ -22,6 +22,7 @@
 
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
+#include "resource_command.h"
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnResource, Status)
 
@@ -31,6 +32,73 @@ QnInitResPool QnResource::m_initAsyncPool;
 
 static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 
+
+// -------------------------------------------------------------------------- //
+// QnResourceGetParamCommand
+// -------------------------------------------------------------------------- //
+class QnResourceGetParamCommand : public QnResourceCommand
+{
+public:
+    QnResourceGetParamCommand(QnResourcePtr res, const QString& name, QnDomain domain):
+        QnResourceCommand(res),
+        m_name(name),
+        m_domain(domain)
+    {}
+
+    virtual void beforeDisconnectFromResource(){}
+
+    bool execute()
+    {
+        if (!isConnectedToTheResource())
+            return false;
+
+        QVariant val;
+        return m_resource->getParam(m_name, val, m_domain);
+    }
+
+private:
+    QString m_name;
+    QnDomain m_domain;
+};
+
+typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
+
+
+// -------------------------------------------------------------------------- //
+// QnResourceSetParamCommand
+// -------------------------------------------------------------------------- //
+class QnResourceSetParamCommand : public QnResourceCommand
+{
+public:
+    QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QVariant& val, QnDomain domain):
+        QnResourceCommand(res),
+        m_name(name),
+        m_val(val),
+        m_domain(domain)
+    {}
+
+    virtual void beforeDisconnectFromResource(){}
+
+    bool execute()
+    {
+        if (!isConnectedToTheResource())
+            return false;
+
+        return m_resource->setParam(m_name, m_val, m_domain);
+    }
+
+private:
+    QString m_name;
+    QVariant m_val;
+    QnDomain m_domain;
+};
+
+typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
+
+
+// -------------------------------------------------------------------------- //
+// QnResource
+// -------------------------------------------------------------------------- //
 QnResource::QnResource(): 
     QObject(),
     m_mutex(QMutex::Recursive),
@@ -445,66 +513,11 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     return true;
 }
 
-class QnResourceGetParamCommand : public QnResourceCommand
-{
-public:
-    QnResourceGetParamCommand(QnResourcePtr res, const QString& name, QnDomain domain):
-      QnResourceCommand(res),
-          m_name(name),
-          m_domain(domain)
-      {}
-
-      virtual void beforeDisconnectFromResource(){}
-
-      bool execute()
-      {
-            if (!isConnectedToTheResource())
-                return false;
-
-            QVariant val;
-            return m_resource->getParam(m_name, val, m_domain);
-      }
-
-private:
-    QString m_name;
-    QnDomain m_domain;
-};
-
-typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
-
 void QnResource::getParamAsync(const QString &name, QnDomain domain)
 {
     QnResourceGetParamCommandPtr command(new QnResourceGetParamCommand(toSharedPointer(this), name, domain));
     addCommandToProc(command);
 }
-
-class QnResourceSetParamCommand : public QnResourceCommand
-{
-public:
-    QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QVariant& val, QnDomain domain):
-      QnResourceCommand(res),
-          m_name(name),
-          m_val(val),
-          m_domain(domain)
-      {}
-
-      virtual void beforeDisconnectFromResource(){}
-
-      bool execute()
-      {
-          if (!isConnectedToTheResource())
-              return false;
-
-          return m_resource->setParam(m_name, m_val, m_domain);
-      }
-
-private:
-    QString m_name;
-    QVariant m_val;
-    QnDomain m_domain;
-};
-
-typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
 
 void QnResource::setParamAsync(const QString& name, const QVariant& val, QnDomain domain)
 {
@@ -805,9 +818,9 @@ void QnResource::stopCommandProc()
     QnResourceCommandProcessor_instance()->stop();
 }
 
-void QnResource::addCommandToProc(const QnAbstractDataPacketPtr& data)
+void QnResource::addCommandToProc(const QnResourceCommandPtr& command)
 {
-    QnResourceCommandProcessor_instance()->putData(data);
+    QnResourceCommandProcessor_instance()->putData(command);
 }
 
 int QnResource::commandProcQueueSize()

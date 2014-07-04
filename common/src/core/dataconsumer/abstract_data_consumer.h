@@ -5,6 +5,7 @@
 
 #include "abstract_data_receptor.h"
 #include "utils/common/long_runnable.h"
+#include "../datapacket/data_queue.h"
 
 class QN_EXPORT QnAbstractDataConsumer
 :
