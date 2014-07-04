@@ -17,6 +17,9 @@ DEFINES += USE_NX_HTTP __STDC_CONSTANT_MACROS ${global.defines}
 DEFINES += ${additional.defines}
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
+android {
+  DEFINES += DISABLE_ALL_VENDORS DISABLE_DATA_PROVIDERS
+}
 
 include( optional_functionality.pri )
 
