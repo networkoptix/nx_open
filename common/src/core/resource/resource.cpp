@@ -36,6 +36,7 @@ static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 // -------------------------------------------------------------------------- //
 // QnResourceGetParamCommand
 // -------------------------------------------------------------------------- //
+#ifdef ENABLE_DATA_PROVIDERS
 class QnResourceGetParamCommand : public QnResourceCommand
 {
 public:
@@ -62,11 +63,12 @@ private:
 };
 
 typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
-
+#endif // ENABLE_DATA_PROVIDERS
 
 // -------------------------------------------------------------------------- //
 // QnResourceSetParamCommand
 // -------------------------------------------------------------------------- //
+#ifdef ENABLE_DATA_PROVIDERS
 class QnResourceSetParamCommand : public QnResourceCommand
 {
 public:
@@ -94,7 +96,7 @@ private:
 };
 
 typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
-
+#endif // ENABLE_DATA_PROVIDERS
 
 // -------------------------------------------------------------------------- //
 // QnResource
@@ -513,6 +515,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     return true;
 }
 
+#ifdef ENABLE_DATA_PROVIDERS
 void QnResource::getParamAsync(const QString &name, QnDomain domain)
 {
     QnResourceGetParamCommandPtr command(new QnResourceGetParamCommand(toSharedPointer(this), name, domain));
@@ -524,6 +527,7 @@ void QnResource::setParamAsync(const QString& name, const QVariant& val, QnDomai
     QnResourceSetParamCommandPtr command(new QnResourceSetParamCommand(toSharedPointer(this), name, val, domain));
     addCommandToProc(command);
 }
+#endif // ENABLE_DATA_PROVIDERS
 
 bool QnResource::unknownResource() const
 {
