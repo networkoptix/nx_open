@@ -12,12 +12,22 @@ CLIENT_DIR = $$PWD/../client
 COMMON_DIR = $$PWD/../common
 EC2_DIR = $$PWD/../appserver2
 BUILDENV_DIR = $$PWD/../build_environment
+BUILDENV_BASE_DIR = C:/develop/buildenv
+
+
+DEFINES += \
+    DISABLE_ALL_VENDORS \
+    DISABLE_DATA_PROVIDERS \
+
+include($$COMMON_DIR/x64/optional_functionality.pri)
+
 
 INCLUDEPATH += \
     $$PWD/src \
     $$COMMON_DIR/src \
     $$EC2_DIR/src \
     $$CLIENT_DIR/src \
+    $$BUILDENV_BASE_DIR/include \
 
 LIBS += \
     -L$$BUILDENV_DIR/target/lib/$$CONFIGURATION \

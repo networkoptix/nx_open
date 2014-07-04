@@ -1,6 +1,8 @@
 #ifndef CONTEXT_AWARE_H
 #define CONTEXT_AWARE_H
 
+#include <QtCore/QObject>
+
 class Context;
 
 class ContextAware {
