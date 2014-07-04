@@ -15,7 +15,8 @@
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),
     m_incompatibleServerAdder(NULL),
-    m_connected(false)
+    m_connected(false),
+    m_holdConnection(false)
 {
 }
 
@@ -39,6 +40,16 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
         qnCommon->setRemoteGUID(QUuid());
     }
+}
+
+void QnClientMessageProcessor::setHoldConnection(bool holdConnection) {
+    if (m_holdConnection == holdConnection)
+        return;
+
+    m_holdConnection = holdConnection;
+
+    if (!m_holdConnection && !m_connected && !qnCommon->remoteGUID().isNull())
+        emit connectionClosed();
 }
 
 void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
@@ -186,7 +197,9 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
     assert(m_connected);
 
     m_connected = false;
-    emit connectionClosed();
+
+    if (!m_holdConnection)
+        emit connectionClosed();
 }
 
 void QnClientMessageProcessor::at_systemNameChangeRequested(const QString &systemName) {

@@ -6,6 +6,7 @@
 #include <nx_ec/ec_api.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <client/client_message_processor.h>
 
 namespace {
     const int checkTimeout = 10 * 60 * 1000;
@@ -43,6 +44,8 @@ void QnInstallUpdatesPeerTask::doStart() {
     connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnInstallUpdatesPeerTask::at_resourceChanged);
 
     m_restartingPeers = m_pendingPeers = peers();
+
+    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(true);
 
     connection2()->getUpdatesManager()->installUpdate(m_updateId, m_pendingPeers,
                                                       this, [this](int, ec2::ErrorCode){});
@@ -101,4 +104,9 @@ void QnInstallUpdatesPeerTask::at_checkTimeout() {
     }
 
     finish(m_pendingPeers.isEmpty() ? NoError : InstallationFailed);
+}
+
+void QnInstallUpdatesPeerTask::finish(int errorCode) {
+    static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
+    QnNetworkPeerTask::finish(errorCode);
 }

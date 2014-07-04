@@ -16,6 +16,9 @@ class QnClientMessageProcessor : public QnCommonMessageProcessor
 public:
     QnClientMessageProcessor();
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
+
+    void setHoldConnection(bool holdConnection);
+
 protected:
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) override;
     virtual void updateResource(const QnResourcePtr &resource) override;
@@ -35,6 +38,7 @@ private:
 private:
     QnIncompatibleServerAdder *m_incompatibleServerAdder;
     bool m_connected;
+    bool m_holdConnection;
 };
 
 #endif // _client_event_manager_h
