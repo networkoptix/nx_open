@@ -44,8 +44,8 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     cleanupConnections();
 
     QnResourceList result;
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("SERVER_DESKTOP_CAMERA"));
-    if (rt.isNull())
+    auto rt = qnResTypePool->desktopCameraResourceType();
+    if (rt->getId().isNull())
         return result;
 
     QMutexLocker lock(&m_mutex);
@@ -55,8 +55,8 @@ QnResourceList QnDesktopCameraResourceSearcher::findResources(void)
     for(; itr != m_connections.end(); ++itr)
     {
         QnSecurityCamResourcePtr cam = QnSecurityCamResourcePtr(new QnDesktopCameraResource(itr->userName));
-        cam->setModel(lit("virtual desktop camera"));
-        cam->setTypeId(rt);
+        cam->setModel(lit("virtual desktop camera"));   //TODO: #GDM globalize the constant
+        cam->setTypeId(rt->getId());
         cam->setPhysicalId(itr->userId);
         result << cam;
     }

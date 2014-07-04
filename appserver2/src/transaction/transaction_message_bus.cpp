@@ -604,7 +604,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         }
 
         transport->setReadSync(true);
-    } else if (remotePeer.peerType == Qn::PT_AndroidClient) {
+    } else if (remotePeer.peerType == Qn::PT_MobileClient) {
         /** Request all data to be sent to the client peers on the connect. */
         QnTransaction<ApiMediaServerDataList> tranServers;
         tranServers.command = ApiCommand::getMediaServers;
@@ -615,15 +615,28 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
             return;
         }
 
-        QnTransaction<ApiCameraDataList> tranCameras;
-        tranCameras.command = ApiCommand::getCameras;
-        tranCameras.id.peerID = m_localPeer.id;
-        if (dbManager->doQuery(QnId(), tranCameras.params) != ErrorCode::ok) {
+        ec2::ApiCameraDataList cameras;
+        if (dbManager->doQuery(QnId(), cameras) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
             QnTransactionTransport::connectDone(remotePeer.id); // release connection
             return;
         }
+        QnTransaction<ApiCameraDataList> tranCameras;
+        tranCameras.command = ApiCommand::getCameras;
+        tranCameras.id.peerID = m_localPeer.id;
 
+        // filter out desktop cameras
+        auto desktopCameraResourceType = qnResTypePool->desktopCameraResourceType();
+        QUuid desktopCameraTypeId = desktopCameraResourceType ? desktopCameraResourceType->getId() : QUuid();
+        if (desktopCameraTypeId.isNull()) {
+            tranCameras.params = cameras;
+        } else {
+            tranCameras.params.reserve(cameras.size());  //usually, there are only a few desktop cameras relatively to total cameras count
+            std::copy_if(cameras.cbegin(), cameras.cend(), std::back_inserter(tranCameras.params), [&desktopCameraTypeId](const ec2::ApiCameraData &camera){
+                return camera.typeId != desktopCameraTypeId;
+            });
+        }
+        
         QnTransaction<ApiUserDataList> tranUsers;
         tranUsers.command = ApiCommand::getUsers;
         tranUsers.id.peerID = m_localPeer.id;
