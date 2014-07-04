@@ -639,7 +639,7 @@ void initAppServerConnection(QSettings &settings)
     }
 
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
-    QString password = settings.value("appserverPassword", QLatin1String("123")).toString();
+    QString password = settings.value("appserverPassword", QLatin1String("")).toString();
     QByteArray authKey = settings.value("authKey").toByteArray();
     if (!authKey.isEmpty())
     {
@@ -1142,7 +1142,7 @@ void QnMain::run()
     connect(QnStorageManager::instance(), &QnStorageManager::storageFailure, this, &QnMain::at_storageManager_storageFailure);
     connect(QnStorageManager::instance(), &QnStorageManager::rebuildFinished, this, &QnMain::at_storageManager_rebuildFinished);
 
-    qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("123")).toString());
+    qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("")).toString());
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
     qnCommon->setModuleGUID(serverGuid());
