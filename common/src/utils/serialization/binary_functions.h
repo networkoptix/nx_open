@@ -263,7 +263,7 @@ void serialize(const QByteArray &value, QnOutputBinaryStream<Output> *stream) {
 
 template<class T>
 bool deserialize(QnInputBinaryStream<T> *stream, QByteArray *target) {
-    qint32 size;
+    qint32 size = 0; /* Initialize it to make GCC happy. */
     if(!QnBinary::deserialize(stream, &size))
         return false;
     if(size < 0)
