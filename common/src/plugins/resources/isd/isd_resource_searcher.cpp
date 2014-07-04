@@ -12,7 +12,7 @@ QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
 }
 
-QnResourcePtr QnPlISDResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& /*params*/)
+QnResourcePtr QnPlISDResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& /*params*/)
 {
     QnNetworkResourcePtr result;
 
@@ -136,6 +136,8 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, con
 QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress)
 {
     QList<QnNetworkResourcePtr> local_result;
+
+    return local_result; // block ISD driver auto discovery
 
 
     QString smac;

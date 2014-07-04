@@ -55,7 +55,7 @@ public:
     virtual void clearUnprocessedData() override;
 
     // put data without mutex. Used for RTSP connection after lockDataQueue
-    void addData(QnAbstractMediaDataPtr data);
+    void addData(const QnAbstractMediaDataPtr& data);
     void setUseRealTimeStreamingMode(bool value);
     void setMultiChannelVideo(bool value);
     void setUseUTCTime(bool value);
@@ -64,7 +64,7 @@ protected:
     //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 
-    void createDataPacketTCP(QnByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel);
+    void createDataPacketTCP(QnByteArray& sendBuffer, const QnAbstractMediaDataPtr& media, int rtpTcpChannel);
 
     // delay streaming. Used for realtime mode streaming
     void doRealtimeDelay(QnConstAbstractMediaDataPtr media);

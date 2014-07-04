@@ -28,7 +28,7 @@ bool QnArecontPanoramicResource::getDescription()
 
 QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider()
 {
-    cl_log.log("Create live provider for camera ", getHostAddress(), cl_logDEBUG1);
+    NX_LOG( lit("Create live provider for camera %1").arg(getHostAddress()), cl_logDEBUG1);
     return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
 }
 
@@ -194,14 +194,14 @@ bool QnArecontPanoramicResource::setCamQuality(int q)
 
 }
 
-QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     QMutexLocker lock(&m_mutex);
 
     const QnConstResourceVideoLayoutPtr& layout = QnPlAreconVisionResource::getVideoLayout(dataProvider);
     //const QnConstCustomResourceVideoLayoutPtr& customLayout = std::dynamic_pointer_cast<const QnCustomResourceVideoLayout>(layout);
-    const QnConstCustomResourceVideoLayoutPtr& customLayout = layout.dynamicCast<const QnCustomResourceVideoLayout>();
-    updateFlipState();
+    const QnCustomResourceVideoLayout* customLayout = dynamic_cast<const QnCustomResourceVideoLayout*>(layout.data());
+    const_cast<QnArecontPanoramicResource*>(this)->updateFlipState();
     if (m_isRotated && customLayout)
     {
         if (!m_rotatedLayout) {

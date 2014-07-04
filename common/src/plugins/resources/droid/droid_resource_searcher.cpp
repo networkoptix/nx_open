@@ -103,7 +103,7 @@ QnResourceList QnPlDroidResourceSearcher::findResources(void)
     return resList;
 }
 
-QnResourcePtr QnPlDroidResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params)
+QnResourcePtr QnPlDroidResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& params)
 {
     QnNetworkResourcePtr result;
 

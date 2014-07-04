@@ -35,7 +35,7 @@ QString QnAviResource::toString() const
 
 QnAviArchiveDelegate* QnAviResource::createArchiveDelegate() const
 {
-    QnLayoutFileStorageResourcePtr layoutFile = m_storage.dynamicCast<QnLayoutFileStorageResource>();
+    QnLayoutFileStorageResource* layoutFile = dynamic_cast<QnLayoutFileStorageResource*>(m_storage.data());
     QnAviArchiveDelegate* aviDelegate = layoutFile ? new QnNovArchiveDelegate() : new QnAviArchiveDelegate();
     if (m_storage)
         aviDelegate->setStorage(m_storage);
@@ -57,7 +57,7 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Connecti
     return result;
 }
 
-QnConstResourceVideoLayoutPtr QnAviResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceVideoLayoutPtr QnAviResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archiveReader)
@@ -66,7 +66,7 @@ QnConstResourceVideoLayoutPtr QnAviResource::getVideoLayout(const QnAbstractStre
     return QnMediaResource::getVideoLayout();
 }
 
-QnConstResourceAudioLayoutPtr QnAviResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider)
+QnConstResourceAudioLayoutPtr QnAviResource::getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const
 {
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archiveReader)
@@ -75,7 +75,7 @@ QnConstResourceAudioLayoutPtr QnAviResource::getAudioLayout(const QnAbstractStre
     return QnMediaResource::getAudioLayout();
 }
 
-void QnAviResource::setStorage(QnStorageResourcePtr storage)
+void QnAviResource::setStorage(const QnStorageResourcePtr& storage)
 {
     m_storage = storage;
 }

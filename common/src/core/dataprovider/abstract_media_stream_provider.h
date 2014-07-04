@@ -6,6 +6,8 @@
 #ifndef ABSTRACT_MEDIA_STREAM_PROVIDER_H
 #define ABSTRACT_MEDIA_STREAM_PROVIDER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/resource_media_layout.h"
 #include "utils/camera/camera_diagnostics.h"
@@ -31,5 +33,7 @@ public:
     */
     virtual QnConstResourceAudioLayoutPtr getAudioLayout() const { return QnConstResourceAudioLayoutPtr(); };
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //ABSTRACT_MEDIA_STREAM_PROVIDER_H

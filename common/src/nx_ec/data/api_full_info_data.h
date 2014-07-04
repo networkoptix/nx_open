@@ -18,10 +18,10 @@ namespace ec2
         ApiBusinessRuleDataList rules;
         ApiCameraServerItemDataList cameraHistory;
         ApiLicenseDataList licenses;
-        ApiServerInfoData serverInfo;
+        //ApiServerInfoData serverInfo;
         ApiDiscoveryDataList discoveryData;
     };
-#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(serverInfo)(discoveryData)
+#define ApiFullInfoData_Fields (resourceTypes)(servers)(cameras)(users)(layouts)(videowalls)(rules)(cameraHistory)(licenses)(discoveryData)
 
 } // namespace ec2
 

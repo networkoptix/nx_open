@@ -80,7 +80,7 @@ bool QnDesktopResourceSearcher::isResourceTypeSupported(QnId resourceTypeId) con
     return false;
 }
 
-QnResourcePtr QnDesktopResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParams& params) {
+QnResourcePtr QnDesktopResourceSearcher::createResource(const QnId &resourceTypeId, const QnResourceParams& params) {
     Q_UNUSED(resourceTypeId)
     Q_UNUSED(params)
 

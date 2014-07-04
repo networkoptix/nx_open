@@ -39,7 +39,7 @@ public:
     virtual ArchiveChunkInfo getLastUsedChunkInfo() const override;
 
 private:
-    bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog);
+    bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, const DeviceFileCatalogPtr& newCatalog);
     qint64 seekInternal(qint64 time, bool findIFrame, bool recursive);
     bool getNextChunk(DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& chunkCatalog);
     bool setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive);

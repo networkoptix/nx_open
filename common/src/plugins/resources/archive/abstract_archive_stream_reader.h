@@ -36,7 +36,7 @@ class QnAbstractArchiveReader : public QnAbstractMediaStreamDataProvider, public
 {
     Q_OBJECT
 public:
-    QnAbstractArchiveReader(QnResourcePtr dev);
+    QnAbstractArchiveReader(const QnResourcePtr& dev);
     virtual ~QnAbstractArchiveReader();
 
     QnAbstractNavigator *navDelegate() const;

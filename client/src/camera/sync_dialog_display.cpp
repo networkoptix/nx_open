@@ -34,7 +34,7 @@ void QnSignDialogDisplay::finilizeSign()
     {
         QnAviArchiveDelegate* aviFile = dynamic_cast<QnAviArchiveDelegate*> (m_reader->getArchiveDelegate());
         if (aviFile) {
-            const char* signPattern = aviFile->getTagValue(QnAviArchiveDelegate::Tag_Signature);
+            const char* signPattern = aviFile->getTagValue(QnAviArchiveDelegate::SignatureTag);
             if (signPattern) 
             {
                 QByteArray baPattern = QByteArray(signPattern).trimmed();

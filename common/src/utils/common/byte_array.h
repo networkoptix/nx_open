@@ -4,6 +4,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/qglobal.h>
 
+#include <utils/memory/abstract_allocator.h>
+
 class QByteArray;
 
 /**
@@ -18,6 +20,7 @@ public:
      * \param capacity                  Initial array capacity.
      */
     explicit QnByteArray( unsigned int alignment, unsigned int capacity );
+    explicit QnByteArray( QnAbstractAllocator* const allocator, unsigned int alignment, unsigned int capacity );
     //!Takes external buffer \a data. This buffer is not deleted in destructor!
     explicit QnByteArray( char* buf, unsigned int dataSize );
 
@@ -161,6 +164,7 @@ protected:
     bool reallocate(unsigned int capacity);
 
 private:
+    QnAbstractAllocator* m_allocator;
     unsigned int m_alignment;
     unsigned int m_capacity;
     unsigned int m_size;

@@ -74,14 +74,17 @@ void QnDesktopResource::createSharedDataProvider()
         audioDevice = QnAudioDeviceInfo(); // no audio devices
         secondAudioDevice = QnAudioDeviceInfo();
     }
-
+    int screen = QnVideoRecorderSettings::screenToAdapter(recorderSettings.screen());
     bool captureCursor = recorderSettings.captureCursor();
     QSize encodingSize = QnVideoRecorderSettings::resolutionToSize(recorderSettings.resolution());
     float encodingQuality = QnVideoRecorderSettings::qualityToNumeric(recorderSettings.decoderQuality());
+    Qn::CaptureMode captureMode = recorderSettings.captureMode();
 
     m_desktopDataProvider = new QnDesktopDataProvider(toSharedPointer(),
+        screen,
         audioDevice.isNull() ? 0 : &audioDevice,
         secondAudioDevice.isNull() ? 0 : &secondAudioDevice,
+        captureMode,
         captureCursor,
         encodingSize,
         encodingQuality,
@@ -89,6 +92,13 @@ void QnDesktopResource::createSharedDataProvider()
         QPixmap());
 #else
 #endif
+}
+
+bool QnDesktopResource::isRendererSlow() const
+{
+    QnVideoRecorderSettings recorderSettings;
+    Qn::CaptureMode captureMode = recorderSettings.captureMode();
+    return captureMode == Qn::FullScreenMode;
 }
 
 void QnDesktopResource::addConnection(QnMediaServerResourcePtr mServer)

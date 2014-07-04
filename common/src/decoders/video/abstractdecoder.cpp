@@ -18,7 +18,7 @@ extern "C"
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = AUTO;
 
 QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(
-    const QnCompressedVideoDataPtr data,
+    const QnCompressedVideoDataPtr& data,
     bool mtDecoding,
     const QGLContext* glContext,
     bool allowHardwareDecoding )
@@ -54,7 +54,7 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(
                     if( decoder.get() && decoder->isHardwareAccelerationEnabled() )
                         return decoder.release();
                 }
-                cl_log.log( lit("Hardware acceleration is not supported. Switching to software decoding..."), cl_logWARNING );
+                NX_LOG( lit("Hardware acceleration is not supported. Switching to software decoding..."), cl_logWARNING );
             }
         }
 

@@ -9,6 +9,7 @@
 #endif
 
 #include <utils/math/math.h>
+#include <utils/common/log.h>
 
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
@@ -38,7 +39,7 @@ struct FffmpegLog
 };
 
 
-CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr data, bool mtDecoding, QAtomicInt* const swDecoderCount):
+CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount):
     m_passedContext(0),
     m_context(0),
     m_width(0),
@@ -142,7 +143,7 @@ void CLFFmpegVideoDecoder::closeDecoder()
     m_motionMap.clear();
 }
 
-void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr data)
+void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data)
 {
     if (m_context->thread_count == 1) {
         m_context->thread_count = qMin(MAX_DECODE_THREAD, QThread::idealThreadCount() + 1);
@@ -191,7 +192,7 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
     //m_context->flags |= CODEC_FLAG_GRAY;
 }
 
-void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr data)
+void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data)
 {
     m_codec = findCodec(m_codecId);
 
@@ -228,7 +229,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr data)
     m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
 
-    cl_log.log(QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
+    NX_LOG(QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
     // TODO: #vasilenko check return value
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
     {
@@ -240,7 +241,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr data)
 //    avpicture_fill((AVPicture *)picture, m_buffer, PIX_FMT_YUV420P, c->width, c->height);
 }
 
-void CLFFmpegVideoDecoder::resetDecoder(QnConstCompressedVideoDataPtr data)
+void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& data)
 {
     if (!(data->flags & AV_PKT_FLAG_KEY))
     {
@@ -330,7 +331,7 @@ void CLFFmpegVideoDecoder::reallocateDeinterlacedFrame()
     }
 }
 
-void CLFFmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr data, int width, int height)
+void CLFFmpegVideoDecoder::processNewResolutionIfChanged(const QnConstCompressedVideoDataPtr& data, int width, int height)
 {
     if (m_currentWidth == -1) {
         m_currentWidth = width;
@@ -358,7 +359,7 @@ void CLFFmpegVideoDecoder::forceMtDecoding(bool value)
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
-bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
+bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
     CLVideoDecoderOutput* const outFrame = outFramePtr->data();
     AVFrame* copyFromFrame = m_frame;
@@ -370,7 +371,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr data, QSha
         {
             if (!(data->flags & QnAbstractMediaData::MediaFlags_StillImage)) {
                 // try to decode in QT for still image
-                cl_log.log(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
+                NX_LOG(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
                 return false;
             }
         }
@@ -685,7 +686,7 @@ void CLFFmpegVideoDecoder::setLightCpuMode(QnAbstractVideoDecoder::DecodeMode va
 {
     if (m_decodeMode == val)
         return;
-    //cl_log.log("set cpu mode:", val, cl_logALWAYS);
+    //NX_LOG("set cpu mode:", val, cl_logALWAYS);
     if (val >= m_decodeMode || m_decodeMode < DecodeMode_Fastest)
     {
         m_decodeMode = val;

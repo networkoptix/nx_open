@@ -29,7 +29,7 @@ public:
 
     bool isInitialized() const;
 
-    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) override;
+    virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
     virtual bool hasDualStreaming() const override;
     virtual int getMaxFps() const override;
 

@@ -53,7 +53,6 @@ void QnConnectionTestingDialog::testEnterpriseController(const QUrl &url) {
 
     setHelpTopic(this, Qn::Login_Help);
 
-    //QnAppServerConnectionFactory::createConnection(url)->testConnectionAsync(this, SLOT(at_ecConnection_result(int, QnConnectionInfoPtr, int)));
     QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
         url,
         this,

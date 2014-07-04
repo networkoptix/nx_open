@@ -4,6 +4,8 @@
 
 #include "h264_mp4_to_annexb.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "core/datapacket/video_data_packet.h"
 
 
@@ -72,13 +74,13 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
 #endif
 static const quint8 H264_START_CODE[] = { 0, 0, 0, 1 };
 
-bool H264Mp4ToAnnexB::isH264SeqHeaderInExtraData( const QnAbstractMediaDataPtr data ) const
+bool H264Mp4ToAnnexB::isH264SeqHeaderInExtraData( const QnAbstractMediaDataPtr& data ) const
 {
     return data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1;
 }
 
 void H264Mp4ToAnnexB::readH264SeqHeaderFromExtraData(
-    const QnAbstractMediaDataPtr data,
+    const QnAbstractMediaDataPtr& data,
     std::basic_string<quint8>* const seqHeader )
 {
     const unsigned char* p = data->context->ctx()->extradata;
@@ -121,3 +123,5 @@ void H264Mp4ToAnnexB::readH264SeqHeaderFromExtraData(
         p += nalsize;
     }
 }
+
+#endif // ENABLE_DATA_PROVIDERS

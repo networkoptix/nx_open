@@ -6,6 +6,8 @@
 #ifndef AUDIO_DATA_PACKET_H
 #define AUDIO_DATA_PACKET_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "media_data_packet.h"
 
 
@@ -60,9 +62,14 @@ public:
         unsigned int alignment = CL_MEDIA_ALIGNMENT,
         unsigned int capacity = 0,
         QnMediaContextPtr ctx = QnMediaContextPtr(0) );
+    QnWritableCompressedAudioData(
+        QnAbstractAllocator* allocator,
+        unsigned int alignment = CL_MEDIA_ALIGNMENT,
+        unsigned int capacity = 0,
+        QnMediaContextPtr ctx = QnMediaContextPtr(0) );
 
     //!Implementation of QnAbstractMediaData::clone
-    virtual QnWritableCompressedAudioData* clone() const override;
+    virtual QnWritableCompressedAudioData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
     //!Implementation of QnAbstractMediaData::data
     virtual const char* data() const override;
     //!Implementation of QnAbstractMediaData::dataSize
@@ -74,5 +81,7 @@ private:
 
 typedef QSharedPointer<QnWritableCompressedAudioData> QnWritableCompressedAudioDataPtr;
 typedef QSharedPointer<const QnWritableCompressedAudioData> QnConstWritableCompressedAudioDataPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //AUDIO_DATA_PACKET_H

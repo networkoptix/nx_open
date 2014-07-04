@@ -1876,10 +1876,10 @@ void MovieObject::parseNavigationCommand(BitStreamReader& reader)
     switch(command)
     {
         case 0x20010000:
-            cl_log.log(QLatin1String("BDMO command: Goto (register arg)"), cl_logDEBUG1);
+            NX_LOG(QLatin1String("BDMO command: Goto (register arg)"), cl_logDEBUG1);
             break;
         case 0x20810000:
-            cl_log.log(QLatin1String("BDMO command: Goto (const arg)"), cl_logDEBUG1);
+            NX_LOG(QLatin1String("BDMO command: Goto (const arg)"), cl_logDEBUG1);
             break;
     }
 

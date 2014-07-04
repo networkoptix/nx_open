@@ -6,8 +6,6 @@
 
 const QString QnDesktopCameraResource::MANUFACTURE("VIRTUAL_CAMERA");
 
-static QByteArray ID_PREFIX("Desktop_camera_");
-
 QString QnDesktopCameraResource::getDriverName() const
 {
     return MANUFACTURE;
@@ -21,7 +19,6 @@ QnDesktopCameraResource::QnDesktopCameraResource(): QnPhysicalCameraResource() {
 QnDesktopCameraResource::QnDesktopCameraResource(const QString &userName): QnPhysicalCameraResource()
 {
     setFlags(flags() | no_last_gop | desktop_camera);
-    setPhysicalId(QLatin1String(ID_PREFIX) + serverGuid().toString() + lit("_") + userName);
     setName(userName);
 }
 

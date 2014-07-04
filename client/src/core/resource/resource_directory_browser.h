@@ -6,7 +6,7 @@
 class QnResourceDirectoryBrowser : public QnAbstractFileResourceSearcher
 {
 public:
-    virtual QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params) override;
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
 
     static QnResourceDirectoryBrowser &instance();
 
@@ -19,6 +19,7 @@ public:
     void cleanup();
 
     static QnLayoutResourcePtr layoutFromFile(const QString& xfile);
+
 protected:
     bool m_resourceReady;
 

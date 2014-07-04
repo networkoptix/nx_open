@@ -93,7 +93,7 @@ void QnResourceTreeItemDelegate::paint(QPainter *painter, const QStyleOptionView
     /* Draw 'problems' icon. */
     decorationRect.moveLeft(decorationRect.left() - decorationRect.width());
     if(QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>())
-        if(camera->statusFlags() & QnSecurityCamResource::HasIssuesFlag)
+        if(camera->statusFlags() & Qn::CSF_HasIssuesFlag)
             m_buggyIcon.paint(painter, decorationRect);
 
     /* Draw item. */

@@ -19,9 +19,9 @@ class NxBufferCache
 {
 public:
     //!When searching for an existing buffer, buffer with size MAX_BUFFER_SIZE_EXCESS_PERCENT percent greater than requested will do
-    static const size_t DEFAULT_MAX_BUFFER_SIZE_EXCESS_PERCENT = 10;
+    static const size_t DEFAULT_MAX_BUFFER_SIZE_EXCESS_PERCENT = 15;
     //!New buffer is allocated this value percent larger than requested
-    static const size_t DEFAULT_BUFFER_ALLOCATION_EXCESS_PERCENT = 5;
+    static const size_t DEFAULT_BUFFER_ALLOCATION_EXCESS_PERCENT = 10;
     static const size_t DEFAULT_MAX_UNUSED_MEMORY_TO_CACHE = 5*1024*1024;
 
     NxBufferCache(
@@ -33,15 +33,32 @@ public:
     void* getBuffer( size_t size );
     void release( void* ptr );
 
+    void setCacheSize( size_t maxUnusedMemoryToCache );
+
+    struct BufferContext
+    {
+        size_t size;
+        void* ptr;
+        size_t timestamp;
+
+        BufferContext( size_t _size = 0, void* _ptr = nullptr, size_t _timestamp = 0 )
+        :
+            size( _size ),
+            ptr( _ptr ),
+            timestamp( _timestamp )
+        {
+        }
+    };
+
 private:
-    const size_t m_maxUnusedMemoryToCache;
+    size_t m_maxUnusedMemoryToCache;
     const size_t m_maxBufferSizeExcessPercent;
     const size_t m_bufferAllocationExcessPercent;
     std::mutex m_mutex;
     //!map<size, ptr>. storing only unused buffers here
-    std::deque<std::pair<size_t, void*> > m_freeBuffers;
-    //std::deque<BlockContext> m_allocatedBlocks;
+    std::deque<BufferContext> m_freeBuffers;
     size_t m_totalCacheSize;
+    size_t m_prevTimestamp;
 
     void cleanCacheIfNeeded();
 };

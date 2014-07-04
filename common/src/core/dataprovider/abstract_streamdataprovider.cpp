@@ -1,8 +1,10 @@
 #include "abstract_streamdataprovider.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "../resource/resource.h"
 
-QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(QnResourcePtr resource):
+QnAbstractStreamDataProvider::QnAbstractStreamDataProvider(const QnResourcePtr& resource):
     QnResourceConsumer(resource),
     m_mutex(QMutex::Recursive),
     m_role(QnResource::Role_Default)
@@ -85,3 +87,5 @@ void QnAbstractStreamDataProvider::setRole(QnResource::ConnectionRole role)
 {
     m_role = role;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

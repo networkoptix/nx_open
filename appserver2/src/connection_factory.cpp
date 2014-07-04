@@ -37,6 +37,7 @@ namespace ec2
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiPeerAliveData>( "ApiPeerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); // TODO: #Elric #EC2 register in a proper place!
+        qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
 
         ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
     }
@@ -80,8 +81,6 @@ namespace ec2
         //registerGetFuncHandler<std::nullptr_t, ApiResourceData>( restProcessorPool, ApiCommand::getResource );
         //AbstractResourceManager::setResourceStatus
         registerUpdateFuncHandler<ApiSetResourceStatusData>( restProcessorPool, ApiCommand::setResourceStatus );
-        //AbstractResourceManager::setResourceDisabled
-        //registerUpdateFuncHandler<ApiSetResourceDisabledData>( restProcessorPool, ApiCommand::setResourceDisabled );
         //AbstractResourceManager::getKvPairs
         registerGetFuncHandler<QnId, ApiResourceParamsData>( restProcessorPool, ApiCommand::getResourceParams );
         //AbstractResourceManager::save
@@ -114,7 +113,6 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
 
         //AbstractCameraManager::getBookmarkTags
-        registerGetFuncHandler<QString, ApiHelpGroupDataList>( restProcessorPool, ApiCommand::getHelp );
 
         //TODO AbstractLicenseManager
         registerUpdateFuncHandler<ApiLicenseDataList>( restProcessorPool, ApiCommand::addLicenses );
@@ -174,7 +172,7 @@ namespace ec2
         //AbstractUpdatesManager::uploadUpdateResponce
         registerUpdateFuncHandler<ApiUpdateUploadResponceData>( restProcessorPool, ApiCommand::uploadUpdateResponce );
         //AbstractUpdatesManager::installUpdate
-        registerUpdateFuncHandler<QString>( restProcessorPool, ApiCommand::installUpdate );
+        registerUpdateFuncHandler<ApiUpdateInstallData>( restProcessorPool, ApiCommand::installUpdate );
 
         //AbstractMiscManager::moduleInfo
         registerUpdateFuncHandler<ApiModuleData>(restProcessorPool, ApiCommand::moduleInfo);
@@ -202,7 +200,7 @@ namespace ec2
         registerUpdateFuncHandler<ApiResourceParamDataList>( restProcessorPool, ApiCommand::saveSettings );
 
         //AbstractECConnection
-        registerGetFuncHandler<std::nullptr_t, qint64>( restProcessorPool, ApiCommand::getCurrentTime );
+        registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
 
 
         registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );
@@ -278,13 +276,15 @@ namespace ec2
             return handler->done( reqID, errorCode, AbstractECConnectionPtr() );
         QnConnectionInfo connectionInfoCopy( connectionInfo );
         connectionInfoCopy.ecUrl = ecURL;
+
+        AbstractECConnectionPtr connection(new RemoteEC2Connection(
+            std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
+            m_resCtx,
+            connectionInfoCopy ));
         return handler->done(
             reqID,
             errorCode,
-            std::make_shared<RemoteEC2Connection>(
-                std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
-                m_resCtx,
-                connectionInfoCopy ) );
+            connection );
     }
 
     void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
@@ -305,6 +305,7 @@ namespace ec2
         connectionInfo->brand = lit(QN_PRODUCT_NAME_SHORT);
         connectionInfo->systemName = qnCommon->localSystemName();
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
+        connectionInfo->box = lit(QN_ARM_BOX);
 
         return ErrorCode::ok;
     }

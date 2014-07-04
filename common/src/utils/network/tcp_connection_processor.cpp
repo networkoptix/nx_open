@@ -350,3 +350,12 @@ void QnTCPConnectionProcessor::releaseSocket()
     Q_D(QnTCPConnectionProcessor);
     d->socket.clear();    
 }
+
+int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
+{
+    Q_D(QnTCPConnectionProcessor);
+    contentType = "text/html";
+    d->responseBody = "<html><head><title>Moved</title></head><body><h1>Moved</h1></html>";
+    d->response.headers.insert(nx_http::HttpHeader("Location", page));
+    return CODE_MOVED_PERMANENTLY;
+}

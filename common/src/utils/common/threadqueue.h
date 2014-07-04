@@ -96,7 +96,7 @@ public:
 
         if (m_bufferLen > 0)
         {
-            val = m_buffer[m_headIndex]; //m_queue.dequeue();
+            val = std::move(m_buffer[m_headIndex]); //m_queue.dequeue();
             m_buffer[m_headIndex] = T();
             m_headIndex++;
             if ((uint)m_headIndex >= m_buffer.size())

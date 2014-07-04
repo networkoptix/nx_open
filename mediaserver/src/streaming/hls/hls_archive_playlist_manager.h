@@ -70,6 +70,9 @@ namespace nx_hls
         bool addOneMoreChunk();
         qint64 endTimestamp() const;
     };
+
+    //!Using std::shared_ptr for \a std::shared_ptr::unique()
+    typedef std::shared_ptr<ArchivePlaylistManager> ArchivePlaylistManagerPtr;
 }
 
 #endif  //HLS_ARCHIVE_PLAYLIST_MANAGER_H

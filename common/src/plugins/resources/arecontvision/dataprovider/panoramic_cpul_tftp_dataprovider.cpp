@@ -23,7 +23,7 @@ extern AVLastPacketSize ExtractSize(const unsigned char* arr);
 
 //=========================================================
 
-AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader(QnResourcePtr res):
+AVPanoramicClientPullSSTFTPStreamreader ::AVPanoramicClientPullSSTFTPStreamreader(const QnResourcePtr& res):
 QnPlAVClinetPullStreamReader(res)
 {
 
@@ -31,7 +31,7 @@ QnPlAVClinetPullStreamReader(res)
     m_last_width = 1600;
     m_last_height = 1200;
 
-    QnPlAreconVisionResourcePtr avRes = res.dynamicCast<QnPlAreconVisionResource>();
+    const QnPlAreconVisionResource* avRes = dynamic_cast<const QnPlAreconVisionResource*>(res.data());
 
     m_panoramic = avRes->isPanoramic();
     m_dualsensor = avRes->isDualSensor();
@@ -157,7 +157,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         {
             if (!m_streamParam.contains("streamID"))
             {
-                cl_log.log("Erorr!!! parameter is missing in stream params.", cl_logERROR);
+                NX_LOG("Erorr!!! parameter is missing in stream params.", cl_logERROR);
                 return QnAbstractMediaDataPtr(0);
             }
 
@@ -275,7 +275,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
 
     if (h264 && (lp_size < iframe_index))
     {
-        cl_log.log("last packet is too short!", cl_logERROR);
+        NX_LOG("last packet is too short!", cl_logERROR);
         return QnAbstractMediaDataPtr(0);
     }
 
@@ -313,7 +313,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
                 if (diff>0)
                     img.startWriting(diff);
 
-                cl_log.log("Perfomance hint: AVPanoramicClientPullSSTFTP Streamreader moved received data", cl_logINFO);
+                NX_LOG("Perfomance hint: AVPanoramicClientPullSSTFTP Streamreader moved received data", cl_logINFO);
 
                 memmove(img.data() + 5 + header_size, img.data() + 5 + expectable_header_size, img.size() - (5 + expectable_header_size));
                 img.finishWriting(diff);

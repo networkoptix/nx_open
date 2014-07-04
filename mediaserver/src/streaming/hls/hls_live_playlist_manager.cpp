@@ -30,6 +30,8 @@ namespace nx_hls
     {
         using namespace std::placeholders;
         m_eventRegistrationID = m_mediaStreamCache->addKeyFrameEventReceiver( std::bind( &HLSLivePlaylistManager::onKeyFrame, this, _1 ) );
+
+        m_inactivityTimer.restart();
     }
 
     HLSLivePlaylistManager::~HLSLivePlaylistManager()
@@ -49,8 +51,10 @@ namespace nx_hls
     {
         QMutexLocker lk( &m_mutex );
 
+        m_inactivityTimer.restart();
+
         //NOTE commented code is a trick to minimize live delay with hls playback. But current implementation results in 
-            //playback freezing and switching to lo-quality, since downloading is one with same speed as playing.
+            //playback freezing and switching to lo-quality, since downloading is done with same speed as playback and HLS client thinks bandwidth is not sufficient.
             //But, something can still be done to minimize that delay
         //if( m_chunks.empty() )
         //{
@@ -78,6 +82,26 @@ namespace nx_hls
         return m_mediaStreamCache->getMaxBitrate();
     }
 
+    void HLSLivePlaylistManager::clear()
+    {
+        QMutexLocker lk( &m_mutex );
+        m_totalPlaylistDuration = 0;
+        if( m_blockID != -1 )
+        {
+            m_mediaStreamCache->unblockData( m_blockID );
+            m_blockID = -1;
+        }
+        m_chunks.clear();
+        while( !m_timestampToBlock.empty() )
+            m_timestampToBlock.pop();
+    }
+
+    size_t HLSLivePlaylistManager::inactivityPeriod() const
+    {
+        QMutexLocker lk( &m_mutex );
+        return m_inactivityTimer.elapsed();
+    }
+
     void HLSLivePlaylistManager::onKeyFrame( quint64 currentPacketTimestampUSec )
     {
         QMutexLocker lk( &m_mutex );
@@ -90,8 +114,10 @@ namespace nx_hls
                 const quint64 playlistDurationBak = m_totalPlaylistDuration;
 
                 //if there is already chunk with same media sequence, replacing it...
-                auto chunkIter = std::find_if( m_chunks.begin(), m_chunks.end(), 
-                    [this]( const ChunkData& chunk ){ return chunk.mediaSequence == m_currentChunk.mediaSequence; } );
+                std::deque<AbstractPlaylistManager::ChunkData>::iterator chunkIter = m_chunks.begin();
+                for( ; chunkIter != m_chunks.end(); ++chunkIter )
+                    if( chunkIter->mediaSequence == m_currentChunk.mediaSequence )
+                        break;
                 if( chunkIter == m_chunks.end() )
                 {
                     m_chunks.push_back( m_currentChunk );
@@ -101,6 +127,7 @@ namespace nx_hls
                     m_currentChunk.alias = chunkIter->alias;
                     *chunkIter = m_currentChunk;
                 }
+
                 m_totalPlaylistDuration += m_currentChunk.duration;
                 m_currentChunk.mediaSequence = 0;   //using media sequence 0 for NULL chunk
                 m_currentChunk.alias.reset();

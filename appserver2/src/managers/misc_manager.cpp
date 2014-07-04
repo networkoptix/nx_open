@@ -23,8 +23,8 @@ void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiModul
     }
 }
 
-void QnMiscNotificationManager::triggerNotification(const QnTransaction<QString> &transaction) {
-    emit systemNameChangeRequested(transaction.params);
+void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSystemNameData> &transaction) {
+    emit systemNameChangeRequested(transaction.params.systemName);
 }
 
 void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiConnectionData> &transaction) {
@@ -143,9 +143,9 @@ QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTrans
 }
 
 template<class QueryProcessorType>
-QnTransaction<QString> QnMiscManager<QueryProcessorType>::prepareTransaction(const QString &systemName) const {
-    QnTransaction<QString> transaction(ApiCommand::changeSystemName, false);
-    transaction.params = systemName;
+QnTransaction<ApiSystemNameData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QString &systemName) const {
+    QnTransaction<ApiSystemNameData> transaction(ApiCommand::changeSystemName, false);
+    transaction.params.systemName = systemName;
 
     return transaction;
 }

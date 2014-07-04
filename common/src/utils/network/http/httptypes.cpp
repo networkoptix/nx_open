@@ -185,6 +185,14 @@ namespace nx_http
         return true;
     }
 
+    HttpHeader parseHeader( const ConstBufferRefType& data )
+    {
+        ConstBufferRefType headerNameRef;
+        ConstBufferRefType headerValueRef;
+        parseHeader( &headerNameRef, &headerValueRef, data );
+        return HttpHeader( headerNameRef, headerValueRef );
+    }
+
     namespace StatusCode
     {
         StringType toString( int val )
@@ -208,6 +216,8 @@ namespace nx_http
                     return StringType("Multiple Choices");
                 case moved:
                     return StringType("Moved");
+                case moved_permanently:
+                    return StringType("Moved Permanently");
                 case badRequest:
                     return StringType("Bad Request");
                 case unauthorized:
@@ -371,22 +381,26 @@ namespace nx_http
     ////////////////////////////////////////////////////////////
     //// class Request
     ////////////////////////////////////////////////////////////
-    bool Request::parse( const ConstBufferRefType& data )
+    template<class MessageType, class MessageLineType>
+    bool parseRequestOrResponse(
+        const ConstBufferRefType& data,
+        MessageType* message,
+        MessageLineType MessageType::*messageLine )
     {
         enum ParseState
         {
-            readingRequestLine,
+            readingMessageLine, //request line or status line
             readingHeaders,
             readingMessageBody
         }
-        state = readingRequestLine;
+        state = readingMessageLine;
 
         int lineNumber = 0;
         for( size_t curPos = 0; curPos < data.size(); ++lineNumber )
         {
             if( state == readingMessageBody )
             {
-                messageBody = data.mid( curPos );
+                message->messageBody = data.mid( curPos );
                 break;
             }
 
@@ -395,8 +409,8 @@ namespace nx_http
             const ConstBufferRefType currentLine = data.mid( curPos, lineSepPos == BufferNpos ? lineSepPos : lineSepPos-curPos );
             switch( state )
             {
-                case readingRequestLine:
-                    if( !requestLine.parse( currentLine ) )
+                case readingMessageLine:
+                    if( !(message->*messageLine).parse( currentLine ) )
                         return false;
                     state = readingHeaders;
                     break;
@@ -409,7 +423,7 @@ namespace nx_http
                         StringType headerValue;
                         if( !parseHeader( &headerName, &headerValue, currentLine ) )
                             return false;
-                        headers.insert( std::make_pair( headerName, headerValue ) );
+                        message->headers.insert( std::make_pair( headerName, headerValue ) );
                         break;
                     }
                     else
@@ -433,6 +447,11 @@ namespace nx_http
         return true;
     }
 
+    bool Request::parse( const ConstBufferRefType& data )
+    {
+        return parseRequestOrResponse( data, this, &Request::requestLine );
+    }
+
     void Request::serialize( BufferType* const dstBuffer ) const
     {
         //estimating required buffer size
@@ -449,6 +468,11 @@ namespace nx_http
     ////////////////////////////////////////////////////////////
     //// class Response
     ////////////////////////////////////////////////////////////
+    bool Response::parse( const ConstBufferRefType& data )
+    {
+        return parseRequestOrResponse( data, this, &Response::statusLine );
+    }
+
     void Response::serialize( BufferType* const dstBuffer ) const
     {
         //estimating required buffer size

@@ -232,6 +232,7 @@ void QnDesktopCameraConnection::run()
             auth.setPassword(QnAppServerConnectionFactory::defaultUrl().password());
             connection = new CLSimpleHTTPClient(m_mServer->getApiUrl(), CONNECT_TIMEOUT, auth);
             connection->addHeader("user-name", auth.user().toUtf8());
+            connection->addHeader("user-id", QnAppServerConnectionFactory::clientGuid().toUtf8());
         }
 
         CLHttpStatus status = connection->doGET(QByteArray("desktop_camera"));

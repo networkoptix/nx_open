@@ -76,13 +76,13 @@ void OnvifResourceSearcherMdns::findResources(QnResourceList& result, const Onvi
     {
         QString log;
         QTextStream(&log) << "OnvifResourceSearcher::findDevices  found " << localAddresses.size() << " adapter(s) with IPV4";
-        cl_log.log(log, cl_logDEBUG1);
+        NX_LOG(log, cl_logDEBUG1);
 
         for (int i = 0; i < localAddresses.size();++i)
         {
             QString slog;
             QTextStream(&slog) << localAddresses.at(i).toString();
-            cl_log.log(slog, cl_logDEBUG1);
+            NX_LOG(slog, cl_logDEBUG1);
         }
     }
 #endif
@@ -140,7 +140,7 @@ void OnvifResourceSearcherMdns::checkSocket(QUdpSocket& sock, QHostAddress local
         quint16 senderPort;
 
         sock.readDatagram(responseData.data(), responseData.size(),    &sender, &senderPort);
-        //cl_log.log(cl_logALWAYS, "size: %d\n", responseData.size());
+        //NX_LOG(cl_logALWAYS, "size: %d\n", responseData.size());
         if (sender == localAddress) continue;
 
         QString endpointUrl(QnPlOnvifResource::createOnvifEndpointUrl(sender.toString()));

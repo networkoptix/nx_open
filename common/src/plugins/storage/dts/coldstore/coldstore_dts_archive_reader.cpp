@@ -121,19 +121,19 @@ bool QnColdStoreDelegate::open(const QnResourcePtr &resource)
     {
         if (m_loggedError == false)
         {
-            cl_log.log("Not enough files, only file is still writing", cl_logALWAYS);
+            NX_LOG("Not enough files, only file is still writing", cl_logALWAYS);
             m_loggedError = true;
         }
         return false;
     }
 
-//    cl_log.log("FileQuery time = ", t.elapsed(), cl_logALWAYS);
+//    NX_LOG("FileQuery time = ", t.elapsed(), cl_logALWAYS);
 
     // Set start and end times
     m_startTime = m_datafileList.at(0).mks;
     if (!openEventFile(m_datafileList.size()-1))
     {
-        cl_log.log("openEventFile failed getting end of time", cl_logALWAYS);
+        NX_LOG("openEventFile failed getting end of time", cl_logALWAYS);
         return false;
     }
     m_endTime = m_eventInfo.back().time;
@@ -141,20 +141,20 @@ bool QnColdStoreDelegate::open(const QnResourcePtr &resource)
     // now reset files to initial files
     if (!openEventFile(0))
     {
-        cl_log.log("openEventFile failed", cl_logALWAYS);
+        NX_LOG("openEventFile failed", cl_logALWAYS);
         return false;
     }
 
-//    cl_log.log("Open1  time = ", t.elapsed(), cl_logALWAYS);
+//    NX_LOG("Open1  time = ", t.elapsed(), cl_logALWAYS);
 
     if (!openCSFile(0, 0))
     {
-        cl_log.log("openCSFile failed", cl_logALWAYS);
+        NX_LOG("openCSFile failed", cl_logALWAYS);
         return false;
     }
 
 
-//    cl_log.log("Open2 time = ", t.elapsed(), cl_logALWAYS);    
+//    NX_LOG("Open2 time = ", t.elapsed(), cl_logALWAYS);    
 
 
     m_opend = true;
@@ -448,7 +448,7 @@ bool QnColdStoreDelegate::openCSFile(int f_index, int event_index)
     CSEvent evnt = m_eventInfo.at(event_index);
     
 
-    //cl_log.log("Open_OPEN time = ", t.elapsed(), cl_logALWAYS);
+    //NX_LOG("Open_OPEN time = ", t.elapsed(), cl_logALWAYS);
 
     if (m_csConnection->Seek(
         m_stream_no, 
@@ -469,7 +469,7 @@ bool QnColdStoreDelegate::openCSFile(int f_index, int event_index)
 
     m_fileContent.resize(evnt.len);
 
-    //cl_log.log("Open_SEEK time = ", t.elapsed(), cl_logALWAYS);
+    //NX_LOG("Open_SEEK time = ", t.elapsed(), cl_logALWAYS);
     
     Veracity::u64 data_remaining;
     Veracity::u64 returned_data_length;
@@ -488,7 +488,7 @@ bool QnColdStoreDelegate::openCSFile(int f_index, int event_index)
 
     //m_csConnection->Close(m_stream_no);
 
-    //cl_log.log("Open_READ time = ", t.elapsed(), cl_logALWAYS);
+    //NX_LOG("Open_READ time = ", t.elapsed(), cl_logALWAYS);
 
     /*/
     FILE* f = fopen("C:/Users/Sergey/Desktop/tests/test.264", "wb");
@@ -535,8 +535,8 @@ bool QnColdStoreDelegate::openCSFile(int f_index, int event_index)
         return false;
 
  
-//    cl_log.log("==========Open file ", f_index, " event = ", event_index,  cl_logALWAYS);
-//    cl_log.log("time ", t.elapsed(),  cl_logALWAYS);
+//    NX_LOG("==========Open file ", f_index, " event = ", event_index,  cl_logALWAYS);
+//    NX_LOG("time ", t.elapsed(),  cl_logALWAYS);
 
     return true;
 }
@@ -555,7 +555,7 @@ bool QnColdStoreDelegate::openEventFile(int f_index)
         Q_ASSERT(false);
         if (m_loggedError == false)
         {
-            cl_log.log("openEventFile not enough files", cl_logALWAYS);
+            NX_LOG("openEventFile not enough files", cl_logALWAYS);
             m_loggedError = true;
         }
 
@@ -579,14 +579,14 @@ bool QnColdStoreDelegate::openEventFile(int f_index)
         &m_file_size, 
         0,  &time_current) != Veracity::ISFS::STATUS_SUCCESS)
     {
-        cl_log.log("openEventFile CS file open failed", cl_logALWAYS);
+        NX_LOG("openEventFile CS file open failed", cl_logALWAYS);
         return false;
     }
     
     m_fileContent.reserve(m_file_size);
     m_fileContent.resize(m_file_size);
 
-    //cl_log.log("OpenEvent_OPEN time = ", t.elapsed(), cl_logALWAYS);
+    //NX_LOG("OpenEvent_OPEN time = ", t.elapsed(), cl_logALWAYS);
 
     
     Veracity::u64 data_remaining;
@@ -600,7 +600,7 @@ bool QnColdStoreDelegate::openEventFile(int f_index)
 
     if (result != Veracity::ISFS::STATUS_SUCCESS)
     {
-        cl_log.log("openEventFile CS file read failed", cl_logALWAYS);
+        NX_LOG("openEventFile CS file read failed", cl_logALWAYS);
         Q_ASSERT(false);
         return false;
     }
@@ -610,7 +610,7 @@ bool QnColdStoreDelegate::openEventFile(int f_index)
 
     m_csConnection->Close(stream_no);
 
-    //cl_log.log("========OpenEvent_READ time = ", t.elapsed(), cl_logALWAYS);
+    //NX_LOG("========OpenEvent_READ time = ", t.elapsed(), cl_logALWAYS);
 
     /*/
     FILE* f = fopen("C:/Users/Patrick/Desktop/coldstore.xml", "wb");
@@ -631,7 +631,7 @@ bool QnColdStoreDelegate::openEventFile(int f_index)
 
         if (!doc.setContent(m_fileContent))
         {    
-            cl_log.log("openEventFile setContent failed", cl_logALWAYS);
+            NX_LOG("openEventFile setContent failed", cl_logALWAYS);
             return false;
         }
     }
@@ -642,14 +642,14 @@ bool QnColdStoreDelegate::openEventFile(int f_index)
     QDomElement root = doc.documentElement();
     if (root.tagName() != QLatin1String("IQeyeDirectToStorageMetadata"))
     {
-        cl_log.log("openEventFile root tag find failed", cl_logALWAYS);
+        NX_LOG("openEventFile root tag find failed", cl_logALWAYS);
         return false;
     }
 
     QDomNodeList lst = doc.elementsByTagName(QLatin1String("framesPerSecond")); 
     if (lst.size()<1)
     {
-        cl_log.log("openEventFile framesPerSecond failed", cl_logALWAYS);
+        NX_LOG("openEventFile framesPerSecond failed", cl_logALWAYS);
         return false;
     }
     fps = lst.at(0).toElement().text().toFloat();
@@ -661,13 +661,13 @@ bool QnColdStoreDelegate::openEventFile(int f_index)
         QDomElement frameNumberEl = node.firstChildElement(QLatin1String("frameNumber"));
         if (frameNumberEl.isNull())
         {
-           cl_log.log("openEventFile frameNumber failed", cl_logALWAYS);
+           NX_LOG("openEventFile frameNumber failed", cl_logALWAYS);
            return false;
         }
         QDomElement fileOffsetEl = node.firstChildElement(QLatin1String("fileOffset"));
         if (fileOffsetEl.isNull())
         {
-            cl_log.log("openEventFile fileOffset failed", cl_logALWAYS);
+            NX_LOG("openEventFile fileOffset failed", cl_logALWAYS);
             return false;
         }
         int frameNum = frameNumberEl.text().toInt();
@@ -701,7 +701,7 @@ bool QnColdStoreDelegate::openEventFile(int f_index)
     m_current_file = f_index;
 
 
-//    cl_log.log("openEventFile time = ", t.elapsed(), cl_logALWAYS);
+//    NX_LOG("openEventFile time = ", t.elapsed(), cl_logALWAYS);
 
 
     return true;
