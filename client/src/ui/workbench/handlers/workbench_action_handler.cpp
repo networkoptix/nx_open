@@ -147,7 +147,7 @@ namespace {
     const int videowallReconnectTimeoutMSec = 5000;
     const int videowallCloseTimeoutMSec = 10000;
 
-    const int maxReconnectTimeout = 10000;
+    const int maxReconnectTimeout = 60 * 1000; // 1 minute
 }
 
 //!time that is given to process to exit. After that, appauncher (if present) will try to terminate it
