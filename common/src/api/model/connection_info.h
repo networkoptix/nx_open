@@ -18,28 +18,24 @@ typedef QnSoftwareVersion SoftwareVersionType; // TODO: #Elric #ec2 remove
 
 
 struct QnConnectionInfo {
-    QnConnectionInfo(): proxyPort(0) {}
+    QnConnectionInfo() {}
 
     QUrl ecUrl;
     SoftwareVersionType version;
     QList<QnCompatibilityItem> compatibilityItems;
-    int proxyPort;
     QString ecsGuid;
     QString publicIp;
     QString brand;
+    QString box;
 };
 
-#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(proxyPort)(ecsGuid)(publicIp)(brand)
+#define QnConnectionInfo_Fields (ecUrl)(version)(compatibilityItems)(ecsGuid)(publicIp)(brand)(box)
 
 #ifndef QN_NO_QT
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (QnCompatibilityItem)(QnConnectionInfo), 
     (ubj)(metatype)(xml)(json)(binary)(csv_record)
 )
-
-// TODO: #Elric remove shared pointer?
-typedef QSharedPointer<QnConnectionInfo> QnConnectionInfoPtr;
-Q_DECLARE_METATYPE(QnConnectionInfoPtr);
 #endif
 
 #endif // QN_CONNECTION_INFO_H

@@ -26,29 +26,31 @@ public:
 
     virtual QnResourceList findResources(void) override;
 
-    void registerCamera(QSharedPointer<AbstractStreamSocket> connection, const QString& userName);
+    void registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, const QString& userName, const QString &userId);
 
     TCPSocketPtr getConnection(const QString& userName);
-    quint32 incCSeq(const TCPSocketPtr socket);
-    void releaseConnection(TCPSocketPtr socket);
+    quint32 incCSeq(const TCPSocketPtr& socket);
+    void releaseConnection(const TCPSocketPtr& socket);
 
     virtual bool isVirtualResource() const override { return true; }
 private:
     struct ClientConnectionInfo
     {
-        ClientConnectionInfo(TCPSocketPtr _socket, const QString& _userName)
+        ClientConnectionInfo(const TCPSocketPtr& socket, const QString &userName, const QString &userId):
+            socket(socket),
+            userName(userName),
+            userId(userId)
         {
-            socket = _socket;
             useCount = 0;
             cSeq = 0;
             timer.restart();
-            userName = _userName;
         }
         TCPSocketPtr socket;
         int useCount;
         quint32 cSeq;
         QElapsedTimer timer;
         QString userName;
+        QString userId;
     };
 
     QList<ClientConnectionInfo> m_connections;

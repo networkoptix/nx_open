@@ -366,6 +366,7 @@ QnDesktopFileEncoder::QnDesktopFileEncoder (
                    int desktopNum,
                    const QnAudioDeviceInfo* audioDevice,
                    const QnAudioDeviceInfo* audioDevice2,
+                   Qn::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
                    float encodeQualuty, // in range 0.0 .. 1.0
@@ -390,6 +391,7 @@ QnDesktopFileEncoder::QnDesktopFileEncoder (
     m_storedAudioPts(0),
     m_maxAudioJitter(0),
 
+    m_captureMode(captureMode),
     m_captureCursor(captureCursor),
     m_captureResolution(captureResolution),
     m_encodeQualuty(encodeQualuty),
@@ -453,8 +455,10 @@ int QnDesktopFileEncoder::calculateBitrate()
 bool QnDesktopFileEncoder::init()
 {
     m_grabber = new QnBufferedScreenGrabber(
+            m_desktopNum,
             QnBufferedScreenGrabber::DEFAULT_QUEUE_SIZE,
             QnBufferedScreenGrabber::DEFAULT_FRAME_RATE,
+            m_captureMode,
             m_captureCursor,
             m_captureResolution,
             m_widget);

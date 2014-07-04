@@ -48,7 +48,7 @@ public:
     */
     void bindHostToResource(
         const QString& targetHost,
-        QnResourcePtr resource );
+        const QnResourcePtr& resource );
     //!Removes proxy added by \a QnNetworkProxyFactory::addToProxyList or \a QnNetworkProxyFactory::bindHostToResource
     void removeFromProxyList( const QString& targetHost );
     void clearProxyList();
@@ -59,7 +59,7 @@ public:
         \note \a requestUrl MUST have valid host, port, path, user password. These can be changed if and only if proxying is required
     */
     bool fillUrlWithRouteToResource(
-        QnResourcePtr targetResource,
+        const QnResourcePtr& targetResource,
         QUrl* const requestUrl,
         WhereToPlaceProxyCredentials credentialsBehavour );
 
@@ -72,7 +72,7 @@ private:
     QMutex m_mutex;
     QMap<QString, QNetworkProxy> m_proxyInfo;
 
-    QNetworkProxy getProxyToResource( QnResourcePtr resource );
+    QNetworkProxy getProxyToResource( const QnResourcePtr& resource );
 };
 
 #endif

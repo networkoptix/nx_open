@@ -24,6 +24,8 @@ extern "C"
 #include "utils/network/socket.h"
 #include "utils/common/aligned_allocator.h"
 #include "utils/common/util.h"
+#include "utils/memory/abstract_allocator.h"
+#include "utils/memory/system_allocator.h"
 #include <utils/math/math.h>
 
 struct AVCodecContext;
@@ -99,7 +101,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     bool isLQ() const { return flags & MediaFlags_LowQuality; }
     bool isLive() const { return flags & MediaFlags_LIVE; }
 
-    virtual QnAbstractMediaData* clone() const = 0;
+    virtual QnAbstractMediaData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const = 0;
     virtual const char* data() const = 0;
     virtual size_t dataSize() const = 0;
 
@@ -127,7 +129,14 @@ struct QnEmptyMediaData : public QnAbstractMediaData
         dataType = EMPTY_DATA;
     }
 
-    virtual QnEmptyMediaData* clone() const override;
+    QnEmptyMediaData( QnAbstractAllocator* allocator )
+    :
+        m_data(allocator, 16, 0)
+    {
+        dataType = EMPTY_DATA;
+    }
+
+    virtual QnEmptyMediaData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
     virtual const char* data() const override { return m_data.data(); }
     virtual size_t dataSize() const override { return m_data.size(); }
 
@@ -182,6 +191,9 @@ typedef std::vector<QnMetaDataV1Light, QnAlignedAllocator<QnMetaDataV1Light> > Q
 struct QnMetaDataV1 : public QnAbstractMediaData
 {
     QnMetaDataV1(int initialValue = 0);
+    QnMetaDataV1(
+        QnAbstractAllocator* allocator,
+        int initialValue = 0);
 
     static QnMetaDataV1Ptr fromLightData(const QnMetaDataV1Light& lightData);
 
@@ -230,7 +242,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 
     static void createMask(const QRegion& region,  char* mask, int* maskStart = 0, int* maskEnd = 0);
 
-    virtual QnMetaDataV1* clone() const override;
+    virtual QnMetaDataV1* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
     virtual const char* data() const override { return m_data.data(); }
     char* data() { return m_data.data(); }
     virtual size_t dataSize() const override { return m_data.size(); }
@@ -238,7 +250,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     //void deserialize(QIODevice* ioDevice);
     void serialize(QIODevice* ioDevice) const;
 
-    static bool mathImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
+    static bool matchImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
 
 
     quint8 m_input;

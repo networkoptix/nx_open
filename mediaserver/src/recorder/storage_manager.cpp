@@ -249,7 +249,7 @@ void QnStorageManager::cancelRebuildCatalogAsync()
 {
     if (m_rebuildState != RebuildState_None) 
     {
-        cl_log.log("Catalog rebuild operation is canceled", cl_logINFO);
+        NX_LOG("Catalog rebuild operation is canceled", cl_logINFO);
         m_rebuildCancelled = true;
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_None);
         setRebuildState(RebuildState_None);
@@ -349,7 +349,7 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
     QMutexLocker lock(&m_mutexStorages);
     m_storagesStatisticsReady = false;
     
-    cl_log.log(QString("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently available: %3MiB").arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+    NX_LOG(QString("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently available: %3MiB").arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
 
     removeStorage(storage); // remove existing storage record if exists
     //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists

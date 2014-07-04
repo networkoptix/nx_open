@@ -10,7 +10,7 @@ class QnPlDroidIpWebCamReader : public CLServerPushStreamReader
 {
     enum {BLOCK_SIZE = 1460};
 public:
-    QnPlDroidIpWebCamReader(QnResourcePtr res);
+    QnPlDroidIpWebCamReader(const QnResourcePtr& res);
     virtual ~QnPlDroidIpWebCamReader();
 
 protected:

@@ -21,9 +21,9 @@ QnThirdPartyCompressedAudioData::~QnThirdPartyCompressedAudioData()
     m_audioPacket = nullptr;
 }
 
-QnWritableCompressedAudioData* QnThirdPartyCompressedAudioData::clone() const
+QnWritableCompressedAudioData* QnThirdPartyCompressedAudioData::clone( QnAbstractAllocator* allocator ) const
 {
-    QnWritableCompressedAudioData* cloned = new QnWritableCompressedAudioData();
+    QnWritableCompressedAudioData* cloned = new QnWritableCompressedAudioData(allocator);
     cloned->QnCompressedAudioData::assign( this );
     cloned->m_data.write( static_cast<const char*>(m_audioPacket->data()), m_audioPacket->dataSize() );
     return cloned;

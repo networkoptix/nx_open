@@ -22,6 +22,7 @@
 #include <nx_ec/data/api_server_info_data.h>
 #include <nx_ec/data/api_email_data.h>
 #include <nx_ec/data/api_server_alive_data.h>
+#include <nx_ec/data/api_time_data.h>
 
 #include "ec_api_fwd.h"
 
@@ -35,36 +36,8 @@ class QnUniversalTcpListener;
 */
 namespace ec2
 {
-    struct QnPeerInfo {
-        enum Type {
-            Server,
-            DesktopClient,
-            VideowallClient,
-            AndroidClient
-
-        };
-
-        bool isClient() const {
-            return peerType != Server;
-        }
-
-        /** Unique ID of the peer. */ 
-        QnId id;
-
-        /** Type of the peer. */
-        Type peerType;
-
-        /** Additional info. */
-        QHash<QString, QString> params;
-
-        QnPeerInfo(QnId id, Type peerType): id(id), peerType(peerType) {}
-    };
-
-    typedef QSet<QnId> QnPeerSet;
-
     struct QnFullResourceData
     {
-        ApiServerInfoData serverInfo;
         QnResourceTypeList resTypes;
         QnResourceList resources;
         QnBusinessEventRuleList bRules; // TODO: #Elric #EC2 rename
@@ -872,7 +845,7 @@ namespace ec2
             \param cameraHistoryItems
         */
         void initNotification(QnFullResourceData fullData);
-        void runtimeInfoChanged(const ec2::ApiServerInfoData& runtimeInfo);
+        void runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
 
         void remotePeerFound(ApiPeerAliveData data, bool isProxy);
         void remotePeerLost(ApiPeerAliveData data, bool isProxy);

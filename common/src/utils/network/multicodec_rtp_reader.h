@@ -42,7 +42,7 @@ private:
     enum {BLOCK_SIZE = 1460};
 
 public:
-    QnMulticodecRtpReader( QnResourcePtr res );
+    QnMulticodecRtpReader( const QnResourcePtr& res );
     virtual ~QnMulticodecRtpReader();
 
     //!Implementation of QnAbstractMediaStreamProvider::getNextData
@@ -80,7 +80,7 @@ private:
 
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
-
+    void at_propertyChanged(const QnResourcePtr & res, const QString & key);
 private:
     RTPSession m_RtpSession;
     RTPIODevice* m_videoIO;

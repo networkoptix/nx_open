@@ -5,6 +5,8 @@
 
 #include "third_party_video_data_packet.h"
 
+#include <utils/common/log.h>
+
 
 QnThirdPartyCompressedVideoData::QnThirdPartyCompressedVideoData(
     nxcip::VideoDataPacket* videoPacket,
@@ -13,17 +15,20 @@ QnThirdPartyCompressedVideoData::QnThirdPartyCompressedVideoData(
     QnCompressedVideoData( ctx ),
     m_videoPacket( videoPacket )
 {
+    NX_LOG( lit("QnThirdPartyCompressedVideoData::QnThirdPartyCompressedVideoData.  %1").arg((size_t)this), cl_logDEBUG1 );
 }
 
 QnThirdPartyCompressedVideoData::~QnThirdPartyCompressedVideoData()
 {
+    NX_LOG( lit("QnThirdPartyCompressedVideoData::~QnThirdPartyCompressedVideoData. %1").arg((size_t)this), cl_logDEBUG1 );
+
     m_videoPacket->releaseRef();
     m_videoPacket = nullptr;
 }
 
-QnWritableCompressedVideoData* QnThirdPartyCompressedVideoData::clone() const
+QnWritableCompressedVideoData* QnThirdPartyCompressedVideoData::clone( QnAbstractAllocator* allocator ) const
 {
-    QnWritableCompressedVideoData* cloned = new QnWritableCompressedVideoData();
+    QnWritableCompressedVideoData* cloned = new QnWritableCompressedVideoData(allocator);
     cloned->QnCompressedVideoData::assign( this );
     cloned->m_data.write( static_cast<const char*>(m_videoPacket->data()), m_videoPacket->dataSize() );
     return cloned;

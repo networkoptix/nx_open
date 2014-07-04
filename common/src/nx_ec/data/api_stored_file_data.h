@@ -13,6 +13,15 @@ namespace ec2
     };
 #define ApiStoredFileData_Fields (path)(data)
 
+    struct ApiStoredFilePath: ApiData
+    {
+        ApiStoredFilePath() {}
+        ApiStoredFilePath(const QString &path): path(path) {}
+
+        QString path;
+    };
+#define ApiStoredFilePath_Fields (path)
+
 }
 
 #endif //EC2_STORED_FILE_DATA_H

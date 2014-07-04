@@ -2,6 +2,10 @@
 
 #include <QtWidgets/QAction>
 
+#include <api/app_server_connection.h>
+
+#include <common/common_module.h>
+
 #include <utils/common/warnings.h>
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
@@ -297,7 +301,10 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(resource->hasFlags(QnResource::user) || resource->hasFlags(QnResource::videowall))
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(QnResource::remote_server) || resource->hasFlags(QnResource::live_cam)) // TODO: #Elric move this to permissions.
+        if(resource->hasFlags(QnResource::live_cam))
+            continue; /* OK to remove. */
+
+        if(resource->hasFlags(QnResource::remote_server)) // TODO: #Elric move this to permissions.
             if(resource->getStatus() == QnResource::Offline)
                 continue; /* Can remove only if offline. */
 
@@ -656,8 +663,10 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemI
     return Qn::InvisibleAction;
 }
 
-Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &) {
-    return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
+Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parameters) {
+    return qnCommon->remoteGUID().isNull()
+        ? Qn::InvisibleAction
+        : Qn::EnabledAction;
 }
 
 Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionParameters &) {
@@ -910,7 +919,7 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
 
     QString userName = context()->user()->getName();
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::desktop_camera)) 
-        if (resource->getName() == userName)
+        if (resource->getUniqueId() == QnAppServerConnectionFactory::clientGuid())
             return Qn::EnabledAction;
     
     return Qn::InvisibleAction;

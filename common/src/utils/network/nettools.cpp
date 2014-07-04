@@ -12,13 +12,16 @@
 #include "../common/log.h"
 
 #ifdef Q_OS_LINUX
-#   include <arpa/inet.h>
-#   include <sys/socket.h>
-#   include <netdb.h>
-#   include <unistd.h>
-#   ifndef Q_OS_ANDROID
-#       include <ifaddrs.h>
-#   endif
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#ifndef Q_OS_ANDROID
+#   include <ifaddrs.h>
+#endif
+#include <unistd.h>
+#include <net/if.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
 #endif
 
 /*
@@ -37,7 +40,7 @@ bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port
 
     if (res)
     {
-        //cl_log.log(cl_logDEBUG1, "bindToInterface(): Can't bind to interface %s: %s", iface.address.toString().toLatin1().constData(), strerror(errno));
+        //NX_LOG(cl_logDEBUG1, "bindToInterface(): Can't bind to interface %s: %s", iface.address.toString().toLatin1().constData(), strerror(errno));
         return false;
     }
 
@@ -321,7 +324,7 @@ struct PinagableT
 
 QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads)
 {
-    cl_log.log(QLatin1String("about to find all ip responded to ping...."), cl_logALWAYS);
+    NX_LOG(QLatin1String("about to find all ip responded to ping...."), cl_logALWAYS);
     QTime time;
     time.restart();
 
@@ -354,13 +357,13 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
             result.push_back(QHostAddress(addr.addr));
     }
 
-    cl_log.log(QLatin1String("Done. time elapsed = "), time.elapsed(), cl_logALWAYS);
+    NX_LOG(lit("Done. time elapsed = %1").arg(time.elapsed()), cl_logALWAYS);
 
     CL_LOG(cl_logDEBUG1)
     {
-        cl_log.log(QLatin1String("ping results..."), cl_logDEBUG1);
+        NX_LOG(lit("ping results..."), cl_logDEBUG1);
         foreach(QHostAddress addr, result)
-            cl_log.log(addr.toString(), cl_logDEBUG1);
+            NX_LOG(addr.toString(), cl_logDEBUG1);
     }
 
 
@@ -499,7 +502,7 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     if (sysctl(mib, 6, NULL, &needed, NULL, 0) < 0)
     {
-        cl_log.log("sysctl: route-sysctl-estimate error", cl_logERROR);
+        NX_LOG("sysctl: route-sysctl-estimate error", cl_logERROR);
         return QString();
     }
 
@@ -510,7 +513,7 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 
     if (sysctl(mib, 6, buf, &needed, NULL, 0) < 0)
     {
-        cl_log.log("actual retrieval of routing table failed", cl_logERROR);
+        NX_LOG("actual retrieval of routing table failed", cl_logERROR);
         return QString();
     }
 
@@ -525,7 +528,7 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
         if (sdl->sdl_alen)
         {
             /* complete ARP entry */
-            cl_log.log(cl_logDEBUG1, "%d ? %d", ip.toIPv4Address(), ntohl(sinarp->sin_addr.s_addr));
+            NX_LOG(cl_logDEBUG1, "%d ? %d", ip.toIPv4Address(), ntohl(sinarp->sin_addr.s_addr));
             if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr)) {
                 free(buf);
                 return MACToString((unsigned char*)LLADDR(sdl));
@@ -598,3 +601,45 @@ bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress,
     int eq2 = strEqualAmount(host.toLatin1().constData(), oldAddress.toLatin1().constData());
     return eq1 > eq2;
 }
+
+#ifdef WIN32
+void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
+{
+    // for test purpose only. This function used for EDGE so far
+    memset(MAC_str, 0, sizeof(MAC_str));
+    *host = 0;
+    QList<QNetworkInterface> ifList = QNetworkInterface::allInterfaces();
+    if (ifList.size() > 0) {
+        QByteArray addr = ifList[0].hardwareAddress().toLocal8Bit();
+        memcpy(MAC_str, addr.constData(), qMin(addr.length(), MAC_ADDR_LEN));
+        for (int i = 0; i < MAC_ADDR_LEN; ++i)
+        {
+            if (MAC_str[i] == ':')
+                MAC_str[i] = '-';
+        }
+        MAC_str[MAC_ADDR_LEN-1] = 0;
+    }
+
+    return;
+}
+#else
+void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
+{
+    memset(MAC_str, 0, sizeof(MAC_str));
+#define HWADDR_len 6
+    int s,i;
+    struct ifreq ifr;
+    s = socket(AF_INET, SOCK_DGRAM, 0);
+    strcpy(ifr.ifr_name, "eth0");
+    if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
+        for (i=0; i<HWADDR_len; i++)
+            sprintf(&MAC_str[i*3],"%02X-",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
+        MAC_str[17] = 0;
+    }
+    if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
+        const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
+        *host = inet_ntoa(ip->sin_addr);
+    }
+    close(s);
+}
+#endif

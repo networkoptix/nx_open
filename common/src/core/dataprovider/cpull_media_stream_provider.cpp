@@ -5,7 +5,7 @@
 #include "../resource/camera_resource.h"
 
 
-QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(QnResourcePtr dev ):
+QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(const QnResourcePtr& dev ):
     QnLiveStreamProvider(dev),
     m_fpsSleep(100*1000)
 {

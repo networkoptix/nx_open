@@ -197,7 +197,7 @@ void QnTcpListener::run()
             "Reason: " << SystemError::toString(prevErrorCode) << "("<<prevErrorCode<<")";
     }
     else {
-        cl_log.log("Server started at ", d->serverAddress.toString() + QLatin1String(":") + QString::number(d->localPort), cl_logINFO);
+        NX_LOG(lit("Server started at %1:%2").arg(d->serverAddress.toString()).arg(d->localPort), cl_logINFO);
     }
 
 
@@ -290,4 +290,16 @@ int QnTcpListener::getPort() const
     if (!d->serverSocket)
         return -1;
     return d->serverSocket->getLocalAddress().port;
+}
+
+static QByteArray m_defaultPage;
+
+void QnTcpListener::setDefaultPage(const QByteArray& path)
+{
+    m_defaultPage = path;
+}
+
+QByteArray QnTcpListener::defaultPage()
+{
+    return m_defaultPage;
 }

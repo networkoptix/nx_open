@@ -10,6 +10,9 @@
 #include <QMutexLocker>
 
 //#define DEBUG_OUTPUT
+#ifdef DEBUG_OUTPUT
+#include <malloc.h>
+#endif
 
 
 using namespace std;
@@ -76,12 +79,13 @@ quint64 MediaStreamCache::SequentialReadContext::currentPos() const
 MediaStreamCache::MediaStreamCache( unsigned int cacheSizeMillis )
 :
     m_cacheSizeMillis( cacheSizeMillis ),
-    m_mutex( QMutex::Recursive ),
+    m_mutex( QMutex::Recursive ),   //TODO #ak get rid of Recursive mutex
     m_prevPacketSrcTimestamp( -1 ),
     m_currentPacketTimestamp( 0 ),
     m_cacheSizeInBytes( 0 ),
     m_prevGivenEventReceiverID( 0 )
 {
+    m_inactivityTimer.restart();
 }
 
 //!Implementation of QnAbstractDataReceptor::canAcceptData
@@ -201,6 +205,16 @@ void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
     }
 }
 
+void MediaStreamCache::clear()
+{
+    QMutexLocker lk( &m_mutex );
+
+    m_prevPacketSrcTimestamp = -1;
+    m_currentPacketTimestamp = 0;
+    m_cacheSizeInBytes = 0;
+    m_packetsByTimestamp.clear();
+}
+
 quint64 MediaStreamCache::startTimestamp() const
 {
     QMutexLocker lk( &m_mutex );
@@ -251,6 +265,8 @@ QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(
     quint64* const foundTimestamp ) const
 {
     QMutexLocker lk( &m_mutex );
+
+    m_inactivityTimer.restart();
 
     if( m_packetsByTimestamp.empty() )
         return QnAbstractDataPacketPtr();
@@ -360,4 +376,10 @@ void MediaStreamCache::unblockData( int blockingID )
         return;
     }
     m_dataBlockings.erase( it );
+}
+
+size_t MediaStreamCache::inactivityPeriod() const
+{
+    QMutexLocker lk( &m_mutex );
+    return m_inactivityTimer.elapsed();
 }

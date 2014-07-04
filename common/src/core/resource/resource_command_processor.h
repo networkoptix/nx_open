@@ -13,7 +13,7 @@ typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
 class QN_EXPORT QnResourceCommand : public QnAbstractDataPacket, public QnResourceConsumer
 {
 public:
-    QnResourceCommand(QnResourcePtr res);
+    QnResourceCommand(const QnResourcePtr& res);
     virtual ~QnResourceCommand();
     virtual bool execute() = 0;
     virtual void beforeDisconnectFromResource();

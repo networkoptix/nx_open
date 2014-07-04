@@ -116,6 +116,7 @@ extern "C"
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
 #endif
+#include "api/runtime_info_manager.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -470,6 +471,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
+    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
+
     //clientMessageProcessor->init(QnAppServerConnectionFactory::getConnection2());
 
     qnSettings->save();

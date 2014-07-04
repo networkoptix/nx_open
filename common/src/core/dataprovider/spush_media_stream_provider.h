@@ -17,7 +17,7 @@ class CLServerPushStreamReader
     Q_OBJECT
 
 public:
-    CLServerPushStreamReader(QnResourcePtr dev );
+    CLServerPushStreamReader(const QnResourcePtr& dev );
     virtual ~CLServerPushStreamReader(){stop();}
 
     //!Implementation of QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection
