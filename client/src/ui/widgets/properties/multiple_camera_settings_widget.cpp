@@ -311,7 +311,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
         bool isMotionAvailable = true;
         foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
-            isMotionAvailable &= camera->getMotionType() != Qn::MT_NoMotion;
+            isMotionAvailable &= camera->hasMotion();
         ui->cameraScheduleWidget->setMotionAvailable(isMotionAvailable);
 
         /* Write camera parameters out. */
