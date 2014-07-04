@@ -355,14 +355,6 @@ ec2::AbstractECConnectionPtr QnWorkbenchActionHandler::connection2() const {
     return QnAppServerConnectionFactory::getConnection2();
 }
 
-bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) const {
-    QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-    if(!layoutResource)
-        return false;
-
-    return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
-}
-
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
 
     if (qnSettings->lightMode() & Qn::LightModeSingleItem) {
@@ -2282,87 +2274,90 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if(resources.isEmpty())
         return;
 
-    /* Check if it's OK to delete everything without asking. */
-    bool okToDelete = true;
-    foreach(const QnResourcePtr &resource, resources) {
-        if(!canAutoDelete(resource)) {
-            okToDelete = false;
-            break;
-        }
-    }
+    auto canAutoDelete = [this](const QnResourcePtr &resource) {
+        QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
+        if(!layoutResource)
+            return false;
 
-    /* Check that we are deleting online auto-found cameras */ 
-    QnResourceList onlineAutoFoundCameras;
-    foreach(const QnResourcePtr &resource, resources) {
-        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!camera ||
-            camera->getStatus() == QnResource::Offline || 
-            camera->isManuallyAdded())
-            continue;
-        okToDelete = false;
-        onlineAutoFoundCameras << camera;
-    }
+        return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
+    };
 
-    if (!onlineAutoFoundCameras.isEmpty()) {
-        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-            mainWindow(),
-            onlineAutoFoundCameras,
-            tr("Delete Resources"),
-            tr("These %n cameras are auto-discovered.\n"\
-               "They may be auto-discovered again after removing.\n"\
-               "Are you sure you want to delete them",
-               "", onlineAutoFoundCameras.size()),   //TODO: #Elric #TR
-            QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel
-            );
-
-        switch (button) {
-        case QDialogButtonBox::No:
-            foreach(const QnResourcePtr &camera, onlineAutoFoundCameras)
-                resources.removeOne(camera);
-            break;
-        case QDialogButtonBox::Cancel:
-            return;
-        default:
-            break;
-        }           
-    }
-
-    if(resources.isEmpty())
-        return; /* Nothing to delete. */
-
-    /* Ask if needed. */
-    if(!okToDelete) {
-        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-            mainWindow(),
-            resources,
-            tr("Delete Resources"),
-            tr("Do you really want to delete the following %n item(s)?", "", resources.size()),
-            QDialogButtonBox::Yes | QDialogButtonBox::No
-        );
-        okToDelete = button == QDialogButtonBox::Yes;
-    }
-
-    if(!okToDelete)
-        return; /* User does not want it deleted. */
-
-    foreach(const QnResourcePtr &resource, resources) {
+    auto deleteResource = [this](const QnResourcePtr &resource) {
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
             if(snapshotManager()->isLocal(layout)) {
                 resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
-                continue;
+                return;
             }
         }
 
         // if we are deleting an edge camera, also delete its server
         QUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
-                                QnMediaServerResource::isEdgeServer(resource->getParentResource())
+            QnMediaServerResource::isEdgeServer(resource->getParentResource())
             ? resource->getParentId()
             : QUuid();
 
         connection2()->getResourceManager()->remove( resource->getId(), this, &QnWorkbenchActionHandler::at_resource_deleted );
         if (!parentToDelete.isNull())
             connection2()->getResourceManager()->remove(parentToDelete, this, &QnWorkbenchActionHandler::at_resource_deleted );
+    };
+
+    /* Check if it's OK to delete something without asking. */
+    QnResourceList autoDeleting;
+    foreach(const QnResourcePtr &resource, resources) {
+        if(!canAutoDelete(resource))
+            continue;
+        autoDeleting << resource;
+        deleteResource(resource);
     }
+    foreach (const QnResourcePtr &resource, autoDeleting)
+        resources.removeOne(resource);
+
+    if(resources.isEmpty())
+        return; /* Nothing to delete. */
+
+    /* Check that we are deleting online auto-found cameras */ 
+    QnResourceList onlineAutoDiscoveredCameras;
+    foreach(const QnResourcePtr &resource, resources) {
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera ||
+            camera->getStatus() == QnResource::Offline || 
+            camera->isManuallyAdded()) 
+                continue;
+        onlineAutoDiscoveredCameras << camera;
+    } 
+
+    QString question;
+    /* First version of the dialog if all cameras are auto-discovered. */
+    if (resources.size() == onlineAutoDiscoveredCameras.size()) 
+        question = tr("These %n cameras are auto-discovered.\n"\
+            "They may be auto-discovered again after removing.\n"\
+            "Are you sure you want to delete them",
+            "", resources.size());
+    else 
+    /* Second version - some cameras are auto-discovered, some not. */
+    if (!onlineAutoDiscoveredCameras.isEmpty())
+        question = tr("%n of these %1 cameras are auto-discovered.\n"\
+            "They may be auto-discovered again after removing.\n"\
+            "Are you sure you want to delete them",
+            "", onlineAutoDiscoveredCameras.size()).arg(resources.size());
+     else
+    /* Third version - no auto-discovered cameras in the list. */
+        question = tr("Do you really want to delete the following %n item(s)?",
+            "", resources.size());
+    
+    
+    QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+        mainWindow(),
+        resources,
+        tr("Delete Resources"),
+        question,
+        QDialogButtonBox::Yes | QDialogButtonBox::No
+        );
+    if (button != QDialogButtonBox::Yes)
+        return; /* User does not want it deleted. */
+
+    foreach(const QnResourcePtr &resource, resources)
+        deleteResource(resource);   
 }
 
 void QnWorkbenchActionHandler::at_newUserAction_triggered() {
