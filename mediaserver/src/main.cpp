@@ -1368,18 +1368,18 @@ void QnMain::run()
     if (url.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
         qnCommon->setCloudMode(true);
-        moduleFinder->start();
+        m_moduleFinder->start();
     }
 #endif
     // ------------------------------------------
 
     QScopedPointer<QnGlobalModuleFinder> globalModuleFinder(new QnGlobalModuleFinder());
     globalModuleFinder->setConnection(ec2Connection);
-    globalModuleFinder->setModuleFinder(moduleFinder.data());
+    globalModuleFinder->setModuleFinder(m_moduleFinder);
 
     QScopedPointer<QnRouter> router(new QnRouter());
     router->setConnection(ec2Connection);
-    router->setModuleFinder(moduleFinder.data());
+    router->setModuleFinder(m_moduleFinder);
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
 
@@ -1605,7 +1605,7 @@ void QnMain::at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo)
         ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged, false);
         tran.params = runtimeInfo;
         tran.fillSequence();
-        ec2::qnTransactionBus->sendTransaction(tran);
+        qnTransactionBus->sendTransaction(tran);
     }
 }
 

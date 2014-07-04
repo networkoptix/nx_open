@@ -232,4 +232,8 @@ namespace ec2
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiConnectionDataList> &tran) {
         m_miscManager->triggerNotification(tran.params);
     }
+
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiSystemNameData> &tran) {
+        m_miscManager->triggerNotification(tran);
+    }
 }

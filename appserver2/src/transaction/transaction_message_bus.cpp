@@ -123,7 +123,7 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
                                             return handleTransactionParams<ApiConnectionData>       (&stream, transaction, function);
     case ApiCommand::availableConnections:  return handleTransactionParams<ApiConnectionDataList>   (&stream, transaction, function);
 
-    case ApiCommand::changeSystemName:      return handleTransactionParams<QString>                 (&stream, transaction, function);
+    case ApiCommand::changeSystemName:      return handleTransactionParams<ApiSystemNameData>       (&stream, transaction, function);
 
     case ApiCommand::lockRequest:
     case ApiCommand::lockResponse:

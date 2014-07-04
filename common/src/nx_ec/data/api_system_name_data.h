@@ -6,9 +6,12 @@
 namespace ec2 {
 
     struct ApiSystemNameData : ApiData {
+        ApiSystemNameData() {}
+        ApiSystemNameData(const QString &systemName): systemName(systemName) {}
+
         QString systemName;
     };
-    #define ApiDiscoverPeerData_Fields (url)
+    #define ApiSystemNameData_Fields (systemName)
 
 } // namespace ec2
 
