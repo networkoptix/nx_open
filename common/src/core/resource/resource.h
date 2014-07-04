@@ -203,7 +203,7 @@ public:
     // same as getParam is invoked in separate thread.
     // as soon as param changed parameterValueChanged() signal is emitted
     void getParamAsync(const QString &name, QnDomain domain);
-#endif ENABLE_DATA_PROVIDERS
+#endif 
 
 
     // return true if no error
@@ -213,9 +213,7 @@ public:
     // same as setParam but but returns immediately;
     // this function leads setParam invoke in separate thread. so no need to make it virtual
     void setParamAsync(const QString &name, const QVariant &val, QnDomain domain);
-#endif
-
-    // ==============================================================================
+#endif 
 
     // some time we can find resource, but cannot request additional information from it ( resource has bad ip for example )
     // in this case we need to request additional information later.
@@ -224,7 +222,6 @@ public:
 
     // updateResource requests the additional  information and returns resource with same params but additional info; unknownResource() for returned resource must return false
     virtual QnResourcePtr updateResource() { return QnResourcePtr(0); }
-    //=============
 
 #ifdef ENABLE_DATA_PROVIDERS
     QnAbstractStreamDataProvider* createDataProvider(ConnectionRole role);
