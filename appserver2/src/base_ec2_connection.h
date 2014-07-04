@@ -54,6 +54,8 @@ namespace ec2
 
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) override;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) override;
+        //!Set peer identified by \a serverGuid to be primary time server (every other peer synchronizes time with server \a serverGuid)
+        virtual int forcePrimaryTimeServer( const QnId& serverGuid, impl::SimpleHandlerPtr handler ) override;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) override;
         virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) override;

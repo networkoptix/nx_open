@@ -795,6 +795,12 @@ namespace ec2
             return impl::doSyncCall<impl::CurrentTimeHandler>( std::bind(fn, this, _1), time );
         }
 
+        //!Set peer identified by \a serverGuid to be primary time server (every other peer synchronizes time with server \a serverGuid)
+        template<class TargetType, class HandlerType> int forcePrimaryTimeServer( const QnId& serverGuid, TargetType* target, HandlerType handler ) {
+            return forcePrimaryTimeServer( std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
         /*!
             \param handler Functor with params: (ErrorCode, QByteArray dbFile)
         */
@@ -856,6 +862,7 @@ namespace ec2
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
+        virtual int forcePrimaryTimeServer( const QnId& serverGuid, impl::SimpleHandlerPtr handler ) = 0;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
         virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) = 0;

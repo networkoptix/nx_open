@@ -16,18 +16,114 @@
 
 namespace ec2
 {
-    TimeManager::TimeManager()
+    //////////////////////////////////////////////
+    //   TimePriorityKey
+    //////////////////////////////////////////////
+    TimePriorityKey::TimePriorityKey()
     :
-        m_timeDelta( 0 ),
-        m_timePriorityKey( 0 )
+        flags(0),
+        sequence(0),
+        seed(0)
     {
+    }
+
+    bool TimePriorityKey::operator==( const TimePriorityKey& right ) const
+    {
+        return flags == right.flags &&
+               sequence == right.sequence &&
+               seed == right.seed;
+    }
+
+    bool TimePriorityKey::operator<( const TimePriorityKey& right ) const
+    {
+        return flags < right.flags ? true :
+               flags > right.flags ? false :
+               sequence < right.sequence ? true :
+               sequence > right.sequence ? false :
+               seed < right.seed;
+    }
+    
+    bool TimePriorityKey::operator>( const TimePriorityKey& right ) const
+    {
+        return right < *this;
+    }
+
+    quint64 TimePriorityKey::toUInt64() const
+    {
+        return ((quint64)flags << 48) | ((quint64)sequence << 32) | seed;
+    }
+    
+    void TimePriorityKey::fromUInt64( quint64 val )
+    {
+        flags = (quint16)(val >> 48);
+        sequence = (quint16)((val >> 32) & 0xFFFF00000000LL);
+        seed = val & 0xFFFFFFFF;
+    }
+
+
+    //////////////////////////////////////////////
+    //   TimeSyncInfo
+    //////////////////////////////////////////////
+    TimeSyncInfo::TimeSyncInfo(
+        qint64 _monotonicClockValue,
+        qint64 _syncTime,
+        const TimePriorityKey& _timePriorityKey )
+    :
+        monotonicClockValue( _monotonicClockValue ),
+        syncTime( _syncTime ),
+        timePriorityKey( _timePriorityKey )
+    {
+    }
+
+    QByteArray TimeSyncInfo::toString() const
+    {
+        QByteArray result;
+        result.resize( 20*3 + 1 );
+        sprintf( result.data(), "%lld,%lld,%lld", monotonicClockValue, syncTime, timePriorityKey.toUInt64() );
+        result.resize( strlen( result.data() ) );
+        return result;
+    }
+    
+    bool TimeSyncInfo::fromString( const QByteArray& str )
+    {
+        int curSepPos = 0;
+        for( int i = 0; curSepPos < str.size(); ++i )
+        {
+            int nextSepPos = str.indexOf( ',', curSepPos );
+            if( nextSepPos == -1 )
+                nextSepPos = str.size();
+            if( i == 0 )
+                monotonicClockValue = QByteArray::fromRawData(str.constData()+curSepPos, nextSepPos-curSepPos).toLongLong();
+            else if( i == 1 )
+                syncTime = QByteArray::fromRawData(str.constData()+curSepPos, nextSepPos-curSepPos).toLongLong();
+            else if( i == 2 )
+                timePriorityKey.fromUInt64( QByteArray::fromRawData(str.constData()+curSepPos, nextSepPos-curSepPos).toLongLong() );
+
+            curSepPos = nextSepPos+1;
+        }
+        return true;
+    }
+
+
+    //////////////////////////////////////////////
+    //   TimeSynchronizationManager
+    //////////////////////////////////////////////
+    static TimeSynchronizationManager* TimeManager_instance = nullptr;
+
+    TimeSynchronizationManager::TimeSynchronizationManager( Qn::PeerType peerType )
+    :
+        m_timeDelta( 0 )
+    {
+        if( peerType == Qn::PT_Server )
+            m_timePriorityKey.flags |= peerIsServer;
+
 #ifndef EDGE_SERVER
-        m_timePriorityKey |= peerIsNotEdgeServer;
+        m_timePriorityKey.flags |= peerIsNotEdgeServer;
 #endif
-        m_timePriorityKey |= (rand() | (rand() * RAND_MAX)) + 1;
+        m_timePriorityKey.seed = (rand() | (rand() * RAND_MAX)) + 1;
         //TODO #ak handle priority key duplicates or use guid?
         if( QElapsedTimer::isMonotonic() )
-            m_timePriorityKey |= peerHasMonotonicClock;
+            m_timePriorityKey.flags |= peerHasMonotonicClock;
 
         m_monotonicClock.restart();
         //initializing synchronized time with local system time
@@ -37,52 +133,42 @@ namespace ec2
             0,
             m_timeDelta,
             m_timePriorityKey ); 
+
+        assert( TimeManager_instance == nullptr );
+        TimeManager_instance = this;
     }
 
-    TimeManager::~TimeManager()
+    TimeSynchronizationManager::~TimeSynchronizationManager()
     {
+        assert( TimeManager_instance == this );
+        TimeManager_instance = nullptr;
     }
 
-    int TimeManager::getSyncTime( qint64* const syncTime ) const
+    TimeSynchronizationManager* TimeSynchronizationManager::instance()
     {
-        QMutexLocker lk( &m_mutex );
-        
-        const int reqID = generateRequestID();
-
-        *syncTime = m_monotonicClock.elapsed() + m_timeDelta;
-
-        //TODO
-        //return ec2::ErrorCode::notImplemented;
-        return reqID;
+        return TimeManager_instance;
     }
 
-    int TimeManager::forcePrimaryTimeServer( const QnId& serverGuid, impl::SimpleHandlerPtr handler )
+    qint64 TimeSynchronizationManager::getSyncTime() const
     {
         QMutexLocker lk( &m_mutex );
-
-        const int reqID = generateRequestID();
-
-        //TODO sending transaction (new one)
-        QnTransaction<ApiPrimaryTimeServerData> tran;
-        tran.params.serverGuid = serverGuid;
-        tran.persistent = false;
-
-        QtConcurrent::run( std::bind( &impl::SimpleHandler::done, handler, reqID, ec2::ErrorCode::notImplemented ) );
-        return reqID;
+        return m_monotonicClock.elapsed() + m_timeDelta; 
     }
 
-    void TimeManager::primaryTimeServerChanged( const QnTransaction<ApiPrimaryTimeServerData>& tran )
+    void TimeSynchronizationManager::primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran )
     {
         QMutexLocker lk( &m_mutex );
 
         //received transaction
 
-        if( tran.params.serverGuid == qnCommon->moduleGUID() )
+        if( tran.params.id == qnCommon->moduleGUID() )
         {
-            const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_timePriorityKey;
             //local peer is selected by user as primary time server
+            const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_timePriorityKey;
             //TODO #ak does it mean that local system time is to be used as synchronized time?
-            m_timePriorityKey |= peerTimeSetByUser;
+            m_timePriorityKey.flags |= peerTimeSetByUser;
+            //incrementing sequence 
+            m_timePriorityKey.sequence = m_usedTimeSyncInfo.timePriorityKey.sequence + 1;
             if( m_timePriorityKey > m_usedTimeSyncInfo.timePriorityKey )
             {
                 //using current server time info
@@ -101,11 +187,11 @@ namespace ec2
         }
         else
         {
-            m_timePriorityKey &= ~peerTimeSetByUser;
+            m_timePriorityKey.flags &= ~peerTimeSetByUser;
         }
     }
 
-    TimeSyncInfo TimeManager::getTimeSyncInfo() const
+    TimeSyncInfo TimeSynchronizationManager::getTimeSyncInfo() const
     {
         QMutexLocker lk( &m_mutex );
 
@@ -116,13 +202,19 @@ namespace ec2
             m_usedTimeSyncInfo.timePriorityKey );
     }
 
-    void TimeManager::remotePeerTimeSyncUpdate(
-        const QnId& /*peerID*/,
+    qint64 TimeSynchronizationManager::getMonotonicClock() const
+    {
+        QMutexLocker lk( &m_mutex );
+        return m_monotonicClock.elapsed();
+    }
+
+    void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
+        const QnId& /*remotePeerID*/,
         qint64 localMonotonicClock,
         qint64 remotePeerSyncTime,
-        quint64 remotePeerTimePriorityKey )
+        const TimePriorityKey& remotePeerTimePriorityKey )
     {
-        assert( remotePeerTimePriorityKey > 0 );
+        assert( remotePeerTimePriorityKey.seed > 0 );
 
         QMutexLocker lk( &m_mutex );
 
@@ -148,7 +240,7 @@ namespace ec2
         }
     }
 
-    //void TimeManager::remotePeerLost( const QnId& peerID )
+    //void TimeSynchronizationManager::remotePeerLost( const QnId& peerID )
     //{
     //    QMutexLocker lk( &m_mutex );
 
@@ -167,8 +259,8 @@ namespace ec2
     //        m_timeInfoByPeer.erase( it );
     //}
 
-    void TimeManager::syncTimeWithExternalSource()
+    void TimeSynchronizationManager::syncTimeWithExternalSource()
     {
-        //TODO #ak synchroniing with some internet server if possible
+        //TODO #ak synchronizing with some internet server if possible
     }
 }

@@ -26,7 +26,9 @@
 
 namespace ec2
 {
-    Ec2DirectConnectionFactory::Ec2DirectConnectionFactory()
+    Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
+    :
+        m_timeSynchronizationManager( peerType )
     {
         srand( ::time(NULL) );
 

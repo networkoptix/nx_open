@@ -9,6 +9,9 @@
 #include "server_query_processor.h"
 #include "common/common_module.h"
 #include "transaction/transaction_message_bus.h"
+#include "managers/time_manager.h"
+#include "nx_ec/data/api_data.h"
+
 
 namespace ec2
 {
@@ -120,7 +123,7 @@ namespace ec2
         auto tran = prepareTransaction( command, value );
 
         using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
 
         return reqID;
     }
@@ -129,19 +132,24 @@ namespace ec2
     int BaseEc2Connection<T>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiTimeData& currentTime) {
-            qint64 outData = 0;
-            if( errorCode == ErrorCode::ok )
-                outData = currentTime.value;
-            handler->done( reqID, errorCode, outData);
-        };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiTimeData, decltype(queryDoneHandler)> (
-            ApiCommand::getCurrentTime, nullptr, queryDoneHandler );
-
+        QtConcurrent::run( std::bind( &impl::CurrentTimeHandler::done, handler, reqID, ec2::ErrorCode::ok, TimeSynchronizationManager::instance()->getSyncTime() ) );
         return reqID;
     }
     
+    template <class T>
+    int BaseEc2Connection<T>::forcePrimaryTimeServer( const QnId& serverGuid, impl::SimpleHandlerPtr handler )
+    {
+        const int reqID = generateRequestID();
+
+        QnTransaction<ApiIdData> tran( ApiCommand::forcePrimaryTimeServer, false );
+        tran.params.id = serverGuid;
+
+        using namespace std::placeholders;
+        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1) );
+
+        return reqID;
+    }
+
 
 
     template<class T>

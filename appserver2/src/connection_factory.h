@@ -15,6 +15,7 @@
 #include "client_query_processor.h"
 #include "server_query_processor.h"
 #include "ec2_connection.h"
+#include "managers/time_manager.h"
 
 
 namespace ec2
@@ -24,7 +25,7 @@ namespace ec2
         public AbstractECConnectionFactory
     {
     public:
-        Ec2DirectConnectionFactory();
+        Ec2DirectConnectionFactory( Qn::PeerType peerType );
         virtual ~Ec2DirectConnectionFactory();
 
         //!Implementation of AbstractECConnectionFactory::testConnectionAsync
@@ -42,6 +43,7 @@ namespace ec2
         Ec2DirectConnectionPtr m_directConnection;
         QMutex m_mutex;
         ResourceContext m_resCtx;
+        TimeSynchronizationManager m_timeSynchronizationManager;
         //std::map<QUrl, AbstractECConnectionPtr> m_urlToConnection;
 
         int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);

@@ -134,12 +134,17 @@ private:
     void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) throw();
     void closeSocket();
     void addData(QByteArray &&data);
-    static void ensureSize(std::vector<quint8>& buffer, std::size_t size);
-    int getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size);
+    /*!
+        \return in case of success returns number of bytes read from \a data. In case of parse error returns 0
+        \note In case of error \a chunkHeader contents are undefined
+    */
+    int readChunkHeader(const quint8* data, int dataLen, nx_http::ChunkHeader* const chunkHeader);
     void processTransactionData( const QByteArray& data);
     void setStateNoLock(State state);
     void cancelConnecting();
     static void connectingCanceledNoLock(const QnId& remoteGuid, bool isOriginator);
+    void addHttpChunkExtensions( std::vector<nx_http::ChunkExtension>* const chunkExtensions );
+    void processChunkExtensions( const nx_http::ChunkHeader& httpChunkHeader );
 private slots:
     void at_responseReceived( const nx_http::AsyncHttpClientPtr& );
     void at_httpClientDone( const nx_http::AsyncHttpClientPtr& );

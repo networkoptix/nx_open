@@ -436,6 +436,35 @@ namespace nx_http
             bool parse( const BufferType& str );
         };
     }
+
+    typedef std::pair<StringType, StringType> ChunkExtension;
+
+    //! chunk-size [ chunk-extension ] CRLF
+    /*!
+        chunk-extension= *( ";" chunk-ext-name [ "=" chunk-ext-val ] )
+        chunk-ext-name = token
+        chunk-ext-val  = token | quoted-string
+    */
+    class ChunkHeader
+    {
+    public:
+        size_t chunkSize;
+        std::vector<ChunkExtension> extensions;
+
+        ChunkHeader();
+
+        void clear();
+
+        /*!
+            \return bytes read from \a buf. -1 in case of parse error
+            \note In case of parse error object state is indefined
+        */
+        int parse( const ConstBufferRefType& buf );
+        /*!
+            \return bytes written to \a dstBuffer. -1 in case of serialize error. In this case contents of \a dstBuffer are undefined
+        */
+        int serialize( BufferType* const dstBuffer ) const;
+    };
 }
 
 #endif  //HTTPTYPES_H

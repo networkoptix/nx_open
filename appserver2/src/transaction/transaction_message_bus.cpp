@@ -9,15 +9,17 @@
 #include <transaction/transaction_transport.h>
 
 #include "api/app_server_connection.h"
+#include "api/runtime_info_manager.h"
 #include "nx_ec/data/api_server_alive_data.h"
 #include "utils/common/synctime.h"
 #include "ec_connection_notification_manager.h"
 #include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_data.h"
+#include "managers/time_manager.h"
 
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
-#include "api/runtime_info_manager.h"
+
 
 namespace ec2
 {
@@ -114,6 +116,8 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::tranSyncRequest:       return handleTransactionParams<QnTranState>             (&stream, transaction, function);
     case ApiCommand::tranSyncResponse:      return handleTransactionParams<QnTranStateResponse>     (&stream, transaction, function);
     case ApiCommand::runtimeInfoChanged:    return handleTransactionParams<ApiRuntimeData>          (&stream, transaction, function);
+    case ApiCommand::forcePrimaryTimeServer:
+                                            return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
 
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";
@@ -261,6 +265,9 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         case ApiCommand::peerAliveInfo:
             onGotServerAliveInfo(tran);
             break; // do not return. proxy this transaction
+        case ApiCommand::forcePrimaryTimeServer:
+            TimeSynchronizationManager::instance()->primaryTimeServerChanged( tran );
+            break;
         default:
             // general transaction
             if (!sender->isReadSync())

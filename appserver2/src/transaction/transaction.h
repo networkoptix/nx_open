@@ -20,7 +20,7 @@ namespace ec2
         // TODO: #Elric #enum
         enum Value
         {
-		    NotDefined                  = 0,
+            NotDefined                  = 0,
 
             /* System */
             tranSyncRequest             = 1,    /*< QnTranState */
@@ -113,9 +113,10 @@ namespace ec2
             saveSettings                = 9001,  /*< ApiResourceParamDataList */
             getCurrentTime              = 9002,  /*< ApiTimeData */         
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
-			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
+            runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
+            forcePrimaryTimeServer      = 9005,  /*< ApiIdData */
 
-			maxTransactionValue         = 65535
+            maxTransactionValue         = 65535
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
@@ -126,7 +127,7 @@ namespace ec2
     class QnAbstractTransaction
     {
     public:
-		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false), timestamp(0), isLocal(false) {}
+        QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false), timestamp(0), isLocal(false) {}
         QnAbstractTransaction(ApiCommand::Value command, bool persistent);
         
         static void setStartSequence(int value);

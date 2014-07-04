@@ -29,18 +29,22 @@ namespace ec2 {
 
     QByteArray QnChunkedTransferEncoder::serializedTransaction(
         const QByteArray& data,
-        const QByteArray& chunkExtensionName,
-        const QByteArray& chunkExtensionValue )
+        const std::vector<nx_http::ChunkExtension>& chunkExtensions )
     {
         QByteArray result;
         quint32 dataSize = static_cast<quint32>(data.size());
 
+        size_t totalExtensionsLength = 0;
+        for( auto val: chunkExtensions )
+            totalExtensionsLength +=
+                1                       // ";"
+                + val.first.size()
+                + 1                     // "="
+                + val.second.size();
+
         result.reserve(
             sizeof(dataSize)*2      //max len of hex representation of chunk size
-            + 1     // ";"
-            + chunkExtensionName.size()
-            + 1     // "="
-            + chunkExtensionValue.size()
+            + totalExtensionsLength
             + sizeof("\r\n")
             + sizeof(dataSize) + dataSize
             + sizeof("\r\n") );
@@ -48,12 +52,12 @@ namespace ec2 {
         //writing chunk size (hex)
         result.append( "00000000" );
         toFormattedHex( reinterpret_cast<quint8*>(result.data()) + sizeof(dataSize)*2 - 1, sizeof(dataSize) + dataSize );
-        if( !chunkExtensionName.isEmpty() )
+        for( auto val: chunkExtensions )
         {
             result += ';';
-            result += chunkExtensionName;
+            result += val.first;
             result += '=';
-            result += chunkExtensionValue;
+            result += val.second;
         }
         result += "\r\n";
         dataSize = htonl(dataSize);
@@ -61,15 +65,5 @@ namespace ec2 {
         result += data;
         result += "\r\n";
         return result;
-
-
-        //QByteArray result;
-        //QnOutputBinaryStream<QByteArray> stream(&result);
-        //stream.write("00000000\r\n",10);
-        //stream.write("0000", 4);
-        //stream.write(data.constData(), data.size());
-        //stream.write("\r\n",2); // chunk end
-        //serializePayload(result);
-        //return result;
     }
 }

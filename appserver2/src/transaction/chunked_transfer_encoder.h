@@ -1,6 +1,11 @@
 #ifndef __CHUNKED_TRANSFER_ENCODER_H_
 #define __CHUNKED_TRANSFER_ENCODER_H_
 
+#include <vector>
+
+#include <utils/network/http/httptypes.h>
+
+
 namespace ec2
 {
     /**
@@ -10,8 +15,7 @@ namespace ec2
     public:
         static QByteArray serializedTransaction(
             const QByteArray& data,
-            const QByteArray& chunkExtensionName = QByteArray(),
-            const QByteArray& chunkExtensionValue = QByteArray() );
+            const std::vector<nx_http::ChunkExtension>& chunkExtensions );
     };
 
 }

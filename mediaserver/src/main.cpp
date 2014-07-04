@@ -1137,7 +1137,7 @@ void QnMain::run()
     qnCommon->setModuleGUID(serverGuid());
     qnCommon->setLocalSystemName(settings->value("systemName").toString());
 
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
+    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory( Qn::PT_Server ));
 
     ec2::ApiRuntimeData runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
     runtimeInfo.peer.peerType = Qn::PT_Server;
@@ -1683,7 +1683,6 @@ static void printVersion();
 
 int main(int argc, char* argv[])
 {
-
 #if 0
 #if defined(__GNUC__)
 # if defined(__i386__)
