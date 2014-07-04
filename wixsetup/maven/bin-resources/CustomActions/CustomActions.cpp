@@ -182,6 +182,7 @@ UINT __stdcall DeleteOldMediaserverSettings(MSIHANDLE hInstall)
         RegKey.DeleteValue(L"appserverPassword");
     } else {
         RegKey.SetStringValue(L"pendingSwitchToClusterMode", L"yes");
+        RegKey.DeleteValue(L"appserverPassword");
     }
 
     RegKey.Close();

@@ -41,14 +41,14 @@
         <beta>true</beta>
         <!-- compile.option1. See profile no-webkit -->
         <webkit>true</webkit>
-		<!-- compile.option2. See profile angle  -->
+        <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
         <box/>
 
         <root.dir>${basedir}</root.dir>
-		<compile.option1>-webkit</compile.option1>
-		<compile.option2></compile.option2>
-		<compile.option3></compile.option3>
+        <compile.option1>-webkit</compile.option1>
+        <compile.option2></compile.option2>
+        <compile.option3></compile.option3>
         <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
 
         <libdir>${root.dir}/build_environment/target</libdir>        
@@ -294,7 +294,7 @@
                 </os>
             </activation>
             <modules>     
-                <!-- <module>traytool</module> -->
+                <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
                 <!--<module>vmaxproxy</module>  -->
                 <module>client</module>                     
@@ -330,7 +330,7 @@
                 <init.python.dir>${environment.dir}/python/bin</init.python.dir>                
                 <python.dir>${libdir}/${arch}/python/bin</python.dir>
                 <buildenv.script>get_buildenv.sh</buildenv.script>                
-				<qt.dir>${libdir}</qt.dir>
+                <qt.dir>${libdir}</qt.dir>
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
@@ -349,7 +349,7 @@
             <properties>            
                 <platform>linux</platform>
                 <qt.spec>linux-g++</qt.spec>
-				<qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
+                <qt.classifier>${platform}-${arch}-${build.configuration}</qt.classifier>
             </properties>
             <modules>
                 <!--<module>plugins/xvbadecoder</module>-->
@@ -408,8 +408,8 @@
             </activation>
             <properties>
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
-				<qt.classifier>${platform}-${arch}-${box}</qt.classifier>
-				<compile.option1></compile.option1>
+                <qt.classifier>${platform}-${arch}-${box}</qt.classifier>
+                <compile.option1></compile.option1>
                 <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
                 <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
@@ -602,6 +602,6 @@
             <properties>
                 <compile.option2>-angle</compile.option2>
             </properties>
-        </profile>  		
+        </profile>          
     </profiles> 
 </project>
