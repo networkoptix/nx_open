@@ -11,16 +11,9 @@
 
 #include <libavutil/avutil.h>
 
+#include "abstract_media_context.h"
+
 class QnAbstractStreamDataProvider;
-
-class QnAbstractMediaContext
-{
-public:
-    QnAbstractMediaContext() {}
-    virtual ~QnAbstractMediaContext() {}
-};
-typedef QSharedPointer<QnAbstractMediaContext> QnAbstractMediaContextPtr;
-
 
 struct QnAbstractDataPacket
 {
