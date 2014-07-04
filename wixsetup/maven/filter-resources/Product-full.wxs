@@ -205,7 +205,7 @@
             </Custom>
 
             <Custom Action="LaunchTrayTool" After="InstallFinalize">
-                <![CDATA[ (!AppServerFeature=3 OR INSTALL_ECS OR !ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>
+                <![CDATA[ (!ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />

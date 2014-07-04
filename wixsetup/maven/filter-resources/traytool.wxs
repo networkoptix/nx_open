@@ -2,11 +2,12 @@
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-    <Fragment Id='FragmentServer'>
+    <Fragment Id='FragmentTraytool'>
         <?include BuildVars.wxi ?>
 
         <DirectoryRef Id="INSTALLDIR">
              <Directory Id="${customization}TrayToolDir" Name="TrayTool">
+                 <Directory Id="TraytoolPlatforms" Name="platforms"/>
                  <Component Id="traytool.exe">
                      <File Id="traytool.exe" Name="traytool.exe" Source="$(var.SourceDir)/traytool.exe" KeyPath="yes">
                          <fire:FirewallException Id="FirewallException${customization}TrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
@@ -33,11 +34,36 @@
             <Component>
                 <File Id="TrayToolQt5Gui$(var.suffix).dll" Name="Qt5Gui$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Gui$(var.suffix).dll"  />
             </Component>
+            <Component>
+                <File Id="TrayToolQt5Network$(var.suffix).dll" Name="Qt5Network$(var.suffix).dll" Source="$(var.SourceDir)\Qt5Network$(var.suffix).dll"  />
+            </Component>
+            <Component>
+                <File Id="TrayToolicudt53.dll" Name="icudt53.dll" Source="$(var.SourceDir)\icudt53.dll"  />                
+            </Component>                 
+            <Component>
+                <File Id="TrayToolicuin53.dll" Name="icuin53.dll" Source="$(var.SourceDir)\icuin53.dll"  />                
+            </Component>                 
+            <Component>
+                <File Id="TrayToolicuuc5.dll" Name="icuuc53.dll" Source="$(var.SourceDir)\icuuc53.dll"  />                
+            </Component>                 
         </ComponentGroup>
+
+        <ComponentGroup Id="TraytoolPlatforms" Directory="TraytoolPlatforms">
+            <Component>
+                <File Id="Traytoolqminimal$(var.suffix).dll" Name="Traytoolqminimal4.dll" Source="$(var.SourceDir)\platforms\qminimal$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="Traytoolqoffscreen$(var.suffix).dll" Name="Traytoolqoffscreen4.dll" Source="$(var.SourceDir)\platforms\qoffscreen$(var.suffix).dll" />
+            </Component>
+            <Component>
+                <File Id="Traytoolqwindows$(var.suffix).dll" Name="Traytoolqwindows4.dll" Source="$(var.SourceDir)\platforms\qwindows$(var.suffix).dll" />
+            </Component>      
+        </ComponentGroup>         
 
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
             <ComponentRef Id="traytool.exe"/>
             <ComponentGroupRef Id="TrayToolQTLibraries"/>
+            <ComponentGroupRef Id="TraytoolPlatforms" />            
         </Feature>
 
     </Fragment>
