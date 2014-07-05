@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
   config.vm.network :private_network, ip: "192.168.33.10"
   #config.vm.network :public_network
   #config.vm.provision :shell, :path => ".vagrant/bootstrap.sh"  
-#config.vm.network :forwarded_port, guest: 7011, host: 7011
+  #config.vm.network :forwarded_port, guest: 7011, host: 7011
 #config.ssh.private_key_path = "~/.ssh/id_rsa"
   config.ssh.forward_agent = true
 
