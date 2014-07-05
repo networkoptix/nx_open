@@ -33,13 +33,8 @@
                     <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
                         <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
                         <RegistryValue Type="string" Name="port" Value="[SERVER_PORT]"/>
+                        <RegistryValue Type="string" Name="adminPassword" Value="[SERVER_PASSWORD]"/>
                     </RegistryKey>
-                    <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\apiPort" Action="removeOnInstall"/>
-                    <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\rtspPort" Action="removeOnInstall"/>
-                    <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\appserverHost" Action="removeOnInstall"/>
-                    <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\appserverPort" Action="removeOnInstall"/>
-                    <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\appserverLogin" Action="removeOnInstall"/>
-                    <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\appserverPassword" Action="removeOnInstall"/>
                 </Component>
 
                 <Directory Id="ServerPlugins" Name="plugins">
