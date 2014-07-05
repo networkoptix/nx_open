@@ -1078,11 +1078,9 @@ QHostAddress QnMain::getPublicAddress()
 void QnMain::run()
 {
     QFile f(QLatin1String(":/cert.pem"));
-    if (!f.open(QIODevice::ReadOnly)) 
-    {
+    if (!f.open(QIODevice::ReadOnly)) {
         qWarning() << "No SSL sertificate for mediaServer!";
-    }
-    else {
+    } else {
         QByteArray certData = f.readAll();
         QnSSLSocket::initSSLEngine(certData);
     }
@@ -1648,10 +1646,7 @@ protected:
     {
         QtSingleCoreApplication *application = this->application();
 
-        // check if local or remote EC. MServer changes guid depend of this fact
-        bool primaryGuidAbsent = MSSettings::roSettings()->value(lit("serverGuid")).isNull();
-        if (primaryGuidAbsent)
-            MSSettings::roSettings()->setValue("separateGuidForRemoteEC", 1);
+        updateGuidIfNeeded();
 
         QUuid guid = serverGuid();
         if (guid.isNull())
@@ -1676,6 +1671,72 @@ protected:
     {
         if (serviceMainInstance)
             serviceMainInstance->stopSync();
+    }
+
+private:
+    QUuid hardwareIdToUuid(const QByteArray& hardwareId) {
+        if (hardwareId.length() != 34)
+            return QUuid();
+
+        QString hwid(hardwareId);
+        QString uuidForm = QString("%1-%2-%3-%4-%5").arg(hwid.mid(2, 8)).arg(hwid.mid(10, 4)).arg(hwid.mid(14, 4)).arg(hwid.mid(18, 4)).arg(hwid.mid(22, 12));
+        return QUuid(uuidForm);
+    }
+
+    QString hardwareIdAsGuid() {
+#ifdef EDGE_SERVER
+	char  mac[13];
+	memset(mac, 0, sizeof(mac));
+	char* host = 0;
+	mac_eth0(mac, &host);
+	QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+	md5Hash.addData(mac, 12);
+	md5Hash.addData("edge");
+	return QUuid::fromRfc4122(md5Hash.result()).toString();
+#else
+	return hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
+#endif
+    }
+
+    void updateGuidIfNeeded() {
+        const QString YES = lit("yes");
+        const QString NO = lit("no");
+        const QString GUID_IS_HWID = lit("guidIsHWID");
+        const QString SERVER_GUID = lit("serverGuid");
+        const QString SERVER_GUID2 = lit("serverGuid2");
+        const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
+
+        QString guidIsHWID = MSSettings::roSettings()->value(GUID_IS_HWID).toString();
+        QString serverGuid = MSSettings::roSettings()->value(SERVER_GUID).toString();
+        QString serverGuid2 = MSSettings::roSettings()->value(SERVER_GUID2).toString();
+
+        QString hwidGuid = hardwareIdAsGuid();
+
+        if (guidIsHWID == YES) {
+            MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+            MSSettings::roSettings()->remove(SERVER_GUID2);
+        } else if (guidIsHWID == NO) {
+            if (serverGuid.isEmpty()) {
+                // serverGuid remove from settings manually?
+                MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+                MSSettings::roSettings()->setValue(GUID_IS_HWID, YES);
+            }
+
+            MSSettings::roSettings()->remove(SERVER_GUID2);
+        } else if (guidIsHWID.isEmpty()) {
+            if (!serverGuid2.isEmpty()) {
+                MSSettings::roSettings()->setValue(SERVER_GUID, serverGuid2);
+                MSSettings::roSettings()->setValue(GUID_IS_HWID, NO);
+                MSSettings::roSettings()->remove(SERVER_GUID2);
+            } else {
+                MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+                MSSettings::roSettings()->setValue(GUID_IS_HWID, YES);
+
+                if (!serverGuid.isEmpty()) {
+                    MSSettings::roSettings()->setValue(OBSOLETE_SERVER_GUID, serverGuid);
+                }
+            }
+        }
     }
 
 private:
