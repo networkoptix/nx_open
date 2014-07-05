@@ -168,6 +168,15 @@ void stopServer(int signal);
 bool restartFlag = false;
 void restartServer();
 
+namespace {
+    const QString YES = lit("yes");
+    const QString NO = lit("no");
+    const QString GUID_IS_HWID = lit("guidIsHWID");
+    const QString SERVER_GUID = lit("serverGuid");
+    const QString SERVER_GUID2 = lit("serverGuid2");
+    const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
+};
+
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
 //#define TEST_RTSP_SERVER
@@ -1330,6 +1339,8 @@ void QnMain::run()
             QnSleep::msleep(1000);
     }
 
+    MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
+
     if (needToStop())
         return;
 
@@ -1699,16 +1710,10 @@ private:
     }
 
     void updateGuidIfNeeded() {
-        const QString YES = lit("yes");
-        const QString NO = lit("no");
-        const QString GUID_IS_HWID = lit("guidIsHWID");
-        const QString SERVER_GUID = lit("serverGuid");
-        const QString SERVER_GUID2 = lit("serverGuid2");
-        const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
-
         QString guidIsHWID = MSSettings::roSettings()->value(GUID_IS_HWID).toString();
         QString serverGuid = MSSettings::roSettings()->value(SERVER_GUID).toString();
         QString serverGuid2 = MSSettings::roSettings()->value(SERVER_GUID2).toString();
+        QString obsoleteGuid = MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString();
 
         QString hwidGuid = hardwareIdAsGuid();
 
@@ -1736,6 +1741,10 @@ private:
                     MSSettings::roSettings()->setValue(OBSOLETE_SERVER_GUID, serverGuid);
                 }
             }
+        }
+
+        if (!obsoleteGuid.isEmpty()) {
+            qnCommon->setObsoleteServerGuid(obsoleteGuid);
         }
     }
 
