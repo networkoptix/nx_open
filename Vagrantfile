@@ -17,7 +17,7 @@ Vagrant.configure("2") do |config|
 
   #  config.vm.define :node1 do |node1|
   #    node1.vm.box = "precise32"
-#    node1.vm.network :private_network, ip: "192.168.33.11"
+  #    node1.vm.network :private_network, ip: "192.168.33.11"
 #    node1.vm.provision :shell, :path => "bootstrap_node1.sh"  
 #  end
 
