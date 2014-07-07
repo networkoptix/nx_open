@@ -1,5 +1,7 @@
 #include "avi_bluray_resource.h"
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtCore/QDir>
 
 #include "avi_bluray_archive_delegate.h"
@@ -52,3 +54,5 @@ bool QnAviBlurayResource::isAcceptedUrl(const QString& url)
     QFileInfoList mplsFileList = playlistDir.entryInfoList();
     return mplsFileList.size() > 0;
 }
+
+#endif // ENABLE_ARCHIVE

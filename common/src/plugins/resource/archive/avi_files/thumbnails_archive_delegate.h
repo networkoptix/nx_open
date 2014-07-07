@@ -1,6 +1,8 @@
 #ifndef __THUMBNAILS_ARCHIVE_DELEGATE_H
 #define __THUMBNAILS_ARCHIVE_DELEGATE_H
 
+#ifdef ENABLE_ARCHIVE
+
 #include "avi_archive_delegate.h"
 
 class QnThumbnailsArchiveDelegate: public QnAbstractArchiveDelegate
@@ -33,5 +35,7 @@ private:
 };
 
 typedef QSharedPointer<QnThumbnailsArchiveDelegate> QnThumbnailsArchiveDelegatePtr;
+
+#endif // ENABLE_ARCHIVE
 
 #endif

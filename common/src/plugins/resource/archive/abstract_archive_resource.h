@@ -1,6 +1,8 @@
 #ifndef abstract_archive_device_h1838
 #define abstract_archive_device_h1838
 
+#ifdef ENABLE_ARCHIVE
+
 #include "core/resource/media_resource.h"
 #include "core/resource/resource.h"
 
@@ -31,5 +33,7 @@ public:
 
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 };
+
+#endif // ENABLE_ARCHIVE
 
 #endif //abstract_archive_device_h1838

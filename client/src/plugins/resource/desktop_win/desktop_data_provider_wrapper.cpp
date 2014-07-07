@@ -2,7 +2,7 @@
 
 #ifdef Q_OS_WIN
 
-#include "device/desktop_resource.h"
+#include "desktop_resource.h"
 #include "desktop_data_provider.h"
 
 QnDesktopDataProviderWrapper::QnDesktopDataProviderWrapper(QnResourcePtr res, QnDesktopDataProvider* owner):

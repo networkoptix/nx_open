@@ -1,6 +1,8 @@
 #ifndef abstract_archive_stream_reader_h1907
 #define abstract_archive_stream_reader_h1907
 
+#ifdef ENABLE_ARCHIVE
+
 #include <core/dataprovider/cpull_media_stream_provider.h>
 
 #include "abstract_archive_delegate.h"
@@ -107,5 +109,7 @@ protected:
     QnAbstractArchiveDelegate* m_delegate;
     QnAbstractNavigator* m_navDelegate;
 };
+
+#endif // ENABLE_ARCHIVE
 
 #endif //abstract_archive_stream_reader_h1907

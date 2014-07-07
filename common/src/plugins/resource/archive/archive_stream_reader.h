@@ -1,6 +1,8 @@
 #ifndef avi_stream_reader_h1901
 #define avi_stream_reader_h1901
 
+#ifdef ENABLE_ARCHIVE
+
 extern "C"
 {
     #include <libavformat/avformat.h>
@@ -196,4 +198,7 @@ private:
     void setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast);
 };
 
+#endif // ENABLE_ARCHIVE
+
 #endif //avi_stream_reader_h1901
+

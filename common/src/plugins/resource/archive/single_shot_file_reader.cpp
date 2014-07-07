@@ -1,5 +1,6 @@
-
 #include "single_shot_file_reader.h"
+
+#ifdef ENABLE_ARCHIVE
 
 #include "filetypesupport.h"
 #include "utils/common/synctime.h"
@@ -74,3 +75,5 @@ CameraDiagnostics::Result QnSingleShotFileStreamreader::diagnoseMediaStreamConne
     //TODO/IMPL
     return CameraDiagnostics::NotImplementedResult();
 }
+
+#endif // ENABLE_ARCHIVE

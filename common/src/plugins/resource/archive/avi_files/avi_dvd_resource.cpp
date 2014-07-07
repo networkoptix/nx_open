@@ -1,5 +1,7 @@
 #include "avi_dvd_resource.h"
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtCore/QDir>
 
 #include "../archive_stream_reader.h"
@@ -82,3 +84,5 @@ QString QnAviDvdResource::urlToFirstVTS(const QString& url)
         titleStr = QLatin1String("0") + titleStr;
     return rezUrl + QLatin1String("VTS_") + titleStr + QLatin1String("_1.VOB");
 }
+
+#endif // ENABLE_ARCHIVE

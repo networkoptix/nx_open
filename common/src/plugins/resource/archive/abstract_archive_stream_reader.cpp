@@ -1,5 +1,7 @@
 #include "abstract_archive_stream_reader.h"
 
+#ifdef ENABLE_ARCHIVE
+
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
@@ -151,3 +153,5 @@ void QnAbstractArchiveReader::run()
 
     CL_LOG(cl_logINFO) NX_LOG(QLatin1String("QnArchiveStreamReader reader stopped."), cl_logINFO);
 }
+
+#endif // ENABLE_ARCHIVE

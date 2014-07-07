@@ -1,6 +1,8 @@
 #ifndef __AVI_ARCHIVE_DELEGATE_H
 #define __AVI_ARCHIVE_DELEGATE_H
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QSharedPointer>
 
 #include "../abstract_archive_delegate.h"
@@ -101,5 +103,7 @@ private:
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;
+
+#endif // ENABLE_ARCHIVE
 
 #endif

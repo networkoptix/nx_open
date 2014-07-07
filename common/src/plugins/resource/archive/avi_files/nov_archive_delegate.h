@@ -1,6 +1,8 @@
 #ifndef __NOV_ARCHIVE_DELEGATE_H
 #define __NOV_ARCHIVE_DELEGATE_H
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QSharedPointer>
 #include "avi_archive_delegate.h"
 #include "recording/time_period_list.h"
@@ -24,5 +26,7 @@ private:
 };
 
 typedef QSharedPointer<QnNovArchiveDelegate> QnNovArchiveDelegatePtr;
+
+#endif // ENABLE_ARCHIVE
 
 #endif // __NOV_ARCHIVE_DELEGATE_H

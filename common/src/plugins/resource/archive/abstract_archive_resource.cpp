@@ -1,5 +1,6 @@
 #include "abstract_archive_resource.h"
 
+#ifdef ENABLE_ARCHIVE
 
 QnAbstractArchiveResource::QnAbstractArchiveResource()
 {
@@ -56,3 +57,5 @@ void QnAbstractArchiveResource::updateInner(const QnResourcePtr &other, QSet<QBy
     QnResource::updateInner(other, modifiedFields);
     QnMediaResource::updateInner(other, modifiedFields);
 }
+
+#endif // ENABLE_ARCHIVE

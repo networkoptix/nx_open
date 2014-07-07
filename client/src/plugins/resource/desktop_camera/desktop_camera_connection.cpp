@@ -2,8 +2,9 @@
 #include "core/resource/media_server_resource.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "api/app_server_connection.h"
-#include "../desktop_win/device/desktop_resource.h"
 #include "rtsp/rtsp_ffmpeg_encoder.h"
+
+#include <plugins/resource/desktop_win/desktop_resource.h>
 
 
 static const int CONNECT_TIMEOUT = 1000 * 5;

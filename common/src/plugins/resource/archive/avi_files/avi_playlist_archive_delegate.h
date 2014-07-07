@@ -1,6 +1,8 @@
 #ifndef QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H
 #define QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtCore/QStringList>
 #include <QtCore/QFile>
 #include "avi_archive_delegate.h"
@@ -63,4 +65,7 @@ private:
     QSharedPointer<QnDefaultResourceVideoLayout> m_defaultVideoLayout;
 };
 
+#endif // ENABLE_ARCHIVE
+
 #endif // QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H
+

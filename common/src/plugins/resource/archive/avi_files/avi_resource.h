@@ -1,6 +1,8 @@
 #ifndef QN_AVI_RESOURCE_H
 #define QN_AVI_RESOURCE_H
 
+#ifdef ENABLE_ARCHIVE
+
 #include "../abstract_archive_resource.h"
 #include <QSharedPointer>
 #include "core/datapacket/media_data_packet.h"
@@ -42,5 +44,7 @@ private:
 };
 
 typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
+
+#endif // ENABLE_ARCHIVE
 
 #endif // QN_AVI_RESOURCE_H

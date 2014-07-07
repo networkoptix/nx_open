@@ -1,6 +1,8 @@
 #ifndef QN_ABSTRACT_NAVIGATOR_H
 #define QN_ABSTRACT_NAVIGATOR_H
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtCore/QtGlobal>
 
 class QnAbstractNavigator
@@ -28,5 +30,7 @@ public:
     // delivery motion data to a client
     //virtual bool setSendMotion(bool value) = 0;
 };
+
+#endif // ENABLE_ARCHIVE
 
 #endif // QN_ABSTRACT_NAVIGATOR_H

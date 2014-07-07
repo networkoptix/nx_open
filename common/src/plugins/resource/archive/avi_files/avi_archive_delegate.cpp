@@ -1,5 +1,6 @@
-
 #include "avi_archive_delegate.h"
+
+#ifdef ENABLE_ARCHIVE
 
 #include <QtCore/QSharedPointer>
 
@@ -685,3 +686,5 @@ void QnAviArchiveDelegate::setMotionConnection(QnAbstractMotionArchiveConnection
     m_motionConnections[channel] = connection;
 }
 */
+
+#endif // ENABLE_ARCHIVE

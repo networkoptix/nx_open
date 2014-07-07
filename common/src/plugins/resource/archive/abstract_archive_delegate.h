@@ -1,9 +1,12 @@
 #ifndef __ABSTRACT_ARCHIVE_DELEGATE_H
 #define __ABSTRACT_ARCHIVE_DELEGATE_H
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtGui/QRegion>
 #include <QtCore/QObject>
 #include <QtCore/QVector>
+
 #include "core/resource/resource.h"
 #include "core/resource/resource_media_layout.h"
 #include "core/datapacket/abstract_data_packet.h"
@@ -102,5 +105,7 @@ protected:
 };
 
 typedef QSharedPointer<QnAbstractArchiveDelegate> QnAbstractArchiveDelegatePtr;
+
+#endif // ENABLE_ARCHIVE
 
 #endif

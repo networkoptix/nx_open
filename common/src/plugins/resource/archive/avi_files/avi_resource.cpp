@@ -1,5 +1,7 @@
 #include "avi_resource.h"
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtCore/QDir>
 
 #include "avi_archive_delegate.h"
@@ -104,3 +106,5 @@ qint64 QnAviResource::timeZoneOffset() const
 {
     return m_timeZoneOffset;
 }
+
+#endif // ENABLE_ARCHIVE
