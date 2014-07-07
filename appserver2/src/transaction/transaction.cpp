@@ -159,6 +159,10 @@ namespace ec2
 
                 case runtimeInfoChanged:
                     return "runtimeInfoChanged";
+                case forcePrimaryTimeServer:
+                    return "forcePrimaryTimeServer";
+                case broadcastPeerSystemTime:
+                    return "broadcastPeerSystemTime";
 
                 default:
                     return "unknown " + QString::number((int)val);

@@ -7,6 +7,7 @@
 #include "utils/common/util.h"
 #include "common/common_module.h"
 #include "managers/impl/license_manager_impl.h"
+#include "managers/time_manager.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "utils/serialization/binary_stream.h"
 #include "utils/serialization/sql_functions.h"
@@ -2050,7 +2051,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnId& resourceId, ApiResourceParamsDa
 // getCurrentTime
 ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime)
 {
-    currentTime.value = QDateTime::currentMSecsSinceEpoch();
+    currentTime.value = TimeSynchronizationManager::instance()->getSyncTime();
     return ErrorCode::ok;
 }
 

@@ -62,6 +62,7 @@ namespace ec2 {
     struct ApiLoginData;
 
     struct ApiTimeData;
+    struct ApiPeerSystemTimeData;
 
     struct ApiPeerData;
     struct ApiRuntimeData;
@@ -98,6 +99,7 @@ namespace ec2 {
     (ApiLockData)\
     (ApiMediaServerData)\
     (ApiPanicModeData)\
+    (ApiPeerSystemTimeData)\
     (ApiPropertyTypeData)\
     (ApiResetBusinessRuleData)\
     (ApiResourceData)\

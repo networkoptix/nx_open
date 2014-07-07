@@ -268,6 +268,9 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         case ApiCommand::forcePrimaryTimeServer:
             TimeSynchronizationManager::instance()->primaryTimeServerChanged( tran );
             break;
+        case ApiCommand::broadcastPeerSystemTime:
+            TimeSynchronizationManager::instance()->peerSystemTimeReceived( tran );
+            break;
         default:
             // general transaction
             if (!sender->isReadSync())
@@ -562,7 +565,7 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
     }
 }
 
-void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const ApiPeerData &remotePeer)
+void QnTransactionMessageBus::gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer)
 {
     if (!dbManager)
     {

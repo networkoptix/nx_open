@@ -115,6 +115,7 @@ namespace ec2
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
             runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
             forcePrimaryTimeServer      = 9005,  /*< ApiIdData */
+            broadcastPeerSystemTime     = 9006,  /*< ApiPeerSystemTimeData*/
 
             maxTransactionValue         = 65535
         };

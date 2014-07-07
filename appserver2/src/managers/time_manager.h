@@ -15,6 +15,7 @@
 
 #include <common/common_globals.h>
 #include <nx_ec/ec_api.h>
+#include <nx_ec/data/api_peer_system_time_data.h>
 #include <utils/common/id.h>
 #include <utils/network/http/httptypes.h>
 
@@ -91,6 +92,9 @@ namespace ec2
     };
 
     //!Cares about synchronizing time across all peers in cluster
+    /*!
+        Time with highest priority key is selected as current
+    */
     class TimeSynchronizationManager
     :
         public QObject
@@ -110,21 +114,27 @@ namespace ec2
 
         static TimeSynchronizationManager* instance();
 
+        //!Returns synchronized time
         qint64 getSyncTime() const;
         //!Called when primary time server has been changed by user
         void primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran );
+        void peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran );
+        //!Returns synchrionized time with time priority key (not local, but the one used)
         TimeSyncInfo getTimeSyncInfo() const;
         //!Returns value of internal monotonic clock
         qint64 getMonotonicClock() const;
-        //void remotePeerLost( const QnId& peerID );
+        //!Priority key of local system. May differ from the one used (which returned by \a TimeSynchronizationManager::getTimeSyncInfo)
+        TimePriorityKey localTimePriorityKey() const;
 
     signals:
         //!Emitted when there is ambiguity while choosing primary time server automatically
         /*!
             User SHOULD call \a TimeSynchronizationManager::forcePrimaryTimeServer to set primary time server manually.
             This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
+            \param localSystemTime Local system time (UTC, millis from epoch)
+            \param peersAndTimes pair<peer id, peer local time (UTC, millis from epoch) corresponding to \a localSystemTime>
         */
-        void primaryTimeServerSelectionRequired();
+        void primaryTimeServerSelectionRequired( qint64 localSystemTime, QList<QPair<QnId, qint64> > peersAndTimes );
         //!Emitted when synchronized time has been changed
         void timeChanged( qint64 syncTime );
 
@@ -153,11 +163,15 @@ namespace ec2
         //!Using monotonic clock to be proof to local system time change
         QElapsedTimer m_monotonicClock;
         //!priority key of current server
-        TimePriorityKey m_timePriorityKey;
+        TimePriorityKey m_localTimePriorityKey;
         //!map<priority key, time info>
         std::map<quint64, RemotePeerTimeInfo, std::greater<quint64> > m_timeInfoByPeer;
         mutable QMutex m_mutex;
         TimeSyncInfo m_usedTimeSyncInfo;
+        quint64 m_broadcastSysTimeTaskID;
+        quint64 m_manualTimerServerSelectionCheckTaskID;
+        bool m_terminated;
+        std::map<QnId, TimeSyncInfo> m_systemTimeByPeer;
 
         /*!
             \param remotePeerID
@@ -176,6 +190,8 @@ namespace ec2
         void syncTimeWithExternalSource();
         void onBeforeSendingHttpChunk( QnTransactionTransport* transport, std::vector<nx_http::ChunkExtension>* const extensions );
         void onRecevingHttpChunkExtensions( QnTransactionTransport* transport, const std::vector<nx_http::ChunkExtension>& extensions );
+        void broadcastLocalSystemTime( quint64 taskID );
+        void checkIfManualTimeServerSelectionIsRequired( quint64 taskID );
 
     private slots:
         void onNewConnectionEstablished( const QnTransactionTransportPtr& transport );

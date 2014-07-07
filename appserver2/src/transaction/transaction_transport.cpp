@@ -20,7 +20,7 @@ QSet<QUuid> QnTransactionTransport::m_existConn;
 QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
 QMutex QnTransactionTransport::m_staticMutex;
 
-QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, const ApiPeerData &remotePeer, QSharedPointer<AbstractStreamSocket> socket):
+QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, const ApiPeerData &remotePeer, const QSharedPointer<AbstractStreamSocket>& socket):
     m_localPeer(localPeer),
     m_remotePeer(remotePeer),
     m_lastConnectTime(0), 
@@ -187,8 +187,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                         const size_t fullChunkSize = m_chunkHeaderLen + m_chunkLen + sizeof("\r\n")-1;
                         if( m_readBuffer.size() < fullChunkSize )
                             m_readBuffer.resize( fullChunkSize );
-                        if( !httpChunkHeader.extensions.empty() )
-                            processChunkExtensions( httpChunkHeader );
+                        processChunkExtensions( httpChunkHeader );  //processing chunk extensions even before receiving whole transaction
 
                         if( m_readBufferLen < fullChunkSize )
                         {
@@ -435,6 +434,8 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
     m_chunkLen = httpChunkHeader.chunkSize;
     while (m_chunkHeaderLen > 0) 
     {
+        processChunkExtensions( httpChunkHeader );
+
         int fullChunkLen = m_chunkHeaderLen + m_chunkLen + 2;
         if (bufferLen >= fullChunkLen)
         {
@@ -500,6 +501,9 @@ void QnTransactionTransport::addHttpChunkExtensions( std::vector<nx_http::ChunkE
 
 void QnTransactionTransport::processChunkExtensions( const nx_http::ChunkHeader& httpChunkHeader )
 {
+    if( httpChunkHeader.extensions.empty() )
+        return;
+
     for( auto val: m_httpChunkExtensonHandlers )
         val.second( this, httpChunkHeader.extensions );
 }

@@ -56,6 +56,7 @@ void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runt
         qnLicensePool->setMainHardwareIds(runtimeInfo.mainHardwareIds);
         qnLicensePool->setCompatibleHardwareIds(runtimeInfo.compatibleHardwareIds);
     }
+    lock.unlock();  //to avoid dead-lock in case if directly (or auto) connected slot calls any method of this class
     emit runtimeInfoChanged(runtimeInfo);
 }
 
@@ -72,6 +73,7 @@ void QnRuntimeInfoManager::update(const ec2::ApiRuntimeData& value)
     ec2::ApiRuntimeData newData = value;
     newData.version = existingData.version + 1;
     m_runtimeInfo.insert(value.peer.id, newData);
+    lock.unlock();
     emit runtimeInfoChanged(newData);
 }
 

@@ -34,7 +34,7 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url, const QUuid& peer = QUuid());
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const ApiPeerData &remotePeer);
+        void gotConnectionFromRemotePeer(const QSharedPointer<AbstractStreamSocket>& socket, const ApiPeerData &remotePeer);
         
         void setLocalPeer(const ApiPeerData localPeer);
         ApiPeerData localPeer() const;

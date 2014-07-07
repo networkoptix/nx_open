@@ -47,7 +47,7 @@ public:
 
     QnTransactionTransport(const ApiPeerData &localPeer,
         const ApiPeerData &remotePeer = ApiPeerData(QnId(), Qn::PT_Server),
-        QSharedPointer<AbstractStreamSocket> socket = QSharedPointer<AbstractStreamSocket>());
+        const QSharedPointer<AbstractStreamSocket>& socket = QSharedPointer<AbstractStreamSocket>());
     ~QnTransactionTransport();
 
 signals:
