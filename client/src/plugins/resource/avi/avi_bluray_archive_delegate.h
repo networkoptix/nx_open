@@ -1,8 +1,6 @@
 #ifndef QN_AVI_BLURAY_ARCHIVE_DELEGATE_H
 #define QN_AVI_BLURAY_ARCHIVE_DELEGATE_H
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QStringList>
 #include <QtCore/QFile>
 
@@ -19,7 +17,5 @@ protected:
     virtual QStringList getPlaylist(const QString& url);
     virtual void fillAdditionalInfo(CLFileInfo* fi);
 };
-
-#endif // ENABLE_ARCHIVE
 
 #endif // QN_AVI_BLURAY_ARCHIVE_DELEGATE_H

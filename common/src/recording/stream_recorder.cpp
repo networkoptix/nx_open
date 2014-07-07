@@ -8,8 +8,8 @@
 #include "utils/common/util.h"
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
-#include <plugins/resource/archive/avi_files/avi_archive_delegate.h>
-#include <plugins/resource/archive/avi_files/avi_archive_custom_data.h>
+#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <plugins/resource/avi/avi_archive_custom_data.h>
 #include "transcoding/ffmpeg_audio_transcoder.h"
 #include "transcoding/ffmpeg_video_transcoder.h"
 #include "transcoding/filters/contrast_image_filter.h"

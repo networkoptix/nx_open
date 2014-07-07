@@ -5,8 +5,8 @@
 #include <QtGui/QRegion>
 
 #include "plugins/resource/archive/abstract_archive_delegate.h"
-#include "plugins/resource/archive/avi_files/avi_archive_delegate.h"
-#include "plugins/resource/archive/avi_files/avi_resource.h"
+#include "plugins/resource/avi/avi_archive_delegate.h"
+#include "plugins/resource/avi/avi_resource.h"
 #include "recorder/device_file_catalog.h"
 #include "recorder/storage_manager.h"
 #include "utils/media/sse_helper.h"

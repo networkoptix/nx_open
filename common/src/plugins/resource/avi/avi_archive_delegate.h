@@ -3,11 +3,12 @@
 
 #ifdef ENABLE_ARCHIVE
 
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 
-#include "../abstract_archive_delegate.h"
 #include "core/datapacket/audio_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
+
+#include <plugins/resource/archive/abstract_archive_delegate.h>
 
 extern "C"
 {

@@ -1,7 +1,5 @@
 #include "avi_playlist_archive_delegate.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QMutex>
 
 #include "utils/common/util.h"
@@ -391,5 +389,3 @@ qint64 QnAVIPlaylistArchiveDelegate::endTime()
         return 0;        
     return m_totalContentLength; 
 }
-
-#endif // ENABLE_ARCHIVE

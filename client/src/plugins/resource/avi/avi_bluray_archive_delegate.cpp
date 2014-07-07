@@ -1,7 +1,5 @@
 #include "avi_bluray_archive_delegate.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QDir>
 
 #include "avi_bluray_resource.h"
@@ -608,5 +606,3 @@ void QnAVIBlurayArchiveDelegate::fillAdditionalInfo(CLFileInfo* fi)
         }
     }
 }
-
-#endif // ENABLE_ARCHIVE

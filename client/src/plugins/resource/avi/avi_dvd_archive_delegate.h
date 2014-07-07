@@ -1,8 +1,6 @@
 #ifndef QN_AVI_DVD_ARCHIVE_DELEGATE_H
 #define QN_AVI_DVD_ARCHIVE_DELEGATE_H
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QStringList>
 #include <QtCore/QFile>
 #include "avi_playlist_archive_delegate.h"
@@ -48,7 +46,5 @@ private:
     qint64 m_currentPosition;
     ifo_handle_t* m_mainIfo;
 };
-
-#endif // ENABLE_ARCHIVE
 
 #endif // QN_AVI_DVD_ARCHIVE_DELEGATE_H

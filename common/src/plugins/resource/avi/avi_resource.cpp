@@ -9,11 +9,13 @@
 #include <core/resource/storage_resource.h>
 #include <utils/fs/file.h>
 
-#include "../archive_stream_reader.h"
-#include "../filetypesupport.h"
-#include "../single_shot_file_reader.h"
+#include <plugins/resource/archive/archive_stream_reader.h>
+#include <plugins/resource/archive/single_shot_file_reader.h>
+
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "nov_archive_delegate.h"
+
+#include "filetypesupport.h"
 
 QnAviResource::QnAviResource(const QString& file)
 {

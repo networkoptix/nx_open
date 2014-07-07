@@ -1,7 +1,9 @@
 #include "thumbnails_stream_reader.h"
-#include "plugins/resource/archive/avi_files/avi_archive_delegate.h"
+
 #include "utils/common/util.h"
-#include "plugins/resource/archive/avi_files/thumbnails_archive_delegate.h"
+
+#include "plugins/resource/avi/avi_archive_delegate.h"
+#include "plugins/resource/avi/thumbnails_archive_delegate.h"
 
 
 // used in reverse mode.

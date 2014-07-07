@@ -1,9 +1,7 @@
 #ifndef QN_AVI_DVD_RESOURCE_H
 #define QN_AVI_DVD_RESOURCE_H
 
-#ifdef ENABLE_ARCHIVE
-
-#include "avi_resource.h"
+#include <plugins/resource/avi/avi_resource.h>
 
 class QnAviDvdResource : public QnAviResource
 {
@@ -20,7 +18,5 @@ protected:
 };
 
 typedef QnSharedResourcePointer<QnAviDvdResource> QnAviDvdResourcePtr;
-
-#endif // ENABLE_ARCHIVE
 
 #endif // QN_AVI_DVD_RESOURCE_H

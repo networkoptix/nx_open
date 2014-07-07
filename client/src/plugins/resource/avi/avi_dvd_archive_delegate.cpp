@@ -1,7 +1,5 @@
 #include "avi_dvd_archive_delegate.h"
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QMutex>
 #include <QtCore/QFileInfo>
 #include <QtCore/QUrl>
@@ -769,5 +767,3 @@ qint64 QnAVIDvdArchiveDelegate::packetTimestamp(AVStream* stream, const AVPacket
     // calc ofset between files
     return packetTime + m_fileList[m_currentFileIndex]->m_offsetInMks;
 }
-
-#endif // ENABLE_ARCHIVE

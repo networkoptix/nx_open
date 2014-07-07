@@ -3,8 +3,8 @@
 
 #ifdef ENABLE_ARCHIVE
 
-#include "../abstract_archive_resource.h"
-#include <QSharedPointer>
+#include <plugins/resource/archive/abstract_archive_resource.h>
+
 #include "core/datapacket/media_data_packet.h"
 
 class QnArchiveStreamReader;

@@ -1,12 +1,10 @@
 #ifndef QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H
 #define QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H
 
-#ifdef ENABLE_ARCHIVE
-
 #include <QtCore/QStringList>
 #include <QtCore/QFile>
-#include "avi_archive_delegate.h"
-#include "core/resource/resource_media_layout.h"
+
+#include <plugins/resource/avi/avi_archive_delegate.h>
 
 
 class QnAVIPlaylistArchiveDelegate : public QnAviArchiveDelegate
@@ -24,6 +22,7 @@ public:
     virtual QnResourceVideoLayoutPtr getVideoLayout() override;
 
     static QString addDirPath(const QString sourceDir, const QString& postfix);
+
 protected:
     struct CLFileInfo
     {
@@ -64,8 +63,6 @@ private:
     qint64 m_totalContentLength;
     QSharedPointer<QnDefaultResourceVideoLayout> m_defaultVideoLayout;
 };
-
-#endif // ENABLE_ARCHIVE
 
 #endif // QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H
 

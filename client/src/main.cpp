@@ -44,7 +44,7 @@ extern "C"
     #include <plugins/resource/desktop_win/desktop_resource_searcher.h>
 #endif
 #include "utils/common/util.h"
-#include "plugins/resource/archive/avi_files/avi_resource.h"
+#include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
 #include "core/resource_management/resource_pool.h"
 #include "plugins/resource/arecontvision/resource/av_resource_searcher.h"
