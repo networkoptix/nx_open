@@ -868,7 +868,8 @@ void QnPlOnvifResource::notificationReceived(
     }
 
     if( std::strstr(notification.oasisWsnB2__Topic->__item, "Trigger/Relay") == nullptr &&
-        std::strstr(notification.oasisWsnB2__Topic->__item, "IO/Port") == nullptr )
+        std::strstr(notification.oasisWsnB2__Topic->__item, "IO/Port") == nullptr &&
+        std::strstr(notification.oasisWsnB2__Topic->__item, "Trigger/DigitalInputs") == nullptr )
     {
         NX_LOG( lit("Received notification with unknown topic: %1. Ignoring...").
             arg(QLatin1String(notification.oasisWsnB2__Topic->__item)), cl_logDEBUG2 );
@@ -898,6 +899,7 @@ void QnPlOnvifResource::notificationReceived(
         ++it )
     {
         if( it->name == QLatin1String("port") || 
+            it->name == QLatin1String("InputToken") || 
             it->name == QLatin1String("RelayToken") || 
             it->name == QLatin1String("RelayInputToken") )
         {
