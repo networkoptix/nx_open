@@ -1395,7 +1395,7 @@ void QnWorkbenchActionHandler::at_preferencesLicensesTabAction_triggered() {
 
 void QnWorkbenchActionHandler::at_preferencesServerTabAction_triggered() {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
-    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::ServerPage);
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::EmailPage);
 }
 
 void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {

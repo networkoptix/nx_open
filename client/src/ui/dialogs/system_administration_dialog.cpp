@@ -3,8 +3,11 @@
 
 #include <QtWidgets/QMessageBox>
 
+#include <ui/widgets/settings/popup_settings_widget.h>
 #include <ui/widgets/settings/license_manager_widget.h>
-#include <ui/widgets/settings/server_settings_widget.h>
+#include <ui/widgets/settings/camera_management_widget.h>
+#include <ui/widgets/settings/smtp_settings_widget.h>
+#include <ui/widgets/settings/database_management_widget.h>
 #include <ui/widgets/server_updates_widget.h>
 
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
@@ -15,8 +18,10 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     ui->setupUi(this);
 
     addPage(LicensesPage, new QnLicenseManagerWidget(this), tr("Licenses"));
-    addPage(ServerPage, new QnServerSettingsWidget(this), tr("Server"));
+    addPage(EmailPage, new QnSmtpSettingsWidget(this), tr("Email"));
+    addPage(CamerasPage, new QnCameraManagementWidget(this), tr("Cameras"));
     addPage(UpdatesPage, new QnServerUpdatesWidget(this), tr("Updates"));
+    addPage(BackupPage, new QnDatabaseManagementWidget(this), tr("Backup && Restore"));
 
     loadData();
 }

@@ -5,17 +5,15 @@
 #include <QtCore/QTimer>
 #include <QtGui/QIntValidator>
 
-#include <api/model/kvpair.h>
-#include <nx_ec/ec_api.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/email.h>
-
+#include <ui/widgets/settings/abstract_preferences_widget.h>
 
 namespace Ui {
     class SmtpSettingsWidget;
 }
 
-class QnSmtpSettingsWidget : public QWidget, public QnWorkbenchContextAware
+class QnSmtpSettingsWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -23,8 +21,8 @@ public:
     explicit QnSmtpSettingsWidget(QWidget *parent = 0);
     ~QnSmtpSettingsWidget();
 
-    void updateFromSettings();
-    void submitToSettings();
+    virtual void updateFromSettings() override;
+    virtual void submitToSettings() override;
 
 private:
     QnEmail::Settings settings();
@@ -42,8 +40,6 @@ private slots:
     void at_okTestButton_clicked();
 
     void at_timer_timeout();
-
-    void at_finishedTestEmailSettings(int handle, ec2::ErrorCode errorCode);
 
     void at_advancedCheckBox_toggled(bool toggled);
 private:

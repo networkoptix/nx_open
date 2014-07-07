@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>351</width>
-    <height>380</height>
+    <width>341</width>
+    <height>478</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string/>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,1">
    <item>
     <widget class="QWidget" name="controlsWidget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -67,12 +67,6 @@
    </item>
    <item>
     <widget class="QStackedWidget" name="stackedWidget">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -523,7 +517,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>0</height>
+       <height>40</height>
       </size>
      </property>
     </spacer>

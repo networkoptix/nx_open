@@ -21,8 +21,8 @@ namespace {
     const QLatin1String dbExtension(".db");
 }
 
-QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent, Qt::WindowFlags windowFlags):
-    base_type(parent, windowFlags),
+QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::DatabaseManagementWidget())
 {
@@ -131,7 +131,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     QnAppServerConnectionFactory::getConnection2()->restoreDatabaseAsync( data, dialog.data(), restoreDatabaseHandler );
     dialog->exec();
     if(dialog->wasCanceled())
-        return; // TODO: #Elric make non-cancellable.   TODO: #ak is running request finish OK?
+        return; // TODO: #Elric make non-cancelable.   TODO: #ak is running request finish OK?
 
     if( errorCode == ec2::ErrorCode::ok ) {
         QMessageBox::information(this,
@@ -140,7 +140,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
         menu()->trigger(Qn::ReconnectAction);
     } else {
         NX_LOG( lit("Failed to restore EC database from file '$1'. $2").arg(fileName).arg(ec2::toString(errorCode)), cl_logERROR );
-        QMessageBox::critical(this, tr("Error"), tr("An error has occured while restoring the database from file '%1'.")
+        QMessageBox::critical(this, tr("Error"), tr("An error has occurred while restoring the database from file '%1'.")
                               .arg(fileName));
     }
 }

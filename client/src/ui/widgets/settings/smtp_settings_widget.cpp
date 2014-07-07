@@ -6,6 +6,8 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
+#include <nx_ec/ec_api.h>
+
 #include <ui/style/warning_style.h>
 
 #include <ui/actions/actions.h>
@@ -56,7 +58,7 @@ private:
 };
 
 QnSmtpSettingsWidget::QnSmtpSettingsWidget(QWidget *parent) :
-    QWidget(parent),
+    QnAbstractPreferencesWidget(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::SmtpSettingsWidget),
     m_testHandle(-1),
@@ -246,6 +248,8 @@ void QnSmtpSettingsWidget::at_advancedCheckBox_toggled(bool toggled) {
 
 void QnSmtpSettingsWidget::at_testButton_clicked() {
     QnEmail::Settings result = settings();
+    result.timeout = testSmtpTimeoutMSec / 1000;
+
     if (result.isNull()) {
         QMessageBox::warning(this, tr("Invalid data"), tr("Provided parameters are not valid. Could not perform a test."));
         return;
@@ -277,7 +281,14 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     m_testHandle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->testEmailSettings(
         result,
         this,
-        &QnSmtpSettingsWidget::at_finishedTestEmailSettings );
+        [this](int handle, ec2::ErrorCode errorCode) {
+            if (handle != m_testHandle)
+                return;
+
+            stopTesting(errorCode != ec2::ErrorCode::ok
+                ? tr("Error while testing settings")
+                : tr("Success") );
+    });
     ui->stackedWidget->setCurrentIndex(TestingPage);
 }
 
@@ -293,15 +304,6 @@ void QnSmtpSettingsWidget::at_timer_timeout() {
     }
 
     stopTesting(tr("Timed out"));
-}
-
-void QnSmtpSettingsWidget::at_finishedTestEmailSettings( int handle, ec2::ErrorCode errorCode ) {
-    if (handle != m_testHandle)
-        return;
-
-    stopTesting(errorCode != ec2::ErrorCode::ok
-            ? tr("Error while testing settings")
-            : tr("Success") );
 }
 
 void QnSmtpSettingsWidget::at_okTestButton_clicked() {
