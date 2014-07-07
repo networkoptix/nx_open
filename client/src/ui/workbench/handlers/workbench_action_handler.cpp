@@ -1347,7 +1347,7 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(mainWindow()));
     dialog->setCurrentPage(QnPreferencesDialog::GeneralPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
@@ -1386,7 +1386,7 @@ void QnWorkbenchActionHandler::at_preferencesServerTabAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(mainWindow()));
     dialog->setCurrentPage(QnPreferencesDialog::NotificationsPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
