@@ -22,8 +22,9 @@
 #include "mustache/mustache_helper.h"
 #include "mustache/partial_info.h"
 
-#include "utils/common/synctime.h"
+#include <utils/common/synctime.h>
 #include <utils/common/email.h>
+#include <utils/common/log.h>
 #include "business_strings_helper.h"
 #include "version.h"
 
