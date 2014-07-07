@@ -110,8 +110,6 @@ public:
 protected:
     ec2::AbstractECConnectionPtr connection2() const;
 
-    bool canAutoDelete(const QnResourcePtr &resource) const;
-
     struct AddToLayoutParams {
         bool usePosition;
         QPointF position;
