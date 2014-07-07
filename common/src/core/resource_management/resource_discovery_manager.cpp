@@ -19,7 +19,7 @@
 #include <core/resource_management/resource_searcher.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <plugins/resources/upnp/upnp_device_searcher.h>
+#include <plugins/resource/upnp/upnp_device_searcher.h>
 #include <plugins/storage/dts/abstract_dts_searcher.h>
 
 #include <utils/common/sleep.h>

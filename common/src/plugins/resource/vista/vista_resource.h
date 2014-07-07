@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_ONVIF
 
-#include <plugins/resources/onvif/onvif_resource.h>
+#include <plugins/resource/onvif/onvif_resource.h>
 
 class QnVistaResource : public QnPlOnvifResource {
     Q_OBJECT

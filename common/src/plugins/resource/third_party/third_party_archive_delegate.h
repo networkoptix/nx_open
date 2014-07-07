@@ -7,7 +7,7 @@
 #define THIRD_PARTY_ARCHIVE_DELEGATE_H
 
 #include <plugins/camera_plugin.h>
-#include <plugins/resources/archive/abstract_archive_delegate.h>
+#include <plugins/resource/archive/abstract_archive_delegate.h>
 
 
 class ThirdPartyArchiveDelegate

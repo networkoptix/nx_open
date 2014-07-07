@@ -16,8 +16,8 @@ extern "C"
 #include "core/resource/storage_resource.h"
 #include "core/resource/media_resource.h"
 
-#include <plugins/resources/archive/avi_files/avi_resource.h>
-#include <plugins/resources/archive/avi_files/avi_archive_custom_data.h>
+#include <plugins/resource/archive/avi_files/avi_resource.h>
+#include <plugins/resource/archive/avi_files/avi_archive_custom_data.h>
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 
 #include "motion/light_motion_archive_connection.h"

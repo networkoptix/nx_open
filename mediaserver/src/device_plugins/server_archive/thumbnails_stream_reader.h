@@ -4,7 +4,7 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/resource/resource_media_layout.h"
 #include <libavformat/avformat.h>
-#include "plugins/resources/archive/abstract_archive_delegate.h"
+#include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "recorder/device_file_catalog.h"
 #include "device_plugins/server_archive/server_archive_delegate.h"
 

@@ -2,7 +2,7 @@
 
 #include "dw_zoom_ptz_controller.h"
 
-#include <plugins/resources/camera_settings/camera_settings.h>
+#include <plugins/resource/camera_settings/camera_settings.h>
 
 #include "digital_watchdog_resource.h"
 

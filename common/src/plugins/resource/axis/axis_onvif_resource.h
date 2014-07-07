@@ -4,7 +4,7 @@
 #ifdef ENABLE_AXIS
 #ifdef ENABLE_ONVIF
 
-#include <plugins/resources/onvif/onvif_resource.h>
+#include <plugins/resource/onvif/onvif_resource.h>
 
 class QnAxisOnvifResource : public QnPlOnvifResource
 {

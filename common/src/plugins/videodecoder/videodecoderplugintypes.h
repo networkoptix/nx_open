@@ -7,8 +7,8 @@
 
 #include <string>
 
-#include <plugins/videodecoders/stree/resourcecontainer.h>
-#include <plugins/videodecoders/stree/resourcenameset.h>
+#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <plugins/videodecoder/stree/resourcenameset.h>
 
 
 namespace DecoderParameter

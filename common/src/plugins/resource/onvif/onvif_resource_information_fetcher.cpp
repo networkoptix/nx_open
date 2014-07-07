@@ -7,8 +7,8 @@
 #include "../digitalwatchdog/digital_watchdog_resource.h"
 #include "../sony/sony_resource.h"
 #include "core/resource_management/resource_pool.h"
-#include "plugins/resources/flex_watch/flexwatch_resource.h"
-#include "plugins/resources/axis/axis_onvif_resource.h"
+#include "plugins/resource/flex_watch/flexwatch_resource.h"
+#include "plugins/resource/axis/axis_onvif_resource.h"
 #include "../vista/vista_resource.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";

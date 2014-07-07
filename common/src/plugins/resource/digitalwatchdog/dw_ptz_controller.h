@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_ONVIF
 
-#include <plugins/resources/onvif/onvif_ptz_controller.h>
+#include <plugins/resource/onvif/onvif_ptz_controller.h>
 
 class QnDwPtzController: public QnOnvifPtzController {
     Q_OBJECT

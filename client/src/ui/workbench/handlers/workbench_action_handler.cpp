@@ -36,8 +36,8 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 
-#include <plugins/resources/archive/archive_stream_reader.h>
-#include <plugins/resources/archive/avi_files/avi_resource.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
+#include <plugins/resource/archive/avi_files/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <recording/time_period_list.h>

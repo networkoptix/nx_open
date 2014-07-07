@@ -16,7 +16,7 @@
 #include <plugins/resource/desktop_win/desktop_resource.h>
 #endif
 #include "utils/common/util.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 #include "core/resource/camera_resource.h"
 #include "redass/redass_controller.h"
 

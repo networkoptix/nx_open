@@ -6,7 +6,7 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtCore/QElapsedTimer>
-#include "plugins/resources/upnp/upnp_resource_searcher.h"
+#include "plugins/resource/upnp/upnp_resource_searcher.h"
 
 
 class QnActiResourceSearcher : public QObject, public QnUpnpResourceSearcher

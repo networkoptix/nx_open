@@ -17,10 +17,10 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/resource_media_layout.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 
 #include "utils/network/tcp_connection_priv.h"
-#include "plugins/resources/archive/abstract_archive_delegate.h"
+#include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "camera/camera_pool.h"
 #include "utils/network/rtpsession.h"
 #include "recorder/recording_manager.h"

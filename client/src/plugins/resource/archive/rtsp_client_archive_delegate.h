@@ -4,10 +4,10 @@
 
 #include "utils/network/rtpsession.h"
 #include "core/resource/resource_media_layout.h"
-#include "plugins/resources/archive/abstract_archive_delegate.h"
+#include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "utils/common/util.h"
 #include "recording/time_period.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 #include "utils/network/ffmpeg_rtp_parser.h"
 
 struct AVFormatContext;

@@ -12,7 +12,7 @@
 #include "core/datapacket/third_party_audio_data_packet.h"
 #include "core/datapacket/third_party_video_data_packet.h"
 #include "plugins/plugin_tools.h"
-#include "plugins/resources/onvif/dataprovider/onvif_mjpeg.h"
+#include "plugins/resource/onvif/dataprovider/onvif_mjpeg.h"
 #include "motion_data_picture.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"

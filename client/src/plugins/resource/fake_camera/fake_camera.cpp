@@ -1,6 +1,6 @@
 #include "fake_camera.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
+#include "plugins/resource/archive/avi_files/avi_archive_delegate.h"
 
 QnFakeCamera::QnFakeCamera()
 {

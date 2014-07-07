@@ -56,25 +56,25 @@
 #include <platform/platform_abstraction.h>
 
 #include <plugins/plugin_manager.h>
-#include <plugins/resources/acti/acti_resource_searcher.h>
-#include <plugins/resources/archive/avi_files/avi_resource.h>
-#include <plugins/resources/arecontvision/resource/av_resource_searcher.h>
-#include <plugins/resources/axis/axis_resource_searcher.h>
-#include <plugins/resources/desktop_camera/desktop_camera_registrator.h>
-#include <plugins/resources/desktop_camera/desktop_camera_resource_searcher.h>
-#include <plugins/resources/desktop_camera/desktop_camera_deleter.h>
-#include <plugins/resources/d-link/dlink_resource_searcher.h>
-#include <plugins/resources/droid/droid_resource_searcher.h>
-#include <plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h>
-#include <plugins/resources/flex_watch/flexwatch_resource_searcher.h>
-#include <plugins/resources/iqinvision/iqinvision_resource_searcher.h>
-#include <plugins/resources/isd/isd_resource_searcher.h>
-#include <plugins/resources/mserver_resource_searcher.h>
-#include <plugins/resources/onvif/onvif_resource_searcher.h>
-#include <plugins/resources/pulse/pulse_resource_searcher.h>
-#include <plugins/resources/stardot/stardot_resource_searcher.h>
-#include <plugins/resources/test_camera/testcamera_resource_searcher.h>
-#include <plugins/resources/third_party/third_party_resource_searcher.h>
+#include <plugins/resource/acti/acti_resource_searcher.h>
+#include <plugins/resource/archive/avi_files/avi_resource.h>
+#include <plugins/resource/arecontvision/resource/av_resource_searcher.h>
+#include <plugins/resource/axis/axis_resource_searcher.h>
+#include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
+#include <plugins/resource/desktop_camera/desktop_camera_resource_searcher.h>
+#include <plugins/resource/desktop_camera/desktop_camera_deleter.h>
+#include <plugins/resource/d-link/dlink_resource_searcher.h>
+#include <plugins/resource/droid/droid_resource_searcher.h>
+#include <plugins/resource/droid_ipwebcam/ipwebcam_droid_resource_searcher.h>
+#include <plugins/resource/flex_watch/flexwatch_resource_searcher.h>
+#include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
+#include <plugins/resource/isd/isd_resource_searcher.h>
+#include <plugins/resource/mserver_resource_searcher.h>
+#include <plugins/resource/onvif/onvif_resource_searcher.h>
+#include <plugins/resource/pulse/pulse_resource_searcher.h>
+#include <plugins/resource/stardot/stardot_resource_searcher.h>
+#include <plugins/resource/test_camera/testcamera_resource_searcher.h>
+#include <plugins/resource/third_party/third_party_resource_searcher.h>
 #include <plugins/storage/coldstore/coldstore_storage.h>
 #include <plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
@@ -137,7 +137,7 @@
 #include "common/systemexcept_win32.h"
 #endif
 #include "core/ptz/server_ptz_controller_pool.h"
-#include "plugins/resources/acti/acti_resource.h"
+#include "plugins/resource/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
 #include "utils/network/modulefinder.h"
@@ -151,7 +151,7 @@
 #include "rest/handlers/old_client_connect_rest_handler.h"
 
 
-//#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
+//#include "plugins/resource/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.

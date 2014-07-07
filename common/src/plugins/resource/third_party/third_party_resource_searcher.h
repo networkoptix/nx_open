@@ -11,8 +11,8 @@
 
 #include "third_party_resource.h"
 #include "../mdns/mdns_device_searcher.h"
-#include "plugins/resources/upnp/upnp_resource_searcher.h"
-#include "plugins/resources/upnp/upnp_device_searcher.h"
+#include "plugins/resource/upnp/upnp_resource_searcher.h"
+#include "plugins/resource/upnp/upnp_device_searcher.h"
 #include "../../camera_plugin.h"
 #include "../../camera_plugin_qt_wrapper.h"
 

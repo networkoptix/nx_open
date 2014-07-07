@@ -5,7 +5,7 @@
 #include "core/resource/camera_resource.h"
 #include "flexwatch_resource.h"
 #include "utils/common/sleep.h"
-#include "plugins/resources/onvif/onvif_resource_searcher.h"
+#include "plugins/resource/onvif/onvif_resource_searcher.h"
 #include "utils/network/mac_address.h"
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;

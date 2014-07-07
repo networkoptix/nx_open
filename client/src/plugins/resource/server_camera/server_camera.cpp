@@ -1,5 +1,5 @@
 #include "server_camera.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 #include "plugins/resource/archive/rtsp_client_archive_delegate.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
