@@ -1,8 +1,9 @@
 #ifndef _SYNC_PLAY_ARCHIVE_DELEGATE_H__
 #define _SYNC_PLAY_ARCHIVE_DELEGATE_H__
 
-#include "abstract_archive_delegate.h"
-#include "utils/media/externaltimesource.h"
+#include <utils/media/externaltimesource.h>
+
+#include <plugins/resource/archive/abstract_archive_delegate.h>
 
 class QnAbstractArchiveReader;
 class QnArchiveSyncPlayWrapper;

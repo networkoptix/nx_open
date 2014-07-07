@@ -15,6 +15,7 @@ public:
     QnTimePeriod getPlaybackRange() const;
     
     qint64 endTimeMs() const;
+
 private:
     QnTimePeriodList m_playbackMask;
     QnTimePeriodList m_playBackMaskOrig;

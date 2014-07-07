@@ -1,16 +1,15 @@
+#include "syncplay_wrapper.h"
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QWaitCondition>
 #include <QtCore/QCoreApplication>
 
-#include "syncplay_wrapper.h"
-#include "syncplay_archive_delegate.h"
-#include "abstract_archive_stream_reader.h"
-#include "utils/media/externaltimesource.h"
 #include "utils/common/util.h"
-#include "playbackmask_helper.h"
 #include "utils/common/synctime.h"
-#include "utils/common/synctime.h"
+
+#include <recording/playbackmask_helper.h>
+
+#include "syncplay_archive_delegate.h"
 
 
 static const qint64 SYNC_EPS = 1000 * 500;

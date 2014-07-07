@@ -4,7 +4,7 @@
 #include "recording/stream_recorder.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "camera/camera_pool.h"
-#include "device_plugins/server_archive/server_archive_delegate.h"
+#include "plugins/resource/server_archive/server_archive_delegate.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
 #include "camera/video_camera.h"
 #include "core/misc/schedule_task.h"

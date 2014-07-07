@@ -18,7 +18,7 @@
 #include "camera/camera_pool.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
-#include "device_plugins/server_archive/server_archive_delegate.h"
+#include "plugins/resource/server_archive/server_archive_delegate.h"
 #include "utils/common/util.h"
 #include "core/resource/camera_resource.h"
 #include "cached_output_stream.h"

@@ -6,7 +6,7 @@
 #include <libavformat/avformat.h>
 #include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "recorder/device_file_catalog.h"
-#include "device_plugins/server_archive/server_archive_delegate.h"
+#include "plugins/resource/server_archive/server_archive_delegate.h"
 
 /*
 * QnThumbnailsStreamReader gets frame sequence in the selected range with defined step.

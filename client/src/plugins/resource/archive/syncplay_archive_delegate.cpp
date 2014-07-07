@@ -1,8 +1,8 @@
 #include "syncplay_archive_delegate.h"
+
+#include <utils/common/util.h>
+
 #include "syncplay_wrapper.h"
-#include "abstract_archive_delegate.h"
-#include "abstract_archive_stream_reader.h"
-#include "utils/common/util.h"
 
 QnSyncPlayArchiveDelegate::QnSyncPlayArchiveDelegate(QnAbstractArchiveReader* reader, QnArchiveSyncPlayWrapper* syncWrapper, 
                                                      QnAbstractArchiveDelegate* ownerDelegate):

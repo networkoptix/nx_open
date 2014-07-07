@@ -2,10 +2,10 @@
 
 extern "C"
 {
-    #include <libavutil/avutil.h>
+    #include <libavutil/avutil.h> /* For AV_NOPTS_VALUE. */
 }
 
-#include "utils/common/util.h"
+#include <utils/common/util.h>
 
 
 QnPlaybackMaskHelper::QnPlaybackMaskHelper()
