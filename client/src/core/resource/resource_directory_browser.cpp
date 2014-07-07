@@ -194,7 +194,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     layout->setParentId(0);
     layout->setId(QnId::createUuid());
     layout->setName(QFileInfo(xfile).fileName());
-    layout->addFlags(QnResource::local);
+    // No need to do so, at end of this function the author do it again. ---- DPENG
+    //layout->addFlags(QnResource::local);
 
     layout->addFlags(QnResource::url);
     layout->setUrl(xfile);
@@ -267,7 +268,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     delete itemNamesIO;
     delete itemTimeZonesIO;
     layout->setItems(updatedItems);
-    layout->addFlags(QnResource::local);
+    // remove for QnResource::local help fix bugs 3471, not sure whether it has side effects or not. --- DPENG
+    //layout->addFlags(QnResource::local);
     return layout;
 }
 
