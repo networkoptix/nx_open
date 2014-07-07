@@ -24,8 +24,6 @@ public:
     enum DialogPage {
         GeneralPage,
         RecordingPage,
-        LicensesPage,
-        ServerPage,
         NotificationsPage,
 
         PageCount

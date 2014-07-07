@@ -1,30 +1,42 @@
 #ifndef UPDATE_DIALOG_H
 #define UPDATE_DIALOG_H
 
-#include <QtWidgets/QDialog>
-
+#include <ui/dialogs/button_box_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
 class QnSystemAdministrationDialog;
 }
 
-class QnServerUpdatesWidget;
+class QnAbstractPreferencesWidget;
 
-class QnSystemAdministrationDialog : public QDialog, public QnWorkbenchContextAware {
+class QnSystemAdministrationDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware {
     Q_OBJECT
-    typedef QDialog base_type;
+    typedef QnButtonBoxDialog base_type;
 public:
-    QnSystemAdministrationDialog(QnWorkbenchContext *context, QWidget *parent = 0);
-    ~QnSystemAdministrationDialog();
+    enum DialogPage {
+        ServerPage,
+        LicensesPage,
+        UpdatesPage,
+
+        PageCount
+    };
+
+    QnSystemAdministrationDialog(QWidget *parent = 0);
+
+    DialogPage currentPage() const;
+    void setCurrentPage(DialogPage page);
 
     virtual void reject() override;
     virtual void accept() override;
+private:
+    void updateFromSettings();
+    void submitToSettings();
 
 private:
     QScopedPointer<Ui::QnSystemAdministrationDialog> ui;
 
-    QnServerUpdatesWidget *m_updatesWidget;
+    QMap<DialogPage, QnAbstractPreferencesWidget*> m_pages;
 };
 
 #endif // UPDATE_DIALOG_H

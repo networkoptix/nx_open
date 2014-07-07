@@ -9,10 +9,8 @@
 #include <ui/style/warning_style.h>
 
 #include <ui/widgets/settings/general_preferences_widget.h>
-#include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <ui/widgets/settings/popup_settings_widget.h>
-#include <ui/widgets/settings/server_settings_widget.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -34,17 +32,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 
     m_pages[NotificationsPage] = new QnPopupSettingsWidget(this);
     ui->tabWidget->addTab(m_pages[NotificationsPage], tr("Notifications"));
-
-    bool isAdmin = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
-    if (isAdmin) {
-        m_pages[LicensesPage] = new QnLicenseManagerWidget(this);
-        ui->tabWidget->addTab(m_pages[LicensesPage], tr("Licenses"));
-    }
-
-    if (isAdmin) {
-        m_pages[ServerPage] = new QnServerSettingsWidget(this);
-        ui->tabWidget->addTab(m_pages[ServerPage], tr("Server"));
-    }
 
     if (qnSettings->isWritable()) {
         ui->readOnlyWarningLabel->hide();

@@ -1354,17 +1354,35 @@ void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_preferencesLicensesTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
-    dialog->setCurrentPage(QnPreferencesDialog::LicensesPage);
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    bool newlyCreated = false;
+    if (!m_systemAdministrationDialog) {
+        m_systemAdministrationDialog = new QnSystemAdministrationDialog(mainWindow());
+        newlyCreated = true;
+    }
+
+    QRect oldGeometry = systemAdministrationDialog()->geometry();
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::LicensesPage);
+    systemAdministrationDialog()->show();
+    systemAdministrationDialog()->raise();
+    systemAdministrationDialog()->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
+    if (!newlyCreated)
+        systemAdministrationDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_preferencesServerTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
-    dialog->setCurrentPage(QnPreferencesDialog::ServerPage);
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    bool newlyCreated = false;
+    if (!m_systemAdministrationDialog) {
+        m_systemAdministrationDialog = new QnSystemAdministrationDialog(mainWindow());
+        newlyCreated = true;
+    }
+
+    QRect oldGeometry = systemAdministrationDialog()->geometry();
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::ServerPage);
+    systemAdministrationDialog()->show();
+    systemAdministrationDialog()->raise();
+    systemAdministrationDialog()->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
+    if (!newlyCreated)
+        systemAdministrationDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
@@ -1414,13 +1432,15 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
     bool newlyCreated = false;
     if (!m_systemAdministrationDialog) {
-        m_systemAdministrationDialog = new QnSystemAdministrationDialog(context(), mainWindow());
+        m_systemAdministrationDialog = new QnSystemAdministrationDialog(mainWindow());
         newlyCreated = true;
     }
 
     QRect oldGeometry = systemAdministrationDialog()->geometry();
     systemAdministrationDialog()->show();
-    if (newlyCreated)
+    systemAdministrationDialog()->raise();
+    systemAdministrationDialog()->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
+    if (!newlyCreated)
         systemAdministrationDialog()->setGeometry(oldGeometry);
 }
 
