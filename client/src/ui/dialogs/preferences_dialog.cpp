@@ -3,6 +3,8 @@
 
 #include <client/client_settings.h>
 
+#include <api/app_server_connection.h>
+
 #include <ui/screen_recording/screen_recorder.h>
 #include <ui/style/warning_style.h>
 

@@ -33,10 +33,6 @@ namespace ec2
         ApiResourceParamDataList paramList;
         m_dbManager->doQueryNoLock(nullptr, paramList);
 
-        QnKvPairList kvPairs;
-        fromApiToResourceList(paramList, kvPairs);
-
-        m_emailManagerImpl.configure(kvPairs);
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
         QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), Qn::PT_Server));
     }

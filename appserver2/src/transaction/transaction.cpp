@@ -138,11 +138,6 @@ namespace ec2
                 case getCurrentTime:
                     return "getCurrentTime";
 
-                case getSettings:
-                    return "getSettings";
-                case saveSettings:
-                    return "saveSettings";
-
                 case uploadUpdate:
                     return "uploadUpdate";
                 case uploadUpdateResponce:
@@ -159,6 +154,11 @@ namespace ec2
 
                 case runtimeInfoChanged:
                     return "runtimeInfoChanged";
+
+                case testEmailSettings:
+                    return "testEmailSettings";
+                case sendEmail:
+                    return "sendEmail";
 
                 default:
                     return "unknown " + QString::number((int)val);

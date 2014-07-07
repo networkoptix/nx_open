@@ -74,13 +74,10 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="simplePage">
       <layout class="QFormLayout" name="formLayout_3">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-       </property>
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -123,7 +120,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="simpleSignatureLabel">
          <property name="text">
           <string>&amp;System Signature:</string>
@@ -134,16 +131,26 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLabel" name="detectErrorLabel">
+        <widget class="QLineEdit" name="simpleSignatureLineEdit">
+         <property name="placeholderText">
+          <string>Enter short system description here...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="simpleSupportEmailLabel">
          <property name="text">
-          <string/>
+          <string>Support Email:</string>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLineEdit" name="simpleSignatureLineEdit">
-         <property name="placeholderText">
-          <string>Enter short system description here...</string>
+        <widget class="QLineEdit" name="simpleSupportEmailLineEdit"/>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLabel" name="detectErrorLabel">
+         <property name="text">
+          <string/>
          </property>
         </widget>
        </item>
@@ -319,6 +326,23 @@
           <widget class="QLineEdit" name="signatureLineEdit">
            <property name="placeholderText">
             <string>Enter short system description here...</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="supportEmailLabel">
+           <property name="text">
+            <string>Support Email:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="supportEmailLineEdit"/>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="supportEmailWarningLabel">
+           <property name="text">
+            <string/>
            </property>
           </widget>
          </item>
