@@ -640,16 +640,19 @@ void initAppServerConnection(const QSettings &settings)
     else if (host.isEmpty() || host == "localhost") 
     {
         appServerUrl = QUrl(QString("file:///") + closeDirPath(getDataDirectory()));
-
-        QString staticDBPath = settings.value("staticDataDir").toString();
-        if (!staticDBPath.isEmpty())
-            params.addQueryItem("staticdb_path", staticDBPath);
     }
     else {
         appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
         int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
         appServerUrl.setHost(host);
         appServerUrl.setPort(port);
+    }
+    if (appServerUrl.scheme() == "file")
+    {
+        QString staticDBPath = settings.value("staticDataDir").toString();
+        if (!staticDBPath.isEmpty()) {
+            params.addQueryItem("staticdb_path", staticDBPath);
+	}
     }
 
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
