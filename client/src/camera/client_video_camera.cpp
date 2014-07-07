@@ -1,11 +1,12 @@
 #include "client_video_camera.h"
 
 #include "core/dataprovider/media_streamdataprovider.h"
-#include "ui/style/skin.h"
+
 #include <core/resource/media_resource.h>
-#include "core/resource/security_cam_resource.h"
-#include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include <core/resource/security_cam_resource.h>
+
+#include <plugins/resource/archive/rtsp_client_archive_delegate.h>
+#include <plugins/resources/archive/archive_stream_reader.h>
 
 QString QnClientVideoCamera::errorString(int errCode) {
     switch (errCode) {

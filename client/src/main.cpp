@@ -41,7 +41,7 @@ extern "C"
 #include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
 #ifdef Q_OS_WIN
-    #include "device_plugins/desktop_win/device/desktop_resource_searcher.h"
+    #include <plugins/resource/desktop_win/desktop_resource_searcher.h>
 #endif
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
@@ -49,8 +49,8 @@ extern "C"
 #include "core/resource_management/resource_pool.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
-#include "device_plugins/server_camera/server_camera.h"
-#include "device_plugins/server_camera/server_camera_factory.h"
+#include <plugins/resource/server_camera/server_camera.h>
+#include <plugins/resource/server_camera/server_camera_factory.h>
 
 
 #define TEST_RTSP_SERVER

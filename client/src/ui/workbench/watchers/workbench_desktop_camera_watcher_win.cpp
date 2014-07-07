@@ -8,7 +8,7 @@
 
 #include <api/media_server_connection.h>
 #include "core/resource/resource_fwd.h"
-#include "device_plugins/desktop_win/device/desktop_resource.h"
+#include "plugins/resource/desktop_win/desktop_resource.h"
 
 enum {
     ServerTimeUpdatePeriod = 1000 * 60 * 2, /* 2 minutes. */

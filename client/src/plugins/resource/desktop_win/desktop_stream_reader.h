@@ -5,8 +5,9 @@
 
 #ifdef Q_OS_WIN
 
-#include "../buffered_screen_grabber.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
+
+#include "buffered_screen_grabber.h"
 
 
 class QnDesktopStreamreader: public CLServerPushStreamReader {

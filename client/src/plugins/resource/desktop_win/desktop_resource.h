@@ -5,9 +5,9 @@
 
 #include "core/resource/resource.h"
 #include "plugins/resources/archive/abstract_archive_resource.h"
-#include "../desktop_data_provider_wrapper.h"
+#include "desktop_data_provider_wrapper.h"
 #include "core/resource/resource_fwd.h"
-#include "device_plugins/desktop_camera/desktop_camera_connection.h"
+#include "plugins/resource/desktop_camera/desktop_camera_connection.h"
 
 #ifdef _WIN32
 

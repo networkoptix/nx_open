@@ -2,11 +2,10 @@
 
 #ifdef Q_OS_WIN
 
-#include "device_plugins/desktop_win/desktop_data_provider.h"
+#include "plugins/resource/desktop_win/desktop_data_provider.h"
 #include "ui/screen_recording/video_recorder_settings.h"
-#include "ui/style/skin.h"
 #include "core/resource/media_server_resource.h"
-#include "device_plugins/desktop_camera/desktop_camera_connection.h"
+#include "plugins/resource/desktop_camera/desktop_camera_connection.h"
 
 namespace {
     const QUuid desktopResourceUuid(lit("{B3B2235F-D279-4d28-9012-00DE1002A61D}"));

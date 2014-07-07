@@ -6,7 +6,7 @@
 #include "core/resource_management/resource_discovery_manager.h"
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
-#include "device_plugins/server_camera/server_camera.h"
+#include <plugins/resource/server_camera/server_camera.h>
 
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),

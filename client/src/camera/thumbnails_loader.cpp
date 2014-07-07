@@ -25,7 +25,7 @@ extern "C"
 #include "plugins/resources/archive/avi_files/thumbnails_archive_delegate.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 
-#include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
+#include "plugins/resource/archive/rtsp_client_archive_delegate.h"
 
 #include "utils/media/frame_info.h"
 
