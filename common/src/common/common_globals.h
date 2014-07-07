@@ -502,6 +502,11 @@ public:
 } // namespace Qn
 
 
+// TODO: #Elric #enum
+enum {MD_WIDTH = 44, MD_HEIGHT = 32};
+
+
+
 /** 
  * \def lit
  * Helper macro to mark strings that are not to be translated. 

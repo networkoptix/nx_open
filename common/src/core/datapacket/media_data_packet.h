@@ -153,10 +153,6 @@ typedef QSharedPointer<const QnMetaDataV1> QnConstMetaDataV1Ptr;
 Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
 
 
-// TODO: #Elric #enum
-enum {MD_WIDTH = 44, MD_HEIGHT = 32};
-
-
 /** 
 * This structure used for serialized QnMetaDataV1
 * Timestamp and duration specified in milliseconds
