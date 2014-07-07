@@ -29,6 +29,10 @@ class QnTransactionTransport: public QObject, public aio::AIOEventHandler
 {
     Q_OBJECT
 public:
+    //not using Qt signal/slot because it is undefined in what thread this object lives and in what thread TimerSynchronizationManager lives
+    typedef std::function<void(QnTransactionTransport*, const std::vector<nx_http::ChunkExtension>&)> HttpChunkExtensonHandler;
+    typedef std::function<void(QnTransactionTransport*, std::vector<nx_http::ChunkExtension>*)> BeforeSendingChunkHandler;
+
     enum State {
         NotDefined,
         ConnectingStage1,
@@ -93,6 +97,19 @@ public:
     void setState(State state);
     State getState() const;
 
+    //!Set \a eventHandler that will receive all http chunk extensions
+    /*!
+        \return event handler id that may be used to remove event handler with \a QnTransactionTransport::removeEventHandler call
+    */
+    int setHttpChunkExtensonHandler( HttpChunkExtensonHandler eventHandler );
+    //!Set \a eventHandler that will be called before sending each http chunk. It (handler) is allowed to add some extensions to the chunk
+    /*!
+        \return event handler id that may be used to remove event handler with \a QnTransactionTransport::removeEventHandler call
+    */
+    int setBeforeSendingChunkHandler( BeforeSendingChunkHandler eventHandler );
+    //!Remove event handler, installed by \a QnTransactionTransport::setHttpChunkExtensonHandler or \a QnTransactionTransport::setBeforeSendingChunkHandler
+    void removeEventHandler( int eventHandlerID );
+
     static bool tryAcquireConnecting(const QnId& remoteGuid, bool isOriginator);
     static bool tryAcquireConnected(const QnId& remoteGuid, bool isOriginator);
     static void connectingCanceled(const QnId& id, bool isOriginator);
@@ -129,6 +146,10 @@ private:
     std::deque<DataToSend> m_dataToSend;
     QUrl m_remoteAddr;
     bool m_connected;
+
+    std::map<int, HttpChunkExtensonHandler> m_httpChunkExtensonHandlers;
+    std::map<int, BeforeSendingChunkHandler> m_beforeSendingChunkHandlers;
+    int m_prevGivenHandlerID;
 
     static QSet<QUuid> m_existConn;
     typedef QMap<QUuid, QPair<bool, bool>> ConnectingInfoMap;

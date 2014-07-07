@@ -43,7 +43,7 @@ namespace ec2
         Ec2DirectConnectionPtr m_directConnection;
         QMutex m_mutex;
         ResourceContext m_resCtx;
-        TimeSynchronizationManager m_timeSynchronizationManager;
+        std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
         //std::map<QUrl, AbstractECConnectionPtr> m_urlToConnection;
 
         int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);

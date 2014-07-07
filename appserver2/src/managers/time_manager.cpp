@@ -12,6 +12,7 @@
 #include <QtCore/QMutexLocker>
 
 #include <common/common_module.h>
+#include <transaction/transaction_message_bus.h>
 
 
 namespace ec2
@@ -136,6 +137,10 @@ namespace ec2
 
         assert( TimeManager_instance == nullptr );
         TimeManager_instance = this;
+
+        connect( QnTransactionMessageBus::instance(), &QnTransactionMessageBus::newConnectionEstablished,
+                 this, &TimeSynchronizationManager::onNewConnectionEstablished,
+                 Qt::DirectConnection );
     }
 
     TimeSynchronizationManager::~TimeSynchronizationManager()
@@ -181,7 +186,9 @@ namespace ec2
                 if( !synchronizingByCurrentServer )
                 {
                     //TODO #ak broadcasting current sync time
-                    emit timeChanged( m_monotonicClock.elapsed() + m_timeDelta );
+                    const qint64 curSyncTime = m_monotonicClock.elapsed() + m_timeDelta;
+                    lk.unlock();
+                    emit timeChanged( curSyncTime );
                 }
             }
         }
@@ -215,8 +222,6 @@ namespace ec2
         const TimePriorityKey& remotePeerTimePriorityKey )
     {
         assert( remotePeerTimePriorityKey.seed > 0 );
-
-        QMutexLocker lk( &m_mutex );
 
         //const quint64 currentMaxRemotePeerTimePriorityKey = m_timeInfoByPeer.empty()
         //    ? 0     //priority key is garanteed to be non-zero
@@ -262,5 +267,47 @@ namespace ec2
     void TimeSynchronizationManager::syncTimeWithExternalSource()
     {
         //TODO #ak synchronizing with some internet server if possible
+    }
+
+    void TimeSynchronizationManager::onNewConnectionEstablished( const QnTransactionTransportPtr& transport )
+    {
+        using namespace std::placeholders;
+        transport->setBeforeSendingChunkHandler( std::bind( &TimeSynchronizationManager::onBeforeSendingHttpChunk, this, _1, _2 ) );
+        transport->setHttpChunkExtensonHandler( std::bind( &TimeSynchronizationManager::onRecevingHttpChunkExtensions, this, _1, _2 ) );
+    }
+
+    //!used to pass time sync information between peers
+    static const QByteArray TIME_SYNC_EXTENSION_NAME( "time_sync" );
+
+    void TimeSynchronizationManager::onBeforeSendingHttpChunk(
+        QnTransactionTransport* /*transport*/,
+        std::vector<nx_http::ChunkExtension>* const extensions )
+    {
+        //TODO #ak synchronizing time periodically (once per several minutes) and on demand
+        extensions->emplace_back( TIME_SYNC_EXTENSION_NAME, getTimeSyncInfo().toString() );
+    }
+
+    void TimeSynchronizationManager::onRecevingHttpChunkExtensions(
+        QnTransactionTransport* transport,
+        const std::vector<nx_http::ChunkExtension>& extensions )
+    {
+        for( auto extension: extensions )
+        {
+            if( extension.first == TIME_SYNC_EXTENSION_NAME )
+            {
+                int rttMillis = 0;    //TODO #ak get tcp connection round trip time
+                TimeSyncInfo remotePeerTimeSyncInfo;
+                if( !remotePeerTimeSyncInfo.fromString( extension.second ) )
+                    continue;
+        
+                QMutexLocker lk( &m_mutex );
+                remotePeerTimeSyncUpdate(
+                    transport->remotePeer().id,
+                    m_monotonicClock.elapsed(),
+                    remotePeerTimeSyncInfo.syncTime + rttMillis / 2,
+                    remotePeerTimeSyncInfo.timePriorityKey );
+                return;
+            }
+        }
     }
 }

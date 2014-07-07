@@ -105,6 +105,7 @@ namespace ec2
         void gotLockResponse(ApiLockData);
 
         void transactionProcessed(const QnAbstractTransaction &transaction);
+        void newConnectionEstablished(const QnTransactionTransportPtr& transport);
 
     private:
         friend class QnTransactionTransport;
@@ -114,7 +115,7 @@ namespace ec2
         bool isExists(const QnId& removeGuid) const;
         bool isConnecting(const QnId& removeGuid) const;
 
-        typedef QMap<QUuid, QSharedPointer<QnTransactionTransport>> QnConnectionMap;
+        typedef QMap<QUuid, QnTransactionTransportPtr> QnConnectionMap;
 
     private:
         template<class T>

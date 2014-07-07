@@ -9,15 +9,12 @@
 #include "transaction_log.h"
 #include <transaction/chunked_transfer_encoder.h>
 #include "common/common_module.h"
-#include "managers/time_manager.h"
 
 
 namespace ec2
 {
 
 static const int SOCKET_TIMEOUT = 1000 * 1000;
-//!used to pass time sync information between peers
-static const QByteArray TIME_SYNC_EXTENSION_NAME( "time_sync" );
 
 QSet<QUuid> QnTransactionTransport::m_existConn;
 QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
@@ -35,7 +32,8 @@ QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, con
     m_chunkHeaderLen(0),
     m_chunkLen(0), 
     m_sendOffset(0), 
-    m_connected(false)
+    m_connected(false),
+    m_prevGivenHandlerID(0)
 {
     m_readBuffer.resize( 4*1024 );
 }
@@ -108,6 +106,27 @@ QnTransactionTransport::State QnTransactionTransport::getState() const
 {
     QMutexLocker lock(&m_mutex);
     return m_state;
+}
+
+int QnTransactionTransport::setHttpChunkExtensonHandler( HttpChunkExtensonHandler eventHandler )
+{
+    QMutexLocker lk(&m_mutex);
+    m_httpChunkExtensonHandlers.emplace( ++m_prevGivenHandlerID, std::move(eventHandler) );
+    return m_prevGivenHandlerID;
+}
+
+int QnTransactionTransport::setBeforeSendingChunkHandler( BeforeSendingChunkHandler eventHandler )
+{
+    QMutexLocker lk(&m_mutex);
+    m_beforeSendingChunkHandlers.emplace( ++m_prevGivenHandlerID, std::move(eventHandler) );
+    return m_prevGivenHandlerID;
+}
+
+void QnTransactionTransport::removeEventHandler( int eventHandlerID )
+{
+    QMutexLocker lk(&m_mutex);
+    m_httpChunkExtensonHandlers.erase( eventHandlerID );
+    m_beforeSendingChunkHandlers.erase( eventHandlerID );
 }
 
 void QnTransactionTransport::close()
@@ -475,29 +494,14 @@ QString QnTransactionTransport::toString( State state )
 
 void QnTransactionTransport::addHttpChunkExtensions( std::vector<nx_http::ChunkExtension>* const chunkExtensions )
 {
-    //TODO #ak synchronizing time periodically (once per several minutes) and on demand
-    chunkExtensions->emplace_back(
-        TIME_SYNC_EXTENSION_NAME,
-        ec2::TimeSynchronizationManager::instance()->getTimeSyncInfo().toString() );
+    for( auto val: m_beforeSendingChunkHandlers )
+        val.second( this, chunkExtensions );
 }
 
 void QnTransactionTransport::processChunkExtensions( const nx_http::ChunkHeader& httpChunkHeader )
 {
-    for( auto extension: httpChunkHeader.extensions )
-    {
-        if( extension.first == TIME_SYNC_EXTENSION_NAME )
-        {
-            int rtt = 0;    //TODO #ak get tcp connection round trip time
-            TimeSyncInfo remotePeerTimeSyncInfo;
-            if( !remotePeerTimeSyncInfo.fromString( extension.second ) )
-                continue;
-            TimeSynchronizationManager::instance()->remotePeerTimeSyncUpdate(
-                m_remotePeer.id,
-                TimeSynchronizationManager::instance()->getMonotonicClock(),
-                remotePeerTimeSyncInfo.syncTime + rtt / 2,
-                remotePeerTimeSyncInfo.timePriorityKey );
-        }
-    }
+    for( auto val: m_httpChunkExtensonHandlers )
+        val.second( this, httpChunkHeader.extensions );
 }
 
 }

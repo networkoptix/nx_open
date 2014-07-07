@@ -27,8 +27,6 @@
 namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory( Qn::PeerType peerType )
-    :
-        m_timeSynchronizationManager( peerType )
     {
         srand( ::time(NULL) );
 
@@ -41,6 +39,7 @@ namespace ec2
         qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!
 
         ec2::QnTransactionMessageBus::initStaticInstance(new ec2::QnTransactionMessageBus());
+        m_timeSynchronizationManager.reset( new TimeSynchronizationManager(peerType) );
     }
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()

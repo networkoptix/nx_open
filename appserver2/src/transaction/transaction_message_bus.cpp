@@ -452,6 +452,7 @@ void QnTransactionMessageBus::at_stateChanged(QnTransactionTransport::State )
         {
             if (m_connectingConnections[i] == transport) {
                 m_connections[transport->remotePeer().id] = m_connectingConnections[i];
+                emit newConnectionEstablished( m_connectingConnections[i] );
                 m_connectingConnections.removeAt(i);
                 break;
             }
@@ -572,6 +573,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     QnTransactionTransportPtr transport(new QnTransactionTransport(m_localPeer, remotePeer, socket));
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
+    emit newConnectionEstablished( transport );
 
     transport->setState(QnTransactionTransport::Connected);
 

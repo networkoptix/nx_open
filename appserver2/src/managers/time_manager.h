@@ -16,39 +16,41 @@
 #include <common/common_globals.h>
 #include <nx_ec/ec_api.h>
 #include <utils/common/id.h>
+#include <utils/network/http/httptypes.h>
 
 #include "nx_ec/data/api_data.h"
 #include "transaction/transaction.h"
+#include "transaction/transaction_transport.h"
 
+
+/*! \page time_sync Time synchronization in cluster
+    Server system time is never changed. To adjust server times means, adjust server "delta" which server adds to it's time. 
+    To change/adjust server time - means to adjust it's delta.
+
+    PTS(primary time server) (if any) pushes it's time to other servers( adjusts other servers' time):\n
+    - every hour (to all servers in the system)
+    - upon PTS changed event (to all servers in the system)
+    - if new server is connected to the system( only to this new server).
+
+    If possible PTS server adjusts it's time once per hour from internet.
+
+    PTS is selected in prioritized order: \n
+    - selected by user
+    - availability of internet access
+    - non edge server
+
+    In case if there is ambiguity in choosing PTS automatically, random server is chosen as PTS and notification sent to client.
+
+    Once PTS pushed it's time to the server, server marks it's time as actual time. Time remains actual till server is restarted. 
+    If there is no PTS in the system, new server( just connected) takes time from any server with actual time.
+
+    Client should offer user to select PTS if there is no PTS in the system and there are at least 2 servers in the system with actual time more than 500 ms different.
+
+    \todo if system without internet access (with PTS selected) joined by a server with internet access, should new server become PTS?
+*/
 
 namespace ec2
 {
-    /*! \page time_sync Time synchronization in cluster
-        Server system time is never changed. To adjust server times means, adjust server "delta" which server adds to it's time. 
-        To change/adjust server time - means to adjust it's delta.
-
-        PTS(primary time server) (if any) pushes it's time to other servers( adjusts other servers' time):\n
-        - every hour (to all servers in the system)
-        - upon PTS changed event (to all servers in the system)
-        - if new server is connected to the system( only to this new server).
-
-        If possible PTS server adjusts it's time once per hour from internet.
-
-        PTS is selected in prioritized order: \n
-        - selected by user
-        - availability of internet access
-        - non edge server
-
-        In case if there is ambiguity in choosing PTS automatically, random server is chosen as PTS and notification sent to client.
-
-        Once PTS pushed it's time to the server, server marks it's time as actual time. Time remains actual till server is restarted. 
-        If there is no PTS in the system, new server( just connected) takes time from any server with actual time.
-
-        Client should offer user to select PTS if there is no PTS in the system and there are at least 2 servers in the system with actual time more than 500 ms different.
-
-        \todo if system without internet access (with PTS selected) joined by a server with internet access, should new server become PTS?
-    */
-
     struct TimePriorityKey
     {
         //!bitset of flags from \a TimeSynchronizationManager class
@@ -114,19 +116,6 @@ namespace ec2
         TimeSyncInfo getTimeSyncInfo() const;
         //!Returns value of internal monotonic clock
         qint64 getMonotonicClock() const;
-        /*!
-            \param remotePeerID
-            \param localMonotonicClock value of local monotonic clock (received with \a TimeSynchronizationManager::monotonicClockValue)
-            \param remotePeerSyncTime remote peer time (millis, UTC from epoch) corresponding to local clock (\a localClock)
-            \param remotePeerTimePriorityKey This value is used to select peer to synchronize time with.\n
-                - upper DWORD is bitset of flags \a peerTimeSetByUser, \a peerTimeSynchronizedWithInternetServer and \a peerTimeNonEdgeServer
-                - low DWORD - some random number
-        */
-        void remotePeerTimeSyncUpdate(
-            const QnId& remotePeerID,
-            qint64 localMonotonicClock,
-            qint64 remotePeerSyncTime,
-            const TimePriorityKey& remotePeerTimePriorityKey );
         //void remotePeerLost( const QnId& peerID );
 
     signals:
@@ -170,8 +159,26 @@ namespace ec2
         mutable QMutex m_mutex;
         TimeSyncInfo m_usedTimeSyncInfo;
 
+        /*!
+            \param remotePeerID
+            \param localMonotonicClock value of local monotonic clock (received with \a TimeSynchronizationManager::monotonicClockValue)
+            \param remotePeerSyncTime remote peer time (millis, UTC from epoch) corresponding to local clock (\a localClock)
+            \param remotePeerTimePriorityKey This value is used to select peer to synchronize time with.\n
+                - upper DWORD is bitset of flags \a peerTimeSetByUser, \a peerTimeSynchronizedWithInternetServer and \a peerTimeNonEdgeServer
+                - low DWORD - some random number
+        */
+        void remotePeerTimeSyncUpdate(
+            const QnId& remotePeerID,
+            qint64 localMonotonicClock,
+            qint64 remotePeerSyncTime,
+            const TimePriorityKey& remotePeerTimePriorityKey );
         //!Periodically synchronizing time with internet (if possible)
         void syncTimeWithExternalSource();
+        void onBeforeSendingHttpChunk( QnTransactionTransport* transport, std::vector<nx_http::ChunkExtension>* const extensions );
+        void onRecevingHttpChunkExtensions( QnTransactionTransport* transport, const std::vector<nx_http::ChunkExtension>& extensions );
+
+    private slots:
+        void onNewConnectionEstablished( const QnTransactionTransportPtr& transport );
     };
 }
 

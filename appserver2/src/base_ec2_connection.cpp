@@ -36,6 +36,13 @@ namespace ec2
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerFound, this, &BaseEc2Connection<T>::remotePeerFound, Qt::DirectConnection);
         connect (QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,  this, &BaseEc2Connection<T>::remotePeerLost, Qt::DirectConnection);
 
+        connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::primaryTimeServerSelectionRequired,
+                 this, &BaseEc2Connection<T>::primaryTimeServerSelectionRequired,
+                 Qt::DirectConnection );
+        connect (TimeSynchronizationManager::instance(), &TimeSynchronizationManager::timeChanged,
+                 this, &BaseEc2Connection<T>::timeChanged,
+                 Qt::DirectConnection );
+
         m_notificationManager.reset(
             new ECConnectionNotificationManager(
                 m_resCtx,

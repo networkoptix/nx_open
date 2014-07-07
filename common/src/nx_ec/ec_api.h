@@ -859,6 +859,15 @@ namespace ec2
         void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);
 
+        //!Emitted when there is ambiguity while choosing primary time server automatically
+        /*!
+            User SHOULD call \a AbstractECConnection::forcePrimaryTimeServer to set primary time server manually.
+            This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
+        */
+        void primaryTimeServerSelectionRequired();
+        //!Emitted when synchronized time has been changed
+        void timeChanged( qint64 syncTime );
+
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
