@@ -19,9 +19,6 @@
   <property name="windowTitle">
    <string>System Settings</string>
   </property>
-  <property name="sizeGripEnabled">
-   <bool>false</bool>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
    <item>
     <widget class="QTabWidget" name="tabWidget">
@@ -30,9 +27,6 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="currentIndex">
-      <number>-1</number>
      </property>
     </widget>
    </item>

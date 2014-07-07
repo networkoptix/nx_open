@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>478</width>
-    <height>444</height>
+    <width>351</width>
+    <height>380</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,7 +74,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="simplePage">
       <layout class="QFormLayout" name="formLayout_3">

@@ -48,6 +48,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     connect(m_updateTool,       &QnMediaServerUpdateTool::peerChanged,          this,           &QnServerUpdatesWidget::at_updateTool_peerChanged);
 
     m_previousToolState = m_updateTool->state();
+
+    ui->progressWidget->setText(tr("Checking for updates..."));
     updateUi();
 }
 
@@ -217,10 +219,7 @@ void QnServerUpdatesWidget::updateUi() {
     foreach (const QnMediaServerResourcePtr &server, m_updatesModel->servers())
         m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(server->getId()));
 
-    if (checkingForUpdates)
-        ui->buttonBox->showProgress(tr("Checking for updates..."));
-    else
-        ui->buttonBox->hideProgress();
+    ui->progressWidget->setVisible(checkingForUpdates);
 
     ui->cancelButton->setVisible(applying);
     ui->cancelButton->setEnabled(cancellable);
