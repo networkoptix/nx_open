@@ -7,7 +7,7 @@
 #include <utils/fs/file.h>
 
 #include <recording/time_period_list.h>
-#include "plugins/resources/archive/filetypesupport.h"
+#include "plugins/resource/archive/filetypesupport.h"
 
 
 class QnLayoutFile: public QIODevice

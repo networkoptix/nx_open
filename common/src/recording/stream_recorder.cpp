@@ -4,12 +4,12 @@
 #include "core/datapacket/abstract_data_packet.h"
 #include "core/datapacket/media_data_packet.h"
 #include "core/dataprovider/media_streamdataprovider.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 #include "utils/common/util.h"
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
-#include <plugins/resources/archive/avi_files/avi_archive_delegate.h>
-#include <plugins/resources/archive/avi_files/avi_archive_custom_data.h>
+#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <plugins/resource/avi/avi_archive_custom_data.h>
 #include "transcoding/ffmpeg_audio_transcoder.h"
 #include "transcoding/ffmpeg_video_transcoder.h"
 #include "transcoding/filters/contrast_image_filter.h"

@@ -13,10 +13,10 @@
 #include <CoreServices/CoreServices.h>
 #elif defined(Q_OS_WIN)
 #include <qt_windows.h>
-#include "device_plugins/desktop_win/device/desktop_resource.h"
+#include <plugins/resource/desktop_win/desktop_resource.h>
 #endif
 #include "utils/common/util.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 #include "core/resource/camera_resource.h"
 #include "redass/redass_controller.h"
 

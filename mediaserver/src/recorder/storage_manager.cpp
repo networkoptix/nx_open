@@ -14,7 +14,7 @@
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
 
-#include <device_plugins/server_archive/dualquality_helper.h>
+#include <plugins/resource/server_archive/dualquality_helper.h>
 
 #include "plugins/storage/file_storage/file_storage_resource.h"
 

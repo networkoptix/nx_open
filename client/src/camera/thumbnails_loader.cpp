@@ -22,15 +22,15 @@ extern "C"
 
 #include "ui/common/geometry.h"
 
-#include "plugins/resources/archive/avi_files/thumbnails_archive_delegate.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/archive/avi_files/thumbnails_archive_delegate.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 
-#include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
+#include "plugins/resource/archive/rtsp_client_archive_delegate.h"
 
 #include "utils/media/frame_info.h"
 
 #include "thumbnails_loader_helper.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
+#include "plugins/resource/archive/avi_files/avi_resource.h"
 
 #include <recording/time_period.h>
 

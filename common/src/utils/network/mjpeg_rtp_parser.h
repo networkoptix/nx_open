@@ -7,7 +7,7 @@
 #include "core/datapacket/video_data_packet.h"
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
-#include "plugins/resources/arecontvision/tools/AVJpegHeader.h"
+#include "plugins/resource/arecontvision/tools/AVJpegHeader.h"
 
 
 class QnMjpegRtpParser: public QnRtpVideoStreamParser

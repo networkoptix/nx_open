@@ -5,9 +5,9 @@
 #include <QtCore/QThread>
 
 #include "core/resource_management/resource_pool.h"
-#include "plugins/resources/archive/avi_files/avi_dvd_resource.h"
-#include "plugins/resources/archive/avi_files/avi_bluray_resource.h"
-#include "plugins/resources/archive/filetypesupport.h"
+#include "plugins/resource/archive/avi_files/avi_dvd_resource.h"
+#include "plugins/resource/archive/avi_files/avi_bluray_resource.h"
+#include "plugins/resource/archive/filetypesupport.h"
 #include "core/resource/layout_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "client/client_globals.h"
