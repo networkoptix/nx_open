@@ -9,10 +9,13 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
+#include <utils/common/log.h>
+
+#include <plugins/plugin_manager.h>
+#include <decoders/abstractvideodecoderplugin.h>
+
 #include "ffmpeg.h"
 #include "ipp_h264_decoder.h"
-#include "../abstractvideodecoderplugin.h"
-#include "../../plugins/plugin_manager.h"
 
 
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = AUTO;

@@ -9,6 +9,8 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include <utils/common/log.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/network_resource.h>

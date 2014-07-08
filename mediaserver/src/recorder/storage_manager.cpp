@@ -4,9 +4,13 @@
 
 #include <api/app_server_connection.h>
 
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/resource.h"
-#include "core/resource/camera_resource.h"
+#include <utils/fs/file.h>
+#include <utils/common/util.h>
+#include <utils/common/log.h>
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/camera_bookmark.h>
@@ -14,13 +18,9 @@
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
 
-#include <device_plugins/server_archive/dualquality_helper.h>
+#include <plugins/resource/server_archive/dualquality_helper.h>
 
 #include "plugins/storage/file_storage/file_storage_resource.h"
-
-#include "utils/common/sleep.h"
-#include <utils/fs/file.h>
-#include "utils/common/util.h"
 
 #include <media_server/serverutil.h>
 #include "file_deletor.h"

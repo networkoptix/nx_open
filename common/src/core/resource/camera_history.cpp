@@ -1,4 +1,3 @@
-
 #include "camera_history.h"
 
 extern "C"
@@ -6,11 +5,11 @@ extern "C"
     #include <libavutil/avutil.h>
 }
 
+#include <utils/common/util.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
-#include "utils/common/warnings.h"
-#include "utils/common/util.h"
 
 
 QnId QnCameraTimePeriod::getServerId() const

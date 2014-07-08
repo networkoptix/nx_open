@@ -7,9 +7,9 @@
 
 #ifdef Q_OS_WIN
 #   include <d3d9.h>
-#   include <device_plugins/desktop_win/screen_grabber.h>
-#   include <device_plugins/desktop_win/desktop_file_encoder.h>
-#   include <device_plugins/desktop_win/win_audio_device_info.h>
+#   include <plugins/resource/desktop_win/screen_grabber.h>
+#   include <plugins/resource/desktop_win/desktop_file_encoder.h>
+#   include <plugins/resource/desktop_win/win_audio_device_info.h>
 #endif
 
 #include <utils/common/warnings.h>

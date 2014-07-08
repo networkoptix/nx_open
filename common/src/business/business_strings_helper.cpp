@@ -3,6 +3,9 @@
 
 #include <api/app_server_connection.h>
 
+#include "utils/common/id.h"
+#include "utils/network/nettools.h" /* For resolveAddress. */
+
 #include <business/business_aggregation_info.h>
 #include <business/events/reasoned_business_event.h>
 #include <business/events/network_issue_business_event.h>
@@ -14,7 +17,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include "utils/common/id.h"
+
 
 namespace {
     static const QString plainTextDelimiter(lit("\n"));

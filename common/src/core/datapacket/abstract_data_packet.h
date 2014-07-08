@@ -1,8 +1,6 @@
 #ifndef abstract_data_h_1112
 #define abstract_data_h_1112
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <libavutil/avutil.h> /* For AV_NOPTS_VALUE. */
 
 #include <QtCore/QSharedPointer>
@@ -23,7 +21,5 @@ typedef QSharedPointer<QnAbstractDataPacket> QnAbstractDataPacketPtr;
 Q_DECLARE_METATYPE(QnAbstractDataPacketPtr);
 typedef QSharedPointer<const QnAbstractDataPacket> QnConstAbstractDataPacketPtr;
 Q_DECLARE_METATYPE(QnConstAbstractDataPacketPtr);
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif //abstract_data_h_1112

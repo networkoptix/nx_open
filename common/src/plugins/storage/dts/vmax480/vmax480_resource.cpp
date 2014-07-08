@@ -2,7 +2,7 @@
 
 #include "vmax480_resource.h"
 #include "vmax480_live_reader.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 #include "vmax480_archive_delegate.h"
 #include "vmax480_chunk_reader.h"
 #include "core/resource_management/resource_pool.h"

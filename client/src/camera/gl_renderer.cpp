@@ -15,6 +15,7 @@
 
 #include <QtWidgets/QErrorMessage>
 
+#include <utils/common/log.h>
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
 #include <utils/media/sse_helper.h>

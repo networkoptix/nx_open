@@ -4,6 +4,8 @@
 #include <QtWidgets/QMessageBox>
 #include <QtCore/QFileInfo>
 
+#include <utils/common/log.h>
+
 #include "client/client_settings.h"
 #include "api/app_server_connection.h"
 

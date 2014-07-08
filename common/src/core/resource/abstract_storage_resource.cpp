@@ -68,6 +68,7 @@ quint16 QnAbstractStorageResource::getIndex() const
     return m_index;
 }
 
+#ifdef ENABLE_DATA_PROVIDERS
 float QnAbstractStorageResource::bitrate() const
 {
     float rez = 0;
@@ -88,6 +89,7 @@ void QnAbstractStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider
     QMutexLocker lock(&m_bitrateMtx);
     m_providers.remove(provider);
 }
+#endif
 
 float QnAbstractStorageResource::getAvarageWritingUsage() const
 {
