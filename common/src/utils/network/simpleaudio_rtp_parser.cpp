@@ -1,5 +1,6 @@
-
 #include "simpleaudio_rtp_parser.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
@@ -108,3 +109,5 @@ void QnSimpleAudioRtpParser::setSampleFormat(AVSampleFormat sampleFormat)
 {
     m_sampleFormat = sampleFormat;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

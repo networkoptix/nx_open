@@ -14,6 +14,8 @@
 
 #pragma once
 
+#ifdef ENABLE_MUSTACHE
+
 #include <QtCore/QStack>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
@@ -251,3 +253,5 @@ private:
 QString renderTemplate(const QString& templateString, const QVariant& args);
 
 };
+
+#endif // ENABLE_MUSTACHE

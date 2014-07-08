@@ -1,5 +1,6 @@
 #include "rtp_stream_parser.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
 
 QnRtpVideoStreamParser::QnRtpVideoStreamParser()
 {
@@ -52,3 +53,5 @@ void QnRtpAudioStreamParser::processStringParam(const QByteArray& checkName, QBy
     if (paramName.toLower() == checkName.toLower())
         setValue = paramValue;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

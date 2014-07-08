@@ -1,6 +1,8 @@
 #ifndef __RTP_STREAM_PARSER_H
 #define __RTP_STREAM_PARSER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QIODevice>
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/resource_media_layout.h"
@@ -95,5 +97,7 @@ protected:
     void processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);
     void processStringParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif

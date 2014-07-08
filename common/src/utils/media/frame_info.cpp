@@ -1,5 +1,7 @@
 #include "frame_info.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <cstring>
 #include <cstdio>
 
@@ -362,3 +364,5 @@ QImage CLVideoDecoderOutput::toImage() const
     
     return img;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

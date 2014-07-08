@@ -1,6 +1,8 @@
 #ifndef rtp_session_h_1935_h
 #define rtp_session_h_1935_h
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <memory>
 #include <vector>
 
@@ -389,5 +391,7 @@ private:
     */
     bool sendRequestAndReceiveResponse( const QByteArray& request, QByteArray& responce );
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //rtp_session_h_1935_h

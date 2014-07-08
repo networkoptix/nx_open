@@ -13,6 +13,8 @@
 */
 #include "mustache.h"
 
+#ifdef ENABLE_MUSTACHE
+
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
@@ -473,3 +475,4 @@ void Renderer::setTagMarkers(const QString& startMarker, const QString& endMarke
     m_defaultTagEndMarker = endMarker;
 }
 
+#endif // ENABLE_MUSTACHE

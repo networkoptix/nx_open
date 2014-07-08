@@ -1,6 +1,8 @@
 #ifndef frame_info_1730
 #define frame_info_1730
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <atomic>
 
 #include <QtCore/QAtomicInt>
@@ -263,6 +265,8 @@ public:
     virtual QImage getGrayscaleScreenshot() = 0;
 };
 
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //frame_info_1730
 

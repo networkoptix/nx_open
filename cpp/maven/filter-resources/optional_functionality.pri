@@ -72,6 +72,10 @@
   DEFINES += ENABLE_DATA_PROVIDERS
 }
 
+!contains( DEFINES, DISABLE_MUSTACHE) {
+  DEFINES += ENABLE_MUSTACHE
+}
+
 contains(NAME, mediaserver) || contains(NAME, common) {
   IS_VMAX_ENABLED=${vmax}
   contains( IS_VMAX_ENABLED, true ) {

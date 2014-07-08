@@ -1,5 +1,7 @@
 #include "audio_processor.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 static inline short clip_short(int v)
 {
     if (v < -32768)
@@ -145,3 +147,5 @@ QnCodecAudioFormat QnAudioProcessor::float2int32(QnByteArray& audio, QnCodecAudi
     format.setSampleType(QnAudioFormat::SignedInt);
     return format;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

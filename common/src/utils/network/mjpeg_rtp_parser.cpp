@@ -1,5 +1,6 @@
-
 #include "mjpeg_rtp_parser.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 #include "core/datapacket/video_data_packet.h"
 #include "rtp_stream_parser.h"
@@ -531,3 +532,5 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     }
     return true;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

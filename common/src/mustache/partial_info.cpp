@@ -1,4 +1,4 @@
-#include "mustache/partial_info.h"
+#include "partial_info.h"
 
 QnPartialInfo::QnPartialInfo (QnBusiness::EventType value) {
     switch (value) {

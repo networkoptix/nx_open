@@ -1,5 +1,7 @@
 #include "transcoder.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <utils/math/math.h>
 #include <core/resource/media_resource.h>
 
@@ -433,3 +435,5 @@ const QVector<int>& QnTranscoder::getPacketsSize()
 {
     return m_outputPacketSize;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

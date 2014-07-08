@@ -1,9 +1,11 @@
+#include "rtpsession.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 #if defined(Q_OS_WIN)
 #  include <winsock2.h>
 #endif
 
-#include "rtpsession.h"
 #include "rtp_stream_parser.h"
 
 #include <QtCore/QFile>
@@ -2014,3 +2016,5 @@ bool RTPSession::sendRequestAndReceiveResponse( const QByteArray& requestBuf, QB
 
     return false;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
