@@ -654,8 +654,8 @@ bool QnCameraScheduleWidget::isRecordingParamsAvailable() const
 void QnCameraScheduleWidget::updateDaysEnabledState()
 {
     bool isEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
-    ui->spinBoxMaxDays->setEnabled(isEnabled && ui->checkBoxMaxArchive->checkState() == Qt::Checked);
-    ui->spinBoxMinDays->setEnabled(isEnabled && ui->checkBoxMinArchive->checkState() == Qt::Checked);
+    ui->spinBoxMaxDays->setEnabled(isEnabled && ui->checkBoxMaxArchive->checkState() == Qt::Unchecked);
+    ui->spinBoxMinDays->setEnabled(isEnabled && ui->checkBoxMinArchive->checkState() == Qt::Unchecked);
 }
 
 void QnCameraScheduleWidget::updateGridEnabledState()
@@ -669,8 +669,7 @@ void QnCameraScheduleWidget::updateGridEnabledState()
 
     ui->checkBoxMinArchive->setEnabled(enabled);
     ui->checkBoxMaxArchive->setEnabled(enabled);
-    ui->spinBoxMaxDays->setEnabled(enabled && ui->checkBoxMaxArchive->checkState() == Qt::Checked); 
-    ui->spinBoxMinDays->setEnabled(enabled && ui->checkBoxMinArchive->checkState() == Qt::Checked); 
+    updateDaysEnabledState();
 }
 
 void QnCameraScheduleWidget::updateLicensesLabelText()
