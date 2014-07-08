@@ -27,7 +27,7 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-        //preparing output data
+        //preparing output data 
         QnVirtualCameraResourceList cameraList;
 		if (resource->getId().isNull()) {
 			resource->setId(QnId::createUuid());

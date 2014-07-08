@@ -697,6 +697,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
     av_lockmgr_register(NULL);
 
+    //restoring default message handler
+    qInstallMessageHandler( defaultMsgHandler );
+
     return result;
 }
 

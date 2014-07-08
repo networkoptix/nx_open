@@ -21,6 +21,7 @@
 #include "nx_ec/data/api_update_data.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
 #include "nx_ec/data/api_runtime_data.h"
+#include "nx_ec/data/api_peer_system_time_data.h"
 #include "utils/db/db_helper.h"
 
 namespace ec2
@@ -168,6 +169,7 @@ namespace ec2
         QUuid transactionHash(const QnTranState& ) const                       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const QnTranStateResponse& ) const               { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
         QUuid transactionHash(const ApiRuntimeData& ) const                    { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
+        QUuid transactionHash(const ApiPeerSystemTimeData& ) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QUuid(); }
 
     private:
         ErrorCode saveToDB(const QnAbstractTransaction& tranID, const QUuid& hash, const QByteArray& data);

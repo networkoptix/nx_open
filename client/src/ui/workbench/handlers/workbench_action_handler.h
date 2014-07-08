@@ -43,6 +43,7 @@ class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
 class QnSystemAdministrationDialog;
+class QnTimeServerSelectionDialog;
 class QnGraphicsMessageBox;
 
 // TODO: #Elric get rid of these processors here
@@ -318,6 +319,7 @@ protected slots:
     void at_betaVersionMessageAction_triggered();
 
     void at_queueAppRestartAction_triggered();
+    void at_selectTimeServerAction_triggered();
 
 private:
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
@@ -343,6 +345,7 @@ private:
     QPointer<QnLoginDialog> m_loginDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
+    QPointer<QnTimeServerSelectionDialog> m_timeServerSelectionDialog;
 
 
     /** Whether the set of selected resources was changed and settings

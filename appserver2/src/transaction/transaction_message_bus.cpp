@@ -116,8 +116,8 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::tranSyncRequest:       return handleTransactionParams<QnTranState>             (&stream, transaction, function);
     case ApiCommand::tranSyncResponse:      return handleTransactionParams<QnTranStateResponse>     (&stream, transaction, function);
     case ApiCommand::runtimeInfoChanged:    return handleTransactionParams<ApiRuntimeData>          (&stream, transaction, function);
-    case ApiCommand::forcePrimaryTimeServer:
-                                            return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
+    case ApiCommand::broadcastPeerSystemTime: return handleTransactionParams<ApiPeerSystemTimeData> (&stream, transaction, function);
+    case ApiCommand::forcePrimaryTimeServer:  return handleTransactionParams<ApiIdData>             (&stream, transaction, function);
 
     default:
         qWarning() << "Transaction type " << transaction.command << " is not implemented for delivery! Implement me!";

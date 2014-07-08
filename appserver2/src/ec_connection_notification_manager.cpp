@@ -203,4 +203,8 @@ namespace ec2
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiCameraBookmarkTagDataList>& tran ) {
         m_cameraManager->triggerNotification(tran);
     }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPeerSystemTimeData>& /*tran*/ ) {
+        //TOOD #ak
+    }
 }

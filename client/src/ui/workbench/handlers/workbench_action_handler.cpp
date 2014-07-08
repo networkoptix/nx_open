@@ -70,6 +70,7 @@
 #include <ui/dialogs/picture_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
+#include <ui/dialogs/time_server_selection_dialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -304,6 +305,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::VersionMismatchMessageAction),           SIGNAL(triggered()),    this,   SLOT(at_versionMismatchMessageAction_triggered()));
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
+    connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -808,6 +810,9 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Server..."));
 
+    if( QnAppServerConnectionFactory::getConnection2() )
+        disconnect( QnAppServerConnectionFactory::getConnection2().get() );
+
     if (!mainWindow())
         return;
 
@@ -845,6 +850,12 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
         m_connectingMessageBox->hideImmideately();
         m_connectingMessageBox = NULL;
     }
+
+    connect( QnAppServerConnectionFactory::getConnection2().get(), &ec2::AbstractECConnection::primaryTimeServerSelectionRequired,
+        this, [this]( qint64 localSystemTime, const QList<QPair<QnId, qint64> >& peersAndTimes ) {
+            menu()->trigger(Qn::SelectTimeServerAction, QnActionParameters().
+                withArgument(Qn::LocalSystemTimeRole, localSystemTime).withArgument(Qn::PeersToChooseTimeServerFromRole, peersAndTimes));
+        });
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -3019,3 +3030,20 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
 
+void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered()
+{
+    if( !m_timeServerSelectionDialog )
+    {
+        m_timeServerSelectionDialog = new QnTimeServerSelectionDialog( mainWindow(), context() );
+        m_timeServerSelectionDialog->setModal(true);
+    }
+
+    const qint64 localSystemTime = menu()->currentParameters(sender()).argument(Qn::LocalSystemTimeRole).toLongLong();
+    const QList<QPair<QnId, qint64>>& peers = menu()->currentParameters(sender()).argument(Qn::PeersToChooseTimeServerFromRole).value<QList<QPair<QnId, qint64>>>();
+    m_timeServerSelectionDialog->setData( localSystemTime, peers );
+
+    if( !m_timeServerSelectionDialog->exec() )
+        return;
+
+    //TODO #ak performing ec2 request
+}

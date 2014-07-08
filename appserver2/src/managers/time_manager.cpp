@@ -113,8 +113,10 @@ namespace ec2
     static TimeSynchronizationManager* TimeManager_instance = nullptr;
     static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*60*1000;
     //!Once per 10 minutes checking if manual time server selection is required
-    static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10*60*1000;
-    static const size_t TIME_SYNCHRONIZATION_PERIOD_MS = 60*1000;
+    //static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10*60*1000;
+    static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10*1000;
+    //static const size_t TIME_SYNCHRONIZATION_PERIOD_MS = 60*1000;
+    static const size_t TIME_SYNCHRONIZATION_PERIOD_MS = 10*1000;
 
     TimeSynchronizationManager::TimeSynchronizationManager( Qn::PeerType peerType )
     :
@@ -313,7 +315,7 @@ namespace ec2
                 LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS );
         }
 
-        //TODO #ak if local time changes have to broadcast as soon as possible
+        //TODO #ak if local time changes have to broadcast it as soon as possible
 
         QnTransaction<ApiPeerSystemTimeData> tran( ApiCommand::broadcastPeerSystemTime, false );
         tran.params.peerID = qnCommon->moduleGUID();
@@ -335,34 +337,51 @@ namespace ec2
             std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
             MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS );
 
-        const qint64 currentClock = m_monotonicClock.elapsed();
-        qint64 minPeerTime = std::numeric_limits<qint64>::max();
-        qint64 maxPeerTime = 0;
-        TimePriorityKey minPriorityKey = std::min<>( m_localTimePriorityKey, m_usedTimeSyncInfo.timePriorityKey );
-        TimePriorityKey maxPriorityKey = std::max<>( m_localTimePriorityKey, m_usedTimeSyncInfo.timePriorityKey );
-        for( auto val: m_systemTimeByPeer )
-        {
-            //val.second.syncTime here is peer's system time (not synchronized time!)
-            const qint64 peerCurrentSystemTime = val.second.syncTime + (currentClock - val.second.monotonicClockValue);
-            if( peerCurrentSystemTime < minPeerTime )
-                minPeerTime = peerCurrentSystemTime;
-            if( peerCurrentSystemTime > maxPeerTime )
-                maxPeerTime = peerCurrentSystemTime;
+        if( m_systemTimeByPeer.empty() )
+            return;
 
-            if( val.second.timePriorityKey < minPriorityKey )
-                minPriorityKey = val.second.timePriorityKey;
-            if( val.second.timePriorityKey > maxPriorityKey )
-                maxPriorityKey = val.second.timePriorityKey;
+        const qint64 currentClock = m_monotonicClock.elapsed();
+        //qint64 minPeerTime = std::numeric_limits<qint64>::max();
+        //qint64 maxPeerTime = 0;
+        //TimePriorityKey minPriorityKey = (m_localTimePriorityKey.flags & peerIsServer)
+        //    ? std::min<>( m_localTimePriorityKey, m_usedTimeSyncInfo.timePriorityKey )
+        //    : m_usedTimeSyncInfo.timePriorityKey;
+        //TimePriorityKey maxPriorityKey = (m_localTimePriorityKey.flags & peerIsServer)
+        //    ? std::max<>( m_localTimePriorityKey, m_usedTimeSyncInfo.timePriorityKey )
+        //    : m_usedTimeSyncInfo.timePriorityKey;
+        //map<priority flags, m_systemTimeByPeer iterator>
+        std::multimap<unsigned int, std::map<QnId, TimeSyncInfo>::const_iterator, std::greater<unsigned int>> peersByTimePriorityFlags;
+        for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
+        {
+            peersByTimePriorityFlags.emplace( it->second.timePriorityKey.flags, it );
+
+
+            ////val.second.syncTime here is peer's system time (not synchronized time!)
+            //const qint64 peerCurrentSystemTime = val.second.syncTime + (currentClock - val.second.monotonicClockValue);
+            //if( peerCurrentSystemTime < minPeerTime )
+            //    minPeerTime = peerCurrentSystemTime;
+            //if( peerCurrentSystemTime > maxPeerTime )
+            //    maxPeerTime = peerCurrentSystemTime;
+
+            //if( val.second.timePriorityKey < minPriorityKey )
+            //    minPriorityKey = val.second.timePriorityKey;
+            //if( val.second.timePriorityKey > maxPriorityKey )
+            //    maxPriorityKey = val.second.timePriorityKey;
         }
 
-        if( minPriorityKey.flags == maxPriorityKey.flags )
+        //if( minPriorityKey.flags == maxPriorityKey.flags )
+        if( peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1 )
         {
             const qint64 currentLocalTime = QDateTime::currentMSecsSinceEpoch();
 
             //list<pair<peerid, time> >
             QList<QPair<QnId, qint64> > peers;
-            for( auto val: m_systemTimeByPeer )
-                peers.push_back( QPair<QnId, qint64>( val.first, val.second.syncTime + (currentClock - val.second.monotonicClockValue) ) );
+            for( auto val: peersByTimePriorityFlags )
+            {
+                if( val.first != peersByTimePriorityFlags.cbegin()->first )
+                    break;
+                peers.push_back( QPair<QnId, qint64>( val.second->first, val.second->second.syncTime + (currentClock - val.second->second.monotonicClockValue) ) );
+            }
             //all peers have same priority, user selection is required
             emit primaryTimeServerSelectionRequired( currentLocalTime, peers );
         }
