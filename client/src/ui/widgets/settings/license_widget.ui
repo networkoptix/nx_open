@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>409</width>
-    <height>303</height>
+    <height>287</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -29,12 +29,27 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="manualActivationInfoLabel">
-     <property name="wordWrap">
+    <widget class="QTextEdit" name="manualActivationTextEdit">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="readOnly">
       <bool>true</bool>
      </property>
-     <property name="openExternalLinks">
-      <bool>true</bool>
+     <property name="textInteractionFlags">
+      <set>Qt::LinksAccessibleByMouse</set>
      </property>
     </widget>
    </item>
