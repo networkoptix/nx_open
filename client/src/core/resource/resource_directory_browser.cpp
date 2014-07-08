@@ -268,8 +268,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     delete itemNamesIO;
     delete itemTimeZonesIO;
     layout->setItems(updatedItems);
-    // remove for QnResource::local help fix bugs 3471, not sure whether it has side effects or not. --- DPENG
-    //layout->addFlags(QnResource::local);
+
+    layout->addFlags(QnResource::local);
     return layout;
 }
 
