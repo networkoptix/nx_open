@@ -329,7 +329,9 @@ void ffmpegInit()
 
     // TODO: #Elric we need comments about true/false at call site => bad api design, use flags instead
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
+#ifdef ENABLE_COLDSTORE
     QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
+#endif
 }
 
 QnStorageResourcePtr createStorage(const QString& path)
