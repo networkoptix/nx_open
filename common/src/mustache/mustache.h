@@ -14,7 +14,7 @@
 
 #pragma once
 
-#ifdef ENABLE_MUSTACHE
+#ifdef ENABLE_SENDMAIL
 
 #include <QtCore/QStack>
 #include <QtCore/QString>
@@ -254,4 +254,4 @@ QString renderTemplate(const QString& templateString, const QVariant& args);
 
 };
 
-#endif // ENABLE_MUSTACHE
+#endif // ENABLE_SENDMAIL

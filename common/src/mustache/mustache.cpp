@@ -13,7 +13,7 @@
 */
 #include "mustache.h"
 
-#ifdef ENABLE_MUSTACHE
+#ifdef ENABLE_SENDMAIL
 
 #include <QtCore/QDebug>
 #include <QtCore/QFile>
@@ -475,4 +475,4 @@ void Renderer::setTagMarkers(const QString& startMarker, const QString& endMarke
     m_defaultTagEndMarker = endMarker;
 }
 
-#endif // ENABLE_MUSTACHE
+#endif // ENABLE_SENDMAIL

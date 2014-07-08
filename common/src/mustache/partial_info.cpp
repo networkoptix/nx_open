@@ -1,5 +1,7 @@
 #include "partial_info.h"
 
+#ifdef ENABLE_SENDMAIL
+
 QnPartialInfo::QnPartialInfo (QnBusiness::EventType value) {
     switch (value) {
         case QnBusiness::CameraMotionEvent: {
@@ -65,3 +67,5 @@ QnPartialInfo::QnPartialInfo (QnBusiness::EventType value) {
         break;
     }
 }
+
+#endif // ENABLE_SENDMAIL

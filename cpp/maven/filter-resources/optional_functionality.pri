@@ -72,8 +72,8 @@
   DEFINES += ENABLE_DATA_PROVIDERS
 }
 
-!contains( DEFINES, DISABLE_MUSTACHE) {
-  DEFINES += ENABLE_MUSTACHE
+!contains( DEFINES, DISABLE_SENDMAIL) {
+  DEFINES += ENABLE_SENDMAIL
 }
 
 contains(NAME, mediaserver) || contains(NAME, common) {

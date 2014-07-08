@@ -1,6 +1,6 @@
 #include "mustache_helper.h"
 
-#ifdef ENABLE_MUSTACHE
+#ifdef ENABLE_SENDMAIL
 
 #include <QtCore/QFile>
 #include <QtCore/QIODevice>
@@ -18,4 +18,4 @@ QString renderTemplateFromFile(const QString& path, const QString& filename, con
     return renderer.render(_template, &context);
 }
 
-#endif // ENABLE_MUSTACHE
+#endif // ENABLE_SENDMAIL

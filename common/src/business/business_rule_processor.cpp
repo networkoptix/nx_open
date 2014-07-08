@@ -447,11 +447,12 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 {
     Q_ASSERT( action );
 
+#ifdef ENABLE_SENDMAIL
     QStringList log;
     QStringList recipients;
     foreach (const QnUserResourcePtr &user, action->getResourceObjects().filtered<QnUserResource>()) {
         QString email = user->getEmail();
-        log << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(user->getEmail());
+        log << lit("%1 <%2>").arg(user->getName()).arg(user->getEmail());
         if (!email.isEmpty() && QnEmail::isValid(email))
             recipients << email;
     }
@@ -523,6 +524,10 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
      */
     action->getParams().setEmailAddress(formatEmailList(recipients));
     return true;
+
+#else
+    return false;
+#endif // ENABLE_SENDMAIL
 }
 
 void QnBusinessRuleProcessor::at_sendEmailFinished(int handle, ec2::ErrorCode errorCode)
