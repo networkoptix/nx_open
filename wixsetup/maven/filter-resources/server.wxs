@@ -33,6 +33,13 @@
                     <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
                         <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
                         <RegistryValue Type="string" Name="port" Value="[SERVER_PORT]"/>
+                    </RegistryKey>
+                </Component>
+
+                <Component Id="ServerConfigurationPassword">
+                    <Condition>SERVER_PASSWORD</Condition>
+
+                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
                         <RegistryValue Type="string" Name="adminPassword" Value="[SERVER_PASSWORD]"/>
                     </RegistryKey>
                 </Component>
@@ -184,6 +191,7 @@
             <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
 
             <ComponentRef Id='ServerConfiguration'/>
+            <ComponentRef Id='ServerConfigurationPassword'/>
 
             <ComponentRef Id="ServerExecutable" />
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>

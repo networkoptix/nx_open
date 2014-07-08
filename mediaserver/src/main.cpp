@@ -175,6 +175,7 @@ namespace {
     const QString SERVER_GUID = lit("serverGuid");
     const QString SERVER_GUID2 = lit("serverGuid2");
     const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
+    const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
 };
 
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
@@ -1192,18 +1193,20 @@ void QnMain::run()
     }
 
     MSSettings::roSettings()->sync();
-    if (MSSettings::roSettings()->value("pendingSwitchToClusterMode").toString() == "yes") {
+    if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
         MSSettings::roSettings()->setValue("systemName", connectInfo->systemName);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverPort");
         MSSettings::roSettings()->remove("appserverLogin");
         MSSettings::roSettings()->remove("appserverPassword");
-        MSSettings::roSettings()->remove("pendingSwitchToClusterMode");
+        MSSettings::roSettings()->remove(PENDING_SWITCH_TO_CLUSTER_MODE);
         MSSettings::roSettings()->sync();
 
         QFile::remove(closeDirPath(getDataDirectory()) + "/ecs.sqlite");
-        qApp->quit();
+
+        // kill itself to restart
+        abort();
         return;
     }
       
@@ -1696,16 +1699,16 @@ private:
 
     QString hardwareIdAsGuid() {
 #ifdef EDGE_SERVER
-	char  mac[13];
-	memset(mac, 0, sizeof(mac));
-	char* host = 0;
-	mac_eth0(mac, &host);
-	QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-	md5Hash.addData(mac, 12);
-	md5Hash.addData("edge");
-	return QUuid::fromRfc4122(md5Hash.result()).toString();
+    char  mac[13];
+    memset(mac, 0, sizeof(mac));
+    char* host = 0;
+    mac_eth0(mac, &host);
+    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+    md5Hash.addData(mac, 12);
+    md5Hash.addData("edge");
+    return QUuid::fromRfc4122(md5Hash.result()).toString();
 #else
-	return hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
+    return hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
 #endif
     }
 
@@ -1713,7 +1716,7 @@ private:
         QString guidIsHWID = MSSettings::roSettings()->value(GUID_IS_HWID).toString();
         QString serverGuid = MSSettings::roSettings()->value(SERVER_GUID).toString();
         QString serverGuid2 = MSSettings::roSettings()->value(SERVER_GUID2).toString();
-        QString obsoleteGuid = MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString();
+        QString pendingSwitchToClusterMode = MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString();
 
         QString hwidGuid = hardwareIdAsGuid();
 
@@ -1734,6 +1737,11 @@ private:
                 MSSettings::roSettings()->setValue(GUID_IS_HWID, NO);
                 MSSettings::roSettings()->remove(SERVER_GUID2);
             } else {
+                // Don't reset serverGuid if we're in pending switch to cluster mode state.
+                // As it's stored in the remote database.
+                if (pendingSwitchToClusterMode == YES)
+                    return;
+
                 MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
                 MSSettings::roSettings()->setValue(GUID_IS_HWID, YES);
 
@@ -1743,6 +1751,7 @@ private:
             }
         }
 
+        QString obsoleteGuid = MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString();
         if (!obsoleteGuid.isEmpty()) {
             qnCommon->setObsoleteServerGuid(obsoleteGuid);
         }
@@ -1789,7 +1798,6 @@ int main(int argc, char* argv[])
 # endif
 #endif
 #endif //__arm__
-
     ::srand( ::time(NULL) );
 #ifdef _WIN32
     win32_exception::installGlobalUnhandledExceptionHandler();
@@ -1842,6 +1850,7 @@ int main(int argc, char* argv[])
         MSSettings::initializeROSettingsFromConfFile( configFilePath );
     if( !rwConfigFilePath.isEmpty() )
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
+
 
     QnVideoService service( argc, argv );
     int res = service.exec();
