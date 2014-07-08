@@ -15,6 +15,7 @@ extern "C"
 #include "utils/common/synctime.h"
 
 #include "vmax480_resource.h"
+#include "utils/common/util.h"
 
 
 
