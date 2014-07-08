@@ -96,7 +96,8 @@ signals:
 private slots:
     void updateGridParams(bool fromUserInput = false);
     void updateGridEnabledState();
-    void updateDaysEnabledState();
+    void updateArchiveRangeEnabledState();
+    void validateArchiveLength();
     void updateLicensesLabelText();
     void updateMotionButtons();
     void updatePanicLabelText();
@@ -112,7 +113,6 @@ private slots:
     void at_licensesButton_clicked();
     void at_releaseSignalizer_activated(QObject *target);
     void at_exportScheduleButton_clicked();
-    void at_archiveRangeChanged();
 private:
     int qualityToComboIndex(const Qn::StreamQuality& q);
 

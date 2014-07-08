@@ -202,18 +202,18 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
 
-    connect(ui->checkBoxMinArchive,      SIGNAL(clicked()),                 this,   SLOT(at_checkBoxArchive_clicked()));
-    connect(ui->checkBoxMinArchive,      SIGNAL(stateChanged(int)),         this,   SLOT(updateDaysEnabledState()));
-    connect(ui->checkBoxMinArchive,      SIGNAL(stateChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
+    connect(ui->checkBoxMinArchive,      &QCheckBox::clicked,               this,   &QnCameraScheduleWidget::at_checkBoxArchive_clicked);
+    connect(ui->checkBoxMinArchive,      &QCheckBox::stateChanged,          this,   &QnCameraScheduleWidget::updateArchiveRangeEnabledState);
+    connect(ui->checkBoxMinArchive,      &QCheckBox::stateChanged,          this,   &QnCameraScheduleWidget::archiveRangeChanged);
 
-    connect(ui->checkBoxMaxArchive,      SIGNAL(clicked()),                 this,   SLOT(at_checkBoxArchive_clicked()));
-    connect(ui->checkBoxMaxArchive,      SIGNAL(stateChanged(int)),         this,   SLOT(updateDaysEnabledState()));
-    connect(ui->checkBoxMaxArchive,      SIGNAL(stateChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
+    connect(ui->checkBoxMaxArchive,      &QCheckBox::clicked,               this,   &QnCameraScheduleWidget::at_checkBoxArchive_clicked);
+    connect(ui->checkBoxMaxArchive,      &QCheckBox::stateChanged,          this,   &QnCameraScheduleWidget::updateArchiveRangeEnabledState);
+    connect(ui->checkBoxMaxArchive,      &QCheckBox::stateChanged,          this,   &QnCameraScheduleWidget::archiveRangeChanged);
 
-    connect(ui->spinBoxMinDays,          SIGNAL(valueChanged(int)),         this,   SLOT(at_archiveRangeChanged()));
+    connect(ui->spinBoxMinDays,          SIGNAL(valueChanged(int)),         this,   SLOT(validateArchiveLength()));
     connect(ui->spinBoxMinDays,          SIGNAL(valueChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
 
-    connect(ui->spinBoxMaxDays,          SIGNAL(valueChanged(int)),         this,   SLOT(at_archiveRangeChanged()));
+    connect(ui->spinBoxMaxDays,          SIGNAL(valueChanged(int)),         this,   SLOT(validateArchiveLength()));
     connect(ui->spinBoxMaxDays,          SIGNAL(valueChanged(int)),         this,   SIGNAL(archiveRangeChanged()));
 
     connect(ui->exportScheduleButton,   SIGNAL(clicked()),                  this,   SLOT(at_exportScheduleButton_clicked()));
@@ -307,8 +307,8 @@ void QnCameraScheduleWidget::setReadOnly(bool readOnly)
 
     setReadOnly(ui->checkBoxMaxArchive, readOnly);
     setReadOnly(ui->checkBoxMinArchive, readOnly);
-    setReadOnly(ui->spinBoxMaxDays, readOnly && ui->checkBoxMaxArchive->checkState() == Qt::Checked);
-    setReadOnly(ui->spinBoxMinDays, readOnly && ui->checkBoxMinArchive->checkState() == Qt::Checked);
+    setReadOnly(ui->spinBoxMaxDays, readOnly);
+    setReadOnly(ui->spinBoxMinDays, readOnly);
     m_readOnly = readOnly;
 }
 
@@ -339,7 +339,12 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
             continue;
         }
         mixedMinDays |= camera->minDays() != minDays;
+        if (mixedMinDays)
+            minDays = qMin(qAbs(minDays), qAbs(camera->minDays()));
+
         mixedMaxDays |= camera->maxDays() != maxDays;
+        if (mixedMaxDays)
+            maxDays = qMax(qAbs(camera->maxDays()), qAbs(maxDays));
     }
 
     if(enabledCount > 0 && disabledCount > 0)
@@ -347,21 +352,19 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     else 
         ui->enableRecordingCheckBox->setCheckState(enabledCount > 0 ? Qt::Checked : Qt::Unchecked);
 
-    if(mixedMinDays) {
-        ui->checkBoxMinArchive->setCheckState(Qt::PartiallyChecked);
-    }
-    else {
-        ui->checkBoxMinArchive->setCheckState(minDays > 0 ? Qt::Checked : Qt::Unchecked);
-        ui->spinBoxMinDays->setValue(qAbs(minDays));
-    }
+    ui->checkBoxMinArchive->setCheckState(mixedMinDays
+        ? Qt::PartiallyChecked
+        : minDays < 0
+        ? Qt::Checked
+        : Qt::Unchecked);
+    ui->spinBoxMinDays->setValue(qAbs(minDays));
 
-    if(mixedMaxDays) {
-        ui->checkBoxMaxArchive->setCheckState(Qt::PartiallyChecked);
-    }
-    else {
-        ui->checkBoxMaxArchive->setCheckState(maxDays > 0 ? Qt::Checked : Qt::Unchecked);
-        ui->spinBoxMaxDays->setValue(qAbs(maxDays));
-    }
+    ui->checkBoxMaxArchive->setCheckState(mixedMaxDays
+        ? Qt::PartiallyChecked
+        : maxDays < 0
+        ? Qt::Checked
+        : Qt::Unchecked);
+    ui->spinBoxMaxDays->setValue(qAbs(maxDays));
 
     updatePanicLabelText();
     updateMotionButtons();
@@ -651,11 +654,11 @@ bool QnCameraScheduleWidget::isRecordingParamsAvailable() const
 }
 
 
-void QnCameraScheduleWidget::updateDaysEnabledState()
-{
+void QnCameraScheduleWidget::updateArchiveRangeEnabledState() {
     bool isEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
     ui->spinBoxMaxDays->setEnabled(isEnabled && ui->checkBoxMaxArchive->checkState() == Qt::Unchecked);
     ui->spinBoxMinDays->setEnabled(isEnabled && ui->checkBoxMinArchive->checkState() == Qt::Unchecked);
+    validateArchiveLength();
 }
 
 void QnCameraScheduleWidget::updateGridEnabledState()
@@ -669,7 +672,7 @@ void QnCameraScheduleWidget::updateGridEnabledState()
 
     ui->checkBoxMinArchive->setEnabled(enabled);
     ui->checkBoxMaxArchive->setEnabled(enabled);
-    updateDaysEnabledState();
+    updateArchiveRangeEnabledState();
 }
 
 void QnCameraScheduleWidget::updateLicensesLabelText()
@@ -980,28 +983,33 @@ bool QnCameraScheduleWidget::hasDualStreamingMotionOnGrid() const {
     return false;
 }
 
-int QnCameraScheduleWidget::maxRecordedDays() const
-{
-    if (ui->checkBoxMaxArchive->checkState() == Qt::PartiallyChecked)
+int QnCameraScheduleWidget::maxRecordedDays() const {
+    switch (ui->checkBoxMaxArchive->checkState()) {
+    case Qt::Unchecked:
+        return ui->spinBoxMaxDays->value();
+    case Qt::Checked:   //automatically manage but save for future use
+        return ui->spinBoxMaxDays->value() * -1;
+    default:
         return RecordedDaysDontChange;
-    else
-        return ui->spinBoxMaxDays->value() * (ui->checkBoxMaxArchive->isChecked() ? 1 : -1);
+    }
 }
 
-int QnCameraScheduleWidget::minRecordedDays() const
-{
-    if (ui->checkBoxMinArchive->checkState() == Qt::PartiallyChecked)
+int QnCameraScheduleWidget::minRecordedDays() const {
+    switch (ui->checkBoxMinArchive->checkState()) {
+    case Qt::Unchecked:
+        return ui->spinBoxMinDays->value();
+    case Qt::Checked:   //automatically manage but save for future use
+        return ui->spinBoxMinDays->value() * -1;
+    default:
         return RecordedDaysDontChange;
-    else
-        return ui->spinBoxMinDays->value() * (ui->checkBoxMinArchive->isChecked() ? 1 : -1);
+    }
 }
 
-void QnCameraScheduleWidget::at_archiveRangeChanged()
-{
-    if (ui->checkBoxMinArchive->checkState() == Qt::Checked && ui->checkBoxMaxArchive->checkState() == Qt::Checked)
+void QnCameraScheduleWidget::validateArchiveLength() {
+    if (ui->checkBoxMinArchive->checkState() == Qt::Unchecked && ui->checkBoxMaxArchive->checkState() == Qt::Unchecked)
     {
         if (ui->spinBoxMaxDays->value() < ui->spinBoxMinDays->value())
             ui->spinBoxMaxDays->setValue(ui->spinBoxMinDays->value());
     }
-    ui->minArchiveDaysWarningLabel->setVisible(ui->checkBoxMinArchive->isChecked() && ui->spinBoxMinDays->value() > dangerousMinArchiveValue);
+    ui->minArchiveDaysWarningLabel->setVisible(ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > dangerousMinArchiveValue);
 }
