@@ -159,7 +159,7 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
 
     connect(exportProgressDialog,   SIGNAL(canceled()),             tool,                   SLOT(stop()));
     if (target && slot)
-        connect(tool,               SIGNAL(finished(bool)),         target,                 slot);
+        connect(tool,               SIGNAL(finished(bool,QString)),         target,                 slot);
 
     return tool->start();
 }
