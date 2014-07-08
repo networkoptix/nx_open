@@ -1731,6 +1731,9 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     /* Adjust for chunks. If they are provided, they MUST intersect with period */
     if(!periods.isEmpty()) {
+
+        QnTimePeriodList localPeriods = periods.intersected(period);
+
         qint64 startDelta = periods.first().startTimeMs - period.startTimeMs;
         if (startDelta > 0) { //user selected period before the first chunk
             period.startTimeMs += startDelta;
@@ -1832,17 +1835,6 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         itemCount = qMin(period.durationMs / step, maxItems);
     }
 
-    /* Adjust resulting period for chunks. */
-    if(!periods.isEmpty()) {
-        qint64 startTime = periods[0].startTimeMs;
-
-        while(startTime > period.startTimeMs + step / 2) {
-            period.startTimeMs += step;
-            period.durationMs -= step;
-            itemCount--;
-        }
-    }
-
     /* Calculate size of the resulting matrix. */
     qreal desiredAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
     QnResourceWidget *widget = parameters.widget();
@@ -1861,6 +1853,12 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     qint64 time = period.startTimeMs;
     for(int i = 0; i < itemCount; i++) {
+        QnTimePeriod localPeriod (time, step);
+        QnTimePeriodList localPeriods = periods.intersected(localPeriod);
+        qint64 localTime = time;
+        if (!localPeriods.isEmpty())
+            localTime = qMax(localTime, localPeriods.first().startTimeMs);
+
         QnLayoutItemData item;
         item.flags = Qn::Pinned;
         item.uuid = QUuid::createUuid();
@@ -1870,11 +1868,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.contrastParams = widget->item()->imageEnhancement();
         item.dewarpingParams = widget->item()->dewarpingParams();
         item.dataByRole[Qn::ItemPausedRole] = true;
-        item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
+        item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(localPeriod);
         item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
-        item.dataByRole[Qn::ItemTimeRole] = time;
+        item.dataByRole[Qn::ItemTimeRole] = localTime;
         item.dataByRole[Qn::ItemAspectRatioRole] = desiredAspectRatio;  // set aspect ratio to make thumbnails load in all cases, see #2619
-        item.dataByRole[Qn::TimePeriodsRole] = QVariant::fromValue<QnTimePeriodList>(periods.intersected(period));
+        item.dataByRole[Qn::TimePeriodsRole] = QVariant::fromValue<QnTimePeriodList>(localPeriods);
 
         layout->addItem(item);
 
