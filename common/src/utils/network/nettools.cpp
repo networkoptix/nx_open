@@ -25,7 +25,10 @@
 #elif defined(Q_OS_MAC)
 #   include <arpa/inet.h>
 #   include <sys/ioctl.h>
+#   include <sys/types.h>
+#   include <sys/socket.h>
 #   include <net/if.h>
+#   include <ifaddrs.h>
 #endif
 
 /*
