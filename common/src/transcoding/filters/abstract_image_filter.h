@@ -3,17 +3,20 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "utils/media/frame_info.h"
+#include <QtCore/QRectF>
+
+class CLVideoDecoderOutput;
+
+// todo: simplify ffmpegVideoTranscoder and perform crop scale operations as filters
 
 /**
  * Base class for addition effects during video transcoding
  */
-
-// todo: simplify ffmpegVideoTranscoder and perform crop scale operations as filters
-
 class QnAbstractImageFilter
 {
 public:
+    virtual ~QnAbstractImageFilter() {}
+
     /**
      * Update video image.
      * 
@@ -21,8 +24,6 @@ public:
      * \param updateRect    image rect to update. Filter MUST not update image outside the rect. Rect in range [0..1]
      */
     virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) = 0;
-
-    virtual ~QnAbstractImageFilter() {}
 };
 
 #endif // ENABLE_DATA_PROVIDERS
