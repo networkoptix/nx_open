@@ -27,11 +27,13 @@ public:
     void setUsedForWriting(bool isUsedForWriting);
     bool isUsedForWriting() const;
 
+#ifdef ENABLE_DATA_PROVIDERS
     virtual float bitrate() const;
     virtual float getStorageBitrateCoeff() const { return 1.0; }
 
     void addBitrate(QnAbstractMediaStreamDataProvider* provider);
     void releaseBitrate(QnAbstractMediaStreamDataProvider* provider);
+#endif
 
     /*
      * Short and uniq storage ID. It is addition related ID field, and used for memory usage optimization

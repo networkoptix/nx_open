@@ -5,6 +5,7 @@
 
 #include "audio_data_packet.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
 
 ////////////////////////////////////////////////////////////
 //// class QnCodecAudioFormat
@@ -151,3 +152,5 @@ void QnWritableCompressedAudioData::assign( const QnWritableCompressedAudioData*
     QnCompressedAudioData::assign( other );
     m_data = other->m_data;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

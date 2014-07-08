@@ -1762,6 +1762,7 @@ INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcet
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '703','618','619' );
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '704','620','619' );
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '10001','10001','619' );
+INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '10002','10002','619' );
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '705','621','6' );
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '706','622','621' );
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '707','625','6' );

@@ -410,9 +410,6 @@
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
 				<qt.classifier>${platform}-${arch}-${box}</qt.classifier>
 				<compile.option1></compile.option1>
-                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-                <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
             </properties>
             <build>
@@ -438,6 +435,8 @@
                 <toolchain.version>codesourcery-2013.11</toolchain.version>
                 <compiler>2011.09</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines>
+                <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines> -->
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -463,6 +462,7 @@
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f-SNAPSHOT</openssl.version>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -487,6 +487,7 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
             </properties>
             <modules>
                 <module>edge_firmware/rpi</module>

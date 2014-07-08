@@ -1,6 +1,8 @@
 #ifndef QN_STATISTICS_H
 #define QN_STATISTICS_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QDateTime>
 #include <QtCore/QMutex>
 
@@ -85,5 +87,7 @@ private:
 
     bool m_runing;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //log_h_109

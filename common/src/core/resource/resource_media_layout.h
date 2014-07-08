@@ -10,7 +10,8 @@
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
 
-#include <core/datapacket/abstract_data_packet.h>
+#include <core/datapacket/abstract_media_context.h>
+
 #include <common/common_globals.h>
 
 class QnResourceLayout {

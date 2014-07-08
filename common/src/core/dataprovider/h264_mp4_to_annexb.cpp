@@ -4,6 +4,8 @@
 
 #include "h264_mp4_to_annexb.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "core/datapacket/video_data_packet.h"
 
 
@@ -121,3 +123,5 @@ void H264Mp4ToAnnexB::readH264SeqHeaderFromExtraData(
         p += nalsize;
     }
 }
+
+#endif // ENABLE_DATA_PROVIDERS

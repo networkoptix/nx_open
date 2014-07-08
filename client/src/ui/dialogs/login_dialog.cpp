@@ -30,9 +30,9 @@
 #include <utils/applauncher_utils.h>
 #include <utils/network/modulefinder.h>
 
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "plugins/resources/archive/filetypesupport.h"
+#include "plugins/resource/avi/avi_resource.h"
+#include "plugins/resource/archive/abstract_archive_stream_reader.h"
+#include "plugins/resource/avi/filetypesupport.h"
 
 #include <client/client_settings.h>
 
@@ -155,7 +155,7 @@ QString QnLoginDialog::currentName() const {
     return ui->connectionsComboBox->currentText();
 }
 
-QnConnectionInfoPtr QnLoginDialog::currentInfo() const {
+QnConnectionInfo QnLoginDialog::currentInfo() const {
     return m_connectInfo;
 }
 
@@ -335,18 +335,19 @@ void QnLoginDialog::updateUsability() {
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::AbstractECConnectionPtr connection )
-{
+void QnLoginDialog::at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode, const ec2::AbstractECConnectionPtr &connection ) {
     updateUsability();
 
-    const QnConnectionInfo& _connectionInfo = connection ? connection->connectionInfo() : QnConnectionInfo();
-    QnConnectionInfoPtr connectionInfo ( new QnConnectionInfo(_connectionInfo) );  //ak: for compatibility with old code
-    bool success = errorCode == ec2::ErrorCode::ok;
+    QnConnectionInfo connectionInfo;
+    if (connection)
+        connectionInfo = connection->connectionInfo();
+
+    bool success = connection && errorCode == ec2::ErrorCode::ok;
     if( success )
     {
         //checking compatibility
-        success = qnSettings->isDevMode() || _connectionInfo.brand.isEmpty()
-                || _connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+        success = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
+                || connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
     }
 
     QString detail;
@@ -372,7 +373,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
         return;
     }
 
-    QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
+    QnCompatibilityChecker remoteChecker(connectionInfo.compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
 
     QnCompatibilityChecker *compatibilityChecker;
@@ -382,11 +383,11 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
         compatibilityChecker = &localChecker;
     }
 
-    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version)) {
+    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo.version)) {
         QnSoftwareVersion minSupportedVersion("1.4"); 
 
         m_restartPending = true;
-        if (connectionInfo->version < minSupportedVersion) {
+        if (connectionInfo.version < minSupportedVersion) {
             QnMessageBox::warning(
                 this,
                 Qn::VersionMismatch_Help,
@@ -395,13 +396,13 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
                     " - Client version: %1.\n"
                     " - EC version: %2.\n"
                     "Compatibility mode for versions lower than %3 is not supported."
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()).arg(minSupportedVersion.toString()),
+                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()).arg(minSupportedVersion.toString()),
                 QMessageBox::Ok
             );
             m_restartPending = false;
         }
 
-        if (connectionInfo->version > QnSoftwareVersion(QN_ENGINE_VERSION)) {
+        if (connectionInfo.version > QnSoftwareVersion(QN_ENGINE_VERSION)) {
 #ifndef Q_OS_MACX
             QnMessageBox::warning(
                 this,
@@ -411,7 +412,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
                     " - Client version: %1.\n"
                     " - EC version: %2.\n"
                     "An error has occurred while trying to restart in compatibility mode."
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()),
                 QMessageBox::Ok
             );
 #else
@@ -433,7 +434,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
         if(m_restartPending) {
             for (;;) {
                 bool isInstalled = false;
-                if (applauncher::isVersionInstalled(connectionInfo->version, &isInstalled) != applauncher::api::ResultType::ok)
+                if (applauncher::isVersionInstalled(connectionInfo.version, &isInstalled) != applauncher::api::ResultType::ok)
                 {
 #ifndef Q_OS_MACX
                     QnMessageBox::warning(
@@ -444,7 +445,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
                             "An error has occurred while trying to restart in compatibility mode."
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()),
                         QMessageBox::Ok
                     );
 #else
@@ -471,12 +472,12 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
                             "Would you like to restart in compatibility mode?"
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()),
                         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel), 
                         QMessageBox::Cancel
                     );
                     if(button == QMessageBox::Ok) {
-                        switch( applauncher::restartClient(connectionInfo->version, currentUrl().toEncoded()) )
+                        switch( applauncher::restartClient(connectionInfo.version, currentUrl().toEncoded()) )
                         {
                             case applauncher::api::ResultType::ok:
                                 break;
@@ -497,9 +498,9 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
                                     this,
                                     Qn::VersionMismatch_Help,
                                     tr("Failure"),
-                                    tr("Failed to launch compatiblity version %1\n"
+                                    tr("Failed to launch compatibility version %1\n"
                                        "Try to restore version %1?").
-                                       arg(connectionInfo->version.toString(QnSoftwareVersion::MinorFormat)),
+                                       arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)),
                                     QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
                                     QMessageBox::Cancel
                                 );
@@ -507,7 +508,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
                                     //starting installation
                                     if( !m_installationDialog.get() )
                                         m_installationDialog.reset( new CompatibilityVersionInstallationDialog( this ) );
-                                    m_installationDialog->setVersionToInstall( connectionInfo->version );
+                                    m_installationDialog->setVersionToInstall( connectionInfo.version );
                                     m_installationDialog->exec();
                                     if( m_installationDialog->installationSucceeded() )
                                         continue;   //offering to start newly-installed compatibility version
@@ -529,7 +530,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
                             " - EC version: %2.\n"
                             "Client version %3 is required to connect to this Enterprise Controller.\n"
                             "Download version %3?"
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()).arg(connectionInfo->version.toString(QnSoftwareVersion::MinorFormat)),
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()).arg(connectionInfo.version.toString(QnSoftwareVersion::MinorFormat)),
                         QMessageBox::StandardButtons(QMessageBox::Ok | QMessageBox::Cancel),
                         QMessageBox::Cancel
                     );
@@ -537,7 +538,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
                         //starting installation
                         if( !m_installationDialog.get() )
                             m_installationDialog.reset( new CompatibilityVersionInstallationDialog( this ) );
-                        m_installationDialog->setVersionToInstall( connectionInfo->version );
+                        m_installationDialog->setVersionToInstall( connectionInfo.version );
                         m_installationDialog->exec();
                         if( m_installationDialog->installationSucceeded() )
                             continue;   //offering to start newly-installed compatibility version
@@ -556,7 +557,6 @@ void QnLoginDialog::at_ec2ConnectFinished( int, ec2::ErrorCode errorCode, ec2::A
 
     QnAppServerConnectionFactory::setEc2Connection( connection );
     m_connectInfo = connectionInfo;
-    qnCommon->setRemoteGUID(m_connectInfo->ecsGuid);
     base_type::accept();
 }
 

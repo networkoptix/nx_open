@@ -4,6 +4,8 @@
 
 #include <api/app_server_connection.h>
 
+#include <common/common_module.h>
+
 #include <utils/common/warnings.h>
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
@@ -661,8 +663,10 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemI
     return Qn::InvisibleAction;
 }
 
-Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &) {
-    return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
+Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parameters) {
+    return qnCommon->remoteGUID().isNull()
+        ? Qn::InvisibleAction
+        : Qn::EnabledAction;
 }
 
 Qn::ActionVisibility QnChangeResolutionActionCondition::check(const QnActionParameters &) {

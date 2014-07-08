@@ -28,7 +28,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 
-#include <plugins/resources/third_party/motion_data_picture.h>
+#include <plugins/resource/third_party/motion_data_picture.h>
 #include <utils/common/log.h>
 #include <utils/common/synctime.h>
 
@@ -368,9 +368,9 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
     int rv = m_vmux->GetFrame (&frame);
     if (rv) {
         const int errnoBak = errno;
-        std::cerr << "Can't read video frame. "<<rv<<", errno "<<errnoBak<<std::endl;
         if( errnoBak == EINTR || errnoBak == EWOULDBLOCK || errnoBak == EAGAIN )
             return nxcip::NX_TRY_AGAIN;
+        std::cerr << "Can't read video frame. "<<rv<<", errno "<<errnoBak<<std::endl;
         if( m_epollFD != -1 )
             unregisterFD( m_vmux->GetFD() );
         m_vmux.reset();

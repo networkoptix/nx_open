@@ -392,7 +392,7 @@ Qn::MotionType QnSecurityCamResource::getDefaultMotionType() const {
     if (!getParam(lit("supportedMotion"), val, QnDomainMemory))
         return defaultMotionType;
 
-    foreach(const QString &s, val.toString().split(QLatin1Char(','))) {
+    foreach(const QString &s, val.toString().split(L',')) {
         QString s1 = s.toLower();
         if (s1 == lit("hardwaregrid"))
             return Qn::MT_HardwareGrid;
@@ -410,7 +410,7 @@ Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
         return Qn::MT_NoMotion;
 
     Qn::MotionTypes result = Qn::MT_Default;
-    foreach(const QString& str, val.toString().split(QLatin1Char(','))) {
+    foreach(const QString& str, val.toString().split(L',')) {
         QString s1 = str.toLower().trimmed();
         if (s1 == lit("hardwaregrid"))
             result |= Qn::MT_HardwareGrid;
@@ -437,7 +437,7 @@ void QnSecurityCamResource::setMotionType(Qn::MotionType value) {
 
 Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const {
     QVariant val;
-    if (!getParam(QLatin1String("cameraCapabilities"), val, QnDomainMemory))
+    if (!getParam(lit("cameraCapabilities"), val, QnDomainMemory))
         return Qn::NoCapabilities;
     return static_cast<Qn::CameraCapabilities>(val.toInt());
 }

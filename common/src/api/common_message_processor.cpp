@@ -22,7 +22,6 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 {
     if (m_connection) {
         m_connection->disconnect(this);
-        //emit connectionClosed();
     }
     m_connection = connection;
 
@@ -114,11 +113,11 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     connection->startReceivingNotifications();
 }
 
-void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool /*isProxy*/)
+void QnCommonMessageProcessor::at_remotePeerFound(const ec2::ApiPeerAliveData &, bool)
 {
 }
 
-void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData runtimeInfo, bool /*isProxy*/)
+void QnCommonMessageProcessor::at_remotePeerLost(const ec2::ApiPeerAliveData &, bool)
 {
 }
 
@@ -154,17 +153,22 @@ void QnCommonMessageProcessor::on_resourceParamsChanged( const QnId& resourceId,
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnId& resourceId )
 {
-    //beforeRemovingResource(resourceId);
-
-    if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId)) 
+    if (canRemoveResource(resourceId))
     {
-        // delete dependent objects
-        foreach(QnResourcePtr subRes, qnResPool->getResourcesByParentId(resourceId))
-            qnResPool->removeResource(subRes);
-        qnResPool->removeResource(ownResource);
-    }
+        //beforeRemovingResource(resourceId);
+
+        if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId)) 
+        {
+            // delete dependent objects
+            foreach(QnResourcePtr subRes, qnResPool->getResourcesByParentId(resourceId))
+                qnResPool->removeResource(subRes);
+            qnResPool->removeResource(ownResource);
+        }
     
-    afterRemovingResource(resourceId);
+        afterRemovingResource(resourceId);
+    }
+    else
+        removeResourceIgnored(resourceId);
 }
 
 void QnCommonMessageProcessor::on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory) {
@@ -262,6 +266,14 @@ void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryLis
         QnCameraHistoryPool::instance()->addCameraHistory(history);
 }
 
+bool QnCommonMessageProcessor::canRemoveResource(const QnId &) 
+{ 
+    return true; 
+}
+
+void QnCommonMessageProcessor::removeResourceIgnored(const QnId &) 
+{
+}
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {

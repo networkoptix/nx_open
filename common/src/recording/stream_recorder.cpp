@@ -1,22 +1,26 @@
 #include "stream_recorder.h"
 
-#include "core/resource/resource_consumer.h"
-#include "core/datapacket/abstract_data_packet.h"
-#include "core/datapacket/media_data_packet.h"
-#include "core/dataprovider/media_streamdataprovider.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "utils/common/util.h"
-#include "decoders/video/ffmpeg.h"
-#include "export/sign_helper.h"
-#include <plugins/resources/archive/avi_files/avi_archive_delegate.h>
-#include <plugins/resources/archive/avi_files/avi_archive_custom_data.h>
+#include <utils/common/util.h>
+#include <utils/common/log.h>
+#include <utils/common/model_functions.h>
+
+#include <core/resource/resource_consumer.h>
+#include <core/datapacket/abstract_data_packet.h>
+#include <core/datapacket/media_data_packet.h>
+#include <core/dataprovider/media_streamdataprovider.h>
+
+#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <plugins/resource/avi/avi_archive_custom_data.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
+
 #include "transcoding/ffmpeg_audio_transcoder.h"
 #include "transcoding/ffmpeg_video_transcoder.h"
 #include "transcoding/filters/contrast_image_filter.h"
 #include "transcoding/filters/time_image_filter.h"
 #include "transcoding/filters/fisheye_image_filter.h"
 
-#include <utils/serialization/json.h>
+#include "decoders/video/ffmpeg.h"
+#include "export/sign_helper.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -495,22 +499,22 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.data());
     {
         if (!isTranscode)
-            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_LayoutInfo, fileExt), layoutStr.toLatin1().data(), 0);
+            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::LayoutInfoTag, fileExt), layoutStr.toLatin1().data(), 0);
         qint64 startTime = m_startOffset+mediaData->timestamp/1000;
-        av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_startTime, fileExt), QString::number(startTime).toLatin1().data(), 0);
-        av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Software, fileExt), "Network Optix", 0);
+        av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::StartTimeTag, fileExt), QString::number(startTime).toLatin1().data(), 0);
+        av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::SoftwareTag, fileExt), "Network Optix", 0);
         QnMediaDewarpingParams mediaDewarpingParams = mediaDev->getDewarpingParams();
         if (mediaDewarpingParams.enabled && !m_itemDewarpingParams.enabled) {
             // dewarping exists in resource and not activated now. Allow dewarping for saved file
             av_dict_set(&m_formatCtx->metadata,
-                        QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Dewarping, fileExt),
+                        QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::DewarpingTag, fileExt),
                         QJson::serialized<QnMediaDewarpingParams>(mediaDewarpingParams), 0);
         }
 
         QnAviArchiveCustomData customData;
         customData.overridenAr = m_device->getProperty(QnMediaResource::customAspectRatioKey()).toDouble();
         av_dict_set(&m_formatCtx->metadata,
-            QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Custom, fileExt),
+            QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::CustomTag, fileExt),
             QJson::serialized<QnAviArchiveCustomData>(customData), 0);
         
 
@@ -522,7 +526,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstCompressedVideoDataPtr& 
             while (signPattern.size() < QnSignHelper::getMaxSignSize())
                 signPattern.append(" ");
             signPattern = signPattern.mid(0, QnSignHelper::getMaxSignSize());
-            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Signature, fileExt), signPattern.data(), 0);
+            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::SignatureTag, fileExt), signPattern.data(), 0);
         }
 #endif
 

@@ -5,6 +5,8 @@
 #ifndef ABSTRACT_MEDIA_DATA_FILTER_H
 #define ABSTRACT_MEDIA_DATA_FILTER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "abstract_ondemand_data_provider.h"
 
 
@@ -40,5 +42,7 @@ protected:
     */
     virtual QnAbstractDataPacketPtr processData( QnAbstractDataPacketPtr* const data ) = 0;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //ABSTRACT_MEDIA_DATA_FILTER_H

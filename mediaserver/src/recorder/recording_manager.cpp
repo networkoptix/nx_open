@@ -4,11 +4,12 @@
 #include "recording/stream_recorder.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "camera/camera_pool.h"
-#include "device_plugins/server_archive/server_archive_delegate.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/server_archive/server_archive_delegate.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 #include "camera/video_camera.h"
 #include "core/misc/schedule_task.h"
 #include "server_stream_recorder.h"
+#include <utils/common/log.h>
 #include "utils/common/synctime.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/resource_fwd.h"
@@ -51,7 +52,7 @@ void QnRecordingManager::start()
     m_scheduleWatchingTimer.start(1000);
     
     connect(&m_licenseTimer, &QTimer::timeout, this, &QnRecordingManager::at_checkLicenses);
-    //m_licenseTimer.start(1000 * 60);
+    m_licenseTimer.start(1000 * 60);
 
     QThread::start();
 }
@@ -166,6 +167,7 @@ bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
 
     const QnResourcePtr& serverRes = qnResPool->getResourceById(res->getParentId());
     const QnMediaServerResource* server = dynamic_cast<const QnMediaServerResource*>(serverRes.data());
+    assert( server != nullptr );
     QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getId().toByteArray());
 
     const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();

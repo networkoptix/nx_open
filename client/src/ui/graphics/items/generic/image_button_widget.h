@@ -34,14 +34,13 @@ class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> >, protecte
     typedef Animated<Clickable<GraphicsWidget> > base_type;
 
 public:
-    // TODO: #Elric #enum
     enum StateFlag {
-        DEFAULT = 0,        /**< Default button state. */
-        CHECKED = 0x1,      /**< Button is checkable and is checked. */
-        PRESSED = 0x2,      /**< Button is pressed. This is the state that the button enters when a mouse button is pressed over it, and leaves when the mouse button is released. */
-        HOVERED = 0x4,      /**< Button is hovered over. */
-        DISABLED = 0x8,     /**< Button is disabled. */
-        FLAGS_MAX = 0xF // TODO: #Elric rename, use CamelCase like in Qt
+        Default = 0,        /**< Default button state. */
+        Checked = 0x1,      /**< Button is checkable and is checked. */
+        Pressed = 0x2,      /**< Button is pressed. This is the state that the button enters when a mouse button is pressed over it, and leaves when the mouse button is released. */
+        Hovered = 0x4,      /**< Button is hovered over. */
+        Disabled = 0x8,     /**< Button is disabled. */
+        MaxState = 0xF 
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
@@ -59,9 +58,9 @@ public:
     Q_SLOT void setCheckable(bool checkable);
 
     StateFlags state() const { return m_state; }
-    bool isHovered() const { return state() & HOVERED; }
-    bool isChecked() const { return state() & CHECKED; }
-    bool isPressed() const { return state() & PRESSED; }
+    bool isHovered() const { return state() & Hovered; }
+    bool isChecked() const { return state() & Checked; }
+    bool isPressed() const { return state() & Pressed; }
     bool isDisabled() const { return !isEnabled(); }
     Q_SLOT void setChecked(bool checked = true);
     Q_SLOT void setPressed(bool pressed = true);
@@ -127,8 +126,8 @@ protected:
 private:
     friend class QnImageButtonHoverProgressAccessor;
 
-    boost::array<QPixmap, FLAGS_MAX + 1> m_pixmaps;
-    mutable boost::array<QPixmap, FLAGS_MAX + 1> m_pixmapCache;
+    boost::array<QPixmap, MaxState + 1> m_pixmaps;
+    mutable boost::array<QPixmap, MaxState + 1> m_pixmapCache;
     mutable bool m_pixmapCacheValid;
 
     StateFlags m_state;

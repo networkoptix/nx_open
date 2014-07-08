@@ -54,7 +54,7 @@ extern "C"
 #include "workbench_layout_snapshot_manager.h"
 
 #include "camera/thumbnails_loader.h"
-#include "plugins/resources/archive/abstract_archive_stream_reader.h"
+#include "plugins/resource/archive/abstract_archive_stream_reader.h"
 #include "redass/redass_controller.h"
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):

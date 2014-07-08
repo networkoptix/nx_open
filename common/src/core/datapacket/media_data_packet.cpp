@@ -1,24 +1,26 @@
 #include "media_data_packet.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 extern "C"
 {
-    #include <libavformat/avformat.h>
+#include <libavformat/avformat.h>
 }
 
-#include "utils/media/bitStream.h"
-#include "utils/media/ffmpeg_helper.h"
-#include "utils/media/sse_helper.h"
-#include "utils/common/synctime.h"
-
 #include <QtGui/QRegion>
+
+#include <utils/media/bitStream.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <utils/media/sse_helper.h>
+#include <utils/common/synctime.h>
+#include <utils/math/math.h>
+
+#include <plugins/camera_plugin.h>
 
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
 #endif
 
-#include <utils/math/math.h>
-
-#include "utils/media/sse_helper.h"
 
 
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)
@@ -543,3 +545,6 @@ bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
 {
     return timeMs < data.startTimeMs;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
+
