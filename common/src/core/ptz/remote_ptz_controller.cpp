@@ -146,7 +146,7 @@ bool QnRemotePtzController::getHomeObject(QnPtzObject *) {
     RUN_COMMAND(Qn::GetHomeObjectPtzCommand, QVariant(), ptzGetHomeObjectAsync);
 }
 
-bool QnRemotePtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) {
+bool QnRemotePtzController::getAuxilaryTraits(QnPtzAuxilaryTraitList *) {
     RUN_COMMAND(Qn::GetAuxilaryTraitsPtzCommand, QVariant(), ptzGetAuxilaryTraitsAsync);
 }
 
