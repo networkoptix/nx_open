@@ -10,6 +10,8 @@
 
 #include <QtCore/QStringList>
 
+#include <utils/common/log.h>
+
 #include "api/app_server_connection.h"
 #include "motion_data_picture.h"
 #include "plugins/resource/archive/archive_stream_reader.h"

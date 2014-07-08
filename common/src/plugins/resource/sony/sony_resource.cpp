@@ -1,9 +1,10 @@
-
 #ifdef ENABLE_ONVIF
 
 #include "sony_resource.h"
 
 #include <QtCore/QMutexLocker>
+
+#include <utils/common/log.h>
 
 #include "onvif/soapMediaBindingProxy.h"
 

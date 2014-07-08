@@ -1,10 +1,13 @@
 #ifdef ENABLE_ARECONT
 
-#include "av_resource.h"
-#include "av_panoramic.h"
+#include <utils/common/log.h>
+#include <utils/network/http/httptypes.h>
+
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
 #include "core/resource/resource_media_layout.h"
-#include "utils/network/http/httptypes.h"
+
+#include "av_resource.h"
+#include "av_panoramic.h"
 
 #define MAX_RESPONSE_LEN (4*1024)
 

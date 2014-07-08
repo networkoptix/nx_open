@@ -35,6 +35,7 @@ extern "C"
 
 #include "decoders/video/ipp_h264_decoder.h"
 
+#include <utils/common/log.h>
 #include <utils/common/command_line_parser.h>
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"

@@ -1,12 +1,14 @@
 #ifdef ENABLE_STARDOT
 
-#include <QtCore/QTextStream>
-#include "stardot_resource.h"
 #include "stardot_stream_reader.h"
-#include "utils/common/sleep.h"
-#include "utils/common/synctime.h"
+
+#include <QtCore/QTextStream>
+
+#include <utils/common/log.h>
 #include "utils/media/nalUnits.h"
 #include "utils/network/tcp_connection_priv.h"
+
+#include "stardot_resource.h"
 
 static const char STARDOT_SEI_UUID[] = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa";
 static const int STARDOT_SEI_PRODUCT_INFO = 0x0a00;

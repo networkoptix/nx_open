@@ -2,6 +2,8 @@
 
 #ifdef Q_OS_WIN
 
+#include <utils/common/log.h>
+
 struct FffmpegLog
 {
     static void av_log_default_callback_impl(void* ptr, int level, const char* fmt, va_list vl)

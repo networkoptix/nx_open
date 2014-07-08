@@ -76,21 +76,4 @@ namespace stree
         return true;
     }
 
-
-    namespace MatchType
-    {
-        Value fromString( const QString& str )
-        {
-            if( str == lit("equal") )
-                return equal;
-            else if( str == lit("greater") )
-                return greater;
-            else if( str == lit("less") )
-                return less;
-            else if( str == lit("wildcard") )
-                return wildcard;
-            else
-                return unknown;
-        }
-    };
 }

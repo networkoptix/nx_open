@@ -1,5 +1,6 @@
-
 #include "coldstore_dts_archive_reader.h"
+
+#include <utils/common/log.h>
 
 #include "core/datapacket/video_data_packet.h"
 #include "core/resource/resource_media_layout.h"

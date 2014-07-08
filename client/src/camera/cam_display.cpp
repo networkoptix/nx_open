@@ -3,8 +3,9 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
 
-#include "utils/common/util.h"
-#include "utils/common/synctime.h"
+#include <utils/common/log.h>
+#include <utils/common/util.h>
+#include <utils/common/synctime.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/datapacket/media_data_packet.h"

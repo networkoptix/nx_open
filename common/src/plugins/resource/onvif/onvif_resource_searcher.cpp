@@ -1,14 +1,17 @@
-
 #ifdef ENABLE_ONVIF
 
 #include "onvif_resource_searcher.h"
+
+#include <QtCore/QUrlQuery>
+
+#include <utils/common/log.h>
+
 #include "core/resource/camera_resource.h"
-#include "onvif_resource.h"
-#include "onvif_resource_information_fetcher.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/dataprovider/live_stream_provider.h"
 
-#include <QtCore/QUrlQuery>
+#include "onvif_resource.h"
+#include "onvif_resource_information_fetcher.h"
 
 bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 {

@@ -28,6 +28,7 @@ extern "C"
 #include "win_audio_device_info.h"
 #include "decoders/audio/ffmpeg_audio.h"
 #include "utils/common/synctime.h"
+#include "utils/common/log.h"
 #include "utils/media/ffmpeg_helper.h"
 
 // mux audio 1 and audio 2 to audio1 buffer

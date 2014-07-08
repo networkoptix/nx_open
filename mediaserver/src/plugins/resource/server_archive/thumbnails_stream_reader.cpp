@@ -1,6 +1,7 @@
 #include "thumbnails_stream_reader.h"
 
-#include "utils/common/util.h"
+#include <utils/common/log.h>
+#include <utils/common/util.h>
 
 #include "plugins/resource/avi/avi_archive_delegate.h"
 #include "plugins/resource/avi/thumbnails_archive_delegate.h"

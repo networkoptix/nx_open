@@ -7,6 +7,7 @@
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/multicodec_rtp_reader.h"
 #include "soap_wrapper.h"
+#include "onvif_resource.h"
 
 struct CameraInfoParams;
 struct ProfilePair;

@@ -5,12 +5,15 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 
-#include "avi_dvd_resource.h"
+#include <utils/common/log.h>
+
 #include "utils/media/dvd_reader/dvd_udf.h"
 #include "utils/media/dvd_reader/ifo_read.h"
 #include "utils/media/dvd_decrypt/dvdcss.h"
 #include "utils/media/pespacket.h"
 #include "utils/media/nalUnits.h"
+
+#include "avi_dvd_resource.h"
 
 static const int IO_BLOCK_SIZE = 1024 * 1024;
 static const int IO_SKIP_BLOCK_SIZE = 1024 * 1024;

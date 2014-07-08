@@ -1,10 +1,11 @@
 #include "server_message_processor.h"
 
-#include "core/resource_management/resource_pool.h"
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+
 #include <media_server/server_update_tool.h>
 
 #include "serverutil.h"

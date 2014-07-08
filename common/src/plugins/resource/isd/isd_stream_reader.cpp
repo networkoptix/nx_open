@@ -1,12 +1,14 @@
 #ifdef ENABLE_ISD
 
-#include <QtCore/QTextStream>
-#include "isd_resource.h"
 #include "isd_stream_reader.h"
-#include "utils/common/sleep.h"
-#include "utils/common/synctime.h"
-#include "utils/media/nalUnits.h"
-#include "utils/network/simple_http_client.h"
+
+#include <QtCore/QTextStream>
+
+#include <utils/common/log.h>
+#include <utils/common/sleep.h>
+#include <utils/network/simple_http_client.h>
+
+#include "isd_resource.h"
 
 extern QString getValueFromString(const QString& line);
 

@@ -8,14 +8,17 @@
 #  include <arpa/inet.h>
 #endif
 
-#include "av_resource.h"
-#include "av_panoramic.h"
-#include "av_singesensor.h"
+#include <utils/common/log.h>
+#include <utils/network/nettools.h>
+#include <utils/network/ping.h>
+
 #include "core/resource/resource_command_processor.h"
 #include "core/resource/resource_command.h"
 
-#include "utils/network/nettools.h"
-#include "utils/network/ping.h"
+#include "av_resource.h"
+#include "av_panoramic.h"
+#include "av_singesensor.h"
+
 
 const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
 #define MAX_RESPONSE_LEN (4*1024)

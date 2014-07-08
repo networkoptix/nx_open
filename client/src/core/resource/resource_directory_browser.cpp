@@ -4,6 +4,12 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
+#include <utils/common/log.h>
+#include <utils/common/warnings.h>
+#include <utils/local_file_cache.h>
+
+#include "utils/serialization/binary_functions.h"
+
 #include "core/resource_management/resource_pool.h"
 #include "plugins/resource/avi/avi_dvd_resource.h"
 #include "plugins/resource/avi/avi_bluray_resource.h"
@@ -12,11 +18,8 @@
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "client/client_globals.h"
 
-#include <utils/common/warnings.h>
-#include <utils/local_file_cache.h>
 #include "nx_ec/data/api_layout_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-#include "utils/serialization/binary_functions.h"
 
 namespace {
     const int maxResourceCount = 1024;

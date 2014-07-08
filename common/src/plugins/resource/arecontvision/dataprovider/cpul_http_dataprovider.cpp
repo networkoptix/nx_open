@@ -1,9 +1,12 @@
 #ifdef ENABLE_ARECONT
 
-#include "cpul_http_dataprovider.h"
+#include <utils/common/synctime.h>
+#include <utils/common/log.h>
+
 #include "../resource/av_resource.h"
 #include "core/datapacket/video_data_packet.h"
-#include "utils/common/synctime.h"
+
+#include "cpul_http_dataprovider.h"
 
 
 AVClientPullSSHTTPStreamreader::AVClientPullSSHTTPStreamreader(const QnResourcePtr& res):

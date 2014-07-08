@@ -175,11 +175,11 @@ struct QnMetaDataV1Light
     */
     void doMarshalling()
     {
-        startTimeMs = ntohll(startTimeMs);
-        durationMs = ntohl(durationMs);
+        startTimeMs = qFromBigEndian(startTimeMs);
+        durationMs = qFromBigEndian(durationMs);
     }
 
-    qint64 endTimeMs()   const  { return startTimeMs + durationMs; }
+    qint64 endTimeMs() const  { return startTimeMs + durationMs; }
 
     quint64 startTimeMs;
     quint32 durationMs;
