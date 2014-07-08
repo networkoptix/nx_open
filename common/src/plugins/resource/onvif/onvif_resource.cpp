@@ -23,6 +23,7 @@
 #include "onvif_resource.h"
 #include "onvif_stream_reader.h"
 #include "onvif_helper.h"
+#include <utils/common/log.h>
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
 #include "utils/network/http/httptypes.h"

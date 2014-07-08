@@ -146,19 +146,6 @@ namespace stree
         const QVariant m_valueToSet;
     };
 
-    namespace MatchType
-    {
-        enum Value
-        {
-            unknown,
-            equal,
-            greater,
-            less,
-            wildcard
-        };
-
-        Value fromString( const QString& str );
-    };
 }
 
 #endif  //ABSTRACTNODE_H

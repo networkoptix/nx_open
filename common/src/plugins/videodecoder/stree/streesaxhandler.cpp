@@ -9,10 +9,29 @@
 
 #include "streecontainer.h"
 #include "wildcardmatchcontainer.h"
+#include "node.h"
 
 
 namespace stree
 {
+    namespace MatchType
+    {
+        Value fromString( const QString& str )
+        {
+            if( str == lit("equal") )
+                return equal;
+            else if( str == lit("greater") )
+                return greater;
+            else if( str == lit("less") )
+                return less;
+            else if( str == lit("wildcard") )
+                return wildcard;
+            else
+                return unknown;
+        }
+    };
+
+
     SaxHandler::SaxHandler( const ResourceNameSet& resourceNameSet )
     :
         m_state( buildingTree ),

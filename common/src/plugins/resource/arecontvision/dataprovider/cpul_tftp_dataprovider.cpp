@@ -4,14 +4,18 @@
 
 #include <QtCore/QMutex>
 
-#include "av_client_pull.h"
+#include <utils/common/log.h>
+#include <utils/common/util.h>
+#include <utils/common/synctime.h>
+
+#include <core/datapacket/video_data_packet.h>
+#include <core/dataprovider/media_streamdataprovider.h>
+
 #include "../resource/av_resource.h"
 #include "../tools/simple_tftp_client.h"
 #include "../tools/AVJpegHeader.h"
-#include "core/datapacket/video_data_packet.h"
-#include "core/dataprovider/media_streamdataprovider.h"
-#include "utils/common/util.h"
-#include "utils/common/synctime.h"
+
+#include "av_client_pull.h"
 
 
 //======================================================

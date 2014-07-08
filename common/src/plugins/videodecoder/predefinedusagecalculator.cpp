@@ -4,8 +4,11 @@
 
 #include "predefinedusagecalculator.h"
 
-#include "pluginusagewatcher.h"
+#include <utils/common/log.h>
+
 #include "stree/streesaxhandler.h"
+#include "stree/node.h"
+#include "pluginusagewatcher.h"
 
 
 PredefinedUsageCalculator::PredefinedUsageCalculator(

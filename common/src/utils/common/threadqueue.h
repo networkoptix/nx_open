@@ -2,10 +2,10 @@
 #define cl_ThreadQueue_h_2236 
 
 #include <vector>
+
 #include <QtCore/QQueue>
 #include <QtCore/QVariant>
 
-#include "log.h"
 #include "semaphore.h"
 
 static const qint32 MAX_THREAD_QUEUE_SIZE = 256;

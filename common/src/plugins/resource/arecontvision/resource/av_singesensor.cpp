@@ -1,6 +1,9 @@
 #ifdef ENABLE_ARECONT
 
 #include "av_singesensor.h"
+
+#include <utils/common/log.h>
+
 #include "../dataprovider/cpul_tftp_dataprovider.h"
 
 CLArecontSingleSensorResource::CLArecontSingleSensorResource(const QString& name)

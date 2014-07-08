@@ -9,6 +9,7 @@
 #include "camera/video_camera.h"
 #include "core/misc/schedule_task.h"
 #include "server_stream_recorder.h"
+#include <utils/common/log.h>
 #include "utils/common/synctime.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/resource_fwd.h"

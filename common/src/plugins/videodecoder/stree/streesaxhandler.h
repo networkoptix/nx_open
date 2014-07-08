@@ -9,12 +9,28 @@
 
 #include <QtXml/QXmlDefaultHandler>
 
-#include "node.h"
 #include "resourcenameset.h"
 
 
 namespace stree
 {
+    class AbstractNode;
+
+    namespace MatchType
+    {
+        enum Value
+        {
+            unknown,
+            equal,
+            greater,
+            less,
+            wildcard
+        };
+
+        Value fromString( const QString& str );
+    };
+
+
     class SaxHandler
     :
         public QXmlDefaultHandler

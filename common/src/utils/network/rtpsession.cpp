@@ -9,6 +9,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QUuid>
 
+#include "utils/common/log.h"
 #include "utils/common/util.h"
 #include "utils/common/systemerror.h"
 #include "utils/network/http/httptypes.h"

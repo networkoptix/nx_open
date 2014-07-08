@@ -23,6 +23,8 @@ extern "C"
     int av_set_string3(void *obj, const char *name, const char *val, int alloc, const AVOption **o_out);
 }
 
+#include <utils/common/log.h>
+
 #include "core/datapacket/media_data_packet.h"
 #include "win_audio_device_info.h"
 #include "decoders/audio/ffmpeg_audio.h"

@@ -1,14 +1,19 @@
-
 #ifdef ENABLE_ONVIF
 
-#include <QtCore/QTextStream>
-#include "onvif_resource.h"
 #include "onvif_stream_reader.h"
+
+#include <QtCore/QTextStream>
+
+#include <utils/common/log.h>
+
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 #include "utils/media/nalUnits.h"
-#include "onvif/soapMediaBindingProxy.h"
 #include "utils/network/tcp_connection_priv.h"
+
+#include "onvif/soapMediaBindingProxy.h"
+
+#include "onvif_resource.h"
 
 static const int MAX_CAHCE_URL_TIME = 1000 * 300;
 

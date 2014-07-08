@@ -1,12 +1,16 @@
 #ifdef ENABLE_AXIS
 
-#include <QtCore/QTextStream>
-#include "axis_resource.h"
 #include "axis_stream_reader.h"
+
+#include <QtCore/QTextStream>
+
+#include <utils/common/log.h>
+#include <utils/common/sleep.h>
+#include <utils/common/synctime.h>
+#include <utils/media/nalUnits.h>
+
 #include "axis_resource.h"
-#include "utils/common/sleep.h"
-#include "utils/common/synctime.h"
-#include "utils/media/nalUnits.h"
+#include "axis_resource.h"
 
 static const char AXIS_SEI_UUID[] = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa";
 static const int AXIS_SEI_PRODUCT_INFO = 0x0a00;

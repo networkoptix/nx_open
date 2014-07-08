@@ -1,18 +1,19 @@
-
 #ifdef ENABLE_ONVIF
 
-#include "openssl/evp.h"
+#include <openssl/evp.h>
 
-#include <quuid.h>
-
-#include "onvif_resource_searcher_wsdd.h"
-#include "core/resource/camera_resource.h"
-#include "onvif_resource.h"
-#include "onvif_helper.h"
-#include "onvif/wsaapi.h"
+#include <QtCore/QUuid>
 
 #include "utils/network/nettools.h"
 #include "utils/common/string.h"
+#include "utils/common/log.h"
+
+#include "core/resource/camera_resource.h"
+
+#include "onvif/wsaapi.h"
+#include "onvif_resource_searcher_wsdd.h"
+#include "onvif_resource.h"
+#include "onvif_helper.h"
 
 
 //static const int SOAP_DISCOVERY_TIMEOUT = 1; // "+" in seconds, "-" in mseconds

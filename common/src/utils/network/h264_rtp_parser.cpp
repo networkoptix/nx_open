@@ -2,6 +2,7 @@
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
 #include "utils/common/synctime.h"
+#include "utils/common/log.h"
 
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};

@@ -10,13 +10,17 @@
 #include <QtCore/QMutex>
 #include <QtCore/QString>
 
-#include "abstractvideodecoderusagecalculator.h"
-#include "videodecoderplugintypes.h"
-#include "stree/node.h"
 #include "stree/resourcenameset.h"
 
+#include "abstractvideodecoderusagecalculator.h"
+#include "videodecoderplugintypes.h"
+
+namespace stree {
+    class AbstractNode;
+};
 
 class PluginUsageWatcher;
+
 
 //!Estimates resources availability based on current load and xml file with predefined values
 class PredefinedUsageCalculator
