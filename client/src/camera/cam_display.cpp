@@ -1,24 +1,30 @@
 #include "cam_display.h"
 
-#include "core/datapacket/media_data_packet.h"
-#include "video_stream_display.h"
-#include "audio_stream_display.h"
-#include "decoders/audio/ffmpeg_audio.h"
-#include "utils/common/synctime.h"
-
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
+
+#include <utils/common/log.h>
+#include <utils/common/util.h>
+#include <utils/common/synctime.h>
+
+#include "core/resource/camera_resource.h"
+#include "core/datapacket/media_data_packet.h"
+
+#include "decoders/audio/ffmpeg_audio.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
+#include "redass/redass_controller.h"
+
+#include "video_stream_display.h"
+#include "audio_stream_display.h"
+
 
 #if defined(Q_OS_MAC)
 #include <CoreServices/CoreServices.h>
 #elif defined(Q_OS_WIN)
 #include <qt_windows.h>
-#include "device_plugins/desktop_win/device/desktop_resource.h"
+#include <plugins/resource/desktop_win/desktop_resource.h>
 #endif
-#include "utils/common/util.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "core/resource/camera_resource.h"
-#include "redass/redass_controller.h"
+
 
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;

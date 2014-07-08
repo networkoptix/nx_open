@@ -1,10 +1,11 @@
 #include "server_message_processor.h"
 
-#include "core/resource_management/resource_pool.h"
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+
 #include <media_server/server_update_tool.h>
 
 #include "serverutil.h"
@@ -198,8 +199,16 @@ void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
     }
 }
 
-void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
-    resource->setStatus(status, true);
+void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) 
+{
+    if (resource->getId() == qnCommon->moduleGUID() && resource->getStatus() != QnResource::Online)
+    {
+        // it's own media server. change status to online
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(resource->getId(), QnResource::Online);
+    }
+    else {
+        resource->setStatus(status, true);
+    }
 }
 
 bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const

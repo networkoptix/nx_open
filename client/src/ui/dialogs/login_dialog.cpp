@@ -30,9 +30,9 @@
 #include <utils/applauncher_utils.h>
 #include <utils/network/modulefinder.h>
 
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "plugins/resources/archive/filetypesupport.h"
+#include "plugins/resource/avi/avi_resource.h"
+#include "plugins/resource/archive/abstract_archive_stream_reader.h"
+#include "plugins/resource/avi/filetypesupport.h"
 
 #include <client/client_settings.h>
 

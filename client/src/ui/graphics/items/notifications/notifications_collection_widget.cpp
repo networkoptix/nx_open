@@ -5,6 +5,7 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <utils/common/delete_later.h>
+#include <utils/common/util.h> /* For random. */
 
 #include <business/business_strings_helper.h>
 

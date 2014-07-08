@@ -182,20 +182,70 @@ QnTransactionMessageBus::~QnTransactionMessageBus()
     delete m_timer;
 }
 
-void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran)
+void QnTransactionMessageBus::addAlivePeerInfo(ApiPeerData peerData, const QnId& gotFromPeer)
+{
+    AlivePeersMap::iterator itr = m_alivePeers.find(peerData.id);
+    if (itr == m_alivePeers.end()) 
+    {
+        AlivePeerInfo peer(peerData);
+        if (!gotFromPeer.isNull())
+            peer.proxyVia << gotFromPeer;
+        m_alivePeers.insert(peerData.id, peer);
+    }
+    else {
+        AlivePeerInfo& currentValue = itr.value();
+        if (!currentValue.proxyVia.isEmpty() && !gotFromPeer.isNull())
+            currentValue.proxyVia << gotFromPeer; // if peer is accessible directly (proxyVia is empty), do not extend proxy list
+    }
+}
+
+void QnTransactionMessageBus::removeAlivePeer(const QnId& id, bool isProxy)
+{
+    // 1. remove peer from alivePeers map
+
+    auto itr = m_alivePeers.find(id);
+    if (itr == m_alivePeers.end())
+        return;
+    
+    handlePeerAliveChanged(itr.value().peer, false, isProxy);
+    m_alivePeers.erase(itr);
+
+    // 2. remove peers proxy via current peer
+    if (isProxy)
+        return;
+    QSet<QnId> morePeersToRemove;
+    for (auto itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
+    {
+        AlivePeerInfo& otherPeer = itr.value();
+        if (otherPeer.proxyVia.contains(id)) {
+            otherPeer.proxyVia.remove(id);
+            if (otherPeer.proxyVia.isEmpty()) {
+                morePeersToRemove << otherPeer.peer.id;
+            }
+        }
+    }
+    foreach(const QnId& p, morePeersToRemove)
+        removeAlivePeer(p, true);
+}
+
+void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QnId& gotFromPeer)
 {
     if (tran.params.peer.id == m_localPeer.id)
         return; // ignore himself
 
     // proxy alive info from non-direct connected host
-    AlivePeersMap::iterator itr = m_alivePeers.find(tran.params.peer.id);
-    if (tran.params.isAlive && itr == m_alivePeers.end()) {
-        m_alivePeers.insert(tran.params.peer.id, AlivePeerInfo(ApiPeerData(tran.params.peer.id, tran.params.peer.peerType), true));
-        emit peerFound(tran.params, true);
+    bool isPeerExist = m_alivePeers.contains(tran.params.peer.id);
+    if (tran.params.isAlive) 
+    {
+        addAlivePeerInfo(ApiPeerData(tran.params.peer.id, tran.params.peer.peerType), gotFromPeer);
+        if (!isPeerExist) 
+            emit peerFound(tran.params, true);
     }
-    else if (!tran.params.isAlive && itr != m_alivePeers.end()) {
-        emit peerLost(tran.params, true);
-        m_alivePeers.remove(tran.params.peer.id);
+    else 
+    {
+        if (isPeerExist) {
+            removeAlivePeer(tran.params.peer.id, true);
+        }
     }
 }
 
@@ -263,7 +313,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             onGotTransactionSyncResponse(sender, tran);
             return;
         case ApiCommand::peerAliveInfo:
-            onGotServerAliveInfo(tran);
+            onGotServerAliveInfo(tran, sender->remotePeer().id);
             break; // do not return. proxy this transaction
         case ApiCommand::forcePrimaryTimeServer:
             TimeSynchronizationManager::instance()->primaryTimeServerChanged( tran );
@@ -324,7 +374,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         if (transportHeader.processedPeers.contains(transport->remotePeer().id) || !transport->isReadyToSend(tran.command)) 
             continue;
 
-        Q_ASSERT(transport->remotePeer().id != tran.id.peerID);
+        //Q_ASSERT(transport->remotePeer().id != tran.id.peerID);
         transport->sendTransaction(tran, QnTransactionTransportHeader(processedPeers));
     }
 
@@ -375,9 +425,7 @@ void QnTransactionMessageBus::connectToPeerLost(const QnId& id)
     if (!m_alivePeers.contains(id)) 
         return;    
     
-    ApiPeerData peer = m_alivePeers.value(id).peer;
-    m_alivePeers.remove(id);
-    handlePeerAliveChanged(peer, false);
+    removeAlivePeer(id, false);
 }
 
 void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
@@ -385,28 +433,35 @@ void QnTransactionMessageBus::connectToPeerEstablished(const ApiPeerData &peer)
     if (m_alivePeers.contains(peer.id)) 
         return;
 
-    m_alivePeers.insert(peer.id, AlivePeerInfo(peer, false));
-    handlePeerAliveChanged(peer, true);
+    addAlivePeerInfo(peer);
+    handlePeerAliveChanged(peer, true, false);
 }
 
-void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bool isAlive) {
-    QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo, false);
-    tran.params.peer.id = peer.id;
-    tran.params.peer.peerType = peer.peerType;
-    tran.params.isAlive = isAlive;
-    tran.fillSequence();
-    sendTransaction(tran);
+void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bool isAlive, bool isProxy) 
+{
+    ApiPeerAliveData aliveData;
+    aliveData.peer.id = peer.id;
+    aliveData.peer.peerType = peer.peerType;
+    aliveData.isAlive = isAlive;
 
-    if (peer.peerType == Qn::PT_VideowallClient)
-        sendVideowallInstanceStatus(peer, isAlive);
+    if (!isProxy)
+    {
+        QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo, false);
+        tran.params = aliveData;
+        tran.fillSequence();
+        sendTransaction(tran);
+
+        if (peer.peerType == Qn::PT_VideowallClient)
+            sendVideowallInstanceStatus(peer, isAlive);
+    }
 
     if( peer.id == qnCommon->moduleGUID() )
         return; //sending keep-alive
 
     if (isAlive)
-        emit peerFound(tran.params, false);
+        emit peerFound(aliveData, isProxy);
     else
-        emit peerLost(tran.params, false);
+        emit peerLost(aliveData, isProxy);
 }
 
 void QnTransactionMessageBus::sendVideowallInstanceStatus(const ApiPeerData &peer, bool isAlive) {
@@ -529,7 +584,7 @@ void QnTransactionMessageBus::doPeriodicTasks()
         m_aliveSendTimer.restart();
     if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL) {
         m_aliveSendTimer.restart();
-        handlePeerAliveChanged(m_localPeer, true);
+        handlePeerAliveChanged(m_localPeer, true, false);
     }
 
     // check if some server not accessible any more

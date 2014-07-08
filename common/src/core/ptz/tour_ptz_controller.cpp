@@ -34,7 +34,7 @@ QnTourPtzController::~QnTourPtzController() {
 }
 
 bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
-    if (capabilities & Qn::nativePresetsPtzCapability)
+    if (capabilities & Qn::builtinPresetControl)
         return false;
     else
         return 

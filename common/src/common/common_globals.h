@@ -480,11 +480,11 @@ public:
 
 
     enum SerializationFormat {
-        JsonFormat,
-        UbjsonFormat,
-        BnsFormat,
-        CsvFormat,
-        XmlFormat
+        JsonFormat      = 0,
+        UbjsonFormat    = 1,
+        BnsFormat       = 2,
+        CsvFormat       = 3,
+        XmlFormat       = 4
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SerializationFormat)
 
@@ -502,6 +502,11 @@ public:
     const T &_id(const T &value) { return value; }
 
 } // namespace Qn
+
+
+// TODO: #Elric #enum
+enum {MD_WIDTH = 44, MD_HEIGHT = 32};
+
 
 
 /** 

@@ -1,7 +1,7 @@
-
 #include "events_db.h"
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QtEndian>
 
 #include "business/events/abstract_business_event.h"
 #include "utils/common/synctime.h"
@@ -258,7 +258,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
 
 inline void appendIntToBA(QByteArray& ba, int value)
 {
-    value = htonl(value);
+    value = qToBigEndian(value);
     ba.append((const char*) &value, sizeof(int));
 }
 
@@ -336,7 +336,7 @@ void QnEventsDB::getAndSerializeActions(
         //ba->set_actionparams(actionsQuery.value(actionParamIdx).toByteArray());
         //ba->set_runtimeparams(actionsQuery.value(runtimeParamIdx).toByteArray());
     }
-    sizeField = htonl(sizeField);
+    sizeField = qToBigEndian(sizeField);
     memcpy(result.data(), &sizeField, sizeof(int));
 
     qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";

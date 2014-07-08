@@ -1,20 +1,21 @@
-
 #include "video_camera.h"
 
 #include <deque>
+
+#include <utils/common/synctime.h>
+#include <utils/common/util.h> /* For getUsecTimer. */
+#include <utils/media/frame_info.h>
+#include <utils/media/media_stream_cache.h>
+#include <utils/memory/cyclic_allocator.h>
 
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/datapacket/media_data_packet.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/resource/camera_resource.h"
+
 #include "decoders/video/ffmpeg.h"
 #include "media_server/settings.h"
-
-#include <utils/common/synctime.h>
-#include <utils/media/frame_info.h>
-#include <utils/media/media_stream_cache.h>
-#include <utils/memory/cyclic_allocator.h>
 
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;

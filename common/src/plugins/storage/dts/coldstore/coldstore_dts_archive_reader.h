@@ -1,6 +1,6 @@
 #ifndef coldstore_stream_reader_h1059
 #define coldstore_stream_reader_h1059
-#include "plugins/resources/archive/abstract_archive_delegate.h"
+#include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "../../coldstore/coldstore_api/ISFS.h"
 
 
