@@ -883,3 +883,8 @@ bool QnCameraScheduleWidget::hasDualStreamingMotionOnGrid() const {
     }
     return false;
 }
+
+void QnCameraScheduleWidget::resetGridWidget() {
+    ui->recordAlwaysButton->toggle();
+    ui->gridWidget->resetCellValues();
+}

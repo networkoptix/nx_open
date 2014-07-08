@@ -137,6 +137,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
     connect(ui->expertSettingsWidget,   SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
+    connect(ui->expertSettingsWidget,   SIGNAL(secondStreamDisabled()),         this,   SLOT(setGridScheduleToAlwaysRecord()));
 
     connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
     connect(ui->fisheyeCheckBox,        &QCheckBox::toggled,                    this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
@@ -1268,4 +1269,9 @@ void QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged() {
         itemParams.enabled = dewarpingParams.enabled;
         item->setDewarpingParams(itemParams);
     }
+}
+
+void QnSingleCameraSettingsWidget::setGridScheduleToAlwaysRecord() {
+    ui->cameraScheduleWidget->resetGridWidget();
+    at_cameraScheduleWidget_scheduleTasksChanged();
 }

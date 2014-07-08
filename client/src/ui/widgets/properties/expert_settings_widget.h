@@ -21,7 +21,7 @@ public:
 
 signals:
     void dataChanged();
-
+    void secondStreamDisabled();
 private slots:
     void at_dataChanged();
 

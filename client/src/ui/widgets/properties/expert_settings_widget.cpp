@@ -175,6 +175,8 @@ void QnAdvancedSettingsWidget::at_qualitySlider_valueChanged(int value) {
     Qn::SecondStreamQuality quality = sliderPosToQuality(value);
     ui->lowQualityWarningLabel->setVisible(quality == Qn::SSQualityLow);
     ui->highQualityWarningLabel->setVisible(quality == Qn::SSQualityHigh);
+    if(quality == Qn::SSQualityDontUse)
+        emit secondStreamDisabled();
 }
 
 Qn::SecondStreamQuality QnAdvancedSettingsWidget::sliderPosToQuality(int pos)

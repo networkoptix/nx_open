@@ -80,6 +80,8 @@ public:
     void setContext(QnWorkbenchContext *context);
 
     void setExportScheduleButtonEnabled(bool enabled);
+
+    void resetGridWidget();
 signals:
     void scheduleTasksChanged();
     void recordingSettingsChanged();
