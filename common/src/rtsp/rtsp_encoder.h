@@ -1,6 +1,8 @@
 #ifndef __RTSP_ENCODER_H__
 #define __RTSP_ENCODER_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "core/datapacket/media_data_packet.h"
 #include "utils/common/byte_array.h"
 
@@ -52,5 +54,7 @@ protected:
 };
 
 typedef QSharedPointer<QnRtspEncoder> QnRtspEncoderPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __RTSP_ENCODER_H__

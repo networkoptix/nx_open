@@ -1,5 +1,7 @@
 #include "aac_rtp_parser.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 
@@ -191,3 +193,5 @@ QnResourceAudioLayoutPtr QnAacRtpParser::getAudioLayout()
 {
     return m_audioLayout;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

@@ -1,5 +1,7 @@
 #include "ffmpeg_rtp_parser.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <utils/common/util.h> /* For DATETIME_NOW. */
 
 #include "core/datapacket/audio_data_packet.h"
@@ -177,3 +179,5 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
     }
     return true;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
