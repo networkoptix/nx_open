@@ -1,7 +1,6 @@
 #include "client_video_camera.h"
 
-#include "core/dataprovider/media_streamdataprovider.h"
-
+#include <core/dataprovider/media_streamdataprovider.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/security_cam_resource.h>
 
