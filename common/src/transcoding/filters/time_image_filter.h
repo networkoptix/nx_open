@@ -4,7 +4,8 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtGui/QFont>
-#include "abstract_filter.h"
+
+#include "abstract_image_filter.h"
 
 class QnTimeImageFilter: public QnAbstractImageFilter
 {
@@ -12,8 +13,10 @@ public:
     QnTimeImageFilter(Qn::Corner datePos, qint64 timeOffsetMs);
     virtual ~QnTimeImageFilter();
     virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) override;
+
 private:
     void initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr);
+
 private:
     QFont m_timeFont;
     int m_dateTimeXOffs;

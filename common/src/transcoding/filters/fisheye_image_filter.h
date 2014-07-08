@@ -1,12 +1,12 @@
 #ifndef __FISHEYE_IMAGE_FILTER_H__
 #define __FISHEYE_IMAGE_FILTER_H__
 
-#include "abstract_filter.h"
-
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
+
+#include "abstract_image_filter.h"
 
 class QnFisheyeImageFilter: public QnAbstractImageFilter
 {
