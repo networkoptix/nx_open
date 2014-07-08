@@ -34,6 +34,7 @@ namespace ec2
         qRegisterMetaType<ErrorCode>( "ErrorCode" );
         qRegisterMetaType<AbstractECConnectionPtr>( "AbstractECConnectionPtr" );
         qRegisterMetaType<QnFullResourceData>( "QnFullResourceData" ); // TODO: #Elric #EC2 register in a proper place!
+        qRegisterMetaType<QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
         qRegisterMetaType<QnTransactionTransportHeader>( "QnTransactionTransportHeader" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiPeerAliveData>( "ApiPeerAliveData" ); // TODO: #Elric #EC2 register in a proper place!
         qRegisterMetaType<ApiRuntimeData>( "ApiRuntimeData" ); // TODO: #Elric #EC2 register in a proper place!

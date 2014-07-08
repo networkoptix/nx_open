@@ -22,15 +22,20 @@ QnTimeServerSelectionDialog::QnTimeServerSelectionDialog( QWidget* parent, QnWor
 :
     QDialog( parent ),
     QnWorkbenchContextAware( parent, context ),
-    m_ui( new Ui::TimeServerSelectionDialog )
+    m_ui( new Ui::TimeServerSelectionDialog ),
+    m_timeBase( 0 )
 {
     m_ui->setupUi(this);
 
+    connect( m_ui->buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept );
+
     setHelpTopic(this, Qn::PrimaryTimeServerSelection_Help);
-    //m_header->setSectionResizeMode(checkBoxColumn, QHeaderView::ResizeToContents);
-    //m_header->setSectionResizeMode(serverNameColumn, QHeaderView::ResizeToContents);
-    //m_header->setSectionResizeMode(serverTimeColumn, QHeaderView::ResizeToContents);
-    //m_header->setSectionsClickable(true);
+    m_ui->serversWidget->horizontalHeader()->setSectionResizeMode(checkBoxColumn, QHeaderView::ResizeToContents);
+    m_ui->serversWidget->horizontalHeader()->setSectionResizeMode(serverNameColumn, QHeaderView::Stretch);
+    m_ui->serversWidget->horizontalHeader()->setSectionResizeMode(serverTimeColumn, QHeaderView::ResizeToContents);
+    m_ui->serversWidget->horizontalHeader()->setSectionsClickable(true);
+
+    connect( &m_timer, &QTimer::timeout, this, &QnTimeServerSelectionDialog::onTimer );
 }
 
 QnTimeServerSelectionDialog::~QnTimeServerSelectionDialog()
@@ -44,10 +49,16 @@ void QnTimeServerSelectionDialog::setData(
     qint64 localSystemTime,
     const QList<QPair<QnId, qint64> >& peersAndTimes )
 {
+    const qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    m_timeBase = localSystemTime;
     m_ui->serversWidget->setRowCount(0);
 
-    for( const QPair<QnId, qint64>& peer: peersAndTimes )
+    m_peersAndTimes = peersAndTimes;
+
+    for( int i = 0; i < peersAndTimes.size(); ++i )
     {
+        const auto& peer = peersAndTimes[i];
+
         const QnResourcePtr& res = QnResourcePool::instance()->getResourceById( peer.first );
         if( !res )
             continue;
@@ -60,15 +71,14 @@ void QnTimeServerSelectionDialog::setData(
 
         QTableWidgetItem* checkItem = new QTableWidgetItem();
         checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
-        //checkItem->setFlags(checkItem->flags() | Qt::ItemIsTristate);
         checkItem->setFlags(checkItem->flags() &~ Qt::ItemIsEnabled);
-        checkItem->setCheckState(Qt::Unchecked);
-        //checkItem->setData(Qt::UserRole, qVariantFromValue<QnManualCameraSearchSingleCamera>(info));
+        checkItem->setCheckState( row == 0 ? Qt::Checked : Qt::Unchecked );
+        checkItem->setData(Qt::UserRole, i);
 
-        QTableWidgetItem* serverNameItem = new QTableWidgetItem( mediaServerRes->getName() );
+        QTableWidgetItem* serverNameItem = new QTableWidgetItem( lit("%1 (%2)").arg(mediaServerRes->getName()).arg(QUrl(mediaServerRes->getUrl()).host()) );
         serverNameItem->setFlags(serverNameItem->flags() & ~Qt::ItemIsEditable);
 
-        QTableWidgetItem* serverTimeItem = new QTableWidgetItem( QDateTime::fromMSecsSinceEpoch(peer.second).toString() );
+        QTableWidgetItem* serverTimeItem = new QTableWidgetItem( QDateTime::fromMSecsSinceEpoch(currentTime - m_timeBase + peer.second).toString(Qt::ISODate) );
         serverTimeItem->setFlags(serverTimeItem->flags() & ~Qt::ItemIsEditable);
 
         m_ui->serversWidget->setItem(row, checkBoxColumn, checkItem);
@@ -82,4 +92,29 @@ void QnTimeServerSelectionDialog::accept()
     //TODO
 
     QDialog::accept();
+}
+
+void QnTimeServerSelectionDialog::showEvent( QShowEvent* )
+{
+    m_timer.start( 300 );
+}
+
+void QnTimeServerSelectionDialog::hideEvent( QHideEvent* )
+{
+    m_timer.stop();
+}
+
+void QnTimeServerSelectionDialog::onTimer()
+{
+    const qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+
+    //updating peer times
+    for( int i = 0; i < m_ui->serversWidget->rowCount(); ++i )
+    {
+        QTableWidgetItem* checkItem = m_ui->serversWidget->item( i, checkBoxColumn );
+        QTableWidgetItem* serverTimeItem = m_ui->serversWidget->item( i, serverTimeColumn );
+        assert( checkItem );
+        const auto& peer = m_peersAndTimes[checkItem->data(Qt::UserRole).toInt()];
+        serverTimeItem->setText( QDateTime::fromMSecsSinceEpoch(currentTime - m_timeBase + peer.second).toString(Qt::ISODate) );
+    }
 }

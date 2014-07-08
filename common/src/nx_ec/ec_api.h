@@ -6,6 +6,8 @@
 #include <memory>
 
 #include <QtCore/QObject>
+#include <QtCore/QPair>
+#include <QtCore/QList>
 #include <QtCore/QUrl>
 
 #include <utils/common/email.h>
@@ -45,6 +47,8 @@ namespace ec2
         QnLicenseList licenses;
     };
 
+    //list<pair<peerid, peer system time (UTC, millis from epoch)> >
+    typedef QList<QPair<QnId, qint64>> QnPeerTimeInfoList;
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -866,7 +870,7 @@ namespace ec2
             \param localSystemTime Local system time (UTC, millis from epoch)
             \param peersAndTimes pair<peer id, peer local time (UTC, millis from epoch) corresponding to \a localSystemTime>
         */
-        void primaryTimeServerSelectionRequired( qint64 localSystemTime, QList<QPair<QnId, qint64> > peersAndTimes );
+        void primaryTimeServerSelectionRequired( qint64 localSystemTime, QnPeerTimeInfoList peersAndTimes );
         //!Emitted when synchronized time has been changed
         void timeChanged( qint64 syncTime );
 
@@ -947,5 +951,6 @@ namespace ec2
 }
 
 Q_DECLARE_METATYPE(ec2::QnFullResourceData);
+Q_DECLARE_METATYPE(ec2::QnPeerTimeInfoList);
 
 #endif  //EC_API_H

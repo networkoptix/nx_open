@@ -111,12 +111,12 @@ namespace ec2
     //   TimeSynchronizationManager
     //////////////////////////////////////////////
     static TimeSynchronizationManager* TimeManager_instance = nullptr;
-    static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*60*1000;
+    //static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*60*1000;
+    static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*1000;
     //!Once per 10 minutes checking if manual time server selection is required
     //static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10*60*1000;
     static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10*1000;
-    //static const size_t TIME_SYNCHRONIZATION_PERIOD_MS = 60*1000;
-    static const size_t TIME_SYNCHRONIZATION_PERIOD_MS = 10*1000;
+    static const size_t TIME_SYNCHRONIZATION_PERIOD_MS = 60*1000;
 
     TimeSynchronizationManager::TimeSynchronizationManager( Qn::PeerType peerType )
     :
@@ -153,26 +153,36 @@ namespace ec2
                  Qt::DirectConnection );
 
         using namespace std::placeholders;
-        m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
-            std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
-            0 );
-        m_manualTimerServerSelectionCheckTaskID = TimerManager::instance()->addTimer(
-            std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
-            MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS );
+        if( peerType == Qn::PT_Server )
+            m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
+                std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
+                0 );
+        else
+            m_manualTimerServerSelectionCheckTaskID = TimerManager::instance()->addTimer(
+                std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
+                MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS );
     }
 
     TimeSynchronizationManager::~TimeSynchronizationManager()
     {
         quint64 broadcastSysTimeTaskID = 0;
+        quint64 manualTimerServerSelectionCheckTaskID = 0;
         {
             QMutexLocker lk( &m_mutex );
             m_terminated = false;
             broadcastSysTimeTaskID = m_broadcastSysTimeTaskID;
+            manualTimerServerSelectionCheckTaskID = m_manualTimerServerSelectionCheckTaskID;
         }
         if( broadcastSysTimeTaskID )
         {
             TimerManager::instance()->joinAndDeleteTimer( m_broadcastSysTimeTaskID );
             m_broadcastSysTimeTaskID = 0;
+        }
+
+        if( manualTimerServerSelectionCheckTaskID )
+        {
+            TimerManager::instance()->joinAndDeleteTimer( manualTimerServerSelectionCheckTaskID );
+            m_manualTimerServerSelectionCheckTaskID = 0;
         }
 
         assert( TimeManager_instance == this );
@@ -370,7 +380,7 @@ namespace ec2
         }
 
         //if( minPriorityKey.flags == maxPriorityKey.flags )
-        if( peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1 )
+        //if( peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1 )
         {
             const qint64 currentLocalTime = QDateTime::currentMSecsSinceEpoch();
 

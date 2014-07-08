@@ -172,13 +172,13 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                         {
                             //reading chunk header
                             m_chunkHeaderLen = readChunkHeader(rBuffer, m_readBufferLen, &httpChunkHeader);
-                            m_chunkLen = httpChunkHeader.chunkSize;
                             if( m_chunkHeaderLen == 0 )
                             {
                                 if( rBuffer > &m_readBuffer[0] )
                                     memmove( &m_readBuffer[0], rBuffer, m_readBufferLen );
                                 break;  //not enough data in rBuffer to read http chunk header
                             }
+                            m_chunkLen = httpChunkHeader.chunkSize;
                         }
 
                         assert( m_chunkHeaderLen > 0 );
@@ -200,6 +200,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                         QByteArray serializedTran;
                         QnTransactionTransportHeader transportHeader;
                         QnBinaryTransactionSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+                        assert( !transportHeader.processedPeers.empty() );
                         emit gotTransaction(serializedTran, transportHeader);
                         rBuffer += fullChunkSize;
                         m_readBufferLen -= fullChunkSize;
@@ -436,12 +437,13 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
     {
         processChunkExtensions( httpChunkHeader );
 
-        int fullChunkLen = m_chunkHeaderLen + m_chunkLen + 2;
+        const int fullChunkLen = m_chunkHeaderLen + m_chunkLen + 2;
         if (bufferLen >= fullChunkLen)
         {
             QByteArray serializedTran;
             QnTransactionTransportHeader transportHeader;
             QnBinaryTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+            assert( !transportHeader.processedPeers.empty() );
             emit gotTransaction(serializedTran, transportHeader);
 
             buffer += fullChunkLen;

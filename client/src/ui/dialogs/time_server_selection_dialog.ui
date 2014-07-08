@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>835</width>
-    <height>501</height>
+    <width>471</width>
+    <height>264</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Event log</string>
+   <string>Primary time server selection</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -22,6 +22,9 @@
      <property name="columnCount">
       <number>3</number>
      </property>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
      <column>
       <property name="text">
        <string/>
