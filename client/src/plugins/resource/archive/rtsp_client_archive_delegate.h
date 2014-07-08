@@ -2,13 +2,14 @@
 #define __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 
 
-#include "utils/network/rtpsession.h"
-#include "core/resource/resource_media_layout.h"
-#include "plugins/resource/archive/abstract_archive_delegate.h"
-#include "utils/common/util.h"
-#include "recording/time_period.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
-#include "utils/network/ffmpeg_rtp_parser.h"
+#include <utils/network/rtpsession.h>
+#include <utils/network/ffmpeg_rtp_parser.h>
+
+#include <core/resource/resource_media_layout.h>
+
+#include <recording/time_period.h>
+
+#include <plugins/resource/archive/abstract_archive_delegate.h>
 
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;

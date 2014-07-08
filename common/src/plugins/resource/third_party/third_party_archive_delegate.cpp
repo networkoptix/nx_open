@@ -7,6 +7,8 @@
 
 #include <plugins/plugin_tools.h>
 
+#include <utils/common/util.h> /* For DATETIME_NOW. */
+
 #include "third_party_stream_reader.h"
 
 

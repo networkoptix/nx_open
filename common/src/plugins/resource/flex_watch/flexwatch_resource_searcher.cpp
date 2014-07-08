@@ -1,12 +1,12 @@
+#include "flexwatch_resource_searcher.h"
 
 #ifdef ENABLE_ONVIF
 
-#include "flexwatch_resource_searcher.h"
-#include "core/resource/camera_resource.h"
+#include <utils/network/mac_address.h>
+#include <utils/common/util.h>
+#include <utils/common/sleep.h>
+
 #include "flexwatch_resource.h"
-#include "utils/common/sleep.h"
-#include "plugins/resource/onvif/onvif_resource_searcher.h"
-#include "utils/network/mac_address.h"
 
 static const qint64 SOCK_UPDATE_INTERVAL = 1000000ll * 60 * 5;
 

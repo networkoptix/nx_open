@@ -57,7 +57,7 @@
 
 #include <plugins/plugin_manager.h>
 #include <plugins/resource/acti/acti_resource_searcher.h>
-#include <plugins/resource/archive/avi_files/avi_resource.h>
+#include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/arecontvision/resource/av_resource_searcher.h>
 #include <plugins/resource/axis/axis_resource_searcher.h>
 #include <plugins/resource/desktop_camera/desktop_camera_registrator.h>

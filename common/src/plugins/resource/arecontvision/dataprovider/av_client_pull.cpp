@@ -2,6 +2,8 @@
 
 #include "av_client_pull.h"
 
+#include <utils/common/util.h>
+
 #include "../resource/av_resource.h"
 
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnResourcePtr& res):

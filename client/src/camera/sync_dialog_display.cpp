@@ -2,7 +2,7 @@
 #include "export/sign_helper.h"
 #include "utils/common/synctime.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
-#include "plugins/resource/archive/avi_files/avi_archive_delegate.h"
+#include "plugins/resource/avi/avi_archive_delegate.h"
 
 QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource): 
     QnCamDisplay(resource, 0),

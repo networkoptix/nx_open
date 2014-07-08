@@ -18,7 +18,7 @@ extern "C"
 }
 
 #include <core/resource/media_resource.h>
-#include <plugins/resource/archive/avi_files/avi_archive_delegate.h>
+#include <plugins/resource/avi/avi_archive_delegate.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <utils/common/long_runnable.h>
 

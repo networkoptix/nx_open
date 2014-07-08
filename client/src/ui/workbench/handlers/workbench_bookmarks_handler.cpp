@@ -1,5 +1,7 @@
 #include "workbench_bookmarks_handler.h"
 
+#include <utils/common/util.h> /* For DATETIME_NOW. */
+
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 

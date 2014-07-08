@@ -1,21 +1,22 @@
 #include "mserver_resource_searcher.h"
 
-#include <media_server/serverutil.h>
-#include <media_server/settings.h>
-
-#include <business/business_event_connector.h>
-
-#include "core/dataprovider/live_stream_provider.h"
-
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/resource.h"
-#include <core/resource/network_resource.h>
-#include <core/resource/media_server_resource.h>
-
 #include "utils/network/nettools.h"
 #include "utils/network/system_socket.h"
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
+#include "utils/common/util.h" /* For DEFAULT_APPSERVER_HOST. */
+
+#include <core/dataprovider/live_stream_provider.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
+#include <core/resource/network_resource.h>
+#include <core/resource/media_server_resource.h>
+
+#include <business/business_event_connector.h>
+
+#include <media_server/serverutil.h>
+#include <media_server/settings.h>
+
 
 
 static quint16 DISCOVERY_PORT = 54013;

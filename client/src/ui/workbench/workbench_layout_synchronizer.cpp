@@ -11,7 +11,7 @@
 #include "workbench_item.h"
 #include "ui/style/globals.h"
 
-#include "plugins/resource/archive/avi_files/avi_resource.h"
+#include "plugins/resource/avi/avi_resource.h"
 
 namespace {
     const char *layoutSynchronizerPropertyName = "_qn_layoutSynchronizer";

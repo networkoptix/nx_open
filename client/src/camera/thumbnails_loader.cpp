@@ -22,7 +22,7 @@ extern "C"
 
 #include "ui/common/geometry.h"
 
-#include "plugins/resource/archive/avi_files/thumbnails_archive_delegate.h"
+#include "plugins/resource/avi/thumbnails_archive_delegate.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
 
 #include "plugins/resource/archive/rtsp_client_archive_delegate.h"
@@ -30,7 +30,7 @@ extern "C"
 #include "utils/media/frame_info.h"
 
 #include "thumbnails_loader_helper.h"
-#include "plugins/resource/archive/avi_files/avi_resource.h"
+#include "plugins/resource/avi/avi_resource.h"
 
 #include <recording/time_period.h>
 

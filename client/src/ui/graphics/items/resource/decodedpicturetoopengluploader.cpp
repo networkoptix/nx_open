@@ -25,6 +25,7 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
+#include <utils/common/util.h> /* For random. */
 #include <utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>

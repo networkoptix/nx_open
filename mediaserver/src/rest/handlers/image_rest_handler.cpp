@@ -17,6 +17,7 @@ extern "C"
 #include "core/datapacket/media_data_packet.h"
 #include "decoders/video/ffmpeg.h"
 #include "camera/camera_pool.h"
+#include "utils/common/util.h" /* For DATETIME_NOW. */
 
 static const int MAX_GOP_LEN = 100;
 static const qint64 LATEST_IMAGE = -1;

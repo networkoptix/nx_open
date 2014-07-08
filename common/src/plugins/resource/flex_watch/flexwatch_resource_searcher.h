@@ -3,8 +3,7 @@
 
 #ifdef ENABLE_ONVIF
 
-#include "../mdns/mdns_device_searcher.h"
-#include "plugins/resource/onvif/onvif_resource_searcher.h"
+#include <plugins/resource/onvif/onvif_resource_searcher.h>
 
 
 class QnFlexWatchResourceSearcher : public OnvifResourceSearcher
