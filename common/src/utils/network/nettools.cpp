@@ -1,4 +1,3 @@
-
 #include <QtCore/QCoreApplication>
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtNetwork/QHostInfo>
@@ -7,21 +6,26 @@
 #include <QtCore/QStringList>
 #include <QtCore/QThreadPool>
 
+#include <utils/common/log.h>
+
 #include "nettools.h"
 #include "ping.h"
 #include "netstate.h"
-#include "../common/log.h"
 
-#ifdef Q_OS_LINUX
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <ifaddrs.h>
-#include <unistd.h>
-#include <net/if.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
+#if defined(Q_OS_LINUX)
+#   include <arpa/inet.h>
+#   include <sys/socket.h>
+#   include <netdb.h>
+#   include <ifaddrs.h>
+#   include <unistd.h>
+#   include <net/if.h>
+#   include <sys/types.h>
+#   include <sys/socket.h>
+#   include <sys/ioctl.h>
+#elif defined(Q_OS_MAC)
+#   include <arpa/inet.h>
+#   include <sys/ioctl.h>
+#   include <net/if.h>
 #endif
 
 /*
