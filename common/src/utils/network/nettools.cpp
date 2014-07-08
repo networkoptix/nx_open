@@ -26,6 +26,7 @@
 #   include <sys/file.h>
 #   include <sys/socket.h>
 #   include <sys/sysctl.h>
+#   include <net/if.h>
 #   include <net/if_dl.h>
 #   include <net/route.h>
 #   include <netinet/in.h>
