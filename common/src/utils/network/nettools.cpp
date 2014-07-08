@@ -6,22 +6,37 @@
 #include <QtCore/QStringList>
 #include <QtCore/QThreadPool>
 
+#include <utils/common/log.h>
+
 #include "nettools.h"
 #include "ping.h"
 #include "netstate.h"
-#include "../common/log.h"
 
-#ifdef Q_OS_LINUX
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#ifndef Q_OS_ANDROID
-#   include <ifaddrs.h>
-#endif
-#include <unistd.h>
-#include <net/if.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
+#if defined(Q_OS_LINUX)
+#   include <arpa/inet.h>
+#   include <sys/socket.h>
+#   include <netdb.h>
+#   ifndef Q_OS_ANDROID
+#      include <ifaddrs.h>
+#   endif
+#   include <unistd.h>
+#   include <net/if.h>
+#   include <sys/types.h>
+#   include <sys/socket.h>
+#   include <sys/ioctl.h>
+#elif defined(Q_OS_MAC)
+#   include <sys/file.h>
+#   include <sys/socket.h>
+#   include <sys/sysctl.h>
+#   include <net/if.h>
+#   include <net/if_dl.h>
+#   include <net/route.h>
+#   include <netinet/in.h>
+#   include <netinet/if_ether.h>
+#   include <arpa/inet.h>
+#   include <err.h>
+#   include <stdio.h>
+#   include <stdlib.h>
 #endif
 
 /*
@@ -473,19 +488,6 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 void removeARPrecord(const QHostAddress& /*ip*/) {}
 
 #define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
-
-#include <sys/file.h>
-#include <sys/socket.h>
-#include <sys/sysctl.h>
-#include <net/if_dl.h>
-#include <net/route.h>
-#include <netinet/in.h>
-#include <netinet/if_ether.h>
-#include <arpa/inet.h>
-#include <err.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 
 QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 {

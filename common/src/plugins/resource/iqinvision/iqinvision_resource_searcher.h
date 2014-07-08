@@ -4,7 +4,7 @@
 #ifdef ENABLE_IQE
 
 #include "core/resource_management/resource_searcher.h"
-#include "../mdns/mdns_device_searcher.h"
+#include "../mdns/mdns_resource_searcher.h"
 
 
 class QnPlIqResourceSearcher : public QnMdnsResourceSearcher

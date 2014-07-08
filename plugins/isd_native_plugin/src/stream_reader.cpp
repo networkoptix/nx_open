@@ -28,7 +28,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 
-#include <plugins/resources/third_party/motion_data_picture.h>
+#include <plugins/resource/third_party/motion_data_picture.h>
 #include <utils/common/log.h>
 #include <utils/common/synctime.h>
 
