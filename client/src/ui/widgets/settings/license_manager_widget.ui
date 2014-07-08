@@ -12,8 +12,6 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_4">
-     <item>
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
         <string>Active Licenses</string>
@@ -41,6 +39,9 @@
            <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
             <item>
              <widget class="QLabel" name="infoLabel">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
               <property name="text">
                <string notr="true"/>
               </property>
@@ -76,8 +77,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-  </layout>
  </widget>
  <customwidgets>
   <customwidget>
