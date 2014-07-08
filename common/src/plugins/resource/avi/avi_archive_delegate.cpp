@@ -8,25 +8,26 @@
 
 extern "C"
 {
-    #include <libavformat/avformat.h>
+#include <libavformat/avformat.h>
 }
 
-#include "core/datapacket/video_data_packet.h"
+#include <utils/media/ffmpeg_helper.h>
+#include <utils/media/nalUnits.h>
+#include <utils/common/util.h>
+#include <utils/common/model_functions.h>
+
+#include <core/resource/resource_media_layout.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource/media_resource.h>
+#include <core/datapacket/video_data_packet.h>
 #include <core/ptz/media_dewarping_params.h>
-#include "core/resource/resource_media_layout.h"
-#include "core/resource/storage_resource.h"
-#include "core/resource/media_resource.h"
 
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/avi/avi_archive_custom_data.h>
-#include "plugins/storage/file_storage/layout_storage_resource.h"
+#include <plugins/storage/file_storage/layout_storage_resource.h>
 
-#include "motion/light_motion_archive_connection.h"
-#include "export/sign_helper.h"
-
-#include "utils/media/ffmpeg_helper.h"
-#include "utils/media/nalUnits.h"
-#include <utils/serialization/json.h>
+#include <motion/light_motion_archive_connection.h>
+#include <export/sign_helper.h>
 
 class QnAviAudioLayout: public QnResourceAudioLayout
 {

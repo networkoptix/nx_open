@@ -8,9 +8,9 @@
 #include <utils/fs/file.h>
 #include <utils/math/math.h>
 #include "recorder/file_deletor.h"
-#include "plugins/resource/archive/avi_files/avi_archive_delegate.h"
+#include "plugins/resource/avi/avi_archive_delegate.h"
 #include "recording/stream_recorder.h"
-#include "plugins/resource/archive/avi_files/avi_resource.h"
+#include "plugins/resource/avi/avi_resource.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
 #include "motion/motion_helper.h"
 #include <QtCore/QDebug>

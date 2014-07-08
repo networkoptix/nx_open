@@ -16,7 +16,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <plugins/resource/archive/archive_stream_reader.h>
-#include <plugins/resource/archive/avi_files/avi_resource.h>
+#include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <recording/time_period.h>

@@ -3,7 +3,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include "plugins/resource/archive/avi_files/avi_resource.h"
+#include "plugins/resource/avi/avi_resource.h"
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>

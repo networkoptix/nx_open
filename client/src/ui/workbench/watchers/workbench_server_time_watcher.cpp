@@ -4,7 +4,8 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include "plugins/resource/archive/avi_files/avi_resource.h"
+
+#include <plugins/resource/avi/avi_resource.h>
 
 #include <api/media_server_connection.h>
 

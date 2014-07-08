@@ -3,7 +3,9 @@
 #include <QtCore/QUrlQuery>
 
 #include <utils/common/model_functions.h>
+#include <utils/common/util.h>
 #include <utils/math/math.h>
+
 #include <api/app_server_connection.h>
 
 
