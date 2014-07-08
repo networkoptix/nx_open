@@ -324,22 +324,22 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
 
     int enabledCount = 0, disabledCount = 0;
     
-    int minDays = INT_MAX, maxDays = INT_MAX;
+    int minDays = 0, maxDays = 0;
     bool mixedMinDays = false, mixedMaxDays = false;
+    bool firstCamera = true;
 
     foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
     {
         (camera->isScheduleDisabled() ? disabledCount : enabledCount)++;
-        if (minDays == INT_MAX) {
+
+        if (firstCamera) {
             minDays = camera->minDays();
             maxDays = camera->maxDays();
+            firstCamera = false;
+            continue;
         }
-        else if (camera->minDays() != minDays) {
-            mixedMinDays = true;
-        }
-        else if (camera->maxDays() != maxDays) {
-            mixedMaxDays = true;
-        }
+        mixedMinDays |= camera->minDays() != minDays;
+        mixedMaxDays |= camera->maxDays() != maxDays;
     }
 
     if(enabledCount > 0 && disabledCount > 0)
