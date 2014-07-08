@@ -1,6 +1,8 @@
 #ifndef __MDNS_LISTENER_H
 #define __MDNS_LISTENER_H
 
+#ifdef ENABLE_MDNS
+
 #include <list>
 
 #include <QtCore/QElapsedTimer>
@@ -55,5 +57,7 @@ private:
     std::list<std::pair<long, ConsumerDataList> > m_data;
     QStringList m_localAddressList;
 };
+
+#endif // ENABLE_MDNS
 
 #endif // __MDNS_LISTENER_H

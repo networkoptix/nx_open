@@ -1,11 +1,12 @@
-#ifndef uniclient_mdns_h
-#define uniclient_mdns_h
+#ifndef QN_MDNS_PACKET_H
+#define QN_MDNS_PACKET_H
+
+#ifdef ENABLE_MDNS
 
 #include <QtCore/QByteArray>
 #include <QtCore/QVector>
 
-// TODO: #Elric move to resource/mdns
-struct MDNSPacket
+struct QnMdnsPacket
 {
     struct Query
     {
@@ -25,7 +26,7 @@ struct MDNSPacket
         QByteArray queryData;
     };
 
-    MDNSPacket()
+    QnMdnsPacket()
         : transactionId(0),
         flags(0),
         questions(0),
@@ -51,5 +52,7 @@ public:
     void fromDatagram(QByteArray& datagram);
 };
 
-#endif // uniclient_mdns_h
+#endif // ENABLE_MDNS
+
+#endif // QN_MDNS_PACKET_H
 
