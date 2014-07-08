@@ -141,6 +141,7 @@ QSize QnSecurityCamResource::getMaxSensorSize() const {
     return QSize(val_w.toInt(), val_h.toInt());
 }
 
+#ifdef ENABLE_DATA_PROVIDERS
 QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(QnResource::ConnectionRole role) {
     if (role == QnResource::Role_LiveVideo || role == QnResource::Role_Default || role == QnResource::Role_SecondaryLiveVideo)
     {
@@ -163,6 +164,7 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
         return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
     return 0;
 }
+#endif // ENABLE_DATA_PROVIDERS
 
 void QnSecurityCamResource::initializationDone() {
     if( m_inputPortListenerCount.load() > 0 )

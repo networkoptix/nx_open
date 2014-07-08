@@ -5,6 +5,8 @@
 
 #include <QtCore/QQueue>
 #include <QtCore/QVariant>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
 
 #include "semaphore.h"
 

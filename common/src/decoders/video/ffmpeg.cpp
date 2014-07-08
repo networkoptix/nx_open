@@ -1,5 +1,7 @@
 #include "ffmpeg.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QThread>
 
 #include "utils/media/nalUnits.h"
@@ -715,3 +717,5 @@ AVCodecContext* CLFFmpegVideoDecoder::getContext() const
 {
     return m_context;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
