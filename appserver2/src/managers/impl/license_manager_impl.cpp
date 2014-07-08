@@ -39,9 +39,6 @@ namespace ec2
 {
     LicenseManagerImpl::LicenseManagerImpl()
     {
-        // TODO: #Ivan, support compatibility mode
-        qnLicensePool->setMainHardwareIds(LLUtil::getMainHardwareIds(0));
-        qnLicensePool->setCompatibleHardwareIds(LLUtil::getCompatibleHardwareIds(0));
     }
 
     bool LicenseManagerImpl::validateLicense(const ApiLicenseData& license) const {

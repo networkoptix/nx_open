@@ -35,8 +35,6 @@ void QnRuntimeInfoManager::at_remotePeerLost(const ec2::ApiPeerAliveData &data, 
     m_runtimeInfo.remove(data.peer.id);
 
     if (data.peer.id == qnCommon->remoteGUID()) {
-        qnLicensePool->setMainHardwareIds(QList<QByteArray>());
-        qnLicensePool->setCompatibleHardwareIds(QList<QByteArray>());
         m_runtimeInfo.clear();
     }
 }
@@ -52,10 +50,6 @@ void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runt
     m_runtimeInfo.insert(runtimeInfo.peer.id, runtimeInfo);
 
     QnId remoteID = qnCommon->remoteGUID();
-    if (runtimeInfo.peer.id == remoteID) {
-        qnLicensePool->setMainHardwareIds(runtimeInfo.mainHardwareIds);
-        qnLicensePool->setCompatibleHardwareIds(runtimeInfo.compatibleHardwareIds);
-    }
     emit runtimeInfoChanged(runtimeInfo);
 }
 
