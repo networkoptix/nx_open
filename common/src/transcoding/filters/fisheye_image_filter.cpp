@@ -1,5 +1,7 @@
 #include "fisheye_image_filter.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtGui/QMatrix4x4>
 
 #include <utils/math/math.h>
@@ -414,3 +416,5 @@ QSize QnFisheyeImageFilter::getOptimalSize(const QSize& srcResolution, const QnI
     int y = int(x /aspect + 0.5);
     return QSize(qPower2Floor(x, 16), qPower2Floor(y, 2));
 }
+
+#endif // ENABLE_DATA_PROVIDERS

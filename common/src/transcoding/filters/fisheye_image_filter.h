@@ -3,6 +3,8 @@
 
 #include "abstract_filter.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
 
@@ -31,5 +33,7 @@ private:
     CLVideoDecoderOutput m_tmpBuffer;
     int m_lastImageFormat;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __FISHEYE_IMAGE_FILTER_H__

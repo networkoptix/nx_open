@@ -5,6 +5,8 @@
 
 #include "third_party_stream_reader.h"
 
+#ifdef ENABLE_THIRD_PARTY
+
 #include <algorithm>
 
 #include <QtCore/QTextStream>
@@ -563,3 +565,5 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
 
     m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
 }
+
+#endif // ENABLE_THIRD_PARTY

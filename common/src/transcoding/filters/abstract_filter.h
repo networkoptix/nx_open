@@ -1,6 +1,8 @@
 #ifndef __ABSTRACT_IMAGE_FILTER_H__
 #define __ABSTRACT_IMAGE_FILTER_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "utils/media/frame_info.h"
 
 /**
@@ -22,5 +24,7 @@ public:
 
     virtual ~QnAbstractImageFilter() {}
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __ABSTRACT_IMAGE_FILTER_H__

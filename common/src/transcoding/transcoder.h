@@ -1,6 +1,8 @@
 #ifndef __TRANSCODER_H
 #define __TRANSCODER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QString>
 #include <QSharedPointer>
 
@@ -243,5 +245,7 @@ private:
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  // __TRANSCODER_H

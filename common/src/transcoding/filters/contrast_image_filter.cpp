@@ -1,5 +1,7 @@
 #include "contrast_image_filter.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <utils/math/math.h>
 
 QnContrastImageFilter::QnContrastImageFilter(const ImageCorrectionParams& params):
@@ -125,3 +127,5 @@ void QnContrastImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRect
     //TODO: C fallback routine
 #endif
 }
+
+#endif // ENABLE_DATA_PROVIDERS
