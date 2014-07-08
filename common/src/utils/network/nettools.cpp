@@ -23,12 +23,17 @@
 #   include <sys/socket.h>
 #   include <sys/ioctl.h>
 #elif defined(Q_OS_MAC)
-#   include <arpa/inet.h>
-#   include <sys/ioctl.h>
-#   include <sys/types.h>
+#   include <sys/file.h>
 #   include <sys/socket.h>
-#   include <net/if.h>
-#   include <ifaddrs.h>
+#   include <sys/sysctl.h>
+#   include <net/if_dl.h>
+#   include <net/route.h>
+#   include <netinet/in.h>
+#   include <netinet/if_ether.h>
+#   include <arpa/inet.h>
+#   include <err.h>
+#   include <stdio.h>
+#   include <stdlib.h>
 #endif
 
 /*
@@ -480,19 +485,6 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 void removeARPrecord(const QHostAddress& /*ip*/) {}
 
 #define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
-
-#include <sys/file.h>
-#include <sys/socket.h>
-#include <sys/sysctl.h>
-#include <net/if_dl.h>
-#include <net/route.h>
-#include <netinet/in.h>
-#include <netinet/if_ether.h>
-#include <arpa/inet.h>
-#include <err.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 
 QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 {
