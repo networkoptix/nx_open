@@ -18,7 +18,7 @@ DEFINES += ${additional.defines}
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 
 android {
-  DEFINES += DISABLE_ALL_VENDORS DISABLE_DATA_PROVIDERS
+  DEFINES += DISABLE_ALL_VENDORS DISABLE_ARCHIVE DISABLE_DATA_PROVIDERS 
 }
 
 include( optional_functionality.pri )
