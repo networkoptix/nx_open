@@ -40,9 +40,9 @@
                     <div class="row">
                         <nav class="col-xs-4 bs-docs-sidebar">
                             <ul class="nav nav-stacked fixed" id="sidebar">
-                                <xsl:for-each select="apidoc/groups/group">
+                                <xsl:for-each select="/apidoc/groups/group">
                                     <xsl:variable name="groupName" select="groupName"/>
-																		<xsl:variable name="urlPrefix" select="urlPrefix"/>
+                                    <xsl:variable name="urlPrefix" select="urlPrefix"/>
                                     <li>
                                         <a>
                                             <xsl:attribute name="href">#group_<xsl:value-of select="$groupName"/>
@@ -68,7 +68,7 @@
                         <div class="col-xs-8">
                             <xsl:for-each select="apidoc/groups/group">
                                 <xsl:variable name="groupName" select="groupName"/>
-																<xsl:variable name="urlPrefix" select="urlPrefix"/>
+                                <xsl:variable name="urlPrefix" select="urlPrefix"/>
                                 <section>
                                     <xsl:attribute name="id">group_<xsl:value-of select="$groupName"/></xsl:attribute>
 
@@ -97,11 +97,16 @@
                                             <dl>
                                                 <dt>Parameters</dt>
                                                 <dd>
+                                                    <xsl:choose>
+                                                        <xsl:when test="params/param">
                                                     <table class="table table-bordered table-condensed">
                                                         <tr>
                                                             <th>Name</th>
                                                             <th>Description</th>
                                                             <th>Optional</th>
+                                                            <xsl:if test="params/param/values/value">
+                                                                <th>Values</th>
+                                                            </xsl:if>
                                                         </tr>
                                                         <xsl:for-each select="params/param">
                                                             <tr>
@@ -114,9 +119,31 @@
                                                                 <td>
                                                                     <xsl:value-of select="optional"/>
                                                                 </td>
+                                                                <xsl:if test="../../params/param/values/value">
+                                                                <td>
+                                                                    <ul class="list-unstyled">
+                                                                            <xsl:for-each select="values/value">
+                                                                                <li>
+                                                                                    <xsl:value-of select="name"/>
+                                                                                    <a style="cursor: pointer;" data-toggle="tooltip" data-placement="right" data-trigger="hover focus click">
+                                                                                        <xsl:attribute name="title">
+                                                                                            <xsl:value-of select="description"/>
+                                                                                        </xsl:attribute>
+                                                                                        (?)    
+                                                                                    </a>
+                                                                                 </li>
+                                                                            </xsl:for-each> 
+                                                                    </ul>
+                                                                </td>
+                                                                </xsl:if>
                                                             </tr>
                                                         </xsl:for-each>
                                                     </table>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            No parameters
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
                                                 </dd>
                                                 <dt>Result</dt>
                                                 <dd>
@@ -143,11 +170,15 @@
             <script src="bower_components/jquery-scrollspy-thesmart/scrollspy.js"></script>
 
             <script>
-                $('body').scrollspy({
-                target: '.bs-docs-sidebar',
-                offset: 40
+                $(function () { 
+                    $("[data-toggle='tooltip']").tooltip(); 
+
+                    $('body').scrollspy({
+                        target: '.bs-docs-sidebar',
+                        offset: 40
+                    });
                 });
             </script>
-        </html>
+          </html>
     </xsl:template>
 </xsl:stylesheet>
