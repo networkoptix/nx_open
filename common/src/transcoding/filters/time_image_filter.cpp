@@ -1,5 +1,7 @@
 #include "time_image_filter.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QDateTime>
 #include <QtGui/QFontMetrics>
 #include <QtGui/QImage>
@@ -131,3 +133,5 @@ void QnTimeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF& u
         frame->linesize[0], frame->linesize[1], 
         m_timeImg->width(), m_timeImg->height(), false);
 }
+
+#endif // ENABLE_DATA_PROVIDERS

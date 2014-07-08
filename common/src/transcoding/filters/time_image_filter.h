@@ -1,6 +1,8 @@
 #ifndef __TIME_IMAGE_FILTER_H__
 #define __TIME_IMAGE_FILTER_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtGui/QFont>
 #include "abstract_filter.h"
 
@@ -23,5 +25,7 @@ private:
     quint8* m_imageBuffer;
     Qn::Corner m_dateTextPos;
 };
+
+#endif // ENABLE_DATA_PROVIDER
 
 #endif // __TIME_IMAGE_FILTER_H__

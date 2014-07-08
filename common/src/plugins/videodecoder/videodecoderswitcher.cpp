@@ -4,6 +4,8 @@
 
 #include "videodecoderswitcher.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QMutexLocker>
 
 #include "decoders/abstractvideodecoderplugin.h"
@@ -163,3 +165,5 @@ void VideoDecoderSwitcher::switchToSoftwareDecoding()
     QMutexLocker lk( &m_mutex );
     m_switchToSWDecoding = true;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

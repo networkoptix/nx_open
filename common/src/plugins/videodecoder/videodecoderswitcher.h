@@ -5,6 +5,8 @@
 #ifndef VIDEODECODERSWITCHER_H
 #define VIDEODECODERSWITCHER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <memory>
 
 #include <QtCore/QMutex>
@@ -87,5 +89,7 @@ private:
     bool m_switchToSWDecoding;
     mutable QMutex m_mutex;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //VIDEODECODERSWITCHER_H

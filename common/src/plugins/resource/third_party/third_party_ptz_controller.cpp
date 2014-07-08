@@ -5,6 +5,7 @@
 
 #include "third_party_ptz_controller.h"
 
+#ifdef ENABLE_THIRD_PARTY
 
 QnThirdPartyPtzController::QnThirdPartyPtzController(
     const QnThirdPartyResourcePtr& resource,
@@ -88,3 +89,6 @@ bool QnThirdPartyPtzController::getFlip(Qt::Orientations* /*flip*/)
     //TODO/IMPL
     return false;
 }
+
+#endif // ENABLE_THIRD_PARTY
+

@@ -1,6 +1,8 @@
 #ifndef __FFMPEG_TRANSCODER_H
 #define __FFMPEG_TRANSCODER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 extern "C"
 {
     #include <libavcodec/avcodec.h>
@@ -52,4 +54,7 @@ private:
     qint64 m_baseTime;
 };
 
+#endif // ENABLE_DATA_PROVIDERS
+
 #endif  // __FFMPEG_TRANSCODER_H
+

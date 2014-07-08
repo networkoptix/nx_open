@@ -1,5 +1,7 @@
 #include "rtp_stream_provider.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 QnRtpStreamReader::QnRtpStreamReader(const QnResourcePtr& res, const QString& request):
     CLServerPushStreamReader(res),
     m_rtpReader(res),
@@ -47,3 +49,5 @@ QnConstResourceAudioLayoutPtr QnRtpStreamReader::getDPAudioLayout() const
 {
     return m_rtpReader.getAudioLayout();
 }
+
+#endif // ENABLE_DATA_PROVIDERS
