@@ -402,7 +402,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::PreferencesLicensesTabAction).
         flags(Qn::NoTarget).
-        text(tr("Get More Licenses..."));
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission);
+
+    factory(Qn::PreferencesSmtpTabAction).
+        flags(Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission);
 
     factory(Qn::PreferencesNotificationTabAction).
         flags(Qn::NoTarget).
@@ -743,14 +747,8 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SystemAdministrationAction).
         flags(Qn::Main | Qn::Tree).
-        text(tr("System Administration")).
-        condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
-
-    factory(Qn::PreferencesServerTabAction).
-        flags(Qn::Tree | Qn::NoTarget).
+        text(tr("System Administration...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Backup/Restore Configuration...")).
-        autoRepeat(false).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory().

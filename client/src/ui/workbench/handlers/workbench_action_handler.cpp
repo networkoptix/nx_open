@@ -261,7 +261,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::PreferencesGeneralTabAction),            SIGNAL(triggered()),    this,   SLOT(at_preferencesGeneralTabAction_triggered()));
     connect(action(Qn::PreferencesLicensesTabAction),           SIGNAL(triggered()),    this,   SLOT(at_preferencesLicensesTabAction_triggered()));
-    connect(action(Qn::PreferencesServerTabAction),             SIGNAL(triggered()),    this,   SLOT(at_preferencesServerTabAction_triggered()));
+    connect(action(Qn::PreferencesSmtpTabAction),               SIGNAL(triggered()),    this,   SLOT(at_preferencesSmtpTabAction_triggered()));
     connect(action(Qn::PreferencesNotificationTabAction),       SIGNAL(triggered()),    this,   SLOT(at_preferencesNotificationTabAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
@@ -1393,9 +1393,9 @@ void QnWorkbenchActionHandler::at_preferencesLicensesTabAction_triggered() {
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::LicensesPage);
 }
 
-void QnWorkbenchActionHandler::at_preferencesServerTabAction_triggered() {
+void QnWorkbenchActionHandler::at_preferencesSmtpTabAction_triggered() {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
-    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::EmailPage);
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::SmtpPage);
 }
 
 void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {

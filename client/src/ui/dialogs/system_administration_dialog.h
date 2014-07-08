@@ -13,9 +13,9 @@ class QnSystemAdministrationDialog : public QnGenericTabbedDialog, public QnWork
     typedef QnGenericTabbedDialog base_type;
 public:
     enum DialogPage {
-        EmailPage,
-        CamerasPage,
         LicensesPage,
+        SmtpPage,
+        CamerasPage,
         UpdatesPage,
         BackupPage,
 

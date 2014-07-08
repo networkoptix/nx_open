@@ -18,7 +18,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     ui->setupUi(this);
 
     addPage(LicensesPage, new QnLicenseManagerWidget(this), tr("Licenses"));
-    addPage(EmailPage, new QnSmtpSettingsWidget(this), tr("Email"));
+    addPage(SmtpPage, new QnSmtpSettingsWidget(this), tr("Email"));
     addPage(CamerasPage, new QnCameraManagementWidget(this), tr("Cameras"));
     addPage(UpdatesPage, new QnServerUpdatesWidget(this), tr("Updates"));
     addPage(BackupPage, new QnDatabaseManagementWidget(this), tr("Backup && Restore"));
