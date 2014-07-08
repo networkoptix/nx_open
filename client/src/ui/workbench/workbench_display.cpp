@@ -77,7 +77,7 @@
 #include "workbench.h"
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
-#include "plugins/resources/archive/abstract_archive_stream_reader.h"
+#include "plugins/resource/archive/abstract_archive_stream_reader.h"
 
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
 #include <ui/workbench/handlers/workbench_notifications_handler.h>

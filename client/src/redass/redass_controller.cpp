@@ -1,6 +1,6 @@
 #include "redass_controller.h"
 #include "camera/cam_display.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 #include "core/resource/camera_resource.h"
 
 Q_GLOBAL_STATIC(QnRedAssController, inst);

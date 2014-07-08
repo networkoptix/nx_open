@@ -2,9 +2,11 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "utils/common/sleep.h"
-#include "core/datapacket/video_data_packet.h"
-#include "../resource/camera_resource.h"
+#include <utils/common/sleep.h>
+#include <utils/common/log.h>
+
+#include <core/datapacket/video_data_packet.h>
+#include <core/resource/camera_resource.h>
 
 
 QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(const QnResourcePtr& dev ):

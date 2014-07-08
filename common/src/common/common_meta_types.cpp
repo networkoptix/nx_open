@@ -147,11 +147,14 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
 
+#ifdef ENABLE_DATA_PROVIDERS
+    qRegisterMetaType<QnMetaDataV1Ptr>();
+#endif
+
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
     qRegisterMetaType<QnAbstractBusinessActionList>();
     qRegisterMetaType<QnBusinessActionDataListPtr>();
     qRegisterMetaType<QnAbstractBusinessEventPtr>();
-    qRegisterMetaType<QnMetaDataV1Ptr>();
     qRegisterMetaType<QnBusinessEventRulePtr>();
     qRegisterMetaType<QnBusinessEventRuleList>();
     qRegisterMetaType<QnAbstractDataPacketPtr>();

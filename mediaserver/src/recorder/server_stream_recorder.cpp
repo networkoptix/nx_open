@@ -17,6 +17,7 @@
 #include "core/datapacket/media_data_packet.h"
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
+#include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
 
 
 static const int MOTION_PREBUFFER_SIZE = 8;

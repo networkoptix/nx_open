@@ -9,6 +9,7 @@
 #include <QtCore/QMetaProperty>
 #include <QtCore/QRunnable>
 
+#include <utils/common/log.h>
 #include <utils/common/warnings.h>
 #include <utils/common/model_functions.h>
 
@@ -713,6 +714,7 @@ bool QnResource::hasConsumer(QnResourceConsumer *consumer) const
     return m_consumers.contains(consumer);
 }
 
+#ifdef ENABLE_DATA_PROVIDERS
 bool QnResource::hasUnprocessedCommands() const
 {
     QMutexLocker locker(&m_consumersMtx);
@@ -724,7 +726,7 @@ bool QnResource::hasUnprocessedCommands() const
 
     return false;
 }
-
+#endif
 
 void QnResource::disconnectAllConsumers()
 {
@@ -809,7 +811,8 @@ QnKvPairList QnResource::getProperties() const {
 }
 
 // -----------------------------------------------------------------------------
-// Temporary until real ResourceFactory is implemented
+
+#ifdef ENABLE_DATA_PROVIDERS
 Q_GLOBAL_STATIC(QnResourceCommandProcessor, QnResourceCommandProcessor_instance)
 
 void QnResource::startCommandProc()
@@ -831,6 +834,7 @@ int QnResource::commandProcQueueSize()
 {
     return QnResourceCommandProcessor_instance()->queueSize();
 }
+#endif // ENABLE_DATA_PROVIDERS
 
 bool QnResource::init()
 {

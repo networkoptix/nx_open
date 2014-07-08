@@ -21,9 +21,13 @@
                 <meta name="description" content=""/>
                 <meta name="viewport" content="width=device-width"/>
                 <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-                <link rel="stylesheet" href="styles/29403685.vendor.css"/>
+                <!-- build:css styles/vendor.css -->
+                <!-- bower:css -->
+                <link rel="stylesheet" href="bower_components/sass-bootstrap/dist/css/bootstrap.css"/>
+                <!-- endbower -->
+                <!-- endbuild -->
                 <!-- build:css({.tmp,app}) styles/main.css -->
-                <link rel="stylesheet" href="styles/2ffdb355.main.css"/>
+                <link rel="stylesheet" href="styles/main.css"/>
             </head>
             <body>
               <div class="container">
@@ -40,9 +44,9 @@
                     <div class="row">
                         <nav class="col-xs-4 bs-docs-sidebar">
                             <ul class="nav nav-stacked fixed" id="sidebar">
-                                <xsl:for-each select="apidoc/groups/group">
-                                    <xsl:variable name="groupName" select="groupName"/>
-																		<xsl:variable name="urlPrefix" select="urlPrefix"/>
+                                <xsl:for-each select="/apidoc/groups/group">
+                                    <xsl:variable name="groupName" select="translate(groupName, ' ', '_')"/>
+                                    <xsl:variable name="urlPrefix" select="urlPrefix"/>
                                     <li>
                                         <a>
                                             <xsl:attribute name="href">#group_<xsl:value-of select="$groupName"/>
@@ -51,7 +55,7 @@
                                         </a>
                                         <ul class="nav nav-stacked">
                                             <xsl:for-each select="functions/function">
-                                                <xsl:variable name="quotedName" select="translate(name, '/', '_')"/>
+                                                <xsl:variable name="quotedName" select="translate(name, '/&lt;&gt;', '___')"/>
                                                 <li>
                                                     <a href="#execAction">
                                                         <xsl:attribute name="href">#group_<xsl:value-of select="$groupName"/>_method_<xsl:value-of select="$quotedName"/></xsl:attribute>
@@ -67,9 +71,9 @@
 
                         <div class="col-xs-8">
                             <xsl:for-each select="apidoc/groups/group">
-                                <xsl:variable name="groupName" select="groupName"/>
-																<xsl:variable name="urlPrefix" select="urlPrefix"/>
-                                <section>
+                                <xsl:variable name="groupName" select="translate(groupName, ' ', '_')"/>
+                                <xsl:variable name="urlPrefix" select="urlPrefix"/>
+                                <section style="padding-top: 40px; margin-top: -40px;">
                                     <xsl:attribute name="id">group_<xsl:value-of select="$groupName"/></xsl:attribute>
 
                                     <div class="page-header">
@@ -79,8 +83,8 @@
                                     </div>
 
                                     <xsl:for-each select="functions/function">
-                                        <xsl:variable name="quotedName" select="translate(name, '/', '_')"/>
-                                        <div class="subgroup">
+                                        <xsl:variable name="quotedName" select="translate(name, '/&lt;&gt;', '___')"/>
+                                        <div class="subgroup" style="padding-top: 70px; margin-top: -70px;">
                                             <xsl:attribute name="id">group_<xsl:value-of select="$groupName"/>_method_<xsl:value-of select="$quotedName"/></xsl:attribute>
                                             <h4>
                                                 <span class="label label-info"><xsl:value-of select="method"/></span>
@@ -97,11 +101,16 @@
                                             <dl>
                                                 <dt>Parameters</dt>
                                                 <dd>
+                                                    <xsl:choose>
+                                                        <xsl:when test="params/param">
                                                     <table class="table table-bordered table-condensed">
                                                         <tr>
                                                             <th>Name</th>
                                                             <th>Description</th>
                                                             <th>Optional</th>
+                                                            <xsl:if test="params/param/values/value">
+                                                                <th>Values</th>
+                                                            </xsl:if>
                                                         </tr>
                                                         <xsl:for-each select="params/param">
                                                             <tr>
@@ -114,9 +123,31 @@
                                                                 <td>
                                                                     <xsl:value-of select="optional"/>
                                                                 </td>
+                                                                <xsl:if test="../../params/param/values/value">
+                                                                <td>
+                                                                    <ul class="list-unstyled">
+                                                                            <xsl:for-each select="values/value">
+                                                                                <li>
+                                                                                    <xsl:value-of select="name"/>
+                                                                                    <a style="cursor: pointer;" data-toggle="tooltip" data-placement="right" data-trigger="hover focus click">
+                                                                                        <xsl:attribute name="title">
+                                                                                            <xsl:value-of select="description"/>
+                                                                                        </xsl:attribute>
+                                                                                        (?)    
+                                                                                    </a>
+                                                                                 </li>
+                                                                            </xsl:for-each> 
+                                                                    </ul>
+                                                                </td>
+                                                                </xsl:if>
                                                             </tr>
                                                         </xsl:for-each>
                                                     </table>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            No parameters
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
                                                 </dd>
                                                 <dt>Result</dt>
                                                 <dd>
@@ -143,11 +174,15 @@
             <script src="bower_components/jquery-scrollspy-thesmart/scrollspy.js"></script>
 
             <script>
-                $('body').scrollspy({
-                target: '.bs-docs-sidebar',
-                offset: 40
+                $(function () { 
+                    $("[data-toggle='tooltip']").tooltip(); 
+
+                    $('body').scrollspy({
+                        target: '.bs-docs-sidebar',
+                        offset: 40
+                    });
                 });
             </script>
-        </html>
+          </html>
     </xsl:template>
 </xsl:stylesheet>
