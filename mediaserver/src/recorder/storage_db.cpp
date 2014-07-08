@@ -40,6 +40,8 @@ bool QnStorageDb::deleteRecords(const QByteArray& mac, QnServer::ChunksCatalog c
 
 void QnStorageDb::addRecord(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
 {
+    QMutexLocker locker(&m_mutex);
+
     if (chunk.durationMs <= 0)
         return;
 
