@@ -80,6 +80,10 @@ private:
     int m_channelNumber; // video/audio source number
 };
 
+#ifdef Q_OS_ANDROID
+typedef int CodecID; // TODO: #Elric evil hack =(
+#endif
+
 class CameraMediaStreamInfo
 {
 public:
