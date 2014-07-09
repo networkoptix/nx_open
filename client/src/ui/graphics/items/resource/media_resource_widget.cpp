@@ -848,9 +848,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         mbps += statistics->getBitrate();
     }
 
-    QSize size = m_display->camDisplay()->getFrameSize(0);
-    if(size.isEmpty())
-        size = QSize(0, 0);
+    QSize size = m_display->camDisplay()->getRawDataSize();
 
     QString codecString;
     if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext()) {

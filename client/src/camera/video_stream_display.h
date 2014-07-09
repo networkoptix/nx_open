@@ -90,6 +90,9 @@ private:
     void onNoVideo();
 
     void updateRenderList();
+    const QSize& getRawDataSize() const {
+        return m_rawDataSize;
+    }
 private:
     mutable QMutex m_mtx;
     QMap<CodecID, QnAbstractVideoDecoder*> m_decoder;
@@ -127,7 +130,7 @@ private:
     bool m_timeChangeEnabled;
     QnBufferedFrameDisplayer* m_bufferedFrameDisplayer;
     bool m_canUseBufferedFrameDisplayer;
-
+    QSize m_rawDataSize;
 private:
     float m_speed;
     bool m_queueWasFilled;

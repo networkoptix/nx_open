@@ -41,6 +41,7 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber)
     m_timeChangeEnabled(true),
     m_bufferedFrameDisplayer(0),
     m_canUseBufferedFrameDisplayer(true),
+    m_rawDataSize(0,0),
     m_speed(1.0),
     m_queueWasFilled(false),
     m_needResetDecoder(false),
@@ -570,6 +571,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             return Status_Skipped;
     }
     m_mtx.unlock();
+    m_rawDataSize = QSize(decodeToFrame->width,decodeToFrame->height);
     if (decodeToFrame->width) {
         if (qFuzzyIsNull(m_overridenAspectRatio)) {
             //qreal sampleAr = decodeToFrame->height > 0 ? (qreal)decodeToFrame->width / (qreal)decodeToFrame->height : 1.0;

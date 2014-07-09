@@ -104,6 +104,10 @@ public:
     qreal overridenAspectRatio() const;
     void setOverridenAspectRatio(qreal aspectRatio);
 
+    const QSize& getRawDataSize() const {
+        return m_display[0]->getRawDataSize();
+    }
+
 public slots:
     void onBeforeJump(qint64 time);
     void onSkippingFrames(qint64 time);
