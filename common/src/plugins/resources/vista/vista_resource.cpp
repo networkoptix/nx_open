@@ -18,7 +18,7 @@ int QnVistaResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolut
     // I assume for a Qn::QualityHighest quality 30 fps for 1080 we need 10 mbps
     // I assume for a Qn::QualityLowest quality 30 fps for 1080 we need 1 mbps
 
-    int hiEnd = 1024*7;
+    int hiEnd = 1024*6;
     int lowEnd = 1024*1;
 
     float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
