@@ -2,8 +2,6 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <utils/common/util.h> /* For DATETIME_NOW. */
-
 #include "core/datapacket/audio_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
 

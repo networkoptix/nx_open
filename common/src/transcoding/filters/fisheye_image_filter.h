@@ -13,8 +13,7 @@
 class QnFisheyeImageFilter: public QnAbstractImageFilter
 {
 public:
-    QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDewarping,
-                         const QnItemDewarpingParams& itemDewarping);
+    QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDewarping, const QnItemDewarpingParams& itemDewarping);
 
     virtual void updateImage(CLVideoDecoderOutput* frame, const QRectF& updateRect) override;
 

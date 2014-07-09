@@ -141,8 +141,8 @@ QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDe
     QnAbstractImageFilter(),
     m_mediaDewarping(mediaDewarping),
     m_itemDewarping(itemDewarping),
-    m_lastImageFormat(-1),
-    m_tmpBuffer(new CLVideoDecoderOutput())
+    m_tmpBuffer(new CLVideoDecoderOutput()),
+    m_lastImageFormat(-1)
 {
     memset (m_transform, 0, sizeof(m_transform));
 }
