@@ -71,8 +71,13 @@ namespace ec2
 
         template<class InputDataType>
             void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );
+
+        template<class InputDataType, class CustomActionType>
+            void registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction );
+
         template<class InputDataType, class OutputDataType>
             void registerGetFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd );
+
         template<class InputType, class OutputType, class HandlerType>
             void registerFunctorHandler(
                 QnRestProcessorPool* const restProcessorPool,

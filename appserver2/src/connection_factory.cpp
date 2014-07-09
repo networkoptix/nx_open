@@ -181,6 +181,10 @@ namespace ec2
 
         //AbstractECConnection
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
+        registerUpdateFuncHandler<ApiIdData>(
+            restProcessorPool,
+            ApiCommand::forcePrimaryTimeServer,
+            std::bind( &TimeSynchronizationManager::primaryTimeServerChanged, m_timeSynchronizationManager.get(), _1 ) );
 
 
         registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );
@@ -319,6 +323,14 @@ namespace ec2
         restProcessorPool->registerHandler(
             lit("ec2/%1").arg(ApiCommand::toString(cmd)),
             new UpdateHttpHandler<InputDataType>(m_directConnection) );
+    }
+
+    template<class InputDataType, class CustomActionType>
+    void Ec2DirectConnectionFactory::registerUpdateFuncHandler( QnRestProcessorPool* const restProcessorPool, ApiCommand::Value cmd, CustomActionType customAction )
+    {
+        restProcessorPool->registerHandler(
+            lit("ec2/%1").arg(ApiCommand::toString(cmd)),
+            new UpdateHttpHandler<InputDataType>(m_directConnection, customAction) );
     }
 
     template<class InputDataType, class OutputDataType>

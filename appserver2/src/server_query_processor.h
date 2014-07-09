@@ -43,14 +43,10 @@ namespace ec2
             \param handler Functor ( ErrorCode )
         */
         template<class QueryDataType, class HandlerType>
-            void processUpdateAsync(QnTransaction<QueryDataType>& tran, HandlerType handler, void* /*dummy*/ = 0 )
+            void processUpdateAsync( QnTransaction<QueryDataType>& tran, HandlerType handler, void* /*dummy*/ = 0 )
         {
             //TODO #ak this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
-
-            QnDbManager::Locker locker(dbManager);
-            if (tran.persistent)
-                locker.beginTran();
 
             if (!tran.id.sequence)
                 tran.fillSequence();
@@ -59,26 +55,30 @@ namespace ec2
                 QnScopedThreadRollback ensureFreeThread(1);
                 QtConcurrent::run( std::bind( handler, errorCode ) );
             };
-            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
+            std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)>
+                SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
-            QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
-
+            //TODO #ak get rid of auxManager
             errorCode = auxManager->executeTransaction(tran);
             if( errorCode != ErrorCode::ok ) {
                 return;
             }
 
-            if (tran.persistent) {
+            if (tran.persistent)
+            {
+                QnDbManager::Locker locker(dbManager);
+                locker.beginTran();
+
+                const QByteArray& serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
                 errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
                 if( errorCode != ErrorCode::ok ) {
                     if (errorCode == ErrorCode::skipped)
                         errorCode = ErrorCode::ok;
                     return;
                 }
-            }
 
-            if (tran.persistent)
                 locker.commit();
+            }
 
             // delivering transaction to remote peers
             if (!tran.isLocal)
@@ -86,9 +86,8 @@ namespace ec2
         }
 
         template<class HandlerType>
-        void processUpdateAsync(QnTransaction<ApiIdData>& tran, HandlerType handler )
+        void processUpdateAsync( QnTransaction<ApiIdData>& tran, HandlerType handler )
         {
-            Q_ASSERT(tran.persistent);
             switch (tran.command)
             {
             case ApiCommand::removeMediaServer:
