@@ -140,8 +140,9 @@ namespace {
         bool m_dualStreamingUsed;
     };
 
-    const int dangerousMinArchiveValue = 5;
-
+    const int defaultMinArchiveDays = 1;
+    const int dangerousMinArchiveDays = 5;
+    const int defaultMaxArchiveDays = 30;
 }
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
@@ -354,17 +355,23 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
 
     ui->checkBoxMinArchive->setCheckState(mixedMinDays
         ? Qt::PartiallyChecked
-        : minDays < 0
+        : minDays <= 0
         ? Qt::Checked
         : Qt::Unchecked);
-    ui->spinBoxMinDays->setValue(qAbs(minDays));
+    if (minDays != 0)
+        ui->spinBoxMinDays->setValue(qAbs(minDays));
+    else 
+        ui->spinBoxMinDays->setValue(defaultMinArchiveDays);
 
     ui->checkBoxMaxArchive->setCheckState(mixedMaxDays
         ? Qt::PartiallyChecked
-        : maxDays < 0
+        : maxDays <= 0
         ? Qt::Checked
         : Qt::Unchecked);
-    ui->spinBoxMaxDays->setValue(qAbs(maxDays));
+    if (maxDays != 0)
+        ui->spinBoxMaxDays->setValue(qAbs(maxDays));
+    else
+        ui->spinBoxMaxDays->setValue(defaultMaxArchiveDays);
 
     updatePanicLabelText();
     updateMotionButtons();
@@ -1011,5 +1018,5 @@ void QnCameraScheduleWidget::validateArchiveLength() {
         if (ui->spinBoxMaxDays->value() < ui->spinBoxMinDays->value())
             ui->spinBoxMaxDays->setValue(ui->spinBoxMinDays->value());
     }
-    ui->minArchiveDaysWarningLabel->setVisible(ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > dangerousMinArchiveValue);
+    ui->minArchiveDaysWarningLabel->setVisible(ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > dangerousMinArchiveDays);
 }
