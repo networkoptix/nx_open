@@ -1,6 +1,8 @@
 #ifndef __TRANSCODER_H
 #define __TRANSCODER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QString>
 #include <QSharedPointer>
 
@@ -12,8 +14,9 @@ extern "C"
 #include "core/datapacket/audio_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
 #include "core/resource/media_resource.h"
-#include "filters/abstract_filter.h"
 
+class QnAbstractImageFilter;
+class CLVideoDecoderOutput;
 
 /*!
     \note All constants (except \a quality) in this namespace refer to libavcodec CodecContex field names
@@ -83,6 +86,7 @@ protected:
 };
 typedef QSharedPointer<QnCodecTranscoder> QnCodecTranscoderPtr;
 
+
 //!Base class for all video transcoders
 class QnVideoTranscoder: public QnCodecTranscoder
 {
@@ -104,17 +108,20 @@ public:
     virtual bool open(const QnConstCompressedVideoDataPtr& video);
 
     virtual void addFilter(QnAbstractImageFilter* filter);
+
 protected:
     static const int WIDTH_ALIGN = 32;
     static const int HEIGHT_ALIGN = 2;
         
     void processFilterChain(CLVideoDecoderOutput* decodedFrame, const QRectF& updateRect);
+
 protected:
     QSize m_resolution;
     QnConstResourceVideoLayoutPtr m_layout;
     QList<QnAbstractImageFilter*> m_filters;
 };
 typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
+
 
 //!Base class for all audio transcoders
 class QnAudioTranscoder: public QnCodecTranscoder
@@ -124,6 +131,7 @@ public:
     virtual bool open(const QnConstCompressedAudioDataPtr& video) { Q_UNUSED(video) return true; }
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
+
 
 //!Multiplexes one or more raw media streams into container format. Can apply transcoding to input media streams
 /*
@@ -243,5 +251,7 @@ private:
 };
 
 typedef QSharedPointer<QnTranscoder> QnTranscoderPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  // __TRANSCODER_H

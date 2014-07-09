@@ -6,6 +6,8 @@
 #include <QtCore/QTimer>
 #include <QtCore/QStandardPaths>
 
+#include <utils/common/util.h> /* For removeDir. */
+
 #include <api/app_server_connection.h>
 
 

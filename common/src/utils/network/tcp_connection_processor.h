@@ -42,6 +42,9 @@ public:
 
     virtual bool isTakeSockOwnership() const { return false; }
     void releaseSocket();
+
+    int redirectTo(const QByteArray& page, QByteArray& contentType);
+
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);

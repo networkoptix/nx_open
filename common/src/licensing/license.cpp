@@ -27,6 +27,7 @@ namespace {
 
     bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
     {
+#ifdef ENABLE_SSL
         // Calculate SHA1 hash
         QCryptographicHash hash(QCryptographicHash::Sha1);
         hash.addData(data);
@@ -47,6 +48,10 @@ namespace {
 
         // Verify signature is correct
         return memcmp(decrypted.data(), dataHash.data(), ret) == 0;
+#else 
+        // TODO: #Elric #android
+        return true;
+#endif
     }
 
 } // anonymous namespace

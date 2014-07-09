@@ -42,6 +42,10 @@ public:
         QJson::serialize(reply, &m_reply);
     }
 
+    void setReply(const QJsonValue &reply) {
+        m_reply = reply;
+    }
+
     QN_FUSION_DECLARE_FUNCTIONS(QnJsonRestResult, (json), friend)
 
 private:

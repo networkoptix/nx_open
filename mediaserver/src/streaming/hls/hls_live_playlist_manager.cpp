@@ -30,6 +30,8 @@ namespace nx_hls
     {
         using namespace std::placeholders;
         m_eventRegistrationID = m_mediaStreamCache->addKeyFrameEventReceiver( std::bind( &HLSLivePlaylistManager::onKeyFrame, this, _1 ) );
+
+        m_inactivityTimer.restart();
     }
 
     HLSLivePlaylistManager::~HLSLivePlaylistManager()
@@ -49,8 +51,10 @@ namespace nx_hls
     {
         QMutexLocker lk( &m_mutex );
 
+        m_inactivityTimer.restart();
+
         //NOTE commented code is a trick to minimize live delay with hls playback. But current implementation results in 
-            //playback freezing and switching to lo-quality, since downloading is one with same speed as playing.
+            //playback freezing and switching to lo-quality, since downloading is done with same speed as playback and HLS client thinks bandwidth is not sufficient.
             //But, something can still be done to minimize that delay
         //if( m_chunks.empty() )
         //{
@@ -76,6 +80,26 @@ namespace nx_hls
     int HLSLivePlaylistManager::getMaxBitrate() const
     {
         return m_mediaStreamCache->getMaxBitrate();
+    }
+
+    void HLSLivePlaylistManager::clear()
+    {
+        QMutexLocker lk( &m_mutex );
+        m_totalPlaylistDuration = 0;
+        if( m_blockID != -1 )
+        {
+            m_mediaStreamCache->unblockData( m_blockID );
+            m_blockID = -1;
+        }
+        m_chunks.clear();
+        while( !m_timestampToBlock.empty() )
+            m_timestampToBlock.pop();
+    }
+
+    size_t HLSLivePlaylistManager::inactivityPeriod() const
+    {
+        QMutexLocker lk( &m_mutex );
+        return m_inactivityTimer.elapsed();
     }
 
     void HLSLivePlaylistManager::onKeyFrame( quint64 currentPacketTimestampUSec )

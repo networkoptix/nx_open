@@ -78,10 +78,10 @@ namespace ec2
 
         struct AlivePeerInfo
         {
-            AlivePeerInfo(): peer(QnId(), Qn::PT_Server), isProxy(false) { lastActivity.restart(); }
-            AlivePeerInfo(const ApiPeerData &peer, bool isProxy): peer(peer), isProxy(isProxy) { lastActivity.restart(); }
+            AlivePeerInfo(): peer(QnId(), Qn::PT_Server) { lastActivity.restart(); }
+            AlivePeerInfo(const ApiPeerData &peer): peer(peer) { lastActivity.restart(); }
             ApiPeerData peer;
-            bool isProxy;
+            QSet<QnId> proxyVia;
             QElapsedTimer lastActivity;
         };
         typedef QMap<QnId, AlivePeerInfo> AlivePeersMap;
@@ -161,19 +161,22 @@ namespace ec2
         void gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader);
 
         void onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<QnTranState> &tran);
-        void onGotTransactionSyncResponse(QnTransactionTransport* sender);
+        void onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse> &tran);
         void onGotDistributedMutexTransaction(const QnTransaction<ApiLockData>& tran);
         void queueSyncRequest(QnTransactionTransport* transport);
 
         void connectToPeerEstablished(const ApiPeerData &peerInfo);
         void connectToPeerLost(const QnId& id);
-        void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive);
+        void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool isProxy);
         void sendVideowallInstanceStatus(const ApiPeerData &peer, bool isAlive);
         bool isPeerUsing(const QUrl& url);
-        void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran);
+        void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QnId& gotFromID);
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
 
         void sendRuntimeInfo(QnTransactionTransport* transport, const QnPeerSet& processedPeers);
+
+        void addAlivePeerInfo(ApiPeerData peerData, const QnId& gotFromPeer = QnId());
+        void removeAlivePeer(const QnId& id, bool isProxy);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();

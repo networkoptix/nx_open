@@ -35,6 +35,9 @@ struct QnVideowallInstanceStatus;
 
 class QnLayoutItemData;
 
+class QnResourceCommand;
+typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
+
 // -->
 
 

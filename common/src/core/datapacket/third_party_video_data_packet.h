@@ -6,6 +6,8 @@
 #ifndef THIRD_PARTY_VIDEO_DATA_PACKET_H
 #define THIRD_PARTY_VIDEO_DATA_PACKET_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "video_data_packet.h"
 
 #include <plugins/camera_plugin.h>
@@ -28,7 +30,7 @@ public:
     virtual ~QnThirdPartyCompressedVideoData();
 
     //!Implementation of QnAbstractMediaData::clone
-    virtual QnWritableCompressedVideoData* clone() const override;
+    virtual QnWritableCompressedVideoData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
     //!Implementation of QnAbstractMediaData::data
     virtual const char* data() const override;
     //!Implementation of QnAbstractMediaData::dataSize
@@ -38,4 +40,7 @@ private:
     nxcip::VideoDataPacket* m_videoPacket;
 };
 
+#endif // ENABLE_DATA_PROVIDERS
+
 #endif //THIRD_PARTY_VIDEO_DATA_PACKET_H
+

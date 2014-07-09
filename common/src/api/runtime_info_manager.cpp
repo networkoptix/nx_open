@@ -26,12 +26,11 @@ QnRuntimeInfoManager* instance()
     return m_inst;
 }
 
-void QnRuntimeInfoManager::at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy)
+void QnRuntimeInfoManager::at_remotePeerFound(const ec2::ApiPeerAliveData &, bool)
 {
-
 }
 
-void QnRuntimeInfoManager::at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy)
+void QnRuntimeInfoManager::at_remotePeerLost(const ec2::ApiPeerAliveData &data, bool)
 {
     m_runtimeInfo.remove(data.peer.id);
 
@@ -42,7 +41,7 @@ void QnRuntimeInfoManager::at_remotePeerLost(ec2::ApiPeerAliveData data, bool is
     }
 }
 
-void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo)
+void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo)
 {
     QMutexLocker lock(&m_mutex);
 

@@ -8,23 +8,29 @@
 
 #include <server/server_globals.h>
 
+#include <utils/common/log.h>
+#include "utils/common/util.h"
+#include "utils/common/model_functions.h"
 #include <utils/fs/file.h>
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
+
+#include "core/resource_management/resource_pool.h"
+#include "core/dataconsumer/abstract_data_consumer.h"
+#include "core/resource/camera_resource.h"
+
+#include "plugins/resource/archive/archive_stream_reader.h"
+#include "plugins/resource/server_archive/server_archive_delegate.h"
+
 #include "transcoding/transcoder.h"
 #include "transcoding/ffmpeg_transcoder.h"
 #include "camera/video_camera.h"
-#include "core/resource_management/resource_pool.h"
 #include "camera/camera_pool.h"
-#include "core/dataconsumer/abstract_data_consumer.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "device_plugins/server_archive/server_archive_delegate.h"
-#include "utils/common/util.h"
-#include "core/resource/camera_resource.h"
-#include "cached_output_stream.h"
 #include "network/authenticate_helper.h"
+
 #include <media_server/settings.h>
-#include "utils/serialization/lexical.h"
+
+#include "cached_output_stream.h"
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;

@@ -1,4 +1,7 @@
 #include "coldstore_storage.h"
+
+#ifdef ENABLE_COLDSTORE
+
 #include "coldstore_io_buffer.h"
 #include "utils/common/sleep.h"
 
@@ -538,3 +541,4 @@ QString QnPlColdStoreStorage::fileName2csFileName(const QString& fn) const
 
 }
 
+#endif // ENABLE_COLDSTORE

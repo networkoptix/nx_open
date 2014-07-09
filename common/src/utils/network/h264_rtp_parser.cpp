@@ -1,7 +1,11 @@
 #include "h264_rtp_parser.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
 #include "utils/common/synctime.h"
+#include "utils/common/log.h"
 
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
@@ -380,3 +384,5 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         result = createVideoData(rtpBufferBase, ntohl(rtpHeader->timestamp), statistics); // last packet
     return true;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

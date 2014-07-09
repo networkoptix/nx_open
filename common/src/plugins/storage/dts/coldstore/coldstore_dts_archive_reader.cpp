@@ -1,5 +1,8 @@
-
 #include "coldstore_dts_archive_reader.h"
+
+#ifdef ENABLE_COLDSTORE
+
+#include <utils/common/log.h>
 
 #include "core/datapacket/video_data_packet.h"
 #include "core/resource/resource_media_layout.h"
@@ -764,3 +767,6 @@ http://www.extreme-chillout.de
 http://www.myspace.com/extremechillout
 
 */
+
+#endif // ENABLE_COLDSTORE
+

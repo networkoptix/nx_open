@@ -215,7 +215,7 @@ bool QnModuleFinder::processDiscoveryResponse(AbstractDatagramSocket *udpSocket)
 
 void QnModuleFinder::run() {
     initSystemThreadId();
-    NX_LOG(lit("NetworkOptixModuleFinder started"), cl_logDEBUG1);
+    NX_LOG(lit("QnModuleFinder started"), cl_logDEBUG1);
 
     static const unsigned int SEARCH_PACKET_LENGTH = 64;
     quint8 searchPacket[SEARCH_PACKET_LENGTH];
@@ -241,9 +241,8 @@ void QnModuleFinder::run() {
             foreach (AbstractDatagramSocket *socket, m_clientSockets) {
                 if (!socket->send(searchPacket, searchPacketBufStart - searchPacket)) {
                     //failed to send packet ???
-                    SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    NX_LOG(lit("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1);
-                    //TODO/IMPL if corresponding interface is down, should remove socket from set
+                    const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+                    NX_LOG(lit("QnModuleFinder. Failed to send search packet to %1. %2").arg(socket->getPeerAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1);
                 }
             }
             m_prevPingClock = currentClock;
@@ -253,8 +252,10 @@ void QnModuleFinder::run() {
         if (socketCount == 0)
             continue;    //timeout
         if (socketCount < 0) {
-            SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-            NX_LOG(lit("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR);
+            const SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+            if( prevErrorCode == SystemError::interrupted )
+                continue;
+            NX_LOG(lit("QnModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR);
             msleep(errorWaitTimeoutMs);
             continue;
         }
@@ -287,7 +288,7 @@ void QnModuleFinder::run() {
         }
     }
 
-    NX_LOG(lit("NetworkOptixModuleFinder stopped"), cl_logDEBUG1);
+    NX_LOG(lit("QnModuleFinder stopped"), cl_logDEBUG1);
 }
 
 QnModuleFinder::ModuleContext::ModuleContext(const RevealResponse &response)

@@ -5,7 +5,7 @@
 
 #include <utils/common/warnings.h>
 #include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
+#include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_pool.h"
 
 
@@ -94,6 +94,8 @@ void QnLayoutResource::setUrl(const QString& value)
     QString oldValue = removeProtocolPrefix(getUrl());
     QnResource::setUrl(value);
     QString newValue = removeProtocolPrefix(getUrl());
+
+#ifdef ENABLE_ARCHIVE
     if (!oldValue.isEmpty() && oldValue != newValue)
     {
         // Local layout renamed
@@ -103,6 +105,7 @@ void QnLayoutResource::setUrl(const QString& value)
             item.resource.path = QnLayoutFileStorageResource::updateNovParent(value, item.resource.path);
         }
     }
+#endif
 }
 
 QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {

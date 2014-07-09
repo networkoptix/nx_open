@@ -112,7 +112,6 @@ namespace ec2
         registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
 
         //AbstractCameraManager::getBookmarkTags
-        registerGetFuncHandler<QString, ApiHelpGroupDataList>( restProcessorPool, ApiCommand::getHelp );
 
         //TODO AbstractLicenseManager
         registerUpdateFuncHandler<ApiLicenseDataList>( restProcessorPool, ApiCommand::addLicenses );
@@ -172,14 +171,14 @@ namespace ec2
         //AbstractUpdatesManager::uploadUpdateResponce
         registerUpdateFuncHandler<ApiUpdateUploadResponceData>( restProcessorPool, ApiCommand::uploadUpdateResponce );
         //AbstractUpdatesManager::installUpdate
-        registerUpdateFuncHandler<QString>( restProcessorPool, ApiCommand::installUpdate );
+        registerUpdateFuncHandler<ApiUpdateInstallData>( restProcessorPool, ApiCommand::installUpdate );
 
         //ApiResourceParamList
         registerGetFuncHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );
         registerUpdateFuncHandler<ApiResourceParamDataList>( restProcessorPool, ApiCommand::saveSettings );
 
         //AbstractECConnection
-        registerGetFuncHandler<std::nullptr_t, qint64>( restProcessorPool, ApiCommand::getCurrentTime );
+        registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
 
 
         registerGetFuncHandler<std::nullptr_t, ApiFullInfoData>( restProcessorPool, ApiCommand::getFullInfo );
@@ -255,13 +254,15 @@ namespace ec2
             return handler->done( reqID, errorCode, AbstractECConnectionPtr() );
         QnConnectionInfo connectionInfoCopy( connectionInfo );
         connectionInfoCopy.ecUrl = ecURL;
+
+        AbstractECConnectionPtr connection(new RemoteEC2Connection(
+            std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
+            m_resCtx,
+            connectionInfoCopy ));
         return handler->done(
             reqID,
             errorCode,
-            std::make_shared<RemoteEC2Connection>(
-                std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
-                m_resCtx,
-                connectionInfoCopy ) );
+            connection );
     }
 
     void Ec2DirectConnectionFactory::remoteTestConnectionFinished(

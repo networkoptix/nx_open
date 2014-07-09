@@ -1,6 +1,8 @@
 #ifndef _LAYOUT_STORAGE_PROTOCOL_H__
 #define _LAYOUT_STORAGE_PROTOCOL_H__
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtCore/QFile>
 
 extern "C"
@@ -107,5 +109,7 @@ private:
 };
 
 typedef QSharedPointer<QnLayoutFileStorageResource> QnLayoutFileStorageResourcePtr;
+
+#endif // ENABLE_ARCHIVE
 
 #endif // _LAYOUT_STORAGE_PROTOCOL_H__

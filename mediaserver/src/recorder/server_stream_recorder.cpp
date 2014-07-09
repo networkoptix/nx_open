@@ -17,6 +17,7 @@
 #include "core/datapacket/media_data_packet.h"
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
+#include "utils/common/util.h" /* For MAX_FRAME_DURATION, MIN_FRAME_DURATION. */
 
 
 static const int MOTION_PREBUFFER_SIZE = 8;
@@ -129,7 +130,7 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
 
     bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
     if (!rez) {
-        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageNotEnoughSpaceReason, m_storage);
+        emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageFullReason, m_storage);
 
         qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
         markNeedKeyData();

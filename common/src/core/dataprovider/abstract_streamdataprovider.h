@@ -1,6 +1,8 @@
 #ifndef stream_reader_514
 #define stream_reader_514
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "utils/common/long_runnable.h"
 #include "../resource/resource_consumer.h"
 #include "../datapacket/abstract_data_packet.h"
@@ -55,5 +57,7 @@ protected:
     QHash<QByteArray, QVariant> m_streamParam;
     QnResource::ConnectionRole m_role;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //stream_reader_514

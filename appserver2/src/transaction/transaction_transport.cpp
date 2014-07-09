@@ -155,7 +155,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                     readed = m_socket->recv(rBuffer + m_readBufferLen, toRead);
                     if (readed < 1) {
                         // no more data or error
-                        if(readed == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock)
+                        if(readed == 0 || (SystemError::getLastOSErrorCode() != SystemError::wouldBlock && SystemError::getLastOSErrorCode() != SystemError::again))
                             setState(State::Error);
                         return; // no more data
                     }
@@ -189,7 +189,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                 const char* dataStart = data.data();
                 int sended = m_socket->send(dataStart + m_sendOffset, data.size() - m_sendOffset);
                 if (sended < 1) {
-                    if(sended == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock) {
+                    if(sended == 0 || (SystemError::getLastOSErrorCode() != SystemError::wouldBlock && SystemError::getLastOSErrorCode() != SystemError::again)) {
                         m_sendOffset = 0;
                         aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite, this );
                         setStateNoLock(State::Error);
