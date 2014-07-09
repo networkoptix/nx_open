@@ -503,7 +503,15 @@ public:
 
 
 // TODO: #Elric #enum
+
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
+
+
+/** Time value for 'now'. */
+#define DATETIME_NOW        INT64_MAX 
+
+/** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE. Checked in ffmpeg.cpp. */
+#define DATETIME_INVALID    INT64_MIN
 
 
 

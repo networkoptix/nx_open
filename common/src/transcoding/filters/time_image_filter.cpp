@@ -9,6 +9,7 @@
 
 #include <utils/common/util.h> /* For UTC_TIME_DETECTION_THRESHOLD. */
 #include <utils/math/math.h>
+#include <utils/media/frame_info.h>
 #include <utils/color_space/yuvconvert.h>
 
 
