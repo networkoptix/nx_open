@@ -1,5 +1,7 @@
 #include "ssl_socket.h"
 
+#ifdef ENABLE_SSL
+
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
@@ -524,3 +526,5 @@ int QnMixedSSLSocket::send( const void* buffer, unsigned int bufferLen )
     else 
         return d->wrappedSocket->send(buffer, bufferLen);
 }
+
+#endif // ENABLE_SSL

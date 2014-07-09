@@ -344,6 +344,7 @@ private:
     bool setListen(int queueLen) ;
 };
 
+#ifdef ENABLE_SSL
 class TCPSslServerSocket: public TCPServerSocket
 {
 public:
@@ -356,6 +357,7 @@ public:
 private:
     bool m_allowNonSecureConnect;
 };
+#endif // ENABLE_SSL
 
 /**
   *   UDP socket class
