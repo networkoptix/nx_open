@@ -801,8 +801,10 @@ namespace ec2
 
         //!Set peer identified by \a serverGuid to be primary time server (every other peer synchronizes time with server \a serverGuid)
         template<class TargetType, class HandlerType> int forcePrimaryTimeServer( const QnId& serverGuid, TargetType* target, HandlerType handler ) {
-            return forcePrimaryTimeServer( std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+            return forcePrimaryTimeServer(
+                serverGuid,
+                std::static_pointer_cast<impl::SimpleHandler>(
+                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
         /*!

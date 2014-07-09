@@ -74,8 +74,10 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
     QMutexLocker lock(&m_mutex);
     qint64 localTime = QDateTime::currentMSecsSinceEpoch();
-    if ((m_lastReceivedTime == 0 || m_timer.elapsed() > EcTimeUpdatePeriod || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod) && 
-        m_gotTimeTask == 0 && QnSessionManager::instance()->isReady() && !QnAppServerConnectionFactory::defaultUrl().isEmpty())
+    if( (m_lastReceivedTime == 0 || m_timer.elapsed() > EcTimeUpdatePeriod || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod)
+        && m_gotTimeTask == 0
+        && QnSessionManager::instance()->isReady()
+        && !QnAppServerConnectionFactory::defaultUrl().isEmpty() )
     {
         m_gotTimeTask = new QnSyncTimeTask(this);
         m_gotTimeTask->setAutoDelete(true);

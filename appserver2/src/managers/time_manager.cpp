@@ -276,6 +276,8 @@ namespace ec2
     {
         assert( remotePeerTimePriorityKey.seed > 0 );
 
+        QMutexLocker lk( &m_mutex );
+
         //if there is new maximum remotePeerTimePriorityKey than updating delta and emitting timeChanged
         if( remotePeerTimePriorityKey > m_usedTimeSyncInfo.timePriorityKey )
         {
@@ -285,6 +287,8 @@ namespace ec2
                 localMonotonicClock,
                 remotePeerSyncTime,
                 remotePeerTimePriorityKey ); 
+            lk.unlock();
+            emit timeChanged( m_monotonicClock.elapsed() + m_timeDelta );
         }
     }
 
@@ -351,36 +355,12 @@ namespace ec2
             return;
 
         const qint64 currentClock = m_monotonicClock.elapsed();
-        //qint64 minPeerTime = std::numeric_limits<qint64>::max();
-        //qint64 maxPeerTime = 0;
-        //TimePriorityKey minPriorityKey = (m_localTimePriorityKey.flags & peerIsServer)
-        //    ? std::min<>( m_localTimePriorityKey, m_usedTimeSyncInfo.timePriorityKey )
-        //    : m_usedTimeSyncInfo.timePriorityKey;
-        //TimePriorityKey maxPriorityKey = (m_localTimePriorityKey.flags & peerIsServer)
-        //    ? std::max<>( m_localTimePriorityKey, m_usedTimeSyncInfo.timePriorityKey )
-        //    : m_usedTimeSyncInfo.timePriorityKey;
         //map<priority flags, m_systemTimeByPeer iterator>
         std::multimap<unsigned int, std::map<QnId, TimeSyncInfo>::const_iterator, std::greater<unsigned int>> peersByTimePriorityFlags;
         for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
-        {
             peersByTimePriorityFlags.emplace( it->second.timePriorityKey.flags, it );
 
-
-            ////val.second.syncTime here is peer's system time (not synchronized time!)
-            //const qint64 peerCurrentSystemTime = val.second.syncTime + (currentClock - val.second.monotonicClockValue);
-            //if( peerCurrentSystemTime < minPeerTime )
-            //    minPeerTime = peerCurrentSystemTime;
-            //if( peerCurrentSystemTime > maxPeerTime )
-            //    maxPeerTime = peerCurrentSystemTime;
-
-            //if( val.second.timePriorityKey < minPriorityKey )
-            //    minPriorityKey = val.second.timePriorityKey;
-            //if( val.second.timePriorityKey > maxPriorityKey )
-            //    maxPriorityKey = val.second.timePriorityKey;
-        }
-
-        //if( minPriorityKey.flags == maxPriorityKey.flags )
-        //if( peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1 )
+        if( peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1 )
         {
             const qint64 currentLocalTime = QDateTime::currentMSecsSinceEpoch();
 
@@ -410,7 +390,6 @@ namespace ec2
                 if( !remotePeerTimeSyncInfo.fromString( extension.second ) )
                     continue;
         
-                QMutexLocker lk( &m_mutex );
                 remotePeerTimeSyncUpdate(
                     transport->remotePeer().id,
                     m_monotonicClock.elapsed(),

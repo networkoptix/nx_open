@@ -35,6 +35,7 @@ QnTimeServerSelectionDialog::QnTimeServerSelectionDialog( QWidget* parent, QnWor
     m_ui->serversWidget->horizontalHeader()->setSectionResizeMode(serverTimeColumn, QHeaderView::ResizeToContents);
     m_ui->serversWidget->horizontalHeader()->setSectionsClickable(true);
 
+    connect( m_ui->serversWidget, &QTableWidget::itemClicked, this, &QnTimeServerSelectionDialog::onTableItemClicked );
     connect( &m_timer, &QTimer::timeout, this, &QnTimeServerSelectionDialog::onTimer );
 }
 
@@ -87,6 +88,17 @@ void QnTimeServerSelectionDialog::setData(
     }
 }
 
+QnId QnTimeServerSelectionDialog::selectedPeer() const
+{
+    for( int row = 0; row < m_ui->serversWidget->rowCount(); ++row )
+    {
+        if( m_ui->serversWidget->item(row, checkBoxColumn)->checkState() == Qt::Checked )
+            return m_peersAndTimes[m_ui->serversWidget->item(row, checkBoxColumn)->data(Qt::UserRole).toInt()].first;
+    }
+
+    return QnId();
+}
+
 void QnTimeServerSelectionDialog::accept()
 {
     //TODO
@@ -116,5 +128,19 @@ void QnTimeServerSelectionDialog::onTimer()
         assert( checkItem );
         const auto& peer = m_peersAndTimes[checkItem->data(Qt::UserRole).toInt()];
         serverTimeItem->setText( QDateTime::fromMSecsSinceEpoch(currentTime - m_timeBase + peer.second).toString(Qt::ISODate) );
+    }
+}
+
+void QnTimeServerSelectionDialog::onTableItemClicked( QTableWidgetItem* item )
+{
+    if( item->column() != checkBoxColumn )
+        return;
+
+    item->setCheckState( Qt::Checked );
+    for( int row = 0; row < m_ui->serversWidget->rowCount(); ++row )
+    {
+        if( row == item->row() )
+            continue;
+        m_ui->serversWidget->item(row, item->column())->setCheckState( Qt::Unchecked );
     }
 }

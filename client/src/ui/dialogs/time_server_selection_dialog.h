@@ -34,6 +34,7 @@ public:
     void setData(
         qint64 localSystemTime,
         const QList<QPair<QnId, qint64> >& peersAndTimes );
+    QnId selectedPeer() const;
 
 public slots:
     virtual void accept() override;
@@ -51,6 +52,7 @@ private:
 
 private slots:
     void onTimer();
+    void onTableItemClicked( QTableWidgetItem* item );
 };
 
 #endif  //TIME_SERVER_SELECTION_DIALOG_H

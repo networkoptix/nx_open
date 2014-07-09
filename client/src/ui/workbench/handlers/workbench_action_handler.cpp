@@ -36,6 +36,8 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 
+#include <nx_ec/dummy_handler.h>
+
 #include <plugins/resource/archive/archive_stream_reader.h>
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
@@ -811,7 +813,10 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Server..."));
 
     if( QnAppServerConnectionFactory::getConnection2() )
-        disconnect( QnAppServerConnectionFactory::getConnection2().get() );
+    {
+        disconnect( QnAppServerConnectionFactory::getConnection2().get(), nullptr, this, nullptr );
+        disconnect( QnAppServerConnectionFactory::getConnection2().get(), nullptr, QnSyncTime::instance(), nullptr );
+    }
 
     if (!mainWindow())
         return;
@@ -856,6 +861,8 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
             menu()->trigger(Qn::SelectTimeServerAction, QnActionParameters().
                 withArgument(Qn::LocalSystemTimeRole, localSystemTime).withArgument(Qn::PeersToChooseTimeServerFromRole, peersAndTimes));
         });
+    connect( QnAppServerConnectionFactory::getConnection2().get(), &ec2::AbstractECConnection::timeChanged,
+             QnSyncTime::instance(), &QnSyncTime::updateTime );
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -2995,7 +3002,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
               : QUrl();
     QByteArray auth = url.toEncoded();
 
-    bool isInstalled;
+    bool isInstalled = false;
     bool success = applauncher::isVersionInstalled(version, &isInstalled) == applauncher::api::ResultType::ok;
     if (success && isInstalled) {
         //TODO: #GDM #Common wtf? whats up with order?
@@ -3039,11 +3046,16 @@ void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered()
     }
 
     const qint64 localSystemTime = menu()->currentParameters(sender()).argument(Qn::LocalSystemTimeRole).toLongLong();
-    const QList<QPair<QnId, qint64>>& peers = menu()->currentParameters(sender()).argument(Qn::PeersToChooseTimeServerFromRole).value<QList<QPair<QnId, qint64>>>();
+    const ec2::QnPeerTimeInfoList& peers = menu()->currentParameters(sender()).argument(Qn::PeersToChooseTimeServerFromRole).value<ec2::QnPeerTimeInfoList>();
     m_timeServerSelectionDialog->setData( localSystemTime, peers );
 
     if( !m_timeServerSelectionDialog->exec() )
         return;
 
-    //TODO #ak performing ec2 request
+    const QnId& selectedPeerID = m_timeServerSelectionDialog->selectedPeer();
+    if( !selectedPeerID.isNull() )
+        QnAppServerConnectionFactory::getConnection2()->forcePrimaryTimeServer(
+            selectedPeerID,
+            ec2::DummyHandler::instance(),
+            &ec2::DummyHandler::onRequestDone );
 }
