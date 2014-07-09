@@ -5,6 +5,7 @@
 #include <QtGui/QMatrix4x4>
 
 #include <utils/math/math.h>
+#include <utils/media/frame_info.h>
 
 extern "C" {
 #ifdef WIN32
@@ -140,7 +141,8 @@ QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDe
     QnAbstractImageFilter(),
     m_mediaDewarping(mediaDewarping),
     m_itemDewarping(itemDewarping),
-    m_lastImageFormat(-1)
+    m_lastImageFormat(-1),
+    m_tmpBuffer(new CLVideoDecoderOutput())
 {
     memset (m_transform, 0, sizeof(m_transform));
 }
@@ -181,10 +183,10 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
         }
         m_lastImageSize = imageSize;
         m_lastImageFormat = frame->format;
-        m_tmpBuffer.reallocate(frame->width, frame->height, frame->format);
+        m_tmpBuffer->reallocate(frame->width, frame->height, frame->format);
     }
 
-    m_tmpBuffer.copyDataFrom(frame);
+    m_tmpBuffer->copyDataFrom(frame);
 
     for (int plane = 0; plane < descr->nb_components && frame->data[plane]; ++plane)
     {
@@ -202,7 +204,7 @@ void QnFisheyeImageFilter::updateImage(CLVideoDecoderOutput* frame, const QRectF
             for (int x = 0; x < w; ++x)
             {
                 const QPointF* dstPixel = m_transform[plane] + index;
-                quint8 pixel = GetPixel(m_tmpBuffer.data[plane], m_tmpBuffer.linesize[plane], dstPixel->x(), dstPixel->y());
+                quint8 pixel = GetPixel(m_tmpBuffer->data[plane], m_tmpBuffer->linesize[plane], dstPixel->x(), dstPixel->y());
                 dstLine[x] = pixel;
                 
                 index++;

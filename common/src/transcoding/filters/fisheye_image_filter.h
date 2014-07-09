@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <QtCore/QScopedPointer>
+
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
 
@@ -30,7 +32,7 @@ private:
     QnItemDewarpingParams m_itemDewarping;
     QSize m_lastImageSize;
     QPointF* m_transform[MAX_COLOR_PLANES];
-    CLVideoDecoderOutput m_tmpBuffer;
+    QScopedPointer<CLVideoDecoderOutput> m_tmpBuffer;
     int m_lastImageFormat;
 };
 
