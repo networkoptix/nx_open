@@ -26,6 +26,8 @@ public:
 
     void paint(QPainter* painter, const QRect &rect);
 
+    void mouseEnter();
+    void mouseLeave();
     void mouseMoveAt(const QPoint &pos);
     void mouseClickAt(const QPoint &pos, Qt::MouseButtons buttons);
     void dragStartAt(const QPoint &pos);

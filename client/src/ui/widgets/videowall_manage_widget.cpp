@@ -58,20 +58,23 @@ void QnVideowallManageWidget::submitToResource(const QnVideoWallResourcePtr &vid
 }
 
 bool QnVideowallManageWidget::eventFilter(QObject *target, QEvent *event) {
-     if (event->type() == QEvent::LeaveWhatsThisMode)
-         m_skipReleaseEvent = true;
+    if (event->type() == QEvent::LeaveWhatsThisMode)
+        m_skipReleaseEvent = true;
+    else if (event->type() == QEvent::Enter) {
+        Q_D(QnVideowallManageWidget);
+        d->mouseEnter();
+    } else if (event->type() == QEvent::Leave) {
+        Q_D(QnVideowallManageWidget);
+        d->mouseLeave();
+    }
     m_dragProcessor->widgetEvent(this, event);
     return base_type::eventFilter(target, event);
 }
 
-
-
 void QnVideowallManageWidget::mousePressEvent(QMouseEvent *event) {
     base_type::mousePressEvent(event);
     m_pressedButtons = event->buttons();
-
 }
-
 
 void QnVideowallManageWidget::mouseMoveEvent(QMouseEvent *event) {
     base_type::mouseMoveEvent(event);

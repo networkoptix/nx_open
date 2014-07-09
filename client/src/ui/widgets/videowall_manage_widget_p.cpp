@@ -640,6 +640,21 @@ void QnVideowallManageWidgetPrivate::paint(QPainter* painter, const QRect &rect)
     });
 }
 
+void QnVideowallManageWidgetPrivate::mouseEnter() {
+    //do nothing for now
+}
+
+void QnVideowallManageWidgetPrivate::mouseLeave() {
+    if (m_process.isRunning())
+        return;
+
+    foreachItem([this](BaseModelItem &item, bool &) {
+        item.flags &= ~(StateFlag::Hovered | StateFlag::DeleteHovered);
+    });
+    QCursor cursor(transformationsCursor(ItemTransformation::None));
+    q_ptr->setCursor(cursor);
+}
+
 void QnVideowallManageWidgetPrivate::mouseMoveAt(const QPoint &pos) {
     if (m_process.isRunning())
         return;
