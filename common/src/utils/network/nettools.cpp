@@ -602,7 +602,7 @@ bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress,
     return eq1 > eq2;
 }
 
-#ifdef WIN32
+#ifndef Q_OS_LINUX
 void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
     // for test purpose only. This function used for EDGE so far
