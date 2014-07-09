@@ -68,6 +68,11 @@
   DEFINES += ENABLE_DATA_PROVIDERS
 }
 
+!contains( DEFINES, DISABLE_SSL) {
+  DEFINES += ENABLE_SSL
+}
+
+
 contains(NAME, mediaserver) || contains(NAME, common) {
   IS_VMAX_ENABLED=${vmax}
   contains( IS_VMAX_ENABLED, true ) {
