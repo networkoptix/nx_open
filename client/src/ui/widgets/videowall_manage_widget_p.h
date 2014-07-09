@@ -12,10 +12,12 @@
 
 #include <ui/common/geometry.h>
 
+class QnVideowallManageWidget;
+
 class QnVideowallManageWidgetPrivate : private QnGeometry {
     Q_DECLARE_TR_FUNCTIONS(QnVideowallManageWidgetPrivate);
 public:
-    QnVideowallManageWidgetPrivate(QWidget* q);
+    QnVideowallManageWidgetPrivate(QnVideowallManageWidget* q);
 
     QTransform getTransform(const QRect &rect);
     QTransform getInvertedTransform(const QRect &rect);
@@ -88,7 +90,7 @@ private:
     };
 
     struct BaseModelItem {
-        BaseModelItem(const QRect &geometry, ItemType itemType, const QUuid &id);
+        BaseModelItem(const QRect &geometry, ItemType itemType, const QUuid &id, QnVideowallManageWidget* q);
 
         virtual bool free() const = 0;
         virtual void setFree(bool value) = 0;
@@ -99,6 +101,7 @@ private:
         virtual QPainterPath bodyPath() const;
         virtual int fontSize() const;
         virtual int iconSize() const;
+        virtual QColor baseColor() const = 0;
         virtual void paintProposed(QPainter* painter, const QRect &proposedGeometry) const;
         void paintDashBorder(QPainter *painter, const QPainterPath &path) const;
         void paintResizeAnchors(QPainter *painter, const QRect &rect) const;
@@ -117,20 +120,23 @@ private:
 
         qreal opacity;
         qreal deleteButtonOpacity;
-        QColor baseColor;
         bool editable;
 
         QString name;
+    protected:
+        Q_DECLARE_PUBLIC(QnVideowallManageWidget);
+        QnVideowallManageWidget *q_ptr;
     };
 
 
     struct ModelItem: BaseModelItem {
         typedef BaseModelItem base_type;
 
-        ModelItem(ItemType itemType, const QUuid &id);
+        ModelItem(ItemType itemType, const QUuid &id, QnVideowallManageWidget* q);
 
         virtual bool free() const override;
         virtual void setFree(bool value) override;
+        virtual QColor baseColor() const override;
 
         virtual void paintProposed(QPainter* painter, const QRect &proposedGeometry) const override;
     };
@@ -138,7 +144,8 @@ private:
     struct FreeSpaceItem: BaseModelItem {
         typedef BaseModelItem base_type;
 
-        FreeSpaceItem(const QRect &rect, ItemType itemType);
+        FreeSpaceItem(const QRect &rect, ItemType itemType, QnVideowallManageWidget* q);
+        virtual QColor baseColor() const override;
 
         virtual void paint(QPainter* painter, const TransformationProcess &process) const override;
     };
@@ -146,7 +153,7 @@ private:
     struct ModelScreenPart: FreeSpaceItem {
         typedef FreeSpaceItem base_type;
 
-        ModelScreenPart(int screenIdx, int xIndex, int yIndex, const QRect &rect);
+        ModelScreenPart(int screenIdx, int xIndex, int yIndex, const QRect &rect, QnVideowallManageWidget* q);
 
         virtual bool free() const override;
         virtual void setFree(bool value) override;
@@ -157,7 +164,7 @@ private:
     struct ModelScreen: FreeSpaceItem {
         typedef FreeSpaceItem base_type;
 
-        ModelScreen(int idx, const QRect &rect);
+        ModelScreen(int idx, const QRect &rect, QnVideowallManageWidget* q);
 
         virtual bool free() const override;
         virtual void setFree(bool value) override;
@@ -169,7 +176,7 @@ private:
     };
 
 private:
-    Q_DECLARE_PUBLIC(QWidget);
+    Q_DECLARE_PUBLIC(QnVideowallManageWidget);
 
     /** 
      * Utility function that iterates over all items and calls handler to each of them. 
@@ -193,7 +200,7 @@ private:
 	void processItemStart(BaseModelItem &item, calculateProposedGeometryFunction proposedGeometry);
 	void processItemEnd(BaseModelItem &item, calculateProposedGeometryFunction proposedGeometry);
 private:
-    QWidget *q_ptr;
+    QnVideowallManageWidget *q_ptr;
     QTransform m_transform;
     QTransform m_invertedTransform;
     QRect m_widgetRect;

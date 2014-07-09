@@ -134,3 +134,12 @@ void QnVideowallManageWidget::tick(int deltaTime) {
     update();
 }
 
+const QnVideowallManageWidgetColors & QnVideowallManageWidget::colors() const {
+    return m_colors;
+}
+
+void QnVideowallManageWidget::setColors(const QnVideowallManageWidgetColors &colors) {
+    m_colors = colors;
+    update();
+}
+

@@ -4,6 +4,7 @@
 #include <QtWidgets/QWidget>
 
 #include <client/client_model_types.h>
+#include <client/client_color_types.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -18,10 +19,15 @@ class QnVideowallManageWidgetPrivate;
 
 class QnVideowallManageWidget : public QWidget, protected  DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT
+    Q_PROPERTY(QnVideowallManageWidgetColors colors READ colors WRITE setColors)
+
     typedef QWidget base_type;
 public:
     explicit QnVideowallManageWidget(QWidget *parent = 0);
     virtual ~QnVideowallManageWidget();
+
+    const QnVideowallManageWidgetColors &colors() const;
+    void setColors(const QnVideowallManageWidgetColors &colors);
 
     void loadFromResource(const QnVideoWallResourcePtr &videowall);
     void submitToResource(const QnVideoWallResourcePtr &videowall); 
@@ -48,6 +54,7 @@ private:
     DragProcessor *m_dragProcessor;
     bool m_skipReleaseEvent;
     Qt::MouseButtons m_pressedButtons;
+    QnVideowallManageWidgetColors m_colors;
 };
 
 #endif // VIDEOWALL_MANAGE_WIDGET_H
