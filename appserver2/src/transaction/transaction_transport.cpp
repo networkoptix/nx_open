@@ -153,9 +153,8 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                     //TODO #ak it makes sense to use here some chunk parser class. At this moment http chunk parsing logic is implemented 
                         //3 times in different parts of our code (async http client, sync http server and here)
                         //Also, it is better to read all data from socket by as few system calls as possible (use some fixed size buffer and parse data from that buffer)
-                    quint8* rBuffer = &m_readBuffer[0];
                     assert( m_readBufferLen < m_readBuffer.size() );
-                    const int readed = m_socket->recv(rBuffer + m_readBufferLen, m_readBuffer.size() - m_readBufferLen);
+                    const int readed = m_socket->recv(&m_readBuffer[0] + m_readBufferLen, m_readBuffer.size() - m_readBufferLen);
                     if (readed < 1) {
                         // no more data or error
                         if(readed == 0 || (SystemError::getLastOSErrorCode() != SystemError::wouldBlock && SystemError::getLastOSErrorCode() != SystemError::again))
@@ -164,18 +163,18 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                     }
                     m_readBufferLen += readed;
 
-                    for( ;; )
+                    for( size_t readBufPos = 0;; )
                     {
                         //processing available data: we can have zero or more chunks in m_readBuffer
                         nx_http::ChunkHeader httpChunkHeader;
                         if (m_chunkHeaderLen == 0)  //chunk header has not been read yet
                         {
                             //reading chunk header
-                            m_chunkHeaderLen = readChunkHeader(rBuffer, m_readBufferLen, &httpChunkHeader);
+                            m_chunkHeaderLen = readChunkHeader(&m_readBuffer[0] + readBufPos, m_readBufferLen, &httpChunkHeader);
                             if( m_chunkHeaderLen == 0 )
                             {
-                                if( rBuffer > &m_readBuffer[0] )
-                                    memmove( &m_readBuffer[0], rBuffer, m_readBufferLen );
+                                if( readBufPos > 0 )
+                                    memmove( &m_readBuffer[0], &m_readBuffer[0] + readBufPos, m_readBufferLen );
                                 break;  //not enough data in rBuffer to read http chunk header
                             }
                             m_chunkLen = httpChunkHeader.chunkSize;
@@ -192,17 +191,21 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                         if( m_readBufferLen < fullChunkSize )
                         {
                             //not enough data in rBuffer
-                            if( rBuffer > &m_readBuffer[0] )
-                                memmove( &m_readBuffer[0], rBuffer, m_readBufferLen );
+                            if( readBufPos > 0 )
+                                memmove( &m_readBuffer[0], &m_readBuffer[0] + readBufPos, m_readBufferLen );
                             break;
                         }
 
                         QByteArray serializedTran;
                         QnTransactionTransportHeader transportHeader;
-                        QnBinaryTransactionSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+                        QnBinaryTransactionSerializer::deserializeTran(
+                            &m_readBuffer[0] + readBufPos + m_chunkHeaderLen + 4,
+                            m_chunkLen - 4,
+                            transportHeader,
+                            serializedTran );
                         assert( !transportHeader.processedPeers.empty() );
                         emit gotTransaction(serializedTran, transportHeader);
-                        rBuffer += fullChunkSize;
+                        readBufPos += fullChunkSize;
                         m_readBufferLen -= fullChunkSize;
                         m_chunkHeaderLen = 0;
 
@@ -428,7 +431,7 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
 {
     m_chunkHeaderLen = 0;
 
-    const quint8* buffer = (const quint8*) data.data();
+    const quint8* buffer = (const quint8*) data.constData();
     int bufferLen = data.size();
     nx_http::ChunkHeader httpChunkHeader;
     m_chunkHeaderLen = readChunkHeader(buffer, bufferLen, &httpChunkHeader);
@@ -437,7 +440,7 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
     {
         processChunkExtensions( httpChunkHeader );
 
-        const int fullChunkLen = m_chunkHeaderLen + m_chunkLen + 2;
+        const int fullChunkLen = m_chunkHeaderLen + m_chunkLen + sizeof("\r\n")-1;
         if (bufferLen >= fullChunkLen)
         {
             QByteArray serializedTran;
@@ -458,7 +461,8 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
     }
 
     if (bufferLen > 0) {
-        m_readBuffer.resize(bufferLen);
+        if( m_readBuffer.size() < bufferLen )
+            m_readBuffer.resize(bufferLen);
         memcpy(&m_readBuffer[0], buffer, bufferLen);
     }
     m_readBufferLen = bufferLen;
