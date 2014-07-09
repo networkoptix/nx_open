@@ -856,6 +856,8 @@ void QnWorkbenchVideoWallHandler::updateMode() {
     QnWorkbenchLayout* layout = workbench()->currentLayout();
 
     QUuid itemUuid = layout->data(Qn::VideoWallItemGuidRole).value<QUuid>();
+
+
     bool control = !itemUuid.isNull();
     setControlMode(control);
 }

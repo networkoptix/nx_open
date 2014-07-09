@@ -22,6 +22,7 @@ class QNetworkReply;
 class QnServerMessageProcessor;
 struct QnModuleInformation;
 class QnModuleFinder;
+class QnPeerRuntimeInfo;
 
 class QnMain : public QnLongRunnable
 {
@@ -51,7 +52,7 @@ private slots:
     void at_peerLost(const QnModuleInformation &moduleInformation);
 
     void at_appStarted();
-    void at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
+    void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
 private:
     void updateDisabledVendorsIfNeeded();
     void initTcpListener();

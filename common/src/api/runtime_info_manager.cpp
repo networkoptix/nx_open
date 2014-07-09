@@ -1,64 +1,34 @@
 #include "runtime_info_manager.h"
-#include "api/common_message_processor.h"
-#include "api/app_server_connection.h"
-#include "common/common_module.h"
 
-static QnRuntimeInfoManager* m_inst;
+#include <api/common_message_processor.h>
 
-QnRuntimeInfoManager::QnRuntimeInfoManager():
-    QObject()
+#include <common/common_module.h>
+
+#include <nx_ec/data/api_server_alive_data.h>
+
+QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
+    QObject(parent)
 {
-    Q_ASSERT(m_inst == 0);
-    m_inst = this;
-
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, &QnRuntimeInfoManager::at_runtimeInfoChanged );
-    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerFound,    this, &QnRuntimeInfoManager::at_remotePeerFound );
-    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, &QnRuntimeInfoManager::at_remotePeerLost );
+    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, [this](const ec2::ApiPeerAliveData &data, bool){
+        m_items->removeItem(data.peer.id);
+    });
 }
 
-QnRuntimeInfoManager::~QnRuntimeInfoManager()
-{
-    m_inst = 0;
-}
-
-QnRuntimeInfoManager* instance()
-{
-    return m_inst;
-}
-
-void QnRuntimeInfoManager::at_remotePeerFound(const ec2::ApiPeerAliveData &, bool)
-{
-}
-
-void QnRuntimeInfoManager::at_remotePeerLost(const ec2::ApiPeerAliveData &data, bool)
-{
-    m_runtimeInfo.remove(data.peer.id);
-
-    if (data.peer.id == qnCommon->remoteGUID()) {
-        qnLicensePool->setMainHardwareIds(QList<QByteArray>());
-        qnLicensePool->setCompatibleHardwareIds(QList<QByteArray>());
-        m_runtimeInfo.clear();
+void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeData) {
+    
+    // check info version
+    if (m_items->hasItem(runtimeData.peer.id)) {
+        QnPeerRuntimeInfo existingInfo = m_items->getItem(runtimeData.peer.id);
+        if (existingInfo.data.version >= runtimeData.version)
+            return;
     }
+
+    QnPeerRuntimeInfo info(runtimeData);
+    m_items->addItem(info);
 }
 
-void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo)
-{
-    QMutexLocker lock(&m_mutex);
-
-    ec2::ApiRuntimeData existingData = m_runtimeInfo.value(runtimeInfo.peer.id);
-    if (existingData.version >= runtimeInfo.version)
-        return;
-
-    m_runtimeInfo.insert(runtimeInfo.peer.id, runtimeInfo);
-
-    QnId remoteID = qnCommon->remoteGUID();
-    if (runtimeInfo.peer.id == remoteID) {
-        qnLicensePool->setMainHardwareIds(runtimeInfo.mainHardwareIds);
-        qnLicensePool->setCompatibleHardwareIds(runtimeInfo.compatibleHardwareIds);
-    }
-    emit runtimeInfoChanged(runtimeInfo);
-}
-
+/*
 void QnRuntimeInfoManager::update(const ec2::ApiRuntimeData& value)
 {
     Q_ASSERT(!value.peer.id.isNull() && value.peer.peerType == Qn::PT_Server);
@@ -73,28 +43,41 @@ void QnRuntimeInfoManager::update(const ec2::ApiRuntimeData& value)
     newData.version = existingData.version + 1;
     m_runtimeInfo.insert(value.peer.id, newData);
     emit runtimeInfoChanged(newData);
-}
+}*/
 
-QMap<QnId, ec2::ApiRuntimeData> QnRuntimeInfoManager::allData() const
-{
-    QMutexLocker lock(&m_mutex);
-    return m_runtimeInfo;
-}
-
-ec2::ApiRuntimeData QnRuntimeInfoManager::data(const QnId& id) const
-{
-    QMutexLocker lock(&m_mutex);
-    if (m_runtimeInfo.contains(id)) {
-        return m_runtimeInfo.value(id);
-    }
-    else {
+/*
+ec2::ApiRuntimeData QnRuntimeInfoManager::data(const QnId& id) const {
+    if (!hasData(id)) {
         ec2::ApiRuntimeData result;
         result.peer.id = id;
         return result;
     }
+
+    QMutexLocker lock(&m_mutex);
+    return m_runtimeInfo.value(id);
+}*/
+
+void QnRuntimeInfoManager::storedItemAdded(const QnPeerRuntimeInfo &item) {
+    emit runtimeInfoAdded(item);
+    if (item.uuid != qnCommon->remoteGUID())
+        return;
+
+    qnLicensePool->setMainHardwareIds(item.data.mainHardwareIds);
+    qnLicensePool->setCompatibleHardwareIds(item.data.compatibleHardwareIds);
 }
 
-QnRuntimeInfoManager* QnRuntimeInfoManager::instance()
-{
-    return m_inst;
+void QnRuntimeInfoManager::storedItemRemoved(const QnPeerRuntimeInfo &item) {
+    emit runtimeInfoRemoved(item);
+    if (item.uuid != qnCommon->remoteGUID())
+        return;
+
+    qnLicensePool->setMainHardwareIds(QList<QByteArray>());
+    qnLicensePool->setCompatibleHardwareIds(QList<QByteArray>());
+
+    //clear all info on disconnect
+    m_items->setItems(QnPeerRuntimeInfoMap());
+}
+
+void QnRuntimeInfoManager::storedItemChanged(const QnPeerRuntimeInfo &item) {
+    emit runtimeInfoChanged(item);
 }

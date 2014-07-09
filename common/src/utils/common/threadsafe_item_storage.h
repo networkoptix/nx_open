@@ -1,37 +1,37 @@
-#ifndef RESOURCE_ITEM_STORAGE_H
-#define RESOURCE_ITEM_STORAGE_H
+#ifndef THREADSAFE_ITEM_STORAGE_H
+#define THREADSAFE_ITEM_STORAGE_H
 
 #include <QtCore/QMutex>
 
 #include <utils/common/warnings.h>
 
-template <class T> class QnResourceItemStorage;
+template <class T> class QnThreadsafeItemStorage;
 
 /**
- * @brief The QnResourceItemStorageNotifier class       Notification interface for the QnResourceItemStorage class.
+ * @brief The QnThreadsafeItemStorageNotifier class       Notification interface for the QnThreadsafeItemStorage class.
  */
 template <class T>
-class QnResourceItemStorageNotifier {
+class QnThreadsafeItemStorageNotifier {
 protected:
     virtual void storedItemAdded(const T &item) = 0;
     virtual void storedItemRemoved(const T &item) = 0;
     virtual void storedItemChanged(const T &item) = 0;
 
 private:
-    friend class QnResourceItemStorage<T>;
+    friend class QnThreadsafeItemStorage<T>;
 };
 
 /**
- * @brief The QnResourceItemStorage class               Utility class for storing and handling set of custom items.
- *                                                      Item class T should have "uuid" field and it must be unique.
+ * @brief The QnThreadsafeItemStorage class               Utility class for storing and handling set of custom items.
+ *                                                        Item class T should have "uuid" field and it must be unique.
  */
 template <class T>
-class QnResourceItemStorage {
+class QnThreadsafeItemStorage {
 public:
     typedef QList<T> ItemList;
     typedef QHash<QUuid, T> ItemMap;
 
-    QnResourceItemStorage(QMutex *mutex, QnResourceItemStorageNotifier<T>* notifier): 
+    QnThreadsafeItemStorage(QMutex *mutex, QnThreadsafeItemStorageNotifier<T>* notifier): 
         m_mutex(mutex),
         m_notifier(notifier)
     {}
@@ -48,7 +48,7 @@ public:
         setItemsUnderLock(items);
     }
 
-    void setItemsUnderLock(QnResourceItemStorage<T>* storage) {
+    void setItemsUnderLock(QnThreadsafeItemStorage<T>* storage) {
         setItemsUnderLock(storage->m_itemByUuid);
     }
 
@@ -153,7 +153,7 @@ private:
 private:
     ItemMap m_itemByUuid;
     QMutex* m_mutex;
-    QnResourceItemStorageNotifier<T> *m_notifier;
+    QnThreadsafeItemStorageNotifier<T> *m_notifier;
 };
 
-#endif // RESOURCE_ITEM_STORAGE_H
+#endif // THREADSAFE_ITEM_STORAGE_H
