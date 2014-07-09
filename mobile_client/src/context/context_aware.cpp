@@ -29,7 +29,7 @@ Context *ContextAware::context() const {
         return m_context;
 
     /* Try to get the context from the QML engine. */
-    QObject *object = dynamic_cast<QObject *>(this);
+    const QObject *object = dynamic_cast<const QObject *>(this);
     assert(object);
 
     QQmlContext *qmlContext = QtQml::qmlContext(object);

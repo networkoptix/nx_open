@@ -25,6 +25,9 @@ DEFINES += \
     DISABLE_SOFTWARE_MOTION_DETECTION \
     DISABLE_SENDMAIL \
 
+DEFINES += \
+    QN_EXPORT= \
+
 include($$COMMON_DIR/x64/optional_functionality.pri)
 
 
