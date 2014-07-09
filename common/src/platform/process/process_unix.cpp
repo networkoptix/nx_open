@@ -1,9 +1,9 @@
-
 #include "process_unix.h"
 
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include <QtCore/QProcess>
 #include <QtCore/QPointer>

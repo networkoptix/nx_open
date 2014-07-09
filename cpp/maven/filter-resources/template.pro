@@ -27,7 +27,7 @@ android {
     DISABLE_DATA_PROVIDERS \
     DISABLE_SOFTWARE_MOTION_DETECTION \
     DISABLE_SENDMAIL \
-    
+    DISABLE_SSL
 }
 
 include( optional_functionality.pri )

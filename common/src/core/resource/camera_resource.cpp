@@ -17,6 +17,8 @@ QnVirtualCameraResource::QnVirtualCameraResource():
     m_dtsFactory(0)
 {}
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 QnPhysicalCameraResource::QnPhysicalCameraResource(): 
     QnVirtualCameraResource(),
     m_channelNumber(0)
@@ -167,6 +169,28 @@ void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& sup
     setParam( QLatin1String(CAMERA_MEDIA_STREAM_LIST_PARAM_NAME), QLatin1String(serializedStreams), QnDomainDatabase );
 }
 
+
+CameraMediaStreamInfo::CameraMediaStreamInfo()
+:
+    resolution( lit("*") ),
+    transcodingRequired( false ),
+    codec( CODEC_ID_NONE )
+{
+}
+
+CameraMediaStreamInfo::CameraMediaStreamInfo( const QSize& _resolution, CodecID _codec )
+:
+    resolution( _resolution.isValid() ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height()) : lit("*") ),
+    transcodingRequired( false ),
+    codec( _codec )
+{
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json), _Fields )
+
+
+#endif // ENABLE_DATA_PROVIDERS
+
 // --------------- QnVirtualCameraResource ----------------------
 
 QnAbstractDTSFactory* QnVirtualCameraResource::getDTSFactory()
@@ -285,20 +309,3 @@ void QnVirtualCameraResource::noCameraIssues()
 }
 
 
-CameraMediaStreamInfo::CameraMediaStreamInfo()
-:
-    resolution( lit("*") ),
-    transcodingRequired( false ),
-    codec( CODEC_ID_NONE )
-{
-}
-
-CameraMediaStreamInfo::CameraMediaStreamInfo( const QSize& _resolution, CodecID _codec )
-:
-    resolution( _resolution.isValid() ? QString::fromLatin1("%1x%2").arg(_resolution.width()).arg(_resolution.height()) : lit("*") ),
-    transcodingRequired( false ),
-    codec( _codec )
-{
-}
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( (CameraMediaStreamInfo)(CameraMediaStreams), (json), _Fields )
