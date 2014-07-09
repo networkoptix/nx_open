@@ -591,11 +591,11 @@ void QnRecordingManager::at_checkLicenses()
     if (recordingDigital > maxDigital  || isOverflowTotal)
     {
         if (++m_tooManyRecordingCnt < 5)
-            return; // do not report license problem immediatly. Server should wait several minutes, probably other media servers will be available soon
+            return; // do not report license problem immediately. Server should wait several minutes, probably other media servers will be available soon
 
 
         ec2::QnDbManager::instance()->markLicenseOverflow(true, qnSyncTime->currentMSecsSinceEpoch());
-        qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID()).prematureLicenseExperationDate;
+        qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
         if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < LICENSE_RECORDING_STOP_TIME)
             return; // not enough license, but timeout not reached yet
 

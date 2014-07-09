@@ -600,10 +600,10 @@ void QnTransactionMessageBus::doPeriodicTasks()
 
 void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport, const QnPeerSet& processedPeers)
 {
-    foreach (ApiRuntimeData info, QnRuntimeInfoManager::instance()->allData().values())
+    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
     {
         QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, false);
-        tran.params = info;
+        tran.params = info.data;
         transport->sendTransaction(tran, processedPeers);
     }
 }

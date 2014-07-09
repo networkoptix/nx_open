@@ -755,6 +755,7 @@ namespace ec2
         virtual void startReceivingNotifications() = 0;
         virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
+        virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager() = 0;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() = 0;

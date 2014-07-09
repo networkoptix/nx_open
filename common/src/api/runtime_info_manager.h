@@ -18,7 +18,13 @@ struct QnPeerRuntimeInfo {
 
     QUuid uuid;
     ec2::ApiRuntimeData data;
+
+    bool operator==(const QnPeerRuntimeInfo& other) const {
+        return uuid == other.uuid &&
+            data == other.data;
+    }
 };
+
 
 Q_DECLARE_METATYPE(QnPeerRuntimeInfo)
 Q_DECLARE_TYPEINFO(QnPeerRuntimeInfo, Q_MOVABLE_TYPE);
@@ -40,7 +46,7 @@ public:
 
     QnThreadsafeItemStorage<QnPeerRuntimeInfo> *items() const;
 
-    //void update(const ec2::ApiRuntimeData& runtimeInfo);
+    QnPeerRuntimeInfo localInfo() const;
 signals:
     void runtimeInfoAdded(const QnPeerRuntimeInfo &data);
     void runtimeInfoChanged(const QnPeerRuntimeInfo &data);

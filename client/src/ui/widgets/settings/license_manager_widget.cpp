@@ -66,11 +66,19 @@ QnLicenseManagerWidget::~QnLicenseManagerWidget()
 }
 
 void QnLicenseManagerWidget::updateLicenses() {
-    // do not re-read licences if we are activating one now
+    // do not re-read licenses if we are activating one now
     if (!m_handleKeyMap.isEmpty())
         return;
 
-    setEnabled(!QnRuntimeInfoManager::instance()->allData().isEmpty());
+    bool connected = false;
+    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems()) {
+        if (info.data.peer.peerType != Qn::PT_Server)
+            continue;
+        connected = true;
+        break;
+    }
+
+    setEnabled(connected);
 
     m_licenses = qnLicensePool->getLicenses();
 
@@ -89,7 +97,7 @@ void QnLicenseManagerWidget::updateLicenses() {
     if (!m_licenses.isEmpty()) {
         QnLicenseUsageHelper helper;
 
-        // TODO: #Elric #TR total mess with numerus forms, and no idea how to fix it in a sane way
+        // TODO: #Elric #TR total mess with numerous forms, and no idea how to fix it in a sane way
 
         if (!helper.isValid()) {
             useRedLabel = true;

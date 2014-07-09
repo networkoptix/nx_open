@@ -1148,7 +1148,8 @@ void QnMain::run()
     int guidCompatibility = 0;
     runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
     runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
-    QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);
+    runtimeData.version = 1;
+    QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);    // initializing localInfo
 
     ec2::ResourceContext resCtx(
         QnResourceDiscoveryManager::instance(),
@@ -1176,12 +1177,11 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
     
-
     if (!connectInfo.publicIp.isEmpty()) {
-        QnPeerRuntimeInfo runtimeInfo = QnRuntimeInfoManager::instance()->items()->getItem(qnCommon->moduleGUID());
-        runtimeInfo.data.publicIP = connectInfo.publicIp;
-        runtimeInfo.data.version = runtimeInfo.data.version + 1;
-        QnRuntimeInfoManager::instance()->items()->updateItem(runtimeInfo.uuid, runtimeInfo);
+        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        localInfo.data.publicIP = connectInfo.publicIp;
+        localInfo.data.version++;
+        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );

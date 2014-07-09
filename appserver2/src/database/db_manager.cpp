@@ -244,9 +244,13 @@ bool QnDbManager::init()
         m_licenseOverflowTime = query.value(0).toByteArray().toLongLong();
         m_licenseOverflowMarked = m_licenseOverflowTime > 0;
     }
-    ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
-    data.prematureLicenseExperationDate = m_licenseOverflowTime;
-    QnRuntimeInfoManager::instance()->update(data);
+
+    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    if (localInfo.data.prematureLicenseExperationDate != m_licenseOverflowTime) {
+        localInfo.data.prematureLicenseExperationDate = m_licenseOverflowTime;
+        localInfo.data.version = localInfo.data.version + 1;
+        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+    }
 
     query.addBindValue(DB_INSTANCE_KEY);
     if (query.exec() && query.next()) {
@@ -2556,9 +2560,13 @@ bool QnDbManager::markLicenseOverflow(bool value, qint64 time)
         return false;
     }
 
-    ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
-    data.prematureLicenseExperationDate = m_licenseOverflowTime;
-    QnRuntimeInfoManager::instance()->update(data);
+    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    if (localInfo.data.prematureLicenseExperationDate != m_licenseOverflowTime) {
+        localInfo.data.prematureLicenseExperationDate = m_licenseOverflowTime;
+        localInfo.data.version++;
+        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+    }
+    
     return true;
 }
 

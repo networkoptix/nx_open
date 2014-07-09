@@ -161,8 +161,11 @@ const QByteArray& QnLicense::rawLicense() const
 
 QUuid QnLicense::findRuntimeDataByLicense() const
 {
-    foreach(const QnPeerRuntimeInfo& info, QnRuntimeInfoManager::instance()->items())
+    foreach(const QnPeerRuntimeInfo& info, QnRuntimeInfoManager::instance()->items()->getItems())
     {
+        if (info.data.peer.peerType != Qn::PT_Server)
+            continue;
+
         bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
         bool brandOK = (m_brand == info.data.brand);
         if (hwKeyOK && brandOK)

@@ -22,7 +22,7 @@ class QNetworkReply;
 class QnServerMessageProcessor;
 struct QnModuleInformation;
 class QnModuleFinder;
-class QnPeerRuntimeInfo;
+struct QnPeerRuntimeInfo;
 
 class QnMain : public QnLongRunnable
 {

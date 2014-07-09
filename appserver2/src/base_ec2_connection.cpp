@@ -218,6 +218,17 @@ namespace ec2
     }
 
 
+    template<class T>
+    void ec2::BaseEc2Connection<T>::sendRuntimeData(const ec2::ApiRuntimeData &data)
+    {
+        ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged, false);
+        tran.params = data;
+        tran.fillSequence();
+        ec2::qnTransactionBus->sendTransaction(tran);
+    }
+
+
+
     template class BaseEc2Connection<FixedUrlClientQueryProcessor>;
     template class BaseEc2Connection<ServerQueryProcessor>;
 }

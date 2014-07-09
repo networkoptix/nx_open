@@ -16,6 +16,7 @@
 
 #include <api/session_manager.h>
 #include <api/network_proxy_factory.h>
+#include <api/runtime_info_manager.h>
 
 #include <business/business_action_parameters.h>
 
@@ -845,6 +846,8 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
         m_connectingMessageBox->hideImmideately();
         m_connectingMessageBox = NULL;
     }
+
+    connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
