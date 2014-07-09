@@ -254,7 +254,7 @@ void initAppServerConnection(const QUuid &videowallGuid, const QUuid &instanceGu
 
     QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
-    QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
+    QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
     if (!videowallGuid.isNull()) {
         QnAppServerConnectionFactory::setVideowallGuid(videowallGuid);
         QnAppServerConnectionFactory::setInstanceGuid(instanceGuid);
@@ -457,6 +457,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         }
     }
 
+    QScopedPointer<QnServerCameraFactory> serverCameraFactory(new QnServerCameraFactory());
+
     //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory( new QnNetworkProxyFactory() );
 
@@ -465,7 +467,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
     ec2::ResourceContext resCtx(
-        &QnServerCameraFactory::instance(),
+        QnServerCameraFactory::instance(),
         qnResPool,
         qnResTypePool );
 	ec2ConnectionFactory->setContext( resCtx );
