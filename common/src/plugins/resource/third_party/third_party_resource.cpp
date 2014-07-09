@@ -5,6 +5,8 @@
 
 #include "third_party_resource.h"
 
+#ifdef ENABLE_THIRD_PARTY
+
 #include <functional>
 #include <memory>
 
@@ -599,3 +601,5 @@ nxcip::Resolution QnThirdPartyResource::getSecondStreamResolution() const
 
     return nxcip::Resolution( secondaryResolution.width(), secondaryResolution.height() );
 }
+
+#endif // ENABLE_THIRD_PARTY

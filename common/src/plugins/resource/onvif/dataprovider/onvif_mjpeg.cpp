@@ -1,5 +1,6 @@
-
 #include "onvif_mjpeg.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 #include "core/datapacket/video_data_packet.h"
 #include "core/resource/network_resource.h"
@@ -178,3 +179,5 @@ bool MJPEGStreamReader::isStreamOpened() const
 {
     return ( mHttpClient.get() && mHttpClient->isOpened() );
 }
+
+#endif // ENABLE_DATA_PROVIDERS

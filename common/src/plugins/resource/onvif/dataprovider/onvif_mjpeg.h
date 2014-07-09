@@ -1,6 +1,8 @@
 #ifndef cl_mjpeg_dataprovider_h_1140
 #define cl_mjpeg_dataprovider_h_1140
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <memory>
 
 #include "core/dataprovider/spush_media_stream_provider.h"
@@ -31,5 +33,7 @@ private:
 
     QString m_request;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //cl_mjpeg_dataprovider_h_1140

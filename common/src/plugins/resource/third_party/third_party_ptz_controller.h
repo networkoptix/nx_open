@@ -6,6 +6,8 @@
 #ifndef THIRD_PARTY_PTZ_CONTROLLER_H
 #define THIRD_PARTY_PTZ_CONTROLLER_H
 
+#ifdef ENABLE_THIRD_PARTY
+
 #include <core/ptz/basic_ptz_controller.h>
 #include <plugins/camera_plugin.h>
 #include <utils/math/functors.h>
@@ -43,5 +45,7 @@ private:
     //mutable QMutex m_mutex;
     //QByteArray m_cookie;
 };
+
+#endif // ENABLE_THIRD_PARTY
 
 #endif  //THIRD_PARTY_PTZ_CONTROLLER_H

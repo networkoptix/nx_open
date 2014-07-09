@@ -1,5 +1,7 @@
 #include "stream_recorder.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <utils/common/util.h>
 #include <utils/common/log.h>
 #include <utils/common/model_functions.h>
@@ -882,3 +884,6 @@ void QnStreamRecorder::setItemDewarpingParams(const QnItemDewarpingParams& param
 {
     m_itemDewarpingParams = params;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
+

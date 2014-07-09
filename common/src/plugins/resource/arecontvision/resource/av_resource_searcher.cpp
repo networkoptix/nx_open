@@ -10,7 +10,7 @@
 #include "utils/common/sleep.h"
 #include "core/resource/camera_resource.h"
 
-#include "plugins/resource/mdns/mdns_device_searcher.h"
+#include "plugins/resource/mdns/mdns_resource_searcher.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
 #include "utils/network/socket.h"

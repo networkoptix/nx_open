@@ -151,8 +151,6 @@
 #include "rest/handlers/old_client_connect_rest_handler.h"
 
 
-//#include "plugins/resource/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
-
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
@@ -329,7 +327,9 @@ void ffmpegInit()
 
     // TODO: #Elric we need comments about true/false at call site => bad api design, use flags instead
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
+#ifdef ENABLE_COLDSTORE
     QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
+#endif
 }
 
 QnStorageResourcePtr createStorage(const QString& path)

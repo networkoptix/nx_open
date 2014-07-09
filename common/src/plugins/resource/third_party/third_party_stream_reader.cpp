@@ -5,6 +5,8 @@
 
 #include "third_party_stream_reader.h"
 
+#ifdef ENABLE_THIRD_PARTY
+
 #include <algorithm>
 
 #include <QtCore/QTextStream>
@@ -12,7 +14,6 @@
 #include "utils/network/http/httptypes.h"
 #include "utils/network/multicodec_rtp_reader.h"
 #include "utils/common/log.h"
-#include "utils/common/util.h" /* For DATETIME_NOW. */
 
 #include "core/datapacket/third_party_audio_data_packet.h"
 #include "core/datapacket/third_party_video_data_packet.h"
@@ -563,3 +564,5 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
 
     m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
 }
+
+#endif // ENABLE_THIRD_PARTY

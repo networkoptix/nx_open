@@ -1,3 +1,6 @@
+#include "coldstore_dts_reader_factory.h"
+
+#ifdef ENABLE_COLDSTORE
 
 #include <QtCore/QString>
 #include <QtCore/QStringList>
@@ -9,7 +12,6 @@
 #include "../../coldstore/coldstore_api/ISFS.h"
 #include "utils/common/log.h"
 #include "../../coldstore/coldstore_api/sfs-client.h"
-#include "coldstore_dts_reader_factory.h"
 #include "utils/network/socket.h"
 #include "utils/network/system_socket.h"
 
@@ -254,3 +256,5 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
     delete sfs_client;
     
 }
+
+#endif // ENABLE_COLDSTORE

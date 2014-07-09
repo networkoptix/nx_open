@@ -1,11 +1,12 @@
+#include "mdns_packet.h"
 
-#include "mdns.h"
+#ifdef ENABLE_MDNS
 
 #include <QtCore/QDataStream>
 #include <QtCore/QIODevice>
 
 
-void MDNSPacket::toDatagram(QByteArray& datagram)
+void QnMdnsPacket::toDatagram(QByteArray& datagram)
 {
     QDataStream stream(&datagram, QIODevice::WriteOnly);
     stream << transactionId << flags << questions << answerRRs << authorityRRs << additionalRRs;
@@ -19,7 +20,7 @@ void MDNSPacket::toDatagram(QByteArray& datagram)
     }
 }
 
-void MDNSPacket::fromDatagram(QByteArray& datagram)
+void QnMdnsPacket::fromDatagram(QByteArray& datagram)
 {
     QDataStream stream(&datagram, QIODevice::ReadOnly);
     stream >> transactionId >> flags >> questions >> answerRRs >> authorityRRs >> additionalRRs;
@@ -58,8 +59,10 @@ void MDNSPacket::fromDatagram(QByteArray& datagram)
     }
 }
 
-void MDNSPacket::addQuery()
+void QnMdnsPacket::addQuery()
 {
     queries.append(Query());
     questions++;
 }
+
+#endif // ENABLE_MDNS

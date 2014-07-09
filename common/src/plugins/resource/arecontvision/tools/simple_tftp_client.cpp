@@ -1,4 +1,7 @@
 #include "simple_tftp_client.h"
+
+#ifdef ENABLE_ARECONT
+
 #include "utils/network/socket.h"
 #include "utils/common/log.h"
 #include "utils/common/byte_array.h"
@@ -261,4 +264,6 @@ int CLSimpleTFTPClient::form_ack(unsigned short blk, char* buff)
 
     return 4;
 }
+
+#endif // ENABLE_ARECONT
 

@@ -1,5 +1,6 @@
 #ifndef abstract_dts_factory_238
 #define abstract_dts_factory_238
+
 #include "core/resource/resource_fwd.h"
 
 class QnAbstractArchiveDelegate;

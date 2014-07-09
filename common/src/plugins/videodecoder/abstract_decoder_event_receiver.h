@@ -5,6 +5,8 @@
 #ifndef ABSTRACTDECODERMANAGER_H
 #define ABSTRACTDECODERMANAGER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "stree/resourcecontainer.h"
 
 
@@ -32,5 +34,7 @@ public:
         QnAbstractVideoDecoder* decoder,
         const stree::AbstractResourceReader& newStreamParams ) = 0;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //ABSTRACTDECODERMANAGER_H
