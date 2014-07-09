@@ -14,6 +14,7 @@ QnRuntimeInfoManager::QnRuntimeInfoManager():
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, &QnRuntimeInfoManager::at_runtimeInfoChanged );
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerFound,    this, &QnRuntimeInfoManager::at_remotePeerFound );
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, &QnRuntimeInfoManager::at_remotePeerLost );
+    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::connectionClosed,   this, &QnRuntimeInfoManager::at_connectionClosed );
 }
 
 QnRuntimeInfoManager::~QnRuntimeInfoManager()
@@ -37,6 +38,11 @@ void QnRuntimeInfoManager::at_remotePeerLost(const ec2::ApiPeerAliveData &data, 
     if (data.peer.id == qnCommon->remoteGUID()) {
         m_runtimeInfo.clear();
     }
+}
+
+void QnRuntimeInfoManager::at_connectionClosed()
+{
+    m_runtimeInfo.clear();
 }
 
 void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo)
