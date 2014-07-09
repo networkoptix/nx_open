@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick
+QT += qml quick concurrent sql
 
 CONFIG(debug, debug|release) {
   CONFIGURATION=debug
