@@ -22,8 +22,6 @@ CLH264RtpParser::CLH264RtpParser():
         m_builtinPpsFound(false),
         m_keyDataExists(false),
         m_frameExists(false),
-        m_timeCycles(0),
-        m_lastTimeStamp(0),
         m_firstSeqNum(0),
         m_packetPerNal(0),
         m_videoFrameSize(0)
