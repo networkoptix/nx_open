@@ -1,16 +1,18 @@
-
 #include "mdns_listener.h"
+
+#ifdef ENABLE_MDNS
 
 #include <memory>
 
-#include "utils/network/nettools.h"
-#include "utils/network/mdns.h"
-#include "utils/network/system_socket.h"
+#include <utils/network/nettools.h>
+#include <utils/network/system_socket.h>
 
 #ifndef Q_OS_WIN
 #include <netinet/in.h>
 #include <sys/socket.h>
 #endif
+
+#include "mdns_packet.h"
 
 static quint16 MDNS_PORT = 5353;
 static const int UPDATE_IF_LIST_INTERVAL = 1000 * 60;
@@ -90,7 +92,7 @@ void QnMdnsListener::readDataFromSocket()
         AbstractDatagramSocket* sock = m_socketList[i];
         
         // send request for next read
-        MDNSPacket request;
+        QnMdnsPacket request;
         request.addQuery();
         QByteArray datagram;
         request.toDatagram(datagram);
@@ -179,3 +181,5 @@ QnMdnsListener* QnMdnsListener::instance()
 {
     return QnMdnsListener_instance();
 }
+
+#endif // ENABLE_MDNS

@@ -1,7 +1,9 @@
-#include "mdns_device_searcher.h"
-#include "utils/network/nettools.h"
-#include "utils/network/mdns.h"
-#include "utils/common/sleep.h"
+#include "mdns_resource_searcher.h"
+
+#ifdef ENABLE_MDNS
+
+#include <utils/network/nettools.h>
+
 #include "mdns_listener.h"
 
 QnMdnsResourceSearcher::QnMdnsResourceSearcher()
@@ -42,3 +44,5 @@ QnResourceList QnMdnsResourceSearcher::findResources()
 
     return result;
 }
+
+#endif // ENABLE_MDNS

@@ -1,5 +1,8 @@
 #ifndef coldstore_stream_reader_h1059
 #define coldstore_stream_reader_h1059
+
+#ifdef ENABLE_COLDSTORE
+
 #include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "../../coldstore/coldstore_api/ISFS.h"
 
@@ -91,6 +94,6 @@ private:
 };
 
 
-//=======================================================================
+#endif // ENABLE_COLDSTORE
 
 #endif //coldstore_stream_reader_h1059

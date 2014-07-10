@@ -15,13 +15,14 @@ namespace ec2
         ServerQueryProcessor* queryProcessor,
         const ResourceContext& resCtx,
         const QnConnectionInfo& connectionInfo,
-        const QString& dbFilePath)
+        const QUrl& dbUrl)
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
         m_dbManager( new QnDbManager(
             resCtx.resFactory,
             &m_licenseManagerImpl,
-            dbFilePath) ),
+            dbUrl.path(),
+            QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path"))),
         m_auxManager(new QnAuxManager(&m_emailManagerImpl)),
         m_transactionLog( new QnTransactionLog(m_dbManager.get() )),
         m_connectionInfo( connectionInfo )

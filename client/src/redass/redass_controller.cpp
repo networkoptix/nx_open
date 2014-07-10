@@ -282,7 +282,7 @@ void QnRedAssController::onTimer()
         if (itr.value().awaitingLQTime && qnSyncTime->currentMSecsSinceEpoch() - itr.value().awaitingLQTime > QUALITY_SWITCH_INTERVAL)
             gotoLowQuality(display, display->queueSize() < 3 ? Reason_Network : Reason_CPU);
 
-        if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display))
+        if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display) && !reader->isPaused())
         {
             gotoLowQuality(display, Reason_Small);
             addHQTry();

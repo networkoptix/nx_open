@@ -6,6 +6,8 @@
 #ifndef THIRD_PARTY_RESOURCE_H
 #define THIRD_PARTY_RESOURCE_H
 
+#ifdef ENABLE_THIRD_PARTY
+
 #include <memory>
 
 #include <QSharedPointer>
@@ -123,5 +125,7 @@ private:
     nxcip::Resolution getNearestResolution( int encoderNumber, const nxcip::Resolution& desiredResolution ) const;
     nxcip::Resolution getSecondStreamResolution() const;
 };
+
+#endif // ENABLE_THIRD_PARTY
 
 #endif  //THIRD_PARTY_RESOURCE_H

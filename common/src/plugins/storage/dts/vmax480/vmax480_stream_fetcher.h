@@ -12,7 +12,7 @@
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/network_resource.h"
 #include "recording/time_period_list.h"
-#include "plugins/resource/archive/playbackmask_helper.h"
+#include "recording/playbackmask_helper.h"
 
 class VMaxStreamFetcherPtr;
 class QnVmax480DataConsumer

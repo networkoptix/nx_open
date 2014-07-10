@@ -1,5 +1,7 @@
 #include "ffmpeg_transcoder.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QDebug>
 
 #include "utils/common/log.h"
@@ -368,3 +370,5 @@ AVCodecContext* QnFfmpegTranscoder::getAudioCodecContext() const
 { 
     return m_audioEncoderCodecCtx; 
 }
+
+#endif // ENABLE_DATA_PROVIDERS

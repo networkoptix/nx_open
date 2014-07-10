@@ -1,5 +1,7 @@
 #include "multicodec_rtp_reader.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QSettings>
 
 #include <business/business_event_connector.h>
@@ -569,3 +571,5 @@ void QnMulticodecRtpReader::setRole(QnResource::ConnectionRole role)
 {
     m_role = role;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

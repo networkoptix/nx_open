@@ -3,11 +3,14 @@
 * akolesnikov
 ***********************************************************/
 
+#include "third_party_resource_searcher.h"
+
+#ifdef ENABLE_THIRD_PARTY
+
 #include <algorithm>
 
 #include <utils/common/log.h>
 
-#include "third_party_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/camera_driver_restriction_list.h"
 #include "core/resource_management/resource_data_pool.h"
@@ -336,3 +339,5 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     }
     return resource;
 }
+
+#endif // ENABLE_THIRD_PARTY

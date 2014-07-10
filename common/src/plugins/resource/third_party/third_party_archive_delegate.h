@@ -6,6 +6,8 @@
 #ifndef THIRD_PARTY_ARCHIVE_DELEGATE_H
 #define THIRD_PARTY_ARCHIVE_DELEGATE_H
 
+#ifdef ENABLE_THIRD_PARTY
+
 #include <plugins/camera_plugin.h>
 #include <plugins/resource/archive/abstract_archive_delegate.h>
 
@@ -54,5 +56,7 @@ private:
     QnAbstractMediaDataPtr m_savedMediaPacket;
     unsigned int m_cSeq;
 };
+
+#endif // ENABLE_THIRD_PARTY
 
 #endif  //THIRD_PARTY_ARCHIVE_DELEGATE_H

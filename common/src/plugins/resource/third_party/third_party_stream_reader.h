@@ -6,6 +6,8 @@
 #ifndef THIRD_PARTY_STREAM_READER_H
 #define THIRD_PARTY_STREAM_READER_H
 
+#ifdef ENABLE_THIRD_PARTY
+
 #include "core/dataprovider/abstract_media_stream_provider.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "core/resource/resource_media_layout.h"
@@ -74,5 +76,7 @@ private:
     QnAbstractMediaDataPtr readLiveStreamReader();
     void initializeAudioContext( const nxcip::AudioFormat& audioFormat );
 };
+
+#endif // ENABLE_THIRD_PARTY
 
 #endif // THIRD_PARTY_STREAM_READER_H

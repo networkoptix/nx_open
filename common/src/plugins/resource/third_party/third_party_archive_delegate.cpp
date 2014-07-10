@@ -5,9 +5,9 @@
 
 #include "third_party_archive_delegate.h"
 
-#include <plugins/plugin_tools.h>
+#ifdef ENABLE_THIRD_PARTY
 
-#include <utils/common/util.h> /* For DATETIME_NOW. */
+#include <plugins/plugin_tools.h>
 
 #include "third_party_stream_reader.h"
 
@@ -168,3 +168,5 @@ void ThirdPartyArchiveDelegate::setSendMotion( bool value )
 {
     m_archiveReader->setMotionDataEnabled( value );
 }
+
+#endif // ENABLE_THIRD_PARTY

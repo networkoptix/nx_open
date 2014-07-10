@@ -10,7 +10,7 @@
 #include "utils/common/sleep.h"
 #include "core/resource/camera_resource.h"
 
-#include "plugins/resource/mdns/mdns_device_searcher.h"
+#include "plugins/resource/mdns/mdns_resource_searcher.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
 #include "utils/network/socket.h"
@@ -252,7 +252,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
 
     QnPlAreconVisionResourcePtr res(0);
 
-    if (QnPlAreconVisionResource::isPanoramic(model))
+    if (QnPlAreconVisionResource::isPanoramic(qnResTypePool->getResourceType(rt)))
         res = QnPlAreconVisionResourcePtr(new QnArecontPanoramicResource(model));
     else
         res = QnPlAreconVisionResourcePtr(new CLArecontSingleSensorResource(model));
