@@ -391,7 +391,10 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
     if( cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
         setAudioEnabled( true );
     if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
-        setParam( lit("dts"), 1, QnDomainMemory );
+    {
+        setParam( lit("dts"), 1, QnDomainDatabase );
+        setParam( lit("analog"), 1, QnDomainDatabase );
+    }
     if( cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability )
     {
         setMotionType( Qn::MT_HardwareGrid );
