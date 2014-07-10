@@ -14,6 +14,7 @@ QnRuntimeInfoManager::QnRuntimeInfoManager():
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, &QnRuntimeInfoManager::at_runtimeInfoChanged );
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerFound,    this, &QnRuntimeInfoManager::at_remotePeerFound );
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, &QnRuntimeInfoManager::at_remotePeerLost );
+    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::connectionClosed,   this, &QnRuntimeInfoManager::at_connectionClosed );
 }
 
 QnRuntimeInfoManager::~QnRuntimeInfoManager()
@@ -35,10 +36,13 @@ void QnRuntimeInfoManager::at_remotePeerLost(const ec2::ApiPeerAliveData &data, 
     m_runtimeInfo.remove(data.peer.id);
 
     if (data.peer.id == qnCommon->remoteGUID()) {
-        qnLicensePool->setMainHardwareIds(QList<QByteArray>());
-        qnLicensePool->setCompatibleHardwareIds(QList<QByteArray>());
         m_runtimeInfo.clear();
     }
+}
+
+void QnRuntimeInfoManager::at_connectionClosed()
+{
+    m_runtimeInfo.clear();
 }
 
 void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo)
@@ -52,10 +56,6 @@ void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runt
     m_runtimeInfo.insert(runtimeInfo.peer.id, runtimeInfo);
 
     QnId remoteID = qnCommon->remoteGUID();
-    if (runtimeInfo.peer.id == remoteID) {
-        qnLicensePool->setMainHardwareIds(runtimeInfo.mainHardwareIds);
-        qnLicensePool->setCompatibleHardwareIds(runtimeInfo.compatibleHardwareIds);
-    }
     lock.unlock();  //to avoid dead-lock in case if directly (or auto) connected slot calls any method of this class
     emit runtimeInfoChanged(runtimeInfo);
 }

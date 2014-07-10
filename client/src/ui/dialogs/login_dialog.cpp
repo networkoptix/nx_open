@@ -424,7 +424,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode,
                     " - Client version: %1.\n"
                     " - EC version: %2.\n"
                     "The other version of client is needed in order to establish the connection to this server."
-                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()),
                 QMessageBox::Ok
             );
 #endif
@@ -457,7 +457,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode,
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
                             "The other version of client is needed in order to establish the connection to this server."
-                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo->version.toString()),
+                        ).arg(QLatin1String(QN_ENGINE_VERSION)).arg(connectionInfo.version.toString()),
                         QMessageBox::Ok
                     );
 #endif

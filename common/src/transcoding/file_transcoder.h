@@ -6,6 +6,8 @@
 #ifndef FILE_TRANSCODER_H
 #define FILE_TRANSCODER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <memory>
 
 #include <QtCore/QIODevice>
@@ -153,5 +155,7 @@ private:
     bool openFiles();
     void closeFiles();
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //FILE_TRANSCODER_H

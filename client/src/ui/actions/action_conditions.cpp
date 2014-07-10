@@ -87,6 +87,19 @@ Qn::ActionVisibility QnVideoWallReviewModeCondition::check(const QnActionParamet
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
+
+
+bool QnPreviewSearchModeCondition::isPreviewSearchMode() const {
+    return context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+}
+
+Qn::ActionVisibility QnPreviewSearchModeCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+        if (m_hide == isPreviewSearchMode())
+            return Qn::InvisibleAction;
+    return Qn::EnabledAction;
+}
+
 QnConjunctionActionCondition::QnConjunctionActionCondition(const QList<QnActionCondition *> conditions, QObject *parent) :
     QnActionCondition(parent),
     m_conditions(conditions)
@@ -111,38 +124,6 @@ Qn::ActionVisibility QnConjunctionActionCondition::check(const QnActionParameter
     Qn::ActionVisibility result = Qn::EnabledAction;
     foreach (QnActionCondition *condition, m_conditions)
         result = qMin(result, condition->check(parameters));
-
-    return result;
-}
-
-Qn::ActionVisibility QnConjunctionActionCondition::check(const QnResourceList &resources) {
-    Qn::ActionVisibility result = Qn::EnabledAction;
-    foreach (QnActionCondition *condition, m_conditions)
-        result = qMin(result, condition->check(resources));
-
-    return result;
-}
-
-Qn::ActionVisibility QnConjunctionActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
-    Qn::ActionVisibility result = Qn::EnabledAction;
-    foreach (QnActionCondition *condition, m_conditions)
-        result = qMin(result, condition->check(layoutItems));
-
-    return result;
-}
-
-Qn::ActionVisibility QnConjunctionActionCondition::check(const QnResourceWidgetList &widgets) {
-    Qn::ActionVisibility result = Qn::EnabledAction;
-    foreach (QnActionCondition *condition, m_conditions)
-        result = qMin(result, condition->check(widgets));
-
-    return result;
-}
-
-Qn::ActionVisibility QnConjunctionActionCondition::check(const QnWorkbenchLayoutList &layouts) {
-    Qn::ActionVisibility result = Qn::EnabledAction;
-    foreach (QnActionCondition *condition, m_conditions)
-        result = qMin(result, condition->check(layouts));
 
     return result;
 }
@@ -498,6 +479,9 @@ Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &p
     bool isImage = media->toResource()->flags() & QnResource::still_image;
     if (isImage)
         return Qn::InvisibleAction;
+
+    if (context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole))
+        return Qn::EnabledAction;
 
 #if 0
     if(camera->isGroupPlayOnly())

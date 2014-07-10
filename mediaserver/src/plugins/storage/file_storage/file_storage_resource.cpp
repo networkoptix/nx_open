@@ -256,20 +256,28 @@ bool QnFileStorageResource::isStorageDirMounted()
 
 bool QnFileStorageResource::readTabFile( const QString& filePath, QStringList* const mountPoints )
 {
-    QFile tabFile( filePath );
-    if( !tabFile.open(QIODevice::ReadOnly) )
+    FILE* tabFile = fopen( filePath.toLocal8Bit().constData(), "r" );
+    if( !tabFile )
         return false;
 
-    while( !tabFile.atEnd() )
+    char* line = nullptr;
+    size_t length = 0;
+    while( !feof(tabFile) )
     {
-        QString line = QString::fromLatin1(tabFile.readLine().trimmed());
-        if( line.isEmpty() || line.startsWith('#') )
+        if( getline( &line, &length, tabFile ) == -1 )
+            break;
+
+        if( length == 0 || line[0] == '#' )
             continue;
 
-        const QStringList& fields = line.split( QRegExp(QLatin1String("[\\s\\t]+")), QString::SkipEmptyParts );
+        //TODO #ak regex is actually not needed here, removing it will remove memcpy by QString also
+        const QStringList& fields = QString::fromLatin1(line, length).split( QRegExp(QLatin1String("[\\s\\t]+")), QString::SkipEmptyParts );
         if( fields.size() >= 2 )
             mountPoints->push_back( fields[1] );
     }
+
+    free( line );
+    fclose( tabFile );
 
     return true;
 }

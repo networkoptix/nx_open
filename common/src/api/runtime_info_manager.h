@@ -26,6 +26,7 @@ private slots:
     void at_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
     void at_remotePeerFound(const ec2::ApiPeerAliveData &data, bool isProxy);
     void at_remotePeerLost(const ec2::ApiPeerAliveData &data, bool isProxy);
+    void at_connectionClosed();
 
 private:
     QMap<QnId, ec2::ApiRuntimeData> m_runtimeInfo;

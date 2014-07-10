@@ -341,6 +341,7 @@ public:
         ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
+        ItemThumbnailTimestampRole,                 /**< Role for item's loaded thumbnail timestamp, in milliseconds. Used in thumbnails search. Value of type qint64. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
         ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
         ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
@@ -505,7 +506,15 @@ public:
 
 
 // TODO: #Elric #enum
+
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
+
+
+/** Time value for 'now'. */
+#define DATETIME_NOW        INT64_MAX 
+
+/** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE. Checked in ffmpeg.cpp. */
+#define DATETIME_INVALID    INT64_MIN
 
 
 

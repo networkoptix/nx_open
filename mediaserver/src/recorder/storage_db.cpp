@@ -40,6 +40,8 @@ bool QnStorageDb::deleteRecords(const QByteArray& mac, QnServer::ChunksCatalog c
 
 void QnStorageDb::addRecord(const QByteArray& mac, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk)
 {
+    QMutexLocker locker(&m_mutex);
+
     if (chunk.durationMs <= 0)
         return;
 
@@ -122,14 +124,14 @@ bool QnStorageDb::open(const QString& fileName)
 bool QnStorageDb::createDatabase()
 {
     beginTran();
-    if (!isObjectExists(lit("table"), lit("storage_data")))
+    if (!isObjectExists(lit("table"), lit("storage_data"), m_sdb))
     {
-        if (!execSQLFile(lit(":/01_create_storage_db.sql"))) {
+        if (!execSQLFile(lit(":/01_create_storage_db.sql"), m_sdb)) {
             rollback();
             return false;
         }
 
-        if (!execSQLFile(lit(":/02_storage_bookmarks.sql"))) {
+        if (!execSQLFile(lit(":/02_storage_bookmarks.sql"), m_sdb)) {
             rollback();
             return false;
         }
