@@ -179,12 +179,8 @@ public:
     void reset();
     bool isEmpty() const;
 
-    void setMainHardwareIds(const QList<QByteArray>& hardwareIds);
     QList<QByteArray> mainHardwareIds() const;
-
-    void setCompatibleHardwareIds(const QList<QByteArray>& hardwareIds);
     QList<QByteArray> compatibleHardwareIds() const;
-
     QByteArray currentHardwareId() const;
     bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
 signals:
@@ -198,8 +194,6 @@ private:
     bool addLicense_i(const QnLicensePtr &license);
     bool addLicenses_i(const QnLicenseList &licenses);
 private:
-    QList<QByteArray> m_mainHardwareIds;
-    QList<QByteArray> m_compatibleHardwareIds;
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
 };

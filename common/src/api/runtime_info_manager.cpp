@@ -5,13 +5,16 @@
 #include <common/common_module.h>
 
 #include <nx_ec/data/api_server_alive_data.h>
-
+    
 QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
     QObject(parent)
 {
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, &QnRuntimeInfoManager::at_runtimeInfoChanged );
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, [this](const ec2::ApiPeerAliveData &data, bool){
         m_items->removeItem(data.peer.id);
+    });
+    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::connectionClosed,   this, [this]{
+        m_items->setItems(QnPeerRuntimeInfoList() << localInfo());
     });
 }
 
@@ -30,23 +33,10 @@ void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runt
 
 void QnRuntimeInfoManager::storedItemAdded(const QnPeerRuntimeInfo &item) {
     emit runtimeInfoAdded(item);
-    if (item.uuid != qnCommon->remoteGUID())
-        return;
-
-    qnLicensePool->setMainHardwareIds(item.data.mainHardwareIds);
-    qnLicensePool->setCompatibleHardwareIds(item.data.compatibleHardwareIds);
 }
 
 void QnRuntimeInfoManager::storedItemRemoved(const QnPeerRuntimeInfo &item) {
-    emit runtimeInfoRemoved(item);
-    if (item.uuid != qnCommon->remoteGUID())
-        return;
-
-    qnLicensePool->setMainHardwareIds(QList<QByteArray>());
-    qnLicensePool->setCompatibleHardwareIds(QList<QByteArray>());
-
-    //clear all info (but self) on disconnect
-    m_items->setItems(QnPeerRuntimeInfoList() << localInfo());
+    emit runtimeInfoRemoved(item);  
 }
 
 void QnRuntimeInfoManager::storedItemChanged(const QnPeerRuntimeInfo &item) {

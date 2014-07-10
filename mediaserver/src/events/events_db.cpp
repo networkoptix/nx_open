@@ -48,15 +48,15 @@ bool QnEventsDB::createDatabase()
         QByteArray sql = versionQuery.value("sql").toByteArray();
         versionQuery.clear();
         if (!sql.contains("business_rule_guid")) {
-            if (!execSQLQuery("drop index 'timeAndCamIdx'")) {
+            if (!execSQLQuery("drop index 'timeAndCamIdx'", m_sdb)) {
                 return false;
             }
-            if (!execSQLQuery("drop table 'runtime_actions'"))
+            if (!execSQLQuery("drop table 'runtime_actions'", m_sdb))
                 return false;
         }
     }
 
-    if (!isObjectExists(lit("table"), lit("runtime_actions")))
+    if (!isObjectExists(lit("table"), lit("runtime_actions"), m_sdb))
     {
         QSqlQuery ddlQuery(m_sdb);
         ddlQuery.prepare(
@@ -69,7 +69,7 @@ bool QnEventsDB::createDatabase()
             return false;
     }
 
-    if (!isObjectExists(lit("index"), lit("timeAndCamIdx"))) {
+    if (!isObjectExists(lit("index"), lit("timeAndCamIdx"), m_sdb)) {
         QSqlQuery ddlQuery(m_sdb);
         ddlQuery.prepare(
             "CREATE INDEX \"timeAndCamIdx\" ON \"runtime_actions\" (timestamp,event_resource_guid)"
