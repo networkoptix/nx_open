@@ -50,7 +50,10 @@ void QnSyncTime::updateTime(qint64 newTime)
     m_gotTimeTask = 0;
 
     if(qAbs(oldTime - newTime) > TimeChangeThreshold)
+    {
+        lock.unlock();  //to avoid deadlock: in case if timeChanged signal handler will call thread-safe method of this class
         emit timeChanged();
+    }
 }
 
 QDateTime QnSyncTime::currentDateTime()
