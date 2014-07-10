@@ -35,9 +35,6 @@ private:
     bool m_builtinPpsFound;
     bool m_keyDataExists;
     bool m_frameExists;
-    quint64 m_timeCycles;
-    quint64 m_timeCycleValue;
-    quint64 m_lastTimeStamp;
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;
 

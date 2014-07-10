@@ -93,6 +93,22 @@ private:
     bool m_hide;
 };
 
+/** Base condition class for actions that should be hidden in preview search mode
+ *  and visible in all other cases - or vise versa. */
+class QnPreviewSearchModeCondition: public QnActionCondition {
+public:
+    QnPreviewSearchModeCondition(bool hide, QObject* parent):
+        QnActionCondition(parent),
+        m_hide(hide)
+    {}
+protected:
+    bool isPreviewSearchMode() const;
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+private:
+    /** Flag that describes if action should be visible or hidden in videowall review mode. */
+    bool m_hide;
+};
+
 /**
  * Condition wich is a conjunction of two or more conditions.
  * It acts like logical AND, e.g. an action is enabled if the all conditions in the conjunction is true.
@@ -106,10 +122,6 @@ public:
     QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QObject *parent = NULL);
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
-    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
-    virtual Qn::ActionVisibility check(const QnLayoutItemIndexList &layoutItems) override;
-    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
-    virtual Qn::ActionVisibility check(const QnWorkbenchLayoutList &layouts) override;
 
 private:
     QList<QnActionCondition*> m_conditions;
