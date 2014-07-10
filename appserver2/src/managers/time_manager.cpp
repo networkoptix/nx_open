@@ -332,11 +332,13 @@ namespace ec2
     {
         {
             QMutexLocker lk( &m_mutex );
-            if( m_terminated || m_broadcastSysTimeTaskID != taskID )
+            if( m_terminated )
             {
                 m_broadcastSysTimeTaskID = 0;
                 return;
             }
+            if( taskID != m_broadcastSysTimeTaskID )
+                return;
 
             using namespace std::placeholders;
             m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
@@ -375,7 +377,7 @@ namespace ec2
         for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
             peersByTimePriorityFlags.emplace( it->second.timePriorityKey.flags, it );
 
-        if( peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1 )
+        //if( peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1 )
         {
             const qint64 currentLocalTime = QDateTime::currentMSecsSinceEpoch();
 
@@ -383,8 +385,8 @@ namespace ec2
             QList<QPair<QnId, qint64> > peers;
             for( auto val: peersByTimePriorityFlags )
             {
-                if( val.first != peersByTimePriorityFlags.cbegin()->first )
-                    break;
+                //if( val.first != peersByTimePriorityFlags.cbegin()->first )
+                //    break;
                 peers.push_back( QPair<QnId, qint64>( val.second->first, val.second->second.syncTime + (currentClock - val.second->second.monotonicClockValue) ) );
             }
             //all peers have same priority, user selection is required
