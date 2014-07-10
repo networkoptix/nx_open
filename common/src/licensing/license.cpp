@@ -210,13 +210,11 @@ bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
         return false; // license is out of date
     }
     
+    bool classOK = true;
     bool isEdgeBox = box == lit("isd") || box == lit("isd_s2");
-    bool classOK;
     if (isEdgeBox)
-        classOK = (m_class == lit("edge") || !m_expiration.isEmpty());
-    else
-        classOK  = m_class != lit("edge");
-    
+        classOK = licenseClass() == Qn::LC_Edge || !m_expiration.isEmpty();
+
     if (errCode)
         *errCode = classOK ? NoError : InvalidType;
     return classOK;
@@ -245,8 +243,15 @@ QString QnLicense::errorMessage(ErrorCode errCode)
     return QString();
 }
 
-bool QnLicense::isAnalog() const {
-    return m_class.toLower() == QLatin1String("analog");
+Qn::LicenseClass QnLicense::licenseClass() const
+{
+    QString tmp = m_class.toLower();
+    if (tmp == lit("Edge"))
+        return Qn::LC_Edge;
+    else if (tmp == lit("analog"))
+        return Qn::LC_Analog;
+    else
+        return Qn::LC_Digital;
 }
 
 QByteArray QnLicense::toString() const
@@ -391,13 +396,13 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
     return m_licenseDict.keys();
 }
 
-int QnLicenseListHelper::totalCamerasByClass(bool analog) const
+int QnLicenseListHelper::totalCamerasByClass(Qn::LicenseClass licenseClass) const
 {
     int result = 0;
 
     foreach (QnLicensePtr license, m_licenseDict.values()) 
     {
-        if (license->isAnalog() == analog && license->isValid())
+        if (license->licenseClass() == licenseClass && license->isValid())
             result += license->cameraCount();
     }
     return result;

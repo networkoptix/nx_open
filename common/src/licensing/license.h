@@ -63,7 +63,7 @@ public:
     /**
      * @returns                         Whether this license is for analog cameras.
      */
-    bool isAnalog() const;
+    Qn::LicenseClass licenseClass() const;
 
     const QString &name() const;
     const QByteArray &key() const;
@@ -135,23 +135,9 @@ public:
     QList<QByteArray> allLicenseKeys() const;
     bool haveLicenseKey(const QByteArray& key) const;
     QnLicensePtr getLicenseByKey(const QByteArray& key) const;
-
-    /**
-     * \returns                         Total number of digital cameras allowed.
-     */
-    int totalDigital() const {
-        return totalCamerasByClass(false);
-    }
-
-    /**
-     * \returns                         Total number of analog cameras allowed.
-     */
-    int totalAnalog() const {
-        return totalCamerasByClass(true);
-    }
+    int totalCamerasByClass(Qn::LicenseClass licenseClass) const;
 
 private:
-    int totalCamerasByClass(bool analog) const;
 
 private:
     QnLicenseDict m_licenseDict;

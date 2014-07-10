@@ -124,15 +124,7 @@ public:
 
     QStringList allTags() const;
 
-    int activeCamerasByClass(bool analog) const;
-
-    int activeDigital() const {
-        return activeCamerasByClass(false);
-    }
-
-    int activeAnalog() const {
-        return activeCamerasByClass(true);
-    }
+    int activeCamerasByClass(Qn::LicenseClass licenseClass) const;
 
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();

@@ -91,39 +91,34 @@ void QnLicenseManagerWidget::updateLicenses() {
 
         // TODO: #Elric #TR total mess with numerus forms, and no idea how to fix it in a sane way
 
-        if (!helper.isValid()) {
+        QString msg(tr("The software is licensed to: "));
+        if (helper.totalDigital() > 0)
+            msg += tr("\n%1 cameras").arg(helper.totalDigital());
+        if (helper.totalAnalog() > 0)
+            msg += tr("\n%1 analog cameras").arg(helper.totalAnalog());
+        if (helper.totalEdge() > 0)
+            msg += tr("\n%1 edge cameras").arg(helper.totalEdge());
+
+        if (!helper.isValid()) 
+        {
             useRedLabel = true;
-            if (helper.totalAnalog() > 0) {
-                ui->infoLabel->setText(
-                    tr("The software is licensed to %1 cameras and %2 analog cameras.\nAt least %3 licenses are required.")
-                        .arg(helper.totalDigital())
-                        .arg(helper.totalAnalog())
-                        .arg(helper.required())
-                );
-            } else {
-                ui->infoLabel->setText(
-                    tr("The software is licensed to %1 cameras.\nAt least %3 licenses are required.")
-                        .arg(helper.totalDigital())
-                        .arg(helper.required())
-                );
-            }
-        } else {
-            if (helper.totalAnalog() > 0) {
-                ui->infoLabel->setText(
-                    tr("The software is licensed to %1 cameras and %2 analog cameras.\n%3 licenses and %4 analog licenses are currently in use.")
-                        .arg(helper.totalDigital())
-                        .arg(helper.totalAnalog())
-                        .arg(helper.usedDigital())
-                        .arg(helper.usedAnalog())
-                );
-            } else {
-                ui->infoLabel->setText(
-                    tr("The software is licensed to %1 cameras.\n%2 licenses are currently in use.")
-                        .arg(helper.totalDigital())
-                        .arg(helper.usedDigital())
-                );
-            }
+
+            if (helper.usedDigital() > 0)
+                msg += tr("\nAt least %1 licenses are required").arg(helper.usedDigital());
+            if (helper.usedAnalog() > 0)
+                msg += tr("\nAt least %1 analog licenses are required").arg(helper.usedAnalog());
+            if (helper.usedEdge() > 0)
+                msg += tr("\nAt least %1 edge licenses are required").arg(helper.usedEdge());
         }
+        else {
+            if (helper.usedDigital() > 0)
+                msg += tr("\n%1 licenses are currently in use").arg(helper.usedDigital());
+            if (helper.usedAnalog() > 0)
+                msg += tr("\n%1 analog licenses are currently in use").arg(helper.usedAnalog());
+            if (helper.usedEdge() > 0)
+                msg += tr("\n%1 edge licenses are currently in use").arg(helper.usedEdge());
+        }
+        ui->infoLabel->setText(msg);
     } else {
         if (qnLicensePool->currentHardwareId().isEmpty()) {
             ui->infoLabel->setText(tr("Obtaining licenses from Enterprise Controller..."));

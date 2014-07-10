@@ -470,17 +470,28 @@ QStringList QnResourcePool::allTags() const
     return result;
 }
 
-int QnResourcePool::activeCamerasByClass(bool analog) const
+int QnResourcePool::activeCamerasByClass(Qn::LicenseClass licenseClass) const
 {
     int count = 0;
 
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources) {
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
-        if (camera && !camera->isScheduleDisabled() && camera->isAnalog() == analog) {
-            QnResourcePtr mServer = getResourceById(camera->getId());
+        if (camera && !camera->isScheduleDisabled()) 
+        {
+            QnMediaServerResourcePtr mServer = getResourceById(camera->getId()).dynamicCast<QnMediaServerResource>();
             if (mServer && mServer->getStatus() != QnResource::Offline)
-                count++;
+            {
+                if (mServer->getServerFlags() & Qn::SF_Edge)
+                {
+                    if (licenseClass == Qn::LC_Edge)
+                        count++;
+                }
+                else if (camera->isAnalog() && licenseClass == Qn::LC_Analog)
+                    count++;
+                else if (!camera->isAnalog() && licenseClass == Qn::LC_Digital)
+                    count++;
+            }
         }
     }
     return count;

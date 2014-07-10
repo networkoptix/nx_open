@@ -14,6 +14,7 @@
 #include "common/common_module.h"
 
 #include <recording/time_period_list.h>
+#include "core/resource/media_server_resource.h"
 
 #define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
 
@@ -263,6 +264,11 @@ bool QnSecurityCamResource::isAnalog() const {
     if (!getParam(ANALOG_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
+}
+
+bool QnSecurityCamResource::isEdge() const {
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(getParentId()).dynamicCast<QnMediaServerResource>();
+    return mServer && (mServer->getServerFlags() & Qn::SF_Edge);
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {

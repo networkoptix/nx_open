@@ -488,6 +488,12 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SerializationFormat)
 
 
+    enum LicenseClass {
+        LC_Analog,
+        LC_Digital,
+        LC_Edge
+    };
+
     /**
      * Invalid value for a timezone UTC offset.
      */
@@ -513,7 +519,6 @@ enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 /** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE. Checked in ffmpeg.cpp. */
 #define DATETIME_INVALID    INT64_MIN
-
 
 
 /** 
