@@ -22,9 +22,3 @@ QnResourcePtr QnServerCameraFactory::createResource(const QnId &resourceTypeId, 
     }
 }
 
-QnServerCameraFactory &QnServerCameraFactory::instance() {
-    static QnServerCameraFactory _instance;
-
-    return _instance;
-}
-

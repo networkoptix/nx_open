@@ -1,5 +1,7 @@
 #include "layout_storage_resource.h"
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 
@@ -522,3 +524,5 @@ QString QnLayoutFileStorageResource::layoutPrefix() {
     static QLatin1String prefix("layout://");
     return prefix;
 }
+
+#endif // ENABLE_ARCHIVE

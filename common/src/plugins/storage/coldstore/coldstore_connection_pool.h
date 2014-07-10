@@ -1,6 +1,8 @@
 #ifndef coldstore_connection_pool_h1931
 #define coldstore_connection_pool_h1931
 
+#ifdef ENABLE_COLDSTORE
+
 #include "coldstore_api/sfs-client.h"
 
 #include <QHash>
@@ -87,5 +89,7 @@ private:
 
     QMutex m_mutex;
 };
+
+#endif // ENABLE_COLDSTORE
 
 #endif // coldstore_connection_pool_h1931

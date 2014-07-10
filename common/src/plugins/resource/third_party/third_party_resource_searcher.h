@@ -6,11 +6,13 @@
 #ifndef THIRD_PARTY_RESOURCE_SEARCHER_H
 #define THIRD_PARTY_RESOURCE_SEARCHER_H
 
+#ifdef ENABLE_THIRD_PARTY
+
 #include <QtCore/QList>
 #include <QtCore/QVector>
 
 #include "third_party_resource.h"
-#include "../mdns/mdns_device_searcher.h"
+#include "../mdns/mdns_resource_searcher.h"
 #include "plugins/resource/upnp/upnp_resource_searcher.h"
 #include "plugins/resource/upnp/upnp_device_searcher.h"
 #include "../../camera_plugin.h"
@@ -76,5 +78,7 @@ private:
         nxcip_qt::CameraDiscoveryManager* const discoveryManager,
         const nxcip::CameraInfo& cameraInfo );
 };
+
+#endif // ENABLE_THIRD_PARTY
 
 #endif  //THIRD_PARTY_RESOURCE_SEARCHER_H

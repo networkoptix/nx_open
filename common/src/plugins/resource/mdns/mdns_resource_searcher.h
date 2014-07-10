@@ -1,23 +1,21 @@
 #ifndef onvif_device_server_h_2054
 #define onvif_device_server_h_2054
 
-#include "core/resource/network_resource.h"
-#include "core/resource_management/resource_searcher.h"
+#ifdef ENABLE_MDNS
 
-bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
+#include <core/resource/network_resource.h>
+#include <core/resource_management/resource_searcher.h>
 
 class QnMdnsResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
 {
-protected:
-    QnMdnsResourceSearcher();
 public:
-    
-
+    QnMdnsResourceSearcher();
     ~QnMdnsResourceSearcher();
 
     bool isProxy() const;
 
-    virtual QnResourceList findResources();
+    virtual QnResourceList findResources() override;
+
 protected:
     /*!
         \param result Just found resources. In case if same camera has been found on multiple network interfaces
@@ -25,5 +23,9 @@ protected:
     */
     virtual QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress) = 0;
 };
+
+bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
+
+#endif // ENABLE_MDNS
 
 #endif // avigilon_device_server_h_1809

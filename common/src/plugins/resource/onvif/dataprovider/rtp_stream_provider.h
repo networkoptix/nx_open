@@ -1,6 +1,8 @@
 #ifndef h264_stream_provider_h_2015
 #define h264_stream_provider_h_2015
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/multicodec_rtp_reader.h"
 
@@ -32,4 +34,7 @@ private:
 
 };
 
+#endif // ENABLE_DATA_PROVIDERS
+
 #endif //h264_stream_provider_h_2015
+

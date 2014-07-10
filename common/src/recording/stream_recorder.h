@@ -1,6 +1,8 @@
 #ifndef _STREAM_RECORDER_H__
 #define _STREAM_RECORDER_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
 
@@ -211,5 +213,7 @@ private:
     bool m_recordingFinished;
     Role m_role;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // _STREAM_RECORDER_H__

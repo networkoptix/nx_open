@@ -1,4 +1,7 @@
 #include "h264_rtp_parser.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
 #include "utils/common/synctime.h"
@@ -19,8 +22,6 @@ CLH264RtpParser::CLH264RtpParser():
         m_builtinPpsFound(false),
         m_keyDataExists(false),
         m_frameExists(false),
-        m_timeCycles(0),
-        m_lastTimeStamp(0),
         m_firstSeqNum(0),
         m_packetPerNal(0),
         m_videoFrameSize(0)
@@ -381,3 +382,5 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         result = createVideoData(rtpBufferBase, ntohl(rtpHeader->timestamp), statistics); // last packet
     return true;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

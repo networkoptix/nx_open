@@ -151,8 +151,6 @@
 #include "rest/handlers/old_client_connect_rest_handler.h"
 
 
-//#include "plugins/resource/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
-
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
@@ -329,7 +327,9 @@ void ffmpegInit()
 
     // TODO: #Elric we need comments about true/false at call site => bad api design, use flags instead
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
+#ifdef ENABLE_COLDSTORE
     QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
+#endif
 }
 
 QnStorageResourcePtr createStorage(const QString& path)
@@ -631,23 +631,35 @@ int serverMain(int argc, char *argv[])
 void initAppServerConnection(const QSettings &settings)
 {
     QUrl appServerUrl;
+    QUrlQuery params;
     
     // ### remove
     QString host = settings.value("appserverHost").toString();
     if (QUrl(host).scheme() == "file")
         appServerUrl = QUrl(host); // it is a completed URL
-    else if (host.isEmpty() || host == "localhost")
+    else if (host.isEmpty() || host == "localhost") 
+    {
         appServerUrl = QUrl(QString("file:///") + closeDirPath(getDataDirectory()));
+    }
     else {
         appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
         int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
         appServerUrl.setHost(host);
         appServerUrl.setPort(port);
     }
+    if (appServerUrl.scheme() == "file")
+    {
+        QString staticDBPath = settings.value("staticDataDir").toString();
+        if (!staticDBPath.isEmpty()) {
+            params.addQueryItem("staticdb_path", staticDBPath);
+	}
+    }
+
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
     QString password = settings.value("appserverPassword", QLatin1String("123")).toString();
     appServerUrl.setUserName(userName);
     appServerUrl.setPassword(password);
+    appServerUrl.setQuery(params);
 
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");

@@ -1,6 +1,8 @@
 #ifndef __SIMPLE_TFTP_CLIENT__1117
 #define __SIMPLE_TFTP_CLIENT__1117
 
+#ifdef ENABLE_ARECONT
+
 #include <memory>
 
 #include <QString>
@@ -58,5 +60,7 @@ private:
     CameraDiagnostics::Result m_prevResult;
     QString m_resolvedAddress;
 };
+
+#endif // ENABLE_ARECONT
 
 #endif //__SIMPLE_TFTP_CLIENT__1117
