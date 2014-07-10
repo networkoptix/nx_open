@@ -135,9 +135,8 @@ namespace {
     }
 #endif
 
-    void addItemToLayout(const QnLayoutResourcePtr &layout, const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc, const QList<int> screens) {
-        int idx = screens.first();
-        int firstScreen = qnIndexOf(pc.screens, [idx](const QnVideoWallPcData::PcScreen &screen) {return screen.index == idx;});
+    void addItemToLayout(const QnLayoutResourcePtr &layout, const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc, const QSet<int> screens) {
+        int firstScreen = qnIndexOf(pc.screens, [screens](const QnVideoWallPcData::PcScreen &screen) {return screens.contains(screen.index);});
         if (firstScreen < 0)
             return;
 
@@ -151,7 +150,7 @@ namespace {
         itemData.resource.id = videoWall->getId();
         itemData.resource.path = videoWall->getUniqueId();
         itemData.dataByRole[Qn::VideoWallPcGuidRole] = qVariantFromValue<QUuid>(pc.uuid);
-        itemData.dataByRole[Qn::VideoWallPcScreenIndicesRole] = qVariantFromValue<QList<int> >(screens);
+        itemData.dataByRole[Qn::VideoWallPcScreenIndicesRole] = qVariantFromValue<QSet<int> >(screens);
         layout->addItem(itemData);
     }
 
@@ -1350,10 +1349,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
                 if (skip)
                     continue;
 
-                //TODO: #GDM #VW refactor
-                QList<int> listScreens = screens.toList();
-                qSort(listScreens);
-                addItemToLayout(layout, videoWall, pc, listScreens);
+                addItemToLayout(layout, videoWall, pc, screens);
             }
         }
 
@@ -1708,7 +1704,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
 
     QnVideoWallPcData pc = videoWall->pcs()->getItem(item.pcUuid);
 
-    QList<int> indices = item.screenSnaps.screens().toList();
+    QSet<int> indices = item.screenSnaps.screens();
     if (indices.isEmpty())
         return;
 
@@ -1719,8 +1715,8 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
             QUuid pcUuid = data.dataByRole[Qn::VideoWallPcGuidRole].value<QUuid>();
             if (pcUuid != item.pcUuid)
                 continue;
-            QList<int> screenIndices = data.dataByRole[Qn::VideoWallPcScreenIndicesRole].value<QList<int> >();
-            if (screenIndices.contains(indices.first()))
+            QSet<int> screenIndices = data.dataByRole[Qn::VideoWallPcScreenIndicesRole].value<QSet<int> >();
+            if (screenIndices.contains(*indices.begin()))
                 return; //widget exists and will handle event by itself
         }
     }
@@ -1785,39 +1781,24 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved(const QnVideoWallReso
     if (!layout)
         return;
 
-    if (!videoWall->pcs()->hasItem(item.pcUuid))
-        return;
-
-    QnVideoWallPcData pc = videoWall->pcs()->getItem(item.pcUuid);
-
     foreach(QnWorkbenchItem *workbenchItem, layout->items()) {
         QnLayoutItemData data = workbenchItem->data();
         QUuid pcUuid = data.dataByRole[Qn::VideoWallPcGuidRole].value<QUuid>();
         if (pcUuid != item.pcUuid)
-            continue;
+            continue;   // widget for another PC
 
-        QRectF combinedGeometry;
-        QList<int> screenIndices = data.dataByRole[Qn::VideoWallPcScreenIndicesRole].value<QList<int> >();
-        foreach(const QnVideoWallPcData::PcScreen &screen, pc.screens) {
-            if (!screenIndices.contains(screen.index))
-                continue;
-            combinedGeometry = combinedGeometry.united(screen.desktopGeometry);
-        }
+        QSet<int> screenIndices = data.dataByRole[Qn::VideoWallPcScreenIndicesRole].value<QSet<int> >();
+        if (!screenIndices.contains(item.screenSnaps.screens()))
+            continue;   // widget did not contain deleted item
 
-        //TODO: #GDM #VW implement!
-        //if (!combinedGeometry.contains(item.geometry))
-        //    continue;
-
-        // we found the widget containing removed item
         foreach (const QnVideoWallItem &existingItem, videoWall->items()->getItems()) {
             if (existingItem.pcUuid != item.pcUuid)
                 continue;
-
-            //TODO: #GDM #VW implement!
-            //if (combinedGeometry.contains(existingItem.geometry))
-            //    return; //that wasn't last item
+            if (screenIndices.contains(existingItem.screenSnaps.screens())) {
+                return; // that was not the last item of this widget
+            }
         }
-
+       
         layout->removeItem(workbenchItem);
         return; // no need to check other items
     }
@@ -2254,10 +2235,11 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(const QnLayoutResourcePtr &la
             continue;
         QnVideoWallPcData pc = videowall->pcs()->getItem(pcUuid);
 
-        QList<int> screenIndices = data.dataByRole[Qn::VideoWallPcScreenIndicesRole].value<QList<int> >();
+        QSet<int> screenIndices = data.dataByRole[Qn::VideoWallPcScreenIndicesRole].value<QSet<int> >();
         if (screenIndices.size() < 1)
             continue;
-        pc.screens[screenIndices.first()].layoutGeometry = data.combinedGeometry.toRect();
+        foreach(int screenIndex, screenIndices)
+            pc.screens[screenIndex].layoutGeometry = data.combinedGeometry.toRect();
         videowall->pcs()->updateItem(pcUuid, pc);
     }
 

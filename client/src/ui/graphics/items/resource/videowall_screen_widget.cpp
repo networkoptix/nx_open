@@ -48,7 +48,7 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(QnWorkbenchContext *context, Qn
         return;
 
     QnVideoWallPcData pc = m_videowall->pcs()->getItem(m_pcUuid);
-    QList<int> screenIndices = item->data(Qn::VideoWallPcScreenIndicesRole).value<QList<int> >();
+    QSet<int> screenIndices = item->data(Qn::VideoWallPcScreenIndicesRole).value<QSet<int> >();
 
     foreach(const QnVideoWallPcData::PcScreen &screen, pc.screens) {
         if (!screenIndices.contains(screen.index))
