@@ -23,26 +23,28 @@ namespace ec2
     //////////////////////////////////////////////
     TimePriorityKey::TimePriorityKey()
     :
-        flags(0),
         sequence(0),
+        flags(0),
         seed(0)
     {
     }
 
     bool TimePriorityKey::operator==( const TimePriorityKey& right ) const
     {
-        return flags == right.flags &&
-               sequence == right.sequence &&
-               seed == right.seed;
+        return
+            sequence == right.sequence &&
+            flags == right.flags &&
+            seed == right.seed;
     }
 
     bool TimePriorityKey::operator<( const TimePriorityKey& right ) const
     {
-        return flags < right.flags ? true :
-               flags > right.flags ? false :
-               sequence < right.sequence ? true :
-               sequence > right.sequence ? false :
-               seed < right.seed;
+        return
+            sequence < right.sequence ? true :
+            sequence > right.sequence ? false :
+            flags < right.flags ? true :
+            flags > right.flags ? false :
+            seed < right.seed;
     }
     
     bool TimePriorityKey::operator>( const TimePriorityKey& right ) const
@@ -52,13 +54,13 @@ namespace ec2
 
     quint64 TimePriorityKey::toUInt64() const
     {
-        return ((quint64)flags << 48) | ((quint64)sequence << 32) | seed;
+        return ((quint64)sequence << 48) | ((quint64)flags << 32) | seed;
     }
     
     void TimePriorityKey::fromUInt64( quint64 val )
     {
-        flags = (quint16)(val >> 48);
-        sequence = (quint16)((val >> 32) & 0xFFFF00000000LL);
+        sequence = (quint16)(val >> 48);
+        flags = (quint16)((val >> 32) & 0xFFFF00000000LL);
         seed = val & 0xFFFFFFFF;
     }
 
@@ -79,10 +81,12 @@ namespace ec2
 
     QByteArray TimeSyncInfo::toString() const
     {
+        static const size_t MAX_DECIMAL_DIGITS_IN_64BIT_INT = 20;
+
         QByteArray result;
-        result.resize( 20*3 + 1 );
+        result.resize( MAX_DECIMAL_DIGITS_IN_64BIT_INT*3 + 1 );
         sprintf( result.data(), "%lld,%lld,%lld", monotonicClockValue, syncTime, timePriorityKey.toUInt64() );
-        result.resize( strlen( result.data() ) );
+        result.resize( (int)strlen( result.data() ) );
         return result;
     }
     
@@ -149,8 +153,11 @@ namespace ec2
         assert( TimeManager_instance == nullptr );
         TimeManager_instance = this;
 
-        connect( QnTransactionMessageBus::instance(), &QnTransactionMessageBus::newConnectionEstablished,
+        connect( QnTransactionMessageBus::instance(), &QnTransactionMessageBus::newDirectConnectionEstablished,
                  this, &TimeSynchronizationManager::onNewConnectionEstablished,
+                 Qt::DirectConnection );
+        connect( QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,
+                 this, &TimeSynchronizationManager::onPeerLost,
                  Qt::DirectConnection );
 
         using namespace std::placeholders;
@@ -381,7 +388,7 @@ namespace ec2
         {
             const qint64 currentLocalTime = QDateTime::currentMSecsSinceEpoch();
 
-            //list<pair<peerid, time> >
+            ////list<pair<peerid, time> >
             QList<QPair<QnId, qint64> > peers;
             for( auto val: peersByTimePriorityFlags )
             {
@@ -415,5 +422,11 @@ namespace ec2
                 return;
             }
         }
+    }
+
+    void TimeSynchronizationManager::onPeerLost( ApiPeerAliveData data, bool /*isProxy*/ )
+    {
+        QMutexLocker lk( &m_mutex );
+        m_systemTimeByPeer.erase( data.peer.id );
     }
 }

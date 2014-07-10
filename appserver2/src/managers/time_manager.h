@@ -54,10 +54,10 @@ namespace ec2
 {
     struct TimePriorityKey
     {
-        //!bitset of flags from \a TimeSynchronizationManager class
-        quint16 flags;
         //!sequence number. Incremented with each peer selection by user
         quint16 sequence;
+        //!bitset of flags from \a TimeSynchronizationManager class
+        quint16 flags;
         //!some random number
         quint32 seed;
 
@@ -196,6 +196,7 @@ namespace ec2
 
     private slots:
         void onNewConnectionEstablished( const QnTransactionTransportPtr& transport );
+        void onPeerLost( ApiPeerAliveData data, bool isProxy );
     };
 }
 

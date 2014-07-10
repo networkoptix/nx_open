@@ -97,15 +97,23 @@ namespace ec2
         AlivePeersMap aliveServerPeers() const;
 
     signals:
+        /*!
+            \param isProxy \a true if we connected to peer indirectly (via any other peer(s)). \a false if there is direct connection to peer
+        */
         void peerLost(ApiPeerAliveData data, bool isProxy);
+        //!Emitted when a new peer has joined cluster or became online
+        /*!
+            \param isProxy \a true if we connected to peer indirectly (via any other peer(s)). \a false if there is direct connection to peer
+        */
         void peerFound(ApiPeerAliveData data, bool isProxy);
+        //!Emitted on a new direct connection to a remote peer has been established
+        void newDirectConnectionEstablished(const QnTransactionTransportPtr& transport);
 
         void gotLockRequest(ApiLockData);
         //void gotUnlockRequest(ApiLockData);
         void gotLockResponse(ApiLockData);
 
         void transactionProcessed(const QnAbstractTransaction &transaction);
-        void newConnectionEstablished(const QnTransactionTransportPtr& transport);
 
     private:
         friend class QnTransactionTransport;
