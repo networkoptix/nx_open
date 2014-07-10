@@ -384,16 +384,16 @@ namespace ec2
         for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
             peersByTimePriorityFlags.emplace( it->second.timePriorityKey.flags, it );
 
-        //if( peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1 )
+        if( peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1 )
         {
             const qint64 currentLocalTime = QDateTime::currentMSecsSinceEpoch();
 
-            ////list<pair<peerid, time> >
+            //list<pair<peerid, time> >
             QList<QPair<QnId, qint64> > peers;
             for( auto val: peersByTimePriorityFlags )
             {
-                //if( val.first != peersByTimePriorityFlags.cbegin()->first )
-                //    break;
+                if( val.first != peersByTimePriorityFlags.cbegin()->first )
+                    break;
                 peers.push_back( QPair<QnId, qint64>( val.second->first, val.second->second.syncTime + (currentClock - val.second->second.monotonicClockValue) ) );
             }
             //all peers have same priority, user selection is required
