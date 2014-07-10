@@ -5,8 +5,10 @@
 
 #include "time_server_selection_dialog.h"
 
+#include <api/app_server_connection.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx_ec/dummy_handler.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -101,9 +103,18 @@ QnId QnTimeServerSelectionDialog::selectedPeer() const
 
 void QnTimeServerSelectionDialog::accept()
 {
-    //TODO
-
     QDialog::accept();
+
+    const QnId& selectedPeerID = selectedPeer();
+    if( selectedPeerID.isNull() )
+        return;
+    const ec2::AbstractECConnectionPtr& connection = QnAppServerConnectionFactory::getConnection2();
+    if( !connection )
+        return;
+    connection->forcePrimaryTimeServer(
+        selectedPeerID,
+        ec2::DummyHandler::instance(),
+        &ec2::DummyHandler::onRequestDone );
 }
 
 void QnTimeServerSelectionDialog::showEvent( QShowEvent* )

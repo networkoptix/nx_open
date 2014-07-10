@@ -172,6 +172,7 @@ namespace ec2
         quint64 m_manualTimerServerSelectionCheckTaskID;
         bool m_terminated;
         std::map<QnId, TimeSyncInfo> m_systemTimeByPeer;
+        Qn::PeerType m_peerType;
 
         /*!
             \param remotePeerID

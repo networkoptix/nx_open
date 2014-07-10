@@ -123,7 +123,8 @@ namespace ec2
         m_timeDelta( 0 ),
         m_broadcastSysTimeTaskID( 0 ),
         m_manualTimerServerSelectionCheckTaskID( 0 ),
-        m_terminated( false )
+        m_terminated( false ),
+        m_peerType( peerType )
     {
         if( peerType == Qn::PT_Server )
             m_localTimePriorityKey.flags |= peerIsServer;
@@ -226,8 +227,12 @@ namespace ec2
 
                 if( !synchronizingByCurrentServer )
                 {
-                    //new sync time will be broadcasted with the next transaction (it will be at least broadcastPeerSystemTime)
                     const qint64 curSyncTime = m_monotonicClock.elapsed() + m_timeDelta;
+                    using namespace std::placeholders;
+                    //sending broadcastPeerSystemTime tran, new sync time will be broadcasted along with it
+                    m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
+                        std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
+                        0 );
                     lk.unlock();
                     emit timeChanged( curSyncTime );
                 }
@@ -287,6 +292,14 @@ namespace ec2
                 localMonotonicClock,
                 remotePeerSyncTime,
                 remotePeerTimePriorityKey ); 
+            if( m_peerType == Qn::PT_Server )
+            {
+                using namespace std::placeholders;
+                //sending broadcastPeerSystemTime tran, new sync time will be broadcasted along with it
+                m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
+                    std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
+                    0 );
+            }
             lk.unlock();
             emit timeChanged( m_monotonicClock.elapsed() + m_timeDelta );
         }
@@ -315,13 +328,15 @@ namespace ec2
         extensions->emplace_back( TIME_SYNC_EXTENSION_NAME, getTimeSyncInfo().toString() );
     }
 
-    void TimeSynchronizationManager::broadcastLocalSystemTime( quint64 /*taskID*/ )
+    void TimeSynchronizationManager::broadcastLocalSystemTime( quint64 taskID )
     {
         {
             QMutexLocker lk( &m_mutex );
-            m_broadcastSysTimeTaskID = 0;
-            if( m_terminated )
+            if( m_terminated || m_broadcastSysTimeTaskID != taskID )
+            {
+                m_broadcastSysTimeTaskID = 0;
                 return;
+            }
 
             using namespace std::placeholders;
             m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(

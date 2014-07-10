@@ -3045,17 +3045,12 @@ void QnWorkbenchActionHandler::at_selectTimeServerAction_triggered()
         m_timeServerSelectionDialog->setModal(true);
     }
 
+    if( m_timeServerSelectionDialog->isVisible() )
+        return; //dialog still running from previous time
+
     const qint64 localSystemTime = menu()->currentParameters(sender()).argument(Qn::LocalSystemTimeRole).toLongLong();
     const ec2::QnPeerTimeInfoList& peers = menu()->currentParameters(sender()).argument(Qn::PeersToChooseTimeServerFromRole).value<ec2::QnPeerTimeInfoList>();
     m_timeServerSelectionDialog->setData( localSystemTime, peers );
 
-    if( !m_timeServerSelectionDialog->exec() )
-        return;
-
-    const QnId& selectedPeerID = m_timeServerSelectionDialog->selectedPeer();
-    if( !selectedPeerID.isNull() )
-        QnAppServerConnectionFactory::getConnection2()->forcePrimaryTimeServer(
-            selectedPeerID,
-            ec2::DummyHandler::instance(),
-            &ec2::DummyHandler::onRequestDone );
+    m_timeServerSelectionDialog->exec();
 }
