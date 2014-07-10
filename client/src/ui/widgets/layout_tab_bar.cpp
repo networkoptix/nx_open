@@ -10,6 +10,8 @@
 #include <client/client_settings.h>
 
 #include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_item_index.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>
@@ -23,7 +25,9 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+
 #include <ui/style/skin.h>
+#include <ui/style/resource_icon_cache.h>
 
 
 QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
@@ -117,10 +121,16 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
         return QIcon();
 
     if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
-        return qnSkin->icon("titlebar/videowall.png");
+        return qnResIconCache->icon(QnResourceIconCache::VideoWall);
 
-    if (!layout->data(Qn::VideoWallItemGuidRole).value<QUuid>().isNull())
-        return qnSkin->icon("titlebar/screen.png");
+    // videowall control mode
+    QUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QUuid>();
+    if (!videoWallInstanceGuid.isNull()) {
+        bool active = layout->data(Qn::VideoWallControlRole).value<bool>();
+        if (active)
+            return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+        return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
+    }
 
     QnLayoutResourcePtr resource = layout->resource();
     if (resource && resource->locked())
@@ -272,8 +282,13 @@ void QnLayoutTabBar::at_layout_lockedChanged() {
 }
 
 void QnLayoutTabBar::at_layout_dataChanged(int role) {
-    if (role != Qn::VideoWallItemGuidRole)
+    switch (role) {
+    case Qn::VideoWallControlRole:
+    case Qn::VideoWallItemGuidRole:
+        break;
+    default:
         return;
+    }
 
     QnWorkbenchLayout *layout = checked_cast<QnWorkbenchLayout *>(sender());
     updateTabIcon(layout);

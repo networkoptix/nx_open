@@ -59,6 +59,8 @@ private:
 
     void at_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
 private:
+    /** Mutex that is to be used when accessing items. */
+    mutable QMutex m_mutex;
     QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo> > m_items;
 };
 

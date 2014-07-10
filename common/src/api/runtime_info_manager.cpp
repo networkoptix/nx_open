@@ -7,7 +7,8 @@
 #include <nx_ec/data/api_server_alive_data.h>
     
 QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
-    QObject(parent)
+    QObject(parent),
+    m_items(new QnThreadsafeItemStorage<QnPeerRuntimeInfo>(&m_mutex, this))
 {
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, &QnRuntimeInfoManager::at_runtimeInfoChanged );
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, [this](const ec2::ApiPeerAliveData &data, bool){

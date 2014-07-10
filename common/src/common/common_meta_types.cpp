@@ -19,6 +19,7 @@
 #include <api/model/connection_info.h>
 #include <api/model/time_reply.h>
 #include <api/model/rebuild_archive_reply.h>
+#include <api/runtime_info_manager.h>
 
 #include <recording/time_period_list.h>
 
@@ -78,6 +79,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qt::Orientations>();
 
     qRegisterMetaType<QnMacAddress>();
+    qRegisterMetaType<QnPeerRuntimeInfo>();
 
     qRegisterMetaType<QnParam>();
     qRegisterMetaType<QnId>();

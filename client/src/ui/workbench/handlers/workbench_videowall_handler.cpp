@@ -6,6 +6,7 @@
 #include <QtWidgets/QDesktopWidget>
 
 #include <api/app_server_connection.h>
+#include <api/runtime_info_manager.h>
 
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/range/adaptor/reversed.hpp>
@@ -72,8 +73,8 @@
 
 #include "version.h"
 
-#define SENDER_DEBUG
-#define RECEIVER_DEBUG
+//#define SENDER_DEBUG
+//#define RECEIVER_DEBUG
 
 namespace {
     #define PARAM_KEY(KEY) const QLatin1String KEY##Key(BOOST_PP_STRINGIZE(KEY));
@@ -819,6 +820,7 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
     m_controlMode.cachedMessages.clear();
 
     QnWorkbenchLayout* layout = workbench()->currentLayout();
+    layout->setData(Qn::VideoWallControlRole, active);
     if (active) {
         connect(workbench(),    &QnWorkbench::itemChanged,              this,   &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
         connect(layout,         &QnWorkbenchLayout::itemAdded,          this,   &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
@@ -856,9 +858,12 @@ void QnWorkbenchVideoWallHandler::updateMode() {
     QnWorkbenchLayout* layout = workbench()->currentLayout();
 
     QUuid itemUuid = layout->data(Qn::VideoWallItemGuidRole).value<QUuid>();
-
-
-    bool control = !itemUuid.isNull();
+    bool control = false;
+    if (!itemUuid.isNull()) {
+        QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(itemUuid);
+        if (!index.isNull() && index.videowall()->items()->getItem(itemUuid).online)
+            control = true;
+    }
     setControlMode(control);
 }
 
@@ -1719,6 +1724,10 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
     //TODO: #GDM #VW implement screen size changes handling
+
+    // check if item become online or offline
+    if (item.uuid == workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).value<QUuid>())
+        updateMode();
 
     // index to place updated layout
     int layoutIndex = -1;
