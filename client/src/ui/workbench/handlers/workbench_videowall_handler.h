@@ -72,6 +72,7 @@ private:
     bool createShortcut(const QnVideoWallResourcePtr &videowall);
 
     void setItemOnline(const QUuid &instanceGuid, bool online);
+    void updateMainWindowGeometry(const QnScreenSnaps &screenSnaps);
 private slots:
 
     void at_newVideoWallAction_triggered();

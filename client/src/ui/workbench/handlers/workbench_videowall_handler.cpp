@@ -501,21 +501,11 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
 
     QnVideoWallItem item = videoWall->items()->getItem(m_videoWallMode.instanceGuid);
 
-    QList<QRect> screens;
-    QDesktopWidget* desktop = qApp->desktop();
-    for (int i = 0; i < desktop->screenCount(); ++i)
-        screens << desktop->screenGeometry(i);
-    QRect targetGeometry = item.screenSnaps.geometry(screens);
-    mainWindow()->setGeometry(targetGeometry);
-
-    for (const QRect &screen: screens) {
-        if (targetGeometry == screen)
-            menu()->action(Qn::EffectiveMaximizeAction)->trigger();
-    }
-
     QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
     if (layout)
         menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+
+    updateMainWindowGeometry(item.screenSnaps);
 }
 
 void QnWorkbenchVideoWallHandler::closeInstanceDelayed() {
@@ -2290,4 +2280,21 @@ void QnWorkbenchVideoWallHandler::setItemOnline(const QUuid &instanceGuid, bool 
     QnVideoWallItem item = index.videowall()->items()->getItem(instanceGuid);
     item.online = online;
     index.videowall()->items()->updateItem(instanceGuid, item);
+}
+
+void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps &screenSnaps) {
+    QList<QRect> screens;
+    QDesktopWidget* desktop = qApp->desktop();
+    for (int i = 0; i < desktop->screenCount(); ++i)
+        screens << desktop->screenGeometry(i);
+    QRect targetGeometry = screenSnaps.geometry(screens);
+    bool equalsScreen = screens.contains(targetGeometry);
+
+    if (equalsScreen) {
+        mainWindow()->setGeometry(targetGeometry);
+        menu()->action(Qn::EffectiveMaximizeAction)->setChecked(true);
+    } else {
+        menu()->action(Qn::EffectiveMaximizeAction)->setChecked(false);
+        mainWindow()->setGeometry(targetGeometry);
+    }       
 }
