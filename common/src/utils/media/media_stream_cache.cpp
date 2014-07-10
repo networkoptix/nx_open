@@ -4,9 +4,15 @@
 
 #include "media_stream_cache.h"
 
+#include <cstdlib>
 #include <algorithm>
 
 #include <QMutexLocker>
+
+//#define DEBUG_OUTPUT
+#ifdef DEBUG_OUTPUT
+#include <malloc.h>
+#endif
 
 
 using namespace std;
@@ -73,11 +79,13 @@ quint64 MediaStreamCache::SequentialReadContext::currentPos() const
 MediaStreamCache::MediaStreamCache( unsigned int cacheSizeMillis )
 :
     m_cacheSizeMillis( cacheSizeMillis ),
-    m_mutex( QMutex::Recursive ),
+    m_mutex( QMutex::Recursive ),   //TODO #ak get rid of Recursive mutex
     m_prevPacketSrcTimestamp( -1 ),
     m_currentPacketTimestamp( 0 ),
-    m_cacheSizeInBytes( 0 )
+    m_cacheSizeInBytes( 0 ),
+    m_prevGivenEventReceiverID( 0 )
 {
+    m_inactivityTimer.restart();
 }
 
 //!Implementation of QnAbstractDataReceptor::canAcceptData
@@ -90,11 +98,11 @@ static qint64 MAX_ALLOWED_TIMESTAMP_DIFF = 5*1000*1000UL;  //5 seconds
 static const int MICROS_PER_MS = 1000;
 
 //!Implementation of QnAbstractDataReceptor::putData
-void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
+void MediaStreamCache::putData( const QnAbstractDataPacketPtr& data )
 {
     QMutexLocker lk( &m_mutex );
 
-    const QnAbstractMediaDataPtr mediaPacket = data.dynamicCast<QnAbstractMediaData>();
+    const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(data.data());
     const bool isKeyFrame = mediaPacket && (mediaPacket->flags & QnAbstractMediaData::MediaFlags_AVKey);
     if( m_packetsByTimestamp.empty() && !isKeyFrame )
         return; //cache data MUST start with key frame
@@ -134,19 +142,30 @@ void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
 
     m_packetsByTimestamp.insert( posToInsert, MediaPacketContext( m_currentPacketTimestamp, data, isKeyFrame ) );
     if( mediaPacket )
-        m_cacheSizeInBytes += mediaPacket->data.size();
+        m_cacheSizeInBytes += mediaPacket->dataSize();
 
     if( !isKeyFrame )
         return; //no sense to perform this operation more than once per GOP
 
-    for( std::set<AbstractMediaCacheEventReceiver*>::const_iterator
-        it = m_eventReceivers.cbegin();
-        it != m_eventReceivers.cend();
-        ++it )
-    {
-        (*it)->onKeyFrame( m_currentPacketTimestamp );
-    }
+#ifdef DEBUG_OUTPUT
+    std::cout<<"Media cache size "<<(m_packetsByTimestamp.empty() ? 0 : (m_packetsByTimestamp.back().timestamp - m_packetsByTimestamp.front().timestamp)) / 1000000<<" sec"
+        ", "<<m_cacheSizeInBytes<<" bytes"<<
+        ", m_packetsByTimestamp.size() = "<<m_packetsByTimestamp.size()<<
+        //", QnAbstractMediaData count "<<QnAbstractMediaData_instanceCount.load()<<
+        //", QnByteArray_bytesAllocated "<<QnByteArray_bytesAllocated.load()<<
+        std::endl;
 
+    static int malloc_statsCounter = 0;
+    ++malloc_statsCounter;
+    if( malloc_statsCounter == 10 )
+    {
+        malloc_stats();
+        malloc_statsCounter = 0;
+    }
+#endif
+
+    for( auto eventReceiver: m_eventReceivers )
+        eventReceiver.second( m_currentPacketTimestamp );
     const quint64 maxTimestamp = m_packetsByTimestamp.back().timestamp;
     if( maxTimestamp - m_packetsByTimestamp.front().timestamp > m_cacheSizeMillis*MICROS_PER_MS )
     {
@@ -178,12 +197,22 @@ void MediaStreamCache::putData( QnAbstractDataPacketPtr data )
             it != lastItToRemove;
             ++it )
         {
-            const QnAbstractMediaDataPtr mediaPacket = it->packet.dynamicCast<QnAbstractMediaData>();
+            const QnAbstractMediaData* mediaPacket = dynamic_cast<QnAbstractMediaData*>(it->packet.data());
             if( mediaPacket )
-                m_cacheSizeInBytes -= mediaPacket->data.size();
+                m_cacheSizeInBytes -= mediaPacket->dataSize();
         }
         m_packetsByTimestamp.erase( m_packetsByTimestamp.begin(), lastItToRemove );
     }
+}
+
+void MediaStreamCache::clear()
+{
+    QMutexLocker lk( &m_mutex );
+
+    m_prevPacketSrcTimestamp = -1;
+    m_currentPacketTimestamp = 0;
+    m_cacheSizeInBytes = 0;
+    m_packetsByTimestamp.clear();
 }
 
 quint64 MediaStreamCache::startTimestamp() const
@@ -237,6 +266,8 @@ QnAbstractDataPacketPtr MediaStreamCache::findByTimestamp(
 {
     QMutexLocker lk( &m_mutex );
 
+    m_inactivityTimer.restart();
+
     if( m_packetsByTimestamp.empty() )
         return QnAbstractDataPacketPtr();
 
@@ -272,16 +303,17 @@ QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quin
     return it->packet;
 }
 
-void MediaStreamCache::addEventReceiver( AbstractMediaCacheEventReceiver* const receiver )
+int MediaStreamCache::addKeyFrameEventReceiver( const std::function<void (quint64)>& keyFrameEventReceiver )
 {
     QMutexLocker lk( &m_mutex );
-    m_eventReceivers.insert( receiver );
+    m_eventReceivers.insert( std::make_pair( ++m_prevGivenEventReceiverID, keyFrameEventReceiver ) );
+    return m_prevGivenEventReceiverID;
 }
 
-void MediaStreamCache::removeEventReceiver( AbstractMediaCacheEventReceiver* const receiver )
+void MediaStreamCache::removeKeyFrameEventReceiver( int receiverID )
 {
     QMutexLocker lk( &m_mutex );
-    m_eventReceivers.erase( receiver );
+    m_eventReceivers.erase( receiverID );
 }
 
 int MediaStreamCache::blockData( quint64 timestamp )
@@ -344,4 +376,10 @@ void MediaStreamCache::unblockData( int blockingID )
         return;
     }
     m_dataBlockings.erase( it );
+}
+
+size_t MediaStreamCache::inactivityPeriod() const
+{
+    QMutexLocker lk( &m_mutex );
+    return m_inactivityTimer.elapsed();
 }

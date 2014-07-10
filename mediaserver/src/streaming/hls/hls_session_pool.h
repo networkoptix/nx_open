@@ -44,8 +44,8 @@ namespace nx_hls
         bool isLive() const;
         MediaQuality streamQuality() const;
 
-        void setPlaylistManager( MediaQuality streamQuality, const QSharedPointer<AbstractPlaylistManager>& value );
-        const QSharedPointer<AbstractPlaylistManager>& playlistManager( MediaQuality streamQuality ) const;
+        void setPlaylistManager( MediaQuality streamQuality, const AbstractPlaylistManagerPtr& value );
+        const AbstractPlaylistManagerPtr& playlistManager( MediaQuality streamQuality ) const;
 
         void saveChunkAlias( MediaQuality streamQuality, const QString& alias, quint64 startTimestamp, quint64 duration );
         bool getChunkByAlias( MediaQuality streamQuality, const QString& alias, quint64* const startTimestamp, quint64* const duration ) const;
@@ -56,7 +56,7 @@ namespace nx_hls
         const bool m_live;
         const MediaQuality m_streamQuality;
         QnVideoCamera* const m_videoCamera;
-        std::vector<QSharedPointer<AbstractPlaylistManager> > m_playlistManagers;
+        std::vector<AbstractPlaylistManagerPtr> m_playlistManagers;
         //!map<pair<quality, alias>, pair<start timestamp, duration> >
         std::map<std::pair<MediaQuality, QString>, std::pair<quint64, quint64> > m_chunksByAlias;
         mutable QMutex m_mutex;
@@ -97,6 +97,7 @@ namespace nx_hls
             const QString m_id;
         };
 
+        HLSSessionPool();
         virtual ~HLSSessionPool();
 
         //!Add new session

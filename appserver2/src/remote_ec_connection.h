@@ -31,7 +31,6 @@ namespace ec2
         virtual QnConnectionInfo connectionInfo() const override;
         virtual void startReceivingNotifications() override;
 
-
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         const QnConnectionInfo m_connectionInfo;

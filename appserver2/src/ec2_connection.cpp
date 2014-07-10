@@ -15,13 +15,14 @@ namespace ec2
         ServerQueryProcessor* queryProcessor,
         const ResourceContext& resCtx,
         const QnConnectionInfo& connectionInfo,
-        const QString& dbFilePath)
+        const QUrl& dbUrl)
     :
         BaseEc2Connection<ServerQueryProcessor>( queryProcessor, resCtx ),
         m_dbManager( new QnDbManager(
             resCtx.resFactory,
             &m_licenseManagerImpl,
-            dbFilePath) ),
+            dbUrl.path(),
+            QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path"))),
         m_auxManager(new QnAuxManager(&m_emailManagerImpl)),
         m_transactionLog( new QnTransactionLog(m_dbManager.get() )),
         m_connectionInfo( connectionInfo )
@@ -37,14 +38,14 @@ namespace ec2
         fromApiToResourceList(paramList, kvPairs);
 
         m_emailManagerImpl.configure(kvPairs);
-        QnTransactionMessageBus::instance()->setHandler(this);
-        QnTransactionMessageBus::instance()->setLocalPeer(QnPeerInfo(qnCommon->moduleGUID(), QnPeerInfo::Server));
+        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
+        QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), Qn::PT_Server));
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
         if (QnTransactionMessageBus::instance())
-            QnTransactionMessageBus::instance()->removeHandler(this);
+            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
         ec2::QnDistributedMutexManager::initStaticInstance(0);
     }
 

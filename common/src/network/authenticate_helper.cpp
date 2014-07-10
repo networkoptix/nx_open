@@ -8,6 +8,7 @@
 #include <core/resource/videowall_resource.h>
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
+#include <utils/network/simple_http_client.h>
 #include <utils/match/wildcard.h>
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
@@ -98,9 +99,10 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
         int customAuthInfoPos = cookie.indexOf(lit("authinfo="));
         if (customAuthInfoPos >= 0) {
             QString digest = cookie.mid(customAuthInfoPos + QByteArray("authinfo=").length(), 32);
-            if (doCustomAuthorization(digest.toLatin1(), response, QnAppServerConnectionFactory::sessionKey()))
+            QMutexLocker lock(&m_sessionKeyMutex);
+            if (doCustomAuthorization(digest.toLatin1(), response, m_sessionKey))
                 return true;
-            if (doCustomAuthorization(digest.toLatin1(), response, QnAppServerConnectionFactory::prevSessionKey()))
+            if (doCustomAuthorization(digest.toLatin1(), response, m_prevSessionKey))
                 return true;
         }
     }
@@ -154,6 +156,39 @@ bool QnAuthHelper::authenticate(const nx_http::Request& request, nx_http::Respon
     }
 
     return false;   //failed to authorise request with any method
+}
+
+bool QnAuthHelper::authenticate( const QAuthenticator& auth, const nx_http::Response& response, nx_http::Request* const request )
+{
+    const nx_http::BufferType& authHeaderBuf = nx_http::getHeaderValue(
+        response.headers,
+        response.statusLine.statusCode == nx_http::StatusCode::proxyAuthenticationRequired ? "Proxy-Authenticate" : "WWW-Authenticate" );
+    nx_http::Header::WWWAuthenticate authenticateHeader;
+    if( !authenticateHeader.parse( authHeaderBuf ) )
+        return false;
+    switch( authenticateHeader.authScheme )
+    {
+        case nx_http::Header::AuthScheme::digest:
+            nx_http::insertOrReplaceHeader(
+                &request->headers,
+                nx_http::parseHeader( CLSimpleHTTPClient::digestAccess(
+                    auth,
+                    QLatin1String(authenticateHeader.params["realm"]),
+                    QLatin1String(authenticateHeader.params["nonce"]),
+                    QLatin1String(request->requestLine.method),
+                    request->requestLine.url.toString(),
+                    response.statusLine.statusCode == nx_http::StatusCode::proxyAuthenticationRequired ).toLatin1() ) );
+            return true;
+
+        case nx_http::Header::AuthScheme::basic:
+            nx_http::insertOrReplaceHeader(
+                &request->headers,
+                nx_http::parseHeader( CLSimpleHTTPClient::basicAuth(auth) ) );
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 bool QnAuthHelper::authenticate( const QString& login, const QByteArray& digest ) const
@@ -395,4 +430,11 @@ void QnAuthHelper::at_resourcePool_resourceRemoved(const QnResourcePtr &res)
     QMutexLocker lock(&m_mutex);
 
     m_users.remove(res->getId());
+}
+
+void QnAuthHelper::setSessionKey(const QByteArray& value)
+{
+    QMutexLocker lock(&m_sessionKeyMutex);
+    m_prevSessionKey = m_sessionKey;
+    m_sessionKey = value;
 }

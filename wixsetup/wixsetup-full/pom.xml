@@ -19,4 +19,27 @@
         <client_name>client.exe</client_name>
         <product_name>${product.name}.exe</product_name>
     </properties>
+
+    <build>
+        <plugins>                
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2.2</version>
+                <executions>
+                    <execution>
+                        <id>pack-binaries</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>${project.build.directory}/binaries.xml</descriptor>
+                            </descriptors>	
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>    
+        </plugins>    
+    </build>
 </project>

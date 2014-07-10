@@ -14,6 +14,8 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
+#include <api/model/storage_space_reply.h>
+
 #include <utils/common/counter.h>
 #include <utils/common/string.h>
 #include <utils/common/variant.h>

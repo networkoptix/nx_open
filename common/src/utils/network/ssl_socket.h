@@ -1,6 +1,8 @@
 #ifndef __SSL_SOCKET_H_
 #define __SSL_SOCKET_H_
 
+#ifdef ENABLE_SSL
+
 #include <QObject>
 
 #include "socket_common.h"
@@ -81,5 +83,7 @@ public:
 private:
     Q_DECLARE_PRIVATE(QnMixedSSLSocket);
 };
+
+#endif // ENABLE_SSL
 
 #endif // __SSL_SOCKET_H_

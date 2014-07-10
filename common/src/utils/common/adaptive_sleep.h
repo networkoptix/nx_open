@@ -82,7 +82,7 @@ public:
                 afterdelay();
             return havetowait;
         }
-        //cl_log.log("sleep time=", havetowait/1000000.0, cl_logALWAYS);
+        //NX_LOG("sleep time=", havetowait/1000000.0, cl_logALWAYS);
         if (havetowait < MAX_VALID_SLEEP_TIME) 
         {
             QMutexLocker lock(&m_mutex);

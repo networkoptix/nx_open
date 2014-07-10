@@ -10,6 +10,7 @@
 
 #include <QtCore/QObject>
 
+#include <nx_ec/ec_api_fwd.h>
 #include <api/model/connection_info.h>
 #include <api/model/kvpair.h>
 #include <business/business_fwd.h>
@@ -82,11 +83,7 @@
 
 namespace ec2
 {
-    const int INVALID_REQ_ID = -1;
-
-    
-    class AbstractECConnection;
-    typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
+    const int INVALID_REQ_ID = -1;  
 
     // TODO: #Elric #enum
     enum class ErrorCode
@@ -180,7 +177,7 @@ namespace ec2
             void emitDumpDatabaseDone( int reqID, const ErrorCode p1, const QByteArray& p2 ) { emit onDumpDatabaseDone( reqID, p1, p2 ); }
             void emitGetSettingsDone( int reqID, const ErrorCode p1, const QnKvPairList& p2 ) { emit onGetSettingsDone( reqID, p1, p2 ); }
             void emitTestConnectionDone( int reqID, const ErrorCode p1, const QnConnectionInfo& p2 ) { emit onTestConnectionDone( reqID, p1, p2 ); }
-            void emitConnectDone( int reqID, const ErrorCode p1, AbstractECConnectionPtr p2 ) { emit onConnectDone( reqID, p1, p2 ); }
+            void emitConnectDone( int reqID, const ErrorCode p1, const AbstractECConnectionPtr &p2 ) { emit onConnectDone( reqID, p1, p2 ); }
             void emitAddVideowallDone( int reqID, const ErrorCode p1, const QnVideoWallResourceList& p2 ) { emit onAddVideowallDone( reqID, p1, p2 ); }
             void emitGetVideowallsDone( int reqID, const ErrorCode p1, const QnVideoWallResourceList& p2 ) { emit onGetVideowallsDone( reqID, p1, p2 ); }
         
@@ -212,7 +209,7 @@ namespace ec2
             void onDumpDatabaseDone( int reqID, const ErrorCode, const QByteArray& );
             void onGetSettingsDone( int reqID, const ErrorCode, const QnKvPairList& );
             void onTestConnectionDone( int reqID, const ErrorCode, const QnConnectionInfo& );
-            void onConnectDone( int reqID, const ErrorCode, AbstractECConnectionPtr );
+            void onConnectDone( int reqID, const ErrorCode, const AbstractECConnectionPtr &);
             void onAddVideowallDone( int reqID, const ErrorCode, const QnVideoWallResourceList& );
             void onGetVideowallsDone( int reqID, const ErrorCode, const QnVideoWallResourceList& );
         };

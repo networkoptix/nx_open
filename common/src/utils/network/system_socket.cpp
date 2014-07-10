@@ -770,7 +770,7 @@ int CommunicatingSocket::recv( void* buffer, unsigned int bufferLen, int flags )
     if (bytesRead < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
-        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock)
+        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock && errCode != SystemError::again)
             mConnected = false;
     }
     else if (bytesRead == 0)
@@ -801,7 +801,7 @@ int CommunicatingSocket::send( const void* buffer, unsigned int bufferLen )
     if (sended < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
-        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock)
+        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock && errCode != SystemError::again)
             mConnected = false;
     }
     else if (sended == 0)
@@ -1034,6 +1034,7 @@ bool TCPServerSocket::setListen(int queueLen)
 
 // -------------------------- TCPSslServerSocket ----------------
 
+#ifdef ENABLE_SSL
 TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect): TCPServerSocket(), m_allowNonSecureConnect(allowNonSecureConnect)
 {
 
@@ -1062,6 +1063,7 @@ AbstractStreamSocket* TCPSslServerSocket::accept()
     return 0;
 #endif
 }
+#endif // ENABLE_SSL
 
 //////////////////////////////////////////////////////////
 ///////// class UDPSocket

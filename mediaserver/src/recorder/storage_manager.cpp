@@ -4,9 +4,13 @@
 
 #include <api/app_server_connection.h>
 
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/resource.h"
-#include "core/resource/camera_resource.h"
+#include <utils/fs/file.h>
+#include <utils/common/util.h>
+#include <utils/common/log.h>
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/camera_bookmark.h>
@@ -14,23 +18,18 @@
 #include <recorder/server_stream_recorder.h>
 #include <recorder/recording_manager.h>
 
-#include <device_plugins/server_archive/dualquality_helper.h>
+#include <plugins/resource/server_archive/dualquality_helper.h>
 
 #include "plugins/storage/file_storage/file_storage_resource.h"
-
-#include "utils/common/sleep.h"
-#include <utils/fs/file.h>
-#include "utils/common/util.h"
 
 #include <media_server/serverutil.h>
 #include "file_deletor.h"
 #include "utils/common/synctime.h"
+#include "common/common_module.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
 static const int DB_UPDATE_PER_RECORDS = 128;
-
-Q_GLOBAL_STATIC(QnStorageManager, QnStorageManager_inst)
 
 
 class RebuildAsyncTask: public QnLongRunnable
@@ -73,6 +72,8 @@ TestStorageThread* QnStorageManager::m_testStorageThread;
 // -------------------- QnStorageManager --------------------
 
 
+static QnStorageManager* QnStorageManager_instance = nullptr;
+
 QnStorageManager::QnStorageManager():
     m_mutexStorages(QMutex::Recursive),
     m_mutexCatalog(QMutex::Recursive),
@@ -87,6 +88,9 @@ QnStorageManager::QnStorageManager():
     m_lastTestTime.restart();
     m_storageWarnTimer.restart();
     m_testStorageThread = new TestStorageThread(this);
+
+    assert( QnStorageManager_instance == nullptr );
+    QnStorageManager_instance = this;
 }
 
 std::deque<DeviceFileCatalog::Chunk> QnStorageManager::correctChunksFromMediaData(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const std::deque<DeviceFileCatalog::Chunk>& chunks)
@@ -163,7 +167,13 @@ bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, 
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
     if (!sdb)
         sdb = m_chunksDB[storage->getUrl()] = QnStorageDbPtr(new QnStorageDb(storage->getIndex()));
-    QString fileName = closeDirPath(storage->getUrl()) + QString::fromLatin1("media.sqlite");
+    QString simplifiedGUID = qnCommon->moduleGUID().toString();
+    simplifiedGUID = simplifiedGUID.replace("{", "");
+    simplifiedGUID = simplifiedGUID.replace("}", "");
+    QString fileName = closeDirPath(storage->getUrl()) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
+    QString oldFileName = closeDirPath(storage->getUrl()) + QString::fromLatin1("media.sqlite");
+    if (QFile::exists(oldFileName) && !QFile::exists(fileName))
+        QFile::rename(oldFileName, fileName);
 
     if (!sdb->open(fileName))
     {
@@ -239,7 +249,7 @@ void QnStorageManager::cancelRebuildCatalogAsync()
 {
     if (m_rebuildState != RebuildState_None) 
     {
-        cl_log.log("Catalog rebuild operation is canceled", cl_logINFO);
+        NX_LOG("Catalog rebuild operation is canceled", cl_logINFO);
         m_rebuildCancelled = true;
         DeviceFileCatalog::setRebuildArchive(DeviceFileCatalog::Rebuild_None);
         setRebuildState(RebuildState_None);
@@ -339,7 +349,7 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
     QMutexLocker lock(&m_mutexStorages);
     m_storagesStatisticsReady = false;
     
-    cl_log.log(QString("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently available: %3MiB").arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
+    NX_LOG(QString("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently available: %3MiB").arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
 
     removeStorage(storage); // remove existing storage record if exists
     //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
@@ -405,12 +415,14 @@ void QnStorageManager::removeAbsentStorages(const QnAbstractStorageResourceList 
 
 QnStorageManager::~QnStorageManager()
 {
+    QnStorageManager_instance = nullptr;
+
     stopAsyncTasks();
 }
 
 QnStorageManager* QnStorageManager::instance()
 {
-    return QnStorageManager_inst();
+    return QnStorageManager_instance;
 }
 
 QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone)
@@ -588,7 +600,7 @@ void QnStorageManager::clearSpace(const QnStorageResourcePtr &storage)
     if (toDelete > 0) {
         if (!m_diskFullWarned[storage->getId()]) {
             QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
-            emit storageFailure(storage, QnBusiness::StorageNotEnoughSpaceReason);
+            emit storageFailure(storage, QnBusiness::StorageFullReason);
             m_diskFullWarned[storage->getId()] = true;
         }
     }

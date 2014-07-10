@@ -87,14 +87,16 @@ void QnShadowItem::ensureShadowParameters() const {
 
 QRectF QnShadowItem::boundingRect() const {
     ensureShadowParameters();
-    //TODO: #GDM #Common what should we return if the rect is not valid?
-    return m_boundingRect;
+    if (m_shapeValid)
+        return m_boundingRect;
+    return QRect();
 }
 
 QPainterPath QnShadowItem::shape() const {
     ensureShadowParameters();
-    //TODO: #GDM #Common what should we return if the rect is not valid?
-    return m_painterPath;
+    if (m_shapeValid)
+        return m_painterPath;
+    return QPainterPath();
 }
 
 void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
@@ -121,15 +123,11 @@ void QnShadowItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
    
     QnOpenGLRendererManager::instance(QGLContext::currentContext()).setColor(color);
+    /* Draw shadowed rect. */
     QnOpenGLRendererManager::instance(QGLContext::currentContext()).drawColoredPolygon(m_shadowShape);
-   /* Draw shadowed rect. */
-   /* glBegin(GL_TRIANGLE_FAN);
-    glColor(color);
-    glVertices(m_shadowShape);
-    glEnd();*/
+   
 
     glDisable(GL_BLEND); 
-    //glPopAttrib();
     QnGlNativePainting::end(painter);
 #endif
 }

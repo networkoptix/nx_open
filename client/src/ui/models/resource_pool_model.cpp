@@ -211,7 +211,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
         return m_rootNodes[Qn::ServersNode];
 
     if (node->resourceFlags() & QnResource::videowall)
-        return m_rootNodes[m_rootNodeType];
+        return m_rootNodes[Qn::RootNode];
 
     // We are requesting for the list of users so we don't want to see their layouts
     if (m_rootNodeType == Qn::UsersNode && !(node->resourceFlags() &  QnResource::user)) 

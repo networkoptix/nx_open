@@ -35,6 +35,9 @@ public:
 
     void addOwnership(QnLongRunnable* processor);
 
+    static void setDefaultPage(const QByteArray& path);
+    static QByteArray defaultPage();
+
 public slots:
     virtual void pleaseStop() override;
 

@@ -1,8 +1,7 @@
 #ifndef QN_SERIALIZATION_BINARY_FUNCTIONS_H
 #define QN_SERIALIZATION_BINARY_FUNCTIONS_H
 
-#include "binary.h"
-
+#include <type_traits> /* For std::enable_if. */
 #include <utility> /* For std::pair, std::min. */
 #include <array>
 #include <vector>
@@ -20,11 +19,9 @@
 #endif
 
 #include <utils/common/collection.h>
+#include <utils/common/latin1_array.h>
 
-#ifndef QN_NO_BASE
-#   include <utils/common/latin1_array.h>
-#endif
-
+#include "binary.h"
 #include "collection_fwd.h"
 #include "enum.h"
 
@@ -335,27 +332,27 @@ void serialize(const QUrl &value, QnOutputBinaryStream<Output> *stream) {
 
 template <class T>
 bool deserialize(QnInputBinaryStream<T> *stream, QUrl *target) {
-    QString data;
-    if(!QnBinary::deserialize(stream, &data))
+    QString tmp;
+    if(!QnBinary::deserialize(stream, &tmp))
         return false;
-    *target = QUrl(data);
+    *target = QUrl(tmp);
     return true;
 }
 
 
 template <class Output>
 void serialize(const QUuid &value, QnOutputBinaryStream<Output> *stream) {
-    QByteArray data = value.toRfc4122();
-    stream->write(data.data(), data.size());
+    QByteArray tmp = value.toRfc4122();
+    stream->write(tmp.data(), tmp.size());
 }
 
 template <class Input>
 bool deserialize(QnInputBinaryStream<Input> *stream, QUuid *target) {
-    QByteArray data;
-    data.resize(16);
-    if( stream->read(data.data(), 16) != 16 )
+    QByteArray tmp;
+    tmp.resize(16);
+    if( stream->read(tmp.data(), 16) != 16 )
         return false;
-    *target = QUuid::fromRfc4122(data);
+    *target = QUuid::fromRfc4122(tmp);
     return true;
 }
 

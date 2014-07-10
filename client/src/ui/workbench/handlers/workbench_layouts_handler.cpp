@@ -93,6 +93,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
         QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
         exportHandler->saveLocalLayout(layout, isReadOnly, true); // overwrite layout file
     } else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
+        //TODO: #GDM #VW #LOW refactor common code to common place
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout, [this, layout](int reqId, ec2::ErrorCode errorCode) {
             snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
             at_layouts_saved(static_cast<int>(errorCode), QnResourceList() << layout, reqId);           
@@ -409,6 +410,7 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
 
         if (!videowallReviewResources.isEmpty()) {
             foreach(const QnLayoutResourcePtr &layout, videowallReviewResources) {
+                //TODO: #GDM #VW #LOW refactor common code to common place
                 if (!context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout, [this, layout, counter](int reqId, ec2::ErrorCode errorCode) {
                     Q_UNUSED(reqId);
                     snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);

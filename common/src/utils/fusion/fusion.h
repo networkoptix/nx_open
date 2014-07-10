@@ -60,7 +60,7 @@ namespace QnFusion {
      */
 
     template<class Base, class Derived, class T>
-    T invoke(T Base::*getter, const Derived &object) {
+    const T &invoke(T Base::*getter, const Derived &object) {
         return object.*getter;
     }
 
@@ -122,7 +122,9 @@ namespace QnFusion {
             typed_member_setter_tag<T>,
             typed_function_setter_tag<T>
         >
-    {};
+    {
+        //static_assert(std::is_member_object_pointer<Setter>::value, "111");
+    };
 
     /**
      * This metafuction returns the type of the field specified by the given
@@ -148,7 +150,7 @@ namespace QnFusion {
     template<class Access>
     struct access_setter_category:
         setter_category<
-            typename Access::template at<setter_type, void>::type,
+            typename Access::template at<setter_type, void>::type::result_type,
             typename access_member_type<Access>::type
         >
     {};

@@ -472,7 +472,7 @@ QVariant QnScheduleGridWidget::cellValue(const QPoint &cell, ParamType paramType
 {
     if (!isValidCell(cell))
         return QVariant();
-    if (paramType < 0 || paramType >= ParamType_Count)
+    if (paramType < 0 || paramType >= ParamCount)
         return QVariant();
     return m_gridParams[cell.x()][cell.y()][paramType];
 }
@@ -481,7 +481,7 @@ void QnScheduleGridWidget::setCellValue(const QPoint &cell, ParamType paramType,
 {
     if (!isValidCell(cell))
         return;
-    if (paramType < 0 || paramType >= ParamType_Count)
+    if (paramType < 0 || paramType >= ParamCount)
         return;
     
     QVariant &localValue = m_gridParams[cell.x()][cell.y()][paramType];
@@ -519,11 +519,11 @@ void QnScheduleGridWidget::setCellValueInternal(const QPoint &cell, const CellPa
     assert(isValidCell(cell));
 
     CellParams &localValue = m_gridParams[cell.x()][cell.y()];
-    if(qEqual(value, &value[ParamType_Count], localValue)) {
+    if(qEqual(value, &value[ParamCount], localValue)) {
         return;
     }
 
-    qCopy(value, &value[ParamType_Count], localValue);
+    qCopy(value, &value[ParamCount], localValue);
 
     emit cellValueChanged(cell);
 }
@@ -531,7 +531,7 @@ void QnScheduleGridWidget::setCellValueInternal(const QPoint &cell, const CellPa
 void QnScheduleGridWidget::setCellValueInternal(const QPoint &cell, ParamType type, const QVariant &value) 
 {
     assert(isValidCell(cell));
-    assert(type >= 0 && type < ParamType_Count);
+    assert(type >= 0 && type < ParamCount);
 
     CellParams &localValue = m_gridParams[cell.x()][cell.y()];
     if(localValue[type] == value)

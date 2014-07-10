@@ -3,6 +3,8 @@
 #include <utils/math/math.h>
 #include <core/resource/media_resource.h>
 
+#include "filters/abstract_image_filter.h"
+
 #include "ffmpeg_transcoder.h"
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
@@ -106,7 +108,7 @@ QSize QnVideoTranscoder::getResolution() const
     return m_resolution;
 }
 
-bool QnVideoTranscoder::open(QnConstCompressedVideoDataPtr video)
+bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
@@ -340,7 +342,7 @@ int QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
     return m_lastErrMessage.isEmpty() ? 0 : 1;
 }
 
-int QnTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, QnByteArray* const result)
+int QnTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& media, QnByteArray* const result)
 {
     m_internalBuffer.clear();
     m_outputPacketSize.clear();
@@ -359,13 +361,14 @@ int QnTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, QnByteArray
     if ((quint64)m_firstTime == AV_NOPTS_VALUE)
         m_firstTime = media->timestamp;
 
+    bool doTranscoding = true;
     if (!m_initialized)
     {
         if (media->dataType == QnAbstractMediaData::VIDEO)
             m_delayedVideoQueue << qSharedPointerDynamicCast<const QnCompressedVideoData> (media);
         else
             m_delayedAudioQueue << qSharedPointerDynamicCast<const QnCompressedAudioData> (media);
-        media.clear();
+        doTranscoding = false;
         if (m_videoCodec != CODEC_ID_NONE && m_delayedVideoQueue.isEmpty())
             return 0; // not ready to init
         if (m_audioCodec != CODEC_ID_NONE && m_delayedAudioQueue.isEmpty())
@@ -376,6 +379,7 @@ int QnTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, QnByteArray
             return rez;
         m_initialized = true;
     }
+
     if( result )
         result->clear();
     int errCode = 0;
@@ -389,7 +393,8 @@ int QnTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, QnByteArray
         if (errCode != 0)
             return errCode;
     }
-    if (media) {
+
+    if (doTranscoding) {
         errCode = transcodePacketInternal(media, result);
         if (errCode != 0)
             return errCode;
@@ -401,7 +406,7 @@ int QnTranscoder::transcodePacket(QnConstAbstractMediaDataPtr media, QnByteArray
     return 0;
 }
 
-bool QnTranscoder::addTag( const QString& name, const QString& value )
+bool QnTranscoder::addTag( const QString& /*name*/, const QString& /*value*/ )
 {
     return false;
 }

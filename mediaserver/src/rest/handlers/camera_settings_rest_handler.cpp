@@ -9,7 +9,10 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include <utils/common/log.h>
+
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/param.h>
 
@@ -27,6 +30,16 @@ namespace HttpStatusCode
         notFound = 404
     };
 }
+
+struct AwaitedParameters
+{
+    QnResourcePtr resource;
+
+    //!Parameters which values we are waiting for
+    std::set<QString> paramsToWaitFor;
+    //!New parameter values are stored here
+    std::map<QString, std::pair<QVariant, bool> > paramValues;
+};
 
 int QnCameraSettingsRestHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType)
 {

@@ -9,25 +9,14 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <functional> /* For std::function. */
 
-#include <QMutex>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QMutex>
 
 #include <core/dataconsumer/abstract_data_receptor.h>
 
 
-/*!
-    Event receiver is allowed to call \a MediaStreamCache methods from \a onKeyFrame
-*/
-class AbstractMediaCacheEventReceiver
-{
-public:
-    virtual ~AbstractMediaCacheEventReceiver() {}
-
-    /*!
-        \param currentPacketTimestampUSec This timestamp is monotonic and contains no discontinuity
-    */
-    virtual void onKeyFrame( quint64 currentPacketTimestampUSec ) = 0;
-};
 
 //!Caches specified duration of media stream for later use
 /*!
@@ -73,7 +62,9 @@ public:
     //!Implementation of QnAbstractDataReceptor::canAcceptData
     virtual bool canAcceptData() const override;
     //!Implementation of QnAbstractDataReceptor::putData
-    virtual void putData( QnAbstractDataPacketPtr data ) override;
+    virtual void putData( const QnAbstractDataPacketPtr& data ) override;
+
+    void clear();
 
     quint64 startTimestamp() const;
     quint64 currentTimestamp() const;
@@ -101,8 +92,14 @@ public:
     //!Returns packet with min timestamp greater than \a timestamp
     QnAbstractDataPacketPtr getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const;
 
-    void addEventReceiver( AbstractMediaCacheEventReceiver* const receiver );
-    void removeEventReceiver( AbstractMediaCacheEventReceiver* const receiver );
+    /*!
+        \return id of event receiver
+    */
+    int addKeyFrameEventReceiver( const std::function<void (quint64)>& keyFrameEventReceiver );
+    /*!
+        \param receiverID id received from \a MediaStreamCache::addKeyFrameEventReceiver
+    */
+    void removeKeyFrameEventReceiver( int receiverID );
 
     //!Prevents data starting with \a timestamp from removal
     /*!
@@ -113,6 +110,9 @@ public:
     void moveBlocking( int blockingID, quint64 timestampToMoveTo );
     //!Removed blocking \a blockingID
     void unblockData( int blockingID );
+
+    //!Time (millis) from last usage of this object
+    size_t inactivityPeriod() const;
 
     struct MediaPacketContext
     {
@@ -150,8 +150,11 @@ private:
     //!In micros
     quint64 m_currentPacketTimestamp;
     size_t m_cacheSizeInBytes;
-    std::set<AbstractMediaCacheEventReceiver*> m_eventReceivers;
+    //!map<event receiver id, function>
+    std::map<int, std::function<void (quint64)> > m_eventReceivers;
+    int m_prevGivenEventReceiverID;
     std::map<int, quint64> m_dataBlockings;
+    mutable QElapsedTimer m_inactivityTimer;
 };
 
 #endif  //MEDIASTREAMCACHE_H

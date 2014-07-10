@@ -77,7 +77,10 @@ public:
     }
 
     static QByteArray basicAuth(const QAuthenticator& auth);
-    static QString digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url);
+    /*!
+        \param isProxy If \a true, this method adds header Proxy-Authorization, otherwise Authorization
+    */
+    static QString digestAccess(const QAuthenticator& auth, const QString& realm, const QString& nonce, const QString& method, const QString& url, bool isProxy = false);
     QByteArray getHeaderValue(const QByteArray& key);
 
     const QString& localAddress() const;

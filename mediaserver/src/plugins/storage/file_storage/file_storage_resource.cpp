@@ -4,6 +4,7 @@
 #include <QtCore/QDir>
 
 #include "file_storage_resource.h"
+#include "utils/common/log.h"
 #include "utils/common/util.h"
 #include "utils/common/buffered_file.h"
 #include "recorder/file_deletor.h"
@@ -15,8 +16,6 @@
 #include <recorder/storage_manager.h>
 
 
-static const int FFMPEG_BUFFER_SIZE = 1024*1024*4;
-
 QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
     QString fileName = removeProtocolPrefix(url);
@@ -25,8 +24,8 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
 
     int systemFlags = 0;
     if (openMode & QIODevice::WriteOnly) {
-        ioBlockSize = IO_BLOCK_SIZE;
-        ffmpegBufferSize = FFMPEG_BUFFER_SIZE;
+        ioBlockSize = MSSettings::roSettings()->value( nx_ms_conf::IO_BLOCK_SIZE, nx_ms_conf::DEFAULT_IO_BLOCK_SIZE ).toInt();
+        ffmpegBufferSize = MSSettings::roSettings()->value( nx_ms_conf::FFMPEG_BUFFER_SIZE, nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE ).toInt();;
 #ifdef Q_OS_WIN
         if (MSSettings::roSettings()->value("disableDirectIO").toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;

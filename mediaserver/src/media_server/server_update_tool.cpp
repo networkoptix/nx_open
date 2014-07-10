@@ -130,7 +130,7 @@ QnServerUpdateTool *QnServerUpdateTool::instance() {
 bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice) {
     QuaZip zip(ioDevice);
     if (!zip.open(QuaZip::mdUnzip)) {
-        cl_log.log("Could not open update package.", cl_logWARNING);
+        NX_LOG("Could not open update package.", cl_logWARNING);
         return false;
     }
 
@@ -141,9 +141,13 @@ bool QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDev
     zip.close();
 
     if (ok)
-        cl_log.log("Update package has been extracted to ", updateDir.path(), cl_logINFO);
+    {
+        NX_LOG( lit("Update package has been extracted to %1").arg(updateDir.path()), cl_logINFO);
+    }
     else
-        cl_log.log("Could not extract update package to ", updateDir.path(), cl_logWARNING);
+    {
+        NX_LOG( lit("Could not extract update package to %1").arg(updateDir.path()), cl_logWARNING);
+    }
 
     return ok;
 }
@@ -181,7 +185,7 @@ bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
     if (!m_file) {
         m_file.reset(new QFile(getUpdateFilePath(updateId)));
         if (!m_file->open(QFile::WriteOnly)) {
-            cl_log.log("Could not save update to ", m_file->fileName(), cl_logERROR);
+            NX_LOG( lit("Could not save update to %1").arg(m_file->fileName()), cl_logERROR);
             m_bannedUpdates.insert(updateId);
             return false;
         }
@@ -212,17 +216,17 @@ bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
 }
 
 bool QnServerUpdateTool::installUpdate(const QString &updateId) {
-    cl_log.log("Starting update to ", updateId, cl_logINFO);
+    NX_LOG( lit("Starting update to %1").arg(updateId), cl_logINFO);
 
     QDir updateDir = getUpdateDir(updateId);
     if (!updateDir.exists()) {
-        cl_log.log("Update dir does not exist: ", updateDir.path(), cl_logERROR);
+        NX_LOG( lit("Update dir does not exist: %1").arg(updateDir.path()), cl_logERROR);
         return false;
     }
 
     QFile updateInfoFile(updateDir.absoluteFilePath(updateInfoFileName));
     if (!updateInfoFile.open(QFile::ReadOnly)) {
-        cl_log.log("Could not open update information file: ", updateInfoFile.fileName(), cl_logERROR);
+        NX_LOG( lit("Could not open update information file: %1").arg(updateInfoFile.fileName()), cl_logERROR);
         return false;
     }
 
@@ -231,22 +235,22 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
 
     QString executable = map.value(lit("executable")).toString();
     if (executable.isEmpty()) {
-        cl_log.log("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
+        NX_LOG( lit("Wrong update information file: %1").arg(updateInfoFile.fileName()), cl_logERROR);
         return false;
     }
 
     if (map.value(lit("platform")) != lit(QN_APPLICATION_PLATFORM)) {
-        cl_log.log("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
+        NX_LOG( lit("Wrong update information file: %1").arg(updateInfoFile.fileName()), cl_logERROR);
         return false;
     }
     if (map.value(lit("arch")) != lit(QN_APPLICATION_ARCH)) {
-        cl_log.log("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
+        NX_LOG( lit("Wrong update information file: %1").arg(updateInfoFile.fileName()), cl_logERROR);
         return false;
     }
     //TODO: #dklychkov ask about QN_ARM_BOX and uncomment
     /*
     if (map.value(lit("modification")) != lit(QN_ARM_BOX)) {
-        cl_log.log("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
+        NX_LOG("Wrong update information file: ", updateInfoFile.fileName(), cl_logERROR);
         return false;
     }
     */
@@ -262,12 +266,12 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     if (initializeUpdateLog(version, &logFileName))
         arguments.append(logFileName);
     else
-        cl_log.log("Could not create or open update log file.", cl_logWARNING);
+        NX_LOG("Could not create or open update log file.", cl_logWARNING);
 
     if (QProcess::startDetached(updateDir.absoluteFilePath(executable), arguments)) {
-        cl_log.log("Update has been started.", cl_logINFO);
+        NX_LOG("Update has been started.", cl_logINFO);
     } else {
-        cl_log.log("Update failed. See update log for details: ", logFileName, cl_logERROR);
+        NX_LOG( lit("Update failed. See update log for details: %1").arg(logFileName), cl_logERROR);
     }
 
     QDir::setCurrent(currentDir);

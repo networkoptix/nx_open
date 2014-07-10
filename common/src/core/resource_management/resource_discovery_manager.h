@@ -14,6 +14,8 @@
 #include <api/model/manual_camera_seach_reply.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/resource_factory.h>
+#include <core/resource/resource_processor.h>
 
 class QnAbstractResourceSearcher;
 class QnAbstractDTSSearcher;
@@ -83,7 +85,7 @@ public:
     void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
 
-    QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParams& params);
+    virtual QnResourcePtr createResource(const QnId &resourceTypeId, const QnResourceParams& params) override;
 
     virtual void pleaseStop();
 
@@ -116,8 +118,8 @@ signals:
     void localInterfacesChanged();
     void CameraIPConflict(QHostAddress addr, QStringList macAddrList);
 
-private slots:
-    void onInitAsyncFinished(QnResourcePtr res, bool initialized);
+protected slots:
+    void onInitAsyncFinished(const QnResourcePtr& res, bool initialized);
     void at_resourceDeleted(const QnResourcePtr& resource);
 
 private:

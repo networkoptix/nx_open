@@ -9,8 +9,8 @@
 #include "stream_reader.h"
 
 
-static const float MIN_FPS = 1.0 / 86400.0; //once per day
-static const float MAX_FPS = 30;
+static const double MIN_FPS = 1.0 / 86400.0; //once per day
+static const double MAX_FPS = 30;
 
 MediaEncoder::MediaEncoder(
     CameraManager* const cameraManager,

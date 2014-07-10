@@ -43,6 +43,7 @@ class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
 class QnSystemAdministrationDialog;
+class QnGraphicsMessageBox;
 
 // TODO: #Elric get rid of these processors here
 namespace detail {
@@ -108,8 +109,6 @@ public:
 
 protected:
     ec2::AbstractECConnectionPtr connection2() const;
-
-    bool canAutoDelete(const QnResourcePtr &resource) const;
 
     struct AddToLayoutParams {
         bool usePosition;
@@ -367,7 +366,7 @@ private:
     QnLayoutResourcePtr m_exportLayout;
     QnStorageResourcePtr m_exportStorage;
 
-
+    QnGraphicsMessageBox* m_connectingMessageBox;
 
     QTimer *m_tourTimer;
 };

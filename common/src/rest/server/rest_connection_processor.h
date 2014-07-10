@@ -36,7 +36,6 @@ public:
 
 protected:
     virtual void run() override;
-    void createHelpPage();
 
 private:
     Q_DECLARE_PRIVATE(QnRestConnectionProcessor);

@@ -198,6 +198,7 @@
  
                                         <!-- Disabling optimization for debug builds -->
                                         <replacement>
+                                            <xpath>//Project/ItemDefinitionGroup[contains(@Condition,'Debug')]</xpath>
                                             <token><![CDATA[<WarningLevel>Level3</WarningLevel>]]></token>
                                             <value><![CDATA[<WarningLevel>Level3</WarningLevel><Optimization>Disabled</Optimization>]]></value>
                                         </replacement>
@@ -278,6 +279,34 @@
                                     <skip>${replace.skip}</skip>
                                 </configuration>								
                             </execution>
+                            <execution>
+                                <id>fix-makefile-QMAKE-SUCKS!!!!!!!!!!</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <configuration>
+                                    <encoding>utf-8</encoding>
+                                    <unescape>no</unescape>
+                                    <ignoreErrors>true</ignoreErrors>
+                                    <file>${project.build.directory}/Makefile.${build.configuration}</file>
+                                    <replacements>
+                                        <replacement>
+                                            <token><![CDATA[@echo compiling \$< && cl]]></token>
+                                            <value>cl</value>
+                                        </replacement>
+                                        <replacement>
+                                            <token><![CDATA[@echo linking \$@ && link]]></token>
+                                            <value>link</value>
+                                        </replacement>
+                                        <replacement>
+                                            <token>${project.artifactId}${parsedVersion.majorVersion}</token>
+                                            <value>${project.artifactId}</value>
+                                        </replacement>										
+                                    </replacements>
+                                    <skip>${replace.skip}</skip>
+                                </configuration>								
+                            </execution>							
                         </executions>
                     </plugin>
                 </plugins>

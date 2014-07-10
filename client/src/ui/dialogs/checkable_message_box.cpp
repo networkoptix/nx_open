@@ -95,10 +95,10 @@ QAbstractButton *QnCheckableMessageBox::clickedButton() const {
     return d->clickedButton;
 }
 
-QDialogButtonBox::StandardButton QnCheckableMessageBox::clickedStandardButton() const {
+QDialogButtonBox::StandardButton QnCheckableMessageBox::clickedStandardButton(QDialogButtonBox::StandardButton defaultButton) const {
     if (d->clickedButton)
         return d->buttonBox->standardButton(d->clickedButton);
-    return QDialogButtonBox::NoButton;
+    return defaultButton;
 }
 
 QString QnCheckableMessageBox::text() const {
@@ -188,10 +188,9 @@ QnCheckableMessageBox::question(QWidget *parent, int helpTopicId, const QString 
     mb.setStandardButtons(buttons);
     mb.setDefaultButton(defaultButton);
     setHelpTopic(&mb, helpTopicId);
-    if (!mb.exec())
-        return cancelButton;
+    mb.exec();
     *checkBoxSetting = mb.isChecked();
-    return mb.clickedStandardButton();
+    return mb.clickedStandardButton(cancelButton);
 }
 
 QDialogButtonBox::StandardButton
@@ -213,11 +212,9 @@ QnCheckableMessageBox::warning(QWidget *parent, int helpTopicId, const QString &
     mb.setStandardButtons(buttons);
     mb.setDefaultButton(defaultButton);
     setHelpTopic(&mb, helpTopicId);
-    if (!mb.exec())
-        return cancelButton;
     mb.exec();
     *checkBoxSetting = mb.isChecked();
-    return mb.clickedStandardButton();
+    return mb.clickedStandardButton(cancelButton);
 }
 
 QDialogButtonBox::StandardButton
