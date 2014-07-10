@@ -53,6 +53,7 @@ private:
         DeviceFileCatalog::Chunk chunk;
     };
 
+    mutable QMutex m_mutex;
     QVector<DelayedData> m_delayedData;
     QMap<QByteArray, int> m_addCount;
 };
