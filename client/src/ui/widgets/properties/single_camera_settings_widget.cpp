@@ -137,7 +137,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->analogViewCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_analogViewCheckBox_clicked()));
 
     connect(ui->expertSettingsWidget,   SIGNAL(dataChanged()),                  this,   SLOT(at_dbDataChanged()));
-
+    connect(ui->expertSettingsWidget,   SIGNAL(secondStreamDisabled(bool)),    ui->cameraScheduleWidget,    SLOT(onSecondStreamStateChange(bool)));
+    connect(ui->expertSettingsWidget,   SIGNAL(secondStreamInitialState(bool)),ui->cameraScheduleWidget,    SLOT(updateMotionButtons(bool)));
     connect(ui->fisheyeSettingsWidget,  SIGNAL(dataChanged()),                  this,   SLOT(at_fisheyeSettingsChanged()));
     connect(ui->fisheyeCheckBox,        &QCheckBox::toggled,                    this,   &QnSingleCameraSettingsWidget::at_fisheyeSettingsChanged);
 

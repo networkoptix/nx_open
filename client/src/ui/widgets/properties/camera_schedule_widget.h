@@ -5,7 +5,7 @@
 
 #include <core/misc/schedule_task.h>
 #include "core/resource/media_resource.h"
-
+#include "ui/widgets/properties/schedule_grid_widget.h"
 class QnWorkbenchContext;
 
 namespace Ui {
@@ -80,6 +80,7 @@ public:
     void setContext(QnWorkbenchContext *context);
 
     void setExportScheduleButtonEnabled(bool enabled);
+
 signals:
     void scheduleTasksChanged();
     void recordingSettingsChanged();
@@ -93,7 +94,7 @@ private slots:
     void updateGridParams(bool fromUserInput = false);
     void updateGridEnabledState();
     void updateLicensesLabelText();
-    void updateMotionButtons();
+    void updateMotionButtons(bool disableSecondStream=false);
     void updatePanicLabelText();
     void updateLicensesButtonVisible();
     void updateRecordSpinboxes();
@@ -107,11 +108,26 @@ private slots:
     void at_releaseSignalizer_activated(QObject *target);
     void at_exportScheduleButton_clicked();
 
+    void onSecondStreamStateChange( bool enable );
+
 private:
     int qualityToComboIndex(const Qn::StreamQuality& q);
 
     void connectToGridWidget();
     void disconnectFromGridWidget();
+
+    // No way, no states object existed for recording the logic instead of UI.
+    // In the code base, all the UI elements serves as an object to store logic, 
+    // no MVC indeed. Kind of like MFC ...                     DPENG
+
+    struct CameraScheduleWidgetState {
+        QnScheduleGridWidget::GridParams grid_params; // state for that UI object
+        Qn::RecordingType recording_type; 
+        bool clear; // a flag to tell that this struct is clean or not
+    };
+    void getCurrentGridState( CameraScheduleWidgetState* state ) const;
+    void setCurrentGridState( const CameraScheduleWidgetState& );
+    void resetCurrentGridState();
 
 private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)
@@ -140,6 +156,8 @@ private:
      * @brief m_inUpdate                Counter that will prevent unnessesary calls when component update is in progress.
      */
     int m_inUpdate;
+
+    mutable QScopedPointer<CameraScheduleWidgetState> m_lastState;
 };
 
 
