@@ -114,8 +114,6 @@ namespace ec2
                     return "removeVideowall";
                 case videowallControl:
                     return "videowallControl";
-                case videowallInstanceStatus:
-                    return "videowallInstanceStatus";
 
                 case listDirectory:
                     return "listDirectory";
@@ -172,6 +170,7 @@ namespace ec2
                     val == unlockRequest ||
                     val == tranSyncRequest ||
                     val == tranSyncResponse ||
+                    val == runtimeInfoChanged ||
                     val == peerAliveInfo;
         }
 

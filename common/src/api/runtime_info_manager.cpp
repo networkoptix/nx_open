@@ -10,10 +10,22 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
     QObject(parent),
     m_items(new QnThreadsafeItemStorage<QnPeerRuntimeInfo>(&m_mutex, this))
 {
-    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, &QnRuntimeInfoManager::at_runtimeInfoChanged );
+    connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::runtimeInfoChanged, this, [this](const ec2::ApiRuntimeData &runtimeData) {
+        // check info version
+        if (m_items->hasItem(runtimeData.peer.id)) {
+            QnPeerRuntimeInfo existingInfo = m_items->getItem(runtimeData.peer.id);
+            if (existingInfo.data.version >= runtimeData.version)
+                return;
+        }
+
+        QnPeerRuntimeInfo info(runtimeData);
+        m_items->addItem(info);
+    });
+
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::remotePeerLost,     this, [this](const ec2::ApiPeerAliveData &data, bool){
         m_items->removeItem(data.peer.id);
     });
+
     connect( QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::connectionClosed,   this, [this]{
         m_items->setItems(QnPeerRuntimeInfoList() << localInfo());
     });
@@ -21,19 +33,6 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
 
 QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const {
     return m_items.data();
-}
-
-void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeData) {
-    
-    // check info version
-    if (m_items->hasItem(runtimeData.peer.id)) {
-        QnPeerRuntimeInfo existingInfo = m_items->getItem(runtimeData.peer.id);
-        if (existingInfo.data.version >= runtimeData.version)
-            return;
-    }
-
-    QnPeerRuntimeInfo info(runtimeData);
-    m_items->addItem(info);
 }
 
 void QnRuntimeInfoManager::storedItemAdded(const QnPeerRuntimeInfo &item) {

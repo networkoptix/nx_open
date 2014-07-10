@@ -233,21 +233,9 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     QUrlQuery q = QUrlQuery(remoteAddr.query());
 
     // Client reconnects to the server
-    if( m_localPeer.peerType == Qn::PT_DesktopClient ) {
+    if( m_localPeer.isClient() ) {
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
-        setState(ConnectingStage2); // one GET method for client peer is enough
-        setReadSync(true);
-    } else if (m_localPeer.peerType == Qn::PT_VideowallClient) {
-        q.removeQueryItem("isClient");  //videowall client is still client
-        q.addQueryItem("isClient", QString());
-
-        q.removeQueryItem("videowallGuid");
-        q.addQueryItem("videowallGuid", m_localPeer.params["videowallGuid"]);
-
-        q.removeQueryItem("instanceGuid");
-        q.addQueryItem("instanceGuid", m_localPeer.params["instanceGuid"]);
-
         setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
     }

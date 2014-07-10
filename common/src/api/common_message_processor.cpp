@@ -99,10 +99,7 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::removed,
         this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::controlMessage,
-        this, &QnCommonMessageProcessor::videowallControlMessageReceived );
-    connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::instanceStatusChanged,
-        this, &QnCommonMessageProcessor::on_videowallInstanceStatusChanged );
-    
+        this, &QnCommonMessageProcessor::videowallControlMessageReceived );  
 
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::at_remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::at_remotePeerLost );
@@ -174,17 +171,6 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnId& resourceId )
 void QnCommonMessageProcessor::on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory) {
     QnCameraHistoryPool::instance()->addCameraHistoryItem(*cameraHistory.data());
 }
-
-void QnCommonMessageProcessor::on_videowallInstanceStatusChanged(const QnVideowallInstanceStatus &status) {
-    QnVideoWallResourcePtr videowall = qnResPool->getResourceById(status.videowallGuid).dynamicCast<QnVideoWallResource>();
-    if (!videowall || !videowall->items()->hasItem(status.instanceGuid))
-        return;
-
-    QnVideoWallItem item = videowall->items()->getItem(status.instanceGuid);
-    item.online = status.online;
-    videowall->items()->updateItem(item.uuid, item);
-}
-
 
 void QnCommonMessageProcessor::on_licenseChanged(const QnLicensePtr &license) {
     qnLicensePool->addLicense(license);

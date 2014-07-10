@@ -18,7 +18,7 @@ namespace ec2
         {}
 
         bool operator==(const ApiPeerData& other) const {
-            return id == other.id && peerType == other.peerType && params == other.params;
+            return id == other.id && peerType == other.peerType && dataFormat == other.dataFormat;
         }
 
         bool isClient() const {
@@ -33,13 +33,10 @@ namespace ec2
 
         /** Preferred client data serialization format */
         Qn::SerializationFormat dataFormat;
-
-        /** Additional info. */
-        QMap<QString, QString> params; // todo: #GDM #VW. remove it
     };
     typedef QSet<QnId> QnPeerSet;
 
-#define ApiPeerData_Fields (id)(peerType)(dataFormat)(params)
+#define ApiPeerData_Fields (id)(peerType)(dataFormat)
 
 }
 

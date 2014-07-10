@@ -56,8 +56,6 @@ private:
     virtual void storedItemAdded(const QnPeerRuntimeInfo &item) override;
     virtual void storedItemRemoved(const QnPeerRuntimeInfo &item) override;
     virtual void storedItemChanged(const QnPeerRuntimeInfo &item) override;
-
-    void at_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
 private:
     /** Mutex that is to be used when accessing items. */
     mutable QMutex m_mutex;

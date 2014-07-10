@@ -70,6 +70,8 @@ private:
     static QString shortcutPath();
     bool shortcutExists(const QnVideoWallResourcePtr &videowall) const;
     bool createShortcut(const QnVideoWallResourcePtr &videowall);
+
+    void setItemOnline(const QUuid &instanceGuid, bool online);
 private slots:
 
     void at_newVideoWallAction_triggered();

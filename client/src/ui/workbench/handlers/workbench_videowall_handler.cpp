@@ -218,7 +218,6 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_videoWallMode.active = qnSettings->isVideoWallMode();
     m_videoWallMode.opening = false;
     m_videoWallMode.ready = false;
-
     m_controlMode.active = false;
     m_controlMode.sequence = 0;
     m_controlMode.cacheTimer = new QTimer(this);
@@ -237,6 +236,23 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     connect(resourcePool(), &QnResourcePool::resourceRemoved,   this,   &QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved);
     foreach(const QnResourcePtr &resource, resourcePool()->getResources())
         at_resPool_resourceAdded(resource);
+
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, [this](const QnPeerRuntimeInfo &info) {
+        if (info.data.peer.peerType != Qn::PT_VideowallClient)
+            return;
+        setItemOnline(info.data.videoWallInstanceGuid, true);
+    });
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, [this](const QnPeerRuntimeInfo &info) {
+        if (info.data.peer.peerType != Qn::PT_VideowallClient)
+            return;
+        setItemOnline(info.data.videoWallInstanceGuid, false);
+    });
+    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems()) {
+        if (info.data.peer.peerType != Qn::PT_VideowallClient)
+            continue;
+        setItemOnline(info.data.videoWallInstanceGuid, true);
+    }
+
 
     if (m_videoWallMode.active) {
         /* Videowall reaction actions */
@@ -2262,4 +2278,16 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(const QnLayoutResourcePtr &la
     } );
 
     return true;
+}
+
+void QnWorkbenchVideoWallHandler::setItemOnline(const QUuid &instanceGuid, bool online) {
+    Q_ASSERT(!instanceGuid.isNull());
+
+    QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(instanceGuid);
+    if (index.isNull())
+        return;
+
+    QnVideoWallItem item = index.videowall()->items()->getItem(instanceGuid);
+    item.online = online;
+    index.videowall()->items()->updateItem(instanceGuid, item);
 }

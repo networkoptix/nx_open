@@ -17,7 +17,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource/videowall_instance_status.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/misc/screen_snap.h>
 
@@ -890,18 +889,6 @@ void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallCon
         data.params.insert(std::pair<QString, QString>(iter.key(), iter.value()));
         ++iter;
     }
-}
-
-void fromApiToResource(const ApiVideowallInstanceStatusData &data, QnVideowallInstanceStatus &status) {
-    status.videowallGuid = data.videowallGuid;
-    status.instanceGuid = data.instanceGuid;
-    status.online = data.online;
-}
-
-void fromResourceToApi(const QnVideowallInstanceStatus &status, ApiVideowallInstanceStatusData &data) {
-    data.videowallGuid = status.videowallGuid;
-    data.instanceGuid = status.instanceGuid;
-    data.online = status.online;
 }
 
 void fromApiToResource(const ApiCameraBookmarkTagDataList &data, QnCameraBookmarkTags &tags) {

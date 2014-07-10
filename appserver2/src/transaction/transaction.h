@@ -77,7 +77,6 @@ namespace ec2
             saveVideowall               = 701,  /*< ApiVideowallData */
             removeVideowall             = 702,  /*< ApiIdData */
             videowallControl            = 703,  /*< ApiVideowallControlMessageData */
-            videowallInstanceStatus     = 704,  /*< ApiVideowallInstanceStatusData */
 
             /* Business rules */
             getBusinessRules            = 800,  /*< ApiBusinessRuleDataList */
@@ -120,6 +119,8 @@ namespace ec2
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
         QString toString( Value val );
+
+        /** Check if transaction can be sent independently of current connection state. MUST have sequence field filled. */
         bool isSystem( Value val );
     }
 

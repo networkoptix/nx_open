@@ -54,6 +54,10 @@ public:
     void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader &header) {
         assert(header.processedPeers.contains(m_localPeer.id));
 #ifdef _DEBUG
+        if (ApiCommand::isSystem(transaction.command) || transaction.persistent) {
+            Q_ASSERT(transaction.id.sequence > 0);
+        }
+
         foreach (const QnId& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());
             Q_ASSERT(peer != qnCommon->moduleGUID());

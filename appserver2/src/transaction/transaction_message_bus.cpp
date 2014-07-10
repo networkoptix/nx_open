@@ -87,8 +87,6 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::saveVideowall:         return handleTransactionParams<ApiVideowallData>        (&stream, transaction, function);
     case ApiCommand::removeVideowall:       return handleTransactionParams<ApiIdData>               (&stream, transaction, function);
     case ApiCommand::videowallControl:      return handleTransactionParams<ApiVideowallControlMessageData>(&stream, transaction, function);
-    case ApiCommand::videowallInstanceStatus:  
-                                            return handleTransactionParams<ApiVideowallInstanceStatusData>(&stream, transaction, function);
     case ApiCommand::addStoredFile:
     case ApiCommand::updateStoredFile:      return handleTransactionParams<ApiStoredFileData>       (&stream, transaction, function);
     case ApiCommand::removeStoredFile:      return handleTransactionParams<ApiStoredFilePath>       (&stream, transaction, function);
@@ -286,6 +284,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         itr.value().lastActivity.restart();
 
     if (isSystem(tran.command)) {
+        Q_ASSERT(tran.id.sequence > 0);
         if (m_lastTranSeq[tran.id.peerID] >= tran.id.sequence)
             return; // already processed
         m_lastTranSeq[tran.id.peerID] = tran.id.sequence;
@@ -440,9 +439,6 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
         tran.params = aliveData;
         tran.fillSequence();
         sendTransaction(tran);
-
-        if (peer.peerType == Qn::PT_VideowallClient)
-            sendVideowallInstanceStatus(peer, isAlive);
     }
 
     if( peer.id == qnCommon->moduleGUID() )
@@ -452,15 +448,6 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
         emit peerFound(aliveData, isProxy);
     else
         emit peerLost(aliveData, isProxy);
-}
-
-void QnTransactionMessageBus::sendVideowallInstanceStatus(const ApiPeerData &peer, bool isAlive) {
-    QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::videowallInstanceStatus, false);
-    tran.params.online = isAlive;
-    tran.params.instanceGuid = peer.params["instanceGuid"];
-    tran.params.videowallGuid = peer.params["videowallGuid"];
-    tran.fillSequence();
-    sendTransaction(tran);
 }
 
 QString getUrlAddr(const QUrl& url) { return url.host() + QString::number(url.port()); }
@@ -604,6 +591,7 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
     {
         QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, false);
         tran.params = info.data;
+        tran.fillSequence();
         transport->sendTransaction(tran, processedPeers);
     }
 }
@@ -641,23 +629,6 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         transport->setWriteSync(true);
         sendRuntimeInfo(transport.data(), processedPeers);
         transport->sendTransaction(tran, processedPeers);
-
-        if (remotePeer.peerType == Qn::PT_DesktopClient) {
-            foreach(QnTransactionTransportPtr connected, m_connections.values()) {
-                if (!connected)
-                    continue;
-                ApiPeerData peer = connected->remotePeer();
-                if (peer.peerType != Qn::PT_VideowallClient)
-                    continue;
-                
-                QnTransaction<ApiVideowallInstanceStatusData> tran(ApiCommand::videowallInstanceStatus, false);
-                tran.params.online = true;
-                tran.params.instanceGuid = peer.params["instanceGuid"];
-                tran.params.videowallGuid = peer.params["videowallGuid"];
-                transport->sendTransaction(tran, QnPeerSet() << remotePeer.id << m_localPeer.id);        
-            }
-        }
-
         transport->setReadSync(true);
     } else if (remotePeer.peerType == Qn::PT_MobileClient) {
         /** Request all data to be sent to the client peers on the connect. */

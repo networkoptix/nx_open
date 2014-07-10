@@ -70,13 +70,6 @@ namespace ec2
     };
 #define ApiVideowallControlMessageData_Fields (operation)(videowallGuid)(instanceGuid)(params)
 
-    struct ApiVideowallInstanceStatusData: ApiData {
-        QnId videowallGuid;
-        QnId instanceGuid;
-        bool online;
-    };
-#define ApiVideowallInstanceStatusData_Fields (videowallGuid)(instanceGuid)(online)
-
     struct ApiVideowallItemWithRefData: public ApiVideowallItemData {
         QnId videowallGuid;
     };

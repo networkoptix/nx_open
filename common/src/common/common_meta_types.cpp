@@ -42,7 +42,6 @@
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_control_message.h>
 #include <core/resource/videowall_matrix.h>
-#include <core/resource/videowall_instance_status.h>
 
 #include <recording/time_period.h>
 
@@ -121,7 +120,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnVideoWallPcData>();
     qRegisterMetaType<QnVideoWallControlMessage>();
     qRegisterMetaType<QnVideoWallMatrix>();
-    qRegisterMetaType<QnVideowallInstanceStatus>();
 
     qRegisterMetaType<QnMotionRegion>();
     qRegisterMetaType<QnScheduleTask>();
