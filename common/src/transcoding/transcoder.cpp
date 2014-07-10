@@ -3,6 +3,8 @@
 #include <utils/math/math.h>
 #include <core/resource/media_resource.h>
 
+#include "filters/abstract_image_filter.h"
+
 #include "ffmpeg_transcoder.h"
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"

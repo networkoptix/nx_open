@@ -4,6 +4,7 @@
 #include <QtCore/QDir>
 
 #include "file_storage_resource.h"
+#include "utils/common/log.h"
 #include "utils/common/util.h"
 #include "utils/common/buffered_file.h"
 #include "recorder/file_deletor.h"

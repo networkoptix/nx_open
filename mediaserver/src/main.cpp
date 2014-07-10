@@ -56,25 +56,25 @@
 #include <platform/platform_abstraction.h>
 
 #include <plugins/plugin_manager.h>
-#include <plugins/resources/acti/acti_resource_searcher.h>
-#include <plugins/resources/archive/avi_files/avi_resource.h>
-#include <plugins/resources/arecontvision/resource/av_resource_searcher.h>
-#include <plugins/resources/axis/axis_resource_searcher.h>
-#include <plugins/resources/desktop_camera/desktop_camera_registrator.h>
-#include <plugins/resources/desktop_camera/desktop_camera_resource_searcher.h>
-#include <plugins/resources/desktop_camera/desktop_camera_deleter.h>
-#include <plugins/resources/d-link/dlink_resource_searcher.h>
-#include <plugins/resources/droid/droid_resource_searcher.h>
-#include <plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h>
-#include <plugins/resources/flex_watch/flexwatch_resource_searcher.h>
-#include <plugins/resources/iqinvision/iqinvision_resource_searcher.h>
-#include <plugins/resources/isd/isd_resource_searcher.h>
-#include <plugins/resources/mserver_resource_searcher.h>
-#include <plugins/resources/onvif/onvif_resource_searcher.h>
-#include <plugins/resources/pulse/pulse_resource_searcher.h>
-#include <plugins/resources/stardot/stardot_resource_searcher.h>
-#include <plugins/resources/test_camera/testcamera_resource_searcher.h>
-#include <plugins/resources/third_party/third_party_resource_searcher.h>
+#include <plugins/resource/acti/acti_resource_searcher.h>
+#include <plugins/resource/avi/avi_resource.h>
+#include <plugins/resource/arecontvision/resource/av_resource_searcher.h>
+#include <plugins/resource/axis/axis_resource_searcher.h>
+#include <plugins/resource/desktop_camera/desktop_camera_registrator.h>
+#include <plugins/resource/desktop_camera/desktop_camera_resource_searcher.h>
+#include <plugins/resource/desktop_camera/desktop_camera_deleter.h>
+#include <plugins/resource/d-link/dlink_resource_searcher.h>
+#include <plugins/resource/droid/droid_resource_searcher.h>
+#include <plugins/resource/droid_ipwebcam/ipwebcam_droid_resource_searcher.h>
+#include <plugins/resource/flex_watch/flexwatch_resource_searcher.h>
+#include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
+#include <plugins/resource/isd/isd_resource_searcher.h>
+#include <plugins/resource/mserver_resource_searcher.h>
+#include <plugins/resource/onvif/onvif_resource_searcher.h>
+#include <plugins/resource/pulse/pulse_resource_searcher.h>
+#include <plugins/resource/stardot/stardot_resource_searcher.h>
+#include <plugins/resource/test_camera/testcamera_resource_searcher.h>
+#include <plugins/resource/third_party/third_party_resource_searcher.h>
 #include <plugins/storage/coldstore/coldstore_storage.h>
 #include <plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
@@ -137,7 +137,7 @@
 #include "common/systemexcept_win32.h"
 #endif
 #include "core/ptz/server_ptz_controller_pool.h"
-#include "plugins/resources/acti/acti_resource.h"
+#include "plugins/resource/acti/acti_resource.h"
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
 #include "utils/network/modulefinder.h"
@@ -150,8 +150,6 @@
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
 
-
-//#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -329,7 +327,9 @@ void ffmpegInit()
 
     // TODO: #Elric we need comments about true/false at call site => bad api design, use flags instead
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
+#ifdef ENABLE_COLDSTORE
     QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
+#endif
 }
 
 QnStorageResourcePtr createStorage(const QString& path)
@@ -631,23 +631,35 @@ int serverMain(int argc, char *argv[])
 void initAppServerConnection(const QSettings &settings)
 {
     QUrl appServerUrl;
+    QUrlQuery params;
     
     // ### remove
     QString host = settings.value("appserverHost").toString();
     if (QUrl(host).scheme() == "file")
         appServerUrl = QUrl(host); // it is a completed URL
-    else if (host.isEmpty() || host == "localhost")
+    else if (host.isEmpty() || host == "localhost") 
+    {
         appServerUrl = QUrl(QString("file:///") + closeDirPath(getDataDirectory()));
+    }
     else {
         appServerUrl.setScheme(settings.value("secureAppserverConnection", true).toBool() ? QLatin1String("https") : QLatin1String("http"));
         int port = settings.value("appserverPort", DEFAULT_APPSERVER_PORT).toInt();
         appServerUrl.setHost(host);
         appServerUrl.setPort(port);
     }
+    if (appServerUrl.scheme() == "file")
+    {
+        QString staticDBPath = settings.value("staticDataDir").toString();
+        if (!staticDBPath.isEmpty()) {
+            params.addQueryItem("staticdb_path", staticDBPath);
+	}
+    }
+
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
     QString password = settings.value("appserverPassword", QLatin1String("123")).toString();
     appServerUrl.setUserName(userName);
     appServerUrl.setPassword(password);
+    appServerUrl.setQuery(params);
 
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");

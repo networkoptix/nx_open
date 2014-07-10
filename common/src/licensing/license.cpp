@@ -27,6 +27,7 @@ namespace {
 
     bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
     {
+#ifdef ENABLE_SSL
         // Calculate SHA1 hash
         QCryptographicHash hash(QCryptographicHash::Sha1);
         hash.addData(data);
@@ -47,6 +48,10 @@ namespace {
 
         // Verify signature is correct
         return memcmp(decrypted.data(), dataHash.data(), ret) == 0;
+#else 
+        // TODO: #Elric #android
+        return true;
+#endif
     }
 
 } // anonymous namespace
@@ -493,27 +498,21 @@ bool QnLicensePool::isEmpty() const
     return m_licenseDict.isEmpty();
 }
 
-void QnLicensePool::setMainHardwareIds(const QList<QByteArray> &hardwareIds)
-{
-    m_mainHardwareIds = hardwareIds;
-}
 
 QList<QByteArray> QnLicensePool::mainHardwareIds() const
 {
-    return m_mainHardwareIds;
-}
-
-void QnLicensePool::setCompatibleHardwareIds(const QList<QByteArray> &hardwareIds)
-{
-    m_compatibleHardwareIds = hardwareIds;
+    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
+    return data.mainHardwareIds;
 }
 
 QList<QByteArray> QnLicensePool::compatibleHardwareIds() const
 {
-    return m_compatibleHardwareIds;
+    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
+    return data.compatibleHardwareIds;
 }
 
 QByteArray QnLicensePool::currentHardwareId() const
 {
-    return m_mainHardwareIds.isEmpty() ? QByteArray() : m_mainHardwareIds.last();
+    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
+    return data.mainHardwareIds.isEmpty() ? QByteArray() : data.mainHardwareIds.last();
 }

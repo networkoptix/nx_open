@@ -1,23 +1,28 @@
 #include "multicodec_rtp_reader.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QSettings>
 
 #include <business/business_event_connector.h>
 #include <business/events/reasoned_business_event.h>
 #include <business/events/network_issue_business_event.h>
 
-#include "utils/network/rtp_stream_parser.h"
-#include "core/resource/network_resource.h"
-#include "utils/network/h264_rtp_parser.h"
-#include "aac_rtp_parser.h"
+#include "utils/common/log.h"
+#include "utils/common/synctime.h"
 #include "utils/common/util.h"
+#include "utils/network/rtp_stream_parser.h"
+#include "utils/network/compat_poll.h"
+#include "utils/network/h264_rtp_parser.h"
+
+#include "core/resource/network_resource.h"
 #include "core/resource/resource_media_layout.h"
 #include "core/resource/media_resource.h"
+#include "core/resource/camera_resource.h"
+
+#include "aac_rtp_parser.h"
 #include "simpleaudio_rtp_parser.h"
 #include "mjpeg_rtp_parser.h"
-#include "core/resource/camera_resource.h"
-#include "utils/common/synctime.h"
-#include "utils/network/compat_poll.h"
 
 
 static const int RTSP_RETRY_COUNT = 6;
@@ -566,3 +571,5 @@ void QnMulticodecRtpReader::setRole(QnResource::ConnectionRole role)
 {
     m_role = role;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
