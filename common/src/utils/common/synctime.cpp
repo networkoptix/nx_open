@@ -34,11 +34,26 @@ private:
 // -------------------------------------------------------------------------- //
 // QnSyncTime
 // -------------------------------------------------------------------------- //
+static QnSyncTime* QnSyncTime_instance = nullptr;
+
 QnSyncTime::QnSyncTime()
 {
+    QnSyncTime_instance = this;
+
     m_lastReceivedTime = 0;
     reset();
 }
+
+QnSyncTime::~QnSyncTime()
+{
+    QnSyncTime_instance = nullptr;
+}
+
+QnSyncTime* QnSyncTime::instance()
+{
+    return QnSyncTime_instance;
+}
+
 
 void QnSyncTime::updateTime(qint64 newTime)
 {
@@ -102,11 +117,3 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
     else
         return QDateTime::currentMSecsSinceEpoch();
 }
-
-Q_GLOBAL_STATIC(QnSyncTime, qn_syncTime_instance);
-
-QnSyncTime* QnSyncTime::instance()
-{
-    return qn_syncTime_instance();
-}
-

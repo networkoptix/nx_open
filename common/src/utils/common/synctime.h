@@ -15,8 +15,9 @@ class QnSyncTime: public QObject {
 
 public:
     QnSyncTime();
+    virtual ~QnSyncTime();
 
-    static QnSyncTime *instance();
+    static QnSyncTime* instance();
 
     qint64 currentMSecsSinceEpoch();
     qint64 currentUSecsSinceEpoch();

@@ -1074,6 +1074,8 @@ void QnMain::run()
         QnSSLSocket::initSSLEngine(certData);
     }
 
+    QnSyncTime syncTime;
+
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
