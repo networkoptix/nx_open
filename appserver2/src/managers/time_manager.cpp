@@ -60,7 +60,7 @@ namespace ec2
     void TimePriorityKey::fromUInt64( quint64 val )
     {
         sequence = (quint16)(val >> 48);
-        flags = (quint16)((val >> 32) & 0xFFFF00000000LL);
+        flags = (quint16)((val >> 32) & 0xFFFF);
         seed = val & 0xFFFFFFFF;
     }
 
