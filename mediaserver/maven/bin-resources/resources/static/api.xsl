@@ -27,7 +27,7 @@
                 <!-- endbower -->
                 <!-- endbuild -->
                 <!-- build:css({.tmp,app}) styles/main.css -->
-                <link rel="stylesheet" href="styles/main.css"/>
+                <link rel="stylesheet" href="styles/2ffdb355.main.css"/>
             </head>
             <body>
               <div class="container">
