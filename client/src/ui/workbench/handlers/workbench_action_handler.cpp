@@ -1734,13 +1734,13 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
         QnTimePeriodList localPeriods = periods.intersected(period);
 
-        qint64 startDelta = periods.first().startTimeMs - period.startTimeMs;
+        qint64 startDelta = localPeriods.first().startTimeMs - period.startTimeMs;
         if (startDelta > 0) { //user selected period before the first chunk
             period.startTimeMs += startDelta;
             period.durationMs -= startDelta;
         }
 
-        qint64 endDelta = period.endTimeMs() - periods.last().endTimeMs();
+        qint64 endDelta = period.endTimeMs() - localPeriods.last().endTimeMs();
         if (endDelta > 0) { // user selected period after the last chunk
             period.durationMs -= endDelta;
         }       
