@@ -510,20 +510,17 @@ bool QnLicensePool::isEmpty() const
 }
 
 
-QList<QByteArray> QnLicensePool::mainHardwareIds() const
-{
-    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
-    return data.mainHardwareIds;
+QList<QByteArray> QnLicensePool::mainHardwareIds() const {
+    return QnRuntimeInfoManager::instance()->remoteInfo().data.mainHardwareIds;
 }
 
-QList<QByteArray> QnLicensePool::compatibleHardwareIds() const
-{
-    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
-    return data.compatibleHardwareIds;
+QList<QByteArray> QnLicensePool::compatibleHardwareIds() const {
+    return QnRuntimeInfoManager::instance()->remoteInfo().data.compatibleHardwareIds;
 }
 
-QByteArray QnLicensePool::currentHardwareId() const
-{
-    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
-    return data.mainHardwareIds.isEmpty() ? QByteArray() : data.mainHardwareIds.last();
+QByteArray QnLicensePool::currentHardwareId() const {
+    QList<QByteArray> hwIds = mainHardwareIds();
+    return hwIds.isEmpty() 
+        ? QByteArray() 
+        : hwIds.last();
 }

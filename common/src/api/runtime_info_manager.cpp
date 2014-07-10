@@ -18,6 +18,10 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
     });
 }
 
+QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const {
+    return m_items.data();
+}
+
 void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeData) {
     
     // check info version
@@ -47,3 +51,10 @@ QnPeerRuntimeInfo QnRuntimeInfoManager::localInfo() const {
     Q_ASSERT(m_items->hasItem(qnCommon->moduleGUID()));
     return m_items->getItem(qnCommon->moduleGUID());
 }
+
+QnPeerRuntimeInfo QnRuntimeInfoManager::remoteInfo() const {
+    if (!m_items->hasItem(qnCommon->remoteGUID()))
+        return QnPeerRuntimeInfo();
+    return m_items->getItem(qnCommon->remoteGUID());
+}
+

@@ -47,6 +47,7 @@ public:
     QnThreadsafeItemStorage<QnPeerRuntimeInfo> *items() const;
 
     QnPeerRuntimeInfo localInfo() const;
+    QnPeerRuntimeInfo remoteInfo() const;
 signals:
     void runtimeInfoAdded(const QnPeerRuntimeInfo &data);
     void runtimeInfoChanged(const QnPeerRuntimeInfo &data);
