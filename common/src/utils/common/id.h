@@ -5,6 +5,7 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QUuid>
 #include <QtCore/QtEndian>
+#include <QCryptographicHash>
 
 #include <common/common_globals.h>
 
@@ -14,11 +15,10 @@ typedef QUuid QnId; // TODO: #Elric remove this typedef. It's useless and it pre
 inline QnId intToGuid(qint32 value, const QByteArray& postfix)
 {
     QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-    value = htonl(value);
+    value = qToBigEndian(value);
     md5Hash.addData((const char*) &value, sizeof(value));
     md5Hash.addData(postfix);
     QByteArray ha2 = md5Hash.result();
-    *((quint32*) data.data()) = qToBigEndian(value);
     return QnId::fromRfc4122(ha2);
 }
 

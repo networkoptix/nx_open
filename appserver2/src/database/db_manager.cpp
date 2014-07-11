@@ -667,7 +667,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         //        if (!execSQLFile(lit(":/02_insert_3thparty_vendor.sql")))
         //            return false;
         //#else
-        if (!execSQLFile(lit(":/02_insert_all_vendors.sql")), m_sdb)
+        if (!execSQLFile(lit(":/02_insert_all_vendors.sql"), m_sdb))
             return false;
         //#endif
 
@@ -679,7 +679,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
     {
         if (!(*dbJustCreated)) {
             *isMigrationFrom2_2 = true;
-            if (!execSQLFile(lit(":/02_migration_from_2_2.sql")), m_sdb)
+            if (!execSQLFile(lit(":/02_migration_from_2_2.sql"), m_sdb))
                 return false;
         }
 

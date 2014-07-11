@@ -1207,7 +1207,7 @@ void QnMain::run()
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
-        MSSettings::roSettings()->setValue("systemName", connectInfo->systemName);
+        MSSettings::roSettings()->setValue("systemName", connectInfo.systemName);
         MSSettings::roSettings()->remove("appserverHost");
         MSSettings::roSettings()->remove("appserverPort");
         MSSettings::roSettings()->remove("appserverLogin");
