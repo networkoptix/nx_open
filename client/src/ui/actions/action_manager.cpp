@@ -703,6 +703,11 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Open in Browser..."));
 
+    factory(Qn::SystemAdministrationAction).
+        flags(Qn::Main | Qn::Tree).
+        text(tr("System Administration...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory(Qn::PreferencesGeneralTabAction).
         flags(Qn::Main).
@@ -743,12 +748,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Camera List...")).
         shortcut(tr("Ctrl+M")).
         autoRepeat(false).
-        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
-
-    factory(Qn::SystemAdministrationAction).
-        flags(Qn::Main | Qn::Tree).
-        text(tr("System Administration...")).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory().
