@@ -3,6 +3,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 
 /* Allow to use 'master' license type instead of 'child' type inf child licenses isn't enough */
 struct LiceseCompatibility 
@@ -31,6 +32,11 @@ QnLicenseUsageHelper::QnLicenseUsageHelper(const QnVirtualCameraResourceList &pr
     m_licenses(qnLicensePool->getLicenses())
 {
     init();
+
+    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   &QnLicenseUsageHelper::at_resourcePool_resourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,   &QnLicenseUsageHelper::at_resourcePool_resourceRemoved);
+    connect(qnResPool, &QnResourcePool::statusChanged,   this,   &QnLicenseUsageHelper::at_resourcePool_statusChanged);
+
     // update will be called inside
     propose(proposedCameras, proposedEnable);
 }
@@ -45,7 +51,12 @@ void QnLicenseUsageHelper::init()
 }
 
 void QnLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable) {
-    foreach (const QnVirtualCameraResourcePtr &camera, proposedCameras) {
+    foreach (const QnVirtualCameraResourcePtr &camera, proposedCameras) 
+    {
+        QnResourcePtr mserver = qnResPool->getResourceById(camera->getParentId());
+        if (mserver->getStatus() == QnResource::Offline)
+            continue;
+
         // if schedule is disabled and we are enabling it
         if (camera->isScheduleDisabled() == proposedEnable) 
             m_proposedLicenses[camera->licenseClass()]++;
@@ -94,6 +105,8 @@ void QnLicenseUsageHelper::update()
         m_overflowLicenses[i] = qMax(0, m_usedLicenses[i] - maxLicenses[i]);
         m_isValid &= (m_overflowLicenses[i] == 0);
     }
+
+    emit updated();
 }
 
 QString QnLicenseUsageHelper::longClassName(Qn::LicenseClass licenseClass) const
@@ -155,4 +168,22 @@ int QnLicenseUsageHelper::totalLicense(Qn::LicenseClass licenseClass) const
 int QnLicenseUsageHelper::usedLicense(Qn::LicenseClass licenseClass) const
 {
     return m_usedLicenses[licenseClass];
+}
+
+void QnLicenseUsageHelper::at_resourcePool_resourceAdded(const QnResourcePtr & res)
+{
+    if (res.dynamicCast<QnMediaServerResource>())
+        update();
+}
+
+void QnLicenseUsageHelper::at_resourcePool_resourceRemoved(const QnResourcePtr & res)
+{
+    if (res.dynamicCast<QnMediaServerResource>())
+        update();
+}
+
+void QnLicenseUsageHelper::at_resourcePool_statusChanged(const QnResourcePtr & res)
+{
+    if (res.dynamicCast<QnMediaServerResource>())
+        update();
 }

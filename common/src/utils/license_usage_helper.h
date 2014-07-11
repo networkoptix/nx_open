@@ -4,8 +4,9 @@
 #include <core/resource/resource_fwd.h>
 #include <licensing/license.h>
 
-class QnLicenseUsageHelper
+class QnLicenseUsageHelper: public QObject
 {
+    Q_OBJECT
 public:
 
     QnLicenseUsageHelper();
@@ -26,6 +27,12 @@ public:
     QString longClassName(Qn::LicenseClass licenseClass) const;
 
     void update();
+signals:
+    void updated();
+private slots:
+    void at_resourcePool_resourceAdded(const QnResourcePtr &);
+    void at_resourcePool_resourceRemoved(const QnResourcePtr &);
+    void at_resourcePool_statusChanged(const QnResourcePtr &);
 private:
     void init();
     void borowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal);

@@ -479,17 +479,10 @@ int QnResourcePool::activeCamerasByClass(Qn::LicenseClass licenseClass) const
         QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
         if (camera && !camera->isScheduleDisabled()) 
         {
-            QnMediaServerResourcePtr mServer = getResourceById(camera->getId()).dynamicCast<QnMediaServerResource>();
+            QnMediaServerResourcePtr mServer = getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
             if (mServer && mServer->getStatus() != QnResource::Offline)
             {
-                if (mServer->getServerFlags() & Qn::SF_Edge)
-                {
-                    if (licenseClass == Qn::LC_Edge)
-                        count++;
-                }
-                else if (camera->isAnalog() && licenseClass == Qn::LC_Analog)
-                    count++;
-                else if (!camera->isAnalog() && licenseClass == Qn::LC_Digital)
+                if (camera->licenseClass() == licenseClass)
                     count++;
             }
         }
