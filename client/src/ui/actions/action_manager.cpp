@@ -706,7 +706,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::PreferencesGeneralTabAction).
         flags(Qn::Main).
-        text(tr("System Settings...")).
+        text(tr("Local Settings...")).
         //shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
         autoRepeat(false);
