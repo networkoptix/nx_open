@@ -461,19 +461,19 @@ void QnMultipleCameraSettingsWidget::updateLicenseText() {
     { // digital licenses
         ui->digitalLicensesLabel->setText(helper.getUsageText(Qn::LC_Digital));
         ui->digitalLicensesLabel->setPalette(palette);
-        ui->digitalLicensesLabel->setVisible(helper.totalDigital() > 0);
+        ui->digitalLicensesLabel->setVisible(helper.totalLicense(Qn::LC_Digital) > 0);
     }
 
     { // analog licenses
         ui->analogLicensesLabel->setText(helper.getUsageText(Qn::LC_Analog));
         ui->analogLicensesLabel->setPalette(palette);
-        ui->analogLicensesLabel->setVisible(helper.totalAnalog() > 0);
+        ui->analogLicensesLabel->setVisible(helper.totalLicense(Qn::LC_Analog) > 0);
     }
 
     { // edge licenses
         ui->edgeLicensesLabel->setText(helper.getUsageText(Qn::LC_Edge));
         ui->edgeLicensesLabel->setPalette(palette);
-        ui->edgeLicensesLabel->setVisible(helper.totalEdge() > 0);
+        ui->edgeLicensesLabel->setVisible(helper.totalLicense(Qn::LC_Edge) > 0);
     }
 
     if (ui->analogViewCheckBox->checkState() != Qt::Checked) {

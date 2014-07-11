@@ -271,6 +271,17 @@ bool QnSecurityCamResource::isEdge() const {
     return mServer && (mServer->getServerFlags() & Qn::SF_Edge);
 }
 
+Qn::LicenseClass QnSecurityCamResource::licenseClass() const 
+{
+    if (isAnalog())
+        return Qn::LC_Analog;
+    else if (isEdge())
+        return Qn::LC_Edge;
+    else
+        return Qn::LC_Digital;
+}
+
+
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
     QVariant val;
     if (!getParam(STREAM_FPS_SHARING_PARAM_NAME, val, QnDomainMemory))

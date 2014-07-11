@@ -7,28 +7,23 @@
 class QnLicenseUsageHelper
 {
 public:
+
     QnLicenseUsageHelper();
     QnLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
 
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
 
-    int totalDigital() const;
-    int totalAnalog() const;
-	int totalEdge() const;
-
-    int usedDigital() const;
-    int usedAnalog() const;
-    int usedEdge() const;
-
-    int overflowDigital() const;
-    int overflowAnalog() const;
-    int overflowEdge() const;
-
     bool isValid() const;
 
     QString getRequiredLicenseMsg() const;
     QString getUsageText(Qn::LicenseClass licenseClass) const;
+    QString getWillUsageText(Qn::LicenseClass licenseClass) const;
     bool isOverflowForCamera(QnVirtualCameraResourcePtr camera);
+
+    int totalLicense(Qn::LicenseClass licenseClass) const;
+    int usedLicense(Qn::LicenseClass licenseClass) const;
+
+    QString longClassName(Qn::LicenseClass licenseClass) const;
 
     void update();
 private:
@@ -37,21 +32,11 @@ private:
 
     QnLicenseListHelper m_licenses;
 
-    int m_usedDigital;
-    int m_usedAnalog;
-    int m_usedEdge;
-
-    //int m_required;
-
-    int m_proposedDigital;
-    int m_proposedAnalog;
-    int m_proposedEdge;
+    int m_usedLicenses[Qn::LC_Count];
+    int m_proposedLicenses[Qn::LC_Count];
+    int m_overflowLicenses[Qn::LC_Count];
 
     bool m_isValid;
-
-    int m_edgeOverflow;
-    int m_digitalOverflow;
-    int m_analogOverflow;
 };
 
 #endif // LICENSE_USAGE_HELPER_H

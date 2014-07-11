@@ -92,31 +92,30 @@ void QnLicenseManagerWidget::updateLicenses() {
         // TODO: #Elric #TR total mess with numerus forms, and no idea how to fix it in a sane way
 
         QString msg(tr("The software is licensed to: "));
-        if (helper.totalDigital() > 0)
-            msg += tr("\n%1 cameras").arg(helper.totalDigital());
-        if (helper.totalAnalog() > 0)
-            msg += tr("\n%1 analog cameras").arg(helper.totalAnalog());
-        if (helper.totalEdge() > 0)
-            msg += tr("\n%1 edge cameras").arg(helper.totalEdge());
+        for (int i = 0; i < Qn::LC_Count; ++i)
+        {
+            Qn::LicenseClass licenseClass = Qn::LicenseClass(i);
+            if (helper.totalLicense(licenseClass) > 0)
+                msg += tr("\n%1 %2").arg(helper.totalLicense(licenseClass)).arg(helper.longClassName(licenseClass));
+        }
 
         if (!helper.isValid()) 
         {
             useRedLabel = true;
-
-            if (helper.usedDigital() > 0)
-                msg += tr("\nAt least %1 licenses are required").arg(helper.usedDigital());
-            if (helper.usedAnalog() > 0)
-                msg += tr("\nAt least %1 analog licenses are required").arg(helper.usedAnalog());
-            if (helper.usedEdge() > 0)
-                msg += tr("\nAt least %1 edge licenses are required").arg(helper.usedEdge());
+            for (int i = 0; i < Qn::LC_Count; ++i)
+            {
+                Qn::LicenseClass licenseClass = Qn::LicenseClass(i);
+                if (helper.usedLicense(licenseClass) > 0)
+                    msg += tr("\nAt least %n %2 are required", "", helper.usedLicense(licenseClass)).arg(helper.longClassName(licenseClass));
+            }
         }
         else {
-            if (helper.usedDigital() > 0)
-                msg += tr("\n%1 licenses are currently in use").arg(helper.usedDigital());
-            if (helper.usedAnalog() > 0)
-                msg += tr("\n%1 analog licenses are currently in use").arg(helper.usedAnalog());
-            if (helper.usedEdge() > 0)
-                msg += tr("\n%1 edge licenses are currently in use").arg(helper.usedEdge());
+            for (int i = 0; i < Qn::LC_Count; ++i)
+            {
+                Qn::LicenseClass licenseClass = Qn::LicenseClass(i);
+                if (helper.usedLicense(licenseClass) > 0)
+                    msg += tr("\n%n %2 are currently in use", "", helper.usedLicense(licenseClass)).arg(helper.longClassName(licenseClass));
+            }
         }
         ui->infoLabel->setText(msg);
     } else {

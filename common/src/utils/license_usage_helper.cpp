@@ -4,6 +4,22 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+/* Allow to use 'master' license type instead of 'child' type inf child licenses isn't enough */
+struct LiceseCompatibility 
+{
+    LiceseCompatibility(Qn::LicenseClass master, Qn::LicenseClass child): master(master), child(child) {}
+    Qn::LicenseClass master;
+    Qn::LicenseClass child;
+};
+
+static std::array<LiceseCompatibility,3> compatibleLicenseClass =
+{
+    LiceseCompatibility(Qn::LC_Edge, Qn::LC_Digital),
+    LiceseCompatibility(Qn::LC_Edge, Qn::LC_Analog),
+    LiceseCompatibility(Qn::LC_Digital, Qn::LC_Digital)
+};
+
+
 QnLicenseUsageHelper::QnLicenseUsageHelper():
     m_licenses(qnLicensePool->getLicenses())
 {
@@ -21,17 +37,10 @@ QnLicenseUsageHelper::QnLicenseUsageHelper(const QnVirtualCameraResourceList &pr
 
 void QnLicenseUsageHelper::init()
 {
-    m_usedEdge = 0;
-    m_usedDigital = 0;
-    m_usedAnalog = 0;
+    memset(m_usedLicenses, 0, sizeof(m_usedLicenses));
+    memset(m_proposedLicenses, 0, sizeof(m_proposedLicenses));
+    memset(m_overflowLicenses, 0, sizeof(m_overflowLicenses));
     
-    m_edgeOverflow = 0;
-    m_digitalOverflow = 0;
-    m_analogOverflow = 0;
-
-    m_proposedDigital = 0;
-    m_proposedAnalog = 0;
-    m_proposedEdge = 0;
     m_isValid = true;
 }
 
@@ -39,19 +48,11 @@ void QnLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCa
     foreach (const QnVirtualCameraResourcePtr &camera, proposedCameras) {
         // if schedule is disabled and we are enabling it
         if (camera->isScheduleDisabled() == proposedEnable) 
-        {
-            if (camera->isEdge())
-                m_proposedEdge++;
-            if (camera->isAnalog())
-                m_proposedAnalog++;
-            else
-                m_proposedDigital++;
-        }
+            m_proposedLicenses[camera->licenseClass()]++;
     }
     if (!proposedEnable) {
-        m_proposedDigital *= -1;
-        m_proposedAnalog *= -1;
-        m_proposedEdge *= -1;
+        for(int i = 0; i < Qn::LC_Count; ++i)
+            m_proposedLicenses[i] *= -1;
     }
     update();
 }
@@ -70,119 +71,88 @@ void QnLicenseUsageHelper::borowLicenseFromClass(int& srcUsed, int srcTotal, int
 
 void QnLicenseUsageHelper::update()
 {
-    m_usedAnalog = qnResPool->activeCamerasByClass(Qn::LC_Analog) + m_proposedAnalog;
-    m_usedDigital = qnResPool->activeCamerasByClass(Qn::LC_Digital) + m_proposedDigital;
-    m_usedEdge = qnResPool->activeCamerasByClass(Qn::LC_Edge) + m_proposedEdge;
-    int recordingTotal = m_usedAnalog + m_usedDigital + m_usedEdge;
-
+    int recordingTotal = 0;
+    int maxTotal = 0;
+    int maxLicenses[Qn::LC_Count];
     QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
-    int maxAnalog = licenseListHelper.totalCamerasByClass(Qn::LC_Analog);
-    int maxDigital = licenseListHelper.totalCamerasByClass(Qn::LC_Digital);
-    int maxEdge = licenseListHelper.totalCamerasByClass(Qn::LC_Edge);
-    int maxTotal = maxAnalog + maxDigital + maxEdge;
-
-
-    if (m_usedDigital > maxDigital)
-        borowLicenseFromClass(m_usedEdge, maxEdge, m_usedDigital, maxDigital);
-
-    if (m_usedAnalog > maxAnalog) {
-        borowLicenseFromClass(m_usedDigital, maxDigital, m_usedAnalog, maxAnalog);
-        if (m_usedAnalog > maxAnalog)
-            borowLicenseFromClass(m_usedEdge, maxEdge, m_usedAnalog, maxAnalog);
+    for (int i = 0; i < Qn::LC_Count; ++i) {
+        m_usedLicenses[i] = qnResPool->activeCamerasByClass((Qn::LicenseClass) i) + m_proposedLicenses[i];
+        recordingTotal += m_usedLicenses[i];
+        maxLicenses[i] = licenseListHelper.totalLicenseByClass(Qn::LicenseClass(i));
+        maxTotal += maxLicenses[i];
+    }
+    
+    for (int i = 0; i < Qn::LC_Count; ++i) {
+        foreach(const LiceseCompatibility& c, compatibleLicenseClass) {
+            if (c.child == Qn::LicenseClass(i))
+                borowLicenseFromClass(m_usedLicenses[c.master], maxLicenses[c.master], m_usedLicenses[i], maxLicenses[i]);
+        }
     }
 
-
-
-    m_edgeOverflow = qMax(0, m_usedEdge - maxEdge);
-    m_digitalOverflow = qMax(0, m_usedDigital - maxDigital);
-    m_analogOverflow = qMax(0, m_usedAnalog - maxAnalog);
-    
-    m_isValid = !m_digitalOverflow && !m_edgeOverflow && !m_analogOverflow;
+    m_isValid = true;
+    for (int i = 0; i < Qn::LC_Count; ++i) {
+        m_overflowLicenses[i] = qMax(0, m_usedLicenses[i] - maxLicenses[i]);
+        m_isValid &= (m_overflowLicenses[i] == 0);
+    }
 }
 
-int QnLicenseUsageHelper::usedEdge() const {
-    return m_usedEdge;
-}
-
-int QnLicenseUsageHelper::usedDigital() const {
-    return m_usedDigital;
-}
-
-int QnLicenseUsageHelper::usedAnalog() const {
-    return m_usedAnalog;
-}
-
-bool QnLicenseUsageHelper::isValid() const {
-    return m_isValid;
-}
-
-int QnLicenseUsageHelper::totalDigital() const {
-    //return 100;
-    return m_licenses.totalCamerasByClass(Qn::LC_Digital);
-}
-
-int QnLicenseUsageHelper::totalAnalog() const {
-    return m_licenses.totalCamerasByClass(Qn::LC_Analog);
-}
-
-int QnLicenseUsageHelper::totalEdge() const {
-    return m_licenses.totalCamerasByClass(Qn::LC_Edge);
-}
-
-int QnLicenseUsageHelper::overflowDigital() const
+QString QnLicenseUsageHelper::longClassName(Qn::LicenseClass licenseClass) const
 {
-    return m_digitalOverflow;
-}
-
-int QnLicenseUsageHelper::overflowAnalog() const
-{
-    return m_analogOverflow;
-}
-
-int QnLicenseUsageHelper::overflowEdge() const
-{
-    return m_edgeOverflow;
+    switch (licenseClass) {
+        case Qn::LC_Edge: return QObject::tr("edge license(s)");
+        case Qn::LC_Analog: return QObject::tr("analog license(s)");
+        default: return QObject::tr("license(s)");
+    }
 }
 
 QString QnLicenseUsageHelper::getUsageText(Qn::LicenseClass licenseClass) const
 {
-    switch (licenseClass)
-    {
-        case Qn::LC_Digital:
-            return QObject::tr("%n license(s) are used out of %1.", "", usedDigital()).arg(totalDigital());
-        case Qn::LC_Analog:
-            return QObject::tr("%n analog license(s) are used out of %1.", "", usedAnalog()).arg(totalAnalog());
-        case Qn::LC_Edge:
-            return QObject::tr("%n edge license(s) are used out of %1.", "", usedEdge()).arg(totalEdge());
-        default:
-            return QString();
-    }
+    return QObject::tr("%n %2 are used out of %1.", "", m_usedLicenses[licenseClass]).arg( m_licenses.totalLicenseByClass(licenseClass)).arg(longClassName(licenseClass));
+}
+
+QString QnLicenseUsageHelper::getWillUsageText(Qn::LicenseClass licenseClass) const
+{
+    return QObject::tr("%n %2 will be used out of %1.", "", m_usedLicenses[licenseClass]).arg( m_licenses.totalLicenseByClass(licenseClass)).arg(longClassName(licenseClass));
 }
 
 
 QString QnLicenseUsageHelper::getRequiredLicenseMsg() const
 {
     QString msg;
-    if (!isValid()) {
-        if (overflowDigital() > 0)
-            msg += QObject::tr("Activate %n more license(s). ", "", overflowDigital());
-        if (overflowEdge() > 0)
-            msg += QObject::tr("Activate %n more edge license(s). ", "", overflowEdge());
-        if (overflowAnalog() > 0)
-            msg += QObject::tr("Activate %n more analog license(s).", "", overflowAnalog());
+
+    if (!isValid()) 
+    {
+        for (int i = 0; i < Qn::LC_Count; ++i) {
+            if (m_overflowLicenses[i] > 0)
+                msg += QObject::tr("Activate %n more %2. ", "", m_overflowLicenses[i]).arg(longClassName((Qn::LicenseClass)i));
+        }
     }
     else {
-        if (m_proposedDigital > 0)
-            msg += QObject::tr("%n more license(s) will be used. ", "", m_proposedDigital);
-        if (m_proposedEdge > 0)
-            msg += QObject::tr("%n more edge license(s) will be used. ", "", m_proposedEdge);
-        if (m_proposedAnalog > 0)
-            msg += QObject::tr("%n more analog license(s) will be used. ", "", m_proposedAnalog);
+        for (int i = 0; i < Qn::LC_Count; ++i) {
+            if (m_proposedLicenses[i] > 0)
+                msg += QObject::tr("%n more %2 will be used. ", "", m_proposedLicenses[Qn::LC_Digital]).arg(longClassName((Qn::LicenseClass)i));;
+        }
     }
     return msg;
 }
 
 bool QnLicenseUsageHelper::isOverflowForCamera(QnVirtualCameraResourcePtr camera)
 {
-    return !camera->isScheduleDisabled() && (overflowEdge() && camera->isEdge()) || (overflowDigital() && !camera->isAnalog()) || (overflowAnalog() && camera->isAnalog());
+    return !camera->isScheduleDisabled() && m_overflowLicenses[camera->licenseClass()];
+}
+
+bool QnLicenseUsageHelper::isValid() const
+{
+    return m_isValid;
+}
+
+int QnLicenseUsageHelper::totalLicense(Qn::LicenseClass licenseClass) const
+{
+    QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
+    return licenseListHelper.totalLicenseByClass(licenseClass);
+}
+
+int QnLicenseUsageHelper::usedLicense(Qn::LicenseClass licenseClass) const
+{
+    return m_usedLicenses[licenseClass];
 }

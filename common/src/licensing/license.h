@@ -135,7 +135,7 @@ public:
     QList<QByteArray> allLicenseKeys() const;
     bool haveLicenseKey(const QByteArray& key) const;
     QnLicensePtr getLicenseByKey(const QByteArray& key) const;
-    int totalCamerasByClass(Qn::LicenseClass licenseClass) const;
+    int totalLicenseByClass(Qn::LicenseClass licenseClass) const;
 
 private:
 

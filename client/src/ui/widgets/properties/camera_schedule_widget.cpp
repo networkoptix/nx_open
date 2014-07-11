@@ -83,17 +83,16 @@ namespace {
                 setWarningStyle(&palette);
             m_licensesLabel->setPalette(palette);
 
-            QString usageText =
-                    tr("%n license(s) will be used out of %1.", "", helper.usedDigital()).arg(helper.totalDigital());
+            QString usageText = helper.getWillUsageText(Qn::LC_Digital);
 
-            if (helper.totalAnalog() > 0) {
+            if (helper.totalLicense(Qn::LC_Analog) > 0) {
                 usageText += L'\n';
-                usageText += tr("%n analog license(s) will be used out of %1.", "", helper.usedAnalog()).arg(helper.totalAnalog());
+                usageText += helper.getWillUsageText(Qn::LC_Analog);
             }
 
-            if (helper.totalEdge() > 0) {
+            if (helper.totalLicense(Qn::LC_Edge) > 0) {
                 usageText += L'\n';
-                usageText += tr("%n edge license(s) will be used out of %1.", "", helper.usedEdge()).arg(helper.totalEdge());
+                usageText += helper.getWillUsageText(Qn::LC_Edge);
             }
 
             m_licensesLabel->setText(usageText);
@@ -608,9 +607,6 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
 {
     QnLicenseUsageHelper helper;
 
-    int usedDigitalChange = helper.usedDigital();
-    int usedAnalogChange = helper.usedAnalog();
-
     switch(ui->enableRecordingCheckBox->checkState()) {
     case Qt::Checked:
         helper.propose(m_cameras, true);
@@ -622,9 +618,6 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
         break;
     }
 
-    usedDigitalChange = helper.usedDigital() - usedDigitalChange;
-    usedAnalogChange = helper.usedAnalog() - usedAnalogChange;
-
     QPalette palette = this->palette();
     if (!helper.isValid())
         setWarningStyle(&palette);
@@ -632,21 +625,21 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
      { // digital licenses
         ui->digitalLicensesLabel->setText(helper.getUsageText(Qn::LC_Digital));
         ui->digitalLicensesLabel->setPalette(palette);
-        ui->digitalLicensesLabel->setVisible(helper.totalDigital() > 0);
+        ui->digitalLicensesLabel->setVisible(helper.totalLicense(Qn::LC_Digital) > 0);
      }
 
     { // analog licenses
         ui->analogLicensesLabel->setText(helper.getUsageText(Qn::LC_Analog));
         ui->analogLicensesLabel->setPalette(palette);
-        ui->analogLicensesLabel->setVisible(helper.totalAnalog() > 0);
+        ui->analogLicensesLabel->setVisible(helper.totalLicense(Qn::LC_Analog) > 0);
     }
 
     { // edge licenses
         ui->edgeLicensesLabel->setText(helper.getUsageText(Qn::LC_Edge));
         ui->edgeLicensesLabel->setPalette(palette);
-        ui->edgeLicensesLabel->setVisible(helper.totalEdge() > 0);
+        ui->edgeLicensesLabel->setVisible(helper.totalLicense(Qn::LC_Edge) > 0);
     }
-
+    
 
     if (ui->enableRecordingCheckBox->checkState() != Qt::Checked) {
         ui->requiredLicensesLabel->setVisible(false);

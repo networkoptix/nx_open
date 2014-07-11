@@ -81,6 +81,10 @@ public:
     /** Returns true if it is a edge camera */
     bool isEdge() const;
 
+    /** Returns edge, analog or digital class */
+    Qn::LicenseClass licenseClass() const;
+
+
 
     virtual Qn::StreamFpsSharingMethod streamFpsSharingMethod() const;
     void setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod value);

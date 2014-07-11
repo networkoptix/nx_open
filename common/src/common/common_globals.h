@@ -491,7 +491,8 @@ public:
     enum LicenseClass {
         LC_Analog,
         LC_Digital,
-        LC_Edge
+        LC_Edge,
+        LC_Count
     };
 
     /**

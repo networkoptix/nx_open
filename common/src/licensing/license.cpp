@@ -246,7 +246,7 @@ QString QnLicense::errorMessage(ErrorCode errCode)
 Qn::LicenseClass QnLicense::licenseClass() const
 {
     QString tmp = m_class.toLower();
-    if (tmp == lit("Edge"))
+    if (tmp == lit("edge"))
         return Qn::LC_Edge;
     else if (tmp == lit("analog"))
         return Qn::LC_Analog;
@@ -396,7 +396,7 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
     return m_licenseDict.keys();
 }
 
-int QnLicenseListHelper::totalCamerasByClass(Qn::LicenseClass licenseClass) const
+int QnLicenseListHelper::totalLicenseByClass(Qn::LicenseClass licenseClass) const
 {
     int result = 0;
 
