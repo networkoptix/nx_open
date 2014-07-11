@@ -13,7 +13,7 @@ extern "C"
 #include "core/resource/network_resource.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/camera_resource.h"
-#include "device_plugins/server_archive/server_archive_delegate.h"
+#include "plugins/resource/server_archive/server_archive_delegate.h"
 #include "core/datapacket/media_data_packet.h"
 #include "decoders/video/ffmpeg.h"
 #include "camera/camera_pool.h"
@@ -108,8 +108,14 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
             QString val = params[i].second.toLower().trimmed(); 
             if (val == lit("before"))
                 roundMethod = IFrameBeforeTime;
-            else if (val == lit("precise") || val == lit("exact"))
-                roundMethod = Precise;
+            else if (val == lit("precise") || val == lit("exact")) {
+#               ifdef EDGE_SERVER
+                    roundMethod = IFrameBeforeTime;
+                    qWarning() << "Get image performance hint: Ignore precise round method to reduce CPU usage";
+#               else
+                    roundMethod = Precise;
+#               endif
+            }
             else if (val == lit("after"))
                 roundMethod = IFrameAfterTime;
         }

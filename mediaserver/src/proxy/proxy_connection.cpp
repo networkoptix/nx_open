@@ -1,15 +1,19 @@
+#include "proxy_connection.h"
+
 #include <QDebug>
 #include <QUrl>
 #include <QUrlQuery>
 
+#include <utils/common/log.h>
+#include <utils/common/systemerror.h>
 #include "utils/network/tcp_listener.h"
-#include "proxy_connection.h"
 #include "utils/network/socket.h"
-#include "proxy_connection_processor_p.h"
+
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"
-#include <utils/common/systemerror.h>
 #include "media_server/server_message_processor.h"
+
+#include "proxy_connection_processor_p.h"
 
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;
@@ -142,15 +146,23 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QString& xSer
 
     if (urlPath.startsWith("proxy") || urlPath.startsWith("/proxy"))
     {
-        int proxyEndPos = urlPath.indexOf('/', 1); // remove proxy prefix
+        int proxyEndPos = urlPath.indexOf('/', 2); // remove proxy prefix
         int protocolEndPos = urlPath.indexOf('/', proxyEndPos+1); // remove proxy prefix
         if (protocolEndPos == -1)
             return false;
+
+        QString protocol = urlPath.mid(proxyEndPos+1, protocolEndPos - proxyEndPos-1);
+        if (!isProtocol(protocol)) {
+            protocol = dstUrl.scheme();
+            if (protocol.isEmpty())
+                protocol = "http";
+            protocolEndPos = proxyEndPos;
+        }
+
         int hostEndPos = urlPath.indexOf('/', protocolEndPos+1); // remove proxy prefix
         if (hostEndPos == -1)
             hostEndPos = urlPath.size();
 
-        QString protocol = urlPath.mid(proxyEndPos+1, protocolEndPos - proxyEndPos-1);
         host = urlPath.mid(protocolEndPos+1, hostEndPos - protocolEndPos-1);
         if (host.startsWith("{"))
             xServerGUID = host;

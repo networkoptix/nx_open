@@ -73,10 +73,6 @@
 #include <utils/common/checked_cast.h>
 #include <client/client_settings.h>
 
-#include "openal/qtvaudiodevice.h"
-#include "core/resource_management/resource_pool.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-
 #include "watchers/workbench_render_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
@@ -351,7 +347,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 #endif
 
     /* Debug overlay */
-    createDebugWidget();
+    //createDebugWidget();
 
     initGraphicsMessageBox();
 
@@ -378,7 +374,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setCalendarVisible(false);
     updateControlsVisibility(false);
 
-    //TODO: #GDM think about a refactoring
+    //TODO: #GDM #Common think about a refactoring
     bool treeOpened = qnSettings->isTreeOpened(); //quite a hack because m_treePinButton sets tree opened if it is pinned
     bool notificationsOpened = qnSettings->isNotificationsOpened(); //same shit
     m_treePinButton->setChecked(qnSettings->isTreePinned());
@@ -1776,7 +1772,7 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
         calendarEmpty = c->isEmpty(); /* Small hack. We have a signal that updates visibility if a calendar receive new data */
 
     bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
-    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM does this belong here?
+    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: #GDM #Common does this belong here?
 
     bool calendarVisible = calendarEnabled && m_sliderVisible && isSliderOpened();
 
@@ -2435,6 +2431,7 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
         return;
 
     m_fpsItem->setVisible(fpsVisible);
+    m_fpsCountingInstrument->setEnabled(fpsVisible);
 
     if(fpsVisible)
         m_fpsCountingInstrument->recursiveEnable();

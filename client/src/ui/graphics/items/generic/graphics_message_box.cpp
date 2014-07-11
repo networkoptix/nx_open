@@ -39,7 +39,7 @@ QnGraphicsMessageBoxItem::QnGraphicsMessageBoxItem(QGraphicsItem *parent):
 
 QnGraphicsMessageBoxItem::~QnGraphicsMessageBoxItem() {
     // instance = NULL;
-    // TODO: #GDM why is it commented out?
+    // TODO: #GDM #Common why is it commented out?
 }
 
 void QnGraphicsMessageBoxItem::addItem(QGraphicsLayoutItem *item) {

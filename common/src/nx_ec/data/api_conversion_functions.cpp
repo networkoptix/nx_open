@@ -2,6 +2,8 @@
 
 #include <api/serializer/serializer.h>
 
+#include <utils/serialization/json.h>
+
 #include <business/business_event_parameters.h>
 #include <business/business_action_parameters.h>
 #include <business/actions/abstract_business_action.h>
@@ -15,6 +17,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/videowall_instance_status.h>
 #include <core/resource/camera_bookmark.h>
 
 #include <nx_ec/ec_api.h>
@@ -33,7 +36,8 @@
 #include "api_resource_type_data.h"
 #include "api_user_data.h"
 #include "api_videowall_data.h"
-
+#include "api_peer_data.h"
+#include "api_runtime_data.h"
 
 namespace ec2 {
 
@@ -143,7 +147,13 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     QnResourcePtr tmp = dst;
     fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 
-    dst->setScheduleDisabled(src.scheduleDisabled);
+    { // test if the camera is desktop camera
+        auto resType = qnResTypePool->desktopCameraResourceType();
+        if (resType && resType->getId() == src.typeId)
+            dst->addFlags(QnResource::desktop_camera);
+    }
+
+    dst->setScheduleDisabled(!src.scheduleEnabled);
     dst->setMotionType(src.motionType);
 
     QList<QnMotionRegion> regions;
@@ -171,18 +181,20 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setGroupId(src.groupId);
     dst->setGroupName(src.groupName);
     dst->setSecondaryStreamQuality(src.secondaryStreamQuality);
-    dst->setCameraControlDisabled(src.controlDisabled);
-    dst->setStatusFlags(static_cast<QnSecurityCamResource::StatusFlags>(src.statusFlags));
+    dst->setCameraControlDisabled(!src.controlEnabled);
+    dst->setStatusFlags(src.statusFlags);
 
     dst->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams));
     dst->setVendor(src.vendor);
+    dst->setMinDays(src.minArchiveDays);
+    dst->setMaxDays(src.maxArchiveDays);
 }
 
 
 void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst) {
     fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
 
-    dst.scheduleDisabled = src->isScheduleDisabled();
+    dst.scheduleEnabled = !src->isScheduleDisabled();
     dst.motionType = src->getMotionType();
 
     QList<QnMotionRegion> regions;
@@ -204,10 +216,12 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.groupId = src->getGroupId();
     dst.groupName = src->getGroupName();
     dst.secondaryStreamQuality = src->secondaryStreamQuality();
-    dst.controlDisabled = src->isCameraControlDisabled();
+    dst.controlEnabled = !src->isCameraControlDisabled();
     dst.statusFlags = src->statusFlags();
     dst.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(src->getDewarpingParams());
     dst.vendor = src->getVendor();
+    dst.minArchiveDays = src->minDays();
+    dst.maxArchiveDays = src->maxDays();
 }
 
 template<class List> 
@@ -317,8 +331,6 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.licenses, dst.licenses);
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
     fromApiToResourceList(src.cameraHistory, dst.cameraHistory);
-
-    dst.serverInfo = src.serverInfo;
 }
 
 
@@ -506,7 +518,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setApiUrl(src.apiUrl);
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
-    dst->setPanicMode(static_cast<Qn::PanicMode>(src.panicMode));
+    dst->setPanicMode(src.panicMode);
     dst->setStreamingUrl(src.streamingUrl);
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setSystemInfo(QnSystemInformation(src.systemInfo));
@@ -880,6 +892,18 @@ void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallCon
     }
 }
 
+void fromApiToResource(const ApiVideowallInstanceStatusData &data, QnVideowallInstanceStatus &status) {
+    status.videowallGuid = data.videowallGuid;
+    status.instanceGuid = data.instanceGuid;
+    status.online = data.online;
+}
+
+void fromResourceToApi(const QnVideowallInstanceStatus &status, ApiVideowallInstanceStatusData &data) {
+    data.videowallGuid = status.videowallGuid;
+    data.instanceGuid = status.instanceGuid;
+    data.online = status.online;
+}
+
 void fromApiToResource(const ApiCameraBookmarkTagDataList &data, QnCameraBookmarkTags &tags) {
     for (const ApiCameraBookmarkTagData &tag: data)
         tags << tag.name;
@@ -890,5 +914,7 @@ void fromResourceToApi(const QnCameraBookmarkTags &tags, ApiCameraBookmarkTagDat
     for (const QString &tag: tags)
         data.push_back(ApiCameraBookmarkTagData(tag));
 }
+
+
 
 } // namespace ec2

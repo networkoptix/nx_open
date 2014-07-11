@@ -27,6 +27,8 @@ public:
      * \returns                         Videowall associated with this widget.
      */
     const QnVideoWallResourcePtr &videowall() const;
+
+    typedef QHash<QUuid, quint64> ReviewButtons;
 protected:
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
 

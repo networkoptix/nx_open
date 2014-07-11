@@ -35,12 +35,15 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
     QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
+    
     ffmpegInit();  
     
     // Each user may have it's own traytool running.
     QCoreApplication app(argc, argv);
 
     QnCommonModule common(argc, argv);
+
+    new QnLongRunnablePool();
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
@@ -162,5 +165,6 @@ int main(int argc, char *argv[])
     delete QnCameraPool::instance();
     QnCameraPool::initGlobalInstance( NULL );
 
+    qDebug() << "Exiting!!!!!!!!!!!!!!!!!!!!!!!!!!";
     return appResult;
 }

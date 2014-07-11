@@ -5,6 +5,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
+#include <network/authenticate_helper.h>
 
 
 // -------------------------------------------------------------------------- //
@@ -37,47 +38,16 @@ void QnNetworkProxyFactory::addToProxyList(
     const QString& userName,
     const QString& password )
 {
-    QMutexLocker l( &m_mutex );
-
+    QMutexLocker lk( &m_mutex );
     m_proxyInfo[targetHost] = QNetworkProxy(QNetworkProxy::HttpProxy, proxyHost, proxyPort, userName, password);
 }
 
 void QnNetworkProxyFactory::bindHostToResource(
     const QString& targetHost,
-    QnResourcePtr resource )
+    const QnResourcePtr& resource )
 {
     QMutexLocker lk( &m_mutex );
-
-    QNetworkProxy proxy( QNetworkProxy::HttpProxy );
-    QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
-    if( camResource )
-    {
-        QnResourcePtr parent = resource->getParentResource();
-        if( !parent )
-            return; //no proxy
-        QnMediaServerResourcePtr mediaServerResource = parent.dynamicCast<QnMediaServerResource>();
-        if( !mediaServerResource )
-            return; //no proxy
-        const QString& proxyHost = mediaServerResource->getPrimaryIF();
-        if( proxyHost == QnMediaServerResource::USE_PROXY )
-        {
-            //proxying via EC
-            proxy.setHostName( QnAppServerConnectionFactory::defaultUrl().host() );
-            proxy.setPort( QnAppServerConnectionFactory::defaultUrl().port() );
-        }
-        else
-        {
-            //going directly through mediaserver
-            const QUrl mServerApiUrl( mediaServerResource->getApiUrl() );
-            proxy.setHostName( mServerApiUrl.host() );
-            proxy.setPort( mServerApiUrl.port() );
-        }
-    }
-    
-    proxy.setUser( QnAppServerConnectionFactory::defaultUrl().userName() );
-    proxy.setPassword( QnAppServerConnectionFactory::defaultUrl().password() );
-    m_proxyInfo[targetHost] = proxy;
-    return;
+    m_proxyInfo[targetHost] = getProxyToResource( resource );
 }
 
 void QnNetworkProxyFactory::clearProxyList()
@@ -109,7 +79,104 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
     return QList<QNetworkProxy>() << itr.value();
 }
 
-QnNetworkProxyFactory *QnNetworkProxyFactory::instance()
+bool QnNetworkProxyFactory::fillUrlWithRouteToResource(
+    const QnResourcePtr& targetResource,
+    QUrl* const requestUrl,
+    WhereToPlaceProxyCredentials credentialsBehavour )
+{
+    QUrlQuery urlQuery( requestUrl->query() );
+    const QNetworkProxy& proxy = getProxyToResource( targetResource );
+    switch( proxy.type() )
+    {
+        case QNetworkProxy::NoProxy:
+            break;
+
+        case QNetworkProxy::HttpProxy:
+            requestUrl->setPath( lit("/proxy/{%1}%2").arg(targetResource->getId().toString()).arg(requestUrl->path()) );
+            requestUrl->setHost( proxy.hostName() );
+            requestUrl->setPort( proxy.port() );
+            urlQuery.addQueryItem( lit("proxy_auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam( requestUrl->userName(), requestUrl->password() )) );
+            break;
+
+        default:
+            assert( false );
+            return false;
+    }
+
+    if( !requestUrl->userName().isEmpty() )
+    {
+        //adding credentials
+        switch( credentialsBehavour )
+        {
+            case QnNetworkProxyFactory::placeCredentialsToUrl:
+                urlQuery.addQueryItem( lit("auth"), QLatin1String(QnAuthHelper::createHttpQueryAuthParam( requestUrl->userName(), requestUrl->password() )) );
+                break;
+
+            default:
+                //TODO #ak
+                break;
+        }
+    }
+
+    requestUrl->setQuery( urlQuery );
+    return true;
+}
+
+QnNetworkProxyFactory* QnNetworkProxyFactory::instance()
 {
     return QnNetworkProxyFactory_instance;
+}
+
+QNetworkProxy QnNetworkProxyFactory::getProxyToResource( const QnResourcePtr& resource )
+{
+    QNetworkProxy proxy( QNetworkProxy::HttpProxy );
+    if( dynamic_cast<QnSecurityCamResource*>(resource.data()) )
+    {
+        QnResourcePtr parent = resource->getParentResource();
+        if( !parent )
+            return QNetworkProxy( QNetworkProxy::NoProxy );
+        const QnMediaServerResource* mediaServerResource = dynamic_cast<QnMediaServerResource*>(parent.data());
+        if( !mediaServerResource )
+            return QNetworkProxy( QNetworkProxy::NoProxy );
+        const QString& proxyHost = mediaServerResource->getPrimaryIF();
+        if( proxyHost == QnMediaServerResource::USE_PROXY )
+        {
+            //proxying via EC
+            proxy.setHostName( QnAppServerConnectionFactory::defaultUrl().host() );
+            proxy.setPort( QnAppServerConnectionFactory::defaultUrl().port() );
+        }
+        else
+        {
+            //going directly through mediaserver
+            const QUrl mServerApiUrl( mediaServerResource->getApiUrl() );
+            proxy.setHostName( mServerApiUrl.host() );
+            proxy.setPort( mServerApiUrl.port() );
+        }
+        proxy.setUser( QnAppServerConnectionFactory::defaultUrl().userName() );
+        proxy.setPassword( QnAppServerConnectionFactory::defaultUrl().password() );
+        return proxy;
+    }
+    else if( const QnMediaServerResource* mediaServerResource = dynamic_cast<QnMediaServerResource*>(resource.data()) )
+    {
+        //TODO #ak looks like copy-paste from upper block
+        const QString& proxyHost = mediaServerResource->getPrimaryIF();
+        if( proxyHost == QnMediaServerResource::USE_PROXY )
+        {
+            //proxying via EC
+            proxy.setHostName( QnAppServerConnectionFactory::defaultUrl().host() );
+            proxy.setPort( QnAppServerConnectionFactory::defaultUrl().port() );
+            proxy.setUser( QnAppServerConnectionFactory::defaultUrl().userName() );
+            proxy.setPassword( QnAppServerConnectionFactory::defaultUrl().password() );
+            return proxy;
+        }
+        else
+        {
+            //going directly through mediaserver
+            return QNetworkProxy( QNetworkProxy::NoProxy );
+        }
+    }
+    else
+    {
+        return QNetworkProxy( QNetworkProxy::NoProxy );
+    }
 }

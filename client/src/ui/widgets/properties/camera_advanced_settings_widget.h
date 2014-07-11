@@ -9,7 +9,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QScrollArea>
-#include "plugins/resources/camera_settings/camera_settings.h"
+#include "plugins/resource/camera_settings/camera_settings.h"
 
 
 class QnSettingsScrollArea : public QScrollArea

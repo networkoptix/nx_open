@@ -3,8 +3,12 @@
 
 #include <type_traits>
 
-#include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QFutureWatcher>
+#include <QtConcurrent/QtConcurrentMap>
+
+#include <utils/common/scoped_thread_rollback.h>
+#include <utils/common/log.h>
+#include <utils/network/ip_range_checker.h>
 
 #include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/resource_pool.h>
@@ -15,8 +19,6 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 
-#include <utils/common/scoped_thread_rollback.h>
-#include <utils/network/ip_range_checker.h>
 
 
 

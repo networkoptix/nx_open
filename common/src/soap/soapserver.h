@@ -10,7 +10,7 @@
 
 #include <string>
 
-#include <plugins/resources/onvif/onvif_notification_consumer.h>
+#include <plugins/resource/onvif/onvif_notification_consumer.h>
 #include <utils/common/long_runnable.h>
 
 

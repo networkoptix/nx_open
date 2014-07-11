@@ -9,6 +9,7 @@
 #include <QtCore/QMetaProperty>
 #include <QtCore/QRunnable>
 
+#include <utils/common/log.h>
 #include <utils/common/warnings.h>
 #include <utils/common/model_functions.h>
 
@@ -22,6 +23,7 @@
 
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
+#include "resource_command.h"
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(QnResource, Status)
 
@@ -31,6 +33,75 @@ QnInitResPool QnResource::m_initAsyncPool;
 
 static const qint64 MIN_INIT_INTERVAL = 1000000ll * 30;
 
+
+// -------------------------------------------------------------------------- //
+// QnResourceGetParamCommand
+// -------------------------------------------------------------------------- //
+#ifdef ENABLE_DATA_PROVIDERS
+class QnResourceGetParamCommand : public QnResourceCommand
+{
+public:
+    QnResourceGetParamCommand(QnResourcePtr res, const QString& name, QnDomain domain):
+        QnResourceCommand(res),
+        m_name(name),
+        m_domain(domain)
+    {}
+
+    virtual void beforeDisconnectFromResource(){}
+
+    bool execute()
+    {
+        if (!isConnectedToTheResource())
+            return false;
+
+        QVariant val;
+        return m_resource->getParam(m_name, val, m_domain);
+    }
+
+private:
+    QString m_name;
+    QnDomain m_domain;
+};
+
+typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
+#endif // ENABLE_DATA_PROVIDERS
+
+// -------------------------------------------------------------------------- //
+// QnResourceSetParamCommand
+// -------------------------------------------------------------------------- //
+#ifdef ENABLE_DATA_PROVIDERS
+class QnResourceSetParamCommand : public QnResourceCommand
+{
+public:
+    QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QVariant& val, QnDomain domain):
+        QnResourceCommand(res),
+        m_name(name),
+        m_val(val),
+        m_domain(domain)
+    {}
+
+    virtual void beforeDisconnectFromResource(){}
+
+    bool execute()
+    {
+        if (!isConnectedToTheResource())
+            return false;
+
+        return m_resource->setParam(m_name, m_val, m_domain);
+    }
+
+private:
+    QString m_name;
+    QVariant m_val;
+    QnDomain m_domain;
+};
+
+typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
+#endif // ENABLE_DATA_PROVIDERS
+
+// -------------------------------------------------------------------------- //
+// QnResource
+// -------------------------------------------------------------------------- //
 QnResource::QnResource(): 
     QObject(),
     m_mutex(QMutex::Recursive),
@@ -91,23 +162,36 @@ bool QnResource::emitDynamicSignal(const char *signal, void **arguments)
     return true;
 }
 
-void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields)
-{
+void QnResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
     Q_ASSERT(getId() == other->getId() || getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
-    m_id = other->m_id; //TODO: #Elric this is WRONG!!!!!!!!!11111111
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
-    
-    m_tags = other->m_tags;
-    m_url = other->m_url;
-    m_flags = other->m_flags;
-    m_name = other->m_name;
-    m_parentId = other->m_parentId;
 
+    m_tags = other->m_tags;
+
+    if (m_url != other->m_url) {
+        m_url = other->m_url;
+        modifiedFields << "urlChanged";
+    }
+
+    if (m_flags != other->m_flags) {
+        m_flags = other->m_flags;    
+        modifiedFields << "flagsChanged";
+    }
+
+    if (m_name != other->m_name) {
+        m_name = other->m_name;
+        modifiedFields << "nameChanged";
+    }
+
+    if (m_parentId != other->m_parentId) {
+        m_parentId = other->m_parentId;
+        modifiedFields << "parentIdChanged";
+    }
 }
 
-void QnResource::update(QnResourcePtr other, bool silenceMode)
+void QnResource::update(const QnResourcePtr& other, bool silenceMode)
 {
     foreach (QnResourceConsumer *consumer, m_consumers)
         consumer->beforeUpdate();
@@ -132,6 +216,11 @@ void QnResource::update(QnResourcePtr other, bool silenceMode)
         {
             setParam(param.name(), param.value(), QnDomainDatabase);
         }
+    }
+
+    //silently ignoring missing properties because of removeProperty method lack
+    for (const QnKvPair &param: other->getProperties()) {
+        setProperty(param.name(), param.value());   //here "propertyChanged" will be called
     }
 
     foreach (QnResourceConsumer *consumer, m_consumers)
@@ -313,13 +402,14 @@ bool QnResource::setSpecialParam(const QString& /*name*/, const QVariant& /*val*
 bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain) const
 {
     const QnParamList& resourceParamList = getResourceParamList();
-    if (!resourceParamList.contains(name))
+    QnParamList::const_iterator paramIter = resourceParamList.find( name );
+    if ( paramIter == resourceParamList.cend() )
     {
         emit asyncParamGetDone(toSharedPointer(const_cast<QnResource*>(this)), name, QVariant(), false);
         return false;
     }
 
-    const QnParam& param = resourceParamList[name];
+    const QnParam& param = paramIter.value();
     val = param.value();
 
     if (domain == QnDomainMemory)
@@ -386,7 +476,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     QnParam param = m_resourceParamList[name];
     if (param.isReadOnly())
     {
-        cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
+        NX_LOG("setParam: cannot set readonly param!", cl_logWARNING);
         m_mutex.unlock();
         emit asyncParamSetDone(toSharedPointer(this), name, val, false);
         return false;
@@ -405,14 +495,15 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         }
     }
 
-    //QnDomainMemory should changed anyway
+    //QnDomainMemory should be changed anyway
     {
         QMutexLocker locker(&m_mutex); // block paramList changing
-        m_resourceParamList[name].setDomain(domain);
-        if (!m_resourceParamList[name].setValue(val))
+        QnParam& param = m_resourceParamList[name];
+        param.setDomain(domain);
+        if (!param.setValue(val))
         {
             locker.unlock();
-            cl_log.log("cannot set such param!", cl_logWARNING);
+            NX_LOG( lit("cannot set such param %1!").arg(name), cl_logWARNING );
             emit asyncParamSetDone(toSharedPointer(this), name, val, false);
             return false;
         }
@@ -425,72 +516,19 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     return true;
 }
 
-class QnResourceGetParamCommand : public QnResourceCommand
-{
-public:
-    QnResourceGetParamCommand(QnResourcePtr res, const QString& name, QnDomain domain):
-      QnResourceCommand(res),
-          m_name(name),
-          m_domain(domain)
-      {}
-
-      virtual void beforeDisconnectFromResource(){}
-
-      bool execute()
-      {
-            if (!isConnectedToTheResource())
-                return false;
-
-            QVariant val;
-            return m_resource->getParam(m_name, val, m_domain);
-      }
-
-private:
-    QString m_name;
-    QnDomain m_domain;
-};
-
-typedef QSharedPointer<QnResourceGetParamCommand> QnResourceGetParamCommandPtr;
-
+#ifdef ENABLE_DATA_PROVIDERS
 void QnResource::getParamAsync(const QString &name, QnDomain domain)
 {
     QnResourceGetParamCommandPtr command(new QnResourceGetParamCommand(toSharedPointer(this), name, domain));
     addCommandToProc(command);
 }
 
-class QnResourceSetParamCommand : public QnResourceCommand
-{
-public:
-    QnResourceSetParamCommand(QnResourcePtr res, const QString& name, const QVariant& val, QnDomain domain):
-      QnResourceCommand(res),
-          m_name(name),
-          m_val(val),
-          m_domain(domain)
-      {}
-
-      virtual void beforeDisconnectFromResource(){}
-
-      bool execute()
-      {
-          if (!isConnectedToTheResource())
-              return false;
-
-          return m_resource->setParam(m_name, m_val, m_domain);
-      }
-
-private:
-    QString m_name;
-    QVariant m_val;
-    QnDomain m_domain;
-};
-
-typedef QSharedPointer<QnResourceSetParamCommand> QnResourceSetParamCommandPtr;
-
 void QnResource::setParamAsync(const QString& name, const QVariant& val, QnDomain domain)
 {
     QnResourceSetParamCommandPtr command(new QnResourceSetParamCommand(toSharedPointer(this), name, val, domain));
     addCommandToProc(command);
 }
+#endif // ENABLE_DATA_PROVIDERS
 
 bool QnResource::unknownResource() const
 {
@@ -676,6 +714,7 @@ bool QnResource::hasConsumer(QnResourceConsumer *consumer) const
     return m_consumers.contains(consumer);
 }
 
+#ifdef ENABLE_DATA_PROVIDERS
 bool QnResource::hasUnprocessedCommands() const
 {
     QMutexLocker locker(&m_consumersMtx);
@@ -687,7 +726,7 @@ bool QnResource::hasUnprocessedCommands() const
 
     return false;
 }
-
+#endif
 
 void QnResource::disconnectAllConsumers()
 {
@@ -702,6 +741,7 @@ void QnResource::disconnectAllConsumers()
     m_consumers.clear();
 }
 
+#ifdef ENABLE_DATA_PROVIDERS
 QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role)
 {
     QnAbstractStreamDataProvider* dataProvider = createDataProviderInternal(role);
@@ -712,11 +752,11 @@ QnAbstractStreamDataProvider* QnResource::createDataProvider(ConnectionRole role
     return dataProvider;
 }
 
-QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(ConnectionRole role)
+QnAbstractStreamDataProvider *QnResource::createDataProviderInternal(ConnectionRole)
 {
-    Q_UNUSED(role)
     return NULL;
 }
+#endif
 
 QnAbstractPtzController *QnResource::createPtzController() {
     QnAbstractPtzController *result = createPtzControllerInternal();
@@ -771,7 +811,8 @@ QnKvPairList QnResource::getProperties() const {
 }
 
 // -----------------------------------------------------------------------------
-// Temporary until real ResourceFactory is implemented
+
+#ifdef ENABLE_DATA_PROVIDERS
 Q_GLOBAL_STATIC(QnResourceCommandProcessor, QnResourceCommandProcessor_instance)
 
 void QnResource::startCommandProc()
@@ -784,15 +825,16 @@ void QnResource::stopCommandProc()
     QnResourceCommandProcessor_instance()->stop();
 }
 
-void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
+void QnResource::addCommandToProc(const QnResourceCommandPtr& command)
 {
-    QnResourceCommandProcessor_instance()->putData(data);
+    QnResourceCommandProcessor_instance()->putData(command);
 }
 
 int QnResource::commandProcQueueSize()
 {
     return QnResourceCommandProcessor_instance()->queueSize();
 }
+#endif // ENABLE_DATA_PROVIDERS
 
 bool QnResource::init()
 {

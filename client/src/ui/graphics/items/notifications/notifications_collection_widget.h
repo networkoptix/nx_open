@@ -15,7 +15,6 @@
 #include <ui/actions/action_parameters.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QGraphicsLinearLayout;
@@ -90,7 +89,7 @@ signals:
     void sizeHintChanged();
     void notificationLevelChanged();
 
-private slots:
+private:
     void showSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);

@@ -7,7 +7,7 @@
 #   
 #endif
 #include <assert.h>
-#include <plugins/resources/third_party/motion_data_picture.h>
+#include <plugins/resource/third_party/motion_data_picture.h>
 #include "limits.h"
 
 static const int sensitivityToMask[10] = 

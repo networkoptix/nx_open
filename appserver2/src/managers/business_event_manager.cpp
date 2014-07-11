@@ -17,8 +17,8 @@ namespace ec2
 template<class QueryProcessorType>
 QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
 :
-    m_queryProcessor( queryProcessor ),
-    m_resCtx( resCtx )
+    QnBusinessEventNotificationManager( resCtx ),
+    m_queryProcessor( queryProcessor )
 {
 }
 
@@ -34,7 +34,7 @@ int QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPt
             fromApiToResourceList(rules, outData, m_resCtx.pool);
         handler->done( reqID, errorCode, outData);
     };
-    m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiBusinessRuleDataList, decltype(queryDoneHandler)> ( ApiCommand::getBusinessRuleList, nullptr, queryDoneHandler);
+    m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiBusinessRuleDataList, decltype(queryDoneHandler)> ( ApiCommand::getBusinessRules, nullptr, queryDoneHandler);
     return reqID;
 }
 
@@ -146,7 +146,7 @@ QnTransaction<ApiEmailSettingsData> QnBusinessEventManager<T>::prepareTransactio
     QnTransaction<ApiEmailSettingsData> tran(command, true);
     fromResourceToApi(resource, tran.params);
     tran.persistent = false;
-    tran.localTransaction = true;
+    tran.isLocal = true;
     return tran;
 }
 
@@ -156,7 +156,7 @@ QnTransaction<ApiEmailData> QnBusinessEventManager<T>::prepareTransaction( ApiCo
     QnTransaction<ApiEmailData> tran(command, true);
     tran.params = data;
     tran.persistent = false;
-    tran.localTransaction = true;
+    tran.isLocal = true;
     return tran;
 }
 

@@ -14,8 +14,19 @@
  * Note that instance of this class will be used from several threads, and
  * must therefore be thread-safe.
  */
-class QnNetworkProxyFactory: public QObject, public QNetworkProxyFactory {
+class QnNetworkProxyFactory
+:
+    public QObject,
+    public QNetworkProxyFactory
+{
 public:
+    enum WhereToPlaceProxyCredentials
+    {
+        noCredentials,
+        placeCredentialsToUrl,
+        placeCredentialsToHttpMessage
+    };
+
     QnNetworkProxyFactory();
     virtual ~QnNetworkProxyFactory();
 
@@ -36,11 +47,20 @@ public:
     */
     void bindHostToResource(
         const QString& targetHost,
-        QnResourcePtr resource );
+        const QnResourcePtr& resource );
     //!Removes proxy added by \a QnNetworkProxyFactory::addToProxyList or \a QnNetworkProxyFactory::bindHostToResource
     void removeFromProxyList( const QString& targetHost );
-
     void clearProxyList();
+
+    //!
+    /*!
+        Can modify host, port in \a requestUrl. If proxying is used, can add prefix to \a url's path and add some parameter to query
+        \note \a requestUrl MUST have valid host, port, path, user password. These can be changed if and only if proxying is required
+    */
+    bool fillUrlWithRouteToResource(
+        const QnResourcePtr& targetResource,
+        QUrl* const requestUrl,
+        WhereToPlaceProxyCredentials credentialsBehavour );
 
     static QnNetworkProxyFactory* instance();
 
@@ -50,6 +70,8 @@ protected:
 private:
     QMutex m_mutex;
     QMap<QString, QNetworkProxy> m_proxyInfo;
+
+    QNetworkProxy getProxyToResource( const QnResourcePtr& resource );
 };
 
 #endif

@@ -80,7 +80,7 @@ QnBusiness::ActionType QnBusinessEventRule::actionType() const {
 
 void QnBusinessEventRule::setActionType(QnBusiness::ActionType actionType) {
     m_actionType = actionType;
-    //TODO: #GDM fill action params with default values? filter action resources?
+    //TODO: #GDM #Business fill action params with default values? filter action resources?
 }
 
 QVector<QnId> QnBusinessEventRule::actionResources() const {
@@ -175,8 +175,9 @@ bool QnBusinessEventRule::isScheduleMatchTime(const QDateTime& datetime) const
     return rez;
 }
 
-QnBusinessEventRule::QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType,
-                                         QnResourcePtr actionRes)
+QnBusinessEventRule::QnBusinessEventRule(
+    int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, 
+    QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, const QnResourcePtr& actionRes)
 {
     m_disabled = false;
     m_eventState = QnBusiness::UndefinedState;

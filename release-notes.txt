@@ -1,3 +1,38 @@
+----------------------------------------------2.2.1.xxxx-------------------------------------------
+
+Improvements:
+1. Onvif protocol support is improved
+2. Web client works better in Internet Explorer 9+
+3. If screenshots are taken from a remote camera, then it can take a long to download it. Added progress bar to allow users to estimate time.
+4. Default motion sensitivity changed from 6 to 5.
+
+Bugs Fixed:
+1. Fixed the installation error on Windows 8 and Windows Server 2008
+2. Incorrect motion detection. Fixed.
+3. Sometimes thumbnails could not be loaded on Android devices. Fixed
+4. Better motion support for non-onvif cameras that are integrated through SDK.
+5. If new drive is mounted after mediaserver started it will stop recording after being filled. Fixed.
+6. Client crash during media folder check under some rare conditions. Fixed.
+7. Update Feed url was broken. Fixed.
+
+2.2.1.xxxx - Additional for Vista
+Improvements:
+1. Removed all screenshots with  HD Witness in Help.
+2. Added ONVIF presets for VK2-1080PTZ and V2-Encoder.
+3. Disabled presets for VK2-720VZMI and VK2-720VZMX.
+4. Added focus for  VK2-600PTZ and VK2-Encoder.
+
+
+2.2.1.xxxx - Additional for DW
+Improvements:
+5. Better PTZ support for DW cameras:
+DWC-MB721M4TIR - Zoom/Focus is not supported, but displayed. Now we do not display PTZ controls at all
+DWC-MB421TIR - PTZ Move is not supported, but displayed (only zoom supported). Now we display only zoom controls.
+DWC-MB950TIR & DWC-MV950TIR - neither PTZ move nor Zoom are supported, but displayed (on the web page zoom/focus is displayed but doesn't work as well). Now we do not display PTZ controls at all
+DWC-MPTZ20XFM - advanced PTZ (point and rectangle) did not work. Now advanced PTZ works well.
+CP04 Encoder - Added ONVIF presets
+
+
 ----------------------------------------------2.2.0.xxxx-------------------------------------------
 
 Features:

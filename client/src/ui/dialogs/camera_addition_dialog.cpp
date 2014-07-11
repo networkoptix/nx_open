@@ -515,7 +515,7 @@ void QnCameraAdditionDialog::at_header_checkStateChanged(Qt::CheckState state) {
 
 void QnCameraAdditionDialog::at_closeButton_clicked() {
     if (m_state == Searching && m_processUuid.isNull()) {
-        return; //TODO: #GDM do something
+        return; //TODO: #GDM #CameraAddition do something
     }
 
     if (m_state == Searching )
@@ -578,7 +578,7 @@ void QnCameraAdditionDialog::at_stopScanButton_clicked() {
 
     // init stage, cannot stop the process
     if (m_processUuid.isNull())
-        return; //TODO: #GDM do something
+        return; //TODO: #GDM #CameraAddition do something
 
     m_server->apiConnection()->searchCameraAsyncStop(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
     ui->progressBar->setFormat(tr("Finishing search..."));

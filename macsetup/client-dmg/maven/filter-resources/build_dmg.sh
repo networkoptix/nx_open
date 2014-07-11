@@ -4,7 +4,7 @@ SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${product.name} ${release.version}"
 DMG_FILE="${project.build.finalName}.dmg"
-HELP=${environment.dir}/help/${release.version}/${customization}
+HELP=${ClientHelpSourceDir}
 
 AS_SRC=app-store
 PKG_FILE="${project.build.finalName}.pkg"

@@ -21,6 +21,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/toggle.h>
+#include <utils/common/log.h>
 #include <utils/math/color_transformations.h>
 #include <utils/resource_property_adaptors.h>
 

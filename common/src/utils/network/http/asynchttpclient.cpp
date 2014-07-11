@@ -436,6 +436,11 @@ namespace nx_http
         m_responseReadTimeoutMs = _responseReadTimeoutMs;
     }
 
+    void AsyncHttpClient::setDecodeChunkedMessageBody( bool val )
+    {
+        m_httpStreamReader.setDecodeChunkedMessageBody( val );
+    }
+
     void AsyncHttpClient::resetDataBeforeNewRequest()
     {
         //stopping client, if it is running
@@ -504,7 +509,7 @@ namespace nx_http
         int bytesRead = m_socket->recv( m_responseBuffer.data(), m_responseBuffer.size(), 0 );
         if( bytesRead < 0 )         //read error
         {
-            if( SystemError::getLastOSErrorCode() == SystemError::wouldBlock )
+            if( SystemError::getLastOSErrorCode() == SystemError::wouldBlock || SystemError::getLastOSErrorCode() == SystemError::again )
                 return 0;
             NX_LOG( lit("AsyncHttpClient. Error reading socket (%1). Url %2").
                 arg(SystemError::getLastOSErrorText()).arg(m_url.toString()), cl_logERROR );
@@ -564,10 +569,11 @@ namespace nx_http
         //adding user credentials
         if( !m_userName.isEmpty() || !m_userPassword.isEmpty() )
         {
-            m_request.headers.erase( Header::Authorization::NAME );
-            m_request.headers.insert( std::make_pair(
-                Header::Authorization::NAME,
-                Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
+            nx_http::insertOrReplaceHeader(
+                &m_request.headers,
+                nx_http::HttpHeader(
+                    Header::Authorization::NAME,
+                    Header::BasicAuthorization( m_userName.toLatin1(), m_userPassword.toLatin1() ).toString() ) );
         }
     }
 
@@ -587,8 +593,12 @@ namespace nx_http
     {
         Q_ASSERT( (int)m_requestBytesSent < m_requestBuffer.size() );
         int bytesSent = m_socket->send( m_requestBuffer.data()+m_requestBytesSent, m_requestBuffer.size()-m_requestBytesSent );
-        if( (bytesSent == -1) && (SystemError::getLastOSErrorCode() != SystemError::wouldBlock) )
+        if( (bytesSent == -1)
+            && (SystemError::getLastOSErrorCode() != SystemError::wouldBlock)
+            && (SystemError::getLastOSErrorCode() != SystemError::again) )
+        {
             return false;
+        }
         m_requestBytesSent += bytesSent;    //TODO it would be very usefull to use buffer with effective pop_front()
         return true;
     }
@@ -755,8 +765,10 @@ namespace nx_http
 
         BufferType authorizationStr;
         digestAuthorizationHeader.serialize( &authorizationStr );
-        m_request.headers.erase( Header::Authorization::NAME );
-        m_request.headers.insert( make_pair(Header::Authorization::NAME, authorizationStr) );
+
+        nx_http::insertOrReplaceHeader(
+            &m_request.headers,
+            nx_http::HttpHeader( Header::Authorization::NAME, authorizationStr ) );
 
         m_authorizationTried = true;
         return initiateHttpMessageDelivery( m_url );

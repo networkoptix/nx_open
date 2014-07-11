@@ -24,7 +24,9 @@
 #include "api_user_data.h"
 #include "api_videowall_data.h"
 #include "api_update_data.h"
-#include "api_help_data.h"
+#include "api_peer_data.h"
+#include "api_runtime_data.h"
+#include "api_time_data.h"
 
 /* Some fields are not meant to be bound or fetched. */
 template<class T, class Allocator>
@@ -35,7 +37,9 @@ template<class Key, class T>
 inline void serialize_field(const QMap<Key, T> &, QVariant *) { return; }
 template<class T>
 inline void serialize_field(const QList<T> &, QVariant *) { return; }
-inline void serialize_field(const ec2::ApiServerInfoData &, QVariant *) { return; }
+
+inline void serialize_field(const ec2::ApiPeerData &, QVariant *) { return; }
+inline void serialize_field(const ec2::ApiRuntimeData &, QVariant *) { return; }
 
 template<class T, class Allocator>
 inline void deserialize_field(const QVariant &, std::vector<T, Allocator> *) { return; }
@@ -45,12 +49,13 @@ template<class Key, class T>
 inline void deserialize_field(const QVariant &, QMap<Key, T> *) { return; }
 template<class T>
 inline void deserialize_field(const QVariant &, QList<T> *) { return; }
-inline void deserialize_field(const QVariant &, ec2::ApiServerInfoData *) { return; }
 
+inline void deserialize_field(const QVariant &, ec2::ApiPeerData *) { return; }
+inline void deserialize_field(const QVariant &, ec2::ApiRuntimeData *) { return; }
 
 namespace ec2 {
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_EC2_API_DATA_TYPES, (xml)(binary)(json)(sql_record)(csv_record), _Fields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_EC2_API_DATA_TYPES, (ubj)(xml)(binary)(json)(sql_record)(csv_record), _Fields)
 
 } // namespace ec2
 

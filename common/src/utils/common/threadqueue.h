@@ -2,10 +2,12 @@
 #define cl_ThreadQueue_h_2236 
 
 #include <vector>
+
 #include <QtCore/QQueue>
 #include <QtCore/QVariant>
+#include <QtCore/QMutex>
+#include <QtCore/QMutexLocker>
 
-#include "log.h"
 #include "semaphore.h"
 
 static const qint32 MAX_THREAD_QUEUE_SIZE = 256;
@@ -96,7 +98,7 @@ public:
 
         if (m_bufferLen > 0)
         {
-            val = m_buffer[m_headIndex]; //m_queue.dequeue();
+            val = std::move(m_buffer[m_headIndex]); //m_queue.dequeue();
             m_buffer[m_headIndex] = T();
             m_headIndex++;
             if ((uint)m_headIndex >= m_buffer.size())

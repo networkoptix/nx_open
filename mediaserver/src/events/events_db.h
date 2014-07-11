@@ -16,7 +16,7 @@ class QnEventsDB: public QnDbHelper
 {
 public:
     void setEventLogPeriod(qint64 periodUsec);
-    bool saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePtr actionRes);
+    bool saveActionToDB(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& actionRes);
     bool removeLogForRes(QnId resId);
 
     QList<QnAbstractBusinessActionPtr> getActions(

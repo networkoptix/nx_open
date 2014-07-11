@@ -26,6 +26,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <QtCore/QFile>
+#include <utils/network/nettools.h>
+
+
 DiscoveryManager::DiscoveryManager()
 :
     m_refManager( IsdNativePlugin::instance()->refManager() )
@@ -57,51 +61,71 @@ unsigned int DiscoveryManager::releaseRef()
     return m_refManager.releaseRef();
 }
 
-static const char* VENDOR_NAME = "ISD_NATIVE";
+static const char* VENDOR_NAME = "ISD_EDGE";
 
 void DiscoveryManager::getVendorName( char* buf ) const
 {
     strcpy( buf, VENDOR_NAME );
 }
 
-#ifndef WIN32
-void mac_eth0(char  MAC_str[13], char** host)
-{
-    #define HWADDR_len 6
-    int s,i;
-    struct ifreq ifr;
-    s = socket(AF_INET, SOCK_DGRAM, 0);
-    strcpy(ifr.ifr_name, "eth0");
-    if (ioctl(s, SIOCGIFHWADDR, &ifr) != -1) {
-        for (i=0; i<HWADDR_len; i++)
-            sprintf(&MAC_str[i*2],"%02X",((unsigned char*)ifr.ifr_hwaddr.sa_data)[i]);
-    }
-    if((ioctl(s, SIOCGIFADDR, &ifr)) != -1) {
-        const sockaddr_in* ip = (sockaddr_in*) &ifr.ifr_addr;
-        *host = inet_ntoa(ip->sin_addr);
-    }
-    close(s);
-}
-#endif
-
 int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*localInterfaceIPAddr*/ )
 {
     //const char* mac = "543959ab129a";
-    char  mac[13];
-    memset(mac, 0, sizeof(mac));
+    char  mac[MAC_ADDR_LEN];
     char* host = 0;
-#ifndef WIN32
-    mac_eth0(mac, &host);
-#endif
-    const char* modelName = "ISD-xxx";
-    const char* firmware = "1.0.0"; // todo: implement me!
+    getMacFromPrimaryIF(mac, &host);
+
+    if( m_modelName.isEmpty() )
+    {
+        m_modelName = "ISD-xxx";
+        QFile hwconfigFile( "/etc/isd/factory/hwconfig.txt" );
+        if( hwconfigFile.open( QIODevice::ReadOnly ) )
+        {
+            const QByteArray& isdParamsStr = hwconfigFile.readAll();
+            const QList<QByteArray>& isdParams = isdParamsStr.split('\n');
+            for( QByteArray isdParamStr: isdParams )
+            {
+                const QList<QByteArray>& paramTokens = isdParamStr.split( '=' );
+                if( paramTokens.size() < 2 )
+                    continue;
+                if( paramTokens[0] == "model" )
+                {
+                    m_modelName = paramTokens[1];
+                    break;
+                }
+            }
+        }
+    }
+
+    if( m_firmwareVersion.isEmpty() )
+    {
+        m_firmwareVersion = "unknown";
+        QFile versionFile( "/webSvr/web/version.html" );
+        if( versionFile.open( QIODevice::ReadOnly ) )
+        {
+            const QByteArray& isdParamsStr = versionFile.readAll();
+            const QList<QByteArray>& isdParams = isdParamsStr.split('\n');
+            for( QByteArray isdParamStr: isdParams )
+            {
+                if( !isdParamStr.startsWith( "Version:" ) )
+                    continue;
+
+                const QList<QByteArray>& paramTokens = isdParamStr.split( ':' );
+                if( paramTokens.size() < 2 )
+                    continue;
+                m_firmwareVersion = paramTokens[1].trimmed();
+                break;
+            }
+        }
+    }
+
     const char* loginToUse = "root";
     const char* passwordToUse = "admin";
 
     memset( cameras, 0, sizeof(*cameras) );
     strncpy( cameras->uid, mac, sizeof(cameras->uid)-1 );
-    strncpy( cameras->modelName, modelName, sizeof(cameras->modelName)-1 );
-    strncpy( cameras->firmware, firmware, sizeof(cameras->firmware)-1 );
+    strncpy( cameras->modelName, m_modelName.constData(), sizeof(cameras->modelName)-1 );
+    strncpy( cameras->firmware, m_firmwareVersion.constData(), sizeof(cameras->firmware)-1 );
     if (host)
         strncpy( cameras->url, host, sizeof(cameras->url)-1 );
     strcpy( cameras->defaultLogin, loginToUse );
@@ -110,7 +134,7 @@ int DiscoveryManager::findCameras( nxcip::CameraInfo* cameras, const char* /*loc
     return 1;
 }
 
-int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, const char* address, const char* /*login*/, const char* /*password*/ )
+int DiscoveryManager::checkHostAddress( nxcip::CameraInfo* /*cameras*/, const char* /*address*/, const char* /*login*/, const char* /*password*/ )
 {
     return nxcip::NX_NO_ERROR;
 }

@@ -4,6 +4,10 @@
 
 #include "h264_mp4_to_annexb.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include "core/datapacket/video_data_packet.h"
+
 
 H264Mp4ToAnnexB::H264Mp4ToAnnexB( const AbstractOnDemandDataProviderPtr& dataSource )
 :
@@ -15,18 +19,19 @@ H264Mp4ToAnnexB::H264Mp4ToAnnexB( const AbstractOnDemandDataProviderPtr& dataSou
 QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* const data )
 {
     static const quint8 START_CODE[] = { 0, 0, 0, 1 };
-    QnAbstractMediaDataPtr srcMediaPacket = data->dynamicCast<QnAbstractMediaData>();
-    if( !srcMediaPacket || srcMediaPacket->compressionType != CODEC_ID_H264 )
+    QnCompressedVideoDataPtr srcVideoPacket = data->dynamicCast<QnCompressedVideoData>();
+    if( !srcVideoPacket || srcVideoPacket->compressionType != CODEC_ID_H264 )
         return *data;
-    if( srcMediaPacket->data.data()[3] == 1 )
+    if( srcVideoPacket->data()[3] == 1 )
         return *data;   //already in annexb format. TODO #ak: format validation is too weak
 
-    //TODO #ak: copying packet
-    QnAbstractMediaDataPtr mediaPacket = srcMediaPacket;
+    //copying packet srcVideoPacket to videoPacket
+    //TODO #ak not good, but with current implementation of buffer we can do nothing better
+    QnWritableCompressedVideoDataPtr videoPacket = QnWritableCompressedVideoDataPtr(static_cast<QnWritableCompressedVideoData*>(srcVideoPacket->clone()));
 
     //replacing NALU size with {0 0 0 1}
-    for( quint8* dataStart = (quint8*)mediaPacket->data.data();
-        dataStart < (quint8*)mediaPacket->data.data() + mediaPacket->data.size();
+    for( quint8* dataStart = (quint8*)videoPacket->m_data.data();
+        dataStart < (quint8*)videoPacket->m_data.data() + videoPacket->m_data.size();
          )
     {
         size_t naluSize = ntohl( *(u_long*)dataStart );
@@ -34,20 +39,20 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
         dataStart += sizeof(START_CODE) + naluSize;
     }
 
-    if( m_isFirstPacket && isH264SeqHeaderInExtraData( mediaPacket ) )
+    if( m_isFirstPacket && isH264SeqHeaderInExtraData( videoPacket ) )
     {
-        m_newContext = QnMediaContextPtr( new QnMediaContext(mediaPacket->context->ctx()) );
+        m_newContext = QnMediaContextPtr( new QnMediaContext(videoPacket->context->ctx()) );
 
         //reading sequence header from extradata
         std::basic_string<quint8> seqHeader;
-        readH264SeqHeaderFromExtraData( mediaPacket, &seqHeader );
+        readH264SeqHeaderFromExtraData( videoPacket, &seqHeader );
         if( seqHeader.size() > 0 )
         {
-            QnByteArray mediaDataWithSeqHeader( FF_INPUT_BUFFER_PADDING_SIZE, seqHeader.size() + mediaPacket->data.size() );
-            mediaDataWithSeqHeader.resize( seqHeader.size() + mediaPacket->data.size() );
+            QnByteArray mediaDataWithSeqHeader( FF_INPUT_BUFFER_PADDING_SIZE, seqHeader.size() + videoPacket->dataSize() );
+            mediaDataWithSeqHeader.resize( seqHeader.size() + videoPacket->dataSize() );
             memcpy( mediaDataWithSeqHeader.data(), seqHeader.data(), seqHeader.size() );
-            memcpy( mediaDataWithSeqHeader.data() + seqHeader.size(), mediaPacket->data.data(), mediaPacket->data.size() );
-            mediaPacket->data = mediaDataWithSeqHeader;
+            memcpy( mediaDataWithSeqHeader.data() + seqHeader.size(), videoPacket->data(), videoPacket->dataSize() );
+            videoPacket->m_data = mediaDataWithSeqHeader;
             m_isFirstPacket = false;
 
             //TODO #ak: monitor sequence header change
@@ -56,9 +61,9 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
         m_newContext->ctx()->extradata_size = 0;
     }
 
-    mediaPacket->context = m_newContext;
+    videoPacket->context = m_newContext;
 
-    return mediaPacket;
+    return videoPacket;
 }
 
 //dishonorably stolen from libavcodec source
@@ -69,13 +74,13 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
 #endif
 static const quint8 H264_START_CODE[] = { 0, 0, 0, 1 };
 
-bool H264Mp4ToAnnexB::isH264SeqHeaderInExtraData( const QnAbstractMediaDataPtr data ) const
+bool H264Mp4ToAnnexB::isH264SeqHeaderInExtraData( const QnAbstractMediaDataPtr& data ) const
 {
     return data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1;
 }
 
 void H264Mp4ToAnnexB::readH264SeqHeaderFromExtraData(
-    const QnAbstractMediaDataPtr data,
+    const QnAbstractMediaDataPtr& data,
     std::basic_string<quint8>* const seqHeader )
 {
     const unsigned char* p = data->context->ctx()->extradata;
@@ -118,3 +123,5 @@ void H264Mp4ToAnnexB::readH264SeqHeaderFromExtraData(
         p += nalsize;
     }
 }
+
+#endif // ENABLE_DATA_PROVIDERS

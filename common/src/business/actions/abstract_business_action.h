@@ -2,6 +2,7 @@
 #define __ABSTRACT_BUSINESS_ACTION_H_
 
 #include <QtCore/QSharedPointer>
+#include <QtCore/QVector>
 
 #include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>
@@ -12,7 +13,7 @@
 
 namespace QnBusiness
 {
-    //TODO: #GDM fix to resourceTypeRequired: None, Camera, Server, User, etc
+    //TODO: #GDM #Business fix to resourceTypeRequired: None, Camera, Server, User, etc
     bool requiresCameraResource(ActionType actionType);
     bool requiresUserResource(ActionType actionType);
 

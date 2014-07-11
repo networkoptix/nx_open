@@ -547,9 +547,9 @@ QStackedLayout* CameraSettingsWidgetsTreeCreator::getRootLayout()
 }
 
 #ifdef QT_WEBKITWIDGETS_LIB
-QWebView** CameraSettingsWidgetsTreeCreator::getWebView()
+QWebView* CameraSettingsWidgetsTreeCreator::getWebView()
 {
-    return &m_webView;
+    return m_webView;
 }
 #endif
 

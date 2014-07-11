@@ -26,7 +26,7 @@ public:
         QualityParam,
         RecordTypeParam,
         DiffersFlagParam,
-        ParamType_Count // TODO: #Elric #enum
+        ParamCount
     };
 
     void setDefaultParam(ParamType number, const QVariant& value);
@@ -71,7 +71,7 @@ protected:
     virtual void resizeEvent(QResizeEvent *event) override;
 
 private:
-    typedef QVariant CellParams[ParamType_Count];
+    typedef QVariant CellParams[ParamCount];
 
     void setCellValueInternal(const QPoint &cell, const CellParams &value);
     void setCellValueInternal(const QPoint &cell, ParamType type, const QVariant &value);

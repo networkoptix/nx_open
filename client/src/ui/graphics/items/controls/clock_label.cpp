@@ -24,20 +24,18 @@ QnClockDataProvider::QnClockDataProvider(const QString fixedFormat, QObject *par
         updateFormatString();
     }
 
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
-    m_timer->start(1000);
+    connect(m_timer, &QTimer::timeout, this, [this](){
+        emit timeChanged(QDateTime::currentDateTime().toString(m_formatString));
+    });
+    m_timer->start(100);
 }
 
 QnClockDataProvider::~QnClockDataProvider() {
     return;
 }
 
-void QnClockDataProvider::at_timer_timeout() {
-    emit timeChanged(QDateTime::currentDateTime().toString(m_formatString));
-}
-
 void QnClockDataProvider::updateFormatString() {
-    // TODO: #GDM field values are not updated from settings.
+    // TODO: #GDM #Common field values are not updated from settings.
     // We probably don't need this complexity anyway.
 
     m_formatString = QString();

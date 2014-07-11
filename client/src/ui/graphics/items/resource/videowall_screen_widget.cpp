@@ -139,11 +139,31 @@ void QnVideowallScreenWidget::updateLayout() {
         delete item;
     }
 
+    ReviewButtons state;
+    if (item())
+        state = item()->data(Qn::ItemVideowallReviewButtonsRole).value<ReviewButtons>();
+
+    auto createItem = [this, &state](const QUuid &id) {
+        QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, id, this, m_mainOverlayWidget);
+        itemWidget->setFrameColors(frameColors());
+        if (state.contains(id))
+            itemWidget->setInfoVisible(state[id] > 0);
+
+        connect(itemWidget, &QnVideowallItemWidget::infoVisibleChanged, this, [this, id](bool visible){
+            if (!this->item())
+                return;
+            ReviewButtons state = item()->data(Qn::ItemVideowallReviewButtonsRole).value<ReviewButtons>();
+            state[id] = visible ? 1 : 0;    //TODO: #VW #temporary solution, will be improved if new buttons will be added
+            item()->setData(Qn::ItemVideowallReviewButtonsRole, state);
+        });
+
+        return itemWidget;
+    };
+
     // can have several items on a single screen
     if (m_screens.size() == 1) {
         foreach (const QnVideoWallItem &item, m_items) {
-            QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, item.uuid, this, m_mainOverlayWidget);
-            itemWidget->setFrameColors(frameColors());
+            QnVideowallItemWidget *itemWidget = createItem(item.uuid);
 
             if (item.geometry.left() == m_desktopGeometry.left())
                 m_mainLayout->addAnchor(itemWidget, Qt::AnchorLeft, m_mainLayout, Qt::AnchorLeft);
@@ -167,9 +187,7 @@ void QnVideowallScreenWidget::updateLayout() {
 
         }
     } else if (m_items.size() == 1 ) {    // can have only on item on several screens
-        QnVideowallItemWidget *itemWidget = new QnVideowallItemWidget(m_videowall, m_items.first().uuid, this, m_mainOverlayWidget);
-        itemWidget->setFrameColors(frameColors());
-
+        QnVideowallItemWidget *itemWidget = createItem(m_items.first().uuid);
         m_mainLayout->addAnchors(itemWidget, m_mainLayout, Qt::Horizontal | Qt::Vertical);
     }
 
