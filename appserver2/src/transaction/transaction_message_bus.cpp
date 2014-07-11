@@ -312,7 +312,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             break; // do not return. proxy this transaction
         default:
             // general transaction
-            if (!sender->isReadSync())
+            if (!sender->isReadSync(tran.command))
                 return;
 
             if( tran.persistent && transactionLog && transactionLog->contains(tran) )

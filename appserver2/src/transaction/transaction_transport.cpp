@@ -405,6 +405,11 @@ bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
     return ApiCommand::isSystem(command) ? true : m_writeSync;
 }
 
+bool QnTransactionTransport::isReadSync(ApiCommand::Value command) const {
+    // allow to read system command immediately, without tranSyncRequest
+    return ApiCommand::isSystem(command) ? true : m_readSync;
+}
+
 QString QnTransactionTransport::toString( State state )
 {
     switch( state )
