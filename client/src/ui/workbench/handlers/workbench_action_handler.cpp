@@ -483,8 +483,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
     if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
-        // TODO: #Elric #TR remove first space.
-        QString message = tr(" Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
+        QString message = tr("Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
         int button = QMessageBox::warning(cameraSettingsDialog(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry) {
             cameraSettingsDialog()->ignoreAcceptOnce();
@@ -1734,13 +1733,13 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
         QnTimePeriodList localPeriods = periods.intersected(period);
 
-        qint64 startDelta = periods.first().startTimeMs - period.startTimeMs;
+        qint64 startDelta = localPeriods.first().startTimeMs - period.startTimeMs;
         if (startDelta > 0) { //user selected period before the first chunk
             period.startTimeMs += startDelta;
             period.durationMs -= startDelta;
         }
 
-        qint64 endDelta = period.endTimeMs() - periods.last().endTimeMs();
+        qint64 endDelta = period.endTimeMs() - localPeriods.last().endTimeMs();
         if (endDelta > 0) { // user selected period after the last chunk
             period.durationMs -= endDelta;
         }       
@@ -2988,9 +2987,9 @@ void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
     QMessageBox::warning(mainWindow(),
-                         tr("Beta version"),
+                         tr("Beta version %1").arg(lit(QN_APPLICATION_VERSION)),
                          tr("You are running beta version of %1.")
-                         .arg(QLatin1String(QN_APPLICATION_NAME)));
+                         .arg(lit(QN_APPLICATION_NAME)));
 }
 
 void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {

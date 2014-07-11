@@ -368,7 +368,7 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
     int rv = m_vmux->GetFrame (&frame);
     if (rv) {
         const int errnoBak = errno;
-        if( errnoBak == EINTR || errnoBak == EWOULDBLOCK || errnoBak == EAGAIN )
+        if( errnoBak == EINTR || errnoBak == EWOULDBLOCK || errnoBak == EAGAIN || errnoBak == EINPROGRESS )
             return nxcip::NX_TRY_AGAIN;
         std::cerr << "Can't read video frame. "<<rv<<", errno "<<errnoBak<<std::endl;
         if( m_epollFD != -1 )

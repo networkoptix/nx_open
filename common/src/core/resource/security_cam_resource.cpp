@@ -39,7 +39,9 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_scheduleDisabled(true),
     m_audioEnabled(false),
     m_advancedWorking(false),
-    m_manuallyAdded(false)
+    m_manuallyAdded(false),
+    m_minDays(0),
+    m_maxDays(0)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionMaskList << QnMotionRegion();
@@ -84,7 +86,8 @@ QnResourcePtr QnSecurityCamResource::toResourcePtr() {
 QnSecurityCamResource::~QnSecurityCamResource() {
 }
 
-void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
+void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) 
+{
     QnNetworkResource::updateInner(other, modifiedFields);
     QnMediaResource::updateInner(other, modifiedFields);
 
@@ -117,6 +120,8 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_manuallyAdded = other_casted->m_manuallyAdded;
         m_model = other_casted->m_model;
         m_vendor = other_casted->m_vendor;
+        m_minDays = other_casted->m_minDays;
+        m_maxDays = other_casted->m_maxDays;
     }
 }
 
@@ -539,6 +544,26 @@ QString QnSecurityCamResource::getVendor() const {
 
 void QnSecurityCamResource::setVendor(const QString& value) {
     SAFE(m_vendor = value)
+}
+
+void QnSecurityCamResource::setMaxDays(int value)
+{
+    SAFE(m_maxDays = value)
+}
+
+int QnSecurityCamResource::maxDays() const
+{
+    SAFE(return m_maxDays);
+}
+
+void QnSecurityCamResource::setMinDays(int value)
+{
+    SAFE(m_minDays = value)
+}
+
+int QnSecurityCamResource::minDays() const
+{
+    SAFE(return m_minDays);
 }
 
 void QnSecurityCamResource::setScheduleDisabled(bool value) {
