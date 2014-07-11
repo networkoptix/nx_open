@@ -484,8 +484,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
     if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
-        // TODO: #Elric #TR remove first space.
-        QString message = tr(" Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
+        QString message = tr("Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
         int button = QMessageBox::warning(cameraSettingsDialog(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry) {
             cameraSettingsDialog()->ignoreAcceptOnce();
@@ -2991,9 +2990,9 @@ void QnWorkbenchActionHandler::at_versionMismatchWatcher_mismatchDataChanged() {
 
 void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered() {
     QMessageBox::warning(mainWindow(),
-                         tr("Beta version"),
+                         tr("Beta version %1").arg(lit(QN_APPLICATION_VERSION)),
                          tr("You are running beta version of %1.")
-                         .arg(QLatin1String(QN_APPLICATION_NAME)));
+                         .arg(lit(QN_APPLICATION_NAME)));
 }
 
 void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
