@@ -41,12 +41,20 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->setupUi(this);
 
     QList<QnLicenseListModel::Column> columns;
-    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn << QnLicenseListModel::ExpirationDateColumn << QnLicenseListModel::LicenseStatusColumn;
+    columns 
+        << QnLicenseListModel::TypeColumn 
+        << QnLicenseListModel::CameraCountColumn 
+        << QnLicenseListModel::LicenseKeyColumn 
+        << QnLicenseListModel::ExpirationDateColumn
+        << QnLicenseListModel::LicenseStatusColumn
+        ;
 
     m_model = new QnLicenseListModel(this);
     m_model->setColumns(columns);
+
     ui->gridLicenses->setModel(m_model);
     ui->gridLicenses->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     setHelpTopic(this, Qn::SystemSettings_Licenses_Help);
 
