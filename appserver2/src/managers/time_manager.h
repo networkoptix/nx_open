@@ -17,6 +17,7 @@
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_peer_system_time_data.h>
 #include <utils/common/id.h>
+#include <utils/network/daytime_nist_fetcher.h>
 #include <utils/network/http/httptypes.h>
 
 #include "nx_ec/data/api_data.h"
@@ -158,6 +159,8 @@ namespace ec2
             }
         };
 
+        //!Delta (millis) from \a m_monotonicClock to local time, synchronized with internet
+        qint64 m_localSystemTimeDelta;
         //!Delta (millis) from \a m_monotonicClock to synchronized time. That is, sync_time = m_monotonicClock.elapsed + delta
         qint64 m_timeDelta;
         //!Using monotonic clock to be proof to local system time change
@@ -169,12 +172,16 @@ namespace ec2
         mutable QMutex m_mutex;
         TimeSyncInfo m_usedTimeSyncInfo;
         quint64 m_broadcastSysTimeTaskID;
+        quint64 m_internetSynchronizationTaskID;
         quint64 m_manualTimerServerSelectionCheckTaskID;
         bool m_terminated;
         std::map<QnId, TimeSyncInfo> m_systemTimeByPeer;
-        Qn::PeerType m_peerType;
+        const Qn::PeerType m_peerType;
+        DaytimeNISTFetcher m_timeSynchronizer;
+        size_t m_internetTimeSynchronizationPeriod;
 
         /*!
+            \param lock Locked \a m_mutex. This method will unlock it to emit \a TimeSynchronizationManager::timeChanged signal
             \param remotePeerID
             \param localMonotonicClock value of local monotonic clock (received with \a TimeSynchronizationManager::monotonicClockValue)
             \param remotePeerSyncTime remote peer time (millis, UTC from epoch) corresponding to local clock (\a localClock)
@@ -183,16 +190,20 @@ namespace ec2
                 - low DWORD - some random number
         */
         void remotePeerTimeSyncUpdate(
+            QMutexLocker* const lock,
             const QnId& remotePeerID,
             qint64 localMonotonicClock,
             qint64 remotePeerSyncTime,
             const TimePriorityKey& remotePeerTimePriorityKey );
-        //!Periodically synchronizing time with internet (if possible)
-        void syncTimeWithExternalSource();
         void onBeforeSendingHttpChunk( QnTransactionTransport* transport, std::vector<nx_http::ChunkExtension>* const extensions );
         void onRecevingHttpChunkExtensions( QnTransactionTransport* transport, const std::vector<nx_http::ChunkExtension>& extensions );
         void broadcastLocalSystemTime( quint64 taskID );
         void checkIfManualTimeServerSelectionIsRequired( quint64 taskID );
+        //!Periodically synchronizing time with internet (if possible)
+        void syncTimeWithInternet( quint64 taskID );
+        void onTimeFetchingDone( qint64 millisFromEpoch, SystemError::ErrorCode errorCode );
+        //!Returns time received from the internet or current local system time
+        qint64 currentMSecsSinceEpoch() const;
 
     private slots:
         void onNewConnectionEstablished( const QnTransactionTransportPtr& transport );

@@ -95,7 +95,7 @@ namespace ec2
         case ApiCommand::removeVideowall:
             return m_videowallManager->triggerNotification( tran );
         case ApiCommand::forcePrimaryTimeServer:
-            //return m_ecConnection->triggerNotification( tran );
+            //#ak no notification needed
             break;
         default:
             assert( false );
@@ -209,6 +209,6 @@ namespace ec2
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiPeerSystemTimeData>& /*tran*/ ) {
-        //TOOD #ak
+        //#ak no notification needed in this case
     }
 }
