@@ -585,7 +585,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated)
         if (!execSQLFile(lit(":/07_refactor_firmware.sql"), m_sdb))
             return false;
 
-        if (!execSQLFile(lit(":/08_min_max_archive.sql")))
+        if (!execSQLFile(lit(":/08_min_max_archive.sql"), m_sdb))
             return false;
     }
 
