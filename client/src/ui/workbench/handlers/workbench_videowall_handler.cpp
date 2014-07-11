@@ -1634,6 +1634,9 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
         connect(videoWall, &QnVideoWallResource::itemAdded,     this, &QnWorkbenchVideoWallHandler::at_videoWall_itemAdded);
         connect(videoWall, &QnVideoWallResource::itemChanged,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged);
         connect(videoWall, &QnVideoWallResource::itemRemoved,   this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved);
+
+        foreach (const QnVideoWallItem &item, videoWall->items()->getItems())
+            at_videoWall_itemAdded(videoWall, item);
     }
 }
 
@@ -1695,6 +1698,17 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved(const QnVideoWallResour
 }
 
 void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResourcePtr &videoWall, const QnVideoWallItem &item) {
+
+    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems()) {
+        if (info.data.videoWallInstanceGuid != item.uuid)
+            continue;
+       
+        QnVideoWallItem updatedItem(item);
+        updatedItem.online = true;
+        videoWall->items()->updateItem(item.uuid, updatedItem);
+        break;
+    }
+
     QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(videoWall);
     if (!layout)
         return;
