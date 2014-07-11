@@ -432,7 +432,7 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
     m_chunkHeaderLen = 0;
 
     const quint8* buffer = (const quint8*) data.constData();
-    int bufferLen = data.size();
+    size_t bufferLen = (size_t)data.size();
     nx_http::ChunkHeader httpChunkHeader;
     m_chunkHeaderLen = readChunkHeader(buffer, bufferLen, &httpChunkHeader);
     m_chunkLen = httpChunkHeader.chunkSize;
@@ -440,7 +440,7 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
     {
         processChunkExtensions( httpChunkHeader );
 
-        const int fullChunkLen = m_chunkHeaderLen + m_chunkLen + sizeof("\r\n")-1;
+        const size_t fullChunkLen = m_chunkHeaderLen + m_chunkLen + sizeof("\r\n")-1;
         if (bufferLen >= fullChunkLen)
         {
             QByteArray serializedTran;

@@ -131,7 +131,7 @@ void DaytimeNISTFetcher::eventTriggered( AbstractSocket* sock, aio::EventType ev
                 const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
                 if( errorCode == SystemError::wouldBlock || errorCode == SystemError::again )
                     return; //waiting for more data
-                m_handlerFunc( -1, SystemError::timedOut );
+                m_handlerFunc( -1, errorCode );
                 break;
             }
 

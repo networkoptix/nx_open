@@ -338,8 +338,9 @@ namespace ec2
                     std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
                     0 );
             }
+            const qint64 curTime = m_monotonicClock.elapsed() + m_timeDelta;
             lock->unlock();
-            emit timeChanged( m_monotonicClock.elapsed() + m_timeDelta );
+            emit timeChanged( curTime );
             lock->relock();
         }
     }
