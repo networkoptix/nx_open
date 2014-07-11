@@ -63,6 +63,7 @@
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/search_line_edit.h>
+#include <ui/widgets/main_window.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/workaround/qtbug_workaround.h>
@@ -363,6 +364,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(display(),                  &QnWorkbenchDisplay::viewportUngrabbed,     this,           &QnWorkbenchUi::enableProxyUpdates);
     connect(display(),                  &QnWorkbenchDisplay::widgetChanged,         this,           &QnWorkbenchUi::at_display_widgetChanged);
 
+    display()->view()->addAction(action(Qn::DisableBackgroundAnimationAction));
+    connect(action(Qn::DisableBackgroundAnimationAction),&QAction::triggered,       this,           &QnWorkbenchUi::at_disableBackgroundAnimationAction_triggered);
     /* Init fields. */
     m_pinOffset = (24 - QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL)) / 2.0;
 
@@ -2472,3 +2475,12 @@ void QnWorkbenchUi::createFpsWidget() {
 }
 
 #pragma endregion Fps widget methods
+
+void QnWorkbenchUi::at_disableBackgroundAnimationAction_triggered() {
+    QnMainWindow* mainWindow = checked_cast<QnMainWindow*>( context()->mainWindow() );
+    // Ivanov advice me that mainWindow may be NULL pointer for context()->mainWindow() may
+    // return NULL pointer. It is possible , so I add a NULL pointer check branch here
+    if( mainWindow == NULL ) 
+        return;
+    mainWindow->flipBackgroundAnimation();
+}
