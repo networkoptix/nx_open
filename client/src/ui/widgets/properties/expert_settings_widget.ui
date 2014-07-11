@@ -249,11 +249,6 @@
           <widget class="QComboBox" name="comboBoxTransport">
            <item>
             <property name="text">
-             <string>Don't change</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
              <string>Auto</string>
             </property>
            </item>
@@ -357,6 +352,7 @@
   </layout>
  </widget>
  <resources>
+  <include location="../../../../x64/build/client.qrc"/>
   <include location="../../../../x64/build/client.qrc"/>
   <include location="../../../../x64/build/client.qrc"/>
   <include location="../../../../x64/build/client.qrc"/>
