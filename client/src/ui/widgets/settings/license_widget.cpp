@@ -37,11 +37,10 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     ui->serialKeyEdit->setFocus();
     ui->activateFreeLicenseButton->setText(qnProductFeatures().freeLicenseIsTrial ? tr("Activate Trial License") : tr("Activate Free License"));
 
-    ui->manualActivationTextEdit->setHtml(tr(
+    ui->manualActivationTextWidget->label()->setText(tr(
          "Please send E-Mail with the Serial Key and the Hardware ID provided to <a href=\"mailto:%1\">%1</a>. "
          "Then we'll send you an Activation Key which should be filled in the field below."
      ).arg(QLatin1String(QN_LICENSING_MAIL_ADDRESS))); // TODO: #Elric move to product features?
-    setPaletteColor(ui->manualActivationTextEdit, QPalette::Base, Qt::transparent);
 
     connect(ui->serialKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
@@ -138,7 +137,7 @@ void QnLicenseWidget::changeEvent(QEvent *event) {
 void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
     bool isOnline = this->isOnline();
 
-    ui->manualActivationTextEdit->setVisible(!isOnline);
+    ui->manualActivationTextWidget->setVisible(!isOnline);
     ui->hardwareIdLabel->setVisible(!isOnline);
     ui->hardwareIdEdit->setVisible(!isOnline);
     ui->activationKeyLabel->setVisible(!isOnline);
