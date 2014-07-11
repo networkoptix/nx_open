@@ -8,6 +8,7 @@
 #include <ui/widgets/settings/camera_management_widget.h>
 #include <ui/widgets/settings/smtp_settings_widget.h>
 #include <ui/widgets/settings/database_management_widget.h>
+#include <ui/widgets/settings/general_system_administration_widget.h>
 #include <ui/widgets/server_updates_widget.h>
 
 QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
@@ -17,11 +18,10 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    addPage(GeneralPage, new QnGeneralSystemAdministrationWidget(this), tr("General"));
     addPage(LicensesPage, new QnLicenseManagerWidget(this), tr("Licenses"));
     addPage(SmtpPage, new QnSmtpSettingsWidget(this), tr("Email"));
-    addPage(CamerasPage, new QnCameraManagementWidget(this), tr("Cameras"));
     addPage(UpdatesPage, new QnServerUpdatesWidget(this), tr("Updates"));
-    addPage(BackupPage, new QnDatabaseManagementWidget(this), tr("Backup && Restore"));
 
     loadData();
 }

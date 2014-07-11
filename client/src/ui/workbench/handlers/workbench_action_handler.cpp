@@ -1433,6 +1433,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
     QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::GeneralPage);
 }
 
 void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {

@@ -29,6 +29,7 @@ QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
     ui(new Ui::DatabaseManagementWidget())
 {
     ui->setupUi(this);
+    ui->labelWidget->setText(tr("You can create a backup for system configurations that can be restored in case of failure."));
     
     setHelpTopic(this, Qn::SystemSettings_Server_Backup_Help);
 
@@ -47,7 +48,8 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
                                                       tr("Save Database Backup..."),
                                                       qnSettings->lastDatabaseBackupDir(),
                                                       tr("Database Backup Files (*.db)")));
-    fileDialog->exec();
+    if (!fileDialog->exec())
+        return;
 
     QString fileName = fileDialog->selectedFile();
     if(fileName.isEmpty())

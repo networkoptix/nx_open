@@ -25,3 +25,11 @@ QSize QnWordWrappedLabel::sizeHint() const {
 QSize QnWordWrappedLabel::minimumSizeHint() const {
     return sizeHint();
 }
+
+QString QnWordWrappedLabel::text() const {
+    return m_label->text();
+}
+
+void QnWordWrappedLabel::setText(const QString &value) {
+    m_label->setText(value);
+}
