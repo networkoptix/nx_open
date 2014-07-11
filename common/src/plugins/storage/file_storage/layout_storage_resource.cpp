@@ -1,13 +1,16 @@
 #include "layout_storage_resource.h"
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 
-#include "utils/common/util.h"
+#include <utils/common/util.h>
 #include <utils/fs/file.h>
 
 #include <recording/time_period_list.h>
-#include "plugins/resources/archive/filetypesupport.h"
+
+#include <plugins/resource/avi/filetypesupport.h>
 
 
 class QnLayoutFile: public QIODevice
@@ -521,3 +524,5 @@ QString QnLayoutFileStorageResource::layoutPrefix() {
     static QLatin1String prefix("layout://");
     return prefix;
 }
+
+#endif // ENABLE_ARCHIVE

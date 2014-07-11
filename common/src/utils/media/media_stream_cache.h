@@ -9,8 +9,10 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <functional> /* For std::function. */
 
-#include <QMutex>
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QMutex>
 
 #include <core/dataconsumer/abstract_data_receptor.h>
 
@@ -62,6 +64,8 @@ public:
     //!Implementation of QnAbstractDataReceptor::putData
     virtual void putData( const QnAbstractDataPacketPtr& data ) override;
 
+    void clear();
+
     quint64 startTimestamp() const;
     quint64 currentTimestamp() const;
     //!Returns cached data size in micros
@@ -107,6 +111,9 @@ public:
     //!Removed blocking \a blockingID
     void unblockData( int blockingID );
 
+    //!Time (millis) from last usage of this object
+    size_t inactivityPeriod() const;
+
     struct MediaPacketContext
     {
         quint64 timestamp;
@@ -147,6 +154,7 @@ private:
     std::map<int, std::function<void (quint64)> > m_eventReceivers;
     int m_prevGivenEventReceiverID;
     std::map<int, quint64> m_dataBlockings;
+    mutable QElapsedTimer m_inactivityTimer;
 };
 
 #endif  //MEDIASTREAMCACHE_H

@@ -5,6 +5,7 @@
 
 #include "audio_data_packet.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
 
 ////////////////////////////////////////////////////////////
 //// class QnCodecAudioFormat
@@ -109,15 +110,29 @@ QnWritableCompressedAudioData::QnWritableCompressedAudioData(
     unsigned int alignment,
     unsigned int capacity,
     QnMediaContextPtr ctx )
-:
+:   //TODO #ak delegate constructor
     QnCompressedAudioData( ctx ),
     m_data( alignment, capacity )
 {
 }
 
-QnWritableCompressedAudioData* QnWritableCompressedAudioData::clone() const
+QnWritableCompressedAudioData::QnWritableCompressedAudioData(
+    QnAbstractAllocator* allocator,
+    unsigned int alignment,
+    unsigned int capacity,
+    QnMediaContextPtr ctx )
+:
+    QnCompressedAudioData( ctx ),
+    m_data( allocator, alignment, capacity )
 {
-    QnWritableCompressedAudioData* rez = new QnWritableCompressedAudioData(m_data.getAlignment(), m_data.size());
+}
+
+QnWritableCompressedAudioData* QnWritableCompressedAudioData::clone( QnAbstractAllocator* allocator ) const
+{
+    QnWritableCompressedAudioData* rez = new QnWritableCompressedAudioData(
+        allocator,
+        m_data.getAlignment(),
+        m_data.size() );
     rez->assign(this);
     return rez;
 }
@@ -137,3 +152,5 @@ void QnWritableCompressedAudioData::assign( const QnWritableCompressedAudioData*
     QnCompressedAudioData::assign( other );
     m_data = other->m_data;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

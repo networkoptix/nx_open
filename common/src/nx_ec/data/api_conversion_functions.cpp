@@ -148,8 +148,8 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 
     { // test if the camera is desktop camera
-        auto resType = qnResTypePool->getResourceType(src.typeId);
-        if (resType->getName() == lit("SERVER_DESKTOP_CAMERA"))
+        auto resType = qnResTypePool->desktopCameraResourceType();
+        if (resType && resType->getId() == src.typeId)
             dst->addFlags(QnResource::desktop_camera);
     }
 
@@ -186,6 +186,8 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
 
     dst->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams));
     dst->setVendor(src.vendor);
+    dst->setMinDays(src.minArchiveDays);
+    dst->setMaxDays(src.maxArchiveDays);
 }
 
 
@@ -218,6 +220,8 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.statusFlags = src->statusFlags();
     dst.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(src->getDewarpingParams());
     dst.vendor = src->getVendor();
+    dst.minArchiveDays = src->minDays();
+    dst.maxArchiveDays = src->maxDays();
 }
 
 template<class List> 

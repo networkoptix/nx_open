@@ -16,7 +16,7 @@
 #include <plugins/plugin_tools.h>
 #include <utils/network/http/httpclient.h>
 #include <utils/network/http/multipart_content_parser.h>
-#include <utils/memory/nx_allocation_cache.h>
+#include <utils/memory/cyclic_allocator.h>
 
 #include "ilp_video_packet.h"
 
@@ -70,7 +70,7 @@ private:
     bool m_terminated;
     QWaitCondition m_cond;
     QMutex m_mutex;
-    NxBufferCache m_mediaBufferCache;
+    CyclicAllocator m_allocator;
  
     void gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame );
     /*!

@@ -25,6 +25,8 @@
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
 
+#include <common/common_module.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_discovery_manager.h>
@@ -34,8 +36,8 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 
-#include <plugins/resources/archive/archive_stream_reader.h>
-#include <plugins/resources/archive/avi_files/avi_resource.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
+#include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <recording/time_period_list.h>
@@ -142,6 +144,8 @@ namespace {
 
     const int videowallReconnectTimeoutMSec = 5000;
     const int videowallCloseTimeoutMSec = 10000;
+
+    const int maxReconnectTimeout = 10000;
 }
 
 //!time that is given to process to exit. After that, appauncher (if present) will try to terminate it
@@ -192,6 +196,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
     m_delayedDropGuard(false),
+    m_connectingMessageBox(NULL),
     m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
@@ -350,14 +355,6 @@ ec2::AbstractECConnectionPtr QnWorkbenchActionHandler::connection2() const {
     return QnAppServerConnectionFactory::getConnection2();
 }
 
-bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) const {
-    QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-    if(!layoutResource)
-        return false;
-
-    return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
-}
-
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, const AddToLayoutParams &params) const {
 
     if (qnSettings->lightMode() & Qn::LightModeSingleItem) {
@@ -486,8 +483,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
     if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
-        // TODO: #Elric #TR remove first space.
-        QString message = tr(" Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
+        QString message = tr("Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
         int button = QMessageBox::warning(cameraSettingsDialog(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry) {
             cameraSettingsDialog()->ignoreAcceptOnce();
@@ -817,6 +813,24 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
     if (cameraAdditionDialog())
         cameraAdditionDialog()->hide();
     context()->instance<QnAppServerNotificationCache>()->clear();
+
+    menu()->trigger(Qn::ClearCameraSettingsAction);
+
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    resourcePool()->removeResources(remoteResources);
+
+    qnLicensePool->reset();
+
+    if (!qnCommon->remoteGUID().isNull()) {
+        m_connectingMessageBox = QnGraphicsMessageBox::informationTicking(
+            tr("Connection failed. Trying to restore connection... %1"),
+            maxReconnectTimeout);
+        connect(m_connectingMessageBox, &QnGraphicsMessageBox::finished, this, [this]{
+            menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
+            menu()->trigger(Qn::ConnectToServerAction);
+            m_connectingMessageBox = NULL;
+        });
+    }
 }
 
 void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
@@ -824,6 +838,12 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
 
     context()->instance<QnAppServerNotificationCache>()->getFileList();
+
+    if (m_connectingMessageBox != NULL) {
+        m_connectingMessageBox->disconnect(this);
+        m_connectingMessageBox->hideImmideately();
+        m_connectingMessageBox = NULL;
+    }
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -1531,13 +1551,14 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     const QnConnectionData connectionData = qnSettings->lastUsedConnection();
     if (!connectionData.isValid())
         return;
-
-    QnConnectionInfoPtr connectionInfo = parameters.argument<QnConnectionInfoPtr>(Qn::ConnectionInfoRole);
-    if(connectionInfo.isNull()) {
-
-        QnConnectionRequestResult result;
+    
+    QnConnectionInfo connectionInfo;
+    if (parameters.hasArgument(Qn::ConnectionInfoRole)) {   // we have received info from Login Dialog
+        connectionInfo = parameters.argument<QnConnectionInfo>(Qn::ConnectionInfoRole);
+    } else {  // auto-login by previous credentials
+        QnEc2ConnectionRequestResult result;
         QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
-            connectionData.url, &result, &QnConnectionRequestResult::processEc2Reply );
+            connectionData.url, &result, &QnEc2ConnectionRequestResult::processEc2Reply );
 
         QnGraphicsMessageBox* connectingMessageBox = qnSettings->isVideoWallMode()
             ? QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX)
@@ -1557,8 +1578,9 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         }
 
         QnAppServerConnectionFactory::setEc2Connection( result.connection());
-        connectionInfo = result.reply<QnConnectionInfoPtr>();
+        connectionInfo = result.reply<QnConnectionInfo>();
     }
+    QnCommonMessageProcessor::instance()->init(NULL);
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
 
     auto incompatibilityHandler = [this]() {
@@ -1569,14 +1591,14 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     };
 
     { // I think we should move this common code to common place --gdm
-        bool compatibleProduct = qnSettings->isDevMode() || connectionInfo->brand.isEmpty()
-                || connectionInfo->brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
+        bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
+                || connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
         if (!compatibleProduct) {
             incompatibilityHandler();
             return;
         }
 
-        QnCompatibilityChecker remoteChecker(connectionInfo->compatibilityItems);
+        QnCompatibilityChecker remoteChecker(connectionInfo.compatibilityItems);
         QnCompatibilityChecker localChecker(localCompatibilityItems());
         QnCompatibilityChecker* compatibilityChecker;
         if (remoteChecker.size() > localChecker.size()) {
@@ -1585,7 +1607,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
             compatibilityChecker = &localChecker;
         }
 
-        if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo->version)) {
+        if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo.version)) {
             incompatibilityHandler();
             return;
         }
@@ -1593,7 +1615,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
 
     QnSessionManager::instance()->stop();
 
-    QnAppServerConnectionFactory::setCurrentVersion(connectionInfo->version);
+    QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
     QnAppServerConnectionFactory::setDefaultUrl(connectionData.url);
 
     // repopulate the resource pool
@@ -1646,9 +1668,9 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     menu()->trigger(Qn::ClearCameraSettingsAction);
 
-//    QnSessionManager::instance()->stop(); // omfg... logic sucks
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
+    QnSessionManager::instance()->stop();
 
     // Also remove layouts that were just added and have no 'remote' flag set.
     foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
@@ -1662,11 +1684,21 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     qnLicensePool->reset();
 
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
+    QnAppServerConnectionFactory::setEc2Connection( NULL);
+    QnCommonMessageProcessor::instance()->init(NULL);
+
     // TODO: #Elric save workbench state on logout.
+    // TODO: #GDM save workbench state on connectionClosed() =)
 
     notificationsHandler()->clear();
 
     qnSettings->setStoredPassword(QString());
+
+    if (m_connectingMessageBox != NULL) {
+        m_connectingMessageBox->disconnect(this);
+        m_connectingMessageBox->hideImmideately();
+        m_connectingMessageBox = NULL;
+    }
 }
 
 void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
@@ -1676,11 +1708,43 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     if(!resource)
         return;
 
+    bool isSearchLayout = workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+    
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-    if(period.isEmpty())
-        return;
-
     QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
+
+    if (period.isEmpty()) {
+        if (!isSearchLayout)
+            return;
+
+        QnResourceWidget *widget = parameters.widget();
+        if (!widget)
+            return;
+        
+        period = widget->item()->data(Qn::ItemSliderSelectionRole).value<QnTimePeriod>();
+        if (period.isEmpty())
+            return;
+
+        periods = widget->item()->data(Qn::TimePeriodsRole).value<QnTimePeriodList>();
+    }
+
+    /* Adjust for chunks. If they are provided, they MUST intersect with period */
+    if(!periods.isEmpty()) {
+
+        QnTimePeriodList localPeriods = periods.intersected(period);
+
+        qint64 startDelta = localPeriods.first().startTimeMs - period.startTimeMs;
+        if (startDelta > 0) { //user selected period before the first chunk
+            period.startTimeMs += startDelta;
+            period.durationMs -= startDelta;
+        }
+
+        qint64 endDelta = period.endTimeMs() - localPeriods.last().endTimeMs();
+        if (endDelta > 0) { // user selected period after the last chunk
+            period.durationMs -= endDelta;
+        }       
+    }
+
 
     /* List of possible time steps, in milliseconds. */
     const qint64 steps[] = {
@@ -1770,23 +1834,6 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         itemCount = qMin(period.durationMs / step, maxItems);
     }
 
-    /* Adjust for chunks. */
-    if(!periods.isEmpty()) {
-        qint64 startTime = periods[0].startTimeMs;
-
-        while(startTime > period.startTimeMs + step / 2) {
-            period.startTimeMs += step;
-            period.durationMs -= step;
-            itemCount--;
-        }
-
-        /*qint64 endTime = qnSyncTime->currentMSecsSinceEpoch();
-        while(endTime < period.startTimeMs + period.durationMs) {
-            period.durationMs -= step;
-            itemCount--
-        }*/
-    }
-
     /* Calculate size of the resulting matrix. */
     qreal desiredAspectRatio = qnGlobals->defaultLayoutCellAspectRatio();
     QnResourceWidget *widget = parameters.widget();
@@ -1805,6 +1852,12 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     qint64 time = period.startTimeMs;
     for(int i = 0; i < itemCount; i++) {
+        QnTimePeriod localPeriod (time, step);
+        QnTimePeriodList localPeriods = periods.intersected(localPeriod);
+        qint64 localTime = time;
+        if (!localPeriods.isEmpty())
+            localTime = qMax(localTime, localPeriods.first().startTimeMs);
+
         QnLayoutItemData item;
         item.flags = Qn::Pinned;
         item.uuid = QUuid::createUuid();
@@ -1814,10 +1867,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.contrastParams = widget->item()->imageEnhancement();
         item.dewarpingParams = widget->item()->dewarpingParams();
         item.dataByRole[Qn::ItemPausedRole] = true;
-        item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
+        item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(localPeriod);
         item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
-        item.dataByRole[Qn::ItemTimeRole] = time;
+        item.dataByRole[Qn::ItemTimeRole] = localTime;
         item.dataByRole[Qn::ItemAspectRatioRole] = desiredAspectRatio;  // set aspect ratio to make thumbnails load in all cases, see #2619
+        item.dataByRole[Qn::TimePeriodsRole] = QVariant::fromValue<QnTimePeriodList>(localPeriods);
 
         layout->addItem(item);
 
@@ -2241,40 +2295,90 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     if(resources.isEmpty())
         return;
 
-    /* Check if it's OK to delete everything without asking. */
-    bool okToDelete = true;
-    foreach(const QnResourcePtr &resource, resources) {
-        if(!canAutoDelete(resource)) {
-            okToDelete = false;
-            break;
-        }
-    }
+    auto canAutoDelete = [this](const QnResourcePtr &resource) {
+        QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
+        if(!layoutResource)
+            return false;
 
-    /* Ask if needed. */
-    if(!okToDelete) {
-        QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-            mainWindow(),
-            resources,
-            tr("Delete Resources"),
-            tr("Do you really want to delete the following %n item(s)?", "", resources.size()),
-            QDialogButtonBox::Yes | QDialogButtonBox::No
-        );
-        okToDelete = button == QDialogButtonBox::Yes;
-    }
+        return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
+    };
 
-    if(!okToDelete)
-        return; /* User does not want it deleted. */
-
-    foreach(const QnResourcePtr &resource, resources) {
+    auto deleteResource = [this](const QnResourcePtr &resource) {
         if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
             if(snapshotManager()->isLocal(layout)) {
                 resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
-                continue;
+                return;
             }
         }
 
+        // if we are deleting an edge camera, also delete its server
+        QUuid parentToDelete = resource.dynamicCast<QnVirtualCameraResource>() && //check for camera to avoid unnecessary parent lookup
+            QnMediaServerResource::isEdgeServer(resource->getParentResource())
+            ? resource->getParentId()
+            : QUuid();
+
         connection2()->getResourceManager()->remove( resource->getId(), this, &QnWorkbenchActionHandler::at_resource_deleted );
+        if (!parentToDelete.isNull())
+            connection2()->getResourceManager()->remove(parentToDelete, this, &QnWorkbenchActionHandler::at_resource_deleted );
+    };
+
+    /* Check if it's OK to delete something without asking. */
+    QnResourceList autoDeleting;
+    foreach(const QnResourcePtr &resource, resources) {
+        if(!canAutoDelete(resource))
+            continue;
+        autoDeleting << resource;
+        deleteResource(resource);
     }
+    foreach (const QnResourcePtr &resource, autoDeleting)
+        resources.removeOne(resource);
+
+    if(resources.isEmpty())
+        return; /* Nothing to delete. */
+
+    /* Check that we are deleting online auto-found cameras */ 
+    QnResourceList onlineAutoDiscoveredCameras;
+    foreach(const QnResourcePtr &resource, resources) {
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera ||
+            camera->getStatus() == QnResource::Offline || 
+            camera->isManuallyAdded()) 
+                continue;
+        onlineAutoDiscoveredCameras << camera;
+    } 
+
+    QString question;
+    /* First version of the dialog if all cameras are auto-discovered. */
+    if (resources.size() == onlineAutoDiscoveredCameras.size()) 
+        question = tr("These %n cameras are auto-discovered.\n"\
+            "They may be auto-discovered again after removing.\n"\
+            "Are you sure you want to delete them",
+            "", resources.size());
+    else 
+    /* Second version - some cameras are auto-discovered, some not. */
+    if (!onlineAutoDiscoveredCameras.isEmpty())
+        question = tr("%n of these %1 cameras are auto-discovered.\n"\
+            "They may be auto-discovered again after removing.\n"\
+            "Are you sure you want to delete them",
+            "", onlineAutoDiscoveredCameras.size()).arg(resources.size());
+     else
+    /* Third version - no auto-discovered cameras in the list. */
+        question = tr("Do you really want to delete the following %n item(s)?",
+            "", resources.size());
+    
+    
+    QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
+        mainWindow(),
+        resources,
+        tr("Delete Resources"),
+        question,
+        QDialogButtonBox::Yes | QDialogButtonBox::No
+        );
+    if (button != QDialogButtonBox::Yes)
+        return; /* User does not want it deleted. */
+
+    foreach(const QnResourcePtr &resource, resources)
+        deleteResource(resource);   
 }
 
 void QnWorkbenchActionHandler::at_newUserAction_triggered() {

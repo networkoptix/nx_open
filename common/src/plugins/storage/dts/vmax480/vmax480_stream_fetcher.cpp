@@ -9,6 +9,7 @@
 #include "core/resource/network_resource.h"
 #include "vmax480_resource.h"
 #include "utils/common/synctime.h"
+#include "utils/common/util.h"
 
 static const int PROCESS_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 150;

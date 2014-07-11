@@ -5,6 +5,8 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
+#include <api/app_server_connection.h>
+
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/range/adaptor/reversed.hpp>
 
@@ -1757,7 +1759,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered() {
     QnVirtualCameraResourcePtr desktopCamera;
 
     foreach (const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::desktop_camera)) {
-        if (resource->getName() == context()->user()->getName())
+        if (resource->getUniqueId() == QnAppServerConnectionFactory::clientGuid())
             desktopCamera = resource.dynamicCast<QnVirtualCameraResource>();    
     }
     if (!desktopCamera)

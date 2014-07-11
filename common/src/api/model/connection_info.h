@@ -36,10 +36,6 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (QnCompatibilityItem)(QnConnectionInfo), 
     (ubj)(metatype)(xml)(json)(binary)(csv_record)
 )
-
-// TODO: #Elric remove shared pointer?
-typedef QSharedPointer<QnConnectionInfo> QnConnectionInfoPtr;
-Q_DECLARE_METATYPE(QnConnectionInfoPtr);
 #endif
 
 #endif // QN_CONNECTION_INFO_H

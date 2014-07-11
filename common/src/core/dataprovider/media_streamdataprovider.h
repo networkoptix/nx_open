@@ -1,7 +1,9 @@
 #ifndef QnMediaStreamDataProvider_514
 #define QnMediaStreamDataProvider_514
 
-#include <QSharedPointer>
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <QtCore/QSharedPointer>
 #include "core/dataprovider/statistics.h"
 #include "../resource/media_resource.h"
 #include "abstract_streamdataprovider.h"
@@ -69,5 +71,7 @@ private:
 
 typedef QSharedPointer<QnAbstractMediaStreamDataProvider> QnAbstractMediaStreamDataProviderPtr;
 
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //QnMediaStreamDataProvider_514

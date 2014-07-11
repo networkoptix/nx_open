@@ -11,7 +11,7 @@
 
 #include "thumbnail.h"
 
-#include "plugins/resources/archive/abstract_archive_delegate.h"
+#include "plugins/resource/archive/abstract_archive_delegate.h"
 
 class CLVideoDecoderOutput;
 class QnRtspClientArchiveDelegate;

@@ -2,7 +2,14 @@
 #define QN_EVENT_LOG_MODEL_H
 
 #include <QtCore/QAbstractItemModel>
-#include "business/actions/abstract_business_action.h"
+
+#include <utils/common/id.h>
+
+#include <core/resource/resource_fwd.h>
+
+#include <business/business_fwd.h>
+#include <business/business_action_parameters.h>
+
 
 class QnEventLogModel: public QAbstractItemModel {
     Q_OBJECT
@@ -63,7 +70,7 @@ private:
     static QString getResourceNameString(QnId id);
     static QString getUserGroupString(QnBusinessActionParameters::UserGroup value);
 
-    Q_SLOT void at_resource_removed(const QnResourcePtr &resource);
+    void at_resource_removed(const QnResourcePtr &resource);
 
 private:
     QList<Column> m_columns;

@@ -6,8 +6,8 @@
 #include <camera/data/time_period_camera_data.h>
 #include <camera/data/bookmark_camera_data.h>
 
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "plugins/storage/file_storage/layout_storage_resource.h"
+#include <plugins/resource/avi/avi_resource.h>
+#include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <recording/time_period_list.h>
 

@@ -9,25 +9,24 @@
 class QnBusinessEventParameters
 {
 public:
-    // TODO: #Elric #enum
-    enum Params 
+    enum Param 
     {
         // base for any event type
-        eventTypeParam,
-        eventTimestampParam,
-        eventResourceParam,
-        actionResourceParam,
+        EventTypeParam,
+        EventTimestampParam,
+        EventResourceParam,
+        ActionResourceParam,
         
         // event specific params.
-        inputPortIdParam,
+        InputPortIdParam,
 
-        reasonCodeParam,
-        reasonParamsEncodedParam,
+        ReasonCodeParam,
+        ReasonParamsEncodedParam,
         
-        sourceParam,
-        conflictsParam,
+        SourceParam,
+        ConflictsParam,
 
-        CountParam
+        ParamCount
     };
 
     QnBusinessEventParameters();

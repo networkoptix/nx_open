@@ -41,6 +41,7 @@ arm-rpi
 target
 target-isd
 target-isd_s2
+target-rpi
 
 build_environment/python/build_packages/*/build
 build_environment/python/packages/llutil/llutil.egg-info
