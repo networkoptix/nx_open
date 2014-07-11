@@ -19,17 +19,46 @@ QnStorageDb::~QnStorageDb()
 {
 }
 
+void QnStorageDb::beforeDelete()
+{
+}
+
+void QnStorageDb::afterDelete()
+{
+    QMutexLocker lock(&m_delMutex);
+
+    beginTran();
+    foreach(const DeleteRecordInfo& delRecord, m_recordsToDelete) {
+        if (!deleteRecordsInternal(delRecord)) {
+            rollback();
+            return; // keep record list to delete. try to the next time
+        }
+    }
+    commit();
+
+    m_recordsToDelete.clear();
+}
+
+
 bool QnStorageDb::deleteRecords(const QByteArray& mac, QnServer::ChunksCatalog catalog, qint64 startTimeMs)
 {
+    QMutexLocker lock(&m_delMutex);
+    m_recordsToDelete << DeleteRecordInfo(mac, catalog, startTimeMs);
+    return true;
+}
+
+
+bool QnStorageDb::deleteRecordsInternal(const DeleteRecordInfo& delRecord)
+{
     QSqlQuery query(m_sdb);
-    if (startTimeMs != -1)
+    if (delRecord.startTimeMs != -1)
         query.prepare("DELETE FROM storage_data WHERE unique_id = ? and role = ? and start_time = ?");
     else
         query.prepare("DELETE FROM storage_data WHERE unique_id = ? and role = ?");
-    query.addBindValue(mac);
-    query.addBindValue((int) catalog);
-    if (startTimeMs != -1)
-        query.addBindValue(startTimeMs);
+    query.addBindValue(delRecord.mac);
+    query.addBindValue((int) delRecord.catalog);
+    if (delRecord.startTimeMs != -1)
+        query.addBindValue(delRecord.startTimeMs);
     if (!query.exec())
     {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
@@ -148,16 +177,6 @@ QVector<DeviceFileCatalogPtr> QnStorageDb::loadFullFileCatalog() {
     result << loadChunksFileCatalog();
     result << loadBookmarksFileCatalog();
     return result;
-}
-
-void QnStorageDb::beforeDelete()
-{
-    beginTran();
-}
-
-void QnStorageDb::afterDelete()
-{
-    commit();
 }
 
 bool QnStorageDb::removeCameraBookmarks(const QByteArray &mac) {
