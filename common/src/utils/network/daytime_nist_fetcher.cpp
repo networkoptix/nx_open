@@ -52,8 +52,7 @@ bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::E
         return false;
 
     if( !m_tcpSock->setNonBlockingMode( true ) ||
-        !m_tcpSock->setRecvTimeout(SOCKET_READ_TIMEOUT) ||
-        !aio::AIOService::instance()->watchSocket( m_tcpSock, aio::etWrite, this ) )
+        !m_tcpSock->setRecvTimeout(SOCKET_READ_TIMEOUT) )
     {
         m_tcpSock.clear();
         return false;
@@ -61,6 +60,14 @@ bool DaytimeNISTFetcher::getTimeAsync( std::function<void(qint64, SystemError::E
     m_handlerFunc = handlerFunc;
 
     m_tcpSock->connect( QString::fromLatin1(DEFAULT_NIST_SERVER), DAYTIME_PROTOCOL_DEFAULT_PORT, SOCKET_READ_TIMEOUT );
+
+    //we MUST do watchSocket after connect
+    if( !aio::AIOService::instance()->watchSocket( m_tcpSock, aio::etWrite, this ) )
+    {
+        m_tcpSock.clear();
+        return false;
+    }
+
     return true;
 }
 
