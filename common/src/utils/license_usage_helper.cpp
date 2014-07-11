@@ -15,9 +15,9 @@ struct LiceseCompatibility
 
 static std::array<LiceseCompatibility,3> compatibleLicenseClass =
 {
-    LiceseCompatibility(Qn::LC_Edge, Qn::LC_Digital),
-    LiceseCompatibility(Qn::LC_Edge, Qn::LC_Analog),
-    LiceseCompatibility(Qn::LC_Digital, Qn::LC_Digital)
+    LiceseCompatibility(Qn::LC_Edge,    Qn::LC_Digital),
+    LiceseCompatibility(Qn::LC_Digital, Qn::LC_Analog),
+    LiceseCompatibility(Qn::LC_Edge,    Qn::LC_Analog)
 };
 
 
