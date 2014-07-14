@@ -97,7 +97,7 @@ function ask_for_value {
     echo $RESULT
 }
 
-function validate_appserverPassword {
+function validate_adminPassword {
     [ -n "$1" ]
 }
 
@@ -126,10 +126,8 @@ case "$1" in
 #      ECS_LOGIN=$(ask_for_value appserverLogin "$ECS_LOGIN")
 #      $CFG_HELPER appserverLogin "$ECS_LOGIN"
 
-#      ECS_PASSWORD="$($CFG_HELPER appserverPassword)"
-#      [ -z "$ECS_PASSWORD" ] && ECS_PASSWORD=$ECS_PASSWORD_DEFAULT
-#      ECS_PASSWORD=$(ask_for_value appserverPassword "$ECS_PASSWORD")
-#      $CFG_HELPER appserverPassword "$ECS_PASSWORD"
+      ADMIN_PASSWORD=$(ask_for_value adminPassword "$ADMIN_PASSWORD")
+      $CFG_HELPER adminPassword "$ADMIN_PASSWORD"
 
       TRANSPORT="$($CFG_HELPER transport)"
       [ -z "$ECS_TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT

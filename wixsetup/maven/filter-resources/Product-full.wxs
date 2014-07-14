@@ -10,6 +10,7 @@
         <?include BuildVars.wxi ?>
 
         <?define ProductName="${product.name}"?>
+        <?define ECRegPath="Software\${company.name}\${appserver.name}"?>
         <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
         <?define ClientRegPath="Software\${company.name}\$(var.ProductName)"?>
 
@@ -26,6 +27,25 @@
 
         <?define LaunchClientChecBoxText="!(loc.Product_LaunchClient)" ?>
 
+        <?define Inst_S1="(INSTALL_SERVER=1 AND !ServerFeature <> 3)"?>
+        <?define Inst_C1="(INSTALL_CLIENT=1 AND !ClientFeature <> 3)"?>
+        <?define Inst_S0="(NOT $(var.Inst_S1))"?>
+        <?define Inst_C0="(NOT $(var.Inst_C1))"?>
+
+        <?define Inst_S0C0="($(var.Inst_S0) AND $(var.Inst_C0))"?>
+        <?define Inst_S0C1="($(var.Inst_S0) AND $(var.Inst_C1))"?>
+        <?define Inst_S1C0="($(var.Inst_S1) AND $(var.Inst_C0))"?>
+        <?define Inst_S1C1="($(var.Inst_S1) AND $(var.Inst_C1))"?>
+
+        <?define Changing_S1="NOT $(var.VmsInstalling) AND $(var.Inst_S1)"?>
+        <?define Changing_S0C1="NOT $(var.VmsInstalling) AND $(var.Inst_S0C1)"?>
+        <?define ChangingNothing="NOT $(var.VmsInstalling) AND $(var.Inst_S0C0)"?>
+
+        <?define PasswordsEqual="(SERVER_PASSWORD = SERVER_PASSWORD_CONFIRM)" ?>
+        <?define IsSettingsFilled="(SYSTEM_NAME AND SERVER_PORT AND SERVER_LOGIN AND SERVER_PASSWORD AND SERVER_PASSWORD_CONFIRM)"?>
+        <?define IsSettingsValid="($(var.IsSettingsFilled) AND $(var.PasswordsEqual))"?>
+
+
         <?if $(var.arch) = x86 ?>
         <Condition Message="!(loc.Product_ArchMismatch)">
             <![CDATA[ NOT VersionNT64 ]]>
@@ -34,6 +54,9 @@
 
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
+
+        <SetProperty Action="SetServerPort1" Id="SERVER_PORT" Value="[SERVER_PORT_EC]" Before="SetServerPort2">NOT SERVER_PORT</SetProperty>
+        <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="7001" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
 
         <Property Id="INSTALL_SERVER" Secure="yes"/>
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
@@ -67,6 +90,7 @@
         <Property Id="BUSYPORT" Secure="yes"/>
 
         <Property Id="MEDIASERVER_REGISTRY_PATH" Value="$(var.ServerRegPath)"/>
+        <Property Id="OLDEC_REGISTRY_PATH" Value="$(var.ECRegPath)"/>
         <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
         <!-- MediaServer properties-->
@@ -76,8 +100,13 @@
         </Property>
         
         <Property Id="SERVER_PORT" Secure="yes">
-            <RegistrySearch Id="ServerEcsPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
+            <RegistrySearch Id="ServerPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
         </Property>
+
+        <Property Id="SERVER_PORT_EC" Secure="yes">
+            <RegistrySearch Id="ServerEcsPortReg" Root="HKLM" Key="$(var.ECRegPath)" Name="port" Type="raw" Win64="yes"/>
+        </Property>
+
 
         <Property Id="SERVER_LOGIN" Value="admin"/>
         <Property Id="SERVER_PASSWORD" Secure="yes"/>
@@ -102,16 +131,30 @@
         <CustomAction Id="CheckPorts" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
         <CustomAction Id="CheckPorts2" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
         <CustomAction Id="FixServerFolder" BinaryKey="CustomActions.dll" DllEntry="FixServerFolder"/>
+        <CustomAction Id="GenerateSystemName" BinaryKey="CustomActions.dll" DllEntry="GenerateSystemName"/>
+        <CustomAction Id="DetectIfSystemIsStandalone" BinaryKey="CustomActions.dll" DllEntry="DetectIfSystemIsStandalone"/>
+        
+        <CustomAction Id="CopyDatabaseFile_Cmd" Property="CopyDatabaseFile" Execute="immediate" Impersonate="yes"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db;[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
+        <CustomAction Id="CopyDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="CopyDatabaseFile" Execute="deferred" Impersonate="no"/>
 
+        <CustomAction Id="DeleteOldMediaserverSettings_Cmd" Property="DeleteOldMediaserverSettings" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="DeleteOldMediaserverSettings" BinaryKey="CustomActions.dll" DllEntry="DeleteOldMediaserverSettings" Execute="deferred" Impersonate="no"/>
+        
         <!-- Assign default values for Quick installation -->
-        <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="7001"/>
         <CustomAction Id="AssignClientPort" Property="CLIENT_PORT" Value="[SERVER_PORT]"/>
+
+        <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
+                      Value="&quot;[${customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
+        <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="ignore" Impersonate="no" />
 
         <CustomAction Id="CloseAppLauncherAction_Cmd" Property="CloseAppLauncherAction"
                       Value="&quot;[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]$(var.ProductName) Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
+        <CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
         <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="applauncher.exe" ExeCommand=""/>
 
         <CustomAction Id="NoDowngrade" Error="NoDowngrade" /> 
@@ -127,8 +170,7 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
-            <Custom Action="FindFreePorts" Before="AssignServerPort"/>
-            <Custom Action="AssignServerPort" Before="AssignClientPort">NOT SERVER_PORT</Custom>
+            <Custom Action="FindFreePorts" Before="AssignClientPort"/>
             <Custom Action="AssignClientPort" Before="FindConfiguredStorages">1</Custom>
             <Custom Action="FindConfiguredStorages" Before="CostInitialize"/> 
         </InstallUISequence>
@@ -137,12 +179,33 @@
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
 
+            <Custom Action="DetectIfSystemIsStandalone" Before="CostInitialize">$(var.VmsUpgrading)</Custom>
+            <Custom Action="GenerateSystemName" After="DetectIfSystemIsStandalone">$(var.VmsUpgrading) AND NOT SYSTEM_NAME AND STANDALONE_SYSTEM="yes"</Custom>
+
+            <Custom Action="CopyDatabaseFile_Cmd" After="InstallFiles">
+                <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CopyDatabaseFile" After="CopyDatabaseFile_Cmd">
+            <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">$(var.VmsUpgrading)</Custom>
+            <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">$(var.VmsUpgrading)</Custom>
+
+            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction">
+                <![CDATA[ NOT $(var.VmsInstalling) ]]>
+            </Custom>
+            <Custom Action="CloseTrayToolAction" Before="StopServices">
+                <![CDATA[ NOT $(var.VmsInstalling) ]]>
+            </Custom>
+
             <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">
                 <![CDATA[ NOT $(var.VmsInstalling) ]]>
             </Custom>
             <Custom Action="CloseAppLauncherAction" Before="StopServices">
                 <![CDATA[ NOT $(var.VmsInstalling) ]]>
             </Custom>
+
+            <Custom Action="LaunchTrayTool" After="InstallFinalize">
+                <![CDATA[ (!ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -249,24 +312,6 @@
             <DialogRef Id="MyFeaturesDlg" />
 
             <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
-
-            <?define Inst_S1="(INSTALL_SERVER=1 AND !ServerFeature <> 3)"?>
-            <?define Inst_C1="(INSTALL_CLIENT=1 AND !ClientFeature <> 3)"?>
-            <?define Inst_S0="(NOT $(var.Inst_S1))"?>
-            <?define Inst_C0="(NOT $(var.Inst_C1))"?>
-
-            <?define Inst_S0C0="($(var.Inst_S0) AND $(var.Inst_C0))"?>
-            <?define Inst_S0C1="($(var.Inst_S0) AND $(var.Inst_C1))"?>
-            <?define Inst_S1C0="($(var.Inst_S1) AND $(var.Inst_C0))"?>
-            <?define Inst_S1C1="($(var.Inst_S1) AND $(var.Inst_C1))"?>
-
-            <?define Changing_S1="NOT $(var.VmsInstalling) AND $(var.Inst_S1)"?>
-            <?define Changing_S0C1="NOT $(var.VmsInstalling) AND $(var.Inst_S0C1)"?>
-            <?define ChangingNothing="NOT $(var.VmsInstalling) AND $(var.Inst_S0C0)"?>
-
-            <?define PasswordsEqual="(SERVER_PASSWORD = SERVER_PASSWORD_CONFIRM)" ?>
-            <?define IsSettingsFilled="(SYSTEM_NAME AND SERVER_PORT AND SERVER_LOGIN AND SERVER_PASSWORD AND SERVER_PASSWORD_CONFIRM)"?>
-            <?define IsSettingsValid="($(var.IsSettingsFilled) AND $(var.PasswordsEqual))"?>
 
             <!-- WelcomeDlg -->
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED</Publish>          

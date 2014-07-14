@@ -166,6 +166,16 @@ void stopServer(int signal);
 bool restartFlag = false;
 void restartServer();
 
+namespace {
+    const QString YES = lit("yes");
+    const QString NO = lit("no");
+    const QString GUID_IS_HWID = lit("guidIsHWID");
+    const QString SERVER_GUID = lit("serverGuid");
+    const QString SERVER_GUID2 = lit("serverGuid2");
+    const QString OBSOLETE_SERVER_GUID = lit("obsoleteServerGuid");
+    const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode");
+};
+
 //#include "device_plugins/arecontvision/devices/av_device_server.h"
 
 //#define TEST_RTSP_SERVER
@@ -503,13 +513,6 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
         return QnMediaServerResourcePtr();
     }
     
-    /*
-    if (!authKey.isEmpty()) {
-        MSSettings::roSettings()->setValue("authKey", authKey);
-        QnAppServerConnectionFactory::setAuthKey(authKey);
-    }
-    */
-
     return savedServer;
 }
 
@@ -628,7 +631,7 @@ int serverMain(int argc, char *argv[])
     return 0;
 }
 
-void initAppServerConnection(const QSettings &settings)
+void initAppServerConnection(QSettings &settings)
 {
     QUrl appServerUrl;
     QUrlQuery params;
@@ -655,8 +658,30 @@ void initAppServerConnection(const QSettings &settings)
 	}
     }
 
+    // TODO: Actually appserverPassword is always empty. Remove?
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
-    QString password = settings.value("appserverPassword", QLatin1String("123")).toString();
+    QString password = settings.value("appserverPassword", QLatin1String("")).toString();
+    QByteArray authKey = settings.value("authKey").toByteArray();
+    if (!authKey.isEmpty())
+    {
+        // convert from v2.2 format and encode value
+        QByteArray prefix("SK_");
+        if (!authKey.startsWith(prefix))
+        {
+            QByteArray authKeyBin = QUuid(authKey).toRfc4122();
+            QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
+            settings.setValue(lit("authKey"), prefix + authKeyEncoded); // encode and update in settings
+        }
+        else {
+            QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
+            QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
+            authKey = QUuid::fromRfc4122(authKeyDecoded).toByteArray();
+        }
+
+        userName = serverGuid().toString();
+        password = authKey;
+    }
+
     appServerUrl.setUserName(userName);
     appServerUrl.setPassword(password);
     appServerUrl.setQuery(params);
@@ -664,7 +689,6 @@ void initAppServerConnection(const QSettings &settings)
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
     NX_LOG(lit("Connect to enterprise controller server %1").arg(urlNoPassword.toString()), cl_logINFO);
-    //QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
@@ -1077,11 +1101,9 @@ QHostAddress QnMain::getPublicAddress()
 void QnMain::run()
 {
     QFile f(QLatin1String(":/cert.pem"));
-    if (!f.open(QIODevice::ReadOnly)) 
-    {
+    if (!f.open(QIODevice::ReadOnly)) {
         qWarning() << "No SSL sertificate for mediaServer!";
-    }
-    else {
+    } else {
         QByteArray certData = f.readAll();
         QnSSLSocket::initSSLEngine(certData);
     }
@@ -1142,8 +1164,8 @@ void QnMain::run()
     connect(QnStorageManager::instance(), &QnStorageManager::storageFailure, this, &QnMain::at_storageManager_storageFailure);
     connect(QnStorageManager::instance(), &QnStorageManager::rebuildFinished, this, &QnMain::at_storageManager_rebuildFinished);
 
-    //TODO #ak remove this 123 from here
-    qnCommon->setDefaultAdminPassword(settings->value("appserverPassword", QLatin1String("123")).toString());
+    // If adminPassword is set by installer save it and create admin user with it if not exists yet
+    qnCommon->setDefaultAdminPassword(settings->value("adminPassword", QLatin1String("")).toString());
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
     qnCommon->setModuleGUID(serverGuid());
@@ -1182,13 +1204,31 @@ void QnMain::run()
         QnSleep::msleep(3000);
     }
 
+    MSSettings::roSettings()->sync();
+    if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
+        NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
+        MSSettings::roSettings()->setValue("systemName", connectInfo.systemName);
+        MSSettings::roSettings()->remove("appserverHost");
+        MSSettings::roSettings()->remove("appserverPort");
+        MSSettings::roSettings()->remove("appserverLogin");
+        MSSettings::roSettings()->remove("appserverPassword");
+        MSSettings::roSettings()->remove(PENDING_SWITCH_TO_CLUSTER_MODE);
+        MSSettings::roSettings()->sync();
+
+        QFile::remove(closeDirPath(getDataDirectory()) + "/ecs.sqlite");
+
+        // kill itself to restart
+        abort();
+        return;
+    }
+      
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
 
 
     runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
-    runtimeInfo.publicIP = connectInfo.publicIp;
+    runtimeInfo.publicIP = getPublicAddress().toString();
     qnCommon->setRemoteGUID(connectInfo.ecsGuid);
     QnRuntimeInfoManager::instance()->update(runtimeInfo);
 
@@ -1313,6 +1353,8 @@ void QnMain::run()
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
     }
+
+    MSSettings::roSettings()->remove(OBSOLETE_SERVER_GUID);
 
     if (needToStop())
         return;
@@ -1636,10 +1678,7 @@ protected:
     {
         QtSingleCoreApplication *application = this->application();
 
-        // check if local or remote EC. MServer changes guid depend of this fact
-        bool primaryGuidAbsent = MSSettings::roSettings()->value(lit("serverGuid")).isNull();
-        if (primaryGuidAbsent)
-            MSSettings::roSettings()->setValue("separateGuidForRemoteEC", 1);
+        updateGuidIfNeeded();
 
         QUuid guid = serverGuid();
         if (guid.isNull())
@@ -1664,6 +1703,76 @@ protected:
     {
         if (serviceMainInstance)
             serviceMainInstance->stopSync();
+    }
+
+private:
+    QUuid hardwareIdToUuid(const QByteArray& hardwareId) {
+        if (hardwareId.length() != 34)
+            return QUuid();
+
+        QString hwid(hardwareId);
+        QString uuidForm = QString("%1-%2-%3-%4-%5").arg(hwid.mid(2, 8)).arg(hwid.mid(10, 4)).arg(hwid.mid(14, 4)).arg(hwid.mid(18, 4)).arg(hwid.mid(22, 12));
+        return QUuid(uuidForm);
+    }
+
+    QString hardwareIdAsGuid() {
+#ifdef EDGE_SERVER
+    char  mac[13];
+    memset(mac, 0, sizeof(mac));
+    char* host = 0;
+    mac_eth0(mac, &host);
+    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+    md5Hash.addData(mac, 12);
+    md5Hash.addData("edge");
+    return QUuid::fromRfc4122(md5Hash.result()).toString();
+#else
+    return hardwareIdToUuid(LLUtil::getHardwareId(LLUtil::LATEST_HWID_VERSION, false)).toString();
+#endif
+    }
+
+    void updateGuidIfNeeded() {
+        QString guidIsHWID = MSSettings::roSettings()->value(GUID_IS_HWID).toString();
+        QString serverGuid = MSSettings::roSettings()->value(SERVER_GUID).toString();
+        QString serverGuid2 = MSSettings::roSettings()->value(SERVER_GUID2).toString();
+        QString pendingSwitchToClusterMode = MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString();
+
+        QString hwidGuid = hardwareIdAsGuid();
+
+        if (guidIsHWID == YES) {
+            MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+            MSSettings::roSettings()->remove(SERVER_GUID2);
+        } else if (guidIsHWID == NO) {
+            if (serverGuid.isEmpty()) {
+                // serverGuid remove from settings manually?
+                MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+                MSSettings::roSettings()->setValue(GUID_IS_HWID, YES);
+            }
+
+            MSSettings::roSettings()->remove(SERVER_GUID2);
+        } else if (guidIsHWID.isEmpty()) {
+            if (!serverGuid2.isEmpty()) {
+                MSSettings::roSettings()->setValue(SERVER_GUID, serverGuid2);
+                MSSettings::roSettings()->setValue(GUID_IS_HWID, NO);
+                MSSettings::roSettings()->remove(SERVER_GUID2);
+            } else {
+                // Don't reset serverGuid if we're in pending switch to cluster mode state.
+                // As it's stored in the remote database.
+                if (pendingSwitchToClusterMode == YES)
+                    return;
+
+                MSSettings::roSettings()->setValue(SERVER_GUID, hwidGuid);
+                MSSettings::roSettings()->setValue(GUID_IS_HWID, YES);
+
+                if (!serverGuid.isEmpty()) {
+                    MSSettings::roSettings()->setValue(OBSOLETE_SERVER_GUID, serverGuid);
+                }
+            }
+        }
+
+        QString obsoleteGuid = MSSettings::roSettings()->value(OBSOLETE_SERVER_GUID).toString();
+        if (!obsoleteGuid.isEmpty()) {
+            qnCommon->setObsoleteServerGuid(obsoleteGuid);
+        }
     }
 
 private:
@@ -1707,7 +1816,6 @@ int main(int argc, char* argv[])
 # endif
 #endif
 #endif //__arm__
-
     ::srand( ::time(NULL) );
 #ifdef _WIN32
     win32_exception::installGlobalUnhandledExceptionHandler();
@@ -1760,6 +1868,7 @@ int main(int argc, char* argv[])
         MSSettings::initializeROSettingsFromConfFile( configFilePath );
     if( !rwConfigFilePath.isEmpty() )
         MSSettings::initializeRunTimeSettingsFromConfFile( rwConfigFilePath );
+
 
     QnVideoService service( argc, argv );
     int res = service.exec();

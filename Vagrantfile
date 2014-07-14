@@ -9,15 +9,15 @@ Vagrant.configure("2") do |config|
   config.vm.box = "precise32"
   config.vm.box_url = "http://noptix.enk.me/vagrant-boxes/precise32.box"
   config.vm.network :private_network, ip: "192.168.33.10"
- #config.vm.network :public_network
+  #config.vm.network :public_network
   #config.vm.provision :shell, :path => ".vagrant/bootstrap.sh"  
-#config.vm.network :forwarded_port, guest: 7011, host: 7011
-#config.ssh.private_key_path = "~/.ssh/id_rsa"
+  #config.vm.network :forwarded_port, guest: 7011, host: 7011
+  #config.ssh.private_key_path = "~/.ssh/id_rsa"
   config.ssh.forward_agent = true
 
-#  config.vm.define :node1 do |node1|
-#    node1.vm.box = "precise32"
-#    node1.vm.network :private_network, ip: "192.168.33.11"
+  #  config.vm.define :node1 do |node1|
+  #    node1.vm.box = "precise32"
+  #    node1.vm.network :private_network, ip: "192.168.33.11"
 #    node1.vm.provision :shell, :path => "bootstrap_node1.sh"  
 #  end
 

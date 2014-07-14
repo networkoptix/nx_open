@@ -1,31 +1,12 @@
 
-Template: ${deb.customization.company.name}-mediaserver/appserverHost
-Type: string
-Default:
-Description: Enterprise Controller host:
-
-Template: ${deb.customization.company.name}-mediaserver/appserverPort
-Type: string
-Default:
-Description: Enterprise Controller port:
-
-Template: ${deb.customization.company.name}-mediaserver/appserverPort_invalid
-Type: error
-Description: Enterprise Controller port is invalid. Please try again.
-
-Template: ${deb.customization.company.name}-mediaserver/appserverLogin
-Type: string
-Default:
-Description: Enterprise Controller login:
-
-Template: ${deb.customization.company.name}-mediaserver/appserverPassword
+Template: ${deb.customization.company.name}-mediaserver/adminPassword
 Type: string
 Default: 
-Description: Enterprise Controller password:
+Description: Admin's password:
 
-Template: ${deb.customization.company.name}-mediaserver/appserverPassword_invalid
+Template: ${deb.customization.company.name}-mediaserver/adminPassword_invalid
 Type: error
-Description: Enterprise Controller can't be empty
+Description: Password can't be empty
 
 Template: ${deb.customization.company.name}-mediaserver/transport
 Type: select

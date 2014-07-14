@@ -22,6 +22,7 @@
 #include "nx_ec/data/api_camera_bookmark_data.h"
 #include "nx_ec/data/api_runtime_data.h"
 #include "utils/db/db_helper.h"
+#include "binary_transaction_serializer.h"
 
 namespace ec2
 {
@@ -74,6 +75,13 @@ namespace ec2
         
         template <class T>
         bool contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
+
+        template <class T>
+        ErrorCode saveTransaction(const QnTransaction<T>& tran) 
+        {
+            QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
+            return saveToDB(tran, transactionHash(tran.params), serializedTran);
+        }
 
         template <class T>
         ErrorCode saveTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran) {

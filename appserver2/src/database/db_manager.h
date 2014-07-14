@@ -320,7 +320,7 @@ namespace ec2
         ErrorCode addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
         ErrorCode removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
 
-        bool createDatabase(bool *dbJustCreated);
+        bool createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2);
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         
@@ -332,10 +332,18 @@ namespace ec2
         void commit();
         void rollback();
     private:
-        QMap<int, QnId> getGuidList(const QString& request);
+        enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_INT};
+
+        QMap<int, QnId> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
         QnId getType(const QString& typeName);
+        bool resyncTransactionLog();
+
+        template <class ObjectType, class ObjectListType> 
+        bool fillTransactionLogInternal(ApiCommand::Value command);
+        template <class ObjectType>
+        bool fillTransactionLogInternal(ApiCommand::Value command);
     private:
         QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;
