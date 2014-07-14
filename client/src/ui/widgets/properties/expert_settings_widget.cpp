@@ -153,7 +153,7 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
     else if (sameRtpTransport)
         ui->comboBoxTransport->setCurrentText(rtpTransport);
     else
-        ui->comboBoxTransport->setCurrentIndex(0);
+        ui->comboBoxTransport->setCurrentIndex(-1);
 
 
     ui->settingsGroupBox->setVisible(arecontCamerasCount != cameras.size());
@@ -166,7 +166,7 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
     bool defaultValues = ui->settingsDisableControlCheckBox->checkState() == Qt::Unchecked
             && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium
             && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
-            && ui->comboBoxTransport->currentIndex() < 1;
+            && ui->comboBoxTransport->currentIndex() == 0;
 
     ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
     ui->assureCheckBox->setChecked(!defaultValues);
@@ -196,7 +196,7 @@ void QnAdvancedSettingsWidget::submitToResources(const QnVirtualCameraResourceLi
         if (ui->checkBoxSecondaryRecorder->checkState() != Qt::PartiallyChecked && camera->hasDualStreaming())
             camera->setProperty(QnMediaResource::dontRecordSecondaryStreamKey(), ui->checkBoxSecondaryRecorder->isChecked() ? lit("1") : lit("0"));
 
-        if (ui->comboBoxTransport->currentIndex() > 0) {
+        if (!ui->comboBoxTransport->currentIndex() >= 0) {
             QString txt = ui->comboBoxTransport->currentText();
             if (txt.toLower() == lit("auto"))
                 txt.clear();
