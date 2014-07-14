@@ -15,6 +15,7 @@ class SocketImpl
 {
 public:
     SocketImpl();
+    virtual ~SocketImpl() {}
 
     void*& getUserData( aio::EventType eventType );
     void* const& getUserData( aio::EventType eventType ) const;

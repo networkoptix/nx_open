@@ -998,7 +998,15 @@ bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
 #endif
 }
 
-TCPSocket::TCPSocket(int newConnSD) : CommunicatingSocket(newConnSD) {
+TCPSocket::TCPSocket(int newConnSD)
+:
+    CommunicatingSocket(
+        newConnSD
+#ifdef _WIN32
+        , new Win32TcpSocketImpl()
+#endif
+        )
+{
 }
 
 
