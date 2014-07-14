@@ -2201,50 +2201,62 @@ void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps &
 }
 
 void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action) {
-    // index to place updated layout
-    int layoutIndex = -1;
-    bool wasCurrent = false;
+    if (action == ItemAction::Changed) {
 
-    // check if layout was changed or detached
-    for (int i = 0; i < workbench()->layouts().size(); ++i) {
-        QnWorkbenchLayout *layout = workbench()->layout(i);
+        // index to place updated layout
+        int layoutIndex = -1;
+        bool wasCurrent = false;
 
-        if (layout->data(Qn::VideoWallItemGuidRole).value<QUuid>() != item.uuid)
-            continue;
+        // check if layout was changed or detached
+        for (int i = 0; i < workbench()->layouts().size(); ++i) {
+            QnWorkbenchLayout *layout = workbench()->layout(i);
 
-        layout->notifyTitleChanged();   //in case of 'online' flag changed
+            if (layout->data(Qn::VideoWallItemGuidRole).value<QUuid>() != item.uuid)
+                continue;
 
-        if (layout->resource() && item.layout == layout->resource()->getId())
-            return; //everything is correct, no changes required
+            layout->notifyTitleChanged();   //in case of 'online' flag changed
 
-        wasCurrent = workbench()->currentLayout() == layout;
-        layoutIndex = i;
-        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QUuid()));
-        workbench()->removeLayout(layout);
-    }
+            if (layout->resource() && item.layout == layout->resource()->getId())
+                return; //everything is correct, no changes required
 
-    if (item.layout.isNull() || layoutIndex < 0)
-        return;
+            wasCurrent = workbench()->currentLayout() == layout;
+            layoutIndex = i;
+            layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QUuid()));
+            workbench()->removeLayout(layout);
+        }
 
-    // add new layout if needed
-    {
-        QnLayoutResourcePtr layoutResource = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
-        if (!layoutResource)
+        if (item.layout.isNull() || layoutIndex < 0)
             return;
 
-        QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(layoutResource);
-        if(!layout) 
-            layout = new QnWorkbenchLayout(layoutResource, workbench());
+        // add new layout if needed
+        {
+            QnLayoutResourcePtr layoutResource = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
+            if (!layoutResource)
+                return;
 
-        if (workbench()->layoutIndex(layout) < 0)
-            workbench()->insertLayout(layout, layoutIndex);
-        else 
-            workbench()->moveLayout(layout, layoutIndex);
+            QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(layoutResource);
+            if(!layout) 
+                layout = new QnWorkbenchLayout(layoutResource, workbench());
 
-        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(item.uuid));
-        layout->notifyTitleChanged();
-        if (wasCurrent)
-            workbench()->setCurrentLayoutIndex(layoutIndex);
+            if (workbench()->layoutIndex(layout) < 0)
+                workbench()->insertLayout(layout, layoutIndex);
+            else 
+                workbench()->moveLayout(layout, layoutIndex);
+
+            layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(item.uuid));
+            layout->notifyTitleChanged();
+            if (wasCurrent)
+                workbench()->setCurrentLayoutIndex(layoutIndex);
+        }
+    } else if (action == ItemAction::Removed) {
+        for (int i = 0; i < workbench()->layouts().size(); ++i) {
+            QnWorkbenchLayout *layout = workbench()->layout(i);
+
+            if (layout->data(Qn::VideoWallItemGuidRole).value<QUuid>() != item.uuid)
+                continue;
+            layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QUuid()));
+            layout->notifyTitleChanged();
+        }
     }
 }
 
