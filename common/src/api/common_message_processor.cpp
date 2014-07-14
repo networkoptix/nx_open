@@ -101,21 +101,10 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::controlMessage,
         this, &QnCommonMessageProcessor::videowallControlMessageReceived );  
 
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::at_remotePeerFound );
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::at_remotePeerLost );
-
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::remotePeerLost );
 
     connection->startReceivingNotifications();
-}
-
-void QnCommonMessageProcessor::at_remotePeerFound(const ec2::ApiPeerAliveData &, bool)
-{
-}
-
-void QnCommonMessageProcessor::at_remotePeerLost(const ec2::ApiPeerAliveData &, bool)
-{
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)

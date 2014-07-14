@@ -589,10 +589,23 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
 {
     foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
     {
+        {
+            ApiPeerAliveData aliveData;
+            aliveData.peer = info.data.peer;
+            aliveData.isAlive = true;
+
+            QnTransaction<ApiPeerAliveData> tran(ApiCommand::peerAliveInfo, false);
+            tran.params = aliveData;
+            tran.fillSequence();
+            transport->sendTransaction(tran, processedPeers);
+        }
+
+        {
         QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, false);
         tran.params = info.data;
         tran.fillSequence();
         transport->sendTransaction(tran, processedPeers);
+    }
     }
 }
 
