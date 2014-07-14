@@ -66,6 +66,8 @@ namespace ec2 {
     struct ApiPeerData;
     struct ApiRuntimeData;
 
+    struct ApiDatabaseDumpData;
+
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
     typedef std::vector<ApiCameraServerItemData> ApiCameraServerItemDataList;
@@ -132,6 +134,7 @@ namespace ec2 {
     (ApiTimeData)\
     (ApiPeerData)\
     (ApiRuntimeData)\
+    (ApiDatabaseDumpData)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

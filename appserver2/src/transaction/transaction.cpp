@@ -160,6 +160,11 @@ namespace ec2
                 case runtimeInfoChanged:
                     return "runtimeInfoChanged";
 
+                case dumpDatabase:
+                    return "dumpDatabase";
+                case resotreDatabase:
+                    return "resotreDatabase";
+
                 default:
                     return "unknown " + QString::number((int)val);
             }
@@ -209,7 +214,7 @@ namespace ec2
         return ++requestID;
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary)(json),   (peerID)(dbID)(sequence))
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary)(json),   (command)(id)(persistent)(timestamp))
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary)(json),   QnAbstractTransaction_ID_Fields)
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary)(json),   QnAbstractTransaction_Fields)
 } // namespace ec2
 

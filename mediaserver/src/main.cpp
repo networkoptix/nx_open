@@ -715,6 +715,11 @@ QnMain::~QnMain()
     stop();
 }
 
+void QnMain::at_restartServerRequired()
+{
+    restartServer();
+}
+
 void QnMain::stopSync()
 {
     if (serviceMainInstance) {
@@ -1204,6 +1209,7 @@ void QnMain::run()
         NX_LOG( QString::fromLatin1("Can't connect to local EC2. %1").arg(ec2::toString(errorCode)), cl_logERROR );
         QnSleep::msleep(3000);
     }
+    connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &QnMain::at_restartServerRequired);
 
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {

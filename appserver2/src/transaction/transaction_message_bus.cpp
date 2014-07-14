@@ -276,6 +276,7 @@ void QnTransactionMessageBus::onGotTransactionSyncResponse(QnTransactionTranspor
 
 template <class T>
 void QnTransactionMessageBus::sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader) {
+    Q_ASSERT(!tran.isLocal);
     transport->sendTransaction(tran, transportHeader);
 }
         

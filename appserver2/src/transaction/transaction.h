@@ -114,6 +114,8 @@ namespace ec2
             getCurrentTime              = 9002,  /*< ApiTimeData */         
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
 			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
+            dumpDatabase                = 9005,  /*< ApiDatabaseDumpData */
+            resotreDatabase             = 9006,  /*< ApiDatabaseDumpData */
 
 			maxTransactionValue         = 65535
         };
@@ -160,7 +162,7 @@ namespace ec2
 
     typedef QnAbstractTransaction::ID QnAbstractTransaction_ID;
 #define QnAbstractTransaction_ID_Fields (peerID)(dbID)(sequence)
-#define QnAbstractTransaction_Fields (command)(id)(persistent)(timestamp)        
+#define QnAbstractTransaction_Fields (command)(id)(persistent)(timestamp)(isLocal)
 
     template <class T>
     class QnTransaction: public QnAbstractTransaction

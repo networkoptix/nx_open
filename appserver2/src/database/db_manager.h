@@ -87,6 +87,10 @@ namespace ec2
             return transactionLog->saveTransaction( tran, serializedTran);
         }
 
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& serializedTran)
+        {
+            return executeTransactionInternal(tran);
+        }
 
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
@@ -114,6 +118,9 @@ namespace ec2
 
         //getCurrentTime
         ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiTimeData& currentTime);
+
+        //dumpDatabase
+        ErrorCode doQuery(const std::nullptr_t& /*dummy*/, ApiDatabaseDumpData& data);
 
         //listDirectory
         ErrorCode doQueryNoLock(const ApiStoredFilePath& path, ApiStoredDirContents& data);
@@ -191,6 +198,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran);
 
         // delete camera, server, layout, any resource, etc.
         ErrorCode executeTransactionInternal(const QnTransaction<ApiIdData>& tran);
@@ -320,7 +328,7 @@ namespace ec2
         ErrorCode addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
         ErrorCode removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
 
-        bool createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2);
+        bool createDatabase(bool *dbJustCreated);
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         
@@ -364,6 +372,7 @@ namespace ec2
         QSqlDatabase m_sdbStatic;
         QnDbTransaction m_tranStatic;
         mutable QReadWriteLock m_mutexStatic;
+        bool m_needResyncLog;
     };
 };
 

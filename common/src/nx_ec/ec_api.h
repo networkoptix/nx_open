@@ -805,8 +805,8 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int restoreDatabaseAsync( const QByteArray& dbFile, TargetType* target, HandlerType handler ) {
-            return restoreDatabaseAsync( dbFile,
+        template<class TargetType, class HandlerType> int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, TargetType* target, HandlerType handler ) {
+            return restoreDatabaseAsync( data,
                 std::static_pointer_cast<impl::SimpleHandler>(
                     std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -853,11 +853,13 @@ namespace ec2
         void settingsChanged(QnKvPairList settings);
         void panicModeChanged(Qn::PanicMode mode);
 
+        void databaseDumped();
+
     protected:
         virtual int setPanicMode( Qn::PanicMode value, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
-        virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) = 0;
         virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
     };  

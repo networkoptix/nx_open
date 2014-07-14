@@ -174,7 +174,7 @@ namespace ec2
             void emitGetStoredFileDone( int reqID, const ErrorCode p1, const QByteArray& p2 ) { emit onGetStoredFileDone( reqID, p1, p2 ); }
             void emitListDirectoryDone( int reqID, const ErrorCode p1, const QStringList& p2 ) { emit onListDirectoryDone( reqID, p1, p2 ); }
             void emitCurrentTimeDone( int reqID, const ErrorCode p1, const qint64& p2 ) { emit onCurrentTimeDone( reqID, p1, p2 ); }
-            void emitDumpDatabaseDone( int reqID, const ErrorCode p1, const QByteArray& p2 ) { emit onDumpDatabaseDone( reqID, p1, p2 ); }
+            void emitDumpDatabaseDone( int reqID, const ErrorCode p1, const ec2::ApiDatabaseDumpData& p2 ) { emit onDumpDatabaseDone( reqID, p1, p2 ); }
             void emitGetSettingsDone( int reqID, const ErrorCode p1, const QnKvPairList& p2 ) { emit onGetSettingsDone( reqID, p1, p2 ); }
             void emitTestConnectionDone( int reqID, const ErrorCode p1, const QnConnectionInfo& p2 ) { emit onTestConnectionDone( reqID, p1, p2 ); }
             void emitConnectDone( int reqID, const ErrorCode p1, const AbstractECConnectionPtr &p2 ) { emit onConnectDone( reqID, p1, p2 ); }
@@ -206,7 +206,7 @@ namespace ec2
             void onGetStoredFileDone( int reqID, const ErrorCode, const QByteArray& );
             void onListDirectoryDone( int reqID, const ErrorCode, const QStringList& );
             void onCurrentTimeDone( int reqID, const ErrorCode, const qint64& );
-            void onDumpDatabaseDone( int reqID, const ErrorCode, const QByteArray& );
+            void onDumpDatabaseDone( int reqID, const ErrorCode, const ec2::ApiDatabaseDumpData& );
             void onGetSettingsDone( int reqID, const ErrorCode, const QnKvPairList& );
             void onTestConnectionDone( int reqID, const ErrorCode, const QnConnectionInfo& );
             void onConnectDone( int reqID, const ErrorCode, const AbstractECConnectionPtr &);
@@ -292,7 +292,7 @@ namespace ec2
         ///////// Handlers for AbstractECConnection
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( CurrentTime, ErrorCode, qint64 )
-        DEFINE_TWO_ARG_HANDLER( DumpDatabase, ErrorCode, QByteArray )
+        DEFINE_TWO_ARG_HANDLER( DumpDatabase, ErrorCode, ApiDatabaseDumpData )
         DEFINE_TWO_ARG_HANDLER( GetSettings, ErrorCode, QnKvPairList )
 
 

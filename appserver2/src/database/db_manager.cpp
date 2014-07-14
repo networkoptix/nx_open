@@ -192,11 +192,20 @@ QnDbManager::QnDbManager(
     m_licenseManagerImpl( licenseManagerImpl ),
     m_licenseOverflowMarked(false),
     m_licenseOverflowTime(0),
-    m_tranStatic(m_sdbStatic, m_mutexStatic)
+    m_tranStatic(m_sdbStatic, m_mutexStatic),
+    m_needResyncLog(false)
 {
     m_resourceFactory = factory;
     m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
-    m_sdb.setDatabaseName( closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite"));
+    QString dbFileName = closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite");
+    m_sdb.setDatabaseName( dbFileName);
+
+    QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
+    if (QFile::exists(backupDbFileName)) {
+        QFile::remove(dbFileName);
+        QFile::rename(backupDbFileName, dbFileName);
+        m_needResyncLog = true;
+    }
 
     m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", "QnDbManagerStatic");
     QString path2 = dbFilePathStatic.isEmpty() ? dbFilePath : dbFilePathStatic;
@@ -274,8 +283,7 @@ bool QnDbManager::init()
     }
 
     bool dbJustCreated = false;
-    bool isMigrationFrom2_2 = false;
-    if (!createDatabase(&dbJustCreated, &isMigrationFrom2_2))  { 
+    if (!createDatabase(&dbJustCreated))  { 
         // create tables is DB is empty
         qWarning() << "can't create tables for sqlLite database!";
         return false;
@@ -363,7 +371,7 @@ bool QnDbManager::init()
     if (QnTransactionLog::instance())
         QnTransactionLog::instance()->init();
 
-    if (isMigrationFrom2_2)
+    if (m_needResyncLog)
         resyncTransactionLog();
     
     if (dbJustCreated) {
@@ -649,12 +657,11 @@ bool QnDbManager::migrateBusinessEvents()
     return true;
 }
 
-bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
+bool QnDbManager::createDatabase(bool *dbJustCreated)
 {
     QnDbTransactionLocker lock(&m_tran);
 
     *dbJustCreated = false;
-    *isMigrationFrom2_2 = false;
 
     if (!isObjectExists(lit("table"), lit("vms_resource"), m_sdb))
     {
@@ -678,7 +685,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
     {
         if (!(*dbJustCreated)) {
-            *isMigrationFrom2_2 = true;
+            m_needResyncLog = true;
             if (!execSQLFile(lit(":/02_migration_from_2_2.sql"), m_sdb))
                 return false;
         }
@@ -1092,6 +1099,27 @@ ErrorCode QnDbManager::updateCameraSchedule(const ApiCameraData& data, qint32 in
             return ErrorCode::dbError;
         }
     }
+    return ErrorCode::ok;
+}
+
+void restartServer();
+
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran)
+{
+    m_sdb.close();
+    QFile f(m_sdb.databaseName() + QString(lit(".backup")));
+    if (!f.open(QFile::WriteOnly))
+        return ErrorCode::failure;
+    f.write(tran.params.data);
+    f.close();
+
+    QSqlDatabase testDB = QSqlDatabase::addDatabase("QSQLITE", "QnDbManagerTmp");
+    testDB.setDatabaseName( f.fileName());
+    if (!testDB.open() || !isObjectExists(lit("table"), lit("transaction_log"), testDB)) {
+        QFile::remove(f.fileName());
+        return ErrorCode::dbError; // invalid back file
+    }
+
     return ErrorCode::ok;
 }
 
@@ -2227,6 +2255,18 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentT
     currentTime.value = QDateTime::currentMSecsSinceEpoch();
     return ErrorCode::ok;
 }
+
+// dumpDatabase
+ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& data)
+{
+    QWriteLocker lock(&m_mutex);
+    QFile f(m_sdb.databaseName());
+    if (!f.open(QFile::ReadOnly))
+        return ErrorCode::failure;
+    data.data = f.readAll();
+    return ErrorCode::ok;
+}
+
 
 // ApiFullInfo
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& data)

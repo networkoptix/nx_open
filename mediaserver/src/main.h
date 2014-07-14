@@ -52,6 +52,7 @@ private slots:
 
     void at_appStarted();
     void at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
+    void at_restartServerRequired();
 private:
     void updateDisabledVendorsIfNeeded();
     void initTcpListener();
