@@ -1305,6 +1305,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered() {
             workbench()->addLayout(layout);
         }
         layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(item.uuid));
+        layout->setData(Qn::VideoWallControlRole, m_controlMode.active);
 
     }
 
@@ -1745,48 +1746,8 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemChanged(const QnVideoWallReso
     if (item.uuid == workbench()->currentLayout()->data(Qn::VideoWallItemGuidRole).value<QUuid>())
         updateMode();
 
-    // index to place updated layout
-    int layoutIndex = -1;
-    bool wasCurrent = false;
-
-    // check if layout was changed or detached
-    for (int i = 0; i < workbench()->layouts().size(); ++i) {
-         QnWorkbenchLayout *layout = workbench()->layout(i);
-
-        if (layout->data(Qn::VideoWallItemGuidRole).value<QUuid>() != item.uuid)
-            continue;
-
-        if (layout->resource() && item.layout == layout->resource()->getId())
-            return; //everything is correct, no changes required
-
-        wasCurrent = workbench()->currentLayout() == layout;
-        layoutIndex = i;
-        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QUuid()));
-        workbench()->removeLayout(layout);
-    }
-
-    if (item.layout.isNull() || layoutIndex < 0)
-        return;
-
-    // add new layout if needed
-    {
-        QnLayoutResourcePtr layoutResource = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
-        if (!layoutResource)
-            return;
-
-        QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(layoutResource);
-        if(!layout) 
-            layout = new QnWorkbenchLayout(layoutResource, workbench());
-
-        if (workbench()->layoutIndex(layout) < 0)
-            workbench()->insertLayout(layout, layoutIndex);
-        else 
-            workbench()->moveLayout(layout, layoutIndex);
-
-        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(item.uuid));
-        if (wasCurrent)
-            workbench()->setCurrentLayoutIndex(layoutIndex);
-    }
+    updateControlLayout(videoWall, item);
+   
 
 }
 
@@ -2293,4 +2254,51 @@ void QnWorkbenchVideoWallHandler::updateMainWindowGeometry(const QnScreenSnaps &
         menu()->action(Qn::EffectiveMaximizeAction)->setChecked(false);
         mainWindow()->setGeometry(targetGeometry);
     }       
+}
+
+void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item) {
+    // index to place updated layout
+    int layoutIndex = -1;
+    bool wasCurrent = false;
+
+    // check if layout was changed or detached
+    for (int i = 0; i < workbench()->layouts().size(); ++i) {
+        QnWorkbenchLayout *layout = workbench()->layout(i);
+
+        if (layout->data(Qn::VideoWallItemGuidRole).value<QUuid>() != item.uuid)
+            continue;
+
+        if (layout->resource() && item.layout == layout->resource()->getId())
+            return; //everything is correct, no changes required
+
+        wasCurrent = workbench()->currentLayout() == layout;
+        layoutIndex = i;
+        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QUuid()));
+        layout->setData(Qn::VideoWallControlRole, false);
+        workbench()->removeLayout(layout);
+    }
+
+    if (item.layout.isNull() || layoutIndex < 0)
+        return;
+
+    // add new layout if needed
+    {
+        QnLayoutResourcePtr layoutResource = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
+        if (!layoutResource)
+            return;
+
+        QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(layoutResource);
+        if(!layout) 
+            layout = new QnWorkbenchLayout(layoutResource, workbench());
+
+        if (workbench()->layoutIndex(layout) < 0)
+            workbench()->insertLayout(layout, layoutIndex);
+        else 
+            workbench()->moveLayout(layout, layoutIndex);
+
+        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(item.uuid));
+        layout->setData(Qn::VideoWallControlRole, wasCurrent && m_controlMode.active);
+        if (wasCurrent)
+            workbench()->setCurrentLayoutIndex(layoutIndex);
+    }
 }

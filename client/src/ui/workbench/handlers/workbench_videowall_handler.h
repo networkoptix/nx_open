@@ -73,6 +73,8 @@ private:
 
     void setItemOnline(const QUuid &instanceGuid, bool online);
     void updateMainWindowGeometry(const QnScreenSnaps &screenSnaps);
+
+    void updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item);
 private slots:
 
     void at_newVideoWallAction_triggered();
