@@ -185,19 +185,24 @@ QnId QnDbManager::getType(const QString& typeName)
     return QnId();
 }
 
-QnDbManager::QnDbManager(
-    QnResourceFactory* factory,
-    LicenseManagerImpl* const licenseManagerImpl,
-    const QString& dbFilePath,
-    const QString& dbFilePathStatic)
+QnDbManager::QnDbManager()
 :
-    QnDbHelper(),
-    m_licenseManagerImpl( licenseManagerImpl ),
     m_licenseOverflowMarked(false),
     m_licenseOverflowTime(0),
-    m_tranStatic(m_sdbStatic, m_mutexStatic)
+    m_tranStatic(m_sdbStatic, m_mutexStatic),
+    m_initialized(false)
+{
+	Q_ASSERT(!globalInstance);
+	globalInstance = this;
+}
+
+bool QnDbManager::init(
+    QnResourceFactory* factory,
+    const QString& dbFilePath,
+    const QString& dbFilePathStatic )
 {
     m_resourceFactory = factory;
+
 	m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
     m_sdb.setDatabaseName( closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite"));
 
@@ -205,13 +210,7 @@ QnDbManager::QnDbManager(
     QString path2 = dbFilePathStatic.isEmpty() ? dbFilePath : dbFilePathStatic;
     m_sdbStatic.setDatabaseName( closeDirPath(path2) + QString::fromLatin1("ecs_static.sqlite"));
 
-	Q_ASSERT(!globalInstance);
-	globalInstance = this;
-}
-
-bool QnDbManager::init()
-{
-	if (!m_sdb.open())
+    if (!m_sdb.open())
 	{
         qWarning() << "can't initialize EC sqlLite database!";
         return false;
@@ -342,8 +341,15 @@ bool QnDbManager::init()
         transactionLog->saveTransaction(tran, serializedTran);
     }
 
+    emit initialized();
+    m_initialized = true;
 
     return true;
+}
+
+bool QnDbManager::isInitialized() const
+{
+    return m_initialized;
 }
 
 QMap<int, QnId> QnDbManager::getGuidList(const QString& request)
@@ -1612,6 +1618,31 @@ ApiObjectInfoList QnDbManager::getNestedObjects(const ApiObjectInfo& parentObjec
     return result;
 }
 
+bool QnDbManager::saveMiscParam( const QByteArray& name, const QByteArray& value )
+{
+    QnDbManager::Locker locker( this );
+
+    QSqlQuery insQuery(m_sdb);
+    insQuery.prepare("INSERT INTO misc_data (key, data) values (?,?)");
+    insQuery.addBindValue( name );
+    insQuery.addBindValue( value );
+    return insQuery.exec();
+}
+
+bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
+{
+    QReadLocker lock(&m_mutex);
+
+    QSqlQuery query(m_sdb);
+    query.prepare("SELECT data from misc_data where key = ?");
+    query.addBindValue(name);
+    if( query.exec() && query.next() ) {
+        *value = query.value(0).toByteArray();
+        return true;
+    }
+    return false;
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiIdData>& tran)
 {
     switch(tran.command) {
@@ -2229,8 +2260,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     }
 
     return ErrorCode::ok;
-
-//    return m_licenseManagerImpl->addLicenses( tran.params );
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList> &tran) {
@@ -2293,10 +2322,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicense
         return ErrorCode::dbError;
     }
 
-    //QnSql::fetch_many_if(query, &data, [&](const ec2::ApiLicenseData &license) { return m_licenseManagerImpl->validateLicense(license); });
     QnSql::fetch_many(query, &data);
-
-    // m_licenseManagerImpl->getLicenses( &data );
     return ErrorCode::ok;
 }
 

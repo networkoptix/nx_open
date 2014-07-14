@@ -35,9 +35,7 @@ namespace ec2
         virtual void startReceivingNotifications() override;
 
     private:
-        LicenseManagerImpl m_licenseManagerImpl;
         EmailManagerImpl m_emailManagerImpl;
-		std::unique_ptr<QnDbManager> m_dbManager;   //TODO: #ak not sure this is right place for QnDbManager instance
         std::unique_ptr<QnAuxManager> m_auxManager;
         std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;

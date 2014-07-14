@@ -40,11 +40,13 @@ namespace ec2
     private:
         ServerQueryProcessor m_serverQueryProcessor;
         ClientQueryProcessor m_remoteQueryProcessor;
-        Ec2DirectConnectionPtr m_directConnection;
         QMutex m_mutex;
         ResourceContext m_resCtx;
+        std::unique_ptr<QnDbManager> m_dbManager;
+        std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
         std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
         //std::map<QUrl, AbstractECConnectionPtr> m_urlToConnection;
+        Ec2DirectConnectionPtr m_directConnection;
 
         int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
         int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler );

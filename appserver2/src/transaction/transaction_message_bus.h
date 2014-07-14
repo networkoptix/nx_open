@@ -30,7 +30,6 @@ namespace ec2
         virtual ~QnTransactionMessageBus();
 
         static QnTransactionMessageBus* instance();
-        static void initStaticInstance(QnTransactionMessageBus* instance);
 
         void addConnectionToPeer(const QUrl& url, const QUuid& peer = QUuid());
         void removeConnectionFromPeer(const QUrl& url);

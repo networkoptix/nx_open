@@ -129,21 +129,15 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
 
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
-static QnTransactionMessageBus*m_globalInstance = 0;
+static QnTransactionMessageBus* m_globalInstance = 0;
 
 QnTransactionMessageBus* QnTransactionMessageBus::instance()
 {
     return m_globalInstance;
 }
 
-void QnTransactionMessageBus::initStaticInstance(QnTransactionMessageBus* instance)
-{
-    Q_ASSERT(m_globalInstance == 0 || instance == 0);
-    delete m_globalInstance;
-    m_globalInstance = instance;
-}
-
-QnTransactionMessageBus::QnTransactionMessageBus(): 
+QnTransactionMessageBus::QnTransactionMessageBus()
+: 
     m_localPeer(QnId(), Qn::PT_Server),
     m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
@@ -163,6 +157,9 @@ QnTransactionMessageBus::QnTransactionMessageBus():
     connect(m_timer, &QTimer::timeout, this, &QnTransactionMessageBus::at_timer);
     m_timer->start(500);
     m_aliveSendTimer.invalidate();
+
+    assert( m_globalInstance == nullptr );
+    m_globalInstance = this;
 }
 
 void QnTransactionMessageBus::start()
@@ -174,6 +171,8 @@ void QnTransactionMessageBus::start()
 
 QnTransactionMessageBus::~QnTransactionMessageBus()
 {
+    m_globalInstance = nullptr;
+
     if (m_thread) {
         m_thread->exit();
         m_thread->wait();
