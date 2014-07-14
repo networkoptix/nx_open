@@ -201,9 +201,17 @@ public:
 protected:
     int sockDesc;              // Socket descriptor
     QString m_lastError;
+    SocketImpl* m_impl;
 
-    Socket(int type, int protocol) ;
-    Socket(int sockDesc);
+    /*!
+        \param sockImpl If not NULL, sockImpl is used, otherwise new is created. In any case, object ownership is passed to class \a Socket
+    */
+    Socket(int type, int protocol, SocketImpl* sockImpl = NULL);
+    /*!
+        \param sockImpl If not NULL, sockImpl is used, otherwise new is created. In any case, object ownership is passed to class \a Socket
+    */
+    Socket(int sockDesc, SocketImpl* sockImpl = NULL);
+
     bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
     bool createSocket(int type, int protocol);
     void setStatusBit( StatusBit _status );
@@ -211,7 +219,6 @@ protected:
     void saveErrorInfo();
 
 private:
-    SocketImpl* m_impl;
     bool m_nonBlockingMode;
     unsigned int m_status;
     SystemError::ErrorCode m_prevErrorCode;
@@ -268,8 +275,14 @@ public:
     unsigned short getForeignPort() ;
 
 protected:
-    CommunicatingSocket(int type, int protocol) ;
-    CommunicatingSocket(int newConnSD);
+    /*!
+        \param sockImpl If not NULL, sockImpl is used, otherwise new is created. In any case, object ownership is passed to class \a Socket
+    */
+    CommunicatingSocket(int type, int protocol, SocketImpl* sockImpl = NULL);
+    /*!
+        \param sockImpl If not NULL, sockImpl is used, otherwise new is created. In any case, object ownership is passed to class \a Socket
+    */
+    CommunicatingSocket(int newConnSD, SocketImpl* sockImpl = NULL);
 
 protected:
     bool mConnected;
@@ -307,6 +320,10 @@ public:
     virtual bool setNoDelay( bool value ) override;
     //!Implementation of AbstractStreamSocket::getNoDelay
     virtual bool getNoDelay( bool* value ) override;
+    //!Implementation of AbstractStreamSocket::toggleStatisticsCollection
+    virtual bool toggleStatisticsCollection( bool val ) override;
+    //!Implementation of AbstractStreamSocket::getConnectionStatistics
+    virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
 
 private:
     // Access for TCPServerSocket::accept() connection creation

@@ -1,19 +1,21 @@
 #include "system_socket.h"
 
+#include <memory>
 #include <boost/type_traits/is_same.hpp>
 
+#include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 #include <utils/network/ssl_socket.h>
 
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
 #  include <iphlpapi.h>
+#  include "win32_socket_tools.h"
 #endif
 
 #include <QtCore/QElapsedTimer>
 
 #include "system_socket_impl.h"
-#include <utils/common/systemerror.h>
 
 
 #ifdef Q_OS_WIN
@@ -460,7 +462,7 @@ const SocketImpl* Socket::impl() const
     return m_impl;
 }
 
-Socket::Socket(int type, int protocol)
+Socket::Socket(int type, int protocol, SocketImpl* sockImpl)
 :
     sockDesc( -1 ),
     m_impl( NULL ),
@@ -476,10 +478,10 @@ Socket::Socket(int type, int protocol)
         setStatusBit( sbFailed );
     }
 
-    m_impl = new SocketImpl();
+    m_impl = sockImpl ? sockImpl : new SocketImpl();
 }
 
-Socket::Socket(int _sockDesc)
+Socket::Socket(int _sockDesc, SocketImpl* sockImpl)
 :
     sockDesc( -1 ),
     m_impl( NULL ),
@@ -490,7 +492,7 @@ Socket::Socket(int _sockDesc)
     m_writeTimeoutMS( 0 )
 {
     this->sockDesc = _sockDesc;
-    m_impl = new SocketImpl();
+    m_impl = sockImpl ? sockImpl : new SocketImpl();
 }
 
 // Function to fill in address structure given an address and port
@@ -628,14 +630,14 @@ namespace
 }
 #endif
 
-CommunicatingSocket::CommunicatingSocket(int type, int protocol)
-    : Socket(type, protocol),
+CommunicatingSocket::CommunicatingSocket(int type, int protocol, SocketImpl* sockImpl)
+    : Socket(type, protocol, sockImpl),
       mConnected(false)
 {
 }
 
-CommunicatingSocket::CommunicatingSocket(int newConnSD) 
-    : Socket(newConnSD),
+CommunicatingSocket::CommunicatingSocket(int newConnSD, SocketImpl* sockImpl) 
+    : Socket(newConnSD, sockImpl),
       mConnected(true)
 {
 }
@@ -876,14 +878,42 @@ unsigned short CommunicatingSocket::getForeignPort()  {
 
 // TCPSocket Code
 
+#ifdef _WIN32
+class Win32TcpSocketImpl
+:
+    public SocketImpl
+{
+public:
+    MIB_TCPROW win32TcpTableRow;
+
+    Win32TcpSocketImpl()
+    {
+        memset( &win32TcpTableRow, 0, sizeof(win32TcpTableRow) );
+    }
+};
+#endif
+
 TCPSocket::TCPSocket()
-    : CommunicatingSocket(SOCK_STREAM,
-                          IPPROTO_TCP) {
+:
+    CommunicatingSocket(
+        SOCK_STREAM,
+        IPPROTO_TCP
+#ifdef _WIN32
+        , new Win32TcpSocketImpl()
+#endif
+        )
+{
 }
 
 TCPSocket::TCPSocket( const QString &foreignAddress, unsigned short foreignPort )
 :
-    CommunicatingSocket(SOCK_STREAM, IPPROTO_TCP)
+    CommunicatingSocket(
+        SOCK_STREAM,
+        IPPROTO_TCP
+#ifdef _WIN32
+        , new Win32TcpSocketImpl()
+#endif
+        )
 {
     connect( foreignAddress, foreignPort, AbstractCommunicatingSocket::DEFAULT_TIMEOUT_MILLIS );
 }
@@ -926,6 +956,46 @@ bool TCPSocket::getNoDelay( bool* value )
 
     *value = flag > 0;
     return true;
+}
+
+bool TCPSocket::toggleStatisticsCollection( bool val )
+{
+#ifdef _WIN32
+    if( GetTcpRow(
+            getLocalAddress().port,
+            getForeignAddress().port,
+            MIB_TCP_STATE_ESTAB,
+            &static_cast<Win32TcpSocketImpl*>(m_impl)->win32TcpTableRow ) != ERROR_SUCCESS )
+    {
+        return false;
+    }
+
+    auto freeLambda = [](void* ptr){ ::free(ptr); };
+    std::unique_ptr<TCP_ESTATS_PATH_RW_v0, decltype(freeLambda)> pathRW( (TCP_ESTATS_PATH_RW_v0*)malloc( sizeof(TCP_ESTATS_PATH_RW_v0) ), freeLambda );
+    if( !pathRW.get() )
+        return false;
+
+    memset( pathRW.get(), 0, sizeof(*pathRW) ); // zero the buffer
+    pathRW->EnableCollection = val ? TRUE : FALSE;
+    //enabling statistics collection
+    return SetPerTcpConnectionEStats(
+            &static_cast<Win32TcpSocketImpl*>(m_impl)->win32TcpTableRow,
+            TcpConnectionEstatsPath,
+            (UCHAR*)pathRW.get(), 0, sizeof(*pathRW),
+            0 ) == NO_ERROR;
+#else
+    Q_UNUSED(val);
+    return true;
+#endif
+}
+
+bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
+{
+#ifdef _WIN32
+    return readTcpStat( &static_cast<Win32TcpSocketImpl*>(m_impl)->win32TcpTableRow, info ) == ERROR_SUCCESS;
+#else
+    return false;
+#endif
 }
 
 TCPSocket::TCPSocket(int newConnSD) : CommunicatingSocket(newConnSD) {

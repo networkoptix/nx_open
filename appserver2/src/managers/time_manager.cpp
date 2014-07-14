@@ -134,6 +134,8 @@ namespace ec2
     //!Considering internet time equal to local time if difference is no more than this value
     static const qint64 MAX_LOCAL_SYSTEM_TIME_DRIFT = 10*1000;
 
+    //TODO #ak save time to persistent storage and restore at startup
+
     TimeSynchronizationManager::TimeSynchronizationManager( Qn::PeerType peerType )
     :
         m_localSystemTimeDelta( std::numeric_limits<qint64>::min() ),
@@ -348,6 +350,7 @@ namespace ec2
     void TimeSynchronizationManager::onNewConnectionEstablished( const QnTransactionTransportPtr& transport )
     {
         using namespace std::placeholders;
+        transport->getSocket()->toggleStatisticsCollection( true );
         transport->setBeforeSendingChunkHandler( std::bind( &TimeSynchronizationManager::onBeforeSendingHttpChunk, this, _1, _2 ) );
         transport->setHttpChunkExtensonHandler( std::bind( &TimeSynchronizationManager::onRecevingHttpChunkExtensions, this, _1, _2 ) );
     }
@@ -459,17 +462,25 @@ namespace ec2
             const qint64 curLocalTime = currentMSecsSinceEpoch();
 
             //using received time
+            const auto flagsBak = m_localTimePriorityKey.flags;
             m_localTimePriorityKey.flags |= peerTimeSynchronizedWithInternetServer;
-            m_localSystemTimeDelta = millisFromEpoch - m_monotonicClock.elapsed();
 
-            if( llabs(curLocalTime - millisFromEpoch) > MAX_LOCAL_SYSTEM_TIME_DRIFT )
+            if( (llabs(curLocalTime - millisFromEpoch) > MAX_LOCAL_SYSTEM_TIME_DRIFT) || (flagsBak != m_localTimePriorityKey.flags) )
             {
+                //sending broadcastPeerSystemTime tran, new sync time will be broadcasted along with it
+                m_localSystemTimeDelta = millisFromEpoch - m_monotonicClock.elapsed();
+
                 remotePeerTimeSyncUpdate(
                     &lk,
                     qnCommon->moduleGUID(),
                     m_monotonicClock.elapsed(),
                     millisFromEpoch,
                     m_localTimePriorityKey );
+
+                using namespace std::placeholders;
+                m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
+                    std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
+                    0 );
             }
         }
         else
@@ -502,7 +513,12 @@ namespace ec2
         {
             if( extension.first == TIME_SYNC_EXTENSION_NAME )
             {
-                int rttMillis = 0;    //TODO #ak get tcp connection round trip time
+                //taking into account tcp connection round trip time
+                unsigned int rttMillis = 0;
+                StreamSocketInfo sockInfo;
+                if( transport->getSocket()->getConnectionStatistics( &sockInfo ) )
+                    rttMillis = sockInfo.rttVar;
+
                 TimeSyncInfo remotePeerTimeSyncInfo;
                 if( !remotePeerTimeSyncInfo.fromString( extension.second ) )
                     continue;

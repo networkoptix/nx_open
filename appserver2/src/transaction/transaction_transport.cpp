@@ -129,6 +129,11 @@ void QnTransactionTransport::removeEventHandler( int eventHandlerID )
     m_beforeSendingChunkHandlers.erase( eventHandlerID );
 }
 
+AbstractStreamSocket* QnTransactionTransport::getSocket() const
+{
+    return m_socket.data();
+}
+
 void QnTransactionTransport::close()
 {
     closeSocket();

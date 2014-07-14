@@ -110,6 +110,8 @@ public:
     //!Remove event handler, installed by \a QnTransactionTransport::setHttpChunkExtensonHandler or \a QnTransactionTransport::setBeforeSendingChunkHandler
     void removeEventHandler( int eventHandlerID );
 
+    AbstractStreamSocket* getSocket() const;
+
     static bool tryAcquireConnecting(const QnId& remoteGuid, bool isOriginator);
     static bool tryAcquireConnected(const QnId& remoteGuid, bool isOriginator);
     static void connectingCanceled(const QnId& id, bool isOriginator);
@@ -140,7 +142,7 @@ private:
     std::vector<quint8> m_readBuffer;
     size_t m_readBufferLen;
     int m_chunkHeaderLen;
-    quint32 m_chunkLen;
+    size_t m_chunkLen;
     int m_sendOffset;
     //!Holds raw data. It is serialized to http chunk just before sending to socket
     std::deque<DataToSend> m_dataToSend;

@@ -321,6 +321,18 @@ bool QnSSLSocket::getNoDelay( bool* value )
     return d->wrappedSocket->getNoDelay(value);
 }
 
+bool QnSSLSocket::toggleStatisticsCollection( bool val )
+{
+    Q_D(QnSSLSocket);
+    return d->wrappedSocket->toggleStatisticsCollection(val);
+}
+
+bool QnSSLSocket::getConnectionStatistics( StreamSocketInfo* info )
+{
+    Q_D(QnSSLSocket);
+    return d->wrappedSocket->getConnectionStatistics(info);
+}
+
 bool QnSSLSocket::connect(
                      const QString& foreignAddress,
                      unsigned short foreignPort,
