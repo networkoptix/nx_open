@@ -209,9 +209,9 @@ namespace ec2
             m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
                 std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
                 0 );
-            //m_internetSynchronizationTaskID = TimerManager::instance()->addTimer(
-            //    std::bind( &TimeSynchronizationManager::syncTimeWithInternet, this, _1 ),
-            //    0 );
+            m_internetSynchronizationTaskID = TimerManager::instance()->addTimer(
+                std::bind( &TimeSynchronizationManager::syncTimeWithInternet, this, _1 ),
+                0 );
         }
         else
             m_manualTimerServerSelectionCheckTaskID = TimerManager::instance()->addTimer(
