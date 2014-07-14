@@ -126,8 +126,11 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
     // videowall control mode
     QUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QUuid>();
     if (!videoWallInstanceGuid.isNull()) {
-        bool active = layout->data(Qn::VideoWallControlRole).value<bool>();
-        if (active)
+        QnVideoWallItemIndex idx = qnResPool->getVideoWallItemByUuid(videoWallInstanceGuid);
+        bool online = idx.isNull()
+            ? false
+            : idx.item().online;
+        if (online)
             return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
         return qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
     }
@@ -269,31 +272,6 @@ void QnLayoutTabBar::at_workbench_currentLayoutChanged() {
     checkInvariants();
 }
 
-void QnLayoutTabBar::at_layout_nameChanged() {
-    QnWorkbenchLayout *layout = checked_cast<QnWorkbenchLayout *>(sender());
-
-    updateTabText(layout);
-}
-
-void QnLayoutTabBar::at_layout_lockedChanged() {
-    QnWorkbenchLayout *layout = checked_cast<QnWorkbenchLayout *>(sender());
-
-    updateTabIcon(layout);
-}
-
-void QnLayoutTabBar::at_layout_dataChanged(int role) {
-    switch (role) {
-    case Qn::VideoWallControlRole:
-    case Qn::VideoWallItemGuidRole:
-        break;
-    default:
-        return;
-    }
-
-    QnWorkbenchLayout *layout = checked_cast<QnWorkbenchLayout *>(sender());
-    updateTabIcon(layout);
-}
-
 void QnLayoutTabBar::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
     updateTabText(QnWorkbenchLayout::instance(resource));
 }
@@ -310,9 +288,16 @@ void QnLayoutTabBar::tabInserted(int index) {
         }
 
         QnWorkbenchLayout *layout = m_layouts[index];
-        connect(layout, SIGNAL(nameChanged()),          this, SLOT(at_layout_nameChanged()));
-        connect(layout, SIGNAL(lockedChanged()),        this, SLOT(at_layout_lockedChanged()));
-        connect(layout, SIGNAL(dataChanged(int)),       this, SLOT(at_layout_dataChanged(int)));
+        connect(layout, &QnWorkbenchLayout::nameChanged,    this, [this, layout] {
+            updateTabText(layout);
+        });
+        connect(layout, &QnWorkbenchLayout::lockedChanged,  this, [this, layout] {
+            updateTabIcon(layout);
+        });
+        connect(layout, &QnWorkbenchLayout::titleChanged,   this, [this, layout] {
+            updateTabText(layout);
+            updateTabIcon(layout);
+        });
 
         if(!name.isNull())
             layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */

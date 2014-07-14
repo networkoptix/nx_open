@@ -34,6 +34,12 @@ public:
     bool saveReviewLayout(const QnLayoutResourcePtr &layout, std::function<void(int, ec2::ErrorCode)> callback);
 
 private:
+    enum class ItemAction {
+        Added,
+        Changed,
+        Removed
+    };
+
     ec2::AbstractECConnectionPtr connection2() const;
 
     void resetLayout(const QnVideoWallItemIndexList &items, const QnLayoutResourcePtr &layout);
@@ -74,7 +80,8 @@ private:
     void setItemOnline(const QUuid &instanceGuid, bool online);
     void updateMainWindowGeometry(const QnScreenSnaps &screenSnaps);
 
-    void updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item);
+    void updateControlLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
+    void updateReviewLayout(const QnVideoWallResourcePtr &videowall, const QnVideoWallItem &item, ItemAction action);
 private slots:
 
     void at_newVideoWallAction_triggered();

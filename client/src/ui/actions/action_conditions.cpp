@@ -810,9 +810,9 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
     if (parameters.videoWallItems().size() > 0) {
         // allow action if there is at least one online item
         foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
-            if (index.isNull() || !index.videowall()->items()->hasItem(index.uuid()))
+            if (!index.isValid())
                 continue;
-            if (index.videowall()->items()->getItem(index.uuid()).online)
+            if (index.item().online)
                 return Qn::EnabledAction;
         }
         return Qn::DisabledAction;
@@ -859,11 +859,10 @@ Qn::ActionVisibility QnStartVideoWallControlActionCondition::check(const QnActio
         return Qn::InvisibleAction;
 
     foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
-        if (index.isNull() || !index.videowall()->items()->hasItem(index.uuid()))
+        if (!index.isValid())
             continue;
 
-        auto item = index.videowall()->items()->getItem(index.uuid());
-        if (item.layout.isNull())
+        if (index.item().layout.isNull())
             continue;
 
         return Qn::EnabledAction;

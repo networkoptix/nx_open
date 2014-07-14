@@ -14,22 +14,17 @@ class QnVideoWallItemIndex {
 public:
     QnVideoWallItemIndex() {}
 
-    QnVideoWallItemIndex(const QnVideoWallResourcePtr &videowall, const QUuid &uuid):
-        m_videowall(videowall), m_uuid(uuid)
-    {}
+    QnVideoWallItemIndex(const QnVideoWallResourcePtr &videowall, const QUuid &uuid);
 
-    const QnVideoWallResourcePtr &videowall() const {
-        return m_videowall;
-    }
+    QnVideoWallResourcePtr videowall() const;
+    QnVideoWallItem item() const;
+    QUuid uuid() const;
 
-    const QUuid &uuid() const {
-        return m_uuid;
-    }
+    /** \return true if the index item is not initialized. */
+    bool isNull() const;
 
-    bool isNull() const {
-        return m_videowall.isNull() || m_uuid.isNull();
-    }
-
+    /** \return true if the index contains valid videowall item data. */
+    bool isValid() const;
 private:
     QnVideoWallResourcePtr m_videowall;
     QUuid m_uuid;

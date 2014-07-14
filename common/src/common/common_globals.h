@@ -314,7 +314,6 @@ public:
         VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QUuid. */
         VideoWallPcGuidRole,                        /**< Role for videowall pc unique id. Value of type QUuid. */
         VideoWallPcScreenIndicesRole,               /**< Role for videowall pc screen indices. Value of type QSet<int>. */
-        VideoWallControlRole,                       /**< Role for status of the videowall control. Value of type bool. */
 
         /* Layout-based. */
         LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */
