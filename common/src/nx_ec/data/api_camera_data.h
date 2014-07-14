@@ -35,7 +35,7 @@ namespace ec2
     struct ApiCameraData: ApiResourceData
     {
         ApiCameraData(): scheduleEnabled(true), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryStreamQuality(Qn::SSQualityNotDefined),
-                         controlEnabled(true), statusFlags(0) {}
+                         controlEnabled(true), statusFlags(0), minArchiveDays(0), maxArchiveDays(0) {}
 
         bool                scheduleEnabled;
         Qn::MotionType      motionType;
@@ -55,9 +55,11 @@ namespace ec2
         Qn::CameraStatusFlags   statusFlags;
         QnLatin1Array       dewarpingParams;
         QString             vendor;
+        int                 minArchiveDays;
+        int                 maxArchiveDays;
     };
 #define ApiCameraData_Fields ApiResourceData_Fields (scheduleEnabled)(motionType)(motionMask)(mac)(login)(password)(scheduleTasks)(audioEnabled)(physicalId)(manuallyAdded)(model) \
-                            (groupId)(groupName)(secondaryStreamQuality)(controlEnabled)(statusFlags)(dewarpingParams)(vendor)
+                            (groupId)(groupName)(secondaryStreamQuality)(controlEnabled)(statusFlags)(dewarpingParams)(vendor)(minArchiveDays)(maxArchiveDays)
 
 } // namespace ec2
 

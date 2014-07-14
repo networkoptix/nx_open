@@ -157,7 +157,7 @@ bool QnArchiveStreamReader::isMediaPaused() const
 {
     if(m_navDelegate)
         return m_navDelegate->isMediaPaused();
-    return m_singleShot;
+    return m_singleShot || m_pausedStart;
 }
 
 void QnArchiveStreamReader::setCurrentTime(qint64 value)
