@@ -18,7 +18,7 @@ Type: string
 Default: ${deb.customization.company.name}
 Description: System name:
 
-Template: ${deb.customization.company.name}-entcontroller/removeDatabase
+Template: ${deb.customization.company.name}-mediaserver/removeDatabase
 Type: select
 Choices: ${choices}
 Description: Keep the database, remove or revert to previous version (if any)
