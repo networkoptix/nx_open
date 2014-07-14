@@ -5,7 +5,9 @@
 
 #include <array>
 
-struct QnScreenSnap {
+#include <boost/operators.hpp>
+
+struct QnScreenSnap: public boost::equality_comparable1<QnScreenSnap>  {
     int screenIndex;    /**< Index of the screen. */
     int snapIndex;      /**< Index of the snap on the screen. */
 
@@ -23,7 +25,7 @@ struct QnScreenSnap {
     }
 };
 
-struct QnScreenSnaps {
+struct QnScreenSnaps: public boost::equality_comparable1<QnScreenSnaps> {
     inline QnScreenSnap &left() {return values[0];}
     inline const QnScreenSnap &left() const {return values[0];}
 

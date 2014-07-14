@@ -135,24 +135,54 @@ namespace {
     }
 #endif
 
-    void addItemToLayout(const QnLayoutResourcePtr &layout, const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc, const QSet<int> screens) {
-        int firstScreen = qnIndexOf(pc.screens, [screens](const QnVideoWallPcData::PcScreen &screen) {return screens.contains(screen.index);});
-        if (firstScreen < 0)
+    void addItemToLayout(const QnLayoutResourcePtr &layout, const QnVideoWallItemIndexList& indices) {
+        if (indices.isEmpty())
+            return;
+
+        QnVideoWallItemIndex firstIdx = indices.first();
+        if (!firstIdx.isValid())
+            return;
+
+        QList<int> screens = firstIdx.item().screenSnaps.screens().toList();
+        if (screens.isEmpty())
+            return;
+
+        QnVideoWallPcData pc = firstIdx.videowall()->pcs()->getItem(firstIdx.item().pcUuid);
+        if (pc.screens.size() < screens.first())
             return;
 
         QnLayoutItemData itemData;
         itemData.uuid = QUuid::createUuid();
-        itemData.combinedGeometry = pc.screens[firstScreen].layoutGeometry;
+        itemData.combinedGeometry = pc.screens[screens.first()].layoutGeometry;
         if (itemData.combinedGeometry.isValid())
             itemData.flags = Qn::Pinned;
         else
             itemData.flags = Qn::PendingGeometryAdjustment;
-        itemData.resource.id = videoWall->getId();
-        itemData.resource.path = videoWall->getUniqueId();
-        itemData.dataByRole[Qn::VideoWallPcGuidRole] = qVariantFromValue<QUuid>(pc.uuid);
-        itemData.dataByRole[Qn::VideoWallPcScreenIndicesRole] = qVariantFromValue<QSet<int> >(screens);
+        itemData.resource.id = firstIdx.videowall()->getId();
+        itemData.resource.path = firstIdx.videowall()->getUniqueId();
+        itemData.dataByRole[Qn::VideoWallItemIndicesRole] = qVariantFromValue<QnVideoWallItemIndexList>(indices);
         layout->addItem(itemData);
     }
+
+    struct ScreenWidgetKey{
+        QUuid pcUuid;
+        QSet<int> screens;
+
+        ScreenWidgetKey(const QUuid &pcUuid, const QSet<int> screens):
+            pcUuid(pcUuid), screens(screens){}
+
+        friend bool operator==(const ScreenWidgetKey &l, const ScreenWidgetKey &r) {
+            return l.pcUuid == r.pcUuid && l.screens == r.screens;
+        }
+
+        friend bool operator<(const ScreenWidgetKey &l, const ScreenWidgetKey &r) {
+            if (l.pcUuid != r.pcUuid || (l.screens.isEmpty() && r.screens.isEmpty()))
+                return l.pcUuid < r.pcUuid;
+            auto lmin = std::min_element(l.screens.constBegin(), l.screens.constEnd());
+            auto rmin = std::min_element(r.screens.constBegin(), r.screens.constEnd());
+            return (*lmin) < (*rmin);
+        }
+    };
 
     const int identifyTimeout  = 5000;
     const int identifyFontSize = 100;
@@ -1326,29 +1356,15 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         if (accessController()->globalPermissions() & Qn::GlobalEditVideoWallPermission)
             layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission));
 
+        QMap<ScreenWidgetKey, QnVideoWallItemIndexList> itemGroups;
 
-        foreach (const QnVideoWallPcData &pc, videoWall->pcs()->getItems()) {
-            QSet<int> usedScreens;
-
-            foreach (const QnVideoWallItem &item, videoWall->items()->getItems()) {
-                if (item.pcUuid != pc.uuid)
-                    continue;
-
-                QSet<int> screens = item.screenSnaps.screens();
-                if (screens.isEmpty())
-                    continue;
-
-                QSet<int> intersected = screens;
-                intersected.intersect(usedScreens);
-                bool skip = !intersected.isEmpty();
-                usedScreens |= screens;
-
-                if (skip)
-                    continue;
-
-                addItemToLayout(layout, videoWall, pc, screens);
-            }
+        foreach (const QnVideoWallItem &item, videoWall->items()->getItems()) {
+            ScreenWidgetKey key(item.pcUuid, item.screenSnaps.screens());
+            itemGroups[key].append(QnVideoWallItemIndex(videoWall, item.uuid));
         }
+
+        foreach (const QnVideoWallItemIndexList &indices, itemGroups)
+            addItemToLayout(layout, indices);
 
         resourcePool()->addResource(layout);
 
@@ -1681,10 +1697,11 @@ void QnWorkbenchVideoWallHandler::at_videoWall_pcRemoved(const QnVideoWallResour
     QList<QnWorkbenchItem*> itemsToDelete;
     foreach(QnWorkbenchItem *workbenchItem, layout->items()) {
         QnLayoutItemData data = workbenchItem->data();
-        QUuid pcUuid = data.dataByRole[Qn::VideoWallPcGuidRole].value<QUuid>();
-        if (pcUuid != pc.uuid)
+        QnVideoWallItemIndexList indices = data.dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
+        if (indices.isEmpty())
             continue;
-
+        if (indices.first().item().pcUuid != pc.uuid)
+             continue;
         itemsToDelete << workbenchItem;
     }
 
@@ -2145,28 +2162,34 @@ bool QnWorkbenchVideoWallHandler::saveReviewLayout(const QnLayoutResourcePtr &la
         return false;
     }
 
-    QnVideoWallResourcePtr videowall = layoutResource->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
-
-    foreach(QnWorkbenchItem *item, layout->items()) {
-        QnLayoutItemData data = item->data();
-        QUuid pcUuid = data.dataByRole[Qn::VideoWallPcGuidRole].value<QUuid>();
-        if (!videowall->pcs()->hasItem(pcUuid))
+    QSet<QnVideoWallResourcePtr> videowalls;
+    foreach(QnWorkbenchItem *workbenchItem, layout->items()) {
+        QnLayoutItemData data = workbenchItem->data();
+        QnVideoWallItemIndexList indices = data.dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
+        if (indices.isEmpty())
             continue;
-        QnVideoWallPcData pc = videowall->pcs()->getItem(pcUuid);
-
-        QSet<int> screenIndices = data.dataByRole[Qn::VideoWallPcScreenIndicesRole].value<QSet<int> >();
+        QnVideoWallItemIndex firstIdx = indices.first();
+        QnVideoWallResourcePtr videowall = firstIdx.videowall();
+        QnVideoWallItem item = firstIdx.item();
+        QSet<int> screenIndices = item.screenSnaps.screens();
+        if (!videowall->pcs()->hasItem(item.pcUuid))
+            continue;
+        QnVideoWallPcData pc = videowall->pcs()->getItem(item.pcUuid);
         if (screenIndices.size() < 1)
             continue;
         foreach(int screenIndex, screenIndices)
             pc.screens[screenIndex].layoutGeometry = data.combinedGeometry.toRect();
-        videowall->pcs()->updateItem(pcUuid, pc);
+        videowall->pcs()->updateItem(item.pcUuid, pc);
+        videowalls << videowall;
     }
 
     //TODO: #GDM #VW sometimes saving is not required
-    connection2()->getVideowallManager()->save(videowall, this, 
-        [this, callback]( int reqID, ec2::ErrorCode errorCode ) {
-            callback(reqID, errorCode);
-    } );
+    foreach (const QnVideoWallResourcePtr &videowall, videowalls){
+        connection2()->getVideowallManager()->save(videowall, this, 
+            [this, callback]( int reqID, ec2::ErrorCode errorCode ) {
+                callback(reqID, errorCode);
+        } );
+    }
 
     return true;
 }
@@ -2265,52 +2288,71 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
     if (!layout)
         return;
 
-    if (action == ItemAction::Removed) {
+    auto findWorkbenchItem = [layout, &item, action]() -> QnWorkbenchItem* {
+        // added new multi-screen item
+        if (action == ItemAction::Added && item.screenSnaps.screens().size() > 1)
+            return nullptr;
+
         foreach(QnWorkbenchItem *workbenchItem, layout->items()) {
             QnLayoutItemData data = workbenchItem->data();
-            QUuid pcUuid = data.dataByRole[Qn::VideoWallPcGuidRole].value<QUuid>();
-            if (pcUuid != item.pcUuid)
-                continue;   // widget for another PC
+            QnVideoWallItemIndexList indices = data.dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
+            if (indices.isEmpty())
+                continue;
 
-            QSet<int> screenIndices = data.dataByRole[Qn::VideoWallPcScreenIndicesRole].value<QSet<int> >();
-            if (!screenIndices.contains(item.screenSnaps.screens()))
-                continue;   // widget did not contain deleted item
-
-            foreach (const QnVideoWallItem &existingItem, videowall->items()->getItems()) {
-                if (existingItem.pcUuid != item.pcUuid)
+            // checking existing widgets with same screen sets
+            if (action == ItemAction::Added) {
+                if (indices.first().item().screenSnaps.screens() != item.screenSnaps.screens())
                     continue;
-                if (screenIndices.contains(existingItem.screenSnaps.screens())) {
-                    return; // that was not the last item of this widget
+                return workbenchItem;
+            } else {
+                // checking existing widgets containing target item
+                foreach (const QnVideoWallItemIndex &index, indices) {
+                    if (index.uuid() != item.uuid) 
+                        continue;
+                    return workbenchItem;
                 }
             }
-
-            layout->removeItem(workbenchItem);
-            return; // no need to check other items
         }
-    } else if (action == ItemAction::Added) {
-        if (!videowall->pcs()->hasItem(item.pcUuid))
-            return;
+        return nullptr;
+    };
 
-        QnVideoWallPcData pc = videowall->pcs()->getItem(item.pcUuid);
+    QnWorkbenchItem* workbenchItem = findWorkbenchItem();
+    QnVideoWallItemIndexList indices = workbenchItem
+        ? workbenchItem->data().dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>()
+        : QnVideoWallItemIndexList();
 
-        QSet<int> indices = item.screenSnaps.screens();
+    if (action == ItemAction::Added) {
+        indices << QnVideoWallItemIndex(videowall, item.uuid);
+        if (workbenchItem)
+            workbenchItem->setData(Qn::VideoWallItemIndicesRole, qVariantFromValue<QnVideoWallItemIndexList>(indices));
+        else
+            addItemToLayout(layout->resource(), indices);
+    } else if (action == ItemAction::Removed && workbenchItem) {
+        indices.removeAll(QnVideoWallItemIndex(videowall, item.uuid));
         if (indices.isEmpty())
-            return;
+            layout->removeItem(workbenchItem);
+        else
+            workbenchItem->setData(Qn::VideoWallItemIndicesRole, qVariantFromValue<QnVideoWallItemIndexList>(indices));
+    } else if (action == ItemAction::Changed) {
+        if (!workbenchItem) {
+            indices << QnVideoWallItemIndex(videowall, item.uuid);
+            addItemToLayout(layout->resource(), indices);
+        } else {
+            // take any other item on this widget
+            int otherIdx = qnIndexOf(indices, [&item](const QnVideoWallItemIndex &idx){return idx.uuid() != item.uuid; });
+            if ((otherIdx >= 0) && (indices[otherIdx].item().screenSnaps.screens() != item.screenSnaps.screens())) {
+                // remove this item from current widget
+                indices.removeAll(QnVideoWallItemIndex(videowall, item.uuid));
+                if (indices.isEmpty())
+                    layout->removeItem(workbenchItem);
+                else
+                    workbenchItem->setData(Qn::VideoWallItemIndicesRole, qVariantFromValue<QnVideoWallItemIndexList>(indices));
 
-        if (indices.size() == 1) {
-            // checking that required widget already exists - only for items, taking part of the screen
-            foreach(QnWorkbenchItem *workbenchItem, layout->items()) {
-                QnLayoutItemData data = workbenchItem->data();
-                QUuid pcUuid = data.dataByRole[Qn::VideoWallPcGuidRole].value<QUuid>();
-                if (pcUuid != item.pcUuid)
-                    continue;
-                QSet<int> screenIndices = data.dataByRole[Qn::VideoWallPcScreenIndicesRole].value<QSet<int> >();
-                if (screenIndices.contains(*indices.begin()))
-                    return; //widget exists and will handle event by itself
-            }
+                // and add it to the corresponding place
+                updateReviewLayout(videowall, item, ItemAction::Added);
+            } // else just do nothing, widget will update itself
+           
         }
-
-        addItemToLayout(layout->resource(), videowall, pc, indices);
     }
 
 }
