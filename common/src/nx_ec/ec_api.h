@@ -880,6 +880,9 @@ namespace ec2
         Q_OBJECT
 
     public:
+        AbstractECConnectionFactory():
+            m_compatibilityMode(false)
+        {}
         virtual ~AbstractECConnectionFactory() {}
 
         /*!
@@ -904,9 +907,24 @@ namespace ec2
         virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) = 0;
         virtual void setContext( const ResourceContext& resCtx ) = 0;
 
+        /**
+        * \returns                         Whether this connection factory is working in compatibility mode.
+        *                                  In this mode all clients are supported regardless of customization.
+        */
+        bool isCompatibilityMode() const {
+            return m_compatibilityMode;
+        }
+
+        //! \param compatibilityMode         New compatibility mode state.
+        void setCompatibilityMode(bool compatibilityMode) {
+            m_compatibilityMode = compatibilityMode;
+        }
     protected:
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) = 0;
         virtual int connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) = 0;
+
+    private:
+        bool m_compatibilityMode;
     };
 }
 

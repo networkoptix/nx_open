@@ -26,7 +26,8 @@
 
 namespace ec2
 {
-    Ec2DirectConnectionFactory::Ec2DirectConnectionFactory()
+    Ec2DirectConnectionFactory::Ec2DirectConnectionFactory():
+        AbstractECConnectionFactory()
     {
         srand( ::time(NULL) );
 
@@ -276,7 +277,7 @@ namespace ec2
         QnConnectionInfo* const connectionInfo )
     {
         connectionInfo->version = QnSoftwareVersion(lit(QN_APPLICATION_VERSION));
-        connectionInfo->brand = lit(QN_PRODUCT_NAME_SHORT);
+        connectionInfo->brand = isCompatibilityMode() ? QString() : lit(QN_PRODUCT_NAME_SHORT);
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
         connectionInfo->box = lit(QN_ARM_BOX);
 
