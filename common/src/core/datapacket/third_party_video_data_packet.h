@@ -6,6 +6,8 @@
 #ifndef THIRD_PARTY_VIDEO_DATA_PACKET_H
 #define THIRD_PARTY_VIDEO_DATA_PACKET_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "video_data_packet.h"
 
 #include <plugins/camera_plugin.h>
@@ -38,4 +40,7 @@ private:
     nxcip::VideoDataPacket* m_videoPacket;
 };
 
+#endif // ENABLE_DATA_PROVIDERS
+
 #endif //THIRD_PARTY_VIDEO_DATA_PACKET_H
+

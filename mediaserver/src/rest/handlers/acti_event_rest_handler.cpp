@@ -11,7 +11,7 @@
 #include <QStringList>
 
 #include <core/resource_management/resource_pool.h>
-#include <plugins/resources/acti/acti_resource.h>
+#include <plugins/resource/acti/acti_resource.h>
 #include <utils/network/http/httptypes.h>
 
 

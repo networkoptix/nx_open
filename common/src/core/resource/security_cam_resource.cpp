@@ -38,7 +38,9 @@ QnSecurityCamResource::QnSecurityCamResource():
     m_scheduleDisabled(true),
     m_audioEnabled(false),
     m_advancedWorking(false),
-    m_manuallyAdded(false)
+    m_manuallyAdded(false),
+    m_minDays(0),
+    m_maxDays(0)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionMaskList << QnMotionRegion();
@@ -83,7 +85,8 @@ QnResourcePtr QnSecurityCamResource::toResourcePtr() {
 QnSecurityCamResource::~QnSecurityCamResource() {
 }
 
-void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) {
+void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) 
+{
     QnNetworkResource::updateInner(other, modifiedFields);
     QnMediaResource::updateInner(other, modifiedFields);
 
@@ -116,6 +119,8 @@ void QnSecurityCamResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_manuallyAdded = other_casted->m_manuallyAdded;
         m_model = other_casted->m_model;
         m_vendor = other_casted->m_vendor;
+        m_minDays = other_casted->m_minDays;
+        m_maxDays = other_casted->m_maxDays;
     }
 }
 
@@ -387,7 +392,7 @@ Qn::MotionType QnSecurityCamResource::getDefaultMotionType() const {
     if (!getParam(lit("supportedMotion"), val, QnDomainMemory))
         return defaultMotionType;
 
-    foreach(const QString &s, val.toString().split(QLatin1Char(','))) {
+    foreach(const QString &s, val.toString().split(L',')) {
         QString s1 = s.toLower();
         if (s1 == lit("hardwaregrid"))
             return Qn::MT_HardwareGrid;
@@ -405,7 +410,7 @@ Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
         return Qn::MT_NoMotion;
 
     Qn::MotionTypes result = Qn::MT_Default;
-    foreach(const QString& str, val.toString().split(QLatin1Char(','))) {
+    foreach(const QString& str, val.toString().split(L',')) {
         QString s1 = str.toLower().trimmed();
         if (s1 == lit("hardwaregrid"))
             result |= Qn::MT_HardwareGrid;
@@ -432,7 +437,7 @@ void QnSecurityCamResource::setMotionType(Qn::MotionType value) {
 
 Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const {
     QVariant val;
-    if (!getParam(QLatin1String("cameraCapabilities"), val, QnDomainMemory))
+    if (!getParam(lit("cameraCapabilities"), val, QnDomainMemory))
         return Qn::NoCapabilities;
     return static_cast<Qn::CameraCapabilities>(val.toInt());
 }
@@ -522,6 +527,26 @@ QString QnSecurityCamResource::getVendor() const {
 
 void QnSecurityCamResource::setVendor(const QString& value) {
     SAFE(m_vendor = value)
+}
+
+void QnSecurityCamResource::setMaxDays(int value)
+{
+    SAFE(m_maxDays = value)
+}
+
+int QnSecurityCamResource::maxDays() const
+{
+    SAFE(return m_maxDays);
+}
+
+void QnSecurityCamResource::setMinDays(int value)
+{
+    SAFE(m_minDays = value)
+}
+
+int QnSecurityCamResource::minDays() const
+{
+    SAFE(return m_minDays);
 }
 
 void QnSecurityCamResource::setScheduleDisabled(bool value) {

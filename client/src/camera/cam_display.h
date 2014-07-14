@@ -3,20 +3,24 @@
 
 #include <QtCore/QTime>
 
-#include "decoders/video/abstractdecoder.h"
+#include <utils/common/adaptive_sleep.h>
+#include <utils/media/externaltimesource.h>
+
+#include <core/resource/resource_fwd.h>
+#include <core/dataconsumer/abstract_data_consumer.h>
+#include <core/datapacket/audio_data_packet.h>
+#include <core/resource/resource_media_layout.h>
+
+#include <decoders/video/abstractdecoder.h>
+
 #include "video_stream_display.h"
-#include "core/dataconsumer/abstract_data_consumer.h"
-#include "core/datapacket/audio_data_packet.h"
-#include "core/resource/resource_media_layout.h"
-#include "utils/common/adaptive_sleep.h"
-#include "utils/media/externaltimesource.h"
-#include "core/resource/resource_fwd.h"
 
 class QnAbstractRenderer;
 class QnVideoStreamDisplay;
 class QnAudioStreamDisplay;
 class QnCompressedVideoData;
 class QnArchiveStreamReader;
+class QnlTimeSource;
 
 /* 
 * This class is not duplicate statistics from Reader. If not enough CPU/network this class still show full (correct) stream fps

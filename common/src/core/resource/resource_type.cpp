@@ -4,6 +4,10 @@
 
 #include "utils/common/log.h"
 
+namespace {
+    const QString desktopCameraTypeName = lit("SERVER_DESKTOP_CAMERA");
+}
+
 QnResourceType::QnResourceType()
     : m_isCameraSet(false)
 {
@@ -233,4 +237,14 @@ QnResourceTypePool::QnResourceTypeMap QnResourceTypePool::getResourceTypeMap() c
     QMutexLocker lock(&m_mutex);
 
     return QnResourceTypeMap(m_resourceTypeMap);
+}
+
+QnResourceTypePtr QnResourceTypePool::desktopCameraResourceType() const {
+    QMutexLocker lock(&m_mutex);
+    for(QnResourceTypeMap::const_iterator itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
+    {
+        if (itr.value()->getName() == desktopCameraTypeName)
+            return itr.value();
+    }
+    return QnResourceTypePtr();
 }

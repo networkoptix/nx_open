@@ -65,6 +65,7 @@
 
 #include <ui/widgets/elided_label.h>
 #include <ui/widgets/dialog_button_box.h>
+#include <ui/widgets/progress_widget.h>
 
 
 // If the operation is expected to take this long (as predicted by

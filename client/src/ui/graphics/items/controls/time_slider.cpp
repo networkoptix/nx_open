@@ -489,7 +489,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     /* Prepare zoom processor. */
     DragProcessor *dragProcessor = new DragProcessor(this);
     dragProcessor->setHandler(this);
-    dragProcessor->setFlags(DragProcessor::DONT_COMPRESS);
+    dragProcessor->setFlags(DragProcessor::DontCompress);
     dragProcessor->setStartDragDistance(startDragDistance);
     dragProcessor->setStartDragTime(-1); /* No drag on timeout. */
 
@@ -1257,13 +1257,13 @@ void QnTimeSlider::updateKineticProcessor() {
         kineticProcessor->setFriction(degreesFor2x * 2.0);
         kineticProcessor->setMaxSpeedMagnitude(degreesFor2x * 8);
         kineticProcessor->setSpeedCuttingThreshold(degreesFor2x / 3);
-        kineticProcessor->setFlags(KineticProcessor::IGNORE_DELTA_TIME);
+        kineticProcessor->setFlags(KineticProcessor::IgnoreDeltaTime);
     } else {
         kineticProcessor->setMaxShiftInterval(0.4);
         kineticProcessor->setFriction(degreesFor2x / 2);
         kineticProcessor->setMaxSpeedMagnitude(degreesFor2x * 8);
         kineticProcessor->setSpeedCuttingThreshold(degreesFor2x / 3);
-        kineticProcessor->setFlags(KineticProcessor::IGNORE_DELTA_TIME);
+        kineticProcessor->setFlags(KineticProcessor::IgnoreDeltaTime);
     }
 }
 

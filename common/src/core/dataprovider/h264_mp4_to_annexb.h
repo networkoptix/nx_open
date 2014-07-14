@@ -5,6 +5,8 @@
 #ifndef H264_MP4_TO_ANNEXB_H
 #define H264_MP4_TO_ANNEXB_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "abstract_media_data_filter.h"
 
 #include "../datapacket/media_data_packet.h"
@@ -36,5 +38,7 @@ private:
         std::basic_string<quint8>* const seqHeader );
     bool isH264SeqHeaderInExtraData( const QnAbstractMediaDataPtr& data ) const;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //H264_MP4_TO_ANNEXB_H

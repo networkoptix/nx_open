@@ -9,6 +9,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <functional> /* For std::function. */
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMutex>

@@ -17,7 +17,7 @@
 #include <client/client_globals.h>
 #include <client/client_settings.h>
 
-#include <device_plugins/server_camera/server_camera.h>
+#include <plugins/resource/server_camera/server_camera.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/actions.h>
@@ -38,9 +38,9 @@ namespace {
 }
 
 
-QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
+QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::EventLogDialog),
     m_eventTypesModel(new QStandardItemModel()),
     m_actionTypesModel(new QStandardItemModel()),

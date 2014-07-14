@@ -810,22 +810,6 @@ namespace ec2
                 std::static_pointer_cast<impl::SimpleHandler>(
                     std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        /*!
-            \param handler Functor with params: (ErrorCode, const QnKvPairList&)
-            \return Request id
-        */
-        template<class TargetType, class HandlerType> int getSettingsAsync( TargetType* target, HandlerType handler ) {
-            return getSettingsAsync( std::static_pointer_cast<impl::GetSettingsHandler>(
-                std::make_shared<impl::CustomGetSettingsHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int saveSettingsAsync( const QnKvPairList& kvPairs, TargetType* target, HandlerType handler ) {
-            return saveSettingsAsync( kvPairs, 
-                std::static_pointer_cast<impl::SimpleHandler>(
-                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
 
         //!Cancel running async request
         /*!
@@ -858,8 +842,6 @@ namespace ec2
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
         virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) = 0;
-        virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
     };  
 
 

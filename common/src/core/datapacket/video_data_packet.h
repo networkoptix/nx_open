@@ -6,6 +6,8 @@
 #ifndef VIDEO_DATA_PACKET_H
 #define VIDEO_DATA_PACKET_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "media_data_packet.h"
 
 
@@ -69,5 +71,7 @@ private:
 
 typedef QSharedPointer<QnWritableCompressedVideoData> QnWritableCompressedVideoDataPtr;
 typedef QSharedPointer<const QnWritableCompressedVideoData> QnConstWritableCompressedVideoDataPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //VIDEO_DATA_PACKET_H

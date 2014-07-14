@@ -1,4 +1,3 @@
-
 #include <QtCore/QCoreApplication>
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtNetwork/QHostInfo>
@@ -7,21 +6,35 @@
 #include <QtCore/QStringList>
 #include <QtCore/QThreadPool>
 
+#include <utils/common/log.h>
+
 #include "nettools.h"
 #include "ping.h"
 #include "netstate.h"
-#include "../common/log.h"
 
-#ifdef Q_OS_LINUX
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <ifaddrs.h>
-#include <unistd.h>
-#include <net/if.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
+#if defined(Q_OS_LINUX)
+#   include <arpa/inet.h>
+#   include <sys/socket.h>
+#   include <netdb.h>
+#   include <ifaddrs.h>
+#   include <unistd.h>
+#   include <net/if.h>
+#   include <sys/types.h>
+#   include <sys/socket.h>
+#   include <sys/ioctl.h>
+#elif defined(Q_OS_MAC)
+#   include <sys/file.h>
+#   include <sys/socket.h>
+#   include <sys/sysctl.h>
+#   include <net/if.h>
+#   include <net/if_dl.h>
+#   include <net/route.h>
+#   include <netinet/in.h>
+#   include <netinet/if_ether.h>
+#   include <arpa/inet.h>
+#   include <err.h>
+#   include <stdio.h>
+#   include <stdlib.h>
 #endif
 
 /*
@@ -474,19 +487,6 @@ void removeARPrecord(const QHostAddress& /*ip*/) {}
 
 #define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(long) - 1))) : sizeof(long))
 
-#include <sys/file.h>
-#include <sys/socket.h>
-#include <sys/sysctl.h>
-#include <net/if_dl.h>
-#include <net/route.h>
-#include <netinet/in.h>
-#include <netinet/if_ether.h>
-#include <arpa/inet.h>
-#include <err.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-
 QString getMacByIP(const QHostAddress& ip, bool /*net*/)
 {
     int mib[6];
@@ -528,7 +528,7 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
         if (sdl->sdl_alen)
         {
             /* complete ARP entry */
-            NX_LOG(cl_logDEBUG1, "%d ? %d", ip.toIPv4Address(), ntohl(sinarp->sin_addr.s_addr));
+            NX_LOG(lit("%1 ? %2").arg(ip.toIPv4Address()).arg(ntohl(sinarp->sin_addr.s_addr)), cl_logDEBUG1);
             if (ip.toIPv4Address() == ntohl(sinarp->sin_addr.s_addr)) {
                 free(buf);
                 return MACToString((unsigned char*)LLADDR(sdl));
@@ -602,7 +602,9 @@ bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress,
     return eq1 > eq2;
 }
 
-#ifdef WIN32
+#ifdef _WIN32
+
+//TODO #ak refactor of function api is required
 void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
     // for test purpose only. This function used for EDGE so far
@@ -622,7 +624,9 @@ void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 
     return;
 }
-#else
+
+#elif defined(__linux__)
+
 void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
     memset(MAC_str, 0, sizeof(MAC_str));
@@ -641,5 +645,59 @@ void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
         *host = inet_ntoa(ip->sin_addr);
     }
     close(s);
+}
+
+#else	//mac, bsd
+
+#include <arpa/inet.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+
+void getMacFromPrimaryIF(char MAC_str[MAC_ADDR_LEN], char** host)
+{
+    struct ifaddrs* ifap = nullptr;
+    if (getifaddrs(&ifap) != 0)
+        return;
+
+    std::map<std::string, std::string> ifNameToLinkAddress;
+    std::map<std::string, std::string> ifNameToInetAddress;
+    for( struct ifaddrs* ifaptr = ifap; ifaptr != NULL; ifaptr = (ifaptr)->ifa_next)
+    {
+        std::cout<<"family = "<<(int)((ifaptr)->ifa_addr)->sa_family<<std::endl;
+        switch( ((ifaptr)->ifa_addr)->sa_family )
+        {
+            case AF_LINK:
+            {
+                unsigned char* ptr = (unsigned char *)LLADDR((struct sockaddr_dl *)(ifaptr)->ifa_addr);
+                sprintf(MAC_str, "%02x:%02x:%02x:%02x:%02x:%02x",
+                                  *ptr, *(ptr+1), *(ptr+2), *(ptr+3), *(ptr+4), *(ptr+5));
+                std::cout<<"AF_LINK. "<<ifaptr->ifa_name<<": "<<MAC_str<<std::endl;
+                ifNameToLinkAddress[ifaptr->ifa_name] = MAC_str;
+                break;
+            }
+
+            case AF_INET:
+            {
+                uint32_t ip4Addr = ((struct in_addr*)(ifaptr)->ifa_addr)->s_addr;
+                std::cout<<"AF_INET. "<<ifaptr->ifa_name<<": "<<inet_ntoa( ((struct sockaddr_in*)ifaptr->ifa_addr)->sin_addr )<<std::endl;
+                ifNameToInetAddress[ifaptr->ifa_name] = inet_ntoa( ((struct sockaddr_in*)ifaptr->ifa_addr)->sin_addr );
+                break;
+            }
+        }
+    }
+
+    freeifaddrs(ifap);
+
+    if( ifNameToInetAddress.empty() )
+        return;	//no ipv4 address
+    auto hwIter = ifNameToLinkAddress.find( ifNameToInetAddress.begin()->first );
+    if( hwIter == ifNameToLinkAddress.end() )
+        return;	//ipv4 interface has no link-level address
+
+    strncpy( MAC_str, hwIter->second.c_str(), sizeof(MAC_str)-1 );
+    if( host )
+        *host = nullptr;
 }
 #endif

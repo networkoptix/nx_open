@@ -174,10 +174,6 @@ namespace ec2
         //AbstractUpdatesManager::installUpdate
         registerUpdateFuncHandler<ApiUpdateInstallData>( restProcessorPool, ApiCommand::installUpdate );
 
-        //ApiResourceParamList
-        registerGetFuncHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );
-        registerUpdateFuncHandler<ApiResourceParamDataList>( restProcessorPool, ApiCommand::saveSettings );
-
         //AbstractECConnection
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
 
@@ -208,7 +204,7 @@ namespace ec2
         {
             QMutexLocker lk( &m_mutex );
             if( !m_directConnection )
-                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url.path() ) );
+                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
         }
         QnScopedThreadRollback ensureFreeThread(1);
         QtConcurrent::run( std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
@@ -255,13 +251,15 @@ namespace ec2
             return handler->done( reqID, errorCode, AbstractECConnectionPtr() );
         QnConnectionInfo connectionInfoCopy( connectionInfo );
         connectionInfoCopy.ecUrl = ecURL;
+
+        AbstractECConnectionPtr connection(new RemoteEC2Connection(
+            std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
+            m_resCtx,
+            connectionInfoCopy ));
         return handler->done(
             reqID,
             errorCode,
-            std::make_shared<RemoteEC2Connection>(
-                std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
-                m_resCtx,
-                connectionInfoCopy ) );
+            connection );
     }
 
     void Ec2DirectConnectionFactory::remoteTestConnectionFinished(

@@ -5,6 +5,8 @@
 
 #include "third_party_video_data_packet.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <utils/common/log.h>
 
 
@@ -43,3 +45,5 @@ size_t QnThirdPartyCompressedVideoData::dataSize() const
 {
     return m_videoPacket->dataSize();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

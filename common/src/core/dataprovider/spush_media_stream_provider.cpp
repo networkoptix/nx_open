@@ -1,10 +1,13 @@
-
 #include "spush_media_stream_provider.h"
 
-#include "utils/common/sleep.h"
-#include "utils/common/util.h"
-#include "utils/network/simple_http_client.h"
-#include "../resource/camera_resource.h"
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <utils/common/sleep.h>
+#include <utils/common/util.h>
+#include <utils/common/log.h>
+#include <utils/network/simple_http_client.h>
+
+#include <core/resource/camera_resource.h>
 
 
 CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
@@ -214,3 +217,5 @@ void CLServerPushStreamReader::afterUpdate()
         m_cameraAudioEnabled = camera->isAudioEnabled();
     }
 }
+
+#endif // ENABLE_DATA_PROVIDERS

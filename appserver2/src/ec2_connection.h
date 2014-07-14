@@ -26,7 +26,7 @@ namespace ec2
             ServerQueryProcessor* queryProcessor,
             const ResourceContext& resCtx,
             const QnConnectionInfo& connectionInfo,
-            const QString& dbFilePath);
+            const QUrl& dbUrl);
         virtual ~Ec2DirectConnection();
 
         //!Implementation of ec2::AbstractECConnection::connectionInfo

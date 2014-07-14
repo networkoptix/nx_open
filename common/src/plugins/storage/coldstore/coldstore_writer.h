@@ -1,6 +1,8 @@
 #ifndef cold_store_writer_1838_h
 #define cold_store_writer_1838_h
 
+#ifdef ENABLE_COLDSTORE
+
 #include "core/resource/resource_consumer.h"
 #include "utils/common/long_runnable.h"
 
@@ -27,5 +29,7 @@ private:
     typedef QSharedPointer<QnCSFile> QnCSFilePtr;
     CLThreadQueue<QnCSFilePtr> m_writeQueue;
 };
+
+#endif // ENABLE_COLDSTORE
 
 #endif //cold_store_writer_1838_h
