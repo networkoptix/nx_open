@@ -258,7 +258,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
 
     QnPlAreconVisionResourcePtr res(0);
 
-    if (QnPlAreconVisionResource::isPanoramic(model))
+    if (QnPlAreconVisionResource::isPanoramic(qnResTypePool->getResourceType(rt)))
         res = QnPlAreconVisionResourcePtr(new QnArecontPanoramicResource(model));
     else
         res = QnPlAreconVisionResourcePtr(new CLArecontSingleSensorResource(model));
