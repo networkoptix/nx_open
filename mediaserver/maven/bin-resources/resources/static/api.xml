@@ -1414,5 +1414,83 @@
                 </function>
             </functions>
         </group>
+        <group>
+            <groupName>Http Live Streaming (HLS)</groupName>
+            <urlPrefix/>
+            <groupDescription>
+							This group contains information about accessing server's media streams with HLS protocol.
+                            This protocol is supported by iOS-based devices (iPhone, iPad).
+							HLS is available on the same port as HTTP and RTSP. To request video use:
+			</groupDescription>
+            <functions>
+                <function>
+                    <name>&lt;camera_unique_id&gt;</name>
+                    <description>
+					    Url format for opening camera stream with HLS:
+					    http://&lt;server_ip&gt;:&lt;port&gt;/hls/&lt;camera_unique_id&gt;.m3u
+					</description>
+                    <method>PLAY</method>
+                    <params>
+                        <param>
+                            <name>startDatetime</name>
+                            <description>Date format: YYYY-MM-DDTHH:MM:SSTZD (e.g., 1997-07-16T19:20:30+01:00). If present, camera archive is opened on specified position</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>startTimestamp</name>
+                            <description>Same as &lt;startDatetime&gt;, but contains number of micro seconds from epoch (1970-01-01 00:00 UTC)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>hi</name>
+                            <description>If specified, only hi quality is available on streaming session. If neither &lt;hi&gt; nor &lt;lo&gt; is specified than HLS client is allowed to perform dynamic stream switching (to fit in available bandwidth and compensate for traffic congestion)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>lo</name>
+                            <description>If specified, only low quality is available on streaming session. If neither &lt;hi&gt; nor &lt;lo&gt; is specified than HLS client is allowed to perform dynamic stream switching (to fit in available bandwidth and compensate for traffic congestion)</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Video stream in mpeg-2/ts format</caption>
+                    </result>
+                </function>
+            </functions>
+        </group>
+        <group>
+            <groupName>Progressive downloading</groupName>
+            <urlPrefix/>
+            <groupDescription>
+                Progressive downloading is method of receiving media stream using HTTP protocol. Codec and stream format can be specified in url parameters.
+                Live stream and archive can be downloaded. If required, media stream transcoding is performed on-the-fly
+            </groupDescription>
+            <functions>
+                <function>
+                    <name>&lt;camera_unique_id&gt;</name>
+                    <description>
+					    Url format:
+					    http://&lt;server_ip&gt;:&lt;port&gt;/media/&lt;camera_unique_id&gt;.&lt;format&gt;
+                        Stream format can be one of following: webm, mpegts, mp4, 3gp, mpjpeg (motion jpeg)
+					</description>
+                    <method>PLAY</method>
+                    <params>
+                        <param>
+                            <name>resolution</name>
+                            <description>Video stream resolution. Example: 720x576, 1920x1080, 720p, 1080p. By default, 640x480 is used</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>pos</name>
+                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions in milliseconds from epoch (1970-01-01 00:00, UTC). Otherwise, LIVE stream is provided</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Video stream in requested format</caption>
+                    </result>
+                </function>
+            </functions>
+        </group>
     </groups>
 </apidoc>
