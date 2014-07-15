@@ -124,13 +124,19 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     }
 
     const QnResourcePtr layoutOwnerUser = layout->getParentResource();
+    bool hasSavePermission = accessController()->hasPermissions(layout, Qn::SavePermission);
 
     QString name = menu()->currentParameters(sender()).argument<QString>(Qn::ResourceNameRole).trimmed();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, mainWindow()));
         dialog->setWindowTitle(tr("Save Layout As"));
         dialog->setText(tr("Enter layout name:"));
-        dialog->setName(layout->getName());
+
+        QString proposedName = hasSavePermission
+            ? layout->getName()
+            : generateUniqueLayoutName(context()->user(), layout->getName(), layout->getName() + lit(" %1"));
+
+        dialog->setName(proposedName);
         setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
 
         QMessageBox::Button button = QMessageBox::Cancel;
@@ -141,7 +147,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             name = dialog->name();
 
             // that's the case when user press "Save As" and enters the same name as this layout already has
-            if (name == layout->getName() && user == layoutOwnerUser) {
+            if (name == layout->getName() && user == layoutOwnerUser && hasSavePermission) {
                 switch (askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes)) {
                 case QMessageBox::Cancel:
                     return;
@@ -153,7 +159,9 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                 }
             }
 
-            QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+            /* Check if we have rights to overwrite the layout */
+            QnLayoutResourcePtr excludingSelfLayout = hasSavePermission ? layout : QnLayoutResourcePtr();
+            QnLayoutResourceList existing = alreadyExistingLayouts(name, user, excludingSelfLayout);
             if (!canRemoveLayouts(existing)) {
                 QMessageBox::warning(
                     mainWindow(),
