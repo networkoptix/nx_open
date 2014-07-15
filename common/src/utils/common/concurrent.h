@@ -322,8 +322,8 @@ namespace QnConcurrent
 
             void taskStoppedNonSafe()
             {
+                assert( m_startedTaskCount >= 1 );
                 --m_startedTaskCount;
-                assert( m_startedTaskCount >= 0 );
             }
         };
 

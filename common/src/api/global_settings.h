@@ -1,6 +1,7 @@
 #ifndef QN_GLOBAL_SETTINGS_H
 #define QN_GLOBAL_SETTINGS_H
 
+#include <QtCore/QMutex>
 #include <QtCore/QObject>
 
 #include <utils/common/singleton.h>
