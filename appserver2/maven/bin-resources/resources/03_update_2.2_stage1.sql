@@ -19,6 +19,27 @@ CREATE TABLE "vms_resource" (id INTEGER PRIMARY KEY AUTOINCREMENT,
                  xtype_guid BLOB(16));
 INSERT INTO "vms_resource" (id, status,name,url) SELECT id, status,name,url FROM vms_resource_tmp;
 
+ALTER TABLE "vms_layoutitem" RENAME TO vms_layoutitem_tmp;
+CREATE TABLE "vms_layoutitem" (
+    "zoom_bottom" real NOT NULL DEFAULT 0,
+    "right" real NOT NULL,
+    "uuid" varchar(40) NOT NULL,
+    "zoom_left" real NOT NULL DEFAULT 0,
+    "resource_guid" BLOB(16) NOT NULL,
+    "zoom_right" real NOT NULL DEFAULT 0,
+    "top" real NOT NULL,
+    "layout_id" integer NOT NULL,
+    "bottom" real NOT NULL,
+    "zoom_top" real NOT NULL DEFAULT 0,
+    "zoom_target_uuid" varchar(40),
+    "flags" integer NOT NULL,
+    "contrast_params" varchar(200),
+    "rotation" real NOT NULL,
+    "id" integer PRIMARY KEY autoincrement,
+    "dewarping_params" varchar(200) NULL,
+    "left" real NOT NULL);
+INSERT INTO vms_layoutitem SELECT * from vms_layoutitem_tmp;
+                                                            
 
 ALTER TABLE "vms_layout" RENAME TO "vms_layout_tmp";
 

@@ -508,11 +508,15 @@ bool QnDbManager::updateGuids()
     if (!updateTableGuids("vms_resource", "guid", guids))
         return false;
 
+    guids = getGuidList("SELECT li.id, r.guid FROM vms_layoutitem_tmp li JOIN vms_resource r on r.id = li.resource_id order by li.id", CM_Binary);
+    if (!updateTableGuids("vms_layoutitem", "resource_guid", guids))
+        return false;
+
     guids = getGuidList("SELECT rt.id, rt.name || coalesce(m.name,'-') as guid from vms_resourcetype rt LEFT JOIN vms_manufacture m on m.id = rt.manufacture_id", CM_MakeHash);
     if (!updateTableGuids("vms_resourcetype", "guid", guids))
         return false;
 
-    guids = getGuidList("SELECT r.id, r2.guid from vms_resource_tmp r JOIN vms_resource_tmp r2 on r2.id = r.parent_id order by r.id", CM_Binary);
+    guids = getGuidList("SELECT r.id, r2.guid from vms_resource_tmp r JOIN vms_resource r2 on r2.id = r.parent_id order by r.id", CM_Binary);
     if (!updateTableGuids("vms_resource", "parent_guid", guids))
         return false;
 
@@ -671,12 +675,14 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
             return false;
         //#endif
 
-        if (!migrateBusinessEvents())
-            return false;
     }
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
     {
+
+        if (!migrateBusinessEvents())
+            return false;
+
         if (!(*dbJustCreated)) {
             *isMigrationFrom2_2 = true;
             if (!execSQLFile(lit(":/02_migration_from_2_2.sql"), m_sdb))
@@ -1253,7 +1259,7 @@ ErrorCode QnDbManager::updateLayoutItems(const ApiLayoutData& data, qint32 inter
         return result;
 
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT INTO vms_layoutitem (zoom_bottom, right, uuid, zoom_left, resource_id, \
+    insQuery.prepare("INSERT INTO vms_layoutitem (zoom_bottom, right, uuid, zoom_left, resource_guid, \
                      zoom_right, top, layout_id, bottom, zoom_top, \
                      zoom_target_uuid, flags, contrast_params, rotation, \
                      dewarping_params, left) VALUES \
@@ -1555,7 +1561,7 @@ ErrorCode QnDbManager::removeCamera(const QnId& guid)
     if (err != ErrorCode::ok)
         return err;
 
-    err = deleteTableRecord(guid, "vms_layoutitem", "resource_id");
+    err = deleteTableRecord(guid, "vms_layoutitem", "resource_guid");
     if (err != ErrorCode::ok)
         return err;
 
@@ -1878,7 +1884,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutDataLi
 
     QSqlQuery queryItems(m_sdb);
     queryItems.setForwardOnly(true);
-    queryItems.prepare("SELECT r.guid as layoutId, li.zoom_bottom as zoomBottom, li.right, li.uuid as id, li.zoom_left as zoomLeft, li.resource_id as resourceId, \
+    queryItems.prepare("SELECT r.guid as layoutId, li.zoom_bottom as zoomBottom, li.right, li.uuid as id, li.zoom_left as zoomLeft, li.resource_guid as resourceId, \
                        li.zoom_right as zoomRight, li.top, li.bottom, li.zoom_top as zoomTop, \
                        li.zoom_target_uuid as zoomTargetId, li.flags, li.contrast_params as contrastParams, li.rotation, li.id, \
                        li.dewarping_params as dewarpingParams, li.left FROM vms_layoutitem li \
