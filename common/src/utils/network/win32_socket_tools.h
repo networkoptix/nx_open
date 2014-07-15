@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#ifdef _WIN32
+
 #ifndef WIN32_SOCKET_TOOLS_H
 #define WIN32_SOCKET_TOOLS_H
 
@@ -24,3 +26,5 @@ DWORD readTcpStat(
     StreamSocketInfo* const sockInfo );
 
 #endif  //WIN32_SOCKET_TOOLS_H
+
+#endif

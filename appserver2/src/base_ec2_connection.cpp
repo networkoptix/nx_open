@@ -5,6 +5,9 @@
 
 #include "base_ec2_connection.h"
 
+#include <utils/common/concurrent.h>
+
+#include "ec2_thread_pool.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 #include "common/common_module.h"
@@ -139,7 +142,10 @@ namespace ec2
     int BaseEc2Connection<T>::getCurrentTime( impl::CurrentTimeHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        QtConcurrent::run( std::bind( &impl::CurrentTimeHandler::done, handler, reqID, ec2::ErrorCode::ok, TimeSynchronizationManager::instance()->getSyncTime() ) );
+        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+        QnConcurrent::run(
+            Ec2ThreadPool::instance(),
+            std::bind( &impl::CurrentTimeHandler::done, handler, reqID, ec2::ErrorCode::ok, TimeSynchronizationManager::instance()->getSyncTime() ) );
         return reqID;
     }
     

@@ -1188,7 +1188,7 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
     connect( ec2Connection.get(), &ec2::AbstractECConnection::timeChanged,
-             QnSyncTime::instance(), &QnSyncTime::updateTime );
+             QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
 
 
     runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());

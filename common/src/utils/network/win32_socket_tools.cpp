@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#ifdef _WIN32
+
 #include <Windows.h>
 
 #include <memory>
@@ -93,3 +95,5 @@ DWORD readTcpStat(
     sockInfo->rttVar = pathRod->RttVar;
     return ERROR_SUCCESS;
 }
+
+#endif

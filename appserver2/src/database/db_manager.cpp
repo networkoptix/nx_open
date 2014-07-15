@@ -189,8 +189,8 @@ QnDbManager::QnDbManager()
 :
     m_licenseOverflowMarked(false),
     m_licenseOverflowTime(0),
-    m_tranStatic(m_sdbStatic, m_mutexStatic),
-    m_initialized(false)
+    m_initialized(false),
+    m_tranStatic(m_sdbStatic, m_mutexStatic)
 {
 	Q_ASSERT(!globalInstance);
 	globalInstance = this;

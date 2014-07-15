@@ -42,7 +42,6 @@ QnSyncTime* QnSyncTime::instance()
     return QnSyncTime_instance;
 }
 
-
 void QnSyncTime::updateTime(int /*reqID*/, ec2::ErrorCode errorCode, qint64 newTime)
 {
     if( errorCode != ec2::ErrorCode::ok )
@@ -81,6 +80,11 @@ void QnSyncTime::reset()
     m_lastLocalTime = 0;
 }
 
+void QnSyncTime::updateTime(qint64 newTime)
+{
+    updateTime( 0, ec2::ErrorCode::ok, newTime );
+}
+
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
     QMutexLocker lock(&m_mutex);
@@ -92,7 +96,7 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
         if( appServerConnection ) 
         {
-            appServerConnection->getCurrentTime( this, &QnSyncTime::updateTime );
+            appServerConnection->getCurrentTime( this, (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime );
             m_syncTimeRequestIssued = true;
         }
     }
