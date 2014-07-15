@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="api.xsl"?>
-<apidoc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="api.xsd">
+<apidoc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="api.xsd">
     <groups>
         <group>
             <groupName>Media server API</groupName>
@@ -15,7 +16,9 @@
                         version.</description>
                     <method>POST</method>
                     <params/>
-                    <result>Return XML with 'OK' message or error code</result>
+                    <result>
+                        <caption>Return XML with 'OK' message or error code</caption>
+                    </result>
                 </function>
                 <function>
                     <name>events</name>
@@ -54,7 +57,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Return media server event log in proprietary binary format</result>
+                    <result>
+                        <caption>Return media server event log in proprietary binary format</caption>
+                    </result>
                 </function>
                 <function>
                     <name>doCameraDiagnosticsStep</name>
@@ -94,7 +99,9 @@
                             </values>
                         </param>
                     </params>
-                    <result>Return XML with parameter value</result>
+                    <result>
+                        <caption>Return XML with parameter value</caption>
+                    </result>
                 </function>
                 <function>
                     <name>setCameraParam</name>
@@ -117,8 +124,10 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Returns OK if all parameters have been set, otherwise returns error 500
-                        (Internal server error) and result of setting for every param.</result>
+                    <result>
+                        <caption>Returns OK if all parameters have been set, otherwise returns error 500
+                        (Internal server error) and result of setting for every param.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>getCameraParam</name>
@@ -140,8 +149,10 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Returns required parameter values in form of paramName=paramValue, each
-                        param on new line</result>
+                    <result>
+                        <caption>Returns required parameter values in form of paramName=paramValue, each
+                        param on new line</caption>
+                    </result>
                 </function>
                 <function>
                     <name>image</name>
@@ -245,7 +256,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Returns image.</result>
+                    <result>
+                        <caption>Returns image.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>showLog</name>
@@ -259,7 +272,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Tail of the server log file in text format</result>
+                    <result>
+                        <caption>Tail of the server log file in text format</caption>
+                    </result>
                 </function>
                 <function>
                     <name>manualCamera/search</name>
@@ -298,7 +313,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>XML with camera names, manufacturers and urls.</result>
+                    <result>
+                        <caption>XML with camera names, manufacturers and urls.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>manualCamera/status</name>
@@ -312,7 +329,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>XML with progress value.</result>
+                    <result>
+                        <caption>XML with progress value.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>manualCamera/stop</name>
@@ -326,7 +345,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>XML with OK message or error code.</result>
+                    <result>
+                        <caption>XML with OK message or error code.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>manualCamera/add</name>
@@ -359,14 +380,18 @@
                             <values/>
                         </param>
                     </params>
-                    <result>XML with OK message or error code.</result>
+                    <result>
+                        <caption>XML with OK message or error code.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>ping</name>
                     <description>Ping the server</description>
                     <method>GET</method>
                     <params/>
-                    <result>XML with PONG message.</result>
+                    <result>
+                        <caption>XML with PONG message.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>ptz/move</name>
@@ -398,7 +423,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>XML with OK message or error code.</result>
+                    <result>
+                        <caption>XML with OK message or error code.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>ptz/stop</name>
@@ -412,7 +439,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>XML with OK message or error code.</result>
+                    <result>
+                        <caption>XML with OK message or error code.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>ptz/moveTo</name>
@@ -445,7 +474,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>XML with OK message or error code.</result>
+                    <result>
+                        <caption>XML with OK message or error code.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>ptz/getPosition</name>
@@ -459,7 +490,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>XML with camera position or error code.</result>
+                    <result>
+                        <caption>XML with camera position or error code.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>ptz/calibrate</name>
@@ -491,7 +524,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>XML with OK message or error code.</result>
+                    <result>
+                        <caption>XML with OK message or error code.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>ptz/getCalibrate</name>
@@ -505,7 +540,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>XML with calibration coeffecients.</result>
+                    <result>
+                        <caption>XML with calibration coeffecients.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>ptz/getSpaceMapper</name>
@@ -521,7 +558,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>return JSON-serialized PTZ space mapper.</result>
+                    <result>
+                        <caption>return JSON-serialized PTZ space mapper.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>rebuildArchive</name>
@@ -535,8 +574,10 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Rebuild progress if no input param specified or XML with OK message or
-                        error code.</result>
+                    <result>
+                        <caption>Rebuild progress if no input param specified or XML with OK message or
+                        error code.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>RecordedTimePeriods</name>
@@ -590,22 +631,28 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Chunks data in requested format. Chunks are merged for all requested
-                        cameras. Time and duration defined in UTC milliseconds.</result>
+                    <result>
+                        <caption>Chunks data in requested format. Chunks are merged for all requested
+                        cameras. Time and duration defined in UTC milliseconds.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>statistics</name>
                     <description>Returns server info: CPU usage, HDD usage e.t.c.</description>
                     <method>GET</method>
                     <params/>
-                    <result>XML data with statistics.</result>
+                    <result>
+                        <caption>XML data with statistics.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>storageSpace</name>
                     <description>Returns a list of all server storages.</description>
                     <method>GET</method>
                     <params/>
-                    <result>XML with server's storages.</result>
+                    <result>
+                        <caption>XML with server's storages.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>storageStatus</name>
@@ -620,15 +667,19 @@
                             <values/>
                         </param>
                     </params>
-                    <result>JSON data. 'OK' if specified folder may be used for writing on
-                        mediaServer. Otherwise returns 'FAIL' </result>
+                    <result>
+                        <caption>JSON data. 'OK' if specified folder may be used for writing on
+                        mediaServer. Otherwise returns 'FAIL' </caption>
+                    </result>
                 </function>
                 <function>
                     <name>gettime</name>
                     <description>Returns server UTC time and time zone</description>
                     <method>GET</method>
                     <params/>
-                    <result>JSON data.</result>
+                    <result>
+                        <caption>JSON data.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>installUpdate</name>
@@ -642,7 +693,9 @@
                     <description>Return server version.</description>
                     <method>GET</method>
                     <params/>
-                    <result>XML data with server version.</result>
+                    <result>
+                        <caption>XML data with server version.</caption>
+                    </result>
                 </function>
                 <function>
                     <name>onEvent</name>
@@ -692,7 +745,9 @@
                             </values>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
                     <name>getResourceParams</name>
@@ -732,10 +787,12 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
-                    <name>getMediaServers</name>
+                    <name>getMediaServerList</name>
                     <description>Return media server list</description>
                     <method>GET</method>
                     <params>
@@ -764,7 +821,9 @@
                             </values>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
                     <name>getCameras</name>
@@ -802,10 +861,12 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
-                    <name>getCameraHistoryItems</name>
+                    <name>getCameraHistoryList</name>
                     <description>Read information about which server hold camera in some time
                         period. This information is used for archive play if camera was moved from
                         one media server to another.</description>
@@ -836,7 +897,9 @@
                             </values>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
                     <name>getCameraBookmarkTags</name>
@@ -868,10 +931,12 @@
                             </values>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
-                    <name>getBusinessRules</name>
+                    <name>getBusinessRuleList</name>
                     <description>Return business rules</description>
                     <method>GET</method>
                     <params>
@@ -900,10 +965,12 @@
                             </values>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
-                    <name>getUsers</name>
+                    <name>getUserList</name>
                     <description>Return users registered in the system. User's password contain MD5
                         hash data with salt</description>
                     <method>GET</method>
@@ -933,10 +1000,12 @@
                             </values>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
-                    <name>getVideowalls</name>
+                    <name>getVideowallList</name>
                     <description>Return list of video walls</description>
                     <method>GET</method>
                     <params>
@@ -965,10 +1034,12 @@
                             </values>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
-                    <name>getLayouts</name>
+                    <name>getLayoutList</name>
                     <description>Return list of user layout</description>
                     <method>GET</method>
                     <params>
@@ -997,7 +1068,9 @@
                             </values>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
                     <name>listDirectory</name>
@@ -1037,7 +1110,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
                     <name>getStoredFile</name>
@@ -1075,7 +1150,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
                     <name>getSettings</name>
@@ -1114,7 +1191,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
                     <name>getCurrentTime</name>
@@ -1152,11 +1231,14 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
-                    <name>getFullInfo</name>
-                    <description>Read all data such as all media servers, cameras, users e.t.c</description>
+                    <name>getAllDataList</name>
+                    <description>Read all data such as all media servers, cameras, users
+                        e.t.c</description>
                     <method>GET</method>
                     <params>
                         <param>
@@ -1190,7 +1272,9 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
                 <function>
                     <name>getLicenses</name>
@@ -1228,25 +1312,27 @@
                             <values/>
                         </param>
                     </params>
-                    <result>Return object in requested format</result>
+                    <result>
+                        <caption>Return object in requested format</caption>
+                    </result>
                 </function>
             </functions>
         </group>
         <group>
             <groupName>RTSP API</groupName>
-            <urlPrefix></urlPrefix>
+            <urlPrefix/>
             <groupDescription>
 							This group contains information about media server RTSP api.
 							RTSP api is accessible on a same port as HTTP requests. To request video for camera use:
 						</groupDescription>
-						<functions>
+            <functions>
                 <function>
                     <name>&lt;camera_unique_id&gt;</name>
                     <description>
 										Open RTSP video from a camera. It is not a exact method name. It mean that RTSP url may contain any camera unique ID. For instance:
 										rtsp://&lt;server_ip&gt;:&lt;port&gt;/12AB42FD5912?pos=1235631&amp;resolution=240p
 										</description>
-										<method>PLAY</method>
+                    <method>PLAY</method>
                     <params>
                         <param>
                             <name>pos</name>
@@ -1267,7 +1353,7 @@
                             <values>
                                 <value>
                                     <name>H263</name>
-                                    <description></description>
+                                    <description/>
                                 </value>
                                 <value>
                                     <name>H263p</name>
@@ -1275,11 +1361,11 @@
                                 </value>
                                 <value>
                                     <name>mpeg2video</name>
-                                    <description></description>
+                                    <description/>
                                 </value>
                                 <value>
                                     <name>mpjeg</name>
-                                    <description></description>
+                                    <description/>
                                 </value>
                                 <value>
                                     <name>mpeg4</name>
@@ -1292,9 +1378,21 @@
                             </values>
                         </param>
                     </params>
-                    <result>Return RTSP video stream</result>
+                    <result>
+                        <caption>Return RTSP video stream</caption>
+                        <attributes>
+                            <attribute>
+                                <name>physical ID</name>
+                                <description>spd fposkd fposdkf posdk fposkdf posdkf posdkf posdkf posdkf posdk fposdkf posdk fposdkf </description>
+                            </attribute>
+                            <attribute>
+                                <name>guid</name>
+                                <description>Globally Unique Identifier Globally Unique Identifier Globally Unique Identifier</description>
+                            </attribute>
+                        </attributes>
+                    </result>
                 </function>
-						</functions>
+            </functions>
         </group>
     </groups>
 </apidoc>
