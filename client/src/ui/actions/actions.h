@@ -25,9 +25,9 @@ namespace Qn {
         PreferencesLicensesTabAction,
 
         /**
-         * Opens server settings preferences tab.
+         * Opens smtp settings preferences tab.
          */
-        PreferencesServerTabAction,
+        PreferencesSmtpTabAction,
 
         /**
          * Opens notifications settings preferences tab.

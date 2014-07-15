@@ -109,8 +109,6 @@ namespace ec2
             installUpdate               = 1202, /*< ApiUpdateInstallData  */
 
             /* Misc */
-            getSettings                 = 9000,  /*< ApiResourceParamDataList */
-            saveSettings                = 9001,  /*< ApiResourceParamDataList */
             getCurrentTime              = 9002,  /*< ApiTimeData */         
             //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
             runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */

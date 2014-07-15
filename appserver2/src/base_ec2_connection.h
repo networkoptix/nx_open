@@ -58,8 +58,6 @@ namespace ec2
         virtual int forcePrimaryTimeServer( const QnId& serverGuid, impl::SimpleHandlerPtr handler ) override;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) override;
-        virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) override;
-        virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
 
         virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) override;
         virtual void deleteRemotePeer(const QUrl& url) override;

@@ -169,14 +169,6 @@ namespace ec2
         emit m_ecConnection->panicModeChanged(tran.params.mode);
     }
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceParamDataList>& tran ) {
-        if( tran.command == ApiCommand::saveSettings ) {
-            QnKvPairList newSettings;
-            fromApiToResourceList(tran.params, newSettings);
-            emit m_ecConnection->settingsChanged(newSettings);
-        }
-    }
-
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran ) {
         return m_videowallManager->triggerNotification(tran);
     }

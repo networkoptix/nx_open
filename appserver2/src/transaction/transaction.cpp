@@ -138,11 +138,6 @@ namespace ec2
                 case getCurrentTime:
                     return "getCurrentTime";
 
-                case getSettings:
-                    return "getSettings";
-                case saveSettings:
-                    return "saveSettings";
-
                 case uploadUpdate:
                     return "uploadUpdate";
                 case uploadUpdateResponce:
@@ -163,6 +158,11 @@ namespace ec2
                     return "forcePrimaryTimeServer";
                 case broadcastPeerSystemTime:
                     return "broadcastPeerSystemTime";
+
+                case testEmailSettings:
+                    return "testEmailSettings";
+                case sendEmail:
+                    return "sendEmail";
 
                 default:
                     return "unknown " + QString::number((int)val);

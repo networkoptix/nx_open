@@ -45,8 +45,8 @@ namespace ec2
         std::unique_ptr<QnDbManager> m_dbManager;
         std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
         std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
-        //std::map<QUrl, AbstractECConnectionPtr> m_urlToConnection;
         Ec2DirectConnectionPtr m_directConnection;
+        Ec2ThreadPool m_ec2ThreadPool;
 
         int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
         int establishConnectionToRemoteServer( const QUrl& addr, impl::ConnectHandlerPtr handler );

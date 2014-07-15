@@ -1,11 +1,13 @@
 #include "updates_manager.h"
 
-#include <QtConcurrent>
-
 #include <transaction/transaction_message_bus.h>
 #include <utils/common/scoped_thread_rollback.h>
+#include <utils/common/concurrent.h>
+
+#include "ec2_thread_pool.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
+
 
 namespace ec2 {
 
@@ -66,8 +68,8 @@ namespace ec2 {
         auto transaction = prepareTransaction(updateId, data, offset);
 
         QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
-        QnScopedThreadRollback ensureFreeThread(1);
-        QtConcurrent::run([handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
+        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+        QnConcurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
 
         return reqId;
     }
@@ -89,8 +91,8 @@ namespace ec2 {
         auto transaction = prepareTransaction(updateId);
 
         QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
-        QnScopedThreadRollback ensureFreeThread(1);
-        QtConcurrent::run([handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
+        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+        QnConcurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
 
         return reqId;
     }

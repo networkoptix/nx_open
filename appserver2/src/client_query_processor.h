@@ -8,16 +8,18 @@
 
 #include <map>
 
-#include <QtConcurrent>
 #include <QtCore/QObject>
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
+#include <QtCore/QUrlQuery>
 
 #include <api/app_server_connection.h>
 
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/network/http/asynchttpclient.h>
+#include <utils/common/concurrent.h>
 
+#include "ec2_thread_pool.h"
 #include "database/db_manager.h"
 #include "rest/request_params.h"
 #include "transaction/transaction.h"
@@ -69,8 +71,8 @@ namespace ec2
             QMutexLocker lk( &m_mutex );
             if( !httpClient->doPost( requestUrl, "application/octet-stream", tranBuffer ) )
             {
-                QnScopedThreadRollback ensureFreeThread(1);
-                QtConcurrent::run( std::bind( handler, ErrorCode::failure ) );
+                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure ) );
                 return;
             }
             auto func = [this, httpClient, handler](){ processHttpPostResponse( httpClient, handler ); };
@@ -108,8 +110,8 @@ namespace ec2
             QMutexLocker lk( &m_mutex );
             if( !httpClient->doGet( requestUrl ) )
             {
-                QnScopedThreadRollback ensureFreeThread(1);
-                QtConcurrent::run( std::bind( handler, ErrorCode::failure, OutputData() ) );
+                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure, OutputData() ) );
                 return;
             }
             auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpGetResponse<OutputData, HandlerType> ), this, httpClient, handler );

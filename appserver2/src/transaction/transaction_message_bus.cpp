@@ -1,4 +1,7 @@
+
 #include "transaction_message_bus.h"
+
+#include <QtCore/QTimer>
 
 #include "remote_ec_connection.h"
 #include "utils/network/aio/aioservice.h"
@@ -19,6 +22,7 @@
 
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
+
 
 
 namespace ec2
@@ -96,7 +100,6 @@ bool handleTransaction(const QByteArray &serializedTransaction, const Function &
     case ApiCommand::removeStoredFile:      return handleTransactionParams<ApiStoredFilePath>       (&stream, transaction, function);
     case ApiCommand::broadcastBusinessAction:
     case ApiCommand::execBusinessAction:    return handleTransactionParams<ApiBusinessActionData>   (&stream, transaction, function);
-    case ApiCommand::saveSettings:          return handleTransactionParams<ApiResourceParamDataList>(&stream, transaction, function);
     case ApiCommand::addLicenses:           return handleTransactionParams<ApiLicenseDataList>      (&stream, transaction, function);
     case ApiCommand::addLicense:            return handleTransactionParams<ApiLicenseData>          (&stream, transaction, function);
     case ApiCommand::testEmailSettings:     transaction.isLocal = true;

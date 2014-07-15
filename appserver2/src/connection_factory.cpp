@@ -8,12 +8,13 @@
 #include <functional>
 
 #include <QtCore/QMutexLocker>
-#include <QtConcurrent>
 
 #include <network/authenticate_helper.h>
 #include <network/universal_tcp_listener.h>
+#include <utils/common/concurrent.h>
 
 #include "ec2_connection.h"
+#include "ec2_thread_pool.h"
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -174,10 +175,6 @@ namespace ec2
         //AbstractUpdatesManager::installUpdate
         registerUpdateFuncHandler<ApiUpdateInstallData>( restProcessorPool, ApiCommand::installUpdate );
 
-        //ApiResourceParamList
-        registerGetFuncHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );
-        registerUpdateFuncHandler<ApiResourceParamDataList>( restProcessorPool, ApiCommand::saveSettings );
-
         //AbstractECConnection
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
         registerUpdateFuncHandler<ApiIdData>(
@@ -214,8 +211,8 @@ namespace ec2
             if( !m_directConnection )
                 m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
         }
-        QnScopedThreadRollback ensureFreeThread(1);
-        QtConcurrent::run( std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
+        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+        QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
         return reqID;
     }
 
@@ -285,7 +282,7 @@ namespace ec2
         QnConnectionInfo* const connectionInfo )
     {
         connectionInfo->version = QnSoftwareVersion(lit(QN_APPLICATION_VERSION));
-        connectionInfo->brand = lit(QN_PRODUCT_NAME_SHORT);
+        connectionInfo->brand = isCompatibilityMode() ? QString() : lit(QN_PRODUCT_NAME_SHORT);
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
         connectionInfo->box = lit(QN_ARM_BOX);
 
@@ -297,8 +294,8 @@ namespace ec2
         const int reqID = generateRequestID();
         QnConnectionInfo connectionInfo;
         fillConnectionInfo( ApiLoginData(), &connectionInfo );
-        QnScopedThreadRollback ensureFreeThread(1);
-        QtConcurrent::run( std::bind( &impl::TestConnectionHandler::done, handler, reqID, ec2::ErrorCode::ok, connectionInfo ) );
+        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+        QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::TestConnectionHandler::done, handler, reqID, ec2::ErrorCode::ok, connectionInfo ) );
         return reqID;
     }
 

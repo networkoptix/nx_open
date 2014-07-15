@@ -1,5 +1,8 @@
+
 #include <QtCore/QRunnable>
 #include <QtCore/QThreadPool>
+
+#include <utils/common/log.h>
 
 #include "synctime.h"
 #include "api/app_server_connection.h"
@@ -12,36 +15,21 @@ enum {
 
 
 // -------------------------------------------------------------------------- //
-// QnSyncTimeTask
-// -------------------------------------------------------------------------- //
-class QnSyncTimeTask: public QRunnable {
-public:
-    QnSyncTimeTask(QnSyncTime* owner): m_owner(owner) {}
-
-    void run() {
-        ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
-        qint64 time;
-        if (appServerConnection && appServerConnection->getCurrentTimeSync(&time) == ec2::ErrorCode::ok) 
-            m_owner->updateTime(time);
-    }
-
-private:
-    QnSyncTime* m_owner;
-    QUrl m_url;
-};
-
-
-// -------------------------------------------------------------------------- //
 // QnSyncTime
 // -------------------------------------------------------------------------- //
 static QnSyncTime* QnSyncTime_instance = nullptr;
 
 QnSyncTime::QnSyncTime()
+:
+    m_lastReceivedTime( 0 ),
+    m_lastWarnTime( 0 ),
+    m_lastLocalTime( 0 ),
+    m_syncTimeRequestIssued( false )
 {
-    QnSyncTime_instance = this;
-
-    m_lastReceivedTime = 0;
     reset();
+
+    assert( QnSyncTime_instance == nullptr );
+    QnSyncTime_instance = this;
 }
 
 QnSyncTime::~QnSyncTime()
@@ -55,14 +43,20 @@ QnSyncTime* QnSyncTime::instance()
 }
 
 
-void QnSyncTime::updateTime(qint64 newTime)
+void QnSyncTime::updateTime(int /*reqID*/, ec2::ErrorCode errorCode, qint64 newTime)
 {
+    if( errorCode != ec2::ErrorCode::ok )
+    {
+        NX_LOG( lit("Failed to receive synchronized time: %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+        return;
+    }
+
     QMutexLocker lock(&m_mutex);
     qint64 oldTime = m_lastReceivedTime + m_timer.elapsed();
     
     m_lastReceivedTime = newTime;
     m_timer.restart();
-    m_gotTimeTask = 0;
+    m_syncTimeRequestIssued = false;
 
     if(qAbs(oldTime - newTime) > TimeChangeThreshold)
     {
@@ -83,7 +77,6 @@ qint64 QnSyncTime::currentUSecsSinceEpoch()
 
 void QnSyncTime::reset()
 {
-    m_gotTimeTask = 0;
     m_lastWarnTime = 0;
     m_lastLocalTime = 0;
 }
@@ -91,15 +84,17 @@ void QnSyncTime::reset()
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
     QMutexLocker lock(&m_mutex);
-    qint64 localTime = QDateTime::currentMSecsSinceEpoch();
-    if( (m_lastReceivedTime == 0 || m_timer.elapsed() > EcTimeUpdatePeriod || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod)
-        && m_gotTimeTask == 0
-        && QnSessionManager::instance()->isReady()
-        && !QnAppServerConnectionFactory::defaultUrl().isEmpty() )
+
+    const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
+    if ((m_lastReceivedTime == 0 || m_timer.elapsed() > EcTimeUpdatePeriod || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod) && 
+        !m_syncTimeRequestIssued && QnSessionManager::instance()->isReady() && !QnAppServerConnectionFactory::defaultUrl().isEmpty())
     {
-        m_gotTimeTask = new QnSyncTimeTask(this);
-        m_gotTimeTask->setAutoDelete(true);
-        QThreadPool::globalInstance()->start(m_gotTimeTask);
+        ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
+        if( appServerConnection ) 
+        {
+            appServerConnection->getCurrentTime( this, &QnSyncTime::updateTime );
+            m_syncTimeRequestIssued = true;
+        }
     }
     m_lastLocalTime = localTime;
 
@@ -109,8 +104,10 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         {
             m_lastWarnTime = localTime;
             if (m_lastWarnTime == 0)
-                qWarning() << "Local time differs from enterprise controller! local time=" << QDateTime::fromMSecsSinceEpoch(localTime).toString() <<
-                            "EC time=" << QDateTime::fromMSecsSinceEpoch(time).toString();
+            {
+                NX_LOG( lit("Local time differs from enterprise controller! local time %1, EC time %2").
+                    arg(QDateTime::fromMSecsSinceEpoch(localTime).toString()).arg(QDateTime::fromMSecsSinceEpoch(time).toString()), cl_logWARNING );
+            }
         }
         return time;
     }

@@ -56,7 +56,13 @@ void QnAppServerFileCache::clearLocalCache() {
 // -------------- File List loading methods -----
 
 void QnAppServerFileCache::getFileList() {
-    m_fileListHandle = QnAppServerConnectionFactory::getConnection2()->getStoredFileManager()->listDirectory(
+    auto connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection) {
+        m_fileListHandle = -1;
+        return;
+    }
+
+    m_fileListHandle = connection->getStoredFileManager()->listDirectory(
                 m_folderName,
                 this,
                 &QnAppServerFileCache::at_fileListReceived );
