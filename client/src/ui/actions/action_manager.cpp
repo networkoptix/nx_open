@@ -651,7 +651,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::GlobalHotkey).
         autoRepeat(false).
         shortcut(tr("Esc")).
-        shortcutContext(Qt::WidgetWithChildrenShortcut).
         text(tr("Stop current action"));
 
     factory(Qn::FullscreenAction).
@@ -683,7 +682,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+Enter")).
         shortcut(tr("Alt+Return")).
 #endif
-        shortcutContext(Qt::WidgetWithChildrenShortcut);
+        shortcutContext(Qt::ApplicationShortcut);
 
 
     factory(Qn::MessageBoxAction).
