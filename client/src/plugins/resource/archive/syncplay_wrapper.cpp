@@ -123,36 +123,6 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
         reinitTime(time);
 }
 
-/*
-bool QnArchiveSyncPlayWrapper::setSendMotion(bool value)
-{
-    Q_D(const QnArchiveSyncPlayWrapper);
-    QMutexLocker lock(&d->timeMutex);
-    bool rez = true;
-    foreach(ReaderInfo info, d->readers) {
-        info.reader->setNavDelegate(0);
-        rez &= info.reader->setSendMotion(value);
-        info.reader->setNavDelegate(this);
-    }
-    return rez;
-}
-*/
-
-/*
-bool QnArchiveSyncPlayWrapper::setMotionRegion(const QRegion& region)
-{
-    Q_D(const QnArchiveSyncPlayWrapper);
-    QMutexLocker lock(&d->timeMutex);
-    bool rez = true;
-    foreach(ReaderInfo info, d->readers) {
-        info.reader->setNavDelegate(0);
-        rez &= info.reader->setMotionRegion(region);
-        info.reader->setNavDelegate(this);
-    }
-    return rez;
-}
-*/
-
 bool QnArchiveSyncPlayWrapper::isMediaPaused() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
@@ -160,6 +130,9 @@ bool QnArchiveSyncPlayWrapper::isMediaPaused() const
     bool rez = true;
     foreach(const ReaderInfo& info, d->readers)
     {
+        if (!info.enabled)
+            continue;
+
         info.reader->setNavDelegate(0);
         rez &= info.reader->isMediaPaused();
         info.reader->setNavDelegate(const_cast<QnArchiveSyncPlayWrapper *>(this));
@@ -174,6 +147,8 @@ void QnArchiveSyncPlayWrapper::pauseMedia()
     d->paused = true;
     foreach(const ReaderInfo& info, d->readers)
     {
+        if (!info.enabled)
+            continue;
         info.reader->setNavDelegate(0);
         info.reader->pauseMedia();
         info.reader->setNavDelegate(this);
@@ -188,13 +163,12 @@ void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 mksec)
     d->timer.restart();
     foreach(const ReaderInfo& info, d->readers)
     {
-        if (info.enabled)
-        {
+        if (!info.enabled)
+            continue;
             info.reader->setNavDelegate(0);
             info.reader->directJumpToNonKeyFrame(mksec);
             info.reader->setNavDelegate(this);
         }
-    }
 }
 
 void QnArchiveSyncPlayWrapper::setJumpTime(qint64 mksec)
@@ -213,13 +187,12 @@ void QnArchiveSyncPlayWrapper::setSkipFramesToTime(qint64 skipTime)
     setJumpTime(skipTime);
     foreach(const ReaderInfo& info, d->readers)
     {
-        if (info.enabled)
-        {
+        if (!info.enabled)
+            continue;
             info.reader->setNavDelegate(0);
             info.reader->setSkipFramesToTime(skipTime);
             info.reader->setNavDelegate(this);
         }
-    }
 }
 
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
@@ -230,13 +203,12 @@ bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
     bool rez = false;
     foreach(const ReaderInfo& info, d->readers)
     {
-        if (info.enabled)
-        {
+        if (!info.enabled)
+            continue;
             info.reader->setNavDelegate(0);
             rez |= info.reader->jumpTo(mksec, skipTime);
             info.reader->setNavDelegate(this);
         }
-    }
     return rez;
 }
 
@@ -247,18 +219,18 @@ void QnArchiveSyncPlayWrapper::nextFrame()
     qint64 mintTime = AV_NOPTS_VALUE;
     foreach(const ReaderInfo& info, d->readers)
     {
-        if (info.enabled) {
+        if (!info.enabled)
+            continue;
             qint64 curTime = info.cam->getCurrentTime();
             if (mintTime == qint64(AV_NOPTS_VALUE))
                 mintTime = curTime;
             else if (curTime != qint64(AV_NOPTS_VALUE))
                 mintTime = qMin(mintTime, curTime);
         }
-    }
     foreach(const ReaderInfo& info, d->readers)
     {
-        if (info.enabled) 
-        {
+        if (!info.enabled)
+            continue;
             if (mintTime == qint64(AV_NOPTS_VALUE) || info.cam->getCurrentTime() <= mintTime+SYNC_FOR_FRAME_EPS)
             {
                 info.reader->setNavDelegate(0);
@@ -266,7 +238,6 @@ void QnArchiveSyncPlayWrapper::nextFrame()
                 info.reader->setNavDelegate(this);
             }
         }
-    }
 }
 
 void QnArchiveSyncPlayWrapper::previousFrame(qint64 mksec)
@@ -275,12 +246,12 @@ void QnArchiveSyncPlayWrapper::previousFrame(qint64 mksec)
     QMutexLocker lock(&d->timeMutex);
     foreach(const ReaderInfo& info, d->readers)
     {
-        if (info.enabled) {
+        if (!info.enabled)
+            continue;
             info.reader->setNavDelegate(0);
             info.reader->previousFrame(mksec);
             info.reader->setNavDelegate(this);
         }
-    }
 }
 
 
@@ -312,8 +283,9 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
             reader->pauseMedia();
     }
 
-    if (d->enabled)
+    if (d->enabled) {
         reader->setNavDelegate(this);
+    }
 
     //connect(reader, SIGNAL(singleShotModeChanged(bool)), this, SLOT(onSingleShotModeChanged(bool)), Qt::DirectConnection);
     //connect(reader, SIGNAL(streamPaused()), this, SLOT(onStreamPaused()), Qt::DirectConnection);
