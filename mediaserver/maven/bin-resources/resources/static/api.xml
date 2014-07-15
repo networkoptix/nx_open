@@ -890,7 +890,7 @@
 								<attribute><name>statusFlags</name> <description>Usually this field is zerro. Non zerro value is used to mark that a lot of network issues was occured with this camera</description></attribute> 
 								<attribute><name>typeId</name> <description>Guid with camera's type. Camera's type can describe predefined information such as camera maximum resolution, fps e.t.c.
 																	    Detailed type information can be obtained via 'getResourceTypes' request.</description></attribute> 
-								<attribute><name>url</name> <description>Camera ip address and port if port isn't default</description></attribute> 
+								<attribute><name>url</name> <description>Camera plain ip address or full http url if camera was added manually. Also, for multichannel encoders full url is used</description></attribute> 
 								<attribute><name>vendor</name> <description>Camera manufacturer</description></attribute>
 						    </attributes>
                     </result>
