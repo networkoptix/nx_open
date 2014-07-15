@@ -735,7 +735,7 @@
                     <result>Return object in requested format</result>
                 </function>
                 <function>
-                    <name>getMediaServerList</name>
+                    <name>getMediaServers</name>
                     <description>Return media server list</description>
                     <method>GET</method>
                     <params>
@@ -805,7 +805,7 @@
                     <result>Return object in requested format</result>
                 </function>
                 <function>
-                    <name>getCameraHistoryList</name>
+                    <name>getCameraHistoryItems</name>
                     <description>Read information about which server hold camera in some time
                         period. This information is used for archive play if camera was moved from
                         one media server to another.</description>
@@ -871,7 +871,7 @@
                     <result>Return object in requested format</result>
                 </function>
                 <function>
-                    <name>getBusinessRuleList</name>
+                    <name>getBusinessRules</name>
                     <description>Return business rules</description>
                     <method>GET</method>
                     <params>
@@ -903,7 +903,7 @@
                     <result>Return object in requested format</result>
                 </function>
                 <function>
-                    <name>getUserList</name>
+                    <name>getUsers</name>
                     <description>Return users registered in the system. User's password contain MD5
                         hash data with salt</description>
                     <method>GET</method>
@@ -936,7 +936,7 @@
                     <result>Return object in requested format</result>
                 </function>
                 <function>
-                    <name>getVideowallList</name>
+                    <name>getVideowalls</name>
                     <description>Return list of video walls</description>
                     <method>GET</method>
                     <params>
@@ -968,7 +968,7 @@
                     <result>Return object in requested format</result>
                 </function>
                 <function>
-                    <name>getLayoutList</name>
+                    <name>getLayouts</name>
                     <description>Return list of user layout</description>
                     <method>GET</method>
                     <params>
@@ -1155,9 +1155,8 @@
                     <result>Return object in requested format</result>
                 </function>
                 <function>
-                    <name>getAllDataList</name>
-                    <description>Read all data such as all media servers, cameras, users
-                        e.t.c</description>
+                    <name>getFullInfo</name>
+                    <description>Read all data such as all media servers, cameras, users e.t.c</description>
                     <method>GET</method>
                     <params>
                         <param>
