@@ -1353,32 +1353,32 @@
             <urlPrefix/>
             <groupDescription>
 							This group contains information about media server RTSP api.
-							RTSP api is accessible on a same port as HTTP requests. To request video for camera use:
+							RTSP api is accessible on the same port as HTTP requests. To request video for camera use:
 						</groupDescription>
             <functions>
                 <function>
                     <name>&lt;physicalId&gt;</name>
                     <description>
-										Open RTSP video from a camera. It is not a exact method name. It mean that RTSP url may contain any camera unique ID. For instance:
+										Open RTSP video from a camera. It is not an exact method name. It means that RTSP url may contain any camera unique ID. For instance:
 										rtsp://&lt;server_ip&gt;:&lt;port&gt;/12AB42FD5912?pos=1235631&amp;resolution=240p
 										</description>
                     <method>PLAY</method>
                     <params>
                         <param>
                             <name>pos</name>
-                            <description>By default media server open camera from live position. This parameter define position in a archive in microseconds in a UTC format.
+                            <description>By default media server opens camera from live position. This parameter defines position in an archive in microseconds in a UTC format.
 														Position can be passed via standard RTSP attribute as well as via URL parameter</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>resolution</name>
-                            <description>Turn on video transcoding to specified resolution. Resolution string either may contain width and height (for instance 320x240) or 
+                            <description>Turn on video transcoding to the specified resolution. Resolution string either may contain width and height (for instance 320x240) or 
 														height only (for instance 240p)</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>codec</name>
-                            <description>Define video codec used for transcoding. Default value H263.</description>
+                            <description>Defines video codec used for transcoding. Default value H263.</description>
                             <optional>true</optional>
                             <values>
                                 <value>
@@ -1424,12 +1424,12 @@
 			</groupDescription>
             <functions>
                 <function>
-                    <name>&lt;camera_unique_id&gt;</name>
+                    <name>&lt;physicalId&gt;</name>
                     <description>
 					    Url format for opening camera stream with HLS:
-					    http://&lt;server_ip&gt;:&lt;port&gt;/hls/&lt;camera_unique_id&gt;.m3u
+					    http://&lt;server_ip&gt;:&lt;port&gt;/hls/&lt;physicalId&gt;.m3u
 					</description>
-                    <method>PLAY</method>
+                    <method>GET</method>
                     <params>
                         <param>
                             <name>startDatetime</name>
@@ -1467,13 +1467,13 @@
             </groupDescription>
             <functions>
                 <function>
-                    <name>&lt;camera_unique_id&gt;</name>
+                    <name>&lt;physicalId&gt;</name>
                     <description>
 					    Url format:
-					    http://&lt;server_ip&gt;:&lt;port&gt;/media/&lt;camera_unique_id&gt;.&lt;format&gt;
+					    http://&lt;server_ip&gt;:&lt;port&gt;/media/&lt;physicalId&gt;.&lt;format&gt;
                         Stream format can be one of following: webm, mpegts, mp4, 3gp, mpjpeg (motion jpeg)
 					</description>
-                    <method>PLAY</method>
+                    <method>GET</method>
                     <params>
                         <param>
                             <name>resolution</name>
