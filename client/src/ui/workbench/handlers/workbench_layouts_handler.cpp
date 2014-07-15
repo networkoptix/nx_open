@@ -148,15 +148,8 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
 
             // that's the case when user press "Save As" and enters the same name as this layout already has
             if (name == layout->getName() && user == layoutOwnerUser && hasSavePermission) {
-                switch (askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes)) {
-                case QMessageBox::Cancel:
-                    return;
-                case QMessageBox::Yes:
-                    saveLayout(layout);
-                    return;
-                default:
-                    continue;
-                }
+                saveLayout(layout);
+                return;
             }
 
             /* Check if we have rights to overwrite the layout */
