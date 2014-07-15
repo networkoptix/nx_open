@@ -237,10 +237,11 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
         m_handleKeyMap[handle] = licenseKey;
     }
 
+    /* There is an issue when we are trying to activate and Edge license on the PC. 
+     * In this case activation server will return no error but local check will fail.  */
     if (!keyLicense) {
         /* QNetworkReply slots should not start event loop. */
-        emit showMessageLater(tr("License Activation"),
-            //TODO: Feature #3629 cases B,D,F are all the same here
+        emit showMessageLater(tr("License Activation"), //TODO: #GDM #FIXME
             tr("You are trying to activate an incompatible license with your software. "
                 "Please contact support team to get a valid license key."),
                               true);
@@ -401,12 +402,36 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
     if (ui->licenseWidget->isOnline()) {
         updateFromServer(ui->licenseWidget->serialKey().toLatin1(), qnLicensePool->mainHardwareIds(), qnLicensePool->compatibleHardwareIds());
     } else {
-        QList<QnLicensePtr> licenseList;
         QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
-        if (license->isValid())
-            licenseList.append(license);
 
-        validateLicenses(license ? license->key() : "", licenseList);
+        QnLicense::ErrorCode errCode = QnLicense::NoError;
+        if (license->isValid(&errCode) || errCode == QnLicense::Expired) {
+            validateLicenses(license->key(), QList<QnLicensePtr>() << license);
+        }
+        else {
+            QString message;
+            switch (errCode) {
+            case QnLicense::InvalidSignature:
+                message = tr("The manual activation key you have entered is invalid. Please check that manual activation key is entered correctly. "
+                             "If problem continues, please contact support team.");
+                break;
+            case QnLicense::InvalidHardwareID:
+                message = tr("This license key has been activated to another hardware id %1. Please contact support team to get a valid license key.")
+                    .arg(QString::fromUtf8(license->hardwareId()));    //TODO: #GDM #FIXME
+                break;
+            case QnLicense::InvalidBrand:
+            case QnLicense::InvalidType: //TODO: #GDM #FIXME
+                message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
+                break;
+            default:
+                break;
+            }
+
+            if (!message.isEmpty())
+                emit showMessageLater(tr("License Activation"), message, true);
+        }
+
+        
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
 }
