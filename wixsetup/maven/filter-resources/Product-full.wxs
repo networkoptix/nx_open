@@ -45,8 +45,8 @@
 
         <?define PasswordsEqual="(SERVER_PASSWORD = SERVER_PASSWORD_CONFIRM)" ?>
         <?define IsSettingsFilled="(SYSTEM_NAME AND SERVER_PORT AND SERVER_LOGIN AND SERVER_PASSWORD AND SERVER_PASSWORD_CONFIRM)"?>
-        <?define IsSettingsValid="($(var.IsSettingsFilled) AND $(var.PasswordsEqual))"?>
-
+        <?define IsSettingsCorrect=$(var.IsSettingsFilled) AND $(var.PasswordsEqual)?>
+        <?define IsSettingsValid="($(var.IsSettingsFilled) AND $(var.PasswordsEqual) AND NOT BUSYPORT)"?>
 
         <?if $(var.arch) = x86 ?>
         <Condition Message="!(loc.Product_ArchMismatch)">
@@ -134,7 +134,6 @@
 
         <CustomAction Id="FindFreePorts" BinaryKey="CustomActions.dll" DllEntry="FindFreePorts" />
         <CustomAction Id="CheckPorts" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
-        <CustomAction Id="CheckPorts2" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
         <CustomAction Id="FixServerFolder" BinaryKey="CustomActions.dll" DllEntry="FixServerFolder"/>
         <CustomAction Id="GenerateSystemName" BinaryKey="CustomActions.dll" DllEntry="GenerateSystemName"/>
         <CustomAction Id="DetectIfSystemIsStandalone" BinaryKey="CustomActions.dll" DllEntry="DetectIfSystemIsStandalone"/>
@@ -358,14 +357,27 @@
 
             <!-- MediaServerDlg -->
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg"/>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"> <![CDATA[ NOT $(var.IsSettingsFilled) ]]> </Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="InvalidPasswordDlg"> <![CDATA[ $(var.IsSettingsFilled) AND NOT $(var.PasswordsEqual) ]]> </Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg"> <![CDATA[ $(var.IsSettingsValid) AND $(var.Inst_C1) ]]> </Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"> <![CDATA[ $(var.IsSettingsValid) AND $(var.Inst_C0) ]]> </Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg" Order="1">NOT $(var.IsSettingsFilled)</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="InvalidPasswordDlg" Order="1">$(var.IsSettingsFilled) AND NOT $(var.PasswordsEqual)</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="BUSYPORT" Value="{}">$(var.IsSettingsCorrect)</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_PORT]" Order="1">$(var.IsSettingsCorrect)</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts" Order="2">$(var.IsSettingsCorrect)</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">$(var.IsSettingsCorrect) AND BUSYPORT</Publish>
 
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_HOST" Value="localhost">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_PORT" Value="[SERVER_PORT]">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_LOGIN" Value="[SERVER_LOGIN]">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="4"> <![CDATA[ $(var.IsSettingsValid) AND $(var.Inst_C1) ]]> </Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"> <![CDATA[ $(var.IsSettingsValid) AND $(var.Inst_C0) ]]> </Publish>
+
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_HOST" Value="localhost" Order="4">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_PORT" Value="[SERVER_PORT]" Order="4">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_LOGIN" Value="[SERVER_LOGIN]" Order="4">1</Publish>
+
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="ClientDlg">INSTALL_CLIENT</Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">NOT INSTALL_CLIENT</Publish>
+
+            <!-- PortIsBusyDlg -->
+            <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
+            <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish>
 
             <!-- ClientDlg -->
             <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">NOT $(var.VmsChanging) AND $(var.Inst_S0)</Publish>
