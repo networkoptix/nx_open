@@ -240,7 +240,9 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     if (!keyLicense) {
         /* QNetworkReply slots should not start event loop. */
         emit showMessageLater(tr("License Activation"),
-                              tr("Invalid License. Please contact our support team to get a valid license."),
+            //TODO: Feature #3629 cases B,D,F are all the same here
+            tr("You are trying to activate an incompatible license with your software. "
+                "Please contact support team to get a valid license key."),
                               true);
     } else if (licenseListHelper.getLicenseByKey(licenseKey)) {
         emit showMessageLater(tr("License Activation"),
@@ -310,8 +312,9 @@ void QnLicenseManagerWidget::at_downloadError() {
 
         /* QNetworkReply slots should not start eventLoop */
         emit showMessageLater(tr("License Activation ") + reply->errorString(),
-                              tr("Network error has occurred during automatic license activation.\nTry to activate your license manually."),
-                              true);
+            tr("Network error has occurred during automatic license activation. "
+               "Please contact support team to activate your license key manually."),
+            true);
 
         ui->licenseWidget->setOnline(false);
     }
@@ -328,28 +331,28 @@ void QnLicenseManagerWidget::at_downloadFinished() {
         // If we can deserialize JSON it means there is an error.
         QJsonObject errorMessage;
         if (QJson::deserialize(replyData, &errorMessage)) {
-//            QString error = errorMessage.value(lit("error")).toString();
             QString messageId = errorMessage.value(lit("messageId")).toString();
             QString message = errorMessage.value(lit("message")).toString();
             QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
 
             if(messageId == lit("DatabaseError")) {
-                message = tr("Database error has occurred.");
+                message = tr("There was a problem activating your license. Database error has occurred.");  //TODO: Feature #3629 case J
             } else if(messageId == lit("InvalidData")) {
-                message = tr("Invalid data was received.");
+                message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report issue.");
             } else if(messageId == lit("InvalidKey")) {
-                message = tr("The license key is invalid.");
+                message = tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
+                             "If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.");
             } else if(messageId == lit("InvalidBrand")) {
-                message = tr("You are trying to activate an incompatible license with your software.");
+                message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
             } else if(messageId == lit("AlreadyActivated")) {
-                message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}.");
+                message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.");
             }
 
             message = Mustache::renderTemplate(message, arguments);
 
             /* QNetworkReply slots should not start eventLoop */
             emit showMessageLater(tr("License Activation"),
-                                  tr("There was a problem activating your license.") + lit(" ") + message,
+                                  message,
                                   true);
             ui->licenseWidget->setState(QnLicenseWidget::Normal);
 
