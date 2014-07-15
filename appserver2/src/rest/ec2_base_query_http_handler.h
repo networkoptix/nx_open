@@ -10,11 +10,12 @@
 #include <QtCore/QMutex>
 #include <QtCore/QMutexLocker>
 #include <QtCore/QWaitCondition>
-#include <QtConcurrent>
 
 #include <rest/server/request_handler.h>
+#include <utils/common/concurrent.h>
 #include <utils/network/http/httptypes.h>
 
+#include "ec2_thread_pool.h"
 #include "request_params.h"
 #include "server_query_processor.h"
 
@@ -177,12 +178,13 @@ namespace ec2
         template<class HandlerType>
         void processQueryAsync( const InputData& inputData, HandlerType handler )
         {
-            QnScopedThreadRollback ensureFreeThread(1);
-            QtConcurrent::run( [this, inputData, handler]() {
-                OutputData output;
-                const ErrorCode errorCode = m_queryHandler( inputData, &output );
-                handler( errorCode, output );
-            } );
+            QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+            QnConcurrent::run( Ec2ThreadPool::instance(),
+                [this, inputData, handler]() {
+                    OutputData output;
+                    const ErrorCode errorCode = m_queryHandler( inputData, &output );
+                    handler( errorCode, output );
+                } );
         }
 
     private:

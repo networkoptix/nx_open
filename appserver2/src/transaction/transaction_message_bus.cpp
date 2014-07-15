@@ -1,4 +1,7 @@
+
 #include "transaction_message_bus.h"
+
+#include <QtCore/QTimer>
 
 #include "remote_ec_connection.h"
 #include "utils/network/aio/aioservice.h"
@@ -18,6 +21,7 @@
 #include <utils/common/checked_cast.h>
 #include "utils/common/warnings.h"
 #include "api/runtime_info_manager.h"
+
 
 namespace ec2
 {
