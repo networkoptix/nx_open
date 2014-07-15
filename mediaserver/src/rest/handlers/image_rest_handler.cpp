@@ -277,6 +277,9 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         AVFrame dstPict;
         avpicture_fill((AVPicture*) &dstPict, scaleBuffer, (PixelFormat) outFrame->format, roundedWidth, roundedHeight);
         sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstPict.data, dstPict.linesize);
+        dstPict.width = roundedWidth;
+        dstPict.height = roundedHeight;
+        dstPict.format = outFrame->format;
 
         AVCodecContext* videoEncoderCodecCtx = avcodec_alloc_context3(0);
         videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
