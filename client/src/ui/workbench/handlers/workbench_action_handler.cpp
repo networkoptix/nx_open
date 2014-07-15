@@ -2590,7 +2590,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.usePosition = true;
     addParams.position = widget->item()->combinedGeometry().center();
     addParams.zoomWindow = rect;
-    addParams.dewarpingParams.enabled = widget->dewarpingParams().enabled;
+    addParams.dewarpingParams.enabled = widget->resource()->getDewarpingParams().enabled;  // zoom items on fisheye cameras must always be dewarped
     addParams.zoomUuid = widget->item()->uuid();
     addParams.frameDistinctionColor = params.argument<QColor>(Qn::ItemFrameDistinctionColorRole);
     addParams.rotation = widget->item()->rotation();
