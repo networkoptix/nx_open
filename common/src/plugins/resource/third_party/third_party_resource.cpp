@@ -388,8 +388,10 @@ CameraDiagnostics::Result QnThirdPartyResource::initInternal()
         }
         ptzManager->releaseRef();
     }
-    if( cameraCapabilities & nxcip::BaseCameraManager::audioCapability )
-        setAudioEnabled( true );
+    setParam(
+        lit("isAudioSupported"),
+        (cameraCapabilities & nxcip::BaseCameraManager::audioCapability) ? 1 : 0,
+        QnDomainDatabase );
     if( cameraCapabilities & nxcip::BaseCameraManager::dtsArchiveCapability )
     {
         setParam( lit("dts"), 1, QnDomainDatabase );
