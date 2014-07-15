@@ -55,7 +55,6 @@ void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runt
 
     m_runtimeInfo.insert(runtimeInfo.peer.id, runtimeInfo);
 
-    QnId remoteID = qnCommon->remoteGUID();
     lock.unlock();  //to avoid dead-lock in case if directly (or auto) connected slot calls any method of this class
     emit runtimeInfoChanged(runtimeInfo);
 }

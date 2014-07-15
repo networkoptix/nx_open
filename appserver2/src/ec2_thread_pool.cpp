@@ -6,7 +6,6 @@
 #include "ec2_thread_pool.h"
 
 #include <cassert>
-#include <thread>
 
 
 namespace ec2
@@ -17,7 +16,7 @@ namespace ec2
     {
         assert( Ec2ThreadPool_instance == nullptr );
         Ec2ThreadPool_instance = this;
-        setMaxThreadCount( std::thread::hardware_concurrency() );
+        setMaxThreadCount( QThread::idealThreadCount() );
     }
 
     Ec2ThreadPool::~Ec2ThreadPool()
