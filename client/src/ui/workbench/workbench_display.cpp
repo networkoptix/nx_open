@@ -27,6 +27,8 @@
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
 
+#include <redass/redass_controller.h>
+
 #include <ui/common/notification_levels.h>
 
 #include <ui/animation/viewport_animator.h>
@@ -1563,6 +1565,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
                 mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
+            qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
         }
 
 //        widget->item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(widget->checkedButtons()));
@@ -1625,6 +1628,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
         if(!widget)
             continue;
+
+        qnRedAssController->registerConsumer(widget->display()->camDisplay());
 
         qint64 time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
 
