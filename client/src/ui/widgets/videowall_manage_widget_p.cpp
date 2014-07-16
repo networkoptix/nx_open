@@ -553,10 +553,13 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
     else
         videowall->pcs()->updateItem(pcUuid, pcData);
 
+    /* Form list of items currently attached to this PC. */
     QSet<QUuid> existingIds;
     foreach (const QnVideoWallItem &item, videowall->items()->getItems())
-        existingIds << item.uuid;
+        if (item.pcUuid == pcUuid)
+            existingIds << item.uuid;
 
+    /* Remove from the list items that will be updated. */
     foreach (const ModelItem &modelItem, m_items) {
         existingIds.remove(modelItem.id);
 
@@ -581,6 +584,7 @@ void QnVideowallManageWidgetPrivate::submitToResource(const QnVideoWallResourceP
             videowall->items()->addItem(item);
     }
 
+    /* Delete other items. */ 
     foreach (const QUuid &toDelete, existingIds)
         videowall->items()->removeItem(toDelete);
 
