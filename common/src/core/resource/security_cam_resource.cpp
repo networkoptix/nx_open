@@ -244,35 +244,30 @@ bool QnSecurityCamResource::hasDualStreaming2() const {
     return hasDualStreaming() && secondaryStreamQuality() != Qn::SSQualityDontUse;
 }
 
-static const QString HAS_DUAL_STREAMING_PARAM_NAME = lit("hasDualStreaming");
-static const QString DTS_PARAM_NAME = lit("dts");
-static const QString ANALOG_PARAM_NAME = lit("analog");
-static const QString STREAM_FPS_SHARING_PARAM_NAME = lit("streamFpsSharing");
-
 bool QnSecurityCamResource::hasDualStreaming() const {
     QVariant val;
-    if (!getParam(HAS_DUAL_STREAMING_PARAM_NAME, val, QnDomainMemory))
+    if (!getParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
 }
 
 bool QnSecurityCamResource::isDtsBased() const {
     QVariant val;
-    if (!getParam(DTS_PARAM_NAME, val, QnDomainMemory))
+    if (!getParam(Qn::DTS_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
 }
 
 bool QnSecurityCamResource::isAnalog() const {
     QVariant val;
-    if (!getParam(ANALOG_PARAM_NAME, val, QnDomainMemory))
+    if (!getParam(Qn::ANALOG_PARAM_NAME, val, QnDomainMemory))
         return false;
     return val.toBool();
 }
 
 Qn::StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const {
     QVariant val;
-    if (!getParam(STREAM_FPS_SHARING_PARAM_NAME, val, QnDomainMemory))
+    if (!getParam(Qn::STREAM_FPS_SHARING_PARAM_NAME, val, QnDomainMemory))
         return defaultStreamFpsSharingMethod;
 
     const QString& sval = val.toString();
@@ -288,13 +283,13 @@ void QnSecurityCamResource::setStreamFpsSharingMethod(Qn::StreamFpsSharingMethod
     switch( value )
     {
         case Qn::BasicFpsSharing:
-            setParam(STREAM_FPS_SHARING_PARAM_NAME, lit("shareFps"), QnDomainDatabase);
+            setParam(Qn::STREAM_FPS_SHARING_PARAM_NAME, lit("shareFps"), QnDomainDatabase);
             break;
         case Qn::NoFpsSharing:
-            setParam(STREAM_FPS_SHARING_PARAM_NAME, lit("noSharing"), QnDomainDatabase);
+            setParam(Qn::STREAM_FPS_SHARING_PARAM_NAME, lit("noSharing"), QnDomainDatabase);
             break;
         default:
-            setParam(STREAM_FPS_SHARING_PARAM_NAME, lit("sharePixels"), QnDomainDatabase);
+            setParam(Qn::STREAM_FPS_SHARING_PARAM_NAME, lit("sharePixels"), QnDomainDatabase);
             break;
     }
 }
@@ -345,33 +340,33 @@ void QnSecurityCamResource::at_parentIdChanged()
 
 int QnSecurityCamResource::motionWindowCount() const {
     QVariant val;
-    if (!getParam(lit("motionWindowCnt"), val, QnDomainMemory))
+    if (!getParam(Qn::MOTION_WINDOW_CNT_PARAM_NAME, val, QnDomainMemory))
         return 0;
     return val.toInt();
 }
 
 int QnSecurityCamResource::motionMaskWindowCount() const {
     QVariant val;
-    if (!getParam(lit("motionMaskWindowCnt"), val, QnDomainMemory))
+    if (!getParam(Qn::MOTION_MASK_WINDOW_CNT_PARAM_NAME, val, QnDomainMemory))
         return 0;
     return val.toInt();
 }
 
 int QnSecurityCamResource::motionSensWindowCount() const {
     QVariant val;
-    if (!getParam(lit("motionSensWindowCnt"), val, QnDomainMemory))
+    if (!getParam(Qn::MOTION_SENS_WINDOW_CNT_PARAM_NAME, val, QnDomainMemory))
         return 0;
     return val.toInt();
 }
 
 bool QnSecurityCamResource::isAudioSupported() const {
     QVariant val;
-    if (!getParam(lit("isAudioSupported"), val, QnDomainMemory))
+    if (!getParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, val, QnDomainMemory))
         return false;
     if (val.toBool())
         return true;
 
-    if (!getParam(lit("forcedIsAudioSupported"), val, QnDomainMemory))
+    if (!getParam(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME, val, QnDomainMemory))
         return false;
 
     return val.toInt() > 0;
@@ -389,7 +384,7 @@ Qn::MotionType QnSecurityCamResource::getCameraBasedMotionType() const {
 
 Qn::MotionType QnSecurityCamResource::getDefaultMotionType() const {
     QVariant val;
-    if (!getParam(lit("supportedMotion"), val, QnDomainMemory))
+    if (!getParam(Qn::SUPPORTED_MOTION_PARAM_NAME, val, QnDomainMemory))
         return defaultMotionType;
 
     foreach(const QString &s, val.toString().split(L',')) {
@@ -406,7 +401,7 @@ Qn::MotionType QnSecurityCamResource::getDefaultMotionType() const {
 
 Qn::MotionTypes QnSecurityCamResource::supportedMotionType() const {
     QVariant val;
-    if (!getParam(lit("supportedMotion"), val, QnDomainMemory))
+    if (!getParam(Qn::SUPPORTED_MOTION_PARAM_NAME, val, QnDomainMemory))
         return Qn::MT_NoMotion;
 
     Qn::MotionTypes result = Qn::MT_Default;
@@ -437,7 +432,7 @@ void QnSecurityCamResource::setMotionType(Qn::MotionType value) {
 
 Qn::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const {
     QVariant val;
-    if (!getParam(lit("cameraCapabilities"), val, QnDomainMemory))
+    if (!getParam(Qn::CAMERA_CAPABILITIES_PARAM_NAME, val, QnDomainMemory))
         return Qn::NoCapabilities;
     return static_cast<Qn::CameraCapabilities>(val.toInt());
 }
@@ -447,7 +442,7 @@ bool QnSecurityCamResource::hasCameraCapabilities(Qn::CameraCapabilities capabil
 }
 
 void QnSecurityCamResource::setCameraCapabilities(Qn::CameraCapabilities capabilities) {
-    setParam(lit("cameraCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
+    setParam(Qn::CAMERA_CAPABILITIES_PARAM_NAME, static_cast<int>(capabilities), QnDomainDatabase);
 }
 
 void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability, bool value) {
@@ -455,7 +450,7 @@ void QnSecurityCamResource::setCameraCapability(Qn::CameraCapability capability,
 }
 
 void QnSecurityCamResource::parameterValueChangedNotify(const QnParam &param) {
-    if (param.name() == lit("cameraCapabilities"))
+    if (param.name() == Qn::CAMERA_CAPABILITIES_PARAM_NAME)
         emit cameraCapabilitiesChanged(::toSharedPointer(this));
 
     base_type::parameterValueChangedNotify(param);

@@ -19,9 +19,15 @@ public:
 protected:
     /*!
         \param result Just found resources. In case if same camera has been found on multiple network interfaces
+        \param Local address, MDNS response had been recevied on
+        \param foundHostAddress Source address of received MDNS packet
         \note Searcher MUST not duplicate resoures, already present in \a result
     */
-    virtual QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress) = 0;
+    virtual QList<QnNetworkResourcePtr> processPacket(
+        QnResourceList& result,
+        const QByteArray& responseData,
+        const QHostAddress& discoveryAddress,
+        const QHostAddress& foundHostAddress ) = 0;
 };
 
 bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
