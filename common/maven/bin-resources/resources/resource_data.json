@@ -31,8 +31,10 @@
                 "ACTI|KCM5211", "ACTI|TCM3511", 
                 "AXIS|AXISP3344", "AXIS|AXISP1344",
                 "*|IPC-HDB3200C", "*|N53F-F",
-                "IPC|LR01", "hs0130|LR01", "H18A2|IPCAM_M1", "H18A3|IPCAM_M1", "H18A4|RL01", "H18A5|IPCAM_M1", "HI9712_51ÊÒÍâ|LR01",
-                "VISTA|*VRD", "VISTA|VK2-2MPBX(DN)"
+                "*|LR01", "*|IPCAM_M1", "*|RL01",
+                "VISTA|*VRD", "VISTA|VK2-2MPBX(DN)",
+                "ZXDZHZ|vimicro","DW|DWC-MF21M4TIR","ACTI|TCM4201","Sony|SNC-CH120","Sony|SNC-CH280",
+                "Sony|SNC-DH210","Sony|SNC-DH120T","VITEK|VT-20VN-M","Etrovision Technology|EV8180U-XL"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -46,7 +48,8 @@
         },
         {
             "keys": [
-                "ACTI|KCM3311"
+                "ACTI|KCM3311","ACTI|KCM7211","ACTI|KCM5611","ACTI|KCM5311","Sony|SNC-EM600","Sony|SNC-CX600","Sony|SNC-DH120T",
+                "Sony|SNC-XM636"
             ],
             "ptzCapabilities": "ContinuousZoomCapability"
         },
@@ -68,7 +71,13 @@
             "keys": [
                 "VISTA|VK2-600PTZ"
             ],
-            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability"
+            "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
+        },
+        {
+            "keys": [
+                "VISTA|VK2-1080VRDIR3V9F"
+            ],
+            "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
         },
         {
             "keys": [
@@ -350,6 +359,32 @@
                         "device":  [    -1,   -0.9,   -0.8,   -0.7,   -0.6,   -0.5,   -0.4,   -0.3,   -0.2,   -0.1,      0,    0.1,    0.2,    0.3,    0.4,    0.5,    0.6,     0.7,     0.8,     0.9,       1],
                         "logical": [1.0000, 1.0859, 1.1797, 1.2891, 1.4141, 1.5703, 1.7422, 1.9453, 2.2031, 2.5000, 2.8672, 3.3281, 3.9297, 4.7344, 5.7188, 7.0313, 8.7969, 12.1481, 14.8011, 19.6882, 29.3229],
                         "logicalMultiplier": 30.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "Canon|VB-S30D"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [   -1,  1],
+                        "logical": [-175, 175]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [-90,   0]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.04,  0.08,  0.12, 0.2,  0.28, 0.36, 0.44, 0.52, 0.6,  0.68, 0.76,0.8],
+                        "logical": [1, 1.025, 1.063, 1.09 ,1.18 ,1.27, 1.40, 1.55, 1.76, 2.02, 2.41, 3.0, 3.4],
+                        "logicalMultiplier": 27.5,
                         "space": "35MmEquiv"
                     }
                 }
