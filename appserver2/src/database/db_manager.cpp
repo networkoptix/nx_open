@@ -262,7 +262,7 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
         return false;
-    if (!fillTransactionLogInternal<ApiResourceParamDataList>(ApiCommand::saveSettings))
+    if (!fillTransactionLogInternal<ApiResourceParamDataList>(ApiCommand::setResourceParams))
         return false;
 
     return true;
