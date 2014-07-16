@@ -1472,7 +1472,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
 
     if (!loginDialog()) {
         m_loginDialog = new QnLoginDialog(mainWindow(), context());
-        loginDialog()->setModal(true);
+        loginDialog()->setWindowModality(Qt::ApplicationModal);
     }
     while(true) {
         QnActionParameters parameters = menu()->currentParameters(sender());
