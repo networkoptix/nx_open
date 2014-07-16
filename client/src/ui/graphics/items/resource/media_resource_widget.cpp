@@ -925,7 +925,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if (!zoomRect().isNull())
         return result;
 
-    if (resource()->toResource()->hasFlags(QnResource::motion) && !(options() & DisplayDewarped))
+    if (resource()->toResource()->hasFlags(QnResource::motion))
         result |= MotionSearchButton;
 
     bool isExportedLayout = item() 
@@ -1068,7 +1068,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
     setOption(DisplayMotion, checked);
 
     if(checked)
-        buttonBar()->setButtonsChecked(PtzButton | ZoomWindowButton, false);
+        buttonBar()->setButtonsChecked(PtzButton | FishEyeButton | ZoomWindowButton, false);
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
@@ -1105,7 +1105,7 @@ void QnMediaResourceWidget::at_zoomWindowButton_toggled(bool checked) {
     setOption(ControlZoomWindow, checked);
 
     if(checked)
-        buttonBar()->setButtonsChecked(PtzButton | MotionSearchButton, false);
+        buttonBar()->setButtonsChecked(PtzButton | FishEyeButton | MotionSearchButton, false);
 }
 
 void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) {
