@@ -166,9 +166,6 @@ QMap<QString, QSet<int>> QnStorageManager::deserializeStorageFile()
 
 bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, bool isRebuild, qreal progressCoeff)
 {
-    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
-    if (!sdb)
-        sdb = m_chunksDB[storage->getUrl()] = QnStorageDbPtr(new QnStorageDb(storage->getIndex()));
     QString simplifiedGUID = qnCommon->moduleGUID().toString();
     simplifiedGUID = simplifiedGUID.replace("{", "");
     simplifiedGUID = simplifiedGUID.replace("}", "");
@@ -177,10 +174,14 @@ bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, 
     if (QFile::exists(oldFileName) && !QFile::exists(fileName))
         QFile::rename(oldFileName, fileName);
 
-    if (!sdb->open(fileName))
-    {
-        qWarning() << "can't initialize sqlLite database! Actions log is not created!";
-        return false;
+    QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
+    if (!sdb) {
+        sdb = m_chunksDB[storage->getUrl()] = QnStorageDbPtr(new QnStorageDb(storage->getIndex()));
+        if (!sdb->open(fileName))
+        {
+            qWarning() << "can't initialize sqlLite database! Actions log is not created!";
+            return false;
+        }
     }
 
     if (!isRebuild)
@@ -189,7 +190,8 @@ bool QnStorageManager::loadFullFileCatalog(const QnStorageResourcePtr &storage, 
         foreach(DeviceFileCatalogPtr c, sdb->loadFullFileCatalog())
         {
             DeviceFileCatalogPtr fileCatalog = getFileCatalogInternal(c->getMac(), c->getCatalog());
-            fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
+            if (fileCatalog->m_chunks.empty())
+                fileCatalog->addChunks(correctChunksFromMediaData(fileCatalog, storage, c->m_chunks));
         }
     }
     else {

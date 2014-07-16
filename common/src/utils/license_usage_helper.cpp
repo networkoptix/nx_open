@@ -54,7 +54,7 @@ void QnLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCa
     foreach (const QnVirtualCameraResourcePtr &camera, proposedCameras) 
     {
         QnResourcePtr mserver = qnResPool->getResourceById(camera->getParentId());
-        if (mserver->getStatus() == QnResource::Offline)
+        if (!mserver || mserver->getStatus() == QnResource::Offline)
             continue;
 
         // if schedule is disabled and we are enabling it
