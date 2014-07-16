@@ -6,6 +6,8 @@
 
 #include <nx_ec/data/api_server_alive_data.h>
     
+#define RUNTIME_INFO_DEBUG
+
 QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
     QObject(parent),
     m_items(new QnThreadsafeItemStorage<QnPeerRuntimeInfo>(&m_mutex, this))
@@ -36,14 +38,23 @@ QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const
 }
 
 void QnRuntimeInfoManager::storedItemAdded(const QnPeerRuntimeInfo &item) {
+#ifdef RUNTIME_INFO_DEBUG
+    qDebug() <<"runtime info added" << item.uuid << item.data.peer.peerType;
+#endif
     emit runtimeInfoAdded(item);
 }
 
 void QnRuntimeInfoManager::storedItemRemoved(const QnPeerRuntimeInfo &item) {
+#ifdef RUNTIME_INFO_DEBUG
+    qDebug() <<"runtime info removed" << item.uuid << item.data.peer.peerType;
+#endif
     emit runtimeInfoRemoved(item);  
 }
 
 void QnRuntimeInfoManager::storedItemChanged(const QnPeerRuntimeInfo &item) {
+#ifdef RUNTIME_INFO_DEBUG
+    qDebug() <<"runtime info changed" << item.uuid << item.data.peer.peerType;
+#endif
     emit runtimeInfoChanged(item);
 }
 

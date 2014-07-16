@@ -23,6 +23,8 @@
 #include "api/runtime_info_manager.h"
 
 
+//#define TRANSACTION_MESSAGE_BUS_DEBUG
+
 namespace ec2
 {
 
@@ -227,6 +229,9 @@ void QnTransactionMessageBus::removeAlivePeer(const QnId& id, bool isProxy)
 
 void QnTransactionMessageBus::onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QnId& gotFromPeer)
 {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    qDebug() << "received peerAlive transaction" << tran.params.peer.id << tran.params.peer.peerType;
+#endif
     if (tran.params.peer.id == m_localPeer.id)
         return; // ignore himself
 
@@ -294,7 +299,9 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
     }
 
     if (transportHeader.dstPeers.isEmpty() || transportHeader.dstPeers.contains(m_localPeer.id)) {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         qDebug() << "got transaction " << ApiCommand::toString(tran.command) << "with time=" << tran.timestamp;
+#endif
         // process system transactions
         switch(tran.command) {
         case ApiCommand::lockRequest:
@@ -347,7 +354,9 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         }
     }
     else {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
         qDebug() << "skip transaction " << ApiCommand::toString(tran.command) << "for peers" << transportHeader.dstPeers;
+#endif
     }
 
     QMutexLocker lock(&m_mutex);
@@ -442,6 +451,9 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
         tran.params = aliveData;
         tran.fillSequence();
         sendTransaction(tran);
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+        qDebug() << "sending peerAlive info" << peer.id << peer.peerType;
+#endif
     }
 
     if( peer.id == qnCommon->moduleGUID() )
