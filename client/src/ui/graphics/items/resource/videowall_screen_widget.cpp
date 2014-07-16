@@ -104,8 +104,8 @@ QString QnVideowallScreenWidget::calculateTitleText() const {
     return tr("Pc %1 - Screens %2", "", screens.size()).arg(idx + 1).arg(screenIndices.join(lit(" ,")));
 }
 
-void QnVideowallScreenWidget::updateLayout() {
-    if (!m_layoutUpdateRequired)
+void QnVideowallScreenWidget::updateLayout(bool force) {
+    if (!m_layoutUpdateRequired && !force)
         return;
 
     if (!m_mainLayout) {
@@ -245,7 +245,7 @@ void QnVideowallScreenWidget::updateItems() {
             setAspectRatio((qreal)totalDesktopGeometry.width() / totalDesktopGeometry.height());
     }
 
-    m_layoutUpdateRequired = true;
+    updateLayout(true);
     updateTitleText();
     update();
 }

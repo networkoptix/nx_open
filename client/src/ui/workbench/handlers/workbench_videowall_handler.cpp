@@ -2288,11 +2288,25 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
     if (!layout)
         return;
 
-    auto findWorkbenchItem = [layout, &item, action]() -> QnWorkbenchItem* {
-        // added new multi-screen item
-        if (action == ItemAction::Added && item.screenSnaps.screens().size() > 1)
-            return nullptr;
+    auto findCurrentWorkbenchItem = [layout, &item]() -> QnWorkbenchItem* {
+        foreach(QnWorkbenchItem *workbenchItem, layout->items()) {
+            QnLayoutItemData data = workbenchItem->data();
+            QnVideoWallItemIndexList indices = data.dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
+            if (indices.isEmpty())
+                continue;
 
+            // checking existing widgets containing target item
+            foreach (const QnVideoWallItemIndex &index, indices) {
+                if (index.uuid() != item.uuid) 
+                    continue;
+                return workbenchItem;
+            }
+        }
+        return nullptr;
+    };
+
+    auto findTargetWorkbenchItem = [layout, &item]() -> QnWorkbenchItem* {
+        QnWorkbenchItem *currentItem = nullptr;
         foreach(QnWorkbenchItem *workbenchItem, layout->items()) {
             QnLayoutItemData data = workbenchItem->data();
             QnVideoWallItemIndexList indices = data.dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
@@ -2300,59 +2314,58 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
                 continue;
 
             // checking existing widgets with same screen sets
-            if (action == ItemAction::Added) {
-                if (indices.first().item().screenSnaps.screens() != item.screenSnaps.screens())
-                    continue;
+            // take any other item on this widget
+            int otherIdx = qnIndexOf(indices, [&item](const QnVideoWallItemIndex &idx){return idx.uuid() != item.uuid; });
+            if ((otherIdx >= 0) && (indices[otherIdx].item().screenSnaps.screens() == item.screenSnaps.screens()))
                 return workbenchItem;
-            } else {
-                // checking existing widgets containing target item
-                foreach (const QnVideoWallItemIndex &index, indices) {
-                    if (index.uuid() != item.uuid) 
-                        continue;
-                    return workbenchItem;
-                }
-            }
+
+            // our item is the only item on the widget, we can modify it as we want
+            if (indices.size() == 1 && indices.first().item().uuid == item.uuid)
+                currentItem = workbenchItem;
+
+            //continue search to more sufficient widgets
         }
-        return nullptr;
+        return currentItem;
     };
 
-    QnWorkbenchItem* workbenchItem = findWorkbenchItem();
-    QnVideoWallItemIndexList indices = workbenchItem
-        ? workbenchItem->data().dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>()
-        : QnVideoWallItemIndexList();
+    auto removeFromWorkbenchItem = [layout, &videowall, &item](QnWorkbenchItem* workbenchItem) {
+        if (!workbenchItem)
+            return;
 
-    if (action == ItemAction::Added) {
-        indices << QnVideoWallItemIndex(videowall, item.uuid);
-        if (workbenchItem)
-            workbenchItem->setData(Qn::VideoWallItemIndicesRole, qVariantFromValue<QnVideoWallItemIndexList>(indices));
-        else
-            addItemToLayout(layout->resource(), indices);
-    } else if (action == ItemAction::Removed && workbenchItem) {
+        QnVideoWallItemIndexList indices = workbenchItem->data().dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
         indices.removeAll(QnVideoWallItemIndex(videowall, item.uuid));
         if (indices.isEmpty())
             layout->removeItem(workbenchItem);
         else
             workbenchItem->setData(Qn::VideoWallItemIndicesRole, qVariantFromValue<QnVideoWallItemIndexList>(indices));
-    } else if (action == ItemAction::Changed) {
-        if (!workbenchItem) {
-            indices << QnVideoWallItemIndex(videowall, item.uuid);
-            addItemToLayout(layout->resource(), indices);
-        } else {
-            // take any other item on this widget
-            int otherIdx = qnIndexOf(indices, [&item](const QnVideoWallItemIndex &idx){return idx.uuid() != item.uuid; });
-            if ((otherIdx >= 0) && (indices[otherIdx].item().screenSnaps.screens() != item.screenSnaps.screens())) {
-                // remove this item from current widget
-                indices.removeAll(QnVideoWallItemIndex(videowall, item.uuid));
-                if (indices.isEmpty())
-                    layout->removeItem(workbenchItem);
-                else
-                    workbenchItem->setData(Qn::VideoWallItemIndicesRole, qVariantFromValue<QnVideoWallItemIndexList>(indices));
+    };
 
-                // and add it to the corresponding place
-                updateReviewLayout(videowall, item, ItemAction::Added);
-            } // else just do nothing, widget will update itself
-           
-        }
+    auto addToWorkbenchItem = [layout, &videowall, &item](QnWorkbenchItem* workbenchItem) {
+        if (workbenchItem) {
+            QnVideoWallItemIndexList indices = workbenchItem->data().dataByRole[Qn::VideoWallItemIndicesRole].value<QnVideoWallItemIndexList>();
+            indices << QnVideoWallItemIndex(videowall, item.uuid);
+            workbenchItem->setData(Qn::VideoWallItemIndicesRole, qVariantFromValue<QnVideoWallItemIndexList>(indices));
+        } else {
+            addItemToLayout(layout->resource(), QnVideoWallItemIndexList() << QnVideoWallItemIndex(videowall, item.uuid));
+        }      
+    };
+
+    if (action == ItemAction::Added) {
+        QnWorkbenchItem* workbenchItem = findTargetWorkbenchItem();
+        addToWorkbenchItem(workbenchItem);
+    } else if (action == ItemAction::Removed) {
+        removeFromWorkbenchItem(findCurrentWorkbenchItem());
+    } else if (action == ItemAction::Changed) {
+        QnWorkbenchItem* workbenchItem = findCurrentWorkbenchItem();
+        /* Find new widget for the item. */
+        QnWorkbenchItem* newWorkbenchItem = findTargetWorkbenchItem();
+        if (workbenchItem != newWorkbenchItem || !newWorkbenchItem) { // additional check in case both of them are null
+            /* Remove item from the old widget. */ 
+            removeFromWorkbenchItem(workbenchItem);
+            addToWorkbenchItem(newWorkbenchItem);
+        } 
+        /*  else item left on the same widget, just do nothing, widget will update itself */
+
     }
 
 }

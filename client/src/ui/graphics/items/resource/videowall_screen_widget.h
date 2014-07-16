@@ -38,7 +38,7 @@ protected:
     virtual void at_itemDataChanged(int role) override;
 private:
     void updateItems();
-    void updateLayout();
+    void updateLayout(bool force = false);
 private slots:
     void at_thumbnailReady(const QnId &resourceId, const QPixmap &thumbnail);
 
