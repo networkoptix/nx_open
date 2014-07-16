@@ -141,9 +141,12 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
 
         QMessageBox::Button button = QMessageBox::Cancel;
         do {
-            dialog->exec();
+            if (!dialog->exec())
+                return;
+
             if(dialog->clickedButton() != QDialogButtonBox::Save)
                 return;
+
             name = dialog->name();
 
             // that's the case when user press "Save As" and enters the same name as this layout already has
@@ -161,7 +164,8 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                     tr("Layout already exists"),
                     tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
                 );
-                return;
+                dialog->setName(proposedName);
+                continue;
             }
 
             button = QMessageBox::Yes;
