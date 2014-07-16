@@ -518,7 +518,12 @@ void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourceP
     for (int i = 0; i < desktop->screenCount(); ++i)
         screens << desktop->screenGeometry(i);
 
+    QUuid pcUuid = qnSettings->pcUuid();
+
     foreach (const QnVideoWallItem &item, videowall->items()->getItems()) {
+        if (item.pcUuid != pcUuid)
+            continue;
+
         ModelItem modelItem(ItemType::Existing, item.uuid, q_ptr);
         modelItem.name = item.name;
         modelItem.snaps = item.screenSnaps;
