@@ -562,6 +562,11 @@ QnResource::Status QnResource::getStatus() const
 
 void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
 {
+    if (newStatus == QnResource::NotDefined)
+    {
+        return;
+    }
+
     Status oldStatus;
     {
         QMutexLocker mutexLocker(&m_mutex);

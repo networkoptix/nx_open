@@ -294,7 +294,7 @@ bool QnDbManager::init()
             return false;
         QSqlQuery query (m_sdb);
         query.prepare("DELETE from misc_data where key = ?");
-        query.addBindValue(LICENSE_EXPIRED_TIME_KEY);
+        query.addBindValue(DB_INSTANCE_KEY);
         if (!query.exec())
             return false;
     }
@@ -856,9 +856,11 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 {
     *internalId = getResourceInternalId(data.id);
 
+    Q_ASSERT_X(data.status == QnResource::NotDefined, Q_FUNC_INFO, "Status MUST be unchanged for resource modification. Use setStatus instead to modify it!");
+
     QSqlQuery query(m_sdb);
     if (*internalId) {
-        query.prepare("UPDATE vms_resource SET guid = :id, xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url, status = :status WHERE id = :internalID");
+        query.prepare("UPDATE vms_resource SET guid = :id, xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url WHERE id = :internalID");
         query.bindValue(":internalID", *internalId);
     }
     else {
