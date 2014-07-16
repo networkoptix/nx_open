@@ -284,8 +284,13 @@ void QnRedAssController::onTimer()
 
         if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display) && !reader->isMediaPaused())
         {
-            gotoLowQuality(display, Reason_Small);
-            addHQTry();
+            if (++itr.value().smallSizeCnt > 1) {
+                gotoLowQuality(display, Reason_Small);
+                addHQTry();
+            }
+        }
+        else {
+            itr.value().smallSizeCnt = 0;
         }
 
         // switch LQ->HQ for LIVE here
