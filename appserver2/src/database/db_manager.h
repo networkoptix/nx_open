@@ -87,7 +87,7 @@ namespace ec2
             return transactionLog->saveTransaction( tran, serializedTran);
         }
 
-        ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& serializedTran)
+        ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& /*serializedTran*/)
         {
             return executeTransactionInternal(tran);
         }
