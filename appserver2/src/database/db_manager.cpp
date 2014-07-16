@@ -289,6 +289,16 @@ bool QnDbManager::init()
         return false;
     }
 
+    if (m_needResyncLog) {
+        if (!execSQLQuery("delete from transaction_log", m_sdb))
+            return false;
+        QSqlQuery query (m_sdb);
+        query.prepare("DELETE from misc_data where key = ?");
+        query.addBindValue(LICENSE_EXPIRED_TIME_KEY);
+        if (!query.exec())
+            return false;
+    }
+
 
     if (!qnCommon->obsoleteServerGuid().isNull()) {
         QSqlQuery updateGuidQuery(m_sdb);

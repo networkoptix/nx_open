@@ -2280,10 +2280,38 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
 
     } else {
         resource->setName(name);
-        connection2()->getResourceManager()->save( resource, this,
-            [this, resource]( int reqID, ec2::ErrorCode errorCode ) {
-                at_resources_saved( reqID, errorCode, QnResourceList() << resource );
+
+        // I've removed command "saveResource" because it cause sync issue in p2p mode. The problem because of we have transactions with different hash:
+        // for instance saveServer and saveResource. But result data will depend of transactions order.
+
+        QnMediaServerResourcePtr mServer = resource.dynamicCast<QnMediaServerResource>();
+        QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
+        QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
+        QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
+        if (mServer) {
+            connection2()->getMediaServerManager()->save( mServer, this,
+                [this, mServer]( int reqID, ec2::ErrorCode errorCode ) {
+                    at_resources_saved( reqID, errorCode, QnResourceList() << mServer );
             });
+        }
+        else if (camera) {
+            connection2()->getCameraManager()->save( QnVirtualCameraResourceList() << camera, this,
+                [this, camera]( int reqID, ec2::ErrorCode errorCode ) {
+                    at_resources_saved( reqID, errorCode, QnResourceList() << camera );
+            });
+        }
+        else if (user) {
+            connection2()->getUserManager()->save( user, this,
+                [this, user]( int reqID, ec2::ErrorCode errorCode ) {
+                    at_resources_saved( reqID, errorCode, QnResourceList() << user );
+            });
+        }
+        else if (layout) {
+            connection2()->getLayoutManager()->save( QnLayoutResourceList() << layout, this,
+                [this, layout]( int reqID, ec2::ErrorCode errorCode ) {
+                    at_resources_saved( reqID, errorCode, QnResourceList() << layout );
+            });
+        }
     }
 }
 
