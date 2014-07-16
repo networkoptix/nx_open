@@ -460,7 +460,7 @@ void QnBusinessRuleViewModel::setActionType(const QnBusiness::ActionType value) 
         fields |= QnBusiness::ActionResourcesField;
 
     /*
-     *  If action is "send e-mail" default units for aggregation period should be hours, not minutes.
+     *  If action is "send email" default units for aggregation period should be hours, not minutes.
      *  Works only if aggregation period was not changed from default value.
      */
     if (value == QnBusiness::SendMailAction && m_aggregationPeriod == 60) {

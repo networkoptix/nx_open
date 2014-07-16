@@ -21,7 +21,11 @@ public:
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
 protected:
-    virtual QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress) override;
+    virtual QList<QnNetworkResourcePtr> processPacket(
+        QnResourceList& result,
+        const QByteArray& responseData,
+        const QHostAddress& discoveryAddress,
+        const QHostAddress& foundHostAddress ) override;
 };
 
 #endif // #ifdef ENABLE_ISD

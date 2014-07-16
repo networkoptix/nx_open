@@ -38,18 +38,15 @@ public:
 
     struct Settings {
         Settings();
-        Settings(const QnKvPairList &values);
-        ~Settings();
 
         bool isNull() const;
         bool isValid() const;
-
-        QnKvPairList serialized() const;
 
         QString server;
         QString user;
         QString password;
         QString signature;
+        QString supportEmail;
         ConnectionType connectionType;
         int port;
         int timeout;
@@ -64,6 +61,7 @@ public:
 
     static bool isValid(const QString &email);
     static int defaultPort(ConnectionType connectionType);
+    static int defaultTimeoutSec();
 
     bool isValid() const;
 
@@ -88,7 +86,7 @@ private:
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnEmail::ConnectionType)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (lexical))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnEmail::SmtpServerPreset)(QnEmail::ConnectionType), (metatype)(lexical))
 
 #endif // QN_EMAIL_H
 

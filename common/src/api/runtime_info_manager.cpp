@@ -55,7 +55,6 @@ void QnRuntimeInfoManager::at_runtimeInfoChanged(const ec2::ApiRuntimeData &runt
 
     m_runtimeInfo.insert(runtimeInfo.peer.id, runtimeInfo);
 
-    QnId remoteID = qnCommon->remoteGUID();
     emit runtimeInfoChanged(runtimeInfo);
 }
 

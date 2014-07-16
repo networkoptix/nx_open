@@ -52,7 +52,6 @@ namespace ec2
             void emitListDirectoryDone( const ErrorCode p1, const QStringList& p2 ) { emit onListDirectoryDone( p1, p2 ); }
             void emitCurrentTimeDone( const ErrorCode p1, const qint64& p2 ) { emit onCurrentTimeDone( p1, p2 ); }
             void emitDumpDatabaseDone( const ErrorCode p1, const ec2::ApiDatabaseDumpData& p2 ) { emit onDumpDatabaseDone( p1, p2 ); }
-            void emitGetSettingsDone( const ErrorCode p1, const QnKvPairList& p2 ) { emit onGetSettingsDone( p1, p2 ); }
             void emitConnectDone( const ErrorCode p1, const AbstractECConnection* p2 ) { emit onConnectDone( p1, p2 ); }
         
         signals:
@@ -75,7 +74,6 @@ namespace ec2
             void onListDirectoryDone( const ErrorCode, const QStringList& );
             void onCurrentTimeDone( const ErrorCode, const qint64& );
             void onDumpDatabaseDone( const ErrorCode, const ec2::ApiDatabaseDumpData& );
-            void onGetSettingsDone( const ErrorCode, const QnKvPairList& );
             void onConnectDone( const ErrorCode, const AbstractECConnection* );
         };
 

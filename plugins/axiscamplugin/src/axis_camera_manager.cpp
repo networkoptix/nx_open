@@ -250,7 +250,7 @@ int AxisCameraManager::readAxisParameter(
     const QByteArray& paramName,
     QVariant* paramValue )
 {
-    if( httpClient->get( QString::fromLatin1("axis-cgi/param.cgi?action=list&group=%1").arg(QLatin1String(paramName)).toLatin1() ) != QNetworkReply::NoError )
+    if( httpClient->get( QString::fromLatin1("/axis-cgi/param.cgi?action=list&group=%1").arg(QLatin1String(paramName)).toLatin1() ) != QNetworkReply::NoError )
         return nxcip::NX_NETWORK_ERROR;
 
     if( httpClient->statusCode() == SyncHttpClient::HTTP_OK )

@@ -28,14 +28,18 @@ QnResourceList QnMdnsResourceSearcher::findResources()
     QnMdnsListener::ConsumerDataList data = QnMdnsListener::instance()->getData((long) this);
     for (int i = 0; i < data.size(); ++i)
     {
-        QString localAddress = data[i].localAddress;
-        QString removeAddress = data[i].remoteAddress;
+        const QString& localAddress = data[i].localAddress;
+        const QString& remoteAddress = data[i].remoteAddress;
 
-        QList<QnNetworkResourcePtr> nresourceLst = processPacket(result, data[i].response, QHostAddress(localAddress));
+        const QList<QnNetworkResourcePtr>& nresourceLst = processPacket(
+            result,
+            data[i].response,
+            QHostAddress(localAddress),
+            QHostAddress(remoteAddress) );
 
         foreach(QnNetworkResourcePtr nresource, nresourceLst)
         {
-            nresource->setHostAddress(removeAddress, QnDomainMemory);
+            nresource->setHostAddress(remoteAddress, QnDomainMemory);
             nresource->setDiscoveryAddr(QHostAddress(localAddress));
             result.push_back(nresource);
         }

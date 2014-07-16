@@ -3,8 +3,11 @@
 
 #include <QtWidgets/QWidget>
 
-#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_fwd.h>
+
 #include <ui/workbench/workbench_context_aware.h>
+
+#include <ui/widgets/settings/abstract_preferences_widget.h>
 
 namespace Ui {
 class QnServerUpdatesWidget;
@@ -13,24 +16,28 @@ class QnServerUpdatesWidget;
 class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
 
-class QnServerUpdatesWidget : public QWidget, public QnWorkbenchContextAware {
+class QnServerUpdatesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
     Q_OBJECT
+
+    typedef QnAbstractPreferencesWidget base_type;
 public:
-    QnServerUpdatesWidget(QnWorkbenchContext *context, QWidget *parent = 0);
-    ~QnServerUpdatesWidget();
+    QnServerUpdatesWidget(QWidget *parent = 0);
 
-    bool cancelUpdate();
-    bool isUpdating() const;
-
+    virtual bool confirm() override;
+    virtual bool discard() override;
 private slots:
     void at_checkForUpdatesButton_clicked();
     void at_installSpecificBuildButton_clicked();
     void at_updateFromLocalSourceButton_clicked();
     void at_updateButton_clicked();
-    void at_updateTool_peerChanged(const QnId &peerId);
+    void at_updateTool_peerChanged(const QUuid &peerId);
 
     void updateUi();
     void createUpdatesDownloader();
+
+private:
+    bool cancelUpdate();
+    bool isUpdating() const;
 
 private:
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;

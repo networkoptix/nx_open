@@ -474,7 +474,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     connect(resource,       &QnResource::nameChanged,                    this,  &QnResourcePoolModel::at_resource_resourceChanged);
     connect(resource,       &QnResource::statusChanged,                  this,  &QnResourcePoolModel::at_resource_resourceChanged);
     connect(resource,       &QnResource::urlChanged,                     this,  &QnResourcePoolModel::at_resource_resourceChanged);
-    connect(resource,       &QnResource::resourceChanged,                this,  &QnResourcePoolModel::at_resource_resourceChanged);
+    connect(resource,       &QnResource::flagsChanged,                   this,  &QnResourcePoolModel::at_resource_resourceChanged);
 
     QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
     if(layout) {
