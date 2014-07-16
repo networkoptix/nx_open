@@ -101,10 +101,6 @@ public:
     static QString MEDIA_URL_PARAM_NAME;
     static QString ONVIF_URL_PARAM_NAME;
     static QString ONVIF_ID_PARAM_NAME;
-    static QString MAX_FPS_PARAM_NAME;
-    static QString AUDIO_SUPPORTED_PARAM_NAME;
-    static QString FORCED_AUDIO_SUPPORTED_PARAM_NAME;
-    static QString DUAL_STREAMING_PARAM_NAME;
     static const float QUALITY_COEF;
     static const char* PROFILE_NAME_PRIMARY;
     static const char* PROFILE_NAME_SECONDARY;

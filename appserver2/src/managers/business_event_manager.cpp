@@ -1,8 +1,10 @@
 #include "business_event_manager.h"
 
 #include <functional>
-#include <QtConcurrent>
 
+#include <utils/common/concurrent.h>
+
+#include "ec2_thread_pool.h"
 #include "fixed_url_client_query_processor.h"
 #include "database/db_manager.h"
 #include "transaction/transaction_log.h"
@@ -94,8 +96,8 @@ int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusiness
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::broadcastBusinessAction, businessAction );
     QnTransactionMessageBus::instance()->sendTransaction(tran);
-    QnScopedThreadRollback ensureFreeThread(1);
-    QtConcurrent::run( std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
+    QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+    QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
     return reqID;
 }
 
@@ -105,8 +107,8 @@ int QnBusinessEventManager<T>::sendBusinessAction( const QnAbstractBusinessActio
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::execBusinessAction, businessAction );
     QnTransactionMessageBus::instance()->sendTransaction(tran, dstPeer);
-    QnScopedThreadRollback ensureFreeThread(1);
-    QtConcurrent::run( std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
+    QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+    QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
     return reqID;
 }
 

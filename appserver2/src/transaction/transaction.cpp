@@ -138,11 +138,6 @@ namespace ec2
                 case getCurrentTime:
                     return "getCurrentTime";
 
-                case getSettings:
-                    return "getSettings";
-                case saveSettings:
-                    return "saveSettings";
-
                 case uploadUpdate:
                     return "uploadUpdate";
                 case uploadUpdateResponce:

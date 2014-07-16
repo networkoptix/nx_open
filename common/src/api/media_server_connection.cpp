@@ -69,6 +69,7 @@ namespace {
         (EventLogObject,           "events")
         (ImageObject,              "image")
         (CameraDiagnosticsObject,  "doCameraDiagnosticsStep")
+        (GetSystemNameObject,      "getSystemName")
         (RebuildArchiveObject,     "rebuildArchive")
         (BookmarkAddObject,        "cameraBookmarks/add")
         (BookmarkUpdateObject,     "cameraBookmarks/update")
@@ -289,6 +290,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     }
     case CameraDiagnosticsObject:
         processJsonReply<QnCameraDiagnosticsReply>(this, response, handle);
+        break;
+    case GetSystemNameObject:
+        emitFinished( this, response.status, QString::fromUtf8(response.data), handle );
         break;
     case RebuildArchiveObject: {
         QnRebuildArchiveReply info;
@@ -666,6 +670,11 @@ int QnMediaServerConnection::ptzGetDataAsync(const QnNetworkResourcePtr &camera,
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QnTimeReply), target, slot);
+}
+
+int QnMediaServerConnection::getSystemNameAsync( QObject* target, const char* slot )
+{
+    return sendAsyncGetRequest(GetSystemNameObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QString), target, slot);
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(

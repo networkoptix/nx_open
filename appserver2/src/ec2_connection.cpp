@@ -4,6 +4,9 @@
 ***********************************************************/
 
 #include "ec2_connection.h"
+
+#include <QtCore/QUrlQuery>
+
 #include "mutex/distributed_mutex.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "transaction/transaction_message_bus.h"
@@ -34,10 +37,6 @@ namespace ec2
         ApiResourceParamDataList paramList;
         m_dbManager->doQueryNoLock(nullptr, paramList);
 
-        QnKvPairList kvPairs;
-        fromApiToResourceList(paramList, kvPairs);
-
-        m_emailManagerImpl.configure(kvPairs);
         QnTransactionMessageBus::instance()->setHandler( notificationManager() );
         QnTransactionMessageBus::instance()->setLocalPeer(ApiPeerData(qnCommon->moduleGUID(), Qn::PT_Server));
     }

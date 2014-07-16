@@ -79,7 +79,29 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="result" type="xs:string"/>
+    <xs:element name="result">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="caption" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="attributes" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="attributes">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="attribute" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="attribute">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="name"/>
+                <xs:element ref="description"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="name" type="xs:string"/>
     <xs:element name="description" type="xs:string"/>
 </xs:schema>
