@@ -55,7 +55,8 @@ protected:
     virtual QList<QnNetworkResourcePtr> processPacket(
         QnResourceList& /*result*/,
         const QByteArray& responseData,
-        const QHostAddress& discoveryAddress ) override;
+        const QHostAddress& discoveryAddress,
+        const QHostAddress& foundHostAddress ) override;
     //!Implementation of QnUpnpResourceSearcherAsync::processPacket
     virtual void processPacket(
         const QHostAddress& discoveryAddr,

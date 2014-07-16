@@ -50,10 +50,6 @@ const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
 QString QnPlOnvifResource::MEDIA_URL_PARAM_NAME = QLatin1String("MediaUrl");
 QString QnPlOnvifResource::ONVIF_URL_PARAM_NAME = QLatin1String("DeviceUrl");
 QString QnPlOnvifResource::ONVIF_ID_PARAM_NAME = QLatin1String("DeviceID");
-QString QnPlOnvifResource::MAX_FPS_PARAM_NAME = QLatin1String("MaxFPS");
-QString QnPlOnvifResource::FORCED_AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("forcedIsAudioSupported");
-QString QnPlOnvifResource::AUDIO_SUPPORTED_PARAM_NAME = QLatin1String("isAudioSupported");
-QString QnPlOnvifResource::DUAL_STREAMING_PARAM_NAME = QLatin1String("hasDualStreaming");
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
 const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
@@ -377,7 +373,7 @@ bool QnPlOnvifResource::hasDualStreaming() const
 {
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
-    this_casted->getParam(DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
+    this_casted->getParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, mediaVariant, QnDomainMemory);
     return mediaVariant.toBool();
 }
 
@@ -701,7 +697,7 @@ int QnPlOnvifResource::getSecondaryH264Profile() const
 
 void QnPlOnvifResource::setMaxFps(int f)
 {
-    setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
+    setParam(Qn::MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
 }
 
 int QnPlOnvifResource::getMaxFps() const
@@ -709,12 +705,12 @@ int QnPlOnvifResource::getMaxFps() const
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
 
-    if (!hasParam(MAX_FPS_PARAM_NAME))
+    if (!hasParam(Qn::MAX_FPS_PARAM_NAME))
     {
         return QnPhysicalCameraResource::getMaxFps();
     }
 
-    this_casted->getParam(MAX_FPS_PARAM_NAME, mediaVariant, QnDomainMemory);
+    this_casted->getParam(Qn::MAX_FPS_PARAM_NAME, mediaVariant, QnDomainMemory);
     return mediaVariant.toInt();
 }
 
@@ -1018,9 +1014,9 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
     fetchAndSetDualStreaming(soapWrapper);
 
     if (fetchAndSetAudioEncoder(soapWrapper) && fetchAndSetAudioEncoderOptions(soapWrapper))
-        setParam(AUDIO_SUPPORTED_PARAM_NAME, 1, QnDomainDatabase);
+        setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 1, QnDomainDatabase);
     else
-        setParam(AUDIO_SUPPORTED_PARAM_NAME, 0, QnDomainDatabase);
+        setParam(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, 0, QnDomainDatabase);
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -1762,7 +1758,7 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper
         NX_LOG(QString(lit("ONVIF debug: disable dualstreaming for camera %1 reason: %2")).arg(getHostAddress()).arg(reason), cl_logDEBUG1);
     }
 
-    setParam(DUAL_STREAMING_PARAM_NAME, dualStreaming ? 1 : 0, QnDomainDatabase);
+    setParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, dualStreaming ? 1 : 0, QnDomainDatabase);
     return true;
 }
 

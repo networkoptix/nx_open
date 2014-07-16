@@ -272,7 +272,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     const CodecID streamCodec = isH264() ? CODEC_ID_H264 : CODEC_ID_MJPEG;
     mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt(), maxSensorHeight.toInt()), streamCodec ) );
     QVariant hasDualStreaming;
-    getParam(lit("hasDualStreaming"), hasDualStreaming, QnDomainMemory);
+    getParam(Qn::HAS_DUAL_STREAMING_PARAM_NAME, hasDualStreaming, QnDomainMemory);
     if( hasDualStreaming.toInt() > 0 )
         mediaStreams.streams.push_back( CameraMediaStreamInfo( QSize(maxSensorWidth.toInt()/2, maxSensorHeight.toInt()/2), streamCodec ) );
     saveResolutionList( mediaStreams );

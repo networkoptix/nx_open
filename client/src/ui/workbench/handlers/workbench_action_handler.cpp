@@ -1642,8 +1642,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnResource::startCommandProc();
 
     context()->setUserName(connectionData.url.userName());
-
-    at_messageProcessor_connectionOpened();
 }
 
 void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
