@@ -187,6 +187,41 @@ void detail::QnResourceReplyProcessor::at_replyReceived(int status, const QnReso
     emit finished(status, resources, handle);
 }
 
+/************************************************************************/
+/* QnNonModalDialogConstructor                                          */
+/************************************************************************/
+template<typename T>
+class QnNonModalDialogConstructor {
+public:
+    /** Helper class to restore geometry of the persistent dialogs. */
+    QnNonModalDialogConstructor<T>(QPointer<T> &dialog, QWidget* parent):
+        m_newlyCreated(false)
+    {
+        if (!dialog) {
+            dialog = new T(parent);
+            m_newlyCreated = true;
+        }
+        m_dialog = dialog;
+        m_oldGeometry = dialog->geometry();
+    }
+
+    ~QnNonModalDialogConstructor() {
+        m_dialog->show();
+        m_dialog->raise();
+        m_dialog->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
+        if (!m_newlyCreated)
+            m_dialog->setGeometry(m_oldGeometry);
+    }
+
+    bool newlyCreated() const {
+        return m_newlyCreated;
+    }
+private:
+    bool m_newlyCreated;
+    QRect m_oldGeometry;
+    QPointer<T> m_dialog;
+};
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchActionHandler
@@ -227,7 +262,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::PreferencesGeneralTabAction),            SIGNAL(triggered()),    this,   SLOT(at_preferencesGeneralTabAction_triggered()));
     connect(action(Qn::PreferencesLicensesTabAction),           SIGNAL(triggered()),    this,   SLOT(at_preferencesLicensesTabAction_triggered()));
-    connect(action(Qn::PreferencesServerTabAction),             SIGNAL(triggered()),    this,   SLOT(at_preferencesServerTabAction_triggered()));
+    connect(action(Qn::PreferencesSmtpTabAction),               SIGNAL(triggered()),    this,   SLOT(at_preferencesSmtpTabAction_triggered()));
     connect(action(Qn::PreferencesNotificationTabAction),       SIGNAL(triggered()),    this,   SLOT(at_preferencesNotificationTabAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
     connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
@@ -1349,28 +1384,24 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(mainWindow()));
     dialog->setCurrentPage(QnPreferencesDialog::GeneralPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_preferencesLicensesTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
-    dialog->setCurrentPage(QnPreferencesDialog::LicensesPage);
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::LicensesPage);
 }
 
-void QnWorkbenchActionHandler::at_preferencesServerTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
-    dialog->setCurrentPage(QnPreferencesDialog::ServerPage);
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
+void QnWorkbenchActionHandler::at_preferencesSmtpTabAction_triggered() {
+    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::SmtpPage);
 }
 
 void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), mainWindow()));
+    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(mainWindow()));
     dialog->setCurrentPage(QnPreferencesDialog::NotificationsPage);
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
@@ -1381,11 +1412,7 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
-    bool newlyCreated = false;
-    if(!businessRulesDialog()) {
-        m_businessRulesDialog = new QnBusinessRulesDialog(mainWindow());
-        newlyCreated = true;
-    }
+    QnNonModalDialogConstructor<QnBusinessRulesDialog> dialogConstructor(m_businessRulesDialog, mainWindow());
 
     QString filter;
     QnActionParameters parameters = menu()->currentParameters(sender());
@@ -1396,13 +1423,6 @@ void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
         }
     }
     businessRulesDialog()->setFilter(filter);
-
-    QRect oldGeometry = businessRulesDialog()->geometry();
-    businessRulesDialog()->show();
-    businessRulesDialog()->raise();
-    businessRulesDialog()->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
-    if(!newlyCreated)
-        businessRulesDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_webClientAction_triggered() {
@@ -1414,16 +1434,8 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_systemAdministrationAction_triggered() {
-    bool newlyCreated = false;
-    if (!m_systemAdministrationDialog) {
-        m_systemAdministrationDialog = new QnSystemAdministrationDialog(context(), mainWindow());
-        newlyCreated = true;
-    }
-
-    QRect oldGeometry = systemAdministrationDialog()->geometry();
-    systemAdministrationDialog()->show();
-    if (newlyCreated)
-        systemAdministrationDialog()->setGeometry(oldGeometry);
+    QnNonModalDialogConstructor<QnSystemAdministrationDialog> dialogConstructor(m_systemAdministrationDialog, mainWindow());
+    systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::GeneralPage);
 }
 
 void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
@@ -1431,11 +1443,7 @@ void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
-    bool newlyCreated = false;
-    if(!businessEventsLogDialog()) {
-        m_businessEventsLogDialog = new QnEventLogDialog(mainWindow(), context());
-        newlyCreated = true;
-    }
+    QnNonModalDialogConstructor<QnEventLogDialog> dialogConstructor(m_businessEventsLogDialog, mainWindow());
 
     QnActionParameters parameters = menu()->currentParameters(sender());
 
@@ -1452,31 +1460,12 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
         businessEventsLogDialog()->setCameraList(cameras);
         businessEventsLogDialog()->enableUpdateData();
     }
-
-    QRect oldGeometry = businessEventsLogDialog()->geometry();
-    businessEventsLogDialog()->show();
-    businessEventsLogDialog()->raise();
-    businessEventsLogDialog()->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
-    if(!newlyCreated)
-        businessEventsLogDialog()->setGeometry(oldGeometry);
 }
 
-void QnWorkbenchActionHandler::at_cameraListAction_triggered()
-{
+void QnWorkbenchActionHandler::at_cameraListAction_triggered() {
+    QnNonModalDialogConstructor<QnCameraListDialog> dialogConstructor(m_cameraListDialog, mainWindow());
     QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
-
-    bool newlyCreated = false;
-    if(!cameraListDialog()) {
-        m_cameraListDialog = new QnCameraListDialog(mainWindow());
-        newlyCreated = true;
-    }
-    QRect oldGeometry = cameraListDialog()->geometry();
     cameraListDialog()->setServer(server);
-    cameraListDialog()->show();
-    cameraListDialog()->raise();
-    cameraListDialog()->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
-    if(!newlyCreated)
-        cameraListDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
@@ -1894,11 +1883,9 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
-    bool newlyCreated = false;
-    if(!cameraSettingsDialog()) {
-        m_cameraSettingsDialog = new QnCameraSettingsDialog(mainWindow());
-        newlyCreated = true;
 
+    QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
+    if (dialogConstructor.newlyCreated()) {
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),        this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
         connect(cameraSettingsDialog(), SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)),  this, SLOT(at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &)));
         connect(cameraSettingsDialog(), SIGNAL(rejected()),                                             this, SLOT(at_cameraSettingsDialog_rejected()));
@@ -1906,7 +1893,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         connect(cameraSettingsDialog(), SIGNAL(cameraOpenRequested()),                                  this, SLOT(at_cameraSettingsDialog_cameraOpenRequested()));
     }
 
-    if(cameraSettingsDialog()->widget()->resources() != resources) {
+     if(cameraSettingsDialog()->widget()->resources() != resources) {
         if(cameraSettingsDialog()->isVisible() && (
            cameraSettingsDialog()->widget()->hasDbChanges() || cameraSettingsDialog()->widget()->hasCameraChanges()))
         {
@@ -1923,11 +1910,6 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     }
     cameraSettingsDialog()->widget()->setResources(resources);
     updateCameraSettingsEditibility();
-
-    QRect oldGeometry = cameraSettingsDialog()->geometry();
-    cameraSettingsDialog()->show();
-    if(!newlyCreated)
-        cameraSettingsDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_pictureSettingsAction_triggered() {
@@ -2044,11 +2026,8 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 
     QnMediaServerResourcePtr server = resources[0];
 
-    bool newlyCreated = false;
-    if(!cameraAdditionDialog()) {
-        m_cameraAdditionDialog = new QnCameraAdditionDialog(mainWindow());
-        newlyCreated = true;
-    }
+    QnNonModalDialogConstructor<QnCameraAdditionDialog> dialogConstructor(m_cameraAdditionDialog, mainWindow());
+
     QnCameraAdditionDialog* dialog = cameraAdditionDialog();
 
     if (dialog->server() != server) {
@@ -2068,11 +2047,6 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
         }
         dialog->setServer(server);
     }
-
-    QRect oldGeometry = cameraAdditionDialog()->geometry();
-    cameraAdditionDialog()->show();
-    if(!newlyCreated)
-        cameraAdditionDialog()->setGeometry(oldGeometry);
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
@@ -2619,7 +2593,7 @@ void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     addParams.usePosition = true;
     addParams.position = widget->item()->combinedGeometry().center();
     addParams.zoomWindow = rect;
-    addParams.dewarpingParams.enabled = widget->dewarpingParams().enabled;
+    addParams.dewarpingParams.enabled = widget->resource()->getDewarpingParams().enabled;  // zoom items on fisheye cameras must always be dewarped
     addParams.zoomUuid = widget->item()->uuid();
     addParams.frameDistinctionColor = params.argument<QColor>(Qn::ItemFrameDistinctionColorRole);
     addParams.rotation = widget->item()->rotation();

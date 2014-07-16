@@ -1,23 +1,14 @@
 #include "email_manager_impl.h"
 
+#include <api/global_settings.h>
+#include <api/model/email_attachment.h>
+
+#include <smtpclient/smtpclient.h>
+#include <smtpclient/QnSmtpMime>
+
 #include "nx_ec/data/api_email_data.h"
-#include <memory>
 
-namespace ec2
-{
-    EmailManagerImpl::EmailManagerImpl()
-    {
-    }
-
-    void EmailManagerImpl::configure(const QnKvPairList& kvPairs) {
-        m_settings = QnEmail::Settings(kvPairs);
-
-        foreach(const QnKvPair& kvPair, kvPairs) {
-            if (kvPair.name() == lit("EMAIL_FROM"))
-                m_from = kvPair.value();
-        }
-    }
-
+namespace {
     SmtpClient::ConnectionType smtpConnectionType(QnEmail::ConnectionType ct) {
         if (ct == QnEmail::Ssl)
             return SmtpClient::SslConnection;
@@ -25,6 +16,14 @@ namespace ec2
             return SmtpClient::TlsConnection;
 
         return SmtpClient::TcpConnection;
+    }
+}
+
+
+namespace ec2
+{
+    EmailManagerImpl::EmailManagerImpl()
+    {
     }
 
     bool EmailManagerImpl::testConnection(const QnEmail::Settings &settings) {
@@ -43,8 +42,14 @@ namespace ec2
     }
 
     bool EmailManagerImpl::sendEmail(const ec2::ApiEmailData& data) {
+
+        QnEmail::Settings settings = QnGlobalSettings::instance()->emailSettings();
+        if (!settings.isValid())
+            return true;    // empty settings should not give us an error while trying to send email, should them?
+
         MimeMessage message;
-        message.setSender(new EmailAddress(m_from));
+        QString sender = QString(lit("%1@%2")).arg(settings.user).arg(settings.server);
+        message.setSender(new EmailAddress(sender));
         foreach (const QString &recipient, data.to) {
             message.addRecipient(new EmailAddress(recipient));
         }
@@ -54,7 +59,7 @@ namespace ec2
         MimeHtml text(data.body);
         message.addPart(&text);
 
-        // Need to store all attachements as smtp client operates on attachment pointers
+        // Need to store all attachments as smtp client operates on attachment pointers
         typedef std::shared_ptr<MimeInlineFile> MimeInlineFilePtr; 
         std::vector<MimeInlineFilePtr> attachments;
         foreach (QnEmailAttachmentPtr attachment, data.attachments) {
@@ -64,12 +69,12 @@ namespace ec2
         }
 
         // Actually send
-        int port = m_settings.port ? m_settings.port : QnEmail::defaultPort(m_settings.connectionType);
-        SmtpClient::ConnectionType connectionType = smtpConnectionType(m_settings.connectionType);
-        SmtpClient smtp(m_settings.server, port, connectionType);
+        int port = settings.port ? settings.port : QnEmail::defaultPort(settings.connectionType);
+        SmtpClient::ConnectionType connectionType = smtpConnectionType(settings.connectionType);
+        SmtpClient smtp(settings.server, port, connectionType);
 
-        smtp.setUser(m_settings.user);
-        smtp.setPassword(m_settings.password);
+        smtp.setUser(settings.user);
+        smtp.setPassword(settings.password);
 
         if (!smtp.connectToHost()) return false;
         bool result = smtp.login();

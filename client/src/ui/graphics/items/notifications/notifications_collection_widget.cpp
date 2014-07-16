@@ -446,7 +446,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         item->addActionButton(
             qnSkin->icon("events/smtp.png"),
             tr("SMTP Settings"),
-            Qn::PreferencesServerTabAction
+            Qn::PreferencesSmtpTabAction
         );
         break;
     case QnSystemHealth::UsersEmailIsEmpty:
@@ -468,7 +468,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         item->addActionButton(
             qnSkin->icon("events/email.png"),
             tr("SMTP Settings"),
-            Qn::PreferencesServerTabAction
+            Qn::PreferencesSmtpTabAction
         );
         break;
     case QnSystemHealth::StoragesNotConfigured:
