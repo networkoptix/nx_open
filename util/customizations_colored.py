@@ -3,6 +3,7 @@
 import sys
 import os
 from colorama import Fore, Back, Style, init
+from itertools import combinations
 
 class Customization():
     def __init__(self, name, path):
@@ -15,6 +16,7 @@ class Customization():
         self.base = []
         self.dark = []
         self.light = []
+        self.total = []
         
     def __str__(self):
         return self.name
@@ -34,7 +36,7 @@ class Customization():
             cut = len(self.basePath) + 1
             for filename in filenames:
                 self.base.append(os.path.join(dirname, filename)[cut:])
-                
+        
         for dirname, dirnames, filenames in os.walk(self.darkPath):
             cut = len(self.darkPath) + 1
             for filename in filenames:
@@ -44,36 +46,35 @@ class Customization():
             cut = len(self.lightPath) + 1
             for filename in filenames:
                 self.light.append(os.path.join(dirname, filename)[cut:])
+                
+        self.total = list(set(self.base + self.dark + self.light))
         
     def validateInner(self):
         print Style.BRIGHT + 'Validating ' + self.name + '...'
         for entry in self.base:
-            if entry in self.dark:
-                print Style.BRIGHT + Fore.YELLOW + 'File ' + os.path.join(self.basePath, entry) + ' duplicated in dark skin'
-            if entry in self.light:
-                print Style.BRIGHT + Fore.YELLOW + 'File ' + os.path.join(self.basePath, entry) + ' duplicated in light skin'
+            if entry in self.dark and entry in self.light:
+                print Style.BRIGHT + Fore.YELLOW + 'File ' + os.path.join(self.basePath, entry) + ' duplicated in both skins'
+
         for entry in self.dark:
             if not entry in self.light:
-                print Style.BRIGHT + Fore.RED + 'File ' + os.path.join(self.darkPath, entry) + ' missing in light skin'
+                if entry in self.base:
+                    print Style.BRIGHT + Fore.YELLOW + 'File ' + os.path.join(self.lightPath, entry) + ' missing, using base version'
+                else:
+                    print Style.BRIGHT + Fore.RED + 'File ' + os.path.join(self.darkPath, entry) + ' missing in light skin'
                 
         for entry in self.light:
             if not entry in self.dark:
-                print Style.BRIGHT + Fore.RED + 'File ' + os.path.join(self.lightPath, entry) + ' missing in dark skin'
+                if entry in self.base:
+                    print Style.BRIGHT + Fore.YELLOW + 'File ' + os.path.join(self.darkPath, entry) + ' missing, using base version'
+                else:
+                    print Style.BRIGHT + Fore.RED + 'File ' + os.path.join(self.lightPath, entry) + ' missing in dark skin'
                 
         
     def validateCross(self, other):
         print Style.BRIGHT + 'Validating ' + self.name + ' vs ' + other.name + '...'
-        for entry in self.base:
-            if not entry in other.base:
-                print Style.BRIGHT + Fore.RED + 'File ' + os.path.join(self.basePath, entry) + ' missing in ' + other.basePath
-
-        for entry in self.dark:
-            if not entry in other.dark:
-                print Style.BRIGHT + Fore.RED + 'File ' + os.path.join(self.darkPath, entry) + ' missing in ' + other.darkPath
-                
-        for entry in self.light:
-            if not entry in other.light:
-                print Style.BRIGHT + Fore.RED + 'File ' + os.path.join(self.lightPath, entry) + ' missing in ' + other.lightPath
+        for entry in self.total:
+            if not entry in other.total:
+                print Style.BRIGHT + Fore.RED + 'File ' + os.path.join(self.basePath, entry) + ' missing in ' + other.name
         
 def main():
     # use Colorama to make Termcolor work on Windows too
@@ -95,11 +96,10 @@ def main():
             roots.append(c)
         customizations[entry] = c
     
-    for n, c1 in enumerate(roots):
-        for c2 in roots[n+1:]:
-            c1.validateCross(c2)
-            c2.validateCross(c1)
- 
+    for c1, c2 in combinations(roots, 2):
+        c1.validateCross(c2)
+        c2.validateCross(c1)
+    print Style.BRIGHT + 'Done'
 
 if __name__ == "__main__":
     main()
