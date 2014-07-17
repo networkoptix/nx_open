@@ -8,8 +8,6 @@
 
 #include <core/resource_management/resource_pool.h>
 
-#include <business/business_event_connector.h>
-
 #include "user_resource.h"
 #include "common/common_module.h"
 
@@ -53,13 +51,6 @@ QnSecurityCamResource::QnSecurityCamResource():
 
     QnMediaResource::initMediaResource();
 
-    // TODO: #AK this is a wrong place for this connect call.
-    // You should listen to changes in resource pool instead.
-    //TODO: #Elric didn't get it. How resource pool connected to relay input event on camera?
-    if(QnBusinessEventConnector::instance())
-        connect(
-            this, &QnSecurityCamResource::cameraInput, 
-            QnBusinessEventConnector::instance(), &QnBusinessEventConnector::at_cameraInput );
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {

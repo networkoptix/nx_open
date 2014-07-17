@@ -56,6 +56,7 @@
 #include <business/business_fwd.h>
 
 #include <licensing/license.h>
+#include "api/model/test_email_settings_reply.h"
 
 
 namespace {
@@ -164,6 +165,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();
     qRegisterMetaType<QnTimeReply>();
+    qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
     qRegisterMetaType<QnRebuildArchiveReply>();
     qRegisterMetaType<QnManualCameraSearchReply>();

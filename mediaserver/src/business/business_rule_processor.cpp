@@ -25,13 +25,15 @@
 #include <utils/common/synctime.h>
 #include <utils/common/email.h>
 #include <utils/common/log.h>
-#include "business_strings_helper.h"
+#include "business/business_strings_helper.h"
 #include "version.h"
 
 #include "nx_ec/data/api_email_data.h"
 #include "common/common_module.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include "email_manager_impl.h"
+#include <QtConcurrent>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -48,7 +50,8 @@ namespace {
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
-QnBusinessRuleProcessor::QnBusinessRuleProcessor()
+QnBusinessRuleProcessor::QnBusinessRuleProcessor():
+        m_emailManager(new EmailManagerImpl())
 {
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDelivered, this, &QnBusinessRuleProcessor::at_actionDelivered);
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDeliveryFail, this, &QnBusinessRuleProcessor::at_actionDeliveryFailed);
@@ -441,6 +444,17 @@ QImage QnBusinessRuleProcessor::getEventScreenshot(const QnBusinessEventParamete
 
     return QImage();
 }
+
+void QnBusinessRuleProcessor::sendEmailAsync(const ec2::ApiEmailData& data)
+{
+    if (!m_emailManager->sendEmail(data))
+    {
+        QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
+        broadcastBusinessAction(action);
+        NX_LOG(lit("Error processing action SendMail."), cl_logWARNING);
+    }
+};
+
 bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action )
 {
     Q_ASSERT( action );
@@ -506,15 +520,14 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
 
     QString messageBody = renderTemplateFromFile(lit(":/email_templates"), partialInfo.attrName + lit(".mustache"), contextMap);
 
-    if (QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->sendEmail(
-                ec2::ApiEmailData(recipients,
-                    QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
-                    messageBody,
-                    emailSettings.timeout,
-                    attachments),
-                this,
-                &QnBusinessRuleProcessor::at_sendEmailFinished ) == ec2::INVALID_REQ_ID)
-        return false;
+    ec2::ApiEmailData data(
+        recipients,
+        QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
+        messageBody,
+        emailSettings.timeout,
+        attachments
+    );
+    QtConcurrent::run(std::bind(&QnBusinessRuleProcessor::sendEmailAsync, this, data));
 
     /*
      * This action instance is not used anymore but storing into the Events Log db.
@@ -523,19 +536,6 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
      */
     action->getParams().setEmailAddress(formatEmailList(recipients));
     return true;
-}
-
-void QnBusinessRuleProcessor::at_sendEmailFinished(int handle, ec2::ErrorCode errorCode)
-{
-    Q_UNUSED(handle)
-    if (errorCode == ec2::ErrorCode::ok)
-        return;
-
-    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
-
-    broadcastBusinessAction(action);
-
-    NX_LOG(lit("Error processing action SendMail. %1").arg(ec2::toString(errorCode)), cl_logWARNING);
 }
 
 void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished( int handle, ec2::ErrorCode errorCode )

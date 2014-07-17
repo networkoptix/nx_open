@@ -7,6 +7,7 @@
 #include "storage_status_reply.h"
 #include "time_reply.h"
 #include "connection_info.h"
+#include "test_email_settings_reply.h"
 
 #define QN_MS_API_DATA_TYPES \
     (QnCameraDiagnosticsReply)\
@@ -17,6 +18,7 @@
     (QnStorageSpaceData)\
     (QnStorageStatusReply)\
     (QnTimeReply)\
+    (QnTestEmailSettingsReply)\
     (QnConnectionInfo)\
     (QnCompatibilityItem)\
 
