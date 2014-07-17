@@ -171,7 +171,6 @@ namespace ec2
                     val == tranSyncRequest ||
                     val == tranSyncResponse ||
                     val == runtimeInfoChanged ||
-                    val == videowallControl ||
                     val == peerAliveInfo;
         }
 
