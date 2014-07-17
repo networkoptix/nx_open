@@ -1,8 +1,20 @@
 #/bin/python
 
 import sys
+import argparse
 import os
+from itertools import combinations
 
+class ColorDummy():
+    class Empty(object):
+        def __getattribute__(self, name):
+            return ''
+    
+    Style = Empty()
+    Fore = Empty()
+
+colorer = ColorDummy()
+        
 class Customization():
     def __init__(self, name, path):
         self.name = name
@@ -14,6 +26,7 @@ class Customization():
         self.base = []
         self.dark = []
         self.light = []
+        self.total = []
         
     def __str__(self):
         return self.name
@@ -24,7 +37,7 @@ class Customization():
                 if not 'parent.customization' in line:
                     continue
                 return (self.name in line)
-        print 'Invalid build.properties file: ' + os.path.join(self.path, 'build.properties')
+        print colorer.Style.BRIGHT + colorer.Fore.RED + 'Invalid build.properties file: ' + os.path.join(self.path, 'build.properties')
         return False
         
     def populateFileList(self):
@@ -33,7 +46,7 @@ class Customization():
             cut = len(self.basePath) + 1
             for filename in filenames:
                 self.base.append(os.path.join(dirname, filename)[cut:])
-                
+        
         for dirname, dirnames, filenames in os.walk(self.darkPath):
             cut = len(self.darkPath) + 1
             for filename in filenames:
@@ -43,38 +56,47 @@ class Customization():
             cut = len(self.lightPath) + 1
             for filename in filenames:
                 self.light.append(os.path.join(dirname, filename)[cut:])
+                
+        self.total = list(set(self.base + self.dark + self.light))
         
     def validateInner(self):
-        print 'Validating ' + self.name + '...'
+        print colorer.Style.BRIGHT + 'Validating ' + self.name + '...'
         for entry in self.base:
-            if entry in self.dark:
-                print 'File ' + os.path.join(self.basePath, entry) + ' duplicated in dark skin'
-            if entry in self.light:
-                print 'File ' + os.path.join(self.basePath, entry) + ' duplicated in light skin'
+            if entry in self.dark and entry in self.light:
+                print colorer.Style.BRIGHT + colorer.Fore.YELLOW + 'File ' + os.path.join(self.basePath, entry) + ' duplicated in both skins'
+
         for entry in self.dark:
             if not entry in self.light:
-                print 'File ' + os.path.join(self.darkPath, entry) + ' missing in light skin'
+                if entry in self.base:
+                    print colorer.Style.BRIGHT + colorer.Fore.YELLOW + 'File ' + os.path.join(self.lightPath, entry) + ' missing, using base version'
+                else:
+                    print colorer.Style.BRIGHT + colorer.Fore.RED + 'File ' + os.path.join(self.darkPath, entry) + ' missing in light skin'
                 
         for entry in self.light:
             if not entry in self.dark:
-                print 'File ' + os.path.join(self.lightPath, entry) + ' missing in dark skin'
+                if entry in self.base:
+                    print colorer.Style.BRIGHT + colorer.Fore.YELLOW + 'File ' + os.path.join(self.darkPath, entry) + ' missing, using base version'
+                else:
+                    print colorer.Style.BRIGHT + colorer.Fore.RED + 'File ' + os.path.join(self.lightPath, entry) + ' missing in dark skin'
                 
         
     def validateCross(self, other):
-        print 'Validating ' + self.name + ' vs ' + other.name + '...'
-        for entry in self.base:
-            if not entry in other.base:
-                print 'File ' + os.path.join(self.basePath, entry) + ' missing in ' + other.basePath
-
-        for entry in self.dark:
-            if not entry in other.dark:
-                print 'File ' + os.path.join(self.darkPath, entry) + ' missing in ' + other.darkPath
-                
-        for entry in self.light:
-            if not entry in other.light:
-                print 'File ' + os.path.join(self.lightPath, entry) + ' missing in ' + other.lightPath
+        print colorer.Style.BRIGHT + 'Validating ' + self.name + ' vs ' + other.name + '...'
+        for entry in self.total:
+            if not entry in other.total:
+                print colorer.Style.BRIGHT + colorer.Fore.RED + 'File ' + os.path.join(self.basePath, entry) + ' missing in ' + other.name
         
 def main():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--color', action='store_true', help="colorized output")
+    args = parser.parse_args()
+    if args.color:
+        from colorama import Fore, Back, Style, init
+        init(autoreset=True) # use Colorama to make Termcolor work on Windows too
+        global colorer
+        import colorama as colorer
+
     rootDir = '../customization';
     customizations = {}
     roots = []
@@ -91,11 +113,10 @@ def main():
             roots.append(c)
         customizations[entry] = c
     
-    for n, c1 in enumerate(roots):
-        for c2 in roots[n+1:]:
-            c1.validateCross(c2)
-            c2.validateCross(c1)
- 
+    for c1, c2 in combinations(roots, 2):
+        c1.validateCross(c2)
+        c2.validateCross(c1)
+    print colorer.Style.BRIGHT + 'Done'
 
 if __name__ == "__main__":
     main()
