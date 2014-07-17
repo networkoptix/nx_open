@@ -24,9 +24,6 @@
 
 #include <client/client_globals.h>
 
-#include <plugins/resources/archive/avi_files/avi_dvd_resource.h>
-#include <plugins/resources/archive/avi_files/avi_bluray_resource.h>
-#include <plugins/resources/archive/filetypesupport.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <ui/workaround/layout_proto.h>
