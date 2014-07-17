@@ -11,9 +11,6 @@
 #include <utils/common/synctime.h>
 #include <utils/common/log.h>
 
-#include <business/business_event_rule.h>
-#include <business/business_rule_processor.h>
-
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 
 #include "axis_stream_reader.h"

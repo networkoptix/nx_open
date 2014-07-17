@@ -41,30 +41,6 @@ int QnBusinessEventManager<T>::getBusinessRules( impl::GetBusinessRulesHandlerPt
 }
 
 template<class T>
-int QnBusinessEventManager<T>::testEmailSettings( const QnEmail::Settings& settings, impl::SimpleHandlerPtr handler )
-{
-    const int reqID = generateRequestID();
-
-    auto tran = prepareTransaction( ApiCommand::testEmailSettings, settings );
-
-    m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, std::placeholders::_1 ) );
-    
-    return reqID;
-}
-
-template<class T>
-int QnBusinessEventManager<T>::sendEmail(const ApiEmailData& data, impl::SimpleHandlerPtr handler )
-{
-    const int reqID = generateRequestID();
-
-    auto tran = prepareTransaction( ApiCommand::sendEmail, data );
-
-    m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, std::placeholders::_1 ) );
-    
-    return reqID;
-}
-
-template<class T>
 int QnBusinessEventManager<T>::save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler )
 {
     const int reqID = generateRequestID();

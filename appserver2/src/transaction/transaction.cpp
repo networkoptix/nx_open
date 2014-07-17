@@ -155,11 +155,6 @@ namespace ec2
                 case runtimeInfoChanged:
                     return "runtimeInfoChanged";
 
-                case testEmailSettings:
-                    return "testEmailSettings";
-                case sendEmail:
-                    return "sendEmail";
-
                 default:
                     return "unknown " + QString::number((int)val);
             }
