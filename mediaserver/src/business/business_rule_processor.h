@@ -8,7 +8,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include "business_message_bus.h"
-#include "business_event_rule.h"
+#include "business/business_event_rule.h"
 
 #include <business/business_aggregation_info.h>
 #include <business/events/abstract_business_event.h>
@@ -18,6 +18,8 @@
 
 #include <nx_ec/ec_api.h>
 #include <utils/common/request_param.h>
+
+class EmailManagerImpl;
 
 class QnProcessorAggregationInfo {
 public:
@@ -128,7 +130,6 @@ protected slots:
     virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
 private slots:
     void at_broadcastBusinessActionFinished(int handle, ec2::ErrorCode errorCode);
-    void at_sendEmailFinished(int handle, ec2::ErrorCode errorCode);
     void at_actionDelivered(const QnAbstractBusinessActionPtr& action);
     void at_actionDeliveryFailed(const QnAbstractBusinessActionPtr& action);
 
@@ -182,6 +183,7 @@ private:
      * @brief m_eventsInProgress         Stores events that are toggled and state is On
      */
     RunningRuleMap m_rulesInProgress;
+    QScopedPointer<EmailManagerImpl> m_emailManager;
 
 
     /**
@@ -198,6 +200,7 @@ private:
         \param isRuleAdded \a true - rule added, \a false - removed
     */
     void notifyResourcesAboutEventIfNeccessary( const QnBusinessEventRulePtr& businessRule, bool isRuleAdded );
+    void sendEmailAsync(const ec2::ApiEmailData& data);
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()

@@ -4,7 +4,6 @@
 
 #include <QtCore/QSettings>
 
-#include <business/business_event_connector.h>
 #include <business/events/reasoned_business_event.h>
 #include <business/events/network_issue_business_event.h>
 
@@ -50,8 +49,9 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(const QnResourcePtr& res):
     m_numberOfVideoChannels = mr->getVideoLayout()->channelCount();
     m_gotKeyData.resize(m_numberOfVideoChannels);
 
-    connect(this, SIGNAL(networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)),
-            qnBusinessRuleConnector, SLOT(at_networkIssue(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QString&)));
+    QnSecurityCamResourcePtr camRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
+    if (camRes)
+        connect(this, &QnMulticodecRtpReader::networkIssue, camRes.data(), &QnSecurityCamResource::networkIssue);
     connect(res.data(), SIGNAL(propertyChanged(const QnResourcePtr &, const QString &)),          this, SLOT(at_propertyChanged(const QnResourcePtr &, const QString &)));
 }
 

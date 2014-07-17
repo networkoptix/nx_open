@@ -98,10 +98,6 @@ namespace ec2
             addLicense                  = 1001, /*< ApiLicenseData */
             addLicenses                 = 1002, /*< ApiLicenseDataList */
 
-            /* Email */
-            testEmailSettings           = 1100, /*< ApiEmailSettingsData */
-            sendEmail                   = 1101, /*< ApiEmailData */
-
             /* Auto-updates */
             uploadUpdate                = 1200, /*< ApiUpdateUploadData */
             uploadUpdateResponce        = 1201, /*< ApiUpdateUploadResponceData */

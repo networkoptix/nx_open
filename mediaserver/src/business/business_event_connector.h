@@ -62,6 +62,8 @@ public slots:
     void at_NoStorages(const QnResourcePtr& resource);
 
     void at_archiveRebuildFinished(const QnResourcePtr& resource);
+private slots:
+    void onNewResource(const QnResourcePtr &resource);
 };
 
 #define qnBusinessRuleConnector QnBusinessEventConnector::instance()
