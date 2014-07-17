@@ -23,7 +23,7 @@
 #include "api/runtime_info_manager.h"
 
 
-//#define TRANSACTION_MESSAGE_BUS_DEBUG
+#define TRANSACTION_MESSAGE_BUS_DEBUG
 
 namespace ec2
 {
@@ -322,8 +322,12 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             break; // do not return. proxy this transaction
         default:
             // general transaction
-            if (!sender->isReadSync(tran.command))
+            if (!sender->isReadSync(tran.command)) {
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+                qDebug() << "skip transaction" << tran.command;
+#endif
                 return;
+            }
 
             if( tran.persistent && transactionLog && transactionLog->contains(tran) )
             {
@@ -801,6 +805,8 @@ ec2::ApiPeerData QnTransactionMessageBus::localPeer() const {
 
 void QnTransactionMessageBus::sendTransaction(const QnTransaction<ec2::ApiVideowallControlMessageData>& tran, const QnPeerSet& dstPeers /*= QnPeerSet()*/)
 {
+    qDebug() << "videowall control message" << tran.params.operation <<  "sending to" << connectedPeers(tran.command);
+    qDebug() << "m_connections size" << m_connections.size() << m_connections.keys();
     //TODO: #GDM #VW fill dstPeers based on m_alivePeers info
     Q_ASSERT(tran.command == ApiCommand::videowallControl);
     QMutexLocker lock(&m_mutex);

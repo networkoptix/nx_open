@@ -290,7 +290,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
     QString passwd;
     int soapRes = SOAP_OK;
     do {
-        qDebug() << "Trying login = " << login << ", password = " << passwd;
+        //qDebug() << "Trying login = " << login << ", password = " << passwd;
         setLogin(login);
         setPassword(passwd);
 
@@ -299,14 +299,14 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
         soapRes = getNetworkInterfaces(request1, response1);
 
         if (soapRes == SOAP_OK || !isNotAuthenticated()) {
-            qDebug() << "Finished picking password";
+          //  qDebug() << "Finished picking password";
 
             return soapRes == SOAP_OK;
         }
 
         if (passwdIter == passwords.end()) {
             //If we had no luck in picking a password, let's try to create a user
-            qDebug() << "Trying to create a user admin/admin";
+            //qDebug() << "Trying to create a user admin/admin";
             setLogin(QString());
             setPassword(QString());
 
