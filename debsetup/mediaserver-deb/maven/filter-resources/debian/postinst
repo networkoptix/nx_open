@@ -21,6 +21,8 @@ DB_PATH="$BASE_DIR/var/ecs.sqlite"
 BIN_DIR="$BASE_DIR/bin"
 CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 
+DBSYNC="$BASE_DIR/share/dbsync-2.2/bin/dbsync"
+
 # This is necessary because changed configuration options should take effect 
 # immediately.
 if status $COMPANY_NAME-mediaserver | grep "start/running" > /dev/null; then
@@ -28,6 +30,7 @@ if status $COMPANY_NAME-mediaserver | grep "start/running" > /dev/null; then
 fi
 
 # Default MS parameters
+PORT_DEFAULT="7001"
 TRANSPORT_DEAULT="auto"
 PUBLIC_IP_ENABLED_DEFAULT="auto"
 SYSTEM_NAME=$COMPANY_NAME
@@ -122,6 +125,11 @@ case "$1" in
             fi
         fi
 
+        PORT="$($CFG_HELPER port)"
+        [ -z "$PORT" ] && PORT=$PORT_DEFAULT
+        PORT=$(ask_for_value port "$PORT")
+        $CFG_HELPER port "$PORT"
+
         if [ ! -f $DB_PATH -a ! -f $OLD_DB_PATH ]; then
             ADMIN_PASSWORD=$(ask_for_value adminPassword "$ADMIN_PASSWORD")
             $CFG_HELPER adminPassword "$ADMIN_PASSWORD"
@@ -137,7 +145,10 @@ case "$1" in
         SYSTEM_NAME=$(ask_for_value systemName "$systemName")
         $CFG_HELPER systemName "$SYSTEM_NAME"
         
-        [ -f "$OLD_DB_PATH" -a ! -f "$DB_PATH" ] && mv "$OLD_DB_PATH" "$DB_PATH"
+        if [ -f "$OLD_DB_PATH" -a ! -f "$DB_PATH" ]; then
+            cp "$OLD_DB_PATH" "$DB_PATH"
+            $DBSYNC
+        fi
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
