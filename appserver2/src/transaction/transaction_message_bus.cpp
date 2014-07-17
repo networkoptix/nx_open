@@ -729,7 +729,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
         QMutexLocker lock(&m_mutex);
         m_connectingConnections << transport;
         transport->setState(QnTransactionTransport::Connected);
-        if (m_connections[remotePeer.id])
+        if (m_connections.contains(remotePeer.id))
             m_connectionsToRemove << m_connections[remotePeer.id];
     }
 }
