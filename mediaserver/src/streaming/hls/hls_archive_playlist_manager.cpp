@@ -9,7 +9,7 @@
 #include <QtCore/QMutexLocker>
 
 #include <core/resource/security_cam_resource.h>
-#include <device_plugins/server_archive/server_archive_delegate.h>
+#include <plugins/resource/server_archive/server_archive_delegate.h>
 
 #include "streaming/streaming_chunk_cache_key.h"
 

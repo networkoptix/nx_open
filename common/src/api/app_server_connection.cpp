@@ -13,9 +13,11 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
 
-#include "utils/common/sleep.h"
+#include <utils/common/log.h>
+#include <utils/common/sleep.h>
 #include <utils/common/model_functions.h>
-#include "utils/common/synctime.h"
+#include <utils/common/synctime.h>
+
 #include "session_manager.h"
 #include "common_message_processor.h"
 
@@ -169,13 +171,12 @@ ec2::AbstractECConnectionFactory* QnAppServerConnectionFactory::ec2ConnectionFac
 }
 
 static ec2::AbstractECConnectionPtr currentlyUsedEc2Connection;
-void QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr ec2Connection )
+void QnAppServerConnectionFactory::setEc2Connection(const ec2::AbstractECConnectionPtr &ec2Connection )
 {
     currentlyUsedEc2Connection = ec2Connection;
 }
 
-ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::getConnection2()
-{
+ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::getConnection2() {
     return currentlyUsedEc2Connection;
 }
 

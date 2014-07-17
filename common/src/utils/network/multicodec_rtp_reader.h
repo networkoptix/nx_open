@@ -1,6 +1,8 @@
 #ifndef __MULTI_CODEC_RTP_READER__
 #define __MULTI_CODEC_RTP_READER__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <vector>
 
 #include "core/dataprovider/abstract_media_stream_provider.h"
@@ -101,5 +103,7 @@ private:
     bool m_gotSomeFrame;
     QnResource::ConnectionRole m_role;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //__MULTI_CODEC_RTP_READER__

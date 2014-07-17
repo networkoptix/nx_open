@@ -11,14 +11,16 @@
 #include "utils/network/socket.h"
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
+#include "utils/network/http/httptypes.h"
 
 #include <recording/time_period_list.h>
+
 
 QnNetworkResource::QnNetworkResource(): 
     QnResource(),
     m_authenticated(true),
     m_networkStatus(0),
-    m_networkTimeout(5000),
+    m_networkTimeout(1000 * 10),
     m_probablyNeedToUpdateStatus(false)
 {
     //TODO: #GDM #Common motion flag should be set in QnVirtualCameraResource depending on motion support
@@ -125,7 +127,7 @@ void QnNetworkResource::setDiscoveryAddr(QHostAddress addr)
 
 int QnNetworkResource::httpPort() const
 {
-    return 80;
+    return nx_http::DEFAULT_HTTP_PORT;
 }
 
 QString QnNetworkResource::toString() const
@@ -142,25 +144,25 @@ QString QnNetworkResource::toSearchString() const
     return result;
 }
 
-void QnNetworkResource::addNetworkStatus(QnNetworkStatus status)
+void QnNetworkResource::addNetworkStatus(NetworkStatus status)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_networkStatus |=  status;
+    m_networkStatus |= status;
 }
 
-void QnNetworkResource::removeNetworkStatus(QnNetworkStatus status)
+void QnNetworkResource::removeNetworkStatus(NetworkStatus status)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_networkStatus &=  (~status);
+    m_networkStatus &= (~status);
 }
 
-bool QnNetworkResource::checkNetworkStatus(QnNetworkStatus status) const
+bool QnNetworkResource::checkNetworkStatus(NetworkStatus status) const
 {
     QMutexLocker mutexLocker(&m_mutex);
-    return m_networkStatus & status;
+    return (m_networkStatus & status) == status;
 }
 
-void QnNetworkResource::setNetworkStatus(QnNetworkStatus status)
+void QnNetworkResource::setNetworkStatus(NetworkStatus status)
 {
     QMutexLocker mutexLocker(&m_mutex);
     m_networkStatus = status;
@@ -210,7 +212,7 @@ int QnNetworkResource::getChannel() const
 bool QnNetworkResource::ping()
 {
     std::auto_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
-    return sock->connect( getHostAddress(), httpPort() );
+    return sock->connect( getHostAddress(), QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
 }
 
 QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {

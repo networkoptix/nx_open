@@ -1,6 +1,8 @@
 #ifndef server_push_stream_reader_h2055
 #define server_push_stream_reader_h2055
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QWaitCondition>
 
 #include "abstract_media_stream_provider.h"
@@ -48,5 +50,7 @@ private:
     QMutex m_openStreamMutex;
     int m_FrameCnt;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //server_push_stream_reader_h2055

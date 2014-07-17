@@ -6,6 +6,8 @@
 #ifndef THIRD_PARTY_AUDIO_DATA_PACKET_H
 #define THIRD_PARTY_AUDIO_DATA_PACKET_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "audio_data_packet.h"
 
 #include <plugins/camera_plugin.h>
@@ -38,4 +40,8 @@ private:
     nxcip::MediaDataPacket* m_audioPacket;
 };
 
+
+#endif // ENABLE_DATA_PROVIDERS
+
 #endif  //THIRD_PARTY_AUDIO_DATA_PACKET_H
+

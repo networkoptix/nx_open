@@ -13,7 +13,7 @@
 #include <QtCore/QMutex>
 
 #include <core/resource/resource_fwd.h>
-#include <plugins/resources/archive/avi_files/thumbnails_archive_delegate.h>
+#include <plugins/resource/avi/thumbnails_archive_delegate.h>
 
 
 namespace nx_hls

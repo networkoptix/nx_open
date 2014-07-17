@@ -1,16 +1,18 @@
 #include "server_message_processor.h"
 
-#include "core/resource_management/resource_pool.h"
+#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+
 #include <media_server/server_update_tool.h>
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
 #include "business/business_message_bus.h"
 #include "settings.h"
+#include "api/app_server_connection.h"
 
 
 QnServerMessageProcessor::QnServerMessageProcessor()
@@ -197,8 +199,16 @@ void QnServerMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
     }
 }
 
-void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) {
-    resource->setStatus(status, true);
+void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, QnResource::Status status) 
+{
+    if (resource->getId() == qnCommon->moduleGUID() && resource->getStatus() != QnResource::Online)
+    {
+        // it's own media server. change status to online
+        QnAppServerConnectionFactory::getConnection2()->getResourceManager()->setResourceStatusSync(resource->getId(), QnResource::Online);
+    }
+    else {
+        resource->setStatus(status, true);
+    }
 }
 
 bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
@@ -248,4 +258,21 @@ void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, c
 
 void QnServerMessageProcessor::at_updateInstallationRequested(const QString &updateId) {
     QnServerUpdateTool::instance()->installUpdate(updateId);
+}
+
+bool QnServerMessageProcessor::canRemoveResource(const QnId& resourceId) 
+{ 
+    QnResourcePtr res = qnResPool->getResourceById(resourceId);
+    bool isOwnServer = (res && res->getId() == qnCommon->moduleGUID());
+    return !isOwnServer;
+}
+
+void QnServerMessageProcessor::removeResourceIgnored(const QnId& resourceId) 
+{
+    QnMediaServerResourcePtr mServer = qnResPool->getResourceById(resourceId).dynamicCast<QnMediaServerResource>();
+    bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
+    if (isOwnServer) {
+        QnMediaServerResourcePtr savedServer;
+        QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()->saveSync(mServer, &savedServer);
+    }
 }

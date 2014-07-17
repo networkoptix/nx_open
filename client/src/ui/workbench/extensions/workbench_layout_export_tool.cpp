@@ -18,9 +18,9 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <nx_ec/data/api_layout_data.h>
+#include <plugins/resource/avi/avi_resource.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
-#include <plugins/resources/archive/avi_files/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <recording/stream_recorder.h>

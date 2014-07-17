@@ -1,6 +1,8 @@
 #ifndef cold_store_storage_h_1800
 #define cold_store_storage_h_1800
 
+#ifdef ENABLE_COLDSTORE
+
 #include "coldstore_api/sfs-client.h"
 
 extern "C"
@@ -88,5 +90,6 @@ private:
 
 };
 
+#endif // ENABLE_COLDSTORE
 
 #endif //cold_store_storage_h_1800

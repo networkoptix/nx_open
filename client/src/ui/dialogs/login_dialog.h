@@ -39,7 +39,7 @@ public:
 
     QUrl currentUrl() const;
     QString currentName() const;
-    QnConnectionInfoPtr currentInfo() const;
+    QnConnectionInfo currentInfo() const;
 
     bool restartPending() const;
 
@@ -80,7 +80,7 @@ private slots:
     void at_saveButton_clicked();
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
-    void at_ec2ConnectFinished( int, ec2::ErrorCode, ec2::AbstractECConnectionPtr );
+    void at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode, const ec2::AbstractECConnectionPtr &connection);
 
     void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
@@ -93,7 +93,7 @@ private:
     QStandardItem* m_autoFoundItem;
 
     int m_requestHandle;
-    QnConnectionInfoPtr m_connectInfo;
+    QnConnectionInfo m_connectInfo;
 
     QnRenderingWidget *m_renderingWidget;
     QnModuleFinder *m_moduleFinder;

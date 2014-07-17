@@ -11,7 +11,11 @@ namespace ec2
     struct ApiPeerData: ApiData 
     {
         ApiPeerData() {}
-        ApiPeerData(QnId id, Qn::PeerType peerType): id(id), peerType(peerType) {}
+        ApiPeerData(QnId id, Qn::PeerType peerType, Qn::SerializationFormat dataFormat = Qn::BnsFormat):
+            id(id),
+            peerType(peerType),
+            dataFormat(dataFormat) 
+        {}
 
         bool operator==(const ApiPeerData& other) const {
             return id == other.id && peerType == other.peerType && params == other.params;
@@ -27,12 +31,15 @@ namespace ec2
         /** Type of the peer. */
         Qn::PeerType peerType;
 
+        /** Preferred client data serialization format */
+        Qn::SerializationFormat dataFormat;
+
         /** Additional info. */
         QMap<QString, QString> params; // todo: #GDM #VW. remove it
     };
     typedef QSet<QnId> QnPeerSet;
 
-#define ApiPeerData_Fields (id)(peerType)(params)
+#define ApiPeerData_Fields (id)(peerType)(dataFormat)(params)
 
 }
 

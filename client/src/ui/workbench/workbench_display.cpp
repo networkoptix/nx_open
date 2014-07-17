@@ -27,6 +27,8 @@
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
 
+#include <redass/redass_controller.h>
+
 #include <ui/common/notification_levels.h>
 
 #include <ui/animation/viewport_animator.h>
@@ -77,7 +79,7 @@
 #include "workbench.h"
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
-#include "plugins/resources/archive/abstract_archive_stream_reader.h"
+#include "plugins/resource/archive/abstract_archive_stream_reader.h"
 
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
@@ -1563,6 +1565,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
                 mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
+            qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
         }
 
 //        widget->item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(widget->checkedButtons()));
@@ -1626,13 +1629,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         if(!widget)
             continue;
 
-        qint64 time;
-        if(thumbnailed) {
-            time = searchState.period.startTimeMs + searchState.step * i;
-            widget->item()->setData(Qn::ItemTimeRole, time);
-        } else {
-            time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
-        }
+        qnRedAssController->registerConsumer(widget->display()->camDisplay());
+
+        qint64 time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
 
         if(!thumbnailed) {
             QnResourcePtr resource = widget->resource()->toResourcePtr();
@@ -1696,7 +1695,7 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     if(searchState.step <= 0)
         return;
-
+  
     int index = (thumbnail.time() - searchState.period.startTimeMs) / searchState.step;
     QList<QnResourceWidget *> widgets = this->widgets();
     if(index < 0)
@@ -1705,12 +1704,27 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
 
     if(index < widgets.size()) {
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[index])) {
-            mediaWidget->display()->archiveReader()->jumpTo(thumbnail.actualTime() * 1000, 0);
-            mediaWidget->display()->camDisplay()->setMTDecoding(false);
-            mediaWidget->display()->camDisplay()->putData(thumbnail.data());
-            mediaWidget->display()->camDisplay()->start();
-            mediaWidget->display()->archiveReader()->startPaused();
+
+        // when we have received thumbnail for an item, check if it can be used for the previous item
+        for (int checkedIdx = qMax(index - 1, 0); checkedIdx <= index; checkedIdx++) {
+            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[checkedIdx])) {
+                qint64 time = mediaWidget->item()->data<qint64>(Qn::ItemTimeRole, -1);
+
+                if (time > 0 && qAbs(time - thumbnail.actualTime()) > searchState.step / 2)
+                    continue;
+
+                qint64 existingThumbnailTime = mediaWidget->item()->data<qint64>(Qn::ItemThumbnailTimestampRole, 0);
+                if (qAbs(time - existingThumbnailTime) < qAbs(time - thumbnail.actualTime()))   // if value not present automatically advance =)
+                    continue;
+
+                mediaWidget->item()->setData(Qn::ItemThumbnailTimestampRole, thumbnail.actualTime());
+
+                mediaWidget->display()->archiveReader()->jumpTo(thumbnail.actualTime() * 1000, 0);
+                mediaWidget->display()->camDisplay()->setMTDecoding(false);
+                mediaWidget->display()->camDisplay()->putData(thumbnail.data());
+                mediaWidget->display()->camDisplay()->start();
+                mediaWidget->display()->archiveReader()->startPaused();
+            }
         }
     }
 

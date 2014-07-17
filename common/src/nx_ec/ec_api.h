@@ -810,22 +810,6 @@ namespace ec2
                 std::static_pointer_cast<impl::SimpleHandler>(
                     std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        /*!
-            \param handler Functor with params: (ErrorCode, const QnKvPairList&)
-            \return Request id
-        */
-        template<class TargetType, class HandlerType> int getSettingsAsync( TargetType* target, HandlerType handler ) {
-            return getSettingsAsync( std::static_pointer_cast<impl::GetSettingsHandler>(
-                std::make_shared<impl::CustomGetSettingsHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int saveSettingsAsync( const QnKvPairList& kvPairs, TargetType* target, HandlerType handler ) {
-            return saveSettingsAsync( kvPairs, 
-                std::static_pointer_cast<impl::SimpleHandler>(
-                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
 
         //!Cancel running async request
         /*!
@@ -858,8 +842,6 @@ namespace ec2
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
         virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) = 0;
-        virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
     };  
 
 
@@ -898,6 +880,9 @@ namespace ec2
         Q_OBJECT
 
     public:
+        AbstractECConnectionFactory():
+            m_compatibilityMode(false)
+        {}
         virtual ~AbstractECConnectionFactory() {}
 
         /*!
@@ -922,9 +907,24 @@ namespace ec2
         virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) = 0;
         virtual void setContext( const ResourceContext& resCtx ) = 0;
 
+        /**
+        * \returns                         Whether this connection factory is working in compatibility mode.
+        *                                  In this mode all clients are supported regardless of customization.
+        */
+        bool isCompatibilityMode() const {
+            return m_compatibilityMode;
+        }
+
+        //! \param compatibilityMode         New compatibility mode state.
+        void setCompatibilityMode(bool compatibilityMode) {
+            m_compatibilityMode = compatibilityMode;
+        }
     protected:
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) = 0;
         virtual int connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) = 0;
+
+    private:
+        bool m_compatibilityMode;
     };
 }
 

@@ -1034,6 +1034,7 @@ bool TCPServerSocket::setListen(int queueLen)
 
 // -------------------------- TCPSslServerSocket ----------------
 
+#ifdef ENABLE_SSL
 TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect): TCPServerSocket(), m_allowNonSecureConnect(allowNonSecureConnect)
 {
 
@@ -1062,6 +1063,7 @@ AbstractStreamSocket* TCPSslServerSocket::accept()
     return 0;
 #endif
 }
+#endif // ENABLE_SSL
 
 //////////////////////////////////////////////////////////
 ///////// class UDPSocket

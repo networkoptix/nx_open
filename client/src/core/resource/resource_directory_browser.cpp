@@ -6,8 +6,15 @@
 
 #include <utils/common/model_functions.h>
 #include <utils/serialization/proto_message.h>
+#include <utils/common/log.h>
 #include <utils/common/warnings.h>
 #include <utils/local_file_cache.h>
+
+#include "utils/serialization/binary_functions.h"
+
+#include "plugins/resource/avi/avi_dvd_resource.h"
+#include "plugins/resource/avi/avi_bluray_resource.h"
+#include "plugins/resource/avi/filetypesupport.h"
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>

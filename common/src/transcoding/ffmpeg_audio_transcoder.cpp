@@ -1,5 +1,6 @@
-
 #include "ffmpeg_audio_transcoder.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 #include "core/datapacket/audio_data_packet.h"
 #include "utils/media/audio_processor.h"
@@ -230,3 +231,5 @@ AVCodecContext* QnFfmpegAudioTranscoder::getCodecContext()
 {
     return m_encoderCtx;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

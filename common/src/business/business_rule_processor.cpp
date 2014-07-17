@@ -22,8 +22,9 @@
 #include "mustache/mustache_helper.h"
 #include "mustache/partial_info.h"
 
-#include "utils/common/synctime.h"
+#include <utils/common/synctime.h>
 #include <utils/common/email.h>
+#include <utils/common/log.h>
 #include "business_strings_helper.h"
 #include "version.h"
 
@@ -31,8 +32,6 @@
 #include "common/common_module.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-
-const int EMAIL_SEND_TIMEOUT = 300; // 5 minutes
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -482,6 +481,8 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     assert(!partialInfo.attrName.isEmpty());
 //    contextMap[partialInfo.attrName] = lit("true");
 
+    QnEmail::Settings emailSettings = QnGlobalSettings::instance()->emailSettings();
+
     QnEmailAttachmentList attachments;
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
     attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(partialInfo.eventLogoFilename, lit(":/skin/email_attachments/") + partialInfo.eventLogoFilename, tpImageMimeType)));
@@ -489,8 +490,8 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
     contextMap[tpEventLogoFilename] = lit("cid:") + partialInfo.eventLogoFilename;
     contextMap[tpCompanyName] = lit(QN_ORGANIZATION_NAME);
     contextMap[tpCompanyUrl] = lit(QN_COMPANY_URL);
-    contextMap[tpSupportEmail] = lit(QN_SUPPORT_MAIL_ADDRESS);
-    contextMap[tpSystemName] = QnGlobalSettings::instance()->systemName();
+    contextMap[tpSupportEmail] = emailSettings.supportEmail;
+    contextMap[tpSystemName] = emailSettings.signature;
     attachments.append(partialInfo.attachments);
 
     QImage screenshot = this->getEventScreenshot(action->getRuntimeParams(), QSize(640, 480));
@@ -509,7 +510,7 @@ bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action
                 ec2::ApiEmailData(recipients,
                     QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
                     messageBody,
-                    EMAIL_SEND_TIMEOUT,
+                    emailSettings.timeout,
                     attachments),
                 this,
                 &QnBusinessRuleProcessor::at_sendEmailFinished ) == ec2::INVALID_REQ_ID)

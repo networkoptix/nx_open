@@ -7,7 +7,6 @@
 
 class QnCommonModule;
 
-// TODO: #Elric inherit from common_module?
 class QnMediaServerModule: public QObject, public Singleton<QnMediaServerModule> {
     Q_OBJECT;
 public:

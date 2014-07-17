@@ -402,7 +402,11 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::PreferencesLicensesTabAction).
         flags(Qn::NoTarget).
-        text(tr("Get More Licenses..."));
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission);
+
+    factory(Qn::PreferencesSmtpTabAction).
+        flags(Qn::NoTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission);
 
     factory(Qn::PreferencesNotificationTabAction).
         flags(Qn::NoTarget).
@@ -609,7 +613,6 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SaveCurrentLayoutAsAction).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::CreateLayoutPermission).
-        requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::SavePermission).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
         text(tr("Save Current Layout As...")).
         shortcut(tr("Ctrl+Alt+S")).
@@ -699,10 +702,15 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Open in Browser..."));
 
+    factory(Qn::SystemAdministrationAction).
+        flags(Qn::Main | Qn::Tree).
+        text(tr("System Administration...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
     factory(Qn::PreferencesGeneralTabAction).
         flags(Qn::Main).
-        text(tr("System Settings...")).
+        text(tr("Local Settings...")).
         //shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
         autoRepeat(false);
@@ -738,18 +746,6 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Camera List...")).
         shortcut(tr("Ctrl+M")).
-        autoRepeat(false).
-        condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
-
-    factory(Qn::SystemAdministrationAction).
-        flags(Qn::Main | Qn::Tree).
-        text(tr("System Administration")).
-        condition(new QnTreeNodeTypeCondition(Qn::RootNode, this));
-
-    factory(Qn::PreferencesServerTabAction).
-        flags(Qn::Tree | Qn::NoTarget).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Backup/Restore Configuration...")).
         autoRepeat(false).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
 
@@ -965,14 +961,12 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::SaveLayoutAsAction).
         flags(Qn::SingleTarget | Qn::ResourceTarget).
-        requiredPermissions(Qn::SavePermission).
         requiredPermissions(Qn::UserResourceRole, Qn::CreateLayoutPermission).
         text(tr("Save Layout As...")).
         condition(hasFlags(QnResource::layout));
 
     factory(Qn::SaveLayoutForCurrentUserAsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredPermissions(Qn::SavePermission).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::CreateLayoutPermission).
         text(tr("Save Layout As...")).
         condition(hasFlags(QnResource::layout));
@@ -1229,19 +1223,28 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Check Camera Issues...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this),
+            new QnPreviewSearchModeCondition(true, this),
+            this));
 
     factory(Qn::CameraBusinessRulesAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Camera Rules...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::ExactlyOne, this));
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::ExactlyOne, this),
+            new QnPreviewSearchModeCondition(true, this),
+            this));
 
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Camera Settings...")).
         requiredPermissions(Qn::WritePermission).
-        condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
+        condition(new QnConjunctionActionCondition(
+             new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this),
+             new QnPreviewSearchModeCondition(true, this),
+             this));
 
     factory(Qn::PictureSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
@@ -1447,7 +1450,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnExportActionCondition(false, this));
 
     factory(Qn::ThumbnailsSearchAction).
-        flags(Qn::Slider | Qn::SingleTarget).
+        flags(Qn::Slider | Qn::Scene | Qn::SingleTarget).
         text(tr("Preview Search...")).
         condition(new QnPreviewActionCondition(this));
 

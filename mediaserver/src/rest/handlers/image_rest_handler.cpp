@@ -13,7 +13,7 @@ extern "C"
 #include "core/resource/network_resource.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/camera_resource.h"
-#include "device_plugins/server_archive/server_archive_delegate.h"
+#include "plugins/resource/server_archive/server_archive_delegate.h"
 #include "core/datapacket/media_data_packet.h"
 #include "decoders/video/ffmpeg.h"
 #include "camera/camera_pool.h"
@@ -295,7 +295,7 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
             qWarning() << "Can't initialize ffmpeg encoder for encoding image to format " << format;
         }
         else {
-            const static int MAX_VIDEO_FRAME = roundedWidth * roundedHeight * 3;
+            const int MAX_VIDEO_FRAME = roundedWidth * roundedHeight * 3 / 2;
             quint8* m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
             int encoded = avcodec_encode_video(videoEncoderCodecCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, &dstPict);
             result.append((const char*) m_videoEncodingBuffer, encoded);
