@@ -11,6 +11,8 @@
 #  include <ws2tcpip.h>
 #  include <iphlpapi.h>
 #  include "win32_socket_tools.h"
+#else
+#  include <netinet/tcp.h>
 #endif
 
 #include <QtCore/QElapsedTimer>
@@ -989,12 +991,20 @@ bool TCPSocket::toggleStatisticsCollection( bool val )
 #endif
 }
 
+static const size_t USEC_PER_MSEC = 1000;
+
 bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
 {
 #ifdef _WIN32
     return readTcpStat( &static_cast<Win32TcpSocketImpl*>(m_impl)->win32TcpTableRow, info ) == ERROR_SUCCESS;
 #else
-    return false;
+    struct tcp_info tcpinfo;
+    memset( &tcpinfo, 0, sizeof(tcpinfo) );
+    socklen_t tcp_info_length = sizeof(tcpinfo);
+    if( getsockopt( sockDesc, SOL_TCP, TCP_INFO, (void *)&tcpinfo, &tcp_info_length ) != 0 )
+        return false;
+    info->rttVar = tcpinfo.tcpi_rttvar / USEC_PER_MSEC;
+    return true;
 #endif
 }
 
