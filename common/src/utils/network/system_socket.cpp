@@ -1007,14 +1007,13 @@ static int acceptWithTimeout( int sockDesc, int timeoutMillis = DEFAULT_ACCEPT_T
     if( sockPollfd.revents & POLLERR )
     {
         int errorCode = 0;
-        int errorCodeLen = sizeof(errorCode);
+        socklen_t errorCodeLen = sizeof(errorCode);
         if( getsockopt( sockDesc, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen ) != 0 )
             return -1;
         errno = errorCode;
         return -1;
     }
     return -1;
-}
 #endif
 }
 
