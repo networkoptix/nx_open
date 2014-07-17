@@ -150,6 +150,7 @@ private slots:
 
     void saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout = false);
     void saveVideowalls(const QSet<QnVideoWallResourcePtr> &videowalls, bool saveLayout = false);
+    void saveVideowallReviewLayout(const QnVideoWallResourcePtr& videowall, const QnLayoutResourcePtr &layout = QnLayoutResourcePtr());
 private:
     typedef QHash<qint64, QnVideoWallControlMessage> StoredMessagesHash;
 

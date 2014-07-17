@@ -1150,7 +1150,7 @@ void QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered() {
     dialog->submitToResource(videoWall);
     
     menu()->trigger(Qn::OpenVideoWallsReviewAction, QnActionParameters(videoWall));
-    menu()->trigger(Qn::SaveVideoWallReviewAction, QnActionParameters(videoWall));
+    saveVideowallReviewLayout(videoWall);
 }
 
 void QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered() {
@@ -1371,7 +1371,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered() {
         menu()->trigger(Qn::OpenSingleLayoutAction, layout);
 
         // new layout should not be marked as changed
-        menu()->trigger(Qn::SaveVideoWallReviewAction, QnActionParameters(videoWall).withArgument(Qn::LayoutResourceRole, layout));
+        saveVideowallReviewLayout(videoWall, layout);
     }
 }
 
@@ -1380,7 +1380,7 @@ void QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered(
     QnVideoWallResourcePtr videowall = layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
     if (!videowall)
         return;
-    menu()->trigger(Qn::SaveVideoWallReviewAction, QnActionParameters(videowall).withArgument(Qn::LayoutResourceRole, layout->resource()));
+    saveVideowallReviewLayout(videowall, layout->resource());
 }
 
 void QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered() {
@@ -1388,30 +1388,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered() {
     QnVideoWallResourcePtr videowall = parameters.resource().dynamicCast<QnVideoWallResource>();
     if (!videowall)
         return;
-
-    QnWorkbenchLayout* layout = NULL;
-    QnLayoutResourcePtr layoutResource = parameters.argument<QnLayoutResourcePtr>(Qn::LayoutResourceRole);
-    if (layoutResource)
-        layout = QnWorkbenchLayout::instance(layoutResource);
-    else
-        layout = QnWorkbenchLayout::instance(videowall);
-
-    if (!layout) 
-        return;
-
-    if (!layoutResource)
-        layoutResource = layout->resource();
-
-    //TODO: #GDM #VW #LOW refactor common code to common place
-    if (saveReviewLayout(layoutResource, [this, layoutResource](int reqId, ec2::ErrorCode errorCode) {
-        Q_UNUSED(reqId);
-        snapshotManager()->setFlags(layoutResource, snapshotManager()->flags(layoutResource) & ~Qn::ResourceIsBeingSaved);
-        if (errorCode != ec2::ErrorCode::ok)
-            return;
-        snapshotManager()->setFlags(layoutResource, snapshotManager()->flags(layoutResource) & ~Qn::ResourceIsChanged);
-    }))
-        snapshotManager()->setFlags(layoutResource, snapshotManager()->flags(layoutResource) | Qn::ResourceIsBeingSaved);
-    
+    saveVideowallReviewLayout(videowall);
 }
 
 void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered() {
@@ -2145,8 +2122,8 @@ bool QnWorkbenchVideoWallHandler::createShortcut(const QnVideoWallResourcePtr &v
 }
 
 void QnWorkbenchVideoWallHandler::saveVideowall(const QnVideoWallResourcePtr& videowall, bool saveLayout) {
-    if (saveLayout)
-        menu()->trigger(Qn::SaveVideoWallReviewAction, QnActionParameters(videowall));
+    if (saveLayout && QnWorkbenchLayout::instance(videowall) )
+        saveVideowallReviewLayout(videowall);
     else
         connection2()->getVideowallManager()->save(videowall, this, [] {});
 }
@@ -2368,4 +2345,26 @@ void QnWorkbenchVideoWallHandler::updateReviewLayout(const QnVideoWallResourcePt
 
     }
 
+}
+
+void QnWorkbenchVideoWallHandler::saveVideowallReviewLayout(const QnVideoWallResourcePtr& videowall, const QnLayoutResourcePtr &layout) {
+    if (!layout) {
+        QnWorkbenchLayout* workbenchLayout = QnWorkbenchLayout::instance(videowall);
+        if (!workbenchLayout || !workbenchLayout->resource()) {
+            Q_ASSERT(false);    //should never get here but save videowall just in case
+            connection2()->getVideowallManager()->save(videowall, this, [] {});
+            return;
+        }
+        saveVideowallReviewLayout(videowall, workbenchLayout->resource());
+    }
+
+    //TODO: #GDM #VW #LOW refactor common code to common place
+    if (saveReviewLayout(layout, [this, layout](int reqId, ec2::ErrorCode errorCode) {
+        Q_UNUSED(reqId);
+        snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
+        if (errorCode != ec2::ErrorCode::ok)
+            return;
+        snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
+    }))
+        snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) | Qn::ResourceIsBeingSaved);
 }
