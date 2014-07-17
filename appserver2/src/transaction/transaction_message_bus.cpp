@@ -624,9 +624,6 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     connect(transport.data(), &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction,  Qt::QueuedConnection);
     connect(transport.data(), &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged,  Qt::QueuedConnection);
 
-    transport->setState(QnTransactionTransport::Connected);
-
-
     /** Send all data to the client peers on the connect. */
     QnPeerSet processedPeers = QnPeerSet() << remotePeer.id << m_localPeer.id;
     if (remotePeer.peerType == Qn::PT_DesktopClient || 
@@ -735,9 +732,10 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(QSharedPointer<Abstrac
     
     {
         QMutexLocker lock(&m_mutex);
-        if (m_connections[remotePeer.id]) 
+        m_connectingConnections << transport;
+        transport->setState(QnTransactionTransport::Connected);
+        if (m_connections[remotePeer.id])
             m_connectionsToRemove << m_connections[remotePeer.id];
-        m_connections[remotePeer.id] = transport;
     }
 }
 
