@@ -17,7 +17,7 @@ class Customization():
         self.light = []
         
     def __str__(self):
-        return self.name + ' ' + str(self.isRoot())
+        return self.name
 
     def isRoot(self):
         with open(os.path.join(self.path, 'build.properties'), "r") as buildFile:
@@ -46,6 +46,7 @@ class Customization():
                 self.light.append(os.path.join(dirname, filename)[cut:])
         
     def validateInner(self):
+        print Style.BRIGHT + 'Validating ' + self.name + '...'
         for entry in self.base:
             if entry in self.dark:
                 print Style.BRIGHT + Fore.YELLOW + 'File ' + os.path.join(self.basePath, entry) + ' duplicated in dark skin'
@@ -58,6 +59,21 @@ class Customization():
         for entry in self.light:
             if not entry in self.dark:
                 print Style.BRIGHT + Fore.RED + 'File ' + os.path.join(self.lightPath, entry) + ' missing in dark skin'
+                
+        
+    def validateCross(self, other):
+        print Style.BRIGHT + 'Validating ' + self.name + ' vs ' + other.name + '...'
+        for entry in self.base:
+            if not entry in other.base:
+                print Style.BRIGHT + Fore.RED + 'File ' + os.path.join(self.basePath, entry) + ' missing in ' + other.basePath
+
+        for entry in self.dark:
+            if not entry in other.dark:
+                print Style.BRIGHT + Fore.RED + 'File ' + os.path.join(self.darkPath, entry) + ' missing in ' + other.darkPath
+                
+        for entry in self.light:
+            if not entry in other.light:
+                print Style.BRIGHT + Fore.RED + 'File ' + os.path.join(self.lightPath, entry) + ' missing in ' + other.lightPath
         
 def main():
     # use Colorama to make Termcolor work on Windows too
@@ -79,8 +95,10 @@ def main():
             roots.append(c)
         customizations[entry] = c
     
-    
-    
+    for n, c1 in enumerate(roots):
+        for c2 in roots[n+1:]:
+            c1.validateCross(c2)
+            c2.validateCross(c1)
  
 
 if __name__ == "__main__":
