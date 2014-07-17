@@ -166,7 +166,6 @@ namespace ec2
     }
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran ) {
-        qDebug() << "VIDEOWALL CONTROL MESSAGE RECEIVED";
         return m_videowallManager->triggerNotification(tran);
     }
 

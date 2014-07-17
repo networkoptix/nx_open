@@ -38,7 +38,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
     std::string passwd;
     int soapRes = SOAP_OK;
     do {
-        //qDebug() << "Trying login = " << login.c_str() << ", password = " << passwd.c_str();
+        qDebug() << "Trying login = " << login.c_str() << ", password = " << passwd.c_str();
         setLoginPassword(login, passwd);
 
         NetIfacesReq request1;
@@ -46,7 +46,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
         soapRes = getNetworkInterfaces(request1, response1);
 
         if (soapRes == SOAP_OK || !isNotAuthenticated()) {
-           // qDebug() << "Finished picking password";
+            qDebug() << "Finished picking password";
 
             return soapRes == SOAP_OK;
         }

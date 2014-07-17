@@ -73,8 +73,8 @@
 
 #include "version.h"
 
-#define SENDER_DEBUG
-#define RECEIVER_DEBUG
+//#define SENDER_DEBUG
+//#define RECEIVER_DEBUG
 
 namespace {
     #define PARAM_KEY(KEY) const QLatin1String KEY##Key(BOOST_PP_STRINGIZE(KEY));
