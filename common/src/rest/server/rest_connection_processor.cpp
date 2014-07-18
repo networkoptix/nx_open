@@ -6,7 +6,6 @@
 #include "rest_connection_processor.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
-#include "rest_server.h"
 #include "request_handler.h"
 #include "network/authenticate_helper.h"
 #include "utils/gzip/gzip_compressor.h"

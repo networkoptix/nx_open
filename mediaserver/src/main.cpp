@@ -108,12 +108,10 @@
 #include <rest/handlers/change_system_name_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
-#include <rest/server/rest_server.h>
 
 #include <streaming/hls/hls_server.h>
 
 #include <rtsp/rtsp_connection.h>
-#include <rtsp/rtsp_listener.h>
 
 #include <soap/soapserver.h>
 
@@ -677,9 +675,6 @@ QnMain::QnMain(int argc, char* argv[])
     m_startMessageSent(false),
     m_firstRunningTime(0),
     m_moduleFinder(0),
-    m_rtspListener(0),
-    m_restServer(0),
-    m_progressiveDownloadingServer(0),
     m_universalTcpListener(0)
 {
     serviceMainInstance = this;
@@ -716,34 +711,10 @@ void QnMain::stopObjects()
     qnFileDeletor->pleaseStop();
 
 
-    if (m_restServer)
-        m_restServer->pleaseStop();
-    if (m_progressiveDownloadingServer)
-        m_progressiveDownloadingServer->pleaseStop();
-    if (m_rtspListener)
-        m_rtspListener->pleaseStop();
-    
     if (m_universalTcpListener) {
         m_universalTcpListener->pleaseStop();
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
-    }
-
-    if (m_restServer)
-    {
-        delete m_restServer;
-        m_restServer = 0;
-    }
-
-    if (m_progressiveDownloadingServer) {
-        delete m_progressiveDownloadingServer;
-        m_progressiveDownloadingServer = 0;
-    }
-
-    if (m_rtspListener)
-    {
-        delete m_rtspListener;
-        m_rtspListener = 0;
     }
 
     if (m_moduleFinder)
@@ -970,7 +941,7 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
     }
 }
 
-void QnMain::initTcpListener()
+bool QnMain::initTcpListener()
 {
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT, nx_ms_conf::DEFAULT_RTSP_PORT).toInt();
     QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
@@ -1005,6 +976,8 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
+    if( !m_universalTcpListener->bindToLocalAddress() )
+        return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
     m_universalTcpListener->enableSSLMode();
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
@@ -1027,6 +1000,8 @@ void QnMain::initTcpListener()
 #endif   //ENABLE_DESKTOP_CAMERA
 
     m_universalTcpListener->start();
+
+    return true;
 }
 
 QHostAddress QnMain::getPublicAddress()
@@ -1095,9 +1070,9 @@ void QnMain::run()
     QnSessionManager::instance()->start();
 
 #ifdef ENABLE_ONVIF
-    //starting soap server to accept event notifications from onvif servers
-    QnSoapServer::initStaticInstance( new QnSoapServer(MSSettings::roSettings()->value(nx_ms_conf::SOAP_PORT, nx_ms_conf::DEFAULT_SOAP_PORT).toInt()) );
-    QnSoapServer::instance()->start();
+    QnSoapServer soapServer;    //starting soap server to accept event notifications from onvif cameras
+    soapServer.bind();
+    soapServer.start();
 #endif //ENABLE_ONVIF
 
     QnResourcePool::initStaticInstance( new QnResourcePool() );
@@ -1244,7 +1219,12 @@ void QnMain::run()
 
     nx_hls::HLSSessionPool hlsSessionPool;
 
-    initTcpListener();
+    if( !initTcpListener() )
+    {
+        qCritical() << "Failed to bind to local port. Terminating...";
+        QCoreApplication::quit();
+        return;
+    }
     using namespace std::placeholders;
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>( std::bind( &QnServerMessageProcessor::isProxy, messageProcessor.data(), _1 ) );
 
@@ -1575,11 +1555,6 @@ void QnMain::run()
     QnStorageManager::instance()->stopAsyncTasks();
 
     ptzPool.reset();
-
-#ifdef ENABLE_ONVIF
-    delete QnSoapServer::instance();
-    QnSoapServer::initStaticInstance( NULL );
-#endif //ENABLE_ONVIF
 
     QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
 

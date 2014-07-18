@@ -16,8 +16,6 @@
 
 
 class QnAppserverResourceProcessor;
-class QnRtspListener;
-class QnRestServer;
 class QNetworkReply;
 class QnServerMessageProcessor;
 struct QnModuleInformation;
@@ -55,7 +53,7 @@ private slots:
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
 private:
     void updateDisabledVendorsIfNeeded();
-    void initTcpListener();
+    bool initTcpListener();
     QHostAddress getPublicAddress();
 private:
     int m_argc;
@@ -64,9 +62,6 @@ private:
     qint64 m_firstRunningTime;
 
     QnModuleFinder* m_moduleFinder;
-    QnRtspListener* m_rtspListener;
-    QnRestServer* m_restServer;
-    QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
 };

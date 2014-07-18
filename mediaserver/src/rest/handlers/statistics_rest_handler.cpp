@@ -4,7 +4,6 @@
 #include "utils/network/tcp_connection_priv.h"
 #include "platform/platform_abstraction.h"
 
-#include "rest/server/rest_server.h"
 
 QnStatisticsRestHandler::QnStatisticsRestHandler() {
     m_monitor = qnPlatform->monitor();
