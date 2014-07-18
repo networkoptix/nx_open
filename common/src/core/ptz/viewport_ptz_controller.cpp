@@ -11,10 +11,12 @@ QnViewportPtzController::QnViewportPtzController(const QnPtzControllerPtr &baseC
 {
     // TODO: #Elric handle finished properly
 
+#ifdef PTZ_DEBUG
     if(!baseController->hasCapabilities(Qn::FlipPtzCapability))
         qnWarning("Base controller doesn't have a Qn::FlipPtzCapability. Flip will not be taken into account by advanced PTZ.");
     if(!baseController->hasCapabilities(Qn::LimitsPtzCapability))
         qnWarning("Base controller doesn't have a Qn::LimitsPtzCapability. Position caching may not work for advanced PTZ.");
+#endif
 }
 
 bool QnViewportPtzController::extends(Qn::PtzCapabilities capabilities) {

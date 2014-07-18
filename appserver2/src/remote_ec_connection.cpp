@@ -4,6 +4,9 @@
 ***********************************************************/
 
 #include "remote_ec_connection.h"
+
+#include <api/app_server_connection.h>
+
 #include "transaction/transaction_message_bus.h"
 #include "common/common_module.h"
 #include "mutex/distributed_mutex.h"
@@ -22,13 +25,13 @@ namespace ec2
     {
         ec2::QnDistributedMutexManager::initStaticInstance(new ec2::QnDistributedMutexManager());
 
-        QnTransactionMessageBus::instance()->setHandler(this);
+        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
     }
 
     RemoteEC2Connection::~RemoteEC2Connection()
     {
         QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
-        QnTransactionMessageBus::instance()->removeHandler(this);
+        QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
     }
 
     QnConnectionInfo RemoteEC2Connection::connectionInfo() const
@@ -36,10 +39,16 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    void RemoteEC2Connection::startReceivingNotifications()
-    {
+    void RemoteEC2Connection::startReceivingNotifications() {
+
         // in remote mode we are always working as a client
-        QnTransactionMessageBus::instance()->setLocalPeer(QnPeerInfo(qnCommon->moduleGUID(), QnPeerInfo::DesktopClient));
+        ApiPeerData localPeer(qnCommon->moduleGUID(), Qn::PT_DesktopClient);
+
+        QUuid videowallGuid = QnAppServerConnectionFactory::videowallGuid();
+        if (!videowallGuid.isNull())
+            localPeer.peerType = Qn::PT_VideowallClient;
+        
+        QnTransactionMessageBus::instance()->setLocalPeer(localPeer);
         QnTransactionMessageBus::instance()->start();
 
         QUrl url(m_queryProcessor->getUrl());

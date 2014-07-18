@@ -44,7 +44,7 @@ void QnNetworkProxyFactory::addToProxyList(
 
 void QnNetworkProxyFactory::bindHostToResource(
     const QString& targetHost,
-    QnResourcePtr resource )
+    const QnResourcePtr& resource )
 {
     QMutexLocker lk( &m_mutex );
     m_proxyInfo[targetHost] = getProxyToResource( resource );
@@ -80,7 +80,7 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
 }
 
 bool QnNetworkProxyFactory::fillUrlWithRouteToResource(
-    QnResourcePtr targetResource,
+    const QnResourcePtr& targetResource,
     QUrl* const requestUrl,
     WhereToPlaceProxyCredentials credentialsBehavour )
 {
@@ -127,15 +127,15 @@ QnNetworkProxyFactory* QnNetworkProxyFactory::instance()
     return QnNetworkProxyFactory_instance;
 }
 
-QNetworkProxy QnNetworkProxyFactory::getProxyToResource( QnResourcePtr resource )
+QNetworkProxy QnNetworkProxyFactory::getProxyToResource( const QnResourcePtr& resource )
 {
     QNetworkProxy proxy( QNetworkProxy::HttpProxy );
-    if( QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>() )
+    if( dynamic_cast<QnSecurityCamResource*>(resource.data()) )
     {
         QnResourcePtr parent = resource->getParentResource();
         if( !parent )
             return QNetworkProxy( QNetworkProxy::NoProxy );
-        QnMediaServerResourcePtr mediaServerResource = parent.dynamicCast<QnMediaServerResource>();
+        const QnMediaServerResource* mediaServerResource = dynamic_cast<QnMediaServerResource*>(parent.data());
         if( !mediaServerResource )
             return QNetworkProxy( QNetworkProxy::NoProxy );
         const QString& proxyHost = mediaServerResource->getPrimaryIF();
@@ -156,7 +156,7 @@ QNetworkProxy QnNetworkProxyFactory::getProxyToResource( QnResourcePtr resource 
         proxy.setPassword( QnAppServerConnectionFactory::defaultUrl().password() );
         return proxy;
     }
-    else if( QnMediaServerResourcePtr mediaServerResource = resource.dynamicCast<QnMediaServerResource>() )
+    else if( const QnMediaServerResource* mediaServerResource = dynamic_cast<QnMediaServerResource*>(resource.data()) )
     {
         //TODO #ak looks like copy-paste from upper block
         const QString& proxyHost = mediaServerResource->getPrimaryIF();

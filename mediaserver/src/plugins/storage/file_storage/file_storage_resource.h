@@ -41,7 +41,6 @@ public:
     void setStorageBitrateCoeff(float value);
     virtual float getStorageBitrateCoeff() const override;
 
-    static const int IO_BLOCK_SIZE = 1024*1024*4;
 private:
     QString removeProtocolPrefix(const QString& url);
 private:
@@ -49,8 +48,6 @@ private:
     float m_storageBitrateCoeff;
 
     bool isStorageDirMounted();
-    //!Reads mount points (local dirs) from /etc/fstab or /etc/mtab
-    bool readTabFile( const QString& filePath, QStringList* const mountPoints );
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

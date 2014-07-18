@@ -1,8 +1,8 @@
 #include "sync_dialog_display.h"
 #include "export/sign_helper.h"
 #include "utils/common/synctime.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
+#include "plugins/resource/avi/avi_archive_delegate.h"
 
 QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource): 
     QnCamDisplay(resource, 0),
@@ -34,7 +34,7 @@ void QnSignDialogDisplay::finilizeSign()
     {
         QnAviArchiveDelegate* aviFile = dynamic_cast<QnAviArchiveDelegate*> (m_reader->getArchiveDelegate());
         if (aviFile) {
-            const char* signPattern = aviFile->getTagValue(QnAviArchiveDelegate::Tag_Signature);
+            const char* signPattern = aviFile->getTagValue(QnAviArchiveDelegate::SignatureTag);
             if (signPattern) 
             {
                 QByteArray baPattern = QByteArray(signPattern).trimmed();
@@ -61,7 +61,7 @@ void QnSignDialogDisplay::finilizeSign()
     emit gotSignature(calculatedSign, signFromPicture);
 }
 
-bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
+bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
     QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (data->dataProvider);
     if (reader)
@@ -98,9 +98,9 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
     {
 #ifndef SIGN_FRAME_ENABLED
         // update digest from current frame
-        if (media && media->data.size() > 4) {
-            const quint8* data = (const quint8*) media->data.data();
-            QnSignHelper::updateDigest(media->context->ctx(), m_mdctx, data, media->data.size());
+        if (media && media->dataSize() > 4) {
+            const quint8* data = (const quint8*) media->data();
+            QnSignHelper::updateDigest(media->context->ctx(), m_mdctx, data, media->dataSize());
         }
 #else
         // update digest from previous frames because of last frame it is sign frame itself

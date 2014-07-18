@@ -1,4 +1,3 @@
-
 #ifndef EC_API_H
 #define EC_API_H
 
@@ -22,7 +21,9 @@
 #include <nx_ec/data/api_server_info_data.h>
 #include <nx_ec/data/api_email_data.h>
 #include <nx_ec/data/api_server_alive_data.h>
+#include <nx_ec/data/api_time_data.h>
 
+#include "ec_api_fwd.h"
 
 class QnRestProcessorPool;
 class QnUniversalTcpListener;
@@ -34,29 +35,8 @@ class QnUniversalTcpListener;
 */
 namespace ec2
 {
-    struct QnPeerInfo {
-        enum Type {
-            Server,
-            DesktopClient,
-            AndroidClient
-
-        };
-
-        bool isClient() const {
-            return peerType == DesktopClient || peerType == AndroidClient;
-        }
-
-        QnId id;
-        Type peerType;
-
-        QnPeerInfo(QnId id, Type peerType): id(id), peerType(peerType) {}
-    };
-
-    typedef QSet<QnId> QnPeerSet;
-
     struct QnFullResourceData
     {
-        ApiServerInfoData serverInfo;
         QnResourceTypeList resTypes;
         QnResourceList resources;
         QnBusinessEventRuleList bRules; // TODO: #Elric #EC2 rename
@@ -174,7 +154,6 @@ namespace ec2
         virtual int save( const QnId& resourceId, const QnKvPairList& kvPairs, bool isPredefinedParams, impl::SaveKvPairsHandlerPtr handler ) = 0;
         virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractResourceManager> AbstractResourceManagerPtr;
 
 
     class AbstractMediaServerManager
@@ -233,7 +212,6 @@ namespace ec2
         virtual int save( const QnMediaServerResourcePtr&, impl::SaveServerHandlerPtr handler ) = 0;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractMediaServerManager> AbstractMediaServerManagerPtr;
 
 
     /*!
@@ -351,7 +329,7 @@ namespace ec2
         virtual int getBookmarkTags(impl::GetCameraBookmarkTagsHandlerPtr handler) = 0;
         virtual int removeBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) = 0;
     };
-    typedef std::shared_ptr<AbstractCameraManager> AbstractCameraManagerPtr;
+
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -395,7 +373,7 @@ namespace ec2
         virtual int getLicenses( impl::GetLicensesHandlerPtr handler ) = 0;
         virtual int addLicenses( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractLicenseManager> AbstractLicenseManagerPtr;
+
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -423,28 +401,6 @@ namespace ec2
             return impl::doSyncCall<impl::GetBusinessRulesHandler>( std::bind(fn, this, _1), businessEventList );
         }
 
-        //!Test if email settings are valid
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int testEmailSettings( const QnEmail::Settings& settings, TargetType* target, HandlerType handler ) {
-            return testEmailSettings( settings, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        /*!
-            \param to Destination address list
-            \param timeout TODO
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int sendEmail(
-            const ApiEmailData& data,
-            TargetType* target, HandlerType handler )
-        {
-            return sendEmail( data, 
-                std::static_pointer_cast<impl::SimpleHandler>(
-                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
         /*!
             \param handler Functor with params: (ErrorCode)
         */
@@ -490,15 +446,13 @@ namespace ec2
 
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
-        virtual int testEmailSettings( const QnEmail::Settings& settings, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int sendEmail(const ApiEmailData& data, impl::SimpleHandlerPtr handler ) = 0;
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) = 0;
         virtual int deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler ) = 0;
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;
         virtual int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractBusinessEventManager> AbstractBusinessEventManagerPtr;
+
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -551,7 +505,7 @@ namespace ec2
         virtual int save( const QnUserResourcePtr& resource, impl::AddUserHandlerPtr handler ) = 0;
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractUserManager> AbstractUserManagerPtr;
+
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -596,7 +550,7 @@ namespace ec2
         virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) = 0;
         virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractLayoutManager> AbstractLayoutManagerPtr;
+    
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -648,14 +602,6 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int sendInstanceId(const QUuid& guid, TargetType* target, HandlerType handler ) {
-            return sendInstanceId(guid, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
     signals:
         void addedOrUpdated(const QnVideoWallResourcePtr &videowall);
         void removed(const QUuid &id);
@@ -667,9 +613,7 @@ namespace ec2
         virtual int remove( const QnId& id, impl::SimpleHandlerPtr handler ) = 0;
 
         virtual int sendControlMessage(const QnVideoWallControlMessage& message, impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendInstanceId(const QUuid& guid, impl::SimpleHandlerPtr handler) = 0;
     };
-    typedef std::shared_ptr<AbstractVideowallManager> AbstractVideowallManagerPtr;
 
 
     /*!
@@ -726,7 +670,7 @@ namespace ec2
         virtual int deleteStoredFile( const QString& filename, impl::SimpleHandlerPtr handler ) = 0;
         virtual int listDirectory( const QString& folderName, impl::ListDirectoryHandlerPtr handler ) = 0;
     };
-    typedef std::shared_ptr<AbstractStoredFileManager> AbstractStoredFileManagerPtr;
+    
 
     class AbstractUpdatesManager : public QObject {
         Q_OBJECT
@@ -763,7 +707,7 @@ namespace ec2
         virtual int sendUpdateUploadResponce(const QString &updateId, const QnId &peerId, int chunks, impl::SimpleHandlerPtr handler) = 0;
         virtual int installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) = 0;
     };
-    typedef std::shared_ptr<AbstractUpdatesManager> AbstractUpdatesManagerPtr;
+
 
     /*!
         \note All methods are asynchronous if other not specified
@@ -785,6 +729,7 @@ namespace ec2
         virtual void startReceivingNotifications() = 0;
         virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
+        virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager() = 0;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() = 0;
@@ -840,22 +785,6 @@ namespace ec2
                 std::static_pointer_cast<impl::SimpleHandler>(
                     std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        /*!
-            \param handler Functor with params: (ErrorCode, const QnKvPairList&)
-            \return Request id
-        */
-        template<class TargetType, class HandlerType> int getSettingsAsync( TargetType* target, HandlerType handler ) {
-            return getSettingsAsync( std::static_pointer_cast<impl::GetSettingsHandler>(
-                std::make_shared<impl::CustomGetSettingsHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int saveSettingsAsync( const QnKvPairList& kvPairs, TargetType* target, HandlerType handler ) {
-            return saveSettingsAsync( kvPairs, 
-                std::static_pointer_cast<impl::SimpleHandler>(
-                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
 
         //!Cancel running async request
         /*!
@@ -875,7 +804,7 @@ namespace ec2
             \param cameraHistoryItems
         */
         void initNotification(QnFullResourceData fullData);
-        void runtimeInfoChanged(const ec2::ApiServerInfoData& runtimeInfo);
+        void runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo);
 
         void remotePeerFound(ApiPeerAliveData data, bool isProxy);
         void remotePeerLost(ApiPeerAliveData data, bool isProxy);
@@ -888,11 +817,8 @@ namespace ec2
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) = 0;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) = 0;
         virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) = 0;
-        virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
     };  
 
-    typedef std::shared_ptr<AbstractECConnection> AbstractECConnectionPtr;
 
     struct ResourceContext
     {
@@ -923,8 +849,15 @@ namespace ec2
         \note All methods are asynchronous if other not specified
     */
     class AbstractECConnectionFactory
+    :
+        public QObject
     {
+        Q_OBJECT
+
     public:
+        AbstractECConnectionFactory():
+            m_compatibilityMode(false)
+        {}
         virtual ~AbstractECConnectionFactory() {}
 
         /*!
@@ -949,9 +882,24 @@ namespace ec2
         virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) = 0;
         virtual void setContext( const ResourceContext& resCtx ) = 0;
 
+        /**
+        * \returns                         Whether this connection factory is working in compatibility mode.
+        *                                  In this mode all clients are supported regardless of customization.
+        */
+        bool isCompatibilityMode() const {
+            return m_compatibilityMode;
+        }
+
+        //! \param compatibilityMode         New compatibility mode state.
+        void setCompatibilityMode(bool compatibilityMode) {
+            m_compatibilityMode = compatibilityMode;
+        }
     protected:
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) = 0;
         virtual int connectAsync( const QUrl& addr, impl::ConnectHandlerPtr handler ) = 0;
+
+    private:
+        bool m_compatibilityMode;
     };
 }
 

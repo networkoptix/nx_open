@@ -1,4 +1,6 @@
 syntax: glob
+ecs.db-shm
+ecs.db-wal
 *.cache
 *make.cache
 *-build*
@@ -39,6 +41,7 @@ arm-rpi
 target
 target-isd
 target-isd_s2
+target-rpi
 
 build_environment/python/build_packages/*/build
 build_environment/python/packages/llutil/llutil.egg-info
@@ -233,7 +236,6 @@ android-client/.metadata/*
 android-client/**/bin/**
 android-client/**/*.prefs
 android-client/**/gen/*
-android-client/android-main/libs/*.jar
 
 ios-client/build
 ios-client/dist
@@ -257,7 +259,6 @@ launcher/x64
 launcher/arm
 android-client/android-main/target/**
 android-client/protobuf-classes/target/**
-android-client/android-dw/**
 
 
 axiscamplugin/x86
@@ -290,6 +291,9 @@ edge_firmware/isd/*.tar.gz
 
 android-client/android-main/AndroidManifest.xml
 android-client/android-main/res/**
+
+android-client/android-main/libs/**
+html
 
 webadmin/node_modules
 webadmin/dist

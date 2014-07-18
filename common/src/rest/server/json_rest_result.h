@@ -5,7 +5,7 @@
 #include <QtCore/QString>
 
 #include <utils/serialization/json.h>
-#include <utils/serialization/enum_fwd.h>
+#include <utils/common/model_functions_fwd.h>
 
 // TODO: #MSAPI rename to QnRestResult.
 // 
@@ -40,6 +40,10 @@ public:
     template<class T>
     void setReply(const T &reply) {
         QJson::serialize(reply, &m_reply);
+    }
+
+    void setReply(const QJsonValue &reply) {
+        m_reply = reply;
     }
 
     QN_FUSION_DECLARE_FUNCTIONS(QnJsonRestResult, (json), friend)

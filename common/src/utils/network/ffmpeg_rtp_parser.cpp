@@ -1,8 +1,19 @@
 #include "ffmpeg_rtp_parser.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include "core/datapacket/audio_data_packet.h"
+#include "core/datapacket/video_data_packet.h"
+
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
 
-QnFfmpegRtpParser::QnFfmpegRtpParser(): QnRtpVideoStreamParser(), m_position(AV_NOPTS_VALUE)
+
+QnFfmpegRtpParser::QnFfmpegRtpParser()
+:
+    QnRtpVideoStreamParser(),
+    m_nextDataPacketBuffer(nullptr),
+    m_position(AV_NOPTS_VALUE)
 {
 
 }
@@ -59,7 +70,9 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
 
             if (dataType == QnAbstractMediaData::EMPTY_DATA)
             {
-                m_nextDataPacket = QnEmptyMediaDataPtr(new QnEmptyMediaData());
+                QnEmptyMediaData* emptyMediaData = new QnEmptyMediaData();
+                m_nextDataPacket = QnEmptyMediaDataPtr(emptyMediaData);
+                m_nextDataPacketBuffer = &emptyMediaData->m_data;
                 if (dataSize != 0)
                 {
                     qWarning() << "Unexpected data size for EOF/BOF packet. got" << dataSize << "expected" << 0 << "bytes. Packet ignored.";
@@ -77,13 +90,14 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
                     return result;
 
                 QnMetaDataV1 *metadata = new QnMetaDataV1(); 
-                metadata->data.clear();
+                metadata->m_data.clear();
                 context.clear();
                 metadata->m_duration = ntohl(*((quint32*)payload))*1000;
                 dataSize -= RTSP_FFMPEG_METADATA_HEADER_SIZE;
                 payload += RTSP_FFMPEG_METADATA_HEADER_SIZE; // deserialize video flags
 
                 m_nextDataPacket = QnMetaDataV1Ptr(metadata);
+                m_nextDataPacketBuffer = &metadata->m_data;
             }
             else if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO && dataType == QnAbstractMediaData::VIDEO)
             {
@@ -95,8 +109,9 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
                 dataSize -= RTSP_FFMPEG_VIDEO_HEADER_SIZE;
                 payload += RTSP_FFMPEG_VIDEO_HEADER_SIZE; // deserialize video flags
 
-                QnCompressedVideoData *video = new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, fullPayloadLen, context);
+                QnWritableCompressedVideoData *video = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, fullPayloadLen, context);
                 m_nextDataPacket = QnCompressedVideoDataPtr(video);
+                m_nextDataPacketBuffer = &video->m_data;
                 if (context) 
                 {
                     video->width = context->ctx()->coded_width;
@@ -105,10 +120,11 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
             }
             else if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO && dataType == QnAbstractMediaData::AUDIO)
             {
-                QnCompressedAudioData *audio = new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize); // , context
+                QnWritableCompressedAudioData *audio = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize); // , context
                 audio->context = context;
                 //audio->format.fromAvStream(context->ctx());
                 m_nextDataPacket = QnCompressedAudioDataPtr(audio);
+                m_nextDataPacketBuffer = &audio->m_data;
             }
             else
             {
@@ -141,7 +157,8 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
         }
 
         if (m_nextDataPacket) {
-            m_nextDataPacket->data.write((const char*)payload, dataSize);
+            assert( m_nextDataPacketBuffer );
+            m_nextDataPacketBuffer->write((const char*)payload, dataSize);
         }
 
         if (rtpHeader->marker)
@@ -155,7 +172,10 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
             }
             result = m_nextDataPacket;
             m_nextDataPacket.clear(); // EOF video frame reached
+            m_nextDataPacketBuffer = nullptr;
         }
     }
     return true;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

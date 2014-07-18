@@ -192,11 +192,11 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
     if (mimeData->hasFormat(Qn::NoSceneDrop))
         return false;
 
-    if (!m_videoWallItems.empty()) {
-        context->menu()->trigger(
-            Qn::StartVideoWallControlAction,
-            QnActionParameters(m_videoWallItems)
-        );
+    // try to drop videowall items first
+    if (context->menu()->triggerIfPossible(
+        Qn::StartVideoWallControlAction,
+        QnActionParameters(m_videoWallItems))) {
+        
     }
     else
     if(!m_intoNewLayout) {

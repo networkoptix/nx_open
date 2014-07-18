@@ -3,7 +3,9 @@
 
 #include <nx_ec/ec_api.h>
 
-#include "core/resource/resource.h"
+#include <core/resource/resource.h>
+#include <core/resource/resource_processor.h>
+
 #include "api/app_server_connection.h"
 #include "mutex/distributed_mutex.h"
 
@@ -20,7 +22,7 @@ public:
     virtual ~QnAppserverResourceProcessor();
 
     virtual bool isBusy() const override;
-    void processResources(const QnResourceList &resources);
+    virtual void processResources(const QnResourceList &resources) override;
 
 private:
     ec2::AbstractECConnectionPtr m_ec2Connection;
@@ -40,11 +42,13 @@ private:
     QMap<QString, LockData> m_lockInProgress;
     ec2::QnMutexCameraDataHandler* m_cameraDataHandler;
     QMutex m_mutex;
+
 private:
     void updateResourceStatusAsync(const QnResourcePtr &resource);
     bool isSetStatusInProgress(const QnResourcePtr &resource);
-    void addNewCamera(QnVirtualCameraResourcePtr cameraResource);
-    void addNewCameraInternal(QnVirtualCameraResourcePtr cameraResource);
+    void addNewCamera(const QnVirtualCameraResourcePtr& cameraResource);
+    void addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource);
+
 private slots:
     void at_resource_statusChanged(const QnResourcePtr& resource);
     //void requestFinished(const QnHTTPRawResponse& response, int handle);

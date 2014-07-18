@@ -4,14 +4,11 @@ EXPORTS
 
 FindConfiguredStorages
 GenerateGuidsForServers
-SetMoviesFolder
 CheckPorts
 FindFreePorts
-FixClientFolder
 CopyMediaServerProfile
 CopyAppServerProfile
 CopyAppServerNotificationFiles
-IsClientFolderExists
 DeleteDatabaseFile
 BackupDatabaseFile
 RestoreDatabaseFile

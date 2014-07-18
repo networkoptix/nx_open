@@ -3,6 +3,9 @@
 
 #include <api/app_server_connection.h>
 
+#include "utils/common/id.h"
+#include "utils/network/nettools.h" /* For resolveAddress. */
+
 #include <business/business_aggregation_info.h>
 #include <business/events/reasoned_business_event.h>
 #include <business/events/network_issue_business_event.h>
@@ -14,7 +17,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include "utils/common/id.h"
+
 
 namespace {
     static const QString plainTextDelimiter(lit("\n"));
@@ -43,7 +46,7 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     case BookmarkAction:            return tr("Bookmark");
     case CameraRecordingAction:     return tr("Camera recording");
     case PanicRecordingAction:      return tr("Panic recording");
-    case SendMailAction:            return tr("Send mail");
+    case SendMailAction:            return tr("Send email");
     case DiagnosticsAction:         return tr("Write to log");
     case ShowPopupAction:           return tr("Show notification");
     case PlaySoundAction:           return tr("Repeat sound");
@@ -349,7 +352,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         result = tr("Not enough HDD/SSD speed for recording to %1.").arg(storageUrl);
         break;
     }
-    case StorageNotEnoughSpaceReason: {
+    case StorageFullReason: {
         QString storageUrl = reasonParamsEncoded;
         result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
         break;

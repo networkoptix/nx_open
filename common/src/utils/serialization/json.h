@@ -18,7 +18,6 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
-#include <utils/common/unused.h>
 #include <utils/fusion/fusion_serialization.h>
 #include <utils/serialization/serialization.h>
 

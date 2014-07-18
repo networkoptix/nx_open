@@ -7,7 +7,7 @@
 #include "utils/network/aio/aioservice.h"
 #include "utils/common/systemerror.h"
 #include "transaction_log.h"
-#include "transaction_transport_serializer.h"
+#include <transaction/chunked_transfer_encoder.h>
 #include "common/common_module.h"
 
 namespace ec2
@@ -19,7 +19,7 @@ QSet<QUuid> QnTransactionTransport::m_existConn;
 QnTransactionTransport::ConnectingInfoMap QnTransactionTransport::m_connectingConn;
 QMutex QnTransactionTransport::m_staticMutex;
 
-QnTransactionTransport::QnTransactionTransport(const QnPeerInfo &localPeer, const QnPeerInfo &remotePeer, QSharedPointer<AbstractStreamSocket> socket):
+QnTransactionTransport::QnTransactionTransport(const ApiPeerData &localPeer, const ApiPeerData &remotePeer, QSharedPointer<AbstractStreamSocket> socket):
     m_localPeer(localPeer),
     m_remotePeer(remotePeer),
     m_lastConnectTime(0), 
@@ -55,7 +55,7 @@ void QnTransactionTransport::addData(const QByteArray& data)
     QMutexLocker lock(&m_mutex);
     if (m_dataToSend.isEmpty() && m_socket)
         aio::AIOService::instance()->watchSocket( m_socket, aio::etWrite, this );
-    m_dataToSend.push_back(data);
+    m_dataToSend.push_back(QnChunkedTransferEncoder::serializedTransaction(data));
 }
 
 int QnTransactionTransport::getChunkHeaderEnd(const quint8* data, int dataLen, quint32* const size)
@@ -155,7 +155,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                     readed = m_socket->recv(rBuffer + m_readBufferLen, toRead);
                     if (readed < 1) {
                         // no more data or error
-                        if(readed == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock)
+                        if(readed == 0 || (SystemError::getLastOSErrorCode() != SystemError::wouldBlock && SystemError::getLastOSErrorCode() != SystemError::again))
                             setState(State::Error);
                         return; // no more data
                     }
@@ -167,8 +167,8 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                         if (m_readBufferLen == fullChunkLen) 
                         {
                             QByteArray serializedTran;
-                            TransactionTransportHeader transportHeader;
-                            QnTransactionTransportSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+                            QnTransactionTransportHeader transportHeader;
+                            QnBinaryTransactionSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
                             emit gotTransaction(serializedTran, transportHeader);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
@@ -189,7 +189,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                 const char* dataStart = data.data();
                 int sended = m_socket->send(dataStart + m_sendOffset, data.size() - m_sendOffset);
                 if (sended < 1) {
-                    if(sended == 0 || SystemError::getLastOSErrorCode() != SystemError::wouldBlock) {
+                    if(sended == 0 || (SystemError::getLastOSErrorCode() != SystemError::wouldBlock && SystemError::getLastOSErrorCode() != SystemError::again)) {
                         m_sendOffset = 0;
                         aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite, this );
                         setStateNoLock(State::Error);
@@ -231,14 +231,9 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     }
 
     QUrlQuery q = QUrlQuery(remoteAddr.query());
-    if (m_state == ConnectingStage1)
-    {
-        q.removeQueryItem("hwList");
-        q.addQueryItem("hwList", QnTransactionTransport::encodeHWList(qnLicensePool->allLocalHardwareIds()));
-    }
 
     // Client reconnects to the server
-    if( m_localPeer.peerType == QnPeerInfo::DesktopClient ) {
+    if( m_localPeer.isClient() ) {
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
         setState(ConnectingStage2); // one GET method for client peer is enough
@@ -335,7 +330,6 @@ void QnTransactionTransport::at_httpClientDone(nx_http::AsyncHttpClientPtr clien
 void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr client)
 {
     nx_http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find("guid");
-    nx_http::HttpHeaders::const_iterator itrHwList = client->response()->headers.find("hwList");
 
     if (itrGuid == client->response()->headers.end() || client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
@@ -349,7 +343,6 @@ void QnTransactionTransport::at_responseReceived(nx_http::AsyncHttpClientPtr cli
     if (getState() == ConnectingStage1) {
         bool lockOK = QnTransactionTransport::tryAcquireConnecting(m_remotePeer.id, true);
         if (lockOK) {
-            setHwList(decodeHWList(itrHwList->second));
             setState(ConnectingStage2);
         }
         else {
@@ -386,8 +379,8 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         if (bufferLen >= fullChunkLen)
         {
             QByteArray serializedTran;
-            TransactionTransportHeader transportHeader;
-            QnTransactionTransportSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+            QnTransactionTransportHeader transportHeader;
+            QnBinaryTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
             emit gotTransaction(serializedTran, transportHeader);
 
             buffer += fullChunkLen;
@@ -412,20 +405,9 @@ bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
     return ApiCommand::isSystem(command) ? true : m_writeSync;
 }
 
-QByteArray QnTransactionTransport::encodeHWList(const QList<QByteArray> hwList)
-{
-    QByteArray result;
-    foreach(const QByteArray& hw, hwList) {
-        if (!result.isEmpty())
-            result.append("-");
-        result.append(hw);
-    }
-    return result;
-}
-
-QList<QByteArray> QnTransactionTransport::decodeHWList(const QByteArray data)
-{
-    return data.split('-');
+bool QnTransactionTransport::isReadSync(ApiCommand::Value command) const {
+    // allow to read system command immediately, without tranSyncRequest
+    return ApiCommand::isSystem(command) ? true : m_readSync;
 }
 
 QString QnTransactionTransport::toString( State state )

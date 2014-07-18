@@ -78,6 +78,8 @@ public:
     QnResourceTypeMap getResourceTypeMap() const;
 
     bool isEmpty() const;
+
+    QnResourceTypePtr desktopCameraResourceType() const;
 private:
     mutable QMutex m_mutex;
     QnResourceTypeMap m_resourceTypeMap;

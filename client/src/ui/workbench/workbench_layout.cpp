@@ -6,6 +6,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/videowall_resource.h>
 #include <utils/common/warnings.h>
 #include <ui/common/geometry.h>
 #include <ui/style/globals.h>
@@ -75,12 +76,20 @@ QnLayoutResourcePtr QnWorkbenchLayout::resource() const {
     return synchronizer->resource();
 }
 
-QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnLayoutResourcePtr &resource) {
-    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource);
+QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnLayoutResourcePtr &layout) {
+    QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(layout);
     if(synchronizer == NULL)
         return NULL;
 
     return synchronizer->layout();
+}
+
+QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnVideoWallResourcePtr &videoWall) {
+    foreach (const QnLayoutResourcePtr &layout, qnResPool->getResources().filtered<QnLayoutResource>()) {
+        if (layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>() == videoWall)
+            return QnWorkbenchLayout::instance(layout);
+    }
+    return NULL;
 }
 
 const QString &QnWorkbenchLayout::name() const {
@@ -168,6 +177,10 @@ void QnWorkbenchLayout::submit(const QnLayoutResourcePtr &resource) const {
     }
 
     resource->setItems(datas);
+}
+
+void QnWorkbenchLayout::notifyTitleChanged() {
+    emit titleChanged();
 }
 
 void QnWorkbenchLayout::addItem(QnWorkbenchItem *item) {

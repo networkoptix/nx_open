@@ -2,9 +2,8 @@
 
 #include "utils/common/util.h"
 #include "utils/network/tcp_connection_priv.h"
-#include "platform/core_platform_abstraction.h"
+#include "platform/platform_abstraction.h"
 
-#include "rest/server/rest_server.h"
 
 QnStatisticsRestHandler::QnStatisticsRestHandler() {
     m_monitor = qnPlatform->monitor();
@@ -69,8 +68,7 @@ int QnStatisticsRestHandler::executeGet(const QString& path, const QnRequestPara
     return CODE_OK;
 }
 
-int QnStatisticsRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnStatisticsRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
-    Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }

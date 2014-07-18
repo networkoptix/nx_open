@@ -15,6 +15,7 @@
 
 #include <rest/server/request_handler.h>
 #include <utils/network/http/httptypes.h>
+#include <utils/common/model_functions.h>
 #include <transaction/transaction.h>
 
 #include "server_query_processor.h"
@@ -29,7 +30,7 @@ namespace ec2
         public QnRestRequestHandler
     {
     public:
-        UpdateHttpHandler( Ec2DirectConnectionPtr  connection )
+        UpdateHttpHandler( const Ec2DirectConnectionPtr& connection )
         :
             m_connection( connection )
         {
@@ -50,14 +51,34 @@ namespace ec2
             const QString& /*path*/,
             const QnRequestParamList& /*params*/,
             const QByteArray& body,
+            const QByteArray& srcBodyContentType,
             QByteArray& /*result*/,
             QByteArray& /*contentType*/ )
         {
             QnTransaction<RequestDataType> tran;
-            QnInputBinaryStream<QByteArray> stream( body );
-            if (!QnBinary::deserialize(&stream, &tran))
-                return nx_http::StatusCode::badRequest;
-            
+
+            Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(srcBodyContentType);
+            switch( format )
+            {
+                case Qn::BnsFormat:
+                    tran = QnBinary::deserialized<QnTransaction<RequestDataType>>(body);
+                    break;
+                case Qn::JsonFormat:
+                    tran = QJson::deserialized<QnTransaction<RequestDataType>>(body);
+                    break;
+                //case Qn::UbjsonFormat:
+                //    tran = QnUbjson::deserialized<QnTransaction<RequestDataType>>(body);
+                //    break;
+                //case Qn::CsvFormat:
+                //    tran = QnCsv::deserialized<QnTransaction<RequestDataType>>(body);
+                //    break;
+                //case Qn::XmlFormat:
+                //    tran = QnXml::deserialized<QnTransaction<RequestDataType>>(body);
+                //    break;
+                default:
+                    assert(false);
+            }
+
             // replace client GUID to own GUID (take transaction ownership).
             tran.id.peerID = qnCommon->moduleGUID();
             if (QnDbManager::instance())
@@ -81,7 +102,7 @@ namespace ec2
 
              // update local data
             if (errorCode == ErrorCode::ok)
-                m_connection->triggerNotification(tran);
+                m_connection->notificationManager()->triggerNotification(tran);
 
             return (errorCode == ErrorCode::ok)
                 ? nx_http::StatusCode::ok

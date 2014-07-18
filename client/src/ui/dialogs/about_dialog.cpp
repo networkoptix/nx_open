@@ -48,15 +48,15 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
     if(menu()->canTrigger(Qn::ShowcaseAction)) {
         QPushButton* showcaseButton = new QPushButton(this);
         showcaseButton->setText(action(Qn::ShowcaseAction)->text());
-        connect(showcaseButton, SIGNAL(clicked()), action(Qn::ShowcaseAction), SLOT(trigger()));
+        connect(showcaseButton, &QPushButton::clicked, action(Qn::ShowcaseAction), &QAction::trigger);
         ui->buttonBox->addButton(showcaseButton, QDialogButtonBox::HelpRole);
     }
 
     m_copyButton = new QPushButton(this);
     ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);
 
-    connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    connect(m_copyButton, SIGNAL(clicked()), this, SLOT(at_copyButton_clicked()));
+    connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
+    connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
 
     retranslateUi();
 }

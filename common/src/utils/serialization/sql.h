@@ -205,7 +205,7 @@ namespace QnSqlDetail {
             return true;
         }
 
-        template<class T, class Access, class Member>
+        template<class T, class Access>
         bool operator()(T &target, const Access &access, int index, const QnFusion::member_setter_tag &) const {
             using namespace QnFusion;
 

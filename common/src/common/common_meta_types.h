@@ -5,7 +5,7 @@
 #include <QtCore/QMetaType>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QAuthenticator>
-#include "nx_ec/ec_api.h"
+
 
 // TODO: #Elric move to model functions?
 /**

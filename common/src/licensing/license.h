@@ -13,7 +13,9 @@
 #include <QtCore/QTextStream>
 
 #include "core/resource/resource_fwd.h"
+#include "utils/common/latin1_array.h"
 #include "utils/common/id.h"
+#include "nx_ec/data/api_fwd.h"
 
 #ifdef __APPLE__
 #undef verify
@@ -54,7 +56,7 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(const QList<QByteArray> &hardwareIds, const QString &brand, ErrorCode* errCode = 0) const;
+    bool isValid(ErrorCode* errCode = 0, bool isNewLicense = false) const;
 
     static QString errorMessage(ErrorCode errCode);
 
@@ -117,6 +119,8 @@ private:
         QByteArray* const v1LicenseBlock,
         QByteArray* const v2LicenseBlock );
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
+
+    QUuid findRuntimeDataByLicense() const;
 };
 
 Q_DECLARE_METATYPE(QnLicensePtr)
@@ -175,21 +179,8 @@ public:
     void reset();
     bool isEmpty() const;
 
-    void setMainHardwareIds(const QList<QByteArray>& hardwareIds);
     QList<QByteArray> mainHardwareIds() const;
-
-    void setCompatibleHardwareIds(const QList<QByteArray>& hardwareIds);
     QList<QByteArray> compatibleHardwareIds() const;
-
-    QList<QByteArray> allHardwareIds() const;
-    QList<QByteArray> allLocalHardwareIds() const;
-
-    QMap<QnId, QList<QByteArray>> remoteHardwareIds() const;
-    QList<QByteArray> allRemoteHardwareIds() const;
-    void setRemoteHardwareIds(const QMap<QnId, QList<QByteArray>>& hardwareIds);
-    void addRemoteHardwareIds(const QnId& peer, const QList<QByteArray>& hardwareIds);
-    void removeRemoteHardwareIds(const QnId& peer);
-
     QByteArray currentHardwareId() const;
     bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
 signals:
@@ -202,15 +193,9 @@ private:
     bool isLicenseMatchesCurrentSystem(const QnLicensePtr &license);
     bool addLicense_i(const QnLicensePtr &license);
     bool addLicenses_i(const QnLicenseList &licenses);
-    void updateRemoteIdList();
 private:
-    QList<QByteArray> m_mainHardwareIds;
-    QList<QByteArray> m_compatibleHardwareIds;
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
-
-    QList<QByteArray> m_remoteHardwareIds;
-    QMap<QnId, QList<QByteArray>> m_remoteHardwareIdsMap;
 };
 
 #define qnLicensePool QnLicensePool::instance()

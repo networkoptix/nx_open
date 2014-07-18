@@ -17,7 +17,10 @@ typedef __m128 simd128;
 typedef int32x4_t simd128i;
 typedef uint32x4_t simd128;
 #else
-#warning "Target CPU has no SIMD extension or it is not supported - using C fallback routines"
+//#ifndef SIMD_WARNING_ISSUED
+//#define SIMD_WARNING_ISSUED
+//#warning "Target CPU has no SIMD extension or it is not supported - using C fallback routines"
+//#endif
 
 typedef struct
 {

@@ -7,7 +7,7 @@
 #include <api/global_settings.h>
 
 QnCameraManagementWidget::QnCameraManagementWidget(QWidget *parent):
-    QWidget(parent),
+    QnAbstractPreferencesWidget(parent),
     ui(new Ui::CameraManagementWidget)
 {
     ui->setupUi(this);

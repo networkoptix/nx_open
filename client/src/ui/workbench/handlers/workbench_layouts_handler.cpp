@@ -93,6 +93,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout) {
         QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
         exportHandler->saveLocalLayout(layout, isReadOnly, true); // overwrite layout file
     } else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
+        //TODO: #GDM #VW #LOW refactor common code to common place
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout, [this, layout](int reqId, ec2::ErrorCode errorCode) {
             snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
             at_layouts_saved(static_cast<int>(errorCode), QnResourceList() << layout, reqId);           
@@ -123,24 +124,38 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     }
 
     const QnResourcePtr layoutOwnerUser = layout->getParentResource();
+    bool hasSavePermission = accessController()->hasPermissions(layout, Qn::SavePermission);
 
     QString name = menu()->currentParameters(sender()).argument<QString>(Qn::ResourceNameRole).trimmed();
     if(name.isEmpty()) {
         QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, mainWindow()));
         dialog->setWindowTitle(tr("Save Layout As"));
         dialog->setText(tr("Enter layout name:"));
-        dialog->setName(layout->getName());
+
+        QString proposedName = hasSavePermission
+            ? layout->getName()
+            : generateUniqueLayoutName(context()->user(), layout->getName(), layout->getName() + lit(" %1"));
+
+        dialog->setName(proposedName);
         setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
 
         QMessageBox::Button button = QMessageBox::Cancel;
         do {
-            dialog->exec();
+            if (!dialog->exec())
+                return;
+
             if(dialog->clickedButton() != QDialogButtonBox::Save)
                 return;
+
             name = dialog->name();
 
             // that's the case when user press "Save As" and enters the same name as this layout already has
-            if (name == layout->getName() && user == layoutOwnerUser) {
+            if (name == layout->getName() && user == layoutOwnerUser && hasSavePermission) {
+                if(snapshotManager()->isLocal(layout)) {
+                    saveLayout(layout);
+                    return;
+                }
+
                 switch (askOverrideLayout(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel, QMessageBox::Yes)) {
                 case QMessageBox::Cancel:
                     return;
@@ -152,14 +167,17 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                 }
             }
 
-            QnLayoutResourceList existing = alreadyExistingLayouts(name, user, layout);
+            /* Check if we have rights to overwrite the layout */
+            QnLayoutResourcePtr excludingSelfLayout = hasSavePermission ? layout : QnLayoutResourcePtr();
+            QnLayoutResourceList existing = alreadyExistingLayouts(name, user, excludingSelfLayout);
             if (!canRemoveLayouts(existing)) {
                 QMessageBox::warning(
                     mainWindow(),
                     tr("Layout already exists"),
                     tr("Layout with the same name already exists and you do not have the rights to overwrite it.")
                 );
-                return;
+                dialog->setName(proposedName);
+                continue;
             }
 
             button = QMessageBox::Yes;
@@ -409,6 +427,7 @@ void QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
 
         if (!videowallReviewResources.isEmpty()) {
             foreach(const QnLayoutResourcePtr &layout, videowallReviewResources) {
+                //TODO: #GDM #VW #LOW refactor common code to common place
                 if (!context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout, [this, layout, counter](int reqId, ec2::ErrorCode errorCode) {
                     Q_UNUSED(reqId);
                     snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);

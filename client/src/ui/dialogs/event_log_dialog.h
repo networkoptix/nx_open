@@ -28,7 +28,7 @@ class QnEventLogDialog: public QnButtonBoxDialog, public QnWorkbenchContextAware
     typedef QnButtonBoxDialog base_type;
 
 public:
-    explicit QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context);
+    explicit QnEventLogDialog(QWidget *parent);
     virtual ~QnEventLogDialog();
 
     void disableUpdateData();

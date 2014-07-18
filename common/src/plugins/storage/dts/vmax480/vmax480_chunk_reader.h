@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_VMAX
 
-#include "plugins/resources/archive/abstract_archive_delegate.h"
+#include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "vmax480_stream_fetcher.h"
 #include "utils/common/long_runnable.h"
 #include "recording/time_period_list.h"
@@ -13,7 +13,7 @@ class QnVMax480ChunkReader: public  QnLongRunnable, public QnVmax480DataConsumer
 {
     Q_OBJECT;
 public:
-    QnVMax480ChunkReader(QnResourcePtr res);
+    QnVMax480ChunkReader(const QnResourcePtr& res);
     virtual ~QnVMax480ChunkReader();
 
     virtual void onGotArchiveRange(quint32 startDateTime, quint32 endDateTime) override;

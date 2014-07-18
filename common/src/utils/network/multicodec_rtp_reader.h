@@ -1,6 +1,8 @@
 #ifndef __MULTI_CODEC_RTP_READER__
 #define __MULTI_CODEC_RTP_READER__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <vector>
 
 #include "core/dataprovider/abstract_media_stream_provider.h"
@@ -42,7 +44,7 @@ private:
     enum {BLOCK_SIZE = 1460};
 
 public:
-    QnMulticodecRtpReader( QnResourcePtr res );
+    QnMulticodecRtpReader( const QnResourcePtr& res );
     virtual ~QnMulticodecRtpReader();
 
     //!Implementation of QnAbstractMediaStreamProvider::getNextData
@@ -80,7 +82,7 @@ private:
 
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
-
+    void at_propertyChanged(const QnResourcePtr & res, const QString & key);
 private:
     RTPSession m_RtpSession;
     RTPIODevice* m_videoIO;
@@ -101,5 +103,7 @@ private:
     bool m_gotSomeFrame;
     QnResource::ConnectionRole m_role;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //__MULTI_CODEC_RTP_READER__

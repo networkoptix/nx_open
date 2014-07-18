@@ -17,7 +17,7 @@ namespace {
 
 QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent):
     QObject(parent),
-    m_state(INITIAL),
+    m_state(Initial),
     m_startTime(0),
     m_timeout(defaultAutoTesterTimeout),
     m_allTests(0),
@@ -35,9 +35,9 @@ QnAutoTester::QnAutoTester(int &argc, char **argv, QObject *parent):
     bool valid = parser.parse(argc, argv, stderr);
     if(valid) {
         if(!m_resourceSearchString.isEmpty())
-            m_allTests |= RESOURCE_SUBSTRING;
+            m_allTests |= ResourceSubstring;
     } else {
-        m_state = INVALID;
+        m_state = Invalid;
         showHelp = true;
     }
 
@@ -55,12 +55,12 @@ QnAutoTester::~QnAutoTester() {
 }
 
 void QnAutoTester::start() {
-    if(m_state != INITIAL) {
+    if(m_state != Initial) {
         qnWarning("Cannot start auto tester that is not in its initial state.");
         return;
     }
 
-    m_state = RUNNING;
+    m_state = Running;
 
     m_timer = new QTimer(this);
     m_timer->setInterval(defaultTestPeriod);
@@ -76,7 +76,7 @@ bool QnAutoTester::needsTesting(Test test) {
 }
 
 void QnAutoTester::at_timer_timeout() {
-    if(needsTesting(RESOURCE_SUBSTRING))
+    if(needsTesting(ResourceSubstring))
         testResourceSubstring();
 
     m_succeeded = m_successfulTests == m_allTests;
@@ -85,11 +85,11 @@ void QnAutoTester::at_timer_timeout() {
         if(m_succeeded) {
             m_message = tr("All tests completed successfully.\n");
         } else {
-            if(needsTesting(RESOURCE_SUBSTRING))
+            if(needsTesting(ResourceSubstring))
                 m_message += tr("Test for resource substring '%1' failed.\n").arg(m_resourceSearchString);
         }
 
-        m_state = FINISHED;
+        m_state = Finished;
         m_timer->stop();
         emit finished();
     }
@@ -98,7 +98,7 @@ void QnAutoTester::at_timer_timeout() {
 void QnAutoTester::testResourceSubstring() {
     foreach(const QnResourcePtr &resource, qnResPool->getResources()) {
         if(resource->getName().contains(m_resourceSearchString)) {
-            m_successfulTests |= RESOURCE_SUBSTRING;
+            m_successfulTests |= ResourceSubstring;
             return;
         }
     }

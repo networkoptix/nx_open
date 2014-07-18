@@ -15,6 +15,10 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_bookmark.h>
 
+#include <core/ptz/ptz_preset.h>
+#include <core/ptz/ptz_tour.h>
+#include <core/ptz/ptz_data.h>
+
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/common/request_param.h>
@@ -27,6 +31,8 @@
 
 #include "network_proxy_factory.h"
 #include "session_manager.h"
+#include "media_server_reply_processor.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -69,6 +75,7 @@ namespace {
         (BookmarkUpdateObject,     "cameraBookmarks/update")
         (BookmarkDeleteObject,     "cameraBookmarks/delete")
         (BookmarksGetObject,       "cameraBookmarks/get")
+        (TestEmailSettingsObject,  "testEmailSettings")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -223,6 +230,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     case TimeObject:
         processJsonReply<QnTimeReply>(this, response, handle);
         break;
+    case TestEmailSettingsObject:
+        processJsonReply<QnTestEmailSettingsReply>(this, response, handle);
+        break;
     case CameraAddObject:
         emitFinished(this, response.status, handle);
         break;
@@ -312,7 +322,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
 // -------------------------------------------------------------------------- //
 // QnMediaServerConnection
 // -------------------------------------------------------------------------- //
-QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QString &videoWallKey, QObject *parent):
+QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver, const QUuid &videowallGuid, QObject *parent):
     base_type(parent),
     m_proxyPort(0)
 {
@@ -321,8 +331,8 @@ QnMediaServerConnection::QnMediaServerConnection(QnMediaServerResource* mserver,
 
     QnRequestHeaderList extraHeaders;
     extraHeaders.insert(lit("x-server-guid"), mserver->getId().toString());
-    if (!videoWallKey.isEmpty())
-        extraHeaders.insert(lit("X-NetworkOptix-VideoWall"), videoWallKey);
+    if (!videowallGuid.isNull())
+        extraHeaders.insert(lit("X-NetworkOptix-VideoWall"), videowallGuid.toString());
     setExtraHeaders(extraHeaders);
 }
 
@@ -661,6 +671,15 @@ int QnMediaServerConnection::ptzGetDataAsync(const QnNetworkResourcePtr &camera,
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QnTimeReply), target, slot);
+}
+
+int QnMediaServerConnection::testEmailSettingsAsync(const QnEmail::Settings &settings, QObject *target, const char *slot) 
+{
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
+    ec2::ApiEmailSettingsData data;
+    ec2::fromResourceToApi(settings, data);
+    return sendAsyncPostRequest(TestEmailSettingsObject, headers, QnRequestParamList(), QJson::serialized(data), QN_STRINGIZE_TYPE(QnTestEmailSettingsReply), target, slot);
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(

@@ -4,6 +4,10 @@
 
 #include "utils/common/log.h"
 
+namespace {
+    const QString desktopCameraTypeName = lit("SERVER_DESKTOP_CAMERA");
+}
+
 QnResourceType::QnResourceType()
     : m_isCameraSet(false)
 {
@@ -185,7 +189,7 @@ QnId QnResourceTypePool::getResourceTypeId(const QString& manufacture, const QSt
     QMutexLocker lock(&m_mutex);
     foreach(QnResourceTypePtr rt, m_resourceTypeMap)
     {
-        //cl_log.log(rt->getName(), cl_logALWAYS); //debug
+        //NX_LOG(rt->getName(), cl_logALWAYS); //debug
 
         if (rt->getName() == name && rt->getManufacture()==manufacture)
             return rt->getId();
@@ -233,4 +237,14 @@ QnResourceTypePool::QnResourceTypeMap QnResourceTypePool::getResourceTypeMap() c
     QMutexLocker lock(&m_mutex);
 
     return QnResourceTypeMap(m_resourceTypeMap);
+}
+
+QnResourceTypePtr QnResourceTypePool::desktopCameraResourceType() const {
+    QMutexLocker lock(&m_mutex);
+    for(QnResourceTypeMap::const_iterator itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
+    {
+        if (itr.value()->getName() == desktopCameraTypeName)
+            return itr.value();
+    }
+    return QnResourceTypePtr();
 }

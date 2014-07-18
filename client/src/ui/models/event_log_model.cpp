@@ -14,7 +14,7 @@
 #include "business/business_strings_helper.h"
 #include "client/client_globals.h"
 #include <utils/math/math.h>
-#include "device_plugins/server_camera/server_camera.h"
+#include <plugins/resource/server_camera/server_camera.h>
 #include "client/client_settings.h"
 #include <ui/common/ui_resource_name.h>
 

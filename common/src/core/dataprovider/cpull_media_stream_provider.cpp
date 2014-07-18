@@ -1,8 +1,15 @@
-#include "utils/common/sleep.h"
 #include "cpull_media_stream_provider.h"
-#include "../resource/camera_resource.h"
 
-QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(QnResourcePtr dev ):
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <utils/common/sleep.h>
+#include <utils/common/log.h>
+
+#include <core/datapacket/video_data_packet.h>
+#include <core/resource/camera_resource.h>
+
+
+QnClientPullMediaStreamProvider::QnClientPullMediaStreamProvider(const QnResourcePtr& dev ):
     QnLiveStreamProvider(dev),
     m_fpsSleep(100*1000)
 {
@@ -22,7 +29,8 @@ void QnClientPullMediaStreamProvider::run()
 
     int numberOfChnnels = 1;
 
-    if (QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>())
+    const QnResourcePtr& resource = getResource();
+    if (QnMediaResource* mr = dynamic_cast<QnMediaResource*>(resource.data()))
     {
         numberOfChnnels = mr->getVideoLayout()->channelCount();
     }
@@ -50,7 +58,7 @@ void QnClientPullMediaStreamProvider::run()
             continue;
         }
 
-        QnAbstractMediaDataPtr data = getNextData();
+        const QnAbstractMediaDataPtr& data = getNextData();
 
         if (data==0)
         {
@@ -91,7 +99,8 @@ void QnClientPullMediaStreamProvider::run()
         }
         checkTime(data);
 
-        if (getResource().dynamicCast<QnPhysicalCameraResource>())
+        const QnResourcePtr& resource = getResource();
+        if (dynamic_cast<QnPhysicalCameraResource*>(resource.data()))
         {
             if (getResource()->getStatus() == QnResource::Unauthorized || getResource()->getStatus() == QnResource::Offline)
                 getResource()->setStatus(QnResource::Online);
@@ -136,7 +145,7 @@ void QnClientPullMediaStreamProvider::run()
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
         if (videoData)
         {
-            m_stat[videoData->channelNumber].onData(videoData->data.size());
+            m_stat[videoData->channelNumber].onData(videoData->dataSize());
             if (lp)
                 lp->onGotVideoFrame(videoData);
         }
@@ -144,7 +153,7 @@ void QnClientPullMediaStreamProvider::run()
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
 
-        putData(data);
+        putData(std::move(data));
 
         if (videoData && !isMaxFps())
             m_fpsSleep.sleep(1000*1000/getFps()/numberOfChnnels);
@@ -161,3 +170,5 @@ void QnClientPullMediaStreamProvider::beforeRun()
     QnAbstractMediaStreamDataProvider::beforeRun();
     getResource()->init();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

@@ -48,7 +48,7 @@ void QnProxyReceiverConnection::run()
     */
 
 
-    sendResponse("PROXY", 200, QByteArray());
+    sendResponse(nx_http::StatusCode::ok, QByteArray());
     QString guid = d->request.requestLine.url.path();
     if ((dynamic_cast<QnUniversalTcpListener*>(d->owner))->registerProxyReceiverConnection(guid, d->socket)) {
         d->takeSocketOwnership = true; // remove ownership from socket

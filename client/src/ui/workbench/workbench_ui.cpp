@@ -73,10 +73,6 @@
 #include <utils/common/checked_cast.h>
 #include <client/client_settings.h>
 
-#include "openal/qtvaudiodevice.h"
-#include "core/resource_management/resource_pool.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-
 #include "watchers/workbench_render_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
@@ -351,7 +347,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 #endif
 
     /* Debug overlay */
-    createDebugWidget();
+    //createDebugWidget();
 
     initGraphicsMessageBox();
 
@@ -2435,6 +2431,7 @@ void QnWorkbenchUi::setFpsVisible(bool fpsVisible) {
         return;
 
     m_fpsItem->setVisible(fpsVisible);
+    m_fpsCountingInstrument->setEnabled(fpsVisible);
 
     if(fpsVisible)
         m_fpsCountingInstrument->recursiveEnable();

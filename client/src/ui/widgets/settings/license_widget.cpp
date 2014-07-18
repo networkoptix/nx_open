@@ -12,6 +12,7 @@
 
 #include <utils/common/product_features.h>
 
+#include <ui/common/palette.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
 
@@ -36,10 +37,10 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     ui->serialKeyEdit->setFocus();
     ui->activateFreeLicenseButton->setText(qnProductFeatures().freeLicenseIsTrial ? tr("Activate Trial License") : tr("Activate Free License"));
 
-    ui->manualActivationInfoLabel->setText(tr(
-        "Please send E-Mail with the Serial Key and the Hardware ID provided to <a href=\"mailto:%1\">%1</a>. "
-        "Then we'll send you an Activation Key which should be filled in the field below."
-    ).arg(QLatin1String(QN_LICENSING_MAIL_ADDRESS))); // TODO: #Elric move to product features?
+    ui->manualActivationTextWidget->setText(tr(
+         "Please send email with the Serial Key and the Hardware ID provided to <a href=\"mailto:%1\">%1</a>. "
+         "Then we'll send you an Activation Key which should be filled in the field below."
+     ).arg(QLatin1String(QN_LICENSING_MAIL_ADDRESS))); // TODO: #Elric move to product features?
 
     connect(ui->serialKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
@@ -136,7 +137,7 @@ void QnLicenseWidget::changeEvent(QEvent *event) {
 void QnLicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
     bool isOnline = this->isOnline();
 
-    ui->manualActivationInfoLabel->setVisible(!isOnline);
+    ui->manualActivationTextWidget->setVisible(!isOnline);
     ui->hardwareIdLabel->setVisible(!isOnline);
     ui->hardwareIdEdit->setVisible(!isOnline);
     ui->activationKeyLabel->setVisible(!isOnline);
