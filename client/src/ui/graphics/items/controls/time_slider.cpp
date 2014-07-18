@@ -148,7 +148,6 @@ namespace {
 
     const qreal lineCommentTopMargin = -0.20;
     const qreal lineCommentBottomMargin = 0.05;
-    const qreal lineBarMinChunkSize = 0.51;
 
     /** Minimal color coefficient for the most noticeable chunk color in range */
     const qreal lineBarMinNoticeableFraction = 0.5;
@@ -382,11 +381,11 @@ private:
             rc = rc * (1.0 - lineBarMinNoticeableFraction);
             mc = sum * lineBarMinNoticeableFraction + mc * (1.0 - lineBarMinNoticeableFraction);
             nc = nc * (1.0 - lineBarMinNoticeableFraction);
-        } else if (!qFuzzyIsNull(rc)) {
+        } else if (!qFuzzyIsNull(rc) && rc < sum * lineBarMinNoticeableFraction) {
             /* Make sure recording content is noticeable even if there isn't much of it. 
              * Note that these adjustments don't change sum because mc == 0. */
-            rc = sum * lineBarMinNoticeableFraction + rc * (1.0 - lineBarMinNoticeableFraction);
-            nc = nc * (1.0 - lineBarMinNoticeableFraction);
+            rc = sum * lineBarMinNoticeableFraction;// + rc * (1.0 - lineBarMinNoticeableFraction);
+            nc = sum * (1.0 - lineBarMinNoticeableFraction);
         }
 
         return 
@@ -1854,7 +1853,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
         inside[i] = pos[i] == end[i] ? false : pos[i]->contains(value);
 
     QnTimeSliderChunkPainter chunkPainter(this, painter);
-    chunkPainter.start(value, this->sliderPosition(), m_msecsPerPixel * lineBarMinChunkSize, rect);
+    chunkPainter.start(value, this->sliderPosition(), m_msecsPerPixel, rect);
 
     while(value != maximumValue) {
         qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue, maximumValue};
