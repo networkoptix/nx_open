@@ -365,33 +365,31 @@ bool QnDbManager::init()
 
     if (isMigrationFrom2_2)
         resyncTransactionLog();
-    
-    if (dbJustCreated) {
-        // Set admin user's password
-        ApiUserDataList users;
-        ErrorCode errCode = doQueryNoLock(nullptr, users);
-        if (errCode != ErrorCode::ok) {
-            return false;
-        }
 
-        if (users.empty()) {
-            return false;
-        }
-
-        if (!qnCommon->defaultAdminPassword().isEmpty()) {
-            QnUserResourcePtr userResource(new QnUserResource());
-            fromApiToResource(users[0], userResource);
-            userResource->setPassword(qnCommon->defaultAdminPassword());
-
-            QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser, true);
-            userTransaction.fillSequence();
-            fromResourceToApi(userResource, userTransaction.params);
-
-            executeTransactionInternal(userTransaction);
-            transactionLog->saveTransaction(userTransaction);
-        }
+    // Set admin user's password
+    ApiUserDataList users;
+    ErrorCode errCode = doQueryNoLock(nullptr, users);
+    if (errCode != ErrorCode::ok) {
+        return false;
     }
 
+    if (users.empty()) {
+        return false;
+    }
+
+    if (!qnCommon->defaultAdminPassword().isEmpty()) {
+        QnUserResourcePtr userResource(new QnUserResource());
+        fromApiToResource(users[0], userResource);
+        userResource->setPassword(qnCommon->defaultAdminPassword());
+
+        QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser, true);
+        userTransaction.fillSequence();
+        fromResourceToApi(userResource, userTransaction.params);
+
+        executeTransactionInternal(userTransaction);
+        transactionLog->saveTransaction(userTransaction);
+    }
+        
     QSqlQuery queryCameras(m_sdb);
     // Update cameras status
     // select cameras from media servers without DB and local cameras
