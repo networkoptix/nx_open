@@ -8,6 +8,15 @@ Template: ${deb.customization.company.name}-mediaserver/adminPassword_invalid
 Type: error
 Description: Password can't be empty
 
+Template: ${deb.customization.company.name}-mediaserver/port
+Type: string
+Default: 
+Description: Port:
+
+Template: ${deb.customization.company.name}-mediaserver/port_invalid
+Type: error
+Description: Port is invalid
+
 Template: ${deb.customization.company.name}-mediaserver/transport
 Type: select
 Choices: auto, tcp, udp
@@ -22,3 +31,7 @@ Template: ${deb.customization.company.name}-mediaserver/removeDatabase
 Type: select
 Choices: ${choices}
 Description: Keep the database, remove or revert to previous version (if any)
+
+Template: ${deb.customization.company.name}-mediaserver/allowCameraChanges
+Type: boolean
+Description: Allow system to optimize cameras settings (Recommended)
