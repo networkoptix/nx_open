@@ -149,7 +149,9 @@ namespace {
     const qreal lineCommentTopMargin = -0.20;
     const qreal lineCommentBottomMargin = 0.05;
     const qreal lineBarMinChunkSize = 0.51;
-    const qreal lineBarMinMotionFraction = 0.5;
+
+    /** Minimal color coefficient for the most noticeable chunk color in range */
+    const qreal lineBarMinNoticeableFraction = 0.5;
 
 
     /* Thumbnails bar. */
@@ -371,15 +373,20 @@ private:
         if (!qFuzzyIsNull(bc)) {
             /* Make sure bookmark is noticeable even if there isn't much of it. 
              * Note that these adjustments don't change sum. */
-            rc = rc * (1.0 - lineBarMinMotionFraction);
-            bc = sum * lineBarMinMotionFraction + bc * (1.0 - lineBarMinMotionFraction);
-            nc = nc * (1.0 - lineBarMinMotionFraction);
+            rc = rc * (1.0 - lineBarMinNoticeableFraction);
+            bc = sum * lineBarMinNoticeableFraction + bc * (1.0 - lineBarMinNoticeableFraction);
+            nc = nc * (1.0 - lineBarMinNoticeableFraction);
         } else if (!qFuzzyIsNull(mc)) {
             /* Make sure motion is noticeable even if there isn't much of it. 
              * Note that these adjustments don't change sum. */
-            rc = rc * (1.0 - lineBarMinMotionFraction);
-            mc = sum * lineBarMinMotionFraction + mc * (1.0 - lineBarMinMotionFraction);
-            nc = nc * (1.0 - lineBarMinMotionFraction);
+            rc = rc * (1.0 - lineBarMinNoticeableFraction);
+            mc = sum * lineBarMinNoticeableFraction + mc * (1.0 - lineBarMinNoticeableFraction);
+            nc = nc * (1.0 - lineBarMinNoticeableFraction);
+        } else if (!qFuzzyIsNull(rc)) {
+            /* Make sure recording content is noticeable even if there isn't much of it. 
+             * Note that these adjustments don't change sum because mc == 0. */
+            rc = sum * lineBarMinNoticeableFraction + rc * (1.0 - lineBarMinNoticeableFraction);
+            nc = nc * (1.0 - lineBarMinNoticeableFraction);
         }
 
         return 
