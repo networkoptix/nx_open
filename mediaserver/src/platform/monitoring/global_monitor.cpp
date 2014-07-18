@@ -42,7 +42,8 @@ public:
         totalRamUsage(0.0),
         prevCpuUsageLoggingClock(0),
         prevMemUsageLoggingClock(0),
-        prevHddUsageLoggingClock(0)
+        prevHddUsageLoggingClock(0),
+        prevNetworkUsageLoggingClock(0)
     {
         upTimeTimer.start();
     }
@@ -81,6 +82,7 @@ private:
     qint64 prevCpuUsageLoggingClock;
     qint64 prevMemUsageLoggingClock;
     qint64 prevHddUsageLoggingClock;
+    qint64 prevNetworkUsageLoggingClock;
 
 private:
     Q_DECLARE_PUBLIC(QnGlobalMonitor)
@@ -200,6 +202,16 @@ QList<QnPlatformMonitor::NetworkLoad> QnGlobalMonitor::totalNetworkLoad() {
 
     d->requestCount++;
     d->stopped = false;
+
+    //printing usage to logs, but not frequently than STATISTICS_LOGGING_PERIOD_MS
+    if( d->upTimeTimer.elapsed() - d->prevNetworkUsageLoggingClock > STATISTICS_LOGGING_PERIOD_MS )
+    {
+        NX_LOG(lit("MONITORING. Network usage:"), cl_logALWAYS);
+        for( const NetworkLoad& networkLoad : d->totalNetworkLoad )
+            NX_LOG(lit("    %1. in %2KBps, out %3KBps").arg(networkLoad.interfaceName).arg(networkLoad.bytesPerSecIn / 1024).arg(networkLoad.bytesPerSecOut / 1024), cl_logALWAYS);
+        d->prevNetworkUsageLoggingClock = d->upTimeTimer.elapsed();
+    }
+
     return d->totalNetworkLoad;
 }
 
