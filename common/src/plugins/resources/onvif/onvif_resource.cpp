@@ -185,9 +185,9 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
     if (qAbs(coeff1 - coeff2) > 1e-4) {
 
         if (!s1.isH264 && s2.isH264)
-            coeff2 /= 1.3;
+            coeff2 /= 1.4;
         else if (s1.isH264 && !s2.isH264)
-            coeff1 /= 1.3;
+            coeff1 /= 1.4;
 
         return coeff1 < coeff2; // less coeff is better
     }
