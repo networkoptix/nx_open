@@ -81,5 +81,5 @@ if reg_key_exists(_winreg.HKEY_LOCAL_MACHINE, optix_reg_path):
     print 'Wiping registry'
     reg_delete_key(_winreg.HKEY_LOCAL_MACHINE, optix_reg_path);
 
-print "Installing HD Witness"
-Command('inst.bat')()
+#print "Installing HD Witness"
+#Command('inst.bat')()

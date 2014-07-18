@@ -656,7 +656,7 @@ void initAppServerConnection(QSettings &settings)
         QString staticDBPath = settings.value("staticDataDir").toString();
         if (!staticDBPath.isEmpty()) {
             params.addQueryItem("staticdb_path", staticDBPath);
-	}
+    }
     }
 
     // TODO: Actually appserverPassword is always empty. Remove?
@@ -1101,7 +1101,7 @@ QHostAddress QnMain::getPublicAddress()
 
 void QnMain::run()
 {
-    QFile f(QLatin1String(":/cert.pem"));
+    QFile f(getDataDirectory() + lit("/ssl/cert.pem"));
     if (!f.open(QIODevice::ReadOnly)) {
         qWarning() << "No SSL sertificate for mediaServer!";
     } else {
