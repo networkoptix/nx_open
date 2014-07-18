@@ -480,12 +480,13 @@ public:
 
 
     enum SerializationFormat {
-        JsonFormat      = 0,
-        UbjsonFormat    = 1,
-        BnsFormat       = 2,
-        CsvFormat       = 3,
-        XmlFormat       = 4,
-        Unsupported     = 5
+        JsonFormat          = 0,
+        UbjsonFormat        = 1,
+        BnsFormat           = 2,
+        CsvFormat           = 3,
+        XmlFormat           = 4,
+
+        UnsupportedFormat   = -1
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SerializationFormat)
 

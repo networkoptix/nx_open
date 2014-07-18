@@ -20,7 +20,7 @@ namespace Qn
                 return "application/xml";
             default:
                 assert(false);
-                return "Unsupported";
+                return "unsupported";
         }
     }
 
@@ -39,7 +39,7 @@ namespace Qn
         else
         {
             assert(false);
-            return Unsupported;
+            return UnsupportedFormat;
         }
     }
 }
