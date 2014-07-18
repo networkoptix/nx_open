@@ -120,7 +120,7 @@ private:
         QByteArray* const v2LicenseBlock );
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 
-    ec2::ApiRuntimeData findRuntimeDataByLicense() const;
+    QUuid findRuntimeDataByLicense() const;
 };
 
 Q_DECLARE_METATYPE(QnLicensePtr)

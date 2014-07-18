@@ -72,11 +72,6 @@ void QnTransactionTcpProcessor::run()
 
     ApiPeerData remotePeer(remoteGuid, peerType, dataFormat);
 
-    if (isVideowall) {
-        remotePeer.params["videowallGuid"] = videowallGuid.toString();
-        remotePeer.params["instanceGuid"] = instanceGuid.toString();
-    }
-
     d->response.headers.insert(nx_http::HttpHeader("guid", qnCommon->moduleGUID().toByteArray()));
 
     if (remotePeer.peerType == Qn::PT_Server)

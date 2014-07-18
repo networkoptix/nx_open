@@ -74,11 +74,19 @@ QnLicenseManagerWidget::~QnLicenseManagerWidget()
 }
 
 void QnLicenseManagerWidget::updateLicenses() {
-    // do not re-read licences if we are activating one now
+    // do not re-read licenses if we are activating one now
     if (!m_handleKeyMap.isEmpty())
         return;
 
-    setEnabled(!QnRuntimeInfoManager::instance()->allData().isEmpty());
+    bool connected = false;
+    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems()) {
+        if (info.data.peer.peerType != Qn::PT_Server)
+            continue;
+        connected = true;
+        break;
+    }
+
+    setEnabled(connected);
 
     m_licenses = qnLicensePool->getLicenses();
 
@@ -97,7 +105,7 @@ void QnLicenseManagerWidget::updateLicenses() {
     if (!m_licenses.isEmpty()) {
         QnLicenseUsageHelper helper;
 
-        // TODO: #Elric #TR total mess with numerus forms, and no idea how to fix it in a sane way
+        // TODO: #Elric #TR total mess with numerous forms, and no idea how to fix it in a sane way
 
         if (!helper.isValid()) {
             useRedLabel = true;
@@ -159,6 +167,15 @@ void QnLicenseManagerWidget::showMessage(const QString &title, const QString &me
 }
 
 void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, const QList<QByteArray> &mainHardwareIds, const QList<QByteArray> &compatibleHardwareIds) {
+
+    if (!QnRuntimeInfoManager::instance()->items()->hasItem(qnCommon->remoteGUID())) {
+        emit showMessageLater(tr("License Activation"),
+            tr("Network error has occurred during automatic license activation.\nTry to activate your license manually."),
+            true);
+        ui->licenseWidget->setOnline(false);
+        ui->licenseWidget->setState(QnLicenseWidget::Normal);
+    }
+
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
@@ -197,7 +214,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
         hw++;
     }
 
-    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
+    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->items()->getItem(qnCommon->remoteGUID()).data;
 
     params.addQueryItem(QLatin1String("box"), runtimeData.box);
     params.addQueryItem(QLatin1String("brand"), runtimeData.brand);

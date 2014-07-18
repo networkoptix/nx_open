@@ -19,3 +19,19 @@ void QnVideowallSettingsDialog::loadFromResource(const QnVideoWallResourcePtr &v
 void QnVideowallSettingsDialog::submitToResource(const QnVideoWallResourcePtr &videowall) const {
     videowall->setAutorun(ui->autoRunCheckBox->isChecked());
 }
+
+bool QnVideowallSettingsDialog::isCreateShortcut() const {
+    return ui->shortcutCheckbox->isChecked();
+}
+
+void QnVideowallSettingsDialog::setCreateShortcut(bool value) {
+    ui->shortcutCheckbox->setChecked(value);
+}
+
+bool QnVideowallSettingsDialog::isShortcutsSupported() const {
+    return ui->shortcutCheckbox->isVisible();
+}
+
+void QnVideowallSettingsDialog::setShortcutsSupported(bool value) {
+    ui->shortcutCheckbox->setVisible(value);
+}

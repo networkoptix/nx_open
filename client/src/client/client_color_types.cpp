@@ -120,6 +120,14 @@ QnLicensesListModelColors::QnLicensesListModelColors() {
     expired = QColor(Qt::red);
 }
 
+QnVideowallManageWidgetColors::QnVideowallManageWidgetColors() {
+    desktop = Qt::darkGray;
+    freeSpace = Qt::lightGray;
+    item = QColor(64, 130, 180);
+    text = Qt::white;
+    error = Qt::red;
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
     (json),

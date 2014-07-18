@@ -725,25 +725,36 @@ Qn::ActionVisibility QnNonEmptyVideowallActionCondition::check(const QnResourceL
     return Qn::InvisibleAction;
 }
 
-
 Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourceList &resources) {
-    foreach(const QnResourcePtr &resource, resources) {
-        if(!resource->hasFlags(QnResource::videowall)) 
-            continue;
+    QnLayoutResourceList layouts;
 
-        QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
-        if (!videowall)
-            continue;
+    if(m_current) {
+        if (workbench()->currentLayout()->data().contains(Qn::VideoWallResourceRole))
+            layouts << workbench()->currentLayout()->resource();
+    } else {
+        foreach(const QnResourcePtr &resource, resources) {
+            if(!resource->hasFlags(QnResource::videowall)) 
+                continue;
 
-       // if (videowall->items()->getItems().isEmpty())
-       //     continue; //disable check to avoid unsaved empty layout
+            QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
+            if (!videowall)
+                continue;
 
-        if (!QnWorkbenchLayout::instance(videowall))
-            continue;
-
-        return Qn::EnabledAction;
+            QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(videowall);
+            if (!layout)
+                continue;
+            layouts << layout->resource();
+        }
     }
-    return Qn::InvisibleAction;
+
+    if (layouts.isEmpty())
+       return Qn::InvisibleAction;
+
+    foreach (const QnLayoutResourcePtr &layout, layouts)
+        if(snapshotManager()->isModified(layout))
+            return Qn::EnabledAction;
+
+    return Qn::DisabledAction;
 }
 
 Qn::ActionVisibility QnRunningVideowallActionCondition::check(const QnResourceList &resources) {
@@ -810,9 +821,9 @@ Qn::ActionVisibility QnIdentifyVideoWallActionCondition::check(const QnActionPar
     if (parameters.videoWallItems().size() > 0) {
         // allow action if there is at least one online item
         foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
-            if (index.isNull() || !index.videowall()->items()->hasItem(index.uuid()))
+            if (!index.isValid())
                 continue;
-            if (index.videowall()->items()->getItem(index.uuid()).online)
+            if (index.item().online)
                 return Qn::EnabledAction;
         }
         return Qn::DisabledAction;
@@ -859,11 +870,10 @@ Qn::ActionVisibility QnStartVideoWallControlActionCondition::check(const QnActio
         return Qn::InvisibleAction;
 
     foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
-        if (index.isNull() || !index.videowall()->items()->hasItem(index.uuid()))
+        if (!index.isValid())
             continue;
 
-        auto item = index.videowall()->items()->getItem(index.uuid());
-        if (item.layout.isNull())
+        if (index.item().layout.isNull())
             continue;
 
         return Qn::EnabledAction;

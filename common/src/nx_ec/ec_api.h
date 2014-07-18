@@ -15,7 +15,6 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/videowall_control_message.h>
-#include <core/resource/videowall_instance_status.h>
 
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
@@ -607,7 +606,6 @@ namespace ec2
         void addedOrUpdated(const QnVideoWallResourcePtr &videowall);
         void removed(const QUuid &id);
         void controlMessage(const QnVideoWallControlMessage &message);
-        void instanceStatusChanged(const QnVideowallInstanceStatus &status);
 
     protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) = 0;
@@ -731,6 +729,7 @@ namespace ec2
         virtual void startReceivingNotifications() = 0;
         virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
+        virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager() = 0;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() = 0;

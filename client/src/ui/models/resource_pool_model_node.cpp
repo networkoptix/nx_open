@@ -174,7 +174,7 @@ void QnResourcePoolModelNode::update() {
 
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
         if (!index.isNull()) {
-            QnVideoWallItem item = index.videowall()->items()->getItem(m_uuid);
+            QnVideoWallItem item = index.item();
 
             if (item.online) {
                 m_status = QnResource::Online;

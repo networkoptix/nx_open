@@ -54,6 +54,10 @@ public:
     void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader &header) {
         assert(header.processedPeers.contains(m_localPeer.id));
 #ifdef _DEBUG
+        if (ApiCommand::isSystem(transaction.command) || transaction.persistent) {
+            Q_ASSERT(transaction.id.sequence > 0);
+        }
+
         foreach (const QnId& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());
             Q_ASSERT(peer != qnCommon->moduleGUID());
@@ -80,7 +84,7 @@ public:
     // these getters/setters are using from a single thread
     qint64 lastConnectTime() { return m_lastConnectTime; }
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
-    bool isReadSync() const       { return m_readSync; }
+    bool isReadSync(ApiCommand::Value command) const;
     void setReadSync(bool value)  {m_readSync = value;}
     bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }
