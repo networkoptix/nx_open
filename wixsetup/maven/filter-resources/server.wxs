@@ -7,8 +7,8 @@
 
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="${customization}MediaServerDir" Name="MediaServer">
-                <Directory Id="ServerImageFormats" Name="imageformats">
-                </Directory>
+                <Directory Id="${customization}DbSync22Dir" Name="dbsync-2.2"></Directory>
+                <Directory Id="ServerImageFormats" Name="imageformats"></Directory>
 
                 <Component Id="ServerExecutable">
                     <File Id="ServerExe" Name="mediaserver.exe" Source="$(var.SourceDir)/mediaserver.exe" KeyPath="yes">
@@ -189,6 +189,8 @@
         <Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
+
+            <ComponentGroupRef Id="DbSync22FilesComponent" />
 
             <ComponentRef Id='ServerConfiguration'/>
             <ComponentRef Id='ServerConfigurationPassword'/>

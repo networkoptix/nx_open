@@ -29,6 +29,8 @@
 
         <?define Remove_S1="(INSTALL_SERVER <> 1 AND !ServerFeature = 3)"?>
 
+        <?define InstallServer="&ServerFeature = 3 AND !ServerFeature <> 3"?>
+
         <?define Inst_S1="(INSTALL_SERVER=1 AND !ServerFeature <> 3)"?>
         <?define Inst_C1="(INSTALL_CLIENT=1 AND !ClientFeature <> 3)"?>
         <?define Inst_S0="(NOT $(var.Inst_S1))"?>
@@ -148,6 +150,11 @@
         <!-- Assign default values for Quick installation -->
         <CustomAction Id="AssignClientPort" Property="CLIENT_PORT" Value="[SERVER_PORT]"/>
 
+        <CustomAction Id="CertGenAction_Cmd" Property="CertGenAction"
+                      Value="&quot;[#certgen.exe]&quot; -i" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="CertGenAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="check" Impersonate="no" />
+
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
                       Value="&quot;[${customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
@@ -157,6 +164,13 @@
                       Value="&quot;[${customization}_${parsedVersion.majorVersion}_${parsedVersion.minorVersion}_Dir]$(var.ProductName) Launcher.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseAppLauncherAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
+
+        <CustomAction Id="SyncDatabaseAction_Cmd_WithWarning" Property="SyncDatabaseAction"
+                      Value="&quot;[#dbsync.exe]&quot;;1;!(loc.UpgradeDlg_DatabaseRecovery)" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="SyncDatabaseAction_Cmd_WithoutWarning" Property="SyncDatabaseAction"
+                      Value="&quot;[#dbsync.exe]&quot;;100500;" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="SyncDatabaseAction" BinaryKey="CustomActions.dll" DllEntry="CAQuitExecAndWarn"
+                      Execute="deferred" Return="check" Impersonate="no" />
 
         <CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="yes"
                       Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\${mediaserver.name}\ecs.sqlite"/>
@@ -193,6 +207,19 @@
                 <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyDatabaseFile" After="CopyDatabaseFile_Cmd">
             <![CDATA[ $(var.Inst_S1) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="CertGenAction_Cmd" After="CopyDatabaseFile">
+                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CertGenAction" After="CertGenAction_Cmd">
+                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="SyncDatabaseAction_Cmd_WithWarning" Before="SyncDatabaseAction">
+                <![CDATA[ $(var.VmsUpgrading) AND $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SyncDatabaseAction_Cmd_WithoutWarning" Before="SyncDatabaseAction">
+                <![CDATA[ (NOT $(var.VmsUpgrading)) AND $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="SyncDatabaseAction" After="CertGenAction">
+                <![CDATA[ $(var.InstallServer) AND REMOVE <> "ALL" ]]></Custom>
 
             <Custom Action="DeleteOldMediaserverSettings_Cmd" After="WriteRegistryValues">$(var.VmsUpgrading)</Custom>
             <Custom Action="DeleteOldMediaserverSettings" After="DeleteOldMediaserverSettings_Cmd">$(var.VmsUpgrading)</Custom>

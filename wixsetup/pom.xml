@@ -17,6 +17,7 @@
         <root.dir>${basedir}/..</root.dir>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
+        <DbSync22Dir>${libdir}/${arch}/share/dbsync-2.2</DbSync22Dir>
     </properties>
 
     <build>
@@ -65,11 +66,11 @@
                                 <resource>
                                     <directory>${root.dir}/wixsetup/maven/filter-resources</directory>
                                     <filtering>true</filtering>
-                                </resource>	                                
+                                </resource>                                 
                                 <resource>
                                     <directory>${parent.customization.dir}/wixsetup</directory>
                                     <filtering>false</filtering>
-                                </resource>		                
+                                </resource>                     
                                 <resource>
                                     <directory>${customization.dir}/wixsetup</directory>
                                     <filtering>false</filtering>
@@ -79,7 +80,7 @@
                         </configuration>            
                     </execution>
                 </executions>
-            </plugin>	
+            </plugin>   
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.7</version>
@@ -177,7 +178,7 @@
             </plugin>                    
         </plugins>
     </build>
-    <profiles>	      
+    <profiles>        
         <profile>
             <id>nobeta</id>
             <activation>
@@ -189,6 +190,6 @@
             <properties>
                 <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${install.type}</finalName>    
             </properties>
-        </profile>	  
+        </profile>    
     </profiles>        
 </project>
