@@ -8,7 +8,6 @@ extern "C"
 #include <QtCore/QBuffer>
 
 #include "utils/network/tcp_connection_priv.h"
-#include "rest/server/rest_server.h"
 #include <utils/math/math.h>
 #include "core/resource/network_resource.h"
 #include "core/resource_management/resource_pool.h"
