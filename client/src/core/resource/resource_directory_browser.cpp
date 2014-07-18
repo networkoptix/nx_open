@@ -127,8 +127,11 @@ void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResou
                 findResources(absoluteFilePath, result);
         } else {
             QnResourcePtr res = createArchiveResource(absoluteFilePath);
-            if (res)
+            if (res) {
+                if (res->getId().isNull() && !res->getUniqueId().isEmpty())
+                    res->setId(guidFromArbitraryData(res->getUniqueId().toUtf8())); //create same IDs for the same files
                 result->append(res);
+            }
         }
     }
 }

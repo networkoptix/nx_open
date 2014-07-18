@@ -360,12 +360,8 @@ QMap<int, QnId> QnDbManager::getGuidList(const QString& request)
             result.insert(id, intToGuid(data.toInt()));
         else {
             QnId guid(data.toString());
-            if (guid.isNull()) {
-                QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-                md5Hash.addData(data.toString().toUtf8());
-                QByteArray ha2 = md5Hash.result();
-                guid = QnId::fromRfc4122(ha2);
-            }
+            if (guid.isNull())
+                guid = guidFromArbitraryData(data.toString().toUtf8());
             result.insert(id, guid);
         }
     }
