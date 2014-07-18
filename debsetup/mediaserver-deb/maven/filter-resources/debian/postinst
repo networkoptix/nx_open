@@ -140,10 +140,10 @@ case "$1" in
             $CFG_HELPER adminPassword "$ADMIN_PASSWORD"
         fi
 
-        TRANSPORT="$($CFG_HELPER transport)"
-        [ -z "$ECS_TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT
-        TRANSPORT=$(ask_for_value transport "$TRANSPORT")
-        $CFG_HELPER transport "$TRANSPORT"
+        TRANSPORT="$($CFG_HELPER rtspTransport)"
+        [ -z "$TRANSPORT" ] && TRANSPORT=$TRANSPORT_DEFAULT
+        TRANSPORT=$(ask_for_value rtspTransport "$TRANSPORT")
+        $CFG_HELPER rtspTransport "$TRANSPORT"
 
         SYSTEM_NAME="$($CFG_HELPER systemName)"
         [ -z "$SYSTEM_NAME" ] && SYSTEM_NAME=$SYSTEM_NAME_DEFAULT
