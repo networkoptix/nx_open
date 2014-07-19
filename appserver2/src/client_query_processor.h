@@ -14,17 +14,16 @@
 #include <QtCore/QUrlQuery>
 
 #include <api/app_server_connection.h>
-
+#include <utils/common/concurrent.h>
+#include <utils/common/model_functions.h>
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/network/http/asynchttpclient.h>
-#include <utils/common/concurrent.h>
 
 #include "ec2_thread_pool.h"
-#include "database/db_manager.h"
 #include "rest/request_params.h"
+#include "transaction/binary_transaction_serializer.h"
+#include "transaction/json_transaction_serializer.h"
 #include "transaction/transaction.h"
-#include "transaction/transaction_log.h"
-#include "utils/serialization/binary_functions.h"
 
 
 namespace ec2
@@ -63,13 +62,24 @@ namespace ec2
             requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
 
             QByteArray tranBuffer;
-            QnOutputBinaryStream<QByteArray> outputStream( &tranBuffer );
-            QnBinary::serialize( tran, &outputStream );
+            Qn::SerializationFormat format = Qn::BnsFormat /*Qn::JsonFormat*/;
+            if( format == Qn::BnsFormat )
+                tranBuffer = QnBinary::serialized(tran);
+            else if( format == Qn::JsonFormat )
+                tranBuffer = QJson::serialized(tran);
+            //else if( format == Qn::UbjsonFormat )
+            //    tranBuffer = QnUbjson::serialized(tran);
+            //else if( format == Qn::CsvFormat )
+            //    tranBuffer = QnCsv::serialized(tran);
+            //else if( format == Qn::XmlFormat )
+            //    tranBuffer = QnXml::serialized(tran, lit("reply"));
+            else
+                assert(false);
 
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
             QMutexLocker lk( &m_mutex );
-            if( !httpClient->doPost( requestUrl, "application/octet-stream", tranBuffer ) )
+            if( !httpClient->doPost(requestUrl, Qn::serializationFormatToHttpContentType(format), tranBuffer) )
             {
                 QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
                 QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure ) );

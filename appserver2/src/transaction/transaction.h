@@ -12,6 +12,10 @@
 #endif
 
 #include "utils/serialization/binary.h"
+#include "utils/serialization/json.h"
+#include "utils/serialization/xml.h"
+#include "utils/serialization/csv.h"
+#include "utils/serialization/ubjson.h"
 
 namespace ec2
 {
@@ -171,6 +175,7 @@ namespace ec2
     QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json))
     QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json))
 
+    //Binary format functions for QnTransaction<T>
     template <class T, class Output>
     void serialize(const QnTransaction<T> &transaction,  QnOutputBinaryStream<Output> *stream)
     {
@@ -185,6 +190,26 @@ namespace ec2
             QnBinary::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&
             QnBinary::deserialize(stream, &transaction->params);
     }
+
+
+    //Json format functions for QnTransaction<T>
+    template<class T>
+    void serialize(QnJsonContext* ctx, const QnTransaction<T>& tran, QJsonValue* target)
+    {
+        QJson::serialize(ctx, static_cast<const QnAbstractTransaction&>(tran), target);
+        QJsonObject localTarget = target->toObject();
+        QJson::serialize(ctx, tran.params, "params", &localTarget);
+        *target = localTarget;
+    }
+
+    template<class T>
+    bool deserialize(QnJsonContext* ctx, const QJsonValue& value, QnTransaction<T>* target)
+    {
+        return 
+            QJson::deserialize(ctx, value, static_cast<QnAbstractTransaction*>(target)) &&
+            QJson::deserialize(ctx, value.toObject(), "params", &target->params);
+    }
+
 
     int generateRequestID();
 } // namespace ec2
