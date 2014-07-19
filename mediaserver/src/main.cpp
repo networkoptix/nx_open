@@ -378,7 +378,7 @@ static QStringList listRecordFolders()
         if (GetDriveType(path.toStdWString().c_str()) != DRIVE_FIXED)
             continue;
 
-        folderPaths.append(path + QN_MEDIA_FOLDER_NAME);
+        folderPaths.append(QDir::toNativeSeparators(path) + QN_MEDIA_FOLDER_NAME);
         /*
         int freeSpace = freeGB(path);
 
@@ -434,6 +434,21 @@ QnAbstractStorageResourceList createStorages()
 
 void updateStorages(QnMediaServerResourcePtr mServer)
 {
+    // I've switched all patches to native separator to fix network patches like \\computer\share
+    foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages()) 
+    {
+        QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
+        if (!storage)
+            continue;
+        if (!storage->getUrl().contains("://")) {
+            QString updatedURL = QDir::toNativeSeparators(storage->getUrl());
+            if (updatedURL.endsWith(QDir::separator()))
+                updatedURL.chop(1);
+            storage->setUrl(updatedURL);
+        }
+
+    }
+
     qint64 bigStorageThreshold = 0;
     foreach(QnAbstractStorageResourcePtr abstractStorage, mServer->getStorages()) {
         QnStorageResourcePtr storage = abstractStorage.dynamicCast<QnStorageResource>();
@@ -452,7 +467,7 @@ void updateStorages(QnMediaServerResourcePtr mServer)
         if (available < bigStorageThreshold) {
             if (storage->isUsedForWriting()) {
                 storage->setUsedForWriting(false);
-                qWarning() << "Disable writing to storage" << storage->getUrl() << "because of low storage size";
+                qWarning() << "Disable writing to storage" << storage->getPath() << "because of low storage size";
             }
         }
     }
@@ -1191,6 +1206,7 @@ void QnMain::run()
 
     runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
     runtimeInfo.publicIP = connectInfo.publicIp;
+    runtimeInfo.platform = QN_APPLICATION_PLATFORM;
     qnCommon->setRemoteGUID(connectInfo.ecsGuid);
     QnRuntimeInfoManager::instance()->update(runtimeInfo);
 
@@ -1319,9 +1335,6 @@ void QnMain::run()
     if (needToStop())
         return;
 
-
-    syncStoragesToSettings(m_mediaServer);
-
     do {
         if (needToStop())
             return;
@@ -1332,7 +1345,7 @@ void QnMain::run()
     foreach (QnAbstractStorageResourcePtr storage, m_mediaServer->getStorages())
     {
         qnResPool->addResource(storage);
-        usedPathList << closeDirPath(storage->getUrl());
+        usedPathList << storage->getPath();
         QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
         if (physicalStorage)
             qnStorageMan->addStorage(physicalStorage);

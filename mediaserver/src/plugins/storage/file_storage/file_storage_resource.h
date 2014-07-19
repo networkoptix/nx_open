@@ -41,6 +41,8 @@ public:
     void setStorageBitrateCoeff(float value);
     virtual float getStorageBitrateCoeff() const override;
 
+    virtual void setUrl(const QString& url) override;
+
 private:
     QString removeProtocolPrefix(const QString& url);
 private:

@@ -82,15 +82,6 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnServer::Chunks
     m_lastAddIndex(-1),
     m_lastRecordRecording(false)
 {
-    /*
-    QString devTitleFile = closeDirPath(getDataDirectory()) + QString("record_catalog/media/");
-    devTitleFile += prefixByCatalog(catalog) + "/";
-    devTitleFile += m_macAddress + "/";
-    devTitleFile += QString("title.csv");
-    m_file.setFileName(devTitleFile);
-    QDir dir;
-    dir.mkpath(QnFile::absolutePath(devTitleFile));
-    */
 }
 
 /*
@@ -140,8 +131,9 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk, bool checkDirOnly)
 
     if (!storage->isCatalogAccessible())
         return true; // Can't check if file really exists
-
-    QString prefix = closeDirPath(storage->getUrl()) + prefixByCatalog(m_catalog) + QString('/') + m_macAddress + QString('/');
+    QString path = closeDirPath(storage->getPath());
+    QString separator = getPathSeparator(path);
+    QString prefix = path + prefixByCatalog(m_catalog) + separator + m_macAddress + separator;
 
    
 
@@ -354,7 +346,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(QnStorageResourcePtr s
 QnTimePeriod DeviceFileCatalog::timePeriodFromDir(QnStorageResourcePtr storage, const QString& dirName)
 {
     QnTimePeriod timePeriod;
-    QString sUrl = storage->getUrl();
+    QString sUrl = storage->getPath();
     QStringList folders = dirName.mid(sUrl.size()).split('/').mid(3);
 
     QString timestamp(lit("%1/%2/%3T%4:00:00"));
@@ -458,7 +450,9 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, QnStorageResourceP
 
 void DeviceFileCatalog::readStorageData(QnStorageResourcePtr storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList)
 {
-    QString rootFolder = closeDirPath(storage->getUrl()) + prefixByCatalog(catalog) + QString('/') + m_macAddress;
+    QString path = closeDirPath(storage->getPath());
+    QString separator = getPathSeparator(path);
+    QString rootFolder = path + prefixByCatalog(catalog) + separator + m_macAddress;
     scanMediaFiles(rootFolder, storage, allChunks, emptyFileList);
 }
 
@@ -715,13 +709,16 @@ void DeviceFileCatalog::updateChunkDuration(Chunk& chunk)
 
 QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 {
-    QnResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
+    QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
     if (!storage)
         return QString();
-    return closeDirPath(storage->getUrl()) + 
-                prefixByCatalog(m_catalog) + QString('/') +
-                m_macAddress + QString('/') +
-                QnStorageManager::dateTimeStr(chunk.startTimeMs, chunk.timeZone) + 
+
+    QString base = closeDirPath(storage->getPath());
+    QString separator = getPathSeparator(base);
+    return      base + 
+                prefixByCatalog(m_catalog) + separator +
+                m_macAddress + separator +
+                QnStorageManager::dateTimeStr(chunk.startTimeMs, chunk.timeZone, separator) + 
                 strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 
                 QString(".mkv");
 }

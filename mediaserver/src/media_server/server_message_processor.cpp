@@ -143,9 +143,6 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource) {
     else
         qnResPool->addResource(resource);
 
-    if (isServer && resource->getId() == serverGuid())
-        syncStoragesToSettings(ownMediaServer);
-
 }
 
 void QnServerMessageProcessor::afterRemovingResource(const QnId& id)

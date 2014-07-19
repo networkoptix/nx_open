@@ -52,6 +52,7 @@ QString getParamFromString(const QString &str, const QString &param);
 QString strPadLeft(const QString &str, int len, char ch);
 
 QString closeDirPath(const QString &value);
+QString getPathSeparator(const QString& path);
 
 qint64 getDiskFreeSpace(const QString &root);
 

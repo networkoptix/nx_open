@@ -91,6 +91,19 @@ void QnAbstractStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider
 }
 #endif
 
+QString QnAbstractStorageResource::getPath() const
+{
+    return urlToPath(getUrl());
+}
+
+QString QnAbstractStorageResource::urlToPath(const QString& url)
+{
+    if (!url.contains(lit("://")))
+        return url;
+    else
+        return QUrl(url).path().mid(1);
+}
+
 float QnAbstractStorageResource::getAvarageWritingUsage() const
 {
     return 0.0;

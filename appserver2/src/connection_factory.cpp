@@ -277,7 +277,6 @@ namespace ec2
         connectionInfo->brand = isCompatibilityMode() ? QString() : lit(QN_PRODUCT_NAME_SHORT);
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
         connectionInfo->box = lit(QN_ARM_BOX);
-
         return ErrorCode::ok;
     }
 
