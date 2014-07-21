@@ -72,7 +72,8 @@ public:
     void removeResource(const QnId& resId);
 
 private:
-    QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem, QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, QnResourcePtr actionRes= QnResourcePtr());
+    QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem,
+        QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, const QnResourcePtr& actionRes= QnResourcePtr());
 
     QnId m_id;
 

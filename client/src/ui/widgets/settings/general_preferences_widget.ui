@@ -501,12 +501,6 @@
      <layout class="QVBoxLayout" name="verticalLayout_13">
       <item>
        <widget class="QListWidget" name="networkInterfacesList">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>

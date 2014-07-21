@@ -114,8 +114,6 @@ namespace ec2
                     return "removeVideowall";
                 case videowallControl:
                     return "videowallControl";
-                case videowallInstanceStatus:
-                    return "videowallInstanceStatus";
 
                 case listDirectory:
                     return "listDirectory";
@@ -138,11 +136,6 @@ namespace ec2
                 case getCurrentTime:
                     return "getCurrentTime";
 
-                case getSettings:
-                    return "getSettings";
-                case saveSettings:
-                    return "saveSettings";
-
                 case uploadUpdate:
                     return "uploadUpdate";
                 case uploadUpdateResponce:
@@ -157,8 +150,8 @@ namespace ec2
                 case removeCameraBookmarkTags:
                     return "removeCameraBookmarkTags";
 
-                case getHelp:
-                    return "getHelp";
+                case runtimeInfoChanged:
+                    return "runtimeInfoChanged";
 
                 default:
                     return "unknown " + QString::number((int)val);
@@ -172,6 +165,7 @@ namespace ec2
                     val == unlockRequest ||
                     val == tranSyncRequest ||
                     val == tranSyncResponse ||
+                    val == runtimeInfoChanged ||
                     val == peerAliveInfo;
         }
 
@@ -209,7 +203,7 @@ namespace ec2
         return ++requestID;
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary)(json),   (peerID)(dbID)(sequence))
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary)(json),   (command)(id)(persistent)(timestamp))
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary)(json)(ubj),   (peerID)(dbID)(sequence))
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary)(json)(ubj),   (command)(id)(persistent)(timestamp))
 } // namespace ec2
 

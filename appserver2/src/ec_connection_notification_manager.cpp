@@ -98,6 +98,12 @@ namespace ec2
         }
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiRuntimeData>& tran )
+    {
+        Q_ASSERT(tran.command == ApiCommand::runtimeInfoChanged);
+        emit m_ecConnection->runtimeInfoChanged(tran.params);
+    }
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiMediaServerData>& tran ) {
         m_mediaServerManager->triggerNotification( tran );
     }
@@ -140,6 +146,11 @@ namespace ec2
         return m_layoutManager->triggerNotification( tran );
     }
 
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiStoredFilePath>& tran ) {
+        assert(tran.command == ApiCommand::removeStoredFile);
+        m_storedFileManager->triggerNotification(tran);
+    }
+
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiStoredFileData>& tran ) {
         return m_storedFileManager->triggerNotification( tran );
     }
@@ -154,32 +165,7 @@ namespace ec2
         emit m_ecConnection->panicModeChanged(tran.params.mode);
     }
 
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<QString>& tran ) {
-        switch (tran.command) {
-        case ApiCommand::removeStoredFile:
-            m_storedFileManager->triggerNotification(tran);
-            break;
-        case ApiCommand::installUpdate:
-            m_updatesManager->triggerNotification(tran);
-            break;
-        default:
-            assert(false); // we should never get here
-        }
-    }
-
-    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiResourceParamDataList>& tran ) {
-        if( tran.command == ApiCommand::saveSettings ) {
-            QnKvPairList newSettings;
-            fromApiToResourceList(tran.params, newSettings);
-            emit m_ecConnection->settingsChanged(newSettings);
-        }
-    }
-
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiVideowallControlMessageData>& tran ) {
-        return m_videowallManager->triggerNotification(tran);
-    }
-
-    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiVideowallInstanceStatusData> &tran) {
         return m_videowallManager->triggerNotification(tran);
     }
 
@@ -187,6 +173,11 @@ namespace ec2
     }
 
     void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiEmailData>& /*tran*/ ) {
+    }
+
+    void ECConnectionNotificationManager::triggerNotification( const QnTransaction<ApiUpdateInstallData>& tran ) {
+        assert(tran.command == ApiCommand::installUpdate);
+        m_updatesManager->triggerNotification(tran);
     }
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiUpdateUploadData>& tran ) {

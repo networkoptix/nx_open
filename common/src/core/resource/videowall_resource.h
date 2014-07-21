@@ -8,12 +8,12 @@
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_matrix.h>
-#include <core/resource/resource_item_storage.h>
+#include <utils/common/threadsafe_item_storage.h>
 
 class QnVideoWallResource : public QnResource, 
-    private QnResourceItemStorageNotifier<QnVideoWallItem>,
-    private QnResourceItemStorageNotifier<QnVideoWallPcData>,
-    private QnResourceItemStorageNotifier<QnVideoWallMatrix>
+    private QnThreadsafeItemStorageNotifier<QnVideoWallItem>,
+    private QnThreadsafeItemStorageNotifier<QnVideoWallPcData>,
+    private QnThreadsafeItemStorageNotifier<QnVideoWallMatrix>
 {
     Q_OBJECT
     typedef QnResource base_type;
@@ -21,9 +21,9 @@ class QnVideoWallResource : public QnResource,
 public:
     QnVideoWallResource();
 
-    QnResourceItemStorage<QnVideoWallItem> *items() const;
-    QnResourceItemStorage<QnVideoWallPcData> *pcs() const;
-    QnResourceItemStorage<QnVideoWallMatrix> *matrices() const;
+    QnThreadsafeItemStorage<QnVideoWallItem> *items() const;
+    QnThreadsafeItemStorage<QnVideoWallPcData> *pcs() const;
+    QnThreadsafeItemStorage<QnVideoWallMatrix> *matrices() const;
 
     /** \returns Whether the videowall should be started when the PC boots up. */
     bool isAutorun() const;
@@ -62,9 +62,9 @@ protected:
 private:
     bool m_autorun;
 
-    QScopedPointer<QnResourceItemStorage<QnVideoWallItem> > m_items;
-    QScopedPointer<QnResourceItemStorage<QnVideoWallPcData> > m_pcs;
-    QScopedPointer<QnResourceItemStorage<QnVideoWallMatrix> > m_matrices;
+    QScopedPointer<QnThreadsafeItemStorage<QnVideoWallItem> > m_items;
+    QScopedPointer<QnThreadsafeItemStorage<QnVideoWallPcData> > m_pcs;
+    QScopedPointer<QnThreadsafeItemStorage<QnVideoWallMatrix> > m_matrices;
 };
 
 Q_DECLARE_METATYPE(QnVideoWallResourcePtr)

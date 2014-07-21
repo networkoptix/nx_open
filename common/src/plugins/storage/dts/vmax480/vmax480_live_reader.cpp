@@ -15,6 +15,7 @@ extern "C"
 #include "utils/common/synctime.h"
 
 #include "vmax480_resource.h"
+#include "utils/common/util.h"
 
 
 
@@ -22,7 +23,7 @@ static const QByteArray GROUP_ID("{347E1C92-4627-405d-99B3-5C7EF78B0055}");
 
 // ----------------------------------- QnVMax480LiveProvider -----------------------
 
-QnVMax480LiveProvider::QnVMax480LiveProvider(QnResourcePtr dev ):
+QnVMax480LiveProvider::QnVMax480LiveProvider(const QnResourcePtr& dev ):
     CLServerPushStreamReader(dev),
     m_maxStream(0),
     m_opened(false)

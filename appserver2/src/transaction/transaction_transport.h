@@ -40,13 +40,10 @@ public:
     };
     static QString toString( State state );
 
-    QnTransactionTransport(const QnPeerInfo &localPeer,
-        const QnPeerInfo &remotePeer = QnPeerInfo(QnId(), QnPeerInfo::Server),
+    QnTransactionTransport(const ApiPeerData &localPeer,
+        const ApiPeerData &remotePeer = ApiPeerData(QnId(), Qn::PT_Server),
         QSharedPointer<AbstractStreamSocket> socket = QSharedPointer<AbstractStreamSocket>());
     ~QnTransactionTransport();
-
-    static QByteArray encodeHWList(const QList<QByteArray> hwList);
-    static QList<QByteArray> decodeHWList(const QByteArray data);
 
 signals:
     void gotTransaction(const QByteArray &data, const QnTransactionTransportHeader &transportHeader);
@@ -57,17 +54,25 @@ public:
     void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader &header) {
         assert(header.processedPeers.contains(m_localPeer.id));
 #ifdef _DEBUG
+        if (ApiCommand::isSystem(transaction.command) || transaction.persistent) {
+            Q_ASSERT(transaction.id.sequence > 0);
+        }
+
         foreach (const QnId& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());
             Q_ASSERT(peer != qnCommon->moduleGUID());
         }
 #endif
 
-        switch (m_remotePeer.peerType) {
-        case QnPeerInfo::AndroidClient:
+        switch (m_remotePeer.dataFormat) {
+        case Qn::JsonFormat:
             addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
+        case Qn::BnsFormat:
+            addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            break;
         default:
+            qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
             addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
         }
@@ -77,17 +82,15 @@ public:
     void close();
 
     // these getters/setters are using from a single thread
-    QList<QByteArray> hwList() const { return m_hwList; }
-    void setHwList(const QList<QByteArray>& value) { m_hwList = value; }
     qint64 lastConnectTime() { return m_lastConnectTime; }
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
-    bool isReadSync() const       { return m_readSync; }
+    bool isReadSync(ApiCommand::Value command) const;
     void setReadSync(bool value)  {m_readSync = value;}
     bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }
     QUrl remoteAddr() const       { return m_remoteAddr; }
 
-    QnPeerInfo remotePeer() const { return m_remotePeer; }
+    ApiPeerData remotePeer() const { return m_remotePeer; }
 
     // This is multi thread getters/setters
     void setState(State state);
@@ -98,15 +101,13 @@ public:
     static void connectingCanceled(const QnId& id, bool isOriginator);
     static void connectDone(const QnId& id);
 private:
-    QnPeerInfo m_localPeer;
-    QnPeerInfo m_remotePeer;
+    ApiPeerData m_localPeer;
+    ApiPeerData m_remotePeer;
 
     qint64 m_lastConnectTime;
 
     bool m_readSync;
     bool m_writeSync;
-
-    QList<QByteArray> m_hwList;
 
     mutable QMutex m_mutex;
     QSharedPointer<AbstractStreamSocket> m_socket;

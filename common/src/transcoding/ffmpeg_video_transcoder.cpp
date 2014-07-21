@@ -1,6 +1,8 @@
 
 #include "ffmpeg_video_transcoder.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "core/datapacket/video_data_packet.h"
 #include "decoders/video/ffmpeg.h"
 
@@ -307,3 +309,5 @@ void QnFfmpegVideoTranscoder::addFilter(QnAbstractImageFilter* filter)
     QnVideoTranscoder::addFilter(filter);
     m_decodedVideoFrame->setUseExternalData(false); // do not modify ffmpeg frame buffer
 }
+
+#endif // ENABLE_DATA_PROVIDERS

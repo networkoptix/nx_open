@@ -11,6 +11,8 @@
 #include "utils/common/model_functions.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
 
+//#define TRANSACTION_LOG_DEBUG
+
 namespace ec2
 {
 
@@ -32,7 +34,7 @@ void QnTransactionLog::init()
         while (query.next()) 
         {
             QnTranStateKey key(QUuid::fromRfc4122(query.value(0).toByteArray()), QUuid::fromRfc4122(query.value(1).toByteArray()));
-            m_state.insert(key, query.value(2).toInt());
+            m_state.values.insert(key, query.value(2).toInt());
         }
     }
 
@@ -131,10 +133,12 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
         return ErrorCode::failure;
     }
 
+#ifdef TRANSACTION_LOG_DEBUG
     qDebug() << "add record to transaction log. Transaction=" << toString(tran.command) << "timestamp=" << tran.timestamp << "producedOnCurrentPeer=" << (tran.id.peerID == qnCommon->moduleGUID());
+#endif
 
     QnTranStateKey key(tran.id.peerID, tran.id.dbID);
-    m_state[key] = qMax(m_state[key], tran.id.sequence);
+    m_state.values[key] = qMax(m_state.values[key], tran.id.sequence);
     m_updateHistory[hash] = qMax(m_updateHistory[hash], tran.timestamp);
 
     QMutexLocker lock(&m_timeMutex);
@@ -157,8 +161,8 @@ bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& 
     QReadLocker lock(&m_dbManager->getMutex());
     QnTranStateKey key (tran.id.peerID, tran.id.dbID);
     Q_ASSERT(tran.id.sequence != 0);
-    if (m_state.value(key) >= tran.id.sequence) {
-        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << "because of precessed seq:" << m_state.value(key) << ">=" << tran.id.sequence;
+    if (m_state.values.value(key) >= tran.id.sequence) {
+        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << "because of precessed seq:" << m_state.values.value(key) << ">=" << tran.id.sequence;
         return true;
     }
     QMap<QUuid, qint64>::const_iterator itr = m_updateHistory.find(hash);
@@ -181,13 +185,13 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
 {
     QReadLocker lock(&m_dbManager->getMutex());
 
-    foreach(const QnTranStateKey& key, m_state.keys())
+    foreach(const QnTranStateKey& key, m_state.values.keys())
     {
         QSqlQuery query(m_dbManager->getDB());
         query.prepare("SELECT tran_data FROM transaction_log WHERE peer_guid = ? and db_guid = ? and sequence > ?  order by timestamp, peer_guid, db_guid, sequence");
         query.addBindValue(key.peerID.toRfc4122());
         query.addBindValue(key.dbID.toRfc4122());
-        query.addBindValue(state.value(key));
+        query.addBindValue(state.values.value(key));
         if (!query.exec())
             return ErrorCode::failure;
         
@@ -198,6 +202,11 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     return ErrorCode::ok;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnTranStateKey,    (binary)(json),   (peerID)(dbID))
+#define QN_TRANSACTION_LOG_DATA_TYPES \
+    (QnTranStateKey)\
+    (QnTranState)\
+    (QnTranStateResponse)\
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_TRANSACTION_LOG_DATA_TYPES,  (binary)(json), _Fields)
 
 } // namespace ec2

@@ -7,11 +7,12 @@
 #define SERVER_QUERY_PROCESSOR_H
 
 #include <QtCore/QDateTime>
-#include <QtConcurrent>
 
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/model_functions.h>
+#include <utils/common/concurrent.h>
 
+#include "ec2_thread_pool.h"
 #include "database/db_manager.h"
 #include "managers/aux_manager.h"
 #include "transaction/transaction.h"
@@ -56,8 +57,8 @@ namespace ec2
                 tran.fillSequence();
 
             auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
-                QnScopedThreadRollback ensureFreeThread(1);
-                QtConcurrent::run( std::bind( handler, errorCode ) );
+                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, errorCode ) );
             };
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
@@ -166,8 +167,8 @@ namespace ec2
             bool processMultiTran = false;
 
             auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
-                QnScopedThreadRollback ensureFreeThread(1);
-                QtConcurrent::run( std::bind( handler, errorCode ) );
+                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, errorCode ) );
             };
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
@@ -238,8 +239,8 @@ namespace ec2
         template<class InputData, class OutputData, class HandlerType>
             void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputData input, HandlerType handler )
         {
-            QnScopedThreadRollback ensureFreeThread(1);
-            QtConcurrent::run( [input, handler]() {
+            QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+            QnConcurrent::run( Ec2ThreadPool::instance(), [input, handler]() {
                 OutputData output;
                 const ErrorCode errorCode = dbManager->doQuery( input, output );
                 handler( errorCode, output );
@@ -253,8 +254,8 @@ namespace ec2
         template<class OutputData, class InputParamType1, class InputParamType2, class HandlerType>
             void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputParamType1 input1, InputParamType2 input2, HandlerType handler )
         {
-            QnScopedThreadRollback ensureFreeThread(1);
-            QtConcurrent::run( [input1, input2, handler]() {
+            QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+            QnConcurrent::run( Ec2ThreadPool::instance(), [input1, input2, handler]() {
                 OutputData output;
                 const ErrorCode errorCode = dbManager->doQuery( input1, input2, output );
                 handler( errorCode, output );

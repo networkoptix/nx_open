@@ -20,7 +20,7 @@
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 #include <utils/media/pts_to_clock_mapper.h>
-#include <utils/memory/nx_allocation_cache.h>
+#include <utils/memory/cyclic_allocator.h>
 
 #include "isd_motion_estimation.h"
 
@@ -89,7 +89,7 @@ private:
     QAtomicInt m_refCounter;
 
     PtsToClockMapper m_ptsMapper;
-    NxBufferCache m_mediaBufferCache;
+    CyclicAllocator m_allocator;
     size_t m_currentGopSizeBytes;
 
 #ifdef DEBUG_OUTPUT

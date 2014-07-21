@@ -1,5 +1,9 @@
 #include "abstract_data_consumer.h"
-#include "utils/common/sleep.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <utils/common/sleep.h>
+#include <utils/common/log.h>
 
 
 QnAbstractDataConsumer::QnAbstractDataConsumer(int maxQueueSize)
@@ -54,7 +58,7 @@ void QnAbstractDataConsumer::run()
             else
                 QnSleep::msleep(1);
         }
-        //cl_log.log("queue size = ", m_dataQueue.size(),cl_logALWAYS);
+        //NX_LOG("queue size = ", m_dataQueue.size(),cl_logALWAYS);
     }
 
     endOfRun();
@@ -64,3 +68,5 @@ int QnAbstractDataConsumer::queueSize() const
 {
     return m_dataQueue.size();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

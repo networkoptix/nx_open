@@ -138,7 +138,7 @@
 								<chmod file="${environment.dir}/${buildenv.script}" perm="755"/>    
 								<chmod file="${libdir}/virtualenv.sh" perm="755"/>    
 								<exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
-									<arg line="${arch} ${toolchain.version}"/> 
+									<arg line="${arch} ${toolchain.version} noqt4 noqt5"/> 
 								</exec>
 							</target>
 							<skip>${rsync.skip}</skip>
@@ -203,6 +203,20 @@
 				</os>
 			</activation>
 			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>appserver</artifactId>
+					<version>2.2.1-SNAPSHOT</version>
+					<type>tar.gz</type>
+					<classifier>${platform}-x86</classifier>
+				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>appserver</artifactId>
+					<version>2.2.1-SNAPSHOT</version>
+					<type>tar.gz</type>
+					<classifier>${platform}-x64</classifier>
+				</dependency>
 				<dependency>
 					<groupId>com.digia</groupId>
 					<version>5.2.1-SNAPSHOT</version>
@@ -284,6 +298,13 @@
 					<type>tar.gz</type>
 					<classifier>${qt.classifier}${compile.options}</classifier>
 				</dependency>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>appserver</artifactId>
+					<version>2.2.1-SNAPSHOT</version>
+					<type>tar.gz</type>
+					<classifier>${profile.classifier}</classifier>
+				</dependency>				
 			</dependencies>
 		</profile>  		
 		<profile>

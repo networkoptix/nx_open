@@ -12,6 +12,10 @@
 #endif
 
 #include "utils/serialization/binary.h"
+#include "utils/serialization/json.h"
+#include "utils/serialization/xml.h"
+#include "utils/serialization/csv.h"
+#include "utils/serialization/ubjson.h"
 
 namespace ec2
 {
@@ -24,11 +28,11 @@ namespace ec2
 
             /* System */
             tranSyncRequest             = 1,    /*< QnTranState */
-            tranSyncResponse            = 2,    /*< int */       
+            tranSyncResponse            = 2,    /*< QnTranStateResponse */       
             lockRequest                 = 3,    /*< ApiLockData */
             lockResponse                = 4,    /*< ApiLockData */
             unlockRequest               = 5,    /*< ApiLockData */
-            peerAliveInfo               = 6,    //TODO: #rvasilenko replace
+            peerAliveInfo               = 6,    /*< ApiPeerAliveData */
 
             /* Connection */
             testConnection              = 100,  /*< ApiLoginData */
@@ -77,7 +81,6 @@ namespace ec2
             saveVideowall               = 701,  /*< ApiVideowallData */
             removeVideowall             = 702,  /*< ApiIdData */
             videowallControl            = 703,  /*< ApiVideowallControlMessageData */
-            videowallInstanceStatus     = 704,  /*< ApiVideowallInstanceStatusData */
 
             /* Business rules */
             getBusinessRules            = 800,  /*< ApiBusinessRuleDataList */
@@ -99,27 +102,23 @@ namespace ec2
             addLicense                  = 1001, /*< ApiLicenseData */
             addLicenses                 = 1002, /*< ApiLicenseDataList */
 
-            /* Email */
-            testEmailSettings           = 1100, /*< ApiEmailSettingsData */
-            sendEmail                   = 1101, /*< ApiEmailData */
-
             /* Auto-updates */
             uploadUpdate                = 1200, /*< ApiUpdateUploadData */
             uploadUpdateResponce        = 1201, /*< ApiUpdateUploadResponceData */
             installUpdate               = 1202, /*< ApiUpdateInstallData  */
 
             /* Misc */
-            getSettings                 = 9000,  /*< ApiResourceParamDataList */
-            saveSettings                = 9001,  /*< ApiResourceParamDataList */
-            getCurrentTime              = 9002,  /*< qint64 */         
-            getHelp                     = 9003,  /*< ApiHelpGroupDataList */
+            getCurrentTime              = 9002,  /*< ApiTimeData */         
+            //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
+			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
 
-
-            maxTransactionValue         = 65535
+			maxTransactionValue         = 65535
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
         QString toString( Value val );
+
+        /** Check if transaction can be sent independently of current connection state. MUST have sequence field filled. */
         bool isSystem( Value val );
     }
 
@@ -173,9 +172,10 @@ namespace ec2
         T params;
     };
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json))
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json)(ubj))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json)(ubj))
 
+    //Binary format functions for QnTransaction<T>
     template <class T, class Output>
     void serialize(const QnTransaction<T> &transaction,  QnOutputBinaryStream<Output> *stream)
     {
@@ -191,10 +191,45 @@ namespace ec2
             QnBinary::deserialize(stream, &transaction->params);
     }
 
+
+    //Json format functions for QnTransaction<T>
+    template<class T>
+    void serialize(QnJsonContext* ctx, const QnTransaction<T>& tran, QJsonValue* target)
+    {
+        QJson::serialize(ctx, static_cast<const QnAbstractTransaction&>(tran), target);
+        QJsonObject localTarget = target->toObject();
+        QJson::serialize(ctx, tran.params, "params", &localTarget);
+        *target = localTarget;
+    }
+
+    template<class T>
+    bool deserialize(QnJsonContext* ctx, const QJsonValue& value, QnTransaction<T>* target)
+    {
+        return 
+            QJson::deserialize(ctx, value, static_cast<QnAbstractTransaction*>(target)) &&
+            QJson::deserialize(ctx, value.toObject(), "params", &target->params);
+    }
+
+    //QnUbjson format functions for QnTransaction<T>
+    template <class T, class Output>
+    void serialize(const QnTransaction<T> &transaction,  QnUbjsonWriter<Output> *stream)
+    {
+        QnUbjson::serialize(static_cast<const QnAbstractTransaction &>(transaction), stream);
+        QnUbjson::serialize(transaction.params, stream);
+    }
+
+    template <class T, class Input>
+    bool deserialize(QnUbjsonReader<Input>* stream,  QnTransaction<T> *transaction)
+    {
+        return 
+            QnUbjson::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&
+            QnUbjson::deserialize(stream, &transaction->params);
+    }
+
     int generateRequestID();
 } // namespace ec2
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (numeric))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (metatype)(numeric))
 
 #ifndef QN_NO_QT
 Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)

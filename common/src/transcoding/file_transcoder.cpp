@@ -5,6 +5,8 @@
 
 #include "file_transcoder.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <memory>
 
 #include <QtCore/QDir>
@@ -309,3 +311,5 @@ void FileTranscoder::closeFiles()
     m_dest->close();
     m_mediaFileReader.reset( NULL );
 }
+
+#endif // ENABLE_DATA_PROVIDERS

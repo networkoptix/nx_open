@@ -3,7 +3,9 @@
 #include <QtCore/QUrlQuery>
 
 #include <utils/common/model_functions.h>
+#include <utils/common/util.h>
 #include <utils/math/math.h>
+
 #include <api/app_server_connection.h>
 
 
@@ -249,8 +251,8 @@ void QnVirtualCameraResource::issueOccured()
     QMutexLocker lock(&m_mutex);
     m_issueTimes.push_back(getUsecTimer());
     if (m_issueTimes.size() >= MAX_ISSUE_CNT) {
-        if (!hasStatusFlags(HasIssuesFlag)) {
-            addStatusFlags(HasIssuesFlag);
+        if (!hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
+            addStatusFlags(Qn::CSF_HasIssuesFlag);
             lock.unlock();
             saveAsync();
         }
@@ -275,8 +277,8 @@ void QnVirtualCameraResource::noCameraIssues()
     while(!m_issueTimes.empty() && m_issueTimes.front() < threshold)
         m_issueTimes.pop_front();
 
-    if (m_issueTimes.empty() && hasStatusFlags(HasIssuesFlag)) {
-        removeStatusFlags(HasIssuesFlag);
+    if (m_issueTimes.empty() && hasStatusFlags(Qn::CSF_HasIssuesFlag)) {
+        removeStatusFlags(Qn::CSF_HasIssuesFlag);
         lock.unlock();
         saveAsync();
     }

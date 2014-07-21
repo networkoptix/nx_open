@@ -1,4 +1,5 @@
 #include <QtCore/QMap>
+
 #include "rtsp_data_consumer.h"
 #include "core/datapacket/media_data_packet.h"
 #include "rtsp_connection.h"
@@ -11,6 +12,8 @@
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "utils/common/synctime.h"
 #include "core/resource/security_cam_resource.h"
+
+static_assert(AV_NOPTS_VALUE == DATETIME_INVALID, "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
 
 static const int MAX_QUEUE_SIZE = 12;
 static const qint64 TO_LOWQ_SWITCH_MIN_QUEUE_DURATION = 2000ll * 1000ll; // 2 seconds
@@ -174,9 +177,9 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     //QnConstAbstractDataPacketPtr data = nonConstData;
 
-//    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
+//    NX_LOG("queueSize=", m_dataQueue.size(), cl_logALWAYS);
 //    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-//    cl_log.log(QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
+//    NX_LOG(QDateTime::fromMSecsSinceEpoch(media->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
 
     QMutexLocker lock(&m_dataQueueMtx);
     m_dataQueue.push(nonConstData);

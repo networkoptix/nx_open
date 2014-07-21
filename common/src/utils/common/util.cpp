@@ -260,3 +260,10 @@ uint qt4Hash(const QString &key)
 {
     return hash(key.unicode(), key.size());
 }
+
+#ifdef _DEBUG
+QString debugTime(qint64 timeMSec, const QString &fmt) {
+    QString format = fmt.isEmpty() ? lit("hh:mm:ss") : fmt;
+    return QDateTime::fromMSecsSinceEpoch(timeMSec).toString(format);
+}
+#endif

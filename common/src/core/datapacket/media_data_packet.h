@@ -1,41 +1,51 @@
 #ifndef abstract_media_data_h_112
 #define abstract_media_data_h_112
 
-#include <QtCore/QVector>
-#include <QtCore/QRect>
+#ifdef ENABLE_DATA_PROVIDERS
 
 extern "C"
 {
-    #include "libavcodec/avcodec.h"
+#include "libavcodec/avcodec.h"
 }
 
-#include "abstract_data_packet.h"
-#include <plugins/camera_plugin.h>
-#include "utils/common/byte_array.h"
-#include "utils/media/sse_helper.h"
+#include <QtCore/QVector>
+#include <QtCore/QRect>
 
+// TODO: #Elric implement this ifdef on utils/media/audioformat.h level.
 #ifndef Q_OS_WIN
-#   include "utils/media/audioformat.h"
+#   include <utils/media/audioformat.h> 
 #else
 #   include <QtMultimedia/QAudioFormat>
 #   define QnAudioFormat QAudioFormat
 #endif
 
-#include "utils/network/socket.h"
-#include "utils/common/aligned_allocator.h"
-#include "utils/common/util.h"
+#include <utils/common/byte_array.h>
+#include <utils/media/sse_helper.h>
+#include <utils/common/aligned_allocator.h>
+#include <utils/memory/abstract_allocator.h>
+#include <utils/memory/system_allocator.h>
 #include <utils/math/math.h>
+
+#include "abstract_data_packet.h"
+
+class QIODevice;
 
 struct AVCodecContext;
 
+namespace nxcip {
+    class Picture;
+}
+
 // TODO: #Elric #enum
-enum MediaQuality { MEDIA_Quality_High = 1,  // high quality
-                    MEDIA_Quality_Low = 2,   // low quality
-                    // At current version MEDIA_Quality_ForceHigh is very similar to MEDIA_Quality_High. It used for export to 'avi' or 'mkv'. 
-                    // This mode do not tries first short LQ chunk if LQ chunk has slightly better position
-                    MEDIA_Quality_ForceHigh,
-                    MEDIA_Quality_Auto,
-                    MEDIA_Quality_None};
+enum MediaQuality { 
+    MEDIA_Quality_High = 1,  // high quality
+    MEDIA_Quality_Low = 2,   // low quality
+    // At current version MEDIA_Quality_ForceHigh is very similar to MEDIA_Quality_High. It used for export to 'avi' or 'mkv'. 
+    // This mode do not tries first short LQ chunk if LQ chunk has slightly better position
+    MEDIA_Quality_ForceHigh,
+    MEDIA_Quality_Auto,
+    MEDIA_Quality_None
+};
 
 class QnMediaContext: public QnAbstractMediaContext {
 public:
@@ -54,6 +64,7 @@ private:
     AVCodecContext* m_ctx;
 };
 typedef QSharedPointer<QnMediaContext> QnMediaContextPtr;
+
 
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {
@@ -99,7 +110,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     bool isLQ() const { return flags & MediaFlags_LowQuality; }
     bool isLive() const { return flags & MediaFlags_LIVE; }
 
-    virtual QnAbstractMediaData* clone() const = 0;
+    virtual QnAbstractMediaData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const = 0;
     virtual const char* data() const = 0;
     virtual size_t dataSize() const = 0;
 
@@ -120,6 +131,7 @@ typedef QSharedPointer<const QnAbstractMediaData> QnConstAbstractMediaDataPtr;
 Q_STATIC_ASSERT(AV_PKT_FLAG_KEY == QnAbstractMediaData::MediaFlags_AVKey);
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnAbstractMediaData::MediaFlags)
 
+
 struct QnEmptyMediaData : public QnAbstractMediaData
 {
     QnEmptyMediaData(): m_data(16,0)
@@ -127,7 +139,14 @@ struct QnEmptyMediaData : public QnAbstractMediaData
         dataType = EMPTY_DATA;
     }
 
-    virtual QnEmptyMediaData* clone() const override;
+    QnEmptyMediaData( QnAbstractAllocator* allocator )
+    :
+        m_data(allocator, 16, 0)
+    {
+        dataType = EMPTY_DATA;
+    }
+
+    virtual QnEmptyMediaData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
     virtual const char* data() const override { return m_data.data(); }
     virtual size_t dataSize() const override { return m_data.size(); }
 
@@ -140,10 +159,6 @@ typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
 Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
 typedef QSharedPointer<const QnMetaDataV1> QnConstMetaDataV1Ptr;
 Q_DECLARE_METATYPE(QnConstMetaDataV1Ptr);
-
-
-// TODO: #Elric #enum
-enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 
 /** 
@@ -160,11 +175,11 @@ struct QnMetaDataV1Light
     */
     void doMarshalling()
     {
-        startTimeMs = ntohll(startTimeMs);
-        durationMs = ntohl(durationMs);
+        startTimeMs = qFromBigEndian(startTimeMs);
+        durationMs = qFromBigEndian(durationMs);
     }
 
-    qint64 endTimeMs()   const  { return startTimeMs + durationMs; }
+    qint64 endTimeMs() const  { return startTimeMs + durationMs; }
 
     quint64 startTimeMs;
     quint32 durationMs;
@@ -179,9 +194,13 @@ bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data);
 
 typedef std::vector<QnMetaDataV1Light, QnAlignedAllocator<QnMetaDataV1Light> > QnMetaDataLightVector;
 
+
 struct QnMetaDataV1 : public QnAbstractMediaData
 {
     QnMetaDataV1(int initialValue = 0);
+    QnMetaDataV1(
+        QnAbstractAllocator* allocator,
+        int initialValue = 0);
 
     static QnMetaDataV1Ptr fromLightData(const QnMetaDataV1Light& lightData);
 
@@ -230,7 +249,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 
     static void createMask(const QRegion& region,  char* mask, int* maskStart = 0, int* maskEnd = 0);
 
-    virtual QnMetaDataV1* clone() const override;
+    virtual QnMetaDataV1* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
     virtual const char* data() const override { return m_data.data(); }
     char* data() { return m_data.data(); }
     virtual size_t dataSize() const override { return m_data.size(); }
@@ -238,7 +257,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     //void deserialize(QIODevice* ioDevice);
     void serialize(QIODevice* ioDevice) const;
 
-    static bool mathImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
+    static bool matchImage(const simd128i* data, const simd128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128 - 1);
 
 
     quint8 m_input;
@@ -251,5 +270,7 @@ protected:
 private:
     qint64 m_firstTimestamp;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //abstract_media_data_h_112

@@ -1,17 +1,21 @@
-
 #include "video_camera.h"
 
 #include <deque>
+
+#include <utils/common/synctime.h>
+#include <utils/common/util.h> /* For getUsecTimer. */
+#include <utils/media/frame_info.h>
+#include <utils/media/media_stream_cache.h>
+#include <utils/memory/cyclic_allocator.h>
 
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "core/datapacket/media_data_packet.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/resource/camera_resource.h"
+
 #include "decoders/video/ffmpeg.h"
-#include "utils/media/frame_info.h"
-#include "utils/common/synctime.h"
-#include "utils/media/media_stream_cache.h"
+#include "media_server/settings.h"
 
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
@@ -19,6 +23,7 @@ static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
 static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
 static const qint64 GET_FRAME_MAX_TIME = 1000000ll * 15;
 static unsigned int MEDIA_CACHE_SIZE_MILLIS = 10*1000;
+static const quint64 MSEC_PER_SEC = 1000;
 
 // ------------------------------ QnVideoCameraGopKeeper --------------------------------
 
@@ -90,6 +95,12 @@ bool QnVideoCameraGopKeeper::canAcceptData() const
     return true;
 }
 
+/*!
+    using different allocator for stored ket frames, since these key frames can be kept in QnVideoCameraGopKeeper::m_lastKeyFrames 
+    for 80 seconds and that can cause huge memory consumption if CyclicAllocator has been used to alloc original frames
+*/
+static CyclicAllocator gopKeeperKeyFramesAllocator;
+
 void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData)
 {
     QMutexLocker lock(&m_queueMtx);
@@ -104,9 +115,10 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
             }
             m_gotIFramesMask |= 1 << video->channelNumber;
             m_lastKeyFrame = video;
+
             const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
             if (m_lastKeyFrames.empty() || m_lastKeyFrames.back()->timestamp <= video->timestamp - KEEP_IFRAMES_DISTANCE)
-                m_lastKeyFrames.push_back(std::move(video));
+                m_lastKeyFrames.push_back(QnCompressedVideoDataPtr(video->clone(&gopKeeperKeyFramesAllocator)));
             while (!m_lastKeyFrames.empty() && m_lastKeyFrames.front()->timestamp < removeThreshold)
                 m_lastKeyFrames.pop_front();
         }
@@ -165,6 +177,7 @@ QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 tim
         return result;
     }
 
+    //TODO #ak looks like std::lower_bound will do fine here
     for (int i = 0; i < (int)m_lastKeyFrames.size(); ++i)
     {
         if (m_lastKeyFrames[i]->timestamp >= time) {
@@ -225,10 +238,22 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
 
 // --------------- QnVideoCamera ----------------------------
 
-QnVideoCamera::QnVideoCamera(QnResourcePtr resource): m_resource(resource)
+QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
+:
+    m_resource(resource),
+    //m_hlsInactivityPeriodMS( MSSettings::roSettings()->value( nx_ms_conf::HLS_INACTIVITY_PERIOD, nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
+    m_hlsInactivityPeriodMS( 10 * MSEC_PER_SEC )
 {
     m_primaryGopKeeper = 0;
     m_secondaryGopKeeper = 0;
+
+    //ensuring that vectors will not take much memory
+    static_assert(
+        ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
+        "MediaQuality enum suddenly contains too large values: consider changing QnVideoCamera::m_liveCache, QnVideoCamera::m_hlsLivePlaylistManager type" );  
+
+    m_liveCache.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
+    m_hlsLivePlaylistManager.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
 }
 
 void QnVideoCamera::beforeStop()
@@ -410,6 +435,39 @@ void QnVideoCamera::updateActivity()
 void QnVideoCamera::stopIfNoActivity()
 {
     QMutexLocker lock(&m_getReaderMutex);
+
+    //stopping live cache (used for HLS)
+    if( (m_liveCache[MEDIA_Quality_High] || m_liveCache[MEDIA_Quality_Low])     //has live cache ever been started?
+        &&
+        (!m_liveCache[MEDIA_Quality_High] ||                                    //has hi quality live cache been started?
+            (m_hlsLivePlaylistManager[MEDIA_Quality_High].unique() &&
+             m_hlsLivePlaylistManager[MEDIA_Quality_High]->inactivityPeriod() > m_hlsInactivityPeriodMS &&  //checking inactivity timer
+             m_liveCache[MEDIA_Quality_High]->inactivityPeriod() > m_hlsInactivityPeriodMS))
+        &&
+        (!m_liveCache[MEDIA_Quality_Low] ||
+            (m_hlsLivePlaylistManager[MEDIA_Quality_Low].unique() &&
+             m_hlsLivePlaylistManager[MEDIA_Quality_Low]->inactivityPeriod() > m_hlsInactivityPeriodMS &&
+             m_liveCache[MEDIA_Quality_Low]->inactivityPeriod() > m_hlsInactivityPeriodMS)) )
+    {
+        m_cameraUsers.remove(this);
+
+        if( m_liveCache[MEDIA_Quality_High] )
+        {
+            if( m_primaryReader )
+                m_primaryReader->removeDataProcessor( m_liveCache[MEDIA_Quality_High].get() );
+            m_hlsLivePlaylistManager[MEDIA_Quality_High].reset();
+            m_liveCache[MEDIA_Quality_High].reset();
+        }
+
+        if( m_liveCache[MEDIA_Quality_Low] )
+        {
+            if( m_secondaryReader )
+                m_secondaryReader->removeDataProcessor( m_liveCache[MEDIA_Quality_Low].get() );
+            m_hlsLivePlaylistManager[MEDIA_Quality_Low].reset();
+            m_liveCache[MEDIA_Quality_Low].reset();
+        }
+    }
+
     if (isSomeActivity())
         return;
 
@@ -418,6 +476,7 @@ void QnVideoCamera::stopIfNoActivity()
 
     if (needStopPrimary)
         m_primaryReader->pleaseStop();
+
     if (needStopSecondary)
         m_secondaryReader->pleaseStop();
 }
@@ -436,11 +495,11 @@ MediaStreamCache* QnVideoCamera::liveCache( MediaQuality streamQuality )
         : nullptr;
 }
 
-QSharedPointer<nx_hls::HLSLivePlaylistManager> QnVideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
+nx_hls::HLSLivePlaylistManagerPtr QnVideoCamera::hlsLivePlaylistManager( MediaQuality streamQuality ) const
 {
     return streamQuality < m_hlsLivePlaylistManager.size()
         ? m_hlsLivePlaylistManager[streamQuality]
-        : QSharedPointer<nx_hls::HLSLivePlaylistManager>();
+        : nx_hls::HLSLivePlaylistManagerPtr();
 }
 
 //!Starts caching live stream, if not started
@@ -486,9 +545,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCata
     }
 	const QnSecurityCamResource* cameraResource = dynamic_cast<QnSecurityCamResource*>(m_resource.data());
 	if ( cameraResource && !cameraResource->hasDualStreaming2() && catalog == QnServer::LowQualityCatalog )
-	{
 		return QnLiveStreamProviderPtr();		
-	}
     return catalog == QnServer::HiQualityCatalog ? m_primaryReader : m_secondaryReader;
 }
 
@@ -498,29 +555,22 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(QnServer::ChunksCata
 */
 bool QnVideoCamera::ensureLiveCacheStarted(
     MediaQuality streamQuality,
-    QnLiveStreamProviderPtr primaryReader,
+    const QnLiveStreamProviderPtr& primaryReader,
     qint64 targetDurationUSec )
 {
-    //ensuring that vectors will not take much memory
-    static_assert(
-        ((MEDIA_Quality_High > MEDIA_Quality_Low ? MEDIA_Quality_High : MEDIA_Quality_Low) + 1) < 16,
-        "MediaQuality enum suddenly contains too large values: consider changing QnVideoCamera::m_liveCache, QnVideoCamera::m_hlsLivePlaylistManager type" );  
-
-    m_liveCache.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
-    m_hlsLivePlaylistManager.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
-
     primaryReader->startIfNotRunning();
 
-    if( m_liveCache[streamQuality].get() )
-        return true;
-    if( !primaryReader )
-        return false;
+    m_cameraUsers.insert(this);
 
-    m_liveCache[streamQuality].reset( new MediaStreamCache( MEDIA_CACHE_SIZE_MILLIS ) );
-    m_hlsLivePlaylistManager[streamQuality] = QSharedPointer<nx_hls::HLSLivePlaylistManager>(
-        new nx_hls::HLSLivePlaylistManager( m_liveCache[streamQuality].get(), targetDurationUSec ) );
+    if( !m_liveCache[streamQuality].get() )
+    {
+        m_liveCache[streamQuality].reset( new MediaStreamCache( MEDIA_CACHE_SIZE_MILLIS ) );
+        m_hlsLivePlaylistManager[streamQuality] = 
+            std::make_shared<nx_hls::HLSLivePlaylistManager>(
+                m_liveCache[streamQuality].get(),
+                targetDurationUSec );
+    }
     //connecting live cache to reader
     primaryReader->addDataProcessor( m_liveCache[streamQuality].get() );
-    m_cameraUsers << this;
     return true;
 }

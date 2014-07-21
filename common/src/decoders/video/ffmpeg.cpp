@@ -9,6 +9,7 @@
 #endif
 
 #include <utils/math/math.h>
+#include <utils/common/log.h>
 
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
@@ -228,7 +229,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
     m_checkH264ResolutionChange = m_context->thread_count > 1 && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0);
 
 
-    cl_log.log(QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
+    NX_LOG(QLatin1String("Creating ") + QLatin1String(m_context->thread_count > 1 ? "FRAME threaded decoder" : "SLICE threaded decoder"), cl_logDEBUG2);
     // TODO: #vasilenko check return value
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
     {
@@ -370,7 +371,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         {
             if (!(data->flags & QnAbstractMediaData::MediaFlags_StillImage)) {
                 // try to decode in QT for still image
-                cl_log.log(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
+                NX_LOG(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
                 return false;
             }
         }
@@ -685,7 +686,7 @@ void CLFFmpegVideoDecoder::setLightCpuMode(QnAbstractVideoDecoder::DecodeMode va
 {
     if (m_decodeMode == val)
         return;
-    //cl_log.log("set cpu mode:", val, cl_logALWAYS);
+    //NX_LOG("set cpu mode:", val, cl_logALWAYS);
     if (val >= m_decodeMode || m_decodeMode < DecodeMode_Fastest)
     {
         m_decodeMode = val;

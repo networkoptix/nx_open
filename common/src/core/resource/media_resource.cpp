@@ -151,3 +151,7 @@ QString QnMediaResource::customAspectRatioKey() {
 QString QnMediaResource::dontRecordSecondaryStreamKey() {
     return lit("dontRecordSecondaryStream");
 }
+
+QString QnMediaResource::rtpTransportKey() {
+    return lit("rtpTransport");
+}

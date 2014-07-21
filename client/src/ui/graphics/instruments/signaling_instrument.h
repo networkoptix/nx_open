@@ -1,7 +1,6 @@
 #ifndef QN_SIGNALING_INSTRUMENT_H
 #define QN_SIGNALING_INSTRUMENT_H
 
-#include "utils/common/util.h"
 #include "instrument.h"
 
 class SignalingInstrument: public Instrument {

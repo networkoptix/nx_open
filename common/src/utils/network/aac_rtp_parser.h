@@ -1,6 +1,8 @@
 #ifndef __AAC_RTP_PARSER_H
 #define __AAC_RTP_PARSER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 
@@ -40,5 +42,7 @@ private:
     QnMediaContextPtr m_context;
     QSharedPointer<QnRtspAudioLayout> m_audioLayout;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // __AAC_RTP_PARSER_H

@@ -1,6 +1,7 @@
 #include "old_client_connect_rest_handler.h"
 #include <utils/network/http/httptypes.h>
 #include "version.h"
+#include <QFile>
 
 int QnOldClientConnectRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &responseMessageBody, QByteArray &contentType)
 {
@@ -29,7 +30,7 @@ int QnOldClientConnectRestHandler::executeGet(const QString &path, const QnReque
 
 }
 
-int QnOldClientConnectRestHandler::executePost(const QString &, const QnRequestParamList &, const QByteArray &, QByteArray &, QByteArray &)
+int QnOldClientConnectRestHandler::executePost(const QString &, const QnRequestParamList &, const QByteArray &, const QByteArray& srcBodyContentType, QByteArray &, QByteArray &)
 {
     return nx_http::StatusCode::notImplemented;
 }

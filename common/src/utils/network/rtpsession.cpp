@@ -9,6 +9,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QUuid>
 
+#include "utils/common/log.h"
 #include "utils/common/util.h"
 #include "utils/common/systemerror.h"
 #include "utils/network/http/httptypes.h"
@@ -28,7 +29,7 @@ static const int MAX_RTCP_PACKET_SIZE = 1024 * 2;
 static const quint32 SSRC_CONST = 0x2a55a9e8;
 static const quint32 CSRC_CONST = 0xe8a9552a;
 
-static const int TCP_CONNECT_TIMEOUT = 1000*2;
+static const int TCP_CONNECT_TIMEOUT = 1000 * 5;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
 static const char USER_AGENT_STR[] = "User-Agent: Network Optix\r\n";
@@ -291,7 +292,7 @@ void QnRtspTimeHelper::printTime(double jitter)
         if (m_jitPackets > 0) {
             QString message(QLatin1String("camera %1. minJit=%2 ms. maxJit=%3 ms. avgJit=%4 ms"));
             message = message.arg(m_resId).arg(int(m_minJitter*1000+0.5)).arg(int(m_maxJitter*1000+0.5)).arg(int(m_jitterSum/m_jitPackets*1000+0.5));
-            cl_log.log(message, cl_logINFO);
+            NX_LOG(message, cl_logINFO);
         }
         m_statsTimer.restart();
         m_minJitter = INT_MAX;

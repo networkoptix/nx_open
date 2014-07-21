@@ -33,7 +33,7 @@ WheelZoomInstrument::WheelZoomInstrument(QObject *parent):
     processor->setFriction(degreesFor2x / 2);
     processor->setMaxSpeedMagnitude(degreesFor2x * 8);
     processor->setSpeedCuttingThreshold(degreesFor2x / 3);
-    processor->setFlags(KineticProcessor::IGNORE_DELTA_TIME);
+    processor->setFlags(KineticProcessor::IgnoreDeltaTime);
     animationTimer()->addListener(processor);
 }
 

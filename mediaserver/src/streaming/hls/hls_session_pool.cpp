@@ -57,13 +57,13 @@ namespace nx_hls
         return m_streamQuality;
     }
 
-    void HLSSession::setPlaylistManager( MediaQuality streamQuality, const QSharedPointer<AbstractPlaylistManager>& value )
+    void HLSSession::setPlaylistManager( MediaQuality streamQuality, const AbstractPlaylistManagerPtr& value )
     {
         assert( streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low );
         m_playlistManagers[streamQuality] = value;
     }
 
-    const QSharedPointer<AbstractPlaylistManager>& HLSSession::playlistManager( MediaQuality streamQuality ) const
+    const AbstractPlaylistManagerPtr& HLSSession::playlistManager( MediaQuality streamQuality ) const
     {
         assert( streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low );
         return m_playlistManagers[streamQuality];
