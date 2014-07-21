@@ -9,6 +9,7 @@
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
+#include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
 
 #include <utils/network/abstract_socket.h>
@@ -71,9 +72,12 @@ public:
         case Qn::BnsFormat:
             addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
+        case Qn::UbjsonFormat:
+            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            break;
         default:
             qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
-            addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
         }
     }

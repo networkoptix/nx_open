@@ -59,7 +59,7 @@ namespace ec2
     };
     #define QnTranStateResponse_Fields (result)
   
-    QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnTranStateKey)(QnTranState)(QnTranStateResponse), (binary)(json))
+    QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnTranStateKey)(QnTranState)(QnTranStateResponse), (binary)(json)(ubj))
 
     class QnTransactionLog
     {
