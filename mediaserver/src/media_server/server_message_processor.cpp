@@ -9,6 +9,7 @@
 #include <media_server/server_update_tool.h>
 #include <media_server/settings.h>
 #include <nx_ec/dummy_handler.h>
+#include <utils/common/log.h>
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"

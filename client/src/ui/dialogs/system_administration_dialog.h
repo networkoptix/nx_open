@@ -23,6 +23,9 @@ public:
 
     QnSystemAdministrationDialog(QWidget *parent = 0);
 
+    virtual void accept() override;
+    virtual void reject() override;
+
 private:
     Q_DISABLE_COPY(QnSystemAdministrationDialog)
 

@@ -8,10 +8,10 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui_server_updates_widget.h>
+#include <utils/common/id.h>
 
 class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
-class QnId;
 
 class QnServerUpdatesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -30,7 +30,7 @@ public:
     bool isMinimalMode() const;
     void setMinimalMode(bool minimalMode);
 
-    virtual void updateFromSettings();
+    virtual void updateFromSettings() override;
     virtual bool confirm() override;
     virtual bool discard() override;
 
@@ -43,10 +43,6 @@ private slots:
     void at_extraMessageTimer_timeout();
 
     void updateUi();
-
-private:
-    bool cancelUpdate();
-    bool isUpdating() const;
 
 private:
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;

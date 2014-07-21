@@ -1606,7 +1606,7 @@ void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
     ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged, false);
     tran.params = runtimeInfo.data;
     tran.fillSequence();
-    ec2::qnTransactionBus->sendTransaction(tran);
+    qnTransactionBus->sendTransaction(tran);
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>

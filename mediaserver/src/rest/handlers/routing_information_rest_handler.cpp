@@ -124,8 +124,9 @@ int QnRoutingInformationRestHandler::executeGet(const QString &path, const QnReq
     return HttpCode::NotFound;
 }
 
-int QnRoutingInformationRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, QByteArray &result, QByteArray &contentType) {
+int QnRoutingInformationRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray &srcBodyContentType, QByteArray &result, QByteArray &resultContentType) {
     Q_UNUSED(body)
+    Q_UNUSED(srcBodyContentType)
 
-    return executeGet(path, params, result, contentType);
+    return executeGet(path, params, result, resultContentType);
 }

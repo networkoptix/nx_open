@@ -589,7 +589,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated)
         if (!execSQLFile(lit(":/08_min_max_archive.sql"), m_sdb))
             return false;
 
-        if (!execSQLFile(lit(":/08_discovery.sql")))
+        if (!execSQLFile(lit(":/08_discovery.sql"), m_sdb))
             return false;
     }
 

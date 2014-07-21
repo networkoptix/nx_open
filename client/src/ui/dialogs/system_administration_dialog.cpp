@@ -30,8 +30,6 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
     loadData();
 }
 
-QnSystemAdministrationDialog::~QnSystemAdministrationDialog() {}
-
 void QnSystemAdministrationDialog::reject() {
     if (!m_updatesWidget->cancelUpdate()) {
         QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state."));

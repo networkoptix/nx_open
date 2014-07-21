@@ -12,13 +12,15 @@
 #include "ui/models/server_addresses_model.h"
 
 namespace {
+    const int defaultRtspPort = 7001;
+
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
     }
 }
 
 QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::QnRoutingManagementWidget)
 {
@@ -52,7 +54,7 @@ QnMediaServerResourcePtr QnRoutingManagementWidget::currentServer() const {
 void QnRoutingManagementWidget::updateModel(const QnMediaServerResourcePtr &server) {
     int port = QUrl(server->getApiUrl()).port();
     if (port == -1)
-        port = DEFAULT_APPSERVER_PORT;
+        port = defaultRtspPort;
 
     QList<QUrl> addresses;
     foreach (const QHostAddress &address, server->getNetAddrList()) {
@@ -106,7 +108,7 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
     }
 
     if (url.port() == -1)
-        url.setPort(DEFAULT_APPSERVER_PORT);
+        url.setPort(defaultRtspPort);
 
     QList<QUrl> urls = server->getAdditionalUrls();
     if ((server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == QUrl(server->getApiUrl()).port()) || urls.contains(url)) {
@@ -190,7 +192,7 @@ void QnRoutingManagementWidget::at_addressesView_doubleClicked(const QModelIndex
     }
 
     if (url.port() == -1)
-        url.setPort(DEFAULT_APPSERVER_PORT);
+        url.setPort(defaultRtspPort);
 
     if (oldUrl == url)
         return;
@@ -221,7 +223,7 @@ void QnRoutingManagementWidget::at_serverAddressesModel_ignoreChangeRequested(co
 
     int port = QUrl(server->getApiUrl()).port();
     if (port == -1)
-        port = DEFAULT_APPSERVER_PORT;
+        port = defaultRtspPort;
 
     QUrl url(address);
     if (server->getNetAddrList().contains(QHostAddress(url.host())) && url.port() == port)

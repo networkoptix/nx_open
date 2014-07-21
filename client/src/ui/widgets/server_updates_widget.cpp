@@ -266,11 +266,6 @@ void QnServerUpdatesWidget::updateUi() {
         break;
     }
 
-    if (checkingForUpdates)
-        ui->buttonBox->showProgress(tr("Checking for updates..."));
-    else
-        ui->buttonBox->hideProgress();
-
     ui->cancelButton->setVisible(applying);
     ui->cancelButton->setEnabled(cancellable);
     ui->updateStateWidget->setVisible(applying);

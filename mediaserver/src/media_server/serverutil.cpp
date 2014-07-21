@@ -9,6 +9,7 @@
 #include <api/app_server_connection.h>
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
+#include <utils/common/log.h>
 #include "version.h"
 
 static QnMediaServerResourcePtr m_server;

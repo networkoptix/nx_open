@@ -211,7 +211,7 @@ namespace ec2
         ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged, false);
         tran.params = data;
         tran.fillSequence();
-        ec2::qnTransactionBus->sendTransaction(tran);
+        qnTransactionBus->sendTransaction(tran);
     }
 
 
