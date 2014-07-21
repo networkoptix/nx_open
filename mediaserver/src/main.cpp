@@ -1208,7 +1208,7 @@ void QnMain::run()
 	QString	publicIP = getPublicAddress().toString();
     if (!publicIP.isEmpty()) {
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    	runtimeInfo.publicIP = publicIP;
+    	localInfo.data.publicIP = publicIP;
         localInfo.data.version++;
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }

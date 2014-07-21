@@ -253,7 +253,7 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
         return false;
-    if (!fillTransactionLogInternal<ApiResourceParamDataList>(ApiCommand::saveSettings))
+    if (!fillTransactionLogInternal<ApiResourceParamDataList>(ApiCommand::setResourceParams))
         return false;
 
     return true;
@@ -389,9 +389,7 @@ bool QnDbManager::init()
         QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser, true);
         userTransaction.fillSequence();
         fromResourceToApi(userResource, userTransaction.params);
-
-        executeTransactionInternal(userTransaction);
-        transactionLog->saveTransaction(userTransaction);
+        executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
     }
         
     QSqlQuery queryCameras(m_sdb);
@@ -415,11 +413,7 @@ bool QnDbManager::init()
         tran.fillSequence();
         tran.params.id = QnId::fromRfc4122(queryCameras.value(0).toByteArray());
         tran.params.status = QnResource::Offline;
-        executeTransactionInternal(tran);
-        QByteArray serializedTran;
-        QnOutputBinaryStream<QByteArray> stream(&serializedTran);
-        QnBinary::serialize(tran, &stream);
-        transactionLog->saveTransaction(tran, serializedTran);
+        executeTransactionNoLock(tran, QnUbjson::serialized(tran));
     }
 
 
