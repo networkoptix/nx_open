@@ -91,6 +91,7 @@ private:
 
     struct BaseModelItem {
         BaseModelItem(const QRect &geometry, ItemType itemType, const QUuid &id, QnVideowallManageWidget* q);
+        virtual ~BaseModelItem();
 
         virtual bool free() const = 0;
         virtual void setFree(bool value) = 0;
