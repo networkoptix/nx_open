@@ -37,6 +37,18 @@ public:
     void dragEndAt(const QPoint &pos);
 
     void tick(int deltaMSecs);
+
+public:
+    enum ItemTransformation {
+        None            = 0x00,
+        Move            = 0x01,
+        ResizeLeft      = 0x02,
+        ResizeRight     = 0x04,
+        ResizeTop       = 0x08,
+        ResizeBottom    = 0x10
+    };
+    Q_DECLARE_FLAGS(ItemTransformations, ItemTransformation)
+
 private:
     enum class ItemType {
         Existing,
@@ -53,15 +65,7 @@ private:
     };
     Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
-    enum ItemTransformation {
-        None            = 0x00,
-        Move            = 0x01,
-        ResizeLeft      = 0x02,
-        ResizeRight     = 0x04,
-        ResizeTop       = 0x08,
-        ResizeBottom    = 0x10
-    };
-    Q_DECLARE_FLAGS(ItemTransformations, ItemTransformation)
+
 
     struct TransformationProcess {
         TransformationProcess();
@@ -211,5 +215,13 @@ private:
 
     TransformationProcess m_process;   
 };
+
+/* 
+ * If we allow this function in windows, 'case expression not constant' will be raised. MSVS 2012 does not support constexpr yet.
+ * Without this function we have an error: invalid conversion from ‘int’ to ‘QnVideowallManageWidgetPrivate::ItemTransformation’ [-fpermissive] in GCC
+ */
+#ifdef __GNUC__
+    Q_DECLARE_OPERATORS_FOR_FLAGS(QnVideowallManageWidgetPrivate::ItemTransformations)
+#endif
 
 #endif // VIDEOWALL_MANAGE_WIDGET_PRIVATE_H
