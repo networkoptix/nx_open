@@ -63,7 +63,7 @@ namespace ec2
             requestUrl.setPath( QString::fromLatin1("/ec2/%1").arg(ApiCommand::toString(tran.command)) );
 
             QByteArray tranBuffer;
-            Qn::SerializationFormat format = Qn::BnsFormat /*Qn::JsonFormat*/;
+            Qn::SerializationFormat format = Qn::UbjsonFormat; /*Qn::JsonFormat*/;
             if( format == Qn::BnsFormat )
                 tranBuffer = QnBinary::serialized(tran);
             else if( format == Qn::JsonFormat )
@@ -167,9 +167,32 @@ namespace ec2
             }
 
             const QByteArray& msgBody = httpClient->fetchMessageBodyBuffer();
-            QnInputBinaryStream<QByteArray> inputStream( &msgBody );
             OutputData outputData;
-            if( !QnBinary::deserialize( &inputStream, &outputData ) )
+
+            Qn::SerializationFormat format = Qn::serializationFormatFromHttpContentType(httpClient->contentType());
+            bool success = false;
+            switch( format )
+            {
+            case Qn::BnsFormat:
+                outputData = QnBinary::deserialized<OutputData>(msgBody, OutputData(), &success);
+                break;
+            case Qn::JsonFormat:
+                outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
+                break;
+            case Qn::UbjsonFormat:
+                outputData = QnUbjson::deserialized<OutputData>(msgBody, OutputData(), &success);
+                break;
+                //case Qn::CsvFormat:
+                //    tran = QnCsv::deserialized<OutputData>(msgBody, OutputData(), &success);
+                //    break;
+                //case Qn::XmlFormat:
+                //    tran = QnXml::deserialized<OutputData>(msgBody, OutputData(), &success);
+                //    break;
+            default:
+                assert(false);
+            }
+
+            if( !success)
                 handler( ErrorCode::badResponse, outputData );
             else
                 handler( ErrorCode::ok, outputData );

@@ -50,10 +50,10 @@ struct SendTransactionToTransportFuction {
 };
 
 template<class T, class Function>
-bool handleTransactionParams(QnInputBinaryStream<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction, Function function) 
+bool handleTransactionParams(QnUbjsonReader<QByteArray> *stream, const QnAbstractTransaction &abstractTransaction, Function function) 
 {
     QnTransaction<T> transaction(abstractTransaction);
-    if (!QnBinary::deserialize(stream, &transaction.params)) 
+    if (!QnUbjson::deserialize(stream, &transaction.params)) 
         return false;
             
     function(transaction);
@@ -64,8 +64,8 @@ template<class Function>
 bool handleTransaction(const QByteArray &serializedTransaction, const Function &function)
 {
     QnAbstractTransaction transaction;
-    QnInputBinaryStream<QByteArray> stream(&serializedTransaction);
-    if (!QnBinary::deserialize(&stream, &transaction)) {
+    QnUbjsonReader<QByteArray> stream(&serializedTransaction);
+    if (!QnUbjson::deserialize(&stream, &transaction)) {
         qnWarning("Ignore bad transaction data. size=%1.", serializedTransaction.size());
         return false;
     }
@@ -144,7 +144,8 @@ QnTransactionMessageBus::QnTransactionMessageBus():
     m_localPeer(QnId(), Qn::PT_Server),
     m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
-    m_handler(nullptr),
+    m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
+	m_handler(nullptr),
     m_timer(nullptr), 
     m_mutex(QMutex::Recursive),
     m_thread(nullptr)
@@ -331,7 +332,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             {
                 if (tran.persistent && dbManager)
                 {
-                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
+                    QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
                     ErrorCode errorCode = dbManager->executeTransaction( tran, serializedTran );
                     if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
                     {

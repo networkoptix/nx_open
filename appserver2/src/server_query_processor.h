@@ -62,7 +62,7 @@ namespace ec2
             };
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
-            QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
+            QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
 
             errorCode = auxManager->executeTransaction(tran);
             if( errorCode != ErrorCode::ok ) {
@@ -189,7 +189,7 @@ namespace ec2
 
                 if (tran.persistent) 
                 {
-                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
+                    QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
                     errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
 					if (errorCode == ErrorCode::skipped)
 						continue;
@@ -207,7 +207,7 @@ namespace ec2
                 errorCode = ErrorCode::ok;
                 if (multiTran.persistent)                 
                 {
-                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(multiTran);
+                    QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(multiTran);
                     errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
                     if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
                         return;

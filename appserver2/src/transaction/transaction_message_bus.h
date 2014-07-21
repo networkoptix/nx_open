@@ -188,6 +188,7 @@ namespace ec2
 
         QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
+		QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
 
         struct RemoteUrlConnectInfo {
             RemoteUrlConnectInfo(const QUuid& peer = QUuid()): peer(peer), lastConnectedTime(0) {}
