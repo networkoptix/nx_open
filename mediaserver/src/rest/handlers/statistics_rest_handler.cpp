@@ -68,8 +68,7 @@ int QnStatisticsRestHandler::executeGet(const QString& path, const QnRequestPara
     return CODE_OK;
 }
 
-int QnStatisticsRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnStatisticsRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
-    Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }

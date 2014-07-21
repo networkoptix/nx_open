@@ -1183,6 +1183,12 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
         }
 #endif
 
+        case Qn::FisheyeCameraSettingsTab:
+        {
+            ui->fisheyeSettingsWidget->loadPreview();
+            break;
+        }
+
         default:
             break;
     }

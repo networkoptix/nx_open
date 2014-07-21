@@ -61,6 +61,9 @@ QnVideowallManageWidgetPrivate::BaseModelItem::BaseModelItem(const QRect &geomet
     q_ptr(q)
 {}
 
+QnVideowallManageWidgetPrivate::BaseModelItem::~BaseModelItem() {}
+
+
 bool QnVideowallManageWidgetPrivate::BaseModelItem::hasFlag(StateFlags flag) const {
     return (flags & flag) == flag;
 }

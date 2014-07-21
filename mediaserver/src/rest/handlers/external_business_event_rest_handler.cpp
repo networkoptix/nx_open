@@ -73,8 +73,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString& path, const Qn
     return CODE_OK;
 }
 
-int QnExternalBusinessEventRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnExternalBusinessEventRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
-    Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }

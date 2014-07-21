@@ -1,6 +1,8 @@
 #ifndef QN_COMMON_GLOBALS_H
 #define QN_COMMON_GLOBALS_H
 
+#include <cassert>
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
@@ -478,14 +480,18 @@ public:
 
 
     enum SerializationFormat {
-        JsonFormat      = 0,
-        UbjsonFormat    = 1,
-        BnsFormat       = 2,
-        CsvFormat       = 3,
-        XmlFormat       = 4
+        JsonFormat          = 0,
+        UbjsonFormat        = 1,
+        BnsFormat           = 2,
+        CsvFormat           = 3,
+        XmlFormat           = 4,
+
+        UnsupportedFormat   = -1
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SerializationFormat)
 
+    const char* serializationFormatToHttpContentType(SerializationFormat format);
+    SerializationFormat serializationFormatFromHttpContentType(const QByteArray& httpContentType);
 
     /**
      * Invalid value for a timezone UTC offset.

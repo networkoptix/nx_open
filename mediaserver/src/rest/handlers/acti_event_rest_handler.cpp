@@ -39,7 +39,7 @@ int QnActiEventRestHandler::executeGet(const QString &path, const QnRequestParam
     return nx_http::StatusCode::ok;
 }
 
-int QnActiEventRestHandler::executePost(const QString &, const QnRequestParamList &, const QByteArray &, QByteArray &, QByteArray &)
+int QnActiEventRestHandler::executePost(const QString &, const QnRequestParamList &, const QByteArray &, const QByteArray& /*srcBodyContentType*/, QByteArray &, QByteArray &)
 {
     return nx_http::StatusCode::notImplemented;
 }

@@ -16,7 +16,7 @@ QnTimeSliderColors::QnTimeSliderColors() {
     selectionMarker = selection.lighter();
 
     pastBackground = QColor(255, 255, 255, 24);
-    futureBackground = QColor(0, 0, 0, 0);
+    futureBackground = QColor(0, 0, 0, 64);
 
     pastRecording = QColor(64, 255, 64, 128);
     futureRecording = QColor(64, 255, 64, 64);

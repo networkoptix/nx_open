@@ -99,7 +99,7 @@ void QnRestConnectionProcessor::run()
             rez = handler->executeGet(url.path(), params, d->responseBody, contentType);
         }
         else if (d->request.requestLine.method.toUpper() == "POST") {
-            rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, contentType);
+            rez = handler->executePost(url.path(), params, d->requestBody, nx_http::getHeaderValue(d->request.headers, "Content-Type"), d->responseBody, contentType);
         }
         else {
             qWarning() << "Unknown REST method " << d->request.requestLine.method;
