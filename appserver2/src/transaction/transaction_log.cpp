@@ -207,6 +207,6 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     (QnTranState)\
     (QnTranStateResponse)\
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_TRANSACTION_LOG_DATA_TYPES,  (binary)(json)(ubj), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_TRANSACTION_LOG_DATA_TYPES,  (binary)(json)(ubjson), _Fields)
 
 } // namespace ec2

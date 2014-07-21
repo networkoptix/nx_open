@@ -172,8 +172,8 @@ namespace ec2
         T params;
     };
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json)(ubj))
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json)(ubj))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json)(ubjson))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json)(ubjson))
 
     //Binary format functions for QnTransaction<T>
     template <class T, class Output>
