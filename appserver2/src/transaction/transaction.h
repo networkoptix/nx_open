@@ -172,8 +172,8 @@ namespace ec2
         T params;
     };
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json))
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json)(ubj))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json)(ubj))
 
     //Binary format functions for QnTransaction<T>
     template <class T, class Output>
@@ -210,11 +210,26 @@ namespace ec2
             QJson::deserialize(ctx, value.toObject(), "params", &target->params);
     }
 
+    //QnUbjson format functions for QnTransaction<T>
+    template <class T, class Output>
+    void serialize(const QnTransaction<T> &transaction,  QnUbjsonWriter<Output> *stream)
+    {
+        QnUbjson::serialize(static_cast<const QnAbstractTransaction &>(transaction), stream);
+        QnUbjson::serialize(transaction.params, stream);
+    }
+
+    template <class T, class Input>
+    bool deserialize(QnUbjsonReader<Input>* stream,  QnTransaction<T> *transaction)
+    {
+        return 
+            QnUbjson::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&
+            QnUbjson::deserialize(stream, &transaction->params);
+    }
 
     int generateRequestID();
 } // namespace ec2
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (numeric))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (metatype)(numeric))
 
 #ifndef QN_NO_QT
 Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)

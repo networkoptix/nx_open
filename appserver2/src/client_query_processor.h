@@ -24,6 +24,7 @@
 #include "transaction/binary_transaction_serializer.h"
 #include "transaction/json_transaction_serializer.h"
 #include "transaction/transaction.h"
+#include "utils/serialization/ubjson.h"
 
 
 namespace ec2
@@ -67,8 +68,8 @@ namespace ec2
                 tranBuffer = QnBinary::serialized(tran);
             else if( format == Qn::JsonFormat )
                 tranBuffer = QJson::serialized(tran);
-            //else if( format == Qn::UbjsonFormat )
-            //    tranBuffer = QnUbjson::serialized(tran);
+            else if( format == Qn::UbjsonFormat )
+                tranBuffer = QnUbjson::serialized(tran);
             //else if( format == Qn::CsvFormat )
             //    tranBuffer = QnCsv::serialized(tran);
             //else if( format == Qn::XmlFormat )

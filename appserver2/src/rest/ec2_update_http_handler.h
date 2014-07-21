@@ -66,9 +66,9 @@ namespace ec2
                 case Qn::JsonFormat:
                     tran = QJson::deserialized<QnTransaction<RequestDataType>>(body);
                     break;
-                //case Qn::UbjsonFormat:
-                //    tran = QnUbjson::deserialized<QnTransaction<RequestDataType>>(body);
-                //    break;
+                case Qn::UbjsonFormat:
+                    tran = QnUbjson::deserialized<QnTransaction<RequestDataType>>(body);
+                    break;
                 //case Qn::CsvFormat:
                 //    tran = QnCsv::deserialized<QnTransaction<RequestDataType>>(body);
                 //    break;
