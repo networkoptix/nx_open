@@ -337,7 +337,19 @@
 					<version>${ffmpeg.version}</version>
 					<type>tar.gz</type>
 					<classifier>${profile.classifier}</classifier>
-				</dependency>      
+				</dependency>      		
+			</dependencies>             
+		</profile>      
+
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>linux</name>
+				</os> 
+			</activation>
+			<dependencies>
 				<dependency>
 					<groupId>${project.groupId}</groupId>
 					<artifactId>appserver</artifactId>
@@ -345,8 +357,8 @@
 					<type>tar.gz</type>
 					<classifier>${profile.classifier}</classifier>
 				</dependency>				
-			</dependencies>             
-		</profile>      
+			</dependencies>        
+		</profile>  
 
 		<profile>
 			<id>linux-isd-jaguar</id>
