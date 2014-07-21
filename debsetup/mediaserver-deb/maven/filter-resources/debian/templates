@@ -17,7 +17,7 @@ Template: ${deb.customization.company.name}-mediaserver/port_invalid
 Type: error
 Description: Port is invalid
 
-Template: ${deb.customization.company.name}-mediaserver/transport
+Template: ${deb.customization.company.name}-mediaserver/rtspTransport
 Type: select
 Choices: auto, tcp, udp
 Description: Select preferred transport. If unsure leave default value.
