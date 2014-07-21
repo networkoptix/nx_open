@@ -7,9 +7,7 @@
 
 #include "api/app_server_connection.h"
 #include "stardot_stream_reader.h"
-#include <business/business_event_connector.h>
 #include <business/business_event_rule.h>
-#include <business/business_rule_processor.h>
 #include "utils/common/synctime.h"
 
 

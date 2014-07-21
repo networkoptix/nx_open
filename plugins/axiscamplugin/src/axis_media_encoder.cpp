@@ -167,7 +167,7 @@ int AxisMediaEncoder::fetchCameraResolutionList() const
         m_cameraManager->cameraInfo().url,
         DEFAULT_AXIS_API_PORT,
         m_cameraManager->credentials() );
-    if( http.get( QLatin1String("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution") ) != QNetworkReply::NoError )
+    if( http.get( QLatin1String("/axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution") ) != QNetworkReply::NoError )
         return nxcip::NX_NETWORK_ERROR;
     if( http.statusCode() != SyncHttpClient::HTTP_OK )
         return http.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;

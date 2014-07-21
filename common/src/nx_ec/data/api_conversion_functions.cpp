@@ -17,8 +17,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource/videowall_instance_status.h>
 #include <core/resource/camera_bookmark.h>
+#include <core/misc/screen_snap.h>
 
 #include <nx_ec/ec_api.h>
 #include <network/authenticate_helper.h>
@@ -730,7 +730,10 @@ void fromApiToResource(const ApiVideowallItemData &src, QnVideoWallItem &dst) {
     dst.layout     = src.layoutGuid;
     dst.pcUuid     = src.pcGuid;
     dst.name       = src.name;
-    dst.geometry   = QRect(src.left, src.top, src.width, src.height);
+    dst.screenSnaps.left() = QnScreenSnap::decode(src.snapLeft);
+    dst.screenSnaps.top() = QnScreenSnap::decode(src.snapTop);
+    dst.screenSnaps.right() = QnScreenSnap::decode(src.snapRight);
+    dst.screenSnaps.bottom() = QnScreenSnap::decode(src.snapBottom);
 }
 
 void fromResourceToApi(const QnVideoWallItem &src, ApiVideowallItemData &dst) {
@@ -738,10 +741,10 @@ void fromResourceToApi(const QnVideoWallItem &src, ApiVideowallItemData &dst) {
     dst.layoutGuid  = src.layout;
     dst.pcGuid      = src.pcUuid;
     dst.name        = src.name;
-    dst.left        = src.geometry.x();
-    dst.top         = src.geometry.y();
-    dst.width       = src.geometry.width();
-    dst.height      = src.geometry.height();
+    dst.snapLeft    = src.screenSnaps.left().encode();
+    dst.snapTop     = src.screenSnaps.top().encode();
+    dst.snapRight   = src.screenSnaps.right().encode();
+    dst.snapBottom  = src.screenSnaps.bottom().encode();
 }
 
 void fromApiToResource(const ApiVideowallMatrixData &src, QnVideoWallMatrix &dst) {
@@ -888,18 +891,6 @@ void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallCon
         data.params.insert(std::pair<QString, QString>(iter.key(), iter.value()));
         ++iter;
     }
-}
-
-void fromApiToResource(const ApiVideowallInstanceStatusData &data, QnVideowallInstanceStatus &status) {
-    status.videowallGuid = data.videowallGuid;
-    status.instanceGuid = data.instanceGuid;
-    status.online = data.online;
-}
-
-void fromResourceToApi(const QnVideowallInstanceStatus &status, ApiVideowallInstanceStatusData &data) {
-    data.videowallGuid = status.videowallGuid;
-    data.instanceGuid = status.instanceGuid;
-    data.online = status.online;
 }
 
 void fromApiToResource(const ApiCameraBookmarkTagDataList &data, QnCameraBookmarkTags &tags) {

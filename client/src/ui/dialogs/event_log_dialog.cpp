@@ -38,9 +38,9 @@ namespace {
 }
 
 
-QnEventLogDialog::QnEventLogDialog(QWidget *parent, QnWorkbenchContext *context):
+QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::EventLogDialog),
     m_eventTypesModel(new QStandardItemModel()),
     m_actionTypesModel(new QStandardItemModel()),

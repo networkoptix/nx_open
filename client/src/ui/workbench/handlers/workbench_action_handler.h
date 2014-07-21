@@ -226,7 +226,7 @@ protected slots:
     void at_systemAdministrationAction_triggered();
     void at_preferencesGeneralTabAction_triggered();
     void at_preferencesLicensesTabAction_triggered();
-    void at_preferencesServerTabAction_triggered();
+    void at_preferencesSmtpTabAction_triggered();
     void at_preferencesNotificationTabAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();

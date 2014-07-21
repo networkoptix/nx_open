@@ -43,7 +43,7 @@ QnCamDisplay* QnRedAssController::getDisplayByReader(QnArchiveStreamReader* read
 
 bool QnRedAssController::isSupportedDisplay(QnCamDisplay* display) const
 {
-    if (!display)
+    if (!display || !display->getArchiveReader())
         return false;
     QnSecurityCamResourcePtr cam = display->getArchiveReader()->getResource().dynamicCast<QnSecurityCamResource>();
     return cam && cam->hasDualStreaming();
@@ -386,6 +386,8 @@ void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason, 
 void QnRedAssController::unregisterConsumer(QnCamDisplay* display)
 {
     QMutexLocker lock(&m_mutex);
+    if (!m_redAssInfo.contains(display))
+        return;
     m_redAssInfo.remove(display);
     addHQTry();
 }

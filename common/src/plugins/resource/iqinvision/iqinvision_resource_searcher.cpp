@@ -72,7 +72,11 @@ QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(const QUrl& url, cons
     return QList<QnResourcePtr>();
 }
 
-QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress)
+QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
+    QnResourceList& result,
+    const QByteArray& responseData,
+    const QHostAddress& discoveryAddress,
+    const QHostAddress& /*foundHostAddress*/ )
 {
 
     QString smac;

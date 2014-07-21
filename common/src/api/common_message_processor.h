@@ -76,7 +76,6 @@ private slots:
     void on_resourceRemoved(const QnId& resourceId );
 
     void on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory);
-    void on_videowallInstanceStatusChanged(const QnVideowallInstanceStatus &status);
 
     void on_businessEventRemoved(const QnId &id);
     void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);
@@ -84,11 +83,7 @@ private slots:
     void on_broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
     void on_execBusinessAction( const QnAbstractBusinessActionPtr& action );
 
-    void on_panicModeChanged(Qn::PanicMode mode);
-
-    void at_remotePeerFound(const ec2::ApiPeerAliveData &data, bool isProxy);
-    void at_remotePeerLost(const ec2::ApiPeerAliveData &data, bool isProxy);
-    
+    void on_panicModeChanged(Qn::PanicMode mode);   
 protected:
     ec2::AbstractECConnectionPtr m_connection;
     QMap<QnId, QnBusinessEventRulePtr> m_rules;

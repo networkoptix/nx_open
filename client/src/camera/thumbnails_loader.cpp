@@ -377,7 +377,7 @@ void QnThumbnailsLoader::process() {
 
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     if (camera) {
-        QnResourceList servers = QnCameraHistoryPool::instance()->getOnlineCameraServers(camera, period);
+        QnMediaServerResourceList servers = QnCameraHistoryPool::instance()->getOnlineCameraServers(camera, period);
         for (int i = 0; i < servers.size(); ++i) 
         {
             QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(0));
@@ -387,7 +387,7 @@ void QnThumbnailsLoader::process() {
             else
                 rtspDelegate->setQuality(MEDIA_Quality_High, true);
             QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(rtspDelegate));
-            rtspDelegate->setResource(camera);
+            rtspDelegate->setCamera(camera);
             rtspDelegate->setServer(servers[i]);
             delegates << thumbnailDelegate;
         }

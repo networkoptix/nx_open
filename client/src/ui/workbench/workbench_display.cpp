@@ -27,6 +27,8 @@
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>
 
+#include <redass/redass_controller.h>
+
 #include <ui/common/notification_levels.h>
 
 #include <ui/animation/viewport_animator.h>
@@ -887,6 +889,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 }
             }
         }
+        qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
     return true;
@@ -922,8 +925,10 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     m_widgets.removeOne(widget);
     m_widgetByItem.remove(item);
-    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
         m_widgetByRenderer.remove(mediaWidget->renderer());
+        qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
+    }
 
     if(destroyWidget) {
         widget->hide();
@@ -1564,8 +1569,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
         }
-
-//        widget->item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(widget->checkedButtons()));
     }
 
     foreach(QnWorkbenchItem *item, layout->items())

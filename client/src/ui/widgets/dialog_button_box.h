@@ -4,17 +4,7 @@
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QLabel>
 
-class QnProgressWidget : public QWidget {
-    Q_OBJECT
-
-public:
-    QnProgressWidget(QWidget *parent = 0);
-
-    void setText(const QString &text);
-private:
-    QLabel* m_img;
-    QLabel* m_text;
-};
+class QnProgressWidget;
 
 class QnDialogButtonBox : public QDialogButtonBox {
     Q_OBJECT

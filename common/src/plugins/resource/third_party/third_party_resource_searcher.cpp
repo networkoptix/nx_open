@@ -194,7 +194,8 @@ ThirdPartyResourceSearcher* ThirdPartyResourceSearcher::instance()
 QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
     QnResourceList& /*result*/,
     const QByteArray& responseData,
-    const QHostAddress& discoveryAddress )
+    const QHostAddress& /*discoveryAddress*/,
+    const QHostAddress& foundHostAddress )
 {
     QList<QnNetworkResourcePtr> localResults;
 
@@ -204,7 +205,7 @@ QList<QnNetworkResourcePtr> ThirdPartyResourceSearcher::processPacket(
         ++it )
     {
         nxcip::CameraInfo cameraInfo;
-        if( !it->fromMDNSData( responseData, discoveryAddress, &cameraInfo ) )
+        if( !it->fromMDNSData( responseData, foundHostAddress, &cameraInfo ) )
             continue;
 
         QnNetworkResourcePtr res = createResourceFromCameraInfo( &*it, cameraInfo );

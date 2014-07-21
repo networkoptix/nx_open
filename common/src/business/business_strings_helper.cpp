@@ -46,7 +46,7 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     case BookmarkAction:            return tr("Bookmark");
     case CameraRecordingAction:     return tr("Camera recording");
     case PanicRecordingAction:      return tr("Panic recording");
-    case SendMailAction:            return tr("Send mail");
+    case SendMailAction:            return tr("Send email");
     case DiagnosticsAction:         return tr("Write to log");
     case ShowPopupAction:           return tr("Show notification");
     case PlaySoundAction:           return tr("Repeat sound");
@@ -416,8 +416,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res->getPhysicalId());
     if (history) {
-        QnTimePeriod period;
-        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, period, false);
+        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, false);
         if (newServer)
             mserverRes = newServer;
     }

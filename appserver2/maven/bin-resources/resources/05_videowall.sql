@@ -35,10 +35,10 @@ CREATE TABLE "vms_videowall_item" (
     layout_guid     BLOB(16) NOT NULL,
     videowall_guid  BLOB(16) NOT NULL,
     name            VARCHAR(200) NOT NULL,
-    x               integer NOT NULL,
-    y               integer NOT NULL,
-    w               integer NOT NULL,
-    h               integer NOT NULL
+    snap_left       integer NOT NULL,
+    snap_top        integer NOT NULL,
+    snap_right      integer NOT NULL,
+    snap_bottom     integer NOT NULL
     );
 
 CREATE UNIQUE INDEX idx_videowall_item_guid ON vms_videowall_item(guid);
