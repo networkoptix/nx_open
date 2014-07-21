@@ -151,8 +151,9 @@ case "$1" in
         $CFG_HELPER systemName "$SYSTEM_NAME"
 
         ALLOW_CAMERA_CHANGES="$($CFG_HELPER allowCameraChanges)"
-        [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$(ask_for_value allowCameraChanges "$ALLOW_CAMERA_CHANGES")
+        [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$($EC_CFG_HELPER allowCameraChanges)
         [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
+        ALLOW_CAMERA_CHANGES=$(ask_for_value allowCameraChanges "$ALLOW_CAMERA_CHANGES")
         $CFG_HELPER allowCameraChanges "$ALLOW_CAMERA_CHANGES"
 
         if [ -f "$OLD_DB_PATH" -a ! -f "$DB_PATH" ]; then
