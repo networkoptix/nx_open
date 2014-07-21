@@ -304,11 +304,7 @@ bool QnDbManager::init()
         userTransaction.fillSequence();
         fromResourceToApi(userResource, userTransaction.params);
 
-        executeTransactionInternal(userTransaction);
-        QByteArray serializedTran;
-        QnOutputBinaryStream<QByteArray> stream(&serializedTran);
-        QnBinary::serialize(userTransaction, &stream);
-        transactionLog->saveTransaction(userTransaction, serializedTran);
+        executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
     }
 
     QSqlQuery queryCameras(m_sdb);
@@ -332,11 +328,7 @@ bool QnDbManager::init()
         tran.fillSequence();
         tran.params.id = QnId::fromRfc4122(queryCameras.value(0).toByteArray());
         tran.params.status = QnResource::Offline;
-        executeTransactionInternal(tran);
-        QByteArray serializedTran;
-        QnOutputBinaryStream<QByteArray> stream(&serializedTran);
-        QnBinary::serialize(tran, &stream);
-        transactionLog->saveTransaction(tran, serializedTran);
+        executeTransactionNoLock(tran, QnUbjson::serialized(tran));
     }
 
 
