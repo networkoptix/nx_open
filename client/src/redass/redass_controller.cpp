@@ -1,6 +1,6 @@
 #include "redass_controller.h"
 #include "camera/cam_display.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 #include "core/resource/camera_resource.h"
 
 Q_GLOBAL_STATIC(QnRedAssController, inst);
@@ -43,7 +43,7 @@ QnCamDisplay* QnRedAssController::getDisplayByReader(QnArchiveStreamReader* read
 
 bool QnRedAssController::isSupportedDisplay(QnCamDisplay* display) const
 {
-    if (!display)
+    if (!display || !display->getArchiveReader())
         return false;
     QnSecurityCamResourcePtr cam = display->getArchiveReader()->getResource().dynamicCast<QnSecurityCamResource>();
     return cam && cam->hasDualStreaming();
@@ -282,7 +282,7 @@ void QnRedAssController::onTimer()
         if (itr.value().awaitingLQTime && qnSyncTime->currentMSecsSinceEpoch() - itr.value().awaitingLQTime > QUALITY_SWITCH_INTERVAL)
             gotoLowQuality(display, display->queueSize() < 3 ? Reason_Network : Reason_CPU);
 
-        if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display))
+        if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display) && !reader->isMediaPaused())
         {
             gotoLowQuality(display, Reason_Small);
             addHQTry();
@@ -386,6 +386,8 @@ void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason, 
 void QnRedAssController::unregisterConsumer(QnCamDisplay* display)
 {
     QMutexLocker lock(&m_mutex);
+    if (!m_redAssInfo.contains(display))
+        return;
     m_redAssInfo.remove(display);
     addHQTry();
 }

@@ -13,6 +13,7 @@
 #include <api/model/storage_status_reply.h>
 #include <api/model/statistics_reply.h>
 #include <api/model/time_reply.h>
+#include "api/model/test_email_settings_reply.h"
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/manual_camera_seach_reply.h>
 
@@ -38,6 +39,7 @@ signals:
     void finished(int status, const QnStringVariantPairList &reply, int handle);
     void finished(int status, const QnStringBoolPairList &reply, int handle);
     void finished(int status, const QnTimeReply &reply, int handle);
+    void finished(int status, const QnTestEmailSettingsReply &reply, int handle);
     void finished(int status, const QnCameraDiagnosticsReply &reply, int handle);
     void finished(int status, const QnManualCameraSearchReply &reply, int handle);
     void finished(int status, const QnBusinessActionDataListPtr &reply, int handle);

@@ -12,12 +12,12 @@ namespace ec2
         QnId pcGuid;
         QnId layoutGuid;
         QString name;
-        int left;
-        int top;
-        int width;
-        int height;
+        int snapLeft;
+        int snapTop;
+        int snapRight;
+        int snapBottom;
     };
-#define ApiVideowallItemData_Fields (guid)(pcGuid)(layoutGuid)(name)(left)(top)(width)(height)
+#define ApiVideowallItemData_Fields (guid)(pcGuid)(layoutGuid)(name)(snapLeft)(snapTop)(snapRight)(snapBottom)
 
 
     struct ApiVideowallScreenData: ApiData {
@@ -69,13 +69,6 @@ namespace ec2
         std::map<QString, QString> params;
     };
 #define ApiVideowallControlMessageData_Fields (operation)(videowallGuid)(instanceGuid)(params)
-
-    struct ApiVideowallInstanceStatusData: ApiData {
-        QnId videowallGuid;
-        QnId instanceGuid;
-        bool online;
-    };
-#define ApiVideowallInstanceStatusData_Fields (videowallGuid)(instanceGuid)(online)
 
     struct ApiVideowallItemWithRefData: public ApiVideowallItemData {
         QnId videowallGuid;

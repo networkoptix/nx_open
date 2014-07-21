@@ -175,35 +175,6 @@ namespace ec2
     }
 
     template<class T>
-    int BaseEc2Connection<T>::getSettingsAsync( impl::GetSettingsHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-
-        auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, const ApiResourceParamDataList& settings) {
-            QnKvPairList outData;
-            if( errorCode == ErrorCode::ok )
-                fromApiToResourceList(settings, outData);
-            handler->done( reqID, errorCode, outData );
-        };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiResourceParamDataList, decltype(queryDoneHandler)> ( ApiCommand::getSettings, nullptr, queryDoneHandler);
-        return reqID;
-    }
-
-    template<class T>
-    int BaseEc2Connection<T>::saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler )
-    {
-        const int reqID = generateRequestID();
-
-        QnTransaction<ApiResourceParamDataList> tran(ApiCommand::saveSettings, true);
-        fromResourceListToApi(kvPairs, tran.params);
-
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( std::mem_fn( &impl::SimpleHandler::done ), handler, reqID, _1) );
-
-        return reqID;
-    }
-
-    template<class T>
     QnTransaction<ApiPanicModeData> BaseEc2Connection<T>::prepareTransaction( ApiCommand::Value command, const Qn::PanicMode& mode)
     {
         QnTransaction<ApiPanicModeData> tran(command, true);
@@ -232,6 +203,17 @@ namespace ec2
         url.setQuery(q);
         QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
     }
+
+
+    template<class T>
+    void ec2::BaseEc2Connection<T>::sendRuntimeData(const ec2::ApiRuntimeData &data)
+    {
+        ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged, false);
+        tran.params = data;
+        tran.fillSequence();
+        ec2::qnTransactionBus->sendTransaction(tran);
+    }
+
 
 
     template class BaseEc2Connection<FixedUrlClientQueryProcessor>;

@@ -211,6 +211,7 @@ public:
 
     int configureAsync(bool wholeSystem, const QString &systemName, const QString &password, const QByteArray &passwordHash, const QByteArray &passwordDigest, int port, QObject *target, const char *slot);
 
+    int testEmailSettingsAsync(const QnEmail::Settings &settings, QObject *target, const char *slot);
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
 

@@ -1,5 +1,6 @@
-
 #include "rtsp_ffmpeg_encoder.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
 
 #include "core/datapacket/video_data_packet.h"
 #include "utils/network/ffmpeg_sdp.h"
@@ -192,3 +193,5 @@ void QnRtspFfmpegEncoder::setCodecContext(QnMediaContextPtr context)
 {
     QnFfmpegHelper::serializeCodecContext(context->ctx(), &m_codecCtxData);
 }
+
+#endif // ENABLE_DATA_PROVIDERS

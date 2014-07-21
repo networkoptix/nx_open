@@ -8,6 +8,7 @@
 #include "nx_ec/data/api_server_alive_data.h"
 #include <utils/network/http/httptypes.h>
 
+class QHostAddress;
 
 class QnServerMessageProcessor : public QnCommonMessageProcessor
 {
@@ -28,6 +29,7 @@ protected:
     bool isLocalAddress(const QString& addr) const;
     virtual bool canRemoveResource(const QnId& resourceId) override;
     virtual void removeResourceIgnored(const QnId& resourceId) override;
+
 private slots:
     void at_remotePeerFound(ec2::ApiPeerAliveData data, bool isProxy);
     void at_remotePeerLost(ec2::ApiPeerAliveData data, bool isProxy);
@@ -42,6 +44,7 @@ private:
     void updateAllIPList(const QnId& id, const QList<QString>& addr);
     void updateAllIPList(const QnId& id, const QString& addr);
     void removeIPList(const QnId& id);
+
 private:
     mutable QMutex m_mutexAddrList;
     QHash<QString, int> m_allIPAddress;

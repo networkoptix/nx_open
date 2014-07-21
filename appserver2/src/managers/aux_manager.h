@@ -3,21 +3,16 @@
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
-#include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
-#include "nx_ec/data/api_stored_file_data.h"
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 
-
 namespace ec2
 {
-    class EmailManagerImpl;
-
     class QnAuxManager
     {
     public:
-        QnAuxManager(EmailManagerImpl* const emailManagerImpl);
+        QnAuxManager();
         virtual ~QnAuxManager();
 
         static QnAuxManager* instance();
@@ -27,11 +22,6 @@ namespace ec2
         {
             return ErrorCode::ok;
         }
-
-        ErrorCode executeTransaction(const QnTransaction<ApiEmailSettingsData>& tran);
-        ErrorCode executeTransaction(const QnTransaction<ApiEmailData>& tran);
-    private:
-        EmailManagerImpl* const m_emailManagerImpl;
     };
 };
 

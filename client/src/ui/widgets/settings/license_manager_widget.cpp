@@ -41,12 +41,20 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     ui->setupUi(this);
 
     QList<QnLicenseListModel::Column> columns;
-    columns << QnLicenseListModel::TypeColumn << QnLicenseListModel::CameraCountColumn << QnLicenseListModel::LicenseKeyColumn << QnLicenseListModel::ExpirationDateColumn << QnLicenseListModel::LicenseStatusColumn;
+    columns 
+        << QnLicenseListModel::TypeColumn 
+        << QnLicenseListModel::CameraCountColumn 
+        << QnLicenseListModel::LicenseKeyColumn 
+        << QnLicenseListModel::ExpirationDateColumn
+        << QnLicenseListModel::LicenseStatusColumn
+        ;
 
     m_model = new QnLicenseListModel(this);
     m_model->setColumns(columns);
+
     ui->gridLicenses->setModel(m_model);
     ui->gridLicenses->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->gridLicenses->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     setHelpTopic(this, Qn::SystemSettings_Licenses_Help);
 
@@ -66,11 +74,19 @@ QnLicenseManagerWidget::~QnLicenseManagerWidget()
 }
 
 void QnLicenseManagerWidget::updateLicenses() {
-    // do not re-read licences if we are activating one now
+    // do not re-read licenses if we are activating one now
     if (!m_handleKeyMap.isEmpty())
         return;
 
-    setEnabled(!QnRuntimeInfoManager::instance()->allData().isEmpty());
+    bool connected = false;
+    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems()) {
+        if (info.data.peer.peerType != Qn::PT_Server)
+            continue;
+        connected = true;
+        break;
+    }
+
+    setEnabled(connected);
 
     m_licenses = qnLicensePool->getLicenses();
 
@@ -89,7 +105,7 @@ void QnLicenseManagerWidget::updateLicenses() {
     if (!m_licenses.isEmpty()) {
         QnLicenseUsageHelper helper;
 
-        // TODO: #Elric #TR total mess with numerus forms, and no idea how to fix it in a sane way
+        // TODO: #Elric #TR total mess with numerous forms, and no idea how to fix it in a sane way
 
         if (!helper.isValid()) {
             useRedLabel = true;
@@ -130,8 +146,8 @@ void QnLicenseManagerWidget::updateLicenses() {
             useRedLabel = false;
         } else {
             QString text = (qnProductFeatures().freeLicenseCount > 0) ?
-                tr("You do not have a valid license installed. Please activate your commercial or trial license.") :
-                tr("You do not have a valid license installed. Please activate your commercial license.");
+                tr("You do not have a valid license installed.\nPlease activate your commercial or trial license.") :
+                tr("You do not have a valid license installed.\nPlease activate your commercial license.");
             ui->infoLabel->setText(text);
             useRedLabel = true;
         }
@@ -151,6 +167,15 @@ void QnLicenseManagerWidget::showMessage(const QString &title, const QString &me
 }
 
 void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, const QList<QByteArray> &mainHardwareIds, const QList<QByteArray> &compatibleHardwareIds) {
+
+    if (!QnRuntimeInfoManager::instance()->items()->hasItem(qnCommon->remoteGUID())) {
+        emit showMessageLater(tr("License Activation"),
+            tr("Network error has occurred during automatic license activation.\nTry to activate your license manually."),
+            true);
+        ui->licenseWidget->setOnline(false);
+        ui->licenseWidget->setState(QnLicenseWidget::Normal);
+    }
+
     if (!m_httpClient)
         m_httpClient = new QNetworkAccessManager(this);
 
@@ -189,7 +214,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
         hw++;
     }
 
-    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
+    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->items()->getItem(qnCommon->remoteGUID()).data;
 
     params.addQueryItem(QLatin1String("box"), runtimeData.box);
     params.addQueryItem(QLatin1String("brand"), runtimeData.brand);
@@ -229,10 +254,13 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
         m_handleKeyMap[handle] = licenseKey;
     }
 
+    /* There is an issue when we are trying to activate and Edge license on the PC. 
+     * In this case activation server will return no error but local check will fail.  */
     if (!keyLicense) {
         /* QNetworkReply slots should not start event loop. */
         emit showMessageLater(tr("License Activation"),
-                              tr("Invalid License. Please contact our support team to get a valid license."),
+            tr("You are trying to activate an incompatible license with your software. "
+                "Please contact support team to get a valid license key."),
                               true);
     } else if (licenseListHelper.getLicenseByKey(licenseKey)) {
         emit showMessageLater(tr("License Activation"),
@@ -277,7 +305,7 @@ void QnLicenseManagerWidget::at_licensesReceived(int handle, ec2::ErrorCode erro
         
     QString message;
     if (!license || (errorCode != ec2::ErrorCode::ok))
-        message = tr("There was a problem activating your license.");
+        message = tr("There was a problem activating your license key. Network error has occurred.");
     else if (license)
         message = tr("License was successfully activated.");
 
@@ -302,8 +330,9 @@ void QnLicenseManagerWidget::at_downloadError() {
 
         /* QNetworkReply slots should not start eventLoop */
         emit showMessageLater(tr("License Activation ") + reply->errorString(),
-                              tr("Network error has occurred during automatic license activation.\nTry to activate your license manually."),
-                              true);
+            tr("Network error has occurred during automatic license activation. "
+               "Please contact support team to activate your license key manually."),
+            true);
 
         ui->licenseWidget->setOnline(false);
     }
@@ -320,28 +349,28 @@ void QnLicenseManagerWidget::at_downloadFinished() {
         // If we can deserialize JSON it means there is an error.
         QJsonObject errorMessage;
         if (QJson::deserialize(replyData, &errorMessage)) {
-//            QString error = errorMessage.value(lit("error")).toString();
             QString messageId = errorMessage.value(lit("messageId")).toString();
             QString message = errorMessage.value(lit("message")).toString();
             QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
 
             if(messageId == lit("DatabaseError")) {
-                message = tr("Database error has occurred.");
+                message = tr("There was a problem activating your license key. Database error has occurred.");  //TODO: Feature #3629 case J
             } else if(messageId == lit("InvalidData")) {
-                message = tr("Invalid data was received.");
+                message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report issue.");
             } else if(messageId == lit("InvalidKey")) {
-                message = tr("The license key is invalid.");
+                message = tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
+                             "If problem continues, please contact support team to confirm if license key is valid or to get a valid license key.");
             } else if(messageId == lit("InvalidBrand")) {
-                message = tr("You are trying to activate an incompatible license with your software.");
+                message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
             } else if(messageId == lit("AlreadyActivated")) {
-                message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}.");
+                message = tr("This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to get a valid license key.");
             }
 
             message = Mustache::renderTemplate(message, arguments);
 
             /* QNetworkReply slots should not start eventLoop */
             emit showMessageLater(tr("License Activation"),
-                                  tr("There was a problem activating your license.") + lit(" ") + message,
+                                  message,
                                   true);
             ui->licenseWidget->setState(QnLicenseWidget::Normal);
 
@@ -390,12 +419,36 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
     if (ui->licenseWidget->isOnline()) {
         updateFromServer(ui->licenseWidget->serialKey().toLatin1(), qnLicensePool->mainHardwareIds(), qnLicensePool->compatibleHardwareIds());
     } else {
-        QList<QnLicensePtr> licenseList;
         QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
-        if (license->isValid())
-            licenseList.append(license);
 
-        validateLicenses(license ? license->key() : "", licenseList);
+        QnLicense::ErrorCode errCode = QnLicense::NoError;
+        if (license->isValid(&errCode) || errCode == QnLicense::Expired) {
+            validateLicenses(license->key(), QList<QnLicensePtr>() << license);
+        }
+        else {
+            QString message;
+            switch (errCode) {
+            case QnLicense::InvalidSignature:
+                message = tr("The manual activation key you have entered is invalid. Please check that manual activation key is entered correctly. "
+                             "If problem continues, please contact support team.");
+                break;
+            case QnLicense::InvalidHardwareID:
+                message = tr("This license key has been previously activated to hardware id %1. Please contact support team to get a valid license key.")
+                    .arg(QString::fromUtf8(license->hardwareId()));
+                break;
+            case QnLicense::InvalidBrand:
+            case QnLicense::InvalidType:
+                message = tr("You are trying to activate an incompatible license with your software. Please contact support team to get a valid license key.");
+                break;
+            default:
+                break;
+            }
+
+            if (!message.isEmpty())
+                emit showMessageLater(tr("License Activation"), message, true);
+        }
+
+        
         ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
 }

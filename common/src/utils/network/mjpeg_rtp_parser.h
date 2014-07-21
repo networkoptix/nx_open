@@ -7,7 +7,7 @@
 #include "core/datapacket/video_data_packet.h"
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
-#include "plugins/resources/arecontvision/tools/AVJpegHeader.h"
+#include "plugins/resource/arecontvision/tools/AVJpegHeader.h"
 
 
 class QnMjpegRtpParser: public QnRtpVideoStreamParser
@@ -31,8 +31,6 @@ private:
     int m_sdpWidth;
     int m_sdpHeight;
 
-    quint8* m_lumaQTPtr;
-    quint8* m_chromaQTPtr;
     int m_lastJpegQ;
 
     int m_hdrQ;

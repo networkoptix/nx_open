@@ -1,16 +1,19 @@
+#include "proxy_connection.h"
+
 #include <QDebug>
 #include <QUrl>
 #include <QUrlQuery>
 
+#include <utils/common/log.h>
+#include <utils/common/systemerror.h>
 #include "utils/network/tcp_listener.h"
-#include "proxy_connection.h"
 #include "utils/network/socket.h"
 #include "utils/network/router.h"
-#include "proxy_connection_processor_p.h"
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"
-#include <utils/common/systemerror.h>
 #include "media_server/server_message_processor.h"
+
+#include "proxy_connection_processor_p.h"
 
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;

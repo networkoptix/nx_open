@@ -30,9 +30,9 @@
 #include <utils/applauncher_utils.h>
 #include <utils/network/module_finder.h>
 
-#include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "plugins/resources/archive/filetypesupport.h"
+#include "plugins/resource/avi/avi_resource.h"
+#include "plugins/resource/archive/abstract_archive_stream_reader.h"
+#include "plugins/resource/avi/filetypesupport.h"
 
 #include <client/client_settings.h>
 #include <common/common_module.h>
@@ -79,6 +79,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
 {
     ui->setupUi(this);
 
+    setWindowTitle(tr("Connect to Enterprise Controller (%1)").arg(lit(QN_APPLICATION_VERSION)));
     setHelpTopic(this, Qn::Login_Help);
 
     static const char *introNames[] = { "intro.mkv", "intro.avi", "intro.png", "intro.jpg", "intro.jpeg", NULL };
@@ -422,7 +423,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode,
                     " - Client version: %1.\n"
                     " - EC version: %2.\n"
                     "The other version of client is needed in order to establish the connection to this server."
-                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo->version.toString()),
+                ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
                 QMessageBox::Ok
             );
 #endif
@@ -455,7 +456,7 @@ void QnLoginDialog::at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode,
                             " - Client version: %1.\n"
                             " - EC version: %2.\n"
                             "The other version of client is needed in order to establish the connection to this server."
-                        ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo->version.toString()),
+                        ).arg(qnCommon->engineVersion().toString()).arg(connectionInfo.version.toString()),
                         QMessageBox::Ok
                     );
 #endif

@@ -135,7 +135,7 @@ namespace QnUbjsonDetail {
         QnUbjsonReader<Input> *m_stream;
     };
 
-} // namespace QnBinaryDetail
+} // namespace QnUbjsonDetail
 
 
 QN_FUSION_REGISTER_SERIALIZATION_VISITOR_TPL((class Output), (QnUbjsonWriter<Output> *), (QnUbjsonDetail::SerializationVisitor<Output>))

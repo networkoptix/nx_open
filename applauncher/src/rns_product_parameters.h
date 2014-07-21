@@ -6,7 +6,7 @@
 #ifndef RNS_PRODUCT_PARAMETERS_H
 #define RNS_PRODUCT_PARAMETERS_H
 
-#include <plugins/videodecoders/stree/resourcenameset.h>
+#include <plugins/videodecoder/stree/resourcenameset.h>
 
 
 namespace ProductParameters

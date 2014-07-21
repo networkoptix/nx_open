@@ -6,11 +6,12 @@
 #include "core/resource_management/resource_discovery_manager.h"
 #include "utils/common/synctime.h"
 #include "common/common_module.h"
-#include "device_plugins/server_camera/server_camera.h"
+#include "plugins/resource/server_camera/server_camera.h"
 #include "utils/incompatible_server_adder.h"
 #include "utils/network/global_module_finder.h"
 
 #include "version.h"
+
 
 QnClientMessageProcessor::QnClientMessageProcessor():
     base_type(),
@@ -193,8 +194,9 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    assert(!isProxy);
-    assert(m_connected);
+
+    Q_ASSERT_X(!isProxy, Q_FUNC_INFO, "!isProxy");
+    Q_ASSERT_X(m_connected, Q_FUNC_INFO, "m_connected");
 
     m_connected = false;
 

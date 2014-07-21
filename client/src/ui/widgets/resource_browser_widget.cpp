@@ -25,6 +25,7 @@
 #include <core/resource/layout_item_index.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
+#include <core/resource/resource_property.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -260,8 +261,8 @@ QnResourceSearchProxyModel *QnResourceBrowserWidget::layoutModel(QnWorkbenchLayo
         result->setSourceModel(m_resourceModel);
         layout->setProperty(qn_searchModelPropertyName, QVariant::fromValue<QnResourceSearchProxyModel *>(result));
 
-        /* Always accept servers. */
-        result->addCriterion(QnResourceCriterion(QnResource::server)); 
+        //initial filter setup
+        setupInitialModelCriteria(result);
     }
     return result;
 }
@@ -686,7 +687,8 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent *event) {
             }
             if(flags != 0)
                 model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
-            model->addCriterion(QnResourceCriterion(QnResource::server));
+
+            setupInitialModelCriteria(model);
         }
     }
 
@@ -780,6 +782,19 @@ void QnResourceBrowserWidget::at_thumbnailClicked() {
     if (!resource)
         return;
     menu()->trigger(Qn::OpenInCurrentLayoutAction, QnActionParameters(resource));
+}
+
+void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyModel *model) const {
+    /* Always accept servers for administrator users. */
+    if (accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission)) {
+        model->addCriterion(QnResourceCriterion(QnResource::server)); 
+    }
+    else {
+        /* Always skip servers for common users, but always show user and layouts */
+        model->addCriterion(QnResourceCriterion(QnResource::server, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next)); 
+        model->addCriterion(QnResourceCriterion(QnResource::user));
+        model->addCriterion(QnResourceCriterion(QnResource::layout));
+    }
 }
 
 

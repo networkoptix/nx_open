@@ -4,23 +4,23 @@
 
 extern "C"
 {
-    #include <libavformat/avformat.h>
+#include <libavformat/avformat.h>
 }
 
-#include "utils/media/bitStream.h"
-#include "utils/media/ffmpeg_helper.h"
-#include "utils/media/sse_helper.h"
-#include "utils/common/synctime.h"
-
 #include <QtGui/QRegion>
+
+#include <utils/media/bitStream.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <utils/media/sse_helper.h>
+#include <utils/common/synctime.h>
+#include <utils/math/math.h>
+
+#include <plugins/camera_plugin.h>
 
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
 #endif
 
-#include <utils/math/math.h>
-
-#include "utils/media/sse_helper.h"
 
 
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)
@@ -331,7 +331,7 @@ inline bool sse4_attribute metadataIsEmpty_sse41(__m128i* src)
 inline bool metadataIsEmpty_cpu(const char* data)
 {
     const quint32* curPtr = (const quint32*) data;
-    for (int i = 0; i < MD_WIDTH*MD_HEIGHT/sizeof(quint32)/CHAR_BIT; ++i)
+    for (size_t i = 0; i < MD_WIDTH*MD_HEIGHT/sizeof(quint32)/CHAR_BIT; ++i)
     {
         if (*curPtr++)
             return false;

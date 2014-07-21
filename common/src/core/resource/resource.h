@@ -238,7 +238,10 @@ public:
     QStringList getTags() const;
 
     bool hasConsumer(QnResourceConsumer *consumer) const;
+#ifdef ENABLE_DATA_PROVIDERS
     bool hasUnprocessedCommands() const;
+#endif
+
     bool isInitialized() const;
 
     static void stopAsyncTasks();
@@ -293,11 +296,13 @@ signals:
 
 
 public:
+#ifdef ENABLE_DATA_PROVIDERS
     // this is thread to process commands like setparam
     static void startCommandProc();
     static void stopCommandProc();
     static void addCommandToProc(const QnResourceCommandPtr &command);
     static int commandProcQueueSize();
+#endif
 
     void update(const QnResourcePtr& other, bool silenceMode = false);
 

@@ -114,8 +114,6 @@ namespace ec2
                     return "removeVideowall";
                 case videowallControl:
                     return "videowallControl";
-                case videowallInstanceStatus:
-                    return "videowallInstanceStatus";
 
                 case listDirectory:
                     return "listDirectory";
@@ -137,11 +135,6 @@ namespace ec2
 
                 case getCurrentTime:
                     return "getCurrentTime";
-
-                case getSettings:
-                    return "getSettings";
-                case saveSettings:
-                    return "saveSettings";
 
                 case uploadUpdate:
                     return "uploadUpdate";
@@ -194,6 +187,7 @@ namespace ec2
                     val == unlockRequest ||
                     val == tranSyncRequest ||
                     val == tranSyncResponse ||
+                    val == runtimeInfoChanged ||
                     val == peerAliveInfo;
         }
 

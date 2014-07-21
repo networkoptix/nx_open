@@ -18,7 +18,7 @@ int QnVersionRestHandler::executeGet(const QString& path, const QnRequestParamLi
     return CODE_OK;
 }
 
-int QnVersionRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray&, QByteArray& result, QByteArray& contentType)
+int QnVersionRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray&, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
     return executeGet(path, params, result, contentType);
 }

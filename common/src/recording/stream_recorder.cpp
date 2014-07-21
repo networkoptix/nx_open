@@ -1,22 +1,28 @@
 #include "stream_recorder.h"
 
-#include "core/resource/resource_consumer.h"
-#include "core/datapacket/abstract_data_packet.h"
-#include "core/datapacket/media_data_packet.h"
-#include "core/dataprovider/media_streamdataprovider.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "utils/common/util.h"
-#include "decoders/video/ffmpeg.h"
-#include "export/sign_helper.h"
-#include <plugins/resources/archive/avi_files/avi_archive_delegate.h>
-#include <plugins/resources/archive/avi_files/avi_archive_custom_data.h>
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <utils/common/util.h>
+#include <utils/common/log.h>
+#include <utils/common/model_functions.h>
+
+#include <core/resource/resource_consumer.h>
+#include <core/datapacket/abstract_data_packet.h>
+#include <core/datapacket/media_data_packet.h>
+#include <core/dataprovider/media_streamdataprovider.h>
+
+#include <plugins/resource/avi/avi_archive_delegate.h>
+#include <plugins/resource/avi/avi_archive_custom_data.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
+
 #include "transcoding/ffmpeg_audio_transcoder.h"
 #include "transcoding/ffmpeg_video_transcoder.h"
 #include "transcoding/filters/contrast_image_filter.h"
 #include "transcoding/filters/time_image_filter.h"
 #include "transcoding/filters/fisheye_image_filter.h"
 
-#include <utils/serialization/json.h>
+#include "decoders/video/ffmpeg.h"
+#include "export/sign_helper.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -878,3 +884,6 @@ void QnStreamRecorder::setItemDewarpingParams(const QnItemDewarpingParams& param
 {
     m_itemDewarpingParams = params;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
+
