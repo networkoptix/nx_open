@@ -93,7 +93,7 @@ public:
     void setIconPixmap(const QPixmap &p);
 
     QAbstractButton *clickedButton() const;
-    QDialogButtonBox::StandardButton clickedStandardButton() const;
+    QDialogButtonBox::StandardButton clickedStandardButton(QDialogButtonBox::StandardButton defaultButton = QDialogButtonBox::NoButton) const;
 
 private slots:
     void at_buttonBox_clicked(QAbstractButton *b);

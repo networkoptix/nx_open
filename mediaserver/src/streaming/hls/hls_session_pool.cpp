@@ -57,13 +57,13 @@ namespace nx_hls
         return m_streamQuality;
     }
 
-    void HLSSession::setPlaylistManager( MediaQuality streamQuality, const QSharedPointer<AbstractPlaylistManager>& value )
+    void HLSSession::setPlaylistManager( MediaQuality streamQuality, const AbstractPlaylistManagerPtr& value )
     {
         assert( streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low );
         m_playlistManagers[streamQuality] = value;
     }
 
-    const QSharedPointer<AbstractPlaylistManager>& HLSSession::playlistManager( MediaQuality streamQuality ) const
+    const AbstractPlaylistManagerPtr& HLSSession::playlistManager( MediaQuality streamQuality ) const
     {
         assert( streamQuality == MEDIA_Quality_High || MEDIA_Quality_Low );
         return m_playlistManagers[streamQuality];
@@ -109,6 +109,14 @@ namespace nx_hls
     {
     }
 
+    static HLSSessionPool* HLSSessionPool_instance = nullptr;
+
+    HLSSessionPool::HLSSessionPool()
+    {
+        assert( HLSSessionPool_instance == nullptr );
+        HLSSessionPool_instance = this;
+    }
+
     HLSSessionPool::~HLSSessionPool()
     {
         while( !m_sessionByID.empty() )
@@ -126,6 +134,8 @@ namespace nx_hls
             delete sessionCtx.session;
             TimerManager::instance()->joinAndDeleteTimer( sessionCtx.removeTaskID );
         }
+
+        HLSSessionPool_instance = nullptr;
     }
 
     bool HLSSessionPool::add( HLSSession* session, unsigned int keepAliveTimeoutMS )
@@ -153,11 +163,9 @@ namespace nx_hls
         removeNonSafe( id );
     }
 
-    Q_GLOBAL_STATIC( HLSSessionPool, staticInstance )
-
     HLSSessionPool* HLSSessionPool::instance()
     {
-        return staticInstance();
+        return HLSSessionPool_instance;
     }
 
     static QAtomicInt nextSessionID = 1;

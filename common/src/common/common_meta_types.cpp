@@ -17,6 +17,9 @@
 #include <api/model/servers_reply.h>
 #include <api/model/kvpair.h>
 #include <api/model/connection_info.h>
+#include <api/model/time_reply.h>
+#include <api/model/rebuild_archive_reply.h>
+#include <api/runtime_info_manager.h>
 
 #include <recording/time_period_list.h>
 
@@ -53,6 +56,7 @@
 #include <business/business_fwd.h>
 
 #include <licensing/license.h>
+#include "api/model/test_email_settings_reply.h"
 
 
 namespace {
@@ -67,8 +71,6 @@ void QnCommonMetaTypes::initialize() {
     if(qn_commonMetaTypes_initialized)
         return;
 
-    qRegisterMetaType<QnConnectionInfoPtr>();
-
     qRegisterMetaType<QUuid>();
     qRegisterMetaType<QnId>("QnId");
     qRegisterMetaType<QHostAddress>();
@@ -77,6 +79,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qt::Orientations>();
 
     qRegisterMetaType<QnMacAddress>();
+    qRegisterMetaType<QnPeerRuntimeInfo>();
 
     qRegisterMetaType<QnParam>();
     qRegisterMetaType<QnId>();
@@ -145,11 +148,14 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnStringVariantPairList>("QList<QPair<QString,QVariant> >");
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
 
+#ifdef ENABLE_DATA_PROVIDERS
+    qRegisterMetaType<QnMetaDataV1Ptr>();
+#endif
+
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
     qRegisterMetaType<QnAbstractBusinessActionList>();
     qRegisterMetaType<QnBusinessActionDataListPtr>();
     qRegisterMetaType<QnAbstractBusinessEventPtr>();
-    qRegisterMetaType<QnMetaDataV1Ptr>();
     qRegisterMetaType<QnBusinessEventRulePtr>();
     qRegisterMetaType<QnBusinessEventRuleList>();
     qRegisterMetaType<QnAbstractDataPacketPtr>();
@@ -159,6 +165,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();
     qRegisterMetaType<QnTimeReply>();
+    qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
     qRegisterMetaType<QnRebuildArchiveReply>();
     qRegisterMetaType<QnManualCameraSearchReply>();

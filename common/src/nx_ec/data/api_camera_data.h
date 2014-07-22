@@ -34,14 +34,10 @@ namespace ec2
 
     struct ApiCameraData: ApiResourceData
     {
-        ApiCameraData(): scheduleDisabled(false), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryStreamQuality(Qn::SSQualityNotDefined),
-                         controlDisabled(false), statusFlags(0) {}
+        ApiCameraData(): scheduleEnabled(true), motionType(Qn::MT_Default), audioEnabled(false), manuallyAdded(false), secondaryStreamQuality(Qn::SSQualityNotDefined),
+                         controlEnabled(true), statusFlags(0), minArchiveDays(0), maxArchiveDays(0) {}
 
-        // TODO: #API using xyzDisabled as a field name is a bad practice.
-        // It leads to constructs like if(!isDisabled()), which are difficult to parse.
-        // As a rule of thumb, name fields in a way that would not lead to double negation in code as in case of !isDisabled.
-
-        bool                scheduleDisabled; // TODO: #API rename 'scheduleEnabled'
+        bool                scheduleEnabled;
         Qn::MotionType      motionType;
         QnLatin1Array       motionMask;
         QnLatin1Array       mac;
@@ -54,14 +50,16 @@ namespace ec2
         QString             model;
         QString             groupId;
         QString             groupName;
-        Qn::SecondStreamQuality    secondaryStreamQuality;
-        bool                controlDisabled; // TODO: #API rename 'controlEnabled'
-        qint32              statusFlags; // TODO: #API use bool here. We have exactly one flag, and I don't see why we would need more. And use bool in security cam resource.
+        Qn::SecondStreamQuality  secondaryStreamQuality;
+        bool                controlEnabled;
+        Qn::CameraStatusFlags   statusFlags;
         QnLatin1Array       dewarpingParams;
         QString             vendor;
+        int                 minArchiveDays;
+        int                 maxArchiveDays;
     };
-#define ApiCameraData_Fields ApiResourceData_Fields (scheduleDisabled)(motionType)(motionMask)(mac)(login)(password)(scheduleTasks)(audioEnabled)(physicalId)(manuallyAdded)(model) \
-                            (groupId)(groupName)(secondaryStreamQuality)(controlDisabled)(statusFlags)(dewarpingParams)(vendor)
+#define ApiCameraData_Fields ApiResourceData_Fields (scheduleEnabled)(motionType)(motionMask)(mac)(login)(password)(scheduleTasks)(audioEnabled)(physicalId)(manuallyAdded)(model) \
+                            (groupId)(groupName)(secondaryStreamQuality)(controlEnabled)(statusFlags)(dewarpingParams)(vendor)(minArchiveDays)(maxArchiveDays)
 
 } // namespace ec2
 

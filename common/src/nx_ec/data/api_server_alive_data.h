@@ -3,17 +3,17 @@
 
 #include "api_globals.h"
 #include "api_data.h"
+#include "utils/common/latin1_array.h"
+#include "api_peer_data.h"
 
 namespace ec2
 {
     struct ApiPeerAliveData: ApiData
     {
-        QnId peerId;
-        int peerType; //TODO: #Elric what should we do to serialize it properly?
+        ApiPeerData peer;
         bool isAlive;
-        QList<QByteArray> hardwareIds;
     };
-#define ApiPeerAliveData_Fields (peerId)(peerType)(isAlive)(hardwareIds)
+#define ApiPeerAliveData_Fields (peer)(isAlive)
 
 } // namespace ec2
 

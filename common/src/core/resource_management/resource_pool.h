@@ -64,7 +64,7 @@ public:
     QnResourcePtr getResourceById(const QnId &id) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
-    void updateUniqId(QnResourcePtr res, const QString &newUniqId);
+    void updateUniqId(const QnResourcePtr& res, const QString &newUniqId);
 
     bool hasSuchResource(const QString &uniqid) const;
 
@@ -72,6 +72,7 @@ public:
 
     QnNetworkResourcePtr getNetResourceByPhysicalId(const QString &physicalId) const;
     QnNetworkResourcePtr getResourceByMacAddress(const QString &mac) const;
+    QnResourcePtr getResourceByParam(const QString &key, const QString &value) const;
 
     QnResourceList getAllResourceByTypeName(const QString &typeName) const;
 
@@ -93,14 +94,14 @@ public:
     /**
      * @brief getVideoWallItemByUuid            Find videowall item by uuid.
      * @param uuid                              Unique id of the item.
-     * @return                                  Index containing the videowall and item's uuid.
+     * @return                                  Valid index containing the videowall and item's uuid or null index if such item does not exist.
      */
     QnVideoWallItemIndex getVideoWallItemByUuid(const QUuid &uuid) const;
 
     /**
      * @brief getVideoWallItemsByUuid           Find list of videowall items by their uuids.
      * @param uuids                             Unique ids of the items.
-     * @return                                  List of indices containing the videowall and items' uuid.
+     * @return                                  List of valid indices containing the videowall and items' uuid.
      */
     QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QUuid> &uuids) const;
 

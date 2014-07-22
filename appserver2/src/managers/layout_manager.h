@@ -13,17 +13,12 @@
 
 namespace ec2
 {
-    template<class QueryProcessorType>
-    class QnLayoutManager
+    class QnLayoutNotificationManager
     :
         public AbstractLayoutManager
     {
     public:
-        QnLayoutManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
-
-        virtual int getLayouts( impl::GetLayoutsHandlerPtr handler ) override;
-        virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) override;
-        virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) override;
+        QnLayoutNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
 
         void triggerNotification( const QnTransaction<ApiIdData>& tran )
         {
@@ -50,13 +45,30 @@ namespace ec2
             }
         }
 
+    protected:
+        const ResourceContext m_resCtx;
+    };
+
+
+
+    template<class QueryProcessorType>
+    class QnLayoutManager
+    :
+        public QnLayoutNotificationManager
+    {
+    public:
+        QnLayoutManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+
+        virtual int getLayouts( impl::GetLayoutsHandlerPtr handler ) override;
+        virtual int save( const QnLayoutResourceList& resources, impl::SimpleHandlerPtr handler ) override;
+        virtual int remove( const QnId& resource, impl::SimpleHandlerPtr handler ) override;
+
     private:
         QnTransaction<ApiIdData> prepareTransaction( ApiCommand::Value command, const QnId& id );
         QnTransaction<ApiLayoutDataList> prepareTransaction( ApiCommand::Value command, const QnLayoutResourceList& layouts );
 
     private:
         QueryProcessorType* const m_queryProcessor;
-        const ResourceContext m_resCtx;
     };
 }
 

@@ -9,16 +9,19 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
+#include <utils/common/log.h>
+
+#include <plugins/plugin_manager.h>
+#include <decoders/abstractvideodecoderplugin.h>
+
 #include "ffmpeg.h"
 #include "ipp_h264_decoder.h"
-#include "../abstractvideodecoderplugin.h"
-#include "../../plugins/plugin_manager.h"
 
 
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = AUTO;
 
 QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(
-    const QnCompressedVideoDataPtr data,
+    const QnCompressedVideoDataPtr& data,
     bool mtDecoding,
     const QGLContext* glContext,
     bool allowHardwareDecoding )
@@ -54,7 +57,7 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(
                     if( decoder.get() && decoder->isHardwareAccelerationEnabled() )
                         return decoder.release();
                 }
-                cl_log.log( lit("Hardware acceleration is not supported. Switching to software decoding..."), cl_logWARNING );
+                NX_LOG( lit("Hardware acceleration is not supported. Switching to software decoding..."), cl_logWARNING );
             }
         }
 

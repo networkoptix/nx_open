@@ -1,7 +1,9 @@
 #ifndef QnMediaStreamDataProvider_514
 #define QnMediaStreamDataProvider_514
 
-#include <QSharedPointer>
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <QtCore/QSharedPointer>
 #include "core/dataprovider/statistics.h"
 #include "../resource/media_resource.h"
 #include "abstract_streamdataprovider.h"
@@ -20,7 +22,7 @@ class QnAbstractMediaStreamDataProvider : public QnAbstractStreamDataProvider
     Q_OBJECT;
 
 public:
-    explicit QnAbstractMediaStreamDataProvider(QnResourcePtr res);
+    explicit QnAbstractMediaStreamDataProvider( const QnResourcePtr& res );
     virtual ~QnAbstractMediaStreamDataProvider();
 
 
@@ -50,9 +52,9 @@ protected:
 
     virtual bool beforeGetData() { return true; }
     // if function returns false we do not put result into the queues
-    virtual bool afterGetData(QnAbstractDataPacketPtr data);
+    virtual bool afterGetData(const QnAbstractDataPacketPtr& data);
     
-    void checkTime(QnAbstractMediaDataPtr data);
+    void checkTime( const QnAbstractMediaDataPtr& data );
     void resetTimeCheck();
 protected:
     QnStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
@@ -69,5 +71,7 @@ private:
 
 typedef QSharedPointer<QnAbstractMediaStreamDataProvider> QnAbstractMediaStreamDataProviderPtr;
 
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //QnMediaStreamDataProvider_514

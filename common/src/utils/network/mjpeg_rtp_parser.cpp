@@ -1,4 +1,7 @@
+
 #include "mjpeg_rtp_parser.h"
+
+#include "core/datapacket/video_data_packet.h"
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
 #include "utils/common/synctime.h"
@@ -500,13 +503,13 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         //    m_frameData.write((const char*) jpeg_end, sizeof(jpeg_end));
         bool needAddMarker = m_frameSize < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1];
 
-        m_videoData = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, m_headerLen + m_frameSize + (needAddMarker ? 2 : 0)));
-        m_videoData->data.uncheckedWrite((const char*)m_hdrBuffer, m_headerLen);
+        m_videoData = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_headerLen + m_frameSize + (needAddMarker ? 2 : 0)));
+        m_videoData->m_data.uncheckedWrite((const char*)m_hdrBuffer, m_headerLen);
         //m_videoData->data.write(m_frameData);
         for (uint i = 0; i < m_chunks.size(); ++i)
-            m_videoData->data.uncheckedWrite((const char*) rtpBufferBase + m_chunks[i].bufferOffset, m_chunks[i].len);
+            m_videoData->m_data.uncheckedWrite((const char*) rtpBufferBase + m_chunks[i].bufferOffset, m_chunks[i].len);
         if (needAddMarker)
-            m_videoData->data.uncheckedWrite((const char*) jpeg_end, sizeof(jpeg_end));
+            m_videoData->m_data.uncheckedWrite((const char*) jpeg_end, sizeof(jpeg_end));
 
         m_chunks.clear();
         m_frameSize = 0;

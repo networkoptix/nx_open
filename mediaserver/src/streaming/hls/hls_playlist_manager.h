@@ -5,6 +5,7 @@
 #ifndef HLS_PLAYLIST_MANAGER_H
 #define HLS_PLAYLIST_MANAGER_H
 
+#include <memory>
 #include <vector>
 
 #include <boost/optional.hpp>
@@ -51,6 +52,9 @@ namespace nx_hls
         //!Returns maximum stream bitrate in bps
         virtual int getMaxBitrate() const = 0;
     };
+
+    //!Using std::shared_ptr for \a std::shared_ptr::unique()
+    typedef std::shared_ptr<AbstractPlaylistManager> AbstractPlaylistManagerPtr;
 }
 
 #endif  //HLS_PLAYLIST_MANAGER_H

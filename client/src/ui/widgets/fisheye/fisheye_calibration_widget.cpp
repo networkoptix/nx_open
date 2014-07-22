@@ -13,7 +13,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
-    int refreshInterval = 5000; //update image every interval (in ms)
+    int refreshInterval = 10000; //update image every interval (in ms)
 }
 
 QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
@@ -22,13 +22,16 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
     m_calibrator(new QnFisheyeCalibrator()),
     m_imageProvider(NULL),
     m_updating(false),
-    m_lastError(QnFisheyeCalibrator::NoError)
+    m_lastError(QnFisheyeCalibrator::NoError),
+    m_inLoading(false)
 {
     ui->setupUi(this);
+
+    ui->loadingWidget->setText(tr("Loading preview, please wait..."));
     
     m_updateTimer = new QTimer(this);
     m_updateTimer->setInterval(refreshInterval);
-    connect(m_updateTimer,      &QTimer::timeout,                       this,               &QnFisheyeCalibrationWidget::at_updateTimer_timeout);
+    connect(m_updateTimer,      &QTimer::timeout,                       this,               &QnFisheyeCalibrationWidget::updateImage);
 
     connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,    ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setCenter);
     connect(m_calibrator,       &QnFisheyeCalibrator::radiusChanged,    ui->imageWidget,    &QnFisheyeCalibrationImageWidget::setRadius);
@@ -59,14 +62,20 @@ void QnFisheyeCalibrationWidget::init() {
     ui->imageWidget->setImage(QImage());
     setImageProvider(NULL);
 
-    at_imageProvider_imageChanged();
+    updatePage();
 }
+
+QnImageProvider* QnFisheyeCalibrationWidget::imageProvider() const 
+{
+    return m_imageProvider;
+}
+
 
 void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
     // TODO: #GDM #Common ownership is not clear. Does this object claim ownership of provider?
     // If not, then it should not rely on destruction order => need to store provider in 
     // QPointer and check that it's alive before usage.
-
+    m_inLoading = false;
     if (m_imageProvider) {
         disconnect(m_updateTimer, NULL, m_imageProvider, NULL);
         disconnect(m_imageProvider, NULL, ui->imageWidget, NULL);
@@ -80,15 +89,15 @@ void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
         return;
 
     connect(m_imageProvider, &QnImageProvider::imageChanged, ui->imageWidget,   &QnFisheyeCalibrationImageWidget::setImage);
-    connect(m_imageProvider, &QnImageProvider::imageChanged, this,              &QnFisheyeCalibrationWidget::at_imageProvider_imageChanged);
+    connect(m_imageProvider, &QnImageProvider::imageChanged, this,              &QnFisheyeCalibrationWidget::updatePage);
 
     m_updateTimer->start();
 
     if (!m_imageProvider->image().isNull()) {
         ui->imageWidget->setImage(provider->image());
-        at_imageProvider_imageChanged();
+        updatePage();
     }
-    m_imageProvider->loadAsync();
+    updateImage();
 }
 
 QPointF QnFisheyeCalibrationWidget::center() const {
@@ -109,12 +118,12 @@ void QnFisheyeCalibrationWidget::setRadius(qreal radius) {
     update();
 }
 
-void QnFisheyeCalibrationWidget::at_imageProvider_imageChanged() {
+void QnFisheyeCalibrationWidget::updatePage() {
+    m_inLoading = false;
     bool imageLoaded = m_imageProvider && !m_imageProvider->image().isNull();
-    ui->autoButton->setVisible(imageLoaded);
-    ui->xCenterSlider->setVisible(imageLoaded);
-    ui->yCenterSlider->setVisible(imageLoaded);
-    ui->radiusSlider->setVisible(imageLoaded);
+    ui->stackedWidget->setCurrentWidget(imageLoaded
+        ? ui->imagePage
+        : ui->loadingPage);
 }
 
 void QnFisheyeCalibrationWidget::at_calibrator_finished(int errorCode) {
@@ -126,10 +135,10 @@ void QnFisheyeCalibrationWidget::at_image_animationFinished() {
     ui->autoButton->setEnabled(true);
     switch (m_lastError) {
     case QnFisheyeCalibrator::ErrorNotFisheyeImage:
-        QMessageBox::warning(this, tr("Error"), tr("Autodetection failed. Image is not round."));
+        QMessageBox::warning(this, tr("Error"), tr("Auto calibration failed. Image is not round."));
         break;
     case QnFisheyeCalibrator::ErrorTooLowLight:
-        QMessageBox::warning(this, tr("Error"), tr("Autodetection failed. The image might be too dim."));
+        QMessageBox::warning(this, tr("Error"), tr("Auto calibration failed. The image might be too dim."));
         break;
     default:
         break;
@@ -183,7 +192,9 @@ void QnFisheyeCalibrationWidget::at_calibrator_radiusChanged(qreal radius) {
     ui->radiusSlider->setValue(radius * 100);
 }
 
-void QnFisheyeCalibrationWidget::at_updateTimer_timeout() {
-    if(m_imageProvider && isVisible())
+void QnFisheyeCalibrationWidget::updateImage() {
+    if(m_imageProvider && isVisible() && !m_inLoading) {
+        m_inLoading = true;
         m_imageProvider->loadAsync();
+    }
 }

@@ -14,9 +14,9 @@ namespace ec2
 {
     template<class QueryProcessorType>
     QnVideowallManager<QueryProcessorType>::QnVideowallManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
-        :
-        m_queryProcessor( queryProcessor ),
-        m_resCtx(resCtx)
+    :
+        QnVideowallNotificationManager( resCtx ),
+        m_queryProcessor( queryProcessor )
     {
     }
 
@@ -32,7 +32,7 @@ namespace ec2
                 fromApiToResourceList(videowalls, outData);
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowallList, nullptr, queryDoneHandler);
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiVideowallDataList, decltype(queryDoneHandler)> ( ApiCommand::getVideowalls, nullptr, queryDoneHandler);
         return reqID;
     }
 
@@ -68,16 +68,6 @@ namespace ec2
     {
         const int reqID = generateRequestID();
         auto tran = prepareTransaction( ApiCommand::videowallControl, message );
-        using namespace std::placeholders;
-        m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
-        return reqID;
-    }
-
-    template<class T>
-    int QnVideowallManager<T>::sendInstanceId(const QnId& id, impl::SimpleHandlerPtr handler)
-    {
-        const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::clientInstanceId, id );
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
         return reqID;

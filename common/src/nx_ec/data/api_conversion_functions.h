@@ -84,7 +84,6 @@ namespace ec2 {
 
     void fromApiToResource(const ApiCameraBookmarkTagDataList &data, QnCameraBookmarkTags &tags);
     void fromResourceToApi(const QnCameraBookmarkTags &tags, ApiCameraBookmarkTagDataList &data);
-
     
 
 } // namespace ec2

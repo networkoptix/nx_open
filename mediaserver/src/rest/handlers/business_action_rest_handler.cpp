@@ -20,7 +20,7 @@ int QnBusinessActionRestHandler::executeGet(const QString& path, const QnRequest
     return CODE_NOT_IMPLEMETED;
 }
 
-int QnBusinessActionRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnBusinessActionRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
@@ -28,7 +28,7 @@ int QnBusinessActionRestHandler::executePost(const QString& path, const QnReques
 
     QnAbstractBusinessActionPtr action;
     ec2::ApiBusinessActionData apiData;
-    QnInputBinaryStream<QByteArray> stream(body);
+    QnInputBinaryStream<QByteArray> stream(&body);
     if (QnBinary::deserialize(&stream, &apiData))
         fromApiToResource(apiData, action, qnResPool);
     

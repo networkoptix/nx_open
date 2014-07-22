@@ -87,7 +87,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
         item->setText(QLatin1String(license->key()));
         break;
     case ExpirationDateColumn:
-        item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString());
+        item->setText(license->expirationTime() < 0 ? tr("Never") : QDateTime::fromMSecsSinceEpoch(license->expirationTime()).toString(Qt::SystemLocaleShortDate));
         break;
     case LicenseStatusColumn: 
         {
@@ -132,6 +132,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
     if (!qnLicensePool->isLicenseValid(license))
         item->setData(QBrush(colors.expired), Qt::ForegroundRole);
 
+    item->setData(Qt::AlignCenter, Qt::TextAlignmentRole);
     return item;
 }
 

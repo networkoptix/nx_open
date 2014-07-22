@@ -4,7 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-
+#include <core/resource/camera_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
@@ -167,20 +167,28 @@ void QnResourcePoolModelNode::update() {
             m_displayName = getResourceName(m_resource);
         }
     } else if (m_type == Qn::VideoWallItemNode) {
-        m_status = QnResource::Online;
         m_searchString = QString();
-        m_flags = QnResource::videowall_item;
-        m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
+        m_flags = 0;
+        m_status = QnResource::Offline;
+        m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem | QnResourceIconCache::Offline);
 
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
         if (!index.isNull()) {
-            QnVideoWallItem item = index.videowall()->items()->getItem(m_uuid);
+            QnVideoWallItem item = index.item();
+
+            if (item.online) {
+                m_status = QnResource::Online;
+                m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallItem);              
+            }
 
             if(m_resource.isNull()) {
                 m_displayName = m_name = item.name;
             } else {
                 m_name = item.name;
-                m_displayName = QString(QLatin1String("%1 <%2>")).arg(item.name).arg(m_resource->getName());
+                QString resourceName = m_resource->getName();
+                if (m_flags & QnResource::desktop_camera)
+                    resourceName = tr("%1's Screen", "%1 means user's name").arg(resourceName);
+                m_displayName = QString(QLatin1String("%1 <%2>")).arg(item.name).arg(resourceName);
             }
         } else {
             m_displayName = m_name = QString();
@@ -189,7 +197,7 @@ void QnResourcePoolModelNode::update() {
         m_status = QnResource::Online;
         m_searchString = QString();
         m_flags = 0; 
-        m_icon = qnResIconCache->icon(QnResourceIconCache::Recorder);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::VideoWallMatrix);
         foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>()) {
             if (!videowall->matrices()->hasItem(m_uuid))
                 continue;
@@ -217,6 +225,8 @@ void QnResourcePoolModelNode::update() {
                 /* Hide "Preview Search" layouts */
                 bastard |= layout->data().contains(Qn::LayoutSearchStateRole);
             }
+        if(!bastard)
+            bastard = (m_flags & QnResource::desktop_camera) == QnResource::desktop_camera; /* Hide desktop camera resources from the tree. */
         if(!bastard)
             bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
         if(!bastard)

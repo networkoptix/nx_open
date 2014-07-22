@@ -7,6 +7,8 @@
 
 #include "utils/network/tcp_listener.h"
 #include "utils/network/tcp_connection_processor.h"
+#include "utils/network/http/httptypes.h"
+
 
 template <class T>
 QnTCPConnectionProcessor* handlerInstance(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
@@ -41,24 +43,22 @@ public:
         m_handlers.append(handler);
     }
 
-    typedef bool (*ProxyCond)(void* opaque, const QUrl& url);
+    typedef std::function<bool(const nx_http::Request&)> ProxyCond;
     struct ProxyInfo
     {
-        ProxyInfo(): proxyHandler(0), proxyCond(0), proxyOpaque(0) {}
+        ProxyInfo(): proxyHandler(0) {}
         InstanceFunc proxyHandler;
         ProxyCond proxyCond;
-        void *proxyOpaque;
     };
 
     template <class T>
-    void setProxyHandler(void* opaque, ProxyCond cond)
+    void setProxyHandler( const ProxyCond& cond )
     {
         m_proxyInfo.proxyHandler = handlerInstance<T>;
         m_proxyInfo.proxyCond = cond;
-        m_proxyInfo.proxyOpaque = opaque;
     }
 
-    QnTCPConnectionProcessor* createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const QUrl& url);
+    QnTCPConnectionProcessor* createNativeProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, const QByteArray& protocol, const nx_http::Request& request);
 
     /* proxy support functions */
 
@@ -71,7 +71,7 @@ public:
 
     void disableAuth();
 
-    bool isProxy(const QUrl& url);
+    bool isProxy(const nx_http::Request& request);
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner) override;
     virtual void doPeriodicTasks() override;

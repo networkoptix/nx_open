@@ -64,6 +64,8 @@
 #endif
 
 #include <ui/widgets/elided_label.h>
+#include <ui/widgets/dialog_button_box.h>
+#include <ui/widgets/progress_widget.h>
 
 
 // If the operation is expected to take this long (as predicted by
@@ -99,13 +101,15 @@ public:
     void init(const QString &labelText, const QString &cancelText, int min, int max);
     void retranslateStrings();
     void _q_disconnectOnClose();
+    void showInfiniteProgress(bool enable);
 
     QnProgressDialog *q_ptr;
 
     QLabel *label;
     QPushButton *cancel;
     QProgressBar *bar;
-    QDialogButtonBox *buttonBox;
+    QnProgressWidget *infiniteProgress;
+    QnDialogButtonBox *buttonBox;
     QVBoxLayout *layout;
 
     QTimer *forceTimer;
@@ -148,14 +152,22 @@ void QnProgressDialogPrivate::init(const QString &labelText, const QString &canc
     bar = new QProgressBar(q);
     bar->setRange(min, max);
 
-    buttonBox = new QDialogButtonBox(QDialogButtonBox::NoButton, Qt::Horizontal, q);
+    infiniteProgress = new QnProgressWidget(q);
+
+    buttonBox = new QnDialogButtonBox(QDialogButtonBox::NoButton, Qt::Horizontal, q);
+
+    QHBoxLayout *hlayout = new QHBoxLayout();
+    hlayout->addWidget(infiniteProgress);
+    hlayout->addWidget(label, 1);
 
     layout = new QVBoxLayout();
-    layout->addWidget(label);
+    layout->addLayout(hlayout);
     layout->addWidget(bar);
     layout->addWidget(buttonBox);
     layout->setSizeConstraint(QLayout::SetFixedSize);
     q->setLayout(layout);
+
+    infiniteProgress->hide();
 
     forceTimer = new QTimer(q);
     QObject::connect(forceTimer, SIGNAL(timeout()), q, SLOT(forceShow()));
@@ -187,6 +199,12 @@ void QnProgressDialogPrivate::_q_disconnectOnClose()
         receiverToDisconnectOnClose = 0;
     }
     memberToDisconnectOnClose.clear();
+}
+
+void QnProgressDialogPrivate::showInfiniteProgress(bool enable)
+{
+    infiniteProgress->setVisible(enable);
+    bar->setVisible(!enable);
 }
 
 /*!
@@ -632,6 +650,9 @@ int QnProgressDialog::value() const
 void QnProgressDialog::setValue(int progress)
 {
     Q_D(QnProgressDialog);
+
+    d->showInfiniteProgress(false);
+
     if (progress == d->bar->value()
         || (d->bar->value() == -1 && progress == d->bar->maximum()))
         return;
@@ -701,6 +722,12 @@ void QnProgressDialog::setMinimumDuration(int ms)
         d->forceTimer->stop();
         d->forceTimer->start(ms);
     }
+}
+
+void QnProgressDialog::setInfiniteProgress()
+{
+    Q_D(QnProgressDialog);
+    d->showInfiniteProgress(true);
 }
 
 int QnProgressDialog::minimumDuration() const

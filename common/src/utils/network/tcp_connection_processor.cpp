@@ -174,13 +174,13 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
     return fullUrl.mid(pos+1);
 }
 
-void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int code, const QByteArray& contentType, const QByteArray& contentEncoding, bool displayDebug)
+void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray& contentType, const QByteArray& contentEncoding, bool displayDebug)
 {
     Q_D(QnTCPConnectionProcessor);
 
     d->response.statusLine.version = d->request.requestLine.version;
-    d->response.statusLine.statusCode = code;
-    d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)code);
+    d->response.statusLine.statusCode = httpStatusCode;
+    d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString((nx_http::StatusCode::Value)httpStatusCode);
     if (d->chunkedMode)
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Transfer-Encoding", "chunked" ) );
 
@@ -191,7 +191,6 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     if (!d->chunkedMode)
         nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Content-Length", QByteArray::number(d->responseBody.length()) ) );
 
-    d->response.statusLine.version.protocol = transport;
     QByteArray response = d->response.toString();
     if (!d->responseBody.isEmpty())
     {
@@ -349,4 +348,13 @@ void QnTCPConnectionProcessor::releaseSocket()
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket.clear();    
+}
+
+int QnTCPConnectionProcessor::redirectTo(const QByteArray& page, QByteArray& contentType)
+{
+    Q_D(QnTCPConnectionProcessor);
+    contentType = "text/html";
+    d->responseBody = "<html><head><title>Moved</title></head><body><h1>Moved</h1></html>";
+    d->response.headers.insert(nx_http::HttpHeader("Location", page));
+    return CODE_MOVED_PERMANENTLY;
 }

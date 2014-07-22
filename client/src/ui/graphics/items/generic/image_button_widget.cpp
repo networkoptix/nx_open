@@ -36,7 +36,7 @@ namespace {
     bool checkPixmapGroupRole(QnImageButtonWidget::StateFlags *flags) {
         bool result = true;
 
-        if(*flags < 0 || *flags > QnImageButtonWidget::FLAGS_MAX) {
+        if(*flags < 0 || *flags > QnImageButtonWidget::MaxState) {
             qnWarning("Invalid pixmap flags '%1'.", static_cast<int>(*flags));
             *flags = 0;
             result = false;
@@ -165,18 +165,18 @@ QIcon QnImageButtonWidget::icon() const {
 }
 
 void QnImageButtonWidget::setIcon(const QIcon &icon) {
-    for(int i = 0; i <= FLAGS_MAX; i++)
+    for(int i = 0; i <= MaxState; i++)
         m_pixmaps[i] = QPixmap();
 
     setPixmap(0,                            bestPixmap(icon, QnIcon::Normal, QnIcon::Off));
-    setPixmap(HOVERED,                      bestPixmap(icon, QnIcon::Active, QnIcon::Off));
-    setPixmap(DISABLED,                     bestPixmap(icon, QnIcon::Disabled, QnIcon::Off));
-    setPixmap(PRESSED,                      bestPixmap(icon, QnIcon::Pressed, QnIcon::Off));
+    setPixmap(Hovered,                      bestPixmap(icon, QnIcon::Active, QnIcon::Off));
+    setPixmap(Disabled,                     bestPixmap(icon, QnIcon::Disabled, QnIcon::Off));
+    setPixmap(Pressed,                      bestPixmap(icon, QnIcon::Pressed, QnIcon::Off));
 
-    setPixmap(CHECKED,                      bestPixmap(icon, QnIcon::Normal, QnIcon::On));
-    setPixmap(CHECKED | HOVERED,            bestPixmap(icon, QnIcon::Active, QnIcon::On));
-    setPixmap(CHECKED | DISABLED,           bestPixmap(icon, QnIcon::Disabled, QnIcon::On));
-    setPixmap(CHECKED | PRESSED,            bestPixmap(icon, QnIcon::Pressed, QnIcon::On));
+    setPixmap(Checked,                      bestPixmap(icon, QnIcon::Normal, QnIcon::On));
+    setPixmap(Checked | Hovered,            bestPixmap(icon, QnIcon::Active, QnIcon::On));
+    setPixmap(Checked | Disabled,           bestPixmap(icon, QnIcon::Disabled, QnIcon::On));
+    setPixmap(Checked | Pressed,            bestPixmap(icon, QnIcon::Pressed, QnIcon::On));
 
     m_actionIconOverridden = true;
 }
@@ -187,7 +187,7 @@ void QnImageButtonWidget::setCheckable(bool checkable) {
 
     m_checkable = checkable;
     if (!m_checkable)
-        updateState(m_state & ~CHECKED);
+        updateState(m_state & ~Checked);
     update();
 }
 
@@ -195,7 +195,7 @@ void QnImageButtonWidget::setChecked(bool checked) {
     if (!m_checkable || checked == isChecked())
         return;
 
-    updateState(checked ? (m_state | CHECKED) : (m_state & ~CHECKED));
+    updateState(checked ? (m_state | Checked) : (m_state & ~Checked));
     update();
 }
 
@@ -205,9 +205,9 @@ void QnImageButtonWidget::setDisabled(bool disabled) {
 
 void QnImageButtonWidget::setPressed(bool pressed) {
     if(pressed) {
-        updateState(m_state | PRESSED);
+        updateState(m_state | Pressed);
     } else {
-        updateState(m_state & ~PRESSED);
+        updateState(m_state & ~Pressed);
     }
 }
 
@@ -251,9 +251,9 @@ void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
         QMenu *menu = m_action->menu();
         QPoint pos = view->mapToGlobal(view->mapFromScene(mapToScene(rect().bottomLeft())));
 
-        updateState(m_state | PRESSED);
+        updateState(m_state | Pressed);
         menu->exec(pos);
-        updateState(m_state & ~PRESSED);
+        updateState(m_state & ~Pressed);
 
         /* Cannot use QMenu::setNoReplayFor, as it will block click events for the whole scene.
          * This is why we resort to nasty hacks with mouse position comparisons. */
@@ -272,8 +272,8 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
         initializeOpenGLFunctions();
     }
 
-    StateFlags hoverState = m_state | HOVERED;
-    StateFlags normalState = m_state & ~HOVERED;
+    StateFlags hoverState = m_state | Hovered;
+    StateFlags normalState = m_state & ~Hovered;
     paint(painter, normalState, hoverState, m_hoverProgress, checked_cast<QGLWidget *>(widget), rect());
 }
 
@@ -390,7 +390,7 @@ void QnImageButtonWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     if(skipHoverEvent(event))
         return;
 
-    updateState(m_state | HOVERED);
+    updateState(m_state | Hovered);
 
     base_type::hoverEnterEvent(event);
 }
@@ -401,7 +401,7 @@ void QnImageButtonWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     if(skipHoverEvent(event))
         return;
 
-    updateState(m_state | HOVERED); /* In case we didn't receive the hover enter event. */
+    updateState(m_state | Hovered); /* In case we didn't receive the hover enter event. */
 
     base_type::hoverMoveEvent(event);
 }
@@ -410,9 +410,9 @@ void QnImageButtonWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
     event->accept();
 
     if(rect().contains(event->pos())) {
-        updateState(m_state | HOVERED);
+        updateState(m_state | Hovered);
     } else {
-        updateState(m_state & ~HOVERED);
+        updateState(m_state & ~Hovered);
     }
 
     base_type::mouseMoveEvent(event);
@@ -421,7 +421,7 @@ void QnImageButtonWidget::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 void QnImageButtonWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     event->accept(); /* Buttons are opaque to hover events. */
 
-    updateState(m_state & ~HOVERED);
+    updateState(m_state & ~Hovered);
 
     base_type::hoverLeaveEvent(event);
 }
@@ -484,7 +484,7 @@ bool QnImageButtonWidget::event(QEvent *event) {
 QVariant QnImageButtonWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
     switch(change) {
     case ItemEnabledHasChanged:
-        updateState(isDisabled() ? (m_state | DISABLED) : (m_state & ~DISABLED));
+        updateState(isDisabled() ? (m_state | Disabled) : (m_state & ~Disabled));
         break;
     default:
         break;
@@ -500,29 +500,29 @@ void QnImageButtonWidget::updateState(StateFlags state) {
     StateFlags oldState = m_state;
     m_state = state;
 
-    if((oldState ^ m_state) & CHECKED) { /* CHECKED has changed, emit notification signal and sync with action. */
+    if((oldState ^ m_state) & Checked) { /* Checked has changed, emit notification signal and sync with action. */
         emit toggled(isChecked());
 
         if(m_action != NULL)
             m_action->setChecked(isChecked());
     }
 
-    if((oldState ^ m_state) & DISABLED) { /* DISABLED has changed, perform back-sync. */
+    if((oldState ^ m_state) & Disabled) { /* Disabled has changed, perform back-sync. */
         /* Disabled state change may have been propagated from parent item,
          * and in this case we shouldn't do any back-sync. */
-        bool newDisabled = m_state & DISABLED;
+        bool newDisabled = m_state & Disabled;
         if(newDisabled != isDisabled())
             setDisabled(newDisabled);
     }
 
-    if(m_action != NULL && !(oldState & HOVERED) && (m_state & HOVERED)) /* !HOVERED -> HOVERED transition */
+    if(m_action != NULL && !(oldState & Hovered) && (m_state & Hovered)) /* !Hovered -> Hovered transition */
         m_action->hover();
 
-    if((oldState & PRESSED) && !(m_state & PRESSED)) /* PRESSED -> !PRESSED */
+    if((oldState & Pressed) && !(m_state & Pressed)) /* Pressed -> !Pressed */
         m_hoverProgress = 0.0; /* No animation here as it looks crappy. */
 
     qreal hoverProgress = isHovered() ? 1.0 : 0.0;
-    if(scene() == NULL || (m_state & PRESSED)) {
+    if(scene() == NULL || (m_state & Pressed)) {
         m_animator->stop();
         m_hoverProgress = hoverProgress;
     } else {
@@ -590,7 +590,7 @@ void QnImageButtonWidget::ensurePixmapCache() const {
     if(m_pixmapCacheValid)
         return;
 
-    for(int i = 0; i < FLAGS_MAX; i++) {
+    for(int i = 0; i < MaxState; i++) {
         if(m_pixmaps[i].isNull()) {
             m_pixmapCache[i] = m_pixmaps[i];
         } else {
@@ -641,7 +641,7 @@ void QnRotatingImageButtonWidget::paint(QPainter *painter, StateFlags startState
 }
 
 void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
-    if(state() & CHECKED)
+    if(state() & Checked)
         m_rotation += m_rotationSpeed * deltaMSecs / 1000.0;
 }
 

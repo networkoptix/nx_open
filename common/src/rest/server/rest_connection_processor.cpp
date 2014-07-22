@@ -6,7 +6,6 @@
 #include "rest_connection_processor.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
-#include "rest_server.h"
 #include "request_handler.h"
 #include "network/authenticate_helper.h"
 #include "utils/gzip/gzip_compressor.h"
@@ -73,41 +72,6 @@ QnRestConnectionProcessor::~QnRestConnectionProcessor()
     stop();
 }
 
-void QnRestConnectionProcessor::createHelpPage()
-{
-    Q_D(QnRestConnectionProcessor);
-
-    d->responseBody.clear();
-    d->responseBody.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");
-    d->responseBody.append("<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">\n");
-    d->responseBody.append("<head>\n");
-    d->responseBody.append("<b>Requested method is absent. Allowed methods:</b>\n");
-    d->responseBody.append("</head>\n");
-    d->responseBody.append("<body>\n");
-
-    d->responseBody.append("<TABLE BORDER=\"1\" CELLSPACING=\"0\">\n");
-    for( QnRestProcessorPool::Handlers::const_iterator
-        itr = QnRestProcessorPool::instance()->handlers().begin();
-        itr != QnRestProcessorPool::instance()->handlers().end();
-    ++itr)
-    {
-        QString str = itr.key();
-        //if (str.startsWith(QLatin1String("api/")))
-        {
-            d->responseBody.append("<TR><TD>");
-            d->responseBody.append(str.toLatin1());
-            d->responseBody.append("<TD>");
-            //d->responseBody.append(itr.value()->description());
-            d->responseBody.append("</TD>");
-            d->responseBody.append("</TD></TR>\n");
-        }
-    }
-    d->responseBody.append("</TABLE>\n");
-
-    d->responseBody.append("</body>\n");
-    d->responseBody.append("</html>\n");
-}
-
 void QnRestConnectionProcessor::run()
 {
     Q_D(QnRestConnectionProcessor);
@@ -135,7 +99,7 @@ void QnRestConnectionProcessor::run()
             rez = handler->executeGet(url.path(), params, d->responseBody, contentType);
         }
         else if (d->request.requestLine.method.toUpper() == "POST") {
-            rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, contentType);
+            rez = handler->executePost(url.path(), params, d->requestBody, nx_http::getHeaderValue(d->request.headers, "Content-Type"), d->responseBody, contentType);
         }
         else {
             qWarning() << "Unknown REST method " << d->request.requestLine.method;
@@ -145,18 +109,15 @@ void QnRestConnectionProcessor::run()
         }
     }
     else {
-        qWarning() << "Unknown REST path " << url.path();
-        contentType = "text/html";
-        rez = CODE_NOT_FOUND;
-        createHelpPage();
+        rez = redirectTo(QnTcpListener::defaultPage(), contentType);
     }
     QByteArray contentEncoding;
-    if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty()) 
+    if ( nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->responseBody.isEmpty() && rez == CODE_OK) 
     {
         if (!contentType.contains("image")) {
             d->responseBody = GZipCompressor::compressData(d->responseBody);
             contentEncoding = "gzip";
         }
     }
-    sendResponse("HTTP", rez, contentType, contentEncoding, false);
+    sendResponse(rez, contentType, contentEncoding, false);
 }

@@ -9,18 +9,12 @@
 
 namespace ec2
 {
-    template<class QueryProcessorType>
-    class QnStoredFileManager
+    class QnStoredFileNotificationManager
     :
         public AbstractStoredFileManager
     {
     public:
-        QnStoredFileManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
-
-        virtual int getStoredFile( const QString& filename, impl::GetStoredFileHandlerPtr handler ) override;
-        virtual int addStoredFile( const QString& filename, const QByteArray& data, impl::SimpleHandlerPtr handler ) override;
-        virtual int deleteStoredFile( const QString& filename, impl::SimpleHandlerPtr handler ) override;
-        virtual int listDirectory( const QString& folderName, impl::ListDirectoryHandlerPtr handler ) override;
+        QnStoredFileNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
 
         void triggerNotification( const QnTransaction<ApiStoredFileData>& tran )
         {
@@ -32,15 +26,32 @@ namespace ec2
                 assert( false );
         }
 
-        void triggerNotification( const QnTransaction<QString>& tran )
+        void triggerNotification( const QnTransaction<ApiStoredFilePath>& tran )
         {
             assert( tran.command == ApiCommand::removeStoredFile );
-            emit removed( tran.params );
+            emit removed( tran.params.path );
         }
 
     private:
-        QueryProcessorType* const m_queryProcessor;
         const ResourceContext m_resCtx;
+    };
+
+
+    template<class QueryProcessorType>
+    class QnStoredFileManager
+    :
+        public QnStoredFileNotificationManager
+    {
+    public:
+        QnStoredFileManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );
+
+        virtual int getStoredFile( const QString& filename, impl::GetStoredFileHandlerPtr handler ) override;
+        virtual int addStoredFile( const QString& filename, const QByteArray& data, impl::SimpleHandlerPtr handler ) override;
+        virtual int deleteStoredFile( const QString& filename, impl::SimpleHandlerPtr handler ) override;
+        virtual int listDirectory( const QString& folderName, impl::ListDirectoryHandlerPtr handler ) override;
+
+    private:
+        QueryProcessorType* const m_queryProcessor;
 
         QnTransaction<ApiStoredFileData> prepareTransaction( const QString& filename, const QByteArray& data );
         QnTransaction<ApiStoredFilePath> prepareTransaction( const QString& filename );

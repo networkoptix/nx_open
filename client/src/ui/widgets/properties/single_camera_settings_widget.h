@@ -170,6 +170,7 @@ private:
     Q_DECLARE_PRIVATE(QnCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
+    QMutex m_cameraMutex;
     QnVirtualCameraResourcePtr m_camera;
     bool m_cameraSupportsMotion;
 
