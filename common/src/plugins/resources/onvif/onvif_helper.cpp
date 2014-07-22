@@ -337,8 +337,18 @@ NameHelper::NameHelper()
     QnResourceTypePool::QnResourceTypeMap typeMap = qnResTypePool->getResourceTypeMap();
 
     foreach(QnResourceTypePtr rt, typeMap) {
+
+        if (rt->getParentId() == 0)
+            continue;
+
         QString normalizedManufacturer = rt->getManufacture().toLower().replace(UNNEEDED_CHARACTERS, QString());
-        QString normalizedName = rt->getName().toLower().replace(UNNEEDED_CHARACTERS, QString()).replace(normalizedManufacturer, QString());
+        QString normalizedName = rt->getName().toLower().replace(UNNEEDED_CHARACTERS, QString());
+
+        if (normalizedName == normalizedManufacturer + QString(lit("camera")))
+            continue;
+
+        normalizedName = normalizedName.replace(normalizedManufacturer, QString());
+
         camerasNames.insert(normalizedName);
     }
 }
