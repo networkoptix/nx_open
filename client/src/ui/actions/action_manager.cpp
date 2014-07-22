@@ -1606,6 +1606,12 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Disable Background Animation")).
         autoRepeat(false);
 
+    factory(Qn::DisableBackgroundAnimationAction).
+        flags(Qn::Main|Qn::GlobalHotkey).
+        shortcut(tr("Ctrl+Alt+T")).
+        text(tr("Disable Background Animation")).
+        autoRepeat(false);
+
 #ifdef QN_ENABLE_BOOKMARKS
     factory(Qn::ToggleBookmarksSearchAction).
         flags(Qn::GlobalHotkey).

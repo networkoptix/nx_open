@@ -217,6 +217,10 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
     if (m_rootNodeType == Qn::UsersNode && !(node->resourceFlags() &  QnResource::user)) 
         return m_rootNodes[Qn::BastardNode];
 
+    // We are requesting for the list of users so we don't want to see their layouts
+    if (m_rootNodeType == Qn::UsersNode && !(node->resourceFlags() &  QnResource::user)) 
+        return m_rootNodes[Qn::BastardNode];
+
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
     if(!parentResource || (parentResource->flags() & QnResource::local_server) == QnResource::local_server) {
         if(node->resourceFlags() & QnResource::local) {

@@ -713,6 +713,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #include <QtCore/QStandardPaths>
 #include <QtCore/Qstring>
 
+#include <QtCore/QStandardPaths>
+#include <QtCore/Qstring>
+
 int main(int argc, char **argv)
 {
 #ifdef Q_WS_X11
