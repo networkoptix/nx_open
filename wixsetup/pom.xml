@@ -17,7 +17,7 @@
         <root.dir>${basedir}/..</root.dir>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
-        <DbSync22Dir>${libdir}/${arch}/share/dbsync-2.2</DbSync22Dir>
+        <DbSync22Dir>${libdir}/${arch}/stage/dbsync-2.2</DbSync22Dir>
     </properties>
 
     <build>
