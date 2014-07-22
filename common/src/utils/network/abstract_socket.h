@@ -15,7 +15,8 @@
 #include "buffer.h"
 #include "nettools.h"
 #include "socket_common.h"
-#include "../common/systemerror.h"
+#include "utils/common/systemerror.h"
+
 
 //todo: #ak cancel asynchoronous operations
 
@@ -130,6 +131,11 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool getSendTimeout( unsigned int* millis ) = 0;
+    //!Get socket's last error code. Needed in case of \a aio::etError
+    /*!
+        \return \a true if read error code successfully, \a false otherwise
+    */
+    virtual bool getLastError( SystemError::ErrorCode* errorCode ) = 0;
     //!Returns system-specific socket handle
     /*!
         TODO: #ak remove this method after complete move to the new socket

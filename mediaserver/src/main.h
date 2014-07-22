@@ -16,12 +16,11 @@
 
 
 class QnAppserverResourceProcessor;
-class QnRtspListener;
-class QnRestServer;
 class QNetworkReply;
 class QnServerMessageProcessor;
 struct QnModuleInformation;
 class QnModuleFinder;
+struct QnPeerRuntimeInfo;
 
 class QnMain : public QnLongRunnable
 {
@@ -40,9 +39,9 @@ private slots:
     void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
     void at_localInterfacesChanged();
     void at_serverSaved(int, ec2::ErrorCode err);
-    void at_cameraIPConflict(QHostAddress host, QStringList macAddrList);
+    void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
-    void at_storageManager_storageFailure(QnResourcePtr storage, QnBusiness::EventReason reason);
+    void at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason);
     void at_storageManager_rebuildFinished();
     void at_timer();
     void at_connectionOpened();
@@ -51,9 +50,10 @@ private slots:
     void at_peerLost(const QnModuleInformation &moduleInformation);
 
     void at_appStarted();
+    void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
 private:
     void updateDisabledVendorsIfNeeded();
-    void initTcpListener();
+    bool initTcpListener();
     QHostAddress getPublicAddress();
 private:
     int m_argc;
@@ -62,9 +62,6 @@ private:
     qint64 m_firstRunningTime;
 
     QnModuleFinder* m_moduleFinder;
-    QnRtspListener* m_rtspListener;
-    QnRestServer* m_restServer;
-    QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
 };

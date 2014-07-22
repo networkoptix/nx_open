@@ -343,6 +343,12 @@ bool Socket::getSendTimeout( unsigned int* millis )
     return true;
 }
 
+bool Socket::getLastError(SystemError::ErrorCode* errorCode)
+{
+    socklen_t optLen = sizeof(*errorCode);
+    return getsockopt(sockDesc, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(errorCode), &optLen) == 0;
+}
+
 AbstractSocket::SOCKET_HANDLE Socket::handle() const
 {
     return sockDesc;
@@ -916,7 +922,7 @@ int CommunicatingSocket::recv( void* buffer, unsigned int bufferLen, int flags )
     if (bytesRead < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
-        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock)
+        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock && errCode != SystemError::again)
             mConnected = false;
     }
     else if (bytesRead == 0)
@@ -947,7 +953,7 @@ int CommunicatingSocket::send( const void* buffer, unsigned int bufferLen )
     if (sended < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
-        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock)
+        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock && errCode != SystemError::again)
             mConnected = false;
     }
     else if (sended == 0)
@@ -1119,13 +1125,35 @@ static int acceptWithTimeout( int sockDesc, int timeoutMillis = DEFAULT_ACCEPT_T
 
 #ifdef _WIN32
     fd_set read_set;
+    FD_ZERO( &read_set );
+    FD_SET( sockDesc, &read_set );
+
+    fd_set except_set;
+    FD_ZERO( &except_set );
+    FD_SET( sockDesc, &except_set );
+
     struct timeval timeout;
-    FD_ZERO(&read_set);
-    FD_SET(sockDesc, &read_set);
     timeout.tv_sec = 0;
     timeout.tv_usec = timeoutMillis * 1000;
 
-    result = ::select(sockDesc + 1, &read_set, NULL, NULL, &timeout);
+    result = ::select( sockDesc + 1, &read_set, NULL, &except_set, &timeout );
+    if( result < 0 )
+        return result;
+    if( result == 0 )   //timeout
+    {
+        ::SetLastError( SystemError::timedOut );
+        return -1;
+    }
+    if( FD_ISSET( sockDesc, &except_set ) )
+    {
+        int errorCode = 0;
+        int errorCodeLen = sizeof( errorCode );
+        if( getsockopt( sockDesc, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &errorCodeLen ) != 0 )
+            return -1;
+        ::SetLastError( errorCode );
+        return -1;
+    }
+    return ::accept( sockDesc, NULL, NULL );
 #else
     struct pollfd sockPollfd;
     memset( &sockPollfd, 0, sizeof(sockPollfd) );
@@ -1135,15 +1163,35 @@ static int acceptWithTimeout( int sockDesc, int timeoutMillis = DEFAULT_ACCEPT_T
     sockPollfd.events |= POLLRDHUP;
 #endif
     result = ::poll( &sockPollfd, 1, timeoutMillis );
-    if( result == 1 && (sockPollfd.revents & POLLIN) == 0 )
-        result = 0;
-#endif
-
-    if( result == 0 )
-        return -2;  //timed out
-    else if( result < 0 )
+    if( result < 0 )
+        return result;
+    if( result == 0 )   //timeout
+    {
+        errno = SystemError::timedOut;
         return -1;
-    return ::accept(sockDesc, NULL, NULL);
+    }
+    if( sockPollfd.revents & POLLIN )
+        return ::accept( sockDesc, NULL, NULL );
+    if( (sockPollfd.revents & POLLHUP)
+#ifdef _GNU_SOURCE
+        || (sockPollfd.revents & POLLRDHUP)
+#endif
+        )
+    {
+        errno = ENOTCONN;
+        return -1;
+    }
+    if( sockPollfd.revents & POLLERR )
+    {
+        int errorCode = 0;
+        socklen_t errorCodeLen = sizeof(errorCode);
+        if( getsockopt( sockDesc, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen ) != 0 )
+            return -1;
+        errno = errorCode;
+        return -1;
+    }
+    return -1;
+#endif
 }
 
 class TCPServerSocketPrivate
@@ -1243,8 +1291,7 @@ TCPServerSocket::TCPServerSocket()
 
 int TCPServerSocket::accept(int sockDesc)
 {
-    int result = acceptWithTimeout( sockDesc );
-    return result == -2 ? -1 : result;
+    return acceptWithTimeout( sockDesc );
 }
 
 bool TCPServerSocket::acceptAsyncImpl( std::unique_ptr<AbstractStreamServerSocket::AbstractAsyncAcceptHandler> handler )
@@ -1272,7 +1319,10 @@ AbstractStreamSocket* TCPServerSocket::accept()
     unsigned int recvTimeoutMs = 0;
     if( !getRecvTimeout( &recvTimeoutMs ) )
         return nullptr;
+
     return d->accept( recvTimeoutMs );
+//    const int newConnSD = acceptWithTimeout( sockDesc, recvTimeoutMs );
+//    return newConnSD >= 0 ? new TCPSocket( newConnSD ) : nullptr;
 }
 
 bool TCPServerSocket::setListen(int queueLen)
@@ -1280,6 +1330,38 @@ bool TCPServerSocket::setListen(int queueLen)
     return ::listen(sockDesc, queueLen) == 0;
 }
 
+// -------------------------- TCPSslServerSocket ----------------
+
+#ifdef ENABLE_SSL
+TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect): TCPServerSocket(), m_allowNonSecureConnect(allowNonSecureConnect)
+{
+
+}
+
+AbstractStreamSocket* TCPSslServerSocket::accept()
+{
+    AbstractStreamSocket* sock = TCPServerSocket::accept();
+    if (!sock)
+        return 0;
+
+    if (m_allowNonSecureConnect)
+        return new QnMixedSSLSocket(sock);
+
+    else
+        return new QnSSLSocket(sock, true);
+
+#if 0
+    // transparent accept required state machine here. doesn't implemented. Handshake implemented on first IO operations
+
+    QnSSLSocket* sslSock = new QnSSLSocket(sock);
+    if (sslSock->doServerHandshake())
+        return sslSock;
+    
+    delete sslSock;
+    return 0;
+#endif
+}
+#endif // ENABLE_SSL
 
 //////////////////////////////////////////////////////////
 ///////// class UDPSocket

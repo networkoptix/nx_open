@@ -20,13 +20,13 @@ public:
     virtual ~QnMotionHelper();
 
     // write motion data to file
-    void saveToArchive(QnConstMetaDataV1Ptr data);
+    void saveToArchive(const QnConstMetaDataV1Ptr& data);
 
-    QnTimePeriodList mathImage(const QList<QRegion>& region, QnResourceList resList, qint64 msStartTime, qint64 msEndTime, int detailLevel);
-    QnTimePeriodList mathImage(const QList<QRegion>& region, QnResourcePtr res, qint64 msStartTime, qint64 msEndTime, int detailLevel);
-    QnMotionArchiveConnectionPtr createConnection(QnResourcePtr res, int channel);
+    QnTimePeriodList matchImage(const QList<QRegion>& region, const QnResourceList& resList, qint64 msStartTime, qint64 msEndTime, int detailLevel);
+    QnTimePeriodList matchImage(const QList<QRegion>& region, const QnResourcePtr& res, qint64 msStartTime, qint64 msEndTime, int detailLevel);
+    QnMotionArchiveConnectionPtr createConnection(const QnResourcePtr& res, int channel);
 
-    QnMotionArchive* getArchive(QnResourcePtr res, int channel);
+    QnMotionArchive* getArchive(const QnResourcePtr& res, int channel);
 
     static QString getMotionDir(const QDate& date, const QString& macAddress);
     static void deleteUnusedFiles(const QList<QDate>& chunks, const QString& macAddress);
@@ -41,9 +41,9 @@ private:
     void createMask(const QRegion& region);
 
     // mach one motion image by mask
-    void mathImage(
+    void matchImage(
         const QList<QRegion>& regions,
-        QnResourcePtr res,
+        const QnResourcePtr& res,
         qint64 msStartTime,
         qint64 msEndTime,
         int detailLevel,

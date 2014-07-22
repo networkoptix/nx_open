@@ -16,7 +16,10 @@
 #include <common/common_globals.h>
 #include <utils/common/synctime.h>
 #include <utils/common/product_features.h>
-#include <api/app_server_connection.h>
+#include "common/common_module.h"
+
+#include "api/runtime_info_manager.h"
+#include <nx_ec/data/api_runtime_data.h>
 
 namespace {
     const char *networkOptixRSAPublicKey = "-----BEGIN PUBLIC KEY-----\n"
@@ -26,6 +29,7 @@ namespace {
 
     bool isSignatureMatch(const QByteArray &data, const QByteArray &signature, const QByteArray &publicKey)
     {
+#ifdef ENABLE_SSL
         // Calculate SHA1 hash
         QCryptographicHash hash(QCryptographicHash::Sha1);
         hash.addData(data);
@@ -46,6 +50,10 @@ namespace {
 
         // Verify signature is correct
         return memcmp(decrypted.data(), dataHash.data(), ret) == 0;
+#else 
+        // TODO: #Elric #android
+        return true;
+#endif
     }
 
 } // anonymous namespace
@@ -151,13 +159,28 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-bool QnLicense::isValid(const QList<QByteArray>& hardwareIds, const QString& brand, ErrorCode* errCode) const
+QUuid QnLicense::findRuntimeDataByLicense() const
+{
+    foreach(const QnPeerRuntimeInfo& info, QnRuntimeInfoManager::instance()->items()->getItems())
+    {
+        if (info.data.peer.peerType != Qn::PT_Server)
+            continue;
+
+        bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
+        bool brandOK = (m_brand == info.data.brand);
+        if (hwKeyOK && brandOK)
+            return info.uuid;
+    }
+    return QUuid();
+}
+
+bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
 {
     // >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
     // v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
     // We just allow empty brand for all, because we believe license is correct.
 
-    QString box = QnAppServerConnectionFactory::box();
+
     // 1. edge licenses can be activated only if box is "isd"
     // 2. if box is "isd" only edge licenses AND any trial can be activated
 
@@ -167,11 +190,23 @@ bool QnLicense::isValid(const QList<QByteArray>& hardwareIds, const QString& bra
         return false;
     }
 
-    if (!hardwareIds.contains(m_hardwareId)) {
+    QUuid runtimeDataUuid = isNewLicense ?
+        QnRuntimeInfoManager::instance()->items()->hasItem(qnCommon->remoteGUID()) 
+        ? qnCommon->remoteGUID()
+        : QUuid()
+    :findRuntimeDataByLicense();
+
+    if (runtimeDataUuid.isNull())
+    {
         if (errCode)
             *errCode = InvalidHardwareID;
         return false;
     }
+
+    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(runtimeDataUuid);        
+
+    const QString box = info.data.box;
+    const QString brand = info.data.brand;
 
     if (!m_brand.isEmpty() && m_brand != brand) {
         if (errCode)
@@ -373,7 +408,7 @@ int QnLicenseListHelper::totalCamerasByClass(bool analog) const
 
     foreach (QnLicensePtr license, m_licenseDict.values()) 
     {
-        if (license->isAnalog() == analog && license->isValid(qnLicensePool->allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT)))
+        if (license->isAnalog() == analog && license->isValid())
             result += license->cameraCount();
     }
     return result;
@@ -402,14 +437,12 @@ QnLicenseList QnLicensePool::getLicenses() const
 }
 
 bool QnLicensePool::isLicenseMatchesCurrentSystem(const QnLicensePtr &license) {
-    const QString brand(QLatin1String(QN_PRODUCT_NAME_SHORT));
-
-    return license->isValid(m_mainHardwareIds + m_compatibleHardwareIds, brand);
+    return license->isValid(0);
 }
 
 bool QnLicensePool::isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode) const
 {
-    return license->isValid(allHardwareIds(), QLatin1String(QN_PRODUCT_NAME_SHORT), errCode);
+    return license->isValid(errCode);
 }
 
 bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
@@ -476,73 +509,18 @@ bool QnLicensePool::isEmpty() const
     return m_licenseDict.isEmpty();
 }
 
-void QnLicensePool::setMainHardwareIds(const QList<QByteArray> &hardwareIds)
-{
-    m_mainHardwareIds = hardwareIds;
+
+QList<QByteArray> QnLicensePool::mainHardwareIds() const {
+    return QnRuntimeInfoManager::instance()->remoteInfo().data.mainHardwareIds;
 }
 
-QList<QByteArray> QnLicensePool::mainHardwareIds() const
-{
-    return m_mainHardwareIds;
+QList<QByteArray> QnLicensePool::compatibleHardwareIds() const {
+    return QnRuntimeInfoManager::instance()->remoteInfo().data.compatibleHardwareIds;
 }
 
-void QnLicensePool::setCompatibleHardwareIds(const QList<QByteArray> &hardwareIds)
-{
-    m_compatibleHardwareIds = hardwareIds;
-}
-
-QList<QByteArray> QnLicensePool::compatibleHardwareIds() const
-{
-    return m_compatibleHardwareIds;
-}
-
-QList<QByteArray> QnLicensePool::allHardwareIds() const
-{
-    return m_mainHardwareIds + m_compatibleHardwareIds + m_remoteHardwareIds;
-}
-
-QList<QByteArray> QnLicensePool::allLocalHardwareIds() const
-{
-    return m_mainHardwareIds + m_compatibleHardwareIds;
-}
-
-QList<QByteArray> QnLicensePool::allRemoteHardwareIds() const
-{
-    return m_remoteHardwareIds;
-}
-
-QMap<QnId, QList<QByteArray>> QnLicensePool::remoteHardwareIds() const
-{
-    return m_remoteHardwareIdsMap;
-}
-
-void QnLicensePool::addRemoteHardwareIds(const QnId& peer, const QList<QByteArray>& hardwareIds)
-{
-    m_remoteHardwareIdsMap.insert(peer, hardwareIds);
-    updateRemoteIdList();
-}
-
-void QnLicensePool::setRemoteHardwareIds(const QMap<QnId, QList<QByteArray>>& hardwareIds)
-{
-    m_remoteHardwareIdsMap = hardwareIds;
-    updateRemoteIdList();
-}
-
-void QnLicensePool::removeRemoteHardwareIds(const QnId& peer)
-{
-    m_remoteHardwareIdsMap.remove(peer);
-    updateRemoteIdList();
-}
-
-void QnLicensePool::updateRemoteIdList()
-{
-    QList<QByteArray> allHwId;
-    foreach(const QList<QByteArray>& hwIDs, m_remoteHardwareIdsMap.values())
-        allHwId << hwIDs;
-    m_remoteHardwareIds = allHwId;
-}
-
-QByteArray QnLicensePool::currentHardwareId() const
-{
-    return m_mainHardwareIds.isEmpty() ? QByteArray() : m_mainHardwareIds.last();
+QByteArray QnLicensePool::currentHardwareId() const {
+    QList<QByteArray> hwIds = mainHardwareIds();
+    return hwIds.isEmpty() 
+        ? QByteArray() 
+        : hwIds.last();
 }

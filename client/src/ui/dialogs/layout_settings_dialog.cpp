@@ -170,7 +170,7 @@ bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
         d->skipNextReleaseEvent = true;
     else if (event->type() == QEvent::MouseButtonRelease) 
     {
-        if (target == ui->imageLabel && event->type() == QEvent::MouseButtonRelease && !d->skipNextReleaseEvent)
+        if (target == ui->imageLabel && !d->skipNextReleaseEvent)
         {
             if (!ui->lockedCheckBox->isChecked() && (d->state == NoImage || d->state == Error) )
                 selectFile();

@@ -90,6 +90,11 @@ int GenericRTSPDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, c
     strncpy( cameras[0].defaultLogin, login, sizeof(cameras[0].defaultLogin)-1 );
     strncpy( cameras[0].defaultPassword, password, sizeof(cameras[0].defaultPassword)-1 );
 
+    QString modelname = url.fileName();
+    if (modelname.isEmpty())    //should not occur, security check
+        modelname = url.toString();
+    strncpy( cameras[0].modelName, modelname.toUtf8().data(), sizeof(cameras[0].modelName)-1 );
+
     return 1;
 }
 

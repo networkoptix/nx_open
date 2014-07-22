@@ -127,8 +127,10 @@ namespace nx_http
                         {
                             if( reconnectIfAppropriate() )
                                 break;
+                            SystemError::ErrorCode errorCode = SystemError::noError;
+                            sock->getLastError(&errorCode);
                             NX_LOG( lit("Error sending http request to %1. %2").
-                                arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
+                                arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
                         }
                         else
                         {
@@ -171,8 +173,10 @@ namespace nx_http
                         {
                             if( reconnectIfAppropriate() )
                                 break;
-                            NX_LOG( lit("Error reading http response from %1. %2").
-                                arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
+                            SystemError::ErrorCode errorCode = SystemError::noError;
+                            sock->getLastError(&errorCode);
+                            NX_LOG(lit("Error reading http response from %1. %2").
+                                arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
                         }
                         else
                         {
@@ -280,7 +284,9 @@ namespace nx_http
                     {
                         if( reconnectIfAppropriate() )
                             break;
-                        NX_LOG( lit("Error reading http response message body from %1").arg(m_url.toString()), cl_logDEBUG1 );
+                        SystemError::ErrorCode errorCode = SystemError::noError;
+                        sock->getLastError(&errorCode);
+                        NX_LOG(lit("Error reading http response message body from %1. %2").arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( sharedThis );
@@ -510,7 +516,7 @@ namespace nx_http
         int bytesRead = m_socket->recv( m_responseBuffer.data(), m_responseBuffer.size(), 0 );
         if( bytesRead < 0 )         //read error
         {
-            if( SystemError::getLastOSErrorCode() == SystemError::wouldBlock )
+            if( SystemError::getLastOSErrorCode() == SystemError::wouldBlock || SystemError::getLastOSErrorCode() == SystemError::again )
                 return 0;
             NX_LOG( lit("AsyncHttpClient. Error reading socket (%1). Url %2").
                 arg(SystemError::getLastOSErrorText()).arg(m_url.toString()), cl_logERROR );
@@ -594,8 +600,12 @@ namespace nx_http
     {
         Q_ASSERT( (int)m_requestBytesSent < m_requestBuffer.size() );
         int bytesSent = m_socket->send( m_requestBuffer.data()+m_requestBytesSent, m_requestBuffer.size()-m_requestBytesSent );
-        if( (bytesSent == -1) && (SystemError::getLastOSErrorCode() != SystemError::wouldBlock) )
+        if( (bytesSent == -1)
+            && (SystemError::getLastOSErrorCode() != SystemError::wouldBlock)
+            && (SystemError::getLastOSErrorCode() != SystemError::again) )
+        {
             return false;
+        }
         m_requestBytesSent += bytesSent;    //TODO it would be very usefull to use buffer with effective pop_front()
         return true;
     }

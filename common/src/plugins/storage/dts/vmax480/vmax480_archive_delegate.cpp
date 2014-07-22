@@ -7,12 +7,13 @@
 #include "core/resource/resource_media_layout.h"
 #include "vmax480_tcp_server.h"
 #include "utils/common/sleep.h"
+#include "utils/common/util.h"
 
 static const QByteArray FIXED_GROUP_ID("{6A7E6407-73A9-4042-B599-0B82CD726CF4}");
 
 static const int EMPTY_PACKET_REPEAT_INTERVAL = 100;
 
-QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(QnResourcePtr res):
+QnVMax480ArchiveDelegate::QnVMax480ArchiveDelegate(const QnResourcePtr& res):
     QnAbstractArchiveDelegate(),
     m_maxStream(NULL),
     m_needStop(false),

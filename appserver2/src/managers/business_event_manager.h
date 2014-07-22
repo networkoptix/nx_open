@@ -67,8 +67,7 @@ namespace ec2
 
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) override;
 
-        virtual int testEmailSettings( const QnEmail::Settings& settings, impl::SimpleHandlerPtr handler ) override;
-        virtual int sendEmail(const ApiEmailData& data, impl::SimpleHandlerPtr handler ) override;
+
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) override;
         virtual int deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler ) override;
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) override;

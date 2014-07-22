@@ -1168,11 +1168,38 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
     if (m_decoder == 0)
         return rez;
 
+#if 0
+	// unit test
+    for (int x = 0; x < MD_WIDTH; ++x)
+    {
+        for (int y = 0; y < MD_HEIGHT; ++y)
+        {
+            bool val = false;
+            switch (m_totalFrames/8 % 4)
+            {
+                case 0:
+                    val = x < MD_WIDTH/2 && y < MD_HEIGHT/2;                
+                    break;
+                case 1:
+                    val = x > MD_WIDTH/2 && y < MD_HEIGHT/2;                
+                    break;
+                case 2:
+                    val = x < MD_WIDTH/2 && y > MD_HEIGHT/2;                
+                    break;
+                case 3:
+                    val = x > MD_WIDTH/2 && y > MD_HEIGHT/2;                
+                    break;
+            }
+            if (val)
+                rez->setMotionAt(x,y);
+        }
+    }
+#else
     // scale result motion (height already valid, scale width ony. Data rotates, so actually duplicate or remove some lines
     int lineStep = (m_scaledWidth*65536) / MD_WIDTH;
     int scaledLineNum = 0;
     int prevILineNum = -1;
-    quint32* dst = (quint32*) rez->data.data();
+    quint32* dst = (quint32*) rez->data();
 
     //postFiltering();
 
@@ -1191,7 +1218,7 @@ QnMetaDataV1Ptr QnMotionEstimation::getMotion()
         prevILineNum = iLineNum;
         scaledLineNum += lineStep;
     }
-
+#endif
     memset(m_resultMotion, 0, MD_HEIGHT * m_scaledWidth);
     m_firstFrameTime = m_lastFrameTime;
     m_totalFrames++;

@@ -39,14 +39,12 @@ namespace ec2 {
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
     struct ApiPeerAliveData;
-    struct ApiServerInfoData;
-    //struct ApiSetResourceDisabledData;
     struct ApiSetResourceStatusData;
     struct ApiStorageData;
     struct ApiStoredFileData;
+    struct ApiStoredFilePath;
     struct ApiUserData;
     struct ApiVideowallControlMessageData;
-    struct ApiVideowallInstanceStatusData;
     struct ApiVideowallData;
     struct ApiVideowallItemData;
     struct ApiVideowallItemWithRefData;
@@ -58,14 +56,14 @@ namespace ec2 {
     struct ApiVideowallMatrixItemWithRefData;
     struct ApiUpdateUploadData;
     struct ApiUpdateUploadResponceData;
+    struct ApiUpdateInstallData;
     struct ApiCameraBookmarkTagData;
     struct ApiLoginData;
 
-    struct ApiHelpValueData;
-    struct ApiHelpParamData;
-    struct ApiHelpFunctionData;
-    struct ApiHelpGroupData;
-    struct ApiHelpGroupDataList;
+    struct ApiTimeData;
+
+    struct ApiPeerData;
+    struct ApiRuntimeData;
 
     typedef std::vector<ApiBusinessRuleData> ApiBusinessRuleDataList;
     typedef std::vector<ApiCameraData> ApiCameraDataList;
@@ -81,9 +79,6 @@ namespace ec2 {
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
     typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
-
-    typedef QString ApiStoredFilePath; // TODO: #Elric struct => extendable?
-    typedef QString ApiUpdateInstallData; // TODO: #Elric struct => extendable?
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
 
 #define QN_EC2_API_DATA_TYPES \
@@ -112,13 +107,12 @@ namespace ec2 {
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\
     (ApiPeerAliveData)\
-    (ApiServerInfoData)\
     (ApiSetResourceStatusData)\
+    (ApiStoredFilePath)\
     (ApiStorageData)\
     (ApiStoredFileData)\
     (ApiUserData)\
     (ApiVideowallControlMessageData)\
-    (ApiVideowallInstanceStatusData)\
     (ApiVideowallData)\
     (ApiVideowallItemData)\
     (ApiVideowallItemWithRefData)\
@@ -128,15 +122,14 @@ namespace ec2 {
     (ApiVideowallMatrixWithRefData)\
     (ApiVideowallMatrixItemData)\
     (ApiVideowallMatrixItemWithRefData)\
+    (ApiUpdateInstallData)\
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
     (ApiCameraBookmarkTagData)\
     (ApiLoginData)\
-    (ApiHelpValueData)\
-    (ApiHelpParamData)\
-    (ApiHelpFunctionData)\
-    (ApiHelpGroupData)\
-    (ApiHelpGroupDataList)\
+    (ApiTimeData)\
+    (ApiPeerData)\
+    (ApiRuntimeData)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

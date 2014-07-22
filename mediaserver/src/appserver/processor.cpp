@@ -2,16 +2,19 @@
 
 #include <QtCore/QThread>
 
+#include <utils/common/log.h>
+
 #include <core/resource/camera_resource.h>
-#include "core/resource_management/resource_pool.h"
-#include "core/resource_management/resource_discovery_manager.h"
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_discovery_manager.h>
+
 #include "api/common_message_processor.h"
 #include "mutex/camera_data_handler.h"
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)
 {
-    connect(qnResPool, SIGNAL(statusChanged(const QnResourcePtr &)), this, SLOT(at_resource_statusChanged(const QnResourcePtr &)));
+    connect(qnResPool, &QnResourcePool::statusChanged, this, &QnAppserverResourceProcessor::at_resource_statusChanged);
 
 
     m_cameraDataHandler = new ec2::QnMutexCameraDataHandler();
@@ -26,13 +29,10 @@ QnAppserverResourceProcessor::~QnAppserverResourceProcessor()
 
 void QnAppserverResourceProcessor::processResources(const QnResourceList &resources)
 {
-    
-
     foreach (QnResourcePtr resource, resources)
     {
-        QnVirtualCameraResourcePtr cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
-
-        if (cameraResource.isNull())
+        QnVirtualCameraResource* cameraResource = dynamic_cast<QnVirtualCameraResource*>(resource.data());
+        if (cameraResource == nullptr)
             continue;
 
         //Q_ASSERT(qnResPool->getAllNetResourceByPhysicalId(cameraResource->getPhysicalId()).isEmpty());

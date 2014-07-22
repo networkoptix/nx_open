@@ -14,6 +14,7 @@ public:
                                      const QString& reasonParamsEncoded = QString());
 
     virtual QnBusinessEventParameters getRuntimeParams() const override;
+
 protected:
     QnBusiness::EventReason m_reasonCode;
     QString m_reasonParamsEncoded;

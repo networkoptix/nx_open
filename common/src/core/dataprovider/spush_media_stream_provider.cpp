@@ -1,13 +1,16 @@
-
 #include "spush_media_stream_provider.h"
 
-#include "utils/common/sleep.h"
-#include "utils/common/util.h"
-#include "utils/network/simple_http_client.h"
-#include "../resource/camera_resource.h"
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <utils/common/sleep.h>
+#include <utils/common/util.h>
+#include <utils/common/log.h>
+#include <utils/network/simple_http_client.h>
+
+#include <core/resource/camera_resource.h>
 
 
-CLServerPushStreamReader::CLServerPushStreamReader(QnResourcePtr dev ):
+CLServerPushStreamReader::CLServerPushStreamReader(const QnResourcePtr& dev ):
     QnLiveStreamProvider(dev),
     m_needReopen(false),
     m_cameraAudioEnabled(false),
@@ -15,7 +18,7 @@ CLServerPushStreamReader::CLServerPushStreamReader(QnResourcePtr dev ):
     m_openStreamCounter(0),
     m_FrameCnt(0)
 {
-    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(getResource().data());
+    const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(dev.data());
     if (camera) 
         m_cameraAudioEnabled = camera->isAudioEnabled();
 }
@@ -93,7 +96,7 @@ void CLServerPushStreamReader::run()
             closeStream();
         }
 
-        QnAbstractMediaDataPtr data = getNextData();
+        const QnAbstractMediaDataPtr& data = getNextData();
 
 
         if (data==0)
@@ -167,7 +170,7 @@ void CLServerPushStreamReader::run()
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
         if (videoData)
         {
-            m_stat[videoData->channelNumber].onData(data->data.size());
+            m_stat[videoData->channelNumber].onData(data->dataSize());
             if (lp)
                 lp->onGotVideoFrame(videoData);
         }
@@ -214,3 +217,5 @@ void CLServerPushStreamReader::afterUpdate()
         m_cameraAudioEnabled = camera->isAudioEnabled();
     }
 }
+
+#endif // ENABLE_DATA_PROVIDERS

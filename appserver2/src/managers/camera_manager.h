@@ -1,8 +1,9 @@
-
 #ifndef CAMERA_MANAGER_H
 #define CAMERA_MANAGER_H
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_factory.h>
+
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_camera_data.h"
 #include "transaction/transaction.h"

@@ -525,7 +525,7 @@ namespace nx_hls
 
         std::vector<nx_hls::AbstractPlaylistManager::ChunkData> chunkList;
         bool isPlaylistClosed = false;
-        const QSharedPointer<nx_hls::AbstractPlaylistManager>& playlistManager = session->playlistManager(streamQuality);
+        const nx_hls::AbstractPlaylistManagerPtr& playlistManager = session->playlistManager(streamQuality);
         if( !playlistManager )
         {
             NX_LOG( QString::fromLatin1("Got request to not available %1 quality of camera %2").
@@ -767,13 +767,13 @@ namespace nx_hls
             for( const MediaQuality quality: requiredQualities )
             {
                 //generating sliding playlist, holding not more than CHUNK_COUNT_IN_ARCHIVE_PLAYLIST archive chunks
-                QSharedPointer<ArchivePlaylistManager> archivePlaylistManager(
-                    new ArchivePlaylistManager(
+                nx_hls::ArchivePlaylistManagerPtr archivePlaylistManager = 
+                    std::make_shared<ArchivePlaylistManager>(
                         camResource,
                         startTimestamp,
                         CHUNK_COUNT_IN_ARCHIVE_PLAYLIST,
                         newHlsSession->targetDurationMS() * USEC_IN_MSEC,
-                        quality ) );
+                        quality );
                 if( !archivePlaylistManager->initialize() )
                 {
                     NX_LOG( QString::fromLatin1("QnHttpLiveStreamingProcessor::getPlaylist. Failed to initialize archive playlist for camera %1").
@@ -803,7 +803,7 @@ namespace nx_hls
             //estimating bitrate as we can
             QnConstCompressedVideoDataPtr videoFrame = videoCamera->getLastVideoFrame( streamQuality == MEDIA_Quality_High );
             if( videoFrame )
-                bandwidth = videoFrame->data.size() * CHAR_BIT / COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO * camResource->getMaxFps();
+                bandwidth = videoFrame->dataSize() * CHAR_BIT / COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO * camResource->getMaxFps();
         }
         if( bandwidth == -1 )
             bandwidth = DEFAULT_PRIMARY_STREAM_BITRATE;

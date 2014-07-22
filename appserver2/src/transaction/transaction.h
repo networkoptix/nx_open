@@ -12,6 +12,10 @@
 #endif
 
 #include "utils/serialization/binary.h"
+#include "utils/serialization/json.h"
+#include "utils/serialization/xml.h"
+#include "utils/serialization/csv.h"
+#include "utils/serialization/ubjson.h"
 
 namespace ec2
 {
@@ -20,155 +24,108 @@ namespace ec2
         // TODO: #Elric #enum
         enum Value
         {
-		    NotDefined = 0,
+		    NotDefined                  = 0,
 
-            testConnection = 1,
-            connect = 2,
+            /* System */
+            tranSyncRequest             = 1,    /*< QnTranState */
+            tranSyncResponse            = 2,    /*< QnTranStateResponse */       
+            lockRequest                 = 3,    /*< ApiLockData */
+            lockResponse                = 4,    /*< ApiLockData */
+            unlockRequest               = 5,    /*< ApiLockData */
+            peerAliveInfo               = 6,    /*< ApiPeerAliveData */
 
-            //!ApiResourceTypeList
-            getResourceTypes = 4,
-            //!ApiResource
-            getResource = 5,
-            //!ApiSetResourceStatusData
-            setResourceStatus = 6,
-            //!ApiSetResourceDisabledData
-            //setResourceDisabled = 7,
-            //!ApiResourceParams
-            setResourceParams = 8,
-            getResourceParams = 9,
-            //!ApiResource
-            saveResource = 10,
-            removeResource = 11,
-            //!ApiPanicModeData
-            setPanicMode = 12,
-            //!ApiFullInfo,
-            getFullInfo = 13,
+            /* Connection */
+            testConnection              = 100,  /*< ApiLoginData */
+            connect                     = 101,  /*< ApiLoginData */
+
+            /* Common resource */
+            saveResource                = 200,  /*< ApiResourceData */
+            removeResource              = 201,  /*< ApiIdData */
+            setResourceStatus           = 202,  /*< ApiSetResourceStatusData */
+            getResourceParams           = 203,  /*< ApiResourceParamDataList */
+            setResourceParams           = 204,  /*< ApiResourceParamsData */
+            getResourceTypes            = 205,  /*< ApiResourceTypeDataList*/
+            getFullInfo                 = 206,  /*< ApiFullInfoData */
+            setPanicMode                = 207,  /*< ApiPanicModeData */
+
+            /* Camera resource */
+            getCameras                  = 300,  /*< ApiCameraDataList */
+            saveCamera                  = 301,  /*< ApiCameraData */
+            saveCameras                 = 302,  /*< ApiCameraDataList */
+            removeCamera                = 303,  /*< ApiIdData */
+            getCameraHistoryItems       = 304,  /*< ApiCameraServerItemDataList */
+            addCameraHistoryItem        = 305,  /*< ApiCameraServerItemData */
+            addCameraBookmarkTags       = 306,  /*< ApiCameraBookmarkTagDataList */
+            getCameraBookmarkTags       = 307,  /*< ApiCameraBookmarkTagDataList */
+            removeCameraBookmarkTags    = 308,
             
-            //!ApiCameraData
-            saveCamera = 14,
-            //!ApiCameraList
-            saveCameras = 15,
-            //!ApiIdData
-            removeCamera = 16,
-            getCameras = 17,
-            //!ApiCameraServerItemList
-            getCameraHistoryItems = 18,
-            //!ApiCameraServerItem
-            addCameraHistoryItem = 19,
+          
+            /* MediaServer resource */
+            getMediaServers             = 400,  /*< ApiMediaServerDataList */
+            saveMediaServer             = 401,  /*< ApiMediaServerData */
+            removeMediaServer           = 402,  /*< ApiIdData */
 
-            getMediaServers = 20,
-            //!ApiMediaServer
-            saveMediaServer = 21,
-            //!ApiIdData
-            removeMediaServer = 22,
+            /* User resource */
+            getUsers                    = 500,  /*< ApiUserDataList */
+            saveUser                    = 501,  /*< ApiUserData */
+            removeUser                  = 502,  /*< ApiIdData */
 
-            //!ApiUser
-            saveUser = 23,
-            getUsers = 24,
-            //!ApiIdData
-            removeUser = 25,
+            /* Layout resource */
+            getLayouts                  = 600,  /*< ApiLayoutDataList */
+            saveLayout                  = 601,  /*< ApiLayoutDataList */
+            saveLayouts                 = 602,  /*< ApiLayoutData */
+            removeLayout                = 603,  /*< ApiIdData */
 
-            //!ApiBusinessRuleList
-            getBusinessRules = 26,
-            //!ApiBusinessRule
-            saveBusinessRule = 27,
-            //!ApiIdData
-            removeBusinessRule = 28,
-            //!ApiBusinessActionData
-            broadcastBusinessAction = 29,
-            //!ApiBusinessActionData
-            execBusinessAction = 30,
+            /* Videowall resource */
+            getVideowalls               = 700,  /*< ApiVideowallDataList */
+            saveVideowall               = 701,  /*< ApiVideowallData */
+            removeVideowall             = 702,  /*< ApiIdData */
+            videowallControl            = 703,  /*< ApiVideowallControlMessageData */
 
-            //!ApiResetBusinessRuleData
-            resetBusinessRules = 31,
+            /* Business rules */
+            getBusinessRules            = 800,  /*< ApiBusinessRuleDataList */
+            saveBusinessRule            = 801,  /*< ApiBusinessRuleData */
+            removeBusinessRule          = 802,  /*< ApiIdData */
+            resetBusinessRules          = 803,  /*< ApiResetBusinessRuleData */
+            broadcastBusinessAction     = 804,  /*< ApiBusinessActionData */
+            execBusinessAction          = 805,  /*< ApiBusinessActionData */
 
-            //!ApiLayout
-            saveLayouts = 32,
-            //!ApiLayoutList
-            saveLayout = 33,
-            //!ApiLayoutList
-            getLayouts = 34,
-            //!ApiIdData
-            removeLayout = 35,
-            
-            //!ApiVideowall
-            saveVideowall = 36,
-            getVideowalls = 37,
-            //!ApiIdData
-            removeVideowall = 38,
+            /* Stored files */
+            listDirectory               = 900,  /*< ApiStoredDirContents */
+            getStoredFile               = 901,  /*< ApiStoredFileData */
+            addStoredFile               = 902,  /*< ApiStoredFileData */
+            updateStoredFile            = 903,  /*< ApiStoredFileData */
+            removeStoredFile            = 904,  /*< ApiStoredFilePath */
 
-            //!ApiVideoWallControlMessage
-            videowallControl = 39,
+            /* Licenses */
+            getLicenses                 = 1000, /*< ApiLicenseDataList */
+            addLicense                  = 1001, /*< ApiLicenseData */
+            addLicenses                 = 1002, /*< ApiLicenseDataList */
 
-            //!
-            listDirectory = 40,
-            //!ApiStoredFileData
-            getStoredFile = 41,
-            //!ApiStoredFileData
-            addStoredFile = 42,
-            //!ApiStoredFileData
-            updateStoredFile = 43,
-            //!QString
-            removeStoredFile = 44,
+            /* Auto-updates */
+            uploadUpdate                = 1200, /*< ApiUpdateUploadData */
+            uploadUpdateResponce        = 1201, /*< ApiUpdateUploadResponceData */
+            installUpdate               = 1202, /*< ApiUpdateInstallData  */
 
-            //!ApiLicenseList
-            addLicenses = 45,
-            //!ApiLicense
-            addLicense = 46,
-            //!ApiLicenseList
-            getLicenses = 47,
+            /* Misc */
+            getCurrentTime              = 9002,  /*< ApiTimeData */         
+            //getHelp                     = 9003,  /*< ApiHelpGroupDataList */
+			runtimeInfoChanged          = 9004,  /*< ApiRuntimeData */
 
-            // ApiEmailSettingsData
-            testEmailSettings = 48,
-
-            // ApiEmailData
-            sendEmail = 49,
-
-            //!ApiResourceParamList
-            getSettings = 50,
-            //!ApiResourceParamList
-            saveSettings = 51,
-
-            getCurrentTime = 52,
-
-            tranSyncRequest = 53,
-            tranSyncResponse = 54,
-            
-            peerAliveInfo = 55,
-            
-            //!ApiLockInfo
-            lockRequest = 56,
-            lockResponse = 57,
-            unlockRequest = 58,
-
-            //!ApiUpdateUploadData
-            uploadUpdate = 59,
-            //!ApiUpdateUploadResponceData
-            uploadUpdateResponce = 60,
-            //!ApiUpdateInstallData
-            installUpdate = 61,
-
-            //!ApiCameraBookmarkTagDataList
-            addCameraBookmarkTags = 62,
-            getCameraBookmarkTags = 63,
-            removeCameraBookmarkTags = 64,
-
-            //ApiHelpGroupDataList
-            getHelp = 65,
-
-            //ApiVideowallInstanceStatusData
-            updateVideowallInstanceStatus = 66
+			maxTransactionValue         = 65535
         };
         QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Value)
 
         QString toString( Value val );
+
+        /** Check if transaction can be sent independently of current connection state. MUST have sequence field filled. */
         bool isSystem( Value val );
     }
 
     class QnAbstractTransaction
     {
     public:
-		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false), timestamp(0), localTransaction(false) {}
+		QnAbstractTransaction(): command(ApiCommand::NotDefined), persistent(false), timestamp(0), isLocal(false) {}
         QnAbstractTransaction(ApiCommand::Value command, bool persistent);
         
         static void setStartSequence(int value);
@@ -197,8 +154,7 @@ namespace ec2
         bool persistent;
         qint64 timestamp;
         
-        static QAtomicInt m_sequence;
-        bool localTransaction; // do not propagate transactions to other server peers
+        bool isLocal; // do not propagate transactions to other server peers
     };
 
     typedef QnAbstractTransaction::ID QnAbstractTransaction_ID;
@@ -216,28 +172,64 @@ namespace ec2
         T params;
     };
 
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json))
-    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction::ID, (binary)(json)(ubj))
+    QN_FUSION_DECLARE_FUNCTIONS(QnAbstractTransaction, (binary)(json)(ubj))
 
+    //Binary format functions for QnTransaction<T>
     template <class T, class Output>
-    void serialize(const QnTransaction<T> &transaction, QnOutputBinaryStream<Output> *stream)
+    void serialize(const QnTransaction<T> &transaction,  QnOutputBinaryStream<Output> *stream)
     {
         QnBinary::serialize(static_cast<const QnAbstractTransaction &>(transaction), stream);
         QnBinary::serialize(transaction.params, stream);
     }
 
     template <class T, class Input>
-    bool deserialize(QnInputBinaryStream<Input>* stream, QnTransaction<T> *transaction)
+    bool deserialize(QnInputBinaryStream<Input>* stream,  QnTransaction<T> *transaction)
     {
         return 
-            QnBinary::deserialize(stream, static_cast<QnAbstractTransaction *>(transaction)) &&
+            QnBinary::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&
             QnBinary::deserialize(stream, &transaction->params);
+    }
+
+
+    //Json format functions for QnTransaction<T>
+    template<class T>
+    void serialize(QnJsonContext* ctx, const QnTransaction<T>& tran, QJsonValue* target)
+    {
+        QJson::serialize(ctx, static_cast<const QnAbstractTransaction&>(tran), target);
+        QJsonObject localTarget = target->toObject();
+        QJson::serialize(ctx, tran.params, "params", &localTarget);
+        *target = localTarget;
+    }
+
+    template<class T>
+    bool deserialize(QnJsonContext* ctx, const QJsonValue& value, QnTransaction<T>* target)
+    {
+        return 
+            QJson::deserialize(ctx, value, static_cast<QnAbstractTransaction*>(target)) &&
+            QJson::deserialize(ctx, value.toObject(), "params", &target->params);
+    }
+
+    //QnUbjson format functions for QnTransaction<T>
+    template <class T, class Output>
+    void serialize(const QnTransaction<T> &transaction,  QnUbjsonWriter<Output> *stream)
+    {
+        QnUbjson::serialize(static_cast<const QnAbstractTransaction &>(transaction), stream);
+        QnUbjson::serialize(transaction.params, stream);
+    }
+
+    template <class T, class Input>
+    bool deserialize(QnUbjsonReader<Input>* stream,  QnTransaction<T> *transaction)
+    {
+        return 
+            QnUbjson::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&
+            QnUbjson::deserialize(stream, &transaction->params);
     }
 
     int generateRequestID();
 } // namespace ec2
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (numeric))
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((ec2::ApiCommand::Value), (metatype)(numeric))
 
 #ifndef QN_NO_QT
 Q_DECLARE_METATYPE(ec2::QnAbstractTransaction)

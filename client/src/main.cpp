@@ -35,21 +35,24 @@ extern "C"
 
 #include "decoders/video/ipp_h264_decoder.h"
 
+#include <utils/common/log.h>
 #include <utils/common/command_line_parser.h>
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
 #ifdef Q_OS_WIN
-    #include "device_plugins/desktop_win/device/desktop_resource_searcher.h"
+    #include <plugins/resource/desktop_win/desktop_resource_searcher.h>
 #endif
 #include "utils/common/util.h"
-#include "plugins/resources/archive/avi_files/avi_resource.h"
+#include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_discovery_manager.h"
 #include "core/resource_management/resource_pool.h"
-#include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
+#include "plugins/resource/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
-#include "device_plugins/server_camera/server_camera.h"
+#include <plugins/resource/server_camera/server_camera.h>
+#include <plugins/resource/server_camera/server_camera_factory.h>
+
 
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
@@ -57,19 +60,19 @@ extern "C"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
 
-#include "plugins/resources/axis/axis_resource_searcher.h"
+#include "plugins/resource/axis/axis_resource_searcher.h"
 #include "plugins/plugin_manager.h"
 #include "core/resource/resource_directory_browser.h"
 
 #include "tests/auto_tester.h"
-#include "plugins/resources/d-link/dlink_resource_searcher.h"
+#include "plugins/resource/d-link/dlink_resource_searcher.h"
 #include "api/session_manager.h"
-#include "plugins/resources/droid/droid_resource_searcher.h"
+#include "plugins/resource/droid/droid_resource_searcher.h"
 #include "ui/actions/action_manager.h"
-#include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
-#include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
-#include "plugins/resources/isd/isd_resource_searcher.h"
-//#include "plugins/resources/onvif/onvif_ws_searcher.h"
+#include "plugins/resource/iqinvision/iqinvision_resource_searcher.h"
+#include "plugins/resource/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
+#include "plugins/resource/isd/isd_resource_searcher.h"
+//#include "plugins/resource/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
 
 
@@ -95,8 +98,9 @@ extern "C"
 #endif
 
 #include "ui/help/help_handler.h"
-#include "client/client_module.h"
+#include <client/client_module.h>
 #include <client/client_connection_data.h>
+#include <client/client_resource_processor.h>
 #include "platform/platform_abstraction.h"
 #include "utils/common/long_runnable.h"
 
@@ -113,6 +117,7 @@ extern "C"
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"
 #endif
+#include "api/runtime_info_manager.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -240,7 +245,7 @@ void addTestData()
 }
 #endif
 
-void initAppServerConnection(const QUuid &videowallGuid, const QUuid &instanceGuid)
+void initAppServerConnection(const QUuid &videowallGuid, const QUuid &videowallInstanceGuid)
 {
     QUrl appServerUrl = qnSettings->lastUsedConnection().url;
 
@@ -249,10 +254,10 @@ void initAppServerConnection(const QUuid &videowallGuid, const QUuid &instanceGu
 
     QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
-    QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
+    QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
     if (!videowallGuid.isNull()) {
         QnAppServerConnectionFactory::setVideowallGuid(videowallGuid);
-        QnAppServerConnectionFactory::setInstanceGuid(instanceGuid);
+        QnAppServerConnectionFactory::setInstanceGuid(videowallInstanceGuid);
     }
 }
 
@@ -357,7 +362,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     QUuid videowallGuid(sVideoWallGuid);
-    QUuid instanceGuid(sVideoWallItemGuid);
+    QUuid videowallInstanceGuid(sVideoWallItemGuid);
 
     QString logFileNameSuffix;
     if (!videowallGuid.isNull()) {
@@ -367,9 +372,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         noVersionMismatchCheck = true;
         qnSettings->setLightModeOverride(Qn::LightModeVideoWall);
 
-        logFileNameSuffix = instanceGuid.isNull() 
+        logFileNameSuffix = videowallInstanceGuid.isNull() 
             ? videowallGuid.toString() 
-            : instanceGuid.toString();
+            : videowallInstanceGuid.toString();
         logFileNameSuffix.replace(QRegExp(lit("[{}]")), lit("_"));
     }
 
@@ -452,22 +457,34 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         }
     }
 
+    QScopedPointer<QnServerCameraFactory> serverCameraFactory(new QnServerCameraFactory());
+
     //NOTE QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory( new QnNetworkProxyFactory() );
 
     /* Initialize connections. */
-    initAppServerConnection(videowallGuid, instanceGuid);
+    initAppServerConnection(videowallGuid, videowallInstanceGuid);
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
     ec2::ResourceContext resCtx(
-        &QnServerCameraFactory::instance(),
+        QnServerCameraFactory::instance(),
         qnResPool,
         qnResTypePool );
 	ec2ConnectionFactory->setContext( resCtx );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
 
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
-    //clientMessageProcessor->init(QnAppServerConnectionFactory::getConnection2());
+    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
+
+    ec2::ApiRuntimeData runtimeData;
+    runtimeData.peer.id = qnCommon->moduleGUID();
+    runtimeData.peer.peerType = videowallInstanceGuid.isNull()
+        ? Qn::PT_DesktopClient
+        : Qn::PT_VideowallClient;
+    runtimeData.brand = lit(QN_PRODUCT_NAME_SHORT);
+    runtimeData.version = 1;
+    runtimeData.videoWallInstanceGuid = videowallInstanceGuid;
+    QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);    // initializing localInfo
 
     qnSettings->save();
     if (!QDir(qnSettings->mediaFolder()).exists())
@@ -495,16 +512,16 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     ffmpegInit();
 
-    qnCommon->setModuleGUID(QUuid::createUuid());
+    
 
     //===========================================================================
 
     CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
 
-    QnLocalFileProcessor localFileProcessor;
+    QnClientResourceProcessor resourceProcessor;
     QnResourceDiscoveryManager::init(new QnResourceDiscoveryManager());
-    localFileProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(&localFileProcessor);
+    resourceProcessor.moveToThread( QnResourceDiscoveryManager::instance() );
+    QnResourceDiscoveryManager::instance()->setResourceProcessor(&resourceProcessor);
 
     //============================
     //QnResourceDirectoryBrowser
@@ -626,7 +643,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     addTestData();
 #endif
 
-    if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::INITIAL) {
+    if(autoTester.tests() != 0 && autoTester.state() == QnAutoTester::Initial) {
         QObject::connect(&autoTester, SIGNAL(finished()), application, SLOT(quit()));
         autoTester.start();
     }
@@ -651,7 +668,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if (!videowallGuid.isNull()) {
         context->menu()->trigger(Qn::DelayedOpenVideoWallItemAction, QnActionParameters()
                              .withArgument(Qn::VideoWallGuidRole, videowallGuid)
-                             .withArgument(Qn::VideoWallItemGuidRole, instanceGuid));
+                             .withArgument(Qn::VideoWallItemGuidRole, videowallInstanceGuid));
     } else {
         /* Drop resources if needed. */
         if(!delayedDrop.isEmpty()) {
@@ -672,7 +689,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     result = application->exec();
 
-    if(autoTester.state() == QnAutoTester::FINISHED) {
+    if(autoTester.state() == QnAutoTester::Finished) {
         if(!autoTester.succeeded())
             result = 1;
 

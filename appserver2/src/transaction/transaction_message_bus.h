@@ -34,10 +34,10 @@ namespace ec2
 
         void addConnectionToPeer(const QUrl& url, const QUuid& peer = QUuid());
         void removeConnectionFromPeer(const QUrl& url);
-        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const QnPeerInfo &remotePeer, QList<QByteArray> hwList);
+        void gotConnectionFromRemotePeer(QSharedPointer<AbstractStreamSocket> socket, const ApiPeerData &remotePeer);
         
-        void setLocalPeer(const QnPeerInfo localPeer);
-        QnPeerInfo localPeer() const;
+        void setLocalPeer(const ApiPeerData localPeer);
+        ApiPeerData localPeer() const;
 
         void start();
 
@@ -63,6 +63,9 @@ namespace ec2
             sendTransactionInternal(tran, QnTransactionTransportHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers));
         }
 
+        /** Template specialization to fill dstPeers from the transaction params. */
+        void sendTransaction(const QnTransaction<ec2::ApiVideowallControlMessageData>& tran, const QnPeerSet& dstPeers = QnPeerSet());
+
         template <class T>
         void sendTransaction(const QnTransaction<T>& tran, const QnId& dstPeerId)
         {
@@ -75,12 +78,11 @@ namespace ec2
 
         struct AlivePeerInfo
         {
-            AlivePeerInfo(): peer(QnId(), QnPeerInfo::Server), isProxy(false) { lastActivity.restart(); }
-            AlivePeerInfo(const QnPeerInfo &peer, bool isProxy, QList<QByteArray> hwList): peer(peer), isProxy(isProxy), hwList(hwList) { lastActivity.restart(); }
-            QnPeerInfo peer;
-            bool isProxy;
+            AlivePeerInfo(): peer(QnId(), Qn::PT_Server) { lastActivity.restart(); }
+            AlivePeerInfo(const ApiPeerData &peer): peer(peer) { lastActivity.restart(); }
+            ApiPeerData peer;
+            QSet<QnId> proxyVia;
             QElapsedTimer lastActivity;
-            QList<QByteArray> hwList;
         };
         typedef QMap<QnId, AlivePeerInfo> AlivePeersMap;
 
@@ -159,18 +161,21 @@ namespace ec2
         void gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader);
 
         void onGotTransactionSyncRequest(QnTransactionTransport* sender, const QnTransaction<QnTranState> &tran);
-        void onGotTransactionSyncResponse(QnTransactionTransport* sender);
+        void onGotTransactionSyncResponse(QnTransactionTransport* sender, const QnTransaction<QnTranStateResponse> &tran);
         void onGotDistributedMutexTransaction(const QnTransaction<ApiLockData>& tran);
         void queueSyncRequest(QnTransactionTransport* transport);
 
-        void connectToPeerEstablished(const QnPeerInfo &peerInfo, const QList<QByteArray>& hwList);
+        void connectToPeerEstablished(const ApiPeerData &peerInfo);
         void connectToPeerLost(const QnId& id);
-        void handlePeerAliveChanged(const QnPeerInfo& peer, bool isAlive, const QList<QByteArray>& hwList);
-        void sendVideowallInstanceStatus(const QnPeerInfo &peer, bool isAlive);
+        void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool isProxy);
         bool isPeerUsing(const QUrl& url);
-        void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran);
+        void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QnId& gotFromID);
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
 
+        void sendRuntimeInfo(QnTransactionTransport* transport, const QnPeerSet& processedPeers);
+
+        void addAlivePeerInfo(ApiPeerData peerData, const QnId& gotFromPeer = QnId());
+        void removeAlivePeer(const QnId& id, bool isProxy);
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
@@ -179,10 +184,11 @@ namespace ec2
 
     private:
         /** Info about us. Should be set before start(). */
-        QnPeerInfo m_localPeer;
+        ApiPeerData m_localPeer;
 
         QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
+		QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
 
         struct RemoteUrlConnectInfo {
             RemoteUrlConnectInfo(const QUuid& peer = QUuid()): peer(peer), lastConnectedTime(0) {}

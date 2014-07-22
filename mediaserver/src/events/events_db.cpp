@@ -1,7 +1,7 @@
-
 #include "events_db.h"
 
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QtEndian>
 
 #include "business/events/abstract_business_event.h"
 #include "utils/common/synctime.h"
@@ -48,15 +48,15 @@ bool QnEventsDB::createDatabase()
         QByteArray sql = versionQuery.value("sql").toByteArray();
         versionQuery.clear();
         if (!sql.contains("business_rule_guid")) {
-            if (!execSQLQuery("drop index 'timeAndCamIdx'")) {
+            if (!execSQLQuery("drop index 'timeAndCamIdx'", m_sdb)) {
                 return false;
             }
-            if (!execSQLQuery("drop table 'runtime_actions'"))
+            if (!execSQLQuery("drop table 'runtime_actions'", m_sdb))
                 return false;
         }
     }
 
-    if (!isObjectExists(lit("table"), lit("runtime_actions")))
+    if (!isObjectExists(lit("table"), lit("runtime_actions"), m_sdb))
     {
         QSqlQuery ddlQuery(m_sdb);
         ddlQuery.prepare(
@@ -69,7 +69,7 @@ bool QnEventsDB::createDatabase()
             return false;
     }
 
-    if (!isObjectExists(lit("index"), lit("timeAndCamIdx"))) {
+    if (!isObjectExists(lit("index"), lit("timeAndCamIdx"), m_sdb)) {
         QSqlQuery ddlQuery(m_sdb);
         ddlQuery.prepare(
             "CREATE INDEX \"timeAndCamIdx\" ON \"runtime_actions\" (timestamp,event_resource_guid)"
@@ -115,7 +115,7 @@ bool QnEventsDB::removeLogForRes(QnId resId)
     return delQuery.exec();
 }
 
-bool QnEventsDB::saveActionToDB(QnAbstractBusinessActionPtr action, QnResourcePtr actionRes)
+bool QnEventsDB::saveActionToDB(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& actionRes)
 {
     QWriteLocker lock(&m_mutex);
 
@@ -258,7 +258,7 @@ QList<QnAbstractBusinessActionPtr> QnEventsDB::getActions(
 
 inline void appendIntToBA(QByteArray& ba, int value)
 {
-    value = htonl(value);
+    value = qToBigEndian(value);
     ba.append((const char*) &value, sizeof(int));
 }
 
@@ -336,7 +336,7 @@ void QnEventsDB::getAndSerializeActions(
         //ba->set_actionparams(actionsQuery.value(actionParamIdx).toByteArray());
         //ba->set_runtimeparams(actionsQuery.value(runtimeParamIdx).toByteArray());
     }
-    sizeField = htonl(sizeField);
+    sizeField = qToBigEndian(sizeField);
     memcpy(result.data(), &sizeField, sizeof(int));
 
     qDebug() << Q_FUNC_INFO << "query time=" << t.elapsed() << "msec";

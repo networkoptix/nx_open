@@ -1,5 +1,11 @@
 #include "ffmpeg_transcoder.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QDebug>
+
+#include "utils/common/log.h"
+
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
 
@@ -142,7 +148,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         if (videoStream == 0)
         {
             m_lastErrMessage = tr("Could not allocate output stream for recording.");
-            cl_log.log(m_lastErrMessage, cl_logERROR);
+            NX_LOG(m_lastErrMessage, cl_logERROR);
             return -1;
         }
 
@@ -220,7 +226,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         if (audioStream == 0)
         {
             m_lastErrMessage = tr("Could not allocate output stream for recording.");
-            cl_log.log(m_lastErrMessage, cl_logERROR);
+            NX_LOG(m_lastErrMessage, cl_logERROR);
             return -1;
         }
 
@@ -264,7 +270,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
     {
         closeFfmpegContext();
         m_lastErrMessage = tr("Video or audio codec is incompatible with container %1.").arg(m_container);
-        cl_log.log(m_lastErrMessage, cl_logERROR);
+        NX_LOG(m_lastErrMessage, cl_logERROR);
         return -3;
     }
     m_initialized = true;
@@ -295,13 +301,11 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
     AVStream* stream = m_formatCtx->streams[streamIndex];
     AVPacket packet;
     av_init_packet(&packet);
-
-    QnConstCompressedVideoDataPtr video = qSharedPointerDynamicCast<const QnCompressedVideoData>(media);
+    
     QnAbstractMediaDataPtr transcodedData;
     
-
     QnCodecTranscoderPtr transcoder;
-    if (video)
+    if (dynamic_cast<const QnCompressedVideoData*>(media.data()))
         transcoder = m_vTranscoder;
     else
         transcoder = m_aTranscoder;
@@ -318,8 +322,9 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
             if (errCode != 0)
                 return errCode;
             if (transcodedData) {
-                packet.data = (quint8*) transcodedData->data.data();
-                packet.size = transcodedData->data.size();
+                packet.data = const_cast<quint8*>((const quint8*) transcodedData->data());  //const_cast is here because av_write_frame accepts 
+                                                                                            //non-const pointer, but does not modifiy packet buffer
+                packet.size = transcodedData->dataSize();
                 packet.pts = av_rescale_q(transcodedData->timestamp - m_baseTime, srcRate, stream->time_base);
                 if(transcodedData->flags & AV_PKT_FLAG_KEY)
                     packet.flags |= AV_PKT_FLAG_KEY;
@@ -328,8 +333,8 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
         else {
             // direct stream copy
             packet.pts = av_rescale_q(media->timestamp - m_baseTime, srcRate, stream->time_base);
-            packet.data = (quint8*) media->data.data();
-            packet.size = media->data.size();
+            packet.data = const_cast<quint8*>((const quint8*) media->data());
+            packet.size = media->dataSize();
             if((media->dataType == QnAbstractMediaData::AUDIO) || (media->flags & AV_PKT_FLAG_KEY))
                 packet.flags |= AV_PKT_FLAG_KEY;
         }
@@ -365,3 +370,5 @@ AVCodecContext* QnFfmpegTranscoder::getAudioCodecContext() const
 { 
     return m_audioEncoderCodecCtx; 
 }
+
+#endif // ENABLE_DATA_PROVIDERS

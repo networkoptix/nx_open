@@ -3,14 +3,14 @@
 
 #ifdef ENABLE_VMAX
 
-#include "plugins/resources/archive/abstract_archive_delegate.h"
+#include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "vmax480_resource.h"
 #include "vmax480_stream_fetcher.h"
 
 class QnVMax480ArchiveDelegate: public QnAbstractArchiveDelegate, public QnVmax480DataConsumer
 {
 public:
-    QnVMax480ArchiveDelegate(QnResourcePtr res);
+    QnVMax480ArchiveDelegate(const QnResourcePtr& res);
     virtual ~QnVMax480ArchiveDelegate();
 
 

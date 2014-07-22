@@ -1,6 +1,8 @@
 #ifndef __SSL_SOCKET_H_
 #define __SSL_SOCKET_H_
 
+#ifdef ENABLE_SSL
+
 #include <openssl/ssl.h>
 
 #include <QObject>
@@ -57,6 +59,8 @@ public:
     virtual bool getRecvTimeout( unsigned int* millis ) override;
     virtual bool setSendTimeout( unsigned int ms ) override;
     virtual bool getSendTimeout( unsigned int* millis ) override;
+    //!Implementation of AbstractSocket::getLastError
+    virtual bool getLastError(SystemError::ErrorCode* errorCode) override;
     virtual SOCKET_HANDLE handle() const override;
 
     bool doServerHandshake();
@@ -111,5 +115,6 @@ public:
 private:
     bool m_allowNonSecureConnect;
 };
+#endif // ENABLE_SSL
 
 #endif // __SSL_SOCKET_H_

@@ -8,7 +8,7 @@
 namespace nx_ms_conf
 {
     //!Port, server listenes on. All requests (ec2 API, mediaserver API, rtsp) are accepted on this port, so name \a rtspPort does not reflects its purpose
-    static const QLatin1String RTSP_PORT( "rtspPort" );
+    static const QLatin1String RTSP_PORT( "port" );
     static const int DEFAULT_RTSP_PORT = 7001;
 
     static const QLatin1String MIN_STORAGE_SPACE( "minStorageSpace" );
@@ -55,6 +55,10 @@ namespace nx_ms_conf
     */
     static const QLatin1String FFMPEG_BUFFER_SIZE( "ffmpegBufferSize" );
     static const int DEFAULT_FFMPEG_BUFFER_SIZE = 4*1024*1024;
+
+    //!If no one uses HLS for thid time period (in seconds), than live media cache is stopped and cleaned. It will be restarted with next HLS request
+    static const QLatin1String HLS_INACTIVITY_PERIOD( "hlsInactivityPeriod" );
+    static const int DEFAULT_HLS_INACTIVITY_PERIOD = 150;
 }
 
 /*!

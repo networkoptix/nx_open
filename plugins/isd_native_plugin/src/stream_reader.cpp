@@ -28,7 +28,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 
-#include <plugins/resources/third_party/motion_data_picture.h>
+#include <plugins/resource/third_party/motion_data_picture.h>
 #include <utils/common/log.h>
 #include <utils/common/synctime.h>
 
@@ -92,7 +92,8 @@ StreamReader::StreamReader(
     m_framesSinceTimeResync(MAX_FRAMES_BETWEEN_TIME_RESYNC),
     m_epollFD(-1),
     m_motionData(nullptr),
-    m_ptsMapper(90000, &timeSyncData.timeSyncData, encoderNum)
+    m_ptsMapper(90000, &timeSyncData.timeSyncData, encoderNum),
+    m_currentGopSizeBytes( 0 )
 #ifdef DEBUG_OUTPUT
     ,m_totalFramesRead(0)
 #endif
@@ -239,7 +240,13 @@ int StreamReader::getNextData( nxcip::MediaDataPacket** lpPacket )
     if( cameraStreamsToRead == 1 )
     {
         //not using epoll to maximize performance
-        return getVideoPacket( lpPacket );
+        for( ;; )
+        {
+            const int result = getVideoPacket( lpPacket );
+            if( result == nxcip::NX_TRY_AGAIN )
+                continue;
+            return result;
+        }
     }
 
     assert( m_epollFD != -1 );
@@ -360,9 +367,10 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
     memset( &frame, 0, sizeof(frame) );
     int rv = m_vmux->GetFrame (&frame);
     if (rv) {
-        std::cerr << "Can't read video frame. "<<rv<<", errno "<<errno<<std::endl;
-        if( errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN )
+        const int errnoBak = errno;
+        if( errnoBak == EINTR || errnoBak == EWOULDBLOCK || errnoBak == EAGAIN || errnoBak == EINPROGRESS )
             return nxcip::NX_TRY_AGAIN;
+        std::cerr << "Can't read video frame. "<<rv<<", errno "<<errnoBak<<std::endl;
         if( m_epollFD != -1 )
             unregisterFD( m_vmux->GetFD() );
         m_vmux.reset();
@@ -380,6 +388,7 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
 #endif
 
     std::unique_ptr<ILPVideoPacket> videoPacket( new ILPVideoPacket(
+        &m_allocator,
         0, // channel
         calcNextTimestamp(
             frame.vmux_info.PTS
@@ -401,6 +410,11 @@ int StreamReader::getVideoPacket( nxcip::MediaDataPacket** lpPacket )
         return nxcip::NX_IO_ERROR; // error
     }
     memcpy(videoPacket->data(), frame.frame_addr, frame.frame_size);
+
+    //TODO #ak calculating GOP size in bytes
+    if( frame.vmux_info.pic_type == VMUX_IDR_FRAME && m_currentGopSizeBytes > 0 )
+        m_currentGopSizeBytes = 0;
+    m_currentGopSizeBytes += frame.frame_size;
 
 #ifdef DUMP_VIDEO_STREAM
     if( m_encoderNum == ENCODER_NUM_TO_DUMP ) 

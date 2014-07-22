@@ -30,13 +30,18 @@ typedef QList<QnLicensePtr> QnLicenseList;
 struct QnParamType;
 typedef QSharedPointer<QnParamType> QnParamTypePtr;
 
+class QnVideoWallItem;
 class QnVideoWallControlMessage;
-struct QnVideowallInstanceStatus;
 
 class QnLayoutItemData;
 
+class QnResourceCommand;
+typedef QSharedPointer<QnResourceCommand> QnResourceCommandPtr;
+
 // -->
 
+
+class QnResourceFactory;
 
 class QnResource;
 typedef QnSharedResourcePointer<QnResource> QnResourcePtr;

@@ -34,11 +34,14 @@ QnTourPtzController::~QnTourPtzController() {
 }
 
 bool QnTourPtzController::extends(Qn::PtzCapabilities capabilities) {
-    return 
-        (capabilities & Qn::PresetsPtzCapability) &&
-        ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
-        (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
-        !(capabilities & Qn::ToursPtzCapability);
+    if (capabilities & Qn::builtinPresetControl)
+        return false;
+    else
+        return 
+            (capabilities & Qn::PresetsPtzCapability) &&
+            ((capabilities & Qn::AbsolutePtzCapabilities) == Qn::AbsolutePtzCapabilities) &&
+            (capabilities & (Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability)) &&
+            !(capabilities & Qn::ToursPtzCapability);
 }
 
 Qn::PtzCapabilities QnTourPtzController::getCapabilities() {

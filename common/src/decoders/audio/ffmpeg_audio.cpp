@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-#include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/audio_data_packet.h"
 #include "audio_struct.h"
 
 struct AVCodecContext;
@@ -103,8 +103,8 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
     if (!codec)
         return false;
 
-    const unsigned char* inbuf_ptr = (const unsigned char*) data->data.data();
-    int size = data->data.size();
+    const unsigned char* inbuf_ptr = (const unsigned char*) data->data();
+    int size = data->dataSize();
     unsigned char* outbuf = (unsigned char*)result.data();
 
     int outbuf_len = 0;
@@ -114,7 +114,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
         int out_size = AVCODEC_MAX_AUDIO_FRAME_SIZE;
 
-        //cl_log.log("before dec",  cl_logALWAYS);
+        //NX_LOG("before dec",  cl_logALWAYS);
 
         if (outbuf_len + out_size > (int)result.capacity())
         {
@@ -131,7 +131,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
         // TODO: #vasilenko avoid using deprecated methods
         int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
 
-        //cl_log.log("after dec",  cl_logALWAYS);
+        //NX_LOG("after dec",  cl_logALWAYS);
 
         if (len < 0) 
             return false;

@@ -1,6 +1,8 @@
 #ifndef QN_COMMON_GLOBALS_H
 #define QN_COMMON_GLOBALS_H
 
+#include <cassert>
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
@@ -29,8 +31,8 @@ namespace Qn
     Q_GADGET
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
-            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat)
-    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities PtzTraits MotionTypes TimePeriodTypes ServerFlags)
+            StreamQuality SecondStreamQuality PanicMode RecordingType PropertyDataType SerializationFormat PeerType)
+    Q_FLAGS(Borders Corners CameraCapabilities PtzDataFields PtzCapabilities PtzTraits MotionTypes TimePeriodTypes ServerFlags CameraStatusFlags)
 public:
 #else
     Q_NAMESPACE
@@ -181,10 +183,13 @@ public:
 
         AuxilaryPtzCapability               = 0x01000000,
 
+        builtinPresetControl                = 0x02000000,
+
         /* Shortcuts */
         ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
         ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
         AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
+        nativePresetsPtzCapability          = PresetsPtzCapability | builtinPresetControl,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzCapability)
 
@@ -309,8 +314,7 @@ public:
 
         VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QUuid. */
         VideoWallItemGuidRole,                      /**< Role for videowall item unique id. Value of type QUuid. */
-        VideoWallPcGuidRole,                        /**< Role for videowall pc unique id. Value of type QUuid. */
-        VideoWallPcScreenIndicesRole,               /**< Role for videowall pc screen indices. Value of type QList<int>. */
+        VideoWallItemIndicesRole,                   /**< Role for videowall item indices list. Value of type QnVideoWallItemIndexList. */
 
         /* Layout-based. */
         LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */
@@ -338,6 +342,7 @@ public:
         ItemAspectRatioRole,                        /**< Role for item's aspect ratio. Value of type qreal. */
 
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. Default value is -1. */
+        ItemThumbnailTimestampRole,                 /**< Role for item's loaded thumbnail timestamp, in milliseconds. Used in thumbnails search. Value of type qint64. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
         ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
         ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
@@ -426,6 +431,13 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SecondStreamQuality)
 
+    enum CameraStatusFlag {
+        CSF_NoFlags = 0x0,
+        CSF_HasIssuesFlag = 0x1
+    };
+    Q_DECLARE_FLAGS(CameraStatusFlags, CameraStatusFlag)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraStatusFlags)
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraStatusFlag)
 
     // TODO: #Elric #EC2 rename
     enum RecordingType {
@@ -445,6 +457,16 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
 
+    enum PeerType {
+        PT_Server = 0,
+        PT_DesktopClient = 1,
+        PT_VideowallClient = 2,
+        PT_MobileClient = 3,
+
+        PT_Count
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
+
     enum PropertyDataType { 
         PDT_None        = 0, 
         PDT_Value       = 1, 
@@ -458,13 +480,18 @@ public:
 
 
     enum SerializationFormat {
-        JsonFormat,
-        UbjsonFormat,
-        BnsFormat,
-        CsvFormat,
-        XmlFormat
-    };
+        JsonFormat          = 0,
+        UbjsonFormat        = 1,
+        BnsFormat           = 2,
+        CsvFormat           = 3,
+        XmlFormat           = 4,
 
+        UnsupportedFormat   = -1
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SerializationFormat)
+
+    const char* serializationFormatToHttpContentType(SerializationFormat format);
+    SerializationFormat serializationFormatFromHttpContentType(const QByteArray& httpContentType);
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -479,6 +506,19 @@ public:
     const T &_id(const T &value) { return value; }
 
 } // namespace Qn
+
+
+// TODO: #Elric #enum
+
+enum {MD_WIDTH = 44, MD_HEIGHT = 32};
+
+
+/** Time value for 'now'. */
+#define DATETIME_NOW        INT64_MAX 
+
+/** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE. Checked in ffmpeg.cpp. */
+#define DATETIME_INVALID    INT64_MIN
+
 
 
 /** 
@@ -501,12 +541,12 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
-        (Qn::SerializationFormat)(Qn::PropertyDataType), 
+        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType), 
     (metatype)(lexical)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::PtzCapabilities),
+    (Qn::ServerFlags)(Qn::PtzDataFields)(Qn::PtzCapabilities)(Qn::CameraStatusFlags),
     (metatype)(numeric)
 )
 

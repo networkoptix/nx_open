@@ -1,6 +1,8 @@
 #ifndef stream_reader_514
 #define stream_reader_514
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "utils/common/long_runnable.h"
 #include "../resource/resource_consumer.h"
 #include "../datapacket/abstract_data_packet.h"
@@ -20,7 +22,7 @@ class QN_EXPORT QnAbstractStreamDataProvider : public QnLongRunnable, public QnR
 {
     Q_OBJECT
 public:
-    explicit QnAbstractStreamDataProvider(QnResourcePtr resource);
+    explicit QnAbstractStreamDataProvider(const QnResourcePtr& resource);
     virtual ~QnAbstractStreamDataProvider();
 
     virtual bool dataCanBeAccepted() const;
@@ -55,5 +57,7 @@ protected:
     QHash<QByteArray, QVariant> m_streamParam;
     QnResource::ConnectionRole m_role;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //stream_reader_514

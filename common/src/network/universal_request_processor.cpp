@@ -53,7 +53,7 @@ bool QnUniversalRequestProcessor::authenticate()
             path = path.left(path.size()-1);
         if (path.startsWith(L'/'))
             path = path.mid(1);
-        bool isProxy = dynamic_cast<QnUniversalTcpListener*>(d->owner)->isProxy(url);
+        const bool isProxy = static_cast<QnUniversalTcpListener*>(d->owner)->isProxy(d->request);
         QElapsedTimer t;
         t.restart();
         while (!qnAuthHelper->authenticate(d->request, d->response, isProxy) && d->socket->isConnected())
@@ -109,13 +109,9 @@ void QnUniversalRequestProcessor::run()
             }
             if( !processRequest() )
             {
-                d->response.statusLine.version = d->request.requestLine.version;
-                d->response.statusLine.statusCode = nx_http::StatusCode::notFound;
-                d->response.statusLine.reasonPhrase = nx_http::StatusCode::toString( d->response.statusLine.statusCode );
-                d->response.headers.insert( nx_http::HttpHeader( "Content-Type", "text/plain" ) );
-                d->response.messageBody = "NOT FOUND";
-                d->response.headers.insert( nx_http::HttpHeader( "Content-Length", nx_http::StringType::number(d->response.messageBody.size()) ) );
-                sendBuffer( d->response.toString() );
+                QByteArray contentType;
+                int rez = redirectTo(QnTcpListener::defaultPage(), contentType);
+                sendResponse(rez, contentType);
             }
         }
 
@@ -134,31 +130,24 @@ void QnUniversalRequestProcessor::run()
 bool QnUniversalRequestProcessor::processRequest()
 {
     Q_D(QnUniversalRequestProcessor);
-    QList<QByteArray> header = d->clientRequest.left(d->clientRequest.indexOf('\n')).split(' ');
 
-    if (header.size() > 2) 
+    QMutexLocker lock(&d->mutex);
+    d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, d->request.requestLine.version.protocol, d->request);
+    if( !d->processor )
+        return false;
+
+    if (d->processor && !needToStop()) 
     {
-        QByteArray protocol = header[2].split('/')[0].toUpper();
-        QMutexLocker lock(&d->mutex);
-        d->processor = dynamic_cast<QnUniversalTcpListener*>(d->owner)->createNativeProcessor(d->socket, protocol, QUrl(QString::fromUtf8(header[1])));
-        if( !d->processor )
-            return false;
-
-        if (d->processor && !needToStop()) 
-        {
-            copyClientRequestTo(*d->processor);
-            d->processor->execute(d->mutex);
-            if (d->processor->isTakeSockOwnership())
-                d->socket.clear();
-            else 
-                d->processor->releaseSocket();
-        }
-        delete d->processor;
-        d->processor = 0;
-        return true;
+        copyClientRequestTo(*d->processor);
+        d->processor->execute(d->mutex);
+        if (d->processor->isTakeSockOwnership())
+            d->socket.clear();
+        else 
+            d->processor->releaseSocket();
     }
-
-    return false;
+    delete d->processor;
+    d->processor = 0;
+    return true;
 }
 
 void QnUniversalRequestProcessor::pleaseStop()
