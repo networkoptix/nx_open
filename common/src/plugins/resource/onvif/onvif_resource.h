@@ -108,8 +108,6 @@ public:
     static QString ONVIF_URL_PARAM_NAME;
     static QString ONVIF_ID_PARAM_NAME;
     static const float QUALITY_COEF;
-    static const char* PROFILE_NAME_PRIMARY;
-    static const char* PROFILE_NAME_SECONDARY;
     static const int MAX_AUDIO_BITRATE;
     static const int MAX_AUDIO_SAMPLERATE;
     static const int ADVANCED_SETTINGS_VALID_TIME; //Time, during which adv settings will not be obtained from camera (in milliseconds)
