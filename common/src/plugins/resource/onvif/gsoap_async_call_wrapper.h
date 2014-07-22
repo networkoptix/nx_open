@@ -79,9 +79,9 @@ public:
         m_syncWrapper(syncWrapper),
         m_syncFunc(syncFunc),
         m_state(init),
-        m_bytesSent(0),
         m_responseDataSize(0),
-        m_responseDataPos(0)
+        m_responseDataPos(0),
+        m_bytesSent(0)
     {
         m_responseBuffer.resize( 64*1024 );
     }
