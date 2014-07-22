@@ -340,6 +340,12 @@ bool Socket::getSendTimeout( unsigned int* millis )
     return true;
 }
 
+bool Socket::getLastError(SystemError::ErrorCode* errorCode)
+{
+    socklen_t optLen = sizeof(*errorCode);
+    return getsockopt(sockDesc, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(errorCode), &optLen) == 0;
+}
+
 AbstractSocket::SOCKET_HANDLE Socket::handle() const
 {
     return sockDesc;
