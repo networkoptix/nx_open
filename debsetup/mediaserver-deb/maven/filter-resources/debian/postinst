@@ -25,6 +25,7 @@ CFG_HELPER="$BIN_DIR/config_helper.py $CONFIG_FILE"
 EC_CFG_HELPER="$BIN_DIR/config_helper.py $EC_CONFIG_FILE"
 
 DBSYNC="$BASE_DIR/share/dbsync-2.2/bin/dbsync"
+CERTGEN="$BASE_DIR/share/dbsync-2.2/bin/certgen"
 
 # This is necessary because changed configuration options should take effect 
 # immediately.
@@ -155,6 +156,8 @@ case "$1" in
         [ -z "$ALLOW_CAMERA_CHANGES" ] && ALLOW_CAMERA_CHANGES=$ALLOW_CAMERA_CHANGES_DEFAULT
         ALLOW_CAMERA_CHANGES=$(ask_for_value allowCameraChanges "$ALLOW_CAMERA_CHANGES")
         $CFG_HELPER allowCameraChanges "$ALLOW_CAMERA_CHANGES"
+
+	"$CERTGEN" -i
 
         if [ -f "$OLD_DB_PATH" -a ! -f "$DB_PATH" ]; then
             cp "$OLD_DB_PATH" "$DB_PATH"
