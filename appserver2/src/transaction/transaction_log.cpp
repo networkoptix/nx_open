@@ -11,6 +11,8 @@
 #include "utils/common/model_functions.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
 
+//#define TRANSACTION_LOG_DEBUG
+
 namespace ec2
 {
 
@@ -131,7 +133,9 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
         return ErrorCode::failure;
     }
 
+#ifdef TRANSACTION_LOG_DEBUG
     qDebug() << "add record to transaction log. Transaction=" << toString(tran.command) << "timestamp=" << tran.timestamp << "producedOnCurrentPeer=" << (tran.id.peerID == qnCommon->moduleGUID());
+#endif
 
     QnTranStateKey key(tran.id.peerID, tran.id.dbID);
     m_state.values[key] = qMax(m_state.values[key], tran.id.sequence);
@@ -203,6 +207,6 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     (QnTranState)\
     (QnTranStateResponse)\
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_TRANSACTION_LOG_DATA_TYPES,  (binary)(json), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_TRANSACTION_LOG_DATA_TYPES,  (binary)(json)(ubj), _Fields)
 
 } // namespace ec2

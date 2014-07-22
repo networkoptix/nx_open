@@ -6,6 +6,8 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QUuid>
 
+#include <core/misc/screen_snap.h>
+
 #include <utils/common/id.h>
 
 class QMimeData;
@@ -39,14 +41,11 @@ public:
      */
     QString name;
 
+    QnScreenSnaps screenSnaps;
+
     /** Status of the running videowall instance bound to this item. Runtime status, should not be serialized or saved. */
     bool online;
 
-    /**
-     * @brief geometry                      Position and size of the item in the Virtual Desktop
-     *                                      coordinate system.
-     */
-    QRect geometry;
 
     static QString mimeType();
 
@@ -60,7 +59,7 @@ public:
                 l.pcUuid == r.pcUuid &&
                 l.name == r.name &&
                 l.online == r.online &&
-                l.geometry == r.geometry);
+                l.screenSnaps == r.screenSnaps);
     }
 };
 

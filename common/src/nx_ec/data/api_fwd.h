@@ -45,7 +45,6 @@ namespace ec2 {
     struct ApiStoredFilePath;
     struct ApiUserData;
     struct ApiVideowallControlMessageData;
-    struct ApiVideowallInstanceStatusData;
     struct ApiVideowallData;
     struct ApiVideowallItemData;
     struct ApiVideowallItemWithRefData;
@@ -116,7 +115,6 @@ namespace ec2 {
     (ApiStoredFileData)\
     (ApiUserData)\
     (ApiVideowallControlMessageData)\
-    (ApiVideowallInstanceStatusData)\
     (ApiVideowallData)\
     (ApiVideowallItemData)\
     (ApiVideowallItemWithRefData)\

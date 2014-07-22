@@ -130,9 +130,6 @@ namespace ec2
         registerUpdateFuncHandler<ApiBusinessActionData>( restProcessorPool, ApiCommand::broadcastBusinessAction );
         registerUpdateFuncHandler<ApiBusinessActionData>( restProcessorPool, ApiCommand::execBusinessAction );
 
-        registerUpdateFuncHandler<ApiEmailSettingsData>( restProcessorPool, ApiCommand::testEmailSettings );
-        registerUpdateFuncHandler<ApiEmailData>( restProcessorPool, ApiCommand::sendEmail );
-
 
         //AbstractUserManager::getUsers
         registerGetFuncHandler<std::nullptr_t, ApiUserDataList>( restProcessorPool, ApiCommand::getUsers );

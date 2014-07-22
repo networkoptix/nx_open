@@ -17,7 +17,9 @@
 #include <utils/common/synctime.h>
 #include <utils/common/product_features.h>
 #include "common/common_module.h"
+
 #include "api/runtime_info_manager.h"
+#include <nx_ec/data/api_runtime_data.h>
 
 namespace {
     const char *networkOptixRSAPublicKey = "-----BEGIN PUBLIC KEY-----\n"
@@ -157,16 +159,19 @@ const QByteArray& QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-ec2::ApiRuntimeData QnLicense::findRuntimeDataByLicense() const
+QUuid QnLicense::findRuntimeDataByLicense() const
 {
-    foreach(const ec2::ApiRuntimeData& data, QnRuntimeInfoManager::instance()->allData().values())
+    foreach(const QnPeerRuntimeInfo& info, QnRuntimeInfoManager::instance()->items()->getItems())
     {
-        bool hwKeyOK = data.mainHardwareIds.contains(m_hardwareId) || data.compatibleHardwareIds.contains(m_hardwareId);
-        bool brandOK = (m_brand == data.brand);
+        if (info.data.peer.peerType != Qn::PT_Server)
+            continue;
+
+        bool hwKeyOK = info.data.mainHardwareIds.contains(m_hardwareId) || info.data.compatibleHardwareIds.contains(m_hardwareId);
+        bool brandOK = (m_brand == info.data.brand);
         if (hwKeyOK && brandOK)
-            return data;
+            return info.uuid;
     }
-    return ec2::ApiRuntimeData();
+    return QUuid();
 }
 
 bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
@@ -185,17 +190,23 @@ bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
         return false;
     }
 
-    ec2::ApiRuntimeData runtimeData = isNewLicense ? QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID()) : findRuntimeDataByLicense();
+    QUuid runtimeDataUuid = isNewLicense ?
+        QnRuntimeInfoManager::instance()->items()->hasItem(qnCommon->remoteGUID()) 
+        ? qnCommon->remoteGUID()
+        : QUuid()
+    :findRuntimeDataByLicense();
 
-    if (runtimeData.peer.id.isNull())
+    if (runtimeDataUuid.isNull())
     {
         if (errCode)
             *errCode = InvalidHardwareID;
         return false;
     }
 
-    const QString box = runtimeData.box;
-    const QString brand = runtimeData.brand;
+    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(runtimeDataUuid);        
+
+    const QString box = info.data.box;
+    const QString brand = info.data.brand;
 
     if (!m_brand.isEmpty() && m_brand != brand) {
         if (errCode)
@@ -499,20 +510,17 @@ bool QnLicensePool::isEmpty() const
 }
 
 
-QList<QByteArray> QnLicensePool::mainHardwareIds() const
-{
-    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
-    return data.mainHardwareIds;
+QList<QByteArray> QnLicensePool::mainHardwareIds() const {
+    return QnRuntimeInfoManager::instance()->remoteInfo().data.mainHardwareIds;
 }
 
-QList<QByteArray> QnLicensePool::compatibleHardwareIds() const
-{
-    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
-    return data.compatibleHardwareIds;
+QList<QByteArray> QnLicensePool::compatibleHardwareIds() const {
+    return QnRuntimeInfoManager::instance()->remoteInfo().data.compatibleHardwareIds;
 }
 
-QByteArray QnLicensePool::currentHardwareId() const
-{
-    ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->remoteGUID());
-    return data.mainHardwareIds.isEmpty() ? QByteArray() : data.mainHardwareIds.last();
+QByteArray QnLicensePool::currentHardwareId() const {
+    QList<QByteArray> hwIds = mainHardwareIds();
+    return hwIds.isEmpty() 
+        ? QByteArray() 
+        : hwIds.last();
 }

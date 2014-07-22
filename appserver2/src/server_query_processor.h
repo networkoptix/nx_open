@@ -49,6 +49,10 @@ namespace ec2
             //TODO #ak this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
 
+            QnDbManager::Locker locker(dbManager);
+            if (tran.persistent)
+                locker.beginTran();
+
             if (!tran.id.sequence)
                 tran.fillSequence();
 
@@ -59,7 +63,6 @@ namespace ec2
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)>
                 SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
-            //TODO #ak get rid of auxManager
             errorCode = auxManager->executeTransaction(tran);
             if( errorCode != ErrorCode::ok ) {
                 return;
@@ -67,11 +70,8 @@ namespace ec2
 
             if (tran.persistent)
             {
-                QnDbManager::Locker locker(dbManager);
-                locker.beginTran();
-
-                const QByteArray& serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
-                errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
+                const QByteArray& serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+                errorCode = dbManager->executeTransactionNoLock( tran, serializedTran );
                 if( errorCode != ErrorCode::ok ) {
                     if (errorCode == ErrorCode::skipped)
                         errorCode = ErrorCode::ok;
@@ -188,7 +188,7 @@ namespace ec2
 
                 if (tran.persistent) 
                 {
-                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
+                    QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
                     errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
 					if (errorCode == ErrorCode::skipped)
 						continue;
@@ -206,7 +206,7 @@ namespace ec2
                 errorCode = ErrorCode::ok;
                 if (multiTran.persistent)                 
                 {
-                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(multiTran);
+                    QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(multiTran);
                     errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
                     if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
                         return;

@@ -196,7 +196,7 @@ void QnAdvancedSettingsWidget::submitToResources(const QnVirtualCameraResourceLi
         if (ui->checkBoxSecondaryRecorder->checkState() != Qt::PartiallyChecked && camera->hasDualStreaming())
             camera->setProperty(QnMediaResource::dontRecordSecondaryStreamKey(), ui->checkBoxSecondaryRecorder->isChecked() ? lit("1") : lit("0"));
 
-        if (!ui->comboBoxTransport->currentIndex() >= 0) {
+        if (ui->comboBoxTransport->currentIndex() >= 0) {
             QString txt = ui->comboBoxTransport->currentText();
             if (txt.toLower() == lit("auto"))
                 txt.clear();

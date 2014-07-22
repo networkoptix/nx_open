@@ -344,6 +344,12 @@ bool Socket::getSendTimeout( unsigned int* millis )
     return true;
 }
 
+bool Socket::getLastError(SystemError::ErrorCode* errorCode)
+{
+    socklen_t optLen = sizeof(*errorCode);
+    return getsockopt(sockDesc, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(errorCode), &optLen) == 0;
+}
+
 AbstractSocket::SOCKET_HANDLE Socket::handle() const
 {
     return sockDesc;
@@ -1036,13 +1042,35 @@ static int acceptWithTimeout( int sockDesc, int timeoutMillis = DEFAULT_ACCEPT_T
 
 #ifdef _WIN32
     fd_set read_set;
+    FD_ZERO( &read_set );
+    FD_SET( sockDesc, &read_set );
+
+    fd_set except_set;
+    FD_ZERO( &except_set );
+    FD_SET( sockDesc, &except_set );
+
     struct timeval timeout;
-    FD_ZERO(&read_set);
-    FD_SET(sockDesc, &read_set);
     timeout.tv_sec = 0;
     timeout.tv_usec = timeoutMillis * 1000;
 
-    result = ::select(sockDesc + 1, &read_set, NULL, NULL, &timeout);
+    result = ::select( sockDesc + 1, &read_set, NULL, &except_set, &timeout );
+    if( result < 0 )
+        return result;
+    if( result == 0 )   //timeout
+    {
+        ::SetLastError( SystemError::timedOut );
+        return -1;
+    }
+    if( FD_ISSET( sockDesc, &except_set ) )
+    {
+        int errorCode = 0;
+        int errorCodeLen = sizeof( errorCode );
+        if( getsockopt( sockDesc, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &errorCodeLen ) != 0 )
+            return -1;
+        ::SetLastError( errorCode );
+        return -1;
+    }
+    return ::accept( sockDesc, NULL, NULL );
 #else
     struct pollfd sockPollfd;
     memset( &sockPollfd, 0, sizeof(sockPollfd) );
@@ -1052,15 +1080,35 @@ static int acceptWithTimeout( int sockDesc, int timeoutMillis = DEFAULT_ACCEPT_T
     sockPollfd.events |= POLLRDHUP;
 #endif
     result = ::poll( &sockPollfd, 1, timeoutMillis );
-    if( result == 1 && (sockPollfd.revents & POLLIN) == 0 )
-        result = 0;
-#endif
-
-    if( result == 0 )
-        return -2;  //timed out
-    else if( result < 0 )
+    if( result < 0 )
+        return result;
+    if( result == 0 )   //timeout
+    {
+        errno = SystemError::timedOut;
         return -1;
-    return ::accept(sockDesc, NULL, NULL);
+    }
+    if( sockPollfd.revents & POLLIN )
+        return ::accept( sockDesc, NULL, NULL );
+    if( (sockPollfd.revents & POLLHUP)
+#ifdef _GNU_SOURCE
+        || (sockPollfd.revents & POLLRDHUP)
+#endif
+        )
+    {
+        errno = ENOTCONN;
+        return -1;
+    }
+    if( sockPollfd.revents & POLLERR )
+    {
+        int errorCode = 0;
+        socklen_t errorCodeLen = sizeof(errorCode);
+        if( getsockopt( sockDesc, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen ) != 0 )
+            return -1;
+        errno = errorCode;
+        return -1;
+    }
+    return -1;
+#endif
 }
 
 
@@ -1074,8 +1122,7 @@ TCPServerSocket::TCPServerSocket()
 
 int TCPServerSocket::accept(int sockDesc)
 {
-    int result = acceptWithTimeout( sockDesc );
-    return result == -2 ? -1 : result;
+    return acceptWithTimeout( sockDesc );
 }
 
 //!Implementation of AbstractStreamServerSocket::listen
@@ -1090,29 +1137,8 @@ AbstractStreamSocket* TCPServerSocket::accept()
     unsigned int recvTimeoutMs = 0;
     if( !getRecvTimeout( &recvTimeoutMs ) )
         return NULL;
-    int newConnSD = acceptWithTimeout( sockDesc, recvTimeoutMs );
-    if( newConnSD >= 0 )
-    {
-        //clearStatusBit( Socket::sbFailed );
-        return new TCPSocket(newConnSD);
-    }
-    else if( newConnSD == -2 )
-    {
-        //setting system error code
-#ifdef _WIN32
-        ::SetLastError( SystemError::timedOut );
-#else
-        errno = SystemError::timedOut;
-#endif
-        return NULL;    //timeout
-    }
-    else
-    {
-        //error
-        //saveErrorInfo();
-        //setStatusBit( Socket::sbFailed );
-        return NULL;
-    }
+    const int newConnSD = acceptWithTimeout( sockDesc, recvTimeoutMs );
+    return newConnSD >= 0 ? new TCPSocket( newConnSD ) : nullptr;
 }
 
 bool TCPServerSocket::setListen(int queueLen)

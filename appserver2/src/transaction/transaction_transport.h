@@ -10,6 +10,7 @@
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
+#include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
 
 #include <utils/network/abstract_socket.h>
@@ -59,6 +60,10 @@ public:
     void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader &header) {
         assert(header.processedPeers.contains(m_localPeer.id));
 #ifdef _DEBUG
+        if (ApiCommand::isSystem(transaction.command) || transaction.persistent) {
+            Q_ASSERT(transaction.id.sequence > 0);
+        }
+
         foreach (const QnId& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());
             Q_ASSERT(peer != qnCommon->moduleGUID());
@@ -72,9 +77,12 @@ public:
         case Qn::BnsFormat:
             addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
+        case Qn::UbjsonFormat:
+            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            break;
         default:
             qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
-            addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
         }
     }
@@ -85,7 +93,7 @@ public:
     // these getters/setters are using from a single thread
     qint64 lastConnectTime() { return m_lastConnectTime; }
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
-    bool isReadSync() const       { return m_readSync; }
+    bool isReadSync(ApiCommand::Value command) const;
     void setReadSync(bool value)  {m_readSync = value;}
     bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }

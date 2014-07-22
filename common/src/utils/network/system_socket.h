@@ -118,6 +118,8 @@ public:
     virtual bool setSendTimeout( unsigned int ms ) override;
     //!Implementation of AbstractSocket::getSendTimeout
     virtual bool getSendTimeout( unsigned int* millis ) override;
+    //!Implementation of AbstractSocket::getLastError
+    virtual bool getLastError(SystemError::ErrorCode* errorCode) override;
     //!Implementation of AbstractSocket::handle
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
 

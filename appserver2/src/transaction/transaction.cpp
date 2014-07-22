@@ -114,8 +114,6 @@ namespace ec2
                     return "removeVideowall";
                 case videowallControl:
                     return "videowallControl";
-                case videowallInstanceStatus:
-                    return "videowallInstanceStatus";
 
                 case listDirectory:
                     return "listDirectory";
@@ -159,11 +157,6 @@ namespace ec2
                 case broadcastPeerSystemTime:
                     return "broadcastPeerSystemTime";
 
-                case testEmailSettings:
-                    return "testEmailSettings";
-                case sendEmail:
-                    return "sendEmail";
-
                 default:
                     return "unknown " + QString::number((int)val);
             }
@@ -176,6 +169,7 @@ namespace ec2
                     val == unlockRequest ||
                     val == tranSyncRequest ||
                     val == tranSyncResponse ||
+                    val == runtimeInfoChanged ||
                     val == peerAliveInfo;
         }
 
@@ -213,7 +207,7 @@ namespace ec2
         return ++requestID;
     }
 
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary)(json),   (peerID)(dbID)(sequence))
-    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary)(json),   (command)(id)(persistent)(timestamp))
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::ID,    (binary)(json)(ubj),   (peerID)(dbID)(sequence))
+    QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,        (binary)(json)(ubj),   (command)(id)(persistent)(timestamp))
 } // namespace ec2
 

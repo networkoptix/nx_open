@@ -262,9 +262,13 @@ bool QnDbManager::init(
         m_licenseOverflowTime = query.value(0).toByteArray().toLongLong();
         m_licenseOverflowMarked = m_licenseOverflowTime > 0;
     }
-    ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
-    data.prematureLicenseExperationDate = m_licenseOverflowTime;
-    QnRuntimeInfoManager::instance()->update(data);
+
+    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    if (localInfo.data.prematureLicenseExperationDate != m_licenseOverflowTime) {
+        localInfo.data.prematureLicenseExperationDate = m_licenseOverflowTime;
+        localInfo.data.version = localInfo.data.version + 1;
+        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+    }
 
     query.addBindValue(DB_INSTANCE_KEY);
     if (query.exec() && query.next()) {
@@ -306,11 +310,7 @@ bool QnDbManager::init(
         userTransaction.fillSequence();
         fromResourceToApi(userResource, userTransaction.params);
 
-        executeTransactionInternal(userTransaction);
-        QByteArray serializedTran;
-        QnOutputBinaryStream<QByteArray> stream(&serializedTran);
-        QnBinary::serialize(userTransaction, &stream);
-        transactionLog->saveTransaction(userTransaction, serializedTran);
+        executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
     }
 
     QSqlQuery queryCameras(m_sdb);
@@ -334,11 +334,7 @@ bool QnDbManager::init(
         tran.fillSequence();
         tran.params.id = QnId::fromRfc4122(queryCameras.value(0).toByteArray());
         tran.params.status = QnResource::Offline;
-        executeTransactionInternal(tran);
-        QByteArray serializedTran;
-        QnOutputBinaryStream<QByteArray> stream(&serializedTran);
-        QnBinary::serialize(tran, &stream);
-        transactionLog->saveTransaction(tran, serializedTran);
+        executeTransactionNoLock(tran, QnUbjson::serialized(tran));
     }
 
     emit initialized();
@@ -369,12 +365,8 @@ QMap<int, QnId> QnDbManager::getGuidList(const QString& request)
             result.insert(id, intToGuid(data.toInt()));
         else {
             QnId guid(data.toString());
-            if (guid.isNull()) {
-                QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-                md5Hash.addData(data.toString().toUtf8());
-                QByteArray ha2 = md5Hash.result();
-                guid = QnId::fromRfc4122(ha2);
-            }
+            if (guid.isNull())
+                guid = guidFromArbitraryData(data.toString().toUtf8());
             result.insert(id, guid);
         }
     }
@@ -2002,7 +1994,7 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
     queryItems.prepare("SELECT \
                        item.guid, item.pc_guid as pcGuid, item.layout_guid as layoutGuid, \
                        item.videowall_guid as videowallGuid, item.name, \
-                       item.x as left, item.y as top, item.w as width, item.h as height \
+                       item.snap_left as snapLeft, item.snap_top as snapTop, item.snap_right as snapRight, item.snap_bottom as snapBottom \
                        FROM vms_videowall_item item ORDER BY videowallGuid");
     if (!queryItems.exec()) {
         qWarning() << Q_FUNC_INFO << queryItems.lastError().text();
@@ -2400,9 +2392,9 @@ ErrorCode QnDbManager::updateVideowallItems(const ApiVideowallData& data) {
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT INTO vms_videowall_item \
-                     (guid, pc_guid, layout_guid, videowall_guid, name, x, y, w, h) \
+                     (guid, pc_guid, layout_guid, videowall_guid, name, snap_left, snap_top, snap_right, snap_bottom) \
                      VALUES \
-                     (:guid, :pcGuid, :layoutGuid, :videowall_guid, :name, :left, :top, :width, :height)");
+                     (:guid, :pcGuid, :layoutGuid, :videowall_guid, :name, :snapLeft, :snapTop, :snapRight, :snapBottom)");
     foreach(const ApiVideowallItemData& item, data.items)
     {
         QnSql::bind(item, &insQuery);
@@ -2633,9 +2625,13 @@ bool QnDbManager::markLicenseOverflow(bool value, qint64 time)
         return false;
     }
 
-    ApiRuntimeData data = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
-    data.prematureLicenseExperationDate = m_licenseOverflowTime;
-    QnRuntimeInfoManager::instance()->update(data);
+    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    if (localInfo.data.prematureLicenseExperationDate != m_licenseOverflowTime) {
+        localInfo.data.prematureLicenseExperationDate = m_licenseOverflowTime;
+        localInfo.data.version++;
+        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+    }
+    
     return true;
 }
 

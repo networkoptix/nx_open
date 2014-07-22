@@ -126,8 +126,10 @@ namespace nx_http
                         {
                             if( reconnectIfAppropriate() )
                                 break;
+                            SystemError::ErrorCode errorCode = SystemError::noError;
+                            sock->getLastError(&errorCode);
                             NX_LOG( lit("Error sending http request to %1. %2").
-                                arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
+                                arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
                         }
                         else
                         {
@@ -170,8 +172,10 @@ namespace nx_http
                         {
                             if( reconnectIfAppropriate() )
                                 break;
-                            NX_LOG( lit("Error reading http response from %1. %2").
-                                arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
+                            SystemError::ErrorCode errorCode = SystemError::noError;
+                            sock->getLastError(&errorCode);
+                            NX_LOG(lit("Error reading http response from %1. %2").
+                                arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
                         }
                         else
                         {
@@ -279,7 +283,9 @@ namespace nx_http
                     {
                         if( reconnectIfAppropriate() )
                             break;
-                        NX_LOG( lit("Error reading http response message body from %1").arg(m_url.toString()), cl_logDEBUG1 );
+                        SystemError::ErrorCode errorCode = SystemError::noError;
+                        sock->getLastError(&errorCode);
+                        NX_LOG(lit("Error reading http response message body from %1. %2").arg(m_url.toString()).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
                         m_state = m_httpStreamReader.state() == HttpStreamReader::messageDone ? sDone : sFailed;
                         lk.unlock();
                         emit done( sharedThis );

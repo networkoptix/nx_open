@@ -176,7 +176,6 @@ namespace ec2
         void connectToPeerEstablished(const ApiPeerData &peerInfo);
         void connectToPeerLost(const QnId& id);
         void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool isProxy);
-        void sendVideowallInstanceStatus(const ApiPeerData &peer, bool isAlive);
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, const QnId& gotFromID);
         QnPeerSet connectedPeers(ApiCommand::Value command) const;
@@ -197,6 +196,7 @@ namespace ec2
 
         QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
+		QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
 
         struct RemoteUrlConnectInfo {
             RemoteUrlConnectInfo(const QUuid& peer = QUuid()): peer(peer), lastConnectedTime(0) {}

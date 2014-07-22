@@ -20,6 +20,7 @@ namespace ec2
                    platform == other.platform &&
                    box == other.box &&
                    publicIP == other.publicIP &&
+                   videoWallInstanceGuid == other.videoWallInstanceGuid &&
                    prematureLicenseExperationDate == other.prematureLicenseExperationDate;
         }
 
@@ -31,15 +32,16 @@ namespace ec2
         QString publicIP;
         qint64 prematureLicenseExperationDate;
 
+        /** Guid of the videowall instance for the running videowall clients. */
+        QUuid videoWallInstanceGuid;
+
         QList<QByteArray> mainHardwareIds;
         QList<QByteArray> compatibleHardwareIds;
 
         int version;
-
-        // todo: #GDM. add VideoWall related fields. #VW
     };
 
-#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)(mainHardwareIds)(compatibleHardwareIds)(version)
+#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)(videoWallInstanceGuid)(mainHardwareIds)(compatibleHardwareIds)(version)
 
 
 } // namespace ec2

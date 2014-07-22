@@ -11,8 +11,10 @@
 #include "utils/network/socket.h"
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
+#include "utils/network/http/httptypes.h"
 
 #include <recording/time_period_list.h>
+
 
 QnNetworkResource::QnNetworkResource(): 
     QnResource(),
@@ -125,7 +127,7 @@ void QnNetworkResource::setDiscoveryAddr(QHostAddress addr)
 
 int QnNetworkResource::httpPort() const
 {
-    return 80;
+    return nx_http::DEFAULT_HTTP_PORT;
 }
 
 QString QnNetworkResource::toString() const
@@ -210,7 +212,7 @@ int QnNetworkResource::getChannel() const
 bool QnNetworkResource::ping()
 {
     std::auto_ptr<AbstractStreamSocket> sock( SocketFactory::createStreamSocket() );
-    return sock->connect( getHostAddress(), httpPort() );
+    return sock->connect( getHostAddress(), QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
 }
 
 QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {

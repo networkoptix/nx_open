@@ -39,13 +39,13 @@ namespace QnConcurrent
         };
 
         template<class T>
-        class QnFutureImpl
+        class QnFutureImplBase
         {
         public:
             typedef T value_type;
-            typedef typename std::vector<typename std::pair<T, bool> >::size_type size_type;
+            typedef std::vector<bool>::size_type size_type;
 
-            QnFutureImpl()
+            QnFutureImplBase()
             :
                 m_totalTasksToRun( 0 ),
                 m_tasksCompleted( 0 ),
@@ -54,7 +54,7 @@ namespace QnConcurrent
             {
             }
 
-            ~QnFutureImpl()
+            ~QnFutureImplBase()
             {
                 if( m_cleanupFunc )
                     m_cleanupFunc();
@@ -63,7 +63,7 @@ namespace QnConcurrent
             void setTotalTasksToRun( size_type totalTasksToRun )
             {
                 m_totalTasksToRun = totalTasksToRun;
-                m_results.resize( m_totalTasksToRun );
+                m_completionMarks.resize( m_totalTasksToRun );
             }
             
             void waitForFinished()
@@ -115,39 +115,7 @@ namespace QnConcurrent
             bool isResultReadyAt( size_type index ) const
             {
                 QMutexLocker lk( &m_mutex );
-                return m_results[index].second;
-            }
-
-            T& resultAt( size_type index )
-            {
-                QMutexLocker lk( &m_mutex );
-                return m_results[index].first;
-            }
-
-            const T& resultAt( size_type index ) const
-            {
-                QMutexLocker lk( &m_mutex );
-                return m_results[index].first;
-            }
-
-            void setResultAt( size_type index, T&& result )
-            {
-                QMutexLocker lk( &m_mutex );
-                m_results[index].first = result;
-                m_results[index].second = true;
-                ++m_tasksCompleted;
-                taskStoppedNonSafe();
-                m_cond.wakeAll();
-            }
-
-            void setResultAt( size_type index, const T& result )
-            {
-                QMutexLocker lk( &m_mutex );
-                m_results[index].first = result;
-                m_results[index].second = true;
-                ++m_tasksCompleted;
-                taskStoppedNonSafe();
-                m_cond.wakeAll();
+                return m_completionMarks[index];
             }
 
             bool incStartedTaskCountIfAllowed()
@@ -164,166 +132,103 @@ namespace QnConcurrent
                 m_cleanupFunc = cleanupFunc;
             }
 
-            template<class Function, class Data>
-            void executeFunctionOnDataAtPos( size_type index, Function function, const Data& data )
-            {
-                setResultAt( index, function( data ) );
-            }
-
-            template<class Function>
-            void executeFunctionOnDataAtPos( size_type index, Function function )
-            {
-                setResultAt( index, function() );
-            }
-
-        private:
+        protected:
             mutable QMutex m_mutex;
-            QWaitCondition m_cond;
-            size_t m_totalTasksToRun;
-            size_t m_tasksCompleted;
-            std::vector<std::pair<T, bool> > m_results;
-            size_type m_startedTaskCount;
-            bool m_isCancelled;
-            std::function<void()> m_cleanupFunc;
+
+            void setCompletedAtNonSafe( size_type index )
+            {
+                m_completionMarks[index] = true;
+                ++m_tasksCompleted;
+                taskStoppedNonSafe();
+                m_cond.wakeAll();
+            }
 
             void taskStoppedNonSafe()
             {
                 assert( m_startedTaskCount >= 1 );
                 --m_startedTaskCount;
             }
+
+        private:
+            QWaitCondition m_cond;
+            size_t m_totalTasksToRun;
+            size_t m_tasksCompleted;
+            std::vector<bool> m_completionMarks;
+            size_type m_startedTaskCount;
+            bool m_isCancelled;
+            std::function<void()> m_cleanupFunc;
         };
 
-        template<>
-        class QnFutureImpl<void>
+        template<class T>
+        class QnFutureImpl
+        :
+            public QnFutureImplBase<T>
         {
+            typedef QnFutureImplBase<T> base_type;
+
         public:
-            typedef void value_type;
-            typedef std::vector<bool>::size_type size_type;
-
-            QnFutureImpl()
-            :
-                m_totalTasksToRun( 0 ),
-                m_tasksCompleted( 0 ),
-                m_startedTaskCount( 0 ),
-                m_isCancelled( false )
-            {
-            }
-
-            ~QnFutureImpl()
-            {
-                if( m_cleanupFunc )
-                    m_cleanupFunc();
-            }
+            typedef typename base_type::size_type size_type;
 
             void setTotalTasksToRun( size_type totalTasksToRun )
             {
-                m_totalTasksToRun = totalTasksToRun;
-                m_results.resize( m_totalTasksToRun );
-            }
-            
-            void waitForFinished()
-            {
-                QMutexLocker lk( &m_mutex );
-                while( (!m_isCancelled && (m_tasksCompleted < m_totalTasksToRun)) ||
-                       (m_isCancelled && (m_startedTaskCount > 0)) )
-                {
-                    m_cond.wait( lk.mutex() );
-                }
+                base_type::setTotalTasksToRun( totalTasksToRun );
+                m_results.resize( totalTasksToRun );
             }
 
-            void cancel()
+            T& resultAt( size_type index )
             {
-                QMutexLocker lk( &m_mutex );
-                m_isCancelled = true;
-            }
-
-            bool isCanceled() const
-            {
-                QMutexLocker lk( &m_mutex );
-                return m_isCancelled;
-            }
-
-            size_type progressValue() const
-            {
-                QMutexLocker lk( &m_mutex );
-                return m_tasksCompleted;
-            }
-
-            size_type progressMinimum() const
-            {
-                QMutexLocker lk( &m_mutex );
-                return 0;
-            }
-
-            size_type progressMaximum() const
-            {
-                QMutexLocker lk( &m_mutex );
-                return m_totalTasksToRun;
-            }
-
-            size_type resultCount() const
-            {
-                QMutexLocker lk( &m_mutex );
-                return m_tasksCompleted;
-            }
-
-            bool isResultReadyAt( size_type index ) const
-            {
-                QMutexLocker lk( &m_mutex );
+                QMutexLocker lk( &this->m_mutex );
                 return m_results[index];
             }
 
-            void setCompletedAt( size_type index )
+            const T& resultAt( size_type index ) const
             {
-                QMutexLocker lk( &m_mutex );
-                m_results[index] = true;
-                ++m_tasksCompleted;
-                taskStoppedNonSafe();
-                m_cond.wakeAll();
-            }
-
-            bool incStartedTaskCountIfAllowed()
-            {
-                QMutexLocker lk( &m_mutex );
-                if( m_isCancelled )
-                    return false;
-                ++m_startedTaskCount;
-                return true;
-            }
-
-            void setCleanupFunc( std::function<void()> cleanupFunc )
-            {
-                m_cleanupFunc = cleanupFunc;
+                QMutexLocker lk( &this->m_mutex );
+                return m_results[index];
             }
 
             template<class Function, class Data>
             void executeFunctionOnDataAtPos( size_type index, Function function, const Data& data )
             {
+                const T& result = function( data );
+                QMutexLocker lk( &this->m_mutex );
+                m_results[index] = std::move(result);
+                this->setCompletedAtNonSafe( index );
+            }
+
+            template<class Function>
+            void executeFunctionOnDataAtPos( size_type index, Function function )
+            {
+                const T& result = function();
+                QMutexLocker lk( &this->m_mutex );
+                m_results[index] = std::move(result);
+                this->setCompletedAtNonSafe( index );
+            }
+
+        private:
+            std::vector<T> m_results;
+        };
+
+        template<>
+        class QnFutureImpl<void>
+        :
+            public QnFutureImplBase<void>
+        {
+        public:
+            template<class Function, class Data>
+            void executeFunctionOnDataAtPos( size_type index, Function function, const Data& data )
+            {
                 function( data );
-                setCompletedAt( index );
+                QMutexLocker lk( &this->m_mutex );
+                this->setCompletedAtNonSafe( index );
             }
 
             template<class Function>
             void executeFunctionOnDataAtPos( size_type index, Function function )
             {
                 function();
-                setCompletedAt( index );
-            }
-
-        private:
-            mutable QMutex m_mutex;
-            QWaitCondition m_cond;
-            size_t m_totalTasksToRun;
-            size_t m_tasksCompleted;
-            std::vector<bool> m_results;
-            size_type m_startedTaskCount;
-            bool m_isCancelled;
-            std::function<void()> m_cleanupFunc;
-
-            void taskStoppedNonSafe()
-            {
-                assert( m_startedTaskCount >= 1 );
-                --m_startedTaskCount;
+                QMutexLocker lk( &this->m_mutex );
+                this->setCompletedAtNonSafe( index );
             }
         };
 
@@ -422,6 +327,31 @@ namespace QnConcurrent
         };
     }
 
+    template<class T>
+    class QnFutureBase
+    {
+    public:
+        typedef typename detail::QnFutureImpl<T> FutureImplType;
+        typedef typename FutureImplType::value_type value_type;
+        typedef typename FutureImplType::size_type size_type;
+
+        QnFutureBase() : m_impl( new FutureImplType() ) {}
+
+        void waitForFinished() { m_impl->waitForFinished(); }
+        void cancel() { m_impl->cancel(); }
+        bool isCanceled() const { return m_impl->isCanceled(); }
+        size_type progressValue() const { return m_impl->progressValue(); }
+        size_type progressMinimum() const { return m_impl->progressMinimum(); }
+        size_type progressMaximum() const { return m_impl->progressMaximum(); }
+        size_type resultCount() const { return m_impl->resultCount(); }
+        bool isResultReadyAt( size_type index ) const { return m_impl->isResultReadyAt( index ); }
+
+        QSharedPointer<FutureImplType> impl() { return m_impl; }
+
+    protected:
+        QSharedPointer<FutureImplType> m_impl;
+    };
+
     //!Result of concurrent task execution
     /*!
         Provides methods to wait for concurrent computation completion, get computation progress and get results
@@ -430,54 +360,22 @@ namespace QnConcurrent
     */
     template<class T>
     class QnFuture
+    :
+        public QnFutureBase<T>
     {
     public:
-        typedef typename detail::QnFutureImpl<T> FutureImplType;
-        typedef typename FutureImplType::value_type value_type;
-        typedef typename FutureImplType::size_type size_type;
+        typedef typename QnFutureBase<T>::size_type size_type;
 
-        QnFuture() : m_impl( new FutureImplType() ) {}
-
-        void waitForFinished() { m_impl->waitForFinished(); }
-        void cancel() { m_impl->cancel(); }
-        bool isCanceled() const { return m_impl->isCanceled(); }
-        size_type progressValue() const { return m_impl->progressValue(); }
-        size_type progressMinimum() const { return m_impl->progressMinimum(); }
-        size_type progressMaximum() const { return m_impl->progressMaximum(); }
-        size_type resultCount() const { return m_impl->resultCount(); }
-        bool isResultReadyAt( size_type index ) const { return m_impl->isResultReadyAt( index ); }
-        T& resultAt( size_type index ) { return m_impl->resultAt( index ); }
-        const T& resultAt( size_type index ) const { return m_impl->resultAt( index ); }
-
-        QSharedPointer<FutureImplType> impl() { return m_impl; }
-
-    private:
-        QSharedPointer<FutureImplType> m_impl;
+        T& resultAt( size_type index ) { return this->m_impl->resultAt( index ); }
+        const T& resultAt( size_type index ) const { return this->m_impl->resultAt( index ); }
     };
 
     template<>
     class QnFuture<void>
+    :
+        public QnFutureBase<void>
     {
     public:
-        typedef detail::QnFutureImpl<void> FutureImplType;
-        typedef FutureImplType::value_type value_type;
-        typedef FutureImplType::size_type size_type;
-
-        QnFuture() : m_impl( new FutureImplType() ) {}
-
-        void waitForFinished() { m_impl->waitForFinished(); }
-        void cancel() { m_impl->cancel(); }
-        bool isCanceled() const { return m_impl->isCanceled(); }
-        size_type progressValue() const { return m_impl->progressValue(); }
-        size_type progressMinimum() const { return m_impl->progressMinimum(); }
-        size_type progressMaximum() const { return m_impl->progressMaximum(); }
-        size_type resultCount() const { return m_impl->resultCount(); }
-        bool isResultReadyAt( size_type index ) const { return m_impl->isResultReadyAt( index ); }
-
-        QSharedPointer<FutureImplType> impl() { return m_impl; }
-
-    private:
-        QSharedPointer<FutureImplType> m_impl;
     };
 
     /*!

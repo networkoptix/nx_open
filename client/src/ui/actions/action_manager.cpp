@@ -628,7 +628,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Save Video Wall View")). //TODO: #VW #TR
         shortcut(tr("Ctrl+S")).
         autoRepeat(false).
-        condition(new QnVideoWallReviewModeCondition(false, this));
+        condition(new QnSaveVideowallReviewActionCondition(true, this));
 
     factory(Qn::DropOnVideoWallItemAction).
         flags(Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::LayoutTarget | Qn::VideoWallItemTarget | Qn::SingleTarget | Qn::MultiTarget).
@@ -912,7 +912,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+S")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditVideoWallPermission).
         autoRepeat(false).
-        condition(new QnSaveVideowallReviewActionCondition(this));
+        condition(new QnSaveVideowallReviewActionCondition(false, this));
 
     factory(Qn::SaveVideowallMatrixAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).

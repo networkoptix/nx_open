@@ -19,6 +19,7 @@
 #include <api/model/connection_info.h>
 #include <api/model/time_reply.h>
 #include <api/model/rebuild_archive_reply.h>
+#include <api/runtime_info_manager.h>
 
 #include <recording/time_period_list.h>
 
@@ -41,7 +42,6 @@
 #include <core/resource/videowall_pc_data.h>
 #include <core/resource/videowall_control_message.h>
 #include <core/resource/videowall_matrix.h>
-#include <core/resource/videowall_instance_status.h>
 
 #include <recording/time_period.h>
 
@@ -56,6 +56,7 @@
 #include <business/business_fwd.h>
 
 #include <licensing/license.h>
+#include "api/model/test_email_settings_reply.h"
 
 
 namespace {
@@ -78,6 +79,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qt::Orientations>();
 
     qRegisterMetaType<QnMacAddress>();
+    qRegisterMetaType<QnPeerRuntimeInfo>();
 
     qRegisterMetaType<QnParam>();
     qRegisterMetaType<QnId>();
@@ -119,7 +121,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnVideoWallPcData>();
     qRegisterMetaType<QnVideoWallControlMessage>();
     qRegisterMetaType<QnVideoWallMatrix>();
-    qRegisterMetaType<QnVideowallInstanceStatus>();
 
     qRegisterMetaType<QnMotionRegion>();
     qRegisterMetaType<QnScheduleTask>();
@@ -164,6 +165,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();
     qRegisterMetaType<QnTimeReply>();
+    qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
     qRegisterMetaType<QnRebuildArchiveReply>();
     qRegisterMetaType<QnManualCameraSearchReply>();

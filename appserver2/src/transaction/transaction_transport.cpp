@@ -203,7 +203,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
 
                         QByteArray serializedTran;
                         QnTransactionTransportHeader transportHeader;
-                        QnBinaryTransactionSerializer::deserializeTran(
+                        QnUbjsonTransactionSerializer::deserializeTran(
                             &m_readBuffer[0] + readBufPos + m_chunkHeaderLen + 4,
                             m_chunkLen - 4,
                             transportHeader,
@@ -286,21 +286,9 @@ void QnTransactionTransport::doOutgoingConnect(QUrl remoteAddr)
     QUrlQuery q = QUrlQuery(remoteAddr.query());
 
     // Client reconnects to the server
-    if( m_localPeer.peerType == Qn::PT_DesktopClient ) {
+    if( m_localPeer.isClient() ) {
         q.removeQueryItem("isClient");
         q.addQueryItem("isClient", QString());
-        setState(ConnectingStage2); // one GET method for client peer is enough
-        setReadSync(true);
-    } else if (m_localPeer.peerType == Qn::PT_VideowallClient) {
-        q.removeQueryItem("isClient");  //videowall client is still client
-        q.addQueryItem("isClient", QString());
-
-        q.removeQueryItem("videowallGuid");
-        q.addQueryItem("videowallGuid", m_localPeer.params["videowallGuid"]);
-
-        q.removeQueryItem("instanceGuid");
-        q.addQueryItem("instanceGuid", m_localPeer.params["instanceGuid"]);
-
         setState(ConnectingStage2); // one GET method for client peer is enough
         setReadSync(true);
     }
@@ -450,7 +438,7 @@ void QnTransactionTransport::processTransactionData(const QByteArray& data)
         {
             QByteArray serializedTran;
             QnTransactionTransportHeader transportHeader;
-            QnBinaryTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+            QnUbjsonTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
             assert( !transportHeader.processedPeers.empty() );
             emit gotTransaction(serializedTran, transportHeader);
 
@@ -477,6 +465,11 @@ bool QnTransactionTransport::isReadyToSend(ApiCommand::Value command) const
 {
      // allow to send system command immediately, without tranSyncRequest
     return ApiCommand::isSystem(command) ? true : m_writeSync;
+}
+
+bool QnTransactionTransport::isReadSync(ApiCommand::Value command) const {
+    // allow to read system command immediately, without tranSyncRequest
+    return ApiCommand::isSystem(command) ? true : m_readSync;
 }
 
 QString QnTransactionTransport::toString( State state )

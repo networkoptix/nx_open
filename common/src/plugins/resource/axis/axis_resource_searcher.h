@@ -22,7 +22,11 @@ public:
 private:
     template <class T> void addMultichannelResources(QList<T>& result);
 protected:
-    QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, const QByteArray& responseData, const QHostAddress& discoveryAddress) override;
+    QList<QnNetworkResourcePtr> processPacket(
+        QnResourceList& result,
+        const QByteArray& responseData,
+        const QHostAddress& discoveryAddress,
+        const QHostAddress& foundHostAddress ) override;
 };
 
 #endif // #ifdef ENABLE_AXIS

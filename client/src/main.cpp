@@ -246,7 +246,7 @@ void addTestData()
 }
 #endif
 
-void initAppServerConnection(const QUuid &videowallGuid, const QUuid &instanceGuid)
+void initAppServerConnection(const QUuid &videowallGuid, const QUuid &videowallInstanceGuid)
 {
     QUrl appServerUrl = qnSettings->lastUsedConnection().url;
 
@@ -258,7 +258,7 @@ void initAppServerConnection(const QUuid &videowallGuid, const QUuid &instanceGu
     QnAppServerConnectionFactory::setDefaultFactory(QnServerCameraFactory::instance());
     if (!videowallGuid.isNull()) {
         QnAppServerConnectionFactory::setVideowallGuid(videowallGuid);
-        QnAppServerConnectionFactory::setInstanceGuid(instanceGuid);
+        QnAppServerConnectionFactory::setInstanceGuid(videowallInstanceGuid);
     }
 }
 
@@ -365,7 +365,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     QUuid videowallGuid(sVideoWallGuid);
-    QUuid instanceGuid(sVideoWallItemGuid);
+    QUuid videowallInstanceGuid(sVideoWallItemGuid);
 
     QString logFileNameSuffix;
     if (!videowallGuid.isNull()) {
@@ -375,9 +375,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         noVersionMismatchCheck = true;
         qnSettings->setLightModeOverride(Qn::LightModeVideoWall);
 
-        logFileNameSuffix = instanceGuid.isNull() 
+        logFileNameSuffix = videowallInstanceGuid.isNull() 
             ? videowallGuid.toString() 
-            : instanceGuid.toString();
+            : videowallInstanceGuid.toString();
         logFileNameSuffix.replace(QRegExp(lit("[{}]")), lit("_"));
     }
 
@@ -466,7 +466,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QNetworkProxyFactory::setApplicationProxyFactory( new QnNetworkProxyFactory() );
 
     /* Initialize connections. */
-    initAppServerConnection(videowallGuid, instanceGuid);
+    initAppServerConnection(videowallGuid, videowallInstanceGuid);
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
         getConnectionFactory( videowallGuid.isNull() ? Qn::PT_DesktopClient : Qn::PT_VideowallClient ) );
@@ -480,7 +480,15 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QScopedPointer<QnClientMessageProcessor> clientMessageProcessor(new QnClientMessageProcessor());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
-    //clientMessageProcessor->init(QnAppServerConnectionFactory::getConnection2());
+    ec2::ApiRuntimeData runtimeData;
+    runtimeData.peer.id = qnCommon->moduleGUID();
+    runtimeData.peer.peerType = videowallInstanceGuid.isNull()
+        ? Qn::PT_DesktopClient
+        : Qn::PT_VideowallClient;
+    runtimeData.brand = lit(QN_PRODUCT_NAME_SHORT);
+    runtimeData.version = 1;
+    runtimeData.videoWallInstanceGuid = videowallInstanceGuid;
+    QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);    // initializing localInfo
 
     qnSettings->save();
     if (!QDir(qnSettings->mediaFolder()).exists())
@@ -508,7 +516,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     ffmpegInit();
 
-    qnCommon->setModuleGUID(QUuid::createUuid());
+    
 
     //===========================================================================
 
@@ -664,7 +672,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     if (!videowallGuid.isNull()) {
         context->menu()->trigger(Qn::DelayedOpenVideoWallItemAction, QnActionParameters()
                              .withArgument(Qn::VideoWallGuidRole, videowallGuid)
-                             .withArgument(Qn::VideoWallItemGuidRole, instanceGuid));
+                             .withArgument(Qn::VideoWallItemGuidRole, videowallInstanceGuid));
     } else {
         /* Drop resources if needed. */
         if(!delayedDrop.isEmpty()) {
