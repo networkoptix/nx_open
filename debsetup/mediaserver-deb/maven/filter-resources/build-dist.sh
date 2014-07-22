@@ -26,7 +26,7 @@ INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 
 SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
-SERVER_SHARE_PATH=${libdir}/share
+SERVER_SHARE_PATH=${libdir}/stage
 #SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
 SERVER_IMAGEFORMATS_PATH=$SERVER_BIN_PATH/imageformats
 SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
