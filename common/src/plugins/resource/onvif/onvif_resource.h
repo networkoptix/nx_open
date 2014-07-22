@@ -22,6 +22,8 @@
 #include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
 #include "onvif_resource_settings.h"
+#include "gsoap_async_call_wrapper.h"
+
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
@@ -62,6 +64,12 @@ class QnPlOnvifResource
     Q_OBJECT
 
 public:
+    typedef GSoapAsyncCallWrapper <
+        PullPointSubscriptionWrapper,
+        _onvifEvents__PullMessages,
+        _onvifEvents__PullMessagesResponse
+    > GSoapAsyncPullMessagesCallWrapper;
+
     class RelayOutputInfo
     {
     public:
@@ -460,10 +468,16 @@ private:
     QString m_onvifNotificationSubscriptionReference;
     QElapsedTimer m_monotonicClock;
     qint64 m_prevRequestSendClock;
+    QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     bool createPullPointSubscription();
     void pullMessages( quint64 timerID );
-    //!Reads relay output list from resource
+    void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
+    void onPullMessagesResponseReceived(
+        PullPointSubscriptionWrapper* soapWrapper, 
+        int resultCode,
+        const _onvifEvents__PullMessagesResponse& response);
+        //!Reads relay output list from resource
     bool fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs );
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
     bool fetchRelayInputInfo();
