@@ -168,7 +168,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                         {
                             QByteArray serializedTran;
                             QnTransactionTransportHeader transportHeader;
-                            QnBinaryTransactionSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+                            QnUbjsonTransactionSerializer::deserializeTran(rBuffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
                             emit gotTransaction(serializedTran, transportHeader);
                             m_readBufferLen = m_chunkHeaderLen = 0;
                         }
@@ -380,7 +380,7 @@ void QnTransactionTransport::processTransactionData( const QByteArray& data)
         {
             QByteArray serializedTran;
             QnTransactionTransportHeader transportHeader;
-            QnBinaryTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
+            QnUbjsonTransactionSerializer::deserializeTran(buffer + m_chunkHeaderLen + 4, m_chunkLen - 4, transportHeader, serializedTran);
             emit gotTransaction(serializedTran, transportHeader);
 
             buffer += fullChunkLen;

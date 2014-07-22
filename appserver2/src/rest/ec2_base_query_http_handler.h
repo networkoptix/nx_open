@@ -57,7 +57,7 @@ namespace ec2
             QString command = path.split(L'/').last();
             parseHttpRequestParams( command, params, &inputData);
 
-            Qn::SerializationFormat format = Qn::BnsFormat;
+            Qn::SerializationFormat format = Qn::UbjsonFormat;
             parseHttpRequestParams( command, params, &format);
 
             ErrorCode errorCode = ErrorCode::ok;
