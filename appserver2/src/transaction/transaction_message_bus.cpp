@@ -374,8 +374,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             continue;
 
         //Q_ASSERT(transport->remotePeer().id != tran.peerID);
-        QnTransactionTransportHeader newHeader(processedPeers, transportHeader.dstPeers);
-        newHeader.fillSequence();
+        QnTransactionTransportHeader newHeader(processedPeers, transportHeader.dstPeers, transportHeader.sequence);
         transport->sendTransaction(tran, newHeader);
     }
 
