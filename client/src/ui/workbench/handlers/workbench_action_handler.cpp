@@ -14,9 +14,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtGui/QImageWriter>
 
-#include <api/session_manager.h>
 #include <api/network_proxy_factory.h>
-#include <api/runtime_info_manager.h>
 
 #include <business/business_action_parameters.h>
 
@@ -51,7 +49,6 @@
 #include <ui/actions/action_target_provider.h>
 
 #include <ui/dialogs/about_dialog.h>
-#include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/server_settings_dialog.h>
 #include <ui/dialogs/connection_testing_dialog.h>
 #include <ui/dialogs/camera_settings_dialog.h>
@@ -85,7 +82,6 @@
 #include <ui/help/help_topics.h>
 
 #include <ui/style/globals.h>
-#include <ui/style/skin.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
@@ -98,8 +94,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
 
-#include <ui/workbench/handlers/workbench_notifications_handler.h>
-#include <ui/workbench/handlers/workbench_layouts_handler.h>
+#include <ui/workbench/handlers/workbench_notifications_handler.h>      //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
 
 #include <ui/workbench/watchers/workbench_user_watcher.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
@@ -110,7 +106,7 @@
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
 #include <utils/app_server_image_cache.h>
-#include <utils/app_server_notification_cache.h>
+
 #include <utils/applauncher_utils.h>
 #include <utils/license_usage_helper.h>
 #include <utils/local_file_cache.h>
@@ -138,16 +134,9 @@
 #include "ui/dialogs/adjust_video_dialog.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/widgets/palette_widget.h"
-#include "compatibility.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
-
-    const int videowallReconnectTimeoutMSec = 5000;
-    const int videowallCloseTimeoutMSec = 10000;
-
-    const int maxReconnectTimeout = 10*1000;                // 10 seconds
-    const int maxVideowallReconnectTimeout = 96*60*60*1000; // 4 days
 }
 
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
@@ -233,15 +222,12 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
     m_delayedDropGuard(false),
-    m_connectingMessageBox(NULL),
     m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
-    connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionClosed()),                     this,   SLOT(at_messageProcessor_connectionClosed()));
-    connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_messageProcessor_connectionOpened()));
-
+    
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
     connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -260,13 +246,11 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
-    connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
+    
     connect(action(Qn::PreferencesGeneralTabAction),            SIGNAL(triggered()),    this,   SLOT(at_preferencesGeneralTabAction_triggered()));
     connect(action(Qn::PreferencesLicensesTabAction),           SIGNAL(triggered()),    this,   SLOT(at_preferencesLicensesTabAction_triggered()));
     connect(action(Qn::PreferencesSmtpTabAction),               SIGNAL(triggered()),    this,   SLOT(at_preferencesSmtpTabAction_triggered()));
     connect(action(Qn::PreferencesNotificationTabAction),       SIGNAL(triggered()),    this,   SLOT(at_preferencesNotificationTabAction_triggered()));
-    connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
-    connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
     connect(action(Qn::BusinessEventsLogAction),                SIGNAL(triggered()),    this,   SLOT(at_businessEventsLogAction_triggered()));
@@ -349,10 +333,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), SIGNAL(mismatchDataChanged()), this, SLOT(at_versionMismatchWatcher_mismatchDataChanged()));
 
-    context()->instance<QnAppServerNotificationCache>();
-
     /* Run handlers that update state. */
-    at_messageProcessor_connectionClosed();
     at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
     at_updateWatcher_availableUpdateChanged();
@@ -383,9 +364,6 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
 
     if (cameraAdditionDialog())
         delete cameraAdditionDialog();
-
-    if (loginDialog())
-        delete loginDialog();
 }
 
 ec2::AbstractECConnectionPtr QnWorkbenchActionHandler::connection2() const {
@@ -483,12 +461,12 @@ void QnWorkbenchActionHandler::openResourcesInNewWindow(const QnResourceList &re
 
 void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
-    arguments << QLatin1String("--no-single-application");
-    arguments << QLatin1String("--no-version-mismatch-check");
+    arguments << lit("--no-single-application");
+    arguments << lit("--no-version-mismatch-check");
 
     if (context()->user()) {
-        arguments << QLatin1String("--auth");
-        arguments << QLatin1String(qnSettings->lastUsedConnection().url.toEncoded());
+        arguments << lit("--auth");
+        arguments << QString::fromUtf8(QnAppServerConnectionFactory::url().toEncoded());
     }
 
     /* For now, simply open it at another screen. Don't account for 3+ monitor setups. */
@@ -501,7 +479,7 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     }
 
     if (qnSettings->isDevMode())
-        arguments << QLatin1String("--dev-mode-key=razrazraz");
+        arguments << lit("--dev-mode-key=razrazraz");
 
     qDebug() << "Starting new instance with args" << arguments;
 
@@ -571,13 +549,6 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
             [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
                 at_resources_saved( reqID, errorCode, cameras );
             } );
-        /*
-        foreach(const QnResourcePtr &camera, cameras) {
-            connection2()->getResourceManager()->save(
-                camera->getId(), camera->getProperties(),
-                this, &QnWorkbenchActionHandler::at_resources_properties_saved  );
-        }
-        */
     }
 
     if (hasCameraChanges) {
@@ -664,10 +635,6 @@ QnCameraAdditionDialog *QnWorkbenchActionHandler::cameraAdditionDialog() const {
     return m_cameraAdditionDialog.data();
 }
 
-QnLoginDialog *QnWorkbenchActionHandler::loginDialog() const {
-    return m_loginDialog.data();
-}
-
 QnSystemAdministrationDialog *QnWorkbenchActionHandler::systemAdministrationDialog() const {
     return m_systemAdministrationDialog.data();
 }
@@ -733,7 +700,7 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
 void QnWorkbenchActionHandler::submitInstantDrop() {
 
     if (QnResourceDiscoveryManager::instance()->state() == QnResourceDiscoveryManager::InitialSearch) {
-        // local resources is not ready yet
+        // local resources are not ready yet
         QTimer::singleShot(100, this, SLOT(submitInstantDrop()));
         return;
     }
@@ -838,73 +805,6 @@ void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
     action(Qn::RadassAutoAction)->setChecked(true);
     qnRedAssController->setMode(Qn::AutoResolution);
     submitDelayedDrops();
-}
-
-void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
-    action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
-    action(Qn::ConnectToServerAction)->setText(tr("Connect to Server..."));
-
-    if (!mainWindow())
-        return;
-
-    if (cameraAdditionDialog())
-        cameraAdditionDialog()->hide();
-    context()->instance<QnAppServerNotificationCache>()->clear();
-
-    menu()->trigger(Qn::ClearCameraSettingsAction);
-
-    // videowall client should silently wait for reconnect
-    if (!qnSettings->isVideoWallMode()) {
-        const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
-        resourcePool()->removeResources(remoteResources);
-    }
-
-    qnLicensePool->reset();
-
-    if (!qnCommon->remoteGUID().isNull()) {
-        if (!qnSettings->isVideoWallMode()) {
-
-            m_connectingMessageBox = QnGraphicsMessageBox::informationTicking(
-                tr("Connection failed. Trying to restore connection... %1"),
-                maxReconnectTimeout);
-
-            connect(m_connectingMessageBox, &QnGraphicsMessageBox::finished, this, [this]{
-                menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
-                menu()->trigger(Qn::ConnectToServerAction);
-                m_connectingMessageBox = NULL;
-            });
-
-        } else { //videowall client should wait much longer and close
-
-            m_connectingMessageBox = QnGraphicsMessageBox::information(
-                tr("Connection failed. Trying to restore connection..."),
-                maxVideowallReconnectTimeout);   
-
-            connect(m_connectingMessageBox, &QnGraphicsMessageBox::finished, this, [this] {
-                m_connectingMessageBox = NULL;
-                menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
-                menu()->trigger(Qn::ExitAction);
-            });
-
-        } 
-
-
-    }
-}
-
-void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
-    action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
-    action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
-
-    context()->instance<QnAppServerNotificationCache>()->getFileList();
-
-    if (m_connectingMessageBox != NULL) {
-        m_connectingMessageBox->disconnect(this);
-        m_connectingMessageBox->hideImmideately();
-        m_connectingMessageBox = NULL;
-    }
-
-    connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -1449,7 +1349,7 @@ void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_webClientAction_triggered() {
-    QUrl url(QnAppServerConnectionFactory::defaultUrl());
+    QUrl url(QnAppServerConnectionFactory::url());
     url.setUserName(QString());
     url.setPassword(QString());
     url.setPath(QLatin1String("/web/"));
@@ -1489,229 +1389,6 @@ void QnWorkbenchActionHandler::at_cameraListAction_triggered() {
     QnNonModalDialogConstructor<QnCameraListDialog> dialogConstructor(m_cameraListDialog, mainWindow());
     QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
     cameraListDialog()->setServer(server);
-}
-
-void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
-    const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
-    if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
-        return;
-
-    if (!loginDialog()) {
-        m_loginDialog = new QnLoginDialog(mainWindow(), context());
-        loginDialog()->setModal(true);
-    }
-    while(true) {
-        QnActionParameters parameters = menu()->currentParameters(sender());
-        loginDialog()->setAutoConnect(parameters.argument(Qn::AutoConnectRole, false));
-
-        if(!loginDialog()->exec())
-            return;
-
-        if(!context()->user())
-            break; /* We weren't connected, so layouts cannot be saved. */
-
-        QnWorkbenchState state;
-        workbench()->submit(state);
-
-        if(!context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true))
-            continue;
-
-        QnWorkbenchStateHash states = qnSettings->userWorkbenchStates();
-        states[context()->user()->getName()] = state;
-        qnSettings->setUserWorkbenchStates(states);
-        break;
-    }
-    menu()->trigger(Qn::ClearCameraSettingsAction);
-
-    QnConnectionDataList connections = qnSettings->customConnections();
-
-    QnConnectionData connectionData;
-    connectionData.url = loginDialog()->currentUrl();
-    qnSettings->setLastUsedConnection(connectionData);
-
-    qnSettings->setStoredPassword(loginDialog()->rememberPassword()
-                ? connectionData.url.password()
-                : QString()
-                  );
-
-    // remove previous "Last used connection"
-    connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
-
-    QUrl cleanUrl(connectionData.url);
-    cleanUrl.setPassword(QString());
-    QnConnectionData selected = connections.getByName(loginDialog()->currentName());
-    if (selected.url == cleanUrl){
-        connections.removeOne(selected.name);
-        connections.prepend(selected);
-    } else {
-        // save "Last used connection"
-        QnConnectionData last(connectionData);
-        last.name = QnConnectionDataList::defaultLastUsedNameKey();
-        last.url.setPassword(QString());
-        connections.prepend(last);
-    }
-    qnSettings->setCustomConnections(connections);
-
-    //updateStoredConnections(connectionData);
-
-    if (loginDialog()->restartPending())
-        QTimer::singleShot(10, this, SLOT(at_exitAction_triggered()));
-    else
-        menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectionInfoRole, loginDialog()->currentInfo()));
-}
-
-void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-
-    const QnConnectionData connectionData = qnSettings->lastUsedConnection();
-    if (!connectionData.isValid())
-        return;
-    
-    QnConnectionInfo connectionInfo;
-    if (parameters.hasArgument(Qn::ConnectionInfoRole)) {   // we have received info from Login Dialog
-        connectionInfo = parameters.argument<QnConnectionInfo>(Qn::ConnectionInfoRole);
-    } else {  // auto-login by previous credentials
-        QnEc2ConnectionRequestResult result;
-        QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
-            connectionData.url, &result, &QnEc2ConnectionRequestResult::processEc2Reply );
-
-        QnGraphicsMessageBox* connectingMessageBox = qnSettings->isVideoWallMode()
-            ? QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX)
-            : NULL;
-
-        //here we are going to inner event loop
-        int errCode = result.exec();
-        if (connectingMessageBox)
-            connectingMessageBox->hideImmideately();
-        
-        if (errCode != 0) {
-            if (qnSettings->isVideoWallMode()) {
-                QnGraphicsMessageBox* reconnectingMessageBox = QnGraphicsMessageBox::informationTicking(tr("Connection failed. Reconnecting in %1..."), videowallReconnectTimeoutMSec);
-                connect(reconnectingMessageBox, &QnGraphicsMessageBox::finished, action(Qn::ReconnectAction), &QAction::trigger);
-            }
-            return;
-        }
-
-        QnAppServerConnectionFactory::setEc2Connection( result.connection());
-        connectionInfo = result.reply<QnConnectionInfo>();
-    }
-    QnCommonMessageProcessor::instance()->init(NULL);
-    QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
-
-    auto incompatibilityHandler = [this]() {
-        if (!qnSettings->isVideoWallMode())
-            return;
-        QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Incompatible server. Closing in %1..."), videowallCloseTimeoutMSec);
-        connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished, action(Qn::ExitAction), &QAction::trigger);
-    };
-
-    { // I think we should move this common code to common place --gdm
-        bool compatibleProduct = qnSettings->isDevMode() || connectionInfo.brand.isEmpty()
-                || connectionInfo.brand == QLatin1String(QN_PRODUCT_NAME_SHORT);
-        if (!compatibleProduct) {
-            incompatibilityHandler();
-            return;
-        }
-
-        QnCompatibilityChecker remoteChecker(connectionInfo.compatibilityItems);
-        QnCompatibilityChecker localChecker(localCompatibilityItems());
-        QnCompatibilityChecker* compatibilityChecker;
-        if (remoteChecker.size() > localChecker.size()) {
-            compatibilityChecker = &remoteChecker;
-        } else {
-            compatibilityChecker = &localChecker;
-        }
-
-        if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QnSoftwareVersion(QN_ENGINE_VERSION), QLatin1String("ECS"), connectionInfo.version)) {
-            incompatibilityHandler();
-            return;
-        }
-    }
-
-    QnSessionManager::instance()->stop();
-
-    QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
-    QnAppServerConnectionFactory::setDefaultUrl(connectionData.url);
-
-    // repopulate the resource pool
-    QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance()->stop();
-
-#ifndef STANDALONE_MODE
-    static const char *appserverAddedPropertyName = "_qn_appserverAdded";
-    if(!QnResourceDiscoveryManager::instance()->property(appserverAddedPropertyName).toBool()) {
-        QnResourceDiscoveryManager::instance()->setProperty(appserverAddedPropertyName, true);
-    }
-#endif
-
-    // Also remove layouts that were just added and have no 'remote' flag set.
-    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
-        if(!(snapshotManager()->flags(layout) & Qn::ResourceIsLocal))
-            resourcePool()->removeResource(layout);
-
-    // don't remove local resources
-    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
-    resourcePool()->removeResources(remoteResources);
-    
-
-    qnLicensePool->reset();
-
-    notificationsHandler()->clear();
-
-    QnSessionManager::instance()->start();
-
-    QnResourceDiscoveryManager::instance()->start();
-
-    QnResource::startCommandProc();
-
-    context()->setUserName(connectionData.url.userName());
-}
-
-void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
-    QnActionParameters parameters = menu()->currentParameters(sender());
-    bool force = parameters.hasArgument(Qn::ForceRole)
-        ? parameters.argument(Qn::ForceRole).toBool()
-        : false;
-
-    //closeAllLayouts should return true in case of force disconnect
-    if( context()->user() && !context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true, force)) 
-        return;
-
-    // TODO: #GDM #Common Factor out common code from reconnect/disconnect/login actions.
-
-    menu()->trigger(Qn::ClearCameraSettingsAction);
-
-    QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance()->stop();
-    QnSessionManager::instance()->stop();
-
-    // Also remove layouts that were just added and have no 'remote' flag set.
-    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
-        if(!(snapshotManager()->flags(layout) & Qn::ResourceIsLocal))
-            resourcePool()->removeResource(layout);
-
-    // don't remove local resources
-    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
-    resourcePool()->removeResources(remoteResources);
-
-    qnLicensePool->reset();
-
-    QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
-    QnAppServerConnectionFactory::setEc2Connection( NULL);
-    QnCommonMessageProcessor::instance()->init(NULL);
-
-    // TODO: #Elric save workbench state on logout.
-    // TODO: #GDM save workbench state on connectionClosed() =)
-
-    notificationsHandler()->clear();
-
-    qnSettings->setStoredPassword(QString());
-
-    if (m_connectingMessageBox != NULL) {
-        m_connectingMessageBox->disconnect(this);
-        m_connectingMessageBox->hideImmideately();
-        m_connectingMessageBox = NULL;
-    }
 }
 
 void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
@@ -2092,15 +1769,17 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     if(!server)
         return;
 
+    if (!context()->user())
+        return;
+
     QUrl url = server->getApiUrl();
     url.setScheme(lit("http"));
     url.setPath( lit("/api/showLog") );
     url.setQuery(lit("lines=1000"));
     
     //setting credentials for access to resource
-    const QnConnectionData& lastUsedConnection = qnSettings->lastUsedConnection();
-    url.setUserName(lastUsedConnection.url.userName());
-    url.setPassword(lastUsedConnection.url.password());
+    url.setUserName(QnAppServerConnectionFactory::url().userName());
+    url.setPassword(QnAppServerConnectionFactory::url().password());
 
     if( !QnNetworkProxyFactory::instance()->fillUrlWithRouteToResource(
             server,
@@ -2496,8 +2175,8 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setEditorPermissions(accessController()->globalPermissions());
 
 
-    // TODO #elric: This is a totally evil hack. Store password hash/salt in user.
-    QString currentPassword = qnSettings->lastUsedConnection().url.password();
+    // TODO #Elric: This is a totally evil hack. Store password hash/salt in user.
+    QString currentPassword = QnAppServerConnectionFactory::url().password();
     if(user == context()->user()) {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, passwordFlags);
         dialog->setCurrentPassword(currentPassword);
@@ -2522,15 +2201,16 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         user->setPassword(QString());
         if(user == context()->user() && !newPassword.isEmpty() && newPassword != currentPassword) {
             /* Password was changed. Change it in global settings and hope for the best. */
-            QnConnectionData data = qnSettings->lastUsedConnection();
-            data.url.setPassword(newPassword);
-            qnSettings->setLastUsedConnection(data);
+            QUrl url = QnAppServerConnectionFactory::url();
+            url.setPassword(newPassword);
 
             // TODO #elric: This is a totally evil hack. Store password hash/salt in user.
             context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(newPassword);
 
-
-            QnAppServerConnectionFactory::setDefaultUrl(data.url);
+            QnAppServerConnectionFactory::setUrl(url);
+            qnSettings->setStoredPassword(qnSettings->storedPassword().isEmpty()
+                ? QString()
+                : newPassword);
         }
     }
 }
@@ -2999,7 +2679,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     QUrl url = parameters.hasArgument(Qn::UrlRole)
             ? parameters.argument<QUrl>(Qn::UrlRole)
             : context()->user()
-              ? QnAppServerConnectionFactory::defaultUrl()
+              ? QnAppServerConnectionFactory::url()
               : QUrl();
     QByteArray auth = url.toEncoded();
 

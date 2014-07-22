@@ -206,11 +206,11 @@ protected:
         QStringList arguments;
         arguments << lit("--videowall");
         arguments << m_videoWallUuid.toString();
-        QUrl url = qnSettings->lastUsedConnection().url;
+        QUrl url = QnAppServerConnectionFactory::url();
         url.setUserName(QString());
         url.setPassword(QString());
-        arguments << QLatin1String("--auth");
-        arguments << QLatin1String(url.toEncoded());
+        arguments << lit("--auth");
+        arguments << QString::fromUtf8(url.toEncoded());
 
         QFileInfo clientFile = QFileInfo(qApp->applicationFilePath());
         QString result = toRegistryFormat(clientFile.canonicalFilePath()) + L' ' + arguments.join(L' ');
@@ -498,9 +498,9 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
             continue;
 
         QStringList arguments;
-        arguments << QLatin1String("--videowall");
+        arguments << lit("--videowall");
         arguments << videoWall->getId().toString();
-        arguments << QLatin1String("--videowall-instance");
+        arguments << lit("--videowall-instance");
         arguments << item.uuid.toString();
         openNewWindow(arguments);
     }
@@ -509,12 +509,12 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
 void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
 
-    QUrl url = qnSettings->lastUsedConnection().url;
+    QUrl url = QnAppServerConnectionFactory::url();
     url.setUserName(QString());
     url.setPassword(QString());
 
-    arguments << QLatin1String("--auth");
-    arguments << QLatin1String(url.toEncoded());
+    arguments << lit("--auth");
+    arguments << QString::fromUtf8(url.toEncoded());
 
 #ifdef SENDER_DEBUG
     qDebug() << "arguments" << arguments;
@@ -2108,15 +2108,15 @@ bool QnWorkbenchVideoWallHandler::createShortcut(const QnVideoWallResourcePtr &v
         return false;
 
     QStringList arguments;
-    arguments << QLatin1String("--videowall");
+    arguments << lit("--videowall");
     arguments << videowall->getId().toString();
 
-    QUrl url = qnSettings->lastUsedConnection().url;
+    QUrl url = QnAppServerConnectionFactory::url();
     url.setUserName(QString());
     url.setPassword(QString());
 
-    arguments << QLatin1String("--auth");
-    arguments << QLatin1String(url.toEncoded());
+    arguments << lit("--auth");
+    arguments << QString::fromUtf8(url.toEncoded());
 
     return qnPlatform->shortcuts()->createShortcut(qApp->applicationFilePath(), destinationPath, videowall->getName(), arguments);
 }

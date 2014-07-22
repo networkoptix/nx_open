@@ -1321,7 +1321,7 @@ void QnWorkbenchUi::createTitleWidget() {
     m_titleRightButtonsLayout->addStretch(0x1000);
     if (QnScreenRecorder::isSupported())
         m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction), 1.0, Qn::MainWindow_ScreenRecording_Help));
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenLoginDialogAction)));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
     titleLayout->addItem(m_titleRightButtonsLayout);
     m_titleItem->setLayout(titleLayout);

@@ -373,11 +373,10 @@ public:
         TimePeriodRole,
         TimePeriodsRole,
         MergedTimePeriodsRole,
-        AutoConnectRole,
         FileNameRole,                               /**< Role for target filename. Used in TakeScreenshotAction. */
         TitleRole,                                  /**< Role for dialog title. Used in MessageBoxAction. */
         TextRole,                                   /**< Role for dialog text. Used in MessageBoxAction. */
-        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction. */
+        UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and ConnectAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
         UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */

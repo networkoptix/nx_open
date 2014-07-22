@@ -91,7 +91,7 @@ void QnAboutDialog::retranslateUi()
         arg(QLatin1String(QN_APPLICATION_COMPILER));
 
     QnSoftwareVersion ecsVersion = QnAppServerConnectionFactory::currentVersion();
-    QUrl ecsUrl = QnAppServerConnectionFactory::defaultUrl();
+    QUrl ecsUrl = QnAppServerConnectionFactory::url();
     QString servers;
 
     if (ecsVersion.isNull()) {

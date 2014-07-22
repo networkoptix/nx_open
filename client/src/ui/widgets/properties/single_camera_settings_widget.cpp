@@ -188,9 +188,11 @@ void QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired ( const QNetwo
     QMutexLocker locker(&m_cameraMutex);
     if (!m_camera)
         return;
-    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-    authenticator->setUser(lastUsedConnection.url.userName());
-    authenticator->setPassword(lastUsedConnection.url.password());
+
+    QString user = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
+    authenticator->setUser(user);
+    authenticator->setPassword(password);
 }
 
 #ifdef QT_WEBKITWIDGETS_LIB

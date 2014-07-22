@@ -38,7 +38,6 @@ class QnAction;
 class QnCameraSettingsDialog;
 class QnBusinessRulesDialog;
 class QnCameraAdditionDialog;
-class QnLoginDialog;
 class QnPopupCollectionWidget;
 class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
@@ -166,8 +165,6 @@ protected:
 
     QnCameraAdditionDialog *cameraAdditionDialog() const;
 
-    QnLoginDialog *loginDialog() const;
-
     QnSystemAdministrationDialog *systemAdministrationDialog() const;
 
     QnWorkbenchNotificationsHandler* notificationsHandler() const;
@@ -184,9 +181,6 @@ protected slots:
     void at_workbench_cellAspectRatioChanged();
     void at_workbench_cellSpacingChanged();
     void at_workbench_currentLayoutChanged();
-
-    void at_messageProcessor_connectionClosed();
-    void at_messageProcessor_connectionOpened();
 
     void at_mainMenuAction_triggered();
     void at_openCurrentUserLayoutMenuAction_triggered();
@@ -228,9 +222,6 @@ protected slots:
     void at_preferencesLicensesTabAction_triggered();
     void at_preferencesSmtpTabAction_triggered();
     void at_preferencesNotificationTabAction_triggered();
-    void at_connectToServerAction_triggered();
-    void at_reconnectAction_triggered();
-    void at_disconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_pictureSettingsAction_triggered();
@@ -340,7 +331,6 @@ private:
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
     QPointer<QnCameraListDialog> m_cameraListDialog;
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
-    QPointer<QnLoginDialog> m_loginDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
 
@@ -363,8 +353,6 @@ private:
     QnTimePeriod m_exportPeriod;
     QnLayoutResourcePtr m_exportLayout;
     QnStorageResourcePtr m_exportStorage;
-
-    QnGraphicsMessageBox* m_connectingMessageBox;
 
     QTimer *m_tourTimer;
 };

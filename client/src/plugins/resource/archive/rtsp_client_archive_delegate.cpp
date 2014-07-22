@@ -784,8 +784,8 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
         session->setUsePredefinedTracks(0);
     }
     
-    QString user = QnAppServerConnectionFactory::defaultUrl().userName();
-    QString password = QnAppServerConnectionFactory::defaultUrl().password();
+    QString user = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
     QAuthenticator auth;
     auth.setUser(user);
     auth.setPassword(password);

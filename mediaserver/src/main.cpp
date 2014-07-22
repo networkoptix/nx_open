@@ -665,7 +665,7 @@ void initAppServerConnection(const QSettings &settings)
     NX_LOG(lit("Connect to enterprise controller server %1").arg(urlNoPassword.toString()), cl_logINFO);
     //QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
-    QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
+    QnAppServerConnectionFactory::setUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
 }
 
@@ -1149,7 +1149,7 @@ void QnMain::run()
     QnConnectionInfo connectInfo;
     while (!needToStop())
     {
-        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QnAppServerConnectionFactory::defaultUrl(), &ec2Connection );
+        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QnAppServerConnectionFactory::url(), &ec2Connection );
         if( errorCode == ec2::ErrorCode::ok )
         {
             connectInfo = ec2Connection->connectionInfo();
@@ -1214,7 +1214,7 @@ void QnMain::run()
     QnRestProcessorPool restProcessorPool;
     QnRestProcessorPool::initStaticInstance( &restProcessorPool );
 
-    if( QnAppServerConnectionFactory::defaultUrl().scheme().toLower() == lit("file") )
+    if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
         ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
 
     nx_hls::HLSSessionPool hlsSessionPool;

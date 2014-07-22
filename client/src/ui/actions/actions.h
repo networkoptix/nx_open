@@ -15,9 +15,25 @@ namespace Qn {
         /* Actions that are not assigned to any menu. */
 
         /**
-         * Opens connection setting dialog.
+         * Opens login dialog.
          */
-        ConnectToServerAction,
+        OpenLoginDialogAction,
+
+        /**
+         * Connects to server.
+         */
+        ConnectAction,
+
+        /**
+         * Disconnects from server.
+         */
+        DisconnectAction,
+
+        /**
+         * Forcefully disconnects from the current server (if any).
+         * Connects to the server using the last used URL set in <tt>QnSettings</tt>.
+         */
+        ReconnectAction,
 
         /**
          * Opens licenses preferences tab.
@@ -33,22 +49,6 @@ namespace Qn {
          * Opens notifications settings preferences tab.
          */
         PreferencesNotificationTabAction,
-
-        /**
-         * Reconnects to the Enterprise Controller using the last used URL
-         * set in <tt>QnSettings</tt>.
-         *
-         * Parameters.
-         * <tt>QnConnectInfoPtr ConnectionInfoRole</tt> --- a connection info
-         * to use. If not provided, action handler will try to send a connect
-         * request first.
-         */
-        ReconnectAction,
-
-        /**
-         * Disconnects from the Enterprise Controller
-         */
-        DisconnectAction,
 
         /**
          * Shows / hides FPS display.

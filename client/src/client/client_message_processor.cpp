@@ -102,11 +102,11 @@ void QnClientMessageProcessor::checkForTmpStatus(const QnResourcePtr& resource)
 void QnClientMessageProcessor::determineOptimalIF(const QnMediaServerResourcePtr &resource)
 {
     // set proxy. If some media server IF will be found, proxy address will be cleared
-    const QString& proxyAddr = QnAppServerConnectionFactory::defaultUrl().host();
+    const QString& proxyAddr = QnAppServerConnectionFactory::url().host();
     resource->apiConnection()->setProxyAddr(
         resource->getApiUrl(),
         proxyAddr,
-        QnAppServerConnectionFactory::defaultUrl().port() );    //starting with 2.3 proxy embedded to EC
+        QnAppServerConnectionFactory::url().port() );    //starting with 2.3 proxy embedded to EC
     disconnect(resource.data(), NULL, this, NULL);
     resource->determineOptimalNetIF();
 }
@@ -161,5 +161,4 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
 void QnClientMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
-    QnResourceDiscoveryManager::instance()->setReady(true);
 }

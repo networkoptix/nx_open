@@ -499,7 +499,7 @@ QnActionManager::QnActionManager(QObject *parent):
         icon(qnSkin->icon("titlebar/main_menu.png"));
 
     // Text and icon are set in QnWorkbenchActionHandler::at_eventManager_connectionOpened/Closed
-    factory(Qn::ConnectToServerAction).
+    factory(Qn::OpenLoginDialogAction).
         flags(Qn::Main).
         autoRepeat(false);
 

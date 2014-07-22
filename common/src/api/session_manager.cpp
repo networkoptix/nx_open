@@ -287,8 +287,8 @@ void QnSessionManager::at_aboutToBeStopped() {
 
 void QnSessionManager::at_proxyAuthenticationRequired ( const QNetworkProxy & reply, QAuthenticator* authenticator)
 {
-    QString user = QnAppServerConnectionFactory::defaultUrl().userName();
-    QString password = QnAppServerConnectionFactory::defaultUrl().password();
+    QString user = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
     authenticator->setUser(user);
     authenticator->setPassword(password);
 }
@@ -302,10 +302,10 @@ void QnSessionManager::at_authenticationRequired(QNetworkReply* reply, QAuthenti
 
     bool useDefaultValues = reply->url().userName().isEmpty();
     QString user = useDefaultValues
-            ? QnAppServerConnectionFactory::defaultUrl().userName()
+            ? QnAppServerConnectionFactory::url().userName()
             :reply->url().userName();
     QString password = useDefaultValues
-            ? QnAppServerConnectionFactory::defaultUrl().password()
+            ? QnAppServerConnectionFactory::url().password()
             : reply->url().password();
 
     // if current values are already present in authenticator, do not send them again -

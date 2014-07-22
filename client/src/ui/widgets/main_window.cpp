@@ -36,6 +36,7 @@
 
 #include <ui/workbench/handlers/workbench_action_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
+#include <ui/workbench/handlers/workbench_connect_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
 #include <ui/workbench/handlers/workbench_screenshot_handler.h>
 #include <ui/workbench/handlers/workbench_export_handler.h>
@@ -202,6 +203,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up handlers. */
     context->instance<QnWorkbenchActionHandler>();
+    context->instance<QnWorkbenchConnectHandler>();
     context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
     context->instance<QnWorkbenchExportHandler>();
@@ -234,7 +236,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::BusinessEventsAction));
     addAction(action(Qn::WebClientAction));
     addAction(action(Qn::OpenFileAction));
-    addAction(action(Qn::ConnectToServerAction));
+   // addAction(action(Qn::OpenLoginDialogAction));
     addAction(action(Qn::OpenNewTabAction));
     addAction(action(Qn::OpenNewWindowAction));
     addAction(action(Qn::CloseLayoutAction));
@@ -303,7 +305,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addStretch(0x1000);
     if (QnScreenRecorder::isSupported())
         m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
-    m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction), false, 1.0, Qn::Login_Help));
+    m_titleLayout->addWidget(newActionButton(action(Qn::OpenLoginDialogAction), false, 1.0, Qn::Login_Help));
     m_titleLayout->addLayout(m_windowButtonsLayout);
 
     /* Layouts. */

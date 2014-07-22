@@ -410,8 +410,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
     if (!mserverRes)
         return QString();
 
-    QUrl appServerUrl = QnAppServerConnectionFactory::publicUrl();
-    QUrl appServerDefaultUrl = QnAppServerConnectionFactory::defaultUrl();
+    QUrl appServerUrl = QnAppServerConnectionFactory::url();
     quint64 ts = params.getEventTimestamp();
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res->getPhysicalId());
@@ -421,13 +420,9 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
             mserverRes = newServer;
     }
 
-    if (!isPublic || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
-        if (resolveAddress(appServerDefaultUrl.host()) != QHostAddress::LocalHost) {
-            appServerUrl = appServerDefaultUrl;
-        } else {
-            QUrl mserverUrl = mserverRes->getUrl();
-            appServerUrl.setHost(mserverUrl.host());
-        }
+    if (resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost) {
+        QUrl mserverUrl = mserverRes->getUrl();
+        appServerUrl.setHost(mserverUrl.host());
     }
 
     QString result(lit("https://%1:%2/web/camera?physical_id=%3&pos=%4"));
