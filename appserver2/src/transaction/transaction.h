@@ -104,6 +104,10 @@ namespace ec2
             addLicenses                 = 1002, /*< ApiLicenseDataList */
             removeLicense               = 1003, /*< ApiLicenseData */
 
+            /* Email */
+            testEmailSettings           = 1100, /*< ApiEmailSettingsData */
+            sendEmail                   = 1101, /*< ApiEmailData */
+
             /* Auto-updates */
             uploadUpdate                = 1200, /*< ApiUpdateUploadData */
             uploadUpdateResponce        = 1201, /*< ApiUpdateUploadResponceData */
@@ -167,7 +171,7 @@ namespace ec2
 
     typedef QnAbstractTransaction::PersistentInfo QnAbstractTransaction_PERSISTENT;
 #define QnAbstractTransaction_PERSISTENT_Fields (dbID)(sequence)(timestamp)
-#define QnAbstractTransaction_Fields (command)(peerID)(persistentInfo)
+#define QnAbstractTransaction_Fields (command)(peerID)(persistentInfo)(isLocal)
 
     template <class T>
     class QnTransaction: public QnAbstractTransaction

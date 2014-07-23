@@ -209,7 +209,8 @@ namespace ec2
                 val == removeStoredFile ||
                 val == addLicense ||
                 val == addLicenses ||
-                val == removeLicense;
+                val == removeLicense || 
+                val == resotreDatabase;
         }
 
     }

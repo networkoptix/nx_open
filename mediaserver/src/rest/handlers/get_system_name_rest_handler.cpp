@@ -16,7 +16,8 @@ int QnGetSystemNameRestHandler::executeGet(const QString& /*path*/, const QnRequ
     return nx_http::StatusCode::ok;
 }
 
-int QnGetSystemNameRestHandler::executePost(const QString& /*path*/, const QnRequestParamList& /*params*/, const QByteArray& /*body*/, QByteArray& /*result*/, QByteArray& /*contentType*/)
+int QnGetSystemNameRestHandler::executePost(const QString& /*path*/, const QnRequestParamList& /*params*/, 
+                                            const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType */, QByteArray& /*result*/, QByteArray& /*contentType*/)
 {
     return nx_http::StatusCode::forbidden;
 }

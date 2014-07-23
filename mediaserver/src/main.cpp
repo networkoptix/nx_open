@@ -1218,9 +1218,10 @@ void QnMain::run()
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
     
-    if (!connectInfo.publicIp.isEmpty()) {
+    QString publicIP = getPublicAddress().toString();
+    if (!publicIP.isEmpty()) {
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    runtimeInfo.publicIP = connectInfo.publicIp;
+        localInfo.data.publicIP = publicIP;
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
 
