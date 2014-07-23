@@ -9,6 +9,7 @@
 #include "utils/network/nettools.h"
 #include "utils/network/system_socket.h"
 
+#include "version.h"
 
 static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 
@@ -17,7 +18,7 @@ static const int TCP_TIMEOUT = 3000;
 static const int CACHE_TIME_TIME = 1000 * 60 * 5;
 static const int GROUP_PORT = 1900;
 
-//!Partial parser for SSDP descrition xml (UPnP™ Device Architecture 1.1, 2.3)
+//!Partial parser for SSDP description xml (UPnP™ Device Architecture 1.1, 2.3)
 class UpnpDeviceDescriptionSaxHandler
 :
     public QXmlDefaultHandler

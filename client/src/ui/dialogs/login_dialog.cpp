@@ -325,16 +325,12 @@ void QnLoginDialog::updateUsability() {
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnLoginDialog::at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode, const ec2::AbstractECConnectionPtr &connection ) {
+void QnLoginDialog::at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo ) {
     if (m_requestHandle != handle)
         return; //previous request result received
 
     m_requestHandle = -1;
     updateUsability();
-
-    QnConnectionInfo connectionInfo;
-    if (connection)
-        connectionInfo = connection->connectionInfo();
 
     QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, currentUrl(), this);
 
