@@ -54,6 +54,11 @@ public:
         GSoapAsyncCallWrapperBase* pThis = static_cast<GSoapAsyncCallWrapperBase*>(soap->user);
         return pThis->onGsoapRecvData(data, maxSize);
     }
+
+    static int gsoapFClose( struct soap* soap, SOAP_SOCKET s )
+    {
+        return 0;
+    }
 };
 
 //!Async wrapper for gsoap call
@@ -132,7 +137,7 @@ public:
         m_syncWrapper->getProxy()->soap->fsend = gsoapFsend;
         m_syncWrapper->getProxy()->soap->frecv = gsoapFrecv;
         m_syncWrapper->getProxy()->soap->fopen = NULL;
-        m_syncWrapper->getProxy()->soap->fclose = NULL;
+        m_syncWrapper->getProxy()->soap->fclosesocket = gsoapFClose;
         m_syncWrapper->getProxy()->soap->socket = m_socket->handle();
         m_syncWrapper->getProxy()->soap->master = m_socket->handle();
 
