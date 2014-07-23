@@ -18,19 +18,8 @@ public:
     explicit QnAttachToVideowallDialog(QWidget *parent = 0);
     ~QnAttachToVideowallDialog();
 
-    QnVideowallAttachSettings settings() const;
-    void loadSettings(const QnVideowallAttachSettings &settings);
-
-    void loadLayoutsList(const QnLayoutResourceList &layouts);
-
-    bool canClone() const;
-    void setCanClone(bool value);
-
-    bool isShortcutsSupported() const;
-    void setShortcutsSupported(bool value);
-
-    bool isCreateShortcut() const;
-    void setCreateShortcut(bool value);
+    void loadFromResource(const QnVideoWallResourcePtr &videowall);
+    void submitToResource(const QnVideoWallResourcePtr &videowall); 
 private:
     QScopedPointer<Ui::QnAttachToVideowallDialog> ui;
 };

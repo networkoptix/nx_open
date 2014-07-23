@@ -104,16 +104,15 @@
 #include <rest/handlers/storage_space_rest_handler.h>
 #include <rest/handlers/storage_status_rest_handler.h>
 #include <rest/handlers/time_rest_handler.h>
+#include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
 #include <rest/handlers/change_system_name_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
-#include <rest/server/rest_server.h>
 
 #include <streaming/hls/hls_server.h>
 
 #include <rtsp/rtsp_connection.h>
-#include <rtsp/rtsp_listener.h>
 
 #include <soap/soapserver.h>
 
@@ -708,9 +707,6 @@ QnMain::QnMain(int argc, char* argv[])
     m_startMessageSent(false),
     m_firstRunningTime(0),
     m_moduleFinder(0),
-    m_rtspListener(0),
-    m_restServer(0),
-    m_progressiveDownloadingServer(0),
     m_universalTcpListener(0)
 {
     serviceMainInstance = this;
@@ -752,34 +748,10 @@ void QnMain::stopObjects()
     qnFileDeletor->pleaseStop();
 
 
-    if (m_restServer)
-        m_restServer->pleaseStop();
-    if (m_progressiveDownloadingServer)
-        m_progressiveDownloadingServer->pleaseStop();
-    if (m_rtspListener)
-        m_rtspListener->pleaseStop();
-    
     if (m_universalTcpListener) {
         m_universalTcpListener->pleaseStop();
         delete m_universalTcpListener;
         m_universalTcpListener = 0;
-    }
-
-    if (m_restServer)
-    {
-        delete m_restServer;
-        m_restServer = 0;
-    }
-
-    if (m_progressiveDownloadingServer) {
-        delete m_progressiveDownloadingServer;
-        m_progressiveDownloadingServer = 0;
-    }
-
-    if (m_rtspListener)
-    {
-        delete m_rtspListener;
-        m_rtspListener = 0;
     }
 
     if (m_moduleFinder)
@@ -1006,7 +978,7 @@ void QnMain::at_peerLost(const QnModuleInformation &moduleInformation) {
     }
 }
 
-void QnMain::initTcpListener()
+bool QnMain::initTcpListener()
 {
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::RTSP_PORT, nx_ms_conf::DEFAULT_RTSP_PORT).toInt();
     QnRestProcessorPool::instance()->registerHandler("api/RecordedTimePeriods", new QnRecordedChunksRestHandler());
@@ -1021,6 +993,7 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/execAction", new QnBusinessActionRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/onEvent", new QnExternalBusinessEventRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/gettime", new QnTimeRestHandler());
+    QnRestProcessorPool::instance()->registerHandler("api/testEmailSettings", new QnTestEmailSettingsHandler());
     QnRestProcessorPool::instance()->registerHandler("api/ping", new QnPingRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/events", new QnBusinessEventLogRestHandler());
@@ -1041,8 +1014,10 @@ void QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
-    m_universalTcpListener->setDefaultPage("/static/index.html");
     m_universalTcpListener->enableSSLMode();
+    if( !m_universalTcpListener->bindToLocalAddress() )
+        return false;
+    m_universalTcpListener->setDefaultPage("/static/index.html");
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
@@ -1063,6 +1038,8 @@ void QnMain::initTcpListener()
 #endif   //ENABLE_DESKTOP_CAMERA
 
     m_universalTcpListener->start();
+
+    return true;
 }
 
 QHostAddress QnMain::getPublicAddress()
@@ -1129,9 +1106,9 @@ void QnMain::run()
     QnSessionManager::instance()->start();
 
 #ifdef ENABLE_ONVIF
-    //starting soap server to accept event notifications from onvif servers
-    QnSoapServer::initStaticInstance( new QnSoapServer(MSSettings::roSettings()->value(nx_ms_conf::SOAP_PORT, nx_ms_conf::DEFAULT_SOAP_PORT).toInt()) );
-    QnSoapServer::instance()->start();
+    QnSoapServer soapServer;    //starting soap server to accept event notifications from onvif cameras
+    soapServer.bind();
+    soapServer.start();
 #endif //ENABLE_ONVIF
 
     QnResourcePool::initStaticInstance( new QnResourcePool() );
@@ -1180,6 +1157,7 @@ void QnMain::run()
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     qnCommon->setDefaultAdminPassword(settings->value(ADMIN_PASSWORD, QLatin1String("")).toString());
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnMain::at_runtimeInfoChanged);
     connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMain::at_runtimeInfoChanged);
 
     qnCommon->setModuleGUID(serverGuid());
@@ -1187,15 +1165,15 @@ void QnMain::run()
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory());
 
-    ec2::ApiRuntimeData runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
-    runtimeInfo.peer.peerType = Qn::PT_Server;
-    runtimeInfo.box = lit(QN_ARM_BOX);
-    runtimeInfo.brand = lit(QN_PRODUCT_NAME_SHORT);
+    ec2::ApiRuntimeData runtimeData;
+    runtimeData.peer.id = qnCommon->moduleGUID();
+    runtimeData.peer.peerType = Qn::PT_Server;
+    runtimeData.box = lit(QN_ARM_BOX);
+    runtimeData.brand = lit(QN_PRODUCT_NAME_SHORT);
     int guidCompatibility = 0;
-    runtimeInfo.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
-    runtimeInfo.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
-    QnRuntimeInfoManager::instance()->update(runtimeInfo);
-
+    runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
+    runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
+    QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);    // initializing localInfo
 
     ec2::ResourceContext resCtx(
         QnResourceDiscoveryManager::instance(),
@@ -1218,7 +1196,7 @@ void QnMain::run()
         QnSleep::msleep(3000);
     }
     connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &QnMain::at_restartServerRequired);
-
+    qnCommon->setRemoteGUID(connectInfo.ecsGuid);
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes") {
         NX_LOG( QString::fromLatin1("Switching to cluster mode and restarting..."), cl_logWARNING );
@@ -1239,13 +1217,12 @@ void QnMain::run()
       
     QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2ConnectionFactory.get() );
-
-
-
-    runtimeInfo = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID());
-    runtimeInfo.publicIP = getPublicAddress().toString();
-    qnCommon->setRemoteGUID(connectInfo.ecsGuid);
-    QnRuntimeInfoManager::instance()->update(runtimeInfo);
+    
+    if (!connectInfo.publicIp.isEmpty()) {
+        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    runtimeInfo.publicIP = connectInfo.publicIp;
+        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
+    }
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
     QnMServerResourceSearcher::instance()->setAppPServerGuid(connectInfo.ecsGuid.toUtf8());
@@ -1293,7 +1270,12 @@ void QnMain::run()
 
     nx_hls::HLSSessionPool hlsSessionPool;
 
-    initTcpListener();
+    if( !initTcpListener() )
+    {
+        qCritical() << "Failed to bind to local port. Terminating...";
+        QCoreApplication::quit();
+        return;
+    }
     using namespace std::placeholders;
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>( std::bind( &QnServerMessageProcessor::isProxy, messageProcessor.data(), _1 ) );
 
@@ -1628,11 +1610,6 @@ void QnMain::run()
 
     ptzPool.reset();
 
-#ifdef ENABLE_ONVIF
-    delete QnSoapServer::instance();
-    QnSoapServer::initStaticInstance( NULL );
-#endif //ENABLE_ONVIF
-
     QnAppServerConnectionFactory::setEc2Connection( ec2::AbstractECConnectionPtr() );
 
     av_lockmgr_register(NULL);
@@ -1653,15 +1630,14 @@ void QnMain::at_appStarted()
     QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2()); // start receiving notifications
 };
 
-void QnMain::at_runtimeInfoChanged(const ec2::ApiRuntimeData& runtimeInfo)
+void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
 {
-    if (runtimeInfo.peer.id == qnCommon->moduleGUID())
-    {
-        ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged, false);
-        tran.params = runtimeInfo;
-        tran.fillSequence();
-        ec2::qnTransactionBus->sendTransaction(tran);
-    }
+    if (runtimeInfo.uuid != qnCommon->moduleGUID())
+        return;
+    
+    ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged);
+    tran.params = runtimeInfo.data;
+    ec2::qnTransactionBus->sendTransaction(tran);
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>

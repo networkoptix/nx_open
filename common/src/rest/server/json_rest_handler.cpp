@@ -18,7 +18,8 @@ int QnJsonRestHandler::executeGet(const QString &path, const QnRequestParamList 
     return returnCode;
 }
 
-int QnJsonRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, QByteArray &result, QByteArray &contentType) {
+int QnJsonRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray& /*srcBodyContentType*/, QByteArray &result, QByteArray &contentType)
+{
     QnJsonRestResult jsonResult;
     int returnCode = executePost(path, processParams(params), body, jsonResult);
 

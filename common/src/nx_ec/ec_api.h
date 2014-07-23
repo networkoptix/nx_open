@@ -15,7 +15,6 @@
 
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/videowall_control_message.h>
-#include <core/resource/videowall_instance_status.h>
 
 #include <nx_ec/impl/ec_api_impl.h>
 #include <nx_ec/impl/sync_handler.h>
@@ -359,12 +358,19 @@ namespace ec2
             return addLicenses( licenses, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        template<class TargetType, class HandlerType> int removeLicense( const QnLicensePtr& license, TargetType* target, HandlerType handler ) {
+            return removeLicense( license, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
+        }
+
+
     signals:
         void licenseChanged(QnLicensePtr license);
+        void licenseRemoved(QnLicensePtr license);
 
     protected:
         virtual int getLicenses( impl::GetLicensesHandlerPtr handler ) = 0;
         virtual int addLicenses( const QList<QnLicensePtr>& licenses, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int removeLicense( const QnLicensePtr& license, impl::SimpleHandlerPtr handler ) = 0;
     };
 
 
@@ -394,28 +400,6 @@ namespace ec2
             return impl::doSyncCall<impl::GetBusinessRulesHandler>( std::bind(fn, this, _1), businessEventList );
         }
 
-        //!Test if email settings are valid
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int testEmailSettings( const QnEmail::Settings& settings, TargetType* target, HandlerType handler ) {
-            return testEmailSettings( settings, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        /*!
-            \param to Destination address list
-            \param timeout TODO
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int sendEmail(
-            const ApiEmailData& data,
-            TargetType* target, HandlerType handler )
-        {
-            return sendEmail( data, 
-                std::static_pointer_cast<impl::SimpleHandler>(
-                    std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
         /*!
             \param handler Functor with params: (ErrorCode)
         */
@@ -461,8 +445,6 @@ namespace ec2
 
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
-        virtual int testEmailSettings( const QnEmail::Settings& settings, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int sendEmail(const ApiEmailData& data, impl::SimpleHandlerPtr handler ) = 0;
         virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) = 0;
         virtual int deleteRule( QnId ruleId, impl::SimpleHandlerPtr handler ) = 0;
         virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;
@@ -623,7 +605,6 @@ namespace ec2
         void addedOrUpdated(const QnVideoWallResourcePtr &videowall);
         void removed(const QUuid &id);
         void controlMessage(const QnVideoWallControlMessage &message);
-        void instanceStatusChanged(const QnVideowallInstanceStatus &status);
 
     protected:
         virtual int getVideowalls( impl::GetVideowallsHandlerPtr handler ) = 0;
@@ -747,6 +728,7 @@ namespace ec2
         virtual void startReceivingNotifications() = 0;
         virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) = 0;
         virtual void deleteRemotePeer(const QUrl& url) = 0;
+        virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
 
         virtual AbstractResourceManagerPtr getResourceManager() = 0;
         virtual AbstractMediaServerManagerPtr getMediaServerManager() = 0;

@@ -178,7 +178,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiPanicModeData> BaseEc2Connection<T>::prepareTransaction( ApiCommand::Value command, const Qn::PanicMode& mode)
     {
-        QnTransaction<ApiPanicModeData> tran(command, true);
+        QnTransaction<ApiPanicModeData> tran(command);
         tran.params.mode = mode;
         return tran;
     }
@@ -204,6 +204,16 @@ namespace ec2
         url.setQuery(q);
         QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
     }
+
+
+    template<class T>
+    void ec2::BaseEc2Connection<T>::sendRuntimeData(const ec2::ApiRuntimeData &data)
+    {
+        ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged);
+        tran.params = data;
+        ec2::qnTransactionBus->sendTransaction(tran);
+    }
+
 
 
     template class BaseEc2Connection<FixedUrlClientQueryProcessor>;

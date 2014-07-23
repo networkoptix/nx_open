@@ -164,6 +164,8 @@ public:
 
 #ifdef Q_OS_WIN
             // TODO: #Elric totally evil workaround for windows, flaw in GetIfTable.
+            // The right way to fix it would be to reimplement this part in windows-specific
+            // monitor to use 64-bit functions.
             if(bytesIn < 0) /* Integer overflow. */
                 bytesIn = bytesIn + std::numeric_limits<unsigned int>::max();
             if(bytesOut < 0) /* Integer overflow. */

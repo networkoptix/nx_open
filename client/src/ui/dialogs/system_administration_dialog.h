@@ -3,10 +3,7 @@
 
 #include <ui/dialogs/generic_tabbed_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
-
-namespace Ui {
-class QnSystemAdministrationDialog;
-}
+#include <ui_system_administration_dialog.h>
 
 class QnSystemAdministrationDialog : public QnGenericTabbedDialog, public QnWorkbenchContextAware {
     Q_OBJECT

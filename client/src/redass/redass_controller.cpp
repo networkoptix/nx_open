@@ -391,6 +391,8 @@ void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason, 
 void QnRedAssController::unregisterConsumer(QnCamDisplay* display)
 {
     QMutexLocker lock(&m_mutex);
+    if (!m_redAssInfo.contains(display))
+        return;
     m_redAssInfo.remove(display);
     addHQTry();
 }

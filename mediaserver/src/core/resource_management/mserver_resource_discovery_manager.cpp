@@ -83,6 +83,9 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnResourcePtr
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
     if (!ownServer || !ownServer->isRedundancy())
         return false; // redundancy is disabled
+
+    if (qnResPool->getAllCameras(ownServer).count() >= ownServer->getMaxCameras())
+        return false;
     
     return mServer->currentStatusTime() > MSERVER_OFFLINE_TIMEOUT;
 }
@@ -150,6 +153,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             if (cameraResource)
             {
                 cameraResource->setParentId(qnCommon->moduleGUID());
+                cameraResource->removeFlags(QnResource::foreigner);
                 QByteArray errorString;
                 QnVirtualCameraResourceList cameras;
                 ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();

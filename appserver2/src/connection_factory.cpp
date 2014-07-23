@@ -115,8 +115,8 @@ namespace ec2
 
         //AbstractCameraManager::getBookmarkTags
 
-        //TODO AbstractLicenseManager
         registerUpdateFuncHandler<ApiLicenseDataList>( restProcessorPool, ApiCommand::addLicenses );
+        registerUpdateFuncHandler<ApiLicenseData>( restProcessorPool, ApiCommand::removeLicense );
 
 
         //AbstractBusinessEventManager::getBusinessRules
@@ -129,9 +129,6 @@ namespace ec2
         registerUpdateFuncHandler<ApiResetBusinessRuleData>( restProcessorPool, ApiCommand::resetBusinessRules );
         registerUpdateFuncHandler<ApiBusinessActionData>( restProcessorPool, ApiCommand::broadcastBusinessAction );
         registerUpdateFuncHandler<ApiBusinessActionData>( restProcessorPool, ApiCommand::execBusinessAction );
-
-        registerUpdateFuncHandler<ApiEmailSettingsData>( restProcessorPool, ApiCommand::testEmailSettings );
-        registerUpdateFuncHandler<ApiEmailData>( restProcessorPool, ApiCommand::sendEmail );
 
 
         //AbstractUserManager::getUsers

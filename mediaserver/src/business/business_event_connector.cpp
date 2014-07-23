@@ -13,7 +13,8 @@
 #include "core/resource/resource.h"
 #include <core/resource_management/resource_pool.h>
 #include "health/system_health.h"
-#include "actions/system_health_business_action.h"
+#include "business/actions/system_health_business_action.h"
+#include "core/resource/camera_resource.h"
 
 
 //#define REDUCE_NET_ISSUE_HACK
@@ -22,10 +23,21 @@ static QnBusinessEventConnector* _instance = NULL;
 
 QnBusinessEventConnector::QnBusinessEventConnector()
 {
+    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnBusinessEventConnector::onNewResource);
 }
 
 QnBusinessEventConnector::~QnBusinessEventConnector()
 {
+}
+
+void QnBusinessEventConnector::onNewResource(const QnResourcePtr &resource)
+{
+    QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(resource);
+    if (camera) 
+    {
+        connect(camera.data(), &QnSecurityCamResource::networkIssue, this, &QnBusinessEventConnector::at_networkIssue );
+        connect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnBusinessEventConnector::at_cameraInput );
+    }
 }
 
 void QnBusinessEventConnector::initStaticInstance( QnBusinessEventConnector* inst )

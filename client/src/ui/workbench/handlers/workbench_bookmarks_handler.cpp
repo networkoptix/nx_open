@@ -78,8 +78,7 @@ QnMediaServerResourcePtr QnWorkbenchBookmarksHandler::getMediaServerOnTime(const
     if (!history)
         return currentServer;
 
-    QnTimePeriod period;
-    QnMediaServerResourcePtr mediaServer = history->getMediaServerOnTime(time, true, period, false);
+    QnMediaServerResourcePtr mediaServer = history->getMediaServerOnTime(time, true, false);
     if (!mediaServer)
         return currentServer;
 

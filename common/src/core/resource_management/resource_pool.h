@@ -94,14 +94,14 @@ public:
     /**
      * @brief getVideoWallItemByUuid            Find videowall item by uuid.
      * @param uuid                              Unique id of the item.
-     * @return                                  Index containing the videowall and item's uuid.
+     * @return                                  Valid index containing the videowall and item's uuid or null index if such item does not exist.
      */
     QnVideoWallItemIndex getVideoWallItemByUuid(const QUuid &uuid) const;
 
     /**
      * @brief getVideoWallItemsByUuid           Find list of videowall items by their uuids.
      * @param uuids                             Unique ids of the items.
-     * @return                                  List of indices containing the videowall and items' uuid.
+     * @return                                  List of valid indices containing the videowall and items' uuid.
      */
     QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QUuid> &uuids) const;
 

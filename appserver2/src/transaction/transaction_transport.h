@@ -9,6 +9,7 @@
 #include <transaction/transaction.h>
 #include <transaction/binary_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
+#include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/transaction_transport_header.h>
 
 #include <utils/network/abstract_socket.h>
@@ -51,9 +52,14 @@ signals:
 public:
 
     template<class T> 
-    void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader &header) {
+    void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header) 
+    {
+        QnTransactionTransportHeader header(_header);
         assert(header.processedPeers.contains(m_localPeer.id));
+        if(header.sequence == 0) 
+            header.fillSequence();
 #ifdef _DEBUG
+
         foreach (const QnId& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());
             Q_ASSERT(peer != qnCommon->moduleGUID());
@@ -67,9 +73,12 @@ public:
         case Qn::BnsFormat:
             addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
+        case Qn::UbjsonFormat:
+            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            break;
         default:
             qWarning() << "Client has requested data in the unsupported format" << m_remotePeer.dataFormat;
-            addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
+            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
             break;
         }
     }
@@ -80,7 +89,7 @@ public:
     // these getters/setters are using from a single thread
     qint64 lastConnectTime() { return m_lastConnectTime; }
     void setLastConnectTime(qint64 value) { m_lastConnectTime = value; }
-    bool isReadSync() const       { return m_readSync; }
+    bool isReadSync(ApiCommand::Value command) const;
     void setReadSync(bool value)  {m_readSync = value;}
     bool isReadyToSend(ApiCommand::Value command) const;
     void setWriteSync(bool value) { m_writeSync = value; }

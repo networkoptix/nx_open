@@ -8,7 +8,6 @@ extern "C"
 #include <QtCore/QBuffer>
 
 #include "utils/network/tcp_connection_priv.h"
-#include "rest/server/rest_server.h"
 #include <utils/math/math.h>
 #include "core/resource/network_resource.h"
 #include "core/resource_management/resource_pool.h"
@@ -277,6 +276,9 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
         AVFrame dstPict;
         avpicture_fill((AVPicture*) &dstPict, scaleBuffer, (PixelFormat) outFrame->format, roundedWidth, roundedHeight);
         sws_scale(scaleContext, outFrame->data, outFrame->linesize, 0, outFrame->height, dstPict.data, dstPict.linesize);
+        dstPict.width = roundedWidth;
+        dstPict.height = roundedHeight;
+        dstPict.format = outFrame->format;
 
         AVCodecContext* videoEncoderCodecCtx = avcodec_alloc_context3(0);
         videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
@@ -349,9 +351,8 @@ int QnImageRestHandler::executeGet(const QString& path, const QnRequestParamList
 
 }
 
-int QnImageRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnImageRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& /*body*/, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
-    Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 

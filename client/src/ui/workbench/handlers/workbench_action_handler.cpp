@@ -16,6 +16,7 @@
 
 #include <api/session_manager.h>
 #include <api/network_proxy_factory.h>
+#include <api/runtime_info_manager.h>
 
 #include <business/business_action_parameters.h>
 
@@ -145,10 +146,11 @@ namespace {
     const int videowallReconnectTimeoutMSec = 5000;
     const int videowallCloseTimeoutMSec = 10000;
 
-    const int maxReconnectTimeout = 10000;
+    const int maxReconnectTimeout = 10*1000;                // 10 seconds
+    const int maxVideowallReconnectTimeout = 96*60*60*1000; // 4 days
 }
 
-//!time that is given to process to exit. After that, appauncher (if present) will try to terminate it
+//!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
 static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 
 // -------------------------------------------------------------------------- //
@@ -851,20 +853,42 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
 
     menu()->trigger(Qn::ClearCameraSettingsAction);
 
-    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
-    resourcePool()->removeResources(remoteResources);
+    // videowall client should silently wait for reconnect
+    if (!qnSettings->isVideoWallMode()) {
+        const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+        resourcePool()->removeResources(remoteResources);
+    }
 
     qnLicensePool->reset();
 
     if (!qnCommon->remoteGUID().isNull()) {
-        m_connectingMessageBox = QnGraphicsMessageBox::informationTicking(
-            tr("Connection failed. Trying to restore connection... %1"),
-            maxReconnectTimeout);
-        connect(m_connectingMessageBox, &QnGraphicsMessageBox::finished, this, [this]{
-            menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
-            menu()->trigger(Qn::ConnectToServerAction);
-            m_connectingMessageBox = NULL;
-        });
+        if (!qnSettings->isVideoWallMode()) {
+
+            m_connectingMessageBox = QnGraphicsMessageBox::informationTicking(
+                tr("Connection failed. Trying to restore connection... %1"),
+                maxReconnectTimeout);
+
+            connect(m_connectingMessageBox, &QnGraphicsMessageBox::finished, this, [this]{
+                menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
+                menu()->trigger(Qn::ConnectToServerAction);
+                m_connectingMessageBox = NULL;
+            });
+
+        } else { //videowall client should wait much longer and close
+
+            m_connectingMessageBox = QnGraphicsMessageBox::information(
+                tr("Connection failed. Trying to restore connection..."),
+                maxVideowallReconnectTimeout);   
+
+            connect(m_connectingMessageBox, &QnGraphicsMessageBox::finished, this, [this] {
+                m_connectingMessageBox = NULL;
+                menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
+                menu()->trigger(Qn::ExitAction);
+            });
+
+        } 
+
+
     }
 }
 
@@ -879,6 +903,8 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
         m_connectingMessageBox->hideImmideately();
         m_connectingMessageBox = NULL;
     }
+
+    connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
@@ -1639,8 +1665,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnResource::startCommandProc();
 
     context()->setUserName(connectionData.url.userName());
-
-    at_messageProcessor_connectionOpened();
 }
 
 void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
