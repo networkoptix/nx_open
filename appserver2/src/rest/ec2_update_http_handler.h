@@ -66,9 +66,9 @@ namespace ec2
                 case Qn::JsonFormat:
                     tran = QJson::deserialized<QnTransaction<RequestDataType>>(body);
                     break;
-                //case Qn::UbjsonFormat:
-                //    tran = QnUbjson::deserialized<QnTransaction<RequestDataType>>(body);
-                //    break;
+                case Qn::UbjsonFormat:
+                    tran = QnUbjson::deserialized<QnTransaction<RequestDataType>>(body);
+                    break;
                 //case Qn::CsvFormat:
                 //    tran = QnCsv::deserialized<QnTransaction<RequestDataType>>(body);
                 //    break;
@@ -80,9 +80,10 @@ namespace ec2
             }
 
             // replace client GUID to own GUID (take transaction ownership).
-            tran.id.peerID = qnCommon->moduleGUID();
-            if (QnDbManager::instance())
-                tran.id.dbID = QnDbManager::instance()->getID();
+            tran.peerID = qnCommon->moduleGUID();
+            if (QnDbManager::instance() && ApiCommand::isPersistent(tran.command))
+                tran.fillPersistentInfo();
+
 
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;

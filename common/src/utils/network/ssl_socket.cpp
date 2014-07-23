@@ -49,9 +49,7 @@ int sock_write(BIO *b, const char *in, int inl)
 namespace {
 static int sock_puts(BIO *bp, const char *str)
 {
-    int n = strlen(str);
-    int ret = sock_write(bp,str,n);
-    return(ret);
+    return sock_write(bp, str, strlen(str));
 }
 
 static long sock_ctrl(BIO *b, int cmd, long num, void* /*ptr*/)
@@ -454,6 +452,13 @@ bool QnSSLSocket::getSendTimeout( unsigned int* millis )
 {
     Q_D(const QnSSLSocket);
     return d->wrappedSocket->getSendTimeout(millis);
+}
+
+//!Implementation of AbstractSocket::getLastError
+bool QnSSLSocket::getLastError( SystemError::ErrorCode* errorCode )
+{
+    Q_D(const QnSSLSocket);
+    return d->wrappedSocket->getLastError(errorCode);
 }
 
 AbstractSocket::SOCKET_HANDLE QnSSLSocket::handle() const

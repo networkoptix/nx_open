@@ -7,7 +7,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QVector>
 
-#include "core/resource/resource.h"
+#include <core/resource/resource_fwd.h>
 #include "core/resource/resource_media_layout.h"
 #include "core/datapacket/abstract_data_packet.h"
 #include "motion/abstract_motion_archive.h"

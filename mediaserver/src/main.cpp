@@ -1149,7 +1149,6 @@ void QnMain::run()
     int guidCompatibility = 0;
     runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
     runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
-    runtimeData.version = 1;
     QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);    // initializing localInfo
 
     ec2::ResourceContext resCtx(
@@ -1181,7 +1180,6 @@ void QnMain::run()
     if (!connectInfo.publicIp.isEmpty()) {
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
         localInfo.data.publicIP = connectInfo.publicIp;
-        localInfo.data.version++;
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
 
@@ -1603,9 +1601,8 @@ void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
     if (runtimeInfo.uuid != qnCommon->moduleGUID())
         return;
     
-    ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged, false);
+    ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged);
     tran.params = runtimeInfo.data;
-    tran.fillSequence();
     qnTransactionBus->sendTransaction(tran);
 }
 

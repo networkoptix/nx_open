@@ -57,16 +57,13 @@ void QnTransactionTcpProcessor::run()
         remoteGuid = QUuid::createUuid();
     QnId videowallGuid = query.queryItemValue("videowallGuid");
     bool isVideowall = (!videowallGuid.isNull());
-    QnId instanceGuid = isVideowall
-        ? query.queryItemValue("instanceGuid")
-        : QnId();
 
     Qn::PeerType peerType = isMobileClient  ? Qn::PT_MobileClient
         : isVideowall   ? Qn::PT_VideowallClient
         : isClient      ? Qn::PT_DesktopClient
         : Qn::PT_Server;
 
-    Qn::SerializationFormat dataFormat = Qn::BnsFormat;
+    Qn::SerializationFormat dataFormat = Qn::UbjsonFormat;
     if (query.hasQueryItem("format"))
          QnLexical::deserialize(query.queryItemValue("format"), &dataFormat);
 

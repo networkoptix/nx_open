@@ -494,7 +494,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         ? Qn::PT_DesktopClient
         : Qn::PT_VideowallClient;
     runtimeData.brand = lit(QN_PRODUCT_NAME_SHORT);
-    runtimeData.version = 1;
     runtimeData.videoWallInstanceGuid = videowallInstanceGuid;
     QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);    // initializing localInfo
 

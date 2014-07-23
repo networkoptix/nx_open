@@ -416,8 +416,7 @@ QString QnBusinessStringsHelper::motionUrl(const QnBusinessEventParameters &para
 
     QnCameraHistoryPtr history = QnCameraHistoryPool::instance()->getCameraHistory(res->getPhysicalId());
     if (history) {
-        QnTimePeriod period;
-        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, period, false);
+        QnMediaServerResourcePtr newServer = history->getMediaServerOnTime(ts/1000, true, false);
         if (newServer)
             mserverRes = newServer;
     }
