@@ -348,6 +348,10 @@
 					<family>unix</family>
 					<name>linux</name>
 				</os> 
+				<property>
+					<name>arch</name>
+					<value>!arm</value>
+				</property>
 			</activation>
 			<dependencies>
 				<dependency>
