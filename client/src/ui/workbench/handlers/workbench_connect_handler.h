@@ -3,10 +3,13 @@
 
 #include <QtCore/QObject>
 
+#include <nx_ec/ec_api_fwd.h>
+
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnGraphicsMessageBox;
 class QnLoginDialog;
+struct QnConnectionInfo;
 
 class QnWorkbenchConnectHandler : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -24,9 +27,6 @@ protected:
 
     bool connectToServer(const QUrl &appServerUrl);
     bool disconnectFromServer(bool force);
-
-
-    bool checkCompatibility(const QnConnectionInfo &connectionInfo, ec2::ErrorCode errCode);
 
     bool saveState(bool force);
     void showLoginDialog();

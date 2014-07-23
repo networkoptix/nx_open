@@ -324,6 +324,10 @@ namespace Qn {
          */
         ExitAction,
 
+        /** 
+         * Closes the client asynchronously.
+         */
+        ExitActionDelayed,
 
         /* Tree Root Nodes actions */
 

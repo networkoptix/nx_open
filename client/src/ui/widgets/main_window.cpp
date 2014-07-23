@@ -221,12 +221,19 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
     /* Set up actions. Only these actions will be available through hotkeys. */
+/*
+    addAction(action(Qn::ConnectAction));
+    addAction(action(Qn::ReconnectAction));
+    addAction(action(Qn::DisconnectAction));
+    addAction(action(Qn::OpenLoginDialogAction));
+*/
     addAction(action(Qn::NextLayoutAction));
     addAction(action(Qn::PreviousLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAsAction));
     addAction(action(Qn::SaveCurrentVideoWallReviewAction));
     addAction(action(Qn::ExitAction));
+//    addAction(action(Qn::ExitActionDelayed));
     addAction(action(Qn::EscapeHotkeyAction));
     addAction(action(Qn::FullscreenMaximizeHotkeyAction));
     addAction(action(Qn::AboutAction));
@@ -236,7 +243,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::BusinessEventsAction));
     addAction(action(Qn::WebClientAction));
     addAction(action(Qn::OpenFileAction));
-   // addAction(action(Qn::OpenLoginDialogAction));
     addAction(action(Qn::OpenNewTabAction));
     addAction(action(Qn::OpenNewWindowAction));
     addAction(action(Qn::CloseLayoutAction));
@@ -604,7 +610,7 @@ bool QnMainWindow::event(QEvent *event) {
 void QnMainWindow::closeEvent(QCloseEvent* event)
 {
     event->ignore();
-    action(Qn::ExitAction)->trigger();
+    menu()->trigger(Qn::ExitAction);
 }
 
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {

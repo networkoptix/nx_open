@@ -39,14 +39,8 @@ public:
 
     QUrl currentUrl() const;
     QString currentName() const;
-    QnConnectionInfo currentInfo() const;
-
-    bool restartPending() const;
 
     bool rememberPassword() const;
-
-    void setAutoConnect(bool value = true);
-
 public slots:
     virtual void accept() override;
     virtual void reject() override;
@@ -93,7 +87,6 @@ private:
     QStandardItem* m_autoFoundItem;
 
     int m_requestHandle;
-    QnConnectionInfo m_connectInfo;
 
     QnRenderingWidget *m_renderingWidget;
     QnModuleFinder *m_moduleFinder;
@@ -111,10 +104,6 @@ private:
 
     /** Hash list of automatically found Enterprise Controllers based on seed as key. */
     QMap<QString, QnEcData> m_foundEcs;
-    std::unique_ptr<CompatibilityVersionInstallationDialog> m_installationDialog;
-
-    bool m_restartPending;
-    bool m_autoConnectPending;
 };
 
 #endif // LOGINDIALOG_H

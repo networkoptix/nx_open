@@ -176,6 +176,8 @@ protected slots:
     void submitInstantDrop();
 
 protected slots:
+    void at_messageProcessor_connectionClosed();
+
     void at_context_userChanged(const QnUserResourcePtr &user);
     void at_workbench_layoutsChanged();
     void at_workbench_cellAspectRatioChanged();

@@ -541,7 +541,7 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
 }
 
 void QnWorkbenchVideoWallHandler::closeInstanceDelayed() {
-    QTimer::singleShot(10, action(Qn::ExitAction), SLOT(trigger()));
+    menu()->trigger(Qn::ExitActionDelayed);
 }
 
 void QnWorkbenchVideoWallHandler::sendMessage(QnVideoWallControlMessage message, bool cached) {

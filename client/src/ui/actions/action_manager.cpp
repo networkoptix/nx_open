@@ -412,6 +412,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Settings..."));
 
+    factory(Qn::ConnectAction).
+        flags(Qn::NoTarget);
+
     factory(Qn::ReconnectAction).
         flags(Qn::NoTarget).
         text(tr("Reconnect to Server"));
@@ -498,9 +501,10 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/main_menu.png"));
 
-    // Text and icon are set in QnWorkbenchActionHandler::at_eventManager_connectionOpened/Closed
     factory(Qn::OpenLoginDialogAction).
         flags(Qn::Main).
+        text(tr("Connect to Server...")).
+        icon(qnSkin->icon("titlebar/disconnected.png")).
         autoRepeat(false);
 
     factory(Qn::DisconnectAction).
@@ -784,6 +788,8 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/exit.png"));
 
+    factory(Qn::ExitActionDelayed).
+        flags(Qn::NoTarget);
 
     /* Tab bar actions. */
     factory().

@@ -70,15 +70,17 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
     QMutexLocker lock(&m_mutex);
 
     const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
-    if ((m_lastReceivedTime == 0 || m_timer.elapsed() > EcTimeUpdatePeriod || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod) && 
-        !m_syncTimeRequestIssued && QnSessionManager::instance()->isReady() && !QnAppServerConnectionFactory::url().isEmpty())
+    if (
+        (
+            m_lastReceivedTime == 0 
+        ||  m_timer.elapsed() > EcTimeUpdatePeriod 
+        || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod
+        ) 
+        && !m_syncTimeRequestIssued 
+        && QnAppServerConnectionFactory::getConnection2())
     {
-        ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
-        if( appServerConnection ) 
-        {
-            appServerConnection->getCurrentTime( this, &QnSyncTime::updateTime );
-            m_syncTimeRequestIssued = true;
-        }
+        QnAppServerConnectionFactory::getConnection2()->getCurrentTime( this, &QnSyncTime::updateTime );
+        m_syncTimeRequestIssued = true;
     }
     m_lastLocalTime = localTime;
 

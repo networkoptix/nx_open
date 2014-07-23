@@ -94,7 +94,6 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
 
-#include <ui/workbench/handlers/workbench_notifications_handler.h>      //TODO: #GDM dependencies
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
 
 #include <ui/workbench/watchers/workbench_user_watcher.h>
@@ -224,6 +223,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_delayedDropGuard(false),
     m_tourTimer(new QTimer())
 {
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionClosed,    this,   &QnWorkbenchActionHandler::at_messageProcessor_connectionClosed);
+
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
@@ -332,6 +333,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), SIGNAL(mismatchDataChanged()), this, SLOT(at_versionMismatchWatcher_mismatchDataChanged()));
+
+    connect(action(Qn::ExitActionDelayed), &QAction::triggered, action(Qn::ExitAction), &QAction::trigger, Qt::QueuedConnection);
 
     /* Run handlers that update state. */
     at_panicWatcher_panicModeChanged();
@@ -611,10 +614,6 @@ void QnWorkbenchActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMo
     qnRedAssController->setMode(resolutionMode);
 }
 
-QnWorkbenchNotificationsHandler* QnWorkbenchActionHandler::notificationsHandler() const {
-    return context()->instance<QnWorkbenchNotificationsHandler>();
-}
-
 QnCameraSettingsDialog *QnWorkbenchActionHandler::cameraSettingsDialog() const {
     return m_cameraSettingsDialog.data();
 }
@@ -727,6 +726,22 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+
+void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
+    if (cameraAdditionDialog())
+        cameraAdditionDialog()->hide();
+
+    if(cameraSettingsDialog())
+        cameraSettingsDialog()->hide();
+
+    if (businessRulesDialog())
+        businessRulesDialog()->hide();
+
+    if (businessEventsLogDialog())
+        businessEventsLogDialog()->hide();
+}
+
+
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
     if(!user)
         return;
@@ -2714,7 +2729,6 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
                     );
         return;
     }
-    qApp->exit(0);
+    menu()->trigger(Qn::ExitActionDelayed);
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
-

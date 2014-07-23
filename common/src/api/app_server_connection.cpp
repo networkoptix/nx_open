@@ -68,9 +68,10 @@ QString QnAppServerConnectionFactory::clientGuid()
     return QString();
 }
 
-QUrl QnAppServerConnectionFactory::url()
-{
+QUrl QnAppServerConnectionFactory::url() {
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
+        Q_ASSERT_X(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was passed");
+
         return factory->m_url;
     }
 
@@ -84,10 +85,9 @@ void QnAppServerConnectionFactory::setClientGuid(const QString &guid)
     }
 }
 
-void QnAppServerConnectionFactory::setUrl(const QUrl &url)
-{
-    Q_ASSERT_X(url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was passed");
-    Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
+void QnAppServerConnectionFactory::setUrl(const QUrl &url) {
+    if (url.isValid())
+        Q_ASSERT_X(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
 
     if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
         factory->m_url = url;
