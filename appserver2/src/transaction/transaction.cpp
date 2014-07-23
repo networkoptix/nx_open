@@ -219,6 +219,8 @@ namespace ec2
                 val == addStoredFile ||
                 val == updateStoredFile ||
                 val == removeStoredFile ||
+                val == addDiscoveryInformation ||
+                val == removeDiscoveryInformation ||
                 val == addLicense ||
                 val == addLicenses;
         }

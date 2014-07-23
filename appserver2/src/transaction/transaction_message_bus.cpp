@@ -456,7 +456,7 @@ bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
         }
 
         QnTransaction<ApiModuleDataList> tranModules = prepareModulesDataTransaction();
-        tranModules.id.peerID = m_localPeer.id;
+        tranModules.peerID = m_localPeer.id;
 
         transport->setWriteSync(true);
         sendRuntimeInfo(transport, processedPeers);
@@ -584,7 +584,7 @@ void QnTransactionMessageBus::sendConnectionsData()
     if (!QnRouter::instance())
         return;
 
-    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections, false);
+    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections);
 
     QMultiHash<QnId, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
     for (auto it = connections.begin(); it != connections.end(); ++it) {
@@ -596,12 +596,11 @@ void QnTransactionMessageBus::sendConnectionsData()
         transaction.params.push_back(connection);
     }
 
-    transaction.fillSequence();
     sendTransaction(transaction);
 }
 
 QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const {
-    QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList, false);
+    QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
 
     foreach (const QnModuleInformation &moduleInformation, QnGlobalModuleFinder::instance()->foundModules()) {
         ApiModuleData data;
@@ -620,8 +619,6 @@ void QnTransactionMessageBus::sendModulesData()
         return;
 
     QnTransaction<ApiModuleDataList> transaction = prepareModulesDataTransaction();
-    transaction.fillSequence();
-
     sendTransaction(transaction);
 }
 

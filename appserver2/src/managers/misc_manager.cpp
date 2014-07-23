@@ -119,7 +119,7 @@ int QnMiscManager<QueryProcessorType>::sendAvailableConnections(impl::SimpleHand
 
 template<class QueryProcessorType>
 QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QnModuleInformation &moduleInformation, bool isAlive, const QnId &discoverer) const {
-    QnTransaction<ApiModuleData> transaction(ApiCommand::moduleInfo, false);
+    QnTransaction<ApiModuleData> transaction(ApiCommand::moduleInfo);
     QnGlobalModuleFinder::fillApiModuleData(moduleInformation, &transaction.params);
     transaction.params.isAlive = isAlive;
     transaction.params.discoverers.append(discoverer);
@@ -129,7 +129,7 @@ QnTransaction<ApiModuleData> QnMiscManager<QueryProcessorType>::prepareTransacti
 
 template<class QueryProcessorType>
 QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTransaction(const QList<QnModuleInformation> &moduleInformationList, const QMultiHash<QnId, QnId> &discoverersByPeer) const {
-    QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList, false);
+    QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
 
     foreach (const QnModuleInformation &moduleInformation, moduleInformationList) {
         ApiModuleData data;
@@ -144,7 +144,7 @@ QnTransaction<ApiModuleDataList> QnMiscManager<QueryProcessorType>::prepareTrans
 
 template<class QueryProcessorType>
 QnTransaction<ApiSystemNameData> QnMiscManager<QueryProcessorType>::prepareTransaction(const QString &systemName) const {
-    QnTransaction<ApiSystemNameData> transaction(ApiCommand::changeSystemName, false);
+    QnTransaction<ApiSystemNameData> transaction(ApiCommand::changeSystemName);
     transaction.params.systemName = systemName;
 
     return transaction;
@@ -152,7 +152,7 @@ QnTransaction<ApiSystemNameData> QnMiscManager<QueryProcessorType>::prepareTrans
 
 template<class QueryProcessorType>
 QnTransaction<ApiConnectionData> QnMiscManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QnId &discovererId, const QnId &peerId, const QString &host, quint16 port) const {
-    QnTransaction<ApiConnectionData> transaction(command, false);
+    QnTransaction<ApiConnectionData> transaction(command);
     transaction.params.discovererId = discovererId;
     transaction.params.peerId = peerId;
     transaction.params.host = host;
@@ -163,7 +163,7 @@ QnTransaction<ApiConnectionData> QnMiscManager<QueryProcessorType>::prepareTrans
 
 template<class QueryProcessorType>
 QnTransaction<ApiConnectionDataList> QnMiscManager<QueryProcessorType>::prepareAvailableConnectionsTransaction() const {
-    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections, false);
+    QnTransaction<ApiConnectionDataList> transaction(ApiCommand::availableConnections);
 
     QMultiHash<QnId, QnRouter::Endpoint> connections = QnRouter::instance()->connections();
     for (auto it = connections.begin(); it != connections.end(); ++it) {

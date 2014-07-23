@@ -73,7 +73,7 @@ int QnDiscoveryManager<QueryProcessorType>::removeDiscoveryInformation(const QnI
 
 template<class QueryProcessorType>
 QnTransaction<ApiDiscoveryDataList> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(ApiCommand::Value command, const QnId &id, const QList<QUrl> &urls, bool ignore) const {
-    QnTransaction<ApiDiscoveryDataList> transaction(command, true);
+    QnTransaction<ApiDiscoveryDataList> transaction(command);
     foreach (const QUrl &url, urls) {
         Q_ASSERT_X(ignore || url.port() != -1, "Additional server URLs without a port are not allowed", Q_FUNC_INFO);
         ApiDiscoveryData data;
@@ -88,7 +88,7 @@ QnTransaction<ApiDiscoveryDataList> QnDiscoveryManager<QueryProcessorType>::prep
 
 template<class QueryProcessorType>
 QnTransaction<ApiDiscoverPeerData> QnDiscoveryManager<QueryProcessorType>::prepareTransaction(const QUrl &url) const {
-    QnTransaction<ApiDiscoverPeerData> transaction(ApiCommand::discoverPeer, false);
+    QnTransaction<ApiDiscoverPeerData> transaction(ApiCommand::discoverPeer);
     transaction.params.url = url.toString();
 
     return transaction;

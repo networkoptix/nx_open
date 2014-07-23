@@ -147,7 +147,7 @@ unix: {
 unix:!mac {
   !arm {
     LIBS += ${linux.oslibs}
-    QMAKE_CXXFLAGS += -msse2
+    QMAKE_CXXFLAGS += -msse4.2
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
   } else {
     LIBS -= -lssl
