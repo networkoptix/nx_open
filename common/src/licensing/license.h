@@ -44,8 +44,8 @@ public:
         InvalidHardwareID,
         InvalidBrand,
         Expired,
-        InvalidType
-
+        InvalidType,
+        TooManyLicensesPerDevice
     };
 
     QnLicense();
