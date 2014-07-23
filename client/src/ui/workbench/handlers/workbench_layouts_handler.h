@@ -2,6 +2,7 @@
 #define WORKBENCH_LAYOUTS_HANDLER_H
 
 #include <QtCore/QObject>
+
 #include <QtWidgets/QMessageBox>
 
 #include <api/api_fwd.h>
@@ -9,12 +10,14 @@
 #include <nx_ec/ec_api.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+class QnWorkbenchStateDelegate;
 
 class QnWorkbenchLayoutsHandler : public QObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
 public:
     explicit QnWorkbenchLayoutsHandler(QObject *parent = 0);
+    virtual ~QnWorkbenchLayoutsHandler();
 
     void renameLayout(const QnLayoutResourcePtr &layout, const QString &newName);
     bool closeAllLayouts(bool waitForReply = false, bool force = false);
@@ -62,6 +65,9 @@ private:
     void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *target, const char *slot);
     bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false, bool force = false);
     bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false, bool force = false);
+
+private:
+    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
 };
 
 #endif // WORKBENCH_LAYOUTS_HANDLER_H

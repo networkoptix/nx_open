@@ -1270,10 +1270,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in Camera Settings Dialog"));
 
-    factory(Qn::ClearCameraSettingsAction).
-        flags(Qn::NoTarget).
-        text(tr("Clear Camera Settings Dialog"));
-
     factory(Qn::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Add Camera(s)...")).

@@ -25,6 +25,7 @@ public:
 
     virtual void updateResource(const QnResourcePtr &resource) = 0;
 
+    QMap<QnId, QnBusinessEventRulePtr> businessRules() const;
 signals:
     void connectionOpened();
     void connectionClosed();

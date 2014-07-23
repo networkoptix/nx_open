@@ -13,7 +13,7 @@
 class QAbstractButton;
 
 class QnCameraSettingsWidget;
-class QnWorkbenchContext;
+class QnWorkbenchStateDelegate;
 
 class QnCameraSettingsDialog: public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -29,6 +29,7 @@ public:
         m_ignoreAccept = true;
     }
 
+    bool tryClose(bool force);
 signals:
     void buttonClicked(QDialogButtonBox::StandardButton button);
     void advancedSettingChanged();
@@ -47,7 +48,8 @@ private slots:
     void acceptIfSafe();
 
 private:
-    QPointer<QnWorkbenchContext> m_context;
+    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
+
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;
     QPushButton *m_applyButton, *m_okButton, *m_openButton, *m_diagnoseButton, *m_rulesButton;

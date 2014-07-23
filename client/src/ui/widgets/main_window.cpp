@@ -51,6 +51,7 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_ui.h>
 #include <ui/workbench/workbench_synchronizer.h>
 #include <ui/workbench/workbench_context.h>
@@ -200,6 +201,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
         m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::HideWhenNormal );
     else
         m_ui->setFlags(QnWorkbenchUi::HideWhenZoomed | QnWorkbenchUi::AdjustMargins);
+
+    /* State manager */
+    context->instance<QnWorkbenchStateManager>();
 
     /* Set up handlers. */
     context->instance<QnWorkbenchActionHandler>();

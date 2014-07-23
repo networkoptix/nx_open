@@ -564,11 +564,6 @@ namespace Qn {
         OpenInCameraSettingsDialogAction,
 
         /**
-         * Clears the resource that is currently open in camera settings dialog.
-         */
-        ClearCameraSettingsAction,
-
-        /**
          * Opens server settings dialog.
          */
         ServerSettingsAction,

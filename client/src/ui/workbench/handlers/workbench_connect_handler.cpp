@@ -30,6 +30,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
 
@@ -110,8 +111,6 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     action(Qn::OpenLoginDialogAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
     action(Qn::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
-    menu()->trigger(Qn::ClearCameraSettingsAction);
-
     /* Remove all remote resources. */
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
     resourcePool()->removeResources(remoteResources);
@@ -136,6 +135,8 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
             m_connectingMessageBox = NULL;
         });
     }
+
+    context()->instance<QnWorkbenchStateManager>()->tryClose(true);
 }
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
@@ -242,7 +243,7 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
 }
 
 bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
-    if (!saveState(force))
+    if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force))
         return false;
 
     if (!force)
@@ -319,22 +320,4 @@ void QnWorkbenchConnectHandler::showLoginDialog() {
         connections.prepend(last);
     }
     qnSettings->setCustomConnections(connections);
-}
-
-bool QnWorkbenchConnectHandler::saveState(bool force) {
-    // do not try to save state if we have not loaded resources
-    if (!connected() || !context()->user())
-        return true;
-
-    QnWorkbenchState state;
-    workbench()->submit(state);
-
-    //closeAllLayouts should return true in case of force disconnect
-    if(!context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true, force)) 
-        return false;
-
-    QnWorkbenchStateHash states = qnSettings->userWorkbenchStates();
-    states[context()->user()->getName()] = state;
-    qnSettings->setUserWorkbenchStates(states);
-    return true;
 }

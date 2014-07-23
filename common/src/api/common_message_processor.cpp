@@ -260,3 +260,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     //on_runtimeInfoChanged(fullData.serverInfo);
     qnSyncTime->reset();
 }
+
+QMap<QnId, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {
+    return m_rules;
+}

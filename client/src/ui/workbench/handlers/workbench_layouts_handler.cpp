@@ -26,16 +26,32 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/handlers/workbench_export_handler.h>
-#include <ui/workbench/handlers/workbench_videowall_handler.h>
+#include <ui/workbench/handlers/workbench_export_handler.h>     //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_videowall_handler.h>  //TODO: #GDM dependencies
+#include <ui/workbench/workbench_state_manager.h>
 
 #include <utils/common/counter.h>
 #include <utils/common/event_processors.h>
 
 
+class QnWorkbenchLayoutsHandlerStateDelegate: public QnWorkbenchStateDelegate {
+public:
+    QnWorkbenchLayoutsHandlerStateDelegate(QnWorkbenchLayoutsHandler* owner):
+        m_owner(owner)
+    {}
+
+    virtual bool tryClose(bool force) override {
+        return m_owner->closeAllLayouts(true, force);
+    }
+private:
+    QnWorkbenchLayoutsHandler* m_owner;
+}; 
+
+
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_workbenchStateDelegate(new QnWorkbenchLayoutsHandlerStateDelegate(this))
 {
     connect(action(Qn::NewUserLayoutAction),                &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered);
     connect(action(Qn::SaveLayoutAction),                   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered);
@@ -45,7 +61,14 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     connect(action(Qn::SaveCurrentLayoutAsAction),          &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
     connect(action(Qn::CloseLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered);
     connect(action(Qn::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
+
+    context()->instance<QnWorkbenchStateManager>()->registerDelegate(m_workbenchStateDelegate.data());
 }
+
+QnWorkbenchLayoutsHandler::~QnWorkbenchLayoutsHandler() {
+    context()->instance<QnWorkbenchStateManager>()->unregisterDelegate(m_workbenchStateDelegate.data());
+}
+
 
 ec2::AbstractECConnectionPtr QnWorkbenchLayoutsHandler::connection2() const {
     return QnAppServerConnectionFactory::getConnection2();

@@ -93,6 +93,7 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_state_manager.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
 
@@ -281,7 +282,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
     connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));
     connect(action(Qn::OpenInCameraSettingsDialogAction),       SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
-    connect(action(Qn::ClearCameraSettingsAction),              SIGNAL(triggered()),    this,   SLOT(at_clearCameraSettingsAction_triggered()));
     connect(action(Qn::SelectionChangeAction),                  SIGNAL(triggered()),    this,   SLOT(at_selectionChangeAction_triggered()));
     connect(action(Qn::ServerAddCameraManuallyAction),          SIGNAL(triggered()),    this,   SLOT(at_serverAddCameraManuallyAction_triggered()));
     connect(action(Qn::ServerSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
@@ -1660,11 +1660,6 @@ void QnWorkbenchActionHandler::at_cameraDiagnosticsAction_triggered() {
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_clearCameraSettingsAction_triggered() {
-    if(cameraSettingsDialog() && cameraSettingsDialog()->isVisible())
-        menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnResourceList());
-}
-
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button) {
     switch(button) {
     case QDialogButtonBox::Ok:
@@ -2092,14 +2087,8 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_exitAction_triggered() {
-    if(context()->user() && !qnSettings->isVideoWallMode()) { // TODO: #Elric factor out
-        QnWorkbenchState state;
-        workbench()->submit(state);
-
-        QnWorkbenchStateHash states = qnSettings->userWorkbenchStates();
-        states[context()->user()->getName()] = state;
-        qnSettings->setUserWorkbenchStates(states);
-    }
+    if (!context()->instance<QnWorkbenchStateManager>()->tryClose(false))
+        return;
 
     if (businessRulesDialog() && businessRulesDialog()->isVisible()) {
         businessRulesDialog()->activateWindow();
@@ -2108,13 +2097,9 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
         businessRulesDialog()->hide();
     }
 
-    menu()->trigger(Qn::ClearCameraSettingsAction);
-    if(!context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true))
-        return;
-
-        qApp->exit(0);
-        applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
-    }
+    qApp->exit(0);
+    applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
+}
 
 QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
 {
@@ -2692,25 +2677,8 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
 
     bool isInstalled;
     bool success = applauncher::isVersionInstalled(version, &isInstalled) == applauncher::api::ResultType::ok;
-    if (success && isInstalled) {
-        //TODO: #GDM #Common wtf? whats up with order?
-        if(context()->user()) { // TODO: #Elric factor out
-            QnWorkbenchState state;
-            workbench()->submit(state);
-
-            QnWorkbenchStateHash states = qnSettings->userWorkbenchStates();
-            states[context()->user()->getName()] = state;
-            qnSettings->setUserWorkbenchStates(states);
-        }
-
-        //TODO: #GDM #Common factor out
-        if(!context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true)) {
-            return;
-        }
-        menu()->trigger(Qn::ClearCameraSettingsAction);
-
+    if (success && isInstalled)
         success = applauncher::restartClient(version, auth) == applauncher::api::ResultType::ok;
-    }
 
     if (!success) {
         QMessageBox::critical(

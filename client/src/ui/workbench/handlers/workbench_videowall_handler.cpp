@@ -446,26 +446,6 @@ bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr
     return false;
 }
 
-
-bool QnWorkbenchVideoWallHandler::canClose() {
-    if (!context()->user())
-        return true;
-    //TODO: #GDM #VW implement real check. Think about circular dependencies
-    /*
-    if (businessRulesDialog() && businessRulesDialog()->isVisible()) {
-        businessRulesDialog()->activateWindow();
-        if (!businessRulesDialog()->canClose())
-            return;
-        businessRulesDialog()->hide();
-    }
-
-    menu()->trigger(Qn::ClearCameraSettingsAction);
-    if(!context()->instance<QnWorkbenchLayoutsHandler>()->closeAllLayouts(true))
-        return;*/
-    return true;
-}
-
-
 void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourcePtr &videoWall) {
     if (!canStartVideowall(videoWall)) {
         QMessageBox::warning(mainWindow(),
@@ -488,8 +468,7 @@ void QnWorkbenchVideoWallHandler::startVideowallAndExit(const QnVideoWallResourc
         return;
 
     if (button == QMessageBox::Yes) {
-        if (canClose())
-            closeInstanceDelayed();
+        closeInstanceDelayed();
     }
     
     QUuid pcUuid = qnSettings->pcUuid();

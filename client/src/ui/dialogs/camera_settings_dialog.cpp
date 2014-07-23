@@ -9,9 +9,26 @@
 
 #include <ui/widgets/properties/camera_settings_widget.h>
 
+#include <ui/workbench/workbench_state_manager.h>
+
+class QnCameraSettingsStateDelegate: public QnWorkbenchStateDelegate {
+public:
+    QnCameraSettingsStateDelegate(QnCameraSettingsDialog* owner):
+        m_owner(owner)
+    {}
+
+    virtual bool tryClose(bool force) override {
+        return m_owner->tryClose(force);
+    }
+
+private:
+    QnCameraSettingsDialog* m_owner;
+}; 
+
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     QDialog(parent),
     QnWorkbenchContextAware(parent),
+    m_workbenchStateDelegate(new QnCameraSettingsStateDelegate(this)),
     m_ignoreAccept(false)
 {
     setWindowTitle(tr("Camera settings"));
@@ -51,6 +68,10 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
 }
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
+}
+
+bool QnCameraSettingsDialog::tryClose(bool force) {
+    return true;
 }
 
 

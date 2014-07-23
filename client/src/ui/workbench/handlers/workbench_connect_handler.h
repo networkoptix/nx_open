@@ -28,7 +28,6 @@ protected:
     bool connectToServer(const QUrl &appServerUrl);
     bool disconnectFromServer(bool force);
 
-    bool saveState(bool force);
     void showLoginDialog();
 private:
     void at_messageProcessor_connectionOpened();

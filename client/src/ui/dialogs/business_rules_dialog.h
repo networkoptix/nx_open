@@ -51,7 +51,7 @@ public Q_SLOTS:
     virtual void reject() override;
 
 private slots:
-    void at_message_ruleDeleted(QnId id);
+    void at_message_ruleDeleted(const QUuid &id);
 
     void at_newRuleButton_clicked();
     void at_saveAllButton_clicked();

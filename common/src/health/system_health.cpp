@@ -11,7 +11,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
     case QnSystemHealth::UsersEmailIsEmpty:
         return tr("Some users have not set their email addresses");
     case QnSystemHealth::ConnectionLost:
-        return tr("Connection to Server is lost");
+        return tr("Connection to server lost");
     case QnSystemHealth::EmailSendError:
         return tr("Error while sending email");
     case QnSystemHealth::StoragesAreFull:
