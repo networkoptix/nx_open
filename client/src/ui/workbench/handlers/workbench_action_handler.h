@@ -210,7 +210,6 @@ protected slots:
     void at_openFileAction_triggered();
     void at_openLayoutAction_triggered();
     void at_openFolderAction_triggered();
-    void at_checkForUpdatesAction_triggered();
     void at_showcaseAction_triggered();
     void at_aboutAction_triggered();
     void at_businessEventsAction_triggered();
@@ -315,7 +314,7 @@ protected slots:
 private:
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
 
-    void notifyAboutUpdate(bool alwaysNotify);
+    void notifyAboutUpdate();
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 

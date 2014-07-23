@@ -310,11 +310,6 @@ namespace Qn {
         AboutAction,
 
         /**
-         * Checks for updates.
-         */
-        CheckForUpdatesAction,
-
-        /**
          * Open Showcase page in default browser
          */
         ShowcaseAction,

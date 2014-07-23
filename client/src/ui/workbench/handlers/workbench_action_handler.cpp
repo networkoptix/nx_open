@@ -238,7 +238,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
-    connect(action(Qn::CheckForUpdatesAction),                  SIGNAL(triggered()),    this,   SLOT(at_checkForUpdatesAction_triggered()));
     connect(action(Qn::ShowcaseAction),                         SIGNAL(triggered()),    this,   SLOT(at_showcaseAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     /* These actions may be activated via context menu. In this case the topmost event loop will be finishing and this somehow affects runModal method of NSSavePanel in MacOS.
@@ -1249,18 +1248,15 @@ void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
         menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dirName));
 }
 
-void QnWorkbenchActionHandler::notifyAboutUpdate(bool alwaysNotify) {
+void QnWorkbenchActionHandler::notifyAboutUpdate() {
     QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
-    if(update.isNull()) {
-        if(alwaysNotify)
-            QMessageBox::information(mainWindow(), tr("Information"), tr("No updates available."));
+    if(update.isNull())
         return;
-    }
 
     QnSoftwareVersion ignoredUpdateVersion = qnSettings->ignoredUpdateVersion();
     bool ignoreThisVersion = update.engineVersion <= ignoredUpdateVersion;
     bool thisVersionWasIgnored = ignoreThisVersion;
-    if(ignoreThisVersion && !alwaysNotify)
+    if(ignoreThisVersion)
         return;
 
     QnCheckableMessageBox::question(
@@ -1303,12 +1299,8 @@ void QnWorkbenchActionHandler::openLayoutSettingsDialog(const QnLayoutResourcePt
 }
 
 void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
-    if (qnSettings->isAutoCheckForUpdates() && qnSettings->isUpdatesEnabled())
-        notifyAboutUpdate(false);
-}
-
-void QnWorkbenchActionHandler::at_checkForUpdatesAction_triggered() {
-    notifyAboutUpdate(true);
+    if (qnSettings->isAutoCheckForUpdates())
+        notifyAboutUpdate();
 }
 
 void QnWorkbenchActionHandler::at_showcaseAction_triggered() {

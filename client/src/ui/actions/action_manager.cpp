@@ -762,11 +762,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("How-to Videos and FAQ...")).
         condition(new QnShowcaseActionCondition(this));
 
-    factory(Qn::CheckForUpdatesAction).
-        flags(Qn::Main).
-        text(tr("Check for Updates...")).
-        condition(new QnCheckForUpdatesActionCondition(this));
-
     factory(Qn::AboutAction).
         flags(Qn::Main | Qn::GlobalHotkey).
         text(tr("About...")).
