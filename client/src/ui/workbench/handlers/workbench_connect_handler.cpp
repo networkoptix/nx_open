@@ -197,7 +197,7 @@ void QnWorkbenchConnectHandler::at_disconnectAction_triggered() {
 }
 
 bool QnWorkbenchConnectHandler::connected() const {
-    return !qnCommon->moduleGUID().isNull();
+    return !qnCommon->remoteGUID().isNull();
 }
 
 bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
@@ -231,7 +231,7 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
     QnAppServerConnectionFactory::setEc2Connection(result.connection());
     QnAppServerConnectionFactory::setCurrentVersion(connectionInfo.version);
 
-    QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
+    QnClientMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
 
     QnSessionManager::instance()->start();
     QnResource::startCommandProc();
@@ -254,11 +254,11 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
         m_connectingMessageBox = NULL;
     }
 
+    QnClientMessageProcessor::instance()->init(NULL);
+
     QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(NULL);
     QnAppServerConnectionFactory::setCurrentVersion(QnSoftwareVersion());
-
-    QnCommonMessageProcessor::instance()->init(NULL);
 
     QnSessionManager::instance()->stop();
     QnResource::stopCommandProc();
@@ -322,7 +322,8 @@ void QnWorkbenchConnectHandler::showLoginDialog() {
 }
 
 bool QnWorkbenchConnectHandler::saveState(bool force) {
-    if (!connected())
+    // do not try to save state if we have not loaded resources
+    if (!connected() || !context()->user())
         return true;
 
     QnWorkbenchState state;

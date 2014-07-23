@@ -27,8 +27,9 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
         assert(!qnCommon->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
         data.peer.id = qnCommon->remoteGUID();
-        at_remotePeerLost(data, false);
         qnCommon->setRemoteGUID(QUuid());
+        m_connected = false;
+        emit connectionClosed();
     } else if (!qnCommon->remoteGUID().isNull()) { // we are trying to reconnect to server now
         qnCommon->setRemoteGUID(QUuid());
     }
