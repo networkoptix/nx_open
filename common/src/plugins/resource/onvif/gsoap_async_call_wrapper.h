@@ -170,19 +170,6 @@ private:
         done
     };
 
-    Request m_request;
-    Response m_response;
-    SyncWrapper* m_syncWrapper;
-    GSoapCallFuncType m_syncFunc;
-    State m_state;
-    QByteArray m_serializedRequest;
-    QByteArray m_responseBuffer;
-    int m_responseDataSize;
-    int m_responseDataPos;
-    QSharedPointer<AbstractStreamSocket> m_socket;
-    int m_bytesSent;
-    std::function<void(int)> m_resultHandler;
-
     virtual int onGsoapSendData(const char* data, size_t size) override
     {
         if( m_state == sendingRequest )
@@ -287,6 +274,20 @@ private:
         m_state = done;
         m_resultHandler(resultCode);
     }
+
+private:
+    Request m_request;
+    Response m_response;
+    SyncWrapper* m_syncWrapper;
+    GSoapCallFuncType m_syncFunc;
+    State m_state;
+    QByteArray m_serializedRequest;
+    QByteArray m_responseBuffer;
+    int m_responseDataSize;
+    int m_responseDataPos;
+    QSharedPointer<AbstractStreamSocket> m_socket;
+    int m_bytesSent;
+    std::function<void(int)> m_resultHandler;
 };
 
 #endif  //GSOAP_ASYNC_CALL_WRAPPER_H

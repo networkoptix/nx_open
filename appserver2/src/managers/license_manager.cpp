@@ -74,7 +74,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiLicenseDataList> QnLicenseManager<T>::prepareTransaction( ApiCommand::Value cmd, const QnLicenseList& licenses )
     {
-        QnTransaction<ApiLicenseDataList> tran( cmd, true );
+        QnTransaction<ApiLicenseDataList> tran( cmd);
         fromResourceListToApi(licenses, tran.params);
         return tran;
     }

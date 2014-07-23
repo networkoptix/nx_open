@@ -29,7 +29,7 @@
 #include "api/runtime_info_manager.h"
 
 
-static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24;
+static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24 * 7;
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)

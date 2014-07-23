@@ -260,7 +260,6 @@ bool QnDbManager::init()
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     if (localInfo.data.prematureLicenseExperationDate != m_licenseOverflowTime) {
         localInfo.data.prematureLicenseExperationDate = m_licenseOverflowTime;
-        localInfo.data.version = localInfo.data.version + 1;
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
 
@@ -300,8 +299,8 @@ bool QnDbManager::init()
         fromApiToResource(users[0], userResource);
         userResource->setPassword(qnCommon->defaultAdminPassword());
 
-        QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser, true);
-        userTransaction.fillSequence();
+        QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser);
+        userTransaction.fillPersistentInfo();
         fromResourceToApi(userResource, userTransaction.params);
 
         executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
@@ -324,8 +323,8 @@ bool QnDbManager::init()
     }
     while (queryCameras.next()) 
     {
-        QnTransaction<ApiSetResourceStatusData> tran(ApiCommand::setResourceStatus, true);
-        tran.fillSequence();
+        QnTransaction<ApiSetResourceStatusData> tran(ApiCommand::setResourceStatus);
+        tran.fillPersistentInfo();
         tran.params.id = QnId::fromRfc4122(queryCameras.value(0).toByteArray());
         tran.params.status = QnResource::Offline;
         executeTransactionNoLock(tran, QnUbjson::serialized(tran));
@@ -2595,7 +2594,6 @@ bool QnDbManager::markLicenseOverflow(bool value, qint64 time)
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     if (localInfo.data.prematureLicenseExperationDate != m_licenseOverflowTime) {
         localInfo.data.prematureLicenseExperationDate = m_licenseOverflowTime;
-        localInfo.data.version++;
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
     

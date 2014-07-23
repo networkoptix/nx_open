@@ -197,6 +197,11 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities)
 
 
+    enum Projection {
+        RectilinearProjection,
+        EquirectangularProjection
+    };
+
 
     enum PtzTrait {
         NoPtzTraits             = 0x00,

@@ -68,7 +68,7 @@ namespace ec2
     template<class QueryProcessorType>
     QnTransaction<ApiStoredFileData> QnStoredFileManager<QueryProcessorType>::prepareTransaction( const QString& filename, const QByteArray& data )
     {
-        QnTransaction<ApiStoredFileData> tran(ApiCommand::addStoredFile, true);
+        QnTransaction<ApiStoredFileData> tran(ApiCommand::addStoredFile);
         tran.params.path = filename;
         tran.params.data = data;
         return tran;
@@ -77,7 +77,7 @@ namespace ec2
     template<class QueryProcessorType>
     QnTransaction<ApiStoredFilePath> QnStoredFileManager<QueryProcessorType>::prepareTransaction( const QString& filename )
     {
-        QnTransaction<ApiStoredFilePath> tran(ApiCommand::removeStoredFile, true);
+        QnTransaction<ApiStoredFilePath> tran(ApiCommand::removeStoredFile);
         tran.params = filename;
         return tran;
     }

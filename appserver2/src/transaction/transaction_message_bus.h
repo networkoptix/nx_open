@@ -60,7 +60,9 @@ namespace ec2
         {
             Q_ASSERT(tran.command != ApiCommand::NotDefined);
             QMutexLocker lock(&m_mutex);
-            sendTransactionInternal(tran, QnTransactionTransportHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers));
+            QnTransactionTransportHeader ttHeader(connectedPeers(tran.command) << m_localPeer.id, dstPeers);
+            ttHeader.fillSequence();
+            sendTransactionInternal(tran, ttHeader);
         }
 
         /** Template specialization to fill dstPeers from the transaction params. */
