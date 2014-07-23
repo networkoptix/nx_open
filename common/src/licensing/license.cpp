@@ -481,6 +481,13 @@ void QnLicensePool::addLicense(const QnLicensePtr &license)
         emit licensesChanged();
 }
 
+void QnLicensePool::removeLicense(const QnLicensePtr &license)
+{
+    QMutexLocker locker(&m_mutex);
+    m_licenseDict.remove(license->key());
+    emit licensesChanged();
+}
+
 bool QnLicensePool::addLicenses_i(const QnLicenseList &licenses)
 {
     bool atLeastOneAdded = false;

@@ -114,8 +114,8 @@ namespace ec2
 
         //AbstractCameraManager::getBookmarkTags
 
-        //TODO AbstractLicenseManager
         registerUpdateFuncHandler<ApiLicenseDataList>( restProcessorPool, ApiCommand::addLicenses );
+        registerUpdateFuncHandler<ApiLicenseData>( restProcessorPool, ApiCommand::removeLicense );
 
 
         //AbstractBusinessEventManager::getBusinessRules

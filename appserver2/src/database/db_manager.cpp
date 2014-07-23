@@ -2195,12 +2195,31 @@ ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return ErrorCode::dbError;
     }
+}
 
+ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license) {
+    QSqlQuery delQuery(m_sdbStatic);
+    delQuery.prepare("DELETE FROM vms_license WHERE license_key = ?");
+    delQuery.addBindValue(license.key);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::dbError;
+    }
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran)
 {
-    return saveLicense(tran.params);
+    if (tran.command == ApiCommand::addLicense)
+        return saveLicense(tran.params);
+    else if (tran.command == ApiCommand::removeLicense)
+        return removeLicense(tran.params);
+    else {
+        Q_ASSERT_X(1, Q_FUNC_INFO, "Unexpected command!");
+        return ErrorCode::notImplemented;
+    }
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseDataList>& tran)

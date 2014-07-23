@@ -175,6 +175,7 @@ public:
     void addLicense(const QnLicensePtr &license);
     void addLicenses(const QnLicenseList &licenses);
     void replaceLicenses(const QnLicenseList &licenses);
+    void removeLicense(const QnLicensePtr &license);
 
     void reset();
     bool isEmpty() const;
