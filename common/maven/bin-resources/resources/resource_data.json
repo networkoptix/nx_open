@@ -34,7 +34,8 @@
                 "*|LR01", "*|IPCAM_M1", "*|RL01",
                 "VISTA|*VRD", "VISTA|VK2-2MPBX(DN)",
                 "ZXDZHZ|vimicro","DW|DWC-MF21M4TIR","ACTI|TCM4201","Sony|SNC-CH120","Sony|SNC-CH280",
-                "Sony|SNC-DH210","Sony|SNC-DH120T","VITEK|VT-20VN-M","Etrovision Technology|EV8180U-XL","VIVOTEK|FE8174V"
+                "Sony|SNC-DH210","Sony|SNC-DH120T","VITEK|VT-20VN-M","Etrovision Technology|EV8180U-XL","VIVOTEK|FE8174V",
+                "AVTECH|AVM542B"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
