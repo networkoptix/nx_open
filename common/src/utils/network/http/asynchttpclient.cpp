@@ -474,7 +474,7 @@ namespace nx_http
         else {
             m_state = sInit;
 
-            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(url.scheme() == lit("https")) );
+            m_socket = QSharedPointer<AbstractStreamSocket>( SocketFactory::createStreamSocket(/*url.scheme() == lit("https")*/) ); //TODO #ak uncomment when async ssl connection supported
             if( !m_socket->setNonBlockingMode( true ) ||
                 !m_socket->setSendTimeout( DEFAULT_CONNECT_TIMEOUT ) )
             {
