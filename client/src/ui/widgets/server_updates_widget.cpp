@@ -269,6 +269,7 @@ void QnServerUpdatesWidget::updateUi() {
     ui->cancelButton->setVisible(applying);
     ui->cancelButton->setEnabled(cancellable);
     ui->updateStateWidget->setVisible(applying);
+    ui->progressWidget->setVisible(checkingForUpdates);
     ui->progressIndicator->setVisible(infiniteProgress);
     ui->updateProgessBar->setVisible(!infiniteProgress);
     ui->checkForUpdatesButton->setEnabled(!applying && !checkingForUpdates);

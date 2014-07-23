@@ -5,11 +5,12 @@
 #include <core/resource/media_server_resource.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
+#include <utils/updates_common.h>
 #include <mutex/distributed_mutex.h>
 
-class QNetworkAccessManager;
 class QnUpdateUploader;
 
+class QnCheckForUpdatesPeerTask;
 class QnDownloadUpdatesPeerTask;
 class QnUploadUpdatesPeerTask;
 class QnInstallUpdatesPeerTask;
@@ -18,26 +19,6 @@ class QnRestUpdatePeerTask;
 class QnMediaServerUpdateTool : public QObject {
     Q_OBJECT
 public:
-    struct UpdateFileInformation {
-        QnSoftwareVersion version;
-        QString fileName;
-        qint64 fileSize;
-        QString baseFileName;
-        QUrl url;
-        QString md5;
-
-        UpdateFileInformation() {}
-
-        UpdateFileInformation(const QnSoftwareVersion &version, const QString &fileName) :
-            version(version), fileName(fileName)
-        {}
-
-        UpdateFileInformation(const QnSoftwareVersion &version, const QUrl &url) :
-            version(version), url(url)
-        {}
-    };
-    typedef QSharedPointer<UpdateFileInformation> UpdateFileInformationPtr;
-
     struct PeerUpdateInformation {
         enum State {
             UpdateUnknown,
@@ -57,7 +38,7 @@ public:
         QnMediaServerResourcePtr server;
         State state;
         QnSoftwareVersion sourceVersion;
-        UpdateFileInformationPtr updateInformation;
+        QnUpdateFileInformationPtr updateInformation;
 
         int progress;
 
@@ -93,6 +74,7 @@ public:
     };
 
     QnMediaServerUpdateTool(QObject *parent = 0);
+    ~QnMediaServerUpdateTool();
 
     State state() const;
 
@@ -125,24 +107,15 @@ signals:
     void peerChanged(const QnId &peerId);
 
 public slots:
-    void checkForUpdates();
-    void checkForUpdates(const QnSoftwareVersion &version);
+    void checkForUpdates(const QnSoftwareVersion &version = QnSoftwareVersion());
     void checkForUpdates(const QString &fileName);
     bool cancelUpdate();
 
-protected:
-    void checkOnlineUpdates(const QnSoftwareVersion &version = QnSoftwareVersion());
-    void checkLocalUpdates();
-    void checkUpdateCoverage();
-    bool needUpdate(const QnSoftwareVersion &version, const QnSoftwareVersion &updateVersion) const;
-
 private slots:
-    void at_updateReply_finished();
-    void at_buildReply_finished();
-
     void at_mutexLocked();
     void at_mutexTimeout();
 
+    void at_checkForUpdatesTask_finished(int errorCode);
     void at_downloadTask_finished(int errorCode);
     void at_uploadTask_finished(int errorCode);
     void at_installTask_finished(int errorCode);
@@ -160,7 +133,6 @@ private:
     void setUpdateResult(UpdateResult result);
     void finishUpdate(UpdateResult result);
     void setPeerState(const QnId &peerId, PeerUpdateInformation::State state);
-    void checkBuildOnline();
     void removeTemporaryDir();
 
     void downloadUpdates();
@@ -172,15 +144,13 @@ private:
     void unlockMutex();
 
 private:
+    QThread *m_tasksThread;
     State m_state;
     CheckResult m_checkResult;
     UpdateResult m_updateResult;
     QString m_resultString;
 
-    QString m_localUpdateFileName;
     QString m_localTemporaryDir;
-    QUrl m_onlineUpdateUrl;
-    QString m_updateLocationPrefix;
 
     QnSoftwareVersion m_targetVersion;
     bool m_targetMustBeNewer;
@@ -188,9 +158,8 @@ private:
 
     QString m_updateId;
 
-    QHash<QnSystemInformation, UpdateFileInformationPtr> m_updateFiles;
+    QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
 
-    QNetworkAccessManager *m_networkAccessManager;
     ec2::QnDistributedMutex *m_distributedMutex;
 
     QHash<QnId, PeerUpdateInformation> m_updateInformationById;
@@ -198,6 +167,7 @@ private:
 
     QnMediaServerResourceList m_targets;
 
+    QnCheckForUpdatesPeerTask *m_checkForUpdatesPeerTask;
     QnDownloadUpdatesPeerTask *m_downloadUpdatesPeerTask;
     QnUploadUpdatesPeerTask *m_uploadUpdatesPeerTask;
     QnInstallUpdatesPeerTask *m_installUpdatesPeerTask;
