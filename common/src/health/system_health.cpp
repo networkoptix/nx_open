@@ -11,7 +11,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
     case QnSystemHealth::UsersEmailIsEmpty:
         return tr("Some users have not set their email addresses");
     case QnSystemHealth::ConnectionLost:
-        return tr("Connection to Enterprise Controller is lost");
+        return tr("Connection to Server is lost");
     case QnSystemHealth::EmailSendError:
         return tr("Error while sending email");
     case QnSystemHealth::StoragesAreFull:
@@ -46,13 +46,13 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
     case QnSystemHealth::UsersEmailIsEmpty:
         return tr("Some users have not set their email addresses.\nThey cannot receive system notifications via email.");
     case QnSystemHealth::StoragesAreFull:
-        return tr("Storages are full on the following Media Server:\n%1.").arg(resourceName);
+        return tr("Storages are full on the following Server:\n%1.").arg(resourceName);
     case QnSystemHealth::StoragesNotConfigured:
-        return tr("Storages are not configured on the following Media Server:\n%1.").arg(resourceName);
+        return tr("Storages are not configured on the following Server:\n%1.").arg(resourceName);
     case QnSystemHealth::NoLicenses:
         return tr("You have no licenses.\nYou cannot record video from cameras.");
     case QnSystemHealth::ArchiveRebuildFinished:
-        return tr("Rebuilding archive index is completed on the following Media Server:\n%1.").arg(resourceName);
+        return tr("Rebuilding archive index is completed on the following Server:\n%1.").arg(resourceName);
     default:
         break;
     }

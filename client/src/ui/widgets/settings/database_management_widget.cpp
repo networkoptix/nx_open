@@ -87,8 +87,8 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
 
     if( errorCode != ec2::ErrorCode::ok )
     {
-        NX_LOG( lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)), cl_logERROR );
-        QMessageBox::information(this, tr("Information"), tr("Failed to dump EC database to '%1'").arg(fileName));
+        NX_LOG( lit("Failed to dump Server database: %1").arg(ec2::toString(errorCode)), cl_logERROR );
+        QMessageBox::information(this, tr("Information"), tr("Failed to dump Server database to '%1'").arg(fileName));
         return;
     }
 
@@ -143,7 +143,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
                                  tr("Database was successfully restored from file '%1'.").arg(fileName));
         menu()->trigger(Qn::ReconnectAction);
     } else {
-        NX_LOG( lit("Failed to restore EC database from file '$1'. $2").arg(fileName).arg(ec2::toString(errorCode)), cl_logERROR );
+        NX_LOG( lit("Failed to restore Server database from file '$1'. $2").arg(fileName).arg(ec2::toString(errorCode)), cl_logERROR );
         QMessageBox::critical(this, tr("Error"), tr("An error has occurred while restoring the database from file '%1'.")
                               .arg(fileName));
     }

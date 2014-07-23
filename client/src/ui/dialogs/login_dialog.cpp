@@ -108,7 +108,7 @@ QnLoginDialog::QnLoginDialog(QWidget *parent, QnWorkbenchContext *context) :
     m_lastUsedItem = NULL;
     m_savedSessionsItem = new QStandardItem(tr("Saved Sessions"));
     m_savedSessionsItem->setFlags(Qt::ItemIsEnabled);
-    m_autoFoundItem = new QStandardItem(tr("Auto-Discovered ECs"));
+    m_autoFoundItem = new QStandardItem(tr("Auto-Discovered Servers"));
     m_autoFoundItem->setFlags(Qt::ItemIsEnabled);
 
     m_connectionsModel->appendRow(m_savedSessionsItem);
@@ -164,7 +164,11 @@ void QnLoginDialog::accept() {
         return;
     }
 
-    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect( url, this, &QnLoginDialog::at_ec2ConnectFinished );
+    m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
+        url,
+        this,
+        &QnLoginDialog::at_ec2ConnectFinished );
+
     updateUsability();
 }
 

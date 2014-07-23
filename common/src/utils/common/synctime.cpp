@@ -91,7 +91,7 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
             m_lastWarnTime = localTime;
             if (m_lastWarnTime == 0)
             {
-                NX_LOG( lit("Local time differs from enterprise controller! local time %1, EC time %2").
+                NX_LOG( lit("Local time differs from server's! local time %1, server time %2").
                     arg(QDateTime::fromMSecsSinceEpoch(localTime).toString()).arg(QDateTime::fromMSecsSinceEpoch(time).toString()), cl_logWARNING );
             }
         }

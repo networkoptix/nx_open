@@ -102,7 +102,7 @@ private:
         }
     };
 
-    /** Hash list of automatically found Enterprise Controllers based on seed as key. */
+    /** Hash list of automatically found Servers based on seed as key. */
     QMap<QString, QnEcData> m_foundEcs;
 };
 

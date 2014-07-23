@@ -161,7 +161,7 @@ Q_DECLARE_METATYPE(QnLicenseList)
 
 
 /**
- * License storage which is associated with instance of Enterprise Controller (i.e. should be reloaded when switching appserver).
+ * License storage which is associated with instance of Server (i.e. should be reloaded when switching appserver).
  */
 class QnLicensePool : public QObject
 {

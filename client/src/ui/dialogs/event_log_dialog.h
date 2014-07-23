@@ -65,7 +65,7 @@ private:
     void updateActionList(bool instantOnly);
 
     /**
-     * Get data from media server
+     * Get data from server
      * 
      * \param fromMsec start date. UTC msecs
      * \param toMsec end date. UTC msecs. Can be DATETIME_NOW

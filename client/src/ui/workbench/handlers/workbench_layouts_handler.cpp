@@ -593,7 +593,7 @@ void QnWorkbenchLayoutsHandler::at_layouts_saved(int status, const QnResourceLis
             mainWindow(),
             resources,
             tr("Error"),
-            tr("Could not save the following %n layout(s) to Enterprise Controller.", "", reopeningLayoutResources.size()),
+            tr("Could not save the following %n layout(s) to Server.", "", reopeningLayoutResources.size()),
             tr("Do you want to restore these %n layout(s)?", "", reopeningLayoutResources.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );

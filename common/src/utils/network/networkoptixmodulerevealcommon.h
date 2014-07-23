@@ -14,7 +14,7 @@
     It may look strange, but "client.exe" is valid on linux too (VER_ORIGINALFILENAME_STR from version.h)
 */
 static const QString nxClientId = lit("client.exe");
-static const QString nxMediaServerId = lit("Media Server");
+static const QString nxMediaServerId = lit("Server");
 
 static const QHostAddress defaultModuleRevealMulticastGroup = QHostAddress(lit("239.255.11.11"));
 static const unsigned int defaultModuleRevealMulticastGroupPort = 5007;
@@ -35,7 +35,7 @@ Q_DECLARE_METATYPE(TypeSpecificParamMap)
 class RevealResponse
 {
 public:
-    //!Name of module (enterprise controller, media server, etc...)
+    //!Name of module (server, client, etc...)
     QString type;
     QString version;
     QString systemInformation;

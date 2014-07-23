@@ -1128,7 +1128,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
                 mainWindow(),
                 QnResourceList() << videoWall,
                 tr("Error"),
-                tr("Could not save the following %n items to Enterprise Controller.", "", 1),
+                tr("Could not save the following %n items to Server.", "", 1),
                 QDialogButtonBox::Ok
                 );
     } );

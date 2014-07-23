@@ -141,7 +141,7 @@ QNetworkProxy QnNetworkProxyFactory::getProxyToResource( const QnResourcePtr& re
         const QString& proxyHost = mediaServerResource->getPrimaryIF();
         if( proxyHost == QnMediaServerResource::USE_PROXY )
         {
-            //proxying via EC
+            //proxying via Server
             proxy.setHostName( QnAppServerConnectionFactory::url().host() );
             proxy.setPort( QnAppServerConnectionFactory::url().port() );
         }
@@ -162,7 +162,7 @@ QNetworkProxy QnNetworkProxyFactory::getProxyToResource( const QnResourcePtr& re
         const QString& proxyHost = mediaServerResource->getPrimaryIF();
         if( proxyHost == QnMediaServerResource::USE_PROXY )
         {
-            //proxying via EC
+            //proxying via Server
             proxy.setHostName( QnAppServerConnectionFactory::url().host() );
             proxy.setPort( QnAppServerConnectionFactory::url().port() );
             proxy.setUser( QnAppServerConnectionFactory::url().userName() );

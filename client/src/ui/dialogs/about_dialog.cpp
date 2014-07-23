@@ -95,9 +95,9 @@ void QnAboutDialog::retranslateUi()
     QString servers;
 
     if (ecsVersion.isNull()) {
-        servers = tr("<b>Enterprise controller</b> is not connected.<br>\n");
+        servers = tr("<b>Server</b> is not connected.<br>\n");
     } else {
-        servers = tr("<b>Enterprise controller</b> version %1 at %2:%3.<br>\n").
+        servers = tr("<b>Server</b> version %1 at %2:%3.<br>\n").
             arg(ecsVersion.toString()).
             arg(ecsUrl.host()).
             arg(ecsUrl.port());
@@ -108,7 +108,7 @@ void QnAboutDialog::retranslateUi()
         if (server->getStatus() != QnResource::Online)
             continue;
 
-        serverVersions.append(tr("<b>Media Server</b> version %2 at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
+        serverVersions.append(tr("<b>Server</b> version %2 at %3.").arg(server->getVersion().toString()).arg(QUrl(server->getUrl()).host()));
     }
     
     if (!ecsVersion.isNull() && !serverVersions.isEmpty())
@@ -120,7 +120,6 @@ void QnAboutDialog::retranslateUi()
             "<br />\n"
             "<b>Qt v.%3</b> - Copyright (c) 2012 Nokia Corporation.<br/>\n"
             "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 FFmpeg developers.<br/>\n"
-            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation.<br/>\n"
             "<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 LAME developers.<br/>\n"
             "<b>OpenAL %5</b> - Copyright (c) 2000-2006 %6.<br/>\n"
             "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br/>\n"

@@ -36,11 +36,11 @@ namespace {
     enum DialogState {
         /** No image is selected. */
         NoImage,
-        /** Error is occured. */
+        /** Error is occurred. */
         Error,
-        /** Current layout image is being downloaded from the EC. */
+        /** Current layout image is being downloaded from the Server. */
         ImageDownloading,
-        /** Current layout image is downloaded from the EC. */
+        /** Current layout image is downloaded from the Server. */
         ImageDownloaded,
         /** Current layout image is downloaded and being loading. */
         ImageLoading,
@@ -52,7 +52,7 @@ namespace {
         NewImageLoading,
         /** New image is selected and loaded. */
         NewImageLoaded,
-        /** New image is selected being uploading to the EC. */
+        /** New image is selected being uploading to the Server. */
         NewImageUploading
     };
 

@@ -73,7 +73,7 @@ namespace Qn {
 
         /**
          * Drops provided serialized resources on the current layout after
-         * connection to Enterprise Controller was established.
+         * connection to Server was established.
          *
          * Parameters:
          *
@@ -599,7 +599,7 @@ namespace Qn {
         ServerAddCameraManuallyAction,
 
         /**
-         * Opens camera list by media server
+         * Opens camera list by server
          */
         CameraListByServerAction,
 
@@ -733,7 +733,7 @@ namespace Qn {
         RemoveLayoutItemAction,
 
         /**
-         * Removes a resource from Enterprise Controller.
+         * Removes a resource from Server.
          */
         RemoveFromServerAction,
 

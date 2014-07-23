@@ -81,7 +81,7 @@ public:
         /** Camera was disconnected. */
         CameraDisconnectEvent = 3,
 
-        /** Storage read error has occured. */
+        /** Storage read error has occurred. */
         StorageFailureEvent = 4,
 
         /** Network issue: packet lost, RTP timeout, etc. */
@@ -96,7 +96,7 @@ public:
         /** Two or more mediaservers are running. */
         ServerConflictEvent = 8,
 
-        /** Media server started */
+        /** Server started */
         ServerStartEvent = 9,
         
         /** Not enough licenses */
@@ -158,7 +158,7 @@ public:
 
         /**
          * Parameters:
-         * - soundUrl (string, required)               - url of sound, contains path to sound on the EC.
+         * - soundUrl (string, required)               - url of sound, contains path to sound on the Server.
          */
         PlaySoundAction = 9,
 

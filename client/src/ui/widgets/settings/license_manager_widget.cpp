@@ -142,7 +142,7 @@ void QnLicenseManagerWidget::updateLicenses() {
         }
     } else {
         if (qnLicensePool->currentHardwareId().isEmpty()) {
-            ui->infoLabel->setText(tr("Obtaining licenses from Enterprise Controller..."));
+            ui->infoLabel->setText(tr("Obtaining licenses from Server..."));
             useRedLabel = false;
         } else {
             QString text = (qnProductFeatures().freeLicenseCount > 0) ?

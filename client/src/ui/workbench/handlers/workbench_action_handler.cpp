@@ -2446,14 +2446,14 @@ void QnWorkbenchActionHandler::at_resources_saved( int handle, ec2::ErrorCode er
             mainWindow(),
             resources,
             tr("Error"),
-            tr("Could not save the following %n items to Enterprise Controller.", "", resources.size()),
+            tr("Could not save the following %n items to Server.", "", resources.size()),
             QDialogButtonBox::Ok
         );
-    } else { // Note that we may get reply of size 0 if EC is down.
+    } else { // Note that we may get reply of size 0 if Server is down.
         QMessageBox::warning(
                     mainWindow(),
                     tr("Changes are not applied"),
-                    tr("Could not save changes to Enterprise Controller."));
+                    tr("Could not save changes to Server."));
     }
 }
 
@@ -2468,7 +2468,7 @@ void QnWorkbenchActionHandler::at_resource_deleted( int handle, ec2::ErrorCode e
     if( errorCode == ec2::ErrorCode::ok )
         return;
 
-    QMessageBox::critical(mainWindow(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Enterprise Controller. \n\nError description: '%2'").arg(ec2::toString(errorCode)));
+    QMessageBox::critical(mainWindow(), tr("Could not delete resource"), tr("An error has occurred while trying to delete a resource from Server. \n\nError description: '%2'").arg(ec2::toString(errorCode)));
 }
 
 void QnWorkbenchActionHandler::at_resources_statusSaved(ec2::ErrorCode errorCode, const QnResourceList &resources) {
@@ -2627,14 +2627,14 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
             component = tr("Client v%1<br/>").arg(data.version.toString());
             break;
         case Qn::EnterpriseControllerComponent:
-            component = tr("Enterprise Controller v%1<br/>").arg(data.version.toString());
+            component = tr("Server v%1<br/>").arg(data.version.toString());
             break;
         case Qn::MediaServerComponent: {
             QnMediaServerResourcePtr resource = data.resource.dynamicCast<QnMediaServerResource>();
             if(resource) {
-                component = tr("Media Server v%1 at %2<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
+                component = tr("Server v%1 at %2<br/>").arg(data.version.toString()).arg(QUrl(resource->getUrl()).host());
             } else {
-                component = tr("Media Server v%1<br/>").arg(data.version.toString());
+                component = tr("Server v%1<br/>").arg(data.version.toString());
             }
         }
         default:

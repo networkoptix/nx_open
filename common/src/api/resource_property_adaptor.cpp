@@ -6,7 +6,7 @@
 
 // TODO: #Elric
 // Right now we have a problem in case resource property is changed very often.
-// Changes are pushed to EC and then we get them back as notifications, not
+// Changes are pushed to Server and then we get them back as notifications, not
 // necessarily in the original order. This way property value gets changed
 // in totally unexpected ways.
 #if 0
