@@ -25,7 +25,7 @@ namespace ec2
             Q_UNUSED(lock);
 
             // do not cache read-only transactions (they have sequence == 0)
-            if (!tran.persistentInfo.isNull() > 0 && m_cache.contains(tran.persistentInfo))
+            if (!tran.persistentInfo.isNull() && m_cache.contains(tran.persistentInfo))
                 return *m_cache[tran.persistentInfo];
 
             QByteArray* result = new QByteArray();
