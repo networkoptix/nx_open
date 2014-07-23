@@ -611,10 +611,10 @@ void QnTransactionMessageBus::sendRuntimeInfo(QnTransactionTransport* transport,
         }
 
         {
-        QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
-        tran.params = info.data;
-        transport->sendTransaction(tran, processedPeers);
-    }
+            QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
+            tran.params = info.data;
+            transport->sendTransaction(tran, processedPeers);
+        }
     }
 }
 
