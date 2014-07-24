@@ -629,7 +629,7 @@ void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 
 void getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host)
 {
-    memset(MAC_str, 0, sizeof(MAC_str));
+    memset(MAC_str, 0, sizeof(MAC_str)/sizeof(*MAC_str));
 #define HWADDR_len 6
     int s,i;
     struct ifreq ifr;

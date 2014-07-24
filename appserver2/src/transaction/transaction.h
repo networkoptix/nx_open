@@ -102,6 +102,7 @@ namespace ec2
             getLicenses                 = 1000, /*< ApiLicenseDataList */
             addLicense                  = 1001, /*< ApiLicenseData */
             addLicenses                 = 1002, /*< ApiLicenseDataList */
+            removeLicense               = 1003, /*< ApiLicenseData */
 
             /* Auto-updates */
             uploadUpdate                = 1200, /*< ApiUpdateUploadData */

@@ -132,6 +132,8 @@ namespace ec2
                     return "addLicense";
                 case getLicenses:
                     return "getLicenses";
+                case removeLicense:
+                    return "removeLicense";
 
                 case getCurrentTime:
                     return "getCurrentTime";
@@ -222,7 +224,8 @@ namespace ec2
                 val == addDiscoveryInformation ||
                 val == removeDiscoveryInformation ||
                 val == addLicense ||
-                val == addLicenses;
+                val == addLicenses ||
+                val == removeLicense;
         }
 
     }
