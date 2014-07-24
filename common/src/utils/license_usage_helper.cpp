@@ -13,11 +13,25 @@ struct LiceseCompatibility
     Qn::LicenseClass child;
 };
 
-static std::array<LiceseCompatibility,3> compatibleLicenseClass =
+static std::array<LiceseCompatibility, 14> compatibleLicenseClass =
 {
-    LiceseCompatibility(Qn::LC_Edge,    Qn::LC_Digital),
-    LiceseCompatibility(Qn::LC_Digital, Qn::LC_Analog),
-    LiceseCompatibility(Qn::LC_Edge,    Qn::LC_Analog)
+    LiceseCompatibility(Qn::LC_Edge,    Qn::LC_Professional),
+    LiceseCompatibility(Qn::LC_Professional, Qn::LC_Analog),
+    LiceseCompatibility(Qn::LC_Edge,    Qn::LC_Analog),
+
+    LiceseCompatibility(Qn::LC_Analog,    Qn::LC_VMAX),
+    LiceseCompatibility(Qn::LC_Professional, Qn::LC_VMAX),
+    LiceseCompatibility(Qn::LC_Edge, Qn::LC_VMAX),
+    
+    LiceseCompatibility(Qn::LC_Free,    Qn::LC_Edge),
+    LiceseCompatibility(Qn::LC_Free,    Qn::LC_Professional),
+    LiceseCompatibility(Qn::LC_Free,    Qn::LC_Analog),
+    LiceseCompatibility(Qn::LC_Free,    Qn::LC_VMAX),
+
+    LiceseCompatibility(Qn::LC_Trial,    Qn::LC_Edge),
+    LiceseCompatibility(Qn::LC_Trial,    Qn::LC_Professional),
+    LiceseCompatibility(Qn::LC_Trial,    Qn::LC_Analog),
+    LiceseCompatibility(Qn::LC_Trial,    Qn::LC_VMAX)
 };
 
 
@@ -106,6 +120,12 @@ void QnLicenseUsageHelper::update()
         m_isValid &= (m_overflowLicenses[i] == 0);
     }
 
+    // move Free licence class to Trial class (there is no diference between that classes except of naming)
+    m_usedLicenses[Qn::LC_Trial] += m_usedLicenses[Qn::LC_Free];
+    m_usedLicenses[Qn::LC_Free] = 0;
+    m_overflowLicenses[Qn::LC_Trial] += m_overflowLicenses[Qn::LC_Free];
+    m_overflowLicenses[Qn::LC_Free] = 0;
+    
     emit updated();
 }
 
@@ -114,6 +134,9 @@ QString QnLicenseUsageHelper::longClassName(Qn::LicenseClass licenseClass) const
     switch (licenseClass) {
         case Qn::LC_Edge: return QObject::tr("edge license(s)");
         case Qn::LC_Analog: return QObject::tr("analog license(s)");
+        case Qn::LC_VMAX: return QObject::tr("VMAX license(s)");
+        case Qn::LC_Trial: return QObject::tr("Trial license(s)");
+        case Qn::LC_Free: return QObject::tr("Free license(s)");
         default: return QObject::tr("license(s)");
     }
 }
@@ -123,11 +146,44 @@ QString QnLicenseUsageHelper::getUsageText(Qn::LicenseClass licenseClass) const
     return QObject::tr("%n %2 are used out of %1.", "", m_usedLicenses[licenseClass]).arg( m_licenses.totalLicenseByClass(licenseClass)).arg(longClassName(licenseClass));
 }
 
+QString QnLicenseUsageHelper::getUsageText() const 
+{
+    QString licenseText;
+    for (int i = 0; i < Qn::LC_Count; ++i) 
+    {
+        {
+            Qn::LicenseClass licenseClass = Qn::LicenseClass(i);
+            if (totalLicense(licenseClass) == 0)
+                continue;
+            if (!licenseText.isEmpty())
+                licenseText += lit("\n");
+            licenseText += getUsageText(licenseClass);
+        } 
+    }
+    return licenseText;
+}
+
 QString QnLicenseUsageHelper::getWillUsageText(Qn::LicenseClass licenseClass) const
 {
     return QObject::tr("%n %2 will be used out of %1.", "", m_usedLicenses[licenseClass]).arg( m_licenses.totalLicenseByClass(licenseClass)).arg(longClassName(licenseClass));
 }
 
+QString QnLicenseUsageHelper::getWillUsageText() const
+{
+    QString licenseText;
+    for (int i = 0; i < Qn::LC_Count; ++i) 
+    {
+        {
+            Qn::LicenseClass licenseClass = Qn::LicenseClass(i);
+            if (licenseClass != Qn::LC_Professional && totalLicense(licenseClass) == 0)
+                continue;
+            if (!licenseText.isEmpty())
+                licenseText += lit("\n");
+            licenseText += getWillUsageText(licenseClass);
+        } 
+    }
+    return licenseText;
+}
 
 QString QnLicenseUsageHelper::getRequiredLicenseMsg() const
 {
@@ -143,7 +199,7 @@ QString QnLicenseUsageHelper::getRequiredLicenseMsg() const
     else {
         for (int i = 0; i < Qn::LC_Count; ++i) {
             if (m_proposedLicenses[i] > 0)
-                msg += QObject::tr("%n more %2 will be used. ", "", m_proposedLicenses[Qn::LC_Digital]).arg(longClassName((Qn::LicenseClass)i));;
+                msg += QObject::tr("%n more %2 will be used. ", "", m_proposedLicenses[Qn::LC_Professional]).arg(longClassName((Qn::LicenseClass)i));;
         }
     }
     return msg;

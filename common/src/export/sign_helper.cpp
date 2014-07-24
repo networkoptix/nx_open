@@ -70,7 +70,7 @@ QnSignHelper::QnSignHelper():
     m_licensedToStr = tr("FREE license");
     foreach (QnLicensePtr license, list)
     {
-        if (license->type() != QnLicense::FreeLicense)
+        if (license->type() != Qn::LC_Free)
             m_licensedToStr = license->name();
     }
 }

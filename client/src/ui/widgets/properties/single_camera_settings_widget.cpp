@@ -1018,23 +1018,10 @@ void QnSingleCameraSettingsWidget::updateLicenseText() {
     if (!helper.isValid())
         setWarningStyle(&palette);
 
-    { // digital licenses
-        ui->digitalLicensesLabel->setText(helper.getUsageText(Qn::LC_Digital));
-        ui->digitalLicensesLabel->setPalette(palette);
-        ui->digitalLicensesLabel->setVisible(helper.totalLicense(Qn::LC_Digital) > 0);
-    }
-
-    { // analog licenses
-        ui->analogLicensesLabel->setText(helper.getUsageText(Qn::LC_Analog));
-        ui->analogLicensesLabel->setPalette(palette);
-        ui->analogLicensesLabel->setVisible(helper.totalLicense(Qn::LC_Analog) > 0);
-    }
-
-    { // edge licenses
-        ui->edgeLicensesLabel->setText(helper.getUsageText(Qn::LC_Edge));
-        ui->edgeLicensesLabel->setPalette(palette);
-        ui->edgeLicensesLabel->setVisible(helper.totalLicense(Qn::LC_Edge) > 0);
-    }
+    QString licenseText = helper.getUsageText();
+    ui->licensesLabel->setText(licenseText);
+    ui->licensesLabel->setPalette(palette);
+    ui->licensesLabel->setVisible(!licenseText.isEmpty());
 
     if (ui->analogViewCheckBox->checkState() != Qt::Checked) {
         ui->requiredLicensesLabel->setVisible(false);

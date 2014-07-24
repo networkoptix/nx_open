@@ -224,20 +224,21 @@ bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
     bool classOK = true;
     bool isEdgeBox = !box.isEmpty(); //box == lit("isd") || box == lit("isd_s2");
 
-    if (isEdgeBox)
-        classOK = licenseClass() == Qn::LC_Edge || !m_expiration.isEmpty();
-	else		
-		classOK = licenseClass() != Qn::LC_Edge;
+    if (isEdgeBox) {
+        Qn::LicenseClass licenseType = type();
+        classOK = (licenseType == Qn::LC_Edge || licenseType == Qn::LC_Free || licenseType == Qn::LC_Trial);
+    }
+
     if (errCode)
         *errCode = classOK ? NoError : InvalidType;
     if (!classOK)
         return false;
 
     // check for single license for ARM device
-    if (isEdgeBox) {
+    if (isEdgeBox && type() == Qn::LC_Edge) {
         foreach(QnLicensePtr license, qnLicensePool->getLicenses()) 
         {
-            if (license->hardwareId() == hardwareId() && license->key() < key()) {
+            if (license->hardwareId() == hardwareId() && license->type() == type() && license->key() < key()) {
                 if (errCode)
                     *errCode = TooManyLicensesPerDevice;
                 return false;
@@ -273,16 +274,6 @@ QString QnLicense::errorMessage(ErrorCode errCode)
     return QString();
 }
 
-Qn::LicenseClass QnLicense::licenseClass() const
-{
-    QString tmp = m_class.toLower();
-    if (tmp == lit("edge"))
-        return Qn::LC_Edge;
-    else if (tmp == lit("analog"))
-        return Qn::LC_Analog;
-    else
-        return Qn::LC_Digital;
-}
 
 QByteArray QnLicense::toString() const
 {
@@ -302,28 +293,33 @@ qint64 QnLicense::expirationTime() const {
     return result.toMSecsSinceEpoch();
 }
 
-QnLicense::Type QnLicense::type() const {
+Qn::LicenseClass QnLicense::type() const 
+{
     if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
-        return FreeLicense;
+        return Qn::LC_Free;
 
     if (!expiration().isEmpty())
-        return TrialLicense;
-
-    if (xclass().toLower() == LICENSE_TYPE_ANALOG)
-        return AnalogLicense;
-    if (xclass().toLower() == LICENSE_TYPE_EDGE)
-        return EdgeLicense;
-
-    return ProfessionalLicense;
+        return Qn::LC_Free;
+    
+    if (xclass().toLower() == lit("analog"))
+        return Qn::LC_Analog;
+    else if (xclass().toLower() == lit("edge"))
+        return Qn::LC_Edge;
+    else if (xclass().toLower() == lit("vmax"))
+        return Qn::LC_Edge;
+    else
+        return Qn::LC_Professional;
 }
 
-QString QnLicense::typeName() const {
+QString QnLicense::typeName() const 
+{
     switch(type()) {
-    case FreeLicense:       return tr("Free");
-    case TrialLicense:      return tr("Trial");
-    case AnalogLicense:     return tr("Analog");
-    case ProfessionalLicense:   return tr("Professional");
-    case EdgeLicense:       return tr("Edge");
+    case Qn::LC_Free:       return tr("Free");
+    case Qn::LC_Trial:      return tr("Trial");
+    case Qn::LC_Analog:     return tr("Analog");
+    case Qn::LC_Professional:   return tr("Professional");
+    case Qn::LC_Edge:       return tr("Edge");
+    case Qn::LC_VMAX:       return tr("Vmax");
     default:
         assert(false);
         return QString();
@@ -432,7 +428,7 @@ int QnLicenseListHelper::totalLicenseByClass(Qn::LicenseClass licenseClass) cons
 
     foreach (QnLicensePtr license, m_licenseDict.values()) 
     {
-        if (license->licenseClass() == licenseClass && license->isValid())
+        if (license->type() == licenseClass && license->isValid())
             result += license->cameraCount();
     }
     return result;

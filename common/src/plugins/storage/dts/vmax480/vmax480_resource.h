@@ -46,6 +46,7 @@ public:
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() override;
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() override;
     QnTimePeriodList getChunks();
+    virtual Qn::LicenseClass licenseClass() const override;
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 

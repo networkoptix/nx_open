@@ -498,11 +498,16 @@ public:
     const char* serializationFormatToHttpContentType(SerializationFormat format);
     SerializationFormat serializationFormatFromHttpContentType(const QByteArray& httpContentType);
 
-    enum LicenseClass {
+    enum LicenseClass 
+    {
+        LC_Free,
+        LC_Trial,
         LC_Analog,
-        LC_Digital,
+        LC_Professional,
         LC_Edge,
-        LC_Count
+        LC_VMAX,
+        LC_Count,
+        LC_Invalid
     };
 
     /**

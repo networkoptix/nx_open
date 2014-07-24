@@ -21,23 +21,21 @@
 #undef verify
 #endif
 
-const QString LICENSE_TYPE_PROFESSIONAL = lit("digital");
-const QString LICENSE_TYPE_ANALOG = lit("analog"); // TODO: #Elric #EC2 TOTALLY EVIL!!!!!!!!!
-const QString LICENSE_TYPE_EDGE = lit("edge");
-
 class QnLicense {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
+    /*
     enum Type {
         FreeLicense,
         TrialLicense,
         AnalogLicense,
         ProfessionalLicense,
         EdgeLicense,
+        vMaxLicense,
         TypeCount,
         Invalid
     };
-
+    */
     enum ErrorCode {
         NoError,
         InvalidSignature,
@@ -60,11 +58,6 @@ public:
 
     static QString errorMessage(ErrorCode errCode);
 
-    /**
-     * @returns                         Whether this license is for analog cameras.
-     */
-    Qn::LicenseClass licenseClass() const;
-
     const QString &name() const;
     const QByteArray &key() const;
     qint32 cameraCount() const;
@@ -85,7 +78,7 @@ public:
      *                                  or -1 if this license never expires.
      */
     qint64 expirationTime() const;
-    Type type() const;
+    Qn::LicenseClass type() const;
     QString typeName() const;
 
     static QnLicensePtr readFromStream(QTextStream &stream);

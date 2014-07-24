@@ -269,7 +269,7 @@ Qn::LicenseClass QnSecurityCamResource::licenseClass() const
     else if (isEdge())
         return Qn::LC_Edge;
     else
-        return Qn::LC_Digital;
+        return Qn::LC_Professional;
 }
 
 

@@ -91,17 +91,7 @@ namespace {
                 setWarningStyle(&palette);
             m_licensesLabel->setPalette(palette);
 
-            QString usageText = helper.getWillUsageText(Qn::LC_Digital);
-
-            if (helper.totalLicense(Qn::LC_Analog) > 0) {
-                usageText += L'\n';
-                usageText += helper.getWillUsageText(Qn::LC_Analog);
-            }
-
-            if (helper.totalLicense(Qn::LC_Edge) > 0) {
-                usageText += L'\n';
-                usageText += helper.getWillUsageText(Qn::LC_Edge);
-            }
+            QString usageText = helper.getWillUsageText();
 
             m_licensesLabel->setText(usageText);
 
@@ -705,25 +695,10 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
     QPalette palette = this->palette();
     if (!helper.isValid())
         setWarningStyle(&palette);
-
-     { // digital licenses
-        ui->digitalLicensesLabel->setText(helper.getUsageText(Qn::LC_Digital));
-        ui->digitalLicensesLabel->setPalette(palette);
-        ui->digitalLicensesLabel->setVisible(helper.totalLicense(Qn::LC_Digital) > 0);
-     }
-
-    { // analog licenses
-        ui->analogLicensesLabel->setText(helper.getUsageText(Qn::LC_Analog));
-        ui->analogLicensesLabel->setPalette(palette);
-        ui->analogLicensesLabel->setVisible(helper.totalLicense(Qn::LC_Analog) > 0);
-    }
-
-    { // edge licenses
-        ui->edgeLicensesLabel->setText(helper.getUsageText(Qn::LC_Edge));
-        ui->edgeLicensesLabel->setPalette(palette);
-        ui->edgeLicensesLabel->setVisible(helper.totalLicense(Qn::LC_Edge) > 0);
-    }
-    
+    QString licenseText = helper.getUsageText();
+    ui->licensesLabel->setText(licenseText);
+    ui->licensesLabel->setPalette(palette);
+    ui->licensesLabel->setVisible(!licenseText.isEmpty());
 
     if (ui->enableRecordingCheckBox->checkState() != Qt::Checked) {
         ui->requiredLicensesLabel->setVisible(false);

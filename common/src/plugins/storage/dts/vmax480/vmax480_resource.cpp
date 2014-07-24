@@ -264,5 +264,11 @@ QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(qint64 startTimeMs, qint
     return m_chunks.intersected(period);
 }
 
+Qn::LicenseClass QnPlVmax480Resource::licenseClass() const
+{
+    return Qn::LC_VMAX;
+}
+
+
 #endif // #ifdef ENABLE_VMAX
 
