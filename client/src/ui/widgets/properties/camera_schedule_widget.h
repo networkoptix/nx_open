@@ -118,7 +118,6 @@ private:
 
     void connectToGridWidget();
     void disconnectFromGridWidget();
-    void updateLicensesLabelTextInternal(QLabel* label, Qn::LicenseClass licenseClass);
 private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)
 

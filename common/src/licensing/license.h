@@ -24,26 +24,15 @@
 class QnLicense {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
-    /*
-    enum Type {
-        FreeLicense,
-        TrialLicense,
-        AnalogLicense,
-        ProfessionalLicense,
-        EdgeLicense,
-        vMaxLicense,
-        TypeCount,
-        Invalid
-    };
-    */
+
     enum ErrorCode {
         NoError,
-        InvalidSignature,
-        InvalidHardwareID,
-        InvalidBrand,
-        Expired,
-        InvalidType,
-        TooManyLicensesPerDevice
+        InvalidSignature,           /**< License digital signature is not match */
+        InvalidHardwareID,          /**< Invalid hardware ID */
+        InvalidBrand,               /**< License belong to other customization */
+        Expired,                    /**< Expired */
+        InvalidType,                /**< Such license type isn't allowed for that device. */
+        TooManyLicensesPerDevice    /**< Too many licenses of this type per device */
     };
 
     QnLicense();
@@ -78,8 +67,10 @@ public:
      *                                  or -1 if this license never expires.
      */
     qint64 expirationTime() const;
-    Qn::LicenseClass type() const;
+    Qn::LicenseType type() const;
     QString typeName() const;
+    QString longTypeName() const;
+    static QString longTypeName(Qn::LicenseType licenseType);
 
     static QnLicensePtr readFromStream(QTextStream &stream);
 
@@ -114,6 +105,7 @@ private:
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 
     QUuid findRuntimeDataByLicense() const;
+    bool gotError(ErrorCode* errCode, ErrorCode errorCode) const;
 };
 
 Q_DECLARE_METATYPE(QnLicensePtr)
@@ -128,7 +120,7 @@ public:
     QList<QByteArray> allLicenseKeys() const;
     bool haveLicenseKey(const QByteArray& key) const;
     QnLicensePtr getLicenseByKey(const QByteArray& key) const;
-    int totalLicenseByClass(Qn::LicenseClass licenseClass) const;
+    int totalLicenseByType(Qn::LicenseType licenseType) const;
 
 private:
 

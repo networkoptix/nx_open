@@ -262,7 +262,7 @@ bool QnSecurityCamResource::isEdge() const {
     return mServer && (mServer->getServerFlags() & Qn::SF_Edge);
 }
 
-Qn::LicenseClass QnSecurityCamResource::licenseClass() const 
+Qn::LicenseType QnSecurityCamResource::licenseType() const 
 {
     if (isAnalog())
         return Qn::LC_Analog;

@@ -109,29 +109,29 @@ void QnLicenseManagerWidget::updateLicenses() {
         // TODO: #Elric #TR total mess with numerous forms, and no idea how to fix it in a sane way
 
         QString msg(tr("The software is licensed to: "));
-        for (int i = 0; i < Qn::LC_Count; ++i)
+        for (int i = 0; i < Qn::LC_CountTotal; ++i)
         {
-            Qn::LicenseClass licenseClass = Qn::LicenseClass(i);
-            if (helper.totalLicense(licenseClass) > 0)
-                msg += tr("\n%1 %2").arg(helper.totalLicense(licenseClass)).arg(helper.longClassName(licenseClass));
+            Qn::LicenseType licenseType = Qn::LicenseType(i);
+            if (helper.totalLicense(licenseType) > 0)
+                msg += tr("\n%1 %2").arg(helper.totalLicense(licenseType)).arg(QnLicense::longTypeName(licenseType));
         }
 
         if (!helper.isValid()) 
         {
             useRedLabel = true;
-            for (int i = 0; i < Qn::LC_Count; ++i)
+            for (int i = 0; i < Qn::LC_CountTotal; ++i)
             {
-                Qn::LicenseClass licenseClass = Qn::LicenseClass(i);
-                if (helper.usedLicense(licenseClass) > 0)
-                    msg += tr("\nAt least %n %2 are required", "", helper.usedLicense(licenseClass)).arg(helper.longClassName(licenseClass));
+                Qn::LicenseType licenseType = Qn::LicenseType(i);
+                if (helper.usedLicense(licenseType) > 0)
+                    msg += tr("\nAt least %n %2 are required", "", helper.usedLicense(licenseType)).arg(QnLicense::longTypeName(licenseType));
             }
         }
         else {
-            for (int i = 0; i < Qn::LC_Count; ++i)
+            for (int i = 0; i < Qn::LC_CountTotal; ++i)
             {
-                Qn::LicenseClass licenseClass = Qn::LicenseClass(i);
-                if (helper.usedLicense(licenseClass) > 0)
-                    msg += tr("\n%n %2 are currently in use", "", helper.usedLicense(licenseClass)).arg(helper.longClassName(licenseClass));
+                Qn::LicenseType licenseType = Qn::LicenseType(i);
+                if (helper.usedLicense(licenseType) > 0)
+                    msg += tr("\n%n %2 are currently in use", "", helper.usedLicense(licenseType)).arg(QnLicense::longTypeName(licenseType));
             }
         }
         ui->infoLabel->setText(msg);

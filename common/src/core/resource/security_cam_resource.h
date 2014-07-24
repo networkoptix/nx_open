@@ -83,7 +83,7 @@ public:
     bool isEdge() const;
 
     /** Returns edge, analog or digital class */
-    virtual Qn::LicenseClass licenseClass() const;
+    virtual Qn::LicenseType licenseType() const;
 
 
 

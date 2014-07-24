@@ -470,7 +470,7 @@ QStringList QnResourcePool::allTags() const
     return result;
 }
 
-int QnResourcePool::activeCamerasByClass(Qn::LicenseClass licenseClass) const
+int QnResourcePool::activeCamerasByLicenseType(Qn::LicenseType licenseType) const
 {
     int count = 0;
 
@@ -482,7 +482,7 @@ int QnResourcePool::activeCamerasByClass(Qn::LicenseClass licenseClass) const
             QnMediaServerResourcePtr mServer = getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
             if (mServer && mServer->getStatus() != QnResource::Offline)
             {
-                if (camera->licenseClass() == licenseClass)
+                if (camera->licenseType() == licenseType)
                     count++;
             }
         }

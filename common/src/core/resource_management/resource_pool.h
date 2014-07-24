@@ -124,7 +124,7 @@ public:
 
     QStringList allTags() const;
 
-    int activeCamerasByClass(Qn::LicenseClass licenseClass) const;
+    int activeCamerasByLicenseType(Qn::LicenseType licenseType) const;
 
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();

@@ -17,16 +17,14 @@ public:
     bool isValid() const;
 
     QString getRequiredLicenseMsg() const;
-    QString getUsageText(Qn::LicenseClass licenseClass) const;
+    QString getUsageText(Qn::LicenseType licenseType) const;
     QString getUsageText() const;
-    QString getWillUsageText(Qn::LicenseClass licenseClass) const;
+    QString getWillUsageText(Qn::LicenseType licenseType) const;
     QString getWillUsageText() const;
     bool isOverflowForCamera(QnVirtualCameraResourcePtr camera);
 
-    int totalLicense(Qn::LicenseClass licenseClass) const;
-    int usedLicense(Qn::LicenseClass licenseClass) const;
-
-    QString longClassName(Qn::LicenseClass licenseClass) const;
+    int totalLicense(Qn::LicenseType licenseType) const;
+    int usedLicense(Qn::LicenseType licenseType) const;
 
     void update();
 signals:
@@ -41,9 +39,9 @@ private:
 
     QnLicenseListHelper m_licenses;
 
-    int m_usedLicenses[Qn::LC_Count];
-    int m_proposedLicenses[Qn::LC_Count];
-    int m_overflowLicenses[Qn::LC_Count];
+    int m_usedLicenses[Qn::LC_CountTotal];
+    int m_proposedLicenses[Qn::LC_CountTotal];
+    int m_overflowLicenses[Qn::LC_CountTotal];
 
     bool m_isValid;
 };

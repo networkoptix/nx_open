@@ -498,15 +498,18 @@ public:
     const char* serializationFormatToHttpContentType(SerializationFormat format);
     SerializationFormat serializationFormatFromHttpContentType(const QByteArray& httpContentType);
 
-    enum LicenseClass 
+    enum LicenseType 
     {
-        LC_Trial,
+        LC_Trial,          
         LC_Analog,
         LC_Professional,
         LC_Edge,
         LC_VMAX,
-        LC_Count,
-        LC_Invalid
+        LC_CountCamLecense, // end of camera's license types
+
+        LC_VideoWall,
+
+        LC_CountTotal
     };
 
     /**
