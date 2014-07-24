@@ -75,6 +75,16 @@ namespace ec2
         return AbstractUpdatesManagerPtr();
     }
 
+    AbstractMiscManagerPtr OldEcConnection::getMiscManager()
+    {
+        return AbstractMiscManagerPtr();
+    }
+
+    AbstractDiscoveryManagerPtr OldEcConnection::getDiscoveryManager()
+    {
+        return AbstractDiscoveryManagerPtr();
+    }
+
     int OldEcConnection::setPanicMode(Qn::PanicMode /*value*/, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
