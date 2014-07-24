@@ -41,7 +41,7 @@
         },
         {
             "keys": [
-                "DW|DWC-MPTZ20X", "DW|DWC-MPTZ5X",
+                "DW|DWC-MPTZ20X", "DW|DWC-MPTZ5X", "DW|DWC-MPZ20XFM",
                 "ACTI|KCM8111", "*|FW3471-PS-E",
                 "VISTA|VK2-ENCODER"
             ],
@@ -64,13 +64,28 @@
         },
         {
             "keys": [
+                "VISTA|VK2-1080PTZ",
+                "*|DW-CP04"
+            ],
+            "ptzCapabilities": "ContinuousPtzCapabilities|nativePresetsPtzCapability"
+        },
+        {
+            "keys": [
+                "VISTA|VK2-ENCODER"
+            ],
+            "ptzCapabilities": "ContinuousPtzCapabilities|nativePresetsPtzCapability|ContinuousFocusCapability"
+        },
+        {
+            "keys": [
                 "VISTA|*"
             ],
             "forceArFromPrimaryStream": true
         },
         {
             "keys": [
-                "VISTA|VK2-600PTZ"
+                "VISTA|VK2-600PTZ",
+				"VISTA|VK2-720VZMI",
+                "VISTA|VK2-720VZMX"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
         },
@@ -88,7 +103,8 @@
         },
         {
             "keys": [
-                "DW|DWC-MPTZ20X"
+                "DW|DWC-MPTZ20X", 
+                "DW|DWC-MPZ20XFM|2.1.0.8", "DW|DWC-MPZ20XFM"
             ],
             "ptzMapper": {
                 "fromCamera": {

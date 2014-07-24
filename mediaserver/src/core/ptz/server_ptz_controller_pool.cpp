@@ -54,6 +54,9 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
         if(QnViewportPtzController::extends(controller->getCapabilities()))
             controller.reset(new QnViewportPtzController(controller));
 
+    if(QnWorkaroundPtzController::extends(controller->getCapabilities()))
+        controller.reset(new QnWorkaroundPtzController(controller));
+
         if(QnPresetPtzController::extends(controller->getCapabilities()))
             controller.reset(new QnPresetPtzController(controller));
 

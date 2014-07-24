@@ -103,9 +103,10 @@ static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
 class VideoOptionsLocal
 {
 public:
-    VideoOptionsLocal(): isH264(false), minQ(-1), maxQ(-1), frameRateMax(-1), govMin(-1), govMax(-1) {}
+    VideoOptionsLocal(): isH264(false), minQ(-1), maxQ(-1), frameRateMax(-1), govMin(-1), govMax(-1), usedInProfiles(false) {}
     VideoOptionsLocal(const QString& _id, const VideoOptionsResp& resp, bool isH264Allowed)
     {
+        usedInProfiles = false;
         id = _id;
 
         std::vector<onvifXsd__VideoResolution*>* srcVector = 0;
@@ -148,6 +149,7 @@ public:
     int frameRateMax;
     int govMin;
     int govMax;
+    bool usedInProfiles;
 };
 
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
@@ -185,9 +187,9 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
     if (qAbs(coeff1 - coeff2) > 1e-4) {
 
         if (!s1.isH264 && s2.isH264)
-            coeff2 /= 1.3;
+            coeff2 /= 1.4;
         else if (s1.isH264 && !s2.isH264)
-            coeff1 /= 1.3;
+            coeff1 /= 1.4;
 
         return coeff1 < coeff2; // less coeff is better
     }
@@ -196,6 +198,11 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
     if (!s1.isH264 && s2.isH264)
         return false;
     else if (s1.isH264 && !s2.isH264)
+        return true;
+
+    if (!s1.usedInProfiles && s2.usedInProfiles)
+        return false;
+    else if (s1.usedInProfiles && !s2.usedInProfiles)
         return true;
 
     return s1.id < s2.id; // sort by name
@@ -812,7 +819,8 @@ void QnPlOnvifResource::notificationReceived(
     }
 
     if( std::strstr(notification.oasisWsnB2__Topic->__item, "Trigger/Relay") == nullptr &&
-        std::strstr(notification.oasisWsnB2__Topic->__item, "IO/Port") == nullptr )
+        std::strstr(notification.oasisWsnB2__Topic->__item, "IO/Port") == nullptr &&
+        std::strstr(notification.oasisWsnB2__Topic->__item, "Trigger/DigitalInputs") == nullptr )
     {
         NX_LOG( lit("Received notification with unknown topic: %1. Ignoring...").
             arg(QLatin1String(notification.oasisWsnB2__Topic->__item)), cl_logDEBUG2 );
@@ -842,6 +850,7 @@ void QnPlOnvifResource::notificationReceived(
         ++it )
     {
         if( it->name == QLatin1String("port") || 
+            it->name == QLatin1String("InputToken") || 
             it->name == QLatin1String("RelayToken") || 
             it->name == QLatin1String("RelayInputToken") )
         {
@@ -1515,6 +1524,35 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     return true;
 }
 
+CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList)
+{
+    QAuthenticator auth(getAuth());
+    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
+
+    ProfilesReq request;
+    ProfilesResp response;
+
+    int soapRes = soapWrapper.getProfiles(request, response);
+    if (soapRes == SOAP_OK)
+    {
+        for (auto iter = response.Profiles.begin(); iter != response.Profiles.end(); ++iter) 
+        {
+            Profile* profile = *iter;
+            if (profile->token.empty() || !profile->VideoEncoderConfiguration)
+                continue;
+            QString vEncoderID = QString::fromStdString(profile->VideoEncoderConfiguration->token);
+            for (int i = 0; i < optionsList.size(); ++i) {
+                if (optionsList[i].id == vEncoderID)
+                    optionsList[i].usedInProfiles = true;
+            }
+        }
+        return CameraDiagnostics::NoErrorResult();
+    }
+    else {
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getProfiles"), soapWrapper.getLastError());
+    }
+}
+
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
     VideoConfigsReq confRequest;
@@ -1586,14 +1624,17 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
             return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurationOptions"), soapWrapper.getLastError());
     }
 
-    qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
-
     if (optionsList.isEmpty())
     {
         qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: all video options are empty. (URL: "
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() << ").";
         return CameraDiagnostics::RequestFailedResult(QLatin1String("fetchAndSetVideoEncoderOptions"), QLatin1String("no video options"));
     }
+
+    CameraDiagnostics::Result result = updateVEncoderUsage(optionsList);
+    if (!result)
+        return result;
+    qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
 
     /*
     if (optionsList.size() <= m_channelNumer)

@@ -12,6 +12,34 @@
 
 #include "soap_wrapper.h"
 
+static QByteArray ENCODE_PREFIX("BASE64_");
+
+static std::string toLatinStdString(const QString& value)
+{
+    std::string value1 = value.toStdString();
+    QByteArray latinString = value.toLatin1();
+    std::string value2(latinString.constData(), latinString.length());
+    if (value1 == value2)
+        return value1;
+    else {
+        QByteArray result = ENCODE_PREFIX.append(value.toUtf8().toBase64());
+        return std::string(result.constData(), result.length());
+    }
+}
+
+static QString fromLatinStdString(const std::string& value)
+{
+    QByteArray data(value.c_str());
+    if (data.startsWith(ENCODE_PREFIX)) {
+        data = QByteArray::fromBase64(data.mid(ENCODE_PREFIX.length()));
+        return QString::fromUtf8(data);
+    }
+    else {
+        return QString::fromStdString(value);
+    }
+}
+
+
 
 // -------------------------------------------------------------------------- //
 // QnOnvifPtzController
@@ -19,7 +47,8 @@
 QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource): 
     base_type(resource),
     m_resource(resource),
-    m_capabilities(0)
+    m_capabilities(0),
+    m_ptzPresetsReady(false)
 {
     m_limits.minPan = -1.0;
     m_limits.maxPan = 1.0;
@@ -38,6 +67,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     m_stopBroken = qnCommon->dataPool()->data(resource, true).value<bool>(lit("onvifPtzStopBroken"), false);
 
     initContinuousMove();
+
     //initContinuousFocus(); // Disabled for now.
 
     // TODO: #PTZ #Elric actually implement flip!
@@ -61,6 +91,8 @@ Qn::PtzCapabilities QnOnvifPtzController::initContinuousMove() {
         return Qn::NoPtzCapabilities;
     if(response.PTZConfiguration.empty())
         return Qn::NoPtzCapabilities;
+
+	// TODO: #PTZ #Elric we can init caps by examining spaces in response!
 
     _onvifPtz__GetNode nodeRequest;
     _onvifPtz__GetNodeResponse nodeResponse;
@@ -97,6 +129,37 @@ Qn::PtzCapabilities QnOnvifPtzController::initContinuousMove() {
         }
     }
     return result;
+}
+
+bool QnOnvifPtzController::readBuiltinPresets()
+{
+    if (m_ptzPresetsReady)
+        return true;
+    
+    QString ptzUrl = m_resource->getPtzUrl();
+    if(ptzUrl.isEmpty())
+        return false;
+
+    QAuthenticator auth = m_resource->getAuth();
+    PtzSoapWrapper ptz(ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+
+    GetPresetsReq request;
+    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    GetPresetsResp response;
+    if (ptz.getPresets(request, response) != SOAP_OK)
+        return false;
+
+    m_builtinPresets.clear();
+    foreach(onvifXsd__PTZPreset* preset, response.Preset) {
+        if (preset) {
+            QString id = QString::fromStdString(*preset->token);
+            QString name = fromLatinStdString(*preset->Name);
+            m_builtinPresets.insert(id, name);
+        }
+    }
+    
+    m_ptzPresetsReady = true;
+    return true;
 }
 
 Qn::PtzCapabilities QnOnvifPtzController::initContinuousFocus() {
@@ -287,6 +350,106 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
         return false;
     }
 
+    return true;
+}
+
+QString QnOnvifPtzController::getPresetToken(const QString &presetId)
+{
+    QString internalId = m_extIdToIntId.value(presetId);
+    if (!internalId.isEmpty())
+        return internalId;
+    else
+        return presetId;
+}
+
+QString QnOnvifPtzController::getPresetName(const QString &presetId)
+{
+    QString internalId = m_extIdToIntId.value(presetId);
+    if (internalId.isEmpty())
+        internalId = presetId;
+    return m_builtinPresets.value(internalId);
+}
+
+bool QnOnvifPtzController::removePreset(const QString &presetId)
+{
+    QString ptzUrl = m_resource->getPtzUrl();
+    if(ptzUrl.isEmpty())
+        return false;
+
+    QAuthenticator auth(m_resource->getAuth());
+    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+
+    RemovePresetReq request;
+    RemovePresetResp response;
+    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.PresetToken = getPresetToken(presetId).toStdString();
+    if (ptz.removePreset(request, response) != SOAP_OK) {
+        qnWarning("Execution of PTZ remove preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        return false;
+    }
+
+    return true;
+}
+
+bool QnOnvifPtzController::getPresets(QnPtzPresetList *presets)
+{
+    if (!readBuiltinPresets())
+        return false;
+    for (auto itr = m_builtinPresets.begin(); itr != m_builtinPresets.end(); ++itr)
+        presets->push_back(QnPtzPreset(itr.key(), itr.value()));
+    return true;
+}
+
+bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed)
+{
+    QString ptzUrl = m_resource->getPtzUrl();
+    if(ptzUrl.isEmpty())
+        return false;
+
+    QAuthenticator auth(m_resource->getAuth());
+    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+
+    GotoPresetReq request;
+    GotoPresetResp response;
+    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    request.PresetToken = getPresetToken(presetId).toStdString();
+
+    if (ptz.gotoPreset(request, response) != SOAP_OK) {
+        qnWarning("Execution of PTZ goto preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        return false;
+    }
+
+    return true;
+}
+
+bool QnOnvifPtzController::updatePreset(const QnPtzPreset &preset)
+{
+    return createPreset(preset);
+}
+
+bool QnOnvifPtzController::createPreset(const QnPtzPreset &preset)
+{
+    QString ptzUrl = m_resource->getPtzUrl();
+    if(ptzUrl.isEmpty())
+        return false;
+
+    QAuthenticator auth(m_resource->getAuth());
+    PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
+
+    SetPresetReq request;
+    SetPresetResp response;
+    request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
+    std::string stdPresetName = toLatinStdString(preset.name);
+    request.PresetName = &stdPresetName;
+
+    if (ptz.setPreset(request, response) != SOAP_OK) {
+        qnWarning("Execution of PTZ create preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
+        return false;
+    }
+
+    QString token = QString::fromStdString(response.PresetToken);
+    m_extIdToIntId.insert(preset.id, token);
+    m_builtinPresets.insert(token, preset.name);
     return true;
 }
 

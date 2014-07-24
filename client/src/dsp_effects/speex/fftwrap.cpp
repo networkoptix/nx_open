@@ -84,14 +84,14 @@ static void renorm_range(spx_word16_t *in, spx_word16_t *out, int shift, int len
 void *spx_fft_init(int size)
 {
    struct drft_lookup *table;
-   table = av_malloc(sizeof(struct drft_lookup));
+   table = (drft_lookup*) av_malloc(sizeof(struct drft_lookup));
    spx_drft_init((struct drft_lookup *)table, size);
    return (void*)table;
 }
 
 void spx_fft_destroy(void *table)
 {
-   spx_drft_clear(table);
+   spx_drft_clear((drft_lookup*) table);
    av_free(table);
 }
 
