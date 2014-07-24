@@ -286,7 +286,7 @@ private:
     QRect getVideoSourceMaxSize(const QString& configToken);
 
     bool isH264Allowed() const; // block H264 if need for compatble with some onvif devices
-
+    CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
 protected:
     std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     QList<QSize> m_resolutionList; //Sorted desc
