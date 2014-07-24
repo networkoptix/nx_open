@@ -108,7 +108,6 @@
 #include <utils/app_server_image_cache.h>
 
 #include <utils/applauncher_utils.h>
-#include <utils/license_usage_helper.h>
 #include <utils/local_file_cache.h>
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -203,9 +202,6 @@ public:
             m_dialog->setGeometry(m_oldGeometry);
     }
 
-    bool newlyCreated() const {
-        return m_newlyCreated;
-    }
 private:
     bool m_newlyCreated;
     QRect m_oldGeometry;
@@ -219,8 +215,6 @@ private:
 QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_selectionUpdatePending(false),
-    m_selectionScope(Qn::SceneScope),
     m_delayedDropGuard(false),
     m_tourTimer(new QTimer())
 {
@@ -228,7 +222,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
-    connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
     
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
@@ -282,7 +275,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
     connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));
     connect(action(Qn::OpenInCameraSettingsDialogAction),       SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
-    connect(action(Qn::SelectionChangeAction),                  SIGNAL(triggered()),    this,   SLOT(at_selectionChangeAction_triggered()));
+    
     connect(action(Qn::ServerAddCameraManuallyAction),          SIGNAL(triggered()),    this,   SLOT(at_serverAddCameraManuallyAction_triggered()));
     connect(action(Qn::ServerSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
     connect(action(Qn::PingAction),                             SIGNAL(triggered()),    this,   SLOT(at_pingAction_triggered()));
@@ -492,115 +485,6 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
 #endif
 }
 
-void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) {
-    if(!cameraSettingsDialog())
-        return;
-
-    bool hasDbChanges = cameraSettingsDialog()->widget()->hasDbChanges();
-    bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
-
-    if (checkControls && cameraSettingsDialog()->widget()->hasScheduleControlsChanges()){
-        QString message = tr("Recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule.");
-        int button = QMessageBox::warning(cameraSettingsDialog(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
-        if (button == QMessageBox::Retry) {
-            cameraSettingsDialog()->ignoreAcceptOnce();
-            return;
-        } else {
-            cameraSettingsDialog()->widget()->clearScheduleControlsChanges();
-        }
-    } else if (checkControls && cameraSettingsDialog()->widget()->hasMotionControlsChanges()){
-        QString message = tr("Actual motion sensitivity was not changed. To change motion sensitivity draw rectangles on the image.");
-        int button = QMessageBox::warning(cameraSettingsDialog(), tr("Changes are not applied"), message, QMessageBox::Retry, QMessageBox::Ignore);
-        if (button == QMessageBox::Retry){
-            cameraSettingsDialog()->ignoreAcceptOnce();
-            return;
-        } else {
-            cameraSettingsDialog()->widget()->clearMotionControlsChanges();
-        }
-    }
-
-    if (!hasDbChanges && !hasCameraChanges && !cameraSettingsDialog()->widget()->hasAnyCameraChanges()) {
-        return;
-    }
-
-    QnVirtualCameraResourceList cameras = cameraSettingsDialog()->widget()->cameras();
-    if(cameras.empty())
-        return;
-
-    /* Dialog will be shown inside */
-    if (!cameraSettingsDialog()->widget()->isValidMotionRegion())
-        return;
-
-    //checking if showing Licenses limit exceeded is appropriate
-    if( cameraSettingsDialog()->widget()->licensedParametersModified() )
-    {
-        QnLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
-        if (!helper.isValid())
-        {
-            QString message = tr("Licenses limit exceeded. The changes will be saved, but will not take effect.");
-            QMessageBox::warning(cameraSettingsDialog(), tr("Could not apply changes"), message);
-            cameraSettingsDialog()->widget()->setScheduleEnabled(false);
-        }
-    }
-
-    /* Submit and save it. */
-    cameraSettingsDialog()->widget()->submitToResources();
-
-    if (hasDbChanges) {
-        connection2()->getCameraManager()->save( cameras, this, 
-            [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
-                at_resources_saved( reqID, errorCode, cameras );
-            } );
-    }
-
-    if (hasCameraChanges) {
-        saveAdvancedCameraSettingsAsync(cameras);
-    }
-}
-
-void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras)
-{
-    if (cameraSettingsDialog()->widget()->mode() != QnCameraSettingsWidget::SingleMode || cameras.size() != 1)
-    {
-        //Advanced camera settings must be available only for single mode
-        Q_ASSERT(false);
-    }
-
-    QnVirtualCameraResourcePtr cameraPtr = cameras.front();
-    QnMediaServerConnectionPtr serverConnectionPtr = cameraSettingsDialog()->widget()->getServerConnection();
-    if (serverConnectionPtr.isNull())
-    {
-        QString error = lit("Connection refused"); // #TR #Elric
-
-        QString failedParams;
-        QList< QPair< QString, QVariant> >::ConstIterator it =
-            cameraSettingsDialog()->widget()->getModifiedAdvancedParams().begin();
-        for (; it != cameraSettingsDialog()->widget()->getModifiedAdvancedParams().end(); ++it)
-        {
-            QString formattedParam(it->first.right(it->first.length() - 2));
-            failedParams += lit("\n"); // #TR #Elric
-            failedParams += formattedParam.replace(lit("%%"), lit("->")); // #TR? #Elric
-        }
-
-        if (!failedParams.isEmpty()) {
-            QMessageBox::warning(
-                mainWindow(),
-                tr("Could not save parameters"),
-                tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams)
-            );
-
-            cameraSettingsDialog()->widget()->updateFromResources();
-        }
-
-        return;
-    }
-
-    // TODO: #Elric method called even if nothing has changed
-    // TODO: #Elric result slot at_camera_settings_saved() is not called
-    serverConnectionPtr->setParamsAsync(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
-        this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
-}
-
 void QnWorkbenchActionHandler::rotateItems(int degrees){
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if(!widgets.empty()) {
@@ -635,34 +519,6 @@ QnCameraAdditionDialog *QnWorkbenchActionHandler::cameraAdditionDialog() const {
 
 QnSystemAdministrationDialog *QnWorkbenchActionHandler::systemAdministrationDialog() const {
     return m_systemAdministrationDialog.data();
-}
-
-void QnWorkbenchActionHandler::updateCameraSettingsEditibility() {
-    if(!cameraSettingsDialog())
-        return;
-
-    Qn::Permissions permissions = accessController()->permissions(cameraSettingsDialog()->widget()->cameras());
-    cameraSettingsDialog()->widget()->setReadOnly(!(permissions & Qn::WritePermission));
-}
-
-void QnWorkbenchActionHandler::updateCameraSettingsFromSelection() {
-    if(!cameraSettingsDialog() || cameraSettingsDialog()->isHidden() || !m_selectionUpdatePending)
-        return;
-
-    m_selectionUpdatePending = false;
-
-    QnActionTargetProvider *provider = menu()->targetProvider();
-    if(!provider)
-        return;
-
-    Qn::ActionScope scope = provider->currentScope();
-    if(scope != Qn::SceneScope && scope != Qn::TreeScope) {
-        scope = m_selectionScope;
-    } else {
-        m_selectionScope = scope;
-    }
-
-    menu()->trigger(Qn::OpenInCameraSettingsDialogAction, provider->currentParameters(scope));
 }
 
 void QnWorkbenchActionHandler::submitDelayedDrops() {
@@ -1587,34 +1443,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
+    QnVirtualCameraResourceList cameras = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
 
     QnNonModalDialogConstructor<QnCameraSettingsDialog> dialogConstructor(m_cameraSettingsDialog, mainWindow());
-    if (dialogConstructor.newlyCreated()) {
-        connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),        this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
-        connect(cameraSettingsDialog(), SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)),  this, SLOT(at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &)));
-        connect(cameraSettingsDialog(), SIGNAL(rejected()),                                             this, SLOT(at_cameraSettingsDialog_rejected()));
-        connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                               this, SLOT(at_cameraSettingsDialog_advancedSettingChanged()));
-        connect(cameraSettingsDialog(), SIGNAL(cameraOpenRequested()),                                  this, SLOT(at_cameraSettingsDialog_cameraOpenRequested()));
-    }
 
-     if(cameraSettingsDialog()->widget()->resources() != resources) {
-        if(cameraSettingsDialog()->isVisible() && (
-           cameraSettingsDialog()->widget()->hasDbChanges() || cameraSettingsDialog()->widget()->hasCameraChanges()))
-        {
-            QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-                mainWindow(),
-                QnResourceList(cameraSettingsDialog()->widget()->resources()),
-                tr("Camera(s) not Saved"),
-                tr("Save changes to the following %n camera(s)?", "", cameraSettingsDialog()->widget()->resources().size()),
-                QDialogButtonBox::Yes | QDialogButtonBox::No
-            );
-            if(button == QDialogButtonBox::Yes)
-                saveCameraSettingsFromDialog();
-        }
-    }
-    cameraSettingsDialog()->widget()->setResources(resources);
-    updateCameraSettingsEditibility();
+    cameraSettingsDialog()->setCameras(cameras);
 }
 
 void QnWorkbenchActionHandler::at_pictureSettingsAction_triggered() {
@@ -1658,65 +1491,6 @@ void QnWorkbenchActionHandler::at_cameraDiagnosticsAction_triggered() {
     dialog->setResource(resource);
     dialog->restart();
     dialog->exec();
-}
-
-void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button) {
-    switch(button) {
-    case QDialogButtonBox::Ok:
-    case QDialogButtonBox::Apply:
-        saveCameraSettingsFromDialog(true);
-        break;
-    case QDialogButtonBox::Cancel:
-        cameraSettingsDialog()->widget()->reject();
-        break;
-    default:
-        break;
-    }
-}
-
-void QnWorkbenchActionHandler::at_cameraSettingsDialog_cameraOpenRequested() {
-    QnResourceList resources = cameraSettingsDialog()->widget()->resources();
-    menu()->trigger(Qn::OpenInNewLayoutAction, resources);
-
-    cameraSettingsDialog()->widget()->setResources(resources);
-    m_selectionUpdatePending = false;
-}
-
-void QnWorkbenchActionHandler::at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras){
-    connection2()->getCameraManager()->save( cameras, this,
-        [this, cameras]( int reqID, ec2::ErrorCode errorCode ) {
-            at_resources_saved( reqID, errorCode, cameras ); 
-    } );
-}
-
-void QnWorkbenchActionHandler::at_cameraSettingsDialog_rejected() {
-    cameraSettingsDialog()->widget()->updateFromResources();
-}
-
-void QnWorkbenchActionHandler::at_cameraSettingsDialog_advancedSettingChanged() {
-    if(!cameraSettingsDialog())
-        return;
-
-    bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
-
-    if (!hasCameraChanges) {
-        return;
-    }
-
-    QnVirtualCameraResourceList cameras = cameraSettingsDialog()->widget()->cameras();
-    if(cameras.empty())
-        return;
-
-    cameraSettingsDialog()->widget()->submitToResources();
-    saveAdvancedCameraSettingsAsync(cameras);
-}
-
-void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
-    if(!cameraSettingsDialog() || cameraSettingsDialog()->isHidden() || m_selectionUpdatePending)
-        return;
-
-    m_selectionUpdatePending = true;
-    QTimer::singleShot(50, this, SLOT(updateCameraSettingsFromSelection()));
 }
 
 void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
@@ -2214,34 +1988,6 @@ void QnWorkbenchActionHandler::at_layoutSettingsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_currentLayoutSettingsAction_triggered() {
     openLayoutSettingsDialog(workbench()->currentLayout()->resource());
-}
-
-
-void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult)
-{
-    QString error = httpStatusCode == 0? lit("Possibly, appropriate camera's service is unavailable now"):
-        lit("Mediaserver returned the following error code : ") + httpStatusCode; // #TR #Elric
-
-    QString failedParams;
-    QList<QPair<QString, bool> >::ConstIterator it = operationResult.begin();
-    for (; it != operationResult.end(); ++it)
-    {
-        if (!it->second) {
-            QString formattedParam(lit("Advanced->") + it->first.right(it->first.length() - 2));
-            failedParams += lit("\n");
-            failedParams += formattedParam.replace(lit("%%"), lit("->")); // TODO: #Elric #TR
-        }
-    }
-
-    if (!failedParams.isEmpty()) {
-        QMessageBox::warning(
-            mainWindow(),
-            tr("Could not save parameters"),
-            tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams)
-        );
-
-        cameraSettingsDialog()->widget()->updateFromResources();
-    }
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {

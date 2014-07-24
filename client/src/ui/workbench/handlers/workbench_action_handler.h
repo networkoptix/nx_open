@@ -143,14 +143,6 @@ protected:
 
     void openNewWindow(const QStringList &args);
 
-    /**
-     * Save modified camera settings to resources.
-     * \param checkControls - if set then additional check will occur.
-     * If user modified some of control elements but did not apply changes he will be asked to fix it.
-     * \see Feature #1195
-     */
-    void saveCameraSettingsFromDialog(bool checkControls = false);
-
     void rotateItems(int degrees);
 
     void setResolutionMode(Qn::ResolutionMode resolutionMode);
@@ -170,8 +162,7 @@ protected:
     QnWorkbenchNotificationsHandler* notificationsHandler() const;
 
 protected slots:
-    void updateCameraSettingsFromSelection();
-    void updateCameraSettingsEditibility();
+   
     void submitDelayedDrops();
     void submitInstantDrop();
 
@@ -231,12 +222,6 @@ protected slots:
     void at_cameraDiagnosticsAction_triggered();
     void at_layoutSettingsAction_triggered();
     void at_currentLayoutSettingsAction_triggered();
-    void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
-    void at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras);
-    void at_cameraSettingsDialog_rejected();
-    void at_cameraSettingsDialog_advancedSettingChanged();
-    void at_cameraSettingsDialog_cameraOpenRequested();
-    void at_selectionChangeAction_triggered();
     void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_serverLogsAction_triggered();
@@ -291,8 +276,6 @@ protected slots:
     void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
 
-    void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
-
     void at_whatsThisAction_triggered();
 
     void at_escapeHotkeyAction_triggered();
@@ -311,8 +294,6 @@ protected slots:
     void at_queueAppRestartAction_triggered();
 
 private:
-    void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-
     void notifyAboutUpdate();
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
@@ -333,14 +314,6 @@ private:
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;
     QPointer<QnAdjustVideoDialog> m_adjustVideoDialog;
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
-
-
-    /** Whether the set of selected resources was changed and settings
-     * dialog is waiting to be updated. */
-    bool m_selectionUpdatePending;
-
-    /** Scope of the last selection change. */
-    Qn::ActionScope m_selectionScope;
 
     bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once

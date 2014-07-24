@@ -21,19 +21,10 @@ public:
     QnCameraSettingsDialog(QWidget *parent = NULL);
     virtual ~QnCameraSettingsDialog();
 
-    QnCameraSettingsWidget *widget() const {
-        return m_settingsWidget;
-    }
-
-    void ignoreAcceptOnce() {
-        m_ignoreAccept = true;
-    }
-
     bool tryClose(bool force);
+
+    void setCameras(const QnVirtualCameraResourceList &cameras, bool force = false);
 signals:
-    void buttonClicked(QDialogButtonBox::StandardButton button);
-    void advancedSettingChanged();
-    void scheduleExported(const QnVirtualCameraResourceList &cameras);
     void cameraOpenRequested();
 
 private slots:
@@ -41,18 +32,45 @@ private slots:
     void at_settingsWidget_hasChangesChanged();
     void at_settingsWidget_modeChanged();
     void at_advancedSettingChanged();
+    void at_selectionChangeAction_triggered();
 
     void at_diagnoseButton_clicked();
     void at_rulesButton_clicked();
+    void at_openButton_clicked();
+
+    void at_cameras_saved(ec2::ErrorCode errorCode, const QnVirtualCameraResourceList &cameras);
+    void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
 
     void acceptIfSafe();
+    void updateCamerasFromSelection();
+private:
+    void updateReadOnly();
 
+    /**
+     * Save modified camera settings to server.
+     * \param checkControls - if set then additional check will occur.
+     * If user modified some of control elements but did not apply changes he will be asked to fix it.
+     * \see Feature #1195
+     */
+    void submitToResources(bool checkControls = false);
+    
+    void saveCameras(const QnVirtualCameraResourceList &cameras);
+
+    void saveAdvancedCameraSettingsAsync(const QnVirtualCameraResourceList &cameras);
 private:
     QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
 
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;
     QPushButton *m_applyButton, *m_okButton, *m_openButton, *m_diagnoseButton, *m_rulesButton;
+
+    /** Whether the set of selected resources was changed and settings
+     * dialog is waiting to be updated. */
+    bool m_selectionUpdatePending;
+
+    /** Scope of the last selection change. */
+    Qn::ActionScope m_selectionScope;
+
     bool m_ignoreAccept;
 };
 
