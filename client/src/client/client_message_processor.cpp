@@ -191,6 +191,10 @@ void QnClientMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData data, boo
         return;
     }
 
+    QnMediaServerResourcePtr server = qnResPool->getResourceById(data.peer.id).staticCast<QnMediaServerResource>();
+    if (server)
+        server->setStatus(QnResource::Offline);
+
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
