@@ -83,6 +83,7 @@ void QnLicense::loadLicenseBlock( const QByteArray& licenseBlock )
     QByteArray v1LicenseBlock, v2LicenseBlock;
     parseLicenseBlock( licenseBlock, &v1LicenseBlock, &v2LicenseBlock );
     verify( v1LicenseBlock, v2LicenseBlock );
+    this->m_rawLicense = licenseBlock;
 }
 
 QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
@@ -226,7 +227,7 @@ bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
 
     if (isEdgeBox) {
         Qn::LicenseClass licenseType = type();
-        classOK = (licenseType == Qn::LC_Edge || licenseType == Qn::LC_Free || licenseType == Qn::LC_Trial);
+        classOK = (licenseType == Qn::LC_Edge || licenseType == Qn::LC_Trial);
     }
 
     if (errCode)
@@ -296,10 +297,10 @@ qint64 QnLicense::expirationTime() const {
 Qn::LicenseClass QnLicense::type() const 
 {
     if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
-        return Qn::LC_Free;
+        return Qn::LC_Trial;
 
     if (!expiration().isEmpty())
-        return Qn::LC_Free;
+        return Qn::LC_Trial;
     
     if (xclass().toLower() == lit("analog"))
         return Qn::LC_Analog;
@@ -314,7 +315,7 @@ Qn::LicenseClass QnLicense::type() const
 QString QnLicense::typeName() const 
 {
     switch(type()) {
-    case Qn::LC_Free:       return tr("Free");
+    //case Qn::LC_Free:       return tr("Free");
     case Qn::LC_Trial:      return tr("Trial");
     case Qn::LC_Analog:     return tr("Analog");
     case Qn::LC_Professional:   return tr("Professional");

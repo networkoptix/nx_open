@@ -500,7 +500,6 @@ public:
 
     enum LicenseClass 
     {
-        LC_Free,
         LC_Trial,
         LC_Analog,
         LC_Professional,

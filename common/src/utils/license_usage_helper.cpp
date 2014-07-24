@@ -13,7 +13,7 @@ struct LiceseCompatibility
     Qn::LicenseClass child;
 };
 
-static std::array<LiceseCompatibility, 14> compatibleLicenseClass =
+static std::array<LiceseCompatibility, 10> compatibleLicenseClass =
 {
     LiceseCompatibility(Qn::LC_Edge,    Qn::LC_Professional),
     LiceseCompatibility(Qn::LC_Professional, Qn::LC_Analog),
@@ -23,11 +23,6 @@ static std::array<LiceseCompatibility, 14> compatibleLicenseClass =
     LiceseCompatibility(Qn::LC_Professional, Qn::LC_VMAX),
     LiceseCompatibility(Qn::LC_Edge, Qn::LC_VMAX),
     
-    LiceseCompatibility(Qn::LC_Free,    Qn::LC_Edge),
-    LiceseCompatibility(Qn::LC_Free,    Qn::LC_Professional),
-    LiceseCompatibility(Qn::LC_Free,    Qn::LC_Analog),
-    LiceseCompatibility(Qn::LC_Free,    Qn::LC_VMAX),
-
     LiceseCompatibility(Qn::LC_Trial,    Qn::LC_Edge),
     LiceseCompatibility(Qn::LC_Trial,    Qn::LC_Professional),
     LiceseCompatibility(Qn::LC_Trial,    Qn::LC_Analog),
@@ -120,12 +115,6 @@ void QnLicenseUsageHelper::update()
         m_isValid &= (m_overflowLicenses[i] == 0);
     }
 
-    // move Free licence class to Trial class (there is no diference between that classes except of naming)
-    m_usedLicenses[Qn::LC_Trial] += m_usedLicenses[Qn::LC_Free];
-    m_usedLicenses[Qn::LC_Free] = 0;
-    m_overflowLicenses[Qn::LC_Trial] += m_overflowLicenses[Qn::LC_Free];
-    m_overflowLicenses[Qn::LC_Free] = 0;
-    
     emit updated();
 }
 
@@ -136,8 +125,7 @@ QString QnLicenseUsageHelper::longClassName(Qn::LicenseClass licenseClass) const
         case Qn::LC_Analog: return QObject::tr("analog license(s)");
         case Qn::LC_VMAX: return QObject::tr("VMAX license(s)");
         case Qn::LC_Trial: return QObject::tr("Trial license(s)");
-        case Qn::LC_Free: return QObject::tr("Free license(s)");
-        default: return QObject::tr("license(s)");
+        default: return QObject::tr("Professional license(s)");
     }
 }
 
