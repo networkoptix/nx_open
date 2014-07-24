@@ -428,6 +428,7 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
     for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
         it->state = PeerUpdateInformation::UpdateCanceled;
 
+    removeTemporaryDir();
     setState(Idle);
     return true;
 }
@@ -622,6 +623,9 @@ void QnMediaServerUpdateTool::at_clientUpdateInstalled() {
         return;
 
     futureWatcher->deleteLater();
+
+    if (m_state != InstallingClientUpdate)
+        return;
 
     if (futureWatcher->result() != applauncher::api::ResultType::ok) {
         for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
