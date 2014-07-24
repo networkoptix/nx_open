@@ -5,9 +5,6 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QUrlQuery>
 
-#include <quazip/quazip.h>
-#include <quazip/quazipfile.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
@@ -27,7 +24,6 @@ const QString QN_UPDATES_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/up
 const QString QN_UPDATE_PACKAGE_URL = lit("http://enk.me/bg/dklychkov/exmaple_update/get_update");
 const QString updatesDirName = lit(QN_PRODUCT_NAME_SHORT) + lit("_updates");
 const QString mutexName = lit("auto_update");
-const QString updateInformationFileName = (lit("update.json"));
 
 #ifdef Q_OS_MACX
 const bool defaultDisableClientUpdates = true;

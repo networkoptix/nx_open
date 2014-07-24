@@ -5,15 +5,20 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
 #include <utils/update/update_utils.h>
+#include <utils/applauncher_utils.h>
 
 #include "version.h"
 
 namespace {
     const QString buildInformationSuffix = lit("update");
+    const QString updateInformationFileName = (lit("update.json"));
 
     QnSoftwareVersion minimalVersionForUpdatePackage(const QString &fileName) {
         QuaZipFile infoFile(fileName, updateInformationFileName);
@@ -106,10 +111,14 @@ bool QnCheckForUpdatesPeerTask::needUpdate(const QnSoftwareVersion &version, con
 
 void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
     bool needUpdate = false;
-    foreach (const QnMediaServerResourcePtr &server, actualTargets()) {
+    foreach (const QnId &peerId, peers()) {
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>();
+        if (!server)
+            continue;
+
         QnUpdateFileInformationPtr updateFileInformation = m_updateFiles[server->getSystemInfo()];
         if (!updateFileInformation) {
-            removeTemporaryDir();
+            cleanUp();
             finish(UpdateImpossible);
             return;
         }
@@ -118,7 +127,7 @@ void QnCheckForUpdatesPeerTask::checkUpdateCoverage() {
 
     if (!m_disableClientUpdates && !m_clientRequiresInstaller) {
         if (!m_clientUpdateFile) {
-            removeTemporaryDir();
+            cleanUp();
             finish(UpdateImpossible);
             return;
         }
