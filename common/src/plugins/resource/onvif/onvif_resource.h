@@ -108,8 +108,6 @@ public:
     static QString ONVIF_URL_PARAM_NAME;
     static QString ONVIF_ID_PARAM_NAME;
     static const float QUALITY_COEF;
-    static const char* PROFILE_NAME_PRIMARY;
-    static const char* PROFILE_NAME_SECONDARY;
     static const int MAX_AUDIO_BITRATE;
     static const int MAX_AUDIO_SAMPLERATE;
     static const int ADVANCED_SETTINGS_VALID_TIME; //Time, during which adv settings will not be obtained from camera (in milliseconds)
@@ -288,7 +286,7 @@ private:
     QRect getVideoSourceMaxSize(const QString& configToken);
 
     bool isH264Allowed() const; // block H264 if need for compatble with some onvif devices
-
+    CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
 protected:
     std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     QList<QSize> m_resolutionList; //Sorted desc

@@ -1710,6 +1710,17 @@ bool QnActionManager::triggerIfPossible(Qn::ActionId id, const QnActionParameter
     return true;
 }
 
+QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &parameters) {
+    if (!menu)
+        return NULL;
+
+    m_parametersByMenu[menu] = parameters;
+    menu->installEventFilter(this);
+    connect(menu, &QObject::destroyed, this, &QnActionManager::at_menu_destroyed);
+    return menu;
+}
+
+
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
     return newMenu(Qn::NoAction, scope, parent, parameters, options);
 }
@@ -1723,15 +1734,7 @@ QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, QWid
     } else {
         result = newMenuRecursive(rootAction, scope, parameters, parent, options);
         if (!result)
-            result = new QnMenu(parent);
-    }
-
-    if(result) {
-        m_parametersByMenu[result] = parameters;
-
-        result->installEventFilter(this);
-
-        connect(result, &QObject::destroyed, this, &QnActionManager::at_menu_destroyed);
+            result = integrateMenu(new QnMenu(parent), parameters);
     }
 
     return result;
@@ -1760,8 +1763,13 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
 QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters, QWidget *parentWidget, CreationOptions options) {
     if (parent->childFactory()) {
         QMenu* childMenu = parent->childFactory()->newMenu(parameters, parentWidget);
+        if (childMenu && childMenu->isEmpty()) {
+            delete childMenu;
+            return NULL;
+        }
+
         if (childMenu)
-            return childMenu;
+            return integrateMenu(childMenu, parameters);
     }
 
     QMenu *result = new QnMenu(parentWidget);
@@ -1837,15 +1845,14 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
         return NULL;
     }
 
-    return result;
+    return integrateMenu(result, parameters);
 }
 
 QnActionParameters QnActionManager::currentParameters(QnAction *action) const {
     if(m_shortcutAction == action)
         return m_parametersByMenu.value(NULL);
     
-    if(m_lastClickedMenu == NULL || !m_parametersByMenu.contains(m_lastClickedMenu)) 
-    {
+    if(!m_parametersByMenu.contains(m_lastClickedMenu)) {
         qnWarning("No active menu, no target exists.");
         return QnActionParameters();
     }

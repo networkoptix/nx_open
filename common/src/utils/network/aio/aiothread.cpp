@@ -183,7 +183,8 @@ namespace aio
             std::auto_ptr<AIOEventHandlingDataHolder> handlingData( new AIOEventHandlingDataHolder( eventHandler ) );
             if( !pollSet.add( socket, eventType, handlingData.get() ) )
             {
-                NX_LOG( lit("Failed to add socket to pollset. %1").arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logWARNING );
+                const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+                NX_LOG(lit("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
                 return false;
             }
 
@@ -486,12 +487,11 @@ namespace aio
                 break;
             if( triggeredSocketCount < 0 )
             {
-                NX_LOG( QString::fromLatin1( "Poll failed. %1" ).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
                 const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
                 if( errorCode == SystemError::interrupted )
                     continue;
-                NX_LOG( lit( "Poll failed. %1" ).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-                msleep( ERROR_RESET_TIMEOUT );
+                NX_LOG(QString::fromLatin1("Poll failed. %1").arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+                msleep(ERROR_RESET_TIMEOUT);
                 continue;
             }
             curClock = getSystemTimerVal(); 

@@ -65,7 +65,8 @@ namespace aio
             AbstractSocket* const sock,
             aio::EventType eventType,
             bool waitForRunningHandlerCompletion = true );
-
+        //!Returns \a true, if socket is still listened for state changes
+        bool isSocketBeingWatched(AbstractSocket* sock) const;
         /*!
             \param threadCount minimal thread count. Actual thread poll may exceed this value because PollSet can monitor limited number of sockets.
                 If zero, thread count is choosed automatically. This value is used only in first call 

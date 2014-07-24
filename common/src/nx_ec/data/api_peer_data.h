@@ -10,7 +10,11 @@ namespace ec2
 
     struct ApiPeerData: ApiData 
     {
-        ApiPeerData() {}
+        ApiPeerData()
+        :
+            dataFormat( Qn::UbjsonFormat )
+        {}
+
         ApiPeerData(QnId id, Qn::PeerType peerType, Qn::SerializationFormat dataFormat = Qn::UbjsonFormat):
             id(id),
             peerType(peerType),

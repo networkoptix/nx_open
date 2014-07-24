@@ -57,9 +57,6 @@ void QnTransactionTcpProcessor::run()
         remoteGuid = QUuid::createUuid();
     QnId videowallGuid = query.queryItemValue("videowallGuid");
     bool isVideowall = (!videowallGuid.isNull());
-    QnId instanceGuid = isVideowall
-        ? query.queryItemValue("instanceGuid")
-        : QnId();
 
     Qn::PeerType peerType = isMobileClient  ? Qn::PT_MobileClient
         : isVideowall   ? Qn::PT_VideowallClient

@@ -102,11 +102,13 @@ void QnTransactionTransport::setStateNoLock(State state)
         m_connected = false;
     }
     else if (state == ReadyForStreaming) {
-        m_socket->setRecvTimeout(SOCKET_TIMEOUT);
-        m_socket->setSendTimeout(SOCKET_TIMEOUT);
-        m_socket->setNonBlockingMode(true);
-        m_chunkHeaderLen = 0;
-        aio::AIOService::instance()->watchSocket( m_socket, aio::etRead, this );
+        if (m_socket) {
+            m_socket->setRecvTimeout(SOCKET_TIMEOUT);
+            m_socket->setSendTimeout(SOCKET_TIMEOUT);
+            m_socket->setNonBlockingMode(true);
+            m_chunkHeaderLen = 0;
+            aio::AIOService::instance()->watchSocket( m_socket, aio::etRead, this );
+        }
     }
     if (this->m_state != state) {
         this->m_state = state;
