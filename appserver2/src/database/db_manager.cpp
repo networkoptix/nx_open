@@ -175,8 +175,10 @@ QnId QnDbManager::getType(const QString& typeName)
     query.setForwardOnly(true);
     query.prepare("select guid from vms_resourcetype where name = ?");
     query.bindValue(0, typeName);
-    bool rez = query.exec();
-    Q_ASSERT(rez);
+    if( !query.exec() )
+    {
+        Q_ASSERT(false);
+    }
     if (query.next())
         return QnId::fromRfc4122(query.value("guid").toByteArray());
     return QnId();
@@ -210,13 +212,13 @@ bool QnDbManager::init()
 {
 	if (!m_sdb.open())
 	{
-        qWarning() << "can't initialize Server sqlLite database!";
+        qWarning() << "can't initialize Server sqlLite database "<<m_sdb.databaseName()<<". Error: "<<m_sdb.lastError().text();
         return false;
     }
 
     if (!m_sdbStatic.open())
     {
-        qWarning() << "can't initialize Server static sqlLite database!";
+        qWarning() << "can't initialize Server static sqlLite database "<<m_sdbStatic.databaseName()<<". Error: "<<m_sdbStatic.lastError().text();
         return false;
     }
 
@@ -234,8 +236,10 @@ bool QnDbManager::init()
     QSqlQuery queryAdminUser(m_sdb);
     queryAdminUser.setForwardOnly(true);
     queryAdminUser.prepare("SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'");
-    bool execRez = queryAdminUser.exec();
-    Q_ASSERT(execRez);
+    if( !queryAdminUser.exec() )
+    {
+        Q_ASSERT(false);
+    }
     if (queryAdminUser.next()) {
         m_adminUserID = QnId::fromRfc4122(queryAdminUser.value(0).toByteArray());
         m_adminUserInternalID = queryAdminUser.value(1).toInt();
@@ -245,8 +249,10 @@ bool QnDbManager::init()
     queryServers.prepare("UPDATE vms_resource set status = ? WHERE xtype_guid = ?"); // todo: only mserver without DB?
     queryServers.bindValue(0, QnResource::Offline);
     queryServers.bindValue(1, m_serverTypeId.toRfc4122());
-    bool rez = queryServers.exec();
-    Q_ASSERT(rez);
+    if( !queryServers.exec() )
+    {
+        Q_ASSERT(false);
+    }
 
     // read license overflow time
     QSqlQuery query(m_sdb);
@@ -2195,12 +2201,31 @@ ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return ErrorCode::dbError;
     }
+}
 
+ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license) {
+    QSqlQuery delQuery(m_sdbStatic);
+    delQuery.prepare("DELETE FROM vms_license WHERE license_key = ?");
+    delQuery.addBindValue(license.key);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::dbError;
+    }
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran)
 {
-    return saveLicense(tran.params);
+    if (tran.command == ApiCommand::addLicense)
+        return saveLicense(tran.params);
+    else if (tran.command == ApiCommand::removeLicense)
+        return removeLicense(tran.params);
+    else {
+        Q_ASSERT_X(1, Q_FUNC_INFO, "Unexpected command!");
+        return ErrorCode::notImplemented;
+    }
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseDataList>& tran)

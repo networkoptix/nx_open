@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>399</width>
+    <width>548</width>
     <height>372</height>
    </rect>
   </property>
@@ -36,9 +36,16 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+         <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0">
           <item>
            <widget class="QLabel" name="infoLabel"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="removeButton">
+            <property name="text">
+             <string>Remove</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QPushButton" name="detailsButton">

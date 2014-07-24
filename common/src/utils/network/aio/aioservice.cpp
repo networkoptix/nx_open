@@ -162,6 +162,13 @@ namespace aio
         }
     }
 
+    bool AIOService::isSocketBeingWatched(AbstractSocket* sock) const
+    {
+        QMutexLocker lk(&m_mutex);
+        const auto& it = m_sockets.lower_bound(std::make_pair(sock, aio::etNone));
+        return it != m_sockets.end() && it->first.first == sock;
+    }
+
     Q_GLOBAL_STATIC( AIOService, aioServiceInstance )
     
     AIOService* AIOService::instance( unsigned int /*threadCount*/ )

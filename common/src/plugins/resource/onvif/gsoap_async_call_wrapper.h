@@ -54,6 +54,11 @@ public:
         GSoapAsyncCallWrapperBase* pThis = static_cast<GSoapAsyncCallWrapperBase*>(soap->user);
         return pThis->onGsoapRecvData(data, maxSize);
     }
+
+    static int gsoapFClose( struct soap* /*soap*/, SOAP_SOCKET /*s*/ )
+    {
+        return 0;
+    }
 };
 
 //!Async wrapper for gsoap call
@@ -91,6 +96,8 @@ public:
         pleaseStop();
         join();
 
+        m_syncWrapper->getProxy()->soap->socket = -1;
+        m_syncWrapper->getProxy()->soap->master = -1;
         soap_destroy(m_syncWrapper->getProxy()->soap);
         soap_end(m_syncWrapper->getProxy()->soap);
         delete m_syncWrapper;
@@ -132,7 +139,7 @@ public:
         m_syncWrapper->getProxy()->soap->fsend = gsoapFsend;
         m_syncWrapper->getProxy()->soap->frecv = gsoapFrecv;
         m_syncWrapper->getProxy()->soap->fopen = NULL;
-        m_syncWrapper->getProxy()->soap->fclose = NULL;
+        m_syncWrapper->getProxy()->soap->fclosesocket = /*gsoapFClose*/[](struct soap*, SOAP_SOCKET) -> int { return 0; };
         m_syncWrapper->getProxy()->soap->socket = m_socket->handle();
         m_syncWrapper->getProxy()->soap->master = m_socket->handle();
 
@@ -141,6 +148,8 @@ public:
         m_state = sendingRequest;
         (m_syncWrapper->*m_syncFunc)(m_request, m_response);
         assert(!m_serializedRequest.isEmpty());
+        m_syncWrapper->getProxy()->soap->socket = -1;
+        m_syncWrapper->getProxy()->soap->master = -1;
         soap_destroy(m_syncWrapper->getProxy()->soap);
         soap_end(m_syncWrapper->getProxy()->soap);
         //m_serializedRequest full
@@ -271,6 +280,8 @@ private:
     {
         m_responseDataPos = 0;
         const int resultCode = (m_syncWrapper->*m_syncFunc)(m_request, m_response);
+        m_syncWrapper->getProxy()->soap->socket = -1;
+        m_syncWrapper->getProxy()->soap->master = -1;
         m_state = done;
         m_resultHandler(resultCode);
     }

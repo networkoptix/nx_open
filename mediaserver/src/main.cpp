@@ -651,7 +651,7 @@ void initAppServerConnection(const QSettings &settings)
         QString staticDBPath = settings.value("staticDataDir").toString();
         if (!staticDBPath.isEmpty()) {
             params.addQueryItem("staticdb_path", staticDBPath);
-	}
+	    }
     }
 
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
@@ -722,7 +722,6 @@ void QnMain::stopObjects()
         delete m_moduleFinder;
         m_moduleFinder = 0;
     }
-
 }
 
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
@@ -976,10 +975,10 @@ bool QnMain::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("favicon.ico", new QnFavIconRestHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
+    m_universalTcpListener->enableSSLMode();
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
-    m_universalTcpListener->enableSSLMode();
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
