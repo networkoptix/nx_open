@@ -768,6 +768,19 @@ void QnMain::updateDisabledVendorsIfNeeded()
     }
 }
 
+void QnMain::updateAllowCameraCHangesIfNeed()
+{
+    static const QString DV_PROPERTY = QLatin1String("allowCameraChanges");
+
+    QString allowCameraChanges = MSSettings::roSettings()->value(DV_PROPERTY).toString();
+    if (!allowCameraChanges.isEmpty())
+    {
+        QnGlobalSettings *settings = QnGlobalSettings::instance();
+        settings->setCameraSettingsOptimizationEnabled(allowCameraChanges.toLower() == lit("true") || allowCameraChanges == lit("1"));
+        MSSettings::roSettings()->remove(DV_PROPERTY);
+    }
+}
+
 void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
 {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
@@ -1502,6 +1515,7 @@ void QnMain::run()
     loadResourcesFromECS(messageProcessor.data());
 #ifndef EDGE_SERVER
     updateDisabledVendorsIfNeeded();
+    updateAllowCameraCHangesIfNeed();
     //QSet<QString> disabledVendors = QnGlobalSettings::instance()->disabledVendorsSet();
 #endif
 

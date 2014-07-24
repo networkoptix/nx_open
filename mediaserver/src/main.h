@@ -53,6 +53,7 @@ private slots:
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
 private:
     void updateDisabledVendorsIfNeeded();
+    void updateAllowCameraCHangesIfNeed();
     bool initTcpListener();
     QHostAddress getPublicAddress();
 private:
