@@ -177,7 +177,7 @@ QnId QnDbManager::getType(const QString& typeName)
     query.bindValue(0, typeName);
     if( !query.exec() )
     {
-        Q_ASSERT(rez);
+        Q_ASSERT(false);
     }
     if (query.next())
         return QnId::fromRfc4122(query.value("guid").toByteArray());
