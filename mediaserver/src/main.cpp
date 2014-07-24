@@ -70,6 +70,7 @@
 #include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
 #include <plugins/resource/isd/isd_resource_searcher.h>
 #include <plugins/resource/mserver_resource_searcher.h>
+#include <plugins/resource/mdns/mdns_listener.h>
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 #include <plugins/resource/pulse/pulse_resource_searcher.h>
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
@@ -1367,7 +1368,8 @@ void QnMain::run()
     //IPPH264Decoder::dll.init();
 
     //============================
-    UPNPDeviceSearcher::initGlobalInstance( new UPNPDeviceSearcher() );
+    std::unique_ptr<UPNPDeviceSearcher> upnpDeviceSearcher(new UPNPDeviceSearcher());
+    std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
     serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
@@ -1530,8 +1532,8 @@ void QnMain::run()
     QnPlVmax480ResourceSearcher::initStaticInstance( NULL );
 #endif
 
-    delete UPNPDeviceSearcher::instance();
-    UPNPDeviceSearcher::initGlobalInstance( NULL );
+    mdnsListener.reset();
+    upnpDeviceSearcher.reset();
 
     connectorThread->quit();
     connectorThread->wait();
