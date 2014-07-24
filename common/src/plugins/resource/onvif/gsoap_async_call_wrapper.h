@@ -30,30 +30,6 @@ public:
         \return bytes read
     */
     virtual int onGsoapRecvData( char* data, size_t size ) = 0;
-
-    static int nullGsoapFconnect( struct soap*, const char*, const char*, int )
-    {
-        return SOAP_OK;
-    }
-
-    static int nullGsoapFdisconnect( struct soap* )
-    {
-        return SOAP_OK;
-    }
-
-    //Socket send through UdpSocket
-    static int gsoapFsend( struct soap* soap, const char *s, size_t n )
-    {
-        GSoapAsyncCallWrapperBase* pThis = static_cast<GSoapAsyncCallWrapperBase*>(soap->user);
-        return pThis->onGsoapSendData( s, n );
-    }
-
-    // avoid SOAP select call
-    static size_t gsoapFrecv( struct soap* soap, char* data, size_t maxSize )
-    {
-        GSoapAsyncCallWrapperBase* pThis = static_cast<GSoapAsyncCallWrapperBase*>(soap->user);
-        return pThis->onGsoapRecvData(data, maxSize);
-    }
 };
 
 //!Async wrapper for gsoap call
@@ -91,6 +67,8 @@ public:
         pleaseStop();
         join();
 
+        m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
+        m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
         soap_destroy(m_syncWrapper->getProxy()->soap);
         soap_end(m_syncWrapper->getProxy()->soap);
         delete m_syncWrapper;
@@ -127,12 +105,21 @@ public:
 
         m_socket = QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket());
         m_syncWrapper->getProxy()->soap->user = this;
-        m_syncWrapper->getProxy()->soap->fconnect = nullGsoapFconnect;
-        m_syncWrapper->getProxy()->soap->fdisconnect = nullGsoapFdisconnect;
-        m_syncWrapper->getProxy()->soap->fsend = gsoapFsend;
-        m_syncWrapper->getProxy()->soap->frecv = gsoapFrecv;
+        m_syncWrapper->getProxy()->soap->fconnect = [](struct soap*, const char*, const char*, int) -> int { return SOAP_OK; };
+        m_syncWrapper->getProxy()->soap->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
+        m_syncWrapper->getProxy()->soap->fsend = [](struct soap* soap, const char *s, size_t n) -> int {
+            GSoapAsyncCallWrapperBase* pThis = static_cast<GSoapAsyncCallWrapperBase*>(soap->user);
+            return pThis->onGsoapSendData(s, n);
+        };
+        m_syncWrapper->getProxy()->soap->frecv = [](struct soap* soap, char* data, size_t maxSize) -> size_t {
+            GSoapAsyncCallWrapperBase* pThis = static_cast<GSoapAsyncCallWrapperBase*>(soap->user);
+            return pThis->onGsoapRecvData(data, maxSize);
+        };
         m_syncWrapper->getProxy()->soap->fopen = NULL;
-        m_syncWrapper->getProxy()->soap->fclose = NULL;
+        m_syncWrapper->getProxy()->soap->fdisconnect = [](struct soap*) -> int { return SOAP_OK; };
+        m_syncWrapper->getProxy()->soap->fclose = [](struct soap*) -> int { return SOAP_OK; };
+        m_syncWrapper->getProxy()->soap->fclosesocket = [](struct soap*, SOAP_SOCKET) -> int { return SOAP_OK; };
+        m_syncWrapper->getProxy()->soap->fshutdownsocket = [](struct soap*, SOAP_SOCKET, int) -> int { return SOAP_OK; };
         m_syncWrapper->getProxy()->soap->socket = m_socket->handle();
         m_syncWrapper->getProxy()->soap->master = m_socket->handle();
 
@@ -141,6 +128,8 @@ public:
         m_state = sendingRequest;
         (m_syncWrapper->*m_syncFunc)(m_request, m_response);
         assert(!m_serializedRequest.isEmpty());
+        m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
+        m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
         soap_destroy(m_syncWrapper->getProxy()->soap);
         soap_end(m_syncWrapper->getProxy()->soap);
         //m_serializedRequest full
@@ -271,6 +260,8 @@ private:
     {
         m_responseDataPos = 0;
         const int resultCode = (m_syncWrapper->*m_syncFunc)(m_request, m_response);
+        m_syncWrapper->getProxy()->soap->socket = SOAP_INVALID_SOCKET;
+        m_syncWrapper->getProxy()->soap->master = SOAP_INVALID_SOCKET;
         m_state = done;
         m_resultHandler(resultCode);
     }

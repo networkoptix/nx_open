@@ -97,7 +97,6 @@ public:
     */
     void processDiscoveredDevices( UPNPSearchHandler* handlerToUse = NULL );
 
-    static void initGlobalInstance( UPNPDeviceSearcher* _inst );
     static UPNPDeviceSearcher* instance();
 
 private:
