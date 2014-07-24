@@ -128,6 +128,7 @@ private slots:
     void at_uploadTask_peerFinished(const QnId &peerId);
     void at_installTask_peerFinished(const QnId &peerId);
     void at_restUpdateTask_peerFinished(const QnId &peerId);
+    void at_clientUpdateInstalled();
 
     void at_networkTask_peerProgressChanged(const QnId &peerId, int progress);
 

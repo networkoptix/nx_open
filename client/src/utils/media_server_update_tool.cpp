@@ -4,6 +4,8 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QUrlQuery>
+#include <QtCore/QFutureWatcher>
+#include <QtConcurrent/qtconcurrentrun.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -329,6 +331,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QnSoftwareVersion &version) 
 
     m_checkForUpdatesPeerTask->setPeers(peers);
     m_checkForUpdatesPeerTask->setTargetVersion(version);
+    m_checkForUpdatesPeerTask->setDisableClientUpdates(m_disableClientUpdates);
     m_tasksThread->start();
     QMetaObject::invokeMethod(m_checkForUpdatesPeerTask, "start", Qt::QueuedConnection);
 }
@@ -345,6 +348,7 @@ void QnMediaServerUpdateTool::checkForUpdates(const QString &fileName) {
 
     m_checkForUpdatesPeerTask->setPeers(peers);
     m_checkForUpdatesPeerTask->setUpdateFileName(fileName);
+    m_checkForUpdatesPeerTask->setDisableClientUpdates(m_disableClientUpdates);
     m_tasksThread->start();
     QMetaObject::invokeMethod(m_checkForUpdatesPeerTask, "start", Qt::QueuedConnection);
 }
@@ -512,16 +516,10 @@ void QnMediaServerUpdateTool::installClientUpdate() {
 
     setState(InstallingClientUpdate);
 
-    qApp->processEvents();
-
-    if (applauncher::installZip(m_targetVersion, m_clientUpdateFile->fileName) != applauncher::api::ResultType::ok) {
-        for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
-            setPeerState(it.key(), PeerUpdateInformation::UpdateFailed);
-        finishUpdate(InstallationFailed);
-        return;
-    }
-
-    installIncompatiblePeers();
+    QFuture<applauncher::api::ResultType::Value> future = QtConcurrent::run(&applauncher::installZip, m_targetVersion, m_clientUpdateFile->fileName);
+    QFutureWatcher<applauncher::api::ResultType::Value> *futureWatcher = new QFutureWatcher<applauncher::api::ResultType::Value>(this);
+    futureWatcher->setFuture(future);
+    connect(futureWatcher, &QFutureWatcher<applauncher::api::ResultType::Value>::finished, this, &QnMediaServerUpdateTool::at_clientUpdateInstalled);
 }
 
 void QnMediaServerUpdateTool::installUpdatesToServers() {
@@ -589,6 +587,8 @@ void QnMediaServerUpdateTool::at_checkForUpdatesTask_finished(int errorCode) {
     m_updateFiles = m_checkForUpdatesPeerTask->updateFiles();
     m_localTemporaryDir = m_checkForUpdatesPeerTask->temporaryDir();
     m_targetVersion = m_checkForUpdatesPeerTask->targetVersion();
+    m_clientRequiresInstaller = m_checkForUpdatesPeerTask->isClientRequiresInstaller();
+    m_clientUpdateFile = m_checkForUpdatesPeerTask->clientUpdateFile();
 
     setCheckResult((CheckResult)errorCode); // codes are the same now
 }
@@ -614,6 +614,23 @@ void QnMediaServerUpdateTool::at_downloadTask_finished(int errorCode) {
         m_clientUpdateFile->fileName = resultingFiles[m_clientUpdateFile->url];
 
     installClientUpdate();
+}
+
+void QnMediaServerUpdateTool::at_clientUpdateInstalled() {
+    QFutureWatcher<applauncher::api::ResultType::Value> *futureWatcher = dynamic_cast<QFutureWatcher<applauncher::api::ResultType::Value>*>(sender());
+    if (!futureWatcher)
+        return;
+
+    futureWatcher->deleteLater();
+
+    if (futureWatcher->result() != applauncher::api::ResultType::ok) {
+        for (auto it = m_updateInformationById.begin(); it != m_updateInformationById.end(); ++it)
+            setPeerState(it.key(), PeerUpdateInformation::UpdateFailed);
+        finishUpdate(InstallationFailed);
+        return;
+    }
+
+    installIncompatiblePeers();
 }
 
 void QnMediaServerUpdateTool::at_uploadTask_finished(int errorCode) {

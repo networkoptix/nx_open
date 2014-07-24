@@ -1377,10 +1377,11 @@ void QnWorkbenchActionHandler::notifyAboutUpdate() {
     messageBox.setIconPixmap(QMessageBox::standardIcon(QMessageBox::Question));
     messageBox.setRichText(message);
     messageBox.setCheckBoxText(tr("Don't notify again about this update."));
+    messageBox.setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
     setHelpTopic(&messageBox, Qn::Upgrade_Help);
     int res = messageBox.exec();
 
-    if (res == QMessageBox::Yes) {
+    if (res == QMessageBox::Accepted) {
         at_systemUpdateAction_triggered();
         systemAdministrationDialog()->checkForUpdates();
     } else {
