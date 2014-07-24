@@ -8,7 +8,7 @@ namespace ec2
 {
     struct ApiEmailSettingsData: ApiData
     {
-        ApiEmailSettingsData(): port(0) {}
+        ApiEmailSettingsData(): port(0), connectionType(QnEmail::Unsecure) {}
 
         QString host;
         int port;

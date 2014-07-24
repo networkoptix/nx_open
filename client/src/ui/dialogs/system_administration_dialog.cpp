@@ -3,24 +3,32 @@
 
 #include <QtWidgets/QMessageBox>
 
+#include <ui/widgets/settings/popup_settings_widget.h>
+#include <ui/widgets/settings/license_manager_widget.h>
+#include <ui/widgets/settings/camera_management_widget.h>
+#include <ui/widgets/settings/smtp_settings_widget.h>
+#include <ui/widgets/settings/database_management_widget.h>
+#include <ui/widgets/settings/general_system_administration_widget.h>
 #include <ui/widgets/server_updates_widget.h>
 #include <ui/widgets/routing_management_widget.h>
 
-QnSystemAdministrationDialog::QnSystemAdministrationDialog(QnWorkbenchContext *context, QWidget *parent) :
-    QDialog(parent),
-    QnWorkbenchContextAware(context),
+QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent) :
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnSystemAdministrationDialog)
 {
     ui->setupUi(this);
 
     m_updatesWidget = new QnServerUpdatesWidget(this);
-    ui->tabWidget->addTab(m_updatesWidget, tr("Updates"));
 
-    m_routingManagementWidget = new QnRoutingManagementWidget(this);
-    ui->tabWidget->addTab(m_routingManagementWidget, tr("Routing Management"));
+    addPage(GeneralPage, new QnGeneralSystemAdministrationWidget(this), tr("General"));
+    addPage(LicensesPage, new QnLicenseManagerWidget(this), tr("Licenses"));
+    addPage(SmtpPage, new QnSmtpSettingsWidget(this), tr("Email"));
+    addPage(UpdatesPage, m_updatesWidget, tr("Updates"));
+    addPage(RoutingManagement, new QnRoutingManagementWidget(this), tr("Routing Management"));
+
+    loadData();
 }
-
-QnSystemAdministrationDialog::~QnSystemAdministrationDialog() {}
 
 void QnSystemAdministrationDialog::reject() {
     if (!m_updatesWidget->cancelUpdate()) {
@@ -36,15 +44,6 @@ void QnSystemAdministrationDialog::accept() {
         return;
     }
     base_type::accept();
-}
-
-void QnSystemAdministrationDialog::reset() {
-    m_updatesWidget->reset();
-}
-
-void QnSystemAdministrationDialog::activateTab(int tab) {
-    if (tab >= 0 && tab < ui->tabWidget->count())
-        ui->tabWidget->setCurrentIndex(tab);
 }
 
 void QnSystemAdministrationDialog::checkForUpdates() {

@@ -4,6 +4,7 @@
 #include <QtCore/QDir>
 
 #include "file_storage_resource.h"
+#include "utils/common/log.h"
 #include "utils/common/util.h"
 #include "utils/common/buffered_file.h"
 #include "recorder/file_deletor.h"
@@ -208,11 +209,45 @@ float QnFileStorageResource::getStorageBitrateCoeff() const
     return m_storageBitrateCoeff;
 }
 
+#ifdef _WIN32
 bool QnFileStorageResource::isStorageDirMounted()
 {
-#ifdef _WIN32
     return true;    //common check is enough on mswin
+}
+
 #else
+
+//!Reads mount points (local dirs) from /etc/fstab or /etc/mtab
+static bool readTabFile( const QString& filePath, QStringList* const mountPoints )
+{
+    FILE* tabFile = fopen( filePath.toLocal8Bit().constData(), "r" );
+    if( !tabFile )
+        return false;
+
+    char* line = nullptr;
+    size_t length = 0;
+    while( !feof(tabFile) )
+    {
+        if( getline( &line, &length, tabFile ) == -1 )
+            break;
+
+        if( length == 0 || line[0] == '#' )
+            continue;
+
+        //TODO #ak regex is actually not needed here, removing it will remove memcpy by QString also
+        const QStringList& fields = QString::fromLatin1(line, length).split( QRegExp(QLatin1String("[\\s\\t]+")), QString::SkipEmptyParts );
+        if( fields.size() >= 2 )
+            mountPoints->push_back( fields[1] );
+    }
+
+    free( line );
+    fclose( tabFile );
+
+    return true;
+}
+
+bool QnFileStorageResource::isStorageDirMounted()
+{
     //on unix, checking that storage directory is mounted, if it is to be mounted
     const QString& storagePath = QDir(closeDirPath(getUrl())).canonicalPath();   //following symbolic link
 
@@ -250,25 +285,6 @@ bool QnFileStorageResource::isStorageDirMounted()
     }
 
     return true;
+}
 #endif    // _WIN32
-}
 
-bool QnFileStorageResource::readTabFile( const QString& filePath, QStringList* const mountPoints )
-{
-    QFile tabFile( filePath );
-    if( !tabFile.open(QIODevice::ReadOnly) )
-        return false;
-
-    while( !tabFile.atEnd() )
-    {
-        QString line = QString::fromLatin1(tabFile.readLine().trimmed());
-        if( line.isEmpty() || line.startsWith('#') )
-            continue;
-
-        const QStringList& fields = line.split( QRegExp(QLatin1String("[\\s\\t]+")), QString::SkipEmptyParts );
-        if( fields.size() >= 2 )
-            mountPoints->push_back( closeDirPath( fields[1] ) );
-    }
-
-    return true;
-}

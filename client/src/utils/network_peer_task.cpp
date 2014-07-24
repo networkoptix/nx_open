@@ -16,6 +16,14 @@ QSet<QnId> QnNetworkPeerTask::peers() const {
     return m_peers;
 }
 
+void QnNetworkPeerTask::setPeers(const QSet<QnId> &peers) {
+    m_peers = peers;
+}
+
+void QnNetworkPeerTask::start() {
+    doStart();
+}
+
 void QnNetworkPeerTask::finish(int errorCode, const QSet<QnId> &failedPeers) {
     emit finished(errorCode, failedPeers);
 }

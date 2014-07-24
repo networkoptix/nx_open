@@ -38,6 +38,7 @@
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
+		<finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
         <beta>true</beta>
         <!-- compile.option1. See profile no-webkit -->
         <webkit>true</webkit>
@@ -94,7 +95,8 @@
         <qtlib16>Qml</qtlib16>
         <qtlib17>Positioning</qtlib17>
         <qtlib18>Sensors</qtlib18>
-        <qtlib19/>
+        <!--qtlib19 is for desktop only-->
+	<qtlib19/>
         <qtlib20/>
 
         <!--QT plugins used-->      
@@ -105,7 +107,7 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
-        <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
+        <finalName>${finalName}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -281,6 +283,9 @@
                     <value>!arm</value>
                 </property>
             </activation>
+            <properties>
+		<qtlib19>DBus</qtlib19>
+	    </properties>
             <modules>                       
                 <module>applauncher</module> 
                 <module>client</module>     

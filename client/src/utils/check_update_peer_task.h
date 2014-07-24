@@ -3,39 +3,75 @@
 
 #include <utils/network_peer_task.h>
 #include <utils/common/system_information.h>
-#include <utils/common/software_version.h>
+#include <utils/updates_common.h>
 
 class QNetworkAccessManager;
 
-class QnCheckUpdatePeerTask : public QnNetworkPeerTask {
+class QnCheckForUpdatesPeerTask : public QnNetworkPeerTask {
     Q_OBJECT
 public:
-    enum ErrorCode {
-        NoError = 0,
-        InternetError,
-        CheckError
+    enum CheckResult {
+        UpdateFound = 0,
+        InternetProblem,
+        NoNewerVersion,
+        NoSuchBuild,
+        UpdateImpossible,
+        BadUpdateFile
     };
 
-    explicit QnCheckUpdatePeerTask(QObject *parent = 0);
+    explicit QnCheckForUpdatesPeerTask(QObject *parent = 0);
 
-    void setBuildNumber(int buildNumber);
-    void setUpdateLocationPrefix(const QString &updateLocationPrefix);
+    void setUpdatesUrl(const QUrl &url);
+
+    void setTargetVersion(const QnSoftwareVersion &version);
+    QnSoftwareVersion targetVersion() const;
+
+    void setUpdateFileName(const QString &fileName);
+    QString updateFileName() const;
+
+    void setDisableClientUpdates(bool f);
+    bool isDisableClientUpdates() const;
+
+    bool isClientRequiresInstaller() const;
+
+    QHash<QnSystemInformation, QnUpdateFileInformationPtr> updateFiles() const;
+    QnUpdateFileInformationPtr clientUpdateFile() const;
+    QString temporaryDir() const;
+
+    bool needUpdate(const QnSoftwareVersion &version, const QnSoftwareVersion &updateVersion) const;
 
 protected:
     virtual void doStart() override;
 
+private:
+    void checkUpdateCoverage();
+
+    void checkBuildOnline();
+    void checkOnlineUpdates(const QnSoftwareVersion &version = QnSoftwareVersion());
+    void checkLocalUpdates();
+
+    void cleanUp();
+
 private slots:
-    void at_reply_finished();
+    void at_updateReply_finished();
+    void at_buildReply_finished();
 
 private:
-    int m_buildNumber;
-    QString m_updateLocationPrefix;
-
     QNetworkAccessManager *m_networkAccessManager;
+    QUrl m_updatesUrl;
 
-    QnSoftwareVersion m_version;
-    QHash<QnSystemInformation, QUrl> m_urlBySystemInformation;
-    QHash<QUrl, qint64> m_fileSizeByUrl;
+    QnSoftwareVersion m_targetVersion;
+    QString m_updateFileName;
+    QString m_temporaryUpdateDir;
+
+    QString m_updateLocationPrefix;
+    bool m_targetMustBeNewer;
+    bool m_denyMajorUpdates;
+    bool m_disableClientUpdates;
+
+    QHash<QnSystemInformation, QnUpdateFileInformationPtr> m_updateFiles;
+    QnUpdateFileInformationPtr m_clientUpdateFile;
+    bool m_clientRequiresInstaller;
 };
 
 #endif // CHECK_UPDATE_PEER_TASK_H

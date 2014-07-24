@@ -222,7 +222,7 @@ public:
             return false;
         }
     }
-
+    int pos() const { return m_stream.pos(); }
 private:
     template<class T>
     bool readNumberInternal(QnUbjson::Marker expectedMarker, T *target) {

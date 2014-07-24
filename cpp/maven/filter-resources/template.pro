@@ -82,7 +82,7 @@ OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib 
+LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib -Wl,-rpath-link,${qt.dir}/lib
 LIBS += ${global.libs}
 
 INCLUDEPATH +=  ${qt.dir}/include \
@@ -135,7 +135,7 @@ win* {
 unix: {
   DEFINES += override=
   DEFINES += QN_EXPORT=  
-  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=maybe-uninitialized
+  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Wuninitialized
   arm {
     QMAKE_CXXFLAGS += -std=c++0x 
   } else {
@@ -147,7 +147,7 @@ unix: {
 unix:!mac {
   !arm {
     LIBS += ${linux.oslibs}
-    QMAKE_CXXFLAGS += -msse2
+    QMAKE_CXXFLAGS += -msse4.2
     QMAKE_CXXFLAGS_WARN_ON += -Wno-unused-local-typedefs
   } else {
     LIBS -= -lssl

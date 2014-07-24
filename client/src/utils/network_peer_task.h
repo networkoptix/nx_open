@@ -11,10 +11,12 @@ public:
     explicit QnNetworkPeerTask(QObject *parent = 0);
     ~QnNetworkPeerTask();
 
-    void start(const QSet<QnId> &peers);
-
     QSet<QnId> peers() const;
+    void setPeers(const QSet<QnId> &peers);
 
+public slots:
+    void start();
+    void start(const QSet<QnId> &peers);
     virtual void cancel() {}
 
 signals:

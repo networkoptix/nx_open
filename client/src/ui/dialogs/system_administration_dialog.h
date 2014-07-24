@@ -1,42 +1,38 @@
 #ifndef UPDATE_DIALOG_H
 #define UPDATE_DIALOG_H
 
-#include <QtWidgets/QDialog>
-
+#include <ui/dialogs/generic_tabbed_dialog.h>
 #include <ui/workbench/workbench_context_aware.h>
-
-namespace Ui {
-class QnSystemAdministrationDialog;
-}
+#include <ui_system_administration_dialog.h>
 
 class QnServerUpdatesWidget;
-class QnRoutingManagementWidget;
 
-class QnSystemAdministrationDialog : public QDialog, public QnWorkbenchContextAware {
+class QnSystemAdministrationDialog : public QnGenericTabbedDialog, public QnWorkbenchContextAware {
     Q_OBJECT
-    typedef QDialog base_type;
+    typedef QnGenericTabbedDialog base_type;
 public:
-    enum Tabs {
-        UpdatesTab = 0,
-        RoutingTab
+    enum DialogPage {
+        GeneralPage,
+        LicensesPage,
+        SmtpPage,
+        UpdatesPage,
+        RoutingManagement,
+
+        PageCount
     };
 
-    QnSystemAdministrationDialog(QnWorkbenchContext *context, QWidget *parent = 0);
-    ~QnSystemAdministrationDialog();
+    QnSystemAdministrationDialog(QWidget *parent = 0);
 
-    virtual void reject() override;
     virtual void accept() override;
+    virtual void reject() override;
 
-    void reset();
-
-    void activateTab(int tab);
     void checkForUpdates();
 
 private:
-    QScopedPointer<Ui::QnSystemAdministrationDialog> ui;
+    Q_DISABLE_COPY(QnSystemAdministrationDialog)
 
+    QScopedPointer<Ui::QnSystemAdministrationDialog> ui;
     QnServerUpdatesWidget *m_updatesWidget;
-    QnRoutingManagementWidget *m_routingManagementWidget;
 };
 
 #endif // UPDATE_DIALOG_H

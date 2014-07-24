@@ -7,13 +7,17 @@
 #include <QtCore/QTimer>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <common/common_module.h>
+
 #include <ui/models/sorted_server_updates_model.h>
 #include <ui/dialogs/file_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/build_number_dialog.h>
 #include <ui/dialogs/update_url_dialog.h>
 #include <ui/delegates/update_status_item_delegate.h>
+
+#include <utils/common/software_version.h>
 #include <utils/media_server_update_tool.h>
 #include <utils/applauncher_utils.h>
 
@@ -26,7 +30,8 @@ namespace {
 }
 
 QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::QnServerUpdatesWidget),
     m_minimalMode(false),
     m_extraMessageTimer(new QTimer(this))
@@ -59,10 +64,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     connect(m_extraMessageTimer, &QTimer::timeout, this, &QnServerUpdatesWidget::at_extraMessageTimer_timeout);
 
     m_previousToolState = m_updateTool->state();
+
+    ui->progressWidget->setText(tr("Checking for updates..."));
     updateUi();
 }
-
-QnServerUpdatesWidget::~QnServerUpdatesWidget() {}
 
 bool QnServerUpdatesWidget::cancelUpdate() {
     if (m_updateTool->isUpdating())
@@ -92,7 +97,7 @@ void QnServerUpdatesWidget::setMinimalMode(bool minimalMode) {
     ui->topButtonBar->setVisible(!m_minimalMode);
 }
 
-void QnServerUpdatesWidget::reset() {
+void QnServerUpdatesWidget::updateFromSettings() {
     if (m_updateTool->state() != QnMediaServerUpdateTool::Idle)
         return;
 
@@ -150,7 +155,7 @@ void QnServerUpdatesWidget::at_updateButton_clicked() {
     m_updateTool->updateServers();
 }
 
-void QnServerUpdatesWidget::at_updateTool_peerChanged(const QnId &peerId) {
+void QnServerUpdatesWidget::at_updateTool_peerChanged(const QUuid &peerId) {
     m_updatesModel->setUpdateInformation(m_updateTool->updateInformation(peerId));
 }
 
@@ -294,14 +299,10 @@ void QnServerUpdatesWidget::updateUi() {
         break;
     }
 
-    if (checkingForUpdates)
-        ui->buttonBox->showProgress(tr("Checking for updates..."));
-    else
-        ui->buttonBox->hideProgress();
-
     ui->cancelButton->setVisible(applying);
     ui->cancelButton->setEnabled(cancellable);
     ui->updateStateWidget->setVisible(applying);
+    ui->progressWidget->setVisible(checkingForUpdates);
     ui->progressIndicator->setVisible(infiniteProgress);
     ui->updateProgessBar->setVisible(!infiniteProgress);
     ui->checkForUpdatesButton->setEnabled(!applying && !checkingForUpdates);
@@ -319,4 +320,22 @@ void QnServerUpdatesWidget::updateUi() {
 
     if (startUpdate)
         m_updateTool->updateServers();
+}
+
+bool QnServerUpdatesWidget::confirm() {
+    if (isUpdating()) {
+        QMessageBox::information(this, tr("Information"), tr("Update is in process now."));
+        return false;
+    }
+
+    return true;
+}
+
+bool QnServerUpdatesWidget::discard() {
+    if(!cancelUpdate()) {
+        QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state."));
+        return false;
+    }
+
+    return true;
 }

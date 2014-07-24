@@ -15,6 +15,7 @@
 namespace {
 
     const int checkTimeout = 60 * 1000;
+    const int defaultRtspPort = 7001;
 
     ec2::AbstractECConnectionPtr connection2() {
         return QnAppServerConnectionFactory::getConnection2();
@@ -40,7 +41,7 @@ void QnJoinSystemTool::start(const QUrl &url, const QString &password) {
     // we need only scheme, hostname and port from the url
     m_targetUrl.setScheme(url.scheme());
     m_targetUrl.setHost(url.host());
-    m_targetUrl.setPort(url.port(DEFAULT_APPSERVER_PORT));
+    m_targetUrl.setPort(url.port(defaultRtspPort));
 
     m_password = password;
 

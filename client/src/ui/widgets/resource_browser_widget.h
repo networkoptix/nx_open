@@ -144,6 +144,7 @@ protected:
     void killSearchTimer();
     void showContextMenuAt(const QPoint &pos, bool ignoreSelection = false);
 
+    void setupInitialModelCriteria(QnResourceSearchProxyModel *model) const;
 private slots:
     void updateFilter(bool force = false);
     void updateToolTipPosition();

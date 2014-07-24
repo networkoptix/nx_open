@@ -36,7 +36,6 @@ signals:
 
 public slots:
     void clear();
-    void updateSmtpSettings( int handle, ec2::ErrorCode errorCode, const QnEmail::Settings& settings );
 
 private slots:
     void at_context_userChanged();
@@ -48,10 +47,9 @@ private slots:
 
     void at_licensePool_licensesChanged();
     void at_settings_valueChanged(int id);
+    void at_emailSettingsChanged();
 
 private:
-    void requestSmtpSettings();
-
     void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
 
     /**

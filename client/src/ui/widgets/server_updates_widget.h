@@ -3,20 +3,22 @@
 
 #include <QtWidgets/QWidget>
 
-#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_fwd.h>
 
-namespace Ui {
-class QnServerUpdatesWidget;
-}
+#include <ui/workbench/workbench_context_aware.h>
+#include <ui/widgets/settings/abstract_preferences_widget.h>
+#include <ui_server_updates_widget.h>
+#include <utils/common/id.h>
 
 class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
 
-class QnServerUpdatesWidget : public QWidget {
+class QnServerUpdatesWidget : public QnAbstractPreferencesWidget, public QnWorkbenchContextAware {
     Q_OBJECT
+
+    typedef QnAbstractPreferencesWidget base_type;
 public:
     QnServerUpdatesWidget(QWidget *parent = 0);
-    ~QnServerUpdatesWidget();
 
     bool cancelUpdate();
     bool isUpdating() const;
@@ -28,7 +30,9 @@ public:
     bool isMinimalMode() const;
     void setMinimalMode(bool minimalMode);
 
-    void reset();
+    virtual void updateFromSettings() override;
+    virtual bool confirm() override;
+    virtual bool discard() override;
 
     void checkForUpdates();
 

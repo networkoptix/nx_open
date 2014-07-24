@@ -119,6 +119,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged(int)),    this,   SLOT(at_dbDataChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(archiveRangeChanged()),          this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(ui->webPageLabel,           SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
@@ -542,6 +543,12 @@ void QnSingleCameraSettingsWidget::submitToResource() {
             m_camera->setScheduleDisabled(!ui->analogViewCheckBox->isChecked());
         } else {
             m_camera->setScheduleDisabled(!ui->cameraScheduleWidget->isScheduleEnabled());
+        }
+
+        int maxDays = ui->cameraScheduleWidget->maxRecordedDays();
+        if (maxDays != QnCameraScheduleWidget::RecordedDaysDontChange) {
+            m_camera->setMaxDays(maxDays);
+            m_camera->setMinDays(ui->cameraScheduleWidget->minRecordedDays());
         }
 
         if (!m_camera->isDtsBased()) {
@@ -1175,6 +1182,12 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
             break;
         }
 #endif
+
+        case Qn::FisheyeCameraSettingsTab:
+        {
+            ui->fisheyeSettingsWidget->loadPreview();
+            break;
+        }
 
         default:
             break;

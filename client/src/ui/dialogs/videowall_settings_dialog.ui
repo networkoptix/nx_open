@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>283</width>
-    <height>70</height>
+    <height>93</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,6 +18,16 @@
     <widget class="QCheckBox" name="autoRunCheckBox">
      <property name="text">
       <string>Start Video Wall when the Windows starts</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="shortcutCheckbox">
+     <property name="text">
+      <string>Create shortcut on the desktop</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

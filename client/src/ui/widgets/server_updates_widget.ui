@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>463</width>
-    <height>413</height>
+    <width>481</width>
+    <height>449</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -127,19 +127,16 @@
     </widget>
    </item>
    <item>
-    <widget class="QnDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::NoButton</set>
-     </property>
-    </widget>
+    <widget class="QnProgressWidget" name="progressWidget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnDialogButtonBox</class>
-   <extends>QDialogButtonBox</extends>
-   <header location="global">ui/widgets/dialog_button_box.h</header>
+   <class>QnProgressWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/progress_widget.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnProgressWidget</class>

@@ -16,8 +16,8 @@
 #include <utils/common/stoppable.h>
 #include <utils/common/joinable.h>
 #include <utils/network/http/asynchttpclient.h>
-#include <plugins/videodecoders/stree/node.h>
-#include <plugins/videodecoders/stree/resourcenameset.h>
+#include <plugins/videodecoder/stree/node.h>
+#include <plugins/videodecoder/stree/resourcenameset.h>
 
 #include "rdir_syncher.h"
 #include "rns_product_parameters.h"

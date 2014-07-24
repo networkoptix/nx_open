@@ -110,8 +110,6 @@ public:
 protected:
     ec2::AbstractECConnectionPtr connection2() const;
 
-    bool canAutoDelete(const QnResourcePtr &resource) const;
-
     struct AddToLayoutParams {
         bool usePosition;
         QPointF position;
@@ -228,7 +226,7 @@ protected slots:
     void at_systemUpdateAction_triggered();
     void at_preferencesGeneralTabAction_triggered();
     void at_preferencesLicensesTabAction_triggered();
-    void at_preferencesServerTabAction_triggered();
+    void at_preferencesSmtpTabAction_triggered();
     void at_preferencesNotificationTabAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
@@ -329,8 +327,6 @@ private:
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
 
     QnAdjustVideoDialog* adjustVideoDialog();
-
-    void showSystemAdministrationDialog(int tab = 0);
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;

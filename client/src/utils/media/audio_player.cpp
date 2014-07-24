@@ -11,7 +11,7 @@
 #include <QtCore/QMutexLocker>
 
 #include <core/resource/resource.h>
-#include <plugins/resources/archive/avi_files/avi_archive_delegate.h>
+#include <plugins/resource/avi/avi_archive_delegate.h>
 #include <utils/common/util.h>
 #include <text_to_wav.h>
 

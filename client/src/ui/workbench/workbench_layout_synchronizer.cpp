@@ -1,17 +1,18 @@
 #include "workbench_layout_synchronizer.h"
+
 #include <cassert>
+
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
+
 #include "workbench.h"
 #include "workbench_layout.h"
 #include "workbench_item.h"
-#include "ui/style/globals.h"
-
-#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 namespace {
     const char *layoutSynchronizerPropertyName = "_qn_layoutSynchronizer";

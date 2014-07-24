@@ -15,8 +15,13 @@ QnWorkbenchSystemNameWatcher::QnWorkbenchSystemNameWatcher(QObject *parent) :
 QnWorkbenchSystemNameWatcher::~QnWorkbenchSystemNameWatcher() {}
 
 void QnWorkbenchSystemNameWatcher::at_resourceChanged(const QnResourcePtr &resource) {
-    if (QnId(QnAppServerConnectionFactory::getConnection2()->connectionInfo().ecsGuid) != resource->getId())
-        return;
+    ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
+    if (connection) {
+        if (QnId(connection->connectionInfo().ecsGuid) != resource->getId())
+            return;
 
-    qnCommon->setLocalSystemName(resource.staticCast<QnMediaServerResource>()->getSystemName());
+        qnCommon->setLocalSystemName(resource.staticCast<QnMediaServerResource>()->getSystemName());
+    } else {
+        qnCommon->setLocalSystemName(QString());
+    }
 }

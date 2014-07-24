@@ -4,11 +4,12 @@
 #include "recording/stream_recorder.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "camera/camera_pool.h"
-#include "device_plugins/server_archive/server_archive_delegate.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resource/server_archive/server_archive_delegate.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
 #include "camera/video_camera.h"
 #include "core/misc/schedule_task.h"
 #include "server_stream_recorder.h"
+#include <utils/common/log.h>
 #include "utils/common/synctime.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/resource_fwd.h"
@@ -28,7 +29,7 @@
 #include "api/runtime_info_manager.h"
 
 
-static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24;
+static const qint64 LICENSE_RECORDING_STOP_TIME = 1000 * 3600 * 24 * 7;
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
 QnRecordingManager::QnRecordingManager(): m_mutex(QMutex::Recursive)
@@ -150,7 +151,7 @@ bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
 
 bool QnRecordingManager::updateCameraHistory(const QnResourcePtr& res)
 {
-    const QnNetworkResource* netRes = dynamic_cast<const QnNetworkResource*>(res.data());
+    const QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
     QString physicalId = netRes->getPhysicalId();
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     if (QnCameraHistoryPool::instance()->getMinTime(netRes) == (qint64)AV_NOPTS_VALUE)
@@ -244,7 +245,7 @@ bool QnRecordingManager::startOrStopRecording(const QnResourcePtr& res, QnVideoC
 {
     QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
     QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
-    QnSecurityCamResource* cameraRes = dynamic_cast<QnSecurityCamResource*>(res.data());
+    QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
 
     if (!cameraRes->isInitialized() && !cameraRes->hasFlags(QnResource::foreigner) && !cameraRes->isScheduleDisabled())
         cameraRes->initAsync(true);
@@ -590,11 +591,11 @@ void QnRecordingManager::at_checkLicenses()
     if (recordingDigital > maxDigital  || isOverflowTotal)
     {
         if (++m_tooManyRecordingCnt < 5)
-            return; // do not report license problem immediatly. Server should wait several minutes, probably other media servers will be available soon
+            return; // do not report license problem immediately. Server should wait several minutes, probably other media servers will be available soon
 
 
         ec2::QnDbManager::instance()->markLicenseOverflow(true, qnSyncTime->currentMSecsSinceEpoch());
-        qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->data(qnCommon->moduleGUID()).prematureLicenseExperationDate;
+        qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
         if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < LICENSE_RECORDING_STOP_TIME)
             return; // not enough license, but timeout not reached yet
 
