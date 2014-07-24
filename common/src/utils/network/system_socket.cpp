@@ -619,7 +619,7 @@ public:
     {
     }
 
-    virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) override
+    virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) override
     {
         const size_t recvAsyncCallCounterBak = recvAsyncCallCounter;
         auto __finally_read = [this, recvAsyncCallCounterBak, sock](CommunicatingSocketPrivate* /*pThis*/)
@@ -628,7 +628,7 @@ public:
             {
                 recvBuffer = nullptr;
                 recvHandler.reset();
-                aio::AIOService::instance()->removeFromWatch( sock, PollSet::etRead );
+                aio::AIOService::instance()->removeFromWatch( sock, aio::etRead );
             }
         };
 
@@ -639,13 +639,13 @@ public:
             {
                 sendBuffer = nullptr;
                 sendHandler.reset();
-                aio::AIOService::instance()->removeFromWatch( sock, PollSet::etWrite );
+                aio::AIOService::instance()->removeFromWatch( sock, aio::etWrite );
             }
         };
 
         switch( eventType )
         {
-            case PollSet::etRead:
+            case aio::etRead:
             {
                 std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_read)> cleanupGuard( this, __finally_read );
 
@@ -671,7 +671,7 @@ public:
                 break;
             }
 
-            case PollSet::etWrite:
+            case aio::etWrite:
             {
                 std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
 
@@ -696,21 +696,21 @@ public:
                 break;
             }
 
-            case PollSet::etReadTimedOut:
+            case aio::etReadTimedOut:
             {
                 std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_read)> cleanupGuard( this, __finally_read );
                 recvHandler->done( SystemError::timedOut, (size_t)-1 );
                 break;
             }
 
-            case PollSet::etWriteTimedOut:
+            case aio::etWriteTimedOut:
             {
                 std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
                 sendHandler->done( SystemError::timedOut, (size_t)-1 );
                 break;
             }
 
-            case PollSet::etError:
+            case aio::etError:
                 //TODO/IMPL distinguish read and write
                 //TODO/IMPL get correct socket error
                 if( recvHandler )
@@ -1035,7 +1035,7 @@ bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<
     d->recvBuffer = buf;
     d->recvHandler = std::move(handler);
     ++d->recvAsyncCallCounter;
-    return aio::AIOService::instance()->watchSocket( this, PollSet::etRead, d );
+    return aio::AIOService::instance()->watchSocket( this, aio::etRead, d );
 }
 
 bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<AbstractAsyncIOHandler> handler )
@@ -1046,7 +1046,7 @@ bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<
     d->sendHandler = std::move(handler);
     d->sendBufPos = 0;
     ++d->sendAsyncCallCounter;
-    return aio::AIOService::instance()->watchSocket( this, PollSet::etWrite, d );
+    return aio::AIOService::instance()->watchSocket( this, aio::etWrite, d );
 }
 
 
@@ -1213,7 +1213,7 @@ public:
     {
     }
 
-    virtual void eventTriggered( AbstractSocket* sock, PollSet::EventType eventType ) override
+    virtual void eventTriggered( AbstractSocket* sock, aio::EventType eventType ) override
     {
         assert( acceptHandler );
 
@@ -1221,7 +1221,7 @@ public:
 
         switch( eventType )
         {
-            case PollSet::etRead:
+            case aio::etRead:
             {
                 //accepting socket
                 AbstractStreamSocket* newSocket = dynamic_cast<TCPServerSocket*>(sock)->accept();
@@ -1231,11 +1231,11 @@ public:
                 break;
             }
 
-            case PollSet::etReadTimedOut:
+            case aio::etReadTimedOut:
                 acceptHandler->onNewConnection( SystemError::timedOut, nullptr );
                 break;
 
-            case PollSet::etError:
+            case aio::etError:
                 //TODO/IMPL get correct socket error
                 acceptHandler->onNewConnection( SystemError::connectionReset, nullptr );
                 break;
@@ -1249,7 +1249,7 @@ public:
         if( acceptAsyncCallCount > acceptAsyncCallCountBak )
             return;
 
-        aio::AIOService::instance()->removeFromWatch( sock, PollSet::etRead );
+        aio::AIOService::instance()->removeFromWatch( sock, aio::etRead );
         acceptHandler.reset();
     }
 
@@ -1305,7 +1305,7 @@ bool TCPServerSocket::acceptAsyncImpl( std::unique_ptr<AbstractStreamServerSocke
 
     d->acceptHandler = std::move(handler);
     //TODO: #ak usually acceptAsyncImpl will be called constantly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
-    return aio::AIOService::instance()->watchSocket( this, PollSet::etRead, d );
+    return aio::AIOService::instance()->watchSocket( this, aio::etRead, d );
 }
 
 //!Implementation of AbstractStreamServerSocket::listen
@@ -1333,38 +1333,6 @@ bool TCPServerSocket::setListen(int queueLen)
     return ::listen(sockDesc, queueLen) == 0;
 }
 
-// -------------------------- TCPSslServerSocket ----------------
-
-#ifdef ENABLE_SSL
-TCPSslServerSocket::TCPSslServerSocket(bool allowNonSecureConnect): TCPServerSocket(), m_allowNonSecureConnect(allowNonSecureConnect)
-{
-
-}
-
-AbstractStreamSocket* TCPSslServerSocket::accept()
-{
-    AbstractStreamSocket* sock = TCPServerSocket::accept();
-    if (!sock)
-        return 0;
-
-    if (m_allowNonSecureConnect)
-        return new QnMixedSSLSocket(sock);
-
-    else
-        return new QnSSLSocket(sock, true);
-
-#if 0
-    // transparent accept required state machine here. doesn't implemented. Handshake implemented on first IO operations
-
-    QnSSLSocket* sslSock = new QnSSLSocket(sock);
-    if (sslSock->doServerHandshake())
-        return sslSock;
-    
-    delete sslSock;
-    return 0;
-#endif
-}
-#endif // ENABLE_SSL
 
 //////////////////////////////////////////////////////////
 ///////// class UDPSocket

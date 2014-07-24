@@ -86,8 +86,8 @@ public:
     {
         if( m_socket )
         {
-            aio::AIOService::instance()->removeFromWatch(m_socket, aio::etRead);
-            aio::AIOService::instance()->removeFromWatch(m_socket, aio::etWrite);
+            aio::AIOService::instance()->removeFromWatch(m_socket.data(), aio::etRead);
+            aio::AIOService::instance()->removeFromWatch(m_socket.data(), aio::etWrite);
             m_socket.clear();
         }
     }
@@ -136,7 +136,7 @@ public:
 
         const QUrl endpoint(QLatin1String(m_syncWrapper->endpoint()));
         return m_socket->setNonBlockingMode(true)
-            && aio::AIOService::instance()->watchSocket(m_socket, aio::etWrite, this)
+            && aio::AIOService::instance()->watchSocket(m_socket.data(), aio::etWrite, this)
             && m_socket->connect(endpoint.host(), endpoint.port(nx_http::DEFAULT_HTTP_PORT));
     }
 
@@ -189,7 +189,7 @@ private:
                 if( bytesSent == -1 )
                 {
                     m_state = done;
-                    aio::AIOService::instance()->removeFromWatch(m_socket, aio::etWrite);
+                    aio::AIOService::instance()->removeFromWatch(m_socket.data(), aio::etWrite);
                     m_resultHandler(SOAP_FAULT);
                     return;
                 }
@@ -198,10 +198,10 @@ private:
                 if( m_bytesSent == m_serializedRequest.size() )
                 {
                     //request has been sent, receiving response
-                    aio::AIOService::instance()->removeFromWatch(m_socket, aio::etWrite);
+                    aio::AIOService::instance()->removeFromWatch(m_socket.data(), aio::etWrite);
                     m_state = receivingResponse;
                     m_responseDataSize = 0;
-                    aio::AIOService::instance()->watchSocket(m_socket, aio::etRead, this);
+                    aio::AIOService::instance()->watchSocket(m_socket.data(), aio::etRead, this);
                 }
                 break;
             }
@@ -221,7 +221,7 @@ private:
                     break;
                 }
                 //error or connection closed, trying to deserialize what we have
-                aio::AIOService::instance()->removeFromWatch(m_socket, aio::etRead);
+                aio::AIOService::instance()->removeFromWatch(m_socket.data(), aio::etRead);
                 deserializeResponse();
                 break;
             }
@@ -230,12 +230,12 @@ private:
             {
                 if( m_state == sendingRequest )
                 {
-                    aio::AIOService::instance()->removeFromWatch(m_socket, aio::etWrite);
+                    aio::AIOService::instance()->removeFromWatch(m_socket.data(), aio::etWrite);
                     m_resultHandler(SOAP_FAULT);
                 }
                 else if( m_state == receivingResponse )
                 {
-                    aio::AIOService::instance()->removeFromWatch(m_socket, aio::etWrite);
+                    aio::AIOService::instance()->removeFromWatch(m_socket.data(), aio::etWrite);
                     if( m_responseDataSize > 0 )
                         deserializeResponse();  //deserializing what we have
                     else
@@ -246,7 +246,7 @@ private:
 
             case aio::etError:
             {
-                aio::AIOService::instance()->removeFromWatch(m_socket, aio::etWrite);
+                aio::AIOService::instance()->removeFromWatch(m_socket.data(), aio::etWrite);
                 m_resultHandler(SOAP_FAULT);
                 break;
             }

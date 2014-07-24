@@ -64,8 +64,8 @@ namespace nx_http
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
         if( m_socket )
         {
-            aio::AIOService::instance()->removeFromWatch( m_socket.get(), aio::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket.get(), aio::etWrite );
+            aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etRead );
+            aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etWrite );
 
             //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
         }
@@ -80,7 +80,7 @@ namespace nx_http
 
         QMutexLocker lk( &m_mutex );
 
-        Q_ASSERT( sock == m_socket.get() );
+        Q_ASSERT( sock == m_socket.data() );
         while( !m_terminated )
         {
             switch( m_state )
@@ -109,7 +109,7 @@ namespace nx_http
                             if( reconnectIfAppropriate() )
                                 break;
                             m_state = sFailed;
-                            aio::AIOService::instance()->removeFromWatch( m_socket.get(), aio::etWrite );
+                            aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etWrite );
                             lk.unlock();
                             emit done( sharedThis );
                             lk.relock();
@@ -148,7 +148,7 @@ namespace nx_http
                     {
                         NX_LOG( lit("Failed to send request to %1. %2").arg(m_url.toString()).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1 );
                         m_state = sFailed;
-                        aio::AIOService::instance()->removeFromWatch( m_socket.get(), aio::etWrite );
+                        aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etWrite );
                         lk.unlock();
                         emit done( sharedThis );
                         lk.relock();
@@ -158,9 +158,9 @@ namespace nx_http
                     {
                         NX_LOG( lit("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG2 );
                         m_state = sReceivingResponse;
-                        aio::AIOService::instance()->removeFromWatch( m_socket.get(), aio::etWrite );
+                        aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etWrite );
                         m_socket->setRecvTimeout( DEFAULT_RESPONSE_READ_TIMEOUT );
-                        aio::AIOService::instance()->watchSocket( m_socket.get(), aio::etRead, this );
+                        aio::AIOService::instance()->watchSocket( m_socket.data(), aio::etRead, this );
                     }
                     break;
 
@@ -297,7 +297,7 @@ namespace nx_http
                     int bytesRead = readAndParseHttp();
                     //TODO #ak reconnect in case of error
                     if( m_state != sReadingMessageBody )
-                        aio::AIOService::instance()->removeFromWatch( m_socket.get(), aio::etRead );
+                        aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etRead );
                     if( bytesRead > 0 )
                     {
                         lk.unlock();
@@ -327,8 +327,8 @@ namespace nx_http
 
         if( m_state == sFailed || m_state == sDone )
         {
-            aio::AIOService::instance()->removeFromWatch( m_socket.get(), aio::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket.get(), aio::etWrite );
+            aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etRead );
+            aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etWrite );
         }
     }
 
@@ -466,8 +466,8 @@ namespace nx_http
 
         if( m_socket )
         {
-            aio::AIOService::instance()->removeFromWatch( m_socket.get(), aio::etRead );
-            aio::AIOService::instance()->removeFromWatch( m_socket.get(), aio::etWrite );
+            aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etRead );
+            aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etWrite );
 
             serializeRequest();
             m_state = sSendingRequest;
@@ -499,11 +499,11 @@ namespace nx_http
         }
 
         //connect is done if socket is available for write
-        if( !aio::AIOService::instance()->watchSocket( m_socket.get(), aio::etWrite, this ) )
+        if( !aio::AIOService::instance()->watchSocket( m_socket.data(), aio::etWrite, this ) )
         {
             NX_LOG( lit("Failed to add socket (connecting to %1:%2) to aio service. %3").
                 arg(url.host()).arg(url.port()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-            m_socket.reset();
+            m_socket.clear();
             return false;
         }
 

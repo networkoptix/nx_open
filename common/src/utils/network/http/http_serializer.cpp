@@ -15,7 +15,7 @@ namespace nx_http
     }
 
     //!Set message to serialize
-    void MessageSerializer::setMessage( const HttpMessage& message )
+    void MessageSerializer::setMessage( const Message& message )
     {
         m_message = &message;
     }

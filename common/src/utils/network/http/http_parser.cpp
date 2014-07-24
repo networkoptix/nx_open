@@ -14,7 +14,7 @@ namespace nx_http
     {
     }
 
-    void MessageParser::setMessage( HttpMessage* const msg )
+    void MessageParser::setMessage( Message* const msg )
     {
         m_msg = msg;
     }

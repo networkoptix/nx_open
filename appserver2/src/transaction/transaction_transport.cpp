@@ -54,7 +54,7 @@ void QnTransactionTransport::addData(const QByteArray& data)
 {
     QMutexLocker lock(&m_mutex);
     if (m_dataToSend.isEmpty() && m_socket)
-        aio::AIOService::instance()->watchSocket( m_socket, aio::etWrite, this );
+        aio::AIOService::instance()->watchSocket( m_socket.data(), aio::etWrite, this );
     m_dataToSend.push_back(QnChunkedTransferEncoder::serializedTransaction(data));
 }
 
@@ -78,8 +78,8 @@ int QnTransactionTransport::getChunkHeaderEnd(const quint8* data, int dataLen, q
 void QnTransactionTransport::closeSocket()
 {
     if (m_socket) {
-        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etRead, this );
-        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite, this );
+        aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etRead, this );
+        aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etWrite, this );
         m_socket->close();
         m_socket.reset();
     }
@@ -107,7 +107,7 @@ void QnTransactionTransport::setStateNoLock(State state)
             m_socket->setSendTimeout(SOCKET_TIMEOUT);
             m_socket->setNonBlockingMode(true);
             m_chunkHeaderLen = 0;
-            aio::AIOService::instance()->watchSocket( m_socket, aio::etRead, this );
+            aio::AIOService::instance()->watchSocket( m_socket.data(), aio::etRead, this );
         }
     }
     if (this->m_state != state) {
@@ -193,7 +193,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                 if (sended < 1) {
                     if(sended == 0 || (SystemError::getLastOSErrorCode() != SystemError::wouldBlock && SystemError::getLastOSErrorCode() != SystemError::again)) {
                         m_sendOffset = 0;
-                        aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite, this );
+                        aio::AIOService::instance()->removeFromWatch( m_socket.data(), aio::etWrite, this );
                         setStateNoLock(State::Error);
                     }
                     return; // can't send any more
@@ -204,7 +204,7 @@ void QnTransactionTransport::eventTriggered( AbstractSocket* , aio::EventType ev
                     m_dataToSend.dequeue();
                 }
             }
-            aio::AIOService::instance()->removeFromWatch( m_socket, aio::etWrite, this );
+            aio::AIOService::instance()->removeFromWatch(m_socket.data(), aio::etWrite, this);
             break;
         }
     case aio::etTimedOut:

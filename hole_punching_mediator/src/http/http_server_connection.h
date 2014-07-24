@@ -23,7 +23,7 @@ class HttpServerConnection
     public nx_api::BaseStreamProtocolConnection<
         HttpServerConnection,
         nx_http::HttpStreamSocketServer,
-        nx_http::HttpMessage,
+        nx_http::Message,
         nx_http::MessageParser,
         nx_http::MessageSerializer>
 {
@@ -31,7 +31,7 @@ public:
     typedef BaseStreamProtocolConnection<
         HttpServerConnection,
         nx_http::HttpStreamSocketServer,
-        nx_http::HttpMessage,
+        nx_http::Message,
         nx_http::MessageParser,
         nx_http::MessageSerializer
     > BaseType;
@@ -40,7 +40,7 @@ public:
         nx_http::HttpStreamSocketServer* socketServer,
         AbstractCommunicatingSocket* sock );
 
-    void processMessage( const nx_http::HttpMessage& request );
+    void processMessage( const nx_http::Message& request );
 };
 
 #endif  //HTTP_SERVER_CONNECTION_H

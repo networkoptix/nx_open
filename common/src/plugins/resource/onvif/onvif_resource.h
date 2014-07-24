@@ -22,7 +22,6 @@
 #include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
 #include "onvif_resource_settings.h"
-#include "gsoap_async_call_wrapper.h"
 
 
 class onvifXsd__AudioEncoderConfigurationOption;
@@ -43,6 +42,9 @@ class VideoOptionsLocal;
 //first = width, second = height
 
 class QDomElement;
+
+template<typename SyncWrapper, typename Request, typename Response>
+class GSoapAsyncCallWrapper;
 
 /*
 * This structure is used during discovery process. These data are read by getDeviceInformation request and may override data from multicast packet

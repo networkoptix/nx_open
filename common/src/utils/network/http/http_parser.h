@@ -32,7 +32,7 @@ namespace nx_http
     public:
         MessageParser();
 
-        void setMessage( HttpMessage* const msg );
+        void setMessage( Message* const msg );
         //!Returns current parse state
         /*!
             Methods returns if:\n
@@ -51,7 +51,7 @@ namespace nx_http
 
     private:
         HttpStreamReader m_httpStreamReader;
-        HttpMessage* m_msg;
+        Message* m_msg;
     };
 }
 

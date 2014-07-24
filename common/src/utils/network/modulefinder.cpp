@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDateTime>
 #include <QtCore/QScopedArrayPointer>
 #include <QtNetwork/QNetworkInterface>
@@ -126,10 +127,10 @@ bool QnModuleFinder::processDiscoveryRequest(AbstractDatagramSocket *udpSocket) 
     }
 
     RevealResponse response;
-    response.version = qApp->applicationVersion();
-    QString moduleName = qApp->applicationName();
-    if (moduleName.startsWith(qApp->organizationName()))
-        moduleName = moduleName.mid(qApp->organizationName().length()).trimmed();
+    response.version = QCoreApplication::instance()->applicationVersion();
+    QString moduleName = QCoreApplication::instance()->applicationName();
+    if( moduleName.startsWith( QCoreApplication::instance()->organizationName() ) )
+        moduleName = moduleName.mid( QCoreApplication::instance()->organizationName().length() ).trimmed();
     
     response.type = moduleName;
     response.customization = QString::fromLatin1(QN_CUSTOMIZATION_NAME);

@@ -50,14 +50,14 @@ namespace nx
 
         void pop_front( size_t count )
         {
-            remove( 0, count );
+            remove( 0, (int)count );
         }
 
         Buffer substr( size_t pos, size_t count = npos ) const
         {
             return QByteArray::fromRawData(
                 data() + pos,
-                count == npos ? size()-pos : count );
+                (int)(count == npos ? size()-pos : count) );
         }
 
         size_t size() const

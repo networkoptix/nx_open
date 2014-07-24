@@ -92,19 +92,19 @@ namespace aio
     public:
         std::shared_ptr<AIOEventHandlingData> data;
         AbstractSocket* socket;
-        PollSet::EventType eventType;
+        aio::EventType eventType;
 
         PeriodicTaskData()
         :
             socket( NULL ),
-            eventType( PollSet::etNone )
+            eventType( aio::etNone )
         {
         }
 
         PeriodicTaskData(
             const std::shared_ptr<AIOEventHandlingData>& _data,
             AbstractSocket* _socket,
-            PollSet::EventType _eventType )
+            aio::EventType _eventType )
         :
             data( _data ),
             socket( _socket ),
@@ -315,7 +315,7 @@ namespace aio
                 {
                     handlingData->eventHandler->eventTriggered(
                         periodicTaskData.socket,
-                        static_cast<PollSet::EventType>(periodicTaskData.eventType | aio::etTimedOut) );
+                        static_cast<aio::EventType>(periodicTaskData.eventType | aio::etTimedOut) );
                     //adding periodic task with same timeout
                     addPeriodicTask(
                         curClock + handlingData->timeout,
@@ -333,7 +333,7 @@ namespace aio
             const qint64 taskClock,
             const std::shared_ptr<AIOEventHandlingData>& handlingData,
             AbstractSocket* _socket,
-            PollSet::EventType eventType )
+            aio::EventType eventType )
         {
             QMutexLocker lk( &periodicTasksMutex );
             periodicTasksByClock.insert( std::make_pair(

@@ -28,7 +28,7 @@ namespace nx_api
             void messageSent();
         \endcode
 
-        \todo This class contains no STUN-specific logic, so it MUST be protocol-independent (it will be used for HTTP later)
+        \todo This class contains no STUN-specific logic, so it MUST be protocol-independent (it may be used for HTTP later)
     */
     template<
         class CustomConnectionType,
