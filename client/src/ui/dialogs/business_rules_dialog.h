@@ -24,6 +24,8 @@ namespace Ui {
     class BusinessRulesDialog;
 }
 
+class QnWorkbenchStateDelegate;
+
 class QnBusinessRulesDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -37,11 +39,12 @@ public:
     void setFilter(const QString &filter);
 
     /**
-     * @brief canClose      Checks if the dialog can be closed safely. If there are unsaved rules the user will be asked
+     * @brief tryClose      Checks if the dialog can be closed safely. If there are unsaved rules the user will be asked
      *                      and they will be saved or dropped.
+     * @param force         If set to true, changes will be silently dropped and the dialog will be hidden.
      * @return              False if the user press Cancel, true otherwise.
      */
-    bool canClose();
+    bool tryClose(bool force);
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
@@ -88,6 +91,7 @@ private:
     void setAdvancedMode(bool value);
 
     QScopedPointer<Ui::BusinessRulesDialog> ui;
+    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
 
     QnBusinessRulesActualModel* m_rulesViewModel;
     QList<QnId> m_pendingDeleteRules;

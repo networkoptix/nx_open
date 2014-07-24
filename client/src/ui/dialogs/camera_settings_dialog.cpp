@@ -25,24 +25,10 @@
 
 #include <utils/license_usage_helper.h>
 
-class QnCameraSettingsStateDelegate: public QnWorkbenchStateDelegate {
-public:
-    QnCameraSettingsStateDelegate(QnCameraSettingsDialog* owner):
-        m_owner(owner)
-    {}
-
-    virtual bool tryClose(bool force) override {
-        return m_owner->tryClose(force);
-    }
-
-private:
-    QnCameraSettingsDialog* m_owner;
-}; 
-
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     QDialog(parent),
     QnWorkbenchContextAware(parent),
-    m_workbenchStateDelegate(new QnCameraSettingsStateDelegate(this)),
+    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnCameraSettingsDialog>(this)),
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
     m_ignoreAccept(false)
@@ -91,13 +77,18 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     connect(action(Qn::SelectionChangeAction),  &QAction::triggered,    this,   &QnCameraSettingsDialog::at_selectionChangeAction_triggered);
 
     at_settingsWidget_hasChangesChanged();
+
+    context()->instance<QnWorkbenchStateManager>()->registerDelegate(m_workbenchStateDelegate.data());
 }
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
+    context()->instance<QnWorkbenchStateManager>()->unregisterDelegate(m_workbenchStateDelegate.data());
 }
 
 bool QnCameraSettingsDialog::tryClose(bool force) {
     setCameras(QnVirtualCameraResourceList(), force);
+    if (force)
+        hide();
     return true;
 }
 

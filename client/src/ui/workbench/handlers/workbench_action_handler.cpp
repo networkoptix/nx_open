@@ -218,8 +218,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_delayedDropGuard(false),
     m_tourTimer(new QTimer())
 {
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionClosed,    this,   &QnWorkbenchActionHandler::at_messageProcessor_connectionClosed);
-
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
     
@@ -581,21 +579,6 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-
-void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
-    if (cameraAdditionDialog())
-        cameraAdditionDialog()->hide();
-
-    if(cameraSettingsDialog())
-        cameraSettingsDialog()->hide();
-
-    if (businessRulesDialog())
-        businessRulesDialog()->hide();
-
-    if (businessEventsLogDialog())
-        businessEventsLogDialog()->hide();
-}
-
 
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
     if(!user)
@@ -1863,13 +1846,6 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
 void QnWorkbenchActionHandler::at_exitAction_triggered() {
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(false))
         return;
-
-    if (businessRulesDialog() && businessRulesDialog()->isVisible()) {
-        businessRulesDialog()->activateWindow();
-        if (!businessRulesDialog()->canClose())
-            return;
-        businessRulesDialog()->hide();
-    }
 
     qApp->exit(0);
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );

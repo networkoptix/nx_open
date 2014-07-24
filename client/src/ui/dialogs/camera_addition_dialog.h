@@ -9,7 +9,11 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <ui/workbench/workbench_context_aware.h>
+
 #include <utils/common/connective.h>
+
+class QnWorkbenchStateDelegate;
 
 namespace Ui {
     class CameraAdditionDialog;
@@ -37,7 +41,7 @@ private:
 };
 
 
-class QnCameraAdditionDialog: public Connective<QDialog> {
+class QnCameraAdditionDialog: public Connective<QDialog>, public QnWorkbenchContextAware {
     Q_OBJECT
     typedef Connective<QDialog> base_type;
 public:
@@ -61,6 +65,8 @@ public:
     void setServer(const QnMediaServerResourcePtr &server);
 
     State state() const;
+
+    bool tryClose(bool force);
 private:
     Q_SLOT void clearTable();
 
@@ -103,6 +109,7 @@ private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)
 
     QScopedPointer<Ui::CameraAdditionDialog> ui;
+    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
     State m_state;
     QnMediaServerResourcePtr m_server;
     QnCheckBoxedHeaderView* m_header;

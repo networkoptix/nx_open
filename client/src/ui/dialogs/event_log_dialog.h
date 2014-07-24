@@ -16,6 +16,7 @@
 
 class QnEventLogModel;
 class QnBusinessRuleViewModel;
+class QnWorkbenchStateDelegate;
 
 namespace Ui {
     class EventLogDialog;
@@ -38,6 +39,7 @@ public:
     void setActionType(QnBusiness::ActionType value);
     void setEventType(QnBusiness::EventType value);
 
+    bool tryClose(bool force);
 protected:
     void setVisible(bool value) override;
 
@@ -74,6 +76,7 @@ private:
 
 private:
     QScopedPointer<Ui::EventLogDialog> ui;
+    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
 
     QnEventLogModel *m_model;
     QStandardItemModel *m_eventTypesModel;
