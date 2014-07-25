@@ -373,7 +373,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
 }
 
 void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout) {
-    if (firstIndex.isValid() || !secondIndex.isValid())
+    if (!firstIndex.isValid() || !secondIndex.isValid())
         return;
 
     QnLayoutResourceList unsavedLayouts;
