@@ -7,7 +7,12 @@
 
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="${customization}MediaServerDir" Name="MediaServer">
-                <Directory Id="${customization}DbSync22Dir" Name="dbsync-2.2"></Directory>
+                <Directory Id="${customization}DbSync22Dir" Name="dbsync-2.2">
+                    <Component Id="dbsync221versionpy">
+                        <File Id="version221.py" Name="version.py" Source="${libdir}/version.py" KeyPath="yes"/>
+                    </Component>
+                </Directory>
+
                 <Directory Id="ServerImageFormats" Name="imageformats"></Directory>
 
                 <Component Id="ServerExecutable">
@@ -192,6 +197,7 @@
 
             <ComponentGroupRef Id="DbSync22FilesComponent" />
 
+            <ComponentRef Id="dbsync221versionpy"/>
             <ComponentRef Id='ServerConfiguration'/>
             <ComponentRef Id='ServerConfigurationPassword'/>
 
