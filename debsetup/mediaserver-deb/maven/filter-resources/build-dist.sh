@@ -46,6 +46,7 @@ mkdir -p $INITDSTAGE
 
 # Copy dbsync 2.2
 cp -r $SERVER_SHARE_PATH/dbsync-2.2 $SHARESTAGE
+cp ${libdir}/version.py $SHARESTAGE/dbsync-2.2/bin
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
