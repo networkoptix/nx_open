@@ -392,7 +392,18 @@ protected:
     }
 
     QRectF calculateCenterPositionBounds() const {
-        return truncated(dilated(m_positionBounds, cwiseMul(m_positionBoundsExtension - MarginsF(0.5, 0.5, 0.5, 0.5), m_sceneViewportRect.size())));
+        MarginsF margins = cwiseMul(m_positionBoundsExtension - MarginsF(0.5, 0.5, 0.5, 0.5), m_sceneViewportRect.size());
+        QRectF fullRect = truncated(dilated(m_positionBounds, margins));
+
+        QSizeF preferredRectSize = eroded(m_sceneViewportRect.size(), margins);
+        QSizeF sizeDiff = m_positionBounds.size() - preferredRectSize;
+        if (sizeDiff.height() < 0)
+            sizeDiff.setHeight(0);
+        if (sizeDiff.width() < 0)
+            sizeDiff.setWidth(0);
+
+        QPointF center = fullRect.center();
+        return QRectF(QPointF(center.x() - sizeDiff.width() / 2, center.y() - sizeDiff.height() / 2), sizeDiff);
     }
 
     /**
