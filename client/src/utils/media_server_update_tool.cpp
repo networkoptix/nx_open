@@ -48,11 +48,11 @@ QnMediaServerUpdateTool::QnMediaServerUpdateTool(QObject *parent) :
     m_checkResult(UpdateFound),
     m_denyMajorUpdates(false),
     m_distributedMutex(0),
-    m_checkForUpdatesPeerTask(new QnCheckForUpdatesPeerTask(this)),
-    m_downloadUpdatesPeerTask(new QnDownloadUpdatesPeerTask(this)),
-    m_uploadUpdatesPeerTask(new QnUploadUpdatesPeerTask(this)),
-    m_installUpdatesPeerTask(new QnInstallUpdatesPeerTask(this)),
-    m_restUpdatePeerTask(new QnRestUpdatePeerTask(this))
+    m_checkForUpdatesPeerTask(new QnCheckForUpdatesPeerTask()),
+    m_downloadUpdatesPeerTask(new QnDownloadUpdatesPeerTask()),
+    m_uploadUpdatesPeerTask(new QnUploadUpdatesPeerTask()),
+    m_installUpdatesPeerTask(new QnInstallUpdatesPeerTask()),
+    m_restUpdatePeerTask(new QnRestUpdatePeerTask())
 {
     m_checkForUpdatesPeerTask->setUpdatesUrl(QN_UPDATES_URL);
 
@@ -82,6 +82,12 @@ QnMediaServerUpdateTool::~QnMediaServerUpdateTool() {
         m_tasksThread->quit();
         m_tasksThread->wait();
     }
+
+    delete m_checkForUpdatesPeerTask;
+    delete m_downloadUpdatesPeerTask;
+    delete m_uploadUpdatesPeerTask;
+    delete m_installUpdatesPeerTask;
+    delete m_restUpdatePeerTask;
 }
 
 QnMediaServerUpdateTool::State QnMediaServerUpdateTool::state() const {

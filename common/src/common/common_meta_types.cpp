@@ -83,6 +83,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnParam>();
     qRegisterMetaType<QnId>();
+    qRegisterMetaType<QSet<QnId>>("QSet<QnId>");
     
     qRegisterMetaType<QnKvPair>();
     qRegisterMetaType<QnKvPairList>();
