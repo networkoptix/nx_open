@@ -513,6 +513,41 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "Samsung Techwin|SNP-6200RH", "Samsung Techwin|SNP-6200RH|3.00_140302"
+            ],
+            "_comment": "This one cannot be calliberated since it pass to -20 which we haven't implemented.",
+            "_ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "_TODO" : "Actual tilt range is [-5,185]",
+                        "device":  [1, 0],
+                        "logical": [5, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0,1],
+                        "logical": [1,20],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                },
+                "toCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1, 1],
+                        "logical": [180,-20]
+                    }
+                }
+            }
         }
     ]
 }
