@@ -275,6 +275,9 @@ void QnWorkbenchConnectHandler::showLoginDialog() {
         loginDialog()->setModal(true);
     }
 
+    if (loginDialog()->isVisible())
+        return;
+
     QUrl url;
     // show login dialog again and again till success or cancel
     while (true) {
