@@ -72,6 +72,7 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 void QnServerStreamRecorder::at_camera_propertyChanged()
 {
     const QnPhysicalCameraResource* camera = dynamic_cast<QnPhysicalCameraResource*>(m_device.data());
+    m_usePrimaryRecorder = (camera->getProperty(QnMediaResource::dontRecordPrimaryStreamKey()).toInt() == 0);
     m_useSecondaryRecorder = (camera->getProperty(QnMediaResource::dontRecordSecondaryStreamKey()).toInt() == 0);
 }
 
@@ -266,6 +267,13 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
         close();
         return false;
     }
+    
+    if (m_catalog == QnServer::HiQualityCatalog && !metaData && !m_usePrimaryRecorder)
+    {
+        close();
+        return false;
+    }
+
     if (task.getRecordingType() == Qn::RT_Always)
         return true;
     else if (task.getRecordingType() == Qn::RT_MotionAndLowQuality && (m_catalog == QnServer::LowQualityCatalog || !camera->hasDualStreaming2()))

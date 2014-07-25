@@ -101,6 +101,7 @@ private:
     QQueue<QnConstAbstractMediaDataPtr> m_recentlyMotion;
     bool m_diskErrorWarned;
     bool m_rebuildBlocked;
+    bool m_usePrimaryRecorder;
     bool m_useSecondaryRecorder;
 };
 
