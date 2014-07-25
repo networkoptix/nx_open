@@ -77,12 +77,9 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     connect(action(Qn::SelectionChangeAction),  &QAction::triggered,    this,   &QnCameraSettingsDialog::at_selectionChangeAction_triggered);
 
     at_settingsWidget_hasChangesChanged();
-
-    context()->instance<QnWorkbenchStateManager>()->registerDelegate(m_workbenchStateDelegate.data());
 }
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
-    context()->instance<QnWorkbenchStateManager>()->unregisterDelegate(m_workbenchStateDelegate.data());
 }
 
 bool QnCameraSettingsDialog::tryClose(bool force) {

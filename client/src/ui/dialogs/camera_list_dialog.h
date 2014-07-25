@@ -12,6 +12,7 @@
 class QnCameraListModel;
 class QnWorkbenchContext;
 class QnResourceSearchProxyModel;
+class QnWorkbenchStateDelegate;
 
 namespace Ui {
     class CameraListDialog;
@@ -29,6 +30,7 @@ public:
     void setServer(const QnMediaServerResourcePtr &server);
     QnMediaServerResourcePtr server() const;
 
+    bool tryClose(bool force);
 private:
     Q_SIGNAL void updateWindowTitleQueued();
     void updateWindowTitleLater();
@@ -44,6 +46,7 @@ private:
     Q_DISABLE_COPY(QnCameraListDialog)
 
     QScopedPointer<Ui::CameraListDialog> ui;
+    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
     QnCameraListModel *m_model;
     QnResourceSearchProxyModel *m_resourceSearch;
     QAction *m_selectAllAction;

@@ -156,12 +156,9 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     ui->progressWidget->setVisible(false);
 
     resize(width(), 1); // set widget height to minimal possible
-
-    context()->instance<QnWorkbenchStateManager>()->registerDelegate(m_workbenchStateDelegate.data());
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){
-    context()->instance<QnWorkbenchStateManager>()->unregisterDelegate(m_workbenchStateDelegate.data());
 }
 
 QnMediaServerResourcePtr QnCameraAdditionDialog::server() const {

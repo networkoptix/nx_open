@@ -148,13 +148,9 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 
     ui->mainGridLayout->activate();
     updateHeaderWidth();
-
-    context()->instance<QnWorkbenchStateManager>()->registerDelegate(m_workbenchStateDelegate.data());
 }
 
-QnEventLogDialog::~QnEventLogDialog()
-{
-    context()->instance<QnWorkbenchStateManager>()->unregisterDelegate(m_workbenchStateDelegate.data());
+QnEventLogDialog::~QnEventLogDialog() {
 }
 
 QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, QnBusiness::EventType value)

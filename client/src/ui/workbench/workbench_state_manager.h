@@ -3,8 +3,11 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchStateDelegate {
+class QnWorkbenchStateDelegate: public QnWorkbenchContextAware {
 public:
+    QnWorkbenchStateDelegate(QObject *parent = NULL);
+    ~QnWorkbenchStateDelegate();
+
     virtual bool tryClose(bool force) = 0;
 };
 
@@ -12,6 +15,7 @@ template <typename T>
 class QnBasicWorkbenchStateDelegate: public QnWorkbenchStateDelegate {
 public:
     QnBasicWorkbenchStateDelegate(T* owner):
+        QnWorkbenchStateDelegate(owner),
         m_owner(owner)
     {}
 
@@ -30,13 +34,14 @@ public:
     QnWorkbenchStateManager(QObject *parent = NULL);
 
     bool tryClose(bool force);
+private:
+    friend class QnWorkbenchStateDelegate;
 
     void registerDelegate(QnWorkbenchStateDelegate *d);
     void unregisterDelegate(QnWorkbenchStateDelegate *d);
 
 private:
     QList<QnWorkbenchStateDelegate*> m_delegates;
-
 };
 
 

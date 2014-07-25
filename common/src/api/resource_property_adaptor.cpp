@@ -96,6 +96,10 @@ QString QnAbstractResourcePropertyAdaptor::serializedValue() const {
     return m_serializedValue;
 }
 
+QString QnAbstractResourcePropertyAdaptor::defaultSerializedValue() const {
+    return QString();
+}
+
 void QnAbstractResourcePropertyAdaptor::setValue(const QVariant &value) {
     bool save = false;
     {
@@ -165,6 +169,11 @@ bool QnAbstractResourcePropertyAdaptor::loadValueLocked(const QString &serialize
     return true;
 }
 
+void QnAbstractResourcePropertyAdaptor::synchronizeNow() {
+    processSaveRequests();
+}
+
+
 void QnAbstractResourcePropertyAdaptor::processSaveRequests() {
     if(!m_pendingSave.loadAcquire())
         return;
@@ -192,6 +201,8 @@ void QnAbstractResourcePropertyAdaptor::processSaveRequestsNoLock(const QnResour
     resource->setProperty(m_key, serializedValue);
 
     ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
+    if (!connection)
+        return;
     connection->getResourceManager()->save(resource->getId(), QnKvPairList() << QnKvPair(m_key, serializedValue), false, this, &QnAbstractResourcePropertyAdaptor::at_connection_propertiesSaved);
 }
 
@@ -210,8 +221,4 @@ void QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged(const QnReso
 
 void QnAbstractResourcePropertyAdaptor::at_connection_propertiesSaved(int, ec2::ErrorCode) {
     return;
-}
-
-QString QnAbstractResourcePropertyAdaptor::defaultSerializedValue() const {
-    return QString();
 }

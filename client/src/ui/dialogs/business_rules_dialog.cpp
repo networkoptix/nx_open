@@ -98,13 +98,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->filterLineEdit,                             &QLineEdit::textChanged, this, &QnBusinessRulesDialog::updateFilter);
     connect(ui->clearFilterButton,                          &QToolButton::clicked, this, &QnBusinessRulesDialog::at_clearFilterButton_clicked);
 
-    updateFilter();
-
-    context()->instance<QnWorkbenchStateManager>()->registerDelegate(m_workbenchStateDelegate.data());
+    updateFilter();  
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog() {
-    context()->instance<QnWorkbenchStateManager>()->unregisterDelegate(m_workbenchStateDelegate.data());
 }
 
 void QnBusinessRulesDialog::setFilter(const QString &filter) {

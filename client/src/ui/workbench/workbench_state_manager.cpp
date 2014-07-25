@@ -47,3 +47,13 @@ void QnWorkbenchStateManager::unregisterDelegate(QnWorkbenchStateDelegate *d) {
     m_delegates.removeOne(d);
 }
 
+
+QnWorkbenchStateDelegate::QnWorkbenchStateDelegate(QObject *parent /*= NULL*/):
+    QnWorkbenchContextAware(parent)
+{
+    context()->instance<QnWorkbenchStateManager>()->registerDelegate(this);
+}
+
+QnWorkbenchStateDelegate::~QnWorkbenchStateDelegate() {
+    context()->instance<QnWorkbenchStateManager>()->unregisterDelegate(this);
+}

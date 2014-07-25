@@ -33,3 +33,7 @@ void QnGeneralSystemAdministrationWidget::submitToSettings() {
     ui->cameraWidget->submitToSettings();
     ui->backupWidget->submitToSettings();
 }
+
+bool QnGeneralSystemAdministrationWidget::hasChanges() const  {
+    return ui->cameraWidget->hasChanges();
+}

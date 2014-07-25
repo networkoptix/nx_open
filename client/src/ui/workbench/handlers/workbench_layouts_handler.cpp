@@ -33,25 +33,10 @@
 #include <utils/common/counter.h>
 #include <utils/common/event_processors.h>
 
-
-class QnWorkbenchLayoutsHandlerStateDelegate: public QnWorkbenchStateDelegate {
-public:
-    QnWorkbenchLayoutsHandlerStateDelegate(QnWorkbenchLayoutsHandler* owner):
-        m_owner(owner)
-    {}
-
-    virtual bool tryClose(bool force) override {
-        return m_owner->closeAllLayouts(true, force);
-    }
-private:
-    QnWorkbenchLayoutsHandler* m_owner;
-}; 
-
-
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_workbenchStateDelegate(new QnWorkbenchLayoutsHandlerStateDelegate(this))
+    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnWorkbenchLayoutsHandler>(this))
 {
     connect(action(Qn::NewUserLayoutAction),                &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered);
     connect(action(Qn::SaveLayoutAction),                   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered);
@@ -61,14 +46,10 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     connect(action(Qn::SaveCurrentLayoutAsAction),          &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
     connect(action(Qn::CloseLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered);
     connect(action(Qn::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
-
-    context()->instance<QnWorkbenchStateManager>()->registerDelegate(m_workbenchStateDelegate.data());
 }
 
 QnWorkbenchLayoutsHandler::~QnWorkbenchLayoutsHandler() {
-    context()->instance<QnWorkbenchStateManager>()->unregisterDelegate(m_workbenchStateDelegate.data());
 }
-
 
 ec2::AbstractECConnectionPtr QnWorkbenchLayoutsHandler::connection2() const {
     return QnAppServerConnectionFactory::getConnection2();
@@ -629,4 +610,8 @@ void QnWorkbenchLayoutsHandler::at_layouts_saved(int status, const QnResourceLis
                 resourcePool()->removeResource(layoutResource);
         }
     }
+}
+
+bool QnWorkbenchLayoutsHandler::tryClose(bool force) {
+    return closeAllLayouts(true, force);
 }

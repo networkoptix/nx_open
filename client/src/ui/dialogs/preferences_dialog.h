@@ -5,8 +5,10 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/dialogs/generic_tabbed_dialog.h>
-#include <ui_preferences_dialog.h>
 
+namespace Ui {
+    class PreferencesDialog;
+}
 
 class QnPreferencesDialog: public QnGenericTabbedDialog, public QnWorkbenchContextAware {
     Q_OBJECT

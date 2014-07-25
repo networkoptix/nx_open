@@ -4,6 +4,7 @@
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
 #include <api/session_manager.h>
+#include <api/global_settings.h>
 #include <api/model/connection_info.h>
 
 #include <common/common_module.h>
@@ -246,8 +247,10 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(force))
         return false;
 
-    if (!force)
+    if (!force) {
         qnSettings->setStoredPassword(QString());
+        QnGlobalSettings::instance()->synchronizeNow();
+    }
 
     if (m_connectingMessageBox != NULL) {
         m_connectingMessageBox->disconnect(this);
