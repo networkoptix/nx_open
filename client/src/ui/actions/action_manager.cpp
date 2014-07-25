@@ -736,7 +736,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::BusinessEventsLogAction).
         flags(Qn::Main | Qn::Tree | Qn::GlobalHotkey).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
-        text(tr("Alarm/Event Log...")).
+        text(tr("Event Log...")).
         shortcut(tr("Ctrl+L")).
         autoRepeat(false).
         condition(new QnTreeNodeTypeCondition(Qn::ServersNode, this));
