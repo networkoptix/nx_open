@@ -54,7 +54,7 @@ void QnAbstractResourcePropertyAdaptor::setResource(const QnResourcePtr &resourc
 }
 
 void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr &resource, bool notify) {
-    QString newSerializedValue = resource ? resource->getProperty(m_key) : QString();
+    QString newSerializedValue = resource ? resource->getProperty(m_key) : defaultSerializedValue();
 
     bool changed;
     QnResourcePtr oldResource;
@@ -210,4 +210,8 @@ void QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged(const QnReso
 
 void QnAbstractResourcePropertyAdaptor::at_connection_propertiesSaved(int, ec2::ErrorCode) {
     return;
+}
+
+QString QnAbstractResourcePropertyAdaptor::defaultSerializedValue() const {
+    return QString();
 }

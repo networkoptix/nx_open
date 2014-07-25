@@ -373,7 +373,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
 }
 
 void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIndex, const QnLayoutResourcePtr &firstLayout, const QnVideoWallItemIndex &secondIndex, const QnLayoutResourcePtr &secondLayout) {
-    if (firstIndex.isValid() || !secondIndex.isValid())
+    if (!firstIndex.isValid() || !secondIndex.isValid())
         return;
 
     QnLayoutResourceList unsavedLayouts;
@@ -1070,30 +1070,43 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 /*------------------------------------ HANDLERS ------------------------------------------*/
 
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
+
+    QStringList usedNames;
+    foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::videowall))
+        usedNames << resource->getName().trimmed().toLower();
+
     //TODO: #GDM #VW refactor to corresponding dialog
+    QString proposedName = generateUniqueString(usedNames, tr("Video Wall"), tr("Video Wall %1") );
+
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Video Wall..."));
     dialog->setText(tr("Enter the name of the Video Wall to create:")); //TODO: #VW #TR
-    dialog->setName(
-        generateUniqueString([] () {
-                QStringList used;
-                foreach(const QnResourcePtr &resource, qnResPool->getResourcesWithFlag(QnResource::videowall))
-                    used << resource->getName();
-                return used;
-            }(), tr("Video Wall"), tr("Video Wall %1") )
-    );
+    dialog->setName(proposedName);
     dialog->setWindowModality(Qt::ApplicationModal);
 
-    if(!dialog->exec())
-        return;
+    while (true) {
+        if(!dialog->exec())
+            return;
 
-    QString name = dialog->name();
-    if (name.isEmpty())
-        return;
+        proposedName = dialog->name().trimmed();
+        if (proposedName.isEmpty())
+            return;
+
+        if (usedNames.contains(proposedName.toLower())) {
+            QMessageBox::warning(
+                mainWindow(),
+                tr("Video Wall already exists"),
+                tr("Video Wall with same name already exists")
+                );
+            continue;
+        }
+
+        break;
+    };
 
     QnVideoWallResourcePtr videoWall(new QnVideoWallResource());
     videoWall->setId(QUuid::createUuid());
-    videoWall->setName(name);
+    videoWall->setName(proposedName);
     videoWall->setTypeByName(lit("Videowall"));
 
     connection2()->getVideowallManager()->save(videoWall,  this, 
@@ -1258,7 +1271,7 @@ void QnWorkbenchVideoWallHandler::at_renameAction_triggered() {
         }
         break;
     default:
-        break;
+        return;
     }
 
     saveVideowalls(videoWalls);

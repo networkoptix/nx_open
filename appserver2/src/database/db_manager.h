@@ -295,6 +295,7 @@ namespace ec2
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnId& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
+        ErrorCode checkExistingUser(const QString &name, qint32 internalId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnId& id);

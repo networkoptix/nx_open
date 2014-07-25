@@ -753,8 +753,13 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 
 ErrorCode QnDbManager::updateResource(const ApiResourceData& data, qint32 internalId)
 {
-	QSqlQuery insQuery(m_sdb);
+    /* Check that we are updating really existing resource */
+    Q_ASSERT(internalId != 0);
+    ErrorCode result = checkExistingUser(data.name, internalId);
+    if (result != ErrorCode::ok)
+        return result;
 
+	QSqlQuery insQuery(m_sdb);
 	insQuery.prepare("UPDATE vms_resource SET xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url, status = :status WHERE id = :internalId");
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
@@ -771,7 +776,7 @@ ErrorCode QnDbManager::updateResource(const ApiResourceData& data, qint32 intern
         if (result != ErrorCode::ok)
             return result;
         */
-        ErrorCode result = insertAddParams(data.addParams, internalId);
+        result = insertAddParams(data.addParams, internalId);
         if (result != ErrorCode::ok)
             return result;
     }
@@ -1521,11 +1526,35 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredF
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId) {
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT r.id\
+                  FROM vms_resource r \
+                  JOIN vms_userprofile p on p.resource_ptr_id = r.id \
+                  WHERE p.resource_ptr_id != :id and r.name = :name");
+
+
+    query.bindValue(":id", internalId);
+    query.bindValue(":name", name);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+    if(query.next())
+        return ErrorCode::failure;  // another user with same name already exists
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserData>& tran)
 {
-    qint32 internalId;
+    qint32 internalId = getResourceInternalId(tran.params.id);
 
-    ErrorCode result = insertOrReplaceResource(tran.params, &internalId);
+    ErrorCode result = checkExistingUser(tran.params.name, internalId);
+    if (result !=ErrorCode::ok)
+        return result;
+
+    result = insertOrReplaceResource(tran.params, &internalId);
     if (result !=ErrorCode::ok)
         return result;
 
