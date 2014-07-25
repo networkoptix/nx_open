@@ -200,7 +200,7 @@ bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
 {
     if (errCode)
         *errCode = errorCode;
-    return false;
+    return errorCode == NoError;
 }
 
 /* 
@@ -210,9 +210,6 @@ bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
 */
 bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
 {
-    if (errCode)
-        *errCode = NoError;
-
     if (!m_isValid1 && !m_isValid2)
         return gotError(errCode, InvalidSignature);
 
@@ -232,14 +229,13 @@ bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
 
     if (isEdgeBox && type() == Qn::LC_Edge) 
     {
-        foreach(QnLicensePtr license, qnLicensePool->getLicenses()) 
-        {
+        foreach(QnLicensePtr license, qnLicensePool->getLicenses()) {
             if (license->hardwareId() == hardwareId() && license->type() == type() && license->key() < key())
                 return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed
         }
     }
 
-    return true;
+    return gotError(errCode, NoError);
 }
 
 QByteArray QnLicense::toString() const
