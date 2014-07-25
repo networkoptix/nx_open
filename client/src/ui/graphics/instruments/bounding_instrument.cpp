@@ -161,7 +161,8 @@ public:
         m_lastTickTime = 0;
         m_stickyLogScaleHi = 1.0;
         m_stickyLogScaleLo = -1.0;
-        m_stickyLogScaleResettingThreshold = 0.91;
+        m_defaultStickyLogScaleResettingThreshold = 0.91;
+        m_stickyLogScaleResettingThreshold = m_defaultStickyLogScaleResettingThreshold;
         m_logScaleResettingSpeedMultiplier = 0.2;
     }
 
@@ -186,10 +187,18 @@ public:
     }
 
     void setPositionBoundsExtension(const MarginsF &extension) {
+        qreal logScale;
+        calculateRelativeScale(&logScale);
+
         m_positionBoundsExtension = extension;
 
         if(m_view != NULL)
             updateSceneRect();
+
+        if (logScale > m_defaultStickyLogScaleResettingThreshold && logScale <= 1.0) {
+            calculateRelativeScale(&logScale);
+            m_stickyLogScaleResettingThreshold = logScale;
+        }
     }
 
     const MarginsF &positionBoundsExtension() const {
@@ -321,8 +330,8 @@ public:
                 qreal logDirection = calculateDistance(logScale, m_stickyLogScaleLo, m_stickyLogScaleHi);
                 qreal scaleSpeed = m_logScaleSpeed;
                 if (qFuzzyIsNull(logDirection)) {
-                    if (logScale > m_stickyLogScaleHi * m_stickyLogScaleResettingThreshold) {
-                        logDirection = m_stickyLogScaleHi - logScale;
+                    if (logScale >= m_stickyLogScaleResettingThreshold) {
+                        logDirection = 1 - logScale;
                         scaleSpeed *= m_logScaleResettingSpeedMultiplier;
                     }
                 }
@@ -367,6 +376,7 @@ public:
 
             m_stickyLogScaleLo = qMin(-1.0, qMax(logScale, m_stickyLogScaleLo));
             m_stickyLogScaleHi = qMax( 1.0, qMin(logScale, m_stickyLogScaleHi));
+            m_stickyLogScaleResettingThreshold = qMin(m_stickyLogScaleResettingThreshold, m_defaultStickyLogScaleResettingThreshold);
         }
 
         m_lastTickTime = time;
@@ -539,8 +549,11 @@ public:
     /** Sticky log scale lower bound. */
     qreal m_stickyLogScaleLo;
 
-    /** A threshold multiplier to specify the scale when the bounds should be reset to default value (m_stickyLogScaleHi). */
+    /** Threshold multiplier to specify the scale when the bounds should be reset to default value (m_stickyLogScaleHi). */
     qreal m_stickyLogScaleResettingThreshold;
+
+    /** Default value of m_stickyLogScaleResettingThreshold. */
+    qreal m_defaultStickyLogScaleResettingThreshold;
 
     /** Scale speed multiplier when scale is resetting to default value (m_stickyLogScaleHi). */
     qreal m_logScaleResettingSpeedMultiplier;
