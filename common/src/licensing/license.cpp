@@ -59,6 +59,7 @@ namespace {
 
 struct LicenseTypeInfo
 {
+    LicenseTypeInfo(): licenseType(Qn::LC_CountTotal), allowedForEdge(0) {}
     LicenseTypeInfo(Qn::LicenseType licenseType, const QString& name, const QString& longName, bool allowedForEdge):
         licenseType(licenseType), name(name), longName(longName), allowedForEdge(allowedForEdge) {}
 
@@ -68,13 +69,14 @@ struct LicenseTypeInfo
     bool allowedForEdge;
 };
 
-static std::array<LicenseTypeInfo, 6>  licenseTypeInfo =
+static std::array<LicenseTypeInfo, Qn::LC_CountTotal>  licenseTypeInfo =
 {
     LicenseTypeInfo(Qn::LC_Trial,        QObject::tr("Trial"),        QObject::tr("Trial license(s)"),        1),
     LicenseTypeInfo(Qn::LC_Analog,       QObject::tr("Analog"),       QObject::tr("Analog license(s)"),       0),
     LicenseTypeInfo(Qn::LC_Professional, QObject::tr("Professional"), QObject::tr("Professional license(s)"), 0),
     LicenseTypeInfo(Qn::LC_Edge,         QObject::tr("Edge"),         QObject::tr("Edge license(s)"),         1),
     LicenseTypeInfo(Qn::LC_VMAX,         QObject::tr("Vmax"),         QObject::tr("Vmax license(s)"),         0),
+    LicenseTypeInfo(), // filler
     LicenseTypeInfo(Qn::LC_VideoWall,    QObject::tr("Videowall"),    QObject::tr("Videowall license(s)"),    1)
 };
 } // anonymous namespace
@@ -97,6 +99,11 @@ QnLicense::QnLicense(const QByteArray &licenseBlock)
       m_isValid2(false)
 {
     loadLicenseBlock( licenseBlock );
+}
+
+bool QnLicense::isInfoMode() const
+{
+    return m_signature.isEmpty() && m_signature2.isEmpty();
 }
 
 void QnLicense::loadLicenseBlock( const QByteArray& licenseBlock )
@@ -208,12 +215,12 @@ bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
    v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
    We just allow empty brand for all, because we believe license is correct. 
 */
-bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
+bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
 {
-    if (!m_isValid1 && !m_isValid2)
+    if (!m_isValid1 && !m_isValid2 && mode != VM_CheckInfo)
         return gotError(errCode, InvalidSignature);
-
-    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(isNewLicense ? qnCommon->remoteGUID() : findRuntimeDataByLicense());
+    
+    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? findRuntimeDataByLicense() : qnCommon->remoteGUID());
     if (info.uuid.isNull())
         return gotError(errCode, InvalidHardwareID); // peer where license was activated not found
 

@@ -35,6 +35,12 @@ public:
         TooManyLicensesPerDevice    /**< Too many licenses of this type per device */
     };
 
+    enum ValidationMode {
+        VM_Regular,
+        VM_CheckInfo,
+        VM_JustCreated
+    };
+
     QnLicense();
     QnLicense(const QByteArray& licenseBlock);
 
@@ -43,7 +49,7 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(ErrorCode* errCode = 0, bool isNewLicense = false) const;
+    bool isValid(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
 
     static QString errorMessage(ErrorCode errCode);
 
@@ -71,6 +77,8 @@ public:
     QString typeName() const;
     QString longTypeName() const;
     static QString longTypeName(Qn::LicenseType licenseType);
+
+    bool isInfoMode() const;
 
     static QnLicensePtr readFromStream(QTextStream &stream);
 

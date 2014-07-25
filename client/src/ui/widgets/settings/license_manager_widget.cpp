@@ -161,7 +161,10 @@ void QnLicenseManagerWidget::showMessage(const QString &title, const QString &me
         QMessageBox::information(this, title, message);
 }
 
-void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, const QList<QByteArray> &mainHardwareIds, const QList<QByteArray> &compatibleHardwareIds) {
+void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool infoMode) 
+{
+    const QList<QByteArray> mainHardwareIds = qnLicensePool->mainHardwareIds();
+    const QList<QByteArray> compatibleHardwareIds = qnLicensePool->compatibleHardwareIds();
 
     if (!QnRuntimeInfoManager::instance()->items()->hasItem(qnCommon->remoteGUID())) {
         emit showMessageLater(tr("License Activation"),
@@ -201,6 +204,8 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, cons
 
         hw++;
     }
+    if (infoMode)
+        params.addQueryItem(lit("mode"), lit("info"));
 
     hw = 1;
     foreach (const QByteArray& hwid, compatibleHardwareIds) {
@@ -378,25 +383,37 @@ void QnLicenseManagerWidget::at_downloadFinished() {
 
         QTextStream is(&replyData);
         is.setCodec("UTF-8");
+        QByteArray licenseKey = m_replyKeyMap[reply];
+        m_replyKeyMap.remove(reply);
+        reply->deleteLater();
 
         while (!is.atEnd()) {
             QnLicensePtr license = QnLicense::readFromStream(is);
             if (!license )
                 break;
 
-
             QnLicense::ErrorCode errCode = QnLicense::NoError;
-            if (license->isValid(&errCode, true))
-                licenses.append(license);
-            else if (errCode == QnLicense::Expired)
-                licenses.append(license); // ignore expired error code
+
+            if (license->isInfoMode()) {
+                if (!license->isValid(&errCode, QnLicense::VM_CheckInfo) && errCode != QnLicense::Expired) {
+                    emit showMessageLater(tr("License activation"), tr("Can't activate license:  %1").arg(QnLicense::errorMessage(errCode)), true);
+                    ui->licenseWidget->setState(QnLicenseWidget::Normal);
+                }
+                else {
+                    updateFromServer(license->key(), false);
+                }
+
+                return;
+            }
+            else {
+                if (license->isValid(&errCode, QnLicense::VM_JustCreated))
+                    licenses.append(license);
+                else if (errCode == QnLicense::Expired)
+                    licenses.append(license); // ignore expired error code
+            }
         }
 
-        validateLicenses(m_replyKeyMap[reply], licenses);
-
-        m_replyKeyMap.remove(reply);
-
-        reply->deleteLater();
+        validateLicenses(licenseKey, licenses);
     }
 
     ui->licenseWidget->setState(QnLicenseWidget::Normal);
@@ -441,7 +458,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
         return;
 
     if (ui->licenseWidget->isOnline()) {
-        updateFromServer(ui->licenseWidget->serialKey().toLatin1(), qnLicensePool->mainHardwareIds(), qnLicensePool->compatibleHardwareIds());
+        updateFromServer(ui->licenseWidget->serialKey().toLatin1(), true);
     } else {
         QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
 
