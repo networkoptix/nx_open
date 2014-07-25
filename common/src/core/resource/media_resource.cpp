@@ -159,3 +159,7 @@ QString QnMediaResource::dontRecordSecondaryStreamKey() {
 QString QnMediaResource::rtpTransportKey() {
     return lit("rtpTransport");
 }
+
+QString QnMediaResource::motionStreamKey() {
+    return lit("motionStream");
+}

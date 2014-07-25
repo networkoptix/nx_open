@@ -58,6 +58,7 @@ public:
     static QString dontRecordPrimaryStreamKey();
     static QString dontRecordSecondaryStreamKey();
     static QString rtpTransportKey();
+    static QString motionStreamKey();
 protected:
     void initMediaResource();
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields);

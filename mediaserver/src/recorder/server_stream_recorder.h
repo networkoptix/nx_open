@@ -73,7 +73,7 @@ private:
     void keepRecentlyMotion(const QnConstAbstractMediaDataPtr& md);
 private slots:
     void at_recordingFinished(int status, const QString &filename);
-    void at_camera_propertyChanged();
+    void at_camera_propertyChanged(const QnResourcePtr &, const QString &);
 private:
     const size_t m_maxRecordQueueSizeBytes;
     const size_t m_maxRecordQueueSizeElements;

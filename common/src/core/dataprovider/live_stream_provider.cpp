@@ -140,11 +140,21 @@ Qn::StreamQuality QnLiveStreamProvider::getQuality() const
 
 QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
 {
-    if (m_softMotionRole == QnResource::Role_Default) {
-        if (m_cameraRes && !m_cameraRes->hasDualStreaming2() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
+    QMutexLocker lock(&m_motionRoleMtx);
+
+    if (m_softMotionRole == QnResource::Role_Default) 
+    {
+        QString forcedMotionStream = m_cameraRes->getProperty(QnMediaResource::motionStreamKey()).toLower();
+        if (forcedMotionStream == lit("primary"))
             m_softMotionRole = QnResource::Role_LiveVideo;
-        else
+        else if (forcedMotionStream == lit("secondary"))
             m_softMotionRole = QnResource::Role_SecondaryLiveVideo;
+        else {
+            if (m_cameraRes && !m_cameraRes->hasDualStreaming2() && (m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability))
+                m_softMotionRole = QnResource::Role_LiveVideo;
+            else
+                m_softMotionRole = QnResource::Role_SecondaryLiveVideo;
+        }
     }
     return m_softMotionRole;
 }
@@ -400,6 +410,12 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
     else
         m_cameraRes->setCameraCapabilities( m_cameraRes->getCameraCapabilities() & ~Qn::PrimaryStreamSoftMotionCapability );
 
+    m_softMotionRole = QnResource::Role_Default;    //it will be auto-detected on the next frame
+}
+
+void QnLiveStreamProvider::updateSoftwareMotionStreamNum()
+{
+    QMutexLocker lock(&m_motionRoleMtx);
     m_softMotionRole = QnResource::Role_Default;    //it will be auto-detected on the next frame
 }
 

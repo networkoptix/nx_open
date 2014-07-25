@@ -55,6 +55,7 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     connect(ui->checkBoxPrimaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->checkBoxSecondaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->comboBoxTransport, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
+    connect(ui->comboBoxMotionStream, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
 
     setHelpTopic(ui->qualityGroupBox, Qn::CameraSettings_SecondStream_Help);
     setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
@@ -89,6 +90,9 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
 
     bool sameRtpTransport = true;
     QString rtpTransport;
+
+    bool sameMotionStream = true;
+    QString motionStream;
 
     int camCnt = 0;
     foreach(const QnVirtualCameraResourcePtr &camera, cameras) 
@@ -131,6 +135,12 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
         if (camRtpTransport != rtpTransport && camCnt > 0)
             sameRtpTransport = false;
         rtpTransport = camRtpTransport;
+
+        QString camMotionStream = camera->getProperty(QnMediaResource::motionStreamKey());
+        if (camMotionStream != motionStream && camCnt > 0)
+            sameMotionStream = false;
+        motionStream = camMotionStream;
+
         camCnt++;
     }
 
@@ -169,6 +179,13 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
     else
         ui->comboBoxTransport->setCurrentIndex(-1);
 
+    if (motionStream.isEmpty())
+        ui->comboBoxMotionStream->setCurrentIndex(0);
+    else if (sameMotionStream)
+        ui->comboBoxMotionStream->setCurrentText(motionStream);
+    else
+        ui->comboBoxMotionStream->setCurrentIndex(-1);
+
 
     ui->settingsGroupBox->setVisible(arecontCamerasCount != cameras.size());
     ui->settingsDisableControlCheckBox->setTristate(!sameControlState);
@@ -181,7 +198,8 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
             && sliderPosToQuality(ui->qualitySlider->value()) == Qn::SSQualityMedium
             && ui->checkBoxPrimaryRecorder->checkState() == Qt::Unchecked
             && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
-            && ui->comboBoxTransport->currentIndex() == 0;
+            && ui->comboBoxTransport->currentIndex() == 0
+            && ui->comboBoxMotionStream->currentIndex() == 0;
 
     ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
     ui->assureCheckBox->setChecked(!defaultValues);
@@ -219,6 +237,13 @@ void QnAdvancedSettingsWidget::submitToResources(const QnVirtualCameraResourceLi
                 txt.clear();
             camera->setProperty(QnMediaResource::rtpTransportKey(), txt);
         }
+
+        if (ui->comboBoxMotionStream->currentIndex() >= 0) {
+            QString txt = ui->comboBoxMotionStream->currentText();
+            if (txt.toLower() == lit("auto"))
+                txt.clear();
+            camera->setProperty(QnMediaResource::motionStreamKey(), txt);
+        }
     }
 }
 
@@ -242,6 +267,7 @@ void QnAdvancedSettingsWidget::at_restoreDefaultsButton_clicked()
     ui->checkBoxPrimaryRecorder->setChecked(false);
     ui->checkBoxSecondaryRecorder->setChecked(false);
     ui->comboBoxTransport->setCurrentIndex(0);
+    ui->comboBoxMotionStream->setCurrentIndex(0);
 }
 
 void QnAdvancedSettingsWidget::at_qualitySlider_valueChanged(int value) {
