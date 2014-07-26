@@ -71,13 +71,14 @@ struct LicenseTypeInfo
 
 static std::array<LicenseTypeInfo, Qn::LC_CountTotal>  licenseTypeInfo =
 {
-    LicenseTypeInfo(Qn::LC_Trial,        QObject::tr("Trial"),        QObject::tr("Trial license(s)"),        1),
-    LicenseTypeInfo(Qn::LC_Analog,       QObject::tr("Analog"),       QObject::tr("Analog license(s)"),       0),
-    LicenseTypeInfo(Qn::LC_Professional, QObject::tr("Professional"), QObject::tr("Professional license(s)"), 0),
-    LicenseTypeInfo(Qn::LC_Edge,         QObject::tr("Edge"),         QObject::tr("Edge license(s)"),         1),
-    LicenseTypeInfo(Qn::LC_VMAX,         QObject::tr("Vmax"),         QObject::tr("Vmax license(s)"),         0),
+    LicenseTypeInfo(Qn::LC_Trial,           QObject::tr("Trial"),           QObject::tr("Trial license(s)"),        1),
+    LicenseTypeInfo(Qn::LC_Analog,          QObject::tr("Analog"),          QObject::tr("Analog license(s)"),       0),
+    LicenseTypeInfo(Qn::LC_Professional,    QObject::tr("Professional"),    QObject::tr("Professional license(s)"), 0),
+    LicenseTypeInfo(Qn::LC_Edge,            QObject::tr("Edge"),            QObject::tr("Edge license(s)"),         1),
+    LicenseTypeInfo(Qn::LC_VMAX,            QObject::tr("Vmax"),            QObject::tr("Vmax license(s)"),         0),
+    LicenseTypeInfo(Qn::LC_AnalogEncoder,   QObject::tr("Analog encoder"),  QObject::tr("Analog encoder license(s)"), 0),
     LicenseTypeInfo(), // filler
-    LicenseTypeInfo(Qn::LC_VideoWall,    QObject::tr("Videowall"),    QObject::tr("Videowall license(s)"),    1)
+    LicenseTypeInfo(Qn::LC_VideoWall,       QObject::tr("Video wall"),      QObject::tr("Video wall license(s)"),    1)
 };
 } // anonymous namespace
 
@@ -304,6 +305,8 @@ Qn::LicenseType QnLicense::type() const
         return Qn::LC_Edge;
     else if (xclass().toLower() == lit("videowall"))
         return Qn::LC_VideoWall;
+    else if (xclass().toLower() == lit("analogencoder"))
+        return Qn::LC_AnalogEncoder;
     else
         return Qn::LC_Professional;
 }

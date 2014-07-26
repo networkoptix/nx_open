@@ -79,6 +79,10 @@ public:
     /** Returns true if it is a analog camera */
     bool isAnalog() const;
 
+    /** Returns true if it is a analog encoder (described in resource_data.json) */
+    bool isAnalogEncoder() const;
+
+
     /** Returns true if it is a edge camera */
     bool isEdge() const;
 

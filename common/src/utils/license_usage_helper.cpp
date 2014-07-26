@@ -13,7 +13,7 @@ struct LiceseCompatibility
     Qn::LicenseType child;
 };
 
-static std::array<LiceseCompatibility, 10> compatibleLicenseType =
+static std::array<LiceseCompatibility, 14> compatibleLicenseType =
 {
     LiceseCompatibility(Qn::LC_Edge,    Qn::LC_Professional),
     LiceseCompatibility(Qn::LC_Professional, Qn::LC_Analog),
@@ -22,11 +22,16 @@ static std::array<LiceseCompatibility, 10> compatibleLicenseType =
     LiceseCompatibility(Qn::LC_Analog,    Qn::LC_VMAX),
     LiceseCompatibility(Qn::LC_Professional, Qn::LC_VMAX),
     LiceseCompatibility(Qn::LC_Edge, Qn::LC_VMAX),
-    
+
+    LiceseCompatibility(Qn::LC_Analog,    Qn::LC_AnalogEncoder),
+    LiceseCompatibility(Qn::LC_Professional, Qn::LC_AnalogEncoder),
+    LiceseCompatibility(Qn::LC_Edge, Qn::LC_AnalogEncoder),
+
     LiceseCompatibility(Qn::LC_Trial,    Qn::LC_Edge),
     LiceseCompatibility(Qn::LC_Trial,    Qn::LC_Professional),
     LiceseCompatibility(Qn::LC_Trial,    Qn::LC_Analog),
-    LiceseCompatibility(Qn::LC_Trial,    Qn::LC_VMAX)
+    LiceseCompatibility(Qn::LC_Trial,    Qn::LC_VMAX),
+    LiceseCompatibility(Qn::LC_Trial,    Qn::LC_AnalogEncoder)
 };
 
 

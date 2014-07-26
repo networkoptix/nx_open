@@ -30,7 +30,7 @@ public:
      * \param useWildcard               do general wildcard search. It more slow method but allow to find values with '*' in the middle of a key value
      * \returns                         Resource data for the given camera.
      */
-    QnResourceData data(const QnVirtualCameraResourcePtr &camera, bool useWildcard = false) const;
+    QnResourceData data(const QnSecurityCamResourcePtr &camera, bool useWildcard = false) const;
     
     bool load(const QString &fileName);
 

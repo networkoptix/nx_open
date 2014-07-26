@@ -6,6 +6,7 @@
 
 #include <utils/serialization/lexical.h>
 
+#include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 
 #include "user_resource.h"
@@ -13,6 +14,7 @@
 
 #include <recording/time_period_list.h>
 #include "core/resource/media_server_resource.h"
+#include "resource_data.h"
 
 #define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
 
@@ -257,6 +259,12 @@ bool QnSecurityCamResource::isAnalog() const {
     return val.toBool();
 }
 
+bool QnSecurityCamResource::isAnalogEncoder() const {
+    const QnSecurityCamResourcePtr ptr = toSharedPointer(const_cast<QnSecurityCamResource*> (this));
+    QnResourceData resourceData = qnCommon->dataPool()->data(ptr, true);
+    return resourceData.value<bool>(lit("analogEncoder"));
+}
+
 bool QnSecurityCamResource::isEdge() const {
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(getParentId()).dynamicCast<QnMediaServerResource>();
     return mServer && (mServer->getServerFlags() & Qn::SF_Edge);
@@ -268,6 +276,8 @@ Qn::LicenseType QnSecurityCamResource::licenseType() const
         return Qn::LC_Analog;
     else if (isEdge())
         return Qn::LC_Edge;
+    else if (isAnalogEncoder())
+        return Qn::LC_AnalogEncoder;
     else
         return Qn::LC_Professional;
 }

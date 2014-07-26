@@ -39,7 +39,7 @@ QnResourceData QnResourceDataPool::data(const QString &key) const {
     return m_dataByKey.value(key.toLower());
 }
 
-QnResourceData QnResourceDataPool::data(const QnVirtualCameraResourcePtr &camera, bool useWildcard) const {
+QnResourceData QnResourceDataPool::data(const QnSecurityCamResourcePtr &camera, bool useWildcard) const {
     QString vendor = camera->getVendor().toLower();
     vendor = m_shortVendorByName.value(vendor, vendor);
     QString model = camera->getModel().toLower();
