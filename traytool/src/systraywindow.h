@@ -113,6 +113,7 @@ private slots:
     void at_mediaServerStartAction();
     void at_mediaServerStopAction();
     void at_mediaServerWebAction();
+    void onShowMediaServerLogAction();
 
     void findServiceInfo();
     void updateServiceInfo();
@@ -131,6 +132,8 @@ private:
     void initTranslations();
 
 private:
+    QSettings m_mediaServerSettings;
+
     QAction *m_quitAction;
 
     QSystemTrayIcon *m_trayIcon;
@@ -142,7 +145,8 @@ private:
 
     SC_HANDLE m_scManager;
     SC_HANDLE m_mediaServerHandle;
-    
+
+    QAction *m_showMediaServerLogAction;    
     QAction* m_mediaServerStartAction;
     QAction* m_mediaServerStopAction;
     QAction* m_mediaServerWebAction;
