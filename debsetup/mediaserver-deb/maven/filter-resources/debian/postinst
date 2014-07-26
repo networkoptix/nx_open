@@ -160,6 +160,7 @@ case "$1" in
 	"$CERTGEN" -i
 
         if [ -f "$OLD_DB_PATH" -a ! -f "$DB_PATH" ]; then
+            [ -d $BASE_DIR/var ] || mkdir $BASE_DIR/var
             cp "$OLD_DB_PATH" "$DB_PATH"
             $DBSYNC
         fi
@@ -173,8 +174,6 @@ case "$1" in
     exit 1
   ;;
 esac
-
-[ -d $VARDIR ] || mkdir $VARDIR
 
 if [ -e "/etc/init/$COMPANY_NAME-mediaserver.conf" ]; then
 	invoke-rc.d $COMPANY_NAME-mediaserver start || exit $?
