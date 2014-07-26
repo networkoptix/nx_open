@@ -125,7 +125,7 @@ void QnLicenseUsageHelper::update()
 
 QString QnLicenseUsageHelper::getUsageText(Qn::LicenseType licenseType) const
 {
-    return QObject::tr("%n %2 are used out of %1.", "", m_usedLicenses[licenseType]).arg( m_licenses.totalLicenseByType(licenseType)).arg(QnLicense::longTypeName(licenseType));
+    return QObject::tr("%n %2 are used out of %1.", "", m_usedLicenses[licenseType]).arg( m_licenses.totalLicenseByType(licenseType)).arg(QnLicense::longDisplayName(licenseType));
 }
 
 QString QnLicenseUsageHelper::getUsageText() const 
@@ -147,7 +147,7 @@ QString QnLicenseUsageHelper::getUsageText() const
 
 QString QnLicenseUsageHelper::getWillUsageText(Qn::LicenseType licenseType) const
 {
-    return QObject::tr("%n %2 will be used out of %1.", "", m_usedLicenses[licenseType]).arg( m_licenses.totalLicenseByType(licenseType)).arg(QnLicense::longTypeName(licenseType));
+    return QObject::tr("%n %2 will be used out of %1.", "", m_usedLicenses[licenseType]).arg( m_licenses.totalLicenseByType(licenseType)).arg(QnLicense::longDisplayName(licenseType));
 }
 
 QString QnLicenseUsageHelper::getWillUsageText() const
@@ -175,13 +175,13 @@ QString QnLicenseUsageHelper::getRequiredLicenseMsg() const
     {
         for (int i = 0; i < Qn::LC_CountCamLecense; ++i) {
             if (m_overflowLicenses[i] > 0)
-                msg += QObject::tr("Activate %n more %2. ", "", m_overflowLicenses[i]).arg(QnLicense::longTypeName((Qn::LicenseType)i));
+                msg += QObject::tr("Activate %n more %2. ", "", m_overflowLicenses[i]).arg(QnLicense::longDisplayName((Qn::LicenseType)i));
         }
     }
     else {
         for (int i = 0; i < Qn::LC_CountCamLecense; ++i) {
             if (m_proposedLicenses[i] > 0)
-                msg += QObject::tr("%n more %2 will be used. ", "", m_proposedLicenses[Qn::LC_Professional]).arg(QnLicense::longTypeName((Qn::LicenseType)i));;
+                msg += QObject::tr("%n more %2 will be used. ", "", m_proposedLicenses[Qn::LC_Professional]).arg(QnLicense::longDisplayName((Qn::LicenseType)i));;
         }
     }
     return msg;

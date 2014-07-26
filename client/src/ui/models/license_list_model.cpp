@@ -78,7 +78,7 @@ QStandardItem *QnLicenseListModel::createItem(Column column, const QnLicensePtr 
 
     switch(column) {
     case TypeColumn:
-        item->setText(license->typeName());
+        item->setText(license->displayName());
         break;
     case CameraCountColumn:
         item->setText(QString::number(license->cameraCount()));

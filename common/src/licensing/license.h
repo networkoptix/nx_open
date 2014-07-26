@@ -74,9 +74,9 @@ public:
      */
     qint64 expirationTime() const;
     Qn::LicenseType type() const;
-    QString typeName() const;
-    QString longTypeName() const;
-    static QString longTypeName(Qn::LicenseType licenseType);
+    QString displayName() const;
+    QString longDisplayName() const;
+    static QString longDisplayName(Qn::LicenseType licenseType);
 
     bool isInfoMode() const;
 

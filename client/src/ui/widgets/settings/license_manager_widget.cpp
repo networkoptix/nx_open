@@ -113,7 +113,7 @@ void QnLicenseManagerWidget::updateLicenses() {
         {
             Qn::LicenseType licenseType = Qn::LicenseType(i);
             if (helper.totalLicense(licenseType) > 0)
-                msg += tr("\n%1 %2").arg(helper.totalLicense(licenseType)).arg(QnLicense::longTypeName(licenseType));
+                msg += tr("\n%1 %2").arg(helper.totalLicense(licenseType)).arg(QnLicense::longDisplayName(licenseType));
         }
 
         if (!helper.isValid()) 
@@ -123,7 +123,7 @@ void QnLicenseManagerWidget::updateLicenses() {
             {
                 Qn::LicenseType licenseType = Qn::LicenseType(i);
                 if (helper.usedLicense(licenseType) > 0)
-                    msg += tr("\nAt least %n %2 are required", "", helper.usedLicense(licenseType)).arg(QnLicense::longTypeName(licenseType));
+                    msg += tr("\nAt least %n %2 are required", "", helper.usedLicense(licenseType)).arg(QnLicense::longDisplayName(licenseType));
             }
         }
         else {
@@ -131,7 +131,7 @@ void QnLicenseManagerWidget::updateLicenses() {
             {
                 Qn::LicenseType licenseType = Qn::LicenseType(i);
                 if (helper.usedLicense(licenseType) > 0)
-                    msg += tr("\n%n %2 are currently in use", "", helper.usedLicense(licenseType)).arg(QnLicense::longTypeName(licenseType));
+                    msg += tr("\n%n %2 are currently in use", "", helper.usedLicense(licenseType)).arg(QnLicense::longDisplayName(licenseType));
             }
         }
         ui->infoLabel->setText(msg);
@@ -277,7 +277,7 @@ void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
         "<br />\n"
         "<b>Features:</b><br />\n"
         "Archive Streams Allowed: %4")
-        .arg(license->typeName())
+        .arg(license->displayName())
         .arg(QLatin1String(license->key()))
         .arg(QLatin1String(qnLicensePool->currentHardwareId()))
         .arg(license->cameraCount());
