@@ -148,13 +148,12 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QModelIndex &index) con
 }
 
 QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource, const QString &groupId, const QString &groupName) {
-    RecorderHash recorderHash = m_recorderHashByResource[resource];
-    if (recorderHash.contains(groupId))
-        return recorderHash[groupId];
+    if (m_recorderHashByResource[resource].contains(groupId))
+        return m_recorderHashByResource[resource][groupId];
 
     QnResourcePoolModelNode* recorder = new QnResourcePoolModelNode(this, Qn::RecorderNode, groupName);
     recorder->setParent(m_resourceNodeByResource[resource]);
-    recorderHash[groupId] = recorder;
+    m_recorderHashByResource[resource][groupId] = recorder;
     return recorder;
 }
 
