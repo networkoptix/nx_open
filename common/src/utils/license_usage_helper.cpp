@@ -5,7 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
-/* Allow to use 'master' license type instead of 'child' type inf child licenses isn't enough */
+/** Allow to use 'master' license type instead of 'child' type if there are not enough child licenses. */
 struct LicenseCompatibility 
 {
     LicenseCompatibility(Qn::LicenseType master, Qn::LicenseType child): master(master), child(child) {}
