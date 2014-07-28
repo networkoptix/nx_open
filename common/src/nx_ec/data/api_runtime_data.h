@@ -25,7 +25,7 @@ namespace ec2
                    box == other.box &&
                    publicIP == other.publicIP &&
                    videoWallInstanceGuid == other.videoWallInstanceGuid &&
-                   videoWallControlSessions == videoWallControlSessions &&
+                   videoWallControlSessions == other.videoWallControlSessions &&
                    prematureLicenseExperationDate == other.prematureLicenseExperationDate;
         }
 
