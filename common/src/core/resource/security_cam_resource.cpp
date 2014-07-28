@@ -675,10 +675,6 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         setMAC(camera->getMAC());
         result = true;
     }
-    if (getFirmware() != camera->getFirmware()) {
-        setFirmware(camera->getFirmware());
-        result = true;
-    }
 
 
     return result;
