@@ -147,6 +147,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 if (existCamRes->getTypeId() != newNetRes->getTypeId()) {
                     QnId newTypeId = newNetRes->getTypeId();
                     newNetRes->update(existCamRes);
+                    newNetRes->setParentId(qnCommon->moduleGUID());
+                    newNetRes->setFlags(existCamRes->flags() & ~QnResource::foreigner);
                     newNetRes->setId(existCamRes->getId());
                     newNetRes->setTypeId(newTypeId);
                     qnResPool->removeResource(existCamRes);
