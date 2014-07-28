@@ -4,7 +4,7 @@
 #include <QtCore/QVariant>
 #include <QtGui/QColor>
 #include <QtWidgets/QWidget>
-
+#include <QVector>
 #include <client/client_color_types.h>
 
 
@@ -28,7 +28,7 @@ public:
         DiffersFlagParam,
         ParamCount
     };
-
+    typedef QVariant CellParams[ParamType_Count];
     void setDefaultParam(ParamType number, const QVariant& value);
     void setShowFps(bool value);
     void setShowQuality(bool value);
@@ -58,6 +58,14 @@ public:
     const QnScheduleGridColors &colors() const;
     void setColors(const QnScheduleGridColors &colors);
 
+    // catch the current schedule grid widget state
+    // First comes row , and then comes column so
+    // the current way to declare this array should be:
+    // GridParams[ROW_COUNT][COL_COUNT]. Seems the the
+    // code misplace these two. ------------- DPENG
+    typedef CellParams GridParams[COL_COUNT][ROW_COUNT];
+    void getCurrentStates( GridParams& ) const;
+    void setCurrentStates( const GridParams& params );
 signals:
     void cellActivated(const QPoint &cell);
     void cellValueChanged(const QPoint &cell);

@@ -449,7 +449,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
         if (task.m_startTime != task.m_endTime)
             tasks.append(task);
     }
-
+    m_lastState->clear = true;
     return tasks;
 }
 
@@ -768,7 +768,7 @@ void QnCameraScheduleWidget::updateRecordSpinboxes(){
     ui->recordAfterSpinBox->setEnabled(motionEnabled);
 }
 
-void QnCameraScheduleWidget::updateMotionButtons() {
+void QnCameraScheduleWidget::updateMotionButtons( bool disableSecondStream ) {
     bool hasDualStreaming = !m_cameras.isEmpty();
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
@@ -778,11 +778,11 @@ void QnCameraScheduleWidget::updateMotionButtons() {
 
     bool enabled;
 
-    enabled = m_motionAvailable && hasMotion;
+    enabled = m_motionAvailable && hasMotion && !disableSecondStream;
     ui->recordMotionButton->setEnabled(enabled);
     ui->labelMotionOnly->setEnabled(enabled);
 
-    enabled = m_motionAvailable && hasDualStreaming && hasMotion;
+    enabled = m_motionAvailable && hasDualStreaming && hasMotion && !disableSecondStream;
     ui->recordMotionPlusLQButton->setEnabled(enabled);
     ui->labelMotionPlusLQ->setEnabled(enabled);
 
@@ -1019,4 +1019,67 @@ void QnCameraScheduleWidget::validateArchiveLength() {
             ui->spinBoxMaxDays->setValue(ui->spinBoxMinDays->value());
     }
     ui->minArchiveDaysWarningLabel->setVisible(ui->spinBoxMinDays->isEnabled() && ui->spinBoxMinDays->value() > dangerousMinArchiveDays);
+}
+
+void QnCameraScheduleWidget::getCurrentGridState( CameraScheduleWidgetState* output) const {
+    ui->gridWidget->getCurrentStates(output->grid_params);
+    // Every time you want to get the RecordType you need such if-else branch.
+    // The UI state code is "SHARING" a same piece of memory for logic state .
+    // I just copy the code from updateFrom resource, CopyAndPast.       DPENG
+    Qn::RecordingType recordType = Qn::RT_Never;
+    if (ui->recordAlwaysButton->isChecked())
+        recordType = Qn::RT_Always;
+    else if (ui->recordMotionButton->isChecked())
+        recordType = Qn::RT_MotionOnly;
+    else if (ui->noRecordButton->isChecked())
+        recordType = Qn::RT_Never;
+    else if (ui->recordMotionPlusLQButton->isChecked())
+        recordType = Qn::RT_MotionAndLowQuality;
+    output->recording_type = recordType;
+}
+
+void QnCameraScheduleWidget::setCurrentGridState(const CameraScheduleWidgetState& params) {
+    ui->gridWidget->setCurrentStates(params.grid_params);
+    // Copy past 
+    switch (params.recording_type) {
+    case Qn::RT_Always:
+        ui->recordAlwaysButton->setChecked(true);
+        break;
+    case Qn::RT_MotionOnly:
+        ui->recordMotionButton->setChecked(true);
+        break;
+    case Qn::RT_MotionAndLowQuality:
+        ui->recordMotionPlusLQButton->setChecked(true);
+        break;
+    default:
+        ui->noRecordButton->setChecked(true);
+        break;
+    }
+}
+
+void QnCameraScheduleWidget::resetCurrentGridState() {
+    ui->gridWidget->resetCellValues();
+    ui->recordAlwaysButton->toggle();
+}
+
+void QnCameraScheduleWidget::onSecondStreamStateChange( bool enable ) {
+    // We need to update the motion buttons here since the DontUseSecondStream
+    // should disable all the related recording option to be disabled states 
+    updateMotionButtons(enable);
+    if(enable) {
+        if( m_lastState.isNull() ) {
+            m_lastState.reset( new CameraScheduleWidgetState );
+        }
+        getCurrentGridState(m_lastState.data());
+        resetCurrentGridState();
+        m_lastState->clear = false;
+    } else {
+        if( m_lastState.isNull() || m_lastState->clear ) 
+            return;
+        setCurrentGridState(*m_lastState);
+    }
+    // Let the QnSingle/Multi XXX to set its 
+    // internal flag to TRUE in order to really
+    // save these schedule changes here.
+    emit scheduleTasksChanged();
 }

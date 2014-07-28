@@ -17,7 +17,8 @@
 QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget* parent):
     QWidget(parent),
     ui(new Ui::AdvancedSettingsWidget),
-    m_updating(false)
+    m_updating(false),
+    m_prevStreamState(Qn::SSQualityNotDefined)
 {
     ui->setupUi(this);
 
@@ -126,6 +127,8 @@ void QnAdvancedSettingsWidget::updateFromResources(const QnVirtualCameraResource
     }
 
     ui->qualityGroupBox->setVisible(anyHasDualStreaming);
+    m_prevStreamState = quality;
+    emit secondStreamInitialState( quality == Qn::SSQualityDontUse );
     if (sameQuality && quality != Qn::SSQualityNotDefined) {
         ui->qualityOverrideCheckBox->setChecked(true);
         ui->qualityOverrideCheckBox->setVisible(false);
@@ -230,6 +233,17 @@ void QnAdvancedSettingsWidget::at_qualitySlider_valueChanged(int value) {
     Qn::SecondStreamQuality quality = sliderPosToQuality(value);
     ui->lowQualityWarningLabel->setVisible(quality == Qn::SSQualityLow);
     ui->highQualityWarningLabel->setVisible(quality == Qn::SSQualityHigh);
+    if(quality == Qn::SSQualityDontUse) {
+        if(m_prevStreamState != Qn::SSQualityDontUse) {
+            m_prevStreamState = quality;
+            emit secondStreamDisabled(true);
+        }
+    } else {
+        if(m_prevStreamState == Qn::SSQualityDontUse) {
+            m_prevStreamState = quality;
+            emit secondStreamDisabled(false);
+        }
+    }
 }
 
 Qn::SecondStreamQuality QnAdvancedSettingsWidget::sliderPosToQuality(int pos)

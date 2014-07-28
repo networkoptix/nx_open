@@ -16,7 +16,7 @@
 #include "api/media_server_connection.h"
 
 #include "ui/workbench/workbench_context_aware.h"
-
+#include "ui/widgets/properties/camera_schedule_widget.h"
 #include "camera_settings_tab.h"
 
 namespace Ui {
