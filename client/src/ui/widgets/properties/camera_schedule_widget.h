@@ -82,6 +82,8 @@ public:
     void setExportScheduleButtonEnabled(bool enabled);
     int maxRecordedDays() const;
     int minRecordedDays() const;
+
+    void resetGridWidget();
     static const int RecordedDaysDontChange = INT_MAX;
 signals:
     void archiveRangeChanged();

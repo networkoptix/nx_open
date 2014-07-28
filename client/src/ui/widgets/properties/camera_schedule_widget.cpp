@@ -1083,3 +1083,8 @@ void QnCameraScheduleWidget::onSecondStreamStateChange( bool enable ) {
     // save these schedule changes here.
     emit scheduleTasksChanged();
 }
+
+void QnCameraScheduleWidget::resetGridWidget() {
+    ui->recordAlwaysButton->toggle();
+    ui->gridWidget->resetCellValues();
+}
