@@ -21,7 +21,7 @@ namespace ec2 {
         void triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction);
 
     private:
-        QSet<QString> m_requestedUpdateIds;
+        QHash<QnAbstractTransaction::PersistentInfo, QString> m_requestedUpdateIds;
 
         void at_transactionProcessed(const QnAbstractTransaction &transaction);
     };

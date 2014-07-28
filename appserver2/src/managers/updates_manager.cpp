@@ -32,18 +32,16 @@ namespace ec2 {
 
     void QnUpdatesNotificationManager::triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction) {
         assert(transaction.command == ApiCommand::installUpdate);
-        m_requestedUpdateIds.insert(transaction.params.updateId);
+        m_requestedUpdateIds.insert(transaction.persistentInfo, transaction.params.updateId);
     }
 
     void QnUpdatesNotificationManager::at_transactionProcessed(const QnAbstractTransaction &transaction) {
         if (transaction.command != ApiCommand::installUpdate)
             return;
-        QnTransaction<ApiUpdateInstallData> t = (QnTransaction<ApiUpdateInstallData>) transaction;
-        auto requestedUpdateItr = m_requestedUpdateIds.find(t.params.updateId);
-        if (requestedUpdateItr == m_requestedUpdateIds.end())
+
+        QString requestedUpdateId = m_requestedUpdateIds.take(transaction.persistentInfo);
+        if (requestedUpdateId.isEmpty())
             return;
-        QString requestedUpdateId = *requestedUpdateItr;
-        m_requestedUpdateIds.erase(requestedUpdateItr);
 
         emit updateInstallationRequested(requestedUpdateId);
     }
