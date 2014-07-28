@@ -637,7 +637,7 @@ QColor QnScheduleGridWidget::disabledCellColor(const QColor &baseColor) const {
 void QnScheduleGridWidget::getCurrentStates( GridParams& output_ref ) const {
     for( int i = 0 ; i < columnCount() ; ++i ) {
         for( int j = 0 ; j < rowCount() ; ++j ) {
-            qCopy(m_gridParams[i][j],m_gridParams[i][j]+ParamType_Count,output_ref[i][j]);
+            qCopy(m_gridParams[i][j],m_gridParams[i][j]+ParamCount,output_ref[i][j]);
         }
     }
 }
@@ -647,7 +647,7 @@ void QnScheduleGridWidget::setCurrentStates( const GridParams& params ) {
     // POD array just not work well with objects like QVariant..
     for( int i = 0 ; i < columnCount() ; ++i ) {
         for( int j = 0 ; j < rowCount() ; ++j ) {
-            qCopy(params[i][j],params[i][j]+ParamType_Count,m_gridParams[i][j]);
+            qCopy(params[i][j],params[i][j]+ParamCount,m_gridParams[i][j]);
         }
     }
 }

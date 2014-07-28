@@ -28,7 +28,7 @@ public:
         DiffersFlagParam,
         ParamCount
     };
-    typedef QVariant CellParams[ParamType_Count];
+    typedef QVariant CellParams[ParamCount];
     void setDefaultParam(ParamType number, const QVariant& value);
     void setShowFps(bool value);
     void setShowQuality(bool value);

@@ -1615,7 +1615,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
 #ifdef QN_ENABLE_BOOKMARKS
     factory(Qn::ToggleBookmarksSearchAction).
-        flags(Qn::123GlobalHotkey).
+        flags(Qn::GlobalHotkey).
         text(tr("Show Search Panel")).
         toggledText(tr("Hide Search Panel")).
         shortcut(tr("Ctrl+F")).
