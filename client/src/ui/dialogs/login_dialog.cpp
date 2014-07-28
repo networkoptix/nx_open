@@ -153,10 +153,6 @@ QUrl QnLoginDialog::currentUrl() const {
     return url;
 }
 
-QString QnLoginDialog::currentName() const {
-    return ui->connectionsComboBox->currentText();
-}
-
 void QnLoginDialog::accept() {
     QUrl url = currentUrl();
     if (!url.isValid()) {
@@ -164,16 +160,35 @@ void QnLoginDialog::accept() {
         return;
     }
 
+    QString name = ui->connectionsComboBox->currentText();
+
     m_requestHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
         url,
         this,
-        &QnLoginDialog::at_ec2ConnectFinished );
+        [this, url, name](int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo)
+    {
+        if (m_requestHandle != handle)
+            return; //connect was cancelled
 
+        m_requestHandle = -1;
+        updateUsability();
+
+        QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, url, this);
+        switch (status) {
+        case QnConnectionDiagnosticsHelper::Result::Failure:
+            return;
+        case QnConnectionDiagnosticsHelper::Result::Restart:
+            menu()->trigger(Qn::ExitActionDelayed);
+            break; // to avoid cycle
+        default:    //success
+            menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
+            updateStoredConnections(url, name);
+            break;
+        }
+
+        base_type::accept();
+    });
     updateUsability();
-}
-
-bool QnLoginDialog::rememberPassword() const {
-    return ui->rememberPasswordCheckBox->isChecked();
 }
 
 void QnLoginDialog::reject() {
@@ -320,32 +335,39 @@ void QnLoginDialog::updateUsability() {
     }
 }
 
+void QnLoginDialog::updateStoredConnections(const QUrl &url, const QString &name) {
+    QnConnectionDataList connections = qnSettings->customConnections();
+
+    QnConnectionData connectionData(QString(), url);
+    qnSettings->setLastUsedConnection(connectionData);
+
+    qnSettings->setStoredPassword(ui->rememberPasswordCheckBox->isChecked()
+        ? url.password()
+        : QString()
+        );
+
+    // remove previous "Last used connection"
+    connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
+
+    QUrl cleanUrl(connectionData.url);
+    cleanUrl.setPassword(QString());
+    QnConnectionData selected = connections.getByName(name);
+    if (selected.url == cleanUrl){
+        connections.removeOne(selected.name);
+        connections.prepend(selected);
+    } else {
+        // save "Last used connection"
+        QnConnectionData last(connectionData);
+        last.name = QnConnectionDataList::defaultLastUsedNameKey();
+        last.url.setPassword(QString());
+        connections.prepend(last);
+    }
+    qnSettings->setCustomConnections(connections);
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-
-void QnLoginDialog::at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo ) {
-    if (m_requestHandle != handle)
-        return; //previous request result received
-
-    m_requestHandle = -1;
-    updateUsability();
-
-    QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errorCode, currentUrl(), this);
-
-    switch (status) {
-    case QnConnectionDiagnosticsHelper::Result::Failure:
-        return;
-    case QnConnectionDiagnosticsHelper::Result::Restart:
-        menu()->trigger(Qn::ExitActionDelayed);
-        break; // to avoid cycle
-    default:    //success
-        break;
-    }
-
-    base_type::accept();
-}
 
 void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex &index) {
     QStandardItem* item = m_connectionsModel->itemFromIndex(index);
@@ -355,6 +377,7 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
     ui->loginLineEdit->setText(url.userName());
     ui->passwordLineEdit->clear();
     ui->rememberPasswordCheckBox->setChecked(false);
+    ui->deleteButton->setEnabled(qnSettings->customConnections().contains(ui->connectionsComboBox->currentText()));
     updateFocus();
 }
 
@@ -434,14 +457,18 @@ void QnLoginDialog::at_saveButton_clicked() {
 }
 
 void QnLoginDialog::at_deleteButton_clicked() {
-    QString name = currentName();
+    QnConnectionDataList connections = qnSettings->customConnections();
+
+    QString name = ui->connectionsComboBox->currentText();
+    if (!connections.contains(name))
+        return;
 
     if (QMessageBox::warning(this, tr("Delete connections"),
                                    tr("Are you sure you want to delete the connection\n%1?").arg(name),
                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
         return;
 
-    QnConnectionDataList connections = qnSettings->customConnections();
+    
     connections.removeOne(name);
     qnSettings->setCustomConnections(connections);
     resetConnectionsModel();

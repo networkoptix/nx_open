@@ -225,19 +225,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
 
     /* Set up actions. Only these actions will be available through hotkeys. */
-/*
-    addAction(action(Qn::ConnectAction));
-    addAction(action(Qn::ReconnectAction));
-    addAction(action(Qn::DisconnectAction));
-    addAction(action(Qn::OpenLoginDialogAction));
-*/
     addAction(action(Qn::NextLayoutAction));
     addAction(action(Qn::PreviousLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAction));
     addAction(action(Qn::SaveCurrentLayoutAsAction));
     addAction(action(Qn::SaveCurrentVideoWallReviewAction));
     addAction(action(Qn::ExitAction));
-//    addAction(action(Qn::ExitActionDelayed));
     addAction(action(Qn::EscapeHotkeyAction));
     addAction(action(Qn::FullscreenMaximizeHotkeyAction));
     addAction(action(Qn::AboutAction));

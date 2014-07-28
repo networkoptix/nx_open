@@ -37,10 +37,6 @@ public:
     explicit QnLoginDialog(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
     virtual ~QnLoginDialog();
 
-    QUrl currentUrl() const;
-    QString currentName() const;
-
-    bool rememberPassword() const;
 public slots:
     virtual void accept() override;
     virtual void reject() override;
@@ -74,11 +70,16 @@ private slots:
     void at_saveButton_clicked();
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
-    void at_ec2ConnectFinished( int handle, ec2::ErrorCode errorCode, const QnConnectionInfo &connectionInfo);
 
     void at_moduleFinder_moduleFound(const QnModuleInformation &moduleInformation, const QString &remoteAddress, const QString &localInterfaceAddress);
     void at_moduleFinder_moduleLost(const QnModuleInformation &moduleInformation);
 
+private:
+    QUrl currentUrl() const;
+    QString currentName() const;
+
+    /** Save current connection credentials. */
+    void updateStoredConnections(const QUrl &url, const QString &name);
 private:
     QScopedPointer<Ui::LoginDialog> ui;
     QStandardItemModel *m_connectionsModel;

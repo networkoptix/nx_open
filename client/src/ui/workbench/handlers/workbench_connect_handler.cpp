@@ -23,6 +23,7 @@
 #include <ui/actions/action_parameter_types.h>
 
 #include <ui/dialogs/login_dialog.h>
+#include <ui/dialogs/non_modal_dialog_constructor.h>
 
 #include <ui/graphics/items/generic/graphics_message_box.h>
 
@@ -141,9 +142,9 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
 }
 
 void QnWorkbenchConnectHandler::at_connectAction_triggered() {
-    Q_ASSERT(!connected());
-    if (connected())
-        return;
+    // ask user if he wants to save changes
+    if (connected() && !disconnectFromServer(false))
+        return; 
 
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
@@ -157,13 +158,12 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
             }
         } 
         else
-        /* 'Open in new window' while connected */
+        /* Login Dialog or 'Open in new window' with url */
         { 
             //try connect; if not - show login dialog
             if (!connectToServer(url))
                 showLoginDialog();
         }
-        
     } else {
         /* Try to load last used connection. */
         url = qnSettings->lastUsedConnection().url;
@@ -273,57 +273,8 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
 }
 
 void QnWorkbenchConnectHandler::showLoginDialog() {
-    if (!loginDialog()) {
-        m_loginDialog = new QnLoginDialog(mainWindow(), context());
-        loginDialog()->setModal(true);
-    }
-
-    if (loginDialog()->isVisible())
-        return;
-
-    QUrl url;
-    // show login dialog again and again till success or cancel
-    while (true) {
-        if(!loginDialog()->exec())
-            return;
-
-        url = loginDialog()->currentUrl();
-        if (!url.isValid()) 
-            continue;   //TODO: #GDM show message? dialog should validate url itself
-
-        // ask user if he wants to save changes
-        if (connected() && !disconnectFromServer(false))
-            return; 
-
-        if (connectToServer(url))
-            break;
-    }
-
-    QnConnectionDataList connections = qnSettings->customConnections();
-
-    QnConnectionData connectionData(QString(), url);
-    qnSettings->setLastUsedConnection(connectionData);
-
-    qnSettings->setStoredPassword(loginDialog()->rememberPassword()
-        ? url.password()
-        : QString()
-        );
-
-    // remove previous "Last used connection"
-    connections.removeOne(QnConnectionDataList::defaultLastUsedNameKey());
-
-    QUrl cleanUrl(connectionData.url);
-    cleanUrl.setPassword(QString());
-    QnConnectionData selected = connections.getByName(loginDialog()->currentName());
-    if (selected.url == cleanUrl){
-        connections.removeOne(selected.name);
-        connections.prepend(selected);
-    } else {
-        // save "Last used connection"
-        QnConnectionData last(connectionData);
-        last.name = QnConnectionDataList::defaultLastUsedNameKey();
-        last.url.setPassword(QString());
-        connections.prepend(last);
-    }
-    qnSettings->setCustomConnections(connections);
+    QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());
+    //just show dialog   
 }
+
+

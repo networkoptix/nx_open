@@ -68,6 +68,7 @@
 #include <ui/dialogs/picture_settings_dialog.h>
 #include <ui/dialogs/ping_dialog.h>
 #include <ui/dialogs/system_administration_dialog.h>
+#include <ui/dialogs/non_modal_dialog_constructor.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -175,39 +176,6 @@ void detail::QnResourceReplyProcessor::at_replyReceived(int status, const QnReso
 
     emit finished(status, resources, handle);
 }
-
-/************************************************************************/
-/* QnNonModalDialogConstructor                                          */
-/************************************************************************/
-template<typename T>
-class QnNonModalDialogConstructor {
-public:
-    /** Helper class to restore geometry of the persistent dialogs. */
-    QnNonModalDialogConstructor<T>(QPointer<T> &dialog, QWidget* parent):
-        m_newlyCreated(false)
-    {
-        if (!dialog) {
-            dialog = new T(parent);
-            m_newlyCreated = true;
-        }
-        m_dialog = dialog;
-        m_oldGeometry = dialog->geometry();
-    }
-
-    ~QnNonModalDialogConstructor() {
-        m_dialog->show();
-        m_dialog->raise();
-        m_dialog->activateWindow(); // TODO: #Elric show raise activateWindow? Maybe we should also do grabKeyboard, grabMouse? wtf, really?
-        if (!m_newlyCreated)
-            m_dialog->setGeometry(m_oldGeometry);
-    }
-
-private:
-    bool m_newlyCreated;
-    QRect m_oldGeometry;
-    QPointer<T> m_dialog;
-};
-
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchActionHandler
