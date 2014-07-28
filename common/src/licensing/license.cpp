@@ -330,6 +330,9 @@ Qn::LicenseType QnLicense::type() const
     if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
         return Qn::LC_Trial;
 
+    if (xclass().toLower().toUtf8() == licenseTypeInfo[Qn::LC_VideoWall].className)
+        return Qn::LC_VideoWall;
+
     if (!expiration().isEmpty())
         return Qn::LC_Trial;
     

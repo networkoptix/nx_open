@@ -20,11 +20,14 @@ public:
     int usedLicense(Qn::LicenseType licenseType) const;
 
     virtual QList<Qn::LicenseType> licenseTypes() const = 0;
+
+     void update();
 protected:
     /* This class should not be used directly. */
     QnLicenseUsageHelper();
 
     void borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal);
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const = 0;
 
     QnLicenseListHelper m_licenses;
 
@@ -44,9 +47,9 @@ public:
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
 
-    void update();
-
     virtual QList<Qn::LicenseType> licenseTypes() const override;
+protected:
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;
 private:
     void init();
 };
@@ -56,9 +59,9 @@ class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper {
 public:
     QnVideoWallLicenseUsageHelper();
 
-    void update();
-
     virtual QList<Qn::LicenseType> licenseTypes() const override;
+protected:
+    virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;
 };
 
 #endif // LICENSE_USAGE_HELPER_H

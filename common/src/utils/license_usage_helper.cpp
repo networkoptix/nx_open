@@ -118,19 +118,41 @@ QString QnLicenseUsageHelper::getRequiredLicenseMsg() const
     return msg;
 }
 
+void QnLicenseUsageHelper::update() {
+    int recordingTotal = 0;
+    int maxTotal = 0;
+    int maxLicenses[Qn::LC_Count];
+    foreach (Qn::LicenseType lt, licenseTypes()) {
+        m_usedLicenses[lt] = calculateUsedLicenses(lt) + m_proposedLicenses[lt];
+        recordingTotal += m_usedLicenses[lt];
+        maxLicenses[lt] = m_licenses.totalLicenseByType(lt);
+        maxTotal += maxLicenses[lt];
+    }
+
+    foreach (Qn::LicenseType lt, licenseTypes()) {
+        foreach(const LicenseCompatibility& c, compatibleLicenseType) {
+            if (c.child == lt)
+                borrowLicenseFromClass(m_usedLicenses[c.master], maxLicenses[c.master], m_usedLicenses[lt], maxLicenses[lt]);
+        }
+    }
+
+    m_isValid = true;
+    foreach (Qn::LicenseType lt, licenseTypes()) {
+        m_overflowLicenses[lt] = qMax(0, m_usedLicenses[lt] - maxLicenses[lt]);
+        m_isValid &= (m_overflowLicenses[lt] == 0);
+    }
+}
+
 bool QnLicenseUsageHelper::isValid() const
 {
     return m_isValid;
 }
 
-int QnLicenseUsageHelper::totalLicense(Qn::LicenseType licenseType) const
-{
-    QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
-    return licenseListHelper.totalLicenseByType(licenseType);
+int QnLicenseUsageHelper::totalLicense(Qn::LicenseType licenseType) const {
+    return m_licenses.totalLicenseByType(licenseType);
 }
 
-int QnLicenseUsageHelper::usedLicense(Qn::LicenseType licenseType) const
-{
+int QnLicenseUsageHelper::usedLicense(Qn::LicenseType licenseType) const {
     return m_usedLicenses[licenseType];
 }
 
@@ -186,32 +208,6 @@ bool QnCamLicenseUsageHelper::isOverflowForCamera(const QnVirtualCameraResourceP
     return !camera->isScheduleDisabled() && m_overflowLicenses[camera->licenseType()];
 }
 
-void QnCamLicenseUsageHelper::update() {
-    int recordingTotal = 0;
-    int maxTotal = 0;
-    int maxLicenses[Qn::LC_Count];
-    QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
-    foreach (Qn::LicenseType lt, licenseTypes()) {
-        m_usedLicenses[lt] = qnResPool->activeCamerasByLicenseType(lt) + m_proposedLicenses[lt];
-        recordingTotal += m_usedLicenses[lt];
-        maxLicenses[lt] = licenseListHelper.totalLicenseByType(lt);
-        maxTotal += maxLicenses[lt];
-    }
-
-    foreach (Qn::LicenseType lt, licenseTypes()) {
-        foreach(const LicenseCompatibility& c, compatibleLicenseType) {
-            if (c.child == lt)
-                borrowLicenseFromClass(m_usedLicenses[c.master], maxLicenses[c.master], m_usedLicenses[lt], maxLicenses[lt]);
-        }
-    }
-
-    m_isValid = true;
-    foreach (Qn::LicenseType lt, licenseTypes()) {
-        m_overflowLicenses[lt] = qMax(0, m_usedLicenses[lt] - maxLicenses[lt]);
-        m_isValid &= (m_overflowLicenses[lt] == 0);
-    }
-}
-
 QList<Qn::LicenseType> QnCamLicenseUsageHelper::licenseTypes() const {
     return QList<Qn::LicenseType>()
         << Qn::LC_Trial
@@ -223,6 +219,10 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::licenseTypes() const {
         ;
 }
 
+int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) const {
+    return qnResPool->activeCamerasByLicenseType(licenseType);
+}
+
 /************************************************************************/
 /* QnVideoWallLicenseUsageHelper                                        */
 /************************************************************************/
@@ -231,11 +231,14 @@ QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper() {
     update();
 }
 
-void QnVideoWallLicenseUsageHelper::update()
-{
-
-}
-
 QList<Qn::LicenseType> QnVideoWallLicenseUsageHelper::licenseTypes() const {
     return QList<Qn::LicenseType>() << Qn::LC_VideoWall;
+}
+
+int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) const {
+    Q_ASSERT(licenseType == Qn::LC_VideoWall);
+    int result = 0;
+    foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
+        result += info.data.videoWallControlSessions;
+    return result;
 }
