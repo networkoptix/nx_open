@@ -463,7 +463,7 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
         QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
 
         QnLicense::ErrorCode errCode = QnLicense::NoError;
-        if (license->isValid(&errCode) || errCode == QnLicense::Expired) {
+        if (license->isValid(&errCode, QnLicense::VM_JustCreated) || errCode == QnLicense::Expired) {
             validateLicenses(license->key(), QList<QnLicensePtr>() << license);
         }
         else {
