@@ -73,15 +73,16 @@ public:
      *                                  or -1 if this license never expires.
      */
     qint64 expirationTime() const;
-    Qn::LicenseType type() const;
-    QString displayName() const;
-    QString longDisplayName() const;
-    static QString longDisplayName(Qn::LicenseType licenseType);
+    Qn::LicenseType type() const; 
 
     bool isInfoMode() const;
 
     static QnLicensePtr readFromStream(QTextStream &stream);
 
+    QString displayName() const;
+    static QString displayName(Qn::LicenseType licenseType);
+    QString longDisplayName() const;
+    static QString longDisplayName(Qn::LicenseType licenseType);
 private:
     QByteArray m_rawLicense;
 
