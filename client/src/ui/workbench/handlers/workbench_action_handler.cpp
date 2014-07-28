@@ -109,7 +109,6 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
-#include <ui/widgets/main_window.h>
 
 #include <utils/app_server_image_cache.h>
 #include <utils/app_server_notification_cache.h>
@@ -126,7 +125,6 @@
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/math/math.h>
-#include <utils/common/checked_cast.h>
 
 
 #ifdef Q_OS_MACX
@@ -3090,13 +3088,4 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     }
     qApp->exit(0);
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
-}
-
-void QnWorkbenchActionHandler::at_disableBackgroundAnimationAction_triggered() {
-    QnMainWindow* mainWindow = checked_cast<QnMainWindow*>( context()->mainWindow() );
-    // Ivanov advice me that mainWindow may be NULL pointer for context()->mainWindow() may
-    // return NULL pointer. It is possible , so I add a NULL pointer check branch here
-    if( mainWindow == NULL ) 
-        return;
-    mainWindow->stopBackgroundAnimation();
 }

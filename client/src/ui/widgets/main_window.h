@@ -51,8 +51,7 @@ public:
     Options options() const;
     void setOptions(Options options);
 
-    void stopBackgroundAnimation();
-
+    void flipBackgroundAnimation();
     void setAnimationsEnabled(bool enabled = true);
 
     QWidget *viewport() const;
@@ -127,6 +126,7 @@ private:
     /** This field is used to restore geometry after switching to fullscreen and back. Do not used in MacOsX due to its fullscreen mode. */
     QRect m_storedGeometry;
 #endif
+    bool m_enableBackgroundAnimation;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);

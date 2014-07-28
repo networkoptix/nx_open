@@ -139,7 +139,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_controller(0),
     m_titleVisible(true),
     m_dwm(NULL),
-    m_drawCustomFrame(false)
+    m_drawCustomFrame(false),
+    m_enableBackgroundAnimation(true)
 {
 #ifdef Q_OS_MACX
     // TODO: #ivigasin check the neccesarity of this line. In Maveric fullscreen animation works fine without it.
@@ -254,7 +255,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::DebugDecrementCounterAction));
     addAction(action(Qn::DebugShowResourcePoolAction));
     addAction(action(Qn::DebugControlPanelAction));
-    addAction(action(Qn::DisableBackgroundAnimationAction));
     connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
@@ -741,11 +741,17 @@ void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 
-void QnMainWindow::stopBackgroundAnimation() {
-    if( m_backgroundPainter.isNull() )
-        return;
-    else {
-        m_view->uninstallLayerPainter(m_backgroundPainter.data());
-        m_backgroundPainter.reset(NULL);
+void QnMainWindow::flipBackgroundAnimation() {
+    if(!m_enableBackgroundAnimation) {
+        if(m_backgroundPainter.isNull()) {
+            m_backgroundPainter.reset(new QnGradientBackgroundPainter(qnSettings->radialBackgroundCycle(), this));
+        }
+        m_view->installLayerPainter(m_backgroundPainter.data(), QGraphicsScene::BackgroundLayer);
+        m_enableBackgroundAnimation = true;
+    } else {
+        if(!m_backgroundPainter.isNull()) {
+            m_view->uninstallLayerPainter(m_backgroundPainter.data());
+        }
+        m_enableBackgroundAnimation = false;
     }
 }
