@@ -62,6 +62,8 @@
 #include "ui/workbench/workbench_navigator.h"
 #include "ui/workbench/workbench_item.h"
 
+#include <utils/license_usage_helper.h>
+
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
 namespace {
@@ -966,6 +968,9 @@ QCursor QnMediaResourceWidget::calculateCursor() const {
 }
 
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const {
+    if (qnSettings->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
+        return Qn::VideowallWithoutLicenseOverlay;
+
     QnResourcePtr resource = m_display->resource();
 
     if (resource->hasFlags(QnResource::SINGLE_SHOT)) {

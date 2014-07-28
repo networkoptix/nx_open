@@ -165,15 +165,15 @@ int QnLicenseUsageHelper::usedLicense(Qn::LicenseType licenseType) const {
 /************************************************************************/
 /* QnCamLicenseUsageHelper                                              */
 /************************************************************************/
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper():
-    QnLicenseUsageHelper()
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(QObject *parent):
+    QnLicenseUsageHelper(parent)
 {
     init();
     update();
 }
 
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable):
-    QnLicenseUsageHelper()
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable, QObject *parent):
+    QnLicenseUsageHelper(parent)
 {
     init();
     // update will be called inside
@@ -232,8 +232,8 @@ int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) 
 /************************************************************************/
 /* QnVideoWallLicenseUsageHelper                                        */
 /************************************************************************/
-QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper():
-    QnLicenseUsageHelper()
+QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper(QObject *parent):
+    QnLicenseUsageHelper(parent)
 {
     auto updateIfNeeded = [this](const QnResourcePtr &resource) {
         if (!resource.dynamicCast<QnVideoWallResource>())

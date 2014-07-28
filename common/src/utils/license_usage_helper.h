@@ -46,8 +46,8 @@ protected:
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
     Q_OBJECT
 public:
-    QnCamLicenseUsageHelper();
-    QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
+    QnCamLicenseUsageHelper(QObject *parent = NULL);
+    QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable, QObject *parent = NULL);
 
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
@@ -62,7 +62,7 @@ private:
 class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper {
     Q_OBJECT
 public:
-    QnVideoWallLicenseUsageHelper();
+    QnVideoWallLicenseUsageHelper(QObject *parent = NULL);
 
     virtual QList<Qn::LicenseType> licenseTypes() const override;
 protected:

@@ -42,6 +42,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 
+#include <utils/license_usage_helper.h>
 
 namespace {
 
@@ -246,6 +247,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_aspectRatio = defaultAspectRatio();
 
     connect(item, &QnWorkbenchItem::dataChanged, this, &QnResourceWidget::at_itemDataChanged);
+
+    /* Videowall license changes helper */
+    QnLicenseUsageHelper* videowallLicenseHelper = new QnVideoWallLicenseUsageHelper(this);
+    connect(videowallLicenseHelper, &QnLicenseUsageHelper::licensesChanged, this, &QnResourceWidget::updateStatusOverlay);
 
     /* Run handlers. */
     updateTitleText();
