@@ -1601,16 +1601,10 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Unpin Notifications"));
 
     factory(Qn::DisableBackgroundAnimationAction).
-        toggledText(tr("Disable Background Animation")).
         flags(Qn::GlobalHotkey).
         shortcut(tr("Ctrl+Alt+T")).
         text(tr("Disable Background Animation")).
-        autoRepeat(false);
-
-    factory(Qn::DisableBackgroundAnimationAction).
-        flags(Qn::Main|Qn::GlobalHotkey).
-        shortcut(tr("Ctrl+Alt+T")).
-        text(tr("Disable Background Animation")).
+        toggledText(tr("Enable Background Animation")).
         autoRepeat(false);
 
 #ifdef QN_ENABLE_BOOKMARKS
