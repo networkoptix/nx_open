@@ -35,7 +35,7 @@ private slots:
     void at_resourcePool_statusChanged(const QnResourcePtr &);
 private:
     void init();
-    void borowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal);
+    void borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal);
 
     QnLicenseListHelper m_licenses;
 

@@ -82,7 +82,7 @@ void QnLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCa
     update();
 }
 
-void QnLicenseUsageHelper::borowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal)
+void QnLicenseUsageHelper::borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal)
 {
     if (dstUsed > dstTotal) {
         int donatorRest = srcTotal - srcUsed;
@@ -110,7 +110,7 @@ void QnLicenseUsageHelper::update()
     for (int i = 0; i < Qn::LC_CountCamLecense; ++i) {
         foreach(const LiceseCompatibility& c, compatibleLicenseType) {
             if (c.child == Qn::LicenseType(i))
-                borowLicenseFromClass(m_usedLicenses[c.master], maxLicenses[c.master], m_usedLicenses[i], maxLicenses[i]);
+                borrowLicenseFromClass(m_usedLicenses[c.master], maxLicenses[c.master], m_usedLicenses[i], maxLicenses[i]);
         }
     }
 
