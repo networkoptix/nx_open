@@ -506,7 +506,7 @@ public:
         LC_Edge,
         LC_VMAX,
         LC_AnalogEncoder,
-        LC_CountCamLecense, // end of camera's license types
+        LC_CountCameras, // end of camera's license types
 
         LC_VideoWall,
 

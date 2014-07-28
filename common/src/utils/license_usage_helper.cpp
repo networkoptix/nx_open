@@ -76,7 +76,7 @@ void QnLicenseUsageHelper::propose(const QnVirtualCameraResourceList &proposedCa
             m_proposedLicenses[camera->licenseType()]++;
     }
     if (!proposedEnable) {
-        for(int i = 0; i < Qn::LC_CountCamLecense; ++i)
+        for(int i = 0; i < Qn::LC_CountCameras; ++i)
             m_proposedLicenses[i] *= -1;
     }
     update();
@@ -98,16 +98,16 @@ void QnLicenseUsageHelper::update()
 {
     int recordingTotal = 0;
     int maxTotal = 0;
-    int maxLicenses[Qn::LC_CountCamLecense];
+    int maxLicenses[Qn::LC_CountCameras];
     QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
-    for (int i = 0; i < Qn::LC_CountCamLecense; ++i) {
+    for (int i = 0; i < Qn::LC_CountCameras; ++i) {
         m_usedLicenses[i] = qnResPool->activeCamerasByLicenseType((Qn::LicenseType) i) + m_proposedLicenses[i];
         recordingTotal += m_usedLicenses[i];
         maxLicenses[i] = licenseListHelper.totalLicenseByType(Qn::LicenseType(i));
         maxTotal += maxLicenses[i];
     }
     
-    for (int i = 0; i < Qn::LC_CountCamLecense; ++i) {
+    for (int i = 0; i < Qn::LC_CountCameras; ++i) {
         foreach(const LicenseCompatibility& c, compatibleLicenseType) {
             if (c.child == Qn::LicenseType(i))
                 borrowLicenseFromClass(m_usedLicenses[c.master], maxLicenses[c.master], m_usedLicenses[i], maxLicenses[i]);
@@ -115,7 +115,7 @@ void QnLicenseUsageHelper::update()
     }
 
     m_isValid = true;
-    for (int i = 0; i < Qn::LC_CountCamLecense; ++i) {
+    for (int i = 0; i < Qn::LC_CountCameras; ++i) {
         m_overflowLicenses[i] = qMax(0, m_usedLicenses[i] - maxLicenses[i]);
         m_isValid &= (m_overflowLicenses[i] == 0);
     }
@@ -131,7 +131,7 @@ QString QnLicenseUsageHelper::getUsageText(Qn::LicenseType licenseType) const
 QString QnLicenseUsageHelper::getUsageText() const 
 {
     QString licenseText;
-    for (int i = 0; i < Qn::LC_CountCamLecense; ++i) 
+    for (int i = 0; i < Qn::LC_CountCameras; ++i) 
     {
         {
             Qn::LicenseType licenseType = Qn::LicenseType(i);
@@ -153,7 +153,7 @@ QString QnLicenseUsageHelper::getWillUsageText(Qn::LicenseType licenseType) cons
 QString QnLicenseUsageHelper::getWillUsageText() const
 {
     QString licenseText;
-    for (int i = 0; i < Qn::LC_CountCamLecense; ++i) 
+    for (int i = 0; i < Qn::LC_CountCameras; ++i) 
     {
         {
             Qn::LicenseType licenseType = Qn::LicenseType(i);
@@ -173,13 +173,13 @@ QString QnLicenseUsageHelper::getRequiredLicenseMsg() const
 
     if (!isValid()) 
     {
-        for (int i = 0; i < Qn::LC_CountCamLecense; ++i) {
+        for (int i = 0; i < Qn::LC_CountCameras; ++i) {
             if (m_overflowLicenses[i] > 0)
                 msg += QObject::tr("Activate %n more %2. ", "", m_overflowLicenses[i]).arg(QnLicense::longDisplayName((Qn::LicenseType)i));
         }
     }
     else {
-        for (int i = 0; i < Qn::LC_CountCamLecense; ++i) {
+        for (int i = 0; i < Qn::LC_CountCameras; ++i) {
             if (m_proposedLicenses[i] > 0)
                 msg += QObject::tr("%n more %2 will be used. ", "", m_proposedLicenses[Qn::LC_Professional]).arg(QnLicense::longDisplayName((Qn::LicenseType)i));;
         }
