@@ -144,9 +144,6 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
             if (existCamRes)
             {
-                existCamRes->setParentId(qnCommon->moduleGUID());
-                existCamRes->setFlags(existCamRes->flags() & ~QnResource::foreigner);
-
                 if (existCamRes->getTypeId() != newNetRes->getTypeId()) {
                     QnId newTypeId = newNetRes->getTypeId();
                     newNetRes->update(existCamRes);
@@ -155,6 +152,11 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     qnResPool->removeResource(existCamRes);
                     qnResPool->addResource(newCamRes);
                     rpNetRes = existCamRes = newCamRes;
+                }
+                else {
+                    existCamRes->setParentId(qnCommon->moduleGUID());
+                    existCamRes->setFlags(existCamRes->flags() & ~QnResource::foreigner);
+
                 }
                 
                 QByteArray errorString;
