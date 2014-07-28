@@ -36,6 +36,8 @@
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::LicenseManagerWidget),
+    m_camerasUsageHelper(new QnCamLicenseUsageHelper()),
+    m_videowallUsageHelper(new QnVideoWallLicenseUsageHelper()),
     m_httpClient(NULL)
 {
     ui->setupUi(this);
@@ -65,6 +67,8 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     connect(ui->gridLicenses,                   SIGNAL(doubleClicked(const QModelIndex &)),                         this,   SLOT(at_gridLicenses_doubleClicked(const QModelIndex &)));
     connect(ui->licenseWidget,                  SIGNAL(stateChanged()),                                             this,   SLOT(at_licenseWidget_stateChanged()));
     connect(this,                               SIGNAL(showMessageLater(QString,QString,bool)),                     this,   SLOT(showMessage(QString,QString,bool)), Qt::QueuedConnection);
+    connect(m_camerasUsageHelper,               &QnLicenseUsageHelper::licensesChanged,                             this,   &QnLicenseManagerWidget::updateLicenses);
+    connect(m_videowallUsageHelper,             &QnLicenseUsageHelper::licensesChanged,                             this,   &QnLicenseManagerWidget::updateLicenses);
 
     updateLicenses();
     updateDetailsButtonEnabled();
@@ -108,12 +112,10 @@ void QnLicenseManagerWidget::updateLicenses() {
 
         QString msg(tr("The software is licensed to: "));
 
-        QScopedPointer<QnCamLicenseUsageHelper> camHelper(new QnCamLicenseUsageHelper());
-        QScopedPointer<QnVideoWallLicenseUsageHelper> vwHelper(new QnVideoWallLicenseUsageHelper());
         QList<QnLicenseUsageHelper*> helpers;
         helpers 
-            << camHelper.data()
-            << vwHelper.data()
+            << m_camerasUsageHelper.data()
+            << m_videowallUsageHelper.data()
             ;
 
         foreach (QnLicenseUsageHelper* helper, helpers) {
@@ -336,7 +338,7 @@ void QnLicenseManagerWidget::at_licensesReceived(int handle, ec2::ErrorCode erro
 
 void QnLicenseManagerWidget::at_downloadError() {
     if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
-        disconnect(reply, 0, this, 0); //avoid double "onError" handling
+        disconnect(reply, NULL, this, NULL); //avoid double "onError" handling
         m_replyKeyMap.remove(reply);
         reply->deleteLater();
 

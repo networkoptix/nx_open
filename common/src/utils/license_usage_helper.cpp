@@ -4,8 +4,11 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/videowall_resource.h>
+
+#include <core/resource_management/resource_pool.h>
+
 
 /** Allow to use 'master' license type instead of 'child' type if there are not enough child licenses. */
 struct LicenseCompatibility 
@@ -40,7 +43,8 @@ static std::array<LicenseCompatibility, 14> compatibleLicenseType =
 /* QnLicenseUsageHelper                                                 */
 /************************************************************************/
 
-QnLicenseUsageHelper::QnLicenseUsageHelper():
+QnLicenseUsageHelper::QnLicenseUsageHelper(QObject *parent):
+    base_type(parent),
     m_licenses(qnLicensePool->getLicenses()),
     m_isValid(true)
 {
@@ -141,6 +145,8 @@ void QnLicenseUsageHelper::update() {
         m_overflowLicenses[lt] = qMax(0, m_usedLicenses[lt] - maxLicenses[lt]);
         m_isValid &= (m_overflowLicenses[lt] == 0);
     }
+
+    emit licensesChanged();
 }
 
 bool QnLicenseUsageHelper::isValid() const
@@ -226,8 +232,34 @@ int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) 
 /************************************************************************/
 /* QnVideoWallLicenseUsageHelper                                        */
 /************************************************************************/
-QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper() {
+QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper():
+    QnLicenseUsageHelper()
+{
+    auto updateIfNeeded = [this](const QnResourcePtr &resource) {
+        if (!resource.dynamicCast<QnVideoWallResource>())
+            return;
+        update();
+    };
+
+    auto connectTo = [this](const QnVideoWallResourcePtr &videowall) {
+        connect(videowall, &QnVideoWallResource::itemAdded,     this, &QnVideoWallLicenseUsageHelper::update);
+        connect(videowall, &QnVideoWallResource::itemChanged,   this, &QnVideoWallLicenseUsageHelper::update);
+        connect(videowall, &QnVideoWallResource::itemRemoved,   this, &QnVideoWallLicenseUsageHelper::update);
+    };
+
+    auto connectIfNeeded = [this, connectTo](const QnResourcePtr &resource) {
+        if (QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>())
+            connectTo(videowall);
+    };
+
+    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   connectIfNeeded);
+    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
+    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>())
+        connectTo(videowall);
+
     connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnVideoWallLicenseUsageHelper::update);
+
     update();
 }
 
@@ -240,5 +272,9 @@ int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType license
     int result = 0;
     foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
         result += info.data.videoWallControlSessions;
+
+    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>())
+        result += videowall->items()->getItems().size();
+
     return result;
 }

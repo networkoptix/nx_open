@@ -4,10 +4,15 @@
 #include <core/resource/resource_fwd.h>
 #include <licensing/license.h>
 
-class QnLicenseUsageHelper: public QObject
+#include <utils/common/connective.h>
+
+class QnLicenseUsageHelper: public Connective<QObject>
 {
     Q_OBJECT
+    typedef  Connective<QObject> base_type;
 public:
+    QnLicenseUsageHelper(QObject *parent = NULL);
+
     bool isValid() const;
 
     QString getRequiredLicenseMsg() const;
@@ -22,10 +27,10 @@ public:
     virtual QList<Qn::LicenseType> licenseTypes() const = 0;
 
      void update();
-protected:
-    /* This class should not be used directly. */
-    QnLicenseUsageHelper();
+signals:
+     void licensesChanged();
 
+protected:
     void borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal);
     virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const = 0;
 
