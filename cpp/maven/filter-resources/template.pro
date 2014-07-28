@@ -82,7 +82,10 @@ OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib -Wl,-rpath-link,${qt.dir}/lib
+LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib
+!win* {
+    LIBS += -Wl,-rpath-link,${qt.dir}/lib
+}
 LIBS += ${global.libs}
 
 INCLUDEPATH +=  ${qt.dir}/include \
