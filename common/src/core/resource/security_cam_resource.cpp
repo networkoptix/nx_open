@@ -663,5 +663,23 @@ bool QnSecurityCamResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &s
         result = true;
     }
 
+    if (getModel() != camera->getModel()) {
+        setModel(camera->getModel());
+        result = true;
+    }
+    if (getVendor() != camera->getVendor()) {
+        setVendor(camera->getVendor());
+        result = true;
+    }
+    if (getMAC() != camera->getMAC()) {
+        setMAC(camera->getMAC());
+        result = true;
+    }
+    if (getFirmware() != camera->getFirmware()) {
+        setFirmware(camera->getFirmware());
+        result = true;
+    }
+
+
     return result;
 }
