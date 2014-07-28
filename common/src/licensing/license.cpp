@@ -59,7 +59,7 @@ namespace {
 
 struct LicenseTypeInfo
 {
-    LicenseTypeInfo(): licenseType(Qn::LC_CountTotal), allowedForEdge(0) {}
+    LicenseTypeInfo(): licenseType(Qn::LC_Count), allowedForEdge(0) {}
     LicenseTypeInfo(Qn::LicenseType licenseType,  const QnLatin1Array& className, bool allowedForEdge):
         licenseType(licenseType), className(className), allowedForEdge(allowedForEdge) {}
 
@@ -68,7 +68,7 @@ struct LicenseTypeInfo
     bool allowedForEdge;
 };
 
-static std::array<LicenseTypeInfo, Qn::LC_CountTotal>  licenseTypeInfo =
+static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
 {
     LicenseTypeInfo(Qn::LC_Trial,           "trial",         1),
     LicenseTypeInfo(Qn::LC_Analog,          "analog",        0),
@@ -76,7 +76,6 @@ static std::array<LicenseTypeInfo, Qn::LC_CountTotal>  licenseTypeInfo =
     LicenseTypeInfo(Qn::LC_Edge,            "edge",          1),
     LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0),
     LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0),
-    LicenseTypeInfo(), // filler
     LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1)
 };
 } // anonymous namespace
@@ -334,7 +333,7 @@ Qn::LicenseType QnLicense::type() const
     if (!expiration().isEmpty())
         return Qn::LC_Trial;
     
-    for (int i = 0; i < Qn::LC_CountTotal; ++i) {
+    for (int i = 0; i < Qn::LC_Count; ++i) {
         if (xclass().toLower().toUtf8() == licenseTypeInfo[i].className)
             return licenseTypeInfo[i].licenseType;
     }

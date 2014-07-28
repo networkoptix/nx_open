@@ -1010,7 +1010,7 @@ void QnSingleCameraSettingsWidget::updateLicenseText() {
     if (!m_camera || !m_camera->isDtsBased())
         return;
 
-    QnLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper;
 
     helper.propose(QnVirtualCameraResourceList() << m_camera, ui->analogViewCheckBox->isChecked());
 

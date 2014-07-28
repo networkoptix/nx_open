@@ -450,7 +450,7 @@ void QnMultipleCameraSettingsWidget::updateLicensesButtonVisible() {
 }
 
 void QnMultipleCameraSettingsWidget::updateLicenseText() {
-    QnLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper;
 
     switch(ui->analogViewCheckBox->checkState()) {
     case Qt::Checked:

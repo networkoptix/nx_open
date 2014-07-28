@@ -554,7 +554,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     //checking if showing Licenses limit exceeded is appropriate
     if( cameraSettingsDialog()->widget()->licensedParametersModified() )
     {
-        QnLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
+        QnCamLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
         if (!helper.isValid())
         {
             QString message = tr("Licenses limit exceeded. The changes will be saved, but will not take effect.");

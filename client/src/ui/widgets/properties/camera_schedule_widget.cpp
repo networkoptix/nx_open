@@ -83,7 +83,7 @@ namespace {
         virtual bool validate(const QnResourceList &selected) override {
             QnVirtualCameraResourceList cameras = selected.filtered<QnVirtualCameraResource>();
 
-            QnLicenseUsageHelper helper(cameras, m_recordingEnabled);
+            QnCamLicenseUsageHelper helper(cameras, m_recordingEnabled);
 
             QPalette palette = m_parentPalette;
             bool licensesOk = helper.isValid();
@@ -679,7 +679,7 @@ void QnCameraScheduleWidget::updateGridEnabledState()
 
 void QnCameraScheduleWidget::updateLicensesLabelText()
 {
-    QnLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper;
 
     switch(ui->enableRecordingCheckBox->checkState()) {
     case Qt::Checked:

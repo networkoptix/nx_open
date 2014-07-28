@@ -581,7 +581,7 @@ void QnRecordingManager::at_checkLicenses()
     if (!ec2::QnTransactionLog::instance() || m_licenseMutex)
         return;
 
-    QnLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper;
 
     if (!helper.isValid())
     {
@@ -619,7 +619,7 @@ void QnRecordingManager::at_checkLicenses()
 
 void QnRecordingManager::at_licenseMutexLocked()
 {
-    QnLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper;
 
     int disabledCameras = 0;
     
