@@ -158,7 +158,7 @@ bool QnServerUpdateTool::addUpdateFileChunk(const QString &updateId, const QByte
         sendReply();
     }
 
-    if (isComplete()) {
+    if (isComplete() && m_file->isOpen()) {
         m_file->close();
 
         bool ok = processUpdate(updateId, m_file.data());
