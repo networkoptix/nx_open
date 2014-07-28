@@ -873,7 +873,9 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
         m_controlMode.cacheTimer->start();
         sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStarted));  //TODO: #GDM #VW start control when item goes online
 
-
+        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        localInfo.data.videoWallControlSessions++;
+        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     } else {
         disconnect(workbench(),    &QnWorkbench::itemChanged,           this,   &QnWorkbenchVideoWallHandler::at_workbench_itemChanged);
         disconnect(layout,         &QnWorkbenchLayout::itemAdded,       this,   &QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode);
@@ -888,6 +890,10 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active) {
         sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStopped));
         m_controlMode.active = active;
         m_controlMode.cacheTimer->stop();
+
+        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        localInfo.data.videoWallControlSessions--;
+        QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
 }
 
