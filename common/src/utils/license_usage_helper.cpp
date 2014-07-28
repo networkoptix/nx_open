@@ -145,12 +145,12 @@ QString QnLicenseUsageHelper::getUsageText() const
     return licenseText;
 }
 
-QString QnLicenseUsageHelper::getWillUsageText(Qn::LicenseType licenseType) const
+QString QnLicenseUsageHelper::getProposedUsageText(Qn::LicenseType licenseType) const
 {
     return QObject::tr("%n %2 will be used out of %1.", "", m_usedLicenses[licenseType]).arg( m_licenses.totalLicenseByType(licenseType)).arg(QnLicense::longDisplayName(licenseType));
 }
 
-QString QnLicenseUsageHelper::getWillUsageText() const
+QString QnLicenseUsageHelper::getProposedUsageText() const
 {
     QString licenseText;
     for (int i = 0; i < Qn::LC_CountCameras; ++i) 
@@ -161,7 +161,7 @@ QString QnLicenseUsageHelper::getWillUsageText() const
                 continue;
             if (!licenseText.isEmpty())
                 licenseText += lit("\n");
-            licenseText += getWillUsageText(licenseType);
+            licenseText += getProposedUsageText(licenseType);
         } 
     }
     return licenseText;

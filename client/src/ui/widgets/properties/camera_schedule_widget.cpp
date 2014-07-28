@@ -91,7 +91,7 @@ namespace {
                 setWarningStyle(&palette);
             m_licensesLabel->setPalette(palette);
 
-            QString usageText = helper.getWillUsageText();
+            QString usageText = helper.getProposedUsageText();
 
             m_licensesLabel->setText(usageText);
 

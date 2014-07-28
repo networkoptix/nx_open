@@ -19,8 +19,8 @@ public:
     QString getRequiredLicenseMsg() const;
     QString getUsageText(Qn::LicenseType licenseType) const;
     QString getUsageText() const;
-    QString getWillUsageText(Qn::LicenseType licenseType) const;
-    QString getWillUsageText() const;
+    QString getProposedUsageText(Qn::LicenseType licenseType) const;
+    QString getProposedUsageText() const;
     bool isOverflowForCamera(QnVirtualCameraResourcePtr camera);
 
     int totalLicense(Qn::LicenseType licenseType) const;
