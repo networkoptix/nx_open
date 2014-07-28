@@ -6,32 +6,32 @@
 #include <core/resource/media_server_resource.h>
 
 /* Allow to use 'master' license type instead of 'child' type inf child licenses isn't enough */
-struct LiceseCompatibility 
+struct LicenseCompatibility 
 {
-    LiceseCompatibility(Qn::LicenseType master, Qn::LicenseType child): master(master), child(child) {}
+    LicenseCompatibility(Qn::LicenseType master, Qn::LicenseType child): master(master), child(child) {}
     Qn::LicenseType master;
     Qn::LicenseType child;
 };
 
-static std::array<LiceseCompatibility, 14> compatibleLicenseType =
+static std::array<LicenseCompatibility, 14> compatibleLicenseType =
 {
-    LiceseCompatibility(Qn::LC_Edge,    Qn::LC_Professional),
-    LiceseCompatibility(Qn::LC_Professional, Qn::LC_Analog),
-    LiceseCompatibility(Qn::LC_Edge,    Qn::LC_Analog),
+    LicenseCompatibility(Qn::LC_Edge,    Qn::LC_Professional),
+    LicenseCompatibility(Qn::LC_Professional, Qn::LC_Analog),
+    LicenseCompatibility(Qn::LC_Edge,    Qn::LC_Analog),
 
-    LiceseCompatibility(Qn::LC_Analog,    Qn::LC_VMAX),
-    LiceseCompatibility(Qn::LC_Professional, Qn::LC_VMAX),
-    LiceseCompatibility(Qn::LC_Edge, Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Analog,    Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Professional, Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Edge, Qn::LC_VMAX),
 
-    LiceseCompatibility(Qn::LC_Analog,    Qn::LC_AnalogEncoder),
-    LiceseCompatibility(Qn::LC_Professional, Qn::LC_AnalogEncoder),
-    LiceseCompatibility(Qn::LC_Edge, Qn::LC_AnalogEncoder),
+    LicenseCompatibility(Qn::LC_Analog,    Qn::LC_AnalogEncoder),
+    LicenseCompatibility(Qn::LC_Professional, Qn::LC_AnalogEncoder),
+    LicenseCompatibility(Qn::LC_Edge, Qn::LC_AnalogEncoder),
 
-    LiceseCompatibility(Qn::LC_Trial,    Qn::LC_Edge),
-    LiceseCompatibility(Qn::LC_Trial,    Qn::LC_Professional),
-    LiceseCompatibility(Qn::LC_Trial,    Qn::LC_Analog),
-    LiceseCompatibility(Qn::LC_Trial,    Qn::LC_VMAX),
-    LiceseCompatibility(Qn::LC_Trial,    Qn::LC_AnalogEncoder)
+    LicenseCompatibility(Qn::LC_Trial,    Qn::LC_Edge),
+    LicenseCompatibility(Qn::LC_Trial,    Qn::LC_Professional),
+    LicenseCompatibility(Qn::LC_Trial,    Qn::LC_Analog),
+    LicenseCompatibility(Qn::LC_Trial,    Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Trial,    Qn::LC_AnalogEncoder)
 };
 
 
@@ -108,7 +108,7 @@ void QnLicenseUsageHelper::update()
     }
     
     for (int i = 0; i < Qn::LC_CountCamLecense; ++i) {
-        foreach(const LiceseCompatibility& c, compatibleLicenseType) {
+        foreach(const LicenseCompatibility& c, compatibleLicenseType) {
             if (c.child == Qn::LicenseType(i))
                 borrowLicenseFromClass(m_usedLicenses[c.master], maxLicenses[c.master], m_usedLicenses[i], maxLicenses[i]);
         }
