@@ -142,12 +142,12 @@ QN_FUSION_REGISTER_SERIALIZATION_VISITOR_TPL((class Output), (QnUbjsonWriter<Out
 QN_FUSION_REGISTER_DESERIALIZATION_VISITOR_TPL((class Input), (QnUbjsonReader<Input> *), (QnUbjsonDetail::DeserializationVisitor<Input>))
 
 
-#define QN_FUSION_DEFINE_FUNCTIONS_ubj(TYPE, ... /* PREFIX */)                  \
+#define QN_FUSION_DEFINE_FUNCTIONS_ubjson(TYPE, ... /* PREFIX */)               \
 __VA_ARGS__ void serialize(const TYPE &value, QnUbjsonWriter<QByteArray> *stream) { \
     QnFusion::serialize(value, &stream);                                        \
 }                                                                               \
                                                                                 \
-__VA_ARGS__ bool deserialize(QnUbjsonReader<QByteArray> *stream, TYPE *target) {   \
+__VA_ARGS__ bool deserialize(QnUbjsonReader<QByteArray> *stream, TYPE *target) { \
     return QnFusion::deserialize(stream, target);                               \
 }
 

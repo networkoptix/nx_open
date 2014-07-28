@@ -12,7 +12,9 @@
 #include <QtGui/QClipboard>
 #include <QtGui/QTextDocumentFragment>
 
-#include "api/app_server_connection.h"
+#include <api/app_server_connection.h>
+#include <api/global_settings.h>
+
 #include "core/resource/resource_type.h"
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/media_server_resource.h>
@@ -57,6 +59,7 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
     connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
+    connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged, this, &QnAboutDialog::retranslateUi);
 
     retranslateUi();
 }
@@ -165,6 +168,9 @@ void QnAboutDialog::retranslateUi()
     ui->creditsLabel->setText(credits);
     ui->gpuLabel->setText(gpu);
     ui->serversLabel->setText(servers);
+
+    QString emailLink = lit("<a href=mailto:%1>%1</a>").arg(QnGlobalSettings::instance()->emailSettings().supportEmail);
+    ui->supportEmailLabel->setText(tr("<b>Email</b>: %1").arg(emailLink));
 }
 
 // -------------------------------------------------------------------------- //

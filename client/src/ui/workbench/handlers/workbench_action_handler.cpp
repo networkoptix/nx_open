@@ -2216,6 +2216,41 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
     }
 }
 
+bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resource, const QString &newName) const {
+    /* Only users and videowall should be checked. Layouts are checked separately, servers and cameras can have the same name. */
+    QnResource::Flags checkedFlags = resource->flags() & (QnResource::user | QnResource::videowall);
+    if (!checkedFlags)
+        return true;
+
+    /* Resource cannot have both of these flags at once. */
+    Q_ASSERT(checkedFlags == QnResource::user || checkedFlags == QnResource::videowall);
+
+    foreach (const QnResourcePtr &resource, qnResPool->getResources()) {
+        if (!resource->hasFlags(checkedFlags))
+            continue;
+        if (resource->getName() != newName)
+            continue;
+
+        QString title = checkedFlags == QnResource::user
+            ? tr("User already exists.")
+            : tr("Video Wall already exists");
+
+        QString message = checkedFlags == QnResource::user 
+            ? tr("User with same name already exists")
+            : tr("Video Wall with same name already exists");
+
+        QMessageBox::warning(
+            mainWindow(),
+            title,
+            message
+            );
+        return false;
+    }
+
+    return true;
+}
+
+
 void QnWorkbenchActionHandler::at_renameAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
@@ -2249,14 +2284,18 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
 
     if(name.isEmpty()) {
         bool ok = false;
-        name = QInputDialog::getText(mainWindow(),
-                                     tr("Rename"),
-                                     tr("Enter new name for the selected item:"),
-                                     QLineEdit::Normal,
-                                     oldName,
-                                     &ok);
-        if (!ok || name.isEmpty())
-            return;
+        do {
+            name = QInputDialog::getText(mainWindow(),
+                                         tr("Rename"),
+                                         tr("Enter new name for the selected item:"),
+                                         QLineEdit::Normal,
+                                         oldName,
+                                         &ok)
+                                         .trimmed();
+            if (!ok || name.isEmpty() || name == oldName)
+                return;
+
+        } while (!validateResourceName(resource, name));
     }
 
     if(name == oldName)
@@ -2265,6 +2304,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
     if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         context()->instance<QnWorkbenchLayoutsHandler>()->renameLayout(layout, name);
     } else if (nodeType == Qn::RecorderNode) {
+        /* Recorder name should not be validated. */
         QString groupId = camera->getGroupId();
         QnVirtualCameraResourceList modified;
         foreach(const QnResourcePtr &resource, qnResPool->getResources()) {
@@ -2275,17 +2315,25 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
             modified << cam;
         }
         connection2()->getCameraManager()->save(modified, this, 
-            [this, modified]( int reqID, ec2::ErrorCode errorCode ) {
+            [this, modified, oldName]( int reqID, ec2::ErrorCode errorCode ) {
                 at_resources_saved( reqID, errorCode, modified );
+                if (errorCode != ec2::ErrorCode::ok)
+                    foreach (const QnVirtualCameraResourcePtr &camera, modified)
+                        camera->setGroupName(oldName);
             } );
 
 
 
     } else {
+        if (!validateResourceName(resource, name))
+            return;
+
         resource->setName(name);
         connection2()->getResourceManager()->save( resource, this,
-            [this, resource]( int reqID, ec2::ErrorCode errorCode ) {
+            [this, resource, oldName]( int reqID, ec2::ErrorCode errorCode ) {
                 at_resources_saved( reqID, errorCode, QnResourceList() << resource );
+                if (errorCode != ec2::ErrorCode::ok)
+                    resource->setName(oldName);
             });
     }
 }
@@ -2394,11 +2442,12 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
     setHelpTopic(dialog.data(), Qn::NewUser_Help);
+    do {
+        if(!dialog->exec())
+            return;
+        dialog->submitToResource();
+    } while (!validateResourceName(user, user->getName())); 
 
-    if(!dialog->exec())
-        return;
-
-    dialog->submitToResource();
     user->setId(QUuid::createUuid());
     user->setTypeByName(lit("User"));
 

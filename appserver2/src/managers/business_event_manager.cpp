@@ -92,7 +92,7 @@ template<class T>
 int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handler )
 {
     const int reqID = generateRequestID();
-    QnTransaction<ApiResetBusinessRuleData> tran(ApiCommand::resetBusinessRules, true);
+    QnTransaction<ApiResetBusinessRuleData> tran(ApiCommand::resetBusinessRules);
     fromResourceListToApi(QnBusinessEventRule::getDefaultRules(), tran.params.defaultRules);
 
     using namespace std::placeholders;
@@ -104,7 +104,7 @@ int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handle
 template<class T>
 QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource )
 {
-    QnTransaction<ApiBusinessActionData> tran(command, false);
+    QnTransaction<ApiBusinessActionData> tran(command);
     fromResourceToApi(resource, tran.params);
     return tran;
 }
@@ -113,7 +113,7 @@ QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransacti
 template<class T>
 QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnBusinessEventRulePtr& resource )
 {
-    QnTransaction<ApiBusinessRuleData> tran(command, true);
+    QnTransaction<ApiBusinessRuleData> tran(command);
     fromResourceToApi(resource, tran.params);
     return tran;
 }
@@ -121,9 +121,8 @@ QnTransaction<ApiBusinessRuleData> QnBusinessEventManager<T>::prepareTransaction
 template<class T>
 QnTransaction<ApiEmailSettingsData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnEmail::Settings& resource )
 {
-    QnTransaction<ApiEmailSettingsData> tran(command, true);
+    QnTransaction<ApiEmailSettingsData> tran(command);
     fromResourceToApi(resource, tran.params);
-    tran.persistent = false;
     tran.isLocal = true;
     return tran;
 }
@@ -131,9 +130,8 @@ QnTransaction<ApiEmailSettingsData> QnBusinessEventManager<T>::prepareTransactio
 template<class T>
 QnTransaction<ApiEmailData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const ApiEmailData& data )
 {
-    QnTransaction<ApiEmailData> tran(command, true);
+    QnTransaction<ApiEmailData> tran(command);
     tran.params = data;
-    tran.persistent = false;
     tran.isLocal = true;
     return tran;
 }
@@ -141,7 +139,7 @@ QnTransaction<ApiEmailData> QnBusinessEventManager<T>::prepareTransaction( ApiCo
 template<class T>
 QnTransaction<ApiIdData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
 {
-    QnTransaction<ApiIdData> tran(command, true);
+    QnTransaction<ApiIdData> tran(command);
     tran.params.id = id;
     return tran;
 }

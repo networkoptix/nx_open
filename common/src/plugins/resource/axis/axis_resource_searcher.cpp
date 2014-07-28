@@ -144,9 +144,14 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     if (iqpos<0)
         return local_results;
 
+    QByteArray prefix2("axis-00");
     int macpos = responseData.indexOf("- 00", iqpos);
-    if (macpos < 0)
-        return local_results;
+    if (macpos < 0) {
+        macpos = responseData.indexOf("- AC", iqpos);
+        if (macpos < 0)
+            return local_results;
+        prefix2 = QByteArray("axis-ac");
+    }
     macpos += 2;
 
     for (int i = iqpos; i < macpos; i++)
@@ -154,7 +159,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
         name += QLatin1Char(responseData[i]);
     }
 
-    int macpos2 = responseData.indexOf("axis-00", macpos);
+    int macpos2 = responseData.indexOf(prefix2, macpos);
     if (macpos2 > 0)
         macpos = macpos2 + 5; // replace real MAC to virtual MAC if exists
 

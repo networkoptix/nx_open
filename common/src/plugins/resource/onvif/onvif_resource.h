@@ -22,7 +22,8 @@
 #include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
 #include "onvif_resource_settings.h"
-#include "utils/common/timermanager.h"
+#include "gsoap_async_call_wrapper.h"
+
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
@@ -58,12 +59,17 @@ struct OnvifResExtInfo
 
 class QnPlOnvifResource
 :
-    public QnPhysicalCameraResource,
-    public TimerEventHandler
+    public QnPhysicalCameraResource
 {
     Q_OBJECT
 
 public:
+    typedef GSoapAsyncCallWrapper <
+        PullPointSubscriptionWrapper,
+        _onvifEvents__PullMessages,
+        _onvifEvents__PullMessagesResponse
+    > GSoapAsyncPullMessagesCallWrapper;
+
     class RelayOutputInfo
     {
     public:
@@ -102,8 +108,6 @@ public:
     static QString ONVIF_URL_PARAM_NAME;
     static QString ONVIF_ID_PARAM_NAME;
     static const float QUALITY_COEF;
-    static const char* PROFILE_NAME_PRIMARY;
-    static const char* PROFILE_NAME_SECONDARY;
     static const int MAX_AUDIO_BITRATE;
     static const int MAX_AUDIO_SAMPLERATE;
     static const int ADVANCED_SETTINGS_VALID_TIME; //Time, during which adv settings will not be obtained from camera (in milliseconds)
@@ -212,8 +216,6 @@ public:
     void notificationReceived(
         const oasisWsnB2__NotificationMessageHolderType& notification,
         time_t minNotificationTime = (time_t)-1 );
-    //!Implementation of TimerEventHandler::onTimer
-    virtual void onTimer( const quint64& timerID );
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
     int getMaxChannels() const;
@@ -284,7 +286,7 @@ private:
     QRect getVideoSourceMaxSize(const QString& configToken);
 
     bool isH264Allowed() const; // block H264 if need for compatble with some onvif devices
-
+    CameraDiagnostics::Result updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList);
 protected:
     std::auto_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
     QList<QSize> m_resolutionList; //Sorted desc
@@ -304,7 +306,7 @@ protected:
     bool registerNotificationConsumer();
 
 private slots:
-    void onRenewSubscriptionTimer();
+    void onRenewSubscriptionTimer( quint64 timerID );
 
 private:
     // TODO: #Elric #enum
@@ -450,7 +452,7 @@ private:
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;
-    QMutex m_subscriptionMutex;
+    mutable QMutex m_subscriptionMutex;
     EventMonitorType m_eventMonitorType;
     quint64 m_timerID;
     quint64 m_renewSubscriptionTaskID;
@@ -464,17 +466,24 @@ private:
     QString m_onvifNotificationSubscriptionReference;
     QElapsedTimer m_monotonicClock;
     qint64 m_prevRequestSendClock;
+    QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
     bool createPullPointSubscription();
-    bool pullMessages();
-    //!Reads relay output list from resource
+    void pullMessages( quint64 timerID );
+    void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
+    void onPullMessagesResponseReceived(
+        PullPointSubscriptionWrapper* soapWrapper, 
+        int resultCode,
+        const _onvifEvents__PullMessagesResponse& response);
+        //!Reads relay output list from resource
     bool fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs );
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
     bool fetchRelayInputInfo();
     bool fetchPtzInfo();
     bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
     void checkPrimaryResolution(QSize& primaryResolution);
-    bool setRelayOutputStateNonSafe(
+    void setRelayOutputStateNonSafe(
+        quint64 timerID,
         const QString& outputID,
         bool active,
         unsigned int autoResetTimeoutMS );

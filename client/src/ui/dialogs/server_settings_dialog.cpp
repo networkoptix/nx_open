@@ -146,6 +146,10 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     connect(ui->rebuildStartButton,     SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
     connect(ui->rebuildStopButton,      SIGNAL(clicked()),              this,   SLOT(at_rebuildButton_clicked()));
 
+    connect(ui->checkBoxRedundancy,     &QCheckBox::stateChanged,       this,   [this]{
+        ui->maxCamerasWidget->setEnabled(ui->checkBoxRedundancy->isChecked() && ui->checkBoxRedundancy->isEnabled());
+    });
+
     updateFromResources();
 }
 
@@ -272,9 +276,9 @@ void QnServerSettingsDialog::updateFromResources()
     ui->nameLineEdit->setText(m_server->getName());
     ui->nameLineEdit->setEnabled(!edge);
     ui->maxCamerasSpinBox->setValue(m_server->getMaxCameras());
-    ui->maxCamerasSpinBox->setEnabled(!edge);
     ui->checkBoxRedundancy->setChecked(m_server->isRedundancy());
     ui->checkBoxRedundancy->setEnabled(!edge);
+    ui->maxCamerasWidget->setEnabled(!edge && m_server->isRedundancy());
 
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));

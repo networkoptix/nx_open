@@ -136,42 +136,51 @@ namespace aio
             if( pollSetModificationQueue.empty() )
                 return;
 
-            QMutexLocker lk( mutex );
+            //using modifiedSockets to avoid deadlock when socket removed in this method with mutex locked (socket can call aio::AIOService in destructor)
+                //TODO #ak remove it in 2.4 (where aio operates with traditional pointer to socket)
+            std::vector<QSharedPointer<AbstractSocket>> modifiedSockets;
+            modifiedSockets.reserve(pollSetModificationQueue.size());
 
-            for( std::deque<SocketAddRemoveTask>::iterator
-                it = pollSetModificationQueue.begin();
-                it != pollSetModificationQueue.end();
-                 )
             {
-                const SocketAddRemoveTask& task = *it;
-                if( (taskFilter != SocketAddRemoveTask::tAll) && (task.type != taskFilter) )
+                QMutexLocker lk(mutex);
+                for( std::deque<SocketAddRemoveTask>::iterator
+                    it = pollSetModificationQueue.begin();
+                    it != pollSetModificationQueue.end();
+                     )
                 {
-                    ++it;
-                    continue;
-                }
+                    const SocketAddRemoveTask& task = *it;
+                    if( (taskFilter != SocketAddRemoveTask::tAll) && (task.type != taskFilter) )
+                    {
+                        ++it;
+                        continue;
+                    }
 
-                if( task.type == SocketAddRemoveTask::tAdding )
-                { 
-                    addSockToPollset( task.socket, task.eventType, task.timeout, task.eventHandler );
-                    if( task.eventType == aio::etRead )
-                        --newReadMonitorTaskCount;
-                    else if( task.eventType == aio::etWrite )
-                        --newWriteMonitorTaskCount;
-                    else
-                        Q_ASSERT( false );
+                    if( task.type == SocketAddRemoveTask::tAdding )
+                    {
+                        addSockToPollset(task.socket, task.eventType, task.timeout, task.eventHandler);
+                        if( task.eventType == aio::etRead )
+                            --newReadMonitorTaskCount;
+                        else if( task.eventType == aio::etWrite )
+                            --newWriteMonitorTaskCount;
+                        else
+                            Q_ASSERT(false);
+                    }
+                    else    //task.type == SocketAddRemoveTask::tRemoving
+                    {
+                        void* userData = pollSet.remove(task.socket.data(), task.eventType);
+                        if( userData )
+                            delete static_cast<AIOEventHandlingDataHolder*>(userData);
+                    }
+                    modifiedSockets.push_back(it->socket);
+                    it = pollSetModificationQueue.erase(it);
                 }
-                else    //task.type == SocketAddRemoveTask::tRemoving
-                {
-                    void* userData = pollSet.remove( task.socket.data(), task.eventType );
-                    if( userData )
-                        delete static_cast<AIOEventHandlingDataHolder*>(userData);
-                }
-                it = pollSetModificationQueue.erase( it );
             }
+
+            modifiedSockets.clear();
         }
 
         bool addSockToPollset(
-            QSharedPointer<AbstractSocket> socket,
+            const QSharedPointer<AbstractSocket>& socket,
             aio::EventType eventType,
             int timeout,
             AIOEventHandler* eventHandler )
@@ -179,7 +188,8 @@ namespace aio
             std::auto_ptr<AIOEventHandlingDataHolder> handlingData( new AIOEventHandlingDataHolder( eventHandler ) );
             if( !pollSet.add( socket.data(), eventType, handlingData.get() ) )
             {
-                NX_LOG( lit("Failed to add socket to pollset. %1").arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logWARNING );
+                const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+                NX_LOG(lit("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
                 return false;
             }
 
@@ -467,12 +477,11 @@ namespace aio
                 break;
             if( triggeredSocketCount < 0 )
             {
-                NX_LOG( QString::fromLatin1( "Poll failed. %1" ).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
                 const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
                 if( errorCode == SystemError::interrupted )
                     continue;
-                NX_LOG( lit( "Poll failed. %1" ).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-                msleep( ERROR_RESET_TIMEOUT );
+                NX_LOG(QString::fromLatin1("Poll failed. %1").arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+                msleep(ERROR_RESET_TIMEOUT);
                 continue;
             }
             curClock = getSystemTimerVal(); 

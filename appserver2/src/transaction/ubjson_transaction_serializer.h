@@ -1,5 +1,5 @@
-#ifndef __JSON_TRANSACTION_SERIALIZER_H_
-#define __JSON_TRANSACTION_SERIALIZER_H_
+#ifndef __UBJSON_TRANSACTION_SERIALIZER_H_
+#define __UBJSON_TRANSACTION_SERIALIZER_H_
 
 #include <QtCore/QCache>
 
@@ -11,15 +11,13 @@
 
 namespace ec2
 {
-    class QnAbstractTransaction;
-
     /**
      * This class serialized a transaction into a byte array.
      */
-    class QnJsonTransactionSerializer: public Singleton<QnJsonTransactionSerializer>
+    class QnUbjsonTransactionSerializer: public Singleton<QnUbjsonTransactionSerializer>
     {
     public:
-        QnJsonTransactionSerializer() {}
+        QnUbjsonTransactionSerializer() {}
 
         template<class T>
         QByteArray serializedTransaction(const QnTransaction<T>& tran) {
@@ -30,19 +28,9 @@ namespace ec2
             if (!tran.persistentInfo.isNull() && m_cache.contains(tran.persistentInfo))
                 return *m_cache[tran.persistentInfo];
 
-            QJsonValue jsonTran;
-            QJson::serialize(tran, &jsonTran);
-
-            QJsonValue jsonParams;
-            QJson::serialize(tran.params, &jsonParams);
-
-            QJsonObject tranObject;
-            tranObject["tran"] = jsonTran;
-            tranObject["params"] = jsonParams;
-            
             QByteArray* result = new QByteArray();
-            QJson::serialize(tranObject, result);
-
+            QnUbjsonWriter<QByteArray> stream(result);
+            QnUbjson::serialize( tran, &stream );
             if (!tran.persistentInfo.isNull())
                 m_cache.insert(tran.persistentInfo, result);
 
@@ -51,10 +39,16 @@ namespace ec2
 
         template<class T>
         QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
-            Q_UNUSED(header);    //header is really unused in json clients
-            return serializedTransaction(tran);
+            QByteArray result;
+            QnUbjsonWriter<QByteArray> stream(&result);
+            QnUbjson::serialize(header, &stream);
+
+            QByteArray serializedTran = serializedTransaction(tran);
+            result.append(serializedTran);
+            return result;
         }
 
+        static bool deserializeTran(const quint8* chunkPayload, int len,  QnTransactionTransportHeader& transportHeader, QByteArray& tranData);
     private:
         mutable QMutex m_mutex;
         QCache<QnAbstractTransaction::PersistentInfo, QByteArray> m_cache;
@@ -62,4 +56,5 @@ namespace ec2
 
 }
 
-#endif // __JSON_TRANSACTION_SERIALIZER_H_
+
+#endif // __UBJSON_TRANSACTION_SERIALIZER_H_

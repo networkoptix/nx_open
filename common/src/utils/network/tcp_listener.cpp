@@ -12,12 +12,6 @@
 class QnTcpListenerPrivate
 {
 public:
-    QnTcpListenerPrivate() {
-        serverSocket = 0;
-        newPort = 0;
-        localPort = 0;
-        useSSL = false;
-    }
     AbstractStreamServerSocket* serverSocket;
     QList<QnLongRunnable*> connections;
     QByteArray authDigest;
@@ -29,6 +23,17 @@ public:
     bool useSSL;
     int maxConnections;
     bool ddosWarned;
+
+    QnTcpListenerPrivate()
+    :
+        serverSocket(nullptr),
+        newPort(0),
+        localPort(0),
+        useSSL(false),
+        maxConnections(0),
+        ddosWarned(false)
+    {
+    }
 };
 
 // ------------------------ QnTcpListener ---------------------------
