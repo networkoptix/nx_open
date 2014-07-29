@@ -7,9 +7,13 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/workbench/workbench_state_manager.h>
+
 QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent) :
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::AdjustVideoDialog),
+    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnAdjustVideoDialog>(this)),
     m_updateDisabled(false),
     m_widget(0)
 {
@@ -188,4 +192,13 @@ void QnAdjustVideoDialog::closeEvent(QCloseEvent *e)
         m_widget->setImageEnhancement(m_backupParams);
     setWidget(0);
     base_type::closeEvent(e);
+}
+
+bool QnAdjustVideoDialog::tryClose(bool force) {
+    if (m_widget)
+        m_widget->setImageEnhancement(m_backupParams);
+    setWidget(0);
+    if (force)
+        hide();
+    return true;
 }
