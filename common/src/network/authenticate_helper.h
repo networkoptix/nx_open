@@ -92,6 +92,7 @@ public:
 
     void setSessionKey(const QByteArray& value);
 
+    static QByteArray symmetricalEncode(const QByteArray& data);
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &);
@@ -108,6 +109,7 @@ private:
     static QnAuthHelper* m_instance;
     //QMap<QByteArray, QElapsedTimer> m_nonces;
     QMap<QnId, QnUserResourcePtr> m_users;
+    QMap<QnId, QnMediaServerResourcePtr> m_servers;
     QnAuthMethodRestrictionList m_authMethodRestrictionList;
 
     QByteArray m_sessionKey;

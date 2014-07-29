@@ -74,6 +74,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         // cameras contains updated resource with all fields
         QnResourcePool::instance()->addResource(cameras.first());
         */
+        QString uniqueId = cameraResource->getUniqueId();
+        cameraResource->setId(cameraResource->uniqueIdToId(uniqueId));
         addNewCamera(cameraResource);
     }
 }
@@ -123,6 +125,7 @@ void QnAppserverResourceProcessor::at_mutexLocked()
 
 void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraResourcePtr& cameraResource)
 {
+    Q_ASSERT(!cameraResource->getId().isNull());
     QnVirtualCameraResourceList cameras;
     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
     const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );

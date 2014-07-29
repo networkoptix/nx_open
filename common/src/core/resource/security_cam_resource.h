@@ -35,6 +35,7 @@ public:
     int motionSensWindowCount() const;
 
 
+    bool hasMotion();
     Qn::MotionType getMotionType();
     void setMotionType(Qn::MotionType value);
 
