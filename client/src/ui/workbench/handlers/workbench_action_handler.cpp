@@ -1637,8 +1637,8 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
             : tr("Video Wall already exists");
 
         QString message = checkedFlags == QnResource::user 
-            ? tr("User with same name already exists")
-            : tr("Video Wall with same name already exists");
+            ? tr("User with the same name already exists")
+            : tr("Video Wall with the same name already exists");
 
         QMessageBox::warning(
             mainWindow(),
