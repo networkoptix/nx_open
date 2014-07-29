@@ -148,6 +148,7 @@
 #include "llutil/hardware_id.h"
 #include "api/runtime_info_manager.h"
 #include "rest/handlers/old_client_connect_rest_handler.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 
 // This constant is used while checking for compatibility.
@@ -1116,6 +1117,7 @@ void QnMain::run()
     QScopedPointer<QnGlobalSettings> globalSettings(new QnGlobalSettings());
 
     QnAuthHelper::initStaticInstance(new QnAuthHelper());
+    connect(QnAuthHelper::instance(), &QnAuthHelper::emptyDigestDetected, this, &QnMain::at_emptyDigestDetected);
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/ping*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/camera_event*"), AuthMethod::noAuth );
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/api/moduleInformation*"), AuthMethod::noAuth );
@@ -1642,6 +1644,29 @@ void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
     tran.params = runtimeInfo.data;
     tran.fillSequence();
     ec2::qnTransactionBus->sendTransaction(tran);
+}
+
+void QnMain::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password)
+{
+    // fill authenticate digest here for compatibility with version 2.1 and below.
+    const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
+    if (user->getDigest().isEmpty() && !m_updateUserRequests.contains(user->getId()))
+    {
+        user->setPassword(password);
+        user->setName(login);
+        m_updateUserRequests << user->getId();
+        appServerConnection->getUserManager()->save(
+            user, this, 
+            [this, user]( int reqID, ec2::ErrorCode errorCode ) 
+            {
+                if (errorCode == ec2::ErrorCode::ok) {
+                    ec2::ApiUserData userData;
+                    fromResourceToApi(user, userData);
+                    user->setDigest(userData.digest);
+                }
+                m_updateUserRequests.remove(user->getId());
+            } );
+    }
 }
 
 class QnVideoService : public QtService<QtSingleCoreApplication>
