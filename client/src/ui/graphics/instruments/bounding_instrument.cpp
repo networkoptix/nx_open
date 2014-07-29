@@ -187,18 +187,10 @@ public:
     }
 
     void setPositionBoundsExtension(const MarginsF &extension) {
-        qreal logScale;
-        calculateRelativeScale(&logScale);
-
         m_positionBoundsExtension = extension;
 
-        if(m_view != NULL)
+        if (m_view)
             updateSceneRect();
-
-        if (logScale > m_defaultStickyLogScaleResettingThreshold && logScale <= 1.0) {
-            calculateRelativeScale(&logScale);
-            m_stickyLogScaleResettingThreshold = logScale;
-        }
     }
 
     const MarginsF &positionBoundsExtension() const {
@@ -221,12 +213,21 @@ public:
     }
 
     void setSizeBoundsExtension(const QSizeF &sizeLowerExtension, const QSizeF &sizeUpperExtension) {
+        qreal logScale;
+        if (m_view)
+            calculateRelativeScale(&logScale);
+
         m_sizeLowerExtension = sizeLowerExtension;
         m_sizeUpperExtension = sizeUpperExtension;
 
-        if(m_view != NULL) {
+        if (m_view) {
             updateExtendedSizeBounds();
             updateSceneRect();
+
+            if (logScale > m_defaultStickyLogScaleResettingThreshold && logScale <= 1.0) {
+                calculateRelativeScale(&logScale);
+                m_stickyLogScaleResettingThreshold = logScale;
+            }
         }
     }
 
