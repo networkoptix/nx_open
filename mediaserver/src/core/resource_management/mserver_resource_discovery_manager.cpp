@@ -150,7 +150,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
             if (existCamRes)
             {
-                if (existCamRes->getTypeId() != newNetRes->getTypeId()) {
+                if (existCamRes->getTypeId() != newNetRes->getTypeId() && !newNetRes->isAbstractResource()) {
                     QnId newTypeId = newNetRes->getTypeId();
                     newNetRes->update(existCamRes);
                     newNetRes->setParentId(qnCommon->moduleGUID());
