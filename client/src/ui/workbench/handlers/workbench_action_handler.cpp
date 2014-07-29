@@ -1410,7 +1410,12 @@ void QnWorkbenchActionHandler::at_pictureSettingsAction_triggered() {
     if (!media)
         return;
 
-    QScopedPointer<QnPictureSettingsDialog> dialog(new QnPictureSettingsDialog(mainWindow()));
+    QScopedPointer<QnPictureSettingsDialog> dialog;
+    if (resource->hasFlags(QnResource::remote))
+        dialog.reset(new QnWorkbenchStateDependentDialog<QnPictureSettingsDialog>(mainWindow()));
+    else
+        dialog.reset(new QnPictureSettingsDialog(mainWindow()));
+    
     dialog->updateFromResource(media);
     if (dialog->exec()) {
         dialog->submitToResource(media);

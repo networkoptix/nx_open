@@ -148,6 +148,10 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             if (!dialog->exec())
                 return;
 
+            /* Check if we were disconnected (server shut down) while the dialog was open. */
+            if (!context()->user())
+                return;
+
             if(dialog->clickedButton() != QDialogButtonBox::Save)
                 return;
 

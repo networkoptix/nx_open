@@ -25,16 +25,13 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_state_manager.h>
 
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::BusinessRulesDialog()),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnBusinessRulesDialog>(this)),
     m_popupMenu(new QMenu(this)),
     m_advancedAction(NULL),
     m_advancedMode(false)

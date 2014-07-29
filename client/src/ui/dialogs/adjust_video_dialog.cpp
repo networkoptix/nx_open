@@ -7,13 +7,9 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/workbench/workbench_state_manager.h>
-
 QnAdjustVideoDialog::QnAdjustVideoDialog(QWidget *parent) :
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::AdjustVideoDialog),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnAdjustVideoDialog>(this)),
     m_updateDisabled(false),
     m_widget(0)
 {

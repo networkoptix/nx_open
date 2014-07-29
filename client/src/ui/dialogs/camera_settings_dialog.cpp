@@ -21,14 +21,11 @@
 
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_state_manager.h>
 
 #include <utils/license_usage_helper.h>
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
-    QDialog(parent),
-    QnWorkbenchContextAware(parent),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnCameraSettingsDialog>(this)),
+    base_type(parent),
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
     m_ignoreAccept(false)

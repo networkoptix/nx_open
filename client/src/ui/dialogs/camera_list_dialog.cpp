@@ -18,13 +18,10 @@
 #include <ui/help/help_topics.h>
 
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_state_manager.h>
 
 QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::CameraListDialog),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnCameraListDialog>(this)),
     m_model(new QnCameraListModel(this)),
     m_resourceSearch(new QnResourceSearchProxyModel(this)),
     m_pendingWindowTitleUpdate(false)
@@ -148,11 +145,5 @@ void QnCameraListDialog::at_exportAction_triggered() {
 
 void QnCameraListDialog::at_clipboardAction_triggered() {
     QnGridWidgetHelper::copyToClipboard(ui->camerasView);
-}
-
-bool QnCameraListDialog::tryClose(bool force) {
-    if (force)
-        hide();
-    return true;
 }
 

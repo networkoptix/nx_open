@@ -33,8 +33,6 @@
 
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_state_manager.h>
-
 
 class QnPtzToursDialogItemDelegate: public QStyledItemDelegate {
     typedef QStyledItemDelegate base_type;
@@ -78,7 +76,6 @@ private:
 QnPtzManageDialog::QnPtzManageDialog(QWidget *parent) :
     base_type(parent),
     ui(new Ui::PtzManageDialog),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnPtzManageDialog>(this)),
     m_model(new QnPtzManageModel(this)),
     m_adaptor(new QnPtzHotkeysResourcePropertyAdaptor(this)),
     m_cache(new QnLocalFileCache(this)),

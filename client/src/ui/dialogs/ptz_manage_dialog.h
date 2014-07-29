@@ -15,7 +15,6 @@ namespace Ui {
 class QnPtzManageModel;
 class QnPtzHotkeysResourcePropertyAdaptor;
 class QnLocalFileCache;
-class QnWorkbenchStateDelegate;
 
 // TODO: #GDM #PTZ remove singleton
 class QnPtzManageDialog : public QnAbstractPtzDialog, public Singleton<QnPtzManageDialog> {
@@ -31,7 +30,7 @@ public:
 
     bool isModified() const;
 
-    bool tryClose(bool force);
+    virtual bool tryClose(bool force) override;
 protected:
     virtual void loadData(const QnPtzData &data) override;
     virtual void saveData() override;
@@ -75,8 +74,7 @@ private:
 
 private:
     QScopedPointer<Ui::PtzManageDialog> ui;
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
-
+    
     QnPtzManageModel *m_model;
     QnPtzHotkeysResourcePropertyAdaptor *m_adaptor;
     QnResourcePtr m_resource;

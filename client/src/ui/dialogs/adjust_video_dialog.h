@@ -8,17 +8,18 @@
 
 #include <utils/color_space/image_correction.h>
 
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
+
 class QnMediaResourceWidget;
-class QnWorkbenchStateDelegate;
 
 namespace Ui {
     class AdjustVideoDialog;
 }
 
 // TODO: #Elric rename image enhancement dialog
-class QnAdjustVideoDialog : public QDialog, public QnWorkbenchContextAware {
+class QnAdjustVideoDialog : public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
-    typedef QDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     explicit QnAdjustVideoDialog(QWidget *parent = NULL);
@@ -30,7 +31,7 @@ public:
     
     void setWidget(QnMediaResourceWidget *widget);
 
-    bool tryClose(bool force);
+    virtual bool tryClose(bool force) override;
 protected:
     virtual void closeEvent(QCloseEvent *e) override;
 
@@ -46,7 +47,6 @@ private slots:
 
 private:
     QScopedPointer<Ui::AdjustVideoDialog> ui;
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
 
     bool m_updateDisabled;
     ImageCorrectionParams m_params;

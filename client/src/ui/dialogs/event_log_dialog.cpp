@@ -33,7 +33,6 @@
 #include <ui/style/warning_style.h>
 
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_state_manager.h>
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -42,9 +41,7 @@ namespace {
 
 QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::EventLogDialog),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnEventLogDialog>(this)),
     m_eventTypesModel(new QStandardItemModel()),
     m_actionTypesModel(new QStandardItemModel()),
     m_updateDisabled(false),
@@ -578,10 +575,4 @@ void QnEventLogDialog::updateActionList(bool instantOnly)
 
     if (!m_actionTypesModel->item(ui->actionComboBox->currentIndex())->isEnabled())
         ui->actionComboBox->setCurrentIndex(0);
-}
-
-bool QnEventLogDialog::tryClose(bool force) {
-    if (force)
-        hide();
-    return true;
 }

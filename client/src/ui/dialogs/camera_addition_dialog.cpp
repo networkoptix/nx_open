@@ -14,7 +14,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_state_manager.h>
 
 namespace {
     enum Column {
@@ -110,9 +109,7 @@ void QnCheckBoxedHeaderView::at_sectionClicked(int logicalIndex) {
 // -------------------------------------------------------------------------- //
 QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
     ui(new Ui::CameraAdditionDialog),
-    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnCameraAdditionDialog>(this)),
     m_state(NoServer),
     m_server(NULL),
     m_inIpRangeEdit(false),

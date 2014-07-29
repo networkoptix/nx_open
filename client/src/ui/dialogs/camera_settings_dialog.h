@@ -8,20 +8,21 @@
 
 #include <ui/widgets/properties/camera_settings_widget.h>
 
-#include <ui/workbench/workbench_context_aware.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QAbstractButton;
 
 class QnCameraSettingsWidget;
-class QnWorkbenchStateDelegate;
 
-class QnCameraSettingsDialog: public QDialog, public QnWorkbenchContextAware {
+class QnCameraSettingsDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
+
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 public:
     QnCameraSettingsDialog(QWidget *parent = NULL);
     virtual ~QnCameraSettingsDialog();
 
-    bool tryClose(bool force);
+    virtual bool tryClose(bool force) override;
 
     void setCameras(const QnVirtualCameraResourceList &cameras, bool force = false);
 signals:
@@ -58,8 +59,6 @@ private:
 
     void saveAdvancedCameraSettingsAsync(const QnVirtualCameraResourceList &cameras);
 private:
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
-
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;
     QPushButton *m_applyButton, *m_okButton, *m_openButton, *m_diagnoseButton, *m_rulesButton;

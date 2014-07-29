@@ -13,10 +13,10 @@
 
 #include <business/business_event_rule.h>
 
-#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
+
 #include <ui/models/business_rules_actual_model.h>
 #include <ui/widgets/business/business_rule_widget.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/request_param.h>
 
@@ -24,13 +24,11 @@ namespace Ui {
     class BusinessRulesDialog;
 }
 
-class QnWorkbenchStateDelegate;
-
-class QnBusinessRulesDialog : public QnButtonBoxDialog, public QnWorkbenchContextAware
+class QnBusinessRulesDialog : public QnWorkbenchStateDependentButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QnButtonBoxDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     explicit QnBusinessRulesDialog(QWidget *parent = 0);
@@ -44,7 +42,7 @@ public:
      * @param force         If set to true, changes will be silently dropped and the dialog will be hidden.
      * @return              False if the user press Cancel, true otherwise.
      */
-    bool tryClose(bool force);
+    virtual bool tryClose(bool force) override;
 protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
@@ -91,7 +89,6 @@ private:
     void setAdvancedMode(bool value);
 
     QScopedPointer<Ui::BusinessRulesDialog> ui;
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
 
     QnBusinessRulesActualModel* m_rulesViewModel;
     QList<QnId> m_pendingDeleteRules;

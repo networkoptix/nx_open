@@ -19,6 +19,8 @@
 #include <ui/dialogs/file_dialog.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
+
 namespace {
     const QLatin1String dbExtension(".db");
 }
@@ -55,6 +57,10 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
     if(fileName.isEmpty())
         return;
 
+    /* Check if we were disconnected (server shut down) while the dialog was open. */
+    if (!context()->user())
+        return;
+
     qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());
     if (!fileName.endsWith(dbExtension))
         fileName += dbExtension;
@@ -65,7 +71,8 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
         return;
     }
    
-    QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog);
+    //TODO: #GDM QnWorkbenchStateDependentDialog, QScopedPointer vs QObject-parent problem
+    QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog());
     dialog->setMinimum(0);
     dialog->setMaximum(0);
     dialog->setWindowTitle(tr("Downloading Database Backup"));
@@ -102,6 +109,11 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     QString fileName = QnFileDialog::getOpenFileName(this, tr("Open Database Backup..."), qnSettings->lastDatabaseBackupDir(), tr("Database Backup Files (*.db)"), NULL, QnCustomFileDialog::fileDialogOptions());
     if(fileName.isEmpty())
         return;
+
+    /* Check if we were disconnected (server shut down) while the dialog was open. */
+    if (!context()->user())
+        return;
+
     qnSettings->setLastDatabaseBackupDir(QFileInfo(fileName).absolutePath());
 
     QFile file(fileName);
@@ -119,6 +131,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     QByteArray data = file.readAll();
     file.close();
 
+    //TODO: #GDM QnWorkbenchStateDependentDialog, QScopedPointer vs QObject-parent problem
     QScopedPointer<QnProgressDialog> dialog(new QnProgressDialog);
     dialog->setMinimum(0);
     dialog->setMaximum(0);

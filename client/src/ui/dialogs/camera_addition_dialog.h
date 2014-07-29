@@ -11,9 +11,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/connective.h>
-
-class QnWorkbenchStateDelegate;
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 namespace Ui {
     class CameraAdditionDialog;
@@ -41,9 +39,9 @@ private:
 };
 
 
-class QnCameraAdditionDialog: public Connective<QDialog>, public QnWorkbenchContextAware {
+class QnCameraAdditionDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
-    typedef Connective<QDialog> base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 public:
     enum State {
         NoServer,           /**< No server is selected. */
@@ -66,7 +64,7 @@ public:
 
     State state() const;
 
-    bool tryClose(bool force);
+    virtual bool tryClose(bool force) override;
 private:
     Q_SLOT void clearTable();
 

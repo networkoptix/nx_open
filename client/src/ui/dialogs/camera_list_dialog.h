@@ -6,22 +6,22 @@
 #include <QtWidgets/QDialog>
 #include <QtGui/QStandardItem>
 
-#include <ui/workbench/workbench_context_aware.h>
 #include <core/resource/resource_fwd.h>
+
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QnCameraListModel;
 class QnWorkbenchContext;
 class QnResourceSearchProxyModel;
-class QnWorkbenchStateDelegate;
 
 namespace Ui {
     class CameraListDialog;
 }
 
-class QnCameraListDialog: public QDialog, public QnWorkbenchContextAware {
+class QnCameraListDialog: public QnWorkbenchStateDependentButtonBoxDialog {
     Q_OBJECT
 
-    typedef QDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     explicit QnCameraListDialog(QWidget *parent = NULL);
@@ -29,8 +29,6 @@ public:
 
     void setServer(const QnMediaServerResourcePtr &server);
     QnMediaServerResourcePtr server() const;
-
-    bool tryClose(bool force);
 private:
     Q_SIGNAL void updateWindowTitleQueued();
     void updateWindowTitleLater();
@@ -46,7 +44,6 @@ private:
     Q_DISABLE_COPY(QnCameraListDialog)
 
     QScopedPointer<Ui::CameraListDialog> ui;
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
     QnCameraListModel *m_model;
     QnResourceSearchProxyModel *m_resourceSearch;
     QAction *m_selectAllAction;
