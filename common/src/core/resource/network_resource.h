@@ -16,12 +16,11 @@ class QN_EXPORT QnNetworkResource : public QnResource
     //Q_PROPERTY(QAuthenticator auth READ getAuth WRITE setAuth)
 
 public:
-    // TODO: #Elric #enum Qn prefix?
-    enum QnNetworkStatus
-    {
+    enum NetworkStatusFlag {
         BadHostAddr = 0x01,
         Ready = 0x04
     };
+    Q_DECLARE_FLAGS(NetworkStatus, NetworkStatusFlag)
 
     QnNetworkResource();
     virtual ~QnNetworkResource();
@@ -57,10 +56,10 @@ public:
     QString toSearchString() const;
 
 
-    void addNetworkStatus(QnNetworkStatus status);
-    void removeNetworkStatus(QnNetworkStatus status);
-    bool checkNetworkStatus(QnNetworkStatus status) const;
-    void setNetworkStatus(QnNetworkStatus status);
+    void addNetworkStatus(NetworkStatus status);
+    void removeNetworkStatus(NetworkStatus status);
+    bool checkNetworkStatus(NetworkStatus status) const;
+    void setNetworkStatus(NetworkStatus status);
 
 
     // all data readers and any sockets will use this number as timeout value in ms
@@ -110,11 +109,13 @@ private:
 
     QHostAddress m_localAddress; // address used to discover this resource ( in case if machine has more than one NIC/address
 
-    unsigned long m_networkStatus; // TODO: #Elric #enum type safety has just walked out of the window.
+    NetworkStatus m_networkStatus;
 
     unsigned int m_networkTimeout;
 
     bool m_probablyNeedToUpdateStatus;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnNetworkResource::NetworkStatus)
 
 #endif // QN_NETWORK_RESOURCE_H

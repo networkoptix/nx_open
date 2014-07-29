@@ -67,6 +67,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
 
     connect(ui->arOverrideCheckBox, &QCheckBox::stateChanged, this, [this](int state){ ui->arComboBox->setEnabled(state == Qt::Checked);} );
     connect(ui->arOverrideCheckBox, SIGNAL(stateChanged(int)), this, SLOT(at_dbDataChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(archiveRangeChanged()),          this,   SLOT(at_dbDataChanged()));
 
     ui->arComboBox->addItem(tr("4:3"),  4.0 / 3);
     ui->arComboBox->addItem(tr("16:9"), 16.0 / 9);
@@ -159,7 +160,8 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
     bool overrideAr = ui->arOverrideCheckBox->checkState() == Qt::Checked;
     bool clearAr = ui->arOverrideCheckBox->checkState() == Qt::Unchecked;
 
-    foreach(QnVirtualCameraResourcePtr camera, m_cameras) {
+    foreach(QnVirtualCameraResourcePtr camera, m_cameras) 
+    {
         QString cameraLogin = camera->getAuth().user();
         if (!login.isEmpty() || !m_loginWasEmpty)
             cameraLogin = login;
@@ -170,6 +172,13 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
 
         camera->setAuth(cameraLogin, cameraPassword);
 
+        int maxDays = ui->cameraScheduleWidget->maxRecordedDays();
+        if (maxDays != QnCameraScheduleWidget::RecordedDaysDontChange)
+            camera->setMaxDays(maxDays);
+        int minDays = ui->cameraScheduleWidget->minRecordedDays();
+        if (minDays != QnCameraScheduleWidget::RecordedDaysDontChange)
+            camera->setMinDays(minDays);
+        
         if (ui->enableAudioCheckBox->checkState() != Qt::PartiallyChecked && ui->enableAudioCheckBox->isEnabled()) 
             camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
 

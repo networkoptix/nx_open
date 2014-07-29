@@ -8,7 +8,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/security_cam_resource.h>
 
-#include <plugins/resources/archive/syncplay_wrapper.h>
+#include <plugins/resource/archive/syncplay_wrapper.h>
 
 #include <camera/resource_display.h>
 #include <camera/client_video_camera.h>

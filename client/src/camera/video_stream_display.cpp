@@ -7,6 +7,8 @@
 #include "utils/math/math.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/adaptive_sleep.h"
+#include <utils/common/log.h>
+
 #include "abstract_renderer.h"
 #include "gl_renderer.h"
 #include "buffered_frame_displayer.h"

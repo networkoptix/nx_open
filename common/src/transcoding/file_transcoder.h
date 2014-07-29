@@ -6,6 +6,8 @@
 #ifndef FILE_TRANSCODER_H
 #define FILE_TRANSCODER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <memory>
 
 #include <QtCore/QIODevice>
@@ -18,7 +20,7 @@ extern "C"
 }
 
 #include <core/resource/media_resource.h>
-#include <plugins/resources/archive/avi_files/avi_archive_delegate.h>
+#include <plugins/resource/avi/avi_archive_delegate.h>
 #include <transcoding/ffmpeg_transcoder.h>
 #include <utils/common/long_runnable.h>
 
@@ -153,5 +155,7 @@ private:
     bool openFiles();
     void closeFiles();
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //FILE_TRANSCODER_H

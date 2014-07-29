@@ -10,7 +10,7 @@
 
 #include <string>
 
-#include <plugins/resources/onvif/onvif_notification_consumer.h>
+#include <plugins/resource/onvif/onvif_notification_consumer.h>
 #include <utils/common/long_runnable.h>
 
 
@@ -23,18 +23,16 @@ class QnSoapServer
     public QnLongRunnable
 {
 public:
-    //!One MUST call \a initialize after instanciation with this constructor
-    QnSoapServer();
     /*!
-        \param port Port to listen on
+        \param port Port to listen on. If zero, random avalable port is chosen
     */
-    QnSoapServer( unsigned int port, const char* path = "/services" );
+    QnSoapServer( unsigned int port = 0, const char* path = "/services" );
     virtual ~QnSoapServer();
 
     //!Implementation of QnSoapServer::pleaseStop
     virtual void pleaseStop();
 
-    void initialize( unsigned int port, const char* path = "/services" );
+    bool bind();
     bool initialized() const;
     //!Port being listened
     unsigned int port() const;

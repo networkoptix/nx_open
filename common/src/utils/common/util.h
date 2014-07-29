@@ -57,8 +57,6 @@ qint64 getDiskFreeSpace(const QString &root);
 
 qint64 getDiskTotalSpace(const QString &root);
 
-#define DATETIME_NOW INT64_MAX 
-
 #define DEFAULT_APPSERVER_HOST "127.0.0.1"
 #define DEFAULT_APPSERVER_PORT 7001
 
@@ -104,6 +102,10 @@ qreal frandom();
  * \returns                             has of string. Added for compatibility with QT4 code
  */
 uint qt4Hash(const QString& key);
+
+#ifdef _DEBUG
+QString debugTime(qint64 timeMSec, const QString &fmt = QString());
+#endif
 
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

@@ -22,7 +22,6 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 {
     if (m_connection) {
         m_connection->disconnect(this);
-        //emit connectionClosed();
     }
     m_connection = connection;
 
@@ -61,6 +60,8 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 
     connect( connection->getLicenseManager().get(), &ec2::AbstractLicenseManager::licenseChanged,
         this, &QnCommonMessageProcessor::on_licenseChanged );
+    connect( connection->getLicenseManager().get(), &ec2::AbstractLicenseManager::licenseRemoved,
+        this, &QnCommonMessageProcessor::on_licenseRemoved );
 
     connect( connection->getBusinessEventManager().get(), &ec2::AbstractBusinessEventManager::addedOrUpdated,
         this, &QnCommonMessageProcessor::on_businessEventAddedOrUpdated );
@@ -100,26 +101,12 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
     connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::removed,
         this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::controlMessage,
-        this, &QnCommonMessageProcessor::videowallControlMessageReceived );
-    connect( connection->getVideowallManager().get(), &ec2::AbstractVideowallManager::instanceStatusChanged,
-        this, &QnCommonMessageProcessor::on_videowallInstanceStatusChanged );
-    
-
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::at_remotePeerFound );
-    connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::at_remotePeerLost );
+        this, &QnCommonMessageProcessor::videowallControlMessageReceived );  
 
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerFound, this, &QnCommonMessageProcessor::remotePeerFound );
     connect( connection.get(), &ec2::AbstractECConnection::remotePeerLost, this, &QnCommonMessageProcessor::remotePeerLost );
 
     connection->startReceivingNotifications();
-}
-
-void QnCommonMessageProcessor::at_remotePeerFound(ec2::ApiPeerAliveData data, bool /*isProxy*/)
-{
-}
-
-void QnCommonMessageProcessor::at_remotePeerLost(ec2::ApiPeerAliveData runtimeInfo, bool /*isProxy*/)
-{
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const ec2::QnFullResourceData &fullData)
@@ -154,36 +141,34 @@ void QnCommonMessageProcessor::on_resourceParamsChanged( const QnId& resourceId,
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnId& resourceId )
 {
-    //beforeRemovingResource(resourceId);
-
-    if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId)) 
+    if (canRemoveResource(resourceId))
     {
-        // delete dependent objects
-        foreach(QnResourcePtr subRes, qnResPool->getResourcesByParentId(resourceId))
-            qnResPool->removeResource(subRes);
-        qnResPool->removeResource(ownResource);
-    }
+        //beforeRemovingResource(resourceId);
+
+        if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId)) 
+        {
+            // delete dependent objects
+            foreach(QnResourcePtr subRes, qnResPool->getResourcesByParentId(resourceId))
+                qnResPool->removeResource(subRes);
+            qnResPool->removeResource(ownResource);
+        }
     
-    afterRemovingResource(resourceId);
+        afterRemovingResource(resourceId);
+    }
+    else
+        removeResourceIgnored(resourceId);
 }
 
 void QnCommonMessageProcessor::on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory) {
     QnCameraHistoryPool::instance()->addCameraHistoryItem(*cameraHistory.data());
 }
 
-void QnCommonMessageProcessor::on_videowallInstanceStatusChanged(const QnVideowallInstanceStatus &status) {
-    QnVideoWallResourcePtr videowall = qnResPool->getResourceById(status.videowallGuid).dynamicCast<QnVideoWallResource>();
-    if (!videowall || !videowall->items()->hasItem(status.instanceGuid))
-        return;
-
-    QnVideoWallItem item = videowall->items()->getItem(status.instanceGuid);
-    item.online = status.online;
-    videowall->items()->updateItem(item.uuid, item);
-}
-
-
 void QnCommonMessageProcessor::on_licenseChanged(const QnLicensePtr &license) {
     qnLicensePool->addLicense(license);
+}
+
+void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr &license) {
+    qnLicensePool->removeLicense(license);
 }
 
 void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &businessRule){
@@ -262,6 +247,14 @@ void QnCommonMessageProcessor::processCameraServerItems(const QnCameraHistoryLis
         QnCameraHistoryPool::instance()->addCameraHistory(history);
 }
 
+bool QnCommonMessageProcessor::canRemoveResource(const QnId &) 
+{ 
+    return true; 
+}
+
+void QnCommonMessageProcessor::removeResourceIgnored(const QnId &) 
+{
+}
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourceData& fullData)
 {

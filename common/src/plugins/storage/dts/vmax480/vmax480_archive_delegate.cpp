@@ -7,6 +7,7 @@
 #include "core/resource/resource_media_layout.h"
 #include "vmax480_tcp_server.h"
 #include "utils/common/sleep.h"
+#include "utils/common/util.h"
 
 static const QByteArray FIXED_GROUP_ID("{6A7E6407-73A9-4042-B599-0B82CD726CF4}");
 

@@ -65,13 +65,12 @@ void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
     if (netMutex)
         netMutex->at_gotLockRequest(lockData);
     else {
-        QnTransaction<ApiLockData> tran(ApiCommand::lockResponse, false);
+        QnTransaction<ApiLockData> tran(ApiCommand::lockResponse);
         tran.params.name = lockData.name;
         tran.params.timestamp = lockData.timestamp;
         tran.params.peer = qnCommon->moduleGUID();
         if (m_userDataHandler)
             tran.params.userData = m_userDataHandler->getUserData(lockData.name);
-        tran.fillSequence();
         qnTransactionBus->sendTransaction(tran, lockData.peer);
     }
 }
@@ -135,13 +134,12 @@ bool QnDistributedMutex::isAllPeersReady() const
 
 void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnId& dstPeer)
 {
-    QnTransaction<ApiLockData> tran(command, false);
+    QnTransaction<ApiLockData> tran(command);
     tran.params.name = m_name;
     tran.params.peer = lockInfo.peer;
     tran.params.timestamp = lockInfo.timestamp;
     if (m_owner->m_userDataHandler)
         tran.params.userData = m_owner->m_userDataHandler->getUserData(lockInfo.name);
-    tran.fillSequence();
     qnTransactionBus->sendTransaction(tran, dstPeer);
 }
 

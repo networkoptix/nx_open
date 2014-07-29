@@ -1,10 +1,14 @@
 #include "resource_command_processor.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "resource.h"
+#include "resource_command.h"
 
 bool sameResourceFunctor(const QnAbstractDataPacketPtr& data, QVariant resource)
 {
     QnResourcePtr res = resource.value<QnResourcePtr>();
-    QnResourceCommand* command = dynamic_cast<QnResourceCommand*>(data.data());
+    QnResourceCommand* command = dynamic_cast<QnResourceCommand *>(data.data());
     if (!command)
         return false;
 
@@ -13,27 +17,6 @@ bool sameResourceFunctor(const QnAbstractDataPacketPtr& data, QVariant resource)
 
     return false;
 }
-
-
-
-QnResourceCommand::QnResourceCommand(const QnResourcePtr& res):
-QnResourceConsumer(res)
-{
-    
-}
-
-QnResourceCommand::~QnResourceCommand()
-{
-    disconnectFromResource();
-};
-
-void QnResourceCommand::beforeDisconnectFromResource()
-{
-    disconnectFromResource();
-}
-
-/////////////////////
-
 
 QnResourceCommandProcessor::QnResourceCommandProcessor():
     QnAbstractDataConsumer(1000)
@@ -64,8 +47,8 @@ bool QnResourceCommandProcessor::processData(const QnAbstractDataPacketPtr& data
     if (!result) // if command failed for this resource. => resource must be not available, lets remove everything related to the resouce from the queue
         m_dataQueue.detachDataByCondition(sameResourceFunctor, QVariant::fromValue<QnResourcePtr>(command->getResource()) );
         
-    
-
     return true;
 }
+
+#endif // ENABLE_DATA_PROVIDERS
 

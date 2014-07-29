@@ -419,7 +419,7 @@ INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"v
 INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '419','632','motionWindowCnt','1',NULL,NULL,NULL,NULL,NULL,'1',NULL,NULL,NULL,NULL,'0','0' );
 INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '420','632','motionMaskWindowCnt','1',NULL,NULL,NULL,NULL,NULL,'1',NULL,NULL,NULL,NULL,'0','0' );
 INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '421','632','motionSensWindowCnt','1',NULL,NULL,NULL,NULL,NULL,'1',NULL,NULL,NULL,NULL,'0','0' );
-INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '422','632','isAudioSupported','1',NULL,NULL,NULL,NULL,NULL,'1',NULL,NULL,NULL,NULL,'0','0' );
+INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '422','632','isAudioSupported','1',NULL,NULL,NULL,NULL,NULL,'0',NULL,NULL,NULL,NULL,'0','0' );
 INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '423','632','hasDualStreaming','1',NULL,NULL,NULL,NULL,NULL,'1',NULL,NULL,NULL,NULL,'0','0' );
 INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '424','632','streamFpsSharing','1',NULL,NULL,NULL,NULL,NULL,'sharePixels',NULL,NULL,NULL,NULL,'0','0' );
 INSERT INTO "vms_propertytype" ( id,"resource_type_id",name,type,min,max,step,"values","ui_values","default_value",netHelper,"group","sub_group",description,ui,readonly ) VALUES ( '425','632','channelsAmount','1',NULL,NULL,NULL,NULL,NULL,'1',NULL,NULL,NULL,NULL,'0','0' );
@@ -1762,6 +1762,7 @@ INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcet
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '703','618','619' );
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '704','620','619' );
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '10001','10001','619' );
+INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '10002','10002','619' );
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '705','621','6' );
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '706','622','621' );
 INSERT INTO "vms_resourcetype_parents" ( id,"from_resourcetype_id","to_resourcetype_id" ) VALUES ( '707','625','6' );

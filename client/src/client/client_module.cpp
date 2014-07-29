@@ -25,6 +25,7 @@ QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(argc, argv, this);
     common->instance<QnClientSettings>();
+    common->setModuleGUID(QUuid::createUuid());
 }
 
 QnClientModule::~QnClientModule() {

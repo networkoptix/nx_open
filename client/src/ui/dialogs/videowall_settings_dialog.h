@@ -20,6 +20,12 @@ public:
 
     void loadFromResource(const QnVideoWallResourcePtr &videowall);
     void submitToResource(const QnVideoWallResourcePtr &videowall) const;
+
+    bool isShortcutsSupported() const;
+    void setShortcutsSupported(bool value);
+
+    bool isCreateShortcut() const;
+    void setCreateShortcut(bool value);
 private:
     QScopedPointer<Ui::QnVideowallSettingsDialog> ui;
 };

@@ -94,7 +94,7 @@ int AxisCameraDiscoveryManager::checkHostAddress( nxcip::CameraInfo* cameras, co
         host,
         port,
         credentials );
-    if( http.get( QLatin1String("axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version,root.Network.eth0.MACAddress,root.Network.Bonjour.FriendlyName") ) != QNetworkReply::NoError )
+    if( http.get( QLatin1String("/axis-cgi/param.cgi?action=list&group=root.Properties.Firmware.Version,root.Network.eth0.MACAddress,root.Network.Bonjour.FriendlyName") ) != QNetworkReply::NoError )
         return nxcip::NX_NETWORK_ERROR;
     if( http.statusCode() != SyncHttpClient::HTTP_OK )
         return http.statusCode() == SyncHttpClient::HTTP_NOT_AUTHORIZED ? nxcip::NX_NOT_AUTHORIZED : nxcip::NX_OTHER_ERROR;

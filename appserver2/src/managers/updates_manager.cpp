@@ -1,11 +1,13 @@
 #include "updates_manager.h"
 
-#include <QtConcurrent>
-
 #include <transaction/transaction_message_bus.h>
 #include <utils/common/scoped_thread_rollback.h>
+#include <utils/common/concurrent.h>
+
+#include "ec2_thread_pool.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
+
 
 namespace ec2 {
 
@@ -30,16 +32,18 @@ namespace ec2 {
 
     void QnUpdatesNotificationManager::triggerNotification(const QnTransaction<ApiUpdateInstallData> &transaction) {
         assert(transaction.command == ApiCommand::installUpdate);
-        m_requestedUpdateIds.insert(transaction.id, transaction.params.updateId);
+        m_requestedUpdateIds.insert(transaction.params.updateId);
     }
 
     void QnUpdatesNotificationManager::at_transactionProcessed(const QnAbstractTransaction &transaction) {
         if (transaction.command != ApiCommand::installUpdate)
             return;
-
-        QString requestedUpdateId = m_requestedUpdateIds.take(transaction.id);
-        if (requestedUpdateId.isEmpty())
+        QnTransaction<ApiUpdateInstallData> t = (QnTransaction<ApiUpdateInstallData>) transaction;
+        auto requestedUpdateItr = m_requestedUpdateIds.find(t.params.updateId);
+        if (requestedUpdateItr == m_requestedUpdateIds.end())
             return;
+        QString requestedUpdateId = *requestedUpdateItr;
+        m_requestedUpdateIds.erase(requestedUpdateItr);
 
         emit updateInstallationRequested(requestedUpdateId);
     }
@@ -66,8 +70,8 @@ namespace ec2 {
         auto transaction = prepareTransaction(updateId, data, offset);
 
         QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
-        QnScopedThreadRollback ensureFreeThread(1);
-        QtConcurrent::run([handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
+        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+        QnConcurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
 
         return reqId;
     }
@@ -89,15 +93,15 @@ namespace ec2 {
         auto transaction = prepareTransaction(updateId);
 
         QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
-        QnScopedThreadRollback ensureFreeThread(1);
-        QtConcurrent::run([handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
+        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+        QnConcurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
 
         return reqId;
     }
 
     template<class QueryProcessorType>
     QnTransaction<ApiUpdateUploadData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QByteArray &data, qint64 offset) const {
-        QnTransaction<ApiUpdateUploadData> transaction(ApiCommand::uploadUpdate, false);
+        QnTransaction<ApiUpdateUploadData> transaction(ApiCommand::uploadUpdate);
         transaction.params.updateId = updateId;
         transaction.params.data = data;
         transaction.params.offset = offset;
@@ -106,7 +110,7 @@ namespace ec2 {
 
     template<class QueryProcessorType>
     QnTransaction<ApiUpdateUploadResponceData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId, const QnId &peerId, int chunks) const {
-        QnTransaction<ApiUpdateUploadResponceData> transaction(ApiCommand::uploadUpdateResponce, false);
+        QnTransaction<ApiUpdateUploadResponceData> transaction(ApiCommand::uploadUpdateResponce);
         transaction.params.id = peerId;
         transaction.params.updateId = updateId;
         transaction.params.chunks = chunks;
@@ -115,7 +119,7 @@ namespace ec2 {
 
     template<class QueryProcessorType>
     QnTransaction<ApiUpdateInstallData> QnUpdatesManager<QueryProcessorType>::prepareTransaction(const QString &updateId) const {
-        QnTransaction<ApiUpdateInstallData> transaction(ApiCommand::installUpdate, false);
+        QnTransaction<ApiUpdateInstallData> transaction(ApiCommand::installUpdate);
         transaction.params = updateId;
         return transaction;
     }

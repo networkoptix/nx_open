@@ -2,9 +2,12 @@
 
 #include <QtCore/QThread>
 
+#include <utils/common/log.h>
+
 #include <core/resource/camera_resource.h>
-#include "core/resource_management/resource_pool.h"
-#include "core/resource_management/resource_discovery_manager.h"
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_discovery_manager.h>
+
 #include "api/common_message_processor.h"
 #include "mutex/camera_data_handler.h"
 

@@ -1,6 +1,8 @@
 #ifndef live_strem_provider_h_1508
 #define live_strem_provider_h_1508
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QObject>
 
@@ -108,5 +110,7 @@ private:
 };
 
 typedef QSharedPointer<QnLiveStreamProvider> QnLiveStreamProviderPtr;
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //live_strem_provider_h_1508

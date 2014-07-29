@@ -32,6 +32,7 @@
 #include "network_proxy_factory.h"
 #include "session_manager.h"
 #include "media_server_reply_processor.h"
+#include "nx_ec/data/api_conversion_functions.h"
 
 namespace {
     QN_DEFINE_LEXICAL_ENUM(RequestObject,
@@ -74,6 +75,7 @@ namespace {
         (BookmarkUpdateObject,     "cameraBookmarks/update")
         (BookmarkDeleteObject,     "cameraBookmarks/delete")
         (BookmarksGetObject,       "cameraBookmarks/get")
+        (TestEmailSettingsObject,  "testEmailSettings")
     );
 
     QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
@@ -227,6 +229,9 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse &response
     }
     case TimeObject:
         processJsonReply<QnTimeReply>(this, response, handle);
+        break;
+    case TestEmailSettingsObject:
+        processJsonReply<QnTestEmailSettingsReply>(this, response, handle);
         break;
     case CameraAddObject:
         emitFinished(this, response.status, handle);
@@ -666,6 +671,15 @@ int QnMediaServerConnection::ptzGetDataAsync(const QnNetworkResourcePtr &camera,
 
 int QnMediaServerConnection::getTimeAsync(QObject *target, const char *slot) {
     return sendAsyncGetRequest(TimeObject, QnRequestParamList(), QN_STRINGIZE_TYPE(QnTimeReply), target, slot);
+}
+
+int QnMediaServerConnection::testEmailSettingsAsync(const QnEmail::Settings &settings, QObject *target, const char *slot) 
+{
+    QnRequestHeaderList headers;
+    headers << QnRequestParam("content-type",   "application/json");
+    ec2::ApiEmailSettingsData data;
+    ec2::fromResourceToApi(settings, data);
+    return sendAsyncPostRequest(TestEmailSettingsObject, headers, QnRequestParamList(), QJson::serialized(data), QN_STRINGIZE_TYPE(QnTestEmailSettingsReply), target, slot);
 }
 
 int QnMediaServerConnection::doCameraDiagnosticsStepAsync(

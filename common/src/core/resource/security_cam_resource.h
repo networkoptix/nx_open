@@ -9,6 +9,7 @@
 #include "core/misc/schedule_task.h"
 #include "network_resource.h"
 #include "common/common_globals.h"
+#include "business/business_fwd.h"
 
 class QnAbstractArchiveDelegate;
 
@@ -158,6 +159,13 @@ public:
 
     bool needCheckIpConflicts() const;
 
+    void setMaxDays(int value);
+    int maxDays() const;
+
+    void setMinDays(int value);
+    int minDays() const;
+
+
     //!Returns list of time periods of DTS archive, containing motion at specified \a regions with timestamp in region [\a msStartTime; \a msEndTime)
     /*!
         \param detailLevel Minimal time period gap (usec) that is of interest to the caller. 
@@ -187,6 +195,7 @@ signals:
     void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
     void groupNameChanged(const QnSecurityCamResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
+    void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
     //!Emitted on camera input port state has been changed
     /*!
@@ -248,6 +257,8 @@ private:
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;
+    int m_minDays;
+    int m_maxDays;
 };
 
 Q_DECLARE_METATYPE(QnSecurityCamResourcePtr)

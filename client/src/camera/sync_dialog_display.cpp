@@ -1,8 +1,8 @@
 #include "sync_dialog_display.h"
 #include "export/sign_helper.h"
 #include "utils/common/synctime.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
+#include "plugins/resource/avi/avi_archive_delegate.h"
 
 QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource): 
     QnCamDisplay(resource, 0),
@@ -34,7 +34,7 @@ void QnSignDialogDisplay::finilizeSign()
     {
         QnAviArchiveDelegate* aviFile = dynamic_cast<QnAviArchiveDelegate*> (m_reader->getArchiveDelegate());
         if (aviFile) {
-            const char* signPattern = aviFile->getTagValue(QnAviArchiveDelegate::Tag_Signature);
+            const char* signPattern = aviFile->getTagValue(QnAviArchiveDelegate::SignatureTag);
             if (signPattern) 
             {
                 QByteArray baPattern = QByteArray(signPattern).trimmed();

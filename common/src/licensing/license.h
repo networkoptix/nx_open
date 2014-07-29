@@ -44,8 +44,8 @@ public:
         InvalidHardwareID,
         InvalidBrand,
         Expired,
-        InvalidType
-
+        InvalidType,
+        TooManyLicensesPerDevice
     };
 
     QnLicense();
@@ -120,7 +120,7 @@ private:
         QByteArray* const v2LicenseBlock );
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 
-    ec2::ApiRuntimeData findRuntimeDataByLicense() const;
+    QUuid findRuntimeDataByLicense() const;
 };
 
 Q_DECLARE_METATYPE(QnLicensePtr)
@@ -175,16 +175,13 @@ public:
     void addLicense(const QnLicensePtr &license);
     void addLicenses(const QnLicenseList &licenses);
     void replaceLicenses(const QnLicenseList &licenses);
+    void removeLicense(const QnLicensePtr &license);
 
     void reset();
     bool isEmpty() const;
 
-    void setMainHardwareIds(const QList<QByteArray>& hardwareIds);
     QList<QByteArray> mainHardwareIds() const;
-
-    void setCompatibleHardwareIds(const QList<QByteArray>& hardwareIds);
     QList<QByteArray> compatibleHardwareIds() const;
-
     QByteArray currentHardwareId() const;
     bool isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode = 0) const;
 signals:
@@ -198,8 +195,6 @@ private:
     bool addLicense_i(const QnLicensePtr &license);
     bool addLicenses_i(const QnLicenseList &licenses);
 private:
-    QList<QByteArray> m_mainHardwareIds;
-    QList<QByteArray> m_compatibleHardwareIds;
     QMap<QByteArray, QnLicensePtr> m_licenseDict;
     mutable QMutex m_mutex;
 };

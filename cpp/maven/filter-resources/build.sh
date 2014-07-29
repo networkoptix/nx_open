@@ -11,7 +11,7 @@ if [ $PLATFORM == 'Linux' ] && [ "${arch}" != "arm"  ] && [ -z "$QTCHECK" ]; the
      exit 1
 fi
 
-export LD_LIBRARY_PATH=${libdir}/lib/${build.configuration}
+export LD_LIBRARY_PATH=${libdir}/lib/${build.configuration}:${qt.dir}/lib
 export DYLD_LIBRARY_PATH=${libdir}/lib/${build.configuration}
 export DYLD_FRAMEWORK_PATH=${qt.dir}/lib
 

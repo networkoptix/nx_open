@@ -8,12 +8,15 @@
 #include <functional>
 
 #include <QtCore/QMutexLocker>
-#include <QtConcurrent>
 
 #include <network/authenticate_helper.h>
 #include <network/universal_tcp_listener.h>
+#include <utils/common/concurrent.h>
+#include <utils/network/simple_http_client.h>
 
+#include "compatibility/old_ec_connection.h"
 #include "ec2_connection.h"
+#include "ec2_thread_pool.h"
 #include "remote_ec_connection.h"
 #include "rest/ec2_base_query_http_handler.h"
 #include "rest/ec2_update_http_handler.h"
@@ -113,8 +116,8 @@ namespace ec2
 
         //AbstractCameraManager::getBookmarkTags
 
-        //TODO AbstractLicenseManager
         registerUpdateFuncHandler<ApiLicenseDataList>( restProcessorPool, ApiCommand::addLicenses );
+        registerUpdateFuncHandler<ApiLicenseData>( restProcessorPool, ApiCommand::removeLicense );
 
 
         //AbstractBusinessEventManager::getBusinessRules
@@ -127,9 +130,6 @@ namespace ec2
         registerUpdateFuncHandler<ApiResetBusinessRuleData>( restProcessorPool, ApiCommand::resetBusinessRules );
         registerUpdateFuncHandler<ApiBusinessActionData>( restProcessorPool, ApiCommand::broadcastBusinessAction );
         registerUpdateFuncHandler<ApiBusinessActionData>( restProcessorPool, ApiCommand::execBusinessAction );
-
-        registerUpdateFuncHandler<ApiEmailSettingsData>( restProcessorPool, ApiCommand::testEmailSettings );
-        registerUpdateFuncHandler<ApiEmailData>( restProcessorPool, ApiCommand::sendEmail );
 
 
         //AbstractUserManager::getUsers
@@ -173,10 +173,6 @@ namespace ec2
         //AbstractUpdatesManager::installUpdate
         registerUpdateFuncHandler<ApiUpdateInstallData>( restProcessorPool, ApiCommand::installUpdate );
 
-        //ApiResourceParamList
-        registerGetFuncHandler<std::nullptr_t, ApiResourceParamDataList>( restProcessorPool, ApiCommand::getSettings );
-        registerUpdateFuncHandler<ApiResourceParamDataList>( restProcessorPool, ApiCommand::saveSettings );
-
         //AbstractECConnection
         registerGetFuncHandler<std::nullptr_t, ApiTimeData>( restProcessorPool, ApiCommand::getCurrentTime );
 
@@ -207,10 +203,10 @@ namespace ec2
         {
             QMutexLocker lk( &m_mutex );
             if( !m_directConnection )
-                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url.path() ) );
+                m_directConnection.reset( new Ec2DirectConnection( &m_serverQueryProcessor, m_resCtx, connectionInfo, url ) );
         }
-        QnScopedThreadRollback ensureFreeThread(1);
-        QtConcurrent::run( std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
+        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+        QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::ConnectHandler::done, handler, reqID, ec2::ErrorCode::ok, m_directConnection ) );
         return reqID;
     }
 
@@ -243,34 +239,116 @@ namespace ec2
         return reqID;
     }
 
+    const char oldEcConnectPath[] = "/api/connect/?format=pb&guid&ping=1";
+
+    static bool parseOldECConnectionInfo(const QByteArray& oldECConnectResponse, QnConnectionInfo* const connectionInfo)
+    {
+        static const char PROTOBUF_FIELD_TYPE_STRING = 0x0a;
+
+        if( oldECConnectResponse.isEmpty() )
+            return false;
+
+        const char* data = oldECConnectResponse.data();
+        const char* dataEnd = oldECConnectResponse.data() + oldECConnectResponse.size();
+        if( data + 2 >= dataEnd )
+            return false;
+        if( *data != PROTOBUF_FIELD_TYPE_STRING )
+            return false;
+        ++data;
+        const int fieldLen = *data;
+        ++data;
+        if( data + fieldLen >= dataEnd )
+            return false;
+        connectionInfo->version = QnSoftwareVersion(QByteArray(data, fieldLen));
+        return true;
+    }
+
+    template<class Handler>
+    void connectToOldEC(const QUrl& ecURL, Handler completionFunc)
+    {
+        QAuthenticator auth;
+        auth.setUser(ecURL.userName());
+        auth.setPassword(ecURL.password());
+        CLSimpleHTTPClient simpleHttpClient(ecURL, 3000, auth);
+        const CLHttpStatus statusCode = simpleHttpClient.doGET(QByteArray::fromRawData(oldEcConnectPath, sizeof(oldEcConnectPath)));
+        switch( statusCode )
+        {
+            case CL_HTTP_SUCCESS:
+            {
+                //reading mesasge body
+                QByteArray oldECResponse;
+                simpleHttpClient.readAll(oldECResponse);
+                QnConnectionInfo oldECConnectionInfo;
+                oldECConnectionInfo.ecUrl = ecURL;
+                if( parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo) )
+                    return completionFunc(ErrorCode::ok, oldECConnectionInfo);
+                else
+                    return completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
+            }
+            case CL_HTTP_AUTH_REQUIRED:
+                return completionFunc(ErrorCode::unauthorized, QnConnectionInfo());
+            default:
+                return completionFunc(ErrorCode::ioError, QnConnectionInfo());
+        }
+    }
+
     void Ec2DirectConnectionFactory::remoteConnectionFinished(
         int reqID,
         ErrorCode errorCode,
         const QnConnectionInfo& connectionInfo,
         const QUrl& ecURL,
-        impl::ConnectHandlerPtr handler )
+        impl::ConnectHandlerPtr handler)
     {
         if( errorCode != ErrorCode::ok )
-            return handler->done( reqID, errorCode, AbstractECConnectionPtr() );
-        QnConnectionInfo connectionInfoCopy( connectionInfo );
+        {
+            //checking for old EC
+            QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
+            QnConcurrent::run(
+                Ec2ThreadPool::instance(),
+                [ecURL, handler, reqID]() {
+                    using namespace std::placeholders;
+                    return connectToOldEC(
+                        ecURL,
+                        [reqID, handler](ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo) {
+                            handler->done(reqID, errorCode, std::make_shared<OldEcConnection>(oldECConnectionInfo));
+                        }
+                    );
+                }
+            );
+            return;
+        }
+        QnConnectionInfo connectionInfoCopy(connectionInfo);
         connectionInfoCopy.ecUrl = ecURL;
+
+        AbstractECConnectionPtr connection(new RemoteEC2Connection(
+            std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
+            m_resCtx,
+            connectionInfoCopy));
         return handler->done(
             reqID,
             errorCode,
-            std::make_shared<RemoteEC2Connection>(
-                std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
-                m_resCtx,
-                connectionInfoCopy ) );
+            connection);
     }
 
     void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
         int reqID,
         ErrorCode errorCode,
         const QnConnectionInfo& connectionInfo,
-        const QUrl& /*ecURL*/,
+        const QUrl& ecURL,
         impl::TestConnectionHandlerPtr handler )
     {
-        return handler->done( reqID, errorCode, connectionInfo );
+        if( errorCode == ErrorCode::ok )
+            return handler->done(reqID, errorCode, connectionInfo);
+
+        //checking for old EC
+        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
+        QnConcurrent::run(
+            Ec2ThreadPool::instance(),
+            [ecURL, handler, reqID]() {
+                using namespace std::placeholders;
+                connectToOldEC(ecURL, std::bind(&impl::TestConnectionHandler::done, handler, reqID, _1, _2));
+            }
+        );
     }
 
     ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
@@ -278,7 +356,7 @@ namespace ec2
         QnConnectionInfo* const connectionInfo )
     {
         connectionInfo->version = QnSoftwareVersion(lit(QN_APPLICATION_VERSION));
-        connectionInfo->brand = lit(QN_PRODUCT_NAME_SHORT);
+        connectionInfo->brand = isCompatibilityMode() ? QString() : lit(QN_PRODUCT_NAME_SHORT);
         connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
         connectionInfo->box = lit(QN_ARM_BOX);
 
@@ -290,8 +368,8 @@ namespace ec2
         const int reqID = generateRequestID();
         QnConnectionInfo connectionInfo;
         fillConnectionInfo( ApiLoginData(), &connectionInfo );
-        QnScopedThreadRollback ensureFreeThread(1);
-        QtConcurrent::run( std::bind( &impl::TestConnectionHandler::done, handler, reqID, ec2::ErrorCode::ok, connectionInfo ) );
+        QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+        QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( &impl::TestConnectionHandler::done, handler, reqID, ec2::ErrorCode::ok, connectionInfo ) );
         return reqID;
     }
 

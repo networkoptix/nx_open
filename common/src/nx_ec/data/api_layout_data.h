@@ -9,7 +9,7 @@ namespace ec2
 {
 
     struct ApiLayoutItemData: ApiData {
-        QnLatin1Array id;
+        QnLatin1Array id; // TODO: #API this is essentially a QUuid
         qint32 flags;
         float left;
         float top;
@@ -22,7 +22,7 @@ namespace ec2
         float zoomTop;
         float zoomRight;
         float zoomBottom;
-        QnLatin1Array zoomTargetId;
+        QnLatin1Array zoomTargetId; // TODO: #API this is essentially a QUuid
         QnLatin1Array contrastParams; // TODO: #API I'll think about this one.
         QnLatin1Array dewarpingParams;
     };

@@ -4,6 +4,8 @@
 #include <QtWidgets/QMessageBox>
 #include <QtCore/QFileInfo>
 
+#include <utils/common/log.h>
+
 #include "client/client_settings.h"
 #include "api/app_server_connection.h"
 
@@ -21,12 +23,13 @@ namespace {
     const QLatin1String dbExtension(".db");
 }
 
-QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent, Qt::WindowFlags windowFlags):
-    base_type(parent, windowFlags),
+QnDatabaseManagementWidget::QnDatabaseManagementWidget(QWidget *parent):
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::DatabaseManagementWidget())
 {
     ui->setupUi(this);
+    ui->labelWidget->setText(tr("You can create a backup for system configurations that can be restored in case of failure."));
     
     setHelpTopic(this, Qn::SystemSettings_Server_Backup_Help);
 
@@ -45,7 +48,8 @@ void QnDatabaseManagementWidget::at_backupButton_clicked() {
                                                       tr("Save Database Backup..."),
                                                       qnSettings->lastDatabaseBackupDir(),
                                                       tr("Database Backup Files (*.db)")));
-    fileDialog->exec();
+    if (!fileDialog->exec())
+        return;
 
     QString fileName = fileDialog->selectedFile();
     if(fileName.isEmpty())
@@ -131,7 +135,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     QnAppServerConnectionFactory::getConnection2()->restoreDatabaseAsync( data, dialog.data(), restoreDatabaseHandler );
     dialog->exec();
     if(dialog->wasCanceled())
-        return; // TODO: #Elric make non-cancellable.   TODO: #ak is running request finish OK?
+        return; // TODO: #Elric make non-cancelable.   TODO: #ak is running request finish OK?
 
     if( errorCode == ec2::ErrorCode::ok ) {
         QMessageBox::information(this,
@@ -140,7 +144,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
         menu()->trigger(Qn::ReconnectAction);
     } else {
         NX_LOG( lit("Failed to restore EC database from file '$1'. $2").arg(fileName).arg(ec2::toString(errorCode)), cl_logERROR );
-        QMessageBox::critical(this, tr("Error"), tr("An error has occured while restoring the database from file '%1'.")
+        QMessageBox::critical(this, tr("Error"), tr("An error has occurred while restoring the database from file '%1'.")
                               .arg(fileName));
     }
 }

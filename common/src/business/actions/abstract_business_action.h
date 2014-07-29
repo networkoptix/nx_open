@@ -2,6 +2,7 @@
 #define __ABSTRACT_BUSINESS_ACTION_H_
 
 #include <QtCore/QSharedPointer>
+#include <QtCore/QVector>
 
 #include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>

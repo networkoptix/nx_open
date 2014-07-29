@@ -7,11 +7,12 @@
 #define SERVER_QUERY_PROCESSOR_H
 
 #include <QtCore/QDateTime>
-#include <QtConcurrent>
 
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/model_functions.h>
+#include <utils/common/concurrent.h>
 
+#include "ec2_thread_pool.h"
 #include "database/db_manager.h"
 #include "managers/aux_manager.h"
 #include "transaction/transaction.h"
@@ -48,27 +49,27 @@ namespace ec2
             //TODO #ak this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
 
+            if (ApiCommand::isPersistent(tran.command))
+                tran.fillPersistentInfo();
+
             QnDbManager::Locker locker(dbManager);
-            if (tran.persistent)
+            if (!tran.persistentInfo.isNull())
                 locker.beginTran();
 
-            if (!tran.id.sequence)
-                tran.fillSequence();
-
             auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
-                QnScopedThreadRollback ensureFreeThread(1);
-                QtConcurrent::run( std::bind( handler, errorCode ) );
+                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, errorCode ) );
             };
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
-            QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
+            QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
 
             errorCode = auxManager->executeTransaction(tran);
             if( errorCode != ErrorCode::ok ) {
                 return;
             }
 
-            if (tran.persistent) {
+            if (!tran.persistentInfo.isNull()) {
                 errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
                 if( errorCode != ErrorCode::ok ) {
                     if (errorCode == ErrorCode::skipped)
@@ -77,7 +78,7 @@ namespace ec2
                 }
             }
 
-            if (tran.persistent)
+            if (!tran.persistentInfo.isNull())
                 locker.commit();
 
             // delivering transaction to remote peers
@@ -88,7 +89,6 @@ namespace ec2
         template<class HandlerType>
         void processUpdateAsync(QnTransaction<ApiIdData>& tran, HandlerType handler )
         {
-            Q_ASSERT(tran.persistent);
             switch (tran.command)
             {
             case ApiCommand::removeMediaServer:
@@ -159,6 +159,9 @@ namespace ec2
         template<class QueryDataType, class SubDataType, class HandlerType>
         void processMultiUpdateAsync(QnTransaction<QueryDataType>& multiTran, HandlerType handler, ApiCommand::Value command, const std::vector<SubDataType>& nestedList, bool isParentObjectTran)
         {
+
+            Q_ASSERT(ApiCommand::isPersistent(multiTran.command));
+
             ErrorCode errorCode = ErrorCode::ok;
             QList< QnTransaction<SubDataType> > processedTransactions;
             processedTransactions.reserve(static_cast<int>(nestedList.size()));
@@ -166,57 +169,49 @@ namespace ec2
             bool processMultiTran = false;
 
             auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
-                QnScopedThreadRollback ensureFreeThread(1);
-                QtConcurrent::run( std::bind( handler, errorCode ) );
+                QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, errorCode ) );
             };
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
             QnDbManager::Locker locker(dbManager);
-            if (multiTran.persistent)
-                locker.beginTran();
+            locker.beginTran();
 
             foreach(const SubDataType& data, nestedList)
             {
-                QnTransaction<SubDataType> tran(command, multiTran.persistent);
+                QnTransaction<SubDataType> tran(command);
                 tran.params = data;
-                tran.fillSequence();
+                tran.fillPersistentInfo();
                 tran.isLocal = multiTran.isLocal;
 
                 errorCode = auxManager->executeTransaction(tran);
                 if( errorCode != ErrorCode::ok )
                     return;
 
-                if (tran.persistent) 
-                {
-                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(tran);
-                    errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
-					if (errorCode == ErrorCode::skipped)
-						continue;
-                    if( errorCode != ErrorCode::ok )
-                        return;
-                }
+                QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+                errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
+				if (errorCode == ErrorCode::skipped)
+					continue;
+                if( errorCode != ErrorCode::ok )
+                    return;
                 processedTransactions << tran;
             }
             
             // delete master object if need (server->cameras required to delete master object, layoutList->layout doesn't)
             if (isParentObjectTran) 
             {
-                multiTran.fillSequence();
+                multiTran.fillPersistentInfo();
 
                 errorCode = ErrorCode::ok;
-                if (multiTran.persistent)                 
-                {
-                    QByteArray serializedTran = QnBinaryTransactionSerializer::instance()->serializedTransaction(multiTran);
-                    errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
-                    if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
-                        return;
-                }
+                QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(multiTran);
+                errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
+                if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
+                    return;
                 processMultiTran = (errorCode == ErrorCode::ok);
             }
 
 
-            if (multiTran.persistent)
-                locker.commit();
+            locker.commit();
 
             foreach(const QnTransaction<SubDataType>& transaction, processedTransactions)
             {
@@ -238,8 +233,8 @@ namespace ec2
         template<class InputData, class OutputData, class HandlerType>
             void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputData input, HandlerType handler )
         {
-            QnScopedThreadRollback ensureFreeThread(1);
-            QtConcurrent::run( [input, handler]() {
+            QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+            QnConcurrent::run( Ec2ThreadPool::instance(), [input, handler]() {
                 OutputData output;
                 const ErrorCode errorCode = dbManager->doQuery( input, output );
                 handler( errorCode, output );
@@ -253,8 +248,8 @@ namespace ec2
         template<class OutputData, class InputParamType1, class InputParamType2, class HandlerType>
             void processQueryAsync( ApiCommand::Value /*cmdCode*/, InputParamType1 input1, InputParamType2 input2, HandlerType handler )
         {
-            QnScopedThreadRollback ensureFreeThread(1);
-            QtConcurrent::run( [input1, input2, handler]() {
+            QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
+            QnConcurrent::run( Ec2ThreadPool::instance(), [input1, input2, handler]() {
                 OutputData output;
                 const ErrorCode errorCode = dbManager->doQuery( input1, input2, output );
                 handler( errorCode, output );

@@ -1,5 +1,11 @@
 #include "ffmpeg_transcoder.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QDebug>
+
+#include "utils/common/log.h"
+
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
 
@@ -161,6 +167,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             QnFfmpegVideoTranscoderPtr ffmpegVideoTranscoder = m_vTranscoder.dynamicCast<QnFfmpegVideoTranscoder>();
             if (ffmpegVideoTranscoder->getCodecContext()) {
                 avcodec_copy_context(m_videoEncoderCodecCtx, ffmpegVideoTranscoder->getCodecContext());
+                m_videoEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
             }
             else {
                 m_videoEncoderCodecCtx->width = m_vTranscoder->getResolution().width();
@@ -189,6 +196,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
 
             if (video->context && video->context->ctx()) {
                 avcodec_copy_context(m_videoEncoderCodecCtx, video->context->ctx());
+                m_videoEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
             }
 
             m_videoEncoderCodecCtx->width = videoWidth;
@@ -240,6 +248,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             QnFfmpegAudioTranscoderPtr ffmpegAudioTranscoder = m_aTranscoder.dynamicCast<QnFfmpegAudioTranscoder>();
             if (ffmpegAudioTranscoder->getCodecContext()) {
                 avcodec_copy_context(m_audioEncoderCodecCtx, ffmpegAudioTranscoder->getCodecContext());
+                m_audioEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
             }
             m_audioEncoderCodecCtx->bit_rate = m_aTranscoder->getBitrate();
         }
@@ -247,6 +256,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         {
             if (audio->context && audio->context->ctx()) {
                 avcodec_copy_context(m_audioEncoderCodecCtx, audio->context->ctx());
+                m_audioEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
             }
             //m_audioEncoderCodecCtx->bit_rate = 1024 * 96;
         }
@@ -364,3 +374,5 @@ AVCodecContext* QnFfmpegTranscoder::getAudioCodecContext() const
 { 
     return m_audioEncoderCodecCtx; 
 }
+
+#endif // ENABLE_DATA_PROVIDERS

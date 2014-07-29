@@ -70,7 +70,13 @@ private:
     mutable std::vector<float> m_supportedFpsList;
     mutable bool m_resolutionListRead;
     mutable std::vector<nxcip::ResolutionInfo> m_supportedResolutions;
+    mutable nxcip::Resolution m_maxResolution;
     bool m_audioEnabled;
+#ifdef BITRATE_IS_PER_GOP
+    double m_currentFps;
+    int64_t m_desiredStreamBitrateKbps;
+    double m_fpsUsedToCalcBitrate;
+#endif
 
     int setCameraParam( const QString& request );
     int getSupportedFps() const;

@@ -38,6 +38,7 @@
         <build.configuration>release</build.configuration>
         <buildNumber>0</buildNumber>
         <skip.sign>true</skip.sign>
+		<finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
         <beta>true</beta>
         <!-- compile.option1. See profile no-webkit -->
         <webkit>true</webkit>
@@ -94,7 +95,8 @@
         <qtlib16>Qml</qtlib16>
         <qtlib17>Positioning</qtlib17>
         <qtlib18>Sensors</qtlib18>
-        <qtlib19/>
+        <!--qtlib19 is for desktop only-->
+	<qtlib19/>
         <qtlib20/>
 
         <!--QT plugins used-->      
@@ -105,7 +107,7 @@
 
     <build>
         <defaultGoal>install</defaultGoal>
-        <finalName>${deb.customization.company.name}-${project.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-beta</finalName>
+        <finalName>${finalName}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -281,6 +283,9 @@
                     <value>!arm</value>
                 </property>
             </activation>
+            <properties>
+		<qtlib19>DBus</qtlib19>
+	    </properties>
             <modules>                       
                 <module>applauncher</module> 
                 <module>client</module>     
@@ -410,9 +415,6 @@
                 <qt.spec>linux-arm-gnueabi-g++</qt.spec>
 				<qt.classifier>${platform}-${arch}-${box}</qt.classifier>
 				<compile.option1></compile.option1>
-                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-                <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines> -->
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <libdir>${root.dir}/build_environment/target-${box}</libdir>
             </properties>
             <build>
@@ -438,6 +440,8 @@
                 <toolchain.version>codesourcery-2013.11</toolchain.version>
                 <compiler>2011.09</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release enable_gprof</additional.defines>
+                <!-- <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines> -->
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -463,6 +467,7 @@
                 <toolchain.version>linaro-multilib-2013.09</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.1f-SNAPSHOT</openssl.version>
+                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
             </properties>
             <modules>
                 <module>plugins/isd_native_plugin</module>
@@ -487,6 +492,7 @@
                 <toolchain.version>rpi</toolchain.version>
                 <compiler>${toolchain.version}</compiler>
                 <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
             </properties>
             <modules>
                 <module>edge_firmware/rpi</module>

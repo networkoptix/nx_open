@@ -1,6 +1,14 @@
 #include "mserver_resource_discovery_manager.h"
+
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
+
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
+#include <utils/common/log.h>
+#include <utils/network/ping.h>
+#include <utils/network/ip_range_checker.h>
+
 #include "api/app_server_connection.h"
 #include "business/business_event_connector.h"
 #include "core/dataprovider/live_stream_provider.h"
@@ -12,11 +20,6 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource_management/resource_searcher.h"
 #include "plugins/storage/dts/abstract_dts_searcher.h"
-#include "utils/common/synctime.h"
-#include "utils/network/ping.h"
-#include "utils/network/ip_range_checker.h"
-#include "utils/common/sleep.h"
-#include "utils/common/util.h"
 #include "common/common_module.h"
 #include "data_only_camera_resource.h"
 
@@ -78,6 +81,9 @@ bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnResourcePtr
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
     if (!ownServer || !ownServer->isRedundancy())
         return false; // redundancy is disabled
+
+    if (qnResPool->getAllCameras(ownServer).count() >= ownServer->getMaxCameras())
+        return false;
     
     return mServer->currentStatusTime() > MSERVER_OFFLINE_TIMEOUT;
 }

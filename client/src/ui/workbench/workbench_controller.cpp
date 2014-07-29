@@ -21,6 +21,7 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/toggle.h>
+#include <utils/common/log.h>
 #include <utils/math/color_transformations.h>
 #include <utils/resource_property_adaptors.h>
 
@@ -1059,6 +1060,7 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.zoomRect = zoomRect;
     data.dewarpingParams = zoomTargetWidget->item()->dewarpingParams();
     data.dewarpingParams.panoFactor = 1; // zoom target must always be dewarped by 90 degrees
+    data.dewarpingParams.enabled = zoomTargetWidget->resource()->getDewarpingParams().enabled;  // zoom items on fisheye cameras must always be dewarped
 
     int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
             ? 1
