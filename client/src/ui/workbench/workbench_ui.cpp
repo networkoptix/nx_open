@@ -670,6 +670,9 @@ void QnWorkbenchUi::at_freespaceAction_triggered() {
         setSliderOpened(qnSettings->isSliderOpened(), isFullscreen);
         setNotificationsOpened(qnSettings->isNotificationsOpened(), isFullscreen);
 
+        updateViewportMargins(); /* This one is needed here so that fit-in-view operates on correct margins. */ // TODO: #Elric change code so that this call is not needed.
+        action(Qn::FitInViewAction)->trigger();
+
         m_inFreespace = false;
     }
 }

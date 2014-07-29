@@ -213,14 +213,13 @@ public:
     }
 
     void setSizeBoundsExtension(const QSizeF &sizeLowerExtension, const QSizeF &sizeUpperExtension) {
-        qreal logScale;
-        if (m_view)
-            calculateRelativeScale(&logScale);
-
         m_sizeLowerExtension = sizeLowerExtension;
         m_sizeUpperExtension = sizeUpperExtension;
 
         if (m_view) {
+            qreal logScale;
+            calculateRelativeScale(&logScale);
+
             updateExtendedSizeBounds();
             updateSceneRect();
 
@@ -371,13 +370,14 @@ public:
         }
 
         /* Adjust sticky scale if needed. */
-        if(stickyScaleDirty && (!qFuzzyCompare(m_stickyLogScaleHi, 1.0) || !qFuzzyCompare(m_stickyLogScaleLo, 1.0))) {
+        if(stickyScaleDirty && (!qFuzzyCompare(m_stickyLogScaleHi, 1.0) || !qFuzzyCompare(m_stickyLogScaleLo, 1.0) ||
+                                !qFuzzyCompare(m_stickyLogScaleResettingThreshold, m_defaultStickyLogScaleResettingThreshold))) {
             qreal logScale, powFactor;
             calculateRelativeScale(&logScale, &powFactor);
 
             m_stickyLogScaleLo = qMin(-1.0, qMax(logScale, m_stickyLogScaleLo));
             m_stickyLogScaleHi = qMax( 1.0, qMin(logScale, m_stickyLogScaleHi));
-            m_stickyLogScaleResettingThreshold = qMin(m_stickyLogScaleResettingThreshold, m_defaultStickyLogScaleResettingThreshold);
+            m_stickyLogScaleResettingThreshold = qMin(m_defaultStickyLogScaleResettingThreshold, qMax(logScale, m_stickyLogScaleResettingThreshold));
         }
 
         m_lastTickTime = time;
