@@ -837,7 +837,7 @@ namespace nx_hls
             //no chunks generated, waiting for at least one chunk to be generated
             QElapsedTimer monotonicTimer;
             monotonicTimer.restart();
-            while( monotonicTimer.elapsed() < session->targetDurationMS() * (MIN_PLAYLIST_SIZE_TO_START_STREAMING + 2) )
+            while( (quint64)monotonicTimer.elapsed() < session->targetDurationMS() * (MIN_PLAYLIST_SIZE_TO_START_STREAMING + 2) )
             {
                 chunkList.clear();
                 chunksGenerated = session->playlistManager(streamQuality)->generateChunkList( &chunkList, &isPlaylistClosed );

@@ -5,6 +5,7 @@
 
 #include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
+#include <utils/common/systemerror.h>
 #include <utils/network/ssl_socket.h>
 
 #ifdef Q_OS_WIN
@@ -17,6 +18,7 @@
 
 #include <QtCore/QElapsedTimer>
 
+#include "aio/aioservice.h"
 #include "system_socket_impl.h"
 
 
@@ -161,6 +163,9 @@ void Socket::close()
 {
     if( sockDesc == -1 )
         return;
+
+    //checking that socket is not registered in aio
+    assert( !aio::AIOService::instance()->isSocketBeingWatched(this) );
 
 #ifdef Q_OS_WIN
     ::shutdown(sockDesc, SD_BOTH);

@@ -16,8 +16,6 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
         // check info version
         if (m_items->hasItem(runtimeData.peer.id)) {
             QnPeerRuntimeInfo existingInfo = m_items->getItem(runtimeData.peer.id);
-            if (existingInfo.data.version >= runtimeData.version)
-                return;
         }
 
         QnPeerRuntimeInfo info(runtimeData);

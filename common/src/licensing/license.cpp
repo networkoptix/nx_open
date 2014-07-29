@@ -221,7 +221,8 @@ bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
         return false; // license is out of date
     }
     
-    bool isEdgeBox = box == lit("isd") || box == lit("isd_s2");
+    bool isEdgeBox = !box.isEmpty(); //box == lit("isd") || box == lit("isd_s2");
+
     bool classOK;
     if (isEdgeBox)
         classOK = (m_class == lit("edge") || !m_expiration.isEmpty());
@@ -230,7 +231,22 @@ bool QnLicense::isValid(ErrorCode* errCode, bool isNewLicense) const
     
     if (errCode)
         *errCode = classOK ? NoError : InvalidType;
-    return classOK;
+    if (!classOK)
+        return false;
+
+    // check for single license for ARM device
+    if (isEdgeBox) {
+        foreach(QnLicensePtr license, qnLicensePool->getLicenses()) 
+        {
+            if (license->hardwareId() == hardwareId() && license->key() < key()) {
+                if (errCode)
+                    *errCode = TooManyLicensesPerDevice;
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 QString QnLicense::errorMessage(ErrorCode errCode)
@@ -249,6 +265,8 @@ QString QnLicense::errorMessage(ErrorCode errCode)
             return tr("Expired"); // license is out of date
         case InvalidType:
             return tr("Invalid type");
+        case TooManyLicensesPerDevice:
+            return tr("Only single license is allowed for this device");
         default:
             return tr("Unknown error");
     }
@@ -461,6 +479,13 @@ void QnLicensePool::addLicense(const QnLicensePtr &license)
 
     if (addLicense_i(license))
         emit licensesChanged();
+}
+
+void QnLicensePool::removeLicense(const QnLicensePtr &license)
+{
+    QMutexLocker locker(&m_mutex);
+    m_licenseDict.remove(license->key());
+    emit licensesChanged();
 }
 
 bool QnLicensePool::addLicenses_i(const QnLicenseList &licenses)

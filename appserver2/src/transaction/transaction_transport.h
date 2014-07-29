@@ -57,12 +57,13 @@ signals:
 public:
 
     template<class T> 
-    void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader &header) {
+    void sendTransaction(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header) 
+    {
+        QnTransactionTransportHeader header(_header);
         assert(header.processedPeers.contains(m_localPeer.id));
+        if(header.sequence == 0) 
+            header.fillSequence();
 #ifdef _DEBUG
-        if (ApiCommand::isSystem(transaction.command) || transaction.persistent) {
-            Q_ASSERT(transaction.id.sequence > 0);
-        }
 
         foreach (const QnId& peer, header.dstPeers) {
             Q_ASSERT(!peer.isNull());

@@ -48,39 +48,41 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
         }
 
         //searching for resource by address
-        auto it = m_notificationProducerAddressToResource.end();
         if( notification.oasisWsnB2__ProducerReference && notification.oasisWsnB2__ProducerReference->Address )
         {
             const QString& address = QUrl( QString::fromStdString(notification.oasisWsnB2__ProducerReference->Address->__item) ).host();
-            it = m_notificationProducerAddressToResource.find( address );
+            auto it = m_notificationProducerAddressToResource.find( address );
+            if( it != m_notificationProducerAddressToResource.end() )
+            {
+                it->second->notificationReceived(notification);
+                continue;
+            }
         }
 
-        if( it == m_notificationProducerAddressToResource.end()
-            && notification.oasisWsnB2__SubscriptionReference
-            && notification.oasisWsnB2__SubscriptionReference->Address )
+        if( notification.oasisWsnB2__SubscriptionReference && notification.oasisWsnB2__SubscriptionReference->Address )
         {
             //trying to find by subscription reference
-            it = m_subscriptionReferenceToResource.find( QString::fromStdString(notification.oasisWsnB2__SubscriptionReference->Address->__item) );
+            auto it = m_subscriptionReferenceToResource.find( QString::fromStdString(notification.oasisWsnB2__SubscriptionReference->Address->__item) );
+            if( it != m_subscriptionReferenceToResource.end() )
+            {
+                it->second->notificationReceived(notification);
+                continue;
+            }
         }
 
-        if( it == m_notificationProducerAddressToResource.end()
-            && notificationRequest->soap
-            && notificationRequest->soap->host )
+        if( notificationRequest->soap && notificationRequest->soap->host )
         {
             //searching by host
-            it = m_notificationProducerAddressToResource.find( QLatin1String(notificationRequest->soap->host) );
+            auto it = m_notificationProducerAddressToResource.find( QLatin1String(notificationRequest->soap->host) );
+            if( it != m_notificationProducerAddressToResource.end() )
+            {
+                it->second->notificationReceived(notification);
+                continue;
+            }
         }
 
-        if( it == m_notificationProducerAddressToResource.end() )
-        {
-            //this is possible shortly after resource unregistration
-            //NX_LOG( lit("Received notification for unknown resource. Producer address %1. Ignoring...").
-            //    arg(QString::fromStdString(notification.oasisWsnB2__ProducerReference->Address->__item)), cl_logWARNING );
-            NX_LOG( lit("Received notification for unknown resource. Ignoring..."), cl_logWARNING );
-            continue;
-        }
-
-        it->second->notificationReceived( notification );
+        //this is possible shortly after resource unregistration
+        NX_LOG( lit("Received notification for unknown resource. Ignoring..."), cl_logWARNING );
     }
 
     return SOAP_OK;

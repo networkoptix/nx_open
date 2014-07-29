@@ -178,7 +178,7 @@ QnId QnDbManager::getType(const QString& typeName)
     query.bindValue(0, typeName);
     if( !query.exec() )
     {
-        Q_ASSERT( false );
+        Q_ASSERT(false);
     }
     if (query.next())
         return QnId::fromRfc4122(query.value("guid").toByteArray());
@@ -212,13 +212,13 @@ bool QnDbManager::init(
 
     if (!m_sdb.open())
 	{
-        qWarning() << "can't initialize EC sqlLite database!";
+        qWarning() << "can't initialize EC sqlLite database "<<m_sdb.databaseName()<<". Error: "<<m_sdb.lastError().text();
         return false;
     }
 
     if (!m_sdbStatic.open())
     {
-        qWarning() << "can't initialize EC static sqlLite database!";
+        qWarning() << "can't initialize EC static sqlLite database "<<m_sdbStatic.databaseName()<<". Error: "<<m_sdbStatic.lastError().text();
         return false;
     }
 
@@ -238,7 +238,7 @@ bool QnDbManager::init(
     queryAdminUser.prepare("SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'");
     if( !queryAdminUser.exec() )
     {
-        Q_ASSERT( false );
+        Q_ASSERT(false);
     }
     if (queryAdminUser.next()) {
         m_adminUserID = QnId::fromRfc4122(queryAdminUser.value(0).toByteArray());
@@ -266,7 +266,6 @@ bool QnDbManager::init(
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     if (localInfo.data.prematureLicenseExperationDate != m_licenseOverflowTime) {
         localInfo.data.prematureLicenseExperationDate = m_licenseOverflowTime;
-        localInfo.data.version = localInfo.data.version + 1;
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
 
@@ -306,8 +305,8 @@ bool QnDbManager::init(
         fromApiToResource(users[0], userResource);
         userResource->setPassword(qnCommon->defaultAdminPassword());
 
-        QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser, true);
-        userTransaction.fillSequence();
+        QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser);
+        userTransaction.fillPersistentInfo();
         fromResourceToApi(userResource, userTransaction.params);
 
         executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
@@ -330,8 +329,8 @@ bool QnDbManager::init(
     }
     while (queryCameras.next()) 
     {
-        QnTransaction<ApiSetResourceStatusData> tran(ApiCommand::setResourceStatus, true);
-        tran.fillSequence();
+        QnTransaction<ApiSetResourceStatusData> tran(ApiCommand::setResourceStatus);
+        tran.fillPersistentInfo();
         tran.params.id = QnId::fromRfc4122(queryCameras.value(0).toByteArray());
         tran.params.status = QnResource::Offline;
         executeTransactionNoLock(tran, QnUbjson::serialized(tran));
@@ -761,8 +760,13 @@ ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint
 
 ErrorCode QnDbManager::updateResource(const ApiResourceData& data, qint32 internalId)
 {
-	QSqlQuery insQuery(m_sdb);
+    /* Check that we are updating really existing resource */
+    Q_ASSERT(internalId != 0);
+    ErrorCode result = checkExistingUser(data.name, internalId);
+    if (result != ErrorCode::ok)
+        return result;
 
+	QSqlQuery insQuery(m_sdb);
 	insQuery.prepare("UPDATE vms_resource SET xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url, status = :status WHERE id = :internalId");
     QnSql::bind(data, &insQuery);
     insQuery.bindValue(":internalId", internalId);
@@ -779,7 +783,7 @@ ErrorCode QnDbManager::updateResource(const ApiResourceData& data, qint32 intern
         if (result != ErrorCode::ok)
             return result;
         */
-        ErrorCode result = insertAddParams(data.addParams, internalId);
+        result = insertAddParams(data.addParams, internalId);
         if (result != ErrorCode::ok)
             return result;
     }
@@ -1529,11 +1533,35 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredF
     return ErrorCode::ok;
 }
 
+ErrorCode QnDbManager::checkExistingUser(const QString &name, qint32 internalId) {
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare("SELECT r.id\
+                  FROM vms_resource r \
+                  JOIN vms_userprofile p on p.resource_ptr_id = r.id \
+                  WHERE p.resource_ptr_id != :id and r.name = :name");
+
+
+    query.bindValue(":id", internalId);
+    query.bindValue(":name", name);
+    if (!query.exec()) {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
+        return ErrorCode::dbError;
+    }
+    if(query.next())
+        return ErrorCode::failure;  // another user with same name already exists
+    return ErrorCode::ok;
+}
+
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiUserData>& tran)
 {
-    qint32 internalId;
+    qint32 internalId = getResourceInternalId(tran.params.id);
 
-    ErrorCode result = insertOrReplaceResource(tran.params, &internalId);
+    ErrorCode result = checkExistingUser(tran.params.name, internalId);
+    if (result !=ErrorCode::ok)
+        return result;
+
+    result = insertOrReplaceResource(tran.params, &internalId);
     if (result !=ErrorCode::ok)
         return result;
 
@@ -2234,12 +2262,31 @@ ErrorCode QnDbManager::saveLicense(const ApiLicenseData& license) {
         qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
         return ErrorCode::dbError;
     }
+}
 
+ErrorCode QnDbManager::removeLicense(const ApiLicenseData& license) {
+    QSqlQuery delQuery(m_sdbStatic);
+    delQuery.prepare("DELETE FROM vms_license WHERE license_key = ?");
+    delQuery.addBindValue(license.key);
+    if (delQuery.exec()) {
+        return ErrorCode::ok;
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
+        return ErrorCode::dbError;
+    }
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran)
 {
-    return saveLicense(tran.params);
+    if (tran.command == ApiCommand::addLicense)
+        return saveLicense(tran.params);
+    else if (tran.command == ApiCommand::removeLicense)
+        return removeLicense(tran.params);
+    else {
+        Q_ASSERT_X(1, Q_FUNC_INFO, "Unexpected command!");
+        return ErrorCode::notImplemented;
+    }
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicenseDataList>& tran)
@@ -2628,7 +2675,6 @@ bool QnDbManager::markLicenseOverflow(bool value, qint64 time)
     QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     if (localInfo.data.prematureLicenseExperationDate != m_licenseOverflowTime) {
         localInfo.data.prematureLicenseExperationDate = m_licenseOverflowTime;
-        localInfo.data.version++;
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
     

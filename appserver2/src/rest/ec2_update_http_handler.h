@@ -85,9 +85,10 @@ namespace ec2
             }
 
             // replace client GUID to own GUID (take transaction ownership).
-            tran.id.peerID = qnCommon->moduleGUID();
-            if (QnDbManager::instance())
-                tran.id.dbID = QnDbManager::instance()->getID();
+            tran.peerID = qnCommon->moduleGUID();
+            if (QnDbManager::instance() && ApiCommand::isPersistent(tran.command))
+                tran.fillPersistentInfo();
+
 
             ErrorCode errorCode = ErrorCode::ok;
             bool finished = false;

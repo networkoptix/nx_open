@@ -164,7 +164,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnVirtualCameraResourcePtr& resource )
     {
-		QnTransaction<ApiCameraData> tran(command, true);
+		QnTransaction<ApiCameraData> tran(command);
         fromResourceToApi(resource, tran.params);
         return tran;
     }
@@ -174,7 +174,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnVirtualCameraResourceList& cameras )
     {
-        QnTransaction<ApiCameraDataList> tran(command, true);
+        QnTransaction<ApiCameraDataList> tran(command);
         fromResourceListToApi(cameras, tran.params);
         return tran;
     }
@@ -184,7 +184,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnCameraHistoryItem& historyItem )
     {
-        QnTransaction<ApiCameraServerItemData> tran(command, true);
+        QnTransaction<ApiCameraServerItemData> tran(command);
         fromResourceToApi(historyItem, tran.params);
         return tran;
     }
@@ -192,7 +192,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiIdData> QnCameraManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
-        QnTransaction<ApiIdData> tran(command, true);
+        QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;
         return tran;
     }
@@ -201,7 +201,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiCameraBookmarkTagDataList> QnCameraManager<T>::prepareTransaction(ApiCommand::Value command, const QnCameraBookmarkTags& tags)
     {
-        QnTransaction<ApiCameraBookmarkTagDataList> tran(command, true);
+        QnTransaction<ApiCameraBookmarkTagDataList> tran(command);
         fromResourceToApi(tags, tran.params);
         return tran;
     }

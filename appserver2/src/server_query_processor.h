@@ -49,12 +49,12 @@ namespace ec2
             //TODO #ak this method must be asynchronous
             ErrorCode errorCode = ErrorCode::ok;
 
-            QnDbManager::Locker locker(dbManager);
-            if (tran.persistent)
-                locker.beginTran();
+            if (ApiCommand::isPersistent(tran.command))
+                tran.fillPersistentInfo();
 
-            if (!tran.id.sequence)
-                tran.fillSequence();
+            QnDbManager::Locker locker(dbManager);
+            if (!tran.persistentInfo.isNull())
+                locker.beginTran();
 
             auto SCOPED_GUARD_FUNC = [&errorCode, &handler]( ServerQueryProcessor* ){
                 QnScopedThreadRollback ensureFreeThread( 1, Ec2ThreadPool::instance() );
@@ -68,10 +68,9 @@ namespace ec2
                 return;
             }
 
-            if (tran.persistent)
-            {
+            if (!tran.persistentInfo.isNull()) {
                 const QByteArray& serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-                errorCode = dbManager->executeTransactionNoLock( tran, serializedTran );
+                errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
                 if( errorCode != ErrorCode::ok ) {
                     if (errorCode == ErrorCode::skipped)
                         errorCode = ErrorCode::ok;
@@ -79,7 +78,6 @@ namespace ec2
                 }
 
                 locker.commit();
-            }
 
             // delivering transaction to remote peers
             if (!tran.isLocal)
@@ -159,6 +157,9 @@ namespace ec2
         template<class QueryDataType, class SubDataType, class HandlerType>
         void processMultiUpdateAsync(QnTransaction<QueryDataType>& multiTran, HandlerType handler, ApiCommand::Value command, const std::vector<SubDataType>& nestedList, bool isParentObjectTran)
         {
+
+            Q_ASSERT(ApiCommand::isPersistent(multiTran.command));
+
             ErrorCode errorCode = ErrorCode::ok;
             QList< QnTransaction<SubDataType> > processedTransactions;
             processedTransactions.reserve(static_cast<int>(nestedList.size()));
@@ -172,51 +173,43 @@ namespace ec2
             std::unique_ptr<ServerQueryProcessor, decltype(SCOPED_GUARD_FUNC)> SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
             QnDbManager::Locker locker(dbManager);
-            if (multiTran.persistent)
-                locker.beginTran();
+            locker.beginTran();
 
             foreach(const SubDataType& data, nestedList)
             {
-                QnTransaction<SubDataType> tran(command, multiTran.persistent);
+                QnTransaction<SubDataType> tran(command);
                 tran.params = data;
-                tran.fillSequence();
+                tran.fillPersistentInfo();
                 tran.isLocal = multiTran.isLocal;
 
                 errorCode = auxManager->executeTransaction(tran);
                 if( errorCode != ErrorCode::ok )
                     return;
 
-                if (tran.persistent) 
-                {
-                    QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
-                    errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
-					if (errorCode == ErrorCode::skipped)
-						continue;
-                    if( errorCode != ErrorCode::ok )
-                        return;
-                }
+                QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+                errorCode = dbManager->executeTransactionNoLock( tran, serializedTran);
+				if (errorCode == ErrorCode::skipped)
+					continue;
+                if( errorCode != ErrorCode::ok )
+                    return;
                 processedTransactions << tran;
             }
             
             // delete master object if need (server->cameras required to delete master object, layoutList->layout doesn't)
             if (isParentObjectTran) 
             {
-                multiTran.fillSequence();
+                multiTran.fillPersistentInfo();
 
                 errorCode = ErrorCode::ok;
-                if (multiTran.persistent)                 
-                {
-                    QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(multiTran);
-                    errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
-                    if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
-                        return;
-                }
+                QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(multiTran);
+                errorCode = dbManager->executeTransactionNoLock(multiTran, serializedTran);
+                if( errorCode != ErrorCode::ok && errorCode != ErrorCode::skipped)
+                    return;
                 processMultiTran = (errorCode == ErrorCode::ok);
             }
 
 
-            if (multiTran.persistent)
-                locker.commit();
+            locker.commit();
 
             foreach(const QnTransaction<SubDataType>& transaction, processedTransactions)
             {
