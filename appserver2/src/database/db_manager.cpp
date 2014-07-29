@@ -218,8 +218,8 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
 
     foreach(const ObjectType& object, objects)
     {
-        QnTransaction<ObjectType> transaction(command, true);
-        transaction.fillSequence();
+        QnTransaction<ObjectType> transaction(command);
+        transaction.fillPersistentInfo();
         transaction.params = object;
         if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
             return false;
@@ -235,8 +235,8 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
     if (errCode != ErrorCode::ok)
         return false;
 
-    QnTransaction<ObjectType> transaction(command, true);
-    transaction.fillSequence();
+    QnTransaction<ObjectType> transaction(command);
+    transaction.fillPersistentInfo();
     transaction.params = object;
     if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
         return false;
@@ -255,7 +255,7 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
         return false;
-    if (!fillTransactionLogInternal<ApiResourceParamDataList>(ApiCommand::saveSettings))
+    if (!fillTransactionLogInternal<ApiResourceParamDataList>(ApiCommand::setResourceParams))
         return false;
 
     return true;
@@ -382,8 +382,7 @@ bool QnDbManager::init()
         QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser);
         userTransaction.fillPersistentInfo();
         fromResourceToApi(userResource, userTransaction.params);
-
-        transactionLog->saveTransaction(userTransaction, serializedTran);
+        executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
     }
 
     QSqlQuery queryCameras(m_sdb);
@@ -656,7 +655,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
         //        if (!execSQLFile(lit(":/02_insert_3thparty_vendor.sql")))
         //            return false;
         //#else
-        if (!execSQLFile(lit(":/02_insert_all_vendors.sql")))
+        if (!execSQLFile(lit(":/02_insert_all_vendors.sql"), m_sdb))
             return false;
         //#endif
 
