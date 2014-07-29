@@ -87,13 +87,13 @@ namespace {
 
             QPalette palette = m_parentPalette;
             bool licensesOk = helper.isValid();
-            if(!licensesOk)
+            QString licenseUsage = helper.getProposedUsageText();
+            if(!licensesOk) {
                 setWarningStyle(&palette);
+                licenseUsage += L'\n' + helper.getRequiredLicenseMsg();
+            }
+            m_licensesLabel->setText(licenseUsage);
             m_licensesLabel->setPalette(palette);
-
-            QString usageText = helper.getProposedUsageText();
-
-            m_licensesLabel->setText(usageText);
 
             bool motionOk = true;
             if (m_motionUsed){

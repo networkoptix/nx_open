@@ -15,26 +15,55 @@ public:
 
     bool isValid() const;
 
+    /** 
+     *  Get text "Activate %n more licenses" or "%n more licenses will be used" if valid for the selected type.
+     */
+
+    QString getRequiredLicenseMsg(Qn::LicenseType licenseType) const;
+
+    /** 
+     *  Get text "Activate %n more licenses" or "%n more licenses will be used" if valid for all types.
+     */
     QString getRequiredLicenseMsg() const;
+
+    /**
+     *  Get text "%n licenses are used out of %n." for the selected type.
+     */
     QString getUsageText(Qn::LicenseType licenseType) const;
+
+    /**
+     *  Get text "%n licenses are used out of %n." for all types.
+     */
     QString getUsageText() const;
+
+    /**
+     *  Get text "%n licenses will be used out of %n." for the selected type.
+     */
     QString getProposedUsageText(Qn::LicenseType licenseType) const;
+
+    /**
+     *  Get text "%n licenses will be used out of %n." for all types.
+     */
     QString getProposedUsageText() const;
 
     int totalLicense(Qn::LicenseType licenseType) const;
     int usedLicense(Qn::LicenseType licenseType) const;
 
-    virtual QList<Qn::LicenseType> licenseTypes() const = 0;
+    virtual QList<Qn::LicenseType> licenseTypes() const;
 
-     void update();
+    virtual Qn::LicenseType mainLicenseType() const = 0;
+
+    void update();
 signals:
      void licensesChanged();
 
 protected:
     void borrowLicenseFromClass(int& srcUsed, int srcTotal, int& dstUsed, int dstTotal);
     virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const = 0;
+    virtual QList<Qn::LicenseType> calculateLicenseTypes() const = 0;
 
     QnLicenseListHelper m_licenses;
+    mutable QList<Qn::LicenseType> m_licenseTypes;
 
     int m_usedLicenses[Qn::LC_Count];
     int m_proposedLicenses[Qn::LC_Count];
@@ -52,9 +81,10 @@ public:
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);
 
-    virtual QList<Qn::LicenseType> licenseTypes() const override;
 protected:
+    virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;
+    virtual Qn::LicenseType mainLicenseType() const override;
 private:
     void init();
 };
@@ -64,9 +94,26 @@ class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper {
 public:
     QnVideoWallLicenseUsageHelper(QObject *parent = NULL);
 
-    virtual QList<Qn::LicenseType> licenseTypes() const override;
+    /** Propose to use itemsCount videowall items on the pc given for the given videowall. */
+    void propose(const QnVideoWallResourcePtr &videowall, const QUuid &pcUuid, int itemsCount);
+
+    /** Propose to use some more or less licenses directly (e.g. to start control session). */
+    void propose(int count);
+
 protected:
+    virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;
+    virtual Qn::LicenseType mainLicenseType() const override;
+};
+
+/** Utility RAAA class to propose some licenses usage. */
+class QnVideoWallLicenseUsageProposer {
+public:
+    QnVideoWallLicenseUsageProposer(QnVideoWallLicenseUsageHelper* helper, int count);
+    ~QnVideoWallLicenseUsageProposer();
+private:
+    QPointer<QnVideoWallLicenseUsageHelper> m_helper;
+    int m_count;
 };
 
 #endif // LICENSE_USAGE_HELPER_H

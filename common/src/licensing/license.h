@@ -126,6 +126,8 @@ class QnLicenseListHelper
 public:
     QnLicenseListHelper(const QnLicenseList& licenseList);
 
+    void update(const QnLicenseList& licenseList);
+
     QList<QByteArray> allLicenseKeys() const;
     bool haveLicenseKey(const QByteArray& key) const;
     QnLicensePtr getLicenseByKey(const QByteArray& key) const;

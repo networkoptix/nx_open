@@ -420,9 +420,7 @@ void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2Li
 // -------------------------------------------------------------------------- //
 
 QnLicenseListHelper::QnLicenseListHelper(const QnLicenseList& licenseList) {
-    foreach (QnLicensePtr license, licenseList) {
-        m_licenseDict[license->key()] = license;
-    }
+    update(licenseList);
 }
 
 bool QnLicenseListHelper::haveLicenseKey(const QByteArray &key) const {
@@ -450,6 +448,13 @@ int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType) const
             result += license->cameraCount();
     }
     return result;
+}
+
+void QnLicenseListHelper::update(const QnLicenseList& licenseList) {
+    m_licenseDict.clear();
+    foreach (QnLicensePtr license, licenseList) {
+        m_licenseDict[license->key()] = license;
+    }
 }
 
 // -------------------------------------------------------------------------- //

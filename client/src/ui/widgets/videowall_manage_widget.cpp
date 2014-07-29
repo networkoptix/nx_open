@@ -29,6 +29,7 @@ QnVideowallManageWidget::QnVideowallManageWidget(QWidget *parent /*= 0*/):
     setTimer(animationTimer);
     startListening();
     
+    connect(d_ptr.data(), &QnVideowallManageWidgetPrivate::itemsChanged, this, &QnVideowallManageWidget::itemsChanged);
 }
 
 QnVideowallManageWidget::~QnVideowallManageWidget() { }
@@ -141,5 +142,10 @@ const QnVideowallManageWidgetColors & QnVideowallManageWidget::colors() const {
 void QnVideowallManageWidget::setColors(const QnVideowallManageWidgetColors &colors) {
     m_colors = colors;
     update();
+}
+
+int QnVideowallManageWidget::proposedItemsCount() const {
+    Q_D(const QnVideowallManageWidget);
+    return d->proposedItemsCount();
 }
 
