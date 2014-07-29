@@ -198,7 +198,7 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
 {
     if ( qnCommon )
     {
-        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera, true);
+        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
         bool showUrl = resourceData.value<bool>(lit("showUrl"), false);
         if ( showUrl && m_camera->getStatus() != QnResource::Offline )
         {

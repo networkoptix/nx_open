@@ -64,7 +64,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     if(m_resource->getPtzUrl().isEmpty())
         m_capabilities = Qn::NoPtzCapabilities;
 
-    m_stopBroken = qnCommon->dataPool()->data(resource, true).value<bool>(lit("onvifPtzStopBroken"), false);
+    m_stopBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
 
     initContinuousMove();
 
