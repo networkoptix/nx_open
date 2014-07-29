@@ -93,9 +93,6 @@ QnResourcePoolModel::~QnResourcePoolModel() {
     disconnect(resourcePool(), NULL, this, NULL);
     disconnect(snapshotManager(), NULL, this, NULL);
 
-    foreach(const QnResourcePtr &resource, resources)
-        at_resPool_resourceRemoved(resource);
-
     /* Free memory. */
     qDeleteAll(m_resourceNodeByResource);
     qDeleteAll(m_itemNodeByUuid);
@@ -104,6 +101,9 @@ QnResourcePoolModel::~QnResourcePoolModel() {
         delete m_rootNodes[t];
         qDeleteAll(m_nodes[t]);
     }
+
+    /* Note, we don't have to check and remove all the resources from the resource pool
+       because they will be removed recursively starting from root nodes. */
 }
 
 QnResourcePtr QnResourcePoolModel::resource(const QModelIndex &index) const {
