@@ -119,7 +119,7 @@ UINT __stdcall GenerateSystemName(MSIHANDLE hInstall)
     // Enterprise Controller Path
     registryPath = GetProperty(hInstall, L"OLDEC_REGISTRY_PATH");
 
-    if(RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS) {
+    if(RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, KEY_READ | KEY_WOW64_64KEY) != ERROR_SUCCESS) {
         WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
         goto LExit;
     }
