@@ -473,8 +473,6 @@ void QnMediaServerUpdateTool::installUpdatesToServers() {
             it->state = PeerUpdateInformation::UpdateInstalling;
     }
 
-    setState(InstallingUpdate);
-
     m_installUpdatesPeerTask->setUpdateId(m_updateId);
     m_installUpdatesPeerTask->setVersion(m_targetVersion);
     m_installUpdatesPeerTask->setPeers(m_targetPeerIds - m_incompatiblePeerIds);
@@ -502,6 +500,8 @@ void QnMediaServerUpdateTool::installIncompatiblePeers() {
 }
 
 void QnMediaServerUpdateTool::lockMutex() {
+    setState(InstallingUpdate);
+
     m_distributedMutex = ec2::QnDistributedMutexManager::instance()->createMutex(mutexName);
     connect(m_distributedMutex, &ec2::QnDistributedMutex::locked,        this,   &QnMediaServerUpdateTool::at_mutexLocked, Qt::QueuedConnection);
     connect(m_distributedMutex, &ec2::QnDistributedMutex::lockTimeout,   this,   &QnMediaServerUpdateTool::at_mutexTimeout, Qt::QueuedConnection);
