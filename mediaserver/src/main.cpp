@@ -503,13 +503,6 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
         return QnMediaServerResourcePtr();
     }
     
-    /*
-    if (!authKey.isEmpty()) {
-        MSSettings::roSettings()->setValue("authKey", authKey);
-        QnAppServerConnectionFactory::setAuthKey(authKey);
-    }
-    */
-
     return savedServer;
 }
 
@@ -628,7 +621,7 @@ int serverMain(int argc, char *argv[])
     return 0;
 }
 
-void initAppServerConnection(const QSettings &settings)
+void initAppServerConnection(QSettings &settings)
 {
     QUrl appServerUrl;
     QUrlQuery params;
@@ -657,6 +650,27 @@ void initAppServerConnection(const QSettings &settings)
 
     QString userName = settings.value("appserverLogin", QLatin1String("admin")).toString();
     QString password = settings.value("appserverPassword", QLatin1String("123")).toString();
+    QByteArray authKey = settings.value("authKey").toByteArray();
+    if (!authKey.isEmpty())
+    {
+        // convert from v2.2 format and encode value
+        QByteArray prefix("SK_");
+        if (!authKey.startsWith(prefix))
+        {
+            QByteArray authKeyBin = QUuid(authKey).toRfc4122();
+            QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
+            settings.setValue(lit("authKey"), prefix + authKeyEncoded); // encode and update in settings
+        }
+        else {
+            QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
+            QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
+            authKey = QUuid::fromRfc4122(authKeyDecoded).toByteArray();
+        }
+
+        userName = serverGuid().toString();
+        password = authKey;
+    }
+
     appServerUrl.setUserName(userName);
     appServerUrl.setPassword(password);
     appServerUrl.setQuery(params);
@@ -664,7 +678,6 @@ void initAppServerConnection(const QSettings &settings)
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
     NX_LOG(lit("Connect to enterprise controller server %1").arg(urlNoPassword.toString()), cl_logINFO);
-    //QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());

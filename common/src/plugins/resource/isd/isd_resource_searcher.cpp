@@ -141,8 +141,6 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
 {
     QList<QnNetworkResourcePtr> local_result;
 
-    return local_result; // block ISD driver auto discovery
-
 
     QString smac;
     QString name;

@@ -731,7 +731,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
             ui->cameraMotionButton->setChecked(m_camera->getMotionType() != Qn::MT_SoftwareGrid);
             ui->softwareMotionButton->setChecked(m_camera->getMotionType() == Qn::MT_SoftwareGrid);
 
-            m_cameraSupportsMotion = m_camera->supportedMotionType() != Qn::MT_NoMotion;
+            m_cameraSupportsMotion = m_camera->hasMotion();
             ui->motionSettingsGroupBox->setEnabled(m_cameraSupportsMotion);
             ui->motionAvailableLabel->setVisible(!m_cameraSupportsMotion);
 
