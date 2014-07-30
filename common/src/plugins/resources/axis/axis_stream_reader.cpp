@@ -7,7 +7,7 @@
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 #include "utils/media/nalUnits.h"
-
+#include "version.h"
 static const char AXIS_SEI_UUID[] = "\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa\xaa";
 static const int AXIS_SEI_PRODUCT_INFO = 0x0a00;
 static const int AXIS_SEI_TIMESTAMP = 0x0a01;
@@ -74,21 +74,21 @@ CameraDiagnostics::Result QnAxisStreamReader::openStream()
     QByteArray profileDescription;
     QByteArray action = "add";
 
-    QByteArray profileSufix;
+    QString profileSufix;
     if (channels > 1)
     {
         // multiple channel encoder
-        profileSufix = QByteArray::number(res->getChannelNumAxis());
+        profileSufix = QString::number(res->getChannelNumAxis());
     }
 
     if (role == QnResource::Role_LiveVideo)
     {
-        profileName = "netOptixPrimary" + profileSufix;
-        profileDescription = "Network Optix Primary Stream";
+        profileName = QString(lit("%1Primary%2")).arg(lit(QN_PRODUCT_NAME_SHORT)).arg(profileSufix).toUtf8();
+        profileDescription = QString(lit("%1 Primary Stream")).arg(lit(QN_PRODUCT_NAME_SHORT)).toUtf8();
     }
     else {
-        profileName = "netOptixSecondary" + profileSufix;
-        profileDescription = "Network Optix Secondary Stream";
+        profileName = QString(lit("%1Secondary%2")).arg(lit(QN_PRODUCT_NAME_SHORT)).arg(profileSufix).toUtf8();
+        profileDescription = QString(lit("%1 Secondary Stream")).arg(lit(QN_PRODUCT_NAME_SHORT)).toUtf8();
     }
 
 
