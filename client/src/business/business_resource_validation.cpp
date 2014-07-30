@@ -72,9 +72,7 @@ QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const boo
 }
 
 bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
-    return !camera->isScheduleDisabled()
-            && camera->getMotionType() != Qn::MT_NoMotion
-            && camera->supportedMotionType() != Qn::MT_NoMotion;
+    return !camera->isScheduleDisabled() && camera->hasMotion();
 }
 
 QString QnCameraMotionPolicy::getText(const QnResourceList &resources, const bool detailed) {

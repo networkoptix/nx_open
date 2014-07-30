@@ -71,6 +71,42 @@ LExit:
     return WcaFinalize(er);
 }
 
+UINT __stdcall DeleteOldMediaserverSettings(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    CRegKey RegKey;
+
+    CAtlString registryPath;
+
+    hr = WcaInitialize(hInstall, "DeleteOldMediaserverSettings");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    registryPath = GetProperty(hInstall, L"CustomActionData");
+
+    if(RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS) {
+        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
+        goto LExit;
+    }
+
+    RegKey.DeleteValue(L"apiPort");
+    RegKey.DeleteValue(L"rtspPort");
+    RegKey.DeleteValue(L"appserverHost");
+    RegKey.DeleteValue(L"appserverPort");
+    RegKey.DeleteValue(L"appserverLogin");
+    RegKey.DeleteValue(L"appserverPassword");
+
+    RegKey.Close();
+
+LExit:
+
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
 /**
   * Create new GUIDs for MediaServer and ECS
   */
@@ -314,6 +350,33 @@ UINT __stdcall RestoreDatabaseFile(MSIHANDLE hInstall)
         version = params.Tokenize(_T(";"), curPos);
 
         CopyFile(toFile + "." + version, toFile, FALSE);
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall CopyDatabaseFile(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "CopyDatabaseFile");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CAtlString params, fromFile, toFile;
+        params = GetProperty(hInstall, L"CustomActionData");
+
+        int curPos = 0;
+        fromFile = params.Tokenize(_T(";"), curPos);
+        toFile = params.Tokenize(_T(";"), curPos);
+
+        CopyFile(fromFile, toFile, TRUE);
     }
 
 LExit:

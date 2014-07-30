@@ -83,7 +83,7 @@ MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib
-!win* {
+!win*:!mac {
     LIBS += -Wl,-rpath-link,${qt.dir}/lib
 }
 LIBS += ${global.libs}
