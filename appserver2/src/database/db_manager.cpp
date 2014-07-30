@@ -284,14 +284,27 @@ bool QnDbManager::init()
 
 
     if (!qnCommon->obsoleteServerGuid().isNull()) {
-        QSqlQuery updateGuidQuery(m_sdb);
-        updateGuidQuery.prepare("UPDATE vms_resource SET guid=? WHERE guid=?");
-        updateGuidQuery.addBindValue(qnCommon->moduleGUID().toRfc4122());
-        updateGuidQuery.addBindValue(qnCommon->obsoleteServerGuid().toRfc4122());
-        if (!updateGuidQuery.exec()) {
-            qWarning() << "can't initialize sqlLite database!" << updateGuidQuery.lastError().text();
-            return false;
-        }
+		{
+			QSqlQuery updateGuidQuery(m_sdb);
+			updateGuidQuery.prepare("UPDATE vms_resource SET guid=? WHERE guid=?");
+			updateGuidQuery.addBindValue(qnCommon->moduleGUID().toRfc4122());
+			updateGuidQuery.addBindValue(qnCommon->obsoleteServerGuid().toRfc4122());
+			if (!updateGuidQuery.exec()) {
+				qWarning() << "can't initialize sqlLite database!" << updateGuidQuery.lastError().text();
+				return false;
+			}
+		}
+
+		{
+			QSqlQuery updateGuidQuery(m_sdb);
+			updateGuidQuery.prepare("UPDATE vms_resource SET parent_guid=? WHERE parent_guid=?");
+			updateGuidQuery.addBindValue(qnCommon->moduleGUID().toRfc4122());
+			updateGuidQuery.addBindValue(qnCommon->obsoleteServerGuid().toRfc4122());
+			if (!updateGuidQuery.exec()) {
+				qWarning() << "can't initialize sqlLite database!" << updateGuidQuery.lastError().text();
+				return false;
+			}
+		}
     }
 
     // updateDBVersion();
