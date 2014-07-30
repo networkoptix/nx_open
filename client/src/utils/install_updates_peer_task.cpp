@@ -72,7 +72,6 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
     }
 
     if (m_pendingPeers.isEmpty()) {
-        disconnect(qnResPool, &QnResourcePool::resourceChanged, this, &QnInstallUpdatesPeerTask::at_resourceChanged);
         finish(NoError);
         return;
     }
@@ -92,9 +91,6 @@ void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource)
 }
 
 void QnInstallUpdatesPeerTask::at_checkTimeout() {
-    /* disconnect from resource pool and make final check */
-    disconnect(qnResPool, &QnResourcePool::resourceChanged, this, &QnInstallUpdatesPeerTask::at_resourceChanged);
-
     foreach (const QnId &id, m_pendingPeers) {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (server->getVersion() == m_version) {
@@ -107,6 +103,7 @@ void QnInstallUpdatesPeerTask::at_checkTimeout() {
 }
 
 void QnInstallUpdatesPeerTask::finish(int errorCode) {
+    qnResPool->disconnect(this);
     static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())->setHoldConnection(false);
     QnNetworkPeerTask::finish(errorCode);
 }
