@@ -50,7 +50,8 @@ namespace {
 QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_connectingMessageBox(NULL)
+    m_connectingMessageBox(NULL),
+    m_connectingHandle(0)
 {
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionOpened,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened);
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::connectionClosed,    this,   &QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed);
@@ -83,11 +84,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
 
     context()->instance<QnAppServerNotificationCache>()->getFileList();
 
-    if (m_connectingMessageBox != NULL) {
-        m_connectingMessageBox->disconnect(this);
-        m_connectingMessageBox->hideImmideately();
-        m_connectingMessageBox = NULL;
-    }
+    hideMessageBox();
 
     connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
 }
@@ -206,15 +203,24 @@ bool QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerUrl) {
     Q_ASSERT(!connected());
     if (connected())
         return true;
+    
+    /* Hiding message box from previous connect. */
+    hideMessageBox();
 
     QnEc2ConnectionRequestResult result;
-    QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(appServerUrl, &result, &QnEc2ConnectionRequestResult::processEc2Reply );
-
-    QnGraphicsMessageBox* connectingMessageBox = QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX);
+    m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(appServerUrl, &result, &QnEc2ConnectionRequestResult::processEc2Reply );
+    m_connectingMessageBox = QnGraphicsMessageBox::information(tr("Connecting..."), INT_MAX);
 
     //here we are going to inner event loop
     ec2::ErrorCode errCode = static_cast<ec2::ErrorCode>(result.exec());
-    connectingMessageBox->hideImmideately();
+
+    /* Check if we have entered 'connect' method again while were in 'connecting...' state */
+    if (m_connectingHandle != result.handle())
+        return true;
+    m_connectingHandle = 0;
+
+    /* Hiding message box from current connect. */
+    hideMessageBox();
 
     QnConnectionInfo connectionInfo = result.reply<QnConnectionInfo>();
     QnConnectionDiagnosticsHelper::Result status = QnConnectionDiagnosticsHelper::validateConnection(connectionInfo, errCode, appServerUrl, mainWindow());
@@ -252,11 +258,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
         QnGlobalSettings::instance()->synchronizeNow();
     }
 
-    if (m_connectingMessageBox != NULL) {
-        m_connectingMessageBox->disconnect(this);
-        m_connectingMessageBox->hideImmideately();
-        m_connectingMessageBox = NULL;
-    }
+    hideMessageBox();
 
     QnClientMessageProcessor::instance()->init(NULL);
 
@@ -271,6 +273,17 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
 
     return true;
 }
+
+
+void QnWorkbenchConnectHandler::hideMessageBox() {
+    if (!m_connectingMessageBox)
+        return;
+    
+    m_connectingMessageBox->disconnect(this);
+    m_connectingMessageBox->hideImmideately();
+    m_connectingMessageBox = NULL;
+}
+
 
 void QnWorkbenchConnectHandler::showLoginDialog() {
     QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());

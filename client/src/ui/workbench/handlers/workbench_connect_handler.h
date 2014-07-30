@@ -28,6 +28,7 @@ protected:
     bool connectToServer(const QUrl &appServerUrl);
     bool disconnectFromServer(bool force);
 
+    void hideMessageBox();
     void showLoginDialog();
 private:
     void at_messageProcessor_connectionOpened();
@@ -40,6 +41,7 @@ private:
 private:
     QnGraphicsMessageBox* m_connectingMessageBox;
     QPointer<QnLoginDialog> m_loginDialog;
+    int m_connectingHandle;
 };
 
 #endif // WORKBENCH_CONNECT_HANDLER_H
