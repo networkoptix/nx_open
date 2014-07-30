@@ -15,12 +15,12 @@ public:
     {
         //  Calling this function without previously reserving a thread temporarily increases maxThreadCount().
         for (int i = 0; i < m_increaseThreadCount; i++)
-            (m_threadPool ? m_threadPool : QThreadPool::globalInstance())->releaseThread();
+            (m_threadPool ? m_threadPool.data() : QThreadPool::globalInstance())->releaseThread();
     }
 
     ~QnScopedThreadRollback() {
         for (int i = 0; i < m_increaseThreadCount; i++)
-            (m_threadPool ? m_threadPool : QThreadPool::globalInstance())->reserveThread();
+            (m_threadPool ? m_threadPool.data() : QThreadPool::globalInstance())->reserveThread();
     }
 
 private:
