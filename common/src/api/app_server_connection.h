@@ -31,7 +31,6 @@ public:
     static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
 
-    //static void setAuthKey(const QString &key);
     static void setClientGuid(const QString &guid);
     static void setUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
