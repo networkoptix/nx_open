@@ -17,7 +17,7 @@ public:
         VerticalUp
     };
 
-    QnMediaDewarpingParams(): enabled(false), viewMode(VerticalDown), fovRot(0.0), xCenter(0.5), yCenter(0.5), radius(0.5), hStretch(1.0) {}
+    QnMediaDewarpingParams(): enabled(false), viewMode(VerticalDown), fovRot(0.0), xCenter(0.5), yCenter(0.5), radius(0.5), hStretch(1.33) {}
 
     QnMediaDewarpingParams(const QnMediaDewarpingParams &other) {
         enabled = other.enabled;

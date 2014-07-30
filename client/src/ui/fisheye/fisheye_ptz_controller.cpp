@@ -123,7 +123,7 @@ void QnFisheyePtzController::updateAspectRatio() {
     if (!m_widget)
         return;
 
-    m_aspectRatio = m_widget->hasAspectRatio() ? m_widget->aspectRatio() : 1.0;
+    m_aspectRatio = (m_widget->hasAspectRatio() ? m_widget->aspectRatio() : 1.0) / m_mediaDewarpingParams.hStretch;
 }
 
 void QnFisheyePtzController::updateMediaDewarpingParams() {

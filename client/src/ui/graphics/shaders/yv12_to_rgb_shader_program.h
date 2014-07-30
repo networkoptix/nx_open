@@ -110,6 +110,7 @@ public:
                             const QnItemDewarpingParams &itemParams,
                             float aspectRatio, float maxX, float maxY)
     {
+        aspectRatio /= mediaParams.hStretch;
         if (itemParams.panoFactor == 1)
         {
             float fovRot = sin(itemParams.xAngle) * qDegreesToRadians(mediaParams.fovRot);
@@ -149,6 +150,7 @@ public:
         setUniformValue(m_radiusLocation, (float) mediaParams.radius);
         setUniformValue(m_maxXLocation, maxX);
         setUniformValue(m_maxYLocation, maxY);
+        setUniformValue(m_xStretchLocation, (float) mediaParams.hStretch);
     }
 
     virtual bool link() override {
@@ -172,6 +174,7 @@ public:
 
             m_maxXLocation = uniformLocation("maxX");
             m_maxYLocation = uniformLocation("maxY");
+            m_xStretchLocation = uniformLocation("xStretch");
         }
         return rez;
     }
@@ -194,6 +197,7 @@ protected:
     
     int m_maxXLocation;
     int m_maxYLocation;
+    int m_xStretchLocation;
     bool m_add_shader;
 };
 

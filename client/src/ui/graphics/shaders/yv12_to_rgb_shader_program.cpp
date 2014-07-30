@@ -153,6 +153,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
     uniform float yGamma;
     uniform float maxX;
     uniform float maxY;
+    uniform float xStretch;
 
     const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
@@ -164,7 +165,7 @@ QString QnFisheyeRectilinearProgram::getShaderText()
 
     // avoid function call for better shader compatibility
     vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx; 
-    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx;
+    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx / xStretch;
     vec3 center = vec3(cos(-yShift) * sin(xShift), cos(-yShift)*cos(xShift), sin(-yShift));
 
     mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,    
@@ -238,6 +239,7 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
     uniform float yGamma;
     uniform float maxX;
     uniform float maxY;
+    uniform float xStretch;
 
     const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
@@ -329,6 +331,7 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
     uniform float yGamma;
     uniform float maxX;
     uniform float maxY;
+    uniform float xStretch;
 
     const float PI = 3.1415926535;
     mat4 colorTransform = mat4( 1.0,  0.0,    1.402, -0.701,
@@ -445,6 +448,7 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
     uniform float radius;
     uniform float maxX;
     uniform float maxY;
+    uniform float xStretch;
 
     const float PI = 3.1415926535;
 
@@ -516,6 +520,7 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
     uniform float radius;
     uniform float maxX;
     uniform float maxY;
+    uniform float xStretch;
 
     const float PI = 3.1415926535;
 
@@ -593,6 +598,7 @@ QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
     uniform float radius;
     uniform float maxX;
     uniform float maxY;
+    uniform float xStretch;
 
     const float PI = 3.1415926535;
 
