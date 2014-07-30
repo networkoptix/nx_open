@@ -2,7 +2,7 @@
 #define SCOPED_THREAD_ROLLBACK_H
 
 #include <QtCore/QThreadPool>
-
+#include <QtCore/QPointer>
 
 /*!
     Intended for use in thread of thread pool
@@ -25,7 +25,7 @@ public:
 
 private:
     int m_increaseThreadCount;
-    QThreadPool* m_threadPool;
+    QPointer<QThreadPool> m_threadPool;
 
 };
 
