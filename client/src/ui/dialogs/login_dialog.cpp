@@ -374,7 +374,9 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
     QUrl url = item == NULL ? QUrl() : item->data(Qn::UrlRole).toUrl();
     ui->hostnameLineEdit->setText(url.host());
     ui->portSpinBox->setValue(url.port());
-    ui->loginLineEdit->setText(url.userName());
+    ui->loginLineEdit->setText(url.userName().isEmpty() 
+        ? lit("admin")  // 99% of users have only one login - admin
+        : url.userName());
     ui->passwordLineEdit->clear();
     ui->rememberPasswordCheckBox->setChecked(false);
     ui->deleteButton->setEnabled(qnSettings->customConnections().contains(ui->connectionsComboBox->currentText()));
