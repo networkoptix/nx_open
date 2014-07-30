@@ -53,5 +53,5 @@ void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version) {
 void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
     bool loaded = QFile::exists(fileName) && dataPool->load(fileName);
     
-    assert(!required || loaded); /* Getting an assert here? Something is wrong with resource data json file. */
+    Q_ASSERT_X(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an assert here? Something is wrong with resource data json file. */
 }

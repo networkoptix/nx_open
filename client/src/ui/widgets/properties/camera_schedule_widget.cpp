@@ -104,7 +104,7 @@ namespace {
             if (m_motionUsed){
                 foreach (const QnVirtualCameraResourcePtr &camera, cameras)
                 {
-                    bool hasMotion = camera->getMotionType() != Qn::MT_NoMotion;
+                    bool hasMotion = camera->hasMotion();
                     if (!hasMotion) {
                         motionOk = false;
                         break;
@@ -773,7 +773,7 @@ void QnCameraScheduleWidget::updateMotionButtons() {
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
         hasDualStreaming &= camera->hasDualStreaming2();
-        hasMotion &= camera->supportedMotionType() != Qn::MT_NoMotion;
+        hasMotion &= camera->hasMotion();
     }
 
     bool enabled;
@@ -892,7 +892,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     bool hasMotion = !m_cameras.isEmpty();
     foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
         hasDualStreaming &= camera->hasDualStreaming2();
-        hasMotion &= camera->supportedMotionType() != Qn::MT_NoMotion;
+        hasMotion &= camera->hasMotion();
     }
 
     if(m_cameras.size() > 1) {

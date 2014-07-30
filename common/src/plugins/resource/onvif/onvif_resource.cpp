@@ -103,9 +103,10 @@ static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
 class VideoOptionsLocal
 {
 public:
-    VideoOptionsLocal(): isH264(false), minQ(-1), maxQ(-1), frameRateMax(-1), govMin(-1), govMax(-1) {}
+    VideoOptionsLocal(): isH264(false), minQ(-1), maxQ(-1), frameRateMax(-1), govMin(-1), govMax(-1), usedInProfiles(false) {}
     VideoOptionsLocal(const QString& _id, const VideoOptionsResp& resp, bool isH264Allowed)
     {
+        usedInProfiles = false;
         id = _id;
 
         std::vector<onvifXsd__VideoResolution*>* srcVector = 0;
@@ -148,6 +149,7 @@ public:
     int frameRateMax;
     int govMin;
     int govMax;
+    bool usedInProfiles;
 };
 
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
@@ -196,6 +198,11 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
     if (!s1.isH264 && s2.isH264)
         return false;
     else if (s1.isH264 && !s2.isH264)
+        return true;
+
+    if (!s1.usedInProfiles && s2.usedInProfiles)
+        return false;
+    else if (s1.usedInProfiles && !s2.usedInProfiles)
         return true;
 
     return s1.id < s2.id; // sort by name
@@ -1262,59 +1269,6 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
 
     bool result = QnPhysicalCameraResource::mergeResourcesIfNeeded(source);
 
-    if (getModel() != onvifR->getModel()) {
-        setModel(onvifR->getModel());
-        result = true;
-    }
-    if (getVendor() != onvifR->getVendor()) {
-        setVendor(onvifR->getVendor());
-        result = true;
-    }
-    if (getMAC() != onvifR->getMAC()) {
-        setMAC(onvifR->getMAC());
-        result = true;
-    }
-
-    /*
-    QString onvifUrlSource = onvifR->getDeviceOnvifUrl();
-    QString mediaUrlSource = onvifR->getMediaUrl();
-
-
-    if (onvifUrlSource.size() != 0 && QUrl(onvifUrlSource).host().size() != 0 && getDeviceOnvifUrl() != onvifUrlSource)
-    {
-        setDeviceOnvifUrl(onvifUrlSource);
-        result = true;
-    }
-
-    if (mediaUrlSource.size() != 0 && QUrl(mediaUrlSource).host().size() != 0 && getMediaUrl() != mediaUrlSource)
-    {
-        setMediaUrl(mediaUrlSource);
-        result = true;
-    }
-
-    if (getDeviceOnvifUrl().size()!=0 && QUrl(getDeviceOnvifUrl()).host().size()==0)
-    {
-        // trying to introduce fix for dw cam 
-        QString temp = getDeviceOnvifUrl();
-
-        QUrl newUrl(getDeviceOnvifUrl());
-        newUrl.setHost(getHostAddress());
-        setDeviceOnvifUrl(newUrl.toString());
-        qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << getDeviceOnvifUrl();
-        result = true;
-    }
-
-    if (getMediaUrl().size() != 0 && QUrl(getMediaUrl()).host().size()==0)
-    {
-        // trying to introduce fix for dw cam 
-        QString temp = getMediaUrl();
-        QUrl newUrl(getMediaUrl());
-        newUrl.setHost(getHostAddress());
-        setMediaUrl(newUrl.toString());
-        qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << getMediaUrl();
-        result = true;
-    }
-    */
 
     return result;
 }
@@ -1567,6 +1521,35 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     return true;
 }
 
+CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOptionsLocal>& optionsList)
+{
+    QAuthenticator auth(getAuth());
+    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user(), auth.password(), m_timeDrift);
+
+    ProfilesReq request;
+    ProfilesResp response;
+
+    int soapRes = soapWrapper.getProfiles(request, response);
+    if (soapRes == SOAP_OK)
+    {
+        for (auto iter = response.Profiles.begin(); iter != response.Profiles.end(); ++iter) 
+        {
+            Profile* profile = *iter;
+            if (profile->token.empty() || !profile->VideoEncoderConfiguration)
+                continue;
+            QString vEncoderID = QString::fromStdString(profile->VideoEncoderConfiguration->token);
+            for (int i = 0; i < optionsList.size(); ++i) {
+                if (optionsList[i].id == vEncoderID)
+                    optionsList[i].usedInProfiles = true;
+            }
+        }
+        return CameraDiagnostics::NoErrorResult();
+    }
+    else {
+        return CameraDiagnostics::RequestFailedResult(QLatin1String("getProfiles"), soapWrapper.getLastError());
+    }
+}
+
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
     VideoConfigsReq confRequest;
@@ -1645,8 +1628,6 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
             return CameraDiagnostics::RequestFailedResult(QLatin1String("getVideoEncoderConfigurationOptions"), soapWrapper.getLastError());
     }
 
-    qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
-
     if (optionsList.isEmpty())
     {
 #ifdef PL_ONVIF_DEBUG
@@ -1655,6 +1636,11 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 #endif
         return CameraDiagnostics::RequestFailedResult(QLatin1String("fetchAndSetVideoEncoderOptions"), QLatin1String("no video options"));
     }
+
+    CameraDiagnostics::Result result = updateVEncoderUsage(optionsList);
+    if (!result)
+        return result;
+    qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
 
     /*
     if (optionsList.size() <= m_channelNumer)

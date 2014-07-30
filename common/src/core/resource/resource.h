@@ -34,9 +34,11 @@ class QnResourcePool;
 class QnInitResPool: public QThreadPool
 {
 public:
+    static const int DEFAULT_RESOURCE_INIT_THREADS_COUNT = 64;
+
     QnInitResPool() : QThreadPool() 
     {
-        setMaxThreadCount(64);
+        setMaxThreadCount( DEFAULT_RESOURCE_INIT_THREADS_COUNT );
     }
 };
 
@@ -263,6 +265,8 @@ public:
     QString getProperty(const QString &key, const QString &defaultValue = QString()) const;
     void setProperty(const QString &key, const QString &value);
     QnKvPairList getProperties() const;
+
+    static QnInitResPool* initAsyncPoolInstance();
 
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QnParam &param) const;

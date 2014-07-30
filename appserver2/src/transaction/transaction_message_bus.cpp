@@ -513,8 +513,8 @@ bool QnTransactionMessageBus::doHandshake(QnTransactionTransport* transport)
 
         QnTransaction<ApiCameraServerItemDataList> tranCameraHistory;
         tranCameraHistory.command = ApiCommand::getCameraHistoryItems;
-        tranLayouts.peerID = m_localPeer.id;
-        if (dbManager->doQuery(nullptr, tranLayouts.params) != ErrorCode::ok) {
+        tranCameraHistory.peerID = m_localPeer.id;
+        if (dbManager->doQuery(nullptr, tranCameraHistory.params) != ErrorCode::ok) {
             qWarning() << "Can't execute query for sync with client peer!";
             return false;
         }

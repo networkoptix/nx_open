@@ -5,24 +5,21 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QUuid>
 #include <QtCore/QtEndian>
-#include <QtCore/QCryptographicHash>
+#include <QCryptographicHash>
 
 #include <common/common_globals.h>
 
 typedef QUuid QnId; // TODO: #Elric remove this typedef. It's useless and it prevents forward declarations.
 typedef QSet<QnId> QnIdSet;
 
-inline QnId intToGuid(qint32 value)
+inline QnId intToGuid(qint32 value, const QByteArray& postfix)
 {
-    QByteArray data(16, 0);
-    *((quint32*) data.data()) = qToBigEndian(value);
-    return QnId::fromRfc4122(data);
-}
-
-inline int guidToInt(const QnId& guid)
-{
-    QByteArray data = guid.toRfc4122();
-    return qFromBigEndian(*((quint32*) data.data()));
+    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
+    value = qToBigEndian(value);
+    md5Hash.addData((const char*) &value, sizeof(value));
+    md5Hash.addData(postfix);
+    QByteArray ha2 = md5Hash.result();
+    return QnId::fromRfc4122(ha2);
 }
 
 inline QString guidToSqlString(const QnId& guid)

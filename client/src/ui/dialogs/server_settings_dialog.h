@@ -69,7 +69,6 @@ private slots:
     void at_updateRebuildInfo();
 
     void at_replyReceived(int status, const QnStorageSpaceReply &reply, int handle);
-
 private:
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;

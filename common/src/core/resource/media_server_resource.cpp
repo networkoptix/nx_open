@@ -68,18 +68,6 @@ QString QnMediaServerResource::getApiUrl() const
     return m_apiUrl;
 }
 
-void QnMediaServerResource::setStreamingUrl(const QString& value)
-{
-    QMutexLocker lock(&m_mutex);
-    m_streamingUrl = value;
-}
-
-const QString& QnMediaServerResource::getStreamingUrl() const
-{
-    QMutexLocker lock(&m_mutex);
-    return m_streamingUrl;
-}
-
 void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
 {
     QMutexLocker lock(&m_mutex);
@@ -308,7 +296,6 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         m_serverFlags = localOther->m_serverFlags;
         netAddrListChanged = m_netAddrList != localOther->m_netAddrList;
         m_netAddrList = localOther->m_netAddrList;
-        m_streamingUrl = localOther->getStreamingUrl();
         m_version = localOther->getVersion();
         m_systemInfo = localOther->getSystemInfo();
         m_systemName = localOther->getSystemName();
@@ -433,4 +420,14 @@ qint64 QnMediaServerResource::currentStatusTime() const
 {
     QMutexLocker lock(&m_mutex);
     return m_statusTimer.elapsed();
+}
+
+QString QnMediaServerResource::getAuthKey() const
+{
+    return m_authKey;
+}
+
+void QnMediaServerResource::setAuthKey(const QString& authKey)
+{
+    m_authKey = authKey;
 }
