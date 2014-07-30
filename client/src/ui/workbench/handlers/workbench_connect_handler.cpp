@@ -116,7 +116,8 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
     foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
-        if(snapshotManager()->isLocal(layout))
+        if(snapshotManager()->isLocal(layout) 
+            && !snapshotManager()->isFile(layout))  //do not remove exported layouts
             resourcePool()->removeResource(layout);
 
     qnLicensePool->reset();
