@@ -31,6 +31,7 @@
 #include <nx_ec/data/api_time_data.h>
 #include "nx_ec/data/api_conversion_functions.h"
 #include "api/runtime_info_manager.h"
+#include "utils/common/log.h"
 
 using std::nullptr_t;
 
@@ -658,6 +659,8 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
 
     if (!isObjectExists(lit("table"), lit("vms_resource"), m_sdb))
     {
+        NX_LOG(QString("Create new database"), cl_logINFO);
+
         *dbJustCreated = true;
 
         if (!execSQLFile(lit(":/01_createdb.sql"), m_sdb))
@@ -675,6 +678,7 @@ bool QnDbManager::createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2)
 
     if (!isObjectExists(lit("table"), lit("transaction_log"), m_sdb))
     {
+        NX_LOG(QString("Update database to v 2.3"), cl_logINFO);
 
         if (!migrateBusinessEvents())
             return false;
