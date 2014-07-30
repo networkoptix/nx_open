@@ -810,6 +810,11 @@ QnKvPairList QnResource::getProperties() const {
     return result;
 }
 
+QnInitResPool* QnResource::initAsyncPoolInstance()
+{
+    return &m_initAsyncPool;
+}
+
 // -----------------------------------------------------------------------------
 
 #ifdef ENABLE_DATA_PROVIDERS
