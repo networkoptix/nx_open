@@ -29,10 +29,12 @@ namespace ec2
 
         //preparing output data
         QnVirtualCameraResourceList cameraList;
-        if (resource->getId().isNull()) {
-            Q_ASSERT_X(false, Q_FUNC_INFO, "You must fill camera ID as md5 hash of unique id");
+        Q_ASSERT_X(
+            resource->getId() == QnVirtualCameraResource::uniqueIdToId( resource->getUniqueId() ),
+            Q_FUNC_INFO,
+            "You must fill camera ID as md5 hash of unique id" );
+        if( resource->getId().isNull() )
             resource->setId(QnId::createUuid());
-        }
         cameraList.push_back( resource );
 
         //performing request
