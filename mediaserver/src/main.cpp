@@ -1378,7 +1378,9 @@ void QnMain::run()
 
 
     //===========================================================================
-    //IPPH264Decoder::dll.init();
+    QnResource::initAsyncPoolInstance()->setMaxThreadCount( MSSettings::roSettings()->value(
+        nx_ms_conf::RESOURCE_INIT_THREADS_COUNT,
+        nx_ms_conf::DEFAULT_RESOURCE_INIT_THREADS_COUNT ).toInt() );
 
     //============================
     std::unique_ptr<UPNPDeviceSearcher> upnpDeviceSearcher(new UPNPDeviceSearcher());

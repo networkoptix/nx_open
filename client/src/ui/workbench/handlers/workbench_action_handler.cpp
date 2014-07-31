@@ -1201,7 +1201,10 @@ void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
 
 void QnWorkbenchActionHandler::at_cameraListAction_triggered() {
     QnNonModalDialogConstructor<QnCameraListDialog> dialogConstructor(m_cameraListDialog, mainWindow());
-    QnMediaServerResourcePtr server = menu()->currentParameters(sender()).resource().dynamicCast<QnMediaServerResource>();
+    QnActionParameters parameters = menu()->currentParameters(sender());
+    QnMediaServerResourcePtr server;
+    if (!parameters.resources().isEmpty())
+        server = parameters.resource().dynamicCast<QnMediaServerResource>();
     cameraListDialog()->setServer(server);
 }
 

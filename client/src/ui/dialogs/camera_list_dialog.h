@@ -33,7 +33,7 @@ private:
     Q_SIGNAL void updateWindowTitleQueued();
     void updateWindowTitleLater();
     void updateWindowTitle();
-    void updateCriterion(const QString &text);
+    void updateCriterion();
 
     void at_camerasView_customContextMenuRequested(const QPoint &pos);
     void at_exportAction_triggered();
