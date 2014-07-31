@@ -198,7 +198,7 @@ void QnSingleCameraSettingsWidget::updateWebPage(QStackedLayout* stackedLayout ,
 {
     if ( qnCommon )
     {
-        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera, true);
+        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
         bool showUrl = resourceData.value<bool>(lit("showUrl"), false);
         if ( showUrl && m_camera->getStatus() != QnResource::Offline )
         {
@@ -1010,7 +1010,7 @@ void QnSingleCameraSettingsWidget::updateLicenseText() {
     if (!m_camera || !m_camera->isDtsBased())
         return;
 
-    QnLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper;
 
     helper.propose(QnVirtualCameraResourceList() << m_camera, ui->analogViewCheckBox->isChecked());
 

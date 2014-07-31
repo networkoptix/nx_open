@@ -59,27 +59,24 @@ namespace {
 
 struct LicenseTypeInfo
 {
-    LicenseTypeInfo(): licenseType(Qn::LC_CountTotal), allowedForEdge(0) {}
-    LicenseTypeInfo(Qn::LicenseType licenseType,  const QnLatin1Array& programName, const QString& displayName, const QString& longName, bool allowedForEdge):
-        licenseType(licenseType), programName(programName), displayName(displayName), longName(longName), allowedForEdge(allowedForEdge) {}
+    LicenseTypeInfo(): licenseType(Qn::LC_Count), allowedForEdge(0) {}
+    LicenseTypeInfo(Qn::LicenseType licenseType,  const QnLatin1Array& className, bool allowedForEdge):
+        licenseType(licenseType), className(className), allowedForEdge(allowedForEdge) {}
 
     Qn::LicenseType licenseType;
-    QnLatin1Array programName;
-    QString displayName;
-    QString longName;
+    QnLatin1Array className;
     bool allowedForEdge;
 };
 
-static std::array<LicenseTypeInfo, Qn::LC_CountTotal>  licenseTypeInfo =
+static std::array<LicenseTypeInfo, Qn::LC_Count>  licenseTypeInfo =
 {
-    LicenseTypeInfo(Qn::LC_Trial,           "trial",         QObject::tr("Trial"),           QObject::tr("Trial license(s)"),          1),
-    LicenseTypeInfo(Qn::LC_Analog,          "analog",        QObject::tr("Analog"),          QObject::tr("Analog license(s)"),         0),
-    LicenseTypeInfo(Qn::LC_Professional,    "digital",       QObject::tr("Professional"),    QObject::tr("Professional license(s)"),   0),
-    LicenseTypeInfo(Qn::LC_Edge,            "edge",          QObject::tr("Edge"),            QObject::tr("Edge license(s)"),           1),
-    LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          QObject::tr("Vmax"),            QObject::tr("Vmax license(s)"),           0),
-    LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", QObject::tr("Analog encoder"),  QObject::tr("Analog encoder license(s)"), 0),
-    LicenseTypeInfo(), // filler
-    LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     QObject::tr("Video wall"),      QObject::tr("Video wall license(s)"),     1)
+    LicenseTypeInfo(Qn::LC_Trial,           "trial",         1),
+    LicenseTypeInfo(Qn::LC_Analog,          "analog",        0),
+    LicenseTypeInfo(Qn::LC_Professional,    "digital",       0),
+    LicenseTypeInfo(Qn::LC_Edge,            "edge",          1),
+    LicenseTypeInfo(Qn::LC_VMAX,            "vmax",          0),
+    LicenseTypeInfo(Qn::LC_AnalogEncoder,   "analogencoder", 0),
+    LicenseTypeInfo(Qn::LC_VideoWall,       "videowall",     1)
 };
 } // anonymous namespace
 
@@ -135,6 +132,44 @@ QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
         return QnLicensePtr();
 
     return QnLicensePtr(new QnLicense(licenseBlock));
+}
+
+QString QnLicense::displayName() const {
+    return QnLicense::displayName(type());
+}
+
+QString QnLicense::displayName(Qn::LicenseType licenseType) {
+    switch (licenseType) {
+    case Qn::LC_Trial:          return tr("Trial");
+    case Qn::LC_Analog:         return tr("Analog");
+    case Qn::LC_Professional:   return tr("Professional");
+    case Qn::LC_Edge:           return tr("Edge");
+    case Qn::LC_VMAX:           return tr("Vmax");
+    case Qn::LC_AnalogEncoder:  return tr("Analog encoder");
+    case Qn::LC_VideoWall:      return tr("Video Wall");
+    default:
+        break;
+    }
+    return QString();
+}
+
+QString QnLicense::longDisplayName() const {
+    return QnLicense::longDisplayName(type());
+}
+
+QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
+    switch (licenseType) {
+    case Qn::LC_Trial:          return tr("Trial license(s)");
+    case Qn::LC_Analog:         return tr("Analog license(s)");
+    case Qn::LC_Professional:   return tr("Professional license(s)");
+    case Qn::LC_Edge:           return tr("Edge license(s)");
+    case Qn::LC_VMAX:           return tr("Vmax license(s)");
+    case Qn::LC_AnalogEncoder:  return tr("Analog encoder license(s)");
+    case Qn::LC_VideoWall:      return tr("Video Wall license(s)");
+    default:
+        break;
+    }
+    return QString();
 }
 
 const QString &QnLicense::name() const
@@ -295,30 +330,18 @@ Qn::LicenseType QnLicense::type() const
     if (key() == qnProductFeatures().freeLicenseKey.toLatin1())
         return Qn::LC_Trial;
 
+    if (xclass().toLower().toUtf8() == licenseTypeInfo[Qn::LC_VideoWall].className)
+        return Qn::LC_VideoWall;
+
     if (!expiration().isEmpty())
         return Qn::LC_Trial;
     
-    for (int i = 0; i < Qn::LC_CountTotal; ++i) {
-        if (xclass().toLower().toUtf8() == licenseTypeInfo[i].programName)
+    for (int i = 0; i < Qn::LC_Count; ++i) {
+        if (xclass().toLower().toUtf8() == licenseTypeInfo[i].className)
             return licenseTypeInfo[i].licenseType;
     }
 
     return Qn::LC_Professional; // default value
-}
-
-QString QnLicense::longDisplayName() const
-{
-    return licenseTypeInfo[type()].longName;
-}
-
-QString QnLicense::longDisplayName(Qn::LicenseType licenseType)
-{
-    return licenseTypeInfo[licenseType].longName;
-}
-
-QString QnLicense::displayName() const 
-{
-    return licenseTypeInfo[type()].displayName;
 }
 
 void QnLicense::parseLicenseBlock(
@@ -397,9 +420,7 @@ void QnLicense::verify( const QByteArray& v1LicenseBlock, const QByteArray& v2Li
 // -------------------------------------------------------------------------- //
 
 QnLicenseListHelper::QnLicenseListHelper(const QnLicenseList& licenseList) {
-    foreach (QnLicensePtr license, licenseList) {
-        m_licenseDict[license->key()] = license;
-    }
+    update(licenseList);
 }
 
 bool QnLicenseListHelper::haveLicenseKey(const QByteArray &key) const {
@@ -427,6 +448,13 @@ int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType) const
             result += license->cameraCount();
     }
     return result;
+}
+
+void QnLicenseListHelper::update(const QnLicenseList& licenseList) {
+    m_licenseDict.clear();
+    foreach (QnLicensePtr license, licenseList) {
+        m_licenseDict[license->key()] = license;
+    }
 }
 
 // -------------------------------------------------------------------------- //

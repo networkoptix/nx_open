@@ -9,19 +9,22 @@
 
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 
+#include <utils/common/connective.h>
+
 class QModelIndex;
 class QNetworkAccessManager;
 class QNetworkReply;
 
 class QnLicenseListModel;
+class QnLicenseUsageHelper;
 
 namespace Ui {
     class LicenseManagerWidget;
 }
 
-class QnLicenseManagerWidget : public QnAbstractPreferencesWidget {
+class QnLicenseManagerWidget : public Connective<QnAbstractPreferencesWidget> {
     Q_OBJECT
-    typedef QnAbstractPreferencesWidget base_type;
+    typedef Connective<QnAbstractPreferencesWidget> base_type;
 
 public:
     explicit QnLicenseManagerWidget(QWidget *parent = 0);
@@ -55,6 +58,8 @@ private:
 
     QScopedPointer<Ui::LicenseManagerWidget> ui;
     QnLicenseListModel *m_model;
+    QScopedPointer<QnLicenseUsageHelper> m_camerasUsageHelper;
+    QScopedPointer<QnLicenseUsageHelper> m_videowallUsageHelper;
     QNetworkAccessManager *m_httpClient;
     QnLicenseList m_licenses;
     QMap<QNetworkReply*, QByteArray> m_replyKeyMap;

@@ -261,7 +261,7 @@ bool QnSecurityCamResource::isAnalog() const {
 
 bool QnSecurityCamResource::isAnalogEncoder() const {
     const QnSecurityCamResourcePtr ptr = toSharedPointer(const_cast<QnSecurityCamResource*> (this));
-    QnResourceData resourceData = qnCommon->dataPool()->data(ptr, true);
+    QnResourceData resourceData = qnCommon->dataPool()->data(ptr);
     return resourceData.value<bool>(lit("analogEncoder"));
 }
 

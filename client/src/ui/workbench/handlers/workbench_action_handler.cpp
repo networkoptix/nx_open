@@ -554,7 +554,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     //checking if showing Licenses limit exceeded is appropriate
     if( cameraSettingsDialog()->widget()->licensedParametersModified() )
     {
-        QnLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
+        QnCamLicenseUsageHelper helper(cameras, cameraSettingsDialog()->widget()->isScheduleEnabled());
         if (!helper.isValid())
         {
             QString message = tr("Licenses limit exceeded. The changes will be saved, but will not take effect.");
@@ -844,6 +844,8 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionClosed() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
     action(Qn::ConnectToServerAction)->setText(tr("Connect to Server..."));
 
+    disconnect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, NULL);
+
     if (!mainWindow())
         return;
 
@@ -905,6 +907,11 @@ void QnWorkbenchActionHandler::at_messageProcessor_connectionOpened() {
     }
 
     connection2()->sendRuntimeData(QnRuntimeInfoManager::instance()->localInfo().data);
+    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, [this](const QnPeerRuntimeInfo &info) {
+        if (info.uuid != qnCommon->moduleGUID())
+            return;
+        connection2()->sendRuntimeData(info.data);
+    });
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {

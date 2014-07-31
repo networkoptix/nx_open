@@ -36,6 +36,8 @@
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::LicenseManagerWidget),
+    m_camerasUsageHelper(new QnCamLicenseUsageHelper()),
+    m_videowallUsageHelper(new QnVideoWallLicenseUsageHelper()),
     m_httpClient(NULL)
 {
     ui->setupUi(this);
@@ -65,6 +67,8 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     connect(ui->gridLicenses,                   SIGNAL(doubleClicked(const QModelIndex &)),                         this,   SLOT(at_gridLicenses_doubleClicked(const QModelIndex &)));
     connect(ui->licenseWidget,                  SIGNAL(stateChanged()),                                             this,   SLOT(at_licenseWidget_stateChanged()));
     connect(this,                               SIGNAL(showMessageLater(QString,QString,bool)),                     this,   SLOT(showMessage(QString,QString,bool)), Qt::QueuedConnection);
+    connect(m_camerasUsageHelper,               &QnLicenseUsageHelper::licensesChanged,                             this,   &QnLicenseManagerWidget::updateLicenses);
+    connect(m_videowallUsageHelper,             &QnLicenseUsageHelper::licensesChanged,                             this,   &QnLicenseManagerWidget::updateLicenses);
 
     updateLicenses();
     updateDetailsButtonEnabled();
@@ -104,34 +108,37 @@ void QnLicenseManagerWidget::updateLicenses() {
     bool useRedLabel = false;
 
     if (!m_licenses.isEmpty()) {
-        QnLicenseUsageHelper helper;
-
         // TODO: #Elric #TR total mess with numerous forms, and no idea how to fix it in a sane way
 
         QString msg(tr("The software is licensed to: "));
-        for (int i = 0; i < Qn::LC_CountTotal; ++i)
-        {
-            Qn::LicenseType licenseType = Qn::LicenseType(i);
-            if (helper.totalLicense(licenseType) > 0)
-                msg += tr("\n%1 %2").arg(helper.totalLicense(licenseType)).arg(QnLicense::longDisplayName(licenseType));
-        }
 
-        if (!helper.isValid()) 
-        {
-            useRedLabel = true;
-            for (int i = 0; i < Qn::LC_CountTotal; ++i)
-            {
-                Qn::LicenseType licenseType = Qn::LicenseType(i);
-                if (helper.usedLicense(licenseType) > 0)
-                    msg += tr("\nAt least %n %2 are required", "", helper.usedLicense(licenseType)).arg(QnLicense::longDisplayName(licenseType));
+        QList<QnLicenseUsageHelper*> helpers;
+        helpers 
+            << m_camerasUsageHelper.data()
+            << m_videowallUsageHelper.data()
+            ;
+
+        foreach (QnLicenseUsageHelper* helper, helpers) {
+            foreach (Qn::LicenseType lt, helper->licenseTypes()) {
+                if (helper->totalLicense(lt) > 0)
+                    msg += tr("\n%1 %2").arg(helper->totalLicense(lt)).arg(QnLicense::longDisplayName(lt));
             }
         }
-        else {
-            for (int i = 0; i < Qn::LC_CountTotal; ++i)
+
+        foreach (QnLicenseUsageHelper *helper, helpers) {
+            if (!helper->isValid()) 
             {
-                Qn::LicenseType licenseType = Qn::LicenseType(i);
-                if (helper.usedLicense(licenseType) > 0)
-                    msg += tr("\n%n %2 are currently in use", "", helper.usedLicense(licenseType)).arg(QnLicense::longDisplayName(licenseType));
+                useRedLabel = true;
+                foreach (Qn::LicenseType lt, helper->licenseTypes()) {
+                    if (helper->usedLicense(lt) > 0)
+                        msg += tr("\nAt least %n %2 are required", "", helper->usedLicense(lt)).arg(QnLicense::longDisplayName(lt));
+                }
+            }
+            else {
+                foreach (Qn::LicenseType lt, helper->licenseTypes()) {
+                    if (helper->usedLicense(lt) > 0)
+                        msg += tr("\n%n %2 are currently in use", "", helper->usedLicense(lt)).arg(QnLicense::longDisplayName(lt));
+                }
             }
         }
         ui->infoLabel->setText(msg);
@@ -269,19 +276,22 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     }
 }
 
-void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
+void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license) {
+    QString features = (license->type() == Qn::LC_VideoWall)
+        ? tr("Screens and Control Sessions Allowed: %1").arg(license->cameraCount())
+        : tr("Archive Streams Allowed: %1").arg(license->cameraCount());
+    
     QString details = tr("<b>Generic:</b><br />\n"
         "License Type: %1<br />\n"
         "License Key: %2<br />\n"
         "Locked to Hardware ID: %3<br />\n"
         "<br />\n"
-        "<b>Features:</b><br />\n"
-        "Archive Streams Allowed: %4")
+        "<b>Features:</b><br />\n")
         .arg(license->displayName())
         .arg(QLatin1String(license->key()))
         .arg(QLatin1String(qnLicensePool->currentHardwareId()))
-        .arg(license->cameraCount());
-    QMessageBox::information(this, tr("License Details"), details);
+        ;
+    QMessageBox::information(this, tr("License Details"), details + features);
 }
 
 void QnLicenseManagerWidget::updateDetailsButtonEnabled() 
@@ -328,7 +338,7 @@ void QnLicenseManagerWidget::at_licensesReceived(int handle, ec2::ErrorCode erro
 
 void QnLicenseManagerWidget::at_downloadError() {
     if (QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender())) {
-        disconnect(reply, 0, this, 0); //avoid double "onError" handling
+        disconnect(reply, NULL, this, NULL); //avoid double "onError" handling
         m_replyKeyMap.remove(reply);
         reply->deleteLater();
 

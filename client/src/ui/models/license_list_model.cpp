@@ -62,7 +62,7 @@ void QnLicenseListModel::setColors(const QnLicensesListModelColors &colors) {
 QString QnLicenseListModel::columnTitle(Column column) {
     switch(column) {
     case TypeColumn:            return tr("Type");
-    case CameraCountColumn:     return tr("Cameras");
+    case CameraCountColumn:     return tr("Amount");
     case LicenseKeyColumn:      return tr("License Key");
     case ExpirationDateColumn:  return tr("Expiration Date");
     case LicenseStatusColumn:   return tr("Status");
