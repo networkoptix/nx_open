@@ -41,9 +41,16 @@ SYSTEM_NAME=$COMPANY_NAME
 ALLOW_CAMERA_CHANGES_DEFAULT=true
 
 function is_local_addr {
-    local addr=$1;
+    local hostname=$1;
+    local addr=$(gethostip -d $hostname)
 
-    ip -4 -o addr | awk '!/^[0-9]*: ?lo|link\/ether/ {gsub("/", " "); print $4}' | grep "^$addr$" > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+	addr=$hostname
+    fi
+
+    [[ "$addr" =~ ^127.[0-9]+.[0-9]+.[0-9]+$ ]] && return 0
+
+    ip -4 -o addr | awk '{gsub("/", " "); print $4;}' | grep "^$addr$" > /dev/null 2>&1
 }
 
 function to_int {
