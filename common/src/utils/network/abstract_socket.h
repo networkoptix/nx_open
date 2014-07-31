@@ -7,7 +7,7 @@
 #define ABSTRACT_SOCKET_H
 
 #include <cstdint> /* For std::uintptr_t. */
-
+#include <functional>
 #include <memory>
 
 #include <utils/common/byte_array.h>
@@ -149,15 +149,6 @@ class AbstractCommunicatingSocket
     virtual public AbstractSocket
 {
 public:
-    //!This class for internal use only. MAY be removed or changed in future
-    class AbstractAsyncIOHandler
-    {
-    public:
-        virtual ~AbstractAsyncIOHandler() {}
-        virtual void done( SystemError::ErrorCode errorCode, size_t bytesProcessed ) = 0;
-    };
-
-
     virtual ~AbstractCommunicatingSocket() {}
 
     static const int DEFAULT_TIMEOUT_MILLIS = 3000;
@@ -223,7 +214,7 @@ public:
     template<class HandlerType>
         bool readSomeAsync( nx::Buffer* const dst, HandlerType handler )
         {
-            return recvAsyncImpl( dst, std::unique_ptr<AbstractAsyncIOHandler>( new CustomAsyncIOHandler<HandlerType>(std::move(handler)) ) );
+            return recvAsyncImpl( dst, std::function<void( SystemError::ErrorCode, size_t )>( std::move( handler ) ) );
         }
 
     //!Asynchnouosly writes all bytes from input buffer
@@ -237,33 +228,12 @@ public:
     template<class HandlerType>
         bool sendAsync( const nx::Buffer& src, HandlerType handler )
         {
-            return sendAsyncImpl( src, std::unique_ptr<AbstractAsyncIOHandler>( new CustomAsyncIOHandler<HandlerType>(std::move(handler)) ) );
+            return sendAsyncImpl( src, std::function<void( SystemError::ErrorCode, size_t )>( std::move( handler ) ) );
         }
 
 protected:
-    template<class HandlerFunc>
-    class CustomAsyncIOHandler
-    :
-        public AbstractAsyncIOHandler
-    {
-    public:
-        CustomAsyncIOHandler( const HandlerFunc& handler ) : m_handler( handler ) {}
-        CustomAsyncIOHandler( const HandlerFunc&& handler ) : m_handler( handler ) {}
-
-        virtual void done( SystemError::ErrorCode errorCode, size_t bytesProcessed ) override
-        {
-            m_handler( errorCode, bytesProcessed );
-        }
-
-    private:
-        HandlerFunc m_handler;
-    };
-
-    /*!
-        \param handler This SHOULD be freed by implementation
-    */
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) = 0;
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) = 0;
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void(SystemError::ErrorCode, size_t)> handler ) = 0;
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void(SystemError::ErrorCode, size_t)> handler ) = 0;
 };
 
 //!Interface for connection-orientied sockets
@@ -330,38 +300,21 @@ public:
         \param handler functor with following signature:
             \code{.cpp}
                 ( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection )
+                //\a newConnection is \a nullptr in case of error
             \endcode
             \a newConnection is NULL, if errorCode is not SystemError::noError
     */
     template<class HandlerType>
         bool acceptAsync( HandlerType handler )
         {
-            return acceptAsyncImpl( std::unique_ptr<AbstractAsyncAcceptHandler>(new CustomAsyncAcceptHandler<HandlerType>(std::move(handler))) );
+            return acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>( std::move(handler) ) );
         }
 
 protected:
-    template<class HandlerFunc>
-    class CustomAsyncAcceptHandler
-    :
-        public AbstractAsyncAcceptHandler
-    {
-    public:
-        CustomAsyncAcceptHandler( const HandlerFunc& handler ) : m_handler( handler ) {}
-        CustomAsyncAcceptHandler( const HandlerFunc&& handler ) : m_handler( handler ) {}
-
-        virtual void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection ) override
-        {
-            m_handler( errorCode, newConnection );
-        }
-
-    private:
-        HandlerFunc m_handler;
-    };
-
     /*!
         \param handler This SHOULD be freed by implementation
     */
-    virtual bool acceptAsyncImpl( std::unique_ptr<AbstractAsyncAcceptHandler> handler ) = 0;
+    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) = 0;
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));

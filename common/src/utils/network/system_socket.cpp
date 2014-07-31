@@ -603,10 +603,10 @@ class CommunicatingSocketPrivate
     public aio::AIOEventHandler
 {
 public:
-    std::unique_ptr<AbstractCommunicatingSocket::AbstractAsyncIOHandler> recvHandler;
+    std::function<void( SystemError::ErrorCode, size_t )> recvHandler;
     nx::Buffer* recvBuffer;
     std::atomic<size_t> recvAsyncCallCounter;
-    std::unique_ptr<AbstractCommunicatingSocket::AbstractAsyncIOHandler> sendHandler;
+    std::function<void( SystemError::ErrorCode, size_t )> sendHandler;
     const nx::Buffer* sendBuffer;
     size_t sendBufPos;
     std::atomic<size_t> sendAsyncCallCounter;
@@ -627,7 +627,7 @@ public:
             if( recvAsyncCallCounterBak == recvAsyncCallCounter )
             {
                 recvBuffer = nullptr;
-                recvHandler.reset();
+                recvHandler = std::function<void( SystemError::ErrorCode, size_t )>();
                 aio::AIOService::instance()->removeFromWatch( sock, aio::etRead );
             }
         };
@@ -638,7 +638,7 @@ public:
             if( sendAsyncCallCounterBak == sendAsyncCallCounter )
             {
                 sendBuffer = nullptr;
-                sendHandler.reset();
+                sendHandler = std::function<void( SystemError::ErrorCode, size_t )>();
                 aio::AIOService::instance()->removeFromWatch( sock, aio::etWrite );
             }
         };
@@ -660,13 +660,13 @@ public:
                 if( bytesRead == -1 )
                 {
                     recvBuffer->resize( bufSizeBak );
-                    recvHandler->done( SystemError::getLastOSErrorCode(), (size_t)-1 );
+                    recvHandler( SystemError::getLastOSErrorCode(), (size_t)-1 );
                 }
                 else
                 {
                     if( bytesRead > 0 )
                         recvBuffer->resize( bufSizeBak + bytesRead );   //shrinking buffer
-                    recvHandler->done( SystemError::noError, bytesRead );
+                    recvHandler( SystemError::noError, bytesRead );
                 }
                 break;
             }
@@ -681,7 +681,7 @@ public:
                     sendBuffer->size() - sendBufPos );
                 if( bytesWritten == -1 || bytesWritten == 0 )
                 {
-                    sendHandler->done(
+                    sendHandler(
                         bytesWritten == 0 ? SystemError::connectionReset : SystemError::getLastOSErrorCode(),
                         sendBufPos );
                     break;
@@ -690,7 +690,7 @@ public:
                 sendBufPos += bytesWritten;
                 if( sendBufPos == sendBuffer->size() )
                 {
-                    sendHandler->done( SystemError::noError, sendBufPos );
+                    sendHandler( SystemError::noError, sendBufPos );
                     sendBufPos = 0;
                 }
                 break;
@@ -699,31 +699,34 @@ public:
             case aio::etReadTimedOut:
             {
                 std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_read)> cleanupGuard( this, __finally_read );
-                recvHandler->done( SystemError::timedOut, (size_t)-1 );
+                recvHandler( SystemError::timedOut, (size_t)-1 );
                 break;
             }
 
             case aio::etWriteTimedOut:
             {
                 std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
-                sendHandler->done( SystemError::timedOut, (size_t)-1 );
+                sendHandler( SystemError::timedOut, (size_t)-1 );
                 break;
             }
 
             case aio::etError:
-                //TODO/IMPL distinguish read and write
-                //TODO/IMPL get correct socket error
+            {
+                //TODO #ak distinguish read and write
+                SystemError::ErrorCode sockErrorCode = SystemError::notConnected;
+                sock->getLastError( &sockErrorCode );
                 if( recvHandler )
                 {
                     std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_read)> cleanupGuard( this, __finally_read );
-                    recvHandler->done( SystemError::notConnected, (size_t)-1 );
+                    recvHandler( sockErrorCode, (size_t)-1 );
                 }
                 if( sendHandler )
                 {
                     std::unique_ptr<CommunicatingSocketPrivate, decltype(__finally_write)> cleanupGuard( this, __finally_write );
-                    sendHandler->done( SystemError::notConnected, (size_t)-1 );
+                    sendHandler( sockErrorCode, (size_t)-1 );
                 }
                 break;
+            }
 
             default:
                 assert( false );
@@ -1026,7 +1029,7 @@ unsigned short CommunicatingSocket::getForeignPort()  {
 
 static const int DEFAULT_RESERVE_SIZE = 4*1024;
 
-bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<AbstractAsyncIOHandler> handler )
+bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )> handler )
 {
     CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>( impl() );
 
@@ -1038,7 +1041,7 @@ bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<
     return aio::AIOService::instance()->watchSocket( this, aio::etRead, d );
 }
 
-bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<AbstractAsyncIOHandler> handler )
+bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )> handler )
 {
     CommunicatingSocketPrivate* d = static_cast<CommunicatingSocketPrivate*>( impl() );
 
@@ -1203,7 +1206,7 @@ class TCPServerSocketPrivate
     public aio::AIOEventHandler
 {
 public:
-    std::unique_ptr<AbstractStreamServerSocket::AbstractAsyncAcceptHandler> acceptHandler;
+    std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> acceptHandler;
     int socketHandle;
     std::atomic<int> acceptAsyncCallCount;
 
@@ -1225,19 +1228,19 @@ public:
             {
                 //accepting socket
                 AbstractStreamSocket* newSocket = dynamic_cast<TCPServerSocket*>(sock)->accept();
-                acceptHandler->onNewConnection(
+                acceptHandler(
                     newSocket != nullptr ? SystemError::noError : SystemError::getLastOSErrorCode(),
                     newSocket );
                 break;
             }
 
             case aio::etReadTimedOut:
-                acceptHandler->onNewConnection( SystemError::timedOut, nullptr );
+                acceptHandler( SystemError::timedOut, nullptr );
                 break;
 
             case aio::etError:
                 //TODO/IMPL get correct socket error
-                acceptHandler->onNewConnection( SystemError::connectionReset, nullptr );
+                acceptHandler( SystemError::connectionReset, nullptr );
                 break;
 
             default:
@@ -1250,7 +1253,7 @@ public:
             return;
 
         aio::AIOService::instance()->removeFromWatch( sock, aio::etRead );
-        acceptHandler.reset();
+        acceptHandler = std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>();
     }
 
     AbstractStreamSocket* accept( unsigned int recvTimeoutMs )
@@ -1297,7 +1300,7 @@ int TCPServerSocket::accept(int sockDesc)
     return acceptWithTimeout( sockDesc );
 }
 
-bool TCPServerSocket::acceptAsyncImpl( std::unique_ptr<AbstractStreamServerSocket::AbstractAsyncAcceptHandler> handler )
+bool TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler )
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>( impl() );
 

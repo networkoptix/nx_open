@@ -74,9 +74,9 @@ protected:
     int sendInternal( const void* buffer, unsigned int bufferLen );
 
     //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) override;
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) override;
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
 
 private:
     void init();
@@ -94,9 +94,9 @@ public:
 
 protected:
     //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) override;
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) override;
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
 
 private:
     Q_DECLARE_PRIVATE(QnMixedSSLSocket);

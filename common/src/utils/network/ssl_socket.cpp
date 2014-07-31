@@ -535,13 +535,13 @@ AbstractSocket::SOCKET_HANDLE QnSSLSocket::handle() const
     return d->wrappedSocket->handle();
 }
 
-bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const /*buf*/, std::unique_ptr<AbstractAsyncIOHandler> /*handler*/ )
+bool QnSSLSocket::recvAsyncImpl( nx::Buffer* const /*buf*/, std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
 {
     assert( false );
     return false;
 }
 
-bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& /*buf*/, std::unique_ptr<AbstractAsyncIOHandler> /*handler*/ )
+bool QnSSLSocket::sendAsyncImpl( const nx::Buffer& /*buf*/, std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
 {
     assert( false );
     return false;
@@ -615,14 +615,14 @@ int QnMixedSSLSocket::send( const void* buffer, unsigned int bufferLen )
 }
 
 //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const /*buf*/, std::unique_ptr<AbstractAsyncIOHandler> /*handler*/ )
+bool QnMixedSSLSocket::recvAsyncImpl( nx::Buffer* const /*buf*/, std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
 {
     assert( false );
     return false;
 }
 
 //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& /*buf*/, std::unique_ptr<AbstractAsyncIOHandler> /*handler*/ )
+bool QnMixedSSLSocket::sendAsyncImpl( const nx::Buffer& /*buf*/, std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
 {
     assert( false );
     return false;

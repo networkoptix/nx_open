@@ -271,9 +271,9 @@ protected:
     CommunicatingSocket(int newConnSD);
 
     //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) override;
+    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::unique_ptr<AbstractAsyncIOHandler> handler ) override;
+    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
 };
 
 /**
@@ -340,7 +340,7 @@ public:
 
 protected:
     //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
-    virtual bool acceptAsyncImpl( std::unique_ptr<AbstractStreamServerSocket::AbstractAsyncAcceptHandler> handler ) override;
+    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) override;
 
 private:
     bool setListen(int queueLen) ;
