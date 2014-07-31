@@ -267,7 +267,7 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     if (expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > expirationTime()) // TODO: #Elric make NEVER an INT64_MAX
         return gotError(errCode, Expired);
     
-    bool isEdgeBox = !info.data.box.isEmpty();
+    bool isEdgeBox = !info.data.box.trimmed().isEmpty() && info.data.box.trimmed().toLower() != lit("none");
     if (isEdgeBox && !licenseTypeInfo[type()].allowedForEdge)
         return gotError(errCode, InvalidType); // strict allowed license type for EDGE devices
 
