@@ -2284,7 +2284,7 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
     if(!workbench()->item(Qn::ZoomedRole))
         action(Qn::ToggleTourModeAction)->setChecked(false);
 
-    if (role == Qn::CentralRole && adjustVideoDialog()->isVisible())
+    if (role == Qn::CentralRole && adjustVideoDialog() && adjustVideoDialog()->isVisible())
     {
         QnWorkbenchItem *item = context()->workbench()->item(Qn::CentralRole);
         QnMediaResourceWidget* widget = dynamic_cast<QnMediaResourceWidget*> (context()->display()->widget(item));
