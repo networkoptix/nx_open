@@ -57,8 +57,7 @@
                 "VISTA|*PTW"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability",
-            "ptzTraits": "FourWayPtz",
-            "panFlipped": true
+            "ptzTraits": "FourWayPtz"
         },
         {
             "keys": [
