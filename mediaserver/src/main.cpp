@@ -632,10 +632,6 @@ int serverMain(int argc, char *argv[])
     addTestData();
 #endif
 
-    QDir stateDirectory;
-    stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
-    qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
-
     return 0;
 }
 
@@ -1149,11 +1145,18 @@ void QnMain::run()
     //QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
     QnStorageManager storageManager;
+    QnFileDeletor fileDeletor;
 
     connect(QnResourceDiscoveryManager::instance(), &QnResourceDiscoveryManager::CameraIPConflict, this, &QnMain::at_cameraIPConflict);
     connect(QnStorageManager::instance(), &QnStorageManager::noStoragesAvailable, this, &QnMain::at_storageManager_noStoragesAvailable);
     connect(QnStorageManager::instance(), &QnStorageManager::storageFailure, this, &QnMain::at_storageManager_storageFailure);
     connect(QnStorageManager::instance(), &QnStorageManager::rebuildFinished, this, &QnMain::at_storageManager_rebuildFinished);
+
+    QString dataLocation = getDataDirectory();
+    QDir stateDirectory;
+    stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
+    fileDeletor.init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
+
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
     qnCommon->setDefaultAdminPassword(settings->value(ADMIN_PASSWORD, QLatin1String("")).toString());
