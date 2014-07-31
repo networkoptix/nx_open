@@ -9,6 +9,8 @@
 #include "utils/common/sleep.h"
 #include "utils/network/ping.h"
 #include "utils/network/socket.h"
+#include "utils/network/http/httptypes.h"
+#include "utils/network/rtsp/rtsp_types.h"
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
 
@@ -18,6 +20,8 @@ QnNetworkResource::QnNetworkResource():
     m_authenticated(true),
     m_networkStatus(0),
     m_networkTimeout(1000 * 10),
+    m_httpPort(nx_http::DEFAULT_HTTP_PORT),
+    m_mediaPort(nx_rtsp::DEFAULT_RTSP_PORT),
     m_probablyNeedToUpdateStatus(false)
 {
     //TODO: #GDM motion flag should be set in QnVirtualCameraResource depending on motion support
@@ -143,7 +147,22 @@ void QnNetworkResource::setDiscoveryAddr(QHostAddress addr)
 
 int QnNetworkResource::httpPort() const
 {
-    return 80;
+    return m_httpPort;
+}
+
+void QnNetworkResource::setHttpPort( int newPort )
+{
+    m_httpPort = newPort;
+}
+
+int QnNetworkResource::mediaPort() const
+{
+    return m_mediaPort;
+}
+
+void QnNetworkResource::setMediaPort( int newPort )
+{
+    m_mediaPort = newPort;
 }
 
 QString QnNetworkResource::toString() const
