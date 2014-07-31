@@ -387,6 +387,10 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         return; // all dstPeers already processed
     }
 
+#ifdef TRANSACTION_MESSAGE_BUS_DEBUG
+    qDebug() << "proxy transaction " << ApiCommand::toString(tran.command) << " to " << transportHeader.dstPeers;
+#endif
+
     QnPeerSet processedPeers = transportHeader.processedPeers + connectedPeers(tran.command);
     processedPeers << m_localPeer.id;
 
