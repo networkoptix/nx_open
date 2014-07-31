@@ -283,6 +283,24 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         }
     }
 
+    {
+        //reading RTSP port
+        CLSimpleHTTPClient http( getHostAddress(), QUrl( getUrl() ).port( DEFAULT_AXIS_API_PORT ), getNetworkTimeout(), getAuth() );
+        CLHttpStatus status = http.doGET( QByteArray( "axis-cgi/param.cgi?action=list&group=Network.RTSP.Port" ) );
+        if( status != CL_HTTP_SUCCESS )
+        {
+            if( status == CL_HTTP_AUTH_REQUIRED )
+                setStatus( QnResource::Unauthorized );
+            return CameraDiagnostics::UnknownErrorResult();
+        }
+        QByteArray paramStr;
+        http.readAll( paramStr );
+        bool ok = false;
+        const int rtspPort = paramStr.trimmed().mid( paramStr.indexOf( '=' ) + 1 ).toInt( &ok );
+        if( ok )
+            setMediaPort( rtspPort );
+    }
+
     readMotionInfo();
 
     // determin camera max resolution
