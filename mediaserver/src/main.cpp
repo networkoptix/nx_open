@@ -1713,10 +1713,11 @@ private:
 
     QString hardwareIdAsGuid() {
 #ifdef EDGE_SERVER
-    char  mac[13];
+    char  mac[MAC_ADDR_LEN];
     memset(mac, 0, sizeof(mac));
     char* host = 0;
-    mac_eth0(mac, &host);
+    getMacFromPrimaryIF(mac, &host);
+
     QCryptographicHash md5Hash( QCryptographicHash::Md5 );
     md5Hash.addData(mac, 12);
     md5Hash.addData("edge");
