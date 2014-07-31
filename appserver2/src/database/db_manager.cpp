@@ -243,7 +243,7 @@ bool QnDbManager::addTransactionForGeneralSettings()
     if (errCode != ErrorCode::ok)
         return false;
 
-    QnTransaction<ObjectType> transaction(command);
+    QnTransaction<ApiResourceParamsData> transaction(ApiCommand::setResourceParams);
     transaction.fillPersistentInfo();
     transaction.params = object;
     if (transactionLog->saveTransaction(transaction) != ErrorCode::ok)
