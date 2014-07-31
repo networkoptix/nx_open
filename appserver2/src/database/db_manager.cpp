@@ -236,11 +236,10 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
     return true;
 }
 
-template <class ObjectType>
-bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command)
+bool QnDbManager::addTransactionForGeneralSettings()
 {
-    ObjectType object;
-    ErrorCode errCode = doQueryNoLock(nullptr, object);
+    ApiResourceParamsData object;
+    ErrorCode errCode = doQueryNoLock(m_adminUserID, object);
     if (errCode != ErrorCode::ok)
         return false;
 
@@ -264,7 +263,7 @@ bool QnDbManager::resyncTransactionLog()
         return false;
     if (!fillTransactionLogInternal<ApiBusinessRuleData, ApiBusinessRuleDataList>(ApiCommand::saveBusinessRule))
         return false;
-    if (!fillTransactionLogInternal<ApiResourceParamDataList>(ApiCommand::setResourceParams))
+    if (!addTransactionForGeneralSettings())
         return false;
 
     return true;

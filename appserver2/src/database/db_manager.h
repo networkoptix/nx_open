@@ -348,8 +348,7 @@ namespace ec2
 
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
-        template <class ObjectType>
-        bool fillTransactionLogInternal(ApiCommand::Value command);
+        bool addTransactionForGeneralSettings();
     private:
         QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;
