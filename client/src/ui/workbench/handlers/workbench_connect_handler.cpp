@@ -61,6 +61,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /*= 0*/):
     connect(action(Qn::DisconnectAction),           &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_disconnectAction_triggered);
 
     connect(action(Qn::OpenLoginDialogAction),      &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::showLoginDialog);
+    connect(action(Qn::ExitActionDelayed),          &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_beforeExitAction_triggered);
 
     context()->instance<QnAppServerNotificationCache>();
 }
@@ -289,6 +290,13 @@ void QnWorkbenchConnectHandler::hideMessageBox() {
 void QnWorkbenchConnectHandler::showLoginDialog() {
     QnNonModalDialogConstructor<QnLoginDialog> dialogConstructor(m_loginDialog, mainWindow());
     //just show dialog   
+}
+
+void QnWorkbenchConnectHandler::at_beforeExitAction_triggered() {
+    disconnectFromServer(true);
+
+    if (loginDialog())
+        delete loginDialog();
 }
 
 

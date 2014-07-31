@@ -237,6 +237,7 @@ protected slots:
 
     void at_adjustVideoAction_triggered();
     void at_exitAction_triggered();
+    void at_beforeExitAction_triggered();
 
     void at_setCurrentLayoutAspectRatio4x3Action_triggered();
     void at_setCurrentLayoutAspectRatio16x9Action_triggered();
@@ -301,6 +302,7 @@ private:
     /** Check if resource can be safely renamed to the new name. */
     bool validateResourceName(const QnResourcePtr &resource, const QString &newName) const;
 
+    void deleteDialogs();
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 

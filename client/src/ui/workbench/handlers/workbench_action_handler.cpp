@@ -293,6 +293,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), SIGNAL(mismatchDataChanged()), this, SLOT(at_versionMismatchWatcher_mismatchDataChanged()));
 
     connect(action(Qn::ExitActionDelayed), &QAction::triggered, action(Qn::ExitAction), &QAction::trigger, Qt::QueuedConnection);
+    connect(action(Qn::BeforeExitAction),  &QAction::triggered, this, &QnWorkbenchActionHandler::at_beforeExitAction_triggered);
 
     /* Run handlers that update state. */
     at_panicWatcher_panicModeChanged();
@@ -314,17 +315,7 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
     if(m_currentUserLayoutsMenu)
         delete m_currentUserLayoutsMenu.data();
 
-    if(cameraSettingsDialog())
-        delete cameraSettingsDialog();
-
-    if (businessRulesDialog())
-        delete businessRulesDialog();
-
-    if (businessEventsLogDialog())
-        delete businessEventsLogDialog();
-
-    if (cameraAdditionDialog())
-        delete cameraAdditionDialog();
+    deleteDialogs();
 }
 
 ec2::AbstractECConnectionPtr QnWorkbenchActionHandler::connection2() const {
@@ -1872,14 +1863,17 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
     if (!context()->instance<QnWorkbenchStateManager>()->tryClose(false))
         return;
 
+    menu()->trigger(Qn::BeforeExitAction);
     qApp->exit(0);
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
 }
 
-QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog()
-{
-    if (!m_adjustVideoDialog)
-        m_adjustVideoDialog = new QnAdjustVideoDialog(mainWindow());
+void QnWorkbenchActionHandler::at_beforeExitAction_triggered() {
+    deleteDialogs();
+}
+
+
+QnAdjustVideoDialog* QnWorkbenchActionHandler::adjustVideoDialog() {
     return m_adjustVideoDialog.data();
 }
 
@@ -1889,8 +1883,8 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
     if(!widget)
         return;
 
+    QnNonModalDialogConstructor<QnAdjustVideoDialog> dialogConstructor(m_adjustVideoDialog, mainWindow());
     adjustVideoDialog()->setWidget(widget);
-    adjustVideoDialog()->show();
 }
 
 void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
@@ -2438,4 +2432,27 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
     }
     menu()->trigger(Qn::ExitActionDelayed);
     applauncher::scheduleProcessKill( QCoreApplication::applicationPid(), PROCESS_TERMINATE_TIMEOUT );
+}
+
+void QnWorkbenchActionHandler::deleteDialogs() {
+    if(cameraSettingsDialog())
+        delete cameraSettingsDialog();
+
+    if (businessRulesDialog())
+        delete businessRulesDialog();
+
+    if (businessEventsLogDialog())
+        delete businessEventsLogDialog();
+
+    if (cameraAdditionDialog())
+        delete cameraAdditionDialog();
+
+    if (adjustVideoDialog())
+        delete adjustVideoDialog();
+
+    if (cameraListDialog())
+        delete cameraListDialog();
+
+    if (systemAdministrationDialog())
+        delete systemAdministrationDialog();
 }

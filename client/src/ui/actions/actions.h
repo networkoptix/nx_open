@@ -324,6 +324,11 @@ namespace Qn {
          */
         ExitActionDelayed,
 
+        /** 
+         * Notifies all modules about client closing.
+         */
+        BeforeExitAction,
+
         /* Tree Root Nodes actions */
 
         /**

@@ -786,6 +786,9 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ExitActionDelayed).
         flags(Qn::NoTarget);
 
+    factory(Qn::BeforeExitAction).
+        flags(Qn::NoTarget);
+
     /* Tab bar actions. */
     factory().
         flags(Qn::TitleBar).

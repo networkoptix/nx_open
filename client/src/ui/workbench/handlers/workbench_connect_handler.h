@@ -38,6 +38,7 @@ private:
     void at_reconnectAction_triggered();
     void at_disconnectAction_triggered();
 
+    void at_beforeExitAction_triggered();
 private:
     QnGraphicsMessageBox* m_connectingMessageBox;
     QPointer<QnLoginDialog> m_loginDialog;
