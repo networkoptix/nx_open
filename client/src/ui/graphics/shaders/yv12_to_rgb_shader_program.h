@@ -110,18 +110,20 @@ public:
                             const QnItemDewarpingParams &itemParams,
                             float aspectRatio, float maxX, float maxY)
     {
+        qreal yAngle = itemParams.yAngle * mediaParams.hStretch;
         aspectRatio /= mediaParams.hStretch;
+
         if (itemParams.panoFactor == 1)
         {
             float fovRot = sin(itemParams.xAngle) * qDegreesToRadians(mediaParams.fovRot);
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
-                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
+                setUniformValue(m_yShiftLocation, (float) (yAngle));
                 setUniformValue(m_yPos, (float) 0.5);
                 setUniformValue(m_xShiftLocation, (float) itemParams.xAngle);
                 setUniformValue(m_fovRotLocation, (float) fovRot);
             }
             else {
-                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - M_PI/2.0 - itemParams.fov/2.0));
+                setUniformValue(m_yShiftLocation, (float) (yAngle - M_PI/2.0 - itemParams.fov/2.0));
                 setUniformValue(m_yPos, (float) 1.0);
                 setUniformValue(m_xShiftLocation, (float) fovRot);
                 setUniformValue(m_fovRotLocation, (float) -itemParams.xAngle);
@@ -133,11 +135,11 @@ public:
             //setUniformValue(m_fovRotLocation, (float) gradToRad(-11.0));
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
                 setUniformValue(m_yPos, (float) 0.5);
-                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
+                setUniformValue(m_yShiftLocation, (float) (yAngle));
             }
             else {
                 setUniformValue(m_yPos, (float) 1.0);
-                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - itemParams.fov/itemParams.panoFactor/2.0));
+                setUniformValue(m_yShiftLocation, (float) (yAngle - itemParams.fov/itemParams.panoFactor/2.0));
             }
         }
 

@@ -30,6 +30,7 @@ QnFisheyeCalibrator::QnFisheyeCalibrator()
     m_height = 0;
     m_center = QPointF(0.0, 0.0);
     m_radius = 0.0;
+    m_horizontalStretch = 1.0;
 }
 
 QnFisheyeCalibrator::~QnFisheyeCalibrator()
@@ -50,6 +51,21 @@ void QnFisheyeCalibrator::setCenter(const QPointF &center) {
 QPointF QnFisheyeCalibrator::center() const {
     return m_center;
 }
+
+void QnFisheyeCalibrator::setHorizontalStretch(const qreal& value)
+{
+    if (qFuzzyEquals(m_horizontalStretch, value))
+        return;
+    m_horizontalStretch = value;
+    emit stretchChanged(m_horizontalStretch);
+
+}
+
+qreal QnFisheyeCalibrator::horizontalStretch() const
+{
+    return m_horizontalStretch;
+}
+
 
 void QnFisheyeCalibrator::setRadius(qreal radius) {
     qreal fixed = qBound(0.25, radius, 0.75);
