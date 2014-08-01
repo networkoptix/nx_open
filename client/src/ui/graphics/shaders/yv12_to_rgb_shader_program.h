@@ -110,11 +110,11 @@ public:
                             const QnItemDewarpingParams &itemParams,
                             float aspectRatio, float maxX, float maxY)
     {
-        qreal yAngle = itemParams.yAngle * mediaParams.hStretch;
         aspectRatio /= mediaParams.hStretch;
 
         if (itemParams.panoFactor == 1)
         {
+            qreal yAngle = itemParams.yAngle * mediaParams.hStretch;
             float fovRot = sin(itemParams.xAngle) * qDegreesToRadians(mediaParams.fovRot);
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
                 setUniformValue(m_yShiftLocation, (float) (yAngle));
@@ -134,12 +134,14 @@ public:
             setUniformValue(m_fovRotLocation, (float) qDegreesToRadians(mediaParams.fovRot));
             //setUniformValue(m_fovRotLocation, (float) gradToRad(-11.0));
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
+                qreal yAngle = itemParams.yAngle * mediaParams.hStretch;
                 setUniformValue(m_yPos, (float) 0.5);
                 setUniformValue(m_yShiftLocation, (float) (yAngle));
             }
             else {
+                qreal yAngle = itemParams.yAngle;
                 setUniformValue(m_yPos, (float) 1.0);
-                setUniformValue(m_yShiftLocation, (float) (yAngle - itemParams.fov/itemParams.panoFactor/2.0));
+                setUniformValue(m_yShiftLocation, (float) (yAngle - itemParams.fov/itemParams.panoFactor/2.0/mediaParams.hStretch));
             }
         }
 
