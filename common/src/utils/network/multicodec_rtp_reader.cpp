@@ -459,14 +459,14 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
         }
         else 
         {
-            QTextStream(&url) << "rtsp://" << nres->getHostAddress();
+            QTextStream(&url) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
             if (!m_request.startsWith(QLatin1Char('/')))
                 url += QLatin1Char('/');
             url += m_request;;
         }
     }
     else
-        QTextStream(&url) << "rtsp://" << nres->getHostAddress();
+        QTextStream( &url ) << "rtsp://" << nres->getHostAddress() << ":" << nres->mediaPort();
 
     m_RtpSession.setAuth(nres->getAuth(), RTPSession::authBasic);
 
