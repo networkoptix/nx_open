@@ -4,6 +4,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/videowall_resource.h>
 
@@ -290,10 +291,33 @@ int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType license
     Q_ASSERT(licenseType == Qn::LC_VideoWall);
     int result = 0;
     foreach (const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
+        /* Calculating running control sessions. */
         result += info.data.videoWallControlSessions;
 
-    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>())
+    foreach (const QnVideoWallResourcePtr &videowall, qnResPool->getResources().filtered<QnVideoWallResource>()) {
+        /* Calculating total screens. */
         result += videowall->items()->getItems().size();
+
+        /* Calculating "PushMyScreen" items. */
+        foreach(const QnVideoWallItem &item, videowall->items()->getItems()) {
+            if (item.layout.isNull())
+                continue;
+
+            QnLayoutResourcePtr layout = qnResPool->getResourceById(item.layout).dynamicCast<QnLayoutResource>();
+            if (!layout)
+                continue;
+            
+            foreach (const QnLayoutItemData &data, layout->getItems()) {
+                QnResourcePtr resource = (!data.resource.id.isNull())
+                    ? qnResPool->getResourceById(data.resource.id)
+                    : qnResPool->getResourceByUniqId(data.resource.path); //TODO: #EC2
+                if (!resource || !resource->hasFlags(QnResource::desktop_camera))
+                    continue;
+
+                result++;   //desktop camera found
+            }
+        }
+    }
 
     return result;
 }
