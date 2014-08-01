@@ -7,6 +7,7 @@
 #include "storage_status_reply.h"
 #include "time_reply.h"
 #include "connection_info.h"
+#include "test_email_settings_reply.h"
 
 #define QN_MS_API_DATA_TYPES \
     (QnCameraDiagnosticsReply)\
@@ -17,7 +18,8 @@
     (QnStorageSpaceData)\
     (QnStorageStatusReply)\
     (QnTimeReply)\
+    (QnTestEmailSettingsReply)\
     (QnConnectionInfo)\
     (QnCompatibilityItem)\
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_MS_API_DATA_TYPES, (ubj)(xml)(json)(binary)(csv_record), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_MS_API_DATA_TYPES, (ubjson)(xml)(json)(binary)(csv_record), _Fields)

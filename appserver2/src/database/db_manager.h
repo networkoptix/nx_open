@@ -81,6 +81,7 @@ namespace ec2
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
+            Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
                 return result;
@@ -91,6 +92,7 @@ namespace ec2
         template <class T>
         ErrorCode executeTransaction(const QnTransaction<T>& tran, const QByteArray& serializedTran)
         {
+            Q_ASSERT_X(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             QnDbTransactionLocker lock(&m_tran);
             ErrorCode result = executeTransactionInternal(tran);
             if (result != ErrorCode::ok)
@@ -223,11 +225,6 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallInstanceStatusData> &) {
-            Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
-            return ErrorCode::notImplemented;
-        }
-
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
@@ -298,6 +295,7 @@ namespace ec2
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnId& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
+        ErrorCode checkExistingUser(const QString &name, qint32 internalId);
 
         ErrorCode saveVideowall(const ApiVideowallData& params);
         ErrorCode removeVideowall(const QnId& id);
@@ -316,11 +314,12 @@ namespace ec2
         ErrorCode updateBusinessRule(const ApiBusinessRuleData& rule);
 
         ErrorCode saveLicense(const ApiLicenseData& license);
+        ErrorCode removeLicense(const ApiLicenseData& license);
 
         ErrorCode addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
         ErrorCode removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
 
-        bool createDatabase(bool *dbJustCreated);
+        bool createDatabase(bool *dbJustCreated, bool *isMigrationFrom2_2);
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
         
@@ -332,10 +331,18 @@ namespace ec2
         void commit();
         void rollback();
     private:
-        QMap<int, QnId> getGuidList(const QString& request);
+        enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash};
+
+        QMap<int, QnId> getGuidList(const QString& request, const QByteArray& tableName, GuidConversionMethod method = CM_Default);
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
         QnId getType(const QString& typeName);
+        bool resyncTransactionLog();
+        
+        template <class ObjectType, class ObjectListType> 
+        bool fillTransactionLogInternal(ApiCommand::Value command);
+        template <class ObjectType>
+        bool fillTransactionLogInternal(ApiCommand::Value command);
     private:
         QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;

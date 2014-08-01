@@ -21,15 +21,22 @@ static QString groupAddress(QLatin1String("224.0.0.251"));
 
 // -------------- QnMdnsListener ------------
 
-QnMdnsListener::QnMdnsListener():
+static QnMdnsListener* QnMdnsListener_instance = nullptr;
+
+QnMdnsListener::QnMdnsListener()
+:
     m_receiveSocket(0)
 {
     updateSocketList();
     readDataFromSocket();
+
+    assert(QnMdnsListener_instance == nullptr);
+    QnMdnsListener_instance = this;
 }
 
 QnMdnsListener::~QnMdnsListener()
 {
+    QnMdnsListener_instance = nullptr;
     deleteSocketList();
 }
 
@@ -175,11 +182,9 @@ QStringList QnMdnsListener::getLocalAddressList() const
 
 
 
-Q_GLOBAL_STATIC(QnMdnsListener, QnMdnsListener_instance);
-
 QnMdnsListener* QnMdnsListener::instance()
 {
-    return QnMdnsListener_instance();
+    return QnMdnsListener_instance;
 }
 
 #endif // ENABLE_MDNS

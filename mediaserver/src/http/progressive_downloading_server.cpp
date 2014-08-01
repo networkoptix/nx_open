@@ -32,24 +32,9 @@
 
 #include "cached_output_stream.h"
 
+
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
-
-QnProgressiveDownloadingServer::QnProgressiveDownloadingServer(const QHostAddress& address, int port):
-    QnTcpListener(address, port)
-{
-
-}
-
-QnProgressiveDownloadingServer::~QnProgressiveDownloadingServer()
-{
-
-}
-
-QnTCPConnectionProcessor* QnProgressiveDownloadingServer::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket, QnTcpListener* owner)
-{
-    return new QnProgressiveDownloadingConsumer(clientSocket, owner);
-}
 
 // -------------------------- QnProgressiveDownloadingDataConsumer ---------------------
 

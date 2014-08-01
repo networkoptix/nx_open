@@ -166,6 +166,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
 
 QnCamDisplay::~QnCamDisplay()
 {
+    qnRedAssController->unregisterConsumer(this);
+
     Q_ASSERT(!isRunning());
     stop();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)

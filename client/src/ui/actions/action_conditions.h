@@ -532,8 +532,10 @@ public:
 
 class QnSaveVideowallReviewActionCondition: public QnActionCondition {
 public:
-    QnSaveVideowallReviewActionCondition(QObject* parent): QnActionCondition(parent) {}
+    QnSaveVideowallReviewActionCondition(bool isCurrent, QObject* parent): QnActionCondition(parent), m_current(isCurrent) {}
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+private:
+    bool m_current;
 };
 
 class QnStartVideowallActionCondition: public QnActionCondition {

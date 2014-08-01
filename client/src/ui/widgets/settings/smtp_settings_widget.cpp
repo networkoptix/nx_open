@@ -17,6 +17,8 @@
 #include <ui/help/help_topics.h>
 
 #include "version.h"
+#include "core/resource_management/resource_pool.h"
+#include "core/resource/media_server_resource.h"
 
 namespace {
     enum WidgetPages {
@@ -278,18 +280,37 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
     m_timeoutTimer->setInterval(testSmtpTimeoutMSec / ui->testProgressBar->maximum());
     m_timeoutTimer->start();
 
-    m_testHandle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager()->testEmailSettings(
-        result,
-        this,
-        [this](int handle, ec2::ErrorCode errorCode) {
-            if (handle != m_testHandle)
-                return;
+    QnMediaServerResourcePtr serverResource;
+    QnMediaServerResourceList servers = qnResPool->getAllServers();
+    if (!servers.isEmpty()) {
+        serverResource = servers.first();
+        foreach(QnMediaServerResourcePtr mserver, servers)
+        {
+            if (mserver->getServerFlags() & Qn::SF_HasPublicIP) {
+                serverResource = mserver;
+                break;
+            }
+        }
+    }
+    if (!serverResource)
+        return;
 
-            stopTesting(errorCode != ec2::ErrorCode::ok
-                ? tr("Error while testing settings")
-                : tr("Success") );
-    });
+    QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();
+    if (!serverConnection)
+        return;
+
+    m_testHandle = serverConnection->testEmailSettingsAsync( result, this, SLOT(at_testEmailSettingsFinished(int, const QnTestEmailSettingsReply& , int)));
     ui->stackedWidget->setCurrentIndex(TestingPage);
+}
+
+void QnSmtpSettingsWidget::at_testEmailSettingsFinished(int status, const QnTestEmailSettingsReply& reply, int handle)
+{
+    if (handle != m_testHandle)
+        return;
+
+    stopTesting(reply.errorCode != 0
+        ? tr("Error while testing settings")
+        : tr("Success") );
 }
 
 void QnSmtpSettingsWidget::at_cancelTestButton_clicked() {

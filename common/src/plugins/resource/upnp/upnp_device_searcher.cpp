@@ -78,6 +78,8 @@ public:
 ////////////////////////////////////////////////////////////
 static const unsigned int READ_BUF_CAPACITY = 64*1024+1;    //max UDP packet size
 
+static UPNPDeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
+
 UPNPDeviceSearcher::UPNPDeviceSearcher( unsigned int discoverTryTimeoutMS )
 :
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
@@ -87,6 +89,9 @@ UPNPDeviceSearcher::UPNPDeviceSearcher( unsigned int discoverTryTimeoutMS )
 {
     m_timerID = TimerManager::instance()->addTimer( this, m_discoverTryTimeoutMS );
     m_cacheTimer.start();
+
+    assert(UPNPDeviceSearcherInstance == nullptr);
+    UPNPDeviceSearcherInstance = this;
 }
 
 UPNPDeviceSearcher::~UPNPDeviceSearcher()
@@ -95,6 +100,8 @@ UPNPDeviceSearcher::~UPNPDeviceSearcher()
 
     delete[] m_readBuf;
     m_readBuf = NULL;
+
+    UPNPDeviceSearcherInstance = nullptr;
 }
 
 void UPNPDeviceSearcher::pleaseStop()
@@ -175,13 +182,6 @@ void UPNPDeviceSearcher::processDiscoveredDevices( UPNPSearchHandler* handlerToU
 
         ++it;
     }
-}
-
-static UPNPDeviceSearcher* UPNPDeviceSearcherInstance = NULL;
-
-void UPNPDeviceSearcher::initGlobalInstance( UPNPDeviceSearcher* _inst )
-{
-    UPNPDeviceSearcherInstance = _inst;
 }
 
 UPNPDeviceSearcher* UPNPDeviceSearcher::instance()

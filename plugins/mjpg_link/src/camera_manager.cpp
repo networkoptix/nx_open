@@ -126,12 +126,12 @@ void CameraManager::getLastErrorString( char* errorString ) const
     //TODO/IMPL
 }
 
-int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveReader ) const
+int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** /*dtsArchiveReader*/ ) const
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }
 
-int CameraManager::find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const
+int CameraManager::find( nxcip::ArchiveSearchOptions* /*searchOptions*/, nxcip::TimePeriods** /*timePeriods*/ ) const
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }

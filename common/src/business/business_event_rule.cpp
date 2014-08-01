@@ -182,7 +182,7 @@ QnBusinessEventRule::QnBusinessEventRule(
     m_disabled = false;
     m_eventState = QnBusiness::UndefinedState;
     
-    m_id = intToGuid(internalId);
+    m_id = intToGuid(internalId, "vms_businessrule");
     m_aggregationPeriod = aggregationPeriod;
     m_system = isSystem;
     m_actionType = bActionType;
@@ -233,8 +233,8 @@ void QnBusinessEventRule::removeResource(const QnId& resId)
 
 QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
 {
-    QnResourcePtr admin = qnResPool->getResourceById(QUuid("e3219e00-cb8f-496c-81a0-28abc1b3a830"));
-
+    QnResourcePtr admin = qnResPool->getResourceById(QUuid("99cbc715-539b-4bfe-856f-799b45b69b1e"));
+    Q_ASSERT(admin);
     QnBusinessEventRuleList result;
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(1,  30,    "{ \"userGroup\" : 0 }",  0, QnBusiness::ShowPopupAction,   QnBusiness::CameraDisconnectEvent));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(2,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::StorageFailureEvent));
@@ -254,6 +254,8 @@ QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(16, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::CameraIpConflictEvent));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(17, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::ServerFailureEvent));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(18, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::ServerConflictEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(19, 0,     QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::ServerStartEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(20, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::ServerStartEvent, admin));
 
     return result;
 }

@@ -44,8 +44,8 @@ public:
         InvalidHardwareID,
         InvalidBrand,
         Expired,
-        InvalidType
-
+        InvalidType,
+        TooManyLicensesPerDevice
     };
 
     QnLicense();
@@ -120,7 +120,7 @@ private:
         QByteArray* const v2LicenseBlock );
     void verify( const QByteArray& v1LicenseBlock, const QByteArray& v2LicenseBlock );
 
-    ec2::ApiRuntimeData findRuntimeDataByLicense() const;
+    QUuid findRuntimeDataByLicense() const;
 };
 
 Q_DECLARE_METATYPE(QnLicensePtr)
@@ -175,6 +175,7 @@ public:
     void addLicense(const QnLicensePtr &license);
     void addLicenses(const QnLicenseList &licenses);
     void replaceLicenses(const QnLicenseList &licenses);
+    void removeLicense(const QnLicensePtr &license);
 
     void reset();
     bool isEmpty() const;

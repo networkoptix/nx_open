@@ -17,7 +17,8 @@ int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParamLis
     return CODE_NOT_IMPLEMETED;
 }
 
-int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, QByteArray &result, QByteArray &contentType) {
+int QnUpdateRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray& srcBodyContentType, QByteArray &result, QByteArray &contentType)
+{
     Q_UNUSED(path)
     Q_UNUSED(result)
     Q_UNUSED(contentType)

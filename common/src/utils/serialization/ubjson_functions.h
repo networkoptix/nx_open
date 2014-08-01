@@ -20,8 +20,9 @@
 #include <utils/common/collection.h>
 #include <utils/common/latin1_array.h>
 
-#include "ubjson.h"
 #include "collection_fwd.h"
+#include "ubjson.h"
+#include "ubjson_macros.h"
 #include "enum.h"
 
 
@@ -206,7 +207,7 @@ bool deserialize(QnUbjsonReader<Input> *stream, TYPE *target) {                 
 }
 
 //QN_DEFINE_INTEGER_CONVERSION_UBJSON_SERIALIZATION_FUNCTIONS(quint16, qint16)
-//QN_DEFINE_INTEGER_CONVERSION_UBJSON_SERIALIZATION_FUNCTIONS(quint32, qint32) // TODO: #Elric this is not semantically correct
+//QN_DEFINE_INTEGER_CONVERSION_UBJSON_SERIALIZATION_FUNCTIONS(quint32, qint32) // This is not semantically correct, so it's commented out.
 //QN_DEFINE_INTEGER_CONVERSION_UBJSON_SERIALIZATION_FUNCTIONS(quint64, qint64)
 #undef QN_DEFINE_INTEGER_CONVERSION_UBJSON_SERIALIZATION_FUNCTIONS
 

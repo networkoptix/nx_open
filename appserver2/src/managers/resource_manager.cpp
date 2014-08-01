@@ -131,7 +131,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnId& id, QnResource::Status status)
     {
-        QnTransaction<ApiSetResourceStatusData> tran(command, true);
+        QnTransaction<ApiSetResourceStatusData> tran(command);
         tran.params.id = id;
         tran.params.status = status;
         return tran;
@@ -142,7 +142,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnId& id, const QnKvPairList& kvPairs, bool isPredefinedParams)
     {
-        QnTransaction<ApiResourceParamsData> tran(command, true);
+        QnTransaction<ApiResourceParamsData> tran(command);
         tran.params.params.reserve(kvPairs.size());
         foreach(const QnKvPair& pair, kvPairs)
             tran.params.params.push_back(ApiResourceParamData(pair.name(), pair.value(), isPredefinedParams));
@@ -153,7 +153,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiIdData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
-        QnTransaction<ApiIdData> tran(command, true);
+        QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;
         
         if (command == ApiCommand::setResourceStatus) 
@@ -182,7 +182,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiResourceData> QnResourceManager<T>::prepareTransaction( ApiCommand::Value command, const QnResourcePtr& resource )
     {
-        QnTransaction<ApiResourceData> tran(command, true);
+        QnTransaction<ApiResourceData> tran(command);
         fromResourceToApi(resource, tran.params);
         return tran;
     }

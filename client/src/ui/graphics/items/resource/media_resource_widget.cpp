@@ -708,19 +708,27 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, 
     Q_UNUSED(channel)
     qreal xStep = rect.width() / MD_WIDTH;
     qreal yStep = rect.height() / MD_HEIGHT;
+    qreal offset = xStep * 0.1;
+    qreal fontIncrement = 1.2;
 
     painter->setPen(Qt::black);
     QFont font;
-    font.setPointSizeF(0.03 * rect.width());
+    font.setPointSizeF(yStep * fontIncrement);
+    font.setBold(true);
     painter->setFont(font);
 
     for (int sensitivity = QnMotionRegion::MIN_SENSITIVITY + 1; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; ++sensitivity) {
-        foreach(const QRect &rect, region.getRectsBySens(sensitivity)) {
+        auto rects = region.getRectsBySens(sensitivity);
+        if (rects.isEmpty())
+            continue;
+
+        m_sensStaticText[sensitivity].prepare(painter->transform(), font);
+        foreach(const QRect &rect, rects) {
             if (rect.width() < 2 || rect.height() < 2)
                 continue;
 
             int x = rect.left(), y = rect.top();
-            painter->drawStaticText(x * xStep + xStep * 0.1, y * yStep + yStep * 0.1, m_sensStaticText[sensitivity]);
+            painter->drawStaticText(x * xStep + offset, y * yStep, m_sensStaticText[sensitivity]);
         }
     }
 }

@@ -11,6 +11,8 @@
 #include "utils/common/model_functions.h"
 #include "nx_ec/data/api_camera_bookmark_data.h"
 
+//#define TRANSACTION_LOG_DEBUG
+
 namespace ec2
 {
 
@@ -111,19 +113,19 @@ QUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookma
 
 ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QUuid& hash, const QByteArray& data)
 {
-    Q_ASSERT_X(!tran.id.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
-    Q_ASSERT_X(!tran.id.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
-    Q_ASSERT_X(tran.id.sequence, Q_FUNC_INFO, "Transaction sequence MUST be filled!");
-    if (tran.id.peerID == qnCommon->moduleGUID() && tran.id.dbID == m_dbManager->instance()->getID())
-        Q_ASSERT(tran.timestamp > 0);
+    Q_ASSERT_X(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
+    Q_ASSERT_X(!tran.persistentInfo.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
+    Q_ASSERT_X(tran.persistentInfo.sequence, Q_FUNC_INFO, "Transaction sequence MUST be filled!");
+    if (tran.peerID == qnCommon->moduleGUID() && tran.persistentInfo.dbID == m_dbManager->instance()->getID())
+        Q_ASSERT(tran.persistentInfo.timestamp > 0);
 
     QSqlQuery query(m_dbManager->getDB());
     //query.prepare("INSERT OR REPLACE INTO transaction_log (peer_guid, db_guid, sequence, timestamp, tran_guid, tran_data) values (?, ?, ?, ?, ?)");
     query.prepare("INSERT OR REPLACE INTO transaction_log values (?, ?, ?, ?, ?, ?)");
-    query.addBindValue(tran.id.peerID.toRfc4122());
-    query.addBindValue(tran.id.dbID.toRfc4122());
-    query.addBindValue(tran.id.sequence);
-    query.addBindValue(tran.timestamp);
+    query.addBindValue(tran.peerID.toRfc4122());
+    query.addBindValue(tran.persistentInfo.dbID.toRfc4122());
+    query.addBindValue(tran.persistentInfo.sequence);
+    query.addBindValue(tran.persistentInfo.timestamp);
     query.addBindValue(hash.toRfc4122());
     query.addBindValue(data);
     if (!query.exec()) {
@@ -131,15 +133,17 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const QU
         return ErrorCode::failure;
     }
 
-    qDebug() << "add record to transaction log. Transaction=" << toString(tran.command) << "timestamp=" << tran.timestamp << "producedOnCurrentPeer=" << (tran.id.peerID == qnCommon->moduleGUID());
+#ifdef TRANSACTION_LOG_DEBUG
+    qDebug() << "add record to transaction log. Transaction=" << toString(tran.command) << "timestamp=" << tran.timestamp << "producedOnCurrentPeer=" << (tran.peerID == qnCommon->moduleGUID());
+#endif
 
-    QnTranStateKey key(tran.id.peerID, tran.id.dbID);
-    m_state.values[key] = qMax(m_state.values[key], tran.id.sequence);
-    m_updateHistory[hash] = qMax(m_updateHistory[hash], tran.timestamp);
+    QnTranStateKey key(tran.peerID, tran.persistentInfo.dbID);
+    m_state.values[key] = qMax(m_state.values[key], tran.persistentInfo.sequence);
+    m_updateHistory[hash] = qMax(m_updateHistory[hash], tran.persistentInfo.timestamp);
 
     QMutexLocker lock(&m_timeMutex);
-    if (tran.timestamp > m_currentTime + m_relativeTimer.elapsed()) {
-        m_currentTime = m_lastTimestamp = tran.timestamp;
+    if (tran.persistentInfo.timestamp > m_currentTime + m_relativeTimer.elapsed()) {
+        m_currentTime = m_lastTimestamp = tran.persistentInfo.timestamp;
         m_relativeTimer.restart();
     }
 
@@ -155,10 +159,10 @@ QnTranState QnTransactionLog::getTransactionsState()
 bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& hash) const
 {
     QReadLocker lock(&m_dbManager->getMutex());
-    QnTranStateKey key (tran.id.peerID, tran.id.dbID);
-    Q_ASSERT(tran.id.sequence != 0);
-    if (m_state.values.value(key) >= tran.id.sequence) {
-        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << "because of precessed seq:" << m_state.values.value(key) << ">=" << tran.id.sequence;
+    QnTranStateKey key (tran.peerID, tran.persistentInfo.dbID);
+    Q_ASSERT(tran.persistentInfo.sequence != 0);
+    if (m_state.values.value(key) >= tran.persistentInfo.sequence) {
+        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << "because of precessed seq:" << m_state.values.value(key) << ">=" << tran.persistentInfo.sequence;
         return true;
     }
     QMap<QUuid, qint64>::const_iterator itr = m_updateHistory.find(hash);
@@ -166,13 +170,13 @@ bool QnTransactionLog::contains(const QnAbstractTransaction& tran, const QUuid& 
         return false;
 
     const qint64 lastTime = itr.value();
-    bool rez = lastTime > tran.timestamp;
-    if (lastTime == tran.timestamp) {
+    bool rez = lastTime > tran.persistentInfo.timestamp;
+    if (lastTime == tran.persistentInfo.timestamp) {
         QnTranStateKey locakKey(qnCommon->moduleGUID(), m_dbManager->getID());
         rez = key > locakKey;
     }
     if (rez)
-        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << "because of timestamp:" << lastTime << ">=" << tran.timestamp;
+        qDebug() << "Transaction log contains transaction " << ApiCommand::toString(tran.command) << "because of timestamp:" << lastTime << ">=" << tran.persistentInfo.timestamp;
 
    return rez;
 }
@@ -203,6 +207,6 @@ ErrorCode QnTransactionLog::getTransactionsAfter(const QnTranState& state, QList
     (QnTranState)\
     (QnTranStateResponse)\
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_TRANSACTION_LOG_DATA_TYPES,  (binary)(json), _Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(QN_TRANSACTION_LOG_DATA_TYPES,  (binary)(json)(ubjson), _Fields)
 
 } // namespace ec2

@@ -889,6 +889,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
                 }
             }
         }
+        qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
     return true;
@@ -924,8 +925,10 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     m_widgets.removeOne(widget);
     m_widgetByItem.remove(item);
-    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
         m_widgetByRenderer.remove(mediaWidget->renderer());
+        qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
+    }
 
     if(destroyWidget) {
         widget->hide();
@@ -1565,10 +1568,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
                 mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
-            qnRedAssController->unregisterConsumer(mediaWidget->display()->camDisplay());
         }
-
-//        widget->item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(widget->checkedButtons()));
     }
 
     foreach(QnWorkbenchItem *item, layout->items())
@@ -1628,8 +1628,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
         if(!widget)
             continue;
-
-        qnRedAssController->registerConsumer(widget->display()->camDisplay());
 
         qint64 time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
 

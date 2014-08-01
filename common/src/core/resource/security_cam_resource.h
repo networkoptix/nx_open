@@ -9,6 +9,7 @@
 #include "core/misc/schedule_task.h"
 #include "network_resource.h"
 #include "common/common_globals.h"
+#include "business/business_fwd.h"
 
 class QnAbstractArchiveDelegate;
 
@@ -34,6 +35,7 @@ public:
     int motionSensWindowCount() const;
 
 
+    bool hasMotion();
     Qn::MotionType getMotionType();
     void setMotionType(Qn::MotionType value);
 
@@ -193,6 +195,7 @@ signals:
     void cameraCapabilitiesChanged(const QnSecurityCamResourcePtr &resource);
     void groupNameChanged(const QnSecurityCamResourcePtr &resource);
     void motionRegionChanged(const QnResourcePtr &resource);
+    void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
     //!Emitted on camera input port state has been changed
     /*!

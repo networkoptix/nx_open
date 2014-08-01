@@ -37,7 +37,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     */
 
     m_resourceSearch->setSourceModel(m_model);
-    m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(lit("*"),Qt::CaseInsensitive, QRegExp::Wildcard)));
+    updateCriterion();
 
     connect(m_resourceSearch,   &QAbstractItemModel::rowsInserted,              this,   &QnCameraListDialog::updateWindowTitleLater);
     connect(m_resourceSearch,   &QAbstractItemModel::rowsRemoved,               this,   &QnCameraListDialog::updateWindowTitleLater);
@@ -95,10 +95,15 @@ void QnCameraListDialog::updateWindowTitle() {
         setWindowTitle(tr("Camera List for '%1' - %n camera(s) found", "", m_resourceSearch->rowCount()).arg(getFullResourceName(m_model->server(), true)));
 }
 
-void QnCameraListDialog::updateCriterion(const QString& text) {
-    QString searchString = QString(lit("*%1*")).arg(text);
+void QnCameraListDialog::updateCriterion() {
+    QString text = ui->filterEdit->text();
+
+    QString searchString = text.isEmpty()
+        ? lit("*")
+        : lit("*%1*").arg(text);
     m_resourceSearch->clearCriteria();
     m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(searchString, Qt::CaseInsensitive, QRegExp::Wildcard)));
+    m_resourceSearch->addCriterion(QnResourceCriterion(QnResource::desktop_camera, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next));
 }
 
 void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) {
