@@ -9,6 +9,7 @@
 #include <core/ptz/ptz_fwd.h>
 
 #include <rest/server/json_rest_handler.h>
+#include <functional>
 
 class QnPtzRestHandler: public QnJsonRestHandler {
     Q_OBJECT
