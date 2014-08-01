@@ -97,6 +97,11 @@ public:
      */
     void submit(const QnLayoutResourcePtr &resource) const;
 
+    /** 
+     * Notify all subscribers that layout title should be updated.
+     */
+    void notifyTitleChanged();
+
     /**
      * \param item                      Item to check.
      * \param geometry                  New position.
@@ -343,6 +348,11 @@ signals:
      * This signal is emitted whenever name of this layout changes.
      */
     void nameChanged();
+
+    /**
+     * This signal is emitted whenever title of this layout changes.
+     */
+    void titleChanged();
 
     /**
      * This signal is emitted whenever cell aspect ratio of this layout changes.

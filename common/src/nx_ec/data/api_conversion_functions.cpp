@@ -17,8 +17,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource/videowall_instance_status.h>
 #include <core/resource/camera_bookmark.h>
+#include <core/misc/screen_snap.h>
 
 #include <nx_ec/ec_api.h>
 #include <network/authenticate_helper.h>
@@ -148,8 +148,8 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     fromApiToResource(static_cast<const ApiResourceData &>(src), tmp);
 
     { // test if the camera is desktop camera
-        auto resType = qnResTypePool->getResourceType(src.typeId);
-        if (resType->getName() == lit("SERVER_DESKTOP_CAMERA"))
+        auto resType = qnResTypePool->desktopCameraResourceType();
+        if (resType && resType->getId() == src.typeId)
             dst->addFlags(QnResource::desktop_camera);
     }
 
@@ -186,6 +186,10 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
 
     dst->setDewarpingParams(QJson::deserialized<QnMediaDewarpingParams>(src.dewarpingParams));
     dst->setVendor(src.vendor);
+    dst->setMinDays(src.minArchiveDays);
+    dst->setMaxDays(src.maxArchiveDays);
+    Q_ASSERT(dst->getId() == QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()));
+
 }
 
 
@@ -218,6 +222,8 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.statusFlags = src->statusFlags();
     dst.dewarpingParams = QJson::serialized<QnMediaDewarpingParams>(src->getDewarpingParams());
     dst.vendor = src->getVendor();
+    dst.minArchiveDays = src->minDays();
+    dst.maxArchiveDays = src->maxDays();
 }
 
 template<class List> 
@@ -491,12 +497,11 @@ void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &
     dst.apiUrl = src->getApiUrl();
     dst.flags = src->getServerFlags();
     dst.panicMode = src->getPanicMode();
-    dst.streamingUrl = src->getStreamingUrl();
     dst.version = src->getVersion().toString();
     dst.systemInfo = src->getSystemInfo().toString();
     dst.maxCameras = src->getMaxCameras();
+    dst.authKey = src->getAuthKey();
     dst.allowAutoRedundancy = src->isRedundancy();
-    //authKey = resource->getAuthKey();
 
     QnAbstractStorageResourceList storageList = src->getStorages();
     dst.storages.resize(storageList.size());
@@ -515,12 +520,11 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     dst->setNetAddrList(resNetAddrList);
     dst->setServerFlags(src.flags);
     dst->setPanicMode(src.panicMode);
-    dst->setStreamingUrl(src.streamingUrl);
     dst->setVersion(QnSoftwareVersion(src.version));
     dst->setSystemInfo(QnSystemInformation(src.systemInfo));
     dst->setMaxCameras(src.maxCameras);
+    dst->setAuthKey(src.authKey);
     dst->setRedundancy(src.allowAutoRedundancy);
-    //dst->setAuthKey(authKey);
 
     QnResourceTypePtr resType = ctx.resTypePool->getResourceTypeByName(lit("Storage"));
     if (!resType)
@@ -728,7 +732,10 @@ void fromApiToResource(const ApiVideowallItemData &src, QnVideoWallItem &dst) {
     dst.layout     = src.layoutGuid;
     dst.pcUuid     = src.pcGuid;
     dst.name       = src.name;
-    dst.geometry   = QRect(src.left, src.top, src.width, src.height);
+    dst.screenSnaps.left() = QnScreenSnap::decode(src.snapLeft);
+    dst.screenSnaps.top() = QnScreenSnap::decode(src.snapTop);
+    dst.screenSnaps.right() = QnScreenSnap::decode(src.snapRight);
+    dst.screenSnaps.bottom() = QnScreenSnap::decode(src.snapBottom);
 }
 
 void fromResourceToApi(const QnVideoWallItem &src, ApiVideowallItemData &dst) {
@@ -736,10 +743,10 @@ void fromResourceToApi(const QnVideoWallItem &src, ApiVideowallItemData &dst) {
     dst.layoutGuid  = src.layout;
     dst.pcGuid      = src.pcUuid;
     dst.name        = src.name;
-    dst.left        = src.geometry.x();
-    dst.top         = src.geometry.y();
-    dst.width       = src.geometry.width();
-    dst.height      = src.geometry.height();
+    dst.snapLeft    = src.screenSnaps.left().encode();
+    dst.snapTop     = src.screenSnaps.top().encode();
+    dst.snapRight   = src.screenSnaps.right().encode();
+    dst.snapBottom  = src.screenSnaps.bottom().encode();
 }
 
 void fromApiToResource(const ApiVideowallMatrixData &src, QnVideoWallMatrix &dst) {
@@ -886,18 +893,6 @@ void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallCon
         data.params.insert(std::pair<QString, QString>(iter.key(), iter.value()));
         ++iter;
     }
-}
-
-void fromApiToResource(const ApiVideowallInstanceStatusData &data, QnVideowallInstanceStatus &status) {
-    status.videowallGuid = data.videowallGuid;
-    status.instanceGuid = data.instanceGuid;
-    status.online = data.online;
-}
-
-void fromResourceToApi(const QnVideowallInstanceStatus &status, ApiVideowallInstanceStatusData &data) {
-    data.videowallGuid = status.videowallGuid;
-    data.instanceGuid = status.instanceGuid;
-    data.online = status.online;
 }
 
 void fromApiToResource(const ApiCameraBookmarkTagDataList &data, QnCameraBookmarkTags &tags) {

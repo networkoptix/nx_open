@@ -1,24 +1,30 @@
 #include "cam_display.h"
 
-#include "core/datapacket/media_data_packet.h"
-#include "video_stream_display.h"
-#include "audio_stream_display.h"
-#include "decoders/audio/ffmpeg_audio.h"
-#include "utils/common/synctime.h"
-
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
+
+#include <utils/common/log.h>
+#include <utils/common/util.h>
+#include <utils/common/synctime.h>
+
+#include "core/resource/camera_resource.h"
+#include "core/datapacket/media_data_packet.h"
+
+#include "decoders/audio/ffmpeg_audio.h"
+#include "plugins/resource/archive/archive_stream_reader.h"
+#include "redass/redass_controller.h"
+
+#include "video_stream_display.h"
+#include "audio_stream_display.h"
+
 
 #if defined(Q_OS_MAC)
 #include <CoreServices/CoreServices.h>
 #elif defined(Q_OS_WIN)
 #include <qt_windows.h>
-#include "device_plugins/desktop_win/device/desktop_resource.h"
+#include <plugins/resource/desktop_win/desktop_resource.h>
 #endif
-#include "utils/common/util.h"
-#include "plugins/resources/archive/archive_stream_reader.h"
-#include "core/resource/camera_resource.h"
-#include "redass/redass_controller.h"
+
 
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
@@ -150,8 +156,6 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     int expectedBufferSize = m_isRealTimeSource ? REALTIME_AUDIO_BUFFER_SIZE : DEFAULT_AUDIO_BUFF_SIZE;
     int expectedPrebuferSize = m_isRealTimeSource ? REALTIME_AUDIO_PREBUFFER : DEFAULT_AUDIO_BUFF_SIZE/2;
     setAudioBufferSize(expectedBufferSize, expectedPrebuferSize);
-
-    qnRedAssController->registerConsumer(this);
 
 #ifdef Q_OS_WIN
     QnDesktopResourcePtr desktopResource = resource.dynamicCast<QnDesktopResource>();
@@ -1470,7 +1474,7 @@ void QnCamDisplay::enqueueVideo(QnCompressedVideoDataPtr vd)
     m_videoQueue[vd->channelNumber].enqueue(vd);
     if (m_videoQueue[vd->channelNumber].size() > 60 * 6) // I assume we are not gonna buffer
     {
-        cl_log.log(QLatin1String("Video buffer overflow!"), cl_logWARNING);
+        cl_log.log(lit("Video buffer overflow!"), cl_logWARNING);
         dequeueVideo(vd->channelNumber);
         // some protection for very large difference between video and audio tracks. Need to improve sync logic for this case (now a lot of glithces)
         m_videoBufferOverflow = true;

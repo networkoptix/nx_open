@@ -20,7 +20,7 @@ int QnBusinessActionRestHandler::executeGet(const QString& path, const QnRequest
     return CODE_NOT_IMPLEMETED;
 }
 
-int QnBusinessActionRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnBusinessActionRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(params)
     Q_UNUSED(path)

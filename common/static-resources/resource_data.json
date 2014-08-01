@@ -79,6 +79,14 @@
         },
         {
             "keys": [
+                "VISTA|VK2-ENCODER",
+                "VISTA|VK2-1080PTZ",
+                "*|DW-CP04"
+            ],
+            "onvifPtzPresetsEnabled": true
+        },
+        {
+            "keys": [
                 "VISTA|*"
             ],
             "forceArFromPrimaryStream": true
@@ -86,20 +94,12 @@
         {
             "keys": [
                 "VISTA|VK2-600PTZ",
-                "VISTA|VK2-720VZMI",
+		"VISTA|VK2-720VZMI",
+ 	        "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-720VZMX",
-                "VISTA|VK2-ENCODER",
-                "VISTA|VK2-1080PTZ"
+                "VISTA|VK2-ENCODER"
             ],
             "onvifPtzAbsoluteMoveBroken": true
-        },
-        {
-            "keys": [
-                "VISTA|VK2-ENCODER",
-                "VISTA|VK2-1080PTZ",
-                "*|DW-CP04"
-            ],
-            "onvifPtzPresetsEnabled": true
         },
         {
             "keys": [

@@ -1,13 +1,14 @@
 #ifndef QN_CAMERA_RESOURCE_H
 #define QN_CAMERA_RESOURCE_H
 
-#include <QtCore/QMetaType>
-
 #include <deque>
 
-#include "nx_ec/impl/ec_api_impl.h"
-#include "security_cam_resource.h"
+#include <QtCore/QMetaType>
+
+#include <nx_ec/impl/ec_api_impl.h>
 #include <utils/common/model_functions_fwd.h>
+
+#include "security_cam_resource.h"
 
 
 class QnAbstractDTSFactory;
@@ -32,20 +33,20 @@ public:
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;
-
+    void saveParams();
+    int saveAsync();
 public slots:
     void issueOccured();
     void noCameraIssues();
 private slots:
     void at_saveAsyncFinished(int, ec2::ErrorCode, const QnVirtualCameraResourceList &);
 protected:
-    void saveParams();
-    int saveAsync();
 
 private:
     QnAbstractDTSFactory* m_dtsFactory;
     std::deque<qint64> m_issueTimes;
 };
+
 
 const QSize EMPTY_RESOLUTION_PAIR(0, 0);
 const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
@@ -100,6 +101,7 @@ public:
     CameraMediaStreamInfo( const QSize& _resolution, CodecID _codec );
 };
 #define CameraMediaStreamInfo_Fields (resolution)(transports)(transcodingRequired)
+
 
 class CameraMediaStreams
 {

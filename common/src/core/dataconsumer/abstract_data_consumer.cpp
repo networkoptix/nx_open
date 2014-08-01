@@ -1,5 +1,9 @@
 #include "abstract_data_consumer.h"
-#include "utils/common/sleep.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
+#include <utils/common/sleep.h>
+#include <utils/common/log.h>
 
 
 QnAbstractDataConsumer::QnAbstractDataConsumer(int maxQueueSize)
@@ -64,3 +68,5 @@ int QnAbstractDataConsumer::queueSize() const
 {
     return m_dataQueue.size();
 }
+
+#endif // ENABLE_DATA_PROVIDERS

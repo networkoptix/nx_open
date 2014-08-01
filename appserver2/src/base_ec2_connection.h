@@ -56,11 +56,10 @@ namespace ec2
         virtual int getCurrentTime( impl::CurrentTimeHandlerPtr handler ) override;
         virtual int dumpDatabaseAsync( impl::DumpDatabaseHandlerPtr handler ) override;
         virtual int restoreDatabaseAsync( const QByteArray& dbFile, impl::SimpleHandlerPtr handler ) override;
-        virtual int getSettingsAsync( impl::GetSettingsHandlerPtr handler ) override;
-        virtual int saveSettingsAsync( const QnKvPairList& kvPairs, impl::SimpleHandlerPtr handler ) override;
 
         virtual void addRemotePeer(const QUrl& url, const QUuid& peerGuid) override;
         virtual void deleteRemotePeer(const QUrl& url) override;
+        virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
         ECConnectionNotificationManager* notificationManager() { return m_notificationManager.get(); }

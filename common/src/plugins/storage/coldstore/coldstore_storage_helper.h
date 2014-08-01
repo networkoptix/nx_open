@@ -1,6 +1,8 @@
 #ifndef coldstore_helper_h_2137_h
 #define coldstore_helper_h_2137_h
 
+#ifdef ENABLE_COLDSTORE
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QFileInfoList>
 #include <QHash>
@@ -116,6 +118,6 @@ private:
 };
 
 
-
+#endif // ENABLE_COLDSTORE
 
 #endif //coldstore_helper_h_2137_h

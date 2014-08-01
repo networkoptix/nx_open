@@ -118,6 +118,8 @@ public:
     virtual bool setSendTimeout( unsigned int ms ) override;
     //!Implementation of AbstractSocket::getSendTimeout
     virtual bool getSendTimeout( unsigned int* millis ) override;
+    //!Implementation of AbstractSocket::getLastError
+    virtual bool getLastError(SystemError::ErrorCode* errorCode) override;
     //!Implementation of AbstractSocket::handle
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
 
@@ -344,6 +346,7 @@ private:
     bool setListen(int queueLen) ;
 };
 
+#ifdef ENABLE_SSL
 class TCPSslServerSocket: public TCPServerSocket
 {
 public:
@@ -356,6 +359,7 @@ public:
 private:
     bool m_allowNonSecureConnect;
 };
+#endif // ENABLE_SSL
 
 /**
   *   UDP socket class

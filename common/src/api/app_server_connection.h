@@ -32,7 +32,6 @@ public:
     static QnSoftwareVersion currentVersion();
     static QnResourceFactory* defaultFactory();
 
-    //static void setAuthKey(const QString &key);
     static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory *);
@@ -51,7 +50,7 @@ public:
 
     static void setEC2ConnectionFactory( ec2::AbstractECConnectionFactory* ec2ConnectionFactory );
     static ec2::AbstractECConnectionFactory* ec2ConnectionFactory();
-    static void setEc2Connection( ec2::AbstractECConnectionPtr connection );
+    static void setEc2Connection(const ec2::AbstractECConnectionPtr &connection );
     static ec2::AbstractECConnectionPtr getConnection2();
 
 private:

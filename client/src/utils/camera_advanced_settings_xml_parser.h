@@ -10,7 +10,7 @@
 #include <QtWebKitWidgets/QtWebKitWidgets>
 #endif
 
-#include "plugins/resources/camera_settings/camera_settings.h"
+#include "plugins/resource/camera_settings/camera_settings.h"
 
 typedef QSharedPointer<CameraSetting> CameraSettingPtr;
 typedef QHash<QString, CameraSettingPtr> CameraSettings;

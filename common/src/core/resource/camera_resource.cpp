@@ -3,7 +3,9 @@
 #include <QtCore/QUrlQuery>
 
 #include <utils/common/model_functions.h>
+#include <utils/common/util.h>
 #include <utils/math/math.h>
+
 #include <api/app_server_connection.h>
 
 
@@ -48,12 +50,14 @@ int QnPhysicalCameraResource::getChannel() const
     return m_channelNumber;
 }
 
-void QnPhysicalCameraResource::setUrl(const QString &url)
+void QnPhysicalCameraResource::setUrl(const QString &urlStr)
 {
-    QnVirtualCameraResource::setUrl(url); /* This call emits, so we should not invoke it under lock. */
+    QnVirtualCameraResource::setUrl( urlStr ); /* This call emits, so we should not invoke it under lock. */
 
     QMutexLocker lock(&m_mutex);
-    m_channelNumber = QUrlQuery(QUrl(url).query()).queryItemValue(QLatin1String("channel")).toInt();
+    QUrl url( urlStr );
+    m_channelNumber = QUrlQuery( url.query() ).queryItemValue( QLatin1String( "channel" ) ).toInt();
+    setHttpPort( url.port() );
     if (m_channelNumber > 0)
         m_channelNumber--; // convert human readable channel in range [1..x] to range [0..x-1]
 }

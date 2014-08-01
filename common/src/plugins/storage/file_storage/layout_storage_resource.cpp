@@ -1,13 +1,16 @@
 #include "layout_storage_resource.h"
 
+#ifdef ENABLE_ARCHIVE
+
 #include <QtCore/QDebug>
 #include <QtCore/QDir>
 
-#include "utils/common/util.h"
+#include <utils/common/util.h>
 #include <utils/fs/file.h>
 
 #include <recording/time_period_list.h>
-#include "plugins/resources/archive/filetypesupport.h"
+
+#include <plugins/resource/avi/filetypesupport.h>
 
 
 class QnLayoutFile: public QIODevice
@@ -404,8 +407,10 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
     if (m_index.entryCount >= (quint32)MAX_FILES_AT_LAYOUT)
         return false;
 
+#ifdef _DEBUG
     qint64 testPos = 0;
     Q_ASSERT_X(getFileOffset(srcFileName, &testPos) == -1, Q_FUNC_INFO, "Duplicate file name");
+#endif
 
     m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize - m_novFileOffset, qt4Hash(fileName));
 
@@ -521,3 +526,5 @@ QString QnLayoutFileStorageResource::layoutPrefix() {
     static QLatin1String prefix("layout://");
     return prefix;
 }
+
+#endif // ENABLE_ARCHIVE

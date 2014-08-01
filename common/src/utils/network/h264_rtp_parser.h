@@ -1,6 +1,8 @@
 #ifndef __H264_RTP_PARSER_H
 #define __H264_RTP_PARSER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <boost/optional.hpp>
 
 #include <QtCore/QByteArray>
@@ -20,6 +22,7 @@ public:
     virtual void setSDPInfo(QList<QByteArray> lines) override;
 
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result) override;
+
 private:
     QMap <int, QByteArray> m_allNonSliceNal;
     QList<QByteArray> m_sdpSpsPps;
@@ -32,15 +35,13 @@ private:
     bool m_builtinPpsFound;
     bool m_keyDataExists;
     bool m_frameExists;
-    quint64 m_timeCycles;
-    quint64 m_timeCycleValue;
-    quint64 m_lastTimeStamp;
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;
 
     QnCompressedVideoDataPtr m_videoData;
     //QnByteArray m_videoBuffer;
     int m_videoFrameSize;
+
 private:
     void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
@@ -49,5 +50,7 @@ private:
     void updateNalFlags(int nalUnitType);
     int getSpsPpsSize() const;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif

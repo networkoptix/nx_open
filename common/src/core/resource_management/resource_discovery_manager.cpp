@@ -19,7 +19,7 @@
 #include <core/resource_management/resource_searcher.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <plugins/resources/upnp/upnp_device_searcher.h>
+#include <plugins/resource/upnp/upnp_device_searcher.h>
 #include <plugins/storage/dts/abstract_dts_searcher.h>
 
 #include <utils/common/sleep.h>
@@ -133,7 +133,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnId &resourceTyp
     if (resourceType.isNull())
         return result;
 
-    if (resourceType->getName() == QLatin1String("Storage"))
+    if (resourceType->getName() == lit("Storage"))
     {
         result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(params.url));
     }

@@ -4,7 +4,7 @@ CREATE TABLE "vms_videowall" (
     resource_ptr_id integer NOT NULL UNIQUE PRIMARY KEY);
     
 -- OMG, should I generate this id by hands? And what if manufacturer count changes?    
-INSERT INTO "vms_resourcetype" (id, name) VALUES ('633', 'Videowall');
+INSERT INTO "vms_resourcetype" (name) VALUES ('Videowall');
 
 -- Videowall-to-pc many-to-many relationship
 CREATE TABLE "vms_videowall_pcs" (
@@ -35,10 +35,10 @@ CREATE TABLE "vms_videowall_item" (
     layout_guid     BLOB(16) NOT NULL,
     videowall_guid  BLOB(16) NOT NULL,
     name            VARCHAR(200) NOT NULL,
-    x               integer NOT NULL,
-    y               integer NOT NULL,
-    w               integer NOT NULL,
-    h               integer NOT NULL
+    snap_left       integer NOT NULL,
+    snap_top        integer NOT NULL,
+    snap_right      integer NOT NULL,
+    snap_bottom     integer NOT NULL
     );
 
 CREATE UNIQUE INDEX idx_videowall_item_guid ON vms_videowall_item(guid);

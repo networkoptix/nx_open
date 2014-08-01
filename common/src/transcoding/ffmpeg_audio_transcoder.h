@@ -1,6 +1,8 @@
 #ifndef __FFMPEG_AUDIO_TRANSCODER_H__
 #define __FFMPEG_AUDIO_TRANSCODER_H__
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QCoreApplication>
 
 #include "transcoder.h"
@@ -37,4 +39,7 @@ private:
 
 typedef QSharedPointer<QnFfmpegAudioTranscoder> QnFfmpegAudioTranscoderPtr;
 
+#endif // ENABLE_DATA_PROVIDERS
+
 #endif // __FFMPEG_AUDIO_TRANSCODER_H__
+

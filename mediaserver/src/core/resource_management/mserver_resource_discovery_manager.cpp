@@ -1,6 +1,14 @@
 #include "mserver_resource_discovery_manager.h"
+
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
+
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
+#include <utils/common/log.h>
+#include <utils/network/ping.h>
+#include <utils/network/ip_range_checker.h>
+
 #include "api/app_server_connection.h"
 #include "business/business_event_connector.h"
 #include "core/dataprovider/live_stream_provider.h"
@@ -12,11 +20,6 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource_management/resource_searcher.h"
 #include "plugins/storage/dts/abstract_dts_searcher.h"
-#include "utils/common/synctime.h"
-#include "utils/network/ping.h"
-#include "utils/network/ip_range_checker.h"
-#include "utils/common/sleep.h"
-#include "utils/common/util.h"
 #include "common/common_module.h"
 #include "data_only_camera_resource.h"
 
@@ -63,12 +66,24 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 bool QnMServerResourceDiscoveryManager::canTakeForeignCamera(const QnResourcePtr& camera)
 {
+#ifdef EDGE_SERVER
+    // return own camera back for edge server
+    char  mac[MAC_ADDR_LEN];
+    char* host = 0;
+    getMacFromPrimaryIF(mac, &host);
+    if (camera->getUniqueId().toLocal8Bit() == QByteArray(mac))
+        return true;
+#endif
+
     QnMediaServerResourcePtr mServer = qnResPool->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     if (!mServer || mServer->getStatus() == QnResource::Online)
         return false;
     QnMediaServerResourcePtr ownServer = qnResPool->getResourceById(qnCommon->moduleGUID()).dynamicCast<QnMediaServerResource>();
     if (!ownServer || !ownServer->isRedundancy())
         return false; // redundancy is disabled
+
+    if (qnResPool->getAllCameras(ownServer).count() >= ownServer->getMaxCameras())
+        return false;
     
     return mServer->currentStatusTime() > MSERVER_OFFLINE_TIMEOUT;
 }
@@ -121,8 +136,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             }
         }
 
-        QnSecurityCamResourcePtr camRes = newNetRes.dynamicCast<QnSecurityCamResource>();
-        if (camRes && camRes->needCheckIpConflicts())
+        QnVirtualCameraResourcePtr newCamRes = newNetRes.dynamicCast<QnVirtualCameraResource>();
+        if (newCamRes && newCamRes->needCheckIpConflicts())
         {
             // do not count 2--N channels of multichannel cameras as conflict
             quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
@@ -132,16 +147,33 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || rpResource->hasFlags(QnResource::foreigner))
         {
-            QnVirtualCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnVirtualCameraResource>();
-            if (cameraResource)
+            QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
+            if (existCamRes)
             {
-                cameraResource->setParentId(qnCommon->moduleGUID());
+                if (existCamRes->getTypeId() != newNetRes->getTypeId() && !newNetRes->isAbstractResource()) {
+                    QnId newTypeId = newNetRes->getTypeId();
+                    newNetRes->update(existCamRes);
+                    newNetRes->setParentId(qnCommon->moduleGUID());
+                    newNetRes->setFlags(existCamRes->flags() & ~QnResource::foreigner);
+                    newNetRes->setId(existCamRes->getId());
+                    newNetRes->setTypeId(newTypeId);
+                    qnResPool->removeResource(existCamRes);
+                    qnResPool->addResource(newCamRes);
+                    rpNetRes = existCamRes = newCamRes;
+                }
+                else {
+                    existCamRes->setParentId(qnCommon->moduleGUID());
+                    existCamRes->setFlags(existCamRes->flags() & ~QnResource::foreigner);
+
+                }
+                
                 QByteArray errorString;
                 QnVirtualCameraResourceList cameras;
                 ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
-                const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( cameraResource, &cameras );
+                const ec2::ErrorCode errorCode = connect->getCameraManager()->addCameraSync( existCamRes, &cameras );
                 if( errorCode != ec2::ErrorCode::ok )
                     NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+                    
             }
 
         }

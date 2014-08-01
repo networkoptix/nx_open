@@ -6,7 +6,6 @@
 #include "rest_connection_processor.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/network/tcp_listener.h"
-#include "rest_server.h"
 #include "request_handler.h"
 #include "network/authenticate_helper.h"
 #include "utils/gzip/gzip_compressor.h"
@@ -100,7 +99,7 @@ void QnRestConnectionProcessor::run()
             rez = handler->executeGet(url.path(), params, d->responseBody, contentType);
         }
         else if (d->request.requestLine.method.toUpper() == "POST") {
-            rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, contentType);
+            rez = handler->executePost(url.path(), params, d->requestBody, nx_http::getHeaderValue(d->request.headers, "Content-Type"), d->responseBody, contentType);
         }
         else {
             qWarning() << "Unknown REST method " << d->request.requestLine.method;
