@@ -1,5 +1,7 @@
 #include "ptz_mapper.h"
 
+#include <cassert>
+
 #include <utils/math/math.h>
 #include <utils/common/model_functions.h>
 
@@ -160,4 +162,8 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnPtzMapperPtr *ta
         QnSpaceMapperPtr<QVector3D>(new QnSeparableVectorSpaceMapper(output[0], output[1], output[2]))
     ));
     return true;
+}
+
+void serialize(QnJsonContext *, const QnPtzMapperPtr &, QJsonValue *) {
+    assert(false); /* Not supported for now. */
 }

@@ -1512,7 +1512,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
     /* Note that we don't pass shared pointer here as this would create a 
      * cyclic reference and onvif resource will never be deleted. */
     QnSoapServer::instance()->getService()->registerResource(
-        this,
+        toSharedPointer().staticCast<QnPlOnvifResource>(),
         QUrl(QString::fromStdString(m_eventCapabilities->XAddr)).host(),
         m_onvifNotificationSubscriptionReference );
 
@@ -2409,7 +2409,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 /*timerID*/)
         NX_LOG( lit("Failed to renew subscription (endpoint %1). %2").
             arg(QString::fromLatin1(soapWrapper.endpoint())).arg(m_prevSoapCallResult), cl_logDEBUG1 );
         lk.unlock();
-        QnSoapServer::instance()->getService()->removeResourceRegistration( this );
+        QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
         registerNotificationConsumer();
         return;
     }
@@ -2541,7 +2541,7 @@ void QnPlOnvifResource::stopInputPortMonitoring()
         TimerManager::instance()->joinAndDeleteTimer(localRenewSubscriptionTaskID);
         m_renewSubscriptionTaskID = 0;
     }
-    //TODO/IMPL removing device event registration
+    //TODO #ak removing device event registration
         //if we do not remove event registration, camera will do it for us in some timeout
 
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper;
@@ -2556,7 +2556,7 @@ void QnPlOnvifResource::stopInputPortMonitoring()
         asyncPullMessagesCallWrapper->join();
     }
 
-    QnSoapServer::instance()->getService()->removeResourceRegistration( this );
+    QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
 }
 
 

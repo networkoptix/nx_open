@@ -1714,6 +1714,7 @@ QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &par
     if (!menu)
         return NULL;
 
+    Q_ASSERT(!m_parametersByMenu.contains(menu));
     m_parametersByMenu[menu] = parameters;
     menu->installEventFilter(this);
     connect(menu, &QObject::destroyed, this, &QnActionManager::at_menu_destroyed);
@@ -1768,8 +1769,8 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
             return NULL;
         }
 
-        if (childMenu)
-            return integrateMenu(childMenu, parameters);
+        /* Do not need to call integrateMenu, it is already integrated. */
+        return childMenu;
     }
 
     QMenu *result = new QnMenu(parentWidget);
