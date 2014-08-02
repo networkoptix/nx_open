@@ -112,17 +112,15 @@ public:
     {
         if (itemParams.panoFactor == 1)
         {
-            qreal yAngle = itemParams.yAngle;
             float fovRot = sin(itemParams.xAngle) * qDegreesToRadians(mediaParams.fovRot);
-            if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) 
-            {
-                setUniformValue(m_yShiftLocation, (float) (yAngle));
+            if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
+                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
                 setUniformValue(m_yPos, (float) 0.5);
                 setUniformValue(m_xShiftLocation, (float) itemParams.xAngle);
                 setUniformValue(m_fovRotLocation, (float) fovRot);
             }
             else {
-                setUniformValue(m_yShiftLocation, (float) (yAngle - M_PI/2.0 - itemParams.fov/2.0 /  aspectRatio));
+                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - M_PI/2.0 - itemParams.fov/2.0/aspectRatio));
                 setUniformValue(m_yPos, (float) 1.0);
                 setUniformValue(m_xShiftLocation, (float) fovRot);
                 setUniformValue(m_fovRotLocation, (float) -itemParams.xAngle);
