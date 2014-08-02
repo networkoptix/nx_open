@@ -363,7 +363,7 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & (QnResource::still_image | QnResource::server))
+    if(widget->resource()->flags() & (QnResource::server))
         return Qn::InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->renderStatus();
