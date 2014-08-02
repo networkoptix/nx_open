@@ -251,8 +251,8 @@ QString QnFisheyeEquirectangularHProgram::getShaderText()
         vec3(0.0, cos(-fovRot), -sin(-fovRot)),
         vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
-    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio*xStretch));
-    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
+    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY));
+    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor ) + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
@@ -343,8 +343,8 @@ QString QnFisheyeEquirectangularVProgram::getShaderText()
         vec3(0.0, cos(-fovRot), -sin(-fovRot)),
         vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
-    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
+    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY));
+    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor ) + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
@@ -456,7 +456,7 @@ QString QnFisheyeRGBRectilinearProgram::getShaderText()
 
     // avoid function call for better shader compatibility
     vec3 xVect  = vec3(sin(xShift + PI/2.0), cos(xShift + PI/2.0), 0.0) * kx; 
-    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx;
+    vec3 yVect  = vec3(cos(-yShift + PI/2.0) * sin(xShift), cos(-yShift + PI/2.0)*cos(xShift), sin(-yShift + PI/2.0)) * kx / xStretch;
     vec3 center = vec3(cos(-yShift) * sin(xShift), cos(-yShift)*cos(xShift), sin(-yShift));
 
     mat3 to3d = mat3(xVect.x,   yVect.x,    center.x,    
@@ -528,8 +528,8 @@ QString QnFisheyeRGBEquirectangularHProgram::getShaderText()
         vec3(0.0, cos(-fovRot), -sin(-fovRot)),
         vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
-    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
+    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY));
+    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor) + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);
@@ -606,8 +606,8 @@ QString QnFisheyeRGBEquirectangularVProgram::getShaderText()
         vec3(0.0, cos(-fovRot), -sin(-fovRot)),
         vec3(0.0, sin(-fovRot),  cos(-fovRot)));
 
-    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY*aspectRatio));
-    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor / aspectRatio) + vec2(xShift, 0.0);
+    vec2 xy1 = vec2(dstFov / maxX, (dstFov / panoFactor) / (maxY));
+    vec2 xy2 = vec2(-0.5*dstFov,  -yPos*dstFov / panoFactor) + vec2(xShift, 0.0);
 
     vec2 xy3 = vec2(maxX / PI * radius*2.0,  maxY / PI * radius*2.0*aspectRatio);
     vec2 xy4 = vec2(maxX * xCenter, maxY * yCenter);

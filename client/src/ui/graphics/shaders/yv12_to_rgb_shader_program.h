@@ -134,14 +134,12 @@ public:
             setUniformValue(m_fovRotLocation, (float) qDegreesToRadians(mediaParams.fovRot));
             //setUniformValue(m_fovRotLocation, (float) gradToRad(-11.0));
             if (mediaParams.viewMode == QnMediaDewarpingParams::Horizontal) {
-                qreal yAngle = itemParams.yAngle * mediaParams.hStretch;
                 setUniformValue(m_yPos, (float) 0.5);
-                setUniformValue(m_yShiftLocation, (float) (yAngle));
+                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle));
             }
             else {
-                qreal yAngle = itemParams.yAngle;
                 setUniformValue(m_yPos, (float) 1.0);
-                setUniformValue(m_yShiftLocation, (float) (yAngle - itemParams.fov/itemParams.panoFactor/2.0/mediaParams.hStretch));
+                setUniformValue(m_yShiftLocation, (float) (itemParams.yAngle - itemParams.fov/itemParams.panoFactor/2.0));
             }
         }
 

@@ -62,7 +62,9 @@ void QnFisheyePtzController::updateLimits() {
     m_limits.minFov = 20.0;
     m_limits.maxFov = 90.0 * m_itemDewarpingParams.panoFactor;
 
-    qreal imageAR = m_aspectRatio / (qreal) m_itemDewarpingParams.panoFactor;
+    qreal imageAR = m_aspectRatio;
+    if (m_itemDewarpingParams.panoFactor > 1)
+        imageAR = 1.0 / (qreal) m_itemDewarpingParams.panoFactor;
     qreal radiusY = m_mediaDewarpingParams.radius * imageAR;
     
     qreal minY = m_mediaDewarpingParams.yCenter - radiusY;

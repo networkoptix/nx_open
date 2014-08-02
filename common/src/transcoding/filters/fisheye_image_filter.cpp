@@ -331,7 +331,10 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
         0.0,    0.0,               0.0,               1.0
     );
 
-    qreal aspectRatio = (imageSize.width()/m_itemDewarping.panoFactor) / (qreal) imageSize.height();
+    qreal aspectRatio = imageSize.width() / (qreal) imageSize.height();
+    if (m_itemDewarping.panoFactor > 1) {
+        aspectRatio = m_itemDewarping.panoFactor;
+    }
     qreal yPos;
     qreal phiShiftSign;
     qreal yAngle = m_itemDewarping.yAngle;

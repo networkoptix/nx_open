@@ -365,7 +365,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
     
     int panoFactor = (parameters.mediaDewarpingParams.enabled && parameters.itemDewarpingParams.enabled) ? parameters.itemDewarpingParams.panoFactor : 1;
     if (panoFactor > 1)
-        resized = resized.scaled(resized.width() * panoFactor, resized.height());
+        resized = resized.scaled(resized.height() * panoFactor, resized.height());
     
 
     QScopedPointer<CLVideoDecoderOutput> frame(new CLVideoDecoderOutput(resized));
