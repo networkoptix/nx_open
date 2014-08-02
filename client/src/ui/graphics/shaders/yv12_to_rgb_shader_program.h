@@ -122,9 +122,7 @@ public:
                 setUniformValue(m_fovRotLocation, (float) fovRot);
             }
             else {
-                yAngle += (itemParams.fov / 2.0)  - (itemParams.fov / 2.0 /  aspectRatio);
-
-                setUniformValue(m_yShiftLocation, (float) (yAngle - M_PI/2.0 - itemParams.fov/2.0));
+                setUniformValue(m_yShiftLocation, (float) (yAngle - M_PI/2.0 - itemParams.fov/2.0 /  aspectRatio));
                 setUniformValue(m_yPos, (float) 1.0);
                 setUniformValue(m_xShiftLocation, (float) fovRot);
                 setUniformValue(m_fovRotLocation, (float) -itemParams.xAngle);
