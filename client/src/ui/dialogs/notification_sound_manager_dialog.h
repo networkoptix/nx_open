@@ -5,14 +5,17 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
+
 namespace Ui {
     class QnNotificationSoundManagerDialog;
 }
 
 class QnAppServerNotificationCache;
 
-class QnNotificationSoundManagerDialog : public QDialog, public QnWorkbenchContextAware
-{
+class QnNotificationSoundManagerDialog : public QnWorkbenchStateDependentButtonBoxDialog {
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
+
     Q_OBJECT
 public:
     explicit QnNotificationSoundManagerDialog(QWidget *parent = 0);

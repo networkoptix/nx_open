@@ -21,14 +21,14 @@
 #include <ui/workaround/gl_native_painting.h>
 #include <opengl_renderer.h>
 
-QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent):
+QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs, QObject *parent, QnWorkbenchContext *context):
     base_type(parent),
-    QnWorkbenchContextAware(parent),
+    QnWorkbenchContextAware(context),
     m_backgroundColorAnimator(NULL),
     m_cycleIntervalSecs(cycleIntervalSecs),
     m_rainbow(NULL)
 {
-    connect(context()->instance<QnWorkbenchPanicWatcher>(), &QnWorkbenchPanicWatcher::panicModeChanged, this, &QnGradientBackgroundPainter::updateBackgroundColorAnimated);
+    connect(this->context()->instance<QnWorkbenchPanicWatcher>(), &QnWorkbenchPanicWatcher::panicModeChanged, this, &QnGradientBackgroundPainter::updateBackgroundColorAnimated);
 
     if(qnSettings->isRainbowMode()) {
         m_rainbow = new QnRainbow(this);

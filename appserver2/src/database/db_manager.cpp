@@ -265,13 +265,13 @@ bool QnDbManager::init()
 {
     if (!m_sdb.open())
     {
-        qWarning() << "can't initialize EC sqlLite database "<<m_sdb.databaseName()<<". Error: "<<m_sdb.lastError().text();
+        qWarning() << "can't initialize Server sqlLite database "<<m_sdb.databaseName()<<". Error: "<<m_sdb.lastError().text();
         return false;
     }
 
     if (!m_sdbStatic.open())
     {
-        qWarning() << "can't initialize EC static sqlLite database "<<m_sdbStatic.databaseName()<<". Error: "<<m_sdbStatic.lastError().text();
+        qWarning() << "can't initialize Server static sqlLite database "<<m_sdbStatic.databaseName()<<". Error: "<<m_sdbStatic.lastError().text();
         return false;
     }
 
@@ -282,7 +282,6 @@ bool QnDbManager::init()
         qWarning() << "can't create tables for sqlLite database!";
         return false;
     }
-
 
     if (!qnCommon->obsoleteServerGuid().isNull()) {
 		{
@@ -307,7 +306,6 @@ bool QnDbManager::init()
 			}
 		}
     }
-
     // updateDBVersion();
     QSqlQuery insVersionQuery(m_sdb);
     insVersionQuery.prepare("INSERT OR REPLACE INTO misc_data (key, data) values (?,?)");
@@ -414,7 +412,7 @@ bool QnDbManager::init()
         
     QSqlQuery queryCameras(m_sdb);
     // Update cameras status
-    // select cameras from media servers without DB and local cameras
+    // select cameras from servers without DB and local cameras
     queryCameras.setForwardOnly(true);
     queryCameras.prepare("SELECT r.guid FROM vms_resource r \
                          JOIN vms_camera c on c.resource_ptr_id = r.id \
@@ -1519,7 +1517,7 @@ ErrorCode QnDbManager::deleteCameraServerItemTable(qint32 /*id*/)
     if( !query.next() )
         return ErrorCode::ok;   //already deleted
     if (query.value("cnt").toInt() > 1)
-        return ErrorCode::ok; // camera instance on a other media server still present
+        return ErrorCode::ok; // camera instance on a other server still present
 
 
     // do not delete because of camera can be found in the future again but camera archive can be still accessible

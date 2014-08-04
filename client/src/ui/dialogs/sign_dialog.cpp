@@ -74,7 +74,7 @@ private:
 // ------------------------------------
 
 SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
-    QDialog(parent),
+    base_type(parent),
     ui(new Ui::SignDialog),
     m_camDispay(NULL),
     m_reader(NULL),

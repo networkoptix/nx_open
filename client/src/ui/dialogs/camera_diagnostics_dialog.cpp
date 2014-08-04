@@ -111,7 +111,7 @@ void QnCameraDiagnosticsDialog::clearLog() {
 QString QnCameraDiagnosticsDialog::diagnosticsStepText(int stepType) {
     switch(stepType) {
     case CameraDiagnostics::Step::mediaServerAvailability:
-        return tr("Checking media server availability");
+        return tr("Checking Server availability");
     case CameraDiagnostics::Step::cameraAvailability:
         return tr("Checking that camera is accessible");
     case CameraDiagnostics::Step::mediaStreamAvailability:

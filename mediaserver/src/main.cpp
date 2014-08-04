@@ -156,7 +156,7 @@
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
 
-static QString SERVICE_NAME = QString(QLatin1String(VER_COMPANYNAME_STR)) + QString(QLatin1String(" Media Server"));
+static QString SERVICE_NAME = lit("%1 Server").arg(lit(QN_ORGANIZATION_NAME));
 static const quint64 DEFAULT_MAX_LOG_FILE_SIZE = 10*1024*1024;
 static const quint64 DEFAULT_LOG_ARCHIVE_SIZE = 25;
 static const quint64 DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;
@@ -690,9 +690,9 @@ void initAppServerConnection(QSettings &settings)
 
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
-    NX_LOG(lit("Connect to enterprise controller server %1").arg(urlNoPassword.toString()), cl_logINFO);
+    NX_LOG(lit("Connect to server %1").arg(urlNoPassword.toString()), cl_logINFO);
     QnAppServerConnectionFactory::setClientGuid(serverGuid().toString());
-    QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
+    QnAppServerConnectionFactory::setUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
 }
 
@@ -789,11 +789,11 @@ void QnMain::loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor)
     ec2::ErrorCode rez;
 
     {
-        //reading media servers list
+        //reading servers list
         QnMediaServerResourceList mediaServerList;
         while( ec2Connection->getMediaServerManager()->getServersSync( &mediaServerList) != ec2::ErrorCode::ok )
         {
-            NX_LOG( lit("QnMain::run(). Can't get media servers."), cl_logERROR );
+            NX_LOG( lit("QnMain::run(). Can't get servers."), cl_logERROR );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
@@ -1186,7 +1186,7 @@ void QnMain::run()
     QnConnectionInfo connectInfo;
     while (!needToStop())
     {
-        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QnAppServerConnectionFactory::defaultUrl(), &ec2Connection );
+        const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync( QnAppServerConnectionFactory::url(), &ec2Connection );
         if( errorCode == ec2::ErrorCode::ok )
         {
             connectInfo = ec2Connection->connectionInfo();
@@ -1247,7 +1247,7 @@ void QnMain::run()
 
     if (!compatibilityChecker->isCompatible(COMPONENT_NAME, QnSoftwareVersion(QN_ENGINE_VERSION), "ECS", connectInfo.version))
     {
-        NX_LOG(lit("Incompatible Enterprise Controller version detected! Giving up."), cl_logERROR);
+        NX_LOG(lit("Incompatible Server version detected! Giving up."), cl_logERROR);
         return;
     }
 
@@ -1267,7 +1267,7 @@ void QnMain::run()
     QnRestProcessorPool restProcessorPool;
     QnRestProcessorPool::initStaticInstance( &restProcessorPool );
 
-    if( QnAppServerConnectionFactory::defaultUrl().scheme().toLower() == lit("file") )
+    if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
         ec2ConnectionFactory->registerRestHandlers( &restProcessorPool );
 
     nx_hls::HLSSessionPool hlsSessionPool;
@@ -1701,6 +1701,7 @@ protected:
     {
         QtSingleCoreApplication *application = this->application();
 
+        // check if local or remote EC. MServer changes guid depend of this fact
         updateGuidIfNeeded();
 
         QUuid guid = serverGuid();

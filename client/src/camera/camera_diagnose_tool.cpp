@@ -141,7 +141,7 @@ namespace CameraDiagnostics
 
         if( !m_serverConnection )
         {
-            m_errorMessage = tr("No connection to media server %1.").arg(m_serverHostAddress);
+            m_errorMessage = tr("No connection to Server %1.").arg(m_serverHostAddress);
             m_result = false;
             emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
             m_state = sDone;
