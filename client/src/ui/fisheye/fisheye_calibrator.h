@@ -47,6 +47,7 @@ protected:
 private:
     quint32 drawCircle(QSharedPointer<CLVideoDecoderOutput> frame, const QPoint& center, int radius);
     void findCircleParams();
+    qreal findElipse();
     int findPixel(int y, int x, int xDelta);
     int findYThreshold(QImage frame);
 private:
