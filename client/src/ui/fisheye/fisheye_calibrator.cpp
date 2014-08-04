@@ -139,15 +139,13 @@ int QnFisheyeCalibrator::findPixel(int y, int x, int xDelta)
     return -1;
 }
 
-qreal QnFisheyeCalibrator::findElipse()
+qreal QnFisheyeCalibrator::findElipse(qreal& newRadius)
 {
     QPointF center(m_center.x() * m_width, m_center.y() * m_height);
-    //qreal radius = m_radius * m_width;
-    qreal delta = sqrt(2.0)/2.0 * (m_radius * m_width);
+    qreal height = m_radius * m_height;
 
-    // draw 45 degree vector from the radius to left top and right bottom, then find points in a real image
-    qreal topLine = center.y() - delta;
-    qreal bottomLine = center.y() + delta;
+    qreal topLine = center.y() - height*0.66;
+    qreal bottomLine = center.y() + height*0.33;
     // scan lines
     int xRight = findPixel(bottomLine, m_width-1, -1);
     int xLeft = findPixel(topLine, 0, 1);
@@ -156,13 +154,12 @@ qreal QnFisheyeCalibrator::findElipse()
     p1 -= center;
     p2 -= center;
 
-    qreal radius = sqrt(p1.x()*p1.x() + p1.y()*p1.y());
-
     qreal c = p2.x()*p2.x() * p1.y()*p1.y() - p1.x()*p1.x() * p2.y()*p2.y();
-    qreal k = radius * radius * (p2.x()*p2.x() - p1.x()*p1.x());
+    qreal k = (p2.x()*p2.x() - p1.x()*p1.x());
     qreal b = sqrt(qAbs(c / k));
     qreal a = sqrt(qAbs(p1.x()*p1.x() * b*b / (b*b - p1.y()*p1.y())));
-    return b / a;
+    newRadius = a;
+    return a / b;
 }
 
 void QnFisheyeCalibrator::findCircleParams()
@@ -266,11 +263,10 @@ void QnFisheyeCalibrator::findCircleParams()
     setRadius(radius / (qreal) m_width);
 
     // check for horizontal stretch
-    qreal stretch = findElipse();
+    qreal newRadius = 0.0;
+    qreal stretch = findElipse(newRadius);
     if (qBetween(1.1, stretch, 2.0)) {
-        dy *= stretch;
-        qreal radius = sqrt(dx*dx + dy*dy) + 0.5;
-        setRadius(radius / (qreal) m_width);
+        setRadius(newRadius / (qreal) m_width);
         setHorizontalStretch(stretch);
     }
     else {
