@@ -67,6 +67,7 @@ public:
 
     const QString &name() const;
     const QByteArray &key() const;
+    void setKey(const QByteArray& value);
     qint32 cameraCount() const;
     const QByteArray &hardwareId() const;
     const QByteArray &signature() const;
