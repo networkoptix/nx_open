@@ -142,8 +142,8 @@ int QnFisheyeCalibrator::findPixel(int y, int x, int xDelta)
 qreal QnFisheyeCalibrator::findElipse()
 {
     QPointF center(m_center.x() * m_width, m_center.y() * m_height);
-    qreal radius = m_radius * m_width;
-    qreal delta = sqrt(2.0)/2.0 * radius;
+    //qreal radius = m_radius * m_width;
+    qreal delta = sqrt(2.0)/2.0 * (m_radius * m_width);
 
     // draw 45 degree vector from the radius to left top and right bottom, then find points in a real image
     qreal topLine = center.y() - delta;
@@ -155,6 +155,8 @@ qreal QnFisheyeCalibrator::findElipse()
     QPointF p2(xRight, bottomLine);
     p1 -= center;
     p2 -= center;
+
+    qreal radius = sqrt(p1.x()*p1.x() + p1.y()*p1.y());
 
     qreal c = p2.x()*p2.x() * p1.y()*p1.y() - p1.x()*p1.x() * p2.y()*p2.y();
     qreal k = radius * radius * (p2.x()*p2.x() - p1.x()*p1.x());
