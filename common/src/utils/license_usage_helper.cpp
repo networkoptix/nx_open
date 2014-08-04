@@ -95,8 +95,6 @@ QString QnLicenseUsageHelper::getProposedUsageText() const
 {
     QString licenseText;
     foreach (Qn::LicenseType lt, licenseTypes()) {
-        if (lt != mainLicenseType() && totalLicense(lt) == 0)
-            continue;
         if (!licenseText.isEmpty())
             licenseText += lit("\n");
         licenseText += getProposedUsageText(lt);
@@ -118,8 +116,6 @@ QString QnLicenseUsageHelper::getRequiredLicenseMsg() const
 {
     QString licenseText;
     foreach (Qn::LicenseType lt, licenseTypes()) {
-        if (lt != mainLicenseType() && totalLicense(lt) == 0)
-            continue;
         if (!licenseText.isEmpty())
             licenseText += lit("\n");
         licenseText += getRequiredLicenseMsg(lt);
@@ -243,10 +239,6 @@ int QnCamLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType licenseType) 
     return qnResPool->activeCamerasByLicenseType(licenseType);
 }
 
-Qn::LicenseType QnCamLicenseUsageHelper::mainLicenseType() const {
-    return Qn::LC_Professional;
-}
-
 /************************************************************************/
 /* QnVideoWallLicenseUsageHelper                                        */
 /************************************************************************/
@@ -320,10 +312,6 @@ int QnVideoWallLicenseUsageHelper::calculateUsedLicenses(Qn::LicenseType license
     }
 
     return result;
-}
-
-Qn::LicenseType QnVideoWallLicenseUsageHelper::mainLicenseType() const {
-    return Qn::LC_VideoWall;
 }
 
 void QnVideoWallLicenseUsageHelper::propose(const QnVideoWallResourcePtr &videowall, const QUuid &pcUuid, int itemsCount) {

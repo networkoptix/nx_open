@@ -51,8 +51,6 @@ public:
 
     virtual QList<Qn::LicenseType> licenseTypes() const;
 
-    virtual Qn::LicenseType mainLicenseType() const = 0;
-
     void update();
 signals:
      void licensesChanged();
@@ -84,7 +82,6 @@ public:
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;
-    virtual Qn::LicenseType mainLicenseType() const override;
 private:
     void init();
 };
@@ -103,7 +100,6 @@ public:
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual int calculateUsedLicenses(Qn::LicenseType licenseType) const override;
-    virtual Qn::LicenseType mainLicenseType() const override;
 };
 
 /** Utility RAAA class to propose some licenses usage. */
