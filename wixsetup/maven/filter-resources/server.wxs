@@ -7,8 +7,13 @@
 
         <DirectoryRef Id="INSTALLDIR">
             <Directory Id="${customization}MediaServerDir" Name="MediaServer">
-                <Directory Id="ServerImageFormats" Name="imageformats">
+                <Directory Id="${customization}DbSync22Dir" Name="dbsync-2.2">
+                    <Component Id="dbsync221versionpy">
+                        <File Id="version221.py" Name="version.py" Source="${libdir}/version.py" KeyPath="yes"/>
+                    </Component>
                 </Directory>
+
+                <Directory Id="ServerImageFormats" Name="imageformats"></Directory>
 
                 <Component Id="ServerExecutable">
                     <File Id="ServerExe" Name="mediaserver.exe" Source="$(var.SourceDir)/mediaserver.exe" KeyPath="yes">
@@ -34,12 +39,14 @@
                         <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
                         <RegistryValue Type="string" Name="port" Value="[SERVER_PORT]"/>
                     </RegistryKey>
-                    <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\apiPort" Action="removeOnInstall"/>
-                    <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\rtspPort" Action="removeOnInstall"/>
-                    <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\appserverHost" Action="removeOnInstall"/>
-                    <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\appserverPort" Action="removeOnInstall"/>
-                    <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\appserverLogin" Action="removeOnInstall"/>
-                    <RemoveRegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}\appserverPassword" Action="removeOnInstall"/>
+                </Component>
+
+                <Component Id="ServerConfigurationPassword">
+                    <Condition>SERVER_PASSWORD</Condition>
+
+                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
+                        <RegistryValue Type="string" Name="adminPassword" Value="[SERVER_PASSWORD]"/>
+                    </RegistryKey>
                 </Component>
 
                 <Directory Id="ServerPlugins" Name="plugins">
@@ -188,7 +195,11 @@
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
             <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
 
+            <ComponentGroupRef Id="DbSync22FilesComponent" />
+
+            <ComponentRef Id="dbsync221versionpy"/>
             <ComponentRef Id='ServerConfiguration'/>
+            <ComponentRef Id='ServerConfigurationPassword'/>
 
             <ComponentRef Id="ServerExecutable" />
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>
@@ -205,6 +216,11 @@
             <ComponentRef Id="VmaxProxyQTLibraries"/>
             <ComponentGroupRef Id="VmaxProxySDK"/>
             <?endif?>       
+
+            <ComponentRef Id="traytool.exe"/>
+            <ComponentGroupRef Id="TrayToolQTLibraries"/>
+            <ComponentGroupRef Id="TraytoolPlatforms" />            
+
         </Feature>
 
     </Fragment>

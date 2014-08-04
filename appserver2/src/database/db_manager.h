@@ -331,18 +331,17 @@ namespace ec2
         void commit();
         void rollback();
     private:
-        enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash};
+        enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_INT};
 
-        QMap<int, QnId> getGuidList(const QString& request, const QByteArray& tableName, GuidConversionMethod method = CM_Default);
+        QMap<int, QnId> getGuidList(const QString& request, GuidConversionMethod method, const QByteArray& intHashPostfix = QByteArray());
+
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnId>& guids);
         bool updateGuids();
         QnId getType(const QString& typeName);
         bool resyncTransactionLog();
-        
         template <class ObjectType, class ObjectListType> 
         bool fillTransactionLogInternal(ApiCommand::Value command);
-        template <class ObjectType>
-        bool fillTransactionLogInternal(ApiCommand::Value command);
+        bool addTransactionForGeneralSettings();
     private:
         QnResourceFactory* m_resourceFactory;
         LicenseManagerImpl* const m_licenseManagerImpl;

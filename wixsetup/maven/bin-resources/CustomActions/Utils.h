@@ -19,5 +19,6 @@ UINT CopyProfile(MSIHANDLE hInstall, const char* actionName, BOOL verifyDestFold
 void fixPath(CString& path);
 
 void QuitExecAndWarn(const LPWSTR commandLine, int status, const LPWSTR warningMsg);
+bool isStandaloneSystem(const char* host);
 
 #endif // _CUSTOM_ACTIONS_UTILS_H_
