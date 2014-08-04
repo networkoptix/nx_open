@@ -272,7 +272,10 @@ bool QnSecurityCamResource::isEdge() const {
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const 
 {
-    if (isAnalog())
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
+    if (resType && resType->getManufacture() == lit("VMAX"))
+        return Qn::LC_VMAX;
+    else if (isAnalog())
         return Qn::LC_Analog;
     else if (isEdge())
         return Qn::LC_Edge;
