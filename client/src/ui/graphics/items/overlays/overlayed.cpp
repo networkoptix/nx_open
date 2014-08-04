@@ -115,8 +115,10 @@ bool detail::OverlayedBase::isOverlayVisible() const {
 }
 
 void detail::OverlayedBase::setOverlayVisible(bool visible, bool animate) {
-    m_overlayVisible = visible;
+    if (m_overlayVisible == visible)
+        return;
 
+    m_overlayVisible = visible;
     updateOverlayWidgetsVisibility(animate);
 }
 
