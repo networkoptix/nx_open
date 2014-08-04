@@ -412,6 +412,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Settings..."));
 
+    factory(Qn::ConnectAction).
+        flags(Qn::NoTarget);
+
     factory(Qn::ReconnectAction).
         flags(Qn::NoTarget).
         text(tr("Reconnect to Server"));
@@ -498,9 +501,10 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/main_menu.png"));
 
-    // Text and icon are set in QnWorkbenchActionHandler::at_eventManager_connectionOpened/Closed
-    factory(Qn::ConnectToServerAction).
+    factory(Qn::OpenLoginDialogAction).
         flags(Qn::Main).
+        text(tr("Connect to Server...")).
+        icon(qnSkin->icon("titlebar/disconnected.png")).
         autoRepeat(false);
 
     factory(Qn::DisconnectAction).
@@ -758,11 +762,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("How-to Videos and FAQ...")).
         condition(new QnShowcaseActionCondition(this));
 
-    factory(Qn::CheckForUpdatesAction).
-        flags(Qn::Main).
-        text(tr("Check for Updates...")).
-        condition(new QnCheckForUpdatesActionCondition(this));
-
     factory(Qn::AboutAction).
         flags(Qn::Main | Qn::GlobalHotkey).
         text(tr("About...")).
@@ -784,6 +783,11 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/exit.png"));
 
+    factory(Qn::ExitActionDelayed).
+        flags(Qn::NoTarget);
+
+    factory(Qn::BeforeExitAction).
+        flags(Qn::NoTarget);
 
     /* Tab bar actions. */
     factory().
@@ -1268,10 +1272,6 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInCameraSettingsDialogAction).
         flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
         text(tr("Open in Camera Settings Dialog"));
-
-    factory(Qn::ClearCameraSettingsAction).
-        flags(Qn::NoTarget).
-        text(tr("Clear Camera Settings Dialog"));
 
     factory(Qn::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).

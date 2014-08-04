@@ -33,7 +33,7 @@ struct QnModuleInformation {
     QnModuleInformation() : isLocal(false) {}
 };
 
-//!Searches for all Network Optix enterprise controllers in local network environment using multicast
+//!Searches for all Network Optix Servers in local network environment using multicast
 /*!
     Search is done by sending multicast packet to predefined multicast group and waiting for an answer.
     Requests are sent periodically every \a pingTimeoutMillis milliseconds.
@@ -67,7 +67,7 @@ public:
 
     /**
      * \returns                         Whether this module finder is working in compatibility mode.
-     *                                  In this mode all EC are supported regardless of customization.
+     *                                  In this mode all Servers are supported regardless of customization.
      */
     bool isCompatibilityMode() const;
 
@@ -80,12 +80,12 @@ public slots:
     virtual void pleaseStop() override;
 
 signals:
-    //!Emitted when new enterprise controller has been found
+    //!Emitted when new Server has been found
     void moduleFound(const QnModuleInformation &moduleInformation,
                      const QString &remoteAddress,
                      const QString &localInterfaceAddress);
 
-    //!Emmited when previously found module did not respond to request in predefined timeout
+    //!Emmitted when previously found module did not respond to request in predefined timeout
     void moduleLost(const QnModuleInformation &moduleInformation);
 
 protected:

@@ -918,7 +918,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
     dialog->setDelegate(dialogDelegate);
     dialog->setSelectedResources(m_cameras);
     setHelpTopic(dialog.data(), Qn::CameraSettings_Recording_Export_Help);
-    if (dialog->exec() != QDialog::Accepted)
+    if (!dialog->exec())
         return;
 
     const bool copyArchiveLength = dialogDelegate->doCopyArchiveLength();

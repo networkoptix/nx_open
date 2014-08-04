@@ -235,7 +235,7 @@ void QnVirtualCameraResource::saveParams()
     ec2::ErrorCode rez = conn->getResourceManager()->saveSync(getId(), params, true, &outData);
 
     if (rez != ec2::ErrorCode::ok) {
-        qCritical() << Q_FUNC_INFO << ": can't save resource params to Enterprise Controller. Resource physicalId: "
+        qCritical() << Q_FUNC_INFO << ": can't save resource params to Server. Resource physicalId: "
             << getPhysicalId() << ". Description: " << ec2::toString(rez);
     }
 }

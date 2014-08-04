@@ -24,7 +24,6 @@ public:
     virtual void updateFromSettings() override;
 
     virtual bool confirm() override;
-
 private:
     void initTranslations();
 

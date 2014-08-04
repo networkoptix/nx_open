@@ -386,7 +386,7 @@ void QnBusinessRuleWidget::at_scheduleButton_clicked() {
 
     QScopedPointer<QnWeekTimeScheduleDialog> dialog(new QnWeekTimeScheduleDialog(this));
     dialog->setScheduleTasks(m_model->schedule());
-    if (dialog->exec() != QDialog::Accepted)
+    if (!dialog->exec())
         return;
     m_model->setSchedule(dialog->scheduleTasks());
 }

@@ -468,7 +468,7 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
 
     static int sensToLevelThreshold[10] = 
     {
-        31, // 0 - aka mask really filtered by media server always
+        31, // 0 - aka mask really filtered by server always
         31, // 1
         25, // 2
         19, // 3

@@ -185,7 +185,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 tim
         return currentServer;
     
     if (mediaServer != m_server)
-        qDebug() << "switch to media server " << mediaServer->getUrl();
+        qDebug() << "switch to server " << mediaServer->getUrl();
     return mediaServer;
 
 }
@@ -497,7 +497,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     /*
     if (result && result->flags & QnAbstractMediaData::MediaFlags_LIVE)
     {
-        // Media server can change quality for LIVE stream (for archive quality controlled by client only)
+        // Server can change quality for LIVE stream (for archive quality controlled by client only)
         // So, if server is changed quality, update current quality variables
         if (qSharedPointerDynamicCast<QnCompressedVideoData>(result))
         {
@@ -784,8 +784,8 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResource
         session->setUsePredefinedTracks(0);
     }
     
-    QString user = QnAppServerConnectionFactory::defaultUrl().userName();
-    QString password = QnAppServerConnectionFactory::defaultUrl().password();
+    QString user = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
     QAuthenticator auth;
     auth.setUser(user);
     auth.setPassword(password);

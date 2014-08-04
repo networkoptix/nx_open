@@ -31,7 +31,7 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
     addFlags(QnResource::server | QnResource::remote);
     removeFlags(QnResource::media); // TODO: #Elric is this call needed here?
 
-    //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on EC.
+    //TODO: #GDM #EDGE in case of EDGE servers getName should return name of its camera. Possibly name just should be synced on Server.
     setName(tr("Server"));
 
     m_primaryIFSelected = false;
@@ -277,7 +277,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
-        /* Keep indices unchanged (EC does not provide this info). */
+        /* Keep indices unchanged (Server does not provide this info). */
         foreach(const QnAbstractStorageResourcePtr &storage, m_storages)
         {
             foreach(const QnAbstractStorageResourcePtr &otherStorage, otherStorages)

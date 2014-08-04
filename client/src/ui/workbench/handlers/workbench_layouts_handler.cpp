@@ -26,16 +26,17 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/handlers/workbench_export_handler.h>
-#include <ui/workbench/handlers/workbench_videowall_handler.h>
+#include <ui/workbench/handlers/workbench_export_handler.h>     //TODO: #GDM dependencies
+#include <ui/workbench/handlers/workbench_videowall_handler.h>  //TODO: #GDM dependencies
+#include <ui/workbench/workbench_state_manager.h>
 
 #include <utils/common/counter.h>
 #include <utils/common/event_processors.h>
 
-
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     QObject(parent),
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_workbenchStateDelegate(new QnBasicWorkbenchStateDelegate<QnWorkbenchLayoutsHandler>(this))
 {
     connect(action(Qn::NewUserLayoutAction),                &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered);
     connect(action(Qn::SaveLayoutAction),                   &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered);
@@ -45,6 +46,9 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent) :
     connect(action(Qn::SaveCurrentLayoutAsAction),          &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
     connect(action(Qn::CloseLayoutAction),                  &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered);
     connect(action(Qn::CloseAllButThisLayoutAction),        &QAction::triggered,    this,   &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
+}
+
+QnWorkbenchLayoutsHandler::~QnWorkbenchLayoutsHandler() {
 }
 
 ec2::AbstractECConnectionPtr QnWorkbenchLayoutsHandler::connection2() const {
@@ -142,6 +146,10 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         QMessageBox::Button button = QMessageBox::Cancel;
         do {
             if (!dialog->exec())
+                return;
+
+            /* Check if we were disconnected (server shut down) while the dialog was open. */
+            if (!context()->user())
                 return;
 
             if(dialog->clickedButton() != QDialogButtonBox::Save)
@@ -593,7 +601,7 @@ void QnWorkbenchLayoutsHandler::at_layouts_saved(int status, const QnResourceLis
             mainWindow(),
             resources,
             tr("Error"),
-            tr("Could not save the following %n layout(s) to Enterprise Controller.", "", reopeningLayoutResources.size()),
+            tr("Could not save the following %n layout(s) to Server.", "", reopeningLayoutResources.size()),
             tr("Do you want to restore these %n layout(s)?", "", reopeningLayoutResources.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
@@ -606,4 +614,8 @@ void QnWorkbenchLayoutsHandler::at_layouts_saved(int status, const QnResourceLis
                 resourcePool()->removeResource(layoutResource);
         }
     }
+}
+
+bool QnWorkbenchLayoutsHandler::tryClose(bool force) {
+    return closeAllLayouts(true, force);
 }

@@ -188,9 +188,11 @@ void QnSingleCameraSettingsWidget::at_proxyAuthenticationRequired ( const QNetwo
     QMutexLocker locker(&m_cameraMutex);
     if (!m_camera)
         return;
-    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-    authenticator->setUser(lastUsedConnection.url.userName());
-    authenticator->setPassword(lastUsedConnection.url.password());
+
+    QString user = QnAppServerConnectionFactory::url().userName();
+    QString password = QnAppServerConnectionFactory::url().password();
+    authenticator->setUser(user);
+    authenticator->setPassword(password);
 }
 
 #ifdef QT_WEBKITWIDGETS_LIB
@@ -367,11 +369,14 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
             cleanAdvancedSettings();
         }
 
-        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), *advancedTreeWidget, *advancedLayout,
+        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), 
 #ifdef QT_WEBKITWIDGETS_LIB
             advancedWebView,
 #endif
-            this);
+            *advancedTreeWidget, *advancedLayout);
+        connect(m_widgetsRecreator, &CameraSettingsWidgetsTreeCreator::advancedParamChanged, this, &QnSingleCameraSettingsWidget::at_advancedParamChanged);
+        connect(m_widgetsRecreator, &CameraSettingsWidgetsTreeCreator::refreshAdvancedSettings, this, &QnSingleCameraSettingsWidget::refreshAdvancedSettings, Qt::QueuedConnection);
+
     }
     else if (m_widgetsRecreator)
     {
@@ -383,12 +388,11 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
         cleanAdvancedSettings();
 
         //Dummy creator: required for cameras, that doesn't support advanced settings
-        //m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout, this);
-		m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout,
+		m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(),
 #ifdef QT_WEBKITWIDGETS_LIB
             advancedWebView,
 #endif
-            this);
+            *advancedTreeWidget, *advancedLayout);
     }
 
     return showOldSettings;
@@ -396,8 +400,11 @@ bool QnSingleCameraSettingsWidget::initAdvancedTab()
 
 void QnSingleCameraSettingsWidget::cleanAdvancedSettings()
 {
-    delete m_widgetsRecreator;
-    m_widgetsRecreator = 0;
+    if (m_widgetsRecreator) {
+        disconnect(m_widgetsRecreator, NULL, this, NULL);
+        delete m_widgetsRecreator;
+        m_widgetsRecreator = NULL;
+    }
     m_cameraSettings.clear();
 }
 
@@ -1234,8 +1241,7 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChange
     m_scheduleEnabledChanged = true;
 }
 
-void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)
-{
+void QnSingleCameraSettingsWidget::at_advancedParamChanged(const CameraSetting& val) {
     m_modifiedAdvancedParams.push_back(QPair<QString, QVariant>(val.getId(), QVariant(val.serializeToStr())));
     setAnyCameraChanges(true);
     at_cameraDataChanged();
