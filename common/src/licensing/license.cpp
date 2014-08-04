@@ -274,8 +274,13 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
     if (isEdgeBox && type() == Qn::LC_Edge) 
     {
         foreach(QnLicensePtr license, qnLicensePool->getLicenses()) {
-            if (license->hardwareId() == hardwareId() && license->type() == type() && license->key() < key())
-                return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed
+            if (license->hardwareId() == hardwareId() && license->type() == type()) 
+            {
+                if (mode == VM_CheckInfo && license->key() != key())
+                    return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed
+                else if (license->key() < key())
+                    return gotError(errCode, TooManyLicensesPerDevice); // Only single EDGE license per ARM device is allowed
+            }
         }
     }
 
