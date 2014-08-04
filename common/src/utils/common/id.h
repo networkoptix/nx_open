@@ -6,6 +6,7 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QUuid>
 #include <QtCore/QtEndian>
+#include <QtCore/QCryptographicHash>
 
 #include <common/common_globals.h>
 

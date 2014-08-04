@@ -188,6 +188,8 @@ void fromApiToResource(const ApiCameraData &src, QnVirtualCameraResourcePtr &dst
     dst->setVendor(src.vendor);
     dst->setMinDays(src.minArchiveDays);
     dst->setMaxDays(src.maxArchiveDays);
+    Q_ASSERT(dst->getId() == QnVirtualCameraResource::uniqueIdToId(dst->getUniqueId()));
+
 }
 
 
@@ -442,6 +444,8 @@ void fromResourceToApi(const QnLicensePtr &src, ApiLicenseData &dst) {
 
 void fromApiToResource(const ApiLicenseData &src, QnLicensePtr &dst) {
     dst->loadLicenseBlock(src.licenseBlock);
+    if (dst->key().isEmpty())
+        dst->setKey(src.key);
 }
 
 void fromResourceListToApi(const QnLicenseList &src, ApiLicenseDataList &dst) {

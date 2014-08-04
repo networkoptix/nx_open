@@ -145,6 +145,7 @@ QnResource::ConnectionRole QnLiveStreamProvider::roleForMotionEstimation()
             m_softMotionRole = QnResource::Role_LiveVideo;
         else
             m_softMotionRole = QnResource::Role_SecondaryLiveVideo;
+		updateSoftwareMotion();
     }
     return m_softMotionRole;
 }
@@ -395,10 +396,16 @@ void QnLiveStreamProvider::updateStreamResolution( int channelNumber, const QSiz
     }
 
     //no secondary stream and no motion, may be primary stream is now OK for motion?
-    if( newResolution.width()*newResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION )
-        m_cameraRes->setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
-    else
-        m_cameraRes->setCameraCapabilities( m_cameraRes->getCameraCapabilities() & ~Qn::PrimaryStreamSoftMotionCapability );
+    bool newValue = newResolution.width()*newResolution.height() <= MAX_PRIMARY_RES_FOR_SOFT_MOTION;
+    bool cameraValue = m_cameraRes->getCameraCapabilities() & Qn::PrimaryStreamSoftMotionCapability;
+    if (newValue != cameraValue) 
+    {
+        if( newValue)
+            m_cameraRes->setCameraCapability( Qn::PrimaryStreamSoftMotionCapability, true );
+        else
+            m_cameraRes->setCameraCapabilities( m_cameraRes->getCameraCapabilities() & ~Qn::PrimaryStreamSoftMotionCapability );
+        m_cameraRes->saveParams();
+    }
 
     m_softMotionRole = QnResource::Role_Default;    //it will be auto-detected on the next frame
 }

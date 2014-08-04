@@ -17,7 +17,7 @@ namespace ec2
     template<class QueryProcessorType>
     QnCameraManager<QueryProcessorType>::QnCameraManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
     :
-		QnCameraNotificationManager( resCtx ),
+        QnCameraNotificationManager( resCtx ),
         m_queryProcessor( queryProcessor )
     {
     }
@@ -29,9 +29,12 @@ namespace ec2
 
         //preparing output data
         QnVirtualCameraResourceList cameraList;
-		if (resource->getId().isNull()) {
-			resource->setId(QnId::createUuid());
-		}
+        Q_ASSERT_X(
+            resource->getId() == QnVirtualCameraResource::uniqueIdToId( resource->getUniqueId() ),
+            Q_FUNC_INFO,
+            "You must fill camera ID as md5 hash of unique id" );
+        if( resource->getId().isNull() )
+            resource->setId(QnId::createUuid());
         cameraList.push_back( resource );
 
         //performing request
@@ -59,15 +62,15 @@ namespace ec2
     {
         const int reqID = generateRequestID();
 
-		auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
-			QnVirtualCameraResourceList outData;
-			if( errorCode == ErrorCode::ok )
+        auto queryDoneHandler = [reqID, handler, this]( ErrorCode errorCode, const ApiCameraDataList& cameras) {
+            QnVirtualCameraResourceList outData;
+            if( errorCode == ErrorCode::ok )
                 fromApiToResourceList(cameras, outData, m_resCtx.resFactory);
-			handler->done( reqID, errorCode, outData);
-		};
-		m_queryProcessor->template processQueryAsync<QnId, ApiCameraDataList, decltype(queryDoneHandler)>
-			( ApiCommand::getCameras, mediaServerId, queryDoneHandler );
-		return reqID;
+            handler->done( reqID, errorCode, outData);
+        };
+        m_queryProcessor->template processQueryAsync<QnId, ApiCameraDataList, decltype(queryDoneHandler)>
+            ( ApiCommand::getCameras, mediaServerId, queryDoneHandler );
+        return reqID;
     }
 
     template<class QueryProcessorType>
@@ -164,7 +167,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnVirtualCameraResourcePtr& resource )
     {
-		QnTransaction<ApiCameraData> tran(command, true);
+        QnTransaction<ApiCameraData> tran(command);
         fromResourceToApi(resource, tran.params);
         return tran;
     }
@@ -174,7 +177,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnVirtualCameraResourceList& cameras )
     {
-        QnTransaction<ApiCameraDataList> tran(command, true);
+        QnTransaction<ApiCameraDataList> tran(command);
         fromResourceListToApi(cameras, tran.params);
         return tran;
     }
@@ -184,7 +187,7 @@ namespace ec2
         ApiCommand::Value command,
         const QnCameraHistoryItem& historyItem )
     {
-        QnTransaction<ApiCameraServerItemData> tran(command, true);
+        QnTransaction<ApiCameraServerItemData> tran(command);
         fromResourceToApi(historyItem, tran.params);
         return tran;
     }
@@ -192,7 +195,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiIdData> QnCameraManager<T>::prepareTransaction( ApiCommand::Value command, const QnId& id )
     {
-        QnTransaction<ApiIdData> tran(command, true);
+        QnTransaction<ApiIdData> tran(command);
         tran.params.id = id;
         return tran;
     }
@@ -201,7 +204,7 @@ namespace ec2
     template<class T>
     QnTransaction<ApiCameraBookmarkTagDataList> QnCameraManager<T>::prepareTransaction(ApiCommand::Value command, const QnCameraBookmarkTags& tags)
     {
-        QnTransaction<ApiCameraBookmarkTagDataList> tran(command, true);
+        QnTransaction<ApiCameraBookmarkTagDataList> tran(command);
         fromResourceToApi(tags, tran.params);
         return tran;
     }

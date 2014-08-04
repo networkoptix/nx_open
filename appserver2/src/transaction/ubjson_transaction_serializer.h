@@ -1,6 +1,8 @@
 #ifndef __UBJSON_TRANSACTION_SERIALIZER_H_
 #define __UBJSON_TRANSACTION_SERIALIZER_H_
 
+#include <memory>
+
 #include <QtCore/QCache>
 
 #include <transaction/transaction.h>
@@ -17,7 +19,13 @@ namespace ec2
     class QnUbjsonTransactionSerializer: public Singleton<QnUbjsonTransactionSerializer>
     {
     public:
-        QnUbjsonTransactionSerializer() {}
+        static const int MAX_CACHE_SIZE_BYTES = 1*1024*1024;
+
+        QnUbjsonTransactionSerializer()
+        :
+            m_cache(MAX_CACHE_SIZE_BYTES)
+        {
+        }
 
         template<class T>
         QByteArray serializedTransaction(const QnTransaction<T>& tran) {
@@ -25,15 +33,18 @@ namespace ec2
             Q_UNUSED(lock);
 
             // do not cache read-only transactions (they have sequence == 0)
-            if (tran.id.sequence > 0 && m_cache.contains(tran.id))
-                return *m_cache[tran.id];
+            if (!tran.persistentInfo.isNull() && m_cache.contains(tran.persistentInfo))
+                return *m_cache[tran.persistentInfo];
 
-            QByteArray* result = new QByteArray();
-            QnUbjsonWriter<QByteArray> stream(result);
+            std::unique_ptr<QByteArray> serializedTran( new QByteArray() );
+            QnUbjsonWriter<QByteArray> stream(serializedTran.get());
             QnUbjson::serialize( tran, &stream );
-            m_cache.insert(tran.id, result);
+            QByteArray result = *serializedTran;
+            if (!tran.persistentInfo.isNull())
+                if( m_cache.insert(tran.persistentInfo, serializedTran.get(), serializedTran->size()) )
+                    serializedTran.release();
 
-            return *result;
+            return result;
         }
 
         template<class T>
@@ -50,7 +61,7 @@ namespace ec2
         static bool deserializeTran(const quint8* chunkPayload, int len,  QnTransactionTransportHeader& transportHeader, QByteArray& tranData);
     private:
         mutable QMutex m_mutex;
-        QCache<QnAbstractTransaction::ID, QByteArray> m_cache;
+        QCache<QnAbstractTransaction::PersistentInfo, QByteArray> m_cache;
     };
 
 }

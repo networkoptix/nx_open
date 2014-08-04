@@ -32,6 +32,7 @@ public:
     void loadFromResource(const QnVideoWallResourcePtr &videowall);
     void submitToResource(const QnVideoWallResourcePtr &videowall); 
 
+    virtual QSize minimumSizeHint() const;
 protected:
     Q_DECLARE_PRIVATE(QnVideowallManageWidget);
 

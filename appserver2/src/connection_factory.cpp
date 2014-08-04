@@ -12,7 +12,9 @@
 #include <network/authenticate_helper.h>
 #include <network/universal_tcp_listener.h>
 #include <utils/common/concurrent.h>
+#include <utils/network/simple_http_client.h>
 
+#include "compatibility/old_ec_connection.h"
 #include "ec2_connection.h"
 #include "ec2_thread_pool.h"
 #include "remote_ec_connection.h"
@@ -28,6 +30,9 @@
 namespace ec2
 {
     Ec2DirectConnectionFactory::Ec2DirectConnectionFactory()
+    :
+        m_terminated( false ),
+        m_runningRequests( 0 )
     {
         srand( ::time(NULL) );
 
@@ -44,8 +49,28 @@ namespace ec2
 
     Ec2DirectConnectionFactory::~Ec2DirectConnectionFactory()
     {
+        pleaseStop();
+        join();
+
         m_directConnection.reset();
         ec2::QnTransactionMessageBus::initStaticInstance(0);
+    }
+
+    void Ec2DirectConnectionFactory::pleaseStop()
+    {
+        QMutexLocker lk( &m_mutex );
+        m_terminated = true;
+    }
+
+    void Ec2DirectConnectionFactory::join()
+    {
+        QMutexLocker lk( &m_mutex );
+        while( m_runningRequests > 0 )
+        {
+            lk.unlock();
+            QThread::msleep( 1000 );
+            lk.relock();
+        }
     }
 
     //!Implementation of AbstractECConnectionFactory::testConnectionAsync
@@ -114,8 +139,8 @@ namespace ec2
 
         //AbstractCameraManager::getBookmarkTags
 
-        //TODO AbstractLicenseManager
         registerUpdateFuncHandler<ApiLicenseDataList>( restProcessorPool, ApiCommand::addLicenses );
+        registerUpdateFuncHandler<ApiLicenseData>( restProcessorPool, ApiCommand::removeLicense );
 
 
         //AbstractBusinessEventManager::getBusinessRules
@@ -223,18 +248,85 @@ namespace ec2
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();
         loginInfo.passwordHash = QnAuthHelper::createUserPasswordDigest( loginInfo.login, addr.password() );
+        {
+            QMutexLocker lk( &m_mutex );
+            if( m_terminated )
+                return INVALID_REQ_ID;
+            ++m_runningRequests;
+        }
 #if 1
         auto func = [this, reqID, addr, handler]( ErrorCode errorCode, const QnConnectionInfo& connectionInfo ) {
             remoteConnectionFinished(reqID, errorCode, connectionInfo, addr, handler); };
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
             addr, ApiCommand::connect, loginInfo, func );
 #else
-        //TODO: #ak investigate, what's wrong with following code
+        //TODO: #ak following does not compile due to msvc2012 restriction: no more than 6 arguments to std::bind
         using namespace std::placeholders;
         m_remoteQueryProcessor.processQueryAsync<ApiLoginData, QnConnectionInfo>(
-            ApiCommand::connect, loginInfo, std::bind(&Ec2DirectConnectionFactory::remoteConnectionFinished, this, _1, _2) );
+            addr, ApiCommand::connect, loginInfo, std::bind(&Ec2DirectConnectionFactory::remoteConnectionFinished, this, reqID, _1, _2, addr, handler) );
 #endif
         return reqID;
+    }
+
+    const char oldEcConnectPath[] = "/api/connect/?format=pb&guid&ping=1";
+
+    static bool parseOldECConnectionInfo(const QByteArray& oldECConnectResponse, QnConnectionInfo* const connectionInfo)
+    {
+        static const char PROTOBUF_FIELD_TYPE_STRING = 0x0a;
+
+        if( oldECConnectResponse.isEmpty() )
+            return false;
+
+        const char* data = oldECConnectResponse.data();
+        const char* dataEnd = oldECConnectResponse.data() + oldECConnectResponse.size();
+        if( data + 2 >= dataEnd )
+            return false;
+        if( *data != PROTOBUF_FIELD_TYPE_STRING )
+            return false;
+        ++data;
+        const int fieldLen = *data;
+        ++data;
+        if( data + fieldLen >= dataEnd )
+            return false;
+        connectionInfo->version = QnSoftwareVersion(QByteArray(data, fieldLen));
+        return true;
+    }
+
+    template<class Handler>
+    void Ec2DirectConnectionFactory::connectToOldEC( const QUrl& ecURL, Handler completionFunc )
+    {
+        QAuthenticator auth;
+        auth.setUser(ecURL.userName());
+        auth.setPassword(ecURL.password());
+        CLSimpleHTTPClient simpleHttpClient(ecURL, 3000, auth);
+        const CLHttpStatus statusCode = simpleHttpClient.doGET(QByteArray::fromRawData(oldEcConnectPath, sizeof(oldEcConnectPath)));
+        switch( statusCode )
+        {
+            case CL_HTTP_SUCCESS:
+            {
+                //reading mesasge body
+                QByteArray oldECResponse;
+                simpleHttpClient.readAll(oldECResponse);
+                QnConnectionInfo oldECConnectionInfo;
+                oldECConnectionInfo.ecUrl = ecURL;
+                if( parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo) )
+                    completionFunc(ErrorCode::ok, oldECConnectionInfo);
+                else
+                    completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
+                break;
+            }
+
+            case CL_HTTP_AUTH_REQUIRED:
+                completionFunc(ErrorCode::unauthorized, QnConnectionInfo());
+                break;
+
+            default:
+                completionFunc(ErrorCode::ioError, QnConnectionInfo());
+                break;
+        }
+
+        QMutexLocker lk( &m_mutex );
+        --m_runningRequests;
     }
 
     void Ec2DirectConnectionFactory::remoteConnectionFinished(
@@ -242,31 +334,66 @@ namespace ec2
         ErrorCode errorCode,
         const QnConnectionInfo& connectionInfo,
         const QUrl& ecURL,
-        impl::ConnectHandlerPtr handler )
+        impl::ConnectHandlerPtr handler)
     {
         if( errorCode != ErrorCode::ok )
-            return handler->done( reqID, errorCode, AbstractECConnectionPtr() );
-        QnConnectionInfo connectionInfoCopy( connectionInfo );
+        {
+            //checking for old EC
+            QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
+            QnConcurrent::run(
+                Ec2ThreadPool::instance(),
+                [this, ecURL, handler, reqID]() {
+                    using namespace std::placeholders;
+                    return connectToOldEC(
+                        ecURL,
+                        [reqID, handler](ErrorCode errorCode, const QnConnectionInfo& oldECConnectionInfo) {
+                            handler->done(reqID, errorCode, std::make_shared<OldEcConnection>(oldECConnectionInfo));
+                        }
+                    );
+                }
+            );
+            return;
+        }
+        QnConnectionInfo connectionInfoCopy(connectionInfo);
         connectionInfoCopy.ecUrl = ecURL;
 
         AbstractECConnectionPtr connection(new RemoteEC2Connection(
             std::make_shared<FixedUrlClientQueryProcessor>(&m_remoteQueryProcessor, ecURL),
             m_resCtx,
-            connectionInfoCopy ));
-        return handler->done(
+            connectionInfoCopy));
+        handler->done(
             reqID,
             errorCode,
-            connection );
+            connection);
+
+        QMutexLocker lk( &m_mutex );
+        --m_runningRequests;
     }
 
     void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
         int reqID,
         ErrorCode errorCode,
         const QnConnectionInfo& connectionInfo,
-        const QUrl& /*ecURL*/,
+        const QUrl& ecURL,
         impl::TestConnectionHandlerPtr handler )
     {
-        return handler->done( reqID, errorCode, connectionInfo );
+        if( errorCode == ErrorCode::ok )
+        {
+            handler->done( reqID, errorCode, connectionInfo );
+            QMutexLocker lk( &m_mutex );
+            --m_runningRequests;
+            return;
+        }
+
+        //checking for old EC
+        QnScopedThreadRollback ensureFreeThread(1, Ec2ThreadPool::instance());
+        QnConcurrent::run(
+            Ec2ThreadPool::instance(),
+            [this, ecURL, handler, reqID]() {
+                using namespace std::placeholders;
+                connectToOldEC(ecURL, std::bind(&impl::TestConnectionHandler::done, handler, reqID, _1, _2));
+            }
+        );
     }
 
     ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
@@ -295,6 +422,13 @@ namespace ec2
     int Ec2DirectConnectionFactory::testRemoteConnection( const QUrl& addr, impl::TestConnectionHandlerPtr handler )
     {
         const int reqID = generateRequestID();
+
+        {
+            QMutexLocker lk( &m_mutex );
+            if( m_terminated )
+                return INVALID_REQ_ID;
+            ++m_runningRequests;
+        }
 
         ApiLoginData loginInfo;
         loginInfo.login = addr.userName();

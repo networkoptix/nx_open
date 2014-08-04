@@ -14,7 +14,7 @@ namespace ec2
 
     struct ApiRuntimeData: ApiData
     {
-        ApiRuntimeData(): ApiData(), prematureLicenseExperationDate(0), version(0) {}
+        ApiRuntimeData(): ApiData(), prematureLicenseExperationDate(0) {}
         bool operator==(const ApiRuntimeData& other) const {
             return peer == other.peer &&
                    platform == other.platform &&
@@ -37,11 +37,9 @@ namespace ec2
 
         QList<QByteArray> mainHardwareIds;
         QList<QByteArray> compatibleHardwareIds;
-
-        int version;
     };
 
-#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)(videoWallInstanceGuid)(mainHardwareIds)(compatibleHardwareIds)(version)
+#define ApiRuntimeData_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)(videoWallInstanceGuid)(mainHardwareIds)(compatibleHardwareIds)
 
 
 } // namespace ec2

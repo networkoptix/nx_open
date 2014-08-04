@@ -141,7 +141,7 @@ void QnGlobalMonitor::setUpdatePeriod(qint64 updatePeriod) {
     d->restartTimersLocked();
 }
 
-static const size_t STATISTICS_LOGGING_PERIOD_MS = 10 * 60 * 1000;
+static const int STATISTICS_LOGGING_PERIOD_MS = 10 * 60 * 1000;
 
 qreal QnGlobalMonitor::totalCpuUsage() {
     Q_D(QnGlobalMonitor);

@@ -70,6 +70,7 @@
 #include <plugins/resource/iqinvision/iqinvision_resource_searcher.h>
 #include <plugins/resource/isd/isd_resource_searcher.h>
 #include <plugins/resource/mserver_resource_searcher.h>
+#include <plugins/resource/mdns/mdns_listener.h>
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 #include <plugins/resource/pulse/pulse_resource_searcher.h>
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
@@ -656,7 +657,7 @@ void initAppServerConnection(QSettings &settings)
         QString staticDBPath = settings.value("staticDataDir").toString();
         if (!staticDBPath.isEmpty()) {
             params.addQueryItem("staticdb_path", staticDBPath);
-    }
+		}
     }
 
     // TODO: Actually appserverPassword is always empty. Remove?
@@ -748,7 +749,6 @@ void QnMain::stopObjects()
         delete m_moduleFinder;
         m_moduleFinder = 0;
     }
-
 }
 
 static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
@@ -1175,7 +1175,6 @@ void QnMain::run()
     int guidCompatibility = 0;
     runtimeData.mainHardwareIds = LLUtil::getMainHardwareIds(guidCompatibility);
     runtimeData.compatibleHardwareIds = LLUtil::getCompatibleHardwareIds(guidCompatibility);
-    runtimeData.version = 1;
     QnRuntimeInfoManager::instance()->items()->addItem(runtimeData);    // initializing localInfo
 
     ec2::ResourceContext resCtx(
@@ -1224,7 +1223,6 @@ void QnMain::run()
     if (!publicIP.isEmpty()) {
         QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
     	localInfo.data.publicIP = publicIP;
-        localInfo.data.version++;
         QnRuntimeInfoManager::instance()->items()->updateItem(localInfo.uuid, localInfo);
     }
 
@@ -1425,10 +1423,13 @@ void QnMain::run()
 
 
     //===========================================================================
-    //IPPH264Decoder::dll.init();
+    QnResource::initAsyncPoolInstance()->setMaxThreadCount( MSSettings::roSettings()->value(
+        nx_ms_conf::RESOURCE_INIT_THREADS_COUNT,
+        nx_ms_conf::DEFAULT_RESOURCE_INIT_THREADS_COUNT ).toInt() );
 
     //============================
-    UPNPDeviceSearcher::initGlobalInstance( new UPNPDeviceSearcher() );
+    std::unique_ptr<UPNPDeviceSearcher> upnpDeviceSearcher(new UPNPDeviceSearcher());
+    std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
     serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
@@ -1592,8 +1593,8 @@ void QnMain::run()
     QnPlVmax480ResourceSearcher::initStaticInstance( NULL );
 #endif
 
-    delete UPNPDeviceSearcher::instance();
-    UPNPDeviceSearcher::initGlobalInstance( NULL );
+    mdnsListener.reset();
+    upnpDeviceSearcher.reset();
 
     connectorThread->quit();
     connectorThread->wait();
@@ -1640,9 +1641,8 @@ void QnMain::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo)
     if (runtimeInfo.uuid != qnCommon->moduleGUID())
         return;
     
-    ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged, false);
+    ec2::QnTransaction<ec2::ApiRuntimeData> tran(ec2::ApiCommand::runtimeInfoChanged);
     tran.params = runtimeInfo.data;
-    tran.fillSequence();
     ec2::qnTransactionBus->sendTransaction(tran);
 }
 

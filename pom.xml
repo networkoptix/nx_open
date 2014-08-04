@@ -95,7 +95,8 @@
         <qtlib16>Qml</qtlib16>
         <qtlib17>Positioning</qtlib17>
         <qtlib18>Sensors</qtlib18>
-        <qtlib19/>
+        <!--qtlib19 is for desktop only-->
+	<qtlib19/>
         <qtlib20/>
 
         <!--QT plugins used-->      
@@ -282,6 +283,9 @@
                     <value>!arm</value>
                 </property>
             </activation>
+            <properties>
+		<qtlib19>DBus</qtlib19>
+	    </properties>
             <modules>                       
                 <module>applauncher</module> 
                 <module>client</module>     
