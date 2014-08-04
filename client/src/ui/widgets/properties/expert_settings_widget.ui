@@ -272,48 +272,6 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_6">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>16</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Stream for software motion:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBoxMotionStream">
-           <item>
-            <property name="text">
-             <string>Auto</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Primary</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Secondary</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item>
           <spacer name="horizontalSpacer_5">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -401,6 +359,7 @@
   </layout>
  </widget>
  <resources>
+  <include location="../../../../x64/build/client.qrc"/>
   <include location="../../../../x64/build/client.qrc"/>
   <include location="../../../../x64/build/client.qrc"/>
   <include location="../../../../x64/build/client.qrc"/>
