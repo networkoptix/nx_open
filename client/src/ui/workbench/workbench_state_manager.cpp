@@ -31,7 +31,8 @@ bool QnWorkbenchStateManager::tryClose(bool force) {
         if (!d->tryClose(force))
             return false;
 
-    if (canSaveState) {
+    /* Server can be stopped while tryClose(false) was in progress because it produces confirmation dialogs. */
+    if (canSaveState && context()->user()) {
         QnWorkbenchStateHash states = qnSettings->userWorkbenchStates();
         states[context()->user()->getName()] = state;
         qnSettings->setUserWorkbenchStates(states);

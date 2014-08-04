@@ -357,15 +357,20 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnLayoutResourceList &resourc
             false
         );
 
-        if(button == QDialogButtonBox::Cancel) {
+        switch (button) {
+        case QDialogButtonBox::NoButton:
+        case QDialogButtonBox::Cancel:
             closeAll = false;
             saveAll = false;
-        } else if(button == QDialogButtonBox::No) {
+            break;
+        case QDialogButtonBox::No:
             closeAll = true;
             saveAll = false;
-        } else {
+            break;
+        default:
             closeAll = true;
             saveAll = true;
+            break;
         }
     }
 
