@@ -25,6 +25,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/style/globals.h>
 #include <ui/widgets/framed_label.h>
+#include <ui/workbench/workbench_context.h>
 
 #include <utils/threaded_image_loader.h>
 #include <utils/app_server_image_cache.h>
@@ -494,13 +495,23 @@ void QnLayoutSettingsDialog::selectFile() {
     }
     nameFilter = QLatin1Char('(') + nameFilter + QLatin1Char(')');
 
-    QString fileName = QnFileDialog::getOpenFileName(this,
-                                 tr("Open file"),
-                                 qnSettings->backgroundsFolder(),
-                                 tr("Pictures %1").arg(nameFilter),
-                                 0,
-                                 QnCustomFileDialog::fileDialogOptions());
+    QScopedPointer<QnCustomFileDialog> dialog(
+        new QnWorkbenchStateDependentDialog<QnCustomFileDialog> (
+            this, tr("Select file..."),
+            qnSettings->backgroundsFolder(),
+            tr("Pictures %1").arg(nameFilter)
+            )
+        );
+    dialog->setFileMode(QFileDialog::ExistingFile);
 
+    if(!dialog->exec())
+        return;
+
+    /* Check if we were disconnected (server shut down) while the dialog was open. */
+    if (!context()->user())
+        return;
+
+    QString fileName = dialog->selectedFile();
     if (fileName.isEmpty())
         return;
 
