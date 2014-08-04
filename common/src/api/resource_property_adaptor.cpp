@@ -163,7 +163,7 @@ bool QnAbstractResourcePropertyAdaptor::loadValueLocked(const QString &serialize
         return false;
 
     m_serializedValue = serializedValue;
-    if(!m_handler->deserialize(m_serializedValue, &m_value))
+    if(m_serializedValue.isEmpty() || !m_handler->deserialize(m_serializedValue, &m_value))
         m_value = QVariant();
 
     return true;

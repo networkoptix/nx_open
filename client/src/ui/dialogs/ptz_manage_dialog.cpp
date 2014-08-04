@@ -660,7 +660,7 @@ void QnPtzManageDialog::updateHotkeys() {
 }
 
 bool QnPtzManageDialog::tryClose(bool force) {
-    if (!isModified() || force) {
+    if (!isModified() || force || isHidden()) {
         if (force)
             hide();
         return true;

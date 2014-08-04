@@ -436,7 +436,7 @@ void QnBusinessRulesDialog::setAdvancedMode(bool value) {
 }
 
 bool QnBusinessRulesDialog::tryClose(bool force) {
-    if (force) {
+    if (force || isHidden()) {
         m_rulesViewModel->reset();
         hide();
         return true;

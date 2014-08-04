@@ -126,7 +126,7 @@ bool QnGenericTabbedDialog::tryClose(bool force) {
         return true;
     }
 
-    if (!hasChanges())
+    if (isHidden() || !hasChanges())
         return true;
 
     QMessageBox::StandardButton btn =  QMessageBox::question(this,
